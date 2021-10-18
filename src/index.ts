@@ -5,8 +5,9 @@ const FEEDER_GATEWAY_URL: string = `${API_URL}/feeder_gateway`;
 const GATEWAY_URL: string = `${API_URL}/gateway`;
 
 /**
+ * Gets the smart contract address on the goerli testnet.
  * https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L13-L15
- * @returns
+ * @returns starknet smart contract address
  */
 export function getContractAddresses(): Promise<object> {
   return new Promise((resolve, reject) => {
@@ -20,10 +21,11 @@ export function getContractAddresses(): Promise<object> {
 }
 
 /**
+ * Calls a function on the StarkNet contract.
  * https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L17-L25
- * @param invokeTx
+ * @param invokeTx - transaction to be invoked (WIP)
  * @param blockId
- * @returns
+ * @returns the result of the function on the smart contract.
  */
 export function callContract(invokeTx: object, blockId: number): Promise<object> {
   return new Promise((resolve, reject) => {
@@ -37,9 +39,10 @@ export function callContract(invokeTx: object, blockId: number): Promise<object>
 }
 
 /**
+ * Gets the block information from a block ID.
  * https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L27-L31
  * @param blockId
- * @returns
+ * @returns the block object { block_id, previous_block_id, state_root, status, timestamp, transaction_receipts, transactions }
  */
 export function getBlock(blockId: number): Promise<object> {
   return new Promise((resolve, reject) => {
@@ -53,10 +56,11 @@ export function getBlock(blockId: number): Promise<object> {
 }
 
 /**
+ * Gets the code of the deployed contract.
  * https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L33-L36
  * @param contractAddress
  * @param blockId
- * @returns
+ * @returns ABI of compiled contract in JSON
  */
 export function getCode(contractAddress: string, blockId: number): Promise<object> {
   return new Promise((resolve, reject) => {
@@ -70,11 +74,12 @@ export function getCode(contractAddress: string, blockId: number): Promise<objec
 }
 
 /**
+ * Gets the contract's storage variable at a specific key.
  * https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L38-L46
  * @param contractAddress
- * @param key
+ * @param key - from getStorageVarAddress('<STORAGE_VARIABLE_NAME>') (WIP)
  * @param blockId
- * @returns
+ * @returns the value of the storage variable
  */
 export function getStorageAt(
   contractAddress: string,
@@ -94,9 +99,10 @@ export function getStorageAt(
 }
 
 /**
+ * Gets the status of a transaction.
  * https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L48-L52
  * @param txId
- * @returns
+ * @returns the transaction status object { block_id, tx_status: NOT_RECEIVED | RECEIVED | PENDING | REJECTED | ACCEPTED_ONCHAIN }
  */
 export function getTransactionStatus(txId: number): Promise<object> {
   return new Promise((resolve, reject) => {
@@ -110,9 +116,10 @@ export function getTransactionStatus(txId: number): Promise<object> {
 }
 
 /**
+ * Gets the transaction information from a tx id.
  * https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L54-L58
  * @param txId
- * @returns
+ * @returns the transacton object { transaction_id, status, transaction, block_id?, block_number?, transaction_index?, transaction_failure_reason? }
  */
 export function getTransaction(txId: number): Promise<object> {
   return new Promise((resolve, reject) => {
@@ -126,9 +133,10 @@ export function getTransaction(txId: number): Promise<object> {
 }
 
 /**
+ * Invoke a function on the starknet contract
  * https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/gateway/gateway_client.py#L13-L17
- * @param tx
- * @returns
+ * @param tx - transaction to be invoked (WIP)
+ * @returns a confirmation of invoking a function on the starknet contract
  */
 export function addTransaction(tx: object): Promise<object> {
   return new Promise((resolve, reject) => {
