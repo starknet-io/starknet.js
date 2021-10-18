@@ -1,3 +1,3 @@
-## StarkNet.js Docs
+## Starknet.js Docs
 
 - [Home](../wiki/Home)

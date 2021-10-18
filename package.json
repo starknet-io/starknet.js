@@ -9,7 +9,7 @@
     "build": "tsc",
     "test": "jest",
     "test:watch": "jest --watch",
-    "docs": "typedoc --theme ./node_modules/typedoc-github-wiki-theme/dist --readme none --name 'StarkNet.js Docs' --excludeNotDocumented"
+    "docs": "typedoc --theme ./node_modules/typedoc-github-wiki-theme/dist --readme none --name 'Starknet.js Docs' --excludeNotDocumented"
   },
   "keywords": [
     "starknet",
