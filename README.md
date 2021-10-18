@@ -22,7 +22,7 @@ Install the starknet with `npm`
 ```bash
 $ npm install starknet
 ```
-Import `starknet` and use the [API](https://github.com/seanjameshan/starknet.js/blob/main/docs)
+Import `starknet` and use the [API](https://github.com/seanjameshan/starknet.js/blob/main/docs/Home.md)
 ```javascript
 import starknet from 'starknet';
 
