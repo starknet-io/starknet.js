@@ -27,8 +27,8 @@ Import `starknet` and use the [API](https://github.com/seanjameshan/starknet.js/
 import starknet from 'starknet';
 
 starknet.getContractAddresses().then((data) => {
-	console.log(data)
-})
+  console.log(data);
+});
 ```
 
 ## 🌐 API
