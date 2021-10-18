@@ -7,7 +7,7 @@ const GATEWAY_URL: string = `${API_URL}/gateway`;
 /**
  * Gets the smart contract address on the goerli testnet.
  *
- * https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L13-L15
+ * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L13-L15)
  * @returns starknet smart contract address
  */
 export function getContractAddresses(): Promise<object> {

@@ -37,7 +37,7 @@ a confirmation of invoking a function on the starknet contract
 
 #### Defined in
 
-[index.ts:156](https://github.com/seanjameshan/starknet.js/blob/d6a7faf/src/index.ts#L156)
+[index.ts:156](https://github.com/seanjameshan/starknet.js/blob/8e7389f/src/index.ts#L156)
 
 ___
 
@@ -64,7 +64,7 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[index.ts:33](https://github.com/seanjameshan/starknet.js/blob/d6a7faf/src/index.ts#L33)
+[index.ts:33](https://github.com/seanjameshan/starknet.js/blob/8e7389f/src/index.ts#L33)
 
 ___
 
@@ -90,7 +90,7 @@ the block object { block_id, previous_block_id, state_root, status, timestamp, t
 
 #### Defined in
 
-[index.ts:52](https://github.com/seanjameshan/starknet.js/blob/d6a7faf/src/index.ts#L52)
+[index.ts:52](https://github.com/seanjameshan/starknet.js/blob/8e7389f/src/index.ts#L52)
 
 ___
 
@@ -117,7 +117,7 @@ ABI of compiled contract in JSON
 
 #### Defined in
 
-[index.ts:72](https://github.com/seanjameshan/starknet.js/blob/d6a7faf/src/index.ts#L72)
+[index.ts:72](https://github.com/seanjameshan/starknet.js/blob/8e7389f/src/index.ts#L72)
 
 ___
 
@@ -127,7 +127,7 @@ ___
 
 Gets the smart contract address on the goerli testnet.
 
-https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L13-L15
+[Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L13-L15)
 
 #### Returns
 
@@ -137,7 +137,7 @@ starknet smart contract address
 
 #### Defined in
 
-[index.ts:13](https://github.com/seanjameshan/starknet.js/blob/d6a7faf/src/index.ts#L13)
+[index.ts:13](https://github.com/seanjameshan/starknet.js/blob/8e7389f/src/index.ts#L13)
 
 ___
 
@@ -165,7 +165,7 @@ the value of the storage variable
 
 #### Defined in
 
-[index.ts:93](https://github.com/seanjameshan/starknet.js/blob/d6a7faf/src/index.ts#L93)
+[index.ts:93](https://github.com/seanjameshan/starknet.js/blob/8e7389f/src/index.ts#L93)
 
 ___
 
@@ -191,7 +191,7 @@ the transacton object { transaction_id, status, transaction, block_id?, block_nu
 
 #### Defined in
 
-[index.ts:137](https://github.com/seanjameshan/starknet.js/blob/d6a7faf/src/index.ts#L137)
+[index.ts:137](https://github.com/seanjameshan/starknet.js/blob/8e7389f/src/index.ts#L137)
 
 ___
 
@@ -217,4 +217,4 @@ the transaction status object { block_id, tx_status: NOT_RECEIVED | RECEIVED | P
 
 #### Defined in
 
-[index.ts:118](https://github.com/seanjameshan/starknet.js/blob/d6a7faf/src/index.ts#L118)
+[index.ts:118](https://github.com/seanjameshan/starknet.js/blob/8e7389f/src/index.ts#L118)
