@@ -1,4 +1,4 @@
-# starknet
+# StarkNet.js Docs
 
 ## Table of contents
 
@@ -59,7 +59,7 @@ a confirmation of invoking a function on the starknet contract
 
 #### Defined in
 
-[index.ts:141](https://github.com/seanjameshan/starknet.js/blob/9e4616f/src/index.ts#L141)
+[index.ts:141](https://github.com/seanjameshan/starknet.js/blob/898c23a/src/index.ts#L141)
 
 ___
 
@@ -85,7 +85,7 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[index.ts:30](https://github.com/seanjameshan/starknet.js/blob/9e4616f/src/index.ts#L30)
+[index.ts:30](https://github.com/seanjameshan/starknet.js/blob/898c23a/src/index.ts#L30)
 
 ___
 
@@ -110,7 +110,7 @@ the block object { block_id, previous_block_id, state_root, status, timestamp, t
 
 #### Defined in
 
-[index.ts:47](https://github.com/seanjameshan/starknet.js/blob/9e4616f/src/index.ts#L47)
+[index.ts:47](https://github.com/seanjameshan/starknet.js/blob/898c23a/src/index.ts#L47)
 
 ___
 
@@ -136,7 +136,7 @@ ABI of compiled contract in JSON
 
 #### Defined in
 
-[index.ts:65](https://github.com/seanjameshan/starknet.js/blob/9e4616f/src/index.ts#L65)
+[index.ts:65](https://github.com/seanjameshan/starknet.js/blob/898c23a/src/index.ts#L65)
 
 ___
 
@@ -155,7 +155,7 @@ starknet smart contract address
 
 #### Defined in
 
-[index.ts:12](https://github.com/seanjameshan/starknet.js/blob/9e4616f/src/index.ts#L12)
+[index.ts:12](https://github.com/seanjameshan/starknet.js/blob/898c23a/src/index.ts#L12)
 
 ___
 
@@ -182,7 +182,7 @@ the value of the storage variable
 
 #### Defined in
 
-[index.ts:84](https://github.com/seanjameshan/starknet.js/blob/9e4616f/src/index.ts#L84)
+[index.ts:84](https://github.com/seanjameshan/starknet.js/blob/898c23a/src/index.ts#L84)
 
 ___
 
@@ -207,7 +207,7 @@ the transacton object { transaction_id, status, transaction, block_id?, block_nu
 
 #### Defined in
 
-[index.ts:124](https://github.com/seanjameshan/starknet.js/blob/9e4616f/src/index.ts#L124)
+[index.ts:124](https://github.com/seanjameshan/starknet.js/blob/898c23a/src/index.ts#L124)
 
 ___
 
@@ -232,4 +232,4 @@ the transaction status object { block_id, tx_status: NOT_RECEIVED | RECEIVED | P
 
 #### Defined in
 
-[index.ts:107](https://github.com/seanjameshan/starknet.js/blob/9e4616f/src/index.ts#L107)
+[index.ts:107](https://github.com/seanjameshan/starknet.js/blob/898c23a/src/index.ts#L107)

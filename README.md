@@ -8,12 +8,13 @@
 
 <!-- primary badges -->
 <p align="center">
-  <img src='https://img.shields.io/github/package-json/v/seanjameshan/starknet.js?color=blue&label=npm&style=flat' />
+  <img src='https://img.shields.io/github/package-json/v/seanjameshan/starknet.js?label=npm' />
   <img src='https://img.shields.io/bundlephobia/minzip/starknet?color=success&label=size' />
-  <img src='https://img.shields.io/npm/dt/starknet?color=blueviolet' />
-  <img src='https://img.shields.io/github/stars/seanjameshan/starknet.js?style=social&color=%23FFB31A' />
-<img src="https://img.shields.io/badge/license-MIT-blue?style=flat-square">
-<img src="https://img.shields.io/badge/powered_by-StarkWare-navy?style=flat-square">
+  <!-- <img src='https://img.shields.io/npm/dt/starknet?color=blueviolet' /> -->
+  <img src="https://img.shields.io/badge/license-MIT-black">
+  <img src='https://img.shields.io/github/stars/seanjameshan/starknet.js?color=yellow' />
+  <img src='https://img.shields.io/github/followers/seanjameshan?color=red' />
+  <img src="https://img.shields.io/badge/powered_by-StarkWare-navy">
 </p>
 
 ## 🕹️ Usage
@@ -31,7 +32,7 @@ starknet.getContractAddresses().then((data) => {
 ```
 
 ## 🌐 API
-[Click Here](https://github.com/seanjameshan/starknet.js/blob/main/docs)
+[Click Here](https://github.com/seanjameshan/starknet.js/blob/main/docs/Home.md)
 
 ## License
 Copyright (c) 2021 Sean James Han
