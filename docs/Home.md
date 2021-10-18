@@ -2,10 +2,6 @@
 
 ## Table of contents
 
-### Properties
-
-- [default](../wiki/Home#default)
-
 ### Functions
 
 - [addTransaction](../wiki/Home#addtransaction)
@@ -17,25 +13,6 @@
 - [getTransaction](../wiki/Home#gettransaction)
 - [getTransactionStatus](../wiki/Home#gettransactionstatus)
 
-## Properties
-
-### default
-
-• **default**: `Object`
-
-#### Type declaration
-
-| Name | Type |
-| :------ | :------ |
-| `addTransaction` | (`tx`: `object`) => `Promise`<`object`\> |
-| `callContract` | (`invokeTx`: `object`, `blockId`: `number`) => `Promise`<`object`\> |
-| `getBlock` | (`blockId`: `number`) => `Promise`<`object`\> |
-| `getCode` | (`contractAddress`: `string`, `blockId`: `number`) => `Promise`<`object`\> |
-| `getContractAddresses` | () => `Promise`<`object`\> |
-| `getStorageAt` | (`contractAddress`: `string`, `key`: `number`, `blockId`: `number`) => `Promise`<`object`\> |
-| `getTransaction` | (`txId`: `number`) => `Promise`<`object`\> |
-| `getTransactionStatus` | (`txId`: `number`) => `Promise`<`object`\> |
-
 ## Functions
 
 ### addTransaction
@@ -43,7 +20,8 @@
 ▸ **addTransaction**(`tx`): `Promise`<`object`\>
 
 Invoke a function on the starknet contract
-https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/gateway/gateway_client.py#L13-L17
+
+[Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/gateway/gateway_client.py#L13-L17)
 
 #### Parameters
 
@@ -59,7 +37,7 @@ a confirmation of invoking a function on the starknet contract
 
 #### Defined in
 
-[index.ts:141](https://github.com/seanjameshan/starknet.js/blob/898c23a/src/index.ts#L141)
+[index.ts:156](https://github.com/seanjameshan/starknet.js/blob/85fd556/src/index.ts#L156)
 
 ___
 
@@ -68,7 +46,8 @@ ___
 ▸ **callContract**(`invokeTx`, `blockId`): `Promise`<`object`\>
 
 Calls a function on the StarkNet contract.
-https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L17-L25
+
+[Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L17-L25)
 
 #### Parameters
 
@@ -85,7 +64,7 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[index.ts:30](https://github.com/seanjameshan/starknet.js/blob/898c23a/src/index.ts#L30)
+[index.ts:33](https://github.com/seanjameshan/starknet.js/blob/85fd556/src/index.ts#L33)
 
 ___
 
@@ -94,7 +73,8 @@ ___
 ▸ **getBlock**(`blockId`): `Promise`<`object`\>
 
 Gets the block information from a block ID.
-https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L27-L31
+
+[Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L27-L31)
 
 #### Parameters
 
@@ -110,7 +90,7 @@ the block object { block_id, previous_block_id, state_root, status, timestamp, t
 
 #### Defined in
 
-[index.ts:47](https://github.com/seanjameshan/starknet.js/blob/898c23a/src/index.ts#L47)
+[index.ts:52](https://github.com/seanjameshan/starknet.js/blob/85fd556/src/index.ts#L52)
 
 ___
 
@@ -119,7 +99,8 @@ ___
 ▸ **getCode**(`contractAddress`, `blockId`): `Promise`<`object`\>
 
 Gets the code of the deployed contract.
-https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L33-L36
+
+[Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L33-L36)
 
 #### Parameters
 
@@ -136,7 +117,7 @@ ABI of compiled contract in JSON
 
 #### Defined in
 
-[index.ts:65](https://github.com/seanjameshan/starknet.js/blob/898c23a/src/index.ts#L65)
+[index.ts:72](https://github.com/seanjameshan/starknet.js/blob/85fd556/src/index.ts#L72)
 
 ___
 
@@ -145,6 +126,7 @@ ___
 ▸ **getContractAddresses**(): `Promise`<`object`\>
 
 Gets the smart contract address on the goerli testnet.
+
 https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L13-L15
 
 #### Returns
@@ -155,7 +137,7 @@ starknet smart contract address
 
 #### Defined in
 
-[index.ts:12](https://github.com/seanjameshan/starknet.js/blob/898c23a/src/index.ts#L12)
+[index.ts:13](https://github.com/seanjameshan/starknet.js/blob/85fd556/src/index.ts#L13)
 
 ___
 
@@ -164,7 +146,8 @@ ___
 ▸ **getStorageAt**(`contractAddress`, `key`, `blockId`): `Promise`<`object`\>
 
 Gets the contract's storage variable at a specific key.
-https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L38-L46
+
+[Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L38-L46)
 
 #### Parameters
 
@@ -182,7 +165,7 @@ the value of the storage variable
 
 #### Defined in
 
-[index.ts:84](https://github.com/seanjameshan/starknet.js/blob/898c23a/src/index.ts#L84)
+[index.ts:93](https://github.com/seanjameshan/starknet.js/blob/85fd556/src/index.ts#L93)
 
 ___
 
@@ -191,7 +174,8 @@ ___
 ▸ **getTransaction**(`txId`): `Promise`<`object`\>
 
 Gets the transaction information from a tx id.
-https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L54-L58
+
+[Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L54-L58)
 
 #### Parameters
 
@@ -207,7 +191,7 @@ the transacton object { transaction_id, status, transaction, block_id?, block_nu
 
 #### Defined in
 
-[index.ts:124](https://github.com/seanjameshan/starknet.js/blob/898c23a/src/index.ts#L124)
+[index.ts:137](https://github.com/seanjameshan/starknet.js/blob/85fd556/src/index.ts#L137)
 
 ___
 
@@ -216,7 +200,8 @@ ___
 ▸ **getTransactionStatus**(`txId`): `Promise`<`object`\>
 
 Gets the status of a transaction.
-https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L48-L52
+
+[Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L48-L52)
 
 #### Parameters
 
@@ -232,4 +217,4 @@ the transaction status object { block_id, tx_status: NOT_RECEIVED | RECEIVED | P
 
 #### Defined in
 
-[index.ts:107](https://github.com/seanjameshan/starknet.js/blob/898c23a/src/index.ts#L107)
+[index.ts:118](https://github.com/seanjameshan/starknet.js/blob/85fd556/src/index.ts#L118)
