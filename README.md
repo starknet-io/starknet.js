@@ -22,7 +22,7 @@ Install the starknet with `npm`
 ```bash
 $ npm install starknet
 ```
-Import `starknet` and use the [API](https://github.com/seanjameshan/starknet.js/blob/main/docs/Home.md)
+Import `starknet` and use the [API](https://github.com/seanjameshan/starknet.js/blob/main/docs)
 ```javascript
 import starknet from 'starknet';
 
@@ -32,7 +32,7 @@ starknet.getContractAddresses().then((data) => {
 ```
 
 ## 🌐 API
-[Click Here](https://github.com/seanjameshan/starknet.js/blob/main/docs/Home.md)
+[Click Here](https://github.com/seanjameshan/starknet.js/blob/main/docs)
 
 ## License
 Copyright (c) 2021 Sean James Han

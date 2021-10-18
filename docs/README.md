@@ -1,17 +1,19 @@
+StarkNet.js Docs
+
 # StarkNet.js Docs
 
 ## Table of contents
 
 ### Functions
 
-- [addTransaction](../wiki/Home#addtransaction)
-- [callContract](../wiki/Home#callcontract)
-- [getBlock](../wiki/Home#getblock)
-- [getCode](../wiki/Home#getcode)
-- [getContractAddresses](../wiki/Home#getcontractaddresses)
-- [getStorageAt](../wiki/Home#getstorageat)
-- [getTransaction](../wiki/Home#gettransaction)
-- [getTransactionStatus](../wiki/Home#gettransactionstatus)
+- [addTransaction](README.md#addtransaction)
+- [callContract](README.md#callcontract)
+- [getBlock](README.md#getblock)
+- [getCode](README.md#getcode)
+- [getContractAddresses](README.md#getcontractaddresses)
+- [getStorageAt](README.md#getstorageat)
+- [getTransaction](README.md#gettransaction)
+- [getTransactionStatus](README.md#gettransactionstatus)
 
 ## Functions
 
@@ -37,7 +39,7 @@ a confirmation of invoking a function on the starknet contract
 
 #### Defined in
 
-[index.ts:156](https://github.com/seanjameshan/starknet.js/blob/8e7389f/src/index.ts#L156)
+[index.ts:156](https://github.com/seanjameshan/starknet.js/blob/505f231/src/index.ts#L156)
 
 ___
 
@@ -64,7 +66,7 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[index.ts:33](https://github.com/seanjameshan/starknet.js/blob/8e7389f/src/index.ts#L33)
+[index.ts:33](https://github.com/seanjameshan/starknet.js/blob/505f231/src/index.ts#L33)
 
 ___
 
@@ -90,7 +92,7 @@ the block object { block_id, previous_block_id, state_root, status, timestamp, t
 
 #### Defined in
 
-[index.ts:52](https://github.com/seanjameshan/starknet.js/blob/8e7389f/src/index.ts#L52)
+[index.ts:52](https://github.com/seanjameshan/starknet.js/blob/505f231/src/index.ts#L52)
 
 ___
 
@@ -117,7 +119,7 @@ ABI of compiled contract in JSON
 
 #### Defined in
 
-[index.ts:72](https://github.com/seanjameshan/starknet.js/blob/8e7389f/src/index.ts#L72)
+[index.ts:72](https://github.com/seanjameshan/starknet.js/blob/505f231/src/index.ts#L72)
 
 ___
 
@@ -137,7 +139,7 @@ starknet smart contract address
 
 #### Defined in
 
-[index.ts:13](https://github.com/seanjameshan/starknet.js/blob/8e7389f/src/index.ts#L13)
+[index.ts:13](https://github.com/seanjameshan/starknet.js/blob/505f231/src/index.ts#L13)
 
 ___
 
@@ -165,7 +167,7 @@ the value of the storage variable
 
 #### Defined in
 
-[index.ts:93](https://github.com/seanjameshan/starknet.js/blob/8e7389f/src/index.ts#L93)
+[index.ts:93](https://github.com/seanjameshan/starknet.js/blob/505f231/src/index.ts#L93)
 
 ___
 
@@ -191,7 +193,7 @@ the transacton object { transaction_id, status, transaction, block_id?, block_nu
 
 #### Defined in
 
-[index.ts:137](https://github.com/seanjameshan/starknet.js/blob/8e7389f/src/index.ts#L137)
+[index.ts:137](https://github.com/seanjameshan/starknet.js/blob/505f231/src/index.ts#L137)
 
 ___
 
@@ -217,4 +219,4 @@ the transaction status object { block_id, tx_status: NOT_RECEIVED | RECEIVED | P
 
 #### Defined in
 
-[index.ts:118](https://github.com/seanjameshan/starknet.js/blob/8e7389f/src/index.ts#L118)
+[index.ts:118](https://github.com/seanjameshan/starknet.js/blob/505f231/src/index.ts#L118)
