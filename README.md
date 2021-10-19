@@ -18,7 +18,7 @@
 </p>
 
 ## 🕹️ Usage
-Install the starknet with `npm`
+Install starknet with `npm`
 ```bash
 $ npm install starknet
 ```
