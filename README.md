@@ -10,7 +10,7 @@
 <p align="center">
   <img src='https://img.shields.io/github/package-json/v/seanjameshan/starknet.js?label=npm' />
   <img src='https://img.shields.io/bundlephobia/minzip/starknet?color=success&label=size' />
-  <!-- <img src='https://img.shields.io/npm/dt/starknet?color=blueviolet' /> -->
+  <img src='https://img.shields.io/npm/dt/starknet?color=blueviolet' />
   <img src="https://img.shields.io/badge/license-MIT-black">
   <img src='https://img.shields.io/github/stars/seanjameshan/starknet.js?color=yellow' />
   <img src='https://img.shields.io/github/followers/seanjameshan?color=red' />
