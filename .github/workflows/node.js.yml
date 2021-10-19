@@ -37,4 +37,9 @@ jobs:
           git config user.name "Docs Bot"
           git add --force -- docs/README.md
           git commit -m "docs: add generated docs"
-          git push
+      - name: Push to git branch for PR
+        if: ${{ github.head_ref != '' }}
+        run: git push origin HEAD:${{ github.head_ref }}
+      - name: Push to git branch for branch
+        if: ${{ github.head_ref == '' }}
+        run: git push
