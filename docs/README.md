@@ -39,7 +39,7 @@ a confirmation of invoking a function on the starknet contract
 
 #### Defined in
 
-[index.ts:171](https://github.com/seanjameshan/starknet.js/blob/40a1d93/src/index.ts#L171)
+[index.ts:171](https://github.com/seanjameshan/starknet.js/blob/f7930c6/src/index.ts#L171)
 
 ___
 
@@ -66,7 +66,7 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[index.ts:42](https://github.com/seanjameshan/starknet.js/blob/40a1d93/src/index.ts#L42)
+[index.ts:42](https://github.com/seanjameshan/starknet.js/blob/f7930c6/src/index.ts#L42)
 
 ___
 
@@ -92,7 +92,7 @@ the block object { block_id, previous_block_id, state_root, status, timestamp, t
 
 #### Defined in
 
-[index.ts:61](https://github.com/seanjameshan/starknet.js/blob/40a1d93/src/index.ts#L61)
+[index.ts:61](https://github.com/seanjameshan/starknet.js/blob/f7930c6/src/index.ts#L61)
 
 ___
 
@@ -119,7 +119,7 @@ Bytecode and ABI of compiled contract
 
 #### Defined in
 
-[index.ts:81](https://github.com/seanjameshan/starknet.js/blob/40a1d93/src/index.ts#L81)
+[index.ts:81](https://github.com/seanjameshan/starknet.js/blob/f7930c6/src/index.ts#L81)
 
 ___
 
@@ -139,7 +139,7 @@ starknet smart contract addresses
 
 #### Defined in
 
-[index.ts:21](https://github.com/seanjameshan/starknet.js/blob/40a1d93/src/index.ts#L21)
+[index.ts:21](https://github.com/seanjameshan/starknet.js/blob/f7930c6/src/index.ts#L21)
 
 ___
 
@@ -167,7 +167,7 @@ the value of the storage variable
 
 #### Defined in
 
-[index.ts:105](https://github.com/seanjameshan/starknet.js/blob/40a1d93/src/index.ts#L105)
+[index.ts:105](https://github.com/seanjameshan/starknet.js/blob/f7930c6/src/index.ts#L105)
 
 ___
 
@@ -193,7 +193,7 @@ the transacton object { transaction_id, status, transaction, block_id?, block_nu
 
 #### Defined in
 
-[index.ts:151](https://github.com/seanjameshan/starknet.js/blob/40a1d93/src/index.ts#L151)
+[index.ts:151](https://github.com/seanjameshan/starknet.js/blob/f7930c6/src/index.ts#L151)
 
 ___
 
@@ -219,4 +219,4 @@ the transaction status object { block_id, tx_status: NOT_RECEIVED | RECEIVED | P
 
 #### Defined in
 
-[index.ts:130](https://github.com/seanjameshan/starknet.js/blob/40a1d93/src/index.ts#L130)
+[index.ts:130](https://github.com/seanjameshan/starknet.js/blob/f7930c6/src/index.ts#L130)
