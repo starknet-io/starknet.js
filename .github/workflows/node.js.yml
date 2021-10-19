@@ -35,13 +35,12 @@ jobs:
         run: |
           git config user.email "janek@argent.xyz"
           git config user.name "Docs Bot"
+          git pull
           git add --force -- docs/README.md
           git commit -m "docs: add generated docs"
       - name: Push to git branch for PR
         if: ${{ github.head_ref != '' }}
-        run: |
-          echo ${{ github.head_ref }}
-          git push origin ${{ github.head_ref }}
+        run: git push origin HEAD:${{ github.head_ref }}
       - name: Push to git branch for branch
         if: ${{ github.head_ref == '' }}
         run: git push
