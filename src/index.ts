@@ -1,5 +1,13 @@
 import axios from 'axios';
 
+import type {
+  GetBlockResponse,
+  GetCode,
+  GetContractAddressesResponse,
+  GetTransactionResponse,
+  GetTransactionStatusResponse,
+} from './index.d';
+
 const API_URL: string = 'https://alpha2.starknet.io/';
 const FEEDER_GATEWAY_URL: string = `${API_URL}/feeder_gateway`;
 const GATEWAY_URL: string = `${API_URL}/gateway`;
@@ -8,19 +16,20 @@ const GATEWAY_URL: string = `${API_URL}/gateway`;
  * Gets the smart contract address on the goerli testnet.
  *
  * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L13-L15)
- * @returns starknet smart contract address
+ * @returns starknet smart contract addresses
  */
-export function getContractAddresses(): Promise<object> {
+export function getContractAddresses(): Promise<GetContractAddressesResponse> {
   return new Promise((resolve, reject) => {
     axios
-      .get(`${FEEDER_GATEWAY_URL}/get_contract_addresses`)
-      .then((resp: any) => {
+      .get<GetContractAddressesResponse>(`${FEEDER_GATEWAY_URL}/get_contract_addresses`)
+      .then((resp) => {
         resolve(resp.data);
       })
       .catch(reject);
   });
 }
 
+// TODO: add proper type
 /**
  * Calls a function on the StarkNet contract.
  *
@@ -49,10 +58,10 @@ export function callContract(invokeTx: object, blockId: number): Promise<object>
  * @param blockId
  * @returns the block object { block_id, previous_block_id, state_root, status, timestamp, transaction_receipts, transactions }
  */
-export function getBlock(blockId: number): Promise<object> {
+export function getBlock(blockId: number): Promise<GetBlockResponse> {
   return new Promise((resolve, reject) => {
     axios
-      .get(`${FEEDER_GATEWAY_URL}/get_block?blockId=${blockId}`)
+      .get<GetBlockResponse>(`${FEEDER_GATEWAY_URL}/get_block?blockId=${blockId}`)
       .then((resp: any) => {
         resolve(resp.data);
       })
@@ -67,19 +76,22 @@ export function getBlock(blockId: number): Promise<object> {
  *
  * @param contractAddress
  * @param blockId
- * @returns ABI of compiled contract in JSON
+ * @returns Bytecode and ABI of compiled contract
  */
-export function getCode(contractAddress: string, blockId: number): Promise<object> {
+export function getCode(contractAddress: string, blockId: number): Promise<GetCode> {
   return new Promise((resolve, reject) => {
     axios
-      .get(`${FEEDER_GATEWAY_URL}/get_code?contractAddress=${contractAddress}&blockId=${blockId}`)
-      .then((resp: any) => {
+      .get<GetCode>(
+        `${FEEDER_GATEWAY_URL}/get_code?contractAddress=${contractAddress}&blockId=${blockId}`
+      )
+      .then((resp) => {
         resolve(resp.data);
       })
       .catch(reject);
   });
 }
 
+// TODO: add proper type
 /**
  * Gets the contract's storage variable at a specific key.
  *
@@ -115,11 +127,13 @@ export function getStorageAt(
  * @param txId
  * @returns the transaction status object { block_id, tx_status: NOT_RECEIVED | RECEIVED | PENDING | REJECTED | ACCEPTED_ONCHAIN }
  */
-export function getTransactionStatus(txId: number): Promise<object> {
+export function getTransactionStatus(txId: number): Promise<GetTransactionStatusResponse> {
   return new Promise((resolve, reject) => {
     axios
-      .get(`${FEEDER_GATEWAY_URL}/get_transaction_status?transactionId=${txId}`)
-      .then((resp: any) => {
+      .get<GetTransactionStatusResponse>(
+        `${FEEDER_GATEWAY_URL}/get_transaction_status?transactionId=${txId}`
+      )
+      .then((resp) => {
         resolve(resp.data);
       })
       .catch(reject);
@@ -134,17 +148,18 @@ export function getTransactionStatus(txId: number): Promise<object> {
  * @param txId
  * @returns the transacton object { transaction_id, status, transaction, block_id?, block_number?, transaction_index?, transaction_failure_reason? }
  */
-export function getTransaction(txId: number): Promise<object> {
+export function getTransaction(txId: number): Promise<GetTransactionResponse> {
   return new Promise((resolve, reject) => {
     axios
-      .get(`${FEEDER_GATEWAY_URL}/get_transaction?transactionId=${txId}`)
-      .then((resp: any) => {
+      .get<GetTransactionResponse>(`${FEEDER_GATEWAY_URL}/get_transaction?transactionId=${txId}`)
+      .then((resp) => {
         resolve(resp.data);
       })
       .catch(reject);
   });
 }
 
+// TODO: add proper type
 /**
  * Invoke a function on the starknet contract
  *
