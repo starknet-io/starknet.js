@@ -39,7 +39,7 @@ a confirmation of invoking a function on the starknet contract
 
 #### Defined in
 
-[index.ts:156](https://github.com/seanjameshan/starknet.js/blob/505f231/src/index.ts#L156)
+[index.ts:171](https://github.com/seanjameshan/starknet.js/blob/4694086/src/index.ts#L171)
 
 ___
 
@@ -66,13 +66,13 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[index.ts:33](https://github.com/seanjameshan/starknet.js/blob/505f231/src/index.ts#L33)
+[index.ts:42](https://github.com/seanjameshan/starknet.js/blob/4694086/src/index.ts#L42)
 
 ___
 
 ### getBlock
 
-▸ **getBlock**(`blockId`): `Promise`<`object`\>
+▸ **getBlock**(`blockId`): `Promise`<`GetBlockResponse`\>
 
 Gets the block information from a block ID.
 
@@ -86,19 +86,19 @@ Gets the block information from a block ID.
 
 #### Returns
 
-`Promise`<`object`\>
+`Promise`<`GetBlockResponse`\>
 
 the block object { block_id, previous_block_id, state_root, status, timestamp, transaction_receipts, transactions }
 
 #### Defined in
 
-[index.ts:52](https://github.com/seanjameshan/starknet.js/blob/505f231/src/index.ts#L52)
+[index.ts:61](https://github.com/seanjameshan/starknet.js/blob/4694086/src/index.ts#L61)
 
 ___
 
 ### getCode
 
-▸ **getCode**(`contractAddress`, `blockId`): `Promise`<`object`\>
+▸ **getCode**(`contractAddress`, `blockId`): `Promise`<`GetCode`\>
 
 Gets the code of the deployed contract.
 
@@ -113,19 +113,19 @@ Gets the code of the deployed contract.
 
 #### Returns
 
-`Promise`<`object`\>
+`Promise`<`GetCode`\>
 
-ABI of compiled contract in JSON
+Bytecode and ABI of compiled contract
 
 #### Defined in
 
-[index.ts:72](https://github.com/seanjameshan/starknet.js/blob/505f231/src/index.ts#L72)
+[index.ts:81](https://github.com/seanjameshan/starknet.js/blob/4694086/src/index.ts#L81)
 
 ___
 
 ### getContractAddresses
 
-▸ **getContractAddresses**(): `Promise`<`object`\>
+▸ **getContractAddresses**(): `Promise`<`GetContractAddressesResponse`\>
 
 Gets the smart contract address on the goerli testnet.
 
@@ -133,13 +133,13 @@ Gets the smart contract address on the goerli testnet.
 
 #### Returns
 
-`Promise`<`object`\>
+`Promise`<`GetContractAddressesResponse`\>
 
-starknet smart contract address
+starknet smart contract addresses
 
 #### Defined in
 
-[index.ts:13](https://github.com/seanjameshan/starknet.js/blob/505f231/src/index.ts#L13)
+[index.ts:21](https://github.com/seanjameshan/starknet.js/blob/4694086/src/index.ts#L21)
 
 ___
 
@@ -167,13 +167,13 @@ the value of the storage variable
 
 #### Defined in
 
-[index.ts:93](https://github.com/seanjameshan/starknet.js/blob/505f231/src/index.ts#L93)
+[index.ts:105](https://github.com/seanjameshan/starknet.js/blob/4694086/src/index.ts#L105)
 
 ___
 
 ### getTransaction
 
-▸ **getTransaction**(`txId`): `Promise`<`object`\>
+▸ **getTransaction**(`txId`): `Promise`<`GetTransactionResponse`\>
 
 Gets the transaction information from a tx id.
 
@@ -187,19 +187,19 @@ Gets the transaction information from a tx id.
 
 #### Returns
 
-`Promise`<`object`\>
+`Promise`<`GetTransactionResponse`\>
 
 the transacton object { transaction_id, status, transaction, block_id?, block_number?, transaction_index?, transaction_failure_reason? }
 
 #### Defined in
 
-[index.ts:137](https://github.com/seanjameshan/starknet.js/blob/505f231/src/index.ts#L137)
+[index.ts:151](https://github.com/seanjameshan/starknet.js/blob/4694086/src/index.ts#L151)
 
 ___
 
 ### getTransactionStatus
 
-▸ **getTransactionStatus**(`txId`): `Promise`<`object`\>
+▸ **getTransactionStatus**(`txId`): `Promise`<`GetTransactionStatusResponse`\>
 
 Gets the status of a transaction.
 
@@ -213,10 +213,10 @@ Gets the status of a transaction.
 
 #### Returns
 
-`Promise`<`object`\>
+`Promise`<`GetTransactionStatusResponse`\>
 
 the transaction status object { block_id, tx_status: NOT_RECEIVED | RECEIVED | PENDING | REJECTED | ACCEPTED_ONCHAIN }
 
 #### Defined in
 
-[index.ts:118](https://github.com/seanjameshan/starknet.js/blob/505f231/src/index.ts#L118)
+[index.ts:130](https://github.com/seanjameshan/starknet.js/blob/4694086/src/index.ts#L130)
