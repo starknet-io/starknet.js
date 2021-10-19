@@ -33,6 +33,8 @@ jobs:
       - run: npm run docs
       - name: Do git actions
         run: |
+          git config user.email "janek@argent.xyz"
+          git config user.name "Docs Bot"
           git add --force -- docs/README.md
           git commit -m "docs: add generated docs"
           git push
