@@ -16,9 +16,10 @@
   </a>
   <img src='https://img.shields.io/bundlephobia/minzip/starknet?color=success&label=size' />
   <img src='https://img.shields.io/npm/dt/starknet?color=blueviolet' />
-  <img src="https://img.shields.io/badge/license-MIT-black">
+  <a href="https://github.com/seanjameshan/starknet.js/blob/main/LICENSE/">
+    <img src="https://img.shields.io/badge/license-MIT-black">
+  </a>
   <img src='https://img.shields.io/github/stars/seanjameshan/starknet.js?color=yellow' />
-  <img src='https://img.shields.io/github/followers/seanjameshan?color=red' />
   <a href="https://starkware.co/">
     <img src="https://img.shields.io/badge/powered_by-StarkWare-navy">
   </a>
