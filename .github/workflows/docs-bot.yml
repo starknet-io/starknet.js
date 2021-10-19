@@ -1,0 +1,22 @@
+name: Node.js CI
+on:
+  push:
+    branches:
+      - main
+jobs:
+  generate-docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: 14.x
+      - run: npm ci
+      - run: npm run docs
+      - name: Do git actions
+        run: |
+          git config user.email "janek@argent.xyz"
+          git config user.name "Docs Bot"
+          git add --force -- docs/README.md
+          git commit -m "docs: add generated docs"
+          git push
