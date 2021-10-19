@@ -8,7 +8,7 @@
 
 <!-- primary badges -->
 <p align="center">
-  <img src="https://github.com/argentlabs/starknet/workflows/Node.js%20CI/badge.svg">
+  <img src="https://img.shields.io/github/workflow/status/seanjameshan/starknet.js/Node.js%20CI/main">
   <img src='https://img.shields.io/github/package-json/v/seanjameshan/starknet.js?label=npm' />
   <img src='https://img.shields.io/bundlephobia/minzip/starknet?color=success&label=size' />
   <!-- <img src='https://img.shields.io/npm/dt/starknet?color=blueviolet' /> -->
