@@ -35,7 +35,7 @@ jobs:
         run: |
           git config user.email "janek@argent.xyz"
           git config user.name "Docs Bot"
-          git pull
+          git pull ${{ github.head_ref }}
           git add --force -- docs/README.md
           git commit -m "docs: add generated docs"
       - name: Push to git branch for PR
