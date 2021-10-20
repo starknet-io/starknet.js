@@ -1,4 +1,4 @@
-import * as starknet from '../';
+import * as starknet from '..';
 
 describe('starknet endpoints', () => {
   describe('feeder gateway endpoints', () => {
