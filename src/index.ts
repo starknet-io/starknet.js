@@ -8,9 +8,9 @@ import type {
   GetTransactionStatusResponse,
 } from './index.d';
 
-const API_URL: string = 'https://alpha2.starknet.io/';
-const FEEDER_GATEWAY_URL: string = `${API_URL}/feeder_gateway`;
-const GATEWAY_URL: string = `${API_URL}/gateway`;
+const API_URL = 'https://alpha2.starknet.io/';
+const FEEDER_GATEWAY_URL = `${API_URL}/feeder_gateway`;
+const GATEWAY_URL = `${API_URL}/gateway`;
 
 /**
  * Gets the smart contract address on the goerli testnet.

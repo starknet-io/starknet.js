@@ -1,11 +1,9 @@
-name: Node.js CI
+name: PR check
 on:
-  push:
-    branches:
-      - main
   pull_request:
     branches:
       - main
+      - develop
 
 jobs:
   build-and-test:

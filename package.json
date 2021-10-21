@@ -5,11 +5,15 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
-    "prepare": "npm run build",
+    "prepare": "npm run build && husky install",
     "build": "tsc",
+    "pretest": "npm run lint",
     "test": "jest",
+    "posttest": "npm run format",
     "test:watch": "jest --watch",
-    "docs": "typedoc --readme none --name 'StarkNet.js Docs' --excludeNotDocumented --disableSources"
+    "docs": "typedoc --readme none --name 'StarkNet.js Docs' --excludeNotDocumented --disableSources",
+    "format": "prettier --loglevel warn --write \"**/*.{ts,js,md,yml,json}\"",
+    "lint": "eslint . --cache --fix --ext .ts"
   },
   "keywords": [
     "starknet",
@@ -24,6 +28,13 @@
   "devDependencies": {
     "@babel/preset-env": "^7.15.8",
     "@babel/preset-typescript": "^7.15.0",
+    "@commitlint/cli": "^13.2.1",
+    "@commitlint/config-conventional": "^13.2.0",
+    "@semantic-release/changelog": "^6.0.0",
+    "@semantic-release/commit-analyzer": "^9.0.1",
+    "@semantic-release/git": "^10.0.0",
+    "@semantic-release/npm": "^8.0.2",
+    "@semantic-release/release-notes-generator": "^10.0.2",
     "@types/jest": "^27.0.2",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
@@ -32,7 +43,9 @@
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-prettier": "^4.0.0",
+    "husky": "^7.0.2",
     "jest": "^27.3.0",
+    "lint-staged": "^11.2.3",
     "prettier": "^2.4.1",
     "typedoc": "^0.22.6",
     "typedoc-plugin-markdown": "^3.11.3",
@@ -40,5 +53,9 @@
   },
   "dependencies": {
     "axios": "^0.23.0"
+  },
+  "lint-staged": {
+    "*.ts": "eslint --cache --fix",
+    "*.{ts,js,md,yml,json}": "prettier --write"
   }
 }

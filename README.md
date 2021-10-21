@@ -9,7 +9,7 @@
 <!-- primary badges -->
 <p align="center">
   <a href="https://github.com/seanjameshan/starknet.js/actions">
-    <img src="https://img.shields.io/github/workflow/status/seanjameshan/starknet.js/Node.js%20CI/main">
+    <img src="https://img.shields.io/github/workflow/status/seanjameshan/starknet.js/Release">
   </a>
   <a href="https://www.npmjs.com/package/starknet">
     <img src='https://img.shields.io/github/package-json/v/seanjameshan/starknet.js?label=npm' />
@@ -39,7 +39,7 @@ Install starknet with `npm`
 $ npm install starknet
 ```
 
-Import `starknet` and use the [API](https://github.com/seanjameshan/starknet.js/blob/main/docs)
+Import `starknet` and use the [API](docs)
 
 ```javascript
 import starknet from 'starknet';
@@ -51,7 +51,7 @@ starknet.getContractAddresses().then((data) => {
 
 ## 🌐 API
 
-[Click Here](https://github.com/seanjameshan/starknet.js/blob/main/docs)
+[Click Here](docs)
 
 ## License
 
