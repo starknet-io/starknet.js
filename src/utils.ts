@@ -1,6 +1,9 @@
 import { CONTRACT_ADDRESS_LOWER_BOUND, CONTRACT_ADDRESS_UPPER_BOUND } from './constants';
 
-export const btoa = (b: ArrayBuffer): string => Buffer.from(b).toString('base64');
+const isBrowser = typeof window !== 'undefined';
+
+export const btoaUniversal = (b: ArrayBuffer): string =>
+  isBrowser ? btoa(String.fromCharCode.apply(null, b as any)) : Buffer.from(b).toString('base64');
 
 export function randomIntFromInterval(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1) + min);

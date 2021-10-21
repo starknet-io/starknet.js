@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { gzip } from 'pako';
-import { btoa, randomAddress } from './utils';
+import { randomAddress, btoaUniversal } from './utils';
 import type {
   GetBlockResponse,
   GetCode,
@@ -184,15 +184,11 @@ export function addTransaction(tx: Transaction): Promise<AddTransactionResponse>
 }
 
 export function compressProgram(program: string): CompressedProgram {
-  try {
-    const json = JSON.parse(program);
-    const stringified = JSON.stringify(json);
-    const compressedProgram = gzip(stringified);
-    const base64 = btoa(compressedProgram);
-    return base64;
-  } catch {
-    throw new Error('couldnt compress program');
-  }
+  const json = JSON.parse(program);
+  const stringified = JSON.stringify(json);
+  const compressedProgram = gzip(stringified);
+  const base64 = btoaUniversal(compressedProgram);
+  return base64;
 }
 
 export function deployContract(
