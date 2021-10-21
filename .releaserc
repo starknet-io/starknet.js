@@ -1,7 +1,10 @@
 {
   "branches": [
     "main",
-    "develop"
+    {
+      "name": "develop",
+      "channel": "next"
+    }
   ],
   "plugins": [
     "@semantic-release/commit-analyzer",
