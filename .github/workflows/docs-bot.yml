@@ -1,8 +1,11 @@
 name: Docs Bot
 on:
   push:
+    branches-ignore:
+      - main
+      - develop
     paths:
-      - 'src/index.ts'
+      - 'src/'
 jobs:
   generate-docs:
     runs-on: ubuntu-latest
