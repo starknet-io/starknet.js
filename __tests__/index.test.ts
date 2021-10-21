@@ -1,4 +1,5 @@
-import * as starknet from '..';
+import starknet, { CompiledContract, compressProgram, randomAddress, makeAddress } from '..';
+import compiledArgentAccount from '../__mocks__/ArgentAccount.json';
 
 describe('starknet endpoints', () => {
   describe('feeder gateway endpoints', () => {
@@ -29,7 +30,36 @@ describe('starknet endpoints', () => {
     test('getTransaction()', () => {
       return expect(starknet.getTransaction(286136)).resolves.not.toThrow();
     });
-    xtest('addTransaction()', () => {});
+    test('addTransaction() deploy', async () => {
+      const inputContract = compiledArgentAccount as unknown as CompiledContract;
+
+      const contractDefinition = {
+        ...inputContract,
+        program: compressProgram(JSON.stringify(inputContract.program)),
+      };
+
+      const response = await starknet.addTransaction({
+        type: 'DEPLOY',
+        contract_address: randomAddress(),
+        contract_definition: contractDefinition,
+      });
+
+      // eslint-disable-next-line no-console
+      console.log(response);
+      expect(response.code).toBe('TRANSACTION_RECEIVED');
+    });
+    test('deployContract()', async () => {
+      const inputContract = compiledArgentAccount as unknown as CompiledContract;
+
+      const response = await starknet.deployContract(
+        inputContract,
+        makeAddress('0x20b5B1b8aFd65F1FCB755a449000cFC4aBCA0D40')
+      );
+
+      // eslint-disable-next-line no-console
+      console.log(response);
+      expect(response.code).toBe('TRANSACTION_RECEIVED');
+    });
   });
 
   describe('gateway endpoints', () => {

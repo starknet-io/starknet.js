@@ -17,6 +17,8 @@
   },
   "plugins": ["@typescript-eslint"],
   "rules": {
-    "camelcase": "off"
+    "camelcase": "off",
+    "import/no-unresolved": "off",
+    "import/extensions": "off"
   }
 }

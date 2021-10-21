@@ -1,12 +1,17 @@
 import axios from 'axios';
-
+import { gzip } from 'pako';
+import { btoa, randomAddress } from './utils';
 import type {
   GetBlockResponse,
   GetCode,
   GetContractAddressesResponse,
   GetTransactionResponse,
   GetTransactionStatusResponse,
-} from './index.d';
+  CompressedProgram,
+  Transaction,
+  AddTransactionResponse,
+  CompiledContract,
+} from './types';
 
 const API_URL = 'https://alpha2.starknet.io/';
 const FEEDER_GATEWAY_URL = `${API_URL}/feeder_gateway`;
@@ -159,7 +164,6 @@ export function getTransaction(txId: number): Promise<GetTransactionResponse> {
   });
 }
 
-// TODO: add proper type
 /**
  * Invoke a function on the starknet contract
  *
@@ -168,7 +172,7 @@ export function getTransaction(txId: number): Promise<GetTransactionResponse> {
  * @param tx - transaction to be invoked (WIP)
  * @returns a confirmation of invoking a function on the starknet contract
  */
-export function addTransaction(tx: object): Promise<object> {
+export function addTransaction(tx: Transaction): Promise<AddTransactionResponse> {
   return new Promise((resolve, reject) => {
     axios
       .post(`${GATEWAY_URL}/add_transaction`, tx)
@@ -179,6 +183,36 @@ export function addTransaction(tx: object): Promise<object> {
   });
 }
 
+export function compressProgram(program: string): CompressedProgram {
+  try {
+    const json = JSON.parse(program);
+    const stringified = JSON.stringify(json);
+    const compressedProgram = gzip(stringified);
+    const base64 = btoa(compressedProgram);
+    return base64;
+  } catch {
+    throw new Error('couldnt compress program');
+  }
+}
+
+export function deployContract(
+  contract: CompiledContract,
+  address: string = randomAddress()
+): Promise<AddTransactionResponse> {
+  const contractDefinition = {
+    ...contract,
+    program: compressProgram(JSON.stringify(contract.program)),
+  };
+
+  return addTransaction({
+    type: 'DEPLOY',
+    contract_address: address,
+    contract_definition: contractDefinition,
+  });
+}
+
+export * from './utils';
+export * from './types';
 export default {
   getContractAddresses,
   callContract,
@@ -188,4 +222,6 @@ export default {
   getTransactionStatus,
   getTransaction,
   addTransaction,
+  compressProgram,
+  deployContract,
 };
