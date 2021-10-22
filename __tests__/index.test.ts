@@ -30,7 +30,10 @@ describe('starknet endpoints', () => {
     test('getTransaction()', () => {
       return expect(starknet.getTransaction(286136)).resolves.not.toThrow();
     });
-    test('addTransaction() deploy', async () => {
+  });
+
+  describe('addTransaction()', () => {
+    test('type: "DEPLOY"', async () => {
       const inputContract = compiledArgentAccount as unknown as CompiledContract;
 
       const contractDefinition = {
@@ -50,6 +53,8 @@ describe('starknet endpoints', () => {
       // eslint-disable-next-line no-console
       console.log('txId:', response.tx_id);
     });
+    xtest('type: "INVOKE_FUNCTION"', () => {});
+
     test('deployContract()', async () => {
       const inputContract = compiledArgentAccount as unknown as CompiledContract;
 
@@ -64,9 +69,5 @@ describe('starknet endpoints', () => {
       // eslint-disable-next-line no-console
       console.log('txId:', response.tx_id);
     });
-  });
-
-  describe('gateway endpoints', () => {
-    xtest('addTransaction()', () => {});
   });
 });
