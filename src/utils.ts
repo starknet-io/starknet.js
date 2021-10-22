@@ -22,6 +22,13 @@ export function makeAddress(input: string): string {
   return `0x${input.replace(/^0x/, '').toLowerCase()}`;
 }
 
+/**
+ * Function to compress compiled cairo program
+ *
+ * [Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/services/api/gateway/transaction.py#L54-L58)
+ * @param jsonProgram - json file representing the compiled cairo program
+ * @returns Compressed cairo program
+ */
 export function compressProgram(jsonProgram: Program): CompressedProgram {
   const stringified = JSON.stringify(jsonProgram);
   const compressedProgram = gzip(stringified);
