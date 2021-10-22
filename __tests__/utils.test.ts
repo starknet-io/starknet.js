@@ -20,6 +20,6 @@ describe('makeAddress()', () => {
 
     const starkAddress = makeAddress(ethAddress);
 
-    expect(starkAddress).toBe('0x00000000000000000000000dfd0f27fce99b50909de0bdd328aed6eabe76bc5');
+    expect(starkAddress).toBe('0xdfd0f27fce99b50909de0bdd328aed6eabe76bc5');
   });
 });
