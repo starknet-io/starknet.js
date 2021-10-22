@@ -11,7 +11,7 @@ import type {
   CompiledContract,
 } from './types';
 
-const API_URL = 'https://alpha2.starknet.io/';
+const API_URL = 'https://alpha2.starknet.io';
 const FEEDER_GATEWAY_URL = `${API_URL}/feeder_gateway`;
 const GATEWAY_URL = `${API_URL}/gateway`;
 

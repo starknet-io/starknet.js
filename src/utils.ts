@@ -2,7 +2,7 @@ import { gzip } from 'pako';
 import { CompressedProgram, Program } from './types';
 import { CONTRACT_ADDRESS_LOWER_BOUND, CONTRACT_ADDRESS_UPPER_BOUND } from './constants';
 
-const isBrowser = typeof window !== 'undefined';
+export const isBrowser = typeof window !== 'undefined';
 
 export const btoaUniversal = (b: ArrayBuffer): string =>
   isBrowser ? btoa(String.fromCharCode.apply(null, b as any)) : Buffer.from(b).toString('base64');
