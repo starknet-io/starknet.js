@@ -43,10 +43,12 @@ describe('starknet endpoints', () => {
         contract_address: randomAddress(),
         contract_definition: contractDefinition,
       });
-
-      // eslint-disable-next-line no-console
-      console.log(response);
       expect(response.code).toBe('TRANSACTION_RECEIVED');
+      expect(response.tx_id).toBeGreaterThan(0);
+
+      // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
+      // eslint-disable-next-line no-console
+      console.log('txId:', response.tx_id);
     });
     test('deployContract()', async () => {
       const inputContract = compiledArgentAccount as unknown as CompiledContract;
@@ -55,10 +57,12 @@ describe('starknet endpoints', () => {
         inputContract,
         makeAddress('0x20b5B1b8aFd65F1FCB755a449000cFC4aBCA0D40')
       );
-
-      // eslint-disable-next-line no-console
-      console.log(response);
       expect(response.code).toBe('TRANSACTION_RECEIVED');
+      expect(response.tx_id).toBeGreaterThan(0);
+
+      // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
+      // eslint-disable-next-line no-console
+      console.log('txId:', response.tx_id);
     });
   });
 

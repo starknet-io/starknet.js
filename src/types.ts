@@ -15,8 +15,8 @@ export interface Abi {
   outputs: { name: string; type: string }[];
   type: string;
 }
-export type EntryPointsByType = any;
-export type Program = any;
+export type EntryPointsByType = object;
+export type Program = object;
 
 export interface CompiledContract {
   abi: Abi;
@@ -24,7 +24,7 @@ export interface CompiledContract {
   program: Program;
 }
 
-export interface CompressedCompiledContract extends CompiledContract {
+export interface CompressedCompiledContract extends Omit<CompiledContract, 'program'> {
   program: CompressedProgram;
 }
 

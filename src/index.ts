@@ -1,13 +1,11 @@
 import axios from 'axios';
-import { gzip } from 'pako';
-import { randomAddress, btoaUniversal } from './utils';
+import { randomAddress, compressProgram } from './utils';
 import type {
   GetBlockResponse,
   GetCode,
   GetContractAddressesResponse,
   GetTransactionResponse,
   GetTransactionStatusResponse,
-  CompressedProgram,
   Transaction,
   AddTransactionResponse,
   CompiledContract,
@@ -183,21 +181,20 @@ export function addTransaction(tx: Transaction): Promise<AddTransactionResponse>
   });
 }
 
-export function compressProgram(program: string): CompressedProgram {
-  const json = JSON.parse(program);
-  const stringified = JSON.stringify(json);
-  const compressedProgram = gzip(stringified);
-  const base64 = btoaUniversal(compressedProgram);
-  return base64;
-}
-
+/**
+ * Deploys a given compiled contract (json) to starknet
+ *
+ * @param contract - a json object containing the compiled contract
+ * @param address - (optional, defaults to a random address) the address where the contract should be deployed (alpha)
+ * @returns a confirmation of sending a transaction on the starknet contract
+ */
 export function deployContract(
   contract: CompiledContract,
   address: string = randomAddress()
 ): Promise<AddTransactionResponse> {
   const contractDefinition = {
     ...contract,
-    program: compressProgram(JSON.stringify(contract.program)),
+    program: compressProgram(contract.program),
   };
 
   return addTransaction({

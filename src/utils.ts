@@ -1,3 +1,5 @@
+import { gzip } from 'pako';
+import { CompressedProgram, Program } from './types';
 import { CONTRACT_ADDRESS_LOWER_BOUND, CONTRACT_ADDRESS_UPPER_BOUND } from './constants';
 
 const isBrowser = typeof window !== 'undefined';
@@ -18,4 +20,11 @@ export function randomAddress(): string {
 
 export function makeAddress(input: string): string {
   return `0x${input.replace(/^0x/, '').toLowerCase()}`;
+}
+
+export function compressProgram(jsonProgram: Program): CompressedProgram {
+  const stringified = JSON.stringify(jsonProgram);
+  const compressedProgram = gzip(stringified);
+  const base64 = btoaUniversal(compressedProgram);
+  return base64;
 }
