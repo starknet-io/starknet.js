@@ -5,11 +5,9 @@ describe('compressProgram()', () => {
   test('compresses a contract program', () => {
     const inputContract = compiledArgentAccount as any;
 
-    const compressed = compressProgram(JSON.stringify(inputContract.program));
+    const compressed = compressProgram(inputContract.program);
 
     expect(compressed).toMatchSnapshot();
   });
-  test('throws Error when no contract program is provided', () => {
-    expect(() => compressProgram('test')).toThrow();
-  });
+  // there's basically no error case with almost all types being supported
 });

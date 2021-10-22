@@ -35,7 +35,7 @@ describe('starknet endpoints', () => {
 
       const contractDefinition = {
         ...inputContract,
-        program: compressProgram(JSON.stringify(inputContract.program)),
+        program: compressProgram(inputContract.program),
       };
 
       const response = await starknet.addTransaction({
