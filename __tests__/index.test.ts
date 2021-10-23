@@ -1,5 +1,15 @@
-import starknet, { CompiledContract, compressProgram, randomAddress, makeAddress } from '..';
-import compiledArgentAccount from '../__mocks__/ArgentAccount.json';
+import fs from 'fs';
+import starknet, {
+  CompiledContract,
+  compressProgram,
+  randomAddress,
+  makeAddress,
+  JsonParser,
+} from '..';
+
+const compiledArgentAccount = JsonParser.parse(
+  fs.readFileSync('./__mocks__/ArgentAccount.json').toString('ascii')
+);
 
 describe('starknet endpoints', () => {
   describe('feeder gateway endpoints', () => {

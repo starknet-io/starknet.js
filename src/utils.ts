@@ -1,4 +1,5 @@
 import { gzip } from 'pako';
+import Json from 'json-bigint';
 import { CompressedProgram, Program } from './types';
 import { CONTRACT_ADDRESS_LOWER_BOUND, CONTRACT_ADDRESS_UPPER_BOUND } from './constants';
 
@@ -22,6 +23,11 @@ export function makeAddress(input: string): string {
   return `0x${input.replace(/^0x/, '').toLowerCase()}`;
 }
 
+export const JsonParser = Json({
+  alwaysParseAsBig: true,
+  useNativeBigInt: true,
+});
+
 /**
  * Function to compress compiled cairo program
  *
@@ -29,8 +35,9 @@ export function makeAddress(input: string): string {
  * @param jsonProgram - json file representing the compiled cairo program
  * @returns Compressed cairo program
  */
-export function compressProgram(jsonProgram: Program): CompressedProgram {
-  const stringified = JSON.stringify(jsonProgram);
+export function compressProgram(jsonProgram: Program | string): CompressedProgram {
+  const stringified =
+    typeof jsonProgram === 'string' ? jsonProgram : JsonParser.stringify(jsonProgram);
   const compressedProgram = gzip(stringified);
   const base64 = btoaUniversal(compressedProgram);
   return base64;

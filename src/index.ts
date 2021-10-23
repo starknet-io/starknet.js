@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { randomAddress, compressProgram } from './utils';
+import { randomAddress, compressProgram, JsonParser } from './utils';
 import type {
   GetBlockResponse,
   GetCode,
@@ -189,12 +189,14 @@ export function addTransaction(tx: Transaction): Promise<AddTransactionResponse>
  * @returns a confirmation of sending a transaction on the starknet contract
  */
 export function deployContract(
-  contract: CompiledContract,
+  contract: CompiledContract | string,
   address: string = randomAddress()
 ): Promise<AddTransactionResponse> {
+  const parsedContract =
+    typeof contract === 'string' ? (JsonParser.parse(contract) as CompiledContract) : contract;
   const contractDefinition = {
-    ...contract,
-    program: compressProgram(contract.program),
+    ...parsedContract,
+    program: compressProgram(parsedContract.program),
   };
 
   return addTransaction({

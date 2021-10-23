@@ -2,8 +2,12 @@
  * @jest-environment jsdom
  */
 
-import { compressProgram, isBrowser } from '..';
-import compiledArgentAccount from '../__mocks__/ArgentAccount.json';
+import fs from 'fs';
+import { compressProgram, isBrowser, JsonParser } from '..';
+
+const compiledArgentAccount = JsonParser.parse(
+  fs.readFileSync('./__mocks__/ArgentAccount.json').toString('ascii')
+);
 
 test('isBrowser', () => {
   expect(isBrowser).toBe(true);
@@ -13,6 +17,13 @@ describe('compressProgram()', () => {
     const inputContract = compiledArgentAccount as any;
 
     const compressed = compressProgram(inputContract.program);
+
+    expect(compressed).toMatchSnapshot();
+  });
+  test('works with strings', () => {
+    const inputProgram = JsonParser.stringify(compiledArgentAccount.program);
+
+    const compressed = compressProgram(inputProgram);
 
     expect(compressed).toMatchSnapshot();
   });

@@ -1,18 +1,28 @@
-import { compressProgram, makeAddress, isBrowser } from '..';
-import compiledArgentAccount from '../__mocks__/ArgentAccount.json';
+import fs from 'fs';
+import { compressProgram, makeAddress, isBrowser, JsonParser } from '..';
+
+const compiledArgentAccount = JsonParser.parse(
+  fs.readFileSync('./__mocks__/ArgentAccount.json').toString('ascii')
+);
 
 test('isNode', () => {
   expect(isBrowser).toBe(false);
 });
 describe('compressProgram()', () => {
   test('compresses a contract program', () => {
-    const inputContract = compiledArgentAccount as any;
+    const inputProgram = compiledArgentAccount.program;
 
-    const compressed = compressProgram(inputContract.program);
+    const compressed = compressProgram(inputProgram);
 
     expect(compressed).toMatchSnapshot();
   });
-  // there's basically no error case with almost all types being supported
+  test('works with strings', () => {
+    const inputProgram = JsonParser.stringify(compiledArgentAccount.program);
+
+    const compressed = compressProgram(inputProgram);
+
+    expect(compressed).toMatchSnapshot();
+  });
 });
 describe('makeAddress()', () => {
   test('test on eth address', () => {
