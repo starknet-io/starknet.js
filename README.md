@@ -53,8 +53,12 @@ starknet.getContractAddresses().then((data) => {
 
 [Click Here](docs)
 
+## Contributing
+
+If you consider to contribute to this project please read [CONTRIBUTING.md](CONTRIBUTING.md) first.
+
 ## License
 
 Copyright (c) 2021 Sean James Han
 
-Licensed under the MIT license.
+Licensed under the [MIT license](LICENSE).
