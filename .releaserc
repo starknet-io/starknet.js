@@ -15,7 +15,6 @@
       "@semantic-release/git",
       {
         "assets": [
-          "docs/README.md",
           "package.json",
           "CHANGELOG.md"
         ],
