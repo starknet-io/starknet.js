@@ -208,7 +208,9 @@ export function deployContract(
 
 export * from './types';
 
-/** @hidden from TypeDoc */
+/**
+ * @hidden from TypeDoc
+ */
 export default {
   getContractAddresses,
   callContract,
