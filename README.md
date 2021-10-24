@@ -12,7 +12,10 @@
     <img src="https://img.shields.io/github/workflow/status/seanjameshan/starknet.js/Release">
   </a>
   <a href="https://www.npmjs.com/package/starknet">
-    <img src='https://img.shields.io/github/package-json/v/seanjameshan/starknet.js?label=npm' />
+    <img src='https://img.shields.io/npm/v/starknet' />
+  </a>
+  <a href="https://www.npmjs.com/package/starknet">
+    <img src='https://img.shields.io/npm/v/starknet/next' />
   </a>
   <a href="https://bundlephobia.com/package/starknet">
     <img src='https://img.shields.io/bundlephobia/minzip/starknet?color=success&label=size' />
