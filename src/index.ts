@@ -206,7 +206,6 @@ export function deployContract(
   });
 }
 
-export * from './utils';
 export * from './types';
 export default {
   getContractAddresses,
@@ -217,6 +216,5 @@ export default {
   getTransactionStatus,
   getTransaction,
   addTransaction,
-  compressProgram,
   deployContract,
 };
