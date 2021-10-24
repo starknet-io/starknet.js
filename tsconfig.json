@@ -103,7 +103,7 @@
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules", "**/*.test.ts"],
+  "exclude": ["node_modules"],
   "typedocOptions": {
     "entryPoints": ["src/index.ts"],
     "out": "docs"
