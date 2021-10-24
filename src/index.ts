@@ -206,7 +206,10 @@ export function deployContract(
   });
 }
 
-const starknet = {
+export * from './types';
+
+/** @hidden from TypeDoc */
+export default {
   getContractAddresses,
   callContract,
   getBlock,
@@ -217,7 +220,3 @@ const starknet = {
   addTransaction,
   deployContract,
 };
-
-export * from './types';
-
-export default starknet;
