@@ -110,6 +110,7 @@
     "out": "docs",
     "githubPages": false,
     "excludeNotDocumented": "true",
-    "readme": "none"
+    "readme": "none",
+    "darkHighlightTheme": "dark-plus"
   }
 }
