@@ -111,6 +111,7 @@
     "githubPages": false,
     "excludeNotDocumented": "true",
     "readme": "none",
-    "darkHighlightTheme": "dark-plus"
+    "darkHighlightTheme": "dark-plus",
+    "name": "StarkNet.js Docs"
   }
 }
