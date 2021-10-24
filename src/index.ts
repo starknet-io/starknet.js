@@ -208,10 +208,7 @@ export function deployContract(
 
 export * from './types';
 
-/**
- * @hidden from TypeDoc
- */
-export default {
+const starknet = {
   getContractAddresses,
   callContract,
   getBlock,
@@ -222,3 +219,6 @@ export default {
   addTransaction,
   deployContract,
 };
+
+/** @ignore */
+export default starknet;
