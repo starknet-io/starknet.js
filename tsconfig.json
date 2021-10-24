@@ -109,8 +109,7 @@
     "entryPointStrategy": "resolve",
     "out": "docs",
     "githubPages": false,
-    "readme": "./www/index.html",
-    "darkHighlightTheme": "dark-plus",
+    "readme": "./README.md",
     "name": "StarkNet.js Docs"
   }
 }
