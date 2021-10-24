@@ -1,3 +1,20 @@
+# [1.1.0](https://github.com/seanjameshan/starknet.js/compare/v1.0.0...v1.1.0) (2021-10-24)
+
+### Bug Fixes
+
+- btoa isomorphic ([f3eb0f5](https://github.com/seanjameshan/starknet.js/commit/f3eb0f5aa01647c0994935b72b723bd13f940faa))
+- json formatting and deploy ([0fe7e3d](https://github.com/seanjameshan/starknet.js/commit/0fe7e3d50c4ebcbc64f30611b1888c966452c910))
+- pr review ([457a852](https://github.com/seanjameshan/starknet.js/commit/457a85266de6cd548a15af1dc866671f3664f418))
+- test ([c307390](https://github.com/seanjameshan/starknet.js/commit/c3073902e838bd9e07f783c13e546e298356e16b))
+- test browser and node ([4c23de0](https://github.com/seanjameshan/starknet.js/commit/4c23de0ef510724fa33e1c3cbb00bc638acb54c2))
+- test structure ([b686f04](https://github.com/seanjameshan/starknet.js/commit/b686f04dc5f74e6042cbd30ec56eeb4ef6b9c45b))
+- tests regarding compressing ([21a83f2](https://github.com/seanjameshan/starknet.js/commit/21a83f25bbb88875854ad3d0cb5f7c7fa1ebacd4))
+- update package-lock ([cd373cb](https://github.com/seanjameshan/starknet.js/commit/cd373cbd8df98f3d973e4076f15681927325c9e2))
+
+### Features
+
+- add deploy ([509fa84](https://github.com/seanjameshan/starknet.js/commit/509fa84532ab5a1a46863edbe63d7538ddacfbc8))
+
 # 1.0.0 (2021-10-21)
 
 ### Bug Fixes
