@@ -1,3 +1,16 @@
+## [1.1.1](https://github.com/seanjameshan/starknet.js/compare/v1.1.0...v1.1.1) (2021-10-24)
+
+### Bug Fixes
+
+- **.gitignore:** remove docs from gitignore ([a4c19ad](https://github.com/seanjameshan/starknet.js/commit/a4c19ad9f9f2c30fc6c7a931645a19610ee15b5d))
+- **gh-action:** add token in actions/checkout ([730f605](https://github.com/seanjameshan/starknet.js/commit/730f605a96d87bbe6606aff958d88151ad8b98db))
+- **gh-action:** add token to bypass protected branch ([8b026ab](https://github.com/seanjameshan/starknet.js/commit/8b026abefdfb7ecdad92ce975dc777761d0bd9ce))
+- **gh-action:** fix action syntax ([f88a476](https://github.com/seanjameshan/starknet.js/commit/f88a47652732d0d1cb5b47f8531fefe7ba5b646b))
+- **gh-action:** fix commit message to lowercase ([82177e6](https://github.com/seanjameshan/starknet.js/commit/82177e6dc32f02e836a19f2c7f5585eefd1fec9e))
+- **gh-action:** fix untracked files ([aba492e](https://github.com/seanjameshan/starknet.js/commit/aba492efbaae51a8d9f5f52474c75f0d346a91a2))
+- **gh-action:** force add readme ([3175e08](https://github.com/seanjameshan/starknet.js/commit/3175e08ca2f30f23ecb763eee9a2f2353061ecca))
+- **typedoc:** github action to push typedoc to github ([4573d19](https://github.com/seanjameshan/starknet.js/commit/4573d19fe55e1245f66ed5c501154151592e8951))
+
 # [1.1.0](https://github.com/seanjameshan/starknet.js/compare/v1.0.0...v1.1.0) (2021-10-24)
 
 ### Bug Fixes

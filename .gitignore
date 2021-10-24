@@ -3,6 +3,4 @@ dist
 npm-debug.log
 .env
 .DS_Store
-
-docs/README.md
 .eslintcache
