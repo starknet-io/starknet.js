@@ -112,6 +112,7 @@
     "excludeNotDocumented": "true",
     "readme": "./www/index.html",
     "darkHighlightTheme": "dark-plus",
-    "name": "StarkNet.js Docs"
+    "name": "StarkNet.js Docs",
+    "theme": "./node_modules/typedoc-neo-theme/bin/default"
   }
 }

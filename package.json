@@ -51,6 +51,7 @@
     "lint-staged": "^11.2.3",
     "prettier": "^2.4.1",
     "typedoc": "^0.22.6",
+    "typedoc-neo-theme": "^1.1.1",
     "typescript": "^4.4.4"
   },
   "dependencies": {
