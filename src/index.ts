@@ -206,8 +206,7 @@ export function deployContract(
   });
 }
 
-export * from './types';
-export default {
+const starknet = {
   getContractAddresses,
   callContract,
   getBlock,
@@ -218,3 +217,7 @@ export default {
   addTransaction,
   deployContract,
 };
+
+export * from './types';
+
+export default starknet;
