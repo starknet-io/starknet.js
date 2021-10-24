@@ -4,16 +4,45 @@ export interface GetContractAddressesResponse {
 }
 
 export type Status = 'NOT_RECEIVED' | 'RECEIVED' | 'PENDING' | 'REJECTED' | 'ACCEPTED_ONCHAIN';
+export type TxStatus = 'TRANSACTION_RECEIVED';
 export type Type = 'DEPLOY' | 'INVOKE_FUNCTION';
 export type EntryPointType = 'EXTERNAL';
+export type CompressedProgram = string;
 
-export interface Transaction {
-  type: Type;
+export interface Abi {
+  inputs: { name: string; type: string }[];
+  name: string;
+  outputs: { name: string; type: string }[];
+  type: string;
+}
+export type EntryPointsByType = object;
+export type Program = object;
+
+export interface CompiledContract {
+  abi: Abi;
+  entry_points_by_type: EntryPointsByType;
+  program: Program;
+}
+
+export interface CompressedCompiledContract extends Omit<CompiledContract, 'program'> {
+  program: CompressedProgram;
+}
+
+export interface DeployTransaction {
+  type: 'DEPLOY';
+  contract_definition: CompressedCompiledContract;
+  contract_address: string;
+}
+
+export interface InvokeFunctionTransaction {
+  type: 'INVOKE_FUNCTION';
   contract_address: string;
   entry_point_type?: EntryPointType;
   entry_point_selector?: string;
   calldata?: string[];
 }
+
+export type Transaction = DeployTransaction | InvokeFunctionTransaction;
 
 export interface GetBlockResponse {
   sequence_number: number;
@@ -41,13 +70,6 @@ export interface GetBlockResponse {
   status: Status;
 }
 
-export interface Abi {
-  inputs: { name: string; type: string }[];
-  name: string;
-  outputs: { name: string; type: string }[];
-  type: string;
-}
-
 export interface GetCode {
   bytecode: string[];
   abi: Abi[];
@@ -65,4 +87,9 @@ export interface GetTransactionResponse {
   block_number: number;
   status: Status;
   transaction_id: number;
+}
+
+export interface AddTransactionResponse {
+  code: TxStatus;
+  tx_id: number;
 }

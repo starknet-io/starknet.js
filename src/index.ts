@@ -1,16 +1,19 @@
 import axios from 'axios';
-
+import { randomAddress, compressProgram, JsonParser } from './utils';
 import type {
   GetBlockResponse,
   GetCode,
   GetContractAddressesResponse,
   GetTransactionResponse,
   GetTransactionStatusResponse,
-} from './index.d';
+  Transaction,
+  AddTransactionResponse,
+  CompiledContract,
+} from './types';
 
-const API_URL: string = 'https://alpha2.starknet.io/';
-const FEEDER_GATEWAY_URL: string = `${API_URL}/feeder_gateway`;
-const GATEWAY_URL: string = `${API_URL}/gateway`;
+const API_URL = 'https://alpha2.starknet.io';
+const FEEDER_GATEWAY_URL = `${API_URL}/feeder_gateway`;
+const GATEWAY_URL = `${API_URL}/gateway`;
 
 /**
  * Gets the smart contract address on the goerli testnet.
@@ -159,7 +162,6 @@ export function getTransaction(txId: number): Promise<GetTransactionResponse> {
   });
 }
 
-// TODO: add proper type
 /**
  * Invoke a function on the starknet contract
  *
@@ -168,7 +170,7 @@ export function getTransaction(txId: number): Promise<GetTransactionResponse> {
  * @param tx - transaction to be invoked (WIP)
  * @returns a confirmation of invoking a function on the starknet contract
  */
-export function addTransaction(tx: object): Promise<object> {
+export function addTransaction(tx: Transaction): Promise<AddTransactionResponse> {
   return new Promise((resolve, reject) => {
     axios
       .post(`${GATEWAY_URL}/add_transaction`, tx)
@@ -179,6 +181,33 @@ export function addTransaction(tx: object): Promise<object> {
   });
 }
 
+/**
+ * Deploys a given compiled contract (json) to starknet
+ *
+ * @param contract - a json object containing the compiled contract
+ * @param address - (optional, defaults to a random address) the address where the contract should be deployed (alpha)
+ * @returns a confirmation of sending a transaction on the starknet contract
+ */
+export function deployContract(
+  contract: CompiledContract | string,
+  address: string = randomAddress()
+): Promise<AddTransactionResponse> {
+  const parsedContract =
+    typeof contract === 'string' ? (JsonParser.parse(contract) as CompiledContract) : contract;
+  const contractDefinition = {
+    ...parsedContract,
+    program: compressProgram(parsedContract.program),
+  };
+
+  return addTransaction({
+    type: 'DEPLOY',
+    contract_address: address,
+    contract_definition: contractDefinition,
+  });
+}
+
+export * from './utils';
+export * from './types';
 export default {
   getContractAddresses,
   callContract,
@@ -188,4 +217,6 @@ export default {
   getTransactionStatus,
   getTransaction,
   addTransaction,
+  compressProgram,
+  deployContract,
 };
