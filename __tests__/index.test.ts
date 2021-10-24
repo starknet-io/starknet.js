@@ -1,4 +1,15 @@
-import * as starknet from '..';
+import fs from 'fs';
+import starknet, {
+  CompiledContract,
+  compressProgram,
+  randomAddress,
+  makeAddress,
+  JsonParser,
+} from '..';
+
+const compiledArgentAccount = JsonParser.parse(
+  fs.readFileSync('./__mocks__/ArgentAccount.json').toString('ascii')
+);
 
 describe('starknet endpoints', () => {
   describe('feeder gateway endpoints', () => {
@@ -29,10 +40,44 @@ describe('starknet endpoints', () => {
     test('getTransaction()', () => {
       return expect(starknet.getTransaction(286136)).resolves.not.toThrow();
     });
-    xtest('addTransaction()', () => {});
   });
 
-  describe('gateway endpoints', () => {
-    xtest('addTransaction()', () => {});
+  describe('addTransaction()', () => {
+    test('type: "DEPLOY"', async () => {
+      const inputContract = compiledArgentAccount as unknown as CompiledContract;
+
+      const contractDefinition = {
+        ...inputContract,
+        program: compressProgram(inputContract.program),
+      };
+
+      const response = await starknet.addTransaction({
+        type: 'DEPLOY',
+        contract_address: randomAddress(),
+        contract_definition: contractDefinition,
+      });
+      expect(response.code).toBe('TRANSACTION_RECEIVED');
+      expect(response.tx_id).toBeGreaterThan(0);
+
+      // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
+      // eslint-disable-next-line no-console
+      console.log('txId:', response.tx_id);
+    });
+    xtest('type: "INVOKE_FUNCTION"', () => {});
+
+    test('deployContract()', async () => {
+      const inputContract = compiledArgentAccount as unknown as CompiledContract;
+
+      const response = await starknet.deployContract(
+        inputContract,
+        makeAddress('0x20b5B1b8aFd65F1FCB755a449000cFC4aBCA0D40')
+      );
+      expect(response.code).toBe('TRANSACTION_RECEIVED');
+      expect(response.tx_id).toBeGreaterThan(0);
+
+      // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
+      // eslint-disable-next-line no-console
+      console.log('txId:', response.tx_id);
+    });
   });
 });
