@@ -110,6 +110,7 @@
     "out": "docs",
     "githubPages": false,
     "readme": "./README.md",
-    "name": "StarkNet.js Docs"
+    "name": "StarkNet.js Docs",
+    "sort": "source-order"
   }
 }
