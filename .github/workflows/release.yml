@@ -26,10 +26,11 @@ jobs:
     needs: [build-and-test]
     steps:
       - uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
       - uses: actions/setup-node@v2
         with:
           node-version: lts/*
-          token: ${{ secrets.GITHUB_TOKEN }}
       - run: npm ci
       - name: 'Generate TypeDocs'
         run: npm run docs
