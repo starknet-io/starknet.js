@@ -58,7 +58,7 @@ starknet.getContractAddresses().then((data) => {
 
 ## Contributing
 
-If you consider to contribute to this project please read [CONTRIBUTING.md](CONTRIBUTING.md) first.
+If you consider to contribute to this project please read [CONTRIBUTING.md](https://github.com/seanjameshan/starknet.js/blob/main/CONTRIBUTING.md) first.
 
 ## License
 
