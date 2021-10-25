@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { compressProgram, makeAddress, isBrowser, JsonParser } from '..';
+import { compressProgram, makeAddress, isBrowser, JsonParser, getSelectorFromName } from '../src';
 
 const compiledArgentAccount = JsonParser.parse(
   fs.readFileSync('./__mocks__/ArgentAccount.json').toString('ascii')
@@ -31,5 +31,17 @@ describe('makeAddress()', () => {
     const starkAddress = makeAddress(ethAddress);
 
     expect(starkAddress).toBe('0xdfd0f27fce99b50909de0bdd328aed6eabe76bc5');
+  });
+});
+describe('starknetKeccak()', () => {
+  test('hash works for value="test"', () => {
+    expect(getSelectorFromName('test')).toBe(
+      '0x22ff5f21f0b81b113e63f7db6da94fedef11b2119b4088b89664fb9a3cb658'
+    );
+  });
+  test('hash works for value="initialize"', () => {
+    expect(getSelectorFromName('initialize')).toBe(
+      '0x79dc0da7c54b95f10aa182ad0a46400db63156920adb65eca2654c0945a463'
+    );
   });
 });

@@ -56,6 +56,7 @@
   },
   "dependencies": {
     "axios": "^0.23.0",
+    "ethereum-cryptography": "^0.2.0",
     "json-bigint": "^1.0.0",
     "pako": "^2.0.4"
   },
