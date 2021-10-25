@@ -1,5 +1,13 @@
+import { BigNumber } from '@ethersproject/bignumber';
 import fs from 'fs';
-import { CompiledContract, Contract, deployContract, JsonParser, randomAddress } from '../src';
+import {
+  CompiledContract,
+  Contract,
+  deployContract,
+  JsonParser,
+  randomAddress,
+  waitForTx,
+} from '../src';
 
 const compiledERC20: CompiledContract = JsonParser.parse(
   fs.readFileSync('./__mocks__/ERC20.json').toString('ascii')
@@ -16,8 +24,15 @@ describe('new Contract()', () => {
     // eslint-disable-next-line no-console
     console.log('deployed erc20 contract', tx_id);
     expect(code).toBe('TRANSACTION_RECEIVED');
+    await waitForTx(tx_id);
   });
-  test('initialize ERC20 mock contract', async () => {
+  test('read initial balance of that account', async () => {
+    const response = await contract.call('balance_of', {
+      user: wallet,
+    });
+    expect(BigNumber.from(response.res)).toStrictEqual(BigNumber.from(0));
+  });
+  test('add 10 test ERC20 to account', async () => {
     const response = await contract.invoke('mint', {
       recipient: wallet,
       amount: '10',
@@ -27,5 +42,13 @@ describe('new Contract()', () => {
     // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
     // eslint-disable-next-line no-console
     console.log('txId:', response.tx_id, ', funded wallet:', wallet);
+    await waitForTx(response.tx_id);
+  });
+  test('read balance after mint of that account', async () => {
+    const response = await contract.call('balance_of', {
+      user: wallet,
+    });
+
+    expect(BigNumber.from(response.res)).toStrictEqual(BigNumber.from(10));
   });
 });

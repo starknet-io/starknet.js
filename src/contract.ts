@@ -2,7 +2,7 @@ import assert from 'assert';
 import { BigNumber } from '@ethersproject/bignumber';
 import { Abi } from './types';
 import { getSelectorFromName } from './utils';
-import { addTransaction } from './starknet';
+import { addTransaction, callContract } from './starknet';
 
 type Args = { [inputName: string]: string | string[] };
 type Calldata = string[];
@@ -56,19 +56,19 @@ export class Contract {
     });
   }
 
-  public invoke(method: string, args: Args = {}) {
-    // ensure contract is connected
-    assert(this.connectedTo !== null, 'contract isnt connected to an address');
-
+  private validateMethodAndArgs(type: 'INVOKE' | 'CALL', method: string, args: Args = {}) {
     // ensure provided method exists
     const invokeableFunctionNames = this.abi
       .filter((abi) => {
         const isView = abi.stateMutability === 'view';
         const isFunction = abi.type === 'function';
-        return isFunction && !isView;
+        return isFunction && type === 'INVOKE' ? !isView : isView;
       })
       .map((abi) => abi.name);
-    assert(invokeableFunctionNames.includes(method), 'invokeable method not found in abi');
+    assert(
+      invokeableFunctionNames.includes(method),
+      `${type === 'INVOKE' ? 'invokeable' : 'viewable'} method not found in abi`
+    );
 
     // ensure args match abi type
     const methodAbi = this.abi.find((abi) => abi.name === method)!;
@@ -94,6 +94,24 @@ export class Contract {
         });
       }
     });
+  }
+
+  private parseResponse(method: string, response: (string | string[])[]): Args {
+    const methodAbi = this.abi.find((abi) => abi.name === method)!;
+    return methodAbi.outputs.reduce((acc, output, i) => {
+      return {
+        ...acc,
+        [output.name]: response[i],
+      };
+    }, {} as Args);
+  }
+
+  public invoke(method: string, args: Args = {}) {
+    // ensure contract is connected
+    assert(this.connectedTo !== null, 'contract isnt connected to an address');
+
+    // validate method and args
+    this.validateMethodAndArgs('INVOKE', method, args);
 
     // compile calldata
     const entrypointSelector = getSelectorFromName(method);
@@ -105,5 +123,23 @@ export class Contract {
       calldata,
       entry_point_selector: entrypointSelector,
     });
+  }
+
+  public async call(method: string, args: Args = {}) {
+    // ensure contract is connected
+    assert(this.connectedTo !== null, 'contract isnt connected to an address');
+
+    // validate method and args
+    this.validateMethodAndArgs('CALL', method, args);
+
+    // compile calldata
+    const entrypointSelector = getSelectorFromName(method);
+    const calldata = Contract.compileCalldata(args);
+
+    return callContract({
+      contract_address: this.connectedTo,
+      calldata,
+      entry_point_selector: entrypointSelector,
+    }).then((x) => this.parseResponse(method, x.result));
   }
 }

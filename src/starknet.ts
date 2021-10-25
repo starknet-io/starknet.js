@@ -9,6 +9,8 @@ import type {
   Transaction,
   AddTransactionResponse,
   CompiledContract,
+  Call,
+  CallContractResponse,
 } from './types';
 
 const API_URL = 'https://alpha2.starknet.io';
@@ -32,20 +34,19 @@ export function getContractAddresses(): Promise<GetContractAddressesResponse> {
   });
 }
 
-// TODO: add proper type
 /**
  * Calls a function on the StarkNet contract.
  *
  * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L17-L25)
  *
- * @param invokeTx - transaction to be invoked (WIP)
+ * @param invokeTx - transaction to be invoked
  * @param blockId
  * @returns the result of the function on the smart contract.
  */
-export function callContract(invokeTx: object, blockId: number): Promise<object> {
+export function callContract(invokeTx: Call, blockId?: number): Promise<CallContractResponse> {
   return new Promise((resolve, reject) => {
     axios
-      .post(`${FEEDER_GATEWAY_URL}/call_contract?blockId=${blockId}`, invokeTx)
+      .post(`${FEEDER_GATEWAY_URL}/call_contract?blockId=${blockId ?? 'null'}`, invokeTx)
       .then((resp: any) => {
         resolve(resp.data);
       })
@@ -167,7 +168,7 @@ export function getTransaction(txId: number): Promise<GetTransactionResponse> {
  *
  * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/gateway/gateway_client.py#L13-L17)
  *
- * @param tx - transaction to be invoked (WIP)
+ * @param tx - transaction to be invoked
  * @returns a confirmation of invoking a function on the starknet contract
  */
 export function addTransaction(tx: Transaction): Promise<AddTransactionResponse> {
@@ -206,7 +207,27 @@ export function deployContract(
   });
 }
 
+const wait = (delay: number) => new Promise((res) => setTimeout(res, delay));
+export async function waitForTx(txId: number, retryInterval: number = 2000) {
+  let onchain = false;
+  while (!onchain) {
+    // eslint-disable-next-line no-await-in-loop
+    const res = await getTransactionStatus(txId);
+    if (res.tx_status === 'ACCEPTED_ONCHAIN' || res.tx_status === 'PENDING') {
+      onchain = true;
+    } else if (res.tx_status === 'REJECTED') {
+      throw Error('REJECTED');
+    } else if (res.tx_status === 'NOT_RECEIVED') {
+      throw Error('NOT_RECEIVED');
+    } else {
+      // eslint-disable-next-line no-await-in-loop
+      await wait(retryInterval);
+    }
+  }
+}
+
 export default {
+  waitForTx,
   getContractAddresses,
   callContract,
   getBlock,

@@ -12,7 +12,7 @@ export type CompressedProgram = string;
 export interface Abi {
   inputs: { name: string; type: 'felt' | 'felt*' }[];
   name: string;
-  outputs: { name: string; type: string }[];
+  outputs: { name: string; type: 'felt' | 'felt*' }[];
   stateMutability?: 'view';
   type: 'function';
 }
@@ -43,7 +43,13 @@ export interface InvokeFunctionTransaction {
   calldata?: string[];
 }
 
+export type Call = Omit<InvokeFunctionTransaction, 'type'>;
+
 export type Transaction = DeployTransaction | InvokeFunctionTransaction;
+
+export interface CallContractResponse {
+  result: string[];
+}
 
 export interface GetBlockResponse {
   sequence_number: number;

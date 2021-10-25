@@ -66,6 +66,6 @@
     "*.{ts,js,md,yml,json}": "prettier --write"
   },
   "jest": {
-    "testTimeout": 20000
+    "testTimeout": 300000
   }
 }
