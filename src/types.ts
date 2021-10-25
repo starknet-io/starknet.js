@@ -10,16 +10,17 @@ export type EntryPointType = 'EXTERNAL';
 export type CompressedProgram = string;
 
 export interface Abi {
-  inputs: { name: string; type: string }[];
+  inputs: { name: string; type: 'felt' | 'felt*' }[];
   name: string;
   outputs: { name: string; type: string }[];
-  type: string;
+  stateMutability?: 'view';
+  type: 'function';
 }
 export type EntryPointsByType = object;
 export type Program = object;
 
 export interface CompiledContract {
-  abi: Abi;
+  abi: Abi[];
   entry_points_by_type: EntryPointsByType;
   program: Program;
 }

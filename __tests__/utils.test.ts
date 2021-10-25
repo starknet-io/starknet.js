@@ -44,4 +44,9 @@ describe('starknetKeccak()', () => {
       '0x79dc0da7c54b95f10aa182ad0a46400db63156920adb65eca2654c0945a463'
     );
   });
+  test('hash works for value="mint"', () => {
+    expect(getSelectorFromName('mint')).toBe(
+      '0x02f0b3c5710379609eb5495f1ecd348cb28167711b73609fe565a72734550354'
+    );
+  });
 });

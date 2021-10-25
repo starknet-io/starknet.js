@@ -1,10 +1,15 @@
 import { gzip } from 'pako';
 import Json from 'json-bigint';
 import { keccak256 } from 'ethereum-cryptography/keccak';
+import { BigNumber } from '@ethersproject/bignumber';
 import { CompressedProgram, Program } from './types';
 import { CONTRACT_ADDRESS_LOWER_BOUND, CONTRACT_ADDRESS_UPPER_BOUND } from './constants';
 
 export const isBrowser = typeof window !== 'undefined';
+const MASK_250 = BigNumber.from(2).pow(250).sub(1); // 2 ** 250 - 1
+
+export const hexToDecimalString = (hex: string): string =>
+  BigNumber.from(`0x${hex.replace(/^0x/, '')}`).toString();
 
 export const arrayBufferToString = (array: ArrayBuffer): string =>
   String.fromCharCode.apply(null, array as any);
@@ -53,17 +58,17 @@ function buf2hex(buffer: Uint8Array) {
   return [...buffer].map((x) => x.toString(16).padStart(2, '0')).join('');
 }
 
-const keccakHex = (value: string): string => buf2hex(keccak256(stringToUint8Array(value)));
+const keccakHex = (value: string): string => `0x${buf2hex(keccak256(stringToUint8Array(value)))}`;
 
 /**
  * Function to get the starknet keccak hash from a string
  *
  * [Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/public/abi.py#L17-L22)
  * @param value - string you want to get the starknetKeccak hash from
- * @returns starknet keccak hash as hex string
+ * @returns starknet keccak hash as BigNumber
  */
-export function starknetKeccak(value: string): string {
-  return `0x${keccakHex(value).substr(2)}`;
+export function starknetKeccak(value: string): BigNumber {
+  return BigNumber.from(keccakHex(value)).and(MASK_250);
 }
 
 /**
@@ -74,5 +79,6 @@ export function starknetKeccak(value: string): string {
  * @returns hex selector of given abi function name
  */
 export function getSelectorFromName(funcName: string) {
-  return starknetKeccak(funcName);
+  // sometimes BigInteger pads the hex string with zeros, which isnt allowed in the starknet api
+  return starknetKeccak(funcName).toHexString();
 }
