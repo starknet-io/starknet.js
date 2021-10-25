@@ -45,7 +45,7 @@ $ npm install starknet
 Import `starknet` and use the [API](https://www.starknetjs.com/modules.html)
 
 ```javascript
-import starknet from 'starknet';
+import * as starknet from 'starknet';
 
 starknet.getContractAddresses().then((data) => {
   console.log(data);
@@ -64,4 +64,4 @@ If you consider to contribute to this project please read [CONTRIBUTING.md](http
 
 Copyright (c) 2021 Sean James Han
 
-Licensed under the [MIT license](LICENSE).
+Licensed under the [MIT license](https://github.com/seanjameshan/starknet.js/blob/main/LICENSE).

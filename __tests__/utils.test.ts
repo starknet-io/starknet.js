@@ -1,5 +1,5 @@
 import fs from 'fs';
-import { compressProgram, makeAddress, isBrowser, JsonParser } from '..';
+import { compressProgram, makeAddress, isBrowser, JsonParser } from '../src/utils';
 
 const compiledArgentAccount = JsonParser.parse(
   fs.readFileSync('./__mocks__/ArgentAccount.json').toString('ascii')
