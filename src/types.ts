@@ -1,7 +1,7 @@
-export interface GetContractAddressesResponse {
+export type GetContractAddressesResponse = {
   Starknet: string;
   GpsStatementVerifier: string;
-}
+};
 
 export type Status = 'NOT_RECEIVED' | 'RECEIVED' | 'PENDING' | 'REJECTED' | 'ACCEPTED_ONCHAIN';
 export type TxStatus = 'TRANSACTION_RECEIVED';
@@ -9,42 +9,40 @@ export type Type = 'DEPLOY' | 'INVOKE_FUNCTION';
 export type EntryPointType = 'EXTERNAL';
 export type CompressedProgram = string;
 
-export interface Abi {
+export type Abi = {
   inputs: { name: string; type: string }[];
   name: string;
   outputs: { name: string; type: string }[];
   type: string;
-}
+};
 export type EntryPointsByType = object;
 export type Program = object;
 
-export interface CompiledContract {
+export type CompiledContract = {
   abi: Abi;
   entry_points_by_type: EntryPointsByType;
   program: Program;
-}
+};
 
-export interface CompressedCompiledContract extends Omit<CompiledContract, 'program'> {
-  program: CompressedProgram;
-}
+export type CompressedCompiledContract = Omit<CompiledContract, 'program'>;
 
-export interface DeployTransaction {
+export type DeployTransaction = {
   type: 'DEPLOY';
   contract_definition: CompressedCompiledContract;
   contract_address: string;
-}
+};
 
-export interface InvokeFunctionTransaction {
+export type InvokeFunctionTransaction = {
   type: 'INVOKE_FUNCTION';
   contract_address: string;
   entry_point_type?: EntryPointType;
   entry_point_selector?: string;
   calldata?: string[];
-}
+};
 
 export type Transaction = DeployTransaction | InvokeFunctionTransaction;
 
-export interface GetBlockResponse {
+export type GetBlockResponse = {
   sequence_number: number;
   state_root: string;
   block_id: number;
@@ -68,28 +66,28 @@ export interface GetBlockResponse {
   };
   previous_block_id: number;
   status: Status;
-}
+};
 
-export interface GetCode {
+export type GetCodeResponse = {
   bytecode: string[];
   abi: Abi[];
-}
+};
 
-export interface GetTransactionStatusResponse {
+export type GetTransactionStatusResponse = {
   tx_status: Status;
   block_id: number;
-}
+};
 
-export interface GetTransactionResponse {
+export type GetTransactionResponse = {
   transaction_index: number;
   transaction: Transaction;
   block_id: number;
   block_number: number;
   status: Status;
   transaction_id: number;
-}
+};
 
-export interface AddTransactionResponse {
+export type AddTransactionResponse = {
   code: TxStatus;
   tx_id: number;
-}
+};

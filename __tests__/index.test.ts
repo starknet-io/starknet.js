@@ -1,11 +1,7 @@
 import fs from 'fs';
-import starknet, {
-  CompiledContract,
-  compressProgram,
-  randomAddress,
-  makeAddress,
-  JsonParser,
-} from '..';
+import { compressProgram, randomAddress, makeAddress, JsonParser } from '../src/utils';
+import { CompiledContract } from '../src/types';
+import * as starknet from '../src/index';
 
 const compiledArgentAccount = JsonParser.parse(
   fs.readFileSync('./__mocks__/ArgentAccount.json').toString('ascii')
