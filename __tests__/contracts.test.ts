@@ -15,7 +15,6 @@ const compiledERC20: CompiledContract = JsonParser.parse(
 
 describe('new Contract()', () => {
   const address = randomAddress();
-  //   const address = "";
   const wallet = randomAddress();
   const contract = new Contract(compiledERC20.abi, address);
   beforeAll(async () => {
