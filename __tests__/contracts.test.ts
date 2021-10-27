@@ -13,7 +13,7 @@ const compiledERC20: CompiledContract = JsonParser.parse(
   fs.readFileSync('./__mocks__/ERC20.json').toString('ascii')
 );
 
-describe('new Contract()', () => {
+describe('class Contract {}', () => {
   const address = randomAddress();
   const wallet = randomAddress();
   const contract = new Contract(compiledERC20.abi, address);

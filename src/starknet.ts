@@ -2,7 +2,7 @@ import axios from 'axios';
 import { randomAddress, compressProgram, JsonParser } from './utils';
 import type {
   GetBlockResponse,
-  GetCode,
+  GetCodeResponse,
   GetContractAddressesResponse,
   GetTransactionResponse,
   GetTransactionStatusResponse,
@@ -82,10 +82,10 @@ export function getBlock(blockId: number): Promise<GetBlockResponse> {
  * @param blockId
  * @returns Bytecode and ABI of compiled contract
  */
-export function getCode(contractAddress: string, blockId: number): Promise<GetCode> {
+export function getCode(contractAddress: string, blockId: number): Promise<GetCodeResponse> {
   return new Promise((resolve, reject) => {
     axios
-      .get<GetCode>(
+      .get<GetCodeResponse>(
         `${FEEDER_GATEWAY_URL}/get_code?contractAddress=${contractAddress}&blockId=${blockId}`
       )
       .then((resp) => {

@@ -105,7 +105,11 @@
   "include": ["src/**/*"],
   "exclude": ["node_modules"],
   "typedocOptions": {
-    "entryPoints": ["src/index.ts"],
-    "out": "docs"
+    "entryPoints": ["src/starknet.ts", "src/types.ts"],
+    "out": "docs",
+    "githubPages": false,
+    "readme": "./README.md",
+    "name": "StarkNet.js Docs",
+    "sort": "source-order"
   }
 }
