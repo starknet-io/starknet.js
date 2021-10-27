@@ -45,7 +45,7 @@ export class Contract {
     return this;
   }
 
-  private static compileCalldata(args: Args): Calldata {
+  public static compileCalldata(args: Args): Calldata {
     return Object.values(args).flatMap((value) => {
       if (Array.isArray(value))
         return [
@@ -73,25 +73,29 @@ export class Contract {
     // ensure args match abi type
     const methodAbi = this.abi.find((abi) => abi.name === method)!;
     methodAbi.inputs.forEach((input) => {
-      assert(args[input.name] !== undefined, `no arg for "${input.name}" provided`);
-      if (input.type === 'felt') {
-        assert(typeof args[input.name] === 'string', `arg ${input.name} should be a felt (string)`);
-        assert(
-          isFelt(args[input.name] as string),
-          `arg ${input.name} should be decimal or hexadecimal`
-        );
-      } else {
-        assert(Array.isArray(args[input.name]), `arg ${input.name} should be a felt* (string[])`);
-        (args[input.name] as string[]).forEach((felt, i) => {
+      if (args[input.name] !== undefined) {
+        if (input.type === 'felt') {
           assert(
-            typeof felt === 'string',
-            `arg ${input.name}[${i}] should be a felt (string) as part of a felt* (string[])`
+            typeof args[input.name] === 'string',
+            `arg ${input.name} should be a felt (string)`
           );
           assert(
-            isFelt(felt),
-            `arg ${input.name}[${i}] should be decimal or hexadecimal as part of a felt* (string[])`
+            isFelt(args[input.name] as string),
+            `arg ${input.name} should be decimal or hexadecimal`
           );
-        });
+        } else {
+          assert(Array.isArray(args[input.name]), `arg ${input.name} should be a felt* (string[])`);
+          (args[input.name] as string[]).forEach((felt, i) => {
+            assert(
+              typeof felt === 'string',
+              `arg ${input.name}[${i}] should be a felt (string) as part of a felt* (string[])`
+            );
+            assert(
+              isFelt(felt),
+              `arg ${input.name}[${i}] should be decimal or hexadecimal as part of a felt* (string[])`
+            );
+          });
+        }
       }
     });
   }

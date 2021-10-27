@@ -2,11 +2,15 @@ import { gzip } from 'pako';
 import Json from 'json-bigint';
 import { keccak256 } from 'ethereum-cryptography/keccak';
 import { BigNumber } from '@ethersproject/bignumber';
+import { hexToBinary, binaryToNumber } from 'enc-utils';
 import { CompressedProgram, Program } from './types';
 import { CONTRACT_ADDRESS_LOWER_BOUND, CONTRACT_ADDRESS_UPPER_BOUND } from './constants';
 
 export const isBrowser = typeof window !== 'undefined';
 const MASK_250 = BigNumber.from(2).pow(250).sub(1); // 2 ** 250 - 1
+
+export const ensureNo0x = (str: string) => str.replace(/^0x/, '');
+export const ensure0x = (str: string) => `0x${ensureNo0x(str)}`;
 
 export const hexToDecimalString = (hex: string): string =>
   BigNumber.from(`0x${hex.replace(/^0x/, '')}`).toString();
@@ -81,4 +85,17 @@ export function starknetKeccak(value: string): BigNumber {
 export function getSelectorFromName(funcName: string) {
   // sometimes BigInteger pads the hex string with zeros, which isnt allowed in the starknet api
   return starknetKeccak(funcName).toHexString();
+}
+
+/*
+ Returns an integer from a given section of bits out of a hex string.
+ hex is the target hex string to slice.
+ start represents the index of the first bit to cut from the hex string (binary) in LSB order.
+ end represents the index of the last bit to cut from the hex string.
+*/
+export function getIntFromBits(hex: string, start: number, end?: number) {
+  const bin = hexToBinary(hex);
+  const bits = bin.slice(start, end);
+  const i = binaryToNumber(bits);
+  return i;
 }
