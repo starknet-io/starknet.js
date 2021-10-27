@@ -1,7 +1,18 @@
 import fs from 'fs';
-import { compressProgram, randomAddress, makeAddress, JsonParser } from '../src/utils';
-import { CompiledContract } from '../src/types';
-import * as starknet from '../src/index';
+import {
+  CompiledContract,
+  compressProgram,
+  randomAddress,
+  JsonParser,
+  getContractAddresses,
+  getBlock,
+  getCode,
+  getStorageAt,
+  getTransactionStatus,
+  getTransaction,
+  addTransaction,
+  deployContract,
+} from '../src';
 
 const compiledArgentAccount = JsonParser.parse(
   fs.readFileSync('./__mocks__/ArgentAccount.json').toString('ascii')
@@ -10,31 +21,27 @@ const compiledArgentAccount = JsonParser.parse(
 describe('starknet endpoints', () => {
   describe('feeder gateway endpoints', () => {
     test('getContractAddresses()', () => {
-      return expect(starknet.getContractAddresses()).resolves.not.toThrow();
+      return expect(getContractAddresses()).resolves.not.toThrow();
     });
     xtest('callContract()', () => {});
     test('getBlock()', () => {
-      return expect(starknet.getBlock(46500)).resolves.not.toThrow();
+      return expect(getBlock(46500)).resolves.not.toThrow();
     });
     test('getCode()', () => {
       return expect(
-        starknet.getCode('0x5f778a983bf8760ad37868f4c869d70247c5546044a7f0386df96d8043d4e9d', 46500)
+        getCode('0x5f778a983bf8760ad37868f4c869d70247c5546044a7f0386df96d8043d4e9d', 46500)
       ).resolves.not.toThrow();
     });
     test('getStorageAt()', () => {
       return expect(
-        starknet.getStorageAt(
-          '0x5f778a983bf8760ad37868f4c869d70247c5546044a7f0386df96d8043d4e9d',
-          0,
-          46500
-        )
+        getStorageAt('0x5f778a983bf8760ad37868f4c869d70247c5546044a7f0386df96d8043d4e9d', 0, 46500)
       ).resolves.not.toThrow();
     });
     test('getTransactionStatus()', () => {
-      return expect(starknet.getTransactionStatus(286136)).resolves.not.toThrow();
+      return expect(getTransactionStatus(286136)).resolves.not.toThrow();
     });
     test('getTransaction()', () => {
-      return expect(starknet.getTransaction(286136)).resolves.not.toThrow();
+      return expect(getTransaction(286136)).resolves.not.toThrow();
     });
   });
 
@@ -47,7 +54,7 @@ describe('starknet endpoints', () => {
         program: compressProgram(inputContract.program),
       };
 
-      const response = await starknet.addTransaction({
+      const response = await addTransaction({
         type: 'DEPLOY',
         contract_address: randomAddress(),
         contract_definition: contractDefinition,
@@ -59,15 +66,11 @@ describe('starknet endpoints', () => {
       // eslint-disable-next-line no-console
       console.log('txId:', response.tx_id);
     });
-    xtest('type: "INVOKE_FUNCTION"', () => {});
 
     test('deployContract()', async () => {
       const inputContract = compiledArgentAccount as unknown as CompiledContract;
 
-      const response = await starknet.deployContract(
-        inputContract,
-        makeAddress('0x20b5B1b8aFd65F1FCB755a449000cFC4aBCA0D40')
-      );
+      const response = await deployContract(inputContract);
       expect(response.code).toBe('TRANSACTION_RECEIVED');
       expect(response.tx_id).toBeGreaterThan(0);
 
