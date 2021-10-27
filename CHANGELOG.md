@@ -1,3 +1,17 @@
+# [1.2.0](https://github.com/seanjameshan/starknet.js/compare/v1.1.1...v1.2.0) (2021-10-27)
+
+### Bug Fixes
+
+- commitlint for release ([e8ad972](https://github.com/seanjameshan/starknet.js/commit/e8ad9721a9cf86365bf6e44d314c5f06a5589ff0))
+- **docs:** new docs page ([2e46cff](https://github.com/seanjameshan/starknet.js/commit/2e46cffff59c8f4db3967896258d737a4cc1bcf8))
+- remove useless comment ([ebf07b4](https://github.com/seanjameshan/starknet.js/commit/ebf07b46b6745ffa224caf33a66fc5958745564b))
+
+### Features
+
+- implement needed helper methods ([46f7173](https://github.com/seanjameshan/starknet.js/commit/46f7173f72a213bace2f7dc021172548f5ae8295))
+- introduce contract class ([db322fd](https://github.com/seanjameshan/starknet.js/commit/db322fda5a9828a9a4577fd2d712217622717e14))
+- type and use callContract ([10c7fc4](https://github.com/seanjameshan/starknet.js/commit/10c7fc4a46f94dc51cecee66e36f1979019fe994)), closes [#6](https://github.com/seanjameshan/starknet.js/issues/6)
+
 ## [1.1.1](https://github.com/seanjameshan/starknet.js/compare/v1.1.0...v1.1.1) (2021-10-24)
 
 ### Bug Fixes
