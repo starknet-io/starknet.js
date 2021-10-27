@@ -23,7 +23,6 @@ describe('starknet endpoints', () => {
     test('getContractAddresses()', () => {
       return expect(getContractAddresses()).resolves.not.toThrow();
     });
-    xtest('callContract()', () => {});
     test('getBlock()', () => {
       return expect(getBlock(46500)).resolves.not.toThrow();
     });
