@@ -27,14 +27,27 @@ describe('starknet endpoints', () => {
     test('getBlock()', () => {
       return expect(getBlock(46500)).resolves.not.toThrow();
     });
+    test('getBlock(blockId=null)', () => {
+      return expect(getBlock()).resolves.not.toThrow();
+    });
     test('getCode()', () => {
       return expect(
         getCode('0x5f778a983bf8760ad37868f4c869d70247c5546044a7f0386df96d8043d4e9d', 46500)
       ).resolves.not.toThrow();
     });
+    test('getCode(blockId=null)', () => {
+      return expect(
+        getCode('0x5f778a983bf8760ad37868f4c869d70247c5546044a7f0386df96d8043d4e9d')
+      ).resolves.not.toThrow();
+    });
     test('getStorageAt()', () => {
       return expect(
         getStorageAt('0x5f778a983bf8760ad37868f4c869d70247c5546044a7f0386df96d8043d4e9d', 0, 46500)
+      ).resolves.not.toThrow();
+    });
+    test('getStorageAt(blockId=null)', () => {
+      return expect(
+        getStorageAt('0x5f778a983bf8760ad37868f4c869d70247c5546044a7f0386df96d8043d4e9d', 0)
       ).resolves.not.toThrow();
     });
     test('getTransactionStatus()', () => {

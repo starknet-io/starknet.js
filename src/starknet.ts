@@ -62,10 +62,10 @@ export function callContract(invokeTx: Call, blockId?: number): Promise<CallCont
  * @param blockId
  * @returns the block object { block_id, previous_block_id, state_root, status, timestamp, transaction_receipts, transactions }
  */
-export function getBlock(blockId: number): Promise<GetBlockResponse> {
+export function getBlock(blockId?: number): Promise<GetBlockResponse> {
   return new Promise((resolve, reject) => {
     axios
-      .get<GetBlockResponse>(`${FEEDER_GATEWAY_URL}/get_block?blockId=${blockId}`)
+      .get<GetBlockResponse>(`${FEEDER_GATEWAY_URL}/get_block?blockId=${blockId ?? 'null'}`)
       .then((resp: any) => {
         resolve(resp.data);
       })
@@ -82,11 +82,13 @@ export function getBlock(blockId: number): Promise<GetBlockResponse> {
  * @param blockId
  * @returns Bytecode and ABI of compiled contract
  */
-export function getCode(contractAddress: string, blockId: number): Promise<GetCodeResponse> {
+export function getCode(contractAddress: string, blockId?: number): Promise<GetCodeResponse> {
   return new Promise((resolve, reject) => {
     axios
       .get<GetCodeResponse>(
-        `${FEEDER_GATEWAY_URL}/get_code?contractAddress=${contractAddress}&blockId=${blockId}`
+        `${FEEDER_GATEWAY_URL}/get_code?contractAddress=${contractAddress}&blockId=${
+          blockId ?? 'null'
+        }`
       )
       .then((resp) => {
         resolve(resp.data);
@@ -109,12 +111,14 @@ export function getCode(contractAddress: string, blockId: number): Promise<GetCo
 export function getStorageAt(
   contractAddress: string,
   key: number,
-  blockId: number
+  blockId?: number
 ): Promise<object> {
   return new Promise((resolve, reject) => {
     axios
       .get(
-        `${FEEDER_GATEWAY_URL}/get_storage_at?contractAddress=${contractAddress}&key=${key}&blockId=${blockId}`
+        `${FEEDER_GATEWAY_URL}/get_storage_at?contractAddress=${contractAddress}&key=${key}&blockId=${
+          blockId ?? 'null'
+        }`
       )
       .then((resp: any) => {
         resolve(resp.data);
