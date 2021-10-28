@@ -1,12 +1,20 @@
 import fs from 'fs';
-import { compressProgram, makeAddress, isBrowser, JsonParser, getSelectorFromName } from '../src';
 
-const compiledArgentAccount = JsonParser.parse(
+import { constants, utils } from '../src';
+
+const { IS_BROWSER } = constants;
+const {
+  json: { parse, stringify },
+  starknet: { compressProgram, getSelectorFromName, makeAddress },
+  enc: { hexToDecimalString },
+} = utils;
+
+const compiledArgentAccount = parse(
   fs.readFileSync('./__mocks__/ArgentAccount.json').toString('ascii')
 );
 
 test('isNode', () => {
-  expect(isBrowser).toBe(false);
+  expect(IS_BROWSER).toBe(false);
 });
 describe('compressProgram()', () => {
   test('compresses a contract program', () => {
@@ -17,13 +25,19 @@ describe('compressProgram()', () => {
     expect(compressed).toMatchSnapshot();
   });
   test('works with strings', () => {
-    const inputProgram = JsonParser.stringify(compiledArgentAccount.program);
+    const inputProgram = stringify(compiledArgentAccount.program);
 
     const compressed = compressProgram(inputProgram);
 
     expect(compressed).toMatchSnapshot();
   });
 });
+describe('hexToDecimalString()', () => {
+  test('parse 0xa23', () => {
+    expect(hexToDecimalString('0xa23')).toBe('2595');
+  });
+});
+
 describe('makeAddress()', () => {
   test('test on eth address', () => {
     const ethAddress = '0xdFD0F27FCe99b50909de0bDD328Aed6eAbe76BC5';
@@ -33,7 +47,7 @@ describe('makeAddress()', () => {
     expect(starkAddress).toBe('0xdfd0f27fce99b50909de0bdd328aed6eabe76bc5');
   });
 });
-describe('starknetKeccak()', () => {
+describe('getSelectorFromName()', () => {
   test('hash works for value="test"', () => {
     expect(getSelectorFromName('test')).toBe(
       '0x22ff5f21f0b81b113e63f7db6da94fedef11b2119b4088b89664fb9a3cb658'
@@ -46,7 +60,7 @@ describe('starknetKeccak()', () => {
   });
   test('hash works for value="mint"', () => {
     expect(getSelectorFromName('mint')).toBe(
-      '0x02f0b3c5710379609eb5495f1ecd348cb28167711b73609fe565a72734550354'
+      '0x2f0b3c5710379609eb5495f1ecd348cb28167711b73609fe565a72734550354'
     );
   });
 });

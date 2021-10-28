@@ -1,20 +1,25 @@
-import { BigNumber } from '@ethersproject/bignumber';
-
 import fs from 'fs';
+
+import { addHexPrefix } from 'enc-utils';
+
 import {
-  hashMessage,
   CompiledContract,
   Contract,
   deployContract,
-  JsonParser,
-  waitForTx,
-  randomAddress,
-  getSelectorFromName,
-  ensure0x,
-  getStarkKey,
   getKeyPair,
+  getStarkKey,
+  hashMessage,
   sign,
+  utils,
+  waitForTx,
 } from '../src';
+import { toBN } from '../src/utils/number';
+
+const {
+  json: { parse },
+  starknet: { getSelectorFromName, randomAddress },
+  number: { toHex },
+} = utils;
 
 describe('getStarkAccountFromPk()', () => {
   test('it works with valid pk', () => {
@@ -35,10 +40,10 @@ describe('getStarkAccountFromPk()', () => {
   });
 });
 
-const compiledArgentAccount: CompiledContract = JsonParser.parse(
+const compiledArgentAccount: CompiledContract = parse(
   fs.readFileSync('./__mocks__/ArgentAccount.json').toString('ascii')
 );
-const compiledErc20: CompiledContract = JsonParser.parse(
+const compiledErc20: CompiledContract = parse(
   fs.readFileSync('./__mocks__/ERC20.json').toString('ascii')
 );
 
@@ -93,18 +98,18 @@ describe('deploy and test Wallet', () => {
   test('read nonce', async () => {
     const { nonce } = await wallet.call('get_current_nonce');
 
-    expect(BigNumber.from(nonce)).toStrictEqual(BigNumber.from(0));
+    expect(toBN(nonce as string).toString()).toStrictEqual(toBN(0).toString());
   });
   test('read balance of wallet', async () => {
     const { res } = await erc20.call('balance_of', {
       user: walletAddress,
     });
 
-    expect(BigNumber.from(res)).toStrictEqual(BigNumber.from(1000));
+    expect(toBN(res as string).toString()).toStrictEqual(toBN(1000).toString());
   });
   test('execute by wallet owner', async () => {
     const { nonce } = await wallet.call('get_current_nonce');
-    const msgHash = ensure0x(
+    const msgHash = addHexPrefix(
       hashMessage(
         walletAddress,
         erc20Address,
@@ -113,14 +118,14 @@ describe('deploy and test Wallet', () => {
         nonce.toString()
       )
     );
-    console.log(msgHash);
+
     const { r, s } = sign(starkKeyPair, msgHash);
     const { code, tx_id } = await wallet.invoke('execute', {
       to: erc20Address,
       selector: getSelectorFromName('transfer'),
       calldata: [erc20Address, '10'],
       nonce: nonce.toString(),
-      sig: [ensure0x(r.toString('hex')), ensure0x(s.toString('hex'))],
+      sig: [toHex(r), toHex(s)],
     });
 
     // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
@@ -135,7 +140,7 @@ describe('deploy and test Wallet', () => {
       user: walletAddress,
     });
 
-    expect(BigNumber.from(res)).toStrictEqual(BigNumber.from(990));
+    expect(toBN(res as string).toString()).toStrictEqual(toBN(990).toString());
   });
 });
 
@@ -149,14 +154,12 @@ test('build tx', async () => {
   const selector = getSelectorFromName('transfer');
 
   expect(selector).toBe(
-    BigNumber.from(
-      '232670485425082704932579856502088130646006032362877466777181098476241604910'
-    ).toHexString()
+    toHex(toBN('232670485425082704932579856502088130646006032362877466777181098476241604910'))
   );
 
   const msgHash = hashMessage(address, '1', selector, ['6', '7'], '0');
-  expect(BigNumber.from(msgHash)).toStrictEqual(
-    BigNumber.from('2221651675559331189881349481637314109810712322791057846116415219218634672652')
+  expect(toBN(msgHash).toString()).toStrictEqual(
+    toBN('2221651675559331189881349481637314109810712322791057846116415219218634672652').toString()
   );
 
   const { r, s } = sign(keyPair, msgHash);

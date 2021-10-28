@@ -1,15 +1,17 @@
-import assert from 'assert';
-import { BigNumber } from '@ethersproject/bignumber';
-import { Abi } from './types';
-import { getSelectorFromName } from './utils';
+import BN from 'bn.js';
+import assert from 'minimalistic-assert';
+
 import { addTransaction, callContract } from './starknet';
+import { Abi } from './types';
+import { toBN } from './utils/number';
+import { getSelectorFromName } from './utils/starknet';
 
 type Args = { [inputName: string]: string | string[] };
 type Calldata = string[];
 
-const parseFelt = (candidate: string): BigNumber => {
+const parseFelt = (candidate: string): BN => {
   try {
-    return BigNumber.from(candidate);
+    return toBN(candidate);
   } catch (e) {
     throw Error('Couldnt parse felt');
   }
@@ -48,11 +50,8 @@ export class Contract {
   public static compileCalldata(args: Args): Calldata {
     return Object.values(args).flatMap((value) => {
       if (Array.isArray(value))
-        return [
-          BigNumber.from(value.length).toString(),
-          ...value.map((x) => BigNumber.from(x).toString()),
-        ];
-      return BigNumber.from(value).toString();
+        return [toBN(value.length).toString(), ...value.map((x) => toBN(x).toString())];
+      return toBN(value).toString();
     });
   }
 

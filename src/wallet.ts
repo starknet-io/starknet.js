@@ -1,4 +1,4 @@
-import { pedersen } from './ec';
+import { pedersen } from './utils/hash';
 
 export * from './ec';
 
