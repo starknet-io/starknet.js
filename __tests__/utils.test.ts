@@ -6,7 +6,7 @@ const { IS_BROWSER } = constants;
 const {
   json: { parse, stringify },
   starknet: { compressProgram, getSelectorFromName, makeAddress },
-  enc: { hexToDecimalString },
+  number: { hexToDecimalString },
 } = utils;
 
 const compiledArgentAccount = parse(

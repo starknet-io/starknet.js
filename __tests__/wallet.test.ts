@@ -1,7 +1,5 @@
 import fs from 'fs';
 
-import { addHexPrefix } from 'enc-utils';
-
 import {
   CompiledContract,
   Contract,
@@ -13,6 +11,7 @@ import {
   utils,
   waitForTx,
 } from '../src';
+import { addHexPrefix } from '../src/utils/enc';
 import { toBN } from '../src/utils/number';
 
 const {

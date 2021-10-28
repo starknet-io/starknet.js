@@ -1,9 +1,9 @@
 import { ec as EC, curves } from 'elliptic';
-import { addHexPrefix, removeHexPrefix, sanitizeBytes } from 'enc-utils';
 import hashJS from 'hash.js';
 import assert from 'minimalistic-assert';
 
 import { CONSTANT_POINTS, EC_ORDER, FIELD_PRIME, MAX_ECDSA_VAL, ONE, ZERO } from './constants';
+import { addHexPrefix, removeHexPrefix, sanitizeBytes } from './utils/enc';
 import { BigNumberish, assertInRange, toBN, toHex } from './utils/number';
 
 export const ec = new EC(

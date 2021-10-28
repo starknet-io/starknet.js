@@ -1,11 +1,10 @@
 import BN from 'bn.js';
-import { addHexPrefix, utf8ToArray } from 'enc-utils';
 import { keccak256 } from 'ethereum-cryptography/keccak';
 import assert from 'minimalistic-assert';
 
 import { CONSTANT_POINTS, FIELD_PRIME, MASK_250, ONE, ZERO } from '../constants';
 import { ec } from '../ec';
-import { buf2hex } from './enc';
+import { addHexPrefix, buf2hex, utf8ToArray } from './enc';
 import { BigNumberish, toBN } from './number';
 
 const keccakHex = (value: string): string => addHexPrefix(buf2hex(keccak256(utf8ToArray(value))));

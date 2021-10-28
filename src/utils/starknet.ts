@@ -1,9 +1,8 @@
-import { addHexPrefix } from 'enc-utils';
 import { gzip } from 'pako';
 
 import { genKeyPair, getStarkKey } from '../ec';
 import { CompressedProgram, Program } from '../types';
-import { btoaUniversal } from './enc';
+import { addHexPrefix, btoaUniversal } from './enc';
 import { starknetKeccak } from './hash';
 import { stringify } from './json';
 import { toHex } from './number';

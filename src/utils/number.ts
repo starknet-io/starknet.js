@@ -1,6 +1,7 @@
 import BN from 'bn.js';
-import { addHexPrefix, removeHexPrefix } from 'enc-utils';
 import assert from 'minimalistic-assert';
+
+import { addHexPrefix, removeHexPrefix } from './enc';
 
 export type BigNumberish = string | number | BN;
 
@@ -17,6 +18,9 @@ export const toBN = (number: BigNumberish, base?: number | 'hex') => {
 export const toHex = (number: BN): string => {
   return addHexPrefix(number.toString('hex'));
 };
+
+export const hexToDecimalString = (hex: string): string =>
+  toBN(`0x${hex.replace(/^0x/, '')}`).toString();
 
 /*
  Asserts input is equal to or greater then lowerBound and lower then upperBound.

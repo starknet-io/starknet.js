@@ -1,6 +1,6 @@
 import { toBN } from './utils/number';
 
-export const IS_BROWSER = typeof window !== 'undefined';
+export { IS_BROWSER } from './utils/enc';
 
 export const ZERO = toBN(0);
 export const ONE = toBN(1);

@@ -61,7 +61,6 @@
     "axios": "^0.23.0",
     "bn.js": "^5.2.0",
     "elliptic": "^6.5.4",
-    "enc-utils": "^3.0.0",
     "ethereum-cryptography": "^0.2.0",
     "hash.js": "^1.1.7",
     "json-bigint": "^1.0.0",
