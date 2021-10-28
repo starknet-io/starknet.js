@@ -1,3 +1,9 @@
+# [1.3.0](https://github.com/seanjameshan/starknet.js/compare/v1.2.0...v1.3.0) (2021-10-28)
+
+### Features
+
+- allow optional blockId ([fbd09ba](https://github.com/seanjameshan/starknet.js/commit/fbd09ba8458caf9a5c0ac0b84a9955c413524292))
+
 # [1.2.0](https://github.com/seanjameshan/starknet.js/compare/v1.1.1...v1.2.0) (2021-10-27)
 
 ### Bug Fixes
