@@ -58,13 +58,13 @@ export type GetBlockResponse = {
   state_root: string;
   block_id: number;
   transactions: {
-    [txid: string]: Transaction;
+    [txHash: string]: Transaction;
   };
   timestamp: number;
   transaction_receipts: {
-    [txid: string]: {
+    [txHash: string]: {
       block_id: number;
-      transaction_id: number;
+      transaction_hash: string;
       l2_to_l1_messages: {
         to_address: string;
         payload: string[];
@@ -90,12 +90,12 @@ export type GetTransactionStatusResponse = {
 };
 
 export type GetTransactionResponse = {
-  transaction_index: number;
+  status: Status;
   transaction: Transaction;
   block_id: number;
   block_number: number;
-  status: Status;
-  transaction_id: number;
+  transaction_index: number;
+  transaction_hash: string;
 };
 
 export type AddTransactionResponse = {

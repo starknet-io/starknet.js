@@ -27,8 +27,10 @@ const compiledArgentAccount = parse(
 
 describe('starknet endpoints', () => {
   describe('feeder gateway endpoints', () => {
-    test('getContractAddresses()', () => {
-      return expect(getContractAddresses()).resolves.not.toThrow();
+    test('getContractAddresses()', async () => {
+      const { GpsStatementVerifier, Starknet } = await getContractAddresses();
+      expect(typeof GpsStatementVerifier).toBe('string');
+      expect(typeof Starknet).toBe('string');
     });
     test('getBlock()', () => {
       return expect(getBlock(870)).resolves.not.toThrow();
@@ -61,7 +63,11 @@ describe('starknet endpoints', () => {
         getTransactionStatus('0x2086ff26645fb0e31a3e252302f3cb1e7612c60389102e5473dfc89758a3aa9')
       ).resolves.not.toThrow();
     });
-    test('getTransaction()', () => {
+    test('getTransaction()', async () => {
+      const x = await getTransaction(
+        '0x2086ff26645fb0e31a3e252302f3cb1e7612c60389102e5473dfc89758a3aa9'
+      );
+      console.log(x);
       return expect(
         getTransaction('0x2086ff26645fb0e31a3e252302f3cb1e7612c60389102e5473dfc89758a3aa9')
       ).resolves.not.toThrow();
