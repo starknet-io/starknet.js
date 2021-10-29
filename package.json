@@ -35,8 +35,10 @@
     "@semantic-release/git": "^10.0.0",
     "@semantic-release/npm": "^8.0.2",
     "@semantic-release/release-notes-generator": "^10.0.2",
+    "@types/elliptic": "^6.4.13",
     "@types/jest": "^27.0.2",
     "@types/json-bigint": "^1.0.1",
+    "@types/minimalistic-assert": "^1.0.1",
     "@types/pako": "^1.0.2",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
@@ -47,17 +49,22 @@
     "eslint-plugin-import": "^2.25.2",
     "eslint-plugin-prettier": "^4.0.0",
     "husky": "^7.0.2",
+    "import-sort-style-module": "^6.0.0",
     "jest": "^27.3.0",
     "lint-staged": "^11.2.3",
     "prettier": "^2.4.1",
+    "prettier-plugin-import-sort": "^0.0.7",
     "typedoc": "^0.22.6",
     "typescript": "^4.4.4"
   },
   "dependencies": {
-    "@ethersproject/bignumber": "^5.5.0",
     "axios": "^0.23.0",
+    "bn.js": "^5.2.0",
+    "elliptic": "^6.5.4",
     "ethereum-cryptography": "^0.2.0",
+    "hash.js": "^1.1.7",
     "json-bigint": "^1.0.0",
+    "minimalistic-assert": "^1.0.1",
     "pako": "^2.0.4"
   },
   "lint-staged": {
@@ -66,5 +73,11 @@
   },
   "jest": {
     "testTimeout": 300000
+  },
+  "importSort": {
+    ".js, .jsx, .ts, .tsx": {
+      "style": "module",
+      "parser": "typescript"
+    }
   }
 }

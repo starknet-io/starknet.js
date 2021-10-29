@@ -1,15 +1,14 @@
-import { BigNumber } from '@ethersproject/bignumber';
 import fs from 'fs';
-import {
-  CompiledContract,
-  Contract,
-  deployContract,
-  JsonParser,
-  randomAddress,
-  waitForTx,
-} from '../src';
 
-const compiledERC20: CompiledContract = JsonParser.parse(
+import { CompiledContract, Contract, deployContract, utils, waitForTx } from '../src';
+
+const {
+  json: { parse },
+  number: { toBN },
+  starknet: { randomAddress },
+} = utils;
+
+const compiledERC20: CompiledContract = parse(
   fs.readFileSync('./__mocks__/ERC20.json').toString('ascii')
 );
 
@@ -29,7 +28,7 @@ describe('class Contract {}', () => {
     const response = await contract.call('balance_of', {
       user: wallet,
     });
-    expect(BigNumber.from(response.res)).toStrictEqual(BigNumber.from(0));
+    expect(toBN(response.res as string).toString()).toStrictEqual(toBN(0).toString());
   });
   test('add 10 test ERC20 to account', async () => {
     const response = await contract.invoke('mint', {
@@ -48,6 +47,6 @@ describe('class Contract {}', () => {
       user: wallet,
     });
 
-    expect(BigNumber.from(response.res)).toStrictEqual(BigNumber.from(10));
+    expect(toBN(response.res as string).toString()).toStrictEqual(toBN(10).toString());
   });
 });

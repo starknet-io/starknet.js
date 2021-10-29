@@ -1,28 +1,30 @@
-import assert from 'assert';
-import { BigNumber } from '@ethersproject/bignumber';
-import { Abi } from './types';
-import { getSelectorFromName } from './utils';
+import BN from 'bn.js';
+import assert from 'minimalistic-assert';
+
 import { addTransaction, callContract } from './starknet';
+import { Abi } from './types';
+import { toBN } from './utils/number';
+import { getSelectorFromName } from './utils/starknet';
 
 type Args = { [inputName: string]: string | string[] };
 type Calldata = string[];
 
-const parseFelt = (candidate: string): BigNumber => {
+function parseFelt(candidate: string): BN {
   try {
-    return BigNumber.from(candidate);
+    return toBN(candidate);
   } catch (e) {
     throw Error('Couldnt parse felt');
   }
-};
+}
 
-const isFelt = (candidate: string): boolean => {
+function isFelt(candidate: string): boolean {
   try {
     parseFelt(candidate);
     return true;
   } catch (e) {
     return false;
   }
-};
+}
 
 export class Contract {
   connectedTo: string | null = null;
@@ -45,14 +47,11 @@ export class Contract {
     return this;
   }
 
-  private static compileCalldata(args: Args): Calldata {
+  public static compileCalldata(args: Args): Calldata {
     return Object.values(args).flatMap((value) => {
       if (Array.isArray(value))
-        return [
-          BigNumber.from(value.length).toString(),
-          ...value.map((x) => BigNumber.from(x).toString()),
-        ];
-      return BigNumber.from(value).toString();
+        return [toBN(value.length).toString(), ...value.map((x) => toBN(x).toString())];
+      return toBN(value).toString();
     });
   }
 
@@ -73,25 +72,29 @@ export class Contract {
     // ensure args match abi type
     const methodAbi = this.abi.find((abi) => abi.name === method)!;
     methodAbi.inputs.forEach((input) => {
-      assert(args[input.name] !== undefined, `no arg for "${input.name}" provided`);
-      if (input.type === 'felt') {
-        assert(typeof args[input.name] === 'string', `arg ${input.name} should be a felt (string)`);
-        assert(
-          isFelt(args[input.name] as string),
-          `arg ${input.name} should be decimal or hexadecimal`
-        );
-      } else {
-        assert(Array.isArray(args[input.name]), `arg ${input.name} should be a felt* (string[])`);
-        (args[input.name] as string[]).forEach((felt, i) => {
+      if (args[input.name] !== undefined) {
+        if (input.type === 'felt') {
           assert(
-            typeof felt === 'string',
-            `arg ${input.name}[${i}] should be a felt (string) as part of a felt* (string[])`
+            typeof args[input.name] === 'string',
+            `arg ${input.name} should be a felt (string)`
           );
           assert(
-            isFelt(felt),
-            `arg ${input.name}[${i}] should be decimal or hexadecimal as part of a felt* (string[])`
+            isFelt(args[input.name] as string),
+            `arg ${input.name} should be decimal or hexadecimal`
           );
-        });
+        } else {
+          assert(Array.isArray(args[input.name]), `arg ${input.name} should be a felt* (string[])`);
+          (args[input.name] as string[]).forEach((felt, i) => {
+            assert(
+              typeof felt === 'string',
+              `arg ${input.name}[${i}] should be a felt (string) as part of a felt* (string[])`
+            );
+            assert(
+              isFelt(felt),
+              `arg ${input.name}[${i}] should be decimal or hexadecimal as part of a felt* (string[])`
+            );
+          });
+        }
       }
     });
   }

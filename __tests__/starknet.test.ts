@@ -1,20 +1,24 @@
 import fs from 'fs';
+
 import {
   CompiledContract,
-  compressProgram,
-  randomAddress,
-  JsonParser,
-  getContractAddresses,
-  getBlock,
-  getCode,
-  getStorageAt,
-  getTransactionStatus,
-  getTransaction,
   addTransaction,
   deployContract,
+  getBlock,
+  getCode,
+  getContractAddresses,
+  getStorageAt,
+  getTransaction,
+  getTransactionStatus,
+  utils,
 } from '../src';
 
-const compiledArgentAccount = JsonParser.parse(
+const {
+  json: { parse },
+  starknet: { compressProgram, randomAddress },
+} = utils;
+
+const compiledArgentAccount = parse(
   fs.readFileSync('./__mocks__/ArgentAccount.json').toString('ascii')
 );
 
@@ -23,7 +27,6 @@ describe('starknet endpoints', () => {
     test('getContractAddresses()', () => {
       return expect(getContractAddresses()).resolves.not.toThrow();
     });
-    xtest('callContract()', () => {});
     test('getBlock()', () => {
       return expect(getBlock(46500)).resolves.not.toThrow();
     });

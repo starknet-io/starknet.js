@@ -1,17 +1,19 @@
 import axios from 'axios';
-import { randomAddress, compressProgram, JsonParser } from './utils';
+
 import type {
+  AddTransactionResponse,
+  Call,
+  CallContractResponse,
+  CompiledContract,
   GetBlockResponse,
   GetCodeResponse,
   GetContractAddressesResponse,
   GetTransactionResponse,
   GetTransactionStatusResponse,
   Transaction,
-  AddTransactionResponse,
-  CompiledContract,
-  Call,
-  CallContractResponse,
 } from './types';
+import { parse } from './utils/json';
+import { compressProgram, randomAddress } from './utils/starknet';
 
 const API_URL = 'https://alpha2.starknet.io';
 const FEEDER_GATEWAY_URL = `${API_URL}/feeder_gateway`;
@@ -198,7 +200,7 @@ export function deployContract(
   address: string = randomAddress()
 ): Promise<AddTransactionResponse> {
   const parsedContract =
-    typeof contract === 'string' ? (JsonParser.parse(contract) as CompiledContract) : contract;
+    typeof contract === 'string' ? (parse(contract) as CompiledContract) : contract;
   const contractDefinition = {
     ...parsedContract,
     program: compressProgram(parsedContract.program),
@@ -211,7 +213,9 @@ export function deployContract(
   });
 }
 
-const wait = (delay: number) => new Promise((res) => setTimeout(res, delay));
+function wait(delay: number) {
+  return new Promise((res) => setTimeout(res, delay));
+}
 export async function waitForTx(txId: number, retryInterval: number = 2000) {
   let onchain = false;
   while (!onchain) {
