@@ -3,7 +3,7 @@ import hashJS from 'hash.js';
 import assert from 'minimalistic-assert';
 
 import { CONSTANT_POINTS, EC_ORDER, FIELD_PRIME, MAX_ECDSA_VAL, ONE, ZERO } from './constants';
-import { addHexPrefix, removeHexPrefix, sanitizeBytes } from './utils/enc';
+import { addHexPrefix, removeHexPrefix, sanitizeBytes } from './utils/encode';
 import { BigNumberish, assertInRange, toBN, toHex } from './utils/number';
 
 export const ec = new EC(
@@ -40,17 +40,17 @@ function fixMessage(msg: string) {
 
 export const genKeyPair = ec.genKeyPair.bind(ec);
 
-export const getKeyPair = (pk: BigNumberish): EC.KeyPair => {
+export function getKeyPair(pk: BigNumberish): EC.KeyPair {
   const pkBn = toBN(pk);
   return ec.keyFromPrivate(removeHexPrefix(toHex(pkBn)), 'hex');
-};
+}
 
-export const getStarkKey = (keyPair: EC.KeyPair): string => {
+export function getStarkKey(keyPair: EC.KeyPair): string {
   // this method needs to be run to generate the .pub property used below
   // the result can be dumped
   keyPair.getPublic(true, 'hex');
   return addHexPrefix(sanitizeBytes((keyPair as any).pub.getX().toString(16), 2));
-};
+}
 
 /*
  Signs a message using the provided key.

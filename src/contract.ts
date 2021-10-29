@@ -9,22 +9,22 @@ import { getSelectorFromName } from './utils/starknet';
 type Args = { [inputName: string]: string | string[] };
 type Calldata = string[];
 
-const parseFelt = (candidate: string): BN => {
+function parseFelt(candidate: string): BN {
   try {
     return toBN(candidate);
   } catch (e) {
     throw Error('Couldnt parse felt');
   }
-};
+}
 
-const isFelt = (candidate: string): boolean => {
+function isFelt(candidate: string): boolean {
   try {
     parseFelt(candidate);
     return true;
   } catch (e) {
     return false;
   }
-};
+}
 
 export class Contract {
   connectedTo: string | null = null;

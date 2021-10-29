@@ -1,6 +1,6 @@
 import { toBN } from './utils/number';
 
-export { IS_BROWSER } from './utils/enc';
+export { IS_BROWSER } from './utils/encode';
 
 export const ZERO = toBN(0);
 export const ONE = toBN(1);

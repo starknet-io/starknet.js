@@ -1,8 +1,8 @@
 import { gzip } from 'pako';
 
-import { genKeyPair, getStarkKey } from '../ec';
+import { genKeyPair, getStarkKey } from '../ellipticalCurve';
 import { CompressedProgram, Program } from '../types';
-import { addHexPrefix, btoaUniversal } from './enc';
+import { addHexPrefix, btoaUniversal } from './encode';
 import { starknetKeccak } from './hash';
 import { stringify } from './json';
 import { toHex } from './number';
@@ -32,10 +32,10 @@ export function getSelectorFromName(funcName: string) {
   return toHex(starknetKeccak(funcName));
 }
 
-export const randomAddress = (): string => {
+export function randomAddress(): string {
   const randomKeyPair = genKeyPair();
   return getStarkKey(randomKeyPair);
-};
+}
 
 export function makeAddress(input: string): string {
   return addHexPrefix(input).toLowerCase();

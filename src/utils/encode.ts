@@ -3,14 +3,17 @@ export const IS_BROWSER = typeof window !== 'undefined';
 
 const STRING_ZERO = '0';
 
-export const arrayBufferToString = (array: ArrayBuffer): string =>
-  String.fromCharCode.apply(null, array as unknown as number[]);
+export function arrayBufferToString(array: ArrayBuffer): string {
+  return String.fromCharCode.apply(null, array as unknown as number[]);
+}
 
-export const btoaUniversal = (b: ArrayBuffer): string =>
-  IS_BROWSER ? btoa(arrayBufferToString(b)) : Buffer.from(b).toString('base64');
+export function btoaUniversal(b: ArrayBuffer): string {
+  return IS_BROWSER ? btoa(arrayBufferToString(b)) : Buffer.from(b).toString('base64');
+}
 
-export const buf2hex = (buffer: Uint8Array) =>
-  [...buffer].map((x) => x.toString(16).padStart(2, '0')).join('');
+export function buf2hex(buffer: Uint8Array) {
+  return [...buffer].map((x) => x.toString(16).padStart(2, '0')).join('');
+}
 
 /**
  * Some function imported from https://github.com/pedrouid/enc-utils/blob/master/src/index.ts

@@ -3,11 +3,13 @@ import { keccak256 } from 'ethereum-cryptography/keccak';
 import assert from 'minimalistic-assert';
 
 import { CONSTANT_POINTS, FIELD_PRIME, MASK_250, ONE, ZERO } from '../constants';
-import { ec } from '../ec';
-import { addHexPrefix, buf2hex, utf8ToArray } from './enc';
+import { ec } from '../ellipticalCurve';
+import { addHexPrefix, buf2hex, utf8ToArray } from './encode';
 import { BigNumberish, toBN } from './number';
 
-const keccakHex = (value: string): string => addHexPrefix(buf2hex(keccak256(utf8ToArray(value))));
+function keccakHex(value: string): string {
+  return addHexPrefix(buf2hex(keccak256(utf8ToArray(value))));
+}
 
 /**
  * Function to get the starknet keccak hash from a string

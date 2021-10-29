@@ -1,8 +1,8 @@
 import { pedersen } from './utils/hash';
 
-export * from './ec';
+export * from './ellipticalCurve';
 
-export const hashCalldata = (calldata: string[]): string => {
+export function hashCalldata(calldata: string[]): string {
   const calldataCopy = [...calldata];
   if (calldataCopy.length === 0) {
     return '0';
@@ -13,18 +13,18 @@ export const hashCalldata = (calldata: string[]): string => {
   // calldata element will always be there as it was checked by an if statement before (!)
   const calldataEl = calldataCopy.shift()!;
   return pedersen([hashCalldata(calldataCopy), calldataEl]);
-};
+}
 
-export const hashMessage = (
+export function hashMessage(
   account: string,
   to: string,
   selector: string,
   calldata: string[],
   nonce: string
-) => {
+) {
   const hash0 = pedersen([account, to]);
   const hash1 = pedersen([hash0, selector]);
   const calldataHash = hashCalldata(calldata);
   const hash2 = pedersen([hash1, calldataHash]);
   return pedersen([hash2, nonce]);
-};
+}

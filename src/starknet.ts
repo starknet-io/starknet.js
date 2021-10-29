@@ -213,7 +213,9 @@ export function deployContract(
   });
 }
 
-const wait = (delay: number) => new Promise((res) => setTimeout(res, delay));
+function wait(delay: number) {
+  return new Promise((res) => setTimeout(res, delay));
+}
 export async function waitForTx(txId: number, retryInterval: number = 2000) {
   let onchain = false;
   while (!onchain) {

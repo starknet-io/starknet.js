@@ -1,5 +1,5 @@
 import { getKeyPair, getStarkKey, hashCalldata, hashMessage, pedersen, sign } from '../src';
-import { removeHexPrefix } from '../src/utils/enc';
+import { removeHexPrefix } from '../src/utils/encode';
 import { toBN, toHex } from '../src/utils/number';
 
 test('does work with package', () => {

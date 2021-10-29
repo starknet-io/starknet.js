@@ -11,7 +11,7 @@ import {
   utils,
   waitForTx,
 } from '../src';
-import { addHexPrefix } from '../src/utils/enc';
+import { addHexPrefix } from '../src/utils/encode';
 import { toBN } from '../src/utils/number';
 
 const {

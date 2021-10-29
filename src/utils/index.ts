@@ -1,4 +1,4 @@
-export * as enc from './enc';
+export * as enc from './encode';
 export * as hash from './hash';
 export * as json from './json';
 export * as number from './number';
