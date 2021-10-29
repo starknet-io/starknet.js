@@ -2,7 +2,7 @@ import { getKeyPair, getStarkKey, hashCalldata, hashMessage, pedersen, sign } fr
 import { removeHexPrefix } from '../src/utils/encode';
 import { toBN, toHex } from '../src/utils/number';
 
-test('does work with package', () => {
+test('getKeyPair()', () => {
   const pk = '0x019800ea6a9a73f94aee6a3d2edf018fc770443e90c7ba121e8303ec6b349279';
   const pair = getKeyPair(pk);
   // somehow needed, returns error else
@@ -11,7 +11,7 @@ test('does work with package', () => {
   );
 });
 
-test('pedersen', () => {
+test('pedersen()', () => {
   const own = pedersen(['0x12773', '0x872362']);
   expect(own).toMatchSnapshot();
 });
@@ -27,6 +27,7 @@ test('hashCalldata()', () => {
     '0x2ab889bd35e684623df9b4ea4a4a1f6d9e0ef39b67c1293b8a89dd17e351235'
   );
 });
+
 test('hashMessage()', () => {
   const pk = '0x019800ea6a9a73f94aee6a3d2edf018fc770443e90c7ba121e8303ec6b349279';
   const hashMsg = hashMessage(
