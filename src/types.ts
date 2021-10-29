@@ -1,3 +1,5 @@
+import { BigNumberish } from './utils/number';
+
 export type GetContractAddressesResponse = {
   Starknet: string;
   GpsStatementVerifier: string;
@@ -30,12 +32,14 @@ export type CompressedCompiledContract = Omit<CompiledContract, 'program'>;
 export type DeployTransaction = {
   type: 'DEPLOY';
   contract_definition: CompressedCompiledContract;
-  contract_address: string;
+  contract_address_salt: BigNumberish;
+  constructor_calldata: string[];
 };
 
 export type InvokeFunctionTransaction = {
   type: 'INVOKE_FUNCTION';
   contract_address: string;
+  signature?: [BigNumberish, BigNumberish];
   entry_point_type?: EntryPointType;
   entry_point_selector?: string;
   calldata?: string[];
@@ -96,5 +100,6 @@ export type GetTransactionResponse = {
 
 export type AddTransactionResponse = {
   code: TxStatus;
-  tx_id: number;
+  transaction_hash: string;
+  address: string;
 };
