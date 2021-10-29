@@ -197,12 +197,6 @@ export function addTransaction(tx: Transaction): Promise<AddTransactionResponse>
   const signature = tx.type === 'INVOKE_FUNCTION' && formatSignature(tx.signature);
   const contract_address_salt = tx.type === 'DEPLOY' && toHex(toBN(tx.contract_address_salt));
 
-  console.log({
-    ...tx,
-    ...(Array.isArray(signature) && { signature }), // not needed on deploy tx
-    ...(contract_address_salt && { contract_address_salt }), // not needed on invoke tx
-  });
-
   return new Promise((resolve, reject) => {
     axios
       .post(`${GATEWAY_URL}/add_transaction`, {

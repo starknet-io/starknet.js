@@ -21,7 +21,7 @@ describe('class Contract {}', () => {
       transaction_hash,
       address: erc20address,
     } = await deployContract(compiledERC20, []);
-    console.log(erc20address);
+
     contract = new Contract(compiledERC20.abi, erc20address);
     // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
     // eslint-disable-next-line no-console
