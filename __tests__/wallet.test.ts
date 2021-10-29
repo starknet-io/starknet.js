@@ -119,7 +119,7 @@ describe('deploy and test Wallet', () => {
     const { nonce } = await wallet.call('get_current_nonce');
     const msgHash = addHexPrefix(
       hashMessage(
-        '0', // needs to be walletAddress once it'S possible to retrieve address(self) in cairo
+        '0', // needs to be walletAddress once it's possible to retrieve address(self) in cairo
         erc20Address,
         getSelectorFromName('transfer'),
         [erc20Address, '10'],
