@@ -64,10 +64,6 @@ describe('starknet endpoints', () => {
       ).resolves.not.toThrow();
     });
     test('getTransaction()', async () => {
-      const x = await getTransaction(
-        '0x2086ff26645fb0e31a3e252302f3cb1e7612c60389102e5473dfc89758a3aa9'
-      );
-      console.log(x);
       return expect(
         getTransaction('0x2086ff26645fb0e31a3e252302f3cb1e7612c60389102e5473dfc89758a3aa9')
       ).resolves.not.toThrow();
@@ -108,10 +104,6 @@ describe('starknet endpoints', () => {
       expect(response.code).toBe('TRANSACTION_RECEIVED');
       expect(response.transaction_hash).toBeDefined();
       expect(response.address).toBeDefined();
-
-      // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
-      // eslint-disable-next-line no-console
-      console.log('txHash:', response.transaction_hash);
     });
 
     test('deployContract()', async () => {
@@ -129,10 +121,6 @@ describe('starknet endpoints', () => {
       expect(response.code).toBe('TRANSACTION_RECEIVED');
       expect(response.transaction_hash).toBeDefined();
       expect(response.address).toBeDefined();
-
-      // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
-      // eslint-disable-next-line no-console
-      console.log('txHash:', response.transaction_hash);
     });
   });
 });

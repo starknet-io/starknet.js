@@ -49,9 +49,6 @@ const compiledErc20: CompiledContract = parse(
 describe('deploy and test Wallet', () => {
   const pk = randomAddress();
 
-  // eslint-disable-next-line no-console
-  console.log('PK:', pk);
-
   const starkKeyPair = getKeyPair(pk);
   const starkKeyPub = getStarkKey(starkKeyPair);
   let wallet: Contract;
@@ -59,23 +56,13 @@ describe('deploy and test Wallet', () => {
   let erc20: Contract;
   let erc20Address: string;
   beforeAll(async () => {
-    const {
-      code: codeErc20,
-      transaction_hash: txErc20,
-      address: erc20AddressLocal,
-    } = await deployContract(compiledErc20, []);
+    const { code: codeErc20, address: erc20AddressLocal } = await deployContract(compiledErc20, []);
     erc20Address = erc20AddressLocal;
     erc20 = new Contract(compiledErc20.abi, erc20Address);
-    // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
-    // eslint-disable-next-line no-console
-    console.log('deployed erc20', txErc20);
+
     expect(codeErc20).toBe('TRANSACTION_RECEIVED');
 
-    const {
-      code,
-      transaction_hash,
-      address: walletAddressLocal,
-    } = await deployContract(
+    const { code, address: walletAddressLocal } = await deployContract(
       compiledArgentAccount,
       Contract.compileCalldata({
         signer: starkKeyPub,
@@ -86,9 +73,6 @@ describe('deploy and test Wallet', () => {
     );
     walletAddress = walletAddressLocal;
     wallet = new Contract(compiledArgentAccount.abi, walletAddress);
-    // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
-    // eslint-disable-next-line no-console
-    console.log('deployed wallet', transaction_hash);
     expect(code).toBe('TRANSACTION_RECEIVED');
 
     const { code: codeErc20Mint, transaction_hash: txErc20Mint } = await erc20.invoke('mint', {
@@ -96,9 +80,6 @@ describe('deploy and test Wallet', () => {
       amount: '1000',
     });
 
-    // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
-    // eslint-disable-next-line no-console
-    console.log('mint erc20', txErc20Mint);
     expect(codeErc20Mint).toBe('TRANSACTION_RECEIVED');
 
     await waitForTx(txErc20Mint);
@@ -139,9 +120,6 @@ describe('deploy and test Wallet', () => {
       [toHex(r), toHex(s)]
     );
 
-    // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
-    // eslint-disable-next-line no-console
-    console.log('transfer erc20 using wallet execute', transaction_hash);
     expect(code).toBe('TRANSACTION_RECEIVED');
 
     await waitForTx(transaction_hash);

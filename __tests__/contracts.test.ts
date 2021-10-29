@@ -23,9 +23,7 @@ describe('class Contract {}', () => {
     } = await deployContract(compiledERC20, []);
 
     contract = new Contract(compiledERC20.abi, erc20address);
-    // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
-    // eslint-disable-next-line no-console
-    console.log('deployed erc20 contract', transaction_hash);
+
     expect(code).toBe('TRANSACTION_RECEIVED');
 
     await waitForTx(transaction_hash);
@@ -43,9 +41,6 @@ describe('class Contract {}', () => {
     });
     expect(response.code).toBe('TRANSACTION_RECEIVED');
 
-    // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
-    // eslint-disable-next-line no-console
-    console.log('txId:', response.transaction_hash, ', funded wallet:', wallet);
     await waitForTx(response.transaction_hash);
   });
   test('read balance after mint of that account', async () => {
