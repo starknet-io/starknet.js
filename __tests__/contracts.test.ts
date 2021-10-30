@@ -13,16 +13,20 @@ const compiledERC20: CompiledContract = parse(
 );
 
 describe('class Contract {}', () => {
-  const address = randomAddress();
   const wallet = randomAddress();
-  const contract = new Contract(compiledERC20.abi, address);
+  let contract: Contract;
   beforeAll(async () => {
-    const { code, tx_id } = await deployContract(compiledERC20, address);
-    // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
-    // eslint-disable-next-line no-console
-    console.log('deployed erc20 contract', tx_id);
+    const {
+      code,
+      transaction_hash,
+      address: erc20address,
+    } = await deployContract(compiledERC20, []);
+
+    contract = new Contract(compiledERC20.abi, erc20address);
+
     expect(code).toBe('TRANSACTION_RECEIVED');
-    await waitForTx(tx_id);
+
+    await waitForTx(transaction_hash);
   });
   test('read initial balance of that account', async () => {
     const response = await contract.call('balance_of', {
@@ -37,10 +41,7 @@ describe('class Contract {}', () => {
     });
     expect(response.code).toBe('TRANSACTION_RECEIVED');
 
-    // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
-    // eslint-disable-next-line no-console
-    console.log('txId:', response.tx_id, ', funded wallet:', wallet);
-    await waitForTx(response.tx_id);
+    await waitForTx(response.transaction_hash);
   });
   test('read balance after mint of that account', async () => {
     const response = await contract.call('balance_of', {

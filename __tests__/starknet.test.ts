@@ -2,7 +2,9 @@ import fs from 'fs';
 
 import {
   CompiledContract,
+  Contract,
   addTransaction,
+  callContract,
   deployContract,
   getBlock,
   getCode,
@@ -12,6 +14,7 @@ import {
   getTransactionStatus,
   utils,
 } from '../src';
+import { getSelectorFromName } from '../src/utils/starknet';
 
 const {
   json: { parse },
@@ -24,40 +27,57 @@ const compiledArgentAccount = parse(
 
 describe('starknet endpoints', () => {
   describe('feeder gateway endpoints', () => {
-    test('getContractAddresses()', () => {
-      return expect(getContractAddresses()).resolves.not.toThrow();
+    test('getContractAddresses()', async () => {
+      const { GpsStatementVerifier, Starknet } = await getContractAddresses();
+      expect(typeof GpsStatementVerifier).toBe('string');
+      expect(typeof Starknet).toBe('string');
     });
     test('getBlock()', () => {
-      return expect(getBlock(46500)).resolves.not.toThrow();
+      return expect(getBlock(870)).resolves.not.toThrow();
     });
     test('getBlock(blockId=null)', () => {
       return expect(getBlock()).resolves.not.toThrow();
     });
     test('getCode()', () => {
       return expect(
-        getCode('0x5f778a983bf8760ad37868f4c869d70247c5546044a7f0386df96d8043d4e9d', 46500)
+        getCode('0x163a1542a64402ffc93e39a4962eec51ce126f2e634631d3f1f6770a76e3a61', 870)
       ).resolves.not.toThrow();
     });
     test('getCode(blockId=null)', () => {
       return expect(
-        getCode('0x5f778a983bf8760ad37868f4c869d70247c5546044a7f0386df96d8043d4e9d')
+        getCode('0x163a1542a64402ffc93e39a4962eec51ce126f2e634631d3f1f6770a76e3a61')
       ).resolves.not.toThrow();
     });
     test('getStorageAt()', () => {
       return expect(
-        getStorageAt('0x5f778a983bf8760ad37868f4c869d70247c5546044a7f0386df96d8043d4e9d', 0, 46500)
+        getStorageAt('0x163a1542a64402ffc93e39a4962eec51ce126f2e634631d3f1f6770a76e3a61', 0, 870)
       ).resolves.not.toThrow();
     });
     test('getStorageAt(blockId=null)', () => {
       return expect(
-        getStorageAt('0x5f778a983bf8760ad37868f4c869d70247c5546044a7f0386df96d8043d4e9d', 0)
+        getStorageAt('0x163a1542a64402ffc93e39a4962eec51ce126f2e634631d3f1f6770a76e3a61', 0)
       ).resolves.not.toThrow();
     });
     test('getTransactionStatus()', () => {
-      return expect(getTransactionStatus(286136)).resolves.not.toThrow();
+      return expect(
+        getTransactionStatus('0x2086ff26645fb0e31a3e252302f3cb1e7612c60389102e5473dfc89758a3aa9')
+      ).resolves.not.toThrow();
     });
-    test('getTransaction()', () => {
-      return expect(getTransaction(286136)).resolves.not.toThrow();
+    test('getTransaction()', async () => {
+      return expect(
+        getTransaction('0x2086ff26645fb0e31a3e252302f3cb1e7612c60389102e5473dfc89758a3aa9')
+      ).resolves.not.toThrow();
+    });
+    test('callContract()', () => {
+      return expect(
+        callContract({
+          contract_address: '0x58bceda58a83a5a100117ddc893234bad9c84a6833c2008f0f1ca90150149af',
+          entry_point_selector: getSelectorFromName('balance_of'),
+          calldata: Contract.compileCalldata({
+            user: '0x58bceda58a83a5a100117ddc893234bad9c84a6833c2008f0f1ca90150149af',
+          }),
+        })
+      ).resolves.not.toThrow();
     });
   });
 
@@ -72,27 +92,35 @@ describe('starknet endpoints', () => {
 
       const response = await addTransaction({
         type: 'DEPLOY',
-        contract_address: randomAddress(),
+        contract_address_salt: randomAddress(),
+        constructor_calldata: Contract.compileCalldata({
+          signer: randomAddress(),
+          guardian: '0',
+          L1_address: '0',
+        }),
         contract_definition: contractDefinition,
       });
-      expect(response.code).toBe('TRANSACTION_RECEIVED');
-      expect(response.tx_id).toBeGreaterThan(0);
 
-      // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
-      // eslint-disable-next-line no-console
-      console.log('txId:', response.tx_id);
+      expect(response.code).toBe('TRANSACTION_RECEIVED');
+      expect(response.transaction_hash).toBeDefined();
+      expect(response.address).toBeDefined();
     });
 
     test('deployContract()', async () => {
       const inputContract = compiledArgentAccount as unknown as CompiledContract;
 
-      const response = await deployContract(inputContract);
-      expect(response.code).toBe('TRANSACTION_RECEIVED');
-      expect(response.tx_id).toBeGreaterThan(0);
+      const response = await deployContract(
+        inputContract,
+        Contract.compileCalldata({
+          signer: randomAddress(),
+          guardian: '0',
+          L1_address: '0',
+        })
+      );
 
-      // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
-      // eslint-disable-next-line no-console
-      console.log('txId:', response.tx_id);
+      expect(response.code).toBe('TRANSACTION_RECEIVED');
+      expect(response.transaction_hash).toBeDefined();
+      expect(response.address).toBeDefined();
     });
   });
 });

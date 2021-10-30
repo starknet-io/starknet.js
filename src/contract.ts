@@ -3,7 +3,7 @@ import assert from 'minimalistic-assert';
 
 import { addTransaction, callContract } from './starknet';
 import { Abi } from './types';
-import { toBN } from './utils/number';
+import { BigNumberish, toBN } from './utils/number';
 import { getSelectorFromName } from './utils/starknet';
 
 type Args = { [inputName: string]: string | string[] };
@@ -109,7 +109,7 @@ export class Contract {
     }, {} as Args);
   }
 
-  public invoke(method: string, args: Args = {}) {
+  public invoke(method: string, args: Args = {}, signature?: [BigNumberish, BigNumberish]) {
     // ensure contract is connected
     assert(this.connectedTo !== null, 'contract isnt connected to an address');
 
@@ -123,6 +123,7 @@ export class Contract {
     return addTransaction({
       type: 'INVOKE_FUNCTION',
       contract_address: this.connectedTo,
+      signature,
       calldata,
       entry_point_selector: entrypointSelector,
     });

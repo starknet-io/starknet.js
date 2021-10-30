@@ -49,47 +49,37 @@ const compiledErc20: CompiledContract = parse(
 describe('deploy and test Wallet', () => {
   const pk = randomAddress();
 
-  // eslint-disable-next-line no-console
-  console.log('PK:', pk);
-
   const starkKeyPair = getKeyPair(pk);
-  const walletAddress = getStarkKey(starkKeyPair);
-  const wallet = new Contract(compiledArgentAccount.abi, walletAddress);
-  const erc20Address = getStarkKey(getKeyPair(randomAddress()));
-  const erc20 = new Contract(compiledErc20.abi, erc20Address);
+  const starkKeyPub = getStarkKey(starkKeyPair);
+  let wallet: Contract;
+  let walletAddress: string;
+  let erc20: Contract;
+  let erc20Address: string;
   beforeAll(async () => {
-    const { code: codeErc20, tx_id: txErc20 } = await deployContract(compiledErc20, erc20Address);
-    // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
-    // eslint-disable-next-line no-console
-    console.log('deployed erc20', txErc20);
+    const { code: codeErc20, address: erc20AddressLocal } = await deployContract(compiledErc20, []);
+    erc20Address = erc20AddressLocal;
+    erc20 = new Contract(compiledErc20.abi, erc20Address);
+
     expect(codeErc20).toBe('TRANSACTION_RECEIVED');
 
-    const { code, tx_id } = await deployContract(compiledArgentAccount, walletAddress);
-    // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
-    // eslint-disable-next-line no-console
-    console.log('deployed wallet', tx_id);
+    const { code, address: walletAddressLocal } = await deployContract(
+      compiledArgentAccount,
+      Contract.compileCalldata({
+        signer: starkKeyPub,
+        guardian: '0',
+        L1_address: '0',
+      }),
+      starkKeyPub
+    );
+    walletAddress = walletAddressLocal;
+    wallet = new Contract(compiledArgentAccount.abi, walletAddress);
     expect(code).toBe('TRANSACTION_RECEIVED');
 
-    const { code: code2, tx_id: txId2 } = await wallet.invoke('initialize', {
-      signer: walletAddress,
-      guardian: '0',
-      L1_address: '0',
-      self_address: walletAddress,
-    });
-
-    // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
-    // eslint-disable-next-line no-console
-    console.log('initialized wallet', txId2);
-    expect(code2).toBe('TRANSACTION_RECEIVED');
-
-    const { code: codeErc20Mint, tx_id: txErc20Mint } = await erc20.invoke('mint', {
+    const { code: codeErc20Mint, transaction_hash: txErc20Mint } = await erc20.invoke('mint', {
       recipient: walletAddress,
       amount: '1000',
     });
 
-    // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
-    // eslint-disable-next-line no-console
-    console.log('mint erc20', txErc20Mint);
     expect(codeErc20Mint).toBe('TRANSACTION_RECEIVED');
 
     await waitForTx(txErc20Mint);
@@ -110,7 +100,7 @@ describe('deploy and test Wallet', () => {
     const { nonce } = await wallet.call('get_current_nonce');
     const msgHash = addHexPrefix(
       hashMessage(
-        walletAddress,
+        '0', // needs to be walletAddress once it's possible to retrieve address(self) in cairo
         erc20Address,
         getSelectorFromName('transfer'),
         [erc20Address, '10'],
@@ -119,20 +109,20 @@ describe('deploy and test Wallet', () => {
     );
 
     const { r, s } = sign(starkKeyPair, msgHash);
-    const { code, tx_id } = await wallet.invoke('execute', {
-      to: erc20Address,
-      selector: getSelectorFromName('transfer'),
-      calldata: [erc20Address, '10'],
-      nonce: nonce.toString(),
-      sig: [toHex(r), toHex(s)],
-    });
+    const { code, transaction_hash } = await wallet.invoke(
+      'execute',
+      {
+        to: erc20Address,
+        selector: getSelectorFromName('transfer'),
+        calldata: [erc20Address, '10'],
+        nonce: nonce.toString(),
+      },
+      [toHex(r), toHex(s)]
+    );
 
-    // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
-    // eslint-disable-next-line no-console
-    console.log('transfer erc20 using wallet execute', tx_id);
     expect(code).toBe('TRANSACTION_RECEIVED');
 
-    await waitForTx(tx_id);
+    await waitForTx(transaction_hash);
   });
   test('read balance of wallet after transfer', async () => {
     const { res } = await erc20.call('balance_of', {
