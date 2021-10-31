@@ -1,35 +1,38 @@
-import { BigNumber } from '@ethersproject/bignumber';
 import fs from 'fs';
-import {
-  CompiledContract,
-  Contract,
-  deployContract,
-  JsonParser,
-  randomAddress,
-  waitForTx,
-} from '../src';
 
-const compiledERC20: CompiledContract = JsonParser.parse(
+import { CompiledContract, Contract, deployContract, utils, waitForTx } from '../src';
+
+const {
+  json: { parse },
+  number: { toBN },
+  starknet: { randomAddress },
+} = utils;
+
+const compiledERC20: CompiledContract = parse(
   fs.readFileSync('./__mocks__/ERC20.json').toString('ascii')
 );
 
 describe('class Contract {}', () => {
-  const address = randomAddress();
   const wallet = randomAddress();
-  const contract = new Contract(compiledERC20.abi, address);
+  let contract: Contract;
   beforeAll(async () => {
-    const { code, tx_id } = await deployContract(compiledERC20, address);
-    // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
-    // eslint-disable-next-line no-console
-    console.log('deployed erc20 contract', tx_id);
+    const {
+      code,
+      transaction_hash,
+      address: erc20address,
+    } = await deployContract(compiledERC20, []);
+
+    contract = new Contract(compiledERC20.abi, erc20address);
+
     expect(code).toBe('TRANSACTION_RECEIVED');
-    await waitForTx(tx_id);
+
+    await waitForTx(transaction_hash);
   });
   test('read initial balance of that account', async () => {
     const response = await contract.call('balance_of', {
       user: wallet,
     });
-    expect(BigNumber.from(response.res)).toStrictEqual(BigNumber.from(0));
+    expect(toBN(response.res as string).toString()).toStrictEqual(toBN(0).toString());
   });
   test('add 10 test ERC20 to account', async () => {
     const response = await contract.invoke('mint', {
@@ -38,16 +41,13 @@ describe('class Contract {}', () => {
     });
     expect(response.code).toBe('TRANSACTION_RECEIVED');
 
-    // I want to show the tx number to the tester, so he/she can trace the transaction in the explorer.
-    // eslint-disable-next-line no-console
-    console.log('txId:', response.tx_id, ', funded wallet:', wallet);
-    await waitForTx(response.tx_id);
+    await waitForTx(response.transaction_hash);
   });
   test('read balance after mint of that account', async () => {
     const response = await contract.call('balance_of', {
       user: wallet,
     });
 
-    expect(BigNumber.from(response.res)).toStrictEqual(BigNumber.from(10));
+    expect(toBN(response.res as string).toString()).toStrictEqual(toBN(10).toString());
   });
 });

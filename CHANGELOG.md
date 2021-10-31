@@ -1,3 +1,41 @@
+# [1.5.0](https://github.com/seanjameshan/starknet.js/compare/v1.4.0...v1.5.0) (2021-10-30)
+
+### Bug Fixes
+
+- gitignore coverage ([36ecd04](https://github.com/seanjameshan/starknet.js/commit/36ecd04ad607bddfa97cfc1046fe4844c91d9df9))
+- remove console logs ([2269fae](https://github.com/seanjameshan/starknet.js/commit/2269fae4d6f66729a142eb1aac3f48df0f273238))
+- remove console.logs ([6032adb](https://github.com/seanjameshan/starknet.js/commit/6032adb6262832388ec7b723b987b41f32eb55a1))
+- skip walletAddress check for now ([8976091](https://github.com/seanjameshan/starknet.js/commit/8976091908c2b9b511d5575ffa19fb314ae216ae))
+- types ([fe484ab](https://github.com/seanjameshan/starknet.js/commit/fe484abf1d5810c601854e0e1764efba9bfdadda))
+- typo ([de0f5cb](https://github.com/seanjameshan/starknet.js/commit/de0f5cb00b919a66f2b06d56402526150050c89e))
+
+### Features
+
+- update to alpha3 ([1cf4616](https://github.com/seanjameshan/starknet.js/commit/1cf4616335e36c64679fafc36719d9ed8bacda20))
+
+# [1.4.0](https://github.com/seanjameshan/starknet.js/compare/v1.3.0...v1.4.0) (2021-10-29)
+
+### Bug Fixes
+
+- cleanup ([82aa438](https://github.com/seanjameshan/starknet.js/commit/82aa438ea08f1d3577ee23ea083f58caf42cbdba))
+- keep tests files consistent ([e343b55](https://github.com/seanjameshan/starknet.js/commit/e343b551fb422a0d337f905eca981dbabf1ae097))
+- push renamed snapshot ([643cd40](https://github.com/seanjameshan/starknet.js/commit/643cd40a0f0b996424517d71cdf6c5d70857a7c3))
+- remove enc-utils to remove buffer dep ([e08e4b5](https://github.com/seanjameshan/starknet.js/commit/e08e4b53bfbdece3f824fedf96101405219da4b5))
+- rename tests ([b4d15a7](https://github.com/seanjameshan/starknet.js/commit/b4d15a7e32abf5eb90f1efbf9e1773b42574be49))
+- update argent wallet implementation ([63cc278](https://github.com/seanjameshan/starknet.js/commit/63cc2780eb44347d42ccf50dc917633eee975c5b))
+- update snapshots after contract upgrade ([2a1dcde](https://github.com/seanjameshan/starknet.js/commit/2a1dcde6bcaff09a45e091d194840bd66a568c67))
+- use function consistently ([67617d7](https://github.com/seanjameshan/starknet.js/commit/67617d73bb414b950ad8d2e347ade6a49d6fc595))
+
+### Features
+
+- wip ([42a8ab1](https://github.com/seanjameshan/starknet.js/commit/42a8ab1b0f998d88d8fc7349b33d5287c017d4b5))
+
+# [1.3.0](https://github.com/seanjameshan/starknet.js/compare/v1.2.0...v1.3.0) (2021-10-28)
+
+### Features
+
+- allow optional blockId ([fbd09ba](https://github.com/seanjameshan/starknet.js/commit/fbd09ba8458caf9a5c0ac0b84a9955c413524292))
+
 # [1.2.0](https://github.com/seanjameshan/starknet.js/compare/v1.1.1...v1.2.0) (2021-10-27)
 
 ### Bug Fixes
