@@ -1,3 +1,9 @@
+## [1.5.1](https://github.com/seanjameshan/starknet.js/compare/v1.5.0...v1.5.1) (2021-11-02)
+
+### Bug Fixes
+
+- protect bigints in axios payloads ([5db78ea](https://github.com/seanjameshan/starknet.js/commit/5db78ea87a0e6357a764cee385d16c63b03e8651))
+
 # [1.5.0](https://github.com/seanjameshan/starknet.js/compare/v1.4.0...v1.5.0) (2021-10-30)
 
 ### Bug Fixes
