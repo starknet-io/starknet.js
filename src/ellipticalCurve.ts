@@ -40,12 +40,15 @@ function fixMessage(msg: string) {
 
 export const genKeyPair = ec.genKeyPair.bind(ec);
 
-export function getKeyPair(pk: BigNumberish): EC.KeyPair {
+export type KeyPair = EC.KeyPair;
+export type Signature = EC.Signature;
+
+export function getKeyPair(pk: BigNumberish): KeyPair {
   const pkBn = toBN(pk);
   return ec.keyFromPrivate(removeHexPrefix(toHex(pkBn)), 'hex');
 }
 
-export function getStarkKey(keyPair: EC.KeyPair): string {
+export function getStarkKey(keyPair: KeyPair): string {
   // this method needs to be run to generate the .pub property used below
   // the result can be dumped
   keyPair.getPublic(true, 'hex');
@@ -57,7 +60,7 @@ export function getStarkKey(keyPair: EC.KeyPair): string {
  key should be an KeyPair with a valid private key.
  Returns an Signature.
 */
-export function sign(keyPair: EC.KeyPair, msgHash: string): EC.Signature {
+export function sign(keyPair: KeyPair, msgHash: string): Signature {
   const msgHashBN = toBN(addHexPrefix(msgHash));
   // Verify message hash has valid length.
   assertInRange(msgHashBN, ZERO, toBN(addHexPrefix(MAX_ECDSA_VAL)), 'msgHash');
@@ -77,7 +80,7 @@ export function sign(keyPair: EC.KeyPair, msgHash: string): EC.Signature {
    msgSignature should be an Signature.
    Returns a boolean true if the verification succeeds.
   */
-export function verify(keyPair: EC.KeyPair, msgHash: string, sig: EC.Signature): boolean {
+export function verify(keyPair: KeyPair, msgHash: string, sig: Signature): boolean {
   const msgHashBN = toBN(addHexPrefix(msgHash));
   assertInRange(msgHashBN, ZERO, toBN(addHexPrefix(MAX_ECDSA_VAL)), 'msgHash');
   const { r, s } = sig;
