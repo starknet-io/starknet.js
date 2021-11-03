@@ -6,8 +6,8 @@ import { Abi } from './types';
 import { BigNumberish, toBN } from './utils/number';
 import { getSelectorFromName } from './utils/starknet';
 
-type Args = { [inputName: string]: string | string[] };
-type Calldata = string[];
+export type Args = { [inputName: string]: string | string[] };
+export type Calldata = string[];
 
 function parseFelt(candidate: string): BN {
   try {
