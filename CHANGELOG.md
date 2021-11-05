@@ -1,3 +1,9 @@
+## [1.5.4](https://github.com/seanjameshan/starknet.js/compare/v1.5.3...v1.5.4) (2021-11-05)
+
+### Bug Fixes
+
+- **type-naming:** more expressive types ([5277b12](https://github.com/seanjameshan/starknet.js/commit/5277b125713695d975c44ae3edcf0f4e3b90dc8d))
+
 ## [1.5.3](https://github.com/seanjameshan/starknet.js/compare/v1.5.2...v1.5.3) (2021-11-03)
 
 ### Bug Fixes
