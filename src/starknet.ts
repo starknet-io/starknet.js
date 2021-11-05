@@ -12,7 +12,7 @@ import type {
   GetTransactionStatusResponse,
   Transaction,
 } from './types';
-import { parse } from './utils/json';
+import { parse, stringify } from './utils/json';
 import { BigNumberish, toBN, toHex } from './utils/number';
 import { compressProgram, randomAddress } from './utils/starknet';
 
@@ -202,11 +202,15 @@ export function addTransaction(tx: Transaction): Promise<AddTransactionResponse>
 
   return new Promise((resolve, reject) => {
     axios
-      .post(`${GATEWAY_URL}/add_transaction`, {
-        ...tx,
-        ...(Array.isArray(signature) && { signature }), // not needed on deploy tx
-        ...(contract_address_salt && { contract_address_salt }), // not needed on invoke tx
-      })
+      .post(
+        `${GATEWAY_URL}/add_transaction`,
+        stringify({
+          ...tx, // the tx can contain BigInts, so we use our own `stringify`
+          ...(Array.isArray(signature) && { signature }), // not needed on deploy tx
+          ...(contract_address_salt && { contract_address_salt }), // not needed on invoke tx
+        }),
+        { headers: { 'Content-Type': 'application/json' } }
+      )
       .then((resp: any) => {
         resolve(resp.data);
       })

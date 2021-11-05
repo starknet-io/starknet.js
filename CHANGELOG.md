@@ -1,3 +1,22 @@
+## [1.5.3](https://github.com/seanjameshan/starknet.js/compare/v1.5.2...v1.5.3) (2021-11-03)
+
+### Bug Fixes
+
+- more types ([e816a3b](https://github.com/seanjameshan/starknet.js/commit/e816a3b7160dd775dd4bf0b6f133cd3f34e92ff8))
+
+## [1.5.2](https://github.com/seanjameshan/starknet.js/compare/v1.5.1...v1.5.2) (2021-11-03)
+
+### Bug Fixes
+
+- export needed types ([c51fe40](https://github.com/seanjameshan/starknet.js/commit/c51fe40d11e7459bce5adac6fe6e330fd73d264b))
+- package-lock release ([a507598](https://github.com/seanjameshan/starknet.js/commit/a5075989ed789ba6fbca3ac304e306a1c8fc3d83))
+
+## [1.5.1](https://github.com/seanjameshan/starknet.js/compare/v1.5.0...v1.5.1) (2021-11-02)
+
+### Bug Fixes
+
+- protect bigints in axios payloads ([5db78ea](https://github.com/seanjameshan/starknet.js/commit/5db78ea87a0e6357a764cee385d16c63b03e8651))
+
 # [1.5.0](https://github.com/seanjameshan/starknet.js/compare/v1.4.0...v1.5.0) (2021-10-30)
 
 ### Bug Fixes
