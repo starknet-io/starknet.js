@@ -45,7 +45,7 @@ export type InvokeFunctionTransaction = {
   calldata?: string[];
 };
 
-export type Call = Omit<InvokeFunctionTransaction, 'type'>;
+export type CallContractTransaction = Omit<InvokeFunctionTransaction, 'type'>;
 
 export type Transaction = DeployTransaction | InvokeFunctionTransaction;
 
