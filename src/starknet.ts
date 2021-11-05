@@ -2,8 +2,8 @@ import axios from 'axios';
 
 import type {
   AddTransactionResponse,
-  Call,
   CallContractResponse,
+  CallContractTransaction,
   CompiledContract,
   GetBlockResponse,
   GetCodeResponse,
@@ -46,7 +46,10 @@ export function getContractAddresses(): Promise<GetContractAddressesResponse> {
  * @param blockId
  * @returns the result of the function on the smart contract.
  */
-export function callContract(invokeTx: Call, blockId?: number): Promise<CallContractResponse> {
+export function callContract(
+  invokeTx: CallContractTransaction,
+  blockId?: number
+): Promise<CallContractResponse> {
   return new Promise((resolve, reject) => {
     axios
       .post(`${FEEDER_GATEWAY_URL}/call_contract?blockId=${blockId ?? 'null'}`, {
