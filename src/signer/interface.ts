@@ -1,5 +1,5 @@
 import { Provider } from '../provider';
-import { AddTransactionResponse, Transaction } from '..';
+import { AddTransactionResponse, Transaction } from '../types';
 
 export abstract class SignerInterface extends Provider {
   public abstract address: string;

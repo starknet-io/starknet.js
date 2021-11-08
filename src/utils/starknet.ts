@@ -1,7 +1,7 @@
 import { gzip } from 'pako';
 
-import { genKeyPair, getStarkKey } from '../ellipticalCurve';
 import { CompressedProgram, Program } from '../types';
+import { genKeyPair, getStarkKey } from './ellipticCurve';
 import { addHexPrefix, btoaUniversal } from './encode';
 import { starknetKeccak } from './hash';
 import { stringify } from './json';
@@ -48,4 +48,8 @@ export function formatSignature(sig?: [BigNumberish, BigNumberish]): [string, st
   } catch (e) {
     return [];
   }
+}
+
+export function wait(delay: number) {
+  return new Promise((res) => setTimeout(res, delay));
 }

@@ -11,11 +11,11 @@ import {
   GetTransactionResponse,
   GetTransactionStatusResponse,
   Transaction,
-} from './types';
-import { wait } from './utils';
-import { parse, stringify } from './utils/json';
-import { BigNumberish, toBN, toHex } from './utils/number';
-import { compressProgram, formatSignature, randomAddress } from './utils/starknet';
+} from '../types';
+import { parse, stringify } from '../utils/json';
+import { BigNumberish, toBN, toHex } from '../utils/number';
+import { compressProgram, formatSignature, randomAddress, wait } from '../utils/starknet';
+import { ProviderInterface } from './interface';
 
 type NetworkName = 'alpha';
 
@@ -23,7 +23,7 @@ interface ProviderOptions {
   network?: NetworkName;
 }
 
-export class Provider {
+export class Provider implements ProviderInterface {
   public baseUrl: string;
 
   public feederGatewayUrl: string;

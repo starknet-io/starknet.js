@@ -1,4 +1,9 @@
-import { BigNumberish } from './utils/number';
+import type { ec as EC } from 'elliptic';
+
+import type { BigNumberish } from './utils/number';
+
+export type KeyPair = EC.KeyPair;
+export type Signature = EC.Signature;
 
 export type GetContractAddressesResponse = {
   Starknet: string;

@@ -1,13 +1,13 @@
 import assert from 'minimalistic-assert';
 
-import { KeyPair } from '../ellipticalCurve';
 import { Provider } from '../provider';
-import { AddTransactionResponse, Transaction } from '../types';
+import { AddTransactionResponse, KeyPair, Transaction } from '../types';
+import { sign } from '../utils/ellipticCurve';
 import { addHexPrefix } from '../utils/encode';
+import { hashMessage } from '../utils/hash';
 import { toBN } from '../utils/number';
 import { getSelectorFromName } from '../utils/starknet';
 import { SignerInterface } from './interface';
-import { hashMessage, sign } from '..';
 
 export class Signer extends Provider implements SignerInterface {
   public address: string;
