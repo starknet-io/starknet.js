@@ -12,9 +12,10 @@ import type {
   GetTransactionStatusResponse,
   Transaction,
 } from './types';
+import { wait } from './utils';
 import { parse, stringify } from './utils/json';
 import { BigNumberish, toBN, toHex } from './utils/number';
-import { compressProgram, randomAddress } from './utils/starknet';
+import { compressProgram, formatSignature, randomAddress } from './utils/starknet';
 
 const API_URL = 'https://alpha3.starknet.io';
 const FEEDER_GATEWAY_URL = `${API_URL}/feeder_gateway`;
@@ -180,14 +181,6 @@ export function getTransaction(txHash: BigNumberish): Promise<GetTransactionResp
   });
 }
 
-function formatSignature(sig?: [BigNumberish, BigNumberish]): [string, string] | [] {
-  if (!sig) return [];
-  try {
-    return sig.map((x) => toBN(x)).map((x) => x.toString()) as [string, string];
-  } catch (e) {
-    return [];
-  }
-}
 /**
  * Invoke a function on the starknet contract
  *
@@ -245,9 +238,6 @@ export function deployContract(
   });
 }
 
-function wait(delay: number) {
-  return new Promise((res) => setTimeout(res, delay));
-}
 export async function waitForTx(txHash: BigNumberish, retryInterval: number = 2000) {
   let onchain = false;
   while (!onchain) {
