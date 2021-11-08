@@ -268,6 +268,30 @@ export class Provider implements ProviderInterface {
     });
   }
 
+  /**
+   * Invokes a function on starknet
+   *
+   * @param contractAddress - target contract address for invoke
+   * @param entrypointSelector - target entrypoint selector for
+   * @param calldata - (optional, default []) calldata
+   * @param signature - (optional) signature to send along
+   * @returns response from addTransaction
+   */
+  public invokeFunction(
+    contractAddress: string,
+    entrypointSelector: string,
+    calldata?: string[],
+    signature?: [BigNumberish, BigNumberish]
+  ): Promise<AddTransactionResponse> {
+    return this.addTransaction({
+      type: 'INVOKE_FUNCTION',
+      contract_address: contractAddress,
+      entry_point_selector: entrypointSelector,
+      calldata,
+      signature,
+    });
+  }
+
   public async waitForTx(txHash: BigNumberish, retryInterval: number = 2000) {
     let onchain = false;
     while (!onchain) {

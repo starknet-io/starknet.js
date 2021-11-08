@@ -122,5 +122,21 @@ export abstract class ProviderInterface {
     addressSalt: BigNumberish
   ): Promise<AddTransactionResponse>;
 
+  /**
+   * Invokes a function on starknet
+   *
+   * @param contractAddress - target contract address for invoke
+   * @param entrypointSelector - target entrypoint selector for
+   * @param calldata - (optional, default []) calldata
+   * @param signature - (optional) signature to send along
+   * @returns response from addTransaction
+   */
+  public abstract invokeFunction(
+    contractAddress: string,
+    entrypointSelector: string,
+    calldata?: string[],
+    signature?: [BigNumberish, BigNumberish]
+  ): Promise<AddTransactionResponse>;
+
   public abstract waitForTx(txHash: BigNumberish, retryInterval?: number): Promise<void>;
 }
