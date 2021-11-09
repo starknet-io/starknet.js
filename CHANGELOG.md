@@ -1,3 +1,14 @@
+# [1.6.0](https://github.com/seanjameshan/starknet.js/compare/v1.5.4...v1.6.0) (2021-11-09)
+
+### Bug Fixes
+
+- review changes ([375043b](https://github.com/seanjameshan/starknet.js/commit/375043bf6908b2475ca80e9ce73d479eb21b577c))
+
+### Features
+
+- add invokeFunction ([7e04b5e](https://github.com/seanjameshan/starknet.js/commit/7e04b5ec383fa6d466e9e06d9fa02e2d0c36b020))
+- add signer and provider v1 ([909fdc0](https://github.com/seanjameshan/starknet.js/commit/909fdc0b2b211755b9124b62f97476d89b655de1))
+
 ## [1.5.4](https://github.com/seanjameshan/starknet.js/compare/v1.5.3...v1.5.4) (2021-11-05)
 
 ### Bug Fixes
