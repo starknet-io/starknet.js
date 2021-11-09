@@ -3,7 +3,7 @@ import { keccak256 } from 'ethereum-cryptography/keccak';
 import assert from 'minimalistic-assert';
 
 import { CONSTANT_POINTS, FIELD_PRIME, MASK_250, ONE, ZERO } from '../constants';
-import { ec } from '../ellipticalCurve';
+import { ec } from './ellipticCurve';
 import { addHexPrefix, buf2hex, utf8ToArray } from './encode';
 import { BigNumberish, toBN } from './number';
 
@@ -41,4 +41,31 @@ export function pedersen(input: [BigNumberish, BigNumberish]) {
     }
   }
   return addHexPrefix(point.getX().toString(16));
+}
+
+export function hashCalldata(calldata: string[]): string {
+  const calldataCopy = [...calldata];
+  if (calldataCopy.length === 0) {
+    return '0';
+  }
+  if (calldataCopy.length === 1) {
+    return calldataCopy[0];
+  }
+  // calldata element will always be there as it was checked by an if statement before (!)
+  const calldataEl = calldataCopy.shift()!;
+  return pedersen([hashCalldata(calldataCopy), calldataEl]);
+}
+
+export function hashMessage(
+  account: string,
+  to: string,
+  selector: string,
+  calldata: string[],
+  nonce: string
+) {
+  const hash0 = pedersen([account, to]);
+  const hash1 = pedersen([hash0, selector]);
+  const calldataHash = hashCalldata(calldata);
+  const hash2 = pedersen([hash1, calldataHash]);
+  return pedersen([hash2, nonce]);
 }

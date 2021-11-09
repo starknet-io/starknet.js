@@ -1,10 +1,10 @@
 import BN from 'bn.js';
 import assert from 'minimalistic-assert';
 
-import { addTransaction, callContract } from './starknet';
+import { Provider, defaultProvider } from './provider';
 import { Abi } from './types';
 import { BigNumberish, toBN } from './utils/number';
-import { getSelectorFromName } from './utils/starknet';
+import { getSelectorFromName } from './utils/stark';
 
 export type Args = { [inputName: string]: string | string[] };
 export type Calldata = string[];
@@ -26,10 +26,20 @@ function isFelt(candidate: string): boolean {
   }
 }
 
+export function compileCalldata(args: Args): Calldata {
+  return Object.values(args).flatMap((value) => {
+    if (Array.isArray(value))
+      return [toBN(value.length).toString(), ...value.map((x) => toBN(x).toString())];
+    return toBN(value).toString();
+  });
+}
+
 export class Contract {
   connectedTo: string | null = null;
 
   abi: Abi[];
+
+  provider: Provider;
 
   /**
    * Contract class to handle contract methods
@@ -37,22 +47,15 @@ export class Contract {
    * @param abi - Abi of the contract object
    * @param address (optional) - address to connect to
    */
-  constructor(abi: Abi[], address: string | null = null) {
+  constructor(abi: Abi[], address: string | null = null, provider: Provider = defaultProvider) {
     this.connectedTo = address;
+    this.provider = provider;
     this.abi = abi;
   }
 
   public connect(address: string): Contract {
     this.connectedTo = address;
     return this;
-  }
-
-  public static compileCalldata(args: Args): Calldata {
-    return Object.values(args).flatMap((value) => {
-      if (Array.isArray(value))
-        return [toBN(value.length).toString(), ...value.map((x) => toBN(x).toString())];
-      return toBN(value).toString();
-    });
   }
 
   private validateMethodAndArgs(type: 'INVOKE' | 'CALL', method: string, args: Args = {}) {
@@ -118,9 +121,9 @@ export class Contract {
 
     // compile calldata
     const entrypointSelector = getSelectorFromName(method);
-    const calldata = Contract.compileCalldata(args);
+    const calldata = compileCalldata(args);
 
-    return addTransaction({
+    return this.provider.addTransaction({
       type: 'INVOKE_FUNCTION',
       contract_address: this.connectedTo,
       signature,
@@ -138,12 +141,14 @@ export class Contract {
 
     // compile calldata
     const entrypointSelector = getSelectorFromName(method);
-    const calldata = Contract.compileCalldata(args);
+    const calldata = compileCalldata(args);
 
-    return callContract({
-      contract_address: this.connectedTo,
-      calldata,
-      entry_point_selector: entrypointSelector,
-    }).then((x) => this.parseResponse(method, x.result));
+    return this.provider
+      .callContract({
+        contract_address: this.connectedTo,
+        calldata,
+        entry_point_selector: entrypointSelector,
+      })
+      .then((x) => this.parseResponse(method, x.result));
   }
 }

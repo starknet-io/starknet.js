@@ -4,15 +4,11 @@
 
 import fs from 'fs';
 
-import { constants, utils } from '../src';
+import { constants, json, stark } from '../../src';
 
 const { IS_BROWSER } = constants;
-const {
-  json: { parse, stringify },
-  starknet: { compressProgram },
-} = utils;
 
-const compiledArgentAccount = parse(
+const compiledArgentAccount = json.parse(
   fs.readFileSync('./__mocks__/ArgentAccount.json').toString('ascii')
 );
 
@@ -23,14 +19,14 @@ describe('compressProgram()', () => {
   test('compresses a contract program', () => {
     const inputContract = compiledArgentAccount as any;
 
-    const compressed = compressProgram(inputContract.program);
+    const compressed = stark.compressProgram(inputContract.program);
 
     expect(compressed).toMatchSnapshot();
   });
   test('works with strings', () => {
-    const inputProgram = stringify(compiledArgentAccount.program);
+    const inputProgram = json.stringify(compiledArgentAccount.program);
 
-    const compressed = compressProgram(inputProgram);
+    const compressed = stark.compressProgram(inputProgram);
 
     expect(compressed).toMatchSnapshot();
   });
