@@ -14,5 +14,5 @@ export * as encode from './utils/encode';
 export * as hash from './utils/hash';
 export * as json from './utils/json';
 export * as number from './utils/number';
-export * as starknet from './utils/starknet';
+export * as stark from './utils/stark';
 export * as ec from './utils/ellipticCurve';

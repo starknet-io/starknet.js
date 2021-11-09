@@ -4,7 +4,7 @@ import assert from 'minimalistic-assert';
 import { Provider, defaultProvider } from './provider';
 import { Abi } from './types';
 import { BigNumberish, toBN } from './utils/number';
-import { getSelectorFromName } from './utils/starknet';
+import { getSelectorFromName } from './utils/stark';
 
 export type Args = { [inputName: string]: string | string[] };
 export type Calldata = string[];

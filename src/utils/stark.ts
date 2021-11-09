@@ -49,7 +49,3 @@ export function formatSignature(sig?: [BigNumberish, BigNumberish]): [string, st
     return [];
   }
 }
-
-export function wait(delay: number) {
-  return new Promise((res) => setTimeout(res, delay));
-}

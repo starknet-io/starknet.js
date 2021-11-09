@@ -1,13 +1,13 @@
 import fs from 'fs';
 
-import { CompiledContract, Contract, defaultProvider, json, number, starknet } from '../src';
+import { CompiledContract, Contract, defaultProvider, json, number, stark } from '../src';
 
 const compiledERC20: CompiledContract = json.parse(
   fs.readFileSync('./__mocks__/ERC20.json').toString('ascii')
 );
 
 describe('class Contract {}', () => {
-  const wallet = starknet.randomAddress();
+  const wallet = stark.randomAddress();
   let contract: Contract;
   beforeAll(async () => {
     const {

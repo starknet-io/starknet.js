@@ -6,7 +6,7 @@ import { sign } from '../utils/ellipticCurve';
 import { addHexPrefix } from '../utils/encode';
 import { hashMessage } from '../utils/hash';
 import { toBN } from '../utils/number';
-import { getSelectorFromName } from '../utils/starknet';
+import { getSelectorFromName } from '../utils/stark';
 import { SignerInterface } from './interface';
 
 export class Signer extends Provider implements SignerInterface {
@@ -44,7 +44,7 @@ export class Signer extends Provider implements SignerInterface {
       hashMessage(
         '0', // needs to be walletAddress once it's possible to retrieve address(self) in cairo
         tx.contract_address,
-        tx.entry_point_selector!,
+        tx.entry_point_selector,
         calldataDecimal,
         nonceBn.toString()
       )
@@ -57,7 +57,7 @@ export class Signer extends Provider implements SignerInterface {
       entry_point_selector: getSelectorFromName('execute'),
       calldata: [
         tx.contract_address,
-        tx.entry_point_selector!,
+        tx.entry_point_selector,
         calldataDecimal.length.toString(),
         ...calldataDecimal,
         nonceBn.toString(),

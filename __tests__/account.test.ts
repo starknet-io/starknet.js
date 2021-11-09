@@ -10,22 +10,22 @@ import {
   hash,
   json,
   number,
-  starknet,
-} from '../../src';
+  stark,
+} from '../src';
 
-describe('getStarkAccountFromPk()', () => {
-  test('it works with valid pk', () => {
-    const pk = '0xb696427c0d79c5d28a1fa6f748bae1b98b3f4b86bd1a2505bab144673c856fa9';
+describe('getStarkAccountFromPrivateKey()', () => {
+  test('it works with valid privateKey', () => {
+    const privateKey = '0xb696427c0d79c5d28a1fa6f748bae1b98b3f4b86bd1a2505bab144673c856fa9';
 
-    const starkKeyPair = ec.getKeyPair(pk);
+    const starkKeyPair = ec.getKeyPair(privateKey);
     const starkKey = ec.getStarkKey(starkKeyPair);
 
     expect(starkKey).toBe('0x060d46f8d7ef3d83ed05f3ed9beb91e22f9529289b9d863683fd71eafaf28035');
   });
-  test('it works with valid pk', () => {
-    const pk = '0x5f65099e269b080000000000000000000000000000000000000000000000000';
+  test('it works with valid privateKey', () => {
+    const privateKey = '0x5f65099e269b080000000000000000000000000000000000000000000000000';
 
-    const starkKeyPair = ec.getKeyPair(pk);
+    const starkKeyPair = ec.getKeyPair(privateKey);
     const starkKey = ec.getStarkKey(starkKeyPair);
 
     expect(starkKey).toBe('0xf321e59b257a577836d8313150aabd21f412491358c329966218df76bab591');
@@ -40,9 +40,9 @@ const compiledErc20: CompiledContract = json.parse(
 );
 
 describe('deploy and test Wallet', () => {
-  const pk = starknet.randomAddress();
+  const privateKey = stark.randomAddress();
 
-  const starkKeyPair = ec.getKeyPair(pk);
+  const starkKeyPair = ec.getKeyPair(privateKey);
   const starkKeyPub = ec.getStarkKey(starkKeyPair);
   let wallet: Contract;
   let walletAddress: string;
@@ -98,7 +98,7 @@ describe('deploy and test Wallet', () => {
       hash.hashMessage(
         '0', // needs to be walletAddress once it's possible to retrieve address(self) in cairo
         erc20Address,
-        starknet.getSelectorFromName('transfer'),
+        stark.getSelectorFromName('transfer'),
         [erc20Address, '10'],
         nonce.toString()
       )
@@ -109,7 +109,7 @@ describe('deploy and test Wallet', () => {
       'execute',
       {
         to: erc20Address,
-        selector: starknet.getSelectorFromName('transfer'),
+        selector: stark.getSelectorFromName('transfer'),
         calldata: [erc20Address, '10'],
         nonce: nonce.toString(),
       },
@@ -130,13 +130,13 @@ describe('deploy and test Wallet', () => {
 });
 
 test('build tx', async () => {
-  const pk = '0x1B69B4BE052FAB1';
-  const keyPair = ec.getKeyPair(pk);
+  const privateKey = '0x1B69B4BE052FAB1';
+  const keyPair = ec.getKeyPair(privateKey);
   const address = ec.getStarkKey(keyPair);
 
   expect(address).toBe('0x04024999b9574cb7623679ce049a609db62a95098982c5b28ac61abdebd1c82b');
 
-  const selector = starknet.getSelectorFromName('transfer');
+  const selector = stark.getSelectorFromName('transfer');
 
   expect(selector).toBe(
     number.toHex(

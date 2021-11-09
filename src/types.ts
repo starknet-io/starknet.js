@@ -46,7 +46,7 @@ export type InvokeFunctionTransaction = {
   contract_address: string;
   signature?: [BigNumberish, BigNumberish];
   entry_point_type?: EntryPointType;
-  entry_point_selector?: string;
+  entry_point_selector: string;
   calldata?: string[];
 };
 

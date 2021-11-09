@@ -4,7 +4,7 @@
 
 import fs from 'fs';
 
-import { constants, json, starknet } from '../../src';
+import { constants, json, stark } from '../../src';
 
 const { IS_BROWSER } = constants;
 
@@ -19,14 +19,14 @@ describe('compressProgram()', () => {
   test('compresses a contract program', () => {
     const inputContract = compiledArgentAccount as any;
 
-    const compressed = starknet.compressProgram(inputContract.program);
+    const compressed = stark.compressProgram(inputContract.program);
 
     expect(compressed).toMatchSnapshot();
   });
   test('works with strings', () => {
     const inputProgram = json.stringify(compiledArgentAccount.program);
 
-    const compressed = starknet.compressProgram(inputProgram);
+    const compressed = stark.compressProgram(inputProgram);
 
     expect(compressed).toMatchSnapshot();
   });

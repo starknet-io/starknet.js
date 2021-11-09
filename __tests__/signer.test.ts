@@ -9,7 +9,7 @@ import {
   ec,
   json,
   number,
-  starknet,
+  stark,
 } from '../src';
 
 const compiledArgentAccount: CompiledContract = json.parse(
@@ -20,9 +20,9 @@ const compiledErc20: CompiledContract = json.parse(
 );
 
 describe('deploy and test Wallet', () => {
-  const pk = starknet.randomAddress();
+  const privateKey = stark.randomAddress();
 
-  const starkKeyPair = ec.getKeyPair(pk);
+  const starkKeyPair = ec.getKeyPair(privateKey);
   const starkKeyPub = ec.getStarkKey(starkKeyPair);
   let walletAddress: string;
   let erc20: Contract;
@@ -68,7 +68,7 @@ describe('deploy and test Wallet', () => {
   test('read nonce', async () => {
     const { result } = await signer.callContract({
       contract_address: signer.address,
-      entry_point_selector: starknet.getSelectorFromName('get_current_nonce'),
+      entry_point_selector: stark.getSelectorFromName('get_current_nonce'),
     });
     const nonce = result[0];
 
@@ -85,7 +85,7 @@ describe('deploy and test Wallet', () => {
     const { code, transaction_hash } = await signer.addTransaction({
       type: 'INVOKE_FUNCTION',
       contract_address: erc20Address,
-      entry_point_selector: starknet.getSelectorFromName('transfer'),
+      entry_point_selector: stark.getSelectorFromName('transfer'),
       calldata: [erc20Address, '10'],
     });
 

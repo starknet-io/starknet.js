@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-import { CompiledContract, compileCalldata, defaultProvider, json, starknet } from '../src';
+import { CompiledContract, compileCalldata, defaultProvider, json, stark } from '../src';
 
 const compiledArgentAccount = json.parse(
   fs.readFileSync('./__mocks__/ArgentAccount.json').toString('ascii')
@@ -67,7 +67,7 @@ describe('defaultProvider', () => {
       return expect(
         defaultProvider.callContract({
           contract_address: '0x58bceda58a83a5a100117ddc893234bad9c84a6833c2008f0f1ca90150149af',
-          entry_point_selector: starknet.getSelectorFromName('balance_of'),
+          entry_point_selector: stark.getSelectorFromName('balance_of'),
           calldata: compileCalldata({
             user: '0x58bceda58a83a5a100117ddc893234bad9c84a6833c2008f0f1ca90150149af',
           }),
@@ -82,14 +82,14 @@ describe('defaultProvider', () => {
 
       const contractDefinition = {
         ...inputContract,
-        program: starknet.compressProgram(inputContract.program),
+        program: stark.compressProgram(inputContract.program),
       };
 
       const response = await defaultProvider.addTransaction({
         type: 'DEPLOY',
-        contract_address_salt: starknet.randomAddress(),
+        contract_address_salt: stark.randomAddress(),
         constructor_calldata: compileCalldata({
-          signer: starknet.randomAddress(),
+          signer: stark.randomAddress(),
           guardian: '0',
           L1_address: '0',
         }),
@@ -107,7 +107,7 @@ describe('defaultProvider', () => {
       const response = await defaultProvider.deployContract(
         inputContract,
         compileCalldata({
-          signer: starknet.randomAddress(),
+          signer: stark.randomAddress(),
           guardian: '0',
           L1_address: '0',
         })

@@ -72,7 +72,7 @@
     "*.{ts,js,md,yml,json}": "prettier --write"
   },
   "jest": {
-    "testTimeout": 300000
+    "testTimeout": 800000
   },
   "importSort": {
     ".js, .jsx, .ts, .tsx": {

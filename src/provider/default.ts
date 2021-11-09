@@ -14,13 +14,17 @@ import {
 } from '../types';
 import { parse, stringify } from '../utils/json';
 import { BigNumberish, toBN, toHex } from '../utils/number';
-import { compressProgram, formatSignature, randomAddress, wait } from '../utils/starknet';
+import { compressProgram, formatSignature, randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
 
 type NetworkName = 'alpha';
 
 interface ProviderOptions {
   network?: NetworkName;
+}
+
+function wait(delay: number) {
+  return new Promise((res) => setTimeout(res, delay));
 }
 
 export class Provider implements ProviderInterface {
@@ -58,15 +62,11 @@ export class Provider implements ProviderInterface {
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L13-L15)
    * @returns starknet smart contract addresses
    */
-  public getContractAddresses(): Promise<GetContractAddressesResponse> {
-    return new Promise((resolve, reject) => {
-      axios
-        .get<GetContractAddressesResponse>(`${this.feederGatewayUrl}/get_contract_addresses`)
-        .then((resp) => {
-          resolve(resp.data);
-        })
-        .catch(reject);
-    });
+  public async getContractAddresses(): Promise<GetContractAddressesResponse> {
+    const { data } = await axios.get<GetContractAddressesResponse>(
+      `${this.feederGatewayUrl}/get_contract_addresses`
+    );
+    return data;
   }
 
   /**
@@ -78,22 +78,19 @@ export class Provider implements ProviderInterface {
    * @param blockId
    * @returns the result of the function on the smart contract.
    */
-  public callContract(
+  public async callContract(
     invokeTx: CallContractTransaction,
     blockId?: number
   ): Promise<CallContractResponse> {
-    return new Promise((resolve, reject) => {
-      axios
-        .post(`${this.feederGatewayUrl}/call_contract?blockId=${blockId ?? 'null'}`, {
-          signature: [],
-          calldata: [],
-          ...invokeTx,
-        })
-        .then((resp: any) => {
-          resolve(resp.data);
-        })
-        .catch(reject);
-    });
+    const { data } = await axios.post<CallContractResponse>(
+      `${this.feederGatewayUrl}/call_contract?blockId=${blockId ?? 'null'}`,
+      {
+        signature: [],
+        calldata: [],
+        ...invokeTx,
+      }
+    );
+    return data;
   }
 
   /**
@@ -104,15 +101,11 @@ export class Provider implements ProviderInterface {
    * @param blockId
    * @returns the block object { block_id, previous_block_id, state_root, status, timestamp, transaction_receipts, transactions }
    */
-  public getBlock(blockId?: number): Promise<GetBlockResponse> {
-    return new Promise((resolve, reject) => {
-      axios
-        .get<GetBlockResponse>(`${this.feederGatewayUrl}/get_block?blockId=${blockId ?? 'null'}`)
-        .then((resp: any) => {
-          resolve(resp.data);
-        })
-        .catch(reject);
-    });
+  public async getBlock(blockId?: number): Promise<GetBlockResponse> {
+    const { data } = await axios.get<GetBlockResponse>(
+      `${this.feederGatewayUrl}/get_block?blockId=${blockId ?? 'null'}`
+    );
+    return data;
   }
 
   /**
@@ -124,19 +117,13 @@ export class Provider implements ProviderInterface {
    * @param blockId
    * @returns Bytecode and ABI of compiled contract
    */
-  public getCode(contractAddress: string, blockId?: number): Promise<GetCodeResponse> {
-    return new Promise((resolve, reject) => {
-      axios
-        .get<GetCodeResponse>(
-          `${this.feederGatewayUrl}/get_code?contractAddress=${contractAddress}&blockId=${
-            blockId ?? 'null'
-          }`
-        )
-        .then((resp) => {
-          resolve(resp.data);
-        })
-        .catch(reject);
-    });
+  public async getCode(contractAddress: string, blockId?: number): Promise<GetCodeResponse> {
+    const { data } = await axios.get<GetCodeResponse>(
+      `${this.feederGatewayUrl}/get_code?contractAddress=${contractAddress}&blockId=${
+        blockId ?? 'null'
+      }`
+    );
+    return data;
   }
 
   // TODO: add proper type
@@ -150,21 +137,17 @@ export class Provider implements ProviderInterface {
    * @param blockId
    * @returns the value of the storage variable
    */
-  public getStorageAt(contractAddress: string, key: number, blockId?: number): Promise<object> {
-    return new Promise((resolve, reject) => {
-      axios
-        .get(
-          `${
-            this.feederGatewayUrl
-          }/get_storage_at?contractAddress=${contractAddress}&key=${key}&blockId=${
-            blockId ?? 'null'
-          }`
-        )
-        .then((resp: any) => {
-          resolve(resp.data);
-        })
-        .catch(reject);
-    });
+  public async getStorageAt(
+    contractAddress: string,
+    key: number,
+    blockId?: number
+  ): Promise<object> {
+    const { data } = await axios.get<object>(
+      `${
+        this.feederGatewayUrl
+      }/get_storage_at?contractAddress=${contractAddress}&key=${key}&blockId=${blockId ?? 'null'}`
+    );
+    return data;
   }
 
   /**
@@ -175,18 +158,12 @@ export class Provider implements ProviderInterface {
    * @param txHash
    * @returns the transaction status object { block_id, tx_status: NOT_RECEIVED | RECEIVED | PENDING | REJECTED | ACCEPTED_ONCHAIN }
    */
-  public getTransactionStatus(txHash: BigNumberish): Promise<GetTransactionStatusResponse> {
+  public async getTransactionStatus(txHash: BigNumberish): Promise<GetTransactionStatusResponse> {
     const txHashBn = toBN(txHash);
-    return new Promise((resolve, reject) => {
-      axios
-        .get<GetTransactionStatusResponse>(
-          `${this.feederGatewayUrl}/get_transaction_status?transactionHash=${toHex(txHashBn)}`
-        )
-        .then((resp) => {
-          resolve(resp.data);
-        })
-        .catch(reject);
-    });
+    const { data } = await axios.get<GetTransactionStatusResponse>(
+      `${this.feederGatewayUrl}/get_transaction_status?transactionHash=${toHex(txHashBn)}`
+    );
+    return data;
   }
 
   /**
@@ -197,18 +174,12 @@ export class Provider implements ProviderInterface {
    * @param txHash
    * @returns the transacton object { transaction_id, status, transaction, block_id?, block_number?, transaction_index?, transaction_failure_reason? }
    */
-  public getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {
+  public async getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {
     const txHashBn = toBN(txHash);
-    return new Promise((resolve, reject) => {
-      axios
-        .get<GetTransactionResponse>(
-          `${this.feederGatewayUrl}/get_transaction?transactionHash=${toHex(txHashBn)}`
-        )
-        .then((resp) => {
-          resolve(resp.data);
-        })
-        .catch(reject);
-    });
+    const { data } = await axios.get<GetTransactionResponse>(
+      `${this.feederGatewayUrl}/get_transaction?transactionHash=${toHex(txHashBn)}`
+    );
+    return data;
   }
 
   /**
@@ -219,26 +190,20 @@ export class Provider implements ProviderInterface {
    * @param tx - transaction to be invoked
    * @returns a confirmation of invoking a function on the starknet contract
    */
-  public addTransaction(tx: Transaction): Promise<AddTransactionResponse> {
+  public async addTransaction(tx: Transaction): Promise<AddTransactionResponse> {
     const signature = tx.type === 'INVOKE_FUNCTION' && formatSignature(tx.signature);
     const contract_address_salt = tx.type === 'DEPLOY' && toHex(toBN(tx.contract_address_salt));
 
-    return new Promise((resolve, reject) => {
-      axios
-        .post(
-          `${this.gatewayUrl}/add_transaction`,
-          stringify({
-            ...tx, // the tx can contain BigInts, so we use our own `stringify`
-            ...(Array.isArray(signature) && { signature }), // not needed on deploy tx
-            ...(contract_address_salt && { contract_address_salt }), // not needed on invoke tx
-          }),
-          { headers: { 'Content-Type': 'application/json' } }
-        )
-        .then((resp: any) => {
-          resolve(resp.data);
-        })
-        .catch(reject);
-    });
+    const { data } = await axios.post<AddTransactionResponse>(
+      `${this.gatewayUrl}/add_transaction`,
+      stringify({
+        ...tx, // the tx can contain BigInts, so we use our own `stringify`
+        ...(Array.isArray(signature) && { signature }), // not needed on deploy tx
+        ...(contract_address_salt && { contract_address_salt }), // not needed on invoke tx
+      }),
+      { headers: { 'Content-Type': 'application/json' } }
+    );
+    return data;
   }
 
   /**
@@ -299,6 +264,7 @@ export class Provider implements ProviderInterface {
       await wait(retryInterval);
       // eslint-disable-next-line no-await-in-loop
       const res = await this.getTransactionStatus(txHash);
+
       if (res.tx_status === 'ACCEPTED_ONCHAIN' || res.tx_status === 'PENDING') {
         onchain = true;
       } else if (res.tx_status === 'REJECTED') {
