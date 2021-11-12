@@ -90,5 +90,5 @@ export function verify(keyPair: KeyPair, msgHash: string, sig: Signature): boole
   assertInRange(s, ONE, toBN(addHexPrefix(EC_ORDER)), 's');
   assertInRange(w, ONE, toBN(addHexPrefix(MAX_ECDSA_VAL)), 'w');
 
-  return keyPair.verify(msgHash, sig);
+  return keyPair.verify(fixMessage(msgHash), sig);
 }
