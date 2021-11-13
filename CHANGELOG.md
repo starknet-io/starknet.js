@@ -1,3 +1,9 @@
+## [1.5.5](https://github.com/seanjameshan/starknet.js/compare/v1.5.4...v1.5.5) (2021-11-13)
+
+### Bug Fixes
+
+- msgHash length fix in signature verify function ([589b126](https://github.com/seanjameshan/starknet.js/commit/589b126b2b87bf7d0b2730f53a40ee2d9ef9aca0))
+
 ## [1.5.4](https://github.com/seanjameshan/starknet.js/compare/v1.5.3...v1.5.4) (2021-11-05)
 
 ### Bug Fixes
