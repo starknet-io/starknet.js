@@ -59,3 +59,21 @@ describe('getSelectorFromName()', () => {
     );
   });
 });
+describe('computeHashOnElements()', () => {
+  test('should return valid hash for empty array', () => {
+    const res = stark.computeHashOnElements([]);
+    expect(res).toMatchInlineSnapshot(
+      `"0x49ee3eba8c1600700ee1b87eb599f16716b0b1022947733551fde4050ca6804"`
+    );
+  });
+  test('should return valid hash for valid array', () => {
+    const res = stark.computeHashOnElements([
+      number.toBN(123782376),
+      number.toBN(213984),
+      number.toBN(128763521321),
+    ]);
+    expect(res).toMatchInlineSnapshot(
+      `"0x7b422405da6571242dfc245a43de3b0fe695e7021c148b918cd9cdb462cac59"`
+    );
+  });
+});
