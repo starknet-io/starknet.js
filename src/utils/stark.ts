@@ -3,7 +3,7 @@ import { gzip } from 'pako';
 import { CompressedProgram, Program } from '../types';
 import { genKeyPair, getStarkKey } from './ellipticCurve';
 import { addHexPrefix, btoaUniversal } from './encode';
-import { starknetKeccak } from './hash';
+import { pedersen, starknetKeccak } from './hash';
 import { stringify } from './json';
 import { BigNumberish, toBN, toHex } from './number';
 
@@ -48,4 +48,8 @@ export function formatSignature(sig?: [BigNumberish, BigNumberish]): [string, st
   } catch (e) {
     return [];
   }
+}
+
+export function computeHashOnElements(data: BigNumberish[]) {
+  return [...data, data.length].reduce((x, y) => pedersen([x, y]), 0);
 }
