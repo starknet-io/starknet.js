@@ -1,3 +1,9 @@
+# [1.7.0](https://github.com/seanjameshan/starknet.js/compare/v1.6.0...v1.7.0) (2021-11-17)
+
+### Features
+
+- add computeHashOnElements ([ec6d3d3](https://github.com/seanjameshan/starknet.js/commit/ec6d3d35abd0e4aecea820d6702adf174e5e37e7))
+
 # [1.6.0](https://github.com/seanjameshan/starknet.js/compare/v1.5.4...v1.6.0) (2021-11-09)
 
 ### Bug Fixes
