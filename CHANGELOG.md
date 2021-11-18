@@ -1,3 +1,13 @@
+# [2.0.0](https://github.com/seanjameshan/starknet.js/compare/v1.7.0...v2.0.0) (2021-11-18)
+
+### Features
+
+- alpha 4 ([f12db5a](https://github.com/seanjameshan/starknet.js/commit/f12db5a9d3d00902792a292e5258263edb7ac7a2))
+
+### BREAKING CHANGES
+
+- implements alpha 4
+
 # [1.7.0](https://github.com/seanjameshan/starknet.js/compare/v1.6.0...v1.7.0) (2021-11-17)
 
 ### Features
