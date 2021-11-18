@@ -1,3 +1,10 @@
+import type { ec as EC } from 'elliptic';
+
+import type { BigNumberish } from './utils/number';
+
+export type KeyPair = EC.KeyPair;
+export type Signature = EC.Signature;
+
 export type GetContractAddressesResponse = {
   Starknet: string;
   GpsStatementVerifier: string;
@@ -30,18 +37,20 @@ export type CompressedCompiledContract = Omit<CompiledContract, 'program'>;
 export type DeployTransaction = {
   type: 'DEPLOY';
   contract_definition: CompressedCompiledContract;
-  contract_address: string;
+  contract_address_salt: BigNumberish;
+  constructor_calldata: string[];
 };
 
 export type InvokeFunctionTransaction = {
   type: 'INVOKE_FUNCTION';
   contract_address: string;
+  signature?: [BigNumberish, BigNumberish];
   entry_point_type?: EntryPointType;
-  entry_point_selector?: string;
+  entry_point_selector: string;
   calldata?: string[];
 };
 
-export type Call = Omit<InvokeFunctionTransaction, 'type'>;
+export type CallContractTransaction = Omit<InvokeFunctionTransaction, 'type'>;
 
 export type Transaction = DeployTransaction | InvokeFunctionTransaction;
 
@@ -54,13 +63,13 @@ export type GetBlockResponse = {
   state_root: string;
   block_id: number;
   transactions: {
-    [txid: string]: Transaction;
+    [txHash: string]: Transaction;
   };
   timestamp: number;
   transaction_receipts: {
-    [txid: string]: {
+    [txHash: string]: {
       block_id: number;
-      transaction_id: number;
+      transaction_hash: string;
       l2_to_l1_messages: {
         to_address: string;
         payload: string[];
@@ -86,15 +95,16 @@ export type GetTransactionStatusResponse = {
 };
 
 export type GetTransactionResponse = {
-  transaction_index: number;
+  status: Status;
   transaction: Transaction;
   block_id: number;
   block_number: number;
-  status: Status;
-  transaction_id: number;
+  transaction_index: number;
+  transaction_hash: string;
 };
 
 export type AddTransactionResponse = {
   code: TxStatus;
-  tx_id: number;
+  transaction_hash: string;
+  address?: string;
 };

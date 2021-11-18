@@ -3,27 +3,30 @@
  */
 
 import fs from 'fs';
-import { compressProgram, isBrowser, JsonParser } from '../src';
 
-const compiledArgentAccount = JsonParser.parse(
+import { constants, json, stark } from '../../src';
+
+const { IS_BROWSER } = constants;
+
+const compiledArgentAccount = json.parse(
   fs.readFileSync('./__mocks__/ArgentAccount.json').toString('ascii')
 );
 
 test('isBrowser', () => {
-  expect(isBrowser).toBe(true);
+  expect(IS_BROWSER).toBe(true);
 });
 describe('compressProgram()', () => {
   test('compresses a contract program', () => {
     const inputContract = compiledArgentAccount as any;
 
-    const compressed = compressProgram(inputContract.program);
+    const compressed = stark.compressProgram(inputContract.program);
 
     expect(compressed).toMatchSnapshot();
   });
   test('works with strings', () => {
-    const inputProgram = JsonParser.stringify(compiledArgentAccount.program);
+    const inputProgram = json.stringify(compiledArgentAccount.program);
 
-    const compressed = compressProgram(inputProgram);
+    const compressed = stark.compressProgram(inputProgram);
 
     expect(compressed).toMatchSnapshot();
   });
