@@ -52,24 +52,24 @@ describe('defaultProvider', () => {
     test('getTransactionStatus()', () => {
       return expect(
         defaultProvider.getTransactionStatus(
-          '0x2086ff26645fb0e31a3e252302f3cb1e7612c60389102e5473dfc89758a3aa9'
+          '0x774f7856b1ce6d5ce023a18cd5a06ab67e3a6d81c7bfcd01f99f32243c2d2ef'
         )
       ).resolves.not.toThrow();
     });
     test('getTransaction()', async () => {
       return expect(
         defaultProvider.getTransaction(
-          '0x2086ff26645fb0e31a3e252302f3cb1e7612c60389102e5473dfc89758a3aa9'
+          '0x774f7856b1ce6d5ce023a18cd5a06ab67e3a6d81c7bfcd01f99f32243c2d2ef'
         )
       ).resolves.not.toThrow();
     });
     test('callContract()', () => {
       return expect(
         defaultProvider.callContract({
-          contract_address: '0x58bceda58a83a5a100117ddc893234bad9c84a6833c2008f0f1ca90150149af',
+          contract_address: '0x9ff64f4ab0e1fe88df4465ade98d1ea99d5732761c39279b8e1374fa943e9b',
           entry_point_selector: stark.getSelectorFromName('balance_of'),
           calldata: compileCalldata({
-            user: '0x58bceda58a83a5a100117ddc893234bad9c84a6833c2008f0f1ca90150149af',
+            user: '0x9ff64f4ab0e1fe88df4465ade98d1ea99d5732761c39279b8e1374fa943e9b',
           }),
         })
       ).resolves.not.toThrow();

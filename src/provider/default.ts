@@ -52,7 +52,7 @@ export class Provider implements ProviderInterface {
     switch (name) {
       case 'alpha':
       default:
-        return 'https://alpha3.starknet.io';
+        return 'https://alpha4.starknet.io';
     }
   }
 
@@ -257,8 +257,9 @@ export class Provider implements ProviderInterface {
     });
   }
 
-  public async waitForTx(txHash: BigNumberish, retryInterval: number = 2000) {
+  public async waitForTx(txHash: BigNumberish, retryInterval: number = 5000) {
     let onchain = false;
+    let firstRun = true;
     while (!onchain) {
       // eslint-disable-next-line no-await-in-loop
       await wait(retryInterval);
@@ -269,9 +270,10 @@ export class Provider implements ProviderInterface {
         onchain = true;
       } else if (res.tx_status === 'REJECTED') {
         throw Error('REJECTED');
-      } else if (res.tx_status === 'NOT_RECEIVED') {
+      } else if (res.tx_status === 'NOT_RECEIVED' && !firstRun) {
         throw Error('NOT_RECEIVED');
       }
+      firstRun = false;
     }
   }
 }

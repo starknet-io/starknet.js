@@ -43,17 +43,12 @@ export function pedersen(input: [BigNumberish, BigNumberish]) {
   return addHexPrefix(point.getX().toString(16));
 }
 
+export function computeHashOnElements(data: BigNumberish[]) {
+  return [...data, data.length].reduce((x, y) => pedersen([x, y]), 0).toString();
+}
+
 export function hashCalldata(calldata: string[]): string {
-  const calldataCopy = [...calldata];
-  if (calldataCopy.length === 0) {
-    return '0';
-  }
-  if (calldataCopy.length === 1) {
-    return calldataCopy[0];
-  }
-  // calldata element will always be there as it was checked by an if statement before (!)
-  const calldataEl = calldataCopy.shift()!;
-  return pedersen([hashCalldata(calldataCopy), calldataEl]);
+  return computeHashOnElements(calldata);
 }
 
 export function hashMessage(
@@ -63,9 +58,6 @@ export function hashMessage(
   calldata: string[],
   nonce: string
 ) {
-  const hash0 = pedersen([account, to]);
-  const hash1 = pedersen([hash0, selector]);
   const calldataHash = hashCalldata(calldata);
-  const hash2 = pedersen([hash1, calldataHash]);
-  return pedersen([hash2, nonce]);
+  return computeHashOnElements([account, to, selector, calldataHash, nonce]);
 }

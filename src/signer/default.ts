@@ -35,14 +35,14 @@ export class Signer extends Provider implements SignerInterface {
 
     const { result } = await this.callContract({
       contract_address: this.address,
-      entry_point_selector: getSelectorFromName('get_current_nonce'),
+      entry_point_selector: getSelectorFromName('get_nonce'),
     });
     const nonceBn = toBN(result[0]);
     const calldataDecimal = (tx.calldata || []).map((x) => toBN(x).toString());
 
     const msgHash = addHexPrefix(
       hashMessage(
-        '0', // needs to be walletAddress once it's possible to retrieve address(self) in cairo
+        this.address,
         tx.contract_address,
         tx.entry_point_selector,
         calldataDecimal,
