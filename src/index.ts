@@ -1,9 +1,18 @@
+/**
+ * Main
+ */
 export * from './types';
 export * from './contract';
-export * from './wallet';
-export * from './starknet';
+export * from './provider';
+export * from './signer';
 
-export { pedersen } from './utils/hash';
-
+/**
+ * Utils
+ */
 export * as constants from './constants';
-export * as utils from './utils';
+export * as encode from './utils/encode';
+export * as hash from './utils/hash';
+export * as json from './utils/json';
+export * as number from './utils/number';
+export * as stark from './utils/stark';
+export * as ec from './utils/ellipticCurve';

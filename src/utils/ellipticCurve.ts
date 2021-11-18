@@ -2,9 +2,10 @@ import { ec as EC, curves } from 'elliptic';
 import hashJS from 'hash.js';
 import assert from 'minimalistic-assert';
 
-import { CONSTANT_POINTS, EC_ORDER, FIELD_PRIME, MAX_ECDSA_VAL, ONE, ZERO } from './constants';
-import { addHexPrefix, removeHexPrefix, sanitizeBytes } from './utils/encode';
-import { BigNumberish, assertInRange, toBN, toHex } from './utils/number';
+import { CONSTANT_POINTS, EC_ORDER, FIELD_PRIME, MAX_ECDSA_VAL, ONE, ZERO } from '../constants';
+import { KeyPair, Signature } from '../types';
+import { addHexPrefix, removeHexPrefix, sanitizeBytes } from './encode';
+import { BigNumberish, assertInRange, toBN, toHex } from './number';
 
 export const ec = new EC(
   new curves.PresetCurve({
@@ -39,9 +40,6 @@ function fixMessage(msg: string) {
 }
 
 export const genKeyPair = ec.genKeyPair.bind(ec);
-
-export type KeyPair = EC.KeyPair;
-export type Signature = EC.Signature;
 
 export function getKeyPair(pk: BigNumberish): KeyPair {
   const pkBn = toBN(pk);

@@ -1,4 +1,9 @@
-import { BigNumberish } from './utils/number';
+import type { ec as EC } from 'elliptic';
+
+import type { BigNumberish } from './utils/number';
+
+export type KeyPair = EC.KeyPair;
+export type Signature = EC.Signature;
 
 export type GetContractAddressesResponse = {
   Starknet: string;
@@ -41,7 +46,7 @@ export type InvokeFunctionTransaction = {
   contract_address: string;
   signature?: [BigNumberish, BigNumberish];
   entry_point_type?: EntryPointType;
-  entry_point_selector?: string;
+  entry_point_selector: string;
   calldata?: string[];
 };
 
@@ -101,5 +106,5 @@ export type GetTransactionResponse = {
 export type AddTransactionResponse = {
   code: TxStatus;
   transaction_hash: string;
-  address: string;
+  address?: string;
 };

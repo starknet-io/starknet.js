@@ -1,3 +1,36 @@
+## [2.0.1](https://github.com/seanjameshan/starknet.js/compare/v2.0.0...v2.0.1) (2021-11-18)
+
+### Bug Fixes
+
+- msgHash length fix in signature verify function ([589b126](https://github.com/seanjameshan/starknet.js/commit/589b126b2b87bf7d0b2730f53a40ee2d9ef9aca0))
+
+# [2.0.0](https://github.com/seanjameshan/starknet.js/compare/v1.7.0...v2.0.0) (2021-11-18)
+
+### Features
+
+- alpha 4 ([f12db5a](https://github.com/seanjameshan/starknet.js/commit/f12db5a9d3d00902792a292e5258263edb7ac7a2))
+
+### BREAKING CHANGES
+
+- implements alpha 4
+
+# [1.7.0](https://github.com/seanjameshan/starknet.js/compare/v1.6.0...v1.7.0) (2021-11-17)
+
+### Features
+
+- add computeHashOnElements ([ec6d3d3](https://github.com/seanjameshan/starknet.js/commit/ec6d3d35abd0e4aecea820d6702adf174e5e37e7))
+
+# [1.6.0](https://github.com/seanjameshan/starknet.js/compare/v1.5.4...v1.6.0) (2021-11-09)
+
+### Bug Fixes
+
+- review changes ([375043b](https://github.com/seanjameshan/starknet.js/commit/375043bf6908b2475ca80e9ce73d479eb21b577c))
+
+### Features
+
+- add invokeFunction ([7e04b5e](https://github.com/seanjameshan/starknet.js/commit/7e04b5ec383fa6d466e9e06d9fa02e2d0c36b020))
+- # add signer and provider v1 ([909fdc0](https://github.com/seanjameshan/starknet.js/commit/909fdc0b2b211755b9124b62f97476d89b655de1))
+
 ## [1.5.5](https://github.com/seanjameshan/starknet.js/compare/v1.5.4...v1.5.5) (2021-11-13)
 
 ### Bug Fixes

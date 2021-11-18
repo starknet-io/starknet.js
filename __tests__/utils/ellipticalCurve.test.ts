@@ -1,19 +1,11 @@
-import {
-  ec,
-  getKeyPair,
-  getStarkKey,
-  hashCalldata,
-  hashMessage,
-  pedersen,
-  sign,
-  verify,
-} from '../src';
-import { removeHexPrefix } from '../src/utils/encode';
-import { toBN, toHex } from '../src/utils/number';
+import { getKeyPair, getStarkKey, sign, verify, ec } from '../../src/utils/ellipticCurve';
+import { removeHexPrefix } from '../../src/utils/encode';
+import { hashCalldata, hashMessage, pedersen } from '../../src/utils/hash';
+import { toBN, toHex } from '../../src/utils/number';
 
 test('getKeyPair()', () => {
-  const pk = '0x019800ea6a9a73f94aee6a3d2edf018fc770443e90c7ba121e8303ec6b349279';
-  const pair = getKeyPair(pk);
+  const privateKey = '0x019800ea6a9a73f94aee6a3d2edf018fc770443e90c7ba121e8303ec6b349279';
+  const pair = getKeyPair(privateKey);
   // somehow needed, returns error else
   expect(toHex(toBN(getStarkKey(pair)))).toBe(
     '0x33f45f07e1bd1a51b45fc24ec8c8c9908db9e42191be9e169bfcac0c0d99745'
@@ -28,17 +20,17 @@ test('pedersen()', () => {
 test('hashCalldata()', () => {
   const array = ['1', '2', '3', '4'];
   expect(hashCalldata(array)).toBe(
-    '0x1439c58e1c389a2ac51f8462ecc0a4ec7f812be1c04e3b82ce2af1c2cf959ef'
+    '0x66bd4335902683054d08a0572747ea78ebd9e531536fb43125424ca9f902084'
   );
   expect(array).toStrictEqual(['1', '2', '3', '4']);
 
   expect(hashCalldata(['1', '2'])).toBe(
-    '0x2ab889bd35e684623df9b4ea4a4a1f6d9e0ef39b67c1293b8a89dd17e351235'
+    '0x501a3a8e6cd4f5241c639c74052aaa34557aafa84dd4ba983d6443c590ab7df'
   );
 });
 
 test('hashMessage()', () => {
-  const pk = '0x019800ea6a9a73f94aee6a3d2edf018fc770443e90c7ba121e8303ec6b349279';
+  const privateKey = '0x019800ea6a9a73f94aee6a3d2edf018fc770443e90c7ba121e8303ec6b349279';
   const hashMsg = hashMessage(
     '0x33f45f07e1bd1a51b45fc24ec8c8c9908db9e42191be9e169bfcac0c0d99745',
     '5',
@@ -46,14 +38,14 @@ test('hashMessage()', () => {
     ['1', '2'],
     '2'
   );
-  expect(hashMsg).toBe('0xf7ec4a68876819eed838be83b5d5dc337081f4a5fb8e421f3d9bdef7c69e9b');
-  const keyPair = getKeyPair(pk);
+  expect(hashMsg).toBe('0x7f15c38ea577a26f4f553282fcfe4f1feeb8ecfaad8f221ae41abf8224cbddd');
+  const keyPair = getKeyPair(privateKey);
   const { r, s } = sign(keyPair, removeHexPrefix(hashMsg));
   expect(r.toString()).toStrictEqual(
-    toBN('2699852629692218907583414128365108566181098618321049245303767746418549764831').toString()
+    toBN('2458502865976494910213617956670505342647705497324144349552978333078363662855').toString()
   );
   expect(s.toString()).toStrictEqual(
-    toBN('2362979021721299440845279407227912881357338080403308888611869245024056250189').toString()
+    toBN('3439514492576562277095748549117516048613512930236865921315982886313695689433').toString()
   );
 });
 
