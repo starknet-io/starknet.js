@@ -81,7 +81,7 @@ describe('deploy and test Wallet', () => {
     await defaultProvider.waitForTx(txErc20Mint);
   });
   test('read nonce', async () => {
-    const { nonce } = await wallet.call('get_current_nonce');
+    const { nonce } = await wallet.call('get_nonce');
 
     expect(number.toBN(nonce as string).toString()).toStrictEqual(number.toBN(0).toString());
   });
@@ -93,10 +93,10 @@ describe('deploy and test Wallet', () => {
     expect(number.toBN(res as string).toString()).toStrictEqual(number.toBN(1000).toString());
   });
   test('execute by wallet owner', async () => {
-    const { nonce } = await wallet.call('get_current_nonce');
+    const { nonce } = await wallet.call('get_nonce');
     const msgHash = encode.addHexPrefix(
       hash.hashMessage(
-        '0', // needs to be walletAddress once it's possible to retrieve address(self) in cairo
+        wallet.connectedTo,
         erc20Address,
         stark.getSelectorFromName('transfer'),
         [erc20Address, '10'],
@@ -147,15 +147,15 @@ test('build tx', async () => {
   const msgHash = hash.hashMessage(address, '1', selector, ['6', '7'], '0');
   expect(number.toBN(msgHash).toString()).toStrictEqual(
     number
-      .toBN('2221651675559331189881349481637314109810712322791057846116415219218634672652')
+      .toBN('2154230509011102177917341711834485670139815171447919056633262592518907948680')
       .toString()
   );
 
   const { r, s } = ec.sign(keyPair, msgHash);
   expect(r.toString()).toBe(
-    '2220702546012141050051149396887481489960265709213083422658245644097500180866'
+    '706800951915233622090196542158919402159816118214143837213294331713137614072'
   );
   expect(s.toString()).toBe(
-    '1542316446019190634489932498001415389924394685441251344076931639569381539117'
+    '1857147121895075123389037565321926580259282654271568123966453051614350474888'
   );
 });

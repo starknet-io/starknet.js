@@ -68,7 +68,7 @@ describe('deploy and test Wallet', () => {
   test('read nonce', async () => {
     const { result } = await signer.callContract({
       contract_address: signer.address,
-      entry_point_selector: stark.getSelectorFromName('get_current_nonce'),
+      entry_point_selector: stark.getSelectorFromName('get_nonce'),
     });
     const nonce = result[0];
 

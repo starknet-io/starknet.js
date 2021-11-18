@@ -106,5 +106,5 @@ export type GetTransactionResponse = {
 export type AddTransactionResponse = {
   code: TxStatus;
   transaction_hash: string;
-  address: string;
+  address?: string;
 };

@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-import { constants, json, number, stark } from '../../src';
+import { constants, hash, json, number, stark } from '../../src';
 
 const { IS_BROWSER } = constants;
 
@@ -61,13 +61,13 @@ describe('getSelectorFromName()', () => {
 });
 describe('computeHashOnElements()', () => {
   test('should return valid hash for empty array', () => {
-    const res = stark.computeHashOnElements([]);
+    const res = hash.computeHashOnElements([]);
     expect(res).toMatchInlineSnapshot(
       `"0x49ee3eba8c1600700ee1b87eb599f16716b0b1022947733551fde4050ca6804"`
     );
   });
   test('should return valid hash for valid array', () => {
-    const res = stark.computeHashOnElements([
+    const res = hash.computeHashOnElements([
       number.toBN(123782376),
       number.toBN(213984),
       number.toBN(128763521321),
