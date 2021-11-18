@@ -1,10 +1,6 @@
 {
   "name": "starknet",
-<<<<<<< HEAD
   "version": "2.0.0",
-=======
-  "version": "1.5.5",
->>>>>>> main
   "description": "JavaScript library for StarkNet",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
