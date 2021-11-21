@@ -16,13 +16,25 @@ export type Type = 'DEPLOY' | 'INVOKE_FUNCTION';
 export type EntryPointType = 'EXTERNAL';
 export type CompressedProgram = string;
 
-export type Abi = {
-  inputs: { name: string; type: 'felt' | 'felt*' }[];
+export type AbiEntry = { name: string; type: 'felt' | 'felt*' | string };
+
+export type FunctionAbi = {
+  inputs: AbiEntry[];
   name: string;
-  outputs: { name: string; type: 'felt' | 'felt*' }[];
+  outputs: AbiEntry[];
   stateMutability?: 'view';
   type: 'function';
 };
+
+export type StructAbi = {
+  members: { name: string; offset: number; type: 'felt' | 'felt*' | string }[];
+  name: string;
+  size: number;
+  type: 'struct';
+};
+
+export type Abi = FunctionAbi | StructAbi;
+
 export type EntryPointsByType = object;
 export type Program = object;
 
