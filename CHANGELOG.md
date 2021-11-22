@@ -1,3 +1,10 @@
+## [2.0.2](https://github.com/seanjameshan/starknet.js/compare/v2.0.1...v2.0.2) (2021-11-22)
+
+### Bug Fixes
+
+- correctly parse structs in Starknet return types ([5a4a318](https://github.com/seanjameshan/starknet.js/commit/5a4a318dad4c78fe84540ad92063fc1879317ac1))
+- make Typescript compiler happy with constant types ([aedd895](https://github.com/seanjameshan/starknet.js/commit/aedd895a62e6018dd1d7330b004d54360007967f))
+
 ## [2.0.1](https://github.com/seanjameshan/starknet.js/compare/v2.0.0...v2.0.1) (2021-11-18)
 
 ### Bug Fixes
