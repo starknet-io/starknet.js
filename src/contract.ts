@@ -2,7 +2,7 @@ import BN from 'bn.js';
 import assert from 'minimalistic-assert';
 
 import { Provider, defaultProvider } from './provider';
-import { Abi } from './types';
+import { Abi, AbiEntry, FunctionAbi, StructAbi } from './types';
 import { BigNumberish, toBN } from './utils/number';
 import { getSelectorFromName } from './utils/stark';
 
@@ -39,6 +39,8 @@ export class Contract {
 
   abi: Abi[];
 
+  structs: { [name: string]: StructAbi };
+
   provider: Provider;
 
   /**
@@ -51,6 +53,15 @@ export class Contract {
     this.connectedTo = address;
     this.provider = provider;
     this.abi = abi;
+    this.structs = abi
+      .filter((abiEntry) => abiEntry.type === 'struct')
+      .reduce(
+        (acc, abiEntry) => ({
+          ...acc,
+          [abiEntry.name]: abiEntry,
+        }),
+        {}
+      );
   }
 
   public connect(address: string): Contract {
@@ -62,9 +73,9 @@ export class Contract {
     // ensure provided method exists
     const invokeableFunctionNames = this.abi
       .filter((abi) => {
+        if (abi.type !== 'function') return false;
         const isView = abi.stateMutability === 'view';
-        const isFunction = abi.type === 'function';
-        return isFunction && type === 'INVOKE' ? !isView : isView;
+        return type === 'INVOKE' ? !isView : isView;
       })
       .map((abi) => abi.name);
     assert(
@@ -73,7 +84,9 @@ export class Contract {
     );
 
     // ensure args match abi type
-    const methodAbi = this.abi.find((abi) => abi.name === method)!;
+    const methodAbi = this.abi.find(
+      (abi) => abi.name === method && abi.type === 'function'
+    ) as FunctionAbi;
     methodAbi.inputs.forEach((input) => {
       if (args[input.name] !== undefined) {
         if (input.type === 'felt') {
@@ -102,14 +115,32 @@ export class Contract {
     });
   }
 
-  private parseResponse(method: string, response: (string | string[])[]): Args {
-    const methodAbi = this.abi.find((abi) => abi.name === method)!;
-    return methodAbi.outputs.reduce((acc, output, i) => {
-      return {
+  private parseResponseField(
+    element: AbiEntry | FunctionAbi,
+    responseIterator: Iterator<string>
+  ): Args {
+    let entries: AbiEntry[] = [];
+    if (['felt', 'felt*'].includes(element.type)) {
+      return responseIterator.next().value;
+    }
+    if (element.type in this.structs) {
+      entries = this.structs[element.type].members;
+    } else if ('outputs' in element) {
+      entries = element.outputs;
+    }
+    return entries.reduce(
+      (acc, member) => ({
         ...acc,
-        [output.name]: response[i],
-      };
-    }, {} as Args);
+        [member.name]: this.parseResponseField(member, responseIterator),
+      }),
+      {}
+    );
+  }
+
+  private parseResponse(method: string, response: string[]): Args {
+    const methodAbi = this.abi.find((abi) => abi.name === method) as FunctionAbi;
+    const responseIterator = response.flat()[Symbol.iterator]();
+    return this.parseResponseField(methodAbi, responseIterator);
   }
 
   public invoke(method: string, args: Args = {}, signature?: [BigNumberish, BigNumberish]) {
