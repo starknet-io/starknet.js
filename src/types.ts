@@ -27,7 +27,7 @@ export type FunctionAbi = {
 };
 
 export type StructAbi = {
-  members: { name: string; offset: number; type: 'felt' | 'felt*' | string }[];
+  members: (AbiEntry & { offset: number })[];
   name: string;
   size: number;
   type: 'struct';
