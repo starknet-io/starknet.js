@@ -56,11 +56,22 @@ defaultProvider.getContractAddresses().then((data) => {
 
 [Click Here](https://www.starknetjs.com/modules.html)
 
-## Contributing
+## 🚀 Powered by Starknet.js
+
+- [Argent X - the first StarkNet wallet](https://github.com/argentlabs/argent-x)
+- [React + Starknet.js boilerplate](https://github.com/fracek/starknet-react-example)
+
+## ✏️ Contributing
 
 If you consider to contribute to this project please read [CONTRIBUTING.md](https://github.com/seanjameshan/starknet.js/blob/main/CONTRIBUTING.md) first.
 
-## License
+## ❤️ Special Thanks
+
+Special thanks to all the [contributors](https://github.com/seanjameshan/starknet.js/graphs/contributors), and especially Janek ([@janek26](https://github.com/janek26)) from [Argent](https://github.com/argentlabs) for driving the development of Starknet.js.
+
+This library would not be possible without these rockstars.
+
+## 📜 License
 
 Copyright (c) 2021 Sean James Han
 
