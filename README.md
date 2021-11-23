@@ -89,6 +89,8 @@ const balanceB = poolBalanceTokenB.result[0];
 console.log('token b liquidity pool balance: ', parseInt(balanceB, 16));
 ```
 
+For more information about signing transactions, please take a look at this [pull request](https://github.com/seanjameshan/starknet.js/pull/51)
+
 ## 🌐 API
 
 [Click Here](https://www.starknetjs.com/modules.html)
