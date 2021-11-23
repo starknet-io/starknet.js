@@ -1,5 +1,5 @@
 import { Provider } from '../provider';
-import { AddTransactionResponse, Transaction } from '../types';
+import { AddTransactionResponse, Signature, Transaction } from '../types';
 
 export abstract class SignerInterface extends Provider {
   public abstract address: string;
@@ -12,4 +12,12 @@ export abstract class SignerInterface extends Provider {
    * @returns a confirmation of invoking a function on the starknet contract
    */
   public abstract override addTransaction(tx: Transaction): Promise<AddTransactionResponse>;
+
+  /**
+   * Sign a message hash.
+   *
+   * @param msghash - Message hash to be signed.
+   * @returns {r,s} of the signed message
+   */
+  public abstract sign(msghash: string): Signature;
 }

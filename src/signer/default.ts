@@ -1,7 +1,7 @@
 import assert from 'minimalistic-assert';
 
 import { Provider } from '../provider';
-import { AddTransactionResponse, KeyPair, Transaction } from '../types';
+import { AddTransactionResponse, KeyPair, Signature, Transaction } from '../types';
 import { sign } from '../utils/ellipticCurve';
 import { addHexPrefix } from '../utils/encode';
 import { hashMessage } from '../utils/hash';
@@ -18,6 +18,16 @@ export class Signer extends Provider implements SignerInterface {
     super(provider);
     this.keyPair = keyPair;
     this.address = address;
+  }
+
+  /**
+   * Sign a message hash.
+   *
+   * @param msghash - Message hash to be signed.
+   * @returns {r,s} of the signed message
+   */
+  public sign(msghash: string): Signature {
+    return sign(this.keyPair, msghash);
   }
 
   /**
