@@ -44,12 +44,49 @@ $ npm install starknet
 
 Import `starknet` and use the [API](https://www.starknetjs.com/modules.html)
 
-```javascript
-import { defaultProvider } from 'starknet';
+The following code is used to build a [simple AMM example](https://starkfin.netlify.app/) from the [cairo docs](https://www.cairo-lang.org/docs/hello_starknet/amm.html)
 
-defaultProvider.getContractAddresses().then((data) => {
-  console.log(data);
+```javascript
+import { defaultProvider, stark } from 'starknet';
+const { getSelectorFromName } = stark;
+
+const CONTRACT_ADDRESS =
+  "0x03e19baa6cb2078631bcdb34844f3f7879449a544c9ce722681a54af08cff4b9";
+
+/**
+ * addTransaction() example
+**/
+
+/** Reset the liquidity pool **/
+const addTokenResponse = await provider.addTransaction({
+  type: "INVOKE_FUNCTION",
+  contract_address: CONTRACT_ADDRESS,
+  entry_point_selector: getSelectorFromName("init_pool"),
+  calldata: ["1000000", "1000000"],
 });
+console.log(addTokenResponse);
+
+/**
+ * callContract() example
+**/
+
+/** Get the balance of the liquidity pool of token A **/
+const poolBalanceTokenA = await callContract({
+  contract_address: CONTRACT_ADDRESS,
+  entry_point_selector: getSelectorFromName("get_pool_token_balance"),
+  calldata: ["1"],
+});
+const balanceA = poolBalanceTokenA.result[0];
+console.log('token a liquidity pool balance: ', parseInt(balanceA, 16));
+
+/** Get the balance of the liquidity pool of token B **/
+const poolBalanceTokenB = await callContract({
+  contract_address: CONTRACT_ADDRESS,
+  entry_point_selector: getSelectorFromName("get_pool_token_balance"),
+  calldata: ["2"],
+});
+const balanceB = poolBalanceTokenB.result[0];
+console.log('token b liquidity pool balance: ', parseInt(balanceB, 16));
 ```
 
 ## 🌐 API
