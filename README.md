@@ -89,7 +89,7 @@ const balanceB = poolBalanceTokenB.result[0];
 console.log('token b liquidity pool balance: ', parseInt(balanceB, 16));
 ```
 
-For more information about signing transactions, please take a look at this [pull request](https://github.com/seanjameshan/starknet.js/pull/51)
+For more information about **signing transactions**, please take a look at this [pull request](https://github.com/seanjameshan/starknet.js/pull/51)
 
 ## 🌐 API
 
@@ -99,6 +99,7 @@ For more information about signing transactions, please take a look at this [pul
 
 - [Argent X - the first StarkNet wallet](https://github.com/argentlabs/argent-x)
 - [React + Starknet.js boilerplate](https://github.com/fracek/starknet-react-example)
+- [AMM Demo](https://www.starknetswap.com/)
 
 ## ✏️ Contributing
 
@@ -106,7 +107,7 @@ If you consider to contribute to this project please read [CONTRIBUTING.md](http
 
 ## ❤️ Special Thanks
 
-Special thanks to all the [contributors](https://github.com/seanjameshan/starknet.js/graphs/contributors), and especially Janek ([@janek26](https://github.com/janek26)) from [Argent](https://github.com/argentlabs) for driving the development of Starknet.js.
+Special thanks to all the [contributors](https://github.com/seanjameshan/starknet.js/graphs/contributors), especially to Janek ([@janek26](https://github.com/janek26)) from [Argent](https://github.com/argentlabs) for driving the development of Starknet.js.
 
 This library would not be possible without these rockstars.
 
