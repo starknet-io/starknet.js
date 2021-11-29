@@ -17,11 +17,15 @@ import { BigNumberish, toBN, toHex } from '../utils/number';
 import { compressProgram, formatSignature, randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
 
-type NetworkName = 'alpha';
+type NetworkName = 'mainnet-alpha' | 'georli-alpha';
 
-interface ProviderOptions {
-  network?: NetworkName;
-}
+type ProviderOptions =
+  | {
+      network: NetworkName;
+    }
+  | {
+      baseUrl: string;
+    };
 
 function wait(delay: number) {
   return new Promise((res) => setTimeout(res, delay));
@@ -34,14 +38,16 @@ export class Provider implements ProviderInterface {
 
   public gatewayUrl: string;
 
-  constructor(optionsOrProvider?: ProviderOptions | Provider) {
+  constructor(optionsOrProvider: ProviderOptions | Provider = { network: 'georli-alpha' }) {
     if (optionsOrProvider instanceof Provider) {
       this.baseUrl = optionsOrProvider.baseUrl;
       this.feederGatewayUrl = optionsOrProvider.feederGatewayUrl;
       this.gatewayUrl = optionsOrProvider.gatewayUrl;
     } else {
-      const { network = 'alpha' } = optionsOrProvider || {};
-      const baseUrl = Provider.getNetworkFromName(network);
+      const baseUrl =
+        'baseUrl' in optionsOrProvider
+          ? optionsOrProvider.baseUrl
+          : Provider.getNetworkFromName(optionsOrProvider.network);
       this.baseUrl = baseUrl;
       this.feederGatewayUrl = `${baseUrl}/feeder_gateway`;
       this.gatewayUrl = `${baseUrl}/gateway`;
@@ -50,7 +56,9 @@ export class Provider implements ProviderInterface {
 
   protected static getNetworkFromName(name: NetworkName) {
     switch (name) {
-      case 'alpha':
+      case 'mainnet-alpha':
+        return 'http://alpha-mainnet.starknet.io/';
+      case 'georli-alpha':
       default:
         return 'https://alpha4.starknet.io';
     }
@@ -257,7 +265,7 @@ export class Provider implements ProviderInterface {
     });
   }
 
-  public async waitForTx(txHash: BigNumberish, retryInterval: number = 5000) {
+  public async waitForTx(txHash: BigNumberish, retryInterval: number = 10000) {
     let onchain = false;
     let firstRun = true;
     while (!onchain) {
@@ -275,5 +283,6 @@ export class Provider implements ProviderInterface {
       }
       firstRun = false;
     }
+    await wait(retryInterval);
   }
 }
