@@ -137,7 +137,7 @@ export class Provider implements ProviderInterface {
     return data;
   }
 
-  // TODO: add proper type
+  // TODO: add proper type and return it
   /**
    * Gets the contract's storage variable at a specific key.
    *
