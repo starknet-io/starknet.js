@@ -265,24 +265,24 @@ export class Provider implements ProviderInterface {
     });
   }
 
-  public async waitForTx(txHash: BigNumberish, retryInterval: number = 10000) {
+  public async waitForTx(txHash: BigNumberish, retryInterval: number = 8000) {
     let onchain = false;
-    let firstRun = true;
     while (!onchain) {
       // eslint-disable-next-line no-await-in-loop
       await wait(retryInterval);
       // eslint-disable-next-line no-await-in-loop
       const res = await this.getTransactionStatus(txHash);
 
-      if (res.tx_status === 'ACCEPTED_ONCHAIN' || res.tx_status === 'PENDING') {
+      if (
+        res.tx_status === 'ACCEPTED_ONCHAIN' ||
+        (res.tx_status === 'PENDING' && res.block_hash !== 'pending') // This is needed as of today. In the future there will be a different status for pending transactions.
+      ) {
         onchain = true;
       } else if (res.tx_status === 'REJECTED') {
         throw Error('REJECTED');
-      } else if (res.tx_status === 'NOT_RECEIVED' && !firstRun) {
+      } else if (res.tx_status === 'NOT_RECEIVED') {
         throw Error('NOT_RECEIVED');
       }
-      firstRun = false;
     }
-    await wait(retryInterval);
   }
 }
