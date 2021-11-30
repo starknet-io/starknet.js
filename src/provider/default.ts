@@ -1,4 +1,5 @@
 import axios from 'axios';
+import urljoin from 'url-join';
 
 import {
   AddTransactionResponse,
@@ -49,15 +50,15 @@ export class Provider implements ProviderInterface {
           ? optionsOrProvider.baseUrl
           : Provider.getNetworkFromName(optionsOrProvider.network);
       this.baseUrl = baseUrl;
-      this.feederGatewayUrl = `${baseUrl}/feeder_gateway`;
-      this.gatewayUrl = `${baseUrl}/gateway`;
+      this.feederGatewayUrl = urljoin(baseUrl, 'feeder_gateway');
+      this.gatewayUrl = urljoin(baseUrl, 'gateway');
     }
   }
 
   protected static getNetworkFromName(name: NetworkName) {
     switch (name) {
       case 'mainnet-alpha':
-        return 'http://alpha-mainnet.starknet.io/';
+        return 'https://alpha-mainnet.starknet.io';
       case 'georli-alpha':
       default:
         return 'https://alpha4.starknet.io';
@@ -72,7 +73,7 @@ export class Provider implements ProviderInterface {
    */
   public async getContractAddresses(): Promise<GetContractAddressesResponse> {
     const { data } = await axios.get<GetContractAddressesResponse>(
-      `${this.feederGatewayUrl}/get_contract_addresses`
+      urljoin(this.feederGatewayUrl, 'get_contract_addresses')
     );
     return data;
   }
@@ -91,7 +92,7 @@ export class Provider implements ProviderInterface {
     blockId?: number
   ): Promise<CallContractResponse> {
     const { data } = await axios.post<CallContractResponse>(
-      `${this.feederGatewayUrl}/call_contract?blockId=${blockId ?? 'null'}`,
+      urljoin(this.feederGatewayUrl, 'call_contract', `?blockId=${blockId ?? 'null'}`),
       {
         signature: [],
         calldata: [],
@@ -111,7 +112,7 @@ export class Provider implements ProviderInterface {
    */
   public async getBlock(blockId?: number): Promise<GetBlockResponse> {
     const { data } = await axios.get<GetBlockResponse>(
-      `${this.feederGatewayUrl}/get_block?blockId=${blockId ?? 'null'}`
+      urljoin(this.feederGatewayUrl, 'get_block', `?blockId=${blockId ?? 'null'}`)
     );
     return data;
   }
@@ -127,9 +128,11 @@ export class Provider implements ProviderInterface {
    */
   public async getCode(contractAddress: string, blockId?: number): Promise<GetCodeResponse> {
     const { data } = await axios.get<GetCodeResponse>(
-      `${this.feederGatewayUrl}/get_code?contractAddress=${contractAddress}&blockId=${
-        blockId ?? 'null'
-      }`
+      urljoin(
+        this.feederGatewayUrl,
+        'get_code',
+        `?contractAddress=${contractAddress}&blockId=${blockId ?? 'null'}`
+      )
     );
     return data;
   }
@@ -151,9 +154,11 @@ export class Provider implements ProviderInterface {
     blockId?: number
   ): Promise<object> {
     const { data } = await axios.get<object>(
-      `${
-        this.feederGatewayUrl
-      }/get_storage_at?contractAddress=${contractAddress}&key=${key}&blockId=${blockId ?? 'null'}`
+      urljoin(
+        this.feederGatewayUrl,
+        'get_storage_at',
+        `?contractAddress=${contractAddress}&key=${key}&blockId=${blockId ?? 'null'}`
+      )
     );
     return data;
   }
@@ -169,7 +174,11 @@ export class Provider implements ProviderInterface {
   public async getTransactionStatus(txHash: BigNumberish): Promise<GetTransactionStatusResponse> {
     const txHashBn = toBN(txHash);
     const { data } = await axios.get<GetTransactionStatusResponse>(
-      `${this.feederGatewayUrl}/get_transaction_status?transactionHash=${toHex(txHashBn)}`
+      urljoin(
+        this.feederGatewayUrl,
+        'get_transaction_status',
+        `?transactionHash=${toHex(txHashBn)}`
+      )
     );
     return data;
   }
@@ -185,7 +194,7 @@ export class Provider implements ProviderInterface {
   public async getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {
     const txHashBn = toBN(txHash);
     const { data } = await axios.get<GetTransactionResponse>(
-      `${this.feederGatewayUrl}/get_transaction?transactionHash=${toHex(txHashBn)}`
+      urljoin(this.feederGatewayUrl, 'get_transaction', `?transactionHash=${toHex(txHashBn)}`)
     );
     return data;
   }
@@ -203,7 +212,7 @@ export class Provider implements ProviderInterface {
     const contract_address_salt = tx.type === 'DEPLOY' && toHex(toBN(tx.contract_address_salt));
 
     const { data } = await axios.post<AddTransactionResponse>(
-      `${this.gatewayUrl}/add_transaction`,
+      urljoin(this.gatewayUrl, 'add_transaction'),
       stringify({
         ...tx, // the tx can contain BigInts, so we use our own `stringify`
         ...(Array.isArray(signature) && { signature }), // not needed on deploy tx
