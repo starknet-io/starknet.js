@@ -1,9 +1,32 @@
+# [2.2.0](https://github.com/seanjameshan/starknet.js/compare/v2.1.0...v2.2.0) (2021-11-30)
+
+### Bug Fixes
+
+- bump version ([02c8d07](https://github.com/seanjameshan/starknet.js/commit/02c8d0772e42c81e35a3a841169eb25cde68716e))
+- correctly parse structs in Starknet return types ([5a4a318](https://github.com/seanjameshan/starknet.js/commit/5a4a318dad4c78fe84540ad92063fc1879317ac1))
+- make Typescript compiler happy with constant types ([aedd895](https://github.com/seanjameshan/starknet.js/commit/aedd895a62e6018dd1d7330b004d54360007967f))
+- use urljoin ([4f1a040](https://github.com/seanjameshan/starknet.js/commit/4f1a04090f26f8e8565c516921d5d3332b6a4649))
+
+### Features
+
+- bump version ([fd22f41](https://github.com/seanjameshan/starknet.js/commit/fd22f41e39ec1c7f71c32019309f82ad0f4d66a9))
+
+## [2.1.1](https://github.com/seanjameshan/starknet.js/compare/v2.1.0...v2.1.1) (2021-11-30)
+
+### Bug Fixes
+
+- bump version ([02c8d07](https://github.com/seanjameshan/starknet.js/commit/02c8d0772e42c81e35a3a841169eb25cde68716e))
+- correctly parse structs in Starknet return types ([5a4a318](https://github.com/seanjameshan/starknet.js/commit/5a4a318dad4c78fe84540ad92063fc1879317ac1))
+- make Typescript compiler happy with constant types ([aedd895](https://github.com/seanjameshan/starknet.js/commit/aedd895a62e6018dd1d7330b004d54360007967f))
+- use urljoin ([4f1a040](https://github.com/seanjameshan/starknet.js/commit/4f1a04090f26f8e8565c516921d5d3332b6a4649))
+
 ## [2.1.1](https://github.com/seanjameshan/starknet.js/compare/v2.1.0...v2.1.1) (2021-11-30)
 
 ### Bug Fixes
 
 - correctly parse structs in Starknet return types ([5a4a318](https://github.com/seanjameshan/starknet.js/commit/5a4a318dad4c78fe84540ad92063fc1879317ac1))
 - make Typescript compiler happy with constant types ([aedd895](https://github.com/seanjameshan/starknet.js/commit/aedd895a62e6018dd1d7330b004d54360007967f))
+- use urljoin ([4f1a040](https://github.com/seanjameshan/starknet.js/commit/4f1a04090f26f8e8565c516921d5d3332b6a4649))
 
 # [2.1.0](https://github.com/seanjameshan/starknet.js/compare/v2.0.1...v2.1.0) (2021-11-30)
 
