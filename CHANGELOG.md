@@ -1,3 +1,14 @@
+# [2.1.0](https://github.com/seanjameshan/starknet.js/compare/v2.0.1...v2.1.0) (2021-11-30)
+
+### Bug Fixes
+
+- deps ([020ba39](https://github.com/seanjameshan/starknet.js/commit/020ba3948f03e41fc96c7c002b613250d73fbda6))
+- transaction status pending ([198d82b](https://github.com/seanjameshan/starknet.js/commit/198d82b30dd8c0c978cfdd2d56cb5a7e5131cb6a))
+
+### Features
+
+- support mainnet ([de07149](https://github.com/seanjameshan/starknet.js/commit/de07149ad6521edc9f79e2b0e9c82bf40f32fe02))
+
 ## [2.0.2](https://github.com/seanjameshan/starknet.js/compare/v2.0.1...v2.0.2) (2021-11-22)
 
 ### Bug Fixes
