@@ -6,7 +6,9 @@ import { Abi, AbiEntry, FunctionAbi, StructAbi } from './types';
 import { BigNumberish, toBN } from './utils/number';
 import { getSelectorFromName } from './utils/stark';
 
-export type Args = { [inputName: string]: string | string[] };
+export type Args = {
+  [inputName: string]: string | string[] | { type: 'struct'; [k: string]: string };
+};
 export type Calldata = string[];
 
 function parseFelt(candidate: string): BN {
@@ -30,6 +32,10 @@ export function compileCalldata(args: Args): Calldata {
   return Object.values(args).flatMap((value) => {
     if (Array.isArray(value))
       return [toBN(value.length).toString(), ...value.map((x) => toBN(x).toString())];
+    if (typeof value === 'object' && 'type' in value)
+      return Object.entries(value)
+        .filter(([k]) => k !== 'struct')
+        .map(([, v]) => toBN(v).toString());
     return toBN(value).toString();
   });
 }
@@ -88,19 +94,16 @@ export class Contract {
       (abi) => abi.name === method && abi.type === 'function'
     ) as FunctionAbi;
     methodAbi.inputs.forEach((input) => {
-      if (args[input.name] !== undefined) {
+      const arg = args[input.name];
+      if (arg !== undefined) {
         if (input.type === 'felt') {
-          assert(
-            typeof args[input.name] === 'string',
-            `arg ${input.name} should be a felt (string)`
-          );
-          assert(
-            isFelt(args[input.name] as string),
-            `arg ${input.name} should be decimal or hexadecimal`
-          );
+          assert(typeof arg === 'string', `arg ${input.name} should be a felt (string)`);
+          assert(isFelt(arg as string), `arg ${input.name} should be decimal or hexadecimal`);
+        } else if (typeof arg === 'object' && 'type' in arg) {
+          assert(arg.type === 'struct', `arg ${input.name} should be a struct`);
         } else {
-          assert(Array.isArray(args[input.name]), `arg ${input.name} should be a felt* (string[])`);
-          (args[input.name] as string[]).forEach((felt, i) => {
+          assert(Array.isArray(arg), `arg ${input.name} should be a felt* (string[])`);
+          (arg as string[]).forEach((felt, i) => {
             assert(
               typeof felt === 'string',
               `arg ${input.name}[${i}] should be a felt (string) as part of a felt* (string[])`
