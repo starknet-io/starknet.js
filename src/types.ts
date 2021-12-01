@@ -16,13 +16,25 @@ export type Type = 'DEPLOY' | 'INVOKE_FUNCTION';
 export type EntryPointType = 'EXTERNAL';
 export type CompressedProgram = string;
 
-export type Abi = {
-  inputs: { name: string; type: 'felt' | 'felt*' }[];
+export type AbiEntry = { name: string; type: 'felt' | 'felt*' | string };
+
+export type FunctionAbi = {
+  inputs: AbiEntry[];
   name: string;
-  outputs: { name: string; type: 'felt' | 'felt*' }[];
+  outputs: AbiEntry[];
   stateMutability?: 'view';
   type: 'function';
 };
+
+export type StructAbi = {
+  members: (AbiEntry & { offset: number })[];
+  name: string;
+  size: number;
+  type: 'struct';
+};
+
+export type Abi = FunctionAbi | StructAbi;
+
 export type EntryPointsByType = object;
 export type Program = object;
 
@@ -61,14 +73,14 @@ export type CallContractResponse = {
 export type GetBlockResponse = {
   sequence_number: number;
   state_root: string;
-  block_id: number;
+  block_hash: string;
   transactions: {
     [txHash: string]: Transaction;
   };
   timestamp: number;
   transaction_receipts: {
     [txHash: string]: {
-      block_id: number;
+      block_hash: string;
       transaction_hash: string;
       l2_to_l1_messages: {
         to_address: string;
@@ -80,7 +92,7 @@ export type GetBlockResponse = {
       transaction_index: number;
     };
   };
-  previous_block_id: number;
+  previous_block_hash: string;
   status: Status;
 };
 
@@ -91,13 +103,13 @@ export type GetCodeResponse = {
 
 export type GetTransactionStatusResponse = {
   tx_status: Status;
-  block_id: number;
+  block_hash: string;
 };
 
 export type GetTransactionResponse = {
   status: Status;
   transaction: Transaction;
-  block_id: number;
+  block_hash: string;
   block_number: number;
   transaction_index: number;
   transaction_hash: string;

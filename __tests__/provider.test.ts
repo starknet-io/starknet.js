@@ -49,17 +49,17 @@ describe('defaultProvider', () => {
         )
       ).resolves.not.toThrow();
     });
-    test('getTransactionStatus()', () => {
+    test('getTransactionStatus()', async () => {
       return expect(
         defaultProvider.getTransactionStatus(
-          '0x774f7856b1ce6d5ce023a18cd5a06ab67e3a6d81c7bfcd01f99f32243c2d2ef'
+          '0x72add9621ecdcb07405a4f943fe410bf57003ca250400f01ce70f8a6fc72147'
         )
       ).resolves.not.toThrow();
     });
     test('getTransaction()', async () => {
       return expect(
         defaultProvider.getTransaction(
-          '0x774f7856b1ce6d5ce023a18cd5a06ab67e3a6d81c7bfcd01f99f32243c2d2ef'
+          '0x72add9621ecdcb07405a4f943fe410bf57003ca250400f01ce70f8a6fc72147'
         )
       ).resolves.not.toThrow();
     });

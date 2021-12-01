@@ -1,4 +1,4 @@
-import { getKeyPair, getStarkKey, sign, verify, ec } from '../../src/utils/ellipticCurve';
+import { ec, getKeyPair, getStarkKey, sign, verify } from '../../src/utils/ellipticCurve';
 import { removeHexPrefix } from '../../src/utils/encode';
 import { hashCalldata, hashMessage, pedersen } from '../../src/utils/hash';
 import { toBN, toHex } from '../../src/utils/number';
