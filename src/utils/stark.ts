@@ -50,6 +50,6 @@ export function formatSignature(sig?: [BigNumberish, BigNumberish]): [string, st
   }
 }
 
-export function compileStructToCalldata<S extends { [k: string]: string }>(struct: S): string[] {
+export function compileStructToCalldata<S>(struct: S): string[] {
   return Object.values(struct);
 }
