@@ -49,3 +49,7 @@ export function formatSignature(sig?: [BigNumberish, BigNumberish]): [string, st
     return [];
   }
 }
+
+export function compileStructToCalldata<S extends { [k: string]: string }>(struct: S): string[] {
+  return Object.values(struct);
+}
