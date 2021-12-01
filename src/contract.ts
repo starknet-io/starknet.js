@@ -34,7 +34,7 @@ export function compileCalldata(args: Args): Calldata {
       return [toBN(value.length).toString(), ...value.map((x) => toBN(x).toString())];
     if (typeof value === 'object' && 'type' in value)
       return Object.entries(value)
-        .filter(([k]) => k !== 'struct')
+        .filter(([k]) => k !== 'type')
         .map(([, v]) => toBN(v).toString());
     return toBN(value).toString();
   });
