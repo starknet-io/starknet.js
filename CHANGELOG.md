@@ -1,3 +1,10 @@
+# [2.3.0](https://github.com/seanjameshan/starknet.js/compare/v2.2.0...v2.3.0) (2021-12-01)
+
+### Features
+
+- add compileStructToCalldata ([e5bdb18](https://github.com/seanjameshan/starknet.js/commit/e5bdb1890e0bc53b03d4b145069cf7fbc639e830))
+- **utils:** support shortstring and uint256 ([f7ff057](https://github.com/seanjameshan/starknet.js/commit/f7ff05753d9bc39b31bdd4e7f893ee04cab77823))
+
 # [2.2.0](https://github.com/seanjameshan/starknet.js/compare/v2.1.0...v2.2.0) (2021-11-30)
 
 ### Bug Fixes
