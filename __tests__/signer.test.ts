@@ -99,4 +99,21 @@ describe('deploy and test Wallet', () => {
 
     expect(number.toBN(res as string).toString()).toStrictEqual(number.toBN(990).toString());
   });
+  test('execute with custom nonce', async () => {
+    const { result } = await signer.callContract({
+      contract_address: signer.address,
+      entry_point_selector: stark.getSelectorFromName('get_nonce'),
+    });
+    const nonce = parseInt(result[0], 10);
+    const { code, transaction_hash } = await signer.addTransaction({
+      type: 'INVOKE_FUNCTION',
+      contract_address: erc20Address,
+      entry_point_selector: stark.getSelectorFromName('transfer'),
+      calldata: [erc20Address, '10'],
+      nonce,
+    });
+
+    expect(code).toBe('TRANSACTION_RECEIVED');
+    await defaultProvider.waitForTx(transaction_hash);
+  });
 });

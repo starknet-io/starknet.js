@@ -47,7 +47,13 @@ export class Signer extends Provider implements SignerInterface {
       contract_address: this.address,
       entry_point_selector: getSelectorFromName('get_nonce'),
     });
-    const nonceBn = toBN(result[0]);
+
+    let nonceBn;
+    if (tx.nonce) {
+      nonceBn = toBN(tx.nonce);
+    } else {
+      nonceBn = toBN(result[0]);
+    }
     const calldataDecimal = (tx.calldata || []).map((x) => toBN(x).toString());
 
     const msgHash = addHexPrefix(
