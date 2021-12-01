@@ -1,3 +1,12 @@
+## [2.3.1](https://github.com/seanjameshan/starknet.js/compare/v2.3.0...v2.3.1) (2021-12-01)
+
+### Bug Fixes
+
+- allow structs in calldata ([fd2bdc0](https://github.com/seanjameshan/starknet.js/commit/fd2bdc0a1756544e4162fa5baaa7d3aec6f97bee))
+- struct compiling ([84617ae](https://github.com/seanjameshan/starknet.js/commit/84617aefe1218f421ca446b2a3c9959252d326e6))
+- struct data ([313dff5](https://github.com/seanjameshan/starknet.js/commit/313dff57f54050747c65b32b3378762c349d9c8c))
+- uint256 type ([2e05902](https://github.com/seanjameshan/starknet.js/commit/2e05902268f76bda2ae9b4e75782fa78876c2f00))
+
 # [2.3.0](https://github.com/seanjameshan/starknet.js/compare/v2.2.0...v2.3.0) (2021-12-01)
 
 ### Features
