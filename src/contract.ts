@@ -7,7 +7,7 @@ import { BigNumberish, toBN } from './utils/number';
 import { getSelectorFromName } from './utils/stark';
 
 export type Args = {
-  [inputName: string]: string | string[] | { type: 'struct'; [k: string]: string };
+  [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
 };
 export type Calldata = string[];
 
