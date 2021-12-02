@@ -32,12 +32,12 @@ export abstract class ProviderInterface {
    *
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L17-L25)
    *
-   * @param invokeTx - transaction to be invoked
+   * @param invokeTransaction - transaction to be invoked
    * @param blockId
    * @returns the result of the function on the smart contract.
    */
   public abstract callContract(
-    invokeTx: CallContractTransaction,
+    invokeTransaction: CallContractTransaction,
     blockId?: number
   ): Promise<CallContractResponse>;
 
@@ -104,10 +104,10 @@ export abstract class ProviderInterface {
    *
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/gateway/gateway_client.py#L13-L17)
    *
-   * @param tx - transaction to be invoked
+   * @param transaction - transaction to be invoked
    * @returns a confirmation of invoking a function on the starknet contract
    */
-  public abstract addTransaction(tx: Transaction): Promise<AddTransactionResponse>;
+  public abstract addTransaction(transaction: Transaction): Promise<AddTransactionResponse>;
 
   /**
    * Deploys a given compiled contract (json) to starknet

@@ -11,7 +11,7 @@ export type GetContractAddressesResponse = {
 };
 
 export type Status = 'NOT_RECEIVED' | 'RECEIVED' | 'PENDING' | 'REJECTED' | 'ACCEPTED_ONCHAIN';
-export type TxStatus = 'TRANSACTION_RECEIVED';
+export type TransactionStatus = 'TRANSACTION_RECEIVED';
 export type Type = 'DEPLOY' | 'INVOKE_FUNCTION';
 export type EntryPointType = 'EXTERNAL';
 export type CompressedProgram = string;
@@ -116,7 +116,7 @@ export type GetTransactionResponse = {
 };
 
 export type AddTransactionResponse = {
-  code: TxStatus;
+  code: TransactionStatus;
   transaction_hash: string;
   address?: string;
 };

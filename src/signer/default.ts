@@ -25,26 +25,29 @@ export class Signer extends Provider implements SignerInterface {
    *
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/gateway/gateway_client.py#L13-L17)
    *
-   * @param tx - transaction to be invoked
+   * @param transaction - transaction to be invoked
    * @returns a confirmation of invoking a function on the starknet contract
    */
-  public override async addTransaction(tx: Transaction): Promise<AddTransactionResponse> {
-    if (tx.type === 'DEPLOY') return super.addTransaction(tx);
+  public override async addTransaction(transaction: Transaction): Promise<AddTransactionResponse> {
+    if (transaction.type === 'DEPLOY') return super.addTransaction(transaction);
 
-    assert(!tx.signature, "Adding signatures to a signer tx currently isn't supported");
+    assert(
+      !transaction.signature,
+      "Adding signatures to a signer transaction currently isn't supported"
+    );
 
     const { result } = await this.callContract({
       contract_address: this.address,
       entry_point_selector: getSelectorFromName('get_nonce'),
     });
     const nonceBn = toBN(result[0]);
-    const calldataDecimal = (tx.calldata || []).map((x) => toBN(x).toString());
+    const calldataDecimal = (transaction.calldata || []).map((x) => toBN(x).toString());
 
     const msgHash = addHexPrefix(
       hashMessage(
         this.address,
-        tx.contract_address,
-        tx.entry_point_selector,
+        transaction.contract_address,
+        transaction.entry_point_selector,
         calldataDecimal,
         nonceBn.toString()
       )
@@ -56,8 +59,8 @@ export class Signer extends Provider implements SignerInterface {
       type: 'INVOKE_FUNCTION',
       entry_point_selector: getSelectorFromName('execute'),
       calldata: [
-        tx.contract_address,
-        tx.entry_point_selector,
+        transaction.contract_address,
+        transaction.entry_point_selector,
         calldataDecimal.length.toString(),
         ...calldataDecimal,
         nonceBn.toString(),
