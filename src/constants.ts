@@ -1,13 +1,11 @@
-import BN from 'bn.js';
-
 import { toBN } from './utils/number';
 
 export { IS_BROWSER } from './utils/encode';
 
-export const ZERO: BN = toBN(0);
-export const ONE: BN = toBN(1);
-export const TWO: BN = toBN(2);
-export const MASK_250: BN = TWO.pow(toBN(250)).sub(ONE); // 2 ** 250 - 1
+export const ZERO = toBN(0);
+export const ONE = toBN(1);
+export const TWO = toBN(2);
+export const MASK_250 = TWO.pow(toBN(250)).sub(ONE); // 2 ** 250 - 1
 
 /**
  * The following is taken from https://github.com/starkware-libs/starkex-resources/blob/master/crypto/starkware/crypto/signature/pedersen_params.json but converted to hex, because JS is very bad handling big integers by default
