@@ -1,7 +1,8 @@
 import assert from 'minimalistic-assert';
 
 import { Provider } from '../provider';
-import { AddTransactionResponse, KeyPair, Transaction } from '../types';
+import { AddTransactionResponse, KeyPair, Signature, Transaction } from '../types';
+import { TypedData, getMessageHash } from '../utils/eip712';
 import { sign } from '../utils/ellipticCurve';
 import { addHexPrefix } from '../utils/encode';
 import { hashMessage } from '../utils/hash';
@@ -68,5 +69,27 @@ export class Signer extends Provider implements SignerInterface {
       contract_address: this.address,
       signature: [r, s],
     });
+  }
+
+  /**
+   * Sign an JSON object with the starknet private key and return the signature
+   *
+   * @param json - JSON object to be signed
+   * @returns the signature of the JSON object
+   * @throws {Error} if the JSON object is not a valid JSON
+   */
+  public async sign(typedData: TypedData): Promise<Signature> {
+    return sign(this.keyPair, await this.hash(typedData));
+  }
+
+  /**
+   * Hash a JSON object with pederson hash and return the hash
+   *
+   * @param json - JSON object to be hashed
+   * @returns the hash of the JSON object
+   * @throws {Error} if the JSON object is not a valid JSON
+   */
+  public async hash(typedData: TypedData): Promise<string> {
+    return getMessageHash(typedData, this.address);
   }
 }
