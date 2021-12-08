@@ -39,7 +39,6 @@
     "@types/jest": "^27.0.2",
     "@types/json-bigint": "^1.0.1",
     "@types/minimalistic-assert": "^1.0.1",
-    "@types/object-hash": "^2.2.1",
     "@types/pako": "^1.0.2",
     "@types/url-join": "^4.0.1",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
