@@ -1,3 +1,9 @@
+# [2.4.0](https://github.com/seanjameshan/starknet.js/compare/v2.3.1...v2.4.0) (2021-12-09)
+
+### Features
+
+- allow custom nonce ([17666de](https://github.com/seanjameshan/starknet.js/commit/17666de94db6875bbf8e88555773b8862a4a32cf))
+
 ## [2.3.1](https://github.com/seanjameshan/starknet.js/compare/v2.3.0...v2.3.1) (2021-12-01)
 
 ### Bug Fixes
