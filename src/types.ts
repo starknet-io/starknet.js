@@ -51,6 +51,7 @@ export type DeployTransaction = {
   contract_definition: CompressedCompiledContract;
   contract_address_salt: BigNumberish;
   constructor_calldata: string[];
+  nonce?: BigNumberish;
 };
 
 export type InvokeFunctionTransaction = {
@@ -60,6 +61,7 @@ export type InvokeFunctionTransaction = {
   entry_point_type?: EntryPointType;
   entry_point_selector: string;
   calldata?: string[];
+  nonce?: BigNumberish;
 };
 
 export type CallContractTransaction = Omit<InvokeFunctionTransaction, 'type'>;
