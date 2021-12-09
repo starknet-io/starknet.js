@@ -36,11 +36,17 @@ export class Signer extends Provider implements SignerInterface {
       "Adding signatures to a signer transaction currently isn't supported"
     );
 
-    const { result } = await this.callContract({
-      contract_address: this.address,
-      entry_point_selector: getSelectorFromName('get_nonce'),
-    });
-    const nonceBn = toBN(result[0]);
+    let nonceBn;
+    if (transaction.nonce) {
+      nonceBn = toBN(transaction.nonce);
+    } else {
+      const { result } = await this.callContract({
+        contract_address: this.address,
+        entry_point_selector: getSelectorFromName('get_nonce'),
+      });
+      nonceBn = toBN(result[0]);
+    }
+
     const calldataDecimal = (transaction.calldata || []).map((x) => toBN(x).toString());
 
     const msgHash = addHexPrefix(
