@@ -160,7 +160,7 @@ export const getStructHash = <T extends TypedData>(
 export const getMessageHash = (typedData: TypedData, account: BigNumberish): string => {
   const message = [
     encodeShortString('StarkNet Message'),
-    getStructHash(typedData, 'EIP712Domain', typedData.domain),
+    getStructHash(typedData, 'StarkNetDomain', typedData.domain),
     account,
     getStructHash(typedData, typedData.primaryType, typedData.message),
   ];

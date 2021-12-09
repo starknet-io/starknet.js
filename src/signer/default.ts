@@ -2,12 +2,12 @@ import assert from 'minimalistic-assert';
 
 import { Provider } from '../provider';
 import { AddTransactionResponse, KeyPair, Signature, Transaction } from '../types';
-import { TypedData, getMessageHash } from '../utils/eip712';
 import { sign } from '../utils/ellipticCurve';
 import { addHexPrefix } from '../utils/encode';
 import { hashMessage } from '../utils/hash';
 import { toBN } from '../utils/number';
 import { getSelectorFromName } from '../utils/stark';
+import { TypedData, getMessageHash } from '../utils/typedData';
 import { SignerInterface } from './interface';
 
 export class Signer extends Provider implements SignerInterface {
@@ -78,8 +78,8 @@ export class Signer extends Provider implements SignerInterface {
    * @returns the signature of the JSON object
    * @throws {Error} if the JSON object is not a valid JSON
    */
-  public async sign(typedData: TypedData): Promise<Signature> {
-    return sign(this.keyPair, await this.hash(typedData));
+  public async signMessage(typedData: TypedData): Promise<Signature> {
+    return sign(this.keyPair, await this.hashMessage(typedData));
   }
 
   /**
@@ -89,7 +89,7 @@ export class Signer extends Provider implements SignerInterface {
    * @returns the hash of the JSON object
    * @throws {Error} if the JSON object is not a valid JSON
    */
-  public async hash(typedData: TypedData): Promise<string> {
+  public async hashMessage(typedData: TypedData): Promise<string> {
     return getMessageHash(typedData, this.address);
   }
 }

@@ -18,4 +18,4 @@ export * as stark from './utils/stark';
 export * as ec from './utils/ellipticCurve';
 export * as uint256 from './utils/uint256';
 export * as shortString from './utils/shortString';
-export * as eip712 from './utils/eip712';
+export * as typedData from './utils/typedData';

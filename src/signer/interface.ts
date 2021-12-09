@@ -1,6 +1,6 @@
 import { Provider } from '../provider';
 import { AddTransactionResponse, Signature, Transaction } from '../types';
-import { TypedData } from '../utils/eip712/types';
+import { TypedData } from '../utils/typedData/types';
 
 export abstract class SignerInterface extends Provider {
   public abstract address: string;
@@ -23,7 +23,7 @@ export abstract class SignerInterface extends Provider {
    * @returns the signature of the JSON object
    * @throws {Error} if the JSON object is not a valid JSON
    */
-  public abstract sign(typedData: TypedData): Promise<Signature>;
+  public abstract signMessage(typedData: TypedData): Promise<Signature>;
 
   /**
    * Hash a JSON object with pederson hash and return the hash
@@ -32,5 +32,5 @@ export abstract class SignerInterface extends Provider {
    * @returns the hash of the JSON object
    * @throws {Error} if the JSON object is not a valid JSON
    */
-  public abstract hash(typedData: TypedData): Promise<string>;
+  public abstract hashMessage(typedData: TypedData): Promise<string>;
 }
