@@ -12,7 +12,7 @@ import {
   union,
 } from 'superstruct';
 
-export const STATIC_TYPES = ['felt', 'felt*', 'shortString'];
+export const STATIC_TYPES = ['felt', 'felt*'];
 
 // Source: https://github.com/Mrtenz/eip-712/blob/master/src/eip-712.ts
 // and modified to support starknet types
@@ -20,7 +20,6 @@ export const STATIC_TYPES = ['felt', 'felt*', 'shortString'];
 /**
  * Checks if a type is valid with the given `typedData`. The following types are valid:
  * - Atomic types: felt, felt*
- * - Dynamic types: shortString
  * - Reference types: struct type (e.g. SomeStruct)
  *
  * @param {Record<string, unknown>} types

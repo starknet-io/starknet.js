@@ -1,11 +1,22 @@
 import { computeHashOnElements } from '../hash';
-import { BigNumberish } from '../number';
+import { BigNumberish, toBN, toHex } from '../number';
 import { encodeShortString } from '../shortString';
 import { getSelectorFromName } from '../stark';
 import { TypedData } from './types';
 import { validateTypedData } from './utils';
 
 export * from './types';
+
+function getHex(value: BigNumberish): string {
+  try {
+    return toHex(toBN(value));
+  } catch (e) {
+    if (typeof value === 'string') {
+      return toHex(toBN(encodeShortString(value)));
+    }
+    throw new Error(`Invalid BigNumberish: ${value}`);
+  }
+}
 
 /**
  * Get the dependencies of a struct type. If a struct has the same dependency multiple times, it's only included once
@@ -89,18 +100,14 @@ export const getTypeHash = (typedData: TypedData, type: string): string => {
 const encodeValue = (typedData: TypedData, type: string, data: unknown): [string, string] => {
   if (typedData.types[type]) {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return ['felt', getStructHash(typedData, type, data as Record<string, unknown>)];
-  }
-
-  if (type === 'shortString') {
-    return ['felt', encodeShortString(data as string)];
+    return [type, getStructHash(typedData, type, data as Record<string, unknown>)];
   }
 
   if (type === 'felt*') {
-    return ['felt', computeHashOnElements(data as string[])];
+    return ['felt*', computeHashOnElements(data as string[])];
   }
 
-  return [type, data as string];
+  return [type, getHex(data as string)];
 };
 
 /**
