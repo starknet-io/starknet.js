@@ -72,7 +72,7 @@ export const encodeType = (typedData: TypedData, type: string): string => {
 
   return types
     .map((dependency) => {
-      return `${dependency}(${typedData.types[dependency].map((t) => `${t.type} ${t.name}`)})`;
+      return `${dependency}(${typedData.types[dependency].map((t) => `${t.name}:${t.type}`)})`;
     })
     .join('');
 };

@@ -17,7 +17,8 @@ export abstract class SignerInterface extends Provider {
   ): Promise<AddTransactionResponse>;
 
   /**
-   * Sign an JSON object with the starknet private key and return the signature
+   * Sign an JSON object for off-chain usage with the starknet private key and return the signature
+   * This adds a message prefix so it cant be interchanged with transactions
    *
    * @param json - JSON object to be signed
    * @returns the signature of the JSON object
@@ -27,6 +28,7 @@ export abstract class SignerInterface extends Provider {
 
   /**
    * Hash a JSON object with pederson hash and return the hash
+   * This adds a message prefix so it cant be interchanged with transactions
    *
    * @param json - JSON object to be hashed
    * @returns the hash of the JSON object

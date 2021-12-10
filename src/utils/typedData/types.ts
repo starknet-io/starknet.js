@@ -12,7 +12,7 @@ import {
   union,
 } from 'superstruct';
 
-export const STATIC_TYPES = ['felt', 'felt*'];
+export const ATOMIC_TYPES = ['felt', 'felt*'];
 
 // Source: https://github.com/Mrtenz/eip-712/blob/master/src/eip-712.ts
 // and modified to support starknet types
@@ -27,7 +27,7 @@ export const STATIC_TYPES = ['felt', 'felt*'];
  * @return {boolean}
  */
 export const isValidType = (types: Record<string, unknown>, type: string): boolean => {
-  if (STATIC_TYPES.includes(type as string)) {
+  if (ATOMIC_TYPES.includes(type as string)) {
     return true;
   }
 
