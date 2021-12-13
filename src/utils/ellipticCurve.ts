@@ -53,6 +53,11 @@ export function getStarkKey(keyPair: KeyPair): string {
   return addHexPrefix(sanitizeBytes((keyPair as any).pub.getX().toString(16), 2));
 }
 
+export function getKeyPairFromPublicKey(publicKey: BigNumberish): KeyPair {
+  const publicKeyBn = toBN(publicKey);
+  return ec.keyFromPublic(removeHexPrefix(toHex(publicKeyBn)), 'hex');
+}
+
 /*
  Signs a message using the provided key.
  key should be an KeyPair with a valid private key.
