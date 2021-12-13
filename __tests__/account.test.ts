@@ -104,7 +104,7 @@ describe('deploy and test Wallet', () => {
       )
     );
 
-    const { r, s } = ec.sign(starkKeyPair, msgHash);
+    const signature = ec.sign(starkKeyPair, msgHash);
     const { code, transaction_hash } = await wallet.invoke(
       'execute',
       {
@@ -113,7 +113,7 @@ describe('deploy and test Wallet', () => {
         calldata: [erc20Address, '10'],
         nonce: nonce.toString(),
       },
-      [number.toHex(r), number.toHex(s)]
+      signature
     );
 
     expect(code).toBe('TRANSACTION_RECEIVED');
@@ -151,7 +151,7 @@ test('build tx', async () => {
       .toString()
   );
 
-  const { r, s } = ec.sign(keyPair, msgHash);
+  const [r, s] = ec.sign(keyPair, msgHash);
   expect(r.toString()).toBe(
     '706800951915233622090196542158919402159816118214143837213294331713137614072'
   );

@@ -3,14 +3,20 @@ import type { ec as EC } from 'elliptic';
 import type { BigNumberish } from './utils/number';
 
 export type KeyPair = EC.KeyPair;
-export type Signature = EC.Signature;
+export type Signature = BigNumberish[];
 
 export type GetContractAddressesResponse = {
   Starknet: string;
   GpsStatementVerifier: string;
 };
 
-export type Status = 'NOT_RECEIVED' | 'RECEIVED' | 'PENDING' | 'REJECTED' | 'ACCEPTED_ONCHAIN';
+export type Status =
+  | 'NOT_RECEIVED'
+  | 'RECEIVED'
+  | 'PENDING'
+  | 'ACCEPTED_ON_L2'
+  | 'ACCEPTED_ON_L1'
+  | 'REJECTED';
 export type TransactionStatus = 'TRANSACTION_RECEIVED';
 export type Type = 'DEPLOY' | 'INVOKE_FUNCTION';
 export type EntryPointType = 'EXTERNAL';
@@ -57,7 +63,7 @@ export type DeployTransaction = {
 export type InvokeFunctionTransaction = {
   type: 'INVOKE_FUNCTION';
   contract_address: string;
-  signature?: [BigNumberish, BigNumberish];
+  signature?: Signature;
   entry_point_type?: EntryPointType;
   entry_point_selector: string;
   calldata?: string[];

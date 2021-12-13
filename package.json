@@ -68,6 +68,7 @@
     "json-bigint": "^1.0.0",
     "minimalistic-assert": "^1.0.1",
     "pako": "^2.0.4",
+    "superstruct": "^0.15.3",
     "url-join": "^4.0.1"
   },
   "lint-staged": {
