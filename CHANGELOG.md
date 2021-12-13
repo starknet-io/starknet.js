@@ -1,3 +1,19 @@
+# [2.5.0](https://github.com/seanjameshan/starknet.js/compare/v2.4.0...v2.5.0) (2021-12-13)
+
+### Bug Fixes
+
+- add jsdoc comment ([4cd969f](https://github.com/seanjameshan/starknet.js/commit/4cd969f82eb4a5d8c08feb59c42fb3e7195af50e))
+- remove eip712 reference ([039a360](https://github.com/seanjameshan/starknet.js/commit/039a360873f9a1cdedc7a498b6e1732183957143))
+- remove unused types ([e528f7d](https://github.com/seanjameshan/starknet.js/commit/e528f7d75f4560d2affe3ca99426e01fbee6dfb5))
+- review ([a3813c9](https://github.com/seanjameshan/starknet.js/commit/a3813c9931c178d58c2521b926fb3fdff6944635))
+
+### Features
+
+- add `getKeyPairFromPublicKey` method ([66d543d](https://github.com/seanjameshan/starknet.js/commit/66d543dca1bb302654f0f1588a27f7794bfa49be))
+- add tests ([b414a83](https://github.com/seanjameshan/starknet.js/commit/b414a839a1fdd56084a58d6efb4747e8f5455628))
+- allow multi sig ([fc1e086](https://github.com/seanjameshan/starknet.js/commit/fc1e0866154d2bf29f26374639a34fec438bae5e))
+- support eip712 for starknet ([d597082](https://github.com/seanjameshan/starknet.js/commit/d59708211fc497d801699a7168dad1a5cc9648fd))
+
 # [2.4.0](https://github.com/seanjameshan/starknet.js/compare/v2.3.1...v2.4.0) (2021-12-09)
 
 ### Features
