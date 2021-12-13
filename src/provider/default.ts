@@ -11,6 +11,7 @@ import {
   GetContractAddressesResponse,
   GetTransactionResponse,
   GetTransactionStatusResponse,
+  Signature,
   Transaction,
 } from '../types';
 import { parse, stringify } from '../utils/json';
@@ -265,7 +266,7 @@ export class Provider implements ProviderInterface {
     contractAddress: string,
     entrypointSelector: string,
     calldata?: string[],
-    signature?: [BigNumberish, BigNumberish]
+    signature?: Signature
   ): Promise<AddTransactionResponse> {
     return this.addTransaction({
       type: 'INVOKE_FUNCTION',
@@ -278,16 +279,15 @@ export class Provider implements ProviderInterface {
 
   public async waitForTx(txHash: BigNumberish, retryInterval: number = 8000) {
     let onchain = false;
+    await wait(retryInterval);
+
     while (!onchain) {
       // eslint-disable-next-line no-await-in-loop
       await wait(retryInterval);
       // eslint-disable-next-line no-await-in-loop
       const res = await this.getTransactionStatus(txHash);
 
-      if (
-        res.tx_status === 'ACCEPTED_ONCHAIN' ||
-        (res.tx_status === 'PENDING' && res.block_hash !== 'pending') // This is needed as of today. In the future there will be a different status for pending transactions.
-      ) {
+      if (res.tx_status === 'ACCEPTED_ON_L1' || res.tx_status === 'ACCEPTED_ON_L2') {
         onchain = true;
       } else if (res.tx_status === 'REJECTED') {
         throw Error('REJECTED');

@@ -2,7 +2,7 @@ import BN from 'bn.js';
 import assert from 'minimalistic-assert';
 
 import { Provider, defaultProvider } from './provider';
-import { Abi, AbiEntry, FunctionAbi, StructAbi } from './types';
+import { Abi, AbiEntry, FunctionAbi, Signature, StructAbi } from './types';
 import { BigNumberish, toBN } from './utils/number';
 import { getSelectorFromName } from './utils/stark';
 
@@ -146,7 +146,7 @@ export class Contract {
     return this.parseResponseField(methodAbi, responseIterator);
   }
 
-  public invoke(method: string, args: Args = {}, signature?: [BigNumberish, BigNumberish]) {
+  public invoke(method: string, args: Args = {}, signature?: Signature) {
     // ensure contract is connected
     assert(this.connectedTo !== null, 'contract isnt connected to an address');
 

@@ -54,7 +54,7 @@ export class Signer extends Provider implements SignerInterface {
       )
     );
 
-    const { r, s } = sign(this.keyPair, msgHash);
+    const signature = sign(this.keyPair, msgHash);
 
     return super.addTransaction({
       type: 'INVOKE_FUNCTION',
@@ -67,7 +67,7 @@ export class Signer extends Provider implements SignerInterface {
         nonceBn.toString(),
       ].map((x) => toBN(x).toString()),
       contract_address: this.address,
-      signature: [r, s],
+      signature,
     });
   }
 
