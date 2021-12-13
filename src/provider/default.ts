@@ -286,6 +286,7 @@ export class Provider implements ProviderInterface {
 
       if (
         res.tx_status === 'ACCEPTED_ONCHAIN' ||
+        res.tx_status === 'ACCEPTED_ON_L2' ||
         (res.tx_status === 'PENDING' && res.block_hash !== 'pending') // This is needed as of today. In the future there will be a different status for pending transactions.
       ) {
         onchain = true;

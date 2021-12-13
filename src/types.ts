@@ -10,7 +10,13 @@ export type GetContractAddressesResponse = {
   GpsStatementVerifier: string;
 };
 
-export type Status = 'NOT_RECEIVED' | 'RECEIVED' | 'PENDING' | 'REJECTED' | 'ACCEPTED_ONCHAIN';
+export type Status =
+  | 'NOT_RECEIVED'
+  | 'RECEIVED'
+  | 'PENDING'
+  | 'ACCEPTED_ON_L2'
+  | 'REJECTED'
+  | 'ACCEPTED_ONCHAIN';
 export type TransactionStatus = 'TRANSACTION_RECEIVED';
 export type Type = 'DEPLOY' | 'INVOKE_FUNCTION';
 export type EntryPointType = 'EXTERNAL';
