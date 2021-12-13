@@ -53,6 +53,12 @@ export function getStarkKey(keyPair: KeyPair): string {
   return addHexPrefix(sanitizeBytes((keyPair as any).pub.getX().toString(16), 2));
 }
 
+/**
+ * Takes a public key and casts it into `elliptic` KeyPair format.
+ *
+ * @param publicKey - public key which should get casted to a KeyPair
+ * @returns keyPair with public key only, which can be used to verify signatures, but cant sign anything
+ */
 export function getKeyPairFromPublicKey(publicKey: BigNumberish): KeyPair {
   const publicKeyBn = toBN(publicKey);
   return ec.keyFromPublic(removeHexPrefix(toHex(publicKeyBn)), 'hex');

@@ -14,8 +14,8 @@ export type Status =
   | 'NOT_RECEIVED'
   | 'RECEIVED'
   | 'PENDING'
-  | 'ACCEPTED_ON_L1'
   | 'ACCEPTED_ON_L2'
+  | 'ACCEPTED_ON_L1'
   | 'REJECTED';
 export type TransactionStatus = 'TRANSACTION_RECEIVED';
 export type Type = 'DEPLOY' | 'INVOKE_FUNCTION';
