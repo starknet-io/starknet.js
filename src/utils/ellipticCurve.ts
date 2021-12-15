@@ -53,6 +53,17 @@ export function getStarkKey(keyPair: KeyPair): string {
   return addHexPrefix(sanitizeBytes((keyPair as any).pub.getX().toString(16), 2));
 }
 
+/**
+ * Takes a public key and casts it into `elliptic` KeyPair format.
+ *
+ * @param publicKey - public key which should get casted to a KeyPair
+ * @returns keyPair with public key only, which can be used to verify signatures, but cant sign anything
+ */
+export function getKeyPairFromPublicKey(publicKey: BigNumberish): KeyPair {
+  const publicKeyBn = toBN(publicKey);
+  return ec.keyFromPublic(removeHexPrefix(toHex(publicKeyBn)), 'hex');
+}
+
 /*
  Signs a message using the provided key.
  key should be an KeyPair with a valid private key.
@@ -69,7 +80,13 @@ export function sign(keyPair: KeyPair, msgHash: string): Signature {
   assertInRange(r, ONE, toBN(addHexPrefix(MAX_ECDSA_VAL)), 'r');
   assertInRange(s, ONE, toBN(addHexPrefix(EC_ORDER)), 's');
   assertInRange(w, ONE, toBN(addHexPrefix(MAX_ECDSA_VAL)), 'w');
-  return msgSignature;
+  return [r, s];
+}
+
+function chunkArray(arr: any[], n: number): any[][] {
+  return Array(Math.ceil(arr.length / n))
+    .fill('')
+    .map((_, i) => arr.slice(i * n, i * n + n));
 }
 
 /*
@@ -78,15 +95,20 @@ export function sign(keyPair: KeyPair, msgHash: string): Signature {
    msgSignature should be an Signature.
    Returns a boolean true if the verification succeeds.
   */
-export function verify(keyPair: KeyPair, msgHash: string, sig: Signature): boolean {
+export function verify(keyPair: KeyPair | KeyPair[], msgHash: string, sig: Signature): boolean {
+  const keyPairArray = Array.isArray(keyPair) ? keyPair : [keyPair];
   const msgHashBN = toBN(addHexPrefix(msgHash));
+  assert(sig.length % 2 === 0, 'Signature must be an array of length dividable by 2');
   assertInRange(msgHashBN, ZERO, toBN(addHexPrefix(MAX_ECDSA_VAL)), 'msgHash');
-  const { r, s } = sig;
-  const w = s.invm(ec.n!);
-  // Verify signature has valid length.
-  assertInRange(r, ONE, toBN(addHexPrefix(MAX_ECDSA_VAL)), 'r');
-  assertInRange(s, ONE, toBN(addHexPrefix(EC_ORDER)), 's');
-  assertInRange(w, ONE, toBN(addHexPrefix(MAX_ECDSA_VAL)), 'w');
+  assert(keyPairArray.length === sig.length / 2, 'Signature and keyPair length must be equal');
 
-  return keyPair.verify(fixMessage(msgHash), sig);
+  return chunkArray(sig, 2).every(([r, s], i) => {
+    const rBN = toBN(r);
+    const sBN = toBN(s);
+    const w = sBN.invm((ec as any).n);
+    assertInRange(rBN, ONE, toBN(addHexPrefix(MAX_ECDSA_VAL)), 'r');
+    assertInRange(sBN, ONE, toBN(addHexPrefix(EC_ORDER)), 's');
+    assertInRange(w, ONE, toBN(addHexPrefix(MAX_ECDSA_VAL)), 'w');
+    return ec.verify(fixMessage(msgHash), { r: rBN, s: sBN }, keyPairArray[i]) ?? false;
+  });
 }

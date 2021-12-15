@@ -1,5 +1,6 @@
 import { Provider } from '../provider';
-import { AddTransactionResponse, Transaction } from '../types';
+import { AddTransactionResponse, Signature, Transaction } from '../types';
+import { TypedData } from '../utils/typedData/types';
 
 export abstract class SignerInterface extends Provider {
   public abstract address: string;
@@ -14,4 +15,24 @@ export abstract class SignerInterface extends Provider {
   public abstract override addTransaction(
     transaction: Transaction
   ): Promise<AddTransactionResponse>;
+
+  /**
+   * Sign an JSON object for off-chain usage with the starknet private key and return the signature
+   * This adds a message prefix so it cant be interchanged with transactions
+   *
+   * @param json - JSON object to be signed
+   * @returns the signature of the JSON object
+   * @throws {Error} if the JSON object is not a valid JSON
+   */
+  public abstract signMessage(typedData: TypedData): Promise<Signature>;
+
+  /**
+   * Hash a JSON object with pederson hash and return the hash
+   * This adds a message prefix so it cant be interchanged with transactions
+   *
+   * @param json - JSON object to be hashed
+   * @returns the hash of the JSON object
+   * @throws {Error} if the JSON object is not a valid JSON
+   */
+  public abstract hashMessage(typedData: TypedData): Promise<string>;
 }

@@ -1,11 +1,11 @@
 import { gzip } from 'pako';
 
-import { CompressedProgram, Program } from '../types';
+import { CompressedProgram, Program, Signature } from '../types';
 import { genKeyPair, getStarkKey } from './ellipticCurve';
 import { addHexPrefix, btoaUniversal } from './encode';
 import { starknetKeccak } from './hash';
 import { stringify } from './json';
-import { BigNumberish, toBN, toHex } from './number';
+import { toBN, toHex } from './number';
 
 /**
  * Function to compress compiled cairo program
@@ -41,10 +41,10 @@ export function makeAddress(input: string): string {
   return addHexPrefix(input).toLowerCase();
 }
 
-export function formatSignature(sig?: [BigNumberish, BigNumberish]): [string, string] | [] {
+export function formatSignature(sig?: Signature): string[] {
   if (!sig) return [];
   try {
-    return sig.map((x) => toBN(x)).map((x) => x.toString()) as [string, string];
+    return sig.map((x) => toBN(x)).map((x) => x.toString());
   } catch (e) {
     return [];
   }

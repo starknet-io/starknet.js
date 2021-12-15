@@ -40,7 +40,7 @@ test('hashMessage()', () => {
   );
   expect(hashMsg).toBe('0x7f15c38ea577a26f4f553282fcfe4f1feeb8ecfaad8f221ae41abf8224cbddd');
   const keyPair = getKeyPair(privateKey);
-  const { r, s } = sign(keyPair, removeHexPrefix(hashMsg));
+  const [r, s] = sign(keyPair, removeHexPrefix(hashMsg));
   expect(r.toString()).toStrictEqual(
     toBN('2458502865976494910213617956670505342647705497324144349552978333078363662855').toString()
   );

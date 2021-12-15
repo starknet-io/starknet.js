@@ -8,6 +8,7 @@ import type {
   GetContractAddressesResponse,
   GetTransactionResponse,
   GetTransactionStatusResponse,
+  Signature,
   Transaction,
 } from '../types';
 import type { BigNumberish } from '../utils/number';
@@ -135,7 +136,7 @@ export abstract class ProviderInterface {
     contractAddress: string,
     entrypointSelector: string,
     calldata?: string[],
-    signature?: [BigNumberish, BigNumberish]
+    signature?: Signature
   ): Promise<AddTransactionResponse>;
 
   public abstract waitForTx(txHash: BigNumberish, retryInterval?: number): Promise<void>;
