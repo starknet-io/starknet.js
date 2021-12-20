@@ -13,10 +13,15 @@ describe('defaultProvider', () => {
       expect(typeof GpsStatementVerifier).toBe('string');
       expect(typeof Starknet).toBe('string');
     });
-    test('getBlock()', () => {
-      return expect(defaultProvider.getBlock(870)).resolves.not.toThrow();
+    test('getBlock(blockHash=0x3b5c37445d93c58d334ade3be988acf0cf37b57955e77e4b8fe6f6c9b2b8e31, blockNumber=26575)', () => {
+      return expect(
+        defaultProvider.getBlock(
+          '0x3b5c37445d93c58d334ade3be988acf0cf37b57955e77e4b8fe6f6c9b2b8e31',
+          26575
+        )
+      ).resolves.not.toThrow();
     });
-    test('getBlock(blockId=null)', () => {
+    test('getBlock(blockHash=null, blockNumber=null)', () => {
       return expect(defaultProvider.getBlock()).resolves.not.toThrow();
     });
     test('getCode()', () => {

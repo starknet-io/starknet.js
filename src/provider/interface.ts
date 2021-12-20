@@ -50,7 +50,10 @@ export abstract class ProviderInterface {
    * @param blockId
    * @returns the block object { block_id, previous_block_id, state_root, status, timestamp, transaction_receipts, transactions }
    */
-  public abstract getBlock(blockId?: number): Promise<GetBlockResponse>;
+  public abstract getBlock(
+    blockHash?: BigNumberish,
+    blockNumber?: number
+  ): Promise<GetBlockResponse>;
 
   /**
    * Gets the code of the deployed contract.
