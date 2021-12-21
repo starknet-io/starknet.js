@@ -106,27 +106,26 @@ export class Provider implements ProviderInterface {
   /**
    * Gets the block information from a block hash or block number.
    *
-   * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L27-L31)
+   * [Reference](https://github.com/starkware-libs/cairo-lang/blob/fc97bdd8322a7df043c87c371634b26c15ed6cee/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L41-L53)
    *
    * @param blockHash
    * @param blockNumber
    * @returns the block object { block_id, previous_block_id, state_root, status, timestamp, transaction_receipts, transactions }
    */
   public async getBlock(blockHash?: BigNumberish, blockNumber?: number): Promise<GetBlockResponse> {
-    let blockHashBn;
-    let blockHashHex;
+    let blockIdentifier;
+    const endpoint = 'get_block';
 
-    if (blockHash) {
-      blockHashBn = toBN(blockHash);
-      blockHashHex = toHex(blockHashBn);
+    if (blockNumber) {
+      blockIdentifier = `?blockNumber=${blockNumber}`;
+    } else if (blockHash) {
+      blockIdentifier = `?blockHash=${blockHash}`;
     }
 
     const { data } = await axios.get<GetBlockResponse>(
-      urljoin(
-        this.feederGatewayUrl,
-        'get_block',
-        `?blockHash=${blockHashHex ?? 'null'}&blockNumber=${blockNumber ?? 'null'}`
-      )
+      blockIdentifier
+        ? urljoin(this.feederGatewayUrl, endpoint, `${blockIdentifier}`)
+        : urljoin(this.feederGatewayUrl, endpoint)
     );
     return data;
   }
