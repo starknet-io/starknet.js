@@ -3,6 +3,7 @@ import urljoin from 'url-join';
 
 import {
   AddTransactionResponse,
+  BlockNumber,
   CallContractResponse,
   CallContractTransaction,
   CompiledContract,
@@ -85,15 +86,15 @@ export class Provider implements ProviderInterface {
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L17-L25)
    *
    * @param invokeTransaction - transaction to be invoked
-   * @param blockId
+   * @param blockNumber
    * @returns the result of the function on the smart contract.
    */
   public async callContract(
     invokeTransaction: CallContractTransaction,
-    blockId?: number
+    blockNumber: BlockNumber = null
   ): Promise<CallContractResponse> {
     const { data } = await axios.post<CallContractResponse>(
-      urljoin(this.feederGatewayUrl, 'call_contract', `?blockId=${blockId ?? 'null'}`),
+      urljoin(this.feederGatewayUrl, 'call_contract', `?blockNumber=${blockNumber}`),
       {
         signature: [],
         calldata: [],
@@ -108,12 +109,12 @@ export class Provider implements ProviderInterface {
    *
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L27-L31)
    *
-   * @param blockId
+   * @param blockNumber
    * @returns the block object { block_id, previous_block_id, state_root, status, timestamp, transaction_receipts, transactions }
    */
-  public async getBlock(blockId?: number): Promise<GetBlockResponse> {
+  public async getBlock(blockNumber: BlockNumber = null): Promise<GetBlockResponse> {
     const { data } = await axios.get<GetBlockResponse>(
-      urljoin(this.feederGatewayUrl, 'get_block', `?blockId=${blockId ?? 'null'}`)
+      urljoin(this.feederGatewayUrl, 'get_block', `?blockNumber=${blockNumber}`)
     );
     return data;
   }
@@ -124,15 +125,18 @@ export class Provider implements ProviderInterface {
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L33-L36)
    *
    * @param contractAddress
-   * @param blockId
+   * @param blockNumber
    * @returns Bytecode and ABI of compiled contract
    */
-  public async getCode(contractAddress: string, blockId?: number): Promise<GetCodeResponse> {
+  public async getCode(
+    contractAddress: string,
+    blockNumber: BlockNumber = null
+  ): Promise<GetCodeResponse> {
     const { data } = await axios.get<GetCodeResponse>(
       urljoin(
         this.feederGatewayUrl,
         'get_code',
-        `?contractAddress=${contractAddress}&blockId=${blockId ?? 'null'}`
+        `?contractAddress=${contractAddress}&blockNumber=${blockNumber}`
       )
     );
     return data;
@@ -146,19 +150,19 @@ export class Provider implements ProviderInterface {
    *
    * @param contractAddress
    * @param key - from getStorageVarAddress('<STORAGE_VARIABLE_NAME>') (WIP)
-   * @param blockId
+   * @param blockNumber
    * @returns the value of the storage variable
    */
   public async getStorageAt(
     contractAddress: string,
     key: number,
-    blockId?: number
+    blockNumber: BlockNumber = null
   ): Promise<object> {
     const { data } = await axios.get<object>(
       urljoin(
         this.feederGatewayUrl,
         'get_storage_at',
-        `?contractAddress=${contractAddress}&key=${key}&blockId=${blockId ?? 'null'}`
+        `?contractAddress=${contractAddress}&key=${key}&blockNumber=${blockNumber}`
       )
     );
     return data;

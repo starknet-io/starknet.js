@@ -16,7 +16,7 @@ describe('defaultProvider', () => {
     test('getBlock()', () => {
       return expect(defaultProvider.getBlock(870)).resolves.not.toThrow();
     });
-    test('getBlock(blockId=null)', () => {
+    test('getBlock(blockNumber=null)', () => {
       return expect(defaultProvider.getBlock()).resolves.not.toThrow();
     });
     test('getCode()', () => {
@@ -27,7 +27,7 @@ describe('defaultProvider', () => {
         )
       ).resolves.not.toThrow();
     });
-    test('getCode(blockId=null)', () => {
+    test('getCode(blockNumber=null)', () => {
       return expect(
         defaultProvider.getCode('0x163a1542a64402ffc93e39a4962eec51ce126f2e634631d3f1f6770a76e3a61')
       ).resolves.not.toThrow();
@@ -41,7 +41,7 @@ describe('defaultProvider', () => {
         )
       ).resolves.not.toThrow();
     });
-    test('getStorageAt(blockId=null)', () => {
+    test('getStorageAt(blockNumber=null)', () => {
       return expect(
         defaultProvider.getStorageAt(
           '0x163a1542a64402ffc93e39a4962eec51ce126f2e634631d3f1f6770a76e3a61',
