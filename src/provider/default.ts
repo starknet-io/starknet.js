@@ -40,7 +40,7 @@ export class Provider implements ProviderInterface {
 
   public gatewayUrl: string;
 
-  constructor(optionsOrProvider: ProviderOptions | Provider = { network: 'georli-alpha' }) {
+  constructor(optionsOrProvider: ProviderOptions | Provider = { network: 'goerli-alpha' }) {
     if (optionsOrProvider instanceof Provider) {
       this.baseUrl = optionsOrProvider.baseUrl;
       this.feederGatewayUrl = optionsOrProvider.feederGatewayUrl;
@@ -60,7 +60,7 @@ export class Provider implements ProviderInterface {
     switch (name) {
       case 'mainnet-alpha':
         return 'https://alpha-mainnet.starknet.io';
-      case 'georli-alpha':
+      case 'goerli-alpha':
       default:
         return 'https://alpha4.starknet.io';
     }
