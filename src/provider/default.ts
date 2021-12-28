@@ -19,7 +19,7 @@ import { BigNumberish, toBN, toHex } from '../utils/number';
 import { compressProgram, formatSignature, randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
 
-type NetworkName = 'mainnet-alpha' | 'georli-alpha';
+type NetworkName = 'mainnet-alpha' | 'goerli-alpha';
 
 type ProviderOptions =
   | {
