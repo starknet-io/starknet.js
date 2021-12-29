@@ -20,7 +20,7 @@ import { BigNumberish, toBN, toHex } from '../utils/number';
 import { compressProgram, formatSignature, randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
 
-type NetworkName = 'mainnet-alpha' | 'georli-alpha';
+type NetworkName = 'mainnet-alpha' | 'goerli-alpha';
 
 type ProviderOptions =
   | {
@@ -41,7 +41,7 @@ export class Provider implements ProviderInterface {
 
   public gatewayUrl: string;
 
-  constructor(optionsOrProvider: ProviderOptions | Provider = { network: 'georli-alpha' }) {
+  constructor(optionsOrProvider: ProviderOptions | Provider = { network: 'goerli-alpha' }) {
     if (optionsOrProvider instanceof Provider) {
       this.baseUrl = optionsOrProvider.baseUrl;
       this.feederGatewayUrl = optionsOrProvider.feederGatewayUrl;
@@ -61,7 +61,7 @@ export class Provider implements ProviderInterface {
     switch (name) {
       case 'mainnet-alpha':
         return 'https://alpha-mainnet.starknet.io';
-      case 'georli-alpha':
+      case 'goerli-alpha':
       default:
         return 'https://alpha4.starknet.io';
     }
