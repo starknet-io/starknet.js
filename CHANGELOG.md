@@ -1,3 +1,14 @@
+# [2.6.0](https://github.com/seanjameshan/starknet.js/compare/v2.5.0...v2.6.0) (2021-12-29)
+
+### Bug Fixes
+
+- correct network name ([66e14c9](https://github.com/seanjameshan/starknet.js/commit/66e14c926f015a2dfbd50d3e54ba4e008fb43aa8))
+- network name ([965f215](https://github.com/seanjameshan/starknet.js/commit/965f21580ef68bf84c105e93bfb3b98f75b31f93))
+
+### Features
+
+- introduce blockNumber ([657dac1](https://github.com/seanjameshan/starknet.js/commit/657dac1d77e840a7fc663d3a180515443a7e834f))
+
 # [2.5.0](https://github.com/seanjameshan/starknet.js/compare/v2.4.0...v2.5.0) (2021-12-13)
 
 ### Bug Fixes
