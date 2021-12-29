@@ -1,5 +1,6 @@
 import type {
   AddTransactionResponse,
+  BlockNumber,
   CallContractResponse,
   CallContractTransaction,
   CompiledContract,
@@ -34,12 +35,12 @@ export abstract class ProviderInterface {
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L17-L25)
    *
    * @param invokeTransaction - transaction to be invoked
-   * @param blockId
+   * @param blockNumber
    * @returns the result of the function on the smart contract.
    */
   public abstract callContract(
     invokeTransaction: CallContractTransaction,
-    blockId?: number
+    blockNumber?: BlockNumber
   ): Promise<CallContractResponse>;
 
   /**
@@ -47,10 +48,10 @@ export abstract class ProviderInterface {
    *
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L27-L31)
    *
-   * @param blockId
-   * @returns the block object { block_id, previous_block_id, state_root, status, timestamp, transaction_receipts, transactions }
+   * @param blockNumber
+   * @returns the block object { block_number, previous_block_number, state_root, status, timestamp, transaction_receipts, transactions }
    */
-  public abstract getBlock(blockId?: number): Promise<GetBlockResponse>;
+  public abstract getBlock(blockNumber?: BlockNumber): Promise<GetBlockResponse>;
 
   /**
    * Gets the code of the deployed contract.
@@ -58,10 +59,13 @@ export abstract class ProviderInterface {
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L33-L36)
    *
    * @param contractAddress
-   * @param blockId
+   * @param blockNumber
    * @returns Bytecode and ABI of compiled contract
    */
-  public abstract getCode(contractAddress: string, blockId?: number): Promise<GetCodeResponse>;
+  public abstract getCode(
+    contractAddress: string,
+    blockNumber?: BlockNumber
+  ): Promise<GetCodeResponse>;
 
   // TODO: add proper type
   /**
@@ -71,13 +75,13 @@ export abstract class ProviderInterface {
    *
    * @param contractAddress
    * @param key - from getStorageVarAddress('<STORAGE_VARIABLE_NAME>') (WIP)
-   * @param blockId
+   * @param blockNumber
    * @returns the value of the storage variable
    */
   public abstract getStorageAt(
     contractAddress: string,
     key: number,
-    blockId?: number
+    blockNumber?: BlockNumber
   ): Promise<object>;
 
   /**
@@ -86,7 +90,7 @@ export abstract class ProviderInterface {
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L48-L52)
    *
    * @param txHash
-   * @returns the transaction status object { block_id, tx_status: NOT_RECEIVED | RECEIVED | PENDING | REJECTED | ACCEPTED_ONCHAIN }
+   * @returns the transaction status object { block_number, tx_status: NOT_RECEIVED | RECEIVED | PENDING | REJECTED | ACCEPTED_ONCHAIN }
    */
   public abstract getTransactionStatus(txHash: BigNumberish): Promise<GetTransactionStatusResponse>;
 
@@ -96,7 +100,7 @@ export abstract class ProviderInterface {
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L54-L58)
    *
    * @param txHash
-   * @returns the transacton object { transaction_id, status, transaction, block_id?, block_number?, transaction_index?, transaction_failure_reason? }
+   * @returns the transacton object { transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? }
    */
   public abstract getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse>;
 

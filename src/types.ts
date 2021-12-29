@@ -43,6 +43,7 @@ export type Abi = FunctionAbi | StructAbi;
 
 export type EntryPointsByType = object;
 export type Program = object;
+export type BlockNumber = 'pending' | null | number;
 
 export type CompiledContract = {
   abi: Abi[];
@@ -95,7 +96,7 @@ export type GetBlockResponse = {
         payload: string[];
         from_address: string;
       }[];
-      block_number: number;
+      block_number: BlockNumber;
       status: Status;
       transaction_index: number;
     };
@@ -118,7 +119,7 @@ export type GetTransactionResponse = {
   status: Status;
   transaction: Transaction;
   block_hash: string;
-  block_number: number;
+  block_number: BlockNumber;
   transaction_index: number;
   transaction_hash: string;
 };
