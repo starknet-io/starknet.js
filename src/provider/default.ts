@@ -293,10 +293,10 @@ export class Provider implements ProviderInterface {
 
       if (res.tx_status === 'ACCEPTED_ON_L1' || res.tx_status === 'ACCEPTED_ON_L2') {
         onchain = true;
-      } else if (res.tx_status === 'REJECTED') {
-        throw Error('REJECTED');
-      } else if (res.tx_status === 'NOT_RECEIVED') {
-        throw Error('NOT_RECEIVED');
+      } else if (res.tx_status === 'REJECTED' || res.tx_status === 'NOT_RECEIVED') {
+        const error = Error(res.tx_status) as Error & { response: GetTransactionStatusResponse };
+        error.response = res;
+        throw error;
       }
     }
   }
