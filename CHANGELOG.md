@@ -1,3 +1,13 @@
+# [2.7.0](https://github.com/seanjameshan/starknet.js/compare/v2.6.0...v2.7.0) (2022-01-03)
+
+### Bug Fixes
+
+- add response to the waitForTx error ([e25bdfd](https://github.com/seanjameshan/starknet.js/commit/e25bdfd428fd36e105ed272ea39462845bae5805))
+
+### Features
+
+- **blockHash:** add blockHash and fix test cases ([4e107eb](https://github.com/seanjameshan/starknet.js/commit/4e107eb7e97a9b8d2efd74b2074a7d82365c932e))
+
 # [2.6.0](https://github.com/seanjameshan/starknet.js/compare/v2.5.0...v2.6.0) (2021-12-29)
 
 ### Bug Fixes
