@@ -35,11 +35,13 @@ export abstract class ProviderInterface {
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L17-L25)
    *
    * @param invokeTransaction - transaction to be invoked
+   * @param blockHash
    * @param blockNumber
    * @returns the result of the function on the smart contract.
    */
   public abstract callContract(
     invokeTransaction: CallContractTransaction,
+    blockHash?: BigNumberish,
     blockNumber?: BlockNumber
   ): Promise<CallContractResponse>;
 
@@ -48,10 +50,14 @@ export abstract class ProviderInterface {
    *
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L27-L31)
    *
+   * @param blockHash
    * @param blockNumber
    * @returns the block object { block_number, previous_block_number, state_root, status, timestamp, transaction_receipts, transactions }
    */
-  public abstract getBlock(blockNumber?: BlockNumber): Promise<GetBlockResponse>;
+  public abstract getBlock(
+    blockHash?: BigNumberish,
+    blockNumber?: BlockNumber
+  ): Promise<GetBlockResponse>;
 
   /**
    * Gets the code of the deployed contract.
@@ -59,11 +65,13 @@ export abstract class ProviderInterface {
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L33-L36)
    *
    * @param contractAddress
+   * @param blockHash
    * @param blockNumber
    * @returns Bytecode and ABI of compiled contract
    */
   public abstract getCode(
     contractAddress: string,
+    blockHash?: BigNumberish,
     blockNumber?: BlockNumber
   ): Promise<GetCodeResponse>;
 
@@ -75,12 +83,14 @@ export abstract class ProviderInterface {
    *
    * @param contractAddress
    * @param key - from getStorageVarAddress('<STORAGE_VARIABLE_NAME>') (WIP)
+   * @param blockHash
    * @param blockNumber
    * @returns the value of the storage variable
    */
   public abstract getStorageAt(
     contractAddress: string,
     key: number,
+    blockHash?: BigNumberish,
     blockNumber?: BlockNumber
   ): Promise<object>;
 

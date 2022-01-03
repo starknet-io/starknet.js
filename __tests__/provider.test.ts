@@ -13,38 +13,49 @@ describe('defaultProvider', () => {
       expect(typeof GpsStatementVerifier).toBe('string');
       expect(typeof Starknet).toBe('string');
     });
-    test('getBlock()', () => {
-      return expect(defaultProvider.getBlock(870)).resolves.not.toThrow();
+    test('getBlock(blockHash=0x3bca19c3d5983e21e9537669b15f951f0664f0747a083dc714e0b9648b8575d, blockNumber=undefined)', () => {
+      return expect(
+        defaultProvider.getBlock(
+          '0x3bca19c3d5983e21e9537669b15f951f0664f0747a083dc714e0b9648b8575d'
+        )
+      ).resolves.not.toThrow();
     });
-    test('getBlock(blockNumber=null)', () => {
+    test('getBlock(blockHash=undefined, blockNumber=36657)', () => {
+      return expect(defaultProvider.getBlock(undefined, 36657)).resolves.not.toThrow();
+    });
+    test('getBlock(blockHash=undefined, blockNumber=null)', () => {
       return expect(defaultProvider.getBlock()).resolves.not.toThrow();
     });
     test('getCode()', () => {
       return expect(
         defaultProvider.getCode(
-          '0x163a1542a64402ffc93e39a4962eec51ce126f2e634631d3f1f6770a76e3a61',
-          870
+          '0x01d1f307c073bb786a66e6e042ec2a9bdc385a3373bb3738d95b966d5ce56166',
+          undefined,
+          36663
         )
       ).resolves.not.toThrow();
     });
-    test('getCode(blockNumber=null)', () => {
+    test('getCode(blockHash=undefined, blockNumber=null)', () => {
       return expect(
-        defaultProvider.getCode('0x163a1542a64402ffc93e39a4962eec51ce126f2e634631d3f1f6770a76e3a61')
+        defaultProvider.getCode(
+          '0x01d1f307c073bb786a66e6e042ec2a9bdc385a3373bb3738d95b966d5ce56166'
+        )
       ).resolves.not.toThrow();
     });
     test('getStorageAt()', () => {
       return expect(
         defaultProvider.getStorageAt(
-          '0x163a1542a64402ffc93e39a4962eec51ce126f2e634631d3f1f6770a76e3a61',
+          '0x01d1f307c073bb786a66e6e042ec2a9bdc385a3373bb3738d95b966d5ce56166',
           0,
-          870
+          undefined,
+          36663
         )
       ).resolves.not.toThrow();
     });
-    test('getStorageAt(blockNumber=null)', () => {
+    test('getStorageAt(blockHash=undefined, blockNumber=null)', () => {
       return expect(
         defaultProvider.getStorageAt(
-          '0x163a1542a64402ffc93e39a4962eec51ce126f2e634631d3f1f6770a76e3a61',
+          '0x01d1f307c073bb786a66e6e042ec2a9bdc385a3373bb3738d95b966d5ce56166',
           0
         )
       ).resolves.not.toThrow();
@@ -52,14 +63,14 @@ describe('defaultProvider', () => {
     test('getTransactionStatus()', async () => {
       return expect(
         defaultProvider.getTransactionStatus(
-          '0x72add9621ecdcb07405a4f943fe410bf57003ca250400f01ce70f8a6fc72147'
+          '0x37013e1cb9c133e6fe51b4b371b76b317a480f56d80576730754c1662582348'
         )
       ).resolves.not.toThrow();
     });
     test('getTransaction()', async () => {
       return expect(
         defaultProvider.getTransaction(
-          '0x72add9621ecdcb07405a4f943fe410bf57003ca250400f01ce70f8a6fc72147'
+          '0x37013e1cb9c133e6fe51b4b371b76b317a480f56d80576730754c1662582348'
         )
       ).resolves.not.toThrow();
     });
