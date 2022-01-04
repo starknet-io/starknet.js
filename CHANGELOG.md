@@ -1,3 +1,9 @@
+## [2.7.1](https://github.com/seanjameshan/starknet.js/compare/v2.7.0...v2.7.1) (2022-01-04)
+
+### Bug Fixes
+
+- **types:** add block_number property to GetBlockResponse interface ([696cf5a](https://github.com/seanjameshan/starknet.js/commit/696cf5ae565bd16365045cc1f20e9fa55184d054))
+
 # [2.7.0](https://github.com/seanjameshan/starknet.js/compare/v2.6.0...v2.7.0) (2022-01-03)
 
 ### Bug Fixes
