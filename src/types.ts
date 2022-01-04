@@ -79,7 +79,7 @@ export type CallContractResponse = {
 };
 
 export type GetBlockResponse = {
-  sequence_number: number;
+  block_number: number;
   state_root: string;
   block_hash: string;
   transactions: {
