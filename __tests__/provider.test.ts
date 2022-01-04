@@ -26,6 +26,10 @@ describe('defaultProvider', () => {
     test('getBlock(blockHash=undefined, blockNumber=null)', () => {
       return expect(defaultProvider.getBlock()).resolves.not.toThrow();
     });
+    test('getBlock() -> { blockNumber }', async () => {
+      const block = await defaultProvider.getBlock();
+      return expect(block).toHaveProperty('block_number');
+    });
     test('getCode()', () => {
       return expect(
         defaultProvider.getCode(
