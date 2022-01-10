@@ -19,3 +19,4 @@ export * as ec from './utils/ellipticCurve';
 export * as uint256 from './utils/uint256';
 export * as shortString from './utils/shortString';
 export * as typedData from './utils/typedData';
+export * from './utils/address';
