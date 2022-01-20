@@ -58,7 +58,7 @@ const CONTRACT_ADDRESS =
 **/
 
 /** Reset the liquidity pool **/
-const addTokenResponse = await provider.addTransaction({
+const addTokenResponse = await defaultProvider.addTransaction({
   type: "INVOKE_FUNCTION",
   contract_address: CONTRACT_ADDRESS,
   entry_point_selector: getSelectorFromName("init_pool"),
@@ -71,7 +71,7 @@ console.log(addTokenResponse);
 **/
 
 /** Get the balance of the liquidity pool of token A **/
-const poolBalanceTokenA = await callContract({
+const poolBalanceTokenA = await defaultProvider.callContract({
   contract_address: CONTRACT_ADDRESS,
   entry_point_selector: getSelectorFromName("get_pool_token_balance"),
   calldata: ["1"],
@@ -80,7 +80,7 @@ const balanceA = poolBalanceTokenA.result[0];
 console.log('token a liquidity pool balance: ', parseInt(balanceA, 16));
 
 /** Get the balance of the liquidity pool of token B **/
-const poolBalanceTokenB = await callContract({
+const poolBalanceTokenB = await defaultProvider.callContract({
   contract_address: CONTRACT_ADDRESS,
   entry_point_selector: getSelectorFromName("get_pool_token_balance"),
   calldata: ["2"],
