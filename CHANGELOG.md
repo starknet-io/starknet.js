@@ -1,3 +1,9 @@
+## [2.5.1](https://github.com/seanjameshan/starknet.js/compare/v2.5.0...v2.5.1) (2022-01-20)
+
+### Bug Fixes
+
+- **CONTRIBUTING:** wrong link ([2622a6c](https://github.com/seanjameshan/starknet.js/commit/2622a6c984259a6928e9ab02892b8de60b8c749e))
+
 # [2.5.0](https://github.com/seanjameshan/starknet.js/compare/v2.4.0...v2.5.0) (2021-12-13)
 
 ### Bug Fixes
