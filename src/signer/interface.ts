@@ -1,5 +1,6 @@
 import { Provider } from '../provider';
 import { AddTransactionResponse, Signature, Transaction } from '../types';
+import { BigNumberish } from '../utils/number';
 import { TypedData } from '../utils/typedData/types';
 
 export abstract class SignerInterface extends Provider {
@@ -35,4 +36,25 @@ export abstract class SignerInterface extends Provider {
    * @throws {Error} if the JSON object is not a valid JSON
    */
   public abstract hashMessage(typedData: TypedData): Promise<string>;
+
+  /**
+   * Verify a signature of a JSON object
+   *
+   * @param json - JSON object to be verified
+   * @param signature - signature of the JSON object
+   * @returns true if the signature is valid, false otherwise
+   * @throws {Error} if the JSON object is not a valid JSON or the signature is not a valid signature
+   */
+  public abstract verifyMessage(typedData: TypedData, signature: Signature): Promise<boolean>;
+
+  /**
+   * Verify a signature of a given hash
+   * @warning This method is not recommended, use verifyMessage instead
+   *
+   * @param hash - hash to be verified
+   * @param signature - signature of the hash
+   * @returns true if the signature is valid, false otherwise
+   * @throws {Error} if the signature is not a valid signature
+   */
+  public abstract verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean>;
 }

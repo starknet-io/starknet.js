@@ -1,11 +1,12 @@
 import assert from 'minimalistic-assert';
 
+import { compileCalldata } from '../contract';
 import { Provider } from '../provider';
 import { AddTransactionResponse, KeyPair, Signature, Transaction } from '../types';
 import { sign } from '../utils/ellipticCurve';
 import { addHexPrefix } from '../utils/encode';
 import { hashMessage } from '../utils/hash';
-import { toBN } from '../utils/number';
+import { BigNumberish, toBN } from '../utils/number';
 import { getSelectorFromName } from '../utils/stark';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { SignerInterface } from './interface';
@@ -97,5 +98,41 @@ export class Signer extends Provider implements SignerInterface {
    */
   public async hashMessage(typedData: TypedData): Promise<string> {
     return getMessageHash(typedData, this.address);
+  }
+
+  /**
+   * Verify a signature of a JSON object
+   *
+   * @param json - JSON object to be verified
+   * @param signature - signature of the JSON object
+   * @returns true if the signature is valid, false otherwise
+   * @throws {Error} if the JSON object is not a valid JSON or the signature is not a valid signature
+   */
+  public async verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean> {
+    const { result } = await this.callContract({
+      contract_address: this.address,
+      entry_point_selector: getSelectorFromName('is_valid_signature'),
+      calldata: compileCalldata({
+        hash: toBN(hash).toString(),
+        signature: signature.map((x) => toBN(x).toString()),
+      }),
+    });
+
+    // 0 is false, 1 is true
+    return Boolean(toBN(result[0]).toNumber());
+  }
+
+  /**
+   * Verify a signature of a given hash
+   * @warning This method is not recommended, use verifyMessage instead
+   *
+   * @param hash - hash to be verified
+   * @param signature - signature of the hash
+   * @returns true if the signature is valid, false otherwise
+   * @throws {Error} if the signature is not a valid signature
+   */
+  public async verifyMessage(typedData: TypedData, signature: Signature): Promise<boolean> {
+    const hash = await this.hashMessage(typedData);
+    return this.verifyMessageHash(hash, signature);
   }
 }
