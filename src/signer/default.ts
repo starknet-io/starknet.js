@@ -109,17 +109,19 @@ export class Signer extends Provider implements SignerInterface {
    * @throws {Error} if the JSON object is not a valid JSON or the signature is not a valid signature
    */
   public async verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean> {
-    const { result } = await this.callContract({
-      contract_address: this.address,
-      entry_point_selector: getSelectorFromName('is_valid_signature'),
-      calldata: compileCalldata({
-        hash: toBN(hash).toString(),
-        signature: signature.map((x) => toBN(x).toString()),
-      }),
-    });
-
-    // 0 is false, 1 is true
-    return Boolean(toBN(result[0]).toNumber());
+    try {
+      await this.callContract({
+        contract_address: this.address,
+        entry_point_selector: getSelectorFromName('is_valid_signature'),
+        calldata: compileCalldata({
+          hash: toBN(hash).toString(),
+          signature: signature.map((x) => toBN(x).toString()),
+        }),
+      });
+      return true;
+    } catch {
+      return false;
+    }
   }
 
   /**

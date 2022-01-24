@@ -1,40 +1,5 @@
+import typedDataExample from '../../__mocks__/typedDataExample.json';
 import { encodeType, getMessageHash, getStructHash, getTypeHash } from '../../src/utils/typedData';
-
-const typedDataExample = {
-  types: {
-    StarkNetDomain: [
-      { name: 'name', type: 'felt' },
-      { name: 'version', type: 'felt' },
-      { name: 'chainId', type: 'felt' },
-    ],
-    Person: [
-      { name: 'name', type: 'felt' },
-      { name: 'wallet', type: 'felt' },
-    ],
-    Mail: [
-      { name: 'from', type: 'Person' },
-      { name: 'to', type: 'Person' },
-      { name: 'contents', type: 'felt' },
-    ],
-  },
-  primaryType: 'Mail',
-  domain: {
-    name: 'StarkNet Mail',
-    version: '1',
-    chainId: 1,
-  },
-  message: {
-    from: {
-      name: 'Cow',
-      wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-    },
-    to: {
-      name: 'Bob',
-      wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
-    },
-    contents: 'Hello, Bob!',
-  },
-};
 
 describe('typedData', () => {
   test('should get right type encoding', () => {
