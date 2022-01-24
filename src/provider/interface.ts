@@ -115,10 +115,13 @@ export abstract class ProviderInterface {
    */
   public abstract getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse>;
 
-  public abstract getTransactionReceipt(
-    txHash?: BigNumberish,
-    txId?: BigNumberish
-  ): Promise<TransactionReceipt>;
+  public abstract getTransactionReceipt({
+    txHash,
+    txId,
+  }: {
+    txHash?: BigNumberish;
+    txId?: BigNumberish;
+  }): Promise<TransactionReceipt>;
 
   /**
    * Invoke a function on the starknet contract

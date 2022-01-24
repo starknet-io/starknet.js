@@ -81,9 +81,9 @@ describe('defaultProvider', () => {
 
     test('getTransactionReceipt', async () => {
       return expect(
-        defaultProvider.getTransactionReceipt(
-          '0x7906b9cfe400e11dd1f977a128f73995029e67c2135cdef1552622e636ff499'
-        )
+        defaultProvider.getTransactionReceipt({
+          txHash: '0x37013e1cb9c133e6fe51b4b371b76b317a480f56d80576730754c1662582348',
+        })
       ).resolves.not.toThrow();
     });
 

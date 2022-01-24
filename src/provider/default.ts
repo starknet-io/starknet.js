@@ -234,10 +234,13 @@ export class Provider implements ProviderInterface {
    * @returns the transaction receipt object
    */
 
-  public async getTransactionReceipt(
-    txHash?: BigNumberish,
-    txId?: BigNumberish
-  ): Promise<TransactionReceipt> {
+  public async getTransactionReceipt({
+    txHash,
+    txId,
+  }: {
+    txHash?: BigNumberish;
+    txId?: BigNumberish;
+  }): Promise<TransactionReceipt> {
     const { data } = await axios.get<TransactionReceipt>(
       urljoin(this.feederGatewayUrl, 'get_transaction_receipt', `?${txIdentifier(txHash, txId)}`)
     );
