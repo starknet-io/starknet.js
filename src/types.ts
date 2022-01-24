@@ -135,7 +135,7 @@ export type TransactionReceipt = {
   transaction_hash: string;
   transaction_index: number;
   block_hash: string;
-  block_number: string;
+  block_number: number;
   l2_to_l1_messages: string[];
   events: string[];
 };
