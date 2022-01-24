@@ -14,12 +14,13 @@ import {
   GetTransactionStatusResponse,
   Signature,
   Transaction,
+  TransactionReceipt,
 } from '../types';
 import { parse, stringify } from '../utils/json';
 import { BigNumberish, toBN, toHex } from '../utils/number';
 import { compressProgram, formatSignature, randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
-import { getFormattedBlockIdentifier } from './utils';
+import { getFormattedBlockIdentifier, txIdentifier } from './utils';
 
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha';
 
@@ -220,6 +221,27 @@ export class Provider implements ProviderInterface {
     const { data } = await axios.get<GetTransactionResponse>(
       urljoin(this.feederGatewayUrl, 'get_transaction', `?transactionHash=${toHex(txHashBn)}`)
     );
+    return data;
+  }
+
+  /**
+   * Gets the transaction receipt from a tx hash or tx id.
+   *
+   * [Reference] (https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L104-L111)
+   *
+   * @param txHash
+   * @param txId
+   * @returns the transaction receipt object
+   */
+
+  public async getTransactionReceipt(
+    txHash?: BigNumberish,
+    txId?: BigNumberish
+  ): Promise<TransactionReceipt> {
+    const { data } = await axios.get<TransactionReceipt>(
+      urljoin(this.feederGatewayUrl, 'get_transaction_receipt', `?${txIdentifier(txHash, txId)}`)
+    );
+
     return data;
   }
 

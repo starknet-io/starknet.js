@@ -11,6 +11,7 @@ import type {
   GetTransactionStatusResponse,
   Signature,
   Transaction,
+  TransactionReceipt,
 } from '../types';
 import type { BigNumberish } from '../utils/number';
 
@@ -113,6 +114,11 @@ export abstract class ProviderInterface {
    * @returns the transacton object { transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? }
    */
   public abstract getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse>;
+
+  public abstract getTransactionReceipt(
+    txHash?: BigNumberish,
+    txId?: BigNumberish
+  ): Promise<TransactionReceipt>;
 
   /**
    * Invoke a function on the starknet contract

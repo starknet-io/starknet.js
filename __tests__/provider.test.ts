@@ -78,6 +78,15 @@ describe('defaultProvider', () => {
         )
       ).resolves.not.toThrow();
     });
+
+    test.only('getTransactionReceipt', async () => {
+      return expect(
+        defaultProvider.getTransactionReceipt(
+          '0x7906b9cfe400e11dd1f977a128f73995029e67c2135cdef1552622e636ff499'
+        )
+      ).resolves.not.toThrow();
+    });
+
     test('callContract()', () => {
       return expect(
         defaultProvider.callContract({
