@@ -108,12 +108,12 @@ export class Provider implements ProviderInterface {
    *
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L27-L31)
    *
-   * @param blockId
+   * @param blockHash
    * @returns the block object { block_id, previous_block_id, state_root, status, timestamp, transaction_receipts, transactions }
    */
-  public async getBlock(blockId?: number): Promise<GetBlockResponse> {
+  public async getBlock(blockHash?: string): Promise<GetBlockResponse> {
     const { data } = await axios.get<GetBlockResponse>(
-      urljoin(this.feederGatewayUrl, 'get_block', `?blockId=${blockId ?? 'null'}`)
+      urljoin(this.feederGatewayUrl, 'get_block', blockHash ? `?blockHash=${blockHash}` : '')
     );
     return data;
   }

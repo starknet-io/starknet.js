@@ -47,10 +47,10 @@ export abstract class ProviderInterface {
    *
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L27-L31)
    *
-   * @param blockId
+   * @param blockHash
    * @returns the block object { block_id, previous_block_id, state_root, status, timestamp, transaction_receipts, transactions }
    */
-  public abstract getBlock(blockId?: number): Promise<GetBlockResponse>;
+  public abstract getBlock(blockHash?: string): Promise<GetBlockResponse>;
 
   /**
    * Gets the code of the deployed contract.

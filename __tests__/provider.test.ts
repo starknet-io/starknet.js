@@ -14,9 +14,10 @@ describe('defaultProvider', () => {
       expect(typeof Starknet).toBe('string');
     });
     test('getBlock()', () => {
-      return expect(defaultProvider.getBlock(870)).resolves.not.toThrow();
+      const blockHash = '0x46b3096a651285b10ca26b31140fdab702f862e0273dfe874385fde20d3ca2c';
+      return expect(defaultProvider.getBlock(blockHash)).resolves.not.toThrow();
     });
-    test('getBlock(blockId=null)', () => {
+    test('getBlock(blockHash=null)', () => {
       return expect(defaultProvider.getBlock()).resolves.not.toThrow();
     });
     test('getCode()', () => {
