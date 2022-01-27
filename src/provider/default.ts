@@ -18,6 +18,7 @@ import { parse, stringify } from '../utils/json';
 import { BigNumberish, toBN, toHex } from '../utils/number';
 import { compressProgram, formatSignature, randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
+import { TransactionStatuses } from './types'
 
 type NetworkName = 'mainnet-alpha' | 'georli-alpha';
 
@@ -277,6 +278,7 @@ export class Provider implements ProviderInterface {
     });
   }
 
+
   public async waitForTx(txHash: BigNumberish, retryInterval: number = 8000) {
     let onchain = false;
     await wait(retryInterval);
@@ -287,12 +289,12 @@ export class Provider implements ProviderInterface {
       // eslint-disable-next-line no-await-in-loop
       const res = await this.getTransactionStatus(txHash);
 
-      if (res.tx_status === 'ACCEPTED_ON_L1' || res.tx_status === 'ACCEPTED_ON_L2') {
+      if (res.tx_status === TransactionStatuses.ACCEPTED_ON_L1 || res.tx_status === TransactionStatuses.ACCEPTED_ON_L2) {
         onchain = true;
-      } else if (res.tx_status === 'REJECTED') {
-        throw Error('REJECTED');
-      } else if (res.tx_status === 'NOT_RECEIVED') {
-        throw Error('NOT_RECEIVED');
+      } else if (res.tx_status === TransactionStatuses.REJECTED) {
+        throw Error(TransactionStatuses.REJECTED);
+      } else if (res.tx_status === TransactionStatuses.NOT_RECEIVED) {
+        throw Error(TransactionStatuses.NOT_RECEIVED);
       }
     }
   }

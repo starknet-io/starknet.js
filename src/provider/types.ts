@@ -1,0 +1,6 @@
+export enum TransactionStatuses {
+    ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
+    ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
+    REJECTED = 'REJECTED',
+    NOT_RECEIVED = 'NOT_RECEIVED'
+}
