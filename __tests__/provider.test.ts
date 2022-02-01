@@ -21,7 +21,7 @@ describe('defaultProvider', () => {
       ).resolves.not.toThrow();
     });
     test('getBlock(blockHash=undefined, blockNumber=36657)', () => {
-      return expect(defaultProvider.getBlock(undefined, 36657)).resolves.not.toThrow();
+      return expect(defaultProvider.getBlock(36657)).resolves.not.toThrow();
     });
     test('getBlock(blockHash=undefined, blockNumber=null)', () => {
       return expect(defaultProvider.getBlock()).resolves.not.toThrow();
@@ -34,7 +34,6 @@ describe('defaultProvider', () => {
       return expect(
         defaultProvider.getCode(
           '0x01d1f307c073bb786a66e6e042ec2a9bdc385a3373bb3738d95b966d5ce56166',
-          undefined,
           36663
         )
       ).resolves.not.toThrow();
@@ -51,7 +50,6 @@ describe('defaultProvider', () => {
         defaultProvider.getStorageAt(
           '0x01d1f307c073bb786a66e6e042ec2a9bdc385a3373bb3738d95b966d5ce56166',
           0,
-          undefined,
           36663
         )
       ).resolves.not.toThrow();
