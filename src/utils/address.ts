@@ -7,14 +7,13 @@ export function addAddressPadding(address: string): string {
 }
 
 export function validateAndParseAddress(address: string): string {
-  let result = null;
   if (typeof address !== 'string') {
     throw new Error('Invalid Address Type');
   }
 
   assertInRange(address, ZERO, MASK_251, 'Starknet Address');
 
-  result = addAddressPadding(address);
+  const result = addAddressPadding(address);
 
   if (!result.match(/^(0x)?[0-9a-fA-F]{64}$/)) {
     throw new Error('Invalid Address Format');
