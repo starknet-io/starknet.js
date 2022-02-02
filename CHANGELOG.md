@@ -1,3 +1,10 @@
+# [2.8.0](https://github.com/seanjameshan/starknet.js/compare/v2.7.2...v2.8.0) (2022-02-02)
+
+### Features
+
+- add tests ([e495d48](https://github.com/seanjameshan/starknet.js/commit/e495d4899141a79fe310d4fe76f70df03b1551ca))
+- implement verifyMessage and verifyMessageHash ([bc9c4e9](https://github.com/seanjameshan/starknet.js/commit/bc9c4e9574cc453af35705eb4488602ea33cc2cb))
+
 ## [2.7.2](https://github.com/seanjameshan/starknet.js/compare/v2.7.1...v2.7.2) (2022-01-20)
 
 ### Bug Fixes
