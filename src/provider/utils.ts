@@ -1,5 +1,5 @@
 import type { BlockNumber } from '../types';
-import { BigNumberish } from '../utils/number';
+import { BigNumberish, toBN, toHex } from '../utils/number';
 
 /**
  * TODO
@@ -18,6 +18,42 @@ export function formatHash() {}
  */
 export function txIdentifier() {}
 
+// hex string and BN are detected as block hashes
+// decimal string and number are detected as block numbers
+// null appends nothing to the request url
+export type BlockIdentifier = BlockNumber | BigNumberish;
+type BlockIdentifierObject =
+  | { type: 'BLOCK_NUMBER'; data: BlockNumber }
+  | { type: 'BLOCK_HASH'; data: BigNumberish };
+
+/**
+ * Identifies the block to be queried.
+ *
+ * @param blockIdentifier - block identifier
+ * @returns block identifier object
+ */
+export function getBlockIdentifier(blockIdentifier: BlockIdentifier): BlockIdentifierObject {
+  if (typeof blockIdentifier === 'number') {
+    return { type: 'BLOCK_NUMBER', data: blockIdentifier };
+  }
+  if (typeof blockIdentifier === 'string' && blockIdentifier.startsWith('0x')) {
+    return { type: 'BLOCK_HASH', data: blockIdentifier };
+  }
+  if (typeof blockIdentifier === 'string' && !Number.isNaN(parseInt(blockIdentifier, 10))) {
+    return { type: 'BLOCK_NUMBER', data: parseInt(blockIdentifier, 10) };
+  }
+  if (blockIdentifier === null) {
+    return { type: 'BLOCK_NUMBER', data: null };
+  }
+  if (blockIdentifier === 'pending') {
+    return { type: 'BLOCK_NUMBER', data: 'pending' };
+  }
+  if (typeof blockIdentifier === 'string') {
+    throw new Error(`Invalid block identifier: ${blockIdentifier}`);
+  }
+  return { type: 'BLOCK_HASH', data: blockIdentifier };
+}
+
 /**
  * Gets the block identifier for API request
  *
@@ -27,12 +63,13 @@ export function txIdentifier() {}
  * @param blockHash
  * @returns block identifier for API request
  */
-export function getFormattedBlockIdentifier(
-  blockHash?: BigNumberish,
-  blockNumber: BlockNumber = null
-): string {
-  if (blockHash) {
-    return `?blockHash=${blockHash}`;
+export function getFormattedBlockIdentifier(blockIdentifier: BlockIdentifier = null): string {
+  const blockIdentifierObject = getBlockIdentifier(blockIdentifier);
+  if (blockIdentifierObject.type === 'BLOCK_NUMBER' && blockIdentifierObject.data === null) {
+    return '';
   }
-  return `?blockNumber=${blockNumber}`;
+  if (blockIdentifierObject.type === 'BLOCK_NUMBER') {
+    return `?blockNumber=${blockIdentifierObject.data}`;
+  }
+  return `?blockHash=${toHex(toBN(blockIdentifierObject.data))}`;
 }

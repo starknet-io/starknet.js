@@ -1,6 +1,5 @@
 import type {
   AddTransactionResponse,
-  BlockNumber,
   CallContractResponse,
   CallContractTransaction,
   CompiledContract,
@@ -13,6 +12,7 @@ import type {
   Transaction,
 } from '../types';
 import type { BigNumberish } from '../utils/number';
+import { BlockIdentifier } from './utils';
 
 export abstract class ProviderInterface {
   public abstract baseUrl: string;
@@ -35,14 +35,12 @@ export abstract class ProviderInterface {
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/fc97bdd8322a7df043c87c371634b26c15ed6cee/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L25-L39)
    *
    * @param invokeTransaction - transaction to be invoked
-   * @param blockHash
-   * @param blockNumber
+   * @param blockIdentifier - block identifier
    * @returns the result of the function on the smart contract.
    */
   public abstract callContract(
     invokeTransaction: CallContractTransaction,
-    blockHash?: BigNumberish,
-    blockNumber?: BlockNumber
+    blockIdentifier?: BlockIdentifier
   ): Promise<CallContractResponse>;
 
   /**
@@ -50,29 +48,23 @@ export abstract class ProviderInterface {
    *
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/fc97bdd8322a7df043c87c371634b26c15ed6cee/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L41-L53)
    *
-   * @param blockHash
-   * @param blockNumber
+   * @param blockIdentifier - block identifier
    * @returns the block object { block_number, previous_block_number, state_root, status, timestamp, transaction_receipts, transactions }
    */
-  public abstract getBlock(
-    blockHash?: BigNumberish,
-    blockNumber?: BlockNumber
-  ): Promise<GetBlockResponse>;
+  public abstract getBlock(blockIdentifier?: BlockIdentifier): Promise<GetBlockResponse>;
 
   /**
    * Gets the code of the deployed contract.
    *
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/fc97bdd8322a7df043c87c371634b26c15ed6cee/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L55-L68)
    *
-   * @param contractAddress
-   * @param blockHash
-   * @param blockNumber
+   * @param contractAddress - contract address
+   * @param blockIdentifier - block identifier
    * @returns Bytecode and ABI of compiled contract
    */
   public abstract getCode(
     contractAddress: string,
-    blockHash?: BigNumberish,
-    blockNumber?: BlockNumber
+    blockIdentifier?: BlockIdentifier
   ): Promise<GetCodeResponse>;
 
   // TODO: add proper type
@@ -83,15 +75,13 @@ export abstract class ProviderInterface {
    *
    * @param contractAddress
    * @param key - from getStorageVarAddress('<STORAGE_VARIABLE_NAME>') (WIP)
-   * @param blockHash
-   * @param blockNumber
+   * @param blockIdentifier - block identifier
    * @returns the value of the storage variable
    */
   public abstract getStorageAt(
     contractAddress: string,
     key: number,
-    blockHash?: BigNumberish,
-    blockNumber?: BlockNumber
+    blockIdentifier?: BlockIdentifier
   ): Promise<object>;
 
   /**
