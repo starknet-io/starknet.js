@@ -6,6 +6,7 @@ export const ZERO = toBN(0);
 export const ONE = toBN(1);
 export const TWO = toBN(2);
 export const MASK_250 = TWO.pow(toBN(250)).sub(ONE); // 2 ** 250 - 1
+export const MASK_251 = TWO.pow(toBN(251));
 
 /**
  * The following is taken from https://github.com/starkware-libs/starkex-resources/blob/master/crypto/starkware/crypto/signature/pedersen_params.json but converted to hex, because JS is very bad handling big integers by default
@@ -13,6 +14,7 @@ export const MASK_250 = TWO.pow(toBN(250)).sub(ONE); // 2 ** 250 - 1
  */
 export const FIELD_PRIME = '800000000000011000000000000000000000000000000000000000000000001';
 export const FIELD_GEN = '3';
+export const FIELD_SIZE = 251;
 export const EC_ORDER = '800000000000010FFFFFFFFFFFFFFFFB781126DCAE7B2321E66A241ADC64D2F';
 export const ALPHA = '1';
 export const BETA = '6F21413EFBE40DE150E596D72F7A8C5609AD26C15C915C1F4CDFCB99CEE9E89';
