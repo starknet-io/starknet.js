@@ -1,3 +1,13 @@
+# [2.9.0](https://github.com/seanjameshan/starknet.js/compare/v2.8.0...v2.9.0) (2022-02-04)
+
+### Bug Fixes
+
+- introduce block identifier type ([75599a9](https://github.com/seanjameshan/starknet.js/commit/75599a99bbcb5723cfc8575b5fbf994a0bbf5b67))
+
+### Features
+
+- **utils:** add validateAndParseAddress function ([c067fc4](https://github.com/seanjameshan/starknet.js/commit/c067fc443e4dc9c22b78ed6c093978a2f37debde))
+
 # [2.8.0](https://github.com/seanjameshan/starknet.js/compare/v2.7.2...v2.8.0) (2022-02-02)
 
 ### Features
