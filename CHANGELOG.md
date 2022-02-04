@@ -1,3 +1,32 @@
+# [2.9.0](https://github.com/seanjameshan/starknet.js/compare/v2.8.0...v2.9.0) (2022-02-04)
+
+### Bug Fixes
+
+- introduce block identifier type ([75599a9](https://github.com/seanjameshan/starknet.js/commit/75599a99bbcb5723cfc8575b5fbf994a0bbf5b67))
+
+### Features
+
+- **utils:** add validateAndParseAddress function ([c067fc4](https://github.com/seanjameshan/starknet.js/commit/c067fc443e4dc9c22b78ed6c093978a2f37debde))
+
+# [2.8.0](https://github.com/seanjameshan/starknet.js/compare/v2.7.2...v2.8.0) (2022-02-02)
+
+### Features
+
+- add tests ([e495d48](https://github.com/seanjameshan/starknet.js/commit/e495d4899141a79fe310d4fe76f70df03b1551ca))
+- implement verifyMessage and verifyMessageHash ([bc9c4e9](https://github.com/seanjameshan/starknet.js/commit/bc9c4e9574cc453af35705eb4488602ea33cc2cb))
+
+## [2.7.2](https://github.com/seanjameshan/starknet.js/compare/v2.7.1...v2.7.2) (2022-01-20)
+
+### Bug Fixes
+
+- **CONTRIBUTING:** wrong link ([2622a6c](https://github.com/seanjameshan/starknet.js/commit/2622a6c984259a6928e9ab02892b8de60b8c749e))
+
+## [2.7.1](https://github.com/seanjameshan/starknet.js/compare/v2.7.0...v2.7.1) (2022-01-04)
+
+### Bug Fixes
+
+- **types:** add block_number property to GetBlockResponse interface ([696cf5a](https://github.com/seanjameshan/starknet.js/commit/696cf5ae565bd16365045cc1f20e9fa55184d054))
+
 # [2.7.0](https://github.com/seanjameshan/starknet.js/compare/v2.6.0...v2.7.0) (2022-01-03)
 
 ### Bug Fixes

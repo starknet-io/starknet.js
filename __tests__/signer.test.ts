@@ -1,5 +1,6 @@
 import fs from 'fs';
 
+import typedDataExample from '../__mocks__/typedDataExample.json';
 import {
   CompiledContract,
   Contract,
@@ -115,5 +116,10 @@ describe('deploy and test Wallet', () => {
 
     expect(code).toBe('TRANSACTION_RECEIVED');
     await defaultProvider.waitForTx(transaction_hash);
+  });
+  test('sign and verify offchain message', async () => {
+    const signature = await signer.signMessage(typedDataExample);
+
+    expect(await signer.verifyMessage(typedDataExample, signature)).toBe(true);
   });
 });

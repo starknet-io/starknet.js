@@ -3,7 +3,6 @@ import urljoin from 'url-join';
 
 import {
   AddTransactionResponse,
-  BlockNumber,
   CallContractResponse,
   CallContractTransaction,
   CompiledContract,
@@ -20,7 +19,7 @@ import { parse, stringify } from '../utils/json';
 import { BigNumberish, toBN, toHex } from '../utils/number';
 import { compressProgram, formatSignature, randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
-import { getFormattedBlockIdentifier, txIdentifier } from './utils';
+import { BlockIdentifier, getFormattedBlockIdentifier, txIdentifier } from './utils';
 
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha';
 
@@ -94,10 +93,9 @@ export class Provider implements ProviderInterface {
    */
   public async callContract(
     invokeTransaction: CallContractTransaction,
-    blockHash?: BigNumberish,
-    blockNumber: BlockNumber = null
+    blockIdentifier: BlockIdentifier = null
   ): Promise<CallContractResponse> {
-    const formattedBlockIdentifier = getFormattedBlockIdentifier(blockHash, blockNumber);
+    const formattedBlockIdentifier = getFormattedBlockIdentifier(blockIdentifier);
 
     const { data } = await axios.post<CallContractResponse>(
       urljoin(this.feederGatewayUrl, 'call_contract', formattedBlockIdentifier),
@@ -119,11 +117,8 @@ export class Provider implements ProviderInterface {
    * @param blockNumber
    * @returns the block object { block_number, previous_block_number, state_root, status, timestamp, transaction_receipts, transactions }
    */
-  public async getBlock(
-    blockHash?: BigNumberish,
-    blockNumber: BlockNumber = null
-  ): Promise<GetBlockResponse> {
-    const formattedBlockIdentifier = getFormattedBlockIdentifier(blockHash, blockNumber);
+  public async getBlock(blockIdentifier: BlockIdentifier = null): Promise<GetBlockResponse> {
+    const formattedBlockIdentifier = getFormattedBlockIdentifier(blockIdentifier);
 
     const { data } = await axios.get<GetBlockResponse>(
       urljoin(this.feederGatewayUrl, 'get_block', formattedBlockIdentifier)
@@ -143,10 +138,9 @@ export class Provider implements ProviderInterface {
    */
   public async getCode(
     contractAddress: string,
-    blockHash?: BigNumberish,
-    blockNumber: BlockNumber = null
+    blockIdentifier: BlockIdentifier = null
   ): Promise<GetCodeResponse> {
-    const formattedBlockIdentifier = getFormattedBlockIdentifier(blockHash, blockNumber);
+    const formattedBlockIdentifier = getFormattedBlockIdentifier(blockIdentifier);
 
     const { data } = await axios.get<GetCodeResponse>(
       urljoin(
@@ -173,10 +167,9 @@ export class Provider implements ProviderInterface {
   public async getStorageAt(
     contractAddress: string,
     key: number,
-    blockHash?: BigNumberish,
-    blockNumber: BlockNumber = null
+    blockIdentifier: BlockIdentifier = null
   ): Promise<object> {
-    const formattedBlockIdentifier = getFormattedBlockIdentifier(blockHash, blockNumber);
+    const formattedBlockIdentifier = getFormattedBlockIdentifier(blockIdentifier);
 
     const { data } = await axios.get<object>(
       urljoin(
