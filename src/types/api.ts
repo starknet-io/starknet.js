@@ -1,57 +1,78 @@
-import type { ec as EC } from 'elliptic';
+import { BlockIdentifier } from '../provider/utils';
+import { BigNumberish } from '../utils/number';
+import {
+  Abi,
+  BlockNumber,
+  CompressedCompiledContract,
+  EntryPointType,
+  RawCalldata,
+  Signature,
+  Status,
+  TransactionStatus,
+} from './lib';
 
-import type { BigNumberish } from './utils/number';
-
-export type KeyPair = EC.KeyPair;
-export type Signature = BigNumberish[];
+export type Endpoints = {
+  get_contract_addresses: {
+    QUERY: never;
+    REQUEST: never;
+    RESPONSE: GetContractAddressesResponse;
+  };
+  add_transaction: {
+    QUERY: never;
+    REQUEST: Transaction;
+    RESPONSE: AddTransactionResponse;
+  };
+  get_transaction: {
+    QUERY: {
+      transactionHash: string;
+    };
+    REQUEST: never;
+    RESPONSE: GetTransactionResponse;
+  };
+  get_transaction_status: {
+    QUERY: {
+      transactionHash: string;
+    };
+    REQUEST: never;
+    RESPONSE: GetTransactionStatusResponse;
+  };
+  get_storage_at: {
+    QUERY: {
+      contractAddress: string;
+      key: number;
+      blockIdentifier: BlockIdentifier;
+    };
+    REQUEST: never;
+    RESPONSE: object;
+  };
+  get_code: {
+    QUERY: {
+      contractAddress: string;
+      blockIdentifier: BlockIdentifier;
+    };
+    REQUEST: never;
+    RESPONSE: GetCodeResponse;
+  };
+  get_block: {
+    QUERY: {
+      blockIdentifier: BlockIdentifier;
+    };
+    REQUEST: never;
+    RESPONSE: GetBlockResponse;
+  };
+  call_contract: {
+    QUERY: {
+      blockIdentifier: BlockIdentifier;
+    };
+    REQUEST: CallContractTransaction;
+    RESPONSE: CallContractResponse;
+  };
+};
 
 export type GetContractAddressesResponse = {
   Starknet: string;
   GpsStatementVerifier: string;
 };
-
-export type Status =
-  | 'NOT_RECEIVED'
-  | 'RECEIVED'
-  | 'PENDING'
-  | 'ACCEPTED_ON_L2'
-  | 'ACCEPTED_ON_L1'
-  | 'REJECTED';
-export type TransactionStatus = 'TRANSACTION_RECEIVED';
-export type Type = 'DEPLOY' | 'INVOKE_FUNCTION';
-export type EntryPointType = 'EXTERNAL';
-export type CompressedProgram = string;
-
-export type AbiEntry = { name: string; type: 'felt' | 'felt*' | string };
-
-export type FunctionAbi = {
-  inputs: AbiEntry[];
-  name: string;
-  outputs: AbiEntry[];
-  stateMutability?: 'view';
-  type: 'function';
-};
-
-export type StructAbi = {
-  members: (AbiEntry & { offset: number })[];
-  name: string;
-  size: number;
-  type: 'struct';
-};
-
-export type Abi = FunctionAbi | StructAbi;
-
-export type EntryPointsByType = object;
-export type Program = object;
-export type BlockNumber = 'pending' | null | number;
-
-export type CompiledContract = {
-  abi: Abi[];
-  entry_points_by_type: EntryPointsByType;
-  program: Program;
-};
-
-export type CompressedCompiledContract = Omit<CompiledContract, 'program'>;
 
 export type DeployTransaction = {
   type: 'DEPLOY';
@@ -67,11 +88,14 @@ export type InvokeFunctionTransaction = {
   signature?: Signature;
   entry_point_type?: EntryPointType;
   entry_point_selector: string;
-  calldata?: string[];
+  calldata?: RawCalldata;
   nonce?: BigNumberish;
 };
 
-export type CallContractTransaction = Omit<InvokeFunctionTransaction, 'type'>;
+export type CallContractTransaction = Omit<
+  InvokeFunctionTransaction,
+  'type' | 'entry_point_type' | 'nonce'
+>;
 
 export type Transaction = DeployTransaction | InvokeFunctionTransaction;
 

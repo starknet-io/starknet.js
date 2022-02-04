@@ -2,11 +2,11 @@ import assert from 'minimalistic-assert';
 
 import { compileCalldata } from '../contract';
 import { Provider } from '../provider';
-import { AddTransactionResponse, KeyPair, Signature, Transaction } from '../types';
+import { Abi, AddTransactionResponse, Invocation, KeyPair, Signature } from '../types';
 import { sign } from '../utils/ellipticCurve';
 import { addHexPrefix } from '../utils/encode';
 import { hashMessage } from '../utils/hash';
-import { BigNumberish, toBN } from '../utils/number';
+import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
 import { getSelectorFromName } from '../utils/stark';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { SignerInterface } from './interface';
@@ -22,6 +22,14 @@ export class Signer extends Provider implements SignerInterface {
     this.address = address;
   }
 
+  public async getNonce(): Promise<string> {
+    const { result } = await this.callContract({
+      contractAddress: this.address,
+      entrypoint: 'get_nonce',
+    });
+    return toHex(toBN(result[0]));
+  }
+
   /**
    * Invoke a function on the starknet contract
    *
@@ -30,32 +38,24 @@ export class Signer extends Provider implements SignerInterface {
    * @param transaction - transaction to be invoked
    * @returns a confirmation of invoking a function on the starknet contract
    */
-  public override async addTransaction(transaction: Transaction): Promise<AddTransactionResponse> {
-    if (transaction.type === 'DEPLOY') return super.addTransaction(transaction);
-
+  public override async invokeFunction(
+    { contractAddress, entrypoint, calldata = [], nonce, ...invocation }: Invocation,
+    _abi?: Abi
+  ): Promise<AddTransactionResponse> {
     assert(
-      !transaction.signature,
+      !invocation.signature,
       "Adding signatures to a signer transaction currently isn't supported"
     );
 
-    let nonceBn;
-    if (transaction.nonce) {
-      nonceBn = toBN(transaction.nonce);
-    } else {
-      const { result } = await this.callContract({
-        contract_address: this.address,
-        entry_point_selector: getSelectorFromName('get_nonce'),
-      });
-      nonceBn = toBN(result[0]);
-    }
-
-    const calldataDecimal = (transaction.calldata || []).map((x) => toBN(x).toString());
+    const nonceBn = toBN(nonce ?? (await this.getNonce()));
+    const entrypointSelector = getSelectorFromName(entrypoint);
+    const calldataDecimal = bigNumberishArrayToDecimalStringArray(calldata);
 
     const msgHash = addHexPrefix(
       hashMessage(
         this.address,
-        transaction.contract_address,
-        transaction.entry_point_selector,
+        contractAddress,
+        entrypointSelector,
         calldataDecimal,
         nonceBn.toString()
       )
@@ -63,18 +63,18 @@ export class Signer extends Provider implements SignerInterface {
 
     const signature = sign(this.keyPair, msgHash);
 
-    return super.addTransaction({
+    return super.fetchEndpoint('add_transaction', undefined, {
       type: 'INVOKE_FUNCTION',
       entry_point_selector: getSelectorFromName('execute'),
-      calldata: [
-        transaction.contract_address,
-        transaction.entry_point_selector,
+      calldata: bigNumberishArrayToDecimalStringArray([
+        contractAddress,
+        entrypointSelector,
         calldataDecimal.length.toString(),
         ...calldataDecimal,
         nonceBn.toString(),
-      ].map((x) => toBN(x).toString()),
+      ]),
       contract_address: this.address,
-      signature,
+      signature: bigNumberishArrayToDecimalStringArray(signature),
     });
   }
 
@@ -111,8 +111,8 @@ export class Signer extends Provider implements SignerInterface {
   public async verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean> {
     try {
       await this.callContract({
-        contract_address: this.address,
-        entry_point_selector: getSelectorFromName('is_valid_signature'),
+        contractAddress: this.address,
+        entrypoint: 'is_valid_signature',
         calldata: compileCalldata({
           hash: toBN(hash).toString(),
           signature: signature.map((x) => toBN(x).toString()),

@@ -2,22 +2,24 @@ import axios from 'axios';
 import urljoin from 'url-join';
 
 import {
+  Abi,
   AddTransactionResponse,
+  Call,
   CallContractResponse,
-  CallContractTransaction,
   CompiledContract,
+  DeployContractPayload,
+  Endpoints,
   GetBlockResponse,
   GetCodeResponse,
   GetContractAddressesResponse,
   GetTransactionResponse,
   GetTransactionStatusResponse,
-  Signature,
-  Transaction,
+  Invocation,
   TransactionReceipt,
 } from '../types';
 import { parse, stringify } from '../utils/json';
-import { BigNumberish, toBN, toHex } from '../utils/number';
-import { compressProgram, formatSignature, randomAddress } from '../utils/stark';
+import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
+import { compressProgram, getSelectorFromName, randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
 import { BlockIdentifier, getFormattedBlockIdentifier, txIdentifier } from './utils';
 
@@ -33,6 +35,15 @@ type ProviderOptions =
 
 function wait(delay: number) {
   return new Promise((res) => setTimeout(res, delay));
+}
+
+function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
+  return (
+    obj === undefined ||
+    Object.keys(obj).length === 0 ||
+    (Object.keys(obj).length === 1 &&
+      Object.entries(obj).every(([k, v]) => k === 'blockIdentifier' && v === null))
+  );
 }
 
 export class Provider implements ProviderInterface {
@@ -68,6 +79,39 @@ export class Provider implements ProviderInterface {
     }
   }
 
+  // typesafe fetch
+  protected async fetchEndpoint<T extends keyof Endpoints>(
+    endpoint: T,
+    ...[query, request]: Endpoints[T]['QUERY'] extends never
+      ? Endpoints[T]['REQUEST'] extends never
+        ? []
+        : [undefined, Endpoints[T]['REQUEST']]
+      : Endpoints[T]['REQUEST'] extends never
+      ? [Endpoints[T]['QUERY']]
+      : [Endpoints[T]['QUERY'], Endpoints[T]['REQUEST']]
+  ): Promise<Endpoints[T]['RESPONSE']> {
+    const baseUrl = ['add_transaction'].includes(endpoint)
+      ? this.gatewayUrl
+      : this.feederGatewayUrl;
+    const method = ['add_transaction', 'call_contract'].includes(endpoint) ? 'POST' : 'GET';
+    const queryString =
+      !isEmptyQueryObject(query) &&
+      `?${Object.entries(query)
+        .map(([key, value]) =>
+          key !== 'blockIdentifier' ? `${key}=${value}` : `${getFormattedBlockIdentifier(value)}`
+        )
+        .join('&')}`;
+
+    const { data } = await axios.request<Endpoints[T]['RESPONSE']>({
+      method,
+      url: urljoin(baseUrl, endpoint, queryString || ''),
+      data: stringify(request),
+      headers: method === 'POST' ? { 'Content-Type': 'application/json' } : {},
+    });
+
+    return data;
+  }
+
   /**
    * Gets the smart contract address on the goerli testnet.
    *
@@ -75,10 +119,7 @@ export class Provider implements ProviderInterface {
    * @returns starknet smart contract addresses
    */
   public async getContractAddresses(): Promise<GetContractAddressesResponse> {
-    const { data } = await axios.get<GetContractAddressesResponse>(
-      urljoin(this.feederGatewayUrl, 'get_contract_addresses')
-    );
-    return data;
+    return this.fetchEndpoint('get_contract_addresses');
   }
 
   /**
@@ -92,20 +133,21 @@ export class Provider implements ProviderInterface {
    * @returns the result of the function on the smart contract.
    */
   public async callContract(
-    invokeTransaction: CallContractTransaction,
+    { contractAddress, entrypoint, calldata = [] }: Call,
     blockIdentifier: BlockIdentifier = null
   ): Promise<CallContractResponse> {
-    const formattedBlockIdentifier = getFormattedBlockIdentifier(blockIdentifier);
-
-    const { data } = await axios.post<CallContractResponse>(
-      urljoin(this.feederGatewayUrl, 'call_contract', formattedBlockIdentifier),
+    return this.fetchEndpoint(
+      'call_contract',
+      {
+        blockIdentifier,
+      },
       {
         signature: [],
-        calldata: [],
-        ...invokeTransaction,
+        contract_address: contractAddress,
+        entry_point_selector: getSelectorFromName(entrypoint),
+        calldata,
       }
     );
-    return data;
   }
 
   /**
@@ -118,12 +160,7 @@ export class Provider implements ProviderInterface {
    * @returns the block object { block_number, previous_block_number, state_root, status, timestamp, transaction_receipts, transactions }
    */
   public async getBlock(blockIdentifier: BlockIdentifier = null): Promise<GetBlockResponse> {
-    const formattedBlockIdentifier = getFormattedBlockIdentifier(blockIdentifier);
-
-    const { data } = await axios.get<GetBlockResponse>(
-      urljoin(this.feederGatewayUrl, 'get_block', formattedBlockIdentifier)
-    );
-    return data;
+    return this.fetchEndpoint('get_block', { blockIdentifier });
   }
 
   /**
@@ -140,16 +177,7 @@ export class Provider implements ProviderInterface {
     contractAddress: string,
     blockIdentifier: BlockIdentifier = null
   ): Promise<GetCodeResponse> {
-    const formattedBlockIdentifier = getFormattedBlockIdentifier(blockIdentifier);
-
-    const { data } = await axios.get<GetCodeResponse>(
-      urljoin(
-        this.feederGatewayUrl,
-        'get_code',
-        `?contractAddress=${contractAddress}&${formattedBlockIdentifier}`
-      )
-    );
-    return data;
+    return this.fetchEndpoint('get_code', { blockIdentifier, contractAddress });
   }
 
   // TODO: add proper type
@@ -169,16 +197,7 @@ export class Provider implements ProviderInterface {
     key: number,
     blockIdentifier: BlockIdentifier = null
   ): Promise<object> {
-    const formattedBlockIdentifier = getFormattedBlockIdentifier(blockIdentifier);
-
-    const { data } = await axios.get<object>(
-      urljoin(
-        this.feederGatewayUrl,
-        'get_storage_at',
-        `?contractAddress=${contractAddress}&key=${key}&${formattedBlockIdentifier}`
-      )
-    );
-    return data;
+    return this.fetchEndpoint('get_storage_at', { blockIdentifier, contractAddress, key });
   }
 
   /**
@@ -190,31 +209,8 @@ export class Provider implements ProviderInterface {
    * @returns the transaction status object { block_number, tx_status: NOT_RECEIVED | RECEIVED | PENDING | REJECTED | ACCEPTED_ONCHAIN }
    */
   public async getTransactionStatus(txHash: BigNumberish): Promise<GetTransactionStatusResponse> {
-    const txHashBn = toBN(txHash);
-    const { data } = await axios.get<GetTransactionStatusResponse>(
-      urljoin(
-        this.feederGatewayUrl,
-        'get_transaction_status',
-        `?transactionHash=${toHex(txHashBn)}`
-      )
-    );
-    return data;
-  }
-
-  /**
-   * Gets the transaction information from a tx id.
-   *
-   * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L54-L58)
-   *
-   * @param txHash
-   * @returns the transacton object { transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? }
-   */
-  public async getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {
-    const txHashBn = toBN(txHash);
-    const { data } = await axios.get<GetTransactionResponse>(
-      urljoin(this.feederGatewayUrl, 'get_transaction', `?transactionHash=${toHex(txHashBn)}`)
-    );
-    return data;
+    const txHashHex = toHex(toBN(txHash));
+    return this.fetchEndpoint('get_transaction_status', { transactionHash: txHashHex });
   }
 
   /**
@@ -242,29 +238,16 @@ export class Provider implements ProviderInterface {
   }
 
   /**
-   * Invoke a function on the starknet contract
+   * Gets the transaction information from a tx id.
    *
-   * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/gateway/gateway_client.py#L13-L17)
+   * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L54-L58)
    *
-   * @param transaction - transaction to be invoked
-   * @returns a confirmation of invoking a function on the starknet contract
+   * @param txHash
+   * @returns the transacton object { transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? }
    */
-  public async addTransaction(transaction: Transaction): Promise<AddTransactionResponse> {
-    const signature =
-      transaction.type === 'INVOKE_FUNCTION' && formatSignature(transaction.signature);
-    const contract_address_salt =
-      transaction.type === 'DEPLOY' && toHex(toBN(transaction.contract_address_salt));
-
-    const { data } = await axios.post<AddTransactionResponse>(
-      urljoin(this.gatewayUrl, 'add_transaction'),
-      stringify({
-        ...transaction, // the tx can contain BigInts, so we use our own `stringify`
-        ...(Array.isArray(signature) && { signature }), // not needed on deploy tx
-        ...(contract_address_salt && { contract_address_salt }), // not needed on invoke tx
-      }),
-      { headers: { 'Content-Type': 'application/json' } }
-    );
-    return data;
+  public async getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {
+    const txHashHex = toHex(toBN(txHash));
+    return this.fetchEndpoint('get_transaction', { transactionHash: txHashHex });
   }
 
   /**
@@ -275,21 +258,24 @@ export class Provider implements ProviderInterface {
    * @returns a confirmation of sending a transaction on the starknet contract
    */
   public deployContract(
-    contract: CompiledContract | string,
-    constructorCalldata: string[] = [],
-    addressSalt: BigNumberish = randomAddress()
+    payload: DeployContractPayload,
+    _abi?: Abi
   ): Promise<AddTransactionResponse> {
     const parsedContract =
-      typeof contract === 'string' ? (parse(contract) as CompiledContract) : contract;
+      typeof payload.contract === 'string'
+        ? (parse(payload.contract) as CompiledContract)
+        : payload.contract;
     const contractDefinition = {
       ...parsedContract,
       program: compressProgram(parsedContract.program),
     };
 
-    return this.addTransaction({
+    return this.fetchEndpoint('add_transaction', undefined, {
       type: 'DEPLOY',
-      contract_address_salt: addressSalt,
-      constructor_calldata: constructorCalldata,
+      contract_address_salt: payload.addressSalt ?? randomAddress(),
+      constructor_calldata: bigNumberishArrayToDecimalStringArray(
+        payload.constructorCalldata ?? []
+      ),
       contract_definition: contractDefinition,
     });
   }
@@ -303,18 +289,13 @@ export class Provider implements ProviderInterface {
    * @param signature - (optional) signature to send along
    * @returns response from addTransaction
    */
-  public invokeFunction(
-    contractAddress: string,
-    entrypointSelector: string,
-    calldata?: string[],
-    signature?: Signature
-  ): Promise<AddTransactionResponse> {
-    return this.addTransaction({
+  public invokeFunction(invocation: Invocation, _abi?: Abi): Promise<AddTransactionResponse> {
+    return this.fetchEndpoint('add_transaction', undefined, {
       type: 'INVOKE_FUNCTION',
-      contract_address: contractAddress,
-      entry_point_selector: entrypointSelector,
-      calldata,
-      signature,
+      contract_address: invocation.contractAddress,
+      entry_point_selector: getSelectorFromName(invocation.entrypoint),
+      calldata: bigNumberishArrayToDecimalStringArray(invocation.calldata ?? []),
+      signature: bigNumberishArrayToDecimalStringArray(invocation.signature ?? []),
     });
   }
 
