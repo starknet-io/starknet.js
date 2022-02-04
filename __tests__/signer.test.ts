@@ -12,6 +12,7 @@ import {
   number,
   stark,
 } from '../src';
+import { toBN } from '../src/utils/number';
 
 const compiledArgentAccount: CompiledContract = json.parse(
   fs.readFileSync('./__mocks__/ArgentAccount.json').toString('ascii')
@@ -31,24 +32,23 @@ describe('deploy and test Wallet', () => {
   let signer: Signer;
 
   beforeAll(async () => {
-    const { code: codeErc20, address: erc20AddressLocal } = await defaultProvider.deployContract(
-      compiledErc20,
-      []
-    );
+    const { code: codeErc20, address: erc20AddressLocal } = await defaultProvider.deployContract({
+      contract: compiledErc20,
+    });
     erc20Address = erc20AddressLocal;
     erc20 = new Contract(compiledErc20.abi, erc20Address);
 
     expect(codeErc20).toBe('TRANSACTION_RECEIVED');
 
-    const { code, address: walletAddressLocal } = await defaultProvider.deployContract(
-      compiledArgentAccount,
-      compileCalldata({
+    const { code, address: walletAddressLocal } = await defaultProvider.deployContract({
+      contract: compiledArgentAccount,
+      constructorCalldata: compileCalldata({
         signer: starkKeyPub,
         guardian: '0',
         L1_address: '0',
       }),
-      starkKeyPub
-    );
+      addressSalt: starkKeyPub,
+    });
     walletAddress = walletAddressLocal;
     expect(code).toBe('TRANSACTION_RECEIVED');
 
@@ -68,8 +68,8 @@ describe('deploy and test Wallet', () => {
   });
   test('read nonce', async () => {
     const { result } = await signer.callContract({
-      contract_address: signer.address,
-      entry_point_selector: stark.getSelectorFromName('get_nonce'),
+      contractAddress: signer.address,
+      entrypoint: 'get_nonce',
     });
     const nonce = result[0];
 
@@ -83,11 +83,10 @@ describe('deploy and test Wallet', () => {
     expect(number.toBN(res as string).toString()).toStrictEqual(number.toBN(1000).toString());
   });
   test('execute by wallet owner', async () => {
-    const { code, transaction_hash } = await signer.addTransaction({
-      type: 'INVOKE_FUNCTION',
-      contract_address: erc20Address,
-      entry_point_selector: stark.getSelectorFromName('transfer'),
-      calldata: [erc20Address, '10'],
+    const { code, transaction_hash } = await signer.invokeFunction({
+      contractAddress: erc20Address,
+      entrypoint: 'transfer',
+      calldata: [toBN(erc20Address).toString(), '10'],
     });
 
     expect(code).toBe('TRANSACTION_RECEIVED');
@@ -102,15 +101,14 @@ describe('deploy and test Wallet', () => {
   });
   test('execute with custom nonce', async () => {
     const { result } = await signer.callContract({
-      contract_address: signer.address,
-      entry_point_selector: stark.getSelectorFromName('get_nonce'),
+      contractAddress: signer.address,
+      entrypoint: 'get_nonce',
     });
-    const nonce = parseInt(result[0], 10);
-    const { code, transaction_hash } = await signer.addTransaction({
-      type: 'INVOKE_FUNCTION',
-      contract_address: erc20Address,
-      entry_point_selector: stark.getSelectorFromName('transfer'),
-      calldata: [erc20Address, '10'],
+    const nonce = toBN(result[0]).toNumber();
+    const { code, transaction_hash } = await signer.invokeFunction({
+      contractAddress: erc20Address,
+      entrypoint: 'transfer',
+      calldata: [toBN(erc20Address).toString(), '10'],
       nonce,
     });
 

@@ -1,20 +1,47 @@
-import { Provider } from '../provider';
-import { AddTransactionResponse, Signature, Transaction } from '../types';
+import { ProviderInterface } from '../provider';
+import {
+  Abi,
+  AddTransactionResponse,
+  DeployContractPayload,
+  Invocation,
+  Signature,
+} from '../types';
 import { BigNumberish } from '../utils/number';
 import { TypedData } from '../utils/typedData/types';
 
-export abstract class SignerInterface extends Provider {
+export abstract class SignerInterface extends ProviderInterface {
   public abstract address: string;
+
   /**
-   * Invoke a function on the starknet contract
+   * Deploys a given compiled contract (json) to starknet
    *
-   * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/gateway/gateway_client.py#L13-L17)
-   *
-   * @param transaction - transaction to be invoked
-   * @returns a confirmation of invoking a function on the starknet contract
+   * @param payload payload to be deployed containing:
+   * - compiled contract code
+   * - constructor calldata
+   * - address salt
+   * @param abi the abi of the contract
+   * @returns a confirmation of sending a transaction on the starknet contract
    */
-  public abstract override addTransaction(
-    transaction: Transaction
+  public abstract override deployContract(
+    payload: DeployContractPayload,
+    abi?: Abi
+  ): Promise<AddTransactionResponse>;
+
+  /**
+   * Invokes a function on starknet
+   *
+   * @param invocation the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   * @param abi (optional) the abi of the contract for better displaying
+   *
+   * @returns response from addTransaction
+   */
+  public abstract override invokeFunction(
+    invocation: Invocation,
+    abi?: Abi
   ): Promise<AddTransactionResponse>;
 
   /**
@@ -57,4 +84,6 @@ export abstract class SignerInterface extends Provider {
    * @throws {Error} if the signature is not a valid signature
    */
   public abstract verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean>;
+
+  public abstract getNonce(): Promise<string>;
 }

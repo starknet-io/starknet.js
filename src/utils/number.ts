@@ -42,3 +42,7 @@ export function assertInRange(
     `Message not signable, ${messageSuffix}.`
   );
 }
+
+export function bigNumberishArrayToDecimalStringArray(rawCalldata: BigNumberish[]): string[] {
+  return rawCalldata.map((x) => toBN(x).toString(10));
+}

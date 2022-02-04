@@ -88,8 +88,8 @@ describe('defaultProvider', () => {
     test('callContract()', () => {
       return expect(
         defaultProvider.callContract({
-          contract_address: '0x9ff64f4ab0e1fe88df4465ade98d1ea99d5732761c39279b8e1374fa943e9b',
-          entry_point_selector: stark.getSelectorFromName('balance_of'),
+          contractAddress: '0x9ff64f4ab0e1fe88df4465ade98d1ea99d5732761c39279b8e1374fa943e9b',
+          entrypoint: 'balance_of',
           calldata: compileCalldata({
             user: '0x9ff64f4ab0e1fe88df4465ade98d1ea99d5732761c39279b8e1374fa943e9b',
           }),
@@ -99,41 +99,17 @@ describe('defaultProvider', () => {
   });
 
   describe('addTransaction()', () => {
-    test('type: "DEPLOY"', async () => {
+    test('deployContract()', async () => {
       const inputContract = compiledArgentAccount as unknown as CompiledContract;
 
-      const contractDefinition = {
-        ...inputContract,
-        program: stark.compressProgram(inputContract.program),
-      };
-
-      const response = await defaultProvider.addTransaction({
-        type: 'DEPLOY',
-        contract_address_salt: stark.randomAddress(),
-        constructor_calldata: compileCalldata({
+      const response = await defaultProvider.deployContract({
+        contract: inputContract,
+        constructorCalldata: compileCalldata({
           signer: stark.randomAddress(),
           guardian: '0',
           L1_address: '0',
         }),
-        contract_definition: contractDefinition,
       });
-
-      expect(response.code).toBe('TRANSACTION_RECEIVED');
-      expect(response.transaction_hash).toBeDefined();
-      expect(response.address).toBeDefined();
-    });
-
-    test('deployContract()', async () => {
-      const inputContract = compiledArgentAccount as unknown as CompiledContract;
-
-      const response = await defaultProvider.deployContract(
-        inputContract,
-        compileCalldata({
-          signer: stark.randomAddress(),
-          guardian: '0',
-          L1_address: '0',
-        })
-      );
 
       expect(response.code).toBe('TRANSACTION_RECEIVED');
       expect(response.transaction_hash).toBeDefined();

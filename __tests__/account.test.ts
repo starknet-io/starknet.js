@@ -49,24 +49,23 @@ describe('deploy and test Wallet', () => {
   let erc20: Contract;
   let erc20Address: string;
   beforeAll(async () => {
-    const { code: codeErc20, address: erc20AddressLocal } = await defaultProvider.deployContract(
-      compiledErc20,
-      []
-    );
+    const { code: codeErc20, address: erc20AddressLocal } = await defaultProvider.deployContract({
+      contract: compiledErc20,
+    });
     erc20Address = erc20AddressLocal;
     erc20 = new Contract(compiledErc20.abi, erc20Address);
 
     expect(codeErc20).toBe('TRANSACTION_RECEIVED');
 
-    const { code, address: walletAddressLocal } = await defaultProvider.deployContract(
-      compiledArgentAccount,
-      compileCalldata({
+    const { code, address: walletAddressLocal } = await defaultProvider.deployContract({
+      contract: compiledArgentAccount,
+      constructorCalldata: compileCalldata({
         signer: starkKeyPub,
         guardian: '0',
         L1_address: '0',
       }),
-      starkKeyPub
-    );
+      addressSalt: starkKeyPub,
+    });
     walletAddress = walletAddressLocal;
     wallet = new Contract(compiledArgentAccount.abi, walletAddress);
     expect(code).toBe('TRANSACTION_RECEIVED');
