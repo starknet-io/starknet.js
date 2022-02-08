@@ -113,6 +113,6 @@ This library would not be possible without these rockstars.
 
 ## 📜 License
 
-Copyright (c) 2021 Sean James Han
+Copyright (c) 2022 0xs34n
 
 Licensed under the [MIT license](https://github.com/seanjameshan/starknet.js/blob/main/LICENSE).
