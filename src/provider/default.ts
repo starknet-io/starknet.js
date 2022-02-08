@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosRequestHeaders } from 'axios';
 import urljoin from 'url-join';
 
 import {
@@ -79,34 +79,65 @@ export class Provider implements ProviderInterface {
     }
   }
 
+  private getFetchUrl(endpoint: keyof Endpoints) {
+    const gatewayUrlEndpoints = ['add_transaction'];
+
+    return gatewayUrlEndpoints.includes(endpoint) ? this.gatewayUrl : this.feederGatewayUrl;
+  }
+
+  private getFetchMethod(endpoint: keyof Endpoints) {
+    const postMethodEndpoints = ['add_transaction', 'call_contract'];
+
+    return postMethodEndpoints.includes(endpoint) ? 'POST' : 'GET';
+  }
+
+  private getQueryString(query?: Record<string, any>): string {
+    if (isEmptyQueryObject(query)) {
+      return '';
+    }
+    const queryString = Object.entries(query)
+      .map(([key, value]) => {
+        if (key === 'blockIdentifier') {
+          return `${getFormattedBlockIdentifier(value)}`;
+        }
+        return `${key}=${value}`;
+      })
+      .join('&');
+
+    return `?${queryString}`;
+  }
+
+  private getHeaders(method: 'POST' | 'GET'): AxiosRequestHeaders | undefined {
+    if (method === 'POST') {
+      return {
+        'Content-Type': 'application/json',
+      };
+    }
+    return undefined;
+  }
+
   // typesafe fetch
   protected async fetchEndpoint<T extends keyof Endpoints>(
     endpoint: T,
+    // typescript type magiuc to create a nice fitting function interface
     ...[query, request]: Endpoints[T]['QUERY'] extends never
       ? Endpoints[T]['REQUEST'] extends never
-        ? []
+        ? [] // when no query and no request is needed, we can omit the query and request parameters
         : [undefined, Endpoints[T]['REQUEST']]
       : Endpoints[T]['REQUEST'] extends never
-      ? [Endpoints[T]['QUERY']]
-      : [Endpoints[T]['QUERY'], Endpoints[T]['REQUEST']]
+      ? [Endpoints[T]['QUERY']] // when no request is needed, we can omit the request parameter
+      : [Endpoints[T]['QUERY'], Endpoints[T]['REQUEST']] // when both query and request are needed, we cant omit anything
   ): Promise<Endpoints[T]['RESPONSE']> {
-    const baseUrl = ['add_transaction'].includes(endpoint)
-      ? this.gatewayUrl
-      : this.feederGatewayUrl;
-    const method = ['add_transaction', 'call_contract'].includes(endpoint) ? 'POST' : 'GET';
-    const queryString =
-      !isEmptyQueryObject(query) &&
-      `?${Object.entries(query)
-        .map(([key, value]) =>
-          key !== 'blockIdentifier' ? `${key}=${value}` : `${getFormattedBlockIdentifier(value)}`
-        )
-        .join('&')}`;
+    const baseUrl = this.getFetchUrl(endpoint);
+    const method = this.getFetchMethod(endpoint);
+    const queryString = this.getQueryString(query);
+    const headers = this.getHeaders(method);
 
     const { data } = await axios.request<Endpoints[T]['RESPONSE']>({
       method,
-      url: urljoin(baseUrl, endpoint, queryString || ''),
+      url: urljoin(baseUrl, endpoint, queryString),
       data: stringify(request),
-      headers: method === 'POST' ? { 'Content-Type': 'application/json' } : {},
+      headers,
     });
 
     return data;
