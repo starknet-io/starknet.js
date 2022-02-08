@@ -3,11 +3,15 @@ import assert from 'minimalistic-assert';
 
 import { Provider, defaultProvider } from './provider';
 import { BlockIdentifier } from './provider/utils';
-import { Abi, AbiEntry, FunctionAbi, RawCalldata, Signature, StructAbi } from './types';
+import { Abi, AbiEntry, FunctionAbi, Signature, StructAbi } from './types';
 import { BigNumberish, toBN } from './utils/number';
 
+export type Struct = {
+  type: 'struct';
+  [k: string]: BigNumberish;
+};
 export type Args = {
-  [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
+  [inputName: string]: string | BigNumberish | BigNumberish[] | Struct | Struct[];
 };
 
 function parseFelt(candidate: string): BN {
@@ -118,31 +122,57 @@ export class Contract {
   }
 
   private parseResponseField(
-    element: AbiEntry | FunctionAbi,
-    responseIterator: Iterator<string>
-  ): Args {
-    let entries: AbiEntry[] = [];
-    if (['felt', 'felt*'].includes(element.type)) {
-      return responseIterator.next().value;
+    responseIterator: Iterator<string>,
+    output: AbiEntry,
+    parsedResult?: Args
+  ): any {
+    const { name, type } = output;
+    let arrLen: number;
+    const parsedDataArr: (BigNumberish | Struct)[] = [];
+    switch (true) {
+      case /_len/.test(name):
+        return parseFelt(responseIterator.next().value).toNumber();
+      case /\(felt/.test(type):
+        return type.split(',').reduce((acc) => {
+          acc.push(parseFelt(responseIterator.next().value));
+          return acc;
+        }, [] as BigNumberish[]);
+      case /\*/.test(type):
+        if (parsedResult && parsedResult[`${name}_len`]) {
+          arrLen = parsedResult[`${name}_len`] as number;
+          for (let i = 0; i < arrLen; i += 1) {
+            parsedDataArr.push(this.parseStructOrFelt(responseIterator, output));
+          }
+        }
+        return parsedDataArr;
+      case type in this.structs:
+        return this.parseStructOrFelt(responseIterator, output);
+      default:
+        return parseFelt(responseIterator.next().value);
     }
-    if (element.type in this.structs) {
-      entries = this.structs[element.type].members;
-    } else if ('outputs' in element) {
-      entries = element.outputs;
+  }
+
+  private parseStructOrFelt(
+    responseIterator: Iterator<string>,
+    output: AbiEntry
+  ): BigNumberish | Struct {
+    const type = output.type.replace(/\*/, '');
+    if (type in this.structs && this.structs[type]) {
+      return this.structs[type].members.reduce((acc, el) => {
+        acc[el.name] = this.parseStructOrFelt(responseIterator, el);
+        return acc;
+      }, {} as any);
     }
-    return entries.reduce(
-      (acc, member) => ({
-        ...acc,
-        [member.name]: this.parseResponseField(member, responseIterator),
-      }),
-      {}
-    );
+    return parseFelt(responseIterator.next().value);
   }
 
   private parseResponse(method: string, response: string[]): Args {
-    const methodAbi = this.abi.find((abi) => abi.name === method) as FunctionAbi;
+    const { outputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
     const responseIterator = response.flat()[Symbol.iterator]();
-    return this.parseResponseField(methodAbi, responseIterator);
+    return outputs.flat().reduce((acc, output) => {
+      acc[output.name] = this.parseResponseField(responseIterator, output, acc);
+      return acc;
+    }, {} as Args);
   }
 
   public invoke(method: string, args: Args = {}, signature?: Signature) {
@@ -172,13 +202,12 @@ export class Contract {
 
     // compile calldata
     const calldata = compileCalldata(args);
-
     return this.provider
       .callContract(
         {
           contractAddress: this.connectedTo,
-          entrypoint: method,
           calldata,
+          entrypoint: method,
         },
         blockIdentifier
       )
