@@ -4,7 +4,7 @@
 export * from './types';
 export * from './contract';
 export * from './provider';
-export * from './signer';
+export * from './account';
 
 /**
  * Utils

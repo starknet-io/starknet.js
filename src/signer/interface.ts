@@ -1,48 +1,13 @@
-import { ProviderInterface } from '../provider';
-import {
-  Abi,
-  AddTransactionResponse,
-  DeployContractPayload,
-  Invocation,
-  Signature,
-} from '../types';
-import { BigNumberish } from '../utils/number';
-import { TypedData } from '../utils/typedData/types';
+import { Abi, Signature, TransactionDetails } from '../types';
+import { TypedData } from '../utils/typedData';
 
-export abstract class SignerInterface extends ProviderInterface {
-  public abstract address: string;
-
+export abstract class SignerInterface {
   /**
-   * Deploys a given compiled contract (json) to starknet
+   * Method to get the public key of the signer
    *
-   * @param payload payload to be deployed containing:
-   * - compiled contract code
-   * - constructor calldata
-   * - address salt
-   * @param abi the abi of the contract
-   * @returns a confirmation of sending a transaction on the starknet contract
+   * @returns public key of signer as hex string with 0x prefix
    */
-  public abstract override deployContract(
-    payload: DeployContractPayload,
-    abi?: Abi
-  ): Promise<AddTransactionResponse>;
-
-  /**
-   * Invokes a function on starknet
-   *
-   * @param invocation the invocation object containing:
-   * - contractAddress - the address of the contract
-   * - entrypoint - the entrypoint of the contract
-   * - calldata - (defaults to []) the calldata
-   * - signature - (defaults to []) the signature
-   * @param abi (optional) the abi of the contract for better displaying
-   *
-   * @returns response from addTransaction
-   */
-  public abstract override invokeFunction(
-    invocation: Invocation,
-    abi?: Abi
-  ): Promise<AddTransactionResponse>;
+  public abstract getPubKey(): Promise<string>;
 
   /**
    * Sign an JSON object for off-chain usage with the starknet private key and return the signature
@@ -52,38 +17,19 @@ export abstract class SignerInterface extends ProviderInterface {
    * @returns the signature of the JSON object
    * @throws {Error} if the JSON object is not a valid JSON
    */
-  public abstract signMessage(typedData: TypedData): Promise<Signature>;
+  public abstract signMessage(typedData: TypedData, walletAddress: string): Promise<Signature>;
 
   /**
-   * Hash a JSON object with pederson hash and return the hash
-   * This adds a message prefix so it cant be interchanged with transactions
+   * Signs a transaction with the starknet private key and returns the signature
    *
-   * @param json - JSON object to be hashed
-   * @returns the hash of the JSON object
-   * @throws {Error} if the JSON object is not a valid JSON
-   */
-  public abstract hashMessage(typedData: TypedData): Promise<string>;
-
-  /**
-   * Verify a signature of a JSON object
+   * @param invocation the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   * @param abi (optional) the abi of the contract for better displaying
    *
-   * @param json - JSON object to be verified
-   * @param signature - signature of the JSON object
-   * @returns true if the signature is valid, false otherwise
-   * @throws {Error} if the JSON object is not a valid JSON or the signature is not a valid signature
+   * @returns signature
    */
-  public abstract verifyMessage(typedData: TypedData, signature: Signature): Promise<boolean>;
-
-  /**
-   * Verify a signature of a given hash
-   * @warning This method is not recommended, use verifyMessage instead
-   *
-   * @param hash - hash to be verified
-   * @param signature - signature of the hash
-   * @returns true if the signature is valid, false otherwise
-   * @throws {Error} if the signature is not a valid signature
-   */
-  public abstract verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean>;
-
-  public abstract getNonce(): Promise<string>;
+  public abstract signTransaction(transaction: TransactionDetails, abi?: Abi): Promise<Signature>;
 }
