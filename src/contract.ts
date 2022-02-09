@@ -2,6 +2,7 @@ import BN from 'bn.js';
 import assert from 'minimalistic-assert';
 
 import { Provider, defaultProvider } from './provider';
+import { BlockIdentifier } from './provider/utils';
 import { Abi, AbiEntry, FunctionAbi, Signature, StructAbi } from './types';
 import { BigNumberish, toBN } from './utils/number';
 import { getSelectorFromName } from './utils/stark';
@@ -166,7 +167,7 @@ export class Contract {
     });
   }
 
-  public async call(method: string, args: Args = {}) {
+  public async call(method: string, args: Args = {}, blockIdentifier: BlockIdentifier = null) {
     // ensure contract is connected
     assert(this.connectedTo !== null, 'contract isnt connected to an address');
 
@@ -178,11 +179,14 @@ export class Contract {
     const calldata = compileCalldata(args);
 
     return this.provider
-      .callContract({
-        contract_address: this.connectedTo,
-        calldata,
-        entry_point_selector: entrypointSelector,
-      })
+      .callContract(
+        {
+          contract_address: this.connectedTo,
+          calldata,
+          entry_point_selector: entrypointSelector,
+        },
+        blockIdentifier
+      )
       .then((x) => this.parseResponse(method, x.result));
   }
 }
