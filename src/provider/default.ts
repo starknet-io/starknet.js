@@ -313,6 +313,7 @@ export class Provider implements ProviderInterface {
 
   /**
    * Invokes a function on starknet
+   * @deprecated This method wont be supported as soon as fees are mandatory
    *
    * @param contractAddress - target contract address for invoke
    * @param entrypointSelector - target entrypoint selector for
