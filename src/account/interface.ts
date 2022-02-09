@@ -29,7 +29,7 @@ export abstract class AccountInterface extends ProviderInterface {
   ): Promise<AddTransactionResponse>;
 
   /**
-   * Invokes a function on starknet
+   * Invoke execute function in account contract
    *
    * @param transactions the invocation object or an array of them, containing:
    * - contractAddress - the address of the contract
