@@ -131,7 +131,6 @@ export abstract class ProviderInterface {
    * - entrypoint - the entrypoint of the contract
    * - calldata - (defaults to []) the calldata
    * - signature - (defaults to []) the signature
-   * @param abi (optional) the abi of the contract for better displaying
    *
    * @returns response from addTransaction
    */
