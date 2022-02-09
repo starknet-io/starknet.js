@@ -4,6 +4,7 @@ import {
   AddTransactionResponse,
   DeployContractPayload,
   Invocation,
+  InvocationsDetails,
   Signature,
 } from '../types';
 import { BigNumberish } from '../utils/number';
@@ -30,7 +31,7 @@ export abstract class AccountInterface extends ProviderInterface {
   /**
    * Invokes a function on starknet
    *
-   * @param invocation the invocation object containing:
+   * @param transactions the invocation object or an array of them, containing:
    * - contractAddress - the address of the contract
    * - entrypoint - the entrypoint of the contract
    * - calldata - (defaults to []) the calldata
@@ -39,9 +40,10 @@ export abstract class AccountInterface extends ProviderInterface {
    *
    * @returns response from addTransaction
    */
-  public abstract override invokeFunction(
-    invocation: Invocation,
-    abi?: Abi
+  public abstract execute(
+    transactions: Invocation | Invocation[],
+    abis?: Abi[],
+    transactionsDetail?: InvocationsDetails
   ): Promise<AddTransactionResponse>;
 
   /**

@@ -41,7 +41,7 @@ export function compileCalldata(args: Args): RawCalldata {
 export class Contract {
   connectedTo: string | null = null;
 
-  abi: Abi[];
+  abi: Abi;
 
   structs: { [name: string]: StructAbi };
 
@@ -53,7 +53,7 @@ export class Contract {
    * @param abi - Abi of the contract object
    * @param address (optional) - address to connect to
    */
-  constructor(abi: Abi[], address: string | null = null, provider: Provider = defaultProvider) {
+  constructor(abi: Abi, address: string | null = null, provider: Provider = defaultProvider) {
     this.connectedTo = address;
     this.provider = provider;
     this.abi = abi;

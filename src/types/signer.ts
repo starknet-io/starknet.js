@@ -1,7 +1,5 @@
-import { BigNumberish } from '../utils/number';
-import { Invocation } from './lib';
+import { InvocationsDetails } from './lib';
 
-export interface TransactionDetails extends Omit<Invocation, 'nonce' | 'signature'> {
+export interface InvocationsSignerDetails extends Required<InvocationsDetails> {
   walletAddress: string;
-  nonce: BigNumberish;
 }

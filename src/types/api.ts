@@ -131,7 +131,7 @@ export type GetBlockResponse = {
 
 export type GetCodeResponse = {
   bytecode: string[];
-  abi: Abi[];
+  abi: Abi;
 };
 
 export type GetTransactionStatusResponse = {

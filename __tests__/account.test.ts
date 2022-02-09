@@ -83,7 +83,7 @@ describe('deploy and test Wallet', () => {
     expect(number.toBN(res as string).toString()).toStrictEqual(number.toBN(1000).toString());
   });
   test('execute by wallet owner', async () => {
-    const { code, transaction_hash } = await account.invokeFunction({
+    const { code, transaction_hash } = await account.execute({
       contractAddress: erc20Address,
       entrypoint: 'transfer',
       calldata: [toBN(erc20Address).toString(), '10'],
@@ -105,12 +105,15 @@ describe('deploy and test Wallet', () => {
       entrypoint: 'get_nonce',
     });
     const nonce = toBN(result[0]).toNumber();
-    const { code, transaction_hash } = await account.invokeFunction({
-      contractAddress: erc20Address,
-      entrypoint: 'transfer',
-      calldata: [toBN(erc20Address).toString(), '10'],
-      nonce,
-    });
+    const { code, transaction_hash } = await account.execute(
+      {
+        contractAddress: erc20Address,
+        entrypoint: 'transfer',
+        calldata: [toBN(erc20Address).toString(), '10'],
+      },
+      undefined,
+      { nonce }
+    );
 
     expect(code).toBe('TRANSACTION_RECEIVED');
     await defaultProvider.waitForTx(transaction_hash);
