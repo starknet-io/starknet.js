@@ -1,4 +1,4 @@
-import { Abi, KeyPair, Signature, TransactionDetails } from '../types';
+import { Abi, Invocation, InvocationsSignerDetails, KeyPair, Signature } from '../types';
 import { getStarkKey, sign } from '../utils/ellipticCurve';
 import { addHexPrefix } from '../utils/encode';
 import { hashMessage } from '../utils/hash';
@@ -19,9 +19,21 @@ export class Signer implements SignerInterface {
   }
 
   public async signTransaction(
-    { contractAddress, entrypoint, calldata = [], nonce, walletAddress }: TransactionDetails,
-    _abi?: Abi
+    transactions: Invocation[],
+    transactionsDetail: InvocationsSignerDetails,
+    abis: Abi[] = []
   ): Promise<Signature> {
+    if (transactions.length !== 1) {
+      throw new Error('Only one transaction at a time is currently supported by this signer');
+    }
+    if (abis?.length !== 0 && abis.length !== transactions.length) {
+      throw new Error('ABI must be provided for each transaction or no transaction');
+    }
+    // now use abi to display decoded data somewhere, but as this signer is headless, we can't do that
+
+    const { contractAddress, entrypoint, calldata = [] } = transactions[0];
+    const { nonce, walletAddress } = transactionsDetail;
+
     const nonceBn = toBN(nonce);
     const entrypointSelector = getSelectorFromName(entrypoint);
     const calldataDecimal = bigNumberishArrayToDecimalStringArray(calldata);

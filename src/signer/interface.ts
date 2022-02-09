@@ -1,4 +1,4 @@
-import { Abi, Signature, TransactionDetails } from '../types';
+import { Abi, Invocation, InvocationsSignerDetails, Signature } from '../types';
 import { TypedData } from '../utils/typedData';
 
 export abstract class SignerInterface {
@@ -31,5 +31,9 @@ export abstract class SignerInterface {
    *
    * @returns signature
    */
-  public abstract signTransaction(transaction: TransactionDetails, abi?: Abi): Promise<Signature>;
+  public abstract signTransaction(
+    transactions: Invocation[],
+    transactionsDetail: InvocationsSignerDetails,
+    abis?: Abi[]
+  ): Promise<Signature>;
 }

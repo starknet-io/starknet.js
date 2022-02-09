@@ -16,8 +16,11 @@ export type Invocation = {
   contractAddress: string;
   entrypoint: string;
   calldata?: RawCalldata;
-  nonce?: BigNumberish;
   signature?: Signature;
+};
+
+export type InvocationsDetails = {
+  nonce?: BigNumberish;
 };
 
 export type Call = Omit<Invocation, 'signature' | 'nonce'>;
@@ -51,14 +54,14 @@ export type StructAbi = {
   type: 'struct';
 };
 
-export type Abi = FunctionAbi | StructAbi;
+export type Abi = Array<FunctionAbi | StructAbi>;
 
 export type EntryPointsByType = object;
 export type Program = Record<any, any>;
 export type BlockNumber = 'pending' | null | number;
 
 export type CompiledContract = {
-  abi: Abi[];
+  abi: Abi;
   entry_points_by_type: EntryPointsByType;
   program: Program;
 };

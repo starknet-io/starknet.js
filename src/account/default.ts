@@ -3,7 +3,14 @@ import assert from 'minimalistic-assert';
 import { compileCalldata } from '../contract';
 import { Provider } from '../provider';
 import { Signer, SignerInterface } from '../signer';
-import { Abi, AddTransactionResponse, Invocation, KeyPair, Signature } from '../types';
+import {
+  Abi,
+  AddTransactionResponse,
+  Invocation,
+  InvocationsDetails,
+  KeyPair,
+  Signature,
+} from '../types';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
 import { getSelectorFromName } from '../utils/stark';
 import { TypedData, getMessageHash } from '../utils/typedData';
@@ -36,10 +43,23 @@ export class Account extends Provider implements AccountInterface {
    * @param transaction - transaction to be invoked
    * @returns a confirmation of invoking a function on the starknet contract
    */
-  public override async invokeFunction(
-    { contractAddress, calldata = [], nonce, entrypoint, ...invocation }: Invocation,
-    _abi?: Abi
+  public async execute(
+    transactions: Invocation | Invocation[],
+    abis: Abi[] = [],
+    transactionsDetail: InvocationsDetails = {}
   ): Promise<AddTransactionResponse> {
+    if (Array.isArray(transactions) && transactions.length !== 1) {
+      throw new Error('Only one transaction at a time is currently supported');
+    }
+
+    const {
+      contractAddress,
+      calldata = [],
+      entrypoint,
+      ...invocation
+    } = Array.isArray(transactions) ? transactions[0] : transactions;
+    const { nonce } = transactionsDetail;
+
     assert(
       !invocation.signature,
       "Adding signatures to an account transaction currently isn't supported"
@@ -48,14 +68,18 @@ export class Account extends Provider implements AccountInterface {
     const nonceBn = toBN(nonce ?? (await this.getNonce()));
     const calldataDecimal = bigNumberishArrayToDecimalStringArray(calldata);
 
-    const signature = await this.signer.signTransaction({
-      ...invocation,
-      contractAddress,
-      walletAddress: this.address,
-      nonce: nonceBn,
-      calldata: calldataDecimal,
-      entrypoint,
-    });
+    const signature = await this.signer.signTransaction(
+      [
+        {
+          ...invocation,
+          contractAddress,
+          calldata: calldataDecimal,
+          entrypoint,
+        },
+      ],
+      { walletAddress: this.address, nonce: nonceBn },
+      abis
+    );
 
     const entrypointSelector = getSelectorFromName(entrypoint);
 
