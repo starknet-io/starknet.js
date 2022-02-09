@@ -19,6 +19,8 @@ export type Invocation = {
   signature?: Signature;
 };
 
+export type ExecuteInvocation = Omit<Invocation, 'signature'>;
+
 export type InvocationsDetails = {
   nonce?: BigNumberish;
 };

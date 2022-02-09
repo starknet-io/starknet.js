@@ -1,12 +1,10 @@
-import assert from 'minimalistic-assert';
-
 import { compileCalldata } from '../contract';
 import { Provider } from '../provider';
 import { Signer, SignerInterface } from '../signer';
 import {
   Abi,
   AddTransactionResponse,
-  Invocation,
+  ExecuteInvocation,
   InvocationsDetails,
   KeyPair,
   Signature,
@@ -44,7 +42,7 @@ export class Account extends Provider implements AccountInterface {
    * @returns a confirmation of invoking a function on the starknet contract
    */
   public async execute(
-    transactions: Invocation | Invocation[],
+    transactions: ExecuteInvocation | ExecuteInvocation[],
     abis: Abi[] = [],
     transactionsDetail: InvocationsDetails = {}
   ): Promise<AddTransactionResponse> {
@@ -59,11 +57,6 @@ export class Account extends Provider implements AccountInterface {
       ...invocation
     } = Array.isArray(transactions) ? transactions[0] : transactions;
     const { nonce } = transactionsDetail;
-
-    assert(
-      !invocation.signature,
-      "Adding signatures to an account transaction currently isn't supported"
-    );
 
     const nonceBn = toBN(nonce ?? (await this.getNonce()));
     const calldataDecimal = bigNumberishArrayToDecimalStringArray(calldata);
@@ -83,18 +76,17 @@ export class Account extends Provider implements AccountInterface {
 
     const entrypointSelector = getSelectorFromName(entrypoint);
 
-    return super.fetchEndpoint('add_transaction', undefined, {
-      type: 'INVOKE_FUNCTION',
-      entry_point_selector: getSelectorFromName('execute'),
-      calldata: bigNumberishArrayToDecimalStringArray([
+    return super.invokeFunction({
+      contractAddress: this.address,
+      entrypoint: 'execute',
+      calldata: [
         contractAddress,
         entrypointSelector,
         calldataDecimal.length.toString(),
         ...calldataDecimal,
         nonceBn.toString(),
-      ]),
-      contract_address: this.address,
-      signature: bigNumberishArrayToDecimalStringArray(signature),
+      ],
+      signature,
     });
   }
 

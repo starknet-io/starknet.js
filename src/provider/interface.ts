@@ -1,5 +1,4 @@
 import type {
-  Abi,
   AddTransactionResponse,
   Call,
   CallContractResponse,
@@ -120,13 +119,9 @@ export abstract class ProviderInterface {
    * - compiled contract code
    * - constructor calldata
    * - address salt
-   * @param abi the abi of the contract
    * @returns a confirmation of sending a transaction on the starknet contract
    */
-  public abstract deployContract(
-    payload: DeployContractPayload,
-    abi?: Abi
-  ): Promise<AddTransactionResponse>;
+  public abstract deployContract(payload: DeployContractPayload): Promise<AddTransactionResponse>;
 
   /**
    * Invokes a function on starknet
@@ -140,10 +135,7 @@ export abstract class ProviderInterface {
    *
    * @returns response from addTransaction
    */
-  public abstract invokeFunction(
-    invocation: Invocation,
-    abi?: Abi
-  ): Promise<AddTransactionResponse>;
+  public abstract invokeFunction(invocation: Invocation): Promise<AddTransactionResponse>;
 
   public abstract waitForTx(txHash: BigNumberish, retryInterval?: number): Promise<void>;
 }
