@@ -79,7 +79,7 @@ export function getFormattedBlockIdentifier(blockIdentifier: BlockIdentifier = n
     return '';
   }
   if (blockIdentifierObject.type === 'BLOCK_NUMBER') {
-    return `?blockNumber=${blockIdentifierObject.data}`;
+    return `blockNumber=${blockIdentifierObject.data}`;
   }
-  return `?blockHash=${toHex(toBN(blockIdentifierObject.data))}`;
+  return `blockHash=${toHex(toBN(blockIdentifierObject.data))}`;
 }

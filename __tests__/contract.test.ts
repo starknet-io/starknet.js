@@ -14,7 +14,9 @@ describe('class Contract {}', () => {
       code,
       transaction_hash,
       address: erc20address,
-    } = await defaultProvider.deployContract(compiledERC20, []);
+    } = await defaultProvider.deployContract({
+      contract: compiledERC20,
+    });
 
     contract = new Contract(compiledERC20.abi, erc20address);
 

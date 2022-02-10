@@ -1,21 +1,13 @@
-import { Provider } from '../provider';
-import { AddTransactionResponse, Signature, Transaction } from '../types';
-import { BigNumberish } from '../utils/number';
-import { TypedData } from '../utils/typedData/types';
+import { Abi, Invocation, InvocationsSignerDetails, Signature } from '../types';
+import { TypedData } from '../utils/typedData';
 
-export abstract class SignerInterface extends Provider {
-  public abstract address: string;
+export abstract class SignerInterface {
   /**
-   * Invoke a function on the starknet contract
+   * Method to get the public key of the signer
    *
-   * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/gateway/gateway_client.py#L13-L17)
-   *
-   * @param transaction - transaction to be invoked
-   * @returns a confirmation of invoking a function on the starknet contract
+   * @returns public key of signer as hex string with 0x prefix
    */
-  public abstract override addTransaction(
-    transaction: Transaction
-  ): Promise<AddTransactionResponse>;
+  public abstract getPubKey(): Promise<string>;
 
   /**
    * Sign an JSON object for off-chain usage with the starknet private key and return the signature
@@ -25,36 +17,23 @@ export abstract class SignerInterface extends Provider {
    * @returns the signature of the JSON object
    * @throws {Error} if the JSON object is not a valid JSON
    */
-  public abstract signMessage(typedData: TypedData): Promise<Signature>;
+  public abstract signMessage(typedData: TypedData, walletAddress: string): Promise<Signature>;
 
   /**
-   * Hash a JSON object with pederson hash and return the hash
-   * This adds a message prefix so it cant be interchanged with transactions
+   * Signs a transaction with the starknet private key and returns the signature
    *
-   * @param json - JSON object to be hashed
-   * @returns the hash of the JSON object
-   * @throws {Error} if the JSON object is not a valid JSON
-   */
-  public abstract hashMessage(typedData: TypedData): Promise<string>;
-
-  /**
-   * Verify a signature of a JSON object
+   * @param invocation the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   * @param abi (optional) the abi of the contract for better displaying
    *
-   * @param json - JSON object to be verified
-   * @param signature - signature of the JSON object
-   * @returns true if the signature is valid, false otherwise
-   * @throws {Error} if the JSON object is not a valid JSON or the signature is not a valid signature
+   * @returns signature
    */
-  public abstract verifyMessage(typedData: TypedData, signature: Signature): Promise<boolean>;
-
-  /**
-   * Verify a signature of a given hash
-   * @warning This method is not recommended, use verifyMessage instead
-   *
-   * @param hash - hash to be verified
-   * @param signature - signature of the hash
-   * @returns true if the signature is valid, false otherwise
-   * @throws {Error} if the signature is not a valid signature
-   */
-  public abstract verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean>;
+  public abstract signTransaction(
+    transactions: Invocation[],
+    transactionsDetail: InvocationsSignerDetails,
+    abis?: Abi[]
+  ): Promise<Signature>;
 }

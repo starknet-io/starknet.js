@@ -3,14 +3,12 @@ import assert from 'minimalistic-assert';
 
 import { Provider, defaultProvider } from './provider';
 import { BlockIdentifier } from './provider/utils';
-import { Abi, AbiEntry, FunctionAbi, Signature, StructAbi } from './types';
+import { Abi, AbiEntry, FunctionAbi, RawCalldata, Signature, StructAbi } from './types';
 import { BigNumberish, toBN } from './utils/number';
-import { getSelectorFromName } from './utils/stark';
 
 export type Args = {
   [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
 };
-export type Calldata = string[];
 
 function parseFelt(candidate: string): BN {
   try {
@@ -29,7 +27,7 @@ function isFelt(candidate: string): boolean {
   }
 }
 
-export function compileCalldata(args: Args): Calldata {
+export function compileCalldata(args: Args): RawCalldata {
   return Object.values(args).flatMap((value) => {
     if (Array.isArray(value))
       return [toBN(value.length).toString(), ...value.map((x) => toBN(x).toString())];
@@ -44,7 +42,7 @@ export function compileCalldata(args: Args): Calldata {
 export class Contract {
   connectedTo: string | null = null;
 
-  abi: Abi[];
+  abi: Abi;
 
   structs: { [name: string]: StructAbi };
 
@@ -56,7 +54,7 @@ export class Contract {
    * @param abi - Abi of the contract object
    * @param address (optional) - address to connect to
    */
-  constructor(abi: Abi[], address: string | null = null, provider: Provider = defaultProvider) {
+  constructor(abi: Abi, address: string | null = null, provider: Provider = defaultProvider) {
     this.connectedTo = address;
     this.provider = provider;
     this.abi = abi;
@@ -155,15 +153,13 @@ export class Contract {
     this.validateMethodAndArgs('INVOKE', method, args);
 
     // compile calldata
-    const entrypointSelector = getSelectorFromName(method);
     const calldata = compileCalldata(args);
 
-    return this.provider.addTransaction({
-      type: 'INVOKE_FUNCTION',
-      contract_address: this.connectedTo,
+    return this.provider.invokeFunction({
+      contractAddress: this.connectedTo,
       signature,
       calldata,
-      entry_point_selector: entrypointSelector,
+      entrypoint: method,
     });
   }
 
@@ -175,15 +171,14 @@ export class Contract {
     this.validateMethodAndArgs('CALL', method, args);
 
     // compile calldata
-    const entrypointSelector = getSelectorFromName(method);
     const calldata = compileCalldata(args);
 
     return this.provider
       .callContract(
         {
-          contract_address: this.connectedTo,
+          contractAddress: this.connectedTo,
+          entrypoint: method,
           calldata,
-          entry_point_selector: entrypointSelector,
         },
         blockIdentifier
       )
