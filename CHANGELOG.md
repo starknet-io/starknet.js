@@ -1,3 +1,27 @@
+# [3.0.0](https://github.com/seanjameshan/starknet.js/compare/v2.9.0...v3.0.0) (2022-02-10)
+
+### Bug Fixes
+
+- **account:** dont allow additional signatures in execute ([ac02d46](https://github.com/seanjameshan/starknet.js/commit/ac02d46c5759904886f56a7b9e7e2686dbf52d4c))
+- comments ([f261120](https://github.com/seanjameshan/starknet.js/commit/f261120e1971710cde8f95bd17a5869860db8160))
+- review comments ([ee93bd6](https://github.com/seanjameshan/starknet.js/commit/ee93bd6e51eabcf3507a77d21c5bdc6fe93d5d1c))
+- **test:** remove only for getTransactionReceipt test ([eb11d3b](https://github.com/seanjameshan/starknet.js/commit/eb11d3b60f434f81390f4d13c0462ad8c7ed7321))
+- **types:** change type of `block_number` from `number` to `BlockNumber` in TransactionReceipt ([7a48ff8](https://github.com/seanjameshan/starknet.js/commit/7a48ff8e15a93a778fec62fdff10f92b1a073dec))
+- **types:** update TransactionReceipt type ([9f9f6a2](https://github.com/seanjameshan/starknet.js/commit/9f9f6a2f4cf3b8bfb438edda06ec38bd1471c03d))
+
+### Features
+
+- **account:** introduce execute method ([0be78c6](https://github.com/seanjameshan/starknet.js/commit/0be78c67a40d0b457c571a57a8b49008f5e423de))
+- **contract:** add an option to pass block identifier ([e34dd86](https://github.com/seanjameshan/starknet.js/commit/e34dd86c07495b7b8c38ee410838e15226a7b8d6))
+- new signer and provider interface ([4b2a71c](https://github.com/seanjameshan/starknet.js/commit/4b2a71c578e363b11abb1c3adb74472bbb9f73fe))
+- **provider:** add getTransactionReceipt() ([4267a5f](https://github.com/seanjameshan/starknet.js/commit/4267a5f5cec77bb4b09b2e8b4979ec0ee611d416))
+- split account and signer ([ca4ad9d](https://github.com/seanjameshan/starknet.js/commit/ca4ad9d62aee8b0637096eb3059e96dd4407f663))
+- update readme ([ed021dc](https://github.com/seanjameshan/starknet.js/commit/ed021dc25a394affec8ea92ed79eed4c68a040d8))
+
+### BREAKING CHANGES
+
+- new provider and signer interfaces
+
 # [2.9.0](https://github.com/seanjameshan/starknet.js/compare/v2.8.0...v2.9.0) (2022-02-04)
 
 ### Bug Fixes
