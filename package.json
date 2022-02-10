@@ -23,7 +23,7 @@
     "zk",
     "rollup"
   ],
-  "repository": "github:seanjameshan/starknet.js",
+  "repository": "github:0xs34n/starknet.js",
   "author": "Sean Han",
   "license": "MIT",
   "devDependencies": {
