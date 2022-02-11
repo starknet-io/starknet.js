@@ -1,7 +1,10 @@
 import fs from 'fs';
 
+import { isBN } from 'bn.js';
+
 import { CompiledContract, Contract, defaultProvider, json, stark } from '../src';
-import { toBN } from '../src/utils/number';
+import { BigNumberish, toBN } from '../src/utils/number';
+import { compileCalldata, getSelectorFromName } from '../src/utils/stark';
 
 const compiledERC20: CompiledContract = json.parse(
   fs.readFileSync('./__mocks__/ERC20.json').toString('ascii')
@@ -9,11 +12,15 @@ const compiledERC20: CompiledContract = json.parse(
 const compiledTypeTransformation: CompiledContract = json.parse(
   fs.readFileSync('./__mocks__/contract.json').toString('ascii')
 );
+const compiledMulticall: CompiledContract = json.parse(
+  fs.readFileSync('./__mocks__/multicall.json').toString('ascii')
+);
 
 describe('class Contract {}', () => {
   const wallet = stark.randomAddress();
   describe('Basic Interaction', () => {
     let erc20: Contract;
+    let contract: Contract;
     beforeAll(async () => {
       const { code, transaction_hash, address } = await defaultProvider.deployContract({
         contract: compiledERC20,
@@ -21,6 +28,22 @@ describe('class Contract {}', () => {
       erc20 = new Contract(compiledERC20.abi, address, defaultProvider);
       expect(code).toBe('TRANSACTION_RECEIVED');
       await defaultProvider.waitForTx(transaction_hash);
+
+      // Deploy Multicall
+
+      const {
+        code: m_code,
+        transaction_hash: m_transaction_hash,
+        address: multicallAddress,
+      } = await defaultProvider.deployContract({
+        contract: compiledMulticall,
+      });
+
+      contract = new Contract(compiledMulticall.abi, multicallAddress);
+
+      expect(m_code).toBe('TRANSACTION_RECEIVED');
+
+      await defaultProvider.waitForTx(m_transaction_hash);
     });
     test('read initial balance of that account', async () => {
       const { res } = await erc20.call('balance_of', {
@@ -43,6 +66,25 @@ describe('class Contract {}', () => {
       });
 
       expect(res).toStrictEqual(toBN(10));
+    });
+    test('read balance in a multicall', async () => {
+      const args1 = { user: wallet };
+      const args2 = {};
+      const calls = [
+        erc20.connectedTo,
+        getSelectorFromName('balance_of'),
+        Object.keys(args1).length,
+        ...compileCalldata(args1),
+
+        erc20.connectedTo,
+        getSelectorFromName('decimals'),
+        Object.keys(args2).length,
+        ...compileCalldata(args2),
+      ];
+      const { block_number, result } = await contract.call('aggregate', { calls });
+      expect(isBN(block_number));
+      expect(Array.isArray(result));
+      (result as BigNumberish[]).forEach((el) => expect(isBN(el)));
     });
   });
   describe('Type Transformation', () => {
