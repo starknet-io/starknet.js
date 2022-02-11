@@ -1,4 +1,3 @@
-import { compileCalldata } from '../contract';
 import { Provider } from '../provider';
 import { Signer, SignerInterface } from '../signer';
 import {
@@ -10,7 +9,7 @@ import {
   Signature,
 } from '../types';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
-import { getSelectorFromName } from '../utils/stark';
+import { compileCalldata, getSelectorFromName } from '../utils/stark';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
 

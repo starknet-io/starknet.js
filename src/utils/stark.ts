@@ -1,6 +1,6 @@
 import { gzip } from 'pako';
 
-import { CompressedProgram, Program, Signature } from '../types';
+import { Calldata, CompressedProgram, Program, RawArgs, Signature } from '../types';
 import { genKeyPair, getStarkKey } from './ellipticCurve';
 import { addHexPrefix, btoaUniversal } from './encode';
 import { starknetKeccak } from './hash';
@@ -48,4 +48,16 @@ export function formatSignature(sig?: Signature): string[] {
   } catch (e) {
     return [];
   }
+}
+
+export function compileCalldata(args: RawArgs): Calldata {
+  return Object.values(args).flatMap((value) => {
+    if (Array.isArray(value))
+      return [toBN(value.length).toString(), ...value.map((x) => toBN(x).toString())];
+    if (typeof value === 'object' && 'type' in value)
+      return Object.entries(value)
+        .filter(([k]) => k !== 'type')
+        .map(([, v]) => toBN(v).toString());
+    return toBN(value).toString();
+  });
 }
