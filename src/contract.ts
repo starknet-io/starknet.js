@@ -55,11 +55,24 @@ export class Contract {
       );
   }
 
+  /**
+   * Saves the address of the contract deployed on network that will be used for interaction
+   *
+   * @param address - address of the contract
+   * @returns Contract
+   */
   public connect(address: string): Contract {
     this.connectedTo = address;
     return this;
   }
 
+  /**
+   * Validates if all arguments that are passed to the method are corresponding to the ones in the abi
+   *
+   * @param type - type of the method
+   * @param method  - name of the method
+   * @param args - arguments that are passed to the method
+   */
   private validateMethodAndArgs(type: 'INVOKE' | 'CALL', method: string, args: Args = {}) {
     // ensure provided method exists
     const invokeableFunctionNames = this.abi
@@ -127,6 +140,13 @@ export class Contract {
     });
   }
 
+  /**
+   * Deep parse of the object that has been passed to the method
+   *
+   * @param element - element that needs to be parsed
+   * @param type  - name of the method
+   * @return {string | string[]} - parsed arguments in format that contract is expecting
+   */
   private parseCalldataObject(
     element: ParsedStruct | BigNumberish,
     type: string
@@ -153,6 +173,13 @@ export class Contract {
     return toFelt(element as BigNumberish);
   }
 
+  /**
+   * Parse of the response elements that are converted to Object (Struct) by using the abi
+   *
+   * @param responseIterator - iterator of the response
+   * @param type - type of the struct
+   * @return {BigNumberish | ParsedStruct} - parsed arguments in format that contract is expecting
+   */
   private parseResponseStruct(
     responseIterator: Iterator<string>,
     type: string
@@ -168,6 +195,13 @@ export class Contract {
     return parseFelt(responseIterator.next().value);
   }
 
+  /**
+   * Parse one field of the calldata by using input field from the abi for that method
+   *
+   * @param args - value of the field
+   * @param input  - input(field) information from the abi that will be used to parse the data
+   * @return {string | string[]} - parsed arguments in format that contract is expecting
+   */
   private parsCalldataField(args: Args, input: AbiEntry): string | string[] {
     const { name, type } = input;
     const value = args[name];
@@ -203,6 +237,13 @@ export class Contract {
     }
   }
 
+  /**
+   * Parse the calldata by using input fields from the abi for that method
+   *
+   * @param args - arguments passed the the method
+   * @param inputs  - list of inputs(fields) that are in the abi
+   * @return {Calldata} - parsed arguments in format that contract is expecting
+   */
   private compileCalldata(args: Args, inputs: AbiEntry[]): Calldata {
     return inputs.reduce((acc, input) => {
       const parsedData = this.parsCalldataField(args, input);
@@ -215,6 +256,13 @@ export class Contract {
     }, [] as Calldata);
   }
 
+  /**
+   * Parse elements of the response and structuring them into one field by using output property from the abi for that method
+   *
+   * @param responseIterator - iterator of the response
+   * @param output  - output(field) information from the abi that will be used to parse the data
+   * @return - parsed response corresponding to the abi structure of the field
+   */
   private parseResponseField(
     responseIterator: Iterator<string>,
     output: AbiEntry,
@@ -248,6 +296,13 @@ export class Contract {
     }
   }
 
+  /**
+   * Parse elements of the response array and structuring them into response object
+   *
+   * @param method - method name
+   * @param response  - response from the method
+   * @return - parsed response corresponding to the abi
+   */
   private parseResponse(method: string, response: string[]): Args {
     const { outputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
     const responseIterator = response.flat()[Symbol.iterator]();
