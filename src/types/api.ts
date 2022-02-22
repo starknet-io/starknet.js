@@ -163,3 +163,9 @@ export type TransactionReceipt = {
   l2_to_l1_messages: string[];
   events: string[];
 };
+
+export type RawArgs = {
+  [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
+};
+
+export type Calldata = string[];

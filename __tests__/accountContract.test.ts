@@ -3,7 +3,6 @@ import fs from 'fs';
 import {
   CompiledContract,
   Contract,
-  compileCalldata,
   defaultProvider,
   ec,
   encode,
@@ -12,6 +11,8 @@ import {
   number,
   stark,
 } from '../src';
+
+const { compileCalldata } = stark;
 
 describe('getStarkAccountFromPrivateKey()', () => {
   test('it works with valid privateKey', () => {

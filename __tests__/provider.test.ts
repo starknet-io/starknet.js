@@ -1,6 +1,8 @@
 import fs from 'fs';
 
-import { CompiledContract, compileCalldata, defaultProvider, json, stark } from '../src';
+import { CompiledContract, defaultProvider, json, stark } from '../src';
+
+const { compileCalldata } = stark;
 
 const compiledArgentAccount = json.parse(
   fs.readFileSync('./__mocks__/ArgentAccount.json').toString('ascii')

@@ -5,7 +5,6 @@ import {
   Account,
   CompiledContract,
   Contract,
-  compileCalldata,
   defaultProvider,
   ec,
   json,
@@ -13,6 +12,8 @@ import {
   stark,
 } from '../src';
 import { toBN } from '../src/utils/number';
+
+const { compileCalldata } = stark;
 
 const compiledArgentAccount: CompiledContract = json.parse(
   fs.readFileSync('./__mocks__/ArgentAccount.json').toString('ascii')
