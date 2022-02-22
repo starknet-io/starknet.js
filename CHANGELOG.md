@@ -1,3 +1,16 @@
+# [3.1.0](https://github.com/seanjameshan/starknet.js/compare/v3.0.0...v3.1.0) (2022-02-22)
+
+### Bug Fixes
+
+- **test:** adding tests for type transferormation ([60d5eb6](https://github.com/seanjameshan/starknet.js/commit/60d5eb614721543be7fbaa842e8872a70564ebb2))
+- **tests:** adding multicall contract ([138b29d](https://github.com/seanjameshan/starknet.js/commit/138b29d60cbc1eae6fa8f6f7dbf232bc11975e9a))
+
+### Features
+
+- **contract:** adding jsDocs to the contract class ([d9ec6d3](https://github.com/seanjameshan/starknet.js/commit/d9ec6d3ea3cc0dbf3538fb2fe7b5e1d8a8831490))
+- **contract:** adding parse request data on call and invoke ([e6d46dc](https://github.com/seanjameshan/starknet.js/commit/e6d46dc39f8d7da6ed1bef2c5074377402810eb9))
+- **contract:** parsing response from the contract call ([3f7425f](https://github.com/seanjameshan/starknet.js/commit/3f7425ff0ac29dda2a7c9373856a4aa20002af9b))
+
 # [3.0.0](https://github.com/seanjameshan/starknet.js/compare/v2.9.0...v3.0.0) (2022-02-10)
 
 ### Bug Fixes
