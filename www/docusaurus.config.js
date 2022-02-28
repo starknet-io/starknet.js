@@ -43,7 +43,7 @@ const config = {
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
       navbar: {
-        title: 'Starknet.js',
+        title: 'Home',
         logo: {
           alt: 'Starknet.js Logo',
           src: 'img/logo.svg',
