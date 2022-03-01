@@ -2,8 +2,8 @@ import { ProviderInterface } from '../provider';
 import {
   Abi,
   AddTransactionResponse,
+  Call,
   DeployContractPayload,
-  ExecuteInvocation,
   InvocationsDetails,
   Signature,
 } from '../types';
@@ -41,7 +41,7 @@ export abstract class AccountInterface extends ProviderInterface {
    * @returns response from addTransaction
    */
   public abstract execute(
-    transactions: ExecuteInvocation | ExecuteInvocation[],
+    transactions: Call | Call[],
     abis?: Abi[],
     transactionsDetail?: InvocationsDetails
   ): Promise<AddTransactionResponse>;

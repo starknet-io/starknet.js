@@ -19,13 +19,12 @@ export type Invocation = {
   signature?: Signature;
 };
 
-export type ExecuteInvocation = Omit<Invocation, 'signature'>;
+export type Call = Omit<Invocation, 'signature'>;
 
 export type InvocationsDetails = {
   nonce?: BigNumberish;
+  maxFee?: BigNumberish;
 };
-
-export type Call = Omit<Invocation, 'signature' | 'nonce'>;
 
 export type Status =
   | 'NOT_RECEIVED'

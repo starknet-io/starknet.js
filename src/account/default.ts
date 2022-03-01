@@ -3,13 +3,14 @@ import { Signer, SignerInterface } from '../signer';
 import {
   Abi,
   AddTransactionResponse,
-  ExecuteInvocation,
+  Call,
   InvocationsDetails,
   KeyPair,
   Signature,
 } from '../types';
+import { getSelectorFromName } from '../utils/hash';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
-import { compileCalldata, getSelectorFromName } from '../utils/stark';
+import { compileCalldata } from '../utils/stark';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
 
@@ -41,52 +42,50 @@ export class Account extends Provider implements AccountInterface {
    * @returns a confirmation of invoking a function on the starknet contract
    */
   public async execute(
-    transactions: ExecuteInvocation | ExecuteInvocation[],
+    calls: Call | Call[],
     abis: Abi[] = [],
     transactionsDetail: InvocationsDetails = {}
   ): Promise<AddTransactionResponse> {
-    if (Array.isArray(transactions) && transactions.length !== 1) {
-      throw new Error('Only one transaction at a time is currently supported');
-    }
+    const transactions = Array.isArray(calls) ? calls : [calls];
 
-    const {
-      contractAddress,
-      calldata = [],
-      entrypoint,
-      ...invocation
-    } = Array.isArray(transactions) ? transactions[0] : transactions;
-    const { nonce } = transactionsDetail;
+    const signerDetails = {
+      walletAddress: this.address,
+      nonce: toBN(transactionsDetail.nonce ?? (await this.getNonce())),
+      maxFee: toBN(transactionsDetail.maxFee ?? '0'),
+    };
 
-    const nonceBn = toBN(nonce ?? (await this.getNonce()));
-    const calldataDecimal = bigNumberishArrayToDecimalStringArray(calldata);
+    const signature = await this.signer.signTransaction(transactions, signerDetails, abis);
 
-    const signature = await this.signer.signTransaction(
-      [
-        {
-          ...invocation,
-          contractAddress,
-          calldata: calldataDecimal,
-          entrypoint,
-        },
-      ],
-      { walletAddress: this.address, nonce: nonceBn },
-      abis
-    );
+    const calldata = this.fromCallsToCallArray(transactions);
 
-    const entrypointSelector = getSelectorFromName(entrypoint);
-
-    return super.invokeFunction({
-      contractAddress: this.address,
-      entrypoint: 'execute',
-      calldata: [
-        contractAddress,
-        entrypointSelector,
-        calldataDecimal.length.toString(),
-        ...calldataDecimal,
-        nonceBn.toString(),
-      ],
-      signature,
+    return this.fetchEndpoint('add_transaction', undefined, {
+      type: 'INVOKE_FUNCTION',
+      contract_address: this.address,
+      entry_point_selector: getSelectorFromName('__execute__'),
+      calldata: [...calldata, signerDetails.nonce.toString()],
+      signature: bigNumberishArrayToDecimalStringArray(signature),
     });
+  }
+
+  private fromCallsToCallArray(calls: Call[]): string[] {
+    const callArray: string[] = [];
+    const calldata: BigNumberish[] = [];
+    calls.forEach((call) => {
+      const data = call.calldata || [];
+      callArray.push(
+        call.contractAddress,
+        getSelectorFromName(call.entrypoint),
+        calldata.length.toString(),
+        data.length.toString()
+      );
+      calldata.push(...data);
+    });
+    return [
+      callArray.length.toString(),
+      ...bigNumberishArrayToDecimalStringArray(callArray),
+      calldata.length.toString(),
+      ...bigNumberishArrayToDecimalStringArray(calldata),
+    ];
   }
 
   /**

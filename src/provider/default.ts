@@ -17,9 +17,10 @@ import {
   Invocation,
   TransactionReceipt,
 } from '../types';
+import { getSelectorFromName } from '../utils/hash';
 import { parse, stringify } from '../utils/json';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
-import { compressProgram, getSelectorFromName, randomAddress } from '../utils/stark';
+import { compressProgram, randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
 import { BlockIdentifier, getFormattedBlockIdentifier, txIdentifier } from './utils';
 
@@ -133,14 +134,21 @@ export class Provider implements ProviderInterface {
     const queryString = this.getQueryString(query);
     const headers = this.getHeaders(method);
 
-    const { data } = await axios.request<Endpoints[T]['RESPONSE']>({
-      method,
-      url: urljoin(baseUrl, endpoint, queryString),
-      data: stringify(request),
-      headers,
-    });
-
-    return data;
+    try {
+      const { data } = await axios.request<Endpoints[T]['RESPONSE']>({
+        method,
+        url: urljoin(baseUrl, endpoint, queryString),
+        data: stringify(request),
+        headers,
+      });
+      return data;
+    } catch (error: any) {
+      const data = error?.response?.data;
+      if (data?.message) {
+        throw new Error(`${data.code}: ${data.message}`);
+      }
+      throw error;
+    }
   }
 
   /**

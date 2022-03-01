@@ -1,7 +1,6 @@
-import { computeHashOnElements } from '../hash';
+import { computeHashOnElements, getSelectorFromName } from '../hash';
 import { BigNumberish, toBN, toHex } from '../number';
 import { encodeShortString } from '../shortString';
-import { getSelectorFromName } from '../stark';
 import { TypedData } from './types';
 import { validateTypedData } from './utils';
 
