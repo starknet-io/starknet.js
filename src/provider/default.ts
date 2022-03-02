@@ -26,13 +26,7 @@ import { BlockIdentifier, getFormattedBlockIdentifier, txIdentifier } from './ut
 
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha';
 
-type ProviderOptions =
-  | {
-      network: NetworkName;
-    }
-  | {
-      baseUrl: string;
-    };
+type ProviderOptions = { network: NetworkName } | { baseUrl: string };
 
 function wait(delay: number) {
   return new Promise((res) => setTimeout(res, delay));
@@ -352,7 +346,10 @@ export class Provider implements ProviderInterface {
       if (res.tx_status === 'ACCEPTED_ON_L1' || res.tx_status === 'ACCEPTED_ON_L2') {
         onchain = true;
       } else if (res.tx_status === 'REJECTED' || res.tx_status === 'NOT_RECEIVED') {
-        const error = Error(res.tx_status) as Error & { response: GetTransactionStatusResponse };
+        const message = res.tx_failure_reason
+          ? `${res.tx_status}: ${res.tx_failure_reason.code}\n${res.tx_failure_reason.error_message}`
+          : res.tx_status;
+        const error = new Error(message) as Error & { response: GetTransactionStatusResponse };
         error.response = res;
         throw error;
       }

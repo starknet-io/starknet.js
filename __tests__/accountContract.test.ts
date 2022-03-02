@@ -26,8 +26,7 @@ describe('deploy and test Wallet', () => {
 
   const starkKeyPair = ec.getKeyPair(privateKey);
   const starkKeyPub = ec.getStarkKey(starkKeyPair);
-  let wallet: Contract;
-  let walletAddress: string;
+  let accountContract: Contract;
   let erc20: Contract;
   let erc20Address: string;
 
@@ -36,11 +35,10 @@ describe('deploy and test Wallet', () => {
       contract: compiledArgentAccount,
       addressSalt: starkKeyPub,
     });
-    walletAddress = accountResponse.address;
-    wallet = new Contract(compiledArgentAccount.abi, walletAddress);
+    accountContract = new Contract(compiledArgentAccount.abi, accountResponse.address);
     expect(accountResponse.code).toBe('TRANSACTION_RECEIVED');
 
-    const initializeResponse = await wallet.invoke('initialize', {
+    const initializeResponse = await accountContract.invoke('initialize', {
       signer: starkKeyPub,
       guardian: '0',
     });
@@ -54,7 +52,7 @@ describe('deploy and test Wallet', () => {
     expect(erc20Response.code).toBe('TRANSACTION_RECEIVED');
 
     const mintResponse = await erc20.invoke('mint', {
-      recipient: walletAddress,
+      recipient: accountContract.connectedTo,
       amount: '1000',
     });
     expect(mintResponse.code).toBe('TRANSACTION_RECEIVED');
@@ -62,31 +60,31 @@ describe('deploy and test Wallet', () => {
   });
 
   test('read nonce', async () => {
-    const { nonce } = await wallet.call('get_nonce');
+    const { nonce } = await accountContract.call('get_nonce');
 
     expect(number.toBN(nonce as string).toString()).toStrictEqual(number.toBN(0).toString());
   });
 
   test('read balance of wallet', async () => {
     const { res } = await erc20.call('balance_of', {
-      user: walletAddress,
+      user: accountContract.connectedTo,
     });
 
     expect(number.toBN(res as string).toString()).toStrictEqual(number.toBN(1000).toString());
   });
 
   test('execute by wallet owner', async () => {
-    const nonce = (await wallet.call('get_nonce')).nonce.toString();
+    const nonce = (await accountContract.call('get_nonce')).nonce.toString();
 
     const calls = [
       { contractAddress: erc20Address, entrypoint: 'transfer', calldata: [erc20Address, '10'] },
     ];
-    const msgHash = hash.hashMulticall(wallet.connectedTo, calls, nonce, '0');
+    const msgHash = hash.hashMulticall(accountContract.connectedTo, calls, nonce, '0');
 
     const { callArray, calldata } = fromCallsToCallArray(calls);
 
     const signature = ec.sign(starkKeyPair, msgHash);
-    const { code, transaction_hash } = await wallet.invoke(
+    const { code, transaction_hash } = await accountContract.invoke(
       '__execute__',
       {
         call_array: callArray,
@@ -103,7 +101,7 @@ describe('deploy and test Wallet', () => {
 
   test('read balance of wallet after transfer', async () => {
     const { res } = await erc20.call('balance_of', {
-      user: walletAddress,
+      user: accountContract.connectedTo,
     });
 
     expect(number.toBN(res as string).toString()).toStrictEqual(number.toBN(990).toString());

@@ -137,6 +137,11 @@ export type GetCodeResponse = {
 export type GetTransactionStatusResponse = {
   tx_status: Status;
   block_hash: string;
+  tx_failure_reason?: {
+    tx_id: number;
+    code: string;
+    error_message: string;
+  };
 };
 
 export type GetTransactionResponse = {

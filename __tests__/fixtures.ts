@@ -10,3 +10,4 @@ export const compiledArgentAccount = readContract('ArgentAccount');
 export const compiledErc20 = readContract('ERC20');
 export const compiledTypeTransformation = readContract('contract');
 export const compiledMulticall = readContract('multicall');
+export const compiledTestDapp = readContract('TestDapp');
