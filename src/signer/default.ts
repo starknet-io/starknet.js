@@ -18,21 +18,21 @@ export class Signer implements SignerInterface {
   public async signTransaction(
     transactions: Invocation[],
     transactionsDetail: InvocationsSignerDetails,
-    abis: Abi[] = []
+    abis?: Abi[]
   ): Promise<Signature> {
     if (abis && abis.length !== transactions.length) {
       throw new Error('ABI must be provided for each transaction or no transaction');
     }
     // now use abi to display decoded data somewhere, but as this signer is headless, we can't do that
 
-    const hash = hashMulticall(
+    const msgHash = hashMulticall(
       transactionsDetail.walletAddress,
       transactions,
       transactionsDetail.nonce.toString(),
       transactionsDetail.maxFee.toString()
     );
 
-    return sign(this.keyPair, hash);
+    return sign(this.keyPair, msgHash);
   }
 
   public async signMessage(typedData: TypedData, walletAddress: string): Promise<Signature> {

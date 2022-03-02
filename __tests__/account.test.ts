@@ -1,26 +1,7 @@
-import fs from 'fs';
-
 import typedDataExample from '../__mocks__/typedDataExample.json';
-import {
-  Account,
-  CompiledContract,
-  Contract,
-  defaultProvider,
-  ec,
-  json,
-  number,
-  stark,
-} from '../src';
+import { Account, Contract, defaultProvider, ec, number, stark } from '../src';
 import { toBN } from '../src/utils/number';
-
-const { compileCalldata } = stark;
-
-const compiledArgentAccount: CompiledContract = json.parse(
-  fs.readFileSync('./__mocks__/ArgentAccount.json').toString('ascii')
-);
-const compiledErc20: CompiledContract = json.parse(
-  fs.readFileSync('./__mocks__/ERC20.json').toString('ascii')
-);
+import { compiledArgentAccount, compiledErc20 } from './fixtures';
 
 describe('deploy and test Wallet', () => {
   const privateKey = stark.randomAddress();
@@ -33,40 +14,41 @@ describe('deploy and test Wallet', () => {
   let account: Account;
 
   beforeAll(async () => {
-    const { code: codeErc20, address: erc20AddressLocal } = await defaultProvider.deployContract({
-      contract: compiledErc20,
-    });
-    erc20Address = erc20AddressLocal;
-    erc20 = new Contract(compiledErc20.abi, erc20Address);
-
-    expect(codeErc20).toBe('TRANSACTION_RECEIVED');
-
-    const { code, address: walletAddressLocal } = await defaultProvider.deployContract({
+    const accountResponse = await defaultProvider.deployContract({
       contract: compiledArgentAccount,
-      constructorCalldata: compileCalldata({
-        signer: starkKeyPub,
-        guardian: '0',
-        L1_address: '0',
-      }),
       addressSalt: starkKeyPub,
     });
-    walletAddress = walletAddressLocal;
-    expect(code).toBe('TRANSACTION_RECEIVED');
+    walletAddress = accountResponse.address;
+    const wallet = new Contract(compiledArgentAccount.abi, walletAddress);
+    expect(accountResponse.code).toBe('TRANSACTION_RECEIVED');
 
-    const { code: codeErc20Mint, transaction_hash: txErc20Mint } = await erc20.invoke('mint', {
+    const initializeResponse = await wallet.invoke('initialize', {
+      signer: starkKeyPub,
+      guardian: '0',
+    });
+    expect(initializeResponse.code).toBe('TRANSACTION_RECEIVED');
+
+    account = new Account(defaultProvider, walletAddress, starkKeyPair);
+
+    const erc20Response = await defaultProvider.deployContract({
+      contract: compiledErc20,
+    });
+    erc20Address = erc20Response.address;
+    erc20 = new Contract(compiledErc20.abi, erc20Address);
+    expect(erc20Response.code).toBe('TRANSACTION_RECEIVED');
+
+    const mintResponse = await erc20.invoke('mint', {
       recipient: walletAddress,
       amount: '1000',
     });
-
-    expect(codeErc20Mint).toBe('TRANSACTION_RECEIVED');
-
-    account = new Account(defaultProvider, walletAddressLocal, starkKeyPair);
-
-    await defaultProvider.waitForTx(txErc20Mint);
+    expect(mintResponse.code).toBe('TRANSACTION_RECEIVED');
+    await defaultProvider.waitForTx(mintResponse.transaction_hash);
   });
+
   test('same wallet address', () => {
     expect(walletAddress).toBe(account.address);
   });
+
   test('read nonce', async () => {
     const { result } = await account.callContract({
       contractAddress: account.address,
@@ -76,6 +58,7 @@ describe('deploy and test Wallet', () => {
 
     expect(number.toBN(nonce).toString()).toStrictEqual(number.toBN(0).toString());
   });
+
   test('read balance of wallet', async () => {
     const { res } = await erc20.call('balance_of', {
       user: walletAddress,
@@ -83,6 +66,7 @@ describe('deploy and test Wallet', () => {
 
     expect(number.toBN(res as string).toString()).toStrictEqual(number.toBN(1000).toString());
   });
+
   test('execute by wallet owner', async () => {
     const { code, transaction_hash } = await account.execute({
       contractAddress: erc20Address,
@@ -93,6 +77,7 @@ describe('deploy and test Wallet', () => {
     expect(code).toBe('TRANSACTION_RECEIVED');
     await defaultProvider.waitForTx(transaction_hash);
   });
+
   test('read balance of wallet after transfer', async () => {
     const { res } = await erc20.call('balance_of', {
       user: walletAddress,
@@ -100,6 +85,7 @@ describe('deploy and test Wallet', () => {
 
     expect(number.toBN(res as string).toString()).toStrictEqual(number.toBN(990).toString());
   });
+
   test('execute with custom nonce', async () => {
     const { result } = await account.callContract({
       contractAddress: account.address,
@@ -119,6 +105,7 @@ describe('deploy and test Wallet', () => {
     expect(code).toBe('TRANSACTION_RECEIVED');
     await defaultProvider.waitForTx(transaction_hash);
   });
+
   test('sign and verify offchain message', async () => {
     const signature = await account.signMessage(typedDataExample);
 

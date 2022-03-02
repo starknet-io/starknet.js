@@ -1,12 +1,7 @@
-import fs from 'fs';
-
-import { CompiledContract, defaultProvider, json, stark } from '../src';
+import { defaultProvider, stark } from '../src';
+import { compiledArgentAccount } from './fixtures';
 
 const { compileCalldata } = stark;
-
-const compiledArgentAccount = json.parse(
-  fs.readFileSync('./__mocks__/ArgentAccount.json').toString('ascii')
-);
 
 describe('defaultProvider', () => {
   describe('feeder gateway endpoints', () => {
@@ -102,15 +97,8 @@ describe('defaultProvider', () => {
 
   describe('addTransaction()', () => {
     test('deployContract()', async () => {
-      const inputContract = compiledArgentAccount as unknown as CompiledContract;
-
       const response = await defaultProvider.deployContract({
-        contract: inputContract,
-        constructorCalldata: compileCalldata({
-          signer: stark.randomAddress(),
-          guardian: '0',
-          L1_address: '0',
-        }),
+        contract: compiledArgentAccount,
       });
 
       expect(response.code).toBe('TRANSACTION_RECEIVED');

@@ -42,12 +42,12 @@ test('hashMessage()', () => {
   ];
   const nonce = '3';
   const maxFee = '0';
-  const hash = hashMulticall(account, transactions, nonce, maxFee);
-  expect(hash).toBe(
+  const hashMsg = hashMulticall(account, transactions, nonce, maxFee);
+  expect(hashMsg).toBe(
     toHex(toBN('1608351043472325350463069815257733118091727529101532499046754244230898025592'))
   );
   const keyPair = getKeyPair(privateKey);
-  const [r, s] = sign(keyPair, removeHexPrefix(hash));
+  const [r, s] = sign(keyPair, removeHexPrefix(hashMsg));
   expect(r.toString()).toStrictEqual(
     toBN('1079537730825246752292590270213864261175133133352510235773017189606850691611').toString()
   );

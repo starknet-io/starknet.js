@@ -1,18 +1,6 @@
-import fs from 'fs';
-
-import {
-  CompiledContract,
-  Contract,
-  defaultProvider,
-  ec,
-  encode,
-  hash,
-  json,
-  number,
-  stark,
-} from '../src';
-
-const { compileCalldata } = stark;
+import { Contract, defaultProvider, ec, hash, number, stark } from '../src';
+import { fromCallsToCallArray } from '../src/utils/transaction';
+import { compiledArgentAccount, compiledErc20 } from './fixtures';
 
 describe('getStarkAccountFromPrivateKey()', () => {
   test('it works with valid privateKey', () => {
@@ -33,13 +21,6 @@ describe('getStarkAccountFromPrivateKey()', () => {
   });
 });
 
-const compiledArgentAccount: CompiledContract = json.parse(
-  fs.readFileSync('./__mocks__/ArgentAccount.json').toString('ascii')
-);
-const compiledErc20: CompiledContract = json.parse(
-  fs.readFileSync('./__mocks__/ERC20.json').toString('ascii')
-);
-
 describe('deploy and test Wallet', () => {
   const privateKey = stark.randomAddress();
 
@@ -49,42 +30,43 @@ describe('deploy and test Wallet', () => {
   let walletAddress: string;
   let erc20: Contract;
   let erc20Address: string;
+
   beforeAll(async () => {
-    const { code: codeErc20, address: erc20AddressLocal } = await defaultProvider.deployContract({
-      contract: compiledErc20,
-    });
-    erc20Address = erc20AddressLocal;
-    erc20 = new Contract(compiledErc20.abi, erc20Address);
-
-    expect(codeErc20).toBe('TRANSACTION_RECEIVED');
-
-    const { code, address: walletAddressLocal } = await defaultProvider.deployContract({
+    const accountResponse = await defaultProvider.deployContract({
       contract: compiledArgentAccount,
-      constructorCalldata: compileCalldata({
-        signer: starkKeyPub,
-        guardian: '0',
-        L1_address: '0',
-      }),
       addressSalt: starkKeyPub,
     });
-    walletAddress = walletAddressLocal;
+    walletAddress = accountResponse.address;
     wallet = new Contract(compiledArgentAccount.abi, walletAddress);
-    expect(code).toBe('TRANSACTION_RECEIVED');
+    expect(accountResponse.code).toBe('TRANSACTION_RECEIVED');
 
-    const { code: codeErc20Mint, transaction_hash: txErc20Mint } = await erc20.invoke('mint', {
+    const initializeResponse = await wallet.invoke('initialize', {
+      signer: starkKeyPub,
+      guardian: '0',
+    });
+    expect(initializeResponse.code).toBe('TRANSACTION_RECEIVED');
+
+    const erc20Response = await defaultProvider.deployContract({
+      contract: compiledErc20,
+    });
+    erc20Address = erc20Response.address;
+    erc20 = new Contract(compiledErc20.abi, erc20Address);
+    expect(erc20Response.code).toBe('TRANSACTION_RECEIVED');
+
+    const mintResponse = await erc20.invoke('mint', {
       recipient: walletAddress,
       amount: '1000',
     });
-
-    expect(codeErc20Mint).toBe('TRANSACTION_RECEIVED');
-
-    await defaultProvider.waitForTx(txErc20Mint);
+    expect(mintResponse.code).toBe('TRANSACTION_RECEIVED');
+    await defaultProvider.waitForTx(mintResponse.transaction_hash);
   });
+
   test('read nonce', async () => {
     const { nonce } = await wallet.call('get_nonce');
 
     expect(number.toBN(nonce as string).toString()).toStrictEqual(number.toBN(0).toString());
   });
+
   test('read balance of wallet', async () => {
     const { res } = await erc20.call('balance_of', {
       user: walletAddress,
@@ -92,26 +74,24 @@ describe('deploy and test Wallet', () => {
 
     expect(number.toBN(res as string).toString()).toStrictEqual(number.toBN(1000).toString());
   });
+
   test('execute by wallet owner', async () => {
-    const { nonce } = await wallet.call('get_nonce');
-    const msgHash = encode.addHexPrefix(
-      hash.hashMessage(
-        wallet.connectedTo,
-        erc20Address,
-        stark.getSelectorFromName('transfer'),
-        [erc20Address, '10'],
-        nonce.toString()
-      )
-    );
+    const nonce = (await wallet.call('get_nonce')).nonce.toString();
+
+    const calls = [
+      { contractAddress: erc20Address, entrypoint: 'transfer', calldata: [erc20Address, '10'] },
+    ];
+    const msgHash = hash.hashMulticall(wallet.connectedTo, calls, nonce, '0');
+
+    const { callArray, calldata } = fromCallsToCallArray(calls);
 
     const signature = ec.sign(starkKeyPair, msgHash);
     const { code, transaction_hash } = await wallet.invoke(
-      'execute',
+      '__execute__',
       {
-        to: erc20Address,
-        selector: stark.getSelectorFromName('transfer'),
-        calldata: [erc20Address, '10'],
-        nonce: nonce.toString(),
+        call_array: callArray,
+        calldata,
+        nonce,
       },
       signature
     );
@@ -120,6 +100,7 @@ describe('deploy and test Wallet', () => {
 
     await defaultProvider.waitForTx(transaction_hash);
   });
+
   test('read balance of wallet after transfer', async () => {
     const { res } = await erc20.call('balance_of', {
       user: walletAddress,
@@ -136,7 +117,7 @@ test('build tx', async () => {
 
   expect(address).toBe('0x04024999b9574cb7623679ce049a609db62a95098982c5b28ac61abdebd1c82b');
 
-  const selector = stark.getSelectorFromName('transfer');
+  const selector = hash.getSelectorFromName('transfer');
 
   expect(selector).toBe(
     number.toHex(
@@ -144,18 +125,19 @@ test('build tx', async () => {
     )
   );
 
-  const msgHash = hash.hashMessage(address, '1', selector, ['6', '7'], '0');
+  const calls = [{ contractAddress: '1', entrypoint: 'transfer', calldata: ['6', '7'] }];
+  const msgHash = hash.hashMulticall(address, calls, '0', '0');
   expect(number.toBN(msgHash).toString()).toStrictEqual(
     number
-      .toBN('2154230509011102177917341711834485670139815171447919056633262592518907948680')
+      .toBN('533725737276146993132325070982049323585915612981489962412873515411469143806')
       .toString()
   );
 
   const [r, s] = ec.sign(keyPair, msgHash);
   expect(r.toString()).toBe(
-    '706800951915233622090196542158919402159816118214143837213294331713137614072'
+    '3081830197073374427897814075820860503521735760640862828374253887454357679197'
   );
   expect(s.toString()).toBe(
-    '1857147121895075123389037565321926580259282654271568123966453051614350474888'
+    '384293936273611705317490990661155378189310283917528660618713929845936492551'
   );
 });

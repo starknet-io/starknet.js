@@ -11,6 +11,7 @@ import {
 import { getSelectorFromName } from '../utils/hash';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
 import { compileCalldata } from '../utils/stark';
+import { fromCallsToExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
 
@@ -43,7 +44,7 @@ export class Account extends Provider implements AccountInterface {
    */
   public async execute(
     calls: Call | Call[],
-    abis: Abi[] = [],
+    abis: Abi[] | undefined = undefined,
     transactionsDetail: InvocationsDetails = {}
   ): Promise<AddTransactionResponse> {
     const transactions = Array.isArray(calls) ? calls : [calls];
@@ -56,36 +57,15 @@ export class Account extends Provider implements AccountInterface {
 
     const signature = await this.signer.signTransaction(transactions, signerDetails, abis);
 
-    const calldata = this.fromCallsToCallArray(transactions);
+    const calldata = [...fromCallsToExecuteCalldata(transactions), signerDetails.nonce.toString()];
 
     return this.fetchEndpoint('add_transaction', undefined, {
       type: 'INVOKE_FUNCTION',
       contract_address: this.address,
       entry_point_selector: getSelectorFromName('__execute__'),
-      calldata: [...calldata, signerDetails.nonce.toString()],
+      calldata,
       signature: bigNumberishArrayToDecimalStringArray(signature),
     });
-  }
-
-  private fromCallsToCallArray(calls: Call[]): string[] {
-    const callArray: string[] = [];
-    const calldata: BigNumberish[] = [];
-    calls.forEach((call) => {
-      const data = call.calldata || [];
-      callArray.push(
-        call.contractAddress,
-        getSelectorFromName(call.entrypoint),
-        calldata.length.toString(),
-        data.length.toString()
-      );
-      calldata.push(...data);
-    });
-    return [
-      callArray.length.toString(),
-      ...bigNumberishArrayToDecimalStringArray(callArray),
-      calldata.length.toString(),
-      ...bigNumberishArrayToDecimalStringArray(calldata),
-    ];
   }
 
   /**
