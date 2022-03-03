@@ -35,8 +35,8 @@ export class Signer implements SignerInterface {
     return sign(this.keyPair, msgHash);
   }
 
-  public async signMessage(typedData: TypedData, walletAddress: string): Promise<Signature> {
-    const msgHash = getMessageHash(typedData, walletAddress);
+  public async signMessage(typedData: TypedData, accountAddress: string): Promise<Signature> {
+    const msgHash = getMessageHash(typedData, accountAddress);
     return sign(this.keyPair, msgHash);
   }
 }

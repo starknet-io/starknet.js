@@ -3,7 +3,13 @@ import { Call } from '../types';
 import { getSelectorFromName } from './hash';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN } from './number';
 
-export const fromCallsToCallArray = (calls: Call[]) => {
+/**
+ * Transforms a list of Calls, each with their own calldata, into
+ * two arrays: one with the entrypoints, and one with the concatenated calldata.
+ * @param calls
+ * @returns
+ */
+export const transformCallsToMulticallArrays = (calls: Call[]) => {
   const callArray: ParsedStruct[] = [];
   const calldata: BigNumberish[] = [];
   calls.forEach((call) => {
@@ -22,8 +28,14 @@ export const fromCallsToCallArray = (calls: Call[]) => {
   };
 };
 
+/**
+ * Transforms a list of calls in the full flattened calldata expected
+ * by the __execute__ protocol.
+ * @param calls
+ * @returns
+ */
 export const fromCallsToExecuteCalldata = (calls: Call[]): string[] => {
-  const { callArray, calldata } = fromCallsToCallArray(calls);
+  const { callArray, calldata } = transformCallsToMulticallArrays(calls);
   return [
     callArray.length.toString(),
     ...callArray

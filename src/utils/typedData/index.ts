@@ -160,7 +160,7 @@ export const getStructHash = <T extends TypedData>(
  * with Keccak256.
  *
  * @param {TypedData} typedData
- * @param {boolean} hash
+ * @param {BigNumberish} account
  * @return {string}
  */
 export const getMessageHash = (typedData: TypedData, account: BigNumberish): string => {

@@ -93,7 +93,7 @@ export class Account extends Provider implements AccountInterface {
   /**
    * Verify a signature of a JSON object
    *
-   * @param json - JSON object to be verified
+   * @param hash - JSON object to be verified
    * @param signature - signature of the JSON object
    * @returns true if the signature is valid, false otherwise
    * @throws {Error} if the JSON object is not a valid JSON or the signature is not a valid signature
