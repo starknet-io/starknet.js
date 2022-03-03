@@ -1,5 +1,5 @@
 import { Contract, defaultProvider, ec, hash, number, stark } from '../src';
-import { fromCallsToCallArray } from '../src/utils/transaction';
+import { transformCallsToMulticallArrays } from '../src/utils/transaction';
 import { compiledArgentAccount, compiledErc20 } from './fixtures';
 
 describe('getStarkAccountFromPrivateKey()', () => {
@@ -81,7 +81,7 @@ describe('deploy and test Wallet', () => {
     ];
     const msgHash = hash.hashMulticall(accountContract.connectedTo, calls, nonce, '0');
 
-    const { callArray, calldata } = fromCallsToCallArray(calls);
+    const { callArray, calldata } = transformCallsToMulticallArrays(calls);
 
     const signature = ec.sign(starkKeyPair, msgHash);
     const { code, transaction_hash } = await accountContract.invoke(
