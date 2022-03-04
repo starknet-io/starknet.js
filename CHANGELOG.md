@@ -1,3 +1,10 @@
+# [3.2.0](https://github.com/seanjameshan/starknet.js/compare/v3.1.0...v3.2.0) (2022-03-04)
+
+### Features
+
+- **account:** initial multicall support ([e2e3d61](https://github.com/seanjameshan/starknet.js/commit/e2e3d61dcc5377c2a6603f4740d4420be7a719e1))
+- **signer:** always return string signatures ([0e9dd6c](https://github.com/seanjameshan/starknet.js/commit/0e9dd6c1c35aac6ad3eb3cc2ebb6212e0f5f809a))
+
 # [3.1.0](https://github.com/seanjameshan/starknet.js/compare/v3.0.0...v3.1.0) (2022-02-22)
 
 ### Bug Fixes
