@@ -3,13 +3,15 @@ import { Signer, SignerInterface } from '../signer';
 import {
   Abi,
   AddTransactionResponse,
-  ExecuteInvocation,
+  Call,
   InvocationsDetails,
   KeyPair,
   Signature,
 } from '../types';
+import { getSelectorFromName } from '../utils/hash';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
-import { compileCalldata, getSelectorFromName } from '../utils/stark';
+import { compileCalldata } from '../utils/stark';
+import { fromCallsToExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
 
@@ -41,51 +43,28 @@ export class Account extends Provider implements AccountInterface {
    * @returns a confirmation of invoking a function on the starknet contract
    */
   public async execute(
-    transactions: ExecuteInvocation | ExecuteInvocation[],
-    abis: Abi[] = [],
+    calls: Call | Call[],
+    abis: Abi[] | undefined = undefined,
     transactionsDetail: InvocationsDetails = {}
   ): Promise<AddTransactionResponse> {
-    if (Array.isArray(transactions) && transactions.length !== 1) {
-      throw new Error('Only one transaction at a time is currently supported');
-    }
+    const transactions = Array.isArray(calls) ? calls : [calls];
 
-    const {
-      contractAddress,
-      calldata = [],
-      entrypoint,
-      ...invocation
-    } = Array.isArray(transactions) ? transactions[0] : transactions;
-    const { nonce } = transactionsDetail;
+    const signerDetails = {
+      walletAddress: this.address,
+      nonce: toBN(transactionsDetail.nonce ?? (await this.getNonce())),
+      maxFee: toBN(transactionsDetail.maxFee ?? '0'),
+    };
 
-    const nonceBn = toBN(nonce ?? (await this.getNonce()));
-    const calldataDecimal = bigNumberishArrayToDecimalStringArray(calldata);
+    const signature = await this.signer.signTransaction(transactions, signerDetails, abis);
 
-    const signature = await this.signer.signTransaction(
-      [
-        {
-          ...invocation,
-          contractAddress,
-          calldata: calldataDecimal,
-          entrypoint,
-        },
-      ],
-      { walletAddress: this.address, nonce: nonceBn },
-      abis
-    );
+    const calldata = [...fromCallsToExecuteCalldata(transactions), signerDetails.nonce.toString()];
 
-    const entrypointSelector = getSelectorFromName(entrypoint);
-
-    return super.invokeFunction({
-      contractAddress: this.address,
-      entrypoint: 'execute',
-      calldata: [
-        contractAddress,
-        entrypointSelector,
-        calldataDecimal.length.toString(),
-        ...calldataDecimal,
-        nonceBn.toString(),
-      ],
-      signature,
+    return this.fetchEndpoint('add_transaction', undefined, {
+      type: 'INVOKE_FUNCTION',
+      contract_address: this.address,
+      entry_point_selector: getSelectorFromName('__execute__'),
+      calldata,
+      signature: bigNumberishArrayToDecimalStringArray(signature),
     });
   }
 
@@ -114,7 +93,7 @@ export class Account extends Provider implements AccountInterface {
   /**
    * Verify a signature of a JSON object
    *
-   * @param json - JSON object to be verified
+   * @param hash - JSON object to be verified
    * @param signature - signature of the JSON object
    * @returns true if the signature is valid, false otherwise
    * @throws {Error} if the JSON object is not a valid JSON or the signature is not a valid signature

@@ -13,11 +13,12 @@ export abstract class SignerInterface {
    * Sign an JSON object for off-chain usage with the starknet private key and return the signature
    * This adds a message prefix so it cant be interchanged with transactions
    *
-   * @param json - JSON object to be signed
+   * @param typedData - JSON object to be signed
+   * @param accountAddress - account
    * @returns the signature of the JSON object
    * @throws {Error} if the JSON object is not a valid JSON
    */
-  public abstract signMessage(typedData: TypedData, walletAddress: string): Promise<Signature>;
+  public abstract signMessage(typedData: TypedData, accountAddress: string): Promise<Signature>;
 
   /**
    * Signs a transaction with the starknet private key and returns the signature

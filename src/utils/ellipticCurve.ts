@@ -80,7 +80,7 @@ export function sign(keyPair: KeyPair, msgHash: string): Signature {
   assertInRange(r, ONE, toBN(addHexPrefix(MAX_ECDSA_VAL)), 'r');
   assertInRange(s, ONE, toBN(addHexPrefix(EC_ORDER)), 's');
   assertInRange(w, ONE, toBN(addHexPrefix(MAX_ECDSA_VAL)), 'w');
-  return [r, s];
+  return [r.toString(), s.toString()];
 }
 
 function chunkArray(arr: any[], n: number): any[][] {

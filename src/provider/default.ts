@@ -17,21 +17,16 @@ import {
   Invocation,
   TransactionReceipt,
 } from '../types';
+import { getSelectorFromName } from '../utils/hash';
 import { parse, stringify } from '../utils/json';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
-import { compressProgram, getSelectorFromName, randomAddress } from '../utils/stark';
+import { compressProgram, randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
 import { BlockIdentifier, getFormattedBlockIdentifier, txIdentifier } from './utils';
 
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha';
 
-type ProviderOptions =
-  | {
-      network: NetworkName;
-    }
-  | {
-      baseUrl: string;
-    };
+type ProviderOptions = { network: NetworkName } | { baseUrl: string };
 
 function wait(delay: number) {
   return new Promise((res) => setTimeout(res, delay));
@@ -133,14 +128,21 @@ export class Provider implements ProviderInterface {
     const queryString = this.getQueryString(query);
     const headers = this.getHeaders(method);
 
-    const { data } = await axios.request<Endpoints[T]['RESPONSE']>({
-      method,
-      url: urljoin(baseUrl, endpoint, queryString),
-      data: stringify(request),
-      headers,
-    });
-
-    return data;
+    try {
+      const { data } = await axios.request<Endpoints[T]['RESPONSE']>({
+        method,
+        url: urljoin(baseUrl, endpoint, queryString),
+        data: stringify(request),
+        headers,
+      });
+      return data;
+    } catch (error: any) {
+      const data = error?.response?.data;
+      if (data?.message) {
+        throw new Error(`${data.code}: ${data.message}`);
+      }
+      throw error;
+    }
   }
 
   /**
@@ -344,7 +346,10 @@ export class Provider implements ProviderInterface {
       if (res.tx_status === 'ACCEPTED_ON_L1' || res.tx_status === 'ACCEPTED_ON_L2') {
         onchain = true;
       } else if (res.tx_status === 'REJECTED' || res.tx_status === 'NOT_RECEIVED') {
-        const error = Error(res.tx_status) as Error & { response: GetTransactionStatusResponse };
+        const message = res.tx_failure_reason
+          ? `${res.tx_status}: ${res.tx_failure_reason.code}\n${res.tx_failure_reason.error_message}`
+          : res.tx_status;
+        const error = new Error(message) as Error & { response: GetTransactionStatusResponse };
         error.response = res;
         throw error;
       }

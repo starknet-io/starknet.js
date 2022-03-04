@@ -1,72 +1,59 @@
-import fs from 'fs';
-
 import typedDataExample from '../__mocks__/typedDataExample.json';
-import {
-  Account,
-  CompiledContract,
-  Contract,
-  defaultProvider,
-  ec,
-  json,
-  number,
-  stark,
-} from '../src';
+import { Account, Contract, defaultProvider, ec, number, stark } from '../src';
 import { toBN } from '../src/utils/number';
-
-const { compileCalldata } = stark;
-
-const compiledArgentAccount: CompiledContract = json.parse(
-  fs.readFileSync('./__mocks__/ArgentAccount.json').toString('ascii')
-);
-const compiledErc20: CompiledContract = json.parse(
-  fs.readFileSync('./__mocks__/ERC20.json').toString('ascii')
-);
+import { compiledArgentAccount, compiledErc20, compiledTestDapp } from './fixtures';
 
 describe('deploy and test Wallet', () => {
   const privateKey = stark.randomAddress();
 
   const starkKeyPair = ec.getKeyPair(privateKey);
   const starkKeyPub = ec.getStarkKey(starkKeyPair);
-  let walletAddress: string;
+  let account: Account;
   let erc20: Contract;
   let erc20Address: string;
-  let account: Account;
+  let dapp: Contract;
 
   beforeAll(async () => {
-    const { code: codeErc20, address: erc20AddressLocal } = await defaultProvider.deployContract({
-      contract: compiledErc20,
-    });
-    erc20Address = erc20AddressLocal;
-    erc20 = new Contract(compiledErc20.abi, erc20Address);
-
-    expect(codeErc20).toBe('TRANSACTION_RECEIVED');
-
-    const { code, address: walletAddressLocal } = await defaultProvider.deployContract({
+    const accountResponse = await defaultProvider.deployContract({
       contract: compiledArgentAccount,
-      constructorCalldata: compileCalldata({
-        signer: starkKeyPub,
-        guardian: '0',
-        L1_address: '0',
-      }),
       addressSalt: starkKeyPub,
     });
-    walletAddress = walletAddressLocal;
-    expect(code).toBe('TRANSACTION_RECEIVED');
+    const contract = new Contract(compiledArgentAccount.abi, accountResponse.address);
+    expect(accountResponse.code).toBe('TRANSACTION_RECEIVED');
 
-    const { code: codeErc20Mint, transaction_hash: txErc20Mint } = await erc20.invoke('mint', {
-      recipient: walletAddress,
+    const initializeResponse = await contract.invoke('initialize', {
+      signer: starkKeyPub,
+      guardian: '0',
+    });
+    expect(initializeResponse.code).toBe('TRANSACTION_RECEIVED');
+
+    account = new Account(defaultProvider, accountResponse.address, starkKeyPair);
+
+    const erc20Response = await defaultProvider.deployContract({
+      contract: compiledErc20,
+    });
+    erc20Address = erc20Response.address;
+    erc20 = new Contract(compiledErc20.abi, erc20Address);
+    expect(erc20Response.code).toBe('TRANSACTION_RECEIVED');
+
+    const mintResponse = await erc20.invoke('mint', {
+      recipient: account.address,
       amount: '1000',
     });
+    expect(mintResponse.code).toBe('TRANSACTION_RECEIVED');
 
-    expect(codeErc20Mint).toBe('TRANSACTION_RECEIVED');
-
-    account = new Account(defaultProvider, walletAddressLocal, starkKeyPair);
-
-    await defaultProvider.waitForTx(txErc20Mint);
+    const dappResponse = await defaultProvider.deployContract({
+      contract: compiledTestDapp,
+    });
+    dapp = new Contract(compiledTestDapp.abi, dappResponse.address);
+    expect(dappResponse.code).toBe('TRANSACTION_RECEIVED');
+    await defaultProvider.waitForTx(dappResponse.transaction_hash);
   });
+
   test('same wallet address', () => {
-    expect(walletAddress).toBe(account.address);
+    expect(account.address).toBe(account.address);
   });
+
   test('read nonce', async () => {
     const { result } = await account.callContract({
       contractAddress: account.address,
@@ -76,13 +63,15 @@ describe('deploy and test Wallet', () => {
 
     expect(number.toBN(nonce).toString()).toStrictEqual(number.toBN(0).toString());
   });
+
   test('read balance of wallet', async () => {
     const { res } = await erc20.call('balance_of', {
-      user: walletAddress,
+      user: account.address,
     });
 
     expect(number.toBN(res as string).toString()).toStrictEqual(number.toBN(1000).toString());
   });
+
   test('execute by wallet owner', async () => {
     const { code, transaction_hash } = await account.execute({
       contractAddress: erc20Address,
@@ -93,13 +82,15 @@ describe('deploy and test Wallet', () => {
     expect(code).toBe('TRANSACTION_RECEIVED');
     await defaultProvider.waitForTx(transaction_hash);
   });
+
   test('read balance of wallet after transfer', async () => {
     const { res } = await erc20.call('balance_of', {
-      user: walletAddress,
+      user: account.address,
     });
 
     expect(number.toBN(res as string).toString()).toStrictEqual(number.toBN(990).toString());
   });
+
   test('execute with custom nonce', async () => {
     const { result } = await account.callContract({
       contractAddress: account.address,
@@ -119,6 +110,28 @@ describe('deploy and test Wallet', () => {
     expect(code).toBe('TRANSACTION_RECEIVED');
     await defaultProvider.waitForTx(transaction_hash);
   });
+
+  test('execute multiple transactions', async () => {
+    const { code, transaction_hash } = await account.execute([
+      {
+        contractAddress: dapp.connectedTo,
+        entrypoint: 'set_number',
+        calldata: ['47'],
+      },
+      {
+        contractAddress: dapp.connectedTo,
+        entrypoint: 'increase_number',
+        calldata: ['10'],
+      },
+    ]);
+
+    expect(code).toBe('TRANSACTION_RECEIVED');
+    await defaultProvider.waitForTx(transaction_hash);
+
+    const response = await dapp.call('get_number', { user: account.address });
+    expect(toBN(response.number as string).toString()).toStrictEqual('57');
+  });
+
   test('sign and verify offchain message', async () => {
     const signature = await account.signMessage(typedDataExample);
 

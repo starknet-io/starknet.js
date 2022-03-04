@@ -3,7 +3,7 @@ import type { ec as EC } from 'elliptic';
 import type { BigNumberish } from '../utils/number';
 
 export type KeyPair = EC.KeyPair;
-export type Signature = BigNumberish[];
+export type Signature = string[];
 export type RawCalldata = BigNumberish[];
 
 export type DeployContractPayload = {
@@ -19,13 +19,12 @@ export type Invocation = {
   signature?: Signature;
 };
 
-export type ExecuteInvocation = Omit<Invocation, 'signature'>;
+export type Call = Omit<Invocation, 'signature'>;
 
 export type InvocationsDetails = {
   nonce?: BigNumberish;
+  maxFee?: BigNumberish;
 };
-
-export type Call = Omit<Invocation, 'signature' | 'nonce'>;
 
 export type Status =
   | 'NOT_RECEIVED'
