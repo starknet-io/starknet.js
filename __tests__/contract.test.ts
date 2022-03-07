@@ -19,7 +19,7 @@ describe('class Contract {}', () => {
       });
       erc20 = new Contract(compiledErc20.abi, address, defaultProvider);
       expect(code).toBe('TRANSACTION_RECEIVED');
-      await defaultProvider.waitForTx(transaction_hash);
+      await defaultProvider.waitForTransaction(transaction_hash);
 
       // Deploy Multicall
 
@@ -35,7 +35,7 @@ describe('class Contract {}', () => {
 
       expect(m_code).toBe('TRANSACTION_RECEIVED');
 
-      await defaultProvider.waitForTx(m_transaction_hash);
+      await defaultProvider.waitForTransaction(m_transaction_hash);
     });
 
     test('read initial balance of that account', async () => {
@@ -52,7 +52,7 @@ describe('class Contract {}', () => {
       });
       expect(response.code).toBe('TRANSACTION_RECEIVED');
 
-      await defaultProvider.waitForTx(response.transaction_hash);
+      await defaultProvider.waitForTransaction(response.transaction_hash);
     });
 
     test('read balance after mint of that account', async () => {
@@ -93,7 +93,7 @@ describe('class Contract {}', () => {
       });
       contract = new Contract(compiledTypeTransformation.abi, address, defaultProvider);
       expect(code).toBe('TRANSACTION_RECEIVED');
-      await defaultProvider.waitForTx(transaction_hash);
+      await defaultProvider.waitForTransaction(transaction_hash);
     });
 
     describe('Request Type Transformation', () => {

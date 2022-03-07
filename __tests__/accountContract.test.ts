@@ -56,7 +56,7 @@ describe('deploy and test Wallet', () => {
       amount: '1000',
     });
     expect(mintResponse.code).toBe('TRANSACTION_RECEIVED');
-    await defaultProvider.waitForTx(mintResponse.transaction_hash);
+    await defaultProvider.waitForTransaction(mintResponse.transaction_hash);
   });
 
   test('read nonce', async () => {
@@ -96,7 +96,7 @@ describe('deploy and test Wallet', () => {
 
     expect(code).toBe('TRANSACTION_RECEIVED');
 
-    await defaultProvider.waitForTx(transaction_hash);
+    await defaultProvider.waitForTransaction(transaction_hash);
   });
 
   test('read balance of wallet after transfer', async () => {

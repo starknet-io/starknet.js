@@ -137,5 +137,10 @@ export abstract class ProviderInterface {
    */
   public abstract invokeFunction(invocation: Invocation): Promise<AddTransactionResponse>;
 
-  public abstract waitForTx(txHash: BigNumberish, retryInterval?: number): Promise<void>;
+  public abstract waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<void>;
+
+  /**
+   * @deprecated use `waitForTransaction` instead
+   */
+  public abstract waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<void>;
 }
