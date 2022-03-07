@@ -16,6 +16,18 @@ const config = {
   organizationName: '0xs34n', // Usually your GitHub org/user name.
   projectName: 'starknet.js', // Usually your repo name.
 
+  plugins: [
+    [
+      '@docusaurus/plugin-content-docs',
+      {
+        id: 'guides',
+        path: 'guides',
+        routeBasePath: 'guides',
+        sidebarPath: require.resolve('./sidebars.js'),
+      },
+    ],
+  ],
+
   presets: [
     [
       'classic',
@@ -51,9 +63,14 @@ const config = {
         items: [
           {
             type: 'doc',
-            docId: 'intro',
+            docId: 'API/index',
             position: 'left',
-            label: 'Tutorial',
+            label: 'API',
+          },
+          {
+            position: 'left',
+            label: 'Guides',
+            to: '/guides/intro'
           },
           {to: '/blog', label: 'Blog', position: 'left'},
           {
@@ -70,8 +87,12 @@ const config = {
             title: 'Docs',
             items: [
               {
-                label: 'Tutorial',
-                to: '/docs/intro',
+                label: 'API',
+                to: '/docs/API/',
+              },
+              {
+                label: 'Guides',
+                to: '/guides/intro',
               },
             ],
           },
