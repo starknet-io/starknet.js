@@ -52,7 +52,7 @@ describe('deploy and test Wallet', () => {
     expect(erc20Response.code).toBe('TRANSACTION_RECEIVED');
 
     const mintResponse = await erc20.invoke('mint', {
-      recipient: accountContract.connectedTo,
+      recipient: accountContract.address,
       amount: '1000',
     });
     expect(mintResponse.code).toBe('TRANSACTION_RECEIVED');
@@ -67,7 +67,7 @@ describe('deploy and test Wallet', () => {
 
   test('read balance of wallet', async () => {
     const { res } = await erc20.call('balance_of', {
-      user: accountContract.connectedTo,
+      user: accountContract.address,
     });
 
     expect(number.toBN(res as string).toString()).toStrictEqual(number.toBN(1000).toString());
@@ -79,7 +79,7 @@ describe('deploy and test Wallet', () => {
     const calls = [
       { contractAddress: erc20Address, entrypoint: 'transfer', calldata: [erc20Address, '10'] },
     ];
-    const msgHash = hash.hashMulticall(accountContract.connectedTo, calls, nonce, '0');
+    const msgHash = hash.hashMulticall(accountContract.address, calls, nonce, '0');
 
     const { callArray, calldata } = transformCallsToMulticallArrays(calls);
 
@@ -101,7 +101,7 @@ describe('deploy and test Wallet', () => {
 
   test('read balance of wallet after transfer', async () => {
     const { res } = await erc20.call('balance_of', {
-      user: accountContract.connectedTo,
+      user: accountContract.address,
     });
 
     expect(number.toBN(res as string).toString()).toStrictEqual(number.toBN(990).toString());

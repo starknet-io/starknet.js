@@ -114,12 +114,12 @@ describe('deploy and test Wallet', () => {
   test('execute multiple transactions', async () => {
     const { code, transaction_hash } = await account.execute([
       {
-        contractAddress: dapp.connectedTo,
+        contractAddress: dapp.address,
         entrypoint: 'set_number',
         calldata: ['47'],
       },
       {
-        contractAddress: dapp.connectedTo,
+        contractAddress: dapp.address,
         entrypoint: 'increase_number',
         calldata: ['10'],
       },
