@@ -47,7 +47,7 @@ describe('deploy and test Wallet', () => {
     });
     dapp = new Contract(compiledTestDapp.abi, dappResponse.address);
     expect(dappResponse.code).toBe('TRANSACTION_RECEIVED');
-    await defaultProvider.waitForTx(dappResponse.transaction_hash);
+    await defaultProvider.waitForTransaction(dappResponse.transaction_hash);
   });
 
   test('same wallet address', () => {
@@ -80,7 +80,7 @@ describe('deploy and test Wallet', () => {
     });
 
     expect(code).toBe('TRANSACTION_RECEIVED');
-    await defaultProvider.waitForTx(transaction_hash);
+    await defaultProvider.waitForTransaction(transaction_hash);
   });
 
   test('read balance of wallet after transfer', async () => {
@@ -108,7 +108,7 @@ describe('deploy and test Wallet', () => {
     );
 
     expect(code).toBe('TRANSACTION_RECEIVED');
-    await defaultProvider.waitForTx(transaction_hash);
+    await defaultProvider.waitForTransaction(transaction_hash);
   });
 
   test('execute multiple transactions', async () => {
@@ -126,7 +126,7 @@ describe('deploy and test Wallet', () => {
     ]);
 
     expect(code).toBe('TRANSACTION_RECEIVED');
-    await defaultProvider.waitForTx(transaction_hash);
+    await defaultProvider.waitForTransaction(transaction_hash);
 
     const response = await dapp.call('get_number', { user: account.address });
     expect(toBN(response.number as string).toString()).toStrictEqual('57');

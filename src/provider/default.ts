@@ -333,7 +333,7 @@ export class Provider implements ProviderInterface {
     });
   }
 
-  public async waitForTx(txHash: BigNumberish, retryInterval: number = 8000) {
+  public async waitForTransaction(txHash: BigNumberish, retryInterval: number = 8000) {
     let onchain = false;
     await wait(retryInterval);
 
@@ -354,5 +354,12 @@ export class Provider implements ProviderInterface {
         throw error;
       }
     }
+  }
+
+  /**
+   * @deprecated use `waitForTransaction` instead
+   */
+  public async waitForTx(txHash: BigNumberish, retryInterval: number = 8000) {
+    return this.waitForTransaction(txHash, retryInterval);
   }
 }
