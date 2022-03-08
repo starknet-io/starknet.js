@@ -342,7 +342,7 @@ export class Provider implements ProviderInterface {
    * @param signature - (optional) signature to send along
    * @returns response from addTransaction
    */
-  public invokeFunctionLegacy(
+  public LEGACY_invokeFunction(
     contractAddress: string,
     entrypointSelector: string,
     calldata?: string[],
