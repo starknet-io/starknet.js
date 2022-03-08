@@ -70,3 +70,7 @@ export type CompiledContract = {
 export type CompressedCompiledContract = Omit<CompiledContract, 'program'> & {
   program: CompressedProgram;
 };
+
+export type ParsedStruct = {
+  [key: string]: BigNumberish | ParsedStruct;
+};

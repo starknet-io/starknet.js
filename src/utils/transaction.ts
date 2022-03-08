@@ -1,5 +1,4 @@
-import { ParsedStruct } from '../contract';
-import { Call } from '../types';
+import { Call, ParsedStruct } from '../types';
 import { getSelectorFromName } from './hash';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN } from './number';
 
