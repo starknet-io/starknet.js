@@ -1,3 +1,9 @@
+# [3.3.0](https://github.com/seanjameshan/starknet.js/compare/v3.2.0...v3.3.0) (2022-03-08)
+
+### Features
+
+- **provider:** add back legacy `invokeFunction` ([dbd00ff](https://github.com/seanjameshan/starknet.js/commit/dbd00ff822456f05df5ba1967d5cd0040b012fc0))
+
 # [3.2.0](https://github.com/seanjameshan/starknet.js/compare/v3.1.0...v3.2.0) (2022-03-04)
 
 ### Features
