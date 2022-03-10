@@ -1,25 +1,25 @@
 import BN from 'bn.js';
 import assert from 'minimalistic-assert';
 
-import { Account } from './account';
-import { Provider, defaultProvider } from './provider';
-import { Abi, AbiEntry, Calldata, FunctionAbi, Invocation, ParsedStruct, StructAbi } from './types';
-import { getSelectorFromName } from './utils/hash';
-import { BigNumberish, toBN, toFelt } from './utils/number';
-
-export type Struct = {
-  type: 'struct';
-  [k: string]: BigNumberish;
-};
-export type Args = {
-  [inputName: string]: BigNumberish | BigNumberish[] | ParsedStruct | ParsedStruct[];
-};
-
-export type AsyncContractFunction<T = any> = (...args: Array<any>) => Promise<T>;
-export type ContractFunction = (...args: Array<any>) => any;
-export interface Result extends Array<any> {
-  [key: string]: any;
-}
+import { Account } from '../account';
+import { Provider, defaultProvider } from '../provider';
+import {
+  Abi,
+  AbiEntry,
+  AddTransactionResponse,
+  Args,
+  AsyncContractFunction,
+  Calldata,
+  ContractFunction,
+  FunctionAbi,
+  Invocation,
+  ParsedStruct,
+  Result,
+  StructAbi,
+} from '../types';
+import { getSelectorFromName } from '../utils/hash';
+import { BigNumberish, toBN, toFelt } from '../utils/number';
+import { ContractInterface } from './interface';
 
 function parseFelt(candidate: string): BN {
   try {
@@ -29,18 +29,30 @@ function parseFelt(candidate: string): BN {
   }
 }
 
+/**
+ * Adds call methods to the contract
+ *
+ */
 function buildCall(contract: Contract, functionAbi: FunctionAbi): AsyncContractFunction {
   return async function (...args: Array<any>): Promise<any> {
     return contract.call(functionAbi.name, args);
   };
 }
 
+/**
+ * Adds invoke methods to the contract
+ *
+ */
 function buildInvoke(contract: Contract, functionAbi: FunctionAbi): AsyncContractFunction {
   return async function (...args: Array<any>): Promise<any> {
     return contract.invoke(functionAbi.name, args);
   };
 }
 
+/**
+ * Adds call/invoke methods to the contract
+ *
+ */
 function buildDefault(contract: Contract, functionAbi: FunctionAbi): AsyncContractFunction {
   if (functionAbi.stateMutability === 'view') {
     return buildCall(contract, functionAbi);
@@ -48,19 +60,27 @@ function buildDefault(contract: Contract, functionAbi: FunctionAbi): AsyncContra
   return buildInvoke(contract, functionAbi);
 }
 
+/**
+ * Adds populate for methods to the contract
+ *
+ */
 function buildPopulate(contract: Contract, functionAbi: FunctionAbi): ContractFunction {
   return function (...args: Array<any>): any {
     return contract.populate(functionAbi.name, args);
   };
 }
 
+/**
+ * Adds estimateFee for methods to the contract
+ *
+ */
 function buildEstimate(contract: Contract, functionAbi: FunctionAbi): ContractFunction {
   return function (...args: Array<any>): any {
     return contract.estimate(functionAbi.name, args);
   };
 }
 
-export class Contract {
+export class Contract implements ContractInterface {
   address: string;
 
   providerOrAccount: Provider | Account;
@@ -170,22 +190,18 @@ export class Contract {
    * Saves the address of the contract deployed on network that will be used for interaction
    *
    * @param address - address of the contract
-   * @returns Contract
    */
-  public attach(address: string): Contract {
+  public attach(address: string): void {
     this.address = address;
-    return this;
   }
 
   /**
    * Attaches to new Provider or Account
    *
    * @param providerOrAccount - new Provider or Account to attach to
-   * @returns Contract
    */
-  public connect(providerOrAccount: Provider | Account): Contract {
+  public connect(providerOrAccount: Provider | Account) {
     this.providerOrAccount = providerOrAccount;
-    return this;
   }
 
   /**
@@ -496,7 +512,7 @@ export class Contract {
     }, [] as Result);
   }
 
-  public invoke(method: string, args: Array<any>) {
+  public invoke(method: string, args: Array<any>): Promise<AddTransactionResponse> {
     // ensure contract is connected
     assert(this.address !== null, 'contract isnt connected to an address');
     // validate method and args
@@ -534,7 +550,7 @@ export class Contract {
     });
   }
 
-  public async call(method: string, args: Array<any>) {
+  public async call(method: string, args: Array<any>): Promise<Result> {
     // ensure contract is connected
     assert(this.address !== null, 'contract isnt connected to an address');
 

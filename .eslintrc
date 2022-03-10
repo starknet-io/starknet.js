@@ -21,6 +21,7 @@
     "class-methods-use-this": 0,
     "import/prefer-default-export": 0,
     "@typescript-eslint/naming-convention": 0,
-    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
+    "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "func-names": 0
   }
 }
