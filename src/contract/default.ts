@@ -147,14 +147,14 @@ export class Contract implements ContractInterface {
         return;
       }
       const signature = abiElement.name;
-      if (this[signature] == null) {
+      if (!this[signature]) {
         Object.defineProperty(this, signature, {
           enumerable: true,
           value: buildDefault(this, abiElement),
           writable: false,
         });
       }
-      if (this.functions[signature] == null) {
+      if (!this.functions[signature]) {
         Object.defineProperty(this.functions, signature, {
           enumerable: true,
           value: buildDefault(this, abiElement),
@@ -162,7 +162,7 @@ export class Contract implements ContractInterface {
         });
       }
 
-      if (this.callStatic[signature] == null) {
+      if (!this.callStatic[signature]) {
         Object.defineProperty(this.callStatic, signature, {
           enumerable: true,
           value: buildCall(this, abiElement),
@@ -170,7 +170,7 @@ export class Contract implements ContractInterface {
         });
       }
 
-      if (this.populateTransaction[signature] == null) {
+      if (!this.populateTransaction[signature]) {
         Object.defineProperty(this.populateTransaction, signature, {
           enumerable: true,
           value: buildPopulate(this, abiElement),
@@ -178,7 +178,7 @@ export class Contract implements ContractInterface {
         });
       }
 
-      if (this.estimateFee[signature] == null) {
+      if (!this.estimateFee[signature]) {
         Object.defineProperty(this.estimateFee, signature, {
           enumerable: true,
           value: buildEstimate(this, abiElement),
@@ -245,61 +245,52 @@ export class Contract implements ContractInterface {
     const methodAbi = this.abi.find(
       (abi) => abi.name === method && abi.type === 'function'
     ) as FunctionAbi;
-    let argPosition = 0;
-    methodAbi.inputs.forEach((input) => {
+    methodAbi.inputs.forEach((input, index) => {
       if (/_len$/.test(input.name)) {
         return;
       }
+      const arg = args[index];
       if (input.type === 'felt') {
         assert(
-          typeof args[argPosition] === 'string' ||
-            typeof args[argPosition] === 'number' ||
-            args[argPosition] instanceof BN,
+          typeof arg === 'string' || typeof arg === 'number' || arg instanceof BN,
           `arg ${input.name} should be a felt (string, number, BigNumber)`
         );
-        argPosition += 1;
-      } else if (input.type in this.structs && typeof args[argPosition] === 'object') {
-        if (Array.isArray(args[argPosition])) {
+      } else if (input.type in this.structs && typeof arg === 'object') {
+        if (Array.isArray(arg)) {
           const structMembersLength = this.calculateStructMembers(input.type);
           assert(
-            args[argPosition].length === structMembersLength,
+            arg.length === structMembersLength,
             `arg should be of length ${structMembersLength}`
           );
         } else {
           this.structs[input.type].members.forEach(({ name }) => {
-            assert(
-              Object.keys(args[argPosition]).includes(name),
-              `arg should have a property ${name}`
-            );
+            assert(Object.keys(arg).includes(name), `arg should have a property ${name}`);
           });
         }
-        argPosition += 1;
       } else {
-        assert(Array.isArray(args[argPosition]), `arg ${input.name} should be an Array`);
+        assert(Array.isArray(arg), `arg ${input.name} should be an Array`);
         if (input.type === 'felt*') {
-          args[argPosition].forEach((felt: BigNumberish) => {
+          arg.forEach((felt: BigNumberish) => {
             assert(
               typeof felt === 'string' || typeof felt === 'number' || felt instanceof BN,
               `arg ${input.name} should be an array of string, number or BigNumber`
             );
           });
-          argPosition += 1;
         } else if (/\(felt/.test(input.type)) {
           const tupleLength = input.type.split(',').length;
           assert(
-            args[argPosition].length === tupleLength,
+            arg.length === tupleLength,
             `arg ${input.name} should have ${tupleLength} elements in tuple`
           );
-          args[argPosition].forEach((felt: BigNumberish) => {
+          arg.forEach((felt: BigNumberish) => {
             assert(
               typeof felt === 'string' || typeof felt === 'number' || felt instanceof BN,
               `arg ${input.name} should be an array of string, number or BigNumber`
             );
           });
-          argPosition += 1;
         } else {
           const arrayType = input.type.replace('*', '');
-          args[argPosition].forEach((struct: any) => {
+          arg.forEach((struct: any) => {
             this.structs[arrayType].members.forEach(({ name }) => {
               if (Array.isArray(struct)) {
                 const structMembersLength = this.calculateStructMembers(arrayType);
@@ -315,7 +306,6 @@ export class Contract implements ContractInterface {
               }
             });
           });
-          argPosition += 1;
         }
       }
     });
@@ -329,15 +319,12 @@ export class Contract implements ContractInterface {
    */
 
   private calculateStructMembers(struct: string): number {
-    let structMemberNum = 0;
-    this.structs[struct].members.forEach((member) => {
+    return this.structs[struct].members.reduce((acc, member) => {
       if (member.type === 'felt') {
-        structMemberNum += 1;
-      } else {
-        structMemberNum += this.structMemberNum(member.type);
+        return acc + 1;
       }
-    });
-    return structMemberNum;
+      return acc + this.structMemberNum(member.type);
+    }, 0);
   }
 
   /**
@@ -410,7 +397,7 @@ export class Contract implements ContractInterface {
    * @param input  - input(field) information from the abi that will be used to parse the data
    * @return {string | string[]} - parsed arguments in format that contract is expecting
    */
-  protected parsCalldataField(argsIterator: Iterator<any>, input: AbiEntry): string | string[] {
+  protected parseCalldataField(argsIterator: Iterator<any>, input: AbiEntry): string | string[] {
     const { name, type } = input;
     const { value } = argsIterator.next();
 
@@ -454,7 +441,7 @@ export class Contract implements ContractInterface {
       if (/_len$/.test(input.name)) {
         return acc;
       }
-      const parsedData = this.parsCalldataField(argsIterator, input);
+      const parsedData = this.parseCalldataField(argsIterator, input);
       if (Array.isArray(parsedData)) {
         acc.push(...parsedData);
       } else {
@@ -477,7 +464,6 @@ export class Contract implements ContractInterface {
     parsedResult?: Args
   ): any {
     const { name, type } = output;
-    let arrLen: number;
     const parsedDataArr: (BigNumberish | ParsedStruct)[] = [];
     switch (true) {
       case /_len$/.test(name):
@@ -489,7 +475,7 @@ export class Contract implements ContractInterface {
         }, [] as BigNumberish[]);
       case /\*/.test(type):
         if (parsedResult && parsedResult[`${name}_len`]) {
-          arrLen = parsedResult[`${name}_len`] as number;
+          const arrLen = parsedResult[`${name}_len`] as number;
           while (parsedDataArr.length < arrLen) {
             parsedDataArr.push(
               this.parseResponseStruct(responseIterator, output.type.replace('*', ''))
@@ -533,6 +519,7 @@ export class Contract implements ContractInterface {
     assert(this.address !== null, 'contract isnt connected to an address');
     // validate method and args
     this.validateMethodAndArgs('INVOKE', method, args);
+
     const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
     const inputsLength = inputs.reduce((acc, input) => {
       if (!/_len$/.test(input.name)) {
@@ -594,35 +581,32 @@ export class Contract implements ContractInterface {
       .then((x) => this.parseResponse(method, x.result));
   }
 
-  public async estimate(method: string, args: Array<any>) {
+  public async estimate(_method: string, _args: Array<any>) {
     //  TODO; remove error as soon as estimate fees are supported
     throw Error('Estimation of the fees are not yet supported');
-    // ensure contract is connected
-    assert(this.address !== null, 'contract isnt connected to an address');
+    // // ensure contract is connected
+    // assert(this.address !== null, 'contract isnt connected to an address');
 
-    // validate method and args
-    // this.validateMethodAndArgs('CALL', method, args);
-    const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
+    // // validate method and args
+    // // this.validateMethodAndArgs('CALL', method, args);
+    // const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
 
-    // compile calldata
-    const calldata = this.compileCalldata(args, inputs);
-    return this.providerOrAccount.estimateFee({
-      contractAddress: this.address as string,
-      calldata,
-      entrypoint: method,
-    });
+    // // compile calldata
+    // const calldata = this.compileCalldata(args, inputs);
+    // return this.providerOrAccount.estimateFee({
+    //   contractAddress: this.address as string,
+    //   calldata,
+    //   entrypoint: method,
+    // });
   }
 
   public populate(method: string, args: Array<any>): Invocation {
     const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
-    if (this.address) {
-      return {
-        contractAddress: this.address,
-        entrypoint: getSelectorFromName(method),
-        calldata: this.compileCalldata(args, inputs),
-        signature: [],
-      };
-    }
-    throw Error('Contract not connected');
+    return {
+      contractAddress: this.address,
+      entrypoint: getSelectorFromName(method),
+      calldata: this.compileCalldata(args, inputs),
+      signature: [],
+    };
   }
 }
