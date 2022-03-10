@@ -1,6 +1,7 @@
 import { Account } from '../account';
 import { Provider } from '../provider';
 import {
+  Abi,
   AddTransactionResponse,
   AsyncContractFunction,
   ContractFunction,
@@ -9,6 +10,8 @@ import {
 } from '../types';
 
 export abstract class ContractInterface {
+  public abstract abi: Abi;
+
   public abstract address: string;
 
   public abstract providerOrAccount: Provider | Account;
@@ -38,6 +41,14 @@ export abstract class ContractInterface {
    * @param providerOrAccount - new Provider or Account to attach to
    */
   public abstract connect(providerOrAccount: Provider | Account): void;
+
+  /**
+   * Resolves when contract is deployed on the network or when no deployment transaction is found
+   *
+   * @returns Promise that resolves when contract is deployed on the network or when no deployment transaction is found
+   * @throws When deployment fails
+   */
+  public abstract deployed(): Promise<ContractInterface>;
 
   /**
    * Calls a method on a contract

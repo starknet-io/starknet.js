@@ -81,13 +81,13 @@ function buildEstimate(contract: Contract, functionAbi: FunctionAbi): ContractFu
 }
 
 export class Contract implements ContractInterface {
+  abi: Abi;
+
   address: string;
 
   providerOrAccount: Provider | Account;
 
   deployTransactionHash?: string;
-
-  protected readonly abi: Abi;
 
   protected readonly structs: { [name: string]: StructAbi };
 
@@ -204,6 +204,20 @@ export class Contract implements ContractInterface {
    */
   public connect(providerOrAccount: Provider | Account) {
     this.providerOrAccount = providerOrAccount;
+  }
+
+  /**
+   * Resolves when contract is deployed on the network or when no deployment transaction is found
+   *
+   * @returns Promise that resolves when contract is deployed on the network or when no deployment transaction is found
+   * @throws When deployment fails
+   */
+  public async deployed(): Promise<Contract> {
+    if (this.deployTransactionHash) {
+      await this.providerOrAccount.waitForTransaction(this.deployTransactionHash);
+      this.deployTransactionHash = undefined;
+    }
+    return this;
   }
 
   /**
