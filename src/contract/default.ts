@@ -568,7 +568,7 @@ export class Contract implements ContractInterface {
     assert(this.address !== null, 'contract isnt connected to an address');
 
     // validate method and args
-    // this.validateMethodAndArgs('CALL', method, args);
+    this.validateMethodAndArgs('CALL', method, args);
     const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
     const inputsLength = inputs.length;
     const options = {
