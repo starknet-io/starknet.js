@@ -245,52 +245,61 @@ export class Contract implements ContractInterface {
     const methodAbi = this.abi.find(
       (abi) => abi.name === method && abi.type === 'function'
     ) as FunctionAbi;
-    methodAbi.inputs.forEach((input, index) => {
+    let argPosition = 0;
+    methodAbi.inputs.forEach((input) => {
       if (/_len$/.test(input.name)) {
         return;
       }
-      const arg = args[index];
       if (input.type === 'felt') {
         assert(
-          typeof arg === 'string' || typeof arg === 'number' || arg instanceof BN,
+          typeof args[argPosition] === 'string' ||
+            typeof args[argPosition] === 'number' ||
+            args[argPosition] instanceof BN,
           `arg ${input.name} should be a felt (string, number, BigNumber)`
         );
-      } else if (input.type in this.structs && typeof arg === 'object') {
-        if (Array.isArray(arg)) {
+        argPosition += 1;
+      } else if (input.type in this.structs && typeof args[argPosition] === 'object') {
+        if (Array.isArray(args[argPosition])) {
           const structMembersLength = this.calculateStructMembers(input.type);
           assert(
-            arg.length === structMembersLength,
+            args[argPosition].length === structMembersLength,
             `arg should be of length ${structMembersLength}`
           );
         } else {
           this.structs[input.type].members.forEach(({ name }) => {
-            assert(Object.keys(arg).includes(name), `arg should have a property ${name}`);
+            assert(
+              Object.keys(args[argPosition]).includes(name),
+              `arg should have a property ${name}`
+            );
           });
         }
+        argPosition += 1;
       } else {
-        assert(Array.isArray(arg), `arg ${input.name} should be an Array`);
+        assert(Array.isArray(args[argPosition]), `arg ${input.name} should be an Array`);
         if (input.type === 'felt*') {
-          arg.forEach((felt: BigNumberish) => {
+          args[argPosition].forEach((felt: BigNumberish) => {
             assert(
               typeof felt === 'string' || typeof felt === 'number' || felt instanceof BN,
               `arg ${input.name} should be an array of string, number or BigNumber`
             );
           });
+          argPosition += 1;
         } else if (/\(felt/.test(input.type)) {
           const tupleLength = input.type.split(',').length;
           assert(
-            arg.length === tupleLength,
+            args[argPosition].length === tupleLength,
             `arg ${input.name} should have ${tupleLength} elements in tuple`
           );
-          arg.forEach((felt: BigNumberish) => {
+          args[argPosition].forEach((felt: BigNumberish) => {
             assert(
               typeof felt === 'string' || typeof felt === 'number' || felt instanceof BN,
               `arg ${input.name} should be an array of string, number or BigNumber`
             );
           });
+          argPosition += 1;
         } else {
           const arrayType = input.type.replace('*', '');
-          arg.forEach((struct: any) => {
+          args[argPosition].forEach((struct: any) => {
             this.structs[arrayType].members.forEach(({ name }) => {
               if (Array.isArray(struct)) {
                 const structMembersLength = this.calculateStructMembers(arrayType);
@@ -306,6 +315,7 @@ export class Contract implements ContractInterface {
               }
             });
           });
+          argPosition += 1;
         }
       }
     });
