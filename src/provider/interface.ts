@@ -40,7 +40,9 @@ export abstract class ProviderInterface {
    */
   public abstract callContract(
     invokeTransaction: Call,
-    blockIdentifier?: BlockIdentifier
+    options: {
+      blockIdentifier: BlockIdentifier;
+    }
   ): Promise<CallContractResponse>;
 
   /**

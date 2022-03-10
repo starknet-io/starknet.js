@@ -3,17 +3,7 @@ import assert from 'minimalistic-assert';
 
 import { Account } from './account';
 import { Provider, defaultProvider } from './provider';
-import { BlockIdentifier } from './provider/utils';
-import {
-  Abi,
-  AbiEntry,
-  Calldata,
-  FunctionAbi,
-  Invocation,
-  ParsedStruct,
-  Signature,
-  StructAbi,
-} from './types';
+import { Abi, AbiEntry, Calldata, FunctionAbi, Invocation, ParsedStruct, StructAbi } from './types';
 import { getSelectorFromName } from './utils/hash';
 import { BigNumberish, toBN, toFelt } from './utils/number';
 
@@ -25,8 +15,11 @@ export type Args = {
   [inputName: string]: BigNumberish | BigNumberish[] | ParsedStruct | ParsedStruct[];
 };
 
-export type AsyncContractFunction<T = any> = (args: Args, options?: any) => Promise<T>;
-export type ContractFunction = (args: Args) => any;
+export type AsyncContractFunction<T = any> = (...args: Array<any>) => Promise<T>;
+export type ContractFunction = (...args: Array<any>) => any;
+export interface Result extends Array<any> {
+  [key: string]: any;
+}
 
 function parseFelt(candidate: string): BN {
   try {
@@ -37,13 +30,13 @@ function parseFelt(candidate: string): BN {
 }
 
 function buildCall(contract: Contract, functionAbi: FunctionAbi): AsyncContractFunction {
-  return async function (args: Args, blockIdentifier?: BlockIdentifier): Promise<any> {
-    return contract.call(functionAbi.name, args, blockIdentifier);
+  return async function (...args: Array<any>): Promise<any> {
+    return contract.call(functionAbi.name, args);
   };
 }
 
 function buildInvoke(contract: Contract, functionAbi: FunctionAbi): AsyncContractFunction {
-  return async function (args: Args): Promise<any> {
+  return async function (...args: Array<any>): Promise<any> {
     return contract.invoke(functionAbi.name, args);
   };
 }
@@ -56,13 +49,13 @@ function buildDefault(contract: Contract, functionAbi: FunctionAbi): AsyncContra
 }
 
 function buildPopulate(contract: Contract, functionAbi: FunctionAbi): ContractFunction {
-  return function (args: Args): any {
+  return function (...args: Array<any>): any {
     return contract.populate(functionAbi.name, args);
   };
 }
 
 function buildEstimate(contract: Contract, functionAbi: FunctionAbi): ContractFunction {
-  return function (args: Args): any {
+  return function (...args: Array<any>): any {
     return contract.estimate(functionAbi.name, args);
   };
 }
@@ -202,7 +195,7 @@ export class Contract {
    * @param method  - name of the method
    * @param args - arguments that are passed to the method
    */
-  protected validateMethodAndArgs(type: 'INVOKE' | 'CALL', method: string, args: Args = {}) {
+  protected validateMethodAndArgs(type: 'INVOKE' | 'CALL', method: string, args: Array<any> = []) {
     // ensure provided method exists
     const invokeableFunctionNames = this.abi
       .filter((abi) => {
@@ -220,53 +213,99 @@ export class Contract {
     const methodAbi = this.abi.find(
       (abi) => abi.name === method && abi.type === 'function'
     ) as FunctionAbi;
+    let argPosition = 0;
     methodAbi.inputs.forEach((input) => {
-      const arg = args[input.name];
-      if (arg !== undefined) {
-        if (input.type === 'felt') {
+      if (/_len$/.test(input.name)) {
+        return;
+      }
+      if (input.type === 'felt') {
+        assert(
+          typeof args[argPosition] === 'string' ||
+            typeof args[argPosition] === 'number' ||
+            args[argPosition] instanceof BN,
+          `arg ${input.name} should be a felt (string, number, BigNumber)`
+        );
+        argPosition += 1;
+      } else if (input.type in this.structs && typeof args[argPosition] === 'object') {
+        if (Array.isArray(args[argPosition])) {
+          const structMembersLength = this.calculateStructMembers(input.type);
           assert(
-            typeof arg === 'string' || typeof arg === 'number' || arg instanceof BN,
-            `arg ${input.name} should be a felt (string, number, BigNumber)`
+            args[argPosition].length === structMembersLength,
+            `arg should be of length ${structMembersLength}`
           );
-        } else if (typeof arg === 'object' && input.type in this.structs) {
-          this.structs[input.type].members.forEach(({ name }) => {
-            assert(Object.keys(arg).includes(name), `arg should have a property ${name}`);
-          });
         } else {
-          assert(Array.isArray(arg), `arg ${input.name} should be an Array`);
-          if (input.type === 'felt*') {
-            arg.forEach((felt) => {
-              assert(
-                typeof felt === 'string' || typeof felt === 'number' || felt instanceof BN,
-                `arg ${input.name} should be an array of string, number or BigNumber`
-              );
-            });
-          } else if (/\(felt/.test(input.type)) {
-            const tupleLength = input.type.split(',').length;
+          this.structs[input.type].members.forEach(({ name }) => {
             assert(
-              arg.length === tupleLength,
-              `arg ${input.name} should have ${tupleLength} elements in tuple`
+              Object.keys(args[argPosition]).includes(name),
+              `arg should have a property ${name}`
             );
-            arg.forEach((felt) => {
-              assert(
-                typeof felt === 'string' || typeof felt === 'number' || felt instanceof BN,
-                `arg ${input.name} should be an array of string, number or BigNumber`
-              );
-            });
-          } else {
-            const arrayType = input.type.replace('*', '');
-            arg.forEach((struct) => {
-              this.structs[arrayType].members.forEach(({ name }) => {
+          });
+        }
+        argPosition += 1;
+      } else {
+        assert(Array.isArray(args[argPosition]), `arg ${input.name} should be an Array`);
+        if (input.type === 'felt*') {
+          args[argPosition].forEach((felt: BigNumberish) => {
+            assert(
+              typeof felt === 'string' || typeof felt === 'number' || felt instanceof BN,
+              `arg ${input.name} should be an array of string, number or BigNumber`
+            );
+          });
+          argPosition += 1;
+        } else if (/\(felt/.test(input.type)) {
+          const tupleLength = input.type.split(',').length;
+          assert(
+            args[argPosition].length === tupleLength,
+            `arg ${input.name} should have ${tupleLength} elements in tuple`
+          );
+          args[argPosition].forEach((felt: BigNumberish) => {
+            assert(
+              typeof felt === 'string' || typeof felt === 'number' || felt instanceof BN,
+              `arg ${input.name} should be an array of string, number or BigNumber`
+            );
+          });
+          argPosition += 1;
+        } else {
+          const arrayType = input.type.replace('*', '');
+          args[argPosition].forEach((struct: any) => {
+            this.structs[arrayType].members.forEach(({ name }) => {
+              if (Array.isArray(struct)) {
+                const structMembersLength = this.calculateStructMembers(arrayType);
+                assert(
+                  struct.length === structMembersLength,
+                  `arg should be of length ${structMembersLength}`
+                );
+              } else {
                 assert(
                   Object.keys(struct).includes(name),
                   `arg ${input.name} should be an array of ${arrayType}`
                 );
-              });
+              }
             });
-          }
+          });
+          argPosition += 1;
         }
       }
     });
+  }
+
+  /**
+   * Deep parse of the object that has been passed to the method
+   *
+   * @param struct - struct that needs to be calculated
+   * @return {number} - number of members for the given struct
+   */
+
+  private calculateStructMembers(struct: string): number {
+    let structMemberNum = 0;
+    this.structs[struct].members.forEach((member) => {
+      if (member.type === 'felt') {
+        structMemberNum += 1;
+      } else {
+        structMemberNum += this.structMemberNum(member.type);
+      }
+    });
+    return structMemberNum;
   }
 
   /**
@@ -276,12 +315,20 @@ export class Contract {
    * @param type  - name of the method
    * @return {string | string[]} - parsed arguments in format that contract is expecting
    */
-  protected parseCalldataObject(
-    element: ParsedStruct | BigNumberish,
+
+  protected parseCalldataValue(
+    element: ParsedStruct | BigNumberish | BigNumberish[],
     type: string
   ): string | string[] {
     if (element === undefined) {
-      throw Error('Missing element in calldata object');
+      throw Error('Missing element in calldata');
+    }
+    if (Array.isArray(element)) {
+      const structMemberNum = this.calculateStructMembers(type);
+      if (element.length !== structMemberNum) {
+        throw Error('Missing element in calldata');
+      }
+      return element.map((el) => toFelt(el));
     }
     // checking if the passed element is struct or element in struct
     if (this.structs[type] && this.structs[type].members.length) {
@@ -290,7 +337,7 @@ export class Contract {
         // if the member of the struct is another struct this will return array of the felts if not it will be single felt
         // TODO: refactor types so member name can be used as keyof ParsedStruct
         /* @ts-ignore */
-        const parsedData = this.parseCalldataObject(element[member.name], member.type);
+        const parsedData = this.parseCalldataValue(element[member.name], member.type);
         if (typeof parsedData === 'string') {
           acc.push(parsedData);
         } else {
@@ -331,31 +378,27 @@ export class Contract {
    * @param input  - input(field) information from the abi that will be used to parse the data
    * @return {string | string[]} - parsed arguments in format that contract is expecting
    */
-  protected parsCalldataField(args: Args, input: AbiEntry): string | string[] {
+  protected parsCalldataField(argsIterator: Iterator<any>, input: AbiEntry): string | string[] {
     const { name, type } = input;
-    const value = args[name];
-    const propName = name.replace(/_len$/, '');
+    const { value } = argsIterator.next();
+
+    const parsedCalldata: string[] = [];
     switch (true) {
-      case /_len$/.test(name):
-        if (Array.isArray(args[propName])) {
-          const arr = args[propName] as (BigNumberish | ParsedStruct)[];
-          return toFelt(arr.length);
-        }
-        throw Error(`Expected ${propName} to be array`);
       case /\*/.test(type):
         if (Array.isArray(value)) {
+          parsedCalldata.push(toFelt(value.length));
           return (value as (BigNumberish | ParsedStruct)[]).reduce((acc, el) => {
             if (/felt/.test(type)) {
               acc.push(toFelt(el as BigNumberish));
             } else {
-              acc.push(...this.parseCalldataObject(el, type.replace('*', '')));
+              acc.push(...this.parseCalldataValue(el, type.replace('*', '')));
             }
             return acc;
-          }, [] as string[]);
+          }, parsedCalldata);
         }
         throw Error(`Expected ${name} to be array`);
       case type in this.structs:
-        return this.parseCalldataObject(value as ParsedStruct, type);
+        return this.parseCalldataValue(value as ParsedStruct | BigNumberish[], type);
       case /\(felt/.test(type):
         if (Array.isArray(value)) {
           return value.map((el) => toFelt(el as BigNumberish));
@@ -373,9 +416,13 @@ export class Contract {
    * @param inputs  - list of inputs(fields) that are in the abi
    * @return {Calldata} - parsed arguments in format that contract is expecting
    */
-  protected compileCalldata(args: Args, inputs: AbiEntry[]): Calldata {
+  protected compileCalldata(args: Array<any>, inputs: AbiEntry[]): Calldata {
+    const argsIterator = args[Symbol.iterator]();
     return inputs.reduce((acc, input) => {
-      const parsedData = this.parsCalldataField(args, input);
+      if (/_len$/.test(input.name)) {
+        return acc;
+      }
+      const parsedData = this.parsCalldataField(argsIterator, input);
       if (Array.isArray(parsedData)) {
         acc.push(...parsedData);
       } else {
@@ -432,25 +479,44 @@ export class Contract {
    * @param response  - response from the method
    * @return - parsed response corresponding to the abi
    */
-  protected parseResponse(method: string, response: string[]): Args {
+  protected parseResponse(method: string, response: string[]): Result {
     const { outputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
     const responseIterator = response.flat()[Symbol.iterator]();
-    return outputs.flat().reduce((acc, output) => {
+    const resultObject = outputs.flat().reduce((acc, output) => {
       acc[output.name] = this.parseResponseField(responseIterator, output, acc);
       if (acc[output.name] && acc[`${output.name}_len`]) {
         delete acc[`${output.name}_len`];
       }
       return acc;
     }, {} as Args);
+    return Object.entries(resultObject).reduce((acc, [key, value]) => {
+      acc.push(value);
+      acc[key] = value;
+      return acc;
+    }, [] as Result);
   }
 
-  public invoke(method: string, args: Args = {}, signature?: Signature) {
+  public invoke(method: string, args: Array<any>) {
     // ensure contract is connected
     assert(this.address !== null, 'contract isnt connected to an address');
     // validate method and args
     this.validateMethodAndArgs('INVOKE', method, args);
     const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
-
+    const inputsLength = inputs.reduce((acc, input) => {
+      if (!/_len$/.test(input.name)) {
+        return acc + 1;
+      }
+      return acc;
+    }, 0);
+    const signature = [];
+    if (args.length === inputsLength + 1 && Array.isArray(args[args.length - 1])) {
+      signature.push(...args.pop());
+    }
+    if (args.length !== inputsLength) {
+      throw Error(
+        `Invalid number of arguments, expected ${inputsLength} arguments, but got ${args.length}`
+      );
+    }
     // compile calldata
     const calldata = this.compileCalldata(args, inputs);
 
@@ -468,14 +534,20 @@ export class Contract {
     });
   }
 
-  public async call(method: string, args: Args = {}, blockIdentifier: BlockIdentifier = null) {
+  public async call(method: string, args: Array<any>) {
     // ensure contract is connected
     assert(this.address !== null, 'contract isnt connected to an address');
 
     // validate method and args
-    this.validateMethodAndArgs('CALL', method, args);
+    // this.validateMethodAndArgs('CALL', method, args);
     const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
-
+    const inputsLength = inputs.length;
+    const options = {
+      blockIdentifier: null,
+    };
+    if (args.length === inputsLength + 1 && typeof args[args.length - 1] === 'object') {
+      Object.assign(options, args.pop());
+    }
     // compile calldata
     const calldata = this.compileCalldata(args, inputs);
     return this.providerOrAccount
@@ -485,19 +557,19 @@ export class Contract {
           calldata,
           entrypoint: method,
         },
-        blockIdentifier
+        options
       )
       .then((x) => this.parseResponse(method, x.result));
   }
 
-  public async estimate(method: string, args: Args = {}) {
+  public async estimate(method: string, args: Array<any>) {
     //  TODO; remove error as soon as estimate fees are supported
     throw Error('Estimation of the fees are not yet supported');
     // ensure contract is connected
     assert(this.address !== null, 'contract isnt connected to an address');
 
     // validate method and args
-    this.validateMethodAndArgs('CALL', method, args);
+    // this.validateMethodAndArgs('CALL', method, args);
     const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
 
     // compile calldata
@@ -509,7 +581,7 @@ export class Contract {
     });
   }
 
-  public populate(method: string, args: Args): Invocation {
+  public populate(method: string, args: Array<any>): Invocation {
     const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
     if (this.address) {
       return {

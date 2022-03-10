@@ -167,20 +167,14 @@ export class Provider implements ProviderInterface {
    */
   public async callContract(
     { contractAddress, entrypoint, calldata = [] }: Call,
-    blockIdentifier: BlockIdentifier = null
+    options: { blockIdentifier: BlockIdentifier } = { blockIdentifier: null }
   ): Promise<CallContractResponse> {
-    return this.fetchEndpoint(
-      'call_contract',
-      {
-        blockIdentifier,
-      },
-      {
-        signature: [],
-        contract_address: contractAddress,
-        entry_point_selector: getSelectorFromName(entrypoint),
-        calldata,
-      }
-    );
+    return this.fetchEndpoint('call_contract', options, {
+      signature: [],
+      contract_address: contractAddress,
+      entry_point_selector: getSelectorFromName(entrypoint),
+      calldata,
+    });
   }
 
   /**

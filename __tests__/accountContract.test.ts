@@ -38,10 +38,7 @@ describe('deploy and test Wallet', () => {
     accountContract = new Contract(compiledArgentAccount.abi, accountResponse.address);
     expect(accountResponse.code).toBe('TRANSACTION_RECEIVED');
 
-    const initializeResponse = await accountContract.invoke('initialize', {
-      signer: starkKeyPub,
-      guardian: '0',
-    });
+    const initializeResponse = await accountContract.initialize(starkKeyPub, '0');
     expect(initializeResponse.code).toBe('TRANSACTION_RECEIVED');
 
     const erc20Response = await defaultProvider.deployContract({
@@ -51,30 +48,25 @@ describe('deploy and test Wallet', () => {
     erc20 = new Contract(compiledErc20.abi, erc20Address);
     expect(erc20Response.code).toBe('TRANSACTION_RECEIVED');
 
-    const mintResponse = await erc20.invoke('mint', {
-      recipient: accountContract.address,
-      amount: '1000',
-    });
+    const mintResponse = await erc20.mint(accountContract.address, '1000');
     expect(mintResponse.code).toBe('TRANSACTION_RECEIVED');
     await defaultProvider.waitForTransaction(mintResponse.transaction_hash);
   });
 
   test('read nonce', async () => {
-    const { nonce } = await accountContract.call('get_nonce');
+    const { nonce } = await accountContract.get_nonce();
 
     expect(number.toBN(nonce as string).toString()).toStrictEqual(number.toBN(0).toString());
   });
 
   test('read balance of wallet', async () => {
-    const { res } = await erc20.call('balance_of', {
-      user: accountContract.address,
-    });
+    const { res } = await erc20.balance_of(accountContract.address);
 
-    expect(number.toBN(res as string).toString()).toStrictEqual(number.toBN(1000).toString());
+    expect(res).toStrictEqual(number.toBN(1000));
   });
 
   test('execute by wallet owner', async () => {
-    const nonce = (await accountContract.call('get_nonce')).nonce.toString();
+    const nonce = (await accountContract.get_nonce()).nonce.toString();
 
     const calls = [
       { contractAddress: erc20Address, entrypoint: 'transfer', calldata: [erc20Address, '10'] },
@@ -84,13 +76,11 @@ describe('deploy and test Wallet', () => {
     const { callArray, calldata } = transformCallsToMulticallArrays(calls);
 
     const signature = ec.sign(starkKeyPair, msgHash);
-    const { code, transaction_hash } = await accountContract.invoke(
-      '__execute__',
-      {
-        call_array: callArray,
-        calldata,
-        nonce,
-      },
+    // eslint-disable-next-line no-underscore-dangle
+    const { code, transaction_hash } = await accountContract.__execute__(
+      callArray,
+      calldata,
+      nonce,
       signature
     );
 
@@ -100,9 +90,7 @@ describe('deploy and test Wallet', () => {
   });
 
   test('read balance of wallet after transfer', async () => {
-    const { res } = await erc20.call('balance_of', {
-      user: accountContract.address,
-    });
+    const { res } = await erc20.balance_of(accountContract.address);
 
     expect(number.toBN(res as string).toString()).toStrictEqual(number.toBN(990).toString());
   });
