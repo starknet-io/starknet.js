@@ -13,6 +13,8 @@ export abstract class ContractInterface {
 
   public abstract providerOrAccount: Provider | Account;
 
+  public abstract deployTransactionHash?: string;
+
   readonly functions!: { [name: string]: AsyncContractFunction };
 
   readonly callStatic!: { [name: string]: AsyncContractFunction };

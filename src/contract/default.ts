@@ -85,6 +85,8 @@ export class Contract implements ContractInterface {
 
   providerOrAccount: Provider | Account;
 
+  deployTransactionHash?: string;
+
   protected readonly abi: Abi;
 
   protected readonly structs: { [name: string]: StructAbi };
