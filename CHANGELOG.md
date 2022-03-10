@@ -1,3 +1,9 @@
+# [3.4.0](https://github.com/seanjameshan/starknet.js/compare/v3.3.0...v3.4.0) (2022-03-10)
+
+### Features
+
+- **account:** add legacy `addTransaction` method ([94f5d87](https://github.com/seanjameshan/starknet.js/commit/94f5d874c8fb5f6c6586d537b75b92f493a32676))
+
 # [3.3.0](https://github.com/seanjameshan/starknet.js/compare/v3.2.0...v3.3.0) (2022-03-08)
 
 ### Features
