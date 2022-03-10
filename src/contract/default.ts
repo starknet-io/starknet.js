@@ -524,7 +524,7 @@ export class Contract implements ContractInterface {
     }, [] as Result);
   }
 
-  public invoke(method: string, args: Array<any>): Promise<AddTransactionResponse> {
+  public invoke(method: string, args: Array<any> = []): Promise<AddTransactionResponse> {
     // ensure contract is connected
     assert(this.address !== null, 'contract isnt connected to an address');
     // validate method and args
@@ -563,7 +563,7 @@ export class Contract implements ContractInterface {
     });
   }
 
-  public async call(method: string, args: Array<any>): Promise<Result> {
+  public async call(method: string, args: Array<any> = []): Promise<Result> {
     // ensure contract is connected
     assert(this.address !== null, 'contract isnt connected to an address');
 
@@ -591,7 +591,7 @@ export class Contract implements ContractInterface {
       .then((x) => this.parseResponse(method, x.result));
   }
 
-  public async estimate(_method: string, _args: Array<any>) {
+  public async estimate(_method: string, _args: Array<any> = []) {
     //  TODO; remove error as soon as estimate fees are supported
     throw Error('Estimation of the fees are not yet supported');
     // // ensure contract is connected
@@ -610,7 +610,7 @@ export class Contract implements ContractInterface {
     // });
   }
 
-  public populate(method: string, args: Array<any>): Invocation {
+  public populate(method: string, args: Array<any> = []): Invocation {
     const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
     return {
       contractAddress: this.address,
