@@ -45,7 +45,7 @@ export type FunctionAbi = {
   name: string;
   outputs: AbiEntry[];
   stateMutability?: 'view';
-  type: 'function';
+  type: 'function' | 'constructor';
 };
 
 export type StructAbi = {

@@ -1,6 +1,6 @@
 import { isBN } from 'bn.js';
 
-import { Account, Contract, Provider, defaultProvider, ec, stark } from '../src';
+import { Account, Contract, ContractFactory, Provider, defaultProvider, ec, stark } from '../src';
 import { getSelectorFromName } from '../src/utils/hash';
 import { BigNumberish, toBN } from '../src/utils/number';
 import { compileCalldata } from '../src/utils/stark';
@@ -264,5 +264,34 @@ describe('class Contract {}', () => {
       const { res } = await erc20.balance_of(account.address);
       expect(res).toStrictEqual(toBN(990));
     });
+  });
+});
+
+describe('class ContractFactory {}', () => {
+  let erc20Address: string;
+  beforeAll(async () => {
+    const { code, transaction_hash, address } = await defaultProvider.deployContract({
+      contract: compiledErc20,
+    });
+    expect(code).toBe('TRANSACTION_RECEIVED');
+    await defaultProvider.waitForTransaction(transaction_hash);
+    erc20Address = address;
+  });
+  test('deployment of new contract', async () => {
+    const factory = new ContractFactory(compiledErc20);
+    const erc20 = await factory.deploy();
+    expect(erc20 instanceof Contract);
+  });
+  test('get the transaction of the deployed contract', async () => {
+    const factory = new ContractFactory(compiledErc20);
+    await factory.deploy();
+    const tx = await factory.getDeployTransaction();
+    expect(tx).toHaveProperty('status');
+    expect(tx).toHaveProperty('transaction');
+  });
+  test('attach new contract', async () => {
+    const factory = new ContractFactory(compiledErc20);
+    const erc20 = factory.attach(erc20Address);
+    expect(erc20 instanceof Contract);
   });
 });
