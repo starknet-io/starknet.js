@@ -15,7 +15,6 @@ import {
   GetTransactionResponse,
   GetTransactionStatusResponse,
   Invocation,
-  Signature,
   TransactionReceipt,
 } from '../types';
 import { getSelectorFromName } from '../utils/hash';
@@ -329,31 +328,6 @@ export class Provider implements ProviderInterface {
       entry_point_selector: getSelectorFromName(invocation.entrypoint),
       calldata: bigNumberishArrayToDecimalStringArray(invocation.calldata ?? []),
       signature: bigNumberishArrayToDecimalStringArray(invocation.signature ?? []),
-    });
-  }
-
-  /**
-   * Invokes a function on starknet
-   * @deprecated This method wont be supported as soon as fees are mandatory
-   *
-   * @param contractAddress - target contract address for invoke
-   * @param entrypointSelector - target entrypoint selector for
-   * @param calldata - (optional, default []) calldata
-   * @param signature - (optional) signature to send along
-   * @returns response from addTransaction
-   */
-  public LEGACY_invokeFunction(
-    contractAddress: string,
-    entrypointSelector: string,
-    calldata?: string[],
-    signature?: Signature
-  ): Promise<AddTransactionResponse> {
-    return this.fetchEndpoint('add_transaction', undefined, {
-      type: 'INVOKE_FUNCTION',
-      contract_address: contractAddress,
-      entry_point_selector: entrypointSelector,
-      calldata: bigNumberishArrayToDecimalStringArray(calldata ?? []),
-      signature: bigNumberishArrayToDecimalStringArray(signature ?? []),
     });
   }
 

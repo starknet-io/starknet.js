@@ -1,3 +1,5 @@
+import assert from 'minimalistic-assert';
+
 import { Provider } from '../provider';
 import { Signer, SignerInterface } from '../signer';
 import {
@@ -5,10 +7,18 @@ import {
   AddTransactionResponse,
   Call,
   InvocationsDetails,
+  InvokeFunctionTransaction,
   KeyPair,
   Signature,
+  Transaction,
 } from '../types';
-import { getSelectorFromName } from '../utils/hash';
+import { sign } from '../utils/ellipticCurve';
+import {
+  computeHashOnElements,
+  getSelectorFromName,
+  transactionPrefix,
+  transactionVersion,
+} from '../utils/hash';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
 import { compileCalldata } from '../utils/stark';
 import { fromCallsToExecuteCalldata } from '../utils/transaction';
@@ -58,6 +68,104 @@ export class Account extends Provider implements AccountInterface {
     const signature = await this.signer.signTransaction(transactions, signerDetails, abis);
 
     const calldata = [...fromCallsToExecuteCalldata(transactions), signerDetails.nonce.toString()];
+
+    return this.fetchEndpoint('add_transaction', undefined, {
+      type: 'INVOKE_FUNCTION',
+      contract_address: this.address,
+      entry_point_selector: getSelectorFromName('__execute__'),
+      calldata,
+      signature: bigNumberishArrayToDecimalStringArray(signature),
+    });
+  }
+
+  /**
+   * Temporary method to allow dapps on starknet.js v2 to work with Argent X v3
+   * @deprecated to remove ASAP
+   */
+  public async LEGACY_addTransaction(transaction: Transaction): Promise<AddTransactionResponse> {
+    if (transaction.type === 'DEPLOY') throw new Error('No DEPLOYS');
+
+    assert(
+      !transaction.signature,
+      "Adding signatures to a signer transaction currently isn't supported"
+    );
+
+    let nonceBn;
+    if (transaction.nonce) {
+      nonceBn = toBN(transaction.nonce);
+    } else {
+      const { result } = await this.callContract({
+        contractAddress: this.address,
+        entrypoint: 'get_nonce',
+      });
+      nonceBn = toBN(result[0]);
+    }
+
+    function hashMulticall(
+      account: string,
+      transactions: InvokeFunctionTransaction[],
+      nonce: string,
+      maxFee: string
+    ) {
+      const hashArray = transactions
+        .map(({ contract_address, entry_point_selector, calldata }) => [
+          contract_address,
+          entry_point_selector,
+          computeHashOnElements(calldata || []),
+        ])
+        .map(bigNumberishArrayToDecimalStringArray)
+        .map(computeHashOnElements);
+
+      return computeHashOnElements([
+        transactionPrefix,
+        account,
+        computeHashOnElements(hashArray),
+        nonce,
+        maxFee,
+        transactionVersion,
+      ]);
+    }
+    const msgHash = hashMulticall(this.address, [transaction], nonceBn.toString(), '0');
+    if (!('keyPair' in this.signer)) {
+      throw new Error('No keyPair');
+    }
+    const signature = sign((this.signer as any).keyPair, msgHash);
+
+    const transformCallsToMulticallArrays = (calls: InvokeFunctionTransaction[]) => {
+      const callArray: any[] = [];
+      const calldata: BigNumberish[] = [];
+      calls.forEach((call) => {
+        const data = call.calldata || [];
+        callArray.push({
+          to: toBN(call.contract_address).toString(10),
+          selector: toBN(call.entry_point_selector).toString(10),
+          data_offset: calldata.length.toString(),
+          data_len: data.length.toString(),
+        });
+        calldata.push(...data);
+      });
+      return {
+        callArray,
+        calldata: bigNumberishArrayToDecimalStringArray(calldata),
+      };
+    };
+
+    const fromCallsToExecuteCalldata2 = (calls: InvokeFunctionTransaction[]): string[] => {
+      const { callArray, calldata } = transformCallsToMulticallArrays(calls);
+      return [
+        callArray.length.toString(),
+        ...callArray
+          .map(
+            ({ to, selector, data_offset, data_len }) =>
+              [to, selector, data_offset, data_len] as string[]
+          )
+          .flat(),
+        calldata.length.toString(),
+        ...calldata,
+      ];
+    };
+
+    const calldata = [...fromCallsToExecuteCalldata2([transaction]), nonceBn.toString()];
 
     return this.fetchEndpoint('add_transaction', undefined, {
       type: 'INVOKE_FUNCTION',
