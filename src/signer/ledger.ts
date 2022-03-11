@@ -2,7 +2,8 @@ import Eth from '@ledgerhq/hw-app-eth';
 import Transport from '@ledgerhq/hw-transport';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
 
-import { Abi, Invocation, InvocationsSignerDetails, Signature } from '../types';
+import { Invocation, InvocationsSignerDetails, Signature } from '../types';
+import { addHexPrefix } from '../utils/encode';
 import { hashMulticall } from '../utils/hash';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { SignerInterface } from './interface';
@@ -43,14 +44,8 @@ export class LedgerBlindSigner implements SignerInterface {
 
   public async signTransaction(
     transactions: Invocation[],
-    transactionsDetail: InvocationsSignerDetails,
-    abis?: Abi[]
+    transactionsDetail: InvocationsSignerDetails
   ): Promise<Signature> {
-    if (abis && abis.length !== transactions.length) {
-      throw new Error('ABI must be provided for each transaction or no transaction');
-    }
-    const eth = await this.getEthApp();
-
     const msgHash = hashMulticall(
       transactionsDetail.walletAddress,
       transactions,
@@ -58,24 +53,29 @@ export class LedgerBlindSigner implements SignerInterface {
       transactionsDetail.maxFee.toString()
     );
 
-    const signature = (await eth.starkUnsafeSign(this.derivationPath, hexZeroPad(msgHash, 32))) as {
-      r: string;
-      s: string;
-    };
-
-    return [`0x${signature.r}`, `0x${signature.s}`];
+    return this.sign(msgHash);
   }
 
   public async signMessage(typedData: TypedData, accountAddress: string): Promise<Signature> {
-    const eth = await this.getEthApp();
-
     const msgHash = getMessageHash(typedData, accountAddress);
 
-    const signature = (await eth.starkUnsafeSign(this.derivationPath, hexZeroPad(msgHash, 32))) as {
+    return this.sign(msgHash);
+  }
+
+  protected async sign(msgHash: string): Promise<Signature> {
+    const eth = await this.getEthApp();
+
+    const {
+      r,
+      s,
+    }: {
+      r: string;
+      s: string;
+    } = (await eth.starkUnsafeSign(this.derivationPath, hexZeroPad(msgHash, 32))) as {
       r: string;
       s: string;
     };
 
-    return [`0x${signature.r}`, `0x${signature.s}`];
+    return [addHexPrefix(r), addHexPrefix(s)];
   }
 }
