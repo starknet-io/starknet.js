@@ -1,3 +1,23 @@
+# [3.5.0](https://github.com/seanjameshan/starknet.js/compare/v3.4.0...v3.5.0) (2022-03-11)
+
+### Bug Fixes
+
+- contract test ([a9b4103](https://github.com/seanjameshan/starknet.js/commit/a9b410356baa5c7305da9ba69229c0882f7ae026))
+- **contract-factory:** move more towards ethers.js api ([4caa6ce](https://github.com/seanjameshan/starknet.js/commit/4caa6cee282fe73bc6fb91bea59c620cc42d31a0))
+- **contract:** structure change ([1ef9d2f](https://github.com/seanjameshan/starknet.js/commit/1ef9d2fee0158c9894d5e049f59cc72bfaad2d55))
+- **contract:** tests for new contract interface ([9273f54](https://github.com/seanjameshan/starknet.js/commit/9273f542b087e2940e0d2e88ecbeec58062953bf))
+- enable validateMethodAndArgs on call ([efa63d6](https://github.com/seanjameshan/starknet.js/commit/efa63d6fc7ae77b28f694640833cec73111b175d))
+- reverting validateMethodAndArgs changes ([d847fa8](https://github.com/seanjameshan/starknet.js/commit/d847fa8e4db3563d67861873046f9cb87d0fff8e))
+
+### Features
+
+- **contractFactory:** lib expanded with contract factory ([2c9c3d1](https://github.com/seanjameshan/starknet.js/commit/2c9c3d1b60961ddd698dc6b3175fff2f574f03bd))
+- **contract:** implement `contract.deployed() ⇒ Promise<Contract>` ([91f4992](https://github.com/seanjameshan/starknet.js/commit/91f4992a3f612a03ff5cde01d07a487ebb883f6d))
+- **contract:** new contract interface ([01eeae8](https://github.com/seanjameshan/starknet.js/commit/01eeae815619009de195a759891cad9d8ec992c7))
+- **contract:** new contract methods signature ([cc87943](https://github.com/seanjameshan/starknet.js/commit/cc8794362d2f20816aabf7b44596035d644a434d))
+- default contract args ([2a3956d](https://github.com/seanjameshan/starknet.js/commit/2a3956dab88f3e68a513916b1644fa0723c5235f))
+- **provider:** preparation for the fee integration ([c1c231b](https://github.com/seanjameshan/starknet.js/commit/c1c231b6ec803b01af280baf61d0afbc3f9be6bb))
+
 # [3.4.0](https://github.com/seanjameshan/starknet.js/compare/v3.3.0...v3.4.0) (2022-03-10)
 
 ### Features
