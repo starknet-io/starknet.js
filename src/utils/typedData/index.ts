@@ -1,7 +1,6 @@
-import { computeHashOnElements } from '../hash';
+import { computeHashOnElements, getSelectorFromName } from '../hash';
 import { BigNumberish, toBN, toHex } from '../number';
 import { encodeShortString } from '../shortString';
-import { getSelectorFromName } from '../stark';
 import { TypedData } from './types';
 import { validateTypedData } from './utils';
 
@@ -161,7 +160,7 @@ export const getStructHash = <T extends TypedData>(
  * with Keccak256.
  *
  * @param {TypedData} typedData
- * @param {boolean} hash
+ * @param {BigNumberish} account
  * @return {string}
  */
 export const getMessageHash = (typedData: TypedData, account: BigNumberish): string => {

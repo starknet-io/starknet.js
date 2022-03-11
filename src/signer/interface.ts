@@ -1,38 +1,40 @@
-import { Provider } from '../provider';
-import { AddTransactionResponse, Signature, Transaction } from '../types';
-import { TypedData } from '../utils/typedData/types';
+import { Abi, Invocation, InvocationsSignerDetails, Signature } from '../types';
+import { TypedData } from '../utils/typedData';
 
-export abstract class SignerInterface extends Provider {
-  public abstract address: string;
+export abstract class SignerInterface {
   /**
-   * Invoke a function on the starknet contract
+   * Method to get the public key of the signer
    *
-   * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/gateway/gateway_client.py#L13-L17)
-   *
-   * @param transaction - transaction to be invoked
-   * @returns a confirmation of invoking a function on the starknet contract
+   * @returns public key of signer as hex string with 0x prefix
    */
-  public abstract override addTransaction(
-    transaction: Transaction
-  ): Promise<AddTransactionResponse>;
+  public abstract getPubKey(): Promise<string>;
 
   /**
    * Sign an JSON object for off-chain usage with the starknet private key and return the signature
    * This adds a message prefix so it cant be interchanged with transactions
    *
-   * @param json - JSON object to be signed
+   * @param typedData - JSON object to be signed
+   * @param accountAddress - account
    * @returns the signature of the JSON object
    * @throws {Error} if the JSON object is not a valid JSON
    */
-  public abstract signMessage(typedData: TypedData): Promise<Signature>;
+  public abstract signMessage(typedData: TypedData, accountAddress: string): Promise<Signature>;
 
   /**
-   * Hash a JSON object with pederson hash and return the hash
-   * This adds a message prefix so it cant be interchanged with transactions
+   * Signs a transaction with the starknet private key and returns the signature
    *
-   * @param json - JSON object to be hashed
-   * @returns the hash of the JSON object
-   * @throws {Error} if the JSON object is not a valid JSON
+   * @param invocation the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   * @param abi (optional) the abi of the contract for better displaying
+   *
+   * @returns signature
    */
-  public abstract hashMessage(typedData: TypedData): Promise<string>;
+  public abstract signTransaction(
+    transactions: Invocation[],
+    transactionsDetail: InvocationsSignerDetails,
+    abis?: Abi[]
+  ): Promise<Signature>;
 }

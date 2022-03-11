@@ -1,11 +1,10 @@
 import { gzip } from 'pako';
 
-import { CompressedProgram, Program, Signature } from '../types';
+import { Calldata, CompressedProgram, Program, RawArgs, Signature } from '../types';
 import { genKeyPair, getStarkKey } from './ellipticCurve';
 import { addHexPrefix, btoaUniversal } from './encode';
-import { starknetKeccak } from './hash';
 import { stringify } from './json';
-import { toBN, toHex } from './number';
+import { toBN } from './number';
 
 /**
  * Function to compress compiled cairo program
@@ -18,18 +17,6 @@ export function compressProgram(jsonProgram: Program | string): CompressedProgra
   const stringified = typeof jsonProgram === 'string' ? jsonProgram : stringify(jsonProgram);
   const compressedProgram = gzip(stringified);
   return btoaUniversal(compressedProgram);
-}
-
-/**
- * Function to get the hex selector from a given function name
- *
- * [Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/public/abi.py#L25-L26)
- * @param funcName - selectors abi function name
- * @returns hex selector of given abi function name
- */
-export function getSelectorFromName(funcName: string) {
-  // sometimes BigInteger pads the hex string with zeros, which isnt allowed in the starknet api
-  return toHex(starknetKeccak(funcName));
 }
 
 export function randomAddress(): string {
@@ -48,4 +35,16 @@ export function formatSignature(sig?: Signature): string[] {
   } catch (e) {
     return [];
   }
+}
+
+export function compileCalldata(args: RawArgs): Calldata {
+  return Object.values(args).flatMap((value) => {
+    if (Array.isArray(value))
+      return [toBN(value.length).toString(), ...value.map((x) => toBN(x).toString())];
+    if (typeof value === 'object' && 'type' in value)
+      return Object.entries(value)
+        .filter(([k]) => k !== 'type')
+        .map(([, v]) => toBN(v).toString());
+    return toBN(value).toString();
+  });
 }

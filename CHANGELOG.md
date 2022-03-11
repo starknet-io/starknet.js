@@ -1,3 +1,136 @@
+## [3.5.1](https://github.com/seanjameshan/starknet.js/compare/v3.5.0...v3.5.1) (2022-03-11)
+
+### Bug Fixes
+
+- account detection ([b3b3ba7](https://github.com/seanjameshan/starknet.js/commit/b3b3ba74dde72027ba7f0e1234fed34a604fdcec))
+- contract interface ([696116d](https://github.com/seanjameshan/starknet.js/commit/696116d383ba16c587e7ed708f7b47d02610b9d9))
+
+# [3.5.0](https://github.com/seanjameshan/starknet.js/compare/v3.4.0...v3.5.0) (2022-03-11)
+
+### Bug Fixes
+
+- contract test ([a9b4103](https://github.com/seanjameshan/starknet.js/commit/a9b410356baa5c7305da9ba69229c0882f7ae026))
+- **contract-factory:** move more towards ethers.js api ([4caa6ce](https://github.com/seanjameshan/starknet.js/commit/4caa6cee282fe73bc6fb91bea59c620cc42d31a0))
+- **contract:** structure change ([1ef9d2f](https://github.com/seanjameshan/starknet.js/commit/1ef9d2fee0158c9894d5e049f59cc72bfaad2d55))
+- **contract:** tests for new contract interface ([9273f54](https://github.com/seanjameshan/starknet.js/commit/9273f542b087e2940e0d2e88ecbeec58062953bf))
+- enable validateMethodAndArgs on call ([efa63d6](https://github.com/seanjameshan/starknet.js/commit/efa63d6fc7ae77b28f694640833cec73111b175d))
+- reverting validateMethodAndArgs changes ([d847fa8](https://github.com/seanjameshan/starknet.js/commit/d847fa8e4db3563d67861873046f9cb87d0fff8e))
+
+### Features
+
+- **contractFactory:** lib expanded with contract factory ([2c9c3d1](https://github.com/seanjameshan/starknet.js/commit/2c9c3d1b60961ddd698dc6b3175fff2f574f03bd))
+- **contract:** implement `contract.deployed() ⇒ Promise<Contract>` ([91f4992](https://github.com/seanjameshan/starknet.js/commit/91f4992a3f612a03ff5cde01d07a487ebb883f6d))
+- **contract:** new contract interface ([01eeae8](https://github.com/seanjameshan/starknet.js/commit/01eeae815619009de195a759891cad9d8ec992c7))
+- **contract:** new contract methods signature ([cc87943](https://github.com/seanjameshan/starknet.js/commit/cc8794362d2f20816aabf7b44596035d644a434d))
+- default contract args ([2a3956d](https://github.com/seanjameshan/starknet.js/commit/2a3956dab88f3e68a513916b1644fa0723c5235f))
+- **provider:** preparation for the fee integration ([c1c231b](https://github.com/seanjameshan/starknet.js/commit/c1c231b6ec803b01af280baf61d0afbc3f9be6bb))
+
+# [3.4.0](https://github.com/seanjameshan/starknet.js/compare/v3.3.0...v3.4.0) (2022-03-10)
+
+### Features
+
+- **account:** add legacy `addTransaction` method ([94f5d87](https://github.com/seanjameshan/starknet.js/commit/94f5d874c8fb5f6c6586d537b75b92f493a32676))
+
+# [3.3.0](https://github.com/seanjameshan/starknet.js/compare/v3.2.0...v3.3.0) (2022-03-08)
+
+### Features
+
+- **provider:** add back legacy `invokeFunction` ([dbd00ff](https://github.com/seanjameshan/starknet.js/commit/dbd00ff822456f05df5ba1967d5cd0040b012fc0))
+
+# [3.2.0](https://github.com/seanjameshan/starknet.js/compare/v3.1.0...v3.2.0) (2022-03-04)
+
+### Features
+
+- **account:** initial multicall support ([e2e3d61](https://github.com/seanjameshan/starknet.js/commit/e2e3d61dcc5377c2a6603f4740d4420be7a719e1))
+- **signer:** always return string signatures ([0e9dd6c](https://github.com/seanjameshan/starknet.js/commit/0e9dd6c1c35aac6ad3eb3cc2ebb6212e0f5f809a))
+
+# [3.1.0](https://github.com/seanjameshan/starknet.js/compare/v3.0.0...v3.1.0) (2022-02-22)
+
+### Bug Fixes
+
+- **test:** adding tests for type transferormation ([60d5eb6](https://github.com/seanjameshan/starknet.js/commit/60d5eb614721543be7fbaa842e8872a70564ebb2))
+- **tests:** adding multicall contract ([138b29d](https://github.com/seanjameshan/starknet.js/commit/138b29d60cbc1eae6fa8f6f7dbf232bc11975e9a))
+
+### Features
+
+- **contract:** adding jsDocs to the contract class ([d9ec6d3](https://github.com/seanjameshan/starknet.js/commit/d9ec6d3ea3cc0dbf3538fb2fe7b5e1d8a8831490))
+- **contract:** adding parse request data on call and invoke ([e6d46dc](https://github.com/seanjameshan/starknet.js/commit/e6d46dc39f8d7da6ed1bef2c5074377402810eb9))
+- **contract:** parsing response from the contract call ([3f7425f](https://github.com/seanjameshan/starknet.js/commit/3f7425ff0ac29dda2a7c9373856a4aa20002af9b))
+
+# [3.0.0](https://github.com/seanjameshan/starknet.js/compare/v2.9.0...v3.0.0) (2022-02-10)
+
+### Bug Fixes
+
+- **account:** dont allow additional signatures in execute ([ac02d46](https://github.com/seanjameshan/starknet.js/commit/ac02d46c5759904886f56a7b9e7e2686dbf52d4c))
+- comments ([f261120](https://github.com/seanjameshan/starknet.js/commit/f261120e1971710cde8f95bd17a5869860db8160))
+- review comments ([ee93bd6](https://github.com/seanjameshan/starknet.js/commit/ee93bd6e51eabcf3507a77d21c5bdc6fe93d5d1c))
+- **test:** remove only for getTransactionReceipt test ([eb11d3b](https://github.com/seanjameshan/starknet.js/commit/eb11d3b60f434f81390f4d13c0462ad8c7ed7321))
+- **types:** change type of `block_number` from `number` to `BlockNumber` in TransactionReceipt ([7a48ff8](https://github.com/seanjameshan/starknet.js/commit/7a48ff8e15a93a778fec62fdff10f92b1a073dec))
+- **types:** update TransactionReceipt type ([9f9f6a2](https://github.com/seanjameshan/starknet.js/commit/9f9f6a2f4cf3b8bfb438edda06ec38bd1471c03d))
+
+### Features
+
+- **account:** introduce execute method ([0be78c6](https://github.com/seanjameshan/starknet.js/commit/0be78c67a40d0b457c571a57a8b49008f5e423de))
+- **contract:** add an option to pass block identifier ([e34dd86](https://github.com/seanjameshan/starknet.js/commit/e34dd86c07495b7b8c38ee410838e15226a7b8d6))
+- new signer and provider interface ([4b2a71c](https://github.com/seanjameshan/starknet.js/commit/4b2a71c578e363b11abb1c3adb74472bbb9f73fe))
+- **provider:** add getTransactionReceipt() ([4267a5f](https://github.com/seanjameshan/starknet.js/commit/4267a5f5cec77bb4b09b2e8b4979ec0ee611d416))
+- split account and signer ([ca4ad9d](https://github.com/seanjameshan/starknet.js/commit/ca4ad9d62aee8b0637096eb3059e96dd4407f663))
+- update readme ([ed021dc](https://github.com/seanjameshan/starknet.js/commit/ed021dc25a394affec8ea92ed79eed4c68a040d8))
+
+### BREAKING CHANGES
+
+- new provider and signer interfaces
+
+# [2.9.0](https://github.com/seanjameshan/starknet.js/compare/v2.8.0...v2.9.0) (2022-02-04)
+
+### Bug Fixes
+
+- introduce block identifier type ([75599a9](https://github.com/seanjameshan/starknet.js/commit/75599a99bbcb5723cfc8575b5fbf994a0bbf5b67))
+
+### Features
+
+- **utils:** add validateAndParseAddress function ([c067fc4](https://github.com/seanjameshan/starknet.js/commit/c067fc443e4dc9c22b78ed6c093978a2f37debde))
+
+# [2.8.0](https://github.com/seanjameshan/starknet.js/compare/v2.7.2...v2.8.0) (2022-02-02)
+
+### Features
+
+- add tests ([e495d48](https://github.com/seanjameshan/starknet.js/commit/e495d4899141a79fe310d4fe76f70df03b1551ca))
+- implement verifyMessage and verifyMessageHash ([bc9c4e9](https://github.com/seanjameshan/starknet.js/commit/bc9c4e9574cc453af35705eb4488602ea33cc2cb))
+
+## [2.7.2](https://github.com/seanjameshan/starknet.js/compare/v2.7.1...v2.7.2) (2022-01-20)
+
+### Bug Fixes
+
+- **CONTRIBUTING:** wrong link ([2622a6c](https://github.com/seanjameshan/starknet.js/commit/2622a6c984259a6928e9ab02892b8de60b8c749e))
+
+## [2.7.1](https://github.com/seanjameshan/starknet.js/compare/v2.7.0...v2.7.1) (2022-01-04)
+
+### Bug Fixes
+
+- **types:** add block_number property to GetBlockResponse interface ([696cf5a](https://github.com/seanjameshan/starknet.js/commit/696cf5ae565bd16365045cc1f20e9fa55184d054))
+
+# [2.7.0](https://github.com/seanjameshan/starknet.js/compare/v2.6.0...v2.7.0) (2022-01-03)
+
+### Bug Fixes
+
+- add response to the waitForTx error ([e25bdfd](https://github.com/seanjameshan/starknet.js/commit/e25bdfd428fd36e105ed272ea39462845bae5805))
+
+### Features
+
+- **blockHash:** add blockHash and fix test cases ([4e107eb](https://github.com/seanjameshan/starknet.js/commit/4e107eb7e97a9b8d2efd74b2074a7d82365c932e))
+
+# [2.6.0](https://github.com/seanjameshan/starknet.js/compare/v2.5.0...v2.6.0) (2021-12-29)
+
+### Bug Fixes
+
+- correct network name ([66e14c9](https://github.com/seanjameshan/starknet.js/commit/66e14c926f015a2dfbd50d3e54ba4e008fb43aa8))
+- network name ([965f215](https://github.com/seanjameshan/starknet.js/commit/965f21580ef68bf84c105e93bfb3b98f75b31f93))
+
+### Features
+
+- introduce blockNumber ([657dac1](https://github.com/seanjameshan/starknet.js/commit/657dac1d77e840a7fc663d3a180515443a7e834f))
+
 # [2.5.0](https://github.com/seanjameshan/starknet.js/compare/v2.4.0...v2.5.0) (2021-12-13)
 
 ### Bug Fixes

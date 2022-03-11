@@ -1,4 +1,4 @@
-import BN from 'bn.js';
+import BN, { isBN } from 'bn.js';
 import assert from 'minimalistic-assert';
 
 import { addHexPrefix, removeHexPrefix } from './encode';
@@ -23,6 +23,13 @@ export function hexToDecimalString(hex: string): string {
   return toBN(`0x${hex.replace(/^0x/, '')}`).toString();
 }
 
+export function toFelt(num: BigNumberish): string {
+  if (isBN(num)) {
+    return num.toString();
+  }
+  return toBN(num).toString();
+}
+
 /*
  Asserts input is equal to or greater then lowerBound and lower then upperBound.
  Assert message specifies inputName.
@@ -41,4 +48,8 @@ export function assertInRange(
     inputBn.gte(toBN(lowerBound)) && inputBn.lt(toBN(upperBound)),
     `Message not signable, ${messageSuffix}.`
   );
+}
+
+export function bigNumberishArrayToDecimalStringArray(rawCalldata: BigNumberish[]): string[] {
+  return rawCalldata.map((x) => toBN(x).toString(10));
 }

@@ -1,6 +1,6 @@
 {
   "name": "starknet",
-  "version": "2.5.0",
+  "version": "3.5.1",
   "description": "JavaScript library for StarkNet",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -23,7 +23,7 @@
     "zk",
     "rollup"
   ],
-  "repository": "github:seanjameshan/starknet.js",
+  "repository": "github:0xs34n/starknet.js",
   "author": "Sean Han",
   "license": "MIT",
   "devDependencies": {
@@ -44,6 +44,7 @@
     "@types/url-join": "^4.0.1",
     "@typescript-eslint/eslint-plugin": "^5.0.0",
     "@typescript-eslint/parser": "^5.0.0",
+    "axios-logger": "^2.6.0",
     "eslint": "^7.32.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-config-airbnb-typescript": "^14.0.1",
@@ -76,7 +77,12 @@
     "*.{ts,js,md,yml,json}": "prettier --write"
   },
   "jest": {
-    "testTimeout": 800000
+    "testMatch": [
+      "**/__tests__/**/(*.)+(spec|test).[jt]s?(x)"
+    ],
+    "setupFilesAfterEnv": [
+      "./__tests__/jest.setup.ts"
+    ]
   },
   "importSort": {
     ".js, .jsx, .ts, .tsx": {
