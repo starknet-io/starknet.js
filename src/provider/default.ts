@@ -81,7 +81,7 @@ export class Provider implements ProviderInterface {
   }
 
   private getFetchMethod(endpoint: keyof Endpoints) {
-    const postMethodEndpoints = ['add_transaction', 'call_contract'];
+    const postMethodEndpoints = ['add_transaction', 'call_contract', 'estimate_fee'];
 
     return postMethodEndpoints.includes(endpoint) ? 'POST' : 'GET';
   }
@@ -167,20 +167,14 @@ export class Provider implements ProviderInterface {
    */
   public async callContract(
     { contractAddress, entrypoint, calldata = [] }: Call,
-    blockIdentifier: BlockIdentifier = null
+    options: { blockIdentifier: BlockIdentifier } = { blockIdentifier: null }
   ): Promise<CallContractResponse> {
-    return this.fetchEndpoint(
-      'call_contract',
-      {
-        blockIdentifier,
-      },
-      {
-        signature: [],
-        contract_address: contractAddress,
-        entry_point_selector: getSelectorFromName(entrypoint),
-        calldata,
-      }
-    );
+    return this.fetchEndpoint('call_contract', options, {
+      signature: [],
+      contract_address: contractAddress,
+      entry_point_selector: getSelectorFromName(entrypoint),
+      calldata,
+    });
   }
 
   /**
@@ -323,6 +317,17 @@ export class Provider implements ProviderInterface {
    */
   public invokeFunction(invocation: Invocation, _abi?: Abi): Promise<AddTransactionResponse> {
     return this.fetchEndpoint('add_transaction', undefined, {
+      type: 'INVOKE_FUNCTION',
+      contract_address: invocation.contractAddress,
+      entry_point_selector: getSelectorFromName(invocation.entrypoint),
+      calldata: bigNumberishArrayToDecimalStringArray(invocation.calldata ?? []),
+      signature: bigNumberishArrayToDecimalStringArray(invocation.signature ?? []),
+    });
+  }
+
+  public estimateFee(invocation: Invocation): Promise<any> {
+    return this.fetchEndpoint('estimate_fee', undefined, {
+      // TODO: change the TYPE of the call
       type: 'INVOKE_FUNCTION',
       contract_address: invocation.contractAddress,
       entry_point_selector: getSelectorFromName(invocation.entrypoint),

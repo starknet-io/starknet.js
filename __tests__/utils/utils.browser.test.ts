@@ -17,9 +17,7 @@ test('isBrowser', () => {
 });
 describe('compressProgram()', () => {
   test('compresses a contract program', () => {
-    const inputContract = compiledArgentAccount as any;
-
-    const compressed = stark.compressProgram(inputContract.program);
+    const compressed = stark.compressProgram(compiledArgentAccount.program);
 
     expect(compressed).toMatchSnapshot();
   });

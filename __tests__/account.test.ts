@@ -21,10 +21,7 @@ describe('deploy and test Wallet', () => {
     const contract = new Contract(compiledArgentAccount.abi, accountResponse.address);
     expect(accountResponse.code).toBe('TRANSACTION_RECEIVED');
 
-    const initializeResponse = await contract.invoke('initialize', {
-      signer: starkKeyPub,
-      guardian: '0',
-    });
+    const initializeResponse = await contract.initialize(starkKeyPub, '0');
     expect(initializeResponse.code).toBe('TRANSACTION_RECEIVED');
 
     account = new Account(defaultProvider, accountResponse.address, starkKeyPair);
@@ -36,10 +33,7 @@ describe('deploy and test Wallet', () => {
     erc20 = new Contract(compiledErc20.abi, erc20Address);
     expect(erc20Response.code).toBe('TRANSACTION_RECEIVED');
 
-    const mintResponse = await erc20.invoke('mint', {
-      recipient: account.address,
-      amount: '1000',
-    });
+    const mintResponse = await erc20.mint(account.address, '1000');
     expect(mintResponse.code).toBe('TRANSACTION_RECEIVED');
 
     const dappResponse = await defaultProvider.deployContract({
@@ -65,9 +59,7 @@ describe('deploy and test Wallet', () => {
   });
 
   test('read balance of wallet', async () => {
-    const { res } = await erc20.call('balance_of', {
-      user: account.address,
-    });
+    const { res } = await erc20.balance_of(account.address);
 
     expect(number.toBN(res as string).toString()).toStrictEqual(number.toBN(1000).toString());
   });
@@ -84,9 +76,7 @@ describe('deploy and test Wallet', () => {
   });
 
   test('read balance of wallet after transfer', async () => {
-    const { res } = await erc20.call('balance_of', {
-      user: account.address,
-    });
+    const { res } = await erc20.balance_of(account.address);
 
     expect(number.toBN(res as string).toString()).toStrictEqual(number.toBN(990).toString());
   });
@@ -114,12 +104,12 @@ describe('deploy and test Wallet', () => {
   test('execute multiple transactions', async () => {
     const { code, transaction_hash } = await account.execute([
       {
-        contractAddress: dapp.connectedTo,
+        contractAddress: dapp.address,
         entrypoint: 'set_number',
         calldata: ['47'],
       },
       {
-        contractAddress: dapp.connectedTo,
+        contractAddress: dapp.address,
         entrypoint: 'increase_number',
         calldata: ['10'],
       },
@@ -128,7 +118,7 @@ describe('deploy and test Wallet', () => {
     expect(code).toBe('TRANSACTION_RECEIVED');
     await defaultProvider.waitForTransaction(transaction_hash);
 
-    const response = await dapp.call('get_number', { user: account.address });
+    const response = await dapp.get_number(account.address);
     expect(toBN(response.number as string).toString()).toStrictEqual('57');
   });
 

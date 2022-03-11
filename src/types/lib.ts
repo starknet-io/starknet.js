@@ -45,7 +45,7 @@ export type FunctionAbi = {
   name: string;
   outputs: AbiEntry[];
   stateMutability?: 'view';
-  type: 'function';
+  type: 'function' | 'constructor';
 };
 
 export type StructAbi = {
@@ -69,4 +69,15 @@ export type CompiledContract = {
 
 export type CompressedCompiledContract = Omit<CompiledContract, 'program'> & {
   program: CompressedProgram;
+};
+
+export type Struct = {
+  type: 'struct';
+  [k: string]: BigNumberish;
+};
+export type Args = {
+  [inputName: string]: BigNumberish | BigNumberish[] | ParsedStruct | ParsedStruct[];
+};
+export type ParsedStruct = {
+  [key: string]: BigNumberish | ParsedStruct;
 };
