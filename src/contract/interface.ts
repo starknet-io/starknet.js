@@ -1,5 +1,5 @@
-import { Account } from '../account';
-import { Provider } from '../provider';
+import { AccountInterface } from '../account';
+import { ProviderInterface } from '../provider';
 import {
   Abi,
   AddTransactionResponse,
@@ -14,7 +14,7 @@ export abstract class ContractInterface {
 
   public abstract address: string;
 
-  public abstract providerOrAccount: Provider | Account;
+  public abstract providerOrAccount: ProviderInterface | AccountInterface;
 
   public abstract deployTransactionHash?: string;
 
@@ -40,7 +40,7 @@ export abstract class ContractInterface {
    *
    * @param providerOrAccount - new Provider or Account to attach to
    */
-  public abstract connect(providerOrAccount: Provider | Account): void;
+  public abstract connect(providerOrAccount: ProviderInterface | AccountInterface): void;
 
   /**
    * Resolves when contract is deployed on the network or when no deployment transaction is found

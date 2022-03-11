@@ -1,8 +1,8 @@
 import BN from 'bn.js';
 import assert from 'minimalistic-assert';
 
-import { Account } from '../account';
-import { Provider, defaultProvider } from '../provider';
+import { AccountInterface } from '../account';
+import { ProviderInterface, defaultProvider } from '../provider';
 import {
   Abi,
   AbiEntry,
@@ -85,7 +85,7 @@ export class Contract implements ContractInterface {
 
   address: string;
 
-  providerOrAccount: Provider | Account;
+  providerOrAccount: ProviderInterface | AccountInterface;
 
   deployTransactionHash?: string;
 
@@ -108,7 +108,11 @@ export class Contract implements ContractInterface {
    * @param address (optional) - address to connect to
    * @param providerOrAccount (optional) - Provider or Account to attach to
    */
-  constructor(abi: Abi, address: string, providerOrAccount: Provider | Account = defaultProvider) {
+  constructor(
+    abi: Abi,
+    address: string,
+    providerOrAccount: ProviderInterface | AccountInterface = defaultProvider
+  ) {
     this.address = address;
     this.providerOrAccount = providerOrAccount;
     this.abi = abi;
@@ -202,7 +206,7 @@ export class Contract implements ContractInterface {
    *
    * @param providerOrAccount - new Provider or Account to attach to
    */
-  public connect(providerOrAccount: Provider | Account) {
+  public connect(providerOrAccount: ProviderInterface | AccountInterface) {
     this.providerOrAccount = providerOrAccount;
   }
 
@@ -554,7 +558,7 @@ export class Contract implements ContractInterface {
       calldata,
       entrypoint: method,
     };
-    if (this.providerOrAccount instanceof Account) {
+    if ('execute' in this.providerOrAccount) {
       return this.providerOrAccount.execute(invocation);
     }
     return this.providerOrAccount.invokeFunction({
