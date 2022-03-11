@@ -558,7 +558,7 @@ export class Contract implements ContractInterface {
       calldata,
       entrypoint: method,
     };
-    if (this.providerOrAccount instanceof AccountInterface) {
+    if ('execute' in this.providerOrAccount) {
       return this.providerOrAccount.execute(invocation);
     }
     return this.providerOrAccount.invokeFunction({
