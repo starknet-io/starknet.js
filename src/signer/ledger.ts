@@ -1,29 +1,41 @@
-import { hexZeroPad } from '@ethersproject/bytes';
 import Eth from '@ledgerhq/hw-app-eth';
 import Transport from '@ledgerhq/hw-transport';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
-import { ethers } from 'ethers';
 
 import { Abi, Invocation, InvocationsSignerDetails, Signature } from '../types';
-import { TypedData } from '../utils/typedData';
+import { hashMulticall } from '../utils/hash';
+import { TypedData, getMessageHash } from '../utils/typedData';
 import { SignerInterface } from './interface';
 
-export class LedgerSigner implements SignerInterface {
+function hexZeroPad(hash: string, length: number): string {
+  let value = hash;
+  if (value.length > 2 * length + 2) {
+    throw new Error('value out of range');
+  }
+  while (value.length < 2 * length + 2) {
+    value = `0x0${value.substring(2)}`;
+  }
+  return value;
+}
+
+export class LedgerBlindSigner implements SignerInterface {
   public derivationPath = "/2645'/579218131'/1148870696'/0'/0'/0";
 
-  static transport: Transport;
+  private transport: Transport | undefined;
 
-  static async getEthApp(): Promise<Eth> {
-    console.log('isSupported', await TransportWebHID.isSupported());
+  private async getEthApp(): Promise<Eth> {
     if (!this.transport) {
-      console.log('create TransportWebHID');
-      this.transport = await TransportWebHID.create();
+      try {
+        this.transport = await TransportWebHID.create();
+      } catch {
+        throw new Error('Device connection error');
+      }
     }
     return new Eth(this.transport);
   }
 
   public async getPubKey(): Promise<string> {
-    const eth = await LedgerSigner.getEthApp();
+    const eth = await this.getEthApp();
     const response = await eth.starkGetPublicKey(this.derivationPath);
     const starkPub = `0x${response.slice(1, 1 + 32).toString('hex')}`;
     return starkPub;
@@ -37,27 +49,33 @@ export class LedgerSigner implements SignerInterface {
     if (abis && abis.length !== transactions.length) {
       throw new Error('ABI must be provided for each transaction or no transaction');
     }
-    console.log(transactions);
-    console.log(transactionsDetail);
-    return ['', ''];
-  }
+    const eth = await this.getEthApp();
 
-  public async signMessage(typedData: TypedData, accountAddress: string): Promise<Signature> {
-    const eth = await LedgerSigner.getEthApp();
-    const messageHash = ethers.utils.keccak256(ethers.utils.toUtf8Bytes(JSON.stringify(typedData)));
+    const msgHash = hashMulticall(
+      transactionsDetail.walletAddress,
+      transactions,
+      transactionsDetail.nonce.toString(),
+      transactionsDetail.maxFee.toString()
+    );
 
-    console.log(`Message to be signed by Nano S/X ${messageHash} for ${accountAddress}`);
-
-    const signature = (await eth.starkUnsafeSign(
-      this.derivationPath,
-      hexZeroPad(messageHash, 32)
-    )) as { r: string; s: string };
+    const signature = (await eth.starkUnsafeSign(this.derivationPath, hexZeroPad(msgHash, 32))) as {
+      r: string;
+      s: string;
+    };
 
     return [`0x${signature.r}`, `0x${signature.s}`];
   }
 
-  static async askPermissionIfNeeded(): Promise<void> {
-    const transport = await TransportWebHID.create();
-    await transport.close();
+  public async signMessage(typedData: TypedData, accountAddress: string): Promise<Signature> {
+    const eth = await this.getEthApp();
+
+    const msgHash = getMessageHash(typedData, accountAddress);
+
+    const signature = (await eth.starkUnsafeSign(this.derivationPath, hexZeroPad(msgHash, 32))) as {
+      r: string;
+      s: string;
+    };
+
+    return [`0x${signature.r}`, `0x${signature.s}`];
   }
 }
