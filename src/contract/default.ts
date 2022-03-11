@@ -81,11 +81,13 @@ function buildEstimate(contract: Contract, functionAbi: FunctionAbi): ContractFu
 }
 
 export class Contract implements ContractInterface {
+  abi: Abi;
+
   address: string;
 
   providerOrAccount: Provider | Account;
 
-  protected readonly abi: Abi;
+  deployTransactionHash?: string;
 
   protected readonly structs: { [name: string]: StructAbi };
 
@@ -145,14 +147,14 @@ export class Contract implements ContractInterface {
         return;
       }
       const signature = abiElement.name;
-      if (this[signature] == null) {
+      if (!this[signature]) {
         Object.defineProperty(this, signature, {
           enumerable: true,
           value: buildDefault(this, abiElement),
           writable: false,
         });
       }
-      if (this.functions[signature] == null) {
+      if (!this.functions[signature]) {
         Object.defineProperty(this.functions, signature, {
           enumerable: true,
           value: buildDefault(this, abiElement),
@@ -160,7 +162,7 @@ export class Contract implements ContractInterface {
         });
       }
 
-      if (this.callStatic[signature] == null) {
+      if (!this.callStatic[signature]) {
         Object.defineProperty(this.callStatic, signature, {
           enumerable: true,
           value: buildCall(this, abiElement),
@@ -168,7 +170,7 @@ export class Contract implements ContractInterface {
         });
       }
 
-      if (this.populateTransaction[signature] == null) {
+      if (!this.populateTransaction[signature]) {
         Object.defineProperty(this.populateTransaction, signature, {
           enumerable: true,
           value: buildPopulate(this, abiElement),
@@ -176,7 +178,7 @@ export class Contract implements ContractInterface {
         });
       }
 
-      if (this.estimateFee[signature] == null) {
+      if (!this.estimateFee[signature]) {
         Object.defineProperty(this.estimateFee, signature, {
           enumerable: true,
           value: buildEstimate(this, abiElement),
@@ -202,6 +204,20 @@ export class Contract implements ContractInterface {
    */
   public connect(providerOrAccount: Provider | Account) {
     this.providerOrAccount = providerOrAccount;
+  }
+
+  /**
+   * Resolves when contract is deployed on the network or when no deployment transaction is found
+   *
+   * @returns Promise that resolves when contract is deployed on the network or when no deployment transaction is found
+   * @throws When deployment fails
+   */
+  public async deployed(): Promise<Contract> {
+    if (this.deployTransactionHash) {
+      await this.providerOrAccount.waitForTransaction(this.deployTransactionHash);
+      this.deployTransactionHash = undefined;
+    }
+    return this;
   }
 
   /**
@@ -313,15 +329,12 @@ export class Contract implements ContractInterface {
    */
 
   private calculateStructMembers(struct: string): number {
-    let structMemberNum = 0;
-    this.structs[struct].members.forEach((member) => {
+    return this.structs[struct].members.reduce((acc, member) => {
       if (member.type === 'felt') {
-        structMemberNum += 1;
-      } else {
-        structMemberNum += this.structMemberNum(member.type);
+        return acc + 1;
       }
-    });
-    return structMemberNum;
+      return acc + this.structMemberNum(member.type);
+    }, 0);
   }
 
   /**
@@ -394,7 +407,7 @@ export class Contract implements ContractInterface {
    * @param input  - input(field) information from the abi that will be used to parse the data
    * @return {string | string[]} - parsed arguments in format that contract is expecting
    */
-  protected parsCalldataField(argsIterator: Iterator<any>, input: AbiEntry): string | string[] {
+  protected parseCalldataField(argsIterator: Iterator<any>, input: AbiEntry): string | string[] {
     const { name, type } = input;
     const { value } = argsIterator.next();
 
@@ -438,7 +451,7 @@ export class Contract implements ContractInterface {
       if (/_len$/.test(input.name)) {
         return acc;
       }
-      const parsedData = this.parsCalldataField(argsIterator, input);
+      const parsedData = this.parseCalldataField(argsIterator, input);
       if (Array.isArray(parsedData)) {
         acc.push(...parsedData);
       } else {
@@ -461,7 +474,6 @@ export class Contract implements ContractInterface {
     parsedResult?: Args
   ): any {
     const { name, type } = output;
-    let arrLen: number;
     const parsedDataArr: (BigNumberish | ParsedStruct)[] = [];
     switch (true) {
       case /_len$/.test(name):
@@ -473,7 +485,7 @@ export class Contract implements ContractInterface {
         }, [] as BigNumberish[]);
       case /\*/.test(type):
         if (parsedResult && parsedResult[`${name}_len`]) {
-          arrLen = parsedResult[`${name}_len`] as number;
+          const arrLen = parsedResult[`${name}_len`] as number;
           while (parsedDataArr.length < arrLen) {
             parsedDataArr.push(
               this.parseResponseStruct(responseIterator, output.type.replace('*', ''))
@@ -512,11 +524,12 @@ export class Contract implements ContractInterface {
     }, [] as Result);
   }
 
-  public invoke(method: string, args: Array<any>): Promise<AddTransactionResponse> {
+  public invoke(method: string, args: Array<any> = []): Promise<AddTransactionResponse> {
     // ensure contract is connected
     assert(this.address !== null, 'contract isnt connected to an address');
     // validate method and args
     this.validateMethodAndArgs('INVOKE', method, args);
+
     const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
     const inputsLength = inputs.reduce((acc, input) => {
       if (!/_len$/.test(input.name)) {
@@ -550,12 +563,12 @@ export class Contract implements ContractInterface {
     });
   }
 
-  public async call(method: string, args: Array<any>): Promise<Result> {
+  public async call(method: string, args: Array<any> = []): Promise<Result> {
     // ensure contract is connected
     assert(this.address !== null, 'contract isnt connected to an address');
 
     // validate method and args
-    // this.validateMethodAndArgs('CALL', method, args);
+    this.validateMethodAndArgs('CALL', method, args);
     const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
     const inputsLength = inputs.length;
     const options = {
@@ -578,35 +591,32 @@ export class Contract implements ContractInterface {
       .then((x) => this.parseResponse(method, x.result));
   }
 
-  public async estimate(method: string, args: Array<any>) {
+  public async estimate(_method: string, _args: Array<any> = []) {
     //  TODO; remove error as soon as estimate fees are supported
     throw Error('Estimation of the fees are not yet supported');
-    // ensure contract is connected
-    assert(this.address !== null, 'contract isnt connected to an address');
+    // // ensure contract is connected
+    // assert(this.address !== null, 'contract isnt connected to an address');
 
-    // validate method and args
-    // this.validateMethodAndArgs('CALL', method, args);
-    const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
+    // // validate method and args
+    // // this.validateMethodAndArgs('CALL', method, args);
+    // const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
 
-    // compile calldata
-    const calldata = this.compileCalldata(args, inputs);
-    return this.providerOrAccount.estimateFee({
-      contractAddress: this.address as string,
-      calldata,
-      entrypoint: method,
-    });
+    // // compile calldata
+    // const calldata = this.compileCalldata(args, inputs);
+    // return this.providerOrAccount.estimateFee({
+    //   contractAddress: this.address as string,
+    //   calldata,
+    //   entrypoint: method,
+    // });
   }
 
-  public populate(method: string, args: Array<any>): Invocation {
+  public populate(method: string, args: Array<any> = []): Invocation {
     const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
-    if (this.address) {
-      return {
-        contractAddress: this.address,
-        entrypoint: getSelectorFromName(method),
-        calldata: this.compileCalldata(args, inputs),
-        signature: [],
-      };
-    }
-    throw Error('Contract not connected');
+    return {
+      contractAddress: this.address,
+      entrypoint: getSelectorFromName(method),
+      calldata: this.compileCalldata(args, inputs),
+      signature: [],
+    };
   }
 }

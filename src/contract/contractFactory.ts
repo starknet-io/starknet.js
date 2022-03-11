@@ -2,28 +2,23 @@ import assert from 'minimalistic-assert';
 
 import { Account } from '../account';
 import { Provider, defaultProvider } from '../provider';
-import { Abi, CompiledContract, GetTransactionResponse, RawCalldata } from '../types';
+import { Abi, CompiledContract, RawCalldata } from '../types';
 import { BigNumberish } from '../utils/number';
 import { Contract } from './default';
 
 export class ContractFactory {
-  address!: string | null;
-
-  abi!: Abi;
-
-  transaction_hash!: string | null;
-
-  code!: string | null;
-
-  providerOrAccount: Provider | Account;
+  abi: Abi;
 
   compiledContract: CompiledContract;
 
+  providerOrAccount: Provider | Account;
+
   constructor(
     compiledContract: CompiledContract,
-    providerOrAccount: Provider | Account = defaultProvider
+    providerOrAccount: Provider | Account = defaultProvider,
+    abi: Abi = compiledContract.abi // abi can be different from the deployed contract ie for proxy contracts
   ) {
-    this.abi = compiledContract.abi;
+    this.abi = abi;
     this.compiledContract = compiledContract;
     this.providerOrAccount = providerOrAccount;
   }
@@ -44,11 +39,29 @@ export class ContractFactory {
       constructorCalldata,
       addressSalt,
     });
-    assert(code === 'TRANSACTION_RECEIVED', 'Deployment of the contract failed');
-    this.address = address as string;
-    this.transaction_hash = transaction_hash;
-    this.code = code;
-    return new Contract(this.compiledContract.abi, address as string, this.providerOrAccount);
+    assert(
+      code === 'TRANSACTION_RECEIVED' && Boolean(address),
+      'Deployment of the contract failed'
+    );
+
+    const contractInstance = new Contract(
+      this.compiledContract.abi,
+      address!,
+      this.providerOrAccount
+    );
+    contractInstance.deployTransactionHash = transaction_hash;
+
+    return contractInstance;
+  }
+
+  /**
+   * Attaches to new Provider or Account
+   *
+   * @param providerOrAccount - new Provider or Account to attach to
+   */
+  connect(providerOrAccount: Provider | Account): ContractFactory {
+    this.providerOrAccount = providerOrAccount;
+    return this;
   }
 
   /**
@@ -58,27 +71,8 @@ export class ContractFactory {
    * @returns Contract
    */
   attach(address: string): Contract {
-    return ContractFactory.getContract(this.abi, address, this.providerOrAccount);
+    return new Contract(this.abi, address, this.providerOrAccount);
   }
 
-  /**
-   * Fetch the transaction of the deployment
-   *
-   * @returns Transaction
-   */
-  public async getDeployTransaction(): Promise<GetTransactionResponse> {
-    if (this.transaction_hash) {
-      return this.providerOrAccount.getTransaction(this.transaction_hash);
-    }
-    throw Error('Deployment not initialized yet');
-  }
-
-  /**
-   * Instances contract
-   *
-   * @returns Contract
-   */
-  static getContract(abi: Abi, address: string, providerOrAccount?: Provider | Account): Contract {
-    return new Contract(abi, address, providerOrAccount);
-  }
+  // ethers.js' getDeployTransaction cant be supported as it requires the account or signer to return a signed transaction which is not possible with the current implementation
 }

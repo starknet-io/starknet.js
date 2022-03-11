@@ -282,12 +282,10 @@ describe('class ContractFactory {}', () => {
     const erc20 = await factory.deploy();
     expect(erc20 instanceof Contract);
   });
-  test('get the transaction of the deployed contract', async () => {
+  test('wait for deployment transaction', async () => {
     const factory = new ContractFactory(compiledErc20);
-    await factory.deploy();
-    const tx = await factory.getDeployTransaction();
-    expect(tx).toHaveProperty('status');
-    expect(tx).toHaveProperty('transaction');
+    const contract = await factory.deploy();
+    expect(contract.deployed()).resolves.not.toThrow();
   });
   test('attach new contract', async () => {
     const factory = new ContractFactory(compiledErc20);
