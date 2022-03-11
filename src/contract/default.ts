@@ -595,23 +595,15 @@ export class Contract implements ContractInterface {
       .then((x) => this.parseResponse(method, x.result));
   }
 
-  public async estimate(_method: string, _args: Array<any> = []) {
+  public async estimate(method: string, args: Array<any> = []) {
     //  TODO; remove error as soon as estimate fees are supported
-    throw Error('Estimation of the fees are not yet supported');
-    // // ensure contract is connected
-    // assert(this.address !== null, 'contract isnt connected to an address');
+    // ensure contract is connected
+    assert(this.address !== null, 'contract isnt connected to an address');
 
-    // // validate method and args
-    // // this.validateMethodAndArgs('CALL', method, args);
-    // const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
-
-    // // compile calldata
-    // const calldata = this.compileCalldata(args, inputs);
-    // return this.providerOrAccount.estimateFee({
-    //   contractAddress: this.address as string,
-    //   calldata,
-    //   entrypoint: method,
-    // });
+    // validate method and args
+    this.validateMethodAndArgs('INVOKE', method, args);
+    const invocation = this.populateTransaction[method](...args);
+    return this.providerOrAccount.estimateFee(invocation);
   }
 
   public populate(method: string, args: Array<any> = []): Invocation {

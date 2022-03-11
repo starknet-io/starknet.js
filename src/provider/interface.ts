@@ -139,6 +139,19 @@ export abstract class ProviderInterface {
    */
   public abstract invokeFunction(invocation: Invocation): Promise<AddTransactionResponse>;
 
+  /**
+   * Estimate Fee for a method on starknet
+   *
+   * @param invocation the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   *
+   * @returns response from addTransaction
+   */
+  public abstract estimateFee(invocation: Invocation): Promise<any>;
+
   public abstract waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<void>;
 
   /**

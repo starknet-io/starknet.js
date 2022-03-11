@@ -69,7 +69,7 @@ export type Endpoints = {
   };
   estimate_fee: {
     QUERY: never;
-    REQUEST: Transaction;
+    REQUEST: CallContractTransaction;
     RESPONSE: EstimateFeeResponse;
   };
 };

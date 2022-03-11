@@ -50,6 +50,12 @@ describe('class Contract {}', () => {
       expect(res).toHaveProperty('signature');
     });
 
+    test('estimate gas fee for `mint`', async () => {
+      const res = await erc20.estimateFee.mint(wallet, '10');
+      expect(res).toHaveProperty('amount');
+      expect(res).toHaveProperty('unit');
+    });
+
     test('read initial balance of that account', async () => {
       const result = await erc20.balance_of(wallet);
       const [res] = result;
