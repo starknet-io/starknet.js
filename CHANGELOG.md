@@ -1,3 +1,10 @@
+## [3.5.1](https://github.com/seanjameshan/starknet.js/compare/v3.5.0...v3.5.1) (2022-03-11)
+
+### Bug Fixes
+
+- account detection ([b3b3ba7](https://github.com/seanjameshan/starknet.js/commit/b3b3ba74dde72027ba7f0e1234fed34a604fdcec))
+- contract interface ([696116d](https://github.com/seanjameshan/starknet.js/commit/696116d383ba16c587e7ed708f7b47d02610b9d9))
+
 # [3.5.0](https://github.com/seanjameshan/starknet.js/compare/v3.4.0...v3.5.0) (2022-03-11)
 
 ### Bug Fixes
