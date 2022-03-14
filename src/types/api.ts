@@ -36,6 +36,13 @@ export type Endpoints = {
     REQUEST: never;
     RESPONSE: GetTransactionStatusResponse;
   };
+  get_transaction_trace: {
+    QUERY: {
+      transactionHash: string;
+    };
+    REQUEST: never;
+    RESPONSE: GetTransactionTraceResponse;
+  };
   get_storage_at: {
     QUERY: {
       contractAddress: string;
@@ -97,6 +104,32 @@ export type InvokeFunctionTransaction = {
   nonce?: BigNumberish;
 };
 
+export type InvokeFunctionTrace = {
+  caller_address: string;
+  contract_address: string;
+  code_address: string;
+  selector: string;
+  calldata: RawCalldata;
+  result: Array<any>;
+  execution_resources: ExecutionResources;
+  internal_call: Array<InvokeFunctionTrace>;
+  events: Array<any>;
+  messages: Array<any>;
+};
+
+export type ExecutionResources = {
+  n_steps: number;
+  builtin_instance_counter: {
+    pedersen_builtin: number;
+    range_check_builtin: number;
+    bitwise_builtin: number;
+    output_builtin: number;
+    ecdsa_builtin: number;
+    ec_op_builtin: number;
+  };
+  n_memory_holes: number;
+};
+
 export type CallContractTransaction = Omit<
   InvokeFunctionTransaction,
   'type' | 'entry_point_type' | 'nonce'
@@ -147,6 +180,22 @@ export type GetTransactionStatusResponse = {
     code: string;
     error_message: string;
   };
+};
+
+export type GetTransactionTraceResponse = {
+  function_invocation: {
+    caller_address: string;
+    contract_address: string;
+    code_address: string;
+    selector: string;
+    calldata: RawArgs;
+    result: Array<any>;
+    execution_resources: any;
+    internal_call: Array<any>;
+    events: Array<any>;
+    messages: Array<any>;
+  };
+  signature: Signature;
 };
 
 export type GetTransactionResponse = {

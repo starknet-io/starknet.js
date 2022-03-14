@@ -14,6 +14,7 @@ import {
   GetContractAddressesResponse,
   GetTransactionResponse,
   GetTransactionStatusResponse,
+  GetTransactionTraceResponse,
   Invocation,
   TransactionReceipt,
 } from '../types';
@@ -275,6 +276,18 @@ export class Provider implements ProviderInterface {
   public async getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {
     const txHashHex = toHex(toBN(txHash));
     return this.fetchEndpoint('get_transaction', { transactionHash: txHashHex });
+  }
+
+  /**
+   * Gets the transaction trace from a tx id.
+   *
+   *
+   * @param txHash
+   * @returns the transaction trace
+   */
+  public async getTransactionTrace(txHash: BigNumberish): Promise<GetTransactionTraceResponse> {
+    const txHashHex = toHex(toBN(txHash));
+    return this.fetchEndpoint('get_transaction_trace', { transactionHash: txHashHex });
   }
 
   /**
