@@ -17,7 +17,6 @@ import {
   Result,
   StructAbi,
 } from '../types';
-import { getSelectorFromName } from '../utils/hash';
 import { BigNumberish, toBN, toFelt } from '../utils/number';
 import { ContractInterface } from './interface';
 
@@ -610,7 +609,7 @@ export class Contract implements ContractInterface {
     const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
     return {
       contractAddress: this.address,
-      entrypoint: getSelectorFromName(method),
+      entrypoint: method,
       calldata: this.compileCalldata(args, inputs),
       signature: [],
     };

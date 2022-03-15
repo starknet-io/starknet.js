@@ -341,7 +341,7 @@ export class Provider implements ProviderInterface {
   public estimateFee(invocation: Invocation): Promise<any> {
     return this.fetchEndpoint('estimate_fee', undefined, {
       contract_address: invocation.contractAddress,
-      entry_point_selector: invocation.entrypoint,
+      entry_point_selector: getSelectorFromName(invocation.entrypoint),
       calldata: bigNumberishArrayToDecimalStringArray(invocation.calldata ?? []),
       signature: bigNumberishArrayToDecimalStringArray(invocation.signature ?? []),
     });
