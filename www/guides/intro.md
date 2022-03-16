@@ -4,8 +4,17 @@ sidebar_position: 1
 
 # Getting Started
 
-## Deploying StarkNet Contracts
+```bash
+npm install starknet
 
-Please check the StarkNet documentation <ins>[here](https://www.cairo-lang.org/docs/hello_starknet/intro.html)</ins> to deploy custom contracts onto StarkNet.
+# to use latest features
 
-> ⚠️  **Note:** Deploying contracts through StarkNet.js will be available when Contract Factory is implemented. This API is set to be released in Q2 of 2022.
+npm install starknet@next
+```
+
+## Compiling StarkNet Contracts
+
+Please check the StarkNet documentation <ins>[here](https://www.cairo-lang.org/docs/hello_starknet/intro.html)</ins> to compile starknet contracts.
+
+## Full example with account & erc20
+Please see workshop <ins>[here](https://github.com/0xs34n/starknet.js-workshop)</ins>
