@@ -103,14 +103,5 @@
     "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
   "include": ["src/**/*"],
-  "exclude": ["node_modules"],
-  "typedocOptions": {
-    "entryPoints": "src/index.ts",
-    "entryPointStrategy": "expand",
-    "out": "docs",
-    "githubPages": false,
-    "readme": "./README.md",
-    "name": "StarkNet.js Docs",
-    "sort": "required-first"
-  }
+  "exclude": ["node_modules"]
 }

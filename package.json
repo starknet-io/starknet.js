@@ -11,7 +11,7 @@
     "test": "jest",
     "posttest": "npm run format",
     "test:watch": "jest --watch",
-    "docs": "typedoc",
+    "docs": "cd www && npm run start",
     "format": "prettier --loglevel warn --write \"**/*.{ts,js,md,yml,json}\"",
     "lint": "eslint . --cache --fix --ext .ts"
   },
