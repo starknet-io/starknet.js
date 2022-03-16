@@ -9,6 +9,7 @@ import {
   CompiledContract,
   DeployContractPayload,
   Endpoints,
+  EstimateFeeResponse,
   GetBlockResponse,
   GetCodeResponse,
   GetContractAddressesResponse,
@@ -338,7 +339,7 @@ export class Provider implements ProviderInterface {
     });
   }
 
-  public estimateFee(invocation: Invocation): Promise<any> {
+  public estimateFee(invocation: Invocation): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint('estimate_fee', undefined, {
       contract_address: invocation.contractAddress,
       entry_point_selector: getSelectorFromName(invocation.entrypoint),

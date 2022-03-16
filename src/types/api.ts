@@ -222,8 +222,11 @@ export type TransactionReceipt = {
   l2_to_l1_messages: string[];
   events: string[];
 };
-// TODO: Add response data
-export type EstimateFeeResponse = {};
+
+export type EstimateFeeResponse = {
+  amount: number;
+  unit: string;
+};
 
 export type RawArgs = {
   [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };

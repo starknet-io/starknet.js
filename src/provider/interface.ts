@@ -3,6 +3,7 @@ import type {
   Call,
   CallContractResponse,
   DeployContractPayload,
+  EstimateFeeResponse,
   GetBlockResponse,
   GetCodeResponse,
   GetContractAddressesResponse,
@@ -150,7 +151,7 @@ export abstract class ProviderInterface {
    *
    * @returns response from addTransaction
    */
-  public abstract estimateFee(invocation: Invocation): Promise<any>;
+  public abstract estimateFee(invocation: Invocation): Promise<EstimateFeeResponse>;
 
   public abstract waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<void>;
 
