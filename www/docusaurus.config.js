@@ -108,10 +108,10 @@ const config = {
           {
             title: 'More',
             items: [
-              {
-                label: 'Blog',
-                to: '/blog',
-              },
+              // {
+              //   label: 'Blog',
+              //   to: '/blog',
+              // },
               {
                 label: 'GitHub',
                 href: 'https://github.com/0xs34n/starknet.js',
