@@ -6,6 +6,7 @@ import {
   Abi,
   AddTransactionResponse,
   Call,
+  EstimateFeeResponse,
   InvocationsDetails,
   InvokeFunctionTransaction,
   KeyPair,
@@ -44,6 +45,25 @@ export class Account extends Provider implements AccountInterface {
     return toHex(toBN(result[0]));
   }
 
+  public async estimateFee(calls: Call | Call[]): Promise<EstimateFeeResponse> {
+    const transactions = Array.isArray(calls) ? calls : [calls];
+    const nonce = await this.getNonce();
+    const signerDetails = {
+      walletAddress: this.address,
+      nonce: toBN(nonce),
+      maxFee: toBN('0'),
+    };
+    const signature = await this.signer.signTransaction(transactions, signerDetails);
+
+    const calldata = [...fromCallsToExecuteCalldata(transactions), signerDetails.nonce.toString()];
+    return this.fetchEndpoint('estimate_fee', undefined, {
+      contract_address: this.address,
+      entry_point_selector: getSelectorFromName('__execute__'),
+      calldata,
+      signature: bigNumberishArrayToDecimalStringArray(signature),
+    });
+  }
+
   /**
    * Invoke execute function in account contract
    *
@@ -58,23 +78,24 @@ export class Account extends Provider implements AccountInterface {
     transactionsDetail: InvocationsDetails = {}
   ): Promise<AddTransactionResponse> {
     const transactions = Array.isArray(calls) ? calls : [calls];
-
+    const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
+    const maxFee = transactionsDetail.maxFee ?? (await this.estimateFee(transactions)).amount;
     const signerDetails = {
       walletAddress: this.address,
-      nonce: toBN(transactionsDetail.nonce ?? (await this.getNonce())),
-      maxFee: toBN(transactionsDetail.maxFee ?? '0'),
+      nonce,
+      maxFee,
     };
 
     const signature = await this.signer.signTransaction(transactions, signerDetails, abis);
 
     const calldata = [...fromCallsToExecuteCalldata(transactions), signerDetails.nonce.toString()];
-
     return this.fetchEndpoint('add_transaction', undefined, {
       type: 'INVOKE_FUNCTION',
       contract_address: this.address,
       entry_point_selector: getSelectorFromName('__execute__'),
       calldata,
       signature: bigNumberishArrayToDecimalStringArray(signature),
+      max_fee: toHex(toBN(maxFee)),
     });
   }
 

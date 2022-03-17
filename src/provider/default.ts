@@ -9,7 +9,6 @@ import {
   CompiledContract,
   DeployContractPayload,
   Endpoints,
-  EstimateFeeResponse,
   GetBlockResponse,
   GetCodeResponse,
   GetContractAddressesResponse,
@@ -332,15 +331,6 @@ export class Provider implements ProviderInterface {
   public invokeFunction(invocation: Invocation, _abi?: Abi): Promise<AddTransactionResponse> {
     return this.fetchEndpoint('add_transaction', undefined, {
       type: 'INVOKE_FUNCTION',
-      contract_address: invocation.contractAddress,
-      entry_point_selector: getSelectorFromName(invocation.entrypoint),
-      calldata: bigNumberishArrayToDecimalStringArray(invocation.calldata ?? []),
-      signature: bigNumberishArrayToDecimalStringArray(invocation.signature ?? []),
-    });
-  }
-
-  public estimateFee(invocation: Invocation): Promise<EstimateFeeResponse> {
-    return this.fetchEndpoint('estimate_fee', undefined, {
       contract_address: invocation.contractAddress,
       entry_point_selector: getSelectorFromName(invocation.entrypoint),
       calldata: bigNumberishArrayToDecimalStringArray(invocation.calldata ?? []),

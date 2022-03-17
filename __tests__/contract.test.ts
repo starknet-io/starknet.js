@@ -4,12 +4,8 @@ import { Account, Contract, ContractFactory, Provider, defaultProvider, ec, star
 import { getSelectorFromName } from '../src/utils/hash';
 import { BigNumberish, toBN } from '../src/utils/number';
 import { compileCalldata } from '../src/utils/stark';
-import {
-  compiledArgentAccount,
-  compiledErc20,
-  compiledMulticall,
-  compiledTypeTransformation,
-} from './fixtures';
+import { ACCOUNT_ADDRESS, PRIVATE_KEY } from './constancts';
+import { compiledErc20, compiledMulticall, compiledTypeTransformation } from './fixtures';
 
 describe('class Contract {}', () => {
   const wallet = stark.randomAddress();
@@ -50,10 +46,8 @@ describe('class Contract {}', () => {
       expect(res).toHaveProperty('signature');
     });
 
-    test('estimate gas fee for `mint`', async () => {
-      const res = await erc20.estimateFee.mint(wallet, '10');
-      expect(res).toHaveProperty('amount');
-      expect(res).toHaveProperty('unit');
+    test('estimate gas fee for `mint` should fail when connected to the provider', async () => {
+      expect(erc20.estimateFee.mint(wallet, '10')).rejects.toThrow();
     });
 
     test('read initial balance of that account', async () => {
@@ -210,26 +204,13 @@ describe('class Contract {}', () => {
   });
 
   describe('Contract interaction with Account', () => {
-    const privateKey = stark.randomAddress();
-
-    const starkKeyPair = ec.getKeyPair(privateKey);
-    const starkKeyPub = ec.getStarkKey(starkKeyPair);
+    const starkKeyPair = ec.getKeyPair(PRIVATE_KEY);
     let account: Account;
     let erc20: Contract;
     let erc20Address: string;
 
     beforeAll(async () => {
-      const accountResponse = await defaultProvider.deployContract({
-        contract: compiledArgentAccount,
-        addressSalt: starkKeyPub,
-      });
-      const contract = new Contract(compiledArgentAccount.abi, accountResponse.address);
-      expect(accountResponse.code).toBe('TRANSACTION_RECEIVED');
-
-      const initializeResponse = await contract.initialize(starkKeyPub, '0');
-      expect(initializeResponse.code).toBe('TRANSACTION_RECEIVED');
-
-      account = new Account(defaultProvider, accountResponse.address, starkKeyPair);
+      account = new Account(defaultProvider, ACCOUNT_ADDRESS, starkKeyPair);
 
       const erc20Response = await defaultProvider.deployContract({
         contract: compiledErc20,
@@ -255,6 +236,12 @@ describe('class Contract {}', () => {
       expect(erc20.providerOrAccount instanceof Provider);
       erc20.connect(account);
       expect(erc20.providerOrAccount instanceof Account);
+    });
+
+    test('estimate gas fee for `mint`', async () => {
+      const res = await erc20.estimateFee.mint(wallet, '10');
+      expect(res).toHaveProperty('amount');
+      expect(res).toHaveProperty('unit');
     });
 
     test('read balance of wallet', async () => {

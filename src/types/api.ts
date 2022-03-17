@@ -102,6 +102,7 @@ export type InvokeFunctionTransaction = {
   entry_point_selector: string;
   calldata?: RawCalldata;
   nonce?: BigNumberish;
+  max_fee?: BigNumberish;
 };
 
 export type InvokeFunctionTrace = {
@@ -233,3 +234,9 @@ export type RawArgs = {
 };
 
 export type Calldata = string[];
+
+export type Overrides = {
+  maxFee?: BigNumberish;
+  nonce?: BigNumberish;
+  signature?: Signature;
+};

@@ -13,6 +13,7 @@ import {
   ContractFunction,
   FunctionAbi,
   Invocation,
+  Overrides,
   ParsedStruct,
   Result,
   StructAbi,
@@ -540,10 +541,12 @@ export class Contract implements ContractInterface {
       }
       return acc;
     }, 0);
-    const signature = [];
+
+    const overrides: Overrides = {};
     if (args.length === inputsLength + 1 && Array.isArray(args[args.length - 1])) {
-      signature.push(...args.pop());
+      Object.assign(overrides, args.pop());
     }
+
     if (args.length !== inputsLength) {
       throw Error(
         `Invalid number of arguments, expected ${inputsLength} arguments, but got ${args.length}`
@@ -558,11 +561,15 @@ export class Contract implements ContractInterface {
       entrypoint: method,
     };
     if ('execute' in this.providerOrAccount) {
-      return this.providerOrAccount.execute(invocation);
+      return this.providerOrAccount.execute(invocation, undefined, {
+        maxFee: overrides.maxFee,
+        nonce: overrides.nonce,
+      });
     }
+
     return this.providerOrAccount.invokeFunction({
       ...invocation,
-      signature,
+      signature: overrides.signature || [],
     });
   }
 
@@ -602,7 +609,10 @@ export class Contract implements ContractInterface {
     // validate method and args
     this.validateMethodAndArgs('INVOKE', method, args);
     const invocation = this.populateTransaction[method](...args);
-    return this.providerOrAccount.estimateFee(invocation);
+    if ('estimateFee' in this.providerOrAccount) {
+      return this.providerOrAccount.estimateFee(invocation);
+    }
+    throw Error('Contract must be connected to the account contract to estimate');
   }
 
   public populate(method: string, args: Array<any> = []): Invocation {
