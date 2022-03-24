@@ -24,6 +24,15 @@ describe('cairo uint256', () => {
       }
     `);
   });
+  test('should convert BigInt to uint256 struct', () => {
+    const uint256 = bnToUint256(BigInt(UINT_128_MAX.add(ONE).toString()));
+    expect(uint256).toMatchInlineSnapshot(`
+      Object {
+        "high": "0x1",
+        "low": "0x0",
+      }
+    `);
+  });
   test('should throw if BN over uint256 range', () => {
     expect(() => bnToUint256(UINT_256_MAX.add(toBN(1)))).toThrowErrorMatchingInlineSnapshot(
       `"Number is too large"`

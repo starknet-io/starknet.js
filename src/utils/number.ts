@@ -3,7 +3,7 @@ import assert from 'minimalistic-assert';
 
 import { addHexPrefix, removeHexPrefix } from './encode';
 
-export type BigNumberish = string | number | BN;
+export type BigNumberish = string | number | BN | BigInt;
 
 export function isHex(hex: string): boolean {
   return hex.startsWith('0x');
