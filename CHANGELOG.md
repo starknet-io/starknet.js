@@ -1,3 +1,11 @@
+# [3.7.0](https://github.com/seanjameshan/starknet.js/compare/v3.6.0...v3.7.0) (2022-03-24)
+
+### Features
+
+- **Account:** account constructor should take a KeyPair or a Signer as parameter ([ea6ae40](https://github.com/seanjameshan/starknet.js/commit/ea6ae40225d33e293b9d2de7c8509e87fb7a651e))
+- add BigInt support within BigNumberish ([e42427a](https://github.com/seanjameshan/starknet.js/commit/e42427afa9a57673576da68cfbbee1356ffb5c0d))
+- using typeguard to narrow variable's type in Account's constructor ([ed048f3](https://github.com/seanjameshan/starknet.js/commit/ed048f355bee815cc9b2ccc984db900059fa2303))
+
 # [3.6.0](https://github.com/seanjameshan/starknet.js/compare/v3.5.1...v3.6.0) (2022-03-24)
 
 ### Bug Fixes
