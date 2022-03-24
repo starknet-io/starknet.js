@@ -13,11 +13,11 @@ import {
   ContractFunction,
   FunctionAbi,
   Invocation,
+  Overrides,
   ParsedStruct,
   Result,
   StructAbi,
 } from '../types';
-import { getSelectorFromName } from '../utils/hash';
 import { BigNumberish, toBN, toFelt } from '../utils/number';
 import { ContractInterface } from './interface';
 
@@ -541,10 +541,12 @@ export class Contract implements ContractInterface {
       }
       return acc;
     }, 0);
-    const signature = [];
+
+    const overrides: Overrides = {};
     if (args.length === inputsLength + 1 && Array.isArray(args[args.length - 1])) {
-      signature.push(...args.pop());
+      Object.assign(overrides, args.pop());
     }
+
     if (args.length !== inputsLength) {
       throw Error(
         `Invalid number of arguments, expected ${inputsLength} arguments, but got ${args.length}`
@@ -559,11 +561,15 @@ export class Contract implements ContractInterface {
       entrypoint: method,
     };
     if ('execute' in this.providerOrAccount) {
-      return this.providerOrAccount.execute(invocation);
+      return this.providerOrAccount.execute(invocation, undefined, {
+        maxFee: overrides.maxFee,
+        nonce: overrides.nonce,
+      });
     }
+
     return this.providerOrAccount.invokeFunction({
       ...invocation,
-      signature,
+      signature: overrides.signature || [],
     });
   }
 
@@ -595,30 +601,25 @@ export class Contract implements ContractInterface {
       .then((x) => this.parseResponse(method, x.result));
   }
 
-  public async estimate(_method: string, _args: Array<any> = []) {
+  public async estimate(method: string, args: Array<any> = []) {
     //  TODO; remove error as soon as estimate fees are supported
-    throw Error('Estimation of the fees are not yet supported');
-    // // ensure contract is connected
-    // assert(this.address !== null, 'contract isnt connected to an address');
+    // ensure contract is connected
+    assert(this.address !== null, 'contract isnt connected to an address');
 
-    // // validate method and args
-    // // this.validateMethodAndArgs('CALL', method, args);
-    // const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
-
-    // // compile calldata
-    // const calldata = this.compileCalldata(args, inputs);
-    // return this.providerOrAccount.estimateFee({
-    //   contractAddress: this.address as string,
-    //   calldata,
-    //   entrypoint: method,
-    // });
+    // validate method and args
+    this.validateMethodAndArgs('INVOKE', method, args);
+    const invocation = this.populateTransaction[method](...args);
+    if ('estimateFee' in this.providerOrAccount) {
+      return this.providerOrAccount.estimateFee(invocation);
+    }
+    throw Error('Contract must be connected to the account contract to estimate');
   }
 
   public populate(method: string, args: Array<any> = []): Invocation {
     const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
     return {
       contractAddress: this.address,
-      entrypoint: getSelectorFromName(method),
+      entrypoint: method,
       calldata: this.compileCalldata(args, inputs),
       signature: [],
     };

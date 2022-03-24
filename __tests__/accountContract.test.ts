@@ -1,5 +1,4 @@
 import { Contract, defaultProvider, ec, hash, number, stark } from '../src';
-import { transformCallsToMulticallArrays } from '../src/utils/transaction';
 import { compiledArgentAccount, compiledErc20 } from './fixtures';
 
 describe('getStarkAccountFromPrivateKey()', () => {
@@ -63,36 +62,6 @@ describe('deploy and test Wallet', () => {
     const { res } = await erc20.balance_of(accountContract.address);
 
     expect(res).toStrictEqual(number.toBN(1000));
-  });
-
-  test('execute by wallet owner', async () => {
-    const nonce = (await accountContract.get_nonce()).nonce.toString();
-
-    const calls = [
-      { contractAddress: erc20Address, entrypoint: 'transfer', calldata: [erc20Address, '10'] },
-    ];
-    const msgHash = hash.hashMulticall(accountContract.address, calls, nonce, '0');
-
-    const { callArray, calldata } = transformCallsToMulticallArrays(calls);
-
-    const signature = ec.sign(starkKeyPair, msgHash);
-    // eslint-disable-next-line no-underscore-dangle
-    const { code, transaction_hash } = await accountContract.__execute__(
-      callArray,
-      calldata,
-      nonce,
-      signature
-    );
-
-    expect(code).toBe('TRANSACTION_RECEIVED');
-
-    await defaultProvider.waitForTransaction(transaction_hash);
-  });
-
-  test('read balance of wallet after transfer', async () => {
-    const { res } = await erc20.balance_of(accountContract.address);
-
-    expect(number.toBN(res as string).toString()).toStrictEqual(number.toBN(990).toString());
   });
 });
 

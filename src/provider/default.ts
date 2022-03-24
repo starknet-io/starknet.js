@@ -14,6 +14,7 @@ import {
   GetContractAddressesResponse,
   GetTransactionResponse,
   GetTransactionStatusResponse,
+  GetTransactionTraceResponse,
   Invocation,
   TransactionReceipt,
 } from '../types';
@@ -278,6 +279,18 @@ export class Provider implements ProviderInterface {
   }
 
   /**
+   * Gets the transaction trace from a tx id.
+   *
+   *
+   * @param txHash
+   * @returns the transaction trace
+   */
+  public async getTransactionTrace(txHash: BigNumberish): Promise<GetTransactionTraceResponse> {
+    const txHashHex = toHex(toBN(txHash));
+    return this.fetchEndpoint('get_transaction_trace', { transactionHash: txHashHex });
+  }
+
+  /**
    * Deploys a given compiled contract (json) to starknet
    *
    * @param contract - a json object containing the compiled contract
@@ -317,17 +330,6 @@ export class Provider implements ProviderInterface {
    */
   public invokeFunction(invocation: Invocation, _abi?: Abi): Promise<AddTransactionResponse> {
     return this.fetchEndpoint('add_transaction', undefined, {
-      type: 'INVOKE_FUNCTION',
-      contract_address: invocation.contractAddress,
-      entry_point_selector: getSelectorFromName(invocation.entrypoint),
-      calldata: bigNumberishArrayToDecimalStringArray(invocation.calldata ?? []),
-      signature: bigNumberishArrayToDecimalStringArray(invocation.signature ?? []),
-    });
-  }
-
-  public estimateFee(invocation: Invocation): Promise<any> {
-    return this.fetchEndpoint('estimate_fee', undefined, {
-      // TODO: change the TYPE of the call
       type: 'INVOKE_FUNCTION',
       contract_address: invocation.contractAddress,
       entry_point_selector: getSelectorFromName(invocation.entrypoint),
