@@ -1,3 +1,21 @@
+# [3.6.0](https://github.com/seanjameshan/starknet.js/compare/v3.5.1...v3.6.0) (2022-03-24)
+
+### Bug Fixes
+
+- **account:** estimate fee transfered from provider to account class ([93e7dd9](https://github.com/seanjameshan/starknet.js/commit/93e7dd941b35bccb67cc426b9ae546801092964c))
+- formatting ([248246f](https://github.com/seanjameshan/starknet.js/commit/248246f2fe75b9897700b955fa98e1779aec1744))
+- link ([494e000](https://github.com/seanjameshan/starknet.js/commit/494e0005c3b1cb86f5de0f25a10cbbe786a87b34))
+- **provider:** estimateFee entrypoint conversion fix ([e40204a](https://github.com/seanjameshan/starknet.js/commit/e40204a2eca5f475fe50a88349fd4890bbc36790))
+- **provider:** estimation fee response type ([ce674ca](https://github.com/seanjameshan/starknet.js/commit/ce674ca632ff70a07d95d685c9bf2f48bebaca20))
+
+### Features
+
+- add LedgerSigner class + blind signing ([9b700f3](https://github.com/seanjameshan/starknet.js/commit/9b700f300a91a0967f8827d0ecdd69e531738ec4))
+- **contract:** contract expanded with estimateFee method ([fbaf4ba](https://github.com/seanjameshan/starknet.js/commit/fbaf4bab56ace0917ce7c66ecf90f8e2d0dc7f60))
+- improvements after PR reviewing ([9f30e20](https://github.com/seanjameshan/starknet.js/commit/9f30e20c2e5d2afafe4eae58c597b82dffc3bbe2))
+- new improvements after new PR review ([2e16808](https://github.com/seanjameshan/starknet.js/commit/2e168082b0042f27336946639f3948e91bc5f641))
+- **provider:** provider expanded with getTransactionTrace ([b67361a](https://github.com/seanjameshan/starknet.js/commit/b67361ad7c50218e00273c097426e14814441404))
+
 ## [3.5.1](https://github.com/seanjameshan/starknet.js/compare/v3.5.0...v3.5.1) (2022-03-11)
 
 ### Bug Fixes
