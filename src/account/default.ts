@@ -30,10 +30,10 @@ export class Account extends Provider implements AccountInterface {
 
   private signer: SignerInterface;
 
-  constructor(provider: Provider, address: string, keyPairOrSigner: KeyPair | Signer) {
+  constructor(provider: Provider, address: string, keyPairOrSigner: KeyPair | SignerInterface) {
     super(provider);
     this.signer =
-      keyPairOrSigner instanceof Signer ? keyPairOrSigner : new Signer(keyPairOrSigner as KeyPair);
+      'getPubKey' in keyPairOrSigner ? keyPairOrSigner : new Signer(keyPairOrSigner as KeyPair);
     this.address = address;
   }
 
