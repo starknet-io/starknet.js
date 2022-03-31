@@ -168,14 +168,18 @@ export class Provider implements ProviderInterface {
    */
   public async callContract(
     { contractAddress, entrypoint, calldata = [] }: Call,
-    options: { blockIdentifier: BlockIdentifier } = { blockIdentifier: null }
+    { blockIdentifier = 'pending' }: { blockIdentifier?: BlockIdentifier } = {}
   ): Promise<CallContractResponse> {
-    return this.fetchEndpoint('call_contract', options, {
-      signature: [],
-      contract_address: contractAddress,
-      entry_point_selector: getSelectorFromName(entrypoint),
-      calldata,
-    });
+    return this.fetchEndpoint(
+      'call_contract',
+      { blockIdentifier },
+      {
+        signature: [],
+        contract_address: contractAddress,
+        entry_point_selector: getSelectorFromName(entrypoint),
+        calldata,
+      }
+    );
   }
 
   /**
@@ -187,7 +191,7 @@ export class Provider implements ProviderInterface {
    * @param blockNumber
    * @returns the block object { block_number, previous_block_number, state_root, status, timestamp, transaction_receipts, transactions }
    */
-  public async getBlock(blockIdentifier: BlockIdentifier = null): Promise<GetBlockResponse> {
+  public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
     return this.fetchEndpoint('get_block', { blockIdentifier });
   }
 
@@ -203,7 +207,7 @@ export class Provider implements ProviderInterface {
    */
   public async getCode(
     contractAddress: string,
-    blockIdentifier: BlockIdentifier = null
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<GetCodeResponse> {
     return this.fetchEndpoint('get_code', { blockIdentifier, contractAddress });
   }
@@ -223,7 +227,7 @@ export class Provider implements ProviderInterface {
   public async getStorageAt(
     contractAddress: string,
     key: number,
-    blockIdentifier: BlockIdentifier = null
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<object> {
     return this.fetchEndpoint('get_storage_at', { blockIdentifier, contractAddress, key });
   }
