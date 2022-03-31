@@ -348,9 +348,12 @@ export class Provider implements ProviderInterface {
       // eslint-disable-next-line no-await-in-loop
       const res = await this.getTransactionStatus(txHash);
 
-      if (res.tx_status === 'ACCEPTED_ON_L1' || res.tx_status === 'ACCEPTED_ON_L2') {
+      const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'];
+      const errorStates = ['REJECTED', 'NOT_RECEIVED'];
+
+      if (successStates.includes(res.tx_status)) {
         onchain = true;
-      } else if (res.tx_status === 'REJECTED' || res.tx_status === 'NOT_RECEIVED') {
+      } else if (errorStates.includes(res.tx_status)) {
         const message = res.tx_failure_reason
           ? `${res.tx_status}: ${res.tx_failure_reason.code}\n${res.tx_failure_reason.error_message}`
           : res.tx_status;
