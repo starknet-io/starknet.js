@@ -191,7 +191,7 @@ export class Provider implements ProviderInterface {
    * @param blockNumber
    * @returns the block object { block_number, previous_block_number, state_root, status, timestamp, transaction_receipts, transactions }
    */
-  public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
+  public async getBlock(blockIdentifier: BlockIdentifier = null): Promise<GetBlockResponse> {
     return this.fetchEndpoint('get_block', { blockIdentifier });
   }
 
