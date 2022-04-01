@@ -1,11 +1,13 @@
 import { AccountInterface } from '../account';
 import { ProviderInterface } from '../provider';
+import { BlockIdentifier } from '../provider/utils';
 import {
   Abi,
   AddTransactionResponse,
   AsyncContractFunction,
   ContractFunction,
   Invocation,
+  Overrides,
   Result,
 } from '../types';
 
@@ -57,7 +59,13 @@ export abstract class ContractInterface {
    * @param args Array of the arguments for the call
    * @returns Result of the call as an array with key value pars
    */
-  public abstract call(method: string, args?: Array<any>): Promise<Result>;
+  public abstract call(
+    method: string,
+    args?: Array<any>,
+    options?: {
+      blockIdentifier?: BlockIdentifier;
+    }
+  ): Promise<Result>;
 
   /**
    * Invokes a method on a contract
@@ -66,7 +74,11 @@ export abstract class ContractInterface {
    * @param args Array of the arguments for the invoke
    * @returns Add Transaction Response
    */
-  public abstract invoke(method: string, args?: Array<any>): Promise<AddTransactionResponse>;
+  public abstract invoke(
+    method: string,
+    args?: Array<any>,
+    options?: Overrides
+  ): Promise<AddTransactionResponse>;
 
   /**
    * Calls a method on a contract
@@ -74,7 +86,13 @@ export abstract class ContractInterface {
    * @param method name of the method
    * @param args Array of the arguments for the call
    */
-  public abstract estimate(method: string, args?: Array<any>): Promise<any>;
+  public abstract estimate(
+    method: string,
+    args?: Array<any>,
+    options?: {
+      blockIdentifier?: BlockIdentifier;
+    }
+  ): Promise<any>;
 
   /**
    * Calls a method on a contract
