@@ -3,6 +3,7 @@ import assert from 'minimalistic-assert';
 
 import { AccountInterface } from '../account';
 import { ProviderInterface, defaultProvider } from '../provider';
+import { BlockIdentifier } from '../provider/utils';
 import {
   Abi,
   AbiEntry,
@@ -528,7 +529,11 @@ export class Contract implements ContractInterface {
     }, [] as Result);
   }
 
-  public invoke(method: string, args: Array<any> = []): Promise<AddTransactionResponse> {
+  public invoke(
+    method: string,
+    args: Array<any> = [],
+    options: Overrides = {}
+  ): Promise<AddTransactionResponse> {
     // ensure contract is connected
     assert(this.address !== null, 'contract isnt connected to an address');
     // validate method and args
@@ -541,11 +546,6 @@ export class Contract implements ContractInterface {
       }
       return acc;
     }, 0);
-
-    const overrides: Overrides = {};
-    if (args.length === inputsLength + 1 && Array.isArray(args[args.length - 1])) {
-      Object.assign(overrides, args.pop());
-    }
 
     if (args.length !== inputsLength) {
       throw Error(
@@ -562,31 +562,33 @@ export class Contract implements ContractInterface {
     };
     if ('execute' in this.providerOrAccount) {
       return this.providerOrAccount.execute(invocation, undefined, {
-        maxFee: overrides.maxFee,
-        nonce: overrides.nonce,
+        maxFee: options.maxFee,
+        nonce: options.nonce,
       });
     }
 
     return this.providerOrAccount.invokeFunction({
       ...invocation,
-      signature: overrides.signature || [],
+      signature: options.signature || [],
     });
   }
 
-  public async call(method: string, args: Array<any> = []): Promise<Result> {
+  public async call(
+    method: string,
+    args: Array<any> = [],
+    {
+      blockIdentifier = 'pending',
+    }: {
+      blockIdentifier?: BlockIdentifier;
+    } = {}
+  ): Promise<Result> {
     // ensure contract is connected
     assert(this.address !== null, 'contract isnt connected to an address');
 
     // validate method and args
     this.validateMethodAndArgs('CALL', method, args);
     const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
-    const inputsLength = inputs.length;
-    const options = {
-      blockIdentifier: null,
-    };
-    if (args.length === inputsLength + 1 && typeof args[args.length - 1] === 'object') {
-      Object.assign(options, args.pop());
-    }
+
     // compile calldata
     const calldata = this.compileCalldata(args, inputs);
     return this.providerOrAccount
@@ -596,7 +598,7 @@ export class Contract implements ContractInterface {
           calldata,
           entrypoint: method,
         },
-        options
+        { blockIdentifier }
       )
       .then((x) => this.parseResponse(method, x.result));
   }

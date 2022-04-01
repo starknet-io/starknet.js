@@ -344,7 +344,6 @@ export class Provider implements ProviderInterface {
 
   public async waitForTransaction(txHash: BigNumberish, retryInterval: number = 8000) {
     let onchain = false;
-    await wait(retryInterval);
 
     while (!onchain) {
       // eslint-disable-next-line no-await-in-loop

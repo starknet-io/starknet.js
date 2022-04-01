@@ -75,7 +75,9 @@ export type Endpoints = {
     RESPONSE: CallContractResponse;
   };
   estimate_fee: {
-    QUERY: never;
+    QUERY: {
+      blockIdentifier: BlockIdentifier;
+    };
     REQUEST: CallContractTransaction;
     RESPONSE: EstimateFeeResponse;
   };
