@@ -1,6 +1,7 @@
 import assert from 'minimalistic-assert';
 
 import { Provider } from '../provider';
+import { BlockIdentifier } from '../provider/utils';
 import { Signer, SignerInterface } from '../signer';
 import {
   Abi,
@@ -46,9 +47,15 @@ export class Account extends Provider implements AccountInterface {
     return toHex(toBN(result[0]));
   }
 
-  public async estimateFee(calls: Call | Call[]): Promise<EstimateFeeResponse> {
+  public async estimateFee(
+    calls: Call | Call[],
+    {
+      nonce: providedNonce,
+      blockIdentifier = 'pending',
+    }: { nonce?: BigNumberish; blockIdentifier?: BlockIdentifier } = {}
+  ): Promise<EstimateFeeResponse> {
     const transactions = Array.isArray(calls) ? calls : [calls];
-    const nonce = await this.getNonce();
+    const nonce = providedNonce ?? (await this.getNonce());
     const signerDetails = {
       walletAddress: this.address,
       nonce: toBN(nonce),
@@ -57,12 +64,16 @@ export class Account extends Provider implements AccountInterface {
     const signature = await this.signer.signTransaction(transactions, signerDetails);
 
     const calldata = [...fromCallsToExecuteCalldata(transactions), signerDetails.nonce.toString()];
-    return this.fetchEndpoint('estimate_fee', undefined, {
-      contract_address: this.address,
-      entry_point_selector: getSelectorFromName('__execute__'),
-      calldata,
-      signature: bigNumberishArrayToDecimalStringArray(signature),
-    });
+    return this.fetchEndpoint(
+      'estimate_fee',
+      { blockIdentifier },
+      {
+        contract_address: this.address,
+        entry_point_selector: getSelectorFromName('__execute__'),
+        calldata,
+        signature: bigNumberishArrayToDecimalStringArray(signature),
+      }
+    );
   }
 
   /**
@@ -80,7 +91,8 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<AddTransactionResponse> {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
-    const maxFee = transactionsDetail.maxFee ?? (await this.estimateFee(transactions)).amount;
+    const maxFee =
+      transactionsDetail.maxFee ?? (await this.estimateFee(transactions, { nonce })).amount;
     const signerDetails = {
       walletAddress: this.address,
       nonce,
