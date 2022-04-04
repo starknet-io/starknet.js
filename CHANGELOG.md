@@ -1,3 +1,16 @@
+# [3.8.0](https://github.com/seanjameshan/starknet.js/compare/v3.7.0...v3.8.0) (2022-04-04)
+
+### Bug Fixes
+
+- getBlock should not default to pending block ([7a641b5](https://github.com/seanjameshan/starknet.js/commit/7a641b55c3c762dada70814bf509b147f0cd315e))
+
+### Features
+
+- complete interface ([39d2f05](https://github.com/seanjameshan/starknet.js/commit/39d2f0574691e4b37a6050831b4e548b07a8e3e3))
+- default estimateFee to pending block ([719dda5](https://github.com/seanjameshan/starknet.js/commit/719dda5f33a2bed353bd1bf311a2baf3110d1654))
+- default to pending block ([d3c1bdc](https://github.com/seanjameshan/starknet.js/commit/d3c1bdcdca996bce273673cf9c8220156e965863))
+- pending as success ([9e79288](https://github.com/seanjameshan/starknet.js/commit/9e7928845cc1e7088ba9a8dc9ba8fb9311970440))
+
 # [3.7.0](https://github.com/seanjameshan/starknet.js/compare/v3.6.0...v3.7.0) (2022-03-24)
 
 ### Features
