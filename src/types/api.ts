@@ -105,6 +105,7 @@ export type InvokeFunctionTransaction = {
   calldata?: RawCalldata;
   nonce?: BigNumberish;
   max_fee?: BigNumberish;
+  version?: BigNumberish;
 };
 
 export type InvokeFunctionTrace = {

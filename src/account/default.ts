@@ -17,6 +17,7 @@ import {
 import { sign } from '../utils/ellipticCurve';
 import {
   computeHashOnElements,
+  feeTransactionVersion,
   getSelectorFromName,
   transactionPrefix,
   transactionVersion,
@@ -56,10 +57,12 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<EstimateFeeResponse> {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = providedNonce ?? (await this.getNonce());
+    const version = toBN(feeTransactionVersion);
     const signerDetails = {
       walletAddress: this.address,
       nonce: toBN(nonce),
       maxFee: toBN('0'),
+      txVersion: version,
     };
     const signature = await this.signer.signTransaction(transactions, signerDetails);
 
@@ -71,6 +74,7 @@ export class Account extends Provider implements AccountInterface {
         contract_address: this.address,
         entry_point_selector: getSelectorFromName('__execute__'),
         calldata,
+        version: toHex(version),
         signature: bigNumberishArrayToDecimalStringArray(signature),
       }
     );
@@ -97,6 +101,7 @@ export class Account extends Provider implements AccountInterface {
       walletAddress: this.address,
       nonce,
       maxFee,
+      txVersion: toBN(transactionVersion),
     };
 
     const signature = await this.signer.signTransaction(transactions, signerDetails, abis);
