@@ -30,7 +30,7 @@ export class Signer implements SignerInterface {
       transactions,
       transactionsDetail.nonce.toString(),
       transactionsDetail.maxFee.toString(),
-      transactionsDetail.txVersion.toString()
+      transactionsDetail.version.toString()
     );
 
     return sign(this.keyPair, msgHash);
