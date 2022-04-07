@@ -70,7 +70,7 @@ export function hashMulticall(
   transactions: Call[],
   nonce: string,
   maxFee: string,
-  txVersion: string | number = transactionVersion
+  version: string | number = transactionVersion
 ) {
   const hashArray = transactions
     .map(({ contractAddress, entrypoint, calldata }) => [
@@ -87,6 +87,6 @@ export function hashMulticall(
     computeHashOnElements(hashArray),
     nonce,
     maxFee,
-    txVersion,
+    version,
   ]);
 }

@@ -62,7 +62,7 @@ export class Account extends Provider implements AccountInterface {
       walletAddress: this.address,
       nonce: toBN(nonce),
       maxFee: toBN('0'),
-      txVersion: version,
+      version,
     };
     const signature = await this.signer.signTransaction(transactions, signerDetails);
 
@@ -101,7 +101,7 @@ export class Account extends Provider implements AccountInterface {
       walletAddress: this.address,
       nonce,
       maxFee,
-      txVersion: toBN(transactionVersion),
+      version: toBN(transactionVersion),
     };
 
     const signature = await this.signer.signTransaction(transactions, signerDetails, abis);

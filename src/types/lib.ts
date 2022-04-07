@@ -24,7 +24,7 @@ export type Call = Omit<Invocation, 'signature'>;
 export type InvocationsDetails = {
   nonce?: BigNumberish;
   maxFee?: BigNumberish;
-  txVersion?: BigNumberish;
+  version?: BigNumberish;
 };
 
 export type Status =
