@@ -23,7 +23,7 @@ import {
   transactionVersion,
 } from '../utils/hash';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
-import { compileCalldata } from '../utils/stark';
+import { compileCalldata, estimatedFeeToMaxFee } from '../utils/stark';
 import { fromCallsToExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
@@ -95,8 +95,13 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<AddTransactionResponse> {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
-    const maxFee =
-      transactionsDetail.maxFee ?? (await this.estimateFee(transactions, { nonce })).amount;
+    let maxFee: BigNumberish = '0';
+    if (transactionsDetail.maxFee) {
+      maxFee = transactionsDetail.maxFee;
+    } else {
+      const estimatedFee = (await this.estimateFee(transactions, { nonce })).amount;
+      maxFee = estimatedFeeToMaxFee(estimatedFee).toString();
+    }
     const signerDetails = {
       walletAddress: this.address,
       nonce,
