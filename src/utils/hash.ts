@@ -11,6 +11,7 @@ import { encodeShortString } from './shortString';
 
 export const transactionPrefix = encodeShortString('StarkNet Transaction');
 export const transactionVersion = 0;
+export const feeTransactionVersion = toBN(2).pow(toBN(128)).add(toBN(transactionVersion));
 
 function keccakHex(value: string): string {
   return addHexPrefix(buf2hex(keccak256(utf8ToArray(value))));
@@ -68,7 +69,8 @@ export function hashMulticall(
   account: string,
   transactions: Call[],
   nonce: string,
-  maxFee: string
+  maxFee: string,
+  txVersion: string | number = transactionVersion
 ) {
   const hashArray = transactions
     .map(({ contractAddress, entrypoint, calldata }) => [
@@ -85,6 +87,6 @@ export function hashMulticall(
     computeHashOnElements(hashArray),
     nonce,
     maxFee,
-    transactionVersion,
+    txVersion,
   ]);
 }
