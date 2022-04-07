@@ -1,4 +1,4 @@
-import BN, { isBN } from 'bn.js';
+import BN from 'bn.js';
 import { gzip } from 'pako';
 
 import { Calldata, CompressedProgram, Program, RawArgs, Signature } from '../types';
@@ -51,6 +51,5 @@ export function compileCalldata(args: RawArgs): Calldata {
 }
 
 export function estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: number = 0.15): BN {
-  const fee = isBN(estimatedFee) ? estimatedFee : toBN(estimatedFee);
-  return fee.mul(toBN(overhead).add(toBN(1)));
+  return toBN(estimatedFee).mul(toBN(overhead).add(toBN(1)));
 }
