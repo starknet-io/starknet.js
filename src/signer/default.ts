@@ -29,7 +29,8 @@ export class Signer implements SignerInterface {
       transactionsDetail.walletAddress,
       transactions,
       transactionsDetail.nonce.toString(),
-      transactionsDetail.maxFee.toString()
+      transactionsDetail.maxFee.toString(),
+      transactionsDetail.version.toString()
     );
 
     return sign(this.keyPair, msgHash);

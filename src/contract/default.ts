@@ -46,7 +46,18 @@ function buildCall(contract: Contract, functionAbi: FunctionAbi): AsyncContractF
  */
 function buildInvoke(contract: Contract, functionAbi: FunctionAbi): AsyncContractFunction {
   return async function (...args: Array<any>): Promise<any> {
-    return contract.invoke(functionAbi.name, args);
+    const { inputs } = functionAbi;
+    const inputsLength = inputs.reduce((acc, input) => {
+      if (!/_len$/.test(input.name)) {
+        return acc + 1;
+      }
+      return acc;
+    }, 0);
+    const options = {};
+    if (inputsLength + 1 === args.length && typeof args[args.length - 1] === 'object') {
+      Object.assign(options, args.pop());
+    }
+    return contract.invoke(functionAbi.name, args, options);
   };
 }
 

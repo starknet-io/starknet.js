@@ -1,10 +1,11 @@
+import BN from 'bn.js';
 import { gzip } from 'pako';
 
 import { Calldata, CompressedProgram, Program, RawArgs, Signature } from '../types';
 import { genKeyPair, getStarkKey } from './ellipticCurve';
 import { addHexPrefix, btoaUniversal } from './encode';
 import { stringify } from './json';
-import { toBN } from './number';
+import { BigNumberish, toBN } from './number';
 
 /**
  * Function to compress compiled cairo program
@@ -47,4 +48,10 @@ export function compileCalldata(args: RawArgs): Calldata {
         .map(([, v]) => toBN(v).toString());
     return toBN(value).toString();
   });
+}
+
+export function estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: number = 0.15): BN {
+  // BN can only handle Integers, so we need to do all calulations with integers
+  const overHeadPercent = Math.round((1 + overhead) * 100);
+  return toBN(estimatedFee).mul(toBN(overHeadPercent)).div(toBN(100));
 }

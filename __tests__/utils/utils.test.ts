@@ -77,3 +77,13 @@ describe('computeHashOnElements()', () => {
     );
   });
 });
+describe('estimatedFeeToMaxFee()', () => {
+  test('should return maxFee for 0', () => {
+    const res = stark.estimatedFeeToMaxFee(0, 0.15).toNumber();
+    expect(res).toBe(0);
+  });
+  test('should return maxFee for 10_000', () => {
+    const res = stark.estimatedFeeToMaxFee(10_000, 0.15).toNumber();
+    expect(res).toBe(11_500);
+  });
+});
