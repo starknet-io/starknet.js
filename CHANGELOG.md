@@ -1,3 +1,17 @@
+# [3.9.0](https://github.com/seanjameshan/starknet.js/compare/v3.8.0...v3.9.0) (2022-04-08)
+
+### Bug Fixes
+
+- **account:** adding overhead on estimateFee for maxFee ([ec52f61](https://github.com/seanjameshan/starknet.js/commit/ec52f61aed9a8755491a4b7de73517b075785479))
+- **contract:** override object when invoking a function ([c605151](https://github.com/seanjameshan/starknet.js/commit/c605151c03b544bf62ff9ab2e314e49de3cd562a))
+- estimatedFeeToMaxFee with integers only ([71d19a7](https://github.com/seanjameshan/starknet.js/commit/71d19a7db01630ca0dba55011ff440243d7db992))
+- rename txVersion to version ([2ae36b2](https://github.com/seanjameshan/starknet.js/commit/2ae36b2c075dbee4710abe47770af35478ceba4e))
+- **utils:** remove check for the BN ([50a7951](https://github.com/seanjameshan/starknet.js/commit/50a79514343e303c397358efdba978fec5f93f48))
+
+### Features
+
+- **account:** adding new transaction version for fee estimation ([2f7cb3f](https://github.com/seanjameshan/starknet.js/commit/2f7cb3fe85c973bcff3e39db333a9ed969c550b1))
+
 # [3.8.0](https://github.com/seanjameshan/starknet.js/compare/v3.7.0...v3.8.0) (2022-04-04)
 
 ### Bug Fixes
