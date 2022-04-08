@@ -14,6 +14,7 @@ import {
   GetContractAddressesResponse,
   GetTransactionResponse,
   GetTransactionStatusResponse,
+  GetTransactionTraceResponse,
   Invocation,
   TransactionReceipt,
 } from '../types';
@@ -167,14 +168,18 @@ export class Provider implements ProviderInterface {
    */
   public async callContract(
     { contractAddress, entrypoint, calldata = [] }: Call,
-    options: { blockIdentifier: BlockIdentifier } = { blockIdentifier: null }
+    { blockIdentifier = 'pending' }: { blockIdentifier?: BlockIdentifier } = {}
   ): Promise<CallContractResponse> {
-    return this.fetchEndpoint('call_contract', options, {
-      signature: [],
-      contract_address: contractAddress,
-      entry_point_selector: getSelectorFromName(entrypoint),
-      calldata,
-    });
+    return this.fetchEndpoint(
+      'call_contract',
+      { blockIdentifier },
+      {
+        signature: [],
+        contract_address: contractAddress,
+        entry_point_selector: getSelectorFromName(entrypoint),
+        calldata,
+      }
+    );
   }
 
   /**
@@ -202,7 +207,7 @@ export class Provider implements ProviderInterface {
    */
   public async getCode(
     contractAddress: string,
-    blockIdentifier: BlockIdentifier = null
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<GetCodeResponse> {
     return this.fetchEndpoint('get_code', { blockIdentifier, contractAddress });
   }
@@ -222,7 +227,7 @@ export class Provider implements ProviderInterface {
   public async getStorageAt(
     contractAddress: string,
     key: number,
-    blockIdentifier: BlockIdentifier = null
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<object> {
     return this.fetchEndpoint('get_storage_at', { blockIdentifier, contractAddress, key });
   }
@@ -278,6 +283,18 @@ export class Provider implements ProviderInterface {
   }
 
   /**
+   * Gets the transaction trace from a tx id.
+   *
+   *
+   * @param txHash
+   * @returns the transaction trace
+   */
+  public async getTransactionTrace(txHash: BigNumberish): Promise<GetTransactionTraceResponse> {
+    const txHashHex = toHex(toBN(txHash));
+    return this.fetchEndpoint('get_transaction_trace', { transactionHash: txHashHex });
+  }
+
+  /**
    * Deploys a given compiled contract (json) to starknet
    *
    * @param contract - a json object containing the compiled contract
@@ -325,20 +342,8 @@ export class Provider implements ProviderInterface {
     });
   }
 
-  public estimateFee(invocation: Invocation): Promise<any> {
-    return this.fetchEndpoint('estimate_fee', undefined, {
-      // TODO: change the TYPE of the call
-      type: 'INVOKE_FUNCTION',
-      contract_address: invocation.contractAddress,
-      entry_point_selector: getSelectorFromName(invocation.entrypoint),
-      calldata: bigNumberishArrayToDecimalStringArray(invocation.calldata ?? []),
-      signature: bigNumberishArrayToDecimalStringArray(invocation.signature ?? []),
-    });
-  }
-
   public async waitForTransaction(txHash: BigNumberish, retryInterval: number = 8000) {
     let onchain = false;
-    await wait(retryInterval);
 
     while (!onchain) {
       // eslint-disable-next-line no-await-in-loop
@@ -346,9 +351,12 @@ export class Provider implements ProviderInterface {
       // eslint-disable-next-line no-await-in-loop
       const res = await this.getTransactionStatus(txHash);
 
-      if (res.tx_status === 'ACCEPTED_ON_L1' || res.tx_status === 'ACCEPTED_ON_L2') {
+      const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'];
+      const errorStates = ['REJECTED', 'NOT_RECEIVED'];
+
+      if (successStates.includes(res.tx_status)) {
         onchain = true;
-      } else if (res.tx_status === 'REJECTED' || res.tx_status === 'NOT_RECEIVED') {
+      } else if (errorStates.includes(res.tx_status)) {
         const message = res.tx_failure_reason
           ? `${res.tx_status}: ${res.tx_failure_reason.code}\n${res.tx_failure_reason.error_message}`
           : res.tx_status;

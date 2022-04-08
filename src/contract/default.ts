@@ -3,6 +3,7 @@ import assert from 'minimalistic-assert';
 
 import { AccountInterface } from '../account';
 import { ProviderInterface, defaultProvider } from '../provider';
+import { BlockIdentifier } from '../provider/utils';
 import {
   Abi,
   AbiEntry,
@@ -13,11 +14,11 @@ import {
   ContractFunction,
   FunctionAbi,
   Invocation,
+  Overrides,
   ParsedStruct,
   Result,
   StructAbi,
 } from '../types';
-import { getSelectorFromName } from '../utils/hash';
 import { BigNumberish, toBN, toFelt } from '../utils/number';
 import { ContractInterface } from './interface';
 
@@ -45,7 +46,18 @@ function buildCall(contract: Contract, functionAbi: FunctionAbi): AsyncContractF
  */
 function buildInvoke(contract: Contract, functionAbi: FunctionAbi): AsyncContractFunction {
   return async function (...args: Array<any>): Promise<any> {
-    return contract.invoke(functionAbi.name, args);
+    const { inputs } = functionAbi;
+    const inputsLength = inputs.reduce((acc, input) => {
+      if (!/_len$/.test(input.name)) {
+        return acc + 1;
+      }
+      return acc;
+    }, 0);
+    const options = {};
+    if (inputsLength + 1 === args.length && typeof args[args.length - 1] === 'object') {
+      Object.assign(options, args.pop());
+    }
+    return contract.invoke(functionAbi.name, args, options);
   };
 }
 
@@ -528,7 +540,11 @@ export class Contract implements ContractInterface {
     }, [] as Result);
   }
 
-  public invoke(method: string, args: Array<any> = []): Promise<AddTransactionResponse> {
+  public invoke(
+    method: string,
+    args: Array<any> = [],
+    options: Overrides = {}
+  ): Promise<AddTransactionResponse> {
     // ensure contract is connected
     assert(this.address !== null, 'contract isnt connected to an address');
     // validate method and args
@@ -541,10 +557,7 @@ export class Contract implements ContractInterface {
       }
       return acc;
     }, 0);
-    const signature = [];
-    if (args.length === inputsLength + 1 && Array.isArray(args[args.length - 1])) {
-      signature.push(...args.pop());
-    }
+
     if (args.length !== inputsLength) {
       throw Error(
         `Invalid number of arguments, expected ${inputsLength} arguments, but got ${args.length}`
@@ -559,28 +572,34 @@ export class Contract implements ContractInterface {
       entrypoint: method,
     };
     if ('execute' in this.providerOrAccount) {
-      return this.providerOrAccount.execute(invocation);
+      return this.providerOrAccount.execute(invocation, undefined, {
+        maxFee: options.maxFee,
+        nonce: options.nonce,
+      });
     }
+
     return this.providerOrAccount.invokeFunction({
       ...invocation,
-      signature,
+      signature: options.signature || [],
     });
   }
 
-  public async call(method: string, args: Array<any> = []): Promise<Result> {
+  public async call(
+    method: string,
+    args: Array<any> = [],
+    {
+      blockIdentifier = 'pending',
+    }: {
+      blockIdentifier?: BlockIdentifier;
+    } = {}
+  ): Promise<Result> {
     // ensure contract is connected
     assert(this.address !== null, 'contract isnt connected to an address');
 
     // validate method and args
     this.validateMethodAndArgs('CALL', method, args);
     const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
-    const inputsLength = inputs.length;
-    const options = {
-      blockIdentifier: null,
-    };
-    if (args.length === inputsLength + 1 && typeof args[args.length - 1] === 'object') {
-      Object.assign(options, args.pop());
-    }
+
     // compile calldata
     const calldata = this.compileCalldata(args, inputs);
     return this.providerOrAccount
@@ -590,35 +609,30 @@ export class Contract implements ContractInterface {
           calldata,
           entrypoint: method,
         },
-        options
+        { blockIdentifier }
       )
       .then((x) => this.parseResponse(method, x.result));
   }
 
-  public async estimate(_method: string, _args: Array<any> = []) {
+  public async estimate(method: string, args: Array<any> = []) {
     //  TODO; remove error as soon as estimate fees are supported
-    throw Error('Estimation of the fees are not yet supported');
-    // // ensure contract is connected
-    // assert(this.address !== null, 'contract isnt connected to an address');
+    // ensure contract is connected
+    assert(this.address !== null, 'contract isnt connected to an address');
 
-    // // validate method and args
-    // // this.validateMethodAndArgs('CALL', method, args);
-    // const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
-
-    // // compile calldata
-    // const calldata = this.compileCalldata(args, inputs);
-    // return this.providerOrAccount.estimateFee({
-    //   contractAddress: this.address as string,
-    //   calldata,
-    //   entrypoint: method,
-    // });
+    // validate method and args
+    this.validateMethodAndArgs('INVOKE', method, args);
+    const invocation = this.populateTransaction[method](...args);
+    if ('estimateFee' in this.providerOrAccount) {
+      return this.providerOrAccount.estimateFee(invocation);
+    }
+    throw Error('Contract must be connected to the account contract to estimate');
   }
 
   public populate(method: string, args: Array<any> = []): Invocation {
     const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
     return {
       contractAddress: this.address,
-      entrypoint: getSelectorFromName(method),
+      entrypoint: method,
       calldata: this.compileCalldata(args, inputs),
       signature: [],
     };

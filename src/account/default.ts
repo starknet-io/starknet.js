@@ -1,11 +1,13 @@
 import assert from 'minimalistic-assert';
 
 import { Provider } from '../provider';
+import { BlockIdentifier } from '../provider/utils';
 import { Signer, SignerInterface } from '../signer';
 import {
   Abi,
   AddTransactionResponse,
   Call,
+  EstimateFeeResponse,
   InvocationsDetails,
   InvokeFunctionTransaction,
   KeyPair,
@@ -15,12 +17,13 @@ import {
 import { sign } from '../utils/ellipticCurve';
 import {
   computeHashOnElements,
+  feeTransactionVersion,
   getSelectorFromName,
   transactionPrefix,
   transactionVersion,
 } from '../utils/hash';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
-import { compileCalldata } from '../utils/stark';
+import { compileCalldata, estimatedFeeToMaxFee } from '../utils/stark';
 import { fromCallsToExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
@@ -30,9 +33,10 @@ export class Account extends Provider implements AccountInterface {
 
   private signer: SignerInterface;
 
-  constructor(provider: Provider, address: string, keyPair: KeyPair) {
+  constructor(provider: Provider, address: string, keyPairOrSigner: KeyPair | SignerInterface) {
     super(provider);
-    this.signer = new Signer(keyPair);
+    this.signer =
+      'getPubKey' in keyPairOrSigner ? keyPairOrSigner : new Signer(keyPairOrSigner as KeyPair);
     this.address = address;
   }
 
@@ -42,6 +46,38 @@ export class Account extends Provider implements AccountInterface {
       entrypoint: 'get_nonce',
     });
     return toHex(toBN(result[0]));
+  }
+
+  public async estimateFee(
+    calls: Call | Call[],
+    {
+      nonce: providedNonce,
+      blockIdentifier = 'pending',
+    }: { nonce?: BigNumberish; blockIdentifier?: BlockIdentifier } = {}
+  ): Promise<EstimateFeeResponse> {
+    const transactions = Array.isArray(calls) ? calls : [calls];
+    const nonce = providedNonce ?? (await this.getNonce());
+    const version = toBN(feeTransactionVersion);
+    const signerDetails = {
+      walletAddress: this.address,
+      nonce: toBN(nonce),
+      maxFee: toBN('0'),
+      version,
+    };
+    const signature = await this.signer.signTransaction(transactions, signerDetails);
+
+    const calldata = [...fromCallsToExecuteCalldata(transactions), signerDetails.nonce.toString()];
+    return this.fetchEndpoint(
+      'estimate_fee',
+      { blockIdentifier },
+      {
+        contract_address: this.address,
+        entry_point_selector: getSelectorFromName('__execute__'),
+        calldata,
+        version: toHex(version),
+        signature: bigNumberishArrayToDecimalStringArray(signature),
+      }
+    );
   }
 
   /**
@@ -58,23 +94,31 @@ export class Account extends Provider implements AccountInterface {
     transactionsDetail: InvocationsDetails = {}
   ): Promise<AddTransactionResponse> {
     const transactions = Array.isArray(calls) ? calls : [calls];
-
+    const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
+    let maxFee: BigNumberish = '0';
+    if (transactionsDetail.maxFee) {
+      maxFee = transactionsDetail.maxFee;
+    } else {
+      const estimatedFee = (await this.estimateFee(transactions, { nonce })).amount;
+      maxFee = estimatedFeeToMaxFee(estimatedFee).toString();
+    }
     const signerDetails = {
       walletAddress: this.address,
-      nonce: toBN(transactionsDetail.nonce ?? (await this.getNonce())),
-      maxFee: toBN(transactionsDetail.maxFee ?? '0'),
+      nonce,
+      maxFee,
+      version: toBN(transactionVersion),
     };
 
     const signature = await this.signer.signTransaction(transactions, signerDetails, abis);
 
     const calldata = [...fromCallsToExecuteCalldata(transactions), signerDetails.nonce.toString()];
-
     return this.fetchEndpoint('add_transaction', undefined, {
       type: 'INVOKE_FUNCTION',
       contract_address: this.address,
       entry_point_selector: getSelectorFromName('__execute__'),
       calldata,
       signature: bigNumberishArrayToDecimalStringArray(signature),
+      max_fee: toHex(toBN(maxFee)),
     });
   }
 

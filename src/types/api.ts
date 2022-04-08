@@ -36,6 +36,13 @@ export type Endpoints = {
     REQUEST: never;
     RESPONSE: GetTransactionStatusResponse;
   };
+  get_transaction_trace: {
+    QUERY: {
+      transactionHash: string;
+    };
+    REQUEST: never;
+    RESPONSE: GetTransactionTraceResponse;
+  };
   get_storage_at: {
     QUERY: {
       contractAddress: string;
@@ -68,8 +75,10 @@ export type Endpoints = {
     RESPONSE: CallContractResponse;
   };
   estimate_fee: {
-    QUERY: never;
-    REQUEST: Transaction;
+    QUERY: {
+      blockIdentifier: BlockIdentifier;
+    };
+    REQUEST: CallContractTransaction;
     RESPONSE: EstimateFeeResponse;
   };
 };
@@ -95,6 +104,34 @@ export type InvokeFunctionTransaction = {
   entry_point_selector: string;
   calldata?: RawCalldata;
   nonce?: BigNumberish;
+  max_fee?: BigNumberish;
+  version?: BigNumberish;
+};
+
+export type InvokeFunctionTrace = {
+  caller_address: string;
+  contract_address: string;
+  code_address: string;
+  selector: string;
+  calldata: RawCalldata;
+  result: Array<any>;
+  execution_resources: ExecutionResources;
+  internal_call: Array<InvokeFunctionTrace>;
+  events: Array<any>;
+  messages: Array<any>;
+};
+
+export type ExecutionResources = {
+  n_steps: number;
+  builtin_instance_counter: {
+    pedersen_builtin: number;
+    range_check_builtin: number;
+    bitwise_builtin: number;
+    output_builtin: number;
+    ecdsa_builtin: number;
+    ec_op_builtin: number;
+  };
+  n_memory_holes: number;
 };
 
 export type CallContractTransaction = Omit<
@@ -149,6 +186,22 @@ export type GetTransactionStatusResponse = {
   };
 };
 
+export type GetTransactionTraceResponse = {
+  function_invocation: {
+    caller_address: string;
+    contract_address: string;
+    code_address: string;
+    selector: string;
+    calldata: RawArgs;
+    result: Array<any>;
+    execution_resources: any;
+    internal_call: Array<any>;
+    events: Array<any>;
+    messages: Array<any>;
+  };
+  signature: Signature;
+};
+
 export type GetTransactionResponse = {
   status: Status;
   transaction: Transaction;
@@ -173,11 +226,20 @@ export type TransactionReceipt = {
   l2_to_l1_messages: string[];
   events: string[];
 };
-// TODO: Add response data
-export type EstimateFeeResponse = {};
+
+export type EstimateFeeResponse = {
+  amount: number;
+  unit: string;
+};
 
 export type RawArgs = {
   [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
 };
 
 export type Calldata = string[];
+
+export type Overrides = {
+  maxFee?: BigNumberish;
+  nonce?: BigNumberish;
+  signature?: Signature;
+};

@@ -1,3 +1,56 @@
+# [3.9.0](https://github.com/seanjameshan/starknet.js/compare/v3.8.0...v3.9.0) (2022-04-08)
+
+### Bug Fixes
+
+- **account:** adding overhead on estimateFee for maxFee ([ec52f61](https://github.com/seanjameshan/starknet.js/commit/ec52f61aed9a8755491a4b7de73517b075785479))
+- **contract:** override object when invoking a function ([c605151](https://github.com/seanjameshan/starknet.js/commit/c605151c03b544bf62ff9ab2e314e49de3cd562a))
+- estimatedFeeToMaxFee with integers only ([71d19a7](https://github.com/seanjameshan/starknet.js/commit/71d19a7db01630ca0dba55011ff440243d7db992))
+- rename txVersion to version ([2ae36b2](https://github.com/seanjameshan/starknet.js/commit/2ae36b2c075dbee4710abe47770af35478ceba4e))
+- **utils:** remove check for the BN ([50a7951](https://github.com/seanjameshan/starknet.js/commit/50a79514343e303c397358efdba978fec5f93f48))
+
+### Features
+
+- **account:** adding new transaction version for fee estimation ([2f7cb3f](https://github.com/seanjameshan/starknet.js/commit/2f7cb3fe85c973bcff3e39db333a9ed969c550b1))
+
+# [3.8.0](https://github.com/seanjameshan/starknet.js/compare/v3.7.0...v3.8.0) (2022-04-04)
+
+### Bug Fixes
+
+- getBlock should not default to pending block ([7a641b5](https://github.com/seanjameshan/starknet.js/commit/7a641b55c3c762dada70814bf509b147f0cd315e))
+
+### Features
+
+- complete interface ([39d2f05](https://github.com/seanjameshan/starknet.js/commit/39d2f0574691e4b37a6050831b4e548b07a8e3e3))
+- default estimateFee to pending block ([719dda5](https://github.com/seanjameshan/starknet.js/commit/719dda5f33a2bed353bd1bf311a2baf3110d1654))
+- default to pending block ([d3c1bdc](https://github.com/seanjameshan/starknet.js/commit/d3c1bdcdca996bce273673cf9c8220156e965863))
+- pending as success ([9e79288](https://github.com/seanjameshan/starknet.js/commit/9e7928845cc1e7088ba9a8dc9ba8fb9311970440))
+
+# [3.7.0](https://github.com/seanjameshan/starknet.js/compare/v3.6.0...v3.7.0) (2022-03-24)
+
+### Features
+
+- **Account:** account constructor should take a KeyPair or a Signer as parameter ([ea6ae40](https://github.com/seanjameshan/starknet.js/commit/ea6ae40225d33e293b9d2de7c8509e87fb7a651e))
+- add BigInt support within BigNumberish ([e42427a](https://github.com/seanjameshan/starknet.js/commit/e42427afa9a57673576da68cfbbee1356ffb5c0d))
+- using typeguard to narrow variable's type in Account's constructor ([ed048f3](https://github.com/seanjameshan/starknet.js/commit/ed048f355bee815cc9b2ccc984db900059fa2303))
+
+# [3.6.0](https://github.com/seanjameshan/starknet.js/compare/v3.5.1...v3.6.0) (2022-03-24)
+
+### Bug Fixes
+
+- **account:** estimate fee transfered from provider to account class ([93e7dd9](https://github.com/seanjameshan/starknet.js/commit/93e7dd941b35bccb67cc426b9ae546801092964c))
+- formatting ([248246f](https://github.com/seanjameshan/starknet.js/commit/248246f2fe75b9897700b955fa98e1779aec1744))
+- link ([494e000](https://github.com/seanjameshan/starknet.js/commit/494e0005c3b1cb86f5de0f25a10cbbe786a87b34))
+- **provider:** estimateFee entrypoint conversion fix ([e40204a](https://github.com/seanjameshan/starknet.js/commit/e40204a2eca5f475fe50a88349fd4890bbc36790))
+- **provider:** estimation fee response type ([ce674ca](https://github.com/seanjameshan/starknet.js/commit/ce674ca632ff70a07d95d685c9bf2f48bebaca20))
+
+### Features
+
+- add LedgerSigner class + blind signing ([9b700f3](https://github.com/seanjameshan/starknet.js/commit/9b700f300a91a0967f8827d0ecdd69e531738ec4))
+- **contract:** contract expanded with estimateFee method ([fbaf4ba](https://github.com/seanjameshan/starknet.js/commit/fbaf4bab56ace0917ce7c66ecf90f8e2d0dc7f60))
+- improvements after PR reviewing ([9f30e20](https://github.com/seanjameshan/starknet.js/commit/9f30e20c2e5d2afafe4eae58c597b82dffc3bbe2))
+- new improvements after new PR review ([2e16808](https://github.com/seanjameshan/starknet.js/commit/2e168082b0042f27336946639f3948e91bc5f641))
+- **provider:** provider expanded with getTransactionTrace ([b67361a](https://github.com/seanjameshan/starknet.js/commit/b67361ad7c50218e00273c097426e14814441404))
+
 ## [3.5.1](https://github.com/seanjameshan/starknet.js/compare/v3.5.0...v3.5.1) (2022-03-11)
 
 ### Bug Fixes

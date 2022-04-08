@@ -4,6 +4,8 @@ import {
   AddTransactionResponse,
   Call,
   DeployContractPayload,
+  EstimateFeeResponse,
+  Invocation,
   InvocationsDetails,
   Signature,
 } from '../types';
@@ -27,6 +29,19 @@ export abstract class AccountInterface extends ProviderInterface {
     payload: DeployContractPayload,
     abi?: Abi
   ): Promise<AddTransactionResponse>;
+
+  /**
+   * Estimate Fee for a method on starknet
+   *
+   * @param invocation the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   *
+   * @returns response from addTransaction
+   */
+  public abstract estimateFee(invocation: Invocation): Promise<EstimateFeeResponse>;
 
   /**
    * Invoke execute function in account contract

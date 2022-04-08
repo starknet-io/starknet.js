@@ -43,6 +43,12 @@ type BlockIdentifierObject =
  * @returns block identifier object
  */
 export function getBlockIdentifier(blockIdentifier: BlockIdentifier): BlockIdentifierObject {
+  if (blockIdentifier === null) {
+    return { type: 'BLOCK_NUMBER', data: null };
+  }
+  if (blockIdentifier === 'pending') {
+    return { type: 'BLOCK_NUMBER', data: 'pending' };
+  }
   if (typeof blockIdentifier === 'number') {
     return { type: 'BLOCK_NUMBER', data: blockIdentifier };
   }
@@ -51,12 +57,6 @@ export function getBlockIdentifier(blockIdentifier: BlockIdentifier): BlockIdent
   }
   if (typeof blockIdentifier === 'string' && !Number.isNaN(parseInt(blockIdentifier, 10))) {
     return { type: 'BLOCK_NUMBER', data: parseInt(blockIdentifier, 10) };
-  }
-  if (blockIdentifier === null) {
-    return { type: 'BLOCK_NUMBER', data: null };
-  }
-  if (blockIdentifier === 'pending') {
-    return { type: 'BLOCK_NUMBER', data: 'pending' };
   }
   if (typeof blockIdentifier === 'string') {
     throw new Error(`Invalid block identifier: ${blockIdentifier}`);
@@ -69,8 +69,7 @@ export function getBlockIdentifier(blockIdentifier: BlockIdentifier): BlockIdent
  *
  * [Reference](https://github.com/starkware-libs/cairo-lang/blob/fc97bdd8322a7df043c87c371634b26c15ed6cee/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L164-L173)
  *
- * @param blockNumber
- * @param blockHash
+ * @param blockIdentifier
  * @returns block identifier for API request
  */
 export function getFormattedBlockIdentifier(blockIdentifier: BlockIdentifier = null): string {
