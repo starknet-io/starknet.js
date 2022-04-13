@@ -63,7 +63,9 @@
   "dependencies": {
     "@ledgerhq/hw-app-eth": "^6.26.0",
     "@ledgerhq/hw-transport": "^6.24.1",
+    "@ledgerhq/hw-transport-node-hid": "^6.24.1",
     "@ledgerhq/hw-transport-webhid": "^6.24.1",
+    "@zondax/ledger-starkware-app": "^0.0.2",
     "axios": "^0.23.0",
     "bn.js": "^5.2.0",
     "elliptic": "^6.5.4",

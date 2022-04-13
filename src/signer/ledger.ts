@@ -1,6 +1,7 @@
-import Eth from '@ledgerhq/hw-app-eth';
-import Transport from '@ledgerhq/hw-transport';
-import TransportWebHID from '@ledgerhq/hw-transport-webhid';
+// import Transport from '@ledgerhq/hw-transport';
+// import TransportWebHID from '@ledgerhq/hw-transport-webhid';
+import TransportNodeHid from '@ledgerhq/hw-transport-node-hid';
+import StarkwareApp from '@zondax/ledger-starkware-app';
 
 import { Invocation, InvocationsSignerDetails, Signature } from '../types';
 import { addHexPrefix } from '../utils/encode';
@@ -20,26 +21,26 @@ function hexZeroPad(hash: string, length: number): string {
 }
 
 export class LedgerBlindSigner implements SignerInterface {
-  public derivationPath = "/2645'/579218131'/1148870696'/0'/0'/0";
+  public derivationPath = "m/2645'/579218131'/1148870696'/0";
 
-  private transport: Transport | undefined;
+  private transport: TransportNodeHid | undefined;
 
-  private async getEthApp(): Promise<Eth> {
+  private async getStarwareApp(): Promise<StarkwareApp> {
     if (!this.transport) {
       try {
-        this.transport = await TransportWebHID.create();
+        // this.transport = await TransportWebHID.create();
+        this.transport = await TransportNodeHid.open('');
       } catch {
         throw new Error('Device connection error');
       }
     }
-    return new Eth(this.transport);
+    return new StarkwareApp(this.transport);
   }
 
   public async getPubKey(): Promise<string> {
-    const eth = await this.getEthApp();
-    const response = await eth.starkGetPublicKey(this.derivationPath);
-    const starkPub = `0x${response.slice(1, 1 + 32).toString('hex')}`;
-    return starkPub;
+    const stark = await this.getStarwareApp();
+    const { publicKey } = await stark.getPubKey(this.derivationPath);
+    return `0x${publicKey.toString('hex', 1, 1 + 32)}`;
   }
 
   public async signTransaction(
@@ -50,8 +51,11 @@ export class LedgerBlindSigner implements SignerInterface {
       transactionsDetail.walletAddress,
       transactions,
       transactionsDetail.nonce.toString(),
-      transactionsDetail.maxFee.toString()
+      transactionsDetail.maxFee.toString(),
+      transactionsDetail.version.toString()
     );
+
+    console.log(`Ledger signTransaction hash = ${msgHash}`);
 
     return this.sign(msgHash);
   }
@@ -62,20 +66,24 @@ export class LedgerBlindSigner implements SignerInterface {
     return this.sign(msgHash);
   }
 
-  protected async sign(msgHash: string): Promise<Signature> {
-    const eth = await this.getEthApp();
+  protected async sign(msg: string): Promise<Signature> {
+    const stark = await this.getStarwareApp();
 
-    const {
-      r,
-      s,
-    }: {
-      r: string;
-      s: string;
-    } = (await eth.starkUnsafeSign(this.derivationPath, hexZeroPad(msgHash, 32))) as {
-      r: string;
-      s: string;
-    };
+    console.log(`Message = ${msg}`);
 
-    return [addHexPrefix(r), addHexPrefix(s)];
+    const message = hexZeroPad(msg, 32);
+
+    console.log(`Message = ${message}`);
+
+    const response = await stark.signFelt(
+      this.derivationPath,
+      Buffer.from(message.slice(2), 'hex')
+    );
+    console.log(response.returnCode);
+    console.log(response.errorMessage);
+    console.log(response.hash);
+    console.log(`r = 0x${response.r.toString('hex')}`);
+    console.log(`s = 0x${response.s.toString('hex')}`);
+    return [addHexPrefix(response.r.toString('hex')), addHexPrefix(response.s.toString('hex'))];
   }
 }
