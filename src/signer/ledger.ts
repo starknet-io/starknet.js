@@ -66,7 +66,7 @@ export class LedgerBlindSigner implements SignerInterface {
     return this.sign(msgHash);
   }
 
-  protected async sign(msg: string): Promise<Signature> {
+  public async sign(msg: string): Promise<Signature> {
     const stark = await this.getStarwareApp();
 
     console.log(`Message = ${msg}`);
