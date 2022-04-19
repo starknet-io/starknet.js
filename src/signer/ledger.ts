@@ -4,7 +4,8 @@ import TransportWebHID from '@ledgerhq/hw-transport-webhid';
 
 import { Invocation, InvocationsSignerDetails, Signature } from '../types';
 import { addHexPrefix } from '../utils/encode';
-import { hashMulticall } from '../utils/hash';
+import { calculcateTransactionHash, getSelectorFromName } from '../utils/hash';
+import { fromCallsToExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { SignerInterface } from './interface';
 
@@ -46,11 +47,15 @@ export class LedgerBlindSigner implements SignerInterface {
     transactions: Invocation[],
     transactionsDetail: InvocationsSignerDetails
   ): Promise<Signature> {
-    const msgHash = hashMulticall(
+    const calldata = [...fromCallsToExecuteCalldata(transactions), transactionsDetail.nonce];
+
+    const msgHash = calculcateTransactionHash(
       transactionsDetail.walletAddress,
-      transactions,
-      transactionsDetail.nonce.toString(),
-      transactionsDetail.maxFee.toString()
+      transactionsDetail.version,
+      getSelectorFromName('__execute__'),
+      calldata,
+      transactionsDetail.maxFee,
+      transactionsDetail.chainId
     );
 
     return this.sign(msgHash);

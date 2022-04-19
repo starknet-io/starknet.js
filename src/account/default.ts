@@ -1,5 +1,6 @@
 import assert from 'minimalistic-assert';
 
+import { ZERO } from '../constants';
 import { Provider } from '../provider';
 import { BlockIdentifier } from '../provider/utils';
 import { Signer, SignerInterface } from '../signer';
@@ -19,10 +20,10 @@ import {
   computeHashOnElements,
   feeTransactionVersion,
   getSelectorFromName,
-  transactionPrefix,
   transactionVersion,
 } from '../utils/hash';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
+import { encodeShortString } from '../utils/shortString';
 import { compileCalldata, estimatedFeeToMaxFee } from '../utils/stark';
 import { fromCallsToExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
@@ -58,15 +59,16 @@ export class Account extends Provider implements AccountInterface {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = providedNonce ?? (await this.getNonce());
     const version = toBN(feeTransactionVersion);
-    const signerDetails = {
+
+    const signature = await this.signer.signTransaction(transactions, {
       walletAddress: this.address,
       nonce: toBN(nonce),
-      maxFee: toBN('0'),
+      maxFee: ZERO,
       version,
-    };
-    const signature = await this.signer.signTransaction(transactions, signerDetails);
+      chainId: this.chainId,
+    });
 
-    const calldata = [...fromCallsToExecuteCalldata(transactions), signerDetails.nonce.toString()];
+    const calldata = [...fromCallsToExecuteCalldata(transactions), toBN(nonce).toString()];
     return this.fetchEndpoint(
       'estimate_fee',
       { blockIdentifier },
@@ -96,22 +98,26 @@ export class Account extends Provider implements AccountInterface {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
     let maxFee: BigNumberish = '0';
-    if (transactionsDetail.maxFee) {
+    if (transactionsDetail.maxFee || transactionsDetail.maxFee === 0) {
       maxFee = transactionsDetail.maxFee;
     } else {
       const estimatedFee = (await this.estimateFee(transactions, { nonce })).amount;
       maxFee = estimatedFeeToMaxFee(estimatedFee).toString();
     }
-    const signerDetails = {
-      walletAddress: this.address,
-      nonce,
-      maxFee,
-      version: toBN(transactionVersion),
-    };
 
-    const signature = await this.signer.signTransaction(transactions, signerDetails, abis);
+    const signature = await this.signer.signTransaction(
+      transactions,
+      {
+        walletAddress: this.address,
+        nonce,
+        maxFee,
+        version: toBN(transactionVersion),
+        chainId: this.chainId,
+      },
+      abis
+    );
 
-    const calldata = [...fromCallsToExecuteCalldata(transactions), signerDetails.nonce.toString()];
+    const calldata = [...fromCallsToExecuteCalldata(transactions), nonce.toString()];
     return this.fetchEndpoint('add_transaction', undefined, {
       type: 'INVOKE_FUNCTION',
       contract_address: this.address,
@@ -161,7 +167,7 @@ export class Account extends Provider implements AccountInterface {
         .map(computeHashOnElements);
 
       return computeHashOnElements([
-        transactionPrefix,
+        encodeShortString('StarkNet Transaction'),
         account,
         computeHashOnElements(hashArray),
         nonce,

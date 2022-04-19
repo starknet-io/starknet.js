@@ -1,6 +1,7 @@
 import { Abi, Invocation, InvocationsSignerDetails, KeyPair, Signature } from '../types';
 import { getStarkKey, sign } from '../utils/ellipticCurve';
-import { hashMulticall } from '../utils/hash';
+import { calculcateTransactionHash, getSelectorFromName } from '../utils/hash';
+import { fromCallsToExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { SignerInterface } from './interface';
 
@@ -25,12 +26,15 @@ export class Signer implements SignerInterface {
     }
     // now use abi to display decoded data somewhere, but as this signer is headless, we can't do that
 
-    const msgHash = hashMulticall(
+    const calldata = [...fromCallsToExecuteCalldata(transactions), transactionsDetail.nonce];
+
+    const msgHash = calculcateTransactionHash(
       transactionsDetail.walletAddress,
-      transactions,
-      transactionsDetail.nonce.toString(),
-      transactionsDetail.maxFee.toString(),
-      transactionsDetail.version.toString()
+      transactionsDetail.version,
+      getSelectorFromName('__execute__'),
+      calldata,
+      transactionsDetail.maxFee,
+      transactionsDetail.chainId
     );
 
     return sign(this.keyPair, msgHash);

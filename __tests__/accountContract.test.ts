@@ -1,4 +1,11 @@
 import { Contract, defaultProvider, ec, hash, number, stark } from '../src';
+import { StarknetChainId } from '../src/constants';
+import {
+  calculcateTransactionHash,
+  getSelectorFromName,
+  transactionVersion,
+} from '../src/utils/hash';
+import { fromCallsToExecuteCalldata } from '../src/utils/transaction';
 import { compiledArgentAccount, compiledErc20 } from './fixtures';
 
 describe('getStarkAccountFromPrivateKey()', () => {
@@ -18,6 +25,45 @@ describe('getStarkAccountFromPrivateKey()', () => {
 
     expect(starkKey).toBe('0xf321e59b257a577836d8313150aabd21f412491358c329966218df76bab591');
   });
+});
+
+test('build tx', async () => {
+  const privateKey = '0x1B69B4BE052FAB1';
+  const keyPair = ec.getKeyPair(privateKey);
+  const address = ec.getStarkKey(keyPair);
+
+  expect(address).toBe('0x04024999b9574cb7623679ce049a609db62a95098982c5b28ac61abdebd1c82b');
+
+  const selector = hash.getSelectorFromName('transfer');
+
+  expect(selector).toBe(
+    number.toHex(
+      number.toBN('232670485425082704932579856502088130646006032362877466777181098476241604910')
+    )
+  );
+
+  const calls = [{ contractAddress: '1', entrypoint: 'transfer', calldata: ['6', '7'] }];
+  const calldata = [...fromCallsToExecuteCalldata(calls), '0'];
+
+  const msgHash = calculcateTransactionHash(
+    address,
+    transactionVersion,
+    getSelectorFromName('__execute__'),
+    calldata,
+    0,
+    StarknetChainId.TESTNET
+  );
+  expect(number.toBN(msgHash).toString()).toMatchInlineSnapshot(
+    `"235855380881994314533025886817815774848495061484535023348790852315407085619"`
+  );
+
+  const [r, s] = ec.sign(keyPair, msgHash);
+  expect(r.toString()).toMatchInlineSnapshot(
+    `"181489288548431284937202760565682158657883789985879744111612429574110648095"`
+  );
+  expect(s.toString()).toMatchInlineSnapshot(
+    `"2055384802167699202203509702082340762385659879831017273872106910763470114538"`
+  );
 });
 
 describe('deploy and test Wallet', () => {
@@ -63,36 +109,4 @@ describe('deploy and test Wallet', () => {
 
     expect(res).toStrictEqual(number.toBN(1000));
   });
-});
-
-test('build tx', async () => {
-  const privateKey = '0x1B69B4BE052FAB1';
-  const keyPair = ec.getKeyPair(privateKey);
-  const address = ec.getStarkKey(keyPair);
-
-  expect(address).toBe('0x04024999b9574cb7623679ce049a609db62a95098982c5b28ac61abdebd1c82b');
-
-  const selector = hash.getSelectorFromName('transfer');
-
-  expect(selector).toBe(
-    number.toHex(
-      number.toBN('232670485425082704932579856502088130646006032362877466777181098476241604910')
-    )
-  );
-
-  const calls = [{ contractAddress: '1', entrypoint: 'transfer', calldata: ['6', '7'] }];
-  const msgHash = hash.hashMulticall(address, calls, '0', '0');
-  expect(number.toBN(msgHash).toString()).toStrictEqual(
-    number
-      .toBN('533725737276146993132325070982049323585915612981489962412873515411469143806')
-      .toString()
-  );
-
-  const [r, s] = ec.sign(keyPair, msgHash);
-  expect(r.toString()).toBe(
-    '3081830197073374427897814075820860503521735760640862828374253887454357679197'
-  );
-  expect(s.toString()).toBe(
-    '384293936273611705317490990661155378189310283917528660618713929845936492551'
-  );
 });

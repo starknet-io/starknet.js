@@ -1,3 +1,4 @@
+import { StarknetChainId } from '../constants';
 import type {
   AddTransactionResponse,
   Call,
@@ -20,6 +21,8 @@ export abstract class ProviderInterface {
   public abstract feederGatewayUrl: string;
 
   public abstract gatewayUrl: string;
+
+  public abstract chainId: StarknetChainId;
 
   /**
    * Gets the smart contract address on the goerli testnet.
