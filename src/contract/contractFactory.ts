@@ -1,7 +1,7 @@
 import assert from 'minimalistic-assert';
 
-import { Account } from '../account';
-import { Provider, defaultProvider } from '../provider';
+import { AccountInterface } from '../account';
+import { ProviderInterface, defaultProvider } from '../provider';
 import { Abi, CompiledContract, RawCalldata } from '../types';
 import { BigNumberish } from '../utils/number';
 import { Contract } from './default';
@@ -11,11 +11,11 @@ export class ContractFactory {
 
   compiledContract: CompiledContract;
 
-  providerOrAccount: Provider | Account;
+  providerOrAccount: ProviderInterface | AccountInterface;
 
   constructor(
     compiledContract: CompiledContract,
-    providerOrAccount: Provider | Account = defaultProvider,
+    providerOrAccount: ProviderInterface | AccountInterface = defaultProvider,
     abi: Abi = compiledContract.abi // abi can be different from the deployed contract ie for proxy contracts
   ) {
     this.abi = abi;
@@ -59,7 +59,7 @@ export class ContractFactory {
    *
    * @param providerOrAccount - new Provider or Account to attach to
    */
-  connect(providerOrAccount: Provider | Account): ContractFactory {
+  connect(providerOrAccount: ProviderInterface | AccountInterface): ContractFactory {
     this.providerOrAccount = providerOrAccount;
     return this;
   }
