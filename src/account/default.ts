@@ -1,7 +1,7 @@
 import assert from 'minimalistic-assert';
 
 import { ZERO } from '../constants';
-import { Provider } from '../provider';
+import { Provider, ProviderInterface } from '../provider';
 import { BlockIdentifier } from '../provider/utils';
 import { Signer, SignerInterface } from '../signer';
 import {
@@ -33,9 +33,13 @@ import { AccountInterface } from './interface';
 export class Account extends Provider implements AccountInterface {
   public address: string;
 
-  private signer: SignerInterface;
+  public signer: SignerInterface;
 
-  constructor(provider: Provider, address: string, keyPairOrSigner: KeyPair | SignerInterface) {
+  constructor(
+    provider: ProviderInterface,
+    address: string,
+    keyPairOrSigner: KeyPair | SignerInterface
+  ) {
     super(provider);
     this.signer =
       'getPubKey' in keyPairOrSigner ? keyPairOrSigner : new Signer(keyPairOrSigner as KeyPair);
