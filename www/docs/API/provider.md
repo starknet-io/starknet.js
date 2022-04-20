@@ -21,7 +21,7 @@ The options for the provider depends from the network. The structure of the opti
 Example:
 
 ```
-const provider = starknet.Provider({
+const provider = new starknet.Provider({
     baseUrl: 'https://alpha4.starknet.io',
     feederGatewayUrl: 'feeder_gateway',
     gatewayUrl: 'gateway',
@@ -34,7 +34,7 @@ const provider = starknet.Provider({
 
 Gets the smart contract address on the network
 
-provider.**getContractAddresses**() => _Promise < [GetContractAddressesResponse](./types#getcontractaddressesresponse) >_
+provider.**getContractAddresses**() => _Promise < GetContractAddressesResponse >_
 
 ```
 {
