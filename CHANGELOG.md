@@ -1,3 +1,13 @@
+## [3.10.1](https://github.com/seanjameshan/starknet.js/compare/v3.10.0...v3.10.1) (2022-04-20)
+
+### Bug Fixes
+
+- **account:** function documentation fix ([34a9779](https://github.com/seanjameshan/starknet.js/commit/34a977953c2bfea53f9cd1157809919b1dd2ed04))
+- **contractFactory:** wrong prop type ([598bcd0](https://github.com/seanjameshan/starknet.js/commit/598bcd0d589c00e2219522d4a342316598678d4e))
+- **contract:** recursion function name fix ([803b6dc](https://github.com/seanjameshan/starknet.js/commit/803b6dcf5cad5cdfd8258a53e176bcd96300cef3))
+- typings ([1fadf41](https://github.com/seanjameshan/starknet.js/commit/1fadf418b04d96ced8d994b35699f40be9a8c898))
+- **utils:** adding transaction utils to the utils export ([6429179](https://github.com/seanjameshan/starknet.js/commit/642917922a5d5278e8c575a2b4ffd60fff53cf42))
+
 # [3.10.0](https://github.com/seanjameshan/starknet.js/compare/v3.9.0...v3.10.0) (2022-04-20)
 
 ### Bug Fixes
