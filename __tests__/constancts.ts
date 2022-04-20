@@ -1,2 +1,0 @@
-export const ACCOUNT_ADDRESS = '0x4e5f6f6020ffa7e5761cbe96e932b7c1cbbcace70c0fe22767c5f0abf851a17';
-export const PRIVATE_KEY = '0x0529868a6dc774b36342024c207686af16e84fc157c5eeb3a9d31fa13c0d44c5';

@@ -1,6 +1,7 @@
 import axios, { AxiosRequestHeaders } from 'axios';
 import urljoin from 'url-join';
 
+import { StarknetChainId } from '../constants';
 import {
   Abi,
   AddTransactionResponse,
@@ -49,17 +50,22 @@ export class Provider implements ProviderInterface {
 
   public gatewayUrl: string;
 
+  public chainId: StarknetChainId;
+
   constructor(optionsOrProvider: ProviderOptions | Provider = { network: 'goerli-alpha' }) {
     if (optionsOrProvider instanceof Provider) {
       this.baseUrl = optionsOrProvider.baseUrl;
       this.feederGatewayUrl = optionsOrProvider.feederGatewayUrl;
       this.gatewayUrl = optionsOrProvider.gatewayUrl;
+      this.chainId =
+        optionsOrProvider.chainId ?? Provider.getChainIdFromBaseUrl(optionsOrProvider.baseUrl);
     } else {
       const baseUrl =
         'baseUrl' in optionsOrProvider
           ? optionsOrProvider.baseUrl
           : Provider.getNetworkFromName(optionsOrProvider.network);
       this.baseUrl = baseUrl;
+      this.chainId = Provider.getChainIdFromBaseUrl(baseUrl);
       this.feederGatewayUrl = urljoin(baseUrl, 'feeder_gateway');
       this.gatewayUrl = urljoin(baseUrl, 'gateway');
     }
@@ -73,6 +79,19 @@ export class Provider implements ProviderInterface {
       default:
         return 'https://alpha4.starknet.io';
     }
+  }
+
+  protected static getChainIdFromBaseUrl(baseUrl: string): StarknetChainId {
+    try {
+      const url = new URL(baseUrl);
+      if (url.host.includes('mainnet.starknet.io')) {
+        return StarknetChainId.MAINNET;
+      }
+    } catch {
+      // eslint-disable-next-line no-console
+      console.error(`Could not parse baseUrl: ${baseUrl}`);
+    }
+    return StarknetChainId.TESTNET;
   }
 
   private getFetchUrl(endpoint: keyof Endpoints) {

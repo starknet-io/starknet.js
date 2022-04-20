@@ -47,3 +47,10 @@ export const fromCallsToExecuteCalldata = (calls: Call[]): string[] => {
     ...calldata,
   ];
 };
+
+export const fromCallsToExecuteCalldataWithNonce = (
+  calls: Call[],
+  nonce: BigNumberish
+): string[] => {
+  return [...fromCallsToExecuteCalldata(calls), toBN(nonce).toString()];
+};

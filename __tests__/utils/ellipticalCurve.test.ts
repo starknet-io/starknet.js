@@ -1,7 +1,15 @@
+import { StarknetChainId } from '../../src/constants';
 import { ec, getKeyPair, getStarkKey, sign, verify } from '../../src/utils/ellipticCurve';
 import { removeHexPrefix } from '../../src/utils/encode';
-import { computeHashOnElements, hashMulticall, pedersen } from '../../src/utils/hash';
+import {
+  calculcateTransactionHash,
+  computeHashOnElements,
+  getSelectorFromName,
+  pedersen,
+  transactionVersion,
+} from '../../src/utils/hash';
 import { toBN, toHex } from '../../src/utils/number';
+import { fromCallsToExecuteCalldataWithNonce } from '../../src/utils/transaction';
 
 test('getKeyPair()', () => {
   const privateKey = '0x019800ea6a9a73f94aee6a3d2edf018fc770443e90c7ba121e8303ec6b349279';
@@ -42,17 +50,27 @@ test('hashMessage()', () => {
   ];
   const nonce = '3';
   const maxFee = '0';
-  const hashMsg = hashMulticall(account, transactions, nonce, maxFee);
-  expect(hashMsg).toBe(
-    toHex(toBN('1608351043472325350463069815257733118091727529101532499046754244230898025592'))
+  const calldata = fromCallsToExecuteCalldataWithNonce(transactions, nonce);
+
+  const hashMsg = calculcateTransactionHash(
+    account,
+    transactionVersion,
+    getSelectorFromName('__execute__'),
+    calldata,
+    maxFee,
+    StarknetChainId.TESTNET
+  );
+
+  expect(hashMsg).toMatchInlineSnapshot(
+    `"0x4c337c6bf32b2cf2b8ae54064e4b982c214660e8d0423b431a3fde10b9b9c02"`
   );
   const keyPair = getKeyPair(privateKey);
   const [r, s] = sign(keyPair, removeHexPrefix(hashMsg));
-  expect(r.toString()).toStrictEqual(
-    toBN('1079537730825246752292590270213864261175133133352510235773017189606850691611').toString()
+  expect(r.toString()).toMatchInlineSnapshot(
+    `"1944132633844378384908742523072599391732300777648030785844673145513474741467"`
   );
-  expect(s.toString()).toStrictEqual(
-    toBN('2904560423220491364719171767721067837294296476624248675613584621502231297000').toString()
+  expect(s.toString()).toMatchInlineSnapshot(
+    `"1067771353159635307522498807851959257107695451405842425488451092336556917559"`
   );
 });
 
