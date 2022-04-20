@@ -17,7 +17,7 @@ import fs from "fs";
 import * as starknet from "starknet";
 ```
 
-##  Generate random key pair.
+## Generate random key pair.
 
 You can also get a key pair from a private key using `getKeyPair(pk: BigNumberish)`
 

@@ -1,6 +1,5 @@
-
 // Install the latest version of starknet with npm install starknet@next and import starknet
-import * as starknet from "starknet";
+import * as starknet from 'starknet';
 
 // Generate public and private key pair.
 
@@ -8,7 +7,11 @@ const keyPair = starknet.ec.genKeyPair();
 const starkKey = starknet.ec.getStarkKey(keyPair);
 const starkKeyInt = starknet.number.toBN(starknet.encode.removeHexPrefix(starkKey), 16);
 
-const { address: walletAddressLocal } = await provider.deployContract({contract: COMPILED_WALLET_CONTRACT_JSON, constructorCallData: [starkKeyInt], addressSalt: 0});
+const { address: walletAddressLocal } = await provider.deployContract({
+  contract: COMPILED_WALLET_CONTRACT_JSON,
+  constructorCallData: [starkKeyInt],
+  addressSalt: 0,
+});
 
 walletAddress = walletAddressLocal;
 
@@ -28,7 +31,7 @@ const balanceBeforeTransfer = await erc20.call('balance_of', {
   user: walletAddress,
 }).res;
 
-console.log(number.toBN(res).toString())
+console.log(number.toBN(res).toString());
 
 const { nonce } = await wallet.call('get_nonce');
 const msgHash = encode.addHexPrefix(
@@ -59,4 +62,4 @@ const balanceAfterTransfer = await erc20.call('balance_of', {
   user: walletAddress,
 }).res;
 
-console.log('Balance after transfer', balanceAfterTransfer)
+console.log('Balance after transfer', balanceAfterTransfer);
