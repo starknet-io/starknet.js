@@ -1,7 +1,7 @@
 import { Abi, Invocation, InvocationsSignerDetails, KeyPair, Signature } from '../types';
 import { getStarkKey, sign } from '../utils/ellipticCurve';
 import { calculcateTransactionHash, getSelectorFromName } from '../utils/hash';
-import { fromCallsToExecuteCalldata } from '../utils/transaction';
+import { fromCallsToExecuteCalldataWithNonce } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { SignerInterface } from './interface';
 
@@ -26,7 +26,7 @@ export class Signer implements SignerInterface {
     }
     // now use abi to display decoded data somewhere, but as this signer is headless, we can't do that
 
-    const calldata = [...fromCallsToExecuteCalldata(transactions), transactionsDetail.nonce];
+    const calldata = fromCallsToExecuteCalldataWithNonce(transactions, transactionsDetail.nonce);
 
     const msgHash = calculcateTransactionHash(
       transactionsDetail.walletAddress,

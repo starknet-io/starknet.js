@@ -10,6 +10,7 @@ import {
   Call,
   EstimateFeeResponse,
   InvocationsDetails,
+  InvocationsSignerDetails,
   InvokeFunctionTransaction,
   KeyPair,
   Signature,
@@ -25,7 +26,7 @@ import {
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
 import { encodeShortString } from '../utils/shortString';
 import { compileCalldata, estimatedFeeToMaxFee } from '../utils/stark';
-import { fromCallsToExecuteCalldata } from '../utils/transaction';
+import { fromCallsToExecuteCalldataWithNonce } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
 
@@ -60,15 +61,17 @@ export class Account extends Provider implements AccountInterface {
     const nonce = providedNonce ?? (await this.getNonce());
     const version = toBN(feeTransactionVersion);
 
-    const signature = await this.signer.signTransaction(transactions, {
+    const signerDetails: InvocationsSignerDetails = {
       walletAddress: this.address,
       nonce: toBN(nonce),
       maxFee: ZERO,
       version,
       chainId: this.chainId,
-    });
+    };
 
-    const calldata = [...fromCallsToExecuteCalldata(transactions), toBN(nonce).toString()];
+    const signature = await this.signer.signTransaction(transactions, signerDetails);
+
+    const calldata = fromCallsToExecuteCalldataWithNonce(transactions, nonce);
     return this.fetchEndpoint(
       'estimate_fee',
       { blockIdentifier },
@@ -105,19 +108,17 @@ export class Account extends Provider implements AccountInterface {
       maxFee = estimatedFeeToMaxFee(estimatedFee).toString();
     }
 
-    const signature = await this.signer.signTransaction(
-      transactions,
-      {
-        walletAddress: this.address,
-        nonce,
-        maxFee,
-        version: toBN(transactionVersion),
-        chainId: this.chainId,
-      },
-      abis
-    );
+    const signerDetails: InvocationsSignerDetails = {
+      walletAddress: this.address,
+      nonce,
+      maxFee,
+      version: toBN(transactionVersion),
+      chainId: this.chainId,
+    };
 
-    const calldata = [...fromCallsToExecuteCalldata(transactions), nonce.toString()];
+    const signature = await this.signer.signTransaction(transactions, signerDetails, abis);
+
+    const calldata = fromCallsToExecuteCalldataWithNonce(transactions, nonce);
     return this.fetchEndpoint('add_transaction', undefined, {
       type: 'INVOKE_FUNCTION',
       contract_address: this.address,

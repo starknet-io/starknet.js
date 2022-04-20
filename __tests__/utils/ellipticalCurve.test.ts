@@ -9,7 +9,7 @@ import {
   transactionVersion,
 } from '../../src/utils/hash';
 import { toBN, toHex } from '../../src/utils/number';
-import { fromCallsToExecuteCalldata } from '../../src/utils/transaction';
+import { fromCallsToExecuteCalldataWithNonce } from '../../src/utils/transaction';
 
 test('getKeyPair()', () => {
   const privateKey = '0x019800ea6a9a73f94aee6a3d2edf018fc770443e90c7ba121e8303ec6b349279';
@@ -50,7 +50,7 @@ test('hashMessage()', () => {
   ];
   const nonce = '3';
   const maxFee = '0';
-  const calldata = [...fromCallsToExecuteCalldata(transactions), nonce];
+  const calldata = fromCallsToExecuteCalldataWithNonce(transactions, nonce);
 
   const hashMsg = calculcateTransactionHash(
     account,

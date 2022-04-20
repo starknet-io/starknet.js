@@ -82,8 +82,14 @@ export class Provider implements ProviderInterface {
   }
 
   protected static getChainIdFromBaseUrl(baseUrl: string): StarknetChainId {
-    if (baseUrl.includes('mainnet.starknet.io')) {
-      return StarknetChainId.MAINNET;
+    try {
+      const url = new URL(baseUrl);
+      if (url.host.includes('mainnet.starknet.io')) {
+        return StarknetChainId.MAINNET;
+      }
+    } catch {
+      // eslint-disable-next-line no-console
+      console.error(`Could not parse baseUrl: ${baseUrl}`);
     }
     return StarknetChainId.TESTNET;
   }

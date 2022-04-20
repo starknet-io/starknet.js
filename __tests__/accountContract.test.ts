@@ -5,7 +5,7 @@ import {
   getSelectorFromName,
   transactionVersion,
 } from '../src/utils/hash';
-import { fromCallsToExecuteCalldata } from '../src/utils/transaction';
+import { fromCallsToExecuteCalldataWithNonce } from '../src/utils/transaction';
 import { compiledArgentAccount, compiledErc20 } from './fixtures';
 
 describe('getStarkAccountFromPrivateKey()', () => {
@@ -36,14 +36,10 @@ test('build tx', async () => {
 
   const selector = hash.getSelectorFromName('transfer');
 
-  expect(selector).toBe(
-    number.toHex(
-      number.toBN('232670485425082704932579856502088130646006032362877466777181098476241604910')
-    )
-  );
+  expect(selector).toMatchInlineSnapshot();
 
   const calls = [{ contractAddress: '1', entrypoint: 'transfer', calldata: ['6', '7'] }];
-  const calldata = [...fromCallsToExecuteCalldata(calls), '0'];
+  const calldata = fromCallsToExecuteCalldataWithNonce(calls, 0);
 
   const msgHash = calculcateTransactionHash(
     address,
