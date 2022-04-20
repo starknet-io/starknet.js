@@ -250,7 +250,8 @@ export class Account extends Provider implements AccountInterface {
   }
 
   /**
-   * Verify a signature of a JSON object
+   * Verify a signature of a given hash
+   * @warning This method is not recommended, use verifyMessage instead
    *
    * @param hash - JSON object to be verified
    * @param signature - signature of the JSON object
@@ -274,8 +275,7 @@ export class Account extends Provider implements AccountInterface {
   }
 
   /**
-   * Verify a signature of a given hash
-   * @warning This method is not recommended, use verifyMessage instead
+   * Verify a signature of a JSON object
    *
    * @param hash - hash to be verified
    * @param signature - signature of the hash
