@@ -52,8 +52,10 @@ export class Provider implements ProviderInterface {
 
   public chainId: StarknetChainId;
 
-  constructor(optionsOrProvider: ProviderOptions | Provider = { network: 'goerli-alpha' }) {
-    if (optionsOrProvider instanceof Provider) {
+  constructor(
+    optionsOrProvider: ProviderOptions | ProviderInterface = { network: 'goerli-alpha' }
+  ) {
+    if (optionsOrProvider instanceof ProviderInterface) {
       this.baseUrl = optionsOrProvider.baseUrl;
       this.feederGatewayUrl = optionsOrProvider.feederGatewayUrl;
       this.gatewayUrl = optionsOrProvider.gatewayUrl;
