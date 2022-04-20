@@ -1,3 +1,14 @@
+# [3.10.0](https://github.com/seanjameshan/starknet.js/compare/v3.9.0...v3.10.0) (2022-04-20)
+
+### Bug Fixes
+
+- new snapshot for browser test ([3394f11](https://github.com/seanjameshan/starknet.js/commit/3394f1110c715826cbc7c3dff1bef1a5b73e80d8))
+- review ([49b04e2](https://github.com/seanjameshan/starknet.js/commit/49b04e231418ca7d26dc78843a905541985aa176))
+
+### Features
+
+- **account:** new hash formula ([ea4df2c](https://github.com/seanjameshan/starknet.js/commit/ea4df2c77e6559f9689eaca3c57edbbb9324073a))
+
 # [3.9.0](https://github.com/seanjameshan/starknet.js/compare/v3.8.0...v3.9.0) (2022-04-08)
 
 ### Bug Fixes
