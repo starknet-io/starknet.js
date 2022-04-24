@@ -349,7 +349,7 @@ export class Contract implements ContractInterface {
       if (member.type === 'felt') {
         return acc + 1;
       }
-      return acc + this.structMemberNum(member.type);
+      return acc + this.calculateStructMembers(member.type);
     }, 0);
   }
 

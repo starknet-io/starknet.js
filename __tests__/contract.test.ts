@@ -4,8 +4,12 @@ import { Account, Contract, ContractFactory, Provider, defaultProvider, ec, star
 import { getSelectorFromName } from '../src/utils/hash';
 import { BigNumberish, toBN } from '../src/utils/number';
 import { compileCalldata } from '../src/utils/stark';
-import { ACCOUNT_ADDRESS, PRIVATE_KEY } from './constancts';
-import { compiledErc20, compiledMulticall, compiledTypeTransformation } from './fixtures';
+import {
+  compiledArgentAccount,
+  compiledErc20,
+  compiledMulticall,
+  compiledTypeTransformation,
+} from './fixtures';
 
 describe('class Contract {}', () => {
   const wallet = stark.randomAddress();
@@ -204,21 +208,29 @@ describe('class Contract {}', () => {
   });
 
   describe('Contract interaction with Account', () => {
-    const starkKeyPair = ec.getKeyPair(PRIVATE_KEY);
     let account: Account;
     let erc20: Contract;
     let erc20Address: string;
 
     beforeAll(async () => {
-      account = new Account(defaultProvider, ACCOUNT_ADDRESS, starkKeyPair);
+      const starkKeyPair = ec.genKeyPair();
+      const starkKeyPub = ec.getStarkKey(starkKeyPair);
+      const { address } = await defaultProvider.deployContract({
+        contract: compiledArgentAccount,
+        addressSalt: starkKeyPub,
+      });
+      expect(address).toBeDefined();
+      account = new Account(defaultProvider, address, starkKeyPair);
+      const accountContract = new Contract(compiledArgentAccount.abi, address);
+      await accountContract.initialize(starkKeyPub, '0');
 
       const erc20Response = await defaultProvider.deployContract({
         contract: compiledErc20,
       });
       erc20Address = erc20Response.address;
       erc20 = new Contract(compiledErc20.abi, erc20Address, defaultProvider);
-      await defaultProvider.waitForTransaction(erc20Response.transaction_hash);
       expect(erc20Response.code).toBe('TRANSACTION_RECEIVED');
+      await defaultProvider.waitForTransaction(erc20Response.transaction_hash);
 
       const mintResponse = await erc20.mint(account.address, '1000');
 
@@ -251,7 +263,9 @@ describe('class Contract {}', () => {
     });
 
     test('invoke contract by wallet owner', async () => {
-      const { transaction_hash, code } = await erc20.transfer(toBN(erc20Address).toString(), 10);
+      const { transaction_hash, code } = await erc20.transfer(erc20Address, 10, {
+        maxFee: 0,
+      });
       expect(code).toBe('TRANSACTION_RECEIVED');
       await defaultProvider.waitForTransaction(transaction_hash);
       const { res } = await erc20.balance_of(account.address);

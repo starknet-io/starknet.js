@@ -2,14 +2,19 @@ import BN from 'bn.js';
 import { keccak256 } from 'ethereum-cryptography/keccak';
 import assert from 'minimalistic-assert';
 
-import { CONSTANT_POINTS, FIELD_PRIME, MASK_250, ONE, ZERO } from '../constants';
-import { Call } from '../types';
+import {
+  CONSTANT_POINTS,
+  FIELD_PRIME,
+  MASK_250,
+  ONE,
+  StarknetChainId,
+  TransactionHashPrefix,
+  ZERO,
+} from '../constants';
 import { ec } from './ellipticCurve';
 import { addHexPrefix, buf2hex, utf8ToArray } from './encode';
-import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from './number';
-import { encodeShortString } from './shortString';
+import { BigNumberish, toBN, toHex } from './number';
 
-export const transactionPrefix = encodeShortString('StarkNet Transaction');
 export const transactionVersion = 0;
 export const feeTransactionVersion = toBN(2).pow(toBN(128)).add(toBN(transactionVersion));
 
@@ -65,28 +70,65 @@ export function computeHashOnElements(data: BigNumberish[]) {
   return [...data, data.length].reduce((x, y) => pedersen([x, y]), 0).toString();
 }
 
-export function hashMulticall(
-  account: string,
-  transactions: Call[],
-  nonce: string,
-  maxFee: string,
-  version: string | number = transactionVersion
-) {
-  const hashArray = transactions
-    .map(({ contractAddress, entrypoint, calldata }) => [
-      contractAddress,
-      getSelectorFromName(entrypoint),
-      computeHashOnElements(calldata || []),
-    ])
-    .map(bigNumberishArrayToDecimalStringArray)
-    .map(computeHashOnElements);
+// following implementation is based on this python implementation:
+// https://github.com/starkware-libs/cairo-lang/blob/b614d1867c64f3fb2cf4a4879348cfcf87c3a5a7/src/starkware/starknet/core/os/transaction_hash/transaction_hash.py
 
-  return computeHashOnElements([
-    transactionPrefix,
-    account,
-    computeHashOnElements(hashArray),
-    nonce,
-    maxFee,
+export function calculateTransactionHashCommon(
+  txHashPrefix: TransactionHashPrefix,
+  version: BigNumberish,
+  contractAddress: BigNumberish,
+  entryPointSelector: BigNumberish,
+  calldata: BigNumberish[],
+  maxFee: BigNumberish,
+  chainId: StarknetChainId,
+  additionalData: BigNumberish[] = []
+): string {
+  const calldataHash = computeHashOnElements(calldata);
+  const dataToHash = [
+    txHashPrefix,
     version,
-  ]);
+    contractAddress,
+    entryPointSelector,
+    calldataHash,
+    maxFee,
+    chainId,
+    ...additionalData,
+  ];
+  return computeHashOnElements(dataToHash);
+}
+
+export function calculateDeployTransactionHash(
+  contractAddress: BigNumberish,
+  constructorCalldata: BigNumberish[],
+  version: BigNumberish,
+  chainId: StarknetChainId
+): string {
+  return calculateTransactionHashCommon(
+    TransactionHashPrefix.DEPLOY,
+    version,
+    contractAddress,
+    getSelectorFromName('constructor'),
+    constructorCalldata,
+    ZERO,
+    chainId
+  );
+}
+
+export function calculcateTransactionHash(
+  contractAddress: BigNumberish,
+  version: BigNumberish,
+  entryPointSelector: BigNumberish,
+  calldata: BigNumberish[],
+  maxFee: BigNumberish,
+  chainId: StarknetChainId
+): string {
+  return calculateTransactionHashCommon(
+    TransactionHashPrefix.INVOKE,
+    version,
+    contractAddress,
+    entryPointSelector,
+    calldata,
+    maxFee,
+    chainId
+  );
 }

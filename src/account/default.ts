@@ -1,6 +1,7 @@
 import assert from 'minimalistic-assert';
 
-import { Provider } from '../provider';
+import { ZERO } from '../constants';
+import { Provider, ProviderInterface } from '../provider';
 import { BlockIdentifier } from '../provider/utils';
 import { Signer, SignerInterface } from '../signer';
 import {
@@ -9,6 +10,7 @@ import {
   Call,
   EstimateFeeResponse,
   InvocationsDetails,
+  InvocationsSignerDetails,
   InvokeFunctionTransaction,
   KeyPair,
   Signature,
@@ -19,21 +21,25 @@ import {
   computeHashOnElements,
   feeTransactionVersion,
   getSelectorFromName,
-  transactionPrefix,
   transactionVersion,
 } from '../utils/hash';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
+import { encodeShortString } from '../utils/shortString';
 import { compileCalldata, estimatedFeeToMaxFee } from '../utils/stark';
-import { fromCallsToExecuteCalldata } from '../utils/transaction';
+import { fromCallsToExecuteCalldataWithNonce } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
 
 export class Account extends Provider implements AccountInterface {
   public address: string;
 
-  private signer: SignerInterface;
+  public signer: SignerInterface;
 
-  constructor(provider: Provider, address: string, keyPairOrSigner: KeyPair | SignerInterface) {
+  constructor(
+    provider: ProviderInterface,
+    address: string,
+    keyPairOrSigner: KeyPair | SignerInterface
+  ) {
     super(provider);
     this.signer =
       'getPubKey' in keyPairOrSigner ? keyPairOrSigner : new Signer(keyPairOrSigner as KeyPair);
@@ -58,15 +64,18 @@ export class Account extends Provider implements AccountInterface {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = providedNonce ?? (await this.getNonce());
     const version = toBN(feeTransactionVersion);
-    const signerDetails = {
+
+    const signerDetails: InvocationsSignerDetails = {
       walletAddress: this.address,
       nonce: toBN(nonce),
-      maxFee: toBN('0'),
+      maxFee: ZERO,
       version,
+      chainId: this.chainId,
     };
+
     const signature = await this.signer.signTransaction(transactions, signerDetails);
 
-    const calldata = [...fromCallsToExecuteCalldata(transactions), signerDetails.nonce.toString()];
+    const calldata = fromCallsToExecuteCalldataWithNonce(transactions, nonce);
     return this.fetchEndpoint(
       'estimate_fee',
       { blockIdentifier },
@@ -96,22 +105,24 @@ export class Account extends Provider implements AccountInterface {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
     let maxFee: BigNumberish = '0';
-    if (transactionsDetail.maxFee) {
+    if (transactionsDetail.maxFee || transactionsDetail.maxFee === 0) {
       maxFee = transactionsDetail.maxFee;
     } else {
       const estimatedFee = (await this.estimateFee(transactions, { nonce })).amount;
       maxFee = estimatedFeeToMaxFee(estimatedFee).toString();
     }
-    const signerDetails = {
+
+    const signerDetails: InvocationsSignerDetails = {
       walletAddress: this.address,
       nonce,
       maxFee,
       version: toBN(transactionVersion),
+      chainId: this.chainId,
     };
 
     const signature = await this.signer.signTransaction(transactions, signerDetails, abis);
 
-    const calldata = [...fromCallsToExecuteCalldata(transactions), signerDetails.nonce.toString()];
+    const calldata = fromCallsToExecuteCalldataWithNonce(transactions, nonce);
     return this.fetchEndpoint('add_transaction', undefined, {
       type: 'INVOKE_FUNCTION',
       contract_address: this.address,
@@ -161,7 +172,7 @@ export class Account extends Provider implements AccountInterface {
         .map(computeHashOnElements);
 
       return computeHashOnElements([
-        transactionPrefix,
+        encodeShortString('StarkNet Transaction'),
         account,
         computeHashOnElements(hashArray),
         nonce,
@@ -243,7 +254,8 @@ export class Account extends Provider implements AccountInterface {
   }
 
   /**
-   * Verify a signature of a JSON object
+   * Verify a signature of a given hash
+   * @warning This method is not recommended, use verifyMessage instead
    *
    * @param hash - JSON object to be verified
    * @param signature - signature of the JSON object
@@ -267,8 +279,7 @@ export class Account extends Provider implements AccountInterface {
   }
 
   /**
-   * Verify a signature of a given hash
-   * @warning This method is not recommended, use verifyMessage instead
+   * Verify a signature of a JSON object
    *
    * @param hash - hash to be verified
    * @param signature - signature of the hash

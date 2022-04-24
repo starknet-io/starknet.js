@@ -1,4 +1,5 @@
 import { ProviderInterface } from '../provider';
+import { SignerInterface } from '../signer';
 import {
   Abi,
   AddTransactionResponse,
@@ -14,6 +15,8 @@ import { TypedData } from '../utils/typedData/types';
 
 export abstract class AccountInterface extends ProviderInterface {
   public abstract address: string;
+
+  public abstract signer: SignerInterface;
 
   /**
    * Deploys a given compiled contract (json) to starknet

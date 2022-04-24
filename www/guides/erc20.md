@@ -1,6 +1,7 @@
 ---
 sidebar_position: 3
 ---
+
 # Deploy an ERC20 Contract
 
 Dpeploy the contract and wait for deployment transaction to be accepted on StarkNet
@@ -15,13 +16,16 @@ const erc20Response = await defaultProvider.deployContract({
 console.log("Waiting for Tx to be Accepted on Starknet - ERC20 Deployment...");
 await defaultProvider.waitForTransaction(erc20Response.transaction_hash);
 ```
+
 ## Get the erc20 contract address and create the contact object
+
 ```javascript
 const erc20Address = erc20Response.address;
 const erc20 = new Contract(compiledErc20.abi, erc20Address);
 ```
 
 ## Mint tokens to an account address
+
 ```javascript
 const { transaction_hash: mintTxHash } = await erc20.mint(
   accountContract.address,
@@ -32,6 +36,7 @@ await defaultProvider.waitForTransaction(mintTxHash);
 ```
 
 ## Check balance after mint
+
 ```javascript
 console.log(`Calling StarkNet for accountContract balance...`);
 const balanceBeforeTransfer = await erc20.balance_of(accountContract.address);
@@ -43,6 +48,7 @@ console.log(
 ```
 
 ## Transfer tokens
+
 ```javascript
 // Get the nonce of the account and prepare transfer tx
 console.log(`Calling StarkNet for accountContract nonce...`);
@@ -76,6 +82,7 @@ await defaultProvider.waitForTransaction(transferTxHash);
 ```
 
 ## Check balance after transfer
+
 ```javascript
 // Check balance after transfer - should be 990
 console.log(`Calling StarkNet for accountContract balance...`);

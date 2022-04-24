@@ -41,8 +41,7 @@ const config = {
         blog: {
           showReadingTime: true,
           // Please change this to your repo.
-          editUrl:
-            'https://github.com/0xs34n/starknet.js',
+          editUrl: 'https://github.com/0xs34n/starknet.js',
         },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
@@ -70,7 +69,7 @@ const config = {
           {
             position: 'left',
             label: 'Guides',
-            to: '/guides/intro'
+            to: '/guides/intro',
           },
           // {to: '/blog', label: 'Blog', position: 'left'},
           {

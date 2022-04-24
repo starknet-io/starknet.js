@@ -1,3 +1,24 @@
+## [3.10.1](https://github.com/seanjameshan/starknet.js/compare/v3.10.0...v3.10.1) (2022-04-20)
+
+### Bug Fixes
+
+- **account:** function documentation fix ([34a9779](https://github.com/seanjameshan/starknet.js/commit/34a977953c2bfea53f9cd1157809919b1dd2ed04))
+- **contractFactory:** wrong prop type ([598bcd0](https://github.com/seanjameshan/starknet.js/commit/598bcd0d589c00e2219522d4a342316598678d4e))
+- **contract:** recursion function name fix ([803b6dc](https://github.com/seanjameshan/starknet.js/commit/803b6dcf5cad5cdfd8258a53e176bcd96300cef3))
+- typings ([1fadf41](https://github.com/seanjameshan/starknet.js/commit/1fadf418b04d96ced8d994b35699f40be9a8c898))
+- **utils:** adding transaction utils to the utils export ([6429179](https://github.com/seanjameshan/starknet.js/commit/642917922a5d5278e8c575a2b4ffd60fff53cf42))
+
+# [3.10.0](https://github.com/seanjameshan/starknet.js/compare/v3.9.0...v3.10.0) (2022-04-20)
+
+### Bug Fixes
+
+- new snapshot for browser test ([3394f11](https://github.com/seanjameshan/starknet.js/commit/3394f1110c715826cbc7c3dff1bef1a5b73e80d8))
+- review ([49b04e2](https://github.com/seanjameshan/starknet.js/commit/49b04e231418ca7d26dc78843a905541985aa176))
+
+### Features
+
+- **account:** new hash formula ([ea4df2c](https://github.com/seanjameshan/starknet.js/commit/ea4df2c77e6559f9689eaca3c57edbbb9324073a))
+
 # [3.9.0](https://github.com/seanjameshan/starknet.js/compare/v3.8.0...v3.9.0) (2022-04-08)
 
 ### Bug Fixes
