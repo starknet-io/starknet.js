@@ -1,3 +1,9 @@
+## [3.10.2](https://github.com/seanjameshan/starknet.js/compare/v3.10.1...v3.10.2) (2022-04-27)
+
+### Bug Fixes
+
+- **tests:** fix getBlock blocks ([c0422b7](https://github.com/seanjameshan/starknet.js/commit/c0422b7d963639d34082731f6efbe3f0dd2c3c4d))
+
 ## [3.10.1](https://github.com/seanjameshan/starknet.js/compare/v3.10.0...v3.10.1) (2022-04-20)
 
 ### Bug Fixes
