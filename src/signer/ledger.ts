@@ -1,6 +1,6 @@
-// import Transport from '@ledgerhq/hw-transport';
-// import TransportWebHID from '@ledgerhq/hw-transport-webhid';
+import Transport from '@ledgerhq/hw-transport';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid';
+import TransportWebHID from '@ledgerhq/hw-transport-webhid';
 import StarkwareApp from '@zondax/ledger-starkware-app';
 
 import { Invocation, InvocationsSignerDetails, Signature } from '../types';
@@ -9,27 +9,22 @@ import { hashMulticall } from '../utils/hash';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { SignerInterface } from './interface';
 
-function hexZeroPad(hash: string, length: number): string {
-  let value = hash;
-  if (value.length > 2 * length + 2) {
-    throw new Error('value out of range');
-  }
-  while (value.length < 2 * length + 2) {
-    value = `0x0${value.substring(2)}`;
-  }
-  return value;
+function toHexString(byteArray: Uint8Array): string {
+  return Array.from(byteArray, function (byte) {
+    return `0${byte.toString(16)}`.slice(-2);
+  }).join('');
 }
 
-export class LedgerBlindSigner implements SignerInterface {
-  public derivationPath = "m/2645'/579218131'/1148870696'/0";
+export class LedgerSigner implements SignerInterface {
+  public derivationPath = "m/2645'/579218131'/0'/0'";
 
-  private transport: TransportNodeHid | undefined;
+  private transport: Transport | undefined;
 
   private async getStarwareApp(): Promise<StarkwareApp> {
     if (!this.transport) {
       try {
-        // this.transport = await TransportWebHID.create();
-        this.transport = await TransportNodeHid.open('');
+        if (process.env.NODE_ENV === 'test') this.transport = await TransportNodeHid.create();
+        else this.transport = await TransportWebHID.create();
       } catch {
         throw new Error('Device connection error');
       }
@@ -38,9 +33,10 @@ export class LedgerBlindSigner implements SignerInterface {
   }
 
   public async getPubKey(): Promise<string> {
-    const stark = await this.getStarwareApp();
-    const { publicKey } = await stark.getPubKey(this.derivationPath);
-    return `0x${publicKey.toString('hex', 1, 1 + 32)}`;
+    const app = await this.getStarwareApp();
+    const { publicKey } = await app.getPubKey(this.derivationPath);
+
+    return `0x${toHexString(publicKey).slice(2, 2 + 64)}`;
   }
 
   public async signTransaction(
@@ -55,8 +51,6 @@ export class LedgerBlindSigner implements SignerInterface {
       transactionsDetail.version.toString()
     );
 
-    console.log(`Ledger signTransaction hash = ${msgHash}`);
-
     return this.sign(msgHash);
   }
 
@@ -67,23 +61,12 @@ export class LedgerBlindSigner implements SignerInterface {
   }
 
   public async sign(msg: string): Promise<Signature> {
-    const stark = await this.getStarwareApp();
+    const app = await this.getStarwareApp();
 
     console.log(`Message = ${msg}`);
 
-    const message = hexZeroPad(msg, 32);
+    const response = await app.signFelt(this.derivationPath, msg);
 
-    console.log(`Message = ${message}`);
-
-    const response = await stark.signFelt(
-      this.derivationPath,
-      Buffer.from(message.slice(2), 'hex')
-    );
-    console.log(response.returnCode);
-    console.log(response.errorMessage);
-    console.log(response.hash);
-    console.log(`r = 0x${response.r.toString('hex')}`);
-    console.log(`s = 0x${response.s.toString('hex')}`);
-    return [addHexPrefix(response.r.toString('hex')), addHexPrefix(response.s.toString('hex'))];
+    return [addHexPrefix(toHexString(response.r)), addHexPrefix(toHexString(response.s))];
   }
 }
