@@ -36,7 +36,9 @@ test('build tx', async () => {
 
   const selector = hash.getSelectorFromName('transfer');
 
-  expect(selector).toMatchInlineSnapshot();
+  expect(selector).toMatchInlineSnapshot(
+    `"0x83afd3f4caedc6eebf44246fe54e38c95e3179a5ec9ea81740eca5b482d12e"`
+  );
 
   const calls = [{ contractAddress: '1', entrypoint: 'transfer', calldata: ['6', '7'] }];
   const calldata = fromCallsToExecuteCalldataWithNonce(calls, 0);
