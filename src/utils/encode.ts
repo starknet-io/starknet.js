@@ -4,7 +4,7 @@ export const IS_BROWSER = typeof window !== 'undefined';
 const STRING_ZERO = '0';
 
 export function arrayBufferToString(array: ArrayBuffer): string {
-  return String.fromCharCode.apply(null, array as unknown as number[]);
+  return new Uint8Array(array).reduce((data, byte) => data + String.fromCharCode(byte), '');
 }
 
 export function btoaUniversal(b: ArrayBuffer): string {
