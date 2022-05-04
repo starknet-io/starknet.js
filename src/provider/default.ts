@@ -10,6 +10,7 @@ import {
   CompiledContract,
   DeployContractPayload,
   Endpoints,
+  EstimateFeeResponse,
   GetBlockResponse,
   GetCodeResponse,
   GetContractAddressesResponse,
@@ -153,6 +154,17 @@ export class Provider implements ProviderInterface {
     try {
       const { data } = await axios.request<Endpoints[T]['RESPONSE']>({
         method,
+        transformResponse:
+          endpoint === 'estimate_fee'
+            ? (res): EstimateFeeResponse => {
+                return parse(res, (_, v) => {
+                  if (v && typeof v === 'bigint') {
+                    return toBN(v.toString());
+                  }
+                  return v;
+                });
+              }
+            : axios.defaults.transformResponse,
         url: urljoin(baseUrl, endpoint, queryString),
         data: stringify(request),
         headers,

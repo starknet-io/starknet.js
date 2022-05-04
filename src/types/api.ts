@@ -1,3 +1,5 @@
+import BN from 'bn.js';
+
 import { BlockIdentifier } from '../provider/utils';
 import { BigNumberish } from '../utils/number';
 import {
@@ -235,7 +237,7 @@ export type TransactionReceiptResponse = {
 };
 
 export type EstimateFeeResponse = {
-  amount: number;
+  amount: BN;
   unit: string;
 };
 
