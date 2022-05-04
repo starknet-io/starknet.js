@@ -22,7 +22,7 @@ export function validateAndParseAddress(address: BigNumberish): string {
   return result;
 }
 
-export const getChecksumAddress = (address: BigNumberish): string => {
+export function getChecksumAddress(address: BigNumberish): string {
   const chars = removeHexPrefix(validateAndParseAddress(address)).toLowerCase().split('');
   const hashed = arrayify(pedersen([0, address]), { hexPad: 'left' }); // as the hash will be 251 bits (63 chars) we need to pad it to 64 chars without changing the number value ("left")
 
@@ -36,8 +36,8 @@ export const getChecksumAddress = (address: BigNumberish): string => {
   }
 
   return addHexPrefix(chars.join(''));
-};
+}
 
-export const validateChecksumAddress = (address: string): boolean => {
+export function validateChecksumAddress(address: string): boolean {
   return getChecksumAddress(address) === address;
-};
+}
