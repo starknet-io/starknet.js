@@ -1,7 +1,7 @@
+import Stark from '@ledgerhq/hw-app-starknet';
 import Transport from '@ledgerhq/hw-transport';
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid';
 import TransportWebHID from '@ledgerhq/hw-transport-webhid';
-import StarkwareApp from '@zondax/ledger-starkware-app';
 
 import { Invocation, InvocationsSignerDetails, Signature } from '../types';
 import { addHexPrefix } from '../utils/encode';
@@ -20,7 +20,7 @@ export class LedgerSigner implements SignerInterface {
 
   private transport: Transport | undefined;
 
-  private async getStarwareApp(): Promise<StarkwareApp> {
+  private async getStarwareApp(): Promise<Stark> {
     if (!this.transport) {
       try {
         if (process.env.NODE_ENV === 'test') this.transport = await TransportNodeHid.create();
@@ -29,7 +29,7 @@ export class LedgerSigner implements SignerInterface {
         throw new Error('Device connection error');
       }
     }
-    return new StarkwareApp(this.transport);
+    return new Stark(this.transport);
   }
 
   public async getPubKey(): Promise<string> {
