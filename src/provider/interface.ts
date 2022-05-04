@@ -10,7 +10,7 @@ import type {
   GetTransactionResponse,
   GetTransactionStatusResponse,
   Invocation,
-  TransactionReceipt,
+  TransactionReceiptResponse,
 } from '../types';
 import type { BigNumberish } from '../utils/number';
 import { BlockIdentifier } from './utils';
@@ -109,13 +109,7 @@ export abstract class ProviderInterface {
    */
   public abstract getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse>;
 
-  public abstract getTransactionReceipt({
-    txHash,
-    txId,
-  }: {
-    txHash?: BigNumberish;
-    txId?: BigNumberish;
-  }): Promise<TransactionReceipt>;
+  public abstract getTransactionReceipt(txHash: BigNumberish): Promise<TransactionReceiptResponse>;
 
   /**
    * Deploys a given compiled contract (json) to starknet

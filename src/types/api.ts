@@ -43,6 +43,13 @@ export type Endpoints = {
     REQUEST: never;
     RESPONSE: GetTransactionTraceResponse;
   };
+  get_transaction_receipt: {
+    QUERY: {
+      transactionHash: string;
+    };
+    REQUEST: never;
+    RESPONSE: TransactionReceiptResponse;
+  };
   get_storage_at: {
     QUERY: {
       contractAddress: string;
@@ -217,7 +224,7 @@ export type AddTransactionResponse = {
   address?: string;
 };
 
-export type TransactionReceipt = {
+export type TransactionReceiptResponse = {
   status: Status;
   transaction_hash: string;
   transaction_index: number;
