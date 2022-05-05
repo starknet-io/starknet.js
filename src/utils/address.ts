@@ -22,6 +22,7 @@ export function validateAndParseAddress(address: BigNumberish): string {
   return result;
 }
 
+// from https://github.com/ethers-io/ethers.js/blob/fc1e006575d59792fa97b4efb9ea2f8cca1944cf/packages/address/src.ts/index.ts#L12
 export function getChecksumAddress(address: BigNumberish): string {
   const chars = removeHexPrefix(validateAndParseAddress(address)).toLowerCase().split('');
   const hashed = arrayify(pedersen([0, address]), { hexPad: 'left' }); // as the hash will be 251 bits (63 chars) we need to pad it to 64 chars without changing the number value ("left")
