@@ -1,3 +1,5 @@
+import { isBN } from 'bn.js';
+
 import typedDataExample from '../__mocks__/typedDataExample.json';
 import { Account, Contract, defaultProvider, ec, number, stark } from '../src';
 import { toBN } from '../src/utils/number';
@@ -50,7 +52,7 @@ describe('deploy and test Wallet', () => {
       entrypoint: 'transfer',
       calldata: [erc20.address, '10'],
     });
-    expect(typeof amount).toBe('number');
+    expect(isBN(amount)).toBe(true);
     expect(typeof unit).toBe('string');
   });
 
