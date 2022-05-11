@@ -10,6 +10,7 @@ import {
   CompiledContract,
   DeployContractPayload,
   Endpoints,
+  EstimateFeeResponse,
   GetBlockResponse,
   GetCodeResponse,
   GetContractAddressesResponse,
@@ -17,14 +18,14 @@ import {
   GetTransactionStatusResponse,
   GetTransactionTraceResponse,
   Invocation,
-  TransactionReceipt,
+  TransactionReceiptResponse,
 } from '../types';
 import { getSelectorFromName } from '../utils/hash';
 import { parse, stringify } from '../utils/json';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
 import { compressProgram, randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
-import { BlockIdentifier, getFormattedBlockIdentifier, txIdentifier } from './utils';
+import { BlockIdentifier, getFormattedBlockIdentifier } from './utils';
 
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha';
 
@@ -153,6 +154,17 @@ export class Provider implements ProviderInterface {
     try {
       const { data } = await axios.request<Endpoints[T]['RESPONSE']>({
         method,
+        transformResponse:
+          endpoint === 'estimate_fee'
+            ? (res): EstimateFeeResponse => {
+                return parse(res, (_, v) => {
+                  if (v && typeof v === 'bigint') {
+                    return toBN(v.toString());
+                  }
+                  return v;
+                });
+              }
+            : axios.defaults.transformResponse,
         url: urljoin(baseUrl, endpoint, queryString),
         data: stringify(request),
         headers,
@@ -272,22 +284,12 @@ export class Provider implements ProviderInterface {
    * [Reference] (https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L104-L111)
    *
    * @param txHash
-   * @param txId
    * @returns the transaction receipt object
    */
 
-  public async getTransactionReceipt({
-    txHash,
-    txId,
-  }: {
-    txHash?: BigNumberish;
-    txId?: BigNumberish;
-  }): Promise<TransactionReceipt> {
-    const { data } = await axios.get<TransactionReceipt>(
-      urljoin(this.feederGatewayUrl, 'get_transaction_receipt', `?${txIdentifier(txHash, txId)}`)
-    );
-
-    return data;
+  public async getTransactionReceipt(txHash: BigNumberish): Promise<TransactionReceiptResponse> {
+    const txHashHex = toHex(toBN(txHash));
+    return this.fetchEndpoint('get_transaction_receipt', { transactionHash: txHashHex });
   }
 
   /**

@@ -1,3 +1,5 @@
+import BN from 'bn.js';
+
 import { BlockIdentifier } from '../provider/utils';
 import { BigNumberish } from '../utils/number';
 import {
@@ -42,6 +44,13 @@ export type Endpoints = {
     };
     REQUEST: never;
     RESPONSE: GetTransactionTraceResponse;
+  };
+  get_transaction_receipt: {
+    QUERY: {
+      transactionHash: string;
+    };
+    REQUEST: never;
+    RESPONSE: TransactionReceiptResponse;
   };
   get_storage_at: {
     QUERY: {
@@ -217,7 +226,7 @@ export type AddTransactionResponse = {
   address?: string;
 };
 
-export type TransactionReceipt = {
+export type TransactionReceiptResponse = {
   status: Status;
   transaction_hash: string;
   transaction_index: number;
@@ -228,7 +237,7 @@ export type TransactionReceipt = {
 };
 
 export type EstimateFeeResponse = {
-  amount: number;
+  amount: BN;
   unit: string;
 };
 
