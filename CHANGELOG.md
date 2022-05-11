@@ -1,3 +1,17 @@
+# [3.11.0](https://github.com/seanjameshan/starknet.js/compare/v3.10.3...v3.11.0) (2022-05-11)
+
+### Bug Fixes
+
+- review ([9ee4987](https://github.com/seanjameshan/starknet.js/commit/9ee498788185a35a75f2b429b3f1ec55dc4ee2a3))
+- tests ([f535edb](https://github.com/seanjameshan/starknet.js/commit/f535edbef8da6050e54575792926488774e3ed0f))
+- transaction receipt ([806eb7d](https://github.com/seanjameshan/starknet.js/commit/806eb7d63a01e158231f7b63cc4fc1fb0c30717e))
+- use npm again ([3b9e176](https://github.com/seanjameshan/starknet.js/commit/3b9e176812f6401e167a207db2d9ff3686260e13))
+
+### Features
+
+- add checksum addresses ([2d32ed8](https://github.com/seanjameshan/starknet.js/commit/2d32ed828f908090642a42d9f6620f050a75b43a))
+- use BigNumber for estimate fee amount ([751c2ed](https://github.com/seanjameshan/starknet.js/commit/751c2edf89d019f365f5fba8123a9df0320ff543))
+
 ## [3.10.3](https://github.com/seanjameshan/starknet.js/compare/v3.10.2...v3.10.3) (2022-05-04)
 
 ### Bug Fixes
