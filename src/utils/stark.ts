@@ -50,7 +50,7 @@ export function compileCalldata(args: RawArgs): Calldata {
   });
 }
 
-export function estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: number = 0.15): BN {
+export function estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: number = 0.5): BN {
   // BN can only handle Integers, so we need to do all calulations with integers
   const overHeadPercent = Math.round((1 + overhead) * 100);
   return toBN(estimatedFee).mul(toBN(overHeadPercent)).div(toBN(100));

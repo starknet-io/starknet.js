@@ -60,7 +60,7 @@ export type Abi = Array<FunctionAbi | StructAbi>;
 
 export type EntryPointsByType = object;
 export type Program = Record<any, any>;
-export type BlockNumber = 'pending' | null | number;
+export type BlockNumber = 'pending' | 'latest' | null | number;
 
 export type CompiledContract = {
   abi: Abi;

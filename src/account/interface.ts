@@ -5,11 +5,11 @@ import {
   AddTransactionResponse,
   Call,
   DeployContractPayload,
-  EstimateFeeResponse,
   Invocation,
   InvocationsDetails,
   Signature,
 } from '../types';
+import { EstimateFee } from '../types/account';
 import { BigNumberish } from '../utils/number';
 import { TypedData } from '../utils/typedData/types';
 
@@ -44,7 +44,7 @@ export abstract class AccountInterface extends ProviderInterface {
    *
    * @returns response from addTransaction
    */
-  public abstract estimateFee(invocation: Invocation): Promise<EstimateFeeResponse>;
+  public abstract estimateFee(invocation: Invocation): Promise<EstimateFee>;
 
   /**
    * Invoke execute function in account contract
