@@ -43,8 +43,8 @@ type BlockIdentifierObject =
  * @returns block identifier object
  */
 export function getBlockIdentifier(blockIdentifier: BlockIdentifier): BlockIdentifierObject {
-  if (blockIdentifier === null) {
-    return { type: 'BLOCK_NUMBER', data: null };
+  if (blockIdentifier === null || blockIdentifier === 'latest') {
+    return { type: 'BLOCK_NUMBER', data: 'latest' }; // default to latest block
   }
   if (blockIdentifier === 'pending') {
     return { type: 'BLOCK_NUMBER', data: 'pending' };
