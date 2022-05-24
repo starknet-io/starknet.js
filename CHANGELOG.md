@@ -1,3 +1,9 @@
+## [3.12.1](https://github.com/0xs34n/starknet.js/compare/v3.12.0...v3.12.1) (2022-05-24)
+
+### Bug Fixes
+
+- update repo url ([c1312c0](https://github.com/0xs34n/starknet.js/commit/c1312c0e00e3387a49d1d7edc33e584687d607ea))
+
 # [3.12.0](https://github.com/seanjameshan/starknet.js/compare/v3.11.0...v3.12.0) (2022-05-24)
 
 ### Bug Fixes
