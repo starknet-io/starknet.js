@@ -1,3 +1,13 @@
+# [3.12.0](https://github.com/seanjameshan/starknet.js/compare/v3.11.0...v3.12.0) (2022-05-24)
+
+### Bug Fixes
+
+- always default to latest block ([dafc575](https://github.com/seanjameshan/starknet.js/commit/dafc57550b9b175b79ec2fd728504ee14a992620))
+
+### Features
+
+- add suggestedMaxFee ([8977772](https://github.com/seanjameshan/starknet.js/commit/8977772763ecd895006c00c9cbe1397429a19b6f))
+
 # [3.11.0](https://github.com/seanjameshan/starknet.js/compare/v3.10.3...v3.11.0) (2022-05-11)
 
 ### Bug Fixes
