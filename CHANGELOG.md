@@ -1,3 +1,9 @@
+## [3.12.3](https://github.com/0xs34n/starknet.js/compare/v3.12.2...v3.12.3) (2022-05-30)
+
+### Bug Fixes
+
+- remove superstruct ([6f13cf0](https://github.com/0xs34n/starknet.js/commit/6f13cf0ec740e715fcbdacf846cd9bcd653c1399))
+
 ## [3.12.2](https://github.com/0xs34n/starknet.js/compare/v3.12.1...v3.12.2) (2022-05-30)
 
 ### Bug Fixes
