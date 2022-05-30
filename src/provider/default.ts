@@ -1,4 +1,4 @@
-import axios, { AxiosRequestHeaders } from 'axios';
+import fetch from 'cross-fetch';
 import urljoin from 'url-join';
 
 import { StarknetChainId } from '../constants';
@@ -10,7 +10,6 @@ import {
   CompiledContract,
   DeployContractPayload,
   Endpoints,
-  EstimateFeeResponse,
   GetBlockResponse,
   GetCodeResponse,
   GetContractAddressesResponse,
@@ -125,7 +124,7 @@ export class Provider implements ProviderInterface {
     return `?${queryString}`;
   }
 
-  private getHeaders(method: 'POST' | 'GET'): AxiosRequestHeaders | undefined {
+  private getHeaders(method: 'POST' | 'GET'): Record<string, string> | undefined {
     if (method === 'POST') {
       return {
         'Content-Type': 'application/json',
@@ -150,33 +149,25 @@ export class Provider implements ProviderInterface {
     const method = this.getFetchMethod(endpoint);
     const queryString = this.getQueryString(query);
     const headers = this.getHeaders(method);
+    const url = urljoin(baseUrl, endpoint, queryString);
 
-    try {
-      const { data } = await axios.request<Endpoints[T]['RESPONSE']>({
-        method,
-        transformResponse:
-          endpoint === 'estimate_fee'
-            ? (res): EstimateFeeResponse => {
-                return parse(res, (_, v) => {
-                  if (v && typeof v === 'bigint') {
-                    return toBN(v.toString());
-                  }
-                  return v;
-                });
-              }
-            : axios.defaults.transformResponse,
-        url: urljoin(baseUrl, endpoint, queryString),
-        data: stringify(request),
-        headers,
+    return fetch(url, {
+      method,
+      body: stringify(request),
+      headers,
+    })
+      .then((res) => res.text())
+      .then((res) => {
+        if (endpoint === 'estimate_fee') {
+          return parse(res, (_, v) => {
+            if (v && typeof v === 'bigint') {
+              return toBN(v.toString());
+            }
+            return v;
+          });
+        }
+        return parse(res) as Endpoints[T]['RESPONSE'];
       });
-      return data;
-    } catch (error: any) {
-      const data = error?.response?.data;
-      if (data?.message) {
-        throw new Error(`${data.code}: ${data.message}`);
-      }
-      throw error;
-    }
   }
 
   /**
