@@ -1,3 +1,10 @@
+## [3.12.2](https://github.com/0xs34n/starknet.js/compare/v3.12.1...v3.12.2) (2022-05-30)
+
+### Bug Fixes
+
+- allow starknet.js in service workers ([7a500d1](https://github.com/0xs34n/starknet.js/commit/7a500d198cffed43f98a669edac2dbb215884a3b))
+- updated powered by starknet list ([aa36463](https://github.com/0xs34n/starknet.js/commit/aa36463e1adb281f79bf8462b2f0063801457782))
+
 ## [3.12.1](https://github.com/0xs34n/starknet.js/compare/v3.12.0...v3.12.1) (2022-05-24)
 
 ### Bug Fixes
