@@ -21,6 +21,7 @@ import {
   defaultProvider,
   ec,
   json,
+  number,
 } from "starknet";
 ```
 
