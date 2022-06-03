@@ -46,7 +46,7 @@ export type Endpoints = {
   get_storage_at: {
     QUERY: {
       contractAddress: string;
-      key: number;
+      key: BigNumberish;
       blockIdentifier: BlockIdentifier;
     };
     REQUEST: never;
