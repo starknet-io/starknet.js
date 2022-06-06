@@ -4,7 +4,6 @@
 export * from './contract';
 export * from './types';
 export * from './provider';
-export * from './rpcProvider';
 export * from './account';
 export * from './signer';
 

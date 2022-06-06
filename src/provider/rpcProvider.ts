@@ -1,7 +1,6 @@
 import axios from 'axios';
 
 import { StarknetChainId } from '../constants';
-import { BlockIdentifier } from '../provider/utils';
 import {
   AddTransactionResponse,
   Call,
@@ -35,19 +34,19 @@ import {
   toHex,
 } from '../utils/number';
 import { compressProgram, randomAddress } from '../utils/stark';
-// import { compressProgram, randomAddress } from '../utils/stark';
-import { RPCProviderInterface } from './interface';
+import { ProviderInterface } from './interface';
+import { BlockIdentifier } from './utils';
 
 function wait(delay: number) {
   return new Promise((res) => setTimeout(res, delay));
 }
 
-export class RPCProvider implements RPCProviderInterface {
+export class RPCProvider implements ProviderInterface {
   public nodeUrl: string;
 
   public chainId!: StarknetChainId;
 
-  constructor(optionsOrProvider: RPCProviderInterface | { nodeUrl: string }) {
+  constructor(optionsOrProvider: { nodeUrl: string }) {
     const { nodeUrl } = optionsOrProvider;
     this.nodeUrl = nodeUrl;
 
