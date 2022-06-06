@@ -1,4 +1,4 @@
-import axios from 'axios';
+import fetch from 'cross-fetch';
 
 import { StarknetChainId } from '../constants';
 import {
@@ -21,7 +21,6 @@ import {
   GetTransactionStatusResponse,
   Invocation,
   Methods,
-  RPCResponse,
 } from '../types';
 import { getSelectorFromName } from '../utils/hash';
 import { parse } from '../utils/json';
@@ -69,15 +68,20 @@ export class RPCProvider implements ProviderInterface {
     };
 
     try {
-      const {
-        data: response,
-        data: { result: data },
-      } = await axios.post<RPCResponse>(this.nodeUrl, requestData);
-      if (response.error) {
-        const { code, message } = response.error;
+      const rawResult = await fetch(this.nodeUrl, {
+        method: 'POST',
+        body: JSON.stringify(requestData),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      const { error, result } = await rawResult.json();
+      if (error) {
+        const { code, message } = error;
         throw new Error(`${code}: ${message}`);
+      } else {
+        return result as Methods[T]['RESPONSE'];
       }
-      return data;
     } catch (error: any) {
       const data = error?.response?.data;
       if (data?.message) {
