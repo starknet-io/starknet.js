@@ -132,7 +132,7 @@ describe('RPCProvider', () => {
       });
 
       expect(response).toHaveProperty('transaction_hash');
-      expect(response).toHaveProperty('contract_address');
+      expect(response).toHaveProperty('address');
     });
   });
 });

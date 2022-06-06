@@ -28,7 +28,7 @@ import { BlockIdentifier, getFormattedBlockIdentifier } from './utils';
 
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha';
 
-type ProviderOptions =
+export type ProviderOptions =
   | { network: NetworkName }
   | {
       baseUrl: string;

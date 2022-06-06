@@ -7,7 +7,6 @@ import {
   CallContractResponse,
   CompiledContract,
   DeployContractPayload,
-  DeployContractRPCResponse,
   EventFilterRPC,
   GetBlockNumberResponseRPC,
   GetBlockResponseRPC,
@@ -41,12 +40,14 @@ function wait(delay: number) {
   return new Promise((res) => setTimeout(res, delay));
 }
 
+export type RpcProviderOptions = { nodeUrl: string };
+
 export class RPCProvider implements ProviderInterface {
   public nodeUrl: string;
 
   public chainId!: StarknetChainId;
 
-  constructor(optionsOrProvider: { nodeUrl: string }) {
+  constructor(optionsOrProvider: RpcProviderOptions) {
     const { nodeUrl } = optionsOrProvider;
     this.nodeUrl = nodeUrl;
 
@@ -258,7 +259,7 @@ export class RPCProvider implements ProviderInterface {
    * @param address - (optional, defaults to a random address) the address where the contract should be deployed (alpha)
    * @returns a confirmation of sending a transaction on the starknet contract
    */
-  public async deployContract(payload: DeployContractPayload): Promise<DeployContractRPCResponse> {
+  public async deployContract(payload: DeployContractPayload): Promise<AddTransactionResponse> {
     const parsedContract =
       typeof payload.contract === 'string'
         ? (parse(payload.contract) as CompiledContract)
@@ -267,11 +268,18 @@ export class RPCProvider implements ProviderInterface {
       ...parsedContract,
       program: compressProgram(parsedContract.program),
     };
-    return this.fetchEndpoint('starknet_addDeployTransaction', [
-      payload.addressSalt ?? randomAddress(),
-      bigNumberishArrayToDecimalStringArray(payload.constructorCalldata ?? []),
-      contractDefinition,
-    ]);
+    const { contract_address, transaction_hash } = await this.fetchEndpoint(
+      'starknet_addDeployTransaction',
+      [
+        payload.addressSalt ?? randomAddress(),
+        bigNumberishArrayToDecimalStringArray(payload.constructorCalldata ?? []),
+        contractDefinition,
+      ]
+    );
+    return {
+      transaction_hash,
+      address: contract_address,
+    };
   }
 
   /**

@@ -4,7 +4,6 @@ import type {
   Call,
   CallContractResponse,
   DeployContractPayload,
-  DeployContractRPCResponse,
   GetBlockResponse,
   GetBlockResponseRPC,
   GetCodeResponse,
@@ -126,9 +125,7 @@ export abstract class ProviderInterface {
    * - address salt
    * @returns a confirmation of sending a transaction on the starknet contract
    */
-  public abstract deployContract(
-    payload: DeployContractPayload
-  ): Promise<AddTransactionResponse | DeployContractRPCResponse>;
+  public abstract deployContract(payload: DeployContractPayload): Promise<AddTransactionResponse>;
 
   /**
    * Invokes a function on starknet

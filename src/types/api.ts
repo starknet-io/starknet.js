@@ -310,8 +310,8 @@ export type GetTransactionResponse = {
 };
 
 export type AddTransactionResponse = {
-  code: TransactionStatus;
   transaction_hash: string;
+  code?: TransactionStatus;
   address?: string;
 };
 
