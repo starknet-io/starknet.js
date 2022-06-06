@@ -28,7 +28,14 @@ import { BlockIdentifier, getFormattedBlockIdentifier } from './utils';
 
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha';
 
-type ProviderOptions = { network: NetworkName } | { baseUrl: string };
+type ProviderOptions =
+  | { network: NetworkName }
+  | {
+      baseUrl: string;
+      feederGatewayUrl: string;
+      gatewayUrl: string;
+      chainId?: StarknetChainId;
+    };
 
 function wait(delay: number) {
   return new Promise((res) => setTimeout(res, delay));
@@ -52,24 +59,18 @@ export class Provider implements ProviderInterface {
 
   public chainId: StarknetChainId;
 
-  constructor(
-    optionsOrProvider: ProviderOptions | ProviderInterface = { network: 'goerli-alpha' }
-  ) {
-    if (optionsOrProvider instanceof ProviderInterface) {
+  constructor(optionsOrProvider: ProviderOptions = { network: 'goerli-alpha' }) {
+    if ('network' in optionsOrProvider) {
+      this.baseUrl = Provider.getNetworkFromName(optionsOrProvider.network);
+      this.chainId = Provider.getChainIdFromBaseUrl(this.baseUrl);
+      this.feederGatewayUrl = urljoin(this.baseUrl, 'feeder_gateway');
+      this.gatewayUrl = urljoin(this.baseUrl, 'gateway');
+    } else {
       this.baseUrl = optionsOrProvider.baseUrl;
       this.feederGatewayUrl = optionsOrProvider.feederGatewayUrl;
       this.gatewayUrl = optionsOrProvider.gatewayUrl;
       this.chainId =
         optionsOrProvider.chainId ?? Provider.getChainIdFromBaseUrl(optionsOrProvider.baseUrl);
-    } else {
-      const baseUrl =
-        'baseUrl' in optionsOrProvider
-          ? optionsOrProvider.baseUrl
-          : Provider.getNetworkFromName(optionsOrProvider.network);
-      this.baseUrl = baseUrl;
-      this.chainId = Provider.getChainIdFromBaseUrl(baseUrl);
-      this.feederGatewayUrl = urljoin(baseUrl, 'feeder_gateway');
-      this.gatewayUrl = urljoin(baseUrl, 'gateway');
     }
   }
 

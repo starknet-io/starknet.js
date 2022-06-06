@@ -1,5 +1,6 @@
 import BN from 'bn.js';
 
+import { StarknetChainId } from '../constants';
 import { BlockIdentifier } from '../provider/utils';
 import { BigNumberish } from '../utils/number';
 import {
@@ -89,6 +90,94 @@ export type Endpoints = {
     };
     REQUEST: CallContractTransaction;
     RESPONSE: EstimateFeeResponse;
+  };
+};
+
+export type Methods = {
+  starknet_getBlockByHash: {
+    QUERY: never;
+    REQUEST: any[];
+    RESPONSE: GetBlockResponseRPC;
+  };
+  starknet_getBlockByNumber: {
+    QUERY: never;
+    REQUEST: any[];
+    RESPONSE: GetBlockResponseRPC;
+  };
+  starknet_getStorageAt: {
+    QUERY: never;
+    REQUEST: any[];
+    RESPONSE: GetStorageAtResponseRPC;
+  };
+  starknet_getTransactionByHash: {
+    QUERY: never;
+    REQUEST: any[];
+    RESPONSE: GetTransactionResponseRPC;
+  };
+  starknet_getTransactionByBlockHashAndIndex: {
+    QUERY: never;
+    REQUEST: any[];
+    RESPONSE: GetTransactionResponseRPC;
+  };
+  starknet_getTransactionByBlockNumberAndIndex: {
+    QUERY: never;
+    REQUEST: any[];
+    RESPONSE: GetTransactionResponseRPC;
+  };
+  starknet_getTransactionReceipt: {
+    QUERY: never;
+    REQUEST: any[];
+    RESPONSE: GetTransactionReceiptResponseRPC;
+  };
+  starknet_getBlockTransactionCountByHash: {
+    QUERY: never;
+    REQUEST: any[];
+    RESPONSE: GetTransactionCountResponseRPC;
+  };
+  starknet_getBlockTransactionCountByNumber: {
+    QUERY: never;
+    REQUEST: any[];
+    RESPONSE: GetTransactionCountResponseRPC;
+  };
+  starknet_getCode: {
+    QUERY: never;
+    REQUEST: any[];
+    RESPONSE: GetCodeResponseRPC;
+  };
+  starknet_call: {
+    QUERY: never;
+    REQUEST: any[];
+    RESPONSE: string[];
+  };
+  starknet_blockNumber: {
+    QUERY: never;
+    REQUEST: any[];
+    RESPONSE: GetBlockNumberResponseRPC;
+  };
+  starknet_chainId: {
+    QUERY: never;
+    REQUEST: any[];
+    RESPONSE: StarknetChainId;
+  };
+  starknet_syncing: {
+    QUERY: never;
+    REQUEST: any[];
+    RESPONSE: GetSyncingStatsResponseRPC;
+  };
+  starknet_getEvents: {
+    QUERY: never;
+    REQUEST: any[];
+    RESPONSE: GetEventsResponseRPC;
+  };
+  starknet_addInvokeTransaction: {
+    QUERY: never;
+    REQUEST: any[];
+    RESPONSE: AddTransactionResponse;
+  };
+  starknet_addDeployTransaction: {
+    QUERY: never;
+    REQUEST: any[];
+    RESPONSE: DeployContractRPCResponse;
   };
 };
 
@@ -251,4 +340,112 @@ export type Overrides = {
   maxFee?: BigNumberish;
   nonce?: BigNumberish;
   signature?: Signature;
+};
+
+// RPC Responses
+export type RPCResponse = {
+  id: number;
+  result: any;
+  jsonrpc: string;
+  error?: {
+    code: string;
+    message: string;
+  };
+};
+
+export type GetBlockResponseRPC = {
+  block_hash: string;
+  parent_hash: string;
+  block_number: number;
+  status: Status;
+  sequencer: string;
+  new_root: string;
+  old_root: string;
+  accepted_time: number;
+  gas_price: string;
+  transactions: string[];
+};
+
+export type GetCodeResponseRPC = {
+  bytecode: string[];
+  abi: string;
+};
+
+export type GetStorageAtResponseRPC = string;
+
+export type GetTransactionReceiptResponseRPC = {
+  txn_hash: string;
+  actual_fee: string;
+  status: Status;
+  status_data: string;
+  messages_sent: MessageToL1;
+  l1_origin_message: MessageToL2;
+  events: StarknetEvent[];
+};
+
+export type GetTransactionResponseRPC = {
+  txn_hash: string;
+  max_fee: string;
+  contract_address: string;
+  entry_point_selector: string;
+  calldata: string[];
+};
+
+export type GetTransactionCountResponseRPC = number;
+
+export type GetBlockNumberResponseRPC = number;
+
+export type GetSyncingStatsResponseRPC =
+  | {
+      starting_block_hash: string;
+      starting_block_num: string;
+      current_block_hash: string;
+      current_block_num: string;
+      highest_block_hash: string;
+      highest_block_num: string;
+    }
+  | boolean;
+
+export type EventFilterRPC = {
+  fromBlock: string;
+  toBlock: string;
+  address: string;
+  keys: string[];
+  page_size: number;
+  page_number: number;
+};
+
+export type GetEventsResponseRPC = {
+  events: StarknetEmittedEvent[];
+  page_number: number;
+  is_last_page: number;
+};
+
+export type DeployContractRPCResponse = {
+  transaction_hash: string;
+  contract_address: string;
+};
+// Other
+
+export type StarknetEvent = {
+  from_address: string;
+  keys: string[];
+  data: string[];
+};
+
+export type StarknetEmittedEvent = {
+  event: StarknetEvent;
+  block_hash: string;
+  block_number: number;
+  transaction_hash: string;
+};
+
+export type MessageToL1 = {
+  to_address: string;
+  payload: string[];
+};
+
+export type MessageToL2 = {
+  from_address: string;
+  payload: string[];
 };
