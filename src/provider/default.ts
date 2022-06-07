@@ -250,7 +250,7 @@ export class Provider implements ProviderInterface {
    */
   public async getStorageAt(
     contractAddress: string,
-    key: number,
+    key: BigNumberish,
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<object> {
     return this.fetchEndpoint('get_storage_at', { blockIdentifier, contractAddress, key });
