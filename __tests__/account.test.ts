@@ -77,15 +77,11 @@ describe('deploy and test Wallet', () => {
   });
 
   test('execute by wallet owner', async () => {
-    const { code, transaction_hash } = await account.execute(
-      {
-        contractAddress: erc20Address,
-        entrypoint: 'transfer',
-        calldata: [erc20.address, '10'],
-      },
-      undefined,
-      { maxFee: '0' }
-    );
+    const { code, transaction_hash } = await account.execute({
+      contractAddress: erc20Address,
+      entrypoint: 'transfer',
+      calldata: [erc20.address, '10'],
+    });
 
     expect(code).toBe('TRANSACTION_RECEIVED');
     await defaultProvider.waitForTransaction(transaction_hash);
@@ -110,7 +106,7 @@ describe('deploy and test Wallet', () => {
         calldata: [account.address, '10'],
       },
       undefined,
-      { nonce, maxFee: '0' }
+      { nonce }
     );
 
     expect(code).toBe('TRANSACTION_RECEIVED');
@@ -118,22 +114,18 @@ describe('deploy and test Wallet', () => {
   });
 
   test('execute multiple transactions', async () => {
-    const { code, transaction_hash } = await account.execute(
-      [
-        {
-          contractAddress: dapp.address,
-          entrypoint: 'set_number',
-          calldata: ['47'],
-        },
-        {
-          contractAddress: dapp.address,
-          entrypoint: 'increase_number',
-          calldata: ['10'],
-        },
-      ],
-      undefined,
-      { maxFee: '0' }
-    );
+    const { code, transaction_hash } = await account.execute([
+      {
+        contractAddress: dapp.address,
+        entrypoint: 'set_number',
+        calldata: ['47'],
+      },
+      {
+        contractAddress: dapp.address,
+        entrypoint: 'increase_number',
+        calldata: ['10'],
+      },
+    ]);
 
     expect(code).toBe('TRANSACTION_RECEIVED');
     await defaultProvider.waitForTransaction(transaction_hash);

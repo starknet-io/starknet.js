@@ -263,9 +263,7 @@ describe('class Contract {}', () => {
     });
 
     test('invoke contract by wallet owner', async () => {
-      const { transaction_hash, code } = await erc20.transfer(erc20Address, 10, {
-        maxFee: 0,
-      });
+      const { transaction_hash, code } = await erc20.transfer(erc20Address, 10);
       expect(code).toBe('TRANSACTION_RECEIVED');
       await defaultProvider.waitForTransaction(transaction_hash);
       const { res } = await erc20.balance_of(account.address);
