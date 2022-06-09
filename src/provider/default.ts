@@ -1,13 +1,14 @@
 import fetch from 'cross-fetch';
 import urljoin from 'url-join';
 
-import { StarknetChainId } from '../constants';
+import { ONE, StarknetChainId, ZERO } from '../constants';
 import {
   Abi,
   AddTransactionResponse,
   Call,
   CallContractResponse,
   CompiledContract,
+  DeclareContractPayload,
   DeployContractPayload,
   Endpoints,
   GetBlockResponse,
@@ -307,6 +308,34 @@ export class Provider implements ProviderInterface {
   public async getTransactionTrace(txHash: BigNumberish): Promise<GetTransactionTraceResponse> {
     const txHashHex = toHex(toBN(txHash));
     return this.fetchEndpoint('get_transaction_trace', { transactionHash: txHashHex });
+  }
+
+  /**
+   * Declare a given compiled contract (json) on starknet
+   *
+   * @param contract - a json object containing the compiled contract
+   * @returns a confirmation of sending a transaction on the starknet contract
+   */
+  public declareContract(
+    payload: DeclareContractPayload,
+    _abi?: Abi
+  ): Promise<AddTransactionResponse> {
+    const parsedContract =
+      typeof payload.contract === 'string'
+        ? (parse(payload.contract) as CompiledContract)
+        : payload.contract;
+    const contractDefinition = {
+      ...parsedContract,
+      program: compressProgram(parsedContract.program),
+    };
+
+    return this.fetchEndpoint('add_transaction', undefined, {
+      type: 'DECLARE',
+      contract_class: contractDefinition,
+      nonce: toHex(ZERO),
+      signature: [],
+      sender_address: toHex(ONE),
+    });
   }
 
   /**
