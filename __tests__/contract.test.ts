@@ -8,7 +8,7 @@ import {
   compiledErc20,
   compiledMulticall,
   compiledTypeTransformation,
-  testAccount,
+  getTestAccount,
 } from './fixtures';
 
 describe('class Contract {}', () => {
@@ -194,7 +194,7 @@ describe('class Contract {}', () => {
   });
 
   describe('Contract interaction with Account', () => {
-    const account = testAccount;
+    const account = getTestAccount();
     let erc20: Contract;
     let erc20Address: string;
 

@@ -15,15 +15,14 @@ export const compiledTestDapp = readContract('TestDapp');
 
 const DEFAULT_TEST_ACCOUNT_ADDRESS =
   '0x6c0a3ca4f79e978f3b7005898aaa49bef4a24aeaa5f10c6a97887516400197e';
-const testAccountAddress = process.env.TEST_ACCOUNT_ADDRESS || DEFAULT_TEST_ACCOUNT_ADDRESS;
-const testAccountPrivateKey = process.env.TEST_ACCOUNT_PRIVATE_KEY;
 
-if (!testAccountPrivateKey) {
-  throw new Error('TEST_ACCOUNT_PRIVATE_KEY is not set');
-}
+export const getTestAccount = () => {
+  const testAccountAddress = process.env.TEST_ACCOUNT_ADDRESS || DEFAULT_TEST_ACCOUNT_ADDRESS;
+  const testAccountPrivateKey = process.env.TEST_ACCOUNT_PRIVATE_KEY;
 
-export const testAccount = new Account(
-  defaultProvider,
-  testAccountAddress,
-  ec.getKeyPair(testAccountPrivateKey)
-);
+  if (!testAccountPrivateKey) {
+    throw new Error('TEST_ACCOUNT_PRIVATE_KEY is not set');
+  }
+
+  return new Account(defaultProvider, testAccountAddress, ec.getKeyPair(testAccountPrivateKey));
+};
