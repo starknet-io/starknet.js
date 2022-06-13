@@ -1,14 +1,14 @@
 import { isBN } from 'bn.js';
 
-import { Account, Contract, ContractFactory, Provider, defaultProvider, ec, stark } from '../src';
+import { Account, Contract, ContractFactory, Provider, defaultProvider, stark } from '../src';
 import { getSelectorFromName } from '../src/utils/hash';
 import { BigNumberish, toBN } from '../src/utils/number';
 import { compileCalldata } from '../src/utils/stark';
 import {
-  compiledArgentAccount,
   compiledErc20,
   compiledMulticall,
   compiledTypeTransformation,
+  testAccount,
 } from './fixtures';
 
 describe('class Contract {}', () => {
@@ -58,20 +58,6 @@ describe('class Contract {}', () => {
       const result = await erc20.balance_of(wallet);
       const [res] = result;
       expect(res).toStrictEqual(toBN(0));
-      expect(res).toStrictEqual(result.res);
-    });
-
-    test('add 10 test ERC20 to account', async () => {
-      const response = await erc20.mint(wallet, '10');
-      expect(response.code).toBe('TRANSACTION_RECEIVED');
-
-      await defaultProvider.waitForTransaction(response.transaction_hash);
-    });
-
-    test('read balance after mint of that account', async () => {
-      const result = await erc20.balance_of(wallet);
-      const [res] = result;
-      expect(res).toStrictEqual(toBN(10));
       expect(res).toStrictEqual(result.res);
     });
 
@@ -208,22 +194,11 @@ describe('class Contract {}', () => {
   });
 
   describe('Contract interaction with Account', () => {
-    let account: Account;
+    const account = testAccount;
     let erc20: Contract;
     let erc20Address: string;
 
     beforeAll(async () => {
-      const starkKeyPair = ec.genKeyPair();
-      const starkKeyPub = ec.getStarkKey(starkKeyPair);
-      const { address } = await defaultProvider.deployContract({
-        contract: compiledArgentAccount,
-        addressSalt: starkKeyPub,
-      });
-      expect(address).toBeDefined();
-      account = new Account(defaultProvider, address, starkKeyPair);
-      const accountContract = new Contract(compiledArgentAccount.abi, address);
-      await accountContract.initialize(starkKeyPub, '0');
-
       const erc20Response = await defaultProvider.deployContract({
         contract: compiledErc20,
       });
@@ -231,16 +206,12 @@ describe('class Contract {}', () => {
       erc20 = new Contract(compiledErc20.abi, erc20Address, defaultProvider);
       expect(erc20Response.code).toBe('TRANSACTION_RECEIVED');
       await defaultProvider.waitForTransaction(erc20Response.transaction_hash);
-
-      const mintResponse = await erc20.mint(account.address, '1000');
-
-      await defaultProvider.waitForTransaction(mintResponse.transaction_hash);
     });
 
     test('read balance of wallet', async () => {
       const result = await erc20.balance_of(account.address);
       const [res] = result;
-      expect(res).toStrictEqual(toBN(1000));
+      expect(res).toStrictEqual(toBN(0));
       expect(res).toStrictEqual(result.res);
     });
 
@@ -254,20 +225,6 @@ describe('class Contract {}', () => {
       const res = await erc20.estimateFee.mint(wallet, '10');
       expect(res).toHaveProperty('amount');
       expect(res).toHaveProperty('unit');
-    });
-
-    test('read balance of wallet', async () => {
-      const { res } = await erc20.balance_of(account.address);
-
-      expect(res).toStrictEqual(toBN(1000));
-    });
-
-    test('invoke contract by wallet owner', async () => {
-      const { transaction_hash, code } = await erc20.transfer(erc20Address, 10);
-      expect(code).toBe('TRANSACTION_RECEIVED');
-      await defaultProvider.waitForTransaction(transaction_hash);
-      const { res } = await erc20.balance_of(account.address);
-      expect(res).toStrictEqual(toBN(990));
     });
   });
 });
