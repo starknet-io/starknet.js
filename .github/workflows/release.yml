@@ -15,7 +15,7 @@ jobs:
           node-version: lts/*
       - run: npm ci
       - run: npm run build --if-present
-      - run: npm test
+      - run: TEST_ACCOUNT_PRIVATE_KEY=${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }} npm test
       - uses: actions/upload-artifact@v2
         with:
           name: build
