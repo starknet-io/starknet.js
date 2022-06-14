@@ -5,7 +5,7 @@ describe('RPCProvider', () => {
   let provider: RPCProvider;
 
   beforeAll(async () => {
-    provider = new RPCProvider({ nodeUrl: process.env.rpcUrl });
+    provider = new RPCProvider({ nodeUrl: process.env.TEST_RPC_URL });
   });
 
   describe('RPC methods', () => {
