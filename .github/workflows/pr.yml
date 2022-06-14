@@ -20,4 +20,6 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - run: npm ci
       - run: npm run build --if-present
-      - run: TEST_ACCOUNT_PRIVATE_KEY=${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }} npm test
+      - run: TEST_ACCOUNT_PRIVATE_KEY=$PRIVATE_KEY npm test
+        env:
+          PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
