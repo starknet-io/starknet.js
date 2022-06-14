@@ -7,6 +7,9 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+    env:
+      TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
+      TEST_RPC_URL: ${{ secrets.TEST_RPC_URL }}
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js 14
@@ -16,6 +19,7 @@ jobs:
       - run: npm ci
       - run: npm run build --if-present
       - run: npm test
+
       - uses: actions/upload-artifact@v2
         with:
           name: build
