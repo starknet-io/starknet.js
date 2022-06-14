@@ -311,7 +311,7 @@ export class RPCProvider implements ProviderInterface {
         // const message = res.tx_failure_reason
         //   ? `${res.tx_status}: ${res.tx_failure_reason.code}\n${res.tx_failure_reason.error_message}`
         //   : res.tx_status;
-        const error = new Error('Comething went wrong');
+        const error = new Error('Something went wrong');
         // error.response = res;
         throw error;
       }
