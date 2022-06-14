@@ -6,9 +6,6 @@ import { CompiledContract } from '../src/types';
 const readContract = (name: string): CompiledContract =>
   json.parse(fs.readFileSync(`./__mocks__/${name}.json`).toString('ascii'));
 
-const readContractJSON = (name: string): CompiledContract =>
-  JSON.parse(fs.readFileSync(`./__mocks__/${name}.json`).toString('ascii'));
-
 export const compiledOpenZeppelinAccount = readContract('Account');
 export const compiledErc20 = readContract('ERC20');
 export const compiledTypeTransformation = readContract('contract');

@@ -1,11 +1,17 @@
 import { RPCProvider } from '../src';
 import { compiledOpenZeppelinAccount } from './fixtures';
 
+const { TEST_RPC_URL } = process.env;
+
+if (!TEST_RPC_URL) {
+  throw new Error('TEST_RPC_URL is not set');
+}
+
 describe('RPCProvider', () => {
   let provider: RPCProvider;
 
   beforeAll(async () => {
-    provider = new RPCProvider({ nodeUrl: process.env.TEST_RPC_URL });
+    provider = new RPCProvider({ nodeUrl: TEST_RPC_URL });
   });
 
   describe('RPC methods', () => {
