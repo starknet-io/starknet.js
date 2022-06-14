@@ -12,6 +12,8 @@ jobs:
       matrix:
         node-version:
           - 14.x
+    env:
+      TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
@@ -21,5 +23,3 @@ jobs:
       - run: npm ci
       - run: npm run build --if-present
       - run: npm test
-        env:
-          TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
