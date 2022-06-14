@@ -31,7 +31,9 @@ type NetworkName = 'mainnet-alpha' | 'goerli-alpha';
 type ProviderOptions = { network: NetworkName } | { baseUrl: string };
 
 function wait(delay: number) {
-  return new Promise((res) => setTimeout(res, delay));
+  return new Promise((res) => {
+    setTimeout(res, delay);
+  });
 }
 
 function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
