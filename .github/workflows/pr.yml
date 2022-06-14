@@ -14,6 +14,7 @@ jobs:
           - 14.x
     env:
       TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
+      TEST_RPC_URL: ${{ secrets.TEST_RPC_URL }}
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
