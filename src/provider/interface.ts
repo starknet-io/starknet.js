@@ -86,7 +86,7 @@ export abstract class ProviderInterface {
    */
   public abstract getStorageAt(
     contractAddress: string,
-    key: number,
+    key: BigNumberish,
     blockIdentifier?: BlockIdentifier
   ): Promise<object | GetStorageAtResponseRPC>;
 

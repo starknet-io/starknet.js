@@ -1,4 +1,5 @@
 import { defaultProvider, stark } from '../src';
+import { toBN } from '../src/utils/number';
 import { compiledArgentAccount } from './fixtures';
 
 const { compileCalldata } = stark;
@@ -42,11 +43,29 @@ describe('defaultProvider', () => {
         )
       ).resolves.not.toThrow();
     });
-    test('getStorageAt()', () => {
+    test('getStorageAt() with "key" type of number', () => {
       return expect(
         defaultProvider.getStorageAt(
           '0x01d1f307c073bb786a66e6e042ec2a9bdc385a3373bb3738d95b966d5ce56166',
           0,
+          36663
+        )
+      ).resolves.not.toThrow();
+    });
+    test('getStorageAt() with "key" type of string', () => {
+      return expect(
+        defaultProvider.getStorageAt(
+          '0x01d1f307c073bb786a66e6e042ec2a9bdc385a3373bb3738d95b966d5ce56166',
+          '0',
+          36663
+        )
+      ).resolves.not.toThrow();
+    });
+    test('getStorageAt() with "key" type of BN', () => {
+      return expect(
+        defaultProvider.getStorageAt(
+          '0x01d1f307c073bb786a66e6e042ec2a9bdc385a3373bb3738d95b966d5ce56166',
+          toBN('0x0'),
           36663
         )
       ).resolves.not.toThrow();
