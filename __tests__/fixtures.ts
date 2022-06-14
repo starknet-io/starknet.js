@@ -26,3 +26,8 @@ export const getTestAccount = () => {
 
   return new Account(defaultProvider, testAccountAddress, ec.getKeyPair(testAccountPrivateKey));
 };
+
+export const getTestProvider = () => {
+  // Will support both local and remote providers in the future
+  return defaultProvider;
+};

@@ -1,17 +1,19 @@
 import { isBN } from 'bn.js';
 
 import typedDataExample from '../__mocks__/typedDataExample.json';
-import { Account, Contract, Provider, defaultProvider, ec, number, stark } from '../src';
+import { Account, Contract, Provider, ec, number, stark } from '../src';
 import { toBN } from '../src/utils/number';
 import {
   compiledErc20,
   compiledOpenZeppelinAccount,
   compiledTestDapp,
   getTestAccount,
+  getTestProvider,
 } from './fixtures';
 
 describe('deploy and test Wallet', () => {
   const account: Account = getTestAccount();
+  const provider = getTestProvider();
   let erc20: Contract;
   let erc20Address: string;
   let dapp: Contract;
@@ -19,14 +21,14 @@ describe('deploy and test Wallet', () => {
   beforeAll(async () => {
     expect(account).toBeInstanceOf(Account);
 
-    const erc20Response = await defaultProvider.deployContract({
+    const erc20Response = await provider.deployContract({
       contract: compiledErc20,
     });
     erc20Address = erc20Response.address;
     erc20 = new Contract(compiledErc20.abi, erc20Address);
     expect(erc20Response.code).toBe('TRANSACTION_RECEIVED');
 
-    await defaultProvider.waitForTransaction(erc20Response.transaction_hash);
+    await provider.waitForTransaction(erc20Response.transaction_hash);
 
     const mintResponse = await account.execute({
       contractAddress: erc20Address,
@@ -36,15 +38,15 @@ describe('deploy and test Wallet', () => {
 
     expect(mintResponse.code).toBe('TRANSACTION_RECEIVED');
 
-    await defaultProvider.waitForTransaction(mintResponse.transaction_hash);
+    await provider.waitForTransaction(mintResponse.transaction_hash);
 
-    const dappResponse = await defaultProvider.deployContract({
+    const dappResponse = await provider.deployContract({
       contract: compiledTestDapp,
     });
     dapp = new Contract(compiledTestDapp.abi, dappResponse.address);
     expect(dappResponse.code).toBe('TRANSACTION_RECEIVED');
 
-    await defaultProvider.waitForTransaction(dappResponse.transaction_hash);
+    await provider.waitForTransaction(dappResponse.transaction_hash);
   });
 
   test('estimate fee', async () => {
@@ -71,7 +73,7 @@ describe('deploy and test Wallet', () => {
     });
 
     expect(code).toBe('TRANSACTION_RECEIVED');
-    await defaultProvider.waitForTransaction(transaction_hash);
+    await provider.waitForTransaction(transaction_hash);
   });
 
   test('read balance of wallet after transfer', async () => {
@@ -97,7 +99,7 @@ describe('deploy and test Wallet', () => {
     );
 
     expect(code).toBe('TRANSACTION_RECEIVED');
-    await defaultProvider.waitForTransaction(transaction_hash);
+    await provider.waitForTransaction(transaction_hash);
   });
 
   test('execute multiple transactions', async () => {
@@ -115,7 +117,7 @@ describe('deploy and test Wallet', () => {
     ]);
 
     expect(code).toBe('TRANSACTION_RECEIVED');
-    await defaultProvider.waitForTransaction(transaction_hash);
+    await provider.waitForTransaction(transaction_hash);
 
     const response = await dapp.get_number(account.address);
     expect(toBN(response.number as string).toString()).toStrictEqual('57');
@@ -134,14 +136,14 @@ describe('deploy and test Wallet', () => {
       const starkKeyPair = ec.genKeyPair();
       const starkKeyPub = ec.getStarkKey(starkKeyPair);
 
-      const accountResponse = await defaultProvider.deployContract({
+      const accountResponse = await provider.deployContract({
         contract: compiledOpenZeppelinAccount,
         constructorCalldata: [starkKeyPub],
       });
 
-      await defaultProvider.waitForTransaction(accountResponse.transaction_hash);
+      await provider.waitForTransaction(accountResponse.transaction_hash);
 
-      newAccount = new Account(defaultProvider, accountResponse.address, starkKeyPair);
+      newAccount = new Account(provider, accountResponse.address, starkKeyPair);
     });
 
     test('read nonce', async () => {
@@ -167,7 +169,7 @@ describe('deploy and test Wallet', () => {
 
       expect(mintResponse.code).toBe('TRANSACTION_RECEIVED');
 
-      await defaultProvider.waitForTransaction(mintResponse.transaction_hash);
+      await provider.waitForTransaction(mintResponse.transaction_hash);
     });
 
     test('change from provider to account', async () => {

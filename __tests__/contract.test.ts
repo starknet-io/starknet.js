@@ -1,6 +1,6 @@
 import { isBN } from 'bn.js';
 
-import { Account, Contract, ContractFactory, Provider, defaultProvider, stark } from '../src';
+import { Account, Contract, ContractFactory, Provider, stark } from '../src';
 import { getSelectorFromName } from '../src/utils/hash';
 import { BigNumberish, toBN } from '../src/utils/number';
 import { compileCalldata } from '../src/utils/stark';
@@ -9,29 +9,31 @@ import {
   compiledMulticall,
   compiledTypeTransformation,
   getTestAccount,
+  getTestProvider,
 } from './fixtures';
 
 describe('class Contract {}', () => {
   const wallet = stark.randomAddress();
+  const provider = getTestProvider();
 
   describe('Basic Interaction', () => {
     let erc20: Contract;
     let contract: Contract;
 
     beforeAll(async () => {
-      const { code, transaction_hash, address } = await defaultProvider.deployContract({
+      const { code, transaction_hash, address } = await provider.deployContract({
         contract: compiledErc20,
       });
-      erc20 = new Contract(compiledErc20.abi, address, defaultProvider);
+      erc20 = new Contract(compiledErc20.abi, address, provider);
       expect(code).toBe('TRANSACTION_RECEIVED');
-      await defaultProvider.waitForTransaction(transaction_hash);
+      await provider.waitForTransaction(transaction_hash);
       // Deploy Multicall
 
       const {
         code: m_code,
         transaction_hash: m_transaction_hash,
         address: multicallAddress,
-      } = await defaultProvider.deployContract({
+      } = await provider.deployContract({
         contract: compiledMulticall,
       });
 
@@ -39,7 +41,7 @@ describe('class Contract {}', () => {
 
       expect(m_code).toBe('TRANSACTION_RECEIVED');
 
-      await defaultProvider.waitForTransaction(m_transaction_hash);
+      await provider.waitForTransaction(m_transaction_hash);
     });
 
     test('populate transaction for initial balance of that account', async () => {
@@ -89,12 +91,12 @@ describe('class Contract {}', () => {
     let contract: Contract;
 
     beforeAll(async () => {
-      const { code, transaction_hash, address } = await defaultProvider.deployContract({
+      const { code, transaction_hash, address } = await provider.deployContract({
         contract: compiledTypeTransformation,
       });
-      contract = new Contract(compiledTypeTransformation.abi, address, defaultProvider);
+      contract = new Contract(compiledTypeTransformation.abi, address, provider);
       expect(code).toBe('TRANSACTION_RECEIVED');
-      await defaultProvider.waitForTransaction(transaction_hash);
+      await provider.waitForTransaction(transaction_hash);
     });
 
     describe('Request Type Transformation', () => {
@@ -199,13 +201,13 @@ describe('class Contract {}', () => {
     let erc20Address: string;
 
     beforeAll(async () => {
-      const erc20Response = await defaultProvider.deployContract({
+      const erc20Response = await provider.deployContract({
         contract: compiledErc20,
       });
       erc20Address = erc20Response.address;
-      erc20 = new Contract(compiledErc20.abi, erc20Address, defaultProvider);
+      erc20 = new Contract(compiledErc20.abi, erc20Address, provider);
       expect(erc20Response.code).toBe('TRANSACTION_RECEIVED');
-      await defaultProvider.waitForTransaction(erc20Response.transaction_hash);
+      await provider.waitForTransaction(erc20Response.transaction_hash);
     });
 
     test('read balance of wallet', async () => {
@@ -232,11 +234,11 @@ describe('class Contract {}', () => {
 describe('class ContractFactory {}', () => {
   let erc20Address: string;
   beforeAll(async () => {
-    const { code, transaction_hash, address } = await defaultProvider.deployContract({
+    const { code, transaction_hash, address } = await provider.deployContract({
       contract: compiledErc20,
     });
     expect(code).toBe('TRANSACTION_RECEIVED');
-    await defaultProvider.waitForTransaction(transaction_hash);
+    await provider.waitForTransaction(transaction_hash);
     erc20Address = address;
   });
   test('deployment of new contract', async () => {
