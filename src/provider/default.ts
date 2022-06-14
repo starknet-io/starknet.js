@@ -316,10 +316,7 @@ export class Provider implements ProviderInterface {
    * @param contract - a json object containing the compiled contract
    * @returns a confirmation of sending a transaction on the starknet contract
    */
-  public declareContract(
-    payload: DeclareContractPayload,
-    _abi?: Abi
-  ): Promise<AddTransactionResponse> {
+  public declareContract(payload: DeclareContractPayload): Promise<AddTransactionResponse> {
     const parsedContract =
       typeof payload.contract === 'string'
         ? (parse(payload.contract) as CompiledContract)

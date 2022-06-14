@@ -198,7 +198,7 @@ Gets the transaction trace from a tx hash.
 
 <hr/>
 
-provider.**declareContract**(payload [ , abi ]) => _Promise < AddTransactionResponse >_
+provider.**declareContract**(payload) => _Promise < AddTransactionResponse >_
 
 Declares a contract on Starknet
 
