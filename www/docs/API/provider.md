@@ -131,11 +131,11 @@ Gets the status of a transaction.
 
 <hr/>
 
-provider.**getTransactionReceipt**(txHash, txId) => _Promise < TransactionReceipt >_
+provider.**getTransactionReceipt**(txHash) => _Promise < TransactionReceiptResponse >_
 
 Gets the status of a transaction.
 
-###### _TransactionReceipt_
+###### _TransactionReceiptResponse_
 
 ```
 {
