@@ -13,7 +13,7 @@ jobs:
         node-version:
           - 14.x
     env:
-      HELLO: ${{ secrets.HELLO }}
+      HELLO: ${{ secrets.NPM_TOKEN }}
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js ${{ matrix.node-version }}
