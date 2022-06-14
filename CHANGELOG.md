@@ -1,3 +1,9 @@
+## [3.13.1](https://github.com/0xs34n/starknet.js/compare/v3.13.0...v3.13.1) (2022-06-14)
+
+### Bug Fixes
+
+- account estimate fee interface ([51e8cf6](https://github.com/0xs34n/starknet.js/commit/51e8cf6858acd5aed003f8f1c4d755088684f134))
+
 # [3.13.0](https://github.com/0xs34n/starknet.js/compare/v3.12.3...v3.13.0) (2022-06-14)
 
 ### Bug Fixes
