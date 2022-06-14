@@ -1,5 +1,5 @@
 import { RPCProvider } from '../src';
-import { compiledArgentAccountRPC } from './fixtures';
+import { compiledOpenZeppelinAccount } from './fixtures';
 
 describe('RPCProvider', () => {
   let provider: RPCProvider;
@@ -128,7 +128,7 @@ describe('RPCProvider', () => {
     });
     test('deployContract', async () => {
       const response = await provider.deployContract({
-        contract: compiledArgentAccountRPC,
+        contract: compiledOpenZeppelinAccount,
       });
 
       expect(response).toHaveProperty('transaction_hash');
