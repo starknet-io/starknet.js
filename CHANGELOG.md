@@ -1,3 +1,29 @@
+# [3.13.0](https://github.com/0xs34n/starknet.js/compare/v3.12.3...v3.13.0) (2022-06-14)
+
+### Bug Fixes
+
+- account tests ([8e86c0e](https://github.com/0xs34n/starknet.js/commit/8e86c0e813924fa5cf8f708acd708f9bea1bb7c3))
+- add TEST_RPC_URL env var ([8972e0b](https://github.com/0xs34n/starknet.js/commit/8972e0bc4b4180a6f28b7fce736db76b28426a4d))
+- change getStorageAt key param type to BigNumberish ([b8a8389](https://github.com/0xs34n/starknet.js/commit/b8a8389d64c3f845be8302054cbc579b4b3d3fb9))
+- contract tests ([f14fe11](https://github.com/0xs34n/starknet.js/commit/f14fe117504634451540f50ce780230716f539dc))
+- deps versions ([68f8373](https://github.com/0xs34n/starknet.js/commit/68f837390e3a4cba56e134f57b88966818ea94ff))
+- env format ([665ab0b](https://github.com/0xs34n/starknet.js/commit/665ab0b0cc725f83d05628f53ee00b63f2801979))
+- lockfile ([839bc15](https://github.com/0xs34n/starknet.js/commit/839bc1519744ea6df044b4929ec219e632e50db5))
+- move env up ([405aca2](https://github.com/0xs34n/starknet.js/commit/405aca2eb07c882e25435c1b18ee5018e0970c6c))
+- move private key to env ([2f4d22c](https://github.com/0xs34n/starknet.js/commit/2f4d22c47b6442479a355b4ee117ba1a5995420f))
+- remove accountContract test ([d239dab](https://github.com/0xs34n/starknet.js/commit/d239dab6bb2872897501e6fc90b2c41650c2ff8f))
+- remove maxFee: 0 ([9569819](https://github.com/0xs34n/starknet.js/commit/9569819c3ca36e8005b6d591d206888f5689f867))
+- secrets ([d080436](https://github.com/0xs34n/starknet.js/commit/d080436acdd13571192cc19292e8ba0661caebc2))
+- test ([3ca4bd3](https://github.com/0xs34n/starknet.js/commit/3ca4bd37c9edd03ca5be09ad2e9daf837d833f7c))
+- tests ([593dfa1](https://github.com/0xs34n/starknet.js/commit/593dfa1da130e7e0ef1aa6edd971bbec771d16b8))
+
+### Features
+
+- add test account to fixtures ([3a1150c](https://github.com/0xs34n/starknet.js/commit/3a1150cfdb44053a18591e38eb30d112115864be))
+- getTestProvider util ([8d6f0b9](https://github.com/0xs34n/starknet.js/commit/8d6f0b96738ee5ba48ab95356441964d8b8ef6c4))
+- update account guide ([b5275b3](https://github.com/0xs34n/starknet.js/commit/b5275b313897e9a6fd4b1e52f850aa5fb189cb23))
+- update erc20 guide ([416da13](https://github.com/0xs34n/starknet.js/commit/416da13b3690463897dfae318135d6f46198c5ec))
+
 ## [3.12.3](https://github.com/0xs34n/starknet.js/compare/v3.12.2...v3.12.3) (2022-05-30)
 
 ### Bug Fixes
