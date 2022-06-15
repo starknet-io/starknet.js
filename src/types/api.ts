@@ -146,7 +146,7 @@ export type ExecutionResources = {
     bitwise_builtin: number;
     output_builtin: number;
     ecdsa_builtin: number;
-    ec_op_builtin: number;
+    ec_op_builtin?: number;
   };
   n_memory_holes: number;
 };
@@ -184,8 +184,9 @@ export type GetBlockResponse = {
       transaction_index: number;
     };
   };
-  previous_block_hash: string;
+  parent_block_hash: string;
   status: Status;
+  gas_price: string;
 };
 
 export type GetCodeResponse = {
@@ -195,9 +196,8 @@ export type GetCodeResponse = {
 
 export type GetTransactionStatusResponse = {
   tx_status: Status;
-  block_hash: string;
+  block_hash?: string;
   tx_failure_reason?: {
-    tx_id: number;
     code: string;
     error_message: string;
   };
@@ -211,7 +211,7 @@ export type GetTransactionTraceResponse = {
     selector: string;
     calldata: RawArgs;
     result: Array<any>;
-    execution_resources: any;
+    execution_resources: ExecutionResources;
     internal_call: Array<any>;
     events: Array<any>;
     messages: Array<any>;
@@ -219,14 +219,24 @@ export type GetTransactionTraceResponse = {
   signature: Signature;
 };
 
-export type GetTransactionResponse = {
+export type SuccessfulTransactionResponse = {
   status: Status;
   transaction: Transaction;
   block_hash: string;
   block_number: BlockNumber;
   transaction_index: number;
-  transaction_hash: string;
 };
+
+export type FailedTransactionResponse = {
+  status: 'REJECTED';
+  transaction_failure_reason: {
+    code: string;
+    error_message: string;
+  };
+  transaction: Transaction;
+};
+
+export type GetTransactionResponse = SuccessfulTransactionResponse | FailedTransactionResponse;
 
 export type AddTransactionResponse = {
   code: TransactionStatus;
@@ -235,7 +245,7 @@ export type AddTransactionResponse = {
   class_hash?: string;
 };
 
-export type TransactionReceiptResponse = {
+export type SuccessfulTransactionReceiptResponse = {
   status: Status;
   transaction_hash: string;
   transaction_index: number;
@@ -243,7 +253,24 @@ export type TransactionReceiptResponse = {
   block_number: BlockNumber;
   l2_to_l1_messages: string[];
   events: string[];
+  actual_fee: string;
+  execution_resources: ExecutionResources;
 };
+
+export type FailedTransactionReceiptResponse = {
+  status: 'REJECTED';
+  transaction_failure_reason: {
+    code: string;
+    error_message: string;
+  };
+  transaction_hash: string;
+  l2_to_l1_messages: string[];
+  events: string[];
+};
+
+export type TransactionReceiptResponse =
+  | SuccessfulTransactionReceiptResponse
+  | FailedTransactionReceiptResponse;
 
 export type EstimateFeeResponse = {
   amount: BN;
