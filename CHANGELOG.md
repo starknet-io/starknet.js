@@ -1,3 +1,9 @@
+## [3.14.1](https://github.com/0xs34n/starknet.js/compare/v3.14.0...v3.14.1) (2022-06-15)
+
+### Bug Fixes
+
+- update api typings ([44796af](https://github.com/0xs34n/starknet.js/commit/44796af4849b6bab3d99065bb1e1948e4ea0b55e))
+
 # [3.14.0](https://github.com/0xs34n/starknet.js/compare/v3.13.1...v3.14.0) (2022-06-15)
 
 ### Bug Fixes
