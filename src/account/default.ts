@@ -143,6 +143,7 @@ export class Account extends Provider implements AccountInterface {
    */
   public async LEGACY_addTransaction(transaction: Transaction): Promise<AddTransactionResponse> {
     if (transaction.type === 'DEPLOY') throw new Error('No DEPLOYS');
+    if (transaction.type === 'DECLARE') throw new Error('No DECLARES');
 
     assert(
       !transaction.signature,

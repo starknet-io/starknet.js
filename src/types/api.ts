@@ -97,6 +97,14 @@ export type GetContractAddressesResponse = {
   GpsStatementVerifier: string;
 };
 
+export type DeclareTransaction = {
+  type: 'DECLARE';
+  contract_class: CompressedCompiledContract;
+  nonce: BigNumberish;
+  sender_address: BigNumberish;
+  signature: Signature;
+};
+
 export type DeployTransaction = {
   type: 'DEPLOY';
   contract_definition: CompressedCompiledContract;
@@ -148,7 +156,7 @@ export type CallContractTransaction = Omit<
   'type' | 'entry_point_type' | 'nonce'
 >;
 
-export type Transaction = DeployTransaction | InvokeFunctionTransaction;
+export type Transaction = DeclareTransaction | DeployTransaction | InvokeFunctionTransaction;
 
 export type CallContractResponse = {
   result: string[];
@@ -224,6 +232,7 @@ export type AddTransactionResponse = {
   code: TransactionStatus;
   transaction_hash: string;
   address?: string;
+  class_hash?: string;
 };
 
 export type TransactionReceiptResponse = {

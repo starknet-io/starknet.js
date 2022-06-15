@@ -1,6 +1,6 @@
 import { defaultProvider, stark } from '../src';
 import { toBN } from '../src/utils/number';
-import { compiledArgentAccount } from './fixtures';
+import { compiledArgentAccount, compiledErc20 } from './fixtures';
 
 const { compileCalldata } = stark;
 
@@ -123,6 +123,16 @@ describe('defaultProvider', () => {
   });
 
   describe('addTransaction()', () => {
+    test('declareContract()', async () => {
+      const response = await defaultProvider.declareContract({
+        contract: compiledErc20,
+      });
+
+      expect(response.code).toBe('TRANSACTION_RECEIVED');
+      expect(response.transaction_hash).toBeDefined();
+      expect(response.class_hash).toBeDefined();
+    });
+
     test('deployContract()', async () => {
       const response = await defaultProvider.deployContract({
         contract: compiledArgentAccount,
