@@ -85,20 +85,43 @@ describe('defaultProvider', () => {
         )
       ).resolves.not.toThrow();
     });
-    test('getTransaction()', async () => {
-      return expect(
-        defaultProvider.getTransaction(
-          '0x37013e1cb9c133e6fe51b4b371b76b317a480f56d80576730754c1662582348'
-        )
-      ).resolves.not.toThrow();
+
+    test('getTransaction() - successful transaction', async () => {
+      const transaction = await defaultProvider.getTransaction(
+        '0x37013e1cb9c133e6fe51b4b371b76b317a480f56d80576730754c1662582348'
+      );
+
+      expect(transaction).not.toHaveProperty('transaction_failure_reason');
+
+      expect(transaction.transaction).toHaveProperty('transaction_hash');
+
+      return expect(transaction.status).not.toEqual('REJECTED');
     });
 
-    test('getTransactionReceipt', async () => {
-      return expect(
-        defaultProvider.getTransactionReceipt(
-          '0x37013e1cb9c133e6fe51b4b371b76b317a480f56d80576730754c1662582348'
-        )
-      ).resolves.not.toThrow();
+    test('getTransaction() - failed transaction', async () => {
+      const transaction = await defaultProvider.getTransaction(
+        '0x698e60db2bae3ef8d5fafda10ff83b6ba634351aa1f4fcf8455ec0cffa738d9'
+      );
+
+      expect(transaction).toHaveProperty('transaction_failure_reason');
+
+      return expect(transaction.status).toEqual('REJECTED');
+    });
+
+    test('getTransactionReceipt() - successful transaction', async () => {
+      const transactionReceipt = await defaultProvider.getTransactionReceipt(
+        '0x18c49389193b40e178dfc9f2f595a7c79a7a55639e9951d956329f2ce6cfd4f'
+      );
+
+      return expect(transactionReceipt).toHaveProperty('actual_fee');
+    });
+
+    test('getTransactionReceipt() - failed transaction', async () => {
+      const transactionReceipt = await defaultProvider.getTransactionReceipt(
+        '0x698e60db2bae3ef8d5fafda10ff83b6ba634351aa1f4fcf8455ec0cffa738d9'
+      );
+
+      return expect(transactionReceipt).not.toHaveProperty('actual_fee');
     });
 
     test('callContract()', () => {
