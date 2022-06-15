@@ -1,3 +1,13 @@
+# [3.14.0](https://github.com/0xs34n/starknet.js/compare/v3.13.1...v3.14.0) (2022-06-15)
+
+### Bug Fixes
+
+- remove redundant \_abi from declareContract() ([53d6578](https://github.com/0xs34n/starknet.js/commit/53d6578b932ed6046b5e0df83d748673d7efc3d5))
+
+### Features
+
+- support contract declaration API introduced at SN 0.9.0 ([ca6203f](https://github.com/0xs34n/starknet.js/commit/ca6203f93471d7fb421d580e07d6de7c183e40f3))
+
 ## [3.13.1](https://github.com/0xs34n/starknet.js/compare/v3.13.0...v3.13.1) (2022-06-14)
 
 ### Bug Fixes
