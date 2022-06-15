@@ -89,10 +89,10 @@ describe('estimatedFeeToMaxFee()', () => {
   });
 });
 
-describe('Deterministic Address calculation', () => {
+describe('calculateContractAddressFromHash()', () => {
   // This test just show how to use calculateContractAddressFromHash for new devs
 
-  test.only('calculate hash', () => {
+  test('calculated contract address should match the snapshot', () => {
     const ethAddress = '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7';
 
     const daiAddress = '0x03e85bfbb8e2a42b7bead9e88e9a1b19dbccf661471061807292120462396ec9';
@@ -109,6 +109,8 @@ describe('Deterministic Address calculation', () => {
       factoryAddress
     );
 
-    expect(res).not.toBeNull();
+    expect(res).toMatchInlineSnapshot(
+      `"0x36dc8dcb3440596472ddde11facacc45d0cd250df764ae7c3d1a360c853c324"`
+    );
   });
 });
