@@ -14,7 +14,7 @@ Contracts allow you to transform Cairo values, like `Uint256` to `BigNumber`. It
 
 `contract.attach(providerOrAccount)` _for changing the provider or account_
 
-`contract.connect(providerOrAccount)` _for changing the address of the connected contract_
+`contract.connect(address)` _for changing the address of the connected contract_
 
 ## Contract properties
 

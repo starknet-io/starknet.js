@@ -2,13 +2,11 @@ import assert from 'minimalistic-assert';
 
 import { ZERO } from '../constants';
 import { Provider, ProviderInterface } from '../provider';
-import { BlockIdentifier } from '../provider/utils';
 import { Signer, SignerInterface } from '../signer';
 import {
   Abi,
   AddTransactionResponse,
   Call,
-  EstimateFeeResponse,
   InvocationsDetails,
   InvocationsSignerDetails,
   InvokeFunctionTransaction,
@@ -16,6 +14,7 @@ import {
   Signature,
   Transaction,
 } from '../types';
+import { EstimateFee, EstimateFeeDetails } from '../types/account';
 import { sign } from '../utils/ellipticCurve';
 import {
   computeHashOnElements,
@@ -56,11 +55,8 @@ export class Account extends Provider implements AccountInterface {
 
   public async estimateFee(
     calls: Call | Call[],
-    {
-      nonce: providedNonce,
-      blockIdentifier = 'pending',
-    }: { nonce?: BigNumberish; blockIdentifier?: BlockIdentifier } = {}
-  ): Promise<EstimateFeeResponse> {
+    { nonce: providedNonce, blockIdentifier = 'pending' }: EstimateFeeDetails = {}
+  ): Promise<EstimateFee> {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = providedNonce ?? (await this.getNonce());
     const version = toBN(feeTransactionVersion);
@@ -76,7 +72,7 @@ export class Account extends Provider implements AccountInterface {
     const signature = await this.signer.signTransaction(transactions, signerDetails);
 
     const calldata = fromCallsToExecuteCalldataWithNonce(transactions, nonce);
-    return this.fetchEndpoint(
+    const fetchedEstimate = await this.fetchEndpoint(
       'estimate_fee',
       { blockIdentifier },
       {
@@ -87,6 +83,12 @@ export class Account extends Provider implements AccountInterface {
         signature: bigNumberishArrayToDecimalStringArray(signature),
       }
     );
+    const suggestedMaxFee = estimatedFeeToMaxFee(fetchedEstimate.amount);
+
+    return {
+      ...fetchedEstimate,
+      suggestedMaxFee,
+    };
   }
 
   /**
@@ -94,7 +96,9 @@ export class Account extends Provider implements AccountInterface {
    *
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/gateway/gateway_client.py#L13-L17)
    *
-   * @param transaction - transaction to be invoked
+   * @param calls - one or more calls to be executed
+   * @param abis - one or more abis which can be used to display the calls
+   * @param transactionsDetail - optional transaction details
    * @returns a confirmation of invoking a function on the starknet contract
    */
   public async execute(
@@ -108,8 +112,8 @@ export class Account extends Provider implements AccountInterface {
     if (transactionsDetail.maxFee || transactionsDetail.maxFee === 0) {
       maxFee = transactionsDetail.maxFee;
     } else {
-      const estimatedFee = (await this.estimateFee(transactions, { nonce })).amount;
-      maxFee = estimatedFeeToMaxFee(estimatedFee).toString();
+      const { suggestedMaxFee } = await this.estimateFee(transactions, { nonce });
+      maxFee = suggestedMaxFee.toString();
     }
 
     const signerDetails: InvocationsSignerDetails = {
@@ -139,6 +143,7 @@ export class Account extends Provider implements AccountInterface {
    */
   public async LEGACY_addTransaction(transaction: Transaction): Promise<AddTransactionResponse> {
     if (transaction.type === 'DEPLOY') throw new Error('No DEPLOYS');
+    if (transaction.type === 'DECLARE') throw new Error('No DECLARES');
 
     assert(
       !transaction.signature,

@@ -4,7 +4,7 @@ sidebar_position: 3
 
 # Deploy an ERC20 Contract
 
-Dpeploy the contract and wait for deployment transaction to be accepted on StarkNet
+Deploy the contract and wait for deployment transaction to be accepted on StarkNet
 
 ```javascript
 const compiledErc20 = json.parse(
@@ -26,9 +26,11 @@ const erc20 = new Contract(compiledErc20.abi, erc20Address);
 
 ## Mint tokens to an account address
 
+Make sure you created the `Account` instance following the [Creating an Account](./account.md) guide.
+
 ```javascript
 const { transaction_hash: mintTxHash } = await erc20.mint(
-  accountContract.address,
+  account.address,
   "1000"
 );
 console.log(`Waiting for Tx to be Accepted on Starknet - Minting...`);
@@ -38,11 +40,11 @@ await defaultProvider.waitForTransaction(mintTxHash);
 ## Check balance after mint
 
 ```javascript
-console.log(`Calling StarkNet for accountContract balance...`);
-const balanceBeforeTransfer = await erc20.balance_of(accountContract.address);
+console.log(`Calling StarkNet for account balance...`);
+const balanceBeforeTransfer = await erc20.balance_of(account.address);
 
 console.log(
-  `accountContract Address ${accountContract.address} has a balance of:`,
+  `account Address ${account.address} has a balance of:`,
   number.toBN(balanceBeforeTransfer.res, 16).toString()
 );
 ```
@@ -50,30 +52,16 @@ console.log(
 ## Transfer tokens
 
 ```javascript
-// Get the nonce of the account and prepare transfer tx
-console.log(`Calling StarkNet for accountContract nonce...`);
-const nonce = (await accountContract.call("get_nonce")).nonce.toString();
-const calls = [
+// Execute tx transfer of 10 tokens
+console.log(`Invoke Tx - Transfer 10 tokens back to erc20 contract...`);
+const { transaction_hash: transferTxHash } = await account.execute(
   {
     contractAddress: erc20Address,
     entrypoint: "transfer",
     calldata: [erc20Address, "10"],
   },
-];
-const msgHash = hash.hashMulticall(accountContract.address, calls, nonce, "0");
-
-const { callArray, calldata } = transformCallsToMulticallArrays(calls);
-
-// sign tx to transfer 10 tokens
-const signature = ec.sign(starkKeyPair, msgHash);
-
-// Execute tx transfer of 10 tokens
-console.log(`Invoke Tx - Transfer 10 tokens back to erc20 contract...`);
-const { transaction_hash: transferTxHash } = await accountContract.__execute__(
-  callArray,
-  calldata,
-  nonce,
-  signature
+  undefined,
+  { maxFee: "0" }
 );
 
 // Wait for the invoke transaction to be accepted on StarkNet
@@ -85,11 +73,11 @@ await defaultProvider.waitForTransaction(transferTxHash);
 
 ```javascript
 // Check balance after transfer - should be 990
-console.log(`Calling StarkNet for accountContract balance...`);
-const balanceAfterTransfer = await erc20.balance_of(accountContract.address);
+console.log(`Calling StarkNet for account balance...`);
+const balanceAfterTransfer = await erc20.balance_of(account.address);
 
 console.log(
-  `accountContract Address ${accountContract.address} has a balance of:`,
+  `account Address ${account.address} has a balance of:`,
   number.toBN(balanceAfterTransfer.res, 16).toString()
 );
 ```

@@ -12,6 +12,10 @@ export type DeployContractPayload = {
   addressSalt?: BigNumberish;
 };
 
+export type DeclareContractPayload = {
+  contract: CompiledContract | string;
+};
+
 export type Invocation = {
   contractAddress: string;
   entrypoint: string;
@@ -35,7 +39,7 @@ export type Status =
   | 'ACCEPTED_ON_L1'
   | 'REJECTED';
 export type TransactionStatus = 'TRANSACTION_RECEIVED';
-export type Type = 'DEPLOY' | 'INVOKE_FUNCTION';
+export type Type = 'DECLARE' | 'DEPLOY' | 'INVOKE_FUNCTION';
 export type EntryPointType = 'EXTERNAL';
 export type CompressedProgram = string;
 
@@ -60,7 +64,7 @@ export type Abi = Array<FunctionAbi | StructAbi>;
 
 export type EntryPointsByType = object;
 export type Program = Record<any, any>;
-export type BlockNumber = 'pending' | null | number;
+export type BlockNumber = 'pending' | 'latest' | null | number;
 
 export type CompiledContract = {
   abi: Abi;

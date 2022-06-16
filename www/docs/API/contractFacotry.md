@@ -12,9 +12,9 @@ Contract Factory allow you to deploy contracts onto StarkNet. To deploy a Contra
 
 Creates a new instance of a ContractFactory for the contract described by the _compiledContract_.
 
-`contractFacotry.connect(providerOrAccount)` _for changing the provider or account_
+`contractFactory.connect(providerOrAccount)` _for changing the provider or account_
 
-`contractFacotry.attach(address)` _for changing the address of the connected contract factory_
+`contractFactory.attach(address)` _for changing the address of the connected contract factory_
 
 ## Properties
 

@@ -1,13 +1,14 @@
-import axios, { AxiosRequestHeaders } from 'axios';
+import fetch from 'cross-fetch';
 import urljoin from 'url-join';
 
-import { StarknetChainId } from '../constants';
+import { ONE, StarknetChainId, ZERO } from '../constants';
 import {
   Abi,
   AddTransactionResponse,
   Call,
   CallContractResponse,
   CompiledContract,
+  DeclareContractPayload,
   DeployContractPayload,
   Endpoints,
   GetBlockResponse,
@@ -17,21 +18,23 @@ import {
   GetTransactionStatusResponse,
   GetTransactionTraceResponse,
   Invocation,
-  TransactionReceipt,
+  TransactionReceiptResponse,
 } from '../types';
 import { getSelectorFromName } from '../utils/hash';
 import { parse, stringify } from '../utils/json';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
 import { compressProgram, randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
-import { BlockIdentifier, getFormattedBlockIdentifier, txIdentifier } from './utils';
+import { BlockIdentifier, getFormattedBlockIdentifier } from './utils';
 
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha';
 
 type ProviderOptions = { network: NetworkName } | { baseUrl: string };
 
 function wait(delay: number) {
-  return new Promise((res) => setTimeout(res, delay));
+  return new Promise((res) => {
+    setTimeout(res, delay);
+  });
 }
 
 function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
@@ -124,7 +127,7 @@ export class Provider implements ProviderInterface {
     return `?${queryString}`;
   }
 
-  private getHeaders(method: 'POST' | 'GET'): AxiosRequestHeaders | undefined {
+  private getHeaders(method: 'POST' | 'GET'): Record<string, string> | undefined {
     if (method === 'POST') {
       return {
         'Content-Type': 'application/json',
@@ -149,22 +152,25 @@ export class Provider implements ProviderInterface {
     const method = this.getFetchMethod(endpoint);
     const queryString = this.getQueryString(query);
     const headers = this.getHeaders(method);
+    const url = urljoin(baseUrl, endpoint, queryString);
 
-    try {
-      const { data } = await axios.request<Endpoints[T]['RESPONSE']>({
-        method,
-        url: urljoin(baseUrl, endpoint, queryString),
-        data: stringify(request),
-        headers,
+    return fetch(url, {
+      method,
+      body: stringify(request),
+      headers,
+    })
+      .then((res) => res.text())
+      .then((res) => {
+        if (endpoint === 'estimate_fee') {
+          return parse(res, (_, v) => {
+            if (v && typeof v === 'bigint') {
+              return toBN(v.toString());
+            }
+            return v;
+          });
+        }
+        return parse(res) as Endpoints[T]['RESPONSE'];
       });
-      return data;
-    } catch (error: any) {
-      const data = error?.response?.data;
-      if (data?.message) {
-        throw new Error(`${data.code}: ${data.message}`);
-      }
-      throw error;
-    }
   }
 
   /**
@@ -247,7 +253,7 @@ export class Provider implements ProviderInterface {
    */
   public async getStorageAt(
     contractAddress: string,
-    key: number,
+    key: BigNumberish,
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<object> {
     return this.fetchEndpoint('get_storage_at', { blockIdentifier, contractAddress, key });
@@ -267,27 +273,16 @@ export class Provider implements ProviderInterface {
   }
 
   /**
-   * Gets the transaction receipt from a tx hash or tx id.
+   * Gets the transaction receipt from a tx hash.
    *
-   * [Reference] (https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L104-L111)
+   * [Reference] (https://github.com/starkware-libs/cairo-lang/blob/167b28bcd940fd25ea3816204fa882a0b0a49603/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L183)
    *
    * @param txHash
-   * @param txId
    * @returns the transaction receipt object
    */
-
-  public async getTransactionReceipt({
-    txHash,
-    txId,
-  }: {
-    txHash?: BigNumberish;
-    txId?: BigNumberish;
-  }): Promise<TransactionReceipt> {
-    const { data } = await axios.get<TransactionReceipt>(
-      urljoin(this.feederGatewayUrl, 'get_transaction_receipt', `?${txIdentifier(txHash, txId)}`)
-    );
-
-    return data;
+  public async getTransactionReceipt(txHash: BigNumberish): Promise<TransactionReceiptResponse> {
+    const txHashHex = toHex(toBN(txHash));
+    return this.fetchEndpoint('get_transaction_receipt', { transactionHash: txHashHex });
   }
 
   /**
@@ -313,6 +308,31 @@ export class Provider implements ProviderInterface {
   public async getTransactionTrace(txHash: BigNumberish): Promise<GetTransactionTraceResponse> {
     const txHashHex = toHex(toBN(txHash));
     return this.fetchEndpoint('get_transaction_trace', { transactionHash: txHashHex });
+  }
+
+  /**
+   * Declare a given compiled contract (json) on starknet
+   *
+   * @param contract - a json object containing the compiled contract
+   * @returns a confirmation of sending a transaction on the starknet contract
+   */
+  public declareContract(payload: DeclareContractPayload): Promise<AddTransactionResponse> {
+    const parsedContract =
+      typeof payload.contract === 'string'
+        ? (parse(payload.contract) as CompiledContract)
+        : payload.contract;
+    const contractDefinition = {
+      ...parsedContract,
+      program: compressProgram(parsedContract.program),
+    };
+
+    return this.fetchEndpoint('add_transaction', undefined, {
+      type: 'DECLARE',
+      contract_class: contractDefinition,
+      nonce: toHex(ZERO),
+      signature: [],
+      sender_address: toHex(ONE),
+    });
   }
 
   /**

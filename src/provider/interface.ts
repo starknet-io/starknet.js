@@ -10,7 +10,7 @@ import type {
   GetTransactionResponse,
   GetTransactionStatusResponse,
   Invocation,
-  TransactionReceipt,
+  TransactionReceiptResponse,
 } from '../types';
 import type { BigNumberish } from '../utils/number';
 import { BlockIdentifier } from './utils';
@@ -85,7 +85,7 @@ export abstract class ProviderInterface {
    */
   public abstract getStorageAt(
     contractAddress: string,
-    key: number,
+    key: BigNumberish,
     blockIdentifier?: BlockIdentifier
   ): Promise<object>;
 
@@ -109,13 +109,15 @@ export abstract class ProviderInterface {
    */
   public abstract getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse>;
 
-  public abstract getTransactionReceipt({
-    txHash,
-    txId,
-  }: {
-    txHash?: BigNumberish;
-    txId?: BigNumberish;
-  }): Promise<TransactionReceipt>;
+  /**
+   * Gets the transaction receipt from a tx hash.
+   *
+   * [Reference] (https://github.com/starkware-libs/cairo-lang/blob/167b28bcd940fd25ea3816204fa882a0b0a49603/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L183)
+   *
+   * @param txHash
+   * @returns the transaction receipt object
+   */
+  public abstract getTransactionReceipt(txHash: BigNumberish): Promise<TransactionReceiptResponse>;
 
   /**
    * Deploys a given compiled contract (json) to starknet

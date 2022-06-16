@@ -14,7 +14,15 @@ Install the latest version of starknet with `npm install starknet@next`
 
 ```javascript
 import fs from "fs";
-import * as starknet from "starknet";
+import fs from "fs";
+import {
+  Account,
+  Contract,
+  defaultProvider,
+  ec,
+  json,
+  number,
+} from "starknet";
 ```
 
 ## Generate random key pair.
@@ -31,11 +39,11 @@ const starkKeyPub = ec.getStarkKey(starkKeyPair);;
 Deploy the Account contract and wait for it to be verified on StarkNet.
 
 ```javascript
-const compiledArgentAccount = json.parse(
-  fs.readFileSync("./ArgentAccount.json").toString("ascii")
+const compiledAccount = json.parse(
+  fs.readFileSync("./Account.json").toString("ascii")
 );
 const accountResponse = await defaultProvider.deployContract({
-  contract: compiledArgentAccount,
+  contract: compiledAccount,
   addressSalt: starkKeyPub,
 });
 ```
@@ -44,17 +52,23 @@ const accountResponse = await defaultProvider.deployContract({
 
 Wait for the deployment transaction to be accepted and assign the address of the deployed account to the Account object.
 
-Use your new account object to sign transactions, messages or verify signatures!
-
 ```javascript
 await defaultProvider.waitForTransaction(accountResponse.transaction_hash);
 const accountContract = new Contract(
-  compiledArgentAccount.abi,
+  compiledAccount.abi,
   accountResponse.address
 );
-const { transaction_hash: initializeTxHash } = await accountContract.initialize(
-  starkKeyPub,
-  "0"
+const initializeResponse = await accountContract.initialize(starkKeyPub, "0");
+
+await defaultProvider.waitForTransaction(initializeResponse.transaction_hash);
+```
+
+Once account contract is initialized [Account](../docs/API/account.md) instance can be created. Use your new account instance to sign transactions, messages or verify signatures!
+
+```js
+const account = new Account(
+    defaultProvider,
+    accountResponse.address,
+    starkKeyPair
 );
-await defaultProvider.waitForTransaction(initializeTxHash);
 ```

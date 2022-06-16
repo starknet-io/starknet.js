@@ -57,8 +57,10 @@ Guides can be found [here](https://www.starknetjs.com/guides/intro)
 ## 🚀 Powered by Starknet.js
 
 - [Argent X - the first StarkNet wallet](https://github.com/argentlabs/argent-x)
+- [Braavos - your new wallet on top of StarkNet](https://chrome.google.com/webstore/detail/braavos-wallet/jnlgamecbpmbajjfhmmmlhejkemejdma)
 - [React + Starknet.js boilerplate](https://github.com/fracek/starknet-react-example)
 - [AMM Demo](https://www.starknetswap.com/)
+- [mySwap - the first DeFi app to launch on StarkNet](myswap.xyz)
 
 ## ✏️ Contributing
 

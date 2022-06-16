@@ -4,9 +4,19 @@ on:
     branches:
       - main
       - develop
+
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
+
+    env:
+      TEST_PROVIDER_BASE_URL: http://127.0.0.1:5050/
+    services:
+      devnet:
+        image: janek2601/starknet-devnet-patched
+        ports:
+          - 5050:5050
+
     steps:
       - uses: actions/checkout@v2
       - name: Use Node.js 14
@@ -16,14 +26,34 @@ jobs:
       - run: npm ci
       - run: npm run build --if-present
       - run: npm test
+
       - uses: actions/upload-artifact@v2
         with:
           name: build
           path: dist
+
+  integration-test:
+    runs-on: ubuntu-latest
+
+    env:
+      TEST_PROVIDER_BASE_URL: https://alpha4.starknet.io
+      TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
+      TEST_ACCOUNT_ADDRESS: ${{ secrets.TEST_ACCOUNT_ADDRESS }}
+      TEST_RPC_URL: ${{ secrets.TEST_RPC_URL }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 14
+        uses: actions/setup-node@v2
+        with:
+          node-version: lts/*
+      - run: npm ci
+      - run: npm test
+
   release:
     name: Release
     runs-on: ubuntu-latest
-    needs: [build-and-test]
+    needs: [build-and-test, integration-test]
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-node@v2

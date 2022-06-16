@@ -1,3 +1,116 @@
+# [3.15.0](https://github.com/0xs34n/starknet.js/compare/v3.14.1...v3.15.0) (2022-06-16)
+
+### Bug Fixes
+
+- **tests:** update test ([c71f482](https://github.com/0xs34n/starknet.js/commit/c71f482facdaac914c45f4bf91f48e05a930abff))
+
+### Features
+
+- add calculateContractAddressFromHash ([e22c346](https://github.com/0xs34n/starknet.js/commit/e22c3464036f97eee3c617d3790aac35b3d95379))
+
+## [3.14.1](https://github.com/0xs34n/starknet.js/compare/v3.14.0...v3.14.1) (2022-06-15)
+
+### Bug Fixes
+
+- update api typings ([44796af](https://github.com/0xs34n/starknet.js/commit/44796af4849b6bab3d99065bb1e1948e4ea0b55e))
+
+# [3.14.0](https://github.com/0xs34n/starknet.js/compare/v3.13.1...v3.14.0) (2022-06-15)
+
+### Bug Fixes
+
+- remove redundant \_abi from declareContract() ([53d6578](https://github.com/0xs34n/starknet.js/commit/53d6578b932ed6046b5e0df83d748673d7efc3d5))
+
+### Features
+
+- support contract declaration API introduced at SN 0.9.0 ([ca6203f](https://github.com/0xs34n/starknet.js/commit/ca6203f93471d7fb421d580e07d6de7c183e40f3))
+
+## [3.13.1](https://github.com/0xs34n/starknet.js/compare/v3.13.0...v3.13.1) (2022-06-14)
+
+### Bug Fixes
+
+- account estimate fee interface ([51e8cf6](https://github.com/0xs34n/starknet.js/commit/51e8cf6858acd5aed003f8f1c4d755088684f134))
+
+# [3.13.0](https://github.com/0xs34n/starknet.js/compare/v3.12.3...v3.13.0) (2022-06-14)
+
+### Bug Fixes
+
+- account tests ([8e86c0e](https://github.com/0xs34n/starknet.js/commit/8e86c0e813924fa5cf8f708acd708f9bea1bb7c3))
+- add TEST_RPC_URL env var ([8972e0b](https://github.com/0xs34n/starknet.js/commit/8972e0bc4b4180a6f28b7fce736db76b28426a4d))
+- change getStorageAt key param type to BigNumberish ([b8a8389](https://github.com/0xs34n/starknet.js/commit/b8a8389d64c3f845be8302054cbc579b4b3d3fb9))
+- contract tests ([f14fe11](https://github.com/0xs34n/starknet.js/commit/f14fe117504634451540f50ce780230716f539dc))
+- deps versions ([68f8373](https://github.com/0xs34n/starknet.js/commit/68f837390e3a4cba56e134f57b88966818ea94ff))
+- env format ([665ab0b](https://github.com/0xs34n/starknet.js/commit/665ab0b0cc725f83d05628f53ee00b63f2801979))
+- lockfile ([839bc15](https://github.com/0xs34n/starknet.js/commit/839bc1519744ea6df044b4929ec219e632e50db5))
+- move env up ([405aca2](https://github.com/0xs34n/starknet.js/commit/405aca2eb07c882e25435c1b18ee5018e0970c6c))
+- move private key to env ([2f4d22c](https://github.com/0xs34n/starknet.js/commit/2f4d22c47b6442479a355b4ee117ba1a5995420f))
+- remove accountContract test ([d239dab](https://github.com/0xs34n/starknet.js/commit/d239dab6bb2872897501e6fc90b2c41650c2ff8f))
+- remove maxFee: 0 ([9569819](https://github.com/0xs34n/starknet.js/commit/9569819c3ca36e8005b6d591d206888f5689f867))
+- secrets ([d080436](https://github.com/0xs34n/starknet.js/commit/d080436acdd13571192cc19292e8ba0661caebc2))
+- test ([3ca4bd3](https://github.com/0xs34n/starknet.js/commit/3ca4bd37c9edd03ca5be09ad2e9daf837d833f7c))
+- tests ([593dfa1](https://github.com/0xs34n/starknet.js/commit/593dfa1da130e7e0ef1aa6edd971bbec771d16b8))
+
+### Features
+
+- add test account to fixtures ([3a1150c](https://github.com/0xs34n/starknet.js/commit/3a1150cfdb44053a18591e38eb30d112115864be))
+- getTestProvider util ([8d6f0b9](https://github.com/0xs34n/starknet.js/commit/8d6f0b96738ee5ba48ab95356441964d8b8ef6c4))
+- update account guide ([b5275b3](https://github.com/0xs34n/starknet.js/commit/b5275b313897e9a6fd4b1e52f850aa5fb189cb23))
+- update erc20 guide ([416da13](https://github.com/0xs34n/starknet.js/commit/416da13b3690463897dfae318135d6f46198c5ec))
+
+## [3.12.3](https://github.com/0xs34n/starknet.js/compare/v3.12.2...v3.12.3) (2022-05-30)
+
+### Bug Fixes
+
+- remove superstruct ([6f13cf0](https://github.com/0xs34n/starknet.js/commit/6f13cf0ec740e715fcbdacf846cd9bcd653c1399))
+
+## [3.12.2](https://github.com/0xs34n/starknet.js/compare/v3.12.1...v3.12.2) (2022-05-30)
+
+### Bug Fixes
+
+- allow starknet.js in service workers ([7a500d1](https://github.com/0xs34n/starknet.js/commit/7a500d198cffed43f98a669edac2dbb215884a3b))
+- updated powered by starknet list ([aa36463](https://github.com/0xs34n/starknet.js/commit/aa36463e1adb281f79bf8462b2f0063801457782))
+
+## [3.12.1](https://github.com/0xs34n/starknet.js/compare/v3.12.0...v3.12.1) (2022-05-24)
+
+### Bug Fixes
+
+- update repo url ([c1312c0](https://github.com/0xs34n/starknet.js/commit/c1312c0e00e3387a49d1d7edc33e584687d607ea))
+
+# [3.12.0](https://github.com/seanjameshan/starknet.js/compare/v3.11.0...v3.12.0) (2022-05-24)
+
+### Bug Fixes
+
+- always default to latest block ([dafc575](https://github.com/seanjameshan/starknet.js/commit/dafc57550b9b175b79ec2fd728504ee14a992620))
+
+### Features
+
+- add suggestedMaxFee ([8977772](https://github.com/seanjameshan/starknet.js/commit/8977772763ecd895006c00c9cbe1397429a19b6f))
+
+# [3.11.0](https://github.com/seanjameshan/starknet.js/compare/v3.10.3...v3.11.0) (2022-05-11)
+
+### Bug Fixes
+
+- review ([9ee4987](https://github.com/seanjameshan/starknet.js/commit/9ee498788185a35a75f2b429b3f1ec55dc4ee2a3))
+- tests ([f535edb](https://github.com/seanjameshan/starknet.js/commit/f535edbef8da6050e54575792926488774e3ed0f))
+- transaction receipt ([806eb7d](https://github.com/seanjameshan/starknet.js/commit/806eb7d63a01e158231f7b63cc4fc1fb0c30717e))
+- use npm again ([3b9e176](https://github.com/seanjameshan/starknet.js/commit/3b9e176812f6401e167a207db2d9ff3686260e13))
+
+### Features
+
+- add checksum addresses ([2d32ed8](https://github.com/seanjameshan/starknet.js/commit/2d32ed828f908090642a42d9f6620f050a75b43a))
+- use BigNumber for estimate fee amount ([751c2ed](https://github.com/seanjameshan/starknet.js/commit/751c2edf89d019f365f5fba8123a9df0320ff543))
+
+## [3.10.3](https://github.com/seanjameshan/starknet.js/compare/v3.10.2...v3.10.3) (2022-05-04)
+
+### Bug Fixes
+
+- **encode:** maximum call stack size exceeded ([3cd8195](https://github.com/seanjameshan/starknet.js/commit/3cd8195d0fcde7d2cf6460959bb2c9f45ef7d066))
+
+## [3.10.2](https://github.com/seanjameshan/starknet.js/compare/v3.10.1...v3.10.2) (2022-04-27)
+
+### Bug Fixes
+
+- **tests:** fix getBlock blocks ([c0422b7](https://github.com/seanjameshan/starknet.js/commit/c0422b7d963639d34082731f6efbe3f0dd2c3c4d))
+
 ## [3.10.1](https://github.com/seanjameshan/starknet.js/compare/v3.10.0...v3.10.1) (2022-04-20)
 
 ### Bug Fixes
