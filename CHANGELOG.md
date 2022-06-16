@@ -1,3 +1,13 @@
+# [3.15.0](https://github.com/0xs34n/starknet.js/compare/v3.14.1...v3.15.0) (2022-06-16)
+
+### Bug Fixes
+
+- **tests:** update test ([c71f482](https://github.com/0xs34n/starknet.js/commit/c71f482facdaac914c45f4bf91f48e05a930abff))
+
+### Features
+
+- add calculateContractAddressFromHash ([e22c346](https://github.com/0xs34n/starknet.js/commit/e22c3464036f97eee3c617d3790aac35b3d95379))
+
 ## [3.14.1](https://github.com/0xs34n/starknet.js/compare/v3.14.0...v3.14.1) (2022-06-15)
 
 ### Bug Fixes
