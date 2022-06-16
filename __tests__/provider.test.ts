@@ -22,8 +22,11 @@ describe('defaultProvider', () => {
     exampleTransactionHash = transaction_hash;
     exampleContractAddress = address!;
     const transaction = await provider.getTransaction(transaction_hash);
-    exampleBlockHash = transaction.block_hash;
-    exampleBlockNumber = transaction.block_number;
+
+    if (transaction.status !== 'REJECTED') {
+      exampleBlockHash = transaction.block_hash;
+      exampleBlockNumber = transaction.block_number;
+    }
   });
 
   describe('feeder gateway endpoints', () => {
