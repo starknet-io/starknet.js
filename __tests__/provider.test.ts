@@ -22,8 +22,11 @@ describe('defaultProvider', () => {
     exampleTransactionHash = transaction_hash;
     exampleContractAddress = address!;
     const transaction = await provider.getTransaction(transaction_hash);
-    exampleBlockHash = transaction.block_hash;
-    exampleBlockNumber = transaction.block_number;
+
+    if ('block_number' in transaction) {
+      exampleBlockHash = transaction.block_hash;
+      exampleBlockNumber = transaction.block_number;
+    }
   });
 
   describe('feeder gateway endpoints', () => {
@@ -77,7 +80,9 @@ describe('defaultProvider', () => {
 
       expect(transaction).not.toHaveProperty('transaction_failure_reason');
 
-      expect(transaction.transaction).toHaveProperty('transaction_hash');
+      if (transaction.transaction.type === 'INVOKE_FUNCTION') {
+        expect(transaction.transaction).toHaveProperty('transaction_hash');
+      }
 
       return expect(transaction.status).not.toEqual('REJECTED');
     });
