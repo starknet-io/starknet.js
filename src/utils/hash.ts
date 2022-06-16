@@ -11,9 +11,10 @@ import {
   TransactionHashPrefix,
   ZERO,
 } from '../constants';
+import { RawCalldata } from '../types/lib';
 import { ec } from './ellipticCurve';
 import { addHexPrefix, buf2hex, utf8ToArray } from './encode';
-import { BigNumberish, toBN, toHex } from './number';
+import { BigNumberish, toBN, toFelt, toHex } from './number';
 
 export const transactionVersion = 0;
 export const feeTransactionVersion = toBN(2).pow(toBN(128)).add(toBN(transactionVersion));
@@ -131,4 +132,25 @@ export function calculcateTransactionHash(
     maxFee,
     chainId
   );
+}
+
+export function calculateContractAddressFromHash(
+  salt: BigNumberish,
+  classHash: BigNumberish,
+  constructorCalldata: RawCalldata,
+  deployerAddress: BigNumberish
+) {
+  const constructorCalldataHash = computeHashOnElements(constructorCalldata);
+
+  const CONTRACT_ADDRESS_PREFIX = toFelt('0x535441524b4e45545f434f4e54524143545f41444452455353'); // Equivalent to 'STARKNET_CONTRACT_ADDRESS'
+
+  const dataToHash = [
+    CONTRACT_ADDRESS_PREFIX,
+    deployerAddress,
+    salt,
+    classHash,
+    constructorCalldataHash,
+  ];
+
+  return computeHashOnElements(dataToHash);
 }
