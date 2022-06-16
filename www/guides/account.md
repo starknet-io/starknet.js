@@ -39,11 +39,11 @@ const starkKeyPub = ec.getStarkKey(starkKeyPair);;
 Deploy the Account contract and wait for it to be verified on StarkNet.
 
 ```javascript
-const compiledArgentAccount = json.parse(
-  fs.readFileSync("./ArgentAccount.json").toString("ascii")
+const compiledAccount = json.parse(
+  fs.readFileSync("./Account.json").toString("ascii")
 );
 const accountResponse = await defaultProvider.deployContract({
-  contract: compiledArgentAccount,
+  contract: compiledAccount,
   addressSalt: starkKeyPub,
 });
 ```
@@ -55,7 +55,7 @@ Wait for the deployment transaction to be accepted and assign the address of the
 ```javascript
 await defaultProvider.waitForTransaction(accountResponse.transaction_hash);
 const accountContract = new Contract(
-  compiledArgentAccount.abi,
+  compiledAccount.abi,
   accountResponse.address
 );
 const initializeResponse = await accountContract.initialize(starkKeyPub, "0");
