@@ -1,0 +1,168 @@
+[
+  {
+    "members": [
+      {
+        "name": "to",
+        "offset": 0,
+        "type": "felt"
+      },
+      {
+        "name": "selector",
+        "offset": 1,
+        "type": "felt"
+      },
+      {
+        "name": "data_offset",
+        "offset": 2,
+        "type": "felt"
+      },
+      {
+        "name": "data_len",
+        "offset": 3,
+        "type": "felt"
+      }
+    ],
+    "name": "AccountCallArray",
+    "size": 4,
+    "type": "struct"
+  },
+  {
+    "inputs": [
+      {
+        "name": "hash",
+        "type": "felt"
+      },
+      {
+        "name": "signature_len",
+        "type": "felt"
+      },
+      {
+        "name": "signature",
+        "type": "felt*"
+      }
+    ],
+    "name": "Account_is_valid_signature",
+    "outputs": [],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "get_public_key",
+    "outputs": [
+      {
+        "name": "res",
+        "type": "felt"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "get_nonce",
+    "outputs": [
+      {
+        "name": "res",
+        "type": "felt"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "name": "interfaceId",
+        "type": "felt"
+      }
+    ],
+    "name": "supportsInterface",
+    "outputs": [
+      {
+        "name": "success",
+        "type": "felt"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "name": "new_public_key",
+        "type": "felt"
+      }
+    ],
+    "name": "set_public_key",
+    "outputs": [],
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "name": "public_key",
+        "type": "felt"
+      }
+    ],
+    "name": "constructor",
+    "outputs": [],
+    "type": "constructor"
+  },
+  {
+    "inputs": [
+      {
+        "name": "hash",
+        "type": "felt"
+      },
+      {
+        "name": "signature_len",
+        "type": "felt"
+      },
+      {
+        "name": "signature",
+        "type": "felt*"
+      }
+    ],
+    "name": "is_valid_signature",
+    "outputs": [],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "name": "call_array_len",
+        "type": "felt"
+      },
+      {
+        "name": "call_array",
+        "type": "AccountCallArray*"
+      },
+      {
+        "name": "calldata_len",
+        "type": "felt"
+      },
+      {
+        "name": "calldata",
+        "type": "felt*"
+      },
+      {
+        "name": "nonce",
+        "type": "felt"
+      }
+    ],
+    "name": "__execute__",
+    "outputs": [
+      {
+        "name": "response_len",
+        "type": "felt"
+      },
+      {
+        "name": "response",
+        "type": "felt*"
+      }
+    ],
+    "type": "function"
+  }
+]

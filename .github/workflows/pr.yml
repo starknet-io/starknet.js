@@ -8,19 +8,21 @@ on:
 jobs:
   build-and-test:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node-version:
-          - 14.x
+
     env:
-      TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
-      TEST_RPC_URL: ${{ secrets.TEST_RPC_URL }}
+      TEST_PROVIDER_BASE_URL: http://127.0.0.1:5050/
+    services:
+      devnet:
+        image: janek2601/starknet-devnet-patched
+        ports:
+          - 5050:5050
+
     steps:
       - uses: actions/checkout@v2
-      - name: Use Node.js ${{ matrix.node-version }}
+      - name: Use Node.js 14
         uses: actions/setup-node@v2
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: lts/*
       - run: npm ci
       - run: npm run build --if-present
       - run: npm test

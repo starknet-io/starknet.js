@@ -5,23 +5,21 @@ import { pedersen } from '../../src/utils/hash';
 
 const { IS_BROWSER } = constants;
 
-const compiledArgentAccount = json.parse(
-  fs.readFileSync('./__mocks__/ArgentAccount.json').toString('ascii')
-);
+const compiledAccount = json.parse(fs.readFileSync('./__mocks__/Account.json').toString('ascii'));
 
 test('isNode', () => {
   expect(IS_BROWSER).toBe(false);
 });
 describe('compressProgram()', () => {
   test('compresses a contract program', () => {
-    const inputProgram = compiledArgentAccount.program;
+    const inputProgram = compiledAccount.program;
 
     const compressed = stark.compressProgram(inputProgram);
 
     expect(compressed).toMatchSnapshot();
   });
   test('works with strings', () => {
-    const inputProgram = json.stringify(compiledArgentAccount.program);
+    const inputProgram = json.stringify(compiledAccount.program);
 
     const compressed = stark.compressProgram(inputProgram);
 
