@@ -119,6 +119,7 @@ export type InvokeFunctionTransaction = {
   signature?: Signature;
   entry_point_type?: EntryPointType;
   entry_point_selector: string;
+  transaction_hash: string;
   calldata?: RawCalldata;
   nonce?: BigNumberish;
   max_fee?: BigNumberish;
