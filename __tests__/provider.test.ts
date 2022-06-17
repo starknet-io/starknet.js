@@ -26,7 +26,6 @@ describe('defaultProvider', () => {
     if (transaction.status !== 'REJECTED') {
       exampleBlockHash = transaction.block_hash;
       exampleBlockNumber = transaction.block_number;
-      console.log(exampleBlockNumber);
     }
   });
 
