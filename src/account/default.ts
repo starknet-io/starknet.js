@@ -269,7 +269,7 @@ export class Account extends Provider implements AccountInterface {
    */
   public async verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean> {
     try {
-      await this.callContract({
+      const response = await this.callContract({
         contractAddress: this.address,
         entrypoint: 'is_valid_signature',
         calldata: compileCalldata({
@@ -277,7 +277,10 @@ export class Account extends Provider implements AccountInterface {
           signature: signature.map((x) => toBN(x).toString()),
         }),
       });
-      return true;
+      if (response.result) {
+        return true;
+      }
+      return false;
     } catch {
       return false;
     }
