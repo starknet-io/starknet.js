@@ -1,3 +1,9 @@
+## [3.15.1](https://github.com/0xs34n/starknet.js/compare/v3.15.0...v3.15.1) (2022-06-17)
+
+### Bug Fixes
+
+- response type for get-transaction ([a232725](https://github.com/0xs34n/starknet.js/commit/a232725099893b45fd6feda0a4cac7d05f903435))
+
 # [3.15.0](https://github.com/0xs34n/starknet.js/compare/v3.14.1...v3.15.0) (2022-06-16)
 
 ### Bug Fixes
