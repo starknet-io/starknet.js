@@ -159,7 +159,12 @@ export class Provider implements ProviderInterface {
       body: stringify(request),
       headers,
     })
-      .then((res) => res.text())
+      .then((res) => {
+        if (res.status >= 400) {
+          throw Error(res.statusText);
+        }
+        return res.text();
+      })
       .then((res) => {
         if (endpoint === 'estimate_fee') {
           return parse(res, (_, v) => {
@@ -170,6 +175,9 @@ export class Provider implements ProviderInterface {
           });
         }
         return parse(res) as Endpoints[T]['RESPONSE'];
+      })
+      .catch((err) => {
+        throw Error(`Could not ${method} from endpoint \`${url}\`: ${err.message}`);
       });
   }
 

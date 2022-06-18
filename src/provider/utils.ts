@@ -49,7 +49,7 @@ export function getBlockIdentifier(blockIdentifier: BlockIdentifier): BlockIdent
   if (blockIdentifier === 'pending') {
     return { type: 'BLOCK_NUMBER', data: 'pending' };
   }
-  if (typeof blockIdentifier === 'number') {
+  if (typeof blockIdentifier === 'number' || typeof blockIdentifier === 'bigint') {
     return { type: 'BLOCK_NUMBER', data: blockIdentifier };
   }
   if (typeof blockIdentifier === 'string' && blockIdentifier.startsWith('0x')) {
