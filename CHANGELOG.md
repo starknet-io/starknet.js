@@ -1,3 +1,12 @@
+## [3.15.2](https://github.com/0xs34n/starknet.js/compare/v3.15.1...v3.15.2) (2022-06-18)
+
+### Bug Fixes
+
+- **cleanup:** cleanup ([a15b6c6](https://github.com/0xs34n/starknet.js/commit/a15b6c6bf13ce7af699c293d697b5136188388c3))
+- **errorcode:** fixed error code >=400 instead of !=200 ([0f16595](https://github.com/0xs34n/starknet.js/commit/0f1659543ba95ce7cac31a5182dad2e33325d4c1))
+- **fetchEndpoint:** error handling and test case fix ([629479f](https://github.com/0xs34n/starknet.js/commit/629479f877aa7d6f39c8d31b2c9449563aadd0e7))
+- **verify:** return false when 500 returned from the gateway ([de3e004](https://github.com/0xs34n/starknet.js/commit/de3e00461730d6fa112046169470d7a603baa296))
+
 ## [3.15.1](https://github.com/0xs34n/starknet.js/compare/v3.15.0...v3.15.1) (2022-06-17)
 
 ### Bug Fixes
