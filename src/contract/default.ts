@@ -17,6 +17,7 @@ import {
   Overrides,
   ParsedStruct,
   Result,
+  ResultAccessor,
   StructAbi,
 } from '../types';
 import { BigNumberish, toBN, toFelt } from '../utils/number';
@@ -523,7 +524,10 @@ export class Contract implements ContractInterface {
    * @param response  - response from the method
    * @return - parsed response corresponding to the abi
    */
-  protected parseResponse(method: string, response: string[]): Result {
+  protected parseResponse(method: string, response?: string[]): Result {
+    if (!response) {
+      return undefined;
+    }
     const { outputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
     const responseIterator = response.flat()[Symbol.iterator]();
     const resultObject = outputs.flat().reduce((acc, output) => {
@@ -537,7 +541,7 @@ export class Contract implements ContractInterface {
       acc.push(value);
       acc[key] = value;
       return acc;
-    }, [] as Result);
+    }, [] as ResultAccessor);
   }
 
   public invoke(

@@ -25,7 +25,7 @@ import { parse, stringify } from '../utils/json';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
 import { compressProgram, randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
-import { BlockIdentifier, getFormattedBlockIdentifier } from './utils';
+import { BlockIdentifier, GatewayError, getFormattedBlockIdentifier } from './utils';
 
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha';
 
@@ -159,9 +159,11 @@ export class Provider implements ProviderInterface {
       body: stringify(request),
       headers,
     })
-      .then((res) => {
+      .then(async (res) => {
         if (res.status >= 400) {
-          throw Error(res.statusText);
+          // This will allow user to handle contract errors
+          const responseBody = parse(await res.text());
+          throw new GatewayError(responseBody.message, responseBody.code);
         }
         return res.text();
       })
