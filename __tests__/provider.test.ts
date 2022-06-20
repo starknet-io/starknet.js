@@ -42,8 +42,15 @@ describe('defaultProvider', () => {
     test(`getBlock(blockHash=undefined, blockNumber=${exampleBlockNumber})`, () => {
       return expect(provider.getBlock(exampleBlockNumber)).resolves.not.toThrow();
     });
-    test('getBlock(blockHash=undefined, blockNumber=null)', () => {
-      return expect(provider.getBlock()).resolves.not.toThrow();
+    test('getBlock(blockHash=undefined, blockNumber=null)', async () => {
+      const block = await provider.getBlock();
+
+      expect(block).not.toBeNull();
+
+      const { block_number, timestamp } = block;
+
+      expect(typeof block_number).toEqual('number');
+      expect(typeof timestamp).toEqual('number');
     });
     test('getBlock() -> { blockNumber }', async () => {
       const block = await provider.getBlock();

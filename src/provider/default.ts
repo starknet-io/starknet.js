@@ -21,7 +21,7 @@ import {
   TransactionReceiptResponse,
 } from '../types';
 import { getSelectorFromName } from '../utils/hash';
-import { parse, stringify } from '../utils/json';
+import { parse, parseAsBig, stringify } from '../utils/json';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
 import { compressProgram, randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
@@ -167,7 +167,7 @@ export class Provider implements ProviderInterface {
       })
       .then((res) => {
         if (endpoint === 'estimate_fee') {
-          return parse(res, (_, v) => {
+          return parseAsBig(res, (_, v) => {
             if (v && typeof v === 'bigint') {
               return toBN(v.toString());
             }
