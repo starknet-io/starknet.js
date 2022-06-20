@@ -1,4 +1,3 @@
-import fetch from 'cross-fetch';
 import urljoin from 'url-join';
 
 import { ONE, StarknetChainId, ZERO } from '../constants';
