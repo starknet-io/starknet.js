@@ -176,7 +176,7 @@ export class Provider implements ProviderInterface {
         return parse(res) as Endpoints[T]['RESPONSE'];
       })
       .catch((err) => {
-        throw Error(`Could not ${method} from endpoint \`${url}\`: ${err.message}`);
+        throw err;
       });
   }
 
