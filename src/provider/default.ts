@@ -161,7 +161,7 @@ export class Provider implements ProviderInterface {
         headers,
       });
       const textResponse = await res.text();
-      if (res.status >= 400) {
+      if (!res.ok) {
         // This will allow user to handle contract errors
         const responseBody = parse(textResponse);
         throw new GatewayError(responseBody.message, responseBody.code); // Caught locally, and re-thrown for the user
