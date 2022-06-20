@@ -46,6 +46,7 @@
     "@types/whatwg-fetch": "^0.0.33",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
+    "cross-fetch": "^3.1.5",
     "eslint": "^8.17.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
@@ -67,9 +68,9 @@
   "dependencies": {
     "@ethersproject/bytes": "^5.6.1",
     "bn.js": "^5.2.1",
+    "cross-fetch": "^3.1.5",
     "elliptic": "^6.5.4",
     "ethereum-cryptography": "^1.0.3",
-    "fetch-ponyfill": "^7.1.0",
     "hash.js": "^1.1.7",
     "json-bigint": "^1.0.0",
     "minimalistic-assert": "^1.0.1",
