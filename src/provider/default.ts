@@ -174,9 +174,6 @@ export class Provider implements ProviderInterface {
           });
         }
         return parse(res) as Endpoints[T]['RESPONSE'];
-      })
-      .catch((err) => {
-        throw err;
       });
   }
 
