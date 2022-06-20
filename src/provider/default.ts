@@ -1,13 +1,13 @@
-import fetch from 'cross-fetch';
 import urljoin from 'url-join';
 
-import { StarknetChainId } from '../constants';
+import { ONE, StarknetChainId, ZERO } from '../constants';
 import {
   Abi,
   AddTransactionResponse,
   Call,
   CallContractResponse,
   CompiledContract,
+  DeclareContractPayload,
   DeployContractPayload,
   Endpoints,
   GetBlockResponse,
@@ -38,7 +38,9 @@ export type ProviderOptions =
     };
 
 function wait(delay: number) {
-  return new Promise((res) => setTimeout(res, delay));
+  return new Promise((res) => {
+    setTimeout(res, delay);
+  });
 }
 
 function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
@@ -157,7 +159,12 @@ export class Provider implements ProviderInterface {
       body: stringify(request),
       headers,
     })
-      .then((res) => res.text())
+      .then((res) => {
+        if (res.status >= 400) {
+          throw Error(res.statusText);
+        }
+        return res.text();
+      })
       .then((res) => {
         if (endpoint === 'estimate_fee') {
           return parse(res, (_, v) => {
@@ -168,6 +175,9 @@ export class Provider implements ProviderInterface {
           });
         }
         return parse(res) as Endpoints[T]['RESPONSE'];
+      })
+      .catch((err) => {
+        throw Error(`Could not ${method} from endpoint \`${url}\`: ${err.message}`);
       });
   }
 
@@ -271,14 +281,13 @@ export class Provider implements ProviderInterface {
   }
 
   /**
-   * Gets the transaction receipt from a tx hash or tx id.
+   * Gets the transaction receipt from a tx hash.
    *
-   * [Reference] (https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L104-L111)
+   * [Reference] (https://github.com/starkware-libs/cairo-lang/blob/167b28bcd940fd25ea3816204fa882a0b0a49603/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L183)
    *
    * @param txHash
    * @returns the transaction receipt object
    */
-
   public async getTransactionReceipt(txHash: BigNumberish): Promise<TransactionReceiptResponse> {
     const txHashHex = toHex(toBN(txHash));
     return this.fetchEndpoint('get_transaction_receipt', { transactionHash: txHashHex });
@@ -307,6 +316,31 @@ export class Provider implements ProviderInterface {
   public async getTransactionTrace(txHash: BigNumberish): Promise<GetTransactionTraceResponse> {
     const txHashHex = toHex(toBN(txHash));
     return this.fetchEndpoint('get_transaction_trace', { transactionHash: txHashHex });
+  }
+
+  /**
+   * Declare a given compiled contract (json) on starknet
+   *
+   * @param contract - a json object containing the compiled contract
+   * @returns a confirmation of sending a transaction on the starknet contract
+   */
+  public declareContract(payload: DeclareContractPayload): Promise<AddTransactionResponse> {
+    const parsedContract =
+      typeof payload.contract === 'string'
+        ? (parse(payload.contract) as CompiledContract)
+        : payload.contract;
+    const contractDefinition = {
+      ...parsedContract,
+      program: compressProgram(parsedContract.program),
+    };
+
+    return this.fetchEndpoint('add_transaction', undefined, {
+      type: 'DECLARE',
+      contract_class: contractDefinition,
+      nonce: toHex(ZERO),
+      signature: [],
+      sender_address: toHex(ONE),
+    });
   }
 
   /**

@@ -131,11 +131,11 @@ Gets the status of a transaction.
 
 <hr/>
 
-provider.**getTransactionReceipt**(txHash, txId) => _Promise < TransactionReceipt >_
+provider.**getTransactionReceipt**(txHash) => _Promise < TransactionReceiptResponse >_
 
 Gets the status of a transaction.
 
-###### _TransactionReceipt_
+###### _TransactionReceiptResponse_
 
 ```
 {
@@ -198,9 +198,26 @@ Gets the transaction trace from a tx hash.
 
 <hr/>
 
+provider.**declareContract**(payload) => _Promise < AddTransactionResponse >_
+
+Declares a contract on Starknet
+
+###### _AddTransactionResponse_
+
+```
+{
+  code: 'TRANSACTION_RECEIVED';
+  transaction_hash: string;
+  class_hash: string;
+};
+
+<hr/>
+
+```
+
 provider.**deployContract**(payload [ , abi ]) => _Promise < AddTransactionResponse >_
 
-Gets the transaction trace from a tx hash.
+Deploys a contract on Starknet
 
 ###### _AddTransactionResponse_
 

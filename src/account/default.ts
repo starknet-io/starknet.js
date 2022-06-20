@@ -2,7 +2,6 @@ import assert from 'minimalistic-assert';
 
 import { ZERO } from '../constants';
 import { Provider, ProviderOptions } from '../provider';
-import { BlockIdentifier } from '../provider/utils';
 import { Signer, SignerInterface } from '../signer';
 import {
   Abi,
@@ -15,7 +14,7 @@ import {
   Signature,
   Transaction,
 } from '../types';
-import { EstimateFee } from '../types/account';
+import { EstimateFee, EstimateFeeDetails } from '../types/account';
 import { sign } from '../utils/ellipticCurve';
 import {
   computeHashOnElements,
@@ -56,10 +55,7 @@ export class Account extends Provider implements AccountInterface {
 
   public async estimateFee(
     calls: Call | Call[],
-    {
-      nonce: providedNonce,
-      blockIdentifier = 'pending',
-    }: { nonce?: BigNumberish; blockIdentifier?: BlockIdentifier } = {}
+    { nonce: providedNonce, blockIdentifier = 'pending' }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = providedNonce ?? (await this.getNonce());
@@ -147,6 +143,7 @@ export class Account extends Provider implements AccountInterface {
    */
   public async LEGACY_addTransaction(transaction: Transaction): Promise<AddTransactionResponse> {
     if (transaction.type === 'DEPLOY') throw new Error('No DEPLOYS');
+    if (transaction.type === 'DECLARE') throw new Error('No DECLARES');
 
     assert(
       !transaction.signature,

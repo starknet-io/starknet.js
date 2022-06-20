@@ -38,7 +38,7 @@ describe('class Contract {}', () => {
         contract: compiledMulticall,
       });
 
-      contract = new Contract(compiledMulticall.abi, multicallAddress!);
+      contract = new Contract(compiledMulticall.abi, multicallAddress!, provider);
 
       expect(m_code).toBe('TRANSACTION_RECEIVED');
 
@@ -223,12 +223,6 @@ describe('class Contract {}', () => {
       erc20.connect(account);
       expect(erc20.providerOrAccount instanceof Account);
     });
-
-    test('estimate gas fee for `mint`', async () => {
-      const res = await erc20.estimateFee.mint(wallet, '10');
-      expect(res).toHaveProperty('amount');
-      expect(res).toHaveProperty('unit');
-    });
   });
 });
 
@@ -243,17 +237,17 @@ describe('class ContractFactory {}', () => {
     erc20Address = address!;
   });
   test('deployment of new contract', async () => {
-    const factory = new ContractFactory(compiledErc20);
+    const factory = new ContractFactory(compiledErc20, provider);
     const erc20 = await factory.deploy();
     expect(erc20 instanceof Contract);
   });
   test('wait for deployment transaction', async () => {
-    const factory = new ContractFactory(compiledErc20);
+    const factory = new ContractFactory(compiledErc20, provider);
     const contract = await factory.deploy();
     expect(contract.deployed()).resolves.not.toThrow();
   });
   test('attach new contract', async () => {
-    const factory = new ContractFactory(compiledErc20);
+    const factory = new ContractFactory(compiledErc20, provider);
     const erc20 = factory.attach(erc20Address);
     expect(erc20 instanceof Contract);
   });

@@ -12,7 +12,7 @@ import {
 } from './fixtures';
 
 describe('deploy and test Wallet', () => {
-  const account: Account = getTestAccount();
+  const account = getTestAccount();
   const provider = getTestProvider();
   let erc20: Contract;
   let erc20Address: string;
@@ -24,8 +24,9 @@ describe('deploy and test Wallet', () => {
     const erc20Response = await provider.deployContract({
       contract: compiledErc20,
     });
-    erc20Address = erc20Response.address;
-    erc20 = new Contract(compiledErc20.abi, erc20Address);
+
+    erc20Address = erc20Response.address!;
+    erc20 = new Contract(compiledErc20.abi, erc20Address, provider);
     expect(erc20Response.code).toBe('TRANSACTION_RECEIVED');
 
     await provider.waitForTransaction(erc20Response.transaction_hash);
@@ -40,10 +41,14 @@ describe('deploy and test Wallet', () => {
 
     await provider.waitForTransaction(mintResponse.transaction_hash);
 
+    const x = await erc20.balance_of(account.address);
+
+    expect(number.toBN(x.res as string).toString()).toStrictEqual(number.toBN(1000).toString());
+
     const dappResponse = await provider.deployContract({
       contract: compiledTestDapp,
     });
-    dapp = new Contract(compiledTestDapp.abi, dappResponse.address);
+    dapp = new Contract(compiledTestDapp.abi, dappResponse.address!, provider);
     expect(dappResponse.code).toBe('TRANSACTION_RECEIVED');
 
     await provider.waitForTransaction(dappResponse.transaction_hash);
@@ -60,9 +65,9 @@ describe('deploy and test Wallet', () => {
   });
 
   test('read balance of wallet', async () => {
-    const { res } = await erc20.balance_of(account.address);
+    const x = await erc20.balance_of(account.address);
 
-    expect(number.toBN(res as string).toString()).toStrictEqual(number.toBN(1000).toString());
+    expect(number.toBN(x.res as string).toString()).toStrictEqual(number.toBN(1000).toString());
   });
 
   test('execute by wallet owner', async () => {
@@ -123,9 +128,15 @@ describe('deploy and test Wallet', () => {
     expect(toBN(response.number as string).toString()).toStrictEqual('57');
   });
 
+  test('sign and verify offchain message fail', async () => {
+    const signature = await account.signMessage(typedDataExample);
+    // change the signature to make it invalid
+    signature[0] += '123';
+    expect(await account.verifyMessage(typedDataExample, signature)).toBe(false);
+  });
+
   test('sign and verify offchain message', async () => {
     const signature = await account.signMessage(typedDataExample);
-
     expect(await account.verifyMessage(typedDataExample, signature)).toBe(true);
   });
 
@@ -143,7 +154,7 @@ describe('deploy and test Wallet', () => {
 
       await provider.waitForTransaction(accountResponse.transaction_hash);
 
-      newAccount = new Account(provider, accountResponse.address, starkKeyPair);
+      newAccount = new Account(provider, accountResponse.address!, starkKeyPair);
     });
 
     test('read nonce', async () => {
