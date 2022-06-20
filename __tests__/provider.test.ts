@@ -103,6 +103,24 @@ describe('defaultProvider', () => {
       ).resolves.not.toThrow();
     });
 
+    test('callContract() - gateway error', () => {
+      return expect(
+        provider.callContract({
+          contractAddress: exampleContractAddress,
+          entrypoint: 'non_existent_entrypoint',
+          calldata: compileCalldata({
+            user: '0xdeadbeef',
+          }),
+        })
+      ).rejects.toThrow(
+        expect.objectContaining({
+          message:
+            'Entry point 0x23b0c8b3d98aa73d8a35f5303fe77d132c6d04279e63f6e1d6aac5946e04612 not found in contract with class hash 0x2864c45bd4ba3e66d8f7855adcadf07205c88f43806ffca664f1f624765207e.',
+          errorCode: 'StarknetErrorCode.ENTRY_POINT_NOT_FOUND_IN_CONTRACT',
+        })
+      );
+    });
+
     test('transaction trace', async () => {
       const transactionTrace = await provider.getTransactionTrace(exampleTransactionHash);
       expect(transactionTrace).toHaveProperty('function_invocation');

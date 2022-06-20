@@ -160,12 +160,12 @@ export class Provider implements ProviderInterface {
         body: stringify(request),
         headers,
       });
+      const textResponse = await res.text();
       if (res.status >= 400) {
         // This will allow user to handle contract errors
-        const responseBody = parse(await res.text());
+        const responseBody = parse(textResponse);
         throw new GatewayError(responseBody.message, responseBody.code); // Caught locally, and re-thrown for the user
       }
-      const textResponse = await res.text();
 
       if (endpoint === 'estimate_fee') {
         return parse(textResponse, (_, v) => {
