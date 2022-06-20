@@ -17,12 +17,13 @@ const DEFAULT_TEST_ACCOUNT_ADDRESS = // run `starknet-devnet --seed 0` and this 
   '0x65d53c8ec4178096167b35a08e16e548d8075cb08ad7bc63d07966ca13569dc';
 const DEFAULT_TEST_ACCOUNT_PRIVATE_KEY = '0xe3e70682c2094cac629f6fbed82c07cd';
 
+const BASE_URL = process.env.TEST_PROVIDER_BASE_URL || DEFAULT_TEST_PROVIDER_BASE_URL;
+export const IS_DEVNET = !BASE_URL.includes('starknet.io');
+
 export const getTestProvider = () => {
-  const baseUrl = process.env.TEST_PROVIDER_BASE_URL || DEFAULT_TEST_PROVIDER_BASE_URL;
+  const provider = new Provider({ baseUrl: BASE_URL });
 
-  const provider = new Provider({ baseUrl });
-
-  if (baseUrl.includes('localhost') || baseUrl.includes('127.0.0.1')) {
+  if (IS_DEVNET) {
     // accelerate the tests when running locally
     const originalWaitForTransaction = provider.waitForTransaction.bind(provider);
     provider.waitForTransaction = (txHash, retryInterval) => {
@@ -43,3 +44,7 @@ export const getTestAccount = () => {
 
   return new Account(provider, testAccountAddress, ec.getKeyPair(testAccountPrivateKey));
 };
+
+export const testIf = (condition: boolean) => (condition ? test : test.skip);
+export const testIfDevnet = testIf(IS_DEVNET);
+export const testIfNotDevnet = testIf(!IS_DEVNET);
