@@ -50,7 +50,8 @@ describe('defaultProvider', () => {
       const { block_number, timestamp } = block;
 
       expect(typeof block_number).toEqual('number');
-      expect(typeof timestamp).toEqual('number');
+
+      return expect(typeof timestamp).toEqual('number');
     });
     test('getBlock() -> { blockNumber }', async () => {
       const block = await provider.getBlock();
