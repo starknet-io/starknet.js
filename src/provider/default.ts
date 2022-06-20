@@ -1,3 +1,4 @@
+import fetchPonyfill from 'fetch-ponyfill';
 import urljoin from 'url-join';
 
 import { ONE, StarknetChainId, ZERO } from '../constants';
@@ -25,6 +26,8 @@ import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from
 import { compressProgram, randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
 import { BlockIdentifier, getFormattedBlockIdentifier } from './utils';
+
+const { fetch } = fetchPonyfill();
 
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha';
 
