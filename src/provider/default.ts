@@ -163,7 +163,9 @@ export class Provider implements ProviderInterface {
       if (!res.ok) {
         // This will allow user to handle contract errors
         const responseBody = parse(textResponse);
-        throw new GatewayError(responseBody.message, responseBody.code); // Caught locally, and re-thrown for the user
+
+        const errorCode = responseBody.code || ((responseBody as any)?.status_code as string); // starknet-devnet uses status_code instead of code; They need to fix that
+        throw new GatewayError(responseBody.message, errorCode); // Caught locally, and re-thrown for the user
       }
 
       if (endpoint === 'estimate_fee') {

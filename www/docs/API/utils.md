@@ -59,7 +59,7 @@ Function that generates a random contract address.
 
 ### `makeAddress(input: string): string`
 
-Function that turns an incompatible address string into stark address format. Returns a string. 
+Function that turns an incompatible address string into stark address format. Returns a string.
 
 Example: `0xdFD0F27FCe99b50909de0bDD328Aed6eAbe76BC5` -> `0xdfd0f27fce99b50909de0bdd328aed6eabe76bc5`
 
@@ -90,7 +90,7 @@ await this.callContract({
 
 ### `estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: number = 0.5): BN`
 
-Function that calculates and returns maximum fee based on the previously estimated one. 
+Function that calculates and returns maximum fee based on the previously estimated one.
 
 Returns a BN.
 
@@ -150,7 +150,7 @@ Asserts input is equal to or greater then `lowerBound` and lower then `upperBoun
 
 Convert BigNumberish array to decimal array. Used for signature conversion.
 
-``` js
+```js
 const signature = await this.signer.signTransaction(transactions, signerDetails);
 
 {
@@ -229,7 +229,7 @@ Function to compute a Pedersen hash on a array of elements. Returns a string.
 
 ### `calculateTransactionHashCommon(txHashPrefix: TransactionHashPrefix, version: BigNumberish,contractAddress: BigNumberish, entryPointSelector: BigNumberish, calldata: BigNumberish[], maxFee: BigNumberish, chainId: StarknetChainId, additionalData: BigNumberish[] = []): string`
 
-Calculates the transaction hash in the StarkNet network - a unique identifier of the transaction. 
+Calculates the transaction hash in the StarkNet network - a unique identifier of the transaction.
 
 Called internally in `calculateDeployTransactionHash` and `calculcateTransactionHash`.
 
