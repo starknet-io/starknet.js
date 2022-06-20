@@ -1,4 +1,6 @@
 import typedDataExample from '../../__mocks__/typedDataExample.json';
+import { number } from '../../src';
+import { BigNumberish } from '../../src/utils/number';
 import { encodeType, getMessageHash, getStructHash, getTypeHash } from '../../src/utils/typedData';
 
 describe('typedData', () => {
@@ -32,6 +34,68 @@ describe('typedData', () => {
     const hash = getMessageHash(typedDataExample, '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826');
     expect(hash).toMatchInlineSnapshot(
       `"0x6fcff244f63e38b9d88b9e3378d44757710d1b244282b435cb472053c8d78d0"`
+    );
+  });
+
+  interface StringStruct {
+    len: BigNumberish;
+    data: BigNumberish[];
+  }
+  function stringToStringStruct(str: string): StringStruct {
+    const len = str.length;
+    const data = str.split('').map((char) => number.toHex(number.toBN(char.charCodeAt(0))));
+    return { len, data };
+  }
+
+  const typedDataStringExample = {
+    types: {
+      StarkNetDomain: [
+        { name: 'name', type: 'felt' },
+        { name: 'version', type: 'felt' },
+        { name: 'chainId', type: 'felt' },
+      ],
+      Person: [
+        { name: 'name', type: 'felt' },
+        { name: 'wallet', type: 'felt' },
+      ],
+      String: [
+        { name: 'len', type: 'felt' },
+        { name: 'data', type: 'felt*' },
+      ],
+      Mail: [
+        { name: 'from', type: 'Person' },
+        { name: 'to', type: 'Person' },
+        { name: 'contents', type: 'String' },
+      ],
+    },
+    primaryType: 'Mail',
+    domain: {
+      name: 'StarkNet Mail',
+      version: '1',
+      chainId: 1,
+    },
+    message: {
+      from: {
+        name: 'Cow',
+        wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+      },
+      to: {
+        name: 'Bob',
+        wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+      },
+      contents: stringToStringStruct(
+        'this is way longer than just 32 characters, to test if that is possible within a typedData struct.'
+      ),
+    },
+  };
+
+  test('should transform strings correctly', () => {
+    const hash = getMessageHash(
+      typedDataStringExample,
+      '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826'
+    );
+    expect(hash).toMatchInlineSnapshot(
+      `"0x70338fb11b8f70b68b261de8a322bcb004bd85e88ac47d9147982c7f5ac66fd"`
     );
   });
 });
