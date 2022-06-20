@@ -1,5 +1,8 @@
 /* eslint-disable no-console */
+import fetch from 'cross-fetch';
 import { register } from 'fetch-intercept';
+
+global.fetch = fetch;
 
 jest.setTimeout(50 * 60 * 1000);
 
