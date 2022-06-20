@@ -154,33 +154,37 @@ export class Provider implements ProviderInterface {
     const headers = this.getHeaders(method);
     const url = urljoin(baseUrl, endpoint, queryString);
 
-    return fetch(url, {
-      method,
-      body: stringify(request),
-      headers,
-    })
-      .then(async (res) => {
-        if (res.status >= 400) {
-          // This will allow user to handle contract errors
-          const responseBody = parse(await res.text());
-          throw new GatewayError(responseBody.message, responseBody.code);
-        }
-        return res.text();
-      })
-      .then((res) => {
-        if (endpoint === 'estimate_fee') {
-          return parse(res, (_, v) => {
-            if (v && typeof v === 'bigint') {
-              return toBN(v.toString());
-            }
-            return v;
-          });
-        }
-        return parse(res) as Endpoints[T]['RESPONSE'];
-      })
-      .catch((err) => {
-        throw Error(`Could not ${method} from endpoint \`${url}\`: ${err.message}`);
+    try {
+      const res = await fetch(url, {
+        method,
+        body: stringify(request),
+        headers,
       });
+      if (res.status >= 400) {
+        // This will allow user to handle contract errors
+        const responseBody = parse(await res.text());
+        throw new GatewayError(responseBody.message, responseBody.code); // Caught locally, and re-thrown for the user
+      }
+      const textResponse = await res.text();
+
+      if (endpoint === 'estimate_fee') {
+        return parse(textResponse, (_, v) => {
+          if (v && typeof v === 'bigint') {
+            return toBN(v.toString());
+          }
+          return v;
+        });
+      }
+      return parse(textResponse) as Endpoints[T]['RESPONSE'];
+    } catch (err) {
+      if (err instanceof GatewayError) {
+        throw err;
+      }
+      if (err instanceof Error) {
+        throw Error(`Could not ${method} from endpoint \`${url}\`: ${err.message}`);
+      }
+      throw err;
+    }
   }
 
   /**
