@@ -1,3 +1,18 @@
+## [3.15.4](https://github.com/0xs34n/starknet.js/compare/v3.15.3...v3.15.4) (2022-06-20)
+
+### Bug Fixes
+
+- **parseResponse:** revert the changes from parseResponse ([d51996f](https://github.com/0xs34n/starknet.js/commit/d51996fa7635428ad4ffe271aa56f202ddcd4179))
+- **provider:** allow the user to handle the contract errors ([5190f7a](https://github.com/0xs34n/starknet.js/commit/5190f7a20fb35382756d86cc67d3fab5c2d541ff))
+- **test:** fix callContract() test ([b11c5da](https://github.com/0xs34n/starknet.js/commit/b11c5daf7fec6e8207dbc0be534aade8e00d5021))
+
+## [3.15.3](https://github.com/0xs34n/starknet.js/compare/v3.15.2...v3.15.3) (2022-06-20)
+
+### Bug Fixes
+
+- **dev:** regenerated package-lock.json ([849cb1e](https://github.com/0xs34n/starknet.js/commit/849cb1ea3ffd7ba10b40b232d0ebc46b6599c7ea))
+- use cross-fetch only for jest ([83be37a](https://github.com/0xs34n/starknet.js/commit/83be37a9e3328a44abd9583b8167c3cb8d882790))
+
 ## [3.15.2](https://github.com/0xs34n/starknet.js/compare/v3.15.1...v3.15.2) (2022-06-18)
 
 ### Bug Fixes

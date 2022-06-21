@@ -1,4 +1,3 @@
-import fetch from 'cross-fetch';
 import urljoin from 'url-join';
 
 import { ONE, StarknetChainId, ZERO } from '../constants';
@@ -25,7 +24,7 @@ import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
 import { compressProgram, randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
-import { BlockIdentifier, getFormattedBlockIdentifier } from './utils';
+import { BlockIdentifier, GatewayError, getFormattedBlockIdentifier } from './utils';
 
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha';
 
@@ -154,31 +153,39 @@ export class Provider implements ProviderInterface {
     const headers = this.getHeaders(method);
     const url = urljoin(baseUrl, endpoint, queryString);
 
-    return fetch(url, {
-      method,
-      body: stringify(request),
-      headers,
-    })
-      .then((res) => {
-        if (res.status >= 400) {
-          throw Error(res.statusText);
-        }
-        return res.text();
-      })
-      .then((res) => {
-        if (endpoint === 'estimate_fee') {
-          return parseAlwaysAsBig(res, (_, v) => {
-            if (v && typeof v === 'bigint') {
-              return toBN(v.toString());
-            }
-            return v;
-          });
-        }
-        return parse(res) as Endpoints[T]['RESPONSE'];
-      })
-      .catch((err) => {
-        throw Error(`Could not ${method} from endpoint \`${url}\`: ${err.message}`);
+    try {
+      const res = await fetch(url, {
+        method,
+        body: stringify(request),
+        headers,
       });
+      const textResponse = await res.text();
+      if (!res.ok) {
+        // This will allow user to handle contract errors
+        const responseBody = parse(textResponse);
+
+        const errorCode = responseBody.code || ((responseBody as any)?.status_code as string); // starknet-devnet uses status_code instead of code; They need to fix that
+        throw new GatewayError(responseBody.message, errorCode); // Caught locally, and re-thrown for the user
+      }
+
+      if (endpoint === 'estimate_fee') {
+        return parseAlwaysAsBig(textResponse, (_, v) => {
+          if (v && typeof v === 'bigint') {
+            return toBN(v.toString());
+          }
+          return v;
+        });
+      }
+      return parse(textResponse) as Endpoints[T]['RESPONSE'];
+    } catch (err) {
+      if (err instanceof GatewayError) {
+        throw err;
+      }
+      if (err instanceof Error) {
+        throw Error(`Could not ${method} from endpoint \`${url}\`: ${err.message}`);
+      }
+      throw err;
+    }
   }
 
   /**

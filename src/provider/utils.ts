@@ -82,3 +82,9 @@ export function getFormattedBlockIdentifier(blockIdentifier: BlockIdentifier = n
   }
   return `blockHash=${toHex(toBN(blockIdentifierObject.data))}`;
 }
+
+export class GatewayError extends Error {
+  constructor(message: string, public errorCode: string) {
+    super(message);
+  }
+}
