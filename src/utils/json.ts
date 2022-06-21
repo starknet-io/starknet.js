@@ -10,6 +10,6 @@ const json = (alwaysParseAsBig: boolean) => {
 };
 
 export const { parse, stringify } = json(false);
-export const { parse: parseAsBig, stringify: stringifyAsBig } = json(true);
+export const { parse: parseAlwaysAsBig, stringify: stringifyAlwaysAsBig } = json(true);
 
 export default { parse, stringify };
