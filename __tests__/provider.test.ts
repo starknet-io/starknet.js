@@ -1,4 +1,5 @@
 import { BlockNumber, stark } from '../src';
+import { GatewayError } from '../src/provider/utils';
 import { toBN } from '../src/utils/number';
 import {
   IS_DEVNET,
@@ -123,6 +124,7 @@ describe('defaultProvider', () => {
       try {
         await promise;
       } catch (e) {
+        expect(e).toBeInstanceOf(GatewayError);
         expect(e.errorCode).toMatchInlineSnapshot(
           IS_DEVNET ? `500n` : `"StarknetErrorCode.ENTRY_POINT_NOT_FOUND_IN_CONTRACT"`
         );

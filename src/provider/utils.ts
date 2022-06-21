@@ -86,5 +86,6 @@ export function getFormattedBlockIdentifier(blockIdentifier: BlockIdentifier = n
 export class GatewayError extends Error {
   constructor(message: string, public errorCode: string) {
     super(message);
+    Object.setPrototypeOf(this, GatewayError.prototype);
   }
 }
