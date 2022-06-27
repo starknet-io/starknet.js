@@ -132,7 +132,7 @@ describe('defaultProvider', () => {
         await promise;
       } catch (e) {
         expect(e.errorCode).toMatchInlineSnapshot(
-          IS_DEVNET ? `500n` : `"StarknetErrorCode.ENTRY_POINT_NOT_FOUND_IN_CONTRACT"`
+          IS_DEVNET ? `500` : `"StarknetErrorCode.ENTRY_POINT_NOT_FOUND_IN_CONTRACT"`
         );
       }
     });
