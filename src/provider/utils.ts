@@ -1,5 +1,3 @@
-import { CustomError } from 'ts-custom-error';
-
 import type { BlockNumber } from '../types';
 import { BigNumberish, toBN, toHex } from '../utils/number';
 
@@ -83,10 +81,4 @@ export function getFormattedBlockIdentifier(blockIdentifier: BlockIdentifier = n
     return `blockNumber=${blockIdentifierObject.data}`;
   }
   return `blockHash=${toHex(toBN(blockIdentifierObject.data))}`;
-}
-
-export class GatewayError extends CustomError {
-  constructor(message: string, public errorCode: string) {
-    super(message);
-  }
 }
