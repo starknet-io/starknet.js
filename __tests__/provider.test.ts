@@ -46,8 +46,16 @@ describe('defaultProvider', () => {
     test(`getBlock(blockHash=undefined, blockNumber=${exampleBlockNumber})`, () => {
       return expect(provider.getBlock(exampleBlockNumber)).resolves.not.toThrow();
     });
-    test('getBlock(blockHash=undefined, blockNumber=null)', () => {
-      return expect(provider.getBlock()).resolves.not.toThrow();
+    test('getBlock(blockHash=undefined, blockNumber=null)', async () => {
+      const block = await provider.getBlock();
+
+      expect(block).not.toBeNull();
+
+      const { block_number, timestamp } = block;
+
+      expect(typeof block_number).toEqual('number');
+
+      return expect(typeof timestamp).toEqual('number');
     });
     test('getBlock() -> { blockNumber }', async () => {
       const block = await provider.getBlock();
@@ -124,7 +132,7 @@ describe('defaultProvider', () => {
         await promise;
       } catch (e) {
         expect(e.errorCode).toMatchInlineSnapshot(
-          IS_DEVNET ? `500n` : `"StarknetErrorCode.ENTRY_POINT_NOT_FOUND_IN_CONTRACT"`
+          IS_DEVNET ? `500` : `"StarknetErrorCode.ENTRY_POINT_NOT_FOUND_IN_CONTRACT"`
         );
       }
     });
