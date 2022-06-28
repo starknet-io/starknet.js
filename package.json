@@ -1,6 +1,6 @@
 {
   "name": "starknet",
-  "version": "3.15.3",
+  "version": "3.15.5",
   "description": "JavaScript library for StarkNet",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -75,6 +75,7 @@
     "json-bigint": "^1.0.0",
     "minimalistic-assert": "^1.0.1",
     "pako": "^2.0.4",
+    "ts-custom-error": "^3.2.0",
     "url-join": "^4.0.1"
   },
   "lint-staged": {

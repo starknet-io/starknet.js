@@ -1,3 +1,21 @@
+## [3.15.5](https://github.com/0xs34n/starknet.js/compare/v3.15.4...v3.15.5) (2022-06-27)
+
+### Bug Fixes
+
+- add return statement ([468a0bf](https://github.com/0xs34n/starknet.js/commit/468a0bfbbc1a9c88383ed2ba0f0bc02b0e5e3a9b))
+- don't enforce bigInt ([efef507](https://github.com/0xs34n/starknet.js/commit/efef5071ebceb5247f5f1995d3c1006d422c02ee))
+- **GatewayError:** export from index ([69addd5](https://github.com/0xs34n/starknet.js/commit/69addd5a2eb30816f5e43ffd71e190838ad5a409))
+- **GatewayError:** use ts-custom-error to support "err instanceof GatewayError" ([092abbc](https://github.com/0xs34n/starknet.js/commit/092abbcff5f5270a0be0b79a8e87645637298c56))
+- **test:** error 500 as number instead of bigInt ([b539144](https://github.com/0xs34n/starknet.js/commit/b5391448cf04d93c4d914ad52d850591a423fe42))
+
+## [3.15.4](https://github.com/0xs34n/starknet.js/compare/v3.15.3...v3.15.4) (2022-06-20)
+
+### Bug Fixes
+
+- **parseResponse:** revert the changes from parseResponse ([d51996f](https://github.com/0xs34n/starknet.js/commit/d51996fa7635428ad4ffe271aa56f202ddcd4179))
+- **provider:** allow the user to handle the contract errors ([5190f7a](https://github.com/0xs34n/starknet.js/commit/5190f7a20fb35382756d86cc67d3fab5c2d541ff))
+- **test:** fix callContract() test ([b11c5da](https://github.com/0xs34n/starknet.js/commit/b11c5daf7fec6e8207dbc0be534aade8e00d5021))
+
 ## [3.15.3](https://github.com/0xs34n/starknet.js/compare/v3.15.2...v3.15.3) (2022-06-20)
 
 ### Bug Fixes
