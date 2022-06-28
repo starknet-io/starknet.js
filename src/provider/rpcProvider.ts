@@ -36,7 +36,9 @@ import { ProviderInterface } from './interface';
 import { BlockIdentifier } from './utils';
 
 function wait(delay: number) {
-  return new Promise((res) => setTimeout(res, delay));
+  return new Promise((res) => {
+    setTimeout(res, delay);
+  });
 }
 
 export type RpcProviderOptions = { nodeUrl: string };
