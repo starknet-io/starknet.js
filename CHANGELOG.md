@@ -1,3 +1,9 @@
+## [3.15.6](https://github.com/0xs34n/starknet.js/compare/v3.15.5...v3.15.6) (2022-06-28)
+
+### Bug Fixes
+
+- throw http error when parsing fails ([898574f](https://github.com/0xs34n/starknet.js/commit/898574f0087bf653b5d74bbe3dc52a0cb6efc432))
+
 ## [3.15.5](https://github.com/0xs34n/starknet.js/compare/v3.15.4...v3.15.5) (2022-06-27)
 
 ### Bug Fixes
