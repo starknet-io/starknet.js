@@ -11,6 +11,7 @@ jobs:
 
     env:
       TEST_PROVIDER_BASE_URL: http://127.0.0.1:5050/
+      TEST_RPC_URL: ${{ secrets.TEST_RPC_URL }}
     services:
       devnet:
         image: janek2601/starknet-devnet-patched
