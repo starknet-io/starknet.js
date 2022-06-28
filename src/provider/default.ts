@@ -32,8 +32,8 @@ export type ProviderOptions =
   | { network: NetworkName }
   | {
       baseUrl: string;
-      feederGatewayUrl: string;
-      gatewayUrl: string;
+      feederGatewayUrl?: string;
+      gatewayUrl?: string;
       chainId?: StarknetChainId;
     };
 
@@ -69,8 +69,9 @@ export class Provider implements ProviderInterface {
       this.gatewayUrl = urljoin(this.baseUrl, 'gateway');
     } else {
       this.baseUrl = optionsOrProvider.baseUrl;
-      this.feederGatewayUrl = optionsOrProvider.feederGatewayUrl;
-      this.gatewayUrl = optionsOrProvider.gatewayUrl;
+      this.feederGatewayUrl =
+        optionsOrProvider.feederGatewayUrl ?? urljoin(this.baseUrl, 'feeder_gateway');
+      this.gatewayUrl = optionsOrProvider.gatewayUrl ?? urljoin(this.baseUrl, 'gateway');
       this.chainId =
         optionsOrProvider.chainId ?? Provider.getChainIdFromBaseUrl(optionsOrProvider.baseUrl);
     }
