@@ -1,7 +1,7 @@
 import assert from 'minimalistic-assert';
 
 import { ZERO } from '../constants';
-import { Provider, ProviderInterface } from '../provider';
+import { Provider, ProviderOptions } from '../provider';
 import { Signer, SignerInterface } from '../signer';
 import {
   Abi,
@@ -35,7 +35,7 @@ export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
 
   constructor(
-    provider: ProviderInterface,
+    provider: ProviderOptions,
     address: string,
     keyPairOrSigner: KeyPair | SignerInterface
   ) {

@@ -5,9 +5,14 @@ import type {
   CallContractResponse,
   DeployContractPayload,
   GetBlockResponse,
+  GetBlockResponseRPC,
   GetCodeResponse,
+  GetCodeResponseRPC,
   GetContractAddressesResponse,
+  GetStorageAtResponseRPC,
+  GetTransactionReceiptResponseRPC,
   GetTransactionResponse,
+  GetTransactionResponseRPC,
   GetTransactionStatusResponse,
   Invocation,
   TransactionReceiptResponse,
@@ -16,12 +21,6 @@ import type { BigNumberish } from '../utils/number';
 import { BlockIdentifier } from './utils';
 
 export abstract class ProviderInterface {
-  public abstract baseUrl: string;
-
-  public abstract feederGatewayUrl: string;
-
-  public abstract gatewayUrl: string;
-
   public abstract chainId: StarknetChainId;
 
   /**
@@ -56,7 +55,9 @@ export abstract class ProviderInterface {
    * @param blockIdentifier block identifier
    * @returns the block object { block_number, previous_block_number, state_root, status, timestamp, transaction_receipts, transactions }
    */
-  public abstract getBlock(blockIdentifier?: BlockIdentifier): Promise<GetBlockResponse>;
+  public abstract getBlock(
+    blockIdentifier?: BlockIdentifier
+  ): Promise<GetBlockResponse | GetBlockResponseRPC>;
 
   /**
    * Gets the code of the deployed contract.
@@ -70,7 +71,7 @@ export abstract class ProviderInterface {
   public abstract getCode(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
-  ): Promise<GetCodeResponse>;
+  ): Promise<GetCodeResponse | GetCodeResponseRPC>;
 
   // TODO: add proper type
   /**
@@ -87,7 +88,7 @@ export abstract class ProviderInterface {
     contractAddress: string,
     key: BigNumberish,
     blockIdentifier?: BlockIdentifier
-  ): Promise<object>;
+  ): Promise<object | GetStorageAtResponseRPC>;
 
   /**
    * Gets the status of a transaction.
@@ -107,7 +108,9 @@ export abstract class ProviderInterface {
    * @param txHash
    * @returns the transacton object { transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? }
    */
-  public abstract getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse>;
+  public abstract getTransaction(
+    txHash: BigNumberish
+  ): Promise<GetTransactionResponse | GetTransactionResponseRPC>;
 
   /**
    * Gets the transaction receipt from a tx hash.
@@ -117,7 +120,9 @@ export abstract class ProviderInterface {
    * @param txHash
    * @returns the transaction receipt object
    */
-  public abstract getTransactionReceipt(txHash: BigNumberish): Promise<TransactionReceiptResponse>;
+  public abstract getTransactionReceipt(
+    txHash: BigNumberish
+  ): Promise<TransactionReceiptResponse | GetTransactionReceiptResponseRPC>;
 
   /**
    * Deploys a given compiled contract (json) to starknet
