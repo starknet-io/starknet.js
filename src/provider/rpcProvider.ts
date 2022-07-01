@@ -1,29 +1,8 @@
 import fetch from 'cross-fetch';
 
 import { StarknetChainId } from '../constants';
-import {
-  AddTransactionResponse,
-  Call,
-  CallContractResponse,
-  CompiledContract,
-  DeployContractPayload,
-  EventFilterRPC,
-  GetBlockNumberResponseRPC,
-  GetBlockResponseRPC,
-  GetCodeResponseRPC,
-  GetContractAddressesResponse,
-  GetEventsResponseRPC,
-  GetStorageAtResponseRPC,
-  GetSyncingStatsResponseRPC,
-  GetTransactionCountResponseRPC,
-  GetTransactionReceiptResponseRPC,
-  GetTransactionResponseRPC,
-  GetTransactionStatusResponse,
-  Invocation,
-  Methods,
-} from '../types';
+import { RPC } from '../types/api/rpc';
 import { getSelectorFromName } from '../utils/hash';
-import { parse } from '../utils/json';
 import {
   BigNumberish,
   bigNumberishArrayToDecimalStringArray,
@@ -31,22 +10,32 @@ import {
   toBN,
   toHex,
 } from '../utils/number';
-import { compressProgram, randomAddress } from '../utils/stark';
-import { ProviderInterface } from './interface';
+import { randomAddress } from '../utils/stark';
+import {
+  CallContractResponse,
+  ContractClass,
+  DeclareContractResponse,
+  DeployContractResponse,
+  FeeEstimateResponse,
+  FunctionCall,
+  GetBlockResponse,
+  GetStateUpdateResponse,
+  GetTransactionReceiptResponse,
+  GetTransactionResponse,
+  InvokeContractResponse,
+  Provider,
+} from './abstractProvider';
+import { RPCResponseParser } from './rpcParser';
 import { BlockIdentifier } from './utils';
-
-function wait(delay: number) {
-  return new Promise((res) => {
-    setTimeout(res, delay);
-  });
-}
 
 export type RpcProviderOptions = { nodeUrl: string };
 
-export class RPCProvider implements ProviderInterface {
+export class RPCProvider implements Provider {
   public nodeUrl: string;
 
   public chainId!: StarknetChainId;
+
+  private responseParser = new RPCResponseParser();
 
   constructor(optionsOrProvider: RpcProviderOptions) {
     const { nodeUrl } = optionsOrProvider;
@@ -57,11 +46,10 @@ export class RPCProvider implements ProviderInterface {
     });
   }
 
-  // typesafe fetch
-  protected async fetchEndpoint<T extends keyof Methods>(
+  protected async fetchEndpoint<T extends keyof RPC.Methods>(
     method: T,
-    request?: Methods[T]['REQUEST']
-  ): Promise<Methods[T]['RESPONSE']> {
+    request?: RPC.Methods[T]['REQUEST']
+  ): Promise<RPC.Methods[T]['RESPONSE']> {
     const requestData = {
       method,
       jsonrpc: '2.0',
@@ -82,7 +70,7 @@ export class RPCProvider implements ProviderInterface {
         const { code, message } = error;
         throw new Error(`${code}: ${message}`);
       } else {
-        return result as Methods[T]['RESPONSE'];
+        return result as RPC.Methods[T]['RESPONSE'];
       }
     } catch (error: any) {
       const data = error?.response?.data;
@@ -93,123 +81,163 @@ export class RPCProvider implements ProviderInterface {
     }
   }
 
-  /**
-   * Gets chain id of the network
-   *
-   * @returns chainId
-   */
   public async getChainId(): Promise<StarknetChainId> {
     return this.fetchEndpoint('starknet_chainId');
   }
 
-  /**
-   * Calls a function on the StarkNet contract.
-   *
-   * @param invokeTransaction transaction to be invoked
-   * @param options additional options for the call
-   * @returns the result of the function on the smart contract.
-   */
-  public async callContract(
-    { contractAddress, entrypoint, calldata = [] }: Call,
-    options: { blockIdentifier: BlockIdentifier } = { blockIdentifier: null }
-  ): Promise<CallContractResponse> {
-    const parsedCalldata = calldata.map((data) => {
+  public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
+    const method =
+      typeof blockIdentifier === 'string' && isHex(blockIdentifier)
+        ? 'starknet_getBlockByHash'
+        : 'starknet_getBlockByNumber';
+
+    return this.fetchEndpoint(method, [blockIdentifier]).then(
+      this.responseParser.parseGetBlockResponse
+    );
+  }
+
+  public async getClass(classHash: BigNumberish): Promise<ContractClass> {
+    return this.fetchEndpoint('starknet_getClass', [classHash]).then(
+      this.responseParser.parseGetClassResponse
+    );
+  }
+
+  public async getClassHash(contractAddress: BigNumberish): Promise<string> {
+    return this.fetchEndpoint('starknet_getClassHashAt', [contractAddress]);
+  }
+
+  public async getClassAt(contractAddress: BigNumberish): Promise<ContractClass> {
+    return this.fetchEndpoint('starknet_getClassAt', [contractAddress]).then(
+      this.responseParser.parseGetClassResponse
+    );
+  }
+
+  public async getStorageAt(
+    contractAddress: string,
+    key: BigNumberish,
+    blockHash: BlockIdentifier
+  ): Promise<BigNumberish> {
+    const parsedKey = toHex(toBN(key));
+    return this.fetchEndpoint('starknet_getStorageAt', [contractAddress, parsedKey, blockHash]);
+  }
+
+  public async getStateUpdate(blockHash: BigNumberish): Promise<GetStateUpdateResponse> {
+    return this.fetchEndpoint('starknet_getStateUpdateByHash', [blockHash]).then(
+      this.responseParser.parseGetStateUpdateResponse
+    );
+  }
+
+  public async getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {
+    return this.fetchEndpoint('starknet_getTransactionByHash', [txHash]).then(
+      this.responseParser.parseGetTransactionResponse
+    );
+  }
+
+  public async getTransactionReceipt(txHash: BigNumberish): Promise<GetTransactionReceiptResponse> {
+    return this.fetchEndpoint('starknet_getTransactionReceipt', [txHash]).then(
+      this.responseParser.parseGetTransactionReceiptResponse
+    );
+  }
+
+  public async estimateFee(
+    request: FunctionCall,
+    blockIdentifier: BlockIdentifier
+  ): Promise<FeeEstimateResponse> {
+    const parsedCalldata = request.calldata.map((data) => {
       if (typeof data === 'string' && isHex(data as string)) {
         return data;
       }
       return toHex(toBN(data));
     });
-    const result = await this.fetchEndpoint('starknet_call', [
+
+    return this.fetchEndpoint('starknet_estimateFee', [
       {
-        contract_address: contractAddress,
-        entry_point_selector: getSelectorFromName(entrypoint),
+        contract_address: request.contractAddress,
+        entry_point_selector: getSelectorFromName(request.entryPointSelector),
         calldata: parsedCalldata,
       },
-      options.blockIdentifier || 'latest',
+      blockIdentifier,
+    ]).then(this.responseParser.parseFeeEstimateResponse);
+  }
+
+  public async declareContract(
+    contractClass: ContractClass,
+    version?: BigNumberish | undefined
+  ): Promise<DeclareContractResponse> {
+    return this.fetchEndpoint('starknet_addDeclareTransaction', [
+      {
+        program: contractClass.program,
+        entry_point_by_type: contractClass.entryPointByType,
+      },
+      version,
+    ]).then(this.responseParser.parseDeclareContractResponse);
+  }
+
+  public async deployContract(
+    contractDefinition: ContractClass,
+    constructorCalldata: BigNumberish[],
+    salt?: BigNumberish | undefined
+  ): Promise<DeployContractResponse> {
+    return this.fetchEndpoint('starknet_addDeployTransaction', [
+      salt ?? randomAddress(),
+      bigNumberishArrayToDecimalStringArray(constructorCalldata ?? []),
+      {
+        program: contractDefinition.program,
+        entry_point_by_type: contractDefinition.entryPointByType,
+      },
+    ]).then(this.responseParser.parseDeployContractResponse);
+  }
+
+  public async invokeContract(
+    functionInvocation: FunctionCall,
+    signature?: BigNumberish[] | undefined,
+    maxFee?: BigNumberish | undefined,
+    version?: BigNumberish | undefined
+  ): Promise<InvokeContractResponse> {
+    const parsedCalldata = functionInvocation.calldata.map((data) => {
+      if (typeof data === 'string' && isHex(data as string)) {
+        return data;
+      }
+      return toHex(toBN(data));
+    });
+
+    return this.fetchEndpoint('starknet_addInvokeTransaction', [
+      {
+        contract_address: functionInvocation.contractAddress,
+        entry_point_selector: getSelectorFromName(functionInvocation.entryPointSelector),
+        calldata: parsedCalldata,
+      },
+      signature,
+      maxFee,
+      version,
+    ]).then(this.responseParser.parseInvokeContractResponse);
+  }
+
+  public async callContract(
+    request: FunctionCall,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<CallContractResponse> {
+    const parsedCalldata = request.calldata.map((data) => {
+      if (typeof data === 'string' && isHex(data as string)) {
+        return data;
+      }
+      return toHex(toBN(data));
+    });
+
+    const result = await this.fetchEndpoint('starknet_call', [
+      {
+        contract_address: request.contractAddress,
+        entry_point_selector: getSelectorFromName(request.entryPointSelector),
+        calldata: parsedCalldata,
+      },
+      blockIdentifier,
     ]);
-    return { result };
+
+    return this.responseParser.parseCallContractResponse(result);
   }
 
-  /**
-   * Gets the block information
-   *   *
-   * @param blockIdentifier
-   * @returns the block object
-   */
-  public async getBlock(blockIdentifier: BlockIdentifier = 'latest'): Promise<GetBlockResponseRPC> {
-    if (typeof blockIdentifier === 'string' && isHex(blockIdentifier)) {
-      return this.fetchEndpoint('starknet_getBlockByHash', [blockIdentifier]);
-    }
-    return this.fetchEndpoint('starknet_getBlockByNumber', [blockIdentifier]);
-  }
-
-  /**
-   * Gets the code of the deployed contract.
-   *
-   * @param contractAddress
-   * @returns Bytecode and ABI of compiled contract
-   */
-  public async getCode(contractAddress: string): Promise<GetCodeResponseRPC> {
-    return this.fetchEndpoint('starknet_getCode', [contractAddress]);
-  }
-
-  /**
-   * Gets the contract's storage variable at a specific key.
-   *
-   * @param contractAddress
-   * @param key - from getStorageVarAddress('<STORAGE_VARIABLE_NAME>') (WIP)
-   * @param txHash
-   * @returns the value of the storage variable
-   */
-  public async getStorageAt(
-    contractAddress: string,
-    key: number | string,
-    blockHash: string = 'latest'
-  ): Promise<GetStorageAtResponseRPC> {
-    const parsedKey = toHex(toBN(key));
-    return this.fetchEndpoint('starknet_getStorageAt', [contractAddress, parsedKey, blockHash]);
-  }
-
-  /**
-   * Gets the transaction receipt from a tx hash
-   *
-   *
-   * @param txHash
-   * @returns the transaction receipt object
-   */
-
-  public async getTransactionReceipt(
-    txHash: BigNumberish
-  ): Promise<GetTransactionReceiptResponseRPC> {
-    const txHashHex = toHex(toBN(txHash));
-    return this.fetchEndpoint('starknet_getTransactionReceipt', [txHashHex]);
-  }
-
-  /**
-   * Gets the transaction information from a tx hash.
-   *
-   * @param txHash
-   * @param blockIndex
-   * @returns the transaction object
-   */
-  public async getTransaction(
-    txIdentifier: BigNumberish,
-    blockIndex?: number
-  ): Promise<GetTransactionResponseRPC> {
-    if (typeof txIdentifier === 'number' && blockIndex) {
-      return this.fetchEndpoint('starknet_getTransactionByBlockNumberAndIndex', [
-        txIdentifier,
-        blockIndex,
-      ]);
-    }
-    const txHashHex = toHex(toBN(txIdentifier));
-    if (blockIndex) {
-      return this.fetchEndpoint('starknet_getTransactionByBlockHashAndIndex', [
-        txHashHex,
-        blockIndex,
-      ]);
-    }
-    return this.fetchEndpoint('starknet_getTransactionByHash', [txHashHex]);
+  public async waitForTransaction(txHash: BigNumberish, retryInterval: number): Promise<void> {
+    throw new Error(`Not implemented ${txHash} ${retryInterval}`);
   }
 
   /**
@@ -221,7 +249,7 @@ export class RPCProvider implements ProviderInterface {
    */
   public async getTransactionCount(
     blockIdentifier: BlockIdentifier
-  ): Promise<GetTransactionCountResponseRPC> {
+  ): Promise<RPC.GetTransactionCountResponse> {
     if (typeof blockIdentifier === 'number') {
       return this.fetchEndpoint('starknet_getBlockTransactionCountByNumber', [blockIdentifier]);
     }
@@ -234,7 +262,7 @@ export class RPCProvider implements ProviderInterface {
    *
    * @returns Number of the latest block
    */
-  public async getBlockNumber(): Promise<GetBlockNumberResponseRPC> {
+  public async getBlockNumber(): Promise<RPC.GetBlockNumberResponse> {
     return this.fetchEndpoint('starknet_blockNumber');
   }
 
@@ -244,7 +272,7 @@ export class RPCProvider implements ProviderInterface {
    *
    * @returns Object with the stats data
    */
-  public async getSyncingStats(): Promise<GetSyncingStatsResponseRPC> {
+  public async getSyncingStats(): Promise<RPC.GetSyncingStatsResponse> {
     return this.fetchEndpoint('starknet_syncing');
   }
 
@@ -254,82 +282,7 @@ export class RPCProvider implements ProviderInterface {
    *
    * @returns events and the pagination of the events
    */
-  public async getEvents(eventFilter: EventFilterRPC): Promise<GetEventsResponseRPC> {
+  public async getEvents(eventFilter: RPC.EventFilter): Promise<RPC.GetEventsResponse> {
     return this.fetchEndpoint('starknet_getEvents', [eventFilter]);
-  }
-
-  /**
-   * Deploys a given compiled contract (json) to starknet
-   *
-   * @param contract - a json object containing the compiled contract
-   * @param address - (optional, defaults to a random address) the address where the contract should be deployed (alpha)
-   * @returns a confirmation of sending a transaction on the starknet contract
-   */
-  public async deployContract(payload: DeployContractPayload): Promise<AddTransactionResponse> {
-    const parsedContract =
-      typeof payload.contract === 'string'
-        ? (parse(payload.contract) as CompiledContract)
-        : payload.contract;
-    const contractDefinition = {
-      ...parsedContract,
-      program: compressProgram(parsedContract.program),
-    };
-    const { contract_address, transaction_hash } = await this.fetchEndpoint(
-      'starknet_addDeployTransaction',
-      [
-        payload.addressSalt ?? randomAddress(),
-        bigNumberishArrayToDecimalStringArray(payload.constructorCalldata ?? []),
-        contractDefinition,
-      ]
-    );
-    return {
-      transaction_hash,
-      address: contract_address,
-    };
-  }
-
-  /**
-   * Waits for the transaction to be resolved
-   *
-   * @param txHash
-   * @param retryInterval
-   * @returns a confirmation of sending a transaction on the starknet contract
-   */
-  public async waitForTransaction(txHash: BigNumberish, retryInterval: number = 8000) {
-    let onchain = false;
-
-    while (!onchain) {
-      // eslint-disable-next-line no-await-in-loop
-      await wait(retryInterval);
-      // eslint-disable-next-line no-await-in-loop
-      const res = await this.getTransactionReceipt(txHash);
-
-      const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'];
-      const errorStates = ['REJECTED', 'NOT_RECEIVED'];
-
-      if (successStates.includes(res.status)) {
-        onchain = true;
-      } else if (errorStates.includes(res.status)) {
-        // const message = res.tx_failure_reason
-        //   ? `${res.tx_status}: ${res.tx_failure_reason.code}\n${res.tx_failure_reason.error_message}`
-        //   : res.tx_status;
-        const error = new Error('Something went wrong');
-        // error.response = res;
-        throw error;
-      }
-    }
-  }
-
-  // Yet not supported endpoints
-  public getContractAddresses(): Promise<GetContractAddressesResponse> {
-    throw new Error('Not Implemented');
-  }
-
-  public invokeFunction(_: Invocation): Promise<AddTransactionResponse> {
-    throw new Error('Not Implemented');
-  }
-
-  public getTransactionStatus(_: BigNumberish): Promise<GetTransactionStatusResponse> {
-    throw new Error('Not Implemented');
   }
 }
