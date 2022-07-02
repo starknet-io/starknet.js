@@ -1,3 +1,9 @@
+## [3.16.1](https://github.com/0xs34n/starknet.js/compare/v3.16.0...v3.16.1) (2022-07-02)
+
+### Bug Fixes
+
+- **test:** for new devnet version ([63d145f](https://github.com/0xs34n/starknet.js/commit/63d145f1fba90cca9e679f115525801ee140ceec))
+
 # [3.16.0](https://github.com/0xs34n/starknet.js/compare/v3.15.6...v3.16.0) (2022-06-29)
 
 ### Features
