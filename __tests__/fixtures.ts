@@ -14,7 +14,7 @@ export const compiledTestDapp = readContract('TestDapp');
 
 const DEFAULT_TEST_PROVIDER_BASE_URL = 'http://127.0.0.1:5050/';
 const DEFAULT_TEST_ACCOUNT_ADDRESS = // run `starknet-devnet --seed 0` and this will be the first account
-  '0x65d53c8ec4178096167b35a08e16e548d8075cb08ad7bc63d07966ca13569dc';
+  '0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a';
 const DEFAULT_TEST_ACCOUNT_PRIVATE_KEY = '0xe3e70682c2094cac629f6fbed82c07cd';
 
 const BASE_URL = process.env.TEST_PROVIDER_BASE_URL || DEFAULT_TEST_PROVIDER_BASE_URL;
