@@ -1,8 +1,23 @@
 import fetch from 'cross-fetch';
 
 import { StarknetChainId } from '../constants';
-import { CompiledContract } from '../types';
-import { RPC } from '../types/api/rpc';
+import {
+  CallContractResponse,
+  CompiledContract,
+  DeclareContractPayload,
+  DeclareContractResponse,
+  DeployContractPayload,
+  DeployContractResponse,
+  EstimateFeeResponse,
+  FunctionCall,
+  GetBlockResponse,
+  GetTransactionReceiptResponse,
+  GetTransactionResponse,
+  Invocation,
+  InvocationsDetails,
+  InvokeFunctionResponse,
+  RPC,
+} from '../types';
 import { getSelectorFromName } from '../utils/hash';
 import { parse, stringify } from '../utils/json';
 import {
@@ -12,20 +27,9 @@ import {
   toBN,
   toHex,
 } from '../utils/number';
+import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { compressProgram, randomAddress } from '../utils/stark';
-import {
-  CallContractResponse,
-  DeclareContractResponse,
-  DeployContractResponse,
-  FeeEstimateResponse,
-  FunctionCall,
-  GetBlockResponse,
-  GetTransactionReceiptResponse,
-  GetTransactionResponse,
-  InvokeContractResponse,
-  Provider,
-} from './abstractProvider';
-import { RPCResponseParser } from './rpcParser';
+import { ProviderInterface } from './interface';
 import { BlockIdentifier } from './utils';
 
 function wait(delay: number) {
@@ -36,7 +40,7 @@ function wait(delay: number) {
 
 export type RpcProviderOptions = { nodeUrl: string };
 
-export class RPCProvider implements Provider {
+export class RPCProvider implements ProviderInterface {
   public nodeUrl: string;
 
   public chainId!: StarknetChainId;
@@ -130,10 +134,10 @@ export class RPCProvider implements Provider {
     return this.fetchEndpoint('starknet_getClassAt', [contractAddress]);
   }
 
-  public async estimateFee(
+  public async getEstimateFee(
     request: FunctionCall,
     blockIdentifier: BlockIdentifier = 'pending'
-  ): Promise<FeeEstimateResponse> {
+  ): Promise<EstimateFeeResponse> {
     const parsedCalldata = request.calldata.map((data) => {
       if (typeof data === 'string' && isHex(data as string)) {
         return data;
@@ -151,10 +155,10 @@ export class RPCProvider implements Provider {
     ]).then(this.responseParser.parseFeeEstimateResponse);
   }
 
-  public async declareContract(
-    compiledContract: CompiledContract | string,
-    version: BigNumberish | undefined = 0
-  ): Promise<DeclareContractResponse> {
+  public async declareContract({
+    contract: compiledContract,
+    version,
+  }: DeclareContractPayload): Promise<DeclareContractResponse> {
     const parsedContract =
       typeof compiledContract === 'string'
         ? (parse(compiledContract) as CompiledContract)
@@ -169,26 +173,24 @@ export class RPCProvider implements Provider {
         program: contractDefinition.program,
         entry_points_by_type: contractDefinition.entry_points_by_type,
       },
-      toHex(toBN(version)),
+      toHex(toBN(version || 0)),
     ]).then(this.responseParser.parseDeclareContractResponse);
   }
 
-  public async deployContract(
-    compiledContract: CompiledContract | string,
-    constructorCalldata?: BigNumberish[],
-    salt?: BigNumberish | undefined
-  ): Promise<DeployContractResponse> {
+  public async deployContract({
+    contract,
+    constructorCalldata,
+    addressSalt,
+  }: DeployContractPayload): Promise<DeployContractResponse> {
     const parsedContract =
-      typeof compiledContract === 'string'
-        ? (parse(compiledContract) as CompiledContract)
-        : compiledContract;
+      typeof contract === 'string' ? (parse(contract) as CompiledContract) : contract;
     const contractDefinition = {
       ...parsedContract,
       program: compressProgram(parsedContract.program),
     };
 
     return this.fetchEndpoint('starknet_addDeployTransaction', [
-      salt ?? randomAddress(),
+      addressSalt ?? randomAddress(),
       bigNumberishArrayToDecimalStringArray(constructorCalldata ?? []),
       {
         program: contractDefinition.program,
@@ -197,13 +199,11 @@ export class RPCProvider implements Provider {
     ]).then(this.responseParser.parseDeployContractResponse);
   }
 
-  public async invokeContract(
-    functionInvocation: FunctionCall,
-    signature?: BigNumberish[] | undefined,
-    maxFee?: BigNumberish | undefined,
-    version?: BigNumberish | undefined
-  ): Promise<InvokeContractResponse> {
-    const parsedCalldata = functionInvocation.calldata.map((data) => {
+  public async invokeFunction(
+    functionInvocation: Invocation,
+    details: InvocationsDetails
+  ): Promise<InvokeFunctionResponse> {
+    const parsedCalldata = functionInvocation.calldata?.map((data) => {
       if (typeof data === 'string' && isHex(data as string)) {
         return data;
       }
@@ -213,13 +213,13 @@ export class RPCProvider implements Provider {
     return this.fetchEndpoint('starknet_addInvokeTransaction', [
       {
         contract_address: functionInvocation.contractAddress,
-        entry_point_selector: getSelectorFromName(functionInvocation.entryPointSelector),
+        entry_point_selector: getSelectorFromName(functionInvocation.entrypoint),
         calldata: parsedCalldata,
       },
-      signature,
-      maxFee,
-      version,
-    ]).then(this.responseParser.parseInvokeContractResponse);
+      functionInvocation.signature,
+      details.maxFee,
+      details.version,
+    ]).then(this.responseParser.parseInvokeFunctionResponse);
   }
 
   public async callContract(

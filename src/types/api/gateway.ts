@@ -13,10 +13,50 @@ import {
   TransactionStatus,
 } from '../lib';
 
+export type GetTransactionStatusResponse = {
+  tx_status: Status;
+  block_hash?: string;
+  tx_failure_reason?: {
+    code: string;
+    error_message: string;
+  };
+};
+
 export namespace Gateway {
   export type GetContractAddressesResponse = {
     Starknet: string;
     GpsStatementVerifier: string;
+  };
+
+  export type InvokeFunctionTrace = {
+    caller_address: string;
+    contract_address: string;
+    code_address: string;
+    selector: string;
+    calldata: RawCalldata;
+    result: Array<any>;
+    execution_resources: ExecutionResources;
+    internal_call: Array<InvokeFunctionTrace>;
+    events: Array<any>;
+    messages: Array<any>;
+  };
+
+  export type ExecutionResources = {
+    n_steps: number;
+    builtin_instance_counter: {
+      pedersen_builtin: number;
+      range_check_builtin: number;
+      bitwise_builtin: number;
+      output_builtin: number;
+      ecdsa_builtin: number;
+      ec_op_builtin?: number;
+    };
+    n_memory_holes: number;
+  };
+
+  export type GetCodeResponse = {
+    bytecode: string[];
+    abi: Abi;
   };
 
   export type DeclareTransaction = {
@@ -84,30 +124,8 @@ export namespace Gateway {
 
   export type GetTransactionResponse = SuccessfulTransactionResponse | FailedTransactionResponse;
 
-  export type GetTransactionStatusResponse = {
-    tx_status: Status;
-    block_hash?: string;
-    tx_failure_reason?: {
-      code: string;
-      error_message: string;
-    };
-  };
-
   export type RawArgs = {
     [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
-  };
-
-  export type ExecutionResources = {
-    n_steps: number;
-    builtin_instance_counter: {
-      pedersen_builtin: number;
-      range_check_builtin: number;
-      bitwise_builtin: number;
-      output_builtin: number;
-      ecdsa_builtin: number;
-      ec_op_builtin?: number;
-    };
-    n_memory_holes: number;
   };
 
   export type GetTransactionTraceResponse = {
@@ -151,11 +169,6 @@ export namespace Gateway {
     transaction_hash: string;
     l2_to_l1_messages: string[];
     events: string[];
-  };
-
-  export type GetCodeResponse = {
-    bytecode: string[];
-    abi: Abi;
   };
 
   export type GetBlockResponse = {

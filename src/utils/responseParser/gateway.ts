@@ -1,16 +1,16 @@
-import { Gateway } from '../types/api/gateway';
-import { toBN } from '../utils/number';
 import {
   CallContractResponse,
   DeclareContractResponse,
   DeployContractResponse,
-  FeeEstimateResponse,
+  EstimateFeeResponse,
+  Gateway,
   GetBlockResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
-  InvokeContractResponse,
-} from './abstractProvider';
-import { ResponseParser } from './parser';
+  InvokeFunctionResponse,
+} from '../../types';
+import { toBN } from '../number';
+import { ResponseParser } from '.';
 
 export class GatewayAPIResponseParser extends ResponseParser {
   public parseGetBlockResponse(res: Gateway.GetBlockResponse): GetBlockResponse {
@@ -32,8 +32,7 @@ export class GatewayAPIResponseParser extends ResponseParser {
 
   public parseGetTransactionResponse(res: Gateway.GetTransactionResponse): GetTransactionResponse {
     return {
-      calldata:
-        'calldata' in res.transaction ? (res.transaction.calldata as Array<string>) : undefined,
+      calldata: 'calldata' in res.transaction ? (res.transaction.calldata as Array<string>) : [],
       contractAddress:
         'contract_address' in res.transaction ? res.transaction.contract_address : undefined,
       contractClass:
@@ -69,7 +68,7 @@ export class GatewayAPIResponseParser extends ResponseParser {
     };
   }
 
-  public parseFeeEstimateResponse(res: Gateway.EstimateFeeResponse): FeeEstimateResponse {
+  public parseFeeEstimateResponse(res: Gateway.EstimateFeeResponse): EstimateFeeResponse {
     return {
       overallFee: toBN(res.amount),
     };
@@ -81,7 +80,7 @@ export class GatewayAPIResponseParser extends ResponseParser {
     };
   }
 
-  public parseInvokeContractResponse(res: Gateway.AddTransactionResponse): InvokeContractResponse {
+  public parseInvokeFunctionResponse(res: Gateway.AddTransactionResponse): InvokeFunctionResponse {
     return {
       transactionHash: res.transaction_hash,
     };

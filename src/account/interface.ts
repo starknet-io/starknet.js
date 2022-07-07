@@ -1,14 +1,6 @@
 import { ProviderInterface } from '../provider';
 import { SignerInterface } from '../signer';
-import {
-  Abi,
-  AddTransactionResponse,
-  Call,
-  DeployContractPayload,
-  InvocationsDetails,
-  Signature,
-} from '../types';
-import { EstimateFee, EstimateFeeDetails } from '../types/account';
+import { Abi, Call, InvocationsDetails, InvokeFunctionResponse, Signature } from '../types';
 import { BigNumberish } from '../utils/number';
 import { TypedData } from '../utils/typedData/types';
 
@@ -16,37 +8,6 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract address: string;
 
   public abstract signer: SignerInterface;
-
-  /**
-   * Deploys a given compiled contract (json) to starknet
-   *
-   * @param payload payload to be deployed containing:
-   * - compiled contract code
-   * - constructor calldata
-   * - address salt
-   * @param abi the abi of the contract
-   * @returns a confirmation of sending a transaction on the starknet contract
-   */
-  public abstract override deployContract(
-    payload: DeployContractPayload,
-    abi?: Abi
-  ): Promise<AddTransactionResponse>;
-
-  /**
-   * Estimate Fee for a method on starknet
-   *
-   * @param invocation the invocation object containing:
-   * - contractAddress - the address of the contract
-   * - entrypoint - the entrypoint of the contract
-   * - calldata - (defaults to []) the calldata
-   * - signature - (defaults to []) the signature
-   *
-   * @returns response from addTransaction
-   */
-  public abstract estimateFee(
-    calls: Call | Call[],
-    estimateFeeDetails?: EstimateFeeDetails
-  ): Promise<EstimateFee>;
 
   /**
    * Invoke execute function in account contract
@@ -64,7 +25,7 @@ export abstract class AccountInterface extends ProviderInterface {
     transactions: Call | Call[],
     abis?: Abi[],
     transactionsDetail?: InvocationsDetails
-  ): Promise<AddTransactionResponse>;
+  ): Promise<InvokeFunctionResponse>;
 
   /**
    * Sign an JSON object for off-chain usage with the starknet private key and return the signature

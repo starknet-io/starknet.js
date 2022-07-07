@@ -1,27 +1,33 @@
 import urljoin from 'url-join';
 
 import { ONE, StarknetChainId, ZERO } from '../constants';
-import { CompiledContract, GetTransactionStatusResponse } from '../types';
-import { Gateway } from '../types/api/gateway';
+import {
+  CallContractResponse,
+  CompiledContract,
+  DeclareContractPayload,
+  DeclareContractResponse,
+  DeployContractPayload,
+  DeployContractResponse,
+  EstimateFeeResponse,
+  FunctionCall,
+  Gateway,
+  GetBlockResponse,
+  GetContractAddressesResponse,
+  GetTransactionReceiptResponse,
+  GetTransactionResponse,
+  GetTransactionStatusResponse,
+  GetTransactionTraceResponse,
+  Invocation,
+  InvocationsDetails,
+  InvokeFunctionResponse,
+} from '../types';
 import { getSelectorFromName } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
+import { GatewayAPIResponseParser } from '../utils/responseParser/gateway';
 import { compressProgram, randomAddress } from '../utils/stark';
-import {
-  CallContractResponse,
-  DeclareContractResponse,
-  DeployContractResponse,
-  FeeEstimateResponse,
-  FunctionCall,
-  GetBlockResponse,
-  GetTransactionReceiptResponse,
-  GetTransactionResponse,
-  InvokeContractResponse,
-  Provider,
-} from './abstractProvider';
-import { ProviderOptions } from './default';
 import { GatewayError, HttpError } from './errors';
-import { GatewayAPIResponseParser } from './gatewayParser';
+import { ProviderInterface } from './interface';
 import { BlockIdentifier, getFormattedBlockIdentifier } from './utils';
 
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha';
@@ -41,7 +47,16 @@ function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
   );
 }
 
-export class GatewayProvider implements Provider {
+export type GatewayProviderOptions =
+  | { network: NetworkName }
+  | {
+      baseUrl: string;
+      feederGatewayUrl?: string;
+      gatewayUrl?: string;
+      chainId?: StarknetChainId;
+    };
+
+export class GatewayProvider implements ProviderInterface {
   public baseUrl: string;
 
   public feederGatewayUrl: string;
@@ -52,7 +67,7 @@ export class GatewayProvider implements Provider {
 
   private responseParser = new GatewayAPIResponseParser();
 
-  constructor(optionsOrProvider: ProviderOptions = { network: 'goerli-alpha' }) {
+  constructor(optionsOrProvider: GatewayProviderOptions = { network: 'goerli-alpha' }) {
     if ('network' in optionsOrProvider) {
       this.baseUrl = GatewayProvider.getNetworkFromName(optionsOrProvider.network);
       this.chainId = GatewayProvider.getChainIdFromBaseUrl(this.baseUrl);
@@ -248,28 +263,26 @@ export class GatewayProvider implements Provider {
     );
   }
 
-  public async invokeContract(
-    functionInvocation: FunctionCall,
-    signature?: BigNumberish[] | undefined,
-    maxFee?: BigNumberish | undefined,
-    version?: BigNumberish | undefined
-  ): Promise<InvokeContractResponse> {
+  public async invokeFunction(
+    functionInvocation: Invocation,
+    details: InvocationsDetails
+  ): Promise<InvokeFunctionResponse> {
     return this.fetchEndpoint('add_transaction', undefined, {
       type: 'INVOKE_FUNCTION',
       contract_address: functionInvocation.contractAddress,
-      entry_point_selector: getSelectorFromName(functionInvocation.entryPointSelector),
+      entry_point_selector: getSelectorFromName(functionInvocation.entrypoint),
       calldata: bigNumberishArrayToDecimalStringArray(functionInvocation.calldata ?? []),
-      signature: bigNumberishArrayToDecimalStringArray(signature ?? []),
-      max_fee: maxFee,
-      version,
-    }).then(this.responseParser.parseInvokeContractResponse);
+      signature: bigNumberishArrayToDecimalStringArray(functionInvocation.signature ?? []),
+      max_fee: details.maxFee,
+      version: details.version,
+    }).then(this.responseParser.parseInvokeFunctionResponse);
   }
 
-  public async deployContract(
-    compiledContract: CompiledContract | string,
-    constructorCalldata?: BigNumberish[],
-    salt?: BigNumberish | undefined
-  ): Promise<DeployContractResponse> {
+  public async deployContract({
+    contract: compiledContract,
+    constructorCalldata,
+    addressSalt,
+  }: DeployContractPayload): Promise<DeployContractResponse> {
     const parsedContract =
       typeof compiledContract === 'string'
         ? (parse(compiledContract) as CompiledContract)
@@ -281,16 +294,15 @@ export class GatewayProvider implements Provider {
 
     return this.fetchEndpoint('add_transaction', undefined, {
       type: 'DEPLOY',
-      contract_address_salt: salt ?? randomAddress(),
+      contract_address_salt: addressSalt ?? randomAddress(),
       constructor_calldata: bigNumberishArrayToDecimalStringArray(constructorCalldata ?? []),
       contract_definition: contractDefinition,
     }).then(this.responseParser.parseDeployContractResponse);
   }
 
-  public async declareContract(
-    compiledContract: CompiledContract | string,
-    _version?: BigNumberish | undefined
-  ): Promise<DeclareContractResponse> {
+  public async declareContract({
+    contract: compiledContract,
+  }: DeclareContractPayload): Promise<DeclareContractResponse> {
     const parsedContract =
       typeof compiledContract === 'string'
         ? (parse(compiledContract) as CompiledContract)
@@ -309,11 +321,11 @@ export class GatewayProvider implements Provider {
     }).then(this.responseParser.parseDeclareContractResponse);
   }
 
-  public async estimateFee(
+  public async getEstimateFee(
     request: FunctionCall,
     blockIdentifier: BlockIdentifier = 'pending',
     signature?: Array<string>
-  ): Promise<FeeEstimateResponse> {
+  ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint(
       'estimate_fee',
       { blockIdentifier },
@@ -324,19 +336,6 @@ export class GatewayProvider implements Provider {
         signature: bigNumberishArrayToDecimalStringArray(signature || []),
       }
     ).then(this.responseParser.parseFeeEstimateResponse);
-  }
-
-  /**
-   * Gets the status of a transaction.
-   *
-   * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L48-L52)
-   *
-   * @param txHash
-   * @returns the transaction status object { block_number, tx_status: NOT_RECEIVED | RECEIVED | PENDING | REJECTED | ACCEPTED_ONCHAIN }
-   */
-  public async getTransactionStatus(txHash: BigNumberish): Promise<GetTransactionStatusResponse> {
-    const txHashHex = toHex(toBN(txHash));
-    return this.fetchEndpoint('get_transaction_status', { transactionHash: txHashHex });
   }
 
   public async waitForTransaction(txHash: BigNumberish, retryInterval: number = 8000) {
@@ -362,5 +361,40 @@ export class GatewayProvider implements Provider {
         throw error;
       }
     }
+  }
+
+  /**
+   * Gets the status of a transaction.
+   *
+   * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L48-L52)
+   *
+   * @param txHash
+   * @returns the transaction status object { block_number, tx_status: NOT_RECEIVED | RECEIVED | PENDING | REJECTED | ACCEPTED_ONCHAIN }
+   */
+  public async getTransactionStatus(txHash: BigNumberish): Promise<GetTransactionStatusResponse> {
+    const txHashHex = toHex(toBN(txHash));
+    return this.fetchEndpoint('get_transaction_status', { transactionHash: txHashHex });
+  }
+
+  /**
+   * Gets the smart contract address on the goerli testnet.
+   *
+   * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L13-L15)
+   * @returns starknet smart contract addresses
+   */
+  public async getContractAddresses(): Promise<GetContractAddressesResponse> {
+    return this.fetchEndpoint('get_contract_addresses');
+  }
+
+  /**
+   * Gets the transaction trace from a tx id.
+   *
+   *
+   * @param txHash
+   * @returns the transaction trace
+   */
+  public async getTransactionTrace(txHash: BigNumberish): Promise<GetTransactionTraceResponse> {
+    const txHashHex = toHex(toBN(txHash));
+    return this.fetchEndpoint('get_transaction_trace', { transactionHash: txHashHex });
   }
 }

@@ -14,6 +14,7 @@ export type DeployContractPayload = {
 
 export type DeclareContractPayload = {
   contract: CompiledContract | string;
+  version?: BigNumberish;
 };
 
 export type Invocation = {

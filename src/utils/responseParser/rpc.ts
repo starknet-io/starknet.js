@@ -1,15 +1,15 @@
-import { RPC } from '../types/api/rpc';
 import {
   CallContractResponse,
   DeclareContractResponse,
   DeployContractResponse,
-  FeeEstimateResponse,
+  EstimateFeeResponse,
   GetBlockResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
-  InvokeContractResponse,
-} from './abstractProvider';
-import { ResponseParser } from './parser';
+  InvokeFunctionResponse,
+  RPC,
+} from '../../types';
+import { ResponseParser } from '.';
 
 export class RPCResponseParser extends ResponseParser {
   public parseGetBlockResponse(res: RPC.GetBlockResponse): GetBlockResponse {
@@ -29,7 +29,7 @@ export class RPCResponseParser extends ResponseParser {
 
   public parseGetTransactionResponse(res: RPC.GetTransactionResponse): GetTransactionResponse {
     return {
-      calldata: res.calldata,
+      calldata: res.calldata || [],
       contractAddress: res.contract_address,
       contractClass: res.contract_class,
       entryPointSelector: res.entry_point_selector,
@@ -66,7 +66,7 @@ export class RPCResponseParser extends ResponseParser {
     };
   }
 
-  public parseFeeEstimateResponse(res: RPC.EstimateFeeResponse): FeeEstimateResponse {
+  public parseFeeEstimateResponse(res: RPC.EstimateFeeResponse): EstimateFeeResponse {
     return {
       overallFee: res.overall_fee,
     };
@@ -78,7 +78,7 @@ export class RPCResponseParser extends ResponseParser {
     };
   }
 
-  public parseInvokeContractResponse(res: RPC.AddTransactionResponse): InvokeContractResponse {
+  public parseInvokeFunctionResponse(res: RPC.AddTransactionResponse): InvokeFunctionResponse {
     return {
       transactionHash: res.transaction_hash,
     };

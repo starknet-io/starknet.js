@@ -1,29 +1,19 @@
-import assert from 'minimalistic-assert';
-
 import { ZERO } from '../constants';
-import { Provider, ProviderOptions } from '../provider';
+import { ProviderOptions } from '../provider';
+import { Provider } from '../provider/default';
 import { Signer, SignerInterface } from '../signer';
 import {
   Abi,
-  AddTransactionResponse,
   Call,
   InvocationsDetails,
   InvocationsSignerDetails,
-  InvokeFunctionTransaction,
+  InvokeFunctionResponse,
   KeyPair,
   Signature,
-  Transaction,
 } from '../types';
 import { EstimateFee, EstimateFeeDetails } from '../types/account';
-import { sign } from '../utils/ellipticCurve';
-import {
-  computeHashOnElements,
-  feeTransactionVersion,
-  getSelectorFromName,
-  transactionVersion,
-} from '../utils/hash';
-import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
-import { encodeShortString } from '../utils/shortString';
+import { feeTransactionVersion, transactionVersion } from '../utils/hash';
+import { BigNumberish, toBN, toHex } from '../utils/number';
 import { compileCalldata, estimatedFeeToMaxFee } from '../utils/stark';
 import { fromCallsToExecuteCalldataWithNonce } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
@@ -48,7 +38,8 @@ export class Account extends Provider implements AccountInterface {
   public async getNonce(): Promise<string> {
     const { result } = await this.callContract({
       contractAddress: this.address,
-      entrypoint: 'get_nonce',
+      entryPointSelector: 'get_nonce',
+      calldata: [],
     });
     return toHex(toBN(result[0]));
   }
@@ -72,18 +63,12 @@ export class Account extends Provider implements AccountInterface {
     const signature = await this.signer.signTransaction(transactions, signerDetails);
 
     const calldata = fromCallsToExecuteCalldataWithNonce(transactions, nonce);
-    const fetchedEstimate = await this.fetchEndpoint(
-      'estimate_fee',
-      { blockIdentifier },
-      {
-        contract_address: this.address,
-        entry_point_selector: getSelectorFromName('__execute__'),
-        calldata,
-        version: toHex(version),
-        signature: bigNumberishArrayToDecimalStringArray(signature),
-      }
+    const fetchedEstimate = await super.getEstimateFee(
+      { contractAddress: this.address, entryPointSelector: '__execute__', calldata, signature },
+      blockIdentifier
     );
-    const suggestedMaxFee = estimatedFeeToMaxFee(fetchedEstimate.amount);
+
+    const suggestedMaxFee = estimatedFeeToMaxFee(fetchedEstimate.overallFee);
 
     return {
       ...fetchedEstimate,
@@ -105,7 +90,7 @@ export class Account extends Provider implements AccountInterface {
     calls: Call | Call[],
     abis: Abi[] | undefined = undefined,
     transactionsDetail: InvocationsDetails = {}
-  ): Promise<AddTransactionResponse> {
+  ): Promise<InvokeFunctionResponse> {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
     let maxFee: BigNumberish = '0';
@@ -116,124 +101,27 @@ export class Account extends Provider implements AccountInterface {
       maxFee = suggestedMaxFee.toString();
     }
 
+    const version = toBN(transactionVersion);
+
     const signerDetails: InvocationsSignerDetails = {
       walletAddress: this.address,
       nonce,
       maxFee,
-      version: toBN(transactionVersion),
+      version,
       chainId: this.chainId,
     };
 
     const signature = await this.signer.signTransaction(transactions, signerDetails, abis);
 
     const calldata = fromCallsToExecuteCalldataWithNonce(transactions, nonce);
-    return this.fetchEndpoint('add_transaction', undefined, {
-      type: 'INVOKE_FUNCTION',
-      contract_address: this.address,
-      entry_point_selector: getSelectorFromName('__execute__'),
-      calldata,
-      signature: bigNumberishArrayToDecimalStringArray(signature),
-      max_fee: toHex(toBN(maxFee)),
-    });
-  }
 
-  /**
-   * Temporary method to allow dapps on starknet.js v2 to work with Argent X v3
-   * @deprecated to remove ASAP
-   */
-  public async LEGACY_addTransaction(transaction: Transaction): Promise<AddTransactionResponse> {
-    if (transaction.type === 'DEPLOY') throw new Error('No DEPLOYS');
-    if (transaction.type === 'DECLARE') throw new Error('No DECLARES');
-
-    assert(
-      !transaction.signature,
-      "Adding signatures to a signer transaction currently isn't supported"
-    );
-
-    let nonceBn;
-    if (transaction.nonce) {
-      nonceBn = toBN(transaction.nonce);
-    } else {
-      const { result } = await this.callContract({
-        contractAddress: this.address,
-        entrypoint: 'get_nonce',
-      });
-      nonceBn = toBN(result[0]);
-    }
-
-    function hashMulticall(
-      account: string,
-      transactions: InvokeFunctionTransaction[],
-      nonce: string,
-      maxFee: string
-    ) {
-      const hashArray = transactions
-        .map(({ contract_address, entry_point_selector, calldata }) => [
-          contract_address,
-          entry_point_selector,
-          computeHashOnElements(calldata || []),
-        ])
-        .map(bigNumberishArrayToDecimalStringArray)
-        .map(computeHashOnElements);
-
-      return computeHashOnElements([
-        encodeShortString('StarkNet Transaction'),
-        account,
-        computeHashOnElements(hashArray),
-        nonce,
+    return this.invokeFunction(
+      { contractAddress: this.address, entrypoint: '__execute__', calldata, signature },
+      {
         maxFee,
-        transactionVersion,
-      ]);
-    }
-    const msgHash = hashMulticall(this.address, [transaction], nonceBn.toString(), '0');
-    if (!('keyPair' in this.signer)) {
-      throw new Error('No keyPair');
-    }
-    const signature = sign((this.signer as any).keyPair, msgHash);
-
-    const transformCallsToMulticallArrays = (calls: InvokeFunctionTransaction[]) => {
-      const callArray: any[] = [];
-      const calldata: BigNumberish[] = [];
-      calls.forEach((call) => {
-        const data = call.calldata || [];
-        callArray.push({
-          to: toBN(call.contract_address).toString(10),
-          selector: toBN(call.entry_point_selector).toString(10),
-          data_offset: calldata.length.toString(),
-          data_len: data.length.toString(),
-        });
-        calldata.push(...data);
-      });
-      return {
-        callArray,
-        calldata: bigNumberishArrayToDecimalStringArray(calldata),
-      };
-    };
-
-    const fromCallsToExecuteCalldata2 = (calls: InvokeFunctionTransaction[]): string[] => {
-      const { callArray, calldata } = transformCallsToMulticallArrays(calls);
-      return [
-        callArray.length.toString(),
-        ...callArray
-          .map(
-            ({ to, selector, data_offset, data_len }) =>
-              [to, selector, data_offset, data_len] as string[]
-          )
-          .flat(),
-        calldata.length.toString(),
-        ...calldata,
-      ];
-    };
-
-    const calldata = [...fromCallsToExecuteCalldata2([transaction]), nonceBn.toString()];
-
-    return this.fetchEndpoint('add_transaction', undefined, {
-      type: 'INVOKE_FUNCTION',
-      contract_address: this.address,
-      entry_point_selector: getSelectorFromName('__execute__'),
-      calldata,
-      signature: bigNumberishArrayToDecimalStringArray(signature),
-    });
+        version,
+      }
+    );
   }
 
   /**
@@ -271,7 +159,7 @@ export class Account extends Provider implements AccountInterface {
     try {
       await this.callContract({
         contractAddress: this.address,
-        entrypoint: 'is_valid_signature',
+        entryPointSelector: 'is_valid_signature',
         calldata: compileCalldata({
           hash: toBN(hash).toString(),
           signature: signature.map((x) => toBN(x).toString()),

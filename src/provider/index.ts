@@ -4,6 +4,6 @@ export * from './default';
 export * from './errors';
 export * from './gateway';
 export * from './interface';
-export * from './rpcProvider';
+export * from './rpc';
 
 export const defaultProvider = new Provider();

@@ -2,12 +2,12 @@ import {
   CallContractResponse,
   DeclareContractResponse,
   DeployContractResponse,
-  FeeEstimateResponse,
+  EstimateFeeResponse,
   GetBlockResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
-  InvokeContractResponse,
-} from './abstractProvider';
+  InvokeFunctionResponse,
+} from '../../types';
 
 export abstract class ResponseParser {
   abstract parseGetBlockResponse(res: any): GetBlockResponse;
@@ -16,11 +16,11 @@ export abstract class ResponseParser {
 
   abstract parseGetTransactionReceiptResponse(res: any): GetTransactionReceiptResponse;
 
-  abstract parseFeeEstimateResponse(res: any): FeeEstimateResponse;
+  abstract parseFeeEstimateResponse(res: any): EstimateFeeResponse;
 
   abstract parseCallContractResponse(res: any): CallContractResponse;
 
-  abstract parseInvokeContractResponse(res: any): InvokeContractResponse;
+  abstract parseInvokeFunctionResponse(res: any): InvokeFunctionResponse;
 
   abstract parseDeployContractResponse(res: any): DeployContractResponse;
 
