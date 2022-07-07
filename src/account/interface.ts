@@ -1,6 +1,14 @@
 import { ProviderInterface } from '../provider';
 import { SignerInterface } from '../signer';
-import { Abi, Call, InvocationsDetails, InvokeFunctionResponse, Signature } from '../types';
+import {
+  Abi,
+  Call,
+  EstimateFee,
+  EstimateFeeDetails,
+  InvocationsDetails,
+  InvokeFunctionResponse,
+  Signature,
+} from '../types';
 import { BigNumberish } from '../utils/number';
 import { TypedData } from '../utils/typedData/types';
 
@@ -8,6 +16,22 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract address: string;
 
   public abstract signer: SignerInterface;
+
+  /**
+   * Estimate Fee for a method on starknet
+   *
+   * @param invocation the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   *
+   * @returns response from addTransaction
+   */
+  public abstract estimateFee(
+    calls: Call | Call[],
+    estimateFeeDetails?: EstimateFeeDetails
+  ): Promise<EstimateFee>;
 
   /**
    * Invoke execute function in account contract

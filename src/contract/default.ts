@@ -7,13 +7,13 @@ import { BlockIdentifier } from '../provider/utils';
 import {
   Abi,
   AbiEntry,
-  AddTransactionResponse,
   Args,
   AsyncContractFunction,
   Calldata,
   ContractFunction,
   FunctionAbi,
   Invocation,
+  InvokeFunctionResponse,
   Overrides,
   ParsedStruct,
   Result,
@@ -97,7 +97,7 @@ export class Contract implements ContractInterface {
 
   address: string;
 
-  providerOrAccount: ProviderInterface | AccountInterface;
+  providerOrAccount!: ProviderInterface | AccountInterface;
 
   deployTransactionHash?: string;
 
@@ -544,7 +544,7 @@ export class Contract implements ContractInterface {
     method: string,
     args: Array<any> = [],
     options: Overrides = {}
-  ): Promise<AddTransactionResponse> {
+  ): Promise<InvokeFunctionResponse> {
     // ensure contract is connected
     assert(this.address !== null, 'contract isnt connected to an address');
     // validate method and args
@@ -578,6 +578,7 @@ export class Contract implements ContractInterface {
       });
     }
 
+    // TODO: throw warning
     return this.providerOrAccount.invokeFunction({
       ...invocation,
       signature: options.signature || [],
@@ -609,13 +610,12 @@ export class Contract implements ContractInterface {
           calldata,
           entrypoint: method,
         },
-        { blockIdentifier }
+        blockIdentifier
       )
       .then((x) => this.parseResponse(method, x.result));
   }
 
   public async estimate(method: string, args: Array<any> = []) {
-    //  TODO; remove error as soon as estimate fees are supported
     // ensure contract is connected
     assert(this.address !== null, 'contract isnt connected to an address');
 

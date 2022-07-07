@@ -1,18 +1,19 @@
 import { StarknetChainId } from '../constants';
 import {
+  Call,
   CallContractResponse,
   DeclareContractPayload,
   DeclareContractResponse,
   DeployContractPayload,
   DeployContractResponse,
   EstimateFeeResponse,
-  FunctionCall,
   GetBlockResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
   InvocationsDetails,
   InvokeFunctionResponse,
+  Signature,
 } from '../types';
 import { BigNumberish } from '../utils/number';
 import { GatewayProvider, GatewayProviderOptions } from './gateway';
@@ -52,10 +53,11 @@ export class Provider implements ProviderInterface {
   }
 
   public async getEstimateFee(
-    request: FunctionCall,
-    blockIdentifier: BlockIdentifier
+    request: Call,
+    blockIdentifier: BlockIdentifier,
+    signature?: Signature
   ): Promise<EstimateFeeResponse> {
-    return this.provider.getEstimateFee(request, blockIdentifier);
+    return this.provider.getEstimateFee(request, blockIdentifier, signature);
   }
 
   public async getStorageAt(
@@ -75,7 +77,7 @@ export class Provider implements ProviderInterface {
   }
 
   public async callContract(
-    request: FunctionCall,
+    request: Call,
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<CallContractResponse> {
     return this.provider.callContract(request, blockIdentifier);

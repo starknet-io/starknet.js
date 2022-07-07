@@ -2,6 +2,7 @@ import urljoin from 'url-join';
 
 import { ONE, StarknetChainId, ZERO } from '../constants';
 import {
+  Call,
   CallContractResponse,
   CompiledContract,
   DeclareContractPayload,
@@ -9,7 +10,6 @@ import {
   DeployContractPayload,
   DeployContractResponse,
   EstimateFeeResponse,
-  FunctionCall,
   Gateway,
   GetBlockResponse,
   GetContractAddressesResponse,
@@ -20,6 +20,7 @@ import {
   Invocation,
   InvocationsDetails,
   InvokeFunctionResponse,
+  Signature,
 } from '../types';
 import { getSelectorFromName } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
@@ -205,7 +206,7 @@ export class GatewayProvider implements ProviderInterface {
   }
 
   public async callContract(
-    { contractAddress, entryPointSelector, calldata = [] }: FunctionCall,
+    { contractAddress, entrypoint: entryPointSelector, calldata = [] }: Call,
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<CallContractResponse> {
     return this.fetchEndpoint(
@@ -322,17 +323,17 @@ export class GatewayProvider implements ProviderInterface {
   }
 
   public async getEstimateFee(
-    request: FunctionCall,
+    call: Call,
     blockIdentifier: BlockIdentifier = 'pending',
-    signature?: Array<string>
+    signature?: Signature
   ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint(
       'estimate_fee',
       { blockIdentifier },
       {
-        contract_address: request.contractAddress,
-        entry_point_selector: getSelectorFromName(request.entryPointSelector),
-        calldata: bigNumberishArrayToDecimalStringArray(request.calldata ?? []),
+        contract_address: call.contractAddress,
+        entry_point_selector: getSelectorFromName(call.entrypoint),
+        calldata: bigNumberishArrayToDecimalStringArray(call.calldata ?? []),
         signature: bigNumberishArrayToDecimalStringArray(signature || []),
       }
     ).then(this.responseParser.parseFeeEstimateResponse);

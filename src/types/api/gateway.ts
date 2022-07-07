@@ -22,43 +22,63 @@ export type GetTransactionStatusResponse = {
   };
 };
 
-export namespace Gateway {
-  export type GetContractAddressesResponse = {
-    Starknet: string;
-    GpsStatementVerifier: string;
-  };
+export type GetContractAddressesResponse = {
+  Starknet: string;
+  GpsStatementVerifier: string;
+};
 
-  export type InvokeFunctionTrace = {
+export type InvokeFunctionTrace = {
+  caller_address: string;
+  contract_address: string;
+  code_address: string;
+  selector: string;
+  calldata: RawCalldata;
+  result: Array<any>;
+  execution_resources: ExecutionResources;
+  internal_call: Array<InvokeFunctionTrace>;
+  events: Array<any>;
+  messages: Array<any>;
+};
+
+export type ExecutionResources = {
+  n_steps: number;
+  builtin_instance_counter: {
+    pedersen_builtin: number;
+    range_check_builtin: number;
+    bitwise_builtin: number;
+    output_builtin: number;
+    ecdsa_builtin: number;
+    ec_op_builtin?: number;
+  };
+  n_memory_holes: number;
+};
+
+export type GetCodeResponse = {
+  bytecode: string[];
+  abi: Abi;
+};
+
+export type GetTransactionTraceResponse = {
+  function_invocation: {
     caller_address: string;
     contract_address: string;
     code_address: string;
     selector: string;
-    calldata: RawCalldata;
+    calldata: RawArgs;
     result: Array<any>;
     execution_resources: ExecutionResources;
-    internal_call: Array<InvokeFunctionTrace>;
+    internal_call: Array<any>;
     events: Array<any>;
     messages: Array<any>;
   };
+  signature: Signature;
+};
 
-  export type ExecutionResources = {
-    n_steps: number;
-    builtin_instance_counter: {
-      pedersen_builtin: number;
-      range_check_builtin: number;
-      bitwise_builtin: number;
-      output_builtin: number;
-      ecdsa_builtin: number;
-      ec_op_builtin?: number;
-    };
-    n_memory_holes: number;
-  };
+export type RawArgs = {
+  [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
+};
 
-  export type GetCodeResponse = {
-    bytecode: string[];
-    abi: Abi;
-  };
-
+export namespace Gateway {
   export type DeclareTransaction = {
     type: 'DECLARE';
     contract_class: CompressedCompiledContract;
@@ -123,26 +143,6 @@ export namespace Gateway {
   };
 
   export type GetTransactionResponse = SuccessfulTransactionResponse | FailedTransactionResponse;
-
-  export type RawArgs = {
-    [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
-  };
-
-  export type GetTransactionTraceResponse = {
-    function_invocation: {
-      caller_address: string;
-      contract_address: string;
-      code_address: string;
-      selector: string;
-      calldata: RawArgs;
-      result: Array<any>;
-      execution_resources: ExecutionResources;
-      internal_call: Array<any>;
-      events: Array<any>;
-      messages: Array<any>;
-    };
-    signature: Signature;
-  };
 
   export type TransactionReceiptResponse =
     | SuccessfulTransactionReceiptResponse

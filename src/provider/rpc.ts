@@ -2,6 +2,7 @@ import fetch from 'cross-fetch';
 
 import { StarknetChainId } from '../constants';
 import {
+  Call,
   CallContractResponse,
   CompiledContract,
   DeclareContractPayload,
@@ -9,7 +10,6 @@ import {
   DeployContractPayload,
   DeployContractResponse,
   EstimateFeeResponse,
-  FunctionCall,
   GetBlockResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
@@ -17,6 +17,7 @@ import {
   InvocationsDetails,
   InvokeFunctionResponse,
   RPC,
+  Signature,
 } from '../types';
 import { getSelectorFromName } from '../utils/hash';
 import { parse, stringify } from '../utils/json';
@@ -135,10 +136,11 @@ export class RPCProvider implements ProviderInterface {
   }
 
   public async getEstimateFee(
-    request: FunctionCall,
-    blockIdentifier: BlockIdentifier = 'pending'
+    call: Call,
+    blockIdentifier: BlockIdentifier = 'pending',
+    _signature: Signature = []
   ): Promise<EstimateFeeResponse> {
-    const parsedCalldata = request.calldata.map((data) => {
+    const parsedCalldata = call.calldata?.map((data) => {
       if (typeof data === 'string' && isHex(data as string)) {
         return data;
       }
@@ -147,8 +149,8 @@ export class RPCProvider implements ProviderInterface {
 
     return this.fetchEndpoint('starknet_estimateFee', [
       {
-        contract_address: request.contractAddress,
-        entry_point_selector: getSelectorFromName(request.entryPointSelector),
+        contract_address: call.contractAddress,
+        entry_point_selector: getSelectorFromName(call.entrypoint),
         calldata: parsedCalldata,
       },
       blockIdentifier,
@@ -223,10 +225,10 @@ export class RPCProvider implements ProviderInterface {
   }
 
   public async callContract(
-    request: FunctionCall,
+    call: Call,
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<CallContractResponse> {
-    const parsedCalldata = request.calldata.map((data) => {
+    const parsedCalldata = call.calldata?.map((data) => {
       if (typeof data === 'string' && isHex(data as string)) {
         return data;
       }
@@ -235,8 +237,8 @@ export class RPCProvider implements ProviderInterface {
 
     const result = await this.fetchEndpoint('starknet_call', [
       {
-        contract_address: request.contractAddress,
-        entry_point_selector: getSelectorFromName(request.entryPointSelector),
+        contract_address: call.contractAddress,
+        entry_point_selector: getSelectorFromName(call.entrypoint),
         calldata: parsedCalldata,
       },
       blockIdentifier,

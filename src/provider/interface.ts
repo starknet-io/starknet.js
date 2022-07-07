@@ -1,18 +1,19 @@
 import { StarknetChainId } from '../constants';
 import type {
+  Call,
   CallContractResponse,
   DeclareContractPayload,
   DeclareContractResponse,
   DeployContractPayload,
   DeployContractResponse,
   EstimateFeeResponse,
-  FunctionCall,
   GetBlockResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
   InvocationsDetails,
   InvokeFunctionResponse,
+  Signature,
 } from '../types';
 import type { BigNumberish } from '../utils/number';
 import { BlockIdentifier } from './utils';
@@ -28,7 +29,7 @@ export abstract class ProviderInterface {
    * @returns the result of the function on the smart contract.
    */
   public abstract callContract(
-    request: FunctionCall,
+    request: Call,
     blockIdentifier?: BlockIdentifier
   ): Promise<CallContractResponse>;
 
@@ -122,12 +123,13 @@ export abstract class ProviderInterface {
    */
   public abstract invokeFunction(
     invocation: Invocation,
-    details: InvocationsDetails
+    details?: InvocationsDetails
   ): Promise<InvokeFunctionResponse>;
 
   public abstract getEstimateFee(
-    request: FunctionCall,
-    blockIdentifier: BlockIdentifier
+    request: Call,
+    blockIdentifier: BlockIdentifier,
+    signature?: Signature
   ): Promise<EstimateFeeResponse>;
 
   public abstract waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<void>;

@@ -38,7 +38,7 @@ export class Account extends Provider implements AccountInterface {
   public async getNonce(): Promise<string> {
     const { result } = await this.callContract({
       contractAddress: this.address,
-      entryPointSelector: 'get_nonce',
+      entrypoint: 'get_nonce',
       calldata: [],
     });
     return toHex(toBN(result[0]));
@@ -64,8 +64,9 @@ export class Account extends Provider implements AccountInterface {
 
     const calldata = fromCallsToExecuteCalldataWithNonce(transactions, nonce);
     const fetchedEstimate = await super.getEstimateFee(
-      { contractAddress: this.address, entryPointSelector: '__execute__', calldata, signature },
-      blockIdentifier
+      { contractAddress: this.address, entrypoint: '__execute__', calldata },
+      blockIdentifier,
+      signature
     );
 
     const suggestedMaxFee = estimatedFeeToMaxFee(fetchedEstimate.overallFee);
@@ -159,7 +160,7 @@ export class Account extends Provider implements AccountInterface {
     try {
       await this.callContract({
         contractAddress: this.address,
-        entryPointSelector: 'is_valid_signature',
+        entrypoint: 'is_valid_signature',
         calldata: compileCalldata({
           hash: toBN(hash).toString(),
           signature: signature.map((x) => toBN(x).toString()),

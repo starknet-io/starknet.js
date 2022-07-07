@@ -88,12 +88,6 @@ export interface EstimateFeeResponse {
   overallFee: BigNumberish;
 }
 
-export interface FunctionCall {
-  contractAddress: string;
-  entryPointSelector: string;
-  calldata: Array<BigNumberish>;
-}
-
 export interface InvokeFunctionResponse {
   transactionHash: string;
 }
@@ -109,5 +103,5 @@ export interface DeclareContractResponse {
 }
 
 export type CallContractResponse = {
-  result: Array<BigNumberish>;
+  result: Array<string>;
 };
