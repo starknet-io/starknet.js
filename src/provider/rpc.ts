@@ -4,7 +4,6 @@ import { StarknetChainId } from '../constants';
 import {
   Call,
   CallContractResponse,
-  CompiledContract,
   DeclareContractPayload,
   DeclareContractResponse,
   DeployContractPayload,
@@ -20,7 +19,7 @@ import {
   Signature,
 } from '../types';
 import { getSelectorFromName } from '../utils/hash';
-import { parse, stringify } from '../utils/json';
+import { stringify } from '../utils/json';
 import {
   BigNumberish,
   bigNumberishArrayToDecimalStringArray,
@@ -28,16 +27,11 @@ import {
   toBN,
   toHex,
 } from '../utils/number';
+import { parseCalldata, parseContract, wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
-import { compressProgram, randomAddress } from '../utils/stark';
+import { randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
 import { BlockIdentifier } from './utils';
-
-function wait(delay: number) {
-  return new Promise((res) => {
-    setTimeout(res, delay);
-  });
-}
 
 export type RpcProviderOptions = { nodeUrl: string };
 
@@ -140,35 +134,21 @@ export class RPCProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier = 'pending',
     _signature: Signature = []
   ): Promise<EstimateFeeResponse> {
-    const parsedCalldata = call.calldata?.map((data) => {
-      if (typeof data === 'string' && isHex(data as string)) {
-        return data;
-      }
-      return toHex(toBN(data));
-    });
-
     return this.fetchEndpoint('starknet_estimateFee', [
       {
         contract_address: call.contractAddress,
         entry_point_selector: getSelectorFromName(call.entrypoint),
-        calldata: parsedCalldata,
+        calldata: parseCalldata(call.calldata),
       },
       blockIdentifier,
     ]).then(this.responseParser.parseFeeEstimateResponse);
   }
 
   public async declareContract({
-    contract: compiledContract,
+    contract,
     version,
   }: DeclareContractPayload): Promise<DeclareContractResponse> {
-    const parsedContract =
-      typeof compiledContract === 'string'
-        ? (parse(compiledContract) as CompiledContract)
-        : compiledContract;
-    const contractDefinition = {
-      ...parsedContract,
-      program: compressProgram(parsedContract.program),
-    };
+    const contractDefinition = parseContract(contract);
 
     return this.fetchEndpoint('starknet_addDeclareTransaction', [
       {
@@ -184,12 +164,7 @@ export class RPCProvider implements ProviderInterface {
     constructorCalldata,
     addressSalt,
   }: DeployContractPayload): Promise<DeployContractResponse> {
-    const parsedContract =
-      typeof contract === 'string' ? (parse(contract) as CompiledContract) : contract;
-    const contractDefinition = {
-      ...parsedContract,
-      program: compressProgram(parsedContract.program),
-    };
+    const contractDefinition = parseContract(contract);
 
     return this.fetchEndpoint('starknet_addDeployTransaction', [
       addressSalt ?? randomAddress(),
@@ -205,18 +180,11 @@ export class RPCProvider implements ProviderInterface {
     functionInvocation: Invocation,
     details: InvocationsDetails
   ): Promise<InvokeFunctionResponse> {
-    const parsedCalldata = functionInvocation.calldata?.map((data) => {
-      if (typeof data === 'string' && isHex(data as string)) {
-        return data;
-      }
-      return toHex(toBN(data));
-    });
-
     return this.fetchEndpoint('starknet_addInvokeTransaction', [
       {
         contract_address: functionInvocation.contractAddress,
         entry_point_selector: getSelectorFromName(functionInvocation.entrypoint),
-        calldata: parsedCalldata,
+        calldata: parseCalldata(functionInvocation.calldata),
       },
       functionInvocation.signature,
       details.maxFee,
@@ -228,18 +196,11 @@ export class RPCProvider implements ProviderInterface {
     call: Call,
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<CallContractResponse> {
-    const parsedCalldata = call.calldata?.map((data) => {
-      if (typeof data === 'string' && isHex(data as string)) {
-        return data;
-      }
-      return toHex(toBN(data));
-    });
-
     const result = await this.fetchEndpoint('starknet_call', [
       {
         contract_address: call.contractAddress,
         entry_point_selector: getSelectorFromName(call.entrypoint),
-        calldata: parsedCalldata,
+        calldata: parseCalldata(call.calldata),
       },
       blockIdentifier,
     ]);

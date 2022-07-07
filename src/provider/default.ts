@@ -22,15 +22,15 @@ import { RPCProvider, RpcProviderOptions } from './rpc';
 import { BlockIdentifier } from './utils';
 
 export interface ProviderOptions {
-  gateway: GatewayProviderOptions;
-  rpc: RpcProviderOptions;
+  gateway?: GatewayProviderOptions;
+  rpc?: RpcProviderOptions;
 }
 
 export class Provider implements ProviderInterface {
   private provider!: ProviderInterface;
 
   constructor(options?: ProviderOptions) {
-    if (options && 'rpc' in options) {
+    if (options && options.rpc) {
       this.provider = new RPCProvider(options.rpc);
     }
 

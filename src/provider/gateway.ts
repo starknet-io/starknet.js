@@ -4,7 +4,6 @@ import { ONE, StarknetChainId, ZERO } from '../constants';
 import {
   Call,
   CallContractResponse,
-  CompiledContract,
   DeclareContractPayload,
   DeclareContractResponse,
   DeployContractPayload,
@@ -25,19 +24,14 @@ import {
 import { getSelectorFromName } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
+import { parseContract, wait } from '../utils/provider';
 import { GatewayAPIResponseParser } from '../utils/responseParser/gateway';
-import { compressProgram, randomAddress } from '../utils/stark';
+import { randomAddress } from '../utils/stark';
 import { GatewayError, HttpError } from './errors';
 import { ProviderInterface } from './interface';
 import { BlockIdentifier, getFormattedBlockIdentifier } from './utils';
 
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha';
-
-function wait(delay: number) {
-  return new Promise((res) => {
-    setTimeout(res, delay);
-  });
-}
 
 function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
   return (
@@ -254,13 +248,7 @@ export class GatewayProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<any> {
     return this.fetchEndpoint('get_full_contract', { blockIdentifier, contractAddress }).then(
-      (res) => {
-        const parsedContract = typeof res === 'string' ? (parse(res) as CompiledContract) : res;
-        return {
-          ...parsedContract,
-          program: compressProgram(parsedContract.program),
-        };
-      }
+      parseContract
     );
   }
 
@@ -280,18 +268,11 @@ export class GatewayProvider implements ProviderInterface {
   }
 
   public async deployContract({
-    contract: compiledContract,
+    contract,
     constructorCalldata,
     addressSalt,
   }: DeployContractPayload): Promise<DeployContractResponse> {
-    const parsedContract =
-      typeof compiledContract === 'string'
-        ? (parse(compiledContract) as CompiledContract)
-        : compiledContract;
-    const contractDefinition = {
-      ...parsedContract,
-      program: compressProgram(parsedContract.program),
-    };
+    const contractDefinition = parseContract(contract);
 
     return this.fetchEndpoint('add_transaction', undefined, {
       type: 'DEPLOY',
@@ -302,16 +283,9 @@ export class GatewayProvider implements ProviderInterface {
   }
 
   public async declareContract({
-    contract: compiledContract,
+    contract,
   }: DeclareContractPayload): Promise<DeclareContractResponse> {
-    const parsedContract =
-      typeof compiledContract === 'string'
-        ? (parse(compiledContract) as CompiledContract)
-        : compiledContract;
-    const contractDefinition = {
-      ...parsedContract,
-      program: compressProgram(parsedContract.program),
-    };
+    const contractDefinition = parseContract(contract);
 
     return this.fetchEndpoint('add_transaction', undefined, {
       type: 'DECLARE',
