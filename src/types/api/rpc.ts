@@ -238,25 +238,10 @@ export namespace RPC {
       REQUEST: any[];
       RESPONSE: DeclareResponse;
     };
-    starknet_getClass: {
-      QUERY: never;
-      REQUEST: any[];
-      RESPONSE: any;
-    };
     starknet_getClassAt: {
       QUERY: never;
       REQUEST: any[];
       RESPONSE: any;
-    };
-    starknet_getStateUpdateByHash: {
-      QUERY: never;
-      REQUEST: any[];
-      RESPONSE: any;
-    };
-    starknet_getClassHashAt: {
-      QUERY: never;
-      REQUEST: any[];
-      RESPONSE: string;
     };
   };
 }

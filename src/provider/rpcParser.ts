@@ -1,12 +1,10 @@
 import { RPC } from '../types/api/rpc';
 import {
   CallContractResponse,
-  ContractClass,
   DeclareContractResponse,
   DeployContractResponse,
   FeeEstimateResponse,
   GetBlockResponse,
-  GetStateUpdateResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   InvokeContractResponse,
@@ -29,45 +27,18 @@ export class RPCResponseParser extends ResponseParser {
     };
   }
 
-  public parseGetClassResponse(res: RPC.GetClassResponse): ContractClass {
-    return {
-      program: res.program,
-      entryPointByType: res.entry_point_by_type,
-    };
-  }
-
-  public parseGetStateUpdateResponse(res: any): GetStateUpdateResponse {
-    return {
-      blockHash: res.block_hash,
-      newRoot: res.new_root,
-      oldRoot: res.old_root,
-      acceptedTime: res.accepted_time,
-      stateDiff: {
-        storageDiffs: res.storage_diffs,
-        deployedContracts: res.deployed_contracts.map((deployedContract: any) => ({
-          address: deployedContract.address,
-          contractHash: deployedContract.contract_hash,
-        })),
-        nonces: res.nonces.map(({ contract_address, nonce }: any) => ({
-          nonce,
-          contractAddress: contract_address,
-        })),
-      },
-    };
-  }
-
   public parseGetTransactionResponse(res: RPC.GetTransactionResponse): GetTransactionResponse {
     return {
-      transactionHash: res.txn_hash,
+      calldata: res.calldata,
+      contractAddress: res.contract_address,
+      contractClass: res.contract_class,
+      entryPointSelector: res.entry_point_selector,
       maxFee: res.max_fee,
       nonce: res.nonce,
-      signature: res.signature,
-      version: res.version,
       senderAddress: res.sender_address,
-      contractClass: res.contract_class && this.parseGetClassResponse(res.contract_class),
-      contractAddress: res.contract_address,
-      entryPointSelector: res.entry_point_selector,
-      calldata: res.calldata,
+      signature: res.signature,
+      transactionHash: res.txn_hash,
+      version: res.version,
     };
   }
 

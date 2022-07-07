@@ -1,11 +1,9 @@
 import {
   CallContractResponse,
-  ContractClass,
   DeclareContractResponse,
   DeployContractResponse,
   FeeEstimateResponse,
   GetBlockResponse,
-  GetStateUpdateResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   InvokeContractResponse,
@@ -13,10 +11,6 @@ import {
 
 export abstract class ResponseParser {
   abstract parseGetBlockResponse(res: any): GetBlockResponse;
-
-  abstract parseGetClassResponse(res: any): ContractClass;
-
-  abstract parseGetStateUpdateResponse(res: any): GetStateUpdateResponse;
 
   abstract parseGetTransactionResponse(res: any): GetTransactionResponse;
 

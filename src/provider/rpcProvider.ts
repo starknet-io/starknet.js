@@ -1,8 +1,10 @@
 import fetch from 'cross-fetch';
 
 import { StarknetChainId } from '../constants';
+import { CompiledContract } from '../types';
 import { RPC } from '../types/api/rpc';
 import { getSelectorFromName } from '../utils/hash';
+import { parse, stringify } from '../utils/json';
 import {
   BigNumberish,
   bigNumberishArrayToDecimalStringArray,
@@ -10,16 +12,14 @@ import {
   toBN,
   toHex,
 } from '../utils/number';
-import { randomAddress } from '../utils/stark';
+import { compressProgram, randomAddress } from '../utils/stark';
 import {
   CallContractResponse,
-  ContractClass,
   DeclareContractResponse,
   DeployContractResponse,
   FeeEstimateResponse,
   FunctionCall,
   GetBlockResponse,
-  GetStateUpdateResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   InvokeContractResponse,
@@ -27,6 +27,12 @@ import {
 } from './abstractProvider';
 import { RPCResponseParser } from './rpcParser';
 import { BlockIdentifier } from './utils';
+
+function wait(delay: number) {
+  return new Promise((res) => {
+    setTimeout(res, delay);
+  });
+}
 
 export type RpcProviderOptions = { nodeUrl: string };
 
@@ -60,7 +66,7 @@ export class RPCProvider implements Provider {
     try {
       const rawResult = await fetch(this.nodeUrl, {
         method: 'POST',
-        body: JSON.stringify(requestData),
+        body: stringify(requestData),
         headers: {
           'Content-Type': 'application/json',
         },
@@ -96,35 +102,13 @@ export class RPCProvider implements Provider {
     );
   }
 
-  public async getClass(classHash: BigNumberish): Promise<ContractClass> {
-    return this.fetchEndpoint('starknet_getClass', [classHash]).then(
-      this.responseParser.parseGetClassResponse
-    );
-  }
-
-  public async getClassHash(contractAddress: BigNumberish): Promise<string> {
-    return this.fetchEndpoint('starknet_getClassHashAt', [contractAddress]);
-  }
-
-  public async getClassAt(contractAddress: BigNumberish): Promise<ContractClass> {
-    return this.fetchEndpoint('starknet_getClassAt', [contractAddress]).then(
-      this.responseParser.parseGetClassResponse
-    );
-  }
-
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockHash: BlockIdentifier
+    blockHash: BlockIdentifier = 'pending'
   ): Promise<BigNumberish> {
     const parsedKey = toHex(toBN(key));
     return this.fetchEndpoint('starknet_getStorageAt', [contractAddress, parsedKey, blockHash]);
-  }
-
-  public async getStateUpdate(blockHash: BigNumberish): Promise<GetStateUpdateResponse> {
-    return this.fetchEndpoint('starknet_getStateUpdateByHash', [blockHash]).then(
-      this.responseParser.parseGetStateUpdateResponse
-    );
   }
 
   public async getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {
@@ -139,9 +123,16 @@ export class RPCProvider implements Provider {
     );
   }
 
+  public async getClassAt(
+    contractAddress: string,
+    _blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<any> {
+    return this.fetchEndpoint('starknet_getClassAt', [contractAddress]);
+  }
+
   public async estimateFee(
     request: FunctionCall,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<FeeEstimateResponse> {
     const parsedCalldata = request.calldata.map((data) => {
       if (typeof data === 'string' && isHex(data as string)) {
@@ -161,29 +152,47 @@ export class RPCProvider implements Provider {
   }
 
   public async declareContract(
-    contractClass: ContractClass,
-    version?: BigNumberish | undefined
+    compiledContract: CompiledContract | string,
+    version: BigNumberish | undefined = 0
   ): Promise<DeclareContractResponse> {
+    const parsedContract =
+      typeof compiledContract === 'string'
+        ? (parse(compiledContract) as CompiledContract)
+        : compiledContract;
+    const contractDefinition = {
+      ...parsedContract,
+      program: compressProgram(parsedContract.program),
+    };
+
     return this.fetchEndpoint('starknet_addDeclareTransaction', [
       {
-        program: contractClass.program,
-        entry_point_by_type: contractClass.entryPointByType,
+        program: contractDefinition.program,
+        entry_points_by_type: contractDefinition.entry_points_by_type,
       },
-      version,
+      toHex(toBN(version)),
     ]).then(this.responseParser.parseDeclareContractResponse);
   }
 
   public async deployContract(
-    contractDefinition: ContractClass,
-    constructorCalldata: BigNumberish[],
+    compiledContract: CompiledContract | string,
+    constructorCalldata?: BigNumberish[],
     salt?: BigNumberish | undefined
   ): Promise<DeployContractResponse> {
+    const parsedContract =
+      typeof compiledContract === 'string'
+        ? (parse(compiledContract) as CompiledContract)
+        : compiledContract;
+    const contractDefinition = {
+      ...parsedContract,
+      program: compressProgram(parsedContract.program),
+    };
+
     return this.fetchEndpoint('starknet_addDeployTransaction', [
       salt ?? randomAddress(),
       bigNumberishArrayToDecimalStringArray(constructorCalldata ?? []),
       {
         program: contractDefinition.program,
-        entry_point_by_type: contractDefinition.entryPointByType,
+        entry_points_by_type: contractDefinition.entry_points_by_type,
       },
     ]).then(this.responseParser.parseDeployContractResponse);
   }
@@ -236,8 +245,41 @@ export class RPCProvider implements Provider {
     return this.responseParser.parseCallContractResponse(result);
   }
 
-  public async waitForTransaction(txHash: BigNumberish, retryInterval: number): Promise<void> {
-    throw new Error(`Not implemented ${txHash} ${retryInterval}`);
+  public async waitForTransaction(txHash: BigNumberish, retryInterval: number = 8000) {
+    let onchain = false;
+    // TODO: optimize this
+    let retries = 100;
+
+    while (!onchain) {
+      const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'];
+      const errorStates = ['REJECTED', 'NOT_RECEIVED'];
+
+      // eslint-disable-next-line no-await-in-loop
+      await wait(retryInterval);
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        const res = await this.getTransactionReceipt(txHash);
+
+        if (successStates.includes(res.status)) {
+          onchain = true;
+        } else if (errorStates.includes(res.status)) {
+          const message = res.status;
+          const error = new Error(message) as Error & { response: any };
+          error.response = res;
+          throw error;
+        }
+      } catch (error: unknown) {
+        if (error instanceof Error && errorStates.includes(error.message)) {
+          throw error;
+        }
+
+        if (retries === 0) {
+          throw error;
+        }
+      }
+
+      retries -= 1;
+    }
   }
 
   /**

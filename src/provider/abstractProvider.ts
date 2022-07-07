@@ -1,3 +1,4 @@
+import { CompiledContract } from '../types';
 import { BigNumberish } from '../utils/number';
 import { BlockIdentifier } from './utils';
 
@@ -21,42 +22,16 @@ type Status =
  */
 
 export interface GetBlockResponse {
-  acceptedTime: number; // "timestamp"
+  acceptedTime: number;
   blockHash: string;
   blockNumber: number;
   gasPrice: string;
-  newRoot: string; // "state_root"
-  oldRoot?: string; // missing
-  parentHash: string; // "parent_block_hash"
-  sequencer: string; // "sequencer_address"
-  status: Status;
-  transactions: Array<unknown>;
-}
-
-/**
- * getStateUpdate response object
- */
-
-export interface GetStateUpdateResponse {
-  blockHash: string;
   newRoot: string;
-  oldRoot: string;
-  acceptedTime?: number; // missing on the default provider
-  stateDiff: {
-    storageDiffs: Array<{
-      address: string;
-      key: string;
-      value: string;
-    }>;
-    deployedContracts: Array<{
-      address: string;
-      contractHash: string;
-    }>;
-    nonces?: Array<{
-      contractAddress: string;
-      nonce: BigNumberish;
-    }>; // missing on the default provider
-  };
+  oldRoot?: string;
+  parentHash: string;
+  sequencer: string;
+  status: Status;
+  transactions: Array<string>;
 }
 
 /**
@@ -67,10 +42,10 @@ export interface GetStateUpdateResponse {
 export type GetTransactionResponse = InvokeTransactionResponse & DeclareTransactionResponse;
 
 export interface CommonTransactionResponse {
-  transactionHash: string;
-  maxFee: string;
-  version: string;
-  signature: Array<string>;
+  transactionHash?: string;
+  version?: string;
+  signature?: Array<string>;
+  maxFee?: string;
   nonce?: string;
 }
 
@@ -99,7 +74,7 @@ export interface ContractClass {
 }
 
 export interface DeclareTransactionResponse extends CommonTransactionResponse {
-  contractClass?: ContractClass;
+  contractClass?: any;
   senderAddress?: string;
 }
 
@@ -109,9 +84,9 @@ export type GetTransactionReceiptResponse =
 
 export interface CommonTransactionReceiptResponse {
   transactionHash: string;
-  actualFee: string;
   status: Status;
-  statusData: string;
+  actualFee?: string;
+  statusData?: string;
 }
 
 export interface MessageToL1 {
@@ -178,9 +153,6 @@ export abstract class Provider {
   // Get block information given the block hash or number
   abstract getBlock(blockIdentifier: BlockIdentifier): Promise<GetBlockResponse>;
 
-  // Get the information about the result of executing the requested block
-  abstract getStateUpdate(blockHash: BigNumberish): Promise<GetStateUpdateResponse>;
-
   // Get the value of the storage at the given address and key
   abstract getStorageAt(
     contractAddress: string,
@@ -193,15 +165,6 @@ export abstract class Provider {
 
   // Get the transaction receipt by the transaction hash
   abstract getTransactionReceipt(txHash: BigNumberish): Promise<GetTransactionReceiptResponse>;
-
-  // Get the contract class deployed under the given class hash.
-  abstract getClass(classHash: BigNumberish): Promise<ContractClass>;
-
-  // Get the contract class deployed under the given address.
-  abstract getClassAt(contractAddress: BigNumberish): Promise<ContractClass>;
-
-  // Get the class hash deployed under the given address.
-  abstract getClassHash(contractAddress: BigNumberish): Promise<string>;
 
   // Estimates the resources required by a transaction relative to a given state
   abstract estimateFee(
@@ -222,13 +185,13 @@ export abstract class Provider {
   ): Promise<InvokeContractResponse>;
 
   abstract deployContract(
-    contractClass: ContractClass,
+    compiledContract: CompiledContract | string,
     constructorCalldata: Array<BigNumberish>,
     salt?: BigNumberish
   ): Promise<DeployContractResponse>;
 
   abstract declareContract(
-    contractClass: ContractClass,
+    compiledContract: CompiledContract | string,
     version?: BigNumberish
   ): Promise<DeclareContractResponse>;
 
