@@ -1,4 +1,4 @@
-import { CompiledContract, RawCalldata } from '../types';
+import { CompiledContract, ContractClass, RawCalldata } from '../types';
 import { parse } from './json';
 import { isHex, toBN, toHex } from './number';
 import { compressProgram } from './stark';
@@ -24,5 +24,5 @@ export function parseContract(contract: CompiledContract | string) {
   return {
     ...parsedContract,
     program: compressProgram(parsedContract.program),
-  };
+  } as ContractClass;
 }

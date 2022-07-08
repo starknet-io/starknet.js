@@ -1,5 +1,5 @@
 import { BigNumberish } from '../utils/number';
-import { RawCalldata, Signature, Status } from './lib';
+import { Abi, CompressedProgram, EntryPointsByType, RawCalldata, Signature, Status } from './lib';
 
 export interface GetBlockResponse {
   accepted_time: number;
@@ -36,12 +36,9 @@ export interface ContractEntryPoint {
 }
 
 export interface ContractClass {
-  program: string;
-  entry_point_by_type: {
-    CONSTRUCTOR: Array<ContractEntryPoint>;
-    EXTERNAL: Array<ContractEntryPoint>;
-    L1_HANDLER: Array<ContractEntryPoint>;
-  };
+  program: CompressedProgram;
+  entry_points_by_type: EntryPointsByType;
+  abi?: Abi;
 }
 
 export interface DeclareTransactionResponse extends CommonTransactionResponse {

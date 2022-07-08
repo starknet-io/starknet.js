@@ -4,6 +4,7 @@ import { ONE, StarknetChainId, ZERO } from '../constants';
 import {
   Call,
   CallContractResponse,
+  ContractClass,
   DeclareContractPayload,
   DeclareContractResponse,
   DeployContractPayload,
@@ -246,7 +247,7 @@ export class GatewayProvider implements ProviderInterface {
   public async getClassAt(
     contractAddress: string,
     blockIdentifier: BlockIdentifier = 'pending'
-  ): Promise<any> {
+  ): Promise<ContractClass> {
     return this.fetchEndpoint('get_full_contract', { blockIdentifier, contractAddress }).then(
       parseContract
     );

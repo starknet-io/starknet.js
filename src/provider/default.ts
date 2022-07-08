@@ -29,12 +29,14 @@ export interface ProviderOptions {
 export class Provider implements ProviderInterface {
   private provider!: ProviderInterface;
 
-  constructor(options?: ProviderOptions) {
-    if (options && options.rpc) {
-      this.provider = new RPCProvider(options.rpc);
+  constructor(providerOrOptions?: ProviderOptions | ProviderInterface) {
+    if (providerOrOptions instanceof ProviderInterface) {
+      this.provider = providerOrOptions;
+    } else if (providerOrOptions && providerOrOptions.rpc) {
+      this.provider = new RPCProvider(providerOrOptions.rpc);
+    } else {
+      this.provider = new GatewayProvider(providerOrOptions?.gateway);
     }
-
-    this.provider = new GatewayProvider(options?.gateway);
   }
 
   public get chainId(): StarknetChainId {

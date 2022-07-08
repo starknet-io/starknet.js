@@ -21,7 +21,7 @@ const BASE_URL = process.env.TEST_PROVIDER_BASE_URL || DEFAULT_TEST_PROVIDER_BAS
 export const IS_DEVNET = !BASE_URL.includes('starknet.io');
 
 export const getTestProvider = () => {
-  const provider = new Provider({ baseUrl: BASE_URL });
+  const provider = new Provider({ gateway: { baseUrl: BASE_URL } });
 
   if (IS_DEVNET) {
     // accelerate the tests when running locally

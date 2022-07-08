@@ -2,6 +2,7 @@ import { StarknetChainId } from '../constants';
 import type {
   Call,
   CallContractResponse,
+  ContractClass,
   DeclareContractPayload,
   DeclareContractResponse,
   DeployContractPayload,
@@ -51,7 +52,7 @@ export abstract class ProviderInterface {
   public abstract getClassAt(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
-  ): Promise<any>;
+  ): Promise<ContractClass>;
 
   /**
    * Gets the contract's storage variable at a specific key.

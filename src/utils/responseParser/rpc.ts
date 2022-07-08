@@ -36,7 +36,7 @@ export class RPCResponseParser extends ResponseParser {
       max_fee: res.max_fee,
       nonce: res.nonce,
       sender_address: res.sender_address,
-      signature: res.signature,
+      signature: res.signature || [],
       transaction_hash: res.txn_hash,
       version: res.version,
     };

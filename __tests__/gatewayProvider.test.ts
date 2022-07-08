@@ -1,18 +1,12 @@
-import { DeployContractResponse, RPCProvider } from '../src';
+import { DeclareContractResponse, DeployContractResponse, GatewayProvider } from '../src';
 import { compileCalldata } from '../src/utils/stark';
 import { compiledErc20 } from './fixtures';
 
-const TEST_RPC_URL = 'https://starknet-goerli.infura.io/v3/3aa5342fa7a1418e8e493404f3dea9b2';
-
-if (!TEST_RPC_URL) {
-  throw new Error('TEST_RPC_URL is not set');
-}
-
-describe('RPCProvider', () => {
-  let provider: RPCProvider;
+describe('GatewayProvider', () => {
+  let provider: GatewayProvider;
 
   beforeAll(async () => {
-    provider = new RPCProvider({ nodeUrl: TEST_RPC_URL });
+    provider = new GatewayProvider();
   });
 
   describe('Provider methods', () => {
@@ -114,7 +108,10 @@ describe('RPCProvider', () => {
         );
 
         expect(transaction.max_fee).toBeTruthy();
+        expect(transaction.nonce).toBeTruthy();
+        expect(transaction.sender_address).toBeTruthy();
         expect(transaction.transaction_hash).toBeTruthy();
+        expect(transaction.version).toBeTruthy();
       });
     });
 
@@ -132,63 +129,62 @@ describe('RPCProvider', () => {
         expect(receipt).toHaveProperty('events');
       });
     });
-  });
 
-  describe('Contract methods', () => {
-    let contractAddress: string;
-    let deployTransactionHash: string;
-    let deployResponse: DeployContractResponse;
+    describe('Contract methods', () => {
+      let deployResponse: DeployContractResponse;
+      let declareResponse: DeclareContractResponse;
 
-    beforeAll(async () => {
-      deployResponse = await provider.deployContract({ contract: compiledErc20 });
-      contractAddress = deployResponse.contract_address;
-      deployTransactionHash = deployResponse.transaction_hash;
-
-      await provider.waitForTransaction(deployTransactionHash);
-    });
-
-    test('Deployed contract', () => {
-      expect(deployResponse).toBeTruthy();
-      expect(contractAddress).toBeTruthy();
-      expect(deployTransactionHash).toBeTruthy();
-    });
-
-    test('Declared contract', async () => {
-      const declareContractResponse = await provider.declareContract({ contract: compiledErc20 });
-
-      expect(declareContractResponse.class_hash).toBeTruthy();
-      expect(declareContractResponse.transaction_hash).toBeTruthy();
-    });
-
-    test('getClassAt', async () => {
-      const classResponse = await provider.getClassAt(contractAddress);
-      expect(classResponse).toHaveProperty('program');
-      expect(classResponse).toHaveProperty('entry_points_by_type');
-    });
-
-    describe('callContract', () => {
-      test('result', () => {
-        return expect(
-          provider
-            .callContract({
-              contractAddress,
-              entrypoint: 'balance_of',
-              calldata: compileCalldata({
-                user: '0x9ff64f4ab0e1fe88df4465ade98d1ea99d5732761c39279b8e1374fa943e9b',
-              }),
-            })
-            .then((res) => {
-              expect(Array.isArray(res.result)).toBe(true);
-            })
-        ).resolves.not.toThrow();
+      beforeAll(async () => {
+        deployResponse = await provider.deployContract({ contract: compiledErc20 });
+        declareResponse = await provider.declareContract({ contract: compiledErc20 });
+        await Promise.all([
+          provider.waitForTransaction(deployResponse.transaction_hash),
+          provider.waitForTransaction(declareResponse.transaction_hash),
+        ]);
       });
-    });
-  });
 
-  describe('RPC methods', () => {
-    test('getChainId', async () => {
-      const chainId = await provider.getChainId();
-      expect(chainId).toBe('0x534e5f474f45524c49');
+      describe('deployContract', () => {
+        test('response', () => {
+          expect(deployResponse.contract_address).toBeTruthy();
+          expect(deployResponse.transaction_hash).toBeTruthy();
+        });
+      });
+
+      describe('declareContract', () => {
+        test('response', async () => {
+          expect(declareResponse.class_hash).toBeTruthy();
+          expect(declareResponse.transaction_hash).toBeTruthy();
+        });
+      });
+
+      describe('getClassAt', () => {
+        test('response', async () => {
+          // Hardcoded contract address as RPC node is throwing "Contract not found" error
+          const classResponse = await provider.getClassAt(
+            '0x0377cd03f6bed2ed201e9783f50b1b823d2ff65032da69f468bba5c6634dfbfa'
+          );
+          expect(classResponse).toHaveProperty('program');
+          expect(classResponse).toHaveProperty('entry_points_by_type');
+        });
+      });
+
+      describe('callContract', () => {
+        test('result', () => {
+          return expect(
+            provider
+              .callContract({
+                contractAddress: deployResponse.contract_address,
+                entrypoint: 'balance_of',
+                calldata: compileCalldata({
+                  user: '0x9ff64f4ab0e1fe88df4465ade98d1ea99d5732761c39279b8e1374fa943e9b',
+                }),
+              })
+              .then((res) => {
+                expect(Array.isArray(res.result)).toBe(true);
+              })
+          ).resolves.not.toThrow();
+        });
+      });
     });
   });
 });

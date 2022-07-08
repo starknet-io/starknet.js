@@ -5,13 +5,13 @@ import { BigNumberish } from '../../utils/number';
 import {
   Abi,
   BlockNumber,
-  CompressedCompiledContract,
   EntryPointType,
   RawCalldata,
   Signature,
   Status,
   TransactionStatus,
 } from '../lib';
+import { ContractClass } from '../provider';
 
 export type GetTransactionStatusResponse = {
   tx_status: Status;
@@ -81,7 +81,7 @@ export type RawArgs = {
 export namespace Gateway {
   export type DeclareTransaction = {
     type: 'DECLARE';
-    contract_class: CompressedCompiledContract;
+    contract_class: ContractClass;
     nonce: BigNumberish;
     sender_address: BigNumberish;
     signature: Signature;
@@ -89,7 +89,7 @@ export namespace Gateway {
 
   export type DeployTransaction = {
     type: 'DEPLOY';
-    contract_definition: CompressedCompiledContract;
+    contract_definition: ContractClass;
     contract_address_salt: BigNumberish;
     constructor_calldata: string[];
     nonce?: BigNumberish;
