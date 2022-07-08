@@ -1,14 +1,14 @@
 import { BigNumberish } from '../utils/number';
-import { Status } from './lib';
+import { RawCalldata, Signature, Status } from './lib';
 
 export interface GetBlockResponse {
-  acceptedTime: number;
-  blockHash: string;
-  blockNumber: number;
-  gasPrice: string;
-  newRoot: string;
-  oldRoot?: string;
-  parentHash: string;
+  accepted_time: number;
+  block_hash: string;
+  block_number: number;
+  gas_price: string;
+  new_root: string;
+  old_root?: string;
+  parent_hash: string;
   sequencer: string;
   status: Status;
   transactions: Array<string>;
@@ -17,17 +17,17 @@ export interface GetBlockResponse {
 export type GetTransactionResponse = InvokeTransactionResponse & DeclareTransactionResponse;
 
 export interface CommonTransactionResponse {
-  transactionHash?: string;
+  transaction_hash?: string;
   version?: string;
-  signature?: Array<string>;
-  maxFee?: string;
+  signature?: Signature;
+  max_fee?: string;
   nonce?: string;
 }
 
 export interface InvokeTransactionResponse extends CommonTransactionResponse {
-  contractAddress?: string;
-  entryPointSelector?: string;
-  calldata: Array<string>;
+  contract_address?: string;
+  entry_point_selector?: string;
+  calldata: RawCalldata;
 }
 
 export interface ContractEntryPoint {
@@ -37,7 +37,7 @@ export interface ContractEntryPoint {
 
 export interface ContractClass {
   program: string;
-  entryPointByType: {
+  entry_point_by_type: {
     CONSTRUCTOR: Array<ContractEntryPoint>;
     EXTERNAL: Array<ContractEntryPoint>;
     L1_HANDLER: Array<ContractEntryPoint>;
@@ -45,8 +45,8 @@ export interface ContractClass {
 }
 
 export interface DeclareTransactionResponse extends CommonTransactionResponse {
-  contractClass?: any;
-  senderAddress?: string;
+  contract_class?: any;
+  sender_address?: string;
 }
 
 export type GetTransactionReceiptResponse =
@@ -54,52 +54,52 @@ export type GetTransactionReceiptResponse =
   | DeclareTransactionReceiptResponse;
 
 export interface CommonTransactionReceiptResponse {
-  transactionHash: string;
+  transaction_hash: string;
   status: Status;
-  actualFee?: string;
-  statusData?: string;
+  actual_fee?: string;
+  status_data?: string;
 }
 
 export interface MessageToL1 {
-  toAddress: string;
+  to_address: string;
   payload: Array<string>;
 }
 
 export interface Event {
-  fromAddress: string;
+  from_address: string;
   keys: Array<string>;
   data: Array<string>;
 }
 
 export interface MessageToL2 {
-  fromAddress: string;
+  from_address: string;
   payload: Array<string>;
 }
 
 export interface InvokeTransactionReceiptResponse extends CommonTransactionReceiptResponse {
-  messagesSent: Array<MessageToL1>;
+  messages_sent: Array<MessageToL1>;
   events: Array<Event>;
-  l1OriginMessage?: MessageToL2;
+  l1_origin_message?: MessageToL2;
 }
 
 export type DeclareTransactionReceiptResponse = CommonTransactionReceiptResponse;
 
 export interface EstimateFeeResponse {
-  overallFee: BigNumberish;
+  overall_fee: BigNumberish;
 }
 
 export interface InvokeFunctionResponse {
-  transactionHash: string;
+  transaction_hash: string;
 }
 
 export interface DeployContractResponse {
-  contractAddress: string;
-  transactionHash: string;
+  contract_address: string;
+  transaction_hash: string;
 }
 
 export interface DeclareContractResponse {
-  transactionHash: string;
-  classHash: string;
+  transaction_hash: string;
+  class_hash: string;
 }
 
 export type CallContractResponse = {

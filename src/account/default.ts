@@ -69,7 +69,7 @@ export class Account extends Provider implements AccountInterface {
       signature
     );
 
-    const suggestedMaxFee = estimatedFeeToMaxFee(fetchedEstimate.overallFee);
+    const suggestedMaxFee = estimatedFeeToMaxFee(fetchedEstimate.overall_fee);
 
     return {
       ...fetchedEstimate,

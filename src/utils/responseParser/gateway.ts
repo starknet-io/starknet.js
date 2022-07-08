@@ -15,13 +15,13 @@ import { ResponseParser } from '.';
 export class GatewayAPIResponseParser extends ResponseParser {
   public parseGetBlockResponse(res: Gateway.GetBlockResponse): GetBlockResponse {
     return {
-      acceptedTime: res.timestamp,
-      blockHash: res.block_hash,
-      blockNumber: res.block_number,
-      gasPrice: res.gas_price,
-      newRoot: res.state_root,
-      oldRoot: undefined,
-      parentHash: res.parent_block_hash,
+      accepted_time: res.timestamp,
+      block_hash: res.block_hash,
+      block_number: res.block_number,
+      gas_price: res.gas_price,
+      new_root: res.state_root,
+      old_root: undefined,
+      parent_hash: res.parent_block_hash,
       sequencer: res.sequencer_address,
       status: res.status,
       transactions: Object.values(res.transactions)
@@ -33,22 +33,22 @@ export class GatewayAPIResponseParser extends ResponseParser {
   public parseGetTransactionResponse(res: Gateway.GetTransactionResponse): GetTransactionResponse {
     return {
       calldata: 'calldata' in res.transaction ? (res.transaction.calldata as Array<string>) : [],
-      contractAddress:
+      contract_address:
         'contract_address' in res.transaction ? res.transaction.contract_address : undefined,
-      contractClass:
+      contract_class:
         'contract_class' in res.transaction ? (res.transaction.contract_class as any) : undefined,
-      entryPointSelector:
+      entry_point_selector:
         'entry_point_selector' in res.transaction
           ? res.transaction.entry_point_selector
           : undefined,
-      maxFee: 'max_fee' in res.transaction ? (res.transaction.max_fee as string) : undefined,
+      max_fee: 'max_fee' in res.transaction ? (res.transaction.max_fee as string) : undefined,
       nonce: res.transaction.nonce as string,
-      senderAddress:
+      sender_address:
         'sender_address' in res.transaction
           ? (res.transaction.sender_address as string)
           : undefined,
       signature: 'signature' in res.transaction ? res.transaction.signature : undefined,
-      transactionHash:
+      transaction_hash:
         'transaction_hash' in res.transaction ? res.transaction.transaction_hash : undefined,
       version: 'version' in res.transaction ? (res.transaction.version as string) : undefined,
     };
@@ -58,19 +58,19 @@ export class GatewayAPIResponseParser extends ResponseParser {
     res: Gateway.TransactionReceiptResponse
   ): GetTransactionReceiptResponse {
     return {
-      transactionHash: res.transaction_hash,
-      actualFee: 'actual_fee' in res ? res.actual_fee : undefined,
+      transaction_hash: res.transaction_hash,
+      actual_fee: 'actual_fee' in res ? res.actual_fee : undefined,
       status: res.status,
-      statusData: undefined,
-      messagesSent: res.l2_to_l1_messages as any, // TODO: parse
+      status_data: undefined,
+      messages_sent: res.l2_to_l1_messages as any, // TODO: parse
       events: res.events as any,
-      l1OriginMessage: undefined,
+      l1_origin_message: undefined,
     };
   }
 
   public parseFeeEstimateResponse(res: Gateway.EstimateFeeResponse): EstimateFeeResponse {
     return {
-      overallFee: toBN(res.amount),
+      overall_fee: toBN(res.amount),
     };
   }
 
@@ -82,14 +82,14 @@ export class GatewayAPIResponseParser extends ResponseParser {
 
   public parseInvokeFunctionResponse(res: Gateway.AddTransactionResponse): InvokeFunctionResponse {
     return {
-      transactionHash: res.transaction_hash,
+      transaction_hash: res.transaction_hash,
     };
   }
 
   public parseDeployContractResponse(res: Gateway.AddTransactionResponse): DeployContractResponse {
     return {
-      transactionHash: res.transaction_hash,
-      contractAddress: res.address as string,
+      transaction_hash: res.transaction_hash,
+      contract_address: res.address as string,
     };
   }
 
@@ -97,8 +97,8 @@ export class GatewayAPIResponseParser extends ResponseParser {
     res: Gateway.AddTransactionResponse
   ): DeclareContractResponse {
     return {
-      transactionHash: res.transaction_hash,
-      classHash: res.class_hash as string,
+      transaction_hash: res.transaction_hash,
+      class_hash: res.class_hash as string,
     };
   }
 }
