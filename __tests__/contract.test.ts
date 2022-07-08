@@ -22,25 +22,19 @@ describe('class Contract {}', () => {
     let contract: Contract;
 
     beforeAll(async () => {
-      const { code, transaction_hash, address } = await provider.deployContract({
+      const { transaction_hash, contract_address } = await provider.deployContract({
         contract: compiledErc20,
       });
-      erc20 = new Contract(compiledErc20.abi, address!, provider);
-      expect(code).toBe('TRANSACTION_RECEIVED');
+      erc20 = new Contract(compiledErc20.abi, contract_address!, provider);
       await provider.waitForTransaction(transaction_hash);
       // Deploy Multicall
 
-      const {
-        code: m_code,
-        transaction_hash: m_transaction_hash,
-        address: multicallAddress,
-      } = await provider.deployContract({
-        contract: compiledMulticall,
-      });
+      const { transaction_hash: m_transaction_hash, contract_address: multicallAddress } =
+        await provider.deployContract({
+          contract: compiledMulticall,
+        });
 
       contract = new Contract(compiledMulticall.abi, multicallAddress!, provider);
-
-      expect(m_code).toBe('TRANSACTION_RECEIVED');
 
       await provider.waitForTransaction(m_transaction_hash);
     });
@@ -92,11 +86,10 @@ describe('class Contract {}', () => {
     let contract: Contract;
 
     beforeAll(async () => {
-      const { code, transaction_hash, address } = await provider.deployContract({
+      const { transaction_hash, contract_address } = await provider.deployContract({
         contract: compiledTypeTransformation,
       });
-      contract = new Contract(compiledTypeTransformation.abi, address!, provider);
-      expect(code).toBe('TRANSACTION_RECEIVED');
+      contract = new Contract(compiledTypeTransformation.abi, contract_address!, provider);
       await provider.waitForTransaction(transaction_hash);
     });
 
@@ -205,9 +198,8 @@ describe('class Contract {}', () => {
       const erc20Response = await provider.deployContract({
         contract: compiledErc20,
       });
-      erc20Address = erc20Response.address!;
+      erc20Address = erc20Response.contract_address!;
       erc20 = new Contract(compiledErc20.abi, erc20Address, provider);
-      expect(erc20Response.code).toBe('TRANSACTION_RECEIVED');
       await provider.waitForTransaction(erc20Response.transaction_hash);
     });
 
@@ -229,12 +221,11 @@ describe('class Contract {}', () => {
 describe('class ContractFactory {}', () => {
   let erc20Address: string;
   beforeAll(async () => {
-    const { code, transaction_hash, address } = await provider.deployContract({
+    const { transaction_hash, contract_address } = await provider.deployContract({
       contract: compiledErc20,
     });
-    expect(code).toBe('TRANSACTION_RECEIVED');
     await provider.waitForTransaction(transaction_hash);
-    erc20Address = address!;
+    erc20Address = contract_address!;
   });
   test('deployment of new contract', async () => {
     const factory = new ContractFactory(compiledErc20, provider);

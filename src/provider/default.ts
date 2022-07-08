@@ -100,7 +100,7 @@ export class Provider implements ProviderInterface {
     return this.provider.declareContract(payload);
   }
 
-  public async waitForTransaction(txHash: BigNumberish, retryInterval: number): Promise<void> {
+  public async waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<void> {
     return this.provider.waitForTransaction(txHash, retryInterval);
   }
 }
