@@ -43,7 +43,7 @@ export class Provider implements ProviderInterface {
     return this.provider.chainId;
   }
 
-  public async getBlock(blockIdentifier: BlockIdentifier): Promise<GetBlockResponse> {
+  public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
     return this.provider.getBlock(blockIdentifier);
   }
 

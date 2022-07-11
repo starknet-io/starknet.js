@@ -227,7 +227,12 @@ export class GatewayProvider implements ProviderInterface {
     key: BigNumberish,
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<BigNumberish> {
-    return this.fetchEndpoint('get_storage_at', { blockIdentifier, contractAddress, key }) as any;
+    const parsedKey = toBN(key).toString(10);
+    return this.fetchEndpoint('get_storage_at', {
+      blockIdentifier,
+      contractAddress,
+      key: parsedKey,
+    });
   }
 
   public async getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {

@@ -20,19 +20,16 @@ import { TypedData, getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
 
 export class Account extends Provider implements AccountInterface {
-  public address: string;
-
   public signer: SignerInterface;
 
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
-    address: string,
+    public address: string,
     keyPairOrSigner: KeyPair | SignerInterface
   ) {
     super(providerOrOptions);
     this.signer =
       'getPubKey' in keyPairOrSigner ? keyPairOrSigner : new Signer(keyPairOrSigner as KeyPair);
-    this.address = address;
   }
 
   public async getNonce(): Promise<string> {

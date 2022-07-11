@@ -259,7 +259,7 @@ export namespace Gateway {
         blockIdentifier: BlockIdentifier;
       };
       REQUEST: never;
-      RESPONSE: object;
+      RESPONSE: string;
     };
     get_code: {
       QUERY: {

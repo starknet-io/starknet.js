@@ -1,12 +1,6 @@
 import { BlockNumber, stark } from '../src';
 import { toBN } from '../src/utils/number';
-import {
-  IS_DEVNET,
-  compiledErc20,
-  compiledOpenZeppelinAccount,
-  getTestProvider,
-  testIfNotDevnet,
-} from './fixtures';
+import { IS_DEVNET, compiledErc20, compiledOpenZeppelinAccount, getTestProvider } from './fixtures';
 
 const { compileCalldata } = stark;
 
@@ -15,86 +9,73 @@ const provider = getTestProvider();
 describe('defaultProvider', () => {
   let exampleTransactionHash: string;
   let exampleContractAddress: string;
-  let exampleBlockHash: string;
-  let exampleBlockNumber: BlockNumber;
+  const exampleBlockHash: string =
+    '0x8a30a1212d142cb0053fe9921e1dbf64f651d328565bd2e7ac24059c270f43';
+  const exampleBlockNumber: BlockNumber = 102634;
+
   beforeAll(async () => {
-    const { code, transaction_hash, address } = await provider.deployContract({
+    const { transaction_hash, contract_address } = await provider.deployContract({
       contract: compiledErc20,
     });
-    expect(code).toBe('TRANSACTION_RECEIVED');
     await provider.waitForTransaction(transaction_hash);
     exampleTransactionHash = transaction_hash;
-    exampleContractAddress = address!;
-    const transaction = await provider.getTransaction(transaction_hash);
-
-    if (transaction.status !== 'REJECTED') {
-      exampleBlockHash = transaction.block_hash;
-      exampleBlockNumber = transaction.block_number;
-    }
+    exampleContractAddress = contract_address;
   });
 
-  describe('feeder gateway endpoints', () => {
-    testIfNotDevnet('getContractAddresses()', async () => {
-      // not supported in starknet-devnet
-      const { GpsStatementVerifier, Starknet } = await provider.getContractAddresses();
-      expect(typeof GpsStatementVerifier).toBe('string');
-      expect(typeof Starknet).toBe('string');
-    });
+  describe('endpoints', () => {
     test(`getBlock(blockHash=${exampleBlockHash}, blockNumber=undefined)`, () => {
       return expect(provider.getBlock(exampleBlockHash)).resolves.not.toThrow();
     });
+
     test(`getBlock(blockHash=undefined, blockNumber=${exampleBlockNumber})`, () => {
       return expect(provider.getBlock(exampleBlockNumber)).resolves.not.toThrow();
     });
+
     test('getBlock(blockHash=undefined, blockNumber=null)', async () => {
       const block = await provider.getBlock();
 
       expect(block).not.toBeNull();
 
-      const { block_number, timestamp } = block;
+      const { block_number, accepted_time } = block;
 
       expect(typeof block_number).toEqual('number');
 
-      return expect(typeof timestamp).toEqual('number');
+      return expect(typeof accepted_time).toEqual('number');
     });
+
     test('getBlock() -> { blockNumber }', async () => {
       const block = await provider.getBlock();
       return expect(block).toHaveProperty('block_number');
     });
-    test('getCode()', () => {
-      return expect(provider.getCode(exampleContractAddress, 36663)).resolves.not.toThrow();
-    });
-    test('getCode(blockHash=undefined, blockNumber=null)', () => {
-      return expect(provider.getCode(exampleContractAddress)).resolves.not.toThrow();
-    });
-    test('getStorageAt() with "key" type of number', () => {
-      return expect(provider.getStorageAt(exampleContractAddress, 0, 36663)).resolves.not.toThrow();
-    });
-    test('getStorageAt() with "key" type of string', () => {
-      return expect(
-        provider.getStorageAt(exampleContractAddress, '0', 36663)
-      ).resolves.not.toThrow();
-    });
-    test('getStorageAt() with "key" type of BN', () => {
-      return expect(
-        provider.getStorageAt(exampleContractAddress, toBN('0x0'), 36663)
-      ).resolves.not.toThrow();
-    });
-    test('getStorageAt(blockHash=undefined, blockNumber=null)', () => {
-      return expect(provider.getStorageAt(exampleContractAddress, 0)).resolves.not.toThrow();
-    });
-    test('getTransactionStatus()', async () => {
-      return expect(provider.getTransactionStatus(exampleTransactionHash)).resolves.not.toThrow();
+
+    describe('getStorageAt', () => {
+      test('with "key" type of number', () => {
+        return expect(
+          provider.getStorageAt(exampleContractAddress, 0, 36663)
+        ).resolves.not.toThrow();
+      });
+
+      test('"key" type of string', () => {
+        return expect(
+          provider.getStorageAt(exampleContractAddress, '0x0', 36663)
+        ).resolves.not.toThrow();
+      });
+
+      test('with "key" type of BN', () => {
+        return expect(
+          provider.getStorageAt(exampleContractAddress, toBN('0x0'), 36663)
+        ).resolves.not.toThrow();
+      });
+
+      test('(blockHash=undefined, blockNumber=null)', () => {
+        return expect(provider.getStorageAt(exampleContractAddress, 0)).resolves.not.toThrow();
+      });
     });
 
     test('getTransaction() - successful transaction', async () => {
       const transaction = await provider.getTransaction(exampleTransactionHash);
 
-      expect(transaction).not.toHaveProperty('transaction_failure_reason');
-
-      expect(transaction.transaction).toHaveProperty('transaction_hash');
-
-      return expect(transaction.status).not.toEqual('REJECTED');
+      expect(transaction).toHaveProperty('transaction_hash');
     });
 
     test('getTransactionReceipt() - successful transaction', async () => {
@@ -103,7 +84,7 @@ describe('defaultProvider', () => {
       return expect(transactionReceipt).toHaveProperty('actual_fee');
     });
 
-    test('callContract()', () => {
+    test.only('callContract()', () => {
       return expect(
         provider.callContract({
           contractAddress: exampleContractAddress,
@@ -115,7 +96,7 @@ describe('defaultProvider', () => {
       ).resolves.not.toThrow();
     });
 
-    test('callContract() - gateway error', async () => {
+    test.only('callContract() - gateway error', async () => {
       const promise = provider.callContract({
         contractAddress: exampleContractAddress,
         entrypoint: 'non_existent_entrypoint',
@@ -136,12 +117,6 @@ describe('defaultProvider', () => {
         );
       }
     });
-
-    test('transaction trace', async () => {
-      const transactionTrace = await provider.getTransactionTrace(exampleTransactionHash);
-      expect(transactionTrace).toHaveProperty('function_invocation');
-      expect(transactionTrace).toHaveProperty('signature');
-    });
   });
 
   describe('addTransaction()', () => {
@@ -150,7 +125,6 @@ describe('defaultProvider', () => {
         contract: compiledErc20,
       });
 
-      expect(response.code).toBe('TRANSACTION_RECEIVED');
       expect(response.transaction_hash).toBeDefined();
       expect(response.class_hash).toBeDefined();
     });
@@ -160,9 +134,8 @@ describe('defaultProvider', () => {
         contract: compiledOpenZeppelinAccount,
       });
 
-      expect(response.code).toBe('TRANSACTION_RECEIVED');
       expect(response.transaction_hash).toBeDefined();
-      expect(response.address).toBeDefined();
+      expect(response.contract_address).toBeDefined();
     });
   });
 });
