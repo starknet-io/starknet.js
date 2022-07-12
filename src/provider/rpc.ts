@@ -16,7 +16,6 @@ import {
   InvocationsDetails,
   InvokeFunctionResponse,
   RPC,
-  Signature,
 } from '../types';
 import { getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
@@ -130,15 +129,15 @@ export class RPCProvider implements ProviderInterface {
   }
 
   public async getEstimateFee(
-    call: Call,
+    invocation: Invocation,
     blockIdentifier: BlockIdentifier = 'pending',
-    _signature: Signature = []
+    _invocationDetails: InvocationsDetails = {}
   ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint('starknet_estimateFee', [
       {
-        contract_address: call.contractAddress,
-        entry_point_selector: getSelectorFromName(call.entrypoint),
-        calldata: parseCalldata(call.calldata),
+        contract_address: invocation.contractAddress,
+        entry_point_selector: getSelectorFromName(invocation.entrypoint),
+        calldata: parseCalldata(invocation.calldata),
       },
       blockIdentifier,
     ]).then(this.responseParser.parseFeeEstimateResponse);

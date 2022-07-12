@@ -14,7 +14,6 @@ import type {
   Invocation,
   InvocationsDetails,
   InvokeFunctionResponse,
-  Signature,
 } from '../types';
 import type { BigNumberish } from '../utils/number';
 import { BlockIdentifier } from './utils';
@@ -128,9 +127,9 @@ export abstract class ProviderInterface {
   ): Promise<InvokeFunctionResponse>;
 
   public abstract getEstimateFee(
-    request: Call,
+    request: Invocation,
     blockIdentifier: BlockIdentifier,
-    signature?: Signature
+    invocationDetails?: InvocationsDetails
   ): Promise<EstimateFeeResponse>;
 
   public abstract waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<void>;

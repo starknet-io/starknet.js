@@ -13,7 +13,6 @@ import {
   Invocation,
   InvocationsDetails,
   InvokeFunctionResponse,
-  Signature,
 } from '../types';
 import { BigNumberish } from '../utils/number';
 import { GatewayProvider, GatewayProviderOptions } from './gateway';
@@ -29,8 +28,8 @@ export interface ProviderOptions {
 export class Provider implements ProviderInterface {
   private provider!: ProviderInterface;
 
-  constructor(providerOrOptions?: ProviderOptions | ProviderInterface) {
-    if (providerOrOptions instanceof ProviderInterface) {
+  constructor(providerOrOptions?: ProviderOptions | Provider) {
+    if (providerOrOptions instanceof Provider) {
       this.provider = providerOrOptions;
     } else if (providerOrOptions && providerOrOptions.rpc) {
       this.provider = new RPCProvider(providerOrOptions.rpc);
@@ -55,11 +54,11 @@ export class Provider implements ProviderInterface {
   }
 
   public async getEstimateFee(
-    request: Call,
+    invocation: Invocation,
     blockIdentifier: BlockIdentifier,
-    signature?: Signature
+    invocationDetails?: InvocationsDetails
   ): Promise<EstimateFeeResponse> {
-    return this.provider.getEstimateFee(request, blockIdentifier, signature);
+    return this.provider.getEstimateFee(invocation, blockIdentifier, invocationDetails);
   }
 
   public async getStorageAt(

@@ -20,7 +20,6 @@ import {
   Invocation,
   InvocationsDetails,
   InvokeFunctionResponse,
-  Signature,
 } from '../types';
 import { getSelectorFromName } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
@@ -268,8 +267,8 @@ export class GatewayProvider implements ProviderInterface {
       entry_point_selector: getSelectorFromName(functionInvocation.entrypoint),
       calldata: bigNumberishArrayToDecimalStringArray(functionInvocation.calldata ?? []),
       signature: bigNumberishArrayToDecimalStringArray(functionInvocation.signature ?? []),
-      max_fee: details.maxFee,
-      version: details.version,
+      max_fee: toHex(toBN(details.maxFee || 0)),
+      version: toHex(toBN(details.version || 0)),
     }).then(this.responseParser.parseInvokeFunctionResponse);
   }
 
@@ -303,18 +302,19 @@ export class GatewayProvider implements ProviderInterface {
   }
 
   public async getEstimateFee(
-    call: Call,
+    invocation: Invocation,
     blockIdentifier: BlockIdentifier = 'pending',
-    signature?: Signature
+    invocationDetails: InvocationsDetails = {}
   ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint(
       'estimate_fee',
       { blockIdentifier },
       {
-        contract_address: call.contractAddress,
-        entry_point_selector: getSelectorFromName(call.entrypoint),
-        calldata: bigNumberishArrayToDecimalStringArray(call.calldata ?? []),
-        signature: bigNumberishArrayToDecimalStringArray(signature || []),
+        contract_address: invocation.contractAddress,
+        entry_point_selector: getSelectorFromName(invocation.entrypoint),
+        calldata: invocation.calldata ?? [],
+        signature: bigNumberishArrayToDecimalStringArray(invocation.signature || []),
+        version: toHex(toBN(invocationDetails?.version || 0)),
       }
     ).then(this.responseParser.parseFeeEstimateResponse);
   }
