@@ -2,7 +2,7 @@ import { DeployContractResponse, RPCProvider } from '../src';
 import { compileCalldata } from '../src/utils/stark';
 import { compiledErc20 } from './fixtures';
 
-const TEST_RPC_URL = 'https://starknet-goerli.infura.io/v3/3aa5342fa7a1418e8e493404f3dea9b2';
+const { TEST_RPC_URL } = process.env;
 
 if (!TEST_RPC_URL) {
   throw new Error('TEST_RPC_URL is not set');
