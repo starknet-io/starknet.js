@@ -34,7 +34,7 @@ import { BlockIdentifier } from './utils';
 
 export type RpcProviderOptions = { nodeUrl: string };
 
-export class RPCProvider implements ProviderInterface {
+export class RpcProvider implements ProviderInterface {
   public nodeUrl: string;
 
   public chainId!: StarknetChainId;

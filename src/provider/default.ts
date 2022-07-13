@@ -16,7 +16,7 @@ import {
 } from '../types';
 import { BigNumberish } from '../utils/number';
 import { ProviderInterface } from './interface';
-import { RPCProvider, RpcProviderOptions } from './rpc';
+import { RpcProvider, RpcProviderOptions } from './rpc';
 import { SequencerProvider, SequencerProviderOptions } from './sequencer';
 import { BlockIdentifier } from './utils';
 
@@ -32,7 +32,7 @@ export class Provider implements ProviderInterface {
     if (providerOrOptions instanceof Provider) {
       this.provider = providerOrOptions;
     } else if (providerOrOptions && providerOrOptions.rpc) {
-      this.provider = new RPCProvider(providerOrOptions.rpc);
+      this.provider = new RpcProvider(providerOrOptions.rpc);
     } else {
       this.provider = new SequencerProvider(providerOrOptions?.sequencer);
     }
