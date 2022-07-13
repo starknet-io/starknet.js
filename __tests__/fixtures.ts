@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-import { Account, Provider, ec, json } from '../src';
+import { Account, Provider, RpcProvider, ec, json } from '../src';
 import { CompiledContract } from '../src/types';
 
 const readContract = (name: string): CompiledContract =>
@@ -53,6 +53,16 @@ export const getTestAccount = (provider = getTestProvider(), isDevnet = false) =
   }
 
   return new Account(provider, testAccountAddress, ec.getKeyPair(testAccountPrivateKey));
+};
+
+export const getTestRpcProvider = () => {
+  const { TEST_RPC_URL } = process.env;
+
+  if (!TEST_RPC_URL) {
+    throw new Error('TEST_RPC_URL is not set');
+  }
+
+  return new RpcProvider({ nodeUrl: TEST_RPC_URL });
 };
 
 export const testIf = (condition: boolean) => (condition ? test : test.skip);
