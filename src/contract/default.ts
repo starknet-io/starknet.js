@@ -578,7 +578,8 @@ export class Contract implements ContractInterface {
       });
     }
 
-    // TODO: throw warning
+    console.warn(`Invoking ${method} without an account. This will not work on a public node.`);
+
     return this.providerOrAccount.invokeFunction({
       ...invocation,
       signature: options.signature || [],

@@ -36,7 +36,6 @@ export class Account extends Provider implements AccountInterface {
     const { result } = await this.callContract({
       contractAddress: this.address,
       entrypoint: 'get_nonce',
-      calldata: [],
     });
     return toHex(toBN(result[0]));
   }
