@@ -130,14 +130,16 @@ export class RPCProvider implements ProviderInterface {
 
   public async getEstimateFee(
     invocation: Invocation,
-    blockIdentifier: BlockIdentifier = 'pending',
-    _invocationDetails: InvocationsDetails = {}
+    blockIdentifier: BlockIdentifier = 'latest',
+    invocationDetails: InvocationsDetails = {}
   ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint('starknet_estimateFee', [
       {
         contract_address: invocation.contractAddress,
         entry_point_selector: getSelectorFromName(invocation.entrypoint),
         calldata: parseCalldata(invocation.calldata),
+        signature: bigNumberishArrayToDecimalStringArray(invocation.signature || []),
+        version: toHex(toBN(invocationDetails?.version || 0)),
       },
       blockIdentifier,
     ]).then(this.responseParser.parseFeeEstimateResponse);
@@ -179,15 +181,26 @@ export class RPCProvider implements ProviderInterface {
     functionInvocation: Invocation,
     details: InvocationsDetails
   ): Promise<InvokeFunctionResponse> {
+    console.log([
+      {
+        contract_address: functionInvocation.contractAddress,
+        entry_point_selector: getSelectorFromName(functionInvocation.entrypoint),
+        calldata: parseCalldata(functionInvocation.calldata),
+      },
+      bigNumberishArrayToDecimalStringArray(functionInvocation.signature || []),
+      toHex(toBN(details.maxFee || 0)),
+      toHex(toBN(details.version || 0)),
+    ]);
+
     return this.fetchEndpoint('starknet_addInvokeTransaction', [
       {
         contract_address: functionInvocation.contractAddress,
         entry_point_selector: getSelectorFromName(functionInvocation.entrypoint),
         calldata: parseCalldata(functionInvocation.calldata),
       },
-      functionInvocation.signature,
-      details.maxFee,
-      details.version,
+      bigNumberishArrayToDecimalStringArray(functionInvocation.signature || []),
+      toHex(toBN(details.maxFee || 0)),
+      toHex(toBN(details.version || 0)),
     ]).then(this.responseParser.parseInvokeFunctionResponse);
   }
 
@@ -221,6 +234,7 @@ export class RPCProvider implements ProviderInterface {
       try {
         // eslint-disable-next-line no-await-in-loop
         const res = await this.getTransactionReceipt(txHash);
+        console.log({ res });
 
         if (successStates.includes(res.status)) {
           onchain = true;
@@ -231,6 +245,7 @@ export class RPCProvider implements ProviderInterface {
           throw error;
         }
       } catch (error: unknown) {
+        console.log(error);
         if (error instanceof Error && errorStates.includes(error.message)) {
           throw error;
         }

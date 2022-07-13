@@ -9,6 +9,7 @@ import {
   InvokeFunctionResponse,
   RPC,
 } from '../../types';
+import { toBN } from '../number';
 import { ResponseParser } from '.';
 
 export class RPCResponseParser extends ResponseParser {
@@ -68,7 +69,7 @@ export class RPCResponseParser extends ResponseParser {
 
   public parseFeeEstimateResponse(res: RPC.EstimateFeeResponse): EstimateFeeResponse {
     return {
-      overall_fee: res.overall_fee,
+      overall_fee: toBN(res.overall_fee),
     };
   }
 

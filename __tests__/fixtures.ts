@@ -35,16 +35,30 @@ export const getTestProvider = () => {
 };
 
 // test account with fee token balance
-export const getTestAccount = () => {
-  const provider = getTestProvider();
+export const getTestAccount = (provider = getTestProvider(), isDevnet = false) => {
+  if (!isDevnet) {
+    if (!process.env.TEST_ACCOUNT_PRIVATE_KEY) {
+      throw new Error('TEST_ACCOUNT_PRIVATE_KEY is not set');
+    }
 
-  const testAccountAddress = process.env.TEST_ACCOUNT_ADDRESS || DEFAULT_TEST_ACCOUNT_ADDRESS;
-  const testAccountPrivateKey =
-    process.env.TEST_ACCOUNT_PRIVATE_KEY || DEFAULT_TEST_ACCOUNT_PRIVATE_KEY;
+    if (!process.env.TEST_ACCOUNT_ADDRESS) {
+      throw new Error('TEST_ACCOUNT_ADDRESS is not set');
+    }
+  }
+
+  const testAccountAddress = isDevnet
+    ? DEFAULT_TEST_ACCOUNT_ADDRESS
+    : (process.env.TEST_ACCOUNT_ADDRESS as string);
+  const testAccountPrivateKey = isDevnet
+    ? DEFAULT_TEST_ACCOUNT_PRIVATE_KEY
+    : (process.env.TEST_ACCOUNT_PRIVATE_KEY as string);
 
   return new Account(provider, testAccountAddress, ec.getKeyPair(testAccountPrivateKey));
 };
 
 export const testIf = (condition: boolean) => (condition ? test : test.skip);
+export const describeIf = (condition: boolean) => (condition ? describe : describe.skip);
 export const testIfDevnet = testIf(IS_DEVNET);
 export const testIfNotDevnet = testIf(!IS_DEVNET);
+export const describeIfDevnet = describeIf(IS_DEVNET);
+export const describeIfNotDevnet = describeIf(!IS_DEVNET);

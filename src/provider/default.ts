@@ -55,8 +55,8 @@ export class Provider implements ProviderInterface {
 
   public async getEstimateFee(
     invocation: Invocation,
-    blockIdentifier: BlockIdentifier,
-    invocationDetails?: InvocationsDetails
+    blockIdentifier: BlockIdentifier = 'latest', // 'pending' is not working on the RPC node
+    invocationDetails: InvocationsDetails = {}
   ): Promise<EstimateFeeResponse> {
     return this.provider.getEstimateFee(invocation, blockIdentifier, invocationDetails);
   }

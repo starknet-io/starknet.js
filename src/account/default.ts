@@ -43,7 +43,7 @@ export class Account extends Provider implements AccountInterface {
 
   public async estimateFee(
     calls: Call | Call[],
-    { nonce: providedNonce, blockIdentifier = 'pending' }: EstimateFeeDetails = {}
+    { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = providedNonce ?? (await this.getNonce());
