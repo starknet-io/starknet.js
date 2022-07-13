@@ -35,7 +35,7 @@ export const getTestProvider = () => {
 };
 
 // test account with fee token balance
-export const getTestAccount = (provider = getTestProvider(), isDevnet = false) => {
+export const getTestAccount = (provider = getTestProvider(), isDevnet = IS_DEVNET) => {
   let testAccountAddress = process.env.TEST_ACCOUNT_ADDRESS;
   let testAccountPrivateKey = process.env.TEST_ACCOUNT_PRIVATE_KEY;
 
