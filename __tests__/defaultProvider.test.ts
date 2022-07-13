@@ -84,7 +84,7 @@ describe('defaultProvider', () => {
       return expect(transactionReceipt).toHaveProperty('actual_fee');
     });
 
-    test.only('callContract()', () => {
+    test('callContract()', () => {
       return expect(
         provider.callContract({
           contractAddress: exampleContractAddress,
@@ -96,7 +96,7 @@ describe('defaultProvider', () => {
       ).resolves.not.toThrow();
     });
 
-    test.only('callContract() - gateway error', async () => {
+    test('callContract() - gateway error', async () => {
       const promise = provider.callContract({
         contractAddress: exampleContractAddress,
         entrypoint: 'non_existent_entrypoint',
