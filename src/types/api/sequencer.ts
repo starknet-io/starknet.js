@@ -78,7 +78,7 @@ export type RawArgs = {
   [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
 };
 
-export namespace Gateway {
+export namespace Sequencer {
   export type DeclareTransaction = {
     type: 'DECLARE';
     contract_class: ContractClass;

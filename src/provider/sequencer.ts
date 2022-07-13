@@ -10,7 +10,6 @@ import {
   DeployContractPayload,
   DeployContractResponse,
   EstimateFeeResponse,
-  Gateway,
   GetBlockResponse,
   GetContractAddressesResponse,
   GetTransactionReceiptResponse,
@@ -20,12 +19,13 @@ import {
   Invocation,
   InvocationsDetails,
   InvokeFunctionResponse,
+  Sequencer,
 } from '../types';
 import { getSelectorFromName } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
 import { parseContract, wait } from '../utils/provider';
-import { GatewayAPIResponseParser } from '../utils/responseParser/gateway';
+import { SequencerAPIResponseParser } from '../utils/responseParser/sequencer';
 import { randomAddress } from '../utils/stark';
 import { GatewayError, HttpError } from './errors';
 import { ProviderInterface } from './interface';
@@ -42,7 +42,7 @@ function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
   );
 }
 
-export type GatewayProviderOptions =
+export type SequencerProviderOptions =
   | { network: NetworkName }
   | {
       baseUrl: string;
@@ -51,7 +51,7 @@ export type GatewayProviderOptions =
       chainId?: StarknetChainId;
     };
 
-export class GatewayProvider implements ProviderInterface {
+export class SequencerProvider implements ProviderInterface {
   public baseUrl: string;
 
   public feederGatewayUrl: string;
@@ -60,12 +60,12 @@ export class GatewayProvider implements ProviderInterface {
 
   public chainId: StarknetChainId;
 
-  private responseParser = new GatewayAPIResponseParser();
+  private responseParser = new SequencerAPIResponseParser();
 
-  constructor(optionsOrProvider: GatewayProviderOptions = { network: 'goerli-alpha' }) {
+  constructor(optionsOrProvider: SequencerProviderOptions = { network: 'goerli-alpha' }) {
     if ('network' in optionsOrProvider) {
-      this.baseUrl = GatewayProvider.getNetworkFromName(optionsOrProvider.network);
-      this.chainId = GatewayProvider.getChainIdFromBaseUrl(this.baseUrl);
+      this.baseUrl = SequencerProvider.getNetworkFromName(optionsOrProvider.network);
+      this.chainId = SequencerProvider.getChainIdFromBaseUrl(this.baseUrl);
       this.feederGatewayUrl = urljoin(this.baseUrl, 'feeder_gateway');
       this.gatewayUrl = urljoin(this.baseUrl, 'gateway');
     } else {
@@ -75,7 +75,7 @@ export class GatewayProvider implements ProviderInterface {
       this.gatewayUrl = optionsOrProvider.gatewayUrl ?? urljoin(this.baseUrl, 'gateway');
       this.chainId =
         optionsOrProvider.chainId ??
-        GatewayProvider.getChainIdFromBaseUrl(optionsOrProvider.baseUrl);
+        SequencerProvider.getChainIdFromBaseUrl(optionsOrProvider.baseUrl);
     }
   }
 
@@ -102,13 +102,13 @@ export class GatewayProvider implements ProviderInterface {
     return StarknetChainId.TESTNET;
   }
 
-  private getFetchUrl(endpoint: keyof Gateway.Endpoints) {
+  private getFetchUrl(endpoint: keyof Sequencer.Endpoints) {
     const gatewayUrlEndpoints = ['add_transaction'];
 
     return gatewayUrlEndpoints.includes(endpoint) ? this.gatewayUrl : this.feederGatewayUrl;
   }
 
-  private getFetchMethod(endpoint: keyof Gateway.Endpoints) {
+  private getFetchMethod(endpoint: keyof Sequencer.Endpoints) {
     const postMethodEndpoints = ['add_transaction', 'call_contract', 'estimate_fee'];
 
     return postMethodEndpoints.includes(endpoint) ? 'POST' : 'GET';
@@ -140,17 +140,17 @@ export class GatewayProvider implements ProviderInterface {
   }
 
   // typesafe fetch
-  protected async fetchEndpoint<T extends keyof Gateway.Endpoints>(
+  protected async fetchEndpoint<T extends keyof Sequencer.Endpoints>(
     endpoint: T,
     // typescript type magiuc to create a nice fitting function interface
-    ...[query, request]: Gateway.Endpoints[T]['QUERY'] extends never
-      ? Gateway.Endpoints[T]['REQUEST'] extends never
+    ...[query, request]: Sequencer.Endpoints[T]['QUERY'] extends never
+      ? Sequencer.Endpoints[T]['REQUEST'] extends never
         ? [] // when no query and no request is needed, we can omit the query and request parameters
-        : [undefined, Gateway.Endpoints[T]['REQUEST']]
-      : Gateway.Endpoints[T]['REQUEST'] extends never
-      ? [Gateway.Endpoints[T]['QUERY']] // when no request is needed, we can omit the request parameter
-      : [Gateway.Endpoints[T]['QUERY'], Gateway.Endpoints[T]['REQUEST']] // when both query and request are needed, we cant omit anything
-  ): Promise<Gateway.Endpoints[T]['RESPONSE']> {
+        : [undefined, Sequencer.Endpoints[T]['REQUEST']]
+      : Sequencer.Endpoints[T]['REQUEST'] extends never
+      ? [Sequencer.Endpoints[T]['QUERY']] // when no request is needed, we can omit the request parameter
+      : [Sequencer.Endpoints[T]['QUERY'], Sequencer.Endpoints[T]['REQUEST']] // when both query and request are needed, we cant omit anything
+  ): Promise<Sequencer.Endpoints[T]['RESPONSE']> {
     const baseUrl = this.getFetchUrl(endpoint);
     const method = this.getFetchMethod(endpoint);
     const queryString = this.getQueryString(query);
@@ -186,7 +186,7 @@ export class GatewayProvider implements ProviderInterface {
           return v;
         });
       }
-      return parse(textResponse) as Gateway.Endpoints[T]['RESPONSE'];
+      return parse(textResponse) as Sequencer.Endpoints[T]['RESPONSE'];
     } catch (err) {
       // rethrow custom errors
       if (err instanceof GatewayError || err instanceof HttpError) {

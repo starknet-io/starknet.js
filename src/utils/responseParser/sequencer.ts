@@ -3,17 +3,17 @@ import {
   DeclareContractResponse,
   DeployContractResponse,
   EstimateFeeResponse,
-  Gateway,
   GetBlockResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   InvokeFunctionResponse,
+  Sequencer,
 } from '../../types';
 import { toBN } from '../number';
 import { ResponseParser } from '.';
 
-export class GatewayAPIResponseParser extends ResponseParser {
-  public parseGetBlockResponse(res: Gateway.GetBlockResponse): GetBlockResponse {
+export class SequencerAPIResponseParser extends ResponseParser {
+  public parseGetBlockResponse(res: Sequencer.GetBlockResponse): GetBlockResponse {
     return {
       accepted_time: res.timestamp,
       block_hash: res.block_hash,
@@ -30,7 +30,9 @@ export class GatewayAPIResponseParser extends ResponseParser {
     };
   }
 
-  public parseGetTransactionResponse(res: Gateway.GetTransactionResponse): GetTransactionResponse {
+  public parseGetTransactionResponse(
+    res: Sequencer.GetTransactionResponse
+  ): GetTransactionResponse {
     return {
       calldata: 'calldata' in res.transaction ? (res.transaction.calldata as Array<string>) : [],
       contract_address:
@@ -55,7 +57,7 @@ export class GatewayAPIResponseParser extends ResponseParser {
   }
 
   public parseGetTransactionReceiptResponse(
-    res: Gateway.TransactionReceiptResponse
+    res: Sequencer.TransactionReceiptResponse
   ): GetTransactionReceiptResponse {
     return {
       transaction_hash: res.transaction_hash,
@@ -68,25 +70,29 @@ export class GatewayAPIResponseParser extends ResponseParser {
     };
   }
 
-  public parseFeeEstimateResponse(res: Gateway.EstimateFeeResponse): EstimateFeeResponse {
+  public parseFeeEstimateResponse(res: Sequencer.EstimateFeeResponse): EstimateFeeResponse {
     return {
       overall_fee: toBN(res.amount),
     };
   }
 
-  public parseCallContractResponse(res: Gateway.CallContractResponse): CallContractResponse {
+  public parseCallContractResponse(res: Sequencer.CallContractResponse): CallContractResponse {
     return {
       result: res.result,
     };
   }
 
-  public parseInvokeFunctionResponse(res: Gateway.AddTransactionResponse): InvokeFunctionResponse {
+  public parseInvokeFunctionResponse(
+    res: Sequencer.AddTransactionResponse
+  ): InvokeFunctionResponse {
     return {
       transaction_hash: res.transaction_hash,
     };
   }
 
-  public parseDeployContractResponse(res: Gateway.AddTransactionResponse): DeployContractResponse {
+  public parseDeployContractResponse(
+    res: Sequencer.AddTransactionResponse
+  ): DeployContractResponse {
     return {
       transaction_hash: res.transaction_hash,
       contract_address: res.address as string,
@@ -94,7 +100,7 @@ export class GatewayAPIResponseParser extends ResponseParser {
   }
 
   public parseDeclareContractResponse(
-    res: Gateway.AddTransactionResponse
+    res: Sequencer.AddTransactionResponse
   ): DeclareContractResponse {
     return {
       transaction_hash: res.transaction_hash,

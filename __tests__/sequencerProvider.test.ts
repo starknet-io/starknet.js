@@ -1,12 +1,12 @@
-import { DeclareContractResponse, DeployContractResponse, GatewayProvider } from '../src';
+import { DeclareContractResponse, DeployContractResponse, SequencerProvider } from '../src';
 import { compileCalldata } from '../src/utils/stark';
 import { compiledErc20 } from './fixtures';
 
-describe('GatewayProvider', () => {
-  let provider: GatewayProvider;
+describe('SequencerProvider', () => {
+  let provider: SequencerProvider;
 
   beforeAll(async () => {
-    provider = new GatewayProvider();
+    provider = new SequencerProvider();
   });
 
   describe('Provider methods', () => {

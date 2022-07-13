@@ -15,13 +15,13 @@ import {
   InvokeFunctionResponse,
 } from '../types';
 import { BigNumberish } from '../utils/number';
-import { GatewayProvider, GatewayProviderOptions } from './gateway';
 import { ProviderInterface } from './interface';
 import { RPCProvider, RpcProviderOptions } from './rpc';
+import { SequencerProvider, SequencerProviderOptions } from './sequencer';
 import { BlockIdentifier } from './utils';
 
 export interface ProviderOptions {
-  gateway?: GatewayProviderOptions;
+  sequencer?: SequencerProviderOptions;
   rpc?: RpcProviderOptions;
 }
 
@@ -34,7 +34,7 @@ export class Provider implements ProviderInterface {
     } else if (providerOrOptions && providerOrOptions.rpc) {
       this.provider = new RPCProvider(providerOrOptions.rpc);
     } else {
-      this.provider = new GatewayProvider(providerOrOptions?.gateway);
+      this.provider = new SequencerProvider(providerOrOptions?.sequencer);
     }
   }
 

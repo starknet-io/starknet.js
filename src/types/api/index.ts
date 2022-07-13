@@ -13,5 +13,5 @@ export type Overrides = {
   signature?: Signature;
 };
 
-export * from './gateway';
+export * from './sequencer';
 export * from './rpc';
