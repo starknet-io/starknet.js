@@ -1,4 +1,4 @@
-import { BlockNumber, stark } from '../src';
+import { BlockNumber, GetBlockResponse, stark } from '../src';
 import { toBN } from '../src/utils/number';
 import { IS_DEVNET, compiledErc20, compiledOpenZeppelinAccount, getTestProvider } from './fixtures';
 
@@ -9,9 +9,10 @@ const provider = getTestProvider();
 describe('defaultProvider', () => {
   let exampleTransactionHash: string;
   let exampleContractAddress: string;
-  const exampleBlockHash: string =
-    '0x8a30a1212d142cb0053fe9921e1dbf64f651d328565bd2e7ac24059c270f43';
-  const exampleBlockNumber: BlockNumber = 102634;
+
+  let exampleBlock!: GetBlockResponse;
+  let exampleBlockNumber!: BlockNumber;
+  let exampleBlockHash!: string;
 
   beforeAll(async () => {
     const { transaction_hash, contract_address } = await provider.deployContract({
@@ -20,23 +21,25 @@ describe('defaultProvider', () => {
     await provider.waitForTransaction(transaction_hash);
     exampleTransactionHash = transaction_hash;
     exampleContractAddress = contract_address;
+
+    exampleBlock = await provider.getBlock();
+    exampleBlockHash = exampleBlock.block_hash;
+    exampleBlockNumber = exampleBlock.block_number;
   });
 
   describe('endpoints', () => {
-    test(`getBlock(blockHash=${exampleBlockHash}, blockNumber=undefined)`, () => {
-      return expect(provider.getBlock(exampleBlockHash)).resolves.not.toThrow();
-    });
-
     test(`getBlock(blockHash=undefined, blockNumber=${exampleBlockNumber})`, () => {
       return expect(provider.getBlock(exampleBlockNumber)).resolves.not.toThrow();
     });
 
+    test(`getBlock(blockHash=${exampleBlockHash}, blockNumber=undefined)`, () => {
+      return expect(provider.getBlock(exampleBlockHash)).resolves.not.toThrow();
+    });
+
     test('getBlock(blockHash=undefined, blockNumber=null)', async () => {
-      const block = await provider.getBlock();
+      expect(exampleBlock).not.toBeNull();
 
-      expect(block).not.toBeNull();
-
-      const { block_number, accepted_time } = block;
+      const { block_number, accepted_time } = exampleBlock;
 
       expect(typeof block_number).toEqual('number');
 
