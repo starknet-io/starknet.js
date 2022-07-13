@@ -181,17 +181,6 @@ export class RPCProvider implements ProviderInterface {
     functionInvocation: Invocation,
     details: InvocationsDetails
   ): Promise<InvokeFunctionResponse> {
-    console.log([
-      {
-        contract_address: functionInvocation.contractAddress,
-        entry_point_selector: getSelectorFromName(functionInvocation.entrypoint),
-        calldata: parseCalldata(functionInvocation.calldata),
-      },
-      bigNumberishArrayToDecimalStringArray(functionInvocation.signature || []),
-      toHex(toBN(details.maxFee || 0)),
-      toHex(toBN(details.version || 0)),
-    ]);
-
     return this.fetchEndpoint('starknet_addInvokeTransaction', [
       {
         contract_address: functionInvocation.contractAddress,
@@ -222,7 +211,6 @@ export class RPCProvider implements ProviderInterface {
 
   public async waitForTransaction(txHash: BigNumberish, retryInterval: number = 8000) {
     let onchain = false;
-    // TODO: optimize this
     let retries = 100;
 
     while (!onchain) {
@@ -234,7 +222,6 @@ export class RPCProvider implements ProviderInterface {
       try {
         // eslint-disable-next-line no-await-in-loop
         const res = await this.getTransactionReceipt(txHash);
-        console.log({ res });
 
         if (successStates.includes(res.status)) {
           onchain = true;
@@ -245,7 +232,6 @@ export class RPCProvider implements ProviderInterface {
           throw error;
         }
       } catch (error: unknown) {
-        console.log(error);
         if (error instanceof Error && errorStates.includes(error.message)) {
           throw error;
         }

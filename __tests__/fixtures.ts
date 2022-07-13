@@ -36,22 +36,21 @@ export const getTestProvider = () => {
 
 // test account with fee token balance
 export const getTestAccount = (provider = getTestProvider(), isDevnet = false) => {
+  let testAccountAddress = process.env.TEST_ACCOUNT_ADDRESS;
+  let testAccountPrivateKey = process.env.TEST_ACCOUNT_PRIVATE_KEY;
+
   if (!isDevnet) {
-    if (!process.env.TEST_ACCOUNT_PRIVATE_KEY) {
+    if (!testAccountPrivateKey) {
       throw new Error('TEST_ACCOUNT_PRIVATE_KEY is not set');
     }
 
-    if (!process.env.TEST_ACCOUNT_ADDRESS) {
+    if (!testAccountAddress) {
       throw new Error('TEST_ACCOUNT_ADDRESS is not set');
     }
+  } else {
+    testAccountAddress = DEFAULT_TEST_ACCOUNT_ADDRESS;
+    testAccountPrivateKey = DEFAULT_TEST_ACCOUNT_PRIVATE_KEY;
   }
-
-  const testAccountAddress = isDevnet
-    ? DEFAULT_TEST_ACCOUNT_ADDRESS
-    : (process.env.TEST_ACCOUNT_ADDRESS as string);
-  const testAccountPrivateKey = isDevnet
-    ? DEFAULT_TEST_ACCOUNT_PRIVATE_KEY
-    : (process.env.TEST_ACCOUNT_PRIVATE_KEY as string);
 
   return new Account(provider, testAccountAddress, ec.getKeyPair(testAccountPrivateKey));
 };

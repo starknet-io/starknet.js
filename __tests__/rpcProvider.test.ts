@@ -205,8 +205,14 @@ describe('RPCProvider', () => {
       account = getTestAccount(rpcProvider, false);
       expect(account).toBeInstanceOf(Account);
 
-      // Using predeployed contract as RPC node has issues with using recent deployed contracts
-      erc20Address = '0x649c8b8dbb19009551120c364208bad865f06d4b12ecd3e7109421d8b22968e';
+      const erc20Response = await provider.deployContract({
+        contract: compiledErc20,
+      });
+
+      erc20Address = erc20Response.contract_address!;
+      erc20 = new Contract(compiledErc20.abi, erc20Address, provider);
+
+      await provider.waitForTransaction(erc20Response.transaction_hash);
       erc20 = new Contract(compiledErc20.abi, erc20Address, provider);
 
       const mintResponse = await account.execute({
@@ -225,7 +231,6 @@ describe('RPCProvider', () => {
         calldata: [erc20.address, '10'],
       });
 
-      console.log({ overall_fee });
       expect(isBN(overall_fee)).toBe(true);
     });
 
