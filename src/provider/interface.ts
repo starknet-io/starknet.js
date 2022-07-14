@@ -24,12 +24,12 @@ export abstract class ProviderInterface {
   /**
    * Calls a function on the StarkNet contract.
    *
-   * @param invokeTransaction transaction to be invoked
+   * @param call transaction to be called
    * @param blockIdentifier block identifier
    * @returns the result of the function on the smart contract.
    */
   public abstract callContract(
-    request: Call,
+    call: Call,
     blockIdentifier?: BlockIdentifier
   ): Promise<CallContractResponse>;
 
@@ -46,7 +46,7 @@ export abstract class ProviderInterface {
    *
    * @param contractAddress - contract address
    * @param blockIdentifier - block identifier
-   * @returns Bytecode and ABI of compiled contract
+   * @returns Contract class of compiled contract
    */
   public abstract getClassAt(
     contractAddress: string,
@@ -101,8 +101,7 @@ export abstract class ProviderInterface {
    *
    * @param payload payload to be deployed containing:
    * - compiled contract code
-   * - constructor calldata
-   * - address salt
+   * - optional version
    * @returns a confirmation of sending a transaction on the starknet contract
    */
   public abstract declareContract(
@@ -118,7 +117,10 @@ export abstract class ProviderInterface {
    * - entrypoint - the entrypoint of the contract
    * - calldata - (defaults to []) the calldata
    * - signature - (defaults to []) the signature
-   *
+   * @param details - optional details containing:
+   * - nonce - optional nonce
+   * - version - optional version
+   * - maxFee - optional maxFee
    * @returns response from addTransaction
    */
   public abstract invokeFunction(
@@ -126,11 +128,30 @@ export abstract class ProviderInterface {
     details?: InvocationsDetails
   ): Promise<InvokeFunctionResponse>;
 
+  /**
+   * Estimates the fee for a given transaction
+   *
+   * @param invocation the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   * @param blockIdentifier - block identifier
+   * @param details - optional details containing:
+   * - nonce - optional nonce
+   * - version - optional version
+   * @returns the estimated fee
+   */
   public abstract getEstimateFee(
-    request: Invocation,
+    invocation: Invocation,
     blockIdentifier: BlockIdentifier,
-    invocationDetails?: InvocationsDetails
+    details?: InvocationsDetails
   ): Promise<EstimateFeeResponse>;
 
+  /**
+   * Wait for the transaction to be accepted
+   * @param txHash - transaction hash
+   * @param retryInterval - retry interval
+   */
   public abstract waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<void>;
 }
