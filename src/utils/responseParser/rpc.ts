@@ -70,6 +70,8 @@ export class RPCResponseParser extends ResponseParser {
   public parseFeeEstimateResponse(res: RPC.EstimateFeeResponse): EstimateFeeResponse {
     return {
       overall_fee: toBN(res.overall_fee),
+      gas_consumed: toBN(res.gas_consumed),
+      gas_price: toBN(res.gas_price),
     };
   }
 

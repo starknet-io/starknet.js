@@ -48,13 +48,15 @@ describe('RPCProvider', () => {
     });
 
     test('estimate fee', async () => {
-      const { overall_fee } = await account.estimateFee({
+      const { overall_fee, gas_consumed, gas_price } = await account.estimateFee({
         contractAddress: erc20Address,
         entrypoint: 'transfer',
         calldata: [erc20.address, '10'],
       });
 
       expect(isBN(overall_fee)).toBe(true);
+      expect(isBN(gas_consumed)).toBe(true);
+      expect(isBN(gas_price)).toBe(true);
     });
 
     test('execute by wallet owner', async () => {

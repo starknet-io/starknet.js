@@ -83,6 +83,8 @@ export type DeclareTransactionReceiptResponse = CommonTransactionReceiptResponse
 
 export interface EstimateFeeResponse {
   overall_fee: BigNumberish;
+  gas_consumed?: BigNumberish;
+  gas_price?: BigNumberish;
 }
 
 export interface InvokeFunctionResponse {
