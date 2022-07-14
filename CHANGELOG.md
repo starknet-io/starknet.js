@@ -1,3 +1,9 @@
+## [3.16.2](https://github.com/0xs34n/starknet.js/compare/v3.16.1...v3.16.2) (2022-07-14)
+
+### Bug Fixes
+
+- **docs:** account.address ([d935b95](https://github.com/0xs34n/starknet.js/commit/d935b95c3bb54977c420efbd25cd85dcd12d1b17))
+
 ## [3.16.1](https://github.com/0xs34n/starknet.js/compare/v3.16.0...v3.16.1) (2022-07-02)
 
 ### Bug Fixes
