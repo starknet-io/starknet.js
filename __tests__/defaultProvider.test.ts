@@ -311,7 +311,6 @@ describe('defaultProvider', () => {
 
         describe('getClassAt', () => {
           test('response', async () => {
-            // Hardcoded contract address as RPC node is throwing "Contract not found" error
             const classResponse = await provider.getClassAt(contractAddress);
 
             expect(classResponse).toHaveProperty('program');

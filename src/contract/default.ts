@@ -97,7 +97,7 @@ export class Contract implements ContractInterface {
 
   address: string;
 
-  providerOrAccount!: ProviderInterface | AccountInterface;
+  providerOrAccount: ProviderInterface | AccountInterface;
 
   deployTransactionHash?: string;
 
