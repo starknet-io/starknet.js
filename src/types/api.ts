@@ -125,6 +125,10 @@ export type InvokeFunctionTransaction = {
   version?: BigNumberish;
 };
 
+export interface InvokeFunctionTransactionResponse extends InvokeFunctionTransaction {
+  transaction_hash: string;
+}
+
 export type InvokeFunctionTrace = {
   caller_address: string;
   contract_address: string;
@@ -157,6 +161,10 @@ export type CallContractTransaction = Omit<
 >;
 
 export type Transaction = DeclareTransaction | DeployTransaction | InvokeFunctionTransaction;
+export type TransactionResponse =
+  | DeclareTransaction
+  | DeployTransaction
+  | InvokeFunctionTransactionResponse;
 
 export type CallContractResponse = {
   result: string[];
@@ -167,7 +175,7 @@ export type GetBlockResponse = {
   state_root: string;
   block_hash: string;
   transactions: {
-    [txHash: string]: Transaction;
+    [txHash: string]: TransactionResponse;
   };
   timestamp: number;
   transaction_receipts: {
@@ -221,7 +229,7 @@ export type GetTransactionTraceResponse = {
 
 export type SuccessfulTransactionResponse = {
   status: Status;
-  transaction: Transaction;
+  transaction: TransactionResponse;
   block_hash: string;
   block_number: BlockNumber;
   transaction_index: number;
@@ -233,7 +241,7 @@ export type FailedTransactionResponse = {
     code: string;
     error_message: string;
   };
-  transaction: Transaction;
+  transaction: TransactionResponse;
 };
 
 export type GetTransactionResponse = SuccessfulTransactionResponse | FailedTransactionResponse;
@@ -272,9 +280,13 @@ export type TransactionReceiptResponse =
   | SuccessfulTransactionReceiptResponse
   | FailedTransactionReceiptResponse;
 
+// Support 0.9.1 changes in a backward-compatible way
 export type EstimateFeeResponse = {
-  amount: BN;
+  overall_fee?: BN;
+  amount?: BN;
   unit: string;
+  gas_price?: BN;
+  gas_usage?: BigNumberish;
 };
 
 export type RawArgs = {

@@ -31,7 +31,7 @@ You can also get a key pair from a private key using `getKeyPair(pk: BigNumberis
 
 ```javascript
 const starkKeyPair = ec.genKeyPair();
-const starkKeyPub = ec.getStarkKey(starkKeyPair);;
+const starkKeyPub = ec.getStarkKey(starkKeyPair);
 ```
 
 ## Deploy Account Contract

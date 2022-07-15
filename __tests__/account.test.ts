@@ -128,9 +128,15 @@ describe('deploy and test Wallet', () => {
     expect(toBN(response.number as string).toString()).toStrictEqual('57');
   });
 
+  test('sign and verify offchain message fail', async () => {
+    const signature = await account.signMessage(typedDataExample);
+    // change the signature to make it invalid
+    signature[0] += '123';
+    expect(await account.verifyMessage(typedDataExample, signature)).toBe(false);
+  });
+
   test('sign and verify offchain message', async () => {
     const signature = await account.signMessage(typedDataExample);
-
     expect(await account.verifyMessage(typedDataExample, signature)).toBe(true);
   });
 

@@ -1,12 +1,16 @@
 import { BlockNumber, stark } from '../src';
 import { toBN } from '../src/utils/number';
-import { compiledErc20, compiledOpenZeppelinAccount, getTestProvider } from './fixtures';
+import {
+  IS_DEVNET,
+  compiledErc20,
+  compiledOpenZeppelinAccount,
+  getTestProvider,
+  testIfNotDevnet,
+} from './fixtures';
 
 const { compileCalldata } = stark;
 
 const provider = getTestProvider();
-
-const testIf = (condition: boolean) => (condition ? test : test.skip);
 
 describe('defaultProvider', () => {
   let exampleTransactionHash: string;
@@ -22,12 +26,15 @@ describe('defaultProvider', () => {
     exampleTransactionHash = transaction_hash;
     exampleContractAddress = address!;
     const transaction = await provider.getTransaction(transaction_hash);
-    exampleBlockHash = transaction.block_hash;
-    exampleBlockNumber = transaction.block_number;
+
+    if (transaction.status !== 'REJECTED') {
+      exampleBlockHash = transaction.block_hash;
+      exampleBlockNumber = transaction.block_number;
+    }
   });
 
   describe('feeder gateway endpoints', () => {
-    testIf(provider.baseUrl.includes('starknet.io'))('getContractAddresses()', async () => {
+    testIfNotDevnet('getContractAddresses()', async () => {
       // not supported in starknet-devnet
       const { GpsStatementVerifier, Starknet } = await provider.getContractAddresses();
       expect(typeof GpsStatementVerifier).toBe('string');
@@ -39,8 +46,16 @@ describe('defaultProvider', () => {
     test(`getBlock(blockHash=undefined, blockNumber=${exampleBlockNumber})`, () => {
       return expect(provider.getBlock(exampleBlockNumber)).resolves.not.toThrow();
     });
-    test('getBlock(blockHash=undefined, blockNumber=null)', () => {
-      return expect(provider.getBlock()).resolves.not.toThrow();
+    test('getBlock(blockHash=undefined, blockNumber=null)', async () => {
+      const block = await provider.getBlock();
+
+      expect(block).not.toBeNull();
+
+      const { block_number, timestamp } = block;
+
+      expect(typeof block_number).toEqual('number');
+
+      return expect(typeof timestamp).toEqual('number');
     });
     test('getBlock() -> { blockNumber }', async () => {
       const block = await provider.getBlock();
@@ -98,6 +113,28 @@ describe('defaultProvider', () => {
           }),
         })
       ).resolves.not.toThrow();
+    });
+
+    test('callContract() - gateway error', async () => {
+      const promise = provider.callContract({
+        contractAddress: exampleContractAddress,
+        entrypoint: 'non_existent_entrypoint',
+        calldata: compileCalldata({
+          user: '0xdeadbeef',
+        }),
+      });
+      expect(promise).rejects.toHaveProperty('errorCode');
+      expect(promise).rejects.toThrowErrorMatchingInlineSnapshot(
+        `"Entry point 0x23b0c8b3d98aa73d8a35f5303fe77d132c6d04279e63f6e1d6aac5946e04612 not found in contract with class hash 0x2864c45bd4ba3e66d8f7855adcadf07205c88f43806ffca664f1f624765207e."`
+      );
+
+      try {
+        await promise;
+      } catch (e) {
+        expect(e.errorCode).toMatchInlineSnapshot(
+          IS_DEVNET ? `500` : `"StarknetErrorCode.ENTRY_POINT_NOT_FOUND_IN_CONTRACT"`
+        );
+      }
     });
 
     test('transaction trace', async () => {

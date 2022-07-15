@@ -1,3 +1,79 @@
+# [3.17.0](https://github.com/0xs34n/starknet.js/compare/v3.16.3...v3.17.0) (2022-07-15)
+
+### Features
+
+- support SN 0.9.1 estimate_fee response ([9302aab](https://github.com/0xs34n/starknet.js/commit/9302aab9cbbe5eaa3a9933b19f8f46b2dd6d6a1d))
+
+## [3.16.3](https://github.com/0xs34n/starknet.js/compare/v3.16.2...v3.16.3) (2022-07-15)
+
+### Bug Fixes
+
+- allow hex to be mixed case ([fa84e55](https://github.com/0xs34n/starknet.js/commit/fa84e558602d1ff134defc3e0f7123c1f4d04775))
+
+## [3.16.2](https://github.com/0xs34n/starknet.js/compare/v3.16.1...v3.16.2) (2022-07-14)
+
+### Bug Fixes
+
+- **docs:** account.address ([d935b95](https://github.com/0xs34n/starknet.js/commit/d935b95c3bb54977c420efbd25cd85dcd12d1b17))
+
+## [3.16.1](https://github.com/0xs34n/starknet.js/compare/v3.16.0...v3.16.1) (2022-07-02)
+
+### Bug Fixes
+
+- **test:** for new devnet version ([63d145f](https://github.com/0xs34n/starknet.js/commit/63d145f1fba90cca9e679f115525801ee140ceec))
+
+# [3.16.0](https://github.com/0xs34n/starknet.js/compare/v3.15.6...v3.16.0) (2022-06-29)
+
+### Features
+
+- **npm:** add npmignore file ([e6084dd](https://github.com/0xs34n/starknet.js/commit/e6084ddbb9ea305847a312cd3a3247b730cca9b5))
+
+## [3.15.6](https://github.com/0xs34n/starknet.js/compare/v3.15.5...v3.15.6) (2022-06-28)
+
+### Bug Fixes
+
+- throw http error when parsing fails ([898574f](https://github.com/0xs34n/starknet.js/commit/898574f0087bf653b5d74bbe3dc52a0cb6efc432))
+
+## [3.15.5](https://github.com/0xs34n/starknet.js/compare/v3.15.4...v3.15.5) (2022-06-27)
+
+### Bug Fixes
+
+- add return statement ([468a0bf](https://github.com/0xs34n/starknet.js/commit/468a0bfbbc1a9c88383ed2ba0f0bc02b0e5e3a9b))
+- don't enforce bigInt ([efef507](https://github.com/0xs34n/starknet.js/commit/efef5071ebceb5247f5f1995d3c1006d422c02ee))
+- **GatewayError:** export from index ([69addd5](https://github.com/0xs34n/starknet.js/commit/69addd5a2eb30816f5e43ffd71e190838ad5a409))
+- **GatewayError:** use ts-custom-error to support "err instanceof GatewayError" ([092abbc](https://github.com/0xs34n/starknet.js/commit/092abbcff5f5270a0be0b79a8e87645637298c56))
+- **test:** error 500 as number instead of bigInt ([b539144](https://github.com/0xs34n/starknet.js/commit/b5391448cf04d93c4d914ad52d850591a423fe42))
+
+## [3.15.4](https://github.com/0xs34n/starknet.js/compare/v3.15.3...v3.15.4) (2022-06-20)
+
+### Bug Fixes
+
+- **parseResponse:** revert the changes from parseResponse ([d51996f](https://github.com/0xs34n/starknet.js/commit/d51996fa7635428ad4ffe271aa56f202ddcd4179))
+- **provider:** allow the user to handle the contract errors ([5190f7a](https://github.com/0xs34n/starknet.js/commit/5190f7a20fb35382756d86cc67d3fab5c2d541ff))
+- **test:** fix callContract() test ([b11c5da](https://github.com/0xs34n/starknet.js/commit/b11c5daf7fec6e8207dbc0be534aade8e00d5021))
+
+## [3.15.3](https://github.com/0xs34n/starknet.js/compare/v3.15.2...v3.15.3) (2022-06-20)
+
+### Bug Fixes
+
+- **dev:** regenerated package-lock.json ([849cb1e](https://github.com/0xs34n/starknet.js/commit/849cb1ea3ffd7ba10b40b232d0ebc46b6599c7ea))
+- use cross-fetch only for jest ([83be37a](https://github.com/0xs34n/starknet.js/commit/83be37a9e3328a44abd9583b8167c3cb8d882790))
+
+## [3.15.2](https://github.com/0xs34n/starknet.js/compare/v3.15.1...v3.15.2) (2022-06-18)
+
+### Bug Fixes
+
+- **cleanup:** cleanup ([a15b6c6](https://github.com/0xs34n/starknet.js/commit/a15b6c6bf13ce7af699c293d697b5136188388c3))
+- **errorcode:** fixed error code >=400 instead of !=200 ([0f16595](https://github.com/0xs34n/starknet.js/commit/0f1659543ba95ce7cac31a5182dad2e33325d4c1))
+- **fetchEndpoint:** error handling and test case fix ([629479f](https://github.com/0xs34n/starknet.js/commit/629479f877aa7d6f39c8d31b2c9449563aadd0e7))
+- **verify:** return false when 500 returned from the gateway ([de3e004](https://github.com/0xs34n/starknet.js/commit/de3e00461730d6fa112046169470d7a603baa296))
+
+## [3.15.1](https://github.com/0xs34n/starknet.js/compare/v3.15.0...v3.15.1) (2022-06-17)
+
+### Bug Fixes
+
+- response type for get-transaction ([a232725](https://github.com/0xs34n/starknet.js/commit/a232725099893b45fd6feda0a4cac7d05f903435))
+
 # [3.15.0](https://github.com/0xs34n/starknet.js/compare/v3.14.1...v3.15.0) (2022-06-16)
 
 ### Bug Fixes
