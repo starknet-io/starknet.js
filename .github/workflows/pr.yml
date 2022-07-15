@@ -29,6 +29,7 @@ jobs:
 
   tests:
     strategy:
+      max-parallel: 1
       matrix:
         name: [sequencer-test, sequencer-goerli, rpc-goerli]
         include:

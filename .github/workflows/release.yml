@@ -26,6 +26,7 @@ jobs:
 
   tests:
     strategy:
+      max-parallel: 1 # needed until we get a seperate account for the rpc provider, until then running them in parallel would result in a nonce issue
       matrix:
         name: [sequencer-test, sequencer-goerli, rpc-goerli]
         include:
