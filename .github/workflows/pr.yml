@@ -45,6 +45,7 @@ jobs:
 
     name: Run test on ${{ matrix.name }}
     runs-on: ubuntu-latest
+    needs: [build]
 
     services:
       devnet:
