@@ -29,30 +29,29 @@ jobs:
       matrix:
         include:
           - name: sequencer-test
-            env:
-              TEST_PROVIDER_BASE_URL: http://127.0.0.1:5050/
-            services:
-              devnet:
-                image: janek2601/starknet-devnet-patched
-                ports:
-                  - 5050:5050
+            TEST_PROVIDER_BASE_URL: http://127.0.0.1:5050/
           - name: sequencer-goerli
-            env:
-              TEST_PROVIDER_BASE_URL: https://alpha4.starknet.io
-              TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
-              TEST_ACCOUNT_ADDRESS: ${{ secrets.TEST_ACCOUNT_ADDRESS }}
+            TEST_PROVIDER_BASE_URL: https://alpha4.starknet.io
+            TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
+            TEST_ACCOUNT_ADDRESS: ${{ secrets.TEST_ACCOUNT_ADDRESS }}
           - name: rpc-goerli
-            env:
-              TEST_RPC_URL: ${{ secrets.TEST_RPC_URL }}
-              TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
-              TEST_ACCOUNT_ADDRESS: ${{ secrets.TEST_ACCOUNT_ADDRESS }}
+            TEST_RPC_URL: ${{ secrets.TEST_RPC_URL }}
+            TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
+            TEST_ACCOUNT_ADDRESS: ${{ secrets.TEST_ACCOUNT_ADDRESS }}
 
     name: Run test on ${{ matrix.name }}
     runs-on: ubuntu-latest
-    needs: [build]
 
-    env: ${{ matrix.env }}
-    services: ${{ matrix.services }}
+    services:
+      devnet:
+        image: janek2601/starknet-devnet-patched
+        ports:
+          - 5050:5050
+    env:
+      TEST_PROVIDER_BASE_URL: ${{ matrix.TEST_PROVIDER_BASE_URL }}
+      TEST_RPC_URL: ${{ matrix.TEST_RPC_URL }}
+      TEST_ACCOUNT_PRIVATE_KEY: ${{ matrix.TEST_ACCOUNT_PRIVATE_KEY }}
+      TEST_ACCOUNT_ADDRESS: ${{ matrix.TEST_ACCOUNT_ADDRESS }}
 
     steps:
       - uses: actions/checkout@v2
