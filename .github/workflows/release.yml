@@ -27,6 +27,7 @@ jobs:
   tests:
     strategy:
       matrix:
+        name: [sequencer-test, sequencer-goerli, rpc-goerli]
         include:
           - name: sequencer-test
             TEST_PROVIDER_BASE_URL: http://127.0.0.1:5050/
