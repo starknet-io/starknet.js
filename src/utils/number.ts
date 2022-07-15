@@ -10,6 +10,10 @@ export function isHex(hex: string): boolean {
 }
 
 export function toBN(number: BigNumberish, base?: number | 'hex') {
+  if (typeof number === 'string') {
+    // eslint-disable-next-line no-param-reassign
+    number = number.toLowerCase();
+  }
   if (typeof number === 'string' && isHex(number) && !base)
     return new BN(removeHexPrefix(number), 'hex');
   return new BN(number, base);

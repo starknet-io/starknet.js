@@ -578,6 +578,7 @@ export class Contract implements ContractInterface {
       });
     }
 
+    // eslint-disable-next-line no-console
     console.warn(`Invoking ${method} without an account. This will not work on a public node.`);
 
     return this.providerOrAccount.invokeFunction({

@@ -1,5 +1,5 @@
 import { ZERO } from '../constants';
-import { ProviderOptions } from '../provider';
+import { ProviderInterface, ProviderOptions } from '../provider';
 import { Provider } from '../provider/default';
 import { Signer, SignerInterface } from '../signer';
 import {
@@ -23,7 +23,7 @@ export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
 
   constructor(
-    providerOrOptions: ProviderOptions | Provider,
+    providerOrOptions: ProviderOptions | ProviderInterface,
     public address: string,
     keyPairOrSigner: KeyPair | SignerInterface
   ) {
