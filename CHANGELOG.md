@@ -1,3 +1,9 @@
+# [3.17.0](https://github.com/0xs34n/starknet.js/compare/v3.16.3...v3.17.0) (2022-07-15)
+
+### Features
+
+- support SN 0.9.1 estimate_fee response ([9302aab](https://github.com/0xs34n/starknet.js/commit/9302aab9cbbe5eaa3a9933b19f8f46b2dd6d6a1d))
+
 ## [3.16.3](https://github.com/0xs34n/starknet.js/compare/v3.16.2...v3.16.3) (2022-07-15)
 
 ### Bug Fixes
