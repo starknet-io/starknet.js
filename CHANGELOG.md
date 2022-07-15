@@ -1,3 +1,9 @@
+## [3.16.3](https://github.com/0xs34n/starknet.js/compare/v3.16.2...v3.16.3) (2022-07-15)
+
+### Bug Fixes
+
+- allow hex to be mixed case ([fa84e55](https://github.com/0xs34n/starknet.js/commit/fa84e558602d1ff134defc3e0f7123c1f4d04775))
+
 ## [3.16.2](https://github.com/0xs34n/starknet.js/compare/v3.16.1...v3.16.2) (2022-07-14)
 
 ### Bug Fixes
