@@ -83,10 +83,15 @@ export class Account extends Provider implements AccountInterface {
         signature: bigNumberishArrayToDecimalStringArray(signature),
       }
     );
-    const suggestedMaxFee = estimatedFeeToMaxFee(fetchedEstimate.amount);
+    const fee = fetchedEstimate.overall_fee ?? fetchedEstimate.amount;
+    if (fee === undefined) {
+      throw new Error('Expected either amount or overall_fee in estimate_fee response');
+    }
+    const suggestedMaxFee = estimatedFeeToMaxFee(fee);
 
     return {
-      ...fetchedEstimate,
+      amount: fee,
+      unit: fetchedEstimate.unit,
       suggestedMaxFee,
     };
   }

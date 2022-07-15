@@ -280,9 +280,13 @@ export type TransactionReceiptResponse =
   | SuccessfulTransactionReceiptResponse
   | FailedTransactionReceiptResponse;
 
+// Support 0.9.1 changes in a backward-compatible way
 export type EstimateFeeResponse = {
-  amount: BN;
+  overall_fee?: BN;
+  amount?: BN;
   unit: string;
+  gas_price?: BN;
+  gas_usage?: BigNumberish;
 };
 
 export type RawArgs = {
