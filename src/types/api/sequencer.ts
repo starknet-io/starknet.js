@@ -208,9 +208,13 @@ export namespace Sequencer {
     result: string[];
   };
 
+  // Support 0.9.1 changes in a backward-compatible way
   export type EstimateFeeResponse = {
-    amount: BN;
+    overall_fee?: BN;
+    amount?: BN;
     unit: string;
+    gas_price?: BN;
+    gas_usage?: BigNumberish;
   };
 
   export type Endpoints = {
