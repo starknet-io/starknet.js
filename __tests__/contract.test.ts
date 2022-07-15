@@ -190,7 +190,7 @@ describe('class Contract {}', () => {
   });
 
   describe('Contract interaction with Account', () => {
-    const account = getTestAccount();
+    const account = getTestAccount(provider);
     let erc20: Contract;
     let erc20Address: string;
 
@@ -198,7 +198,7 @@ describe('class Contract {}', () => {
       const erc20Response = await provider.deployContract({
         contract: compiledErc20,
       });
-      erc20Address = erc20Response.contract_address!;
+      erc20Address = erc20Response.contract_address;
       erc20 = new Contract(compiledErc20.abi, erc20Address, provider);
       await provider.waitForTransaction(erc20Response.transaction_hash);
     });
@@ -225,7 +225,7 @@ describe('class ContractFactory {}', () => {
       contract: compiledErc20,
     });
     await provider.waitForTransaction(transaction_hash);
-    erc20Address = contract_address!;
+    erc20Address = contract_address;
   });
   test('deployment of new contract', async () => {
     const factory = new ContractFactory(compiledErc20, provider);

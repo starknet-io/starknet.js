@@ -12,8 +12,8 @@ import {
 } from './fixtures';
 
 describe('deploy and test Wallet', () => {
-  const account = getTestAccount();
   const provider = getTestProvider();
+  const account = getTestAccount(provider);
   let erc20: Contract;
   let erc20Address: string;
   let dapp: Contract;
@@ -25,7 +25,7 @@ describe('deploy and test Wallet', () => {
       contract: compiledErc20,
     });
 
-    erc20Address = erc20Response.contract_address!;
+    erc20Address = erc20Response.contract_address;
     erc20 = new Contract(compiledErc20.abi, erc20Address, provider);
 
     await provider.waitForTransaction(erc20Response.transaction_hash);

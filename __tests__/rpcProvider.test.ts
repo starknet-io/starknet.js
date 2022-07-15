@@ -1,14 +1,14 @@
 import { isBN } from 'bn.js';
 
-import { Account, Contract, Provider, RpcProvider } from '../src';
+import { Account, Contract, RpcProvider } from '../src';
 import { toBN } from '../src/utils/number';
-import { compiledErc20, describeIfNotDevnet, getTestAccount, getTestRpcProvider } from './fixtures';
+import { compiledErc20, describeIfRpc, getTestAccount, getTestProvider } from './fixtures';
 
-describe('RPCProvider', () => {
+describeIfRpc('RPCProvider', () => {
   let provider: RpcProvider;
 
   beforeAll(async () => {
-    provider = getTestRpcProvider();
+    provider = getTestProvider() as RpcProvider;
   });
 
   describe('RPC methods', () => {
@@ -18,21 +18,20 @@ describe('RPCProvider', () => {
     });
   });
 
-  describeIfNotDevnet('Account', () => {
+  describe('Account', () => {
     let account: Account;
-    let erc20Address!: string;
+    let erc20Address: string;
     let erc20: Contract;
 
     beforeAll(async () => {
-      const rpcProvider = new Provider({ rpc: { nodeUrl: provider.nodeUrl } });
-      account = getTestAccount(rpcProvider, false);
+      account = getTestAccount(provider);
       expect(account).toBeInstanceOf(Account);
 
       const erc20Response = await provider.deployContract({
         contract: compiledErc20,
       });
 
-      erc20Address = erc20Response.contract_address!;
+      erc20Address = erc20Response.contract_address;
       erc20 = new Contract(compiledErc20.abi, erc20Address, provider);
 
       await provider.waitForTransaction(erc20Response.transaction_hash);

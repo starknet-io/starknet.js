@@ -28,13 +28,15 @@ export interface ProviderOptions {
 export class Provider implements ProviderInterface {
   private provider!: ProviderInterface;
 
-  constructor(providerOrOptions?: ProviderOptions | Provider) {
-    if (providerOrOptions instanceof Provider) {
+  constructor(providerOrOptions?: ProviderOptions | ProviderInterface) {
+    if (providerOrOptions && 'chainId' in providerOrOptions) {
       this.provider = providerOrOptions;
-    } else if (providerOrOptions && providerOrOptions.rpc) {
+    } else if (providerOrOptions?.rpc) {
       this.provider = new RpcProvider(providerOrOptions.rpc);
+    } else if (providerOrOptions?.sequencer) {
+      this.provider = new SequencerProvider(providerOrOptions.sequencer);
     } else {
-      this.provider = new SequencerProvider(providerOrOptions?.sequencer);
+      this.provider = new SequencerProvider();
     }
   }
 

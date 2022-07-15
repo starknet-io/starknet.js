@@ -3,7 +3,6 @@ import {
   DeclareContractResponse,
   DeployContractResponse,
   GetBlockResponse,
-  SequencerProvider,
   stark,
 } from '../src';
 import { toBN } from '../src/utils/number';
@@ -11,8 +10,8 @@ import {
   IS_DEVNET,
   compiledErc20,
   compiledOpenZeppelinAccount,
+  describeIfNotDevnet,
   getTestProvider,
-  getTestRpcProvider,
 } from './fixtures';
 
 const { compileCalldata } = stark;
@@ -23,9 +22,9 @@ describe('defaultProvider', () => {
   let exampleTransactionHash: string;
   let exampleContractAddress: string;
 
-  let exampleBlock!: GetBlockResponse;
-  let exampleBlockNumber!: BlockNumber;
-  let exampleBlockHash!: string;
+  let exampleBlock: GetBlockResponse;
+  let exampleBlockNumber: BlockNumber;
+  let exampleBlockHash: string;
 
   beforeAll(async () => {
     const { transaction_hash, contract_address } = await testProvider.deployContract({
@@ -155,11 +154,9 @@ describe('defaultProvider', () => {
     });
   });
 
-  describe.each([
-    { name: 'RPC', provider: getTestRpcProvider() },
-    { name: 'Sequencer', provider: new SequencerProvider() },
-  ])('$name provider', ({ name, provider }) => {
-    describe(`Provider methods: ${name}`, () => {
+  describeIfNotDevnet('Provider', () => {
+    const provider = getTestProvider();
+    describe(`Provider methods`, () => {
       describe('getBlock', () => {
         test('pending', async () => {
           const latestBlock = await provider.getBlock();
