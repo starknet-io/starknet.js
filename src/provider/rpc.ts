@@ -15,8 +15,8 @@ import {
   Invocation,
   InvocationsDetails,
   InvokeFunctionResponse,
-  RPC,
 } from '../types';
+import { RPC } from '../types/api';
 import { getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
 import {

@@ -11,16 +11,18 @@ import {
   DeployContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
-  GetContractAddressesResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
-  GetTransactionStatusResponse,
-  GetTransactionTraceResponse,
   Invocation,
   InvocationsDetails,
   InvokeFunctionResponse,
-  Sequencer,
 } from '../types';
+import {
+  GetContractAddressesResponse,
+  GetTransactionStatusResponse,
+  GetTransactionTraceResponse,
+  Sequencer,
+} from '../types/api';
 import { getSelectorFromName } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';

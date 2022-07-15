@@ -7,8 +7,8 @@ import {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   InvokeFunctionResponse,
-  RPC,
 } from '../../types';
+import { RPC } from '../../types/api';
 import { toBN } from '../number';
 import { ResponseParser } from '.';
 

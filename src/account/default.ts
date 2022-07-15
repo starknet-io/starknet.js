@@ -59,20 +59,16 @@ export class Account extends Provider implements AccountInterface {
     const signature = await this.signer.signTransaction(transactions, signerDetails);
 
     const calldata = fromCallsToExecuteCalldataWithNonce(transactions, nonce);
-    const fetchedEstimate = await super.getEstimateFee(
+    const response = await super.getEstimateFee(
       { contractAddress: this.address, entrypoint: '__execute__', calldata, signature },
       blockIdentifier,
       { version }
     );
-    const fee = fetchedEstimate.overall_fee ?? fetchedEstimate.amount;
-    if (fee === undefined) {
-      throw new Error('Expected either amount or overall_fee in estimate_fee response');
-    }
-    const suggestedMaxFee = estimatedFeeToMaxFee(fee);
+
+    const suggestedMaxFee = estimatedFeeToMaxFee(response.overall_fee);
 
     return {
-      amount: fee,
-      unit: fetchedEstimate.unit,
+      ...response,
       suggestedMaxFee,
     };
   }

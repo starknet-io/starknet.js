@@ -7,8 +7,8 @@ import {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   InvokeFunctionResponse,
-  Sequencer,
 } from '../../types';
+import { Sequencer } from '../../types/api';
 import { toBN } from '../number';
 import { ResponseParser } from '.';
 
@@ -71,6 +71,23 @@ export class SequencerAPIResponseParser extends ResponseParser {
   }
 
   public parseFeeEstimateResponse(res: Sequencer.EstimateFeeResponse): EstimateFeeResponse {
+    if ('overall_fee' in res) {
+      let gasInfo = {};
+
+      try {
+        gasInfo = {
+          gas_consumed: toBN(res.gas_usage),
+          gas_price: toBN(res.gas_price),
+        };
+      } catch {
+        // do nothing
+      }
+
+      return {
+        overall_fee: toBN(res.overall_fee),
+        ...gasInfo,
+      };
+    }
     return {
       overall_fee: toBN(res.amount),
     };

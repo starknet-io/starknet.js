@@ -1,5 +1,6 @@
 export * from './lib';
-export * from './api';
+export * as api from './api';
+export { Calldata, Overrides, RawArgs } from './api';
 export * from './signer';
 export * from './contract';
 export * from './account';

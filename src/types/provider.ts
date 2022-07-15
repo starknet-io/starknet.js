@@ -1,4 +1,5 @@
-import { BigNumberish } from '../utils/number';
+import BN from 'bn.js';
+
 import { Abi, CompressedProgram, EntryPointsByType, RawCalldata, Signature, Status } from './lib';
 
 export interface GetBlockResponse {
@@ -82,9 +83,9 @@ export interface InvokeTransactionReceiptResponse extends CommonTransactionRecei
 export type DeclareTransactionReceiptResponse = CommonTransactionReceiptResponse;
 
 export interface EstimateFeeResponse {
-  overall_fee: BigNumberish;
-  gas_consumed?: BigNumberish;
-  gas_price?: BigNumberish;
+  overall_fee: BN;
+  gas_consumed?: BN;
+  gas_price?: BN;
 }
 
 export interface InvokeFunctionResponse {

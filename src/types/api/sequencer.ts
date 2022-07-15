@@ -209,13 +209,16 @@ export namespace Sequencer {
   };
 
   // Support 0.9.1 changes in a backward-compatible way
-  export type EstimateFeeResponse = {
-    overall_fee?: BN;
-    amount?: BN;
-    unit: string;
-    gas_price?: BN;
-    gas_usage?: BigNumberish;
-  };
+  export type EstimateFeeResponse =
+    | {
+        overall_fee: number;
+        gas_price: number;
+        gas_usage: number;
+      }
+    | {
+        amount: BN;
+        unit: string;
+      };
 
   export type Endpoints = {
     get_contract_addresses: {
