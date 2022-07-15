@@ -6,6 +6,45 @@ on:
       - develop
 
 jobs:
+  tests:
+    strategy:
+      matrix:
+        include:
+          - name: sequencer-test
+            env:
+              TEST_PROVIDER_BASE_URL: http://127.0.0.1:5050/
+            services:
+              devnet:
+                image: janek2601/starknet-devnet-patched
+                ports:
+                  - 5050:5050
+          - name: sequencer-goerli
+            env:
+              TEST_PROVIDER_BASE_URL: https://alpha4.starknet.io
+              TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
+              TEST_ACCOUNT_ADDRESS: ${{ secrets.TEST_ACCOUNT_ADDRESS }}
+          - name: rpc-goerli
+            env:
+              TEST_RPC_URL: ${{ secrets.TEST_RPC_URL }}
+              TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
+              TEST_ACCOUNT_ADDRESS: ${{ secrets.TEST_ACCOUNT_ADDRESS }}
+
+    name: Run test on ${{ matrix.name }}
+    runs-on: ubuntu-latest
+
+    env: ${{ matrix.env }}
+    services: ${{ matrix.services }}
+
+    steps:
+      - uses: actions/checkout@v2
+      - name: Use Node.js 14
+        uses: actions/setup-node@v2
+        with:
+          node-version: lts/*
+          cache: 'npm'
+      - run: npm ci
+      - run: npm test
+
   build-and-test:
     runs-on: ubuntu-latest
 
