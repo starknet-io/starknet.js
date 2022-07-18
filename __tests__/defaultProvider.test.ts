@@ -51,11 +51,9 @@ describe('defaultProvider', () => {
     test('getBlock(blockHash=undefined, blockNumber=null)', async () => {
       expect(exampleBlock).not.toBeNull();
 
-      const { block_number, accepted_time } = exampleBlock;
-
-      expect(typeof block_number).toEqual('number');
-
-      return expect(typeof accepted_time).toEqual('number');
+      // pending block doesnt have a block number value
+      expect(exampleBlock).toHaveProperty('block_number');
+      expect(exampleBlock).toHaveProperty('accepted_time');
     });
 
     test('getBlock() -> { blockNumber }', async () => {
