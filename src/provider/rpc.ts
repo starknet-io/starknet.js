@@ -195,7 +195,7 @@ export class RpcProvider implements ProviderInterface {
 
   public async callContract(
     call: Call,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = 'latest'
   ): Promise<CallContractResponse> {
     const result = await this.fetchEndpoint('starknet_call', [
       {

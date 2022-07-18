@@ -81,7 +81,7 @@ export class Provider implements ProviderInterface {
 
   public async callContract(
     request: Call,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = 'latest'
   ): Promise<CallContractResponse> {
     return this.provider.callContract(request, blockIdentifier);
   }

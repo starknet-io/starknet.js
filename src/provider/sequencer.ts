@@ -203,7 +203,7 @@ export class SequencerProvider implements ProviderInterface {
 
   public async callContract(
     { contractAddress, entrypoint: entryPointSelector, calldata = [] }: Call,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = 'latest'
   ): Promise<CallContractResponse> {
     return this.fetchEndpoint(
       'call_contract',
