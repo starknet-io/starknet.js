@@ -90,7 +90,7 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_chainId');
   }
 
-  public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
+  public async getBlock(blockIdentifier: BlockIdentifier = 'latest'): Promise<GetBlockResponse> {
     const method =
       typeof blockIdentifier === 'string' && isHex(blockIdentifier)
         ? 'starknet_getBlockByHash'
@@ -104,7 +104,7 @@ export class RpcProvider implements ProviderInterface {
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockHashOrTag: BlockTag | BigNumberish = 'pending'
+    blockHashOrTag: BlockTag | BigNumberish = 'latest'
   ): Promise<BigNumberish> {
     const parsedKey = toHex(toBN(key));
     return this.fetchEndpoint('starknet_getStorageAt', [
@@ -128,7 +128,7 @@ export class RpcProvider implements ProviderInterface {
 
   public async getClassAt(
     contractAddress: string,
-    _blockIdentifier: BlockIdentifier = 'pending'
+    _blockIdentifier: BlockIdentifier = 'latest'
   ): Promise<any> {
     return this.fetchEndpoint('starknet_getClassAt', [contractAddress]);
   }
@@ -219,7 +219,7 @@ export class RpcProvider implements ProviderInterface {
     let retries = 100;
 
     while (!onchain) {
-      const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'];
+      const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2'];
       const errorStates = ['REJECTED', 'NOT_RECEIVED'];
 
       // eslint-disable-next-line no-await-in-loop

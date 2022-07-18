@@ -7,7 +7,6 @@ import {
 } from '../src';
 import { toBN } from '../src/utils/number';
 import {
-  IS_DEVNET,
   compiledErc20,
   compiledOpenZeppelinAccount,
   describeIfNotDevnet,
@@ -51,9 +50,11 @@ describe('defaultProvider', () => {
     test('getBlock(blockHash=undefined, blockNumber=null)', async () => {
       expect(exampleBlock).not.toBeNull();
 
-      // pending block doesnt have a block number value
-      expect(exampleBlock).toHaveProperty('block_number');
-      expect(exampleBlock).toHaveProperty('accepted_time');
+      const { block_number, accepted_time } = exampleBlock;
+
+      expect(typeof block_number).toEqual('number');
+
+      return expect(typeof accepted_time).toEqual('number');
     });
 
     test('getBlock() -> { blockNumber }', async () => {
@@ -63,37 +64,19 @@ describe('defaultProvider', () => {
 
     describe('getStorageAt', () => {
       test('with "key" type of number', () => {
-        return expect(
-          testProvider.getStorageAt(
-            exampleContractAddress,
-            0,
-            '0x1b77403cfce4a31f6919cf6c64c5bca7f9bba841ec6492d2cda8cf4486a58e1'
-          )
-        ).resolves.not.toThrow();
+        return expect(testProvider.getStorageAt(exampleContractAddress, 0)).resolves.not.toThrow();
       });
 
       test('"key" type of string', () => {
         return expect(
-          testProvider.getStorageAt(
-            exampleContractAddress,
-            '0x0',
-            '0x1b77403cfce4a31f6919cf6c64c5bca7f9bba841ec6492d2cda8cf4486a58e1'
-          )
+          testProvider.getStorageAt(exampleContractAddress, '0x0')
         ).resolves.not.toThrow();
       });
 
       test('with "key" type of BN', () => {
         return expect(
-          testProvider.getStorageAt(
-            exampleContractAddress,
-            toBN('0x0'),
-            '0x1b77403cfce4a31f6919cf6c64c5bca7f9bba841ec6492d2cda8cf4486a58e1'
-          )
+          testProvider.getStorageAt(exampleContractAddress, toBN('0x0'))
         ).resolves.not.toThrow();
-      });
-
-      test('(blockHash=undefined, blockNumber=null)', () => {
-        return expect(testProvider.getStorageAt(exampleContractAddress, 0)).resolves.not.toThrow();
       });
     });
 
@@ -122,25 +105,15 @@ describe('defaultProvider', () => {
     });
 
     test('callContract() - gateway error', async () => {
-      const promise = testProvider.callContract({
-        contractAddress: exampleContractAddress,
-        entrypoint: 'non_existent_entrypoint',
-        calldata: compileCalldata({
-          user: '0xdeadbeef',
-        }),
-      });
-      expect(promise).rejects.toHaveProperty('errorCode');
-      expect(promise).rejects.toThrowErrorMatchingInlineSnapshot(
-        `"Entry point 0x23b0c8b3d98aa73d8a35f5303fe77d132c6d04279e63f6e1d6aac5946e04612 not found in contract with class hash 0x2864c45bd4ba3e66d8f7855adcadf07205c88f43806ffca664f1f624765207e."`
-      );
-
-      try {
-        await promise;
-      } catch (e) {
-        expect(e.errorCode).toMatchInlineSnapshot(
-          IS_DEVNET ? `500` : `"StarknetErrorCode.ENTRY_POINT_NOT_FOUND_IN_CONTRACT"`
-        );
-      }
+      return expect(
+        testProvider.callContract({
+          contractAddress: exampleContractAddress,
+          entrypoint: 'non_existent_entrypoint',
+          calldata: compileCalldata({
+            user: '0xdeadbeef',
+          }),
+        })
+      ).rejects.toThrowError();
     });
   });
 

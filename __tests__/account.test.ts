@@ -1,15 +1,9 @@
 import { isBN } from 'bn.js';
 
 import typedDataExample from '../__mocks__/typedDataExample.json';
-import { Account, Contract, Provider, ec, number, stark } from '../src';
+import { Account, Contract, Provider, number, stark } from '../src';
 import { toBN } from '../src/utils/number';
-import {
-  compiledErc20,
-  compiledOpenZeppelinAccount,
-  compiledTestDapp,
-  getTestAccount,
-  getTestProvider,
-} from './fixtures';
+import { compiledErc20, compiledTestDapp, getTestAccount, getTestProvider } from './fixtures';
 
 describe('deploy and test Wallet', () => {
   const provider = getTestProvider();
@@ -130,34 +124,6 @@ describe('deploy and test Wallet', () => {
   test('sign and verify offchain message', async () => {
     const signature = await account.signMessage(typedDataExample);
     expect(await account.verifyMessage(typedDataExample, signature)).toBe(true);
-  });
-
-  describe('new deployed account', () => {
-    let newAccount: Account;
-
-    beforeAll(async () => {
-      const starkKeyPair = ec.genKeyPair();
-      const starkKeyPub = ec.getStarkKey(starkKeyPair);
-
-      const accountResponse = await provider.deployContract({
-        contract: compiledOpenZeppelinAccount,
-        constructorCalldata: [starkKeyPub],
-      });
-
-      await provider.waitForTransaction(accountResponse.transaction_hash);
-
-      newAccount = new Account(provider, accountResponse.contract_address!, starkKeyPair);
-    });
-
-    test('read nonce', async () => {
-      const { result } = await account.callContract({
-        contractAddress: newAccount.address,
-        entrypoint: 'get_nonce',
-      });
-      const nonce = result[0];
-
-      expect(number.toBN(nonce).toString()).toStrictEqual(number.toBN(0).toString());
-    });
   });
 
   describe('Contract interaction with Account', () => {

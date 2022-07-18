@@ -218,7 +218,7 @@ export class SequencerProvider implements ProviderInterface {
     ).then(this.responseParser.parseCallContractResponse);
   }
 
-  public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
+  public async getBlock(blockIdentifier: BlockIdentifier = 'latest'): Promise<GetBlockResponse> {
     return this.fetchEndpoint('get_block', { blockIdentifier }).then(
       this.responseParser.parseGetBlockResponse
     );
@@ -253,7 +253,7 @@ export class SequencerProvider implements ProviderInterface {
 
   public async getClassAt(
     contractAddress: string,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = 'latest'
   ): Promise<ContractClass> {
     return this.fetchEndpoint('get_full_contract', { blockIdentifier, contractAddress }).then(
       parseContract
@@ -306,7 +306,7 @@ export class SequencerProvider implements ProviderInterface {
 
   public async getEstimateFee(
     invocation: Invocation,
-    blockIdentifier: BlockIdentifier = 'pending',
+    blockIdentifier: BlockIdentifier = 'latest',
     invocationDetails: InvocationsDetails = {}
   ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint(
