@@ -330,7 +330,7 @@ export class SequencerProvider implements ProviderInterface {
       // eslint-disable-next-line no-await-in-loop
       const res = await this.getTransactionStatus(txHash);
 
-      const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'];
+      const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2'];
       const errorStates = ['REJECTED', 'NOT_RECEIVED'];
 
       if (successStates.includes(res.tx_status)) {
