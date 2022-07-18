@@ -1,6 +1,6 @@
 import { isBN } from 'bn.js';
 
-import { Account, Contract, ContractFactory, Provider, stark } from '../src';
+import { Contract, ContractFactory, stark } from '../src';
 import { getSelectorFromName } from '../src/utils/hash';
 import { BigNumberish, toBN } from '../src/utils/number';
 import { compileCalldata } from '../src/utils/stark';
@@ -8,7 +8,6 @@ import {
   compiledErc20,
   compiledMulticall,
   compiledTypeTransformation,
-  getTestAccount,
   getTestProvider,
 } from './fixtures';
 
@@ -186,34 +185,6 @@ describe('class Contract {}', () => {
         expect(array).toStrictEqual(result.array);
         expect(point).toStrictEqual(result.point);
       });
-    });
-  });
-
-  describe('Contract interaction with Account', () => {
-    const account = getTestAccount(provider);
-    let erc20: Contract;
-    let erc20Address: string;
-
-    beforeAll(async () => {
-      const erc20Response = await provider.deployContract({
-        contract: compiledErc20,
-      });
-      erc20Address = erc20Response.contract_address;
-      erc20 = new Contract(compiledErc20.abi, erc20Address, provider);
-      await provider.waitForTransaction(erc20Response.transaction_hash);
-    });
-
-    test('read balance of wallet', async () => {
-      const result = await erc20.balance_of(account.address);
-      const [res] = result;
-      expect(res).toStrictEqual(toBN(0));
-      expect(res).toStrictEqual(result.res);
-    });
-
-    test('change from provider to account', async () => {
-      expect(erc20.providerOrAccount instanceof Provider);
-      erc20.connect(account);
-      expect(erc20.providerOrAccount instanceof Account);
     });
   });
 });
