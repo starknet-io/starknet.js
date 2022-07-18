@@ -2,6 +2,7 @@ import urljoin from 'url-join';
 
 import { ONE, StarknetChainId, ZERO } from '../constants';
 import {
+  BlockTag,
   Call,
   CallContractResponse,
   ContractClass,
@@ -226,11 +227,11 @@ export class SequencerProvider implements ProviderInterface {
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockHashOrTag: BlockTag | BigNumberish = 'latest'
   ): Promise<BigNumberish> {
     const parsedKey = toBN(key).toString(10);
     return this.fetchEndpoint('get_storage_at', {
-      blockIdentifier,
+      blockIdentifier: blockHashOrTag,
       contractAddress,
       key: parsedKey,
     });

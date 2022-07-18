@@ -1,5 +1,6 @@
 import { StarknetChainId } from '../constants';
 import {
+  BlockTag,
   Call,
   CallContractResponse,
   DeclareContractPayload,
@@ -66,7 +67,7 @@ export class Provider implements ProviderInterface {
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockTag | BigNumberish = 'latest'
   ): Promise<BigNumberish> {
     return this.provider.getStorageAt(contractAddress, key, blockIdentifier);
   }

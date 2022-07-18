@@ -64,19 +64,31 @@ describe('defaultProvider', () => {
     describe('getStorageAt', () => {
       test('with "key" type of number', () => {
         return expect(
-          testProvider.getStorageAt(exampleContractAddress, 0, 36663)
+          testProvider.getStorageAt(
+            exampleContractAddress,
+            0,
+            '0x1b77403cfce4a31f6919cf6c64c5bca7f9bba841ec6492d2cda8cf4486a58e1'
+          )
         ).resolves.not.toThrow();
       });
 
       test('"key" type of string', () => {
         return expect(
-          testProvider.getStorageAt(exampleContractAddress, '0x0', 36663)
+          testProvider.getStorageAt(
+            exampleContractAddress,
+            '0x0',
+            '0x1b77403cfce4a31f6919cf6c64c5bca7f9bba841ec6492d2cda8cf4486a58e1'
+          )
         ).resolves.not.toThrow();
       });
 
       test('with "key" type of BN', () => {
         return expect(
-          testProvider.getStorageAt(exampleContractAddress, toBN('0x0'), 36663)
+          testProvider.getStorageAt(
+            exampleContractAddress,
+            toBN('0x0'),
+            '0x1b77403cfce4a31f6919cf6c64c5bca7f9bba841ec6492d2cda8cf4486a58e1'
+          )
         ).resolves.not.toThrow();
       });
 

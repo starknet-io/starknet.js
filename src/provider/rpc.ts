@@ -2,6 +2,7 @@ import fetch from 'cross-fetch';
 
 import { StarknetChainId } from '../constants';
 import {
+  BlockTag,
   Call,
   CallContractResponse,
   DeclareContractPayload,
@@ -103,10 +104,14 @@ export class RpcProvider implements ProviderInterface {
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockHash: BlockIdentifier = 'pending'
+    blockHashOrTag: BlockTag | BigNumberish = 'pending'
   ): Promise<BigNumberish> {
     const parsedKey = toHex(toBN(key));
-    return this.fetchEndpoint('starknet_getStorageAt', [contractAddress, parsedKey, blockHash]);
+    return this.fetchEndpoint('starknet_getStorageAt', [
+      contractAddress,
+      parsedKey,
+      blockHashOrTag,
+    ]);
   }
 
   public async getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {
