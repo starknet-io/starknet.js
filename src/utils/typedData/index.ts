@@ -36,6 +36,12 @@ export const getDependencies = (
     throw new Error('Typed data does not match JSON schema');
   }
 
+  // Include pointers (struct arrays)
+  if (type[type.length - 1] === '*') {
+    // eslint-disable-next-line no-param-reassign
+    type = type.slice(0, -1);
+  }
+
   if (dependencies.includes(type)) {
     return dependencies;
   }
@@ -100,6 +106,18 @@ const encodeValue = (typedData: TypedData, type: string, data: unknown): [string
   if (typedData.types[type]) {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
     return [type, getStructHash(typedData, type, data as Record<string, unknown>)];
+  }
+
+  if (
+    Object.keys(typedData.types)
+      .map((x) => `${x}*`)
+      .includes(type)
+  ) {
+    const structHashes: string[] = (data as unknown[]).map((struct) => {
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      return getStructHash(typedData, type.slice(0, -1), struct as Record<string, unknown>);
+    });
+    return [type, computeHashOnElements(structHashes)];
   }
 
   if (type === 'felt*') {
