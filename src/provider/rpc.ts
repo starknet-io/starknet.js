@@ -248,6 +248,8 @@ export class RpcProvider implements ProviderInterface {
 
       retries -= 1;
     }
+
+    await wait(retryInterval);
   }
 
   /**
