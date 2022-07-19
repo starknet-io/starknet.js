@@ -43,8 +43,9 @@ The _options_ object may include any of:
 
 ```
 {
-  amount: number;
-  unit: string;
+  overall_fee: BN;
+  gas_consumed?: BN;
+  gas_price?: BN;
 }
 ```
 
@@ -64,9 +65,7 @@ The _transactionsDetail_ object may include any of:
 
 ```
 {
-  code: 'TRANSACTION_RECEIVED';
   transaction_hash: string;
-  address?: string;
 };
 ```
 
