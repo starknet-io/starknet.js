@@ -33,7 +33,7 @@ describe('defaultProvider', () => {
     exampleTransactionHash = transaction_hash;
     exampleContractAddress = contract_address;
 
-    exampleBlock = await testProvider.getBlock();
+    exampleBlock = await testProvider.getBlock('latest');
     exampleBlockHash = exampleBlock.block_hash;
     exampleBlockNumber = exampleBlock.block_number;
   });
@@ -47,7 +47,7 @@ describe('defaultProvider', () => {
       return expect(testProvider.getBlock(exampleBlockHash)).resolves.not.toThrow();
     });
 
-    test('getBlock(blockHash=undefined, blockNumber=null)', async () => {
+    test('getBlock(blockIdentifier=latest)', async () => {
       expect(exampleBlock).not.toBeNull();
 
       const { block_number, accepted_time } = exampleBlock;
