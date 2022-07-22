@@ -3,16 +3,14 @@ import {
   DeclareContractResponse,
   DeployContractResponse,
   GetBlockResponse,
-  SequencerProvider,
   stark,
 } from '../src';
 import { toBN } from '../src/utils/number';
 import {
-  IS_DEVNET,
   compiledErc20,
   compiledOpenZeppelinAccount,
+  describeIfNotDevnet,
   getTestProvider,
-  getTestRpcProvider,
 } from './fixtures';
 
 const { compileCalldata } = stark;
@@ -23,9 +21,9 @@ describe('defaultProvider', () => {
   let exampleTransactionHash: string;
   let exampleContractAddress: string;
 
-  let exampleBlock!: GetBlockResponse;
-  let exampleBlockNumber!: BlockNumber;
-  let exampleBlockHash!: string;
+  let exampleBlock: GetBlockResponse;
+  let exampleBlockNumber: BlockNumber;
+  let exampleBlockHash: string;
 
   beforeAll(async () => {
     const { transaction_hash, contract_address } = await testProvider.deployContract({
@@ -35,7 +33,7 @@ describe('defaultProvider', () => {
     exampleTransactionHash = transaction_hash;
     exampleContractAddress = contract_address;
 
-    exampleBlock = await testProvider.getBlock();
+    exampleBlock = await testProvider.getBlock('latest');
     exampleBlockHash = exampleBlock.block_hash;
     exampleBlockNumber = exampleBlock.block_number;
   });
@@ -49,7 +47,7 @@ describe('defaultProvider', () => {
       return expect(testProvider.getBlock(exampleBlockHash)).resolves.not.toThrow();
     });
 
-    test('getBlock(blockHash=undefined, blockNumber=null)', async () => {
+    test('getBlock(blockIdentifier=latest)', async () => {
       expect(exampleBlock).not.toBeNull();
 
       const { block_number, accepted_time } = exampleBlock;
@@ -66,25 +64,19 @@ describe('defaultProvider', () => {
 
     describe('getStorageAt', () => {
       test('with "key" type of number', () => {
-        return expect(
-          testProvider.getStorageAt(exampleContractAddress, 0, 36663)
-        ).resolves.not.toThrow();
+        return expect(testProvider.getStorageAt(exampleContractAddress, 0)).resolves.not.toThrow();
       });
 
       test('"key" type of string', () => {
         return expect(
-          testProvider.getStorageAt(exampleContractAddress, '0x0', 36663)
+          testProvider.getStorageAt(exampleContractAddress, '0x0')
         ).resolves.not.toThrow();
       });
 
       test('with "key" type of BN', () => {
         return expect(
-          testProvider.getStorageAt(exampleContractAddress, toBN('0x0'), 36663)
+          testProvider.getStorageAt(exampleContractAddress, toBN('0x0'))
         ).resolves.not.toThrow();
-      });
-
-      test('(blockHash=undefined, blockNumber=null)', () => {
-        return expect(testProvider.getStorageAt(exampleContractAddress, 0)).resolves.not.toThrow();
       });
     });
 
@@ -113,25 +105,15 @@ describe('defaultProvider', () => {
     });
 
     test('callContract() - gateway error', async () => {
-      const promise = testProvider.callContract({
-        contractAddress: exampleContractAddress,
-        entrypoint: 'non_existent_entrypoint',
-        calldata: compileCalldata({
-          user: '0xdeadbeef',
-        }),
-      });
-      expect(promise).rejects.toHaveProperty('errorCode');
-      expect(promise).rejects.toThrowErrorMatchingInlineSnapshot(
-        `"Entry point 0x23b0c8b3d98aa73d8a35f5303fe77d132c6d04279e63f6e1d6aac5946e04612 not found in contract with class hash 0x2864c45bd4ba3e66d8f7855adcadf07205c88f43806ffca664f1f624765207e."`
-      );
-
-      try {
-        await promise;
-      } catch (e) {
-        expect(e.errorCode).toMatchInlineSnapshot(
-          IS_DEVNET ? `500` : `"StarknetErrorCode.ENTRY_POINT_NOT_FOUND_IN_CONTRACT"`
-        );
-      }
+      return expect(
+        testProvider.callContract({
+          contractAddress: exampleContractAddress,
+          entrypoint: 'non_existent_entrypoint',
+          calldata: compileCalldata({
+            user: '0xdeadbeef',
+          }),
+        })
+      ).rejects.toThrowError();
     });
   });
 
@@ -155,11 +137,9 @@ describe('defaultProvider', () => {
     });
   });
 
-  describe.each([
-    { name: 'RPC', provider: getTestRpcProvider() },
-    { name: 'Sequencer', provider: new SequencerProvider() },
-  ])('$name provider', ({ name, provider }) => {
-    describe(`Provider methods: ${name}`, () => {
+  describeIfNotDevnet('Provider', () => {
+    const provider = getTestProvider();
+    describe(`Provider methods`, () => {
       describe('getBlock', () => {
         test('pending', async () => {
           const latestBlock = await provider.getBlock();

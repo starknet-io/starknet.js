@@ -2,6 +2,7 @@ import urljoin from 'url-join';
 
 import { ONE, StarknetChainId, ZERO } from '../constants';
 import {
+  BlockTag,
   Call,
   CallContractResponse,
   ContractClass,
@@ -11,16 +12,18 @@ import {
   DeployContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
-  GetContractAddressesResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
-  GetTransactionStatusResponse,
-  GetTransactionTraceResponse,
   Invocation,
   InvocationsDetails,
   InvokeFunctionResponse,
-  Sequencer,
 } from '../types';
+import {
+  GetContractAddressesResponse,
+  GetTransactionStatusResponse,
+  GetTransactionTraceResponse,
+  Sequencer,
+} from '../types/api';
 import { getSelectorFromName } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
@@ -224,11 +227,11 @@ export class SequencerProvider implements ProviderInterface {
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockHashOrTag: BlockTag | BigNumberish = 'pending'
   ): Promise<BigNumberish> {
     const parsedKey = toBN(key).toString(10);
     return this.fetchEndpoint('get_storage_at', {
-      blockIdentifier,
+      blockIdentifier: blockHashOrTag,
       contractAddress,
       key: parsedKey,
     });

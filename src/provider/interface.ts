@@ -1,5 +1,6 @@
 import { StarknetChainId } from '../constants';
 import type {
+  BlockTag,
   Call,
   CallContractResponse,
   ContractClass,
@@ -58,13 +59,13 @@ export abstract class ProviderInterface {
    *
    * @param contractAddress
    * @param key - from getStorageVarAddress('<STORAGE_VARIABLE_NAME>') (WIP)
-   * @param blockIdentifier - block identifier
+   * @param blockHashOrTag - block hash or tag (pending, latest)
    * @returns the value of the storage variable
    */
   public abstract getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockIdentifier?: BlockIdentifier
+    blockHashOrTag?: BlockTag | BigNumberish
   ): Promise<BigNumberish>;
 
   /**

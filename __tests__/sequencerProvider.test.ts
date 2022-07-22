@@ -1,20 +1,27 @@
 import { SequencerProvider } from '../src';
+import {
+  compiledErc20,
+  describeIfNotDevnet,
+  describeIfSequencer,
+  getTestProvider,
+} from './fixtures';
 
-describe('SequencerProvider', () => {
+describeIfSequencer('SequencerProvider', () => {
   let provider: SequencerProvider;
 
   beforeAll(async () => {
-    provider = new SequencerProvider();
+    provider = getTestProvider() as SequencerProvider;
   });
 
-  describe('Gateway specifc methods', () => {
-    const exampleTransactionHash =
-      '0x37013e1cb9c133e6fe51b4b371b76b317a480f56d80576730754c1662582348';
+  describe('Gateway specific methods', () => {
+    let exampleTransactionHash: string;
 
-    test('getContractAddresses()', async () => {
-      const { GpsStatementVerifier, Starknet } = await provider.getContractAddresses();
-      expect(typeof GpsStatementVerifier).toBe('string');
-      expect(typeof Starknet).toBe('string');
+    beforeAll(async () => {
+      const { transaction_hash } = await provider.deployContract({
+        contract: compiledErc20,
+      });
+      await provider.waitForTransaction(transaction_hash);
+      exampleTransactionHash = transaction_hash;
     });
 
     test('getTransactionStatus()', async () => {
@@ -25,6 +32,14 @@ describe('SequencerProvider', () => {
       const transactionTrace = await provider.getTransactionTrace(exampleTransactionHash);
       expect(transactionTrace).toHaveProperty('function_invocation');
       expect(transactionTrace).toHaveProperty('signature');
+    });
+
+    describeIfNotDevnet('which are not available on devnet', () => {
+      test('getContractAddresses()', async () => {
+        const { GpsStatementVerifier, Starknet } = await provider.getContractAddresses();
+        expect(typeof GpsStatementVerifier).toBe('string');
+        expect(typeof Starknet).toBe('string');
+      });
     });
   });
 });

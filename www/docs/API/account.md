@@ -18,7 +18,7 @@ For creating new instance of Account, account contract must be deployed. Also th
 
 ## Account Properties
 
-contract.**address** => _string_
+account.**address** => _string_
 
 The address of the account contract
 

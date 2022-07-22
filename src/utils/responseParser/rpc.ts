@@ -7,8 +7,8 @@ import {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   InvokeFunctionResponse,
-  RPC,
 } from '../../types';
+import { RPC } from '../../types/api';
 import { toBN } from '../number';
 import { ResponseParser } from '.';
 
@@ -51,19 +51,9 @@ export class RPCResponseParser extends ResponseParser {
       actual_fee: res.actual_fee,
       status: res.status,
       status_data: res.status_data,
-      messages_sent: res.messages_sent?.map(({ to_address, payload }) => ({
-        to_address,
-        payload,
-      })),
-      l1_origin_message: res.l1_origin_message && {
-        from_address: res.l1_origin_message.from_address,
-        payload: res.l1_origin_message.payload,
-      },
-      events: res.events.map(({ from_address, keys, data }) => ({
-        from_address,
-        keys,
-        data,
-      })),
+      messages_sent: res.messages_sent,
+      l1_origin_message: res.l1_origin_message,
+      events: res.events,
     };
   }
 

@@ -3,8 +3,8 @@ import { SignerInterface } from '../signer';
 import {
   Abi,
   Call,
-  EstimateFee,
   EstimateFeeDetails,
+  EstimateFeeResponse,
   InvocationsDetails,
   InvokeFunctionResponse,
   Signature,
@@ -31,7 +31,7 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract estimateFee(
     calls: Call | Call[],
     estimateFeeDetails?: EstimateFeeDetails
-  ): Promise<EstimateFee>;
+  ): Promise<EstimateFeeResponse>;
 
   /**
    * Invoke execute function in account contract

@@ -2,6 +2,7 @@ import fetch from 'cross-fetch';
 
 import { StarknetChainId } from '../constants';
 import {
+  BlockTag,
   Call,
   CallContractResponse,
   DeclareContractPayload,
@@ -15,8 +16,8 @@ import {
   Invocation,
   InvocationsDetails,
   InvokeFunctionResponse,
-  RPC,
 } from '../types';
+import { RPC } from '../types/api';
 import { getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
 import {
@@ -103,10 +104,14 @@ export class RpcProvider implements ProviderInterface {
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockHash: BlockIdentifier = 'pending'
+    blockHashOrTag: BlockTag | BigNumberish = 'pending'
   ): Promise<BigNumberish> {
     const parsedKey = toHex(toBN(key));
-    return this.fetchEndpoint('starknet_getStorageAt', [contractAddress, parsedKey, blockHash]);
+    return this.fetchEndpoint('starknet_getStorageAt', [
+      contractAddress,
+      parsedKey,
+      blockHashOrTag,
+    ]);
   }
 
   public async getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {
@@ -130,7 +135,7 @@ export class RpcProvider implements ProviderInterface {
 
   public async getEstimateFee(
     invocation: Invocation,
-    blockIdentifier: BlockIdentifier = 'latest',
+    blockIdentifier: BlockIdentifier = 'pending',
     invocationDetails: InvocationsDetails = {}
   ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint('starknet_estimateFee', [
@@ -243,6 +248,8 @@ export class RpcProvider implements ProviderInterface {
 
       retries -= 1;
     }
+
+    await wait(retryInterval);
   }
 
   /**

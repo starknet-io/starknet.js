@@ -1,5 +1,5 @@
 import { ZERO } from '../constants';
-import { ProviderOptions } from '../provider';
+import { ProviderInterface, ProviderOptions } from '../provider';
 import { Provider } from '../provider/default';
 import { Signer, SignerInterface } from '../signer';
 import {
@@ -23,7 +23,7 @@ export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
 
   constructor(
-    providerOrOptions: ProviderOptions | Provider,
+    providerOrOptions: ProviderOptions | ProviderInterface,
     public address: string,
     keyPairOrSigner: KeyPair | SignerInterface
   ) {
@@ -59,16 +59,16 @@ export class Account extends Provider implements AccountInterface {
     const signature = await this.signer.signTransaction(transactions, signerDetails);
 
     const calldata = fromCallsToExecuteCalldataWithNonce(transactions, nonce);
-    const fetchedEstimate = await super.getEstimateFee(
+    const response = await super.getEstimateFee(
       { contractAddress: this.address, entrypoint: '__execute__', calldata, signature },
       blockIdentifier,
       { version }
     );
 
-    const suggestedMaxFee = estimatedFeeToMaxFee(fetchedEstimate.overall_fee);
+    const suggestedMaxFee = estimatedFeeToMaxFee(response.overall_fee);
 
     return {
-      ...fetchedEstimate,
+      ...response,
       suggestedMaxFee,
     };
   }

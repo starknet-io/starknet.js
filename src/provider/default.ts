@@ -1,5 +1,6 @@
 import { StarknetChainId } from '../constants';
 import {
+  BlockTag,
   Call,
   CallContractResponse,
   DeclareContractPayload,
@@ -28,13 +29,15 @@ export interface ProviderOptions {
 export class Provider implements ProviderInterface {
   private provider!: ProviderInterface;
 
-  constructor(providerOrOptions?: ProviderOptions | Provider) {
-    if (providerOrOptions instanceof Provider) {
+  constructor(providerOrOptions?: ProviderOptions | ProviderInterface) {
+    if (providerOrOptions && 'chainId' in providerOrOptions) {
       this.provider = providerOrOptions;
-    } else if (providerOrOptions && providerOrOptions.rpc) {
+    } else if (providerOrOptions?.rpc) {
       this.provider = new RpcProvider(providerOrOptions.rpc);
+    } else if (providerOrOptions?.sequencer) {
+      this.provider = new SequencerProvider(providerOrOptions.sequencer);
     } else {
-      this.provider = new SequencerProvider(providerOrOptions?.sequencer);
+      this.provider = new SequencerProvider();
     }
   }
 
@@ -55,7 +58,7 @@ export class Provider implements ProviderInterface {
 
   public async getEstimateFee(
     invocation: Invocation,
-    blockIdentifier: BlockIdentifier = 'latest', // 'pending' is not working on the RPC node
+    blockIdentifier: BlockIdentifier = 'pending', // 'pending' is not working on the RPC node
     invocationDetails: InvocationsDetails = {}
   ): Promise<EstimateFeeResponse> {
     return this.provider.getEstimateFee(invocation, blockIdentifier, invocationDetails);
@@ -64,9 +67,9 @@ export class Provider implements ProviderInterface {
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockTagOrHash: BlockTag | BigNumberish = 'pending'
   ): Promise<BigNumberish> {
-    return this.provider.getStorageAt(contractAddress, key, blockIdentifier);
+    return this.provider.getStorageAt(contractAddress, key, blockTagOrHash);
   }
 
   public async getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {

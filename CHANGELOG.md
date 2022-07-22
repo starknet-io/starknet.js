@@ -1,3 +1,21 @@
+# [3.17.0](https://github.com/0xs34n/starknet.js/compare/v3.16.3...v3.17.0) (2022-07-15)
+
+### Features
+
+- support SN 0.9.1 estimate_fee response ([9302aab](https://github.com/0xs34n/starknet.js/commit/9302aab9cbbe5eaa3a9933b19f8f46b2dd6d6a1d))
+
+## [3.16.3](https://github.com/0xs34n/starknet.js/compare/v3.16.2...v3.16.3) (2022-07-15)
+
+### Bug Fixes
+
+- allow hex to be mixed case ([fa84e55](https://github.com/0xs34n/starknet.js/commit/fa84e558602d1ff134defc3e0f7123c1f4d04775))
+
+## [3.16.2](https://github.com/0xs34n/starknet.js/compare/v3.16.1...v3.16.2) (2022-07-14)
+
+### Bug Fixes
+
+- **docs:** account.address ([d935b95](https://github.com/0xs34n/starknet.js/commit/d935b95c3bb54977c420efbd25cd85dcd12d1b17))
+
 ## [3.16.1](https://github.com/0xs34n/starknet.js/compare/v3.16.0...v3.16.1) (2022-07-02)
 
 ### Bug Fixes

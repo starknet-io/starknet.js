@@ -1,19 +1,13 @@
 import { isBN } from 'bn.js';
 
 import typedDataExample from '../__mocks__/typedDataExample.json';
-import { Account, Contract, Provider, ec, number, stark } from '../src';
+import { Account, Contract, Provider, number, stark } from '../src';
 import { toBN } from '../src/utils/number';
-import {
-  compiledErc20,
-  compiledOpenZeppelinAccount,
-  compiledTestDapp,
-  getTestAccount,
-  getTestProvider,
-} from './fixtures';
+import { compiledErc20, compiledTestDapp, getTestAccount, getTestProvider } from './fixtures';
 
 describe('deploy and test Wallet', () => {
-  const account = getTestAccount();
   const provider = getTestProvider();
+  const account = getTestAccount(provider);
   let erc20: Contract;
   let erc20Address: string;
   let dapp: Contract;
@@ -25,7 +19,7 @@ describe('deploy and test Wallet', () => {
       contract: compiledErc20,
     });
 
-    erc20Address = erc20Response.contract_address!;
+    erc20Address = erc20Response.contract_address;
     erc20 = new Contract(compiledErc20.abi, erc20Address, provider);
 
     await provider.waitForTransaction(erc20Response.transaction_hash);
@@ -130,34 +124,6 @@ describe('deploy and test Wallet', () => {
   test('sign and verify offchain message', async () => {
     const signature = await account.signMessage(typedDataExample);
     expect(await account.verifyMessage(typedDataExample, signature)).toBe(true);
-  });
-
-  describe('new deployed account', () => {
-    let newAccount: Account;
-
-    beforeAll(async () => {
-      const starkKeyPair = ec.genKeyPair();
-      const starkKeyPub = ec.getStarkKey(starkKeyPair);
-
-      const accountResponse = await provider.deployContract({
-        contract: compiledOpenZeppelinAccount,
-        constructorCalldata: [starkKeyPub],
-      });
-
-      await provider.waitForTransaction(accountResponse.transaction_hash);
-
-      newAccount = new Account(provider, accountResponse.contract_address!, starkKeyPair);
-    });
-
-    test('read nonce', async () => {
-      const { result } = await account.callContract({
-        contractAddress: newAccount.address,
-        entrypoint: 'get_nonce',
-      });
-      const nonce = result[0];
-
-      expect(number.toBN(nonce).toString()).toStrictEqual(number.toBN(0).toString());
-    });
   });
 
   describe('Contract interaction with Account', () => {
