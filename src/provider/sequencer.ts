@@ -204,7 +204,7 @@ export class SequencerProvider implements ProviderInterface {
 
   public async callContract(
     { contractAddress, entrypoint: entryPointSelector, calldata = [] }: Call,
-    blockIdentifier: BlockIdentifier = 'latest'
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<CallContractResponse> {
     return this.fetchEndpoint(
       'call_contract',
@@ -218,7 +218,7 @@ export class SequencerProvider implements ProviderInterface {
     ).then(this.responseParser.parseCallContractResponse);
   }
 
-  public async getBlock(blockIdentifier: BlockIdentifier = 'latest'): Promise<GetBlockResponse> {
+  public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
     return this.fetchEndpoint('get_block', { blockIdentifier }).then(
       this.responseParser.parseGetBlockResponse
     );
@@ -227,7 +227,7 @@ export class SequencerProvider implements ProviderInterface {
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockHashOrTag: BlockTag | BigNumberish = 'latest'
+    blockHashOrTag: BlockTag | BigNumberish = 'pending'
   ): Promise<BigNumberish> {
     const parsedKey = toBN(key).toString(10);
     return this.fetchEndpoint('get_storage_at', {
@@ -253,7 +253,7 @@ export class SequencerProvider implements ProviderInterface {
 
   public async getClassAt(
     contractAddress: string,
-    blockIdentifier: BlockIdentifier = 'latest'
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<ContractClass> {
     return this.fetchEndpoint('get_full_contract', { blockIdentifier, contractAddress }).then(
       parseContract
@@ -306,7 +306,7 @@ export class SequencerProvider implements ProviderInterface {
 
   public async getEstimateFee(
     invocation: Invocation,
-    blockIdentifier: BlockIdentifier = 'latest',
+    blockIdentifier: BlockIdentifier = 'pending',
     invocationDetails: InvocationsDetails = {}
   ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint(
@@ -331,7 +331,7 @@ export class SequencerProvider implements ProviderInterface {
       // eslint-disable-next-line no-await-in-loop
       const res = await this.getTransactionStatus(txHash);
 
-      const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2'];
+      const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'];
       const errorStates = ['REJECTED', 'NOT_RECEIVED'];
 
       if (successStates.includes(res.tx_status)) {

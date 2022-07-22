@@ -90,7 +90,7 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_chainId');
   }
 
-  public async getBlock(blockIdentifier: BlockIdentifier = 'latest'): Promise<GetBlockResponse> {
+  public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
     const method =
       typeof blockIdentifier === 'string' && isHex(blockIdentifier)
         ? 'starknet_getBlockByHash'
@@ -104,7 +104,7 @@ export class RpcProvider implements ProviderInterface {
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockHashOrTag: BlockTag | BigNumberish = 'latest'
+    blockHashOrTag: BlockTag | BigNumberish = 'pending'
   ): Promise<BigNumberish> {
     const parsedKey = toHex(toBN(key));
     return this.fetchEndpoint('starknet_getStorageAt', [
@@ -128,14 +128,14 @@ export class RpcProvider implements ProviderInterface {
 
   public async getClassAt(
     contractAddress: string,
-    _blockIdentifier: BlockIdentifier = 'latest'
+    _blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<any> {
     return this.fetchEndpoint('starknet_getClassAt', [contractAddress]);
   }
 
   public async getEstimateFee(
     invocation: Invocation,
-    blockIdentifier: BlockIdentifier = 'latest',
+    blockIdentifier: BlockIdentifier = 'pending',
     invocationDetails: InvocationsDetails = {}
   ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint('starknet_estimateFee', [
@@ -200,7 +200,7 @@ export class RpcProvider implements ProviderInterface {
 
   public async callContract(
     call: Call,
-    blockIdentifier: BlockIdentifier = 'latest'
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<CallContractResponse> {
     const result = await this.fetchEndpoint('starknet_call', [
       {
@@ -219,7 +219,7 @@ export class RpcProvider implements ProviderInterface {
     let retries = 100;
 
     while (!onchain) {
-      const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2'];
+      const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'];
       const errorStates = ['REJECTED', 'NOT_RECEIVED'];
 
       // eslint-disable-next-line no-await-in-loop

@@ -46,20 +46,20 @@ export class Provider implements ProviderInterface {
     return this.provider.chainId;
   }
 
-  public async getBlock(blockIdentifier: BlockIdentifier = 'latest'): Promise<GetBlockResponse> {
+  public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
     return this.provider.getBlock(blockIdentifier);
   }
 
   public async getClassAt(
     contractAddress: string,
-    blockIdentifier: BlockIdentifier = 'latest'
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<ContractClass> {
     return this.provider.getClassAt(contractAddress, blockIdentifier);
   }
 
   public async getEstimateFee(
     invocation: Invocation,
-    blockIdentifier: BlockIdentifier = 'latest',
+    blockIdentifier: BlockIdentifier = 'pending',
     invocationDetails: InvocationsDetails = {}
   ): Promise<EstimateFeeResponse> {
     return this.provider.getEstimateFee(invocation, blockIdentifier, invocationDetails);
@@ -68,7 +68,7 @@ export class Provider implements ProviderInterface {
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockTagOrHash: BlockTag | BigNumberish = 'latest'
+    blockTagOrHash: BlockTag | BigNumberish = 'pending'
   ): Promise<BigNumberish> {
     return this.provider.getStorageAt(contractAddress, key, blockTagOrHash);
   }
@@ -83,7 +83,7 @@ export class Provider implements ProviderInterface {
 
   public async callContract(
     request: Call,
-    blockIdentifier: BlockIdentifier = 'latest'
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<CallContractResponse> {
     return this.provider.callContract(request, blockIdentifier);
   }
