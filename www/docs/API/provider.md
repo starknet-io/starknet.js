@@ -159,11 +159,11 @@ Declares a contract on Starknet
 
 ```
 
-provider.**deployContract**(payload [ , abi ]) => _Promise < DeclareContractResponse >_
+provider.**deployContract**(payload [ , abi ]) => _Promise < DeployContractResponse >_
 
 Deploys a contract on Starknet
 
-###### _DeclareContractResponse_
+###### _DeployContractResponse_
 
 ```
 {
