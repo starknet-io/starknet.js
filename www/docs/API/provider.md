@@ -73,6 +73,7 @@ Gets the block information.
   sequencer: string;
   status: 'NOT_RECEIVED' | 'RECEIVED' | 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
   transactions: Array<string>;
+  starknet_version?: string;
 }
 ```
 

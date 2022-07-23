@@ -13,6 +13,7 @@ export interface GetBlockResponse {
   sequencer: string;
   status: Status;
   transactions: Array<string>;
+  starknet_version?: string;
 }
 
 export type GetTransactionResponse = InvokeTransactionResponse & DeclareTransactionResponse;
