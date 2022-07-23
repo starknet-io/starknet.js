@@ -1,4 +1,5 @@
 import typedDataExample from '../../__mocks__/typedDataExample.json';
+import typedDataStructArrayExample from '../../__mocks__/typedDataStructArrayExample.json';
 import { number } from '../../src';
 import { BigNumberish } from '../../src/utils/number';
 import { encodeType, getMessageHash, getStructHash, getTypeHash } from '../../src/utils/typedData';
@@ -9,7 +10,12 @@ describe('typedData', () => {
     expect(typeEncoding).toMatchInlineSnapshot(
       `"Mail(from:Person,to:Person,contents:felt)Person(name:felt,wallet:felt)"`
     );
+    const typeEncodingStructArr = encodeType(typedDataStructArrayExample, 'Mail');
+    expect(typeEncodingStructArr).toMatchInlineSnapshot(
+      `"Mail(from:Person,to:Person,posts_len:felt,posts:Post*)Person(name:felt,wallet:felt)Post(title:felt,content:felt)"`
+    );
   });
+
   test('should get right type hash', () => {
     const typeHashDomain = getTypeHash(typedDataExample, 'StarkNetDomain');
     expect(typeHashDomain).toMatchInlineSnapshot(
@@ -23,17 +29,35 @@ describe('typedData', () => {
     expect(typeHashMail).toMatchInlineSnapshot(
       `"0x13d89452df9512bf750f539ba3001b945576243288137ddb6c788457d4b2f79"`
     );
+    const typeHashPost = getTypeHash(typedDataStructArrayExample, 'Post');
+    expect(typeHashPost).toMatchInlineSnapshot(
+      `"0x1d71e69bf476486b43cdcfaf5a85c00bb2d954c042b281040e513080388356d"`
+    );
+    const typeHashMailWithStructArray = getTypeHash(typedDataStructArrayExample, 'Mail');
+    expect(typeHashMailWithStructArray).toMatchInlineSnapshot(
+      `"0x873b878e35e258fc99e3085d5aaad3a81a0c821f189c08b30def2cde55ff27"`
+    );
   });
+
   test('should get right hash for StarkNetDomain', () => {
     const hash = getStructHash(typedDataExample, 'StarkNetDomain', typedDataExample.domain as any);
     expect(hash).toMatchInlineSnapshot(
       `"0x54833b121883a3e3aebff48ec08a962f5742e5f7b973469c1f8f4f55d470b07"`
     );
   });
+
   test('should get right hash for entire message', () => {
     const hash = getMessageHash(typedDataExample, '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826');
     expect(hash).toMatchInlineSnapshot(
       `"0x6fcff244f63e38b9d88b9e3378d44757710d1b244282b435cb472053c8d78d0"`
+    );
+
+    const hashStructArr = getMessageHash(
+      typedDataStructArrayExample,
+      '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826'
+    );
+    expect(hashStructArr).toMatchInlineSnapshot(
+      `"0x5914ed2764eca2e6a41eb037feefd3d2e33d9af6225a9e7fe31ac943ff712c"`
     );
   });
 
