@@ -22,9 +22,9 @@ contract.**address** => _string_
 
 The address the contract was constructed/connected with
 
-contract.**providerOrAcount** => _Provider | Account_
+contract.**providerOrAcount** => ProviderInterface | AccountInterface_
 
-Provider or Account that are used to interact with the network
+Provider or account that are used to interact with the network
 
 contract.**deployTransactionHash** => _string | null_
 

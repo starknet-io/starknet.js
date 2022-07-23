@@ -3,6 +3,7 @@ import {
   BlockTag,
   Call,
   CallContractResponse,
+  ContractClass,
   DeclareContractPayload,
   DeclareContractResponse,
   DeployContractPayload,
@@ -52,13 +53,13 @@ export class Provider implements ProviderInterface {
   public async getClassAt(
     contractAddress: string,
     blockIdentifier: BlockIdentifier = 'pending'
-  ): Promise<any> {
+  ): Promise<ContractClass> {
     return this.provider.getClassAt(contractAddress, blockIdentifier);
   }
 
   public async getEstimateFee(
     invocation: Invocation,
-    blockIdentifier: BlockIdentifier = 'pending', // 'pending' is not working on the RPC node
+    blockIdentifier: BlockIdentifier = 'pending',
     invocationDetails: InvocationsDetails = {}
   ): Promise<EstimateFeeResponse> {
     return this.provider.getEstimateFee(invocation, blockIdentifier, invocationDetails);
