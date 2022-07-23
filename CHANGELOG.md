@@ -1,3 +1,9 @@
+## [3.18.1](https://github.com/0xs34n/starknet.js/compare/v3.18.0...v3.18.1) (2022-07-23)
+
+### Bug Fixes
+
+- struct array hashing ([e1f82df](https://github.com/0xs34n/starknet.js/commit/e1f82dfd575be4c84b291c33f8169bf367493603))
+
 # [3.18.0](https://github.com/0xs34n/starknet.js/compare/v3.17.0...v3.18.0) (2022-07-23)
 
 ### Features
