@@ -195,6 +195,7 @@ export type GetBlockResponse = {
   parent_block_hash: string;
   status: Status;
   gas_price: string;
+  starknet_version?: string;
 };
 
 export type GetCodeResponse = {
