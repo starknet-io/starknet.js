@@ -85,6 +85,7 @@ Gets the block information.
   transation: Transaction[];
   timestamp: number;
   transaction_receipts: [];
+  starknet_version: string;
 }
 ```
 

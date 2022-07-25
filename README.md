@@ -85,3 +85,4 @@ This library would not be possible without these rockstars.
 Copyright (c) 2022 0xs34n
 
 Licensed under the [MIT license](https://github.com/0xs34n/starknet.js/blob/main/LICENSE).
+
