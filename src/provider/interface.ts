@@ -1,123 +1,90 @@
 import { StarknetChainId } from '../constants';
 import type {
-  AddTransactionResponse,
+  BlockTag,
   Call,
   CallContractResponse,
+  ContractClass,
+  DeclareContractPayload,
+  DeclareContractResponse,
   DeployContractPayload,
+  DeployContractResponse,
+  EstimateFeeResponse,
   GetBlockResponse,
-  GetCodeResponse,
-  GetContractAddressesResponse,
+  GetTransactionReceiptResponse,
   GetTransactionResponse,
-  GetTransactionStatusResponse,
   Invocation,
-  TransactionReceiptResponse,
+  InvocationsDetails,
+  InvokeFunctionResponse,
 } from '../types';
 import type { BigNumberish } from '../utils/number';
 import { BlockIdentifier } from './utils';
 
 export abstract class ProviderInterface {
-  public abstract baseUrl: string;
-
-  public abstract feederGatewayUrl: string;
-
-  public abstract gatewayUrl: string;
-
   public abstract chainId: StarknetChainId;
-
-  /**
-   * Gets the smart contract address on the goerli testnet.
-   *
-   * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L13-L15)
-   * @returns starknet smart contract addresses
-   */
-  public abstract getContractAddresses(): Promise<GetContractAddressesResponse>;
 
   /**
    * Calls a function on the StarkNet contract.
    *
-   * [Reference](https://github.com/starkware-libs/cairo-lang/blob/fc97bdd8322a7df043c87c371634b26c15ed6cee/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L25-L39)
-   *
-   * @param invokeTransaction transaction to be invoked
+   * @param call transaction to be called
    * @param blockIdentifier block identifier
    * @returns the result of the function on the smart contract.
    */
   public abstract callContract(
-    invokeTransaction: Call,
-    options: {
-      blockIdentifier: BlockIdentifier;
-    }
+    call: Call,
+    blockIdentifier?: BlockIdentifier
   ): Promise<CallContractResponse>;
 
   /**
    * Gets the block information
    *
-   * [Reference](https://github.com/starkware-libs/cairo-lang/blob/fc97bdd8322a7df043c87c371634b26c15ed6cee/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L41-L53)
-   *
    * @param blockIdentifier block identifier
-   * @returns the block object { block_number, previous_block_number, state_root, status, timestamp, transaction_receipts, transactions }
+   * @returns the block object
    */
-  public abstract getBlock(blockIdentifier?: BlockIdentifier): Promise<GetBlockResponse>;
+  public abstract getBlock(blockIdentifier: BlockIdentifier): Promise<GetBlockResponse>;
 
   /**
-   * Gets the code of the deployed contract.
-   *
-   * [Reference](https://github.com/starkware-libs/cairo-lang/blob/fc97bdd8322a7df043c87c371634b26c15ed6cee/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L55-L68)
+   * Gets the contract class of the deployed contract.
    *
    * @param contractAddress - contract address
    * @param blockIdentifier - block identifier
-   * @returns Bytecode and ABI of compiled contract
+   * @returns Contract class of compiled contract
    */
-  public abstract getCode(
+  public abstract getClassAt(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
-  ): Promise<GetCodeResponse>;
+  ): Promise<ContractClass>;
 
-  // TODO: add proper type
   /**
    * Gets the contract's storage variable at a specific key.
    *
-   * [Reference](https://github.com/starkware-libs/cairo-lang/blob/fc97bdd8322a7df043c87c371634b26c15ed6cee/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L70-L85)
-   *
    * @param contractAddress
    * @param key - from getStorageVarAddress('<STORAGE_VARIABLE_NAME>') (WIP)
-   * @param blockIdentifier - block identifier
+   * @param blockHashOrTag - block hash or tag (pending, latest)
    * @returns the value of the storage variable
    */
   public abstract getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockIdentifier?: BlockIdentifier
-  ): Promise<object>;
-
-  /**
-   * Gets the status of a transaction.
-   *
-   * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L48-L52)
-   *
-   * @param txHash
-   * @returns the transaction status object { block_number, tx_status: NOT_RECEIVED | RECEIVED | PENDING | REJECTED | ACCEPTED_ONCHAIN }
-   */
-  public abstract getTransactionStatus(txHash: BigNumberish): Promise<GetTransactionStatusResponse>;
+    blockHashOrTag?: BlockTag | BigNumberish
+  ): Promise<BigNumberish>;
 
   /**
    * Gets the transaction information from a tx id.
    *
-   * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L54-L58)
-   *
    * @param txHash
    * @returns the transacton object { transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? }
    */
-  public abstract getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse>;
+  public abstract getTransaction(transactionHash: BigNumberish): Promise<GetTransactionResponse>;
 
   /**
    * Gets the transaction receipt from a tx hash.
    *
-   * [Reference] (https://github.com/starkware-libs/cairo-lang/blob/167b28bcd940fd25ea3816204fa882a0b0a49603/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L183)
-   *
    * @param txHash
    * @returns the transaction receipt object
    */
-  public abstract getTransactionReceipt(txHash: BigNumberish): Promise<TransactionReceiptResponse>;
+  public abstract getTransactionReceipt(
+    transactionHash: BigNumberish
+  ): Promise<GetTransactionReceiptResponse>;
 
   /**
    * Deploys a given compiled contract (json) to starknet
@@ -128,7 +95,19 @@ export abstract class ProviderInterface {
    * - address salt
    * @returns a confirmation of sending a transaction on the starknet contract
    */
-  public abstract deployContract(payload: DeployContractPayload): Promise<AddTransactionResponse>;
+  public abstract deployContract(payload: DeployContractPayload): Promise<DeployContractResponse>;
+
+  /**
+   * Declares a given compiled contract (json) to starknet
+   *
+   * @param payload payload to be deployed containing:
+   * - compiled contract code
+   * - optional version
+   * @returns a confirmation of sending a transaction on the starknet contract
+   */
+  public abstract declareContract(
+    payload: DeclareContractPayload
+  ): Promise<DeclareContractResponse>;
 
   /**
    * Invokes a function on starknet
@@ -139,15 +118,41 @@ export abstract class ProviderInterface {
    * - entrypoint - the entrypoint of the contract
    * - calldata - (defaults to []) the calldata
    * - signature - (defaults to []) the signature
-   *
+   * @param details - optional details containing:
+   * - nonce - optional nonce
+   * - version - optional version
+   * - maxFee - optional maxFee
    * @returns response from addTransaction
    */
-  public abstract invokeFunction(invocation: Invocation): Promise<AddTransactionResponse>;
-
-  public abstract waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<void>;
+  public abstract invokeFunction(
+    invocation: Invocation,
+    details?: InvocationsDetails
+  ): Promise<InvokeFunctionResponse>;
 
   /**
-   * @deprecated use `waitForTransaction` instead
+   * Estimates the fee for a given transaction
+   *
+   * @param invocation the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   * @param blockIdentifier - block identifier
+   * @param details - optional details containing:
+   * - nonce - optional nonce
+   * - version - optional version
+   * @returns the estimated fee
+   */
+  public abstract getEstimateFee(
+    invocation: Invocation,
+    blockIdentifier: BlockIdentifier,
+    details?: InvocationsDetails
+  ): Promise<EstimateFeeResponse>;
+
+  /**
+   * Wait for the transaction to be accepted
+   * @param txHash - transaction hash
+   * @param retryInterval - retry interval
    */
   public abstract waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<void>;
 }

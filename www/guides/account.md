@@ -54,16 +54,9 @@ Wait for the deployment transaction to be accepted and assign the address of the
 
 ```javascript
 await defaultProvider.waitForTransaction(accountResponse.transaction_hash);
-const accountContract = new Contract(
-  compiledAccount.abi,
-  accountResponse.address
-);
-const initializeResponse = await accountContract.initialize(starkKeyPub, "0");
-
-await defaultProvider.waitForTransaction(initializeResponse.transaction_hash);
 ```
 
-Once account contract is initialized [Account](../docs/API/account.md) instance can be created. Use your new account instance to sign transactions, messages or verify signatures!
+Once account contract is deployed [Account](../docs/API/account.md) instance can be created. Use your new account instance to sign transactions, messages or verify signatures! Make sure your Account has enough funds to execute invocations.
 
 ```js
 const account = new Account(

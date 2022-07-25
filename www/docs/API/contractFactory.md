@@ -26,9 +26,9 @@ contractFactory.**compiledContract** => _CompiledContract_;
 
 The compiled contract the contractFactory was constructed with
 
-contractFactory.**providerOrAccount** => _Provider | Account_;
+contractFactory.**providerOrAccount** => _ProviderInterface | AccountInterface_;
 
-Provider or Account that are used to interact with the network
+Provider or account that are used to interact with the network
 
 ## Methods
 

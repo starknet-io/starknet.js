@@ -29,10 +29,13 @@ const erc20 = new Contract(compiledErc20.abi, erc20Address);
 Make sure you created the `Account` instance following the [Creating an Account](./account.md) guide.
 
 ```javascript
+erc20.connect(account);
+
 const { transaction_hash: mintTxHash } = await erc20.mint(
   account.address,
   "1000"
 );
+
 console.log(`Waiting for Tx to be Accepted on Starknet - Minting...`);
 await defaultProvider.waitForTransaction(mintTxHash);
 ```

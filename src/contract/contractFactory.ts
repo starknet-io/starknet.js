@@ -34,19 +34,16 @@ export class ContractFactory {
     constructorCalldata?: RawCalldata,
     addressSalt?: BigNumberish
   ): Promise<Contract> {
-    const { address, code, transaction_hash } = await this.providerOrAccount.deployContract({
+    const { contract_address, transaction_hash } = await this.providerOrAccount.deployContract({
       contract: this.compiledContract,
       constructorCalldata,
       addressSalt,
     });
-    assert(
-      code === 'TRANSACTION_RECEIVED' && Boolean(address),
-      'Deployment of the contract failed'
-    );
+    assert(Boolean(contract_address), 'Deployment of the contract failed');
 
     const contractInstance = new Contract(
       this.compiledContract.abi,
-      address!,
+      contract_address!,
       this.providerOrAccount
     );
     contractInstance.deployTransactionHash = transaction_hash;
