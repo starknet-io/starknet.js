@@ -1,3 +1,9 @@
+## [3.18.2](https://github.com/0xs34n/starknet.js/compare/v3.18.1...v3.18.2) (2022-07-25)
+
+### Bug Fixes
+
+- release to [@next](https://github.com/next) ([12e37ce](https://github.com/0xs34n/starknet.js/commit/12e37cef78bc0e9d97d25c44d0dcf576969cb182))
+
 ## [3.18.1](https://github.com/0xs34n/starknet.js/compare/v3.18.0...v3.18.1) (2022-07-23)
 
 ### Bug Fixes
