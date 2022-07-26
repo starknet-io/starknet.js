@@ -110,7 +110,7 @@ export namespace RPC {
   export type GetEventsResponse = {
     events: StarknetEmittedEvent[];
     page_number: number;
-    is_last_page: number;
+    is_last_page: boolean;
   };
 
   export type DeployContractResponse = {
