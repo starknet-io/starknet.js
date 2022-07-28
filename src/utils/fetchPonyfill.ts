@@ -1,15 +1,18 @@
-/* eslint-disable global-require, import/no-mutable-exports */
-let fetch: (input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<Response>;
+/* eslint-disable global-require */
 
-if (typeof window !== 'undefined') {
-  // use buildin fetch in browser if available
-  fetch = window.fetch;
-} else if (typeof global !== 'undefined') {
-  // use buildin fetch in node, react-native and service worker if available
-  fetch = global.fetch;
-} else {
+function getFetch() {
+  if (typeof window !== 'undefined') {
+    // use buildin fetch in browser if available
+    return window.fetch;
+  }
+  if (typeof global !== 'undefined') {
+    // use buildin fetch in node, react-native and service worker if available
+    return global.fetch;
+  }
   // ponyfill fetch in node and browsers that don't have it
-  fetch = require('isomorphic-fetch');
+  return require('isomorphic-fetch');
 }
+
+const fetch = getFetch();
 
 export default fetch;
