@@ -175,7 +175,7 @@ Deploys a contract on Starknet
 
 <hr/>
 
-provider.\*\*waitForTransaction(txHash [ , retryInterval]) => _Promise < void >_
+provider.**waitForTransaction**(txHash [ , retryInterval]) => _Promise < void >_
 
 Wait for the transaction to be accepted on L2 or L1.
 
