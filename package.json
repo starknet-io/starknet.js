@@ -70,7 +70,7 @@
     "elliptic": "^6.5.4",
     "ethereum-cryptography": "^1.0.3",
     "hash.js": "^1.1.7",
-    "isomorphic-unfetch": "^3.1.0",
+    "isomorphic-fetch": "^3.0.0",
     "json-bigint": "^1.0.0",
     "minimalistic-assert": "^1.0.1",
     "pako": "^2.0.4",
