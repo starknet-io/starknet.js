@@ -1,5 +1,5 @@
 /* eslint-disable global-require, import/no-mutable-exports */
-let fetch: any;
+let fetch: (input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<Response>;
 
 if (typeof window !== 'undefined') {
   // use buildin fetch in browser if available
