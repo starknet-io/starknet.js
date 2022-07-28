@@ -1,3 +1,4 @@
+import fetch from 'isomorphic-unfetch';
 import urljoin from 'url-join';
 
 import { ONE, StarknetChainId, ZERO } from '../constants';
