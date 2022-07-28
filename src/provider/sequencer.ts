@@ -1,4 +1,3 @@
-import fetch from 'isomorphic-unfetch';
 import urljoin from 'url-join';
 
 import { ONE, StarknetChainId, ZERO } from '../constants';
@@ -25,6 +24,7 @@ import {
   GetTransactionTraceResponse,
   Sequencer,
 } from '../types/api';
+import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';

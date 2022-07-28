@@ -1,6 +1,6 @@
-/* eslint-disable no-console */
-import 'isomorphic-unfetch';
+import 'isomorphic-fetch';
 
+/* eslint-disable no-console */
 import { register } from 'fetch-intercept';
 
 jest.setTimeout(50 * 60 * 1000);
