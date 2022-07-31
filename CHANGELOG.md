@@ -1,3 +1,13 @@
+# [4.0.0](https://github.com/0xs34n/starknet.js/compare/v3.19.0...v4.0.0) (2022-07-27)
+
+### Documentation
+
+- v4 ([9e300a9](https://github.com/0xs34n/starknet.js/commit/9e300a98e587fc702ee3ef98441c457fe87e6c1e))
+
+### BREAKING CHANGES
+
+- new provider and signer interfaces
+
 # [3.19.0](https://github.com/0xs34n/starknet.js/compare/v3.18.2...v3.19.0) (2022-07-25)
 
 ### Bug Fixes
