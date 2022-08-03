@@ -1,5 +1,6 @@
 import BN from 'bn.js';
 import { keccak256 } from 'ethereum-cryptography/keccak';
+import { hexToBytes } from 'ethereum-cryptography/utils';
 import assert from 'minimalistic-assert';
 
 import {
@@ -13,11 +14,17 @@ import {
 } from '../constants';
 import { RawCalldata } from '../types/lib';
 import { ec } from './ellipticCurve';
-import { addHexPrefix, buf2hex, utf8ToArray } from './encode';
+import { addHexPrefix, buf2hex, removeHexPrefix, utf8ToArray } from './encode';
 import { BigNumberish, toBN, toFelt, toHex } from './number';
 
 export const transactionVersion = 0;
 export const feeTransactionVersion = toBN(2).pow(toBN(128)).add(toBN(transactionVersion));
+
+export function keccakBn(value: BigNumberish): string {
+  const hexWithoutPrefix = removeHexPrefix(toHex(toBN(value)));
+  const evenHex = hexWithoutPrefix.length % 2 === 0 ? hexWithoutPrefix : `0${hexWithoutPrefix}`;
+  return addHexPrefix(buf2hex(keccak256(hexToBytes(evenHex))));
+}
 
 function keccakHex(value: string): string {
   return addHexPrefix(buf2hex(keccak256(utf8ToArray(value))));
