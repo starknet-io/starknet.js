@@ -323,6 +323,15 @@ export class SequencerProvider implements ProviderInterface {
     ).then(this.responseParser.parseFeeEstimateResponse);
   }
 
+  public async getCode(
+    contractAddress: string,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<Sequencer.GetCodeResponse> {
+    return this.fetchEndpoint('get_code', { contractAddress, blockIdentifier }).then(
+      this.responseParser.parseGetCodeResponse
+    );
+  }
+
   public async waitForTransaction(txHash: BigNumberish, retryInterval: number = 8000) {
     let onchain = false;
 
