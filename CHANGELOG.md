@@ -1,3 +1,9 @@
+# [4.1.0](https://github.com/0xs34n/starknet.js/compare/v4.0.1...v4.1.0) (2022-08-03)
+
+### Features
+
+- get-code ([de6e597](https://github.com/0xs34n/starknet.js/commit/de6e5971de5155925defcf9249a8160dc3fdc9b7))
+
 ## [4.0.1](https://github.com/0xs34n/starknet.js/compare/v4.0.0...v4.0.1) (2022-08-03)
 
 ### Bug Fixes
