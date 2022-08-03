@@ -53,11 +53,6 @@ export type ExecutionResources = {
   n_memory_holes: number;
 };
 
-export type GetCodeResponse = {
-  bytecode: string[];
-  abi: Abi;
-};
-
 export type GetTransactionTraceResponse = {
   function_invocation: {
     caller_address: string;
@@ -114,6 +109,11 @@ export namespace Sequencer {
     code?: TransactionStatus;
     address?: string;
     class_hash?: string;
+  };
+
+  export type GetCodeResponse = {
+    bytecode: string[];
+    abi: Abi;
   };
 
   export interface InvokeFunctionTransactionResponse extends InvokeFunctionTransaction {

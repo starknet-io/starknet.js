@@ -16,6 +16,11 @@ export interface GetBlockResponse {
   starknet_version?: string;
 }
 
+export interface GetCodeResponse {
+  bytecode: string[];
+  // abi: string; // is not consistent between rpc and sequencer (is it?), therefore not included in the provider interface
+}
+
 export type GetTransactionResponse = InvokeTransactionResponse & DeclareTransactionResponse;
 
 export interface CommonTransactionResponse {

@@ -10,6 +10,7 @@ import type {
   DeployContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
+  GetCodeResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
@@ -41,6 +42,11 @@ export abstract class ProviderInterface {
    * @returns the block object
    */
   public abstract getBlock(blockIdentifier: BlockIdentifier): Promise<GetBlockResponse>;
+
+  public abstract getCode(
+    contractAddress: string,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<GetCodeResponse>;
 
   /**
    * Gets the contract class of the deployed contract.
