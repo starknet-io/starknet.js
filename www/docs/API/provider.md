@@ -17,19 +17,40 @@ The options for the provider depends from the network. The structure of the opti
 - options.**sequencer** - Options for sequencer provider
 - options.**rpc** - Options for RPC provider
 
-Example:
+The easiest way to get started is:
 
+```typescript
+const provider = new starknet.Provider()
 ```
+
+The above snippet creates a Starknet Provider instance with `goerli-alpha` network.
+
+However, if you want to use `mainnet-alpha` or explicitly declare the network, you can use:
+
+```typescript
 const provider = new starknet.Provider({
   sequencer: {
-    baseUrl: 'https://alpha4.starknet.io',
-    feederGatewayUrl: 'feeder_gateway',
-    gatewayUrl: 'gateway',
+    network: 'mainnet-alpha' // or 'goerli-alpha'
   }
-})
+ })
 ```
 
-**This is also default options for the constructor for the **testnet\*\*\*
+If you want to more control:
+
+```typescript
+const provider = new starknet.Provider({
+  sequencer: {
+  baseUrl: 'https://alpha4.starknet.io',
+  feederGatewayUrl: 'feeder_gateway',
+  gatewayUrl: 'gateway',
+  }
+})
+
+```
+
+\*\*This is also default options for the Provider constructor with `network: 'goerli-alpha'`\*\*\*
+
+\*\*Note: `network` arguement should work in most cases. If you want to use sequencer arguement with `baseUrl`, you will not be able to use `network` field in the object.\*\*\*
 
 ## Methods
 
@@ -48,9 +69,11 @@ The call object structure:
 ###### CallContractResponse
 
 ```
+
 {
-    result: string[];
+result: string[];
 }
+
 ```
 
 <hr/>
@@ -62,19 +85,21 @@ Gets the block information.
 ###### _GetBlockResponse_
 
 ```
+
 {
-  accepted_time: number;
-  block_hash: string;
-  block_number: number;
-  gas_price: string;
-  new_root: string;
-  old_root?: string;
-  parent_hash: string;
-  sequencer: string;
-  status: 'NOT_RECEIVED' | 'RECEIVED' | 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
-  transactions: Array<string>;
-  starknet_version?: string;
+accepted_time: number;
+block_hash: string;
+block_number: number;
+gas_price: string;
+new_root: string;
+old_root?: string;
+parent_hash: string;
+sequencer: string;
+status: 'NOT_RECEIVED' | 'RECEIVED' | 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
+transactions: Array<string>;
+starknet_version?: string;
 }
+
 ```
 
 <hr/>
@@ -86,11 +111,13 @@ Gets the contract class of the deployed contract.
 ###### _ContractClass_
 
 ```
+
 {
-  program: CompressedProgram;
-  entry_points_by_type: EntryPointsByType;
-  abi?: Abi;
+program: CompressedProgram;
+entry_points_by_type: EntryPointsByType;
+abi?: Abi;
 }
+
 ```
 
 <hr/>
@@ -108,15 +135,17 @@ Gets the status of a transaction.
 ###### _GetTransactionReceiptResponse_
 
 ```
+
 {
-  transaction_hash: string;
-  status: 'NOT_RECEIVED' | 'RECEIVED' | 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
-  actual_fee?: string;
-  status_data?: string;
-  messages_sent?: Array<MessageToL1>;
-  events?: Array<Event>;
-  l1_origin_message?: MessageToL2;
+transaction_hash: string;
+status: 'NOT_RECEIVED' | 'RECEIVED' | 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
+actual_fee?: string;
+status_data?: string;
+messages_sent?: Array<MessageToL1>;
+events?: Array<Event>;
+l1_origin_message?: MessageToL2;
 }
+
 ```
 
 <hr/>
@@ -128,18 +157,20 @@ Gets the transaction information from a tx hash.
 ###### _GetTransactionResponse_
 
 ```
+
 {
-  transaction_hash: string;
-  version?: string;
-  signature?: Signature;
-  max_fee?: string;
-  nonce?: string;
-  contract_address?: string;
-  entry_point_selector?: string;
-  calldata?: RawCalldata;
-  contract_class?: ContractClass;
-  sender_address?: string;
+transaction_hash: string;
+version?: string;
+signature?: Signature;
+max_fee?: string;
+nonce?: string;
+contract_address?: string;
+entry_point_selector?: string;
+calldata?: RawCalldata;
+contract_class?: ContractClass;
+sender_address?: string;
 }
+
 ```
 
 <hr/>
@@ -151,9 +182,10 @@ Declares a contract on Starknet
 ###### _DeclareContractResponse_
 
 ```
+
 {
-  transaction_hash: string;
-  class_hash: string;
+transaction_hash: string;
+class_hash: string;
 };
 
 <hr/>
@@ -167,10 +199,12 @@ Deploys a contract on Starknet
 ###### _DeployContractResponse_
 
 ```
+
 {
-  transaction_hash: string;
-  contract_address?: string;
+transaction_hash: string;
+contract_address?: string;
 };
+
 ```
 
 <hr/>
@@ -198,11 +232,13 @@ or
 Example:
 
 ```
+
 const provider = new starknet.Provider({
-  baseUrl: 'https://alpha4.starknet.io',
-  feederGatewayUrl: 'feeder_gateway',
-  gatewayUrl: 'gateway',
+baseUrl: 'https://alpha4.starknet.io',
+feederGatewayUrl: 'feeder_gateway',
+gatewayUrl: 'gateway',
 })
+
 ```
 
 ## Methods
@@ -212,10 +248,12 @@ Gets the smart contract address on the network
 provider.**getContractAddresses**() => _Promise < GetContractAddressesResponse >_
 
 ```
+
 {
-  Starknet: string;
-  GpsStatementVerifier: string;
+Starknet: string;
+GpsStatementVerifier: string;
 }
+
 ```
 
 <hr/>
@@ -227,15 +265,17 @@ Gets the status of a transaction.
 ###### _GetTransactionStatusResponse_
 
 ```
+
 {
-  tx_status: 'NOT_RECEIVED' | 'RECEIVED' | 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
-  block_hash: string;
-  tx_failure_reason?: {
-    tx_id: number;
-    code: string;
-    error_message: string;
-  }
+tx_status: 'NOT_RECEIVED' | 'RECEIVED' | 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
+block_hash: string;
+tx_failure_reason?: {
+tx_id: number;
+code: string;
+error_message: string;
 }
+}
+
 ```
 
 <hr/>
@@ -247,23 +287,25 @@ Gets the transaction trace from a tx hash.
 ###### _GetTransactionTraceResponse_
 
 ```
+
 {
-  function_invocation: {
-    caller_address: string;
-    contract_address: string;
-    code_address: string;
-    selector: string;
-    calldata: {
-        [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
-    };
-    result: Array<any>;
-    execution_resources: any;
-    internal_call: Array<any>;
-    events: Array<any>;
-    messages: Array<any>;
-  };
-  signature: Signature;
+function_invocation: {
+caller_address: string;
+contract_address: string;
+code_address: string;
+selector: string;
+calldata: {
+[inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
+};
+result: Array<any>;
+execution_resources: any;
+internal_call: Array<any>;
+events: Array<any>;
+messages: Array<any>;
+};
+signature: Signature;
 }
+
 ```
 
 # RpcProvider
@@ -277,9 +319,11 @@ Gets the transaction trace from a tx hash.
 Example:
 
 ```
+
 const provider = new starknet.RpcProvider({
-  nodeUrl: 'URL_TO_STARKNET_RPC_NODE',
+nodeUrl: 'URL_TO_STARKNET_RPC_NODE',
 })
+
 ```
 
 ## Methods
@@ -303,15 +347,17 @@ Gets syncing status of the node
 ###### GetSyncingStatsResponse
 
 ```
+
 boolean |
 {
-  starting_block_hash: string;
-  starting_block_num: string;
-  current_block_hash: string;
-  current_block_num: string;
-  highest_block_hash: string;
-  highest_block_num: string;
+starting_block_hash: string;
+starting_block_num: string;
+current_block_hash: string;
+current_block_num: string;
+highest_block_hash: string;
+highest_block_num: string;
 }
+
 ```
 
 <hr/>
@@ -321,22 +367,34 @@ provider.**getEvents**(eventFilter) => _Promise < GetEventsResponse >_
 ##### EventFilter
 
 ```
+
 type EventFilter = {
-  fromBlock: string;
-  toBlock: string;
-  address: string;
-  keys: string[];
-  page_size: number;
-  page_number: number;
+fromBlock: string;
+toBlock: string;
+address: string;
+keys: string[];
+page_size: number;
+page_number: number;
 };
+
 ```
 
 ###### GetSyncingStatsResponse
 
 ```
+
 {
-  events: StarknetEmittedEvent[];
-  page_number: number;
-  is_last_page: number;
+events: StarknetEmittedEvent[];
+page_number: number;
+is_last_page: number;
 }
+
+```
+
+```
+
+```
+
+```
+
 ```
