@@ -1,4 +1,5 @@
-import { SequencerProvider } from '../src';
+import { Contract, Provider, SequencerProvider, stark } from '../src';
+import { toBN } from '../src/utils/number';
 import {
   compiledErc20,
   describeIfNotDevnet,
@@ -8,9 +9,17 @@ import {
 
 describeIfSequencer('SequencerProvider', () => {
   let provider: SequencerProvider;
+  let customSequencerProvider: Provider;
 
   beforeAll(async () => {
     provider = getTestProvider() as SequencerProvider;
+    customSequencerProvider = new Provider({
+      sequencer: {
+        baseUrl: 'https://alpha4.starknet.io',
+        feederGatewayUrl: 'feeder_gateway',
+        gatewayUrl: 'gateway',
+      }, // Similar to arguements used in docs
+    });
   });
 
   describe('Gateway specific methods', () => {
@@ -40,6 +49,27 @@ describeIfSequencer('SequencerProvider', () => {
         expect(typeof GpsStatementVerifier).toBe('string');
         expect(typeof Starknet).toBe('string');
       });
+    });
+  });
+
+  describe('Test calls with Custom Sequencer Provider', () => {
+    let erc20: Contract;
+    const wallet = stark.randomAddress();
+
+    beforeAll(async () => {
+      const { contract_address, transaction_hash } = await customSequencerProvider.deployContract({
+        contract: compiledErc20,
+      });
+
+      await customSequencerProvider.waitForTransaction(transaction_hash);
+      erc20 = new Contract(compiledErc20.abi, contract_address, customSequencerProvider);
+    });
+
+    test('Check ERC20 balance using Custom Sequencer Provider', async () => {
+      const result = await erc20.balance_of(wallet);
+      const [res] = result;
+      expect(res).toStrictEqual(toBN(0));
+      expect(res).toStrictEqual(result.res);
     });
   });
 });
