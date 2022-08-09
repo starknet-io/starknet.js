@@ -26,12 +26,12 @@ describe('address checksums', () => {
       '0x2fd23d9182193775423497fc0c472e156c57c69e4089a1967fb288a2d84e914'
     );
     expect(checksumAddress).toEqual(
-      '0x02FD23D9182193775423497Fc0c472E156C57C69E4089a1967fb288a2D84e914'
+      '0x02Fd23d9182193775423497fc0c472E156C57C69E4089A1967fb288A2d84e914'
     );
   });
   test('should be able to verify checksum address', () => {
     const isValid = validateChecksumAddress(
-      '0x02FD23D9182193775423497Fc0c472E156C57C69E4089a1967fb288a2D84e914'
+      '0x02Fd23d9182193775423497fc0c472E156C57C69E4089A1967fb288A2d84e914'
     );
     expect(isValid).toEqual(true);
   });
