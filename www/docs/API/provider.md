@@ -68,10 +68,10 @@ The call object structure:
 
 ###### CallContractResponse
 
-```
+```typescript
 
 {
-result: string[];
+  result: string[];
 }
 
 ```
@@ -84,20 +84,20 @@ Gets the block information.
 
 ###### _GetBlockResponse_
 
-```
+```typescript
 
 {
-accepted_time: number;
-block_hash: string;
-block_number: number;
-gas_price: string;
-new_root: string;
-old_root?: string;
-parent_hash: string;
-sequencer: string;
-status: 'NOT_RECEIVED' | 'RECEIVED' | 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
-transactions: Array<string>;
-starknet_version?: string;
+  accepted_time: number;
+  block_hash: string;
+  block_number: number;
+  gas_price: string;
+  new_root: string;
+  old_root?: string;
+  parent_hash: string;
+  sequencer: string;
+  status: 'NOT_RECEIVED' | 'RECEIVED' | 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
+  transactions: Array<string>;
+  starknet_version?: string;
 }
 
 ```
@@ -110,12 +110,12 @@ Gets the contract class of the deployed contract.
 
 ###### _ContractClass_
 
-```
+```typescript
 
 {
-program: CompressedProgram;
-entry_points_by_type: EntryPointsByType;
-abi?: Abi;
+  program: CompressedProgram;
+  entry_points_by_type: EntryPointsByType;
+  abi?: Abi;
 }
 
 ```
@@ -134,16 +134,16 @@ Gets the status of a transaction.
 
 ###### _GetTransactionReceiptResponse_
 
-```
+```typescript
 
 {
-transaction_hash: string;
-status: 'NOT_RECEIVED' | 'RECEIVED' | 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
-actual_fee?: string;
-status_data?: string;
-messages_sent?: Array<MessageToL1>;
-events?: Array<Event>;
-l1_origin_message?: MessageToL2;
+  transaction_hash: string;
+  status: 'NOT_RECEIVED' | 'RECEIVED' | 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
+  actual_fee?: string;
+  status_data?: string;
+  messages_sent?: Array<MessageToL1>;
+  events?: Array<Event>;
+  l1_origin_message?: MessageToL2;
 }
 
 ```
@@ -156,19 +156,19 @@ Gets the transaction information from a tx hash.
 
 ###### _GetTransactionResponse_
 
-```
+```typescript
 
 {
-transaction_hash: string;
-version?: string;
-signature?: Signature;
-max_fee?: string;
-nonce?: string;
-contract_address?: string;
-entry_point_selector?: string;
-calldata?: RawCalldata;
-contract_class?: ContractClass;
-sender_address?: string;
+  transaction_hash: string;
+  version?: string;
+  signature?: Signature;
+  max_fee?: string;
+  nonce?: string;
+  contract_address?: string;
+  entry_point_selector?: string;
+  calldata?: RawCalldata;
+  contract_class?: ContractClass;
+  sender_address?: string;
 }
 
 ```
@@ -181,11 +181,11 @@ Declares a contract on Starknet
 
 ###### _DeclareContractResponse_
 
-```
+```typescript
 
 {
-transaction_hash: string;
-class_hash: string;
+  transaction_hash: string;
+  class_hash: string;
 };
 
 <hr/>
@@ -198,11 +198,11 @@ Deploys a contract on Starknet
 
 ###### _DeployContractResponse_
 
-```
+```typescript
 
 {
-transaction_hash: string;
-contract_address?: string;
+  transaction_hash: string;
+  contract_address?: string;
 };
 
 ```
@@ -231,12 +231,12 @@ or
 
 Example:
 
-```
+```typescript
 
 const provider = new starknet.Provider({
-baseUrl: 'https://alpha4.starknet.io',
-feederGatewayUrl: 'feeder_gateway',
-gatewayUrl: 'gateway',
+  baseUrl: 'https://alpha4.starknet.io',
+  feederGatewayUrl: 'feeder_gateway',
+  gatewayUrl: 'gateway',
 })
 
 ```
@@ -247,11 +247,11 @@ Gets the smart contract address on the network
 
 provider.**getContractAddresses**() => _Promise < GetContractAddressesResponse >_
 
-```
+```typescript
 
 {
-Starknet: string;
-GpsStatementVerifier: string;
+  Starknet: string;
+  GpsStatementVerifier: string;
 }
 
 ```
@@ -264,16 +264,16 @@ Gets the status of a transaction.
 
 ###### _GetTransactionStatusResponse_
 
-```
+```typescript
 
 {
-tx_status: 'NOT_RECEIVED' | 'RECEIVED' | 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
-block_hash: string;
-tx_failure_reason?: {
-tx_id: number;
-code: string;
-error_message: string;
-}
+  tx_status: 'NOT_RECEIVED' | 'RECEIVED' | 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
+  block_hash: string;
+  tx_failure_reason?: {
+    tx_id: number;
+    code: string;
+    error_message: string;
+  }
 }
 
 ```
@@ -286,24 +286,23 @@ Gets the transaction trace from a tx hash.
 
 ###### _GetTransactionTraceResponse_
 
-```
-
+```typescript
 {
-function_invocation: {
-caller_address: string;
-contract_address: string;
-code_address: string;
-selector: string;
-calldata: {
-[inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
-};
-result: Array<any>;
-execution_resources: any;
-internal_call: Array<any>;
-events: Array<any>;
-messages: Array<any>;
-};
-signature: Signature;
+  function_invocation: {
+    caller_address: string;
+    contract_address: string;
+    code_address: string;
+    selector: string;
+    calldata: {
+      [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
+    };
+    result: Array<any>;
+    execution_resources: any;
+    internal_call: Array<any>;
+    events: Array<any>;
+    messages: Array<any>;
+    };
+  signature: Signature;
 }
 
 ```
@@ -318,10 +317,10 @@ signature: Signature;
 
 Example:
 
-```
+```typescript
 
 const provider = new starknet.RpcProvider({
-nodeUrl: 'URL_TO_STARKNET_RPC_NODE',
+  nodeUrl: 'URL_TO_STARKNET_RPC_NODE',
 })
 
 ```
@@ -346,16 +345,16 @@ Gets syncing status of the node
 
 ###### GetSyncingStatsResponse
 
-```
+```typescript
 
 boolean |
 {
-starting_block_hash: string;
-starting_block_num: string;
-current_block_hash: string;
-current_block_num: string;
-highest_block_hash: string;
-highest_block_num: string;
+  starting_block_hash: string;
+  starting_block_num: string;
+  current_block_hash: string;
+  current_block_num: string;
+  highest_block_hash: string;
+  highest_block_num: string;
 }
 
 ```
@@ -366,27 +365,27 @@ provider.**getEvents**(eventFilter) => _Promise < GetEventsResponse >_
 
 ##### EventFilter
 
-```
+```typescript
 
 type EventFilter = {
-fromBlock: string;
-toBlock: string;
-address: string;
-keys: string[];
-page_size: number;
-page_number: number;
+  fromBlock: string;
+  toBlock: string;
+  address: string;
+  keys: string[];
+  page_size: number;
+  page_number: number;
 };
 
 ```
 
 ###### GetSyncingStatsResponse
 
-```
+```typescript
 
 {
-events: StarknetEmittedEvent[];
-page_number: number;
-is_last_page: number;
+  events: StarknetEmittedEvent[];
+  page_number: number;
+  is_last_page: number;
 }
 
 ```
