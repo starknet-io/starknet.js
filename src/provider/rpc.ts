@@ -1,5 +1,3 @@
-import fetch from 'cross-fetch';
-
 import { StarknetChainId } from '../constants';
 import {
   BlockTag,
@@ -18,6 +16,7 @@ import {
   InvokeFunctionResponse,
 } from '../types';
 import { RPC } from '../types/api';
+import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
 import {
@@ -212,6 +211,15 @@ export class RpcProvider implements ProviderInterface {
     ]);
 
     return this.responseParser.parseCallContractResponse(result);
+  }
+
+  public async getCode(
+    contractAddress: string,
+    _blockIdentifier?: BlockIdentifier
+  ): Promise<RPC.GetCodeResponse> {
+    const result = await this.fetchEndpoint('starknet_getCode', [contractAddress]);
+
+    return this.responseParser.parseGetCodeResponse(result);
   }
 
   public async waitForTransaction(txHash: BigNumberish, retryInterval: number = 8000) {

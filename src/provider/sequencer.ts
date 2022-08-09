@@ -24,6 +24,7 @@ import {
   GetTransactionTraceResponse,
   Sequencer,
 } from '../types/api';
+import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
@@ -320,6 +321,15 @@ export class SequencerProvider implements ProviderInterface {
         version: toHex(toBN(invocationDetails?.version || 0)),
       }
     ).then(this.responseParser.parseFeeEstimateResponse);
+  }
+
+  public async getCode(
+    contractAddress: string,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<Sequencer.GetCodeResponse> {
+    return this.fetchEndpoint('get_code', { contractAddress, blockIdentifier }).then(
+      this.responseParser.parseGetCodeResponse
+    );
   }
 
   public async waitForTransaction(txHash: BigNumberish, retryInterval: number = 8000) {

@@ -1,6 +1,6 @@
 {
   "name": "starknet",
-  "version": "4.0.0",
+  "version": "4.1.0",
   "description": "JavaScript library for StarkNet",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -43,10 +43,8 @@
     "@types/minimalistic-assert": "^1.0.1",
     "@types/pako": "^2.0.0",
     "@types/url-join": "^4.0.1",
-    "@types/whatwg-fetch": "^0.0.33",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
-    "cross-fetch": "^3.1.5",
     "eslint": "^8.17.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-config-airbnb-typescript": "^17.0.0",
@@ -62,16 +60,15 @@
     "prettier": "^2.7.0",
     "prettier-plugin-import-sort": "^0.0.7",
     "typedoc": "^0.22.17",
-    "typescript": "^4.7.3",
-    "whatwg-fetch": "^3.6.2"
+    "typescript": "^4.7.3"
   },
   "dependencies": {
     "@ethersproject/bytes": "^5.6.1",
     "bn.js": "^5.2.1",
-    "cross-fetch": "^3.1.5",
     "elliptic": "^6.5.4",
     "ethereum-cryptography": "^1.0.3",
     "hash.js": "^1.1.7",
+    "isomorphic-fetch": "^3.0.0",
     "json-bigint": "^1.0.0",
     "minimalistic-assert": "^1.0.1",
     "pako": "^2.0.4",

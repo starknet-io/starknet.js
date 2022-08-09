@@ -62,6 +62,11 @@ describe('defaultProvider', () => {
       return expect(block).toHaveProperty('block_number');
     });
 
+    test('getCode() -> { bytecode }', async () => {
+      const code = await testProvider.getCode(exampleContractAddress);
+      return expect(Array.isArray(code.bytecode)).toBe(true);
+    });
+
     describe('getStorageAt', () => {
       test('with "key" type of number', () => {
         return expect(testProvider.getStorageAt(exampleContractAddress, 0)).resolves.not.toThrow();

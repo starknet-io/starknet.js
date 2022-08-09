@@ -10,6 +10,7 @@ import {
   DeployContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
+  GetCodeResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
@@ -101,6 +102,13 @@ export class Provider implements ProviderInterface {
 
   public async declareContract(payload: DeclareContractPayload): Promise<DeclareContractResponse> {
     return this.provider.declareContract(payload);
+  }
+
+  public async getCode(
+    contractAddress: string,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<GetCodeResponse> {
+    return this.provider.getCode(contractAddress, blockIdentifier);
   }
 
   public async waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<void> {
