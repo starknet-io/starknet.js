@@ -1,3 +1,9 @@
+# [4.2.0](https://github.com/0xs34n/starknet.js/compare/v4.1.0...v4.2.0) (2022-08-09)
+
+### Features
+
+- change checksum address hashing algorithm ([0f32adf](https://github.com/0xs34n/starknet.js/commit/0f32adf217b3d2e55046bbb21980648f0c8cf631))
+
 # [4.1.0](https://github.com/0xs34n/starknet.js/compare/v4.0.1...v4.1.0) (2022-08-03)
 
 ### Features
