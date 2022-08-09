@@ -1,3 +1,14 @@
+# [4.3.0](https://github.com/0xs34n/starknet.js/compare/v4.2.0...v4.3.0) (2022-08-09)
+
+### Bug Fixes
+
+- intendations in provider.md ([4a310c6](https://github.com/0xs34n/starknet.js/commit/4a310c6c992c77f9f6729a70c1af14481cd891f7))
+- **sequenceProvider:** feedergatewayUrl and gatewayUrl ([e236d23](https://github.com/0xs34n/starknet.js/commit/e236d2352e3fbb0f78965decac5893217347ceb7))
+
+### Features
+
+- update docs ([28786ed](https://github.com/0xs34n/starknet.js/commit/28786ed550909f6a30b8cb145e93d072ed28a862))
+
 # [4.2.0](https://github.com/0xs34n/starknet.js/compare/v4.1.0...v4.2.0) (2022-08-09)
 
 ### Features
