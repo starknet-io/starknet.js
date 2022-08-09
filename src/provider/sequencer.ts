@@ -31,7 +31,7 @@ import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from
 import { parseContract, wait } from '../utils/provider';
 import { SequencerAPIResponseParser } from '../utils/responseParser/sequencer';
 import { randomAddress } from '../utils/stark';
-import { isUrl } from '../utils/url';
+import { buildUrl } from '../utils/url';
 import { GatewayError, HttpError } from './errors';
 import { ProviderInterface } from './interface';
 import { BlockIdentifier, getFormattedBlockIdentifier } from './utils';
@@ -75,12 +75,12 @@ export class SequencerProvider implements ProviderInterface {
       this.gatewayUrl = urljoin(this.baseUrl, 'gateway');
     } else {
       this.baseUrl = optionsOrProvider.baseUrl;
-      this.feederGatewayUrl = this.parseUrlOrPath(
+      this.feederGatewayUrl = buildUrl(
         this.baseUrl,
         'feeder_gateway',
         optionsOrProvider.feederGatewayUrl
       );
-      this.gatewayUrl = this.parseUrlOrPath(this.baseUrl, 'gateway', optionsOrProvider.gatewayUrl);
+      this.gatewayUrl = buildUrl(this.baseUrl, 'gateway', optionsOrProvider.gatewayUrl);
 
       this.chainId =
         optionsOrProvider.chainId ??
@@ -109,16 +109,6 @@ export class SequencerProvider implements ProviderInterface {
       console.error(`Could not parse baseUrl: ${baseUrl}`);
     }
     return StarknetChainId.TESTNET;
-  }
-
-  private parseUrlOrPath(baseUrl: string, defaultPath: string, urlOrPath?: string) {
-    if (urlOrPath) {
-      if (isUrl(urlOrPath)) {
-        return urlOrPath;
-      }
-      return urljoin(baseUrl, urlOrPath);
-    }
-    return urljoin(baseUrl, defaultPath);
   }
 
   private getFetchUrl(endpoint: keyof Sequencer.Endpoints) {

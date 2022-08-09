@@ -1,13 +1,14 @@
-/**
- * RegExps.
- * A URL must match #1 and then at least one of #2/#3.
- * Use two levels of REs to avoid REDOS.
- */
+import urljoin from 'url-join';
 
 /**
  * Inspired from https://github.com/segmentio/is-url
  */
 
+/**
+ * RegExps.
+ * A URL must match #1 and then at least one of #2/#3.
+ * Use two levels of REs to avoid REDOS.
+ */
 const protocolAndDomainRE = /^(?:\w+:)?\/\/(\S+)$/;
 
 const localhostDomainRE = /^localhost[:?\d]*(?:[^:?\d]\S*)?$/;
@@ -18,7 +19,11 @@ const nonLocalhostDomainRE = /^[^\s.]+\.\S{2,}$/;
  * @param {String} s
  * @return {Boolean}
  */
-export function isUrl(s: string): boolean {
+export function isUrl(s?: string): boolean {
+  if (!s) {
+    return false;
+  }
+
   if (typeof s !== 'string') {
     return false;
   }
@@ -41,4 +46,8 @@ export function isUrl(s: string): boolean {
   }
 
   return false;
+}
+
+export function buildUrl(baseUrl: string, defaultPath: string, urlOrPath?: string) {
+  return isUrl(urlOrPath) ? urlOrPath! : urljoin(baseUrl, urlOrPath ?? defaultPath);
 }
