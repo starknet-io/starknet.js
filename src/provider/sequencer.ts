@@ -31,6 +31,7 @@ import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from
 import { parseContract, wait } from '../utils/provider';
 import { SequencerAPIResponseParser } from '../utils/responseParser/sequencer';
 import { randomAddress } from '../utils/stark';
+import { buildUrl } from '../utils/url';
 import { GatewayError, HttpError } from './errors';
 import { ProviderInterface } from './interface';
 import { BlockIdentifier, getFormattedBlockIdentifier } from './utils';
@@ -74,9 +75,13 @@ export class SequencerProvider implements ProviderInterface {
       this.gatewayUrl = urljoin(this.baseUrl, 'gateway');
     } else {
       this.baseUrl = optionsOrProvider.baseUrl;
-      this.feederGatewayUrl =
-        optionsOrProvider.feederGatewayUrl ?? urljoin(this.baseUrl, 'feeder_gateway');
-      this.gatewayUrl = optionsOrProvider.gatewayUrl ?? urljoin(this.baseUrl, 'gateway');
+      this.feederGatewayUrl = buildUrl(
+        this.baseUrl,
+        'feeder_gateway',
+        optionsOrProvider.feederGatewayUrl
+      );
+      this.gatewayUrl = buildUrl(this.baseUrl, 'gateway', optionsOrProvider.gatewayUrl);
+
       this.chainId =
         optionsOrProvider.chainId ??
         SequencerProvider.getChainIdFromBaseUrl(optionsOrProvider.baseUrl);
