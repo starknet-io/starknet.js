@@ -20,7 +20,7 @@ await defaultProvider.waitForTransaction(erc20Response.transaction_hash);
 ## Get the erc20 contract address and create the contact object
 
 ```javascript
-const erc20Address = erc20Response.address;
+const erc20Address = erc20Response.contract_address;
 const erc20 = new Contract(compiledErc20.abi, erc20Address);
 ```
 
@@ -33,7 +33,10 @@ erc20.connect(account);
 
 const { transaction_hash: mintTxHash } = await erc20.mint(
   account.address,
-  "1000"
+  "1000",
+  { 
+    maxFee: "1" 
+  }
 );
 
 console.log(`Waiting for Tx to be Accepted on Starknet - Minting...`);
@@ -64,7 +67,7 @@ const { transaction_hash: transferTxHash } = await account.execute(
     calldata: [erc20Address, "10"],
   },
   undefined,
-  { maxFee: "0" }
+  { maxFee: "1" }
 );
 
 // Wait for the invoke transaction to be accepted on StarkNet

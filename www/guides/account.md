@@ -83,7 +83,7 @@ Once account contract is deployed [Account](../docs/API/account.md) instance can
 ```js
 const account = new Account(
     defaultProvider,
-    accountResponse.address,
+    accountResponse.contract_address,
     starkKeyPair
 );
 ```
