@@ -2,7 +2,7 @@
 
 ### Bug Fixes
 
-- intendations in provider.md ([4a310c6](https://github.com/0xs34n/starknet.js/commit/4a310c6c992c77f9f6729a70c1af14481cd891f7))
+- indentations in provider.md ([4a310c6](https://github.com/0xs34n/starknet.js/commit/4a310c6c992c77f9f6729a70c1af14481cd891f7))
 - **sequenceProvider:** feedergatewayUrl and gatewayUrl ([e236d23](https://github.com/0xs34n/starknet.js/commit/e236d2352e3fbb0f78965decac5893217347ceb7))
 
 ### Features
