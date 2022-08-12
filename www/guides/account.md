@@ -76,10 +76,6 @@ await defaultProvider.waitForTransaction(accountResponse.transaction_hash);
 
 Once account contract is deployed [Account](../docs/API/account.md) instance can be created. Use your new account instance to sign transactions, messages or verify signatures! 
 
-> **Note**
-> 
-> Make sure your Account has enough funds to execute invocations. Use this [faucet](https://faucet.goerli.starknet.io/) for funding on testnet.
-
 ```js
 const account = new Account(
     defaultProvider,
@@ -87,3 +83,7 @@ const account = new Account(
     starkKeyPair
 );
 ```
+
+## Fund your new account!
+
+Make sure your Account has enough funds to execute invocations. Use this [faucet](https://faucet.goerli.starknet.io/) for funding on testnet.

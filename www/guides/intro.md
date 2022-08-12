@@ -16,6 +16,8 @@ npm install starknet@next
 
 Please check the StarkNet documentation <ins>[here](https://www.cairo-lang.org/docs/hello_starknet/intro.html)</ins> to compile starknet contracts.
 
+Additional helpful resources can also be found at [OpenZeppelin](https://docs.openzeppelin.com/contracts-cairo/0.3.1/) documentation site.
+
 ## Full example with account & erc20
 
-Please see workshop <ins>[here](https://github.com/0xs34n/starknet.js-workshop)</ins>
+Please take a look at our workshop <ins>[here](https://github.com/0xs34n/starknet.js-workshop)</ins>.
