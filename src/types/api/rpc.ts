@@ -99,8 +99,8 @@ export namespace RPC {
     | boolean;
 
   export type EventFilter = {
-    fromBlock: string;
-    toBlock: string;
+    fromBlock: number;
+    toBlock: number;
     address: string;
     keys: string[];
     page_size: number;
