@@ -12,7 +12,7 @@ export class MerkleTree {
     this.root = this.build(leafHashes);
   }
 
-  build(leaves: string[]): string {
+  private build(leaves: string[]): string {
     if (leaves.length === 1) {
       return leaves[0];
     }
@@ -35,7 +35,7 @@ export class MerkleTree {
     return pedersen([aSorted, bSorted]);
   }
 
-  getProof(leaf: string, branch = this.leaves, hashPath: string[] = []): string[] {
+  public getProof(leaf: string, branch = this.leaves, hashPath: string[] = []): string[] {
     if (branch.length === 1) {
       return hashPath;
     }
