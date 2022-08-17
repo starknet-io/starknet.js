@@ -6,7 +6,7 @@ sidebar_position: 6
 
 Util functions are provided so you can use low level functions in your application.
 
-## `address`
+## **address**
 
 the address helpers can be imported using:
 
@@ -16,7 +16,9 @@ import { address } from 'starknet.js';
 
 <br/>
 
-### `getChecksumAddress(address: BigNumberish): string`
+### getChecksumAddress
+
+`getChecksumAddress(address: BigNumberish): string`
 
 This function accepts an address as a `BigNumberish` and returns the checksummed address as a string.
 An example:
@@ -33,45 +35,63 @@ console.log(checksummedAddress); // 0x02FD23D9182193775423497Fc0c472E156C57C69E4
 
 <br/>
 
-### `validateChecksumAddress(address: string): boolean`
+### validateChecksumAddress
 
-This function validates the checksum address. It returns true if the address is valid, false otherwise.
+`validateChecksumAddress(address: string): boolean`
+
+This function validates the checksum address.
+
+Returns true if the address is valid, false otherwise.
 
 <hr />
 
-## `stark`
+## stark
 
 Functions for stark specific manipulations.
 
 <br/>
 
-### `compressProgram(jsonProgram: Program | string): CompressedProgram`
+### compressProgram
+
+`compressProgram(jsonProgram: Program | string): CompressedProgram`
 
 Function to compress compiled cairo program. Accepts a json file representing the compiled cairo program and returns a compressed cairo program.
 
 <br/>
 
-### `randomAddress(): string`
+### randomAddress
+
+`randomAddress(): string`
 
 Function that generates a random contract address.
 
 <br/>
 
-### `makeAddress(input: string): string`
+### makeAddress
 
-Function that turns an incompatible address string into stark address format. Returns a string.
+`makeAddress(input: string): string`
+
+Function that turns an incompatible address string into stark address format. 
+
+Returns a string.
 
 Example: `0xdFD0F27FCe99b50909de0bDD328Aed6eAbe76BC5` -> `0xdfd0f27fce99b50909de0bdd328aed6eabe76bc5`
 
 <br/>
 
-### `formatSignature(sig?: Signature): string[]`
+### formatSignature
 
-Function that formats a Signature to BigNum and then to string array. Returns a string array.
+`formatSignature(sig?: Signature): string[]`
+
+Function that formats a Signature to BigNum and then to string array. 
+
+Returns a string array.
 
 <br/>
 
-### `compileCalldata(args: RawArgs): Calldata`
+### compileCalldata
+
+`compileCalldata(args: RawArgs): Calldata`
 
 Function that creates calldata that gets sent to the contract.
 
@@ -88,7 +108,9 @@ await this.callContract({
 
 <br/>
 
-### `estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: number = 0.5): BN`
+### estimatedFeeToMaxFee
+
+`estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: number = 0.5): BN`
 
 Function that calculates and returns maximum fee based on the previously estimated one.
 
@@ -96,7 +118,7 @@ Returns a BN.
 
 <hr />
 
-## `number`
+## **number**
 
 Various number formatting functions.
 
@@ -108,37 +130,55 @@ export type BigNumberish = string | number | BN;
 
 <br/>
 
-### `isHex(hex: string): boolean`
+### isHex
+
+`isHex(hex: string): boolean`
 
 Check if number is in hex format.
 
 <br/>
 
-### `toBN(number: BigNumberish, base?: number | 'hex'): BN`
+### toBN
 
-Converts BigNumberish to BN. Returns a BN.
+`toBN(number: BigNumberish, base?: number | 'hex'): BN`
 
-<br/>
+Converts BigNumberish to BN. 
 
-### `toHex(number: BN): string`
-
-Converts BN to hex. Returns a string.
+Returns a BN.
 
 <br/>
 
-### `hexToDecimalString(hex: string): string`
+### toHex
+
+`toHex(number: BN): string`
+
+Converts BN to hex. 
+
+Returns a string.
+
+<br/>
+
+### hexToDecimalString
+
+`hexToDecimalString(hex: string): string`
 
 Converts hex string to decimal string.
 
 <br/>
 
-### `toFelt(num: BigNumberish): string`
+### toFelt
 
-Converts BN to Felt. Returns a string.
+`toFelt(num: BigNumberish): string`
+
+Converts BN to Felt. 
+
+Returns a string.
 
 <br/>
 
-### `assertInRange(input: BigNumberish, lowerBound: BigNumberish, upperBound: BigNumberish, inputName = '')`
+### assertInRange
+
+`assertInRange(input: BigNumberish, lowerBound: BigNumberish, upperBound: BigNumberish, inputName = '')`
 
 Asserts input is equal to or greater then `lowerBound` and lower then `upperBound`. Assert message specifies inputName.
 `input`, `lowerBound`, and `upperBound` should be of type BN.
@@ -146,7 +186,9 @@ Asserts input is equal to or greater then `lowerBound` and lower then `upperBoun
 
 <br/>
 
-### `bigNumberishArrayToDecimalStringArray(rawCalldata: BigNumberish[]): string[]`
+### bigNumberishArrayToDecimalStringArray
+
+`bigNumberishArrayToDecimalStringArray(rawCalldata: BigNumberish[]): string[]`
 
 Convert BigNumberish array to decimal array. Used for signature conversion.
 
@@ -164,7 +206,7 @@ const signature = await this.signer.signTransaction(transactions, signerDetails)
 
 <hr />
 
-## `uint256`
+## **uint256**
 
 ```js
 // Represents an integer in the range [0, 2^256).
@@ -178,56 +220,78 @@ export interface Uint256 {
 
 <br/>
 
-### `uint256ToBN(uint256: Uint256): BN`
+### uint256ToBN
+
+`uint256ToBN(uint256: Uint256): BN`
 
 Function to convert `Uint256` to `BN` (big number), which uses the `bn.js` library.
 
 <br/>
 
-### `isUint256(bn: BigNumberish): boolean`
+### isUint256
+
+`isUint256(bn: BigNumberish): boolean`
 
 Function to check if `BN` is smaller or equal to `2**256-1`.
 
 <br/>
 
-### `bnToUint256(bignumber: BigNumberish): Uint256`
+### bnToUint256
+
+`bnToUint256(bignumber: BigNumberish): Uint256`
 
 Function to convert `BN` to `Uint256`.
 
 <hr />
 
-## `hash`
+## **hash**
 
 Various hashing helpers.
 
-### `starknetKeccak(value: string): BN`
+### starknetKeccak
+
+`starknetKeccak(value: string): BN`
 
 Function to get the starknet keccak hash from a string. Returns starknet keccak hash as BigNumber.
-nction to get the starknet keccak hash from a string. Returns starknet keccak hash as BigNumber.
+nction to get the starknet keccak hash from a string. 
+
+Returns starknet keccak hash as BigNumber.
 
 <br/>
 
-### `getSelectorFromName(funcName: string)`
+### getSelectorFromName
 
-Function to get the hex selector from a given function name. Returns hex selector of given abi function name.
+`getSelectorFromName(funcName: string)`
 
-<br/>
+Function to get the hex selector from a given function name. 
 
-### `pedersen(input: [BigNumberish, BigNumberish])`
-
-<br/>
-
-Function to get the Pedersen hash for two arguments. Returns a string.
-
-### `computeHashOnElements(data: BigNumberish[])`
+Returns hex selector of given abi function name.
 
 <br/>
 
-Function to compute a Pedersen hash on a array of elements. Returns a string.
+### pedersen
+
+`pedersen(input: [BigNumberish, BigNumberish])`
+
+Function to get the Pedersen hash for two arguments. 
+
+Returns a string.
 
 <br/>
 
-### `calculateTransactionHashCommon(txHashPrefix: TransactionHashPrefix, version: BigNumberish,contractAddress: BigNumberish, entryPointSelector: BigNumberish, calldata: BigNumberish[], maxFee: BigNumberish, chainId: StarknetChainId, additionalData: BigNumberish[] = []): string`
+### computeHashOnElements
+
+`computeHashOnElements(data: BigNumberish[])`
+
+Function to compute a Pedersen hash on a array of elements. 
+
+Returns a string.
+
+<br/>
+
+### calculateTransactionHashCommon
+
+`calculateTransactionHashCommon(txHashPrefix: TransactionHashPrefix, version: BigNumberish,contractAddress: BigNumberish, entryPointSelector: BigNumberish, calldata: BigNumberish[], maxFee: BigNumberish, chainId: StarknetChainId, additionalData: BigNumberish[] = []): string`
 
 Calculates the transaction hash in the StarkNet network - a unique identifier of the transaction.
 
@@ -235,7 +299,9 @@ Called internally in `calculateDeployTransactionHash` and `calculcateTransaction
 
 <br/>
 
-### `calculateDeployTransactionHash(contractAddress: BigNumberish, constructorCalldata: BigNumberish[], version: BigNumberish, chainId: StarknetChainId): string`
+### calculateDeployTransactionHash
+
+`calculateDeployTransactionHash(contractAddress: BigNumberish, constructorCalldata: BigNumberish[], version: BigNumberish, chainId: StarknetChainId): string`
 
 Function that calculates the deployment transaction hash in the StarkNet network.
 
@@ -243,7 +309,9 @@ Internally calls `calculateTransactionHashCommon` with `TransactionHashPrefix.DE
 
 <br/>
 
-### `calculcateTransactionHash(contractAddress: BigNumberish, version: BigNumberish, entryPointSelector: BigNumberish, calldata: BigNumberish[], maxFee: BigNumberish, chainId: StarknetChainId): string`
+### calculcateTransactionHash
+
+`calculcateTransactionHash(contractAddress: BigNumberish, version: BigNumberish, entryPointSelector: BigNumberish, calldata: BigNumberish[], maxFee: BigNumberish, chainId: StarknetChainId): string`
 
 Function that internally calls `calculateTransactionHashCommon`, with `TransactionHashPrefix.INVOKE`.
 
@@ -260,6 +328,10 @@ const hashMsg = calculcateTransactionHash(
 
 <br/>
 
-### `calculateContractAddressFromHash(salt: BigNumberish, classHash: BigNumberish, constructorCalldata: RawCalldata, deployerAddress: BigNumberish)`
+### calculateContractAddressFromHash
 
-Function that calculates contract address from hash. Returns a string.
+`calculateContractAddressFromHash(salt: BigNumberish, classHash: BigNumberish, constructorCalldata: RawCalldata, deployerAddress: BigNumberish)`
+
+Function that calculates contract address from hash.
+
+Returns a string.
