@@ -2,7 +2,7 @@ import { MerkleTree, proofMerklePath } from '../../src/utils/merkle';
 
 describe('MerkleTree class', () => {
   describe('generate roots', () => {
-    test('should generate valid root for 1 elemements', async () => {
+    test('should generate valid root for 1 elements', async () => {
       const leaves = ['0x1'];
       const tree = new MerkleTree(leaves);
 
@@ -10,7 +10,7 @@ describe('MerkleTree class', () => {
 
       expect(tree.root).toBe(manualMerkle);
     });
-    test('should generate valid root for 2 elemements', async () => {
+    test('should generate valid root for 2 elements', async () => {
       const leaves = ['0x1', '0x2'];
       const tree = new MerkleTree(leaves);
 
@@ -18,7 +18,7 @@ describe('MerkleTree class', () => {
 
       expect(tree.root).toBe(manualMerkle);
     });
-    test('should generate valid root for 4 elemements', async () => {
+    test('should generate valid root for 4 elements', async () => {
       const leaves = ['0x1', '0x2', '0x3', '0x4'];
       const tree = new MerkleTree(leaves);
 
@@ -29,7 +29,7 @@ describe('MerkleTree class', () => {
 
       expect(tree.root).toBe(manualMerkle);
     });
-    test('should generate valid root for 6 elemements', async () => {
+    test('should generate valid root for 6 elements', async () => {
       const leaves = ['0x1', '0x2', '0x3', '0x4', '0x5', '0x6'];
       const tree = new MerkleTree(leaves);
 
@@ -43,7 +43,7 @@ describe('MerkleTree class', () => {
 
       expect(tree.root).toBe(manualMerkle);
     });
-    test('should generate valid root for 7 elemements', async () => {
+    test('should generate valid root for 7 elements', async () => {
       const leaves = ['0x1', '0x2', '0x3', '0x4', '0x5', '0x6', '0x7'];
       const tree = new MerkleTree(leaves);
 
