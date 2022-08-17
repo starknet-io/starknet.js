@@ -21,11 +21,13 @@ export const ec = new EC(
   })
 );
 
-/*
- The function _truncateToN in lib/elliptic/ec/index.js does a shift-right of 4 bits
- in some cases. This function does the opposite operation so that
-   _truncateToN(fixMessage(msg)) == msg.
-*/
+/**
+ * The function _truncateToN in lib/elliptic/ec/index.js does a shift-right of 4 bits
+ * in some cases. This function does the opposite operation so that
+ * _truncateToN(fixMessage(msg)) == msg.
+ * 
+ * @param msg
+ */
 function fixMessage(msg: string) {
   const pureHex = msg.replace(/^0x0*/, '');
 
@@ -64,11 +66,12 @@ export function getKeyPairFromPublicKey(publicKey: BigNumberish): KeyPair {
   return ec.keyFromPublic(removeHexPrefix(toHex(publicKeyBn)), 'hex');
 }
 
-/*
- Signs a message using the provided key.
- key should be an KeyPair with a valid private key.
- Returns an Signature.
-*/
+/**
+ * Signs a message using the provided key.
+ * 
+ * @param keyPair should be an KeyPair with a valid private key.
+ * @returns an Signature.
+ */
 export function sign(keyPair: KeyPair, msgHash: string): Signature {
   const msgHashBN = toBN(addHexPrefix(msgHash));
   // Verify message hash has valid length.
@@ -89,12 +92,13 @@ function chunkArray(arr: any[], n: number): any[][] {
     .map((_, i) => arr.slice(i * n, i * n + n));
 }
 
-/*
-   Verifies a message using the provided key.
-   key should be an KeyPair with a valid public key.
-   msgSignature should be an Signature.
-   Returns a boolean true if the verification succeeds.
-  */
+/**
+ * Verifies a message using the provided key.
+ * 
+ * @param keyPair should be an KeyPair with a valid public key.
+ * @param sig should be an Signature.
+ * @returns true if the verification succeeds.
+ */
 export function verify(keyPair: KeyPair | KeyPair[], msgHash: string, sig: Signature): boolean {
   const keyPairArray = Array.isArray(keyPair) ? keyPair : [keyPair];
   const msgHashBN = toBN(addHexPrefix(msgHash));

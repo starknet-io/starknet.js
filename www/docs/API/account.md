@@ -41,7 +41,7 @@ The _options_ object may include any of:
 
 ###### _EstimateFeeResponse_
 
-```ts
+```typescript
 {
   overall_fee: BN;
   gas_consumed?: BN;
@@ -63,7 +63,7 @@ The _transactionsDetail_ object may include any of:
 
 ###### _AddTransactionResponse_
 
-```ts
+```typescript
 {
   transaction_hash: string;
 };
@@ -77,7 +77,7 @@ Creates a signature from the passed data.
 
 ###### _Signature_
 
-```ts
+```typescript
 string[];
 ```
 
