@@ -16,15 +16,15 @@ Contracts allow you to transform Cairo values, like `Uint256` to `BigNumber`. It
 
 `contract.connect(providerOrAccount)` _for changing the provider or account_
 
-## Contract properties
+## Properties
 
 contract.**address** => _string_
 
-The address the contract was constructed/connected with
+The address the contract was constructed/connected with.
 
 contract.**providerOrAccount** => _ProviderInterface | AccountInterface_
 
-Provider or account that are used to interact with the network
+Provider or account that are used to interact with the network.
 
 contract.**deployTransactionHash** => _string | null_
 
@@ -32,9 +32,9 @@ If the Contract object is the result of a ContractFactory deployment, this is th
 
 contract.**abi** => _Abi_
 
-The ABI the contract was constructed with
+The ABI the contract was constructed with.
 
-## Contract methods
+## Methods
 
 contract.**deployed**() => _Promise < Contract >_
 

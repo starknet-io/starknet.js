@@ -16,32 +16,32 @@ For creating new instance of Account, account contract must be deployed. Also th
 
 `new starknet.Account(Provider, address, starkKeyPair)`
 
-## Account Properties
+## Properties
 
 account.**address** => _string_
 
-The address of the account contract
+The address of the account contract.
 
-## Account methods
+## Methods
 
 account.**getNonce()** => _Promise < string >_
 
-Gets new Nonce for the next transaction
+Gets new Nonce for the next transaction.
 
 <hr />
 
 account.**estimateFee**(calls [ , options ]) => _Promise < EstimateFeeResponse >_
 
-Gets the estimated fee for the call(s)
+Gets the estimated fee for the call(s).
 
 The _options_ object may include any of:
 
 - options.**blockIdentifier** - Block Identifier for the transaction
 - options.**nonce** - Nonce for the transaction
 
-###### EstimateFeeResponse
+###### _EstimateFeeResponse_
 
-```
+```ts
 {
   overall_fee: BN;
   gas_consumed?: BN;
@@ -61,9 +61,9 @@ The _transactionsDetail_ object may include any of:
 - transactionsDetail.**nonce** - Nonce for the transaction
 - transactionsDetail.**version** - Version for the transaction (default is 0)
 
-###### AddTransactionResponse
+###### _AddTransactionResponse_
 
-```
+```ts
 {
   transaction_hash: string;
 };
@@ -73,11 +73,11 @@ The _transactionsDetail_ object may include any of:
 
 account.**signMessage**(typedData) => _Promise < Signature >_
 
-Creates a signature from the passed data
+Creates a signature from the passed data.
 
-###### Signature
+###### _Signature_
 
-```
+```ts
 string[];
 ```
 
@@ -85,20 +85,22 @@ string[];
 
 account.**hashMessage**(typedData) => _Promise < string >_
 
-Creates a hash from the passed data
+Creates a hash from the passed data.
 
 <hr />
 
 account.**verifyMessageHash**(hash, signature) => _Promise < boolean >_
 
-Verify a signature of a given hash
+Verify a signature of a given hash.
 
-**WARNING** This method is not recommended, use verifyMessage instead
+> **WARNING** 
+>
+> This method is not recommended, use `verifyMessage` instead
 
 <hr />
 
 account.**verifyMessage**(typedData, signature) => _Promise < boolean >_
 
-Verify a signature of a JSON object
+Verify a signature of a JSON object.
 
 <hr />
