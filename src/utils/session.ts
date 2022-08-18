@@ -1,9 +1,8 @@
 import type { AccountInterface } from '../account';
 import { Signature } from '../types';
-import { getSelectorFromName, pedersen } from './hash';
+import { pedersen } from './hash';
 import { MerkleTree } from './merkle';
-import { isHex } from './number';
-import { StarkNetDomain } from './typedData';
+import { StarkNetDomain, prepareSelector } from './typedData';
 
 interface Policy {
   contractAddress: string;
@@ -27,13 +26,13 @@ export interface SignedSession extends PreparedSession {
   signature: Signature;
 }
 
+function preparePolicy({ contractAddress, selector }: Policy): string {
+  return pedersen([contractAddress, prepareSelector(selector)]);
+}
+
 export function prepareSession(session: RequestSession): PreparedSession {
   const { policies, ...rest } = session;
-  const { root } = new MerkleTree(
-    policies.map(({ contractAddress, selector }) =>
-      pedersen([contractAddress, isHex(selector) ? selector : getSelectorFromName(selector)])
-    )
-  );
+  const { root } = new MerkleTree(policies.map(preparePolicy));
   return { ...rest, root };
 }
 
@@ -46,10 +45,14 @@ export async function createSession(
   const signature = await account.signMessage({
     primaryType: 'Session',
     types: {
+      Policy: [
+        { name: 'contractAddress', type: 'felt' },
+        { name: 'selector', type: 'selector' },
+      ],
       Session: [
         { name: 'key', type: 'felt' },
         { name: 'expires', type: 'felt' },
-        { name: 'root', type: 'felt' },
+        { name: 'root', type: 'merkletree', contains: 'Policy*' },
       ],
       StarkNetDomain: [
         { name: 'name', type: 'felt' },
@@ -61,7 +64,7 @@ export async function createSession(
     message: {
       key,
       expires,
-      root,
+      root: session.policies,
     },
   });
   return {

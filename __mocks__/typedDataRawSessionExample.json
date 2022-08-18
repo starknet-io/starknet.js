@@ -1,0 +1,25 @@
+{
+  "primaryType": "Session",
+  "types": {
+    "Session": [
+      { "name": "key", "type": "felt" },
+      { "name": "expires", "type": "felt" },
+      { "name": "root", "type": "raw" }
+    ],
+    "StarkNetDomain": [
+      { "name": "name", "type": "felt" },
+      { "name": "version", "type": "felt" },
+      { "name": "chain_id", "type": "felt" }
+    ]
+  },
+  "domain": {
+    "name": "StarkNet Mail",
+    "version": "1",
+    "chain_id": 1
+  },
+  "message": {
+    "key": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "expires": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "root": "0x0"
+  }
+}
