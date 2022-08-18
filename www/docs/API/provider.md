@@ -285,7 +285,7 @@ Gets the transaction trace from a tx hash.
     events: Array<any>;
     messages: Array<any>;
     };
-  signature: Signature;
+    signature: Signature;
 }
 ```
 

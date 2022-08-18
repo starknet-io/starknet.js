@@ -4,17 +4,15 @@ sidebar_position: 6
 
 # Utils
 
-Util functions are provided so you can use low level functions in your application.
+Util functions are provided so you can use various low level functions in your application.
 
 ## **address**
 
-the address helpers can be imported using:
+The address helpers can be imported using:
 
 ```js
 import { address } from 'starknet.js';
 ```
-
-<br/>
 
 ### getChecksumAddress
 
@@ -33,8 +31,6 @@ const checksummedAddress = address.getChecksumAddress(addressToCheck);
 console.log(checksummedAddress); // 0x02FD23D9182193775423497Fc0c472E156C57C69E4089a1967fb288a2D84e914
 ```
 
-<br/>
-
 ### validateChecksumAddress
 
 `validateChecksumAddress(address: string): boolean`
@@ -45,11 +41,9 @@ Returns true if the address is valid, false otherwise.
 
 <hr />
 
-## stark
+## **stark**
 
 Functions for stark specific manipulations.
-
-<br/>
 
 ### compressProgram
 
@@ -57,15 +51,11 @@ Functions for stark specific manipulations.
 
 Function to compress compiled cairo program. Accepts a json file representing the compiled cairo program and returns a compressed cairo program.
 
-<br/>
-
 ### randomAddress
 
 `randomAddress(): string`
 
 Function that generates a random contract address.
-
-<br/>
 
 ### makeAddress
 
@@ -77,8 +67,6 @@ Returns a string.
 
 Example: `0xdFD0F27FCe99b50909de0bDD328Aed6eAbe76BC5` -> `0xdfd0f27fce99b50909de0bdd328aed6eabe76bc5`
 
-<br/>
-
 ### formatSignature
 
 `formatSignature(sig?: Signature): string[]`
@@ -86,8 +74,6 @@ Example: `0xdFD0F27FCe99b50909de0bDD328Aed6eAbe76BC5` -> `0xdfd0f27fce99b50909de
 Function that formats a Signature to BigNum and then to string array. 
 
 Returns a string array.
-
-<br/>
 
 ### compileCalldata
 
@@ -105,8 +91,6 @@ await this.callContract({
     }),
 });
 ```
-
-<br/>
 
 ### estimatedFeeToMaxFee
 
@@ -128,15 +112,11 @@ Various number formatting functions.
 export type BigNumberish = string | number | BN;
 ```
 
-<br/>
-
 ### isHex
 
 `isHex(hex: string): boolean`
 
 Check if number is in hex format.
-
-<br/>
 
 ### toBN
 
@@ -146,8 +126,6 @@ Converts BigNumberish to BN.
 
 Returns a BN.
 
-<br/>
-
 ### toHex
 
 `toHex(number: BN): string`
@@ -156,15 +134,11 @@ Converts BN to hex.
 
 Returns a string.
 
-<br/>
-
 ### hexToDecimalString
 
 `hexToDecimalString(hex: string): string`
 
 Converts hex string to decimal string.
-
-<br/>
 
 ### toFelt
 
@@ -174,8 +148,6 @@ Converts BN to Felt.
 
 Returns a string.
 
-<br/>
-
 ### assertInRange
 
 `assertInRange(input: BigNumberish, lowerBound: BigNumberish, upperBound: BigNumberish, inputName = '')`
@@ -183,8 +155,6 @@ Returns a string.
 Asserts input is equal to or greater then `lowerBound` and lower then `upperBound`. Assert message specifies inputName.
 `input`, `lowerBound`, and `upperBound` should be of type BN.
 `inputName` should be a string.
-
-<br/>
 
 ### bigNumberishArrayToDecimalStringArray
 
@@ -204,8 +174,6 @@ const signature = await this.signer.signTransaction(transactions, signerDetails)
 }
 ```
 
-<hr />
-
 ## **uint256**
 
 ```js
@@ -218,23 +186,17 @@ export interface Uint256 {
 }
 ```
 
-<br/>
-
 ### uint256ToBN
 
 `uint256ToBN(uint256: Uint256): BN`
 
 Function to convert `Uint256` to `BN` (big number), which uses the `bn.js` library.
 
-<br/>
-
 ### isUint256
 
 `isUint256(bn: BigNumberish): boolean`
 
 Function to check if `BN` is smaller or equal to `2**256-1`.
-
-<br/>
 
 ### bnToUint256
 
@@ -253,11 +215,8 @@ Various hashing helpers.
 `starknetKeccak(value: string): BN`
 
 Function to get the starknet keccak hash from a string. Returns starknet keccak hash as BigNumber.
-nction to get the starknet keccak hash from a string. 
 
 Returns starknet keccak hash as BigNumber.
-
-<br/>
 
 ### getSelectorFromName
 
@@ -267,8 +226,6 @@ Function to get the hex selector from a given function name.
 
 Returns hex selector of given abi function name.
 
-<br/>
-
 ### pedersen
 
 `pedersen(input: [BigNumberish, BigNumberish])`
@@ -276,8 +233,6 @@ Returns hex selector of given abi function name.
 Function to get the Pedersen hash for two arguments. 
 
 Returns a string.
-
-<br/>
 
 ### computeHashOnElements
 
@@ -287,8 +242,6 @@ Function to compute a Pedersen hash on a array of elements.
 
 Returns a string.
 
-<br/>
-
 ### calculateTransactionHashCommon
 
 `calculateTransactionHashCommon(txHashPrefix: TransactionHashPrefix, version: BigNumberish,contractAddress: BigNumberish, entryPointSelector: BigNumberish, calldata: BigNumberish[], maxFee: BigNumberish, chainId: StarknetChainId, additionalData: BigNumberish[] = []): string`
@@ -297,8 +250,6 @@ Calculates the transaction hash in the StarkNet network - a unique identifier of
 
 Called internally in `calculateDeployTransactionHash` and `calculcateTransactionHash`.
 
-<br/>
-
 ### calculateDeployTransactionHash
 
 `calculateDeployTransactionHash(contractAddress: BigNumberish, constructorCalldata: BigNumberish[], version: BigNumberish, chainId: StarknetChainId): string`
@@ -306,8 +257,6 @@ Called internally in `calculateDeployTransactionHash` and `calculcateTransaction
 Function that calculates the deployment transaction hash in the StarkNet network.
 
 Internally calls `calculateTransactionHashCommon` with `TransactionHashPrefix.DEPLOY`.
-
-<br/>
 
 ### calculcateTransactionHash
 
@@ -326,8 +275,6 @@ const hashMsg = calculcateTransactionHash(
 );
 ```
 
-<br/>
-
 ### calculateContractAddressFromHash
 
 `calculateContractAddressFromHash(salt: BigNumberish, classHash: BigNumberish, constructorCalldata: RawCalldata, deployerAddress: BigNumberish)`
@@ -335,3 +282,57 @@ const hashMsg = calculcateTransactionHash(
 Function that calculates contract address from hash.
 
 Returns a string.
+
+<hr />
+
+## **ellipticCurve**
+
+Wrapper around the javascript `elliptic` library with additional functionality.
+
+### genKeyPair
+
+`ec.genKeyPair()`
+
+Generate a random key pair.
+
+### getKeyPair
+
+`getKeyPair(pk: BigNumberish): KeyPair`
+
+Get a key pair from a private key.
+
+### getStarkKey
+
+`getStarkKey(keyPair: KeyPair): string`
+
+Public key defined over a Stark-friendly elliptic curve that is different from the standard Ethereum elliptic curve
+
+### getKeyPairFromPublicKey
+
+`getKeyPairFromPublicKey(publicKey: BigNumberish): KeyPair`
+
+Takes a public key and casts it into `elliptic` KeyPair format.
+
+Returns keyPair with public key only, which can be used to verify signatures, but cant sign anything.
+
+### sign
+
+`sign(keyPair: KeyPair, msgHash: string): Signature`
+
+Signs a message using the provided key.
+
+keyPair should be an KeyPair with a valid private key.
+
+Returns an Signature.
+
+### verify
+
+`verify(keyPair: KeyPair | KeyPair[], msgHash: string, sig: Signature): boolean`
+
+Verifies a message using the provided key.
+
+keyPair should be an KeyPair with a valid public key.
+
+sig should be an Signature.
+   
+Returns true if the verification succeeds.
