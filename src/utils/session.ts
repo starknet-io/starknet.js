@@ -9,16 +9,13 @@ interface Policy {
   selector: string;
 }
 
-interface BaseSession {
+export interface RequestSession {
   key: string;
   expires: number;
-}
-
-export interface RequestSession extends BaseSession {
   policies: Policy[];
 }
 
-export interface PreparedSession extends BaseSession {
+export interface PreparedSession extends RequestSession {
   root: string;
 }
 
@@ -30,10 +27,13 @@ function preparePolicy({ contractAddress, selector }: Policy): string {
   return pedersen([contractAddress, prepareSelector(selector)]);
 }
 
+export function createMerkleTreeForPolicies(policies: Policy[]): MerkleTree {
+  return new MerkleTree(policies.map(preparePolicy));
+}
+
 export function prepareSession(session: RequestSession): PreparedSession {
-  const { policies, ...rest } = session;
-  const { root } = new MerkleTree(policies.map(preparePolicy));
-  return { ...rest, root };
+  const { root } = createMerkleTreeForPolicies(session.policies);
+  return { ...session, root };
 }
 
 export async function createSession(
@@ -41,7 +41,7 @@ export async function createSession(
   account: AccountInterface,
   domain: StarkNetDomain = {}
 ): Promise<SignedSession> {
-  const { key, expires, root } = prepareSession(session);
+  const { expires, key, policies, root } = prepareSession(session);
   const signature = await account.signMessage({
     primaryType: 'Session',
     types: {
@@ -69,6 +69,7 @@ export async function createSession(
   });
   return {
     key,
+    policies,
     expires,
     root,
     signature,

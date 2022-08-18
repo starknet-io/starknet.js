@@ -1,3 +1,5 @@
+import assert from 'minimalistic-assert';
+
 import { ZERO } from '../constants';
 import { ProviderInterface, ProviderOptions } from '../provider';
 import { SignerInterface } from '../signer';
@@ -12,8 +14,9 @@ import {
   KeyPair,
 } from '../types';
 import { feeTransactionVersion, transactionVersion } from '../utils/hash';
+import { MerkleTree } from '../utils/merkle';
 import { BigNumberish, toBN } from '../utils/number';
-import type { SignedSession } from '../utils/session';
+import { SignedSession, createMerkleTreeForPolicies } from '../utils/session';
 import { compileCalldata, estimatedFeeToMaxFee } from '../utils/stark';
 import { fromCallsToExecuteCalldataWithNonce } from '../utils/transaction';
 import { Account } from './default';
@@ -23,6 +26,8 @@ const SESSION_PLUGIN_CLASS_HASH =
   '0x6a184757e350de1fe3a544037efbef6434724980a572f294c90555dadc20052';
 
 export class SessionAccount extends Account implements AccountInterface {
+  public merkleTree: MerkleTree;
+
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
     address: string,
@@ -30,6 +35,8 @@ export class SessionAccount extends Account implements AccountInterface {
     public signedSession: SignedSession
   ) {
     super(providerOrOptions, address, keyPairOrSigner);
+    this.merkleTree = createMerkleTreeForPolicies(signedSession.policies);
+    assert(signedSession.root === this.merkleTree.root, 'Invalid session');
   }
 
   private async sessionToCall(session: SignedSession): Promise<Call> {
