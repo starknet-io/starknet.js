@@ -24,7 +24,6 @@ const erc20Address = erc20Response.contract_address;
 const erc20 = new Contract(compiledErc20.abi, erc20Address, defaultProvider);
 ```
 
-
 ## Mint tokens to an account address
 
 Make sure you created the `Account` instance following the [Creating an Account](./account.md) guide.
@@ -37,8 +36,8 @@ erc20.connect(account);
 const { transaction_hash: mintTxHash } = await erc20.mint(
   account.address,
   "1000",
-  { 
-    maxFee: "1" 
+  {
+    maxFee: "1"
   }
 );
 
@@ -46,9 +45,9 @@ console.log(`Waiting for Tx to be Accepted on Starknet - Minting...`);
 await defaultProvider.waitForTransaction(mintTxHash);
 ```
 
-> **Note** 
+> **Note**
 >
-> Transaction can be rejected if `maxFee` is lower than actual. 
+> Transaction can be rejected if `maxFee` is lower than actual.
 >
 > _Error: REJECTED: FEE_TRANSFER_FAILURE_
 >

@@ -43,9 +43,9 @@ const compiledAccount = json.parse(
 );
 ```
 
-> **Note** 
-> 
-> below example uses [Argent's](https://github.com/argentlabs/argent-contracts-starknet/blob/develop/contracts/ArgentAccount.cairo) account contract 
+> **Note**
+>
+> below example uses [Argent's](https://github.com/argentlabs/argent-contracts-starknet/blob/develop/contracts/ArgentAccount.cairo) account contract
 
 ```javascript
 const accountResponse = await defaultProvider.deployContract({
@@ -54,9 +54,9 @@ const accountResponse = await defaultProvider.deployContract({
 });
 ```
 
-> **Note** 
-> 
-> below example uses [OpenZeppelin's](https://github.com/OpenZeppelin/cairo-contracts/blob/main/src/openzeppelin/account/presets/Account.cairo) account contract 
+> **Note**
+>
+> below example uses [OpenZeppelin's](https://github.com/OpenZeppelin/cairo-contracts/blob/main/src/openzeppelin/account/presets/Account.cairo) account contract
 
 ```javascript
 const accountResponse = await defaultProvider.deployContract({
@@ -74,7 +74,7 @@ Wait for the deployment transaction to be accepted and assign the address of the
 await defaultProvider.waitForTransaction(accountResponse.transaction_hash);
 ```
 
-Once account contract is deployed [Account](../docs/API/account.md) instance can be created. Use your new account instance to sign transactions, messages or verify signatures! 
+Once account contract is deployed [Account](../docs/API/account.md) instance can be created. Use your new account instance to sign transactions, messages or verify signatures!
 
 ```js
 const account = new Account(
