@@ -139,3 +139,16 @@ export class SessionAccount extends Account implements AccountInterface {
     );
   }
 }
+
+export async function supportsSession(
+  address: string,
+  provider: ProviderInterface
+): Promise<boolean> {
+  const res = await provider.callContract({
+    contractAddress: address,
+    entrypoint: 'is_plugin',
+    calldata: [toBN(SESSION_PLUGIN_CLASS_HASH).toString()],
+  });
+
+  return Boolean(parseInt(res.result[0], 16));
+}
