@@ -90,14 +90,17 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
-    const method =
-      typeof blockIdentifier === 'string' && isHex(blockIdentifier)
-        ? 'starknet_getBlockByHash'
-        : 'starknet_getBlockByNumber';
-
-    return this.fetchEndpoint(method, [blockIdentifier]).then(
-      this.responseParser.parseGetBlockResponse
-    );
+    const method = 'starknet_getBlockWithTxHashes';
+    if (typeof blockIdentifier === 'string' && isHex(blockIdentifier)) {
+      return this.fetchEndpoint(method, [{ block_hash: blockIdentifier }]).then(
+        this.responseParser.parseGetBlockResponse
+      );
+    }
+    else {
+      return this.fetchEndpoint(method, [{ block_number: blockIdentifier }]).then(
+        this.responseParser.parseGetBlockResponse
+      );
+    }
   }
 
   public async getStorageAt(
