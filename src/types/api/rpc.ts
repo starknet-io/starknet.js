@@ -143,12 +143,7 @@ export namespace RPC {
   };
 
   export type Methods = {
-    starknet_getBlockByHash: {
-      QUERY: never;
-      REQUEST: any[];
-      RESPONSE: GetBlockResponse;
-    };
-    starknet_getBlockByNumber: {
+    starknet_getBlockWithTxHashes: {
       QUERY: never;
       REQUEST: any[];
       RESPONSE: GetBlockResponse;
