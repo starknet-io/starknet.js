@@ -81,6 +81,9 @@ function getMerkleTreeType(types: TypedData['types'], ctx: Context) {
     if (!isMerkleTree) {
       throw new Error(`${ctx.key} is not a merkle tree`);
     }
+    if (merkleType.contains.endsWith('*')) {
+      throw new Error(`Merkle tree contain property must not be an array but was given ${ctx.key}`);
+    }
     return merkleType.contains;
   }
   return 'raw';
@@ -159,10 +162,6 @@ export const encodeValue = (
 
   if (type === 'felt*') {
     return ['felt*', computeHashOnElements(data as string[])];
-  }
-
-  if (type === 'raw') {
-    return ['felt', data as string];
   }
 
   if (type === 'selector') {

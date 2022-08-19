@@ -16,7 +16,7 @@ import {
 import { feeTransactionVersion, transactionVersion } from '../utils/hash';
 import { MerkleTree } from '../utils/merkle';
 import { BigNumberish, toBN } from '../utils/number';
-import { SignedSession, createMerkleTreeForPolicies } from '../utils/session';
+import { SignedSession, createMerkleTreeForPolicies, preparePolicy } from '../utils/session';
 import { compileCalldata, estimatedFeeToMaxFee } from '../utils/stark';
 import { fromCallsToExecuteCalldataWithNonce } from '../utils/transaction';
 import { Account } from './default';
@@ -39,24 +39,44 @@ export class SessionAccount extends Account implements AccountInterface {
     assert(signedSession.root === this.merkleTree.root, 'Invalid session');
   }
 
-  private async sessionToCall(session: SignedSession): Promise<Call> {
+  private async sessionToCall(session: SignedSession, proofs: string[][]): Promise<Call> {
     return {
       contractAddress: this.address,
       entrypoint: 'use_plugin',
       calldata: compileCalldata({
-        SESSION_PLUGIN_CLASS_HASH,
+        classHash: SESSION_PLUGIN_CLASS_HASH,
         signer: await this.signer.getPubKey(),
         expires: session.expires.toString(),
+        root: session.root,
+        proofLength: proofs[0].length.toString(),
+        ...proofs.reduce(
+          (acc, proof, i) => ({
+            ...acc,
+            ...proof.reduce((acc2, path, j) => ({ ...acc2, [`proof${i}:${j}`]: path }), {}),
+          }),
+          {}
+        ),
+
         token1: session.signature[0],
         token2: session.signature[1],
-        root: session.root,
-        proof: [],
       }),
     };
   }
 
+  private proofCalls(calls: Call[]): string[][] {
+    return calls.map((call) => {
+      const leaf = preparePolicy({
+        contractAddress: call.contractAddress,
+        selector: call.entrypoint,
+      });
+      return this.merkleTree.getProof(leaf);
+    });
+  }
+
   private async extendCallsBySession(calls: Call[], session: SignedSession): Promise<Call[]> {
-    return [await this.sessionToCall(session), ...calls];
+    const proofs = this.proofCalls(calls);
+    const pluginCall = await this.sessionToCall(session, proofs);
+    return [pluginCall, ...calls];
   }
 
   public async estimateFee(
@@ -119,7 +139,9 @@ export class SessionAccount extends Account implements AccountInterface {
     if (transactionsDetail.maxFee || transactionsDetail.maxFee === 0) {
       maxFee = transactionsDetail.maxFee;
     } else {
-      const { suggestedMaxFee } = await this.estimateFee(transactions, { nonce });
+      const { suggestedMaxFee } = await this.estimateFee(Array.isArray(calls) ? calls : [calls], {
+        nonce,
+      });
       maxFee = suggestedMaxFee.toString();
     }
 

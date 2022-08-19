@@ -36,15 +36,15 @@ export class MerkleTree {
   }
 
   public getProof(leaf: string, branch = this.leaves, hashPath: string[] = []): string[] {
-    if (branch.length === 1) {
-      return hashPath;
-    }
     const index = branch.indexOf(leaf);
     if (index === -1) {
       throw new Error('leaf not found');
     }
+    if (branch.length === 1) {
+      return hashPath;
+    }
     const isLeft = index % 2 === 0;
-    const neededBranch = (isLeft ? branch[index + 1] : branch[index - 1]) ?? branch[index];
+    const neededBranch = (isLeft ? branch[index + 1] : branch[index - 1]) ?? '0x0';
     const newHashPath = [...hashPath, neededBranch];
     const currentBranchLevelIndex =
       this.leaves.length === branch.length
@@ -52,11 +52,11 @@ export class MerkleTree {
         : this.branches.findIndex((b) => b.length === branch.length);
     const nextBranch = this.branches[currentBranchLevelIndex + 1] ?? [this.root];
     return this.getProof(
-      neededBranch === leaf
+      neededBranch === '0x0'
         ? leaf
         : MerkleTree.hash(isLeft ? leaf : neededBranch, isLeft ? neededBranch : leaf),
       nextBranch,
-      neededBranch === leaf ? hashPath : newHashPath
+      newHashPath
     );
   }
 }
