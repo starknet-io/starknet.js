@@ -1,5 +1,6 @@
 import { StarknetChainId } from '../../constants';
 import { Status } from '../lib';
+import { BlockIdentifier } from '../../provider/utils';
 
 export namespace RPC {
   export type Response = {
@@ -99,8 +100,8 @@ export namespace RPC {
     | boolean;
 
   export type EventFilter = {
-    fromBlock: string;
-    toBlock: string;
+    fromBlock: BlockIdentifier;
+    toBlock: BlockIdentifier;
     address: string;
     keys: string[];
     page_size: number;
@@ -143,12 +144,12 @@ export namespace RPC {
   };
 
   export type Methods = {
-    starknet_getBlockByHash: {
+    starknet_getBlockWithTxHashes: {
       QUERY: never;
       REQUEST: any[];
       RESPONSE: GetBlockResponse;
     };
-    starknet_getBlockByNumber: {
+    starknet_getBlockWithTxs: {
       QUERY: never;
       REQUEST: any[];
       RESPONSE: GetBlockResponse;
@@ -178,12 +179,7 @@ export namespace RPC {
       REQUEST: any[];
       RESPONSE: GetTransactionReceiptResponse;
     };
-    starknet_getBlockTransactionCountByHash: {
-      QUERY: never;
-      REQUEST: any[];
-      RESPONSE: GetTransactionCountResponse;
-    };
-    starknet_getBlockTransactionCountByNumber: {
+    starknet_getBlockTransactionCount: {
       QUERY: never;
       REQUEST: any[];
       RESPONSE: GetTransactionCountResponse;
