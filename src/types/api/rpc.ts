@@ -154,6 +154,11 @@ export namespace RPC {
       REQUEST: any[];
       RESPONSE: GetBlockResponse;
     };
+    starknet_getNonce: {
+      QUERY: never;
+      REQUEST: any[];
+      RESPONSE: string;
+    };
     starknet_getStorageAt: {
       QUERY: never;
       REQUEST: any[];

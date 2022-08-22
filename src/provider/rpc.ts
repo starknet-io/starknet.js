@@ -127,6 +127,10 @@ export class RpcProvider implements ProviderInterface {
     }
   }
 
+  public async getNonce(contractAddress: string): Promise<any> {
+    return this.fetchEndpoint('starknet_getNonce', [contractAddress]);
+  }
+
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,
