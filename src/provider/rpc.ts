@@ -96,8 +96,32 @@ export class RpcProvider implements ProviderInterface {
         this.responseParser.parseGetBlockResponse
       );
     }
-    else {
+    else if (typeof blockIdentifier === 'number') {
       return this.fetchEndpoint(method, [{ block_number: blockIdentifier }]).then(
+        this.responseParser.parseGetBlockResponse
+      );
+    }
+    else {
+      return this.fetchEndpoint(method, [blockIdentifier]).then(
+        this.responseParser.parseGetBlockResponse
+      );
+    }
+  }
+
+  public async getBlockWithTxs(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
+    const method = 'starknet_getBlockWithTxs';
+    if (typeof blockIdentifier === 'string' && isHex(blockIdentifier)) {
+      return this.fetchEndpoint(method, [{ block_hash: blockIdentifier }]).then(
+        this.responseParser.parseGetBlockResponse
+      );
+    }
+    else if (typeof blockIdentifier === 'number') {
+      return this.fetchEndpoint(method, [{ block_number: blockIdentifier }]).then(
+        this.responseParser.parseGetBlockResponse
+      );
+    }
+    else {
+      return this.fetchEndpoint(method, [blockIdentifier]).then(
         this.responseParser.parseGetBlockResponse
       );
     }
@@ -273,10 +297,16 @@ export class RpcProvider implements ProviderInterface {
   public async getTransactionCount(
     blockIdentifier: BlockIdentifier
   ): Promise<RPC.GetTransactionCountResponse> {
-    if (typeof blockIdentifier === 'number') {
-      return this.fetchEndpoint('starknet_getBlockTransactionCountByNumber', [blockIdentifier]);
+    const method = 'starknet_getBlockTransactionCount';
+    if (typeof blockIdentifier === 'string' && isHex(blockIdentifier)) {
+      return this.fetchEndpoint(method, [{ block_hash: blockIdentifier }]);
     }
-    return this.fetchEndpoint('starknet_getBlockTransactionCountByHash', [blockIdentifier]);
+    else if (typeof blockIdentifier === 'number') {
+      return this.fetchEndpoint(method, [{ block_number: blockIdentifier }]);
+    }
+    else {
+      return this.fetchEndpoint(method, [blockIdentifier]);
+    }
   }
 
   /**
