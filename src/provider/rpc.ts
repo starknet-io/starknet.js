@@ -248,6 +248,9 @@ export class RpcProvider implements ProviderInterface {
     contractAddress: string,
     _blockIdentifier?: BlockIdentifier
   ): Promise<RPC.GetCodeResponse> {
+
+    console.log('WARNING: deprecated method, please wait for an update of starknet.js');
+    
     const result = await this.fetchEndpoint('starknet_getCode', [contractAddress]);
 
     return this.responseParser.parseGetCodeResponse(result);
