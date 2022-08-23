@@ -1,7 +1,7 @@
 ## Motivation and Resolution
 ...
 
-### RPC version
+### RPC version (if applicable)
 ...
 
 ## Usage related changes
