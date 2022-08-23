@@ -22,15 +22,14 @@ import { stringify } from '../utils/json';
 import {
   BigNumberish,
   bigNumberishArrayToDecimalStringArray,
-  isHex,
   toBN,
-  toHex,
-} from '../utils/number';
+  toHex
+  } from '../utils/number';
 import { parseCalldata, parseContract, wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
-import { BlockIdentifier } from './utils';
+import { BlockIdentifier, BlockIdentifierClass } from './utils';
 
 export type RpcProviderOptions = { nodeUrl: string };
 
@@ -90,41 +89,21 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
+    const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
     const method = 'starknet_getBlockWithTxHashes';
-    if (typeof blockIdentifier === 'string' && isHex(blockIdentifier)) {
-      return this.fetchEndpoint(method, [{ block_hash: blockIdentifier }]).then(
-        this.responseParser.parseGetBlockResponse
-      );
-    }
-    else if (typeof blockIdentifier === 'number') {
-      return this.fetchEndpoint(method, [{ block_number: blockIdentifier }]).then(
-        this.responseParser.parseGetBlockResponse
-      );
-    }
-    else {
-      return this.fetchEndpoint(method, [blockIdentifier]).then(
-        this.responseParser.parseGetBlockResponse
-      );
-    }
+    return this.fetchEndpoint(method, [blockIdentifierGetter.getIdentifier()]).then(
+      this.responseParser.parseGetBlockResponse
+    );
   }
 
-  public async getBlockWithTxs(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
+  public async getBlockWithTxs(
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<GetBlockResponse> {
+    const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
     const method = 'starknet_getBlockWithTxs';
-    if (typeof blockIdentifier === 'string' && isHex(blockIdentifier)) {
-      return this.fetchEndpoint(method, [{ block_hash: blockIdentifier }]).then(
-        this.responseParser.parseGetBlockResponse
-      );
-    }
-    else if (typeof blockIdentifier === 'number') {
-      return this.fetchEndpoint(method, [{ block_number: blockIdentifier }]).then(
-        this.responseParser.parseGetBlockResponse
-      );
-    }
-    else {
-      return this.fetchEndpoint(method, [blockIdentifier]).then(
-        this.responseParser.parseGetBlockResponse
-      );
-    }
+    return this.fetchEndpoint(method, [blockIdentifierGetter.getIdentifier()]).then(
+      this.responseParser.parseGetBlockResponse
+    );
   }
 
   public async getNonce(contractAddress: string): Promise<any> {
@@ -248,9 +227,8 @@ export class RpcProvider implements ProviderInterface {
     contractAddress: string,
     _blockIdentifier?: BlockIdentifier
   ): Promise<RPC.GetCodeResponse> {
+    // console.log('WARNING: deprecated method, please wait for an update of starknet.js');
 
-    console.log('WARNING: deprecated method, please wait for an update of starknet.js');
-    
     const result = await this.fetchEndpoint('starknet_getCode', [contractAddress]);
 
     return this.responseParser.parseGetCodeResponse(result);
@@ -304,16 +282,9 @@ export class RpcProvider implements ProviderInterface {
   public async getTransactionCount(
     blockIdentifier: BlockIdentifier
   ): Promise<RPC.GetTransactionCountResponse> {
+    const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
     const method = 'starknet_getBlockTransactionCount';
-    if (typeof blockIdentifier === 'string' && isHex(blockIdentifier)) {
-      return this.fetchEndpoint(method, [{ block_hash: blockIdentifier }]);
-    }
-    else if (typeof blockIdentifier === 'number') {
-      return this.fetchEndpoint(method, [{ block_number: blockIdentifier }]);
-    }
-    else {
-      return this.fetchEndpoint(method, [blockIdentifier]);
-    }
+    return this.fetchEndpoint(method, [blockIdentifierGetter.getIdentifier()]);
   }
 
   /**
