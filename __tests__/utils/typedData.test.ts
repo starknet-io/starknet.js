@@ -56,7 +56,7 @@ describe('typedData', () => {
   test('should transform type selector', () => {
     const selector = 'transfer';
     const selectorHash = getSelectorFromName(selector);
-    const rawSelectorValueHash = encodeValue({}, 'raw', selectorHash);
+    const rawSelectorValueHash = encodeValue({}, 'felt', selectorHash);
     const selectorValueHash = encodeValue({}, 'selector', selector);
     expect(selectorValueHash).toEqual(rawSelectorValueHash);
     expect(selectorValueHash).toMatchInlineSnapshot(`
