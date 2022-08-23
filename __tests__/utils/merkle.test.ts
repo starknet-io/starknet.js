@@ -79,6 +79,7 @@ describe('MerkleTree class', () => {
       const proof = tree.getProof('0x7');
 
       const manualProof = [
+        '0x0', // proofs should always be as long as the tree is deep
         MerkleTree.hash('0x5', '0x6'),
         MerkleTree.hash(MerkleTree.hash('0x1', '0x2'), MerkleTree.hash('0x3', '0x4')),
       ];

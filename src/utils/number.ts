@@ -6,7 +6,7 @@ import { addHexPrefix, removeHexPrefix } from './encode';
 export type BigNumberish = string | number | BN;
 
 export function isHex(hex: string): boolean {
-  return hex.startsWith('0x');
+  return /^0x[0-9a-f]*$/i.test(hex);
 }
 
 export function toBN(number: BigNumberish, base?: number | 'hex') {
