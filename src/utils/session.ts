@@ -1,5 +1,4 @@
 import type { AccountInterface } from '../account';
-import { StarknetChainId } from '../constants';
 import { ProviderInterface } from '../provider';
 import { Signature } from '../types';
 import { computeHashOnElements } from './hash';
@@ -28,7 +27,8 @@ export interface SignedSession extends PreparedSession {
 }
 
 export const SESSION_PLUGIN_CLASS_HASH =
-  '0x1031d8540af9d984d8d8aa5dff598467008c58b6f6147b7f90fda4b6d8db463';
+  '0x31c70ed28f4b0faf39b2f97d8f0a61a36968319c13fe6f2051b8de5a15f3d9b';
+
 // H(Policy(contractAddress:felt,selector:selector))
 const POLICY_TYPE_HASH = '0x2f0026e78543f036f33e26a8f5891b88c58dc1e20cbbfaf0bb53274da6fa568';
 
@@ -74,16 +74,10 @@ export async function createSession(
         { name: 'expires', type: 'felt' },
         { name: 'root', type: 'merkletree', contains: 'Policy' },
       ],
-      StarkNetDomain: [
-        { name: 'name', type: 'felt' },
-        { name: 'version', type: 'felt' },
-        { name: 'chainId', type: 'felt' },
-      ],
+      StarkNetDomain: [{ name: 'chainId', type: 'felt' }],
     },
     domain: {
-      name: '0x0',
-      version: '0x0',
-      chainId: StarknetChainId.TESTNET,
+      chainId: account.chainId,
     },
     message: {
       key,

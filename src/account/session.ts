@@ -16,14 +16,16 @@ import {
 import { feeTransactionVersion, transactionVersion } from '../utils/hash';
 import { MerkleTree } from '../utils/merkle';
 import { BigNumberish, toBN } from '../utils/number';
-import { SignedSession, createMerkleTreeForPolicies, preparePolicy } from '../utils/session';
+import {
+  SESSION_PLUGIN_CLASS_HASH,
+  SignedSession,
+  createMerkleTreeForPolicies,
+  preparePolicy,
+} from '../utils/session';
 import { compileCalldata, estimatedFeeToMaxFee } from '../utils/stark';
 import { fromCallsToExecuteCalldataWithNonce } from '../utils/transaction';
 import { Account } from './default';
 import { AccountInterface } from './interface';
-
-const SESSION_PLUGIN_CLASS_HASH =
-  '0x6a184757e350de1fe3a544037efbef6434724980a572f294c90555dadc20052';
 
 export class SessionAccount extends Account implements AccountInterface {
   public merkleTree: MerkleTree;
