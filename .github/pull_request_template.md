@@ -21,7 +21,8 @@
 ## Checklist:
 - [ ] Performed a self-review of the code
 - [ ] Rebased to the last commit of the target branch (or merged it into my branch)
-- [ ] Documented the changes
 - [ ] Linked the issues which this PR resolves
+- [ ] Documented the changes
+- [ ] Updated the docs (www)
 - [ ] Updated the tests
 - [ ] All tests are passing
