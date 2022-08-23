@@ -90,8 +90,7 @@ export class RpcProvider implements ProviderInterface {
 
   public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
     const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
-    const method = 'starknet_getBlockWithTxHashes';
-    return this.fetchEndpoint(method, [blockIdentifierGetter.getIdentifier()]).then(
+    return this.fetchEndpoint('starknet_getBlockWithTxHashes', [blockIdentifierGetter.getIdentifier()]).then(
       this.responseParser.parseGetBlockResponse
     );
   }
@@ -100,8 +99,7 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<GetBlockResponse> {
     const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
-    const method = 'starknet_getBlockWithTxs';
-    return this.fetchEndpoint(method, [blockIdentifierGetter.getIdentifier()]).then(
+    return this.fetchEndpoint('starknet_getBlockWithTxs', [blockIdentifierGetter.getIdentifier()]).then(
       this.responseParser.parseGetBlockResponse
     );
   }
@@ -227,7 +225,7 @@ export class RpcProvider implements ProviderInterface {
     contractAddress: string,
     _blockIdentifier?: BlockIdentifier
   ): Promise<RPC.GetCodeResponse> {
-    // console.log('WARNING: deprecated method, please wait for an update of starknet.js');
+    console.log('WARNING: deprecated method, please wait for an update of starknet.js');
 
     const result = await this.fetchEndpoint('starknet_getCode', [contractAddress]);
 
@@ -283,8 +281,7 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier
   ): Promise<RPC.GetTransactionCountResponse> {
     const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
-    const method = 'starknet_getBlockTransactionCount';
-    return this.fetchEndpoint(method, [blockIdentifierGetter.getIdentifier()]);
+    return this.fetchEndpoint('starknet_getBlockTransactionCount', [blockIdentifierGetter.getIdentifier()]);
   }
 
   /**

@@ -32,6 +32,12 @@ export function txIdentifier(txHash?: BigNumberish, txId?: BigNumberish): string
 // decimal string and number are detected as block numbers
 // null appends nothing to the request url
 
+export type BlockIdentifier = BlockNumber | BigNumberish;
+type BlockIdentifierObject =
+  | { type: 'BLOCK_NUMBER'; data: BlockNumber }
+  | { type: 'BLOCK_HASH'; data: BigNumberish };
+
+
 export class BlockIdentifierClass {
   blockIdentifier: BlockIdentifier;
 
@@ -51,11 +57,6 @@ export class BlockIdentifierClass {
     return this.blockIdentifier;
   }
 }
-
-export type BlockIdentifier = BlockNumber | BigNumberish;
-type BlockIdentifierObject =
-  | { type: 'BLOCK_NUMBER'; data: BlockNumber }
-  | { type: 'BLOCK_HASH'; data: BigNumberish };
 
 /**
  * Identifies the block to be queried.
