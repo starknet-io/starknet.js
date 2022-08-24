@@ -22,7 +22,6 @@ import { stringify } from '../utils/json';
 import {
   BigNumberish,
   bigNumberishArrayToDecimalStringArray,
-  isHex,
   toBN,
   toHex,
 } from '../utils/number';
@@ -30,7 +29,7 @@ import { parseCalldata, parseContract, wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
-import { BlockIdentifier } from './utils';
+import { BlockIdentifier, BlockIdentifierClass } from './utils';
 
 export type RpcProviderOptions = { nodeUrl: string };
 
@@ -90,14 +89,23 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
-    const method =
-      typeof blockIdentifier === 'string' && isHex(blockIdentifier)
-        ? 'starknet_getBlockByHash'
-        : 'starknet_getBlockByNumber';
-
-    return this.fetchEndpoint(method, [blockIdentifier]).then(
+    const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
+    return this.fetchEndpoint('starknet_getBlockWithTxHashes', [blockIdentifierGetter.getIdentifier()]).then(
       this.responseParser.parseGetBlockResponse
     );
+  }
+
+  public async getBlockWithTxs(
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<GetBlockResponse> {
+    const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
+    return this.fetchEndpoint('starknet_getBlockWithTxs', [blockIdentifierGetter.getIdentifier()]).then(
+      this.responseParser.parseGetBlockResponse
+    );
+  }
+
+  public async getNonce(contractAddress: string): Promise<any> {
+    return this.fetchEndpoint('starknet_getNonce', [contractAddress]);
   }
 
   public async getStorageAt(
@@ -217,6 +225,8 @@ export class RpcProvider implements ProviderInterface {
     contractAddress: string,
     _blockIdentifier?: BlockIdentifier
   ): Promise<RPC.GetCodeResponse> {
+    // deprecated method, please wait for an update of starknet.js
+
     const result = await this.fetchEndpoint('starknet_getCode', [contractAddress]);
 
     return this.responseParser.parseGetCodeResponse(result);
@@ -270,10 +280,8 @@ export class RpcProvider implements ProviderInterface {
   public async getTransactionCount(
     blockIdentifier: BlockIdentifier
   ): Promise<RPC.GetTransactionCountResponse> {
-    if (typeof blockIdentifier === 'number') {
-      return this.fetchEndpoint('starknet_getBlockTransactionCountByNumber', [blockIdentifier]);
-    }
-    return this.fetchEndpoint('starknet_getBlockTransactionCountByHash', [blockIdentifier]);
+    const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
+    return this.fetchEndpoint('starknet_getBlockTransactionCount', [blockIdentifierGetter.getIdentifier()]);
   }
 
   /**
