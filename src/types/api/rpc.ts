@@ -1,6 +1,6 @@
 import { StarknetChainId } from '../../constants';
-import { Status } from '../lib';
 import { BlockIdentifier } from '../../provider/utils';
+import { Status } from '../lib';
 
 export namespace RPC {
   export type Response = {
@@ -41,7 +41,7 @@ export namespace RPC {
     sequencer: string;
     new_root: string;
     old_root: string;
-    accepted_time: number;
+    timestamp: number;
     gas_price: string;
     transactions: string[];
   };

@@ -19,12 +19,7 @@ import { RPC } from '../types/api';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
-import {
-  BigNumberish,
-  bigNumberishArrayToDecimalStringArray,
-  toBN,
-  toHex,
-} from '../utils/number';
+import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
 import { parseCalldata, parseContract, wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { randomAddress } from '../utils/stark';
@@ -90,18 +85,18 @@ export class RpcProvider implements ProviderInterface {
 
   public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
     const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
-    return this.fetchEndpoint('starknet_getBlockWithTxHashes', [blockIdentifierGetter.getIdentifier()]).then(
-      this.responseParser.parseGetBlockResponse
-    );
+    return this.fetchEndpoint('starknet_getBlockWithTxHashes', [
+      blockIdentifierGetter.getIdentifier(),
+    ]).then(this.responseParser.parseGetBlockResponse);
   }
 
   public async getBlockWithTxs(
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<GetBlockResponse> {
     const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
-    return this.fetchEndpoint('starknet_getBlockWithTxs', [blockIdentifierGetter.getIdentifier()]).then(
-      this.responseParser.parseGetBlockResponse
-    );
+    return this.fetchEndpoint('starknet_getBlockWithTxs', [
+      blockIdentifierGetter.getIdentifier(),
+    ]).then(this.responseParser.parseGetBlockResponse);
   }
 
   public async getNonce(contractAddress: string): Promise<any> {
@@ -281,7 +276,9 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier
   ): Promise<RPC.GetTransactionCountResponse> {
     const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
-    return this.fetchEndpoint('starknet_getBlockTransactionCount', [blockIdentifierGetter.getIdentifier()]);
+    return this.fetchEndpoint('starknet_getBlockTransactionCount', [
+      blockIdentifierGetter.getIdentifier(),
+    ]);
   }
 
   /**

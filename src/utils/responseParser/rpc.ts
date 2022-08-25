@@ -15,7 +15,7 @@ import { ResponseParser } from '.';
 export class RPCResponseParser extends ResponseParser {
   public parseGetBlockResponse(res: RPC.GetBlockResponse): GetBlockResponse {
     return {
-      accepted_time: res.accepted_time,
+      timestamp: res.timestamp,
       block_hash: res.block_hash,
       block_number: res.block_number,
       gas_price: res.gas_price,

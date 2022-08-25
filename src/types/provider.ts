@@ -3,7 +3,8 @@ import BN from 'bn.js';
 import { Abi, CompressedProgram, EntryPointsByType, RawCalldata, Signature, Status } from './lib';
 
 export interface GetBlockResponse {
-  accepted_time: number;
+  accepted_time?: number;
+  timestamp?: number;
   block_hash: string;
   block_number: number;
   gas_price: string;

@@ -25,7 +25,7 @@ export const ec = new EC(
  * The function _truncateToN in lib/elliptic/ec/index.js does a shift-right of 4 bits
  * in some cases. This function does the opposite operation so that
  * _truncateToN(fixMessage(msg)) == msg.
- * 
+ *
  * @param msg
  */
 function fixMessage(msg: string) {
@@ -68,7 +68,7 @@ export function getKeyPairFromPublicKey(publicKey: BigNumberish): KeyPair {
 
 /**
  * Signs a message using the provided key.
- * 
+ *
  * @param keyPair should be an KeyPair with a valid private key.
  * @returns an Signature.
  */
@@ -94,7 +94,7 @@ function chunkArray(arr: any[], n: number): any[][] {
 
 /**
  * Verifies a message using the provided key.
- * 
+ *
  * @param keyPair should be an KeyPair with a valid public key.
  * @param sig should be an Signature.
  * @returns true if the verification succeeds.
