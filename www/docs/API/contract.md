@@ -46,7 +46,7 @@ A Meta-Class is a Class which has any of its properties determined at run-time. 
 
 ### Read-Only Methods(constant)
 
-A constant method (denoted view in Cairo) is read-only and evaluates a small amount of EVM code against the current blockchain state. It is therefore free and does not require any fee, but cannot make changes to the blockchain state...
+A constant method (denoted view in Cairo) is read-only and evaluates a small amount of Cairo code against the current blockchain state. It is therefore free and does not require any fee, but cannot make changes to the blockchain state...
 
 contract.**METHOD_NAME**(...args [ , overrides ]) => _Promise < Result >_
 
