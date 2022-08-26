@@ -21,7 +21,7 @@ import { getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
 import {
   BigNumberish,
-  bigNumberishArrayToDecimalStringArray,
+  bigNumberishArrayToHexadecimalStringArray,
   toBN,
   toHex,
 } from '../utils/number';
@@ -90,18 +90,18 @@ export class RpcProvider implements ProviderInterface {
 
   public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
     const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
-    return this.fetchEndpoint('starknet_getBlockWithTxHashes', [blockIdentifierGetter.getIdentifier()]).then(
-      this.responseParser.parseGetBlockResponse
-    );
+    return this.fetchEndpoint('starknet_getBlockWithTxHashes', [
+      blockIdentifierGetter.getIdentifier(),
+    ]).then(this.responseParser.parseGetBlockResponse);
   }
 
   public async getBlockWithTxs(
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<GetBlockResponse> {
     const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
-    return this.fetchEndpoint('starknet_getBlockWithTxs', [blockIdentifierGetter.getIdentifier()]).then(
-      this.responseParser.parseGetBlockResponse
-    );
+    return this.fetchEndpoint('starknet_getBlockWithTxs', [
+      blockIdentifierGetter.getIdentifier(),
+    ]).then(this.responseParser.parseGetBlockResponse);
   }
 
   public async getNonce(contractAddress: string): Promise<any> {
@@ -150,7 +150,7 @@ export class RpcProvider implements ProviderInterface {
         contract_address: invocation.contractAddress,
         entry_point_selector: getSelectorFromName(invocation.entrypoint),
         calldata: parseCalldata(invocation.calldata),
-        signature: bigNumberishArrayToDecimalStringArray(invocation.signature || []),
+        signature: bigNumberishArrayToHexadecimalStringArray(invocation.signature || []),
         version: toHex(toBN(invocationDetails?.version || 0)),
       },
       blockIdentifier,
@@ -181,7 +181,7 @@ export class RpcProvider implements ProviderInterface {
 
     return this.fetchEndpoint('starknet_addDeployTransaction', [
       addressSalt ?? randomAddress(),
-      bigNumberishArrayToDecimalStringArray(constructorCalldata ?? []),
+      bigNumberishArrayToHexadecimalStringArray(constructorCalldata ?? []),
       {
         program: contractDefinition.program,
         entry_points_by_type: contractDefinition.entry_points_by_type,
@@ -199,7 +199,7 @@ export class RpcProvider implements ProviderInterface {
         entry_point_selector: getSelectorFromName(functionInvocation.entrypoint),
         calldata: parseCalldata(functionInvocation.calldata),
       },
-      bigNumberishArrayToDecimalStringArray(functionInvocation.signature || []),
+      bigNumberishArrayToHexadecimalStringArray(functionInvocation.signature || []),
       toHex(toBN(details.maxFee || 0)),
       toHex(toBN(details.version || 0)),
     ]).then(this.responseParser.parseInvokeFunctionResponse);
@@ -281,7 +281,9 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier
   ): Promise<RPC.GetTransactionCountResponse> {
     const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
-    return this.fetchEndpoint('starknet_getBlockTransactionCount', [blockIdentifierGetter.getIdentifier()]);
+    return this.fetchEndpoint('starknet_getBlockTransactionCount', [
+      blockIdentifierGetter.getIdentifier(),
+    ]);
   }
 
   /**

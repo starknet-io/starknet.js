@@ -57,3 +57,7 @@ export function assertInRange(
 export function bigNumberishArrayToDecimalStringArray(rawCalldata: BigNumberish[]): string[] {
   return rawCalldata.map((x) => toBN(x).toString(10));
 }
+
+export function bigNumberishArrayToHexadecimalStringArray(rawCalldata: BigNumberish[]): string[] {
+  return rawCalldata.map((x) => toHex(toBN(x)));
+}
