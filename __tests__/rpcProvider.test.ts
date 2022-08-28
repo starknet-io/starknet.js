@@ -56,6 +56,6 @@ describeIfRpc('RPCProvider', () => {
       expect(isBN(overall_fee)).toBe(true);
     });
 
-    xtest('invokeFunction', async () => {});
+    test.todo('invokeFunction');
   });
 });
