@@ -332,9 +332,7 @@ export class SequencerProvider implements ProviderInterface {
     contractAddress: string,
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<Sequencer.GetCodeResponse> {
-    return this.fetchEndpoint('get_code', { contractAddress, blockIdentifier }).then(
-      this.responseParser.parseGetCodeResponse
-    );
+    return this.fetchEndpoint('get_code', { contractAddress, blockIdentifier });
   }
 
   public async waitForTransaction(txHash: BigNumberish, retryInterval: number = 8000) {

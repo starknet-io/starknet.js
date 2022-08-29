@@ -71,10 +71,6 @@ export class SequencerAPIResponseParser extends ResponseParser {
     };
   }
 
-  public parseGetCodeResponse(res: Sequencer.GetCodeResponse): Sequencer.GetCodeResponse {
-    return res;
-  }
-
   public parseFeeEstimateResponse(res: Sequencer.EstimateFeeResponse): EstimateFeeResponse {
     if ('overall_fee' in res) {
       let gasInfo = {};

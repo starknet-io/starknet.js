@@ -223,17 +223,6 @@ export class RpcProvider implements ProviderInterface {
     return this.responseParser.parseCallContractResponse(result);
   }
 
-  public async getCode(
-    contractAddress: string,
-    _blockIdentifier?: BlockIdentifier
-  ): Promise<RPC.GetCodeResponse> {
-    // deprecated method, please wait for an update of starknet.js
-
-    const result = await this.fetchEndpoint('starknet_getCode', [contractAddress]);
-
-    return this.responseParser.parseGetCodeResponse(result);
-  }
-
   public async waitForTransaction(txHash: BigNumberish, retryInterval: number = 8000) {
     let onchain = false;
     let retries = 100;

@@ -49,11 +49,6 @@ export namespace RPC {
     transactions: string[];
   }; */
 
-  export type GetCodeResponse = {
-    bytecode: string[];
-    abi: string;
-  };
-
   export type GetStorageAtResponse = string;
 
   export type GetTransactionReceiptResponse = {
@@ -191,11 +186,6 @@ export namespace RPC {
       QUERY: never;
       REQUEST: any[];
       RESPONSE: GetTransactionCountResponse;
-    };
-    starknet_getCode: {
-      QUERY: never;
-      REQUEST: any[];
-      RESPONSE: GetCodeResponse;
     };
     starknet_call: {
       QUERY: never;
