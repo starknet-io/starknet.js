@@ -93,7 +93,7 @@ account.**verifyMessageHash**(hash, signature) => _Promise < boolean >_
 
 Verify a signature of a given hash.
 
-> **WARNING** 
+> **WARNING**
 >
 > This method is not recommended, use `verifyMessage` instead
 
