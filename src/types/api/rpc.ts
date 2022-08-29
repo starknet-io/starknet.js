@@ -49,7 +49,7 @@ export namespace RPC {
     transactions: string[];
   }; */
 
-  export type GetStorageAtResponse = string;
+  export type GetStorageAtResponse = OPENRPC.GetStorageAtResponse;
 
   export type GetTransactionReceiptResponse = {
     txn_hash: string;

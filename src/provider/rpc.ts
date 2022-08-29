@@ -1,6 +1,5 @@
 import { StarknetChainId } from '../constants';
 import {
-  BlockTag,
   Call,
   CallContractResponse,
   DeclareContractPayload,
@@ -113,13 +112,14 @@ export class RpcProvider implements ProviderInterface {
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockHashOrTag: BlockTag | BigNumberish = 'pending'
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<BigNumberish> {
     const parsedKey = toHex(toBN(key));
+    const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
     return this.fetchEndpoint('starknet_getStorageAt', [
       contractAddress,
       parsedKey,
-      blockHashOrTag,
+      blockIdentifierGetter.getIdentifier(),
     ]);
   }
 

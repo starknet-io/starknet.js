@@ -2,7 +2,7 @@
  * Starknet RPC version 0.1.0
  * starknet_api_openrpc version 0.31.0
  *
- * TypeScript Representation of OpenRpc protocol types
+ * TypeScript Representation of OpenRpc protocol types | responses
  */
 
 /**
@@ -145,4 +145,5 @@ type PENDING_BLOCK_WITH_TXS = BLOCK_BODY_WITH_TXS & {
 export namespace OPENRPC {
   export type getBlockWithTxHashesResponse = BLOCK_WITH_TX_HASHES | PENDING_BLOCK_WITH_TX_HASHES;
   export type getBlockWithTxs = BLOCK_WITH_TXS | PENDING_BLOCK_WITH_TXS;
+  export type GetStorageAtResponse = FELT;
 }

@@ -49,8 +49,8 @@ const provider = new starknet.Provider({
 
 These are also default options for the Provider constructor with `network: 'goerli-alpha'`.
 
-> **Note** 
-> 
+> **Note**
+>
 > `network` arguement should work in most cases. If you want to use sequencer arguement with `baseUrl`, you will not be able to use `network` field in the object.
 
 ## Methods
@@ -117,7 +117,7 @@ Gets the contract class of the deployed contract.
 
 <hr/>
 
-provider.**getStorageAt**(contractAddress, key, blockHashOrTag) => _Promise < string >_
+provider.**getStorageAt**(contractAddress, key, blockIdentifier) => _Promise < string >_
 
 Gets the contract's storage variable at a specific key.
 

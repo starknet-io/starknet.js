@@ -138,7 +138,7 @@ describe('defaultProvider', () => {
 
   describeIfNotDevnet('Provider', () => {
     const provider = getTestProvider();
-    describe(`Provider methods`, () => {
+    describe(`Provider methods if not devnet`, () => {
       describe('getBlock', () => {
         test('pending', async () => {
           const latestBlock = await provider.getBlock();
