@@ -91,7 +91,7 @@ export class RpcProvider implements ProviderInterface {
 
   public async getBlockWithTxHashes(
     blockIdentifier: BlockIdentifier = 'pending'
-  ): Promise<RPC.getBlockWithTxHashesResponse> {
+  ): Promise<RPC.GetBlockWithTxHashesResponse > {
     const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
     return this.fetchEndpoint('starknet_getBlockWithTxHashes', [
       blockIdentifierGetter.getIdentifier(),
@@ -100,7 +100,7 @@ export class RpcProvider implements ProviderInterface {
 
   public async getBlockWithTxs(
     blockIdentifier: BlockIdentifier = 'pending'
-  ): Promise<RPC.getBlockWithTxs> {
+  ): Promise<RPC.GetBlockWithTxs > {
     const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
     return this.fetchEndpoint('starknet_getBlockWithTxs', [blockIdentifierGetter.getIdentifier()]);
   }
