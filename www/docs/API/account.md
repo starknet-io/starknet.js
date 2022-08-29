@@ -26,7 +26,7 @@ The address of the account contract.
 
 account.**getNonce()** => _Promise < string >_
 
-Gets thw new Nonce for the next transaction.
+Gets the new Nonce for the next transaction.
 
 <hr />
 
