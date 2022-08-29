@@ -1,6 +1,7 @@
 import { StarknetChainId } from '../../constants';
 import { BlockIdentifier } from '../../provider/utils';
 import { Status } from '../lib';
+import { OPENRPC } from './openrpc';
 
 export namespace RPC {
   export type Response = {
@@ -33,7 +34,9 @@ export namespace RPC {
     gas_price: number;
   };
 
-  export type GetBlockResponse = {
+  export type getBlockWithTxHashesResponse = OPENRPC.getBlockWithTxHashesResponse;
+  export type getBlockWithTxs = OPENRPC.getBlockWithTxs;
+  /*   {
     block_hash: string;
     parent_hash: string;
     block_number: number;
@@ -44,7 +47,7 @@ export namespace RPC {
     timestamp: number;
     gas_price: string;
     transactions: string[];
-  };
+  }; */
 
   export type GetCodeResponse = {
     bytecode: string[];
@@ -147,12 +150,12 @@ export namespace RPC {
     starknet_getBlockWithTxHashes: {
       QUERY: never;
       REQUEST: any[];
-      RESPONSE: GetBlockResponse;
+      RESPONSE: getBlockWithTxHashesResponse;
     };
     starknet_getBlockWithTxs: {
       QUERY: never;
       REQUEST: any[];
-      RESPONSE: GetBlockResponse;
+      RESPONSE: getBlockWithTxs;
     };
     starknet_getNonce: {
       QUERY: never;

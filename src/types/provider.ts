@@ -1,20 +1,19 @@
+/**
+ * Common interface response
+ * Intersection (sequencer response ∩ (∪ rpc responses))
+ */
 import BN from 'bn.js';
 
 import { Abi, CompressedProgram, EntryPointsByType, RawCalldata, Signature, Status } from './lib';
 
 export interface GetBlockResponse {
-  accepted_time?: number;
-  timestamp?: number;
+  timestamp: number;
   block_hash: string;
   block_number: number;
-  gas_price: string;
   new_root: string;
-  old_root?: string;
   parent_hash: string;
-  sequencer: string;
   status: Status;
   transactions: Array<string>;
-  starknet_version?: string;
 }
 
 export interface GetCodeResponse {

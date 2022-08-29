@@ -1,3 +1,7 @@
+/**
+ * Map RPC Response to common interface response
+ * Intersection (sequencer response ∩ (∪ rpc responses))
+ */
 import {
   CallContractResponse,
   DeclareContractResponse,
@@ -12,17 +16,18 @@ import { RPC } from '../../types/api';
 import { toBN } from '../number';
 import { ResponseParser } from '.';
 
+type RpcGetBlockResponse = RPC.getBlockWithTxHashesResponse & {
+  [key: string]: any;
+};
+
 export class RPCResponseParser extends ResponseParser {
-  public parseGetBlockResponse(res: RPC.GetBlockResponse): GetBlockResponse {
+  public parseGetBlockResponse(res: RpcGetBlockResponse): GetBlockResponse {
     return {
       timestamp: res.timestamp,
       block_hash: res.block_hash,
       block_number: res.block_number,
-      gas_price: res.gas_price,
       new_root: res.new_root,
-      old_root: res.old_root,
       parent_hash: res.parent_hash,
-      sequencer: res.sequencer,
       status: res.status,
       transactions: res.transactions,
     };

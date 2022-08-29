@@ -46,6 +46,16 @@ describe('defaultProvider', () => {
     test(`getBlock(blockHash=${exampleBlockHash}, blockNumber=undefined)`, () => {
       return expect(testProvider.getBlock(exampleBlockHash)).resolves.not.toThrow();
     });
+    test('getBlock(blockIdentifier=latest)', async () => {
+      expect(exampleBlock).not.toBeNull();
+
+      const { block_number, timestamp } = exampleBlock;
+
+      expect(typeof block_number).toEqual('number');
+
+      return expect(typeof timestamp).toEqual('number');
+    });
+
     test('getBlock() -> { blockNumber }', async () => {
       const block = await testProvider.getBlock();
       return expect(block).toHaveProperty('block_number');

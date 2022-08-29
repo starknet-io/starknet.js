@@ -1,3 +1,7 @@
+/**
+ * Map Sequencer Response to common interface response
+ * Intersection (sequencer response ∩ (∪ rpc responses))
+ */
 import {
   CallContractResponse,
   DeclareContractResponse,
@@ -15,14 +19,11 @@ import { ResponseParser } from '.';
 export class SequencerAPIResponseParser extends ResponseParser {
   public parseGetBlockResponse(res: Sequencer.GetBlockResponse): GetBlockResponse {
     return {
-      accepted_time: res.timestamp,
+      timestamp: res.timestamp,
       block_hash: res.block_hash,
       block_number: res.block_number,
-      gas_price: res.gas_price,
       new_root: res.state_root,
-      old_root: undefined,
       parent_hash: res.parent_block_hash,
-      sequencer: res.sequencer_address,
       status: res.status,
       transactions: Object.values(res.transactions)
         .map((value) => 'transaction_hash' in value && value.transaction_hash)

@@ -1,4 +1,4 @@
-import { Contract, GetBlockResponse, Provider, SequencerProvider, stark } from '../src';
+import { Contract, Provider, SequencerProvider, stark } from '../src';
 import { toBN } from '../src/utils/number';
 import {
   compiledErc20,
@@ -72,22 +72,5 @@ describeIfSequencer('SequencerProvider', () => {
       expect(res).toStrictEqual(toBN(0));
       expect(res).toStrictEqual(result.res);
     });
-  });
-});
-
-describe('divergence from Provider methods', () => {
-  let exampleBlock: GetBlockResponse;
-  let sequencerProvider: SequencerProvider;
-
-  beforeAll(async () => {
-    sequencerProvider = getTestProvider() as SequencerProvider;
-    exampleBlock = await sequencerProvider.getBlock('latest');
-  });
-
-  test('getBlock(blockIdentifier=latest)', async () => {
-    expect(exampleBlock).not.toBeNull();
-    const { block_number, accepted_time } = exampleBlock;
-    expect(typeof block_number).toEqual('number');
-    return expect(typeof accepted_time).toEqual('number');
   });
 });

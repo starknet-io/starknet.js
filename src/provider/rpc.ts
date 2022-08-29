@@ -83,20 +83,27 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_chainId');
   }
 
+  // Common Interface
   public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
+    return this.getBlockWithTxHashes(blockIdentifier).then(
+      this.responseParser.parseGetBlockResponse
+    );
+  }
+
+  public async getBlockWithTxHashes(
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<RPC.getBlockWithTxHashesResponse> {
     const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
     return this.fetchEndpoint('starknet_getBlockWithTxHashes', [
       blockIdentifierGetter.getIdentifier(),
-    ]).then(this.responseParser.parseGetBlockResponse);
+    ]);
   }
 
   public async getBlockWithTxs(
     blockIdentifier: BlockIdentifier = 'pending'
-  ): Promise<GetBlockResponse> {
+  ): Promise<RPC.getBlockWithTxs> {
     const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
-    return this.fetchEndpoint('starknet_getBlockWithTxs', [
-      blockIdentifierGetter.getIdentifier(),
-    ]).then(this.responseParser.parseGetBlockResponse);
+    return this.fetchEndpoint('starknet_getBlockWithTxs', [blockIdentifierGetter.getIdentifier()]);
   }
 
   public async getNonce(contractAddress: string): Promise<any> {
