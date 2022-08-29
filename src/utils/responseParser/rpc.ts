@@ -16,7 +16,7 @@ import { RPC } from '../../types/api';
 import { toBN } from '../number';
 import { ResponseParser } from '.';
 
-type RpcGetBlockResponse = RPC.getBlockWithTxHashesResponse & {
+type RpcGetBlockResponse = RPC.GetBlockWithTxHashesResponse & {
   [key: string]: any;
 };
 

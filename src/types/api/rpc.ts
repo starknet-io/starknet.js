@@ -34,8 +34,8 @@ export namespace RPC {
     gas_price: number;
   };
 
-  export type getBlockWithTxHashesResponse = OPENRPC.GetBlockWithTxHashesResponse;
-  export type getBlockWithTxs = OPENRPC.GetBlockWithTxs;
+  export type GetBlockWithTxHashesResponse = OPENRPC.GetBlockWithTxHashesResponse;
+  export type GetBlockWithTxs = OPENRPC.GetBlockWithTxs;
   export type GetStorageAtResponse = OPENRPC.GetStorageAtResponse;
 
   export type GetTransactionReceiptResponse = {
@@ -133,12 +133,12 @@ export namespace RPC {
     starknet_getBlockWithTxHashes: {
       QUERY: never;
       REQUEST: any[];
-      RESPONSE: getBlockWithTxHashesResponse;
+      RESPONSE: GetBlockWithTxHashesResponse;
     };
     starknet_getBlockWithTxs: {
       QUERY: never;
       REQUEST: any[];
-      RESPONSE: getBlockWithTxs;
+      RESPONSE: GetBlockWithTxs;
     };
     starknet_getNonce: {
       QUERY: never;
