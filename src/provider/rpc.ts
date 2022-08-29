@@ -123,10 +123,22 @@ export class RpcProvider implements ProviderInterface {
     ]);
   }
 
+  // common interface
   public async getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {
-    return this.fetchEndpoint('starknet_getTransactionByHash', [txHash]).then(
-      this.responseParser.parseGetTransactionResponse
-    );
+    return this.getTransactionByHash(txHash).then(this.responseParser.parseGetTransactionResponse);
+  }
+
+  public async getTransactionByHash(
+    txHash: BigNumberish
+  ): Promise<RPC.GetTransactionByHashResponse> {
+    return this.fetchEndpoint('starknet_getTransactionByHash', [txHash]);
+  }
+
+  public async getTransactionByBlockIdAndIndex(
+    blockIdentifier: BlockIdentifier,
+    index: number
+  ): Promise<RPC.GetTransactionByBlockIdAndIndex> {
+    return this.fetchEndpoint('starknet_getTransactionByHash', [blockIdentifier, index]);
   }
 
   public async getTransactionReceipt(txHash: BigNumberish): Promise<GetTransactionReceiptResponse> {
@@ -135,11 +147,12 @@ export class RpcProvider implements ProviderInterface {
     );
   }
 
-  public async getClassAt(
-    contractAddress: string,
-    _blockIdentifier: BlockIdentifier = 'pending'
-  ): Promise<any> {
-    return this.fetchEndpoint('starknet_getClassAt', [contractAddress]);
+  public async getClassAt(contractAddress: string, blockIdentifier: BlockIdentifier): Promise<any> {
+    const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
+    return this.fetchEndpoint('starknet_getClassAt', [
+      blockIdentifierGetter.getIdentifier(),
+      contractAddress,
+    ]);
   }
 
   public async getEstimateFee(

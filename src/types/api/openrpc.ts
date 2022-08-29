@@ -2,7 +2,8 @@
  * Starknet RPC version 0.1.0
  * starknet_api_openrpc version 0.31.0
  *
- * TypeScript Representation of OpenRpc protocol types | responses
+ * TypeScript Representation of OpenRpc protocol types | results
+ * errors are not implemented here only results
  */
 
 /**
@@ -142,8 +143,26 @@ type PENDING_BLOCK_WITH_TXS = BLOCK_BODY_WITH_TXS & {
   parent_hash: BLOCK_HASH;
 };
 
+type CONTRACT_CLASS = {
+  program: string; // A base64 representation of the compressed program code
+  entry_points_by_type: {
+    CONSTRUCTOR: CONTRACT_ENTRY_POINT_LIST;
+    EXTERNAL: CONTRACT_ENTRY_POINT_LIST;
+    L1_HANDLER: CONTRACT_ENTRY_POINT_LIST;
+  };
+};
+
+type CONTRACT_ENTRY_POINT_LIST = Array<CONTRACT_ENTRY_POINT>;
+type CONTRACT_ENTRY_POINT = {
+  offset: NUM_AS_HEX;
+  selector: FELT;
+};
+
 export namespace OPENRPC {
-  export type getBlockWithTxHashesResponse = BLOCK_WITH_TX_HASHES | PENDING_BLOCK_WITH_TX_HASHES;
-  export type getBlockWithTxs = BLOCK_WITH_TXS | PENDING_BLOCK_WITH_TXS;
+  export type GetBlockWithTxHashesResponse = BLOCK_WITH_TX_HASHES | PENDING_BLOCK_WITH_TX_HASHES;
+  export type GetBlockWithTxs = BLOCK_WITH_TXS | PENDING_BLOCK_WITH_TXS;
   export type GetStorageAtResponse = FELT;
+  export type GetTransactionByHashResponse = TXN;
+  export type GetTransactionByBlockIdAndIndex = TXN;
+  export type GetClassResponse = CONTRACT_CLASS;
 }

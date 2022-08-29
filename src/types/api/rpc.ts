@@ -34,21 +34,8 @@ export namespace RPC {
     gas_price: number;
   };
 
-  export type getBlockWithTxHashesResponse = OPENRPC.getBlockWithTxHashesResponse;
-  export type getBlockWithTxs = OPENRPC.getBlockWithTxs;
-  /*   {
-    block_hash: string;
-    parent_hash: string;
-    block_number: number;
-    status: Status;
-    sequencer: string;
-    new_root: string;
-    old_root: string;
-    timestamp: number;
-    gas_price: string;
-    transactions: string[];
-  }; */
-
+  export type getBlockWithTxHashesResponse = OPENRPC.GetBlockWithTxHashesResponse;
+  export type getBlockWithTxs = OPENRPC.GetBlockWithTxs;
   export type GetStorageAtResponse = OPENRPC.GetStorageAtResponse;
 
   export type GetTransactionReceiptResponse = {
@@ -80,7 +67,8 @@ export namespace RPC {
     sender_address?: string;
   }
 
-  export type GetTransactionResponse = InvokeTransactionResponse & DeclareTransactionResponse;
+  export type GetTransactionByHashResponse = OPENRPC.GetTransactionByHashResponse;
+  export type GetTransactionByBlockIdAndIndex = OPENRPC.GetTransactionByBlockIdAndIndex;
 
   export type GetTransactionCountResponse = number;
 
@@ -165,17 +153,12 @@ export namespace RPC {
     starknet_getTransactionByHash: {
       QUERY: never;
       REQUEST: any[];
-      RESPONSE: GetTransactionResponse;
+      RESPONSE: GetTransactionByHashResponse;
     };
-    starknet_getTransactionByBlockHashAndIndex: {
+    starknet_getTransactionByBlockIdAndIndex: {
       QUERY: never;
       REQUEST: any[];
-      RESPONSE: GetTransactionResponse;
-    };
-    starknet_getTransactionByBlockNumberAndIndex: {
-      QUERY: never;
-      REQUEST: any[];
-      RESPONSE: GetTransactionResponse;
+      RESPONSE: GetTransactionByBlockIdAndIndex;
     };
     starknet_getTransactionReceipt: {
       QUERY: never;

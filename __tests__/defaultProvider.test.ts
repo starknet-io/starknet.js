@@ -146,11 +146,8 @@ describe('defaultProvider', () => {
           expect(latestBlock).toHaveProperty('parent_hash');
           expect(latestBlock).toHaveProperty('block_number');
           expect(latestBlock).toHaveProperty('status');
-          expect(latestBlock).toHaveProperty('sequencer');
           expect(latestBlock).toHaveProperty('new_root');
-          expect(latestBlock).toHaveProperty('old_root');
-          expect(latestBlock).toHaveProperty('accepted_time');
-          expect(latestBlock).toHaveProperty('gas_price');
+          expect(latestBlock).toHaveProperty('timestamp');
           expect(latestBlock).toHaveProperty('transactions');
           expect(Array.isArray(latestBlock.transactions)).toBe(true);
         });
@@ -164,11 +161,8 @@ describe('defaultProvider', () => {
           expect(block).toHaveProperty('parent_hash');
           expect(block).toHaveProperty('block_number');
           expect(block).toHaveProperty('status');
-          expect(block).toHaveProperty('sequencer');
           expect(block).toHaveProperty('new_root');
-          expect(block).toHaveProperty('old_root');
-          expect(block).toHaveProperty('accepted_time');
-          expect(block).toHaveProperty('gas_price');
+          expect(block).toHaveProperty('timestamp');
           expect(block).toHaveProperty('transactions');
           expect(Array.isArray(block.transactions)).toBe(true);
         });
@@ -179,11 +173,8 @@ describe('defaultProvider', () => {
           expect(block).toHaveProperty('parent_hash');
           expect(block).toHaveProperty('block_number');
           expect(block).toHaveProperty('status');
-          expect(block).toHaveProperty('sequencer');
           expect(block).toHaveProperty('new_root');
-          expect(block).toHaveProperty('old_root');
-          expect(block).toHaveProperty('accepted_time');
-          expect(block).toHaveProperty('gas_price');
+          expect(block).toHaveProperty('timestamp');
           expect(block).toHaveProperty('transactions');
           expect(Array.isArray(block.transactions)).toBe(true);
         });
@@ -193,7 +184,7 @@ describe('defaultProvider', () => {
         test('pending', async () => {
           const storage = await provider.getStorageAt(
             '0x01d1f307c073bb786a66e6e042ec2a9bdc385a3373bb3738d95b966d5ce56166',
-            0
+            '0'
           );
           expect(typeof storage).toBe('string');
         });
@@ -201,7 +192,7 @@ describe('defaultProvider', () => {
         test('Block Hash 0x7104702055c2a5773a870ceada9552ec659d69c18053b14078983f07527dea8', async () => {
           const storage = await provider.getStorageAt(
             '0x01d1f307c073bb786a66e6e042ec2a9bdc385a3373bb3738d95b966d5ce56166',
-            0,
+            '0',
             '0x7225762c7ff5e7e5f0867f0a8e73594df4f44f05a65375339a76398e8ae3e64'
           );
           expect(typeof storage).toBe('string');
@@ -239,7 +230,6 @@ describe('defaultProvider', () => {
           expect(transaction.max_fee).toBeTruthy();
           expect(transaction.transaction_hash).toBeTruthy();
           expect(transaction).toHaveProperty('nonce');
-          expect(transaction).toHaveProperty('sender_address');
           expect(transaction).toHaveProperty('version');
         });
       });
@@ -260,13 +250,13 @@ describe('defaultProvider', () => {
       });
 
       describe('Contract methods', () => {
-        let contractAddress: string;
+        // let contractAddress: string;
         let deployResponse: DeployContractResponse;
         let declareResponse: DeclareContractResponse;
 
         beforeAll(async () => {
           deployResponse = await provider.deployContract({ contract: compiledErc20 });
-          contractAddress = deployResponse.contract_address;
+          // contractAddress = deployResponse.contract_address;
           declareResponse = await provider.declareContract({ contract: compiledErc20 });
           await Promise.all([
             provider.waitForTransaction(deployResponse.transaction_hash),
@@ -290,7 +280,10 @@ describe('defaultProvider', () => {
 
         describe('getClassAt', () => {
           test('response', async () => {
-            const classResponse = await provider.getClassAt(contractAddress);
+            const classResponse = await provider.getClassAt(
+              '0x075c4CEe7e88010008c1aA8777D798073D5Db63B685A033140cE5AF144EA0283',
+              '0x673c337dd17b50628e7b2a070e2c599a4fed54a2e7c1ff10e84115325c5b37e'
+            );
 
             expect(classResponse).toHaveProperty('program');
             expect(classResponse).toHaveProperty('entry_points_by_type');

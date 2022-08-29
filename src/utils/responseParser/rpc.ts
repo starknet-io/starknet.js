@@ -20,6 +20,10 @@ type RpcGetBlockResponse = RPC.getBlockWithTxHashesResponse & {
   [key: string]: any;
 };
 
+type GetTransactionByHashResponse = RPC.GetTransactionByHashResponse & {
+  [key: string]: any;
+};
+
 export class RPCResponseParser extends ResponseParser {
   public parseGetBlockResponse(res: RpcGetBlockResponse): GetBlockResponse {
     return {
@@ -33,17 +37,15 @@ export class RPCResponseParser extends ResponseParser {
     };
   }
 
-  public parseGetTransactionResponse(res: RPC.GetTransactionResponse): GetTransactionResponse {
+  public parseGetTransactionResponse(res: GetTransactionByHashResponse): GetTransactionResponse {
     return {
       calldata: res.calldata || [],
       contract_address: res.contract_address,
-      contract_class: res.contract_class,
       entry_point_selector: res.entry_point_selector,
       max_fee: res.max_fee,
       nonce: res.nonce,
-      sender_address: res.sender_address,
       signature: res.signature || [],
-      transaction_hash: res.txn_hash,
+      transaction_hash: res.transaction_hash,
       version: res.version,
     };
   }
