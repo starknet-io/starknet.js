@@ -12,7 +12,7 @@ This API is the primary way to interact with an account contract on StarkNet.
 
 ## Creating an instance
 
-For creating new instance of Account, account contract must be deployed. Also there needs to be a Provider instance that will be passed in the constructor and key pair for the account.
+To create a new instance of the Account, first an account contract must be deployed. Also there needs to be a Provider instance that will be passed in the constructor and key pair for the account.
 
 `new starknet.Account(Provider, address, starkKeyPair)`
 
@@ -26,7 +26,7 @@ The address of the account contract.
 
 account.**getNonce()** => _Promise < string >_
 
-Gets new Nonce for the next transaction.
+Gets the new Nonce for the next transaction.
 
 <hr />
 
@@ -53,7 +53,7 @@ The _options_ object may include any of:
 
 account.**execute**(calls [ , abi , transactionsDetail ]) => _Promise < AddTransactionResponse >_
 
-Executes one or multiple calls using the account contract
+Executes one or multiple calls using the account contract.
 
 The _transactionsDetail_ object may include any of:
 

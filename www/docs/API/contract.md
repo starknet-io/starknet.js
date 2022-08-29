@@ -52,7 +52,7 @@ contract.**METHOD_NAME**(...args [ , overrides ]) => _Promise < Result >_
 
 The type of the result depends on the ABI. Result object will be returned with each parameter available positionally and if the parameter is named, it will also be available by its name.
 
-The _overrides_ object for a read-only method may include any of:
+The _overrides_ object for a read-only method may include:
 
 - overrides.**blockIdentifier**
 
@@ -62,7 +62,7 @@ A non-constant method requires a transaction to be signed and requires payment i
 
 contract.**METHOD_NAME**(...args [ , overrides ]) => _Promise < AddTransactionResponse >_
 
-Returns a AddTransactionResponse for the transaction after it is sent to the network. This requires the Contract has a signer.
+Returns a _AddTransactionResponse_ for the transaction after it is sent to the network. This requires that Contract has a signer.
 
 The _overrides_ object for write methods may include any of:
 

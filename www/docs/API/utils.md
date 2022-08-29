@@ -8,11 +8,13 @@ Util functions are provided so you can use various low level functions in your a
 
 ## **address**
 
-The address helpers can be imported using:
+Helper functions for starknet addresses.
 
-```js
-import { address } from 'starknet.js';
-```
+### validateAndParseAddress
+
+`validateAndParseAddress(address: BigNumberish): string`
+
+Checks if the address is valid and, if it is, parses it to the correct format (0x prefix is added if not provided).
 
 ### getChecksumAddress
 
@@ -55,13 +57,13 @@ Function to compress compiled cairo program. Accepts a json file representing th
 
 `randomAddress(): string`
 
-Function that generates a random contract address.
+Function that generates a random stark address.
 
 ### makeAddress
 
 `makeAddress(input: string): string`
 
-Function that turns an incompatible address string into stark address format. 
+Function that turns an incompatible address string into stark address format.
 
 Returns a string.
 
@@ -71,7 +73,7 @@ Example: `0xdFD0F27FCe99b50909de0bDD328Aed6eAbe76BC5` -> `0xdfd0f27fce99b50909de
 
 `formatSignature(sig?: Signature): string[]`
 
-Function that formats a Signature to BigNum and then to string array. 
+Function that formats a Signature to BigNum and then to string array.
 
 Returns a string array.
 
@@ -122,7 +124,7 @@ Check if number is in hex format.
 
 `toBN(number: BigNumberish, base?: number | 'hex'): BN`
 
-Converts BigNumberish to BN. 
+Converts BigNumberish to BN.
 
 Returns a BN.
 
@@ -130,7 +132,7 @@ Returns a BN.
 
 `toHex(number: BN): string`
 
-Converts BN to hex. 
+Converts BN to hex.
 
 Returns a string.
 
@@ -144,7 +146,7 @@ Converts hex string to decimal string.
 
 `toFelt(num: BigNumberish): string`
 
-Converts BN to Felt. 
+Converts BN to Felt.
 
 Returns a string.
 
@@ -173,6 +175,8 @@ const signature = await this.signer.signTransaction(transactions, signerDetails)
     signature: bigNumberishArrayToDecimalStringArray(signature),
 }
 ```
+
+<hr />
 
 ## **uint256**
 
@@ -222,7 +226,7 @@ Returns starknet keccak hash as BigNumber.
 
 `getSelectorFromName(funcName: string)`
 
-Function to get the hex selector from a given function name. 
+Function to get the hex selector from a given function name.
 
 Returns hex selector of given abi function name.
 
@@ -230,7 +234,7 @@ Returns hex selector of given abi function name.
 
 `pedersen(input: [BigNumberish, BigNumberish])`
 
-Function to get the Pedersen hash for two arguments. 
+Function to get the Pedersen hash for two arguments.
 
 Returns a string.
 
@@ -238,7 +242,7 @@ Returns a string.
 
 `computeHashOnElements(data: BigNumberish[])`
 
-Function to compute a Pedersen hash on a array of elements. 
+Function to compute a Pedersen hash on a array of elements.
 
 Returns a string.
 
@@ -313,7 +317,7 @@ Public key defined over a Stark-friendly elliptic curve that is different from t
 
 Takes a public key and casts it into `elliptic` KeyPair format.
 
-Returns keyPair with public key only, which can be used to verify signatures, but cant sign anything.
+Returns keyPair with public key only, which can be used to verify signatures, but can't sign anything.
 
 ### sign
 
@@ -334,5 +338,5 @@ Verifies a message using the provided key.
 keyPair should be an KeyPair with a valid public key.
 
 sig should be an Signature.
-   
+
 Returns true if the verification succeeds.
