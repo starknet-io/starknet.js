@@ -4,7 +4,7 @@ sidebar_position: 1
 
 # Provider
 
-The **Provider** API allows you to interface with the StarkNet network, without signing transactions or messages.
+The **Provider** API allows you to interact with the StarkNet network, without signing transactions or messages.
 
 Typically, these are _read_ calls on the blockchain.
 
@@ -12,7 +12,7 @@ Typically, these are _read_ calls on the blockchain.
 
 `new starknet.Provider(optionsOrProvider)`
 
-The options for the provider depends from the network. The structure of the options object is:
+The options for the provider depend on the network. The structure of the options object is:
 
 - options.**sequencer** - Options for sequencer provider
 - options.**rpc** - Options for RPC provider
@@ -35,11 +35,11 @@ const provider = new starknet.Provider({
 })
 ```
 
-If you want to more control:
+If you want more control:
 
 ```typescript
 const provider = new starknet.Provider({
-    sequencer: {
+  sequencer: {
     baseUrl: 'https://alpha4.starknet.io',
     feederGatewayUrl: 'feeder_gateway',
     gatewayUrl: 'gateway',
@@ -47,11 +47,11 @@ const provider = new starknet.Provider({
 })
 ```
 
-These are also default options for the Provider constructor with `network: 'goerli-alpha'`.
+These are also the default options for the Provider constructor with `network: 'goerli-alpha'`.
 
 > **Note** 
 > 
-> `network` arguement should work in most cases. If you want to use sequencer arguement with `baseUrl`, you will not be able to use `network` field in the object.
+> `network` arguement should work in most cases. If you want to use the `sequencer` arguement with `baseUrl`, you will not be able to use the `network` field in the object.
 
 ## Methods
 
@@ -65,7 +65,7 @@ The call object structure:
 
 - call.**contractAddress** - Address of the contract
 - call.**entrypoint** - Entrypoint of the call (method name)
-- call.**calldata** - Payload for the invoking the method
+- call.**calldata** - Payload for the invoking method
 
 ###### _CallContractResponse_
 
@@ -168,7 +168,7 @@ Gets the transaction information from a tx hash.
 
 provider.**declareContract**(payload) => _Promise < DeclareContractResponse >_
 
-Declares a contract on Starknet
+Declares a contract on Starknet.
 
 ###### _DeclareContractResponse_
 
@@ -183,7 +183,7 @@ Declares a contract on Starknet
 
 provider.**deployContract**(payload [ , abi ]) => _Promise < DeployContractResponse >_
 
-Deploys a contract on Starknet
+Deploys a contract on Starknet.
 
 ###### _DeployContractResponse_
 
@@ -206,7 +206,7 @@ Wait for the transaction to be accepted on L2 or L1.
 
 `new starknet.SequencerProvider(optionsOrProvider)`
 
-The options for the provider depends from the network. The structure of the options object is:
+The options for the provider depend on the network. The structure of the options object is:
 
 - options.**baseUrl** - Base URL of the network
 - options.**feederGatewayUrl** - Feeder Gateway Endpoint of the network
@@ -214,7 +214,7 @@ The options for the provider depends from the network. The structure of the opti
 
 or
 
-- options.**network** - One of 'mainnet-alpha' or 'goerli-alpha'
+- options.**network** - Either 'mainnet-alpha' or 'goerli-alpha'
 
 Example:
 
@@ -228,7 +228,7 @@ const provider = new starknet.Provider({
 
 ## Methods
 
-Gets the smart contract address on the network
+Gets the smart contract address on the network.
 
 provider.**getContractAddresses**() => _Promise < GetContractAddressesResponse >_
 
@@ -284,8 +284,8 @@ Gets the transaction trace from a tx hash.
     internal_call: Array<any>;
     events: Array<any>;
     messages: Array<any>;
-    };
-    signature: Signature;
+  };
+  signature: Signature;
 }
 ```
 

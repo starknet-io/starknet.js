@@ -14,13 +14,13 @@ The **Signer** API allows you to sign transactions and messages, and also allows
 
 signer.**getPubKey**() => _Promise < string >_
 
-Returns public key of the signer.
+Returns the public key of the signer.
 
 <hr />
 
 signer.**signTransaction**(transactions, transactionsDetail [ , abi ]) => _Promise < Signature >_
 
-Returns signature of the transaction.
+Returns the signature of the transaction.
 
 ###### _Signature_
 
@@ -32,7 +32,7 @@ string[]
 
 signer.**signMessage**(typedData, accountAddress) => _Promise < Signature >_
 
-Returns signature of the transaction.
+Returns the signature of the transaction.
 
 ###### _Signature_
 

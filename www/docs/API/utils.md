@@ -8,11 +8,13 @@ Util functions are provided so you can use various low level functions in your a
 
 ## **address**
 
-The address helpers can be imported using:
+Helper functions for starknet addresses.
 
-```js
-import { address } from 'starknet.js';
-```
+### validateAndParseAddress
+
+`validateAndParseAddress(address: BigNumberish): string`
+
+Checks if the address is valid and, if it is, parses it to the correct format (0x prefix is added if not provided).
 
 ### getChecksumAddress
 
@@ -55,7 +57,7 @@ Function to compress compiled cairo program. Accepts a json file representing th
 
 `randomAddress(): string`
 
-Function that generates a random contract address.
+Function that generates a random stark address.
 
 ### makeAddress
 
@@ -173,6 +175,8 @@ const signature = await this.signer.signTransaction(transactions, signerDetails)
     signature: bigNumberishArrayToDecimalStringArray(signature),
 }
 ```
+
+<hr />
 
 ## **uint256**
 
@@ -313,7 +317,7 @@ Public key defined over a Stark-friendly elliptic curve that is different from t
 
 Takes a public key and casts it into `elliptic` KeyPair format.
 
-Returns keyPair with public key only, which can be used to verify signatures, but cant sign anything.
+Returns keyPair with public key only, which can be used to verify signatures, but can't sign anything.
 
 ### sign
 
