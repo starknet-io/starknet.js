@@ -7,7 +7,7 @@ import {
   getTestProvider,
 } from './fixtures';
 
-// This run only if Devnet Sequencer ?
+// Run only if Devnet Sequencer
 describeIfSequencer('SequencerProvider', () => {
   let provider: SequencerProvider;
   let customSequencerProvider: Provider;

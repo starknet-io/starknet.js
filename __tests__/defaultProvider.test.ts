@@ -46,6 +46,7 @@ describe('defaultProvider', () => {
     test(`getBlock(blockHash=${exampleBlockHash}, blockNumber=undefined)`, () => {
       return expect(testProvider.getBlock(exampleBlockHash)).resolves.not.toThrow();
     });
+
     test('getBlock(blockIdentifier=latest)', async () => {
       expect(exampleBlock).not.toBeNull();
 
@@ -250,13 +251,11 @@ describe('defaultProvider', () => {
       });
 
       describe('Contract methods', () => {
-        // let contractAddress: string;
         let deployResponse: DeployContractResponse;
         let declareResponse: DeclareContractResponse;
 
         beforeAll(async () => {
           deployResponse = await provider.deployContract({ contract: compiledErc20 });
-          // contractAddress = deployResponse.contract_address;
           declareResponse = await provider.declareContract({ contract: compiledErc20 });
           await Promise.all([
             provider.waitForTransaction(deployResponse.transaction_hash),
