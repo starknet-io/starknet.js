@@ -4,5 +4,6 @@ npm-debug.log
 .env
 .DS_Store
 .eslintcache
+.vscode
 coverage
 yarn.lock

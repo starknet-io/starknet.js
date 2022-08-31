@@ -7,9 +7,11 @@ import {
   getTestProvider,
 } from './fixtures';
 
+// Run only if Devnet Sequencer
 describeIfSequencer('SequencerProvider', () => {
   let provider: SequencerProvider;
   let customSequencerProvider: Provider;
+  let exampleContractAddress: string;
 
   beforeAll(async () => {
     provider = getTestProvider() as SequencerProvider;
@@ -26,11 +28,12 @@ describeIfSequencer('SequencerProvider', () => {
     let exampleTransactionHash: string;
 
     beforeAll(async () => {
-      const { transaction_hash } = await provider.deployContract({
+      const { transaction_hash, contract_address } = await provider.deployContract({
         contract: compiledErc20,
       });
       await provider.waitForTransaction(transaction_hash);
       exampleTransactionHash = transaction_hash;
+      exampleContractAddress = contract_address;
     });
 
     test('getTransactionStatus()', async () => {
@@ -41,6 +44,11 @@ describeIfSequencer('SequencerProvider', () => {
       const transactionTrace = await provider.getTransactionTrace(exampleTransactionHash);
       expect(transactionTrace).toHaveProperty('function_invocation');
       expect(transactionTrace).toHaveProperty('signature');
+    });
+
+    test('getCode() -> { bytecode }', async () => {
+      const code = await provider.getCode(exampleContractAddress);
+      return expect(Array.isArray(code.bytecode)).toBe(true);
     });
 
     describeIfNotDevnet('which are not available on devnet', () => {

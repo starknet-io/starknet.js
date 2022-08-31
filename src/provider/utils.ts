@@ -37,7 +37,6 @@ type BlockIdentifierObject =
   | { type: 'BLOCK_NUMBER'; data: BlockNumber }
   | { type: 'BLOCK_HASH'; data: BigNumberish };
 
-
 export class BlockIdentifierClass {
   blockIdentifier: BlockIdentifier;
 
