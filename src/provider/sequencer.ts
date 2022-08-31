@@ -229,6 +229,10 @@ export class SequencerProvider implements ProviderInterface {
     );
   }
 
+  public async getNonce(contractAddress: string): Promise<any> {
+    return this.fetchEndpoint('get_nonce', { contractAddress });
+  }
+
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,

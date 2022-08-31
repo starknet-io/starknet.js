@@ -259,6 +259,13 @@ export namespace Sequencer {
       REQUEST: never;
       RESPONSE: TransactionReceiptResponse;
     };
+    get_nonce: {
+      QUERY: {
+        contractAddress: string;
+      };
+      REQUEST: never;
+      RESPONSE: any;
+    };
     get_storage_at: {
       QUERY: {
         contractAddress: string;

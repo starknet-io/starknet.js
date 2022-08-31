@@ -62,6 +62,11 @@ describe('defaultProvider', () => {
       return expect(block).toHaveProperty('block_number');
     });
 
+    test('getNonce()', async () => {
+      const nonce = await testProvider.getNonce(exampleContractAddress);
+      return expect(nonce).toEqual('0x0');
+    });
+
     describe('getStorageAt', () => {
       test('with "key" type of number', () => {
         return expect(testProvider.getStorageAt(exampleContractAddress, 0)).resolves.not.toThrow();

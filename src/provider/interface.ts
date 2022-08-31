@@ -63,6 +63,14 @@ export abstract class ProviderInterface {
   ): Promise<ContractClass>;
 
   /**
+   * Gets the nonce of a contract with respect to a specific block
+   *
+   * @param contractAddress - contract address
+   * @returns the hex nonce
+   */
+  public abstract getNonce(contractAddress: string): Promise<any>;
+
+  /**
    * Gets the contract's storage variable at a specific key.
    *
    * @param contractAddress
