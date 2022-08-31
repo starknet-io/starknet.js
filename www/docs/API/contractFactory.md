@@ -4,7 +4,7 @@ sidebar_position: 5
 
 # Contract Factory
 
-Contract Factory allow you to deploy contracts onto StarkNet. To deploy a Contract, additional information is needed that is not available on a Contract object itself.
+Contract Factory allow you to deploy contracts to StarkNet. To deploy a Contract, additional information is needed that is not available on a Contract object itself.
 
 ## Creating an instance
 
@@ -36,8 +36,10 @@ contractFactory.**attach**( address ) ⇒ _Contract_
 
 Return an instance of a _Contract_ attached to address. This is the same as using the _Contract_ constructor with address and this _compiledContract_ and _providerOrAccount_ passed in when creating the ContractFactory.
 
+<hr />
+
 contractFactory.**deploy**( constructorCalldata, addressSalt ) ⇒ _Promise < Contract >_
 
-Uses the provider to deploy the Contract with constructorCalldata passed into the constructor and returns a _Contract_ which is attached to the address where this contract will be deployed.
+Uses the provider to deploy the Contract with _constructorCalldata_ passed into the constructor and returns a _Contract_ which is attached to the address where this contract will be deployed.
 
 The transaction hash can be found at _contract.deployTransactionHash_, and no interactions should be made until the transaction is resolved.

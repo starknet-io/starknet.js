@@ -1,3 +1,7 @@
+/**
+ * Map RPC Response to common interface response
+ * Intersection (sequencer response ∩ (∪ rpc responses))
+ */
 import {
   CallContractResponse,
   DeclareContractResponse,
@@ -12,33 +16,36 @@ import { RPC } from '../../types/api';
 import { toBN } from '../number';
 import { ResponseParser } from '.';
 
+type RpcGetBlockResponse = RPC.GetBlockWithTxHashesResponse & {
+  [key: string]: any;
+};
+
+type GetTransactionByHashResponse = RPC.GetTransactionByHashResponse & {
+  [key: string]: any;
+};
+
 export class RPCResponseParser extends ResponseParser {
-  public parseGetBlockResponse(res: RPC.GetBlockResponse): GetBlockResponse {
+  public parseGetBlockResponse(res: RpcGetBlockResponse): GetBlockResponse {
     return {
-      accepted_time: res.accepted_time,
+      timestamp: res.timestamp,
       block_hash: res.block_hash,
       block_number: res.block_number,
-      gas_price: res.gas_price,
       new_root: res.new_root,
-      old_root: res.old_root,
       parent_hash: res.parent_hash,
-      sequencer: res.sequencer,
       status: res.status,
       transactions: res.transactions,
     };
   }
 
-  public parseGetTransactionResponse(res: RPC.GetTransactionResponse): GetTransactionResponse {
+  public parseGetTransactionResponse(res: GetTransactionByHashResponse): GetTransactionResponse {
     return {
       calldata: res.calldata || [],
       contract_address: res.contract_address,
-      contract_class: res.contract_class,
       entry_point_selector: res.entry_point_selector,
       max_fee: res.max_fee,
       nonce: res.nonce,
-      sender_address: res.sender_address,
       signature: res.signature || [],
-      transaction_hash: res.txn_hash,
+      transaction_hash: res.transaction_hash,
       version: res.version,
     };
   }
@@ -55,10 +62,6 @@ export class RPCResponseParser extends ResponseParser {
       l1_origin_message: res.l1_origin_message,
       events: res.events,
     };
-  }
-
-  public parseGetCodeResponse(res: RPC.GetCodeResponse): RPC.GetCodeResponse {
-    return res;
   }
 
   public parseFeeEstimateResponse(res: RPC.EstimateFeeResponse): EstimateFeeResponse {

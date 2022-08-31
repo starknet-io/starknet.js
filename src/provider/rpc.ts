@@ -1,6 +1,5 @@
 import { StarknetChainId } from '../constants';
 import {
-  BlockTag,
   Call,
   CallContractResponse,
   DeclareContractPayload,
@@ -9,6 +8,7 @@ import {
   DeployContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
+  GetCodeResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
@@ -19,18 +19,12 @@ import { RPC } from '../types/api';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
-import {
-  BigNumberish,
-  bigNumberishArrayToDecimalStringArray,
-  isHex,
-  toBN,
-  toHex,
-} from '../utils/number';
+import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
 import { parseCalldata, parseContract, wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
-import { BlockIdentifier } from './utils';
+import { BlockIdentifier, BlockIdentifierClass } from './utils';
 
 export type RpcProviderOptions = { nodeUrl: string };
 
@@ -89,34 +83,63 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_chainId');
   }
 
+  // Common Interface
   public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
-    const method =
-      typeof blockIdentifier === 'string' && isHex(blockIdentifier)
-        ? 'starknet_getBlockByHash'
-        : 'starknet_getBlockByNumber';
-
-    return this.fetchEndpoint(method, [blockIdentifier]).then(
+    return this.getBlockWithTxHashes(blockIdentifier).then(
       this.responseParser.parseGetBlockResponse
     );
+  }
+
+  public async getBlockWithTxHashes(
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<RPC.GetBlockWithTxHashesResponse> {
+    const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
+    return this.fetchEndpoint('starknet_getBlockWithTxHashes', [
+      blockIdentifierGetter.getIdentifier(),
+    ]);
+  }
+
+  public async getBlockWithTxs(
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<RPC.GetBlockWithTxs> {
+    const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
+    return this.fetchEndpoint('starknet_getBlockWithTxs', [blockIdentifierGetter.getIdentifier()]);
+  }
+
+  public async getNonce(contractAddress: string): Promise<any> {
+    return this.fetchEndpoint('starknet_getNonce', [contractAddress]);
   }
 
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockHashOrTag: BlockTag | BigNumberish = 'pending'
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<BigNumberish> {
     const parsedKey = toHex(toBN(key));
+    const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
     return this.fetchEndpoint('starknet_getStorageAt', [
       contractAddress,
       parsedKey,
-      blockHashOrTag,
+      blockIdentifierGetter.getIdentifier(),
     ]);
   }
 
+  // common interface
   public async getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {
-    return this.fetchEndpoint('starknet_getTransactionByHash', [txHash]).then(
-      this.responseParser.parseGetTransactionResponse
-    );
+    return this.getTransactionByHash(txHash).then(this.responseParser.parseGetTransactionResponse);
+  }
+
+  public async getTransactionByHash(
+    txHash: BigNumberish
+  ): Promise<RPC.GetTransactionByHashResponse> {
+    return this.fetchEndpoint('starknet_getTransactionByHash', [txHash]);
+  }
+
+  public async getTransactionByBlockIdAndIndex(
+    blockIdentifier: BlockIdentifier,
+    index: number
+  ): Promise<RPC.GetTransactionByBlockIdAndIndex> {
+    return this.fetchEndpoint('starknet_getTransactionByHash', [blockIdentifier, index]);
   }
 
   public async getTransactionReceipt(txHash: BigNumberish): Promise<GetTransactionReceiptResponse> {
@@ -125,11 +148,12 @@ export class RpcProvider implements ProviderInterface {
     );
   }
 
-  public async getClassAt(
-    contractAddress: string,
-    _blockIdentifier: BlockIdentifier = 'pending'
-  ): Promise<any> {
-    return this.fetchEndpoint('starknet_getClassAt', [contractAddress]);
+  public async getClassAt(contractAddress: string, blockIdentifier: BlockIdentifier): Promise<any> {
+    const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
+    return this.fetchEndpoint('starknet_getClassAt', [
+      blockIdentifierGetter.getIdentifier(),
+      contractAddress,
+    ]);
   }
 
   public async getEstimateFee(
@@ -214,12 +238,10 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getCode(
-    contractAddress: string,
+    _contractAddress: string,
     _blockIdentifier?: BlockIdentifier
-  ): Promise<RPC.GetCodeResponse> {
-    const result = await this.fetchEndpoint('starknet_getCode', [contractAddress]);
-
-    return this.responseParser.parseGetCodeResponse(result);
+  ): Promise<GetCodeResponse> {
+    throw new Error('RPC 0.1.0 does not implement getCode function');
   }
 
   public async waitForTransaction(txHash: BigNumberish, retryInterval: number = 8000) {
@@ -270,10 +292,10 @@ export class RpcProvider implements ProviderInterface {
   public async getTransactionCount(
     blockIdentifier: BlockIdentifier
   ): Promise<RPC.GetTransactionCountResponse> {
-    if (typeof blockIdentifier === 'number') {
-      return this.fetchEndpoint('starknet_getBlockTransactionCountByNumber', [blockIdentifier]);
-    }
-    return this.fetchEndpoint('starknet_getBlockTransactionCountByHash', [blockIdentifier]);
+    const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
+    return this.fetchEndpoint('starknet_getBlockTransactionCount', [
+      blockIdentifierGetter.getIdentifier(),
+    ]);
   }
 
   /**

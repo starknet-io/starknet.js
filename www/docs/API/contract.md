@@ -16,15 +16,15 @@ Contracts allow you to transform Cairo values, like `Uint256` to `BigNumber`. It
 
 `contract.connect(providerOrAccount)` _for changing the provider or account_
 
-## Contract properties
+## Properties
 
 contract.**address** => _string_
 
-The address the contract was constructed/connected with
+The address the contract was constructed/connected with.
 
 contract.**providerOrAccount** => _ProviderInterface | AccountInterface_
 
-Provider or account that are used to interact with the network
+Provider or account that are used to interact with the network.
 
 contract.**deployTransactionHash** => _string | null_
 
@@ -32,9 +32,9 @@ If the Contract object is the result of a ContractFactory deployment, this is th
 
 contract.**abi** => _Abi_
 
-The ABI the contract was constructed with
+The ABI the contract was constructed with.
 
-## Contract methods
+## Methods
 
 contract.**deployed**() => _Promise < Contract >_
 
@@ -46,13 +46,13 @@ A Meta-Class is a Class which has any of its properties determined at run-time. 
 
 ### Read-Only Methods(constant)
 
-A constant method (denoted view in Cairo) is read-only and evaluates a small amount of EVM code against the current blockchain state. It is therefore free and does not require any fee, but cannot make changes to the blockchain state...
+A constant method (denoted view in Cairo) is read-only and evaluates a small amount of Cairo code against the current blockchain state. It is therefore free and does not require any fee, but cannot make changes to the blockchain state...
 
 contract.**METHOD_NAME**(...args [ , overrides ]) => _Promise < Result >_
 
 The type of the result depends on the ABI. Result object will be returned with each parameter available positionally and if the parameter is named, it will also be available by its name.
 
-The _overrides_ object for a read-only method may include any of:
+The _overrides_ object for a read-only method may include:
 
 - overrides.**blockIdentifier**
 
@@ -62,7 +62,7 @@ A non-constant method requires a transaction to be signed and requires payment i
 
 contract.**METHOD_NAME**(...args [ , overrides ]) => _Promise < AddTransactionResponse >_
 
-Returns a AddTransactionResponse for the transaction after it is sent to the network. This requires the Contract has a signer.
+Returns a _AddTransactionResponse_ for the transaction after it is sent to the network. This requires that Contract has a signer.
 
 The _overrides_ object for write methods may include any of:
 

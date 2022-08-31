@@ -1,5 +1,5 @@
 import type { BlockNumber } from '../types';
-import { BigNumberish, toBN, toHex } from '../utils/number';
+import { BigNumberish, isHex, toBN, toHex } from '../utils/number';
 
 /**
  *
@@ -31,10 +31,31 @@ export function txIdentifier(txHash?: BigNumberish, txId?: BigNumberish): string
 // hex string and BN are detected as block hashes
 // decimal string and number are detected as block numbers
 // null appends nothing to the request url
+
 export type BlockIdentifier = BlockNumber | BigNumberish;
 type BlockIdentifierObject =
   | { type: 'BLOCK_NUMBER'; data: BlockNumber }
   | { type: 'BLOCK_HASH'; data: BigNumberish };
+
+export class BlockIdentifierClass {
+  blockIdentifier: BlockIdentifier;
+
+  constructor(blockIdentifier: BlockIdentifier) {
+    this.blockIdentifier = blockIdentifier;
+  }
+
+  getIdentifier() {
+    if (typeof this.blockIdentifier === 'string' && isHex(this.blockIdentifier)) {
+      return { block_hash: this.blockIdentifier };
+    }
+
+    if (typeof this.blockIdentifier === 'number') {
+      return { block_number: this.blockIdentifier };
+    }
+
+    return this.blockIdentifier;
+  }
+}
 
 /**
  * Identifies the block to be queried.

@@ -50,21 +50,16 @@ describe('defaultProvider', () => {
     test('getBlock(blockIdentifier=latest)', async () => {
       expect(exampleBlock).not.toBeNull();
 
-      const { block_number, accepted_time } = exampleBlock;
+      const { block_number, timestamp } = exampleBlock;
 
       expect(typeof block_number).toEqual('number');
 
-      return expect(typeof accepted_time).toEqual('number');
+      return expect(typeof timestamp).toEqual('number');
     });
 
     test('getBlock() -> { blockNumber }', async () => {
       const block = await testProvider.getBlock();
       return expect(block).toHaveProperty('block_number');
-    });
-
-    test('getCode() -> { bytecode }', async () => {
-      const code = await testProvider.getCode(exampleContractAddress);
-      return expect(Array.isArray(code.bytecode)).toBe(true);
     });
 
     describe('getStorageAt', () => {
@@ -144,7 +139,7 @@ describe('defaultProvider', () => {
 
   describeIfNotDevnet('Provider', () => {
     const provider = getTestProvider();
-    describe(`Provider methods`, () => {
+    describe(`Provider methods if not devnet`, () => {
       describe('getBlock', () => {
         test('pending', async () => {
           const latestBlock = await provider.getBlock();
@@ -152,11 +147,8 @@ describe('defaultProvider', () => {
           expect(latestBlock).toHaveProperty('parent_hash');
           expect(latestBlock).toHaveProperty('block_number');
           expect(latestBlock).toHaveProperty('status');
-          expect(latestBlock).toHaveProperty('sequencer');
           expect(latestBlock).toHaveProperty('new_root');
-          expect(latestBlock).toHaveProperty('old_root');
-          expect(latestBlock).toHaveProperty('accepted_time');
-          expect(latestBlock).toHaveProperty('gas_price');
+          expect(latestBlock).toHaveProperty('timestamp');
           expect(latestBlock).toHaveProperty('transactions');
           expect(Array.isArray(latestBlock.transactions)).toBe(true);
         });
@@ -170,11 +162,8 @@ describe('defaultProvider', () => {
           expect(block).toHaveProperty('parent_hash');
           expect(block).toHaveProperty('block_number');
           expect(block).toHaveProperty('status');
-          expect(block).toHaveProperty('sequencer');
           expect(block).toHaveProperty('new_root');
-          expect(block).toHaveProperty('old_root');
-          expect(block).toHaveProperty('accepted_time');
-          expect(block).toHaveProperty('gas_price');
+          expect(block).toHaveProperty('timestamp');
           expect(block).toHaveProperty('transactions');
           expect(Array.isArray(block.transactions)).toBe(true);
         });
@@ -185,11 +174,8 @@ describe('defaultProvider', () => {
           expect(block).toHaveProperty('parent_hash');
           expect(block).toHaveProperty('block_number');
           expect(block).toHaveProperty('status');
-          expect(block).toHaveProperty('sequencer');
           expect(block).toHaveProperty('new_root');
-          expect(block).toHaveProperty('old_root');
-          expect(block).toHaveProperty('accepted_time');
-          expect(block).toHaveProperty('gas_price');
+          expect(block).toHaveProperty('timestamp');
           expect(block).toHaveProperty('transactions');
           expect(Array.isArray(block.transactions)).toBe(true);
         });
@@ -199,7 +185,7 @@ describe('defaultProvider', () => {
         test('pending', async () => {
           const storage = await provider.getStorageAt(
             '0x01d1f307c073bb786a66e6e042ec2a9bdc385a3373bb3738d95b966d5ce56166',
-            0
+            '0'
           );
           expect(typeof storage).toBe('string');
         });
@@ -207,7 +193,7 @@ describe('defaultProvider', () => {
         test('Block Hash 0x7104702055c2a5773a870ceada9552ec659d69c18053b14078983f07527dea8', async () => {
           const storage = await provider.getStorageAt(
             '0x01d1f307c073bb786a66e6e042ec2a9bdc385a3373bb3738d95b966d5ce56166',
-            0,
+            '0',
             '0x7225762c7ff5e7e5f0867f0a8e73594df4f44f05a65375339a76398e8ae3e64'
           );
           expect(typeof storage).toBe('string');
@@ -245,7 +231,6 @@ describe('defaultProvider', () => {
           expect(transaction.max_fee).toBeTruthy();
           expect(transaction.transaction_hash).toBeTruthy();
           expect(transaction).toHaveProperty('nonce');
-          expect(transaction).toHaveProperty('sender_address');
           expect(transaction).toHaveProperty('version');
         });
       });
@@ -269,6 +254,7 @@ describe('defaultProvider', () => {
         let contractAddress: string;
         let deployResponse: DeployContractResponse;
         let declareResponse: DeclareContractResponse;
+        let blockNumber: BlockNumber;
 
         beforeAll(async () => {
           deployResponse = await provider.deployContract({ contract: compiledErc20 });
@@ -278,6 +264,7 @@ describe('defaultProvider', () => {
             provider.waitForTransaction(deployResponse.transaction_hash),
             provider.waitForTransaction(declareResponse.transaction_hash),
           ]);
+          ({ block_number: blockNumber } = await provider.getBlock('latest'));
         });
 
         describe('deployContract', () => {
@@ -296,7 +283,7 @@ describe('defaultProvider', () => {
 
         describe('getClassAt', () => {
           test('response', async () => {
-            const classResponse = await provider.getClassAt(contractAddress);
+            const classResponse = await provider.getClassAt(contractAddress, blockNumber);
 
             expect(classResponse).toHaveProperty('program');
             expect(classResponse).toHaveProperty('entry_points_by_type');
