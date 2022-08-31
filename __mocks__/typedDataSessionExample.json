@@ -1,0 +1,42 @@
+{
+  "primaryType": "Session",
+  "types": {
+    "Policy": [
+      { "name": "contractAddress", "type": "felt" },
+      { "name": "selector", "type": "selector" }
+    ],
+    "Session": [
+      { "name": "key", "type": "felt" },
+      { "name": "expires", "type": "felt" },
+      { "name": "root", "type": "merkletree", "contains": "Policy" }
+    ],
+    "StarkNetDomain": [
+      { "name": "name", "type": "felt" },
+      { "name": "version", "type": "felt" },
+      { "name": "chain_id", "type": "felt" }
+    ]
+  },
+  "domain": {
+    "name": "StarkNet Mail",
+    "version": "1",
+    "chain_id": 1
+  },
+  "message": {
+    "key": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "expires": "0x0000000000000000000000000000000000000000000000000000000000000000",
+    "root": [
+      {
+        "contractAddress": "0x1",
+        "selector": "transfer"
+      },
+      {
+        "contractAddress": "0x2",
+        "selector": "transfer"
+      },
+      {
+        "contractAddress": "0x3",
+        "selector": "transfer"
+      }
+    ]
+  }
+}

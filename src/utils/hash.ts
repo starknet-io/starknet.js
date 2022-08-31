@@ -62,13 +62,15 @@ export function pedersen(input: [BigNumberish, BigNumberish]) {
   for (let i = 0; i < input.length; i += 1) {
     let x = toBN(input[i]);
     assert(x.gte(ZERO) && x.lt(toBN(addHexPrefix(FIELD_PRIME))), `Invalid input: ${input[i]}`);
-    for (let j = 0; j < 252; j += 1) {
-      const pt = constantPoints[2 + i * 252 + j];
-      assert(!point.getX().eq(pt.getX()));
-      if (x.and(ONE).toNumber() !== 0) {
-        point = point.add(pt);
+    if (!x.isZero()) {
+      for (let j = 0; j < 252; j += 1) {
+        const pt = constantPoints[2 + i * 252 + j];
+        assert(!point.getX().eq(pt.getX()));
+        if (x.and(ONE).toNumber() !== 0) {
+          point = point.add(pt);
+        }
+        x = x.shrn(1);
       }
-      x = x.shrn(1);
     }
   }
   return addHexPrefix(point.getX().toString(16));

@@ -25,6 +25,11 @@ test('pedersen()', () => {
   expect(own).toMatchSnapshot();
 });
 
+test('pedersen() with 0', () => {
+  const own = pedersen(['0x12773', '0x0']);
+  expect(own).toMatchSnapshot();
+});
+
 test('computeHashOnElements()', () => {
   const array = ['1', '2', '3', '4'];
   expect(computeHashOnElements(array)).toBe(
