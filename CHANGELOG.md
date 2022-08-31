@@ -1,3 +1,18 @@
+## [4.3.1](https://github.com/0xs34n/starknet.js/compare/v4.3.0...v4.3.1) (2022-08-31)
+
+### Bug Fixes
+
+- getClassAt and Test Fixes ([548cf6e](https://github.com/0xs34n/starknet.js/commit/548cf6e69d16292b9c216493c77e1c7a14be2ae9))
+- getCode removed from RPC 0.1.0 ([744a988](https://github.com/0xs34n/starknet.js/commit/744a9882c363331ff47f409971cacbfda977c4c2))
+- merge ([67d87fc](https://github.com/0xs34n/starknet.js/commit/67d87fc834ea5b877029445f39782457584fb4ec))
+- naming ([0c75f6f](https://github.com/0xs34n/starknet.js/commit/0c75f6f431c3828b1078d955123b2d13aef6b5d0))
+- restore GetCode to common interface for backward compatibility ([52f8e61](https://github.com/0xs34n/starknet.js/commit/52f8e61797a3f2390577b3a6e977adae11346a23))
+- rpc 0.1.0 getStorageAt ([c622913](https://github.com/0xs34n/starknet.js/commit/c6229138c57cd9a04b982c386c7278d63b931a1f))
+- **RpcProvider:** update of RpcProvider getBlock method to work with v0.3.0 of pathfinder ([3b12421](https://github.com/0xs34n/starknet.js/commit/3b124219dd25ef5a0c81583fcfe67d6a3cc5a70e))
+- test getBlock('latest') ([2c92f79](https://github.com/0xs34n/starknet.js/commit/2c92f79aefe3af68834aa9a9a16754c0ff4116cc))
+- test getBlock(latest) ([0c5e31e](https://github.com/0xs34n/starknet.js/commit/0c5e31effb63bf7afb26c9f2049b66c93c6b1366))
+- unoptimise getClassAt test to work with integration ([e98220b](https://github.com/0xs34n/starknet.js/commit/e98220bc6e6fff55bc439773bd1258844de312e2))
+
 # [4.3.0](https://github.com/0xs34n/starknet.js/compare/v4.2.0...v4.3.0) (2022-08-09)
 
 ### Bug Fixes
