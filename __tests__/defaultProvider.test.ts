@@ -251,16 +251,20 @@ describe('defaultProvider', () => {
       });
 
       describe('Contract methods', () => {
+        let contractAddress: string;
         let deployResponse: DeployContractResponse;
         let declareResponse: DeclareContractResponse;
+        let blockNumber: BlockNumber;
 
         beforeAll(async () => {
           deployResponse = await provider.deployContract({ contract: compiledErc20 });
+          contractAddress = deployResponse.contract_address;
           declareResponse = await provider.declareContract({ contract: compiledErc20 });
           await Promise.all([
             provider.waitForTransaction(deployResponse.transaction_hash),
             provider.waitForTransaction(declareResponse.transaction_hash),
           ]);
+          ({ block_number: blockNumber } = await provider.getBlock('latest'));
         });
 
         describe('deployContract', () => {
@@ -279,10 +283,7 @@ describe('defaultProvider', () => {
 
         describe('getClassAt', () => {
           test('response', async () => {
-            const classResponse = await provider.getClassAt(
-              '0x075c4CEe7e88010008c1aA8777D798073D5Db63B685A033140cE5AF144EA0283',
-              '0x673c337dd17b50628e7b2a070e2c599a4fed54a2e7c1ff10e84115325c5b37e'
-            );
+            const classResponse = await provider.getClassAt(contractAddress, blockNumber);
 
             expect(classResponse).toHaveProperty('program');
             expect(classResponse).toHaveProperty('entry_points_by_type');
