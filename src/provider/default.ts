@@ -65,6 +65,10 @@ export class Provider implements ProviderInterface {
     return this.provider.getEstimateFee(invocation, blockIdentifier, invocationDetails);
   }
 
+  public async getNonce(contractAddress: string): Promise<any> {
+    return this.provider.getNonce(contractAddress);
+  }
+
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,

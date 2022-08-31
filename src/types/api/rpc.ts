@@ -143,7 +143,7 @@ export namespace RPC {
     starknet_getNonce: {
       QUERY: never;
       REQUEST: any[];
-      RESPONSE: string;
+      RESPONSE: any;
     };
     starknet_getStorageAt: {
       QUERY: never;
