@@ -1,3 +1,9 @@
+## [4.4.1](https://github.com/0xs34n/starknet.js/compare/v4.4.0...v4.4.1) (2022-09-01)
+
+### Bug Fixes
+
+- supply calldata as hexadecimal string array ([44cb4c5](https://github.com/0xs34n/starknet.js/commit/44cb4c5f108a2ea8fcd77147f053e068189d4f33))
+
 # [4.4.0](https://github.com/0xs34n/starknet.js/compare/v4.3.1...v4.4.0) (2022-09-01)
 
 ### Bug Fixes
