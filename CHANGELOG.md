@@ -1,3 +1,21 @@
+# [4.4.0](https://github.com/0xs34n/starknet.js/compare/v4.3.1...v4.4.0) (2022-09-01)
+
+### Bug Fixes
+
+- delete premature session account file ([ca3e70b](https://github.com/0xs34n/starknet.js/commit/ca3e70b06d21dba8b2074512251cf232ed8be46b))
+- session ([00269bf](https://github.com/0xs34n/starknet.js/commit/00269bfd23ed647270a1efd699af7c36978965c7))
+- session account prooving ([0b56833](https://github.com/0xs34n/starknet.js/commit/0b56833f6eb7557d55725a505a01185bbc9756db))
+- tests ([4586e93](https://github.com/0xs34n/starknet.js/commit/4586e93f10a2a43c375a23d851a9778bab412fcc))
+- typo ([1c60a4d](https://github.com/0xs34n/starknet.js/commit/1c60a4d4b306879422769a6c2afc4fd6c39c4c07))
+
+### Features
+
+- add merkle trees ([e9b8674](https://github.com/0xs34n/starknet.js/commit/e9b8674f51c6d6fe57772a4c88b162c5132cfbdd))
+- add visibility modifiers ([cd1a23d](https://github.com/0xs34n/starknet.js/commit/cd1a23d74b49407c27314a12d5bc149ed40209f3))
+- allow merkle trees as native type in eip712 like messages ([65b7766](https://github.com/0xs34n/starknet.js/commit/65b7766c29eca4f4d0e89f6ad1368fedd5e0e18e))
+- session ([9ac48cc](https://github.com/0xs34n/starknet.js/commit/9ac48cc15c1c7b0e504adfc79a7f382f5d0b55d0))
+- session needs to be aware of the whole tree ([11e10bd](https://github.com/0xs34n/starknet.js/commit/11e10bda0f020a670854d941a54142d55936fc18))
+
 ## [4.3.1](https://github.com/0xs34n/starknet.js/compare/v4.3.0...v4.3.1) (2022-08-31)
 
 ### Bug Fixes
