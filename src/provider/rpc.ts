@@ -19,7 +19,12 @@ import { RPC } from '../types/api';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
-import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
+import {
+  BigNumberish,
+  bigNumberishArrayToHexadecimalStringArray,
+  toBN,
+  toHex,
+} from '../utils/number';
 import { parseCalldata, parseContract, wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { randomAddress } from '../utils/stark';
@@ -166,7 +171,7 @@ export class RpcProvider implements ProviderInterface {
         contract_address: invocation.contractAddress,
         entry_point_selector: getSelectorFromName(invocation.entrypoint),
         calldata: parseCalldata(invocation.calldata),
-        signature: bigNumberishArrayToDecimalStringArray(invocation.signature || []),
+        signature: bigNumberishArrayToHexadecimalStringArray(invocation.signature || []),
         version: toHex(toBN(invocationDetails?.version || 0)),
       },
       blockIdentifier,
@@ -197,7 +202,7 @@ export class RpcProvider implements ProviderInterface {
 
     return this.fetchEndpoint('starknet_addDeployTransaction', [
       addressSalt ?? randomAddress(),
-      bigNumberishArrayToDecimalStringArray(constructorCalldata ?? []),
+      bigNumberishArrayToHexadecimalStringArray(constructorCalldata ?? []),
       {
         program: contractDefinition.program,
         entry_points_by_type: contractDefinition.entry_points_by_type,
@@ -215,7 +220,7 @@ export class RpcProvider implements ProviderInterface {
         entry_point_selector: getSelectorFromName(functionInvocation.entrypoint),
         calldata: parseCalldata(functionInvocation.calldata),
       },
-      bigNumberishArrayToDecimalStringArray(functionInvocation.signature || []),
+      bigNumberishArrayToHexadecimalStringArray(functionInvocation.signature || []),
       toHex(toBN(details.maxFee || 0)),
       toHex(toBN(details.version || 0)),
     ]).then(this.responseParser.parseInvokeFunctionResponse);
