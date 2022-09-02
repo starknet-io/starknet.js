@@ -41,7 +41,6 @@ export class RPCResponseParser extends ResponseParser {
     return {
       calldata: res.calldata || [],
       contract_address: res.contract_address,
-      entry_point_selector: res.entry_point_selector,
       max_fee: res.max_fee,
       nonce: res.nonce,
       signature: res.signature || [],

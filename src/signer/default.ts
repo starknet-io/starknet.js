@@ -1,7 +1,7 @@
-import { Abi, Invocation, InvocationsSignerDetails, KeyPair, Signature } from '../types';
+import { Abi, Call, InvocationsSignerDetails, KeyPair, Signature } from '../types';
 import { genKeyPair, getStarkKey, sign } from '../utils/ellipticCurve';
-import { calculcateTransactionHash, getSelectorFromName } from '../utils/hash';
-import { fromCallsToExecuteCalldataWithNonce } from '../utils/transaction';
+import { calculateTransactionHash } from '../utils/hash';
+import { fromCallsToExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { SignerInterface } from './interface';
 
@@ -17,7 +17,7 @@ export class Signer implements SignerInterface {
   }
 
   public async signTransaction(
-    transactions: Invocation[],
+    transactions: Call[],
     transactionsDetail: InvocationsSignerDetails,
     abis?: Abi[]
   ): Promise<Signature> {
@@ -26,15 +26,15 @@ export class Signer implements SignerInterface {
     }
     // now use abi to display decoded data somewhere, but as this signer is headless, we can't do that
 
-    const calldata = fromCallsToExecuteCalldataWithNonce(transactions, transactionsDetail.nonce);
+    const calldata = fromCallsToExecuteCalldata(transactions);
 
-    const msgHash = calculcateTransactionHash(
+    const msgHash = calculateTransactionHash(
       transactionsDetail.walletAddress,
       transactionsDetail.version,
-      getSelectorFromName('__execute__'),
       calldata,
       transactionsDetail.maxFee,
-      transactionsDetail.chainId
+      transactionsDetail.chainId,
+      transactionsDetail.nonce
     );
 
     return sign(this.keyPair, msgHash);

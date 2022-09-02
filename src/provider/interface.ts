@@ -13,7 +13,7 @@ import type {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
-  InvocationsDetails,
+  InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
 } from '../types';
 import type { BigNumberish } from '../utils/number';
@@ -68,7 +68,7 @@ export abstract class ProviderInterface {
    * @param contractAddress - contract address
    * @returns the hex nonce
    */
-  public abstract getNonce(contractAddress: string): Promise<any>;
+  public abstract getNonce(contractAddress: string): Promise<BigNumberish>;
 
   /**
    * Gets the contract's storage variable at a specific key.
@@ -142,7 +142,7 @@ export abstract class ProviderInterface {
    */
   public abstract invokeFunction(
     invocation: Invocation,
-    details?: InvocationsDetails
+    details: InvocationsDetailsWithNonce
   ): Promise<InvokeFunctionResponse>;
 
   /**
@@ -161,8 +161,8 @@ export abstract class ProviderInterface {
    */
   public abstract getEstimateFee(
     invocation: Invocation,
-    blockIdentifier: BlockIdentifier,
-    details?: InvocationsDetails
+    details: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier
   ): Promise<EstimateFeeResponse>;
 
   /**

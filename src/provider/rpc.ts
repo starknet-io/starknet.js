@@ -12,7 +12,7 @@ import {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
-  InvocationsDetails,
+  InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
 } from '../types';
 import { RPC } from '../types/api';
@@ -106,7 +106,7 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_getBlockWithTxs', [blockIdentifierGetter.getIdentifier()]);
   }
 
-  public async getNonce(contractAddress: string): Promise<any> {
+  public async getNonce(contractAddress: string): Promise<BigNumberish> {
     return this.fetchEndpoint('starknet_getNonce', [contractAddress]);
   }
 
@@ -158,13 +158,12 @@ export class RpcProvider implements ProviderInterface {
 
   public async getEstimateFee(
     invocation: Invocation,
-    blockIdentifier: BlockIdentifier = 'pending',
-    invocationDetails: InvocationsDetails = {}
+    invocationDetails: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint('starknet_estimateFee', [
       {
         contract_address: invocation.contractAddress,
-        entry_point_selector: getSelectorFromName(invocation.entrypoint),
         calldata: parseCalldata(invocation.calldata),
         signature: bigNumberishArrayToDecimalStringArray(invocation.signature || []),
         version: toHex(toBN(invocationDetails?.version || 0)),
@@ -207,12 +206,11 @@ export class RpcProvider implements ProviderInterface {
 
   public async invokeFunction(
     functionInvocation: Invocation,
-    details: InvocationsDetails
+    details: InvocationsDetailsWithNonce
   ): Promise<InvokeFunctionResponse> {
     return this.fetchEndpoint('starknet_addInvokeTransaction', [
       {
         contract_address: functionInvocation.contractAddress,
-        entry_point_selector: getSelectorFromName(functionInvocation.entrypoint),
         calldata: parseCalldata(functionInvocation.calldata),
       },
       bigNumberishArrayToDecimalStringArray(functionInvocation.signature || []),

@@ -12,10 +12,10 @@ import {
   Signature,
 } from '../types';
 import { EstimateFee, EstimateFeeDetails } from '../types/account';
-import { feeTransactionVersion, transactionVersion } from '../utils/hash';
-import { BigNumberish, toBN, toHex } from '../utils/number';
+import { transactionVersion } from '../utils/hash';
+import { BigNumberish, toBN } from '../utils/number';
 import { compileCalldata, estimatedFeeToMaxFee } from '../utils/stark';
-import { fromCallsToExecuteCalldataWithNonce } from '../utils/transaction';
+import { fromCallsToExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
 
@@ -32,25 +32,17 @@ export class Account extends Provider implements AccountInterface {
       'getPubKey' in keyPairOrSigner ? keyPairOrSigner : new Signer(keyPairOrSigner as KeyPair);
   }
 
-  public async getNonce(): Promise<string> {
-    const { result } = await this.callContract({
-      contractAddress: this.address,
-      entrypoint: 'get_nonce',
-    });
-    return toHex(toBN(result[0]));
-  }
-
   public async estimateFee(
     calls: Call | Call[],
     { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
     const transactions = Array.isArray(calls) ? calls : [calls];
-    const nonce = providedNonce ?? (await this.getNonce());
-    const version = toBN(feeTransactionVersion);
+    const nonce = toBN(providedNonce ?? (await this.getNonce(this.address)));
+    const version = toBN(transactionVersion);
 
     const signerDetails: InvocationsSignerDetails = {
       walletAddress: this.address,
-      nonce: toBN(nonce),
+      nonce,
       maxFee: ZERO,
       version,
       chainId: this.chainId,
@@ -58,11 +50,11 @@ export class Account extends Provider implements AccountInterface {
 
     const signature = await this.signer.signTransaction(transactions, signerDetails);
 
-    const calldata = fromCallsToExecuteCalldataWithNonce(transactions, nonce);
+    const calldata = fromCallsToExecuteCalldata(transactions);
     const response = await super.getEstimateFee(
-      { contractAddress: this.address, entrypoint: '__execute__', calldata, signature },
-      blockIdentifier,
-      { version }
+      { contractAddress: this.address, calldata, signature },
+      { version, nonce },
+      blockIdentifier
     );
 
     const suggestedMaxFee = estimatedFeeToMaxFee(response.overall_fee);
@@ -89,7 +81,7 @@ export class Account extends Provider implements AccountInterface {
     transactionsDetail: InvocationsDetails = {}
   ): Promise<InvokeFunctionResponse> {
     const transactions = Array.isArray(calls) ? calls : [calls];
-    const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
+    const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce(this.address)));
     let maxFee: BigNumberish = '0';
     if (transactionsDetail.maxFee || transactionsDetail.maxFee === 0) {
       maxFee = transactionsDetail.maxFee;
@@ -110,11 +102,12 @@ export class Account extends Provider implements AccountInterface {
 
     const signature = await this.signer.signTransaction(transactions, signerDetails, abis);
 
-    const calldata = fromCallsToExecuteCalldataWithNonce(transactions, nonce);
+    const calldata = fromCallsToExecuteCalldata(transactions);
 
     return this.invokeFunction(
-      { contractAddress: this.address, entrypoint: '__execute__', calldata, signature },
+      { contractAddress: this.address, calldata, signature },
       {
+        nonce,
         maxFee,
         version,
       }

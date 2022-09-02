@@ -13,7 +13,7 @@ import {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
-  InvocationsDetails,
+  InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
 } from '../types';
 import { BigNumberish } from '../utils/number';
@@ -59,13 +59,13 @@ export class Provider implements ProviderInterface {
 
   public async getEstimateFee(
     invocation: Invocation,
-    blockIdentifier: BlockIdentifier = 'pending',
-    invocationDetails: InvocationsDetails = {}
+    invocationDetails: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<EstimateFeeResponse> {
-    return this.provider.getEstimateFee(invocation, blockIdentifier, invocationDetails);
+    return this.provider.getEstimateFee(invocation, invocationDetails, blockIdentifier);
   }
 
-  public async getNonce(contractAddress: string): Promise<any> {
+  public async getNonce(contractAddress: string): Promise<BigNumberish> {
     return this.provider.getNonce(contractAddress);
   }
 
@@ -94,7 +94,7 @@ export class Provider implements ProviderInterface {
 
   public async invokeFunction(
     functionInvocation: Invocation,
-    details: InvocationsDetails
+    details: InvocationsDetailsWithNonce
   ): Promise<InvokeFunctionResponse> {
     return this.provider.invokeFunction(functionInvocation, details);
   }
