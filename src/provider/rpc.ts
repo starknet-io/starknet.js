@@ -24,7 +24,7 @@ import { parseCalldata, parseContract, wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
-import { BlockIdentifier, BlockIdentifierClass } from './utils';
+import { Block, BlockIdentifier } from './utils';
 
 export type RpcProviderOptions = { nodeUrl: string };
 
@@ -44,37 +44,32 @@ export class RpcProvider implements ProviderInterface {
     });
   }
 
+  public fetch(method: any, params: any): Promise<any> {
+    return fetch(this.nodeUrl, {
+      method: 'POST',
+      body: stringify({ method, jsonrpc: '2.0', params, id: 0 }),
+      headers: { 'Content-Type': 'application/json' },
+    });
+  }
+
+  protected errorHandler(error: any) {
+    if (error) {
+      const { code, message } = error;
+      throw new Error(`${code}: ${message}`);
+    }
+  }
+
   protected async fetchEndpoint<T extends keyof RPC.Methods>(
     method: T,
     request?: RPC.Methods[T]['REQUEST']
   ): Promise<RPC.Methods[T]['RESPONSE']> {
-    const requestData = {
-      method,
-      jsonrpc: '2.0',
-      params: request,
-      id: 0,
-    };
-
     try {
-      const rawResult = await fetch(this.nodeUrl, {
-        method: 'POST',
-        body: stringify(requestData),
-        headers: {
-          'Content-Type': 'application/json',
-        },
-      });
+      const rawResult = await this.fetch(method, request);
       const { error, result } = await rawResult.json();
-      if (error) {
-        const { code, message } = error;
-        throw new Error(`${code}: ${message}`);
-      } else {
-        return result as RPC.Methods[T]['RESPONSE'];
-      }
+      this.errorHandler(error);
+      return result as RPC.Methods[T]['RESPONSE'];
     } catch (error: any) {
-      const data = error?.response?.data;
-      if (data?.message) {
-        throw new Error(`${data.code}: ${data.message}`);
-      }
+      this.errorHandler(error?.response?.data);
       throw error;
     }
   }
@@ -93,17 +88,15 @@ export class RpcProvider implements ProviderInterface {
   public async getBlockWithTxHashes(
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<RPC.GetBlockWithTxHashesResponse> {
-    const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
-    return this.fetchEndpoint('starknet_getBlockWithTxHashes', [
-      blockIdentifierGetter.getIdentifier(),
-    ]);
+    const block = new Block(blockIdentifier);
+    return this.fetchEndpoint('starknet_getBlockWithTxHashes', [block.identifier]);
   }
 
   public async getBlockWithTxs(
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<RPC.GetBlockWithTxs> {
-    const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
-    return this.fetchEndpoint('starknet_getBlockWithTxs', [blockIdentifierGetter.getIdentifier()]);
+    const block = new Block(blockIdentifier);
+    return this.fetchEndpoint('starknet_getBlockWithTxs', [block.identifier]);
   }
 
   public async getNonce(contractAddress: string): Promise<any> {
@@ -116,11 +109,11 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<BigNumberish> {
     const parsedKey = toHex(toBN(key));
-    const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
+    const block = new Block(blockIdentifier);
     return this.fetchEndpoint('starknet_getStorageAt', [
       contractAddress,
       parsedKey,
-      blockIdentifierGetter.getIdentifier(),
+      block.identifier,
     ]);
   }
 
@@ -149,11 +142,8 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getClassAt(contractAddress: string, blockIdentifier: BlockIdentifier): Promise<any> {
-    const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
-    return this.fetchEndpoint('starknet_getClassAt', [
-      blockIdentifierGetter.getIdentifier(),
-      contractAddress,
-    ]);
+    const block = new Block(blockIdentifier);
+    return this.fetchEndpoint('starknet_getClassAt', [block.identifier, contractAddress]);
   }
 
   public async getEstimateFee(
@@ -292,10 +282,8 @@ export class RpcProvider implements ProviderInterface {
   public async getTransactionCount(
     blockIdentifier: BlockIdentifier
   ): Promise<RPC.GetTransactionCountResponse> {
-    const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
-    return this.fetchEndpoint('starknet_getBlockTransactionCount', [
-      blockIdentifierGetter.getIdentifier(),
-    ]);
+    const block = new Block(blockIdentifier);
+    return this.fetchEndpoint('starknet_getBlockTransactionCount', [block.identifier]);
   }
 
   /**
