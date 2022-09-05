@@ -32,12 +32,16 @@ export class Account extends Provider implements AccountInterface {
       'getPubKey' in keyPairOrSigner ? keyPairOrSigner : new Signer(keyPairOrSigner as KeyPair);
   }
 
+  public async getNonce(): Promise<BigNumberish> {
+    return super.getNonce(this.address);
+  }
+
   public async estimateFee(
     calls: Call | Call[],
     { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
     const transactions = Array.isArray(calls) ? calls : [calls];
-    const nonce = toBN(providedNonce ?? (await this.getNonce(this.address)));
+    const nonce = toBN(providedNonce ?? (await this.getNonce()));
     const version = toBN(transactionVersion);
 
     const signerDetails: InvocationsSignerDetails = {
@@ -81,7 +85,7 @@ export class Account extends Provider implements AccountInterface {
     transactionsDetail: InvocationsDetails = {}
   ): Promise<InvokeFunctionResponse> {
     const transactions = Array.isArray(calls) ? calls : [calls];
-    const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce(this.address)));
+    const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
     let maxFee: BigNumberish = '0';
     if (transactionsDetail.maxFee || transactionsDetail.maxFee === 0) {
       maxFee = transactionsDetail.maxFee;

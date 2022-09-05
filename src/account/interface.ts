@@ -91,4 +91,6 @@ export abstract class AccountInterface extends ProviderInterface {
    * @throws {Error} if the signature is not a valid signature
    */
   public abstract verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean>;
+
+  public abstract getNonce(): Promise<BigNumberish>;
 }
