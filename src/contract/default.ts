@@ -578,9 +578,21 @@ export class Contract implements ContractInterface {
       });
     }
 
+    if (!options.nonce) {
+      throw new Error(`Nonce is required when invoking a function without an account`);
+    }
+
     // eslint-disable-next-line no-console
-    throw new Error(
-      `Invoking ${method} without an account is not supported. Please use account.execute`
+    console.warn(`Invoking ${method} without an account. This will not work on a public node.`);
+
+    return this.providerOrAccount.invokeFunction(
+      {
+        ...invocation,
+        signature: options.signature || [],
+      },
+      {
+        nonce: options.nonce,
+      }
     );
   }
 
