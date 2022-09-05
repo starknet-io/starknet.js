@@ -1,6 +1,5 @@
 import { StarknetChainId } from '../../constants';
 import { BlockIdentifier } from '../../provider/utils';
-import { Status } from '../lib';
 import { OPENRPC } from './openrpc';
 
 export namespace RPC {
@@ -18,10 +17,7 @@ export namespace RPC {
     transaction_hash: string;
   };
 
-  export type GetClassResponse = {
-    program: string;
-    entry_point_by_type: any;
-  };
+  export type GetClassResponse = OPENRPC.GetClassResponse;
 
   export type DeclareResponse = {
     transaction_hash: string;
@@ -35,18 +31,10 @@ export namespace RPC {
   };
 
   export type GetBlockWithTxHashesResponse = OPENRPC.GetBlockWithTxHashesResponse;
-  export type GetBlockWithTxs = OPENRPC.GetBlockWithTxs;
+  export type GetBlockWithTxs = OPENRPC.GetBlockWithTxsResponse;
   export type GetStorageAtResponse = OPENRPC.GetStorageAtResponse;
 
-  export type GetTransactionReceiptResponse = {
-    txn_hash: string;
-    actual_fee: string;
-    status: Status;
-    status_data: string;
-    messages_sent: Array<MessageToL1>;
-    l1_origin_message: MessageToL2;
-    events: Array<StarknetEvent>;
-  };
+  export type GetTransactionReceiptResponse = OPENRPC.GetTransactionReceiptResponse;
 
   interface CommonTransactionProperties {
     txn_hash: string;
