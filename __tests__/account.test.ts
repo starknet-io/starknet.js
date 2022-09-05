@@ -1,19 +1,13 @@
 import { isBN } from 'bn.js';
 
 import typedDataExample from '../__mocks__/typedDataExample.json';
-import { Account, Contract, Provider, ec, number, stark } from '../src';
+import { Account, Contract, Provider, number, stark } from '../src';
 import { toBN } from '../src/utils/number';
-import {
-  compiledErc20,
-  compiledOpenZeppelinAccount,
-  compiledTestDapp,
-  getTestAccount,
-  getTestProvider,
-} from './fixtures';
+import { compiledErc20, compiledTestDapp, getTestAccount, getTestProvider } from './fixtures';
 
 describe('deploy and test Wallet', () => {
-  const account = getTestAccount();
   const provider = getTestProvider();
+  const account = getTestAccount(provider);
   let erc20: Contract;
   let erc20Address: string;
   let dapp: Contract;
@@ -25,9 +19,8 @@ describe('deploy and test Wallet', () => {
       contract: compiledErc20,
     });
 
-    erc20Address = erc20Response.address!;
+    erc20Address = erc20Response.contract_address;
     erc20 = new Contract(compiledErc20.abi, erc20Address, provider);
-    expect(erc20Response.code).toBe('TRANSACTION_RECEIVED');
 
     await provider.waitForTransaction(erc20Response.transaction_hash);
 
@@ -36,8 +29,6 @@ describe('deploy and test Wallet', () => {
       entrypoint: 'mint',
       calldata: [account.address, '1000'],
     });
-
-    expect(mintResponse.code).toBe('TRANSACTION_RECEIVED');
 
     await provider.waitForTransaction(mintResponse.transaction_hash);
 
@@ -48,20 +39,18 @@ describe('deploy and test Wallet', () => {
     const dappResponse = await provider.deployContract({
       contract: compiledTestDapp,
     });
-    dapp = new Contract(compiledTestDapp.abi, dappResponse.address!, provider);
-    expect(dappResponse.code).toBe('TRANSACTION_RECEIVED');
+    dapp = new Contract(compiledTestDapp.abi, dappResponse.contract_address!, provider);
 
     await provider.waitForTransaction(dappResponse.transaction_hash);
   });
 
   test('estimate fee', async () => {
-    const { amount, unit } = await account.estimateFee({
+    const { overall_fee } = await account.estimateFee({
       contractAddress: erc20Address,
       entrypoint: 'transfer',
       calldata: [erc20.address, '10'],
     });
-    expect(isBN(amount)).toBe(true);
-    expect(typeof unit).toBe('string');
+    expect(isBN(overall_fee)).toBe(true);
   });
 
   test('read balance of wallet', async () => {
@@ -71,13 +60,12 @@ describe('deploy and test Wallet', () => {
   });
 
   test('execute by wallet owner', async () => {
-    const { code, transaction_hash } = await account.execute({
+    const { transaction_hash } = await account.execute({
       contractAddress: erc20Address,
       entrypoint: 'transfer',
       calldata: [erc20.address, '10'],
     });
 
-    expect(code).toBe('TRANSACTION_RECEIVED');
     await provider.waitForTransaction(transaction_hash);
   });
 
@@ -93,7 +81,7 @@ describe('deploy and test Wallet', () => {
       entrypoint: 'get_nonce',
     });
     const nonce = toBN(result[0]).toNumber();
-    const { code, transaction_hash } = await account.execute(
+    const { transaction_hash } = await account.execute(
       {
         contractAddress: erc20Address,
         entrypoint: 'transfer',
@@ -103,12 +91,11 @@ describe('deploy and test Wallet', () => {
       { nonce }
     );
 
-    expect(code).toBe('TRANSACTION_RECEIVED');
     await provider.waitForTransaction(transaction_hash);
   });
 
   test('execute multiple transactions', async () => {
-    const { code, transaction_hash } = await account.execute([
+    const { transaction_hash } = await account.execute([
       {
         contractAddress: dapp.address,
         entrypoint: 'set_number',
@@ -121,7 +108,6 @@ describe('deploy and test Wallet', () => {
       },
     ]);
 
-    expect(code).toBe('TRANSACTION_RECEIVED');
     await provider.waitForTransaction(transaction_hash);
 
     const response = await dapp.get_number(account.address);
@@ -140,34 +126,6 @@ describe('deploy and test Wallet', () => {
     expect(await account.verifyMessage(typedDataExample, signature)).toBe(true);
   });
 
-  describe('new deployed account', () => {
-    let newAccount: Account;
-
-    beforeAll(async () => {
-      const starkKeyPair = ec.genKeyPair();
-      const starkKeyPub = ec.getStarkKey(starkKeyPair);
-
-      const accountResponse = await provider.deployContract({
-        contract: compiledOpenZeppelinAccount,
-        constructorCalldata: [starkKeyPub],
-      });
-
-      await provider.waitForTransaction(accountResponse.transaction_hash);
-
-      newAccount = new Account(provider, accountResponse.address!, starkKeyPair);
-    });
-
-    test('read nonce', async () => {
-      const { result } = await account.callContract({
-        contractAddress: newAccount.address,
-        entrypoint: 'get_nonce',
-      });
-      const nonce = result[0];
-
-      expect(number.toBN(nonce).toString()).toStrictEqual(number.toBN(0).toString());
-    });
-  });
-
   describe('Contract interaction with Account', () => {
     const wallet = stark.randomAddress();
 
@@ -177,8 +135,6 @@ describe('deploy and test Wallet', () => {
         entrypoint: 'mint',
         calldata: [wallet, '1000'],
       });
-
-      expect(mintResponse.code).toBe('TRANSACTION_RECEIVED');
 
       await provider.waitForTransaction(mintResponse.transaction_hash);
     });
@@ -191,8 +147,7 @@ describe('deploy and test Wallet', () => {
 
     test('estimate gas fee for `mint`', async () => {
       const res = await erc20.estimateFee.mint(wallet, '10');
-      expect(res).toHaveProperty('amount');
-      expect(res).toHaveProperty('unit');
+      expect(res).toHaveProperty('overall_fee');
     });
   });
 });

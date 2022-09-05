@@ -14,6 +14,7 @@ export type DeployContractPayload = {
 
 export type DeclareContractPayload = {
   contract: CompiledContract | string;
+  version?: BigNumberish;
 };
 
 export type Invocation = {
@@ -64,7 +65,8 @@ export type Abi = Array<FunctionAbi | StructAbi>;
 
 export type EntryPointsByType = object;
 export type Program = Record<any, any>;
-export type BlockNumber = 'pending' | 'latest' | null | number;
+export type BlockTag = 'pending' | 'latest';
+export type BlockNumber = BlockTag | null | number;
 
 export type CompiledContract = {
   abi: Abi;

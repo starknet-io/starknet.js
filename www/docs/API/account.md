@@ -12,39 +12,40 @@ This API is the primary way to interact with an account contract on StarkNet.
 
 ## Creating an instance
 
-For creating new instance of Account, account contract must be deployed. Also there needs to be a Provider instance that will be passed in the constructor and key pair for the account.
+To create a new instance of the Account, first an account contract must be deployed. Also there needs to be a Provider instance that will be passed in the constructor and key pair for the account.
 
 `new starknet.Account(Provider, address, starkKeyPair)`
 
-## Account Properties
+## Properties
 
 account.**address** => _string_
 
-The address of the account contract
+The address of the account contract.
 
-## Account methods
+## Methods
 
 account.**getNonce()** => _Promise < string >_
 
-Gets new Nonce for the next transaction
+Gets the new Nonce for the next transaction.
 
 <hr />
 
 account.**estimateFee**(calls [ , options ]) => _Promise < EstimateFeeResponse >_
 
-Gets the estimated fee for the call(s)
+Gets the estimated fee for the call(s).
 
 The _options_ object may include any of:
 
 - options.**blockIdentifier** - Block Identifier for the transaction
 - options.**nonce** - Nonce for the transaction
 
-###### EstimateFeeResponse
+###### _EstimateFeeResponse_
 
-```
+```typescript
 {
-  amount: number;
-  unit: string;
+  overall_fee: BN;
+  gas_consumed?: BN;
+  gas_price?: BN;
 }
 ```
 
@@ -52,7 +53,7 @@ The _options_ object may include any of:
 
 account.**execute**(calls [ , abi , transactionsDetail ]) => _Promise < AddTransactionResponse >_
 
-Executes one or multiple calls using the account contract
+Executes one or multiple calls using the account contract.
 
 The _transactionsDetail_ object may include any of:
 
@@ -60,13 +61,11 @@ The _transactionsDetail_ object may include any of:
 - transactionsDetail.**nonce** - Nonce for the transaction
 - transactionsDetail.**version** - Version for the transaction (default is 0)
 
-###### AddTransactionResponse
+###### _AddTransactionResponse_
 
-```
+```typescript
 {
-  code: 'TRANSACTION_RECEIVED';
   transaction_hash: string;
-  address?: string;
 };
 ```
 
@@ -74,11 +73,11 @@ The _transactionsDetail_ object may include any of:
 
 account.**signMessage**(typedData) => _Promise < Signature >_
 
-Creates a signature from the passed data
+Creates a signature from the passed data.
 
-###### Signature
+###### _Signature_
 
-```
+```typescript
 string[];
 ```
 
@@ -86,20 +85,22 @@ string[];
 
 account.**hashMessage**(typedData) => _Promise < string >_
 
-Creates a hash from the passed data
+Creates a hash from the passed data.
 
 <hr />
 
 account.**verifyMessageHash**(hash, signature) => _Promise < boolean >_
 
-Verify a signature of a given hash
+Verify a signature of a given hash.
 
-**WARNING** This method is not recommended, use verifyMessage instead
+> **WARNING**
+>
+> This method is not recommended, use `verifyMessage` instead
 
 <hr />
 
 account.**verifyMessage**(typedData, signature) => _Promise < boolean >_
 
-Verify a signature of a JSON object
+Verify a signature of a JSON object.
 
 <hr />

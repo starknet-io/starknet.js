@@ -1,3 +1,135 @@
+## [4.4.1](https://github.com/0xs34n/starknet.js/compare/v4.4.0...v4.4.1) (2022-09-01)
+
+### Bug Fixes
+
+- supply calldata as hexadecimal string array ([44cb4c5](https://github.com/0xs34n/starknet.js/commit/44cb4c5f108a2ea8fcd77147f053e068189d4f33))
+
+# [4.4.0](https://github.com/0xs34n/starknet.js/compare/v4.3.1...v4.4.0) (2022-09-01)
+
+### Bug Fixes
+
+- delete premature session account file ([ca3e70b](https://github.com/0xs34n/starknet.js/commit/ca3e70b06d21dba8b2074512251cf232ed8be46b))
+- session ([00269bf](https://github.com/0xs34n/starknet.js/commit/00269bfd23ed647270a1efd699af7c36978965c7))
+- session account prooving ([0b56833](https://github.com/0xs34n/starknet.js/commit/0b56833f6eb7557d55725a505a01185bbc9756db))
+- tests ([4586e93](https://github.com/0xs34n/starknet.js/commit/4586e93f10a2a43c375a23d851a9778bab412fcc))
+- typo ([1c60a4d](https://github.com/0xs34n/starknet.js/commit/1c60a4d4b306879422769a6c2afc4fd6c39c4c07))
+
+### Features
+
+- add merkle trees ([e9b8674](https://github.com/0xs34n/starknet.js/commit/e9b8674f51c6d6fe57772a4c88b162c5132cfbdd))
+- add visibility modifiers ([cd1a23d](https://github.com/0xs34n/starknet.js/commit/cd1a23d74b49407c27314a12d5bc149ed40209f3))
+- allow merkle trees as native type in eip712 like messages ([65b7766](https://github.com/0xs34n/starknet.js/commit/65b7766c29eca4f4d0e89f6ad1368fedd5e0e18e))
+- session ([9ac48cc](https://github.com/0xs34n/starknet.js/commit/9ac48cc15c1c7b0e504adfc79a7f382f5d0b55d0))
+- session needs to be aware of the whole tree ([11e10bd](https://github.com/0xs34n/starknet.js/commit/11e10bda0f020a670854d941a54142d55936fc18))
+
+## [4.3.1](https://github.com/0xs34n/starknet.js/compare/v4.3.0...v4.3.1) (2022-08-31)
+
+### Bug Fixes
+
+- getClassAt and Test Fixes ([548cf6e](https://github.com/0xs34n/starknet.js/commit/548cf6e69d16292b9c216493c77e1c7a14be2ae9))
+- getCode removed from RPC 0.1.0 ([744a988](https://github.com/0xs34n/starknet.js/commit/744a9882c363331ff47f409971cacbfda977c4c2))
+- merge ([67d87fc](https://github.com/0xs34n/starknet.js/commit/67d87fc834ea5b877029445f39782457584fb4ec))
+- naming ([0c75f6f](https://github.com/0xs34n/starknet.js/commit/0c75f6f431c3828b1078d955123b2d13aef6b5d0))
+- restore GetCode to common interface for backward compatibility ([52f8e61](https://github.com/0xs34n/starknet.js/commit/52f8e61797a3f2390577b3a6e977adae11346a23))
+- rpc 0.1.0 getStorageAt ([c622913](https://github.com/0xs34n/starknet.js/commit/c6229138c57cd9a04b982c386c7278d63b931a1f))
+- **RpcProvider:** update of RpcProvider getBlock method to work with v0.3.0 of pathfinder ([3b12421](https://github.com/0xs34n/starknet.js/commit/3b124219dd25ef5a0c81583fcfe67d6a3cc5a70e))
+- test getBlock('latest') ([2c92f79](https://github.com/0xs34n/starknet.js/commit/2c92f79aefe3af68834aa9a9a16754c0ff4116cc))
+- test getBlock(latest) ([0c5e31e](https://github.com/0xs34n/starknet.js/commit/0c5e31effb63bf7afb26c9f2049b66c93c6b1366))
+- unoptimise getClassAt test to work with integration ([e98220b](https://github.com/0xs34n/starknet.js/commit/e98220bc6e6fff55bc439773bd1258844de312e2))
+
+# [4.3.0](https://github.com/0xs34n/starknet.js/compare/v4.2.0...v4.3.0) (2022-08-09)
+
+### Bug Fixes
+
+- indentations in provider.md ([4a310c6](https://github.com/0xs34n/starknet.js/commit/4a310c6c992c77f9f6729a70c1af14481cd891f7))
+- **sequenceProvider:** feedergatewayUrl and gatewayUrl ([e236d23](https://github.com/0xs34n/starknet.js/commit/e236d2352e3fbb0f78965decac5893217347ceb7))
+
+### Features
+
+- update docs ([28786ed](https://github.com/0xs34n/starknet.js/commit/28786ed550909f6a30b8cb145e93d072ed28a862))
+
+# [4.2.0](https://github.com/0xs34n/starknet.js/compare/v4.1.0...v4.2.0) (2022-08-09)
+
+### Features
+
+- change checksum address hashing algorithm ([0f32adf](https://github.com/0xs34n/starknet.js/commit/0f32adf217b3d2e55046bbb21980648f0c8cf631))
+
+# [4.1.0](https://github.com/0xs34n/starknet.js/compare/v4.0.1...v4.1.0) (2022-08-03)
+
+### Features
+
+- get-code ([de6e597](https://github.com/0xs34n/starknet.js/commit/de6e5971de5155925defcf9249a8160dc3fdc9b7))
+
+## [4.0.1](https://github.com/0xs34n/starknet.js/compare/v4.0.0...v4.0.1) (2022-08-03)
+
+### Bug Fixes
+
+- use custom fetch ponyfill ([16e9a53](https://github.com/0xs34n/starknet.js/commit/16e9a530d62942da75ed1bc30d0048a35f9f0152))
+- use isomorphic-unfetch ([aa7af66](https://github.com/0xs34n/starknet.js/commit/aa7af6622d918ad0d17fe28bf1e73635895537c5))
+
+# [4.0.0](https://github.com/0xs34n/starknet.js/compare/v3.19.0...v4.0.0) (2022-07-27)
+
+### Documentation
+
+- v4 ([9e300a9](https://github.com/0xs34n/starknet.js/commit/9e300a98e587fc702ee3ef98441c457fe87e6c1e))
+
+### BREAKING CHANGES
+
+- new provider and signer interfaces
+
+# [3.19.0](https://github.com/0xs34n/starknet.js/compare/v3.18.2...v3.19.0) (2022-07-25)
+
+### Bug Fixes
+
+- account tests ([cc3f362](https://github.com/0xs34n/starknet.js/commit/cc3f362fffc157cb97e0fa2b8ff3a3db7dcf5985))
+- add invoke warning ([34db683](https://github.com/0xs34n/starknet.js/commit/34db683267b639adbd37eb097573eb7210cb4a58))
+- call contract latest block ([1476461](https://github.com/0xs34n/starknet.js/commit/1476461aeff6885b5185f45c5f8633f8c60cbfca))
+- ci ([808e1f7](https://github.com/0xs34n/starknet.js/commit/808e1f7a837e014d3c3781973b434df646c207b4))
+- ci ([6337feb](https://github.com/0xs34n/starknet.js/commit/6337febc9f6f6359f70d66be039779371f3186ff))
+- contract tests ([ffb6a12](https://github.com/0xs34n/starknet.js/commit/ffb6a12dec4c27f9b570fcc2016fb3c17f5dcfb4))
+- default provider tests ([2fac438](https://github.com/0xs34n/starknet.js/commit/2fac43876375a3d83818e152f4be5c3f219e8aff))
+- invoke response type ([bdeb96b](https://github.com/0xs34n/starknet.js/commit/bdeb96b896c96f7f7778fd38e697bf368f2a8510))
+- no secrets in matrix ([5ff7a26](https://github.com/0xs34n/starknet.js/commit/5ff7a2610c1c3f67ecb0a2b8d32e7c8c61017354))
+- nonce issue on test runs ([bed6fbf](https://github.com/0xs34n/starknet.js/commit/bed6fbf74b6446e18ea63444ddefaa782a7ffdf4))
+- pending getBlock test ([a9ea023](https://github.com/0xs34n/starknet.js/commit/a9ea023249c33369ed04b3f548bf98947240ff9e))
+- provider ([32f9072](https://github.com/0xs34n/starknet.js/commit/32f90724894eccd1b0154842180da38bcf6411fe))
+- provider tests ([79eb5ba](https://github.com/0xs34n/starknet.js/commit/79eb5bac4c03b64b6f3a2f3b59a1fea7bb930ce8))
+- provider tests ([255fd3c](https://github.com/0xs34n/starknet.js/commit/255fd3cb68f0edc7794f77623389f94ac341880a))
+- remove account test from contract tests ([d444e7f](https://github.com/0xs34n/starknet.js/commit/d444e7fb5f55a7a384dcc43a9ea0f1d09438364a))
+- remove comment ([591caf6](https://github.com/0xs34n/starknet.js/commit/591caf6e7983ecf009a95ab3f9e1b86335fe1a23))
+- remove hardcoded url ([c8f3377](https://github.com/0xs34n/starknet.js/commit/c8f3377d52f605dd03ab20879a5c7fd53aafe819))
+- remove test only ([5add341](https://github.com/0xs34n/starknet.js/commit/5add341257f8d6b355a367e977b125f9642f7630))
+- rename gateway to sequencer ([b7291e6](https://github.com/0xs34n/starknet.js/commit/b7291e654732bd5f57b2d477b20a5467dfc9854b))
+- rename rpc provider ([fee4fb3](https://github.com/0xs34n/starknet.js/commit/fee4fb3e36e9d824f0956174a9278f6131b3ba3e))
+- revert default block to pending ([28beff7](https://github.com/0xs34n/starknet.js/commit/28beff76107f762478e70974389eb75202a65d42))
+- rpc provider account tests ([b2fc530](https://github.com/0xs34n/starknet.js/commit/b2fc53004a1e52149b3fa4e7357c3ade1d01cd4a))
+- rpc provider tests ([12db930](https://github.com/0xs34n/starknet.js/commit/12db930b1babf3e3de035426c8c449bfb448951c))
+- rpc provider waitForTransaction ([9e708ba](https://github.com/0xs34n/starknet.js/commit/9e708ba72ea350ae4866e5cff9519a89201b5b01))
+- run only devnet on pr ([613084b](https://github.com/0xs34n/starknet.js/commit/613084b32f93540e5f11938196d7b2c003f12bbf))
+- seperate types and fix fees ([577a836](https://github.com/0xs34n/starknet.js/commit/577a836b48a4567d63f0138163d016422256d221))
+- set rpc url in pr workflow ([89ec3c1](https://github.com/0xs34n/starknet.js/commit/89ec3c1edfd6947404d009420305d7bb210c6cd3))
+- test account ([ac8210a](https://github.com/0xs34n/starknet.js/commit/ac8210a6bbb159a17ab548a12f7a20823e55814a))
+- tests should wait for build ([af8c5c7](https://github.com/0xs34n/starknet.js/commit/af8c5c779370e170de4785902e1e9ac282f2bfec))
+- update jsdocs ([2c08e5d](https://github.com/0xs34n/starknet.js/commit/2c08e5d8fe80469ba41222767193823b3d516536))
+- use rpc conditionally ([7023068](https://github.com/0xs34n/starknet.js/commit/70230682343b682df50da21cb9e7a7f54490091c))
+- waitForTransaction ([4f0c00b](https://github.com/0xs34n/starknet.js/commit/4f0c00b568a174db51ecef918d8a8878254daba5))
+- www/docs/API/contract.md ([3ca4a51](https://github.com/0xs34n/starknet.js/commit/3ca4a513950f4aa27ac447835fcefcebbece083b))
+- www/docs/API/provider.md ([d73e826](https://github.com/0xs34n/starknet.js/commit/d73e8264527a5af21e1d8e7a7c1f3aa8b8c92fb8))
+
+### Features
+
+- adapt abstract provider interface to RPC provider ([b217b3b](https://github.com/0xs34n/starknet.js/commit/b217b3bd1e40c60427636ccad03583e901f6ba58))
+- add account rpc tests ([fc3b484](https://github.com/0xs34n/starknet.js/commit/fc3b4846486e63f2ff5eaba78844235091f2d49e))
+- add gateway provider class ([dad1eea](https://github.com/0xs34n/starknet.js/commit/dad1eea9caafc71c940262ee13dd75817996abfd))
+- add provider utils ([4df4ae7](https://github.com/0xs34n/starknet.js/commit/4df4ae7e8b8111669e2bc20e30c2c89af9c50a4f))
+- add rpc provider ([315bb74](https://github.com/0xs34n/starknet.js/commit/315bb747f26ba19556841a326484a7dbfa1a2857))
+- change estimate fee response on rpc provider ([942f4f2](https://github.com/0xs34n/starknet.js/commit/942f4f2508fab697e796ee9f691341b86ccd34be))
+- change provider keys to snake case ([2ee4b0b](https://github.com/0xs34n/starknet.js/commit/2ee4b0bf0892a3bd54e6d188990f979298814551))
+- getStorageAt block param ([d89bf30](https://github.com/0xs34n/starknet.js/commit/d89bf307796e69627ffd91ebd97c787e4a7a77e7))
+- implement new interface on account class ([b202f37](https://github.com/0xs34n/starknet.js/commit/b202f37ab72fd310a8c99b28863f38b8d142d2a7))
+- implement new interface on contract class ([e942a9d](https://github.com/0xs34n/starknet.js/commit/e942a9d88479d88b82a3dbc05ec2f60ab9ad1f19))
+- use shared describe block for providers ([b525a60](https://github.com/0xs34n/starknet.js/commit/b525a60eb77647962f4509bb02f64bb66071c9c2))
+
 ## [3.18.2](https://github.com/0xs34n/starknet.js/compare/v3.18.1...v3.18.2) (2022-07-25)
 
 ### Bug Fixes

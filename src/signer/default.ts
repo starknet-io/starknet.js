@@ -1,5 +1,5 @@
 import { Abi, Invocation, InvocationsSignerDetails, KeyPair, Signature } from '../types';
-import { getStarkKey, sign } from '../utils/ellipticCurve';
+import { genKeyPair, getStarkKey, sign } from '../utils/ellipticCurve';
 import { calculcateTransactionHash, getSelectorFromName } from '../utils/hash';
 import { fromCallsToExecuteCalldataWithNonce } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
@@ -8,7 +8,7 @@ import { SignerInterface } from './interface';
 export class Signer implements SignerInterface {
   protected keyPair: KeyPair;
 
-  constructor(keyPair: KeyPair) {
+  constructor(keyPair: KeyPair = genKeyPair()) {
     this.keyPair = keyPair;
   }
 

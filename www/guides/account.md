@@ -14,7 +14,6 @@ Install the latest version of starknet with `npm install starknet@next`
 
 ```javascript
 import fs from "fs";
-import fs from "fs";
 import {
   Account,
   Contract,
@@ -42,9 +41,28 @@ Deploy the Account contract and wait for it to be verified on StarkNet.
 const compiledAccount = json.parse(
   fs.readFileSync("./Account.json").toString("ascii")
 );
+```
+
+> **Note**
+>
+> below example uses [Argent's](https://github.com/argentlabs/argent-contracts-starknet/blob/develop/contracts/ArgentAccount.cairo) account contract
+
+```javascript
 const accountResponse = await defaultProvider.deployContract({
   contract: compiledAccount,
   addressSalt: starkKeyPub,
+});
+```
+
+> **Note**
+>
+> below example uses [OpenZeppelin's](https://github.com/OpenZeppelin/cairo-contracts/blob/main/src/openzeppelin/account/presets/Account.cairo) account contract
+
+```javascript
+const accountResponse = await defaultProvider.deployContract({
+    contract: compiledAccount,
+    constructorCalldata: [starkKeyPub],
+    addressSalt: starkKeyPub,
 });
 ```
 
@@ -54,21 +72,18 @@ Wait for the deployment transaction to be accepted and assign the address of the
 
 ```javascript
 await defaultProvider.waitForTransaction(accountResponse.transaction_hash);
-const accountContract = new Contract(
-  compiledAccount.abi,
-  accountResponse.address
-);
-const initializeResponse = await accountContract.initialize(starkKeyPub, "0");
-
-await defaultProvider.waitForTransaction(initializeResponse.transaction_hash);
 ```
 
-Once account contract is initialized [Account](../docs/API/account.md) instance can be created. Use your new account instance to sign transactions, messages or verify signatures!
+Once account contract is deployed [Account](../docs/API/account.md) instance can be created. Use your new account instance to sign transactions, messages or verify signatures!
 
 ```js
 const account = new Account(
     defaultProvider,
-    accountResponse.address,
+    accountResponse.contract_address,
     starkKeyPair
 );
 ```
+
+## Fund your new account!
+
+Make sure your Account has enough funds to execute invocations. Use this [faucet](https://faucet.goerli.starknet.io/) for funding on testnet.

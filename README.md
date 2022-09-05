@@ -40,7 +40,7 @@ Install starknet with `npm`
 
 ```bash
 $ npm install starknet
-# or for pre-release features:
+# or for starknet.js v4:
 $ npm install starknet@next
 ```
 
