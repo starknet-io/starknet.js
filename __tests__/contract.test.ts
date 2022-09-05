@@ -43,7 +43,6 @@ describe('class Contract {}', () => {
       expect(res).toHaveProperty('contractAddress');
       expect(res).toHaveProperty('entrypoint');
       expect(res).toHaveProperty('calldata');
-      expect(res).toHaveProperty('signature');
     });
 
     test('estimate gas fee for `mint` should fail when connected to the provider', async () => {
