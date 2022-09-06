@@ -1,5 +1,6 @@
 import { StarknetChainId } from '../../constants';
 import { BlockIdentifier } from '../../provider/utils';
+import { BigNumberish } from '../../utils/number';
 import { Status } from '../lib';
 import { OPENRPC } from './openrpc';
 
@@ -143,7 +144,7 @@ export namespace RPC {
     starknet_getNonce: {
       QUERY: never;
       REQUEST: any[];
-      RESPONSE: any;
+      RESPONSE: BigNumberish;
     };
     starknet_getStorageAt: {
       QUERY: never;

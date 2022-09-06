@@ -269,7 +269,7 @@ export namespace Sequencer {
         contractAddress: string;
       };
       REQUEST: never;
-      RESPONSE: any;
+      RESPONSE: BigNumberish;
     };
     get_storage_at: {
       QUERY: {
