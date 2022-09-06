@@ -262,9 +262,9 @@ Function that calculates the deployment transaction hash in the StarkNet network
 
 Internally calls `calculateTransactionHashCommon` with `TransactionHashPrefix.DEPLOY`.
 
-### calculcateTransactionHash
+### calculateTransactionHash
 
-`calculcateTransactionHash(contractAddress: BigNumberish, version: BigNumberish, entryPointSelector: BigNumberish, calldata: BigNumberish[], maxFee: BigNumberish, chainId: StarknetChainId): string`
+`calculateTransactionHash(contractAddress: BigNumberish, version: BigNumberish, entryPointSelector: BigNumberish, calldata: BigNumberish[], maxFee: BigNumberish, chainId: StarknetChainId, nonce: BigNumberish): string`
 
 Function that internally calls `calculateTransactionHashCommon`, with `TransactionHashPrefix.INVOKE`.
 

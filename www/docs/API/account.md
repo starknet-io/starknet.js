@@ -24,9 +24,9 @@ The address of the account contract.
 
 ## Methods
 
-account.**getNonce()** => _Promise < string >_
+account.**getNonce()** => _Promise < BigNumberish >_
 
-Gets the new Nonce for the next transaction.
+Gets the new Nonce of the connected account for the next transaction.
 
 <hr />
 
@@ -59,7 +59,7 @@ The _transactionsDetail_ object may include any of:
 
 - transactionsDetail.**maxFee** - Max Fee that that will be used to execute the call(s)
 - transactionsDetail.**nonce** - Nonce for the transaction
-- transactionsDetail.**version** - Version for the transaction (default is 0)
+- transactionsDetail.**version** - Version for the transaction (default is 1)
 
 ###### _AddTransactionResponse_
 
