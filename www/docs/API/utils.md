@@ -176,6 +176,12 @@ const signature = await this.signer.signTransaction(transactions, signerDetails)
 }
 ```
 
+### bigNumberishArrayToHexadecimalStringArray
+
+`bigNumberishArrayToHexadecimalStringArray(rawCalldata: BigNumberish[]): string[]`
+
+Convert BigNumberish array to hexadecimal string array. Used for signature conversion.
+
 <hr />
 
 ## **uint256**
