@@ -319,7 +319,7 @@ Gets the latest block number.
 
 <hr/>
 
-provider.**getNonce**(contractAddress) => _Promise< BigNumberish >_
+provider.**getNonce**(contractAddress) => _Promise < BigNumberish >_
 
 Gets the nonce of the provided contractAddress
 
