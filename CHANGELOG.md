@@ -1,3 +1,11 @@
+## [4.4.2](https://github.com/0xs34n/starknet.js/compare/v4.4.1...v4.4.2) (2022-09-07)
+
+### Bug Fixes
+
+- dont import fetch from crosshatch ([a3ef41c](https://github.com/0xs34n/starknet.js/commit/a3ef41cac0e818f7429e6dd7654722ede1dc3796))
+- use custom fetch ponyfill ([78f904a](https://github.com/0xs34n/starknet.js/commit/78f904a1d5aeb5efaba7fbdd853802529c80594b))
+- use isomorphic-unfetch ([c63b6a1](https://github.com/0xs34n/starknet.js/commit/c63b6a138616936cf7a70f9098af5df290983c74))
+
 ## [4.4.1](https://github.com/0xs34n/starknet.js/compare/v4.4.0...v4.4.1) (2022-09-01)
 
 ### Bug Fixes
