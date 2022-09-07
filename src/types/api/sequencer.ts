@@ -267,6 +267,7 @@ export namespace Sequencer {
     get_nonce: {
       QUERY: {
         contractAddress: string;
+        blockIdentifier: BlockIdentifier;
       };
       REQUEST: never;
       RESPONSE: BigNumberish;

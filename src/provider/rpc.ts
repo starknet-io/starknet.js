@@ -111,8 +111,15 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_getBlockWithTxs', [blockIdentifierGetter.getIdentifier()]);
   }
 
-  public async getNonce(contractAddress: string): Promise<BigNumberish> {
-    return this.fetchEndpoint('starknet_getNonce', [contractAddress]);
+  public async getNonce(
+    contractAddress: string,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<BigNumberish> {
+    const blockIdentifierGetter = new BlockIdentifierClass(blockIdentifier);
+    return this.fetchEndpoint('starknet_getNonce', [
+      contractAddress,
+      blockIdentifierGetter.getIdentifier(),
+    ]);
   }
 
   public async getStorageAt(

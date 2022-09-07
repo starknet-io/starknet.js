@@ -68,7 +68,10 @@ export abstract class ProviderInterface {
    * @param contractAddress - contract address
    * @returns the hex nonce
    */
-  public abstract getNonce(contractAddress: string): Promise<BigNumberish>;
+  public abstract getNonce(
+    contractAddress: string,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<BigNumberish>;
 
   /**
    * Gets the contract's storage variable at a specific key.

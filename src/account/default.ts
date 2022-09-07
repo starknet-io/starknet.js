@@ -1,6 +1,7 @@
 import { ZERO } from '../constants';
 import { ProviderInterface, ProviderOptions } from '../provider';
 import { Provider } from '../provider/default';
+import { BlockIdentifier } from '../provider/utils';
 import { Signer, SignerInterface } from '../signer';
 import {
   Abi,
@@ -32,8 +33,8 @@ export class Account extends Provider implements AccountInterface {
       'getPubKey' in keyPairOrSigner ? keyPairOrSigner : new Signer(keyPairOrSigner as KeyPair);
   }
 
-  public async getNonce(): Promise<BigNumberish> {
-    return super.getNonce(this.address);
+  public async getNonce(blockIdentifier?: BlockIdentifier): Promise<BigNumberish> {
+    return super.getNonce(this.address, blockIdentifier);
   }
 
   public async estimateFee(
