@@ -20,22 +20,40 @@ await defaultProvider.waitForTransaction(erc20Response.transaction_hash);
 ## Get the erc20 contract address and create the contact object
 
 ```javascript
-const erc20Address = erc20Response.address;
-const erc20 = new Contract(compiledErc20.abi, erc20Address);
+const erc20Address = erc20Response.contract_address;
+const erc20 = new Contract(compiledErc20.abi, erc20Address, defaultProvider);
 ```
 
 ## Mint tokens to an account address
 
 Make sure you created the `Account` instance following the [Creating an Account](./account.md) guide.
 
+Also make sure you added funds to your account!
+
 ```javascript
+erc20.connect(account);
+
 const { transaction_hash: mintTxHash } = await erc20.mint(
   account.address,
-  "1000"
+  "1000",
+  {
+    maxFee: "1"
+  }
 );
+
 console.log(`Waiting for Tx to be Accepted on Starknet - Minting...`);
 await defaultProvider.waitForTransaction(mintTxHash);
 ```
+
+> **Note**
+>
+> Transaction can be rejected if `maxFee` is lower than actual.
+>
+> _Error: REJECTED: FEE_TRANSFER_FAILURE_
+>
+> _Actual fee exceeded max fee._
+>
+> If this occurs, set `maxFee` to a higher value, for example: 999999995330000
 
 ## Check balance after mint
 
@@ -61,7 +79,7 @@ const { transaction_hash: transferTxHash } = await account.execute(
     calldata: [erc20Address, "10"],
   },
   undefined,
-  { maxFee: "0" }
+  { maxFee: "1" }
 );
 
 // Wait for the invoke transaction to be accepted on StarkNet

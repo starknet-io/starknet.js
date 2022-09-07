@@ -3,10 +3,10 @@ import { ProviderInterface } from '../provider';
 import { BlockIdentifier } from '../provider/utils';
 import {
   Abi,
-  AddTransactionResponse,
   AsyncContractFunction,
   ContractFunction,
   Invocation,
+  InvokeFunctionResponse,
   Overrides,
   Result,
 } from '../types';
@@ -78,7 +78,7 @@ export abstract class ContractInterface {
     method: string,
     args?: Array<any>,
     options?: Overrides
-  ): Promise<AddTransactionResponse>;
+  ): Promise<InvokeFunctionResponse>;
 
   /**
    * Calls a method on a contract

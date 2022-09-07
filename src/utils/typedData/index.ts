@@ -1,7 +1,8 @@
 import { computeHashOnElements, getSelectorFromName } from '../hash';
-import { BigNumberish, toBN, toHex } from '../number';
+import { MerkleTree } from '../merkle';
+import { BigNumberish, isHex, toBN, toHex } from '../number';
 import { encodeShortString } from '../shortString';
-import { TypedData } from './types';
+import { StarkNetMerkleType, StarkNetType, TypedData } from './types';
 import { validateTypedData } from './utils';
 
 export * from './types';
@@ -17,6 +18,19 @@ function getHex(value: BigNumberish): string {
   }
 }
 
+export function prepareSelector(selector: string): string {
+  return isHex(selector) ? selector : getSelectorFromName(selector);
+}
+
+export function isMerkleTreeType(type: StarkNetType): type is StarkNetMerkleType {
+  return type.type === 'merkletree';
+}
+
+interface Context {
+  parent?: string;
+  key?: string;
+}
+
 /**
  * Get the dependencies of a struct type. If a struct has the same dependency multiple times, it's only included once
  * in the resulting array.
@@ -27,15 +41,10 @@ function getHex(value: BigNumberish): string {
  * @return {string[]}
  */
 export const getDependencies = (
-  typedData: TypedData,
+  types: TypedData['types'],
   type: string,
   dependencies: string[] = []
 ): string[] => {
-  // `getDependencies` is called by most other functions, so we validate the JSON schema here
-  if (!validateTypedData(typedData)) {
-    throw new Error('Typed data does not match JSON schema');
-  }
-
   // Include pointers (struct arrays)
   if (type[type.length - 1] === '*') {
     // eslint-disable-next-line no-param-reassign
@@ -46,16 +55,16 @@ export const getDependencies = (
     return dependencies;
   }
 
-  if (!typedData.types[type]) {
+  if (!types[type]) {
     return dependencies;
   }
 
   return [
     type,
-    ...typedData.types[type].reduce<string[]>(
+    ...types[type].reduce<string[]>(
       (previous, t) => [
         ...previous,
-        ...getDependencies(typedData, t.type, previous).filter(
+        ...getDependencies(types, t.type, previous).filter(
           (dependency) => !previous.includes(dependency)
         ),
       ],
@@ -64,6 +73,22 @@ export const getDependencies = (
   ];
 };
 
+function getMerkleTreeType(types: TypedData['types'], ctx: Context) {
+  if (ctx.parent && ctx.key) {
+    const parentType = types[ctx.parent];
+    const merkleType = parentType.find((t) => t.name === ctx.key)!;
+    const isMerkleTree = isMerkleTreeType(merkleType);
+    if (!isMerkleTree) {
+      throw new Error(`${ctx.key} is not a merkle tree`);
+    }
+    if (merkleType.contains.endsWith('*')) {
+      throw new Error(`Merkle tree contain property must not be an array but was given ${ctx.key}`);
+    }
+    return merkleType.contains;
+  }
+  return 'raw';
+}
+
 /**
  * Encode a type to a string. All dependant types are alphabetically sorted.
  *
@@ -71,13 +96,13 @@ export const getDependencies = (
  * @param {string} type
  * @return {string}
  */
-export const encodeType = (typedData: TypedData, type: string): string => {
-  const [primary, ...dependencies] = getDependencies(typedData, type);
-  const types = [primary, ...dependencies.sort()];
+export const encodeType = (types: TypedData['types'], type: string): string => {
+  const [primary, ...dependencies] = getDependencies(types, type);
+  const newTypes = !primary ? [] : [primary, ...dependencies.sort()];
 
-  return types
+  return newTypes
     .map((dependency) => {
-      return `${dependency}(${typedData.types[dependency].map((t) => `${t.name}:${t.type}`)})`;
+      return `${dependency}(${types[dependency].map((t) => `${t.name}:${t.type}`)})`;
     })
     .join('');
 };
@@ -89,8 +114,8 @@ export const encodeType = (typedData: TypedData, type: string): string => {
  * @param {string} type
  * @return {string}
  */
-export const getTypeHash = (typedData: TypedData, type: string): string => {
-  return getSelectorFromName(encodeType(typedData, type));
+export const getTypeHash = (types: TypedData['types'], type: string): string => {
+  return getSelectorFromName(encodeType(types, type));
 };
 
 /**
@@ -102,26 +127,45 @@ export const getTypeHash = (typedData: TypedData, type: string): string => {
  * @param {any} data
  * @returns {[string, string]}
  */
-const encodeValue = (typedData: TypedData, type: string, data: unknown): [string, string] => {
-  if (typedData.types[type]) {
+export const encodeValue = (
+  types: TypedData['types'],
+  type: string,
+  data: unknown,
+  ctx: Context = {}
+): [string, string] => {
+  if (types[type]) {
     // eslint-disable-next-line @typescript-eslint/no-use-before-define
-    return [type, getStructHash(typedData, type, data as Record<string, unknown>)];
+    return [type, getStructHash(types, type, data as Record<string, unknown>)];
   }
 
   if (
-    Object.keys(typedData.types)
+    Object.keys(types)
       .map((x) => `${x}*`)
       .includes(type)
   ) {
     const structHashes: string[] = (data as unknown[]).map((struct) => {
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      return getStructHash(typedData, type.slice(0, -1), struct as Record<string, unknown>);
+      return getStructHash(types, type.slice(0, -1), struct as Record<string, unknown>);
     });
     return [type, computeHashOnElements(structHashes)];
   }
 
+  if (type === 'merkletree') {
+    const merkleTreeType = getMerkleTreeType(types, ctx);
+    const structHashes: string[] = (data as unknown[]).map((struct) => {
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      return encodeValue(types, merkleTreeType, struct as Record<string, unknown>)[1];
+    });
+    const { root } = new MerkleTree(structHashes as string[]);
+    return ['felt', root];
+  }
+
   if (type === 'felt*') {
     return ['felt*', computeHashOnElements(data as string[])];
+  }
+
+  if (type === 'selector') {
+    return ['felt', prepareSelector(data as string)];
   }
 
   return [type, getHex(data as string)];
@@ -135,25 +179,32 @@ const encodeValue = (typedData: TypedData, type: string, data: unknown): [string
  * @param {string} type
  * @param {Record<string, any>} data
  */
-export const encodeData = <T extends TypedData>(typedData: T, type: string, data: T['message']) => {
-  const [types, values] = typedData.types[type].reduce<[string[], string[]]>(
+export const encodeData = <T extends TypedData>(
+  types: T['types'],
+  type: string,
+  data: T['message']
+) => {
+  const [returnTypes, values] = types[type].reduce<[string[], string[]]>(
     ([ts, vs], field) => {
       if (data[field.name] === undefined || data[field.name] === null) {
         throw new Error(`Cannot encode data: missing data for '${field.name}'`);
       }
 
       const value = data[field.name];
-      const [t, encodedValue] = encodeValue(typedData, field.type, value);
+      const [t, encodedValue] = encodeValue(types, field.type, value, {
+        parent: type,
+        key: field.name,
+      });
 
       return [
         [...ts, t],
         [...vs, encodedValue],
       ];
     },
-    [['felt'], [getTypeHash(typedData, type)]]
+    [['felt'], [getTypeHash(types, type)]]
   );
 
-  return [types, values];
+  return [returnTypes, values];
 };
 
 /**
@@ -166,27 +217,30 @@ export const encodeData = <T extends TypedData>(typedData: T, type: string, data
  * @return {Buffer}
  */
 export const getStructHash = <T extends TypedData>(
-  typedData: T,
+  types: T['types'],
   type: string,
   data: T['message']
 ) => {
-  return computeHashOnElements(encodeData(typedData, type, data)[1]);
+  return computeHashOnElements(encodeData(types, type, data)[1]);
 };
 
 /**
- * Get the EIP-191 encoded message to sign, from the typedData object. If `hash` is enabled, the message will be hashed
- * with Keccak256.
+ * Get the EIP-191 encoded message to sign, from the typedData object.
  *
  * @param {TypedData} typedData
  * @param {BigNumberish} account
  * @return {string}
  */
 export const getMessageHash = (typedData: TypedData, account: BigNumberish): string => {
+  if (!validateTypedData(typedData)) {
+    throw new Error('Typed data does not match JSON schema');
+  }
+
   const message = [
     encodeShortString('StarkNet Message'),
-    getStructHash(typedData, 'StarkNetDomain', typedData.domain),
+    getStructHash(typedData.types, 'StarkNetDomain', typedData.domain),
     account,
-    getStructHash(typedData, typedData.primaryType, typedData.message),
+    getStructHash(typedData.types, typedData.primaryType, typedData.message),
   ];
 
   return computeHashOnElements(message);
