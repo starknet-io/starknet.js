@@ -1,4 +1,4 @@
-import { ZERO } from '../constants';
+import { StarknetChainId, ZERO } from '../constants';
 import { ProviderInterface, ProviderOptions } from '../provider';
 import { Provider } from '../provider/default';
 import { Signer, SignerInterface } from '../signer';
@@ -32,6 +32,10 @@ export class Account extends Provider implements AccountInterface {
       'getPubKey' in keyPairOrSigner ? keyPairOrSigner : new Signer(keyPairOrSigner as KeyPair);
   }
 
+  public async getChainId(): Promise<StarknetChainId> {
+    return this.getChainId();
+  }
+
   public async getNonce(): Promise<string> {
     const { result } = await this.callContract({
       contractAddress: this.address,
@@ -47,13 +51,14 @@ export class Account extends Provider implements AccountInterface {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = providedNonce ?? (await this.getNonce());
     const version = toBN(feeTransactionVersion);
+    const chainId = await this.getChainId();
 
     const signerDetails: InvocationsSignerDetails = {
       walletAddress: this.address,
       nonce: toBN(nonce),
       maxFee: ZERO,
       version,
-      chainId: this.chainId,
+      chainId,
     };
 
     const signature = await this.signer.signTransaction(transactions, signerDetails);
@@ -99,13 +104,14 @@ export class Account extends Provider implements AccountInterface {
     }
 
     const version = toBN(transactionVersion);
+    const chainId = await this.getChainId();
 
     const signerDetails: InvocationsSignerDetails = {
       walletAddress: this.address,
       nonce,
       maxFee,
       version,
-      chainId: this.chainId,
+      chainId,
     };
 
     const signature = await this.signer.signTransaction(transactions, signerDetails, abis);
