@@ -1,4 +1,4 @@
-import { StarknetChainId, ZERO } from '../constants';
+import { ZERO } from '../constants';
 import { ProviderInterface, ProviderOptions } from '../provider';
 import { Provider } from '../provider/default';
 import { Signer, SignerInterface } from '../signer';
@@ -30,10 +30,6 @@ export class Account extends Provider implements AccountInterface {
     super(providerOrOptions);
     this.signer =
       'getPubKey' in keyPairOrSigner ? keyPairOrSigner : new Signer(keyPairOrSigner as KeyPair);
-  }
-
-  public async getChainId(): Promise<StarknetChainId> {
-    return this.getChainId();
   }
 
   public async getNonce(): Promise<string> {

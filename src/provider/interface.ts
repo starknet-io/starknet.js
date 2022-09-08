@@ -22,6 +22,8 @@ import { BlockIdentifier } from './utils';
 export abstract class ProviderInterface {
   public abstract chainId: StarknetChainId;
 
+  public abstract getChainId(): Promise<StarknetChainId>;
+
   /**
    * Calls a function on the StarkNet contract.
    *
