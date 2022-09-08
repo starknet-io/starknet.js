@@ -85,6 +85,9 @@
     ],
     "setupFilesAfterEnv": [
       "./__tests__/jest.setup.ts"
+    ],
+    "sandboxInjectedGlobals": [
+      "Math"
     ]
   },
   "importSort": {
