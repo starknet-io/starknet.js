@@ -23,6 +23,13 @@ export abstract class ProviderInterface {
   public abstract chainId: StarknetChainId;
 
   /**
+   * Gets the Starknet chain Id
+   *
+   * @returns the chain Id
+   */
+  public abstract getChainId(): Promise<StarknetChainId>;
+
+  /**
    * Calls a function on the StarkNet contract.
    *
    * @param call transaction to be called

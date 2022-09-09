@@ -46,6 +46,10 @@ export class Provider implements ProviderInterface {
     return this.provider.chainId;
   }
 
+  public async getChainId(): Promise<StarknetChainId> {
+    return this.provider.getChainId();
+  }
+
   public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
     return this.provider.getBlock(blockIdentifier);
   }

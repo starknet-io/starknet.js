@@ -1,3 +1,22 @@
+# [4.5.0](https://github.com/0xs34n/starknet.js/compare/v4.4.2...v4.5.0) (2022-09-09)
+
+### Bug Fixes
+
+- prevent undefined rpc chainId in account ([9f69229](https://github.com/0xs34n/starknet.js/commit/9f69229fcb5205bb3fd1fcc7eb7c627faa300561))
+- repair chain fix ([d7758a6](https://github.com/0xs34n/starknet.js/commit/d7758a6d180cd1af89f8aefb37bce077b92c5fd5))
+
+### Features
+
+- optional abi field for deploy and declare rpc transactions ([ce62648](https://github.com/0xs34n/starknet.js/commit/ce626481cb6bc3dea77963482820ae6f50c82566))
+
+## [4.4.2](https://github.com/0xs34n/starknet.js/compare/v4.4.1...v4.4.2) (2022-09-07)
+
+### Bug Fixes
+
+- dont import fetch from crosshatch ([a3ef41c](https://github.com/0xs34n/starknet.js/commit/a3ef41cac0e818f7429e6dd7654722ede1dc3796))
+- use custom fetch ponyfill ([78f904a](https://github.com/0xs34n/starknet.js/commit/78f904a1d5aeb5efaba7fbdd853802529c80594b))
+- use isomorphic-unfetch ([c63b6a1](https://github.com/0xs34n/starknet.js/commit/c63b6a138616936cf7a70f9098af5df290983c74))
+
 ## [4.4.1](https://github.com/0xs34n/starknet.js/compare/v4.4.0...v4.4.1) (2022-09-01)
 
 ### Bug Fixes
