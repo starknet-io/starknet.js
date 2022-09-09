@@ -154,7 +154,7 @@ export class Account extends Provider implements AccountInterface {
     try {
       await this.callContract({
         contractAddress: this.address,
-        entrypoint: 'is_valid_signature',
+        entrypoint: 'isValidSignature',
         calldata: compileCalldata({
           hash: toBN(hash).toString(),
           signature: signature.map((x) => toBN(x).toString()),
