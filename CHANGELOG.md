@@ -1,3 +1,14 @@
+# [4.5.0](https://github.com/0xs34n/starknet.js/compare/v4.4.2...v4.5.0) (2022-09-09)
+
+### Bug Fixes
+
+- prevent undefined rpc chainId in account ([9f69229](https://github.com/0xs34n/starknet.js/commit/9f69229fcb5205bb3fd1fcc7eb7c627faa300561))
+- repair chain fix ([d7758a6](https://github.com/0xs34n/starknet.js/commit/d7758a6d180cd1af89f8aefb37bce077b92c5fd5))
+
+### Features
+
+- optional abi field for deploy and declare rpc transactions ([ce62648](https://github.com/0xs34n/starknet.js/commit/ce626481cb6bc3dea77963482820ae6f50c82566))
+
 ## [4.4.2](https://github.com/0xs34n/starknet.js/compare/v4.4.1...v4.4.2) (2022-09-07)
 
 ### Bug Fixes
