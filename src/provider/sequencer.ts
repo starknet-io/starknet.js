@@ -207,6 +207,10 @@ export class SequencerProvider implements ProviderInterface {
     }
   }
 
+  public async getChainId(): Promise<StarknetChainId> {
+    return Promise.resolve(this.chainId);
+  }
+
   public async callContract(
     { contractAddress, entrypoint: entryPointSelector, calldata = [] }: Call,
     blockIdentifier: BlockIdentifier = 'pending'
