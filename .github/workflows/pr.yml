@@ -26,7 +26,7 @@ jobs:
 
     services:
       devnet:
-        image: shardlabs/starknet-devnet:0.3.0-seed0
+        image: shardlabs/starknet-devnet:a0d2214898603fa122ce39d329088b946aff1b1f-seed0
         ports:
           - 5050:5050
     env:
