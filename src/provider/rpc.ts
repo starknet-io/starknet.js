@@ -178,6 +178,7 @@ export class RpcProvider implements ProviderInterface {
       {
         program: contractDefinition.program,
         entry_points_by_type: contractDefinition.entry_points_by_type,
+        abi: contractDefinition.abi, // rpc 2.0
       },
       toHex(toBN(version || 0)),
     ]).then(this.responseParser.parseDeclareContractResponse);
@@ -196,6 +197,7 @@ export class RpcProvider implements ProviderInterface {
       {
         program: contractDefinition.program,
         entry_points_by_type: contractDefinition.entry_points_by_type,
+        abi: contractDefinition.abi, // rpc 2.0
       },
     ]).then(this.responseParser.parseDeployContractResponse);
   }

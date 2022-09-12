@@ -1,7 +1,9 @@
 ## Motivation and Resolution
+
 ...
 
 ### RPC version (if applicable)
+
 ...
 
 ## Usage related changes
@@ -19,6 +21,7 @@
 - ...
 
 ## Checklist:
+
 - [ ] Performed a self-review of the code
 - [ ] Rebased to the last commit of the target branch (or merged it into my branch)
 - [ ] Linked the issues which this PR resolves

@@ -47,13 +47,14 @@ export class Account extends Provider implements AccountInterface {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = providedNonce ?? (await this.getNonce());
     const version = toBN(feeTransactionVersion);
+    const chainId = await this.getChainId();
 
     const signerDetails: InvocationsSignerDetails = {
       walletAddress: this.address,
       nonce: toBN(nonce),
       maxFee: ZERO,
       version,
-      chainId: this.chainId,
+      chainId,
     };
 
     const signature = await this.signer.signTransaction(transactions, signerDetails);
@@ -99,13 +100,14 @@ export class Account extends Provider implements AccountInterface {
     }
 
     const version = toBN(transactionVersion);
+    const chainId = await this.getChainId();
 
     const signerDetails: InvocationsSignerDetails = {
       walletAddress: this.address,
       nonce,
       maxFee,
       version,
-      chainId: this.chainId,
+      chainId,
     };
 
     const signature = await this.signer.signTransaction(transactions, signerDetails, abis);
