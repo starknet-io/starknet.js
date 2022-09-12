@@ -1,40 +1,46 @@
 import { StarknetChainId } from '../../constants';
 import { BlockIdentifier } from '../../provider/utils';
-import { OPENRPC } from './openrpc';
+import { ADDRESS, FELT, OPENRPC } from './openrpc';
 
 export namespace RPC {
   export type Response = {
     id: number;
-    result: any;
     jsonrpc: string;
+    result?: any;
     error?: {
       code: string;
       message: string;
     };
   };
 
+  export type ContractAddress = ADDRESS;
+  export type Felt = FELT;
+  export type ContractClass = OPENRPC.ContractClass;
+  export type StateUpdate = OPENRPC.StateUpdate;
+  export type Transaction = OPENRPC.Transaction;
+  export type TransactionHash = OPENRPC.TransactionHash;
+  export type Trace = OPENRPC.Trace;
+  export type Traces = OPENRPC.Traces;
+  export type BlockHash = OPENRPC.BlockHash;
+  export type BlockHashAndNumber = OPENRPC.BlockHashAndNumber;
+
   export type AddTransactionResponse = {
     transaction_hash: string;
   };
 
-  export type GetClassResponse = OPENRPC.GetClassResponse;
+  export type GetClassResponse = OPENRPC.ContractClass;
 
   export type DeclareResponse = {
     transaction_hash: string;
     class_hash: string;
   };
 
-  export type EstimateFeeResponse = {
-    overall_fee: number;
-    gas_consumed: number;
-    gas_price: number;
-  };
+  export type EstimateFeeResponse = OPENRPC.EstimateFee;
 
-  export type GetBlockWithTxHashesResponse = OPENRPC.GetBlockWithTxHashesResponse;
-  export type GetBlockWithTxs = OPENRPC.GetBlockWithTxsResponse;
-  export type GetStorageAtResponse = OPENRPC.GetStorageAtResponse;
-
-  export type GetTransactionReceiptResponse = OPENRPC.GetTransactionReceiptResponse;
+  export type GetBlockWithTxHashesResponse = OPENRPC.BlockWithTxHashes;
+  export type GetBlockWithTxs = OPENRPC.BlockWithTxs;
+  export type GetStorageAtResponse = OPENRPC.Storage;
+  export type GetTransactionReceiptResponse = OPENRPC.TransactionReceipt;
 
   interface CommonTransactionProperties {
     txn_hash: string;
@@ -55,12 +61,12 @@ export namespace RPC {
     sender_address?: string;
   }
 
-  export type GetTransactionByHashResponse = OPENRPC.GetTransactionByHashResponse;
-  export type GetTransactionByBlockIdAndIndex = OPENRPC.GetTransactionByBlockIdAndIndex;
+  export type GetTransactionByHashResponse = OPENRPC.Transaction;
+  export type GetTransactionByBlockIdAndIndex = OPENRPC.Transaction;
 
   export type GetTransactionCountResponse = number;
 
-  export type GetBlockNumberResponse = number;
+  export type GetBlockNumberResponse = OPENRPC.BlockNumber;
 
   export type GetSyncingStatsResponse =
     | {
@@ -82,11 +88,7 @@ export namespace RPC {
     page_number: number;
   };
 
-  export type GetEventsResponse = {
-    events: StarknetEmittedEvent[];
-    page_number: number;
-    is_last_page: number;
-  };
+  export type GetEventsResponse = OPENRPC.Events;
 
   export type DeployContractResponse = {
     transaction_hash: string;
@@ -100,13 +102,6 @@ export namespace RPC {
     data: string[];
   };
 
-  export type StarknetEmittedEvent = {
-    event: StarknetEvent;
-    block_hash: string;
-    block_number: number;
-    transaction_hash: string;
-  };
-
   export type MessageToL1 = {
     to_address: string;
     payload: string[];
@@ -118,6 +113,31 @@ export namespace RPC {
   };
 
   export type Methods = {
+    starknet_pendingTransactions: {
+      QUERY: never;
+      REQUEST: any[];
+      RESPONSE: Transaction;
+    };
+    starknet_blockHashAndNumber: {
+      QUERY: never;
+      REQUEST: any[];
+      RESPONSE: BlockHashAndNumber;
+    };
+    starknet_getClassHashAt: {
+      QUERY: never;
+      REQUEST: any[];
+      RESPONSE: Felt;
+    };
+    starknet_getStateUpdate: {
+      QUERY: never;
+      REQUEST: any[];
+      RESPONSE: OPENRPC.StateUpdate;
+    };
+    starknet_getClass: {
+      QUERY: never;
+      REQUEST: any[];
+      RESPONSE: OPENRPC.ContractClass;
+    };
     starknet_getBlockWithTxHashes: {
       QUERY: never;
       REQUEST: any[];
@@ -131,7 +151,7 @@ export namespace RPC {
     starknet_getNonce: {
       QUERY: never;
       REQUEST: any[];
-      RESPONSE: string;
+      RESPONSE: OPENRPC.Nonce;
     };
     starknet_getStorageAt: {
       QUERY: never;
@@ -204,6 +224,16 @@ export namespace RPC {
       RESPONSE: DeclareResponse;
     };
     starknet_getClassAt: {
+      QUERY: never;
+      REQUEST: any[];
+      RESPONSE: any;
+    };
+    starknet_traceTransaction: {
+      QUERY: never;
+      REQUEST: any[];
+      RESPONSE: any;
+    };
+    starknet_traceBlockTransactions: {
       QUERY: never;
       REQUEST: any[];
       RESPONSE: any;

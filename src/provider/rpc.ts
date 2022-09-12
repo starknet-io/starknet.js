@@ -90,6 +90,10 @@ export class RpcProvider implements ProviderInterface {
     );
   }
 
+  public async getBlockHashAndNumber(): Promise<RPC.BlockHashAndNumber> {
+    return this.fetchEndpoint('starknet_blockHashAndNumber');
+  }
+
   public async getBlockWithTxHashes(
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<RPC.GetBlockWithTxHashesResponse> {
@@ -104,8 +108,27 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_getBlockWithTxs', [block.identifier]);
   }
 
+  public async getClassHashAt(
+    blockIdentifier: BlockIdentifier,
+    contractAddress: RPC.ContractAddress
+  ): Promise<RPC.Felt> {
+    return this.fetchEndpoint('starknet_getClassHashAt', [blockIdentifier, contractAddress]);
+  }
+
   public async getNonce(contractAddress: string): Promise<any> {
     return this.fetchEndpoint('starknet_getNonce', [contractAddress]);
+  }
+
+  public async getPendingTransactions(): Promise<RPC.Transaction> {
+    return this.fetchEndpoint('starknet_pendingTransactions');
+  }
+
+  public async getProtocolVersion(): Promise<Error> {
+    throw new Error('Pathfinder does not implement this rpc 0.1.0 method');
+  }
+
+  public async getStateUpdate(blockIdentifier: BlockIdentifier): Promise<RPC.StateUpdate> {
+    return this.fetchEndpoint('starknet_getStateUpdate', [blockIdentifier]);
   }
 
   public async getStorageAt(
@@ -146,9 +169,21 @@ export class RpcProvider implements ProviderInterface {
     );
   }
 
+  // TODO: Check, changed response from common interface to rpc
+  public async getClass(classHash: RPC.Felt): Promise<RPC.ContractClass> {
+    return this.fetchEndpoint('starknet_getClass', [classHash]);
+  }
+
   public async getClassAt(contractAddress: string, blockIdentifier: BlockIdentifier): Promise<any> {
     const block = new Block(blockIdentifier);
     return this.fetchEndpoint('starknet_getClassAt', [block.identifier, contractAddress]);
+  }
+
+  public async getCode(
+    _contractAddress: string,
+    _blockIdentifier?: BlockIdentifier
+  ): Promise<GetCodeResponse> {
+    throw new Error('RPC 0.1.0 does not implement getCode function');
   }
 
   public async getEstimateFee(
@@ -234,11 +269,12 @@ export class RpcProvider implements ProviderInterface {
     return this.responseParser.parseCallContractResponse(result);
   }
 
-  public async getCode(
-    _contractAddress: string,
-    _blockIdentifier?: BlockIdentifier
-  ): Promise<GetCodeResponse> {
-    throw new Error('RPC 0.1.0 does not implement getCode function');
+  public async traceTransaction(transactionHash: RPC.TransactionHash): Promise<RPC.Trace> {
+    return this.fetchEndpoint('starknet_traceTransaction', [transactionHash]);
+  }
+
+  public async traceBlockTransactions(blockHash: RPC.BlockHash): Promise<RPC.Traces> {
+    return this.fetchEndpoint('starknet_traceBlockTransactions', [blockHash]);
   }
 
   public async waitForTransaction(txHash: BigNumberish, retryInterval: number = 8000) {
