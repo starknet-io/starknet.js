@@ -1,5 +1,3 @@
-import { StarknetChainId } from '../../constants';
-import { BlockIdentifier } from '../../provider/utils';
 import { ADDRESS, FELT, OPENRPC } from './openrpc';
 
 export namespace RPC {
@@ -13,6 +11,7 @@ export namespace RPC {
     };
   };
 
+  export type ChainId = OPENRPC.ChainId;
   export type ContractAddress = ADDRESS;
   export type Felt = FELT;
   export type ContractClass = OPENRPC.ContractClass;
@@ -23,78 +22,24 @@ export namespace RPC {
   export type Traces = OPENRPC.Traces;
   export type BlockHash = OPENRPC.BlockHash;
   export type BlockHashAndNumber = OPENRPC.BlockHashAndNumber;
-
-  export type AddTransactionResponse = {
-    transaction_hash: string;
-  };
-
   export type GetClassResponse = OPENRPC.ContractClass;
-
-  export type DeclareResponse = {
-    transaction_hash: string;
-    class_hash: string;
-  };
-
   export type EstimateFeeResponse = OPENRPC.EstimateFee;
-
   export type GetBlockWithTxHashesResponse = OPENRPC.BlockWithTxHashes;
   export type GetBlockWithTxs = OPENRPC.BlockWithTxs;
   export type GetStorageAtResponse = OPENRPC.Storage;
-  export type GetTransactionReceiptResponse = OPENRPC.TransactionReceipt;
-
-  interface CommonTransactionProperties {
-    txn_hash: string;
-    max_fee: string;
-    version: string;
-    nonce: string;
-    signature: Array<string>;
-  }
-
-  export interface InvokeTransactionResponse extends CommonTransactionProperties {
-    contract_address?: string;
-    entry_point_selector?: string;
-    calldata?: Array<string>;
-  }
-
-  export interface DeclareTransactionResponse extends CommonTransactionProperties {
-    contract_class?: GetClassResponse;
-    sender_address?: string;
-  }
-
+  export type TransactionReceipt = OPENRPC.TransactionReceipt;
   export type GetTransactionByHashResponse = OPENRPC.Transaction;
   export type GetTransactionByBlockIdAndIndex = OPENRPC.Transaction;
-
   export type GetTransactionCountResponse = number;
-
   export type GetBlockNumberResponse = OPENRPC.BlockNumber;
-
-  export type GetSyncingStatsResponse =
-    | {
-        starting_block_hash: string;
-        starting_block_num: string;
-        current_block_hash: string;
-        current_block_num: string;
-        highest_block_hash: string;
-        highest_block_num: string;
-      }
-    | boolean;
-
-  export type EventFilter = {
-    fromBlock: BlockIdentifier;
-    toBlock: BlockIdentifier;
-    address: string;
-    keys: string[];
-    page_size: number;
-    page_number: number;
-  };
-
+  export type GetSyncingStatsResponse = OPENRPC.SyncingStatus;
+  export type EventFilter = OPENRPC.EventFilter;
   export type GetEventsResponse = OPENRPC.Events;
 
-  export type DeployContractResponse = {
-    transaction_hash: string;
-    contract_address: string;
-  };
-  // Other
+  //
+  export type InvokedTransaction = OPENRPC.InvokedTransaction;
+  export type DeclaredTransaction = OPENRPC.DeclaredTransaction;
+  export type DeployContractResponse = OPENRPC.DeployedTransaction;
 
   export type StarknetEvent = {
     from_address: string;
@@ -171,7 +116,7 @@ export namespace RPC {
     starknet_getTransactionReceipt: {
       QUERY: never;
       REQUEST: any[];
-      RESPONSE: GetTransactionReceiptResponse;
+      RESPONSE: TransactionReceipt;
     };
     starknet_getBlockTransactionCount: {
       QUERY: never;
@@ -196,7 +141,7 @@ export namespace RPC {
     starknet_chainId: {
       QUERY: never;
       REQUEST: any[];
-      RESPONSE: StarknetChainId;
+      RESPONSE: OPENRPC.ChainId;
     };
     starknet_syncing: {
       QUERY: never;
@@ -211,17 +156,17 @@ export namespace RPC {
     starknet_addInvokeTransaction: {
       QUERY: never;
       REQUEST: any[];
-      RESPONSE: AddTransactionResponse;
+      RESPONSE: OPENRPC.InvokedTransaction;
     };
     starknet_addDeployTransaction: {
       QUERY: never;
       REQUEST: any[];
-      RESPONSE: DeployContractResponse;
+      RESPONSE: OPENRPC.DeployedTransaction;
     };
     starknet_addDeclareTransaction: {
       QUERY: never;
       REQUEST: any[];
-      RESPONSE: DeclareResponse;
+      RESPONSE: OPENRPC.DeclaredTransaction;
     };
     starknet_getClassAt: {
       QUERY: never;

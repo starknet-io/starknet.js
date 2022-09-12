@@ -251,7 +251,7 @@ export namespace OPENRPC {
   export type ChainId = CHAIN_ID;
   export type PendingTransactions = Array<TXN>;
   export type ProtocolVersion = PROTOCOL_VERSION;
-  export type Syncing = boolean | SYNC_STATUS;
+  export type SyncingStatus = false | SYNC_STATUS;
   export type Events = {
     events: Array<EMITTED_EVENT>;
     page_number: number;
@@ -265,12 +265,10 @@ export namespace OPENRPC {
   }>;
   export type TransactionHash = TXN_HASH;
   export type BlockHash = BLOCK_HASH;
-  export type addInvokeTransactionResponse = { transaction_hash: TXN_HASH };
-  export type addDeclareTransactionResponse = { transaction_hash: TXN_HASH; class_hash: FELT };
-  export type addDeployTransactionResponse = {
-    transaction_hash: TXN_HASH;
-    contract_address: FELT;
-  };
+  export type EventFilter = EVENT_FILTER;
+  export type InvokedTransaction = { transaction_hash: TXN_HASH };
+  export type DeclaredTransaction = { transaction_hash: TXN_HASH; class_hash: FELT };
+  export type DeployedTransaction = { transaction_hash: TXN_HASH; contract_address: FELT };
 
   // Final Methods
   export type Methods = {
@@ -365,7 +363,7 @@ export namespace OPENRPC {
       result: Array<TXN>;
     };
     starknet_syncing: {
-      result: false | SYNC_STATUS;
+      result: SyncingStatus;
     };
     starknet_getEvents: {
       params: { filter: EVENT_FILTER & RESULT_PAGE_REQUEST };
@@ -386,14 +384,14 @@ export namespace OPENRPC {
         max_fee: NUM_AS_HEX;
         version: NUM_AS_HEX;
       };
-      result: addInvokeTransactionResponse;
+      result: InvokedTransaction;
     };
     starknet_addDeclareTransaction: {
       params: {
         contract_class: CONTRACT_CLASS;
         version: NUM_AS_HEX;
       };
-      result: addDeclareTransactionResponse;
+      result: DeclaredTransaction;
       errors: errors.INVALID_CONTRACT_CLASS;
     };
     starknet_addDeployTransaction: {
@@ -402,7 +400,7 @@ export namespace OPENRPC {
         constructor_calldata: FELT;
         contract_definition: CONTRACT_CLASS;
       };
-      result: addDeployTransactionResponse;
+      result: DeployedTransaction;
       errors: errors.INVALID_CONTRACT_CLASS;
     };
 

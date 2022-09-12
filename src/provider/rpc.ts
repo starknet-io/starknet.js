@@ -79,7 +79,7 @@ export class RpcProvider implements ProviderInterface {
     }
   }
 
-  public async getChainId(): Promise<StarknetChainId> {
+  public async getChainId(): Promise<any> {
     return this.fetchEndpoint('starknet_chainId');
   }
 
