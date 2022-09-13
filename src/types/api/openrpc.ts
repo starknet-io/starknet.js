@@ -242,7 +242,7 @@ export namespace OPENRPC {
   export type TransactionReceipt = TXN_RECEIPT;
   export type ContractClass = CONTRACT_CLASS;
   export type CallResponse = Array<FELT>;
-  export type EstimateFee = FEE_ESTIMATE;
+  export type EstimatedFee = FEE_ESTIMATE;
   export type BlockNumber = BLOCK_NUMBER;
   export type BlockHashAndNumber = {
     block_hash: BLOCK_HASH;
@@ -276,85 +276,85 @@ export namespace OPENRPC {
     starknet_getBlockWithTxHashes: {
       params: { block_id: BLOCK_ID };
       result: BlockWithTxHashes;
-      errors: errors.INVALID_BLOCK_ID;
+      errors: Errors.INVALID_BLOCK_ID;
     };
     starknet_getBlockWithTxs: {
       params: { block_id: BLOCK_ID };
       result: BlockWithTxs;
-      errors: errors.INVALID_BLOCK_ID;
+      errors: Errors.INVALID_BLOCK_ID;
     };
     starknet_getStateUpdate: {
       params: { block_id: BLOCK_ID };
       result: StateUpdate;
-      errors: errors.INVALID_BLOCK_ID;
+      errors: Errors.INVALID_BLOCK_ID;
     };
     starknet_getStorageAt: {
       params: { contract_address: ADDRESS; key: STORAGE_KEY; block_id: BLOCK_ID };
       result: Storage;
-      errors: errors.CONTRACT_NOT_FOUND | errors.INVALID_BLOCK_ID;
+      errors: Errors.CONTRACT_NOT_FOUND | Errors.INVALID_BLOCK_ID;
     };
     starknet_getTransactionByHash: {
       params: { transaction_hash: TXN_HASH };
       result: Transaction;
-      errors: errors.INVALID_TXN_HASH;
+      errors: Errors.INVALID_TXN_HASH;
     };
     starknet_getTransactionByBlockIdAndIndex: {
       params: { block_id: BLOCK_ID; index: number };
       result: Transaction;
-      errors: errors.INVALID_BLOCK_ID | errors.INVALID_TXN_INDEX;
+      errors: Errors.INVALID_BLOCK_ID | Errors.INVALID_TXN_INDEX;
     };
     starknet_getTransactionReceipt: {
       params: { transaction_hash: TXN_HASH };
       result: TransactionReceipt;
-      errors: errors.INVALID_TXN_HASH;
+      errors: Errors.INVALID_TXN_HASH;
     };
     starknet_getClass: {
       params: { class_hash: FELT };
       result: ContractClass;
-      errors: errors.INVALID_CONTRACT_CLASS_HASH;
+      errors: Errors.INVALID_CONTRACT_CLASS_HASH;
     };
     starknet_getClassHashAt: {
       params: { block_id: BLOCK_ID; contract_address: ADDRESS };
       result: FELT;
-      errors: errors.INVALID_BLOCK_ID | errors.CONTRACT_NOT_FOUND;
+      errors: Errors.INVALID_BLOCK_ID | Errors.CONTRACT_NOT_FOUND;
     };
     starknet_getClassAt: {
       params: { block_id: BLOCK_ID; contract_address: ADDRESS };
       result: ContractClass;
-      errors: errors.INVALID_BLOCK_ID | errors.CONTRACT_NOT_FOUND;
+      errors: Errors.INVALID_BLOCK_ID | Errors.CONTRACT_NOT_FOUND;
     };
     starknet_getBlockTransactionCount: {
       params: { block_id: BLOCK_ID };
       result: number;
-      errors: errors.INVALID_BLOCK_ID;
+      errors: Errors.INVALID_BLOCK_ID;
     };
     starknet_call: {
       params: { request: FUNCTION_CALL; block_id: BLOCK_ID };
       result: Array<FELT>;
       errors:
-        | errors.CONTRACT_NOT_FOUND
-        | errors.INVALID_MESSAGE_SELECTOR
-        | errors.INVALID_CALL_DATA
-        | errors.CONTRACT_ERROR
-        | errors.INVALID_BLOCK_ID;
+        | Errors.CONTRACT_NOT_FOUND
+        | Errors.INVALID_MESSAGE_SELECTOR
+        | Errors.INVALID_CALL_DATA
+        | Errors.CONTRACT_ERROR
+        | Errors.INVALID_BLOCK_ID;
     };
     starknet_estimateFee: {
       params: { request: INVOKE_TXN; block_id: BLOCK_ID };
       result: FEE_ESTIMATE;
       errors:
-        | errors.CONTRACT_NOT_FOUND
-        | errors.INVALID_MESSAGE_SELECTOR
-        | errors.INVALID_CALL_DATA
-        | errors.CONTRACT_ERROR
-        | errors.INVALID_BLOCK_ID;
+        | Errors.CONTRACT_NOT_FOUND
+        | Errors.INVALID_MESSAGE_SELECTOR
+        | Errors.INVALID_CALL_DATA
+        | Errors.CONTRACT_ERROR
+        | Errors.INVALID_BLOCK_ID;
     };
     starknet_blockNumber: {
       result: BLOCK_NUMBER;
-      errors: errors.NO_BLOCKS;
+      errors: Errors.NO_BLOCKS;
     };
     starknet_blockHashAndNumber: {
       result: BLOCK_HASH & BLOCK_NUMBER;
-      errors: errors.NO_BLOCKS;
+      errors: Errors.NO_BLOCKS;
     };
     starknet_chainId: {
       result: CHAIN_ID;
@@ -368,12 +368,12 @@ export namespace OPENRPC {
     starknet_getEvents: {
       params: { filter: EVENT_FILTER & RESULT_PAGE_REQUEST };
       result: { events: EMITTED_EVENT; page_number: number; is_last_page: boolean };
-      errors: errors.PAGE_SIZE_TOO_BIG;
+      errors: Errors.PAGE_SIZE_TOO_BIG;
     };
     starknet_getNonce: {
       params: { contract_address: ADDRESS };
       result: FELT;
-      errors: errors.CONTRACT_NOT_FOUND;
+      errors: Errors.CONTRACT_NOT_FOUND;
     };
 
     // Write API
@@ -392,7 +392,7 @@ export namespace OPENRPC {
         version: NUM_AS_HEX;
       };
       result: DeclaredTransaction;
-      errors: errors.INVALID_CONTRACT_CLASS;
+      errors: Errors.INVALID_CONTRACT_CLASS;
     };
     starknet_addDeployTransaction: {
       params: {
@@ -401,28 +401,28 @@ export namespace OPENRPC {
         contract_definition: CONTRACT_CLASS;
       };
       result: DeployedTransaction;
-      errors: errors.INVALID_CONTRACT_CLASS;
+      errors: Errors.INVALID_CONTRACT_CLASS;
     };
 
     // Trace API
     starknet_traceTransaction: {
       params: { transaction_hash: TXN_HASH };
-      result: { trace: Trace };
+      result: Trace;
       errors:
-        | errors.INVALID_TXN_HASH
-        | errors.NO_TRACE_AVAILABLE
-        | errors.INVALID_BLOCK_HASH
-        | errors.INVALID_TXN_HASH;
+        | Errors.INVALID_TXN_HASH
+        | Errors.NO_TRACE_AVAILABLE
+        | Errors.INVALID_BLOCK_HASH
+        | Errors.INVALID_TXN_HASH;
     };
     starknet_traceBlockTransactions: {
       params: { block_hash: BLOCK_HASH };
       result: Traces;
-      errors: errors.INVALID_BLOCK_HASH;
+      errors: Errors.INVALID_BLOCK_HASH;
     };
   };
 }
 
-namespace errors {
+export namespace Errors {
   export interface FAILED_TO_RECEIVE_TXN {
     code: 1;
     message: 'Failed to write transaction';

@@ -1,4 +1,4 @@
-import { Account, RpcProvider, ec } from '../src';
+import { Account, GetBlockResponse, RpcProvider, ec } from '../src';
 import {
   compiledOpenZeppelinAccount,
   describeIfRpc,
@@ -20,8 +20,12 @@ describeIfRpc('RPCProvider', () => {
     accountPublicKey = ec.getStarkKey(accountKeyPair);
   });
 
-  describe('RPC methods', async () => {
-    const latestBlock = await rpcProvider.getBlock('latest');
+  describe('RPC methods', () => {
+    let latestBlock: GetBlockResponse;
+
+    beforeAll(async () => {
+      latestBlock = await rpcProvider.getBlock('latest');
+    });
 
     test('getChainId', async () => {
       const chainId = await rpcProvider.getChainId();
@@ -38,13 +42,18 @@ describeIfRpc('RPCProvider', () => {
       expect(blockResponse).toHaveProperty('transactions');
     });
 
-    describe('deployContract', async () => {
-      const { contract_address, transaction_hash } = await rpcProvider.deployContract({
-        contract: compiledOpenZeppelinAccount,
-        constructorCalldata: [accountPublicKey],
-        addressSalt: accountPublicKey,
+    describe('deployContract', () => {
+      let contract_address;
+      let transaction_hash;
+
+      beforeAll(async () => {
+        ({ contract_address, transaction_hash } = await rpcProvider.deployContract({
+          contract: compiledOpenZeppelinAccount,
+          constructorCalldata: [accountPublicKey],
+          addressSalt: accountPublicKey,
+        }));
+        await rpcProvider.waitForTransaction(transaction_hash);
       });
-      await rpcProvider.waitForTransaction(transaction_hash);
 
       test('deployContract result', () => {
         expect(contract_address).toBeTruthy();
@@ -52,16 +61,16 @@ describeIfRpc('RPCProvider', () => {
       });
 
       test('getTransactionByHash', async () => {
-        const blockResponse = await rpcProvider.getTransactionByHash(transaction_hash);
-        expect(blockResponse).toHaveProperty('transactions');
+        const transaction = await rpcProvider.getTransactionByHash(transaction_hash);
+        expect(transaction).toHaveProperty('transaction_hash');
       });
 
       test('getTransactionByBlockIdAndIndex', async () => {
-        const blockResponse = await rpcProvider.getTransactionByBlockIdAndIndex(
+        const transaction = await rpcProvider.getTransactionByBlockIdAndIndex(
           latestBlock.block_number,
           0
         );
-        expect(blockResponse).toHaveProperty('transactions');
+        expect(transaction).toHaveProperty('transaction_hash');
       });
     });
 

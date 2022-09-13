@@ -88,7 +88,7 @@ export class RPCResponseParser extends ResponseParser {
     };
   }
 
-  public parseDeployContractResponse(res: RPC.DeployContractResponse): DeployContractResponse {
+  public parseDeployContractResponse(res: RPC.DeployedTransaction): DeployContractResponse {
     return {
       transaction_hash: res.transaction_hash,
       contract_address: res.contract_address,

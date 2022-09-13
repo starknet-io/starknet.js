@@ -23,7 +23,7 @@ export namespace RPC {
   export type BlockHash = OPENRPC.BlockHash;
   export type BlockHashAndNumber = OPENRPC.BlockHashAndNumber;
   export type GetClassResponse = OPENRPC.ContractClass;
-  export type EstimateFeeResponse = OPENRPC.EstimateFee;
+  export type EstimateFeeResponse = OPENRPC.EstimatedFee;
   export type GetBlockWithTxHashesResponse = OPENRPC.BlockWithTxHashes;
   export type GetBlockWithTxs = OPENRPC.BlockWithTxs;
   export type GetStorageAtResponse = OPENRPC.Storage;
@@ -35,27 +35,9 @@ export namespace RPC {
   export type GetSyncingStatsResponse = OPENRPC.SyncingStatus;
   export type EventFilter = OPENRPC.EventFilter;
   export type GetEventsResponse = OPENRPC.Events;
-
-  //
   export type InvokedTransaction = OPENRPC.InvokedTransaction;
   export type DeclaredTransaction = OPENRPC.DeclaredTransaction;
-  export type DeployContractResponse = OPENRPC.DeployedTransaction;
-
-  export type StarknetEvent = {
-    from_address: string;
-    keys: string[];
-    data: string[];
-  };
-
-  export type MessageToL1 = {
-    to_address: string;
-    payload: string[];
-  };
-
-  export type MessageToL2 = {
-    from_address: string;
-    payload: string[];
-  };
+  export type DeployedTransaction = OPENRPC.DeployedTransaction;
 
   export type Methods = {
     starknet_pendingTransactions: {
@@ -131,7 +113,7 @@ export namespace RPC {
     starknet_estimateFee: {
       QUERY: never;
       REQUEST: any[];
-      RESPONSE: EstimateFeeResponse;
+      RESPONSE: OPENRPC.EstimatedFee;
     };
     starknet_blockNumber: {
       QUERY: never;
@@ -163,6 +145,16 @@ export namespace RPC {
       REQUEST: any[];
       RESPONSE: OPENRPC.DeployedTransaction;
     };
+    /*     
+    starknet_addDeployTransaction: {
+      params: {
+        contract_address_salt: FELT;
+        constructor_calldata: FELT;
+        contract_definition: OPENRPC.ContractClass;
+      };
+      result: DeployedTransaction;
+      errors: Errors.INVALID_CONTRACT_CLASS;
+    }; */
     starknet_addDeclareTransaction: {
       QUERY: never;
       REQUEST: any[];

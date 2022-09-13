@@ -36,6 +36,7 @@ export type RpcProviderOptions = { nodeUrl: string };
 export class RpcProvider implements ProviderInterface {
   public nodeUrl: string;
 
+  // interface
   public chainId!: StarknetChainId;
 
   private responseParser = new RPCResponseParser();
@@ -79,6 +80,7 @@ export class RpcProvider implements ProviderInterface {
     }
   }
 
+  // Interface
   public async getChainId(): Promise<any> {
     return this.fetchEndpoint('starknet_chainId');
   }
@@ -112,7 +114,8 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier,
     contractAddress: RPC.ContractAddress
   ): Promise<RPC.Felt> {
-    return this.fetchEndpoint('starknet_getClassHashAt', [blockIdentifier, contractAddress]);
+    const block = new Block(blockIdentifier);
+    return this.fetchEndpoint('starknet_getClassHashAt', [block.identifier, contractAddress]);
   }
 
   public async getNonce(contractAddress: string): Promise<any> {
@@ -128,7 +131,8 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getStateUpdate(blockIdentifier: BlockIdentifier): Promise<RPC.StateUpdate> {
-    return this.fetchEndpoint('starknet_getStateUpdate', [blockIdentifier]);
+    const block = new Block(blockIdentifier);
+    return this.fetchEndpoint('starknet_getStateUpdate', [block.identifier]);
   }
 
   public async getStorageAt(
@@ -160,7 +164,11 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier,
     index: number
   ): Promise<RPC.GetTransactionByBlockIdAndIndex> {
-    return this.fetchEndpoint('starknet_getTransactionByHash', [blockIdentifier, index]);
+    const block = new Block(blockIdentifier);
+    return this.fetchEndpoint('starknet_getTransactionByBlockIdAndIndex', [
+      block.identifier,
+      index,
+    ]);
   }
 
   public async getTransactionReceipt(txHash: BigNumberish): Promise<GetTransactionReceiptResponse> {
@@ -253,6 +261,7 @@ export class RpcProvider implements ProviderInterface {
     ]).then(this.responseParser.parseInvokeFunctionResponse);
   }
 
+  // Interface
   public async callContract(
     call: Call,
     blockIdentifier: BlockIdentifier = 'pending'
