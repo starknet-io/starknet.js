@@ -17,6 +17,7 @@ export namespace RPC {
   export type ContractClass = OPENRPC.ContractClass;
   export type StateUpdate = OPENRPC.StateUpdate;
   export type Transaction = OPENRPC.Transaction;
+  export type PendingTransactions = OPENRPC.PendingTransactions;
   export type TransactionHash = OPENRPC.TransactionHash;
   export type Trace = OPENRPC.Trace;
   export type Traces = OPENRPC.Traces;
@@ -43,7 +44,7 @@ export namespace RPC {
     starknet_pendingTransactions: {
       QUERY: never;
       REQUEST: any[];
-      RESPONSE: Transaction;
+      RESPONSE: PendingTransactions;
     };
     starknet_blockHashAndNumber: {
       QUERY: never;
@@ -145,16 +146,6 @@ export namespace RPC {
       REQUEST: any[];
       RESPONSE: OPENRPC.DeployedTransaction;
     };
-    /*     
-    starknet_addDeployTransaction: {
-      params: {
-        contract_address_salt: FELT;
-        constructor_calldata: FELT;
-        contract_definition: OPENRPC.ContractClass;
-      };
-      result: DeployedTransaction;
-      errors: Errors.INVALID_CONTRACT_CLASS;
-    }; */
     starknet_addDeclareTransaction: {
       QUERY: never;
       REQUEST: any[];

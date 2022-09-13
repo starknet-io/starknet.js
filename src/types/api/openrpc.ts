@@ -360,7 +360,7 @@ export namespace OPENRPC {
       result: CHAIN_ID;
     };
     starknet_pendingTransactions: {
-      result: Array<TXN>;
+      result: PendingTransactions;
     };
     starknet_syncing: {
       result: SyncingStatus;

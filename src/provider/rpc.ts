@@ -36,7 +36,7 @@ export type RpcProviderOptions = { nodeUrl: string };
 export class RpcProvider implements ProviderInterface {
   public nodeUrl: string;
 
-  // interface
+  // from interface
   public chainId!: StarknetChainId;
 
   private responseParser = new RPCResponseParser();
@@ -80,12 +80,12 @@ export class RpcProvider implements ProviderInterface {
     }
   }
 
-  // Interface
+  // Methods from Interface
   public async getChainId(): Promise<any> {
     return this.fetchEndpoint('starknet_chainId');
   }
 
-  // Common Interface
+  // Methods from Interface
   public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
     return this.getBlockWithTxHashes(blockIdentifier).then(
       this.responseParser.parseGetBlockResponse
@@ -122,7 +122,7 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_getNonce', [contractAddress]);
   }
 
-  public async getPendingTransactions(): Promise<RPC.Transaction> {
+  public async getPendingTransactions(): Promise<RPC.PendingTransactions> {
     return this.fetchEndpoint('starknet_pendingTransactions');
   }
 
@@ -149,7 +149,7 @@ export class RpcProvider implements ProviderInterface {
     ]);
   }
 
-  // common interface
+  // Methods from Interface
   public async getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {
     return this.getTransactionByHash(txHash).then(this.responseParser.parseGetTransactionResponse);
   }
@@ -177,7 +177,6 @@ export class RpcProvider implements ProviderInterface {
     );
   }
 
-  // TODO: Check, changed response from common interface to rpc
   public async getClass(classHash: RPC.Felt): Promise<RPC.ContractClass> {
     return this.fetchEndpoint('starknet_getClass', [classHash]);
   }
@@ -261,7 +260,7 @@ export class RpcProvider implements ProviderInterface {
     ]).then(this.responseParser.parseInvokeFunctionResponse);
   }
 
-  // Interface
+  // Methods from Interface
   public async callContract(
     call: Call,
     blockIdentifier: BlockIdentifier = 'pending'
