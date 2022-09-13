@@ -31,6 +31,11 @@ describeIfRpc('RPCProvider', () => {
     expect(Array.isArray(transactions)).toBe(true);
   });
 
+  test('getTransactionCount', async () => {
+    const count = await rpcProvider.getTransactionCount('latest');
+    expect(typeof count).toBe('number');
+  });
+
   test('getBlockHashAndNumber', async () => {
     const blockHashAndNumber = await rpcProvider.getBlockHashAndNumber();
     expect(blockHashAndNumber).toHaveProperty('block_hash');
