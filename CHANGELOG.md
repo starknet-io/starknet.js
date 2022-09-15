@@ -1,3 +1,18 @@
+# [4.6.0](https://github.com/0xs34n/starknet.js/compare/v4.5.0...v4.6.0) (2022-09-15)
+
+### Bug Fixes
+
+- add test getTransactionCount [skip ci] ([342755a](https://github.com/0xs34n/starknet.js/commit/342755aa99dda016d7aa394a0023b3f2e5d5e963))
+- estimateFee and call block id ([ef1645f](https://github.com/0xs34n/starknet.js/commit/ef1645f740e7c29edea6b091bec9949ec713953f))
+- rpc test update, comepleted rpc to openrpc mapping, rpc provider methods ([8b41e0f](https://github.com/0xs34n/starknet.js/commit/8b41e0fcf36b34b20dfaba356cfc0131f02d7d69))
+
+### Features
+
+- new Block utility object, rpc fetch clenup, open rpc fetch api ([0d381c8](https://github.com/0xs34n/starknet.js/commit/0d381c89fe655b2628f02e67095ef03cb1721398))
+- read, write and trace api ([d488ab2](https://github.com/0xs34n/starknet.js/commit/d488ab2513b88fdeb4e27b6ec2b7226ffd359445))
+- retry rpc wait for transaction 200 times instead of 100 ([3bc9118](https://github.com/0xs34n/starknet.js/commit/3bc9118cae86fba21e1c85667079079662ba0b7b))
+- updated rpc tests with new methods ([e369d95](https://github.com/0xs34n/starknet.js/commit/e369d95d72f3b39b3e8b8baa99867b94c1d5d1c1))
+
 # [4.5.0](https://github.com/0xs34n/starknet.js/compare/v4.4.2...v4.5.0) (2022-09-09)
 
 ### Bug Fixes
