@@ -198,6 +198,7 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier = 'pending',
     invocationDetails: InvocationsDetails = {}
   ): Promise<EstimateFeeResponse> {
+    const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_estimateFee', [
       {
         contract_address: invocation.contractAddress,
@@ -206,7 +207,7 @@ export class RpcProvider implements ProviderInterface {
         signature: bigNumberishArrayToHexadecimalStringArray(invocation.signature || []),
         version: toHex(toBN(invocationDetails?.version || 0)),
       },
-      blockIdentifier,
+      block_id,
     ]).then(this.responseParser.parseFeeEstimateResponse);
   }
 
@@ -265,13 +266,14 @@ export class RpcProvider implements ProviderInterface {
     call: Call,
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<CallContractResponse> {
+    const block_id = new Block(blockIdentifier).identifier;
     const result = await this.fetchEndpoint('starknet_call', [
       {
         contract_address: call.contractAddress,
         entry_point_selector: getSelectorFromName(call.entrypoint),
         calldata: parseCalldata(call.calldata),
       },
-      blockIdentifier,
+      block_id,
     ]);
 
     return this.responseParser.parseCallContractResponse(result);
@@ -287,7 +289,7 @@ export class RpcProvider implements ProviderInterface {
 
   public async waitForTransaction(txHash: BigNumberish, retryInterval: number = 8000) {
     let onchain = false;
-    let retries = 100;
+    let retries = 200;
 
     while (!onchain) {
       const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'];
