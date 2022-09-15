@@ -24,6 +24,10 @@ type GetTransactionByHashResponse = RPC.GetTransactionByHashResponse & {
   [key: string]: any;
 };
 
+type TransactionReceipt = RPC.TransactionReceipt & {
+  [key: string]: any;
+};
+
 export class RPCResponseParser extends ResponseParser {
   public parseGetBlockResponse(res: RpcGetBlockResponse): GetBlockResponse {
     return {
@@ -50,10 +54,10 @@ export class RPCResponseParser extends ResponseParser {
   }
 
   public parseGetTransactionReceiptResponse(
-    res: RPC.GetTransactionReceiptResponse
+    res: TransactionReceipt
   ): GetTransactionReceiptResponse {
     return {
-      transaction_hash: res.txn_hash,
+      transaction_hash: res.transaction_hash,
       actual_fee: res.actual_fee,
       status: res.status,
       status_data: res.status_data,
@@ -77,20 +81,20 @@ export class RPCResponseParser extends ResponseParser {
     };
   }
 
-  public parseInvokeFunctionResponse(res: RPC.AddTransactionResponse): InvokeFunctionResponse {
+  public parseInvokeFunctionResponse(res: RPC.InvokedTransaction): InvokeFunctionResponse {
     return {
       transaction_hash: res.transaction_hash,
     };
   }
 
-  public parseDeployContractResponse(res: RPC.DeployContractResponse): DeployContractResponse {
+  public parseDeployContractResponse(res: RPC.DeployedTransaction): DeployContractResponse {
     return {
       transaction_hash: res.transaction_hash,
       contract_address: res.contract_address,
     };
   }
 
-  public parseDeclareContractResponse(res: RPC.DeclareResponse): DeclareContractResponse {
+  public parseDeclareContractResponse(res: RPC.DeclaredTransaction): DeclareContractResponse {
     return {
       transaction_hash: res.transaction_hash,
       class_hash: res.class_hash,

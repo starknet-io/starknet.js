@@ -1,6 +1,7 @@
 import fs from 'fs';
 
 import { constants, hash, json, number, stark } from '../../src';
+import { Block } from '../../src/provider/utils';
 import { pedersen } from '../../src/utils/hash';
 
 const { IS_BROWSER } = constants;
@@ -110,5 +111,21 @@ describe('calculateContractAddressFromHash()', () => {
     expect(res).toMatchInlineSnapshot(
       `"0x36dc8dcb3440596472ddde11facacc45d0cd250df764ae7c3d1a360c853c324"`
     );
+  });
+});
+
+describe('new Block()', () => {
+  test('Block identifier and queryIdentifier', () => {
+    const blockA = new Block(0);
+    expect(blockA.identifier).toMatchObject({ block_number: 0 });
+    expect(blockA.queryIdentifier).toBe('blockNumber=0');
+
+    const blockB = new Block('latest');
+    expect(blockB.identifier).toBe('latest');
+    expect(blockB.queryIdentifier).toBe('blockNumber=latest');
+
+    const blockC = new Block('0x01');
+    expect(blockC.identifier).toMatchObject({ block_hash: '0x01' });
+    expect(blockC.queryIdentifier).toBe('blockHash=0x01');
   });
 });

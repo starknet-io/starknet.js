@@ -144,10 +144,11 @@ describe('defaultProvider', () => {
 
   describeIfNotDevnet('Provider', () => {
     const provider = getTestProvider();
+    let latestBlock;
     describe(`Provider methods if not devnet`, () => {
       describe('getBlock', () => {
-        test('pending', async () => {
-          const latestBlock = await provider.getBlock();
+        test('getBlock by tag pending', async () => {
+          latestBlock = await provider.getBlock();
           expect(latestBlock).toHaveProperty('block_hash');
           expect(latestBlock).toHaveProperty('parent_hash');
           expect(latestBlock).toHaveProperty('block_number');
@@ -158,11 +159,8 @@ describe('defaultProvider', () => {
           expect(Array.isArray(latestBlock.transactions)).toBe(true);
         });
 
-        test('Block Hash 0x8a30a1212d142cb0053fe9921e1dbf64f651d328565bd2e7ac24059c270f43', async () => {
-          const block = await provider.getBlock(
-            '0x8a30a1212d142cb0053fe9921e1dbf64f651d328565bd2e7ac24059c270f43'
-          );
-
+        test('getBlock by Hash', async () => {
+          const block = await provider.getBlock(latestBlock.block_hash);
           expect(block).toHaveProperty('block_hash');
           expect(block).toHaveProperty('parent_hash');
           expect(block).toHaveProperty('block_number');
@@ -173,8 +171,8 @@ describe('defaultProvider', () => {
           expect(Array.isArray(block.transactions)).toBe(true);
         });
 
-        test('Block Number 102634', async () => {
-          const block = await provider.getBlock(102634);
+        test('getBlock by Number', async () => {
+          const block = await provider.getBlock(latestBlock.block_number);
           expect(block).toHaveProperty('block_hash');
           expect(block).toHaveProperty('parent_hash');
           expect(block).toHaveProperty('block_number');
