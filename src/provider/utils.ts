@@ -1,3 +1,4 @@
+/* eslint-disable max-classes-per-file */
 import type { BlockNumber } from '../types';
 import { BigNumberish, isHex, toBN, toHex } from '../utils/number';
 
@@ -33,73 +34,59 @@ export function txIdentifier(txHash?: BigNumberish, txId?: BigNumberish): string
 // null appends nothing to the request url
 
 export type BlockIdentifier = BlockNumber | BigNumberish;
-type BlockIdentifierObject =
-  | { type: 'BLOCK_NUMBER'; data: BlockNumber }
-  | { type: 'BLOCK_HASH'; data: BigNumberish };
 
-export class BlockIdentifierClass {
-  blockIdentifier: BlockIdentifier;
+export class Block {
+  hash: BlockIdentifier = null;
 
-  constructor(blockIdentifier: BlockIdentifier) {
-    this.blockIdentifier = blockIdentifier;
+  number: BlockIdentifier = null;
+
+  tag: BlockIdentifier = null;
+
+  private setIdentifier: (_identifier: BlockIdentifier) => void;
+
+  constructor(_identifier: BlockIdentifier) {
+    this.setIdentifier = function (__identifier: BlockIdentifier) {
+      if (typeof __identifier === 'string' && isHex(__identifier)) {
+        this.hash = __identifier;
+      } else if (typeof __identifier === 'number') {
+        this.number = __identifier;
+      } else {
+        this.tag = __identifier;
+      }
+    };
+
+    this.setIdentifier(_identifier);
   }
 
-  getIdentifier() {
-    if (typeof this.blockIdentifier === 'string' && isHex(this.blockIdentifier)) {
-      return { block_hash: this.blockIdentifier };
+  get queryIdentifier(): any {
+    if (this.number !== null) {
+      return `blockNumber=${this.number}`;
     }
 
-    if (typeof this.blockIdentifier === 'number') {
-      return { block_number: this.blockIdentifier };
+    if (this.hash !== null) {
+      return `blockHash=${this.hash}`;
     }
 
-    return this.blockIdentifier;
+    return `blockNumber=${this.tag}`;
   }
-}
 
-/**
- * Identifies the block to be queried.
- *
- * @param blockIdentifier - block identifier
- * @returns block identifier object
- */
-export function getBlockIdentifier(blockIdentifier: BlockIdentifier): BlockIdentifierObject {
-  if (blockIdentifier === null || blockIdentifier === 'latest') {
-    return { type: 'BLOCK_NUMBER', data: 'latest' }; // default to latest block
-  }
-  if (blockIdentifier === 'pending') {
-    return { type: 'BLOCK_NUMBER', data: 'pending' };
-  }
-  if (typeof blockIdentifier === 'number' || typeof blockIdentifier === 'bigint') {
-    return { type: 'BLOCK_NUMBER', data: blockIdentifier };
-  }
-  if (typeof blockIdentifier === 'string' && blockIdentifier.startsWith('0x')) {
-    return { type: 'BLOCK_HASH', data: blockIdentifier };
-  }
-  if (typeof blockIdentifier === 'string' && !Number.isNaN(parseInt(blockIdentifier, 10))) {
-    return { type: 'BLOCK_NUMBER', data: parseInt(blockIdentifier, 10) };
-  }
-  if (typeof blockIdentifier === 'string') {
-    throw new Error(`Invalid block identifier: ${blockIdentifier}`);
-  }
-  return { type: 'BLOCK_HASH', data: blockIdentifier };
-}
+  get identifier(): any {
+    if (this.number !== null) {
+      return { block_number: this.number };
+    }
 
-/**
- * Gets the block identifier for API request
- *
- * [Reference](https://github.com/starkware-libs/cairo-lang/blob/fc97bdd8322a7df043c87c371634b26c15ed6cee/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L164-L173)
- *
- * @param blockIdentifier
- * @returns block identifier for API request
- */
-export function getFormattedBlockIdentifier(blockIdentifier: BlockIdentifier = null): string {
-  const blockIdentifierObject = getBlockIdentifier(blockIdentifier);
-  if (blockIdentifierObject.type === 'BLOCK_NUMBER' && blockIdentifierObject.data === null) {
-    return '';
+    if (this.hash !== null) {
+      return { block_hash: this.hash };
+    }
+
+    return this.tag;
   }
-  if (blockIdentifierObject.type === 'BLOCK_NUMBER') {
-    return `blockNumber=${blockIdentifierObject.data}`;
+
+  set identifier(_identifier: BlockIdentifier) {
+    this.setIdentifier(_identifier);
   }
-  return `blockHash=${toHex(toBN(blockIdentifierObject.data))}`;
+
+  valueOf = () => this.number;
+
+  toString = () => this.hash;
 }

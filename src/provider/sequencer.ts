@@ -33,7 +33,7 @@ import { randomAddress } from '../utils/stark';
 import { buildUrl } from '../utils/url';
 import { GatewayError, HttpError } from './errors';
 import { ProviderInterface } from './interface';
-import { BlockIdentifier, getFormattedBlockIdentifier } from './utils';
+import { Block, BlockIdentifier } from './utils';
 
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha';
 
@@ -129,7 +129,8 @@ export class SequencerProvider implements ProviderInterface {
     const queryString = Object.entries(query)
       .map(([key, value]) => {
         if (key === 'blockIdentifier') {
-          return `${getFormattedBlockIdentifier(value)}`;
+          const block = new Block(value);
+          return `${block.queryIdentifier}`;
         }
         return `${key}=${value}`;
       })
