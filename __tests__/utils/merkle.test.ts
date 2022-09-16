@@ -143,7 +143,7 @@ describe('MerkleTree class', () => {
       expect(proofMerklePath(root, leaf, proof)).toBe(false);
     });
   });
-  describe('data on the right', () => {
+  describe('data on the right with a 2-deep tree', () => {
     let tree: MerkleTree;
     beforeAll(() => {
       const leaves = ['0x1', '0x2', '0x3'];
@@ -156,6 +156,28 @@ describe('MerkleTree class', () => {
     });
     test('should check the previous proof is working fine', async () => {
       const manualMerkle = MerkleTree.hash('0x3', MerkleTree.hash('0x1', '0x2'));
+      expect(tree.root).toBe(manualMerkle);
+    });
+  });
+  describe('data on the right with a 3-deep tree', () => {
+    let tree: MerkleTree;
+    beforeAll(() => {
+      const leaves = ['0x1', '0x2', '0x3', '0x4', '0x5', '0x6'];
+      tree = new MerkleTree(leaves);
+    });
+    test('should return 1-length proof in a 2-length tree', async () => {
+      const proof = tree.getProof('0x5');
+      const manualProof = [
+        '0x6',
+        MerkleTree.hash(MerkleTree.hash('0x1', '0x2'), MerkleTree.hash('0x3', '0x4')),
+      ];
+      expect(proof).toEqual(manualProof);
+    });
+    test('should check the previous proof is working fine', async () => {
+      const manualMerkle = MerkleTree.hash(
+        MerkleTree.hash('0x5', '0x6'),
+        MerkleTree.hash(MerkleTree.hash('0x1', '0x2'), MerkleTree.hash('0x3', '0x4'))
+      );
       expect(tree.root).toBe(manualMerkle);
     });
   });

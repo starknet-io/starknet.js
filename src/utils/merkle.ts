@@ -45,7 +45,7 @@ export class MerkleTree {
     }
     const isLeft = index % 2 === 0;
     const neededBranch = isLeft ? branch[index + 1] : branch[index - 1];
-    const newHashPath = hashPath.length > 0 || neededBranch ? [...hashPath, neededBranch] : [];
+    const newHashPath = neededBranch ? [...hashPath, neededBranch] : hashPath;
     const currentBranchLevelIndex =
       this.leaves.length === branch.length
         ? -1
