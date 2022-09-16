@@ -31,8 +31,10 @@ import { randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
 import { Block, BlockIdentifier } from './utils';
 
-export type RpcProviderOptions = { nodeUrl: string };
-type Options = { retries: number };
+export type RpcProviderOptions = {
+  nodeUrl: string;
+  retries?: number;
+};
 
 export class RpcProvider implements ProviderInterface {
   public nodeUrl: string;
@@ -42,12 +44,12 @@ export class RpcProvider implements ProviderInterface {
 
   private responseParser = new RPCResponseParser();
 
-  private options: Options;
+  private retries: number;
 
-  constructor(optionsOrProvider: RpcProviderOptions, options: Options) {
-    const { nodeUrl } = optionsOrProvider;
+  constructor(optionsOrProvider: RpcProviderOptions) {
+    const { nodeUrl, retries } = optionsOrProvider;
     this.nodeUrl = nodeUrl;
-    this.options = options;
+    this.retries = retries || 200;
 
     this.getChainId().then((chainId) => {
       this.chainId = chainId;
@@ -298,7 +300,7 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async waitForTransaction(txHash: string, retryInterval: number = 8000) {
-    let retries = this.options?.retries || 200;
+    let { retries } = this;
     let onchain = false;
 
     while (!onchain) {
