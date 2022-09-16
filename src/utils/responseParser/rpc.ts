@@ -4,13 +4,10 @@
  */
 import {
   CallContractResponse,
-  DeclareContractResponse,
-  DeployContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
-  InvokeFunctionResponse,
 } from '../../types';
 import { RPC } from '../../types/api';
 import { toBN } from '../number';
@@ -28,7 +25,13 @@ type TransactionReceipt = RPC.TransactionReceipt & {
   [key: string]: any;
 };
 
-export class RPCResponseParser extends ResponseParser {
+export class RPCResponseParser
+  implements
+    Omit<
+      ResponseParser,
+      'parseDeclareContractResponse' | 'parseDeployContractResponse' | 'parseInvokeFunctionResponse'
+    >
+{
   public parseGetBlockResponse(res: RpcGetBlockResponse): GetBlockResponse {
     return {
       timestamp: res.timestamp,
@@ -79,26 +82,6 @@ export class RPCResponseParser extends ResponseParser {
   public parseCallContractResponse(res: Array<string>): CallContractResponse {
     return {
       result: res,
-    };
-  }
-
-  public parseInvokeFunctionResponse(res: RPC.InvokedTransaction): InvokeFunctionResponse {
-    return {
-      transaction_hash: res.transaction_hash,
-    };
-  }
-
-  public parseDeployContractResponse(res: RPC.DeployedTransaction): DeployContractResponse {
-    return {
-      transaction_hash: res.transaction_hash,
-      contract_address: res.contract_address,
-    };
-  }
-
-  public parseDeclareContractResponse(res: RPC.DeclaredTransaction): DeclareContractResponse {
-    return {
-      transaction_hash: res.transaction_hash,
-      class_hash: res.class_hash,
     };
   }
 }

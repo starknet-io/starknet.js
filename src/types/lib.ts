@@ -9,7 +9,7 @@ export type RawCalldata = BigNumberish[];
 export type DeployContractPayload = {
   contract: CompiledContract | string;
   constructorCalldata?: RawCalldata;
-  addressSalt?: BigNumberish;
+  addressSalt?: string;
 };
 
 export type DeclareContractPayload = {
