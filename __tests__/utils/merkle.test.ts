@@ -78,8 +78,8 @@ describe('MerkleTree class', () => {
     test('should return proof path for valid child', async () => {
       const proof = tree.getProof('0x7');
 
+      // tree can be shorther when exploring the right side of it
       const manualProof = [
-        '0x0', // proofs should always be as long as the tree is deep
         MerkleTree.hash('0x5', '0x6'),
         MerkleTree.hash(MerkleTree.hash('0x1', '0x2'), MerkleTree.hash('0x3', '0x4')),
       ];
@@ -141,6 +141,22 @@ describe('MerkleTree class', () => {
       const { root } = tree;
       proof[2] = '0x4';
       expect(proofMerklePath(root, leaf, proof)).toBe(false);
+    });
+  });
+  describe('data on the right', () => {
+    let tree: MerkleTree;
+    beforeAll(() => {
+      const leaves = ['0x1', '0x2', '0x3'];
+      tree = new MerkleTree(leaves);
+    });
+    test('should return 1-length proof in a 2-length tree', async () => {
+      const proof = tree.getProof('0x3');
+      const manualProof = [MerkleTree.hash('0x1', '0x2')];
+      expect(proof).toEqual(manualProof);
+    });
+    test('should check the previous proof is working fine', async () => {
+      const manualMerkle = MerkleTree.hash('0x3', MerkleTree.hash('0x1', '0x2'));
+      expect(tree.root).toBe(manualMerkle);
     });
   });
 });

@@ -44,15 +44,15 @@ export class MerkleTree {
       return hashPath;
     }
     const isLeft = index % 2 === 0;
-    const neededBranch = (isLeft ? branch[index + 1] : branch[index - 1]) ?? '0x0';
-    const newHashPath = [...hashPath, neededBranch];
+    const neededBranch = isLeft ? branch[index + 1] : branch[index - 1];
+    const newHashPath = hashPath.length > 0 || neededBranch ? [...hashPath, neededBranch] : [];
     const currentBranchLevelIndex =
       this.leaves.length === branch.length
         ? -1
         : this.branches.findIndex((b) => b.length === branch.length);
     const nextBranch = this.branches[currentBranchLevelIndex + 1] ?? [this.root];
     return this.getProof(
-      neededBranch === '0x0'
+      !neededBranch
         ? leaf
         : MerkleTree.hash(isLeft ? leaf : neededBranch, isLeft ? neededBranch : leaf),
       nextBranch,
