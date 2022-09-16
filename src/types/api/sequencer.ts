@@ -95,9 +95,8 @@ export namespace Sequencer {
     contract_address: string;
     signature?: Signature;
     entry_point_type?: EntryPointType;
-    entry_point_selector: string;
     calldata?: RawCalldata;
-    nonce?: BigNumberish;
+    nonce: BigNumberish;
     max_fee?: BigNumberish;
     version?: BigNumberish;
   };
@@ -118,6 +117,7 @@ export namespace Sequencer {
 
   export interface InvokeFunctionTransactionResponse extends InvokeFunctionTransaction {
     transaction_hash: string;
+    entry_point_selector: string;
   }
 
   export type TransactionResponse =
@@ -202,11 +202,16 @@ export namespace Sequencer {
   export type CallContractTransaction = Omit<
     InvokeFunctionTransaction,
     'type' | 'entry_point_type' | 'nonce'
-  >;
+  > & { entry_point_selector: string };
 
   export type CallContractResponse = {
     result: string[];
   };
+
+  export type EstimateFeeTransaction = Omit<
+    InvokeFunctionTransaction,
+    'max_fee' | 'entry_point_type'
+  >;
 
   // Support 0.9.1 changes in a backward-compatible way
   export type EstimateFeeResponse =
@@ -259,6 +264,14 @@ export namespace Sequencer {
       REQUEST: never;
       RESPONSE: TransactionReceiptResponse;
     };
+    get_nonce: {
+      QUERY: {
+        contractAddress: string;
+        blockIdentifier: BlockIdentifier;
+      };
+      REQUEST: never;
+      RESPONSE: BigNumberish;
+    };
     get_storage_at: {
       QUERY: {
         contractAddress: string;
@@ -294,7 +307,7 @@ export namespace Sequencer {
       QUERY: {
         blockIdentifier: BlockIdentifier;
       };
-      REQUEST: CallContractTransaction;
+      REQUEST: EstimateFeeTransaction;
       RESPONSE: EstimateFeeResponse;
     };
     get_class_by_hash: {

@@ -319,6 +319,12 @@ Gets the latest block number.
 
 <hr/>
 
+provider.**getNonce**(contractAddress, blockIdentifier) => _Promise < BigNumberish >_
+
+Gets the nonce of the provided contractAddress
+
+<hr/>
+
 provider.**getSyncingStats**() => _Promise < GetSyncingStatsResponse >_
 
 Gets syncing status of the node.

@@ -78,8 +78,8 @@ contract.estimateGas.**METHOD_NAME**( ...args ) => _Promise < EstimateFeeRespons
 
 Returns the estimate units of gas that would be required to execute the METHOD_NAME with args and overrides.
 
-contract.populateTransaction.**METHOD_NAME**( ...args [ , overrides ] ) ⇒ _Invocation_
+contract.populateTransaction.**METHOD_NAME**( ...args [ , overrides ] ) ⇒ _Call_
 
-Returns an _Invocation_ object which represents the transaction that would need to be signed and submitted to the network to execute METHOD_NAME with args and overrides.
+Returns an _Call_ object which represents the transaction that would need to be signed and submitted to the network to execute METHOD_NAME with args and overrides.
 
 The overrides are identical to the overrides above for write methods.
