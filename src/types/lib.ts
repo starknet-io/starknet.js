@@ -17,20 +17,22 @@ export type DeclareContractPayload = {
   version?: BigNumberish;
 };
 
-export type Invocation = {
+export type CallDetails = {
   contractAddress: string;
-  entrypoint: string;
   calldata?: RawCalldata;
-  signature?: Signature;
 };
 
-export type Call = Omit<Invocation, 'signature'>;
+export type Invocation = CallDetails & { signature?: Signature };
+
+export type Call = CallDetails & { entrypoint: string };
 
 export type InvocationsDetails = {
   nonce?: BigNumberish;
   maxFee?: BigNumberish;
   version?: BigNumberish;
 };
+
+export type InvocationsDetailsWithNonce = InvocationsDetails & { nonce: BigNumberish };
 
 export type Status =
   | 'NOT_RECEIVED'

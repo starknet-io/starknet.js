@@ -17,7 +17,7 @@ import { ec } from './ellipticCurve';
 import { addHexPrefix, buf2hex, removeHexPrefix, utf8ToArray } from './encode';
 import { BigNumberish, toBN, toFelt, toHex } from './number';
 
-export const transactionVersion = 0;
+export const transactionVersion = 1;
 export const feeTransactionVersion = toBN(2).pow(toBN(128)).add(toBN(transactionVersion));
 
 export function keccakBn(value: BigNumberish): string {
@@ -124,22 +124,23 @@ export function calculateDeployTransactionHash(
   );
 }
 
-export function calculcateTransactionHash(
+export function calculateTransactionHash(
   contractAddress: BigNumberish,
   version: BigNumberish,
-  entryPointSelector: BigNumberish,
   calldata: BigNumberish[],
   maxFee: BigNumberish,
-  chainId: StarknetChainId
+  chainId: StarknetChainId,
+  nonce: BigNumberish
 ): string {
   return calculateTransactionHashCommon(
     TransactionHashPrefix.INVOKE,
     version,
     contractAddress,
-    entryPointSelector,
+    0,
     calldata,
     maxFee,
-    chainId
+    chainId,
+    [nonce]
   );
 }
 

@@ -9,12 +9,12 @@ import {
 
 // Run only if Devnet Sequencer
 describeIfSequencer('SequencerProvider', () => {
-  let provider: SequencerProvider;
+  let sequencerProvider: SequencerProvider;
   let customSequencerProvider: Provider;
   let exampleContractAddress: string;
 
   beforeAll(async () => {
-    provider = getTestProvider() as SequencerProvider;
+    sequencerProvider = getTestProvider() as SequencerProvider;
     customSequencerProvider = new Provider({
       sequencer: {
         baseUrl: 'https://alpha4.starknet.io',
@@ -28,32 +28,34 @@ describeIfSequencer('SequencerProvider', () => {
     let exampleTransactionHash: string;
 
     beforeAll(async () => {
-      const { transaction_hash, contract_address } = await provider.deployContract({
+      const { transaction_hash, contract_address } = await sequencerProvider.deployContract({
         contract: compiledErc20,
       });
-      await provider.waitForTransaction(transaction_hash);
+      await sequencerProvider.waitForTransaction(transaction_hash);
       exampleTransactionHash = transaction_hash;
       exampleContractAddress = contract_address;
     });
 
     test('getTransactionStatus()', async () => {
-      return expect(provider.getTransactionStatus(exampleTransactionHash)).resolves.not.toThrow();
+      return expect(
+        sequencerProvider.getTransactionStatus(exampleTransactionHash)
+      ).resolves.not.toThrow();
     });
 
     test('transaction trace', async () => {
-      const transactionTrace = await provider.getTransactionTrace(exampleTransactionHash);
+      const transactionTrace = await sequencerProvider.getTransactionTrace(exampleTransactionHash);
       expect(transactionTrace).toHaveProperty('function_invocation');
       expect(transactionTrace).toHaveProperty('signature');
     });
 
     test('getCode() -> { bytecode }', async () => {
-      const code = await provider.getCode(exampleContractAddress);
+      const code = await sequencerProvider.getCode(exampleContractAddress);
       return expect(Array.isArray(code.bytecode)).toBe(true);
     });
 
     describeIfNotDevnet('which are not available on devnet', () => {
       test('getContractAddresses()', async () => {
-        const { GpsStatementVerifier, Starknet } = await provider.getContractAddresses();
+        const { GpsStatementVerifier, Starknet } = await sequencerProvider.getContractAddresses();
         expect(typeof GpsStatementVerifier).toBe('string');
         expect(typeof Starknet).toBe('string');
       });

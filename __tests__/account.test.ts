@@ -76,11 +76,8 @@ describe('deploy and test Wallet', () => {
   });
 
   test('execute with custom nonce', async () => {
-    const { result } = await account.callContract({
-      contractAddress: account.address,
-      entrypoint: 'get_nonce',
-    });
-    const nonce = toBN(result[0]).toNumber();
+    const result = await account.getNonce();
+    const nonce = toBN(result).toNumber();
     const { transaction_hash } = await account.execute(
       {
         contractAddress: erc20Address,

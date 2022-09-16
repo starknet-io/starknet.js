@@ -1,4 +1,5 @@
 import { ProviderInterface } from '../provider';
+import { BlockIdentifier } from '../provider/utils';
 import { SignerInterface } from '../signer';
 import {
   Abi,
@@ -92,5 +93,5 @@ export abstract class AccountInterface extends ProviderInterface {
    */
   public abstract verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean>;
 
-  public abstract getNonce(): Promise<string>;
+  public abstract getNonce(blockIdentifier?: BlockIdentifier): Promise<BigNumberish>;
 }
