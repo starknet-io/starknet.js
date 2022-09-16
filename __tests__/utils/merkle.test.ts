@@ -143,7 +143,7 @@ describe('MerkleTree class', () => {
       expect(proofMerklePath(root, leaf, proof)).toBe(false);
     });
   });
-  describe('data on the right with a 2-deep tree', () => {
+  describe('verify 2-deep tree with empty data on the right', () => {
     let tree: MerkleTree;
     beforeAll(() => {
       const leaves = ['0x1', '0x2', '0x3'];
@@ -154,18 +154,18 @@ describe('MerkleTree class', () => {
       const manualProof = [MerkleTree.hash('0x1', '0x2')];
       expect(proof).toEqual(manualProof);
     });
-    test('should check the previous proof is working fine', async () => {
+    test('should check the previous proof works fine', async () => {
       const manualMerkle = MerkleTree.hash('0x3', MerkleTree.hash('0x1', '0x2'));
       expect(tree.root).toBe(manualMerkle);
     });
   });
-  describe('data on the right with a 3-deep tree', () => {
+  describe('verify 3-deep tree with empty data on the right', () => {
     let tree: MerkleTree;
     beforeAll(() => {
       const leaves = ['0x1', '0x2', '0x3', '0x4', '0x5', '0x6'];
       tree = new MerkleTree(leaves);
     });
-    test('should return 1-length proof in a 2-length tree', async () => {
+    test('should return 2-length proof with the 2nd place skipped', async () => {
       const proof = tree.getProof('0x5');
       const manualProof = [
         '0x6',
@@ -173,7 +173,7 @@ describe('MerkleTree class', () => {
       ];
       expect(proof).toEqual(manualProof);
     });
-    test('should check the previous proof is working fine', async () => {
+    test('should check the previous proof works fine', async () => {
       const manualMerkle = MerkleTree.hash(
         MerkleTree.hash('0x5', '0x6'),
         MerkleTree.hash(MerkleTree.hash('0x1', '0x2'), MerkleTree.hash('0x3', '0x4'))
