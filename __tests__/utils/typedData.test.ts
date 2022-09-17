@@ -72,7 +72,7 @@ describe('typedData', () => {
     const [, merkleTreeHash] = encodeValue({}, 'merkletree', tree.leaves);
     expect(merkleTreeHash).toBe(tree.root);
     expect(merkleTreeHash).toMatchInlineSnapshot(
-      `"0x551b4adb6c35d49c686a00b9192da9332b18c9b262507cad0ece37f3b6918d2"`
+      `"0x15ac9e457789ef0c56e5d559809e7336a909c14ee2511503fa7af69be1ba639"`
     );
   });
 
@@ -119,7 +119,7 @@ describe('typedData', () => {
     );
     expect(merkleTreeHash).toBe(tree.root);
     expect(merkleTreeHash).toMatchInlineSnapshot(
-      `"0x75c4f467f4527a5348f3e302007228a6b0057fc4c015f981ffb5b3ace475727"`
+      `"0xe5d3a1485ef98aab230e888bfcf3a6793a8b1330c0702dae504f2c502c9aa8"`
     );
   });
 
@@ -217,7 +217,7 @@ describe('typedData', () => {
       '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826'
     );
     expect(hash).toMatchInlineSnapshot(
-      `"0x1ad0330a62a4a94eae5ea1a7ad96388179d2e4d33e6f909d17421d315110653"`
+      `"0x43c6768a7402cd86d7c8684e8ea51956cab49ddb65b4f613d3e1c07d5464785"`
     );
   });
 });

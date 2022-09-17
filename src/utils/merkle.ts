@@ -23,7 +23,7 @@ export class MerkleTree {
     const newLeaves = [];
     for (let i = 0; i < leaves.length; i += 2) {
       if (i + 1 === leaves.length) {
-        newLeaves.push(leaves[i]);
+        newLeaves.push(MerkleTree.hash(leaves[i], '0x0'));
       } else {
         newLeaves.push(MerkleTree.hash(leaves[i], leaves[i + 1]));
       }
@@ -53,9 +53,7 @@ export class MerkleTree {
         : this.branches.findIndex((b) => b.length === branch.length);
     const nextBranch = this.branches[currentBranchLevelIndex + 1] ?? [this.root];
     return this.getProof(
-      neededBranch === '0x0'
-        ? leaf
-        : MerkleTree.hash(isLeft ? leaf : neededBranch, isLeft ? neededBranch : leaf),
+      MerkleTree.hash(isLeft ? leaf : neededBranch, isLeft ? neededBranch : leaf),
       nextBranch,
       newHashPath
     );
