@@ -261,6 +261,10 @@ describe('defaultProvider', () => {
 
         beforeAll(async () => {
           deployResponse = await provider.deployContract({ contract: compiledErc20 });
+          console.log(
+            '🚀 ~ file: defaultProvider.test.ts ~ line 264 ~ beforeAll ~ deployResponse',
+            deployResponse
+          );
           contractAddress = deployResponse.contract_address;
           declareResponse = await provider.declareContract({ contract: compiledErc20 });
           await Promise.all([
