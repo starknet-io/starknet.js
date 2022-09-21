@@ -130,12 +130,12 @@ export class RpcProvider implements ProviderInterface {
   public async getNonce(
     contractAddress: string,
     blockIdentifier: BlockIdentifier = 'pending'
-  ): Promise<BigNumberish> {
-    const blockIdentifierGetter = new Block(blockIdentifier);
-    return this.fetchEndpoint('starknet_getNonce', [
-      contractAddress,
-      blockIdentifierGetter.identifier(),
-    ]);
+  ): Promise<RPC.Nonce> {
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint('starknet_getNonce', {
+      contract_address: contractAddress,
+      block_id,
+    });
   }
 
   public async getPendingTransactions(): Promise<RPC.PendingTransactions> {

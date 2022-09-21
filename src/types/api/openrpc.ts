@@ -95,9 +95,9 @@ type COMMON_TXN_PROPERTIES = {
   type?: TXN_TYPE;
 };
 type FUNCTION_CALL = {
-  contract_address: ADDRESS;
-  entry_point_selector: FELT;
-  calldata: Array<FELT>;
+  contract_address?: ADDRESS;
+  entry_point_selector?: FELT;
+  calldata?: Array<FELT>;
 };
 type INVOKE_TXN = COMMON_TXN_PROPERTIES & FUNCTION_CALL;
 type DECLARE_TXN = COMMON_TXN_PROPERTIES & {
@@ -364,8 +364,9 @@ export namespace OPENRPC {
       result: Events;
       errors: Errors.PAGE_SIZE_TOO_BIG;
     };
+    // FROM RPC 0.2.0 Pathfinder exception
     starknet_getNonce: {
-      params: { contract_address: ADDRESS };
+      params: { contract_address: ADDRESS; block_id: BLOCK_ID };
       result: FELT;
       errors: Errors.CONTRACT_NOT_FOUND;
     };
