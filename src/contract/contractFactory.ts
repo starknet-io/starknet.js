@@ -3,7 +3,6 @@ import assert from 'minimalistic-assert';
 import { AccountInterface } from '../account';
 import { ProviderInterface, defaultProvider } from '../provider';
 import { Abi, CompiledContract, RawCalldata } from '../types';
-import { BigNumberish } from '../utils/number';
 import { Contract } from './default';
 
 export class ContractFactory {
@@ -32,7 +31,7 @@ export class ContractFactory {
    */
   public async deploy(
     constructorCalldata?: RawCalldata,
-    addressSalt?: BigNumberish
+    addressSalt?: string | undefined
   ): Promise<Contract> {
     const { contract_address, transaction_hash } = await this.providerOrAccount.deployContract({
       contract: this.compiledContract,
