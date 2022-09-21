@@ -62,6 +62,11 @@ describe('defaultProvider', () => {
       return expect(block).toHaveProperty('block_number');
     });
 
+    test('getNonce()', async () => {
+      const nonce = await testProvider.getNonce(exampleContractAddress);
+      return expect(nonce).toEqual('0x0');
+    });
+
     describe('getStorageAt', () => {
       test('with "key" type of number', () => {
         return expect(testProvider.getStorageAt(exampleContractAddress, 0)).resolves.not.toThrow();
@@ -256,6 +261,10 @@ describe('defaultProvider', () => {
 
         beforeAll(async () => {
           deployResponse = await provider.deployContract({ contract: compiledErc20 });
+          console.log(
+            '🚀 ~ file: defaultProvider.test.ts ~ line 264 ~ beforeAll ~ deployResponse',
+            deployResponse
+          );
           contractAddress = deployResponse.contract_address;
           declareResponse = await provider.declareContract({ contract: compiledErc20 });
           await Promise.all([

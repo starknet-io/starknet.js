@@ -14,7 +14,7 @@ import {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
-  InvocationsDetails,
+  InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
 } from '../types';
 import {
@@ -234,6 +234,13 @@ export class SequencerProvider implements ProviderInterface {
     );
   }
 
+  public async getNonce(
+    contractAddress: string,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<BigNumberish> {
+    return this.fetchEndpoint('get_nonce', { contractAddress, blockIdentifier });
+  }
+
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,
@@ -272,16 +279,16 @@ export class SequencerProvider implements ProviderInterface {
 
   public async invokeFunction(
     functionInvocation: Invocation,
-    details: InvocationsDetails
+    details: InvocationsDetailsWithNonce
   ): Promise<InvokeFunctionResponse> {
     return this.fetchEndpoint('add_transaction', undefined, {
       type: 'INVOKE_FUNCTION',
       contract_address: functionInvocation.contractAddress,
-      entry_point_selector: getSelectorFromName(functionInvocation.entrypoint),
       calldata: bigNumberishArrayToDecimalStringArray(functionInvocation.calldata ?? []),
       signature: bigNumberishArrayToDecimalStringArray(functionInvocation.signature ?? []),
+      nonce: toHex(toBN(details.nonce)),
       max_fee: toHex(toBN(details.maxFee || 0)),
-      version: toHex(toBN(details.version || 0)),
+      version: toHex(toBN(details.version || 1)),
     }).then(this.responseParser.parseInvokeFunctionResponse);
   }
 
@@ -316,18 +323,19 @@ export class SequencerProvider implements ProviderInterface {
 
   public async getEstimateFee(
     invocation: Invocation,
-    blockIdentifier: BlockIdentifier = 'pending',
-    invocationDetails: InvocationsDetails = {}
+    invocationDetails: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint(
       'estimate_fee',
       { blockIdentifier },
       {
+        type: 'INVOKE_FUNCTION',
         contract_address: invocation.contractAddress,
-        entry_point_selector: getSelectorFromName(invocation.entrypoint),
         calldata: invocation.calldata ?? [],
         signature: bigNumberishArrayToDecimalStringArray(invocation.signature || []),
-        version: toHex(toBN(invocationDetails?.version || 0)),
+        version: toHex(toBN(invocationDetails?.version || 1)),
+        nonce: toHex(toBN(invocationDetails.nonce)),
       }
     ).then(this.responseParser.parseFeeEstimateResponse);
   }

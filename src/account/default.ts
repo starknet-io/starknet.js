@@ -1,6 +1,7 @@
 import { ZERO } from '../constants';
 import { ProviderInterface, ProviderOptions } from '../provider';
 import { Provider } from '../provider/default';
+import { BlockIdentifier } from '../provider/utils';
 import { Signer, SignerInterface } from '../signer';
 import {
   Abi,
@@ -12,32 +13,31 @@ import {
   Signature,
 } from '../types';
 import { EstimateFee, EstimateFeeDetails } from '../types/account';
-import { feeTransactionVersion, transactionVersion } from '../utils/hash';
-import { BigNumberish, toBN, toHex } from '../utils/number';
+import { transactionVersion } from '../utils/hash';
+import { BigNumberish, toBN } from '../utils/number';
 import { compileCalldata, estimatedFeeToMaxFee } from '../utils/stark';
-import { fromCallsToExecuteCalldataWithNonce } from '../utils/transaction';
+import { fromCallsToExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
 
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
 
+  public address: string;
+
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
-    public address: string,
+    address: string,
     keyPairOrSigner: KeyPair | SignerInterface
   ) {
     super(providerOrOptions);
+    this.address = address.toLowerCase();
     this.signer =
       'getPubKey' in keyPairOrSigner ? keyPairOrSigner : new Signer(keyPairOrSigner as KeyPair);
   }
 
-  public async getNonce(): Promise<string> {
-    const { result } = await this.callContract({
-      contractAddress: this.address,
-      entrypoint: 'get_nonce',
-    });
-    return toHex(toBN(result[0]));
+  public async getNonce(blockIdentifier?: BlockIdentifier): Promise<BigNumberish> {
+    return super.getNonce(this.address, blockIdentifier);
   }
 
   public async estimateFee(
@@ -45,13 +45,13 @@ export class Account extends Provider implements AccountInterface {
     { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
     const transactions = Array.isArray(calls) ? calls : [calls];
-    const nonce = providedNonce ?? (await this.getNonce());
-    const version = toBN(feeTransactionVersion);
+    const nonce = toBN(providedNonce ?? (await this.getNonce()));
+    const version = toBN(transactionVersion);
     const chainId = await this.getChainId();
 
     const signerDetails: InvocationsSignerDetails = {
       walletAddress: this.address,
-      nonce: toBN(nonce),
+      nonce,
       maxFee: ZERO,
       version,
       chainId,
@@ -59,11 +59,11 @@ export class Account extends Provider implements AccountInterface {
 
     const signature = await this.signer.signTransaction(transactions, signerDetails);
 
-    const calldata = fromCallsToExecuteCalldataWithNonce(transactions, nonce);
+    const calldata = fromCallsToExecuteCalldata(transactions);
     const response = await super.getEstimateFee(
-      { contractAddress: this.address, entrypoint: '__execute__', calldata, signature },
-      blockIdentifier,
-      { version }
+      { contractAddress: this.address, calldata, signature },
+      { version, nonce },
+      blockIdentifier
     );
 
     const suggestedMaxFee = estimatedFeeToMaxFee(response.overall_fee);
@@ -112,11 +112,12 @@ export class Account extends Provider implements AccountInterface {
 
     const signature = await this.signer.signTransaction(transactions, signerDetails, abis);
 
-    const calldata = fromCallsToExecuteCalldataWithNonce(transactions, nonce);
+    const calldata = fromCallsToExecuteCalldata(transactions);
 
     return this.invokeFunction(
-      { contractAddress: this.address, entrypoint: '__execute__', calldata, signature },
+      { contractAddress: this.address, calldata, signature },
       {
+        nonce,
         maxFee,
         version,
       }
@@ -158,7 +159,7 @@ export class Account extends Provider implements AccountInterface {
     try {
       await this.callContract({
         contractAddress: this.address,
-        entrypoint: 'is_valid_signature',
+        entrypoint: 'isValidSignature',
         calldata: compileCalldata({
           hash: toBN(hash).toString(),
           signature: signature.map((x) => toBN(x).toString()),

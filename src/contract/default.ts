@@ -9,10 +9,10 @@ import {
   AbiEntry,
   Args,
   AsyncContractFunction,
+  Call,
   Calldata,
   ContractFunction,
   FunctionAbi,
-  Invocation,
   InvokeFunctionResponse,
   Overrides,
   ParsedStruct,
@@ -125,7 +125,7 @@ export class Contract implements ContractInterface {
     address: string,
     providerOrAccount: ProviderInterface | AccountInterface = defaultProvider
   ) {
-    this.address = address;
+    this.address = address.toLowerCase();
     this.providerOrAccount = providerOrAccount;
     this.abi = abi;
     this.structs = abi
@@ -578,13 +578,22 @@ export class Contract implements ContractInterface {
       });
     }
 
+    if (!options.nonce) {
+      throw new Error(`Nonce is required when invoking a function without an account`);
+    }
+
     // eslint-disable-next-line no-console
     console.warn(`Invoking ${method} without an account. This will not work on a public node.`);
 
-    return this.providerOrAccount.invokeFunction({
-      ...invocation,
-      signature: options.signature || [],
-    });
+    return this.providerOrAccount.invokeFunction(
+      {
+        ...invocation,
+        signature: options.signature || [],
+      },
+      {
+        nonce: options.nonce,
+      }
+    );
   }
 
   public async call(
@@ -630,13 +639,12 @@ export class Contract implements ContractInterface {
     throw Error('Contract must be connected to the account contract to estimate');
   }
 
-  public populate(method: string, args: Array<any> = []): Invocation {
+  public populate(method: string, args: Array<any> = []): Call {
     const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
     return {
       contractAddress: this.address,
       entrypoint: method,
       calldata: this.compileCalldata(args, inputs),
-      signature: [],
     };
   }
 }

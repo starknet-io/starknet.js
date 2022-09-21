@@ -2,9 +2,8 @@ import { StarknetChainId } from '../../src/constants';
 import { ec, getKeyPair, getStarkKey, sign, verify } from '../../src/utils/ellipticCurve';
 import { removeHexPrefix } from '../../src/utils/encode';
 import {
-  calculcateTransactionHash,
+  calculateTransactionHash,
   computeHashOnElements,
-  getSelectorFromName,
   pedersen,
   transactionVersion,
 } from '../../src/utils/hash';
@@ -57,25 +56,25 @@ test('hashMessage()', () => {
   const maxFee = '0';
   const calldata = fromCallsToExecuteCalldataWithNonce(transactions, nonce);
 
-  const hashMsg = calculcateTransactionHash(
+  const hashMsg = calculateTransactionHash(
     account,
     transactionVersion,
-    getSelectorFromName('__execute__'),
     calldata,
     maxFee,
-    StarknetChainId.TESTNET
+    StarknetChainId.TESTNET,
+    nonce
   );
 
   expect(hashMsg).toMatchInlineSnapshot(
-    `"0x4c337c6bf32b2cf2b8ae54064e4b982c214660e8d0423b431a3fde10b9b9c02"`
+    `"0x6d1706bd3d1ba7c517be2a2a335996f63d4738e2f182144d078a1dd9997062e"`
   );
   const keyPair = getKeyPair(privateKey);
   const [r, s] = sign(keyPair, removeHexPrefix(hashMsg));
   expect(r.toString()).toMatchInlineSnapshot(
-    `"1944132633844378384908742523072599391732300777648030785844673145513474741467"`
+    `"1427981024487605678086498726488552139932400435436186597196374630267616399345"`
   );
   expect(s.toString()).toMatchInlineSnapshot(
-    `"1067771353159635307522498807851959257107695451405842425488451092336556917559"`
+    `"1853664302719670721837677288395394946745467311923401353018029119631574115563"`
   );
 });
 

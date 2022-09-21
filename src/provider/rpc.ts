@@ -12,7 +12,7 @@ import {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
-  InvocationsDetails,
+  InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
 } from '../types';
 import { RPC } from '../types/api';
@@ -127,8 +127,15 @@ export class RpcProvider implements ProviderInterface {
     });
   }
 
-  public async getNonce(contractAddress: string): Promise<RPC.Nonce> {
-    return this.fetchEndpoint('starknet_getNonce', { contract_address: contractAddress });
+  public async getNonce(
+    contractAddress: string,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<BigNumberish> {
+    const blockIdentifierGetter = new Block(blockIdentifier);
+    return this.fetchEndpoint('starknet_getNonce', [
+      contractAddress,
+      blockIdentifierGetter.identifier(),
+    ]);
   }
 
   public async getPendingTransactions(): Promise<RPC.PendingTransactions> {
@@ -206,14 +213,13 @@ export class RpcProvider implements ProviderInterface {
 
   public async getEstimateFee(
     invocation: Invocation,
-    blockIdentifier: BlockIdentifier = 'pending',
-    invocationDetails: InvocationsDetails = {}
+    invocationDetails: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<EstimateFeeResponse> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_estimateFee', {
       request: {
         contract_address: invocation.contractAddress,
-        entry_point_selector: getSelectorFromName(invocation.entrypoint),
         calldata: parseCalldata(invocation.calldata),
         signature: bigNumberishArrayToHexadecimalStringArray(invocation.signature || []),
         version: toHex(toBN(invocationDetails?.version || 0)),
@@ -259,12 +265,11 @@ export class RpcProvider implements ProviderInterface {
 
   public async invokeFunction(
     functionInvocation: Invocation,
-    details: InvocationsDetails
+    details: InvocationsDetailsWithNonce
   ): Promise<InvokeFunctionResponse> {
     return this.fetchEndpoint('starknet_addInvokeTransaction', {
       function_invocation: {
         contract_address: functionInvocation.contractAddress,
-        entry_point_selector: getSelectorFromName(functionInvocation.entrypoint),
         calldata: parseCalldata(functionInvocation.calldata),
       },
       signature: bigNumberishArrayToHexadecimalStringArray(functionInvocation.signature || []),
