@@ -23,12 +23,15 @@ import { AccountInterface } from './interface';
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
 
+  public address: string;
+
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
-    public address: string,
+    address: string,
     keyPairOrSigner: KeyPair | SignerInterface
   ) {
     super(providerOrOptions);
+    this.address = address.toLowerCase();
     this.signer =
       'getPubKey' in keyPairOrSigner ? keyPairOrSigner : new Signer(keyPairOrSigner as KeyPair);
   }

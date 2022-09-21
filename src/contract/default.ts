@@ -125,7 +125,7 @@ export class Contract implements ContractInterface {
     address: string,
     providerOrAccount: ProviderInterface | AccountInterface = defaultProvider
   ) {
-    this.address = address;
+    this.address = address.toLowerCase();
     this.providerOrAccount = providerOrAccount;
     this.abi = abi;
     this.structs = abi
