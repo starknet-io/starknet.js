@@ -105,24 +105,24 @@ export class RpcProvider implements ProviderInterface {
   public async getBlockWithTxHashes(
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<RPC.GetBlockWithTxHashesResponse> {
-    const block = new Block(blockIdentifier);
-    return this.fetchEndpoint('starknet_getBlockWithTxHashes', { block_id: block.identifier });
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint('starknet_getBlockWithTxHashes', { block_id });
   }
 
   public async getBlockWithTxs(
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<RPC.GetBlockWithTxs> {
-    const block = new Block(blockIdentifier);
-    return this.fetchEndpoint('starknet_getBlockWithTxs', { block_id: block.identifier });
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint('starknet_getBlockWithTxs', { block_id });
   }
 
   public async getClassHashAt(
     blockIdentifier: BlockIdentifier,
     contractAddress: RPC.ContractAddress
   ): Promise<RPC.Felt> {
-    const block = new Block(blockIdentifier);
+    const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getClassHashAt', {
-      block_id: block.identifier,
+      block_id,
       contract_address: contractAddress,
     });
   }
@@ -147,8 +147,8 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getStateUpdate(blockIdentifier: BlockIdentifier): Promise<RPC.StateUpdate> {
-    const block = new Block(blockIdentifier);
-    return this.fetchEndpoint('starknet_getStateUpdate', { block_id: block.identifier });
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint('starknet_getStateUpdate', { block_id });
   }
 
   public async getStorageAt(
@@ -157,11 +157,11 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<BigNumberish> {
     const parsedKey = toHex(toBN(key));
-    const block = new Block(blockIdentifier);
+    const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getStorageAt', {
       contract_address: contractAddress,
       key: parsedKey,
-      block_id: block.identifier,
+      block_id,
     });
   }
 
@@ -171,8 +171,7 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getTransactionByHash(txHash: string): Promise<RPC.GetTransactionByHashResponse> {
-    const transaction_hash = txHash;
-    return this.fetchEndpoint('starknet_getTransactionByHash', { transaction_hash });
+    return this.fetchEndpoint('starknet_getTransactionByHash', { transaction_hash: txHash });
   }
 
   public async getTransactionByBlockIdAndIndex(
@@ -352,8 +351,8 @@ export class RpcProvider implements ProviderInterface {
   public async getTransactionCount(
     blockIdentifier: BlockIdentifier
   ): Promise<RPC.GetTransactionCountResponse> {
-    const block = new Block(blockIdentifier);
-    return this.fetchEndpoint('starknet_getBlockTransactionCount', { block_id: block.identifier });
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint('starknet_getBlockTransactionCount', { block_id });
   }
 
   /**
