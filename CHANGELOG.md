@@ -1,3 +1,28 @@
+# [4.7.0](https://github.com/0xs34n/starknet.js/compare/v4.6.0...v4.7.0) (2022-09-22)
+
+### Bug Fixes
+
+- add blockIdentifier for getNonce ([7f2edab](https://github.com/0xs34n/starknet.js/commit/7f2edab5099eb9679744140bfe80328801a621ab))
+- addressSalt from BigNumberish to string | undefined ([f77784c](https://github.com/0xs34n/starknet.js/commit/f77784c98d1827a8fd64dd1c543beea4284af7b3))
+- block_id identifier cleanup ([24c24e8](https://github.com/0xs34n/starknet.js/commit/24c24e8060b76f6a300b21c3148a15183b802fcb))
+- **ci:** use correct devnet image for release pipeline ([fc2fcbb](https://github.com/0xs34n/starknet.js/commit/fc2fcbb57e48b4cec9197c59120a574b018a54af))
+- cleanup pr.yml ([263e296](https://github.com/0xs34n/starknet.js/commit/263e29658c30e2c80fe1795f89d4c334777fef5e))
+- fix tests for starknet 0.10 ([c2da26d](https://github.com/0xs34n/starknet.js/commit/c2da26d4b92221fdd54fdd8ff37c437529616b21))
+- get_nonce response type ([f0c30bd](https://github.com/0xs34n/starknet.js/commit/f0c30bd4376eb7c70098d77ff2918ea80418a8af))
+- throw error only when nonce is not provided with contract.invoke ([c6bba65](https://github.com/0xs34n/starknet.js/commit/c6bba6517054b5221f227732750092d0c11b566d))
+- ts types fixes and block_id ([bad0b85](https://github.com/0xs34n/starknet.js/commit/bad0b851765b9af70af3a784aeb1ae5adbe29816))
+
+### Features
+
+- add getNonce method on account ([8e935eb](https://github.com/0xs34n/starknet.js/commit/8e935ebaa251279b83fab65397687ef0380358ac))
+- getNonce endpoint for sequencer ([add4900](https://github.com/0xs34n/starknet.js/commit/add4900ad86f40390b68f6f2158cfbb588fe21d6))
+- is_valid_signature -> isValidSignature ([f704f3e](https://github.com/0xs34n/starknet.js/commit/f704f3e9a3aec0744c155fc3bded079fac7284b5))
+- rpc options, methods, fetch with prop types, imp. types, clenup responseParser ([0ab5769](https://github.com/0xs34n/starknet.js/commit/0ab576957b3e193a68ae6f3ceb15d0b042d39b14))
+- rpc optionsOrProvider extend with retries ([46f9634](https://github.com/0xs34n/starknet.js/commit/46f96342be05252de306fba28da74e634e8b9c3f))
+- transaction v1 changes ([e928478](https://github.com/0xs34n/starknet.js/commit/e92847848166170c7d63394993cd74ae79c14a67))
+- update tests ([1af16f4](https://github.com/0xs34n/starknet.js/commit/1af16f475813a15c78d3b049b7453c19023fe53a))
+- use starknet-devnet 0.3.1 ([83e5dd7](https://github.com/0xs34n/starknet.js/commit/83e5dd7f3bfc5d8d492b3761da6e9fe15669d03c))
+
 # [4.6.0](https://github.com/0xs34n/starknet.js/compare/v4.5.0...v4.6.0) (2022-09-15)
 
 ### Bug Fixes
