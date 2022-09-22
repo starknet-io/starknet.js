@@ -4,7 +4,8 @@
  */
 import BN from 'bn.js';
 
-import { Abi, CompressedProgram, EntryPointsByType, RawCalldata, Signature, Status } from './lib';
+import { RPC } from './api/rpc';
+import { Abi, CompressedProgram, RawCalldata, Signature, Status } from './lib';
 
 export interface GetBlockResponse {
   timestamp: number;
@@ -44,7 +45,7 @@ export interface ContractEntryPoint {
 
 export interface ContractClass {
   program: CompressedProgram;
-  entry_points_by_type: EntryPointsByType;
+  entry_points_by_type: RPC.ContractClass['entry_points_by_type'];
   abi?: Abi;
 }
 

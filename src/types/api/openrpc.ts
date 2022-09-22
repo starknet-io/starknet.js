@@ -8,26 +8,14 @@
  * TypeScript Representation of OpenRpc protocol types
  */
 
-/**
- * "type": "string",
- * "title": "Field element",
- * "$comment": "A field element, represented as a string of hex digits",
- * "description": "A field element. Represented as up to 63 hex digits and leading 4 bits zeroed.",
- * "pattern": "^0x0[a-fA-F0-9]{1,63}$"
- */
 export type FELT = string;
 export type ADDRESS = FELT;
-/**
- * "title": "An integer number in hex format (0x...)",
- * "pattern": "^0x[a-fA-F0-9]+$"
- */
 type NUM_AS_HEX = string;
 type SIGNATURE = Array<FELT>;
 type ETH_ADDRESS = string;
 type BLOCK_NUMBER = number;
 type BLOCK_HASH = FELT;
 type TXN_HASH = FELT;
-type CHAIN_ID = string;
 type PROTOCOL_VERSION = string;
 type TXN_STATUS = 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
 type TXN_TYPE = 'DECLARE' | 'DEPLOY' | 'INVOKE' | 'L1_HANDLER';
@@ -68,7 +56,6 @@ type PENDING_COMMON_RECEIPT_PROPERTIES = {
   actual_fee: FELT;
 };
 type INVOKE_TXN_RECEIPT = COMMON_RECEIPT_PROPERTIES & INVOKE_TXN_RECEIPT_PROPERTIES;
-// type L1_HANDLER_TXN_RECEIPT = COMMON_RECEIPT_PROPERTIES;
 type DECLARE_TXN_RECEIPT = COMMON_RECEIPT_PROPERTIES;
 type DEPLOY_TXN_RECEIPT = COMMON_RECEIPT_PROPERTIES;
 type PENDING_INVOKE_TXN_RECEIPT = PENDING_COMMON_RECEIPT_PROPERTIES & INVOKE_TXN_RECEIPT_PROPERTIES;
@@ -98,18 +85,19 @@ type PENDING_BLOCK_WITH_TX_HASHES = BLOCK_BODY_WITH_TX_HASHES & {
   sequencer_address: FELT;
   parent_hash: BLOCK_HASH;
 };
+// transaction_hash, nonce, type optional because of pathfinder not implemented
 type COMMON_TXN_PROPERTIES = {
-  transaction_hash: TXN_HASH;
+  transaction_hash?: TXN_HASH;
   max_fee: FELT;
   version: NUM_AS_HEX;
   signature: SIGNATURE;
-  nonce: FELT;
-  type: TXN_TYPE;
+  nonce?: FELT;
+  type?: TXN_TYPE;
 };
 type FUNCTION_CALL = {
-  contract_address: ADDRESS;
-  entry_point_selector: FELT;
-  calldata: Array<FELT>;
+  contract_address?: ADDRESS;
+  entry_point_selector?: FELT;
+  calldata?: Array<FELT>;
 };
 type INVOKE_TXN = COMMON_TXN_PROPERTIES & FUNCTION_CALL;
 type DECLARE_TXN = COMMON_TXN_PROPERTIES & {
@@ -138,6 +126,7 @@ type PENDING_BLOCK_WITH_TXS = BLOCK_BODY_WITH_TXS & {
   sequencer_address: FELT;
   parent_hash: BLOCK_HASH;
 };
+
 type CONTRACT_CLASS = {
   program: string; // A base64 representation of the compressed program code
   entry_points_by_type: {
@@ -234,6 +223,7 @@ type TRACE_ROOT = {
 };
 
 export namespace OPENRPC {
+  export type Nonce = FELT;
   export type BlockWithTxHashes = BLOCK_WITH_TX_HASHES | PENDING_BLOCK_WITH_TX_HASHES;
   export type BlockWithTxs = BLOCK_WITH_TXS | PENDING_BLOCK_WITH_TXS;
   export type StateUpdate = STATE_UPDATE;
@@ -248,7 +238,7 @@ export namespace OPENRPC {
     block_hash: BLOCK_HASH;
     block_number: BLOCK_NUMBER;
   };
-  export type ChainId = CHAIN_ID;
+  export type CHAIN_ID = string;
   export type PendingTransactions = Array<TXN>;
   export type ProtocolVersion = PROTOCOL_VERSION;
   export type SyncingStatus = false | SYNC_STATUS;
@@ -257,7 +247,6 @@ export namespace OPENRPC {
     page_number: number;
     is_last_page: boolean;
   };
-  export type Nonce = FELT;
   export type Trace = TRACE_ROOT;
   export type Traces = Array<{
     transaction_hash: FELT;
@@ -265,7 +254,7 @@ export namespace OPENRPC {
   }>;
   export type TransactionHash = TXN_HASH;
   export type BlockHash = BLOCK_HASH;
-  export type EventFilter = EVENT_FILTER;
+  export type EventFilter = EVENT_FILTER & RESULT_PAGE_REQUEST;
   export type InvokedTransaction = { transaction_hash: TXN_HASH };
   export type DeclaredTransaction = { transaction_hash: TXN_HASH; class_hash: FELT };
   export type DeployedTransaction = { transaction_hash: TXN_HASH; contract_address: FELT };
@@ -349,29 +338,35 @@ export namespace OPENRPC {
         | Errors.INVALID_BLOCK_ID;
     };
     starknet_blockNumber: {
+      params: {};
       result: BLOCK_NUMBER;
       errors: Errors.NO_BLOCKS;
     };
     starknet_blockHashAndNumber: {
+      params: {};
       result: BLOCK_HASH & BLOCK_NUMBER;
       errors: Errors.NO_BLOCKS;
     };
     starknet_chainId: {
+      params: {};
       result: CHAIN_ID;
     };
     starknet_pendingTransactions: {
+      params: {};
       result: PendingTransactions;
     };
     starknet_syncing: {
+      params: {};
       result: SyncingStatus;
     };
     starknet_getEvents: {
       params: { filter: EVENT_FILTER & RESULT_PAGE_REQUEST };
-      result: { events: EMITTED_EVENT; page_number: number; is_last_page: boolean };
+      result: Events;
       errors: Errors.PAGE_SIZE_TOO_BIG;
     };
+    // FROM RPC 0.2.0 Pathfinder exception
     starknet_getNonce: {
-      params: { contract_address: ADDRESS };
+      params: { contract_address: ADDRESS; block_id: BLOCK_ID };
       result: FELT;
       errors: Errors.CONTRACT_NOT_FOUND;
     };
@@ -397,7 +392,7 @@ export namespace OPENRPC {
     starknet_addDeployTransaction: {
       params: {
         contract_address_salt: FELT;
-        constructor_calldata: FELT;
+        constructor_calldata: Array<FELT>;
         contract_definition: CONTRACT_CLASS;
       };
       result: DeployedTransaction;

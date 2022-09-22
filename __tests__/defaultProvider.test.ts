@@ -221,7 +221,6 @@ describe('defaultProvider', () => {
           expect(transaction.transaction_hash).toBeTruthy();
           expect(transaction.contract_address).toBeTruthy();
           expect(Array.isArray(transaction.calldata)).toBe(true);
-          expect(transaction.entry_point_selector).toBeTruthy();
           expect(Array.isArray(transaction.signature)).toBe(true);
           expect(transaction.max_fee).toBeTruthy();
         });
