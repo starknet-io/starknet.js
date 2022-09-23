@@ -1,14 +1,18 @@
 import { pedersen } from '../../src/utils/hash';
 import { MerkleTree, proofMerklePath } from '../../src/utils/merkle';
+import { toBN } from '../../src/utils/number';
 
 describe('MerkleTree class', () => {
   describe('calculate hashes', () => {
     test('should generate hash with sorted arguments', async () => {
-      const leaves = ['0x12', '0xa']; // 18, 10
+      let leaves = ['0x12', '0xa']; // 18, 10
+      let merkleHash = MerkleTree.hash(leaves[0], leaves[1]);
+      let rawHash = pedersen([toBN(leaves[1]), toBN(leaves[0])]);
+      expect(merkleHash).toBe(rawHash);
 
-      const merkleHash = MerkleTree.hash(leaves[0], leaves[1]);
-      const rawHash = pedersen([10, 18]);
-
+      leaves = ['0x5bb9440e27889a364bcb678b1f679ecd1347acdedcbf36e83494f857cc58026', '0x3'];
+      merkleHash = MerkleTree.hash(leaves[0], leaves[1]);
+      rawHash = pedersen([toBN(leaves[1]), toBN(leaves[0])]);
       expect(merkleHash).toBe(rawHash);
     });
   });

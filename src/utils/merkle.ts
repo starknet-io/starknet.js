@@ -32,14 +32,7 @@ export class MerkleTree {
   }
 
   static hash(a: string, b: string) {
-    let aSorted = a;
-    let bSorted = b;
-
-    if (toBN(aSorted) > toBN(bSorted)) {
-      aSorted = b;
-      bSorted = a;
-    }
-
+    const [aSorted, bSorted] = [toBN(a), toBN(b)].sort((x: any, y: any) => (x.gte(y) ? 1 : -1));
     return pedersen([aSorted, bSorted]);
   }
 

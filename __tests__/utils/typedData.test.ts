@@ -72,7 +72,7 @@ describe('typedData', () => {
     const [, merkleTreeHash] = encodeValue({}, 'merkletree', tree.leaves);
     expect(merkleTreeHash).toBe(tree.root);
     expect(merkleTreeHash).toMatchInlineSnapshot(
-      `"0x5cdd7ef6b0b1cf28fba033a8369dec45d1d94101c0550ac8a26bd8133695e07"`
+      `"0x551b4adb6c35d49c686a00b9192da9332b18c9b262507cad0ece37f3b6918d2"`
     );
   });
 
