@@ -1,4 +1,5 @@
 import { pedersen } from './hash';
+import { toBN } from './number';
 
 export class MerkleTree {
   public leaves: string[];
@@ -31,7 +32,14 @@ export class MerkleTree {
   }
 
   static hash(a: string, b: string) {
-    const [aSorted, bSorted] = [a, b].sort();
+    let aSorted = a;
+    let bSorted = b;
+
+    if (toBN(aSorted) > toBN(bSorted)) {
+      aSorted = b;
+      bSorted = a;
+    }
+
     return pedersen([aSorted, bSorted]);
   }
 

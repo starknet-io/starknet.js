@@ -19,7 +19,7 @@ ALways start from `develop` branch and merge back to `develop` branch.
 To build you changes run:
 
 ```bash
-npm build
+npm run build
 ```
 
 Run linters and tests:
@@ -31,7 +31,7 @@ npm test
 Or run tests in watch mode:
 
 ```bash
-npm run test --watch
+npm test --watch
 ```
 
 **Don’t forget to add tests and update documentation for your changes.**

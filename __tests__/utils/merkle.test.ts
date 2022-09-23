@@ -1,6 +1,17 @@
+import { pedersen } from '../../src/utils/hash';
 import { MerkleTree, proofMerklePath } from '../../src/utils/merkle';
 
 describe('MerkleTree class', () => {
+  describe('calculate hashes', () => {
+    test('should generate hash with sorted arguments', async () => {
+      const leaves = ['0x12', '0xa']; // 18, 10
+
+      const merkleHash = MerkleTree.hash(leaves[0], leaves[1]);
+      const rawHash = pedersen([10, 18]);
+
+      expect(merkleHash).toBe(rawHash);
+    });
+  });
   describe('generate roots', () => {
     test('should generate valid root for 1 elements', async () => {
       const leaves = ['0x1'];
