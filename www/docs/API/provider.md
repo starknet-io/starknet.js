@@ -271,21 +271,29 @@ Gets the transaction trace from a tx hash.
 
 ```typescript
 {
-  function_invocation: {
+  validate_invocation?: FunctionInvocation;
+  function_invocation?: FunctionInvocation;
+  fee_transfer_invocation?: FunctionInvocation;
+  signature: Signature;
+}
+
+{
+  FunctionInvocation: {
     caller_address: string;
     contract_address: string;
-    code_address: string;
-    selector: string;
     calldata: {
       [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
     };
+    call_type?: string;
+    class_hash?: string;
+    selector?: string;
+    entry_point_type?: EntryPointType;
     result: Array<any>;
-    execution_resources: any;
-    internal_call: Array<any>;
+    execution_resources: ExecutionResources;
+    internal_calls: Array<FunctionInvocation>;
     events: Array<any>;
     messages: Array<any>;
   };
-  signature: Signature;
 }
 ```
 

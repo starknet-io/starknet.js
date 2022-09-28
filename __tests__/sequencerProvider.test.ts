@@ -45,7 +45,7 @@ describe('SequencerProvider', () => {
 
     test('transaction trace', async () => {
       const transactionTrace = await sequencerProvider.getTransactionTrace(exampleTransactionHash);
-      expect(transactionTrace).toHaveProperty('function_invocation');
+      // TODO test optional properties
       expect(transactionTrace).toHaveProperty('signature');
     });
 

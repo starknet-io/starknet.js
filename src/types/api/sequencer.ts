@@ -27,15 +27,17 @@ export type GetContractAddressesResponse = {
   GpsStatementVerifier: string;
 };
 
-export type InvokeFunctionTrace = {
+export type FunctionInvocation = {
   caller_address: string;
   contract_address: string;
-  code_address: string;
-  selector: string;
   calldata: RawCalldata;
+  call_type?: string;
+  class_hash?: string;
+  selector?: string;
+  entry_point_type?: EntryPointType;
   result: Array<any>;
   execution_resources: ExecutionResources;
-  internal_call: Array<InvokeFunctionTrace>;
+  internal_calls: Array<FunctionInvocation>;
   events: Array<any>;
   messages: Array<any>;
 };
@@ -54,18 +56,9 @@ export type ExecutionResources = {
 };
 
 export type GetTransactionTraceResponse = {
-  function_invocation: {
-    caller_address: string;
-    contract_address: string;
-    code_address: string;
-    selector: string;
-    calldata: RawArgs;
-    result: Array<any>;
-    execution_resources: ExecutionResources;
-    internal_call: Array<any>;
-    events: Array<any>;
-    messages: Array<any>;
-  };
+  validate_invocation?: FunctionInvocation;
+  function_invocation?: FunctionInvocation;
+  fee_transfer_invocation?: FunctionInvocation;
   signature: Signature;
 };
 
