@@ -425,7 +425,6 @@ export class SequencerProvider implements ProviderInterface {
     { from_address, to_address, entry_point_selector, payload }: CallL1Handler,
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<Sequencer.EstimateFeeResponse> {
-    // ensure from_address is decimalString, can be sent hexString, decimalString
     const validCallL1Handler = {
       from_address: getDecimalString(from_address),
       to_address: getHexString(to_address),
