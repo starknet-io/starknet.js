@@ -18,15 +18,24 @@ import {
   InvokeFunctionResponse,
 } from '../types';
 import {
+  CallL1Handler,
   GetContractAddressesResponse,
   GetTransactionStatusResponse,
   GetTransactionTraceResponse,
   Sequencer,
 } from '../types/api';
 import fetch from '../utils/fetchPonyfill';
-import { getSelectorFromName } from '../utils/hash';
+import { getSelector, getSelectorFromName } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
-import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
+import {
+  BigNumberish,
+  bigNumberishArrayToDecimalStringArray,
+  getDecimalString,
+  getHexString,
+  getHexStringArray,
+  toBN,
+  toHex,
+} from '../utils/number';
 import { parseContract, wait } from '../utils/provider';
 import { SequencerAPIResponseParser } from '../utils/responseParser/sequencer';
 import { randomAddress } from '../utils/stark';
@@ -117,7 +126,12 @@ export class SequencerProvider implements ProviderInterface {
   }
 
   private getFetchMethod(endpoint: keyof Sequencer.Endpoints) {
-    const postMethodEndpoints = ['add_transaction', 'call_contract', 'estimate_fee'];
+    const postMethodEndpoints = [
+      'add_transaction',
+      'call_contract',
+      'estimate_fee',
+      'estimate_message_fee',
+    ];
 
     return postMethodEndpoints.includes(endpoint) ? 'POST' : 'GET';
   }
@@ -405,5 +419,20 @@ export class SequencerProvider implements ProviderInterface {
   public async getTransactionTrace(txHash: BigNumberish): Promise<GetTransactionTraceResponse> {
     const txHashHex = toHex(toBN(txHash));
     return this.fetchEndpoint('get_transaction_trace', { transactionHash: txHashHex });
+  }
+
+  public async estimateMessageFee(
+    { from_address, to_address, entry_point_selector, payload }: CallL1Handler,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<Sequencer.EstimateFeeResponse> {
+    // ensure from_address is decimalString, can be sent hexString, decimalString
+    const validCallL1Handler = {
+      from_address: getDecimalString(from_address),
+      to_address: getHexString(to_address),
+      entry_point_selector: getSelector(entry_point_selector),
+      payload: getHexStringArray(payload),
+    };
+
+    return this.fetchEndpoint('estimate_message_fee', { blockIdentifier }, validCallL1Handler);
   }
 }

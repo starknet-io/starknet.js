@@ -73,6 +73,13 @@ export type RawArgs = {
   [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
 };
 
+export type CallL1Handler = {
+  from_address: string;
+  to_address: string;
+  entry_point_selector: string;
+  payload: Array<string>;
+};
+
 export namespace Sequencer {
   export type DeclareTransaction = {
     type: 'DECLARE';
@@ -339,6 +346,11 @@ export namespace Sequencer {
       };
       REQUEST: never;
       RESPONSE: any;
+    };
+    estimate_message_fee: {
+      QUERY: any;
+      REQUEST: any;
+      RESPONSE: EstimateFeeResponse;
     };
   };
 }
