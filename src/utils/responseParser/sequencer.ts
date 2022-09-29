@@ -68,7 +68,7 @@ export class SequencerAPIResponseParser extends ResponseParser {
       ...('transaction_index' in res && { transaction_index: res.transaction_index }),
       ...('execution_resources' in res && { execution_resources: res.execution_resources }),
       ...('l1_to_l2_consumed_message' in res && {
-        l1_to_l2_consumed_message: res.l1_to_l2_consumed_message,
+        l1_to_l2_consumed_message: res['l1_to_l2_consumed_message'],
       }),
       ...('transaction_failure_reason' in res && {
         transaction_failure_reason: res.transaction_failure_reason,
