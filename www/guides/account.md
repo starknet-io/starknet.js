@@ -45,7 +45,7 @@ const compiledAccount = json.parse(
 
 > **Note**
 >
-> below example uses [Argent's](https://github.com/argentlabs/argent-contracts-starknet/blob/develop/contracts/ArgentAccount.cairo) account contract
+> below example uses [Argent's](https://github.com/argentlabs/argent-contracts-starknet/blob/develop/contracts/account/ArgentAccount.cairo) account contract
 
 ```javascript
 const accountResponse = await defaultProvider.deployContract({
