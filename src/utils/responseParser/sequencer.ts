@@ -19,12 +19,9 @@ import { ResponseParser } from '.';
 export class SequencerAPIResponseParser extends ResponseParser {
   public parseGetBlockResponse(res: Sequencer.GetBlockResponse): GetBlockResponse {
     return {
-      timestamp: res.timestamp,
-      block_hash: res.block_hash,
-      block_number: res.block_number,
+      ...res,
       new_root: res.state_root,
       parent_hash: res.parent_block_hash,
-      status: res.status,
       transactions: Object.values(res.transactions)
         .map((value) => 'transaction_hash' in value && value.transaction_hash)
         .filter(Boolean) as Array<string>,
