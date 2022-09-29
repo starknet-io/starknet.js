@@ -5,11 +5,12 @@ import {
   compiledErc20,
   compiledL1L2,
   describeIfNotDevnet,
+  describeIfSequencer,
   getTestProvider,
 } from './fixtures';
 
 // Run only if Devnet Sequencer
-describe('SequencerProvider', () => {
+describeIfSequencer('SequencerProvider', () => {
   let sequencerProvider: SequencerProvider;
   let customSequencerProvider: Provider;
   let exampleContractAddress: string;
@@ -112,9 +113,9 @@ describe('SequencerProvider', () => {
       );
       expect(estimation).toEqual(
         expect.objectContaining({
-          overall_fee: expect.any(Number),
-          gas_price: expect.any(Number),
-          gas_usage: expect.any(Number),
+          overall_fee: expect.anything(),
+          gas_price: expect.anything(),
+          gas_usage: expect.anything(),
           unit: 'wei',
         })
       );
