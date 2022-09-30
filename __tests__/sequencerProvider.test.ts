@@ -1,7 +1,7 @@
 import { Contract, Provider, SequencerProvider, stark } from '../src';
 import { toBN } from '../src/utils/number';
 import {
-  IS_SEQUENCER_GOERLY,
+  IS_SEQUENCER_GOERLI,
   compiledErc20,
   compiledL1L2,
   describeIfNotDevnet,
@@ -90,7 +90,7 @@ describeIfSequencer('SequencerProvider', () => {
     let l1l2ContractAddress: string;
 
     beforeAll(async () => {
-      if (IS_SEQUENCER_GOERLY) {
+      if (IS_SEQUENCER_GOERLI) {
         l1l2ContractAddress = '0x2863141e0d9a74e9b484c1f5b1e3a2f6cbb6b84df8233c7c1cbe31334d9aed8';
       } else {
         const { transaction_hash, contract_address } = await sequencerProvider.deployContract({
