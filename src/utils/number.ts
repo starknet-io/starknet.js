@@ -61,3 +61,30 @@ export function bigNumberishArrayToDecimalStringArray(rawCalldata: BigNumberish[
 export function bigNumberishArrayToHexadecimalStringArray(rawCalldata: BigNumberish[]): string[] {
   return rawCalldata.map((x) => toHex(toBN(x)));
 }
+
+export const isStringWholeNumber = (value: string) => /^\d+$/.test(value);
+export const toHexString = (value: string) => toHex(toBN(value));
+
+export function getDecimalString(value: string) {
+  if (isHex(value)) {
+    return hexToDecimalString(value);
+  }
+  if (isStringWholeNumber(value)) {
+    return value;
+  }
+  throw new Error(`${value} need to be hex-string or whole-number-string`);
+}
+
+export function getHexString(value: string) {
+  if (isHex(value)) {
+    return value;
+  }
+  if (isStringWholeNumber(value)) {
+    return toHexString(value);
+  }
+  throw new Error(`${value} need to be hex-string or whole-number-string`);
+}
+
+export function getHexStringArray(value: Array<string>) {
+  return value.map((el) => getHexString(el));
+}

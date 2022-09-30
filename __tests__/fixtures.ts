@@ -8,6 +8,7 @@ const readContract = (name: string): CompiledContract =>
 
 export const compiledOpenZeppelinAccount = readContract('Account');
 export const compiledErc20 = readContract('ERC20');
+export const compiledL1L2 = readContract('l1l2_compiled');
 export const compiledTypeTransformation = readContract('contract');
 export const compiledMulticall = readContract('multicall');
 export const compiledTestDapp = readContract('TestDapp');
@@ -26,6 +27,7 @@ const IS_RPC_DEVNET = Boolean(
 );
 const IS_SEQUENCER = !IS_RPC;
 const IS_SEQUENCER_DEVNET = !BASE_URL.includes('starknet.io');
+export const IS_SEQUENCER_GOERLI = BASE_URL === 'https://alpha4.starknet.io';
 export const IS_DEVNET = IS_SEQUENCER ? IS_SEQUENCER_DEVNET : IS_RPC_DEVNET;
 
 export const getTestProvider = () => {
