@@ -245,7 +245,6 @@ describe('defaultProvider', () => {
 
           expect(receipt).toHaveProperty('transaction_hash');
           expect(receipt).toHaveProperty('status');
-          expect(receipt).toHaveProperty('status_data');
           expect(receipt).toHaveProperty('messages_sent');
           expect(receipt).toHaveProperty('l1_origin_message');
           expect(receipt).toHaveProperty('events');
