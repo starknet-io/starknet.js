@@ -124,6 +124,38 @@ export function calculateDeployTransactionHash(
   );
 }
 
+export function calculateDeclareTransactionHash(
+  // contractClass: ContractClass, // Should be used once class hash is present in ContractClass
+  classHash: string,
+  senderAddress: BigNumberish,
+  version: BigNumberish,
+  maxFee: BigNumberish,
+  chainId: StarknetChainId,
+  nonce: BigNumberish
+): string {
+  let calldata: BigNumberish[] = [];
+  let additionalData: BigNumberish[] = [];
+
+  if (version !== ZERO) {
+    calldata = [classHash];
+    additionalData = [nonce];
+  } else {
+    calldata = [];
+    additionalData = [classHash];
+  }
+
+  return calculateTransactionHashCommon(
+    TransactionHashPrefix.DECLARE,
+    version,
+    senderAddress,
+    0,
+    calldata,
+    maxFee,
+    chainId,
+    additionalData
+  );
+}
+
 export function calculateTransactionHash(
   contractAddress: BigNumberish,
   version: BigNumberish,

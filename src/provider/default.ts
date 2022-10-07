@@ -3,7 +3,6 @@ import {
   Call,
   CallContractResponse,
   ContractClass,
-  DeclareContractPayload,
   DeclareContractResponse,
   DeployContractPayload,
   DeployContractResponse,
@@ -16,6 +15,7 @@ import {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
 } from '../types';
+import { DeclareContractTransaction } from '../types/lib';
 import { BigNumberish } from '../utils/number';
 import { ProviderInterface } from './interface';
 import { RpcProvider, RpcProviderOptions } from './rpc';
@@ -61,12 +61,16 @@ export class Provider implements ProviderInterface {
     return this.provider.getClassAt(contractAddress, blockIdentifier);
   }
 
-  public async getEstimateFee(
-    invocation: Invocation,
+  public async getInvokeEstimateFee(
+    invocationWithTxType: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<EstimateFeeResponse> {
-    return this.provider.getEstimateFee(invocation, invocationDetails, blockIdentifier);
+    return this.provider.getInvokeEstimateFee(
+      invocationWithTxType,
+      invocationDetails,
+      blockIdentifier
+    );
   }
 
   public async getNonce(
@@ -110,8 +114,19 @@ export class Provider implements ProviderInterface {
     return this.provider.deployContract(payload);
   }
 
-  public async declareContract(payload: DeclareContractPayload): Promise<DeclareContractResponse> {
-    return this.provider.declareContract(payload);
+  public async declareContract(
+    transaction: DeclareContractTransaction,
+    details: InvocationsDetailsWithNonce
+  ): Promise<DeclareContractResponse> {
+    return this.provider.declareContract(transaction, details);
+  }
+
+  public async getDeclareEstimateFee(
+    transaction: DeclareContractTransaction,
+    details: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<EstimateFeeResponse> {
+    return this.provider.getDeclareEstimateFee(transaction, details, blockIdentifier);
   }
 
   public async getCode(

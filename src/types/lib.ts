@@ -1,10 +1,17 @@
 import type { ec as EC } from 'elliptic';
 
 import type { BigNumberish } from '../utils/number';
+import { RPC } from './api/rpc';
 
 export type KeyPair = EC.KeyPair;
 export type Signature = string[];
 export type RawCalldata = BigNumberish[];
+
+export interface ContractClass {
+  program: CompressedProgram;
+  entry_points_by_type: RPC.ContractClass['entry_points_by_type'];
+  abi?: Abi;
+}
 
 export type DeployContractPayload = {
   contract: CompiledContract | string;
@@ -13,8 +20,15 @@ export type DeployContractPayload = {
 };
 
 export type DeclareContractPayload = {
+  // The line is commented until we have Class Hash in the compiled contract
   contract: CompiledContract | string;
-  version?: BigNumberish;
+  classHash: string;
+};
+
+export type DeclareContractTransaction = {
+  contractDefinition: ContractClass;
+  senderAddress: string;
+  signature?: Signature;
 };
 
 export type CallDetails = {
@@ -24,7 +38,7 @@ export type CallDetails = {
 
 export type Invocation = CallDetails & { signature?: Signature };
 
-export type Call = CallDetails & { entrypoint: string };
+export type Call = CallDetails & { entrypoint: BigNumberish };
 
 export type InvocationsDetails = {
   nonce?: BigNumberish;
@@ -42,7 +56,7 @@ export type Status =
   | 'ACCEPTED_ON_L1'
   | 'REJECTED';
 export type TransactionStatus = 'TRANSACTION_RECEIVED';
-export type Type = 'DECLARE' | 'DEPLOY' | 'INVOKE_FUNCTION';
+export type TransactionType = 'DECLARE' | 'DEPLOY' | 'INVOKE_FUNCTION';
 export type EntryPointType = 'EXTERNAL';
 export type CompressedProgram = string;
 

@@ -5,13 +5,13 @@ import { BigNumberish } from '../../utils/number';
 import {
   Abi,
   BlockNumber,
+  ContractClass,
   EntryPointType,
   RawCalldata,
   Signature,
   Status,
   TransactionStatus,
 } from '../lib';
-import { ContractClass } from '../provider';
 
 export type GetTransactionStatusResponse = {
   tx_status: Status;
@@ -76,10 +76,12 @@ export type RawArgs = {
 export namespace Sequencer {
   export type DeclareTransaction = {
     type: 'DECLARE';
+    sender_address: string;
     contract_class: ContractClass;
+    signature?: Signature;
     nonce: BigNumberish;
-    sender_address: BigNumberish;
-    signature: Signature;
+    max_fee?: BigNumberish;
+    version?: BigNumberish;
   };
 
   export type DeployTransaction = {
@@ -208,10 +210,11 @@ export namespace Sequencer {
     result: string[];
   };
 
-  export type EstimateFeeTransaction = Omit<
-    InvokeFunctionTransaction,
-    'max_fee' | 'entry_point_type'
-  >;
+  export type InvokeEstimateFee = Omit<InvokeFunctionTransaction, 'max_fee' | 'entry_point_type'>;
+  export type DeclareEstimateFee = Omit<DeclareTransaction, 'max_fee'>;
+  export type DeployEstimateFee = DeployTransaction;
+
+  export type EstimateFeeRequest = InvokeEstimateFee | DeclareEstimateFee | DeployEstimateFee;
 
   // Support 0.9.1 changes in a backward-compatible way
   export type EstimateFeeResponse =
@@ -307,7 +310,7 @@ export namespace Sequencer {
       QUERY: {
         blockIdentifier: BlockIdentifier;
       };
-      REQUEST: EstimateFeeTransaction;
+      REQUEST: EstimateFeeRequest;
       RESPONSE: EstimateFeeResponse;
     };
     get_class_by_hash: {

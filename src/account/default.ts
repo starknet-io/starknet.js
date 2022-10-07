@@ -6,6 +6,7 @@ import { Signer, SignerInterface } from '../signer';
 import {
   Abi,
   Call,
+  DeclareContractResponse,
   InvocationsDetails,
   InvocationsSignerDetails,
   InvokeFunctionResponse,
@@ -13,8 +14,10 @@ import {
   Signature,
 } from '../types';
 import { EstimateFee, EstimateFeeDetails } from '../types/account';
+import { DeclareContractPayload } from '../types/lib';
 import { transactionVersion } from '../utils/hash';
 import { BigNumberish, toBN } from '../utils/number';
+import { parseContract } from '../utils/provider';
 import { compileCalldata, estimatedFeeToMaxFee } from '../utils/stark';
 import { fromCallsToExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
@@ -40,7 +43,7 @@ export class Account extends Provider implements AccountInterface {
     return super.getNonce(this.address, blockIdentifier);
   }
 
-  public async estimateFee(
+  public async estimateInvokeFee(
     calls: Call | Call[],
     { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
@@ -60,12 +63,43 @@ export class Account extends Provider implements AccountInterface {
     const signature = await this.signer.signTransaction(transactions, signerDetails);
 
     const calldata = fromCallsToExecuteCalldata(transactions);
-    const response = await super.getEstimateFee(
+    const response = await super.getInvokeEstimateFee(
       { contractAddress: this.address, calldata, signature },
       { version, nonce },
       blockIdentifier
     );
 
+    const suggestedMaxFee = estimatedFeeToMaxFee(response.overall_fee);
+
+    return {
+      ...response,
+      suggestedMaxFee,
+    };
+  }
+
+  public async estimateDeclareFee(
+    { classHash, contract }: DeclareContractPayload,
+    { blockIdentifier, nonce: providedNonce }: EstimateFeeDetails = {}
+  ): Promise<EstimateFee> {
+    const nonce = toBN(providedNonce ?? (await this.getNonce()));
+    const version = toBN(transactionVersion);
+    const chainId = await this.getChainId();
+    const contractDefinition = parseContract(contract);
+
+    const signature = await this.signer.signDeclareTransaction({
+      classHash,
+      senderAddress: this.address,
+      chainId,
+      maxFee: ZERO,
+      version,
+      nonce,
+    });
+
+    const response = await super.getDeclareEstimateFee(
+      { senderAddress: this.address, signature, contractDefinition },
+      { version, nonce },
+      blockIdentifier
+    );
     const suggestedMaxFee = estimatedFeeToMaxFee(response.overall_fee);
 
     return {
@@ -95,7 +129,7 @@ export class Account extends Provider implements AccountInterface {
     if (transactionsDetail.maxFee || transactionsDetail.maxFee === 0) {
       maxFee = transactionsDetail.maxFee;
     } else {
-      const { suggestedMaxFee } = await this.estimateFee(transactions, { nonce });
+      const { suggestedMaxFee } = await this.estimateInvokeFee(transactions, { nonce });
       maxFee = suggestedMaxFee.toString();
     }
 
@@ -116,6 +150,49 @@ export class Account extends Provider implements AccountInterface {
 
     return this.invokeFunction(
       { contractAddress: this.address, calldata, signature },
+      {
+        nonce,
+        maxFee,
+        version,
+      }
+    );
+  }
+
+  public async declare(
+    { classHash, contract }: DeclareContractPayload,
+    transactionsDetail: InvocationsDetails = {}
+  ): Promise<DeclareContractResponse> {
+    const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
+    let maxFee: BigNumberish = '0';
+
+    if (transactionsDetail.maxFee || transactionsDetail.maxFee === 0) {
+      maxFee = transactionsDetail.maxFee;
+    } else {
+      const { suggestedMaxFee } = await this.estimateDeclareFee(
+        { contract, classHash },
+        {
+          nonce,
+        }
+      );
+      maxFee = suggestedMaxFee.toString();
+    }
+
+    const version = toBN(transactionVersion);
+    const chainId = await this.getChainId();
+
+    const signature = await this.signer.signDeclareTransaction({
+      classHash,
+      senderAddress: this.address,
+      chainId,
+      maxFee,
+      version,
+      nonce,
+    });
+
+    const contractDefinition = parseContract(contract);
+
+    return this.declareContract(
+      { contractDefinition, senderAddress: this.address, signature },
       {
         nonce,
         maxFee,

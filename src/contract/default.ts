@@ -633,8 +633,8 @@ export class Contract implements ContractInterface {
     // validate method and args
     this.validateMethodAndArgs('INVOKE', method, args);
     const invocation = this.populateTransaction[method](...args);
-    if ('estimateFee' in this.providerOrAccount) {
-      return this.providerOrAccount.estimateFee(invocation);
+    if ('estimateInvokeFee' in this.providerOrAccount) {
+      return this.providerOrAccount.estimateInvokeFee(invocation);
     }
     throw Error('Contract must be connected to the account contract to estimate');
   }

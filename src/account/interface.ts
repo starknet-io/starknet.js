@@ -4,12 +4,14 @@ import { SignerInterface } from '../signer';
 import {
   Abi,
   Call,
+  DeclareContractResponse,
   EstimateFeeDetails,
   EstimateFeeResponse,
   InvocationsDetails,
   InvokeFunctionResponse,
   Signature,
 } from '../types';
+import { DeclareContractPayload } from '../types/lib';
 import { BigNumberish } from '../utils/number';
 import { TypedData } from '../utils/typedData/types';
 
@@ -29,9 +31,14 @@ export abstract class AccountInterface extends ProviderInterface {
    *
    * @returns response from addTransaction
    */
-  public abstract estimateFee(
+  public abstract estimateInvokeFee(
     calls: Call | Call[],
     estimateFeeDetails?: EstimateFeeDetails
+  ): Promise<EstimateFeeResponse>;
+
+  public abstract estimateDeclareFee(
+    contractPayload: DeclareContractPayload,
+    transactionsDetail?: EstimateFeeDetails
   ): Promise<EstimateFeeResponse>;
 
   /**
@@ -51,6 +58,23 @@ export abstract class AccountInterface extends ProviderInterface {
     abis?: Abi[],
     transactionsDetail?: InvocationsDetails
   ): Promise<InvokeFunctionResponse>;
+
+  /**
+   * Declares a given compiled contract (json) to starknet
+   * @param contractPayload transaction payload to be deployed containing:
+  - contract: compiled contract code
+  - classHash: computed class hash of compiled contract
+  - signature
+   * @param transactionsDetail Invocation Details containing:
+  - optional nonce
+  - optional version
+  - optional maxFee
+   * @returns a confirmation of sending a transaction on the starknet contract
+   */
+  public abstract declare(
+    contractPayload: DeclareContractPayload,
+    transactionsDetail?: InvocationsDetails
+  ): Promise<DeclareContractResponse>;
 
   /**
    * Sign an JSON object for off-chain usage with the starknet private key and return the signature

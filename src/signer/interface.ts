@@ -1,4 +1,4 @@
-import { Abi, Call, InvocationsSignerDetails, Signature } from '../types';
+import { Abi, Call, DeclareSignerDetails, InvocationsSignerDetails, Signature } from '../types';
 import { TypedData } from '../utils/typedData';
 
 export abstract class SignerInterface {
@@ -27,7 +27,6 @@ export abstract class SignerInterface {
    * - contractAddress - the address of the contract
    * - entrypoint - the entrypoint of the contract
    * - calldata - (defaults to []) the calldata
-   * - signature - (defaults to []) the signature
    * @param abi (optional) the abi of the contract for better displaying
    *
    * @returns signature
@@ -37,4 +36,17 @@ export abstract class SignerInterface {
     transactionsDetail: InvocationsSignerDetails,
     abis?: Abi[]
   ): Promise<Signature>;
+
+  /**
+   * Signs a DECLARE transaction with the starknet private key and returns the signature
+   * @param transaction
+   * - classHash - computed class hash. Will be replaced by ContractClass in future once class hash is present in CompiledContract
+   * - senderAddress - the address of the sender
+   * - chainId - the chainId to declare contract on
+   * - maxFee - maxFee for the declare transaction
+   * - version - transaction version
+   * - nonce - Nonce of the declare transaction
+   * @returns signature
+   */
+  public abstract signDeclareTransaction(transaction: DeclareSignerDetails): Promise<Signature>;
 }
