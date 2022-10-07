@@ -19,12 +19,9 @@ import { ResponseParser } from '.';
 export class SequencerAPIResponseParser extends ResponseParser {
   public parseGetBlockResponse(res: Sequencer.GetBlockResponse): GetBlockResponse {
     return {
-      timestamp: res.timestamp,
-      block_hash: res.block_hash,
-      block_number: res.block_number,
+      ...res,
       new_root: res.state_root,
       parent_hash: res.parent_block_hash,
-      status: res.status,
       transactions: Object.values(res.transactions)
         .map((value) => 'transaction_hash' in value && value.transaction_hash)
         .filter(Boolean) as Array<string>,
@@ -62,12 +59,20 @@ export class SequencerAPIResponseParser extends ResponseParser {
   ): GetTransactionReceiptResponse {
     return {
       transaction_hash: res.transaction_hash,
-      actual_fee: 'actual_fee' in res ? res.actual_fee : undefined,
       status: res.status,
-      status_data: undefined,
       messages_sent: res.l2_to_l1_messages as any, // TODO: parse
       events: res.events as any,
-      l1_origin_message: undefined,
+      ...('block_hash' in res && { block_hash: res.block_hash }),
+      ...('block_number' in res && { block_number: res.block_number }),
+      ...('actual_fee' in res && { actual_fee: res.actual_fee }),
+      ...('transaction_index' in res && { transaction_index: res.transaction_index }),
+      ...('execution_resources' in res && { execution_resources: res.execution_resources }),
+      ...('l1_to_l2_consumed_message' in res && {
+        l1_to_l2_consumed_message: res['l1_to_l2_consumed_message'],
+      }),
+      ...('transaction_failure_reason' in res && {
+        transaction_failure_reason: res.transaction_failure_reason,
+      }),
     };
   }
 

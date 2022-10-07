@@ -15,7 +15,15 @@ import {
 import { RawCalldata } from '../types/lib';
 import { ec } from './ellipticCurve';
 import { addHexPrefix, buf2hex, removeHexPrefix, utf8ToArray } from './encode';
-import { BigNumberish, toBN, toFelt, toHex } from './number';
+import {
+  BigNumberish,
+  isHex,
+  isStringWholeNumber,
+  toBN,
+  toFelt,
+  toHex,
+  toHexString,
+} from './number';
 
 export const transactionVersion = 1;
 export const feeTransactionVersion = toBN(2).pow(toBN(128)).add(toBN(transactionVersion));
@@ -51,6 +59,21 @@ export function starknetKeccak(value: string): BN {
 export function getSelectorFromName(funcName: string) {
   // sometimes BigInteger pads the hex string with zeros, which isnt allowed in the starknet api
   return toHex(starknetKeccak(funcName));
+}
+
+/**
+ * Function to get hex selector from function name, decimal string or hex string
+ * @param value hex string | decimal string | string
+ * @returns Hex selector
+ */
+export function getSelector(value: string) {
+  if (isHex(value)) {
+    return value;
+  }
+  if (isStringWholeNumber(value)) {
+    return toHexString(value);
+  }
+  return getSelectorFromName(value);
 }
 
 const constantPoints = CONSTANT_POINTS.map((coords: string[]) =>

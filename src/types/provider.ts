@@ -14,6 +14,10 @@ export interface GetBlockResponse {
   parent_hash: string;
   status: Status;
   transactions: Array<string>;
+  gas_price?: string;
+  sequencer_address?: string;
+  starknet_version?: string;
+  transaction_receipts?: any;
 }
 
 export interface GetCodeResponse {

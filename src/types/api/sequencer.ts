@@ -27,15 +27,17 @@ export type GetContractAddressesResponse = {
   GpsStatementVerifier: string;
 };
 
-export type InvokeFunctionTrace = {
+export type FunctionInvocation = {
   caller_address: string;
   contract_address: string;
-  code_address: string;
-  selector: string;
   calldata: RawCalldata;
+  call_type?: string;
+  class_hash?: string;
+  selector?: string;
+  entry_point_type?: EntryPointType;
   result: Array<any>;
   execution_resources: ExecutionResources;
-  internal_call: Array<InvokeFunctionTrace>;
+  internal_calls: Array<FunctionInvocation>;
   events: Array<any>;
   messages: Array<any>;
 };
@@ -54,23 +56,21 @@ export type ExecutionResources = {
 };
 
 export type GetTransactionTraceResponse = {
-  function_invocation: {
-    caller_address: string;
-    contract_address: string;
-    code_address: string;
-    selector: string;
-    calldata: RawArgs;
-    result: Array<any>;
-    execution_resources: ExecutionResources;
-    internal_call: Array<any>;
-    events: Array<any>;
-    messages: Array<any>;
-  };
+  validate_invocation?: FunctionInvocation;
+  function_invocation?: FunctionInvocation;
+  fee_transfer_invocation?: FunctionInvocation;
   signature: Signature;
 };
 
 export type RawArgs = {
   [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
+};
+
+export type CallL1Handler = {
+  from_address: string;
+  to_address: string;
+  entry_point_selector: string;
+  payload: Array<string>;
 };
 
 export namespace Sequencer {
@@ -199,6 +199,7 @@ export namespace Sequencer {
     status: Status;
     gas_price: string;
     sequencer_address: string;
+    starknet_version: string;
   };
 
   export type CallContractTransaction = Omit<
@@ -342,6 +343,11 @@ export namespace Sequencer {
       };
       REQUEST: never;
       RESPONSE: any;
+    };
+    estimate_message_fee: {
+      QUERY: any;
+      REQUEST: any;
+      RESPONSE: EstimateFeeResponse;
     };
   };
 }
