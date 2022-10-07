@@ -10,6 +10,7 @@ import {
   compiledErc20,
   compiledOpenZeppelinAccount,
   describeIfNotDevnet,
+  getERC20DeployPayload,
   getTestProvider,
 } from './fixtures';
 
@@ -24,11 +25,14 @@ describe('defaultProvider', () => {
   let exampleBlock: GetBlockResponse;
   let exampleBlockNumber: BlockNumber;
   let exampleBlockHash: string;
+  const wallet = stark.randomAddress();
 
   beforeAll(async () => {
-    const { transaction_hash, contract_address } = await testProvider.deployContract({
-      contract: compiledErc20,
-    });
+    const erc20DeployPayload = getERC20DeployPayload(wallet);
+
+    const { contract_address, transaction_hash } = await testProvider.deployContract(
+      erc20DeployPayload
+    );
     await testProvider.waitForTransaction(transaction_hash);
     exampleTransactionHash = transaction_hash;
     exampleContractAddress = contract_address;
@@ -101,7 +105,7 @@ describe('defaultProvider', () => {
       return expect(
         testProvider.callContract({
           contractAddress: exampleContractAddress,
-          entrypoint: 'balance_of',
+          entrypoint: 'balanceOf',
           calldata: compileCalldata({
             user: '0x9ff64f4ab0e1fe88df4465ade98d1ea99d5732761c39279b8e1374fa943e9b',
           }),
@@ -123,15 +127,6 @@ describe('defaultProvider', () => {
   });
 
   describe('addTransaction()', () => {
-    test('declareContract()', async () => {
-      const response = await testProvider.declareContract({
-        contract: compiledErc20,
-      });
-
-      expect(response.transaction_hash).toBeDefined();
-      expect(response.class_hash).toBeDefined();
-    });
-
     test('deployContract()', async () => {
       const response = await testProvider.deployContract({
         contract: compiledOpenZeppelinAccount,
@@ -221,6 +216,7 @@ describe('defaultProvider', () => {
           expect(transaction.transaction_hash).toBeTruthy();
           expect(transaction.contract_address).toBeTruthy();
           expect(Array.isArray(transaction.calldata)).toBe(true);
+          // expect(transaction.entry_point_selector).toBeTruthy();
           expect(Array.isArray(transaction.signature)).toBe(true);
           expect(transaction.max_fee).toBeTruthy();
         });
@@ -260,12 +256,7 @@ describe('defaultProvider', () => {
 
         beforeAll(async () => {
           deployResponse = await provider.deployContract({ contract: compiledErc20 });
-          console.log(
-            '🚀 ~ file: defaultProvider.test.ts ~ line 264 ~ beforeAll ~ deployResponse',
-            deployResponse
-          );
           contractAddress = deployResponse.contract_address;
-          declareResponse = await provider.declareContract({ contract: compiledErc20 });
           await Promise.all([
             provider.waitForTransaction(deployResponse.transaction_hash),
             provider.waitForTransaction(declareResponse.transaction_hash),
@@ -277,13 +268,6 @@ describe('defaultProvider', () => {
           test('response', () => {
             expect(deployResponse.contract_address).toBeTruthy();
             expect(deployResponse.transaction_hash).toBeTruthy();
-          });
-        });
-
-        describe('declareContract', () => {
-          test('response', async () => {
-            expect(declareResponse.class_hash).toBeTruthy();
-            expect(declareResponse.transaction_hash).toBeTruthy();
           });
         });
 

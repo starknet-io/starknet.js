@@ -4,6 +4,7 @@ import {
   compiledErc20,
   describeIfNotDevnet,
   describeIfSequencer,
+  getERC20DeployPayload,
   getTestProvider,
 } from './fixtures';
 
@@ -17,7 +18,7 @@ describeIfSequencer('SequencerProvider', () => {
     sequencerProvider = getTestProvider() as SequencerProvider;
     customSequencerProvider = new Provider({
       sequencer: {
-        baseUrl: 'https://alpha4.starknet.io',
+        baseUrl: 'http://127.0.0.1:5050/',
         feederGatewayUrl: 'feeder_gateway',
         gatewayUrl: 'gateway',
       }, // Similar to arguements used in docs
@@ -26,11 +27,15 @@ describeIfSequencer('SequencerProvider', () => {
 
   describe('Gateway specific methods', () => {
     let exampleTransactionHash: string;
+    const wallet = stark.randomAddress();
 
     beforeAll(async () => {
-      const { transaction_hash, contract_address } = await sequencerProvider.deployContract({
-        contract: compiledErc20,
-      });
+      const erc20DeployPayload = getERC20DeployPayload(wallet);
+
+      const { contract_address, transaction_hash } = await sequencerProvider.deployContract(
+        erc20DeployPayload
+      );
+
       await sequencerProvider.waitForTransaction(transaction_hash);
       exampleTransactionHash = transaction_hash;
       exampleContractAddress = contract_address;
@@ -67,19 +72,21 @@ describeIfSequencer('SequencerProvider', () => {
     const wallet = stark.randomAddress();
 
     beforeAll(async () => {
-      const { contract_address, transaction_hash } = await customSequencerProvider.deployContract({
-        contract: compiledErc20,
-      });
+      const erc20DeployPayload = getERC20DeployPayload(wallet);
+
+      const { contract_address, transaction_hash } = await customSequencerProvider.deployContract(
+        erc20DeployPayload
+      );
 
       await customSequencerProvider.waitForTransaction(transaction_hash);
       erc20 = new Contract(compiledErc20.abi, contract_address, customSequencerProvider);
     });
 
     test('Check ERC20 balance using Custom Sequencer Provider', async () => {
-      const result = await erc20.balance_of(wallet);
+      const result = await erc20.balanceOf(wallet);
       const [res] = result;
-      expect(res).toStrictEqual(toBN(0));
-      expect(res).toStrictEqual(result.res);
+      expect(res.low).toStrictEqual(toBN(1000));
+      expect(res).toStrictEqual(result.balance);
     });
   });
 });
