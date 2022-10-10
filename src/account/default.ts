@@ -134,7 +134,7 @@ export class Account extends Provider implements AccountInterface {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
     let maxFee: BigNumberish = ZERO;
-    if (transactionsDetail.maxFee || transactionsDetail.maxFee === 0) {
+    if (transactionsDetail.maxFee) {
       maxFee = transactionsDetail.maxFee;
     } else {
       const { suggestedMaxFee } = await this.estimateInvokeFee(transactions, { nonce });
@@ -171,9 +171,9 @@ export class Account extends Provider implements AccountInterface {
     transactionsDetail: InvocationsDetails = {}
   ): Promise<DeclareContractResponse> {
     const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
-    let maxFee: BigNumberish = '0';
+    let maxFee: BigNumberish = ZERO;
 
-    if (transactionsDetail.maxFee || transactionsDetail.maxFee === 0) {
+    if (transactionsDetail.maxFee) {
       maxFee = transactionsDetail.maxFee;
     } else {
       const { suggestedMaxFee } = await this.estimateDeclareFee(
