@@ -20,9 +20,8 @@ export type DeployContractPayload = {
 };
 
 export type DeclareContractPayload = {
-  // The line is commented until we have Class Hash in the compiled contract
   contract: CompiledContract | string;
-  classHash: string;
+  classHash: string; // Once the classHash is included in CompiledContract, this can be removedf
 };
 
 export type DeclareContractTransaction = {

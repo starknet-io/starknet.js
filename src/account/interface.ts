@@ -22,14 +22,14 @@ export abstract class AccountInterface extends ProviderInterface {
 
   /**
    * @deprecated Use estimateInvokeFee or estimateDeclareFee instead
-   * Estimate Fee for a method on starknet
+   * Estimate Fee for executing an INVOKE transaction on starknet
    *
    * @param calls the invocation object containing:
    * - contractAddress - the address of the contract
    * - entrypoint - the entrypoint of the contract
    * - calldata - (defaults to []) the calldata
    *
-   * @returns response from addTransaction
+   * @returns response from estimate_fee
    */
   public abstract estimateFee(
     calls: Call | Call[],
@@ -37,23 +37,32 @@ export abstract class AccountInterface extends ProviderInterface {
   ): Promise<EstimateFeeResponse>;
 
   /**
-   * Estimate Fee for a method on starknet
+   * Estimate Fee for executing an INVOKE transaction on starknet
    *
    * @param calls the invocation object containing:
    * - contractAddress - the address of the contract
    * - entrypoint - the entrypoint of the contract
    * - calldata - (defaults to []) the calldata
    *
-   * @returns response from addTransaction
+   * @returns response from estimate_fee
    */
   public abstract estimateInvokeFee(
     calls: Call | Call[],
     estimateFeeDetails?: EstimateFeeDetails
   ): Promise<EstimateFeeResponse>;
 
+  /**
+   * Estimate Fee for executing a DECLARE transaction on starknet
+   *
+   * @param contractPayload the payload object containing:
+   * - contract - the compiled contract to be declared
+   * - classHash - the class hash of the compiled contract. This can be obtained by using starknet-cli.
+   *
+   * @returns response from estimate_fee
+   */
   public abstract estimateDeclareFee(
     contractPayload: DeclareContractPayload,
-    transactionsDetail?: EstimateFeeDetails
+    estimateFeeDetails?: EstimateFeeDetails
   ): Promise<EstimateFeeResponse>;
 
   /**
