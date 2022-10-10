@@ -210,6 +210,14 @@ export class RpcProvider implements ProviderInterface {
     throw new Error('RPC 0.1.0 does not implement getCode function');
   }
 
+  public async getEstimateFee(
+    invocation: Invocation,
+    invocationDetails: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<EstimateFeeResponse> {
+    return this.getInvokeEstimateFee(invocation, invocationDetails, blockIdentifier);
+  }
+
   public async getInvokeEstimateFee(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,

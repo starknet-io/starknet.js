@@ -336,6 +336,14 @@ export class SequencerProvider implements ProviderInterface {
     }).then(this.responseParser.parseDeclareContractResponse);
   }
 
+  public async getEstimateFee(
+    invocation: Invocation,
+    invocationDetails: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<EstimateFeeResponse> {
+    return this.getInvokeEstimateFee(invocation, invocationDetails, blockIdentifier);
+  }
+
   public async getInvokeEstimateFee(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,

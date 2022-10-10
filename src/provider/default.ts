@@ -61,6 +61,14 @@ export class Provider implements ProviderInterface {
     return this.provider.getClassAt(contractAddress, blockIdentifier);
   }
 
+  public async getEstimateFee(
+    invocationWithTxType: Invocation,
+    invocationDetails: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<EstimateFeeResponse> {
+    return this.provider.getEstimateFee(invocationWithTxType, invocationDetails, blockIdentifier);
+  }
+
   public async getInvokeEstimateFee(
     invocationWithTxType: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,

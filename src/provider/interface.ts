@@ -162,6 +162,27 @@ export abstract class ProviderInterface {
 
   /**
    * Estimates the fee for a given INVOKE transaction
+   * @deprecated Please use getInvokeEstimateFee or getDeclareEstimateFee instead
+   *
+   * @param invocation the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   * @param blockIdentifier - block identifier
+   * @param details - optional details containing:
+   * - nonce - optional nonce
+   * - version - optional version
+   * @returns the estimated fee
+   */
+  public abstract getEstimateFee(
+    invocation: Invocation,
+    details: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier
+  ): Promise<EstimateFeeResponse>;
+
+  /**
+   * Estimates the fee for a given INVOKE transaction
    *
    * @param invocation the invocation object containing:
    * - contractAddress - the address of the contract

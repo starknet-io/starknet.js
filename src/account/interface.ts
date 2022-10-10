@@ -21,13 +21,28 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract signer: SignerInterface;
 
   /**
+   * @deprecated Use estimateInvokeFee or estimateDeclareFee instead
    * Estimate Fee for a method on starknet
    *
-   * @param invocation the invocation object containing:
+   * @param calls the invocation object containing:
    * - contractAddress - the address of the contract
    * - entrypoint - the entrypoint of the contract
    * - calldata - (defaults to []) the calldata
-   * - signature - (defaults to []) the signature
+   *
+   * @returns response from addTransaction
+   */
+  public abstract estimateFee(
+    calls: Call | Call[],
+    estimateFeeDetails?: EstimateFeeDetails
+  ): Promise<EstimateFeeResponse>;
+
+  /**
+   * Estimate Fee for a method on starknet
+   *
+   * @param calls the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
    *
    * @returns response from addTransaction
    */

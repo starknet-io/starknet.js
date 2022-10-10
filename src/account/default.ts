@@ -7,6 +7,7 @@ import {
   Abi,
   Call,
   DeclareContractResponse,
+  EstimateFeeResponse,
   InvocationsDetails,
   InvocationsSignerDetails,
   InvokeFunctionResponse,
@@ -41,6 +42,13 @@ export class Account extends Provider implements AccountInterface {
 
   public async getNonce(blockIdentifier?: BlockIdentifier): Promise<BigNumberish> {
     return super.getNonce(this.address, blockIdentifier);
+  }
+
+  public async estimateFee(
+    calls: Call | Call[],
+    estimateFeeDetails?: EstimateFeeDetails | undefined
+  ): Promise<EstimateFeeResponse> {
+    return this.estimateInvokeFee(calls, estimateFeeDetails);
   }
 
   public async estimateInvokeFee(
@@ -125,7 +133,7 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<InvokeFunctionResponse> {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
-    let maxFee: BigNumberish = '0';
+    let maxFee: BigNumberish = ZERO;
     if (transactionsDetail.maxFee || transactionsDetail.maxFee === 0) {
       maxFee = transactionsDetail.maxFee;
     } else {
