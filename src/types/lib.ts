@@ -21,7 +21,7 @@ export type DeployContractPayload = {
 
 export type DeclareContractPayload = {
   contract: CompiledContract | string;
-  classHash: string; // Once the classHash is included in CompiledContract, this can be removedf
+  classHash: BigNumberish; // Once the classHash is included in CompiledContract, this can be removedf
 };
 
 export type DeclareContractTransaction = {

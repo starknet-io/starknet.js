@@ -149,7 +149,7 @@ export function calculateDeployTransactionHash(
 
 export function calculateDeclareTransactionHash(
   // contractClass: ContractClass, // Should be used once class hash is present in ContractClass
-  classHash: string,
+  classHash: BigNumberish,
   senderAddress: BigNumberish,
   version: BigNumberish,
   maxFee: BigNumberish,

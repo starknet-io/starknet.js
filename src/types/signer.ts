@@ -9,7 +9,7 @@ export interface InvocationsSignerDetails extends Required<InvocationsDetails> {
 
 export interface DeclareSignerDetails {
   // contractClass: ContractClass,  // Should be used once class hash is present in ContractClass
-  classHash: string;
+  classHash: BigNumberish;
   senderAddress: BigNumberish;
   chainId: StarknetChainId;
   maxFee: BigNumberish;
