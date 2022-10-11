@@ -168,6 +168,30 @@ export function calculateDeclareTransactionHash(
   );
 }
 
+export function calculateDeployAccountTransactionHash(
+  contractAddress: BigNumberish,
+  classHash: BigNumberish,
+  constructorCalldata: BigNumberish[],
+  salt: BigNumberish,
+  version: BigNumberish,
+  maxFee: BigNumberish,
+  chainId: StarknetChainId,
+  nonce: BigNumberish
+) {
+  const calldata = [classHash, salt, ...constructorCalldata];
+
+  return calculateTransactionHashCommon(
+    TransactionHashPrefix.DEPLOY_ACCOUNT,
+    version,
+    contractAddress,
+    0,
+    calldata,
+    maxFee,
+    chainId,
+    [nonce]
+  );
+}
+
 export function calculateTransactionHash(
   contractAddress: BigNumberish,
   version: BigNumberish,

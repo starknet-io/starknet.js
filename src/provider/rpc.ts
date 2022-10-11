@@ -15,7 +15,11 @@ import {
   InvokeFunctionResponse,
 } from '../types';
 import { RPC } from '../types/api';
-import { DeclareContractTransaction } from '../types/lib';
+import {
+  DeclareContractTransaction,
+  DeployAccountContractPayload,
+  DeployAccountContractTransaction,
+} from '../types/lib';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
@@ -264,6 +268,27 @@ export class RpcProvider implements ProviderInterface {
     }).then(this.responseParser.parseFeeEstimateResponse);
   }
 
+  public async getDeployAccountEstimateFee(
+    { classHash, constructorCalldata, addressSalt, signature }: DeployAccountContractTransaction,
+    details: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<EstimateFeeResponse> {
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint('starknet_estimateFee', {
+      request: {
+        type: 'DEPLOY_ACCOUNT',
+        constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
+        class_hash: toHex(toBN(classHash)),
+        contract_address_salt: toHex(toBN(addressSalt || 0)),
+        signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
+        version: toHex(toBN(details?.version || 0)),
+        nonce: toHex(toBN(details.nonce)),
+        max_fee: toHex(toBN(details?.maxFee || 0)),
+      },
+      block_id,
+    }).then(this.responseParser.parseFeeEstimateResponse);
+  }
+
   // TODO: Revisit after Pathfinder release with JSON-RPC v0.2.1 RPC Spec
   public async declareContract(
     { contractDefinition, signature, senderAddress }: DeclareContractTransaction,
@@ -298,6 +323,18 @@ export class RpcProvider implements ProviderInterface {
         entry_points_by_type: contractDefinition.entry_points_by_type,
         abi: contractDefinition.abi, // rpc 2.0
       },
+    });
+  }
+
+  public async deployAccountContract({
+    classHash,
+    constructorCalldata,
+    addressSalt,
+  }: DeployAccountContractPayload): Promise<DeployContractResponse> {
+    return this.fetchEndpoint('starknet_addDeployAccountTransaction', {
+      constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
+      class_hash: toHex(toBN(classHash)),
+      contract_address_salt: toHex(toBN(addressSalt || 0)),
     });
   }
 

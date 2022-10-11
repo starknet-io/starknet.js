@@ -5,13 +5,18 @@ import {
   Abi,
   Call,
   DeclareContractResponse,
+  DeployContractResponse,
   EstimateFeeDetails,
   EstimateFeeResponse,
   InvocationsDetails,
   InvokeFunctionResponse,
   Signature,
 } from '../types';
-import { DeclareContractPayload } from '../types/lib';
+import {
+  DeclareContractPayload,
+  DeployAccountContractPayload,
+  DeployAccountContractTransaction,
+} from '../types/lib';
 import { BigNumberish } from '../utils/number';
 import { TypedData } from '../utils/typedData/types';
 
@@ -66,6 +71,20 @@ export abstract class AccountInterface extends ProviderInterface {
   ): Promise<EstimateFeeResponse>;
 
   /**
+   * Estimate Fee for executing a DEPLOY_ACCOUNT transaction on starknet
+   *
+   * @param contractPayload the payload object containing:
+   * - contract - the compiled contract to be declared
+   * - classHash - the class hash of the compiled contract. This can be obtained by using starknet-cli.
+   *
+   * @returns response from estimate_fee
+   */
+  public abstract estimateAccountDeployFee(
+    contractPayload: DeployAccountContractPayload,
+    estimateFeeDetails?: EstimateFeeDetails
+  ): Promise<EstimateFeeResponse>;
+
+  /**
    * Invoke execute function in account contract
    *
    * @param transactions the invocation object or an array of them, containing:
@@ -99,6 +118,24 @@ export abstract class AccountInterface extends ProviderInterface {
     contractPayload: DeclareContractPayload,
     transactionsDetail?: InvocationsDetails
   ): Promise<DeclareContractResponse>;
+
+  /**
+   * Deploy the account on Starknet
+   * @param contractPayload transaction payload to be deployed containing:
+   * - classHash: computed class hash of compiled contract
+   * - constructor calldata
+   * - address salt  
+  - signature
+   * @param transactionsDetail Invocation Details containing:
+  - optional nonce
+  - optional version
+  - optional maxFee
+   * @returns a confirmation of sending a transaction on the starknet contract
+   */
+  public abstract deployAccount(
+    contractPayload: DeployAccountContractTransaction,
+    transactionsDetail?: InvocationsDetails
+  ): Promise<DeployContractResponse>;
 
   /**
    * Sign an JSON object for off-chain usage with the starknet private key and return the signature

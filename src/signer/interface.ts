@@ -1,4 +1,5 @@
 import { Abi, Call, DeclareSignerDetails, InvocationsSignerDetails, Signature } from '../types';
+import { DeployAccountSignerDetails } from '../types/signer';
 import { TypedData } from '../utils/typedData';
 
 export abstract class SignerInterface {
@@ -35,6 +36,22 @@ export abstract class SignerInterface {
     transactions: Call[],
     transactionsDetail: InvocationsSignerDetails,
     abis?: Abi[]
+  ): Promise<Signature>;
+
+  /**
+   * Signs a DEPLOY_ACCOUNT transaction with the starknet private key and returns the signature
+   * @param transaction
+   * - contractAddress - the computed address of the contract
+   * - constructorCalldata - calldata to be passed in deploy constructor
+   * - addressSalt - contract address salt
+   * - chainId - the chainId to declare contract on
+   * - maxFee - maxFee for the declare transaction
+   * - version - transaction version
+   * - nonce - Nonce of the declare transaction
+   * @returns signature
+   */
+  public abstract signDeployAccountTransaction(
+    transaction: DeployAccountSignerDetails
   ): Promise<Signature>;
 
   /**

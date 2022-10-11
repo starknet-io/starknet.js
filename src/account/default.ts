@@ -7,6 +7,7 @@ import {
   Abi,
   Call,
   DeclareContractResponse,
+  DeployContractResponse,
   EstimateFeeResponse,
   InvocationsDetails,
   InvocationsSignerDetails,
@@ -15,8 +16,8 @@ import {
   Signature,
 } from '../types';
 import { EstimateFee, EstimateFeeDetails } from '../types/account';
-import { DeclareContractPayload } from '../types/lib';
-import { transactionVersion } from '../utils/hash';
+import { DeclareContractPayload, DeployAccountContractPayload } from '../types/lib';
+import { calculateContractAddressFromHash, transactionVersion } from '../utils/hash';
 import { BigNumberish, toBN } from '../utils/number';
 import { parseContract } from '../utils/provider';
 import { compileCalldata, estimatedFeeToMaxFee } from '../utils/stark';
@@ -116,6 +117,56 @@ export class Account extends Provider implements AccountInterface {
     };
   }
 
+  public async estimateAccountDeployFee(
+    {
+      classHash,
+      addressSalt = 0,
+      constructorCalldata = [],
+      contractAddress: providedContractAddress,
+    }: DeployAccountContractPayload,
+    { blockIdentifier, nonce: providedNonce }: EstimateFeeDetails = {}
+  ): Promise<EstimateFee> {
+    const nonce = toBN(providedNonce ?? (await this.getNonce()));
+    const version = toBN(transactionVersion);
+    const chainId = await this.getChainId();
+
+    let contractAddress = ZERO.toString();
+
+    if (!providedContractAddress) {
+      contractAddress = calculateContractAddressFromHash(
+        addressSalt,
+        classHash,
+        constructorCalldata,
+        0
+      );
+    } else {
+      contractAddress = providedContractAddress;
+    }
+
+    const signature = await this.signer.signDeployAccountTransaction({
+      classHash,
+      contractAddress,
+      chainId,
+      maxFee: ZERO,
+      version,
+      nonce,
+      addressSalt,
+      constructorCalldata,
+    });
+
+    const response = await super.getDeployAccountEstimateFee(
+      { classHash, addressSalt, constructorCalldata, signature },
+      { version, nonce },
+      blockIdentifier
+    );
+    const suggestedMaxFee = estimatedFeeToMaxFee(response.overall_fee);
+
+    return {
+      ...response,
+      suggestedMaxFee,
+    };
+  }
+
   /**
    * Invoke execute function in account contract
    *
@@ -201,6 +252,67 @@ export class Account extends Provider implements AccountInterface {
 
     return this.declareContract(
       { contractDefinition, senderAddress: this.address, signature },
+      {
+        nonce,
+        maxFee,
+        version,
+      }
+    );
+  }
+
+  public async deployAccount(
+    {
+      classHash,
+      constructorCalldata = [],
+      addressSalt = 0,
+      contractAddress: providedContractAddress,
+    }: DeployAccountContractPayload,
+    transactionsDetail: InvocationsDetails = {}
+  ): Promise<DeployContractResponse> {
+    const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
+    let maxFee: BigNumberish = '0';
+
+    if (transactionsDetail.maxFee || transactionsDetail.maxFee === 0) {
+      maxFee = transactionsDetail.maxFee;
+    } else {
+      const { suggestedMaxFee } = await this.estimateAccountDeployFee(
+        { addressSalt, classHash, constructorCalldata },
+        {
+          nonce,
+        }
+      );
+      maxFee = suggestedMaxFee.toString();
+    }
+
+    const version = toBN(transactionVersion);
+    const chainId = await this.getChainId();
+
+    let contractAddress = ZERO.toString();
+
+    if (!providedContractAddress) {
+      contractAddress = calculateContractAddressFromHash(
+        addressSalt,
+        classHash,
+        constructorCalldata,
+        0
+      );
+    } else {
+      contractAddress = providedContractAddress;
+    }
+
+    const signature = await this.signer.signDeployAccountTransaction({
+      classHash,
+      constructorCalldata,
+      contractAddress,
+      addressSalt,
+      chainId,
+      maxFee,
+      version,
+      nonce,
+    });
+
+    return this.deployAccountContract(
+      { classHash, addressSalt, constructorCalldata, signature },
       {
         nonce,
         maxFee,

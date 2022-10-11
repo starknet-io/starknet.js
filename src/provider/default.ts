@@ -15,7 +15,7 @@ import {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
 } from '../types';
-import { DeclareContractTransaction } from '../types/lib';
+import { DeclareContractTransaction, DeployAccountContractTransaction } from '../types/lib';
 import { BigNumberish } from '../utils/number';
 import { ProviderInterface } from './interface';
 import { RpcProvider, RpcProviderOptions } from './rpc';
@@ -122,6 +122,13 @@ export class Provider implements ProviderInterface {
     return this.provider.deployContract(payload);
   }
 
+  public async deployAccountContract(
+    payload: DeployAccountContractTransaction,
+    details: InvocationsDetailsWithNonce
+  ): Promise<DeployContractResponse> {
+    return this.provider.deployAccountContract(payload, details);
+  }
+
   public async declareContract(
     transaction: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce
@@ -135,6 +142,14 @@ export class Provider implements ProviderInterface {
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<EstimateFeeResponse> {
     return this.provider.getDeclareEstimateFee(transaction, details, blockIdentifier);
+  }
+
+  public getDeployAccountEstimateFee(
+    transaction: DeployAccountContractTransaction,
+    details: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<EstimateFeeResponse> {
+    return this.provider.getDeployAccountEstimateFee(transaction, details, blockIdentifier);
   }
 
   public async getCode(

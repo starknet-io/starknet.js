@@ -15,7 +15,11 @@ import type {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
 } from '../types';
-import { DeclareContractTransaction } from '../types/lib';
+import {
+  DeclareContractTransaction,
+  DeployAccountContractPayload,
+  DeployAccountContractTransaction,
+} from '../types/lib';
 import type { BigNumberish } from '../utils/number';
 import { BlockIdentifier } from './utils';
 
@@ -124,6 +128,20 @@ export abstract class ProviderInterface {
   public abstract deployContract(payload: DeployContractPayload): Promise<DeployContractResponse>;
 
   /**
+   * Deploys a given compiled Account contract (json) to starknet
+   *
+   * @param payload payload to be deployed containing:
+   * - compiled contract code
+   * - constructor calldata
+   * - address salt
+   * @returns a confirmation of sending a transaction on the starknet contract
+   */
+  public abstract deployAccountContract(
+    payload: DeployAccountContractPayload,
+    details: InvocationsDetailsWithNonce
+  ): Promise<DeployContractResponse>;
+
+  /**
    * Invokes a function on starknet
    * @deprecated This method wont be supported as soon as fees are mandatory
    *
@@ -204,7 +222,7 @@ export abstract class ProviderInterface {
   /**
    * Estimates the fee for a given DECLARE transaction
    *
-   * @param transaction transaction payload to be deployed containing:
+   * @param transaction transaction payload to be declared containing:
    * - compiled contract code
    * - sender address
    * - signature - (defaults to []) the signature
@@ -217,6 +235,27 @@ export abstract class ProviderInterface {
    */
   public abstract getDeclareEstimateFee(
     transaction: DeclareContractTransaction,
+    details: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier
+  ): Promise<EstimateFeeResponse>;
+
+  /**
+   * Estimates the fee for a given DEPLOY_ACCOUNT transaction
+   *
+   * @param transaction transaction payload to be deployed containing:
+   * - classHash
+   * - constructorCalldata
+   * - addressSalt
+   * - signature - (defaults to []) the signature
+   * @param details - optional details containing:
+   * - nonce
+   * - version - optional version
+   * - optional maxFee
+   * @param blockIdentifier - block identifier
+   * @returns the estimated fee
+   */
+  public abstract getDeployAccountEstimateFee(
+    transaction: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,
     blockIdentifier: BlockIdentifier
   ): Promise<EstimateFeeResponse>;

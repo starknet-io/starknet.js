@@ -1,6 +1,6 @@
 import { StarknetChainId } from '../constants';
 import { BigNumberish } from '../utils/number';
-import { InvocationsDetails } from './lib';
+import { DeployAccountContractPayload, InvocationsDetails } from './lib';
 
 export interface InvocationsSignerDetails extends Required<InvocationsDetails> {
   walletAddress: string;
@@ -16,3 +16,9 @@ export interface DeclareSignerDetails {
   version: BigNumberish;
   nonce: BigNumberish;
 }
+
+export type DeployAccountSignerDetails = Required<DeployAccountContractPayload> &
+  Required<InvocationsDetails> & {
+    contractAddress: BigNumberish;
+    chainId: StarknetChainId;
+  };

@@ -92,6 +92,17 @@ export namespace Sequencer {
     nonce?: BigNumberish;
   };
 
+  export type DeployAccountTransaction = {
+    type: 'DEPLOY_ACCOUNT';
+    class_hash: string;
+    contract_address_salt: BigNumberish;
+    constructor_calldata: string[];
+    signature?: Signature;
+    max_fee?: BigNumberish;
+    version?: BigNumberish;
+    nonce?: BigNumberish;
+  };
+
   export type InvokeFunctionTransaction = {
     type: 'INVOKE_FUNCTION';
     contract_address: string;
@@ -103,7 +114,11 @@ export namespace Sequencer {
     version?: BigNumberish;
   };
 
-  export type Transaction = DeclareTransaction | DeployTransaction | InvokeFunctionTransaction;
+  export type Transaction =
+    | DeclareTransaction
+    | DeployTransaction
+    | InvokeFunctionTransaction
+    | DeployAccountTransaction;
 
   export type AddTransactionResponse = {
     transaction_hash: string;
@@ -213,9 +228,14 @@ export namespace Sequencer {
 
   export type InvokeEstimateFee = Omit<InvokeFunctionTransaction, 'max_fee' | 'entry_point_type'>;
   export type DeclareEstimateFee = Omit<DeclareTransaction, 'max_fee'>;
+  export type DeployAccountEstimateFee = Omit<DeployAccountTransaction, 'max_fee'>;
   export type DeployEstimateFee = DeployTransaction;
 
-  export type EstimateFeeRequest = InvokeEstimateFee | DeclareEstimateFee | DeployEstimateFee;
+  export type EstimateFeeRequest =
+    | InvokeEstimateFee
+    | DeclareEstimateFee
+    | DeployEstimateFee
+    | DeployAccountEstimateFee;
 
   // Support 0.9.1 changes in a backward-compatible way
   export type EstimateFeeResponse =

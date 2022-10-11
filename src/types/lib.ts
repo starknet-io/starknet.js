@@ -19,6 +19,20 @@ export type DeployContractPayload = {
   addressSalt?: string;
 };
 
+export type DeployAccountContractPayload = {
+  classHash: BigNumberish;
+  constructorCalldata?: RawCalldata;
+  addressSalt?: BigNumberish;
+  contractAddress?: string;
+};
+
+export type DeployAccountContractTransaction = Omit<
+  DeployAccountContractPayload,
+  'contractAddress'
+> & {
+  signature?: Signature;
+};
+
 export type DeclareContractPayload = {
   contract: CompiledContract | string;
   classHash: BigNumberish; // Once the classHash is included in CompiledContract, this can be removedf
@@ -55,7 +69,7 @@ export type Status =
   | 'ACCEPTED_ON_L1'
   | 'REJECTED';
 export type TransactionStatus = 'TRANSACTION_RECEIVED';
-export type TransactionType = 'DECLARE' | 'DEPLOY' | 'INVOKE_FUNCTION';
+export type TransactionType = 'DECLARE' | 'DEPLOY' | 'INVOKE_FUNCTION' | 'DEPLOY_ACCOUNT';
 export type EntryPointType = 'EXTERNAL';
 export type CompressedProgram = string;
 

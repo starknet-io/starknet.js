@@ -6,8 +6,13 @@ import {
   KeyPair,
   Signature,
 } from '../types';
+import { DeployAccountSignerDetails } from '../types/signer';
 import { genKeyPair, getStarkKey, sign } from '../utils/ellipticCurve';
-import { calculateDeclareTransactionHash, calculateTransactionHash } from '../utils/hash';
+import {
+  calculateDeclareTransactionHash,
+  calculateDeployAccountTransactionHash,
+  calculateTransactionHash,
+} from '../utils/hash';
 import { fromCallsToExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { SignerInterface } from './interface';
@@ -54,6 +59,30 @@ export class Signer implements SignerInterface {
     const msgHash = calculateDeclareTransactionHash(
       classHash,
       senderAddress,
+      version,
+      maxFee,
+      chainId,
+      nonce
+    );
+
+    return sign(this.keyPair, msgHash);
+  }
+
+  public async signDeployAccountTransaction({
+    classHash,
+    contractAddress,
+    constructorCalldata,
+    addressSalt,
+    maxFee,
+    version,
+    chainId,
+    nonce,
+  }: DeployAccountSignerDetails) {
+    const msgHash = calculateDeployAccountTransactionHash(
+      contractAddress,
+      classHash,
+      constructorCalldata,
+      addressSalt,
       version,
       maxFee,
       chainId,
