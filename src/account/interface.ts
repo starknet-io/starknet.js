@@ -4,12 +4,14 @@ import { SignerInterface } from '../signer';
 import {
   Abi,
   Call,
+  DeclareContractResponse,
   EstimateFeeDetails,
   EstimateFeeResponse,
   InvocationsDetails,
   InvokeFunctionResponse,
   Signature,
 } from '../types';
+import { DeclareContractPayload } from '../types/lib';
 import { BigNumberish } from '../utils/number';
 import { TypedData } from '../utils/typedData/types';
 
@@ -19,18 +21,47 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract signer: SignerInterface;
 
   /**
-   * Estimate Fee for a method on starknet
+   * @deprecated Use estimateInvokeFee or estimateDeclareFee instead
+   * Estimate Fee for executing an INVOKE transaction on starknet
    *
-   * @param invocation the invocation object containing:
+   * @param calls the invocation object containing:
    * - contractAddress - the address of the contract
    * - entrypoint - the entrypoint of the contract
    * - calldata - (defaults to []) the calldata
-   * - signature - (defaults to []) the signature
    *
-   * @returns response from addTransaction
+   * @returns response from estimate_fee
    */
   public abstract estimateFee(
     calls: Call | Call[],
+    estimateFeeDetails?: EstimateFeeDetails
+  ): Promise<EstimateFeeResponse>;
+
+  /**
+   * Estimate Fee for executing an INVOKE transaction on starknet
+   *
+   * @param calls the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   *
+   * @returns response from estimate_fee
+   */
+  public abstract estimateInvokeFee(
+    calls: Call | Call[],
+    estimateFeeDetails?: EstimateFeeDetails
+  ): Promise<EstimateFeeResponse>;
+
+  /**
+   * Estimate Fee for executing a DECLARE transaction on starknet
+   *
+   * @param contractPayload the payload object containing:
+   * - contract - the compiled contract to be declared
+   * - classHash - the class hash of the compiled contract. This can be obtained by using starknet-cli.
+   *
+   * @returns response from estimate_fee
+   */
+  public abstract estimateDeclareFee(
+    contractPayload: DeclareContractPayload,
     estimateFeeDetails?: EstimateFeeDetails
   ): Promise<EstimateFeeResponse>;
 
@@ -51,6 +82,23 @@ export abstract class AccountInterface extends ProviderInterface {
     abis?: Abi[],
     transactionsDetail?: InvocationsDetails
   ): Promise<InvokeFunctionResponse>;
+
+  /**
+   * Declares a given compiled contract (json) to starknet
+   * @param contractPayload transaction payload to be deployed containing:
+  - contract: compiled contract code
+  - classHash: computed class hash of compiled contract
+  - signature
+   * @param transactionsDetail Invocation Details containing:
+  - optional nonce
+  - optional version
+  - optional maxFee
+   * @returns a confirmation of sending a transaction on the starknet contract
+   */
+  public abstract declare(
+    contractPayload: DeclareContractPayload,
+    transactionsDetail?: InvocationsDetails
+  ): Promise<DeclareContractResponse>;
 
   /**
    * Sign an JSON object for off-chain usage with the starknet private key and return the signature

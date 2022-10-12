@@ -1,7 +1,8 @@
 import fs from 'fs';
 
 import { Account, ProviderInterface, RpcProvider, SequencerProvider, ec, json } from '../src';
-import { CompiledContract } from '../src/types';
+import { CompiledContract, DeployContractPayload } from '../src/types';
+import { encodeShortString } from '../src/utils/shortString';
 
 const readContract = (name: string): CompiledContract =>
   json.parse(fs.readFileSync(`./__mocks__/${name}.json`).toString('ascii'));
@@ -71,3 +72,10 @@ const describeIf = (condition: boolean) => (condition ? describe : describe.skip
 export const describeIfSequencer = describeIf(IS_DEVNET);
 export const describeIfRpc = describeIf(IS_RPC);
 export const describeIfNotDevnet = describeIf(!IS_DEVNET);
+
+export const getERC20DeployPayload = (recipient: string): DeployContractPayload => {
+  return {
+    contract: compiledErc20,
+    constructorCalldata: [encodeShortString('Token'), encodeShortString('ERC20'), recipient],
+  };
+};

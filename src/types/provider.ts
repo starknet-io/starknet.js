@@ -4,8 +4,7 @@
  */
 import BN from 'bn.js';
 
-import { RPC } from './api/rpc';
-import { Abi, CompressedProgram, RawCalldata, Signature, Status } from './lib';
+import { RawCalldata, Signature, Status } from './lib';
 
 export interface GetBlockResponse {
   timestamp: number;
@@ -45,12 +44,6 @@ export interface InvokeTransactionResponse extends CommonTransactionResponse {
 export interface ContractEntryPoint {
   offset: string;
   selector: string;
-}
-
-export interface ContractClass {
-  program: CompressedProgram;
-  entry_points_by_type: RPC.ContractClass['entry_points_by_type'];
-  abi?: Abi;
 }
 
 export interface DeclareTransactionResponse extends CommonTransactionResponse {

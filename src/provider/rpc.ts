@@ -2,7 +2,6 @@ import { StarknetChainId } from '../constants';
 import {
   Call,
   CallContractResponse,
-  DeclareContractPayload,
   DeclareContractResponse,
   DeployContractPayload,
   DeployContractResponse,
@@ -16,6 +15,7 @@ import {
   InvokeFunctionResponse,
 } from '../types';
 import { RPC } from '../types/api';
+import { DeclareContractTransaction } from '../types/lib';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
@@ -215,32 +215,71 @@ export class RpcProvider implements ProviderInterface {
     invocationDetails: InvocationsDetailsWithNonce,
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<EstimateFeeResponse> {
+    return this.getInvokeEstimateFee(invocation, invocationDetails, blockIdentifier);
+  }
+
+  public async getInvokeEstimateFee(
+    invocation: Invocation,
+    invocationDetails: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<EstimateFeeResponse> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_estimateFee', {
       request: {
+        type: 'INVOKE',
         contract_address: invocation.contractAddress,
         calldata: parseCalldata(invocation.calldata),
         signature: bigNumberishArrayToHexadecimalStringArray(invocation.signature || []),
         version: toHex(toBN(invocationDetails?.version || 0)),
+        nonce: toHex(toBN(invocationDetails.nonce)),
         max_fee: toHex(toBN(invocationDetails?.maxFee || 0)),
       },
       block_id,
     }).then(this.responseParser.parseFeeEstimateResponse);
   }
 
-  public async declareContract({
-    contract,
-    version,
-  }: DeclareContractPayload): Promise<DeclareContractResponse> {
-    const contractDefinition = parseContract(contract);
+  // TODO: Revisit after Pathfinder release with JSON-RPC v0.2.1 RPC Spec
 
+  public async getDeclareEstimateFee(
+    { senderAddress, contractDefinition, signature }: DeclareContractTransaction,
+    details: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<EstimateFeeResponse> {
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint('starknet_estimateFee', {
+      request: {
+        type: 'DECLARE',
+        contract_class: {
+          program: contractDefinition.program,
+          entry_points_by_type: contractDefinition.entry_points_by_type,
+          abi: contractDefinition.abi, // rpc 2.0
+        },
+        sender_address: senderAddress,
+        signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
+        version: toHex(toBN(details?.version || 0)),
+        nonce: toHex(toBN(details.nonce)),
+        max_fee: toHex(toBN(details?.maxFee || 0)),
+      },
+      block_id,
+    }).then(this.responseParser.parseFeeEstimateResponse);
+  }
+
+  // TODO: Revisit after Pathfinder release with JSON-RPC v0.2.1 RPC Spec
+  public async declareContract(
+    { contractDefinition, signature, senderAddress }: DeclareContractTransaction,
+    details: InvocationsDetailsWithNonce
+  ): Promise<DeclareContractResponse> {
     return this.fetchEndpoint('starknet_addDeclareTransaction', {
       contract_class: {
         program: contractDefinition.program,
         entry_points_by_type: contractDefinition.entry_points_by_type,
         abi: contractDefinition.abi, // rpc 2.0
       },
-      version: toHex(toBN(version || 0)),
+      version: toHex(toBN(details.version || 0)),
+      max_fee: toHex(toBN(details.maxFee || 0)),
+      signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
+      sender_address: senderAddress,
+      nonce: toHex(toBN(details.nonce)),
     });
   }
 

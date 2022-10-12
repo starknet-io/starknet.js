@@ -1,6 +1,7 @@
 import { isBN } from 'bn.js';
 
 import { Contract, ContractFactory, stark } from '../src';
+import { DeployContractPayload } from '../src/types/lib';
 import { getSelectorFromName } from '../src/utils/hash';
 import { BigNumberish, toBN } from '../src/utils/number';
 import { compileCalldata } from '../src/utils/stark';
@@ -8,6 +9,7 @@ import {
   compiledErc20,
   compiledMulticall,
   compiledTypeTransformation,
+  getERC20DeployPayload,
   getTestProvider,
 } from './fixtures';
 
@@ -21,9 +23,12 @@ describe('class Contract {}', () => {
     let contract: Contract;
 
     beforeAll(async () => {
-      const { transaction_hash, contract_address } = await provider.deployContract({
-        contract: compiledErc20,
-      });
+      const erc20DeployPayload = getERC20DeployPayload(wallet);
+
+      const { contract_address, transaction_hash } = await provider.deployContract(
+        erc20DeployPayload
+      );
+
       erc20 = new Contract(compiledErc20.abi, contract_address!, provider);
       await provider.waitForTransaction(transaction_hash);
       // Deploy Multicall
@@ -39,21 +44,21 @@ describe('class Contract {}', () => {
     });
 
     test('populate transaction for initial balance of that account', async () => {
-      const res = await erc20.populateTransaction.balance_of(wallet);
+      const res = await erc20.populateTransaction.balanceOf(wallet);
       expect(res).toHaveProperty('contractAddress');
       expect(res).toHaveProperty('entrypoint');
       expect(res).toHaveProperty('calldata');
     });
 
     test('estimate gas fee for `mint` should fail when connected to the provider', async () => {
-      expect(erc20.estimateFee.mint(wallet, '10')).rejects.toThrow();
+      expect(erc20.estimateFee.mint(wallet, ['10', '0'])).rejects.toThrow();
     });
 
     test('read initial balance of that account', async () => {
-      const result = await erc20.balance_of(wallet);
+      const result = await erc20.balanceOf(wallet);
       const [res] = result;
-      expect(res).toStrictEqual(toBN(0));
-      expect(res).toStrictEqual(result.res);
+      expect(res.low).toStrictEqual(toBN(1000));
+      expect(res).toStrictEqual(result.balance);
     });
 
     test('read balance in a multicall', async () => {
@@ -61,7 +66,7 @@ describe('class Contract {}', () => {
       const args2 = {};
       const calls = [
         erc20.address,
-        getSelectorFromName('balance_of'),
+        getSelectorFromName('balanceOf'),
         Object.keys(args1).length,
         ...compileCalldata(args1),
 
@@ -190,21 +195,27 @@ describe('class Contract {}', () => {
 
 describe('class ContractFactory {}', () => {
   let erc20Address: string;
+  const wallet = stark.randomAddress();
+  let erc20DeployPayload: DeployContractPayload;
+
   beforeAll(async () => {
-    const { transaction_hash, contract_address } = await provider.deployContract({
-      contract: compiledErc20,
-    });
+    erc20DeployPayload = getERC20DeployPayload(wallet);
+
+    const { contract_address, transaction_hash } = await provider.deployContract(
+      erc20DeployPayload
+    );
+
     await provider.waitForTransaction(transaction_hash);
     erc20Address = contract_address;
   });
   test('deployment of new contract', async () => {
     const factory = new ContractFactory(compiledErc20, provider);
-    const erc20 = await factory.deploy();
+    const erc20 = await factory.deploy(erc20DeployPayload.constructorCalldata);
     expect(erc20 instanceof Contract);
   });
   test('wait for deployment transaction', async () => {
     const factory = new ContractFactory(compiledErc20, provider);
-    const contract = await factory.deploy();
+    const contract = await factory.deploy(erc20DeployPayload.constructorCalldata);
     expect(contract.deployed()).resolves.not.toThrow();
   });
   test('attach new contract', async () => {

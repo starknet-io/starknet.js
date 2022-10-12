@@ -1,6 +1,13 @@
-import { Abi, Call, InvocationsSignerDetails, KeyPair, Signature } from '../types';
+import {
+  Abi,
+  Call,
+  DeclareSignerDetails,
+  InvocationsSignerDetails,
+  KeyPair,
+  Signature,
+} from '../types';
 import { genKeyPair, getStarkKey, sign } from '../utils/ellipticCurve';
-import { calculateTransactionHash } from '../utils/hash';
+import { calculateDeclareTransactionHash, calculateTransactionHash } from '../utils/hash';
 import { fromCallsToExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { SignerInterface } from './interface';
@@ -35,6 +42,22 @@ export class Signer implements SignerInterface {
       transactionsDetail.maxFee,
       transactionsDetail.chainId,
       transactionsDetail.nonce
+    );
+
+    return sign(this.keyPair, msgHash);
+  }
+
+  public async signDeclareTransaction(
+    // contractClass: ContractClass,  // Should be used once class hash is present in ContractClass
+    { classHash, senderAddress, chainId, maxFee, version, nonce }: DeclareSignerDetails
+  ) {
+    const msgHash = calculateDeclareTransactionHash(
+      classHash,
+      senderAddress,
+      version,
+      maxFee,
+      chainId,
+      nonce
     );
 
     return sign(this.keyPair, msgHash);

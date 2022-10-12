@@ -104,6 +104,10 @@ type DECLARE_TXN = COMMON_TXN_PROPERTIES & {
   class_hash: FELT;
   sender_address: ADDRESS;
 };
+type DECLARE_TXN_REQUEST = COMMON_TXN_PROPERTIES & {
+  contract_class: CONTRACT_CLASS;
+  sender_address: ADDRESS;
+};
 type DEPLOY_TXN = {
   transaction_hash: TXN_HASH;
   class_hash: FELT;
@@ -328,7 +332,7 @@ export namespace OPENRPC {
         | Errors.INVALID_BLOCK_ID;
     };
     starknet_estimateFee: {
-      params: { request: INVOKE_TXN; block_id: BLOCK_ID };
+      params: { request: INVOKE_TXN | DECLARE_TXN_REQUEST; block_id: BLOCK_ID };
       result: FEE_ESTIMATE;
       errors:
         | Errors.CONTRACT_NOT_FOUND
@@ -384,7 +388,11 @@ export namespace OPENRPC {
     starknet_addDeclareTransaction: {
       params: {
         contract_class: CONTRACT_CLASS;
+        sender_address: ADDRESS;
+        signature: SIGNATURE;
+        max_fee: NUM_AS_HEX;
         version: NUM_AS_HEX;
+        nonce: FELT;
       };
       result: DeclaredTransaction;
       errors: Errors.INVALID_CONTRACT_CLASS;

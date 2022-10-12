@@ -30,9 +30,30 @@ Gets the new Nonce of the connected account for the next transaction.
 
 <hr />
 
-account.**estimateFee**(calls [ , options ]) => _Promise < EstimateFeeResponse >_
+account.**estimateInvokeFee**(calls [ , options ]) => _Promise < EstimateFeeResponse >_
 
 Gets the estimated fee for the call(s).
+
+The _options_ object may include any of:
+
+- options.**blockIdentifier** - Block Identifier for the transaction
+- options.**nonce** - Nonce for the transaction
+
+###### _EstimateFeeResponse_
+
+```typescript
+{
+  overall_fee: BN;
+  gas_consumed?: BN;
+  gas_price?: BN;
+}
+```
+
+<hr />
+
+account.**estimateDeclareFee**(contractPayload [ , options ]) => _Promise < EstimateFeeResponse >_
+
+Gets the estimated fee for the declare transaction.
 
 The _options_ object may include any of:
 
@@ -70,6 +91,27 @@ The _transactionsDetail_ object may include any of:
 ```
 
 <hr />
+
+account.**declare**(payload [ , transactionsDetail ]) => _Promise < DeclareContractResponse >_
+
+The _transactionsDetail_ object may include any of:
+
+- transactionsDetail.**maxFee** - Max Fee that that will be used to execute the call(s)
+- transactionsDetail.**nonce** - Nonce for the transaction
+- transactionsDetail.**version** - Version for the transaction (default is 1)
+
+Declares a contract on Starknet.
+
+###### _DeclareContractResponse_
+
+```typescript
+{
+  transaction_hash: string;
+  class_hash: string;
+};
+```
+
+<hr/>
 
 account.**signMessage**(typedData) => _Promise < Signature >_
 
