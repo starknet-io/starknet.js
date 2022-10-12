@@ -156,26 +156,15 @@ export function calculateDeclareTransactionHash(
   chainId: StarknetChainId,
   nonce: BigNumberish
 ): string {
-  let calldata: BigNumberish[] = [];
-  let additionalData: BigNumberish[] = [];
-
-  if (version !== ZERO) {
-    calldata = [classHash];
-    additionalData = [nonce];
-  } else {
-    calldata = [];
-    additionalData = [classHash];
-  }
-
   return calculateTransactionHashCommon(
     TransactionHashPrefix.DECLARE,
     version,
     senderAddress,
     0,
-    calldata,
+    [classHash],
     maxFee,
     chainId,
-    additionalData
+    [nonce]
   );
 }
 

@@ -236,7 +236,7 @@ export class SequencerProvider implements ProviderInterface {
       {
         signature: [],
         contract_address: contractAddress,
-        entry_point_selector: getSelectorFromName(entryPointSelector.toString()),
+        entry_point_selector: getSelectorFromName(entryPointSelector),
         calldata,
       }
     ).then(this.responseParser.parseCallContractResponse);

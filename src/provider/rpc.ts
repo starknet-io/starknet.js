@@ -325,7 +325,7 @@ export class RpcProvider implements ProviderInterface {
     const result = await this.fetchEndpoint('starknet_call', {
       request: {
         contract_address: call.contractAddress,
-        entry_point_selector: getSelectorFromName(call.entrypoint.toString()),
+        entry_point_selector: getSelectorFromName(call.entrypoint),
         calldata: parseCalldata(call.calldata),
       },
       block_id,

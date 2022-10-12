@@ -15,7 +15,7 @@ export const transformCallsToMulticallArrays = (calls: Call[]) => {
     const data = call.calldata || [];
     callArray.push({
       to: toBN(call.contractAddress).toString(10),
-      selector: toBN(getSelectorFromName(call.entrypoint.toString())).toString(10),
+      selector: toBN(getSelectorFromName(call.entrypoint)).toString(10),
       data_offset: calldata.length.toString(),
       data_len: data.length.toString(),
     });

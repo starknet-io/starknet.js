@@ -37,7 +37,7 @@ export type CallDetails = {
 
 export type Invocation = CallDetails & { signature?: Signature };
 
-export type Call = CallDetails & { entrypoint: BigNumberish };
+export type Call = CallDetails & { entrypoint: string };
 
 export type InvocationsDetails = {
   nonce?: BigNumberish;
