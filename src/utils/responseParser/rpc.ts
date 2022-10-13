@@ -6,7 +6,6 @@ import {
   CallContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
-  GetTransactionReceiptResponse,
   GetTransactionResponse,
 } from '../../types';
 import { RPC } from '../../types/api';
@@ -21,15 +20,14 @@ type GetTransactionByHashResponse = RPC.GetTransactionByHashResponse & {
   [key: string]: any;
 };
 
-type TransactionReceipt = RPC.TransactionReceipt & {
-  [key: string]: any;
-};
-
 export class RPCResponseParser
   implements
     Omit<
       ResponseParser,
-      'parseDeclareContractResponse' | 'parseDeployContractResponse' | 'parseInvokeFunctionResponse'
+      | 'parseDeclareContractResponse'
+      | 'parseDeployContractResponse'
+      | 'parseInvokeFunctionResponse'
+      | 'parseGetTransactionReceiptResponse'
     >
 {
   public parseGetBlockResponse(res: RpcGetBlockResponse): GetBlockResponse {
@@ -53,20 +51,6 @@ export class RPCResponseParser
       signature: res.signature || [],
       transaction_hash: res.transaction_hash,
       version: res.version,
-    };
-  }
-
-  public parseGetTransactionReceiptResponse(
-    res: TransactionReceipt
-  ): GetTransactionReceiptResponse {
-    return {
-      transaction_hash: res.transaction_hash,
-      actual_fee: res.actual_fee,
-      status: res.status,
-      status_data: res.status_data,
-      messages_sent: res.messages_sent,
-      l1_origin_message: res.l1_origin_message,
-      events: res.events,
     };
   }
 

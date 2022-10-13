@@ -183,9 +183,7 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getTransactionReceipt(txHash: string): Promise<GetTransactionReceiptResponse> {
-    return this.fetchEndpoint('starknet_getTransactionReceipt', { transaction_hash: txHash }).then(
-      this.responseParser.parseGetTransactionReceiptResponse
-    );
+    return this.fetchEndpoint('starknet_getTransactionReceipt', { transaction_hash: txHash });
   }
 
   public async getClass(classHash: RPC.Felt): Promise<RPC.ContractClass> {
@@ -356,9 +354,9 @@ export class RpcProvider implements ProviderInterface {
         // eslint-disable-next-line no-await-in-loop
         const res = await this.getTransactionReceipt(txHash);
 
-        if (successStates.includes(res.status)) {
+        if (res.status && successStates.includes(res.status)) {
           onchain = true;
-        } else if (errorStates.includes(res.status)) {
+        } else if (res.status && errorStates.includes(res.status)) {
           const message = res.status;
           const error = new Error(message) as Error & { response: any };
           error.response = res;

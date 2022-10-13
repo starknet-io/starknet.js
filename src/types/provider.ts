@@ -57,7 +57,7 @@ export type GetTransactionReceiptResponse =
 
 export interface CommonTransactionReceiptResponse {
   transaction_hash: string;
-  status: Status;
+  status?: Status;
   actual_fee?: string;
   status_data?: string;
 }
