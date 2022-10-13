@@ -546,7 +546,7 @@ export class Contract implements ContractInterface {
     options: Overrides = {}
   ): Promise<InvokeFunctionResponse> {
     // ensure contract is connected
-    assert(this.address !== null, 'contract isnt connected to an address');
+    assert(this.address !== null, 'contract is not connected to an address');
     // validate method and args
     this.validateMethodAndArgs('INVOKE', method, args);
 
@@ -606,7 +606,7 @@ export class Contract implements ContractInterface {
     } = {}
   ): Promise<Result> {
     // ensure contract is connected
-    assert(this.address !== null, 'contract isnt connected to an address');
+    assert(this.address !== null, 'contract is not connected to an address');
 
     // validate method and args
     this.validateMethodAndArgs('CALL', method, args);
@@ -628,7 +628,7 @@ export class Contract implements ContractInterface {
 
   public async estimate(method: string, args: Array<any> = []) {
     // ensure contract is connected
-    assert(this.address !== null, 'contract isnt connected to an address');
+    assert(this.address !== null, 'contract is not connected to an address');
 
     // validate method and args
     this.validateMethodAndArgs('INVOKE', method, args);

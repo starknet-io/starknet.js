@@ -8,7 +8,9 @@ The **Provider** API allows you to interact with the StarkNet network, without s
 
 Typically, these are _read_ calls on the blockchain.
 
-## Creating an instance
+## Default Provider
+
+### Creating an instance
 
 `new starknet.Provider(optionsOrProvider)`
 
@@ -53,7 +55,13 @@ These are also the default options for the Provider constructor with `network: '
 >
 > `network` arguement should work in most cases. If you want to use the `sequencer` arguement with `baseUrl`, you will not be able to use the `network` field in the object.
 
-## Methods
+### Methods
+
+<hr/>
+
+provider.**getChainId**() => _Promise < StarknetChainId >_
+
+Returns the chain Id for the current network.
 
 <hr/>
 
@@ -117,6 +125,28 @@ Gets the contract class of the deployed contract.
 
 <hr/>
 
+provider.**getInvokeEstimateFee**(invocationWithTxType, invocationDetails, blockIdentifier) => _Promise < EstimateFeeResponse >_
+
+Estimate fee for invoke transaction.
+
+###### _EstimateFeeResponse_
+
+```typescript
+{
+  overall_fee: BN;
+  gas_consumed?: BN;
+  gas_price?: BN;
+}
+```
+
+<hr/>
+
+provider.**getNonce**(contractAddress, blockIdentifier) => _Promise < BigNumberish >_
+
+Gets the nonce of the provided contractAddress.
+
+<hr/>
+
 provider.**getStorageAt**(contractAddress, key, blockIdentifier) => _Promise < string >_
 
 Gets the contract's storage variable at a specific key.
@@ -175,7 +205,38 @@ Deploys a contract on Starknet.
 ```typescript
 {
   transaction_hash: string;
-  contract_address?: string;
+  contract_address: string;
+};
+```
+
+<hr/>
+
+provider.**declareContract**(transaction, details) => _Promise < DeclareContractResponse >_
+
+Declare a contract on Starknet.
+
+###### _DeclareContractResponse_
+
+```typescript
+{
+  transaction_hash: string;
+  class_hash: string;
+};
+```
+
+<hr/>
+
+provider.**getDeclareEstimateFee**(transaction, details, blockIdentifier) => _Promise < EstimateFeeResponse >_
+
+Estimate fee for declare transaction.
+
+###### _EstimateFeeResponse_
+
+```typescript
+{
+  overall_fee: BN;
+  gas_consumed?: BN;
+  gas_price?: BN;
 };
 ```
 
@@ -185,9 +246,9 @@ provider.**waitForTransaction**(txHash [ , retryInterval]) => _Promise < void >_
 
 Wait for the transaction to be accepted on L2 or L1.
 
-# SequencerProvider
+## SequencerProvider
 
-## Creating an instance
+### Creating an instance
 
 `new starknet.SequencerProvider(optionsOrProvider)`
 
@@ -211,7 +272,7 @@ const provider = new starknet.Provider({
 })
 ```
 
-## Methods
+### Methods
 
 Gets the smart contract address on the network.
 
@@ -282,9 +343,9 @@ Gets the transaction trace from a tx hash.
 }
 ```
 
-# RpcProvider
+## RpcProvider
 
-## Creating an instance
+### Creating an instance
 
 `new starknet.RpcProvider(options)`
 
@@ -298,7 +359,7 @@ const provider = new starknet.RpcProvider({
 })
 ```
 
-## Methods
+### Methods
 
 provider.**getTransactionCount**(blockIdentifier) => _Promise < number >_
 
