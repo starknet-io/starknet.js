@@ -55,7 +55,7 @@ describe('defaultProvider', () => {
     });
 
     test('getBlock() -> { blockNumber }', async () => {
-      const block = await testProvider.getBlock();
+      const block = await testProvider.getBlock('latest');
       return expect(block).toHaveProperty('block_number');
     });
 
@@ -136,7 +136,7 @@ describe('defaultProvider', () => {
     describe(`Provider methods if not devnet`, () => {
       describe('getBlock', () => {
         test('getBlock by tag pending', async () => {
-          latestBlock = await provider.getBlock();
+          latestBlock = await provider.getBlock('latest');
           expect(latestBlock).toHaveProperty('block_hash');
           expect(latestBlock).toHaveProperty('parent_hash');
           expect(latestBlock).toHaveProperty('block_number');
