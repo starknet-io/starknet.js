@@ -94,10 +94,16 @@ The _transactionsDetail_ object may include any of:
 
 account.**declare**(payload [ , transactionsDetail ]) => _Promise < DeclareContractResponse >_
 
+The _payload_ object consists of:
+
+- payload.**contract** - The compiled contract
+- payload.**classHash** - Hash of the compiled contract
+
 The _transactionsDetail_ object may include any of:
 
-- transactionsDetail.**contract** - The compiled contract
-- transactionsDetail.**classHash** - Hash of the compiled contract
+- transactionsDetail.**maxFee** - Max Fee that that will be used to execute the call(s)
+- transactionsDetail.**nonce** - Nonce for the transaction
+- transactionsDetail.**version** - Version for the transaction (default is 1)
 
 Declares a contract on Starknet.
 

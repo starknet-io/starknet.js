@@ -248,6 +248,8 @@ Wait for the transaction to be accepted on L2 or L1.
 
 ## SequencerProvider
 
+On top of methods found in the [Default Provider](#default-provider) section, `SequencerProvider` has some additional ones you can use.
+
 ### Creating an instance
 
 `new starknet.SequencerProvider(optionsOrProvider)`
@@ -265,7 +267,7 @@ or
 Example:
 
 ```typescript
-const provider = new starknet.Provider({
+const provider = new starknet.SequencerProvider({
   baseUrl: 'https://alpha4.starknet.io',
   feederGatewayUrl: 'feeder_gateway',
   gatewayUrl: 'gateway',
@@ -274,9 +276,11 @@ const provider = new starknet.Provider({
 
 ### Methods
 
-Gets the smart contract address on the network.
+<hr/>
 
 provider.**getContractAddresses**() => _Promise < GetContractAddressesResponse >_
+
+Gets the smart contract address on the network.
 
 ###### _GetContractAddressesResponse_
 
@@ -286,6 +290,48 @@ provider.**getContractAddresses**() => _Promise < GetContractAddressesResponse >
   GpsStatementVerifier: string;
 }
 ```
+
+<hr/>
+
+provider.**getCode**(contractAddress, blockIdentifier) => _Promise < GetCodeResponse >_
+
+Gets the smart contract address on the network.
+
+###### _GetCodeResponse_
+
+```typescript
+{
+  bytecode: string[];
+  abi: Abi;
+}
+```
+
+<hr/>
+
+provider.**estimateMessageFee**(CallL1Handler, blockIdentifier) => _Promise < EstimateFeeResponse >_
+
+Estimate fee for sending a message to L1.
+
+##### _CallL1Handler_
+
+````typescript
+type CallL1Handler = {
+  from_address: getDecimalString(from_address),
+  to_address: getHexString(to_address),
+  entry_point_selector: getSelector(entry_point_selector),
+  payload: getHexStringArray(payload),
+};
+
+###### _EstimateFeeResponse_
+
+```typescript
+{
+  overall_fee: number;
+  gas_price: number;
+  gas_usage: number;
+  unit: string;
+}
+````
 
 <hr/>
 
@@ -361,6 +407,59 @@ const provider = new starknet.RpcProvider({
 
 ### Methods
 
+<hr/>
+
+provider.**fetch**(method: any, params: any) => _Promise < any >_
+
+Generic method for users to be able to experiment with RPC methods.
+
+<hr/>
+
+provider.**getChainId**() => _Promise < any >_
+
+<hr/>
+
+provider.**getBlock**(blockIdentifier) => _Promise < GetBlockResponse >_
+
+<hr/>
+
+provider.**getBlockHashAndNumber**() => _Promise < BlockHashAndNumber >_
+
+###### _BlockHashAndNumber_
+
+```typescript
+{
+  block_hash: BLOCK_HASH;
+  block_number: BLOCK_NUMBER;
+}
+```
+
+<hr/>
+
+provider.**getBlockWithTxHashes**(blockIdentifier) => _Promise < GetBlockWithTxHashesResponse >_
+
+###### _GetBlockWithTxHashesResponse_
+
+```typescript
+OPENRPC.BlockWithTxHashes
+```
+
+<hr/>
+
+provider.**getBlockWithTxs**(blockIdentifier) => _Promise < GetBlockWithTxs >_
+
+###### _GetBlockWithTxs_
+
+```typescript
+OPENRPC.BlockWithTxs
+```
+
+<hr/>
+
+provider.**getClassHashAt**(blockIdentifier) => _Promise < ContractAddress >_
+
+<hr/>
+
 provider.**getTransactionCount**(blockIdentifier) => _Promise < number >_
 
 Gets the transaction count from a block.
@@ -376,6 +475,148 @@ Gets the latest block number.
 provider.**getNonce**(contractAddress, blockIdentifier) => _Promise < BigNumberish >_
 
 Gets the nonce of the provided contractAddress
+
+<hr/>
+
+provider.**getPendingTransactions**() => _Promise < PendingTransactions >_
+
+###### _PendingTransactions_
+
+```typescript
+OPENRPC.PendingTransactions;
+```
+
+<hr/>
+
+provider.**getStateUpdate**(blockIdentifier) => _Promise < StateUpdate >_
+
+###### _StateUpdate_
+
+```typescript
+OPENRPC.StateUpdate;
+```
+
+<hr/>
+
+provider.**getStorageAt**(contractAddress, key, blockIdentifier) => _Promise < BigNumberish >_
+
+<hr/>
+
+provider.**getTransaction**(txHash) => _Promise < GetTransactionResponse >_
+
+<hr/>
+
+provider.**getTransactionByHash**(txHash) => _Promise < GetTransactionByHashResponse >_
+
+###### _GetTransactionByHashResponse_
+
+```typescript
+OPENRPC.Transaction;
+```
+
+<hr/>
+
+provider.**getTransactionByBlockIdAndIndex**(blockIdentifier, index) => _Promise < GetTransactionByBlockIdAndIndex >_
+
+###### _GetTransactionByBlockIdAndIndex_
+
+```typescript
+OPENRPC.Transaction;
+```
+
+<hr/>
+
+provider.**getTransactionReceipt**(txHash) => _Promise < GetTransactionReceiptResponse >_
+
+<hr/>
+
+provider.**getClass**(classHash) => _Promise < ContractClass >_
+
+###### _ContractClass_
+
+```typescript
+OPENRPC.ContractClass;
+```
+
+<hr/>
+
+provider.**getClassAt**(contractAddress, blockIdentifier) => _Promise < ContractClass >_
+
+###### _ContractClass_
+
+```typescript
+OPENRPC.ContractClass;
+```
+
+<hr/>
+
+provider.**getInvokeEstimateFee**(invocation, invocationDetails, blockIdentifier) => _Promise < EstimateFeeResponse >_
+
+###### _EstimateFeeResponse_
+
+```typescript
+  overall_fee: BN;
+  gas_consumed?: BN;
+  gas_price?: BN;
+```
+
+<hr/>
+
+provider.**getDeclareEstimateFee**(DeclareContractTransaction, details, blockIdentifier) => _Promise < EstimateFeeResponse >_
+
+###### _EstimateFeeResponse_
+
+```typescript
+  overall_fee: BN;
+  gas_consumed?: BN;
+  gas_price?: BN;
+```
+
+<hr/>
+
+provider.**declareContract**(DeclareContractTransaction, details) => _Promise < DeclareContractResponse >_
+
+###### _DeclareContractResponse_
+
+```typescript
+  transaction_hash: string;
+  class_hash: string;
+```
+
+<hr/>
+
+provider.**deployContract**(contract, constructorCalldata, addressSalt) => _Promise < DeployContractResponse >_
+
+###### _DeployContractResponse_
+
+```typescript
+  contract_address: string;
+  transaction_hash: string;
+```
+
+<hr/>
+
+provider.**callContract**(call, blockIdentifier) => _Promise < CallContractResponse >_
+
+<hr/>
+
+provider.**traceTransaction**(transactionHash) => _Promise < Trace >_
+
+###### _Trace_
+
+```typescript
+OPENRPC.Trace;
+```
+
+<hr/>
+
+provider.**traceBlockTransactions**(blockHash) => _Promise < Traces >_
+
+###### _Traces_
+
+```typescript
+OPENRPC.Traces;
+```
 
 <hr/>
 
@@ -400,6 +641,8 @@ boolean |
 <hr/>
 
 provider.**getEvents**(eventFilter) => _Promise < GetEventsResponse >_
+
+Gets all the events filtered
 
 ##### _EventFilter_
 
