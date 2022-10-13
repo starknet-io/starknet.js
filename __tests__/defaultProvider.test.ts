@@ -1,13 +1,6 @@
-import {
-  BlockNumber,
-  DeclareContractResponse,
-  DeployContractResponse,
-  GetBlockResponse,
-  stark,
-} from '../src';
+import { BlockNumber, DeployContractResponse, GetBlockResponse, stark } from '../src';
 import { toBN } from '../src/utils/number';
 import {
-  compiledErc20,
   compiledOpenZeppelinAccount,
   describeIfNotDevnet,
   getERC20DeployPayload,
@@ -62,7 +55,7 @@ describe('defaultProvider', () => {
     });
 
     test('getBlock() -> { blockNumber }', async () => {
-      const block = await testProvider.getBlock();
+      const block = await testProvider.getBlock('latest');
       return expect(block).toHaveProperty('block_number');
     });
 
@@ -142,8 +135,8 @@ describe('defaultProvider', () => {
     let latestBlock;
     describe(`Provider methods if not devnet`, () => {
       describe('getBlock', () => {
-        test('getBlock by tag pending', async () => {
-          latestBlock = await provider.getBlock();
+        test('getBlock by tag latest', async () => {
+          latestBlock = await provider.getBlock('latest');
           expect(latestBlock).toHaveProperty('block_hash');
           expect(latestBlock).toHaveProperty('parent_hash');
           expect(latestBlock).toHaveProperty('block_number');
@@ -249,16 +242,13 @@ describe('defaultProvider', () => {
       describe('Contract methods', () => {
         let contractAddress: string;
         let deployResponse: DeployContractResponse;
-        let declareResponse: DeclareContractResponse;
         let blockNumber: BlockNumber;
 
         beforeAll(async () => {
-          deployResponse = await provider.deployContract({ contract: compiledErc20 });
+          const erc20DeployPayload = getERC20DeployPayload(wallet);
+          deployResponse = await provider.deployContract(erc20DeployPayload);
           contractAddress = deployResponse.contract_address;
-          await Promise.all([
-            provider.waitForTransaction(deployResponse.transaction_hash),
-            provider.waitForTransaction(declareResponse.transaction_hash),
-          ]);
+          await provider.waitForTransaction(deployResponse.transaction_hash);
           ({ block_number: blockNumber } = await provider.getBlock('latest'));
         });
 
@@ -284,9 +274,9 @@ describe('defaultProvider', () => {
               provider
                 .callContract({
                   contractAddress: deployResponse.contract_address,
-                  entrypoint: 'balance_of',
+                  entrypoint: 'balanceOf',
                   calldata: compileCalldata({
-                    user: '0x9ff64f4ab0e1fe88df4465ade98d1ea99d5732761c39279b8e1374fa943e9b',
+                    user: wallet,
                   }),
                 })
                 .then((res) => {
