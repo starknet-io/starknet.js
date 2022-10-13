@@ -135,7 +135,7 @@ describe('defaultProvider', () => {
     let latestBlock;
     describe(`Provider methods if not devnet`, () => {
       describe('getBlock', () => {
-        test('getBlock by tag pending', async () => {
+        test('getBlock by tag latest', async () => {
           latestBlock = await provider.getBlock('latest');
           expect(latestBlock).toHaveProperty('block_hash');
           expect(latestBlock).toHaveProperty('parent_hash');
