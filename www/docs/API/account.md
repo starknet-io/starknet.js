@@ -94,6 +94,11 @@ The _transactionsDetail_ object may include any of:
 
 account.**declare**(payload [ , transactionsDetail ]) => _Promise < DeclareContractResponse >_
 
+The _payload_ object consists of:
+
+- payload.**contract** - The compiled contract
+- payload.**classHash** - Hash of the compiled contract
+
 The _transactionsDetail_ object may include any of:
 
 - transactionsDetail.**maxFee** - Max Fee that that will be used to execute the call(s)
@@ -101,6 +106,18 @@ The _transactionsDetail_ object may include any of:
 - transactionsDetail.**version** - Version for the transaction (default is 1)
 
 Declares a contract on Starknet.
+
+> _Note:_ Once the classHash is included in CompiledContract, this parameter can be removed. Currently it can be pre-computed from starknet-cli.
+
+Example:
+
+```typescript
+const declareTx = await account.declare({
+  contract: compiledErc20,
+  // classHash is pre-computed from starknet-cli
+  classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+});
+```
 
 ###### _DeclareContractResponse_
 
