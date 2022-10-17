@@ -32,6 +32,7 @@ export class SequencerAPIResponseParser extends ResponseParser {
     res: Sequencer.GetTransactionResponse
   ): GetTransactionResponse {
     return {
+      ...res,
       calldata: 'calldata' in res.transaction ? (res.transaction.calldata as Array<string>) : [],
       contract_address:
         'contract_address' in res.transaction ? res.transaction.contract_address : undefined,
@@ -68,6 +69,7 @@ export class SequencerAPIResponseParser extends ResponseParser {
       ...('transaction_index' in res && { transaction_index: res.transaction_index }),
       ...('execution_resources' in res && { execution_resources: res.execution_resources }),
       ...('l1_to_l2_consumed_message' in res && {
+        // eslint-disable-next-line @typescript-eslint/dot-notation
         l1_to_l2_consumed_message: res['l1_to_l2_consumed_message'],
       }),
       ...('transaction_failure_reason' in res && {
