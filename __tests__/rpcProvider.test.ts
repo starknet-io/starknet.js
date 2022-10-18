@@ -1,6 +1,5 @@
 import { Account, GetBlockResponse, RpcProvider, ec } from '../src';
 import {
-  compiledErc20,
   compiledOpenZeppelinAccount,
   describeIfRpc,
   getTestAccount,
@@ -116,20 +115,12 @@ describeIfRpc('RPCProvider', () => {
       });
     });
 
-    describe('declare contract related tests', () => {
-      let class_hash;
-
-      beforeAll(async () => {
-        ({ class_hash } = await rpcProvider.declareContract({
-          contract: compiledErc20,
-        }));
-      });
-
-      test('getClass', async () => {
-        const contractClass = await rpcProvider.getClass(class_hash);
-        expect(contractClass).toHaveProperty('program');
-        expect(contractClass).toHaveProperty('entry_points_by_type');
-      });
+    test('getClass classHash 0x0733734fa0dab1158bccdfe0df7b0becf3827f908971fac8d39cc73d99ad8645', async () => {
+      const contractClass = await rpcProvider.getClass(
+        '0x0733734fa0dab1158bccdfe0df7b0becf3827f908971fac8d39cc73d99ad8645'
+      );
+      expect(contractClass).toHaveProperty('program');
+      expect(contractClass).toHaveProperty('entry_points_by_type');
     });
 
     test.todo('getEstimateFee');

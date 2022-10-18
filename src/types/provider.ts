@@ -79,8 +79,9 @@ export interface MessageToL2 {
 }
 
 export interface InvokeTransactionReceiptResponse extends CommonTransactionReceiptResponse {
-  messages_sent: Array<MessageToL1>;
-  events: Array<Event>;
+  /** @deprecated Use l2_to_l1_messages */
+  messages_sent?: Array<MessageToL1>;
+  events?: Array<Event>;
   l1_origin_message?: MessageToL2;
 }
 

@@ -231,11 +231,9 @@ describe('defaultProvider', () => {
           const receipt = await provider.getTransactionReceipt(
             '0x37013e1cb9c133e6fe51b4b371b76b317a480f56d80576730754c1662582348'
           );
-
           expect(receipt).toHaveProperty('transaction_hash');
           expect(receipt).toHaveProperty('status');
-          expect(receipt).toHaveProperty('messages_sent');
-          expect(receipt).toHaveProperty('events');
+          expect(receipt).toHaveProperty('actual_fee');
         });
       });
 
