@@ -57,7 +57,7 @@ export function starknetKeccak(value: string): BN {
  * @returns hex selector of given abi function name
  */
 export function getSelectorFromName(funcName: string) {
-  // sometimes BigInteger pads the hex string with zeros, which isnt allowed in the starknet api
+  // sometimes BigInteger pads the hex string with zeros, which is not allowed in the starknet api
   return toHex(starknetKeccak(funcName));
 }
 
