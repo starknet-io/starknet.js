@@ -6,6 +6,7 @@ import { RPC } from './api/rpc';
 export type KeyPair = EC.KeyPair;
 export type Signature = string[];
 export type RawCalldata = BigNumberish[];
+export type AllowArray<T> = T | T[];
 
 export interface ContractClass {
   program: CompressedProgram;

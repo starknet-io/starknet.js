@@ -8,6 +8,7 @@ import {
   Call,
   DeclareContractResponse,
   DeployContractResponse,
+  EstimateFeeAction,
   InvocationsDetails,
   InvocationsSignerDetails,
   InvokeFunctionResponse,
@@ -15,7 +16,7 @@ import {
   Signature,
 } from '../types';
 import { EstimateFee, EstimateFeeDetails } from '../types/account';
-import { DeclareContractPayload, DeployAccountContractPayload } from '../types/lib';
+import { AllowArray, DeclareContractPayload, DeployAccountContractPayload } from '../types/lib';
 import { calculateContractAddressFromHash, transactionVersion } from '../utils/hash';
 import { BigNumberish, toBN } from '../utils/number';
 import { parseContract } from '../utils/provider';
@@ -45,14 +46,14 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async estimateFee(
-    calls: Call | Call[],
+    calls: AllowArray<Call>,
     estimateFeeDetails?: EstimateFeeDetails | undefined
   ): Promise<EstimateFee> {
     return this.estimateInvokeFee(calls, estimateFeeDetails);
   }
 
   public async estimateInvokeFee(
-    calls: Call | Call[],
+    calls: AllowArray<Call>,
     { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
     const transactions = Array.isArray(calls) ? calls : [calls];
@@ -167,20 +168,15 @@ export class Account extends Provider implements AccountInterface {
    * @returns a confirmation of invoking a function on the starknet contract
    */
   public async execute(
-    calls: Call | Call[],
+    calls: AllowArray<Call>,
     abis: Abi[] | undefined = undefined,
     transactionsDetail: InvocationsDetails = {}
   ): Promise<InvokeFunctionResponse> {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
-    let maxFee: BigNumberish = ZERO;
-    if (transactionsDetail.maxFee) {
-      maxFee = transactionsDetail.maxFee;
-    } else {
-      const { suggestedMaxFee } = await this.estimateInvokeFee(transactions, { nonce });
-      maxFee = suggestedMaxFee.toString();
-    }
-
+    const maxFee =
+      transactionsDetail.maxFee ??
+      (await this.getMaxFee({ type: 'INVOKE', payload: calls }, transactionsDetail));
     const version = toBN(transactionVersion);
     const chainId = await this.getChainId();
 
@@ -211,19 +207,12 @@ export class Account extends Provider implements AccountInterface {
     transactionsDetail: InvocationsDetails = {}
   ): Promise<DeclareContractResponse> {
     const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
-    let maxFee: BigNumberish = ZERO;
-
-    if (transactionsDetail.maxFee) {
-      maxFee = transactionsDetail.maxFee;
-    } else {
-      const { suggestedMaxFee } = await this.estimateDeclareFee(
-        { contract, classHash },
-        {
-          nonce,
-        }
-      );
-      maxFee = suggestedMaxFee.toString();
-    }
+    const maxFee =
+      transactionsDetail.maxFee ??
+      (await this.getMaxFee(
+        { type: 'DECLARE', payload: { classHash, contract } },
+        transactionsDetail
+      ));
 
     const version = toBN(transactionVersion);
     const chainId = await this.getChainId();
@@ -261,23 +250,20 @@ export class Account extends Provider implements AccountInterface {
     const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
     const version = toBN(transactionVersion);
     const chainId = await this.getChainId();
-    let maxFee: BigNumberish = '0';
 
     const contractAddress =
       providedContractAddress ??
       calculateContractAddressFromHash(addressSalt, classHash, constructorCalldata, 0);
 
-    if (transactionsDetail.maxFee || transactionsDetail.maxFee === 0) {
-      maxFee = transactionsDetail.maxFee;
-    } else {
-      const { suggestedMaxFee } = await this.estimateAccountDeployFee(
-        { addressSalt, classHash, constructorCalldata, contractAddress },
+    const maxFee =
+      transactionsDetail.maxFee ??
+      (await this.getMaxFee(
         {
-          nonce,
-        }
-      );
-      maxFee = suggestedMaxFee.toString();
-    }
+          type: 'DEPLOY_ACCOUNT',
+          payload: { classHash, constructorCalldata, addressSalt, contractAddress },
+        },
+        transactionsDetail
+      ));
 
     const signature = await this.signer.signDeployAccountTransaction({
       classHash,
@@ -358,5 +344,29 @@ export class Account extends Provider implements AccountInterface {
   public async verifyMessage(typedData: TypedData, signature: Signature): Promise<boolean> {
     const hash = await this.hashMessage(typedData);
     return this.verifyMessageHash(hash, signature);
+  }
+
+  public async getMaxFee(estimateFeeAction: EstimateFeeAction, details: EstimateFeeDetails) {
+    let feeEstimate: EstimateFee;
+
+    switch (estimateFeeAction.type) {
+      case 'INVOKE':
+        feeEstimate = await this.estimateInvokeFee(estimateFeeAction.payload, details);
+        break;
+
+      case 'DECLARE':
+        feeEstimate = await this.estimateDeclareFee(estimateFeeAction.payload, details);
+        break;
+
+      case 'DEPLOY_ACCOUNT':
+        feeEstimate = await this.estimateAccountDeployFee(estimateFeeAction.payload, details);
+        break;
+
+      default:
+        feeEstimate = { suggestedMaxFee: ZERO, overall_fee: ZERO };
+        break;
+    }
+
+    return feeEstimate.suggestedMaxFee.toString();
   }
 }

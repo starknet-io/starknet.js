@@ -6,17 +6,14 @@ import {
   Call,
   DeclareContractResponse,
   DeployContractResponse,
+  EstimateFeeAction,
   EstimateFeeDetails,
   EstimateFeeResponse,
   InvocationsDetails,
   InvokeFunctionResponse,
   Signature,
 } from '../types';
-import {
-  DeclareContractPayload,
-  DeployAccountContractPayload,
-  DeployAccountContractTransaction,
-} from '../types/lib';
+import { AllowArray, DeclareContractPayload, DeployAccountContractPayload } from '../types/lib';
 import { BigNumberish } from '../utils/number';
 import { TypedData } from '../utils/typedData/types';
 
@@ -37,7 +34,7 @@ export abstract class AccountInterface extends ProviderInterface {
    * @returns response from estimate_fee
    */
   public abstract estimateFee(
-    calls: Call | Call[],
+    calls: AllowArray<Call>,
     estimateFeeDetails?: EstimateFeeDetails
   ): Promise<EstimateFeeResponse>;
 
@@ -52,7 +49,7 @@ export abstract class AccountInterface extends ProviderInterface {
    * @returns response from estimate_fee
    */
   public abstract estimateInvokeFee(
-    calls: Call | Call[],
+    calls: AllowArray<Call>,
     estimateFeeDetails?: EstimateFeeDetails
   ): Promise<EstimateFeeResponse>;
 
@@ -97,7 +94,7 @@ export abstract class AccountInterface extends ProviderInterface {
    * @returns response from addTransaction
    */
   public abstract execute(
-    transactions: Call | Call[],
+    transactions: AllowArray<Call>,
     abis?: Abi[],
     transactionsDetail?: InvocationsDetails
   ): Promise<InvokeFunctionResponse>;
@@ -133,7 +130,7 @@ export abstract class AccountInterface extends ProviderInterface {
    * @returns a confirmation of sending a transaction on the starknet contract
    */
   public abstract deployAccount(
-    contractPayload: DeployAccountContractTransaction,
+    contractPayload: DeployAccountContractPayload,
     transactionsDetail?: InvocationsDetails
   ): Promise<DeployContractResponse>;
 
@@ -179,4 +176,9 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean>;
 
   public abstract getNonce(blockIdentifier?: BlockIdentifier): Promise<BigNumberish>;
+
+  public abstract getMaxFee(
+    estimateFeeAction: EstimateFeeAction,
+    details: EstimateFeeDetails
+  ): Promise<BigNumberish>;
 }
