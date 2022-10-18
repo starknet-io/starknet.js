@@ -175,9 +175,20 @@ export abstract class AccountInterface extends ProviderInterface {
    */
   public abstract verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean>;
 
+  /**
+   * Gets the nonce of the account with respect to a specific block
+   * @param  {BlockIdentifier} blockIdentifier - optional blockIdentifier. Defaults to 'pending'
+   * @returns nonce of the account
+   */
   public abstract getNonce(blockIdentifier?: BlockIdentifier): Promise<BigNumberish>;
 
-  public abstract getMaxFee(
+  /**
+   * Gets Suggested Max Fee based on the transaction type
+   * @param  {EstimateFeeAction} estimateFeeAction
+   * @param  {EstimateFeeDetails} details
+   * @returns suggestedMaxFee
+   */
+  public abstract getSuggestedMaxFee(
     estimateFeeAction: EstimateFeeAction,
     details: EstimateFeeDetails
   ): Promise<BigNumberish>;
