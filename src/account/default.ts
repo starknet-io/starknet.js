@@ -8,7 +8,6 @@ import {
   Call,
   DeclareContractResponse,
   DeployContractResponse,
-  EstimateFeeResponse,
   InvocationsDetails,
   InvocationsSignerDetails,
   InvokeFunctionResponse,
@@ -48,7 +47,7 @@ export class Account extends Provider implements AccountInterface {
   public async estimateFee(
     calls: Call | Call[],
     estimateFeeDetails?: EstimateFeeDetails | undefined
-  ): Promise<EstimateFeeResponse> {
+  ): Promise<EstimateFee> {
     return this.estimateInvokeFee(calls, estimateFeeDetails);
   }
 
