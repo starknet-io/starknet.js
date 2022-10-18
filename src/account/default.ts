@@ -128,19 +128,9 @@ export class Account extends Provider implements AccountInterface {
     const nonce = toBN(providedNonce ?? (await this.getNonce()));
     const version = toBN(transactionVersion);
     const chainId = await this.getChainId();
-
-    let contractAddress = ZERO.toString();
-
-    if (!providedContractAddress) {
-      contractAddress = calculateContractAddressFromHash(
-        addressSalt,
-        classHash,
-        constructorCalldata,
-        0
-      );
-    } else {
-      contractAddress = providedContractAddress;
-    }
+    const contractAddress =
+      providedContractAddress ??
+      calculateContractAddressFromHash(addressSalt, classHash, constructorCalldata, 0);
 
     const signature = await this.signer.signDeployAccountTransaction({
       classHash,
@@ -269,34 +259,24 @@ export class Account extends Provider implements AccountInterface {
     transactionsDetail: InvocationsDetails = {}
   ): Promise<DeployContractResponse> {
     const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
+    const version = toBN(transactionVersion);
+    const chainId = await this.getChainId();
     let maxFee: BigNumberish = '0';
+
+    const contractAddress =
+      providedContractAddress ??
+      calculateContractAddressFromHash(addressSalt, classHash, constructorCalldata, 0);
 
     if (transactionsDetail.maxFee || transactionsDetail.maxFee === 0) {
       maxFee = transactionsDetail.maxFee;
     } else {
       const { suggestedMaxFee } = await this.estimateAccountDeployFee(
-        { addressSalt, classHash, constructorCalldata },
+        { addressSalt, classHash, constructorCalldata, contractAddress },
         {
           nonce,
         }
       );
       maxFee = suggestedMaxFee.toString();
-    }
-
-    const version = toBN(transactionVersion);
-    const chainId = await this.getChainId();
-
-    let contractAddress = ZERO.toString();
-
-    if (!providedContractAddress) {
-      contractAddress = calculateContractAddressFromHash(
-        addressSalt,
-        classHash,
-        constructorCalldata,
-        0
-      );
-    } else {
-      contractAddress = providedContractAddress;
     }
 
     const signature = await this.signer.signDeployAccountTransaction({
