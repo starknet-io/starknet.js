@@ -1,3 +1,22 @@
+# [4.8.0](https://github.com/0xs34n/starknet.js/compare/v4.7.0...v4.8.0) (2022-10-05)
+
+### Bug Fixes
+
+- adapted transactionTrace response ([58c21c0](https://github.com/0xs34n/starknet.js/commit/58c21c0a3c647eae781d57024c3193aa6c98b20b))
+- estimate fee BigInt test ([0489bed](https://github.com/0xs34n/starknet.js/commit/0489bed7ea16790708878d7714df554b84d02153))
+- fixed and one-lined hash sort and added additional test case ([023c7c7](https://github.com/0xs34n/starknet.js/commit/023c7c7c543c0e4382bf3e109140206f7c7cba57))
+- fixed hash arg sorting in merkle tree generation ([ccbfecf](https://github.com/0xs34n/starknet.js/commit/ccbfecfa63aa5037455405d929aea6322590d6ac))
+- is sequencer goerli fix ([2d43d1b](https://github.com/0xs34n/starknet.js/commit/2d43d1b666ccbcaf3a9fda92ebfbb7db3b96f8c1))
+- issue 296 ([bfc1f70](https://github.com/0xs34n/starknet.js/commit/bfc1f7051f8949b4c4d89ee379430e4404c9a2f5))
+- remove linter fix ([272e2ec](https://github.com/0xs34n/starknet.js/commit/272e2ecbe254758bc6d841e16d426446914e18e9))
+- remove optional l1_origin_message from test ([01050e3](https://github.com/0xs34n/starknet.js/commit/01050e333a6d96e3b439bdb3398a634ee18137af))
+- remove status_data as it is optional response parameter ([9bb0a3e](https://github.com/0xs34n/starknet.js/commit/9bb0a3e0afb610817a12c036e3f117a385f4a1d6))
+- sequencer getBlock response ([165bce7](https://github.com/0xs34n/starknet.js/commit/165bce743467cd9de36559c3cb232fccc32064be))
+
+### Features
+
+- sequencer estimateMessageFee ([f1ffda7](https://github.com/0xs34n/starknet.js/commit/f1ffda7e79e9bfda7f041abc3fd8c5b4ac9f1a66))
+
 # [4.7.0](https://github.com/0xs34n/starknet.js/compare/v4.6.0...v4.7.0) (2022-09-22)
 
 ### Bug Fixes

@@ -12,10 +12,16 @@ const compiledErc20 = json.parse(
 );
 const erc20Response = await defaultProvider.deployContract({
   contract: compiledErc20,
+  constructorCalldata: [encodeShortString('TokenName'), encodeShortString('TokenSymbol'), recipient], // Here the `recipient` receives the initial 1000 tokens
 });
+
 console.log("Waiting for Tx to be Accepted on Starknet - ERC20 Deployment...");
 await defaultProvider.waitForTransaction(erc20Response.transaction_hash);
 ```
+
+> **Note**
+>
+> The ERC20 contract can be found [here](https://github.com/argentlabs/argent-contracts-starknet/blob/develop/contracts/lib/ERC20.cairo)
 
 ## Get the erc20 contract address and create the contact object
 
@@ -35,7 +41,7 @@ erc20.connect(account);
 
 const { transaction_hash: mintTxHash } = await erc20.mint(
   account.address,
-  "1000",
+ [ "1000", "0"]
   {
     maxFee: "1"
   }
@@ -59,11 +65,11 @@ await defaultProvider.waitForTransaction(mintTxHash);
 
 ```javascript
 console.log(`Calling StarkNet for account balance...`);
-const balanceBeforeTransfer = await erc20.balance_of(account.address);
+const balanceBeforeTransfer = await erc20.balanceOf(account.address);
 
 console.log(
   `account Address ${account.address} has a balance of:`,
-  number.toBN(balanceBeforeTransfer.res, 16).toString()
+  number.toBN(balanceBeforeTransfer.balance.low, 16).toString()
 );
 ```
 
@@ -76,7 +82,7 @@ const { transaction_hash: transferTxHash } = await account.execute(
   {
     contractAddress: erc20Address,
     entrypoint: "transfer",
-    calldata: [erc20Address, "10"],
+    calldata: [erc20Address, "10", "0"],
   },
   undefined,
   { maxFee: "1" }
@@ -90,12 +96,12 @@ await defaultProvider.waitForTransaction(transferTxHash);
 ## Check balance after transfer
 
 ```javascript
-// Check balance after transfer - should be 990
+// Check balance after transfer - should be 1990 (1000 initial supply + 1000 mint - 10 transfer)
 console.log(`Calling StarkNet for account balance...`);
-const balanceAfterTransfer = await erc20.balance_of(account.address);
+const balanceAfterTransfer = await erc20.balanceOf(account.address);
 
 console.log(
   `account Address ${account.address} has a balance of:`,
-  number.toBN(balanceAfterTransfer.res, 16).toString()
+  number.toBN(balanceAfterTransfer.balance.low, 16).toString()
 );
 ```

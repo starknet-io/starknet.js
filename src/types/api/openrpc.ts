@@ -18,7 +18,7 @@ type BLOCK_HASH = FELT;
 type TXN_HASH = FELT;
 type PROTOCOL_VERSION = string;
 type TXN_STATUS = 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
-type TXN_TYPE = 'DECLARE' | 'DEPLOY' | 'INVOKE' | 'L1_HANDLER';
+type TXN_TYPE = 'DECLARE' | 'DEPLOY' | 'DEPLOY_ACCOUNT' | 'INVOKE' | 'L1_HANDLER';
 type BLOCK_STATUS = 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
 enum BLOCK_TAG {
   'latest',
@@ -102,6 +102,15 @@ type FUNCTION_CALL = {
 type INVOKE_TXN = COMMON_TXN_PROPERTIES & FUNCTION_CALL;
 type DECLARE_TXN = COMMON_TXN_PROPERTIES & {
   class_hash: FELT;
+  sender_address: ADDRESS;
+};
+type DEPLOY_ACCOUNT_TXN_REQUEST = COMMON_TXN_PROPERTIES & {
+  class_hash: FELT;
+  contract_address_salt: FELT;
+  constructor_calldata: Array<FELT>;
+};
+type DECLARE_TXN_REQUEST = COMMON_TXN_PROPERTIES & {
+  contract_class: CONTRACT_CLASS;
   sender_address: ADDRESS;
 };
 type DEPLOY_TXN = {
@@ -328,7 +337,10 @@ export namespace OPENRPC {
         | Errors.INVALID_BLOCK_ID;
     };
     starknet_estimateFee: {
-      params: { request: INVOKE_TXN; block_id: BLOCK_ID };
+      params: {
+        request: INVOKE_TXN | DECLARE_TXN_REQUEST | DEPLOY_ACCOUNT_TXN_REQUEST;
+        block_id: BLOCK_ID;
+      };
       result: FEE_ESTIMATE;
       errors:
         | Errors.CONTRACT_NOT_FOUND
@@ -384,7 +396,11 @@ export namespace OPENRPC {
     starknet_addDeclareTransaction: {
       params: {
         contract_class: CONTRACT_CLASS;
+        sender_address: ADDRESS;
+        signature: SIGNATURE;
+        max_fee: NUM_AS_HEX;
         version: NUM_AS_HEX;
+        nonce: FELT;
       };
       result: DeclaredTransaction;
       errors: Errors.INVALID_CONTRACT_CLASS;
@@ -394,6 +410,16 @@ export namespace OPENRPC {
         contract_address_salt: FELT;
         constructor_calldata: Array<FELT>;
         contract_definition: CONTRACT_CLASS;
+      };
+      result: DeployedTransaction;
+      errors: Errors.INVALID_CONTRACT_CLASS;
+    };
+
+    starknet_addDeployAccountTransaction: {
+      params: {
+        contract_address_salt: FELT;
+        constructor_calldata: Array<FELT>;
+        class_hash: FELT;
       };
       result: DeployedTransaction;
       errors: Errors.INVALID_CONTRACT_CLASS;

@@ -57,7 +57,7 @@ export function starknetKeccak(value: string): BN {
  * @returns hex selector of given abi function name
  */
 export function getSelectorFromName(funcName: string) {
-  // sometimes BigInteger pads the hex string with zeros, which isnt allowed in the starknet api
+  // sometimes BigInteger pads the hex string with zeros, which is not allowed in the starknet api
   return toHex(starknetKeccak(funcName));
 }
 
@@ -144,6 +144,51 @@ export function calculateDeployTransactionHash(
     constructorCalldata,
     ZERO,
     chainId
+  );
+}
+
+export function calculateDeclareTransactionHash(
+  // contractClass: ContractClass, // Should be used once class hash is present in ContractClass
+  classHash: BigNumberish,
+  senderAddress: BigNumberish,
+  version: BigNumberish,
+  maxFee: BigNumberish,
+  chainId: StarknetChainId,
+  nonce: BigNumberish
+): string {
+  return calculateTransactionHashCommon(
+    TransactionHashPrefix.DECLARE,
+    version,
+    senderAddress,
+    0,
+    [classHash],
+    maxFee,
+    chainId,
+    [nonce]
+  );
+}
+
+export function calculateDeployAccountTransactionHash(
+  contractAddress: BigNumberish,
+  classHash: BigNumberish,
+  constructorCalldata: BigNumberish[],
+  salt: BigNumberish,
+  version: BigNumberish,
+  maxFee: BigNumberish,
+  chainId: StarknetChainId,
+  nonce: BigNumberish
+) {
+  const calldata = [classHash, salt, ...constructorCalldata];
+
+  return calculateTransactionHashCommon(
+    TransactionHashPrefix.DEPLOY_ACCOUNT,
+    version,
+    contractAddress,
+    0,
+    calldata,
+    maxFee,
+    chainId,
+    [nonce]
   );
 }
 

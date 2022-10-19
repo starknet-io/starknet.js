@@ -4,8 +4,15 @@
  */
 import BN from 'bn.js';
 
-import { RPC } from './api/rpc';
-import { Abi, CompressedProgram, RawCalldata, Signature, Status } from './lib';
+import {
+  AllowArray,
+  Call,
+  DeclareContractPayload,
+  DeployAccountContractPayload,
+  RawCalldata,
+  Signature,
+  Status,
+} from './lib';
 
 export interface GetBlockResponse {
   timestamp: number;
@@ -47,12 +54,6 @@ export interface ContractEntryPoint {
   selector: string;
 }
 
-export interface ContractClass {
-  program: CompressedProgram;
-  entry_points_by_type: RPC.ContractClass['entry_points_by_type'];
-  abi?: Abi;
-}
-
 export interface DeclareTransactionResponse extends CommonTransactionResponse {
   contract_class?: any;
   sender_address?: string;
@@ -64,7 +65,7 @@ export type GetTransactionReceiptResponse =
 
 export interface CommonTransactionReceiptResponse {
   transaction_hash: string;
-  status: Status;
+  status?: Status;
   actual_fee?: string;
   status_data?: string;
 }
@@ -86,8 +87,9 @@ export interface MessageToL2 {
 }
 
 export interface InvokeTransactionReceiptResponse extends CommonTransactionReceiptResponse {
-  messages_sent: Array<MessageToL1>;
-  events: Array<Event>;
+  /** @deprecated Use l2_to_l1_messages */
+  messages_sent?: Array<MessageToL1>;
+  events?: Array<Event>;
   l1_origin_message?: MessageToL2;
 }
 
@@ -116,3 +118,17 @@ export interface DeclareContractResponse {
 export type CallContractResponse = {
   result: Array<string>;
 };
+
+export type EstimateFeeAction =
+  | {
+      type: 'INVOKE';
+      payload: AllowArray<Call>;
+    }
+  | {
+      type: 'DECLARE';
+      payload: DeclareContractPayload;
+    }
+  | {
+      type: 'DEPLOY_ACCOUNT';
+      payload: DeployAccountContractPayload;
+    };

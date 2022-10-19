@@ -3,7 +3,6 @@ import {
   Call,
   CallContractResponse,
   ContractClass,
-  DeclareContractPayload,
   DeclareContractResponse,
   DeployContractPayload,
   DeployContractResponse,
@@ -16,6 +15,7 @@ import {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
 } from '../types';
+import { DeclareContractTransaction, DeployAccountContractTransaction } from '../types/lib';
 import { BigNumberish } from '../utils/number';
 import { ProviderInterface } from './interface';
 import { RpcProvider, RpcProviderOptions } from './rpc';
@@ -62,11 +62,23 @@ export class Provider implements ProviderInterface {
   }
 
   public async getEstimateFee(
-    invocation: Invocation,
+    invocationWithTxType: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<EstimateFeeResponse> {
-    return this.provider.getEstimateFee(invocation, invocationDetails, blockIdentifier);
+    return this.provider.getEstimateFee(invocationWithTxType, invocationDetails, blockIdentifier);
+  }
+
+  public async getInvokeEstimateFee(
+    invocationWithTxType: Invocation,
+    invocationDetails: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<EstimateFeeResponse> {
+    return this.provider.getInvokeEstimateFee(
+      invocationWithTxType,
+      invocationDetails,
+      blockIdentifier
+    );
   }
 
   public async getNonce(
@@ -110,8 +122,34 @@ export class Provider implements ProviderInterface {
     return this.provider.deployContract(payload);
   }
 
-  public async declareContract(payload: DeclareContractPayload): Promise<DeclareContractResponse> {
-    return this.provider.declareContract(payload);
+  public async deployAccountContract(
+    payload: DeployAccountContractTransaction,
+    details: InvocationsDetailsWithNonce
+  ): Promise<DeployContractResponse> {
+    return this.provider.deployAccountContract(payload, details);
+  }
+
+  public async declareContract(
+    transaction: DeclareContractTransaction,
+    details: InvocationsDetailsWithNonce
+  ): Promise<DeclareContractResponse> {
+    return this.provider.declareContract(transaction, details);
+  }
+
+  public async getDeclareEstimateFee(
+    transaction: DeclareContractTransaction,
+    details: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<EstimateFeeResponse> {
+    return this.provider.getDeclareEstimateFee(transaction, details, blockIdentifier);
+  }
+
+  public getDeployAccountEstimateFee(
+    transaction: DeployAccountContractTransaction,
+    details: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<EstimateFeeResponse> {
+    return this.provider.getDeployAccountEstimateFee(transaction, details, blockIdentifier);
   }
 
   public async getCode(
