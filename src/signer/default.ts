@@ -28,6 +28,11 @@ export class Signer implements SignerInterface {
     return getStarkKey(this.keyPair);
   }
 
+  public async signMessage(typedData: TypedData, accountAddress: string): Promise<Signature> {
+    const msgHash = getMessageHash(typedData, accountAddress);
+    return sign(this.keyPair, msgHash);
+  }
+
   public async signTransaction(
     transactions: Call[],
     transactionsDetail: InvocationsSignerDetails,
@@ -47,22 +52,6 @@ export class Signer implements SignerInterface {
       transactionsDetail.maxFee,
       transactionsDetail.chainId,
       transactionsDetail.nonce
-    );
-
-    return sign(this.keyPair, msgHash);
-  }
-
-  public async signDeclareTransaction(
-    // contractClass: ContractClass,  // Should be used once class hash is present in ContractClass
-    { classHash, senderAddress, chainId, maxFee, version, nonce }: DeclareSignerDetails
-  ) {
-    const msgHash = calculateDeclareTransactionHash(
-      classHash,
-      senderAddress,
-      version,
-      maxFee,
-      chainId,
-      nonce
     );
 
     return sign(this.keyPair, msgHash);
@@ -92,8 +81,19 @@ export class Signer implements SignerInterface {
     return sign(this.keyPair, msgHash);
   }
 
-  public async signMessage(typedData: TypedData, accountAddress: string): Promise<Signature> {
-    const msgHash = getMessageHash(typedData, accountAddress);
+  public async signDeclareTransaction(
+    // contractClass: ContractClass,  // Should be used once class hash is present in ContractClass
+    { classHash, senderAddress, chainId, maxFee, version, nonce }: DeclareSignerDetails
+  ) {
+    const msgHash = calculateDeclareTransactionHash(
+      classHash,
+      senderAddress,
+      version,
+      maxFee,
+      chainId,
+      nonce
+    );
+
     return sign(this.keyPair, msgHash);
   }
 }
