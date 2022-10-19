@@ -1,3 +1,27 @@
+# [4.9.0](https://github.com/0xs34n/starknet.js/compare/v4.8.0...v4.9.0) (2022-10-19)
+
+### Bug Fixes
+
+- add back getEstimateFee and estimateFee ([bf7abca](https://github.com/0xs34n/starknet.js/commit/bf7abca616ebbb658fda040959c6103d8998069d))
+- build ([421b9d7](https://github.com/0xs34n/starknet.js/commit/421b9d7a3fa3fd962faab8f22289d69bd521b5ca))
+- erc20 tests ([2b6aa24](https://github.com/0xs34n/starknet.js/commit/2b6aa2455e6d878003157b16ae2e611dbcb017ea))
+- estimateFee response ([546e43b](https://github.com/0xs34n/starknet.js/commit/546e43ba605c79c2f8c1c47b881a554da2f9bad7))
+- getBlock test ([e3750d0](https://github.com/0xs34n/starknet.js/commit/e3750d0c31eb63a6627a6e3cc47542cea7c1915e))
+- linter autofix restored ([07d28f6](https://github.com/0xs34n/starknet.js/commit/07d28f6ac4c91ab3a80f12c1d3ad0a1c4b15ca88))
+- optional address ([95e7e47](https://github.com/0xs34n/starknet.js/commit/95e7e479c7f1d30d43f122bef820f93999453f14))
+- provide all available data from sequencer GetTransaction ([f3d2969](https://github.com/0xs34n/starknet.js/commit/f3d29693f2a349eed089224db9e96a137ab9f236))
+- removed parseGetTransactionReceiptResponse rpc response parser for TransactionReceipt ([7fca26d](https://github.com/0xs34n/starknet.js/commit/7fca26ddf9b830aa1290f6e450daeea5bee03b38))
+- use BigNumberish type for classHash ([0ab4d47](https://github.com/0xs34n/starknet.js/commit/0ab4d478a4930a2044b68280ca4e6cd69f63920a))
+
+### Features
+
+- add and update tests ([b2df4c7](https://github.com/0xs34n/starknet.js/commit/b2df4c7deea96aaefcdf90e640bca67a91b6dab7))
+- add declare flow with estimate fee ([30d5544](https://github.com/0xs34n/starknet.js/commit/30d554442ed3173bf4fa1d80dd3acaf2461b78aa))
+- deploy_account transaction ([8e5d414](https://github.com/0xs34n/starknet.js/commit/8e5d4148fe8edc72e5b5eaac0be56d5127ce828d))
+- **refactor:** contractAddress calculation ([2b791d5](https://github.com/0xs34n/starknet.js/commit/2b791d5db4a78fceb6cc08ae4ed2ef68fe0c3f07))
+- update maxFee logic ([19add10](https://github.com/0xs34n/starknet.js/commit/19add10d53b5b83fb96c8db1043318942f59309c))
+- use updated erc20 contract ([19ca7e8](https://github.com/0xs34n/starknet.js/commit/19ca7e822988d9b82e075c569a1decb4d4d7966a))
+
 # [4.8.0](https://github.com/0xs34n/starknet.js/compare/v4.7.0...v4.8.0) (2022-10-05)
 
 ### Bug Fixes
