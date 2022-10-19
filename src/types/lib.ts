@@ -6,6 +6,7 @@ import { RPC } from './api/rpc';
 export type KeyPair = EC.KeyPair;
 export type Signature = string[];
 export type RawCalldata = BigNumberish[];
+export type AllowArray<T> = T | T[];
 
 export interface ContractClass {
   program: CompressedProgram;
@@ -17,6 +18,20 @@ export type DeployContractPayload = {
   contract: CompiledContract | string;
   constructorCalldata?: RawCalldata;
   addressSalt?: string;
+};
+
+export type DeployAccountContractPayload = {
+  classHash: BigNumberish;
+  constructorCalldata?: RawCalldata;
+  addressSalt?: BigNumberish;
+  contractAddress?: string;
+};
+
+export type DeployAccountContractTransaction = Omit<
+  DeployAccountContractPayload,
+  'contractAddress'
+> & {
+  signature?: Signature;
 };
 
 export type DeclareContractPayload = {
@@ -55,7 +70,7 @@ export type Status =
   | 'ACCEPTED_ON_L1'
   | 'REJECTED';
 export type TransactionStatus = 'TRANSACTION_RECEIVED';
-export type TransactionType = 'DECLARE' | 'DEPLOY' | 'INVOKE_FUNCTION';
+export type TransactionType = 'DECLARE' | 'DEPLOY' | 'INVOKE_FUNCTION' | 'DEPLOY_ACCOUNT';
 export type EntryPointType = 'EXTERNAL';
 export type CompressedProgram = string;
 

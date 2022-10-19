@@ -15,6 +15,7 @@ export enum StarknetChainId {
 export enum TransactionHashPrefix {
   DECLARE = '0x6465636c617265', // encodeShortString('declare'),
   DEPLOY = '0x6465706c6f79', // encodeShortString('deploy'),
+  DEPLOY_ACCOUNT = '0x6465706c6f795f6163636f756e74', // encodeShortString('deploy_account'),
   INVOKE = '0x696e766f6b65', // encodeShortString('invoke'),
   L1_HANDLER = '0x6c315f68616e646c6572', // encodeShortString('l1_handler'),
 }

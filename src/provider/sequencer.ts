@@ -23,7 +23,7 @@ import {
   GetTransactionTraceResponse,
   Sequencer,
 } from '../types/api';
-import { DeclareContractTransaction } from '../types/lib';
+import { DeclareContractTransaction, DeployAccountContractTransaction } from '../types/lib';
 import fetch from '../utils/fetchPonyfill';
 import { getSelector, getSelectorFromName } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
@@ -165,7 +165,7 @@ export class SequencerProvider implements ProviderInterface {
   // typesafe fetch
   protected async fetchEndpoint<T extends keyof Sequencer.Endpoints>(
     endpoint: T,
-    // typescript type magiuc to create a nice fitting function interface
+    // typescript type magic to create a nice fitting function interface
     ...[query, request]: Sequencer.Endpoints[T]['QUERY'] extends never
       ? Sequencer.Endpoints[T]['REQUEST'] extends never
         ? [] // when no query and no request is needed, we can omit the query and request parameters
@@ -321,6 +321,22 @@ export class SequencerProvider implements ProviderInterface {
     }).then(this.responseParser.parseDeployContractResponse);
   }
 
+  public async deployAccountContract(
+    { classHash, constructorCalldata, addressSalt, signature }: DeployAccountContractTransaction,
+    details: InvocationsDetailsWithNonce
+  ): Promise<DeployContractResponse> {
+    return this.fetchEndpoint('add_transaction', undefined, {
+      type: 'DEPLOY_ACCOUNT',
+      contract_address_salt: addressSalt ?? randomAddress(),
+      constructor_calldata: bigNumberishArrayToDecimalStringArray(constructorCalldata ?? []),
+      class_hash: toHex(toBN(classHash)),
+      max_fee: toHex(toBN(details.maxFee || 0)),
+      version: toHex(toBN(details.version || 0)),
+      nonce: toHex(toBN(details.nonce)),
+      signature: bigNumberishArrayToDecimalStringArray(signature || []),
+    }).then(this.responseParser.parseDeployContractResponse);
+  }
+
   public async declareContract(
     { senderAddress, contractDefinition, signature }: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce
@@ -377,6 +393,26 @@ export class SequencerProvider implements ProviderInterface {
         contract_class: contractDefinition,
         signature: bigNumberishArrayToDecimalStringArray(signature || []),
         version: toHex(toBN(details?.version || 1)),
+        nonce: toHex(toBN(details.nonce)),
+      }
+    ).then(this.responseParser.parseFeeEstimateResponse);
+  }
+
+  public async getDeployAccountEstimateFee(
+    { classHash, addressSalt, constructorCalldata, signature }: DeployAccountContractTransaction,
+    details: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<EstimateFeeResponse> {
+    return this.fetchEndpoint(
+      'estimate_fee',
+      { blockIdentifier },
+      {
+        type: 'DEPLOY_ACCOUNT',
+        class_hash: toHex(toBN(classHash)),
+        constructor_calldata: bigNumberishArrayToDecimalStringArray(constructorCalldata || []),
+        contract_address_salt: toHex(toBN(addressSalt || 0)),
+        signature: bigNumberishArrayToDecimalStringArray(signature || []),
+        version: toHex(toBN(details?.version || 0)),
         nonce: toHex(toBN(details.nonce)),
       }
     ).then(this.responseParser.parseFeeEstimateResponse);

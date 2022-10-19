@@ -7,7 +7,8 @@ import {
   Abi,
   Call,
   DeclareContractResponse,
-  EstimateFeeResponse,
+  DeployContractResponse,
+  EstimateFeeAction,
   InvocationsDetails,
   InvocationsSignerDetails,
   InvokeFunctionResponse,
@@ -15,8 +16,8 @@ import {
   Signature,
 } from '../types';
 import { EstimateFee, EstimateFeeDetails } from '../types/account';
-import { DeclareContractPayload } from '../types/lib';
-import { transactionVersion } from '../utils/hash';
+import { AllowArray, DeclareContractPayload, DeployAccountContractPayload } from '../types/lib';
+import { calculateContractAddressFromHash, transactionVersion } from '../utils/hash';
 import { BigNumberish, toBN } from '../utils/number';
 import { parseContract } from '../utils/provider';
 import { compileCalldata, estimatedFeeToMaxFee } from '../utils/stark';
@@ -45,14 +46,14 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async estimateFee(
-    calls: Call | Call[],
+    calls: AllowArray<Call>,
     estimateFeeDetails?: EstimateFeeDetails | undefined
-  ): Promise<EstimateFeeResponse> {
+  ): Promise<EstimateFee> {
     return this.estimateInvokeFee(calls, estimateFeeDetails);
   }
 
   public async estimateInvokeFee(
-    calls: Call | Call[],
+    calls: AllowArray<Call>,
     { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
     const transactions = Array.isArray(calls) ? calls : [calls];
@@ -116,31 +117,56 @@ export class Account extends Provider implements AccountInterface {
     };
   }
 
-  /**
-   * Invoke execute function in account contract
-   *
-   * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/gateway/gateway_client.py#L13-L17)
-   *
-   * @param calls - one or more calls to be executed
-   * @param abis - one or more abis which can be used to display the calls
-   * @param transactionsDetail - optional transaction details
-   * @returns a confirmation of invoking a function on the starknet contract
-   */
+  public async estimateAccountDeployFee(
+    {
+      classHash,
+      addressSalt = 0,
+      constructorCalldata = [],
+      contractAddress: providedContractAddress,
+    }: DeployAccountContractPayload,
+    { blockIdentifier, nonce: providedNonce }: EstimateFeeDetails = {}
+  ): Promise<EstimateFee> {
+    const nonce = toBN(providedNonce ?? (await this.getNonce()));
+    const version = toBN(transactionVersion);
+    const chainId = await this.getChainId();
+    const contractAddress =
+      providedContractAddress ??
+      calculateContractAddressFromHash(addressSalt, classHash, constructorCalldata, 0);
+
+    const signature = await this.signer.signDeployAccountTransaction({
+      classHash,
+      contractAddress,
+      chainId,
+      maxFee: ZERO,
+      version,
+      nonce,
+      addressSalt,
+      constructorCalldata,
+    });
+
+    const response = await super.getDeployAccountEstimateFee(
+      { classHash, addressSalt, constructorCalldata, signature },
+      { version, nonce },
+      blockIdentifier
+    );
+    const suggestedMaxFee = estimatedFeeToMaxFee(response.overall_fee);
+
+    return {
+      ...response,
+      suggestedMaxFee,
+    };
+  }
+
   public async execute(
-    calls: Call | Call[],
+    calls: AllowArray<Call>,
     abis: Abi[] | undefined = undefined,
     transactionsDetail: InvocationsDetails = {}
   ): Promise<InvokeFunctionResponse> {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
-    let maxFee: BigNumberish = ZERO;
-    if (transactionsDetail.maxFee) {
-      maxFee = transactionsDetail.maxFee;
-    } else {
-      const { suggestedMaxFee } = await this.estimateInvokeFee(transactions, { nonce });
-      maxFee = suggestedMaxFee.toString();
-    }
-
+    const maxFee =
+      transactionsDetail.maxFee ??
+      (await this.getSuggestedMaxFee({ type: 'INVOKE', payload: calls }, transactionsDetail));
     const version = toBN(transactionVersion);
     const chainId = await this.getChainId();
 
@@ -171,19 +197,12 @@ export class Account extends Provider implements AccountInterface {
     transactionsDetail: InvocationsDetails = {}
   ): Promise<DeclareContractResponse> {
     const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
-    let maxFee: BigNumberish = ZERO;
-
-    if (transactionsDetail.maxFee) {
-      maxFee = transactionsDetail.maxFee;
-    } else {
-      const { suggestedMaxFee } = await this.estimateDeclareFee(
-        { contract, classHash },
-        {
-          nonce,
-        }
-      );
-      maxFee = suggestedMaxFee.toString();
-    }
+    const maxFee =
+      transactionsDetail.maxFee ??
+      (await this.getSuggestedMaxFee(
+        { type: 'DECLARE', payload: { classHash, contract } },
+        transactionsDetail
+      ));
 
     const version = toBN(transactionVersion);
     const chainId = await this.getChainId();
@@ -209,37 +228,62 @@ export class Account extends Provider implements AccountInterface {
     );
   }
 
-  /**
-   * Sign an JSON object with the starknet private key and return the signature
-   *
-   * @param json - JSON object to be signed
-   * @returns the signature of the JSON object
-   * @throws {Error} if the JSON object is not a valid JSON
-   */
+  public async deployAccount(
+    {
+      classHash,
+      constructorCalldata = [],
+      addressSalt = 0,
+      contractAddress: providedContractAddress,
+    }: DeployAccountContractPayload,
+    transactionsDetail: InvocationsDetails = {}
+  ): Promise<DeployContractResponse> {
+    const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
+    const version = toBN(transactionVersion);
+    const chainId = await this.getChainId();
+
+    const contractAddress =
+      providedContractAddress ??
+      calculateContractAddressFromHash(addressSalt, classHash, constructorCalldata, 0);
+
+    const maxFee =
+      transactionsDetail.maxFee ??
+      (await this.getSuggestedMaxFee(
+        {
+          type: 'DEPLOY_ACCOUNT',
+          payload: { classHash, constructorCalldata, addressSalt, contractAddress },
+        },
+        transactionsDetail
+      ));
+
+    const signature = await this.signer.signDeployAccountTransaction({
+      classHash,
+      constructorCalldata,
+      contractAddress,
+      addressSalt,
+      chainId,
+      maxFee,
+      version,
+      nonce,
+    });
+
+    return this.deployAccountContract(
+      { classHash, addressSalt, constructorCalldata, signature },
+      {
+        nonce,
+        maxFee,
+        version,
+      }
+    );
+  }
+
   public async signMessage(typedData: TypedData): Promise<Signature> {
     return this.signer.signMessage(typedData, this.address);
   }
 
-  /**
-   * Hash a JSON object with pederson hash and return the hash
-   *
-   * @param json - JSON object to be hashed
-   * @returns the hash of the JSON object
-   * @throws {Error} if the JSON object is not a valid JSON
-   */
   public async hashMessage(typedData: TypedData): Promise<string> {
     return getMessageHash(typedData, this.address);
   }
 
-  /**
-   * Verify a signature of a given hash
-   * @warning This method is not recommended, use verifyMessage instead
-   *
-   * @param hash - JSON object to be verified
-   * @param signature - signature of the JSON object
-   * @returns true if the signature is valid, false otherwise
-   * @throws {Error} if the JSON object is not a valid JSON or the signature is not a valid signature
-   */
   public async verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean> {
     try {
       await this.callContract({
@@ -256,16 +300,35 @@ export class Account extends Provider implements AccountInterface {
     }
   }
 
-  /**
-   * Verify a signature of a JSON object
-   *
-   * @param hash - hash to be verified
-   * @param signature - signature of the hash
-   * @returns true if the signature is valid, false otherwise
-   * @throws {Error} if the signature is not a valid signature
-   */
   public async verifyMessage(typedData: TypedData, signature: Signature): Promise<boolean> {
     const hash = await this.hashMessage(typedData);
     return this.verifyMessageHash(hash, signature);
+  }
+
+  public async getSuggestedMaxFee(
+    estimateFeeAction: EstimateFeeAction,
+    details: EstimateFeeDetails
+  ) {
+    let feeEstimate: EstimateFee;
+
+    switch (estimateFeeAction.type) {
+      case 'INVOKE':
+        feeEstimate = await this.estimateInvokeFee(estimateFeeAction.payload, details);
+        break;
+
+      case 'DECLARE':
+        feeEstimate = await this.estimateDeclareFee(estimateFeeAction.payload, details);
+        break;
+
+      case 'DEPLOY_ACCOUNT':
+        feeEstimate = await this.estimateAccountDeployFee(estimateFeeAction.payload, details);
+        break;
+
+      default:
+        feeEstimate = { suggestedMaxFee: ZERO, overall_fee: ZERO };
+        break;
+    }
+
+    return feeEstimate.suggestedMaxFee.toString();
   }
 }
