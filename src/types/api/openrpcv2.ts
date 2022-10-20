@@ -1,7 +1,7 @@
 /**
  * Starknet RPC version 0.2.0
  *
- * StarkNet Node API 0.44.0
+ * StarkNet Node API 0.45.0
  * StarkNet Node Write API 0.3.0 - rpc 0.2.0
  * StarkNet Trace API 0.3.0 - rpc 0.2.0
  *
@@ -74,7 +74,8 @@ type TXN_RECEIPT =
   | L1_HANDLER_TXN_RECEIPT
   | DECLARE_TXN_RECEIPT
   | DEPLOY_TXN_RECEIPT
-  | PENDING_TXN_RECEIPT;
+  | PENDING_TXN_RECEIPT
+  | DEPLOY_ACCOUNT_TXN_RECEIPT;
 
 type BLOCK_HEADER = {
   block_hash: BLOCK_HASH;
@@ -114,7 +115,18 @@ type DEPLOY_TXN = {
   transaction_hash: TXN_HASH;
   class_hash: FELT;
 } & DEPLOY_TXN_PROPERTIES;
-type TXN = INVOKE_TXN | L1_HANDLER_TXN | DECLARE_TXN | DEPLOY_TXN;
+
+type DEPLOY_ACCOUNT_TXN = COMMON_TXN_PROPERTIES & DEPLOY_ACCOUNT_TXN_PROPERTIES;
+
+type DEPLOY_ACCOUNT_TXN_PROPERTIES = {
+  contract_address_salt: FELT;
+  constructor_calldata: FELT;
+  class_hash: FELT;
+};
+
+type DEPLOY_ACCOUNT_TXN_RECEIPT = DEPLOY_TXN_RECEIPT;
+
+type TXN = INVOKE_TXN | L1_HANDLER_TXN | DECLARE_TXN | DEPLOY_TXN | DEPLOY_ACCOUNT_TXN;
 
 enum L1_HANDLER {
   'L1_HANDLER',
@@ -127,7 +139,14 @@ type L1_HANDLER_TXN = {
   nonce: NUM_AS_HEX;
 } & FUNCTION_CALL;
 
-type BROADCASTED_TXN = BROADCASTED_INVOKE_TXN | BROADCASTED_DECLARE_TXN | BROADCASTED_DEPLOY_TXN;
+type BROADCASTED_DEPLOY_ACCOUNT_TXN = BROADCASTED_TXN_COMMON_PROPERTIES &
+  DEPLOY_ACCOUNT_TXN_PROPERTIES;
+
+type BROADCASTED_TXN =
+  | BROADCASTED_INVOKE_TXN
+  | BROADCASTED_DECLARE_TXN
+  | BROADCASTED_DEPLOY_TXN
+  | BROADCASTED_DEPLOY_ACCOUNT_TXN;
 
 type BROADCASTED_INVOKE_TXN = BROADCASTED_TXN_COMMON_PROPERTIES & (INVOKE_TXN_V0 | INVOKE_TXN_V1);
 
@@ -301,10 +320,12 @@ type FUNCTION_INVOCATION = FUNCTION_CALL & {
   entry_point_type: ENTRY_POINT_TYPE;
   call_type: CALL_TYPE;
   result: FELT;
-  calls: FUNCTION_INVOCATION;
+  calls: NESTED_CALL;
   events: EVENT;
   messages: MSG_TO_L1;
 };
+type NESTED_CALL = FUNCTION_INVOCATION;
+
 type TRACE_ROOT = {
   nonce: FELT;
   signature: FELT;
@@ -482,6 +503,14 @@ export namespace OPENRPC {
       };
       result: DeployedTransaction;
       errors: Errors.INVALID_CONTRACT_CLASS;
+    };
+    starknet_addDeployAccountTransaction: {
+      params: BROADCASTED_DEPLOY_ACCOUNT_TXN;
+      result: {
+        transaction_hash: TXN_HASH;
+        contract_address: FELT;
+      };
+      errors: Errors.CLASS_HASH_NOT_FOUND;
     };
 
     // Trace API
