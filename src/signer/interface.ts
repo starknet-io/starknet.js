@@ -40,6 +40,7 @@ export abstract class SignerInterface {
 
   /**
    * Signs a DEPLOY_ACCOUNT transaction with the starknet private key and returns the signature
+   *
    * @param transaction
    * - contractAddress - the computed address of the contract
    * - constructorCalldata - calldata to be passed in deploy constructor
@@ -56,6 +57,7 @@ export abstract class SignerInterface {
 
   /**
    * Signs a DECLARE transaction with the starknet private key and returns the signature
+   *
    * @param transaction
    * - classHash - computed class hash. Will be replaced by ContractClass in future once class hash is present in CompiledContract
    * - senderAddress - the address of the sender

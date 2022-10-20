@@ -71,7 +71,7 @@ export abstract class AccountInterface extends ProviderInterface {
    * Estimate Fee for executing a DEPLOY_ACCOUNT transaction on starknet
    *
    * @param contractPayload the payload object containing:
-   * - contract - the compiled contract to be declared
+   * - contract - the compiled contract to be deployed
    * - classHash - the class hash of the compiled contract. This can be obtained by using starknet-cli.
    *
    * @returns response from estimate_fee
@@ -101,6 +101,7 @@ export abstract class AccountInterface extends ProviderInterface {
 
   /**
    * Declares a given compiled contract (json) to starknet
+   * 
    * @param contractPayload transaction payload to be deployed containing:
   - contract: compiled contract code
   - classHash: computed class hash of compiled contract
@@ -118,11 +119,12 @@ export abstract class AccountInterface extends ProviderInterface {
 
   /**
    * Deploy the account on Starknet
+   * 
    * @param contractPayload transaction payload to be deployed containing:
-   * - classHash: computed class hash of compiled contract
-   * - constructor calldata
-   * - address salt  
-  - signature
+  - classHash: computed class hash of compiled contract
+  - optional constructor calldata
+  - optional address salt  
+  - optional contractAddress
    * @param transactionsDetail Invocation Details containing:
   - optional nonce
   - optional version
@@ -157,7 +159,7 @@ export abstract class AccountInterface extends ProviderInterface {
   /**
    * Verify a signature of a JSON object
    *
-   * @param json - JSON object to be verified
+   * @param typedData - JSON object to be verified
    * @param signature - signature of the JSON object
    * @returns true if the signature is valid, false otherwise
    * @throws {Error} if the JSON object is not a valid JSON or the signature is not a valid signature
@@ -177,6 +179,7 @@ export abstract class AccountInterface extends ProviderInterface {
 
   /**
    * Gets the nonce of the account with respect to a specific block
+   *
    * @param  {BlockIdentifier} blockIdentifier - optional blockIdentifier. Defaults to 'pending'
    * @returns nonce of the account
    */
@@ -184,6 +187,7 @@ export abstract class AccountInterface extends ProviderInterface {
 
   /**
    * Gets Suggested Max Fee based on the transaction type
+   *
    * @param  {EstimateFeeAction} estimateFeeAction
    * @param  {EstimateFeeDetails} details
    * @returns suggestedMaxFee
