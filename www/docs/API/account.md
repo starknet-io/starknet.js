@@ -24,20 +24,30 @@ The address of the account contract.
 
 ## Methods
 
-account.**getNonce()** => _Promise < BigNumberish >_
+account.**getNonce(blockIdentifier)** => _Promise < BigNumberish >_
 
-Gets the new Nonce of the connected account for the next transaction.
+Gets the nonce of the account with respect to a specific block.
+
+_blockIdentifier_ - optional blockIdentifier. Defaults to 'pending'.
+
+Returns the nonce of the account.
 
 <hr />
 
-account.**estimateInvokeFee**(calls [ , options ]) => _Promise < EstimateFeeResponse >_
+account.**estimateInvokeFee**(calls [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse >_
 
-Gets the estimated fee for the call(s).
+Estimate Fee for executing an INVOKE transaction on starknet.
 
-The _options_ object may include any of:
+The _calls_ object structure:
 
-- options.**blockIdentifier** - Block Identifier for the transaction
-- options.**nonce** - Nonce for the transaction
+- calls.**contractAddress** - Address of the contract
+- calls.**entrypoint** - Entrypoint of the call (method name)
+- calls.**calldata** - Payload for the invoking method
+
+The _estimateFeeDetails_ object may include any of:
+
+- estimateFeeDetails.**blockIdentifier** - Block Identifier for the transaction
+- estimateFeeDetails.**nonce** - Nonce for the transaction
 
 ###### _EstimateFeeResponse_
 
@@ -51,14 +61,19 @@ The _options_ object may include any of:
 
 <hr />
 
-account.**estimateDeclareFee**(contractPayload [ , options ]) => _Promise < EstimateFeeResponse >_
+account.**estimateDeclareFee**(contractPayload [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse >_
 
-Gets the estimated fee for the declare transaction.
+Estimate Fee for executing a DECLARE transaction on starknet.
 
-The _options_ object may include any of:
+The _contractPayload_ object structure:
 
-- options.**blockIdentifier** - Block Identifier for the transaction
-- options.**nonce** - Nonce for the transaction
+- contractPayload.**contract** - The compiled contract
+- contractPayload.**classHash** - This can be obtained by using starknet-cli. Once the classHash is included in CompiledContract, this can be removed
+
+The _estimateFeeDetails_ object may include any of:
+
+- estimateFeeDetails.**blockIdentifier** - Block Identifier for the transaction
+- estimateFeeDetails.**nonce** - Nonce for the transaction
 
 ###### _EstimateFeeResponse_
 
@@ -72,9 +87,44 @@ The _options_ object may include any of:
 
 <hr />
 
-account.**execute**(calls [ , abi , transactionsDetail ]) => _Promise < AddTransactionResponse >_
+account.**estimateAccountDeployFee**(contractPayload [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse >_
+
+Estimate Fee for executing a DEPLOY_ACCOUNT transaction on starknet
+
+The _contractPayload_ object structure:
+
+- contractPayload.**contract** - The compiled contract to be declared
+- contractPayload.**classHash** - This can be obtained by using starknet-cli. Once the classHash is included in CompiledContract, this can be removed
+
+The _estimateFeeDetails_ object may include any of:
+
+- estimateFeeDetails.**blockIdentifier** - Block Identifier for the transaction
+- estimateFeeDetails.**nonce** - Nonce for the transaction
+
+###### _EstimateFeeResponse_
+
+```typescript
+{
+  overall_fee: BN;
+  gas_consumed?: BN;
+  gas_price?: BN;
+}
+```
+
+<hr />
+
+account.**execute**(transactions [ , abi , transactionsDetail ]) => _Promise < InvokeFunctionResponse >_
 
 Executes one or multiple calls using the account contract.
+
+The _transactions_ object structure:
+
+- contractPayload.**contractAddress** - the address of the contract
+- contractPayload.**entrypoint** - the entrypoint of the contract
+- contractPayload.**calldata** - (defaults to []) the calldata
+- contractPayload.**signature** - (defaults to []) the signature
+
+_abi_ - (optional) the abi of the contract for better displaying
 
 The _transactionsDetail_ object may include any of:
 
@@ -82,7 +132,7 @@ The _transactionsDetail_ object may include any of:
 - transactionsDetail.**nonce** - Nonce for the transaction
 - transactionsDetail.**version** - Version for the transaction (default is 1)
 
-###### _AddTransactionResponse_
+###### _InvokeFunctionResponse_
 
 ```typescript
 {
@@ -92,20 +142,20 @@ The _transactionsDetail_ object may include any of:
 
 <hr />
 
-account.**declare**(payload [ , transactionsDetail ]) => _Promise < DeclareContractResponse >_
+account.**declare**(contractPayload [ , transactionsDetail ]) => _Promise < DeclareContractResponse >_
 
-The _payload_ object consists of:
+Declares a given compiled contract (json) to starknet.
 
-- payload.**contract** - The compiled contract
-- payload.**classHash** - Hash of the compiled contract
+The _contractPayload_ object consists of:
+
+- contractPayload.**contract** - The compiled contract
+- contractPayload.**classHash** - Hash of the compiled contract
 
 The _transactionsDetail_ object may include any of:
 
 - transactionsDetail.**maxFee** - Max Fee that that will be used to execute the call(s)
 - transactionsDetail.**nonce** - Nonce for the transaction
 - transactionsDetail.**version** - Version for the transaction (default is 1)
-
-Declares a contract on Starknet.
 
 > _Note:_ Once the classHash is included in CompiledContract, this parameter can be removed. Currently it can be pre-computed from starknet-cli.
 
@@ -128,11 +178,43 @@ const declareTx = await account.declare({
 };
 ```
 
+<hr />
+
+account.**deployAccount**(contractPayload [ , transactionsDetail ]) => _Promise < DeployContractResponse >_
+
+Declares a given compiled contract (json) to starknet.
+
+The _contractPayload_ object consists of:
+
+- contractPayload.**classHash** - Hash of the compiled contract
+- contractPayload.**constructorCalldata** - optional
+- contractPayload.**addressSalt** - optional
+- contractPayload.**contractAddress** - optional
+
+The _transactionsDetail_ object may include any of:
+
+- transactionsDetail.**maxFee** - Max Fee that that will be used to execute the call(s)
+- transactionsDetail.**nonce** - Nonce for the transaction
+- transactionsDetail.**version** - Version for the transaction (default is 1)
+
+> _Note:_ Once the classHash is included in CompiledContract, this parameter can be removed. Currently it can be pre-computed from starknet-cli.
+
+###### _DeployContractResponse_
+
+```typescript
+{
+  contract_address: string;
+  transaction_hash: string;
+};
+```
+
 <hr/>
 
 account.**signMessage**(typedData) => _Promise < Signature >_
 
-Creates a signature from the passed data.
+Sign an JSON object for off-chain usage with the starknet private key and return the signature. This adds a message prefix so it cant be interchanged with transactions.
+
+_typedData_ - JSON object to be signed
 
 ###### _Signature_
 
@@ -144,7 +226,11 @@ string[];
 
 account.**hashMessage**(typedData) => _Promise < string >_
 
-Creates a hash from the passed data.
+Hash a JSON object with pederson hash and return the hash. This adds a message prefix so it cant be interchanged with transactions.
+
+_typedData_ - JSON object to be signed
+
+Returns the hash of the JSON object.
 
 <hr />
 
@@ -162,4 +248,18 @@ account.**verifyMessage**(typedData, signature) => _Promise < boolean >_
 
 Verify a signature of a JSON object.
 
+_typedData_ - JSON object to be verified
+_signature_ - signature of the JSON object
+
+Returns true if the signature is valid, false otherwise
+
 <hr />
+
+account.**getSuggestedMaxFee**(estimateFeeAction, details) => _Promise < BigNumberish >_
+
+Gets Suggested Max Fee based on the transaction type.
+
+The _details_ object may include any of:
+
+- details.**blockIdentifier**
+- details.**nonce**
