@@ -3,7 +3,6 @@ import type {
   Call,
   CallContractResponse,
   ContractClass,
-  DeclareContractPayload,
   DeclareContractResponse,
   DeployContractPayload,
   DeployContractResponse,
@@ -13,14 +12,26 @@ import type {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
-  InvocationsDetails,
+  InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
 } from '../types';
+import {
+  DeclareContractTransaction,
+  DeployAccountContractPayload,
+  DeployAccountContractTransaction,
+} from '../types/lib';
 import type { BigNumberish } from '../utils/number';
 import { BlockIdentifier } from './utils';
 
 export abstract class ProviderInterface {
   public abstract chainId: StarknetChainId;
+
+  /**
+   * Gets the Starknet chain Id
+   *
+   * @returns the chain Id
+   */
+  public abstract getChainId(): Promise<StarknetChainId>;
 
   /**
    * Calls a function on the StarkNet contract.
@@ -61,6 +72,17 @@ export abstract class ProviderInterface {
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
   ): Promise<ContractClass>;
+
+  /**
+   * Gets the nonce of a contract with respect to a specific block
+   *
+   * @param contractAddress - contract address
+   * @returns the hex nonce
+   */
+  public abstract getNonce(
+    contractAddress: string,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<BigNumberish>;
 
   /**
    * Gets the contract's storage variable at a specific key.
@@ -106,16 +128,18 @@ export abstract class ProviderInterface {
   public abstract deployContract(payload: DeployContractPayload): Promise<DeployContractResponse>;
 
   /**
-   * Declares a given compiled contract (json) to starknet
+   * Deploys a given compiled Account contract (json) to starknet
    *
    * @param payload payload to be deployed containing:
    * - compiled contract code
-   * - optional version
+   * - constructor calldata
+   * - address salt
    * @returns a confirmation of sending a transaction on the starknet contract
    */
-  public abstract declareContract(
-    payload: DeclareContractPayload
-  ): Promise<DeclareContractResponse>;
+  public abstract deployAccountContract(
+    payload: DeployAccountContractPayload,
+    details: InvocationsDetailsWithNonce
+  ): Promise<DeployContractResponse>;
 
   /**
    * Invokes a function on starknet
@@ -134,11 +158,29 @@ export abstract class ProviderInterface {
    */
   public abstract invokeFunction(
     invocation: Invocation,
-    details?: InvocationsDetails
+    details: InvocationsDetailsWithNonce
   ): Promise<InvokeFunctionResponse>;
 
   /**
-   * Estimates the fee for a given transaction
+   * Declares a given compiled contract (json) to starknet
+   * @param transaction transaction payload to be deployed containing:
+   * - compiled contract code
+   * - sender address
+   * - signature
+   * @param details Invocation Details containing:
+   * - nonce
+   * - optional version
+   * - optional maxFee
+   * @returns a confirmation of sending a transaction on the starknet contract
+   */
+  public abstract declareContract(
+    transaction: DeclareContractTransaction,
+    details: InvocationsDetailsWithNonce
+  ): Promise<DeclareContractResponse>;
+
+  /**
+   * Estimates the fee for a given INVOKE transaction
+   * @deprecated Please use getInvokeEstimateFee or getDeclareEstimateFee instead
    *
    * @param invocation the invocation object containing:
    * - contractAddress - the address of the contract
@@ -153,8 +195,69 @@ export abstract class ProviderInterface {
    */
   public abstract getEstimateFee(
     invocation: Invocation,
-    blockIdentifier: BlockIdentifier,
-    details?: InvocationsDetails
+    details: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier
+  ): Promise<EstimateFeeResponse>;
+
+  /**
+   * Estimates the fee for a given INVOKE transaction
+   *
+   * @param invocation the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   * @param blockIdentifier - block identifier
+   * @param details - optional details containing:
+   * - nonce - optional nonce
+   * - version - optional version
+   * @returns the estimated fee
+   */
+  public abstract getInvokeEstimateFee(
+    invocation: Invocation,
+    details: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier
+  ): Promise<EstimateFeeResponse>;
+
+  /**
+   * Estimates the fee for a given DECLARE transaction
+   *
+   * @param transaction transaction payload to be declared containing:
+   * - compiled contract code
+   * - sender address
+   * - signature - (defaults to []) the signature
+   * @param details - optional details containing:
+   * - nonce
+   * - version - optional version
+   * - optional maxFee
+   * @param blockIdentifier - block identifier
+   * @returns the estimated fee
+   */
+  public abstract getDeclareEstimateFee(
+    transaction: DeclareContractTransaction,
+    details: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier
+  ): Promise<EstimateFeeResponse>;
+
+  /**
+   * Estimates the fee for a given DEPLOY_ACCOUNT transaction
+   *
+   * @param transaction transaction payload to be deployed containing:
+   * - classHash
+   * - constructorCalldata
+   * - addressSalt
+   * - signature - (defaults to []) the signature
+   * @param details - optional details containing:
+   * - nonce
+   * - version - optional version
+   * - optional maxFee
+   * @param blockIdentifier - block identifier
+   * @returns the estimated fee
+   */
+  public abstract getDeployAccountEstimateFee(
+    transaction: DeployAccountContractTransaction,
+    details: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier
   ): Promise<EstimateFeeResponse>;
 
   /**

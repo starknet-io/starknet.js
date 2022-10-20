@@ -1,3 +1,97 @@
+# [4.9.0](https://github.com/0xs34n/starknet.js/compare/v4.8.0...v4.9.0) (2022-10-19)
+
+### Bug Fixes
+
+- add back getEstimateFee and estimateFee ([bf7abca](https://github.com/0xs34n/starknet.js/commit/bf7abca616ebbb658fda040959c6103d8998069d))
+- build ([421b9d7](https://github.com/0xs34n/starknet.js/commit/421b9d7a3fa3fd962faab8f22289d69bd521b5ca))
+- erc20 tests ([2b6aa24](https://github.com/0xs34n/starknet.js/commit/2b6aa2455e6d878003157b16ae2e611dbcb017ea))
+- estimateFee response ([546e43b](https://github.com/0xs34n/starknet.js/commit/546e43ba605c79c2f8c1c47b881a554da2f9bad7))
+- getBlock test ([e3750d0](https://github.com/0xs34n/starknet.js/commit/e3750d0c31eb63a6627a6e3cc47542cea7c1915e))
+- linter autofix restored ([07d28f6](https://github.com/0xs34n/starknet.js/commit/07d28f6ac4c91ab3a80f12c1d3ad0a1c4b15ca88))
+- optional address ([95e7e47](https://github.com/0xs34n/starknet.js/commit/95e7e479c7f1d30d43f122bef820f93999453f14))
+- provide all available data from sequencer GetTransaction ([f3d2969](https://github.com/0xs34n/starknet.js/commit/f3d29693f2a349eed089224db9e96a137ab9f236))
+- removed parseGetTransactionReceiptResponse rpc response parser for TransactionReceipt ([7fca26d](https://github.com/0xs34n/starknet.js/commit/7fca26ddf9b830aa1290f6e450daeea5bee03b38))
+- use BigNumberish type for classHash ([0ab4d47](https://github.com/0xs34n/starknet.js/commit/0ab4d478a4930a2044b68280ca4e6cd69f63920a))
+
+### Features
+
+- add and update tests ([b2df4c7](https://github.com/0xs34n/starknet.js/commit/b2df4c7deea96aaefcdf90e640bca67a91b6dab7))
+- add declare flow with estimate fee ([30d5544](https://github.com/0xs34n/starknet.js/commit/30d554442ed3173bf4fa1d80dd3acaf2461b78aa))
+- deploy_account transaction ([8e5d414](https://github.com/0xs34n/starknet.js/commit/8e5d4148fe8edc72e5b5eaac0be56d5127ce828d))
+- **refactor:** contractAddress calculation ([2b791d5](https://github.com/0xs34n/starknet.js/commit/2b791d5db4a78fceb6cc08ae4ed2ef68fe0c3f07))
+- update maxFee logic ([19add10](https://github.com/0xs34n/starknet.js/commit/19add10d53b5b83fb96c8db1043318942f59309c))
+- use updated erc20 contract ([19ca7e8](https://github.com/0xs34n/starknet.js/commit/19ca7e822988d9b82e075c569a1decb4d4d7966a))
+
+# [4.8.0](https://github.com/0xs34n/starknet.js/compare/v4.7.0...v4.8.0) (2022-10-05)
+
+### Bug Fixes
+
+- adapted transactionTrace response ([58c21c0](https://github.com/0xs34n/starknet.js/commit/58c21c0a3c647eae781d57024c3193aa6c98b20b))
+- estimate fee BigInt test ([0489bed](https://github.com/0xs34n/starknet.js/commit/0489bed7ea16790708878d7714df554b84d02153))
+- fixed and one-lined hash sort and added additional test case ([023c7c7](https://github.com/0xs34n/starknet.js/commit/023c7c7c543c0e4382bf3e109140206f7c7cba57))
+- fixed hash arg sorting in merkle tree generation ([ccbfecf](https://github.com/0xs34n/starknet.js/commit/ccbfecfa63aa5037455405d929aea6322590d6ac))
+- is sequencer goerli fix ([2d43d1b](https://github.com/0xs34n/starknet.js/commit/2d43d1b666ccbcaf3a9fda92ebfbb7db3b96f8c1))
+- issue 296 ([bfc1f70](https://github.com/0xs34n/starknet.js/commit/bfc1f7051f8949b4c4d89ee379430e4404c9a2f5))
+- remove linter fix ([272e2ec](https://github.com/0xs34n/starknet.js/commit/272e2ecbe254758bc6d841e16d426446914e18e9))
+- remove optional l1_origin_message from test ([01050e3](https://github.com/0xs34n/starknet.js/commit/01050e333a6d96e3b439bdb3398a634ee18137af))
+- remove status_data as it is optional response parameter ([9bb0a3e](https://github.com/0xs34n/starknet.js/commit/9bb0a3e0afb610817a12c036e3f117a385f4a1d6))
+- sequencer getBlock response ([165bce7](https://github.com/0xs34n/starknet.js/commit/165bce743467cd9de36559c3cb232fccc32064be))
+
+### Features
+
+- sequencer estimateMessageFee ([f1ffda7](https://github.com/0xs34n/starknet.js/commit/f1ffda7e79e9bfda7f041abc3fd8c5b4ac9f1a66))
+
+# [4.7.0](https://github.com/0xs34n/starknet.js/compare/v4.6.0...v4.7.0) (2022-09-22)
+
+### Bug Fixes
+
+- add blockIdentifier for getNonce ([7f2edab](https://github.com/0xs34n/starknet.js/commit/7f2edab5099eb9679744140bfe80328801a621ab))
+- addressSalt from BigNumberish to string | undefined ([f77784c](https://github.com/0xs34n/starknet.js/commit/f77784c98d1827a8fd64dd1c543beea4284af7b3))
+- block_id identifier cleanup ([24c24e8](https://github.com/0xs34n/starknet.js/commit/24c24e8060b76f6a300b21c3148a15183b802fcb))
+- **ci:** use correct devnet image for release pipeline ([fc2fcbb](https://github.com/0xs34n/starknet.js/commit/fc2fcbb57e48b4cec9197c59120a574b018a54af))
+- cleanup pr.yml ([263e296](https://github.com/0xs34n/starknet.js/commit/263e29658c30e2c80fe1795f89d4c334777fef5e))
+- fix tests for starknet 0.10 ([c2da26d](https://github.com/0xs34n/starknet.js/commit/c2da26d4b92221fdd54fdd8ff37c437529616b21))
+- get_nonce response type ([f0c30bd](https://github.com/0xs34n/starknet.js/commit/f0c30bd4376eb7c70098d77ff2918ea80418a8af))
+- throw error only when nonce is not provided with contract.invoke ([c6bba65](https://github.com/0xs34n/starknet.js/commit/c6bba6517054b5221f227732750092d0c11b566d))
+- ts types fixes and block_id ([bad0b85](https://github.com/0xs34n/starknet.js/commit/bad0b851765b9af70af3a784aeb1ae5adbe29816))
+
+### Features
+
+- add getNonce method on account ([8e935eb](https://github.com/0xs34n/starknet.js/commit/8e935ebaa251279b83fab65397687ef0380358ac))
+- getNonce endpoint for sequencer ([add4900](https://github.com/0xs34n/starknet.js/commit/add4900ad86f40390b68f6f2158cfbb588fe21d6))
+- is_valid_signature -> isValidSignature ([f704f3e](https://github.com/0xs34n/starknet.js/commit/f704f3e9a3aec0744c155fc3bded079fac7284b5))
+- rpc options, methods, fetch with prop types, imp. types, clenup responseParser ([0ab5769](https://github.com/0xs34n/starknet.js/commit/0ab576957b3e193a68ae6f3ceb15d0b042d39b14))
+- rpc optionsOrProvider extend with retries ([46f9634](https://github.com/0xs34n/starknet.js/commit/46f96342be05252de306fba28da74e634e8b9c3f))
+- transaction v1 changes ([e928478](https://github.com/0xs34n/starknet.js/commit/e92847848166170c7d63394993cd74ae79c14a67))
+- update tests ([1af16f4](https://github.com/0xs34n/starknet.js/commit/1af16f475813a15c78d3b049b7453c19023fe53a))
+- use starknet-devnet 0.3.1 ([83e5dd7](https://github.com/0xs34n/starknet.js/commit/83e5dd7f3bfc5d8d492b3761da6e9fe15669d03c))
+
+# [4.6.0](https://github.com/0xs34n/starknet.js/compare/v4.5.0...v4.6.0) (2022-09-15)
+
+### Bug Fixes
+
+- add test getTransactionCount [skip ci] ([342755a](https://github.com/0xs34n/starknet.js/commit/342755aa99dda016d7aa394a0023b3f2e5d5e963))
+- estimateFee and call block id ([ef1645f](https://github.com/0xs34n/starknet.js/commit/ef1645f740e7c29edea6b091bec9949ec713953f))
+- rpc test update, comepleted rpc to openrpc mapping, rpc provider methods ([8b41e0f](https://github.com/0xs34n/starknet.js/commit/8b41e0fcf36b34b20dfaba356cfc0131f02d7d69))
+
+### Features
+
+- new Block utility object, rpc fetch clenup, open rpc fetch api ([0d381c8](https://github.com/0xs34n/starknet.js/commit/0d381c89fe655b2628f02e67095ef03cb1721398))
+- read, write and trace api ([d488ab2](https://github.com/0xs34n/starknet.js/commit/d488ab2513b88fdeb4e27b6ec2b7226ffd359445))
+- retry rpc wait for transaction 200 times instead of 100 ([3bc9118](https://github.com/0xs34n/starknet.js/commit/3bc9118cae86fba21e1c85667079079662ba0b7b))
+- updated rpc tests with new methods ([e369d95](https://github.com/0xs34n/starknet.js/commit/e369d95d72f3b39b3e8b8baa99867b94c1d5d1c1))
+
+# [4.5.0](https://github.com/0xs34n/starknet.js/compare/v4.4.2...v4.5.0) (2022-09-09)
+
+### Bug Fixes
+
+- prevent undefined rpc chainId in account ([9f69229](https://github.com/0xs34n/starknet.js/commit/9f69229fcb5205bb3fd1fcc7eb7c627faa300561))
+- repair chain fix ([d7758a6](https://github.com/0xs34n/starknet.js/commit/d7758a6d180cd1af89f8aefb37bce077b92c5fd5))
+
+### Features
+
+- optional abi field for deploy and declare rpc transactions ([ce62648](https://github.com/0xs34n/starknet.js/commit/ce626481cb6bc3dea77963482820ae6f50c82566))
+
 ## [4.4.2](https://github.com/0xs34n/starknet.js/compare/v4.4.1...v4.4.2) (2022-09-07)
 
 ### Bug Fixes

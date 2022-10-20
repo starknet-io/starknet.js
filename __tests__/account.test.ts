@@ -3,7 +3,13 @@ import { isBN } from 'bn.js';
 import typedDataExample from '../__mocks__/typedDataExample.json';
 import { Account, Contract, Provider, number, stark } from '../src';
 import { toBN } from '../src/utils/number';
-import { compiledErc20, compiledTestDapp, getTestAccount, getTestProvider } from './fixtures';
+import {
+  compiledErc20,
+  compiledTestDapp,
+  getERC20DeployPayload,
+  getTestAccount,
+  getTestProvider,
+} from './fixtures';
 
 describe('deploy and test Wallet', () => {
   const provider = getTestProvider();
@@ -15,26 +21,18 @@ describe('deploy and test Wallet', () => {
   beforeAll(async () => {
     expect(account).toBeInstanceOf(Account);
 
-    const erc20Response = await provider.deployContract({
-      contract: compiledErc20,
-    });
+    const erc20DeployPayload = getERC20DeployPayload(account.address);
+
+    const erc20Response = await provider.deployContract(erc20DeployPayload);
 
     erc20Address = erc20Response.contract_address;
     erc20 = new Contract(compiledErc20.abi, erc20Address, provider);
 
     await provider.waitForTransaction(erc20Response.transaction_hash);
 
-    const mintResponse = await account.execute({
-      contractAddress: erc20Address,
-      entrypoint: 'mint',
-      calldata: [account.address, '1000'],
-    });
+    const x = await erc20.balanceOf(account.address);
 
-    await provider.waitForTransaction(mintResponse.transaction_hash);
-
-    const x = await erc20.balance_of(account.address);
-
-    expect(number.toBN(x.res as string).toString()).toStrictEqual(number.toBN(1000).toString());
+    expect(number.toBN(x[0].low).toString()).toStrictEqual(number.toBN(1000).toString());
 
     const dappResponse = await provider.deployContract({
       contract: compiledTestDapp,
@@ -45,47 +43,44 @@ describe('deploy and test Wallet', () => {
   });
 
   test('estimate fee', async () => {
-    const { overall_fee } = await account.estimateFee({
+    const { overall_fee } = await account.estimateInvokeFee({
       contractAddress: erc20Address,
       entrypoint: 'transfer',
-      calldata: [erc20.address, '10'],
+      calldata: [erc20.address, '10', '0'],
     });
     expect(isBN(overall_fee)).toBe(true);
   });
 
   test('read balance of wallet', async () => {
-    const x = await erc20.balance_of(account.address);
+    const x = await erc20.balanceOf(account.address);
 
-    expect(number.toBN(x.res as string).toString()).toStrictEqual(number.toBN(1000).toString());
+    expect(number.toBN(x[0].low).toString()).toStrictEqual(number.toBN(1000).toString());
   });
 
   test('execute by wallet owner', async () => {
     const { transaction_hash } = await account.execute({
       contractAddress: erc20Address,
       entrypoint: 'transfer',
-      calldata: [erc20.address, '10'],
+      calldata: [erc20.address, '10', '0'],
     });
 
     await provider.waitForTransaction(transaction_hash);
   });
 
   test('read balance of wallet after transfer', async () => {
-    const { res } = await erc20.balance_of(account.address);
+    const { balance } = await erc20.balanceOf(account.address);
 
-    expect(res).toStrictEqual(toBN(990));
+    expect(balance.low).toStrictEqual(toBN(990));
   });
 
   test('execute with custom nonce', async () => {
-    const { result } = await account.callContract({
-      contractAddress: account.address,
-      entrypoint: 'get_nonce',
-    });
-    const nonce = toBN(result[0]).toNumber();
+    const result = await account.getNonce();
+    const nonce = toBN(result).toNumber();
     const { transaction_hash } = await account.execute(
       {
         contractAddress: erc20Address,
         entrypoint: 'transfer',
-        calldata: [account.address, '10'],
+        calldata: [account.address, '10', '0'],
       },
       undefined,
       { nonce }
@@ -133,7 +128,7 @@ describe('deploy and test Wallet', () => {
       const mintResponse = await account.execute({
         contractAddress: erc20Address,
         entrypoint: 'mint',
-        calldata: [wallet, '1000'],
+        calldata: [wallet, '1000', '0'],
       });
 
       await provider.waitForTransaction(mintResponse.transaction_hash);
@@ -146,8 +141,18 @@ describe('deploy and test Wallet', () => {
     });
 
     test('estimate gas fee for `mint`', async () => {
-      const res = await erc20.estimateFee.mint(wallet, '10');
+      const res = await erc20.estimateFee.mint(wallet, ['10', '0']);
       expect(res).toHaveProperty('overall_fee');
+    });
+
+    test('Declare Account contract', async () => {
+      const declareTx = await account.declare({
+        contract: compiledErc20,
+        classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+      });
+      await provider.waitForTransaction(declareTx.transaction_hash);
+
+      expect(declareTx.class_hash).toBeDefined();
     });
   });
 });

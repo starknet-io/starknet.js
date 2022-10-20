@@ -5,13 +5,13 @@ import { BigNumberish } from '../../utils/number';
 import {
   Abi,
   BlockNumber,
+  ContractClass,
   EntryPointType,
   RawCalldata,
   Signature,
   Status,
   TransactionStatus,
 } from '../lib';
-import { ContractClass } from '../provider';
 
 export type GetTransactionStatusResponse = {
   tx_status: Status;
@@ -27,15 +27,17 @@ export type GetContractAddressesResponse = {
   GpsStatementVerifier: string;
 };
 
-export type InvokeFunctionTrace = {
+export type FunctionInvocation = {
   caller_address: string;
   contract_address: string;
-  code_address: string;
-  selector: string;
   calldata: RawCalldata;
+  call_type?: string;
+  class_hash?: string;
+  selector?: string;
+  entry_point_type?: EntryPointType;
   result: Array<any>;
   execution_resources: ExecutionResources;
-  internal_call: Array<InvokeFunctionTrace>;
+  internal_calls: Array<FunctionInvocation>;
   events: Array<any>;
   messages: Array<any>;
 };
@@ -54,18 +56,9 @@ export type ExecutionResources = {
 };
 
 export type GetTransactionTraceResponse = {
-  function_invocation: {
-    caller_address: string;
-    contract_address: string;
-    code_address: string;
-    selector: string;
-    calldata: RawArgs;
-    result: Array<any>;
-    execution_resources: ExecutionResources;
-    internal_call: Array<any>;
-    events: Array<any>;
-    messages: Array<any>;
-  };
+  validate_invocation?: FunctionInvocation;
+  function_invocation?: FunctionInvocation;
+  fee_transfer_invocation?: FunctionInvocation;
   signature: Signature;
 };
 
@@ -73,13 +66,22 @@ export type RawArgs = {
   [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
 };
 
+export type CallL1Handler = {
+  from_address: string;
+  to_address: string;
+  entry_point_selector: string;
+  payload: Array<string>;
+};
+
 export namespace Sequencer {
   export type DeclareTransaction = {
     type: 'DECLARE';
+    sender_address: string;
     contract_class: ContractClass;
+    signature?: Signature;
     nonce: BigNumberish;
-    sender_address: BigNumberish;
-    signature: Signature;
+    max_fee?: BigNumberish;
+    version?: BigNumberish;
   };
 
   export type DeployTransaction = {
@@ -90,19 +92,33 @@ export namespace Sequencer {
     nonce?: BigNumberish;
   };
 
+  export type DeployAccountTransaction = {
+    type: 'DEPLOY_ACCOUNT';
+    class_hash: string;
+    contract_address_salt: BigNumberish;
+    constructor_calldata: string[];
+    signature?: Signature;
+    max_fee?: BigNumberish;
+    version?: BigNumberish;
+    nonce?: BigNumberish;
+  };
+
   export type InvokeFunctionTransaction = {
     type: 'INVOKE_FUNCTION';
     contract_address: string;
     signature?: Signature;
     entry_point_type?: EntryPointType;
-    entry_point_selector: string;
     calldata?: RawCalldata;
-    nonce?: BigNumberish;
+    nonce: BigNumberish;
     max_fee?: BigNumberish;
     version?: BigNumberish;
   };
 
-  export type Transaction = DeclareTransaction | DeployTransaction | InvokeFunctionTransaction;
+  export type Transaction =
+    | DeclareTransaction
+    | DeployTransaction
+    | InvokeFunctionTransaction
+    | DeployAccountTransaction;
 
   export type AddTransactionResponse = {
     transaction_hash: string;
@@ -118,6 +134,7 @@ export namespace Sequencer {
 
   export interface InvokeFunctionTransactionResponse extends InvokeFunctionTransaction {
     transaction_hash: string;
+    entry_point_selector: string;
   }
 
   export type TransactionResponse =
@@ -197,16 +214,28 @@ export namespace Sequencer {
     status: Status;
     gas_price: string;
     sequencer_address: string;
+    starknet_version: string;
   };
 
   export type CallContractTransaction = Omit<
     InvokeFunctionTransaction,
     'type' | 'entry_point_type' | 'nonce'
-  >;
+  > & { entry_point_selector: string };
 
   export type CallContractResponse = {
     result: string[];
   };
+
+  export type InvokeEstimateFee = Omit<InvokeFunctionTransaction, 'max_fee' | 'entry_point_type'>;
+  export type DeclareEstimateFee = Omit<DeclareTransaction, 'max_fee'>;
+  export type DeployAccountEstimateFee = Omit<DeployAccountTransaction, 'max_fee'>;
+  export type DeployEstimateFee = DeployTransaction;
+
+  export type EstimateFeeRequest =
+    | InvokeEstimateFee
+    | DeclareEstimateFee
+    | DeployEstimateFee
+    | DeployAccountEstimateFee;
 
   // Support 0.9.1 changes in a backward-compatible way
   export type EstimateFeeResponse =
@@ -259,6 +288,14 @@ export namespace Sequencer {
       REQUEST: never;
       RESPONSE: TransactionReceiptResponse;
     };
+    get_nonce: {
+      QUERY: {
+        contractAddress: string;
+        blockIdentifier: BlockIdentifier;
+      };
+      REQUEST: never;
+      RESPONSE: BigNumberish;
+    };
     get_storage_at: {
       QUERY: {
         contractAddress: string;
@@ -294,7 +331,7 @@ export namespace Sequencer {
       QUERY: {
         blockIdentifier: BlockIdentifier;
       };
-      REQUEST: CallContractTransaction;
+      REQUEST: EstimateFeeRequest;
       RESPONSE: EstimateFeeResponse;
     };
     get_class_by_hash: {
@@ -326,6 +363,11 @@ export namespace Sequencer {
       };
       REQUEST: never;
       RESPONSE: any;
+    };
+    estimate_message_fee: {
+      QUERY: any;
+      REQUEST: any;
+      RESPONSE: EstimateFeeResponse;
     };
   };
 }

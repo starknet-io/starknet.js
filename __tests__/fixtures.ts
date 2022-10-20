@@ -1,13 +1,15 @@
 import fs from 'fs';
 
 import { Account, ProviderInterface, RpcProvider, SequencerProvider, ec, json } from '../src';
-import { CompiledContract } from '../src/types';
+import { CompiledContract, DeployContractPayload } from '../src/types';
+import { encodeShortString } from '../src/utils/shortString';
 
 const readContract = (name: string): CompiledContract =>
   json.parse(fs.readFileSync(`./__mocks__/${name}.json`).toString('ascii'));
 
 export const compiledOpenZeppelinAccount = readContract('Account');
 export const compiledErc20 = readContract('ERC20');
+export const compiledL1L2 = readContract('l1l2_compiled');
 export const compiledTypeTransformation = readContract('contract');
 export const compiledMulticall = readContract('multicall');
 export const compiledTestDapp = readContract('TestDapp');
@@ -26,6 +28,7 @@ const IS_RPC_DEVNET = Boolean(
 );
 const IS_SEQUENCER = !IS_RPC;
 const IS_SEQUENCER_DEVNET = !BASE_URL.includes('starknet.io');
+export const IS_SEQUENCER_GOERLI = BASE_URL === 'https://alpha4.starknet.io';
 export const IS_DEVNET = IS_SEQUENCER ? IS_SEQUENCER_DEVNET : IS_RPC_DEVNET;
 
 export const getTestProvider = () => {
@@ -69,3 +72,10 @@ const describeIf = (condition: boolean) => (condition ? describe : describe.skip
 export const describeIfSequencer = describeIf(IS_DEVNET);
 export const describeIfRpc = describeIf(IS_RPC);
 export const describeIfNotDevnet = describeIf(!IS_DEVNET);
+
+export const getERC20DeployPayload = (recipient: string): DeployContractPayload => {
+  return {
+    contract: compiledErc20,
+    constructorCalldata: [encodeShortString('Token'), encodeShortString('ERC20'), recipient],
+  };
+};

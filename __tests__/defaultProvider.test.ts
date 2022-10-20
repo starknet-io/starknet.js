@@ -1,15 +1,9 @@
-import {
-  BlockNumber,
-  DeclareContractResponse,
-  DeployContractResponse,
-  GetBlockResponse,
-  stark,
-} from '../src';
+import { BlockNumber, DeployContractResponse, GetBlockResponse, stark } from '../src';
 import { toBN } from '../src/utils/number';
 import {
-  compiledErc20,
   compiledOpenZeppelinAccount,
   describeIfNotDevnet,
+  getERC20DeployPayload,
   getTestProvider,
 } from './fixtures';
 
@@ -24,11 +18,14 @@ describe('defaultProvider', () => {
   let exampleBlock: GetBlockResponse;
   let exampleBlockNumber: BlockNumber;
   let exampleBlockHash: string;
+  const wallet = stark.randomAddress();
 
   beforeAll(async () => {
-    const { transaction_hash, contract_address } = await testProvider.deployContract({
-      contract: compiledErc20,
-    });
+    const erc20DeployPayload = getERC20DeployPayload(wallet);
+
+    const { contract_address, transaction_hash } = await testProvider.deployContract(
+      erc20DeployPayload
+    );
     await testProvider.waitForTransaction(transaction_hash);
     exampleTransactionHash = transaction_hash;
     exampleContractAddress = contract_address;
@@ -58,8 +55,13 @@ describe('defaultProvider', () => {
     });
 
     test('getBlock() -> { blockNumber }', async () => {
-      const block = await testProvider.getBlock();
+      const block = await testProvider.getBlock('latest');
       return expect(block).toHaveProperty('block_number');
+    });
+
+    test('getNonce()', async () => {
+      const nonce = await testProvider.getNonce(exampleContractAddress);
+      return expect(nonce).toEqual('0x0');
     });
 
     describe('getStorageAt', () => {
@@ -96,7 +98,7 @@ describe('defaultProvider', () => {
       return expect(
         testProvider.callContract({
           contractAddress: exampleContractAddress,
-          entrypoint: 'balance_of',
+          entrypoint: 'balanceOf',
           calldata: compileCalldata({
             user: '0x9ff64f4ab0e1fe88df4465ade98d1ea99d5732761c39279b8e1374fa943e9b',
           }),
@@ -118,15 +120,6 @@ describe('defaultProvider', () => {
   });
 
   describe('addTransaction()', () => {
-    test('declareContract()', async () => {
-      const response = await testProvider.declareContract({
-        contract: compiledErc20,
-      });
-
-      expect(response.transaction_hash).toBeDefined();
-      expect(response.class_hash).toBeDefined();
-    });
-
     test('deployContract()', async () => {
       const response = await testProvider.deployContract({
         contract: compiledOpenZeppelinAccount,
@@ -139,10 +132,11 @@ describe('defaultProvider', () => {
 
   describeIfNotDevnet('Provider', () => {
     const provider = getTestProvider();
+    let latestBlock;
     describe(`Provider methods if not devnet`, () => {
       describe('getBlock', () => {
-        test('pending', async () => {
-          const latestBlock = await provider.getBlock();
+        test('getBlock by tag latest', async () => {
+          latestBlock = await provider.getBlock('latest');
           expect(latestBlock).toHaveProperty('block_hash');
           expect(latestBlock).toHaveProperty('parent_hash');
           expect(latestBlock).toHaveProperty('block_number');
@@ -153,11 +147,8 @@ describe('defaultProvider', () => {
           expect(Array.isArray(latestBlock.transactions)).toBe(true);
         });
 
-        test('Block Hash 0x8a30a1212d142cb0053fe9921e1dbf64f651d328565bd2e7ac24059c270f43', async () => {
-          const block = await provider.getBlock(
-            '0x8a30a1212d142cb0053fe9921e1dbf64f651d328565bd2e7ac24059c270f43'
-          );
-
+        test('getBlock by Hash', async () => {
+          const block = await provider.getBlock(latestBlock.block_hash);
           expect(block).toHaveProperty('block_hash');
           expect(block).toHaveProperty('parent_hash');
           expect(block).toHaveProperty('block_number');
@@ -168,8 +159,8 @@ describe('defaultProvider', () => {
           expect(Array.isArray(block.transactions)).toBe(true);
         });
 
-        test('Block Number 102634', async () => {
-          const block = await provider.getBlock(102634);
+        test('getBlock by Number', async () => {
+          const block = await provider.getBlock(latestBlock.block_number);
           expect(block).toHaveProperty('block_hash');
           expect(block).toHaveProperty('parent_hash');
           expect(block).toHaveProperty('block_number');
@@ -218,7 +209,7 @@ describe('defaultProvider', () => {
           expect(transaction.transaction_hash).toBeTruthy();
           expect(transaction.contract_address).toBeTruthy();
           expect(Array.isArray(transaction.calldata)).toBe(true);
-          expect(transaction.entry_point_selector).toBeTruthy();
+          // expect(transaction.entry_point_selector).toBeTruthy();
           expect(Array.isArray(transaction.signature)).toBe(true);
           expect(transaction.max_fee).toBeTruthy();
         });
@@ -240,30 +231,22 @@ describe('defaultProvider', () => {
           const receipt = await provider.getTransactionReceipt(
             '0x37013e1cb9c133e6fe51b4b371b76b317a480f56d80576730754c1662582348'
           );
-
           expect(receipt).toHaveProperty('transaction_hash');
           expect(receipt).toHaveProperty('status');
-          expect(receipt).toHaveProperty('status_data');
-          expect(receipt).toHaveProperty('messages_sent');
-          expect(receipt).toHaveProperty('l1_origin_message');
-          expect(receipt).toHaveProperty('events');
+          expect(receipt).toHaveProperty('actual_fee');
         });
       });
 
       describe('Contract methods', () => {
         let contractAddress: string;
         let deployResponse: DeployContractResponse;
-        let declareResponse: DeclareContractResponse;
         let blockNumber: BlockNumber;
 
         beforeAll(async () => {
-          deployResponse = await provider.deployContract({ contract: compiledErc20 });
+          const erc20DeployPayload = getERC20DeployPayload(wallet);
+          deployResponse = await provider.deployContract(erc20DeployPayload);
           contractAddress = deployResponse.contract_address;
-          declareResponse = await provider.declareContract({ contract: compiledErc20 });
-          await Promise.all([
-            provider.waitForTransaction(deployResponse.transaction_hash),
-            provider.waitForTransaction(declareResponse.transaction_hash),
-          ]);
+          await provider.waitForTransaction(deployResponse.transaction_hash);
           ({ block_number: blockNumber } = await provider.getBlock('latest'));
         });
 
@@ -271,13 +254,6 @@ describe('defaultProvider', () => {
           test('response', () => {
             expect(deployResponse.contract_address).toBeTruthy();
             expect(deployResponse.transaction_hash).toBeTruthy();
-          });
-        });
-
-        describe('declareContract', () => {
-          test('response', async () => {
-            expect(declareResponse.class_hash).toBeTruthy();
-            expect(declareResponse.transaction_hash).toBeTruthy();
           });
         });
 
@@ -296,9 +272,9 @@ describe('defaultProvider', () => {
               provider
                 .callContract({
                   contractAddress: deployResponse.contract_address,
-                  entrypoint: 'balance_of',
+                  entrypoint: 'balanceOf',
                   calldata: compileCalldata({
-                    user: '0x9ff64f4ab0e1fe88df4465ade98d1ea99d5732761c39279b8e1374fa943e9b',
+                    user: wallet,
                   }),
                 })
                 .then((res) => {

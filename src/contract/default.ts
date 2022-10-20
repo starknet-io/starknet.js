@@ -9,10 +9,10 @@ import {
   AbiEntry,
   Args,
   AsyncContractFunction,
+  Call,
   Calldata,
   ContractFunction,
   FunctionAbi,
-  Invocation,
   InvokeFunctionResponse,
   Overrides,
   ParsedStruct,
@@ -125,7 +125,7 @@ export class Contract implements ContractInterface {
     address: string,
     providerOrAccount: ProviderInterface | AccountInterface = defaultProvider
   ) {
-    this.address = address;
+    this.address = address && address.toLowerCase();
     this.providerOrAccount = providerOrAccount;
     this.abi = abi;
     this.structs = abi
@@ -204,36 +204,143 @@ export class Contract implements ContractInterface {
     });
   }
 
-  /**
-   * Saves the address of the contract deployed on network that will be used for interaction
-   *
-   * @param address - address of the contract
-   */
   public attach(address: string): void {
     this.address = address;
   }
 
-  /**
-   * Attaches to new Provider or Account
-   *
-   * @param providerOrAccount - new Provider or Account to attach to
-   */
   public connect(providerOrAccount: ProviderInterface | AccountInterface) {
     this.providerOrAccount = providerOrAccount;
   }
 
-  /**
-   * Resolves when contract is deployed on the network or when no deployment transaction is found
-   *
-   * @returns Promise that resolves when contract is deployed on the network or when no deployment transaction is found
-   * @throws When deployment fails
-   */
   public async deployed(): Promise<Contract> {
     if (this.deployTransactionHash) {
       await this.providerOrAccount.waitForTransaction(this.deployTransactionHash);
       this.deployTransactionHash = undefined;
     }
     return this;
+  }
+
+  public async call(
+    method: string,
+    args: Array<any> = [],
+    {
+      blockIdentifier = 'pending',
+    }: {
+      blockIdentifier?: BlockIdentifier;
+    } = {}
+  ): Promise<Result> {
+    // ensure contract is connected
+    assert(this.address !== null, 'contract is not connected to an address');
+
+    // validate method and args
+    this.validateMethodAndArgs('CALL', method, args);
+    const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
+
+    // compile calldata
+    const calldata = this.compileCalldata(args, inputs);
+    return this.providerOrAccount
+      .callContract(
+        {
+          contractAddress: this.address,
+          calldata,
+          entrypoint: method,
+        },
+        blockIdentifier
+      )
+      .then((x) => this.parseResponse(method, x.result));
+  }
+
+  public invoke(
+    method: string,
+    args: Array<any> = [],
+    options: Overrides = {}
+  ): Promise<InvokeFunctionResponse> {
+    // ensure contract is connected
+    assert(this.address !== null, 'contract is not connected to an address');
+    // validate method and args
+    this.validateMethodAndArgs('INVOKE', method, args);
+
+    const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
+    const inputsLength = inputs.reduce((acc, input) => {
+      if (!/_len$/.test(input.name)) {
+        return acc + 1;
+      }
+      return acc;
+    }, 0);
+
+    if (args.length !== inputsLength) {
+      throw Error(
+        `Invalid number of arguments, expected ${inputsLength} arguments, but got ${args.length}`
+      );
+    }
+    // compile calldata
+    const calldata = this.compileCalldata(args, inputs);
+
+    const invocation = {
+      contractAddress: this.address,
+      calldata,
+      entrypoint: method,
+    };
+    if ('execute' in this.providerOrAccount) {
+      return this.providerOrAccount.execute(invocation, undefined, {
+        maxFee: options.maxFee,
+        nonce: options.nonce,
+      });
+    }
+
+    if (!options.nonce) {
+      throw new Error(`Nonce is required when invoking a function without an account`);
+    }
+
+    // eslint-disable-next-line no-console
+    console.warn(`Invoking ${method} without an account. This will not work on a public node.`);
+
+    return this.providerOrAccount.invokeFunction(
+      {
+        ...invocation,
+        signature: options.signature || [],
+      },
+      {
+        nonce: options.nonce,
+      }
+    );
+  }
+
+  public async estimate(method: string, args: Array<any> = []) {
+    // ensure contract is connected
+    assert(this.address !== null, 'contract is not connected to an address');
+
+    // validate method and args
+    this.validateMethodAndArgs('INVOKE', method, args);
+    const invocation = this.populateTransaction[method](...args);
+    if ('estimateInvokeFee' in this.providerOrAccount) {
+      return this.providerOrAccount.estimateInvokeFee(invocation);
+    }
+    throw Error('Contract must be connected to the account contract to estimate');
+  }
+
+  public populate(method: string, args: Array<any> = []): Call {
+    const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
+    return {
+      contractAddress: this.address,
+      entrypoint: method,
+      calldata: this.compileCalldata(args, inputs),
+    };
+  }
+
+  /**
+   * Deep parse of the object that has been passed to the method
+   *
+   * @param struct - struct that needs to be calculated
+   * @return {number} - number of members for the given struct
+   */
+  private calculateStructMembers(struct: string): number {
+    return this.structs[struct].members.reduce((acc, member) => {
+      if (member.type === 'felt') {
+        return acc + 1;
+      }
+      return acc + this.calculateStructMembers(member.type);
+    }, 0);
   }
 
   /**
@@ -335,22 +442,6 @@ export class Contract implements ContractInterface {
         }
       }
     });
-  }
-
-  /**
-   * Deep parse of the object that has been passed to the method
-   *
-   * @param struct - struct that needs to be calculated
-   * @return {number} - number of members for the given struct
-   */
-
-  private calculateStructMembers(struct: string): number {
-    return this.structs[struct].members.reduce((acc, member) => {
-      if (member.type === 'felt') {
-        return acc + 1;
-      }
-      return acc + this.calculateStructMembers(member.type);
-    }, 0);
   }
 
   /**
@@ -538,105 +629,5 @@ export class Contract implements ContractInterface {
       acc[key] = value;
       return acc;
     }, [] as Result);
-  }
-
-  public invoke(
-    method: string,
-    args: Array<any> = [],
-    options: Overrides = {}
-  ): Promise<InvokeFunctionResponse> {
-    // ensure contract is connected
-    assert(this.address !== null, 'contract isnt connected to an address');
-    // validate method and args
-    this.validateMethodAndArgs('INVOKE', method, args);
-
-    const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
-    const inputsLength = inputs.reduce((acc, input) => {
-      if (!/_len$/.test(input.name)) {
-        return acc + 1;
-      }
-      return acc;
-    }, 0);
-
-    if (args.length !== inputsLength) {
-      throw Error(
-        `Invalid number of arguments, expected ${inputsLength} arguments, but got ${args.length}`
-      );
-    }
-    // compile calldata
-    const calldata = this.compileCalldata(args, inputs);
-
-    const invocation = {
-      contractAddress: this.address,
-      calldata,
-      entrypoint: method,
-    };
-    if ('execute' in this.providerOrAccount) {
-      return this.providerOrAccount.execute(invocation, undefined, {
-        maxFee: options.maxFee,
-        nonce: options.nonce,
-      });
-    }
-
-    // eslint-disable-next-line no-console
-    console.warn(`Invoking ${method} without an account. This will not work on a public node.`);
-
-    return this.providerOrAccount.invokeFunction({
-      ...invocation,
-      signature: options.signature || [],
-    });
-  }
-
-  public async call(
-    method: string,
-    args: Array<any> = [],
-    {
-      blockIdentifier = 'pending',
-    }: {
-      blockIdentifier?: BlockIdentifier;
-    } = {}
-  ): Promise<Result> {
-    // ensure contract is connected
-    assert(this.address !== null, 'contract isnt connected to an address');
-
-    // validate method and args
-    this.validateMethodAndArgs('CALL', method, args);
-    const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
-
-    // compile calldata
-    const calldata = this.compileCalldata(args, inputs);
-    return this.providerOrAccount
-      .callContract(
-        {
-          contractAddress: this.address,
-          calldata,
-          entrypoint: method,
-        },
-        blockIdentifier
-      )
-      .then((x) => this.parseResponse(method, x.result));
-  }
-
-  public async estimate(method: string, args: Array<any> = []) {
-    // ensure contract is connected
-    assert(this.address !== null, 'contract isnt connected to an address');
-
-    // validate method and args
-    this.validateMethodAndArgs('INVOKE', method, args);
-    const invocation = this.populateTransaction[method](...args);
-    if ('estimateFee' in this.providerOrAccount) {
-      return this.providerOrAccount.estimateFee(invocation);
-    }
-    throw Error('Contract must be connected to the account contract to estimate');
-  }
-
-  public populate(method: string, args: Array<any> = []): Invocation {
-    const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
-    return {
-      contractAddress: this.address,
-      entrypoint: method,
-      calldata: this.compileCalldata(args, inputs),
-      signature: [],
-    };
   }
 }

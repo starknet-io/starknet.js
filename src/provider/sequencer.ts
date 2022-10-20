@@ -1,11 +1,10 @@
 import urljoin from 'url-join';
 
-import { ONE, StarknetChainId, ZERO } from '../constants';
+import { StarknetChainId } from '../constants';
 import {
   Call,
   CallContractResponse,
   ContractClass,
-  DeclareContractPayload,
   DeclareContractResponse,
   DeployContractPayload,
   DeployContractResponse,
@@ -14,26 +13,36 @@ import {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
-  InvocationsDetails,
+  InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
 } from '../types';
 import {
+  CallL1Handler,
   GetContractAddressesResponse,
   GetTransactionStatusResponse,
   GetTransactionTraceResponse,
   Sequencer,
 } from '../types/api';
+import { DeclareContractTransaction, DeployAccountContractTransaction } from '../types/lib';
 import fetch from '../utils/fetchPonyfill';
-import { getSelectorFromName } from '../utils/hash';
+import { getSelector, getSelectorFromName } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
-import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN, toHex } from '../utils/number';
+import {
+  BigNumberish,
+  bigNumberishArrayToDecimalStringArray,
+  getDecimalString,
+  getHexString,
+  getHexStringArray,
+  toBN,
+  toHex,
+} from '../utils/number';
 import { parseContract, wait } from '../utils/provider';
 import { SequencerAPIResponseParser } from '../utils/responseParser/sequencer';
 import { randomAddress } from '../utils/stark';
 import { buildUrl } from '../utils/url';
 import { GatewayError, HttpError } from './errors';
 import { ProviderInterface } from './interface';
-import { BlockIdentifier, getFormattedBlockIdentifier } from './utils';
+import { Block, BlockIdentifier } from './utils';
 
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha';
 
@@ -117,7 +126,12 @@ export class SequencerProvider implements ProviderInterface {
   }
 
   private getFetchMethod(endpoint: keyof Sequencer.Endpoints) {
-    const postMethodEndpoints = ['add_transaction', 'call_contract', 'estimate_fee'];
+    const postMethodEndpoints = [
+      'add_transaction',
+      'call_contract',
+      'estimate_fee',
+      'estimate_message_fee',
+    ];
 
     return postMethodEndpoints.includes(endpoint) ? 'POST' : 'GET';
   }
@@ -129,7 +143,8 @@ export class SequencerProvider implements ProviderInterface {
     const queryString = Object.entries(query)
       .map(([key, value]) => {
         if (key === 'blockIdentifier') {
-          return `${getFormattedBlockIdentifier(value)}`;
+          const block = new Block(value);
+          return `${block.queryIdentifier}`;
         }
         return `${key}=${value}`;
       })
@@ -150,7 +165,7 @@ export class SequencerProvider implements ProviderInterface {
   // typesafe fetch
   protected async fetchEndpoint<T extends keyof Sequencer.Endpoints>(
     endpoint: T,
-    // typescript type magiuc to create a nice fitting function interface
+    // typescript type magic to create a nice fitting function interface
     ...[query, request]: Sequencer.Endpoints[T]['QUERY'] extends never
       ? Sequencer.Endpoints[T]['REQUEST'] extends never
         ? [] // when no query and no request is needed, we can omit the query and request parameters
@@ -207,6 +222,10 @@ export class SequencerProvider implements ProviderInterface {
     }
   }
 
+  public async getChainId(): Promise<StarknetChainId> {
+    return Promise.resolve(this.chainId);
+  }
+
   public async callContract(
     { contractAddress, entrypoint: entryPointSelector, calldata = [] }: Call,
     blockIdentifier: BlockIdentifier = 'pending'
@@ -227,6 +246,13 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('get_block', { blockIdentifier }).then(
       this.responseParser.parseGetBlockResponse
     );
+  }
+
+  public async getNonce(
+    contractAddress: string,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<BigNumberish> {
+    return this.fetchEndpoint('get_nonce', { contractAddress, blockIdentifier });
   }
 
   public async getStorageAt(
@@ -267,16 +293,16 @@ export class SequencerProvider implements ProviderInterface {
 
   public async invokeFunction(
     functionInvocation: Invocation,
-    details: InvocationsDetails
+    details: InvocationsDetailsWithNonce
   ): Promise<InvokeFunctionResponse> {
     return this.fetchEndpoint('add_transaction', undefined, {
       type: 'INVOKE_FUNCTION',
       contract_address: functionInvocation.contractAddress,
-      entry_point_selector: getSelectorFromName(functionInvocation.entrypoint),
       calldata: bigNumberishArrayToDecimalStringArray(functionInvocation.calldata ?? []),
       signature: bigNumberishArrayToDecimalStringArray(functionInvocation.signature ?? []),
+      nonce: toHex(toBN(details.nonce)),
       max_fee: toHex(toBN(details.maxFee || 0)),
-      version: toHex(toBN(details.version || 0)),
+      version: toHex(toBN(details.version || 1)),
     }).then(this.responseParser.parseInvokeFunctionResponse);
   }
 
@@ -295,34 +321,99 @@ export class SequencerProvider implements ProviderInterface {
     }).then(this.responseParser.parseDeployContractResponse);
   }
 
-  public async declareContract({
-    contract,
-  }: DeclareContractPayload): Promise<DeclareContractResponse> {
-    const contractDefinition = parseContract(contract);
+  public async deployAccountContract(
+    { classHash, constructorCalldata, addressSalt, signature }: DeployAccountContractTransaction,
+    details: InvocationsDetailsWithNonce
+  ): Promise<DeployContractResponse> {
+    return this.fetchEndpoint('add_transaction', undefined, {
+      type: 'DEPLOY_ACCOUNT',
+      contract_address_salt: addressSalt ?? randomAddress(),
+      constructor_calldata: bigNumberishArrayToDecimalStringArray(constructorCalldata ?? []),
+      class_hash: toHex(toBN(classHash)),
+      max_fee: toHex(toBN(details.maxFee || 0)),
+      version: toHex(toBN(details.version || 0)),
+      nonce: toHex(toBN(details.nonce)),
+      signature: bigNumberishArrayToDecimalStringArray(signature || []),
+    }).then(this.responseParser.parseDeployContractResponse);
+  }
 
+  public async declareContract(
+    { senderAddress, contractDefinition, signature }: DeclareContractTransaction,
+    details: InvocationsDetailsWithNonce
+  ): Promise<DeclareContractResponse> {
     return this.fetchEndpoint('add_transaction', undefined, {
       type: 'DECLARE',
       contract_class: contractDefinition,
-      nonce: toHex(ZERO),
-      signature: [],
-      sender_address: toHex(ONE),
+      nonce: toHex(toBN(details.nonce)),
+      signature: bigNumberishArrayToDecimalStringArray(signature || []),
+      sender_address: senderAddress,
+      max_fee: toHex(toBN(details.maxFee || 0)),
+      version: toHex(toBN(details.version || 1)),
     }).then(this.responseParser.parseDeclareContractResponse);
   }
 
   public async getEstimateFee(
     invocation: Invocation,
-    blockIdentifier: BlockIdentifier = 'pending',
-    invocationDetails: InvocationsDetails = {}
+    invocationDetails: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<EstimateFeeResponse> {
+    return this.getInvokeEstimateFee(invocation, invocationDetails, blockIdentifier);
+  }
+
+  public async getInvokeEstimateFee(
+    invocation: Invocation,
+    invocationDetails: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint(
       'estimate_fee',
       { blockIdentifier },
       {
+        type: 'INVOKE_FUNCTION',
         contract_address: invocation.contractAddress,
-        entry_point_selector: getSelectorFromName(invocation.entrypoint),
         calldata: invocation.calldata ?? [],
         signature: bigNumberishArrayToDecimalStringArray(invocation.signature || []),
-        version: toHex(toBN(invocationDetails?.version || 0)),
+        version: toHex(toBN(invocationDetails?.version || 1)),
+        nonce: toHex(toBN(invocationDetails.nonce)),
+      }
+    ).then(this.responseParser.parseFeeEstimateResponse);
+  }
+
+  public async getDeclareEstimateFee(
+    { senderAddress, contractDefinition, signature }: DeclareContractTransaction,
+    details: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<EstimateFeeResponse> {
+    return this.fetchEndpoint(
+      'estimate_fee',
+      { blockIdentifier },
+      {
+        type: 'DECLARE',
+        sender_address: senderAddress,
+        contract_class: contractDefinition,
+        signature: bigNumberishArrayToDecimalStringArray(signature || []),
+        version: toHex(toBN(details?.version || 1)),
+        nonce: toHex(toBN(details.nonce)),
+      }
+    ).then(this.responseParser.parseFeeEstimateResponse);
+  }
+
+  public async getDeployAccountEstimateFee(
+    { classHash, addressSalt, constructorCalldata, signature }: DeployAccountContractTransaction,
+    details: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<EstimateFeeResponse> {
+    return this.fetchEndpoint(
+      'estimate_fee',
+      { blockIdentifier },
+      {
+        type: 'DEPLOY_ACCOUNT',
+        class_hash: toHex(toBN(classHash)),
+        constructor_calldata: bigNumberishArrayToDecimalStringArray(constructorCalldata || []),
+        contract_address_salt: toHex(toBN(addressSalt || 0)),
+        signature: bigNumberishArrayToDecimalStringArray(signature || []),
+        version: toHex(toBN(details?.version || 0)),
+        nonce: toHex(toBN(details.nonce)),
       }
     ).then(this.responseParser.parseFeeEstimateResponse);
   }
@@ -392,5 +483,19 @@ export class SequencerProvider implements ProviderInterface {
   public async getTransactionTrace(txHash: BigNumberish): Promise<GetTransactionTraceResponse> {
     const txHashHex = toHex(toBN(txHash));
     return this.fetchEndpoint('get_transaction_trace', { transactionHash: txHashHex });
+  }
+
+  public async estimateMessageFee(
+    { from_address, to_address, entry_point_selector, payload }: CallL1Handler,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<Sequencer.EstimateFeeResponse> {
+    const validCallL1Handler = {
+      from_address: getDecimalString(from_address),
+      to_address: getHexString(to_address),
+      entry_point_selector: getSelector(entry_point_selector),
+      payload: getHexStringArray(payload),
+    };
+
+    return this.fetchEndpoint('estimate_message_fee', { blockIdentifier }, validCallL1Handler);
   }
 }

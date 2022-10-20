@@ -15,9 +15,17 @@ import {
 import { RawCalldata } from '../types/lib';
 import { ec } from './ellipticCurve';
 import { addHexPrefix, buf2hex, removeHexPrefix, utf8ToArray } from './encode';
-import { BigNumberish, toBN, toFelt, toHex } from './number';
+import {
+  BigNumberish,
+  isHex,
+  isStringWholeNumber,
+  toBN,
+  toFelt,
+  toHex,
+  toHexString,
+} from './number';
 
-export const transactionVersion = 0;
+export const transactionVersion = 1;
 export const feeTransactionVersion = toBN(2).pow(toBN(128)).add(toBN(transactionVersion));
 
 export function keccakBn(value: BigNumberish): string {
@@ -49,8 +57,23 @@ export function starknetKeccak(value: string): BN {
  * @returns hex selector of given abi function name
  */
 export function getSelectorFromName(funcName: string) {
-  // sometimes BigInteger pads the hex string with zeros, which isnt allowed in the starknet api
+  // sometimes BigInteger pads the hex string with zeros, which is not allowed in the starknet api
   return toHex(starknetKeccak(funcName));
+}
+
+/**
+ * Function to get hex selector from function name, decimal string or hex string
+ * @param value hex string | decimal string | string
+ * @returns Hex selector
+ */
+export function getSelector(value: string) {
+  if (isHex(value)) {
+    return value;
+  }
+  if (isStringWholeNumber(value)) {
+    return toHexString(value);
+  }
+  return getSelectorFromName(value);
 }
 
 const constantPoints = CONSTANT_POINTS.map((coords: string[]) =>
@@ -124,22 +147,68 @@ export function calculateDeployTransactionHash(
   );
 }
 
-export function calculcateTransactionHash(
+export function calculateDeclareTransactionHash(
+  // contractClass: ContractClass, // Should be used once class hash is present in ContractClass
+  classHash: BigNumberish,
+  senderAddress: BigNumberish,
+  version: BigNumberish,
+  maxFee: BigNumberish,
+  chainId: StarknetChainId,
+  nonce: BigNumberish
+): string {
+  return calculateTransactionHashCommon(
+    TransactionHashPrefix.DECLARE,
+    version,
+    senderAddress,
+    0,
+    [classHash],
+    maxFee,
+    chainId,
+    [nonce]
+  );
+}
+
+export function calculateDeployAccountTransactionHash(
+  contractAddress: BigNumberish,
+  classHash: BigNumberish,
+  constructorCalldata: BigNumberish[],
+  salt: BigNumberish,
+  version: BigNumberish,
+  maxFee: BigNumberish,
+  chainId: StarknetChainId,
+  nonce: BigNumberish
+) {
+  const calldata = [classHash, salt, ...constructorCalldata];
+
+  return calculateTransactionHashCommon(
+    TransactionHashPrefix.DEPLOY_ACCOUNT,
+    version,
+    contractAddress,
+    0,
+    calldata,
+    maxFee,
+    chainId,
+    [nonce]
+  );
+}
+
+export function calculateTransactionHash(
   contractAddress: BigNumberish,
   version: BigNumberish,
-  entryPointSelector: BigNumberish,
   calldata: BigNumberish[],
   maxFee: BigNumberish,
-  chainId: StarknetChainId
+  chainId: StarknetChainId,
+  nonce: BigNumberish
 ): string {
   return calculateTransactionHashCommon(
     TransactionHashPrefix.INVOKE,
     version,
     contractAddress,
-    entryPointSelector,
+    0,
     calldata,
     maxFee,
-    chainId
+    chainId,
+    [nonce]
   );
 }
 

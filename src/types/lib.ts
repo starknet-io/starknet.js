@@ -1,36 +1,66 @@
 import type { ec as EC } from 'elliptic';
 
 import type { BigNumberish } from '../utils/number';
+import { RPC } from './api/rpc';
 
 export type KeyPair = EC.KeyPair;
 export type Signature = string[];
 export type RawCalldata = BigNumberish[];
+export type AllowArray<T> = T | T[];
+
+export interface ContractClass {
+  program: CompressedProgram;
+  entry_points_by_type: RPC.ContractClass['entry_points_by_type'];
+  abi?: Abi;
+}
 
 export type DeployContractPayload = {
   contract: CompiledContract | string;
   constructorCalldata?: RawCalldata;
+  addressSalt?: string;
+};
+
+export type DeployAccountContractPayload = {
+  classHash: BigNumberish;
+  constructorCalldata?: RawCalldata;
   addressSalt?: BigNumberish;
+  contractAddress?: string;
+};
+
+export type DeployAccountContractTransaction = Omit<
+  DeployAccountContractPayload,
+  'contractAddress'
+> & {
+  signature?: Signature;
 };
 
 export type DeclareContractPayload = {
   contract: CompiledContract | string;
-  version?: BigNumberish;
+  classHash: BigNumberish; // Once the classHash is included in CompiledContract, this can be removed
 };
 
-export type Invocation = {
-  contractAddress: string;
-  entrypoint: string;
-  calldata?: RawCalldata;
+export type DeclareContractTransaction = {
+  contractDefinition: ContractClass;
+  senderAddress: string;
   signature?: Signature;
 };
 
-export type Call = Omit<Invocation, 'signature'>;
+export type CallDetails = {
+  contractAddress: string;
+  calldata?: RawCalldata;
+};
+
+export type Invocation = CallDetails & { signature?: Signature };
+
+export type Call = CallDetails & { entrypoint: string };
 
 export type InvocationsDetails = {
   nonce?: BigNumberish;
   maxFee?: BigNumberish;
   version?: BigNumberish;
 };
+
+export type InvocationsDetailsWithNonce = InvocationsDetails & { nonce: BigNumberish };
 
 export type Status =
   | 'NOT_RECEIVED'
@@ -40,7 +70,7 @@ export type Status =
   | 'ACCEPTED_ON_L1'
   | 'REJECTED';
 export type TransactionStatus = 'TRANSACTION_RECEIVED';
-export type Type = 'DECLARE' | 'DEPLOY' | 'INVOKE_FUNCTION';
+export type TransactionType = 'DECLARE' | 'DEPLOY' | 'INVOKE_FUNCTION' | 'DEPLOY_ACCOUNT';
 export type EntryPointType = 'EXTERNAL';
 export type CompressedProgram = string;
 

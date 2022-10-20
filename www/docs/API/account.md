@@ -24,15 +24,36 @@ The address of the account contract.
 
 ## Methods
 
-account.**getNonce()** => _Promise < string >_
+account.**getNonce()** => _Promise < BigNumberish >_
 
-Gets the new Nonce for the next transaction.
+Gets the new Nonce of the connected account for the next transaction.
 
 <hr />
 
-account.**estimateFee**(calls [ , options ]) => _Promise < EstimateFeeResponse >_
+account.**estimateInvokeFee**(calls [ , options ]) => _Promise < EstimateFeeResponse >_
 
 Gets the estimated fee for the call(s).
+
+The _options_ object may include any of:
+
+- options.**blockIdentifier** - Block Identifier for the transaction
+- options.**nonce** - Nonce for the transaction
+
+###### _EstimateFeeResponse_
+
+```typescript
+{
+  overall_fee: BN;
+  gas_consumed?: BN;
+  gas_price?: BN;
+}
+```
+
+<hr />
+
+account.**estimateDeclareFee**(contractPayload [ , options ]) => _Promise < EstimateFeeResponse >_
+
+Gets the estimated fee for the declare transaction.
 
 The _options_ object may include any of:
 
@@ -59,7 +80,7 @@ The _transactionsDetail_ object may include any of:
 
 - transactionsDetail.**maxFee** - Max Fee that that will be used to execute the call(s)
 - transactionsDetail.**nonce** - Nonce for the transaction
-- transactionsDetail.**version** - Version for the transaction (default is 0)
+- transactionsDetail.**version** - Version for the transaction (default is 1)
 
 ###### _AddTransactionResponse_
 
@@ -70,6 +91,44 @@ The _transactionsDetail_ object may include any of:
 ```
 
 <hr />
+
+account.**declare**(payload [ , transactionsDetail ]) => _Promise < DeclareContractResponse >_
+
+The _payload_ object consists of:
+
+- payload.**contract** - The compiled contract
+- payload.**classHash** - Hash of the compiled contract
+
+The _transactionsDetail_ object may include any of:
+
+- transactionsDetail.**maxFee** - Max Fee that that will be used to execute the call(s)
+- transactionsDetail.**nonce** - Nonce for the transaction
+- transactionsDetail.**version** - Version for the transaction (default is 1)
+
+Declares a contract on Starknet.
+
+> _Note:_ Once the classHash is included in CompiledContract, this parameter can be removed. Currently it can be pre-computed from starknet-cli.
+
+Example:
+
+```typescript
+const declareTx = await account.declare({
+  contract: compiledErc20,
+  // classHash is pre-computed from starknet-cli
+  classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+});
+```
+
+###### _DeclareContractResponse_
+
+```typescript
+{
+  transaction_hash: string;
+  class_hash: string;
+};
+```
+
+<hr/>
 
 account.**signMessage**(typedData) => _Promise < Signature >_
 
