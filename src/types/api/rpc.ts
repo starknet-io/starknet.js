@@ -1,4 +1,4 @@
-import { ADDRESS, FELT, OPENRPC } from './openrpc';
+import { ADDRESS, FELT, OPENRPC } from './openrpcv2';
 
 export namespace RPC {
   export type Response = {
@@ -41,6 +41,5 @@ export namespace RPC {
   export type InvokedTransaction = OPENRPC.InvokedTransaction;
   export type DeclaredTransaction = OPENRPC.DeclaredTransaction;
   export type DeployedTransaction = OPENRPC.DeployedTransaction;
-
   export type Methods = OPENRPC.Methods;
 }

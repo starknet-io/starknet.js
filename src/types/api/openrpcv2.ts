@@ -36,22 +36,22 @@ type EVENT = {
 };
 
 type COMMON_RECEIPT_PROPERTIES = {
-  transaction_hash?: TXN_HASH;
-  actual_fee?: FELT;
-  status?: TXN_STATUS;
+  transaction_hash: TXN_HASH;
+  actual_fee: FELT;
+  status: TXN_STATUS;
   block_hash?: BLOCK_HASH;
   block_number?: BLOCK_NUMBER;
-  type?: TXN_TYPE;
-  messages_sent: MSG_TO_L1;
-  events: EVENT;
+  type: TXN_TYPE;
+  messages_sent: Array<MSG_TO_L1>;
+  events: Array<EVENT>;
 };
 
 type PENDING_COMMON_RECEIPT_PROPERTIES = {
   transaction_hash: TXN_HASH;
   actual_fee: FELT;
   type?: TXN_TYPE;
-  messages_sent: MSG_TO_L1;
-  events: EVENT;
+  messages_sent: Array<MSG_TO_L1>;
+  events: Array<EVENT>;
 };
 
 type INVOKE_TXN_RECEIPT = COMMON_RECEIPT_PROPERTIES;
@@ -321,7 +321,7 @@ type FUNCTION_INVOCATION = FUNCTION_CALL & {
   call_type: CALL_TYPE;
   result: FELT;
   calls: NESTED_CALL;
-  events: EVENT;
+  events: Array<EVENT>;
   messages: MSG_TO_L1;
 };
 type NESTED_CALL = FUNCTION_INVOCATION;

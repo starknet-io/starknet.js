@@ -8,7 +8,6 @@ import {
   EstimateFeeResponse,
   GetBlockResponse,
   GetCodeResponse,
-  GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
   InvocationsDetailsWithNonce,
@@ -186,17 +185,21 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_getTransactionByBlockIdAndIndex', { block_id, index });
   }
 
-  public async getTransactionReceipt(txHash: string): Promise<GetTransactionReceiptResponse> {
+  public async getTransactionReceipt(txHash: string): Promise<RPC.TransactionReceipt> {
     return this.fetchEndpoint('starknet_getTransactionReceipt', { transaction_hash: txHash });
   }
 
-  public async getClass(classHash: RPC.Felt): Promise<RPC.ContractClass> {
-    return this.fetchEndpoint('starknet_getClass', { class_hash: classHash });
+  public async getClass(
+    classHash: RPC.Felt,
+    blockIdentifier: BlockIdentifier
+  ): Promise<RPC.ContractClass> {
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint('starknet_getClass', { class_hash: classHash, block_id });
   }
 
   public async getClassAt(
     contractAddress: string,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<RPC.ContractClass> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getClassAt', {
@@ -351,6 +354,17 @@ export class RpcProvider implements ProviderInterface {
     });
   }
 
+  /* 
+    sender_address: ADDRESS;
+    calldata: Array<FELT>;
+
+    type: TXN_TYPE;
+    max_fee: FELT;
+    version: NUM_AS_HEX;
+    signature: SIGNATURE;
+    nonce: FELT;
+   */
+
   // Methods from Interface
   public async callContract(
     call: Call,
@@ -390,6 +404,11 @@ export class RpcProvider implements ProviderInterface {
       try {
         // eslint-disable-next-line no-await-in-loop
         const res = await this.getTransactionReceipt(txHash);
+
+        if (!('status' in res)) {
+          const error = new Error('pending transaction');
+          throw error;
+        }
 
         if (res.status && successStates.includes(res.status)) {
           onchain = true;
