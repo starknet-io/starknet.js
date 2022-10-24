@@ -296,16 +296,19 @@ export class RpcProvider implements ProviderInterface {
     details: InvocationsDetailsWithNonce
   ): Promise<DeclareContractResponse> {
     return this.fetchEndpoint('starknet_addDeclareTransaction', {
-      contract_class: {
-        program: contractDefinition.program,
-        entry_points_by_type: contractDefinition.entry_points_by_type,
-        abi: contractDefinition.abi, // rpc 2.0
+      declare_transaction: {
+        contract_class: {
+          program: contractDefinition.program,
+          entry_points_by_type: contractDefinition.entry_points_by_type,
+          abi: contractDefinition.abi, // rpc 2.0
+        },
+        type: 'DECLARE',
+        version: toHex(toBN(details.version || 0)),
+        max_fee: toHex(toBN(details.maxFee || 0)),
+        signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
+        sender_address: senderAddress,
+        nonce: toHex(toBN(details.nonce)),
       },
-      version: toHex(toBN(details.version || 0)),
-      max_fee: toHex(toBN(details.maxFee || 0)),
-      signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
-      sender_address: senderAddress,
-      nonce: toHex(toBN(details.nonce)),
     });
   }
 
@@ -313,16 +316,20 @@ export class RpcProvider implements ProviderInterface {
     contract,
     constructorCalldata,
     addressSalt,
+    details,
   }: DeployContractPayload): Promise<DeployContractResponse> {
     const contractDefinition = parseContract(contract);
-
     return this.fetchEndpoint('starknet_addDeployTransaction', {
-      contract_address_salt: addressSalt ?? randomAddress(),
-      constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata ?? []),
-      contract_definition: {
-        program: contractDefinition.program,
-        entry_points_by_type: contractDefinition.entry_points_by_type,
-        abi: contractDefinition.abi, // rpc 2.0
+      deploy_transaction: {
+        contract_address_salt: addressSalt ?? randomAddress(),
+        constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata ?? []),
+        contract_class: {
+          program: contractDefinition.program,
+          entry_points_by_type: contractDefinition.entry_points_by_type,
+          abi: contractDefinition.abi, // rpc 2.0
+        },
+        type: 'DEPLOY',
+        version: toHex(toBN(details.version || 0)),
       },
     });
   }
@@ -331,11 +338,17 @@ export class RpcProvider implements ProviderInterface {
     classHash,
     constructorCalldata,
     addressSalt,
+    details,
   }: DeployAccountContractPayload): Promise<DeployContractResponse> {
     return this.fetchEndpoint('starknet_addDeployAccountTransaction', {
       constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
       class_hash: toHex(toBN(classHash)),
       contract_address_salt: toHex(toBN(addressSalt || 0)),
+      type: 'DEPLOY',
+      max_fee: toHex(toBN(details.maxFee || 0)),
+      version: toHex(toBN(details.version || 0)),
+      signature: bigNumberishArrayToHexadecimalStringArray(details.signature || []),
+      nonce: toHex(toBN(details.nonce)),
     });
   }
 
@@ -344,26 +357,17 @@ export class RpcProvider implements ProviderInterface {
     details: InvocationsDetailsWithNonce
   ): Promise<InvokeFunctionResponse> {
     return this.fetchEndpoint('starknet_addInvokeTransaction', {
-      function_invocation: {
-        contract_address: functionInvocation.contractAddress,
+      invoke_transaction: {
+        sender_address: functionInvocation.contractAddress,
         calldata: parseCalldata(functionInvocation.calldata),
+        type: 'INVOKE',
+        max_fee: toHex(toBN(details.maxFee || 0)),
+        version: toHex(toBN(details.version || 0)),
+        signature: bigNumberishArrayToHexadecimalStringArray(functionInvocation.signature || []),
+        nonce: toHex(toBN(details.nonce)),
       },
-      signature: bigNumberishArrayToHexadecimalStringArray(functionInvocation.signature || []),
-      max_fee: toHex(toBN(details.maxFee || 0)),
-      version: toHex(toBN(details.version || 0)),
     });
   }
-
-  /* 
-    sender_address: ADDRESS;
-    calldata: Array<FELT>;
-
-    type: TXN_TYPE;
-    max_fee: FELT;
-    version: NUM_AS_HEX;
-    signature: SIGNATURE;
-    nonce: FELT;
-   */
 
   // Methods from Interface
   public async callContract(

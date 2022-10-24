@@ -18,7 +18,7 @@ type BLOCK_HASH = FELT;
 type TXN_HASH = FELT;
 type PROTOCOL_VERSION = string;
 type TXN_STATUS = 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
-type TXN_TYPE = 'DECLARE' | 'DEPLOY' | 'INVOKE' | 'L1_HANDLER';
+type TXN_TYPE = 'DECLARE' | 'DEPLOY' | 'INVOKE' | 'L1_HANDLER' | 'DEPLOY_ACCOUNT'; // DEPLOY_ACCOUNT Missing in RPC 0.2.1rc
 type BLOCK_STATUS = 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
 enum BLOCK_TAG {
   'latest',
@@ -120,7 +120,7 @@ type DEPLOY_ACCOUNT_TXN = COMMON_TXN_PROPERTIES & DEPLOY_ACCOUNT_TXN_PROPERTIES;
 
 type DEPLOY_ACCOUNT_TXN_PROPERTIES = {
   contract_address_salt: FELT;
-  constructor_calldata: FELT;
+  constructor_calldata: Array<FELT>;
   class_hash: FELT;
 };
 
@@ -171,7 +171,7 @@ type DEPLOY_TXN_PROPERTIES = {
   version: NUM_AS_HEX;
   type: TXN_TYPE;
   contract_address_salt: FELT;
-  constructor_calldata: FELT;
+  constructor_calldata: Array<FELT>;
 };
 
 type INVOKE_TXN_V0 = FUNCTION_CALL;
