@@ -259,10 +259,12 @@ The options for the provider depend on the network. The structure of the options
 - options.**baseUrl** - Base URL of the network
 - options.**feederGatewayUrl** - Feeder Gateway Endpoint of the network
 - options.**gatewayUrl** - Gateway Endpoint
+- options.**headers** - [Optional] custom fecth headers
 
 or
 
 - options.**network** - Either 'mainnet-alpha' or 'goerli-alpha'
+- options.**headers** - [Optional] custom fecth headers
 
 Example:
 
@@ -396,6 +398,8 @@ Gets the transaction trace from a tx hash.
 `new starknet.RpcProvider(options)`
 
 - options.**nodeUrl** - Starknet RPC node url
+- options.**headers** - [Optional] custom fecth headers
+- options.**retries** - [Optional] wait for transaction max retries
 
 Example:
 
