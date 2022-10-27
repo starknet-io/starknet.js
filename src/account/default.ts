@@ -16,7 +16,12 @@ import {
   Signature,
 } from '../types';
 import { EstimateFee, EstimateFeeDetails } from '../types/account';
-import { AllowArray, DeclareContractPayload, DeployAccountContractPayload } from '../types/lib';
+import {
+  AllowArray,
+  DeclareContractPayload,
+  DeployAccountContractPayload,
+  UniversalDeployerContractPayload,
+} from '../types/lib';
 import { calculateContractAddressFromHash, transactionVersion } from '../utils/hash';
 import { BigNumberish, toBN } from '../utils/number';
 import { parseContract } from '../utils/provider';
@@ -225,6 +230,26 @@ export class Account extends Provider implements AccountInterface {
         maxFee,
         version,
       }
+    );
+  }
+
+  public async deploy(
+    { classHash, salt, unique, constructorCalldata = [] }: UniversalDeployerContractPayload,
+    transactionsDetail: InvocationsDetails = {}
+  ): Promise<any> {
+    return this.execute(
+      {
+        contractAddress: '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
+        entrypoint: 'deployContract',
+        calldata: [
+          classHash,
+          salt,
+          unique === true ? '1' : '0',
+          // constructorCalldata.toString(),
+        ],
+      },
+      undefined,
+      transactionsDetail
     );
   }
 

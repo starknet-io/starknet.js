@@ -14,6 +14,13 @@ export interface ContractClass {
   abi?: Abi;
 }
 
+export type UniversalDeployerContractPayload = {
+  classHash: BigNumberish;
+  salt: string;
+  unique: boolean;
+  constructorCalldata: RawCalldata;
+};
+
 export type DeployContractPayload = {
   contract: CompiledContract | string;
   constructorCalldata?: RawCalldata;

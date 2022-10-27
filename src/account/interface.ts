@@ -13,7 +13,12 @@ import {
   InvokeFunctionResponse,
   Signature,
 } from '../types';
-import { AllowArray, DeclareContractPayload, DeployAccountContractPayload } from '../types/lib';
+import {
+  AllowArray,
+  DeclareContractPayload,
+  DeployAccountContractPayload,
+  UniversalDeployerContractPayload,
+} from '../types/lib';
 import { BigNumberish } from '../utils/number';
 import { TypedData } from '../utils/typedData/types';
 
@@ -116,6 +121,22 @@ export abstract class AccountInterface extends ProviderInterface {
     contractPayload: DeclareContractPayload,
     transactionsDetail?: InvocationsDetails
   ): Promise<DeclareContractResponse>;
+
+  /**
+   * @param deployContractPayload containing
+   * - classHash: computed class hash of compiled contract
+   * - salt: address salt
+   * - unique: bool if true ensure unique salt
+   * - calldata: constructor calldata
+   * @param transactionsDetail Invocation Details containing:
+   *  - optional nonce
+   *  - optional version
+   *  - optional maxFee
+   */
+  public abstract deploy(
+    deployContractPayload: UniversalDeployerContractPayload,
+    transactionsDetail?: InvocationsDetails
+  ): Promise<any>;
 
   /**
    * Deploy the account on Starknet

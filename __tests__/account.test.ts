@@ -23,7 +23,7 @@ describe('deploy and test Wallet', () => {
 
     const erc20DeployPayload = getERC20DeployPayload(account.address);
 
-    const erc20Response = await provider.deployContract(erc20DeployPayload);
+    /* const erc20Response = await provider.deployContract(erc20DeployPayload);
 
     erc20Address = erc20Response.contract_address;
     erc20 = new Contract(compiledErc20.abi, erc20Address, provider);
@@ -39,7 +39,19 @@ describe('deploy and test Wallet', () => {
     });
     dapp = new Contract(compiledTestDapp.abi, dappResponse.contract_address!, provider);
 
-    await provider.waitForTransaction(dappResponse.transaction_hash);
+    await provider.waitForTransaction(dappResponse.transaction_hash); */
+    console.log('ok');
+  });
+
+  test('UDC Deploy', async () => {
+    const result = await account.deploy({
+      classHash: '0x04c2d9baf8dd7c2c57959b5c20ce35cb6b8e9a1f9089da5bf10c9a4986854869',
+      salt: '123',
+      unique: true,
+      constructorCalldata: [],
+    });
+
+    console.log('resut: ', result);
   });
 
   test('estimate fee', async () => {
