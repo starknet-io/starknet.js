@@ -72,11 +72,9 @@ If you consider to contribute to this project please read [CONTRIBUTING.md](http
 
 Special thanks to all the [contributors](https://github.com/0xs34n/starknet.js/graphs/contributors), especially to:
 
-Janek ([@janek26](https://github.com/janek26)) and Axel ([@delaaxe](https://github.com/delaaxe)) from [Argent](https://github.com/argentlabs)
+Janek ([@janek26](https://github.com/janek26)), Axel ([@delaaxe](https://github.com/delaaxe)) and Dhruv ([@dhruvkelawala](https://github.com/dhruvkelawala)) from [Argent](https://github.com/argentlabs)
 
 Miljan ([@MilGard91](https://github.com/MilGard91)) from [Shard Labs](https://shardlabs.io/)
-
-Dhruv ([@dhruvkelawala](https://github.com/dhruvkelawala)) from [Jedi Swap](https://twitter.com/jediswap)
 
 and of course the [StarkWare](https://starkware.co/) team for their dedicated support!
 
