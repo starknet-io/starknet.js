@@ -1,4 +1,4 @@
-import { ZERO } from '../constants';
+import { UDC, ZERO } from '../constants';
 import { ProviderInterface, ProviderOptions } from '../provider';
 import { Provider } from '../provider/default';
 import { BlockIdentifier } from '../provider/utils';
@@ -23,7 +23,7 @@ import {
   UniversalDeployerContractPayload,
 } from '../types/lib';
 import { calculateContractAddressFromHash, transactionVersion } from '../utils/hash';
-import { BigNumberish, toBN } from '../utils/number';
+import { BigNumberish, toBN, toCairoBool } from '../utils/number';
 import { parseContract } from '../utils/provider';
 import { compileCalldata, estimatedFeeToMaxFee } from '../utils/stark';
 import { fromCallsToExecuteCalldata } from '../utils/transaction';
@@ -234,18 +234,20 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async deploy(
-    { classHash, salt, unique, constructorCalldata = [] }: UniversalDeployerContractPayload,
+    { classHash, salt, unique = true, callData = [] }: UniversalDeployerContractPayload,
     transactionsDetail: InvocationsDetails = {}
   ): Promise<any> {
+    const compiledCallData = compileCalldata(callData);
     return this.execute(
       {
-        contractAddress: '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
-        entrypoint: 'deployContract',
+        contractAddress: UDC.ADDRESS,
+        entrypoint: UDC.ENTRYPOINT,
         calldata: [
           classHash,
           salt,
-          unique === true ? '1' : '0',
-          // constructorCalldata.toString(),
+          toCairoBool(unique),
+          compiledCallData.length,
+          ...compiledCallData,
         ],
       },
       undefined,

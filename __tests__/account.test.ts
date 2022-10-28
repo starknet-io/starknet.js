@@ -23,7 +23,7 @@ describe('deploy and test Wallet', () => {
 
     const erc20DeployPayload = getERC20DeployPayload(account.address);
 
-    /* const erc20Response = await provider.deployContract(erc20DeployPayload);
+    const erc20Response = await provider.deployContract(erc20DeployPayload);
 
     erc20Address = erc20Response.contract_address;
     erc20 = new Contract(compiledErc20.abi, erc20Address, provider);
@@ -39,19 +39,25 @@ describe('deploy and test Wallet', () => {
     });
     dapp = new Contract(compiledTestDapp.abi, dappResponse.contract_address!, provider);
 
-    await provider.waitForTransaction(dappResponse.transaction_hash); */
-    console.log('ok');
+    await provider.waitForTransaction(dappResponse.transaction_hash);
   });
 
   test('UDC Deploy', async () => {
-    const result = await account.deploy({
-      classHash: '0x04c2d9baf8dd7c2c57959b5c20ce35cb6b8e9a1f9089da5bf10c9a4986854869',
+    // only work on testnet
+    const deployment = await account.deploy({
+      classHash: '0x6ad13d6c3f382bdc7d337a3928528e974b76c21153ff25a946d2c4f26ef1c6b',
+      callData: [
+        '0xb3e8b4bd1906e46f4b9ce2d0cbdcf747409ab506469287587b23130a600535',
+        '0x2dd76e7ad84dbed81c314ffe5e7a7cacfb8f4836f01af4e913f275f89a3de1a',
+        '0x2',
+        '0x46a1aa85bb0e68cd29fadbc81791208ddebee17886f075935e5b72f4aa898aa',
+        '0x46a1aa85bb0e68cd29fadbc81791208ddebee17886f075935e5b72f4aa898aa',
+      ],
       salt: '123',
-      unique: true,
-      constructorCalldata: [],
+      unique: false,
     });
 
-    console.log('resut: ', result);
+    expect(deployment).toHaveProperty('transaction_hash');
   });
 
   test('estimate fee', async () => {

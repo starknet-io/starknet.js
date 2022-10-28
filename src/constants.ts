@@ -20,6 +20,11 @@ export enum TransactionHashPrefix {
   L1_HANDLER = '0x6c315f68616e646c6572', // encodeShortString('l1_handler'),
 }
 
+export const UDC = {
+  ADDRESS: '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
+  ENTRYPOINT: 'deployContract',
+};
+
 /**
  * The following is taken from https://github.com/starkware-libs/starkex-resources/blob/master/crypto/starkware/crypto/signature/pedersen_params.json but converted to hex, because JS is very bad handling big integers by default
  * Please do not edit until the JSON changes.
