@@ -1,4 +1,4 @@
-import BN, { isBN } from 'bn.js';
+import BN from 'bn.js';
 import assert from 'minimalistic-assert';
 
 import { addHexPrefix, removeHexPrefix } from './encode';
@@ -28,7 +28,7 @@ export function hexToDecimalString(hex: string): string {
 }
 
 export function toFelt(num: BigNumberish): string {
-  if (isBN(num)) {
+  if (BN.isBN(num)) {
     return num.toString();
   }
   return toBN(num).toString();

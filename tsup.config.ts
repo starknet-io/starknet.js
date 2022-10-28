@@ -5,6 +5,6 @@ export default defineConfig({
   dts: true,
   sourcemap: true,
   clean: true,
-  format: ['esm', 'cjs', 'iife'],
+  format: ['cjs'],
   globalName: 'starknet',
 });
