@@ -234,13 +234,19 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async deploy(
-    { classHash, salt, unique = true, callData = [] }: UniversalDeployerContractPayload,
+    {
+      classHash,
+      salt,
+      unique = true,
+      callData = [],
+      isDevnet = false,
+    }: UniversalDeployerContractPayload,
     transactionsDetail: InvocationsDetails = {}
   ): Promise<any> {
     const compiledCallData = compileCalldata(callData);
     return this.execute(
       {
-        contractAddress: UDC.ADDRESS,
+        contractAddress: isDevnet ? UDC.ADDRESS_DEVNET : UDC.ADDRESS,
         entrypoint: UDC.ENTRYPOINT,
         calldata: [
           classHash,

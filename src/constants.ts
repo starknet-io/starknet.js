@@ -23,6 +23,7 @@ export enum TransactionHashPrefix {
 export const UDC = {
   ADDRESS: '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
   ENTRYPOINT: 'deployContract',
+  ADDRESS_DEVNET: '0x25fcb74260022bd8ed7e8d542408941826b53345e478b8303d6f31744838a36',
 };
 
 /**
