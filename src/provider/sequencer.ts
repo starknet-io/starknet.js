@@ -62,6 +62,7 @@ export type SequencerProviderOptions =
       feederGatewayUrl?: string;
       gatewayUrl?: string;
       chainId?: StarknetChainId;
+      headers?: object;
     };
 
 export class SequencerProvider implements ProviderInterface {
@@ -72,6 +73,8 @@ export class SequencerProvider implements ProviderInterface {
   public gatewayUrl: string;
 
   public chainId: StarknetChainId;
+
+  public headers: object | undefined;
 
   private responseParser = new SequencerAPIResponseParser();
 
@@ -93,6 +96,8 @@ export class SequencerProvider implements ProviderInterface {
       this.chainId =
         optionsOrProvider.chainId ??
         SequencerProvider.getChainIdFromBaseUrl(optionsOrProvider.baseUrl);
+
+      this.headers = optionsOrProvider?.headers;
     }
   }
 
@@ -153,13 +158,14 @@ export class SequencerProvider implements ProviderInterface {
     return `?${queryString}`;
   }
 
-  private getHeaders(method: 'POST' | 'GET'): Record<string, string> | undefined {
+  private getHeaders(method: 'POST' | 'GET'): object | undefined {
     if (method === 'POST') {
       return {
         'Content-Type': 'application/json',
+        ...this.headers,
       };
     }
-    return undefined;
+    return this.headers;
   }
 
   // typesafe fetch
