@@ -19,7 +19,11 @@ describe('Declare and UDC Deploy Flow', () => {
   test('UDC Deploy', async () => {
     const deployment = await account.deploy({
       classHash: erc20ClassHash,
-      callData: [encodeShortString('Token'), encodeShortString('ERC20'), account.address],
+      constructorCalldata: [
+        encodeShortString('Token'),
+        encodeShortString('ERC20'),
+        account.address,
+      ],
       salt: '123',
       unique: true, // Using true here so as not to clash with normal erc20 deploy in account and provider test
       isDevnet: IS_DEVNET,

@@ -23,7 +23,7 @@ export type UniversalDeployerContractPayload = {
   classHash: BigNumberish;
   salt: string;
   unique: boolean;
-  callData?: RawArgs;
+  constructorCalldata?: RawArgs;
   isDevnet?: boolean;
 };
 

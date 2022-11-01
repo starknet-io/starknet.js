@@ -238,12 +238,12 @@ export class Account extends Provider implements AccountInterface {
       classHash,
       salt,
       unique = true,
-      callData = [],
+      constructorCalldata = [],
       isDevnet = false,
     }: UniversalDeployerContractPayload,
     transactionsDetail: InvocationsDetails = {}
-  ): Promise<any> {
-    const compiledCallData = compileCalldata(callData);
+  ): Promise<InvokeFunctionResponse> {
+    const compiledConstructorCallData = compileCalldata(constructorCalldata);
     return this.execute(
       {
         contractAddress: isDevnet ? UDC.ADDRESS_DEVNET : UDC.ADDRESS,
@@ -252,8 +252,8 @@ export class Account extends Provider implements AccountInterface {
           classHash,
           salt,
           toCairoBool(unique),
-          compiledCallData.length,
-          ...compiledCallData,
+          compiledConstructorCallData.length,
+          ...compiledConstructorCallData,
         ],
       },
       undefined,
