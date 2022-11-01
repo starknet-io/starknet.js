@@ -128,6 +128,7 @@ export abstract class AccountInterface extends ProviderInterface {
    * - salt: address salt
    * - unique: bool if true ensure unique salt
    * - calldata: constructor calldata
+   * @param additionalCalls - optional additional calls array to support multicall
    * @param transactionsDetail Invocation Details containing:
    *  - optional nonce
    *  - optional version
@@ -135,6 +136,7 @@ export abstract class AccountInterface extends ProviderInterface {
    */
   public abstract deploy(
     deployContractPayload: UniversalDeployerContractPayload,
+    additionalCalls?: AllowArray<Call>,
     transactionsDetail?: InvocationsDetails
   ): Promise<any>;
 

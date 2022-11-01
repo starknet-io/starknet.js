@@ -241,21 +241,28 @@ export class Account extends Provider implements AccountInterface {
       constructorCalldata = [],
       isDevnet = false,
     }: UniversalDeployerContractPayload,
+    additionalCalls: AllowArray<Call> = [], // support multicall
     transactionsDetail: InvocationsDetails = {}
   ): Promise<InvokeFunctionResponse> {
     const compiledConstructorCallData = compileCalldata(constructorCalldata);
+
+    const callsArray = Array.isArray(additionalCalls) ? additionalCalls : [additionalCalls];
+
     return this.execute(
-      {
-        contractAddress: isDevnet ? UDC.ADDRESS_DEVNET : UDC.ADDRESS,
-        entrypoint: UDC.ENTRYPOINT,
-        calldata: [
-          classHash,
-          salt,
-          toCairoBool(unique),
-          compiledConstructorCallData.length,
-          ...compiledConstructorCallData,
-        ],
-      },
+      [
+        {
+          contractAddress: isDevnet ? UDC.ADDRESS_DEVNET : UDC.ADDRESS,
+          entrypoint: UDC.ENTRYPOINT,
+          calldata: [
+            classHash,
+            salt,
+            toCairoBool(unique),
+            compiledConstructorCallData.length,
+            ...compiledConstructorCallData,
+          ],
+        },
+        ...callsArray,
+      ],
       undefined,
       transactionsDetail
     );
