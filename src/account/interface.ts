@@ -138,7 +138,7 @@ export abstract class AccountInterface extends ProviderInterface {
     deployContractPayload: UniversalDeployerContractPayload,
     additionalCalls?: AllowArray<Call>,
     transactionsDetail?: InvocationsDetails
-  ): Promise<any>;
+  ): Promise<InvokeFunctionResponse>;
 
   /**
    * Deploy the account on Starknet
