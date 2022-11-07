@@ -74,6 +74,26 @@ export abstract class ProviderInterface {
   ): Promise<ContractClass>;
 
   /**
+   * Returns the class hash deployed under the given address.
+   *
+   * @param contractAddress - contract address
+   * @param blockIdentifier - block identifier
+   * @returns Class hash
+   */
+  public abstract getClassHashAt(
+    contractAddress: string,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<string>;
+
+  /**
+   * Returns the contract class deployed under the given class hash.
+   *
+   * @param classHash - class hash
+   * @returns Contract class of compiled contract
+   */
+  public abstract getClass(classHash: string): Promise<ContractClass>;
+
+  /**
    * Gets the nonce of a contract with respect to a specific block
    *
    * @param contractAddress - contract address

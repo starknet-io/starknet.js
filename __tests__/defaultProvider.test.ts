@@ -86,6 +86,18 @@ describe('defaultProvider', () => {
       expect(classResponse).toHaveProperty('entry_points_by_type');
     });
 
+    // TODO see if feasible to split
+    describe('getClassHashAt & GetClass', () => {
+      test('responses', async () => {
+        const classHash = await testProvider.getClassHashAt(exampleContractAddress);
+        expect(typeof classHash).toBe('string');
+
+        const classResponse = await testProvider.getClass(classHash);
+        expect(classResponse).toHaveProperty('program');
+        expect(classResponse).toHaveProperty('entry_points_by_type');
+      });
+    });
+
     describe('getStorageAt', () => {
       test('with "key" type of number', () => {
         return expect(testProvider.getStorageAt(exampleContractAddress, 0)).resolves.not.toThrow();

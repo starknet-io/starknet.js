@@ -61,6 +61,20 @@ export class Provider implements ProviderInterface {
     return this.provider.getClassAt(contractAddress, blockIdentifier);
   }
 
+  public async getClassHashAt(
+    contractAddress: string,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<string> {
+    // TODO flip params in one of the provider implementations?
+    if (this.provider instanceof RpcProvider)
+      return this.provider.getClassHashAt(blockIdentifier, contractAddress);
+    return this.provider.getClassHashAt(contractAddress, blockIdentifier);
+  }
+
+  public getClass(classHash: string): Promise<ContractClass> {
+    return this.provider.getClass(classHash);
+  }
+
   public async getEstimateFee(
     invocationWithTxType: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,

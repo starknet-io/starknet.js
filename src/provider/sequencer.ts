@@ -300,6 +300,17 @@ export class SequencerProvider implements ProviderInterface {
     );
   }
 
+  public async getClassHashAt(
+    contractAddress: string,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<string> {
+    return this.fetchEndpoint('get_class_hash_at', { blockIdentifier, contractAddress });
+  }
+
+  public async getClass(classHash: string): Promise<ContractClass> {
+    return this.fetchEndpoint('get_class_by_hash', { classHash }).then(parseContract);
+  }
+
   public async invokeFunction(
     functionInvocation: Invocation,
     details: InvocationsDetailsWithNonce
