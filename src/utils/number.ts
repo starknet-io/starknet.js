@@ -88,3 +88,5 @@ export function getHexString(value: string) {
 export function getHexStringArray(value: Array<string>) {
   return value.map((el) => getHexString(el));
 }
+
+export const toCairoBool = (value: boolean): string => (+value).toString();

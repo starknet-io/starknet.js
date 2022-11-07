@@ -1,4 +1,4 @@
-import { ZERO } from '../constants';
+import { UDC, ZERO } from '../constants';
 import { ProviderInterface, ProviderOptions } from '../provider';
 import { Provider } from '../provider/default';
 import { BlockIdentifier } from '../provider/utils';
@@ -16,9 +16,14 @@ import {
   Signature,
 } from '../types';
 import { EstimateFee, EstimateFeeDetails } from '../types/account';
-import { AllowArray, DeclareContractPayload, DeployAccountContractPayload } from '../types/lib';
+import {
+  AllowArray,
+  DeclareContractPayload,
+  DeployAccountContractPayload,
+  UniversalDeployerContractPayload,
+} from '../types/lib';
 import { calculateContractAddressFromHash, transactionVersion } from '../utils/hash';
-import { BigNumberish, toBN } from '../utils/number';
+import { BigNumberish, toBN, toCairoBool } from '../utils/number';
 import { parseContract } from '../utils/provider';
 import { compileCalldata, estimatedFeeToMaxFee } from '../utils/stark';
 import { fromCallsToExecuteCalldata } from '../utils/transaction';
@@ -225,6 +230,41 @@ export class Account extends Provider implements AccountInterface {
         maxFee,
         version,
       }
+    );
+  }
+
+  public async deploy(
+    {
+      classHash,
+      salt,
+      unique = true,
+      constructorCalldata = [],
+      isDevnet = false,
+    }: UniversalDeployerContractPayload,
+    additionalCalls: AllowArray<Call> = [], // support multicall
+    transactionsDetail: InvocationsDetails = {}
+  ): Promise<InvokeFunctionResponse> {
+    const compiledConstructorCallData = compileCalldata(constructorCalldata);
+
+    const callsArray = Array.isArray(additionalCalls) ? additionalCalls : [additionalCalls];
+
+    return this.execute(
+      [
+        {
+          contractAddress: isDevnet ? UDC.ADDRESS_DEVNET : UDC.ADDRESS,
+          entrypoint: UDC.ENTRYPOINT,
+          calldata: [
+            classHash,
+            salt,
+            toCairoBool(unique),
+            compiledConstructorCallData.length,
+            ...compiledConstructorCallData,
+          ],
+        },
+        ...callsArray,
+      ],
+      undefined,
+      transactionsDetail
     );
   }
 
