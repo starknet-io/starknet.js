@@ -1,4 +1,4 @@
-name: Release
+goername: Release
 on:
   push:
     branches:
@@ -33,7 +33,7 @@ jobs:
           - name: sequencer-test
             TEST_PROVIDER_BASE_URL: http://127.0.0.1:5050/
           - name: sequencer-goerli
-            TEST_PROVIDER_BASE_URL: https://alpha4.starknet.io
+            TEST_PROVIDER_BASE_URL: https://alpha4-2.starknet.io
             ENABLE_TEST_ACCOUNT_PRIVATE_KEY: true
             ENABLE_TEST_ACCOUNT_ADDRESS: true
           - name: rpc-goerli
