@@ -1,4 +1,4 @@
-goername: Release
+name: Release
 on:
   push:
     branches:
