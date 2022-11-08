@@ -44,7 +44,7 @@ import { GatewayError, HttpError } from './errors';
 import { ProviderInterface } from './interface';
 import { Block, BlockIdentifier } from './utils';
 
-type NetworkName = 'mainnet-alpha' | 'goerli-alpha';
+type NetworkName = 'mainnet-alpha' | 'goerli-alpha' | 'goerli-alpha-2';
 
 function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
   return (
@@ -106,6 +106,9 @@ export class SequencerProvider implements ProviderInterface {
       case 'mainnet-alpha':
         return 'https://alpha-mainnet.starknet.io';
       case 'goerli-alpha':
+        return 'https://alpha4.starknet.io';
+      case 'goerli-alpha-2':
+        return 'https://alpha4-2.starknet.io';
       default:
         return 'https://alpha4.starknet.io';
     }
