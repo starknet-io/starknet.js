@@ -1,4 +1,5 @@
 import { encodeShortString } from '../src/utils/shortString';
+import { randomAddress } from '../src/utils/stark';
 import { IS_DEVNET, compiledErc20, getTestAccount, getTestProvider } from './fixtures';
 
 describe('Declare and UDC Deploy Flow', () => {
@@ -12,11 +13,15 @@ describe('Declare and UDC Deploy Flow', () => {
       contract: compiledErc20,
     });
 
+    await provider.waitForTransaction(declareTx.transaction_hash);
+
     expect(declareTx).toHaveProperty('class_hash');
     expect(declareTx.class_hash).toEqual(erc20ClassHash);
   });
 
   test('UDC Deploy', async () => {
+    const salt = randomAddress(); // use random salt
+
     const deployment = await account.deploy({
       classHash: erc20ClassHash,
       constructorCalldata: [
@@ -24,10 +29,12 @@ describe('Declare and UDC Deploy Flow', () => {
         encodeShortString('ERC20'),
         account.address,
       ],
-      salt: '123',
+      salt,
       unique: true, // Using true here so as not to clash with normal erc20 deploy in account and provider test
       isDevnet: IS_DEVNET,
     });
+
+    await provider.waitForTransaction(deployment.transaction_hash);
 
     expect(deployment).toHaveProperty('transaction_hash');
   });
