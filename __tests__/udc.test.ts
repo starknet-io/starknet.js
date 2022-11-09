@@ -28,7 +28,6 @@ describe('Declare and UDC Deploy Flow', () => {
       unique: true, // Using true here so as not to clash with normal erc20 deploy in account and provider test
       isDevnet: IS_DEVNET,
     });
-
     expect(deployment).toHaveProperty('transaction_hash');
   });
 });
