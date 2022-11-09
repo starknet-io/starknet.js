@@ -200,7 +200,7 @@ export class RpcProvider implements ProviderInterface {
 
   public async getClassAt(
     contractAddress: string,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<RPC.ContractClass> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getClassAt', {
