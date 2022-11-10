@@ -1,4 +1,5 @@
 import { Account, GetBlockResponse, RpcProvider, ec } from '../src';
+import { StarknetChainId } from '../src/constants';
 import {
   compiledOpenZeppelinAccount,
   describeIfRpc,
@@ -22,7 +23,7 @@ describeIfRpc('RPCProvider', () => {
 
   test('getChainId', async () => {
     const chainId = await rpcProvider.getChainId();
-    expect(chainId).toBe('0x534e5f474f45524c49');
+    expect(chainId).toBe(StarknetChainId.TESTNET2);
   });
 
   test('getPendingTransactions', async () => {
@@ -115,9 +116,9 @@ describeIfRpc('RPCProvider', () => {
       });
     });
 
-    test('getClass classHash 0x0733734fa0dab1158bccdfe0df7b0becf3827f908971fac8d39cc73d99ad8645', async () => {
+    test('getClass classHash 0x00808396477a4296946bf6574afb2e14723f8d9a37bba25a1e104315ca89b1f7', async () => {
       const contractClass = await rpcProvider.getClass(
-        '0x0733734fa0dab1158bccdfe0df7b0becf3827f908971fac8d39cc73d99ad8645'
+        '0x00808396477a4296946bf6574afb2e14723f8d9a37bba25a1e104315ca89b1f7'
       );
       expect(contractClass).toHaveProperty('program');
       expect(contractClass).toHaveProperty('entry_points_by_type');
