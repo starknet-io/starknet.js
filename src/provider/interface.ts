@@ -95,7 +95,7 @@ export abstract class ProviderInterface {
   public abstract getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier?: BlockIdentifier
   ): Promise<BigNumberish>;
 
   /**

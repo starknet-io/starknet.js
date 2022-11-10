@@ -31,7 +31,7 @@ const IS_SEQUENCER_DEVNET = !BASE_URL.includes('starknet.io');
 export const IS_SEQUENCER_GOERLI = BASE_URL === 'https://alpha4-2.starknet.io';
 export const IS_DEVNET = IS_SEQUENCER ? IS_SEQUENCER_DEVNET : IS_RPC_DEVNET;
 
-export const getTestProvider = () => {
+export const getTestProvider = (): ProviderInterface => {
   const provider = RPC_URL
     ? new RpcProvider({ nodeUrl: RPC_URL })
     : new SequencerProvider({ baseUrl: BASE_URL });
