@@ -11,6 +11,7 @@ export const MASK_251 = TWO.pow(toBN(251));
 export enum StarknetChainId {
   MAINNET = '0x534e5f4d41494e', // encodeShortString('SN_MAIN'),
   TESTNET = '0x534e5f474f45524c49', // encodeShortString('SN_GOERLI'),
+  TESTNET2 = '0x534e5f474f45524c4932',
 }
 export enum TransactionHashPrefix {
   DECLARE = '0x6465636c617265', // encodeShortString('declare'),
