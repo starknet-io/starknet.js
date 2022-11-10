@@ -78,7 +78,7 @@ export class SequencerProvider implements ProviderInterface {
 
   private responseParser = new SequencerAPIResponseParser();
 
-  constructor(optionsOrProvider: SequencerProviderOptions = { network: 'goerli-alpha' }) {
+  constructor(optionsOrProvider: SequencerProviderOptions = { network: 'goerli-alpha-2' }) {
     if ('network' in optionsOrProvider) {
       this.baseUrl = SequencerProvider.getNetworkFromName(optionsOrProvider.network);
       this.chainId = SequencerProvider.getChainIdFromBaseUrl(this.baseUrl);
