@@ -1,9 +1,9 @@
 /**
  * Starknet RPC version 0.2.0
  *
- * StarkNet Node API 0.45.0
- * StarkNet Node Write API 0.3.0 - rpc 0.2.0
- * StarkNet Trace API 0.3.0 - rpc 0.2.0
+ * StarkNet Node API 0.45.0 - rpc 0.2.1
+ * StarkNet Node Write API 0.3.0 - rpc 0.2.1
+ * StarkNet Trace API 0.4.0 - rpc 0.2.1
  *
  * TypeScript Representation of OpenRpc protocol types
  */
@@ -18,7 +18,7 @@ type BLOCK_HASH = FELT;
 type TXN_HASH = FELT;
 type PROTOCOL_VERSION = string;
 type TXN_STATUS = 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
-type TXN_TYPE = 'DECLARE' | 'DEPLOY' | 'INVOKE' | 'L1_HANDLER' | 'DEPLOY_ACCOUNT'; // DEPLOY_ACCOUNT Missing in RPC 0.2.1rc
+type TXN_TYPE = 'DECLARE' | 'DEPLOY' | 'DEPLOY_ACCOUNT' | 'INVOKE' | 'L1_HANDLER';
 type BLOCK_STATUS = 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
 enum BLOCK_TAG {
   'latest',
@@ -74,8 +74,8 @@ type TXN_RECEIPT =
   | L1_HANDLER_TXN_RECEIPT
   | DECLARE_TXN_RECEIPT
   | DEPLOY_TXN_RECEIPT
-  | PENDING_TXN_RECEIPT
-  | DEPLOY_ACCOUNT_TXN_RECEIPT;
+  | DEPLOY_ACCOUNT_TXN_RECEIPT
+  | PENDING_TXN_RECEIPT;
 
 type BLOCK_HEADER = {
   block_hash: BLOCK_HASH;
@@ -217,6 +217,7 @@ enum EVENT_ABI_TYPE {
 enum FUNCTION_ABI_TYPE {
   'function',
   'l1_handler',
+  'constructor',
 }
 
 type STRUCT_ABI_ENTRY = STRUCT_ABI_TYPE & {
