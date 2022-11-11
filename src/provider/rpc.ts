@@ -16,8 +16,8 @@ import {
 import { RPC } from '../types/api';
 import {
   DeclareContractTransaction,
-  DeployAccountContractPayload,
   DeployAccountContractTransaction,
+  InvocationsDetails,
 } from '../types/lib';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
@@ -316,12 +316,10 @@ export class RpcProvider implements ProviderInterface {
     });
   }
 
-  public async deployContract({
-    contract,
-    constructorCalldata,
-    addressSalt,
-    details,
-  }: DeployContractPayload): Promise<DeployContractResponse> {
+  public async deployContract(
+    { contract, constructorCalldata, addressSalt }: DeployContractPayload,
+    details: InvocationsDetails
+  ): Promise<DeployContractResponse> {
     const contractDefinition = parseContract(contract);
     return this.fetchEndpoint('starknet_addDeployTransaction', {
       deploy_transaction: {
@@ -330,7 +328,7 @@ export class RpcProvider implements ProviderInterface {
         contract_class: {
           program: contractDefinition.program,
           entry_points_by_type: contractDefinition.entry_points_by_type,
-          abi: contractDefinition.abi, // rpc 2.0
+          abi: contractDefinition.abi,
         },
         type: 'DEPLOY',
         version: toHex(toBN(details.version || 0)),
@@ -338,12 +336,10 @@ export class RpcProvider implements ProviderInterface {
     });
   }
 
-  public async deployAccountContract({
-    classHash,
-    constructorCalldata,
-    addressSalt,
-    details,
-  }: DeployAccountContractPayload): Promise<DeployContractResponse> {
+  public async deployAccountContract(
+    { classHash, constructorCalldata, addressSalt, signature }: DeployAccountContractTransaction,
+    details: InvocationsDetailsWithNonce
+  ): Promise<DeployContractResponse> {
     return this.fetchEndpoint('starknet_addDeployAccountTransaction', {
       constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
       class_hash: toHex(toBN(classHash)),
@@ -351,7 +347,7 @@ export class RpcProvider implements ProviderInterface {
       type: 'DEPLOY',
       max_fee: toHex(toBN(details.maxFee || 0)),
       version: toHex(toBN(details.version || 0)),
-      signature: bigNumberishArrayToHexadecimalStringArray(details.signature || []),
+      signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
       nonce: toHex(toBN(details.nonce)),
     });
   }

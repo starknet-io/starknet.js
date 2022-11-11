@@ -15,7 +15,11 @@ import {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
 } from '../types';
-import { DeclareContractTransaction, DeployAccountContractTransaction } from '../types/lib';
+import {
+  DeclareContractTransaction,
+  DeployAccountContractTransaction,
+  InvocationsDetails,
+} from '../types/lib';
 import { BigNumberish } from '../utils/number';
 import { ProviderInterface } from './interface';
 import { RpcProvider, RpcProviderOptions } from './rpc';
@@ -118,8 +122,11 @@ export class Provider implements ProviderInterface {
     return this.provider.invokeFunction(functionInvocation, details);
   }
 
-  public async deployContract(payload: DeployContractPayload): Promise<DeployContractResponse> {
-    return this.provider.deployContract(payload);
+  public async deployContract(
+    payload: DeployContractPayload,
+    details: InvocationsDetails
+  ): Promise<DeployContractResponse> {
+    return this.provider.deployContract(payload, details);
   }
 
   public async deployAccountContract(

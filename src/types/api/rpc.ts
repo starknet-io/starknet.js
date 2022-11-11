@@ -1,4 +1,4 @@
-import { ADDRESS, FELT, OPENRPC } from './openrpcv2';
+import { ADDRESS, FELT, OPENRPC } from './openrpc';
 
 export namespace RPC {
   export type Response = {
