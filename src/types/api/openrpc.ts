@@ -16,7 +16,6 @@ type SIGNATURE = Array<FELT>;
 type BLOCK_NUMBER = number;
 type BLOCK_HASH = FELT;
 type TXN_HASH = FELT;
-type PROTOCOL_VERSION = string;
 type TXN_STATUS = 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
 type TXN_TYPE = 'DECLARE' | 'DEPLOY' | 'DEPLOY_ACCOUNT' | 'INVOKE' | 'L1_HANDLER';
 type BLOCK_STATUS = 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
@@ -351,7 +350,6 @@ export namespace OPENRPC {
   };
   export type CHAIN_ID = string;
   export type PendingTransactions = Array<TXN>;
-  export type ProtocolVersion = PROTOCOL_VERSION;
   export type SyncingStatus = false | SYNC_STATUS;
   export type Events = {
     events: Array<EMITTED_EVENT>;
@@ -464,10 +462,6 @@ export namespace OPENRPC {
     starknet_pendingTransactions: {
       params: {};
       result: PendingTransactions;
-    };
-    starknet_protocolVersion: {
-      params: {};
-      result: ProtocolVersion;
     };
     starknet_syncing: {
       params: {};
