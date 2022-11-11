@@ -73,6 +73,8 @@ export const describeIfSequencer = describeIf(IS_DEVNET);
 export const describeIfRpc = describeIf(IS_RPC);
 export const describeIfNotDevnet = describeIf(!IS_DEVNET);
 
+export const erc20ClassHash = '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a';
+
 export const getERC20DeployPayload = (recipient: string): DeployContractPayload => {
   return {
     contract: compiledErc20,

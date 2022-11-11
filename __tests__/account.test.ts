@@ -3,9 +3,13 @@ import { isBN } from 'bn.js';
 import typedDataExample from '../__mocks__/typedDataExample.json';
 import { Account, Contract, Provider, number, stark } from '../src';
 import { toBN } from '../src/utils/number';
+import { encodeShortString } from '../src/utils/shortString';
+import { randomAddress } from '../src/utils/stark';
 import {
+  IS_DEVNET,
   compiledErc20,
   compiledTestDapp,
+  erc20ClassHash,
   getERC20DeployPayload,
   getTestAccount,
   getTestProvider,
@@ -153,6 +157,40 @@ describe('deploy and test Wallet', () => {
       await provider.waitForTransaction(declareTx.transaction_hash);
 
       expect(declareTx.class_hash).toBeDefined();
+    });
+  });
+
+  describe('Declare and UDC Deploy Flow', () => {
+    test('ERC20 Declare', async () => {
+      const declareTx = await account.declare({
+        classHash: erc20ClassHash,
+        contract: compiledErc20,
+      });
+
+      await provider.waitForTransaction(declareTx.transaction_hash);
+
+      expect(declareTx).toHaveProperty('class_hash');
+      expect(declareTx.class_hash).toEqual(erc20ClassHash);
+    });
+
+    test('UDC Deploy', async () => {
+      const salt = randomAddress(); // use random salt
+
+      const deployment = await account.deploy({
+        classHash: erc20ClassHash,
+        constructorCalldata: [
+          encodeShortString('Token'),
+          encodeShortString('ERC20'),
+          account.address,
+        ],
+        salt,
+        unique: true, // Using true here so as not to clash with normal erc20 deploy in account and provider test
+        isDevnet: IS_DEVNET,
+      });
+
+      await provider.waitForTransaction(deployment.transaction_hash);
+
+      expect(deployment).toHaveProperty('transaction_hash');
     });
   });
 });
