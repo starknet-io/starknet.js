@@ -64,7 +64,7 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public fetch(method: any, params: any): Promise<any> {
-    return fetch(this.nodeUrl, {
+    return fetch(`${this.nodeUrl}/rpc/v0.2`, {
       method: 'POST',
       body: stringify({ method, jsonrpc: '2.0', params, id: 0 }),
       headers: this.headers,
@@ -124,8 +124,8 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getClassHashAt(
-    blockIdentifier: BlockIdentifier,
-    contractAddress: RPC.ContractAddress
+    contractAddress: RPC.ContractAddress,
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<RPC.Felt> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getClassHashAt', {
@@ -153,7 +153,9 @@ export class RpcProvider implements ProviderInterface {
     throw new Error('Pathfinder does not implement this rpc 0.1.0 method');
   }
 
-  public async getStateUpdate(blockIdentifier: BlockIdentifier): Promise<RPC.StateUpdate> {
+  public async getStateUpdate(
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<RPC.StateUpdate> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getStateUpdate', { block_id });
   }
@@ -195,7 +197,7 @@ export class RpcProvider implements ProviderInterface {
 
   public async getClass(
     classHash: RPC.Felt,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<RPC.ContractClass> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getClass', { class_hash: classHash, block_id });
@@ -216,7 +218,7 @@ export class RpcProvider implements ProviderInterface {
     _contractAddress: string,
     _blockIdentifier?: BlockIdentifier
   ): Promise<GetCodeResponse> {
-    throw new Error('RPC 0.1.0 does not implement getCode function');
+    throw new Error('RPC does not implement getCode function');
   }
 
   public async getEstimateFee(
@@ -316,9 +318,12 @@ export class RpcProvider implements ProviderInterface {
     });
   }
 
+  /**
+   * @deprecated This method wont be supported soon, use Account.deploy instead
+   */
   public async deployContract(
     { contract, constructorCalldata, addressSalt }: DeployContractPayload,
-    details: InvocationsDetails
+    details?: InvocationsDetails
   ): Promise<DeployContractResponse> {
     const contractDefinition = parseContract(contract);
     return this.fetchEndpoint('starknet_addDeployTransaction', {
@@ -331,7 +336,7 @@ export class RpcProvider implements ProviderInterface {
           abi: contractDefinition.abi,
         },
         type: 'DEPLOY',
-        version: toHex(toBN(details.version || 0)),
+        version: toHex(toBN(details?.version || 0)),
       },
     });
   }
@@ -446,7 +451,7 @@ export class RpcProvider implements ProviderInterface {
    * @returns Number of transactions
    */
   public async getTransactionCount(
-    blockIdentifier: BlockIdentifier
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<RPC.GetTransactionCountResponse> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getBlockTransactionCount', { block_id });

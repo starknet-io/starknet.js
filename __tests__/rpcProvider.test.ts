@@ -107,7 +107,7 @@ describeIfRpc('RPCProvider', () => {
       });
 
       test('getClassHashAt', async () => {
-        const classHash = await rpcProvider.getClassHashAt('latest', contract_address);
+        const classHash = await rpcProvider.getClassHashAt(contract_address);
         expect(typeof classHash).toBe('string');
       });
 
