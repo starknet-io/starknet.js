@@ -481,4 +481,6 @@ export class RpcProvider implements ProviderInterface {
   public async getEvents(eventFilter: RPC.EventFilter): Promise<RPC.GetEventsResponse> {
     return this.fetchEndpoint('starknet_getEvents', { filter: eventFilter });
   }
+
+  // TODO add starknet_protocolVersion
 }

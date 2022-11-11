@@ -94,12 +94,13 @@ export type FunctionAbi = {
   name: string;
   outputs: AbiEntry[];
   stateMutability?: 'view';
-  type: FUNCTION_ABI_TYPE;
+  type: FunctionAbiType;
 };
 
-enum FUNCTION_ABI_TYPE {
+enum FunctionAbiType {
   'function',
   'l1_handler',
+  'constructor',
 }
 
 export type StructAbi = {
@@ -111,7 +112,7 @@ export type StructAbi = {
 
 export type Abi = Array<FunctionAbi | EventAbi | StructAbi>;
 
-type EventAbi = any; // TODO: define
+type EventAbi = any;
 
 export type EntryPointsByType = object;
 export type Program = Record<any, any>;
