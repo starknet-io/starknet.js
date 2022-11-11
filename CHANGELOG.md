@@ -1,3 +1,25 @@
+# [4.10.0](https://github.com/0xs34n/starknet.js/compare/v4.9.0...v4.10.0) (2022-11-10)
+
+### Bug Fixes
+
+- ci ([9b38cd8](https://github.com/0xs34n/starknet.js/commit/9b38cd8a2e23b71a1490c168ae83b64f479d3da9))
+- deploy return type in interface ([6a663d4](https://github.com/0xs34n/starknet.js/commit/6a663d492751b0cd8493af6d4ee9a5cf5524ed19))
+- path rpc test to release ([a1dafad](https://github.com/0xs34n/starknet.js/commit/a1dafad7056fb2e52849a8d5d533872254c62293))
+- remove multiple RawArgs declaration ([b65dc65](https://github.com/0xs34n/starknet.js/commit/b65dc651bbd86708d4f88b7445813dab7dfea639))
+- return type and rename calldata ([67fe081](https://github.com/0xs34n/starknet.js/commit/67fe081a24ca9eb64669ed9b0c2726898c68a34c))
+- update readme ([7859cb1](https://github.com/0xs34n/starknet.js/commit/7859cb1d2b6e4e924f8bb21a1bbb9ada1a46a308))
+- wait for declare and deploy, use random salt ([8dbd3c1](https://github.com/0xs34n/starknet.js/commit/8dbd3c183413f298307f2b22941c6981191a62b2))
+
+### Features
+
+- add multicall support ([4b99f4a](https://github.com/0xs34n/starknet.js/commit/4b99f4a7b09a03990e2ba9ea00de2d0206f93ce0))
+- enable custom providers headers option ([f2e9b1a](https://github.com/0xs34n/starknet.js/commit/f2e9b1a439908179bad1f4bb0e0632180b7b658f))
+- fix and add proper UDC tests ([d96cc53](https://github.com/0xs34n/starknet.js/commit/d96cc531786738de7d8ec285ccdaa39e76a94de3))
+- provider docs update ([e5d0376](https://github.com/0xs34n/starknet.js/commit/e5d0376dd281b04c486c58786709c42ea1e3a5a7))
+- testnet2 ([8a054d0](https://github.com/0xs34n/starknet.js/commit/8a054d0ceb312efc0b6d303cad73b9bb39ba4304))
+- udc demo ([27b402b](https://github.com/0xs34n/starknet.js/commit/27b402b6eed4c2bec67bfbf7ee27c9636ca4ae2b))
+- udc working example ([5c4452a](https://github.com/0xs34n/starknet.js/commit/5c4452aa2e6b50768438f1117794dce430984ff8))
+
 # [4.9.0](https://github.com/0xs34n/starknet.js/compare/v4.8.0...v4.9.0) (2022-10-19)
 
 ### Bug Fixes

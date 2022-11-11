@@ -37,6 +37,7 @@ import { Block, BlockIdentifier } from './utils';
 export type RpcProviderOptions = {
   nodeUrl: string;
   retries?: number;
+  headers?: object;
 };
 
 export class RpcProvider implements ProviderInterface {
@@ -45,14 +46,17 @@ export class RpcProvider implements ProviderInterface {
   // from interface
   public chainId!: StarknetChainId;
 
+  public headers: object;
+
   private responseParser = new RPCResponseParser();
 
   private retries: number;
 
   constructor(optionsOrProvider: RpcProviderOptions) {
-    const { nodeUrl, retries } = optionsOrProvider;
+    const { nodeUrl, retries, headers } = optionsOrProvider;
     this.nodeUrl = nodeUrl;
     this.retries = retries || 200;
+    this.headers = { 'Content-Type': 'application/json', ...headers };
 
     this.getChainId().then((chainId) => {
       this.chainId = chainId;
@@ -63,7 +67,7 @@ export class RpcProvider implements ProviderInterface {
     return fetch(this.nodeUrl, {
       method: 'POST',
       body: stringify({ method, jsonrpc: '2.0', params, id: 0 }),
-      headers: { 'Content-Type': 'application/json' },
+      headers: this.headers,
     });
   }
 

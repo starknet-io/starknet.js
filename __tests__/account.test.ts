@@ -145,7 +145,7 @@ describe('deploy and test Wallet', () => {
       expect(res).toHaveProperty('overall_fee');
     });
 
-    test('Declare Account contract', async () => {
+    test('Declare ERC20 contract', async () => {
       const declareTx = await account.declare({
         contract: compiledErc20,
         classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',

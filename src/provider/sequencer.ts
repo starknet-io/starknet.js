@@ -44,7 +44,7 @@ import { GatewayError, HttpError } from './errors';
 import { ProviderInterface } from './interface';
 import { Block, BlockIdentifier } from './utils';
 
-type NetworkName = 'mainnet-alpha' | 'goerli-alpha';
+type NetworkName = 'mainnet-alpha' | 'goerli-alpha' | 'goerli-alpha-2';
 
 function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
   return (
@@ -62,6 +62,7 @@ export type SequencerProviderOptions =
       feederGatewayUrl?: string;
       gatewayUrl?: string;
       chainId?: StarknetChainId;
+      headers?: object;
     };
 
 export class SequencerProvider implements ProviderInterface {
@@ -73,9 +74,11 @@ export class SequencerProvider implements ProviderInterface {
 
   public chainId: StarknetChainId;
 
+  public headers: object | undefined;
+
   private responseParser = new SequencerAPIResponseParser();
 
-  constructor(optionsOrProvider: SequencerProviderOptions = { network: 'goerli-alpha' }) {
+  constructor(optionsOrProvider: SequencerProviderOptions = { network: 'goerli-alpha-2' }) {
     if ('network' in optionsOrProvider) {
       this.baseUrl = SequencerProvider.getNetworkFromName(optionsOrProvider.network);
       this.chainId = SequencerProvider.getChainIdFromBaseUrl(this.baseUrl);
@@ -93,6 +96,8 @@ export class SequencerProvider implements ProviderInterface {
       this.chainId =
         optionsOrProvider.chainId ??
         SequencerProvider.getChainIdFromBaseUrl(optionsOrProvider.baseUrl);
+
+      this.headers = optionsOrProvider?.headers;
     }
   }
 
@@ -101,6 +106,9 @@ export class SequencerProvider implements ProviderInterface {
       case 'mainnet-alpha':
         return 'https://alpha-mainnet.starknet.io';
       case 'goerli-alpha':
+        return 'https://alpha4.starknet.io';
+      case 'goerli-alpha-2':
+        return 'https://alpha4-2.starknet.io';
       default:
         return 'https://alpha4.starknet.io';
     }
@@ -153,13 +161,14 @@ export class SequencerProvider implements ProviderInterface {
     return `?${queryString}`;
   }
 
-  private getHeaders(method: 'POST' | 'GET'): Record<string, string> | undefined {
+  private getHeaders(method: 'POST' | 'GET'): object | undefined {
     if (method === 'POST') {
       return {
         'Content-Type': 'application/json',
+        ...this.headers,
       };
     }
-    return undefined;
+    return this.headers;
   }
 
   // typesafe fetch

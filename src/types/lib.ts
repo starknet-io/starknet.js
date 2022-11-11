@@ -7,12 +7,25 @@ export type KeyPair = EC.KeyPair;
 export type Signature = string[];
 export type RawCalldata = BigNumberish[];
 export type AllowArray<T> = T | T[];
+export type RawArgs =
+  | {
+      [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
+    }
+  | string[];
 
 export interface ContractClass {
   program: CompressedProgram;
   entry_points_by_type: RPC.ContractClass['entry_points_by_type'];
   abi?: Abi;
 }
+
+export type UniversalDeployerContractPayload = {
+  classHash: BigNumberish;
+  salt: string;
+  unique: boolean;
+  constructorCalldata?: RawArgs;
+  isDevnet?: boolean;
+};
 
 export type DeployContractPayload = {
   contract: CompiledContract | string;
