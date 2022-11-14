@@ -69,8 +69,6 @@ export class Provider implements ProviderInterface {
     contractAddress: string,
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<string> {
-    if (this.provider instanceof RpcProvider)
-      return this.provider.getClassHashAt(blockIdentifier, contractAddress);
     return this.provider.getClassHashAt(contractAddress, blockIdentifier);
   }
 
