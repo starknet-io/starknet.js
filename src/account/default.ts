@@ -22,7 +22,11 @@ import {
   DeployAccountContractPayload,
   UniversalDeployerContractPayload,
 } from '../types/lib';
-import { calculateContractAddressFromHash, transactionVersion } from '../utils/hash';
+import {
+  calculateContractAddressFromHash,
+  feeTransactionVersion,
+  transactionVersion,
+} from '../utils/hash';
 import { BigNumberish, toBN, toCairoBool } from '../utils/number';
 import { parseContract } from '../utils/provider';
 import { compileCalldata, estimatedFeeToMaxFee } from '../utils/stark';
@@ -63,7 +67,7 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<EstimateFee> {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = toBN(providedNonce ?? (await this.getNonce()));
-    const version = toBN(transactionVersion);
+    const version = toBN(feeTransactionVersion);
     const chainId = await this.getChainId();
 
     const signerDetails: InvocationsSignerDetails = {
@@ -96,7 +100,7 @@ export class Account extends Provider implements AccountInterface {
     { blockIdentifier, nonce: providedNonce }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
     const nonce = toBN(providedNonce ?? (await this.getNonce()));
-    const version = toBN(transactionVersion);
+    const version = toBN(feeTransactionVersion);
     const chainId = await this.getChainId();
     const contractDefinition = parseContract(contract);
 
@@ -132,7 +136,7 @@ export class Account extends Provider implements AccountInterface {
     { blockIdentifier, nonce: providedNonce }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
     const nonce = toBN(providedNonce ?? (await this.getNonce()));
-    const version = toBN(transactionVersion);
+    const version = toBN(feeTransactionVersion);
     const chainId = await this.getChainId();
     const contractAddress =
       providedContractAddress ??

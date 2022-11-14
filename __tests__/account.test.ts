@@ -2,6 +2,7 @@ import { isBN } from 'bn.js';
 
 import typedDataExample from '../__mocks__/typedDataExample.json';
 import { Account, Contract, Provider, number, stark } from '../src';
+import { feeTransactionVersion } from '../src/utils/hash';
 import { toBN } from '../src/utils/number';
 import {
   compiledErc20,
@@ -43,12 +44,15 @@ describe('deploy and test Wallet', () => {
   });
 
   test('estimate fee', async () => {
+    const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
     const { overall_fee } = await account.estimateInvokeFee({
       contractAddress: erc20Address,
       entrypoint: 'transfer',
       calldata: [erc20.address, '10', '0'],
     });
     expect(isBN(overall_fee)).toBe(true);
+    expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
+    innerInvokeEstFeeSpy.mockClear();
   });
 
   test('read balance of wallet', async () => {
