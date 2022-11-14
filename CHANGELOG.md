@@ -1,3 +1,24 @@
+# [4.11.0](https://github.com/0xs34n/starknet.js/compare/v4.10.0...v4.11.0) (2022-11-14)
+
+### Bug Fixes
+
+- change txn version for estimate fee apis to be feeTransactionVersion ([4d255c5](https://github.com/0xs34n/starknet.js/commit/4d255c5cf4adceb16a7f9ac61904a6e5d8020cbd))
+- lib FunctionAbiType and EventAbi shallow ([7088dc6](https://github.com/0xs34n/starknet.js/commit/7088dc6828f9f4fd29922323e63183a2e11f7340))
+- remove deprecated function ([0a9f84f](https://github.com/0xs34n/starknet.js/commit/0a9f84f86aabaa49ab78faa3331cac0ca98ace61))
+- removed fixed params swap ([57c01f6](https://github.com/0xs34n/starknet.js/commit/57c01f6418771d8ceaa3f393d54cad8bfff94b56))
+- rpcProvider tests ([4b0fd20](https://github.com/0xs34n/starknet.js/commit/4b0fd20a8ce235e0e069521f7dca50a4696120a4))
+
+### Features
+
+- fill in sequencer class methods ([83c0a29](https://github.com/0xs34n/starknet.js/commit/83c0a296bced3128a0ca9dd5246b376816a0be63))
+- implement rpc-0.2.1rc1 types ([2b1b71e](https://github.com/0xs34n/starknet.js/commit/2b1b71ebedfa709aab4fa652bd98a8efc2d3e39a))
+- rpc 0.2.0 plane implementation ([35a880c](https://github.com/0xs34n/starknet.js/commit/35a880ce4f8438e78143f7c0997ccfe6de680d80))
+- rpc 0.2.0 type implementation ([866dda7](https://github.com/0xs34n/starknet.js/commit/866dda76fc35ef656a9e21b8b8674f73729c9a50))
+- rpc 0.2.0 types spec ([25b2d29](https://github.com/0xs34n/starknet.js/commit/25b2d293a1a570b6fc68ea3877bfe6c3e898e3a6))
+- rpc 0.2.1 ([ed17f63](https://github.com/0xs34n/starknet.js/commit/ed17f6380d2b1ab1432d5426c7395ab18c6dc793))
+- rpc v0.2 endpoint, default identifiers, getClassHashAt flip parameters ([f0a0d6c](https://github.com/0xs34n/starknet.js/commit/f0a0d6c49e33442b603dcc9c9c119867c1ed32cc))
+- rpc0.2.1 definition migration comlete ([35c5a06](https://github.com/0xs34n/starknet.js/commit/35c5a0645dafe061080c2c2ced6a9a4a9882207c))
+
 # [4.10.0](https://github.com/0xs34n/starknet.js/compare/v4.9.0...v4.10.0) (2022-11-10)
 
 ### Bug Fixes
