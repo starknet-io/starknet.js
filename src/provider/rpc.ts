@@ -8,7 +8,6 @@ import {
   EstimateFeeResponse,
   GetBlockResponse,
   GetCodeResponse,
-  GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
   InvocationsDetailsWithNonce,
@@ -17,8 +16,8 @@ import {
 import { RPC } from '../types/api';
 import {
   DeclareContractTransaction,
-  DeployAccountContractPayload,
   DeployAccountContractTransaction,
+  InvocationsDetails,
 } from '../types/lib';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
@@ -65,7 +64,7 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public fetch(method: any, params: any): Promise<any> {
-    return fetch(this.nodeUrl, {
+    return fetch(`${this.nodeUrl}/rpc/v0.2`, {
       method: 'POST',
       body: stringify({ method, jsonrpc: '2.0', params, id: 0 }),
       headers: this.headers,
@@ -125,8 +124,8 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getClassHashAt(
-    blockIdentifier: BlockIdentifier,
-    contractAddress: RPC.ContractAddress
+    contractAddress: RPC.ContractAddress,
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<RPC.Felt> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getClassHashAt', {
@@ -154,7 +153,9 @@ export class RpcProvider implements ProviderInterface {
     throw new Error('Pathfinder does not implement this rpc 0.1.0 method');
   }
 
-  public async getStateUpdate(blockIdentifier: BlockIdentifier): Promise<RPC.StateUpdate> {
+  public async getStateUpdate(
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<RPC.StateUpdate> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getStateUpdate', { block_id });
   }
@@ -190,12 +191,16 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_getTransactionByBlockIdAndIndex', { block_id, index });
   }
 
-  public async getTransactionReceipt(txHash: string): Promise<GetTransactionReceiptResponse> {
+  public async getTransactionReceipt(txHash: string): Promise<RPC.TransactionReceipt> {
     return this.fetchEndpoint('starknet_getTransactionReceipt', { transaction_hash: txHash });
   }
 
-  public async getClass(classHash: RPC.Felt): Promise<RPC.ContractClass> {
-    return this.fetchEndpoint('starknet_getClass', { class_hash: classHash });
+  public async getClass(
+    classHash: RPC.Felt,
+    blockIdentifier: BlockIdentifier = 'pending'
+  ): Promise<RPC.ContractClass> {
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint('starknet_getClass', { class_hash: classHash, block_id });
   }
 
   public async getClassAt(
@@ -213,7 +218,7 @@ export class RpcProvider implements ProviderInterface {
     _contractAddress: string,
     _blockIdentifier?: BlockIdentifier
   ): Promise<GetCodeResponse> {
-    throw new Error('RPC 0.1.0 does not implement getCode function');
+    throw new Error('RPC does not implement getCode function');
   }
 
   public async getEstimateFee(
@@ -297,46 +302,58 @@ export class RpcProvider implements ProviderInterface {
     details: InvocationsDetailsWithNonce
   ): Promise<DeclareContractResponse> {
     return this.fetchEndpoint('starknet_addDeclareTransaction', {
-      contract_class: {
-        program: contractDefinition.program,
-        entry_points_by_type: contractDefinition.entry_points_by_type,
-        abi: contractDefinition.abi, // rpc 2.0
+      declare_transaction: {
+        contract_class: {
+          program: contractDefinition.program,
+          entry_points_by_type: contractDefinition.entry_points_by_type,
+          abi: contractDefinition.abi, // rpc 2.0
+        },
+        type: 'DECLARE',
+        version: toHex(toBN(details.version || 0)),
+        max_fee: toHex(toBN(details.maxFee || 0)),
+        signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
+        sender_address: senderAddress,
+        nonce: toHex(toBN(details.nonce)),
       },
-      version: toHex(toBN(details.version || 0)),
-      max_fee: toHex(toBN(details.maxFee || 0)),
-      signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
-      sender_address: senderAddress,
-      nonce: toHex(toBN(details.nonce)),
     });
   }
 
-  public async deployContract({
-    contract,
-    constructorCalldata,
-    addressSalt,
-  }: DeployContractPayload): Promise<DeployContractResponse> {
+  /**
+   * @deprecated This method wont be supported soon, use Account.deploy instead
+   */
+  public async deployContract(
+    { contract, constructorCalldata, addressSalt }: DeployContractPayload,
+    details?: InvocationsDetails
+  ): Promise<DeployContractResponse> {
     const contractDefinition = parseContract(contract);
-
     return this.fetchEndpoint('starknet_addDeployTransaction', {
-      contract_address_salt: addressSalt ?? randomAddress(),
-      constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata ?? []),
-      contract_definition: {
-        program: contractDefinition.program,
-        entry_points_by_type: contractDefinition.entry_points_by_type,
-        abi: contractDefinition.abi, // rpc 2.0
+      deploy_transaction: {
+        contract_address_salt: addressSalt ?? randomAddress(),
+        constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata ?? []),
+        contract_class: {
+          program: contractDefinition.program,
+          entry_points_by_type: contractDefinition.entry_points_by_type,
+          abi: contractDefinition.abi,
+        },
+        type: 'DEPLOY',
+        version: toHex(toBN(details?.version || 0)),
       },
     });
   }
 
-  public async deployAccountContract({
-    classHash,
-    constructorCalldata,
-    addressSalt,
-  }: DeployAccountContractPayload): Promise<DeployContractResponse> {
+  public async deployAccountContract(
+    { classHash, constructorCalldata, addressSalt, signature }: DeployAccountContractTransaction,
+    details: InvocationsDetailsWithNonce
+  ): Promise<DeployContractResponse> {
     return this.fetchEndpoint('starknet_addDeployAccountTransaction', {
       constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
       class_hash: toHex(toBN(classHash)),
       contract_address_salt: toHex(toBN(addressSalt || 0)),
+      type: 'DEPLOY',
+      max_fee: toHex(toBN(details.maxFee || 0)),
+      version: toHex(toBN(details.version || 0)),
+      signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
+      nonce: toHex(toBN(details.nonce)),
     });
   }
 
@@ -345,13 +362,15 @@ export class RpcProvider implements ProviderInterface {
     details: InvocationsDetailsWithNonce
   ): Promise<InvokeFunctionResponse> {
     return this.fetchEndpoint('starknet_addInvokeTransaction', {
-      function_invocation: {
-        contract_address: functionInvocation.contractAddress,
+      invoke_transaction: {
+        sender_address: functionInvocation.contractAddress,
         calldata: parseCalldata(functionInvocation.calldata),
+        type: 'INVOKE',
+        max_fee: toHex(toBN(details.maxFee || 0)),
+        version: toHex(toBN(details.version || 0)),
+        signature: bigNumberishArrayToHexadecimalStringArray(functionInvocation.signature || []),
+        nonce: toHex(toBN(details.nonce)),
       },
-      signature: bigNumberishArrayToHexadecimalStringArray(functionInvocation.signature || []),
-      max_fee: toHex(toBN(details.maxFee || 0)),
-      version: toHex(toBN(details.version || 0)),
     });
   }
 
@@ -395,6 +414,11 @@ export class RpcProvider implements ProviderInterface {
         // eslint-disable-next-line no-await-in-loop
         const res = await this.getTransactionReceipt(txHash);
 
+        if (!('status' in res)) {
+          const error = new Error('pending transaction');
+          throw error;
+        }
+
         if (res.status && successStates.includes(res.status)) {
           onchain = true;
         } else if (res.status && errorStates.includes(res.status)) {
@@ -427,7 +451,7 @@ export class RpcProvider implements ProviderInterface {
    * @returns Number of transactions
    */
   public async getTransactionCount(
-    blockIdentifier: BlockIdentifier
+    blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<RPC.GetTransactionCountResponse> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getBlockTransactionCount', { block_id });
