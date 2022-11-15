@@ -395,7 +395,7 @@ Gets the transaction trace from a tx hash.
 
 provider.**simulateTransaction**(invocationWithTxType, invocationDetails, blockIdentifier) => _Promise < TransactionSimulationResponse >_
 
-Simulate transaction execution.
+Simulates the transaction and returns the transaction trace and estimated fee.
 
 ###### _TransactionSimulationResponse_
 
