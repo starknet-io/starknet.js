@@ -357,11 +357,11 @@ Gets the status of a transaction.
 
 <hr/>
 
-provider.**getTransactionTrace**(txHash) => _Promise < GetTransactionTraceResponse >_
+provider.**getTransactionTrace**(txHash) => _Promise < TransactionTraceResponse >_
 
 Gets the transaction trace from a tx hash.
 
-###### _GetTransactionTraceResponse_
+###### _TransactionTraceResponse_
 
 ```typescript
 {
@@ -388,6 +388,21 @@ Gets the transaction trace from a tx hash.
     events: Array<any>;
     messages: Array<any>;
   };
+}
+```
+
+<hr/>
+
+provider.**simulateTransaction**(invocationWithTxType, invocationDetails, blockIdentifier) => _Promise < TransactionSimulationResponse >_
+
+Simulate transaction execution.
+
+###### _TransactionSimulationResponse_
+
+```typescript
+{
+  trace: TransactionTraceResponse;
+  fee_estimation: EstimateFeeResponse;
 }
 ```
 
