@@ -1,3 +1,14 @@
+# [4.12.0](https://github.com/0xs34n/starknet.js/compare/v4.11.0...v4.12.0) (2022-11-17)
+
+### Bug Fixes
+
+- **tests:** refactor udc tests ([01a6eef](https://github.com/0xs34n/starknet.js/commit/01a6eef11b2f32e05d2aea4ab185536e3fdb1a71))
+- use method name similar to gateway endpoint ([79641b3](https://github.com/0xs34n/starknet.js/commit/79641b3076412d71fa4e5ccbdb018c4f3ecab938))
+
+### Features
+
+- create getClass RPC alias ([1003534](https://github.com/0xs34n/starknet.js/commit/10035341dd26e23b59d3dd764936a7d8eaa3f3b0))
+
 # [4.11.0](https://github.com/0xs34n/starknet.js/compare/v4.10.0...v4.11.0) (2022-11-14)
 
 ### Bug Fixes
