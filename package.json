@@ -21,13 +21,14 @@
     "build:esm": "tsup --clean false --format esm --platform node",
     "build:iife": "tsup --clean false --format iife --platform browser",
     "build:dts": "tsup --clean false --dts-only",
-    "pretest": "npm run lint",
+    "pretest": "npm run lint && npm run ts:check",
     "test": "jest -i",
     "posttest": "npm run format",
     "test:watch": "jest --watch",
     "docs": "cd www && npm run start",
     "format": "prettier --loglevel warn --write \"**/*.{ts,js,md,yml,json}\"",
-    "lint": "eslint . --cache --fix --ext .ts"
+    "lint": "eslint . --cache --fix --ext .ts",
+    "ts:check": "tsc --noEmit --resolveJsonModule --project tsconfig.eslint.json"
   },
   "keywords": [
     "starknet",
