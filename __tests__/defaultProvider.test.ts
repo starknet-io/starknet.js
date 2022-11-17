@@ -87,7 +87,7 @@ describe('defaultProvider', () => {
     });
 
     // TODO see if feasible to split
-    describe(' GetClass', () => {
+    describe('GetClassByHash', () => {
       test('responses', async () => {
         const classResponse = await testProvider.getClassByHash(erc20ClassHash);
         expect(classResponse).toHaveProperty('program');
