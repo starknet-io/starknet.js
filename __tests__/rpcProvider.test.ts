@@ -23,7 +23,9 @@ describeIfRpc('RPCProvider', () => {
 
   test('getChainId', async () => {
     const chainId = await rpcProvider.getChainId();
-    expect(chainId).toBe(StarknetChainId.TESTNET2);
+    expect([StarknetChainId.TESTNET2, StarknetChainId.MAINNET, StarknetChainId.TESTNET]).toContain(
+      chainId
+    );
   });
 
   test('getPendingTransactions', async () => {
@@ -107,7 +109,7 @@ describeIfRpc('RPCProvider', () => {
       });
 
       test('getClassHashAt', async () => {
-        const classHash = await rpcProvider.getClassHashAt('latest', contract_address);
+        const classHash = await rpcProvider.getClassHashAt(contract_address);
         expect(typeof classHash).toBe('string');
       });
 
@@ -116,9 +118,9 @@ describeIfRpc('RPCProvider', () => {
       });
     });
 
-    test('getClass classHash 0x00808396477a4296946bf6574afb2e14723f8d9a37bba25a1e104315ca89b1f7', async () => {
+    test('getClass classHash 0x03fcbf77b28c96f4f2fb5bd2d176ab083a12a5e123adeb0de955d7ee228c9854', async () => {
       const contractClass = await rpcProvider.getClass(
-        '0x00808396477a4296946bf6574afb2e14723f8d9a37bba25a1e104315ca89b1f7'
+        '0x03fcbf77b28c96f4f2fb5bd2d176ab083a12a5e123adeb0de955d7ee228c9854'
       );
       expect(contractClass).toHaveProperty('program');
       expect(contractClass).toHaveProperty('entry_points_by_type');

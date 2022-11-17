@@ -41,6 +41,5 @@ export namespace RPC {
   export type InvokedTransaction = OPENRPC.InvokedTransaction;
   export type DeclaredTransaction = OPENRPC.DeclaredTransaction;
   export type DeployedTransaction = OPENRPC.DeployedTransaction;
-
   export type Methods = OPENRPC.Methods;
 }

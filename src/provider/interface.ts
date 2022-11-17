@@ -19,6 +19,7 @@ import {
   DeclareContractTransaction,
   DeployAccountContractPayload,
   DeployAccountContractTransaction,
+  InvocationsDetails,
 } from '../types/lib';
 import type { BigNumberish } from '../utils/number';
 import { BlockIdentifier } from './utils';
@@ -145,7 +146,10 @@ export abstract class ProviderInterface {
    * - address salt
    * @returns a confirmation of sending a transaction on the starknet contract
    */
-  public abstract deployContract(payload: DeployContractPayload): Promise<DeployContractResponse>;
+  public abstract deployContract(
+    payload: DeployContractPayload,
+    details?: InvocationsDetails
+  ): Promise<DeployContractResponse>;
 
   /**
    * Deploys a given compiled Account contract (json) to starknet
