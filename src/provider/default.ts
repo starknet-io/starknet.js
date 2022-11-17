@@ -72,8 +72,8 @@ export class Provider implements ProviderInterface {
     return this.provider.getClassHashAt(contractAddress, blockIdentifier);
   }
 
-  public getClass(classHash: string): Promise<ContractClass> {
-    return this.provider.getClass(classHash);
+  public getClassByHash(classHash: string): Promise<ContractClass> {
+    return this.provider.getClassByHash(classHash);
   }
 
   public async getEstimateFee(

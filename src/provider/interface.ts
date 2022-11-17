@@ -92,7 +92,7 @@ export abstract class ProviderInterface {
    * @param classHash - class hash
    * @returns Contract class of compiled contract
    */
-  public abstract getClass(classHash: string): Promise<ContractClass>;
+  public abstract getClassByHash(classHash: string): Promise<ContractClass>;
 
   /**
    * Gets the nonce of a contract with respect to a specific block

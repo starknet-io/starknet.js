@@ -195,6 +195,10 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_getTransactionReceipt', { transaction_hash: txHash });
   }
 
+  public async getClassByHash(classHash: RPC.Felt): Promise<RPC.ContractClass> {
+    return this.getClass(classHash);
+  }
+
   public async getClass(
     classHash: RPC.Felt,
     blockIdentifier: BlockIdentifier = 'pending'

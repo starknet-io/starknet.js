@@ -307,7 +307,7 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('get_class_hash_at', { blockIdentifier, contractAddress });
   }
 
-  public async getClass(classHash: string): Promise<ContractClass> {
+  public async getClassByHash(classHash: string): Promise<ContractClass> {
     return this.fetchEndpoint('get_class_by_hash', { classHash }).then(parseContract);
   }
 
