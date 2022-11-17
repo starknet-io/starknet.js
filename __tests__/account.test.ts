@@ -1,11 +1,13 @@
 import { isBN } from 'bn.js';
 
 import typedDataExample from '../__mocks__/typedDataExample.json';
-import { Account, Contract, Provider, number, stark } from '../src';
+import { Account, Contract, DeployContractPayload, Provider, number, stark } from '../src';
 import { feeTransactionVersion } from '../src/utils/hash';
 import { toBN } from '../src/utils/number';
 import {
   compiledErc20,
+  compiledNamingContract,
+  compiledStarknetId,
   compiledTestDapp,
   getERC20DeployPayload,
   getTestAccount,
@@ -157,6 +159,65 @@ describe('deploy and test Wallet', () => {
       await provider.waitForTransaction(declareTx.transaction_hash);
 
       expect(declareTx.class_hash).toBeDefined();
+    });
+
+    test('Get the stark name of the account and account from stark name (using starknet.id)', async () => {
+      // Deploy naming contract
+      const namingPlayLoad: DeployContractPayload = { contract: compiledNamingContract };
+      const namingResponse = await provider.deployContract(namingPlayLoad);
+      const namingAddress = namingResponse.contract_address;
+
+      // Deploy Starknet id contract
+      const idPlayLoad: DeployContractPayload = { contract: compiledStarknetId };
+      const idResponse = await provider.deployContract(idPlayLoad);
+      const idAddress = idResponse.contract_address;
+
+      const { transaction_hash } = await account.execute([
+        {
+          contractAddress: namingAddress,
+          entrypoint: 'initializer',
+          calldata: [
+            idAddress, // starknetid_contract_addr
+            '0', // pricing_contract_addr
+            account.address, // admin
+            '1576987121283045618657875225183003300580199140020787494777499595331436496159', // whitelisting_key
+            '0', // l1_contract
+          ],
+        },
+        {
+          contractAddress: idAddress,
+          entrypoint: 'mint',
+          calldata: ['1'], // TokenId
+        },
+        {
+          contractAddress: namingAddress,
+          entrypoint: 'whitelisted_mint',
+          calldata: [
+            '18925', // Domain encoded "ben"
+            '1697380617', // Expiry
+            '1', // Starknet id linked
+            account.address, // receiver_address
+            '1249449923402095645023546949816521361907869702415870903008894560968474148064', // sig 0 for whitelist
+            '543901326374961504443808953662149863005450004831659662383974986108355067943', // sig 1 for whitelist
+          ],
+        },
+        {
+          contractAddress: namingAddress,
+          entrypoint: 'set_address_to_domain',
+          calldata: [
+            '1', // length
+            '18925', // Domain encoded "ben"
+          ],
+        },
+      ]);
+
+      await provider.waitForTransaction(transaction_hash);
+
+      const address = await account.getAddressFromStarkName('ben.stark', namingAddress);
+      expect(address).toEqual(account.address);
+
+      const name = await account.getStarkName(namingAddress);
+      expect(name).toEqual('ben.stark');
     });
   });
 });

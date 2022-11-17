@@ -13,6 +13,8 @@ export const compiledL1L2 = readContract('l1l2_compiled');
 export const compiledTypeTransformation = readContract('contract');
 export const compiledMulticall = readContract('multicall');
 export const compiledTestDapp = readContract('TestDapp');
+export const compiledStarknetId = readContract('starknetId_compiled');
+export const compiledNamingContract = readContract('naming_compiled');
 
 const DEFAULT_TEST_PROVIDER_BASE_URL = 'http://127.0.0.1:5050/';
 const DEFAULT_TEST_ACCOUNT_ADDRESS = // run `starknet-devnet --seed 0` and this will be the first account

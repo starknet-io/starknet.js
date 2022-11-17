@@ -1,3 +1,5 @@
+import { BN } from 'bn.js';
+
 import { UDC, ZERO } from '../constants';
 import { ProviderInterface, ProviderOptions } from '../provider';
 import { Provider } from '../provider/default';
@@ -27,9 +29,10 @@ import {
   feeTransactionVersion,
   transactionVersion,
 } from '../utils/hash';
-import { BigNumberish, toBN, toCairoBool } from '../utils/number';
+import { BigNumberish, hexToDecimalString, toBN, toCairoBool } from '../utils/number';
 import { parseContract } from '../utils/provider';
 import { compileCalldata, estimatedFeeToMaxFee } from '../utils/stark';
+import { getStarknetIdContract, useDecoded, useEncoded } from '../utils/starknetId';
 import { fromCallsToExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
@@ -52,6 +55,53 @@ export class Account extends Provider implements AccountInterface {
 
   public async getNonce(blockIdentifier?: BlockIdentifier): Promise<BigNumberish> {
     return super.getNonce(this.address, blockIdentifier);
+  }
+
+  public async getStarkName(StarknetIdContract?: string): Promise<string | Error> {
+    const chainId = await this.getChainId();
+    const contract = StarknetIdContract ?? getStarknetIdContract(chainId);
+
+    try {
+      const hexDomain = await this.callContract({
+        contractAddress: contract,
+        entrypoint: 'address_to_domain',
+        calldata: compileCalldata({
+          address: this.address,
+        }),
+      });
+      const decimalDomain = hexDomain.result
+        .map((element) => new BN(hexToDecimalString(element)))
+        .slice(1);
+
+      const stringDomain = useDecoded(decimalDomain);
+      // const stringDomain = useDecodedSeveral(decimalDomain);
+
+      return stringDomain;
+    } catch {
+      return Error('Couldnt get stark name');
+    }
+  }
+
+  public async getAddressFromStarkName(
+    name: string,
+    StarknetIdContract?: string
+  ): Promise<string | Error> {
+    const chainId = await this.getChainId();
+    const contract = StarknetIdContract ?? getStarknetIdContract(chainId);
+
+    try {
+      const addressData = await this.callContract({
+        contractAddress: contract,
+        entrypoint: 'domain_to_address',
+        calldata: compileCalldata({
+          domain: [useEncoded(name.replace('.stark', '')).toString(10)],
+        }),
+      });
+
+      return addressData.result[0];
+    } catch {
+      return Error('Couldnt get address from stark name');
+    }
   }
 
   public async estimateFee(
