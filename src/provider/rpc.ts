@@ -195,6 +195,10 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getClassByHash(classHash: RPC.Felt): Promise<RPC.ContractClass> {
+    return this.getClass(classHash);
+  }
+
+  public async getClass(classHash: RPC.Felt): Promise<RPC.ContractClass> {
     return this.fetchEndpoint('starknet_getClass', { class_hash: classHash });
   }
 
