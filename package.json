@@ -76,6 +76,7 @@
     "hash.js": "^1.1.7",
     "isomorphic-fetch": "^3.0.0",
     "json-bigint": "^1.0.0",
+    "micro-starknet": "github:paulmillr/micro-starknet",
     "minimalistic-assert": "^1.0.1",
     "pako": "^2.0.4",
     "ts-custom-error": "^3.2.0",

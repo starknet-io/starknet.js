@@ -5,6 +5,7 @@ export { IS_BROWSER } from './utils/encode';
 export const ZERO = toBN(0);
 export const ONE = toBN(1);
 export const TWO = toBN(2);
+export const API_VERSION = ZERO;
 export const MASK_250 = TWO.pow(toBN(250)).sub(ONE); // 2 ** 250 - 1
 export const MASK_251 = TWO.pow(toBN(251));
 

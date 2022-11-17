@@ -1,10 +1,12 @@
 /* eslint-disable import/extensions */
 import BN from 'bn.js';
-import { keccak256 } from 'ethereum-cryptography/keccak.js';
-import { hexToBytes } from 'ethereum-cryptography/utils.js';
+import { keccak256 } from 'ethereum-cryptography/keccak';
+import { hexToBytes } from 'ethereum-cryptography/utils';
+import { keccak as micro_keccak, pedersen as micro_pedersen } from 'micro-starknet';
 import assert from 'minimalistic-assert';
 
 import {
+  API_VERSION,
   CONSTANT_POINTS,
   FIELD_PRIME,
   MASK_250,
@@ -13,9 +15,10 @@ import {
   TransactionHashPrefix,
   ZERO,
 } from '../constants';
-import { RawCalldata } from '../types/lib';
+import { CompiledContract, RawCalldata } from '../types/lib';
 import { ec } from './ellipticCurve';
 import { addHexPrefix, buf2hex, removeHexPrefix, utf8ToArray } from './encode';
+import { parse, stringify } from './json';
 import {
   BigNumberish,
   isHex,
@@ -25,6 +28,7 @@ import {
   toHex,
   toHexString,
 } from './number';
+import { encodeShortString } from './shortString';
 
 export const transactionVersion = 1;
 export const feeTransactionVersion = toBN(2).pow(toBN(128)).add(toBN(transactionVersion));
@@ -81,7 +85,7 @@ const constantPoints = CONSTANT_POINTS.map((coords: string[]) =>
   ec.curve.point(coords[0], coords[1])
 );
 
-export function pedersen(input: [BigNumberish, BigNumberish]) {
+export function pedersen__old(input: [BigNumberish, BigNumberish]) {
   let point = constantPoints[0];
   for (let i = 0; i < input.length; i += 1) {
     let x = toBN(input[i]);
@@ -100,8 +104,26 @@ export function pedersen(input: [BigNumberish, BigNumberish]) {
   return addHexPrefix(point.getX().toString(16));
 }
 
+export type PedersenArg = bigint | number | string;
+
+export function pedersen(input: [PedersenArg, PedersenArg]) {
+  return addHexPrefix(micro_pedersen(...input));
+}
+
 export function computeHashOnElements(data: BigNumberish[]) {
-  return [...data, data.length].reduce((x, y) => pedersen([x, y]), 0).toString();
+  const hexData = data.map((d) => toHex(toBN(d)));
+
+  return [...hexData, hexData.length]
+    .reduce((x: PedersenArg, y: PedersenArg) => pedersen([x, y]), 0)
+    .toString();
+}
+
+export function computeHashOnElements__old(data: BigNumberish[]) {
+  return [...data, data.length]
+    .reduce((x, y) => {
+      return pedersen__old([x, y]);
+    }, 0)
+    .toString();
 }
 
 // following implementation is based on this python implementation:
@@ -232,4 +254,74 @@ export function calculateContractAddressFromHash(
   ];
 
   return computeHashOnElements(dataToHash);
+}
+
+export default function computeHintedClassHash(compiledContract: CompiledContract) {
+  const { abi, program } = compiledContract;
+
+  const serialisedJson = stringify({ abi, program });
+
+  return addHexPrefix(micro_keccak(utf8ToArray(serialisedJson)).toString(16));
+}
+
+// Computes the class hash of a given contract class
+export function computeContractClassHash(contract: CompiledContract | string) {
+  const compiledContract =
+    typeof contract === 'string' ? (parse(contract) as CompiledContract) : contract;
+
+  const apiVersion = toHex(API_VERSION);
+
+  const externalEntryPointsHash = computeHashOnElements(
+    compiledContract.entry_points_by_type.EXTERNAL.flatMap((e) => [e.selector, e.offset])
+  );
+  console.log(
+    '🚀 ~ file: hash.ts ~ line 278 ~ computeContractClassHash ~ externalEntryPointsHash',
+    externalEntryPointsHash
+  );
+
+  const l1HandlerEntryPointsHash = computeHashOnElements(
+    compiledContract.entry_points_by_type.L1_HANDLER.flatMap((e) => [e.selector, e.offset])
+  );
+  console.log(
+    '🚀 ~ file: hash.ts ~ line 283 ~ computeContractClassHash ~ l1HandlerEntryPointsHash',
+    l1HandlerEntryPointsHash
+  );
+
+  const constructorEntryPointHash = computeHashOnElements(
+    compiledContract.entry_points_by_type.CONSTRUCTOR.flatMap((e) => [e.selector, e.offset])
+  );
+  console.log(
+    '🚀 ~ file: hash.ts ~ line 288 ~ computeContractClassHash ~ constructorEntryPointHash',
+    constructorEntryPointHash
+  );
+
+  const builtinsHash = computeHashOnElements(
+    compiledContract.program.builtins.map((s) => encodeShortString(s))
+  );
+  console.log(
+    '🚀 ~ file: hash.ts ~ line 293 ~ computeContractClassHash ~ builtinsHash',
+    builtinsHash
+  );
+
+  const hintedClassHash = computeHintedClassHash(compiledContract);
+  console.log(
+    '🚀 ~ file: hash.ts ~ line 296 ~ computeContractClassHash ~ hintedClassHash',
+    hintedClassHash
+  );
+
+  const dataHash = computeHashOnElements(compiledContract.program.data);
+  console.log('🚀 ~ file: hash.ts ~ line 299 ~ computeContractClassHash ~ dataHash', dataHash);
+
+  const elements: string[] = [
+    apiVersion,
+    externalEntryPointsHash,
+    l1HandlerEntryPointsHash,
+    constructorEntryPointHash,
+    builtinsHash,
+    hintedClassHash,
+    dataHash,
+  ];
+  console.log('🚀 ~ file: hash.ts ~ line 310 ~ computeContractClassHash ~ elements', elements);
+
+  return computeHashOnElements__old(elements);
 }

@@ -114,8 +114,21 @@ export type Abi = Array<FunctionAbi | EventAbi | StructAbi>;
 
 type EventAbi = any;
 
-export type EntryPointsByType = object;
-export type Program = Record<any, any>;
+export type ContractEntryPointFields = {
+  selector: string;
+  offset: string;
+};
+
+export type EntryPointsByType = {
+  CONSTRUCTOR: ContractEntryPointFields[];
+  EXTERNAL: ContractEntryPointFields[];
+  L1_HANDLER: ContractEntryPointFields[];
+};
+
+export interface Program extends Record<string, any> {
+  builtins: string[];
+  data: string[];
+}
 export type BlockTag = 'pending' | 'latest';
 export type BlockNumber = BlockTag | null | number;
 

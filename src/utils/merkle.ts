@@ -1,4 +1,4 @@
-import { pedersen } from './hash';
+import { pedersen__old } from './hash';
 import { toBN } from './number';
 
 export class MerkleTree {
@@ -20,7 +20,7 @@ export class MerkleTree {
     if (leaves.length !== this.leaves.length) {
       this.branches.push(leaves);
     }
-    const newLeaves = [];
+    const newLeaves: string[] = [];
     for (let i = 0; i < leaves.length; i += 2) {
       if (i + 1 === leaves.length) {
         newLeaves.push(MerkleTree.hash(leaves[i], '0x0'));
@@ -33,7 +33,7 @@ export class MerkleTree {
 
   static hash(a: string, b: string) {
     const [aSorted, bSorted] = [toBN(a), toBN(b)].sort((x: any, y: any) => (x.gte(y) ? 1 : -1));
-    return pedersen([aSorted, bSorted]);
+    return pedersen__old([aSorted, bSorted]);
   }
 
   public getProof(leaf: string, branch = this.leaves, hashPath: string[] = []): string[] {
