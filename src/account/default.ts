@@ -74,11 +74,10 @@ export class Account extends Provider implements AccountInterface {
         .slice(1);
 
       const stringDomain = useDecoded(decimalDomain);
-      // const stringDomain = useDecodedSeveral(decimalDomain);
 
       return stringDomain;
     } catch {
-      return Error('Couldnt get stark name');
+      return Error('Could not get stark name');
     }
   }
 
@@ -100,7 +99,7 @@ export class Account extends Provider implements AccountInterface {
 
       return addressData.result[0];
     } catch {
-      return Error('Couldnt get address from stark name');
+      return Error('Could not get address from stark name');
     }
   }
 

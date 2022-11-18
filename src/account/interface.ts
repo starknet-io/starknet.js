@@ -222,6 +222,7 @@ export abstract class AccountInterface extends ProviderInterface {
 
   /**
    * Get starknet.id stark name with the address
+   *
    * @param  {string} StarknetIdContract
    * @returns name
    */
@@ -229,6 +230,7 @@ export abstract class AccountInterface extends ProviderInterface {
 
   /**
    * Get starknet.id address with the stark name
+   *
    * @param  {string} StarknetIdContract
    * @returns name
    */
