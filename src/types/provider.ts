@@ -12,6 +12,7 @@ import {
   RawCalldata,
   Signature,
   Status,
+  UniversalDeployerContractPayload,
 } from './lib';
 
 export interface GetBlockResponse {
@@ -131,4 +132,8 @@ export type EstimateFeeAction =
   | {
       type: 'DEPLOY_ACCOUNT';
       payload: DeployAccountContractPayload;
+    }
+  | {
+      type: 'DEPLOY';
+      payload: UniversalDeployerContractPayload;
     };

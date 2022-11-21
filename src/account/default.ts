@@ -166,6 +166,38 @@ export class Account extends Provider implements AccountInterface {
     };
   }
 
+  public async estimateDeployFee(
+    {
+      classHash,
+      salt,
+      unique = true,
+      constructorCalldata = [],
+      additionalCalls = [],
+    }: UniversalDeployerContractPayload,
+    transactionsDetail?: InvocationsDetails | undefined
+  ): Promise<EstimateFee> {
+    const compiledConstructorCallData = compileCalldata(constructorCalldata);
+
+    const callsArray = Array.isArray(additionalCalls) ? additionalCalls : [additionalCalls];
+    return this.estimateInvokeFee(
+      [
+        {
+          contractAddress: UDC.ADDRESS,
+          entrypoint: UDC.ENTRYPOINT,
+          calldata: [
+            classHash,
+            salt,
+            toCairoBool(unique),
+            compiledConstructorCallData.length,
+            ...compiledConstructorCallData,
+          ],
+        },
+        ...callsArray,
+      ],
+      transactionsDetail
+    );
+  }
+
   public async execute(
     calls: AllowArray<Call>,
     abis: Abi[] | undefined = undefined,
@@ -243,9 +275,8 @@ export class Account extends Provider implements AccountInterface {
       salt,
       unique = true,
       constructorCalldata = [],
-      isDevnet = false,
+      additionalCalls = [],
     }: UniversalDeployerContractPayload,
-    additionalCalls: AllowArray<Call> = [], // support multicall
     transactionsDetail: InvocationsDetails = {}
   ): Promise<InvokeFunctionResponse> {
     const compiledConstructorCallData = compileCalldata(constructorCalldata);
@@ -255,7 +286,7 @@ export class Account extends Provider implements AccountInterface {
     return this.execute(
       [
         {
-          contractAddress: isDevnet ? UDC.ADDRESS_DEVNET : UDC.ADDRESS,
+          contractAddress: UDC.ADDRESS,
           entrypoint: UDC.ENTRYPOINT,
           calldata: [
             classHash,
@@ -350,22 +381,26 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async getSuggestedMaxFee(
-    estimateFeeAction: EstimateFeeAction,
+    { type, payload }: EstimateFeeAction,
     details: EstimateFeeDetails
   ) {
     let feeEstimate: EstimateFee;
 
-    switch (estimateFeeAction.type) {
+    switch (type) {
       case 'INVOKE':
-        feeEstimate = await this.estimateInvokeFee(estimateFeeAction.payload, details);
+        feeEstimate = await this.estimateInvokeFee(payload, details);
         break;
 
       case 'DECLARE':
-        feeEstimate = await this.estimateDeclareFee(estimateFeeAction.payload, details);
+        feeEstimate = await this.estimateDeclareFee(payload, details);
         break;
 
       case 'DEPLOY_ACCOUNT':
-        feeEstimate = await this.estimateAccountDeployFee(estimateFeeAction.payload, details);
+        feeEstimate = await this.estimateAccountDeployFee(payload, details);
+        break;
+
+      case 'DEPLOY':
+        feeEstimate = await this.estimateDeployFee(payload, details);
         break;
 
       default:
