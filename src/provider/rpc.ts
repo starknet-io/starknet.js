@@ -242,7 +242,7 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_estimateFee', {
       request: {
         type: 'INVOKE',
-        contract_address: invocation.contractAddress,
+        sender_address: invocation.contractAddress,
         calldata: parseCalldata(invocation.calldata),
         signature: bigNumberishArrayToHexadecimalStringArray(invocation.signature || []),
         version: toHex(toBN(invocationDetails?.version || 0)),
