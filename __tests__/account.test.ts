@@ -7,7 +7,6 @@ import { toBN } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
 import { randomAddress } from '../src/utils/stark';
 import {
-  IS_DEVNET,
   compiledErc20,
   compiledTestDapp,
   erc20ClassHash,
@@ -189,7 +188,6 @@ describe('deploy and test Wallet', () => {
         ],
         salt,
         unique: true, // Using true here so as not to clash with normal erc20 deploy in account and provider test
-        isDevnet: IS_DEVNET,
       });
 
       await provider.waitForTransaction(deployment.transaction_hash);

@@ -24,7 +24,7 @@ export type UniversalDeployerContractPayload = {
   salt: string;
   unique: boolean;
   constructorCalldata?: RawArgs;
-  isDevnet?: boolean;
+  additionalCalls?: AllowArray<Call>; // support multicall
 };
 
 export type DeployContractPayload = {
