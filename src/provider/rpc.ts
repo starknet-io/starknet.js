@@ -64,7 +64,7 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public fetch(method: any, params: any): Promise<any> {
-    return fetch(`${this.nodeUrl}/rpc/v0.2`, {
+    return fetch(this.nodeUrl, {
       method: 'POST',
       body: stringify({ method, jsonrpc: '2.0', params, id: 0 }),
       headers: this.headers,
