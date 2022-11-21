@@ -193,7 +193,7 @@ export class SequencerProvider implements ProviderInterface {
       const res = await fetch(url, {
         method,
         body: stringify(request),
-        headers,
+        headers: headers as Record<string, string>,
       });
       const textResponse = await res.text();
       if (!res.ok) {

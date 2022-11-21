@@ -1,6 +1,7 @@
+/* eslint-disable import/extensions */
 import BN from 'bn.js';
-import { keccak256 } from 'ethereum-cryptography/keccak';
-import { hexToBytes } from 'ethereum-cryptography/utils';
+import { keccak256 } from 'ethereum-cryptography/keccak.js';
+import { hexToBytes } from 'ethereum-cryptography/utils.js';
 import assert from 'minimalistic-assert';
 
 import {
