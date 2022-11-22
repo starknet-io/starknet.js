@@ -6,3 +6,4 @@ npm-debug.log
 .eslintcache
 .vscode
 coverage
+package-lock.json
