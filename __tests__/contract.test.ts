@@ -1,9 +1,7 @@
-import { isBN } from 'bn.js';
-
 import { Contract, ContractFactory, stark } from '../src';
 import { DeployContractPayload } from '../src/types/lib';
 import { getSelectorFromName } from '../src/utils/hash';
-import { BigNumberish, toBigInt } from '../src/utils/number';
+import { BigNumberish, isBigInt, toBigInt } from '../src/utils/number';
 import { compileCalldata } from '../src/utils/stark';
 import {
   compiledErc20,
@@ -77,9 +75,9 @@ describe('class Contract {}', () => {
       ];
       const result = await contract.aggregate(calls);
       const [block_number, res] = result;
-      expect(isBN(block_number));
+      expect(isBigInt(block_number));
       expect(Array.isArray(res));
-      (res as BigNumberish[]).forEach((el) => expect(isBN(el)));
+      (res as BigNumberish[]).forEach((el) => expect(isBigInt(el)));
       expect(block_number).toStrictEqual(result.block_number);
       expect(res).toStrictEqual(result.result);
     });
