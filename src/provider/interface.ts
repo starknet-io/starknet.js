@@ -140,6 +140,8 @@ export abstract class ProviderInterface {
   /**
    * Deploys a given compiled contract (json) to starknet
    *
+   * @deprecated This method won't be supported, use Account.deploy instead
+   *
    * @param payload payload to be deployed containing:
    * - compiled contract code
    * - constructor calldata

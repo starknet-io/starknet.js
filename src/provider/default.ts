@@ -133,6 +133,9 @@ export class Provider implements ProviderInterface {
     return this.provider.invokeFunction(functionInvocation, details);
   }
 
+  /**
+   * @deprecated This method won't be supported, use Account.deploy instead
+   */
   public async deployContract(
     payload: DeployContractPayload,
     details: InvocationsDetails

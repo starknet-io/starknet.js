@@ -326,6 +326,9 @@ export class SequencerProvider implements ProviderInterface {
     }).then(this.responseParser.parseInvokeFunctionResponse);
   }
 
+  /**
+   * @deprecated This method won't be supported, use Account.deploy instead
+   */
   public async deployContract({
     contract,
     constructorCalldata,
