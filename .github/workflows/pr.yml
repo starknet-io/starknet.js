@@ -16,8 +16,8 @@ jobs:
         with:
           node-version: lts/*
           cache: 'npm'
-      - run: npm ci
-      - run: npm run build --if-present
+      - run: yarn install --frozen-lockfile
+      - run: yarn build --if-present
 
   tests:
     name: Run test
@@ -39,5 +39,5 @@ jobs:
         with:
           node-version: lts/*
           cache: 'npm'
-      - run: npm ci
-      - run: npm test
+      - run: yarn install --frozen-lockfile
+      - run: yarn test
