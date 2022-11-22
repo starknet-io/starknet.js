@@ -15,9 +15,9 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: lts/*
-          cache: 'npm'
-      - run: npm ci
-      - run: npm run build --if-present
+          cache: 'yarn'
+      - run: yarn install --frozen-lockfile
+      - run: yarn build --if-present
 
       - uses: actions/upload-artifact@v2
         with:
@@ -62,9 +62,9 @@ jobs:
         uses: actions/setup-node@v2
         with:
           node-version: lts/*
-          cache: 'npm'
-      - run: npm ci
-      - run: npm test
+          cache: 'yarn'
+      - run: yarn install --frozen-lockfile
+      - run: yarn test
 
   release:
     name: Release
@@ -75,8 +75,8 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: lts/*
-          cache: 'npm'
-      - run: npm ci
+          cache: 'yarn'
+      - run: yarn install --frozen-lockfile
       - uses: actions/download-artifact@v2
         with:
           name: build
