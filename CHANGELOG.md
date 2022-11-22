@@ -1,3 +1,17 @@
+# [4.13.0](https://github.com/0xs34n/starknet.js/compare/v4.12.0...v4.13.0) (2022-11-22)
+
+### Bug Fixes
+
+- add estimateDeployFee ([3bc11be](https://github.com/0xs34n/starknet.js/commit/3bc11bef0d744303a1288eb997fbfca32c7523ab))
+- adjust fetch parameter types ([dfe876a](https://github.com/0xs34n/starknet.js/commit/dfe876ad9fd59a4351671df5fc0705b3f980ce75))
+- anotate deprecate all providers deployContract ([65eed1f](https://github.com/0xs34n/starknet.js/commit/65eed1f671b41393b3ae33ae1aaa7a9ae0fbc013))
+- restore rpc node url to provided one ([2e1d87a](https://github.com/0xs34n/starknet.js/commit/2e1d87a6d9fc9a1fe9b493ffd8153eb2342ffdfc))
+- transaction v1 getInvokeEstimateFee ([cb4ede3](https://github.com/0xs34n/starknet.js/commit/cb4ede3b5b586ebf69768d4e4a8b36c739f6715f))
+
+### Features
+
+- update devnet ([0dbe9f7](https://github.com/0xs34n/starknet.js/commit/0dbe9f72fdad96250850599ed90495a5c2975f60))
+
 # [4.12.0](https://github.com/0xs34n/starknet.js/compare/v4.11.0...v4.12.0) (2022-11-17)
 
 ### Bug Fixes
