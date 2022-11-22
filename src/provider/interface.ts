@@ -291,5 +291,5 @@ export abstract class ProviderInterface {
    * @param txHash - transaction hash
    * @param retryInterval - retry interval
    */
-  public abstract waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<void>;
+  public abstract waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<any>;
 }

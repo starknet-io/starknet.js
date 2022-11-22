@@ -111,6 +111,16 @@ export interface DeployContractResponse {
   transaction_hash: string;
 }
 
+export interface AccountDeployContractResponse extends DeployContractResponse {
+  address: string;
+  deployer: string;
+  unique: string;
+  classHash: string;
+  calldata_len: string;
+  calldata: Array<string>;
+  salt: string;
+}
+
 export interface DeclareContractResponse {
   transaction_hash: string;
   class_hash: string;

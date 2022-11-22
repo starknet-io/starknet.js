@@ -407,6 +407,7 @@ export class RpcProvider implements ProviderInterface {
   public async waitForTransaction(txHash: string, retryInterval: number = 8000) {
     let { retries } = this;
     let onchain = false;
+    let res;
 
     while (!onchain) {
       const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'];
@@ -416,7 +417,7 @@ export class RpcProvider implements ProviderInterface {
       await wait(retryInterval);
       try {
         // eslint-disable-next-line no-await-in-loop
-        const res = await this.getTransactionReceipt(txHash);
+        res = await this.getTransactionReceipt(txHash);
 
         if (!('status' in res)) {
           const error = new Error('pending transaction');
@@ -445,6 +446,7 @@ export class RpcProvider implements ProviderInterface {
     }
 
     await wait(retryInterval);
+    return res;
   }
 
   /**

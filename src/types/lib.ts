@@ -21,8 +21,8 @@ export interface ContractClass {
 
 export type UniversalDeployerContractPayload = {
   classHash: BigNumberish;
-  salt: string;
-  unique: boolean;
+  salt?: string;
+  unique?: boolean;
   constructorCalldata?: RawArgs;
   additionalCalls?: AllowArray<Call>; // support multicall
 };

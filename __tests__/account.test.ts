@@ -10,7 +10,6 @@ import {
   compiledErc20,
   compiledTestDapp,
   erc20ClassHash,
-  getERC20DeployPayload,
   getTestAccount,
   getTestProvider,
 } from './fixtures';
@@ -25,14 +24,37 @@ describe('deploy and test Wallet', () => {
   beforeAll(async () => {
     expect(account).toBeInstanceOf(Account);
 
-    const erc20DeployPayload = getERC20DeployPayload(account.address);
+    /*     // Declare
+    const declareTx = await account.declare({
+      contract: compiledErc20,
+      classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+    });
+    expect(declareTx.transaction_hash).toBeDefined();
+    await provider.waitForTransaction(declareTx.transaction_hash);
 
-    const erc20Response = await provider.deployContract(erc20DeployPayload);
+    // Deploy Contract
+    const erc20Response = await account.deployContract2({
+      classHash: declareTx.class_hash,
+      constructorCalldata: [
+        encodeShortString('Token'),
+        encodeShortString('ERC20'),
+        account.address,
+      ],
+    });
+    expect(erc20Response.contract_address).toBeDefined(); */
 
-    erc20Address = erc20Response.contract_address;
+    const declareDeploy = await account.declareDeploy({
+      contract: compiledErc20,
+      classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+      constructorCalldata: [
+        encodeShortString('Token'),
+        encodeShortString('ERC20'),
+        account.address,
+      ],
+    });
+
+    erc20Address = declareDeploy.deploy.contract_address;
     erc20 = new Contract(compiledErc20.abi, erc20Address, provider);
-
-    await provider.waitForTransaction(erc20Response.transaction_hash);
 
     const x = await erc20.balanceOf(account.address);
 
@@ -174,6 +196,27 @@ describe('deploy and test Wallet', () => {
 
       expect(declareTx).toHaveProperty('class_hash');
       expect(declareTx.class_hash).toEqual(erc20ClassHash);
+    });
+
+    test('UDC DeployContract', async () => {
+      const deployResponse = await account.deployContract2({
+        classHash: erc20ClassHash,
+        constructorCalldata: [
+          encodeShortString('Token'),
+          encodeShortString('ERC20'),
+          account.address,
+        ],
+      });
+
+      expect(deployResponse.contract_address).toBeDefined();
+      expect(deployResponse.transaction_hash).toBeDefined();
+      expect(deployResponse.address).toBeDefined();
+      expect(deployResponse.deployer).toBeDefined();
+      expect(deployResponse.unique).toBeDefined();
+      expect(deployResponse.classHash).toBeDefined();
+      expect(deployResponse.calldata_len).toBeDefined();
+      expect(deployResponse.calldata).toBeDefined();
+      expect(deployResponse.salt).toBeDefined();
     });
 
     test('UDC Deploy', async () => {

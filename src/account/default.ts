@@ -22,6 +22,7 @@ import {
   DeployAccountContractPayload,
   UniversalDeployerContractPayload,
 } from '../types/lib';
+import { AccountDeployContractResponse, InvokeTransactionReceiptResponse } from '../types/provider';
 import {
   calculateContractAddressFromHash,
   feeTransactionVersion,
@@ -29,7 +30,7 @@ import {
 } from '../utils/hash';
 import { BigNumberish, toBN, toCairoBool } from '../utils/number';
 import { parseContract } from '../utils/provider';
-import { compileCalldata, estimatedFeeToMaxFee } from '../utils/stark';
+import { compileCalldata, estimatedFeeToMaxFee, randomAddress } from '../utils/stark';
 import { fromCallsToExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
@@ -169,7 +170,7 @@ export class Account extends Provider implements AccountInterface {
   public async estimateDeployFee(
     {
       classHash,
-      salt,
+      salt = '',
       unique = true,
       constructorCalldata = [],
       additionalCalls = [],
@@ -272,7 +273,7 @@ export class Account extends Provider implements AccountInterface {
   public async deploy(
     {
       classHash,
-      salt,
+      salt = '',
       unique = true,
       constructorCalldata = [],
       additionalCalls = [],
@@ -280,8 +281,8 @@ export class Account extends Provider implements AccountInterface {
     transactionsDetail: InvocationsDetails = {}
   ): Promise<InvokeFunctionResponse> {
     const compiledConstructorCallData = compileCalldata(constructorCalldata);
-
     const callsArray = Array.isArray(additionalCalls) ? additionalCalls : [additionalCalls];
+    const randomSalt = salt ?? randomAddress();
 
     return this.execute(
       [
@@ -290,7 +291,7 @@ export class Account extends Provider implements AccountInterface {
           entrypoint: UDC.ENTRYPOINT,
           calldata: [
             classHash,
-            salt,
+            randomSalt,
             toCairoBool(unique),
             compiledConstructorCallData.length,
             ...compiledConstructorCallData,
@@ -301,6 +302,70 @@ export class Account extends Provider implements AccountInterface {
       undefined,
       transactionsDetail
     );
+  }
+
+  /**
+   * Simplify deploy simulating old DeployContract with same response + UDC specific response
+   *
+   * @param payload UniversalDeployerContractPayload
+   * @param detials InvocationsDetails
+   * @returns Promise<AccountDeployContractResponse | Error>
+   */
+  public async deployContract2(
+    {
+      classHash,
+      salt,
+      unique = true,
+      constructorCalldata = [],
+      additionalCalls = [],
+    }: UniversalDeployerContractPayload,
+    transactionsDetail: InvocationsDetails = {}
+  ): Promise<AccountDeployContractResponse | Error> {
+    const deployTx = await this.deploy(
+      {
+        classHash,
+        salt,
+        unique,
+        constructorCalldata,
+        additionalCalls,
+      },
+      transactionsDetail
+    );
+    const txReceipt = await this.waitForTransaction(deployTx.transaction_hash);
+
+    return this.getUDCResponse(txReceipt);
+  }
+
+  /**
+   * Parse Transaction Receipt Event from UDC invoke transaction and
+   * create DeployContractResponse compatibile response with adition of UDC Event data
+   *
+   * @param txReceipt
+   * @returns DeployContractResponse | UDC Event Response data
+   */
+  public getUDCResponse(txReceipt: InvokeTransactionReceiptResponse | void) {
+    if (txReceipt && txReceipt.events) {
+      const event = txReceipt.events.find((it) => it.from_address === UDC.ADDRESS) || { data: [] };
+      return {
+        transaction_hash: txReceipt.transaction_hash,
+        contract_address: event.data[0],
+        address: event.data[0],
+        deployer: event.data[1],
+        unique: event.data[2],
+        classHash: event.data[3],
+        calldata_len: event.data[4],
+        calldata: event.data.slice(5, 5 + parseInt(event.data[4], 16)),
+        salt: event.data[event.data.length - 1],
+      };
+    }
+    return new Error("UDC didn't emmit event");
+  }
+
+  public async declareDeploy({ classHash, contract, constructorCalldata }: any) {
+    const { transaction_hash } = await this.declare({ contract, classHash });
+    const declare = await this.waitForTransaction(transaction_hash);
+    const deploy = await this.deployContract2({ classHash, constructorCalldata });
+    return { declare: { ...declare, class_hash: classHash }, deploy };
   }
 
   public async deployAccount(

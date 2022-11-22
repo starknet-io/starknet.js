@@ -35,13 +35,20 @@ export class Provider implements ProviderInterface {
   private provider!: ProviderInterface;
 
   constructor(providerOrOptions?: ProviderOptions | ProviderInterface) {
-    if (providerOrOptions && 'chainId' in providerOrOptions) {
-      this.provider = providerOrOptions;
-    } else if (providerOrOptions?.rpc) {
-      this.provider = new RpcProvider(providerOrOptions.rpc);
-    } else if (providerOrOptions?.sequencer) {
-      this.provider = new SequencerProvider(providerOrOptions.sequencer);
+    if (
+      providerOrOptions instanceof RpcProvider ||
+      providerOrOptions instanceof SequencerProvider
+    ) {
+      // providerOrOptions is provider
+      this.provider = <ProviderInterface>providerOrOptions;
+    } else if (providerOrOptions && 'rpc' in providerOrOptions) {
+      // providerOrOptions is rpc option
+      this.provider = new RpcProvider(<RpcProviderOptions>providerOrOptions.rpc);
+    } else if (providerOrOptions && 'sequencer' in providerOrOptions) {
+      // providerOrOptions is sequencer option
+      this.provider = new SequencerProvider(<SequencerProviderOptions>providerOrOptions.sequencer);
     } else {
+      // providerOrOptions is none, create SequencerProvider as default
       this.provider = new SequencerProvider();
     }
   }
@@ -180,7 +187,7 @@ export class Provider implements ProviderInterface {
     return this.provider.getCode(contractAddress, blockIdentifier);
   }
 
-  public async waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<void> {
+  public async waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<any> {
     return this.provider.waitForTransaction(txHash, retryInterval);
   }
 }
