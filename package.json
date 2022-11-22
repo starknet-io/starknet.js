@@ -70,7 +70,6 @@
   },
   "dependencies": {
     "@ethersproject/bytes": "^5.6.1",
-    "elliptic": "^6.5.4",
     "ethereum-cryptography": "^1.0.3",
     "hash.js": "^1.1.7",
     "isomorphic-fetch": "^3.0.0",
