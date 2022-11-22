@@ -1,10 +1,8 @@
-import type { ec as EC } from 'elliptic';
+import { Signature } from 'micro-starknet';
 
 import type { BigNumberish } from '../utils/number';
 import { RPC } from './api/rpc';
 
-export type KeyPair = EC.KeyPair;
-export type Signature = string[];
 export type RawCalldata = BigNumberish[];
 export type AllowArray<T> = T | T[];
 export type RawArgs =
@@ -22,7 +20,7 @@ export interface ContractClass {
 export type UniversalDeployerContractPayload = {
   classHash: BigNumberish;
   salt: string;
-  unique: boolean;
+  unique?: boolean;
   constructorCalldata?: RawArgs;
   additionalCalls?: AllowArray<Call>; // support multicall
 };

@@ -1,5 +1,5 @@
 import { BlockNumber, GetBlockResponse, stark } from '../src';
-import { toBN } from '../src/utils/number';
+import { toBigInt } from '../src/utils/number';
 import { erc20ClassHash, getERC20DeployPayload, getTestProvider } from './fixtures';
 
 const { compileCalldata } = stark;
@@ -109,7 +109,7 @@ describe('defaultProvider', () => {
 
       test('with "key" type of BN', () => {
         return expect(
-          testProvider.getStorageAt(erc20ContractAddress, toBN('0x0'))
+          testProvider.getStorageAt(erc20ContractAddress, toBigInt('0x0'))
         ).resolves.not.toThrow();
       });
     });

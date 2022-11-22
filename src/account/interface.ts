@@ -1,3 +1,5 @@
+import { Signature } from 'micro-starknet';
+
 import { ProviderInterface } from '../provider';
 import { BlockIdentifier } from '../provider/utils';
 import { SignerInterface } from '../signer';
@@ -11,7 +13,6 @@ import {
   EstimateFeeResponse,
   InvocationsDetails,
   InvokeFunctionResponse,
-  Signature,
 } from '../types';
 import {
   AllowArray,

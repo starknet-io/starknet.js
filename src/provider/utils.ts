@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import type { BlockNumber } from '../types';
-import { BigNumberish, isHex, toBN, toHex } from '../utils/number';
+import { BigNumberish, isHex, toHex } from '../utils/number';
 
 /**
  *
@@ -11,7 +11,7 @@ import { BigNumberish, isHex, toBN, toHex } from '../utils/number';
  */
 export function formatHash(hashValue: BigNumberish): string {
   if (typeof hashValue === 'string') return hashValue;
-  return toHex(toBN(hashValue));
+  return toHex(hashValue);
 }
 
 /**

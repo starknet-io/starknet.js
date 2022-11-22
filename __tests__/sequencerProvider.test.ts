@@ -1,5 +1,5 @@
 import { Contract, Provider, SequencerProvider, stark } from '../src';
-import { toBN } from '../src/utils/number';
+import { toBigInt } from '../src/utils/number';
 import {
   IS_SEQUENCER_GOERLI,
   compiledErc20,
@@ -87,7 +87,7 @@ describeIfSequencer('SequencerProvider', () => {
     test('Check ERC20 balance using Custom Sequencer Provider', async () => {
       const result = await erc20.balanceOf(wallet);
       const [res] = result;
-      expect(res.low).toStrictEqual(toBN(1000));
+      expect(res.low).toStrictEqual(toBigInt(1000));
       expect(res).toStrictEqual(result.balance);
     });
   });

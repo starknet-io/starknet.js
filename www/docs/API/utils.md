@@ -88,8 +88,8 @@ await this.callContract({
     contractAddress: this.address,
     entrypoint: 'is_valid_signature',
     calldata: compileCalldata({
-        hash: toBN(hash).toString(),
-        signature: signature.map((x) => toBN(x).toString()),
+        hash: toBigInt(hash).toString(),
+        signature: signature.map((x) => toBigInt(x).toString()),
     }),
 });
 ```
@@ -120,9 +120,9 @@ export type BigNumberish = string | number | BN;
 
 Check if number is in hex format.
 
-### toBN
+### toBigInt
 
-`toBN(number: BigNumberish, base?: number | 'hex'): BN`
+`toBigInt(number: BigNumberish, base?: number | 'hex'): BN`
 
 Converts BigNumberish to BN.
 

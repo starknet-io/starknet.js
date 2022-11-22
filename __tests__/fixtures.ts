@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-import { Account, ProviderInterface, RpcProvider, SequencerProvider, ec, json } from '../src';
+import { Account, ProviderInterface, RpcProvider, SequencerProvider, json } from '../src';
 import { CompiledContract, DeployContractPayload } from '../src/types';
 import { encodeShortString } from '../src/utils/shortString';
 
@@ -65,7 +65,7 @@ export const getTestAccount = (provider: ProviderInterface) => {
     testAccountPrivateKey = DEFAULT_TEST_ACCOUNT_PRIVATE_KEY;
   }
 
-  return new Account(provider, testAccountAddress, ec.getKeyPair(testAccountPrivateKey));
+  return new Account(provider, testAccountAddress, testAccountPrivateKey);
 };
 
 const describeIf = (condition: boolean) => (condition ? describe : describe.skip);

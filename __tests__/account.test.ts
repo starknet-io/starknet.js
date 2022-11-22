@@ -1,9 +1,7 @@
-import { isBN } from 'bn.js';
-
 import typedDataExample from '../__mocks__/typedDataExample.json';
 import { Account, Contract, Provider, number, stark } from '../src';
 import { feeTransactionVersion } from '../src/utils/hash';
-import { toBN } from '../src/utils/number';
+import { toBigInt } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
 import { randomAddress } from '../src/utils/stark';
 import {
@@ -36,7 +34,7 @@ describe('deploy and test Wallet', () => {
 
     const x = await erc20.balanceOf(account.address);
 
-    expect(number.toBN(x[0].low).toString()).toStrictEqual(number.toBN(1000).toString());
+    expect(number.toBigInt(x[0].low).toString()).toStrictEqual(number.toBigInt(1000).toString());
 
     const dappResponse = await provider.deployContract({
       contract: compiledTestDapp,
@@ -53,7 +51,7 @@ describe('deploy and test Wallet', () => {
       entrypoint: 'transfer',
       calldata: [erc20.address, '10', '0'],
     });
-    expect(isBN(overall_fee)).toBe(true);
+    expect(typeof overall_fee === 'bigint').toBe(true);
     expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
     innerInvokeEstFeeSpy.mockClear();
   });
@@ -61,7 +59,7 @@ describe('deploy and test Wallet', () => {
   test('read balance of wallet', async () => {
     const x = await erc20.balanceOf(account.address);
 
-    expect(number.toBN(x[0].low).toString()).toStrictEqual(number.toBN(1000).toString());
+    expect(number.toBigInt(x[0].low).toString()).toStrictEqual(number.toBigInt(1000).toString());
   });
 
   test('execute by wallet owner', async () => {
@@ -77,12 +75,12 @@ describe('deploy and test Wallet', () => {
   test('read balance of wallet after transfer', async () => {
     const { balance } = await erc20.balanceOf(account.address);
 
-    expect(balance.low).toStrictEqual(toBN(990));
+    expect(balance.low).toStrictEqual(toBigInt(990));
   });
 
   test('execute with custom nonce', async () => {
     const result = await account.getNonce();
-    const nonce = toBN(result).toNumber();
+    const nonce = toBigInt(result);
     const { transaction_hash } = await account.execute(
       {
         contractAddress: erc20Address,
@@ -113,14 +111,21 @@ describe('deploy and test Wallet', () => {
     await provider.waitForTransaction(transaction_hash);
 
     const response = await dapp.get_number(account.address);
-    expect(toBN(response.number as string).toString()).toStrictEqual('57');
+    expect(toBigInt(response.number as string).toString()).toStrictEqual('57');
   });
 
   test('sign and verify offchain message fail', async () => {
     const signature = await account.signMessage(typedDataExample);
+    const [r, s] = stark.formatSignature(signature);
+
     // change the signature to make it invalid
-    signature[0] += '123';
-    expect(await account.verifyMessage(typedDataExample, signature)).toBe(false);
+    const r2 = toBigInt(r) + 123n;
+
+    const signature2 = stark.parseSignature([r2.toString(), s]);
+
+    if (!signature2) return;
+
+    expect(await account.verifyMessage(typedDataExample, signature2)).toBe(false);
   });
 
   test('sign and verify offchain message', async () => {

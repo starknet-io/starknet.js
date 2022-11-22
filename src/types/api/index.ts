@@ -1,5 +1,6 @@
+import { Signature } from 'micro-starknet';
+
 import { BigNumberish } from '../../utils/number';
-import { Signature } from '../lib';
 
 export type Calldata = string[];
 

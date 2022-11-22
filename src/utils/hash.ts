@@ -1,40 +1,29 @@
 /* eslint-disable import/extensions */
-import BN from 'bn.js';
-import { keccak256 } from 'ethereum-cryptography/keccak';
-import { hexToBytes } from 'ethereum-cryptography/utils';
-import { keccak as micro_keccak, pedersen as micro_pedersen } from 'micro-starknet';
-import assert from 'minimalistic-assert';
 
-import {
-  API_VERSION,
-  CONSTANT_POINTS,
-  FIELD_PRIME,
-  MASK_250,
-  ONE,
-  StarknetChainId,
-  TransactionHashPrefix,
-  ZERO,
-} from '../constants';
+import { keccak256 } from 'ethereum-cryptography/keccak.js';
+import { hexToBytes } from 'ethereum-cryptography/utils.js';
+import { keccak, pedersen as micro_pedersen } from 'micro-starknet';
+
+import { API_VERSION, MASK_250, StarknetChainId, TransactionHashPrefix } from '../constants';
 import { CompiledContract, RawCalldata } from '../types/lib';
-import { ec } from './ellipticCurve';
 import { addHexPrefix, buf2hex, removeHexPrefix, utf8ToArray } from './encode';
 import { parse, stringify } from './json';
 import {
   BigNumberish,
   isHex,
   isStringWholeNumber,
-  toBN,
+  toBigInt,
   toFelt,
   toHex,
   toHexString,
 } from './number';
 import { encodeShortString } from './shortString';
 
-export const transactionVersion = 1;
-export const feeTransactionVersion = toBN(2).pow(toBN(128)).add(toBN(transactionVersion));
+export const transactionVersion = 1n;
+export const feeTransactionVersion = 2n ** 128n + transactionVersion;
 
 export function keccakBn(value: BigNumberish): string {
-  const hexWithoutPrefix = removeHexPrefix(toHex(toBN(value)));
+  const hexWithoutPrefix = removeHexPrefix(toHex(BigInt(value)));
   const evenHex = hexWithoutPrefix.length % 2 === 0 ? hexWithoutPrefix : `0${hexWithoutPrefix}`;
   return addHexPrefix(buf2hex(keccak256(hexToBytes(evenHex))));
 }
@@ -50,8 +39,10 @@ function keccakHex(value: string): string {
  * @param value - string you want to get the starknetKeccak hash from
  * @returns starknet keccak hash as BigNumber
  */
-export function starknetKeccak(value: string): BN {
-  return toBN(keccakHex(value)).and(MASK_250);
+export function starknetKeccak(value: string): bigint {
+  const hash = BigInt(keccakHex(value));
+  // eslint-disable-next-line no-bitwise
+  return hash & MASK_250;
 }
 
 /**
@@ -81,48 +72,13 @@ export function getSelector(value: string) {
   return getSelectorFromName(value);
 }
 
-const constantPoints = CONSTANT_POINTS.map((coords: string[]) =>
-  ec.curve.point(coords[0], coords[1])
-);
-
-export function pedersen__old(input: [BigNumberish, BigNumberish]) {
-  let point = constantPoints[0];
-  for (let i = 0; i < input.length; i += 1) {
-    let x = toBN(input[i]);
-    assert(x.gte(ZERO) && x.lt(toBN(addHexPrefix(FIELD_PRIME))), `Invalid input: ${input[i]}`);
-    if (!x.isZero()) {
-      for (let j = 0; j < 252; j += 1) {
-        const pt = constantPoints[2 + i * 252 + j];
-        assert(!point.getX().eq(pt.getX()));
-        if (x.and(ONE).toNumber() !== 0) {
-          point = point.add(pt);
-        }
-        x = x.shrn(1);
-      }
-    }
-  }
-  return addHexPrefix(point.getX().toString(16));
+export function pedersen(x: BigNumberish, y: BigNumberish): string {
+  return micro_pedersen(x, y);
 }
 
-export type PedersenArg = bigint | number | string;
-
-export function pedersen(input: [PedersenArg, PedersenArg]) {
-  return addHexPrefix(micro_pedersen(...input));
-}
-
-export function computeHashOnElements(data: BigNumberish[]) {
-  const hexData = data.map((d) => toHex(toBN(d)));
-
-  return [...hexData, hexData.length]
-    .reduce((x: PedersenArg, y: PedersenArg) => pedersen([x, y]), 0)
-    .toString();
-}
-
-export function computeHashOnElements__old(data: BigNumberish[]) {
+export function computeHashOnElements(data: BigNumberish[]): string {
   return [...data, data.length]
-    .reduce((x, y) => {
-      return pedersen__old([x, y]);
-    }, 0)
+    .reduce((x: BigNumberish, y: BigNumberish) => pedersen(toBigInt(x), toBigInt(y)), 0)
     .toString();
 }
 
@@ -165,7 +121,7 @@ export function calculateDeployTransactionHash(
     contractAddress,
     getSelectorFromName('constructor'),
     constructorCalldata,
-    ZERO,
+    0,
     chainId
   );
 }
@@ -261,7 +217,7 @@ export default function computeHintedClassHash(compiledContract: CompiledContrac
 
   const serialisedJson = stringify({ abi, program });
 
-  return addHexPrefix(micro_keccak(utf8ToArray(serialisedJson)).toString(16));
+  return addHexPrefix(keccak(utf8ToArray(serialisedJson)).toString(16));
 }
 
 // Computes the class hash of a given contract class
@@ -323,5 +279,5 @@ export function computeContractClassHash(contract: CompiledContract | string) {
   ];
   console.log('🚀 ~ file: hash.ts ~ line 310 ~ computeContractClassHash ~ elements', elements);
 
-  return computeHashOnElements__old(elements);
+  return computeHashOnElements(elements);
 }

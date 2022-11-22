@@ -22,15 +22,10 @@ import {
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
-import {
-  BigNumberish,
-  bigNumberishArrayToHexadecimalStringArray,
-  toBN,
-  toHex,
-} from '../utils/number';
+import { BigNumberish, bigNumberishArrayToHexadecimalStringArray, toHex } from '../utils/number';
 import { parseCalldata, parseContract, wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
-import { randomAddress } from '../utils/stark';
+import { randomAddress, signatureToDecimalArray } from '../utils/stark';
 import { ProviderInterface } from './interface';
 import { Block, BlockIdentifier } from './utils';
 
@@ -165,7 +160,7 @@ export class RpcProvider implements ProviderInterface {
     key: BigNumberish,
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<BigNumberish> {
-    const parsedKey = toHex(toBN(key));
+    const parsedKey = toHex(key);
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getStorageAt', {
       contract_address: contractAddress,
@@ -244,10 +239,10 @@ export class RpcProvider implements ProviderInterface {
         type: 'INVOKE',
         sender_address: invocation.contractAddress,
         calldata: parseCalldata(invocation.calldata),
-        signature: bigNumberishArrayToHexadecimalStringArray(invocation.signature || []),
-        version: toHex(toBN(invocationDetails?.version || 0)),
-        nonce: toHex(toBN(invocationDetails.nonce)),
-        max_fee: toHex(toBN(invocationDetails?.maxFee || 0)),
+        signature: signatureToDecimalArray(invocation.signature),
+        version: toHex(invocationDetails?.version || 0),
+        nonce: toHex(invocationDetails.nonce),
+        max_fee: toHex(invocationDetails?.maxFee || 0),
       },
       block_id,
     }).then(this.responseParser.parseFeeEstimateResponse);
@@ -270,10 +265,10 @@ export class RpcProvider implements ProviderInterface {
           abi: contractDefinition.abi, // rpc 2.0
         },
         sender_address: senderAddress,
-        signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
-        version: toHex(toBN(details?.version || 0)),
-        nonce: toHex(toBN(details.nonce)),
-        max_fee: toHex(toBN(details?.maxFee || 0)),
+        signature: signatureToDecimalArray(signature),
+        version: toHex(details?.version || 0),
+        nonce: toHex(details.nonce),
+        max_fee: toHex(details?.maxFee || 0),
       },
       block_id,
     }).then(this.responseParser.parseFeeEstimateResponse);
@@ -289,12 +284,12 @@ export class RpcProvider implements ProviderInterface {
       request: {
         type: 'DEPLOY_ACCOUNT',
         constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
-        class_hash: toHex(toBN(classHash)),
-        contract_address_salt: toHex(toBN(addressSalt || 0)),
-        signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
-        version: toHex(toBN(details?.version || 0)),
-        nonce: toHex(toBN(details.nonce)),
-        max_fee: toHex(toBN(details?.maxFee || 0)),
+        class_hash: toHex(classHash),
+        contract_address_salt: toHex(addressSalt || 0),
+        signature: signatureToDecimalArray(signature),
+        version: toHex(details?.version || 0),
+        nonce: toHex(details.nonce),
+        max_fee: toHex(details?.maxFee || 0),
       },
       block_id,
     }).then(this.responseParser.parseFeeEstimateResponse);
@@ -313,11 +308,11 @@ export class RpcProvider implements ProviderInterface {
           abi: contractDefinition.abi, // rpc 2.0
         },
         type: 'DECLARE',
-        version: toHex(toBN(details.version || 0)),
-        max_fee: toHex(toBN(details.maxFee || 0)),
-        signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
+        version: toHex(details.version || 0),
+        max_fee: toHex(details.maxFee || 0),
+        signature: signatureToDecimalArray(signature),
         sender_address: senderAddress,
-        nonce: toHex(toBN(details.nonce)),
+        nonce: toHex(details.nonce),
       },
     });
   }
@@ -340,7 +335,7 @@ export class RpcProvider implements ProviderInterface {
           abi: contractDefinition.abi,
         },
         type: 'DEPLOY',
-        version: toHex(toBN(details?.version || 0)),
+        version: toHex(details?.version || 0),
       },
     });
   }
@@ -351,13 +346,13 @@ export class RpcProvider implements ProviderInterface {
   ): Promise<DeployContractResponse> {
     return this.fetchEndpoint('starknet_addDeployAccountTransaction', {
       constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
-      class_hash: toHex(toBN(classHash)),
-      contract_address_salt: toHex(toBN(addressSalt || 0)),
+      class_hash: toHex(classHash),
+      contract_address_salt: toHex(addressSalt || 0),
       type: 'DEPLOY',
-      max_fee: toHex(toBN(details.maxFee || 0)),
-      version: toHex(toBN(details.version || 0)),
-      signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
-      nonce: toHex(toBN(details.nonce)),
+      max_fee: toHex(details.maxFee || 0),
+      version: toHex(details.version || 0),
+      signature: signatureToDecimalArray(signature),
+      nonce: toHex(details.nonce),
     });
   }
 
@@ -370,10 +365,10 @@ export class RpcProvider implements ProviderInterface {
         sender_address: functionInvocation.contractAddress,
         calldata: parseCalldata(functionInvocation.calldata),
         type: 'INVOKE',
-        max_fee: toHex(toBN(details.maxFee || 0)),
-        version: toHex(toBN(details.version || 0)),
-        signature: bigNumberishArrayToHexadecimalStringArray(functionInvocation.signature || []),
-        nonce: toHex(toBN(details.nonce)),
+        max_fee: toHex(details.maxFee || 0),
+        version: toHex(details.version || 0),
+        signature: signatureToDecimalArray(functionInvocation.signature),
+        nonce: toHex(details.nonce),
       },
     });
   }

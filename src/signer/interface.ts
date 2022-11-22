@@ -1,4 +1,6 @@
-import { Abi, Call, DeclareSignerDetails, InvocationsSignerDetails, Signature } from '../types';
+import { Signature } from 'micro-starknet';
+
+import { Abi, Call, DeclareSignerDetails, InvocationsSignerDetails } from '../types';
 import { DeployAccountSignerDetails } from '../types/signer';
 import { TypedData } from '../utils/typedData';
 

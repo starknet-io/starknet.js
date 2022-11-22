@@ -1,13 +1,7 @@
-import {
-  Abi,
-  Call,
-  DeclareSignerDetails,
-  InvocationsSignerDetails,
-  KeyPair,
-  Signature,
-} from '../types';
+import { Signature, getStarkKey, sign, utils } from 'micro-starknet';
+
+import { Abi, Call, DeclareSignerDetails, InvocationsSignerDetails } from '../types';
 import { DeployAccountSignerDetails } from '../types/signer';
-import { genKeyPair, getStarkKey, sign } from '../utils/ellipticCurve';
 import {
   calculateDeclareTransactionHash,
   calculateDeployAccountTransactionHash,
@@ -18,19 +12,21 @@ import { TypedData, getMessageHash } from '../utils/typedData';
 import { SignerInterface } from './interface';
 
 export class Signer implements SignerInterface {
-  protected keyPair: KeyPair;
+  protected pk: Uint8Array | string;
 
-  constructor(keyPair: KeyPair = genKeyPair()) {
-    this.keyPair = keyPair;
+  constructor(pk: Uint8Array | string = utils.randomPrivateKey()) {
+    this.pk = pk;
   }
 
   public async getPubKey(): Promise<string> {
-    return getStarkKey(this.keyPair);
+    return getStarkKey(this.pk);
   }
 
   public async signMessage(typedData: TypedData, accountAddress: string): Promise<Signature> {
     const msgHash = getMessageHash(typedData, accountAddress);
-    return sign(this.keyPair, msgHash);
+    const sig = sign(msgHash, this.pk);
+
+    return Signature.fromHex(sig);
   }
 
   public async signTransaction(
@@ -54,7 +50,7 @@ export class Signer implements SignerInterface {
       transactionsDetail.nonce
     );
 
-    return sign(this.keyPair, msgHash);
+    return this.signMessageHash(msgHash);
   }
 
   public async signDeployAccountTransaction({
@@ -78,7 +74,7 @@ export class Signer implements SignerInterface {
       nonce
     );
 
-    return sign(this.keyPair, msgHash);
+    return this.signMessageHash(msgHash);
   }
 
   public async signDeclareTransaction(
@@ -94,6 +90,11 @@ export class Signer implements SignerInterface {
       nonce
     );
 
-    return sign(this.keyPair, msgHash);
+    return this.signMessageHash(msgHash);
+  }
+
+  protected signMessageHash(msgHash: string): Signature {
+    const sig = sign(msgHash, this.pk);
+    return Signature.fromHex(sig);
   }
 }

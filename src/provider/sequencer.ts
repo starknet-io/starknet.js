@@ -33,12 +33,12 @@ import {
   getDecimalString,
   getHexString,
   getHexStringArray,
-  toBN,
+  toBigInt,
   toHex,
 } from '../utils/number';
 import { parseContract, wait } from '../utils/provider';
 import { SequencerAPIResponseParser } from '../utils/responseParser/sequencer';
-import { randomAddress } from '../utils/stark';
+import { randomAddress, signatureToDecimalArray } from '../utils/stark';
 import { buildUrl } from '../utils/url';
 import { GatewayError, HttpError } from './errors';
 import { ProviderInterface } from './interface';
@@ -213,7 +213,7 @@ export class SequencerProvider implements ProviderInterface {
       if (endpoint === 'estimate_fee') {
         return parseAlwaysAsBig(textResponse, (_, v) => {
           if (v && typeof v === 'bigint') {
-            return toBN(v.toString());
+            return toBigInt(v.toString());
           }
           return v;
         });
@@ -269,7 +269,7 @@ export class SequencerProvider implements ProviderInterface {
     key: BigNumberish,
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<BigNumberish> {
-    const parsedKey = toBN(key).toString(10);
+    const parsedKey = toBigInt(key).toString(10);
     return this.fetchEndpoint('get_storage_at', {
       blockIdentifier,
       contractAddress,
@@ -278,14 +278,14 @@ export class SequencerProvider implements ProviderInterface {
   }
 
   public async getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {
-    const txHashHex = toHex(toBN(txHash));
+    const txHashHex = toHex(txHash);
     return this.fetchEndpoint('get_transaction', { transactionHash: txHashHex }).then((value) =>
       this.responseParser.parseGetTransactionResponse(value)
     );
   }
 
   public async getTransactionReceipt(txHash: BigNumberish): Promise<GetTransactionReceiptResponse> {
-    const txHashHex = toHex(toBN(txHash));
+    const txHashHex = toHex(txHash);
     return this.fetchEndpoint('get_transaction_receipt', { transactionHash: txHashHex }).then(
       this.responseParser.parseGetTransactionReceiptResponse
     );
@@ -319,10 +319,10 @@ export class SequencerProvider implements ProviderInterface {
       type: 'INVOKE_FUNCTION',
       contract_address: functionInvocation.contractAddress,
       calldata: bigNumberishArrayToDecimalStringArray(functionInvocation.calldata ?? []),
-      signature: bigNumberishArrayToDecimalStringArray(functionInvocation.signature ?? []),
-      nonce: toHex(toBN(details.nonce)),
-      max_fee: toHex(toBN(details.maxFee || 0)),
-      version: toHex(toBN(details.version || 1)),
+      signature: signatureToDecimalArray(functionInvocation.signature),
+      nonce: toHex(details.nonce),
+      max_fee: toHex(details.maxFee || 0),
+      version: toHex(details.version || 1),
     }).then(this.responseParser.parseInvokeFunctionResponse);
   }
 
@@ -352,11 +352,11 @@ export class SequencerProvider implements ProviderInterface {
       type: 'DEPLOY_ACCOUNT',
       contract_address_salt: addressSalt ?? randomAddress(),
       constructor_calldata: bigNumberishArrayToDecimalStringArray(constructorCalldata ?? []),
-      class_hash: toHex(toBN(classHash)),
-      max_fee: toHex(toBN(details.maxFee || 0)),
-      version: toHex(toBN(details.version || 0)),
-      nonce: toHex(toBN(details.nonce)),
-      signature: bigNumberishArrayToDecimalStringArray(signature || []),
+      class_hash: toHex(classHash),
+      max_fee: toHex(details.maxFee || 0),
+      version: toHex(details.version || 0),
+      nonce: toHex(details.nonce),
+      signature: signatureToDecimalArray(signature),
     }).then(this.responseParser.parseDeployContractResponse);
   }
 
@@ -367,11 +367,11 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('add_transaction', undefined, {
       type: 'DECLARE',
       contract_class: contractDefinition,
-      nonce: toHex(toBN(details.nonce)),
-      signature: bigNumberishArrayToDecimalStringArray(signature || []),
+      nonce: toHex(details.nonce),
+      signature: signatureToDecimalArray(signature),
       sender_address: senderAddress,
-      max_fee: toHex(toBN(details.maxFee || 0)),
-      version: toHex(toBN(details.version || 1)),
+      max_fee: toHex(details.maxFee || 0),
+      version: toHex(details.version || 1),
     }).then(this.responseParser.parseDeclareContractResponse);
   }
 
@@ -395,9 +395,9 @@ export class SequencerProvider implements ProviderInterface {
         type: 'INVOKE_FUNCTION',
         contract_address: invocation.contractAddress,
         calldata: invocation.calldata ?? [],
-        signature: bigNumberishArrayToDecimalStringArray(invocation.signature || []),
-        version: toHex(toBN(invocationDetails?.version || 1)),
-        nonce: toHex(toBN(invocationDetails.nonce)),
+        signature: signatureToDecimalArray(invocation.signature),
+        version: toHex(invocationDetails?.version || 1),
+        nonce: toHex(invocationDetails.nonce),
       }
     ).then(this.responseParser.parseFeeEstimateResponse);
   }
@@ -414,9 +414,9 @@ export class SequencerProvider implements ProviderInterface {
         type: 'DECLARE',
         sender_address: senderAddress,
         contract_class: contractDefinition,
-        signature: bigNumberishArrayToDecimalStringArray(signature || []),
-        version: toHex(toBN(details?.version || 1)),
-        nonce: toHex(toBN(details.nonce)),
+        signature: signatureToDecimalArray(signature),
+        version: toHex(details?.version || 1),
+        nonce: toHex(details.nonce),
       }
     ).then(this.responseParser.parseFeeEstimateResponse);
   }
@@ -431,12 +431,12 @@ export class SequencerProvider implements ProviderInterface {
       { blockIdentifier },
       {
         type: 'DEPLOY_ACCOUNT',
-        class_hash: toHex(toBN(classHash)),
+        class_hash: toHex(classHash),
         constructor_calldata: bigNumberishArrayToDecimalStringArray(constructorCalldata || []),
-        contract_address_salt: toHex(toBN(addressSalt || 0)),
-        signature: bigNumberishArrayToDecimalStringArray(signature || []),
-        version: toHex(toBN(details?.version || 0)),
-        nonce: toHex(toBN(details.nonce)),
+        contract_address_salt: toHex(addressSalt || 0),
+        signature: signatureToDecimalArray(signature),
+        version: toHex(details?.version || 0),
+        nonce: toHex(details.nonce),
       }
     ).then(this.responseParser.parseFeeEstimateResponse);
   }
@@ -482,7 +482,7 @@ export class SequencerProvider implements ProviderInterface {
    * @returns the transaction status object { block_number, tx_status: NOT_RECEIVED | RECEIVED | PENDING | REJECTED | ACCEPTED_ONCHAIN }
    */
   public async getTransactionStatus(txHash: BigNumberish): Promise<GetTransactionStatusResponse> {
-    const txHashHex = toHex(toBN(txHash));
+    const txHashHex = toHex(txHash);
     return this.fetchEndpoint('get_transaction_status', { transactionHash: txHashHex });
   }
 
@@ -504,7 +504,7 @@ export class SequencerProvider implements ProviderInterface {
    * @returns the transaction trace
    */
   public async getTransactionTrace(txHash: BigNumberish): Promise<GetTransactionTraceResponse> {
-    const txHashHex = toHex(toBN(txHash));
+    const txHashHex = toHex(txHash);
     return this.fetchEndpoint('get_transaction_trace', { transactionHash: txHashHex });
   }
 
