@@ -323,7 +323,7 @@ export class RpcProvider implements ProviderInterface {
   }
 
   /**
-   * @deprecated This method wont be supported soon, use Account.deploy instead
+   * @deprecated This method won't be supported, use Account.deploy instead
    */
   public async deployContract(
     { contract, constructorCalldata, addressSalt }: DeployContractPayload,
