@@ -170,7 +170,7 @@ export class Account extends Provider implements AccountInterface {
   public async estimateDeployFee(
     {
       classHash,
-      salt = '',
+      salt,
       unique = true,
       constructorCalldata = [],
       additionalCalls = [],
@@ -273,7 +273,7 @@ export class Account extends Provider implements AccountInterface {
   public async deploy(
     {
       classHash,
-      salt = '',
+      salt,
       unique = true,
       constructorCalldata = [],
       additionalCalls = [],
@@ -312,27 +312,11 @@ export class Account extends Provider implements AccountInterface {
    * @returns Promise<AccountDeployContractResponse | Error>
    */
   public async deployContract2(
-    {
-      classHash,
-      salt,
-      unique = true,
-      constructorCalldata = [],
-      additionalCalls = [],
-    }: UniversalDeployerContractPayload,
-    transactionsDetail: InvocationsDetails = {}
+    payload: UniversalDeployerContractPayload,
+    details: InvocationsDetails = {}
   ): Promise<AccountDeployContractResponse | Error> {
-    const deployTx = await this.deploy(
-      {
-        classHash,
-        salt,
-        unique,
-        constructorCalldata,
-        additionalCalls,
-      },
-      transactionsDetail
-    );
+    const deployTx = await this.deploy(payload, details);
     const txReceipt = await this.waitForTransaction(deployTx.transaction_hash);
-
     return this.getUDCResponse(txReceipt);
   }
 

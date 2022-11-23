@@ -3,7 +3,7 @@ import { isBN } from 'bn.js';
 import typedDataExample from '../__mocks__/typedDataExample.json';
 import { Account, Contract, Provider, number, stark } from '../src';
 import { feeTransactionVersion } from '../src/utils/hash';
-import { toBN } from '../src/utils/number';
+import { hexToDecimalString, toBN } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
 import { randomAddress } from '../src/utils/stark';
 import {
@@ -24,25 +24,7 @@ describe('deploy and test Wallet', () => {
   beforeAll(async () => {
     expect(account).toBeInstanceOf(Account);
 
-    /*     // Declare
-    const declareTx = await account.declare({
-      contract: compiledErc20,
-      classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
-    });
-    expect(declareTx.transaction_hash).toBeDefined();
-    await provider.waitForTransaction(declareTx.transaction_hash);
-
-    // Deploy Contract
-    const erc20Response = await account.deployContract2({
-      classHash: declareTx.class_hash,
-      constructorCalldata: [
-        encodeShortString('Token'),
-        encodeShortString('ERC20'),
-        account.address,
-      ],
-    });
-    expect(erc20Response.contract_address).toBeDefined(); */
-
+    // New Stuff
     const declareDeploy = await account.declareDeploy({
       contract: compiledErc20,
       classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
@@ -60,12 +42,12 @@ describe('deploy and test Wallet', () => {
 
     expect(number.toBN(x[0].low).toString()).toStrictEqual(number.toBN(1000).toString());
 
-    const dappResponse = await provider.deployContract({
+    const dappResponse = await account.declareDeploy({
       contract: compiledTestDapp,
+      classHash: '0x04367b26fbb92235e8d1137d19c080e6e650a6889ded726d00658411cc1046f5',
     });
-    dapp = new Contract(compiledTestDapp.abi, dappResponse.contract_address!, provider);
 
-    await provider.waitForTransaction(dappResponse.transaction_hash);
+    dapp = new Contract(compiledTestDapp.abi, dappResponse.deploy.contract_address!, provider);
   });
 
   test('estimate fee', async () => {
@@ -195,7 +177,7 @@ describe('deploy and test Wallet', () => {
       await provider.waitForTransaction(declareTx.transaction_hash);
 
       expect(declareTx).toHaveProperty('class_hash');
-      expect(declareTx.class_hash).toEqual(erc20ClassHash);
+      expect(hexToDecimalString(declareTx.class_hash)).toEqual(hexToDecimalString(erc20ClassHash));
     });
 
     test('UDC DeployContract', async () => {
