@@ -1,3 +1,10 @@
+## [4.13.1](https://github.com/0xs34n/starknet.js/compare/v4.13.0...v4.13.1) (2022-11-23)
+
+### Bug Fixes
+
+- **ci:** adjust build script ([880ef27](https://github.com/0xs34n/starknet.js/commit/880ef27d3212fe1aa8b6ea87e2a77a7e5d56aa79))
+- flatten main type export and import ([869f470](https://github.com/0xs34n/starknet.js/commit/869f470973c583f3d8d856f9996280741257dbab))
+
 # [4.13.0](https://github.com/0xs34n/starknet.js/compare/v4.12.0...v4.13.0) (2022-11-22)
 
 ### Bug Fixes
