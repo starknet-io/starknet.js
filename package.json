@@ -2,10 +2,6 @@
   "name": "starknet",
   "version": "4.13.1",
   "description": "JavaScript library for StarkNet",
-  "files": [
-    "dist",
-    "LICENSE"
-  ],
   "main": "dist/index.js",
   "module": "dist/esm/index.js",
   "browser": "dist/iife/index.js",
