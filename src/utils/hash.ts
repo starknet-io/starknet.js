@@ -13,7 +13,7 @@ import {
   TransactionHashPrefix,
   ZERO,
 } from '../constants';
-import { RawCalldata } from '../types/lib';
+import { RawCalldata } from '../types';
 import { ec } from './ellipticCurve';
 import { addHexPrefix, buf2hex, removeHexPrefix, utf8ToArray } from './encode';
 import {

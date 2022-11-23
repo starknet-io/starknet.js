@@ -4,6 +4,9 @@ import type {
   CallContractResponse,
   ContractClass,
   DeclareContractResponse,
+  DeclareContractTransaction,
+  DeployAccountContractPayload,
+  DeployAccountContractTransaction,
   DeployContractPayload,
   DeployContractResponse,
   EstimateFeeResponse,
@@ -12,15 +15,10 @@ import type {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
+  InvocationsDetails,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
 } from '../types';
-import {
-  DeclareContractTransaction,
-  DeployAccountContractPayload,
-  DeployAccountContractTransaction,
-  InvocationsDetails,
-} from '../types/lib';
 import type { BigNumberish } from '../utils/number';
 import { BlockIdentifier } from './utils';
 
