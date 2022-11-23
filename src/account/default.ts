@@ -5,23 +5,22 @@ import { BlockIdentifier } from '../provider/utils';
 import { Signer, SignerInterface } from '../signer';
 import {
   Abi,
+  AllowArray,
   Call,
+  DeclareContractPayload,
   DeclareContractResponse,
+  DeployAccountContractPayload,
   DeployContractResponse,
+  EstimateFee,
   EstimateFeeAction,
+  EstimateFeeDetails,
   InvocationsDetails,
   InvocationsSignerDetails,
   InvokeFunctionResponse,
   KeyPair,
   Signature,
-} from '../types';
-import { EstimateFee, EstimateFeeDetails } from '../types/account';
-import {
-  AllowArray,
-  DeclareContractPayload,
-  DeployAccountContractPayload,
   UniversalDeployerContractPayload,
-} from '../types/lib';
+} from '../types';
 import {
   calculateContractAddressFromHash,
   feeTransactionVersion,

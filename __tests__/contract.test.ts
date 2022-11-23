@@ -1,7 +1,7 @@
 import { isBN } from 'bn.js';
 
 import { Contract, ContractFactory, stark } from '../src';
-import { DeployContractPayload } from '../src/types/lib';
+import { DeployContractPayload } from '../src/types';
 import { getSelectorFromName } from '../src/utils/hash';
 import { BigNumberish, toBN } from '../src/utils/number';
 import { compileCalldata } from '../src/utils/stark';

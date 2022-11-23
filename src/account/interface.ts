@@ -3,8 +3,11 @@ import { BlockIdentifier } from '../provider/utils';
 import { SignerInterface } from '../signer';
 import {
   Abi,
+  AllowArray,
   Call,
+  DeclareContractPayload,
   DeclareContractResponse,
+  DeployAccountContractPayload,
   DeployContractResponse,
   EstimateFeeAction,
   EstimateFeeDetails,
@@ -12,13 +15,8 @@ import {
   InvocationsDetails,
   InvokeFunctionResponse,
   Signature,
-} from '../types';
-import {
-  AllowArray,
-  DeclareContractPayload,
-  DeployAccountContractPayload,
   UniversalDeployerContractPayload,
-} from '../types/lib';
+} from '../types';
 import { BigNumberish } from '../utils/number';
 import { TypedData } from '../utils/typedData/types';
 
