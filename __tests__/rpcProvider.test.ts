@@ -8,15 +8,12 @@ import {
 } from './fixtures';
 
 describeIfRpc('RPCProvider', () => {
-  let rpcProvider: RpcProvider;
+  const rpcProvider = getTestProvider() as RpcProvider;
+  const account = getTestAccount(rpcProvider);
   let accountPublicKey: string;
 
   beforeAll(async () => {
-    rpcProvider = getTestProvider() as RpcProvider;
-    const account = getTestAccount(rpcProvider);
-
     expect(account).toBeInstanceOf(Account);
-
     const accountKeyPair = ec.genKeyPair();
     accountPublicKey = ec.getStarkKey(accountKeyPair);
   });
@@ -28,7 +25,8 @@ describeIfRpc('RPCProvider', () => {
     );
   });
 
-  test('getPendingTransactions', async () => {
+  xtest('getPendingTransactions', async () => {
+    // devnet not implement
     const transactions = await rpcProvider.getPendingTransactions();
     expect(Array.isArray(transactions)).toBe(true);
   });
@@ -90,15 +88,18 @@ describeIfRpc('RPCProvider', () => {
       let transaction_hash;
 
       beforeAll(async () => {
-        ({ contract_address, transaction_hash } = await rpcProvider.deployContract({
+        const { deploy } = await account.declareDeploy({
           contract: compiledOpenZeppelinAccount,
+          classHash: '0x03fcbf77b28c96f4f2fb5bd2d176ab083a12a5e123adeb0de955d7ee228c9854',
           constructorCalldata: [accountPublicKey],
-          addressSalt: accountPublicKey,
-        }));
-        await rpcProvider.waitForTransaction(transaction_hash);
+          salt: accountPublicKey,
+        });
+
+        contract_address = deploy.contract_address;
+        transaction_hash = deploy.transaction_hash;
       });
 
-      test('deployContract result', () => {
+      test('declareDeploy()', () => {
         expect(contract_address).toBeTruthy();
         expect(transaction_hash).toBeTruthy();
       });

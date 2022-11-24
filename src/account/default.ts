@@ -28,7 +28,7 @@ import {
   feeTransactionVersion,
   transactionVersion,
 } from '../utils/hash';
-import { BigNumberish, toBN, toCairoBool } from '../utils/number';
+import { BigNumberish, cleanHex, toBN, toCairoBool } from '../utils/number';
 import { parseContract } from '../utils/provider';
 import { compileCalldata, estimatedFeeToMaxFee, randomAddress } from '../utils/stark';
 import { fromCallsToExecuteCalldata } from '../utils/transaction';
@@ -329,7 +329,11 @@ export class Account extends Provider implements AccountInterface {
    */
   public getUDCResponse(txReceipt: InvokeTransactionReceiptResponse | void) {
     if (txReceipt && txReceipt.events) {
-      const event = txReceipt.events.find((it) => it.from_address === UDC.ADDRESS) || { data: [] };
+      const event = txReceipt.events.find(
+        (it) => cleanHex(it.from_address) === cleanHex(UDC.ADDRESS)
+      ) || {
+        data: [],
+      };
       return {
         transaction_hash: txReceipt.transaction_hash,
         contract_address: event.data[0],
@@ -345,10 +349,13 @@ export class Account extends Provider implements AccountInterface {
     return new Error("UDC didn't emmit event");
   }
 
-  public async declareDeploy({ classHash, contract, constructorCalldata }: any) {
-    const { transaction_hash } = await this.declare({ contract, classHash });
+  public async declareDeploy(
+    { classHash, contract, constructorCalldata }: any,
+    details?: InvocationsDetails
+  ) {
+    const { transaction_hash } = await this.declare({ contract, classHash }, details);
     const declare = await this.waitForTransaction(transaction_hash);
-    const deploy = await this.deployContract2({ classHash, constructorCalldata });
+    const deploy = await this.deployContract2({ classHash, constructorCalldata }, details);
     return { declare: { ...declare, class_hash: classHash }, deploy };
   }
 

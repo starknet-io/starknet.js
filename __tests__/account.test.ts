@@ -24,7 +24,6 @@ describe('deploy and test Wallet', () => {
   beforeAll(async () => {
     expect(account).toBeInstanceOf(Account);
 
-    // New Stuff
     const declareDeploy = await account.declareDeploy({
       contract: compiledErc20,
       classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',

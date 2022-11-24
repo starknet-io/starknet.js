@@ -131,7 +131,6 @@ export abstract class AccountInterface extends ProviderInterface {
    * @param contractPayload transaction payload to be deployed containing:
   - contract: compiled contract code
   - classHash: computed class hash of compiled contract
-  - signature
    * @param transactionsDetail Invocation Details containing:
   - optional nonce
   - optional version

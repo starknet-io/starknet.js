@@ -472,7 +472,8 @@ export class SequencerProvider implements ProviderInterface {
         throw error;
       }
     }
-    return res;
+    const txReceipt = await this.getTransactionReceipt(txHash);
+    return txReceipt;
   }
 
   /**

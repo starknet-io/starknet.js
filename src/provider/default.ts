@@ -35,11 +35,14 @@ export class Provider implements ProviderInterface {
   private provider!: ProviderInterface;
 
   constructor(providerOrOptions?: ProviderOptions | ProviderInterface) {
-    if (
+    if (providerOrOptions instanceof Provider) {
+      // providerOrOptions is Provider
+      this.provider = providerOrOptions.provider;
+    } else if (
       providerOrOptions instanceof RpcProvider ||
       providerOrOptions instanceof SequencerProvider
     ) {
-      // providerOrOptions is provider
+      // providerOrOptions is SequencerProvider or RpcProvider
       this.provider = <ProviderInterface>providerOrOptions;
     } else if (providerOrOptions && 'rpc' in providerOrOptions) {
       // providerOrOptions is rpc option
