@@ -4,7 +4,6 @@ import {
   CallContractResponse,
   ContractClass,
   DeclareContractResponse,
-  DeployContractPayload,
   DeployContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
@@ -15,11 +14,7 @@ import {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
 } from '../types';
-import {
-  DeclareContractTransaction,
-  DeployAccountContractTransaction,
-  InvocationsDetails,
-} from '../types/lib';
+import { DeclareContractTransaction, DeployAccountContractTransaction } from '../types/lib';
 import { BigNumberish } from '../utils/number';
 import { ProviderInterface } from './interface';
 import { RpcProvider, RpcProviderOptions } from './rpc';
@@ -143,16 +138,6 @@ export class Provider implements ProviderInterface {
     return this.provider.invokeFunction(functionInvocation, details);
   }
 
-  /**
-   * @deprecated This method won't be supported, use Account.deploy instead
-   */
-  public async deployContract(
-    payload: DeployContractPayload,
-    details: InvocationsDetails
-  ): Promise<DeployContractResponse> {
-    return this.provider.deployContract(payload, details);
-  }
-
   public async deployAccountContract(
     payload: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce
@@ -190,7 +175,10 @@ export class Provider implements ProviderInterface {
     return this.provider.getCode(contractAddress, blockIdentifier);
   }
 
-  public async waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<any> {
+  public async waitForTransaction(
+    txHash: BigNumberish,
+    retryInterval?: number
+  ): Promise<GetTransactionReceiptResponse> {
     return this.provider.waitForTransaction(txHash, retryInterval);
   }
 }
