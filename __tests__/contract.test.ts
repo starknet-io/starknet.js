@@ -207,11 +207,10 @@ describe('class ContractFactory {}', () => {
   let erc20Address: string;
   const wallet = stark.randomAddress();
   const account = getTestAccount(provider);
-  let constructorCalldata;
+  const constructorCalldata = [encodeShortString('Token'), encodeShortString('ERC20'), wallet];
+  const classHash = '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a';
 
   beforeAll(async () => {
-    constructorCalldata = [encodeShortString('Token'), encodeShortString('ERC20'), wallet];
-
     await account.declareDeploy({
       contract: compiledErc20,
       classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
@@ -219,17 +218,17 @@ describe('class ContractFactory {}', () => {
     });
   });
   test('deployment of new contract', async () => {
-    const factory = new ContractFactory(compiledErc20, provider);
+    const factory = new ContractFactory(compiledErc20, classHash, account);
     const erc20 = await factory.deploy(constructorCalldata);
     expect(erc20 instanceof Contract);
   });
   test('wait for deployment transaction', async () => {
-    const factory = new ContractFactory(compiledErc20, provider);
+    const factory = new ContractFactory(compiledErc20, classHash, account);
     const contract = await factory.deploy(constructorCalldata);
     expect(contract.deployed()).resolves.not.toThrow();
   });
   test('attach new contract', async () => {
-    const factory = new ContractFactory(compiledErc20, provider);
+    const factory = new ContractFactory(compiledErc20, classHash, account);
     const erc20 = factory.attach(erc20Address);
     expect(erc20 instanceof Contract);
   });
