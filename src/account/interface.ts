@@ -5,6 +5,7 @@ import {
   Abi,
   Call,
   DeclareContractResponse,
+  DeclareDeployContractResponse,
   DeployContractResponse,
   EstimateFeeAction,
   EstimateFeeDetails,
@@ -16,6 +17,7 @@ import {
 import {
   AllowArray,
   DeclareContractPayload,
+  DeclareDeployContractPayload,
   DeployAccountContractPayload,
   UniversalDeployerContractPayload,
 } from '../types/lib';
@@ -148,10 +150,10 @@ export abstract class AccountInterface extends ProviderInterface {
    *
    * @param deployContractPayload containing
    * - classHash: computed class hash of compiled contract
-   * - salt: address salt
-   * - unique: bool if true ensure unique salt
-   * - calldata: constructor calldata
-   * - additionalCalls - optional additional calls array to support multicall
+   * - constructorCalldata: constructor calldata
+   * - optional salt: address salt - default random
+   * - optional unique: bool if true ensure unique salt - default true
+   * - optional additionalCalls - optional additional calls array to support multicall
    * @param transactionsDetail Invocation Details containing:
    *  - optional nonce
    *  - optional version
@@ -161,6 +163,26 @@ export abstract class AccountInterface extends ProviderInterface {
     deployContractPayload: UniversalDeployerContractPayload,
     transactionsDetail?: InvocationsDetails
   ): Promise<InvokeFunctionResponse>;
+
+  /**
+   * Declares and Deploy a given compiled contract (json) to starknet using UDC
+   *
+   * @param declareDeployerContractPayload containing
+   * - contract: compiled contract code
+   * - classHash: computed class hash of compiled contract
+   * - optional constructorCalldata: constructor calldata
+   * - optional salt: address salt - default random
+   * - optional unique: bool if true ensure unique salt - default true
+   * - optional additionalCalls: - optional additional calls array to support multicall
+   * @param details
+   * - optional nonce
+   * - optional version
+   * - optional maxFee
+   */
+  public abstract declareDeploy(
+    declareDeployerContractPayload: DeclareDeployContractPayload,
+    details?: InvocationsDetails
+  ): Promise<DeclareDeployContractResponse | Error>;
 
   /**
    * Deploy the account on Starknet

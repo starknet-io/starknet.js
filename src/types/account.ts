@@ -2,7 +2,7 @@ import BN from 'bn.js';
 
 import { BlockIdentifier } from '../provider/utils';
 import { BigNumberish } from '../utils/number';
-import { EstimateFeeResponse } from './provider';
+import { DeclareTransactionReceiptResponse, EstimateFeeResponse } from './provider';
 
 export interface EstimateFee extends EstimateFeeResponse {
   suggestedMaxFee: BN;
@@ -12,3 +12,23 @@ export interface EstimateFeeDetails {
   nonce?: BigNumberish;
   blockIdentifier?: BlockIdentifier;
 }
+
+export interface DeployContractResponse {
+  contract_address: string;
+  transaction_hash: string;
+}
+
+export interface DeployContract2Response extends DeployContractResponse {
+  address: string;
+  deployer: string;
+  unique: string;
+  classHash: string;
+  calldata_len: string;
+  calldata: Array<string>;
+  salt: string;
+}
+
+export type DeclareDeployContractResponse = {
+  declare: DeclareTransactionReceiptResponse;
+  deploy: DeployContract2Response;
+};
