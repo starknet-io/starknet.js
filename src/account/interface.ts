@@ -219,23 +219,4 @@ export abstract class AccountInterface extends ProviderInterface {
     estimateFeeAction: EstimateFeeAction,
     details: EstimateFeeDetails
   ): Promise<BigNumberish>;
-
-  /**
-   * Get starknet.id stark name with the address
-   *
-   * @param  {string} StarknetIdContract
-   * @returns name
-   */
-  public abstract getStarkName(StarknetIdContract?: string): Promise<string | Error>;
-
-  /**
-   * Get starknet.id address with the stark name
-   *
-   * @param  {string} StarknetIdContract
-   * @returns name
-   */
-  public abstract getAddressFromStarkName(
-    name: string,
-    StarknetIdContract?: string
-  ): Promise<string | Error>;
 }
