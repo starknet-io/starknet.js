@@ -7,6 +7,7 @@ import {
   DeclareContractResponse,
   DeclareDeployContractResponse,
   DeployContractResponse,
+  DeployContractUDCResponse,
   EstimateFeeAction,
   EstimateFeeDetails,
   EstimateFeeResponse,
@@ -163,6 +164,18 @@ export abstract class AccountInterface extends ProviderInterface {
     deployContractPayload: UniversalDeployerContractPayload,
     transactionsDetail?: InvocationsDetails
   ): Promise<InvokeFunctionResponse>;
+
+  /**
+   * Simplify deploy simulating old DeployContract with same response + UDC specific response
+   *
+   * @param payload UniversalDeployerContractPayload
+   * @param detials InvocationsDetails
+   * @returns Promise<AccountDeployContractResponse>
+   */
+  public abstract deployContract(
+    payload: UniversalDeployerContractPayload,
+    details: InvocationsDetails
+  ): Promise<DeployContractUDCResponse>;
 
   /**
    * Declares and Deploy a given compiled contract (json) to starknet using UDC

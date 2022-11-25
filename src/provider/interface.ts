@@ -149,7 +149,7 @@ export abstract class ProviderInterface {
    * @returns a confirmation of sending a transaction on the starknet contract
    */
   public abstract deployContract(
-    payload: DeployContractPayload,
+    payload: DeployContractPayload | any,
     details?: InvocationsDetails
   ): Promise<DeployContractResponse>;
 

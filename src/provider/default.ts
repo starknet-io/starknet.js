@@ -147,7 +147,7 @@ export class Provider implements ProviderInterface {
    * @deprecated This method won't be supported, use Account.deploy instead
    */
   public async deployContract(
-    payload: DeployContractPayload,
+    payload: DeployContractPayload | any,
     details: InvocationsDetails
   ): Promise<DeployContractResponse> {
     return this.provider.deployContract(payload, details);

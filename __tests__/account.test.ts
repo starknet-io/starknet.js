@@ -180,7 +180,7 @@ describe('deploy and test Wallet', () => {
     });
 
     test('UDC DeployContract', async () => {
-      const deployResponse = await account.deployContract2({
+      const deployResponse = await account.deployContract({
         classHash: erc20ClassHash,
         constructorCalldata: [
           encodeShortString('Token'),
