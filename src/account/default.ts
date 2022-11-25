@@ -279,21 +279,11 @@ export class Account extends Provider implements AccountInterface {
       constructorCalldata = [],
       additionalCalls = [],
     }: UniversalDeployerContractPayload,
-    { nonce, version, maxFee }: InvocationsDetails = {}
+    invocationsDetails: InvocationsDetails = {}
   ): Promise<InvokeFunctionResponse> {
     const compiledConstructorCallData = compileCalldata(constructorCalldata);
     const callsArray = Array.isArray(additionalCalls) ? additionalCalls : [additionalCalls];
     const deploySalt = salt ?? randomAddress();
-
-    const deployMaxFee =
-      maxFee ??
-      (await this.getSuggestedMaxFee(
-        {
-          type: 'DEPLOY',
-          payload: { classHash, salt: deploySalt, unique, constructorCalldata, additionalCalls },
-        },
-        {}
-      ));
 
     return this.execute(
       [
@@ -311,11 +301,7 @@ export class Account extends Provider implements AccountInterface {
         ...callsArray,
       ],
       undefined,
-      {
-        nonce,
-        maxFee: deployMaxFee,
-        version,
-      }
+      invocationsDetails
     );
   }
 
