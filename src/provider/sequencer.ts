@@ -4,26 +4,25 @@ import { StarknetChainId } from '../constants';
 import {
   Call,
   CallContractResponse,
+  CallL1Handler,
   ContractClass,
   DeclareContractResponse,
+  DeclareContractTransaction,
+  DeployAccountContractTransaction,
   DeployContractPayload,
   DeployContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
+  GetContractAddressesResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
+  GetTransactionStatusResponse,
+  GetTransactionTraceResponse,
   Invocation,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
-} from '../types';
-import {
-  CallL1Handler,
-  GetContractAddressesResponse,
-  GetTransactionStatusResponse,
-  GetTransactionTraceResponse,
   Sequencer,
-} from '../types/api';
-import { DeclareContractTransaction, DeployAccountContractTransaction } from '../types/lib';
+} from '../types';
 import fetch from '../utils/fetchPonyfill';
 import { getSelector, getSelectorFromName } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';

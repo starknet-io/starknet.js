@@ -11,8 +11,8 @@ import {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   InvokeFunctionResponse,
+  Sequencer,
 } from '../../types';
-import { Sequencer } from '../../types/api';
 import { toBN } from '../number';
 import { ResponseParser } from '.';
 

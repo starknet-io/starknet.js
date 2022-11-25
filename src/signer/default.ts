@@ -2,11 +2,11 @@ import {
   Abi,
   Call,
   DeclareSignerDetails,
+  DeployAccountSignerDetails,
   InvocationsSignerDetails,
   KeyPair,
   Signature,
 } from '../types';
-import { DeployAccountSignerDetails } from '../types/signer';
 import { genKeyPair, getStarkKey, sign } from '../utils/ellipticCurve';
 import {
   calculateDeclareTransactionHash,
