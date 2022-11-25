@@ -182,7 +182,7 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract declareDeploy(
     declareDeployerContractPayload: DeclareDeployContractPayload,
     details?: InvocationsDetails
-  ): Promise<DeclareDeployContractResponse | Error>;
+  ): Promise<DeclareDeployContractResponse>;
 
   /**
    * Deploy the account on Starknet
