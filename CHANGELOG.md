@@ -1,3 +1,9 @@
+## [4.13.2](https://github.com/0xs34n/starknet.js/compare/v4.13.1...v4.13.2) (2022-11-25)
+
+### Bug Fixes
+
+- package json exports ([0eea96a](https://github.com/0xs34n/starknet.js/commit/0eea96a15500f4dce4125fdaa5f6720df0a9e333))
+
 ## [4.13.1](https://github.com/0xs34n/starknet.js/compare/v4.13.0...v4.13.1) (2022-11-23)
 
 ### Bug Fixes
