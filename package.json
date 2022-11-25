@@ -6,6 +6,14 @@
   "module": "dist/index.mjs",
   "browser": "dist/index.global.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "browser": "./dist/index.global.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "scripts": {
     "prepare": "npm run build && husky install",
     "build": "tsup && npm run build:esm && npm run build:iife && npm run build:dts",
