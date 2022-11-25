@@ -18,7 +18,7 @@ export interface DeployContractResponse {
   transaction_hash: string;
 }
 
-export interface DeployContract2Response extends DeployContractResponse {
+export interface DeployContractUDCResponse extends DeployContractResponse {
   address: string;
   deployer: string;
   unique: string;
@@ -30,5 +30,5 @@ export interface DeployContract2Response extends DeployContractResponse {
 
 export type DeclareDeployContractResponse = {
   declare: DeclareTransactionReceiptResponse;
-  deploy: DeployContract2Response;
+  deploy: DeployContractUDCResponse;
 };

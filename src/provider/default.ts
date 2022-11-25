@@ -4,6 +4,8 @@ import {
   CallContractResponse,
   ContractClass,
   DeclareContractResponse,
+  DeclareContractTransaction,
+  DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
@@ -14,7 +16,6 @@ import {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
 } from '../types';
-import { DeclareContractTransaction, DeployAccountContractTransaction } from '../types/lib';
 import { BigNumberish } from '../utils/number';
 import { ProviderInterface } from './interface';
 import { RpcProvider, RpcProviderOptions } from './rpc';

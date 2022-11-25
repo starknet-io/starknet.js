@@ -1,6 +1,6 @@
 {
   "name": "starknet",
-  "version": "4.12.0",
+  "version": "4.13.1",
   "description": "JavaScript library for StarkNet",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -8,9 +8,10 @@
   "types": "dist/index.d.ts",
   "scripts": {
     "prepare": "npm run build && husky install",
-    "build": "tsup && npm run build:esm && npm run build:iife",
+    "build": "tsup && npm run build:esm && npm run build:iife && npm run build:dts",
     "build:esm": "tsup --clean false --format esm --platform node",
     "build:iife": "tsup --clean false --format iife --platform browser",
+    "build:dts": "tsup --clean false --dts-only",
     "pretest": "npm run lint",
     "test": "jest",
     "posttest": "npm run format",
@@ -64,7 +65,7 @@
     "lint-staged": "^13.0.1",
     "prettier": "^2.7.0",
     "prettier-plugin-import-sort": "^0.0.7",
-    "tsup": "^6.3.0",
+    "tsup": "~6.3.0",
     "typedoc": "^0.22.17",
     "typescript": "^4.7.3"
   },

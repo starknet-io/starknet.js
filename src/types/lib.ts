@@ -27,6 +27,12 @@ export type UniversalDeployerContractPayload = {
   additionalCalls?: AllowArray<Call>; // support multicall
 };
 
+export type DeployContractPayload = {
+  contract: CompiledContract | string;
+  constructorCalldata?: RawCalldata;
+  addressSalt?: string;
+};
+
 export type DeployAccountContractPayload = {
   classHash: BigNumberish;
   constructorCalldata?: RawCalldata;

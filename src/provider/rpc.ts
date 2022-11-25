@@ -3,6 +3,8 @@ import {
   Call,
   CallContractResponse,
   DeclareContractResponse,
+  DeclareContractTransaction,
+  DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
@@ -11,9 +13,8 @@ import {
   Invocation,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  RPC,
 } from '../types';
-import { RPC } from '../types/api';
-import { DeclareContractTransaction, DeployAccountContractTransaction } from '../types/lib';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';

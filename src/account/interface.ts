@@ -3,24 +3,23 @@ import { BlockIdentifier } from '../provider/utils';
 import { SignerInterface } from '../signer';
 import {
   Abi,
+  AllowArray,
   Call,
+  DeclareContractPayload,
   DeclareContractResponse,
+  DeclareDeployContractPayload,
   DeclareDeployContractResponse,
+  DeployAccountContractPayload,
   DeployContractResponse,
+  DeployContractUDCResponse,
   EstimateFeeAction,
   EstimateFeeDetails,
   EstimateFeeResponse,
   InvocationsDetails,
   InvokeFunctionResponse,
   Signature,
-} from '../types';
-import {
-  AllowArray,
-  DeclareContractPayload,
-  DeclareDeployContractPayload,
-  DeployAccountContractPayload,
   UniversalDeployerContractPayload,
-} from '../types/lib';
+} from '../types';
 import { BigNumberish } from '../utils/number';
 import { TypedData } from '../utils/typedData/types';
 
@@ -165,6 +164,18 @@ export abstract class AccountInterface extends ProviderInterface {
   ): Promise<InvokeFunctionResponse>;
 
   /**
+   * Simplify deploy simulating old DeployContract with same response + UDC specific response
+   *
+   * @param payload UniversalDeployerContractPayload
+   * @param detials InvocationsDetails
+   * @returns Promise<AccountDeployContractResponse>
+   */
+  public abstract deployContract(
+    payload: UniversalDeployerContractPayload,
+    details: InvocationsDetails
+  ): Promise<DeployContractUDCResponse>;
+
+  /**
    * Declares and Deploy a given compiled contract (json) to starknet using UDC
    *
    * @param declareDeployerContractPayload containing
@@ -182,7 +193,7 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract declareDeploy(
     declareDeployerContractPayload: DeclareDeployContractPayload,
     details?: InvocationsDetails
-  ): Promise<DeclareDeployContractResponse | Error>;
+  ): Promise<DeclareDeployContractResponse>;
 
   /**
    * Deploy the account on Starknet

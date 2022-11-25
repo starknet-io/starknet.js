@@ -5,25 +5,24 @@ import { BlockIdentifier } from '../provider/utils';
 import { Signer, SignerInterface } from '../signer';
 import {
   Abi,
+  AllowArray,
   Call,
+  DeclareContractPayload,
   DeclareContractResponse,
-  DeployContract2Response,
+  DeclareDeployContractPayload,
+  DeployAccountContractPayload,
   DeployContractResponse,
+  DeployContractUDCResponse,
+  EstimateFee,
   EstimateFeeAction,
+  EstimateFeeDetails,
   InvocationsDetails,
   InvocationsSignerDetails,
   InvokeFunctionResponse,
   KeyPair,
   Signature,
-} from '../types';
-import { EstimateFee, EstimateFeeDetails } from '../types/account';
-import {
-  AllowArray,
-  DeclareContractPayload,
-  DeclareDeployContractPayload,
-  DeployAccountContractPayload,
   UniversalDeployerContractPayload,
-} from '../types/lib';
+} from '../types';
 import { parseUDCEvent } from '../utils/events';
 import {
   calculateContractAddressFromHash,
@@ -327,10 +326,10 @@ export class Account extends Provider implements AccountInterface {
    * @param detials InvocationsDetails
    * @returns Promise<AccountDeployContractResponse>
    */
-  public async deployContract2(
+  public async deployContract(
     payload: UniversalDeployerContractPayload,
     details: InvocationsDetails = {}
-  ): Promise<DeployContract2Response> {
+  ): Promise<DeployContractUDCResponse> {
     const deployTx = await this.deploy(payload, details);
     const txReceipt = await this.waitForTransaction(deployTx.transaction_hash);
     return parseUDCEvent(txReceipt);
@@ -342,7 +341,7 @@ export class Account extends Provider implements AccountInterface {
   ) {
     const { transaction_hash } = await this.declare({ contract, classHash }, details);
     const declare = await this.waitForTransaction(transaction_hash);
-    const deploy = await this.deployContract2({ classHash, constructorCalldata }, details);
+    const deploy = await this.deployContract({ classHash, constructorCalldata }, details);
     return { declare: { ...declare, class_hash: classHash }, deploy };
   }
 
