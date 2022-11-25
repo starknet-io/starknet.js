@@ -28,7 +28,7 @@ import {
 } from '../utils/hash';
 import { BigNumberish, toBN, toCairoBool } from '../utils/number';
 import { parseContract } from '../utils/provider';
-import { compileCalldata, estimatedFeeToMaxFee } from '../utils/stark';
+import { compileCalldata, estimatedFeeToMaxFee, randomAddress } from '../utils/stark';
 import { fromCallsToExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
@@ -276,11 +276,20 @@ export class Account extends Provider implements AccountInterface {
       constructorCalldata = [],
       additionalCalls = [],
     }: UniversalDeployerContractPayload,
-    transactionsDetail: InvocationsDetails = {}
+    { nonce, version, maxFee }: InvocationsDetails = {}
   ): Promise<InvokeFunctionResponse> {
     const compiledConstructorCallData = compileCalldata(constructorCalldata);
-
     const callsArray = Array.isArray(additionalCalls) ? additionalCalls : [additionalCalls];
+    const deploySalt = salt ?? randomAddress();
+    const deployMaxFee =
+      maxFee ??
+      (await this.getSuggestedMaxFee(
+        {
+          type: 'DEPLOY',
+          payload: { classHash, salt: deploySalt, unique, constructorCalldata, additionalCalls },
+        },
+        {}
+      ));
 
     return this.execute(
       [
@@ -289,7 +298,7 @@ export class Account extends Provider implements AccountInterface {
           entrypoint: UDC.ENTRYPOINT,
           calldata: [
             classHash,
-            salt,
+            deploySalt,
             toCairoBool(unique),
             compiledConstructorCallData.length,
             ...compiledConstructorCallData,
@@ -298,7 +307,11 @@ export class Account extends Provider implements AccountInterface {
         ...callsArray,
       ],
       undefined,
-      transactionsDetail
+      {
+        nonce,
+        maxFee: deployMaxFee,
+        version,
+      }
     );
   }
 
