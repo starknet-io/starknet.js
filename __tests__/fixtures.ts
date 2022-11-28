@@ -1,10 +1,13 @@
 import fs from 'fs';
+import path from 'path';
 
 import { Account, ProviderInterface, RpcProvider, SequencerProvider, ec, json } from '../src';
 import { CompiledContract } from '../src/types';
 
 const readContract = (name: string): CompiledContract =>
-  json.parse(fs.readFileSync(`./__mocks__/${name}.json`).toString('ascii'));
+  json.parse(
+    fs.readFileSync(path.resolve(__dirname, `../__mocks__/${name}.json`)).toString('ascii')
+  );
 
 export const compiledOpenZeppelinAccount = readContract('Account');
 export const compiledErc20 = readContract('ERC20');
