@@ -305,13 +305,6 @@ export class Account extends Provider implements AccountInterface {
     );
   }
 
-  /**
-   * Simplify deploy simulating old DeployContract with same response + UDC specific response
-   *
-   * @param payload UniversalDeployerContractPayload
-   * @param detials InvocationsDetails
-   * @returns Promise<AccountDeployContractResponse>
-   */
   public async deployContract(
     payload: UniversalDeployerContractPayload,
     details: InvocationsDetails = {}

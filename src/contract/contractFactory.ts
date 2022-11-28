@@ -59,10 +59,10 @@ export class ContractFactory {
   /**
    * Attaches to new Provider or Account
    *
-   * @param providerOrAccount - new Provider or Account to attach to
+   * @param account - new Provider or Account to attach to
    */
-  connect(providerOrAccount: AccountInterface): ContractFactory {
-    this.account = providerOrAccount;
+  connect(account: AccountInterface): ContractFactory {
+    this.account = account;
     return this;
   }
 
