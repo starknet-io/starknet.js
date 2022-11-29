@@ -30,7 +30,7 @@ jobs:
           - name: rpc-devnet
             TEST_RPC_URL: http://127.0.0.1:5050/rpc
             
-    name: Run test
+    name: Run test ${{ matrix.name }}
     runs-on: ubuntu-latest
     needs: [build]
 
@@ -40,7 +40,8 @@ jobs:
         ports:
           - 5050:5050
     env:
-      TEST_PROVIDER_BASE_URL: http://127.0.0.1:5050/
+      TEST_PROVIDER_BASE_URL: ${{ matrix.TEST_PROVIDER_BASE_URL }}
+      TEST_RPC_URL: ${{ matrix.TEST_RPC_URL }}
 
     steps:
       - uses: actions/checkout@v2
