@@ -4,6 +4,8 @@ sidebar_position: 3
 
 # Deploy an ERC20 Contract
 
+🐛 Outdated TODO Fix - defaultProvider.deployContract is not supported anymore
+
 Deploy the contract and wait for deployment transaction to be accepted on StarkNet
 
 ```javascript

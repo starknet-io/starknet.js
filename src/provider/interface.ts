@@ -288,6 +288,10 @@ export abstract class ProviderInterface {
    * Wait for the transaction to be accepted
    * @param txHash - transaction hash
    * @param retryInterval - retry interval
+   * @return GetTransactionReceiptResponse
    */
-  public abstract waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<any>;
+  public abstract waitForTransaction(
+    txHash: BigNumberish,
+    retryInterval?: number
+  ): Promise<GetTransactionReceiptResponse>;
 }
