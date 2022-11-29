@@ -2,6 +2,7 @@ import { Account, GetBlockResponse, RpcProvider, ec } from '../src';
 import { StarknetChainId } from '../src/constants';
 import {
   compiledOpenZeppelinAccount,
+  describeIfNotDevnet,
   describeIfRpc,
   getTestAccount,
   getTestProvider,
@@ -25,12 +26,6 @@ describeIfRpc('RPCProvider', () => {
     );
   });
 
-  xtest('getPendingTransactions', async () => {
-    // devnet not implement
-    const transactions = await rpcProvider.getPendingTransactions();
-    expect(Array.isArray(transactions)).toBe(true);
-  });
-
   test('getTransactionCount', async () => {
     const count = await rpcProvider.getTransactionCount('latest');
     expect(typeof count).toBe('number');
@@ -50,8 +45,15 @@ describeIfRpc('RPCProvider', () => {
     expect(stateUpdate).toHaveProperty('state_diff');
   });
 
-  xtest('getProtocolVersion', async () => {
+  xtest('getProtocolVersion - pathfinder not implement', async () => {
     await rpcProvider.getProtocolVersion();
+  });
+
+  describeIfNotDevnet('devnet not implement', () => {
+    test('getPendingTransactions', async () => {
+      const transactions = await rpcProvider.getPendingTransactions();
+      expect(Array.isArray(transactions)).toBe(true);
+    });
   });
 
   describe('RPC methods', () => {
