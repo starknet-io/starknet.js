@@ -141,9 +141,9 @@ Estimate fee for invoke transaction.
 
 <hr/>
 
-provider.**getNonce**(contractAddress, blockIdentifier) => _Promise < BigNumberish >_
+provider.**getNonceForAddress**(contractAddress, blockIdentifier) => _Promise < BigNumberish >_
 
-Gets the nonce of the provided contractAddress.
+Gets the nonce of the provided contractAddress. This was renamed from `getNonce` to `getNonceForAddress` to avoid confusion when inheriting an Account from the Provider class.
 
 <hr/>
 
@@ -475,12 +475,6 @@ Gets the transaction count from a block.
 provider.**getBlockNumber**() => _Promise < number >_
 
 Gets the latest block number.
-
-<hr/>
-
-provider.**getNonce**(contractAddress, blockIdentifier) => _Promise < BigNumberish >_
-
-Gets the nonce of the provided contractAddress
 
 <hr/>
 
