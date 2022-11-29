@@ -310,7 +310,7 @@ export class Account extends Provider implements AccountInterface {
     details: InvocationsDetails = {}
   ): Promise<DeployContractUDCResponse> {
     const deployTx = await this.deploy(payload, details);
-    const txReceipt = await this.waitForTransaction(deployTx.transaction_hash);
+    const txReceipt = await this.waitForTransaction(deployTx.transaction_hash, ['ACCEPTED_ON_L2']);
     return parseUDCEvent(txReceipt);
   }
 
@@ -319,7 +319,7 @@ export class Account extends Provider implements AccountInterface {
     details?: InvocationsDetails
   ) {
     const { transaction_hash } = await this.declare({ contract, classHash }, details);
-    const declare = await this.waitForTransaction(transaction_hash);
+    const declare = await this.waitForTransaction(transaction_hash, ['ACCEPTED_ON_L2']);
     const deploy = await this.deployContract({ classHash, constructorCalldata }, details);
     return { declare: { ...declare, class_hash: classHash }, deploy };
   }

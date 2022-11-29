@@ -17,6 +17,7 @@ import {
   InvocationsDetails,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  Status,
 } from '../types';
 import { BigNumberish } from '../utils/number';
 import { ProviderInterface } from './interface';
@@ -188,7 +189,11 @@ export class Provider implements ProviderInterface {
     return this.provider.getCode(contractAddress, blockIdentifier);
   }
 
-  public async waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<any> {
-    return this.provider.waitForTransaction(txHash, retryInterval);
+  public async waitForTransaction(
+    txHash: BigNumberish,
+    successStates?: Array<Status>,
+    retryInterval?: number
+  ): Promise<any> {
+    return this.provider.waitForTransaction(txHash, successStates, retryInterval);
   }
 }
