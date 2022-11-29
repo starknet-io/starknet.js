@@ -132,7 +132,7 @@ export class RpcProvider implements ProviderInterface {
     });
   }
 
-  public async getNonce(
+  public async getNonceForAddress(
     contractAddress: string,
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<RPC.Nonce> {

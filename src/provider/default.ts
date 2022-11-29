@@ -105,11 +105,11 @@ export class Provider implements ProviderInterface {
     );
   }
 
-  public async getNonce(
+  public async getNonceForAddress(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
   ): Promise<BigNumberish> {
-    return this.provider.getNonce(contractAddress, blockIdentifier);
+    return this.provider.getNonceForAddress(contractAddress, blockIdentifier);
   }
 
   public async getStorageAt(

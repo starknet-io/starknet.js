@@ -99,7 +99,7 @@ export abstract class ProviderInterface {
    * @param contractAddress - contract address
    * @returns the hex nonce
    */
-  public abstract getNonce(
+  public abstract getNonceForAddress(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
   ): Promise<BigNumberish>;
