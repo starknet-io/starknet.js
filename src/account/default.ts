@@ -53,7 +53,7 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async getNonce(blockIdentifier?: BlockIdentifier): Promise<BigNumberish> {
-    return super.getNonce(this.address, blockIdentifier);
+    return super.getNonceForAddress(this.address, blockIdentifier);
   }
 
   public async estimateFee(

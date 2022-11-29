@@ -4,7 +4,6 @@ about: Create a report to help us improve
 title: ''
 labels: 'Type: bug'
 assignees: ''
-
 ---
 
 **Describe the bug**
@@ -20,10 +19,11 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Desktop (please complete the following information):**
- - Browser & version [e.g. chrome, safari, webworker]
- - Node version [e.g. 16.0.1]
- - StarkNet.js version
- - Network [devnet, testnet]
+
+- Browser & version [e.g. chrome, safari, webworker]
+- Node version [e.g. 16.0.1]
+- StarkNet.js version
+- Network [devnet, testnet]
 
 **Additional context**
 Add any other context about the problem here.
