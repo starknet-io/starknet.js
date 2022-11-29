@@ -405,7 +405,7 @@ export class RpcProvider implements ProviderInterface {
   public async waitForTransaction(txHash: string, retryInterval: number = 8000) {
     let { retries } = this;
     let onchain = false;
-    let txReceipt;
+    let txReceipt: any = {};
 
     while (!onchain) {
       const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'];
