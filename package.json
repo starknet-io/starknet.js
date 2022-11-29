@@ -21,7 +21,7 @@
     "build:iife": "tsup --clean false --format iife --platform browser",
     "build:dts": "tsup --clean false --dts-only",
     "pretest": "npm run lint",
-    "test": "jest",
+    "test": "jest -i",
     "posttest": "npm run format",
     "test:watch": "jest --watch",
     "docs": "cd www && npm run start",

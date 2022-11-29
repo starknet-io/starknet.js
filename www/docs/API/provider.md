@@ -242,7 +242,9 @@ Estimate fee for declare transaction.
 
 <hr/>
 
-provider.**waitForTransaction**(txHash [ , retryInterval]) => _Promise < void >_
+### waitForTransaction
+
+provider.**waitForTransaction**(txHash [ , retryInterval]) => _Promise < GetTransactionReceiptResponse >_
 
 Wait for the transaction to be accepted on L2 or L1.
 

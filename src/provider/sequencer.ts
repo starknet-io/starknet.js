@@ -449,12 +449,13 @@ export class SequencerProvider implements ProviderInterface {
 
   public async waitForTransaction(txHash: BigNumberish, retryInterval: number = 8000) {
     let onchain = false;
+    let res;
 
     while (!onchain) {
       // eslint-disable-next-line no-await-in-loop
       await wait(retryInterval);
       // eslint-disable-next-line no-await-in-loop
-      const res = await this.getTransactionStatus(txHash);
+      res = await this.getTransactionStatus(txHash);
 
       const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'];
       const errorStates = ['REJECTED', 'NOT_RECEIVED'];
@@ -470,6 +471,8 @@ export class SequencerProvider implements ProviderInterface {
         throw error;
       }
     }
+    const txReceipt = await this.getTransactionReceipt(txHash);
+    return txReceipt;
   }
 
   /**

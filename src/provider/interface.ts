@@ -147,7 +147,7 @@ export abstract class ProviderInterface {
    * @returns a confirmation of sending a transaction on the starknet contract
    */
   public abstract deployContract(
-    payload: DeployContractPayload,
+    payload: DeployContractPayload | any,
     details?: InvocationsDetails
   ): Promise<DeployContractResponse>;
 
@@ -288,6 +288,10 @@ export abstract class ProviderInterface {
    * Wait for the transaction to be accepted
    * @param txHash - transaction hash
    * @param retryInterval - retry interval
+   * @return GetTransactionReceiptResponse
    */
-  public abstract waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<void>;
+  public abstract waitForTransaction(
+    txHash: BigNumberish,
+    retryInterval?: number
+  ): Promise<GetTransactionReceiptResponse>;
 }

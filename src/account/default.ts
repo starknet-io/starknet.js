@@ -9,8 +9,10 @@ import {
   Call,
   DeclareContractPayload,
   DeclareContractResponse,
+  DeclareDeployContractPayload,
   DeployAccountContractPayload,
   DeployContractResponse,
+  DeployContractUDCResponse,
   EstimateFee,
   EstimateFeeAction,
   EstimateFeeDetails,
@@ -21,6 +23,7 @@ import {
   Signature,
   UniversalDeployerContractPayload,
 } from '../types';
+import { parseUDCEvent } from '../utils/events';
 import {
   calculateContractAddressFromHash,
   feeTransactionVersion,
@@ -28,7 +31,7 @@ import {
 } from '../utils/hash';
 import { BigNumberish, toBN, toCairoBool } from '../utils/number';
 import { parseContract } from '../utils/provider';
-import { compileCalldata, estimatedFeeToMaxFee } from '../utils/stark';
+import { compileCalldata, estimatedFeeToMaxFee, randomAddress } from '../utils/stark';
 import { fromCallsToExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
@@ -168,7 +171,7 @@ export class Account extends Provider implements AccountInterface {
   public async estimateDeployFee(
     {
       classHash,
-      salt,
+      salt = '0',
       unique = true,
       constructorCalldata = [],
       additionalCalls = [],
@@ -276,11 +279,11 @@ export class Account extends Provider implements AccountInterface {
       constructorCalldata = [],
       additionalCalls = [],
     }: UniversalDeployerContractPayload,
-    transactionsDetail: InvocationsDetails = {}
+    invocationsDetails: InvocationsDetails = {}
   ): Promise<InvokeFunctionResponse> {
     const compiledConstructorCallData = compileCalldata(constructorCalldata);
-
     const callsArray = Array.isArray(additionalCalls) ? additionalCalls : [additionalCalls];
+    const deploySalt = salt ?? randomAddress();
 
     return this.execute(
       [
@@ -289,7 +292,7 @@ export class Account extends Provider implements AccountInterface {
           entrypoint: UDC.ENTRYPOINT,
           calldata: [
             classHash,
-            salt,
+            deploySalt,
             toCairoBool(unique),
             compiledConstructorCallData.length,
             ...compiledConstructorCallData,
@@ -298,8 +301,27 @@ export class Account extends Provider implements AccountInterface {
         ...callsArray,
       ],
       undefined,
-      transactionsDetail
+      invocationsDetails
     );
+  }
+
+  public async deployContract(
+    payload: UniversalDeployerContractPayload,
+    details: InvocationsDetails = {}
+  ): Promise<DeployContractUDCResponse> {
+    const deployTx = await this.deploy(payload, details);
+    const txReceipt = await this.waitForTransaction(deployTx.transaction_hash);
+    return parseUDCEvent(txReceipt);
+  }
+
+  public async declareDeploy(
+    { classHash, contract, constructorCalldata }: DeclareDeployContractPayload,
+    details?: InvocationsDetails
+  ) {
+    const { transaction_hash } = await this.declare({ contract, classHash }, details);
+    const declare = await this.waitForTransaction(transaction_hash);
+    const deploy = await this.deployContract({ classHash, constructorCalldata }, details);
+    return { declare: { ...declare, class_hash: classHash }, deploy };
   }
 
   public async deployAccount(

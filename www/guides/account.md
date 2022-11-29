@@ -35,6 +35,8 @@ const starkKeyPub = ec.getStarkKey(starkKeyPair);
 
 ## Deploy Account Contract
 
+🐛 Deprecated: TODO: Refactor with account deployContract
+
 Deploy the Account contract and wait for it to be verified on StarkNet.
 
 ```javascript
