@@ -74,7 +74,7 @@ describe('deploy and test Wallet', () => {
       calldata: [erc20.address, '10', '0'],
     });
 
-    await provider.waitForTransaction(transaction_hash);
+    await provider.waitForTransaction(transaction_hash, ['ACCEPTED_ON_L2']);
   });
 
   test('read balance of wallet after transfer', async () => {
@@ -113,7 +113,7 @@ describe('deploy and test Wallet', () => {
       },
     ]);
 
-    await provider.waitForTransaction(transaction_hash);
+    await provider.waitForTransaction(transaction_hash, ['ACCEPTED_ON_L2']);
 
     const response = await dapp.get_number(account.address);
     expect(toBN(response.number as string).toString()).toStrictEqual('57');
