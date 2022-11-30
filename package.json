@@ -87,7 +87,7 @@
     "json-bigint": "^1.0.0",
     "minimalistic-assert": "^1.0.1",
     "pako": "^2.0.4",
-    "ts-custom-error": "^3.2.0",
+    "ts-custom-error": "^3.3.1",
     "url-join": "^4.0.1"
   },
   "lint-staged": {
