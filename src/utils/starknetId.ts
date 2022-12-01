@@ -71,11 +71,31 @@ export function useEncoded(decoded: string): BN {
 }
 
 export function getStarknetIdContract(chainId: StarknetChainId): string {
-  const starknetIdMainnetContract = '';
+  const starknetIdMainnetContract =
+    '0x6ac597f8116f886fa1c97a23fa4e08299975ecaf6b598873ca6792b9bbfb678';
   const starknetIdTestnetContract =
     '0x05cf267a0af6101667013fc6bd3f6c11116a14cda9b8c4b1198520d59f900b17';
 
-  return StarknetChainId.MAINNET === chainId
-    ? starknetIdMainnetContract
-    : starknetIdTestnetContract;
+  switch (chainId) {
+    case StarknetChainId.MAINNET:
+      return starknetIdMainnetContract;
+
+    case StarknetChainId.TESTNET:
+      return starknetIdTestnetContract;
+
+    default:
+      throw new Error('Starknet.id is not yet deployed on this network');
+  }
+}
+
+const characters = basicAlphabet.concat(bigAlphabet);
+
+export function generateString(length: number): string {
+  let result = '';
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i += 1) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+
+  return result;
 }
