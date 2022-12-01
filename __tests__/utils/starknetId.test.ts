@@ -1,10 +1,17 @@
 import { StarknetChainId } from '../../src/constants';
-import {
-  generateString,
-  getStarknetIdContract,
-  useDecoded,
-  useEncoded,
-} from '../../src/utils/starknetId';
+import { getStarknetIdContract, useDecoded, useEncoded } from '../../src/utils/starknetId';
+
+const characters = 'abcdefghijklmnopqrstuvwxyz0123456789-这来';
+
+function generateString(length: number): string {
+  let result = '';
+  const charactersLength = characters.length;
+  for (let i = 0; i < length; i += 1) {
+    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+  }
+
+  return result;
+}
 
 describe('Should tets StarknetId utils', () => {
   test('Should test useEncoded and useDecoded hook with 100 random strings', () => {

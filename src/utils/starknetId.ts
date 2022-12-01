@@ -87,15 +87,3 @@ export function getStarknetIdContract(chainId: StarknetChainId): string {
       throw new Error('Starknet.id is not yet deployed on this network');
   }
 }
-
-const characters = basicAlphabet.concat(bigAlphabet);
-
-export function generateString(length: number): string {
-  let result = '';
-  const charactersLength = characters.length;
-  for (let i = 0; i < length; i += 1) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-  }
-
-  return result;
-}
