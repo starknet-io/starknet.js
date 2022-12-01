@@ -6,6 +6,7 @@
     "jest": true
   },
   "extends": ["airbnb-base", "airbnb-typescript/base", "prettier", "plugin:prettier/recommended"],
+  "ignorePatterns": ["tsup.config.ts"],
   "globals": {
     "Atomics": "readonly",
     "SharedArrayBuffer": "readonly"

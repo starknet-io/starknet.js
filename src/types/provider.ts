@@ -12,6 +12,7 @@ import {
   RawCalldata,
   Signature,
   Status,
+  UniversalDeployerContractPayload,
 } from './lib';
 
 export interface GetBlockResponse {
@@ -105,11 +106,6 @@ export interface InvokeFunctionResponse {
   transaction_hash: string;
 }
 
-export interface DeployContractResponse {
-  contract_address: string;
-  transaction_hash: string;
-}
-
 export interface DeclareContractResponse {
   transaction_hash: string;
   class_hash: string;
@@ -131,4 +127,8 @@ export type EstimateFeeAction =
   | {
       type: 'DEPLOY_ACCOUNT';
       payload: DeployAccountContractPayload;
+    }
+  | {
+      type: 'DEPLOY';
+      payload: UniversalDeployerContractPayload;
     };

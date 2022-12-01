@@ -3,6 +3,8 @@ import {
   Call,
   CallContractResponse,
   DeclareContractResponse,
+  DeclareContractTransaction,
+  DeployAccountContractTransaction,
   DeployContractPayload,
   DeployContractResponse,
   EstimateFeeResponse,
@@ -10,15 +12,11 @@ import {
   GetCodeResponse,
   GetTransactionResponse,
   Invocation,
+  InvocationsDetails,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  RPC,
 } from '../types';
-import { RPC } from '../types/api';
-import {
-  DeclareContractTransaction,
-  DeployAccountContractTransaction,
-  InvocationsDetails,
-} from '../types/lib';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
@@ -64,10 +62,10 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public fetch(method: any, params: any): Promise<any> {
-    return fetch(`${this.nodeUrl}/rpc/v0.2`, {
+    return fetch(this.nodeUrl, {
       method: 'POST',
       body: stringify({ method, jsonrpc: '2.0', params, id: 0 }),
-      headers: this.headers,
+      headers: this.headers as Record<string, string>,
     });
   }
 
@@ -134,7 +132,7 @@ export class RpcProvider implements ProviderInterface {
     });
   }
 
-  public async getNonce(
+  public async getNonceForAddress(
     contractAddress: string,
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<RPC.Nonce> {
@@ -195,6 +193,10 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_getTransactionReceipt', { transaction_hash: txHash });
   }
 
+  public async getClassByHash(classHash: RPC.Felt): Promise<RPC.ContractClass> {
+    return this.getClass(classHash);
+  }
+
   public async getClass(
     classHash: RPC.Felt,
     blockIdentifier: BlockIdentifier = 'pending'
@@ -238,7 +240,7 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_estimateFee', {
       request: {
         type: 'INVOKE',
-        contract_address: invocation.contractAddress,
+        sender_address: invocation.contractAddress,
         calldata: parseCalldata(invocation.calldata),
         signature: bigNumberishArrayToHexadecimalStringArray(invocation.signature || []),
         version: toHex(toBN(invocationDetails?.version || 0)),
@@ -319,7 +321,7 @@ export class RpcProvider implements ProviderInterface {
   }
 
   /**
-   * @deprecated This method wont be supported soon, use Account.deploy instead
+   * @deprecated This method won't be supported, use Account.deploy instead
    */
   public async deployContract(
     { contract, constructorCalldata, addressSalt }: DeployContractPayload,
@@ -400,31 +402,34 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_traceBlockTransactions', { block_hash: blockHash });
   }
 
-  public async waitForTransaction(txHash: string, retryInterval: number = 8000) {
+  public async waitForTransaction(
+    txHash: string,
+    successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'],
+    retryInterval: number = 8000
+  ) {
+    const errorStates = ['REJECTED', 'NOT_RECEIVED'];
     let { retries } = this;
     let onchain = false;
+    let txReceipt: any = {};
 
     while (!onchain) {
-      const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'];
-      const errorStates = ['REJECTED', 'NOT_RECEIVED'];
-
       // eslint-disable-next-line no-await-in-loop
       await wait(retryInterval);
       try {
         // eslint-disable-next-line no-await-in-loop
-        const res = await this.getTransactionReceipt(txHash);
+        txReceipt = await this.getTransactionReceipt(txHash);
 
-        if (!('status' in res)) {
+        if (!('status' in txReceipt)) {
           const error = new Error('pending transaction');
           throw error;
         }
 
-        if (res.status && successStates.includes(res.status)) {
+        if (txReceipt.status && successStates.includes(txReceipt.status)) {
           onchain = true;
-        } else if (res.status && errorStates.includes(res.status)) {
-          const message = res.status;
+        } else if (txReceipt.status && errorStates.includes(txReceipt.status)) {
+          const message = txReceipt.status;
           const error = new Error(message) as Error & { response: any };
-          error.response = res;
+          error.response = txReceipt;
           throw error;
         }
       } catch (error: unknown) {
@@ -441,6 +446,7 @@ export class RpcProvider implements ProviderInterface {
     }
 
     await wait(retryInterval);
+    return txReceipt;
   }
 
   /**

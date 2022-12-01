@@ -1,4 +1,4 @@
-import { ec as EC, curves } from 'elliptic';
+import elliptic from 'elliptic';
 import hashJS from 'hash.js';
 import assert from 'minimalistic-assert';
 
@@ -6,6 +6,8 @@ import { CONSTANT_POINTS, EC_ORDER, FIELD_PRIME, MAX_ECDSA_VAL, ONE, ZERO } from
 import { KeyPair, Signature } from '../types';
 import { addHexPrefix, removeHexPrefix, sanitizeBytes } from './encode';
 import { BigNumberish, assertInRange, toBN, toHex } from './number';
+
+const { ec: EC, curves } = elliptic;
 
 export const ec = new EC(
   new curves.PresetCurve({

@@ -1,6 +1,7 @@
 import { BlockNumber, GetBlockResponse, stark } from '../src';
 import { toBN } from '../src/utils/number';
-import { getERC20DeployPayload, getTestProvider } from './fixtures';
+import { encodeShortString } from '../src/utils/shortString';
+import { compiledErc20, erc20ClassHash, getTestAccount, getTestProvider } from './fixtures';
 
 const { compileCalldata } = stark;
 
@@ -8,22 +9,22 @@ const testProvider = getTestProvider();
 
 describe('defaultProvider', () => {
   let exampleTransactionHash: string;
-  let exampleContractAddress: string;
-
+  let erc20ContractAddress: string;
   let exampleBlock: GetBlockResponse;
   let exampleBlockNumber: BlockNumber;
   let exampleBlockHash: string;
   const wallet = stark.randomAddress();
+  const account = getTestAccount(testProvider);
 
   beforeAll(async () => {
-    const erc20DeployPayload = getERC20DeployPayload(wallet);
+    const { deploy } = await account.declareDeploy({
+      contract: compiledErc20,
+      classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+      constructorCalldata: [encodeShortString('Token'), encodeShortString('ERC20'), wallet],
+    });
 
-    const { contract_address, transaction_hash } = await testProvider.deployContract(
-      erc20DeployPayload
-    );
-    await testProvider.waitForTransaction(transaction_hash);
-    exampleTransactionHash = transaction_hash;
-    exampleContractAddress = contract_address;
+    exampleTransactionHash = deploy.transaction_hash;
+    erc20ContractAddress = deploy.contract_address;
 
     exampleBlock = await testProvider.getBlock('latest');
     exampleBlockHash = exampleBlock.block_hash;
@@ -31,8 +32,8 @@ describe('defaultProvider', () => {
   });
 
   describe('endpoints', () => {
-    test('deployContract()', () => {
-      expect(exampleContractAddress).toBeTruthy();
+    test('declareDeploy()', () => {
+      expect(erc20ContractAddress).toBeTruthy();
       expect(exampleTransactionHash).toBeTruthy();
     });
 
@@ -74,44 +75,42 @@ describe('defaultProvider', () => {
       });
     });
 
-    test('getNonce()', async () => {
-      const nonce = await testProvider.getNonce(exampleContractAddress);
-      return expect(nonce).toEqual('0x0');
+    test('getNonceForAddress()', async () => {
+      const nonce = await testProvider.getNonceForAddress(erc20ContractAddress);
+      return expect(toBN(nonce)).toEqual(toBN('0x0'));
     });
 
     test('getClassAt(contractAddress, blockNumber="latest")', async () => {
-      const classResponse = await testProvider.getClassAt(exampleContractAddress);
+      const classResponse = await testProvider.getClassAt(erc20ContractAddress);
 
       expect(classResponse).toHaveProperty('program');
       expect(classResponse).toHaveProperty('entry_points_by_type');
     });
 
     // TODO see if feasible to split
-    describe('getClassHashAt & GetClass', () => {
+    describe('GetClassByHash', () => {
       test('responses', async () => {
-        const classHash = await testProvider.getClassHashAt(exampleContractAddress);
-        expect(typeof classHash).toBe('string');
-
-        const classResponse = await testProvider.getClass(classHash);
+        const classResponse = await testProvider.getClassByHash(erc20ClassHash);
         expect(classResponse).toHaveProperty('program');
         expect(classResponse).toHaveProperty('entry_points_by_type');
+        expect(classResponse).toHaveProperty('abi');
       });
     });
 
     describe('getStorageAt', () => {
       test('with "key" type of number', () => {
-        return expect(testProvider.getStorageAt(exampleContractAddress, 0)).resolves.not.toThrow();
+        return expect(testProvider.getStorageAt(erc20ContractAddress, 0)).resolves.not.toThrow();
       });
 
       test('"key" type of string', () => {
         return expect(
-          testProvider.getStorageAt(exampleContractAddress, '0x0')
+          testProvider.getStorageAt(erc20ContractAddress, '0x0')
         ).resolves.not.toThrow();
       });
 
       test('with "key" type of BN', () => {
         return expect(
-          testProvider.getStorageAt(exampleContractAddress, toBN('0x0'))
+          testProvider.getStorageAt(erc20ContractAddress, toBN('0x0'))
         ).resolves.not.toThrow();
       });
     });
@@ -135,7 +134,7 @@ describe('defaultProvider', () => {
       test('callContract()', () => {
         return expect(
           testProvider.callContract({
-            contractAddress: exampleContractAddress,
+            contractAddress: erc20ContractAddress,
             entrypoint: 'balanceOf',
             calldata: compileCalldata({
               user: '0x9ff64f4ab0e1fe88df4465ade98d1ea99d5732761c39279b8e1374fa943e9b',
@@ -148,7 +147,7 @@ describe('defaultProvider', () => {
         return expect(
           testProvider
             .callContract({
-              contractAddress: exampleContractAddress,
+              contractAddress: erc20ContractAddress,
               entrypoint: 'balanceOf',
               calldata: compileCalldata({
                 user: wallet,
@@ -163,7 +162,7 @@ describe('defaultProvider', () => {
       test('callContract() - gateway error', async () => {
         return expect(
           testProvider.callContract({
-            contractAddress: exampleContractAddress,
+            contractAddress: erc20ContractAddress,
             entrypoint: 'non_existent_entrypoint',
             calldata: compileCalldata({
               user: '0xdeadbeef',

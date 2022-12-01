@@ -4,6 +4,8 @@ import {
   CallContractResponse,
   ContractClass,
   DeclareContractResponse,
+  DeclareContractTransaction,
+  DeployAccountContractTransaction,
   DeployContractPayload,
   DeployContractResponse,
   EstimateFeeResponse,
@@ -12,14 +14,11 @@ import {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
+  InvocationsDetails,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  Status,
 } from '../types';
-import {
-  DeclareContractTransaction,
-  DeployAccountContractTransaction,
-  InvocationsDetails,
-} from '../types/lib';
 import { BigNumberish } from '../utils/number';
 import { ProviderInterface } from './interface';
 import { RpcProvider, RpcProviderOptions } from './rpc';
@@ -35,13 +34,23 @@ export class Provider implements ProviderInterface {
   private provider!: ProviderInterface;
 
   constructor(providerOrOptions?: ProviderOptions | ProviderInterface) {
-    if (providerOrOptions && 'chainId' in providerOrOptions) {
-      this.provider = providerOrOptions;
-    } else if (providerOrOptions?.rpc) {
-      this.provider = new RpcProvider(providerOrOptions.rpc);
-    } else if (providerOrOptions?.sequencer) {
-      this.provider = new SequencerProvider(providerOrOptions.sequencer);
+    if (providerOrOptions instanceof Provider) {
+      // providerOrOptions is Provider
+      this.provider = providerOrOptions.provider;
+    } else if (
+      providerOrOptions instanceof RpcProvider ||
+      providerOrOptions instanceof SequencerProvider
+    ) {
+      // providerOrOptions is SequencerProvider or RpcProvider
+      this.provider = <ProviderInterface>providerOrOptions;
+    } else if (providerOrOptions && 'rpc' in providerOrOptions) {
+      // providerOrOptions is rpc option
+      this.provider = new RpcProvider(<RpcProviderOptions>providerOrOptions.rpc);
+    } else if (providerOrOptions && 'sequencer' in providerOrOptions) {
+      // providerOrOptions is sequencer option
+      this.provider = new SequencerProvider(<SequencerProviderOptions>providerOrOptions.sequencer);
     } else {
+      // providerOrOptions is none, create SequencerProvider as default
       this.provider = new SequencerProvider();
     }
   }
@@ -72,8 +81,8 @@ export class Provider implements ProviderInterface {
     return this.provider.getClassHashAt(contractAddress, blockIdentifier);
   }
 
-  public getClass(classHash: string): Promise<ContractClass> {
-    return this.provider.getClass(classHash);
+  public getClassByHash(classHash: string): Promise<ContractClass> {
+    return this.provider.getClassByHash(classHash);
   }
 
   public async getEstimateFee(
@@ -96,11 +105,11 @@ export class Provider implements ProviderInterface {
     );
   }
 
-  public async getNonce(
+  public async getNonceForAddress(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
   ): Promise<BigNumberish> {
-    return this.provider.getNonce(contractAddress, blockIdentifier);
+    return this.provider.getNonceForAddress(contractAddress, blockIdentifier);
   }
 
   public async getStorageAt(
@@ -133,8 +142,11 @@ export class Provider implements ProviderInterface {
     return this.provider.invokeFunction(functionInvocation, details);
   }
 
+  /**
+   * @deprecated This method won't be supported, use Account.deploy instead
+   */
   public async deployContract(
-    payload: DeployContractPayload,
+    payload: DeployContractPayload | any,
     details: InvocationsDetails
   ): Promise<DeployContractResponse> {
     return this.provider.deployContract(payload, details);
@@ -177,7 +189,11 @@ export class Provider implements ProviderInterface {
     return this.provider.getCode(contractAddress, blockIdentifier);
   }
 
-  public async waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<void> {
-    return this.provider.waitForTransaction(txHash, retryInterval);
+  public async waitForTransaction(
+    txHash: BigNumberish,
+    successStates?: Array<Status>,
+    retryInterval?: number
+  ): Promise<any> {
+    return this.provider.waitForTransaction(txHash, successStates, retryInterval);
   }
 }

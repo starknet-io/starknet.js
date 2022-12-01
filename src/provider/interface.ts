@@ -4,6 +4,9 @@ import type {
   CallContractResponse,
   ContractClass,
   DeclareContractResponse,
+  DeclareContractTransaction,
+  DeployAccountContractPayload,
+  DeployAccountContractTransaction,
   DeployContractPayload,
   DeployContractResponse,
   EstimateFeeResponse,
@@ -12,15 +15,11 @@ import type {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
+  InvocationsDetails,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  Status,
 } from '../types';
-import {
-  DeclareContractTransaction,
-  DeployAccountContractPayload,
-  DeployAccountContractTransaction,
-  InvocationsDetails,
-} from '../types/lib';
 import type { BigNumberish } from '../utils/number';
 import { BlockIdentifier } from './utils';
 
@@ -92,7 +91,7 @@ export abstract class ProviderInterface {
    * @param classHash - class hash
    * @returns Contract class of compiled contract
    */
-  public abstract getClass(classHash: string): Promise<ContractClass>;
+  public abstract getClassByHash(classHash: string): Promise<ContractClass>;
 
   /**
    * Gets the nonce of a contract with respect to a specific block
@@ -100,7 +99,7 @@ export abstract class ProviderInterface {
    * @param contractAddress - contract address
    * @returns the hex nonce
    */
-  public abstract getNonce(
+  public abstract getNonceForAddress(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
   ): Promise<BigNumberish>;
@@ -140,6 +139,8 @@ export abstract class ProviderInterface {
   /**
    * Deploys a given compiled contract (json) to starknet
    *
+   * @deprecated This method won't be supported, use Account.deploy instead
+   *
    * @param payload payload to be deployed containing:
    * - compiled contract code
    * - constructor calldata
@@ -147,7 +148,7 @@ export abstract class ProviderInterface {
    * @returns a confirmation of sending a transaction on the starknet contract
    */
   public abstract deployContract(
-    payload: DeployContractPayload,
+    payload: DeployContractPayload | any,
     details?: InvocationsDetails
   ): Promise<DeployContractResponse>;
 
@@ -288,6 +289,11 @@ export abstract class ProviderInterface {
    * Wait for the transaction to be accepted
    * @param txHash - transaction hash
    * @param retryInterval - retry interval
+   * @return GetTransactionReceiptResponse
    */
-  public abstract waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<void>;
+  public abstract waitForTransaction(
+    txHash: BigNumberish,
+    successStates?: Array<Status>,
+    retryInterval?: number
+  ): Promise<GetTransactionReceiptResponse>;
 }

@@ -4,26 +4,25 @@ import { StarknetChainId } from '../constants';
 import {
   Call,
   CallContractResponse,
+  CallL1Handler,
   ContractClass,
   DeclareContractResponse,
+  DeclareContractTransaction,
+  DeployAccountContractTransaction,
   DeployContractPayload,
   DeployContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
+  GetContractAddressesResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
+  GetTransactionStatusResponse,
+  GetTransactionTraceResponse,
   Invocation,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
-} from '../types';
-import {
-  CallL1Handler,
-  GetContractAddressesResponse,
-  GetTransactionStatusResponse,
-  GetTransactionTraceResponse,
   Sequencer,
-} from '../types/api';
-import { DeclareContractTransaction, DeployAccountContractTransaction } from '../types/lib';
+} from '../types';
 import fetch from '../utils/fetchPonyfill';
 import { getSelector, getSelectorFromName } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
@@ -193,7 +192,7 @@ export class SequencerProvider implements ProviderInterface {
       const res = await fetch(url, {
         method,
         body: stringify(request),
-        headers,
+        headers: headers as Record<string, string>,
       });
       const textResponse = await res.text();
       if (!res.ok) {
@@ -257,7 +256,7 @@ export class SequencerProvider implements ProviderInterface {
     );
   }
 
-  public async getNonce(
+  public async getNonceForAddress(
     contractAddress: string,
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<BigNumberish> {
@@ -307,7 +306,7 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('get_class_hash_at', { blockIdentifier, contractAddress });
   }
 
-  public async getClass(classHash: string): Promise<ContractClass> {
+  public async getClassByHash(classHash: string): Promise<ContractClass> {
     return this.fetchEndpoint('get_class_by_hash', { classHash }).then(parseContract);
   }
 
@@ -326,6 +325,9 @@ export class SequencerProvider implements ProviderInterface {
     }).then(this.responseParser.parseInvokeFunctionResponse);
   }
 
+  /**
+   * @deprecated This method won't be supported, use Account.deploy instead
+   */
   public async deployContract({
     contract,
     constructorCalldata,
@@ -445,17 +447,20 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('get_code', { contractAddress, blockIdentifier });
   }
 
-  public async waitForTransaction(txHash: BigNumberish, retryInterval: number = 8000) {
+  public async waitForTransaction(
+    txHash: BigNumberish,
+    successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'],
+    retryInterval: number = 8000
+  ) {
+    const errorStates = ['REJECTED', 'NOT_RECEIVED'];
     let onchain = false;
+    let res;
 
     while (!onchain) {
       // eslint-disable-next-line no-await-in-loop
       await wait(retryInterval);
       // eslint-disable-next-line no-await-in-loop
-      const res = await this.getTransactionStatus(txHash);
-
-      const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'];
-      const errorStates = ['REJECTED', 'NOT_RECEIVED'];
+      res = await this.getTransactionStatus(txHash);
 
       if (successStates.includes(res.tx_status)) {
         onchain = true;
@@ -468,6 +473,8 @@ export class SequencerProvider implements ProviderInterface {
         throw error;
       }
     }
+    const txReceipt = await this.getTransactionReceipt(txHash);
+    return txReceipt;
   }
 
   /**

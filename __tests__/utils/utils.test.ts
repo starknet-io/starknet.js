@@ -27,9 +27,18 @@ describe('compressProgram()', () => {
     expect(compressed).toMatchSnapshot();
   });
 });
+
 describe('hexToDecimalString()', () => {
   test('parse 0xa23', () => {
     expect(number.hexToDecimalString('0xa23')).toBe('2595');
+  });
+});
+
+describe('cleanHex()', () => {
+  test('parse 0xa23', () => {
+    expect(number.cleanHex('0x023Ab')).toBe('0x23ab');
+    expect(number.cleanHex('0x000023Ab')).toBe('0x23ab');
+    expect(number.cleanHex('0x23Ab')).toBe('0x23ab');
   });
 });
 
@@ -42,6 +51,7 @@ describe('makeAddress()', () => {
     expect(starkAddress).toBe('0xdfd0f27fce99b50909de0bdd328aed6eabe76bc5');
   });
 });
+
 describe('getSelectorFromName()', () => {
   test('hash works for value="test"', () => {
     expect(hash.getSelectorFromName('test')).toBe(

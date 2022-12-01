@@ -1,3 +1,61 @@
+# [4.14.0](https://github.com/0xs34n/starknet.js/compare/v4.13.2...v4.14.0) (2022-11-29)
+
+### Bug Fixes
+
+- account test removed provider deployContract ([605c2a9](https://github.com/0xs34n/starknet.js/commit/605c2a9426f8ef5bc3c16803db0055550ca58da3))
+- cleanup after refactor and remove branch split ([f695629](https://github.com/0xs34n/starknet.js/commit/f69562960877bc37d38e2964a88569c9ae9bedca))
+- properly parse blockIdentifier in buildCall function ([d09affd](https://github.com/0xs34n/starknet.js/commit/d09affd57c260eccf2f59c9cb7dd8c668fe8a5b3))
+- remove deployMaxFee from deploy ([6d5fa24](https://github.com/0xs34n/starknet.js/commit/6d5fa2461def5caad3cdd71af8a4e6c61d88092e))
+- rpc tests ([cd913ee](https://github.com/0xs34n/starknet.js/commit/cd913ee93df433eb3730e6aae43dd22b0c8aed32))
+- split getNonce interface ([7b7acd9](https://github.com/0xs34n/starknet.js/commit/7b7acd9f5ebe0b2b97e389fb3a68249dd72224ce))
+- tiping issue ([78aa340](https://github.com/0xs34n/starknet.js/commit/78aa3402131f51e83287eada7499ea01de41efa0))
+- udc require L2 status for deployed contract to be awailable to use ([afba8d0](https://github.com/0xs34n/starknet.js/commit/afba8d068685c1c9b03126e5de13a5dfddb2925e))
+
+### Features
+
+- account deployContract ts overide base class ([dd4502d](https://github.com/0xs34n/starknet.js/commit/dd4502d76fb73f04e8e512336f6e5924c55b2f39))
+- extend acc interface, use deploy estimate fee ([da7392a](https://github.com/0xs34n/starknet.js/commit/da7392a65fa2b261cc1c6916739c1a59ecf9330f))
+- r p.deployCo. C tests, CF fixtures, cleanHex, DeclareDeploy, F Provider, seq.waitFor ret.txRec ([bb50f53](https://github.com/0xs34n/starknet.js/commit/bb50f5312f2b8618a26eaf13f1f851a645f5b670))
+- return from wait Transaction,Account deployContract and declareDeploy ([724975d](https://github.com/0xs34n/starknet.js/commit/724975dd92cc764208e1cf70c6f0d4089f0d363d))
+
+## [4.13.2](https://github.com/0xs34n/starknet.js/compare/v4.13.1...v4.13.2) (2022-11-25)
+
+### Bug Fixes
+
+- package json exports ([0eea96a](https://github.com/0xs34n/starknet.js/commit/0eea96a15500f4dce4125fdaa5f6720df0a9e333))
+
+## [4.13.1](https://github.com/0xs34n/starknet.js/compare/v4.13.0...v4.13.1) (2022-11-23)
+
+### Bug Fixes
+
+- **ci:** adjust build script ([880ef27](https://github.com/0xs34n/starknet.js/commit/880ef27d3212fe1aa8b6ea87e2a77a7e5d56aa79))
+- flatten main type export and import ([869f470](https://github.com/0xs34n/starknet.js/commit/869f470973c583f3d8d856f9996280741257dbab))
+
+# [4.13.0](https://github.com/0xs34n/starknet.js/compare/v4.12.0...v4.13.0) (2022-11-22)
+
+### Bug Fixes
+
+- add estimateDeployFee ([3bc11be](https://github.com/0xs34n/starknet.js/commit/3bc11bef0d744303a1288eb997fbfca32c7523ab))
+- adjust fetch parameter types ([dfe876a](https://github.com/0xs34n/starknet.js/commit/dfe876ad9fd59a4351671df5fc0705b3f980ce75))
+- anotate deprecate all providers deployContract ([65eed1f](https://github.com/0xs34n/starknet.js/commit/65eed1f671b41393b3ae33ae1aaa7a9ae0fbc013))
+- restore rpc node url to provided one ([2e1d87a](https://github.com/0xs34n/starknet.js/commit/2e1d87a6d9fc9a1fe9b493ffd8153eb2342ffdfc))
+- transaction v1 getInvokeEstimateFee ([cb4ede3](https://github.com/0xs34n/starknet.js/commit/cb4ede3b5b586ebf69768d4e4a8b36c739f6715f))
+
+### Features
+
+- update devnet ([0dbe9f7](https://github.com/0xs34n/starknet.js/commit/0dbe9f72fdad96250850599ed90495a5c2975f60))
+
+# [4.12.0](https://github.com/0xs34n/starknet.js/compare/v4.11.0...v4.12.0) (2022-11-17)
+
+### Bug Fixes
+
+- **tests:** refactor udc tests ([01a6eef](https://github.com/0xs34n/starknet.js/commit/01a6eef11b2f32e05d2aea4ab185536e3fdb1a71))
+- use method name similar to gateway endpoint ([79641b3](https://github.com/0xs34n/starknet.js/commit/79641b3076412d71fa4e5ccbdb018c4f3ecab938))
+
+### Features
+
+- create getClass RPC alias ([1003534](https://github.com/0xs34n/starknet.js/commit/10035341dd26e23b59d3dd764936a7d8eaa3f3b0))
+
 # [4.11.0](https://github.com/0xs34n/starknet.js/compare/v4.10.0...v4.11.0) (2022-11-14)
 
 ### Bug Fixes

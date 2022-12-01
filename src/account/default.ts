@@ -7,23 +7,25 @@ import { BlockIdentifier } from '../provider/utils';
 import { Signer, SignerInterface } from '../signer';
 import {
   Abi,
+  AllowArray,
   Call,
+  DeclareContractPayload,
   DeclareContractResponse,
+  DeclareDeployContractPayload,
+  DeployAccountContractPayload,
   DeployContractResponse,
+  DeployContractUDCResponse,
+  EstimateFee,
   EstimateFeeAction,
+  EstimateFeeDetails,
   InvocationsDetails,
   InvocationsSignerDetails,
   InvokeFunctionResponse,
   KeyPair,
   Signature,
-} from '../types';
-import { EstimateFee, EstimateFeeDetails } from '../types/account';
-import {
-  AllowArray,
-  DeclareContractPayload,
-  DeployAccountContractPayload,
   UniversalDeployerContractPayload,
-} from '../types/lib';
+} from '../types';
+import { parseUDCEvent } from '../utils/events';
 import {
   calculateContractAddressFromHash,
   feeTransactionVersion,
@@ -31,7 +33,7 @@ import {
 } from '../utils/hash';
 import { BigNumberish, hexToDecimalString, toBN, toCairoBool } from '../utils/number';
 import { parseContract } from '../utils/provider';
-import { compileCalldata, estimatedFeeToMaxFee } from '../utils/stark';
+import { compileCalldata, estimatedFeeToMaxFee, randomAddress } from '../utils/stark';
 import { getStarknetIdContract, useDecoded, useEncoded } from '../utils/starknetId';
 import { fromCallsToExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
@@ -54,7 +56,7 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async getNonce(blockIdentifier?: BlockIdentifier): Promise<BigNumberish> {
-    return super.getNonce(this.address, blockIdentifier);
+    return super.getNonceForAddress(this.address, blockIdentifier);
   }
 
   public async getStarkName(StarknetIdContract?: string): Promise<string | Error> {
@@ -215,6 +217,38 @@ export class Account extends Provider implements AccountInterface {
     };
   }
 
+  public async estimateDeployFee(
+    {
+      classHash,
+      salt = '0',
+      unique = true,
+      constructorCalldata = [],
+      additionalCalls = [],
+    }: UniversalDeployerContractPayload,
+    transactionsDetail?: InvocationsDetails | undefined
+  ): Promise<EstimateFee> {
+    const compiledConstructorCallData = compileCalldata(constructorCalldata);
+
+    const callsArray = Array.isArray(additionalCalls) ? additionalCalls : [additionalCalls];
+    return this.estimateInvokeFee(
+      [
+        {
+          contractAddress: UDC.ADDRESS,
+          entrypoint: UDC.ENTRYPOINT,
+          calldata: [
+            classHash,
+            salt,
+            toCairoBool(unique),
+            compiledConstructorCallData.length,
+            ...compiledConstructorCallData,
+          ],
+        },
+        ...callsArray,
+      ],
+      transactionsDetail
+    );
+  }
+
   public async execute(
     calls: AllowArray<Call>,
     abis: Abi[] | undefined = undefined,
@@ -292,23 +326,22 @@ export class Account extends Provider implements AccountInterface {
       salt,
       unique = true,
       constructorCalldata = [],
-      isDevnet = false,
+      additionalCalls = [],
     }: UniversalDeployerContractPayload,
-    additionalCalls: AllowArray<Call> = [], // support multicall
-    transactionsDetail: InvocationsDetails = {}
+    invocationsDetails: InvocationsDetails = {}
   ): Promise<InvokeFunctionResponse> {
     const compiledConstructorCallData = compileCalldata(constructorCalldata);
-
     const callsArray = Array.isArray(additionalCalls) ? additionalCalls : [additionalCalls];
+    const deploySalt = salt ?? randomAddress();
 
     return this.execute(
       [
         {
-          contractAddress: isDevnet ? UDC.ADDRESS_DEVNET : UDC.ADDRESS,
+          contractAddress: UDC.ADDRESS,
           entrypoint: UDC.ENTRYPOINT,
           calldata: [
             classHash,
-            salt,
+            deploySalt,
             toCairoBool(unique),
             compiledConstructorCallData.length,
             ...compiledConstructorCallData,
@@ -317,8 +350,27 @@ export class Account extends Provider implements AccountInterface {
         ...callsArray,
       ],
       undefined,
-      transactionsDetail
+      invocationsDetails
     );
+  }
+
+  public async deployContract(
+    payload: UniversalDeployerContractPayload,
+    details: InvocationsDetails = {}
+  ): Promise<DeployContractUDCResponse> {
+    const deployTx = await this.deploy(payload, details);
+    const txReceipt = await this.waitForTransaction(deployTx.transaction_hash, ['ACCEPTED_ON_L2']);
+    return parseUDCEvent(txReceipt);
+  }
+
+  public async declareDeploy(
+    { classHash, contract, constructorCalldata }: DeclareDeployContractPayload,
+    details?: InvocationsDetails
+  ) {
+    const { transaction_hash } = await this.declare({ contract, classHash }, details);
+    const declare = await this.waitForTransaction(transaction_hash, ['ACCEPTED_ON_L2']);
+    const deploy = await this.deployContract({ classHash, constructorCalldata }, details);
+    return { declare: { ...declare, class_hash: classHash }, deploy };
   }
 
   public async deployAccount(
@@ -399,22 +451,26 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async getSuggestedMaxFee(
-    estimateFeeAction: EstimateFeeAction,
+    { type, payload }: EstimateFeeAction,
     details: EstimateFeeDetails
   ) {
     let feeEstimate: EstimateFee;
 
-    switch (estimateFeeAction.type) {
+    switch (type) {
       case 'INVOKE':
-        feeEstimate = await this.estimateInvokeFee(estimateFeeAction.payload, details);
+        feeEstimate = await this.estimateInvokeFee(payload, details);
         break;
 
       case 'DECLARE':
-        feeEstimate = await this.estimateDeclareFee(estimateFeeAction.payload, details);
+        feeEstimate = await this.estimateDeclareFee(payload, details);
         break;
 
       case 'DEPLOY_ACCOUNT':
-        feeEstimate = await this.estimateAccountDeployFee(estimateFeeAction.payload, details);
+        feeEstimate = await this.estimateAccountDeployFee(payload, details);
+        break;
+
+      case 'DEPLOY':
+        feeEstimate = await this.estimateDeployFee(payload, details);
         break;
 
       default:
