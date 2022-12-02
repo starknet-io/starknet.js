@@ -27,7 +27,7 @@ function parseFelt(candidate: string): BN {
   try {
     return toBN(candidate);
   } catch (e) {
-    throw Error('Couldnt parse felt');
+    throw Error('Could not parse felt');
   }
 }
 

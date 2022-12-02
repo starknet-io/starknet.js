@@ -454,7 +454,12 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('get_code', { contractAddress, blockIdentifier });
   }
 
-  public async waitForTransaction(txHash: BigNumberish, retryInterval: number = 8000) {
+  public async waitForTransaction(
+    txHash: BigNumberish,
+    successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'],
+    retryInterval: number = 8000
+  ) {
+    const errorStates = ['REJECTED', 'NOT_RECEIVED'];
     let onchain = false;
     let res;
 
@@ -463,9 +468,6 @@ export class SequencerProvider implements ProviderInterface {
       await wait(retryInterval);
       // eslint-disable-next-line no-await-in-loop
       res = await this.getTransactionStatus(txHash);
-
-      const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'];
-      const errorStates = ['REJECTED', 'NOT_RECEIVED'];
 
       if (successStates.includes(res.tx_status)) {
         onchain = true;

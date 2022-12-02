@@ -15,6 +15,8 @@ export const compiledL1L2 = readContract('l1l2_compiled');
 export const compiledTypeTransformation = readContract('contract');
 export const compiledMulticall = readContract('multicall');
 export const compiledTestDapp = readContract('TestDapp');
+export const compiledStarknetId = readContract('starknetId_compiled');
+export const compiledNamingContract = readContract('naming_compiled');
 
 /* Default test config based on run `starknet-devnet --seed 0` */
 const DEFAULT_TEST_PROVIDER_SEQUENCER_URL = 'http://127.0.0.1:5050/';
@@ -46,7 +48,7 @@ export const getTestProvider = (): ProviderInterface => {
     // accelerate the tests when running locally
     const originalWaitForTransaction = provider.waitForTransaction.bind(provider);
     provider.waitForTransaction = (txHash, retryInterval) => {
-      return originalWaitForTransaction(txHash, retryInterval || 1000);
+      return originalWaitForTransaction(txHash, undefined, retryInterval || 1000);
     };
   }
 

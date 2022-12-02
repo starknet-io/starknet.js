@@ -1,3 +1,5 @@
+import { BN } from 'bn.js';
+
 import { UDC, ZERO } from '../constants';
 import { ProviderInterface, ProviderOptions } from '../provider';
 import { Provider } from '../provider/default';
@@ -29,9 +31,10 @@ import {
   feeTransactionVersion,
   transactionVersion,
 } from '../utils/hash';
-import { BigNumberish, toBN, toCairoBool } from '../utils/number';
+import { BigNumberish, hexToDecimalString, toBN, toCairoBool } from '../utils/number';
 import { parseContract } from '../utils/provider';
 import { compileCalldata, estimatedFeeToMaxFee, randomAddress } from '../utils/stark';
+import { getStarknetIdContract, useDecoded, useEncoded } from '../utils/starknetId';
 import { fromCallsToExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
@@ -54,6 +57,52 @@ export class Account extends Provider implements AccountInterface {
 
   public async getNonce(blockIdentifier?: BlockIdentifier): Promise<BigNumberish> {
     return super.getNonceForAddress(this.address, blockIdentifier);
+  }
+
+  public async getStarkName(StarknetIdContract?: string): Promise<string | Error> {
+    const chainId = await this.getChainId();
+    const contract = StarknetIdContract ?? getStarknetIdContract(chainId);
+
+    try {
+      const hexDomain = await this.callContract({
+        contractAddress: contract,
+        entrypoint: 'address_to_domain',
+        calldata: compileCalldata({
+          address: this.address,
+        }),
+      });
+      const decimalDomain = hexDomain.result
+        .map((element) => new BN(hexToDecimalString(element)))
+        .slice(1);
+
+      const stringDomain = useDecoded(decimalDomain);
+
+      return stringDomain;
+    } catch {
+      return Error('Could not get stark name');
+    }
+  }
+
+  public async getAddressFromStarkName(
+    name: string,
+    StarknetIdContract?: string
+  ): Promise<string | Error> {
+    const chainId = await this.getChainId();
+    const contract = StarknetIdContract ?? getStarknetIdContract(chainId);
+
+    try {
+      const addressData = await this.callContract({
+        contractAddress: contract,
+        entrypoint: 'domain_to_address',
+        calldata: compileCalldata({
+          domain: [useEncoded(name.replace('.stark', '')).toString(10)],
+        }),
+      });
+
+      return addressData.result[0];
+    } catch {
+      return Error('Could not get address from stark name');
+    }
   }
 
   public async estimateFee(
@@ -310,7 +359,7 @@ export class Account extends Provider implements AccountInterface {
     details: InvocationsDetails = {}
   ): Promise<DeployContractUDCResponse> {
     const deployTx = await this.deploy(payload, details);
-    const txReceipt = await this.waitForTransaction(deployTx.transaction_hash);
+    const txReceipt = await this.waitForTransaction(deployTx.transaction_hash, ['ACCEPTED_ON_L2']);
     return parseUDCEvent(txReceipt);
   }
 
@@ -319,7 +368,7 @@ export class Account extends Provider implements AccountInterface {
     details?: InvocationsDetails
   ) {
     const { transaction_hash } = await this.declare({ contract, classHash }, details);
-    const declare = await this.waitForTransaction(transaction_hash);
+    const declare = await this.waitForTransaction(transaction_hash, ['ACCEPTED_ON_L2']);
     const deploy = await this.deployContract({ classHash, constructorCalldata }, details);
     return { declare: { ...declare, class_hash: classHash }, deploy };
   }
