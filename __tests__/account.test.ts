@@ -220,7 +220,7 @@ describe('deploy and test Wallet', () => {
       await provider.waitForTransaction(transaction_hash);
 
       const address = await account.getAddressFromStarkName('ben.stark', namingAddress);
-      expect(address).toEqual(account.address);
+      expect(hexToDecimalString(address as string)).toEqual(hexToDecimalString(account.address));
 
       const name = await account.getStarkName(namingAddress);
       expect(name).toEqual('ben.stark');
