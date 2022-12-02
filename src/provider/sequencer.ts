@@ -45,15 +45,6 @@ import { Block, BlockIdentifier } from './utils';
 
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha' | 'goerli-alpha-2';
 
-function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
-  return (
-    obj === undefined ||
-    Object.keys(obj).length === 0 ||
-    (Object.keys(obj).length === 1 &&
-      Object.entries(obj).every(([k, v]) => k === 'blockIdentifier' && v === null))
-  );
-}
-
 export type SequencerProviderOptions =
   | { network: NetworkName }
   | {
@@ -63,6 +54,19 @@ export type SequencerProviderOptions =
       chainId?: StarknetChainId;
       headers?: object;
     };
+
+function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
+  return (
+    obj === undefined ||
+    Object.keys(obj).length === 0 ||
+    (Object.keys(obj).length === 1 &&
+      Object.entries(obj).every(([k, v]) => k === 'blockIdentifier' && v === null))
+  );
+}
+
+const defaultOptions: SequencerProviderOptions = {
+  network: 'goerli-alpha-2',
+};
 
 export class SequencerProvider implements ProviderInterface {
   public baseUrl: string;
@@ -77,7 +81,7 @@ export class SequencerProvider implements ProviderInterface {
 
   private responseParser = new SequencerAPIResponseParser();
 
-  constructor(optionsOrProvider: SequencerProviderOptions = { network: 'goerli-alpha-2' }) {
+  constructor(optionsOrProvider: SequencerProviderOptions = defaultOptions) {
     if ('network' in optionsOrProvider) {
       this.baseUrl = SequencerProvider.getNetworkFromName(optionsOrProvider.network);
       this.chainId = SequencerProvider.getChainIdFromBaseUrl(this.baseUrl);
@@ -118,6 +122,9 @@ export class SequencerProvider implements ProviderInterface {
       const url = new URL(baseUrl);
       if (url.host.includes('mainnet.starknet.io')) {
         return StarknetChainId.MAINNET;
+      }
+      if (url.host.includes('alpha4-2.starknet.io')) {
+        return StarknetChainId.TESTNET2;
       }
     } catch {
       // eslint-disable-next-line no-console
