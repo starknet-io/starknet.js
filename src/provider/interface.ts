@@ -293,7 +293,7 @@ export abstract class ProviderInterface {
    */
   public abstract waitForTransaction(
     txHash: BigNumberish,
-    successStates?: Array<Status>,
-    retryInterval?: number
+    retryInterval?: number,
+    successStates?: Array<Status>
   ): Promise<GetTransactionReceiptResponse>;
 }

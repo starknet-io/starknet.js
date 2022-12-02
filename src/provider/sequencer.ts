@@ -449,8 +449,8 @@ export class SequencerProvider implements ProviderInterface {
 
   public async waitForTransaction(
     txHash: BigNumberish,
-    successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'],
-    retryInterval: number = 8000
+    retryInterval: number = 8000,
+    successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING']
   ) {
     const errorStates = ['REJECTED', 'NOT_RECEIVED'];
     let onchain = false;
