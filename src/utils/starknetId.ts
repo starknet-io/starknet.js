@@ -10,8 +10,18 @@ const basicAlphabetSize = new BN(basicAlphabet.length);
 const bigAlphabetSize = new BN(bigAlphabet.length);
 const bigAlphabetSizePlusOne = new BN(bigAlphabet.length + 1);
 
+function extractStars(str: string): [string, number] {
+  let k = 0;
+  while (str.endsWith(bigAlphabet[bigAlphabet.length - 1])) {
+    str = str.substring(0, str.length - 1);
+    k += 1;
+  }
+  return [str, k];
+}
+
 export function useDecoded(encoded: BN[]): string {
   let decoded = '';
+
   encoded.forEach((subdomain) => {
     while (!subdomain.isZero()) {
       const code = subdomain.mod(basicSizePlusOne).toNumber();
@@ -30,15 +40,32 @@ export function useDecoded(encoded: BN[]): string {
         }
       } else decoded += basicAlphabet[code];
     }
+
+    const [str, k] = extractStars(decoded);
+    if (k)
+      decoded =
+        str +
+        (k % 2 === 0
+          ? bigAlphabet[bigAlphabet.length - 1].repeat(k / 2 - 1) +
+            bigAlphabet[0] +
+            basicAlphabet[1]
+          : bigAlphabet[bigAlphabet.length - 1].repeat((k - 1) / 2 + 1));
     decoded += '.';
   });
-
   return decoded.concat('stark');
 }
 
 export function useEncoded(decoded: string): BN {
   let encoded = new BN(0);
   let multiplier = new BN(1);
+
+  if (decoded.endsWith(bigAlphabet[0] + basicAlphabet[1])) {
+    const [str, k] = extractStars(decoded.substring(0, decoded.length - 2));
+    decoded = str + bigAlphabet[bigAlphabet.length - 1].repeat(2 * (k + 1));
+  } else {
+    const [str, k] = extractStars(decoded);
+    if (k) decoded = str + bigAlphabet[bigAlphabet.length - 1].repeat(1 + 2 * (k - 1));
+  }
 
   for (let i = 0; i < decoded.length; i += 1) {
     const char = decoded[i];
