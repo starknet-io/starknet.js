@@ -1,7 +1,7 @@
 import { isBN } from 'bn.js';
 
 import typedDataExample from '../__mocks__/typedDataExample.json';
-import { Account, Contract, DeployContractPayload, Provider, number, stark } from '../src';
+import { Account, Contract, Provider, number, stark } from '../src';
 import { feeTransactionVersion } from '../src/utils/hash';
 import { hexToDecimalString, toBN } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
@@ -169,14 +169,18 @@ describe('deploy and test Wallet', () => {
 
     test('Get the stark name of the account and account from stark name (using starknet.id)', async () => {
       // Deploy naming contract
-      const namingPlayLoad: DeployContractPayload = { contract: compiledNamingContract };
-      const namingResponse = await provider.deployContract(namingPlayLoad);
-      const namingAddress = namingResponse.contract_address;
+      const namingResponse = await account.declareDeploy({
+        contract: compiledNamingContract,
+        classHash: '0x3f2f8c80ab2d404bcfb4182e8528708e4efa2c646dd711bdd7b721ecc6111f7',
+      });
+      const namingAddress = namingResponse.deploy.contract_address;
 
       // Deploy Starknet id contract
-      const idPlayLoad: DeployContractPayload = { contract: compiledStarknetId };
-      const idResponse = await provider.deployContract(idPlayLoad);
-      const idAddress = idResponse.contract_address;
+      const idResponse = await account.declareDeploy({
+        contract: compiledStarknetId,
+        classHash: '0x1eb5a8308760d82321cb3ee8967581bb1d38348c7d2f082a07580040c52217c',
+      });
+      const idAddress = idResponse.deploy.contract_address;
 
       const { transaction_hash } = await account.execute([
         {
