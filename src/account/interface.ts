@@ -152,11 +152,13 @@ export abstract class AccountInterface extends ProviderInterface {
    * - constructorCalldata: constructor calldata
    * - optional salt: address salt - default random
    * - optional unique: bool if true ensure unique salt - default true
-   * - optional additionalCalls - optional additional calls array to support multicall
+   * - optional additionalCalls - optional additional calls array to support multi-call
    * @param transactionsDetail Invocation Details containing:
    *  - optional nonce
    *  - optional version
    *  - optional maxFee
+   * @returns Promise<InvokeFunctionResponse>
+   *  - transaction_hash
    */
   public abstract deploy(
     deployContractPayload: UniversalDeployerContractPayload,
@@ -167,8 +169,25 @@ export abstract class AccountInterface extends ProviderInterface {
    * Simplify deploy simulating old DeployContract with same response + UDC specific response
    *
    * @param payload UniversalDeployerContractPayload
-   * @param detials InvocationsDetails
-   * @returns Promise<AccountDeployContractResponse>
+   *  - classHash: computed class hash of compiled contract
+   *  - constructorCalldata: constructor calldata
+   *  - optional salt: address salt - default random
+   *  - optional unique: bool if true ensure unique salt - default true
+   *  - optional additionalCalls - optional additional calls array to support multi-call
+   * @param details InvocationsDetails
+   *  - optional nonce
+   *  - optional version
+   *  - optional maxFee
+   * @returns Promise<DeployContractUDCResponse>
+   *  - contract_address
+   *  - transaction_hash
+   *  - address
+   *  - deployer
+   *  - unique
+   *  - classHash
+   *  - calldata_len
+   *  - calldata
+   *  - salt
    */
   public abstract deployContract(
     payload: UniversalDeployerContractPayload,
@@ -189,6 +208,19 @@ export abstract class AccountInterface extends ProviderInterface {
    * - optional nonce
    * - optional version
    * - optional maxFee
+   * @returns Promise<DeclareDeployContractResponse>
+   * - declare
+   *    - transaction_hash
+   * - deploy
+   *    - contract_address
+   *    - transaction_hash
+   *    - address
+   *    - deployer
+   *    - unique
+   *    - classHash
+   *    - calldata_len
+   *    - calldata
+   *    - salt
    */
   public abstract declareDeploy(
     declareDeployerContractPayload: DeclareDeployContractPayload,

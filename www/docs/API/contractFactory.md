@@ -8,33 +8,29 @@ Contract Factory allow you to deploy contracts to StarkNet. To deploy a Contract
 
 ## Creating an instance
 
-`new starknet.ContractFactory( compiledContract , providerOrAccount, [ , abi ] )`
+`new starknet.ContractFactory( compiledContract, classHash, account, [ , abi ] )`
 
 Creates a new instance of a ContractFactory for the contract described by the _compiledContract_.
 
-`contractFactory.connect(providerOrAccount)` _for changing the provider or account_
+`contractFactory.connect(account)` _for changing the provider or account_
 
 `contractFactory.attach(address)` _for changing the address of the connected contract factory_
 
 ## Properties
 
-contractFactory.**abi** => _Abi_
+contractFactory.**compiledContract** => _CompiledContract_ (the compiled contract the contractFactory was constructed with)
 
-The ABI the contractFactory was constructed with.
+contractFactory.**classHash** => _string_ (contract classHash can be obtained using tool for compiling contract)
 
-contractFactory.**compiledContract** => _CompiledContract_
+contractFactory.**account** => _AccountInterface_ (account that are used to interact with the network)
 
-The compiled contract the contractFactory was constructed with.
-
-contractFactory.**providerOrAccount** => _ProviderInterface | AccountInterface_
-
-Provider or account that are used to interact with the network.
+contractFactory.**abi** => _Abi_ (the ABI the contractFactory was constructed with)
 
 ## Methods
 
 contractFactory.**attach**( address ) ⇒ _Contract_
 
-Return an instance of a _Contract_ attached to address. This is the same as using the _Contract_ constructor with address and this _compiledContract_ and _providerOrAccount_ passed in when creating the ContractFactory.
+Return an instance of a _Contract_ attached to address. This is the same as using the _Contract_ constructor with address and this _compiledContract_ and _account_ passed in when creating the ContractFactory.
 
 <hr />
 

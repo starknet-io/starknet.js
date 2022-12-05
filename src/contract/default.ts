@@ -9,6 +9,7 @@ import {
   AbiEntry,
   Args,
   AsyncContractFunction,
+  BlockTag,
   Call,
   Calldata,
   ContractFunction,
@@ -26,7 +27,7 @@ function parseFelt(candidate: string): BN {
   try {
     return toBN(candidate);
   } catch (e) {
-    throw Error('Couldnt parse felt');
+    throw Error('Could not parse felt');
   }
 }
 
@@ -36,7 +37,15 @@ function parseFelt(candidate: string): BN {
  */
 function buildCall(contract: Contract, functionAbi: FunctionAbi): AsyncContractFunction {
   return async function (...args: Array<any>): Promise<any> {
-    return contract.call(functionAbi.name, args);
+    let blockIdentifier: BlockTag | null = null;
+
+    args.forEach((arg) => {
+      if (arg.blockIdentifier) {
+        blockIdentifier = arg.blockIdentifier;
+      }
+    });
+
+    return contract.call(functionAbi.name, args, { blockIdentifier });
   };
 }
 

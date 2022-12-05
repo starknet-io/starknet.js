@@ -1,11 +1,19 @@
 {
   "name": "starknet",
-  "version": "4.13.1",
+  "version": "4.14.0",
   "description": "JavaScript library for StarkNet",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "browser": "dist/index.global.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "browser": "./dist/index.global.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
   "scripts": {
     "prepare": "npm run build && husky install",
     "build": "tsup && npm run build:esm && npm run build:iife && npm run build:dts",
@@ -13,7 +21,7 @@
     "build:iife": "tsup --clean false --format iife --platform browser",
     "build:dts": "tsup --clean false --dts-only",
     "pretest": "npm run lint",
-    "test": "jest",
+    "test": "jest -i",
     "posttest": "npm run format",
     "test:watch": "jest --watch",
     "docs": "cd www && npm run start",
@@ -79,7 +87,7 @@
     "json-bigint": "^1.0.0",
     "minimalistic-assert": "^1.0.1",
     "pako": "^2.0.4",
-    "ts-custom-error": "^3.2.0",
+    "ts-custom-error": "^3.3.1",
     "url-join": "^4.0.1"
   },
   "lint-staged": {

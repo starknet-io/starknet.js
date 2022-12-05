@@ -75,8 +75,8 @@ describe('defaultProvider', () => {
       });
     });
 
-    test('getNonce()', async () => {
-      const nonce = await testProvider.getNonce(erc20ContractAddress);
+    test('getNonceForAddress()', async () => {
+      const nonce = await testProvider.getNonceForAddress(erc20ContractAddress);
       return expect(toBN(nonce)).toEqual(toBN('0x0'));
     });
 

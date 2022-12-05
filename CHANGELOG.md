@@ -1,3 +1,29 @@
+# [4.14.0](https://github.com/0xs34n/starknet.js/compare/v4.13.2...v4.14.0) (2022-11-29)
+
+### Bug Fixes
+
+- account test removed provider deployContract ([605c2a9](https://github.com/0xs34n/starknet.js/commit/605c2a9426f8ef5bc3c16803db0055550ca58da3))
+- cleanup after refactor and remove branch split ([f695629](https://github.com/0xs34n/starknet.js/commit/f69562960877bc37d38e2964a88569c9ae9bedca))
+- properly parse blockIdentifier in buildCall function ([d09affd](https://github.com/0xs34n/starknet.js/commit/d09affd57c260eccf2f59c9cb7dd8c668fe8a5b3))
+- remove deployMaxFee from deploy ([6d5fa24](https://github.com/0xs34n/starknet.js/commit/6d5fa2461def5caad3cdd71af8a4e6c61d88092e))
+- rpc tests ([cd913ee](https://github.com/0xs34n/starknet.js/commit/cd913ee93df433eb3730e6aae43dd22b0c8aed32))
+- split getNonce interface ([7b7acd9](https://github.com/0xs34n/starknet.js/commit/7b7acd9f5ebe0b2b97e389fb3a68249dd72224ce))
+- tiping issue ([78aa340](https://github.com/0xs34n/starknet.js/commit/78aa3402131f51e83287eada7499ea01de41efa0))
+- udc require L2 status for deployed contract to be awailable to use ([afba8d0](https://github.com/0xs34n/starknet.js/commit/afba8d068685c1c9b03126e5de13a5dfddb2925e))
+
+### Features
+
+- account deployContract ts overide base class ([dd4502d](https://github.com/0xs34n/starknet.js/commit/dd4502d76fb73f04e8e512336f6e5924c55b2f39))
+- extend acc interface, use deploy estimate fee ([da7392a](https://github.com/0xs34n/starknet.js/commit/da7392a65fa2b261cc1c6916739c1a59ecf9330f))
+- r p.deployCo. C tests, CF fixtures, cleanHex, DeclareDeploy, F Provider, seq.waitFor ret.txRec ([bb50f53](https://github.com/0xs34n/starknet.js/commit/bb50f5312f2b8618a26eaf13f1f851a645f5b670))
+- return from wait Transaction,Account deployContract and declareDeploy ([724975d](https://github.com/0xs34n/starknet.js/commit/724975dd92cc764208e1cf70c6f0d4089f0d363d))
+
+## [4.13.2](https://github.com/0xs34n/starknet.js/compare/v4.13.1...v4.13.2) (2022-11-25)
+
+### Bug Fixes
+
+- package json exports ([0eea96a](https://github.com/0xs34n/starknet.js/commit/0eea96a15500f4dce4125fdaa5f6720df0a9e333))
+
 ## [4.13.1](https://github.com/0xs34n/starknet.js/compare/v4.13.0...v4.13.1) (2022-11-23)
 
 ### Bug Fixes

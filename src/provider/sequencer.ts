@@ -44,6 +44,16 @@ import { Block, BlockIdentifier } from './utils';
 
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha' | 'goerli-alpha-2';
 
+export type SequencerProviderOptions =
+  | { network: NetworkName | StarknetChainId }
+  | {
+      baseUrl: string;
+      feederGatewayUrl?: string;
+      gatewayUrl?: string;
+      chainId?: StarknetChainId;
+      headers?: object;
+    };
+
 function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
   return (
     obj === undefined ||
@@ -53,15 +63,9 @@ function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
   );
 }
 
-export type SequencerProviderOptions =
-  | { network: NetworkName }
-  | {
-      baseUrl: string;
-      feederGatewayUrl?: string;
-      gatewayUrl?: string;
-      chainId?: StarknetChainId;
-      headers?: object;
-    };
+const defaultOptions: SequencerProviderOptions = {
+  network: 'goerli-alpha-2',
+};
 
 export class SequencerProvider implements ProviderInterface {
   public baseUrl: string;
@@ -76,7 +80,7 @@ export class SequencerProvider implements ProviderInterface {
 
   private responseParser = new SequencerAPIResponseParser();
 
-  constructor(optionsOrProvider: SequencerProviderOptions = { network: 'goerli-alpha-2' }) {
+  constructor(optionsOrProvider: SequencerProviderOptions = defaultOptions) {
     if ('network' in optionsOrProvider) {
       this.baseUrl = SequencerProvider.getNetworkFromName(optionsOrProvider.network);
       this.chainId = SequencerProvider.getChainIdFromBaseUrl(this.baseUrl);
@@ -99,13 +103,13 @@ export class SequencerProvider implements ProviderInterface {
     }
   }
 
-  protected static getNetworkFromName(name: NetworkName) {
+  protected static getNetworkFromName(name: NetworkName | StarknetChainId) {
     switch (name) {
-      case 'mainnet-alpha':
+      case 'mainnet-alpha' || StarknetChainId.MAINNET:
         return 'https://alpha-mainnet.starknet.io';
-      case 'goerli-alpha':
+      case 'goerli-alpha' || StarknetChainId.TESTNET:
         return 'https://alpha4.starknet.io';
-      case 'goerli-alpha-2':
+      case 'goerli-alpha-2' || StarknetChainId.TESTNET2:
         return 'https://alpha4-2.starknet.io';
       default:
         return 'https://alpha4.starknet.io';
@@ -255,7 +259,7 @@ export class SequencerProvider implements ProviderInterface {
     );
   }
 
-  public async getNonce(
+  public async getNonceForAddress(
     contractAddress: string,
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<BigNumberish> {
@@ -428,7 +432,12 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('get_code', { contractAddress, blockIdentifier });
   }
 
-  public async waitForTransaction(txHash: BigNumberish, retryInterval: number = 8000) {
+  public async waitForTransaction(
+    txHash: BigNumberish,
+    retryInterval: number = 8000,
+    successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING']
+  ) {
+    const errorStates = ['REJECTED', 'NOT_RECEIVED'];
     let onchain = false;
     let res;
 
@@ -437,9 +446,6 @@ export class SequencerProvider implements ProviderInterface {
       await wait(retryInterval);
       // eslint-disable-next-line no-await-in-loop
       res = await this.getTransactionStatus(txHash);
-
-      const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'];
-      const errorStates = ['REJECTED', 'NOT_RECEIVED'];
 
       if (successStates.includes(res.tx_status)) {
         onchain = true;

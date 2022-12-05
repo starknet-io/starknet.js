@@ -15,6 +15,7 @@ import {
   Invocation,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  Status,
 } from '../types';
 import { BigNumberish } from '../utils/number';
 import { ProviderInterface } from './interface';
@@ -102,11 +103,11 @@ export class Provider implements ProviderInterface {
     );
   }
 
-  public async getNonce(
+  public async getNonceForAddress(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
   ): Promise<BigNumberish> {
-    return this.provider.getNonce(contractAddress, blockIdentifier);
+    return this.provider.getNonceForAddress(contractAddress, blockIdentifier);
   }
 
   public async getStorageAt(
@@ -178,8 +179,9 @@ export class Provider implements ProviderInterface {
 
   public async waitForTransaction(
     txHash: BigNumberish,
-    retryInterval?: number
+    retryInterval?: number,
+    successStates?: Array<Status>
   ): Promise<GetTransactionReceiptResponse> {
-    return this.provider.waitForTransaction(txHash, retryInterval);
+    return this.provider.waitForTransaction(txHash, retryInterval, successStates);
   }
 }

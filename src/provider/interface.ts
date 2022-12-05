@@ -16,6 +16,7 @@ import type {
   Invocation,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  Status,
 } from '../types';
 import type { BigNumberish } from '../utils/number';
 import { BlockIdentifier } from './utils';
@@ -96,7 +97,7 @@ export abstract class ProviderInterface {
    * @param contractAddress - contract address
    * @returns the hex nonce
    */
-  public abstract getNonce(
+  public abstract getNonceForAddress(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
   ): Promise<BigNumberish>;
@@ -270,6 +271,11 @@ export abstract class ProviderInterface {
    * Wait for the transaction to be accepted
    * @param txHash - transaction hash
    * @param retryInterval - retry interval
+   * @return GetTransactionReceiptResponse
    */
-  public abstract waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<any>;
+  public abstract waitForTransaction(
+    txHash: BigNumberish,
+    retryInterval?: number,
+    successStates?: Array<Status>
+  ): Promise<GetTransactionReceiptResponse>;
 }

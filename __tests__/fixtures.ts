@@ -1,10 +1,13 @@
 import fs from 'fs';
+import path from 'path';
 
 import { Account, ProviderInterface, RpcProvider, SequencerProvider, ec, json } from '../src';
 import { CompiledContract } from '../src/types';
 
 const readContract = (name: string): CompiledContract =>
-  json.parse(fs.readFileSync(`./__mocks__/${name}.json`).toString('ascii'));
+  json.parse(
+    fs.readFileSync(path.resolve(__dirname, `../__mocks__/${name}.json`)).toString('ascii')
+  );
 
 export const compiledOpenZeppelinAccount = readContract('Account');
 export const compiledErc20 = readContract('ERC20');
@@ -12,6 +15,8 @@ export const compiledL1L2 = readContract('l1l2_compiled');
 export const compiledTypeTransformation = readContract('contract');
 export const compiledMulticall = readContract('multicall');
 export const compiledTestDapp = readContract('TestDapp');
+export const compiledStarknetId = readContract('starknetId_compiled');
+export const compiledNamingContract = readContract('naming_compiled');
 
 /* Default test config based on run `starknet-devnet --seed 0` */
 const DEFAULT_TEST_PROVIDER_SEQUENCER_URL = 'http://127.0.0.1:5050/';

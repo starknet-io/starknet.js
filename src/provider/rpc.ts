@@ -129,7 +129,7 @@ export class RpcProvider implements ProviderInterface {
     });
   }
 
-  public async getNonce(
+  public async getNonceForAddress(
     contractAddress: string,
     blockIdentifier: BlockIdentifier = 'pending'
   ): Promise<RPC.Nonce> {
@@ -376,15 +376,17 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_traceBlockTransactions', { block_hash: blockHash });
   }
 
-  public async waitForTransaction(txHash: string, retryInterval: number = 8000) {
+  public async waitForTransaction(
+    txHash: string,
+    retryInterval: number = 8000,
+    successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING']
+  ) {
+    const errorStates = ['REJECTED', 'NOT_RECEIVED'];
     let { retries } = this;
     let onchain = false;
-    let txReceipt;
+    let txReceipt: any = {};
 
     while (!onchain) {
-      const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'];
-      const errorStates = ['REJECTED', 'NOT_RECEIVED'];
-
       // eslint-disable-next-line no-await-in-loop
       await wait(retryInterval);
       try {
