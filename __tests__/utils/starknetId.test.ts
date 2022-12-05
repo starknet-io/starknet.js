@@ -1,24 +1,39 @@
+import { BN } from 'bn.js';
+
 import { StarknetChainId } from '../../src/constants';
 import { getStarknetIdContract, useDecoded, useEncoded } from '../../src/utils/starknetId';
 
-const characters = 'abcdefghijklmnopqrstuvwxyz0123456789-这来';
+function randomWithSeed(seed: number) {
+  const x = Math.sin(seed) * 10000;
+  return x - Math.floor(x);
+}
 
-function generateString(length: number): string {
+function generateString(length: number, seed: number): string {
+  const characters = 'abcdefghijklmnopqrstuvwxyz0123456789-这来';
+
   let result = '';
   const charactersLength = characters.length;
   for (let i = 0; i < length; i += 1) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    result += characters.charAt(Math.floor(randomWithSeed(seed + i) * charactersLength));
   }
 
   return result;
 }
 
 describe('Should tets StarknetId utils', () => {
-  test('Should test useEncoded and useDecoded hook with 100 random strings', () => {
-    for (let index = 0; index < 100; index += 1) {
-      const randomString = generateString(10);
-
+  test('Should test useEncoded and useDecoded hook with a random string', () => {
+    for (let index = 0; index < 2500; index += 1) {
+      const randomString = generateString(10, index);
       expect(useDecoded([useEncoded(randomString)])).toBe(randomString.concat('.stark'));
+    }
+  });
+
+  test('Should test useDecoded and useEncoded hook with an encoded number', () => {
+    for (let index = 0; index < 2500; index += 1) {
+      const decoded = useDecoded([new BN(index)]);
+      expect(useEncoded(decoded.substring(0, decoded.length - 6)).toString()).toBe(
+        index.toString()
+      );
     }
   });
 
