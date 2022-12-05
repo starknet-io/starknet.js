@@ -122,6 +122,9 @@ export class SequencerProvider implements ProviderInterface {
       if (url.host.includes('mainnet.starknet.io')) {
         return StarknetChainId.MAINNET;
       }
+      if (url.host.includes('alpha4-2.starknet.io')) {
+        return StarknetChainId.TESTNET2;
+      }
     } catch {
       // eslint-disable-next-line no-console
       console.error(`Could not parse baseUrl: ${baseUrl}`);

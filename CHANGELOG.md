@@ -1,3 +1,22 @@
+# [4.15.0](https://github.com/0xs34n/starknet.js/compare/v4.14.0...v4.15.0) (2022-12-05)
+
+### Bug Fixes
+
+- add deterministic tests ([ff8e06e](https://github.com/0xs34n/starknet.js/commit/ff8e06e5eee8f04349f1f171fc9cfd8f2a12e493))
+- add string function to test ([bf24d7f](https://github.com/0xs34n/starknet.js/commit/bf24d7f3b9c23f2e7eea6427469bd99e03ae5f1c))
+- delete functions from interface ([1cb96a3](https://github.com/0xs34n/starknet.js/commit/1cb96a3d4904434d61d50ea27d6dc17d8e4807d4))
+- docs starknet id ([69b5bcc](https://github.com/0xs34n/starknet.js/commit/69b5bcc8d8e8eb2e22a1402caaf428f1f747ee3a))
+- fix Ivan comments ([7ab252a](https://github.com/0xs34n/starknet.js/commit/7ab252a7adde52403f01e1d68d3a1ada42870dca))
+- revert waitfortransaction to original interface ([bb2a8cd](https://github.com/0xs34n/starknet.js/commit/bb2a8cddc0ca272a3a291668e80c59ff8758e903))
+- test on account ([81f5d71](https://github.com/0xs34n/starknet.js/commit/81f5d71c19a4bf24a6cf7ff9ed39fafb70625e29))
+- waitfortransaction usage ([67c2031](https://github.com/0xs34n/starknet.js/commit/67c2031d637a8b8b4697f29cd592298778404d1b))
+
+### Features
+
+- add starknet.id getters ([855854a](https://github.com/0xs34n/starknet.js/commit/855854a4e17bd43e6a0c79ab68dcd1c8534ef06f))
+- allow usage of chainId to define network, cleanup ([6cffaad](https://github.com/0xs34n/starknet.js/commit/6cffaadcc096efa9f10f759e6e4cb2c91db4cb4a))
+- set testnet2 chain id, cleanup ([16cdfd4](https://github.com/0xs34n/starknet.js/commit/16cdfd46ed4887e3878fa8bdeccaf0c806d92ccb))
+
 # [4.14.0](https://github.com/0xs34n/starknet.js/compare/v4.13.2...v4.14.0) (2022-11-29)
 
 ### Bug Fixes
