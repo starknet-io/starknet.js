@@ -191,9 +191,9 @@ export class Provider implements ProviderInterface {
 
   public async waitForTransaction(
     txHash: BigNumberish,
-    successStates?: Array<Status>,
-    retryInterval?: number
+    retryInterval?: number,
+    successStates?: Array<Status>
   ): Promise<any> {
-    return this.provider.waitForTransaction(txHash, successStates, retryInterval);
+    return this.provider.waitForTransaction(txHash, retryInterval, successStates);
   }
 }

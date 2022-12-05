@@ -46,7 +46,7 @@ import { Block, BlockIdentifier } from './utils';
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha' | 'goerli-alpha-2';
 
 export type SequencerProviderOptions =
-  | { network: NetworkName }
+  | { network: NetworkName | StarknetChainId }
   | {
       baseUrl: string;
       feederGatewayUrl?: string;
@@ -104,13 +104,13 @@ export class SequencerProvider implements ProviderInterface {
     }
   }
 
-  protected static getNetworkFromName(name: NetworkName) {
+  protected static getNetworkFromName(name: NetworkName | StarknetChainId) {
     switch (name) {
-      case 'mainnet-alpha':
+      case 'mainnet-alpha' || StarknetChainId.MAINNET:
         return 'https://alpha-mainnet.starknet.io';
-      case 'goerli-alpha':
+      case 'goerli-alpha' || StarknetChainId.TESTNET:
         return 'https://alpha4.starknet.io';
-      case 'goerli-alpha-2':
+      case 'goerli-alpha-2' || StarknetChainId.TESTNET2:
         return 'https://alpha4-2.starknet.io';
       default:
         return 'https://alpha4.starknet.io';
@@ -456,8 +456,8 @@ export class SequencerProvider implements ProviderInterface {
 
   public async waitForTransaction(
     txHash: BigNumberish,
-    successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'],
-    retryInterval: number = 8000
+    retryInterval: number = 8000,
+    successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING']
   ) {
     const errorStates = ['REJECTED', 'NOT_RECEIVED'];
     let onchain = false;
