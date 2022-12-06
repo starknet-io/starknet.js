@@ -2,7 +2,8 @@ import { isBN } from 'bn.js';
 
 import typedDataExample from '../__mocks__/typedDataExample.json';
 import { Account, Contract, Provider, number, stark } from '../src';
-import { feeTransactionVersion } from '../src/utils/hash';
+import { getKeyPair, sign } from '../src/utils/ellipticCurve';
+import { feeTransactionVersion, pedersen } from '../src/utils/hash';
 import { hexToDecimalString, toBN } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
 import { randomAddress } from '../src/utils/stark';
@@ -182,6 +183,18 @@ describe('deploy and test Wallet', () => {
       });
       const idAddress = idResponse.deploy.contract_address;
 
+      // Create signature from private key
+      const whitelistingPublicKey =
+        '1893860513534673656759973582609638731665558071107553163765293299136715951024';
+      const whitelistingPrivateKey =
+        '301579081698031303837612923223391524790804435085778862878979120159194507372';
+      const hashed = pedersen([
+        pedersen([toBN('18925'), toBN('1922775124')]),
+        toBN(hexToDecimalString(account.address)),
+      ]);
+      const keyPair = getKeyPair(toBN(whitelistingPrivateKey));
+      const signed = sign(keyPair, hashed);
+
       const { transaction_hash } = await account.execute([
         {
           contractAddress: namingAddress,
@@ -190,7 +203,7 @@ describe('deploy and test Wallet', () => {
             idAddress, // starknetid_contract_addr
             '0', // pricing_contract_addr
             account.address, // admin
-            '1576987121283045618657875225183003300580199140020787494777499595331436496159', // whitelisting_key
+            whitelistingPublicKey, // whitelisting_key
             '0', // l1_contract
           ],
         },
@@ -204,11 +217,11 @@ describe('deploy and test Wallet', () => {
           entrypoint: 'whitelisted_mint',
           calldata: [
             '18925', // Domain encoded "ben"
-            '1697380617', // Expiry
+            '1922775124', // Expiry
             '1', // Starknet id linked
             account.address, // receiver_address
-            '1249449923402095645023546949816521361907869702415870903008894560968474148064', // sig 0 for whitelist
-            '543901326374961504443808953662149863005450004831659662383974986108355067943', // sig 1 for whitelist
+            signed[0], // sig 0 for whitelist
+            signed[1], // sig 1 for whitelist
           ],
         },
         {
