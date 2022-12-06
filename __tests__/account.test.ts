@@ -4,7 +4,7 @@ import typedDataExample from '../__mocks__/typedDataExample.json';
 import { Account, Contract, Provider, number, stark } from '../src';
 import { parseUDCEvent } from '../src/utils/events';
 import { feeTransactionVersion } from '../src/utils/hash';
-import { hexToDecimalString, toBN } from '../src/utils/number';
+import { cleanHex, hexToDecimalString, toBN } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
 import { randomAddress } from '../src/utils/stark';
 import {
@@ -284,7 +284,7 @@ describe('deploy and test Wallet', () => {
       // check pre-calculated address
       const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
       const udcEvent = parseUDCEvent(txReceipt);
-      expect(deployment.contract_address).toBe(udcEvent.contract_address);
+      expect(cleanHex(deployment.contract_address[0])).toBe(cleanHex(udcEvent.contract_address));
     });
 
     test('UDC Deploy non-unique', async () => {
@@ -305,7 +305,27 @@ describe('deploy and test Wallet', () => {
       // check pre-calculated address
       const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
       const udcEvent = parseUDCEvent(txReceipt);
-      expect(deployment.contract_address).toBe(udcEvent.contract_address);
+      expect(cleanHex(deployment.contract_address[0])).toBe(cleanHex(udcEvent.contract_address));
+    });
+
+    test('UDC multi Deploy', async () => {
+      // TODO: add test with multiple deploys
+      const deployments = await account.deploy([
+        {
+          classHash: '0x04367b26fbb92235e8d1137d19c080e6e650a6889ded726d00658411cc1046f5',
+        },
+        {
+          classHash: erc20ClassHash,
+          constructorCalldata: [
+            encodeShortString('Token'),
+            encodeShortString('ERC20'),
+            account.address,
+          ],
+        },
+      ]);
+      expect(deployments).toHaveProperty('transaction_hash');
+      expect(deployments.contract_address[0]).toBeDefined();
+      expect(deployments.contract_address[1]).toBeDefined();
     });
   });
 });
