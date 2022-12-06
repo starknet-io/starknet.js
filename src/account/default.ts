@@ -22,6 +22,7 @@ import {
   InvocationsSignerDetails,
   InvokeFunctionResponse,
   KeyPair,
+  MultiDeployContractResponse,
   Signature,
   UniversalDeployerContractPayload,
 } from '../types';
@@ -29,6 +30,7 @@ import { parseUDCEvent } from '../utils/events';
 import {
   calculateContractAddressFromHash,
   feeTransactionVersion,
+  pedersen,
   transactionVersion,
 } from '../utils/hash';
 import { BigNumberish, hexToDecimalString, toBN, toCairoBool } from '../utils/number';
@@ -329,29 +331,39 @@ export class Account extends Provider implements AccountInterface {
       additionalCalls = [],
     }: UniversalDeployerContractPayload,
     invocationsDetails: InvocationsDetails = {}
-  ): Promise<InvokeFunctionResponse> {
+  ): Promise<DeployContractResponse | MultiDeployContractResponse> {
     const compiledConstructorCallData = compileCalldata(constructorCalldata);
     const callsArray = Array.isArray(additionalCalls) ? additionalCalls : [additionalCalls];
     const deploySalt = salt ?? randomAddress();
 
-    return this.execute(
-      [
-        {
-          contractAddress: UDC.ADDRESS,
-          entrypoint: UDC.ENTRYPOINT,
-          calldata: [
-            classHash,
-            deploySalt,
-            toCairoBool(unique),
-            compiledConstructorCallData.length,
-            ...compiledConstructorCallData,
-          ],
-        },
-        ...callsArray,
-      ],
-      undefined,
-      invocationsDetails
+    const calls = [
+      {
+        contractAddress: UDC.ADDRESS,
+        entrypoint: UDC.ENTRYPOINT,
+        calldata: [
+          classHash,
+          deploySalt,
+          toCairoBool(unique),
+          compiledConstructorCallData.length,
+          ...compiledConstructorCallData,
+        ],
+      },
+      ...callsArray,
+    ];
+
+    const invokeResponse = await this.execute(calls, undefined, invocationsDetails);
+
+    const calculated_address = calculateContractAddressFromHash(
+      unique ? pedersen([this.address, deploySalt]) : deploySalt,
+      classHash,
+      compiledConstructorCallData,
+      unique ? UDC.ADDRESS : 0
     );
+
+    return {
+      ...invokeResponse,
+      contract_address: calculated_address,
+    };
   }
 
   public async deployContract(
@@ -384,7 +396,6 @@ export class Account extends Provider implements AccountInterface {
     );
     return { declare: { ...declare, class_hash: classHash }, deploy };
   }
-
 
   public async deployAccount(
     {

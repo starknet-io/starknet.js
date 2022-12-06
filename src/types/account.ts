@@ -18,6 +18,11 @@ export interface DeployContractResponse {
   transaction_hash: string;
 }
 
+export interface MultiDeployContractResponse {
+  contract_address: Array<string>;
+  transaction_hash: string;
+}
+
 export interface DeployContractUDCResponse extends DeployContractResponse {
   address: string;
   deployer: string;

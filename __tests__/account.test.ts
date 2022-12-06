@@ -2,6 +2,7 @@ import { isBN } from 'bn.js';
 
 import typedDataExample from '../__mocks__/typedDataExample.json';
 import { Account, Contract, Provider, number, stark } from '../src';
+import { parseUDCEvent } from '../src/utils/events';
 import { feeTransactionVersion } from '../src/utils/hash';
 import { hexToDecimalString, toBN } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
@@ -265,7 +266,7 @@ describe('deploy and test Wallet', () => {
       expect(deployResponse.salt).toBeDefined();
     });
 
-    test('UDC Deploy', async () => {
+    test('UDC Deploy unique', async () => {
       const salt = randomAddress(); // use random salt
 
       const deployment = await account.deploy({
@@ -276,12 +277,35 @@ describe('deploy and test Wallet', () => {
           account.address,
         ],
         salt,
-        unique: true, // Using true here so as not to clash with normal erc20 deploy in account and provider test
+        unique: true,
       });
-
-      await provider.waitForTransaction(deployment.transaction_hash);
-
       expect(deployment).toHaveProperty('transaction_hash');
+
+      // check pre-calculated address
+      const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
+      const udcEvent = parseUDCEvent(txReceipt);
+      expect(deployment.contract_address).toBe(udcEvent.contract_address);
+    });
+
+    test('UDC Deploy non-unique', async () => {
+      const salt = randomAddress(); // use random salt
+
+      const deployment = await account.deploy({
+        classHash: erc20ClassHash,
+        constructorCalldata: [
+          encodeShortString('Token'),
+          encodeShortString('ERC20'),
+          account.address,
+        ],
+        salt,
+        unique: false,
+      });
+      expect(deployment).toHaveProperty('transaction_hash');
+
+      // check pre-calculated address
+      const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
+      const udcEvent = parseUDCEvent(txReceipt);
+      expect(deployment.contract_address).toBe(udcEvent.contract_address);
     });
   });
 });
