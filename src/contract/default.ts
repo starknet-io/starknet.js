@@ -338,18 +338,13 @@ export class Contract implements ContractInterface {
   }
 
   /**
-   * Deep parse of the object that has been passed to the method
+   * Number of (deep) felt members of a struct.
    *
-   * @param struct - struct that needs to be calculated
+   * @param struct - struct whose members need to be counted
    * @return {number} - number of members for the given struct
    */
-  private calculateStructMembers(struct: string): number {
-    return this.structs[struct].members.reduce((acc, member) => {
-      if (member.type === 'felt') {
-        return acc + 1;
-      }
-      return acc + this.calculateStructMembers(member.type);
-    }, 0);
+  private countDeepStructMembers(struct: string): number {
+    return this.structs[struct].size;
   }
 
   /**
@@ -392,7 +387,7 @@ export class Contract implements ContractInterface {
         argPosition += 1;
       } else if (input.type in this.structs && typeof args[argPosition] === 'object') {
         if (Array.isArray(args[argPosition])) {
-          const structMembersLength = this.calculateStructMembers(input.type);
+          const structMembersLength = this.countDeepStructMembers(input.type);
           assert(
             args[argPosition].length === structMembersLength,
             `arg should be of length ${structMembersLength}`
@@ -434,7 +429,7 @@ export class Contract implements ContractInterface {
           args[argPosition].forEach((struct: any) => {
             this.structs[arrayType].members.forEach(({ name }) => {
               if (Array.isArray(struct)) {
-                const structMembersLength = this.calculateStructMembers(arrayType);
+                const structMembersLength = this.countDeepStructMembers(arrayType);
                 assert(
                   struct.length === structMembersLength,
                   `arg should be of length ${structMembersLength}`
@@ -469,7 +464,7 @@ export class Contract implements ContractInterface {
       throw Error('Missing element in calldata');
     }
     if (Array.isArray(element)) {
-      const structMemberNum = this.calculateStructMembers(type);
+      const structMemberNum = this.countDeepStructMembers(type);
       if (element.length !== structMemberNum) {
         throw Error('Missing element in calldata');
       }
