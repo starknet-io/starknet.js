@@ -322,7 +322,6 @@ describe('deploy and test Wallet', () => {
     });
 
     test('UDC multi Deploy', async () => {
-      // TODO: add test with multiple deploys
       const deployments = await account.deploy([
         {
           classHash: '0x04367b26fbb92235e8d1137d19c080e6e650a6889ded726d00658411cc1046f5',
