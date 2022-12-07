@@ -191,10 +191,9 @@ Deploys a given compiled contract (json) to starknet, wrapper around _execute_ i
 @param object **_deployContractPayload_**
 
 - **classHash**: computed class hash of compiled contract
-- **constructorCalldata**: constructor calldata
+- optional constructorCalldata: constructor calldata
 - optional salt: address salt - default random
 - optional unique: bool if true ensure unique salt - default true
-- optional additionalCalls - optional additional calls array to support multi-call
 
 @param object **transactionsDetail** Invocation Details
 
@@ -242,7 +241,6 @@ High level wrapper for deploy. Doesn't require waitForTransaction. Response simi
 - **constructorCalldata**: constructor calldata
 - optional salt: address salt - default random
 - optional unique: bool if true ensure unique salt - default true
-- optional additionalCalls - optional additional calls array to support multi-call
 
 @param object **details** InvocationsDetails
 
@@ -282,7 +280,7 @@ Example:
 ✅ NEW
 High level wrapper for declare & deploy. Doesn't require waitForTransaction. Functionality similar to deprecated provider deployContract. Declare and Deploy contract using single function.
 
-**declareDeploy**(payload [ , details ]) => _Promise < DeclareDeployContractResponse >_
+**declareDeploy**(payload [ , details ]) => _Promise < DeclareDeployUDCResponse >_
 
 @param object **_payload_** DeclareDeployContractPayload
 
@@ -291,7 +289,6 @@ High level wrapper for declare & deploy. Doesn't require waitForTransaction. Fun
 - optional constructorCalldata: constructor calldata
 - optional salt: address salt - default random
 - optional unique: bool if true ensure unique salt - default true
-- optional additionalCalls - optional additional calls array to support multi-call
 
 @param object **details** InvocationsDetails
 
@@ -299,10 +296,11 @@ High level wrapper for declare & deploy. Doesn't require waitForTransaction. Fun
 - optional version
 - optional maxFee
 
-@returns Promise object DeclareDeployContractResponse
+@returns Promise DeclareDeployUDCResponse
 
 - declare: CommonTransactionReceiptResponse
   - transaction_hash
+  - class_hash
 - deploy: DeployContractUDCResponse;
   - contract_address
   - transaction_hash

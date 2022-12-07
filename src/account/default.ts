@@ -12,6 +12,7 @@ import {
   DeclareContractPayload,
   DeclareContractResponse,
   DeclareDeployContractPayload,
+  DeclareDeployUDCResponse,
   DeployAccountContractPayload,
   DeployContractResponse,
   DeployContractUDCResponse,
@@ -321,7 +322,7 @@ export class Account extends Provider implements AccountInterface {
 
   public async deploy(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
-    details: InvocationsDetails = {}
+    details?: InvocationsDetails | undefined
   ): Promise<MultiDeployContractResponse> {
     const params = [].concat(payload as []).map((it) => {
       const {
@@ -366,8 +367,8 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async deployContract(
-    payload: UniversalDeployerContractPayload,
-    details: InvocationsDetails = {}
+    payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
+    details?: InvocationsDetails | undefined
   ): Promise<DeployContractUDCResponse> {
     const deployTx = await this.deploy(payload, details);
     const txReceipt = await this.waitForTransaction(deployTx.transaction_hash, undefined, [
@@ -377,9 +378,10 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async declareDeploy(
-    { classHash, contract, constructorCalldata, salt, unique }: DeclareDeployContractPayload,
-    details?: InvocationsDetails
-  ) {
+    payload: DeclareDeployContractPayload,
+    details?: InvocationsDetails | undefined
+  ): Promise<DeclareDeployUDCResponse> {
+    const { classHash, contract, constructorCalldata, salt, unique } = payload;
     const { transaction_hash } = await this.declare({ contract, classHash }, details);
     const declare = await this.waitForTransaction(transaction_hash, undefined, ['ACCEPTED_ON_L2']);
     const deploy = await this.deployContract(
