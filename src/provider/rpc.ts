@@ -5,14 +5,12 @@ import {
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
-  DeployContractPayload,
   DeployContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
   GetCodeResponse,
   GetTransactionResponse,
   Invocation,
-  InvocationsDetails,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   RPC,
@@ -26,9 +24,8 @@ import {
   toBN,
   toHex,
 } from '../utils/number';
-import { parseCalldata, parseContract, wait } from '../utils/provider';
+import { parseCalldata, wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
-import { randomAddress } from '../utils/stark';
 import { ProviderInterface } from './interface';
 import { Block, BlockIdentifier } from './utils';
 
@@ -333,29 +330,6 @@ export class RpcProvider implements ProviderInterface {
     });
   }
 
-  /**
-   * @deprecated This method won't be supported, use Account.deploy instead
-   */
-  public async deployContract(
-    { contract, constructorCalldata, addressSalt }: DeployContractPayload,
-    details?: InvocationsDetails
-  ): Promise<DeployContractResponse> {
-    const contractDefinition = parseContract(contract);
-    return this.fetchEndpoint('starknet_addDeployTransaction', {
-      deploy_transaction: {
-        contract_address_salt: addressSalt ?? randomAddress(),
-        constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata ?? []),
-        contract_class: {
-          program: contractDefinition.program,
-          entry_points_by_type: contractDefinition.entry_points_by_type,
-          abi: contractDefinition.abi,
-        },
-        type: 'DEPLOY',
-        version: toHex(toBN(details?.version || 0)),
-      },
-    });
-  }
-
   public async deployAccountContract(
     { classHash, constructorCalldata, addressSalt, signature }: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce
@@ -417,8 +391,8 @@ export class RpcProvider implements ProviderInterface {
 
   public async waitForTransaction(
     txHash: string,
-    successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'],
-    retryInterval: number = 8000
+    retryInterval: number = 8000,
+    successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING']
   ) {
     const errorStates = ['REJECTED', 'NOT_RECEIVED'];
     let { retries } = this;

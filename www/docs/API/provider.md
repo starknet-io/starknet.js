@@ -196,21 +196,6 @@ Gets the transaction information from a tx hash.
 
 <hr/>
 
-provider.**deployContract**(payload [ , abi ]) => _Promise < DeployContractResponse >_
-
-Deploys a contract on Starknet.
-
-###### _DeployContractResponse_
-
-```typescript
-{
-  transaction_hash: string;
-  contract_address: string;
-};
-```
-
-<hr/>
-
 provider.**declareContract**(transaction, details) => _Promise < DeclareContractResponse >_
 
 Declare a contract on Starknet.
@@ -581,17 +566,6 @@ provider.**declareContract**(DeclareContractTransaction, details) => _Promise < 
 ```typescript
   transaction_hash: string;
   class_hash: string;
-```
-
-<hr/>
-
-provider.**deployContract**(contract, constructorCalldata, addressSalt) => _Promise < DeployContractResponse >_
-
-###### _DeployContractResponse_
-
-```typescript
-  contract_address: string;
-  transaction_hash: string;
 ```
 
 <hr/>

@@ -7,7 +7,6 @@ import type {
   DeclareContractTransaction,
   DeployAccountContractPayload,
   DeployAccountContractTransaction,
-  DeployContractPayload,
   DeployContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
@@ -15,7 +14,6 @@ import type {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
-  InvocationsDetails,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Status,
@@ -135,22 +133,6 @@ export abstract class ProviderInterface {
   public abstract getTransactionReceipt(
     transactionHash: BigNumberish
   ): Promise<GetTransactionReceiptResponse>;
-
-  /**
-   * Deploys a given compiled contract (json) to starknet
-   *
-   * @deprecated This method won't be supported, use Account.deploy instead
-   *
-   * @param payload payload to be deployed containing:
-   * - compiled contract code
-   * - constructor calldata
-   * - address salt
-   * @returns a confirmation of sending a transaction on the starknet contract
-   */
-  public abstract deployContract(
-    payload: DeployContractPayload | any,
-    details?: InvocationsDetails
-  ): Promise<DeployContractResponse>;
 
   /**
    * Deploys a given compiled Account contract (json) to starknet
@@ -293,7 +275,7 @@ export abstract class ProviderInterface {
    */
   public abstract waitForTransaction(
     txHash: BigNumberish,
-    successStates?: Array<Status>,
-    retryInterval?: number
+    retryInterval?: number,
+    successStates?: Array<Status>
   ): Promise<GetTransactionReceiptResponse>;
 }

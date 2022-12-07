@@ -6,7 +6,6 @@ import {
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
-  DeployContractPayload,
   DeployContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
@@ -14,7 +13,6 @@ import {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
-  InvocationsDetails,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Status,
@@ -148,16 +146,6 @@ export class Provider implements ProviderInterface {
     return this.provider.invokeFunction(functionInvocation, details);
   }
 
-  /**
-   * @deprecated This method won't be supported, use Account.deploy instead
-   */
-  public async deployContract(
-    payload: DeployContractPayload | any,
-    details: InvocationsDetails
-  ): Promise<DeployContractResponse> {
-    return this.provider.deployContract(payload, details);
-  }
-
   public async deployAccountContract(
     payload: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce
@@ -197,9 +185,9 @@ export class Provider implements ProviderInterface {
 
   public async waitForTransaction(
     txHash: BigNumberish,
-    successStates?: Array<Status>,
-    retryInterval?: number
-  ): Promise<any> {
-    return this.provider.waitForTransaction(txHash, successStates, retryInterval);
+    retryInterval?: number,
+    successStates?: Array<Status>
+  ): Promise<GetTransactionReceiptResponse> {
+    return this.provider.waitForTransaction(txHash, retryInterval, successStates);
   }
 }

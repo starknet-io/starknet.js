@@ -9,7 +9,6 @@ import {
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
-  DeployContractPayload,
   DeployContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
@@ -45,6 +44,16 @@ import { Block, BlockIdentifier } from './utils';
 
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha' | 'goerli-alpha-2';
 
+export type SequencerProviderOptions =
+  | { network: NetworkName | StarknetChainId }
+  | {
+      baseUrl: string;
+      feederGatewayUrl?: string;
+      gatewayUrl?: string;
+      chainId?: StarknetChainId;
+      headers?: object;
+    };
+
 function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
   return (
     obj === undefined ||
@@ -54,15 +63,9 @@ function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
   );
 }
 
-export type SequencerProviderOptions =
-  | { network: NetworkName }
-  | {
-      baseUrl: string;
-      feederGatewayUrl?: string;
-      gatewayUrl?: string;
-      chainId?: StarknetChainId;
-      headers?: object;
-    };
+const defaultOptions: SequencerProviderOptions = {
+  network: 'goerli-alpha-2',
+};
 
 export class SequencerProvider implements ProviderInterface {
   public baseUrl: string;
@@ -77,7 +80,7 @@ export class SequencerProvider implements ProviderInterface {
 
   private responseParser = new SequencerAPIResponseParser();
 
-  constructor(optionsOrProvider: SequencerProviderOptions = { network: 'goerli-alpha-2' }) {
+  constructor(optionsOrProvider: SequencerProviderOptions = defaultOptions) {
     if ('network' in optionsOrProvider) {
       this.baseUrl = SequencerProvider.getNetworkFromName(optionsOrProvider.network);
       this.chainId = SequencerProvider.getChainIdFromBaseUrl(this.baseUrl);
@@ -100,13 +103,13 @@ export class SequencerProvider implements ProviderInterface {
     }
   }
 
-  protected static getNetworkFromName(name: NetworkName) {
+  protected static getNetworkFromName(name: NetworkName | StarknetChainId) {
     switch (name) {
-      case 'mainnet-alpha':
+      case 'mainnet-alpha' || StarknetChainId.MAINNET:
         return 'https://alpha-mainnet.starknet.io';
-      case 'goerli-alpha':
+      case 'goerli-alpha' || StarknetChainId.TESTNET:
         return 'https://alpha4.starknet.io';
-      case 'goerli-alpha-2':
+      case 'goerli-alpha-2' || StarknetChainId.TESTNET2:
         return 'https://alpha4-2.starknet.io';
       default:
         return 'https://alpha4.starknet.io';
@@ -118,6 +121,9 @@ export class SequencerProvider implements ProviderInterface {
       const url = new URL(baseUrl);
       if (url.host.includes('mainnet.starknet.io')) {
         return StarknetChainId.MAINNET;
+      }
+      if (url.host.includes('alpha4-2.starknet.io')) {
+        return StarknetChainId.TESTNET2;
       }
     } catch {
       // eslint-disable-next-line no-console
@@ -325,24 +331,6 @@ export class SequencerProvider implements ProviderInterface {
     }).then(this.responseParser.parseInvokeFunctionResponse);
   }
 
-  /**
-   * @deprecated This method won't be supported, use Account.deploy instead
-   */
-  public async deployContract({
-    contract,
-    constructorCalldata,
-    addressSalt,
-  }: DeployContractPayload): Promise<DeployContractResponse> {
-    const contractDefinition = parseContract(contract);
-
-    return this.fetchEndpoint('add_transaction', undefined, {
-      type: 'DEPLOY',
-      contract_address_salt: addressSalt ?? randomAddress(),
-      constructor_calldata: bigNumberishArrayToDecimalStringArray(constructorCalldata ?? []),
-      contract_definition: contractDefinition,
-    }).then(this.responseParser.parseDeployContractResponse);
-  }
-
   public async deployAccountContract(
     { classHash, constructorCalldata, addressSalt, signature }: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce
@@ -449,8 +437,8 @@ export class SequencerProvider implements ProviderInterface {
 
   public async waitForTransaction(
     txHash: BigNumberish,
-    successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'],
-    retryInterval: number = 8000
+    retryInterval: number = 8000,
+    successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING']
   ) {
     const errorStates = ['REJECTED', 'NOT_RECEIVED'];
     let onchain = false;
@@ -502,7 +490,6 @@ export class SequencerProvider implements ProviderInterface {
 
   /**
    * Gets the transaction trace from a tx id.
-   *
    *
    * @param txHash
    * @returns the transaction trace
