@@ -17,6 +17,7 @@ import {
   EstimateFeeResponse,
   InvocationsDetails,
   InvokeFunctionResponse,
+  MultiDeployContractResponse,
   Signature,
   UniversalDeployerContractPayload,
 } from '../types';
@@ -155,13 +156,13 @@ export abstract class AccountInterface extends ProviderInterface {
    *  - optional nonce
    *  - optional version
    *  - optional maxFee
-   * @returns Promise<InvokeFunctionResponse>
+   * @returns Promise<MultiDeployContractResponse>
    *  - transaction_hash
    */
   public abstract deploy(
     deployContractPayload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
     transactionsDetail?: InvocationsDetails
-  ): Promise<InvokeFunctionResponse>;
+  ): Promise<MultiDeployContractResponse>;
 
   /**
    * Simplify deploy simulating old DeployContract with same response + UDC specific response
