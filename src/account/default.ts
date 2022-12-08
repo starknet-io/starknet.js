@@ -12,6 +12,7 @@ import {
   DeclareContractPayload,
   DeclareContractResponse,
   DeclareDeployContractPayload,
+  DeclareDeployUDCResponse,
   DeployAccountContractPayload,
   DeployContractResponse,
   DeployContractUDCResponse,
@@ -22,6 +23,7 @@ import {
   InvocationsSignerDetails,
   InvokeFunctionResponse,
   KeyPair,
+  MultiDeployContractResponse,
   Signature,
   UniversalDeployerContractPayload,
 } from '../types';
@@ -29,6 +31,7 @@ import { parseUDCEvent } from '../utils/events';
 import {
   calculateContractAddressFromHash,
   feeTransactionVersion,
+  pedersen,
   transactionVersion,
 } from '../utils/hash';
 import { BigNumberish, hexToDecimalString, toBN, toCairoBool } from '../utils/number';
@@ -218,35 +221,32 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async estimateDeployFee(
-    {
-      classHash,
-      salt = '0',
-      unique = true,
-      constructorCalldata = [],
-      additionalCalls = [],
-    }: UniversalDeployerContractPayload,
+    payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
     transactionsDetail?: InvocationsDetails | undefined
   ): Promise<EstimateFee> {
-    const compiledConstructorCallData = compileCalldata(constructorCalldata);
+    const calls = [].concat(payload as []).map((it) => {
+      const {
+        classHash,
+        salt = '0',
+        unique = true,
+        constructorCalldata = [],
+      } = it as UniversalDeployerContractPayload;
+      const compiledConstructorCallData = compileCalldata(constructorCalldata);
 
-    const callsArray = Array.isArray(additionalCalls) ? additionalCalls : [additionalCalls];
-    return this.estimateInvokeFee(
-      [
-        {
-          contractAddress: UDC.ADDRESS,
-          entrypoint: UDC.ENTRYPOINT,
-          calldata: [
-            classHash,
-            salt,
-            toCairoBool(unique),
-            compiledConstructorCallData.length,
-            ...compiledConstructorCallData,
-          ],
-        },
-        ...callsArray,
-      ],
-      transactionsDetail
-    );
+      return {
+        contractAddress: UDC.ADDRESS,
+        entrypoint: UDC.ENTRYPOINT,
+        calldata: [
+          classHash,
+          salt,
+          toCairoBool(unique),
+          compiledConstructorCallData.length,
+          ...compiledConstructorCallData,
+        ],
+      };
+    });
+
+    return this.estimateInvokeFee(calls, transactionsDetail);
   }
 
   public async execute(
@@ -321,22 +321,22 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async deploy(
-    {
-      classHash,
-      salt,
-      unique = true,
-      constructorCalldata = [],
-      additionalCalls = [],
-    }: UniversalDeployerContractPayload,
-    invocationsDetails: InvocationsDetails = {}
-  ): Promise<InvokeFunctionResponse> {
-    const compiledConstructorCallData = compileCalldata(constructorCalldata);
-    const callsArray = Array.isArray(additionalCalls) ? additionalCalls : [additionalCalls];
-    const deploySalt = salt ?? randomAddress();
+    payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
+    details?: InvocationsDetails | undefined
+  ): Promise<MultiDeployContractResponse> {
+    const params = [].concat(payload as []).map((it) => {
+      const {
+        classHash,
+        salt,
+        unique = true,
+        constructorCalldata = [],
+      } = it as UniversalDeployerContractPayload;
 
-    return this.execute(
-      [
-        {
+      const compiledConstructorCallData = compileCalldata(constructorCalldata);
+      const deploySalt = salt ?? randomAddress();
+
+      return {
+        call: {
           contractAddress: UDC.ADDRESS,
           entrypoint: UDC.ENTRYPOINT,
           calldata: [
@@ -347,16 +347,28 @@ export class Account extends Provider implements AccountInterface {
             ...compiledConstructorCallData,
           ],
         },
-        ...callsArray,
-      ],
-      undefined,
-      invocationsDetails
-    );
+        address: calculateContractAddressFromHash(
+          unique ? pedersen([this.address, deploySalt]) : deploySalt,
+          classHash,
+          compiledConstructorCallData,
+          unique ? UDC.ADDRESS : 0
+        ),
+      };
+    });
+
+    const calls = params.map((it) => it.call);
+    const addresses = params.map((it) => it.address);
+    const invokeResponse = await this.execute(calls, undefined, details);
+
+    return {
+      ...invokeResponse,
+      contract_address: addresses,
+    };
   }
 
   public async deployContract(
-    payload: UniversalDeployerContractPayload,
-    details: InvocationsDetails = {}
+    payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
+    details?: InvocationsDetails | undefined
   ): Promise<DeployContractUDCResponse> {
     const deployTx = await this.deploy(payload, details);
     const txReceipt = await this.waitForTransaction(deployTx.transaction_hash, undefined, [
@@ -366,25 +378,18 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async declareDeploy(
-    {
-      classHash,
-      contract,
-      constructorCalldata,
-      salt,
-      unique,
-      additionalCalls,
-    }: DeclareDeployContractPayload,
-    details?: InvocationsDetails
-  ) {
+    payload: DeclareDeployContractPayload,
+    details?: InvocationsDetails | undefined
+  ): Promise<DeclareDeployUDCResponse> {
+    const { classHash, contract, constructorCalldata, salt, unique } = payload;
     const { transaction_hash } = await this.declare({ contract, classHash }, details);
     const declare = await this.waitForTransaction(transaction_hash, undefined, ['ACCEPTED_ON_L2']);
     const deploy = await this.deployContract(
-      { classHash, salt, unique, constructorCalldata, additionalCalls },
+      { classHash, salt, unique, constructorCalldata },
       details
     );
     return { declare: { ...declare, class_hash: classHash }, deploy };
   }
-
 
   public async deployAccount(
     {

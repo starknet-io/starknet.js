@@ -18,7 +18,14 @@ export interface DeployContractResponse {
   transaction_hash: string;
 }
 
-export interface DeployContractUDCResponse extends DeployContractResponse {
+export type MultiDeployContractResponse = {
+  contract_address: Array<string>;
+  transaction_hash: string;
+};
+
+export type DeployContractUDCResponse = {
+  contract_address: string;
+  transaction_hash: string;
   address: string;
   deployer: string;
   unique: string;
@@ -26,9 +33,11 @@ export interface DeployContractUDCResponse extends DeployContractResponse {
   calldata_len: string;
   calldata: Array<string>;
   salt: string;
-}
+};
 
-export type DeclareDeployContractResponse = {
-  declare: DeclareTransactionReceiptResponse;
+export type DeclareDeployUDCResponse = {
+  declare: {
+    class_hash: BigNumberish;
+  } & DeclareTransactionReceiptResponse;
   deploy: DeployContractUDCResponse;
 };
