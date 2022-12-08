@@ -366,14 +366,25 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async declareDeploy(
-    { classHash, contract, constructorCalldata }: DeclareDeployContractPayload,
+    {
+      classHash,
+      contract,
+      constructorCalldata,
+      salt,
+      unique,
+      additionalCalls,
+    }: DeclareDeployContractPayload,
     details?: InvocationsDetails
   ) {
     const { transaction_hash } = await this.declare({ contract, classHash }, details);
     const declare = await this.waitForTransaction(transaction_hash, undefined, ['ACCEPTED_ON_L2']);
-    const deploy = await this.deployContract({ classHash, constructorCalldata }, details);
+    const deploy = await this.deployContract(
+      { classHash, salt, unique, constructorCalldata, additionalCalls },
+      details
+    );
     return { declare: { ...declare, class_hash: classHash }, deploy };
   }
+
 
   public async deployAccount(
     {

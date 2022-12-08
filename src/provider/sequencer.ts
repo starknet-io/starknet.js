@@ -9,7 +9,6 @@ import {
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
-  DeployContractPayload,
   DeployContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
@@ -122,6 +121,9 @@ export class SequencerProvider implements ProviderInterface {
       const url = new URL(baseUrl);
       if (url.host.includes('mainnet.starknet.io')) {
         return StarknetChainId.MAINNET;
+      }
+      if (url.host.includes('alpha4-2.starknet.io')) {
+        return StarknetChainId.TESTNET2;
       }
     } catch {
       // eslint-disable-next-line no-console
@@ -329,24 +331,6 @@ export class SequencerProvider implements ProviderInterface {
     }).then(this.responseParser.parseInvokeFunctionResponse);
   }
 
-  /**
-   * @deprecated This method won't be supported, use Account.deploy instead
-   */
-  public async deployContract({
-    contract,
-    constructorCalldata,
-    addressSalt,
-  }: DeployContractPayload): Promise<DeployContractResponse> {
-    const contractDefinition = parseContract(contract);
-
-    return this.fetchEndpoint('add_transaction', undefined, {
-      type: 'DEPLOY',
-      contract_address_salt: addressSalt ?? randomAddress(),
-      constructor_calldata: bigNumberishArrayToDecimalStringArray(constructorCalldata ?? []),
-      contract_definition: contractDefinition,
-    }).then(this.responseParser.parseDeployContractResponse);
-  }
-
   public async deployAccountContract(
     { classHash, constructorCalldata, addressSalt, signature }: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce
@@ -506,7 +490,6 @@ export class SequencerProvider implements ProviderInterface {
 
   /**
    * Gets the transaction trace from a tx id.
-   *
    *
    * @param txHash
    * @returns the transaction trace
