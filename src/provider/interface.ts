@@ -120,7 +120,7 @@ export abstract class ProviderInterface {
    * Gets the transaction information from a tx id.
    *
    * @param txHash
-   * @returns the transacton object { transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? }
+   * @returns the transaction object { transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? }
    */
   public abstract getTransaction(transactionHash: BigNumberish): Promise<GetTransactionResponse>;
 
@@ -223,7 +223,7 @@ export abstract class ProviderInterface {
   public abstract getInvokeEstimateFee(
     invocation: Invocation,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponse>;
 
   /**
@@ -243,7 +243,7 @@ export abstract class ProviderInterface {
   public abstract getDeclareEstimateFee(
     transaction: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponse>;
 
   /**
@@ -264,7 +264,7 @@ export abstract class ProviderInterface {
   public abstract getDeployAccountEstimateFee(
     transaction: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponse>;
 
   /**

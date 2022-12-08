@@ -425,7 +425,7 @@ export class RpcProvider implements ProviderInterface {
         }
 
         if (retries === 0) {
-          throw new Error('waitForTransaction timedout with retries');
+          throw new Error(`waitForTransaction timed-out with retries ${this.retries}`);
         }
       }
 

@@ -385,7 +385,6 @@ export class Account extends Provider implements AccountInterface {
     return { declare: { ...declare, class_hash: classHash }, deploy };
   }
 
-
   public async deployAccount(
     {
       classHash,

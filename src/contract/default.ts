@@ -3,7 +3,6 @@ import assert from 'minimalistic-assert';
 
 import { AccountInterface } from '../account';
 import { ProviderInterface, defaultProvider } from '../provider';
-import { BlockIdentifier } from '../provider/utils';
 import {
   Abi,
   AbiEntry,
@@ -21,7 +20,7 @@ import {
   StructAbi,
 } from '../types';
 import { BigNumberish, toBN, toFelt } from '../utils/number';
-import { ContractInterface } from './interface';
+import { CallOptions, ContractInterface } from './interface';
 
 function parseFelt(candidate: string): BN {
   try {
@@ -232,12 +231,11 @@ export class Contract implements ContractInterface {
   public async call(
     method: string,
     args: Array<any> = [],
-    {
-      blockIdentifier = 'pending',
-    }: {
-      blockIdentifier?: BlockIdentifier;
-    } = {}
+    options: CallOptions = {}
   ): Promise<Result> {
+    // default value also for null
+    const blockIdentifier = options?.blockIdentifier;
+
     // ensure contract is connected
     assert(this.address !== null, 'contract is not connected to an address');
 
@@ -361,7 +359,7 @@ export class Contract implements ContractInterface {
    */
   protected validateMethodAndArgs(type: 'INVOKE' | 'CALL', method: string, args: Array<any> = []) {
     // ensure provided method exists
-    const invokeableFunctionNames = this.abi
+    const invocableFunctionNames = this.abi
       .filter((abi) => {
         if (abi.type !== 'function') return false;
         const isView = abi.stateMutability === 'view';
@@ -369,8 +367,8 @@ export class Contract implements ContractInterface {
       })
       .map((abi) => abi.name);
     assert(
-      invokeableFunctionNames.includes(method),
-      `${type === 'INVOKE' ? 'invokeable' : 'viewable'} method not found in abi`
+      invocableFunctionNames.includes(method),
+      `${type === 'INVOKE' ? 'invocable' : 'viewable'} method not found in abi`
     );
 
     // ensure args match abi type
