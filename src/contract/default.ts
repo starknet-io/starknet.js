@@ -234,7 +234,7 @@ export class Contract implements ContractInterface {
     options: CallOptions = {}
   ): Promise<Result> {
     // default value also for null
-    const blockIdentifier = options?.blockIdentifier;
+    const blockIdentifier = options?.blockIdentifier || undefined;
 
     // ensure contract is connected
     assert(this.address !== null, 'contract is not connected to an address');
