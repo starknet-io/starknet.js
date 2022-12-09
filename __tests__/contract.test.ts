@@ -223,12 +223,24 @@ describe('class ContractFactory {}', () => {
   });
   test('deployment of new contract', async () => {
     const factory = new ContractFactory(compiledErc20, classHash, account);
-    const erc20 = await factory.deploy(constructorCalldata);
+    const erc20 = await factory.deploy(
+      compileCalldata({
+        name: encodeShortString('Token'),
+        symbol: encodeShortString('ERC20'),
+        recipient: wallet,
+      })
+    );
     expect(erc20 instanceof Contract);
   });
   test('wait for deployment transaction', async () => {
     const factory = new ContractFactory(compiledErc20, classHash, account);
-    const contract = await factory.deploy(constructorCalldata);
+    const contract = await factory.deploy(
+      compileCalldata({
+        name: encodeShortString('Token'),
+        symbol: encodeShortString('ERC20'),
+        recipient: wallet,
+      })
+    );
     expect(contract.deployed()).resolves.not.toThrow();
   });
   test('attach new contract', async () => {
