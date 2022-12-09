@@ -3,7 +3,6 @@ import assert from 'minimalistic-assert';
 
 import { AccountInterface } from '../account';
 import { ProviderInterface, defaultProvider } from '../provider';
-import { BlockIdentifier } from '../provider/utils';
 import {
   Abi,
   AbiEntry,
@@ -21,7 +20,7 @@ import {
 } from '../types';
 import { CheckCallData } from '../utils/calldata';
 import { BigNumberish, toBN } from '../utils/number';
-import { ContractInterface } from './interface';
+import { CallOptions, ContractInterface } from './interface';
 
 function parseFelt(candidate: string): BN {
   try {
@@ -235,12 +234,11 @@ export class Contract implements ContractInterface {
   public async call(
     method: string,
     args: Array<any> = [],
-    {
-      blockIdentifier = 'pending',
-    }: {
-      blockIdentifier?: BlockIdentifier;
-    } = {}
+    options: CallOptions = {}
   ): Promise<Result> {
+    // default value also for null
+    const blockIdentifier = options?.blockIdentifier || undefined;
+
     // ensure contract is connected
     assert(this.address !== null, 'contract is not connected to an address');
 

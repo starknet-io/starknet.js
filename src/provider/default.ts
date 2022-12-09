@@ -61,20 +61,20 @@ export class Provider implements ProviderInterface {
     return this.provider.getChainId();
   }
 
-  public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
+  public async getBlock(blockIdentifier: BlockIdentifier): Promise<GetBlockResponse> {
     return this.provider.getBlock(blockIdentifier);
   }
 
   public async getClassAt(
     contractAddress: string,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier
   ): Promise<ContractClass> {
     return this.provider.getClassAt(contractAddress, blockIdentifier);
   }
 
   public async getClassHashAt(
     contractAddress: string,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier
   ): Promise<string> {
     return this.provider.getClassHashAt(contractAddress, blockIdentifier);
   }
@@ -86,7 +86,7 @@ export class Provider implements ProviderInterface {
   public async getEstimateFee(
     invocationWithTxType: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier
   ): Promise<EstimateFeeResponse> {
     return this.provider.getEstimateFee(invocationWithTxType, invocationDetails, blockIdentifier);
   }
@@ -94,7 +94,7 @@ export class Provider implements ProviderInterface {
   public async getInvokeEstimateFee(
     invocationWithTxType: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponse> {
     return this.provider.getInvokeEstimateFee(
       invocationWithTxType,
@@ -113,7 +113,7 @@ export class Provider implements ProviderInterface {
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier
   ): Promise<BigNumberish> {
     return this.provider.getStorageAt(contractAddress, key, blockIdentifier);
   }
@@ -128,7 +128,7 @@ export class Provider implements ProviderInterface {
 
   public async callContract(
     request: Call,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier?: BlockIdentifier
   ): Promise<CallContractResponse> {
     return this.provider.callContract(request, blockIdentifier);
   }
@@ -157,7 +157,7 @@ export class Provider implements ProviderInterface {
   public async getDeclareEstimateFee(
     transaction: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponse> {
     return this.provider.getDeclareEstimateFee(transaction, details, blockIdentifier);
   }
@@ -165,7 +165,7 @@ export class Provider implements ProviderInterface {
   public getDeployAccountEstimateFee(
     transaction: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponse> {
     return this.provider.getDeployAccountEstimateFee(transaction, details, blockIdentifier);
   }

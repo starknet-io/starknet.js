@@ -53,7 +53,7 @@ These are also the default options for the Provider constructor with `network: '
 
 > **Note**
 >
-> `network` arguement should work in most cases. If you want to use the `sequencer` arguement with `baseUrl`, you will not be able to use the `network` field in the object.
+> `network` argument should work in most cases. If you want to use the `sequencer` argument with `baseUrl`, you will not be able to use the `network` field in the object.
 
 ### Methods
 
@@ -387,6 +387,7 @@ Gets the transaction trace from a tx hash.
 - options.**nodeUrl** - Starknet RPC node url
 - options.**headers** - [Optional] custom fetch headers
 - options.**retries** - [Optional] wait for transaction max retries
+- options.**blockIdentifier** - [Optional] default value set to 'latest'
 
 Example:
 

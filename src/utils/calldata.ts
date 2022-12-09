@@ -59,7 +59,7 @@ export class CheckCallData {
   ) {
     // ensure provided method exists
     if (type !== 'DEPLOY') {
-      const invokeableFunctionNames = this.abi
+      const invocableFunctionNames = this.abi
         .filter((abi) => {
           if (abi.type !== 'function') return false;
           const isView = abi.stateMutability === 'view';
@@ -67,8 +67,8 @@ export class CheckCallData {
         })
         .map((abi) => abi.name);
       assert(
-        invokeableFunctionNames.includes(method),
-        `${type === 'INVOKE' ? 'invokeable' : 'viewable'} method not found in abi`
+        invocableFunctionNames.includes(method),
+        `${type === 'INVOKE' ? 'invocable' : 'viewable'} method not found in abi`
       );
     }
 

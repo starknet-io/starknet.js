@@ -1,3 +1,11 @@
+## [4.15.1](https://github.com/0xs34n/starknet.js/compare/v4.15.0...v4.15.1) (2022-12-07)
+
+### Bug Fixes
+
+- add testnet 2 compatibility to test ([b83f35b](https://github.com/0xs34n/starknet.js/commit/b83f35bbfc0c2a6c84318a473ca816cc053f5806))
+- delete only on test ([e13db57](https://github.com/0xs34n/starknet.js/commit/e13db577b7d40073707d78e57f63e65b6472c446))
+- lib chainid test ([e820572](https://github.com/0xs34n/starknet.js/commit/e820572a9eafe732dae3d1bbde5f63279c000be7))
+
 # [4.15.0](https://github.com/0xs34n/starknet.js/compare/v4.14.0...v4.15.0) (2022-12-05)
 
 ### Bug Fixes
