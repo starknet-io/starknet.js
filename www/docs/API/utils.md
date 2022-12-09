@@ -369,6 +369,6 @@ Parse the calldata by using input fields from the abi for that method.
 
 ### validate
 
-`validateMethodAndArgs(type: 'INVOKE' | 'CALL' | 'DEPLOY', method: string, args: Array<any> = []`
+`validateMethodAndArgs(type: 'INVOKE' | 'CALL' | 'DEPLOY', method: string, args: Array<any> = [])`
 
 Validates if all arguments that are passed to the method are corresponding to the ones in the abi.
