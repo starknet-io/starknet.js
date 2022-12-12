@@ -233,7 +233,6 @@ export class RpcProvider implements ProviderInterface {
     throw new Error('RPC does not implement getCode function');
   }
 
-  // Should not be used outside of Account class
   public async getEstimateFee(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
@@ -347,7 +346,6 @@ export class RpcProvider implements ProviderInterface {
     });
   }
 
-  // Should not be used outside of Account class
   public async invokeFunction(
     functionInvocation: Invocation,
     details: InvocationsDetailsWithNonce
