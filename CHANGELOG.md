@@ -1,3 +1,16 @@
+# [4.16.0](https://github.com/0xs34n/starknet.js/compare/v4.15.1...v4.16.0) (2022-12-12)
+
+### Bug Fixes
+
+- blockIdentifier null on call from constructed function ([c88fbf0](https://github.com/0xs34n/starknet.js/commit/c88fbf0cdfc57e1150275a34c15900d6c81802d3))
+- default pathfinder does't have pending block ([4619188](https://github.com/0xs34n/starknet.js/commit/4619188e21e5cc9a811c59bcf2923c4382661635))
+- sequencer defaults, remove defaultProvider default blockIdentifier, spelling, class ([555a9a3](https://github.com/0xs34n/starknet.js/commit/555a9a3982bc1a742776119df5dee5d701209a0d))
+
+### Features
+
+- multi deploy reimplemented ([10e609a](https://github.com/0xs34n/starknet.js/commit/10e609a1af584df65942477b264ad7809b5c70c9))
+- return precalculated address from deploy ([5e40224](https://github.com/0xs34n/starknet.js/commit/5e402246841bdf9117a9ee96799833fc6f68d16b))
+
 ## [4.15.1](https://github.com/0xs34n/starknet.js/compare/v4.15.0...v4.15.1) (2022-12-07)
 
 ### Bug Fixes
