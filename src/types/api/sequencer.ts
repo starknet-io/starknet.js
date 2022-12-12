@@ -365,5 +365,12 @@ export namespace Sequencer {
       REQUEST: any;
       RESPONSE: EstimateFeeResponse;
     };
+    estimate_fee_bulk: {
+      QUERY: {
+        blockIdentifier: BlockIdentifier;
+      };
+      REQUEST: EstimateFeeRequest;
+      RESPONSE: EstimateFeeResponse[];
+    };
   };
 }
