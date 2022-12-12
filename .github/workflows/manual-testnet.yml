@@ -39,11 +39,6 @@ jobs:
     runs-on: ubuntu-latest
     needs: [build]
 
-    services:
-      devnet:
-        image: shardlabs/starknet-devnet:0.4.0-seed0
-        ports:
-          - 5050:5050
     env:
       TEST_PROVIDER_BASE_URL: ${{ matrix.TEST_PROVIDER_BASE_URL }}
       TEST_RPC_URL: ${{ matrix.ENABLE_TEST_RPC_URL && secrets.TEST_RPC_URL }}
