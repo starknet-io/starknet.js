@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # What's Starknet.js ?
 
-Starknet.js is a way to connect your website or your Digital Application (DAPP) to the blockchain-based Starknet network, using javascript/Typescript language.
+Starknet.js is a way to connect your website or your Digital Application (DAPP) to the blockchain-based Starknet network, using Javascript/Typescript language.
 
 ## Overview :
 
@@ -14,7 +14,7 @@ Starknet.js is a way to connect your website or your Digital Application (DAPP) 
 Some important topics that have to be understood:
 - You can connect your DAPP to several networks :
 	- [Starknet mainnet](https://starkscan.co) (linked with [Ethereum network](https://etherscan.io/) ).
-	- [Starknet testnets 1](https://testnet.starkscan.co/) & [2]() (linked with [Goerli network](https://goerli.etherscan.io/) (testnet of Ethereum)).
+	- [Starknet testnet 1](https://testnet.starkscan.co/) & [testnet 2](https://testnet-2.starkscan.co/) (linked with [Goerli network](https://goerli.etherscan.io/) (testnet of Ethereum)).
 	- [Starknet-devnet](https://shard-labs.github.io/starknet-devnet/docs/intro) (your local Starknet network, for developers).  
 
 	and also to some more specific solutions : 
