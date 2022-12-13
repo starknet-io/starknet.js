@@ -1,29 +1,32 @@
-import { BlockNumber, GetBlockResponse, stark } from '../src';
+import { BlockNumber, GetBlockResponse, Provider, stark } from '../src';
 import { toBigInt } from '../src/utils/number';
-import { erc20ClassHash, getERC20DeployPayload, getTestProvider } from './fixtures';
+import { encodeShortString } from '../src/utils/shortString';
+import { compiledErc20, erc20ClassHash, getTestAccount, getTestProvider } from './fixtures';
 
 const { compileCalldata } = stark;
 
-const testProvider = getTestProvider();
+const testProvider = new Provider(getTestProvider());
 
 describe('defaultProvider', () => {
   let exampleTransactionHash: string;
   let erc20ContractAddress: string;
-
   let exampleBlock: GetBlockResponse;
   let exampleBlockNumber: BlockNumber;
   let exampleBlockHash: string;
   const wallet = stark.randomAddress();
+  const account = getTestAccount(testProvider);
 
   beforeAll(async () => {
-    const erc20DeployPayload = getERC20DeployPayload(wallet);
+    expect(testProvider).toBeInstanceOf(Provider);
 
-    const { contract_address, transaction_hash } = await testProvider.deployContract(
-      erc20DeployPayload
-    );
-    await testProvider.waitForTransaction(transaction_hash);
-    exampleTransactionHash = transaction_hash;
-    erc20ContractAddress = contract_address;
+    const { deploy } = await account.declareDeploy({
+      contract: compiledErc20,
+      classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+      constructorCalldata: [encodeShortString('Token'), encodeShortString('ERC20'), wallet],
+    });
+
+    exampleTransactionHash = deploy.transaction_hash;
+    erc20ContractAddress = deploy.contract_address;
 
     exampleBlock = await testProvider.getBlock('latest');
     exampleBlockHash = exampleBlock.block_hash;
@@ -31,7 +34,7 @@ describe('defaultProvider', () => {
   });
 
   describe('endpoints', () => {
-    test('deployContract()', () => {
+    test('declareDeploy()', () => {
       expect(erc20ContractAddress).toBeTruthy();
       expect(exampleTransactionHash).toBeTruthy();
     });
@@ -74,9 +77,9 @@ describe('defaultProvider', () => {
       });
     });
 
-    test('getNonce()', async () => {
-      const nonce = await testProvider.getNonce(erc20ContractAddress);
-      return expect(nonce).toEqual('0x0');
+    test('getNonceForAddress()', async () => {
+      const nonce = await testProvider.getNonceForAddress(erc20ContractAddress);
+      return expect(toBigInt(nonce)).toEqual(toBigInt('0x0'));
     });
 
     test('getClassAt(contractAddress, blockNumber="latest")', async () => {

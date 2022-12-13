@@ -53,7 +53,7 @@ These are also the default options for the Provider constructor with `network: '
 
 > **Note**
 >
-> `network` arguement should work in most cases. If you want to use the `sequencer` arguement with `baseUrl`, you will not be able to use the `network` field in the object.
+> `network` argument should work in most cases. If you want to use the `sequencer` argument with `baseUrl`, you will not be able to use the `network` field in the object.
 
 ### Methods
 
@@ -141,9 +141,9 @@ Estimate fee for invoke transaction.
 
 <hr/>
 
-provider.**getNonce**(contractAddress, blockIdentifier) => _Promise < BigNumberish >_
+provider.**getNonceForAddress**(contractAddress, blockIdentifier) => _Promise < BigNumberish >_
 
-Gets the nonce of the provided contractAddress.
+Gets the nonce of the provided contractAddress. This was renamed from `getNonce` to `getNonceForAddress` to avoid confusion when inheriting an Account from the Provider class.
 
 <hr/>
 
@@ -196,21 +196,6 @@ Gets the transaction information from a tx hash.
 
 <hr/>
 
-provider.**deployContract**(payload [ , abi ]) => _Promise < DeployContractResponse >_
-
-Deploys a contract on Starknet.
-
-###### _DeployContractResponse_
-
-```typescript
-{
-  transaction_hash: string;
-  contract_address: string;
-};
-```
-
-<hr/>
-
 provider.**declareContract**(transaction, details) => _Promise < DeclareContractResponse >_
 
 Declare a contract on Starknet.
@@ -242,7 +227,9 @@ Estimate fee for declare transaction.
 
 <hr/>
 
-provider.**waitForTransaction**(txHash [ , retryInterval]) => _Promise < void >_
+### waitForTransaction
+
+provider.**waitForTransaction**(txHash [ , retryInterval]) => _Promise < GetTransactionReceiptResponse >_
 
 Wait for the transaction to be accepted on L2 or L1.
 
@@ -400,6 +387,7 @@ Gets the transaction trace from a tx hash.
 - options.**nodeUrl** - Starknet RPC node url
 - options.**headers** - [Optional] custom fetch headers
 - options.**retries** - [Optional] wait for transaction max retries
+- options.**blockIdentifier** - [Optional] default value set to 'latest'
 
 Example:
 
@@ -473,12 +461,6 @@ Gets the transaction count from a block.
 provider.**getBlockNumber**() => _Promise < number >_
 
 Gets the latest block number.
-
-<hr/>
-
-provider.**getNonce**(contractAddress, blockIdentifier) => _Promise < BigNumberish >_
-
-Gets the nonce of the provided contractAddress
 
 <hr/>
 
@@ -585,17 +567,6 @@ provider.**declareContract**(DeclareContractTransaction, details) => _Promise < 
 ```typescript
   transaction_hash: string;
   class_hash: string;
-```
-
-<hr/>
-
-provider.**deployContract**(contract, constructorCalldata, addressSalt) => _Promise < DeployContractResponse >_
-
-###### _DeployContractResponse_
-
-```typescript
-  contract_address: string;
-  transaction_hash: string;
 ```
 
 <hr/>

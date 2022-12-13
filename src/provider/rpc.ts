@@ -3,7 +3,8 @@ import {
   Call,
   CallContractResponse,
   DeclareContractResponse,
-  DeployContractPayload,
+  DeclareContractTransaction,
+  DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
@@ -12,20 +13,15 @@ import {
   Invocation,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  RPC,
 } from '../types';
-import { RPC } from '../types/api';
-import {
-  DeclareContractTransaction,
-  DeployAccountContractTransaction,
-  InvocationsDetails,
-} from '../types/lib';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
 import { BigNumberish, bigNumberishArrayToHexadecimalStringArray, toHex } from '../utils/number';
-import { parseCalldata, parseContract, wait } from '../utils/provider';
+import { parseCalldata, wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
-import { randomAddress, signatureToDecimalArray } from '../utils/stark';
+import { signatureToDecimalArray } from '../utils/stark';
 import { ProviderInterface } from './interface';
 import { Block, BlockIdentifier } from './utils';
 
@@ -33,12 +29,20 @@ export type RpcProviderOptions = {
   nodeUrl: string;
   retries?: number;
   headers?: object;
+  blockIdentifier?: BlockIdentifier;
+};
+
+// Default Pathfinder disabled pending block https://github.com/eqlabs/pathfinder/blob/main/README.md
+// Note that pending support is disabled by default and must be enabled by setting poll-pending=true in the configuration options.
+const defaultOptions = {
+  headers: { 'Content-Type': 'application/json' },
+  blockIdentifier: 'latest',
+  retries: 200,
 };
 
 export class RpcProvider implements ProviderInterface {
   public nodeUrl: string;
 
-  // from interface
   public chainId!: StarknetChainId;
 
   public headers: object;
@@ -47,11 +51,14 @@ export class RpcProvider implements ProviderInterface {
 
   private retries: number;
 
+  private blockIdentifier: BlockIdentifier;
+
   constructor(optionsOrProvider: RpcProviderOptions) {
-    const { nodeUrl, retries, headers } = optionsOrProvider;
+    const { nodeUrl, retries, headers, blockIdentifier } = optionsOrProvider;
     this.nodeUrl = nodeUrl;
-    this.retries = retries || 200;
-    this.headers = { 'Content-Type': 'application/json', ...headers };
+    this.retries = retries || defaultOptions.retries;
+    this.headers = { ...defaultOptions.headers, ...headers };
+    this.blockIdentifier = blockIdentifier || defaultOptions.blockIdentifier;
 
     this.getChainId().then((chainId) => {
       this.chainId = chainId;
@@ -94,7 +101,9 @@ export class RpcProvider implements ProviderInterface {
   }
 
   // Methods from Interface
-  public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
+  public async getBlock(
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<GetBlockResponse> {
     return this.getBlockWithTxHashes(blockIdentifier).then(
       this.responseParser.parseGetBlockResponse
     );
@@ -105,14 +114,14 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getBlockWithTxHashes(
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<RPC.GetBlockWithTxHashesResponse> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getBlockWithTxHashes', { block_id });
   }
 
   public async getBlockWithTxs(
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<RPC.GetBlockWithTxs> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getBlockWithTxs', { block_id });
@@ -120,7 +129,7 @@ export class RpcProvider implements ProviderInterface {
 
   public async getClassHashAt(
     contractAddress: RPC.ContractAddress,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<RPC.Felt> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getClassHashAt', {
@@ -129,9 +138,9 @@ export class RpcProvider implements ProviderInterface {
     });
   }
 
-  public async getNonce(
+  public async getNonceForAddress(
     contractAddress: string,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<RPC.Nonce> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getNonce', {
@@ -149,7 +158,7 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getStateUpdate(
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<RPC.StateUpdate> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getStateUpdate', { block_id });
@@ -158,7 +167,7 @@ export class RpcProvider implements ProviderInterface {
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<BigNumberish> {
     const parsedKey = toHex(key);
     const block_id = new Block(blockIdentifier).identifier;
@@ -196,7 +205,7 @@ export class RpcProvider implements ProviderInterface {
 
   public async getClass(
     classHash: RPC.Felt,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<RPC.ContractClass> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getClass', { class_hash: classHash, block_id });
@@ -204,7 +213,7 @@ export class RpcProvider implements ProviderInterface {
 
   public async getClassAt(
     contractAddress: string,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<RPC.ContractClass> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getClassAt', {
@@ -223,7 +232,7 @@ export class RpcProvider implements ProviderInterface {
   public async getEstimateFee(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<EstimateFeeResponse> {
     return this.getInvokeEstimateFee(invocation, invocationDetails, blockIdentifier);
   }
@@ -231,7 +240,7 @@ export class RpcProvider implements ProviderInterface {
   public async getInvokeEstimateFee(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<EstimateFeeResponse> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_estimateFee', {
@@ -253,7 +262,7 @@ export class RpcProvider implements ProviderInterface {
   public async getDeclareEstimateFee(
     { senderAddress, contractDefinition, signature }: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<EstimateFeeResponse> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_estimateFee', {
@@ -277,7 +286,7 @@ export class RpcProvider implements ProviderInterface {
   public async getDeployAccountEstimateFee(
     { classHash, constructorCalldata, addressSalt, signature }: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<EstimateFeeResponse> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_estimateFee', {
@@ -313,29 +322,6 @@ export class RpcProvider implements ProviderInterface {
         signature: signatureToDecimalArray(signature),
         sender_address: senderAddress,
         nonce: toHex(details.nonce),
-      },
-    });
-  }
-
-  /**
-   * @deprecated This method won't be supported, use Account.deploy instead
-   */
-  public async deployContract(
-    { contract, constructorCalldata, addressSalt }: DeployContractPayload,
-    details?: InvocationsDetails
-  ): Promise<DeployContractResponse> {
-    const contractDefinition = parseContract(contract);
-    return this.fetchEndpoint('starknet_addDeployTransaction', {
-      deploy_transaction: {
-        contract_address_salt: addressSalt ?? randomAddress(),
-        constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata ?? []),
-        contract_class: {
-          program: contractDefinition.program,
-          entry_points_by_type: contractDefinition.entry_points_by_type,
-          abi: contractDefinition.abi,
-        },
-        type: 'DEPLOY',
-        version: toHex(details?.version || 0),
       },
     });
   }
@@ -376,7 +362,7 @@ export class RpcProvider implements ProviderInterface {
   // Methods from Interface
   public async callContract(
     call: Call,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<CallContractResponse> {
     const block_id = new Block(blockIdentifier).identifier;
     const result = await this.fetchEndpoint('starknet_call', {
@@ -399,31 +385,34 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_traceBlockTransactions', { block_hash: blockHash });
   }
 
-  public async waitForTransaction(txHash: string, retryInterval: number = 8000) {
+  public async waitForTransaction(
+    txHash: string,
+    retryInterval: number = 8000,
+    successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING']
+  ) {
+    const errorStates = ['REJECTED', 'NOT_RECEIVED'];
     let { retries } = this;
     let onchain = false;
+    let txReceipt: any = {};
 
     while (!onchain) {
-      const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'];
-      const errorStates = ['REJECTED', 'NOT_RECEIVED'];
-
       // eslint-disable-next-line no-await-in-loop
       await wait(retryInterval);
       try {
         // eslint-disable-next-line no-await-in-loop
-        const res = await this.getTransactionReceipt(txHash);
+        txReceipt = await this.getTransactionReceipt(txHash);
 
-        if (!('status' in res)) {
+        if (!('status' in txReceipt)) {
           const error = new Error('pending transaction');
           throw error;
         }
 
-        if (res.status && successStates.includes(res.status)) {
+        if (txReceipt.status && successStates.includes(txReceipt.status)) {
           onchain = true;
-        } else if (res.status && errorStates.includes(res.status)) {
-          const message = res.status;
+        } else if (txReceipt.status && errorStates.includes(txReceipt.status)) {
+          const message = txReceipt.status;
           const error = new Error(message) as Error & { response: any };
-          error.response = res;
+          error.response = txReceipt;
           throw error;
         }
       } catch (error: unknown) {
@@ -432,7 +421,7 @@ export class RpcProvider implements ProviderInterface {
         }
 
         if (retries === 0) {
-          throw new Error('waitForTransaction timedout with retries');
+          throw new Error(`waitForTransaction timed-out with retries ${this.retries}`);
         }
       }
 
@@ -440,6 +429,7 @@ export class RpcProvider implements ProviderInterface {
     }
 
     await wait(retryInterval);
+    return txReceipt;
   }
 
   /**
@@ -450,7 +440,7 @@ export class RpcProvider implements ProviderInterface {
    * @returns Number of transactions
    */
   public async getTransactionCount(
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<RPC.GetTransactionCountResponse> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getBlockTransactionCount', { block_id });

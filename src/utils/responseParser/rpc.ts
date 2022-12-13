@@ -7,8 +7,8 @@ import {
   EstimateFeeResponse,
   GetBlockResponse,
   GetTransactionResponse,
+  RPC,
 } from '../../types';
-import { RPC } from '../../types/api';
 import { toBigInt } from '../number';
 import { ResponseParser } from '.';
 

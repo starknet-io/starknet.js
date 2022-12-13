@@ -34,6 +34,7 @@ export function txIdentifier(txHash?: BigNumberish, txId?: BigNumberish): string
 // null appends nothing to the request url
 
 export type BlockIdentifier = BlockNumber | BigNumberish;
+export const validBlockTags = ['latest', 'pending'];
 
 export class Block {
   hash: BlockIdentifier = null;
@@ -42,22 +43,26 @@ export class Block {
 
   tag: BlockIdentifier = null;
 
-  private setIdentifier: (_identifier: BlockIdentifier) => void;
+  private setIdentifier(__identifier: BlockIdentifier) {
+    if (typeof __identifier === 'string' && isHex(__identifier)) {
+      this.hash = __identifier;
+    } else if (typeof __identifier === 'bigint') {
+      this.hash = toHex(__identifier);
+    } else if (typeof __identifier === 'number') {
+      this.number = __identifier;
+    } else if (typeof __identifier === 'string' && validBlockTags.includes(__identifier)) {
+      this.tag = __identifier;
+    } else {
+      // default
+      this.tag = 'pending';
+    }
+  }
 
   constructor(_identifier: BlockIdentifier) {
-    this.setIdentifier = function (__identifier: BlockIdentifier) {
-      if (typeof __identifier === 'string' && isHex(__identifier)) {
-        this.hash = __identifier;
-      } else if (typeof __identifier === 'number') {
-        this.number = __identifier;
-      } else {
-        this.tag = __identifier;
-      }
-    };
-
     this.setIdentifier(_identifier);
   }
 
+  // TODO: fix any
   get queryIdentifier(): any {
     if (this.number !== null) {
       return `blockNumber=${this.number}`;
@@ -70,6 +75,7 @@ export class Block {
     return `blockNumber=${this.tag}`;
   }
 
+  // TODO: fix any
   get identifier(): any {
     if (this.number !== null) {
       return { block_number: this.number };

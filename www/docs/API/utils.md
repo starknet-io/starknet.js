@@ -136,6 +136,14 @@ Converts BN to hex.
 
 Returns a string.
 
+### cleanHex
+
+`cleanHex(hex: string): string`
+
+Remove leading zeroes and lowercase hex string after '0x'
+
+`0x01AFF` -> `0x1aff`
+
 ### hexToDecimalString
 
 `hexToDecimalString(hex: string): string`

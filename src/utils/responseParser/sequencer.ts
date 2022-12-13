@@ -11,8 +11,8 @@ import {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   InvokeFunctionResponse,
+  Sequencer,
 } from '../../types';
-import { Sequencer } from '../../types/api';
 import { toBigInt } from '../number';
 import { parseSignature } from '../stark';
 import { ResponseParser } from '.';

@@ -1,46 +1,35 @@
 import { Contract, Provider, SequencerProvider, stark } from '../src';
 import { toBigInt } from '../src/utils/number';
+import { encodeShortString } from '../src/utils/shortString';
 import {
-  IS_SEQUENCER_GOERLI,
   compiledErc20,
   compiledL1L2,
+  describeIfDevnet,
   describeIfNotDevnet,
   describeIfSequencer,
-  getERC20DeployPayload,
+  getTestAccount,
   getTestProvider,
 } from './fixtures';
 
-// Run only if Devnet Sequencer
 describeIfSequencer('SequencerProvider', () => {
-  let sequencerProvider: SequencerProvider;
+  const sequencerProvider = getTestProvider() as SequencerProvider;
+  const account = getTestAccount(sequencerProvider);
   let customSequencerProvider: Provider;
   let exampleContractAddress: string;
-
-  beforeAll(async () => {
-    sequencerProvider = getTestProvider() as SequencerProvider;
-    customSequencerProvider = new Provider({
-      sequencer: {
-        baseUrl: 'http://127.0.0.1:5050/',
-        feederGatewayUrl: 'feeder_gateway',
-        gatewayUrl: 'gateway',
-      }, // Similar to arguements used in docs
-    });
-  });
 
   describe('Gateway specific methods', () => {
     let exampleTransactionHash: string;
     const wallet = stark.randomAddress();
 
     beforeAll(async () => {
-      const erc20DeployPayload = getERC20DeployPayload(wallet);
+      const { deploy } = await account.declareDeploy({
+        contract: compiledErc20,
+        classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+        constructorCalldata: [encodeShortString('Token'), encodeShortString('ERC20'), wallet],
+      });
 
-      const { contract_address, transaction_hash } = await sequencerProvider.deployContract(
-        erc20DeployPayload
-      );
-
-      await sequencerProvider.waitForTransaction(transaction_hash);
-      exampleTransactionHash = transaction_hash;
-      exampleContractAddress = contract_address;
+      exampleTransactionHash = deploy.transaction_hash;
+      exampleContractAddress = deploy.contract_address;
     });
 
     test('getTransactionStatus()', async () => {
@@ -69,43 +58,16 @@ describeIfSequencer('SequencerProvider', () => {
     });
   });
 
-  describe('Test calls with Custom Sequencer Provider', () => {
-    let erc20: Contract;
-    const wallet = stark.randomAddress();
-
-    beforeAll(async () => {
-      const erc20DeployPayload = getERC20DeployPayload(wallet);
-
-      const { contract_address, transaction_hash } = await customSequencerProvider.deployContract(
-        erc20DeployPayload
-      );
-
-      await customSequencerProvider.waitForTransaction(transaction_hash);
-      erc20 = new Contract(compiledErc20.abi, contract_address, customSequencerProvider);
-    });
-
-    test('Check ERC20 balance using Custom Sequencer Provider', async () => {
-      const result = await erc20.balanceOf(wallet);
-      const [res] = result;
-      expect(res.low).toStrictEqual(toBigInt(1000));
-      expect(res).toStrictEqual(result.balance);
-    });
-  });
-
   describe('Test Estimate message fee', () => {
     const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165A0';
     let l1l2ContractAddress: string;
 
     beforeAll(async () => {
-      if (IS_SEQUENCER_GOERLI) {
-        l1l2ContractAddress = '0x2863141e0d9a74e9b484c1f5b1e3a2f6cbb6b84df8233c7c1cbe31334d9aed8';
-      } else {
-        const { transaction_hash, contract_address } = await sequencerProvider.deployContract({
-          contract: compiledL1L2,
-        });
-        await sequencerProvider.waitForTransaction(transaction_hash);
-        l1l2ContractAddress = contract_address;
-      }
+      const { deploy } = await account.declareDeploy({
+        contract: compiledL1L2,
+        classHash: '0x028d1671fb74ecb54d848d463cefccffaef6df3ae40db52130e19fe8299a7b43',
+      });
+      l1l2ContractAddress = deploy.contract_address;
     });
 
     test('estimate message fee', async () => {
@@ -126,6 +88,36 @@ describeIfSequencer('SequencerProvider', () => {
           unit: 'wei',
         })
       );
+    });
+  });
+
+  describeIfDevnet('Test calls with Custom Devnet Sequencer Provider', () => {
+    let erc20: Contract;
+    const wallet = stark.randomAddress();
+
+    beforeAll(async () => {
+      customSequencerProvider = new Provider({
+        sequencer: {
+          baseUrl: 'http://127.0.0.1:5050/',
+          feederGatewayUrl: 'feeder_gateway',
+          gatewayUrl: 'gateway',
+        },
+      });
+      const accountCustom = getTestAccount(customSequencerProvider);
+      const { deploy } = await accountCustom.declareDeploy({
+        contract: compiledErc20,
+        classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+        constructorCalldata: [encodeShortString('Token'), encodeShortString('ERC20'), wallet],
+      });
+
+      erc20 = new Contract(compiledErc20.abi, deploy.contract_address, customSequencerProvider);
+    });
+
+    test('Check ERC20 balance using Custom Sequencer Provider', async () => {
+      const result = await erc20.balanceOf(wallet);
+      const [res] = result;
+      expect(res.low).toStrictEqual(toBigInt(1000));
+      expect(res).toStrictEqual(result.balance);
     });
   });
 });

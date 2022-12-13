@@ -12,7 +12,7 @@ export function toBigInt(value: BigNumberish): bigint {
   return BigInt(value);
 }
 
-export function isBigInt(value: any): boolean {
+export function isBigInt(value: any): value is bigint {
   return typeof value === 'bigint';
 }
 
@@ -30,6 +30,12 @@ export function toFelt(num: BigNumberish): string {
   }
   return BigInt(num).toString();
 }
+
+/**
+ * Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
+ * @param hex string
+ */
+export const cleanHex = (hex: string) => hex.toLowerCase().replace(/^(0x)0+/, '$1');
 
 /*
  Asserts input is equal to or greater then lowerBound and lower then upperBound.

@@ -5,21 +5,23 @@ import { BlockIdentifier } from '../provider/utils';
 import { SignerInterface } from '../signer';
 import {
   Abi,
+  AllowArray,
   Call,
+  DeclareContractPayload,
   DeclareContractResponse,
+  DeclareDeployContractPayload,
+  DeclareDeployUDCResponse,
+  DeployAccountContractPayload,
   DeployContractResponse,
+  DeployContractUDCResponse,
   EstimateFeeAction,
   EstimateFeeDetails,
   EstimateFeeResponse,
   InvocationsDetails,
   InvokeFunctionResponse,
-} from '../types';
-import {
-  AllowArray,
-  DeclareContractPayload,
-  DeployAccountContractPayload,
+  MultiDeployContractResponse,
   UniversalDeployerContractPayload,
-} from '../types/lib';
+} from '../types';
 import { BigNumberish } from '../utils/number';
 import { TypedData } from '../utils/typedData/types';
 
@@ -96,7 +98,6 @@ export abstract class AccountInterface extends ProviderInterface {
    * - salt: address salt
    * - unique: bool if true ensure unique salt
    * - calldata: constructor calldata
-   * - additionalCalls - optional additional calls array to support multicall
    * 
    * @param transactionsDetail Invocation Details containing:
    *  - optional nonce
@@ -104,7 +105,7 @@ export abstract class AccountInterface extends ProviderInterface {
    *  - optional maxFee
    */
   public abstract estimateDeployFee(
-    deployContractPayload: UniversalDeployerContractPayload,
+    deployContractPayload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
     transactionsDetail?: InvocationsDetails
   ): Promise<EstimateFeeResponse>;
 
@@ -132,7 +133,6 @@ export abstract class AccountInterface extends ProviderInterface {
    * @param contractPayload transaction payload to be deployed containing:
   - contract: compiled contract code
   - classHash: computed class hash of compiled contract
-  - signature
    * @param transactionsDetail Invocation Details containing:
   - optional nonce
   - optional version
@@ -145,24 +145,88 @@ export abstract class AccountInterface extends ProviderInterface {
   ): Promise<DeclareContractResponse>;
 
   /**
-   * Deploys a given compiled contract (json) to starknet using Universal Deployer Contract (UDC)
-   * This is different from the normal DEPLOY transaction as it goes through the Universal Deployer Contract (UDC)
+   * Deploys a declared contract to starknet - using Universal Deployer Contract (UDC)
+   * support multicall
    *
-   * @param deployContractPayload containing
+   * @param payload -
    * - classHash: computed class hash of compiled contract
-   * - salt: address salt
-   * - unique: bool if true ensure unique salt
-   * - calldata: constructor calldata
-   * - additionalCalls - optional additional calls array to support multicall
-   * @param transactionsDetail Invocation Details containing:
-   *  - optional nonce
-   *  - optional version
-   *  - optional maxFee
+   * - [constructorCalldata] contract constructor calldata
+   * - [salt=pseudorandom] deploy address salt
+   * - [unique=true] ensure unique salt
+   * @param details -
+   * - [nonce=getNonce]
+   * - [version=transactionVersion]
+   * - [maxFee=getSuggestedMaxFee]
+   * @returns
+   * - contract_address[]
+   * - transaction_hash
    */
   public abstract deploy(
-    deployContractPayload: UniversalDeployerContractPayload,
-    transactionsDetail?: InvocationsDetails
-  ): Promise<InvokeFunctionResponse>;
+    payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
+    details?: InvocationsDetails | undefined
+  ): Promise<MultiDeployContractResponse>;
+
+  /**
+   * Simplify deploy simulating old DeployContract with same response + UDC specific response
+   * Internal wait for L2 transaction, support multicall
+   *
+   * @param payload -
+   * - classHash: computed class hash of compiled contract
+   * - [constructorCalldata] contract constructor calldata
+   * - [salt=pseudorandom] deploy address salt
+   * - [unique=true] ensure unique salt
+   * @param details -
+   * - [nonce=getNonce]
+   * - [version=transactionVersion]
+   * - [maxFee=getSuggestedMaxFee]
+   * @returns
+   *  - contract_address
+   *  - transaction_hash
+   *  - address
+   *  - deployer
+   *  - unique
+   *  - classHash
+   *  - calldata_len
+   *  - calldata
+   *  - salt
+   */
+  public abstract deployContract(
+    payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
+    details?: InvocationsDetails | undefined
+  ): Promise<DeployContractUDCResponse>;
+
+  /**
+   * Declares and Deploy a given compiled contract (json) to starknet using UDC
+   * Internal wait for L2 transaction, do not support multicall
+   *
+   * @param  containing
+   * - contract: compiled contract code
+   * - classHash: computed class hash of compiled contract
+   * - [constructorCalldata] contract constructor calldata
+   * - [salt=pseudorandom] deploy address salt
+   * - [unique=true] ensure unique salt
+   * @param details
+   * - [nonce=getNonce]
+   * - [version=transactionVersion]
+   * - [maxFee=getSuggestedMaxFee]
+   * @returns
+   * - declare
+   *    - transaction_hash
+   * - deploy
+   *    - contract_address
+   *    - transaction_hash
+   *    - address
+   *    - deployer
+   *    - unique
+   *    - classHash
+   *    - calldata_len
+   *    - calldata
+   *    - salt
+   */
+  public abstract declareDeploy(
+    payload: DeclareDeployContractPayload,
+    details?: InvocationsDetails | undefined
+  ): Promise<DeclareDeployUDCResponse>;
 
   /**
    * Deploy the account on Starknet

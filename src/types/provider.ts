@@ -106,11 +106,6 @@ export interface InvokeFunctionResponse {
   transaction_hash: string;
 }
 
-export interface DeployContractResponse {
-  contract_address: string;
-  transaction_hash: string;
-}
-
 export interface DeclareContractResponse {
   transaction_hash: string;
   class_hash: string;

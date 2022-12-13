@@ -4,7 +4,8 @@ import {
   CallContractResponse,
   ContractClass,
   DeclareContractResponse,
-  DeployContractPayload,
+  DeclareContractTransaction,
+  DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
@@ -14,12 +15,8 @@ import {
   Invocation,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  Status,
 } from '../types';
-import {
-  DeclareContractTransaction,
-  DeployAccountContractTransaction,
-  InvocationsDetails,
-} from '../types/lib';
 import { BigNumberish } from '../utils/number';
 import { ProviderInterface } from './interface';
 import { RpcProvider, RpcProviderOptions } from './rpc';
@@ -35,13 +32,23 @@ export class Provider implements ProviderInterface {
   private provider!: ProviderInterface;
 
   constructor(providerOrOptions?: ProviderOptions | ProviderInterface) {
-    if (providerOrOptions && 'chainId' in providerOrOptions) {
-      this.provider = providerOrOptions;
-    } else if (providerOrOptions?.rpc) {
-      this.provider = new RpcProvider(providerOrOptions.rpc);
-    } else if (providerOrOptions?.sequencer) {
-      this.provider = new SequencerProvider(providerOrOptions.sequencer);
+    if (providerOrOptions instanceof Provider) {
+      // providerOrOptions is Provider
+      this.provider = providerOrOptions.provider;
+    } else if (
+      providerOrOptions instanceof RpcProvider ||
+      providerOrOptions instanceof SequencerProvider
+    ) {
+      // providerOrOptions is SequencerProvider or RpcProvider
+      this.provider = <ProviderInterface>providerOrOptions;
+    } else if (providerOrOptions && 'rpc' in providerOrOptions) {
+      // providerOrOptions is rpc option
+      this.provider = new RpcProvider(<RpcProviderOptions>providerOrOptions.rpc);
+    } else if (providerOrOptions && 'sequencer' in providerOrOptions) {
+      // providerOrOptions is sequencer option
+      this.provider = new SequencerProvider(<SequencerProviderOptions>providerOrOptions.sequencer);
     } else {
+      // providerOrOptions is none, create SequencerProvider as default
       this.provider = new SequencerProvider();
     }
   }
@@ -54,20 +61,20 @@ export class Provider implements ProviderInterface {
     return this.provider.getChainId();
   }
 
-  public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
+  public async getBlock(blockIdentifier: BlockIdentifier): Promise<GetBlockResponse> {
     return this.provider.getBlock(blockIdentifier);
   }
 
   public async getClassAt(
     contractAddress: string,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier?: BlockIdentifier
   ): Promise<ContractClass> {
     return this.provider.getClassAt(contractAddress, blockIdentifier);
   }
 
   public async getClassHashAt(
     contractAddress: string,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier
   ): Promise<string> {
     return this.provider.getClassHashAt(contractAddress, blockIdentifier);
   }
@@ -79,7 +86,7 @@ export class Provider implements ProviderInterface {
   public async getEstimateFee(
     invocationWithTxType: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier
   ): Promise<EstimateFeeResponse> {
     return this.provider.getEstimateFee(invocationWithTxType, invocationDetails, blockIdentifier);
   }
@@ -87,7 +94,7 @@ export class Provider implements ProviderInterface {
   public async getInvokeEstimateFee(
     invocationWithTxType: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponse> {
     return this.provider.getInvokeEstimateFee(
       invocationWithTxType,
@@ -96,17 +103,17 @@ export class Provider implements ProviderInterface {
     );
   }
 
-  public async getNonce(
+  public async getNonceForAddress(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
   ): Promise<BigNumberish> {
-    return this.provider.getNonce(contractAddress, blockIdentifier);
+    return this.provider.getNonceForAddress(contractAddress, blockIdentifier);
   }
 
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier?: BlockIdentifier
   ): Promise<BigNumberish> {
     return this.provider.getStorageAt(contractAddress, key, blockIdentifier);
   }
@@ -121,7 +128,7 @@ export class Provider implements ProviderInterface {
 
   public async callContract(
     request: Call,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier?: BlockIdentifier
   ): Promise<CallContractResponse> {
     return this.provider.callContract(request, blockIdentifier);
   }
@@ -131,16 +138,6 @@ export class Provider implements ProviderInterface {
     details: InvocationsDetailsWithNonce
   ): Promise<InvokeFunctionResponse> {
     return this.provider.invokeFunction(functionInvocation, details);
-  }
-
-  /**
-   * @deprecated This method won't be supported, use Account.deploy instead
-   */
-  public async deployContract(
-    payload: DeployContractPayload,
-    details: InvocationsDetails
-  ): Promise<DeployContractResponse> {
-    return this.provider.deployContract(payload, details);
   }
 
   public async deployAccountContract(
@@ -160,7 +157,7 @@ export class Provider implements ProviderInterface {
   public async getDeclareEstimateFee(
     transaction: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponse> {
     return this.provider.getDeclareEstimateFee(transaction, details, blockIdentifier);
   }
@@ -168,7 +165,7 @@ export class Provider implements ProviderInterface {
   public getDeployAccountEstimateFee(
     transaction: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponse> {
     return this.provider.getDeployAccountEstimateFee(transaction, details, blockIdentifier);
   }
@@ -180,7 +177,11 @@ export class Provider implements ProviderInterface {
     return this.provider.getCode(contractAddress, blockIdentifier);
   }
 
-  public async waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<void> {
-    return this.provider.waitForTransaction(txHash, retryInterval);
+  public async waitForTransaction(
+    txHash: BigNumberish,
+    retryInterval?: number,
+    successStates?: Array<Status>
+  ): Promise<GetTransactionReceiptResponse> {
+    return this.provider.waitForTransaction(txHash, retryInterval, successStates);
   }
 }
