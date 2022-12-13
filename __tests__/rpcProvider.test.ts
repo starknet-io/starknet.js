@@ -128,9 +128,5 @@ describeIfRpc('RPCProvider', () => {
       expect(contractClass).toHaveProperty('program');
       expect(contractClass).toHaveProperty('entry_points_by_type');
     });
-
-    test.todo('getEstimateFee');
-
-    test.todo('invokeFunction');
   });
 });
