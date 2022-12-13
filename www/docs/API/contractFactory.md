@@ -38,8 +38,8 @@ Return an instance of a _Contract_ attached to address. This is the same as usin
 
 ### deploy()
 
-contractFactory.**deploy**( constructorCalldata, addressSalt ) ⇒ _Promise < Contract >_
+contractFactory.**deploy**( args, addressSalt ) ⇒ _Promise < Contract >_
 
-Uses the provider to deploy the Contract with _constructorCalldata_ passed into the constructor and returns a _Contract_ which is attached to the address where this contract will be deployed.
+Uses the provider to deploy the Contract with _args_ passed into the constructor and returns a _Contract_ which is attached to the address where this contract will be deployed.
 
 The transaction hash can be found at _contract.deployTransactionHash_, and no interactions should be made until the transaction is resolved.
