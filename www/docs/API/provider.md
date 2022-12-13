@@ -57,13 +57,15 @@ These are also the default options for the Provider constructor with `network: '
 
 ### Methods
 
-<hr/>
+#### getChainId()
 
 provider.**getChainId**() => _Promise < StarknetChainId >_
 
 Returns the chain Id for the current network.
 
-<hr/>
+---
+
+#### callContract()
 
 provider.**callContract**(call [ , blockIdentifier ]) => _Promise < CallContractResponse >_
 
@@ -83,7 +85,9 @@ The call object structure:
 }
 ```
 
-<hr/>
+---
+
+#### getBlock()
 
 provider.**getBlock**(blockIdentifier) => _Promise < GetBlockResponse >_
 
@@ -107,7 +111,9 @@ Gets the block information.
 }
 ```
 
-<hr/>
+---
+
+#### getClassAt()
 
 provider.**getClassAt**(contractAddress, blockIdentifier) => _Promise < ContractClass >_
 
@@ -123,7 +129,9 @@ Gets the contract class of the deployed contract.
 }
 ```
 
-<hr/>
+---
+
+#### getInvokeEstimateFee()
 
 provider.**getInvokeEstimateFee**(invocationWithTxType, invocationDetails, blockIdentifier) => _Promise < EstimateFeeResponse >_
 
@@ -139,19 +147,25 @@ Estimate fee for invoke transaction.
 }
 ```
 
-<hr/>
+---
+
+#### getNonceForAddress()
 
 provider.**getNonceForAddress**(contractAddress, blockIdentifier) => _Promise < BigNumberish >_
 
 Gets the nonce of the provided contractAddress. This was renamed from `getNonce` to `getNonceForAddress` to avoid confusion when inheriting an Account from the Provider class.
 
-<hr/>
+---
+
+#### getStorageAt()
 
 provider.**getStorageAt**(contractAddress, key, blockIdentifier) => _Promise < string >_
 
 Gets the contract's storage variable at a specific key.
 
-<hr/>
+---
+
+#### getTransactionReceipt()
 
 provider.**getTransactionReceipt**(txHash) => _Promise < GetTransactionReceiptResponse >_
 
@@ -171,7 +185,9 @@ Gets the status of a transaction.
 }
 ```
 
-<hr/>
+---
+
+#### getTransaction()
 
 provider.**getTransaction**(txHash) => _Promise < GetTransactionResponse >_
 
@@ -194,7 +210,9 @@ Gets the transaction information from a tx hash.
 }
 ```
 
-<hr/>
+---
+
+#### declareContract()
 
 provider.**declareContract**(transaction, details) => _Promise < DeclareContractResponse >_
 
@@ -209,7 +227,9 @@ Declare a contract on Starknet.
 };
 ```
 
-<hr/>
+---
+
+#### getDeclareEstimateFee()
 
 provider.**getDeclareEstimateFee**(transaction, details, blockIdentifier) => _Promise < EstimateFeeResponse >_
 
@@ -225,9 +245,9 @@ Estimate fee for declare transaction.
 };
 ```
 
-<hr/>
+---
 
-### waitForTransaction
+#### waitForTransaction()
 
 provider.**waitForTransaction**(txHash [ , retryInterval]) => _Promise < GetTransactionReceiptResponse >_
 
@@ -265,7 +285,9 @@ const provider = new starknet.SequencerProvider({
 
 ### Methods
 
-<hr/>
+---
+
+#### getContractAddresses()
 
 provider.**getContractAddresses**() => _Promise < GetContractAddressesResponse >_
 
@@ -280,7 +302,9 @@ Gets the smart contract address on the network.
 }
 ```
 
-<hr/>
+---
+
+#### getCode()
 
 provider.**getCode**(contractAddress, blockIdentifier) => _Promise < GetCodeResponse >_
 
@@ -295,7 +319,9 @@ Gets the smart contract address on the network.
 }
 ```
 
-<hr/>
+---
+
+#### estimateMessageFee()
 
 provider.**estimateMessageFee**(CallL1Handler, blockIdentifier) => _Promise < EstimateFeeResponse >_
 
@@ -322,7 +348,9 @@ type CallL1Handler = {
 }
 ````
 
-<hr/>
+---
+
+#### getTransactionStatus()
 
 provider.**getTransactionStatus**(txHash) => _Promise < GetTransactionStatusResponse >_
 
@@ -342,7 +370,9 @@ Gets the status of a transaction.
 }
 ```
 
-<hr/>
+---
+
+#### getTransactionTrace()
 
 provider.**getTransactionTrace**(txHash) => _Promise < GetTransactionTraceResponse >_
 
@@ -399,21 +429,29 @@ const provider = new starknet.RpcProvider({
 
 ### Methods
 
-<hr/>
+---
+
+#### fetch()
 
 provider.**fetch**(method: any, params: any) => _Promise < any >_
 
 Generic method for users to be able to experiment with RPC methods.
 
-<hr/>
+---
+
+#### getChainId()
 
 provider.**getChainId**() => _Promise < any >_
 
-<hr/>
+---
+
+#### getBlock()
 
 provider.**getBlock**(blockIdentifier) => _Promise < GetBlockResponse >_
 
-<hr/>
+---
+
+#### getBlockHashAndNumber()
 
 provider.**getBlockHashAndNumber**() => _Promise < BlockHashAndNumber >_
 
@@ -426,7 +464,9 @@ provider.**getBlockHashAndNumber**() => _Promise < BlockHashAndNumber >_
 }
 ```
 
-<hr/>
+---
+
+#### getBlockWithTxHashes()
 
 provider.**getBlockWithTxHashes**(blockIdentifier) => _Promise < GetBlockWithTxHashesResponse >_
 
@@ -436,7 +476,9 @@ provider.**getBlockWithTxHashes**(blockIdentifier) => _Promise < GetBlockWithTxH
 OPENRPC.BlockWithTxHashes
 ```
 
-<hr/>
+---
+
+#### getBlockWithTxs()
 
 provider.**getBlockWithTxs**(blockIdentifier) => _Promise < GetBlockWithTxs >_
 
@@ -446,23 +488,31 @@ provider.**getBlockWithTxs**(blockIdentifier) => _Promise < GetBlockWithTxs >_
 OPENRPC.BlockWithTxs
 ```
 
-<hr/>
+---
+
+#### getClassHashAt()
 
 provider.**getClassHashAt**(blockIdentifier) => _Promise < ContractAddress >_
 
-<hr/>
+---
+
+#### getTransactionCount()
 
 provider.**getTransactionCount**(blockIdentifier) => _Promise < number >_
 
 Gets the transaction count from a block.
 
-<hr/>
+---
+
+#### getBlockNumber()
 
 provider.**getBlockNumber**() => _Promise < number >_
 
 Gets the latest block number.
 
-<hr/>
+---
+
+#### getPendingTransactions()
 
 provider.**getPendingTransactions**() => _Promise < PendingTransactions >_
 
@@ -472,7 +522,9 @@ provider.**getPendingTransactions**() => _Promise < PendingTransactions >_
 OPENRPC.PendingTransactions;
 ```
 
-<hr/>
+---
+
+#### getStateUpdate()
 
 provider.**getStateUpdate**(blockIdentifier) => _Promise < StateUpdate >_
 
@@ -482,15 +534,21 @@ provider.**getStateUpdate**(blockIdentifier) => _Promise < StateUpdate >_
 OPENRPC.StateUpdate;
 ```
 
-<hr/>
+---
+
+#### getStorageAt()
 
 provider.**getStorageAt**(contractAddress, key, blockIdentifier) => _Promise < BigNumberish >_
 
-<hr/>
+---
+
+#### getTransaction()
 
 provider.**getTransaction**(txHash) => _Promise < GetTransactionResponse >_
 
-<hr/>
+---
+
+#### getTransactionByHash()
 
 provider.**getTransactionByHash**(txHash) => _Promise < GetTransactionByHashResponse >_
 
@@ -500,7 +558,9 @@ provider.**getTransactionByHash**(txHash) => _Promise < GetTransactionByHashResp
 OPENRPC.Transaction;
 ```
 
-<hr/>
+---
+
+#### getTransactionByBlockIdAndIndex()
 
 provider.**getTransactionByBlockIdAndIndex**(blockIdentifier, index) => _Promise < GetTransactionByBlockIdAndIndex >_
 
@@ -510,11 +570,15 @@ provider.**getTransactionByBlockIdAndIndex**(blockIdentifier, index) => _Promise
 OPENRPC.Transaction;
 ```
 
-<hr/>
+---
+
+#### getTransactionReceipt()
 
 provider.**getTransactionReceipt**(txHash) => _Promise < GetTransactionReceiptResponse >_
 
-<hr/>
+---
+
+#### getClass()
 
 provider.**getClass**(classHash) => _Promise < ContractClass >_
 
@@ -524,7 +588,9 @@ provider.**getClass**(classHash) => _Promise < ContractClass >_
 OPENRPC.ContractClass;
 ```
 
-<hr/>
+---
+
+#### getClassAt()
 
 provider.**getClassAt**(contractAddress, blockIdentifier) => _Promise < ContractClass >_
 
@@ -534,7 +600,9 @@ provider.**getClassAt**(contractAddress, blockIdentifier) => _Promise < Contract
 OPENRPC.ContractClass;
 ```
 
-<hr/>
+---
+
+#### getInvokeEstimateFee()
 
 provider.**getInvokeEstimateFee**(invocation, invocationDetails, blockIdentifier) => _Promise < EstimateFeeResponse >_
 
@@ -546,7 +614,9 @@ provider.**getInvokeEstimateFee**(invocation, invocationDetails, blockIdentifier
   gas_price?: BN;
 ```
 
-<hr/>
+---
+
+#### getDeclareEstimateFee()
 
 provider.**getDeclareEstimateFee**(DeclareContractTransaction, details, blockIdentifier) => _Promise < EstimateFeeResponse >_
 
@@ -558,7 +628,9 @@ provider.**getDeclareEstimateFee**(DeclareContractTransaction, details, blockIde
   gas_price?: BN;
 ```
 
-<hr/>
+---
+
+#### declareContract()
 
 provider.**declareContract**(DeclareContractTransaction, details) => _Promise < DeclareContractResponse >_
 
@@ -569,11 +641,15 @@ provider.**declareContract**(DeclareContractTransaction, details) => _Promise < 
   class_hash: string;
 ```
 
-<hr/>
+---
+
+#### callContract()
 
 provider.**callContract**(call, blockIdentifier) => _Promise < CallContractResponse >_
 
-<hr/>
+---
+
+#### getContractAddresses()
 
 provider.**traceTransaction**(transactionHash) => _Promise < Trace >_
 
@@ -583,7 +659,9 @@ provider.**traceTransaction**(transactionHash) => _Promise < Trace >_
 OPENRPC.Trace;
 ```
 
-<hr/>
+---
+
+#### traceBlockTransactions()
 
 provider.**traceBlockTransactions**(blockHash) => _Promise < Traces >_
 
@@ -593,7 +671,9 @@ provider.**traceBlockTransactions**(blockHash) => _Promise < Traces >_
 OPENRPC.Traces;
 ```
 
-<hr/>
+---
+
+#### getSyncingStats()
 
 provider.**getSyncingStats**() => _Promise < GetSyncingStatsResponse >_
 
@@ -613,7 +693,9 @@ boolean |
 }
 ```
 
-<hr/>
+---
+
+#### getEvents()
 
 provider.**getEvents**(eventFilter) => _Promise < GetEventsResponse >_
 

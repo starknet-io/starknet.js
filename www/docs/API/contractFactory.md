@@ -28,11 +28,15 @@ contractFactory.**abi** => _Abi_ (the ABI the contractFactory was constructed wi
 
 ## Methods
 
+### attach()
+
 contractFactory.**attach**( address ) ⇒ _Contract_
 
 Return an instance of a _Contract_ attached to address. This is the same as using the _Contract_ constructor with address and this _compiledContract_ and _account_ passed in when creating the ContractFactory.
 
-<hr />
+---
+
+### deploy()
 
 contractFactory.**deploy**( constructorCalldata, addressSalt ) ⇒ _Promise < Contract >_
 

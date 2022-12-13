@@ -41,7 +41,7 @@ This function validates the checksum address.
 
 Returns true if the address is valid, false otherwise.
 
-<hr />
+---
 
 ## **stark**
 
@@ -102,7 +102,7 @@ Function that calculates and returns maximum fee based on the previously estimat
 
 Returns a BN.
 
-<hr />
+---
 
 ## **number**
 
@@ -190,7 +190,7 @@ const signature = await this.signer.signTransaction(transactions, signerDetails)
 
 Convert BigNumberish array to hexadecimal string array. Used for signature conversion.
 
-<hr />
+---
 
 ## **uint256**
 
@@ -222,7 +222,7 @@ Function to check if `BN` is smaller or equal to `2**256-1`.
 
 Function to convert `BN` to `Uint256`.
 
-<hr />
+---
 
 ## **hash**
 
@@ -301,7 +301,7 @@ Function that calculates contract address from hash.
 
 Returns a string.
 
-<hr />
+---
 
 ## **ellipticCurve**
 
