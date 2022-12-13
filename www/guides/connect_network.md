@@ -14,7 +14,7 @@ import {Provider} from 'starknet';
 ## Connect your DAPP to Starknet mainnet :
 
 ```typescript
-const provider = new Provider({ sequencer: { network: 'mainnet-alpha ' } })
+const provider = new Provider({ sequencer: { network: 'mainnet-alpha' } })
 ```
 
 ## Connect your DAPP to Starknet testnet 1 & 2 :
