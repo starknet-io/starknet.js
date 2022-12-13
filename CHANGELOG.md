@@ -1,3 +1,14 @@
+# [4.17.0](https://github.com/0xs34n/starknet.js/compare/v4.16.0...v4.17.0) (2022-12-13)
+
+### Bug Fixes
+
+- merge conflicts ([92a3be8](https://github.com/0xs34n/starknet.js/commit/92a3be8500153d4b87b888f454bb4140edb88411))
+
+### Features
+
+- contract factory deploy arguments ([9eff7f4](https://github.com/0xs34n/starknet.js/commit/9eff7f4ccc74cb5f0c0594e88c0292600f20ec09))
+- update contractFactory docs ([76f8440](https://github.com/0xs34n/starknet.js/commit/76f8440233c4a1e24e3dfff25fe02525e86a8258))
+
 # [4.16.0](https://github.com/0xs34n/starknet.js/compare/v4.15.1...v4.16.0) (2022-12-12)
 
 ### Bug Fixes
