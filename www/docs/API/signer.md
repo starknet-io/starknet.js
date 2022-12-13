@@ -12,11 +12,15 @@ The **Signer** API allows you to sign transactions and messages, and also allows
 
 ## Methods
 
+### getPubKey()
+
 signer.**getPubKey**() => _Promise < string >_
 
 Returns the public key of the signer.
 
-<hr />
+---
+
+### signTransaction()
 
 signer.**signTransaction**(transactions, transactionsDetail [ , abi ]) => _Promise < Signature >_
 
@@ -36,7 +40,9 @@ _abi_ - (optional) the abi of the contract for better displaying
 string[]
 ```
 
-<hr />
+---
+
+### signMessage()
 
 signer.**signMessage**(typedData, accountAddress) => _Promise < Signature >_
 
@@ -51,7 +57,9 @@ _accountAddress_ - calldata to be passed in deploy constructor
 string[]
 ```
 
-<hr />
+---
+
+### signDeployAccountTransaction()
 
 signer.**signDeployAccountTransaction**(transaction) => _Promise < Signature >_
 
@@ -73,7 +81,9 @@ The _transactions_ object for write methods may include any of:
 string[]
 ```
 
-<hr />
+---
+
+### signDeclareTransaction()
 
 signer.**signDeclareTransaction**(transaction, transactionsDetail [ , abi ]) => _Promise < Signature >_
 
