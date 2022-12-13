@@ -9,7 +9,7 @@ You need 2 data :
 >If you don't have the abi file, the `provider.getcode()` command can help you.
 
 ```typescript
-import { Provider, Contract,json } from "starknet";
+import { Provider, Contract, json } from "starknet";
 ```
 ## Get the abi from a compiled file :
 If you have the compiled file of the contract, use this code to recover all data, including ABI :

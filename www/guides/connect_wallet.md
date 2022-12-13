@@ -29,7 +29,7 @@ const accountAddress = "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd37
 const account = new Account(provider, accountAddress, starkKeyPair);
 ```
 Your account is now connect, and you can use it.
-## Connect an existing wallet (in any network) :
+## 👛 Connect an existing wallet (in any network) :
 The code is exactly the same, you have just :
 - to connect to the appropriate network.
 - to use the address of this wallet (public data).
