@@ -1,5 +1,5 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable import/extensions */
-
 import { keccak256 } from 'ethereum-cryptography/keccak.js';
 import { hexToBytes } from 'ethereum-cryptography/utils.js';
 import { keccak, pedersen as micro_pedersen } from 'micro-starknet';
@@ -201,38 +201,57 @@ export function calculateContractAddressFromHash(
 
   const CONTRACT_ADDRESS_PREFIX = toFelt('0x535441524b4e45545f434f4e54524143545f41444452455353'); // Equivalent to 'STARKNET_CONTRACT_ADDRESS'
 
-  const dataToHash = [
+  return computeHashOnElements([
     CONTRACT_ADDRESS_PREFIX,
     deployerAddress,
     salt,
     classHash,
     constructorCalldataHash,
-  ];
-
-  return computeHashOnElements(dataToHash);
+  ]);
 }
 
-// function customStringify(_: string, value: any): any {
-//   if (typeof value === 'string') {
-//     return value
-//       .replace(/:(?=[^"]*(?:"[^"]*"[^"]*)*$)/g, ': ')
-//       .replace(/,(?=[^"]*(?:"[^"]*"[^"]*)*$)/g, ', ');
-//   }
-//   return value;
-// }
+function nullSkipReplacer(key: string, value: any) {
+  if (key === 'attributes' || key === 'accessible_scopes') {
+    return Array.isArray(value) && value.length === 0 ? undefined : value;
+  }
+
+  if (key === 'debug_info') {
+    return null;
+  }
+
+  return value === null ? undefined : value;
+}
 
 export default function computeHintedClassHash(compiledContract: CompiledContract) {
   const { abi, program } = compiledContract;
 
   const contractClass = { abi, program };
-  const serialisedJson = stringify(contractClass).replace(/\s/g, '');
 
-  // console.log('🚀 ~ file: hash.ts:239 ~ computeHintedClassHash ~ serialisedJson', serialisedJson);
+  const serialisedJson = stringify(contractClass, nullSkipReplacer)
+    .split('')
+    .reduce<[boolean, string]>(
+      ([insideQuotes, newString], char) => {
+        if (char === '"' && newString[newString.length - 1] !== '\\') {
+          // ignore escaped quotes
+          insideQuotes = !insideQuotes;
+        }
+        if (insideQuotes) {
+          newString += char;
+          return [insideQuotes, newString];
+        }
+        if (char === ':' && !insideQuotes) {
+          newString += ': ';
+        } else if (char === ',' && !insideQuotes) {
+          newString += ', ';
+        } else {
+          newString += char;
+        }
+        return [insideQuotes, newString];
+      },
+      [false, '']
+    )[1];
 
-  const hintedClassHash = addHexPrefix(keccak(utf8ToArray(serialisedJson)).toString(16));
-  console.log('🚀 ~ file: hash.ts:238 ~ computeHintedClassHash ~ hintedClassHash', hintedClassHash);
-
-  return hintedClassHash;
+  return addHexPrefix(keccak(utf8ToArray(serialisedJson)).toString(16));
 }
 
 // Computes the class hash of a given contract class
@@ -262,7 +281,7 @@ export function computeContractClassHash(contract: CompiledContract | string) {
 
   const dataHash = computeHashOnElements(compiledContract.program.data);
 
-  const elements: string[] = [
+  return computeHashOnElements([
     apiVersion,
     externalEntryPointsHash,
     l1HandlerEntryPointsHash,
@@ -270,8 +289,5 @@ export function computeContractClassHash(contract: CompiledContract | string) {
     builtinsHash,
     hintedClassHash,
     dataHash,
-  ];
-  console.log('🚀 ~ file: hash.ts ~ line 310 ~ computeContractClassHash ~ elements', elements);
-
-  return computeHashOnElements(elements);
+  ]);
 }
