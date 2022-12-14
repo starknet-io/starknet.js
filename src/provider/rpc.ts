@@ -84,15 +84,22 @@ export class RpcProvider implements ProviderInterface {
     }
   }
 
+  protected deviationHandler(method: string, { error, result }: any): any {
+    // for non-existing address Sequencer return '0x0' rpc return error.
+    if (method === 'starknet_getNonce' && error.code === 20) return '0x0';
+
+    this.errorHandler(error);
+    return result;
+  }
+
   protected async fetchEndpoint<T extends keyof RPC.Methods>(
     method: T,
     params?: RPC.Methods[T]['params']
   ): Promise<RPC.Methods[T]['result']> {
     try {
-      const rawResult = await this.fetch(method, params);
-      const { error, result } = await rawResult.json();
-      this.errorHandler(error);
-      return result as RPC.Methods[T]['result'];
+      const rawResponse = await this.fetch(method, params);
+      const response = await rawResponse.json();
+      return this.deviationHandler(method, response) as RPC.Methods[T]['result'];
     } catch (error: any) {
       this.errorHandler(error?.response?.data);
       throw error;
@@ -335,14 +342,16 @@ export class RpcProvider implements ProviderInterface {
     details: InvocationsDetailsWithNonce
   ): Promise<DeployContractResponse> {
     return this.fetchEndpoint('starknet_addDeployAccountTransaction', {
-      constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
-      class_hash: toHex(toBN(classHash)),
-      contract_address_salt: toHex(toBN(addressSalt || 0)),
-      type: 'DEPLOY',
-      max_fee: toHex(toBN(details.maxFee || 0)),
-      version: toHex(toBN(details.version || 0)),
-      signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
-      nonce: toHex(toBN(details.nonce)),
+      deploy_account_transaction: {
+        constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
+        class_hash: toHex(toBN(classHash)),
+        contract_address_salt: toHex(toBN(addressSalt || 0)),
+        type: 'DEPLOY_ACCOUNT',
+        max_fee: toHex(toBN(details.maxFee || 0)),
+        version: toHex(toBN(details.version || 0)),
+        signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
+        nonce: toHex(toBN(details.nonce)),
+      },
     });
   }
 

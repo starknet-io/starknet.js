@@ -500,7 +500,9 @@ export namespace OPENRPC {
       errors: Errors.INVALID_CONTRACT_CLASS;
     };
     starknet_addDeployAccountTransaction: {
-      params: BROADCASTED_DEPLOY_ACCOUNT_TXN;
+      params: {
+        deploy_account_transaction: BROADCASTED_DEPLOY_ACCOUNT_TXN;
+      };
       result: {
         transaction_hash: TXN_HASH;
         contract_address: FELT;
