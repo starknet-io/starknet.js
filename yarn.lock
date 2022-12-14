@@ -1440,10 +1440,20 @@
     "@jridgewell/resolve-uri" "3.1.0"
     "@jridgewell/sourcemap-codec" "1.4.14"
 
+"@noble/curves@~0.1.0":
+  version "0.1.0"
+  resolved "https://registry.yarnpkg.com/@noble/curves/-/curves-0.1.0.tgz#823fbfdf0b5248a05369dd1bdd8d05e9a8395c57"
+  integrity sha512-5j/xRon+8aYz6tiS1wUTu1RHbufVEZwvK1/2lj4J/zRlNTZ0kDYhuMNk2SDW2g1Ui2y0rSyB50mUz8bbi734ng==
+
 "@noble/hashes@1.1.2":
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.1.2.tgz#e9e035b9b166ca0af657a7848eb2718f0f22f183"
   integrity sha512-KYRCASVTv6aeUi1tsF8/vpyR7zpfs3FUzy2Jqm+MU+LmUKhQ0y2FpfwqkCcxSg2ua4GALJd8k2R76WxwZGbQpA==
+
+"@noble/hashes@1.1.4":
+  version "1.1.4"
+  resolved "https://registry.yarnpkg.com/@noble/hashes/-/hashes-1.1.4.tgz#2611ebf5764c1bf754da7c7794de4fb30512336d"
+  integrity sha512-+PYsVPrTSqtVjatKt2A/Proukn2Yrz61OBThOCKErc5w2/r1Fh37vbDv0Eah7pyNltrmacjwTvdw3JoR+WE4TA==
 
 "@noble/hashes@~1.1.1":
   version "1.1.3"
@@ -5443,9 +5453,18 @@ merge2@^1.3.0, merge2@^1.4.1:
   resolved "https://registry.yarnpkg.com/merge2/-/merge2-1.4.1.tgz#4368892f885e907455a6fd7dc55c0c9d404990ae"
   integrity sha512-8q7VEgMJW4J8tcfVPy8g09NcQwZdbwFEqhe/WZkoIzjn/3TGDwtOCYtXGxA3O8tPzpczCCDgv+P2P5y00ZJOOg==
 
-"micro-starknet@github:janek26/micro-starknet#feature/compile-esm-and-cjs":
+micro-curve-definitions@^0.1.0:
   version "0.1.0"
-  resolved "https://codeload.github.com/janek26/micro-starknet/tar.gz/ea69383b2d610c889706b4a4f7dc6180c194e07e"
+  resolved "https://registry.yarnpkg.com/micro-curve-definitions/-/micro-curve-definitions-0.1.0.tgz#bf7e3fe94d3c1887d7fc09b780d8accf0f02f233"
+  integrity sha512-ZZsxhYMAB/ZPMwr16GDm+qn8XJmglp/YFFNV7NvRpisoxdSnD8SnLe53sEyh9I+0ZnhWKa6ITVp2u77TgTesWQ==
+  dependencies:
+    "@noble/curves" "~0.1.0"
+    "@noble/hashes" "1.1.4"
+
+micro-starknet@^0.1.2:
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/micro-starknet/-/micro-starknet-0.1.2.tgz#e7f441893989096aee034afcd3dfa3e8d31c411d"
+  integrity sha512-zPqCXzpxuHCf3UpBJojepvAFJiQlFXHwmfldk/RoUPIdKuwEPYXoAEyxQvE8PgN7OqcgBafYV0jVQ2n+SEHGXA==
   dependencies:
     "@noble/hashes" "~1.1.1"
 

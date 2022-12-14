@@ -212,12 +212,27 @@ export function calculateContractAddressFromHash(
   return computeHashOnElements(dataToHash);
 }
 
+// function customStringify(_: string, value: any): any {
+//   if (typeof value === 'string') {
+//     return value
+//       .replace(/:(?=[^"]*(?:"[^"]*"[^"]*)*$)/g, ': ')
+//       .replace(/,(?=[^"]*(?:"[^"]*"[^"]*)*$)/g, ', ');
+//   }
+//   return value;
+// }
+
 export default function computeHintedClassHash(compiledContract: CompiledContract) {
   const { abi, program } = compiledContract;
 
-  const serialisedJson = stringify({ abi, program });
+  const contractClass = { abi, program };
+  const serialisedJson = stringify(contractClass).replace(/\s/g, '');
 
-  return addHexPrefix(keccak(utf8ToArray(serialisedJson)).toString(16));
+  // console.log('🚀 ~ file: hash.ts:239 ~ computeHintedClassHash ~ serialisedJson', serialisedJson);
+
+  const hintedClassHash = addHexPrefix(keccak(utf8ToArray(serialisedJson)).toString(16));
+  console.log('🚀 ~ file: hash.ts:238 ~ computeHintedClassHash ~ hintedClassHash', hintedClassHash);
+
+  return hintedClassHash;
 }
 
 // Computes the class hash of a given contract class
@@ -230,43 +245,22 @@ export function computeContractClassHash(contract: CompiledContract | string) {
   const externalEntryPointsHash = computeHashOnElements(
     compiledContract.entry_points_by_type.EXTERNAL.flatMap((e) => [e.selector, e.offset])
   );
-  console.log(
-    '🚀 ~ file: hash.ts ~ line 278 ~ computeContractClassHash ~ externalEntryPointsHash',
-    externalEntryPointsHash
-  );
 
   const l1HandlerEntryPointsHash = computeHashOnElements(
     compiledContract.entry_points_by_type.L1_HANDLER.flatMap((e) => [e.selector, e.offset])
-  );
-  console.log(
-    '🚀 ~ file: hash.ts ~ line 283 ~ computeContractClassHash ~ l1HandlerEntryPointsHash',
-    l1HandlerEntryPointsHash
   );
 
   const constructorEntryPointHash = computeHashOnElements(
     compiledContract.entry_points_by_type.CONSTRUCTOR.flatMap((e) => [e.selector, e.offset])
   );
-  console.log(
-    '🚀 ~ file: hash.ts ~ line 288 ~ computeContractClassHash ~ constructorEntryPointHash',
-    constructorEntryPointHash
-  );
 
   const builtinsHash = computeHashOnElements(
     compiledContract.program.builtins.map((s) => encodeShortString(s))
   );
-  console.log(
-    '🚀 ~ file: hash.ts ~ line 293 ~ computeContractClassHash ~ builtinsHash',
-    builtinsHash
-  );
 
   const hintedClassHash = computeHintedClassHash(compiledContract);
-  console.log(
-    '🚀 ~ file: hash.ts ~ line 296 ~ computeContractClassHash ~ hintedClassHash',
-    hintedClassHash
-  );
 
   const dataHash = computeHashOnElements(compiledContract.program.data);
-  console.log('🚀 ~ file: hash.ts ~ line 299 ~ computeContractClassHash ~ dataHash', dataHash);
 
   const elements: string[] = [
     apiVersion,
