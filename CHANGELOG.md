@@ -1,3 +1,11 @@
+## [4.17.1](https://github.com/0xs34n/starknet.js/compare/v4.17.0...v4.17.1) (2022-12-14)
+
+### Bug Fixes
+
+- estimateAccountDeployFee set nonce to constant 0 ([2110ef0](https://github.com/0xs34n/starknet.js/commit/2110ef09da63765609d60e01259c360a0e8a9ddf))
+- nonce should be fixed for deploy account to 0 ([c8a38e5](https://github.com/0xs34n/starknet.js/commit/c8a38e5349e5c5ebe3bb0665a4fb18cd02811626))
+- rpc deployAccountContract request, rpc nonce hotfix ([9576335](https://github.com/0xs34n/starknet.js/commit/9576335893561603cfd6a8ff4454b69cb49f7484))
+
 # [4.17.0](https://github.com/0xs34n/starknet.js/compare/v4.16.0...v4.17.0) (2022-12-13)
 
 ### Bug Fixes
