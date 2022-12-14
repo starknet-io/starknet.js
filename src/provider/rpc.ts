@@ -86,7 +86,7 @@ export class RpcProvider implements ProviderInterface {
 
   protected deviationHandler(method: string, { error, result }: any): any {
     // for non-existing address Sequencer return '0x0' rpc return error.
-    if (method === 'starknet_getNonce' && error.code === 20) return '0x0';
+    if (method === 'starknet_getNonce' && error?.code === 20) return '0x0';
 
     this.errorHandler(error);
     return result;
