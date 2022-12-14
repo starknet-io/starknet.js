@@ -7,12 +7,24 @@ export type KeyPair = EC.KeyPair;
 export type Signature = string[];
 export type RawCalldata = BigNumberish[];
 export type AllowArray<T> = T | T[];
+export type RawArgs =
+  | {
+      [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
+    }
+  | string[];
 
 export interface ContractClass {
   program: CompressedProgram;
   entry_points_by_type: RPC.ContractClass['entry_points_by_type'];
   abi?: Abi;
 }
+
+export type UniversalDeployerContractPayload = {
+  classHash: BigNumberish;
+  salt?: string;
+  unique?: boolean;
+  constructorCalldata?: RawArgs;
+};
 
 export type DeployContractPayload = {
   contract: CompiledContract | string;
@@ -38,6 +50,9 @@ export type DeclareContractPayload = {
   contract: CompiledContract | string;
   classHash: BigNumberish; // Once the classHash is included in CompiledContract, this can be removed
 };
+
+export type DeclareDeployContractPayload = DeclareContractPayload &
+  UniversalDeployerContractPayload;
 
 export type DeclareContractTransaction = {
   contractDefinition: ContractClass;
@@ -81,8 +96,14 @@ export type FunctionAbi = {
   name: string;
   outputs: AbiEntry[];
   stateMutability?: 'view';
-  type: 'function' | 'constructor';
+  type: FunctionAbiType;
 };
+
+enum FunctionAbiType {
+  'function',
+  'l1_handler',
+  'constructor',
+}
 
 export type StructAbi = {
   members: (AbiEntry & { offset: number })[];
@@ -91,7 +112,9 @@ export type StructAbi = {
   type: 'struct';
 };
 
-export type Abi = Array<FunctionAbi | StructAbi>;
+export type Abi = Array<FunctionAbi | EventAbi | StructAbi>;
+
+type EventAbi = any;
 
 export type EntryPointsByType = object;
 export type Program = Record<any, any>;

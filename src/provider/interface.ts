@@ -4,7 +4,9 @@ import type {
   CallContractResponse,
   ContractClass,
   DeclareContractResponse,
-  DeployContractPayload,
+  DeclareContractTransaction,
+  DeployAccountContractPayload,
+  DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
@@ -14,12 +16,8 @@ import type {
   Invocation,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  Status,
 } from '../types';
-import {
-  DeclareContractTransaction,
-  DeployAccountContractPayload,
-  DeployAccountContractTransaction,
-} from '../types/lib';
 import type { BigNumberish } from '../utils/number';
 import { BlockIdentifier } from './utils';
 
@@ -74,12 +72,32 @@ export abstract class ProviderInterface {
   ): Promise<ContractClass>;
 
   /**
+   * Returns the class hash deployed under the given address.
+   *
+   * @param contractAddress - contract address
+   * @param blockIdentifier - block identifier
+   * @returns Class hash
+   */
+  public abstract getClassHashAt(
+    contractAddress: string,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<string>;
+
+  /**
+   * Returns the contract class deployed under the given class hash.
+   *
+   * @param classHash - class hash
+   * @returns Contract class of compiled contract
+   */
+  public abstract getClassByHash(classHash: string): Promise<ContractClass>;
+
+  /**
    * Gets the nonce of a contract with respect to a specific block
    *
    * @param contractAddress - contract address
    * @returns the hex nonce
    */
-  public abstract getNonce(
+  public abstract getNonceForAddress(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
   ): Promise<BigNumberish>;
@@ -95,14 +113,14 @@ export abstract class ProviderInterface {
   public abstract getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier?: BlockIdentifier
   ): Promise<BigNumberish>;
 
   /**
    * Gets the transaction information from a tx id.
    *
    * @param txHash
-   * @returns the transacton object { transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? }
+   * @returns the transaction object { transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? }
    */
   public abstract getTransaction(transactionHash: BigNumberish): Promise<GetTransactionResponse>;
 
@@ -115,17 +133,6 @@ export abstract class ProviderInterface {
   public abstract getTransactionReceipt(
     transactionHash: BigNumberish
   ): Promise<GetTransactionReceiptResponse>;
-
-  /**
-   * Deploys a given compiled contract (json) to starknet
-   *
-   * @param payload payload to be deployed containing:
-   * - compiled contract code
-   * - constructor calldata
-   * - address salt
-   * @returns a confirmation of sending a transaction on the starknet contract
-   */
-  public abstract deployContract(payload: DeployContractPayload): Promise<DeployContractResponse>;
 
   /**
    * Deploys a given compiled Account contract (json) to starknet
@@ -143,7 +150,7 @@ export abstract class ProviderInterface {
 
   /**
    * Invokes a function on starknet
-   * @deprecated This method wont be supported as soon as fees are mandatory
+   * @deprecated This method wont be supported as soon as fees are mandatory. Should not be used outside of Account class
    *
    * @param invocation the invocation object containing:
    * - contractAddress - the address of the contract
@@ -180,7 +187,7 @@ export abstract class ProviderInterface {
 
   /**
    * Estimates the fee for a given INVOKE transaction
-   * @deprecated Please use getInvokeEstimateFee or getDeclareEstimateFee instead
+   * @deprecated Please use getInvokeEstimateFee or getDeclareEstimateFee instead. Should not be used outside of Account class
    *
    * @param invocation the invocation object containing:
    * - contractAddress - the address of the contract
@@ -216,7 +223,7 @@ export abstract class ProviderInterface {
   public abstract getInvokeEstimateFee(
     invocation: Invocation,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponse>;
 
   /**
@@ -236,7 +243,7 @@ export abstract class ProviderInterface {
   public abstract getDeclareEstimateFee(
     transaction: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponse>;
 
   /**
@@ -257,13 +264,18 @@ export abstract class ProviderInterface {
   public abstract getDeployAccountEstimateFee(
     transaction: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponse>;
 
   /**
    * Wait for the transaction to be accepted
    * @param txHash - transaction hash
    * @param retryInterval - retry interval
+   * @return GetTransactionReceiptResponse
    */
-  public abstract waitForTransaction(txHash: BigNumberish, retryInterval?: number): Promise<void>;
+  public abstract waitForTransaction(
+    txHash: BigNumberish,
+    retryInterval?: number,
+    successStates?: Array<Status>
+  ): Promise<GetTransactionReceiptResponse>;
 }

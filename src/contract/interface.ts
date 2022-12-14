@@ -11,6 +11,10 @@ import {
   Result,
 } from '../types';
 
+export type CallOptions = {
+  blockIdentifier?: BlockIdentifier;
+};
+
 export abstract class ContractInterface {
   public abstract abi: Abi;
 
@@ -57,21 +61,17 @@ export abstract class ContractInterface {
    *
    * @param method name of the method
    * @param args Array of the arguments for the call
+   * @param options optional blockIdentifier
    * @returns Result of the call as an array with key value pars
    */
-  public abstract call(
-    method: string,
-    args?: Array<any>,
-    options?: {
-      blockIdentifier?: BlockIdentifier;
-    }
-  ): Promise<Result>;
+  public abstract call(method: string, args?: Array<any>, options?: CallOptions): Promise<Result>;
 
   /**
    * Invokes a method on a contract
    *
    * @param method name of the method
    * @param args Array of the arguments for the invoke
+   * @param options
    * @returns Add Transaction Response
    */
   public abstract invoke(
@@ -81,10 +81,11 @@ export abstract class ContractInterface {
   ): Promise<InvokeFunctionResponse>;
 
   /**
-   * Calls a method on a contract
+   * Estimates a method on a contract
    *
    * @param method name of the method
    * @param args Array of the arguments for the call
+   * @param options optional blockIdentifier
    */
   public abstract estimate(
     method: string,
@@ -99,7 +100,7 @@ export abstract class ContractInterface {
    *
    * @param method name of the method
    * @param args Array of the arguments for the call
-   * @returns Invocation objet
+   * @returns Invocation object
    */
   public abstract populate(method: string, args?: Array<any>): Invocation;
 }

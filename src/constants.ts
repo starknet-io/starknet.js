@@ -11,6 +11,7 @@ export const MASK_251 = TWO.pow(toBN(251));
 export enum StarknetChainId {
   MAINNET = '0x534e5f4d41494e', // encodeShortString('SN_MAIN'),
   TESTNET = '0x534e5f474f45524c49', // encodeShortString('SN_GOERLI'),
+  TESTNET2 = '0x534e5f474f45524c4932',
 }
 export enum TransactionHashPrefix {
   DECLARE = '0x6465636c617265', // encodeShortString('declare'),
@@ -19,6 +20,11 @@ export enum TransactionHashPrefix {
   INVOKE = '0x696e766f6b65', // encodeShortString('invoke'),
   L1_HANDLER = '0x6c315f68616e646c6572', // encodeShortString('l1_handler'),
 }
+
+export const UDC = {
+  ADDRESS: '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
+  ENTRYPOINT: 'deployContract',
+};
 
 /**
  * The following is taken from https://github.com/starkware-libs/starkex-resources/blob/master/crypto/starkware/crypto/signature/pedersen_params.json but converted to hex, because JS is very bad handling big integers by default

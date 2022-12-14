@@ -1,33 +1,29 @@
 import { Account, GetBlockResponse, RpcProvider, ec } from '../src';
+import { StarknetChainId } from '../src/constants';
 import {
   compiledOpenZeppelinAccount,
+  describeIfNotDevnet,
   describeIfRpc,
   getTestAccount,
   getTestProvider,
 } from './fixtures';
 
 describeIfRpc('RPCProvider', () => {
-  let rpcProvider: RpcProvider;
+  const rpcProvider = getTestProvider() as RpcProvider;
+  const account = getTestAccount(rpcProvider);
   let accountPublicKey: string;
 
   beforeAll(async () => {
-    rpcProvider = getTestProvider() as RpcProvider;
-    const account = getTestAccount(rpcProvider);
-
     expect(account).toBeInstanceOf(Account);
-
     const accountKeyPair = ec.genKeyPair();
     accountPublicKey = ec.getStarkKey(accountKeyPair);
   });
 
   test('getChainId', async () => {
     const chainId = await rpcProvider.getChainId();
-    expect(chainId).toBe('0x534e5f474f45524c49');
-  });
-
-  test('getPendingTransactions', async () => {
-    const transactions = await rpcProvider.getPendingTransactions();
-    expect(Array.isArray(transactions)).toBe(true);
+    expect([StarknetChainId.TESTNET2, StarknetChainId.MAINNET, StarknetChainId.TESTNET]).toContain(
+      chainId
+    );
   });
 
   test('getTransactionCount', async () => {
@@ -49,8 +45,15 @@ describeIfRpc('RPCProvider', () => {
     expect(stateUpdate).toHaveProperty('state_diff');
   });
 
-  xtest('getProtocolVersion', async () => {
+  xtest('getProtocolVersion - pathfinder not implement', async () => {
     await rpcProvider.getProtocolVersion();
+  });
+
+  describeIfNotDevnet('devnet not implement', () => {
+    test('getPendingTransactions', async () => {
+      const transactions = await rpcProvider.getPendingTransactions();
+      expect(Array.isArray(transactions)).toBe(true);
+    });
   });
 
   describe('RPC methods', () => {
@@ -83,19 +86,22 @@ describeIfRpc('RPCProvider', () => {
     });
 
     describe('deploy contract related tests', () => {
-      let contract_address;
-      let transaction_hash;
+      let contract_address: string;
+      let transaction_hash: string;
 
       beforeAll(async () => {
-        ({ contract_address, transaction_hash } = await rpcProvider.deployContract({
+        const { deploy } = await account.declareDeploy({
           contract: compiledOpenZeppelinAccount,
+          classHash: '0x03fcbf77b28c96f4f2fb5bd2d176ab083a12a5e123adeb0de955d7ee228c9854',
           constructorCalldata: [accountPublicKey],
-          addressSalt: accountPublicKey,
-        }));
-        await rpcProvider.waitForTransaction(transaction_hash);
+          salt: accountPublicKey,
+        });
+
+        contract_address = deploy.contract_address;
+        transaction_hash = deploy.transaction_hash;
       });
 
-      test('deployContract result', () => {
+      test('declareDeploy()', () => {
         expect(contract_address).toBeTruthy();
         expect(transaction_hash).toBeTruthy();
       });
@@ -106,7 +112,7 @@ describeIfRpc('RPCProvider', () => {
       });
 
       test('getClassHashAt', async () => {
-        const classHash = await rpcProvider.getClassHashAt('latest', contract_address);
+        const classHash = await rpcProvider.getClassHashAt(contract_address);
         expect(typeof classHash).toBe('string');
       });
 
@@ -115,16 +121,12 @@ describeIfRpc('RPCProvider', () => {
       });
     });
 
-    test('getClass classHash 0x0733734fa0dab1158bccdfe0df7b0becf3827f908971fac8d39cc73d99ad8645', async () => {
+    test('getClass classHash 0x03fcbf77b28c96f4f2fb5bd2d176ab083a12a5e123adeb0de955d7ee228c9854', async () => {
       const contractClass = await rpcProvider.getClass(
-        '0x0733734fa0dab1158bccdfe0df7b0becf3827f908971fac8d39cc73d99ad8645'
+        '0x03fcbf77b28c96f4f2fb5bd2d176ab083a12a5e123adeb0de955d7ee228c9854'
       );
       expect(contractClass).toHaveProperty('program');
       expect(contractClass).toHaveProperty('entry_points_by_type');
     });
-
-    test.todo('getEstimateFee');
-
-    test.todo('invokeFunction');
   });
 });

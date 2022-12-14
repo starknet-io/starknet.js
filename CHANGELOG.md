@@ -1,3 +1,163 @@
+## [4.17.1](https://github.com/0xs34n/starknet.js/compare/v4.17.0...v4.17.1) (2022-12-14)
+
+### Bug Fixes
+
+- estimateAccountDeployFee set nonce to constant 0 ([2110ef0](https://github.com/0xs34n/starknet.js/commit/2110ef09da63765609d60e01259c360a0e8a9ddf))
+- nonce should be fixed for deploy account to 0 ([c8a38e5](https://github.com/0xs34n/starknet.js/commit/c8a38e5349e5c5ebe3bb0665a4fb18cd02811626))
+- rpc deployAccountContract request, rpc nonce hotfix ([9576335](https://github.com/0xs34n/starknet.js/commit/9576335893561603cfd6a8ff4454b69cb49f7484))
+
+# [4.17.0](https://github.com/0xs34n/starknet.js/compare/v4.16.0...v4.17.0) (2022-12-13)
+
+### Bug Fixes
+
+- merge conflicts ([92a3be8](https://github.com/0xs34n/starknet.js/commit/92a3be8500153d4b87b888f454bb4140edb88411))
+
+### Features
+
+- contract factory deploy arguments ([9eff7f4](https://github.com/0xs34n/starknet.js/commit/9eff7f4ccc74cb5f0c0594e88c0292600f20ec09))
+- update contractFactory docs ([76f8440](https://github.com/0xs34n/starknet.js/commit/76f8440233c4a1e24e3dfff25fe02525e86a8258))
+
+# [4.16.0](https://github.com/0xs34n/starknet.js/compare/v4.15.1...v4.16.0) (2022-12-12)
+
+### Bug Fixes
+
+- blockIdentifier null on call from constructed function ([c88fbf0](https://github.com/0xs34n/starknet.js/commit/c88fbf0cdfc57e1150275a34c15900d6c81802d3))
+- default pathfinder does't have pending block ([4619188](https://github.com/0xs34n/starknet.js/commit/4619188e21e5cc9a811c59bcf2923c4382661635))
+- sequencer defaults, remove defaultProvider default blockIdentifier, spelling, class ([555a9a3](https://github.com/0xs34n/starknet.js/commit/555a9a3982bc1a742776119df5dee5d701209a0d))
+
+### Features
+
+- multi deploy reimplemented ([10e609a](https://github.com/0xs34n/starknet.js/commit/10e609a1af584df65942477b264ad7809b5c70c9))
+- return precalculated address from deploy ([5e40224](https://github.com/0xs34n/starknet.js/commit/5e402246841bdf9117a9ee96799833fc6f68d16b))
+
+## [4.15.1](https://github.com/0xs34n/starknet.js/compare/v4.15.0...v4.15.1) (2022-12-07)
+
+### Bug Fixes
+
+- add testnet 2 compatibility to test ([b83f35b](https://github.com/0xs34n/starknet.js/commit/b83f35bbfc0c2a6c84318a473ca816cc053f5806))
+- delete only on test ([e13db57](https://github.com/0xs34n/starknet.js/commit/e13db577b7d40073707d78e57f63e65b6472c446))
+- lib chainid test ([e820572](https://github.com/0xs34n/starknet.js/commit/e820572a9eafe732dae3d1bbde5f63279c000be7))
+
+# [4.15.0](https://github.com/0xs34n/starknet.js/compare/v4.14.0...v4.15.0) (2022-12-05)
+
+### Bug Fixes
+
+- add deterministic tests ([ff8e06e](https://github.com/0xs34n/starknet.js/commit/ff8e06e5eee8f04349f1f171fc9cfd8f2a12e493))
+- add string function to test ([bf24d7f](https://github.com/0xs34n/starknet.js/commit/bf24d7f3b9c23f2e7eea6427469bd99e03ae5f1c))
+- delete functions from interface ([1cb96a3](https://github.com/0xs34n/starknet.js/commit/1cb96a3d4904434d61d50ea27d6dc17d8e4807d4))
+- docs starknet id ([69b5bcc](https://github.com/0xs34n/starknet.js/commit/69b5bcc8d8e8eb2e22a1402caaf428f1f747ee3a))
+- fix Ivan comments ([7ab252a](https://github.com/0xs34n/starknet.js/commit/7ab252a7adde52403f01e1d68d3a1ada42870dca))
+- revert waitfortransaction to original interface ([bb2a8cd](https://github.com/0xs34n/starknet.js/commit/bb2a8cddc0ca272a3a291668e80c59ff8758e903))
+- test on account ([81f5d71](https://github.com/0xs34n/starknet.js/commit/81f5d71c19a4bf24a6cf7ff9ed39fafb70625e29))
+- waitfortransaction usage ([67c2031](https://github.com/0xs34n/starknet.js/commit/67c2031d637a8b8b4697f29cd592298778404d1b))
+
+### Features
+
+- add starknet.id getters ([855854a](https://github.com/0xs34n/starknet.js/commit/855854a4e17bd43e6a0c79ab68dcd1c8534ef06f))
+- allow usage of chainId to define network, cleanup ([6cffaad](https://github.com/0xs34n/starknet.js/commit/6cffaadcc096efa9f10f759e6e4cb2c91db4cb4a))
+- set testnet2 chain id, cleanup ([16cdfd4](https://github.com/0xs34n/starknet.js/commit/16cdfd46ed4887e3878fa8bdeccaf0c806d92ccb))
+
+# [4.14.0](https://github.com/0xs34n/starknet.js/compare/v4.13.2...v4.14.0) (2022-11-29)
+
+### Bug Fixes
+
+- account test removed provider deployContract ([605c2a9](https://github.com/0xs34n/starknet.js/commit/605c2a9426f8ef5bc3c16803db0055550ca58da3))
+- cleanup after refactor and remove branch split ([f695629](https://github.com/0xs34n/starknet.js/commit/f69562960877bc37d38e2964a88569c9ae9bedca))
+- properly parse blockIdentifier in buildCall function ([d09affd](https://github.com/0xs34n/starknet.js/commit/d09affd57c260eccf2f59c9cb7dd8c668fe8a5b3))
+- remove deployMaxFee from deploy ([6d5fa24](https://github.com/0xs34n/starknet.js/commit/6d5fa2461def5caad3cdd71af8a4e6c61d88092e))
+- rpc tests ([cd913ee](https://github.com/0xs34n/starknet.js/commit/cd913ee93df433eb3730e6aae43dd22b0c8aed32))
+- split getNonce interface ([7b7acd9](https://github.com/0xs34n/starknet.js/commit/7b7acd9f5ebe0b2b97e389fb3a68249dd72224ce))
+- tiping issue ([78aa340](https://github.com/0xs34n/starknet.js/commit/78aa3402131f51e83287eada7499ea01de41efa0))
+- udc require L2 status for deployed contract to be awailable to use ([afba8d0](https://github.com/0xs34n/starknet.js/commit/afba8d068685c1c9b03126e5de13a5dfddb2925e))
+
+### Features
+
+- account deployContract ts overide base class ([dd4502d](https://github.com/0xs34n/starknet.js/commit/dd4502d76fb73f04e8e512336f6e5924c55b2f39))
+- extend acc interface, use deploy estimate fee ([da7392a](https://github.com/0xs34n/starknet.js/commit/da7392a65fa2b261cc1c6916739c1a59ecf9330f))
+- r p.deployCo. C tests, CF fixtures, cleanHex, DeclareDeploy, F Provider, seq.waitFor ret.txRec ([bb50f53](https://github.com/0xs34n/starknet.js/commit/bb50f5312f2b8618a26eaf13f1f851a645f5b670))
+- return from wait Transaction,Account deployContract and declareDeploy ([724975d](https://github.com/0xs34n/starknet.js/commit/724975dd92cc764208e1cf70c6f0d4089f0d363d))
+
+## [4.13.2](https://github.com/0xs34n/starknet.js/compare/v4.13.1...v4.13.2) (2022-11-25)
+
+### Bug Fixes
+
+- package json exports ([0eea96a](https://github.com/0xs34n/starknet.js/commit/0eea96a15500f4dce4125fdaa5f6720df0a9e333))
+
+## [4.13.1](https://github.com/0xs34n/starknet.js/compare/v4.13.0...v4.13.1) (2022-11-23)
+
+### Bug Fixes
+
+- **ci:** adjust build script ([880ef27](https://github.com/0xs34n/starknet.js/commit/880ef27d3212fe1aa8b6ea87e2a77a7e5d56aa79))
+- flatten main type export and import ([869f470](https://github.com/0xs34n/starknet.js/commit/869f470973c583f3d8d856f9996280741257dbab))
+
+# [4.13.0](https://github.com/0xs34n/starknet.js/compare/v4.12.0...v4.13.0) (2022-11-22)
+
+### Bug Fixes
+
+- add estimateDeployFee ([3bc11be](https://github.com/0xs34n/starknet.js/commit/3bc11bef0d744303a1288eb997fbfca32c7523ab))
+- adjust fetch parameter types ([dfe876a](https://github.com/0xs34n/starknet.js/commit/dfe876ad9fd59a4351671df5fc0705b3f980ce75))
+- anotate deprecate all providers deployContract ([65eed1f](https://github.com/0xs34n/starknet.js/commit/65eed1f671b41393b3ae33ae1aaa7a9ae0fbc013))
+- restore rpc node url to provided one ([2e1d87a](https://github.com/0xs34n/starknet.js/commit/2e1d87a6d9fc9a1fe9b493ffd8153eb2342ffdfc))
+- transaction v1 getInvokeEstimateFee ([cb4ede3](https://github.com/0xs34n/starknet.js/commit/cb4ede3b5b586ebf69768d4e4a8b36c739f6715f))
+
+### Features
+
+- update devnet ([0dbe9f7](https://github.com/0xs34n/starknet.js/commit/0dbe9f72fdad96250850599ed90495a5c2975f60))
+
+# [4.12.0](https://github.com/0xs34n/starknet.js/compare/v4.11.0...v4.12.0) (2022-11-17)
+
+### Bug Fixes
+
+- **tests:** refactor udc tests ([01a6eef](https://github.com/0xs34n/starknet.js/commit/01a6eef11b2f32e05d2aea4ab185536e3fdb1a71))
+- use method name similar to gateway endpoint ([79641b3](https://github.com/0xs34n/starknet.js/commit/79641b3076412d71fa4e5ccbdb018c4f3ecab938))
+
+### Features
+
+- create getClass RPC alias ([1003534](https://github.com/0xs34n/starknet.js/commit/10035341dd26e23b59d3dd764936a7d8eaa3f3b0))
+
+# [4.11.0](https://github.com/0xs34n/starknet.js/compare/v4.10.0...v4.11.0) (2022-11-14)
+
+### Bug Fixes
+
+- change txn version for estimate fee apis to be feeTransactionVersion ([4d255c5](https://github.com/0xs34n/starknet.js/commit/4d255c5cf4adceb16a7f9ac61904a6e5d8020cbd))
+- lib FunctionAbiType and EventAbi shallow ([7088dc6](https://github.com/0xs34n/starknet.js/commit/7088dc6828f9f4fd29922323e63183a2e11f7340))
+- remove deprecated function ([0a9f84f](https://github.com/0xs34n/starknet.js/commit/0a9f84f86aabaa49ab78faa3331cac0ca98ace61))
+- removed fixed params swap ([57c01f6](https://github.com/0xs34n/starknet.js/commit/57c01f6418771d8ceaa3f393d54cad8bfff94b56))
+- rpcProvider tests ([4b0fd20](https://github.com/0xs34n/starknet.js/commit/4b0fd20a8ce235e0e069521f7dca50a4696120a4))
+
+### Features
+
+- fill in sequencer class methods ([83c0a29](https://github.com/0xs34n/starknet.js/commit/83c0a296bced3128a0ca9dd5246b376816a0be63))
+- implement rpc-0.2.1rc1 types ([2b1b71e](https://github.com/0xs34n/starknet.js/commit/2b1b71ebedfa709aab4fa652bd98a8efc2d3e39a))
+- rpc 0.2.0 plane implementation ([35a880c](https://github.com/0xs34n/starknet.js/commit/35a880ce4f8438e78143f7c0997ccfe6de680d80))
+- rpc 0.2.0 type implementation ([866dda7](https://github.com/0xs34n/starknet.js/commit/866dda76fc35ef656a9e21b8b8674f73729c9a50))
+- rpc 0.2.0 types spec ([25b2d29](https://github.com/0xs34n/starknet.js/commit/25b2d293a1a570b6fc68ea3877bfe6c3e898e3a6))
+- rpc 0.2.1 ([ed17f63](https://github.com/0xs34n/starknet.js/commit/ed17f6380d2b1ab1432d5426c7395ab18c6dc793))
+- rpc v0.2 endpoint, default identifiers, getClassHashAt flip parameters ([f0a0d6c](https://github.com/0xs34n/starknet.js/commit/f0a0d6c49e33442b603dcc9c9c119867c1ed32cc))
+- rpc0.2.1 definition migration comlete ([35c5a06](https://github.com/0xs34n/starknet.js/commit/35c5a0645dafe061080c2c2ced6a9a4a9882207c))
+
+# [4.10.0](https://github.com/0xs34n/starknet.js/compare/v4.9.0...v4.10.0) (2022-11-10)
+
+### Bug Fixes
+
+- ci ([9b38cd8](https://github.com/0xs34n/starknet.js/commit/9b38cd8a2e23b71a1490c168ae83b64f479d3da9))
+- deploy return type in interface ([6a663d4](https://github.com/0xs34n/starknet.js/commit/6a663d492751b0cd8493af6d4ee9a5cf5524ed19))
+- path rpc test to release ([a1dafad](https://github.com/0xs34n/starknet.js/commit/a1dafad7056fb2e52849a8d5d533872254c62293))
+- remove multiple RawArgs declaration ([b65dc65](https://github.com/0xs34n/starknet.js/commit/b65dc651bbd86708d4f88b7445813dab7dfea639))
+- return type and rename calldata ([67fe081](https://github.com/0xs34n/starknet.js/commit/67fe081a24ca9eb64669ed9b0c2726898c68a34c))
+- update readme ([7859cb1](https://github.com/0xs34n/starknet.js/commit/7859cb1d2b6e4e924f8bb21a1bbb9ada1a46a308))
+- wait for declare and deploy, use random salt ([8dbd3c1](https://github.com/0xs34n/starknet.js/commit/8dbd3c183413f298307f2b22941c6981191a62b2))
+
+### Features
+
+- add multicall support ([4b99f4a](https://github.com/0xs34n/starknet.js/commit/4b99f4a7b09a03990e2ba9ea00de2d0206f93ce0))
+- enable custom providers headers option ([f2e9b1a](https://github.com/0xs34n/starknet.js/commit/f2e9b1a439908179bad1f4bb0e0632180b7b658f))
+- fix and add proper UDC tests ([d96cc53](https://github.com/0xs34n/starknet.js/commit/d96cc531786738de7d8ec285ccdaa39e76a94de3))
+- provider docs update ([e5d0376](https://github.com/0xs34n/starknet.js/commit/e5d0376dd281b04c486c58786709c42ea1e3a5a7))
+- testnet2 ([8a054d0](https://github.com/0xs34n/starknet.js/commit/8a054d0ceb312efc0b6d303cad73b9bb39ba4304))
+- udc demo ([27b402b](https://github.com/0xs34n/starknet.js/commit/27b402b6eed4c2bec67bfbf7ee27c9636ca4ae2b))
+- udc working example ([5c4452a](https://github.com/0xs34n/starknet.js/commit/5c4452aa2e6b50768438f1117794dce430984ff8))
+
 # [4.9.0](https://github.com/0xs34n/starknet.js/compare/v4.8.0...v4.9.0) (2022-10-19)
 
 ### Bug Fixes

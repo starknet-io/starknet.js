@@ -18,6 +18,10 @@ Contracts allow you to transform Cairo values, like `Uint256` to `BigNumber`. It
 
 ## Properties
 
+contract.**abi** => _Abi_
+
+The ABI the contract was constructed with.
+
 contract.**address** => _string_
 
 The address the contract was constructed/connected with.
@@ -30,15 +34,61 @@ contract.**deployTransactionHash** => _string | null_
 
 If the Contract object is the result of a ContractFactory deployment, this is the transaction which was used to deploy the contract.
 
-contract.**abi** => _Abi_
-
-The ABI the contract was constructed with.
-
 ## Methods
+
+### attach()
+
+contract.**attach**(address) => void
+
+Saves the address of the contract deployed on network that will be used for interaction.
+
+_address_ - address of the contract.
+
+---
+
+### connect()
+
+contract.**connect**(providerOrAccount) => void
+
+Attaches to new Provider or Account
+
+---
+
+### deployed()
 
 contract.**deployed**() => _Promise < Contract >_
 
 If the Contract object is the result of a ContractFactory deployment, this method will wait for the transaction to be resolved.
+
+---
+
+### call()
+
+contract.**call**(method, args, options) => _Promise < Result >_
+
+Calls a method on a contract.
+
+---
+
+### invoke()
+
+contract.**invoke**(method, args, options) => _Promise < InvokeFunctionResponse >_
+
+Invokes a method on a contract.
+
+---
+
+### estimate()
+
+contract.**estimate**(method, args, options) => _Promise < any >_
+
+Estimates a method on a contract.
+
+---
+
+### populate()
+
+contract.**populate**(method, args, options) => _Invocation_
 
 ## Meta-Class
 

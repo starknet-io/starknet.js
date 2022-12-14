@@ -1,4 +1,4 @@
-import BN, { isBN } from 'bn.js';
+import BN from 'bn.js';
 import assert from 'minimalistic-assert';
 
 import { addHexPrefix, removeHexPrefix } from './encode';
@@ -28,11 +28,17 @@ export function hexToDecimalString(hex: string): string {
 }
 
 export function toFelt(num: BigNumberish): string {
-  if (isBN(num)) {
+  if (BN.isBN(num)) {
     return num.toString();
   }
   return toBN(num).toString();
 }
+
+/**
+ * Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
+ * @param hex string
+ */
+export const cleanHex = (hex: string) => hex.toLowerCase().replace(/^(0x)0+/, '$1');
 
 /*
  Asserts input is equal to or greater then lowerBound and lower then upperBound.
@@ -88,3 +94,5 @@ export function getHexString(value: string) {
 export function getHexStringArray(value: Array<string>) {
   return value.map((el) => getHexString(el));
 }
+
+export const toCairoBool = (value: boolean): string => (+value).toString();

@@ -1,9 +1,9 @@
 /**
- * Starknet RPC version 0.1.0
+ * Starknet RPC version 0.2.0
  *
- * StarkNet Node API 0.31.0
- * StarkNet Node Write API 0.3.0
- * StarkNet Trace API 0.3.0
+ * StarkNet Node API 0.45.0 - rpc 0.2.1
+ * StarkNet Node Write API 0.3.0 - rpc 0.2.1
+ * StarkNet Trace API 0.4.0 - rpc 0.2.1
  *
  * TypeScript Representation of OpenRpc protocol types
  */
@@ -12,11 +12,10 @@ export type FELT = string;
 export type ADDRESS = FELT;
 type NUM_AS_HEX = string;
 type SIGNATURE = Array<FELT>;
-type ETH_ADDRESS = string;
+// type ETH_ADDRESS = string;
 type BLOCK_NUMBER = number;
 type BLOCK_HASH = FELT;
 type TXN_HASH = FELT;
-type PROTOCOL_VERSION = string;
 type TXN_STATUS = 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
 type TXN_TYPE = 'DECLARE' | 'DEPLOY' | 'DEPLOY_ACCOUNT' | 'INVOKE' | 'L1_HANDLER';
 type BLOCK_STATUS = 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
@@ -34,37 +33,49 @@ type EVENT = {
   keys: Array<FELT>;
   data: Array<FELT>;
 };
+
 type COMMON_RECEIPT_PROPERTIES = {
   transaction_hash: TXN_HASH;
   actual_fee: FELT;
   status: TXN_STATUS;
-  status_data?: string;
-  block_hash: BLOCK_HASH;
-  block_number: BLOCK_NUMBER;
+  block_hash?: BLOCK_HASH;
+  block_number?: BLOCK_NUMBER;
+  type: TXN_TYPE;
+  messages_sent: Array<MSG_TO_L1>;
+  events: Array<EVENT>;
 };
-type MSG_TO_L2 = {
-  from_address: ETH_ADDRESS;
-  payload: FELT;
-};
-type INVOKE_TXN_RECEIPT_PROPERTIES = {
-  messages_sent: MSG_TO_L1;
-  l1_origin_message?: MSG_TO_L2;
-  events: EVENT;
-};
+
 type PENDING_COMMON_RECEIPT_PROPERTIES = {
   transaction_hash: TXN_HASH;
   actual_fee: FELT;
+  type?: TXN_TYPE;
+  messages_sent: Array<MSG_TO_L1>;
+  events: Array<EVENT>;
 };
-type INVOKE_TXN_RECEIPT = COMMON_RECEIPT_PROPERTIES & INVOKE_TXN_RECEIPT_PROPERTIES;
+
+type INVOKE_TXN_RECEIPT = COMMON_RECEIPT_PROPERTIES;
 type DECLARE_TXN_RECEIPT = COMMON_RECEIPT_PROPERTIES;
-type DEPLOY_TXN_RECEIPT = COMMON_RECEIPT_PROPERTIES;
-type PENDING_INVOKE_TXN_RECEIPT = PENDING_COMMON_RECEIPT_PROPERTIES & INVOKE_TXN_RECEIPT_PROPERTIES;
-type PENDING_TXN_RECEIPT = PENDING_INVOKE_TXN_RECEIPT | PENDING_COMMON_RECEIPT_PROPERTIES;
+
+type DEPLOY_TXN_RECEIPT = {
+  contract_address: FELT;
+} & COMMON_RECEIPT_PROPERTIES;
+
+type L1_HANDLER_TXN_RECEIPT = COMMON_RECEIPT_PROPERTIES;
+
+type PENDING_DEPLOY_TXN_RECEIPT = {
+  contract_address: FELT;
+} & PENDING_COMMON_RECEIPT_PROPERTIES;
+
+type PENDING_TXN_RECEIPT = PENDING_DEPLOY_TXN_RECEIPT | PENDING_COMMON_RECEIPT_PROPERTIES;
+
 type TXN_RECEIPT =
   | INVOKE_TXN_RECEIPT
+  | L1_HANDLER_TXN_RECEIPT
   | DECLARE_TXN_RECEIPT
   | DEPLOY_TXN_RECEIPT
+  | DEPLOY_ACCOUNT_TXN_RECEIPT
   | PENDING_TXN_RECEIPT;
+
 type BLOCK_HEADER = {
   block_hash: BLOCK_HASH;
   parent_hash: BLOCK_HASH;
@@ -77,7 +88,7 @@ type BLOCK_BODY_WITH_TX_HASHES = {
   transactions: Array<TXN_HASH>;
 };
 type BLOCK_WITH_TX_HASHES = {
-  status: TXN_STATUS;
+  status: BLOCK_STATUS;
 } & BLOCK_HEADER &
   BLOCK_BODY_WITH_TX_HASHES;
 type PENDING_BLOCK_WITH_TX_HASHES = BLOCK_BODY_WITH_TX_HASHES & {
@@ -88,41 +99,87 @@ type PENDING_BLOCK_WITH_TX_HASHES = BLOCK_BODY_WITH_TX_HASHES & {
 // transaction_hash, nonce, type optional because of pathfinder not implemented
 type COMMON_TXN_PROPERTIES = {
   transaction_hash?: TXN_HASH;
-  max_fee: FELT;
-  version: NUM_AS_HEX;
-  signature: SIGNATURE;
-  nonce?: FELT;
-  type?: TXN_TYPE;
-};
+} & BROADCASTED_TXN_COMMON_PROPERTIES;
 type FUNCTION_CALL = {
   contract_address?: ADDRESS;
   entry_point_selector?: FELT;
   calldata?: Array<FELT>;
 };
-type INVOKE_TXN = COMMON_TXN_PROPERTIES & FUNCTION_CALL;
+type INVOKE_TXN = COMMON_TXN_PROPERTIES & (INVOKE_TXN_V0 | INVOKE_TXN_V1);
 type DECLARE_TXN = COMMON_TXN_PROPERTIES & {
   class_hash: FELT;
-  sender_address: ADDRESS;
-};
-type DEPLOY_ACCOUNT_TXN_REQUEST = COMMON_TXN_PROPERTIES & {
-  class_hash: FELT;
-  contract_address_salt: FELT;
-  constructor_calldata: Array<FELT>;
-};
-type DECLARE_TXN_REQUEST = COMMON_TXN_PROPERTIES & {
-  contract_class: CONTRACT_CLASS;
   sender_address: ADDRESS;
 };
 type DEPLOY_TXN = {
   transaction_hash: TXN_HASH;
   class_hash: FELT;
+} & DEPLOY_TXN_PROPERTIES;
+
+type DEPLOY_ACCOUNT_TXN = COMMON_TXN_PROPERTIES & DEPLOY_ACCOUNT_TXN_PROPERTIES;
+
+type DEPLOY_ACCOUNT_TXN_PROPERTIES = {
+  contract_address_salt: FELT;
+  constructor_calldata: Array<FELT>;
+  class_hash: FELT;
+};
+
+type DEPLOY_ACCOUNT_TXN_RECEIPT = DEPLOY_TXN_RECEIPT;
+
+type TXN = INVOKE_TXN | L1_HANDLER_TXN | DECLARE_TXN | DEPLOY_TXN | DEPLOY_ACCOUNT_TXN;
+
+enum L1_HANDLER {
+  'L1_HANDLER',
+}
+
+type L1_HANDLER_TXN = {
+  transaction_hash: TXN_HASH;
+  version: NUM_AS_HEX;
+  type: L1_HANDLER;
+  nonce: NUM_AS_HEX;
+} & FUNCTION_CALL;
+
+type BROADCASTED_DEPLOY_ACCOUNT_TXN = BROADCASTED_TXN_COMMON_PROPERTIES &
+  DEPLOY_ACCOUNT_TXN_PROPERTIES;
+
+type BROADCASTED_TXN =
+  | BROADCASTED_INVOKE_TXN
+  | BROADCASTED_DECLARE_TXN
+  | BROADCASTED_DEPLOY_TXN
+  | BROADCASTED_DEPLOY_ACCOUNT_TXN;
+
+type BROADCASTED_INVOKE_TXN = BROADCASTED_TXN_COMMON_PROPERTIES & (INVOKE_TXN_V0 | INVOKE_TXN_V1);
+
+type BROADCASTED_TXN_COMMON_PROPERTIES = {
+  type: TXN_TYPE;
+  max_fee: FELT;
+  version: NUM_AS_HEX;
+  signature: SIGNATURE;
+  nonce: FELT;
+};
+
+type BROADCASTED_DECLARE_TXN = {
+  contract_class: CONTRACT_CLASS;
+  sender_address: ADDRESS;
+} & BROADCASTED_TXN_COMMON_PROPERTIES;
+
+type BROADCASTED_DEPLOY_TXN = {
+  contract_class: CONTRACT_CLASS;
+} & DEPLOY_TXN_PROPERTIES;
+
+type DEPLOY_TXN_PROPERTIES = {
   version: NUM_AS_HEX;
   type: TXN_TYPE;
-  contract_address: FELT;
   contract_address_salt: FELT;
   constructor_calldata: Array<FELT>;
 };
-type TXN = INVOKE_TXN | DECLARE_TXN | DEPLOY_TXN;
+
+type INVOKE_TXN_V0 = FUNCTION_CALL;
+
+type INVOKE_TXN_V1 = {
+  sender_address: ADDRESS;
+  calldata: Array<FELT>;
+};
+
 type BLOCK_BODY_WITH_TXS = {
   transactions: Array<TXN>;
 };
@@ -137,27 +194,69 @@ type PENDING_BLOCK_WITH_TXS = BLOCK_BODY_WITH_TXS & {
 };
 
 type CONTRACT_CLASS = {
-  program: string; // A base64 representation of the compressed program code
+  program: string;
   entry_points_by_type: {
     CONSTRUCTOR: CONTRACT_ENTRY_POINT_LIST;
     EXTERNAL: CONTRACT_ENTRY_POINT_LIST;
     L1_HANDLER: CONTRACT_ENTRY_POINT_LIST;
   };
-  abi?: any; // Pathfinder exception from rpc 0.1.0
+  abi?: CONTRACT_ABI;
 };
+
+type CONTRACT_ABI = Array<CONTRACT_ABI_ENTRY>;
+
+type CONTRACT_ABI_ENTRY = FUNCTION_ABI_ENTRY | EVENT_ABI_ENTRY | STRUCT_ABI_ENTRY;
+
+enum STRUCT_ABI_TYPE {
+  'struct',
+}
+enum EVENT_ABI_TYPE {
+  'event',
+}
+enum FUNCTION_ABI_TYPE {
+  'function',
+  'l1_handler',
+  'constructor',
+}
+
+type STRUCT_ABI_ENTRY = STRUCT_ABI_TYPE & {
+  name: string;
+  size: number;
+  members: Array<STRUCT_MEMBER>;
+};
+
+type STRUCT_MEMBER = {
+  offset: number;
+} & TYPED_PARAMETER;
+
+type EVENT_ABI_ENTRY = {
+  name: string;
+  keys: Array<TYPED_PARAMETER>;
+  data: Array<TYPED_PARAMETER>;
+} & EVENT_ABI_TYPE;
+
+type FUNCTION_ABI_ENTRY = {
+  type: FUNCTION_ABI_TYPE;
+  name: string;
+  inputs: Array<TYPED_PARAMETER>;
+  outputs: Array<TYPED_PARAMETER>;
+};
+
+type TYPED_PARAMETER = {
+  name: string;
+  type: string;
+};
+
 type CONTRACT_ENTRY_POINT_LIST = Array<CONTRACT_ENTRY_POINT>;
 type CONTRACT_ENTRY_POINT = {
   offset: NUM_AS_HEX;
   selector: FELT;
 };
-type STORAGE_DIFF_ITEM = {
+type CONTRACT_STORAGE_DIFF_ITEM = {
   address: FELT;
-  key: FELT;
-  value: FELT;
+  storage_entries: [key: FELT, value: FELT];
 };
-type DECLARED_CONTRACT_ITEM = {
-  class_hash: FELT;
-};
+
 type DEPLOYED_CONTRACT_ITEM = {
   address: FELT;
   class_hash: FELT;
@@ -167,8 +266,8 @@ type STATE_UPDATE = {
   new_root: FELT;
   old_root: FELT;
   state_diff: {
-    storage_diffs: Array<STORAGE_DIFF_ITEM>;
-    declared_contracts: Array<DECLARED_CONTRACT_ITEM>;
+    storage_diffs: Array<CONTRACT_STORAGE_DIFF_ITEM>;
+    declared_contract_hashes: Array<FELT>;
     deployed_contracts: Array<DEPLOYED_CONTRACT_ITEM>;
     nonces: Array<{
       contract_address: ADDRESS;
@@ -184,8 +283,8 @@ type EVENT_FILTER = {
   keys?: Array<FELT>;
 };
 type RESULT_PAGE_REQUEST = {
-  page_size: number;
-  page_number: number;
+  continuation_token?: string;
+  chunk_size: number;
 };
 type EMITTED_EVENT = EVENT & {
   block_hash: BLOCK_HASH;
@@ -221,10 +320,12 @@ type FUNCTION_INVOCATION = FUNCTION_CALL & {
   entry_point_type: ENTRY_POINT_TYPE;
   call_type: CALL_TYPE;
   result: FELT;
-  calls: FUNCTION_INVOCATION;
-  events: EVENT;
+  calls: NESTED_CALL;
+  events: Array<EVENT>;
   messages: MSG_TO_L1;
 };
+type NESTED_CALL = FUNCTION_INVOCATION;
+
 type TRACE_ROOT = {
   nonce: FELT;
   signature: FELT;
@@ -249,12 +350,10 @@ export namespace OPENRPC {
   };
   export type CHAIN_ID = string;
   export type PendingTransactions = Array<TXN>;
-  export type ProtocolVersion = PROTOCOL_VERSION;
   export type SyncingStatus = false | SYNC_STATUS;
   export type Events = {
     events: Array<EMITTED_EVENT>;
-    page_number: number;
-    is_last_page: boolean;
+    continuation_token: string;
   };
   export type Trace = TRACE_ROOT;
   export type Traces = Array<{
@@ -274,57 +373,57 @@ export namespace OPENRPC {
     starknet_getBlockWithTxHashes: {
       params: { block_id: BLOCK_ID };
       result: BlockWithTxHashes;
-      errors: Errors.INVALID_BLOCK_ID;
+      errors: Errors.BLOCK_NOT_FOUND;
     };
     starknet_getBlockWithTxs: {
       params: { block_id: BLOCK_ID };
       result: BlockWithTxs;
-      errors: Errors.INVALID_BLOCK_ID;
+      errors: Errors.BLOCK_NOT_FOUND;
     };
     starknet_getStateUpdate: {
       params: { block_id: BLOCK_ID };
       result: StateUpdate;
-      errors: Errors.INVALID_BLOCK_ID;
+      errors: Errors.BLOCK_NOT_FOUND;
     };
     starknet_getStorageAt: {
       params: { contract_address: ADDRESS; key: STORAGE_KEY; block_id: BLOCK_ID };
       result: Storage;
-      errors: Errors.CONTRACT_NOT_FOUND | Errors.INVALID_BLOCK_ID;
+      errors: Errors.CONTRACT_NOT_FOUND | Errors.BLOCK_NOT_FOUND;
     };
     starknet_getTransactionByHash: {
       params: { transaction_hash: TXN_HASH };
       result: Transaction;
-      errors: Errors.INVALID_TXN_HASH;
+      errors: Errors.TXN_HASH_NOT_FOUND;
     };
     starknet_getTransactionByBlockIdAndIndex: {
       params: { block_id: BLOCK_ID; index: number };
       result: Transaction;
-      errors: Errors.INVALID_BLOCK_ID | Errors.INVALID_TXN_INDEX;
+      errors: Errors.BLOCK_NOT_FOUND | Errors.INVALID_TXN_INDEX;
     };
     starknet_getTransactionReceipt: {
       params: { transaction_hash: TXN_HASH };
       result: TransactionReceipt;
-      errors: Errors.INVALID_TXN_HASH;
+      errors: Errors.TXN_HASH_NOT_FOUND;
     };
     starknet_getClass: {
-      params: { class_hash: FELT };
+      params: { block_id: BLOCK_ID; class_hash: FELT };
       result: ContractClass;
-      errors: Errors.INVALID_CONTRACT_CLASS_HASH;
+      errors: Errors.BLOCK_NOT_FOUND | Errors.CLASS_HASH_NOT_FOUND;
     };
     starknet_getClassHashAt: {
       params: { block_id: BLOCK_ID; contract_address: ADDRESS };
       result: FELT;
-      errors: Errors.INVALID_BLOCK_ID | Errors.CONTRACT_NOT_FOUND;
+      errors: Errors.BLOCK_NOT_FOUND | Errors.CONTRACT_NOT_FOUND;
     };
     starknet_getClassAt: {
       params: { block_id: BLOCK_ID; contract_address: ADDRESS };
       result: ContractClass;
-      errors: Errors.INVALID_BLOCK_ID | Errors.CONTRACT_NOT_FOUND;
+      errors: Errors.BLOCK_NOT_FOUND | Errors.CONTRACT_NOT_FOUND;
     };
     starknet_getBlockTransactionCount: {
       params: { block_id: BLOCK_ID };
       result: number;
-      errors: Errors.INVALID_BLOCK_ID;
+      errors: Errors.BLOCK_NOT_FOUND;
     };
     starknet_call: {
       params: { request: FUNCTION_CALL; block_id: BLOCK_ID };
@@ -334,20 +433,17 @@ export namespace OPENRPC {
         | Errors.INVALID_MESSAGE_SELECTOR
         | Errors.INVALID_CALL_DATA
         | Errors.CONTRACT_ERROR
-        | Errors.INVALID_BLOCK_ID;
+        | Errors.BLOCK_NOT_FOUND;
     };
     starknet_estimateFee: {
-      params: {
-        request: INVOKE_TXN | DECLARE_TXN_REQUEST | DEPLOY_ACCOUNT_TXN_REQUEST;
-        block_id: BLOCK_ID;
-      };
+      params: { request: BROADCASTED_TXN; block_id: BLOCK_ID };
       result: FEE_ESTIMATE;
       errors:
         | Errors.CONTRACT_NOT_FOUND
         | Errors.INVALID_MESSAGE_SELECTOR
         | Errors.INVALID_CALL_DATA
         | Errors.CONTRACT_ERROR
-        | Errors.INVALID_BLOCK_ID;
+        | Errors.BLOCK_NOT_FOUND;
     };
     starknet_blockNumber: {
       params: {};
@@ -374,55 +470,44 @@ export namespace OPENRPC {
     starknet_getEvents: {
       params: { filter: EVENT_FILTER & RESULT_PAGE_REQUEST };
       result: Events;
-      errors: Errors.PAGE_SIZE_TOO_BIG;
+      errors: Errors.PAGE_SIZE_TOO_BIG | Errors.INVALID_CONTINUATION_TOKEN | Errors.BLOCK_NOT_FOUND;
     };
-    // FROM RPC 0.2.0 Pathfinder exception
     starknet_getNonce: {
-      params: { contract_address: ADDRESS; block_id: BLOCK_ID };
+      params: { block_id: BLOCK_ID; contract_address: ADDRESS };
       result: FELT;
-      errors: Errors.CONTRACT_NOT_FOUND;
+      errors: Errors.BLOCK_NOT_FOUND | Errors.CONTRACT_NOT_FOUND;
     };
 
     // Write API
     starknet_addInvokeTransaction: {
       params: {
-        function_invocation: FUNCTION_CALL;
-        signature: SIGNATURE;
-        max_fee: NUM_AS_HEX;
-        version: NUM_AS_HEX;
+        invoke_transaction: BROADCASTED_INVOKE_TXN;
       };
       result: InvokedTransaction;
     };
     starknet_addDeclareTransaction: {
       params: {
-        contract_class: CONTRACT_CLASS;
-        sender_address: ADDRESS;
-        signature: SIGNATURE;
-        max_fee: NUM_AS_HEX;
-        version: NUM_AS_HEX;
-        nonce: FELT;
+        declare_transaction: BROADCASTED_DECLARE_TXN;
       };
       result: DeclaredTransaction;
       errors: Errors.INVALID_CONTRACT_CLASS;
     };
     starknet_addDeployTransaction: {
       params: {
-        contract_address_salt: FELT;
-        constructor_calldata: Array<FELT>;
-        contract_definition: CONTRACT_CLASS;
+        deploy_transaction: BROADCASTED_DEPLOY_TXN;
       };
       result: DeployedTransaction;
       errors: Errors.INVALID_CONTRACT_CLASS;
     };
-
     starknet_addDeployAccountTransaction: {
       params: {
-        contract_address_salt: FELT;
-        constructor_calldata: Array<FELT>;
-        class_hash: FELT;
+        deploy_account_transaction: BROADCASTED_DEPLOY_ACCOUNT_TXN;
       };
-      result: DeployedTransaction;
-      errors: Errors.INVALID_CONTRACT_CLASS;
+      result: {
+        transaction_hash: TXN_HASH;
+        contract_address: FELT;
+      };
+      errors: Errors.CLASS_HASH_NOT_FOUND;
     };
 
     // Trace API
@@ -430,10 +515,10 @@ export namespace OPENRPC {
       params: { transaction_hash: TXN_HASH };
       result: Trace;
       errors:
-        | Errors.INVALID_TXN_HASH
+        | Errors.TXN_HASH_NOT_FOUND
         | Errors.NO_TRACE_AVAILABLE
         | Errors.INVALID_BLOCK_HASH
-        | Errors.INVALID_TXN_HASH;
+        | Errors.TXN_HASH_NOT_FOUND;
     };
     starknet_traceBlockTransactions: {
       params: { block_hash: BLOCK_HASH };
@@ -464,9 +549,9 @@ export namespace Errors {
     message: 'Invalid call data';
   }
 
-  export interface INVALID_BLOCK_ID {
+  export interface BLOCK_NOT_FOUND {
     code: 24;
-    message: 'Invalid block id';
+    message: 'Block not found';
   }
 
   export interface INVALID_TXN_INDEX {
@@ -474,9 +559,9 @@ export namespace Errors {
     message: 'Invalid transaction index in a block';
   }
 
-  export interface INVALID_CONTRACT_CLASS_HASH {
+  export interface CLASS_HASH_NOT_FOUND {
     code: 28;
-    message: 'The supplied contract class hash is invalid or unknown';
+    message: 'Class hash not found';
   }
 
   export interface PAGE_SIZE_TOO_BIG {
@@ -487,6 +572,11 @@ export namespace Errors {
   export interface NO_BLOCKS {
     code: 32;
     message: 'There are no blocks';
+  }
+
+  export interface INVALID_CONTINUATION_TOKEN {
+    code: 33;
+    message: 'The supplied continuation token is invalid or unknown';
   }
 
   export interface CONTRACT_ERROR {
@@ -512,8 +602,8 @@ export namespace Errors {
     message: 'Invalid block hash';
   }
 
-  export interface INVALID_TXN_HASH {
+  export interface TXN_HASH_NOT_FOUND {
     code: 25;
-    message: 'Invalid transaction hash';
+    message: 'Transaction hash not found';
   }
 }
