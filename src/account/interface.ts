@@ -77,10 +77,12 @@ export abstract class AccountInterface extends ProviderInterface {
   /**
    * Estimate Fee for executing a DEPLOY_ACCOUNT transaction on starknet
    *
-   * @param contractPayload the payload object containing:
+   * @param contractPayload -
    * - contract - the compiled contract to be deployed
    * - classHash - the class hash of the compiled contract. This can be obtained by using starknet-cli.
-   *
+   * @param estimateFeeDetails -
+   * - optional blockIdentifier
+   * - constant nonce = 0
    * @returns response from estimate_fee
    */
   public abstract estimateAccountDeployFee(
