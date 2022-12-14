@@ -84,22 +84,15 @@ export class RpcProvider implements ProviderInterface {
     }
   }
 
-  protected deviationHandler(method: string, { error, result }: any): any {
-    // for non-existing address Sequencer return '0x0' rpc return error.
-    if (method === 'starknet_getNonce' && error.code === 20) return '0x0';
-
-    this.errorHandler(error);
-    return result;
-  }
-
   protected async fetchEndpoint<T extends keyof RPC.Methods>(
     method: T,
     params?: RPC.Methods[T]['params']
   ): Promise<RPC.Methods[T]['result']> {
     try {
-      const rawResponse = await this.fetch(method, params);
-      const response = await rawResponse.json();
-      return this.deviationHandler(method, response) as RPC.Methods[T]['result'];
+      const rawResult = await this.fetch(method, params);
+      const { error, result } = await rawResult.json();
+      this.errorHandler(error);
+      return result as RPC.Methods[T]['result'];
     } catch (error: any) {
       this.errorHandler(error?.response?.data);
       throw error;

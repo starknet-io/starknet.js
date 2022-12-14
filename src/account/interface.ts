@@ -236,7 +236,7 @@ export abstract class AccountInterface extends ProviderInterface {
   - optional address salt  
   - optional contractAddress
    * @param transactionsDetail Invocation Details containing:
-  - optional nonce
+  - constant nonce = 0
   - optional version
   - optional maxFee
    * @returns a confirmation of sending a transaction on the starknet contract

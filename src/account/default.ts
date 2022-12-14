@@ -400,7 +400,7 @@ export class Account extends Provider implements AccountInterface {
     }: DeployAccountContractPayload,
     transactionsDetail: InvocationsDetails = {}
   ): Promise<DeployContractResponse> {
-    const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
+    const nonce = '0x0';
     const version = toBN(transactionVersion);
     const chainId = await this.getChainId();
 
