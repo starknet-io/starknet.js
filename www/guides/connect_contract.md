@@ -6,7 +6,7 @@ Once your provider initialized, you can connect a contract already deployed in t
 You need 2 data :
 - the address of the contract
 - the ABI file of the contract (or the compiled contract file, that includes the abi)  
->If you don't have the abi file, the `provider.getcode()` command can help you.
+>If you don't have the abi file, the `provider.getClassAt()` command can help you.
 
 ```typescript
 import { Provider, Contract, json } from "starknet";
