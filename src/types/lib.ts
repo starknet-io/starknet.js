@@ -77,6 +77,9 @@ export type InvocationsDetails = {
 
 export type InvocationsDetailsWithNonce = InvocationsDetails & { nonce: BigNumberish };
 
+export type InvocationBulk = Invocation &
+  InvocationsDetailsWithNonce & { blockIdentifier: BlockNumber | BigNumberish };
+
 export type Status =
   | 'NOT_RECEIVED'
   | 'RECEIVED'

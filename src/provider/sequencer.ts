@@ -18,6 +18,7 @@ import {
   GetTransactionStatusResponse,
   GetTransactionTraceResponse,
   Invocation,
+  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Sequencer,
@@ -150,6 +151,7 @@ export class SequencerProvider implements ProviderInterface {
       'call_contract',
       'estimate_fee',
       'estimate_message_fee',
+      'estimate_fee_bulk',
     ];
 
     return postMethodEndpoints.includes(endpoint) ? 'POST' : 'GET';
@@ -434,6 +436,26 @@ export class SequencerProvider implements ProviderInterface {
         nonce: toHex(toBN(details.nonce)),
       }
     ).then(this.responseParser.parseFeeEstimateResponse);
+  }
+
+  public async getInvokeEstimateFeeBulk(
+    invocations: Array<InvocationBulk>,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<EstimateFeeResponse> {
+    const params: any = [].concat(invocations as []).map((invocation: InvocationBulk) => {
+      return {
+        type: 'INVOKE_FUNCTION',
+        contract_address: invocation.contractAddress,
+        calldata: invocation.calldata ?? [],
+        signature: bigNumberishArrayToDecimalStringArray(invocation.signature || []),
+        version: toHex(toBN(invocation?.version || 1)),
+        nonce: toHex(toBN(invocation.nonce)),
+      };
+    });
+
+    return this.fetchEndpoint('estimate_fee_bulk', { blockIdentifier }, params).then(
+      this.responseParser.parseFeeEstimateResponse
+    );
   }
 
   public async getCode(

@@ -11,6 +11,7 @@ import {
   GetCodeResponse,
   GetTransactionResponse,
   Invocation,
+  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   RPC,
@@ -259,6 +260,13 @@ export class RpcProvider implements ProviderInterface {
       },
       block_id,
     }).then(this.responseParser.parseFeeEstimateResponse);
+  }
+
+  public async getInvokeEstimateFeeBulk(
+    _invocations: Array<InvocationBulk>,
+    _blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<EstimateFeeResponse> {
+    throw new Error('RPC does not implement getInvokeEstimateFeeBulk function');
   }
 
   // TODO: Revisit after Pathfinder release with JSON-RPC v0.2.1 RPC Spec

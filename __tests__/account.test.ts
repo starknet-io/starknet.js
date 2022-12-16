@@ -65,6 +65,29 @@ describe('deploy and test Wallet', () => {
     innerInvokeEstFeeSpy.mockClear();
   });
 
+  test('estimate fee bulk', async () => {
+    const estimate = await account.estimateInvokeFeeBulk([
+      {
+        contractAddress: erc20Address,
+        entrypoint: 'transfer',
+        calldata: [erc20.address, '10', '0'],
+      },
+      [
+        {
+          contractAddress: erc20Address,
+          entrypoint: 'transfer',
+          calldata: [erc20.address, '10', '0'],
+        },
+        {
+          contractAddress: erc20Address,
+          entrypoint: 'transfer',
+          calldata: [erc20.address, '10', '0'],
+        },
+      ],
+    ]);
+    expect(isBN(estimate.overall_fee)).toBe(true);
+  });
+
   test('read balance of wallet', async () => {
     const x = await erc20.balanceOf(account.address);
 

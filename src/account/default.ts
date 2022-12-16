@@ -19,6 +19,7 @@ import {
   EstimateFee,
   EstimateFeeAction,
   EstimateFeeDetails,
+  Invocation,
   InvocationsDetails,
   InvocationsSignerDetails,
   InvokeFunctionResponse,
@@ -146,6 +147,59 @@ export class Account extends Provider implements AccountInterface {
     return {
       ...response,
       suggestedMaxFee,
+    };
+  }
+
+  public async estimateInvokeFeeBulk(
+    calls: Array<AllowArray<Call>>,
+    { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
+  ): Promise<EstimateFee> {
+    let nonce = toBN(providedNonce ?? (await this.getNonce()));
+    const version = toBN(feeTransactionVersion);
+    const chainId = await this.getChainId();
+
+    const invocations: any = await Promise.all(
+      [].concat(calls as []).map(async (call) => {
+        const transactions = Array.isArray(call) ? call : [call];
+        const signerDetails: InvocationsSignerDetails = {
+          walletAddress: this.address,
+          nonce,
+          maxFee: ZERO,
+          version,
+          chainId,
+        };
+        const invocation = await this.buildInvocation(transactions, signerDetails);
+        const res = {
+          ...invocation,
+          version,
+          nonce,
+          blockIdentifier,
+        };
+        nonce = toBN(Number(nonce) + 1);
+        return res;
+      })
+    );
+
+    const response = await super.getInvokeEstimateFeeBulk(invocations, blockIdentifier);
+    const suggestedMaxFee = estimatedFeeToMaxFee(response.overall_fee);
+
+    return {
+      ...response,
+      suggestedMaxFee,
+    };
+  }
+
+  private async buildInvocation(
+    call: Array<Call>,
+    signerDetails: InvocationsSignerDetails
+  ): Promise<Invocation> {
+    const calldata = fromCallsToExecuteCalldata(call);
+    const signature = await this.signer.signTransaction(call, signerDetails);
+
+    return {
+      contractAddress: this.address,
+      calldata,
+      signature,
     };
   }
 

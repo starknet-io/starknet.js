@@ -61,6 +61,21 @@ export abstract class AccountInterface extends ProviderInterface {
   ): Promise<EstimateFeeResponse>;
 
   /**
+   * Estimate Fee for executing a list of INVOKE transaction on starknet
+   *
+   * @param calls the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   *
+   * @returns response from estimate_fee
+   */
+  public abstract estimateInvokeFeeBulk(
+    calls: Array<AllowArray<Call>>,
+    estimateFeeDetails?: EstimateFeeDetails
+  ): Promise<EstimateFeeResponse>;
+
+  /**
    * Estimate Fee for executing a DECLARE transaction on starknet
    *
    * @param contractPayload the payload object containing:
