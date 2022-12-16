@@ -25,6 +25,7 @@ import {
   KeyPair,
   MultiDeployContractResponse,
   Signature,
+  TransactionStatus,
   TransactionType,
   UniversalDeployerContractPayload,
 } from '../types';
@@ -369,7 +370,7 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<DeployContractUDCResponse> {
     const deployTx = await this.deploy(payload, details);
     const txReceipt = await this.waitForTransaction(deployTx.transaction_hash, {
-      successStates: ['ACCEPTED_ON_L2'],
+      successStates: [TransactionStatus.ACCEPTED_ON_L2],
     });
     return parseUDCEvent(txReceipt);
   }
@@ -381,7 +382,7 @@ export class Account extends Provider implements AccountInterface {
     const { classHash, contract, constructorCalldata, salt, unique } = payload;
     const { transaction_hash } = await this.declare({ contract, classHash }, details);
     const declare = await this.waitForTransaction(transaction_hash, {
-      successStates: ['ACCEPTED_ON_L2'],
+      successStates: [TransactionStatus.ACCEPTED_ON_L2],
     });
     const deploy = await this.deployContract(
       { classHash, salt, unique, constructorCalldata },

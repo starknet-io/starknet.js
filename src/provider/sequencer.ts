@@ -1,6 +1,6 @@
 import urljoin from 'url-join';
 
-import { NetworkName, StarknetChainId } from '../constants';
+import { BaseUrl, NetworkName, StarknetChainId } from '../constants';
 import {
   Call,
   CallContractResponse,
@@ -112,14 +112,14 @@ export class SequencerProvider implements ProviderInterface {
 
   protected static getNetworkFromName(name: NetworkName | StarknetChainId) {
     switch (name) {
-      case NetworkName.SN_MAIN || StarknetChainId.MAINNET:
-        return 'https://alpha-mainnet.starknet.io';
-      case NetworkName.SN_GOERLI || StarknetChainId.TESTNET:
-        return 'https://alpha4.starknet.io';
-      case NetworkName.SN_GOERLI2 || StarknetChainId.TESTNET2:
-        return 'https://alpha4-2.starknet.io';
+      case NetworkName.SN_MAIN || StarknetChainId.SN_MAIN:
+        return BaseUrl.SN_MAIN;
+      case NetworkName.SN_GOERLI || StarknetChainId.SN_GOERLI:
+        return BaseUrl.SN_GOERLI;
+      case NetworkName.SN_GOERLI2 || StarknetChainId.SN_GOERLI2:
+        return BaseUrl.SN_GOERLI2;
       default:
-        return 'https://alpha4.starknet.io';
+        throw new Error('Could not detect base url from NetworkName');
     }
   }
 
@@ -127,16 +127,16 @@ export class SequencerProvider implements ProviderInterface {
     try {
       const url = new URL(baseUrl);
       if (url.host.includes('mainnet.starknet.io')) {
-        return StarknetChainId.MAINNET;
+        return StarknetChainId.SN_MAIN;
       }
       if (url.host.includes('alpha4-2.starknet.io')) {
-        return StarknetChainId.TESTNET2;
+        return StarknetChainId.SN_GOERLI;
       }
     } catch {
       // eslint-disable-next-line no-console
       console.error(`Could not parse baseUrl: ${baseUrl}`);
     }
-    return StarknetChainId.TESTNET;
+    return StarknetChainId.SN_GOERLI2;
   }
 
   private getFetchUrl(endpoint: keyof Sequencer.Endpoints) {
