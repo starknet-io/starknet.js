@@ -16,7 +16,7 @@ import type {
   Invocation,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
-  Status,
+  waitForTransactionOptions,
 } from '../types';
 import type { BigNumberish } from '../utils/number';
 import { BlockIdentifier } from './utils';
@@ -275,7 +275,6 @@ export abstract class ProviderInterface {
    */
   public abstract waitForTransaction(
     txHash: BigNumberish,
-    retryInterval?: number,
-    successStates?: Array<Status>
+    options?: waitForTransactionOptions
   ): Promise<GetTransactionReceiptResponse>;
 }

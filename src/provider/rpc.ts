@@ -14,6 +14,7 @@ import {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   RPC,
+  waitForTransactionOptions,
 } from '../types';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
@@ -393,8 +394,10 @@ export class RpcProvider implements ProviderInterface {
 
   public async waitForTransaction(
     txHash: string,
-    retryInterval: number = 8000,
-    successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING']
+    {
+      retryInterval = 8000,
+      successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'],
+    }: waitForTransactionOptions
   ) {
     const errorStates = ['REJECTED', 'NOT_RECEIVED'];
     let { retries } = this;

@@ -21,6 +21,7 @@ import {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Sequencer,
+  waitForTransactionOptions,
 } from '../types';
 import fetch from '../utils/fetchPonyfill';
 import { getSelector, getSelectorFromName } from '../utils/hash';
@@ -445,8 +446,10 @@ export class SequencerProvider implements ProviderInterface {
 
   public async waitForTransaction(
     txHash: BigNumberish,
-    retryInterval: number = 8000,
-    successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING']
+    {
+      retryInterval = 8000,
+      successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'],
+    }: waitForTransactionOptions
   ) {
     const errorStates = ['REJECTED', 'NOT_RECEIVED'];
     let onchain = false;

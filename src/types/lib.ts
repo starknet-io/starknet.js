@@ -147,3 +147,8 @@ export type Args = {
 export type ParsedStruct = {
   [key: string]: BigNumberish | ParsedStruct;
 };
+
+export type waitForTransactionOptions = {
+  retryInterval?: number;
+  successStates?: Array<Status>;
+};

@@ -368,9 +368,9 @@ export class Account extends Provider implements AccountInterface {
     details?: InvocationsDetails | undefined
   ): Promise<DeployContractUDCResponse> {
     const deployTx = await this.deploy(payload, details);
-    const txReceipt = await this.waitForTransaction(deployTx.transaction_hash, undefined, [
-      'ACCEPTED_ON_L2',
-    ]);
+    const txReceipt = await this.waitForTransaction(deployTx.transaction_hash, {
+      successStates: ['ACCEPTED_ON_L2'],
+    });
     return parseUDCEvent(txReceipt);
   }
 
@@ -380,7 +380,9 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<DeclareDeployUDCResponse> {
     const { classHash, contract, constructorCalldata, salt, unique } = payload;
     const { transaction_hash } = await this.declare({ contract, classHash }, details);
-    const declare = await this.waitForTransaction(transaction_hash, undefined, ['ACCEPTED_ON_L2']);
+    const declare = await this.waitForTransaction(transaction_hash, {
+      successStates: ['ACCEPTED_ON_L2'],
+    });
     const deploy = await this.deployContract(
       { classHash, salt, unique, constructorCalldata },
       details
