@@ -4,16 +4,7 @@
  */
 import BN from 'bn.js';
 
-import {
-  AllowArray,
-  Call,
-  DeclareContractPayload,
-  DeployAccountContractPayload,
-  RawCalldata,
-  Signature,
-  Status,
-  UniversalDeployerContractPayload,
-} from './lib';
+import { RawCalldata, Signature, Status } from './lib';
 
 export interface GetBlockResponse {
   timestamp: number;
@@ -114,21 +105,3 @@ export interface DeclareContractResponse {
 export type CallContractResponse = {
   result: Array<string>;
 };
-
-export type EstimateFeeAction =
-  | {
-      type: 'INVOKE';
-      payload: AllowArray<Call>;
-    }
-  | {
-      type: 'DECLARE';
-      payload: DeclareContractPayload;
-    }
-  | {
-      type: 'DEPLOY_ACCOUNT';
-      payload: DeployAccountContractPayload;
-    }
-  | {
-      type: 'DEPLOY';
-      payload: UniversalDeployerContractPayload;
-    };

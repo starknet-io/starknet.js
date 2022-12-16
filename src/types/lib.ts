@@ -85,7 +85,13 @@ export type Status =
   | 'ACCEPTED_ON_L1'
   | 'REJECTED';
 export type TransactionStatus = 'TRANSACTION_RECEIVED';
-export type TransactionType = 'DECLARE' | 'DEPLOY' | 'INVOKE_FUNCTION' | 'DEPLOY_ACCOUNT';
+export enum TransactionType {
+  INVOKE = 'INVOKE',
+  DECLARE = 'DECLARE',
+  DEPLOY = 'DEPLOY',
+  DEPLOY_ACCOUNT = 'DEPLOY_ACCOUNT',
+}
+
 export type EntryPointType = 'EXTERNAL';
 export type CompressedProgram = string;
 

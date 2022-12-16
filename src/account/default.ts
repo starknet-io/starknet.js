@@ -25,6 +25,7 @@ import {
   KeyPair,
   MultiDeployContractResponse,
   Signature,
+  TransactionType,
   UniversalDeployerContractPayload,
 } from '../types';
 import { parseUDCEvent } from '../utils/events';
@@ -106,13 +107,6 @@ export class Account extends Provider implements AccountInterface {
     } catch {
       return Error('Could not get address from stark name');
     }
-  }
-
-  public async estimateFee(
-    calls: AllowArray<Call>,
-    estimateFeeDetails?: EstimateFeeDetails | undefined
-  ): Promise<EstimateFee> {
-    return this.estimateInvokeFee(calls, estimateFeeDetails);
   }
 
   public async estimateInvokeFee(
@@ -258,7 +252,10 @@ export class Account extends Provider implements AccountInterface {
     const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
     const maxFee =
       transactionsDetail.maxFee ??
-      (await this.getSuggestedMaxFee({ type: 'INVOKE', payload: calls }, transactionsDetail));
+      (await this.getSuggestedMaxFee(
+        { type: TransactionType.INVOKE, payload: calls },
+        transactionsDetail
+      ));
     const version = toBN(transactionVersion);
     const chainId = await this.getChainId();
 
@@ -292,7 +289,7 @@ export class Account extends Provider implements AccountInterface {
     const maxFee =
       transactionsDetail.maxFee ??
       (await this.getSuggestedMaxFee(
-        { type: 'DECLARE', payload: { classHash, contract } },
+        { type: TransactionType.DECLARE, payload: { classHash, contract } },
         transactionsDetail
       ));
 
@@ -412,7 +409,7 @@ export class Account extends Provider implements AccountInterface {
       transactionsDetail.maxFee ??
       (await this.getSuggestedMaxFee(
         {
-          type: 'DEPLOY_ACCOUNT',
+          type: TransactionType.DEPLOY_ACCOUNT,
           payload: { classHash, constructorCalldata, addressSalt, contractAddress },
         },
         transactionsDetail
@@ -475,19 +472,19 @@ export class Account extends Provider implements AccountInterface {
     let feeEstimate: EstimateFee;
 
     switch (type) {
-      case 'INVOKE':
+      case TransactionType.INVOKE:
         feeEstimate = await this.estimateInvokeFee(payload, details);
         break;
 
-      case 'DECLARE':
+      case TransactionType.DECLARE:
         feeEstimate = await this.estimateDeclareFee(payload, details);
         break;
 
-      case 'DEPLOY_ACCOUNT':
+      case TransactionType.DEPLOY_ACCOUNT:
         feeEstimate = await this.estimateAccountDeployFee(payload, details);
         break;
 
-      case 'DEPLOY':
+      case TransactionType.DEPLOY:
         feeEstimate = await this.estimateDeployFee(payload, details);
         break;
 

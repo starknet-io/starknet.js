@@ -2,6 +2,14 @@ import BN from 'bn.js';
 
 import { BlockIdentifier } from '../provider/utils';
 import { BigNumberish } from '../utils/number';
+import {
+  AllowArray,
+  Call,
+  DeclareContractPayload,
+  DeployAccountContractPayload,
+  TransactionType,
+  UniversalDeployerContractPayload,
+} from './lib';
 import { DeclareTransactionReceiptResponse, EstimateFeeResponse } from './provider';
 
 export interface EstimateFee extends EstimateFeeResponse {
@@ -41,3 +49,21 @@ export type DeclareDeployUDCResponse = {
   } & DeclareTransactionReceiptResponse;
   deploy: DeployContractUDCResponse;
 };
+
+export type EstimateFeeAction =
+  | {
+      type: TransactionType.INVOKE;
+      payload: AllowArray<Call>;
+    }
+  | {
+      type: TransactionType.DECLARE;
+      payload: DeclareContractPayload;
+    }
+  | {
+      type: TransactionType.DEPLOY_ACCOUNT;
+      payload: DeployAccountContractPayload;
+    }
+  | {
+      type: TransactionType.DEPLOY;
+      payload: UniversalDeployerContractPayload;
+    };
