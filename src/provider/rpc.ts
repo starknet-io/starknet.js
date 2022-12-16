@@ -14,6 +14,7 @@ import {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   RPC,
+  TransactionStatus,
   waitForTransactionOptions,
 } from '../types';
 import fetch from '../utils/fetchPonyfill';
@@ -250,7 +251,7 @@ export class RpcProvider implements ProviderInterface {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_estimateFee', {
       request: {
-        type: 'INVOKE',
+        type: RPC.TransactionType.INVOKE,
         sender_address: invocation.contractAddress,
         calldata: parseCalldata(invocation.calldata),
         signature: bigNumberishArrayToHexadecimalStringArray(invocation.signature || []),
@@ -262,8 +263,6 @@ export class RpcProvider implements ProviderInterface {
     }).then(this.responseParser.parseFeeEstimateResponse);
   }
 
-  // TODO: Revisit after Pathfinder release with JSON-RPC v0.2.1 RPC Spec
-
   public async getDeclareEstimateFee(
     { senderAddress, contractDefinition, signature }: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
@@ -272,7 +271,7 @@ export class RpcProvider implements ProviderInterface {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_estimateFee', {
       request: {
-        type: 'DECLARE',
+        type: RPC.TransactionType.DECLARE,
         contract_class: {
           program: contractDefinition.program,
           entry_points_by_type: contractDefinition.entry_points_by_type,
@@ -296,7 +295,7 @@ export class RpcProvider implements ProviderInterface {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_estimateFee', {
       request: {
-        type: 'DEPLOY_ACCOUNT',
+        type: RPC.TransactionType.DEPLOY_ACCOUNT,
         constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
         class_hash: toHex(toBN(classHash)),
         contract_address_salt: toHex(toBN(addressSalt || 0)),
@@ -321,7 +320,7 @@ export class RpcProvider implements ProviderInterface {
           entry_points_by_type: contractDefinition.entry_points_by_type,
           abi: contractDefinition.abi, // rpc 2.0
         },
-        type: 'DECLARE',
+        type: RPC.TransactionType.DECLARE,
         version: toHex(toBN(details.version || 0)),
         max_fee: toHex(toBN(details.maxFee || 0)),
         signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
@@ -340,7 +339,7 @@ export class RpcProvider implements ProviderInterface {
         constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
         class_hash: toHex(toBN(classHash)),
         contract_address_salt: toHex(toBN(addressSalt || 0)),
-        type: 'DEPLOY_ACCOUNT',
+        type: RPC.TransactionType.DEPLOY_ACCOUNT,
         max_fee: toHex(toBN(details.maxFee || 0)),
         version: toHex(toBN(details.version || 0)),
         signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
@@ -357,7 +356,7 @@ export class RpcProvider implements ProviderInterface {
       invoke_transaction: {
         sender_address: functionInvocation.contractAddress,
         calldata: parseCalldata(functionInvocation.calldata),
-        type: 'INVOKE',
+        type: RPC.TransactionType.INVOKE,
         max_fee: toHex(toBN(details.maxFee || 0)),
         version: toHex(toBN(details.version || 0)),
         signature: bigNumberishArrayToHexadecimalStringArray(functionInvocation.signature || []),
@@ -396,10 +395,14 @@ export class RpcProvider implements ProviderInterface {
     txHash: string,
     {
       retryInterval = 8000,
-      successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'],
+      successStates = [
+        TransactionStatus.ACCEPTED_ON_L1,
+        TransactionStatus.ACCEPTED_ON_L2,
+        TransactionStatus.PENDING,
+      ],
     }: waitForTransactionOptions
   ) {
-    const errorStates = ['REJECTED', 'NOT_RECEIVED'];
+    const errorStates = [TransactionStatus.RECEIVED, TransactionStatus.NOT_RECEIVED];
     let { retries } = this;
     let onchain = false;
     let txReceipt: any = {};
@@ -425,7 +428,7 @@ export class RpcProvider implements ProviderInterface {
           throw error;
         }
       } catch (error: unknown) {
-        if (error instanceof Error && errorStates.includes(error.message)) {
+        if (error instanceof Error && errorStates.includes(error.message as TransactionStatus)) {
           throw error;
         }
 

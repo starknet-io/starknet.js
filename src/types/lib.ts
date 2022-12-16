@@ -77,6 +77,15 @@ export type InvocationsDetails = {
 
 export type InvocationsDetailsWithNonce = InvocationsDetails & { nonce: BigNumberish };
 
+export enum TransactionStatus {
+  NOT_RECEIVED = 'NOT_RECEIVED',
+  RECEIVED = 'RECEIVED',
+  PENDING = 'PENDING',
+  ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
+  ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
+  REJECTED = 'REJECTED',
+}
+
 export type Status =
   | 'NOT_RECEIVED'
   | 'RECEIVED'
@@ -84,9 +93,9 @@ export type Status =
   | 'ACCEPTED_ON_L2'
   | 'ACCEPTED_ON_L1'
   | 'REJECTED';
-export type TransactionStatus = 'TRANSACTION_RECEIVED';
+
 export enum TransactionType {
-  INVOKE = 'INVOKE',
+  INVOKE = 'INVOKE_FUNCTION',
   DECLARE = 'DECLARE',
   DEPLOY = 'DEPLOY',
   DEPLOY_ACCOUNT = 'DEPLOY_ACCOUNT',

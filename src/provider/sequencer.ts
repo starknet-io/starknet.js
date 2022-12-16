@@ -1,6 +1,6 @@
 import urljoin from 'url-join';
 
-import { StarknetChainId } from '../constants';
+import { NetworkName, StarknetChainId } from '../constants';
 import {
   Call,
   CallContractResponse,
@@ -21,6 +21,8 @@ import {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Sequencer,
+  TransactionStatus,
+  TransactionType,
   waitForTransactionOptions,
 } from '../types';
 import fetch from '../utils/fetchPonyfill';
@@ -42,8 +44,6 @@ import { buildUrl } from '../utils/url';
 import { GatewayError, HttpError } from './errors';
 import { ProviderInterface } from './interface';
 import { Block, BlockIdentifier } from './utils';
-
-type NetworkName = 'mainnet-alpha' | 'goerli-alpha' | 'goerli-alpha-2';
 
 export type SequencerProviderOptions = {
   headers?: object;
@@ -71,7 +71,7 @@ function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
 }
 
 const defaultOptions = {
-  network: 'goerli-alpha-2' as NetworkName,
+  network: NetworkName.SN_GOERLI2,
   blockIdentifier: 'pending',
 };
 
@@ -112,11 +112,11 @@ export class SequencerProvider implements ProviderInterface {
 
   protected static getNetworkFromName(name: NetworkName | StarknetChainId) {
     switch (name) {
-      case 'mainnet-alpha' || StarknetChainId.MAINNET:
+      case NetworkName.SN_MAIN || StarknetChainId.MAINNET:
         return 'https://alpha-mainnet.starknet.io';
-      case 'goerli-alpha' || StarknetChainId.TESTNET:
+      case NetworkName.SN_GOERLI || StarknetChainId.TESTNET:
         return 'https://alpha4.starknet.io';
-      case 'goerli-alpha-2' || StarknetChainId.TESTNET2:
+      case NetworkName.SN_GOERLI2 || StarknetChainId.TESTNET2:
         return 'https://alpha4-2.starknet.io';
       default:
         return 'https://alpha4.starknet.io';
@@ -141,7 +141,6 @@ export class SequencerProvider implements ProviderInterface {
 
   private getFetchUrl(endpoint: keyof Sequencer.Endpoints) {
     const gatewayUrlEndpoints = ['add_transaction'];
-
     return gatewayUrlEndpoints.includes(endpoint) ? this.gatewayUrl : this.feederGatewayUrl;
   }
 
@@ -330,7 +329,7 @@ export class SequencerProvider implements ProviderInterface {
     details: InvocationsDetailsWithNonce
   ): Promise<InvokeFunctionResponse> {
     return this.fetchEndpoint('add_transaction', undefined, {
-      type: 'INVOKE_FUNCTION',
+      type: TransactionType.INVOKE,
       contract_address: functionInvocation.contractAddress,
       calldata: bigNumberishArrayToDecimalStringArray(functionInvocation.calldata ?? []),
       signature: bigNumberishArrayToDecimalStringArray(functionInvocation.signature ?? []),
@@ -345,7 +344,7 @@ export class SequencerProvider implements ProviderInterface {
     details: InvocationsDetailsWithNonce
   ): Promise<DeployContractResponse> {
     return this.fetchEndpoint('add_transaction', undefined, {
-      type: 'DEPLOY_ACCOUNT',
+      type: TransactionType.DEPLOY_ACCOUNT,
       contract_address_salt: addressSalt ?? randomAddress(),
       constructor_calldata: bigNumberishArrayToDecimalStringArray(constructorCalldata ?? []),
       class_hash: toHex(toBN(classHash)),
@@ -361,7 +360,7 @@ export class SequencerProvider implements ProviderInterface {
     details: InvocationsDetailsWithNonce
   ): Promise<DeclareContractResponse> {
     return this.fetchEndpoint('add_transaction', undefined, {
-      type: 'DECLARE',
+      type: TransactionType.DECLARE,
       contract_class: contractDefinition,
       nonce: toHex(toBN(details.nonce)),
       signature: bigNumberishArrayToDecimalStringArray(signature || []),
@@ -388,7 +387,7 @@ export class SequencerProvider implements ProviderInterface {
       'estimate_fee',
       { blockIdentifier },
       {
-        type: 'INVOKE_FUNCTION',
+        type: TransactionType.INVOKE,
         contract_address: invocation.contractAddress,
         calldata: invocation.calldata ?? [],
         signature: bigNumberishArrayToDecimalStringArray(invocation.signature || []),
@@ -407,7 +406,7 @@ export class SequencerProvider implements ProviderInterface {
       'estimate_fee',
       { blockIdentifier },
       {
-        type: 'DECLARE',
+        type: TransactionType.DECLARE,
         sender_address: senderAddress,
         contract_class: contractDefinition,
         signature: bigNumberishArrayToDecimalStringArray(signature || []),
@@ -426,7 +425,7 @@ export class SequencerProvider implements ProviderInterface {
       'estimate_fee',
       { blockIdentifier },
       {
-        type: 'DEPLOY_ACCOUNT',
+        type: TransactionType.DEPLOY_ACCOUNT,
         class_hash: toHex(toBN(classHash)),
         constructor_calldata: bigNumberishArrayToDecimalStringArray(constructorCalldata || []),
         contract_address_salt: toHex(toBN(addressSalt || 0)),
@@ -448,10 +447,14 @@ export class SequencerProvider implements ProviderInterface {
     txHash: BigNumberish,
     {
       retryInterval = 8000,
-      successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'],
+      successStates = [
+        TransactionStatus.ACCEPTED_ON_L1,
+        TransactionStatus.ACCEPTED_ON_L2,
+        TransactionStatus.PENDING,
+      ],
     }: waitForTransactionOptions
   ) {
-    const errorStates = ['REJECTED', 'NOT_RECEIVED'];
+    const errorStates = [TransactionStatus.RECEIVED, TransactionStatus.NOT_RECEIVED];
     let onchain = false;
     let res;
 
