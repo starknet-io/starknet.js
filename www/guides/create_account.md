@@ -34,7 +34,12 @@ console.log('publicKey=', starkKeyPub);
 const OZaccountClashHass = "0x2794ce20e5f2ff0d40e632cb53845b9f4e526ebd8471983f7dbd355b721d5a";
 // Calculate future address of the account
 const OZaccountConstructorCallData = stark.compileCalldata({ publicKey: starkKeyPub });
-const OZcontractAddress = hash.calculateContractAddressFromHash(starkKeyPub, OZaccountClashHass, OZaccountConstructorCallData, 0);
+const OZcontractAddress = hash.calculateContractAddressFromHash(
+    starkKeyPub, 
+    OZaccountClashHass, 
+    OZaccountConstructorCallData, 
+    0
+);
 console.log('Precalculated account address=', OZcontractAddress);
 
 ```
@@ -50,12 +55,17 @@ How to proceed is out of the scope of this guide, by you can for example :
 If you have sent enough fund to this new address, you can go forward to the final step :
 ```typescript
 const OZaccount = new Account(provider, OZcontractAddress, starkKeyPair);
-const { transaction_hash, contract_address } = await OZaccount.deployAccount({ classHash: OZaccountClashHass, constructorCalldata: OZaccountConstructorCallData, addressSalt: starkKeyPub });
+const { transaction_hash, contract_address } = await OZaccount.deployAccount({ 
+    classHash: OZaccountClashHass, 
+    constructorCalldata: OZaccountConstructorCallData, 
+    addressSalt: starkKeyPub 
+});
 await provider.waitForTransaction(transaction_hash);
 console.log('✅ New OpenZeppelin account created.\n   address =', contract_address);
 ```
 ## Create AX (Argent X) account :
 Here, we will create a wallet with the ArgentX smartcontract v0.2.3. This case is more complicated, because we will have the wallet behind a proxy contract (by this way, the wallet contract can be updated). The contract classes of both contracts are already implemented in both Testnet 1 & 2.
+> If necessary OZ contracts can also be create with a proxy.
 ```typescript
 import { Account, ec, json, stark, Provider, hash } from "starknet";
 ```
@@ -74,8 +84,17 @@ const starkKeyPairAX = ec.getKeyPair(privateKeyAX);
 const starkKeyPubAX = ec.getStarkKey(starkKeyPairAX);
 console.log('AX_ACCOUNT_PUBLIC_KEY=', starkKeyPubAX);
 // Calculate future address of the ArgentX account
-const AXproxyConstructorCallData = stark.compileCalldata({ implementation: argentXaccountClassHash, selector: hash.getSelectorFromName("initialize"), calldata: stark.compileCalldata({ signer: starkKeyPubAX, guardian: "0" }), });
-const AXcontractAddress = hash.calculateContractAddressFromHash(starkKeyPubAX, argentXproxyClassHash, AXproxyConstructorCallData, 0);
+const AXproxyConstructorCallData = stark.compileCalldata({ 
+    implementation: argentXaccountClassHash, 
+    selector: hash.getSelectorFromName("initialize"), 
+    calldata: stark.compileCalldata({ signer: starkKeyPubAX, guardian: "0" }), 
+});
+const AXcontractAddress = hash.calculateContractAddressFromHash(
+    starkKeyPubAX, 
+    argentXproxyClassHash, 
+    AXproxyConstructorCallData, 
+    0
+);
 console.log('Precalculated account address=', AXcontractAddress);
 ```
 If you want a specific private key, replace `stark.randomAddress()` by your choice.  
@@ -84,7 +103,11 @@ Then you have to fund this address.
 If you have sent enough fund to this new address, you can go forward to the final step :
 ```typescript
 const accountAX = new Account(provider, AXcontractAddress, starkKeyPairAX);
-const deployAccountPayload = { classHash: argentXproxyClassHash, constructorCalldata: AXproxyConstructorCallData, contractAddress: AXcontractAddress, addressSalt: starkKeyPubAX };
+const deployAccountPayload = { 
+    classHash: argentXproxyClassHash, 
+    constructorCalldata: AXproxyConstructorCallData, 
+    contractAddress: AXcontractAddress, 
+    addressSalt: starkKeyPubAX };
 const { transaction_hash: AXdAth, contract_address: AXcontractFinalAdress } = await accountAX.deployAccount(deployAccountPayload);
 console.log('✅ ArgentX wallet deployed at :',AXcontractFinalAdress);
 ```
@@ -126,13 +149,24 @@ console.log('publicKey=', AAstarkKeyPub);
 // declare the contract
 const compiledAAaccount = json.parse(fs.readFileSync("./compiled_contracts/myAccountAbstraction.json").toString("ascii")
 const AAaccountClashHass = "0x5139780c7ec8246e21a22e49f4fa0ce430237df4a4b241214a3a5a5c120120d";
-const { transaction_hash: declTH, class_hash: decCH } = await account0.declare({ classHash: AAaccountClashHass, contract: compiledAAaccount });
+const { transaction_hash: declTH, class_hash: decCH } = await account0.declare({ 
+    classHash: AAaccountClashHass, 
+    contract: compiledAAaccount 
+});
 console.log('Customized account class hash =', decCH);
 await provider.waitForTransaction(declTH);
 
 // Calculate future address of the account
-const AAaccountConstructorCallData = stark.compileCalldata({ super_admin_address: account0.address, publicKey: AAstarkKeyPub });
-const AAcontractAddress = hash.calculateContractAddressFromHash(AAstarkKeyPub, AAaccountClashHass, AAaccountConstructorCallData, 0);
+const AAaccountConstructorCallData = stark.compileCalldata({
+    super_admin_address: account0.address, 
+    publicKey: AAstarkKeyPub 
+});
+const AAcontractAddress = hash.calculateContractAddressFromHash(
+    AAstarkKeyPub, 
+    AAaccountClashHass, 
+    AAaccountConstructorCallData, 
+    0
+);
 console.log('Precalculated account address=', AAcontractAddress);
 
 // fund account address before account creation
@@ -141,7 +175,11 @@ console.log('Answer mint =', answer);
 
 // deploy account
 const AAaccount = new Account(provider, AAcontractAddress, AAstarkKeyPair);
-const { transaction_hash, contract_address } = await AAaccount.deployAccount({ classHash: AAaccountClashHass, constructorCalldata: AAaccountConstructorCallData, addressSalt: AAstarkKeyPub });
+const { transaction_hash, contract_address } = await AAaccount.deployAccount({ 
+    classHash: AAaccountClashHass, 
+    constructorCalldata: AAaccountConstructorCallData, 
+    addressSalt: AAstarkKeyPub 
+});
 await provider.waitForTransaction(transaction_hash);
 console.log('✅ New customized account created.\n   address =', contract_address);
 ```

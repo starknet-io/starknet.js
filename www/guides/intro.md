@@ -21,13 +21,13 @@ npm install starknet@next
 
 ### With Devnet
 
-Example devnet version is `0.7.0`.
+Example devnet version is `0.7.1`.
 
 Get devnet with docker:
 
 ```bash
-docker pull shardlabs/starknet-devnet:0.7.0
-docker run -p 5050:5050 shardlabs/starknet-devnet:0.7.0 --seed 0
+docker pull shardlabs/starknet-devnet:0.7.1
+docker run -p 5050:5050 shardlabs/starknet-devnet:0.7.1 --seed 0
 ```
 
 Open new console tab, go to your starknet.js directory and run:
