@@ -47,7 +47,7 @@ export const getTestProvider = (): ProviderInterface => {
   if (IS_LOCALHOST_DEVNET) {
     // accelerate the tests when running locally
     const originalWaitForTransaction = provider.waitForTransaction.bind(provider);
-    provider.waitForTransaction = (txHash: string, { retryInterval }) => {
+    provider.waitForTransaction = (txHash: string, { retryInterval }: any) => {
       return originalWaitForTransaction(txHash, { retryInterval: retryInterval || 1000 });
     };
   }
