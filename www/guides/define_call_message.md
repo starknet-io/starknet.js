@@ -13,12 +13,10 @@ In Starknet.js, it's a bit ... complicated : you have the BigNumberish type  ; i
 - Number (max 64 bits) : 123 
 - BN (max 256 bits) : BigNum from [BN.js](https://github.com/indutny/bn.js/) 🤯.
 
-> To create a BigInt : 
-`const myBigInt=BigInt(1234n);`  
-To create a BN : `const myBN=new BN("0x12b4");`   
-To convert a BigInt to BN : 
-`const myBigInt=BigInt(myBN.toString);`  
-To convert a BN to BigInt : `const myBN=new BN(myBigInt.toString();` 
+> To create a BigInt : `const myBigInt=BigInt(1234n);`  
+To create a BN :  `const myBN=new BN("0x12b4");`  
+To convert a BigInt to BN : `const myBN=new BN(myBigInt.toString();`  
+To convert a BN to BigInt : `const myBigInt=BigInt(myBN.toString);`
 
 
 ## function argument types :
@@ -26,7 +24,7 @@ There are 4 different types of contract function arguments used in Starknet.js.
 ### Array of < BigNumberish > :
 You have to create by yourself this array of < BigNumberish >, in respect with the order of the Cairo function parameters :
 ```typescript
-const myCallData: = [ // array of <BigNumberish>
+const myCallData = [ // array of <BigNumberish>
     123, // number 64 bits
     "0x2345", // string
     bn1, // BN
@@ -34,7 +32,8 @@ const myCallData: = [ // array of <BigNumberish>
     num1, // number 64 bits
     initialUint256.low, initialUint256.high, //object converted to BigNumberish
     coord.x0, coord.y0, coord.z0, //object converted to BigNumberish
-    shortString.encodeShortString('A')
+    shortString.encodeShortString('A'),
+    2, "123", "0x2345" // an array of 2 felts
 ];
 // in Typescript, this object type is : `RawCalldata`
 ```
@@ -54,11 +53,13 @@ Example for a constructor :
 	decimals: "18", 
 	initial_supply: { type: 'struct', low: initialTk.low, high: initialTk.high }, 
 	recipient: account0.address, 
-	owner: account0.address 
+	owner: account0.address,
+	list:["678","321","7890"] // array of 3 cairo felts
 }
 ```
-> 🚨 In opposition with the object philosophy, your object content has to be in respect with the order of the Cairo function parameters.
+> 🚨 In opposition with the object philosophy, your object content has to be ordered in respect with the order of the definition of the Cairo function parameters.
 
+> You can't send an array of cairo struct with this object type. 
 ### Array of < string > :
 You can create by yourself this array of < string >, in respect with the order of the Cairo function parameters :
 ```typescript
@@ -70,11 +71,13 @@ const myCallData = [
     number.toBN(num1).toString(), // Number 64 bits converted to string
     initialUint256.low.toString(), initialUint256.high.toString(),
     coord.x0.toString(), coord.y0.toString(), coord.z0.toString(),
-    shortString.encodeShortString('A')
+    shortString.encodeShortString('A'),
+    "3", "52788", "123", "0x2345", // an array of 3 felts 
+    "2", "100", "0", "234", "456" // an array of 2 Uint256
 ];
 // in Typescript, this object type is : `Calldata`
 ```
-Or you can use the function `stark.compileCalldata()`, that converts an object type to an 'array of string' type.  
+Or you can use the function `stark.compileCalldata()`, that converts an object type to an 'array of string' type :  
 For a cairo contract, with this constructor :
 ```cairo
 func constructor{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
@@ -92,7 +95,6 @@ const ERC20ConstructorCallData = stark.compileCalldata({
 	recipient: account0.address, 
 	owner: account0.address 
 });
-// in Typescript, the object type is : `uint256.Uint256`
 ```
 ### Array of < any > :
 With this type, you can includes :
@@ -112,19 +114,29 @@ const myCallData = [
     num1, // number 64 bits
     initialUint256, // object representing a struct of 2 felt
     coord, // object representing a struct of 3 felt
-    shortString.encodeShortString('A') // short string
+    shortString.encodeShortString('A'), // short string
+    [123, "0x2345"], // for an array of 2 cairo felts
+    [initialUint256, finallUint256] // for an array of 2 structs (Uint256 here)
 ];
 // in Typescript, thes object type is : `Array<any>`
 
 ```
-> Objects representing Cairo structs are made of BigNumberish elements. Same for arrays : their elements have the BigNumberish type.
+> Object representing a Cairo struct are made of BigNumberish elements. Ex :
+```typescript
+interface c3D {
+        x0: BigNumberish;
+        y0: BigNumberish;
+        z0: BigNumberish;
+    }
+```
+>Same for arrays : their elements must have the BigNumberish type.
 ### summary table for arguments : 
-The array of string type can be used in all functions. The 3 other types of arguments can't be used at your convenience anywhere. Here a table showing which type can be used in which function :  
+These 4 types of arguments can't be used at your convenience everywhere. Here a table showing which type can be used in which function :  
 |Function|array of < BigNumberish >|array of < string >| object|array of < any >|Multicall|
 |---:|:---:|:---:|:---:|:---:|:---:|
 |**Typescript type**|RawCalldata|Calldata or RawArgs or RawCalldata|RawArgs|Array< any >|array|
-|contract.call contract.metaClass||✔️||✔️||
-|contract.invoke contract.metaClass||✔️||✔️||
+|contract.call contract.metaClass||⚠️||✔️||
+|contract.invoke contract.metaClass||⚠️||✔️||
 |account.execute|✔️|✔️|||✅|
 |account.deploy||✔️|✔️||✅|
 |account.deployContract||✔️|✔️||✅|
@@ -132,32 +144,25 @@ The array of string type can be used in all functions. The 3 other types of argu
 |account.deployAccount|✔️|✔️||||
 |hash.calculateContractAddressFromHash|✔️|✔️|||||
 ||||||
+
+⚠️ = only for a list of felt (no array or struct).
 > for Typescript, you can import these type of data :
 ```typescript
 import { type Calldata, type RawArgs } from "starknet";
 import { type RawCalldata } from "starknet/dist/types/lib";
 ```
  
-
-|JS/TS type|JS/TS functions to prepare data|number of data added in string[]|Cairo code|
-|----|----------|:--------------------:|------------------------------|
-|BN[ ]|`stark.compileCalldata( {list: myArray.map( (x)=> x.toString())})`|Nb of elements +1|`func setV(list_len: felt, list: felt*)->()`|
-|Number[ ]|`stark.compileCalldata( {list: my Array.map( (x)=> number.toBN(x).toString())})`|Nb of elements +1||
-|string[ ] (31 ASCII characters max per element)|`stark.compileCalldata( {list: arr.map((x)=>shortString.encodeShortString(x))})`|(Nb of elements * nb of property of object) +1||
-|struct[ ] (here with BN properties)|`stark.compileCalldata( {list: arr.map((x)=>x.map((y)=>y.toString()))})`|(Nb of elements * nb of property of object) +1|`func setV(list_len: felt, list: myStruct*)->()`|
-  
-  
 ## Receive data from a Cairo contract :
 When you perform a call, you have the result in an object :  
 - With a contract.call : `const result=contract.call("read_val", myParameters)`.
 - With a contract.meta-class : `const result=contract.read_val(...myParameters)`.
 
 
-|Type|Cairo code|received from contract|JS/TS function to recover data|
+|Type in Cairo|Cairo code|Type expected in JS/TS|JS/TS function to recover data|
 |----|----------|--------------------|------------------------------|
-|numbers (251 bits max)|`func getV()->(total:felt)`|total:BN|`const total:BN = result.total`|
-|numbers (64 bits max)|`func getV()->(total:felt)`|total:BN|`const total:number = parseInt(result.total)`|
-|address|`func getV()->(address:felt)`|address:BN|`const address:string = number.toHex(result.address)`|
-|Uint256 (256 bits max)|`func getV()->(balance:Uint256)`|low:BN, high:BN|`const balance:BN = uint256.uint256toBN(result.balance)`|
-|array|`func getV()->(list_len:felt, list:felt*)`|list:[BN]|`const list:BN[]= result.list`|
-|shortString (31 ASCII characters max)|`func getV()->(title:felt)`|title:BN|`const title:string = shortString.decodeShortString(result.title)`|
+|felt (251 bits max)|`func getV()->(total:felt)`|BN|`const total:BN = result.total`|
+|||number (64 bits max)|`const total:number = parseInt(result.total)`|
+|||string representing an hex number|`const address:string = number.toHex(result.address)`|
+|Uint256 (256 bits max)|`func getV()->(balance:Uint256)`|BN|`const balance:BN = uint256.uint256toBN(result.balance)`|
+|array of felt|`func getV()->(list_len:felt, list:felt*)`|BN[]|`const list:BN[]= result.list`|
+|shortString (31 ASCII characters max)|`func getV()->(title:felt)`|string|`const title:string = shortString.decodeShortString(result.title)`|
