@@ -358,7 +358,7 @@ export class RpcProvider implements ProviderInterface {
         calldata: parseCalldata(functionInvocation.calldata),
         type: 'INVOKE',
         max_fee: toHex(toBN(details.maxFee || 0)),
-        version: toHex(toBN(details.version || 0)),
+        version: toHex(toBN(details.version || 1)),
         signature: bigNumberishArrayToHexadecimalStringArray(functionInvocation.signature || []),
         nonce: toHex(toBN(details.nonce)),
       },
