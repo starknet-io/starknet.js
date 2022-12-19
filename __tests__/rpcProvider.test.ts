@@ -21,9 +21,11 @@ describeIfRpc('RPCProvider', () => {
 
   test('getChainId', async () => {
     const chainId = await rpcProvider.getChainId();
-    expect([StarknetChainId.TESTNET2, StarknetChainId.MAINNET, StarknetChainId.TESTNET]).toContain(
-      chainId
-    );
+    expect([
+      StarknetChainId.SN_GOERLI,
+      StarknetChainId.SN_GOERLI2,
+      StarknetChainId.SN_MAIN,
+    ]).toContain(chainId);
   });
 
   test('getTransactionCount', async () => {

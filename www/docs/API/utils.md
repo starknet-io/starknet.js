@@ -289,7 +289,7 @@ const hashMsg = calculcateTransactionHash(
   getSelectorFromName('__execute__'),
   calldata,
   maxFee,
-  StarknetChainId.TESTNET
+  StarknetChainId.SN_GOERLI
 );
 ```
 
