@@ -1,19 +1,38 @@
 {
   "name": "starknet",
-  "version": "4.11.0",
+  "version": "4.17.1",
   "description": "JavaScript library for StarkNet",
   "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "jsdelivr": "dist/index.global.js",
+  "unpkg": "dist/index.global.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "browser": "./dist/index.global.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "CHANGELOG.md",
+    "dist"
+  ],
   "scripts": {
     "prepare": "npm run build && husky install",
-    "build": "tsc",
-    "pretest": "npm run lint",
-    "test": "jest",
+    "build": "tsup && npm run build:esm && npm run build:iife && npm run build:dts",
+    "build:esm": "tsup --clean false --format esm --platform node",
+    "build:iife": "tsup --clean false --format iife --platform browser",
+    "build:dts": "tsup --clean false --dts-only",
+    "pretest": "npm run lint && npm run ts:check",
+    "test": "jest -i",
     "posttest": "npm run format",
     "test:watch": "jest --watch",
     "docs": "cd www && npm run start",
     "format": "prettier --loglevel warn --write \"**/*.{ts,js,md,yml,json}\"",
-    "lint": "eslint . --cache --fix --ext .ts"
+    "lint": "eslint . --cache --fix --ext .ts",
+    "ts:check": "tsc --noEmit --resolveJsonModule --project tsconfig.eslint.json"
   },
   "keywords": [
     "starknet",
@@ -38,6 +57,7 @@
     "@semantic-release/npm": "^9.0.1",
     "@semantic-release/release-notes-generator": "^10.0.3",
     "@types/elliptic": "^6.4.14",
+    "@types/isomorphic-fetch": "^0.0.36",
     "@types/jest": "^28.1.1",
     "@types/json-bigint": "^1.0.1",
     "@types/minimalistic-assert": "^1.0.1",
@@ -59,6 +79,7 @@
     "lint-staged": "^13.0.1",
     "prettier": "^2.7.0",
     "prettier-plugin-import-sort": "^0.0.7",
+    "tsup": "~6.3.0",
     "typedoc": "^0.22.17",
     "typescript": "^4.7.3"
   },
@@ -72,7 +93,7 @@
     "json-bigint": "^1.0.0",
     "minimalistic-assert": "^1.0.1",
     "pako": "^2.0.4",
-    "ts-custom-error": "^3.2.0",
+    "ts-custom-error": "^3.3.1",
     "url-join": "^4.0.1"
   },
   "lint-staged": {

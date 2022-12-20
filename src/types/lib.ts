@@ -21,10 +21,9 @@ export interface ContractClass {
 
 export type UniversalDeployerContractPayload = {
   classHash: BigNumberish;
-  salt: string;
-  unique: boolean;
+  salt?: string;
+  unique?: boolean;
   constructorCalldata?: RawArgs;
-  isDevnet?: boolean;
 };
 
 export type DeployContractPayload = {
@@ -51,6 +50,9 @@ export type DeclareContractPayload = {
   contract: CompiledContract | string;
   classHash: BigNumberish; // Once the classHash is included in CompiledContract, this can be removed
 };
+
+export type DeclareDeployContractPayload = DeclareContractPayload &
+  UniversalDeployerContractPayload;
 
 export type DeclareContractTransaction = {
   contractDefinition: ContractClass;

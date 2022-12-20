@@ -6,7 +6,7 @@ sidebar_position: 2
 
 An Account extends <ins>[`Provider`](/docs/API/provider)</ins> and inherits all of its methods.
 
-It also introduces new methods that allow Accounts to create and verify signatures with a custom <ins>[`Signer`](/docs/API/signer)</ins>.
+It also introduces new methods that allow Accounts to create and verify signatures with a custom <ins>[`Signer`](/docs/API/signer)</ins>, declare and deploy Contract and deploy new Account
 
 This API is the primary way to interact with an account contract on StarkNet.
 
@@ -24,6 +24,8 @@ The address of the account contract.
 
 ## Methods
 
+### getNonce()
+
 account.**getNonce(blockIdentifier)** => _Promise < BigNumberish >_
 
 Gets the nonce of the account with respect to a specific block.
@@ -32,7 +34,9 @@ _blockIdentifier_ - optional blockIdentifier. Defaults to 'pending'.
 
 Returns the nonce of the account.
 
-<hr />
+---
+
+### estimateInvokeFee()
 
 account.**estimateInvokeFee**(calls [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse >_
 
@@ -59,7 +63,9 @@ The _estimateFeeDetails_ object may include any of:
 }
 ```
 
-<hr />
+---
+
+### estimateDeclareFee()
 
 account.**estimateDeclareFee**(contractPayload [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse >_
 
@@ -85,11 +91,13 @@ The _estimateFeeDetails_ object may include any of:
 }
 ```
 
-<hr />
+---
+
+### estimateAccountDeployFee()
 
 account.**estimateAccountDeployFee**(contractPayload [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse >_
 
-Estimate Fee for executing a DEPLOY_ACCOUNT transaction on starknet
+Estimate Fee for executing a DEPLOY_ACCOUNT transaction on StarkNet
 
 The _contractPayload_ object structure:
 
@@ -111,7 +119,9 @@ The _estimateFeeDetails_ object may include any of:
 }
 ```
 
-<hr />
+---
+
+### execute()
 
 account.**execute**(transactions [ , abi , transactionsDetail ]) => _Promise < InvokeFunctionResponse >_
 
@@ -140,7 +150,9 @@ The _transactionsDetail_ object may include any of:
 };
 ```
 
-<hr />
+---
+
+### declare()
 
 account.**declare**(contractPayload [ , transactionsDetail ]) => _Promise < DeclareContractResponse >_
 
@@ -178,7 +190,159 @@ const declareTx = await account.declare({
 };
 ```
 
-<hr />
+---
+
+### deploy()
+
+Deploys a given compiled contract (json) to starknet, wrapper around _execute_ invoke function
+
+account.**deploy**(deployContractPayload [ , transactionsDetail ]) => _Promise < InvokeFunctionResponse >_
+
+@param object **_deployContractPayload_**
+
+- **classHash**: computed class hash of compiled contract
+- optional constructorCalldata: constructor calldata
+- optional salt: address salt - default random
+- optional unique: bool if true ensure unique salt - default true
+
+@param object **transactionsDetail** Invocation Details
+
+- optional nonce
+- optional version
+- optional maxFee
+
+@returns **transaction_hash**
+
+Example:
+
+```typescript
+  const deployment = await account.deploy({
+    classHash: erc20ClassHash,
+    constructorCalldata: [
+      encodeShortString('Token'),
+      encodeShortString('ERC20'),
+      account.address,
+    ],
+    salt: randomAddress(),
+    unique: true, // Using true here so as not to clash with normal erc20 deploy in account and provider test
+  });
+
+  await provider.waitForTransaction(deployment.transaction_hash);
+```
+
+Example multi-call:
+
+```typescript
+TODO Example with multi-call
+```
+
+---
+
+### deployContract()
+
+✅ NEW
+High level wrapper for deploy. Doesn't require waitForTransaction. Response similar to deprecated provider deployContract.
+
+account.**deployContract**(payload [ , details ]) => _Promise < DeployContractUDCResponse >_
+
+@param object **_payload_** UniversalDeployerContractPayload
+
+- **classHash**: computed class hash of compiled contract
+- **constructorCalldata**: constructor calldata
+- optional salt: address salt - default random
+- optional unique: bool if true ensure unique salt - default true
+
+@param object **details** InvocationsDetails
+
+- optional nonce
+- optional version
+- optional maxFee
+
+@returns Promise DeployContractUDCResponse
+
+- contract_address
+- transaction_hash
+- address
+- deployer
+- unique
+- classHash
+- calldata_len
+- calldata
+- salt
+
+Example:
+
+```typescript
+  const deployResponse = await account.deployContract({
+    classHash: erc20ClassHash,
+    constructorCalldata: [
+      encodeShortString('Token'),
+      encodeShortString('ERC20'),
+      account.address,
+    ],
+  });
+```
+
+---
+
+### declareDeploy()
+
+✅ NEW
+High level wrapper for declare & deploy. Doesn't require waitForTransaction. Functionality similar to deprecated provider deployContract. Declare and Deploy contract using single function.
+
+account.**declareDeploy**(payload [ , details ]) => _Promise < DeclareDeployUDCResponse >_
+
+@param object **_payload_** DeclareDeployContractPayload
+
+- **contract**: compiled contract code
+- **classHash**: computed class hash of compiled contract
+- optional constructorCalldata: constructor calldata
+- optional salt: address salt - default random
+- optional unique: bool if true ensure unique salt - default true
+
+@param object **details** InvocationsDetails
+
+- optional nonce
+- optional version
+- optional maxFee
+
+@returns Promise DeclareDeployUDCResponse
+
+- declare: CommonTransactionReceiptResponse
+  - transaction_hash
+  - class_hash
+- deploy: DeployContractUDCResponse;
+  - contract_address
+  - transaction_hash
+  - address
+  - deployer
+  - unique
+  - classHash
+  - calldata_len
+  - calldata
+  - salt
+  ***
+
+Example:
+
+```typescript
+  const declareDeploy = await account.declareDeploy({
+    contract: compiledErc20,
+    classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+    constructorCalldata: [
+      encodeShortString('Token'),
+      encodeShortString('ERC20'),
+      account.address,
+    ],
+  });
+
+  const declareTransactionHash = declareDeploy.declare.transaction_hash
+  const erc20Address = declareDeploy.deploy.contract_address;
+```
+
+---
+
+### deployAccount()
 
 account.**deployAccount**(contractPayload [ , transactionsDetail ]) => _Promise < DeployContractResponse >_
 
@@ -208,7 +372,9 @@ The _transactionsDetail_ object may include any of:
 };
 ```
 
-<hr/>
+---
+
+### signMessage()
 
 account.**signMessage**(typedData) => _Promise < Signature >_
 
@@ -222,7 +388,9 @@ _typedData_ - JSON object to be signed
 string[];
 ```
 
-<hr />
+---
+
+### hashMessage()
 
 account.**hashMessage**(typedData) => _Promise < string >_
 
@@ -232,7 +400,9 @@ _typedData_ - JSON object to be signed
 
 Returns the hash of the JSON object.
 
-<hr />
+---
+
+### verifyMessageHash()
 
 account.**verifyMessageHash**(hash, signature) => _Promise < boolean >_
 
@@ -242,7 +412,9 @@ Verify a signature of a given hash.
 >
 > This method is not recommended, use `verifyMessage` instead
 
-<hr />
+---
+
+### verifyMessage()
 
 account.**verifyMessage**(typedData, signature) => _Promise < boolean >_
 
@@ -253,7 +425,9 @@ _signature_ - signature of the JSON object
 
 Returns true if the signature is valid, false otherwise
 
-<hr />
+---
+
+### getSuggestedMaxFee()
 
 account.**getSuggestedMaxFee**(estimateFeeAction, details) => _Promise < BigNumberish >_
 
@@ -263,3 +437,27 @@ The _details_ object may include any of:
 
 - details.**blockIdentifier**
 - details.**nonce**
+
+---
+
+### getStarkName()
+
+account.**getStarkName**(StarknetIdContract) => _Promise<string | Error>_
+
+Gets starknet.id stark name with the address of the account
+
+The _StarknetIdContract_ argument can be undefined, if it is, the function will automatically use official starknet id contracts of your network (It currently supports TESTNET 1 only).
+
+Returns directly a string (Example: `vitalik.stark`).
+
+---
+
+### getAddressFromStarkName()
+
+account.**getAddressFromStarkName**(name, StarknetIdContract) => _Promise<string | Error>_
+
+Gets account address with the starknet id stark name.
+
+The _StarknetIdContract_ argument can be undefined, if it is, the function will automatically use official starknet id contracts of your network (It currently supports TESTNET 1 only).
+
+Returns directly the address in a string (Example: `0xff...34`).

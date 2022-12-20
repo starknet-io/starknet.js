@@ -48,21 +48,13 @@ $ npm install starknet@next
 
 Import `starknet` and use the [API](https://www.starknetjs.com/docs/API/)
 
-Please refer to the following code example [here](https://github.com/0xs34n/starknet.js-workshop/blob/main/index.js)
+Please refer to the following code example [here](https://github.com/0xs34n/starknet.js-workshop)
 
 Guides can be found [here](https://www.starknetjs.com/guides/intro)
 
 ## 🌐 API
 
 [Click Here](https://www.starknetjs.com/docs/API/)
-
-## 🚀 Powered by Starknet.js
-
-- [Argent X - the first StarkNet wallet](https://github.com/argentlabs/argent-x)
-- [Braavos - your new wallet on top of StarkNet](https://chrome.google.com/webstore/detail/braavos-wallet/jnlgamecbpmbajjfhmmmlhejkemejdma)
-- [React + Starknet.js boilerplate](https://github.com/fracek/starknet-react-example)
-- [AMM Demo](https://www.starknetswap.com/)
-- [mySwap - the first DeFi app to launch on StarkNet](myswap.xyz)
 
 ## ✏️ Contributing
 
@@ -72,9 +64,9 @@ If you consider to contribute to this project please read [CONTRIBUTING.md](http
 
 Special thanks to all the [contributors](https://github.com/0xs34n/starknet.js/graphs/contributors), especially to:
 
-Janek ([@janek26](https://github.com/janek26)), Axel ([@delaaxe](https://github.com/delaaxe)) and Dhruv ([@dhruvkelawala](https://github.com/dhruvkelawala)) from [Argent](https://github.com/argentlabs)
+Janek ([@janek26](https://github.com/janek26)) and Dhruv ([@dhruvkelawala](https://github.com/dhruvkelawala)) from [Argent](https://github.com/argentlabs)
 
-Miljan ([@MilGard91](https://github.com/MilGard91)) from [Shard Labs](https://shardlabs.io/)
+Toni ([@tabaktoni](https://github.com/tabaktoni)) and Ivan ([@ivpavici](https://github.com/ivpavici)) from [Shard Labs](https://shardlabs.io/)
 
 and of course the [StarkWare](https://starkware.co/) team for their dedicated support!
 

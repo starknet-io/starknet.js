@@ -62,10 +62,6 @@ export type TransactionTraceResponse = {
   signature: Signature;
 };
 
-export type RawArgs = {
-  [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
-};
-
 export type CallL1Handler = {
   from_address: string;
   to_address: string;

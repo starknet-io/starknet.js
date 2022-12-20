@@ -4,26 +4,24 @@ import { StarknetChainId } from '../constants';
 import {
   Call,
   CallContractResponse,
+  CallL1Handler,
   ContractClass,
   DeclareContractResponse,
-  DeployContractPayload,
+  DeclareContractTransaction,
+  DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
+  GetContractAddressesResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
+  GetTransactionStatusResponse,
   Invocation,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
-} from '../types';
-import {
-  CallL1Handler,
-  GetContractAddressesResponse,
-  GetTransactionStatusResponse,
   Sequencer,
   TransactionTraceResponse,
-} from '../types/api';
-import { DeclareContractTransaction, DeployAccountContractTransaction } from '../types/lib';
+} from '../types';
 import fetch from '../utils/fetchPonyfill';
 import { getSelector, getSelectorFromName } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
@@ -46,6 +44,22 @@ import { Block, BlockIdentifier } from './utils';
 
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha' | 'goerli-alpha-2';
 
+export type SequencerProviderOptions = {
+  headers?: object;
+  blockIdentifier?: BlockIdentifier;
+} & (
+  | {
+      network: NetworkName | StarknetChainId;
+      chainId?: StarknetChainId;
+    }
+  | {
+      baseUrl: string;
+      feederGatewayUrl?: string;
+      gatewayUrl?: string;
+      chainId?: StarknetChainId;
+    }
+);
+
 function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
   return (
     obj === undefined ||
@@ -55,15 +69,10 @@ function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
   );
 }
 
-export type SequencerProviderOptions =
-  | { network: NetworkName }
-  | {
-      baseUrl: string;
-      feederGatewayUrl?: string;
-      gatewayUrl?: string;
-      chainId?: StarknetChainId;
-      headers?: object;
-    };
+const defaultOptions = {
+  network: 'goerli-alpha-2' as NetworkName,
+  blockIdentifier: 'pending',
+};
 
 export class SequencerProvider implements ProviderInterface {
   public baseUrl: string;
@@ -78,12 +87,13 @@ export class SequencerProvider implements ProviderInterface {
 
   private responseParser = new SequencerAPIResponseParser();
 
-  constructor(optionsOrProvider: SequencerProviderOptions = { network: 'goerli-alpha-2' }) {
+  private blockIdentifier: BlockIdentifier;
+
+  constructor(optionsOrProvider: SequencerProviderOptions = defaultOptions) {
     if ('network' in optionsOrProvider) {
       this.baseUrl = SequencerProvider.getNetworkFromName(optionsOrProvider.network);
-      this.chainId = SequencerProvider.getChainIdFromBaseUrl(this.baseUrl);
-      this.feederGatewayUrl = urljoin(this.baseUrl, 'feeder_gateway');
-      this.gatewayUrl = urljoin(this.baseUrl, 'gateway');
+      this.feederGatewayUrl = buildUrl(this.baseUrl, 'feeder_gateway');
+      this.gatewayUrl = buildUrl(this.baseUrl, 'gateway');
     } else {
       this.baseUrl = optionsOrProvider.baseUrl;
       this.feederGatewayUrl = buildUrl(
@@ -92,22 +102,20 @@ export class SequencerProvider implements ProviderInterface {
         optionsOrProvider.feederGatewayUrl
       );
       this.gatewayUrl = buildUrl(this.baseUrl, 'gateway', optionsOrProvider.gatewayUrl);
-
-      this.chainId =
-        optionsOrProvider.chainId ??
-        SequencerProvider.getChainIdFromBaseUrl(optionsOrProvider.baseUrl);
-
-      this.headers = optionsOrProvider?.headers;
     }
+    this.chainId =
+      optionsOrProvider?.chainId ?? SequencerProvider.getChainIdFromBaseUrl(this.baseUrl);
+    this.headers = optionsOrProvider.headers;
+    this.blockIdentifier = optionsOrProvider?.blockIdentifier || defaultOptions.blockIdentifier;
   }
 
-  protected static getNetworkFromName(name: NetworkName) {
+  protected static getNetworkFromName(name: NetworkName | StarknetChainId) {
     switch (name) {
-      case 'mainnet-alpha':
+      case 'mainnet-alpha' || StarknetChainId.MAINNET:
         return 'https://alpha-mainnet.starknet.io';
-      case 'goerli-alpha':
+      case 'goerli-alpha' || StarknetChainId.TESTNET:
         return 'https://alpha4.starknet.io';
-      case 'goerli-alpha-2':
+      case 'goerli-alpha-2' || StarknetChainId.TESTNET2:
         return 'https://alpha4-2.starknet.io';
       default:
         return 'https://alpha4.starknet.io';
@@ -119,6 +127,9 @@ export class SequencerProvider implements ProviderInterface {
       const url = new URL(baseUrl);
       if (url.host.includes('mainnet.starknet.io')) {
         return StarknetChainId.MAINNET;
+      }
+      if (url.host.includes('alpha4-2.starknet.io')) {
+        return StarknetChainId.TESTNET2;
       }
     } catch {
       // eslint-disable-next-line no-console
@@ -194,7 +205,7 @@ export class SequencerProvider implements ProviderInterface {
       const res = await fetch(url, {
         method,
         body: stringify(request),
-        headers,
+        headers: headers as Record<string, string>,
       });
       const textResponse = await res.text();
       if (!res.ok) {
@@ -238,7 +249,7 @@ export class SequencerProvider implements ProviderInterface {
 
   public async callContract(
     { contractAddress, entrypoint: entryPointSelector, calldata = [] }: Call,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<CallContractResponse> {
     return this.fetchEndpoint(
       'call_contract',
@@ -252,15 +263,17 @@ export class SequencerProvider implements ProviderInterface {
     ).then(this.responseParser.parseCallContractResponse);
   }
 
-  public async getBlock(blockIdentifier: BlockIdentifier = 'pending'): Promise<GetBlockResponse> {
+  public async getBlock(
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<GetBlockResponse> {
     return this.fetchEndpoint('get_block', { blockIdentifier }).then(
       this.responseParser.parseGetBlockResponse
     );
   }
 
-  public async getNonce(
+  public async getNonceForAddress(
     contractAddress: string,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<BigNumberish> {
     return this.fetchEndpoint('get_nonce', { contractAddress, blockIdentifier });
   }
@@ -268,7 +281,7 @@ export class SequencerProvider implements ProviderInterface {
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<BigNumberish> {
     const parsedKey = toBN(key).toString(10);
     return this.fetchEndpoint('get_storage_at', {
@@ -294,7 +307,7 @@ export class SequencerProvider implements ProviderInterface {
 
   public async getClassAt(
     contractAddress: string,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<ContractClass> {
     return this.fetchEndpoint('get_full_contract', { blockIdentifier, contractAddress }).then(
       parseContract
@@ -303,12 +316,12 @@ export class SequencerProvider implements ProviderInterface {
 
   public async getClassHashAt(
     contractAddress: string,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<string> {
     return this.fetchEndpoint('get_class_hash_at', { blockIdentifier, contractAddress });
   }
 
-  public async getClass(classHash: string): Promise<ContractClass> {
+  public async getClassByHash(classHash: string): Promise<ContractClass> {
     return this.fetchEndpoint('get_class_by_hash', { classHash }).then(parseContract);
   }
 
@@ -325,21 +338,6 @@ export class SequencerProvider implements ProviderInterface {
       max_fee: toHex(toBN(details.maxFee || 0)),
       version: toHex(toBN(details.version || 1)),
     }).then(this.responseParser.parseInvokeFunctionResponse);
-  }
-
-  public async deployContract({
-    contract,
-    constructorCalldata,
-    addressSalt,
-  }: DeployContractPayload): Promise<DeployContractResponse> {
-    const contractDefinition = parseContract(contract);
-
-    return this.fetchEndpoint('add_transaction', undefined, {
-      type: 'DEPLOY',
-      contract_address_salt: addressSalt ?? randomAddress(),
-      constructor_calldata: bigNumberishArrayToDecimalStringArray(constructorCalldata ?? []),
-      contract_definition: contractDefinition,
-    }).then(this.responseParser.parseDeployContractResponse);
   }
 
   public async deployAccountContract(
@@ -376,7 +374,7 @@ export class SequencerProvider implements ProviderInterface {
   public async getEstimateFee(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<EstimateFeeResponse> {
     return this.getInvokeEstimateFee(invocation, invocationDetails, blockIdentifier);
   }
@@ -384,7 +382,7 @@ export class SequencerProvider implements ProviderInterface {
   public async getInvokeEstimateFee(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint(
       'estimate_fee',
@@ -403,7 +401,7 @@ export class SequencerProvider implements ProviderInterface {
   public async getDeclareEstimateFee(
     { senderAddress, contractDefinition, signature }: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint(
       'estimate_fee',
@@ -422,7 +420,7 @@ export class SequencerProvider implements ProviderInterface {
   public async getDeployAccountEstimateFee(
     { classHash, addressSalt, constructorCalldata, signature }: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint(
       'estimate_fee',
@@ -441,22 +439,25 @@ export class SequencerProvider implements ProviderInterface {
 
   public async getCode(
     contractAddress: string,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<Sequencer.GetCodeResponse> {
     return this.fetchEndpoint('get_code', { contractAddress, blockIdentifier });
   }
 
-  public async waitForTransaction(txHash: BigNumberish, retryInterval: number = 8000) {
+  public async waitForTransaction(
+    txHash: BigNumberish,
+    retryInterval: number = 8000,
+    successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING']
+  ) {
+    const errorStates = ['REJECTED', 'NOT_RECEIVED'];
     let onchain = false;
+    let res;
 
     while (!onchain) {
       // eslint-disable-next-line no-await-in-loop
       await wait(retryInterval);
       // eslint-disable-next-line no-await-in-loop
-      const res = await this.getTransactionStatus(txHash);
-
-      const successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING'];
-      const errorStates = ['REJECTED', 'NOT_RECEIVED'];
+      res = await this.getTransactionStatus(txHash);
 
       if (successStates.includes(res.tx_status)) {
         onchain = true;
@@ -469,6 +470,8 @@ export class SequencerProvider implements ProviderInterface {
         throw error;
       }
     }
+    const txReceipt = await this.getTransactionReceipt(txHash);
+    return txReceipt;
   }
 
   /**
@@ -497,7 +500,6 @@ export class SequencerProvider implements ProviderInterface {
   /**
    * Gets the transaction trace from a tx id.
    *
-   *
    * @param txHash
    * @returns the transaction trace
    */
@@ -508,7 +510,7 @@ export class SequencerProvider implements ProviderInterface {
 
   public async estimateMessageFee(
     { from_address, to_address, entry_point_selector, payload }: CallL1Handler,
-    blockIdentifier: BlockIdentifier = 'pending'
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<Sequencer.EstimateFeeResponse> {
     const validCallL1Handler = {
       from_address: getDecimalString(from_address),

@@ -1,8 +1,8 @@
 import assert from 'minimalistic-assert';
 
 import { AccountInterface } from '../account';
-import { ProviderInterface, defaultProvider } from '../provider';
-import { Abi, CompiledContract, RawCalldata } from '../types';
+import { Abi, CompiledContract, FunctionAbi } from '../types';
+import { CheckCallData } from '../utils/calldata';
 import { Contract } from './default';
 
 export class ContractFactory {
@@ -10,40 +10,53 @@ export class ContractFactory {
 
   compiledContract: CompiledContract;
 
-  providerOrAccount: ProviderInterface | AccountInterface;
+  classHash: string;
+
+  account: AccountInterface;
+
+  private checkCalldata: CheckCallData;
 
   constructor(
     compiledContract: CompiledContract,
-    providerOrAccount: ProviderInterface | AccountInterface = defaultProvider,
+    classHash: string,
+    account: AccountInterface,
     abi: Abi = compiledContract.abi // abi can be different from the deployed contract ie for proxy contracts
   ) {
     this.abi = abi;
     this.compiledContract = compiledContract;
-    this.providerOrAccount = providerOrAccount;
+    this.account = account;
+    this.classHash = classHash;
+    this.checkCalldata = new CheckCallData(abi);
   }
 
   /**
    * Deploys contract and returns new instance of the Contract
    *
-   * @param constructorCalldata - Constructor Calldata
+   * @param args - Array of the constructor arguments for deployment
    * @param addressSalt (optional) - Address Salt for deployment
    * @returns deployed Contract
    */
-  public async deploy(
-    constructorCalldata?: RawCalldata,
-    addressSalt?: string | undefined
-  ): Promise<Contract> {
-    const { contract_address, transaction_hash } = await this.providerOrAccount.deployContract({
+  public async deploy(args: Array<any> = [], addressSalt?: string | undefined): Promise<Contract> {
+    this.checkCalldata.validateMethodAndArgs('DEPLOY', 'constructor', args);
+    const { inputs } = this.abi.find((abi) => abi.type === 'constructor') as FunctionAbi;
+
+    // compile calldata
+    const constructorCalldata = this.checkCalldata.compileCalldata(args, inputs);
+
+    const {
+      deploy: { contract_address, transaction_hash },
+    } = await this.account.declareDeploy({
       contract: this.compiledContract,
+      classHash: this.classHash,
       constructorCalldata,
-      addressSalt,
+      salt: addressSalt,
     });
     assert(Boolean(contract_address), 'Deployment of the contract failed');
 
     const contractInstance = new Contract(
       this.compiledContract.abi,
       contract_address!,
-      this.providerOrAccount
+      this.account
     );
     contractInstance.deployTransactionHash = transaction_hash;
 
@@ -53,10 +66,11 @@ export class ContractFactory {
   /**
    * Attaches to new Provider or Account
    *
-   * @param providerOrAccount - new Provider or Account to attach to
+   * @param account - new Provider or Account to attach to
+   * @returns ContractFactory
    */
-  connect(providerOrAccount: ProviderInterface | AccountInterface): ContractFactory {
-    this.providerOrAccount = providerOrAccount;
+  connect(account: AccountInterface): ContractFactory {
+    this.account = account;
     return this;
   }
 
@@ -67,7 +81,7 @@ export class ContractFactory {
    * @returns Contract
    */
   attach(address: string): Contract {
-    return new Contract(this.abi, address, this.providerOrAccount);
+    return new Contract(this.abi, address, this.account);
   }
 
   // ethers.js' getDeployTransaction cant be supported as it requires the account or signer to return a signed transaction which is not possible with the current implementation
