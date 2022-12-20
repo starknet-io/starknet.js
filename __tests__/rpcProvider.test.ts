@@ -86,8 +86,8 @@ describeIfRpc('RPCProvider', () => {
     });
 
     describe('deploy contract related tests', () => {
-      let contract_address;
-      let transaction_hash;
+      let contract_address: string;
+      let transaction_hash: string;
 
       beforeAll(async () => {
         const { deploy } = await account.declareDeploy({
@@ -128,9 +128,5 @@ describeIfRpc('RPCProvider', () => {
       expect(contractClass).toHaveProperty('program');
       expect(contractClass).toHaveProperty('entry_points_by_type');
     });
-
-    test.todo('getEstimateFee');
-
-    test.todo('invokeFunction');
   });
 });

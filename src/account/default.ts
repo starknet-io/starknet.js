@@ -189,9 +189,9 @@ export class Account extends Provider implements AccountInterface {
       constructorCalldata = [],
       contractAddress: providedContractAddress,
     }: DeployAccountContractPayload,
-    { blockIdentifier, nonce: providedNonce }: EstimateFeeDetails = {}
+    { blockIdentifier }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
-    const nonce = toBN(providedNonce ?? (await this.getNonce()));
+    const nonce = '0x0';
     const version = toBN(feeTransactionVersion);
     const chainId = await this.getChainId();
     const contractAddress =
@@ -556,7 +556,7 @@ export class Account extends Provider implements AccountInterface {
     }: DeployAccountContractPayload,
     transactionsDetail: InvocationsDetails = {}
   ): Promise<DeployContractResponse> {
-    const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
+    const nonce = '0x0';
     const version = toBN(transactionVersion);
     const chainId = await this.getChainId();
 

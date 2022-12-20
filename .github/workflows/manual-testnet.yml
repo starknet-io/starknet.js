@@ -1,28 +1,29 @@
-name: Manual Devnet Test
+name: Manual Testnet Test
 on: workflow_dispatch
 
 jobs:
   tests:
     name: Run test on ${{ matrix.name }}
     runs-on: ubuntu-latest
-    services:
-      devnet:
-        image: shardlabs/starknet-devnet:0.4.0-seed0
-        ports:
-          - 5050:5050
 
     strategy:
       max-parallel: 1 # needed until we get a seperate account for the rpc provider, until then running them in parallel would result in a nonce issue
       matrix:
-        name: [sequencer-devnet, rpc-devnet]
+        name: [sequencer-goerli, rpc-goerli]
         include:
-          - name: sequencer-devnet
-            TEST_PROVIDER_BASE_URL: http://127.0.0.1:5050/
-          - name: rpc-devnet
-            TEST_RPC_URL: http://127.0.0.1:5050/rpc
+          - name: sequencer-goerli
+            TEST_PROVIDER_BASE_URL: https://alpha4-2.starknet.io
+            ENABLE_TEST_ACCOUNT_PRIVATE_KEY: true
+            ENABLE_TEST_ACCOUNT_ADDRESS: true
+          - name: rpc-goerli
+            ENABLE_TEST_RPC_URL: true
+            ENABLE_TEST_ACCOUNT_PRIVATE_KEY: true
+            ENABLE_TEST_ACCOUNT_ADDRESS: true
     env:
       TEST_PROVIDER_BASE_URL: ${{ matrix.TEST_PROVIDER_BASE_URL }}
       TEST_RPC_URL: ${{ matrix.ENABLE_TEST_RPC_URL && secrets.TEST_RPC_URL }}
+      TEST_ACCOUNT_PRIVATE_KEY: ${{ matrix.ENABLE_TEST_ACCOUNT_PRIVATE_KEY && secrets.TEST_ACCOUNT_PRIVATE_KEY }}
+      TEST_ACCOUNT_ADDRESS: ${{ matrix.ENABLE_TEST_ACCOUNT_ADDRESS && secrets.TEST_ACCOUNT_ADDRESS }}
 
     steps:
       - uses: actions/checkout@v3

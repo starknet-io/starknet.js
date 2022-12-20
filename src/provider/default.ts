@@ -68,7 +68,7 @@ export class Provider implements ProviderInterface {
 
   public async getClassAt(
     contractAddress: string,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier?: BlockIdentifier
   ): Promise<ContractClass> {
     return this.provider.getClassAt(contractAddress, blockIdentifier);
   }
@@ -121,7 +121,7 @@ export class Provider implements ProviderInterface {
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier?: BlockIdentifier
   ): Promise<BigNumberish> {
     return this.provider.getStorageAt(contractAddress, key, blockIdentifier);
   }

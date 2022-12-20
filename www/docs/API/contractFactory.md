@@ -28,14 +28,18 @@ contractFactory.**abi** => _Abi_ (the ABI the contractFactory was constructed wi
 
 ## Methods
 
+### attach()
+
 contractFactory.**attach**( address ) ⇒ _Contract_
 
 Return an instance of a _Contract_ attached to address. This is the same as using the _Contract_ constructor with address and this _compiledContract_ and _account_ passed in when creating the ContractFactory.
 
-<hr />
+---
 
-contractFactory.**deploy**( constructorCalldata, addressSalt ) ⇒ _Promise < Contract >_
+### deploy()
 
-Uses the provider to deploy the Contract with _constructorCalldata_ passed into the constructor and returns a _Contract_ which is attached to the address where this contract will be deployed.
+contractFactory.**deploy**( args, addressSalt ) ⇒ _Promise < Contract >_
+
+Uses the provider to deploy the Contract with _args_ passed into the constructor and returns a _Contract_ which is attached to the address where this contract will be deployed.
 
 The transaction hash can be found at _contract.deployTransactionHash_, and no interactions should be made until the transaction is resolved.

@@ -373,6 +373,8 @@ describe('deploy and test Wallet', () => {
       expect(deployments).toHaveProperty('transaction_hash');
       expect(deployments.contract_address[0]).toBeDefined();
       expect(deployments.contract_address[1]).toBeDefined();
+
+      await provider.waitForTransaction(deployments.transaction_hash);
     });
   });
 });

@@ -151,7 +151,7 @@ export abstract class ProviderInterface {
 
   /**
    * Invokes a function on starknet
-   * @deprecated This method wont be supported as soon as fees are mandatory
+   * @deprecated This method wont be supported as soon as fees are mandatory. Should not be used outside of Account class
    *
    * @param invocation the invocation object containing:
    * - contractAddress - the address of the contract
@@ -188,7 +188,7 @@ export abstract class ProviderInterface {
 
   /**
    * Estimates the fee for a given INVOKE transaction
-   * @deprecated Please use getInvokeEstimateFee or getDeclareEstimateFee instead
+   * @deprecated Please use getInvokeEstimateFee or getDeclareEstimateFee instead. Should not be used outside of Account class
    *
    * @param invocation the invocation object containing:
    * - contractAddress - the address of the contract
