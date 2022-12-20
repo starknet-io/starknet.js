@@ -65,27 +65,39 @@ describe('deploy and test Wallet', () => {
     innerInvokeEstFeeSpy.mockClear();
   });
 
-  test('estimate fee bulk', async () => {
-    const estimate = await account.estimateInvokeFeeBulk([
+  test('estimate invoke fee bulk', async () => {
+    const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
+    const { overall_fee } = await account.estimateFeeBulk([
       {
+        type: 'DECLARE',
+        contract: compiledErc20,
+        classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+      },
+      {
+        type: 'DEPLOY',
+        classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+        constructorCalldata: [
+          encodeShortString('Token'),
+          encodeShortString('ERC20'),
+          account.address,
+        ],
+      },
+      {
+        type: 'INVOKE_FUNCTION',
+        contractAddress: erc20Address,
+        entrypoint: 'approve',
+        calldata: [erc20Address, '10', '0'],
+      },
+      {
+        type: 'INVOKE_FUNCTION',
         contractAddress: erc20Address,
         entrypoint: 'transfer',
         calldata: [erc20.address, '10', '0'],
       },
-      [
-        {
-          contractAddress: erc20Address,
-          entrypoint: 'transfer',
-          calldata: [erc20.address, '10', '0'],
-        },
-        {
-          contractAddress: erc20Address,
-          entrypoint: 'transfer',
-          calldata: [erc20.address, '10', '0'],
-        },
-      ],
     ]);
-    expect(isBN(estimate.overall_fee)).toBe(true);
+    expect(isBN(overall_fee)).toBe(true);
+    expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
+    innerInvokeEstFeeSpy.mockClear();
   });
 
   test('read balance of wallet', async () => {

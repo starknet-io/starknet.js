@@ -228,23 +228,6 @@ export abstract class ProviderInterface {
   ): Promise<EstimateFeeResponse>;
 
   /**
-   * Estimates the fee for a list of INVOKE transaction
-   *
-   * @param invocations the array of invocation and invocation details object containing:
-   * - contractAddress - the address of the account
-   * - calldata - (defaults to []) the calldata
-   * - signature - (defaults to []) the signature
-   * - nonce - optional nonce
-   * - version - optional version
-   * @param blockIdentifier - block identifier
-   * @returns the estimated fee
-   */
-  public abstract getInvokeEstimateFeeBulk(
-    invocations: Array<InvocationBulk>,
-    blockIdentifier?: BlockIdentifier
-  ): Promise<EstimateFeeResponse>;
-
-  /**
    * Estimates the fee for a given DECLARE transaction
    *
    * @param transaction transaction payload to be declared containing:
@@ -282,6 +265,23 @@ export abstract class ProviderInterface {
   public abstract getDeployAccountEstimateFee(
     transaction: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<EstimateFeeResponse>;
+
+  /**
+   * Estimates the fee for a list of INVOKE transaction
+   *
+   * @param invocations the array of invocation and invocation details object containing:
+   * - contractAddress - the address of the account
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   * - nonce - optional nonce
+   * - version - optional version
+   * @param blockIdentifier - block identifier
+   * @returns the estimated fee
+   */
+  public abstract getEstimateFeeBulk(
+    invocations: Array<InvocationBulk>,
     blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponse>;
 

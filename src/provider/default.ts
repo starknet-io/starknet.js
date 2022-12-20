@@ -104,11 +104,11 @@ export class Provider implements ProviderInterface {
     );
   }
 
-  public async getInvokeEstimateFeeBulk(
+  public async getEstimateFeeBulk(
     invocations: Array<InvocationBulk>,
     blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponse> {
-    return this.provider.getInvokeEstimateFeeBulk(invocations, blockIdentifier);
+    return this.provider.getEstimateFeeBulk(invocations, blockIdentifier);
   }
 
   public async getNonceForAddress(

@@ -223,7 +223,7 @@ export class SequencerProvider implements ProviderInterface {
         throw new GatewayError(responseBody.message, errorCode); // Caught locally, and re-thrown for the user
       }
 
-      if (endpoint === 'estimate_fee') {
+      if (endpoint === 'estimate_fee' || endpoint === 'estimate_fee_bulk') {
         return parseAlwaysAsBig(textResponse, (_, v) => {
           if (v && typeof v === 'bigint') {
             return toBN(v.toString());
@@ -438,15 +438,38 @@ export class SequencerProvider implements ProviderInterface {
     ).then(this.responseParser.parseFeeEstimateResponse);
   }
 
-  public async getInvokeEstimateFeeBulk(
+  public async getEstimateFeeBulk(
     invocations: Array<InvocationBulk>,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<EstimateFeeResponse> {
-    const params: any = [].concat(invocations as []).map((invocation: InvocationBulk) => {
+    const params: any = [].concat(invocations as []).map((invocation: any) => {
+      let res;
+      if (invocation.type === 'INVOKE_FUNCTION') {
+        res = {
+          type: 'INVOKE_FUNCTION',
+          contract_address: invocation.contractAddress,
+          calldata: invocation.calldata ?? [],
+        };
+      }
+      if (invocation.type === 'DECLARE') {
+        res = {
+          type: 'DECLARE',
+          sender_address: invocation.senderAddress,
+          contract_class: invocation.contractDefinition,
+        };
+      }
+      if (invocation.type === 'DEPLOY_ACCOUNT') {
+        res = {
+          type: 'DEPLOY_ACCOUNT',
+          class_hash: toHex(toBN(invocation.classHash)),
+          constructor_calldata: bigNumberishArrayToDecimalStringArray(
+            invocation.constructorCalldata || []
+          ),
+          contract_address_salt: toHex(toBN(invocation.addressSalt || 0)),
+        };
+      }
       return {
-        type: 'INVOKE_FUNCTION',
-        contract_address: invocation.contractAddress,
-        calldata: invocation.calldata ?? [],
+        ...res,
         signature: bigNumberishArrayToDecimalStringArray(invocation.signature || []),
         version: toHex(toBN(invocation?.version || 1)),
         nonce: toHex(toBN(invocation.nonce)),

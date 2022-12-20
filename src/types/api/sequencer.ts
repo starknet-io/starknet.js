@@ -233,12 +233,6 @@ export namespace Sequencer {
     | DeployEstimateFee
     | DeployAccountEstimateFee;
 
-  export type EstimateFeeRequestBulk =
-    | Array<InvokeEstimateFee>
-    | Array<DeclareEstimateFee>
-    | Array<DeployEstimateFee>
-    | Array<DeployAccountEstimateFee>;
-
   // Support 0.9.1 changes in a backward-compatible way
   export type EstimateFeeResponse =
     | {
@@ -375,7 +369,7 @@ export namespace Sequencer {
       QUERY: {
         blockIdentifier: BlockIdentifier;
       };
-      REQUEST: EstimateFeeRequestBulk;
+      REQUEST: any;
       RESPONSE: EstimateFeeResponse;
     };
   };

@@ -26,6 +26,7 @@ import {
   KeyPair,
   MultiDeployContractResponse,
   Signature,
+  TransactionBulk,
   UniversalDeployerContractPayload,
 } from '../types';
 import { parseUDCEvent } from '../utils/events';
@@ -150,59 +151,6 @@ export class Account extends Provider implements AccountInterface {
     };
   }
 
-  public async estimateInvokeFeeBulk(
-    calls: Array<AllowArray<Call>>,
-    { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
-  ): Promise<EstimateFee> {
-    let nonce = toBN(providedNonce ?? (await this.getNonce()));
-    const version = toBN(feeTransactionVersion);
-    const chainId = await this.getChainId();
-
-    const invocations: any = await Promise.all(
-      [].concat(calls as []).map(async (call) => {
-        const transactions = Array.isArray(call) ? call : [call];
-        const signerDetails: InvocationsSignerDetails = {
-          walletAddress: this.address,
-          nonce,
-          maxFee: ZERO,
-          version,
-          chainId,
-        };
-        const invocation = await this.buildInvocation(transactions, signerDetails);
-        const res = {
-          ...invocation,
-          version,
-          nonce,
-          blockIdentifier,
-        };
-        nonce = toBN(Number(nonce) + 1);
-        return res;
-      })
-    );
-
-    const response = await super.getInvokeEstimateFeeBulk(invocations, blockIdentifier);
-    const suggestedMaxFee = estimatedFeeToMaxFee(response.overall_fee);
-
-    return {
-      ...response,
-      suggestedMaxFee,
-    };
-  }
-
-  private async buildInvocation(
-    call: Array<Call>,
-    signerDetails: InvocationsSignerDetails
-  ): Promise<Invocation> {
-    const calldata = fromCallsToExecuteCalldata(call);
-    const signature = await this.signer.signTransaction(call, signerDetails);
-
-    return {
-      contractAddress: this.address,
-      calldata,
-      signature,
-    };
-  }
-
   public async estimateDeclareFee(
     { classHash, contract }: DeclareContractPayload,
     { blockIdentifier, nonce: providedNonce }: EstimateFeeDetails = {}
@@ -301,6 +249,160 @@ export class Account extends Provider implements AccountInterface {
     });
 
     return this.estimateInvokeFee(calls, transactionsDetail);
+  }
+
+  public async estimateFeeBulk(
+    calls: Array<TransactionBulk>,
+    { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
+  ): Promise<EstimateFee> {
+    const nonce = toBN(providedNonce ?? (await this.getNonce()));
+    const version = toBN(feeTransactionVersion);
+    const chainId = await this.getChainId();
+
+    const invocations: any = await Promise.all(
+      [].concat(calls as []).map(async (transaction: any, index: number) => {
+        const signerDetails: InvocationsSignerDetails = {
+          walletAddress: this.address,
+          nonce: toBN(Number(nonce) + index),
+          maxFee: ZERO,
+          version,
+          chainId,
+        };
+
+        let res;
+        if (
+          typeof transaction === 'object' &&
+          transaction.type === 'INVOKE_FUNCTION' &&
+          'entrypoint' in transaction &&
+          'contractAddress' in transaction &&
+          'calldata' in transaction
+        ) {
+          const transactions: any = Array.isArray(transaction) ? transaction : [transaction];
+          const invocation = await this.buildInvocation(transactions, signerDetails);
+          res = {
+            type: 'INVOKE_FUNCTION',
+            ...invocation,
+            version,
+            nonce: toBN(Number(nonce) + index),
+            blockIdentifier,
+          };
+        } else if (
+          typeof transaction === 'object' &&
+          transaction.type === 'DECLARE' &&
+          'contract' in transaction &&
+          'classHash' in transaction
+        ) {
+          const contractDefinition = parseContract(transaction.contract);
+          const signature = await this.signer.signDeclareTransaction({
+            classHash: transaction.classHash,
+            senderAddress: this.address,
+            chainId,
+            maxFee: ZERO,
+            version,
+            nonce: toBN(Number(nonce) + index),
+          });
+          res = {
+            type: 'DECLARE',
+            senderAddress: this.address,
+            signature,
+            contractDefinition,
+            version,
+            nonce: toBN(Number(nonce) + index),
+            blockIdentifier,
+          };
+        } else if (
+          typeof transaction === 'object' &&
+          transaction.type === 'DEPLOY_ACCOUNT' &&
+          'classHash' in transaction
+        ) {
+          const contractAddress =
+            transaction.contractAddress ??
+            calculateContractAddressFromHash(
+              transaction.addressSalt || 0,
+              transaction.classHash,
+              transaction.constructorCalldata || [],
+              0
+            );
+
+          const signature = await this.signer.signDeployAccountTransaction({
+            classHash: transaction.classHash,
+            contractAddress,
+            chainId,
+            maxFee: ZERO,
+            version,
+            nonce: toBN(Number(nonce) + index),
+            addressSalt: transaction.addressSalt || 0,
+            constructorCalldata: transaction.constructorCalldata || [],
+          });
+
+          res = {
+            type: 'DEPLOY_ACCOUNT',
+            classHash: transaction.classHash,
+            addressSalt: transaction.addressSalt || 0,
+            constructorCalldata: transaction.constructorCalldata || [],
+            signature,
+            version,
+            nonce,
+            blockIdentifier,
+          };
+        } else if (
+          typeof transaction === 'object' &&
+          transaction.type === 'DEPLOY' &&
+          'classHash' in transaction
+        ) {
+          const {
+            classHash,
+            salt = '0',
+            unique = true,
+            constructorCalldata = [],
+          } = transaction as UniversalDeployerContractPayload;
+          const compiledConstructorCallData = compileCalldata(constructorCalldata);
+          const call = {
+            contractAddress: UDC.ADDRESS,
+            entrypoint: UDC.ENTRYPOINT,
+            calldata: [
+              classHash,
+              salt,
+              toCairoBool(unique),
+              compiledConstructorCallData.length,
+              ...compiledConstructorCallData,
+            ],
+          };
+          const transactions: any = Array.isArray(call) ? call : [call];
+          const invocation = await this.buildInvocation(transactions, signerDetails);
+          res = {
+            type: 'INVOKE_FUNCTION',
+            ...invocation,
+            version,
+            nonce: toBN(Number(nonce) + index),
+            blockIdentifier,
+          };
+        }
+        return res;
+      })
+    );
+
+    const response = await super.getEstimateFeeBulk(invocations, blockIdentifier);
+    const suggestedMaxFee = estimatedFeeToMaxFee(response.overall_fee);
+
+    return {
+      ...response,
+      suggestedMaxFee,
+    };
+  }
+
+  private async buildInvocation(
+    call: Array<Call>,
+    signerDetails: InvocationsSignerDetails
+  ): Promise<Invocation> {
+    const calldata = fromCallsToExecuteCalldata(call);
+    const signature = await this.signer.signTransaction(call, signerDetails);
+
+    return {
+      contractAddress: this.address,
+      calldata,
+      signature,
+    };
   }
 
   public async execute(

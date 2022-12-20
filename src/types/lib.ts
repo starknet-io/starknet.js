@@ -77,7 +77,17 @@ export type InvocationsDetails = {
 
 export type InvocationsDetailsWithNonce = InvocationsDetails & { nonce: BigNumberish };
 
-export type InvocationBulk = Invocation &
+export type TransactionBulk = { type: TransactionType } & (
+  | DeclareContractPayload
+  | AllowArray<Call>
+  | DeployAccountContractPayload
+);
+
+export type InvocationBulk = { type: TransactionType } & (
+  | Invocation
+  | DeclareContractTransaction
+  | DeployAccountContractTransaction
+) &
   InvocationsDetailsWithNonce & { blockIdentifier: BlockNumber | BigNumberish };
 
 export type Status =
