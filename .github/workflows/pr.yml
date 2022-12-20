@@ -6,20 +6,15 @@ on:
       - develop
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js 14
-        uses: actions/setup-node@v2
-        with:
-          node-version: lts/*
-          cache: 'yarn'
-      - run: yarn install --frozen-lockfile
-      - run: yarn build --if-present
-
   tests:
+    name: Run test ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    services:
+      devnet:
+        image: shardlabs/starknet-devnet:0.4.0-seed0
+        ports:
+          - 5050:5050
+
     strategy:
       max-parallel: 1 # needed until we get a seperate account for the rpc provider, until then running them in parallel would result in a nonce issue
       matrix:
@@ -29,26 +24,15 @@ jobs:
             TEST_PROVIDER_BASE_URL: http://127.0.0.1:5050/
           - name: rpc-devnet
             TEST_RPC_URL: http://127.0.0.1:5050/rpc
-
-    name: Run test ${{ matrix.name }}
-    runs-on: ubuntu-latest
-    needs: [build]
-
-    services:
-      devnet:
-        image: shardlabs/starknet-devnet:0.4.0-seed0
-        ports:
-          - 5050:5050
     env:
       TEST_PROVIDER_BASE_URL: ${{ matrix.TEST_PROVIDER_BASE_URL }}
       TEST_RPC_URL: ${{ matrix.TEST_RPC_URL }}
 
     steps:
-      - uses: actions/checkout@v2
-      - name: Use Node.js 14
-        uses: actions/setup-node@v2
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: lts/*
           cache: 'yarn'
-      - run: yarn install --frozen-lockfile
+      - run: yarn install --frozen-lockfile --ignore-scripts
       - run: yarn test

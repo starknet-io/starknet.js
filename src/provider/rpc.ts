@@ -331,14 +331,16 @@ export class RpcProvider implements ProviderInterface {
     details: InvocationsDetailsWithNonce
   ): Promise<DeployContractResponse> {
     return this.fetchEndpoint('starknet_addDeployAccountTransaction', {
-      constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
-      class_hash: toHex(classHash),
-      contract_address_salt: toHex(addressSalt || 0),
-      type: 'DEPLOY',
-      max_fee: toHex(details.maxFee || 0),
-      version: toHex(details.version || 0),
-      signature: signatureToDecimalArray(signature),
-      nonce: toHex(details.nonce),
+      deploy_account_transaction: {
+        constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
+        class_hash: toHex(classHash),
+        contract_address_salt: toHex(addressSalt || 0),
+        type: 'DEPLOY_ACCOUNT',
+        max_fee: toHex(details.maxFee || 0),
+        version: toHex(details.version || 0),
+        signature: signatureToDecimalArray(signature),
+        nonce: toHex(details.nonce),
+      },
     });
   }
 

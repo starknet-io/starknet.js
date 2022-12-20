@@ -41,7 +41,7 @@ This function validates the checksum address.
 
 Returns true if the address is valid, false otherwise.
 
-<hr />
+---
 
 ## **stark**
 
@@ -102,7 +102,7 @@ Function that calculates and returns maximum fee based on the previously estimat
 
 Returns a BN.
 
-<hr />
+---
 
 ## **number**
 
@@ -190,7 +190,7 @@ const signature = await this.signer.signTransaction(transactions, signerDetails)
 
 Convert BigNumberish array to hexadecimal string array. Used for signature conversion.
 
-<hr />
+---
 
 ## **uint256**
 
@@ -222,7 +222,7 @@ Function to check if `BN` is smaller or equal to `2**256-1`.
 
 Function to convert `BN` to `Uint256`.
 
-<hr />
+---
 
 ## **hash**
 
@@ -301,7 +301,7 @@ Function that calculates contract address from hash.
 
 Returns a string.
 
-<hr />
+---
 
 ## **ellipticCurve**
 
@@ -354,3 +354,21 @@ keyPair should be an KeyPair with a valid public key.
 sig should be an Signature.
 
 Returns true if the verification succeeds.
+
+<hr />
+
+## **calldata**
+
+Functions to compile and validate arguments passed in invoke, call and deploy functions.
+
+### compile
+
+`compileCalldata(args: Array<any>, inputs: AbiEntry[]): Calldata`
+
+Parse the calldata by using input fields from the abi for that method.
+
+### validate
+
+`validateMethodAndArgs(type: 'INVOKE' | 'CALL' | 'DEPLOY', method: string, args: Array<any> = [])`
+
+Validates if all arguments that are passed to the method are corresponding to the ones in the abi.
