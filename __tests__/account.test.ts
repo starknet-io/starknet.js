@@ -65,6 +65,16 @@ describe('deploy and test Wallet', () => {
     innerInvokeEstFeeSpy.mockClear();
   });
 
+  test('simulate transaction', async () => {
+    const res = await account.simulateTransaction({
+      contractAddress: erc20Address,
+      entrypoint: 'transfer',
+      calldata: [erc20.address, '10', '0'],
+    });
+    expect(res).toHaveProperty('fee_estimation');
+    expect(res).toHaveProperty('trace');
+  });
+
   test('read balance of wallet', async () => {
     const x = await erc20.balanceOf(account.address);
 
