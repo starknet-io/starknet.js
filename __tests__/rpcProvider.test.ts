@@ -1,4 +1,6 @@
-import { Account, GetBlockResponse, RpcProvider, ec } from '../src';
+import { getStarkKey, utils } from 'micro-curve-definitions/lib/stark';
+
+import { Account, GetBlockResponse, RpcProvider } from '../src';
 import { StarknetChainId } from '../src/constants';
 import {
   compiledOpenZeppelinAccount,
@@ -15,8 +17,8 @@ describeIfRpc('RPCProvider', () => {
 
   beforeAll(async () => {
     expect(account).toBeInstanceOf(Account);
-    const accountKeyPair = ec.genKeyPair();
-    accountPublicKey = ec.getStarkKey(accountKeyPair);
+    const accountKeyPair = utils.randomPrivateKey();
+    accountPublicKey = getStarkKey(accountKeyPair);
   });
 
   test('getChainId', async () => {
