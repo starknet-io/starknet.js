@@ -223,7 +223,7 @@ export class SequencerProvider implements ProviderInterface {
         throw new GatewayError(responseBody.message, errorCode); // Caught locally, and re-thrown for the user
       }
 
-      if (endpoint === 'estimate_fee' || endpoint === 'estimate_fee_bulk') {
+      if (endpoint === 'estimate_fee') {
         return parseAlwaysAsBig(textResponse, (_, v) => {
           if (v && typeof v === 'bigint') {
             return toBN(v.toString());
@@ -441,7 +441,7 @@ export class SequencerProvider implements ProviderInterface {
   public async getEstimateFeeBulk(
     invocations: Array<InvocationBulk>,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<EstimateFeeResponse> {
+  ): Promise<Array<EstimateFeeResponse>> {
     const params: any = [].concat(invocations as []).map((invocation: any) => {
       let res;
       if (invocation.type === 'INVOKE_FUNCTION') {
@@ -476,9 +476,11 @@ export class SequencerProvider implements ProviderInterface {
       };
     });
 
-    return this.fetchEndpoint('estimate_fee_bulk', { blockIdentifier }, params).then(
-      this.responseParser.parseFeeEstimateResponse
-    );
+    return this.fetchEndpoint('estimate_fee_bulk', { blockIdentifier }, params).then((result) => {
+      return [].concat(result as []).map((elem: any) => {
+        return this.responseParser.parseFeeEstimateResponse(elem);
+      });
+    });
   }
 
   public async getCode(

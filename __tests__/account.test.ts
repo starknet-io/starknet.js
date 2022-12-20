@@ -65,9 +65,8 @@ describe('deploy and test Wallet', () => {
     innerInvokeEstFeeSpy.mockClear();
   });
 
-  test('estimate invoke fee bulk', async () => {
-    const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
-    const { overall_fee } = await account.estimateFeeBulk([
+  test('estimate fee bulk', async () => {
+    const res = await account.estimateFeeBulk([
       {
         type: 'DECLARE',
         contract: compiledErc20,
@@ -95,9 +94,9 @@ describe('deploy and test Wallet', () => {
         calldata: [erc20.address, '10', '0'],
       },
     ]);
-    expect(isBN(overall_fee)).toBe(true);
-    expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
-    innerInvokeEstFeeSpy.mockClear();
+    expect(res).toHaveLength(4);
+    expect(res[0]).toHaveProperty('overall_fee');
+    expect(res[0]).toHaveProperty('suggestedMaxFee');
   });
 
   test('read balance of wallet', async () => {

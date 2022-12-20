@@ -113,6 +113,7 @@ export abstract class AccountInterface extends ProviderInterface {
 
   /**
    * Estimate Fee for executing a list of transactions on starknet
+   * Contract must be deployed for fee estimation to be possible
    *
    * @param transactions array of transaction object containing :
    * - type - the type of transaction : 'DECLARE' | 'DEPLOY' | 'INVOKE_FUNCTION' | 'DEPLOY_ACCOUNT'
@@ -121,9 +122,9 @@ export abstract class AccountInterface extends ProviderInterface {
    * @returns response from estimate_fee
    */
   public abstract estimateFeeBulk(
-    calls: Array<TransactionBulk>,
+    transactions: Array<TransactionBulk>,
     estimateFeeDetails?: EstimateFeeDetails
-  ): Promise<EstimateFeeResponse>;
+  ): Promise<AllowArray<EstimateFeeResponse>>;
 
   /**
    * Invoke execute function in account contract

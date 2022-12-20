@@ -4,6 +4,7 @@ import { BlockIdentifier } from '../../provider/utils';
 import { BigNumberish } from '../../utils/number';
 import {
   Abi,
+  AllowArray,
   BlockNumber,
   ContractClass,
   EntryPointType,
@@ -370,7 +371,7 @@ export namespace Sequencer {
         blockIdentifier: BlockIdentifier;
       };
       REQUEST: any;
-      RESPONSE: EstimateFeeResponse;
+      RESPONSE: AllowArray<EstimateFeeResponse>;
     };
   };
 }

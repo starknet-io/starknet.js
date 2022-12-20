@@ -252,15 +252,15 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async estimateFeeBulk(
-    calls: Array<TransactionBulk>,
+    transactions: Array<TransactionBulk>,
     { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
-  ): Promise<EstimateFee> {
+  ): Promise<Array<EstimateFee>> {
     const nonce = toBN(providedNonce ?? (await this.getNonce()));
     const version = toBN(feeTransactionVersion);
     const chainId = await this.getChainId();
 
     const invocations: any = await Promise.all(
-      [].concat(calls as []).map(async (transaction: any, index: number) => {
+      [].concat(transactions as []).map(async (transaction: any, index: number) => {
         const signerDetails: InvocationsSignerDetails = {
           walletAddress: this.address,
           nonce: toBN(Number(nonce) + index),
@@ -277,8 +277,8 @@ export class Account extends Provider implements AccountInterface {
           'contractAddress' in transaction &&
           'calldata' in transaction
         ) {
-          const transactions: any = Array.isArray(transaction) ? transaction : [transaction];
-          const invocation = await this.buildInvocation(transactions, signerDetails);
+          const calls: any = Array.isArray(transaction) ? transaction : [transaction];
+          const invocation = await this.buildInvocation(calls, signerDetails);
           res = {
             type: 'INVOKE_FUNCTION',
             ...invocation,
@@ -368,8 +368,8 @@ export class Account extends Provider implements AccountInterface {
               ...compiledConstructorCallData,
             ],
           };
-          const transactions: any = Array.isArray(call) ? call : [call];
-          const invocation = await this.buildInvocation(transactions, signerDetails);
+          const calls: any = Array.isArray(call) ? call : [call];
+          const invocation = await this.buildInvocation(calls, signerDetails);
           res = {
             type: 'INVOKE_FUNCTION',
             ...invocation,
@@ -383,12 +383,14 @@ export class Account extends Provider implements AccountInterface {
     );
 
     const response = await super.getEstimateFeeBulk(invocations, blockIdentifier);
-    const suggestedMaxFee = estimatedFeeToMaxFee(response.overall_fee);
 
-    return {
-      ...response,
-      suggestedMaxFee,
-    };
+    return [].concat(response as []).map((elem: any) => {
+      const suggestedMaxFee = estimatedFeeToMaxFee(elem.overall_fee);
+      return {
+        ...elem,
+        suggestedMaxFee,
+      };
+    });
   }
 
   private async buildInvocation(

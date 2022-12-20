@@ -283,7 +283,7 @@ export abstract class ProviderInterface {
   public abstract getEstimateFeeBulk(
     invocations: Array<InvocationBulk>,
     blockIdentifier?: BlockIdentifier
-  ): Promise<EstimateFeeResponse>;
+  ): Promise<Array<EstimateFeeResponse>>;
 
   /**
    * Wait for the transaction to be accepted

@@ -312,7 +312,7 @@ export class RpcProvider implements ProviderInterface {
   public async getEstimateFeeBulk(
     _invocations: Array<InvocationBulk>,
     _blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<EstimateFeeResponse> {
+  ): Promise<Array<EstimateFeeResponse>> {
     throw new Error('RPC does not implement getInvokeEstimateFeeBulk function');
   }
 
