@@ -85,7 +85,7 @@
     "hash.js": "^1.1.7",
     "isomorphic-fetch": "^3.0.0",
     "json-bigint": "^1.0.0",
-    "micro-curve-definitions": "^0.1.0",
+    "micro-curve-definitions": "^0.2.0",
     "micro-starknet": "^0.1.2",
     "minimalistic-assert": "^1.0.1",
     "pako": "^2.0.4",
