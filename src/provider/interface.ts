@@ -16,7 +16,6 @@ import type {
   Invocation,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
-  Sequencer,
   Status,
 } from '../types';
 import type { BigNumberish } from '../utils/number';
@@ -279,11 +278,4 @@ export abstract class ProviderInterface {
     retryInterval?: number,
     successStates?: Array<Status>
   ): Promise<GetTransactionReceiptResponse>;
-
-  // todo documentation
-  public abstract getSimulateTransaction(
-    invocation: Invocation,
-    invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
-  ): Promise<Sequencer.TransactionSimulationResponse>;
 }

@@ -18,7 +18,6 @@ import {
   InvocationsDetails,
   InvokeFunctionResponse,
   MultiDeployContractResponse,
-  Sequencer,
   Signature,
   UniversalDeployerContractPayload,
 } from '../types';
@@ -309,19 +308,4 @@ export abstract class AccountInterface extends ProviderInterface {
     estimateFeeAction: EstimateFeeAction,
     details: EstimateFeeDetails
   ): Promise<BigNumberish>;
-
-  /**
-   * Estimate Fee for executing an INVOKE transaction on starknet
-   *
-   * @param calls the invocation object containing:
-   * - contractAddress - the address of the contract
-   * - entrypoint - the entrypoint of the contract
-   * - calldata - (defaults to []) the calldata
-   *
-   * @returns response from estimate_fee
-   */
-  public abstract simulateTransaction(
-    calls: AllowArray<Call>,
-    estimateFeeDetails?: EstimateFeeDetails
-  ): Promise<Sequencer.TransactionSimulationResponse>;
 }

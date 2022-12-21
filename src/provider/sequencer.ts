@@ -522,7 +522,7 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('estimate_message_fee', { blockIdentifier }, validCallL1Handler);
   }
 
-  public async getSimulateTransaction(
+  public async simulateTransaction(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
     blockIdentifier: BlockIdentifier = this.blockIdentifier

@@ -15,7 +15,6 @@ import {
   Invocation,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
-  Sequencer,
   Status,
 } from '../types';
 import { BigNumberish } from '../utils/number';
@@ -184,13 +183,5 @@ export class Provider implements ProviderInterface {
     successStates?: Array<Status>
   ): Promise<GetTransactionReceiptResponse> {
     return this.provider.waitForTransaction(txHash, retryInterval, successStates);
-  }
-
-  public async getSimulateTransaction(
-    invocation: Invocation,
-    invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
-  ): Promise<Sequencer.TransactionSimulationResponse> {
-    return this.provider.getSimulateTransaction(invocation, invocationDetails, blockIdentifier);
   }
 }
