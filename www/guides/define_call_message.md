@@ -118,7 +118,7 @@ const myCallData = [
     [123, "0x2345"], // for an array of 2 cairo felts
     [initialUint256, finallUint256] // for an array of 2 structs (Uint256 here)
 ];
-// in Typescript, thes object type is : `Array<any>`
+// in Typescript, the object type is : `Array<any>`
 
 ```
 > Object representing a Cairo struct are made of BigNumberish elements. Ex :
@@ -132,7 +132,7 @@ interface c3D {
 >Same for arrays : their elements must have the BigNumberish type.
 ### summary table for arguments : 
 These 4 types of arguments can't be used at your convenience everywhere. Here a table showing which type can be used in which function :  
-|Function|array of < BigNumberish >|array of < string >| object|array of < any >|Multicall|
+|Function|array of < BigNumberish >|array of < string >| object|array of < any >|MultiInvoke|
 |---:|:---:|:---:|:---:|:---:|:---:|
 |**Typescript type**|RawCalldata|Calldata or RawArgs or RawCalldata|RawArgs|Array< any >|array|
 |contract.call contract.metaClass||⚠️||✔️||
