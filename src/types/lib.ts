@@ -77,18 +77,20 @@ export type InvocationsDetails = {
 
 export type InvocationsDetailsWithNonce = InvocationsDetails & { nonce: BigNumberish };
 
-export type TransactionBulk = { type: TransactionType } & (
-  | DeclareContractPayload
-  | AllowArray<Call>
-  | DeployAccountContractPayload
-);
+export type TransactionBulk = Array<
+  { type: TransactionType } & {
+    payload: DeclareContractPayload | AllowArray<Call> | DeployAccountContractPayload;
+  }
+>;
 
-export type InvocationBulk = { type: TransactionType } & (
-  | Invocation
-  | DeclareContractTransaction
-  | DeployAccountContractTransaction
-) &
-  InvocationsDetailsWithNonce & { blockIdentifier: BlockNumber | BigNumberish };
+export type InvocationBulk = Array<
+  { type: TransactionType } & (
+    | Invocation
+    | DeclareContractTransaction
+    | DeployAccountContractTransaction
+  ) &
+    InvocationsDetailsWithNonce & { blockIdentifier: BlockNumber | BigNumberish }
+>;
 
 export type Status =
   | 'NOT_RECEIVED'

@@ -105,7 +105,7 @@ export class Provider implements ProviderInterface {
   }
 
   public async getEstimateFeeBulk(
-    invocations: Array<InvocationBulk>,
+    invocations: InvocationBulk,
     blockIdentifier?: BlockIdentifier
   ): Promise<Array<EstimateFeeResponse>> {
     return this.provider.getEstimateFeeBulk(invocations, blockIdentifier);

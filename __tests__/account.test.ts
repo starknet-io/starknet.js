@@ -24,6 +24,7 @@ describe('deploy and test Wallet', () => {
   let erc20: Contract;
   let erc20Address: string;
   let dapp: Contract;
+  // let accountPublicKey: string;
 
   beforeAll(async () => {
     expect(account).toBeInstanceOf(Account);
@@ -51,6 +52,9 @@ describe('deploy and test Wallet', () => {
     });
 
     dapp = new Contract(compiledTestDapp.abi, dappResponse.deploy.contract_address!, provider);
+
+    // const accountKeyPair = ec.genKeyPair();
+    // accountPublicKey = ec.getStarkKey(accountKeyPair);
   });
 
   test('estimate fee', async () => {
@@ -69,32 +73,39 @@ describe('deploy and test Wallet', () => {
     const res = await account.estimateFeeBulk([
       {
         type: 'DECLARE',
-        contract: compiledErc20,
-        classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+        payload: {
+          contract: compiledErc20,
+          classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+        },
       },
       {
         type: 'DEPLOY',
-        classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
-        constructorCalldata: [
-          encodeShortString('Token'),
-          encodeShortString('ERC20'),
-          account.address,
+        payload: {
+          classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+          constructorCalldata: [
+            encodeShortString('Token'),
+            encodeShortString('ERC20'),
+            account.address,
+          ],
+        },
+      },
+      {
+        type: 'INVOKE_FUNCTION',
+        payload: [
+          {
+            contractAddress: erc20Address,
+            entrypoint: 'approve',
+            calldata: [erc20Address, '10', '0'],
+          },
+          {
+            contractAddress: erc20Address,
+            entrypoint: 'transfer',
+            calldata: [erc20.address, '10', '0'],
+          },
         ],
       },
-      {
-        type: 'INVOKE_FUNCTION',
-        contractAddress: erc20Address,
-        entrypoint: 'approve',
-        calldata: [erc20Address, '10', '0'],
-      },
-      {
-        type: 'INVOKE_FUNCTION',
-        contractAddress: erc20Address,
-        entrypoint: 'transfer',
-        calldata: [erc20.address, '10', '0'],
-      },
     ]);
-    expect(res).toHaveLength(4);
+    expect(res).toHaveLength(3);
     expect(res[0]).toHaveProperty('overall_fee');
     expect(res[0]).toHaveProperty('suggestedMaxFee');
   });

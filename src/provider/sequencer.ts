@@ -439,7 +439,7 @@ export class SequencerProvider implements ProviderInterface {
   }
 
   public async getEstimateFeeBulk(
-    invocations: Array<InvocationBulk>,
+    invocations: InvocationBulk,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<Array<EstimateFeeResponse>> {
     const params: any = [].concat(invocations as []).map((invocation: any) => {

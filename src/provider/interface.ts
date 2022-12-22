@@ -281,7 +281,7 @@ export abstract class ProviderInterface {
    * @returns the estimated fee
    */
   public abstract getEstimateFeeBulk(
-    invocations: Array<InvocationBulk>,
+    invocations: InvocationBulk,
     blockIdentifier?: BlockIdentifier
   ): Promise<Array<EstimateFeeResponse>>;
 

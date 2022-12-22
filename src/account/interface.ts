@@ -122,7 +122,7 @@ export abstract class AccountInterface extends ProviderInterface {
    * @returns response from estimate_fee
    */
   public abstract estimateFeeBulk(
-    transactions: Array<TransactionBulk>,
+    transactions: TransactionBulk,
     estimateFeeDetails?: EstimateFeeDetails
   ): Promise<AllowArray<EstimateFeeResponse>>;
 
