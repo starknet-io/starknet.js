@@ -1,4 +1,4 @@
-import { sign } from 'micro-starknet';
+import { Signature, sign } from 'micro-starknet';
 
 import typedDataExample from '../__mocks__/typedDataExample.json';
 import { Account, Contract, Provider, number, stark } from '../src';
@@ -175,7 +175,7 @@ describe('deploy and test Wallet', () => {
       expect(declareTx.class_hash).toBeDefined();
     });
 
-    test('Get the stark name of the account and account from stark name (using starknet.id)', async () => {
+    test.only('Get the stark name of the account and account from stark name (using starknet.id)', async () => {
       // Deploy naming contract
       const namingResponse = await account.declareDeploy({
         contract: compiledNamingContract,
@@ -197,9 +197,11 @@ describe('deploy and test Wallet', () => {
         '301579081698031303837612923223391524790804435085778862878979120159194507372';
       const hashed = pedersen(
         pedersen(toBigInt('18925'), toBigInt('1922775124')),
-        toBigInt(hexToDecimalString(account.address))
+        toBigInt(account.address)
       );
       const signed = sign(hashed, toBigInt(whitelistingPrivateKey));
+
+      const signature = Signature.fromHex(signed);
 
       const { transaction_hash } = await account.execute([
         {
@@ -226,8 +228,8 @@ describe('deploy and test Wallet', () => {
             '1922775124', // Expiry
             '1', // Starknet id linked
             account.address, // receiver_address
-            signed[0], // sig 0 for whitelist
-            signed[1], // sig 1 for whitelist
+            signature.r, // sig 0 for whitelist
+            signature.s, // sig 1 for whitelist
           ],
         },
         {
