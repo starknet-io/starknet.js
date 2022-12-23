@@ -10,13 +10,13 @@ In Cairo, everything is felt, an integer on 251 bits.
 This type do not exists in JS/TS ; you have Number, bigInt, string, array, objects... and types defined in libraries.   
 In Starknet.js, it's a bit ... complicated : you have the BigNumberish type  ; it can includes :
 - String : "123", "0xabc2"
-- Number (max 64 bits) : 123 
+- Number (max 53 bits) : 123 
 - BN (max 256 bits) : BigNum from [BN.js](https://github.com/indutny/bn.js/) 🤯.
 
 > To create a BigInt : `const myBigInt=BigInt(1234n);`  
 To create a BN :  `const myBN=new BN("0x12b4");`  
-To convert a BigInt to BN : `const myBN=new BN(myBigInt.toString();`  
-To convert a BN to BigInt : `const myBigInt=BigInt(myBN.toString);`
+To convert a BigInt to BN : `const myBN=new BN(myBigInt.toString());`  
+To convert a BN to BigInt : `const myBigInt=BigInt(myBN.toString());`
 
 
 ## function argument types :
@@ -25,11 +25,11 @@ There are 4 different types of contract function arguments used in Starknet.js.
 You have to create by yourself this array of < BigNumberish >, in respect with the order of the Cairo function parameters :
 ```typescript
 const myCallData = [ // array of <BigNumberish>
-    123, // number 64 bits
+    123, // number 53 bits
     "0x2345", // string
     bn1, // BN
     bi1.toString(), // BigInt converted to string
-    num1, // number 64 bits
+    num1, // number 53 bits
     initialUint256.low, initialUint256.high, //object converted to BigNumberish
     coord.x0, coord.y0, coord.z0, //object converted to BigNumberish
     shortString.encodeShortString('A'),
@@ -68,7 +68,7 @@ const myCallData = [
     "0x2345",
     bn1.toString(), // BN converted to string
     bi1.toString(), // BigInt converted to string
-    number.toBN(num1).toString(), // Number 64 bits converted to string
+    number.toBN(num1).toString(), // Number 53 bits converted to string
     initialUint256.low.toString(), initialUint256.high.toString(),
     coord.x0.toString(), coord.y0.toString(), coord.z0.toString(),
     shortString.encodeShortString('A'),
@@ -107,11 +107,11 @@ With this type, you can includes :
 Example :
 ```typescript
 const myCallData = [
-    123, // number 64 bits
+    123, // number 53 bits
     "0x2345",
     bn1, // BigNum
     bi1.toString(), // Bigint converted to string
-    num1, // number 64 bits
+    num1, // number 53 bits
     initialUint256, // object representing a struct of 2 felt
     coord, // object representing a struct of 3 felt
     shortString.encodeShortString('A'), // short string
@@ -161,7 +161,7 @@ When you perform a call, you have the result in an object :
 |Type in Cairo|Cairo code|Type expected in JS/TS|JS/TS function to recover data|
 |----|----------|--------------------|------------------------------|
 |felt (251 bits max)|`func getV()->(total:felt)`|BN|`const total:BN = result.total`|
-|||number (64 bits max)|`const total:number = parseInt(result.total)`|
+|||number (53 bits max)|`const total:number = parseInt(result.total)`|
 |||string representing an hex number|`const address:string = number.toHex(result.address)`|
 |Uint256 (256 bits max)|`func getV()->(balance:Uint256)`|BN|`const balance:BN = uint256.uint256toBN(result.balance)`|
 |array of felt|`func getV()->(list_len:felt, list:felt*)`|BN[]|`const list:BN[]= result.list`|
