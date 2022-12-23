@@ -39,9 +39,9 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: lts/*
-          cache: 'yarn'
-      - run: yarn install --frozen-lockfile --ignore-scripts
-      - run: yarn test
+          cache: 'npm'
+      - run: npm ci --ignore-scripts
+      - run: npm test
 
   release:
     name: Release
@@ -52,8 +52,8 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: lts/*
-          cache: 'yarn'
-      - run: yarn install --frozen-lockfile
+          cache: 'npm'
+      - run: npm ci
       - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

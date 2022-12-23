@@ -8,4 +8,4 @@ dist
 node_modules
 npm-debug.log
 package
-package-lock.json
+yarn.lock
