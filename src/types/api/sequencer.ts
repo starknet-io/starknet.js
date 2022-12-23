@@ -52,7 +52,7 @@ export type ExecutionResources = {
   n_memory_holes: number;
 };
 
-export type GetTransactionTraceResponse = {
+export type TransactionTraceResponse = {
   validate_invocation?: FunctionInvocation;
   function_invocation?: FunctionInvocation;
   fee_transfer_invocation?: FunctionInvocation;
@@ -230,12 +230,20 @@ export namespace Sequencer {
     | DeployEstimateFee
     | DeployAccountEstimateFee;
 
+  export type TransactionSimulationResponse = {
+    trace: TransactionTraceResponse;
+    fee_estimation: Sequencer.EstimateFeeResponse;
+  };
+
+  export type SimulateTransaction = Omit<InvokeFunctionTransaction, 'max_fee' | 'entry_point_type'>;
+
   // Support 0.9.1 changes in a backward-compatible way
   export type EstimateFeeResponse =
     | {
         overall_fee: number;
         gas_price: number;
         gas_usage: number;
+        uint: string;
       }
     | {
         amount: bigint;
@@ -272,7 +280,7 @@ export namespace Sequencer {
         transactionHash: string;
       };
       REQUEST: never;
-      RESPONSE: GetTransactionTraceResponse;
+      RESPONSE: TransactionTraceResponse;
     };
     get_transaction_receipt: {
       QUERY: {
@@ -361,6 +369,13 @@ export namespace Sequencer {
       QUERY: any;
       REQUEST: any;
       RESPONSE: EstimateFeeResponse;
+    };
+    simulate_transaction: {
+      QUERY: {
+        blockIdentifier: BlockIdentifier;
+      };
+      REQUEST: SimulateTransaction;
+      RESPONSE: TransactionSimulationResponse;
     };
   };
 }

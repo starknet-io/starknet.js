@@ -16,11 +16,11 @@ import {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   GetTransactionStatusResponse,
-  GetTransactionTraceResponse,
   Invocation,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Sequencer,
+  TransactionTraceResponse,
 } from '../types';
 import fetch from '../utils/fetchPonyfill';
 import { getSelector, getSelectorFromName } from '../utils/hash';
@@ -150,6 +150,7 @@ export class SequencerProvider implements ProviderInterface {
       'call_contract',
       'estimate_fee',
       'estimate_message_fee',
+      'simulate_transaction',
     ];
 
     return postMethodEndpoints.includes(endpoint) ? 'POST' : 'GET';
@@ -502,7 +503,7 @@ export class SequencerProvider implements ProviderInterface {
    * @param txHash
    * @returns the transaction trace
    */
-  public async getTransactionTrace(txHash: BigNumberish): Promise<GetTransactionTraceResponse> {
+  public async getTransactionTrace(txHash: BigNumberish): Promise<TransactionTraceResponse> {
     const txHashHex = toHex(txHash);
     return this.fetchEndpoint('get_transaction_trace', { transactionHash: txHashHex });
   }
@@ -519,5 +520,24 @@ export class SequencerProvider implements ProviderInterface {
     };
 
     return this.fetchEndpoint('estimate_message_fee', { blockIdentifier }, validCallL1Handler);
+  }
+
+  public async simulateTransaction(
+    invocation: Invocation,
+    invocationDetails: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<Sequencer.TransactionSimulationResponse> {
+    return this.fetchEndpoint(
+      'simulate_transaction',
+      { blockIdentifier },
+      {
+        type: 'INVOKE_FUNCTION',
+        contract_address: invocation.contractAddress,
+        calldata: invocation.calldata ?? [],
+        signature: signatureToDecimalArray(invocation.signature),
+        version: toHex(invocationDetails?.version || 1),
+        nonce: toHex(invocationDetails.nonce),
+      }
+    );
   }
 }
