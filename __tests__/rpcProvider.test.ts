@@ -22,10 +22,14 @@ describeIfRpc('RPCProvider', () => {
   });
 
   test('getChainId', async () => {
-    const chainId = await rpcProvider.getChainId();
-    expect([StarknetChainId.TESTNET2, StarknetChainId.MAINNET, StarknetChainId.TESTNET]).toContain(
-      chainId
-    );
+    const fetchSpy = jest.spyOn(rpcProvider as any, 'fetchEndpoint');
+    rpcProvider.chainId = undefined as unknown as StarknetChainId;
+    const chainId1 = await rpcProvider.getChainId();
+    const chainId2 = await rpcProvider.getChainId();
+    expect(fetchSpy.mock.calls.length).toBe(1);
+    expect(chainId1).toBe(chainId2);
+    expect(Object.values(StarknetChainId)).toContain(chainId1);
+    fetchSpy.mockRestore();
   });
 
   test('getTransactionCount', async () => {
