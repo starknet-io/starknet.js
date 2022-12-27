@@ -40,7 +40,7 @@ import { parseContract, wait } from '../utils/provider';
 import { SequencerAPIResponseParser } from '../utils/responseParser/sequencer';
 import { randomAddress } from '../utils/stark';
 import { buildUrl } from '../utils/url';
-import { GatewayError, HttpError } from './errors';
+import { GatewayError, HttpError, LibraryError } from './errors';
 import { ProviderInterface } from './interface';
 import { Block, BlockIdentifier } from './utils';
 
@@ -296,9 +296,11 @@ export class SequencerProvider implements ProviderInterface {
 
   public async getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {
     const txHashHex = toHex(toBN(txHash));
-    return this.fetchEndpoint('get_transaction', { transactionHash: txHashHex }).then((value) =>
-      this.responseParser.parseGetTransactionResponse(value)
-    );
+    return this.fetchEndpoint('get_transaction', { transactionHash: txHashHex }).then((result) => {
+      // throw for no matching transaction to unify behavior with RPC and avoid parsing errors
+      if (Object.values(result).length === 1) throw new LibraryError(result.status);
+      return this.responseParser.parseGetTransactionResponse(result);
+    });
   }
 
   public async getTransactionReceipt(txHash: BigNumberish): Promise<GetTransactionReceiptResponse> {
