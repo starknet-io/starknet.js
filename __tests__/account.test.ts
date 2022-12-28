@@ -1,4 +1,4 @@
-import { pedersen, sign } from '@noble/curves/lib/stark';
+import { pedersen, sign } from '@noble/curves/stark';
 
 import typedDataExample from '../__mocks__/typedDataExample.json';
 import { Account, Contract, Provider, number, stark } from '../src';

@@ -1,4 +1,5 @@
-import { pedersen } from '../../src/utils/hash';
+import { pedersen } from '@noble/curves/stark';
+
 import { MerkleTree, proofMerklePath } from '../../src/utils/merkle';
 
 describe('MerkleTree class', () => {

@@ -1,6 +1,6 @@
 import fs from 'fs';
 
-import { pedersen } from '@noble/curves/lib/stark';
+import { pedersen } from '@noble/curves/stark';
 
 import { constants, hash, json, number, stark } from '../../src';
 import { Block } from '../../src/provider/utils';

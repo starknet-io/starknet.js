@@ -1,4 +1,4 @@
-import { getPublicKey, getStarkKey, pedersen, sign, verify } from '@noble/curves/lib/stark';
+import { getPublicKey, getStarkKey, pedersen, sign, verify } from '@noble/curves/stark';
 
 import { StarknetChainId } from '../../src/constants';
 import {
