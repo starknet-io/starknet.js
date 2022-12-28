@@ -175,7 +175,7 @@ describe('deploy and test Wallet', () => {
       expect(declareTx.class_hash).toBeDefined();
     });
 
-    test.only('Get the stark name of the account and account from stark name (using starknet.id)', async () => {
+    test('Get the stark name of the account and account from stark name (using starknet.id)', async () => {
       // Deploy naming contract
       const namingResponse = await account.declareDeploy({
         contract: compiledNamingContract,

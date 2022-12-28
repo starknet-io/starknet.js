@@ -21,7 +21,7 @@ import { stringify } from '../utils/json';
 import { BigNumberish, bigNumberishArrayToHexadecimalStringArray, toHex } from '../utils/number';
 import { parseCalldata, wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
-import { signatureToDecimalArray } from '../utils/stark';
+import { signatureToHexArray } from '../utils/stark';
 import { ProviderInterface } from './interface';
 import { Block, BlockIdentifier } from './utils';
 
@@ -248,7 +248,7 @@ export class RpcProvider implements ProviderInterface {
         type: 'INVOKE',
         sender_address: invocation.contractAddress,
         calldata: parseCalldata(invocation.calldata),
-        signature: signatureToDecimalArray(invocation.signature),
+        signature: signatureToHexArray(invocation.signature),
         version: toHex(invocationDetails?.version || 0),
         nonce: toHex(invocationDetails.nonce),
         max_fee: toHex(invocationDetails?.maxFee || 0),
@@ -274,7 +274,7 @@ export class RpcProvider implements ProviderInterface {
           abi: contractDefinition.abi, // rpc 2.0
         },
         sender_address: senderAddress,
-        signature: signatureToDecimalArray(signature),
+        signature: signatureToHexArray(signature),
         version: toHex(details?.version || 0),
         nonce: toHex(details.nonce),
         max_fee: toHex(details?.maxFee || 0),
@@ -295,7 +295,7 @@ export class RpcProvider implements ProviderInterface {
         constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
         class_hash: toHex(classHash),
         contract_address_salt: toHex(addressSalt || 0),
-        signature: signatureToDecimalArray(signature),
+        signature: signatureToHexArray(signature),
         version: toHex(details?.version || 0),
         nonce: toHex(details.nonce),
         max_fee: toHex(details?.maxFee || 0),
@@ -319,7 +319,7 @@ export class RpcProvider implements ProviderInterface {
         type: 'DECLARE',
         version: toHex(details.version || 0),
         max_fee: toHex(details.maxFee || 0),
-        signature: signatureToDecimalArray(signature),
+        signature: signatureToHexArray(signature),
         sender_address: senderAddress,
         nonce: toHex(details.nonce),
       },
@@ -338,7 +338,7 @@ export class RpcProvider implements ProviderInterface {
         type: 'DEPLOY_ACCOUNT',
         max_fee: toHex(details.maxFee || 0),
         version: toHex(details.version || 0),
-        signature: signatureToDecimalArray(signature),
+        signature: signatureToHexArray(signature),
         nonce: toHex(details.nonce),
       },
     });
@@ -355,7 +355,7 @@ export class RpcProvider implements ProviderInterface {
         type: 'INVOKE',
         max_fee: toHex(details.maxFee || 0),
         version: toHex(details.version || 1),
-        signature: signatureToDecimalArray(functionInvocation.signature),
+        signature: signatureToHexArray(functionInvocation.signature),
         nonce: toHex(details.nonce),
       },
     });

@@ -5,7 +5,13 @@ import { gzip } from 'pako';
 import { Calldata, CompressedProgram, Program, RawArgs } from '../types';
 import { addHexPrefix, btoaUniversal } from './encode';
 import { stringify } from './json';
-import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBigInt, toHex } from './number';
+import {
+  BigNumberish,
+  bigNumberishArrayToDecimalStringArray,
+  bigNumberishArrayToHexadecimalStringArray,
+  toBigInt,
+  toHex,
+} from './number';
 
 /**
  * Function to compress compiled cairo program
@@ -41,6 +47,10 @@ export function formatSignature(sig?: SignatureType): string[] {
 
 export function signatureToDecimalArray(sig?: SignatureType): string[] {
   return bigNumberishArrayToDecimalStringArray(formatSignature(sig));
+}
+
+export function signatureToHexArray(sig?: SignatureType): string[] {
+  return bigNumberishArrayToHexadecimalStringArray(formatSignature(sig));
 }
 
 export function parseSignature(sig?: string[]) {
