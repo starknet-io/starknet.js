@@ -285,17 +285,17 @@ Example:
 
 ---
 
-### declareDeploy()
+### declareAndDeploy()
 
 ✅ NEW
 High level wrapper for declare & deploy. Doesn't require waitForTransaction. Functionality similar to deprecated provider deployContract. Declare and Deploy contract using single function.
 
-account.**declareDeploy**(payload [ , details ]) => _Promise < DeclareDeployUDCResponse >_
+account.**declareAndDeploy**(payload [ , details ]) => _Promise < DeclareDeployUDCResponse >_
 
 @param object **_payload_** DeclareDeployContractPayload
 
 - **contract**: compiled contract code
-- **classHash**: computed class hash of compiled contract
+- optional computed class hash of compiled contract
 - optional constructorCalldata: constructor calldata
 - optional salt: address salt - default random
 - optional unique: bool if true ensure unique salt - default true
@@ -328,7 +328,6 @@ Example:
 ```typescript
   const declareDeploy = await account.declareDeploy({
     contract: compiledErc20,
-    classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
     constructorCalldata: [
       encodeShortString('Token'),
       encodeShortString('ERC20'),

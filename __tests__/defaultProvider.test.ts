@@ -19,9 +19,8 @@ describe('defaultProvider', () => {
   beforeAll(async () => {
     expect(testProvider).toBeInstanceOf(Provider);
 
-    const { deploy } = await account.declareDeploy({
+    const { deploy } = await account.declareAndDeploy({
       contract: compiledErc20,
-      classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
       constructorCalldata: [encodeShortString('Token'), encodeShortString('ERC20'), wallet],
     });
 

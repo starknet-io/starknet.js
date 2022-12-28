@@ -7,9 +7,9 @@ import {
   Abi,
   AllowArray,
   Call,
+  DeclareAndDeployContractPayload,
   DeclareContractPayload,
   DeclareContractResponse,
-  DeclareDeployContractPayload,
   DeclareDeployUDCResponse,
   DeployAccountContractPayload,
   DeployContractResponse,
@@ -225,8 +225,8 @@ export abstract class AccountInterface extends ProviderInterface {
    *    - calldata
    *    - salt
    */
-  public abstract declareDeploy(
-    payload: DeclareDeployContractPayload,
+  public abstract declareAndDeploy(
+    payload: DeclareAndDeployContractPayload,
     details?: InvocationsDetails | undefined
   ): Promise<DeclareDeployUDCResponse>;
 

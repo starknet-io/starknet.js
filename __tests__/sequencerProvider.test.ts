@@ -24,9 +24,8 @@ describeIfSequencer('SequencerProvider', () => {
     let exampleTransactionHash: string;
 
     beforeAll(async () => {
-      const { deploy } = await account.declareDeploy({
+      const { deploy } = await account.declareAndDeploy({
         contract: compiledErc20,
-        classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
         constructorCalldata: [
           encodeShortString('Token'),
           encodeShortString('ERC20'),
@@ -99,9 +98,8 @@ describeIfSequencer('SequencerProvider', () => {
     let l1l2ContractAddress: string;
 
     beforeAll(async () => {
-      const { deploy } = await account.declareDeploy({
+      const { deploy } = await account.declareAndDeploy({
         contract: compiledL1L2,
-        classHash: '0x028d1671fb74ecb54d848d463cefccffaef6df3ae40db52130e19fe8299a7b43',
       });
       l1l2ContractAddress = deploy.contract_address;
     });
@@ -140,9 +138,8 @@ describeIfSequencer('SequencerProvider', () => {
         },
       });
       const accountCustom = getTestAccount(customSequencerProvider);
-      const { deploy } = await accountCustom.declareDeploy({
+      const { deploy } = await accountCustom.declareAndDeploy({
         contract: compiledErc20,
-        classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
         constructorCalldata: [encodeShortString('Token'), encodeShortString('ERC20'), wallet],
       });
 

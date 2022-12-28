@@ -31,7 +31,7 @@ export type DeployContractPayload = {
 };
 
 export type DeployAccountContractPayload = {
-  classHash: BigNumberish;
+  classHash: string;
   constructorCalldata?: RawCalldata;
   addressSalt?: BigNumberish;
   contractAddress?: string;
@@ -49,8 +49,8 @@ export type DeclareContractPayload = {
   classHash?: string;
 };
 
-export type DeclareDeployContractPayload = DeclareContractPayload &
-  UniversalDeployerContractPayload;
+export type DeclareAndDeployContractPayload = Omit<UniversalDeployerContractPayload, 'classHash'> &
+  DeclareContractPayload;
 
 export type DeclareContractTransaction = {
   contractDefinition: ContractClass;

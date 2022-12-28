@@ -45,9 +45,8 @@ export class ContractFactory {
 
     const {
       deploy: { contract_address, transaction_hash },
-    } = await this.account.declareDeploy({
+    } = await this.account.declareAndDeploy({
       contract: this.compiledContract,
-      classHash: this.classHash,
       constructorCalldata,
       salt: addressSalt,
     });

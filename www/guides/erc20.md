@@ -146,7 +146,7 @@ Convenient also to get the address of the deployed contract in the same response
   });
 ```
 
-### declareDeploy convenience method
+### declareAndDeploy convenience method
 
 High level wrapper for declare & deploy. Doesn't require `waitForTransaction`. Functionality similar to deprecated `provider.deployContract`.
 
@@ -157,9 +157,8 @@ number.toBigInt(balanceAfterTransfer.balance.low, 16).toString()
 Declare and Deploy contract using single function:
 
 ```typescript
-  const declareDeploy = await account.declareDeploy({
+  const declareDeploy = await account.declareAndDeploy({
     contract: compiledErc20,
-    classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
     constructorCalldata: [
       encodeShortString('Token'),
       encodeShortString('ERC20'),

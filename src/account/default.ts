@@ -10,9 +10,9 @@ import {
   Abi,
   AllowArray,
   Call,
+  DeclareAndDeployContractPayload,
   DeclareContractPayload,
   DeclareContractResponse,
-  DeclareDeployContractPayload,
   DeclareDeployUDCResponse,
   DeployAccountContractPayload,
   DeployContractResponse,
@@ -382,18 +382,18 @@ export class Account extends Provider implements AccountInterface {
     return parseUDCEvent(txReceipt);
   }
 
-  public async declareDeploy(
-    payload: DeclareDeployContractPayload,
+  public async declareAndDeploy(
+    payload: DeclareAndDeployContractPayload,
     details?: InvocationsDetails | undefined
   ): Promise<DeclareDeployUDCResponse> {
-    const { classHash, contract, constructorCalldata, salt, unique } = payload;
-    const { transaction_hash } = await this.declare({ contract, classHash }, details);
+    const { contract, constructorCalldata, salt, unique } = payload;
+    const { transaction_hash, class_hash } = await this.declare({ contract }, details);
     const declare = await this.waitForTransaction(transaction_hash, undefined, ['ACCEPTED_ON_L2']);
     const deploy = await this.deployContract(
-      { classHash, salt, unique, constructorCalldata },
+      { classHash: class_hash, salt, unique, constructorCalldata },
       details
     );
-    return { declare: { ...declare, class_hash: classHash }, deploy };
+    return { declare: { ...declare, class_hash }, deploy };
   }
 
   public async deployAccount(

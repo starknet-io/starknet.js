@@ -25,17 +25,15 @@ describe('contract module', () => {
       let multicallContract: Contract;
 
       beforeAll(async () => {
-        const { deploy } = await account.declareDeploy({
+        const { deploy } = await account.declareAndDeploy({
           contract: compiledErc20,
-          classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
           constructorCalldata: [encodeShortString('Token'), encodeShortString('ERC20'), wallet],
         });
 
         erc20Contract = new Contract(compiledErc20.abi, deploy.contract_address!, provider);
 
-        const { deploy: multicallDeploy } = await account.declareDeploy({
+        const { deploy: multicallDeploy } = await account.declareAndDeploy({
           contract: compiledMulticall,
-          classHash: '0x06f94f3229a8d9c1d51cb84f1f5ec306c8552a805e307540727dda53c4936b43',
         });
 
         multicallContract = new Contract(
@@ -91,9 +89,8 @@ describe('contract module', () => {
       let typeTransformedContract: Contract;
 
       beforeAll(async () => {
-        const { deploy } = await account.declareDeploy({
+        const { deploy } = await account.declareAndDeploy({
           contract: compiledTypeTransformation,
-          classHash: '0x022a0e662b13d18a2aaa3ee54ae290de6569621b549022c18169c6e7893809ea',
         });
 
         typeTransformedContract = new Contract(
@@ -210,9 +207,8 @@ describe('contract module', () => {
 
   describe('class ContractFactory {}', () => {
     beforeAll(async () => {
-      await account.declareDeploy({
+      await account.declareAndDeploy({
         contract: compiledErc20,
-        classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
         constructorCalldata,
       });
     });

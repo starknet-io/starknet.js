@@ -27,9 +27,8 @@ describe('deploy and test Wallet', () => {
   beforeAll(async () => {
     expect(account).toBeInstanceOf(Account);
 
-    const declareDeploy = await account.declareDeploy({
+    const declareDeploy = await account.declareAndDeploy({
       contract: compiledErc20,
-      classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
       constructorCalldata: [
         encodeShortString('Token'),
         encodeShortString('ERC20'),
@@ -44,7 +43,7 @@ describe('deploy and test Wallet', () => {
 
     expect(number.toBigInt(x[0].low).toString()).toStrictEqual(number.toBigInt(1000).toString());
 
-    const dappResponse = await account.declareDeploy({
+    const dappResponse = await account.declareAndDeploy({
       contract: compiledTestDapp,
       classHash: '0x04367b26fbb92235e8d1137d19c080e6e650a6889ded726d00658411cc1046f5',
     });
@@ -177,16 +176,14 @@ describe('deploy and test Wallet', () => {
 
     test('Get the stark name of the account and account from stark name (using starknet.id)', async () => {
       // Deploy naming contract
-      const namingResponse = await account.declareDeploy({
+      const namingResponse = await account.declareAndDeploy({
         contract: compiledNamingContract,
-        classHash: '0x3f2f8c80ab2d404bcfb4182e8528708e4efa2c646dd711bdd7b721ecc6111f7',
       });
       const namingAddress = namingResponse.deploy.contract_address;
 
       // Deploy Starknet id contract
-      const idResponse = await account.declareDeploy({
+      const idResponse = await account.declareAndDeploy({
         contract: compiledStarknetId,
-        classHash: '0x1eb5a8308760d82321cb3ee8967581bb1d38348c7d2f082a07580040c52217c',
       });
       const idAddress = idResponse.deploy.contract_address;
 
@@ -252,7 +249,7 @@ describe('deploy and test Wallet', () => {
     });
   });
 
-  describe.only('Declare and UDC Deploy Flow', () => {
+  describe('Declare and UDC Deploy Flow', () => {
     test('ERC20 Declare', async () => {
       const declareTx = await account.declare({
         contract: compiledErc20,

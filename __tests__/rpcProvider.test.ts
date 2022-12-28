@@ -92,9 +92,8 @@ describeIfRpc('RPCProvider', () => {
       let transaction_hash: string;
 
       beforeAll(async () => {
-        const { deploy } = await account.declareDeploy({
+        const { deploy } = await account.declareAndDeploy({
           contract: compiledOpenZeppelinAccount,
-          classHash: '0x03fcbf77b28c96f4f2fb5bd2d176ab083a12a5e123adeb0de955d7ee228c9854',
           constructorCalldata: [accountPublicKey],
           salt: accountPublicKey,
         });
