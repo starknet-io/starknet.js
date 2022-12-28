@@ -1,4 +1,4 @@
-import { Signature } from 'micro-starknet';
+import { SignatureType as Signature } from '@noble/curves/abstract/weierstrass';
 
 import { Abi, Call, DeclareSignerDetails, InvocationsSignerDetails } from '../types';
 import { DeployAccountSignerDetails } from '../types/signer';

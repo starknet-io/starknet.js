@@ -1,4 +1,5 @@
-import { Signature, getStarkKey, utils } from 'micro-starknet';
+import { SignatureType } from '@noble/curves/abstract/weierstrass';
+import { Signature, getStarkKey, utils } from '@noble/curves/stark';
 import { gzip } from 'pako';
 
 import { Calldata, CompressedProgram, Program, RawArgs } from '../types';
@@ -28,7 +29,7 @@ export function makeAddress(input: string): string {
   return addHexPrefix(input).toLowerCase();
 }
 
-export function formatSignature(sig?: Signature): string[] {
+export function formatSignature(sig?: SignatureType): string[] {
   if (!sig) return [];
   try {
     const { r, s } = sig;
@@ -38,7 +39,7 @@ export function formatSignature(sig?: Signature): string[] {
   }
 }
 
-export function signatureToDecimalArray(sig?: Signature): string[] {
+export function signatureToDecimalArray(sig?: SignatureType): string[] {
   return bigNumberishArrayToDecimalStringArray(formatSignature(sig));
 }
 

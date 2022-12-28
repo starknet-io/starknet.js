@@ -1,4 +1,5 @@
-import { Signature } from 'micro-starknet';
+import { SignatureType as Signature } from '@noble/curves/abstract/weierstrass';
+import { pedersen } from '@noble/curves/stark';
 
 import { UDC, ZERO } from '../constants';
 import { ProviderInterface, ProviderOptions } from '../provider';
@@ -29,7 +30,6 @@ import { parseUDCEvent } from '../utils/events';
 import {
   calculateContractAddressFromHash,
   feeTransactionVersion,
-  pedersen,
   transactionVersion,
 } from '../utils/hash';
 import { BigNumberish, toBigInt, toCairoBool, toHex } from '../utils/number';

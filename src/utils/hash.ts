@@ -1,8 +1,8 @@
+import { keccak, pedersen } from '@noble/curves/stark';
 /* eslint-disable no-param-reassign */
 /* eslint-disable import/extensions */
 import { keccak256 } from 'ethereum-cryptography/keccak.js';
 import { hexToBytes } from 'ethereum-cryptography/utils.js';
-import { keccak, pedersen as micro_pedersen } from 'micro-curve-definitions/lib/stark';
 
 import { API_VERSION, MASK_250, StarknetChainId, TransactionHashPrefix } from '../constants';
 import { CompiledContract, RawCalldata } from '../types/lib';
@@ -70,10 +70,6 @@ export function getSelector(value: string) {
     return toHexString(value);
   }
   return getSelectorFromName(value);
-}
-
-export function pedersen(x: BigNumberish, y: BigNumberish): string {
-  return micro_pedersen(x, y);
 }
 
 export function computeHashOnElements(data: BigNumberish[]): string {

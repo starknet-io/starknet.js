@@ -1,4 +1,4 @@
-import { Signature } from 'micro-starknet';
+import { SignatureType as Signature } from '@noble/curves/abstract/weierstrass';
 
 import { ProviderInterface } from '../provider';
 import { BlockIdentifier } from '../provider/utils';

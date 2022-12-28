@@ -3,7 +3,7 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 
-import { Signature } from 'micro-starknet';
+import { SignatureType as Signature } from '@noble/curves/abstract/weierstrass';
 
 import {
   AllowArray,

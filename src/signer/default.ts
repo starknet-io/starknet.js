@@ -1,4 +1,5 @@
-import { Signature, getStarkKey, sign, utils } from 'micro-starknet';
+import { SignatureType as Signature } from '@noble/curves/abstract/weierstrass';
+import { getStarkKey, sign, utils } from '@noble/curves/stark';
 
 import { Abi, Call, DeclareSignerDetails, InvocationsSignerDetails } from '../types';
 import { DeployAccountSignerDetails } from '../types/signer';
@@ -24,9 +25,7 @@ export class Signer implements SignerInterface {
 
   public async signMessage(typedData: TypedData, accountAddress: string): Promise<Signature> {
     const msgHash = getMessageHash(typedData, accountAddress);
-    const sig = sign(msgHash, this.pk);
-
-    return Signature.fromHex(sig);
+    return sign(msgHash, this.pk, undefined);
   }
 
   public async signTransaction(
@@ -50,7 +49,7 @@ export class Signer implements SignerInterface {
       transactionsDetail.nonce
     );
 
-    return this.signMessageHash(msgHash);
+    return sign(msgHash, this.pk, undefined);
   }
 
   public async signDeployAccountTransaction({
@@ -74,7 +73,7 @@ export class Signer implements SignerInterface {
       nonce
     );
 
-    return this.signMessageHash(msgHash);
+    return sign(msgHash, this.pk, undefined);
   }
 
   public async signDeclareTransaction(
@@ -90,11 +89,6 @@ export class Signer implements SignerInterface {
       nonce
     );
 
-    return this.signMessageHash(msgHash);
-  }
-
-  protected signMessageHash(msgHash: string): Signature {
-    const sig = sign(msgHash, this.pk);
-    return Signature.fromHex(sig);
+    return sign(msgHash, this.pk, undefined);
   }
 }

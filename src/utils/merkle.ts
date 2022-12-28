@@ -1,4 +1,5 @@
-import { pedersen } from './hash';
+import { pedersen } from '@noble/curves/stark';
+
 import { toBigInt } from './number';
 
 export class MerkleTree {

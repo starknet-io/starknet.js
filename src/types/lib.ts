@@ -1,4 +1,4 @@
-import { Signature } from 'micro-starknet';
+import { SignatureType as Signature } from '@noble/curves/abstract/weierstrass';
 
 import type { BigNumberish } from '../utils/number';
 import { RPC } from './api/rpc';

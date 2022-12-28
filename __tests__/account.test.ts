@@ -1,10 +1,10 @@
-import { Signature, sign } from 'micro-starknet';
+import { pedersen, sign } from '@noble/curves/lib/stark';
 
 import typedDataExample from '../__mocks__/typedDataExample.json';
 import { Account, Contract, Provider, number, stark } from '../src';
 import { parseUDCEvent } from '../src/utils/events';
-import { feeTransactionVersion, pedersen } from '../src/utils/hash';
-import { cleanHex, hexToDecimalString, toBigInt } from '../src/utils/number';
+import { feeTransactionVersion } from '../src/utils/hash';
+import { cleanHex, hexToDecimalString, toBigInt, toHex } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
 import { randomAddress } from '../src/utils/stark';
 import {
@@ -199,9 +199,9 @@ describe('deploy and test Wallet', () => {
         pedersen(toBigInt('18925'), toBigInt('1922775124')),
         toBigInt(account.address)
       );
-      const signed = sign(hashed, toBigInt(whitelistingPrivateKey));
+      const signed = sign(hashed, toHex(whitelistingPrivateKey), undefined);
 
-      const signature = Signature.fromHex(signed);
+      // const signature = Signature.fromDER(signed);
 
       const { transaction_hash } = await account.execute([
         {
@@ -228,8 +228,8 @@ describe('deploy and test Wallet', () => {
             '1922775124', // Expiry
             '1', // Starknet id linked
             account.address, // receiver_address
-            signature.r, // sig 0 for whitelist
-            signature.s, // sig 1 for whitelist
+            signed.r, // sig 0 for whitelist
+            signed.s, // sig 1 for whitelist
           ],
         },
         {
