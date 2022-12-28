@@ -29,6 +29,7 @@ import {
 import { parseUDCEvent } from '../utils/events';
 import {
   calculateContractAddressFromHash,
+  computeContractClassHash,
   feeTransactionVersion,
   transactionVersion,
 } from '../utils/hash';
@@ -148,13 +149,14 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async estimateDeclareFee(
-    { classHash, contract }: DeclareContractPayload,
+    { contract, classHash: providedClassHash }: DeclareContractPayload,
     { blockIdentifier, nonce: providedNonce }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
     const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
     const version = toBigInt(feeTransactionVersion);
     const chainId = await this.getChainId();
-    const contractDefinition = parseContract(contract);
+
+    const classHash = providedClassHash ?? computeContractClassHash(contract);
 
     const signature = await this.signer.signDeclareTransaction({
       classHash,
@@ -164,6 +166,8 @@ export class Account extends Provider implements AccountInterface {
       version,
       nonce,
     });
+
+    const contractDefinition = parseContract(contract);
 
     const response = await super.getDeclareEstimateFee(
       { senderAddress: this.address, signature, contractDefinition },
@@ -283,14 +287,17 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async declare(
-    { classHash, contract }: DeclareContractPayload,
+    { contract, classHash: providedClassHash }: DeclareContractPayload,
     transactionsDetail: InvocationsDetails = {}
   ): Promise<DeclareContractResponse> {
     const nonce = toBigInt(transactionsDetail.nonce ?? (await this.getNonce()));
+
+    const classHash = providedClassHash ?? computeContractClassHash(contract);
+
     const maxFee =
       transactionsDetail.maxFee ??
       (await this.getSuggestedMaxFee(
-        { type: 'DECLARE', payload: { classHash, contract } },
+        { type: 'DECLARE', payload: { classHash, contract } }, // Provide the classHash to avoid re-computing it
         transactionsDetail
       ));
 

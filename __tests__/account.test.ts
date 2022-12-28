@@ -252,10 +252,9 @@ describe('deploy and test Wallet', () => {
     });
   });
 
-  describe('Declare and UDC Deploy Flow', () => {
+  describe.only('Declare and UDC Deploy Flow', () => {
     test('ERC20 Declare', async () => {
       const declareTx = await account.declare({
-        classHash: erc20ClassHash,
         contract: compiledErc20,
       });
 
