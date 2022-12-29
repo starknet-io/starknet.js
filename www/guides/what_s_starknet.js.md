@@ -23,7 +23,7 @@ Some important topics that have to be understood:
   - private customized version of Starknet.
   - local Starknet node (connected to mainnet or testnet).
 
-- Only the Provider object is talking directly to the network ; your DAPP will talk mainly to Account and Contract objects. You will define with the Provider on which network you want to work. You can ask to the Provider some low level data of the network (block,timestamp, ...).
+- Only the Provider object is talking directly to the network ; your DAPP will talk mainly to Account and Contract objects. You will define with the Provider with which network you want to work. You can ask to the Provider some low level data of the network (block,timestamp, ...).
 - Signer and Utils objects contains many useful functions for the interaction with Starknet.js.
 - The Contract object is mainly used to read the memory of a blockchain contract.
 - The Account object is the most useful :

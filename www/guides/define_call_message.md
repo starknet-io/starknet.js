@@ -162,7 +162,7 @@ When you perform a call, you have the result in an object :
 |----|----------|--------------------|------------------------------|
 |felt (251 bits max)|`func getV()->(total:felt)`|BN|`const total:BN = result.total`|
 |||number (53 bits max)|`const total:number = parseInt(result.total)`|
-|||string representing an hex number|`const address:string = number.toHex(result.address)`|
+|||string representing an hex number|`const address:string = number.toHex(result.total)`|
 |Uint256 (256 bits max)|`func getV()->(balance:Uint256)`|BN|`const balance:BN = uint256.uint256toBN(result.balance)`|
 |array of felt|`func getV()->(list_len:felt, list:felt*)`|BN[]|`const list:BN[]= result.list`|
 |shortString (31 ASCII characters max)|`func getV()->(title:felt)`|string|`const title:string = shortString.decodeShortString(result.title)`|
