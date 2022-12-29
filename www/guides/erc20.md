@@ -47,7 +47,6 @@ const account = new Account(
 
 ```javascript
 const erc20DeclareResponse = await account.declare({
-  classHash: erc20ClassHash,
   contract: compiledErc20,
 });
 
