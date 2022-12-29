@@ -198,8 +198,6 @@ describe('deploy and test Wallet', () => {
       );
       const signed = sign(hashed, toHex(whitelistingPrivateKey), undefined);
 
-      // const signature = Signature.fromDER(signed);
-
       const { transaction_hash } = await account.execute([
         {
           contractAddress: namingAddress,

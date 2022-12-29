@@ -119,11 +119,7 @@ const balanceBeforeTransfer = await erc20.balanceOf(account.address);
 
 console.log(
   `account Address ${account.address} has a balance of:`,
-<<<<<<< HEAD
   number.toBigInt(balanceBeforeTransfer.balance.low, 16).toString()
-=======
-  number.toBN(balanceBeforeTransfer[0].high).toString()
->>>>>>> caf9fccd79efb31e711d4425001e29c7495b93c4
 );
 ```
 
