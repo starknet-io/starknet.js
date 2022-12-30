@@ -50,8 +50,8 @@ estimatedFee1.mul(new BN(11)).div(new BN(10))
 Example for declare :
 ```typescript
 const { suggestedMaxFee: estimatedFee1 } = await account0.estimateDeclareFee({ 
-contract: compiledTest, 
-classHash: testClassHash });
+	contract: compiledTest, 
+	classHash: testClassHash });
 const declareResponse = await account0.declare({ 
 	contract: compiledTest, 
 	classHash: testClassHash 

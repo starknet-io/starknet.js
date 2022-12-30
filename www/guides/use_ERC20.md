@@ -6,7 +6,8 @@ Based on what has been seen in the previous pages of this guide, we will use an 
 ## What's an ERC20 :
 As in Ethereum, a token has an ERC20 contract to manage it. This contract contains a table, that lists the quantity of token own by each involved account :
 ![](./pictures/ERC20.png)
-For example, the Account address 2 own 100 token of this contract.  
+
+For example, the Account address 2 own 100 token of this ERC20 contract.  
 Users have the feeling that their tokens are stored in their wallet, but it's absolutely false. You have no list of assets stored in your account contract. In fact, a token has its own ERC20 contract, and the amount of token owned by your account address is stored in this contract.  
 If you want to have your balance of a token, ask to its ERC20 contract, with the function `ERC20contract.balanceOf(accountAddress)`.  
 When you want to transfer some tokens in you possession, you have to use the ERC20 contract function `transfer`, through the `account.execute` function. By this way, Starknet.js will send to the account contract function `Execute` a message signed with the private key. This message contains the name of the function to call in the ERC20 contract, with its optional parameters. The account contract will use the public key to check that you have the private key, then will ask to the ERC20 contract to execute the requested function. By this way, the ERC20 contract is absolutely sure that the caller of the transfer function know the private key of this account.
