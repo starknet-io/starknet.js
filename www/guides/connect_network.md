@@ -38,7 +38,7 @@ const provider = new Provider({ sequencer: { baseUrl:"http://127.0.0.1:5050"} })
 If necessary you can have a full control on the network access (for example for your company private test network) :
 
 ```typescript
-const provider = new starknet.Provider({
+const provider = new Provider({
   sequencer: {
     baseUrl: 'https://mynetwork.mycompany.io',
     feederGatewayUrl: 'feeder_gateway',
