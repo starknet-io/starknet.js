@@ -48,7 +48,7 @@ const ERC20ConstructorCallData = stark.compileCalldata({
     recipient: account0.address, 
     owner: account0.address });
     console.log("constructor=", ERC20ConstructorCallData);
-    const deployERC20Response = await account0.declareDeploy({ 
+const deployERC20Response = await account0.declareDeploy({ 
     classHash: ERC20mintableClassHash, 
     contract: compiledErc20mintable, 
     constructorCalldata: ERC20ConstructorCallData });
