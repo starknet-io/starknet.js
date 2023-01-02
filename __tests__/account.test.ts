@@ -196,7 +196,7 @@ describe('deploy and test Wallet', () => {
         pedersen(toBigInt('18925'), toBigInt('1922775124')),
         toBigInt(account.address)
       );
-      const signed = sign(hashed, toHex(whitelistingPrivateKey), undefined);
+      const signed = sign(hashed, toHex(whitelistingPrivateKey));
 
       const { transaction_hash } = await account.execute([
         {

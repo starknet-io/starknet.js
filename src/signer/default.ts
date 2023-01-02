@@ -25,7 +25,7 @@ export class Signer implements SignerInterface {
 
   public async signMessage(typedData: TypedData, accountAddress: string): Promise<Signature> {
     const msgHash = getMessageHash(typedData, accountAddress);
-    return sign(msgHash, this.pk, undefined);
+    return sign(msgHash, this.pk);
   }
 
   public async signTransaction(
@@ -49,7 +49,7 @@ export class Signer implements SignerInterface {
       transactionsDetail.nonce
     );
 
-    return sign(msgHash, this.pk, undefined);
+    return sign(msgHash, this.pk);
   }
 
   public async signDeployAccountTransaction({
@@ -73,7 +73,7 @@ export class Signer implements SignerInterface {
       nonce
     );
 
-    return sign(msgHash, this.pk, undefined);
+    return sign(msgHash, this.pk);
   }
 
   public async signDeclareTransaction(
@@ -89,6 +89,6 @@ export class Signer implements SignerInterface {
       nonce
     );
 
-    return sign(msgHash, this.pk, undefined);
+    return sign(msgHash, this.pk);
   }
 }

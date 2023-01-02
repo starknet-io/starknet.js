@@ -65,7 +65,7 @@ test('hashMessage()', () => {
     `"0x6d1706bd3d1ba7c517be2a2a335996f63d4738e2f182144d078a1dd9997062e"`
   );
 
-  const { r, s } = sign(hashMsg, privateKey, undefined);
+  const { r, s } = sign(hashMsg, privateKey);
 
   expect(r.toString()).toMatchInlineSnapshot(
     `"1427981024487605678086498726488552139932400435436186597196374630267616399345"`
@@ -80,7 +80,7 @@ test('verify signed message()', () => {
   const account = '0x33f45f07e1bd1a51b45fc24ec8c8c9908db9e42191be9e169bfcac0c0d99745';
   const price = '1';
   const hashMsg = pedersen(account, price);
-  const signature = sign(hashMsg, pk, undefined);
+  const signature = sign(hashMsg, pk);
   const pubKey = getPublicKey(pk);
   expect(verify(signature.toDERHex(), hashMsg, pubKey)).toBe(true);
 });
