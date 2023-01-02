@@ -223,12 +223,7 @@ export class SequencerProvider implements ProviderInterface {
       }
 
       if (endpoint === 'estimate_fee') {
-        return parseAlwaysAsBig(textResponse, (_, v) => {
-          if (v && typeof v === 'bigint') {
-            return toBigInt(v.toString());
-          }
-          return v;
-        });
+        return parseAlwaysAsBig(textResponse);
       }
       return parse(textResponse) as Sequencer.Endpoints[T]['RESPONSE'];
     } catch (err) {
