@@ -7,9 +7,11 @@ You can exchange messages between L1 & L2 networks :
 - L2 Starknet testnet 1 & 2 ↔️ L1 Goerli ETH testnet.
 - L2 local starknet devnet ↔️ L1 local ETH testnet (Ganache, ...).
 
+You can find explanation of the global mechanism [here](https://docs.starknet.io/documentation/architecture_and_concepts/L1-L2_Communication/messaging-mechanism/).
+
 Most of the code for this message process will be written in Cairo, but Starknet.js provides some functionalities for this subject.
 
-You can find explanation of the global mechanism [here](https://docs.starknet.io/documentation/architecture_and_concepts/L1-L2_Communication/messaging-mechanism/).
+
 ## L1 ➡️ L2 messages
 To send a message from L1 to L2, you need a solidity smart contract in the L1 network, calling the `SendMessageToL2` function of the StarkNet core contract. The interface of this function :
 ```solidity
@@ -26,7 +28,7 @@ To send a message from L1 to L2, you need a solidity smart contract in the L1 ne
 
     /**
 ```
-You have to pay in the L1 an extra fee when invoking `sendMessageToL2` (of course with the L1 fee TOKEN), to pay the L2 part of the messaging mechanism. You can estimate this fee with this function :
+You have to pay in the L1 an extra fee when invoking `sendMessageToL2` (of course paid with the L1 fee TOKEN), to pay the L2 part of the messaging mechanism. You can estimate this fee with this function :
 ```typescript
 import { SequencerProvider } from "starknet";
 const provider = new SequencerProvider({ baseUrl: "https://alpha4.starknet.io" }); // for testnet 1
@@ -34,7 +36,7 @@ const responseEstimateMessageFee = await provider.estimateMessageFee({
         from_address: L1address,
         to_address: L2address,
         entry_point_selector: "handle_l1_mess",
-        payload: ["1234567890123456789"]
+        payload: ["1234567890123456789","200"]
     })
 ```
 If the fee is paid in L1, the cairo contract at `to_Address` is automatically executed, function `entry_point_selector` (the function shall have a decorator `@l1_handler` in the Cairo code), with parameters `payload`.
