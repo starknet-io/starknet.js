@@ -1,8 +1,13 @@
-import { SignatureType } from '@noble/curves/abstract/weierstrass';
 import { Signature, getStarkKey, utils } from '@noble/curves/stark';
 import { gzip } from 'pako';
 
-import { Calldata, CompressedProgram, Program, RawArgs } from '../types';
+import {
+  Calldata,
+  CompressedProgram,
+  Program,
+  RawArgs,
+  Signature as SignatureType,
+} from '../types';
 import { addHexPrefix, btoaUniversal } from './encode';
 import { stringify } from './json';
 import {

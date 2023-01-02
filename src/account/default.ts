@@ -1,4 +1,3 @@
-import { SignatureType as Signature } from '@noble/curves/abstract/weierstrass';
 import { pedersen } from '@noble/curves/stark';
 
 import { UDC, ZERO } from '../constants';
@@ -24,6 +23,7 @@ import {
   InvocationsSignerDetails,
   InvokeFunctionResponse,
   MultiDeployContractResponse,
+  Signature,
   UniversalDeployerContractPayload,
 } from '../types';
 import { parseUDCEvent } from '../utils/events';

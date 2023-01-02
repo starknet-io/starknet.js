@@ -1,6 +1,5 @@
-import { SignatureType as Signature } from '@noble/curves/abstract/weierstrass';
-
 import { BigNumberish } from '../../utils/number';
+import { Signature } from '../lib';
 
 export type Calldata = string[];
 

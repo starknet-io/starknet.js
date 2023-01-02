@@ -1,7 +1,12 @@
-import { SignatureType as Signature } from '@noble/curves/abstract/weierstrass';
+import { SignatureType } from '@noble/curves/abstract/weierstrass';
 
 import type { BigNumberish } from '../utils/number';
 import { RPC } from './api/rpc';
+
+// Common Signature Type which needs to be imported from weierstrass
+// and imported at many places
+// This is because stark.ts doesn't export SignatureType
+export type Signature = SignatureType;
 
 export type RawCalldata = BigNumberish[];
 export type AllowArray<T> = T | T[];

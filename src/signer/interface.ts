@@ -1,6 +1,4 @@
-import { SignatureType as Signature } from '@noble/curves/abstract/weierstrass';
-
-import { Abi, Call, DeclareSignerDetails, InvocationsSignerDetails } from '../types';
+import { Abi, Call, DeclareSignerDetails, InvocationsSignerDetails, Signature } from '../types';
 import { DeployAccountSignerDetails } from '../types/signer';
 import { TypedData } from '../utils/typedData';
 

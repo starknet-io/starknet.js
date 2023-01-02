@@ -1,7 +1,6 @@
-import { SignatureType as Signature } from '@noble/curves/abstract/weierstrass';
 import { getStarkKey, sign, utils } from '@noble/curves/stark';
 
-import { Abi, Call, DeclareSignerDetails, InvocationsSignerDetails } from '../types';
+import { Abi, Call, DeclareSignerDetails, InvocationsSignerDetails, Signature } from '../types';
 import { DeployAccountSignerDetails } from '../types/signer';
 import {
   calculateDeclareTransactionHash,

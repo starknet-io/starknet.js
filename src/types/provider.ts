@@ -3,14 +3,13 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 
-import { SignatureType as Signature } from '@noble/curves/abstract/weierstrass';
-
 import {
   AllowArray,
   Call,
   DeclareContractPayload,
   DeployAccountContractPayload,
   RawCalldata,
+  Signature,
   Status,
   UniversalDeployerContractPayload,
 } from './lib';

@@ -1,5 +1,3 @@
-import { SignatureType as Signature } from '@noble/curves/abstract/weierstrass';
-
 import { ProviderInterface } from '../provider';
 import { BlockIdentifier } from '../provider/utils';
 import { SignerInterface } from '../signer';
@@ -20,6 +18,7 @@ import {
   InvocationsDetails,
   InvokeFunctionResponse,
   MultiDeployContractResponse,
+  Signature,
   UniversalDeployerContractPayload,
 } from '../types';
 import { BigNumberish } from '../utils/number';
