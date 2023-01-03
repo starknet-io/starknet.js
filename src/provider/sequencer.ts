@@ -458,7 +458,7 @@ export class SequencerProvider implements ProviderInterface {
 
     while (!onchain) {
       // eslint-disable-next-line no-await-in-loop
-      await wait(retryInterval ?? 8000);
+      await wait(retryInterval);
       // eslint-disable-next-line no-await-in-loop
       res = await this.getTransactionStatus(txHash);
 
