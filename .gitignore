@@ -1,9 +1,11 @@
-node_modules
-dist
-npm-debug.log
-.env
+**/*.tgz
 .DS_Store
+.env
 .eslintcache
 .vscode
 coverage
+dist
+node_modules
+npm-debug.log
+package
 yarn.lock
