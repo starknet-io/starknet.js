@@ -13,7 +13,7 @@
     /* Language and Environment */
     "target": "es5" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
     "lib": [
-      "es2017",
+      "ES2020",
       "es7",
       "es6",
       "dom"

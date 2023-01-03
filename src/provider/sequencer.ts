@@ -130,13 +130,14 @@ export class SequencerProvider implements ProviderInterface {
         return StarknetChainId.SN_MAIN;
       }
       if (url.host.includes('alpha4-2.starknet.io')) {
-        return StarknetChainId.SN_GOERLI;
+        return StarknetChainId.SN_GOERLI2;
       }
+      return StarknetChainId.SN_GOERLI;
     } catch {
       // eslint-disable-next-line no-console
       console.error(`Could not parse baseUrl: ${baseUrl}`);
+      return StarknetChainId.SN_GOERLI;
     }
-    return StarknetChainId.SN_GOERLI2;
   }
 
   private getFetchUrl(endpoint: keyof Sequencer.Endpoints) {
@@ -443,24 +444,20 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('get_code', { contractAddress, blockIdentifier });
   }
 
-  public async waitForTransaction(
-    txHash: BigNumberish,
-    {
-      retryInterval = 8000,
-      successStates = [
-        TransactionStatus.ACCEPTED_ON_L1,
-        TransactionStatus.ACCEPTED_ON_L2,
-        TransactionStatus.PENDING,
-      ],
-    }: waitForTransactionOptions
-  ) {
+  public async waitForTransaction(txHash: BigNumberish, options?: waitForTransactionOptions) {
     const errorStates = [TransactionStatus.RECEIVED, TransactionStatus.NOT_RECEIVED];
     let onchain = false;
     let res;
+    const retryInterval = options?.retryInterval ?? 8000;
+    const successStates = options?.successStates ?? [
+      TransactionStatus.ACCEPTED_ON_L1,
+      TransactionStatus.ACCEPTED_ON_L2,
+      TransactionStatus.PENDING,
+    ];
 
     while (!onchain) {
       // eslint-disable-next-line no-await-in-loop
-      await wait(retryInterval);
+      await wait(retryInterval ?? 8000);
       // eslint-disable-next-line no-await-in-loop
       res = await this.getTransactionStatus(txHash);
 
