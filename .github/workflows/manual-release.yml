@@ -1,6 +1,15 @@
 name: Manual Release
-on: workflow_dispatch
-
+on:
+  workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Debug'
+        type: boolean
+        default: true
+      dry-run:
+        description: 'Dry run'
+        type: boolean
+        default: true
 jobs:
   release:
     name: Release
@@ -11,8 +20,8 @@ jobs:
         with:
           node-version: lts/*
           cache: 'npm'
-      - run: npm ci
+      - run: npm ci --ignore-scripts ${{ inputs.dry-run }}
       - env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npx semantic-release
+        run: npx semantic-release --debug ${{ inputs.debug }} --dry-run ${{ inputs.dry-run }}

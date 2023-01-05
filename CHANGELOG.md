@@ -1,3 +1,15 @@
+# [4.18.0](https://github.com/0xs34n/starknet.js/compare/v4.17.1...v4.18.0) (2022-12-23)
+
+### Bug Fixes
+
+- merge develop into branch ([21efcb1](https://github.com/0xs34n/starknet.js/commit/21efcb1cefd6ea70a9d49e060ff620e88002e3b6))
+
+### Features
+
+- simulate_transaction support on sequencer ([304c3cc](https://github.com/0xs34n/starknet.js/commit/304c3cc1af81bc8810581546f043caca01db173b))
+- update simulate tx ([8f3ea55](https://github.com/0xs34n/starknet.js/commit/8f3ea55eb1e23cefc0419902a2ebbe10ee373ccb))
+- update simulate tx in sequencer ([d79a9fa](https://github.com/0xs34n/starknet.js/commit/d79a9faa307936561504c120f67f3fb2f18423b6))
+
 ## [4.17.1](https://github.com/0xs34n/starknet.js/compare/v4.17.0...v4.17.1) (2022-12-14)
 
 ### Bug Fixes
