@@ -18,6 +18,7 @@ import {
   compiledOpenZeppelinAccount,
   compiledStarknetId,
   compiledTestDapp,
+  describeIfSequencer,
   erc20ClassHash,
   getTestAccount,
   getTestProvider,
@@ -348,7 +349,7 @@ describe('deploy and test Wallet', () => {
     });
   });
 
-  describe('Estimate fee bulk', () => {
+  describeIfSequencer('Estimate fee bulk', () => {
     let accountClassHash: string;
     let precalculatedAddress: string;
     let starkKeyPub: string;
