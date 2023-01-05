@@ -45,10 +45,11 @@ import { GatewayError, HttpError, LibraryError } from './errors';
 import { ProviderInterface } from './interface';
 import { Block, BlockIdentifier } from './utils';
 
-type NetworkName = 'mainnet-alpha' | 'goerli-alpha' | 'goerli-alpha-2';
+export type NetworkName = 'mainnet-alpha' | 'goerli-alpha' | 'goerli-alpha-2';
+export type SequencerHttpMethod = 'POST' | 'GET';
 
 export type SequencerProviderOptions = {
-  headers?: object;
+  headers?: Record<string, string>;
   blockIdentifier?: BlockIdentifier;
 } & (
   | {
@@ -84,13 +85,13 @@ export class SequencerProvider implements ProviderInterface {
 
   public gatewayUrl: string;
 
-  public headers: object | undefined;
+  public headers?: Record<string, string>;
+
+  private blockIdentifier: BlockIdentifier;
 
   private chainId: StarknetChainId;
 
   private responseParser = new SequencerAPIResponseParser();
-
-  private blockIdentifier: BlockIdentifier;
 
   constructor(optionsOrProvider: SequencerProviderOptions = defaultOptions) {
     if ('network' in optionsOrProvider) {
@@ -177,7 +178,7 @@ export class SequencerProvider implements ProviderInterface {
     return `?${queryString}`;
   }
 
-  private getHeaders(method: 'POST' | 'GET'): object | undefined {
+  private getHeaders(method: SequencerHttpMethod): Record<string, string> | undefined {
     if (method === 'POST') {
       return {
         'Content-Type': 'application/json',
@@ -202,43 +203,52 @@ export class SequencerProvider implements ProviderInterface {
     const baseUrl = this.getFetchUrl(endpoint);
     const method = this.getFetchMethod(endpoint);
     const queryString = this.getQueryString(query);
-    const headers = this.getHeaders(method);
     const url = urljoin(baseUrl, endpoint, queryString);
 
+    return this.fetch(url, {
+      method,
+      body: request,
+    });
+  }
+
+  public async fetch(
+    endpoint: string,
+    options?: {
+      method?: SequencerHttpMethod;
+      body?: any;
+      parseAlwaysAsBigInt?: boolean;
+    }
+  ): Promise<any> {
+    const url = buildUrl(this.baseUrl, '', endpoint);
+    const method = options?.method ?? 'GET';
+    const headers = this.getHeaders(method);
+
     try {
-      const res = await fetch(url, {
+      const response = await fetch(url, {
         method,
-        body: stringify(request),
-        headers: headers as Record<string, string>,
+        body: stringify(options?.body),
+        headers,
       });
-      const textResponse = await res.text();
-      if (!res.ok) {
-        // This will allow user to handle contract errors
+      const textResponse = await response.text();
+
+      if (!response.ok) {
+        // This will allow the user to handle contract errors
         let responseBody: any;
         try {
           responseBody = parse(textResponse);
         } catch {
-          // if error parsing fails, return an http error
-          throw new HttpError(res.statusText, res.status);
+          throw new HttpError(response.statusText, response.status);
         }
-
-        const errorCode = responseBody.code || ((responseBody as any)?.status_code as string); // starknet-devnet uses status_code instead of code; They need to fix that
-        throw new GatewayError(responseBody.message, errorCode); // Caught locally, and re-thrown for the user
+        throw new GatewayError(responseBody.message, responseBody.code);
       }
 
-      if (endpoint === 'estimate_fee') {
-        return parseAlwaysAsBig(textResponse);
-      }
-      return parse(textResponse) as Sequencer.Endpoints[T]['RESPONSE'];
-    } catch (err) {
-      // rethrow custom errors
-      if (err instanceof GatewayError || err instanceof HttpError) {
-        throw err;
-      }
-      if (err instanceof Error) {
-        throw Error(`Could not ${method} from endpoint \`${url}\`: ${err.message}`);
-      }
-      throw err;
+      const parseChoice = options?.parseAlwaysAsBigInt ? parseAlwaysAsBig : parse;
+      return parseChoice(textResponse);
+    } catch (error) {
+      if (error instanceof Error && !(error instanceof LibraryError))
+        throw Error(`Could not ${method} from endpoint \`${url}\`: ${error.message}`);
+
+      throw error;
     }
   }
 
