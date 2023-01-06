@@ -2,11 +2,13 @@ import { getStarkKey, sign, utils } from '@noble/curves/stark';
 
 import { Abi, Call, DeclareSignerDetails, InvocationsSignerDetails, Signature } from '../types';
 import { DeployAccountSignerDetails } from '../types/signer';
+import { buf2hex } from '../utils/encode';
 import {
   calculateDeclareTransactionHash,
   calculateDeployAccountTransactionHash,
   calculateTransactionHash,
 } from '../utils/hash';
+import { toHex } from '../utils/number';
 import { fromCallsToExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { SignerInterface } from './interface';
@@ -15,7 +17,7 @@ export class Signer implements SignerInterface {
   protected pk: Uint8Array | string;
 
   constructor(pk: Uint8Array | string = utils.randomPrivateKey()) {
-    this.pk = pk;
+    this.pk = pk instanceof Uint8Array ? buf2hex(pk) : toHex(pk);
   }
 
   public async getPubKey(): Promise<string> {
