@@ -49,14 +49,14 @@ export class Account extends Provider implements AccountInterface {
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
     address: string,
-    keyPairOrSigner: Uint8Array | string | SignerInterface
+    pkOrSigner: Uint8Array | string | SignerInterface
   ) {
     super(providerOrOptions);
     this.address = address.toLowerCase();
     this.signer =
-      typeof keyPairOrSigner === 'string' || keyPairOrSigner instanceof Uint8Array
-        ? new Signer(keyPairOrSigner)
-        : keyPairOrSigner;
+      typeof pkOrSigner === 'string' || pkOrSigner instanceof Uint8Array
+        ? new Signer(pkOrSigner)
+        : pkOrSigner;
   }
 
   public async getNonce(blockIdentifier?: BlockIdentifier): Promise<BigNumberish> {

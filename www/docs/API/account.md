@@ -14,7 +14,7 @@ This API is the primary way to interact with an account contract on StarkNet.
 
 To create a new instance of the Account, first an account contract must be deployed. Also there needs to be a Provider instance that will be passed in the constructor and key pair for the account.
 
-`new starknet.Account(Provider, address, starkKeyPair)`
+`new starknet.Account(Provider, address, pk)`
 
 ## Properties
 
