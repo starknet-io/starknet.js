@@ -1,4 +1,4 @@
-import { BN } from 'bn.js';
+import { pedersen } from '@noble/curves/stark';
 
 import { UDC, ZERO } from '../constants';
 import { ProviderInterface, ProviderOptions } from '../provider';
@@ -9,9 +9,9 @@ import {
   Abi,
   AllowArray,
   Call,
+  DeclareAndDeployContractPayload,
   DeclareContractPayload,
   DeclareContractResponse,
-  DeclareDeployContractPayload,
   DeclareDeployUDCResponse,
   DeployAccountContractPayload,
   DeployContractResponse,
@@ -22,7 +22,6 @@ import {
   InvocationsDetails,
   InvocationsSignerDetails,
   InvokeFunctionResponse,
-  KeyPair,
   MultiDeployContractResponse,
   Signature,
   UniversalDeployerContractPayload,
@@ -30,11 +29,11 @@ import {
 import { parseUDCEvent } from '../utils/events';
 import {
   calculateContractAddressFromHash,
+  computeContractClassHash,
   feeTransactionVersion,
-  pedersen,
   transactionVersion,
 } from '../utils/hash';
-import { BigNumberish, hexToDecimalString, toBN, toCairoBool } from '../utils/number';
+import { BigNumberish, toBigInt, toCairoBool, toHex } from '../utils/number';
 import { parseContract } from '../utils/provider';
 import { compileCalldata, estimatedFeeToMaxFee, randomAddress } from '../utils/stark';
 import { getStarknetIdContract, useDecoded, useEncoded } from '../utils/starknetId';
@@ -50,12 +49,14 @@ export class Account extends Provider implements AccountInterface {
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
     address: string,
-    keyPairOrSigner: KeyPair | SignerInterface
+    pkOrSigner: Uint8Array | string | SignerInterface
   ) {
     super(providerOrOptions);
     this.address = address.toLowerCase();
     this.signer =
-      'getPubKey' in keyPairOrSigner ? keyPairOrSigner : new Signer(keyPairOrSigner as KeyPair);
+      typeof pkOrSigner === 'string' || pkOrSigner instanceof Uint8Array
+        ? new Signer(pkOrSigner)
+        : pkOrSigner;
   }
 
   public async getNonce(blockIdentifier?: BlockIdentifier): Promise<BigNumberish> {
@@ -74,9 +75,7 @@ export class Account extends Provider implements AccountInterface {
           address: this.address,
         }),
       });
-      const decimalDomain = hexDomain.result
-        .map((element) => new BN(hexToDecimalString(element)))
-        .slice(1);
+      const decimalDomain = hexDomain.result.map((element) => toBigInt(element)).slice(1);
 
       const stringDomain = useDecoded(decimalDomain);
 
@@ -120,14 +119,14 @@ export class Account extends Provider implements AccountInterface {
     { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
     const transactions = Array.isArray(calls) ? calls : [calls];
-    const nonce = toBN(providedNonce ?? (await this.getNonce()));
-    const version = toBN(feeTransactionVersion);
+    const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
+    const version = toBigInt(feeTransactionVersion);
     const chainId = await this.getChainId();
 
     const signerDetails: InvocationsSignerDetails = {
       walletAddress: this.address,
       nonce,
-      maxFee: ZERO,
+      maxFee: 0,
       version,
       chainId,
     };
@@ -150,22 +149,25 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async estimateDeclareFee(
-    { classHash, contract }: DeclareContractPayload,
+    { contract, classHash: providedClassHash }: DeclareContractPayload,
     { blockIdentifier, nonce: providedNonce }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
-    const nonce = toBN(providedNonce ?? (await this.getNonce()));
-    const version = toBN(feeTransactionVersion);
+    const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
+    const version = toBigInt(feeTransactionVersion);
     const chainId = await this.getChainId();
-    const contractDefinition = parseContract(contract);
+
+    const classHash = providedClassHash ?? computeContractClassHash(contract);
 
     const signature = await this.signer.signDeclareTransaction({
       classHash,
       senderAddress: this.address,
       chainId,
-      maxFee: ZERO,
+      maxFee: 0,
       version,
       nonce,
     });
+
+    const contractDefinition = parseContract(contract);
 
     const response = await super.getDeclareEstimateFee(
       { senderAddress: this.address, signature, contractDefinition },
@@ -189,8 +191,8 @@ export class Account extends Provider implements AccountInterface {
     }: DeployAccountContractPayload,
     { blockIdentifier }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
-    const nonce = '0x0';
-    const version = toBN(feeTransactionVersion);
+    const version = toBigInt(feeTransactionVersion);
+    const nonce = ZERO; // DEPLOY_ACCOUNT transaction will have a nonce zero as it is the first transaction in the account
     const chainId = await this.getChainId();
     const contractAddress =
       providedContractAddress ??
@@ -200,7 +202,7 @@ export class Account extends Provider implements AccountInterface {
       classHash,
       contractAddress,
       chainId,
-      maxFee: ZERO,
+      maxFee: 0,
       version,
       nonce,
       addressSalt,
@@ -255,11 +257,11 @@ export class Account extends Provider implements AccountInterface {
     transactionsDetail: InvocationsDetails = {}
   ): Promise<InvokeFunctionResponse> {
     const transactions = Array.isArray(calls) ? calls : [calls];
-    const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
+    const nonce = toBigInt(transactionsDetail.nonce ?? (await this.getNonce()));
     const maxFee =
       transactionsDetail.maxFee ??
       (await this.getSuggestedMaxFee({ type: 'INVOKE', payload: calls }, transactionsDetail));
-    const version = toBN(transactionVersion);
+    const version = toBigInt(transactionVersion);
     const chainId = await this.getChainId();
 
     const signerDetails: InvocationsSignerDetails = {
@@ -285,18 +287,21 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async declare(
-    { classHash, contract }: DeclareContractPayload,
+    { contract, classHash: providedClassHash }: DeclareContractPayload,
     transactionsDetail: InvocationsDetails = {}
   ): Promise<DeclareContractResponse> {
-    const nonce = toBN(transactionsDetail.nonce ?? (await this.getNonce()));
+    const nonce = toBigInt(transactionsDetail.nonce ?? (await this.getNonce()));
+
+    const classHash = providedClassHash ?? computeContractClassHash(contract);
+
     const maxFee =
       transactionsDetail.maxFee ??
       (await this.getSuggestedMaxFee(
-        { type: 'DECLARE', payload: { classHash, contract } },
+        { type: 'DECLARE', payload: { classHash, contract } }, // Provide the classHash to avoid re-computing it
         transactionsDetail
       ));
 
-    const version = toBN(transactionVersion);
+    const version = toBigInt(transactionVersion);
     const chainId = await this.getChainId();
 
     const signature = await this.signer.signDeclareTransaction({
@@ -348,7 +353,7 @@ export class Account extends Provider implements AccountInterface {
           ],
         },
         address: calculateContractAddressFromHash(
-          unique ? pedersen([this.address, deploySalt]) : deploySalt,
+          unique ? pedersen(this.address, deploySalt) : deploySalt,
           classHash,
           compiledConstructorCallData,
           unique ? UDC.ADDRESS : 0
@@ -377,18 +382,18 @@ export class Account extends Provider implements AccountInterface {
     return parseUDCEvent(txReceipt);
   }
 
-  public async declareDeploy(
-    payload: DeclareDeployContractPayload,
+  public async declareAndDeploy(
+    payload: DeclareAndDeployContractPayload,
     details?: InvocationsDetails | undefined
   ): Promise<DeclareDeployUDCResponse> {
-    const { classHash, contract, constructorCalldata, salt, unique } = payload;
-    const { transaction_hash } = await this.declare({ contract, classHash }, details);
+    const { contract, constructorCalldata, salt, unique } = payload;
+    const { transaction_hash, class_hash } = await this.declare({ contract }, details);
     const declare = await this.waitForTransaction(transaction_hash, undefined, ['ACCEPTED_ON_L2']);
     const deploy = await this.deployContract(
-      { classHash, salt, unique, constructorCalldata },
+      { classHash: class_hash, salt, unique, constructorCalldata },
       details
     );
-    return { declare: { ...declare, class_hash: classHash }, deploy };
+    return { declare: { ...declare, class_hash }, deploy };
   }
 
   public async deployAccount(
@@ -400,8 +405,8 @@ export class Account extends Provider implements AccountInterface {
     }: DeployAccountContractPayload,
     transactionsDetail: InvocationsDetails = {}
   ): Promise<DeployContractResponse> {
-    const nonce = '0x0';
-    const version = toBN(transactionVersion);
+    const version = toBigInt(transactionVersion);
+    const nonce = ZERO; // DEPLOY_ACCOUNT transaction will have a nonce zero as it is the first transaction in the account
     const chainId = await this.getChainId();
 
     const contractAddress =
@@ -453,8 +458,8 @@ export class Account extends Provider implements AccountInterface {
         contractAddress: this.address,
         entrypoint: 'isValidSignature',
         calldata: compileCalldata({
-          hash: toBN(hash).toString(),
-          signature: signature.map((x) => toBN(x).toString()),
+          hash: toBigInt(hash).toString(),
+          signature: [toHex(signature.r), toHex(signature.s)],
         }),
       });
       return true;

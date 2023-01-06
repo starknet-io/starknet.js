@@ -1,4 +1,3 @@
-import BN from 'bn.js';
 import assert from 'minimalistic-assert';
 
 import { Abi, AbiEntry, Calldata, FunctionAbi, ParsedStruct, StructAbi } from '../types';
@@ -87,8 +86,8 @@ export class CheckCallData {
         assert(
           typeof args[argPosition] === 'string' ||
             typeof args[argPosition] === 'number' ||
-            args[argPosition] instanceof BN,
-          `arg ${input.name} should be a felt (string, number, BigNumber)`
+            typeof args[argPosition] === 'bigint',
+          `arg ${input.name} should be a felt (string, number, bigInt)`
         );
         argPosition += 1;
       } else if (input.type in this.structs && typeof args[argPosition] === 'object') {
@@ -112,8 +111,8 @@ export class CheckCallData {
         if (input.type === 'felt*') {
           args[argPosition].forEach((felt: BigNumberish) => {
             assert(
-              typeof felt === 'string' || typeof felt === 'number' || felt instanceof BN,
-              `arg ${input.name} should be an array of string, number or BigNumber`
+              typeof felt === 'string' || typeof felt === 'number' || typeof felt === 'bigint',
+              `arg ${input.name} should be an array of string, number or bigInt`
             );
           });
           argPosition += 1;
@@ -125,8 +124,8 @@ export class CheckCallData {
           );
           args[argPosition].forEach((felt: BigNumberish) => {
             assert(
-              typeof felt === 'string' || typeof felt === 'number' || felt instanceof BN,
-              `arg ${input.name} should be an array of string, number or BigNumber`
+              typeof felt === 'string' || typeof felt === 'number' || typeof felt === 'bigint',
+              `arg ${input.name} should be an array of string, number or bigInt`
             );
           });
           argPosition += 1;

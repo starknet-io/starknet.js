@@ -155,7 +155,7 @@ describe('typedData', () => {
   }
   function stringToStringStruct(str: string): StringStruct {
     const len = str.length;
-    const data = str.split('').map((char) => number.toHex(number.toBN(char.charCodeAt(0))));
+    const data = str.split('').map((char) => number.toHex(char.charCodeAt(0)));
     return { len, data };
   }
 

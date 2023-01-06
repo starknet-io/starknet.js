@@ -1,4 +1,6 @@
-import { Account, GetBlockResponse, RpcProvider, ec } from '../src';
+import { getStarkKey, utils } from '@noble/curves/stark';
+
+import { Account, GetBlockResponse, RpcProvider } from '../src';
 import { StarknetChainId } from '../src/constants';
 import {
   compiledOpenZeppelinAccount,
@@ -15,8 +17,8 @@ describeIfRpc('RPCProvider', () => {
 
   beforeAll(async () => {
     expect(account).toBeInstanceOf(Account);
-    const accountKeyPair = ec.genKeyPair();
-    accountPublicKey = ec.getStarkKey(accountKeyPair);
+    const accountKeyPair = utils.randomPrivateKey();
+    accountPublicKey = getStarkKey(accountKeyPair);
   });
 
   test('getChainId', async () => {
@@ -90,9 +92,8 @@ describeIfRpc('RPCProvider', () => {
       let transaction_hash: string;
 
       beforeAll(async () => {
-        const { deploy } = await account.declareDeploy({
+        const { deploy } = await account.declareAndDeploy({
           contract: compiledOpenZeppelinAccount,
-          classHash: '0x03fcbf77b28c96f4f2fb5bd2d176ab083a12a5e123adeb0de955d7ee228c9854',
           constructorCalldata: [accountPublicKey],
           salt: accountPublicKey,
         });

@@ -47,7 +47,6 @@ const account = new Account(
 
 ```javascript
 const erc20DeclareResponse = await account.declare({
-  classHash: erc20ClassHash,
   contract: compiledErc20,
 });
 
@@ -119,7 +118,7 @@ const balanceBeforeTransfer = await erc20.balanceOf(account.address);
 
 console.log(
   `account Address ${account.address} has a balance of:`,
-  number.toBN(balanceBeforeTransfer[0].high).toString()
+  number.toBigInt(balanceBeforeTransfer.balance.low, 16).toString()
 );
 ```
 
@@ -142,16 +141,19 @@ Convenient also to get the address of the deployed contract in the same response
   });
 ```
 
-### declareDeploy convenience method
+### declareAndDeploy convenience method
 
 High level wrapper for declare & deploy. Doesn't require `waitForTransaction`. Functionality similar to deprecated `provider.deployContract`.
 
+console.log(
+`account Address ${account.address} has a balance of:`,
+number.toBigInt(balanceAfterTransfer.balance.low, 16).toString()
+);
 Declare and Deploy contract using single function:
 
 ```typescript
-  const declareDeploy = await account.declareDeploy({
+  const declareDeploy = await account.declareAndDeploy({
     contract: compiledErc20,
-    classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
     constructorCalldata: [
       encodeShortString('Token'),
       encodeShortString('ERC20'),

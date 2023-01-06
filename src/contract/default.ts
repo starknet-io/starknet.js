@@ -1,4 +1,3 @@
-import BN from 'bn.js';
 import assert from 'minimalistic-assert';
 
 import { AccountInterface } from '../account';
@@ -19,12 +18,12 @@ import {
   StructAbi,
 } from '../types';
 import { CheckCallData } from '../utils/calldata';
-import { BigNumberish, toBN } from '../utils/number';
+import { BigNumberish, toBigInt } from '../utils/number';
 import { CallOptions, ContractInterface } from './interface';
 
-function parseFelt(candidate: string): BN {
+function parseFelt(candidate: string): bigint {
   try {
-    return toBN(candidate);
+    return toBigInt(candidate);
   } catch (e) {
     throw Error('Could not parse felt');
   }
@@ -308,7 +307,7 @@ export class Contract implements ContractInterface {
     return this.providerOrAccount.invokeFunction(
       {
         ...invocation,
-        signature: options.signature || [],
+        signature: options.signature,
       },
       {
         nonce: options.nonce,
@@ -376,7 +375,7 @@ export class Contract implements ContractInterface {
     const parsedDataArr: (BigNumberish | ParsedStruct)[] = [];
     switch (true) {
       case /_len$/.test(name):
-        return parseFelt(responseIterator.next().value).toNumber();
+        return Number(parseFelt(responseIterator.next().value));
       case /\(felt/.test(type):
         return type.split(',').reduce((acc) => {
           acc.push(parseFelt(responseIterator.next().value));

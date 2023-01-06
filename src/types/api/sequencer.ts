@@ -1,5 +1,3 @@
-import BN from 'bn.js';
-
 import { BlockIdentifier } from '../../provider/utils';
 import { BigNumberish } from '../../utils/number';
 import {
@@ -8,7 +6,6 @@ import {
   ContractClass,
   EntryPointType,
   RawCalldata,
-  Signature,
   Status,
   TransactionStatus,
 } from '../lib';
@@ -59,7 +56,7 @@ export type TransactionTraceResponse = {
   validate_invocation?: FunctionInvocation;
   function_invocation?: FunctionInvocation;
   fee_transfer_invocation?: FunctionInvocation;
-  signature: Signature;
+  signature: string[];
 };
 
 export type CallL1Handler = {
@@ -74,7 +71,7 @@ export namespace Sequencer {
     type: 'DECLARE';
     sender_address: string;
     contract_class: ContractClass;
-    signature?: Signature;
+    signature?: string[];
     nonce: BigNumberish;
     max_fee?: BigNumberish;
     version?: BigNumberish;
@@ -93,7 +90,7 @@ export namespace Sequencer {
     class_hash: string;
     contract_address_salt: BigNumberish;
     constructor_calldata: string[];
-    signature?: Signature;
+    signature?: string[];
     max_fee?: BigNumberish;
     version?: BigNumberish;
     nonce?: BigNumberish;
@@ -102,7 +99,7 @@ export namespace Sequencer {
   export type InvokeFunctionTransaction = {
     type: 'INVOKE_FUNCTION';
     contract_address: string;
-    signature?: Signature;
+    signature?: string[];
     entry_point_type?: EntryPointType;
     calldata?: RawCalldata;
     nonce: BigNumberish;
@@ -249,7 +246,7 @@ export namespace Sequencer {
         uint: string;
       }
     | {
-        amount: BN;
+        amount: bigint;
         unit: string;
       };
 

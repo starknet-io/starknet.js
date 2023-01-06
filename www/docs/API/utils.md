@@ -88,8 +88,8 @@ await this.callContract({
     contractAddress: this.address,
     entrypoint: 'is_valid_signature',
     calldata: compileCalldata({
-        hash: toBN(hash).toString(),
-        signature: signature.map((x) => toBN(x).toString()),
+        hash: toBigInt(hash).toString(),
+        signature: signature.map((x) => toBigInt(x).toString()),
     }),
 });
 ```
@@ -120,9 +120,9 @@ export type BigNumberish = string | number | BN;
 
 Check if number is in hex format.
 
-### toBN
+### toBigInt
 
-`toBN(number: BigNumberish, base?: number | 'hex'): BN`
+`toBigInt(number: BigNumberish, base?: number | 'hex'): BN`
 
 Converts BigNumberish to BN.
 
@@ -230,11 +230,11 @@ Various hashing helpers.
 
 ### starknetKeccak
 
-`starknetKeccak(value: string): BN`
+`starknetKeccak(value: string): bigint`
 
-Function to get the starknet keccak hash from a string. Returns starknet keccak hash as BigNumber.
+Function to get the starknet keccak hash from a string. Returns starknet keccak hash as bigint.
 
-Returns starknet keccak hash as BigNumber.
+Returns starknet keccak hash as bigint.
 
 ### getSelectorFromName
 
@@ -246,7 +246,7 @@ Returns hex selector of given abi function name.
 
 ### pedersen
 
-`pedersen(input: [BigNumberish, BigNumberish])`
+`pedersen(input: BigNumberish, BigNumberish)`
 
 Function to get the Pedersen hash for two arguments.
 
@@ -301,61 +301,15 @@ Function that calculates contract address from hash.
 
 Returns a string.
 
+### computeContractClassHash
+
+`computeContractClassHash(contract: CompiledContract | string)`
+
+Function that computes Class hash of a compiled contract
+
+Returns a string.
+
 ---
-
-## **ellipticCurve**
-
-Wrapper around the javascript `elliptic` library with additional functionality.
-
-### genKeyPair
-
-`ec.genKeyPair()`
-
-Generate a random key pair.
-
-### getKeyPair
-
-`getKeyPair(pk: BigNumberish): KeyPair`
-
-Get a key pair from a private key.
-
-### getStarkKey
-
-`getStarkKey(keyPair: KeyPair): string`
-
-Public key defined over a Stark-friendly elliptic curve that is different from the standard Ethereum elliptic curve
-
-### getKeyPairFromPublicKey
-
-`getKeyPairFromPublicKey(publicKey: BigNumberish): KeyPair`
-
-Takes a public key and casts it into `elliptic` KeyPair format.
-
-Returns keyPair with public key only, which can be used to verify signatures, but can't sign anything.
-
-### sign
-
-`sign(keyPair: KeyPair, msgHash: string): Signature`
-
-Signs a message using the provided key.
-
-keyPair should be an KeyPair with a valid private key.
-
-Returns an Signature.
-
-### verify
-
-`verify(keyPair: KeyPair | KeyPair[], msgHash: string, sig: Signature): boolean`
-
-Verifies a message using the provided key.
-
-keyPair should be an KeyPair with a valid public key.
-
-sig should be an Signature.
-
-Returns true if the verification succeeds.
-
-<hr />
 
 ## **calldata**
 

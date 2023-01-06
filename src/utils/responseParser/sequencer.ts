@@ -13,7 +13,8 @@ import {
   InvokeFunctionResponse,
   Sequencer,
 } from '../../types';
-import { toBN } from '../number';
+import { toBigInt } from '../number';
+import { parseSignature } from '../stark';
 import { ResponseParser } from '.';
 
 export class SequencerAPIResponseParser extends ResponseParser {
@@ -48,7 +49,8 @@ export class SequencerAPIResponseParser extends ResponseParser {
         'sender_address' in res.transaction
           ? (res.transaction.sender_address as string)
           : undefined,
-      signature: 'signature' in res.transaction ? res.transaction.signature : undefined,
+      signature:
+        'signature' in res.transaction ? parseSignature(res.transaction.signature) : undefined,
       transaction_hash:
         'transaction_hash' in res.transaction ? res.transaction.transaction_hash : undefined,
       version: 'version' in res.transaction ? (res.transaction.version as string) : undefined,
@@ -84,20 +86,20 @@ export class SequencerAPIResponseParser extends ResponseParser {
 
       try {
         gasInfo = {
-          gas_consumed: toBN(res.gas_usage),
-          gas_price: toBN(res.gas_price),
+          gas_consumed: toBigInt(res.gas_usage),
+          gas_price: toBigInt(res.gas_price),
         };
       } catch {
         // do nothing
       }
 
       return {
-        overall_fee: toBN(res.overall_fee),
+        overall_fee: toBigInt(res.overall_fee),
         ...gasInfo,
       };
     }
     return {
-      overall_fee: toBN(res.amount),
+      overall_fee: toBigInt(res.amount),
     };
   }
 

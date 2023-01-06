@@ -1,6 +1,6 @@
 import { Call, ParsedStruct } from '../types';
 import { getSelectorFromName } from './hash';
-import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBN } from './number';
+import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBigInt } from './number';
 
 /**
  * Transforms a list of Calls, each with their own calldata, into
@@ -14,8 +14,8 @@ export const transformCallsToMulticallArrays = (calls: Call[]) => {
   calls.forEach((call) => {
     const data = call.calldata || [];
     callArray.push({
-      to: toBN(call.contractAddress).toString(10),
-      selector: toBN(getSelectorFromName(call.entrypoint)).toString(10),
+      to: toBigInt(call.contractAddress).toString(10),
+      selector: toBigInt(getSelectorFromName(call.entrypoint)).toString(10),
       data_offset: calldata.length.toString(),
       data_len: data.length.toString(),
     });
@@ -52,5 +52,5 @@ export const fromCallsToExecuteCalldataWithNonce = (
   calls: Call[],
   nonce: BigNumberish
 ): string[] => {
-  return [...fromCallsToExecuteCalldata(calls), toBN(nonce).toString()];
+  return [...fromCallsToExecuteCalldata(calls), toBigInt(nonce).toString()];
 };

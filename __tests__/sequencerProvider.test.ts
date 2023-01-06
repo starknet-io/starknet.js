@@ -1,7 +1,7 @@
 import { Contract, Provider, SequencerProvider, stark } from '../src';
 import { ZERO } from '../src/constants';
 import { feeTransactionVersion } from '../src/utils/hash';
-import { toBN } from '../src/utils/number';
+import { toBigInt } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
 import { fromCallsToExecuteCalldata } from '../src/utils/transaction';
 import {
@@ -24,9 +24,8 @@ describeIfSequencer('SequencerProvider', () => {
     let exampleTransactionHash: string;
 
     beforeAll(async () => {
-      const { deploy } = await account.declareDeploy({
+      const { deploy } = await account.declareAndDeploy({
         contract: compiledErc20,
-        classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
         constructorCalldata: [
           encodeShortString('Token'),
           encodeShortString('ERC20'),
@@ -57,8 +56,8 @@ describeIfSequencer('SequencerProvider', () => {
         calldata: [exampleContractAddress, '10', '0'],
       };
       const calldata = fromCallsToExecuteCalldata([call]);
-      const nonce = toBN(await account.getNonce());
-      const version = toBN(feeTransactionVersion);
+      const nonce = toBigInt(await account.getNonce());
+      const version = toBigInt(feeTransactionVersion);
       const chainId = await account.getChainId();
       const signature = await account.signer.signTransaction([call], {
         walletAddress: account.address,
@@ -99,9 +98,8 @@ describeIfSequencer('SequencerProvider', () => {
     let l1l2ContractAddress: string;
 
     beforeAll(async () => {
-      const { deploy } = await account.declareDeploy({
+      const { deploy } = await account.declareAndDeploy({
         contract: compiledL1L2,
-        classHash: '0x028d1671fb74ecb54d848d463cefccffaef6df3ae40db52130e19fe8299a7b43',
       });
       l1l2ContractAddress = deploy.contract_address;
     });
@@ -140,9 +138,8 @@ describeIfSequencer('SequencerProvider', () => {
         },
       });
       const accountCustom = getTestAccount(customSequencerProvider);
-      const { deploy } = await accountCustom.declareDeploy({
+      const { deploy } = await accountCustom.declareAndDeploy({
         contract: compiledErc20,
-        classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
         constructorCalldata: [encodeShortString('Token'), encodeShortString('ERC20'), wallet],
       });
 
@@ -152,7 +149,7 @@ describeIfSequencer('SequencerProvider', () => {
     test('Check ERC20 balance using Custom Sequencer Provider', async () => {
       const result = await erc20.balanceOf(wallet);
       const [res] = result;
-      expect(res.low).toStrictEqual(toBN(1000));
+      expect(res.low).toStrictEqual(toBigInt(1000));
       expect(res).toStrictEqual(result.balance);
     });
   });

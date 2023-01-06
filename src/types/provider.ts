@@ -2,7 +2,6 @@
  * Common interface response
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
-import BN from 'bn.js';
 
 import {
   AllowArray,
@@ -97,9 +96,9 @@ export interface InvokeTransactionReceiptResponse extends CommonTransactionRecei
 export type DeclareTransactionReceiptResponse = CommonTransactionReceiptResponse;
 
 export interface EstimateFeeResponse {
-  overall_fee: BN;
-  gas_consumed?: BN;
-  gas_price?: BN;
+  overall_fee: bigint;
+  gas_consumed?: bigint;
+  gas_price?: bigint;
 }
 
 export interface InvokeFunctionResponse {

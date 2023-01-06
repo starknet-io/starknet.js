@@ -14,7 +14,7 @@ This API is the primary way to interact with an account contract on StarkNet.
 
 To create a new instance of the Account, first an account contract must be deployed. Also there needs to be a Provider instance that will be passed in the constructor and key pair for the account.
 
-`new starknet.Account(Provider, address, starkKeyPair)`
+`new starknet.Account(Provider, address, pk)`
 
 ## Properties
 
@@ -285,17 +285,17 @@ Example:
 
 ---
 
-### declareDeploy()
+### declareAndDeploy()
 
 ✅ NEW
 High level wrapper for declare & deploy. Doesn't require waitForTransaction. Functionality similar to deprecated provider deployContract. Declare and Deploy contract using single function.
 
-account.**declareDeploy**(payload [ , details ]) => _Promise < DeclareDeployUDCResponse >_
+account.**declareAndDeploy**(payload [ , details ]) => _Promise < DeclareDeployUDCResponse >_
 
 @param object **_payload_** DeclareDeployContractPayload
 
 - **contract**: compiled contract code
-- **classHash**: computed class hash of compiled contract
+- optional computed class hash of compiled contract
 - optional constructorCalldata: constructor calldata
 - optional salt: address salt - default random
 - optional unique: bool if true ensure unique salt - default true
@@ -328,7 +328,6 @@ Example:
 ```typescript
   const declareDeploy = await account.declareDeploy({
     contract: compiledErc20,
-    classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
     constructorCalldata: [
       encodeShortString('Token'),
       encodeShortString('ERC20'),
