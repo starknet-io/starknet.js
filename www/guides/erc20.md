@@ -89,7 +89,7 @@ erc20.connect(account);
 
 const { transaction_hash: mintTxHash } = await erc20.transfer(
   recieverAddress,
-  ['0', '10'], // send 10 tokens as Uint256
+  ['10', '0'], // send 10 tokens as Uint256
 );
 
 await provider.waitForTransaction(mintTxHash);
