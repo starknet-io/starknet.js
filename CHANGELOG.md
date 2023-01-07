@@ -1,3 +1,32 @@
+# [5.0.0-beta.1](https://github.com/0xs34n/starknet.js/compare/v4.18.0...v5.0.0-beta.1) (2023-01-07)
+
+### Bug Fixes
+
+- better ([cda4931](https://github.com/0xs34n/starknet.js/commit/cda49313b17d715463f915f9ec8f1bf7c4de93f2))
+- imports ([a151afc](https://github.com/0xs34n/starknet.js/commit/a151afce77eb175e39982fbf8bfcbe25001ee6db))
+- imports ([43f0e25](https://github.com/0xs34n/starknet.js/commit/43f0e25f22106da510a0152c65084b1ee677cc6f))
+- sequencer fetchEndpoint ([7206d77](https://github.com/0xs34n/starknet.js/commit/7206d776a497cab833f5bf2e00b9f2eb695e3c71))
+- **tests:** signature in account tests ([c8bc860](https://github.com/0xs34n/starknet.js/commit/c8bc8604d74d0e0556468afa3475150fe3579e7a))
+- trying fixing tests for sequencer ([480e20d](https://github.com/0xs34n/starknet.js/commit/480e20de6b8d3f8eb3048a84430380d73fe46dcc))
+- update lockfile ([ecf9ead](https://github.com/0xs34n/starknet.js/commit/ecf9ead06d137bd2b43816a75f66dca0626e9ecd))
+- use hex array for RPC signatures ([aa73351](https://github.com/0xs34n/starknet.js/commit/aa73351b024daf75af2bc997b78cbde56de567e9))
+
+- chore!: account and signer updates ([be0cbe8](https://github.com/0xs34n/starknet.js/commit/be0cbe88b409fa9db20de8125319e10d1e29677e))
+
+### Features
+
+- add computeClassHash functionality ([3f6d88e](https://github.com/0xs34n/starknet.js/commit/3f6d88e00d9620bf2044ecccea6369067f2192d0))
+- compute class hash tests ([31a52a2](https://github.com/0xs34n/starknet.js/commit/31a52a28994abb0081fb27a0a7801cf160bcd2ad))
+- initial commit to ue faster hashing ([722717d](https://github.com/0xs34n/starknet.js/commit/722717dcf23f6b62a528e58e9483f868f658ebf3))
+- initial poc ([eb26fbd](https://github.com/0xs34n/starknet.js/commit/eb26fbddc02d54bb1f9ecf12192f484122ab5df4))
+- make class hash optional for Declare Txn ([624ca8b](https://github.com/0xs34n/starknet.js/commit/624ca8b8d1885d9b9a405a31f05d869fdfc03c9c))
+- update declareAndDeploy method ([a47fbd5](https://github.com/0xs34n/starknet.js/commit/a47fbd5f523a375b988f912a5631c181e3a7159b))
+- use yarn ([ec1101e](https://github.com/0xs34n/starknet.js/commit/ec1101e6edaf53446e76181fa0cf4530befb9463))
+
+### BREAKING CHANGES
+
+- uses BigInt and Faster Hashing
+
 # [4.18.0](https://github.com/0xs34n/starknet.js/compare/v4.17.1...v4.18.0) (2022-12-23)
 
 ### Bug Fixes
