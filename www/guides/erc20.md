@@ -102,9 +102,14 @@ const executeHash = await account.execute(
   {
     contractAddress: erc20Address,
     entrypoint: 'transfer',
-    calldata: stark.compileCalldata({
+    calldata: 
+      // Use a simple array to pass args in calldata
+      // [reciverAddress, '10', '0']
+      
+      // Use compiled calldata to pass args in calldata
+      stark.compileCalldata({
       recipient: recieverAddress,
-      amount: ['10']
+      amount: {type: 'struct', low: '10', high: '0',}
     })
   }
 );
