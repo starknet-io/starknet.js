@@ -3,6 +3,7 @@ import path from 'path';
 
 import { Account, ProviderInterface, RpcProvider, SequencerProvider, json } from '../src';
 import { CompiledContract } from '../src/types';
+import { toHex } from '../src/utils/number';
 
 const readContract = (name: string): CompiledContract =>
   json.parse(
@@ -72,7 +73,7 @@ export const getTestAccount = (provider: ProviderInterface) => {
     testAccountPrivateKey = DEFAULT_TEST_ACCOUNT_PRIVATE_KEY;
   }
 
-  return new Account(provider, testAccountAddress, testAccountPrivateKey);
+  return new Account(provider, toHex(testAccountAddress), testAccountPrivateKey);
 };
 
 const describeIf = (condition: boolean) => (condition ? describe : describe.skip);
