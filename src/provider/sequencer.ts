@@ -444,25 +444,23 @@ export class SequencerProvider implements ProviderInterface {
     invocations: InvocationBulk,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<EstimateFeeResponseBulk> {
-    const params: any = [].concat(invocations as []).map((invocation: any) => {
+    const params: Sequencer.EstimateFeeRequestBulk = invocations.map((invocation) => {
       let res;
       if (invocation.type === 'INVOKE_FUNCTION') {
         res = {
-          type: 'INVOKE_FUNCTION',
+          type: invocation.type,
           contract_address: invocation.contractAddress,
           calldata: invocation.calldata ?? [],
         };
-      }
-      if (invocation.type === 'DECLARE') {
+      } else if (invocation.type === 'DECLARE') {
         res = {
-          type: 'DECLARE',
+          type: invocation.type,
           sender_address: invocation.senderAddress,
           contract_class: invocation.contractDefinition,
         };
-      }
-      if (invocation.type === 'DEPLOY_ACCOUNT') {
+      } else {
         res = {
-          type: 'DEPLOY_ACCOUNT',
+          type: invocation.type,
           class_hash: toHex(toBN(invocation.classHash)),
           constructor_calldata: bigNumberishArrayToDecimalStringArray(
             invocation.constructorCalldata || []
