@@ -92,8 +92,8 @@ if (!txReceiptDeployTest.events) {
 const event = txReceiptDeployTest.events.find(
         (it) => number.cleanHex(it.from_address) === number.cleanHex(testContractAddress)
     ) || {data: []};
-const eventD1 = event.data[0],
-const eventD2 = event.data[1],
+const eventD1 = event.data[0];
+const eventD2 = event.data[1];
 const eventD3 = event.data[2]
     };
 ```
