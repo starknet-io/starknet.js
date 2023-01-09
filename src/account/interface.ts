@@ -15,6 +15,7 @@ import {
   EstimateFeeAction,
   EstimateFeeDetails,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   InvocationsDetails,
   InvokeFunctionResponse,
   MultiDeployContractResponse,
@@ -124,7 +125,7 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract estimateFeeBulk(
     transactions: TransactionBulk,
     estimateFeeDetails?: EstimateFeeDetails
-  ): Promise<AllowArray<EstimateFeeResponse>>;
+  ): Promise<EstimateFeeResponseBulk>;
 
   /**
    * Invoke execute function in account contract

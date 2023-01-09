@@ -11,6 +11,7 @@ import {
   DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetContractAddressesResponse,
   GetTransactionReceiptResponse,
@@ -442,7 +443,7 @@ export class SequencerProvider implements ProviderInterface {
   public async getEstimateFeeBulk(
     invocations: InvocationBulk,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<Array<EstimateFeeResponse>> {
+  ): Promise<EstimateFeeResponseBulk> {
     const params: any = [].concat(invocations as []).map((invocation: any) => {
       let res;
       if (invocation.type === 'INVOKE_FUNCTION') {
@@ -477,11 +478,9 @@ export class SequencerProvider implements ProviderInterface {
       };
     });
 
-    return this.fetchEndpoint('estimate_fee_bulk', { blockIdentifier }, params).then((result) => {
-      return [].concat(result as []).map((elem: any) => {
-        return this.responseParser.parseFeeEstimateResponse(elem);
-      });
-    });
+    return this.fetchEndpoint('estimate_fee_bulk', { blockIdentifier }, params).then(
+      this.responseParser.parseFeeEstimateBulkResponse
+    );
   }
 
   public async getCode(

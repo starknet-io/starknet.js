@@ -7,6 +7,7 @@ import {
   DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetCodeResponse,
   GetTransactionResponse,
@@ -312,7 +313,7 @@ export class RpcProvider implements ProviderInterface {
   public async getEstimateFeeBulk(
     _invocations: InvocationBulk,
     _blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<Array<EstimateFeeResponse>> {
+  ): Promise<EstimateFeeResponseBulk> {
     throw new Error('RPC does not implement getInvokeEstimateFeeBulk function');
   }
 

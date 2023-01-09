@@ -78,16 +78,19 @@ export type InvocationsDetails = {
 export type InvocationsDetailsWithNonce = InvocationsDetails & { nonce: BigNumberish };
 
 export type TransactionBulk = Array<
-  { type: TransactionType } & {
-    payload: DeclareContractPayload | AllowArray<Call> | DeployAccountContractPayload;
-  }
+  | ({ type: 'DECLARE' } & { payload: DeclareContractPayload })
+  | ({ type: 'DEPLOY' } & {
+      payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[];
+    })
+  | ({ type: 'DEPLOY_ACCOUNT' } & { payload: DeployAccountContractPayload })
+  | ({ type: 'INVOKE_FUNCTION' } & { payload: AllowArray<Call> })
 >;
 
 export type InvocationBulk = Array<
-  { type: TransactionType } & (
-    | Invocation
-    | DeclareContractTransaction
-    | DeployAccountContractTransaction
+  (
+    | ({ type: 'DECLARE' } & DeclareContractTransaction)
+    | ({ type: 'DEPLOY_ACCOUNT' } & DeployAccountContractTransaction)
+    | ({ type: 'INVOKE_FUNCTION' } & Invocation)
   ) &
     InvocationsDetailsWithNonce & { blockIdentifier: BlockNumber | BigNumberish }
 >;

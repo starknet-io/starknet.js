@@ -21,6 +21,7 @@ import {
   EstimateFee,
   EstimateFeeAction,
   EstimateFeeDetails,
+  EstimateFeeResponseBulk,
   Invocation,
   InvocationsDetails,
   InvocationsSignerDetails,
@@ -219,7 +220,7 @@ export class Account extends Provider implements AccountInterface {
   public async estimateFeeBulk(
     transactions: TransactionBulk,
     { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
-  ): Promise<Array<EstimateFee>> {
+  ): Promise<EstimateFeeResponseBulk> {
     const nonce = toBN(providedNonce ?? (await this.getNonce()));
     const version = toBN(feeTransactionVersion);
     const chainId = await this.getChainId();
@@ -293,7 +294,7 @@ export class Account extends Provider implements AccountInterface {
     });
   }
 
-  private async buildInvocation(
+  public async buildInvocation(
     call: Array<Call>,
     signerDetails: InvocationsSignerDetails
   ): Promise<Invocation> {
@@ -557,7 +558,7 @@ export class Account extends Provider implements AccountInterface {
     return feeEstimate.suggestedMaxFee.toString();
   }
 
-  private async buildDeclarePayload(
+  public async buildDeclarePayload(
     { classHash, contract }: DeclareContractPayload,
     { nonce, chainId, version, walletAddress, maxFee }: InvocationsSignerDetails
   ): Promise<DeclareContractTransaction> {
@@ -578,7 +579,7 @@ export class Account extends Provider implements AccountInterface {
     };
   }
 
-  private async buildAccountDeployPayload(
+  public async buildAccountDeployPayload(
     {
       classHash,
       addressSalt = 0,
@@ -610,7 +611,7 @@ export class Account extends Provider implements AccountInterface {
     };
   }
 
-  private buildUDCContractPayload(
+  public buildUDCContractPayload(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[]
   ): Call[] {
     const calls = [].concat(payload as []).map((it) => {

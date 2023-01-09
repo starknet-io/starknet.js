@@ -8,6 +8,7 @@ import {
   DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetCodeResponse,
   GetTransactionReceiptResponse,
@@ -107,7 +108,7 @@ export class Provider implements ProviderInterface {
   public async getEstimateFeeBulk(
     invocations: InvocationBulk,
     blockIdentifier?: BlockIdentifier
-  ): Promise<Array<EstimateFeeResponse>> {
+  ): Promise<EstimateFeeResponseBulk> {
     return this.provider.getEstimateFeeBulk(invocations, blockIdentifier);
   }
 

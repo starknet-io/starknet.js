@@ -9,6 +9,7 @@ import type {
   DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetCodeResponse,
   GetTransactionReceiptResponse,
@@ -283,7 +284,7 @@ export abstract class ProviderInterface {
   public abstract getEstimateFeeBulk(
     invocations: InvocationBulk,
     blockIdentifier?: BlockIdentifier
-  ): Promise<Array<EstimateFeeResponse>>;
+  ): Promise<EstimateFeeResponseBulk>;
 
   /**
    * Wait for the transaction to be accepted
