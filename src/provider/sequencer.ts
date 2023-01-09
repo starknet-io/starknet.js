@@ -11,12 +11,14 @@ import {
   DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetContractAddressesResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   GetTransactionStatusResponse,
   Invocation,
+  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Sequencer,
@@ -150,6 +152,7 @@ export class SequencerProvider implements ProviderInterface {
       'call_contract',
       'estimate_fee',
       'estimate_message_fee',
+      'estimate_fee_bulk',
       'simulate_transaction',
     ];
 
@@ -435,6 +438,47 @@ export class SequencerProvider implements ProviderInterface {
         nonce: toHex(toBN(details.nonce)),
       }
     ).then(this.responseParser.parseFeeEstimateResponse);
+  }
+
+  public async getEstimateFeeBulk(
+    invocations: InvocationBulk,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<EstimateFeeResponseBulk> {
+    const params: Sequencer.EstimateFeeRequestBulk = invocations.map((invocation) => {
+      let res;
+      if (invocation.type === 'INVOKE_FUNCTION') {
+        res = {
+          type: invocation.type,
+          contract_address: invocation.contractAddress,
+          calldata: invocation.calldata ?? [],
+        };
+      } else if (invocation.type === 'DECLARE') {
+        res = {
+          type: invocation.type,
+          sender_address: invocation.senderAddress,
+          contract_class: invocation.contractDefinition,
+        };
+      } else {
+        res = {
+          type: invocation.type,
+          class_hash: toHex(toBN(invocation.classHash)),
+          constructor_calldata: bigNumberishArrayToDecimalStringArray(
+            invocation.constructorCalldata || []
+          ),
+          contract_address_salt: toHex(toBN(invocation.addressSalt || 0)),
+        };
+      }
+      return {
+        ...res,
+        signature: bigNumberishArrayToDecimalStringArray(invocation.signature || []),
+        version: toHex(toBN(invocation?.version || 1)),
+        nonce: toHex(toBN(invocation.nonce)),
+      };
+    });
+
+    return this.fetchEndpoint('estimate_fee_bulk', { blockIdentifier }, params).then(
+      this.responseParser.parseFeeEstimateBulkResponse
+    );
   }
 
   public async getCode(

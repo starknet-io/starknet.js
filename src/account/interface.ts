@@ -15,10 +15,12 @@ import {
   EstimateFeeAction,
   EstimateFeeDetails,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   InvocationsDetails,
   InvokeFunctionResponse,
   MultiDeployContractResponse,
   Signature,
+  TransactionBulk,
   UniversalDeployerContractPayload,
 } from '../types';
 import { BigNumberish } from '../utils/number';
@@ -109,6 +111,21 @@ export abstract class AccountInterface extends ProviderInterface {
     deployContractPayload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
     transactionsDetail?: InvocationsDetails
   ): Promise<EstimateFeeResponse>;
+
+  /**
+   * Estimate Fee for executing a list of transactions on starknet
+   * Contract must be deployed for fee estimation to be possible
+   *
+   * @param transactions array of transaction object containing :
+   * - type - the type of transaction : 'DECLARE' | 'DEPLOY' | 'INVOKE_FUNCTION' | 'DEPLOY_ACCOUNT'
+   * - payload - the payload of the transaction
+   *
+   * @returns response from estimate_fee
+   */
+  public abstract estimateFeeBulk(
+    transactions: TransactionBulk,
+    estimateFeeDetails?: EstimateFeeDetails
+  ): Promise<EstimateFeeResponseBulk>;
 
   /**
    * Invoke execute function in account contract
