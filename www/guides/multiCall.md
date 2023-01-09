@@ -18,8 +18,8 @@ const accountAddress = "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd37
 // Ether token contract address
 const contractAddress_1 = '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7';
 
-// Ether bridge contract address
-const contractAddress_2 = '0x073314940630fd6dcda0d772d4c972c4e0a9946bef9dabf4ef84eda8ef542b82';
+// contract address which require ether
+const contractAddress_2 = '0x078f36c1d59dd29e00a0bb60aa2a9409856f4f9841c47f165aba5bab4225aa6b';
 
 const account = new Account(
     provider,
@@ -30,27 +30,31 @@ const account = new Account(
 
 ## Interact with contracts
 
+Interact with more than one contract by using `account.execute([calls])`. Example is as follows.
+
 ```javascript
 const multiCall = await account.execute(
-	[{
-        contractAddress: contractAddress_1,
-            entrypoint: "approve", 
-        	// approve 1 wei for bridge
-            calldata: stark.compileCalldata({
-                spender: contractAddress_2,
-                amount: {type: 'struct', low: '1', high: '0'},
-              })
-          },
-          {
-            contractAddress: contractAddress_2,
-            entrypoint: "initiate_withdraw",
-            // bridge 1 wei to L1
-            calldata: stark.compileCalldata({
-                l1_recipient: `reciver address here`,
-            	amount: {type: 'struct', low: '1', high: '0'},
-            })
-          }]
+	[
+    // Calling the first contract
+    {
+    contractAddress: contractAddress_1,
+    entrypoint: "approve", 
+    // approve 1 wei for bridge
+    calldata: stark.compileCalldata({
+        spender: contractAddress_2,
+        amount: {type: 'struct', low: '1', high: '0'},
+      })
+    },
+    // Calling the second contract
+    {
+      contractAddress: contractAddress_2,
+      entrypoint: "transfer_ether",
+      // transfer 1 wei to the contract address
+      calldata: stark.compileCalldata({
+          amount: {type: 'struct', low: '1', high: '0'},
+      })
+    }
+  ]
 )
 await provider.waitForTransaction(multiCall.transaction_hash);
 ```
-
