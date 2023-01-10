@@ -155,8 +155,7 @@ These 4 types of arguments can't be used at your convenience everywhere. Here a 
 |account.deployContract||✔️|✔️||✅|
 |account.declareDeploy||✔️|✔️|||
 |account.deployAccount|✔️|✔️||||
-|hash.calculateContractAddressFromHash|✔️|✔️|||||
-||||||
+|hash.calculateContractAddressFromHash|✔️|✔️||||
 
 ⚠️ = only for a list of felt (no array or struct).
 > for Typescript, you can import these type of data :
