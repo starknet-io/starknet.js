@@ -73,4 +73,4 @@ const declareResponse = await account0.declare({
 	}, { 
 	maxFee: estimatedFee1.mul(new BN(11)).div(new BN(10)) 
 	});
-	```
+```

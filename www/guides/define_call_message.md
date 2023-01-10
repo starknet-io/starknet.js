@@ -145,6 +145,7 @@ interface c3D {
 ### summary table for arguments : 
 
 These 4 types of arguments can't be used at your convenience everywhere. Here a table showing which type can be used in which function :  
+
 |Function|array of < BigNumberish >|array of < string >| object|array of < any >|MultiInvoke|
 |---:|:---:|:---:|:---:|:---:|:---:|
 |**Typescript type**|RawCalldata|Calldata or RawArgs or RawCalldata|RawArgs|Array< any >|array|
