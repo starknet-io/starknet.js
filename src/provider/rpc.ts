@@ -43,9 +43,9 @@ const defaultOptions = {
 export class RpcProvider implements ProviderInterface {
   public nodeUrl: string;
 
-  public chainId!: StarknetChainId;
-
   public headers: object;
+
+  private chainId!: StarknetChainId;
 
   private responseParser = new RPCResponseParser();
 
@@ -60,9 +60,7 @@ export class RpcProvider implements ProviderInterface {
     this.headers = { ...defaultOptions.headers, ...headers };
     this.blockIdentifier = blockIdentifier || defaultOptions.blockIdentifier;
 
-    this.getChainId().then((chainId) => {
-      this.chainId = chainId;
-    });
+    this.getChainId();
   }
 
   public fetch(method: any, params: any): Promise<any> {
@@ -96,11 +94,11 @@ export class RpcProvider implements ProviderInterface {
   }
 
   // Methods from Interface
-  public async getChainId(): Promise<any> {
-    return this.fetchEndpoint('starknet_chainId');
+  public async getChainId(): Promise<StarknetChainId> {
+    this.chainId ??= (await this.fetchEndpoint('starknet_chainId')) as StarknetChainId;
+    return this.chainId;
   }
 
-  // Methods from Interface
   public async getBlock(
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<GetBlockResponse> {
