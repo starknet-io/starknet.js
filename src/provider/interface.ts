@@ -22,8 +22,6 @@ import type { BigNumberish } from '../utils/number';
 import { BlockIdentifier } from './utils';
 
 export abstract class ProviderInterface {
-  public abstract chainId: StarknetChainId;
-
   /**
    * Gets the Starknet chain Id
    *

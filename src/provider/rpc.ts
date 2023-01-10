@@ -43,10 +43,9 @@ const defaultOptions = {
 export class RpcProvider implements ProviderInterface {
   public nodeUrl: string;
 
-  // TODO: consider making private
-  public chainId!: StarknetChainId;
-
   public headers: object;
+
+  private chainId!: StarknetChainId;
 
   private responseParser = new RPCResponseParser();
 

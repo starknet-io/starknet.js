@@ -53,10 +53,6 @@ export class Provider implements ProviderInterface {
     }
   }
 
-  public get chainId(): StarknetChainId {
-    return this.provider.chainId;
-  }
-
   public async getChainId(): Promise<StarknetChainId> {
     return this.provider.getChainId();
   }

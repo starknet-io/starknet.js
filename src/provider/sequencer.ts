@@ -81,9 +81,9 @@ export class SequencerProvider implements ProviderInterface {
 
   public gatewayUrl: string;
 
-  public chainId: StarknetChainId;
-
   public headers: object | undefined;
+
+  private chainId: StarknetChainId;
 
   private responseParser = new SequencerAPIResponseParser();
 
