@@ -27,7 +27,7 @@ export function bnToUint256(bignumber: BigNumberish): Uint256 {
   const bn = toBigInt(bignumber);
   if (!isUint256(bn)) throw new Error('Number is too large');
   return {
-    low: addHexPrefix((bn & 128n).toString(16)),
+    low: addHexPrefix((bn & UINT_128_MAX).toString(16)),
     high: addHexPrefix((bn >> 128n).toString(16)),
   };
 }
