@@ -4,6 +4,7 @@ import { BlockIdentifier } from '../../provider/utils';
 import { BigNumberish } from '../../utils/number';
 import {
   Abi,
+  AllowArray,
   BlockNumber,
   ContractClass,
   EntryPointType,
@@ -240,6 +241,10 @@ export namespace Sequencer {
 
   export type SimulateTransaction = Omit<InvokeFunctionTransaction, 'max_fee' | 'entry_point_type'>;
 
+  export type EstimateFeeRequestBulk = AllowArray<
+    InvokeEstimateFee | DeclareEstimateFee | DeployEstimateFee | DeployAccountEstimateFee
+  >;
+
   // Support 0.9.1 changes in a backward-compatible way
   export type EstimateFeeResponse =
     | {
@@ -252,6 +257,8 @@ export namespace Sequencer {
         amount: BN;
         unit: string;
       };
+
+  export type EstimateFeeResponseBulk = AllowArray<EstimateFeeResponse>;
 
   export type Endpoints = {
     get_contract_addresses: {
@@ -379,6 +386,13 @@ export namespace Sequencer {
       };
       REQUEST: SimulateTransaction;
       RESPONSE: TransactionSimulationResponse;
+    };
+    estimate_fee_bulk: {
+      QUERY: {
+        blockIdentifier: BlockIdentifier;
+      };
+      REQUEST: EstimateFeeRequestBulk;
+      RESPONSE: EstimateFeeResponseBulk;
     };
   };
 }

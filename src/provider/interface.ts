@@ -9,11 +9,13 @@ import type {
   DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetCodeResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
+  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Status,
@@ -266,6 +268,23 @@ export abstract class ProviderInterface {
     details: InvocationsDetailsWithNonce,
     blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponse>;
+
+  /**
+   * Estimates the fee for a list of INVOKE transaction
+   *
+   * @param invocations the array of invocation and invocation details object containing:
+   * - contractAddress - the address of the account
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   * - nonce - optional nonce
+   * - version - optional version
+   * @param blockIdentifier - block identifier
+   * @returns the estimated fee
+   */
+  public abstract getEstimateFeeBulk(
+    invocations: InvocationBulk,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<EstimateFeeResponseBulk>;
 
   /**
    * Wait for the transaction to be accepted

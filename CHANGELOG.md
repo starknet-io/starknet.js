@@ -1,3 +1,18 @@
+# [4.19.0](https://github.com/0xs34n/starknet.js/compare/v4.18.0...v4.19.0) (2023-01-09)
+
+### Bug Fixes
+
+- merge develop into feat/add_estimate_fee_bulk ([88e76af](https://github.com/0xs34n/starknet.js/commit/88e76af68dd711b3f277c0a6d4f1935710aba4d7))
+- update getEstimateFeeBulk function ([4b22c82](https://github.com/0xs34n/starknet.js/commit/4b22c8212f4586b37dc7c8ddfad77955e44b1b12))
+- update types & add separate responseParser for estimateFeeBulk ([52110b2](https://github.com/0xs34n/starknet.js/commit/52110b289e3dfbbe449cf195709b2714f295a70d))
+
+### Features
+
+- add function estimateInvokeFeeBulk ([e716a18](https://github.com/0xs34n/starknet.js/commit/e716a1882f3ac37d17eae72a51cd3c4fc4649bcb))
+- update estimateFeeBulk ([5ee94f7](https://github.com/0xs34n/starknet.js/commit/5ee94f78af681690905e1ead1de711e3a43c0774))
+- update estimateFeeBulk function & doc ([ce20139](https://github.com/0xs34n/starknet.js/commit/ce201394142a19c4810a1e44cb3f601b815a11fe))
+- update sequencer api ([a12f99e](https://github.com/0xs34n/starknet.js/commit/a12f99ea6e93fb5d44d4d07f7fa8cc2d997db91a))
+
 # [4.18.0](https://github.com/0xs34n/starknet.js/compare/v4.17.1...v4.18.0) (2022-12-23)
 
 ### Bug Fixes

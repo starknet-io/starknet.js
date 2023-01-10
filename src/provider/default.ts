@@ -8,11 +8,13 @@ import {
   DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetCodeResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
+  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Status,
@@ -101,6 +103,13 @@ export class Provider implements ProviderInterface {
       invocationDetails,
       blockIdentifier
     );
+  }
+
+  public async getEstimateFeeBulk(
+    invocations: InvocationBulk,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<EstimateFeeResponseBulk> {
+    return this.provider.getEstimateFeeBulk(invocations, blockIdentifier);
   }
 
   public async getNonceForAddress(
