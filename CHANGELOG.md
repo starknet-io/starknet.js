@@ -1,3 +1,12 @@
+## [4.19.1](https://github.com/0xs34n/starknet.js/compare/v4.19.0...v4.19.1) (2023-01-10)
+
+### Bug Fixes
+
+- describeIfDevnetSequencer ([4a088ad](https://github.com/0xs34n/starknet.js/commit/4a088ada404ef912976141d8fba1c66d791c273c))
+- es6 ([e85ad45](https://github.com/0xs34n/starknet.js/commit/e85ad45c5565d93417b1a18e3663bd6c5e8861c1))
+- estimate fee response bulk type ([78a1444](https://github.com/0xs34n/starknet.js/commit/78a14445c75b7ec259d6cfecd1cc17869b507dd8))
+- tests ([5ab047f](https://github.com/0xs34n/starknet.js/commit/5ab047ff0b272057e70a29e909084d083db36a96))
+
 # [4.19.0](https://github.com/0xs34n/starknet.js/compare/v4.18.0...v4.19.0) (2023-01-09)
 
 ### Bug Fixes
