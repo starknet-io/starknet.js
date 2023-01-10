@@ -9,11 +9,13 @@ import type {
   DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetCodeResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
+  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Status,
@@ -150,7 +152,7 @@ export abstract class ProviderInterface {
 
   /**
    * Invokes a function on starknet
-   * @deprecated This method wont be supported as soon as fees are mandatory
+   * @deprecated This method wont be supported as soon as fees are mandatory. Should not be used outside of Account class
    *
    * @param invocation the invocation object containing:
    * - contractAddress - the address of the contract
@@ -187,7 +189,7 @@ export abstract class ProviderInterface {
 
   /**
    * Estimates the fee for a given INVOKE transaction
-   * @deprecated Please use getInvokeEstimateFee or getDeclareEstimateFee instead
+   * @deprecated Please use getInvokeEstimateFee or getDeclareEstimateFee instead. Should not be used outside of Account class
    *
    * @param invocation the invocation object containing:
    * - contractAddress - the address of the contract
@@ -266,6 +268,23 @@ export abstract class ProviderInterface {
     details: InvocationsDetailsWithNonce,
     blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponse>;
+
+  /**
+   * Estimates the fee for a list of INVOKE transaction
+   *
+   * @param invocations the array of invocation and invocation details object containing:
+   * - contractAddress - the address of the account
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   * - nonce - optional nonce
+   * - version - optional version
+   * @param blockIdentifier - block identifier
+   * @returns the estimated fee
+   */
+  public abstract getEstimateFeeBulk(
+    invocations: InvocationBulk,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<EstimateFeeResponseBulk>;
 
   /**
    * Wait for the transaction to be accepted

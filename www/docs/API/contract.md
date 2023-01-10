@@ -36,43 +36,57 @@ If the Contract object is the result of a ContractFactory deployment, this is th
 
 ## Methods
 
+### attach()
+
 contract.**attach**(address) => void
 
 Saves the address of the contract deployed on network that will be used for interaction.
 
 _address_ - address of the contract.
 
-<br></br>
+---
+
+### connect()
 
 contract.**connect**(providerOrAccount) => void
 
 Attaches to new Provider or Account
 
-<br></br>
+---
+
+### deployed()
 
 contract.**deployed**() => _Promise < Contract >_
 
 If the Contract object is the result of a ContractFactory deployment, this method will wait for the transaction to be resolved.
 
-<br></br>
+---
+
+### call()
 
 contract.**call**(method, args, options) => _Promise < Result >_
 
 Calls a method on a contract.
 
-<br></br>
+---
+
+### invoke()
 
 contract.**invoke**(method, args, options) => _Promise < InvokeFunctionResponse >_
 
 Invokes a method on a contract.
 
-<br></br>
+---
+
+### estimate()
 
 contract.**estimate**(method, args, options) => _Promise < any >_
 
 Estimates a method on a contract.
 
-<br></br>
+---
+
+### populate()
 
 contract.**populate**(method, args, options) => _Invocation_
 

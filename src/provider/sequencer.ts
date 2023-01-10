@@ -11,16 +11,18 @@ import {
   DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetContractAddressesResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   GetTransactionStatusResponse,
-  GetTransactionTraceResponse,
   Invocation,
+  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Sequencer,
+  TransactionTraceResponse,
 } from '../types';
 import fetch from '../utils/fetchPonyfill';
 import { getSelector, getSelectorFromName } from '../utils/hash';
@@ -150,6 +152,8 @@ export class SequencerProvider implements ProviderInterface {
       'call_contract',
       'estimate_fee',
       'estimate_message_fee',
+      'estimate_fee_bulk',
+      'simulate_transaction',
     ];
 
     return postMethodEndpoints.includes(endpoint) ? 'POST' : 'GET';
@@ -436,6 +440,47 @@ export class SequencerProvider implements ProviderInterface {
     ).then(this.responseParser.parseFeeEstimateResponse);
   }
 
+  public async getEstimateFeeBulk(
+    invocations: InvocationBulk,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<EstimateFeeResponseBulk> {
+    const params: Sequencer.EstimateFeeRequestBulk = invocations.map((invocation) => {
+      let res;
+      if (invocation.type === 'INVOKE_FUNCTION') {
+        res = {
+          type: invocation.type,
+          contract_address: invocation.contractAddress,
+          calldata: invocation.calldata ?? [],
+        };
+      } else if (invocation.type === 'DECLARE') {
+        res = {
+          type: invocation.type,
+          sender_address: invocation.senderAddress,
+          contract_class: invocation.contractDefinition,
+        };
+      } else {
+        res = {
+          type: invocation.type,
+          class_hash: toHex(toBN(invocation.classHash)),
+          constructor_calldata: bigNumberishArrayToDecimalStringArray(
+            invocation.constructorCalldata || []
+          ),
+          contract_address_salt: toHex(toBN(invocation.addressSalt || 0)),
+        };
+      }
+      return {
+        ...res,
+        signature: bigNumberishArrayToDecimalStringArray(invocation.signature || []),
+        version: toHex(toBN(invocation?.version || 1)),
+        nonce: toHex(toBN(invocation.nonce)),
+      };
+    });
+
+    return this.fetchEndpoint('estimate_fee_bulk', { blockIdentifier }, params).then(
+      this.responseParser.parseFeeEstimateBulkResponse
+    );
+  }
+
   public async getCode(
     contractAddress: string,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
@@ -502,7 +547,7 @@ export class SequencerProvider implements ProviderInterface {
    * @param txHash
    * @returns the transaction trace
    */
-  public async getTransactionTrace(txHash: BigNumberish): Promise<GetTransactionTraceResponse> {
+  public async getTransactionTrace(txHash: BigNumberish): Promise<TransactionTraceResponse> {
     const txHashHex = toHex(toBN(txHash));
     return this.fetchEndpoint('get_transaction_trace', { transactionHash: txHashHex });
   }
@@ -519,5 +564,24 @@ export class SequencerProvider implements ProviderInterface {
     };
 
     return this.fetchEndpoint('estimate_message_fee', { blockIdentifier }, validCallL1Handler);
+  }
+
+  public async simulateTransaction(
+    invocation: Invocation,
+    invocationDetails: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<Sequencer.TransactionSimulationResponse> {
+    return this.fetchEndpoint(
+      'simulate_transaction',
+      { blockIdentifier },
+      {
+        type: 'INVOKE_FUNCTION',
+        contract_address: invocation.contractAddress,
+        calldata: invocation.calldata ?? [],
+        signature: bigNumberishArrayToDecimalStringArray(invocation.signature || []),
+        version: toHex(toBN(invocationDetails?.version || 1)),
+        nonce: toHex(toBN(invocationDetails.nonce)),
+      }
+    );
   }
 }

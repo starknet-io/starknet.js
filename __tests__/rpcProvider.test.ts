@@ -86,13 +86,13 @@ describeIfRpc('RPCProvider', () => {
     });
 
     describe('deploy contract related tests', () => {
-      let contract_address;
-      let transaction_hash;
+      let contract_address: string;
+      let transaction_hash: string;
 
       beforeAll(async () => {
         const { deploy } = await account.declareDeploy({
           contract: compiledOpenZeppelinAccount,
-          classHash: '0x03fcbf77b28c96f4f2fb5bd2d176ab083a12a5e123adeb0de955d7ee228c9854',
+          classHash: '0x058d97f7d76e78f44905cc30cb65b91ea49a4b908a76703c54197bca90f81773',
           constructorCalldata: [accountPublicKey],
           salt: accountPublicKey,
         });
@@ -121,16 +121,12 @@ describeIfRpc('RPCProvider', () => {
       });
     });
 
-    test('getClass classHash 0x03fcbf77b28c96f4f2fb5bd2d176ab083a12a5e123adeb0de955d7ee228c9854', async () => {
+    test('getClass classHash 0x058d97f7d76e78f44905cc30cb65b91ea49a4b908a76703c54197bca90f81773', async () => {
       const contractClass = await rpcProvider.getClass(
-        '0x03fcbf77b28c96f4f2fb5bd2d176ab083a12a5e123adeb0de955d7ee228c9854'
+        '0x058d97f7d76e78f44905cc30cb65b91ea49a4b908a76703c54197bca90f81773'
       );
       expect(contractClass).toHaveProperty('program');
       expect(contractClass).toHaveProperty('entry_points_by_type');
     });
-
-    test.todo('getEstimateFee');
-
-    test.todo('invokeFunction');
   });
 });

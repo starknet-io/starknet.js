@@ -1,18 +1,25 @@
 import { isBN } from 'bn.js';
 
 import typedDataExample from '../__mocks__/typedDataExample.json';
-import { Account, Contract, Provider, number, stark } from '../src';
+import { Account, Contract, Provider, ec, number, stark } from '../src';
 import { getKeyPair, sign } from '../src/utils/ellipticCurve';
 import { parseUDCEvent } from '../src/utils/events';
-import { feeTransactionVersion, pedersen } from '../src/utils/hash';
+import {
+  calculateContractAddressFromHash,
+  feeTransactionVersion,
+  pedersen,
+} from '../src/utils/hash';
 import { cleanHex, hexToDecimalString, toBN } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
 import { randomAddress } from '../src/utils/stark';
 import {
   compiledErc20,
   compiledNamingContract,
+  compiledOpenZeppelinAccount,
   compiledStarknetId,
   compiledTestDapp,
+  describeIfDevnetSequencer,
+  describeIfSequencer,
   erc20ClassHash,
   getTestAccount,
   getTestProvider,
@@ -63,6 +70,36 @@ describe('deploy and test Wallet', () => {
     expect(isBN(overall_fee)).toBe(true);
     expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
     innerInvokeEstFeeSpy.mockClear();
+  });
+
+  describeIfDevnetSequencer('Estimate Fee Bulk on Sequencer', () => {
+    test('estimate fee bulk', async () => {
+      const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
+      const estimatedFeeBulk = await account.estimateFeeBulk([
+        {
+          type: 'INVOKE_FUNCTION',
+          payload: {
+            contractAddress: erc20Address,
+            entrypoint: 'transfer',
+            calldata: [erc20.address, '10', '0'],
+          },
+        },
+        {
+          type: 'INVOKE_FUNCTION',
+          payload: {
+            contractAddress: erc20Address,
+            entrypoint: 'transfer',
+            calldata: [erc20.address, '10', '0'],
+          },
+        },
+      ]);
+
+      expect(estimatedFeeBulk[0]).toHaveProperty('suggestedMaxFee');
+      expect(estimatedFeeBulk.length).toEqual(2);
+      expect(isBN(estimatedFeeBulk[0].overall_fee)).toBe(true);
+      expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
+      innerInvokeEstFeeSpy.mockClear();
+    });
   });
 
   test('read balance of wallet', async () => {
@@ -338,6 +375,115 @@ describe('deploy and test Wallet', () => {
       expect(deployments).toHaveProperty('transaction_hash');
       expect(deployments.contract_address[0]).toBeDefined();
       expect(deployments.contract_address[1]).toBeDefined();
+
+      await provider.waitForTransaction(deployments.transaction_hash);
+    });
+  });
+
+  describeIfSequencer('Estimate fee bulk', () => {
+    let accountClassHash: string;
+    let precalculatedAddress: string;
+    let starkKeyPub: string;
+    let newAccount: Account;
+
+    beforeAll(async () => {
+      const declareAccount = await account.declare({
+        contract: compiledOpenZeppelinAccount,
+        classHash: '0x058d97f7d76e78f44905cc30cb65b91ea49a4b908a76703c54197bca90f81773',
+      });
+      accountClassHash = declareAccount.class_hash;
+      await provider.waitForTransaction(declareAccount.transaction_hash);
+
+      const privateKey = stark.randomAddress();
+      const starkKeyPair = ec.getKeyPair(privateKey);
+      starkKeyPub = ec.getStarkKey(starkKeyPair);
+      precalculatedAddress = calculateContractAddressFromHash(
+        starkKeyPub,
+        accountClassHash,
+        [starkKeyPub],
+        0
+      );
+      newAccount = new Account(provider, precalculatedAddress, starkKeyPair);
+    });
+
+    test('deploy account & invoke functions', async () => {
+      const { transaction_hash } = await account.execute({
+        contractAddress: erc20Address,
+        entrypoint: 'transfer',
+        calldata: [precalculatedAddress, '10', '0'],
+      });
+      await provider.waitForTransaction(transaction_hash);
+
+      const res = await newAccount.estimateFeeBulk([
+        {
+          type: 'DEPLOY_ACCOUNT',
+          payload: {
+            classHash: accountClassHash,
+            constructorCalldata: [starkKeyPub],
+            addressSalt: starkKeyPub,
+            contractAddress: precalculatedAddress,
+          },
+        },
+        {
+          type: 'INVOKE_FUNCTION',
+          payload: [
+            {
+              contractAddress: erc20Address,
+              entrypoint: 'approve',
+              calldata: [account.address, '10', '0'],
+            },
+            {
+              contractAddress: erc20Address,
+              entrypoint: 'transfer',
+              calldata: [account.address, '10', '0'],
+            },
+          ],
+        },
+      ]);
+      expect(res).toHaveLength(2);
+      expect(res[0]).toHaveProperty('overall_fee');
+      expect(res[0]).toHaveProperty('suggestedMaxFee');
+    });
+
+    test('declare, deploy & invoke functions', async () => {
+      const res = await account.estimateFeeBulk([
+        {
+          type: 'DECLARE',
+          payload: {
+            contract: compiledErc20,
+            classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+          },
+        },
+        {
+          type: 'DEPLOY',
+          payload: {
+            classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+            constructorCalldata: [
+              encodeShortString('Token'),
+              encodeShortString('ERC20'),
+              account.address,
+            ],
+          },
+        },
+        {
+          type: 'INVOKE_FUNCTION',
+          payload: [
+            {
+              contractAddress: erc20Address,
+              entrypoint: 'approve',
+              calldata: [erc20Address, '10', '0'],
+            },
+            {
+              contractAddress: erc20Address,
+              entrypoint: 'transfer',
+              calldata: [erc20.address, '10', '0'],
+            },
+          ],
+        },
+      ]);
+      expect(res).toHaveLength(3);
+      expect(res[0]).toHaveProperty('overall_fee');
+      expect(res[0]).toHaveProperty('suggestedMaxFee');
     });
   });
 });

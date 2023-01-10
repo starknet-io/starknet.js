@@ -8,6 +8,8 @@ export interface EstimateFee extends EstimateFeeResponse {
   suggestedMaxFee: BN;
 }
 
+export type EstimateFeeBulk = Array<EstimateFee>;
+
 export interface EstimateFeeDetails {
   nonce?: BigNumberish;
   blockIdentifier?: BlockIdentifier;

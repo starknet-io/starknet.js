@@ -1,3 +1,71 @@
+## [4.19.1](https://github.com/0xs34n/starknet.js/compare/v4.19.0...v4.19.1) (2023-01-10)
+
+### Bug Fixes
+
+- describeIfDevnetSequencer ([4a088ad](https://github.com/0xs34n/starknet.js/commit/4a088ada404ef912976141d8fba1c66d791c273c))
+- es6 ([e85ad45](https://github.com/0xs34n/starknet.js/commit/e85ad45c5565d93417b1a18e3663bd6c5e8861c1))
+- estimate fee response bulk type ([78a1444](https://github.com/0xs34n/starknet.js/commit/78a14445c75b7ec259d6cfecd1cc17869b507dd8))
+- tests ([5ab047f](https://github.com/0xs34n/starknet.js/commit/5ab047ff0b272057e70a29e909084d083db36a96))
+
+# [4.19.0](https://github.com/0xs34n/starknet.js/compare/v4.18.0...v4.19.0) (2023-01-09)
+
+### Bug Fixes
+
+- merge develop into feat/add_estimate_fee_bulk ([88e76af](https://github.com/0xs34n/starknet.js/commit/88e76af68dd711b3f277c0a6d4f1935710aba4d7))
+- update getEstimateFeeBulk function ([4b22c82](https://github.com/0xs34n/starknet.js/commit/4b22c8212f4586b37dc7c8ddfad77955e44b1b12))
+- update types & add separate responseParser for estimateFeeBulk ([52110b2](https://github.com/0xs34n/starknet.js/commit/52110b289e3dfbbe449cf195709b2714f295a70d))
+
+### Features
+
+- add function estimateInvokeFeeBulk ([e716a18](https://github.com/0xs34n/starknet.js/commit/e716a1882f3ac37d17eae72a51cd3c4fc4649bcb))
+- update estimateFeeBulk ([5ee94f7](https://github.com/0xs34n/starknet.js/commit/5ee94f78af681690905e1ead1de711e3a43c0774))
+- update estimateFeeBulk function & doc ([ce20139](https://github.com/0xs34n/starknet.js/commit/ce201394142a19c4810a1e44cb3f601b815a11fe))
+- update sequencer api ([a12f99e](https://github.com/0xs34n/starknet.js/commit/a12f99ea6e93fb5d44d4d07f7fa8cc2d997db91a))
+
+# [4.18.0](https://github.com/0xs34n/starknet.js/compare/v4.17.1...v4.18.0) (2022-12-23)
+
+### Bug Fixes
+
+- merge develop into branch ([21efcb1](https://github.com/0xs34n/starknet.js/commit/21efcb1cefd6ea70a9d49e060ff620e88002e3b6))
+
+### Features
+
+- simulate_transaction support on sequencer ([304c3cc](https://github.com/0xs34n/starknet.js/commit/304c3cc1af81bc8810581546f043caca01db173b))
+- update simulate tx ([8f3ea55](https://github.com/0xs34n/starknet.js/commit/8f3ea55eb1e23cefc0419902a2ebbe10ee373ccb))
+- update simulate tx in sequencer ([d79a9fa](https://github.com/0xs34n/starknet.js/commit/d79a9faa307936561504c120f67f3fb2f18423b6))
+
+## [4.17.1](https://github.com/0xs34n/starknet.js/compare/v4.17.0...v4.17.1) (2022-12-14)
+
+### Bug Fixes
+
+- estimateAccountDeployFee set nonce to constant 0 ([2110ef0](https://github.com/0xs34n/starknet.js/commit/2110ef09da63765609d60e01259c360a0e8a9ddf))
+- nonce should be fixed for deploy account to 0 ([c8a38e5](https://github.com/0xs34n/starknet.js/commit/c8a38e5349e5c5ebe3bb0665a4fb18cd02811626))
+- rpc deployAccountContract request, rpc nonce hotfix ([9576335](https://github.com/0xs34n/starknet.js/commit/9576335893561603cfd6a8ff4454b69cb49f7484))
+
+# [4.17.0](https://github.com/0xs34n/starknet.js/compare/v4.16.0...v4.17.0) (2022-12-13)
+
+### Bug Fixes
+
+- merge conflicts ([92a3be8](https://github.com/0xs34n/starknet.js/commit/92a3be8500153d4b87b888f454bb4140edb88411))
+
+### Features
+
+- contract factory deploy arguments ([9eff7f4](https://github.com/0xs34n/starknet.js/commit/9eff7f4ccc74cb5f0c0594e88c0292600f20ec09))
+- update contractFactory docs ([76f8440](https://github.com/0xs34n/starknet.js/commit/76f8440233c4a1e24e3dfff25fe02525e86a8258))
+
+# [4.16.0](https://github.com/0xs34n/starknet.js/compare/v4.15.1...v4.16.0) (2022-12-12)
+
+### Bug Fixes
+
+- blockIdentifier null on call from constructed function ([c88fbf0](https://github.com/0xs34n/starknet.js/commit/c88fbf0cdfc57e1150275a34c15900d6c81802d3))
+- default pathfinder does't have pending block ([4619188](https://github.com/0xs34n/starknet.js/commit/4619188e21e5cc9a811c59bcf2923c4382661635))
+- sequencer defaults, remove defaultProvider default blockIdentifier, spelling, class ([555a9a3](https://github.com/0xs34n/starknet.js/commit/555a9a3982bc1a742776119df5dee5d701209a0d))
+
+### Features
+
+- multi deploy reimplemented ([10e609a](https://github.com/0xs34n/starknet.js/commit/10e609a1af584df65942477b264ad7809b5c70c9))
+- return precalculated address from deploy ([5e40224](https://github.com/0xs34n/starknet.js/commit/5e402246841bdf9117a9ee96799833fc6f68d16b))
+
 ## [4.15.1](https://github.com/0xs34n/starknet.js/compare/v4.15.0...v4.15.1) (2022-12-07)
 
 ### Bug Fixes

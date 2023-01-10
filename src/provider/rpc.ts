@@ -7,10 +7,12 @@ import {
   DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetCodeResponse,
   GetTransactionResponse,
   Invocation,
+  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   RPC,
@@ -308,6 +310,13 @@ export class RpcProvider implements ProviderInterface {
     }).then(this.responseParser.parseFeeEstimateResponse);
   }
 
+  public async getEstimateFeeBulk(
+    _invocations: InvocationBulk,
+    _blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<EstimateFeeResponseBulk> {
+    throw new Error('RPC does not implement getInvokeEstimateFeeBulk function');
+  }
+
   // TODO: Revisit after Pathfinder release with JSON-RPC v0.2.1 RPC Spec
   public async declareContract(
     { contractDefinition, signature, senderAddress }: DeclareContractTransaction,
@@ -335,14 +344,16 @@ export class RpcProvider implements ProviderInterface {
     details: InvocationsDetailsWithNonce
   ): Promise<DeployContractResponse> {
     return this.fetchEndpoint('starknet_addDeployAccountTransaction', {
-      constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
-      class_hash: toHex(toBN(classHash)),
-      contract_address_salt: toHex(toBN(addressSalt || 0)),
-      type: 'DEPLOY',
-      max_fee: toHex(toBN(details.maxFee || 0)),
-      version: toHex(toBN(details.version || 0)),
-      signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
-      nonce: toHex(toBN(details.nonce)),
+      deploy_account_transaction: {
+        constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
+        class_hash: toHex(toBN(classHash)),
+        contract_address_salt: toHex(toBN(addressSalt || 0)),
+        type: 'DEPLOY_ACCOUNT',
+        max_fee: toHex(toBN(details.maxFee || 0)),
+        version: toHex(toBN(details.version || 0)),
+        signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
+        nonce: toHex(toBN(details.nonce)),
+      },
     });
   }
 
@@ -356,7 +367,7 @@ export class RpcProvider implements ProviderInterface {
         calldata: parseCalldata(functionInvocation.calldata),
         type: 'INVOKE',
         max_fee: toHex(toBN(details.maxFee || 0)),
-        version: toHex(toBN(details.version || 0)),
+        version: toHex(toBN(details.version || 1)),
         signature: bigNumberishArrayToHexadecimalStringArray(functionInvocation.signature || []),
         nonce: toHex(toBN(details.nonce)),
       },

@@ -8,11 +8,13 @@ import {
   DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetCodeResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
+  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Status,
@@ -67,7 +69,7 @@ export class Provider implements ProviderInterface {
 
   public async getClassAt(
     contractAddress: string,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier?: BlockIdentifier
   ): Promise<ContractClass> {
     return this.provider.getClassAt(contractAddress, blockIdentifier);
   }
@@ -103,6 +105,13 @@ export class Provider implements ProviderInterface {
     );
   }
 
+  public async getEstimateFeeBulk(
+    invocations: InvocationBulk,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<EstimateFeeResponseBulk> {
+    return this.provider.getEstimateFeeBulk(invocations, blockIdentifier);
+  }
+
   public async getNonceForAddress(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
@@ -113,7 +122,7 @@ export class Provider implements ProviderInterface {
   public async getStorageAt(
     contractAddress: string,
     key: BigNumberish,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier?: BlockIdentifier
   ): Promise<BigNumberish> {
     return this.provider.getStorageAt(contractAddress, key, blockIdentifier);
   }
