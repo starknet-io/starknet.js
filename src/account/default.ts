@@ -21,7 +21,6 @@ import {
   EstimateFee,
   EstimateFeeAction,
   EstimateFeeDetails,
-  EstimateFeeResponseBulk,
   Invocation,
   InvocationsDetails,
   InvocationsSignerDetails,
@@ -32,6 +31,7 @@ import {
   TransactionBulk,
   UniversalDeployerContractPayload,
 } from '../types';
+import { EstimateFeeBulk } from '../types/account';
 import { parseUDCEvent } from '../utils/events';
 import {
   calculateContractAddressFromHash,
@@ -220,7 +220,7 @@ export class Account extends Provider implements AccountInterface {
   public async estimateFeeBulk(
     transactions: TransactionBulk,
     { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
-  ): Promise<EstimateFeeResponseBulk> {
+  ): Promise<EstimateFeeBulk> {
     const nonce = toBN(providedNonce ?? (await this.getNonce()));
     const version = toBN(feeTransactionVersion);
     const chainId = await this.getChainId();
