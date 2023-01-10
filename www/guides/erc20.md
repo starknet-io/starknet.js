@@ -65,7 +65,11 @@ const erc20Response = await account.deploy({
     name: shortString.encodeShortString('TestToken'),
     symbol: shortString.encodeShortString('ERC20'),
     decimals: 18,
-    initial_supply: ['1000'],
+    initial_supply: {
+      type: "struct",
+      low: '1000',
+      high: '0',
+    }
     recipient: account.address,
   }),
   salt,
