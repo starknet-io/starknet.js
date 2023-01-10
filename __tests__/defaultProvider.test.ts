@@ -1,11 +1,11 @@
-import { BlockNumber, GetBlockResponse, stark } from '../src';
+import { BlockNumber, GetBlockResponse, Provider, stark } from '../src';
 import { toBN } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
 import { compiledErc20, erc20ClassHash, getTestAccount, getTestProvider } from './fixtures';
 
 const { compileCalldata } = stark;
 
-const testProvider = getTestProvider();
+const testProvider = new Provider(getTestProvider());
 
 describe('defaultProvider', () => {
   let exampleTransactionHash: string;
@@ -17,6 +17,8 @@ describe('defaultProvider', () => {
   const account = getTestAccount(testProvider);
 
   beforeAll(async () => {
+    expect(testProvider).toBeInstanceOf(Provider);
+
     const { deploy } = await account.declareDeploy({
       contract: compiledErc20,
       classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',

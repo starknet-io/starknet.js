@@ -1,10 +1,11 @@
 {
   "name": "starknet",
-  "version": "4.15.1",
+  "version": "4.19.1",
   "description": "JavaScript library for StarkNet",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
-  "browser": "dist/index.global.js",
+  "jsdelivr": "dist/index.global.js",
+  "unpkg": "dist/index.global.js",
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
@@ -14,19 +15,24 @@
       "types": "./dist/index.d.ts"
     }
   },
+  "files": [
+    "CHANGELOG.md",
+    "dist"
+  ],
   "scripts": {
     "prepare": "npm run build && husky install",
     "build": "tsup && npm run build:esm && npm run build:iife && npm run build:dts",
     "build:esm": "tsup --clean false --format esm --platform node",
     "build:iife": "tsup --clean false --format iife --platform browser",
     "build:dts": "tsup --clean false --dts-only",
-    "pretest": "npm run lint",
+    "pretest": "npm run lint && npm run ts:check",
     "test": "jest -i",
     "posttest": "npm run format",
     "test:watch": "jest --watch",
     "docs": "cd www && npm run start",
     "format": "prettier --loglevel warn --write \"**/*.{ts,js,md,yml,json}\"",
-    "lint": "eslint . --cache --fix --ext .ts"
+    "lint": "eslint . --cache --fix --ext .ts",
+    "ts:check": "tsc --noEmit --resolveJsonModule --project tsconfig.eslint.json"
   },
   "keywords": [
     "starknet",

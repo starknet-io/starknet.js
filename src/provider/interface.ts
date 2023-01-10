@@ -9,11 +9,13 @@ import type {
   DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetCodeResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
+  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Status,
@@ -120,7 +122,7 @@ export abstract class ProviderInterface {
    * Gets the transaction information from a tx id.
    *
    * @param txHash
-   * @returns the transacton object { transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? }
+   * @returns the transaction object { transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? }
    */
   public abstract getTransaction(transactionHash: BigNumberish): Promise<GetTransactionResponse>;
 
@@ -150,7 +152,7 @@ export abstract class ProviderInterface {
 
   /**
    * Invokes a function on starknet
-   * @deprecated This method wont be supported as soon as fees are mandatory
+   * @deprecated This method wont be supported as soon as fees are mandatory. Should not be used outside of Account class
    *
    * @param invocation the invocation object containing:
    * - contractAddress - the address of the contract
@@ -187,7 +189,7 @@ export abstract class ProviderInterface {
 
   /**
    * Estimates the fee for a given INVOKE transaction
-   * @deprecated Please use getInvokeEstimateFee or getDeclareEstimateFee instead
+   * @deprecated Please use getInvokeEstimateFee or getDeclareEstimateFee instead. Should not be used outside of Account class
    *
    * @param invocation the invocation object containing:
    * - contractAddress - the address of the contract
@@ -223,7 +225,7 @@ export abstract class ProviderInterface {
   public abstract getInvokeEstimateFee(
     invocation: Invocation,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponse>;
 
   /**
@@ -243,7 +245,7 @@ export abstract class ProviderInterface {
   public abstract getDeclareEstimateFee(
     transaction: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponse>;
 
   /**
@@ -264,8 +266,25 @@ export abstract class ProviderInterface {
   public abstract getDeployAccountEstimateFee(
     transaction: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponse>;
+
+  /**
+   * Estimates the fee for a list of INVOKE transaction
+   *
+   * @param invocations the array of invocation and invocation details object containing:
+   * - contractAddress - the address of the account
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   * - nonce - optional nonce
+   * - version - optional version
+   * @param blockIdentifier - block identifier
+   * @returns the estimated fee
+   */
+  public abstract getEstimateFeeBulk(
+    invocations: InvocationBulk,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<EstimateFeeResponseBulk>;
 
   /**
    * Wait for the transaction to be accepted

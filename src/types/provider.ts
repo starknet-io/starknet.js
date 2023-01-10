@@ -132,3 +132,5 @@ export type EstimateFeeAction =
       type: 'DEPLOY';
       payload: UniversalDeployerContractPayload;
     };
+
+export type EstimateFeeResponseBulk = Array<EstimateFeeResponse>;

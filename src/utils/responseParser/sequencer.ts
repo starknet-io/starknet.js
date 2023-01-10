@@ -7,6 +7,7 @@ import {
   DeclareContractResponse,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
@@ -99,6 +100,33 @@ export class SequencerAPIResponseParser extends ResponseParser {
     return {
       overall_fee: toBN(res.amount),
     };
+  }
+
+  public parseFeeEstimateBulkResponse(
+    res: Sequencer.EstimateFeeResponseBulk
+  ): EstimateFeeResponseBulk {
+    return [].concat(res as []).map((item: Sequencer.EstimateFeeResponse) => {
+      if ('overall_fee' in item) {
+        let gasInfo = {};
+
+        try {
+          gasInfo = {
+            gas_consumed: toBN(item.gas_usage),
+            gas_price: toBN(item.gas_price),
+          };
+        } catch {
+          // do nothing
+        }
+
+        return {
+          overall_fee: toBN(item.overall_fee),
+          ...gasInfo,
+        };
+      }
+      return {
+        overall_fee: toBN(item.amount),
+      };
+    });
   }
 
   public parseCallContractResponse(res: Sequencer.CallContractResponse): CallContractResponse {

@@ -1,7 +1,8 @@
 import assert from 'minimalistic-assert';
 
 import { AccountInterface } from '../account';
-import { Abi, CompiledContract, RawArgs } from '../types';
+import { Abi, CompiledContract, FunctionAbi } from '../types';
+import { CheckCallData } from '../utils/calldata';
 import { Contract } from './default';
 
 export class ContractFactory {
@@ -13,6 +14,8 @@ export class ContractFactory {
 
   account: AccountInterface;
 
+  private checkCalldata: CheckCallData;
+
   constructor(
     compiledContract: CompiledContract,
     classHash: string,
@@ -23,19 +26,23 @@ export class ContractFactory {
     this.compiledContract = compiledContract;
     this.account = account;
     this.classHash = classHash;
+    this.checkCalldata = new CheckCallData(abi);
   }
 
   /**
    * Deploys contract and returns new instance of the Contract
    *
-   * @param constructorCalldata - Constructor Calldata
+   * @param args - Array of the constructor arguments for deployment
    * @param addressSalt (optional) - Address Salt for deployment
    * @returns deployed Contract
    */
-  public async deploy(
-    constructorCalldata?: RawArgs,
-    addressSalt?: string | undefined
-  ): Promise<Contract> {
+  public async deploy(args: Array<any> = [], addressSalt?: string | undefined): Promise<Contract> {
+    this.checkCalldata.validateMethodAndArgs('DEPLOY', 'constructor', args);
+    const { inputs } = this.abi.find((abi) => abi.type === 'constructor') as FunctionAbi;
+
+    // compile calldata
+    const constructorCalldata = this.checkCalldata.compileCalldata(args, inputs);
+
     const {
       deploy: { contract_address, transaction_hash },
     } = await this.account.declareDeploy({

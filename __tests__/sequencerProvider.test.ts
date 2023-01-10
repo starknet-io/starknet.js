@@ -1,6 +1,9 @@
 import { Contract, Provider, SequencerProvider, stark } from '../src';
+import { ZERO } from '../src/constants';
+import { feeTransactionVersion } from '../src/utils/hash';
 import { toBN } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
+import { fromCallsToExecuteCalldata } from '../src/utils/transaction';
 import {
   compiledErc20,
   compiledL1L2,
@@ -19,13 +22,16 @@ describeIfSequencer('SequencerProvider', () => {
 
   describe('Gateway specific methods', () => {
     let exampleTransactionHash: string;
-    const wallet = stark.randomAddress();
 
     beforeAll(async () => {
       const { deploy } = await account.declareDeploy({
         contract: compiledErc20,
         classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
-        constructorCalldata: [encodeShortString('Token'), encodeShortString('ERC20'), wallet],
+        constructorCalldata: [
+          encodeShortString('Token'),
+          encodeShortString('ERC20'),
+          account.address,
+        ],
       });
 
       exampleTransactionHash = deploy.transaction_hash;
@@ -42,6 +48,36 @@ describeIfSequencer('SequencerProvider', () => {
       const transactionTrace = await sequencerProvider.getTransactionTrace(exampleTransactionHash);
       // TODO test optional properties
       expect(transactionTrace).toHaveProperty('signature');
+    });
+
+    test('simulate transaction', async () => {
+      const call = {
+        contractAddress: exampleContractAddress,
+        entrypoint: 'transfer',
+        calldata: [exampleContractAddress, '10', '0'],
+      };
+      const calldata = fromCallsToExecuteCalldata([call]);
+      const nonce = toBN(await account.getNonce());
+      const version = toBN(feeTransactionVersion);
+      const chainId = await account.getChainId();
+      const signature = await account.signer.signTransaction([call], {
+        walletAddress: account.address,
+        nonce,
+        version,
+        maxFee: ZERO,
+        chainId,
+      });
+
+      const res = await sequencerProvider.simulateTransaction(
+        {
+          contractAddress: account.address,
+          calldata,
+          signature,
+        },
+        { version, nonce }
+      );
+      expect(res).toHaveProperty('trace');
+      expect(res).toHaveProperty('fee_estimation');
     });
 
     test('getCode() -> { bytecode }', async () => {

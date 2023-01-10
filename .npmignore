@@ -1,7 +1,0 @@
-.DS_Store
-tsconfig.json
-lib._esm
-tsconfig.tsbuildinfo
-node_modules
-.github/
-.husky/

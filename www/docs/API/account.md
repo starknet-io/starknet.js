@@ -24,6 +24,8 @@ The address of the account contract.
 
 ## Methods
 
+### getNonce()
+
 account.**getNonce(blockIdentifier)** => _Promise < BigNumberish >_
 
 Gets the nonce of the account with respect to a specific block.
@@ -32,7 +34,9 @@ _blockIdentifier_ - optional blockIdentifier. Defaults to 'pending'.
 
 Returns the nonce of the account.
 
-<hr />
+---
+
+### estimateInvokeFee()
 
 account.**estimateInvokeFee**(calls [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse >_
 
@@ -59,7 +63,9 @@ The _estimateFeeDetails_ object may include any of:
 }
 ```
 
-<hr />
+---
+
+### estimateDeclareFee()
 
 account.**estimateDeclareFee**(contractPayload [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse >_
 
@@ -85,7 +91,9 @@ The _estimateFeeDetails_ object may include any of:
 }
 ```
 
-<hr />
+---
+
+### estimateAccountDeployFee()
 
 account.**estimateAccountDeployFee**(contractPayload [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse >_
 
@@ -111,7 +119,37 @@ The _estimateFeeDetails_ object may include any of:
 }
 ```
 
-<hr />
+---
+
+### estimateFeeBulk()
+
+account.**estimateFeeBulk**(transaction[] [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse[] >_
+
+Estimate Fee for executing a list of transactions on starknet.
+
+The _transaction_ object structure:
+
+- transaction.**type** - the type of transaction : 'DECLARE' | 'DEPLOY' | 'INVOKE_FUNCTION' | 'DEPLOY_ACCOUNT'
+- transaction payload - the payload for the transaction
+
+The _estimateFeeDetails_ object may include any of:
+
+- estimateFeeDetails.**blockIdentifier** - Block Identifier for the transaction
+- estimateFeeDetails.**nonce** - Nonce for the transaction
+
+###### _EstimateFeeResponse_
+
+```typescript
+{
+  overall_fee: BN;
+  gas_consumed?: BN;
+  gas_price?: BN;
+}
+```
+
+---
+
+### execute()
 
 account.**execute**(transactions [ , abi , transactionsDetail ]) => _Promise < InvokeFunctionResponse >_
 
@@ -140,9 +178,9 @@ The _transactionsDetail_ object may include any of:
 };
 ```
 
-<hr />
+---
 
-### Declare
+### declare()
 
 account.**declare**(contractPayload [ , transactionsDetail ]) => _Promise < DeclareContractResponse >_
 
@@ -180,21 +218,20 @@ const declareTx = await account.declare({
 };
 ```
 
-<hr />
+---
 
-### Deploy
+### deploy()
 
 Deploys a given compiled contract (json) to starknet, wrapper around _execute_ invoke function
 
-**deploy**(deployContractPayload [ , transactionsDetail ]) => _Promise < InvokeFunctionResponse >_
+account.**deploy**(deployContractPayload [ , transactionsDetail ]) => _Promise < InvokeFunctionResponse >_
 
 @param object **_deployContractPayload_**
 
 - **classHash**: computed class hash of compiled contract
-- **constructorCalldata**: constructor calldata
+- optional constructorCalldata: constructor calldata
 - optional salt: address salt - default random
 - optional unique: bool if true ensure unique salt - default true
-- optional additionalCalls - optional additional calls array to support multi-call
 
 @param object **transactionsDetail** Invocation Details
 
@@ -227,14 +264,14 @@ Example multi-call:
 TODO Example with multi-call
 ```
 
-<hr />
+---
 
-### DeployContract
+### deployContract()
 
 ✅ NEW
 High level wrapper for deploy. Doesn't require waitForTransaction. Response similar to deprecated provider deployContract.
 
-**deployContract**(payload [ , details ]) => _Promise < DeployContractUDCResponse >_
+account.**deployContract**(payload [ , details ]) => _Promise < DeployContractUDCResponse >_
 
 @param object **_payload_** UniversalDeployerContractPayload
 
@@ -242,7 +279,6 @@ High level wrapper for deploy. Doesn't require waitForTransaction. Response simi
 - **constructorCalldata**: constructor calldata
 - optional salt: address salt - default random
 - optional unique: bool if true ensure unique salt - default true
-- optional additionalCalls - optional additional calls array to support multi-call
 
 @param object **details** InvocationsDetails
 
@@ -275,14 +311,14 @@ Example:
   });
 ```
 
-<hr />
+---
 
-### DeclareDeploy
+### declareDeploy()
 
 ✅ NEW
 High level wrapper for declare & deploy. Doesn't require waitForTransaction. Functionality similar to deprecated provider deployContract. Declare and Deploy contract using single function.
 
-**declareDeploy**(payload [ , details ]) => _Promise < DeclareDeployContractResponse >_
+account.**declareDeploy**(payload [ , details ]) => _Promise < DeclareDeployUDCResponse >_
 
 @param object **_payload_** DeclareDeployContractPayload
 
@@ -291,7 +327,6 @@ High level wrapper for declare & deploy. Doesn't require waitForTransaction. Fun
 - optional constructorCalldata: constructor calldata
 - optional salt: address salt - default random
 - optional unique: bool if true ensure unique salt - default true
-- optional additionalCalls - optional additional calls array to support multi-call
 
 @param object **details** InvocationsDetails
 
@@ -299,10 +334,11 @@ High level wrapper for declare & deploy. Doesn't require waitForTransaction. Fun
 - optional version
 - optional maxFee
 
-@returns Promise object DeclareDeployContractResponse
+@returns Promise DeclareDeployUDCResponse
 
 - declare: CommonTransactionReceiptResponse
   - transaction_hash
+  - class_hash
 - deploy: DeployContractUDCResponse;
   - contract_address
   - transaction_hash
@@ -313,7 +349,7 @@ High level wrapper for declare & deploy. Doesn't require waitForTransaction. Fun
   - calldata_len
   - calldata
   - salt
-  <hr />
+  ***
 
 Example:
 
@@ -332,7 +368,9 @@ Example:
   const erc20Address = declareDeploy.deploy.contract_address;
 ```
 
-### deployAccount
+---
+
+### deployAccount()
 
 account.**deployAccount**(contractPayload [ , transactionsDetail ]) => _Promise < DeployContractResponse >_
 
@@ -362,7 +400,9 @@ The _transactionsDetail_ object may include any of:
 };
 ```
 
-<hr/>
+---
+
+### signMessage()
 
 account.**signMessage**(typedData) => _Promise < Signature >_
 
@@ -376,7 +416,9 @@ _typedData_ - JSON object to be signed
 string[];
 ```
 
-<hr />
+---
+
+### hashMessage()
 
 account.**hashMessage**(typedData) => _Promise < string >_
 
@@ -386,7 +428,9 @@ _typedData_ - JSON object to be signed
 
 Returns the hash of the JSON object.
 
-<hr />
+---
+
+### verifyMessageHash()
 
 account.**verifyMessageHash**(hash, signature) => _Promise < boolean >_
 
@@ -396,7 +440,9 @@ Verify a signature of a given hash.
 >
 > This method is not recommended, use `verifyMessage` instead
 
-<hr />
+---
+
+### verifyMessage()
 
 account.**verifyMessage**(typedData, signature) => _Promise < boolean >_
 
@@ -407,7 +453,9 @@ _signature_ - signature of the JSON object
 
 Returns true if the signature is valid, false otherwise
 
-<hr />
+---
+
+### getSuggestedMaxFee()
 
 account.**getSuggestedMaxFee**(estimateFeeAction, details) => _Promise < BigNumberish >_
 
@@ -418,7 +466,9 @@ The _details_ object may include any of:
 - details.**blockIdentifier**
 - details.**nonce**
 
-<hr />
+---
+
+### getStarkName()
 
 account.**getStarkName**(StarknetIdContract) => _Promise<string | Error>_
 
@@ -428,7 +478,9 @@ The _StarknetIdContract_ argument can be undefined, if it is, the function will 
 
 Returns directly a string (Example: `vitalik.stark`).
 
-<hr />
+---
+
+### getAddressFromStarkName()
 
 account.**getAddressFromStarkName**(name, StarknetIdContract) => _Promise<string | Error>_
 

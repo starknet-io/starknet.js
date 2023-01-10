@@ -35,6 +35,9 @@ const PROVIDER_URL = RPC_URL || BASE_URL;
 export const IS_LOCALHOST_DEVNET =
   PROVIDER_URL.includes('localhost') || PROVIDER_URL.includes('127.0.0.1');
 
+export const IS_DEVNET_RPC = IS_LOCALHOST_DEVNET && PROVIDER_URL.includes('rpc');
+export const IS_DEVNET_SEQUENCER = IS_LOCALHOST_DEVNET && !PROVIDER_URL.includes('rpc');
+
 /* Definitions */
 export const IS_RPC = !!RPC_URL;
 export const IS_SEQUENCER = !RPC_URL;
@@ -47,7 +50,7 @@ export const getTestProvider = (): ProviderInterface => {
   if (IS_LOCALHOST_DEVNET) {
     // accelerate the tests when running locally
     const originalWaitForTransaction = provider.waitForTransaction.bind(provider);
-    provider.waitForTransaction = (txHash, retryInterval) => {
+    provider.waitForTransaction = (txHash: string, retryInterval?: number) => {
       return originalWaitForTransaction(txHash, retryInterval || 1000);
     };
   }
@@ -80,5 +83,7 @@ export const describeIfSequencer = describeIf(IS_SEQUENCER);
 export const describeIfRpc = describeIf(IS_RPC);
 export const describeIfNotDevnet = describeIf(!IS_LOCALHOST_DEVNET);
 export const describeIfDevnet = describeIf(IS_LOCALHOST_DEVNET);
+export const describeIfDevnetRpc = describeIf(IS_DEVNET_RPC);
+export const describeIfDevnetSequencer = describeIf(IS_DEVNET_SEQUENCER);
 
 export const erc20ClassHash = '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a';
