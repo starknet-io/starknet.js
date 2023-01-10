@@ -3,6 +3,7 @@ sidebar_position: 4
 ---
 
 # 🔌 Connect an existing account :
+
 Once your provider initialized,you can connect an existing account.  
 You need 2 data :
 - the address of the account
@@ -10,7 +11,9 @@ You need 2 data :
 ```typescript
 import { Account, ec, Provider } from "starknet";
 ```
+
 ## Connect a predeployed account in Starknet-devnet :
+
 When you launch starknet-devnet, 10 accounts are predeployed with 100 dummy ETH in each. Addresses and private keys are displayed on the console at initialization. These data will change at each launch ; to freeze them, launch with : `starknet-devnet --seed 0`. The result for account #0 :   
 ```Account #0
 Address: 0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a
@@ -29,7 +32,9 @@ const accountAddress = "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd37
 const account = new Account(provider, accountAddress, starkKeyPair);
 ```
 Your account is now connect, and you can use it.
+
 ## 👛 Connect an existing account (in any network) :
+
 The code is exactly the same, you have just :
 - to connect to the appropriate network.
 - to use the address of this account (public data).

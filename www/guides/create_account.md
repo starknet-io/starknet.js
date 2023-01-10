@@ -1,7 +1,9 @@
 ---
 sidebar_position: 8
 ---
+
 # Create account
+
 Since there are no Externally Owned Accounts (EOA) in StarkNet, all Accounts in StarkNet are contracts.
 
 Unlike in Ethereum where a wallet is created with a public and private key pair, StarkNet Accounts are the only way to sign transactions and messages, and verify signatures. Therefore a Account - Contract interface is needed.
@@ -14,11 +16,13 @@ Create an account is a bit tricky ; you have several steps :
 4. Actual deployment of the Account
 
 ## Create OZ (Open Zeppelin) account :
+
 Here, we will create a wallet with the Open Zeppelin smartcontract v0.5.1. The contract class is already implemented in both Testnet 1 & 2.  
 ```typescript
 import { Account, ec, json, stark, Provider, hash } from "starknet";
 ```
 ### compute address :
+
 ```typescript
 // connect provider
 const provider = new Provider({ sequencer: { network: "goerli-alpha" } });
@@ -47,11 +51,17 @@ If you want a specific private key, replace `stark.randomAddress()` by your choi
 
 Then you have to fund this address.  
 How to proceed is out of the scope of this guide, by you can for example :
+
 - transfert ETH from an other wallet.
+
 - Bridge ETH to this Starknet address.
+
 - Use a faucet.
+
 - Mint ETH on starknet-devnet.
+
 ### deployment of the new account :
+
 If you have sent enough fund to this new address, you can go forward to the final step :
 ```typescript
 const OZaccount = new Account(provider, OZcontractAddress, starkKeyPair);
@@ -64,12 +74,14 @@ await provider.waitForTransaction(transaction_hash);
 console.log('✅ New OpenZeppelin account created.\n   address =', contract_address);
 ```
 ## Create AX (Argent X) account :
+
 Here, we will create a wallet with the ArgentX smartcontract v0.2.3. This case is more complicated, because we will have the wallet behind a proxy contract (by this way, the wallet contract can be updated). The contract classes of both contracts are already implemented in both Testnet 1 & 2.
 > If necessary OZ contracts can also be create with a proxy.
 ```typescript
 import { Account, ec, json, stark, Provider, hash } from "starknet";
 ```
 ### compute address :
+
 ```typescript
 // connect provider
 const provider = new Provider({ sequencer: { network: "goerli-alpha" } });
@@ -99,7 +111,9 @@ console.log('Precalculated account address=', AXcontractAddress);
 ```
 If you want a specific private key, replace `stark.randomAddress()` by your choice.  
 Then you have to fund this address.  
+
 ### deployment of the new account :
+
 If you have sent enough fund to this new address, you can go forward to the final step :
 ```typescript
 const accountAX = new Account(provider, AXcontractAddress, starkKeyPairAX);
@@ -112,17 +126,31 @@ const { transaction_hash: AXdAth, contract_address: AXcontractFinalAdress } = aw
 console.log('✅ ArgentX wallet deployed at :',AXcontractFinalAdress);
 ```
 ## Create your account abstraction :
+
 You are not limited to OZ or AX contracts ; you can create your own contract for wallet. It's the concept of Account Abstraction.
 You can customize entirely the wallet ; for example :
+
 - use a different concept of keys.
+
 - Add a guardian to save your account.
+
 - have the possibility to transfer the ownership of the wallet.
+
 - Add some administrators or a super-administrator.
+
 - Whitelist of address for transfer.
+
 - Multisig  
 
 The only limitation is your imagination...  
+
+> Prior to the declaration of the contract, do not forget to read the compiled contract with `json.parse` :  
+```typescript
+const compiledAAaccount = json.parse(fs.readFileSync("./compiled_contracts/myAccountAbstraction.json").toString("ascii")
+````
 Here an example of a customized wallet, including super administrator management, on a local starknet-devnet (launch `starknet-devnet --seed 0`  before using this script) :
+
+
 ```typescript
 import { Account, ec, json, stark, Provider, hash } from "starknet";
 import axios from "axios";

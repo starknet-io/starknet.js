@@ -56,8 +56,11 @@ const provider = new Provider({ rpc: { nodeUrl: '127.0.0.1:9545' } })
 ```
 
 ## Specific methods :
+
 Some methods are available only if connected to a sequencer ; some others are available only if connected to a node (RPC).
+
 ### Specific sequencer methods :
+
 For example, if you want to estimate the fee of a L1 ➡️ L2 message, you need to use a method available only from a sequencer ; the class SequencerProvider is available for this case :
 ```typescript
 import { SequencerProvider } from "starknet";
@@ -66,6 +69,7 @@ const responseEstimateMessageFee = await provider.estimateMessageFee(.....)
 ```
 
 ### Specific RPC methods :
+
 For example, if you want to read the events recorded in a range of blocks, you need to use a method available only from a RPC node ; the class RpcProvider is available for this case :
 ```typescript
 import { RpcProvider } from "starknet";

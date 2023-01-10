@@ -1,9 +1,13 @@
 ---
 sidebar_position: 11
 ---
+
 # Work with ERC20 tokens
+
 Based on what has been seen in the previous pages of this guide, we will use an ERC20 contract.
+
 ## What's an ERC20 :
+
 As in Ethereum, a token has an ERC20 contract to manage it. This contract contains a table, that lists the quantity of token own by each involved account :
 ![](./pictures/ERC20.png)
 
@@ -13,12 +17,14 @@ If you want to have your balance of a token, ask to its ERC20 contract, with the
 When you want to transfer some tokens in you possession, you have to use the ERC20 contract function `transfer`, through the `account.execute` function. By this way, Starknet.js will send to the account contract function `Execute` a message signed with the private key. This message contains the name of the function to call in the ERC20 contract, with its optional parameters. The account contract will use the public key to check that you have the private key, then will ask to the ERC20 contract to execute the requested function. By this way, the ERC20 contract is absolutely sure that the caller of the transfer function know the private key of this account.
 
 ## ETH token is an ERC20 in Starknet :
+
 In opposition with Ethereum, the ETH token is an ERC20 in Starknet, as all other tokens. In all networks, it's ERC20 contract address is : 
 ```typescript
 const addrETH = "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7";
 ```
 
 ## Deploy an ERC20 :
+
 Lets dive down the rabbit hole.  
 This example works with an ERC20 mintable (everybody can mint new tokens), that we will deploy on the devnet (launched with `starknet-devnet --seed 0`).   
 First, let's initialize an account :
@@ -63,6 +69,7 @@ erc20.connect(account0);
 
 
 ## Interact with an ERC20 :
+
 Here we will read the balance, mint new tokens, and transfer tokens :
 ```typescript
 // Check balance - should be 100

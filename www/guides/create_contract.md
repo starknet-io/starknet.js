@@ -1,7 +1,9 @@
 ---
 sidebar_position: 7
 ---
+
 # Create new contract
+
 When you have compiled your new Cairo contract, you can deploy it in the network.  
 In Starknet, a new contract has to be added in two phases :
 1. Create the contract class.
@@ -20,12 +22,16 @@ You will have only one Class Hash for a contract code, but you can have as many 
 ```typescript
 import { Provider, Account, Contract, ec, json, stark, uint256, shortString } from "starknet";
 ```
+
 ## Class Hash 😕 :
+
 TLDR : Starknet.js is not able to calculate a Class Hash 😮.  
 The Class Hash should be a result of the compilation, but today, it's not recorded in the compiled file. It could be calculated during the declaration activity, but it's actually too long to process.   
 So you need to calculate yourself the Class hash, and add it as constant in your code.
 >You can calculate it with some other tool, for example: [Starkli](https://github.com/xJonathanLEI/starkli)
+
 ## declareDeploy() your new contract :
+
 Starknet.js proposes a function to perform both operations in one step : `declareDeploy()`.  
 Here, to declare & deploy a Test.cairo smartcontract, in Testnet 1 :
 ```typescript
@@ -50,6 +56,7 @@ console.log('✅ Test Contract connected at =', myTestContract.address);
 ```
 
 ## deployContract() for a new instance :
+
 If the contract class is already deployed, it's faster and cheaper to use `deployContract()`.
 ```typescript
 // connect provider
@@ -74,6 +81,7 @@ const myTestContract = new Contract(testAbi, deployResponse.contract_address, pr
 console.log('✅ Test Contract connected at =', myTestContract.address);
 ```
 ## declare() for a new class :
+
 If you want only declare a new Contract Class, use `declare()`.
 
 ```typescript

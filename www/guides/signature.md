@@ -1,9 +1,13 @@
 ---
 sidebar_position: 14
 ---
+
 # Signature
+
 You can use Starknet.js to sign a message outside of the network.
+
 ## Sign and send a message :
+
 Your message has to be an array of BigNumberish. You calculate the hash of this message, then you calculate the signature.
 ```typescript
 import {ec, hash, number, json, Contract } from "starknet";
@@ -21,7 +25,9 @@ Then you can send, by any means, to the recipient of the message :
 - the message.
 - the signature.
 - the public key (or a wallet address).
+
 ## Receive and verify a message :
+
 On receiver side, you can verify that the sender of this message owns the private key corresponding to the public key sent. 
 
 ```typescript

@@ -1,11 +1,15 @@
 ---
 sidebar_position: 9
 ---
+
 # Data transformation 
+
 Cairo contracts and Javascript/Typescript languages do not have the same types of data.   
 So, it's necessary to prepare the data before sending them to a contract (for invoke/execute, or for a constructor).  
 On the other side, when a contract send data to your DAPP (result of a call), you have also to transform them before use in your code.
+
 ## Types of data :
+
 In Cairo, everything is felt, an integer on 251 bits.  
 This type do not exists in JS/TS ; you have Number, bigInt, string, array, objects... and types defined in libraries.   
 In Starknet.js, it's a bit ... complicated : you have the BigNumberish type  ; it can includes :
@@ -20,8 +24,10 @@ To convert a BN to BigInt : `const myBigInt=BigInt(myBN.toString());`
 
 
 ## function argument types :
+
 There are 4 different types of contract function arguments used in Starknet.js.
 ### Array of < BigNumberish > :
+
 You have to create by yourself this array of < BigNumberish >, in respect with the order of the Cairo function parameters :
 ```typescript
 const myCallData = [ // array of <BigNumberish>
@@ -38,6 +44,7 @@ const myCallData = [ // array of <BigNumberish>
 // in Typescript, this object type is : `RawCalldata`
 ```
 ### Object :
+
 You can list your parameters in an object: 
 - The names of the object parameters are the names of the Cairo function parameters. 
 - Simple types have to be converted in strings. 
@@ -60,7 +67,9 @@ Example for a constructor :
 > 🚨 In opposition with the object philosophy, your object content has to be ordered in respect with the order of the definition of the Cairo function parameters.
 
 > You can't send an array of cairo struct with this object type. 
+
 ### Array of < string > :
+
 You can create by yourself this array of < string >, in respect with the order of the Cairo function parameters :
 ```typescript
 const myCallData = [
@@ -96,7 +105,9 @@ const ERC20ConstructorCallData = stark.compileCalldata({
 	owner: account0.address 
 });
 ```
+
 ### Array of < any > :
+
 With this type, you can includes :
 - BigNumberish 
 - objects representing a Cairo struct
@@ -130,7 +141,9 @@ interface c3D {
     }
 ```
 >Same for arrays : their elements must have the BigNumberish type.
+
 ### summary table for arguments : 
+
 These 4 types of arguments can't be used at your convenience everywhere. Here a table showing which type can be used in which function :  
 |Function|array of < BigNumberish >|array of < string >| object|array of < any >|MultiInvoke|
 |---:|:---:|:---:|:---:|:---:|:---:|
@@ -153,6 +166,7 @@ import { type RawCalldata } from "starknet/dist/types/lib";
 ```
  
 ## Receive data from a Cairo contract :
+
 When you perform a call, you have the result in an object :  
 - With a contract.call : `const result=contract.call("read_val", myParameters)`.
 - With a contract.meta-class : `const result=contract.read_val(...myParameters)`.

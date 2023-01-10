@@ -1,7 +1,9 @@
 ---
 sidebar_position: 5
 ---
+
 # 🔌 Connect a deployed contract :
+
 Once your provider initialized, you can connect a contract already deployed in the network.  
 You need 2 data :
 - the address of the contract
@@ -11,11 +13,14 @@ You need 2 data :
 ```typescript
 import { Provider, Contract, json } from "starknet";
 ```
+
 ## Get the abi from a compiled file :
+
 If you have the compiled file of the contract, use this code to recover all data, including ABI :
 ```typescript
 const compiledContract = json.parse(fs.readFileSync("./compiledContracts/test.json").toString("ascii"));
 ```
+
 ## Connect the contract :
 
 ```typescript

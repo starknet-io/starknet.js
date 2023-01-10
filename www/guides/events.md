@@ -1,6 +1,7 @@
 ---
 sidebar_position: 12
 ---
+
 # Reading emitted events
 
 ## Starknet events :
@@ -13,7 +14,9 @@ A contract may emit events throughout its execution. Each event contains the fol
     data: a list of field elements
 
 The events are stored in a block of the blockchain.
+
 ## Events in the Cairo code :
+
 You have to analyze the Cairo code of your smart contract, to recover the list of data emitted by the event :
 ```cairo     
 @event
@@ -44,6 +47,7 @@ Once compiled, this code will generate an abi file containing :
 ```
 
 ## Recover the event data :
+
 Once the `my_func` invoked, the event is stored in the blockchain and you have in return the transaction hash.  
 ```javascript
 const resu = await myTestContract.invoke("my_func");
