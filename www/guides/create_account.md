@@ -58,7 +58,13 @@ How to proceed is out of the scope of this guide, by you can for example :
 
 - Use a faucet.
 
-- Mint ETH on starknet-devnet.
+- transfer ETH from another wallet.
+- Bridge ETH to this Starknet address.
+- Use a faucet. (https://faucet.goerli.starknet.io/)
+- Mint ETH on starknet-devnet, like so:
+```bash
+curl -X POST http://127.0.0.1:5050/mint -d '{"address":"0x04a093c37ab61065d001550089b1089922212c60b34e662bb14f2f91faee2979","amount":50000000000000000000,"lite":true}' -H "Content-Type:application/json"
+// {"new_balance":50000000000000000000,"tx_hash":null,"unit":"wei"}
 
 ### deployment of the new account :
 
