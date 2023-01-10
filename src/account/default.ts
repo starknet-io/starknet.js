@@ -284,7 +284,6 @@ export class Account extends Provider implements AccountInterface {
     );
 
     const response = await super.getEstimateFeeBulk(params, blockIdentifier);
-    console.log('🚀 ~ file: default.ts:287 ~ Account ~ response', response);
 
     return [].concat(response as []).map((elem: any) => {
       const suggestedMaxFee = estimatedFeeToMaxFee(elem.overall_fee);
