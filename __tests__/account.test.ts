@@ -18,6 +18,7 @@ import {
   compiledOpenZeppelinAccount,
   compiledStarknetId,
   compiledTestDapp,
+  describeIfDevnetSequencer,
   describeIfSequencer,
   erc20ClassHash,
   getTestAccount,
@@ -71,32 +72,34 @@ describe('deploy and test Wallet', () => {
     innerInvokeEstFeeSpy.mockClear();
   });
 
-  test('estimate fee bulk', async () => {
-    const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
-    const estimatedFeeBulk = await account.estimateFeeBulk([
-      {
-        type: 'INVOKE_FUNCTION',
-        payload: {
-          contractAddress: erc20Address,
-          entrypoint: 'transfer',
-          calldata: [erc20.address, '10', '0'],
+  describeIfDevnetSequencer('Estimate Fee Bulk on Sequencer', () => {
+    test('estimate fee bulk', async () => {
+      const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
+      const estimatedFeeBulk = await account.estimateFeeBulk([
+        {
+          type: 'INVOKE_FUNCTION',
+          payload: {
+            contractAddress: erc20Address,
+            entrypoint: 'transfer',
+            calldata: [erc20.address, '10', '0'],
+          },
         },
-      },
-      {
-        type: 'INVOKE_FUNCTION',
-        payload: {
-          contractAddress: erc20Address,
-          entrypoint: 'transfer',
-          calldata: [erc20.address, '10', '0'],
+        {
+          type: 'INVOKE_FUNCTION',
+          payload: {
+            contractAddress: erc20Address,
+            entrypoint: 'transfer',
+            calldata: [erc20.address, '10', '0'],
+          },
         },
-      },
-    ]);
+      ]);
 
-    expect(estimatedFeeBulk[0]).toHaveProperty('suggestedMaxFee');
-    expect(estimatedFeeBulk.length).toEqual(2);
-    expect(isBN(estimatedFeeBulk[0].overall_fee)).toBe(true);
-    expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
-    innerInvokeEstFeeSpy.mockClear();
+      expect(estimatedFeeBulk[0]).toHaveProperty('suggestedMaxFee');
+      expect(estimatedFeeBulk.length).toEqual(2);
+      expect(isBN(estimatedFeeBulk[0].overall_fee)).toBe(true);
+      expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
+      innerInvokeEstFeeSpy.mockClear();
+    });
   });
 
   test('read balance of wallet', async () => {
