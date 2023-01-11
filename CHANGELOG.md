@@ -1,3 +1,9 @@
+## [4.19.2](https://github.com/0xs34n/starknet.js/compare/v4.19.1...v4.19.2) (2023-01-11)
+
+### Bug Fixes
+
+- repair and unify transaction retrieval error ([ea5e646](https://github.com/0xs34n/starknet.js/commit/ea5e64651bf47824b254ae73ed8aa88998a5be44))
+
 ## [4.19.1](https://github.com/0xs34n/starknet.js/compare/v4.19.0...v4.19.1) (2023-01-10)
 
 ### Bug Fixes
