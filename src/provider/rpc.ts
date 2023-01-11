@@ -28,6 +28,7 @@ import {
 } from '../utils/number';
 import { parseCalldata, wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
+import { LibraryError } from './errors';
 import { ProviderInterface } from './interface';
 import { Block, BlockIdentifier } from './utils';
 
@@ -82,7 +83,7 @@ export class RpcProvider implements ProviderInterface {
   protected errorHandler(error: any) {
     if (error) {
       const { code, message } = error;
-      throw new Error(`${code}: ${message}`);
+      throw new LibraryError(`${code}: ${message}`);
     }
   }
 
