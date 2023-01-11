@@ -62,6 +62,7 @@ Some methods are available only if connected to a sequencer ; some others are av
 ### Specific sequencer methods :
 
 For example, if you want to estimate the fee of a L1 ➡️ L2 message, you need to use a method available only from a sequencer ; the class SequencerProvider is available for this case :
+
 ```typescript
 import { SequencerProvider } from "starknet";
 const provider = new SequencerProvider({ baseUrl: "https://alpha4-2.starknet.io" }); // for testnet 2
@@ -71,6 +72,7 @@ const responseEstimateMessageFee = await provider.estimateMessageFee(.....)
 ### Specific RPC methods :
 
 For example, if you want to read the events recorded in a range of blocks, you need to use a method available only from a RPC node ; the class RpcProvider is available for this case :
+
 ```typescript
 import { RpcProvider } from "starknet";
 const providerRPC = new RpcProvider({ nodeUrl: "http://192.168.1.99:9545" }); // for a pathfinder node located in a PC in the local network
@@ -81,4 +83,3 @@ let eventsList = await providerRPC.getEvents({
         chunk_size: 1000
     });
 ```
-

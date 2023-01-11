@@ -102,6 +102,22 @@ describe('deploy and test Wallet', () => {
     });
   });
 
+  describeIfDevnetSequencer('Simulate transaction on Sequencer', () => {
+    test('simulate transaction', async () => {
+      const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
+      const res = await account.simulateTransaction({
+        contractAddress: erc20Address,
+        entrypoint: 'transfer',
+        calldata: [erc20.address, '10', '0'],
+      });
+      expect(res).toHaveProperty('fee_estimation');
+      expect(res.fee_estimation).toHaveProperty('suggestedMaxFee');
+      expect(res).toHaveProperty('trace');
+      expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
+      innerInvokeEstFeeSpy.mockClear();
+    });
+  });
+
   test('read balance of wallet', async () => {
     const x = await erc20.balanceOf(account.address);
 

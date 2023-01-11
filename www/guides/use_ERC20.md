@@ -18,7 +18,8 @@ When you want to transfer some tokens in you possession, you have to use the ERC
 
 ## ETH token is an ERC20 in Starknet :
 
-In opposition with Ethereum, the ETH token is an ERC20 in Starknet, as all other tokens. In all networks, it's ERC20 contract address is : 
+In opposition with Ethereum, the ETH token is an ERC20 in Starknet, as all other tokens. In all networks, it's ERC20 contract address is :
+
 ```typescript
 const addrETH = "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7";
 ```
@@ -26,8 +27,9 @@ const addrETH = "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004
 ## Deploy an ERC20 :
 
 Lets dive down the rabbit hole.  
-This example works with an ERC20 mintable (everybody can mint new tokens), that we will deploy on the devnet (launched with `starknet-devnet --seed 0`).   
+This example works with an ERC20 mintable (everybody can mint new tokens), that we will deploy on the devnet (launched with `starknet-devnet --seed 0`).  
 First, let's initialize an account :
+
 ```typescript
 // intialize provider
 const provider = new Provider({ sequencer: { baseUrl:"http://127.0.0.1:5050"  } });
@@ -40,23 +42,24 @@ const account0 = new Account(provider, accountAddress, starkKeyPair);
 ```
 
 Declaration and deployment of the ERC20 contract :
+
 ```typescript
-// Deploy an ERC20 contract 
+// Deploy an ERC20 contract
 console.log("Deployment Tx - ERC20 Contract to StarkNet...");
 const compiledErc20mintable = json.parse(fs.readFileSync("compiled_contracts/ERC20MintableOZ051.json").toString("ascii"));
 const ERC20mintableClassHash = "0x795be772eab12ee65d5f3d9e8922d509d6672039978acc98697c0a563669e8";
 const initialTk = { low: 100, high: 0 };
-const ERC20ConstructorCallData = stark.compileCalldata({ 
-    name: shortString.encodeShortString('MyToken'), 
-    symbol: shortString.encodeShortString('MTK'), 
-    decimals: "18", 
-    initial_supply: { type: 'struct', low: initialTk.low, high: initialTk.high }, 
-    recipient: account0.address, 
+const ERC20ConstructorCallData = stark.compileCalldata({
+    name: shortString.encodeShortString('MyToken'),
+    symbol: shortString.encodeShortString('MTK'),
+    decimals: "18",
+    initial_supply: { type: 'struct', low: initialTk.low, high: initialTk.high },
+    recipient: account0.address,
     owner: account0.address });
     console.log("constructor=", ERC20ConstructorCallData);
-const deployERC20Response = await account0.declareDeploy({ 
-    classHash: ERC20mintableClassHash, 
-    contract: compiledErc20mintable, 
+const deployERC20Response = await account0.declareDeploy({
+    classHash: ERC20mintableClassHash,
+    contract: compiledErc20mintable,
     constructorCalldata: ERC20ConstructorCallData });
     console.log("ERC20 deployed at address: ", deployERC20Response.deploy.contract_address);
 
@@ -67,10 +70,10 @@ const erc20 = new Contract(compiledErc20mintable.abi, erc20Address, provider);
 erc20.connect(account0);
 ```
 
-
 ## Interact with an ERC20 :
 
 Here we will read the balance, mint new tokens, and transfer tokens :
+
 ```typescript
 // Check balance - should be 100
 console.log(`Calling StarkNet for account balance...`);
@@ -81,8 +84,8 @@ console.log("account0 has a balance of :", uint256.uint256ToBN(balanceInitial.ba
 const amountToMint = uint256.bnToUint256(1000);
 console.log("Invoke Tx - Minting 1000 tokens to account0...");
 const { transaction_hash: mintTxHash } = await erc20.mint(
-	account0.address, 
-	amountToMint, 
+	account0.address,
+	amountToMint,
 	{ maxFee: 900_000_000_000_000 });
 // Wait for the invoke transaction to be accepted on StarkNet
 console.log(`Waiting for Tx to be Accepted on Starknet - Minting...`);
@@ -95,14 +98,14 @@ console.log("account0 has a balance of :", uint256.uint256ToBN(balanceBeforeTran
 // Execute tx transfer of 10 tokens
 console.log(`Invoke Tx - Transfer 10 tokens back to erc20 contract...`);
 const toTransferTk: uint256.Uint256 = uint256.bnToUint256(10);
-const transferCallData = stark.compileCalldata({ 
-	recipient: erc20Address, 
+const transferCallData = stark.compileCalldata({
+	recipient: erc20Address,
 	initial_supply: { type: 'struct', low: toTransferTk.low, high: toTransferTk.high } });
-const { transaction_hash: transferTxHash } = await account0.execute({ 
-	contractAddress: erc20Address, 
-	entrypoint: "transfer", 
-	calldata: transferCallData, }, 
-	undefined, 
+const { transaction_hash: transferTxHash } = await account0.execute({
+	contractAddress: erc20Address,
+	entrypoint: "transfer",
+	calldata: transferCallData, },
+	undefined,
 	{ maxFee: 900_000_000_000_000 });
 // Wait for the invoke transaction to be accepted on StarkNet
 console.log(`Waiting for Tx to be Accepted on Starknet - Transfer...`);

@@ -27,6 +27,7 @@ import {
   InvokeFunctionResponse,
   KeyPair,
   MultiDeployContractResponse,
+  Sequencer,
   Signature,
   TransactionBulk,
   UniversalDeployerContractPayload,
@@ -636,5 +637,35 @@ export class Account extends Provider implements AccountInterface {
       };
     });
     return calls;
+  }
+
+  public async simulateTransaction(
+    calls: AllowArray<Call>,
+    { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
+  ): Promise<Sequencer.TransactionSimulationResponse> {
+    const transactions = Array.isArray(calls) ? calls : [calls];
+    const nonce = toBN(providedNonce ?? (await this.getNonce()));
+    const version = toBN(feeTransactionVersion);
+    const chainId = await this.getChainId();
+
+    const signerDetails: InvocationsSignerDetails = {
+      walletAddress: this.address,
+      nonce,
+      maxFee: ZERO,
+      version,
+      chainId,
+    };
+
+    const invocation = await this.buildInvocation(transactions, signerDetails);
+    const response: any = await super.getSimulateTransaction(
+      { ...invocation },
+      { version, nonce },
+      blockIdentifier
+    );
+
+    const suggestedMaxFee = estimatedFeeToMaxFee(response.fee_estimation.overall_fee);
+    response.fee_estimation.suggestedMaxFee = suggestedMaxFee;
+
+    return response;
   }
 }
