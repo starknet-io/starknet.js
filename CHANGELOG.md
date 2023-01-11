@@ -1,3 +1,9 @@
+# [5.0.0-beta.2](https://github.com/0xs34n/starknet.js/compare/v5.0.0-beta.1...v5.0.0-beta.2) (2023-01-11)
+
+### Bug Fixes
+
+- bnToUint256 and add more tests ([baa9d61](https://github.com/0xs34n/starknet.js/commit/baa9d611b18725ba269818631f668183212988df))
+
 # [5.0.0-beta.1](https://github.com/0xs34n/starknet.js/compare/v4.18.0...v5.0.0-beta.1) (2023-01-07)
 
 ### Bug Fixes
