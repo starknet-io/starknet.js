@@ -656,15 +656,20 @@ export class Account extends Provider implements AccountInterface {
     };
 
     const invocation = await this.buildInvocation(transactions, signerDetails);
-    const response: any = await super.getSimulateTransaction(
+    const response = await super.getSimulateTransaction(
       invocation,
       { version, nonce },
       blockIdentifier
     );
 
     const suggestedMaxFee = estimatedFeeToMaxFee(response.fee_estimation.overall_fee);
-    response.fee_estimation.suggestedMaxFee = suggestedMaxFee;
 
-    return response;
+    return {
+      ...response,
+      fee_estimation: {
+        ...response.fee_estimation,
+        suggestedMaxFee,
+      },
+    };
   }
 }
