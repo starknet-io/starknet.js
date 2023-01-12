@@ -38,7 +38,7 @@ const multiCall = await account.execute(
     // Calling the first contract
     {
     contractAddress: contractAddress_1,
-    entrypoint: "approve", 
+    entrypoint: "approve",
     // approve 1 wei for bridge
     calldata: stark.compileCalldata({
         spender: contractAddress_2,
