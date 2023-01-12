@@ -136,7 +136,7 @@ export type EstimateFeeAction =
 
 export type EstimateFeeResponseBulk = Array<EstimateFeeResponse>;
 
-export type TransactionSimulationResponse = {
+export interface TransactionSimulationResponse {
   trace: TransactionTraceResponse;
   fee_estimation: EstimateFeeResponse;
-};
+}

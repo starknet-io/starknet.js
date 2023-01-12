@@ -503,6 +503,6 @@ Simulates the transaction and returns the transaction trace and estimated fee.
 ```typescript
 {
   trace: TransactionTraceResponse;
-  fee_estimation: EstimateFeeResponse;
+  fee_estimation: EstimateFee;
 }
 ```

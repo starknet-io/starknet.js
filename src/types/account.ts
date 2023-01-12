@@ -2,7 +2,11 @@ import BN from 'bn.js';
 
 import { BlockIdentifier } from '../provider/utils';
 import { BigNumberish } from '../utils/number';
-import { DeclareTransactionReceiptResponse, EstimateFeeResponse } from './provider';
+import {
+  DeclareTransactionReceiptResponse,
+  EstimateFeeResponse,
+  TransactionSimulationResponse,
+} from './provider';
 
 export interface EstimateFee extends EstimateFeeResponse {
   suggestedMaxFee: BN;
@@ -43,3 +47,7 @@ export type DeclareDeployUDCResponse = {
   } & DeclareTransactionReceiptResponse;
   deploy: DeployContractUDCResponse;
 };
+
+export interface TransactionSimulation extends TransactionSimulationResponse {
+  fee_estimation: EstimateFee;
+}

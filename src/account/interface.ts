@@ -21,7 +21,7 @@ import {
   MultiDeployContractResponse,
   Signature,
   TransactionBulk,
-  TransactionSimulationResponse,
+  TransactionSimulation,
   UniversalDeployerContractPayload,
 } from '../types';
 import { BigNumberish } from '../utils/number';
@@ -340,5 +340,5 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract simulateTransaction(
     calls: AllowArray<Call>,
     estimateFeeDetails?: EstimateFeeDetails
-  ): Promise<TransactionSimulationResponse>;
+  ): Promise<TransactionSimulation>;
 }

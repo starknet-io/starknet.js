@@ -29,10 +29,9 @@ import {
   MultiDeployContractResponse,
   Signature,
   TransactionBulk,
-  TransactionSimulationResponse,
   UniversalDeployerContractPayload,
 } from '../types';
-import { EstimateFeeBulk } from '../types/account';
+import { EstimateFeeBulk, TransactionSimulation } from '../types/account';
 import { parseUDCEvent } from '../utils/events';
 import {
   calculateContractAddressFromHash,
@@ -642,7 +641,7 @@ export class Account extends Provider implements AccountInterface {
   public async simulateTransaction(
     calls: AllowArray<Call>,
     { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
-  ): Promise<TransactionSimulationResponse> {
+  ): Promise<TransactionSimulation> {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = toBN(providedNonce ?? (await this.getNonce()));
     const version = toBN(feeTransactionVersion);
@@ -658,7 +657,7 @@ export class Account extends Provider implements AccountInterface {
 
     const invocation = await this.buildInvocation(transactions, signerDetails);
     const response: any = await super.getSimulateTransaction(
-      { ...invocation },
+      invocation,
       { version, nonce },
       blockIdentifier
     );
