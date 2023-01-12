@@ -6,17 +6,26 @@ sidebar_position: 11
 
 Based on what has been seen in the previous pages of this guide, we will use an ERC20 contract.
 
-## What's an ERC20 :
+## What's an ERC20
 
-As in Ethereum, a token has an ERC20 contract to manage it. This contract contains a table, that lists the quantity of token own by each involved account :
+As in Ethereum, a token has an ERC20 contract to manage it. This contract contains a table, that lists the quantity of tokens owned by each involved account :
 ![](./pictures/ERC20.png)
 
-For example, the Account address 2 own 100 token of this ERC20 contract.  
-Users have the feeling that their tokens are stored in their wallet, but it's absolutely false. You have no list of assets stored in your account contract. In fact, a token has its own ERC20 contract, and the amount of token owned by your account address is stored in this contract.  
-If you want to have your balance of a token, ask to its ERC20 contract, with the function `ERC20contract.balanceOf(accountAddress)`.  
-When you want to transfer some tokens in you possession, you have to use the ERC20 contract function `transfer`, through the `account.execute` function. By this way, Starknet.js will send to the account contract function `Execute` a message signed with the private key. This message contains the name of the function to call in the ERC20 contract, with its optional parameters. The account contract will use the public key to check that you have the private key, then will ask to the ERC20 contract to execute the requested function. By this way, the ERC20 contract is absolutely sure that the caller of the transfer function know the private key of this account.
+For example, the Account address 2 owns 100 token of this ERC20 contract.
 
-## ETH token is an ERC20 in Starknet :
+Users have the feeling that their tokens are stored in their wallet, but it's absolutely false. You have no list of assets stored in your account contract. In fact, a token has its own ERC20 contract, and the amount of token owned by your account address is stored in this contract.
+
+If you want to have your balance of a token, ask its ERC20 contract, with the function `ERC20contract.balanceOf(accountAddress)`.
+
+When you want to transfer some tokens in you possession, you have to use the ERC20 contract function `transfer`, through the `account.execute` function. In this way, Starknet.js will send to the account contract function `Execute` a message signed with the private key.
+
+This message contains the name of the function to call in the ERC20 contract, with its optional parameters.
+
+The account contract will use the public key to check that you have the private key, then will ask to the ERC20 contract to execute the requested function.
+
+This way, the ERC20 contract is absolutely sure that the caller of the transfer function knows the private key of this account.
+
+## ETH token is an ERC20 in Starknet
 
 In opposition with Ethereum, the ETH token is an ERC20 in Starknet, as all other tokens. In all networks, it's ERC20 contract address is :
 
@@ -24,10 +33,12 @@ In opposition with Ethereum, the ETH token is an ERC20 in Starknet, as all other
 const addrETH = "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7";
 ```
 
-## Deploy an ERC20 :
+## Deploy an ERC20
 
-Lets dive down the rabbit hole.  
-This example works with an ERC20 mintable (everybody can mint new tokens), that we will deploy on the devnet (launched with `starknet-devnet --seed 0`).  
+Lets dive down the rabbit hole!
+
+This example works with an ERC20 mintable (everybody can mint new tokens), that we will deploy on the devnet (launched with `starknet-devnet --seed 0`).
+
 First, let's initialize an account :
 
 ```typescript
@@ -49,19 +60,24 @@ console.log("Deployment Tx - ERC20 Contract to StarkNet...");
 const compiledErc20mintable = json.parse(fs.readFileSync("compiled_contracts/ERC20MintableOZ051.json").toString("ascii"));
 const ERC20mintableClassHash = "0x795be772eab12ee65d5f3d9e8922d509d6672039978acc98697c0a563669e8";
 const initialTk = { low: 100, high: 0 };
+
 const ERC20ConstructorCallData = stark.compileCalldata({
     name: shortString.encodeShortString('MyToken'),
     symbol: shortString.encodeShortString('MTK'),
     decimals: "18",
     initial_supply: { type: 'struct', low: initialTk.low, high: initialTk.high },
     recipient: account0.address,
-    owner: account0.address });
-    console.log("constructor=", ERC20ConstructorCallData);
+    owner: account0.address
+});
+console.log("constructor=", ERC20ConstructorCallData);
+
 const deployERC20Response = await account0.declareDeploy({
     classHash: ERC20mintableClassHash,
     contract: compiledErc20mintable,
-    constructorCalldata: ERC20ConstructorCallData });
-    console.log("ERC20 deployed at address: ", deployERC20Response.deploy.contract_address);
+    constructorCalldata: ERC20ConstructorCallData
+});
+
+console.log("ERC20 deployed at address: ", deployERC20Response.deploy.contract_address);
 
 // Get the erc20 contract address
 const erc20Address = deployERC20Response.deploy.contract_address;
@@ -70,7 +86,7 @@ const erc20 = new Contract(compiledErc20mintable.abi, erc20Address, provider);
 erc20.connect(account0);
 ```
 
-## Interact with an ERC20 :
+## Interact with an ERC20
 
 Here we will read the balance, mint new tokens, and transfer tokens :
 
@@ -86,10 +102,13 @@ console.log("Invoke Tx - Minting 1000 tokens to account0...");
 const { transaction_hash: mintTxHash } = await erc20.mint(
 	account0.address,
 	amountToMint,
-	{ maxFee: 900_000_000_000_000 });
+	{ maxFee: 900_000_000_000_000 }
+);
+
 // Wait for the invoke transaction to be accepted on StarkNet
 console.log(`Waiting for Tx to be Accepted on Starknet - Minting...`);
 await provider.waitForTransaction(mintTxHash);
+
 // Check balance - should be 1100
 console.log(`Calling StarkNet for account balance...`);
 const balanceBeforeTransfer = await erc20.balanceOf(account0.address);
@@ -100,16 +119,21 @@ console.log(`Invoke Tx - Transfer 10 tokens back to erc20 contract...`);
 const toTransferTk: uint256.Uint256 = uint256.bnToUint256(10);
 const transferCallData = stark.compileCalldata({
 	recipient: erc20Address,
-	initial_supply: { type: 'struct', low: toTransferTk.low, high: toTransferTk.high } });
+	initial_supply: { type: 'struct', low: toTransferTk.low, high: toTransferTk.high }
+});
+
 const { transaction_hash: transferTxHash } = await account0.execute({
 	contractAddress: erc20Address,
 	entrypoint: "transfer",
 	calldata: transferCallData, },
 	undefined,
-	{ maxFee: 900_000_000_000_000 });
+	{ maxFee: 900_000_000_000_000 }
+);
+
 // Wait for the invoke transaction to be accepted on StarkNet
 console.log(`Waiting for Tx to be Accepted on Starknet - Transfer...`);
 await provider.waitForTransaction(transferTxHash);
+
 // Check balance after transfer - should be 1090
 console.log(`Calling StarkNet for account balance...`);
 const balanceAfterTransfer = await erc20.balanceOf(account0.address);

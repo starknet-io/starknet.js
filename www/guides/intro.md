@@ -7,7 +7,6 @@ sidebar_position: 1
 ## Installation
 
 ```bash
-
 # use the main branch
 
 npm install starknet

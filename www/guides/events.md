@@ -4,7 +4,7 @@ sidebar_position: 12
 
 # Reading emitted events
 
-## Starknet events :
+## Starknet events
 
 A contract may emit events throughout its execution. Each event contains the following fields:
 
@@ -12,9 +12,9 @@ A contract may emit events throughout its execution. Each event contains the fol
     keys: a list of field elements
     data: a list of field elements
 
-The events are stored in a block of the blockchain.
+The events are stored in a block on the blockchain.
 
-## Events in the Cairo code :
+## Events in the Cairo code
 
 You have to analyze the Cairo code of your smart contract, to recover the list of data emitted by the event :
 
@@ -33,6 +33,7 @@ func my_func{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}() 
 ```
 
 Here, we can see that the event will store 3 felts.
+
 Once compiled, this code will generate an abi file containing :
 
 ```typescript
@@ -48,13 +49,13 @@ Once compiled, this code will generate an abi file containing :
 }
 ```
 
-## Recover the event data :
+## Recover the event data
 
-Once the `my_func` invoked, the event is stored in the blockchain and you have in return the transaction hash.
+Once the `my_func` is invoked, the event is stored in the blockchain and you get in return the transaction hash.
 
 ```javascript
 const resu = await myTestContract.invoke("my_func");
-const txReceiptDeployTest await provider.waitForTransaction(resu.transaction_hash);
+const txReceiptDeployTest = await provider.waitForTransaction(resu.transaction_hash);
 ```
 
 In Typescript, you have to change a little the code :
@@ -63,11 +64,11 @@ In Typescript, you have to change a little the code :
 import { number, InvokeTransactionReceiptResponse } from "starknet";
 
 const resu = await myTestContract.invoke("my_func");
-const txReceiptDeployTest: InvokeTransactionReceiptResponse await provider.waitForTransaction(resu.transaction_hash);
+const txReceiptDeployTest: InvokeTransactionReceiptResponse = await provider.waitForTransaction(resu.transaction_hash);
 console.log("events =",txReceiptDeployTest.events);
 ```
 
-Now, you have all the events of the block. Here, we have 2 events ; the last one contains our data :
+Now, you have all the events of the block. Here, we have 2 events - the last one contains our data :
 
 ```typescript
 [
@@ -98,14 +99,11 @@ Now, you have all the events of the block. Here, we have 2 events ; the last one
 Use the contract deployment address, to filter the events and read the data from your smart contract :
 
 ```typescript
-if (!txReceiptDeployTest.events) {
-        throw new Error('List of events is empty');
-    }
 const event = txReceiptDeployTest.events.find(
-        (it) => number.cleanHex(it.from_address) === number.cleanHex(testContractAddress)
-    ) || {data: []};
+  (it) => number.cleanHex(it.from_address) === number.cleanHex(testContractAddress)
+) || {data: []};
+
 const eventD1 = event.data[0];
 const eventD2 = event.data[1];
-const eventD3 = event.data[2]
-    };
+const eventD3 = event.data[2];
 ```

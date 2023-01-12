@@ -2,11 +2,11 @@
 sidebar_position: 2
 ---
 
-# What's Starknet.js ?
+# What is Starknet.js ?
 
-Starknet.js is a way to connect your website or your Digital Application (DAPP) to the blockchain-based Starknet network, using Javascript/Typescript language.
+Starknet.js is a library that helps to connect your website or your Decentralized Application (DAPP) to the blockchain-based Starknet network, using Javascript / Typescript language.
 
-## Overview :
+## Overview
 
 ![](./pictures/starknet-js-chart.png)
 
@@ -23,9 +23,9 @@ Some important topics that have to be understood:
   - private customized version of Starknet.
   - local Starknet node (connected to mainnet or testnet).
 
-- Only the Provider object is talking directly to the network ; your DAPP will talk mainly to Account and Contract objects. You will define with the Provider with which network you want to work. You can ask to the Provider some low level data of the network (block,timestamp, ...).
-- Signer and Utils objects contains many useful functions for the interaction with Starknet.js.
-- The Contract object is mainly used to read the memory of a blockchain contract.
-- The Account object is the most useful :
+- Only the `Provider` object is talking directly to the network - your DAPP will talk mainly to `Account` and `Contract` objects. You will define with the `Provider` with which network you want to work. You can ask the Provider some low level data of the network (block, timestamp, ...).
+- `Signer` and `Utils` objects contain many useful functions for the interaction with Starknet.js.
+- The `Contract` object is mainly used to read the memory of a blockchain contract.
+- The `Account` object is the most useful :
   - as wallet, to store your tokens.
   - as a way to pay the fees to the network, to be able to write in its memory.
