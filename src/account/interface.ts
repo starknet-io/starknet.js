@@ -21,6 +21,7 @@ import {
   MultiDeployContractResponse,
   Signature,
   TransactionBulk,
+  TransactionSimulation,
   UniversalDeployerContractPayload,
 } from '../types';
 import { BigNumberish } from '../utils/number';
@@ -325,4 +326,19 @@ export abstract class AccountInterface extends ProviderInterface {
     estimateFeeAction: EstimateFeeAction,
     details: EstimateFeeDetails
   ): Promise<BigNumberish>;
+
+  /**
+   * Simulates the transaction and returns the transaction trace and estimated fee.
+   *
+   * @param calls the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   *
+   * @returns response from estimate_fee
+   */
+  public abstract simulateTransaction(
+    calls: AllowArray<Call>,
+    estimateFeeDetails?: EstimateFeeDetails
+  ): Promise<TransactionSimulation>;
 }

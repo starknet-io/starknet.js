@@ -31,7 +31,7 @@ import {
   TransactionBulk,
   UniversalDeployerContractPayload,
 } from '../types';
-import { EstimateFeeBulk } from '../types/account';
+import { EstimateFeeBulk, TransactionSimulation } from '../types/account';
 import { parseUDCEvent } from '../utils/events';
 import {
   calculateContractAddressFromHash,
@@ -636,5 +636,40 @@ export class Account extends Provider implements AccountInterface {
       };
     });
     return calls;
+  }
+
+  public async simulateTransaction(
+    calls: AllowArray<Call>,
+    { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
+  ): Promise<TransactionSimulation> {
+    const transactions = Array.isArray(calls) ? calls : [calls];
+    const nonce = toBN(providedNonce ?? (await this.getNonce()));
+    const version = toBN(feeTransactionVersion);
+    const chainId = await this.getChainId();
+
+    const signerDetails: InvocationsSignerDetails = {
+      walletAddress: this.address,
+      nonce,
+      maxFee: ZERO,
+      version,
+      chainId,
+    };
+
+    const invocation = await this.buildInvocation(transactions, signerDetails);
+    const response = await super.getSimulateTransaction(
+      invocation,
+      { version, nonce },
+      blockIdentifier
+    );
+
+    const suggestedMaxFee = estimatedFeeToMaxFee(response.fee_estimation.overall_fee);
+
+    return {
+      ...response,
+      fee_estimation: {
+        ...response.fee_estimation,
+        suggestedMaxFee,
+      },
+    };
   }
 }
