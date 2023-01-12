@@ -18,8 +18,8 @@ import type {
   InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
-  Sequencer,
   Status,
+  TransactionSimulationResponse,
 } from '../types';
 import type { BigNumberish } from '../utils/number';
 import { BlockIdentifier } from './utils';
@@ -317,5 +317,5 @@ export abstract class ProviderInterface {
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
     blockIdentifier?: BlockIdentifier
-  ): Promise<Sequencer.TransactionSimulationResponse>;
+  ): Promise<TransactionSimulationResponse>;
 }

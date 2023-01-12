@@ -4,6 +4,7 @@
  */
 import BN from 'bn.js';
 
+import { TransactionTraceResponse } from './api/sequencer';
 import {
   AllowArray,
   Call,
@@ -134,3 +135,8 @@ export type EstimateFeeAction =
     };
 
 export type EstimateFeeResponseBulk = Array<EstimateFeeResponse>;
+
+export type TransactionSimulationResponse = {
+  trace: TransactionTraceResponse;
+  fee_estimation: EstimateFeeResponse;
+};

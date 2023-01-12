@@ -16,7 +16,7 @@ import {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   RPC,
-  Sequencer,
+  TransactionSimulationResponse,
 } from '../types';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
@@ -497,7 +497,7 @@ export class RpcProvider implements ProviderInterface {
     _invocation: Invocation,
     _invocationDetails: InvocationsDetailsWithNonce,
     _blockIdentifier?: BlockIdentifier
-  ): Promise<Sequencer.TransactionSimulationResponse> {
+  ): Promise<TransactionSimulationResponse> {
     throw new Error('RPC does not implement simulateTransaction function');
   }
 }

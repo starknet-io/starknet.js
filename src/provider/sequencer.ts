@@ -22,6 +22,7 @@ import {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Sequencer,
+  TransactionSimulationResponse,
   TransactionTraceResponse,
 } from '../types';
 import fetch from '../utils/fetchPonyfill';
@@ -572,7 +573,7 @@ export class SequencerProvider implements ProviderInterface {
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<Sequencer.TransactionSimulationResponse> {
+  ): Promise<TransactionSimulationResponse> {
     return this.fetchEndpoint(
       'simulate_transaction',
       { blockIdentifier },
@@ -584,6 +585,6 @@ export class SequencerProvider implements ProviderInterface {
         version: toHex(toBN(invocationDetails?.version || 1)),
         nonce: toHex(toBN(invocationDetails.nonce)),
       }
-    );
+    ).then(this.responseParser.parseFeeSimulateTransactionResponse);
   }
 }

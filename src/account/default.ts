@@ -27,9 +27,9 @@ import {
   InvokeFunctionResponse,
   KeyPair,
   MultiDeployContractResponse,
-  Sequencer,
   Signature,
   TransactionBulk,
+  TransactionSimulationResponse,
   UniversalDeployerContractPayload,
 } from '../types';
 import { EstimateFeeBulk } from '../types/account';
@@ -642,7 +642,7 @@ export class Account extends Provider implements AccountInterface {
   public async simulateTransaction(
     calls: AllowArray<Call>,
     { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
-  ): Promise<Sequencer.TransactionSimulationResponse> {
+  ): Promise<TransactionSimulationResponse> {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = toBN(providedNonce ?? (await this.getNonce()));
     const version = toBN(feeTransactionVersion);
