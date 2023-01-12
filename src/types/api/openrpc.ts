@@ -105,8 +105,9 @@ type FUNCTION_CALL = {
   entry_point_selector?: FELT;
   calldata?: Array<FELT>;
 };
-type INVOKE_TXN = COMMON_TXN_PROPERTIES & (INVOKE_TXN_V0 | INVOKE_TXN_V1);
+type INVOKE_TXN = COMMON_TXN_PROPERTIES & { type: 'INVOKE' } & (INVOKE_TXN_V0 | INVOKE_TXN_V1);
 type DECLARE_TXN = COMMON_TXN_PROPERTIES & {
+  type: 'DECLARE';
   class_hash: FELT;
   sender_address: ADDRESS;
 };
@@ -118,6 +119,7 @@ type DEPLOY_TXN = {
 type DEPLOY_ACCOUNT_TXN = COMMON_TXN_PROPERTIES & DEPLOY_ACCOUNT_TXN_PROPERTIES;
 
 type DEPLOY_ACCOUNT_TXN_PROPERTIES = {
+  type: 'DEPLOY_ACCOUNT';
   contract_address_salt: FELT;
   constructor_calldata: Array<FELT>;
   class_hash: FELT;
@@ -127,14 +129,10 @@ type DEPLOY_ACCOUNT_TXN_RECEIPT = DEPLOY_TXN_RECEIPT;
 
 type TXN = INVOKE_TXN | L1_HANDLER_TXN | DECLARE_TXN | DEPLOY_TXN | DEPLOY_ACCOUNT_TXN;
 
-enum L1_HANDLER {
-  'L1_HANDLER',
-}
-
 type L1_HANDLER_TXN = {
+  type: 'L1_HANDLER';
   transaction_hash: TXN_HASH;
   version: NUM_AS_HEX;
-  type: L1_HANDLER;
   nonce: NUM_AS_HEX;
 } & FUNCTION_CALL;
 
@@ -147,10 +145,12 @@ type BROADCASTED_TXN =
   | BROADCASTED_DEPLOY_TXN
   | BROADCASTED_DEPLOY_ACCOUNT_TXN;
 
-type BROADCASTED_INVOKE_TXN = BROADCASTED_TXN_COMMON_PROPERTIES & (INVOKE_TXN_V0 | INVOKE_TXN_V1);
+type BROADCASTED_INVOKE_TXN = BROADCASTED_TXN_COMMON_PROPERTIES & { type: 'INVOKE' } & (
+    | INVOKE_TXN_V0
+    | INVOKE_TXN_V1
+  );
 
 type BROADCASTED_TXN_COMMON_PROPERTIES = {
-  type: TXN_TYPE;
   max_fee: FELT;
   version: NUM_AS_HEX;
   signature: SIGNATURE;
@@ -158,6 +158,7 @@ type BROADCASTED_TXN_COMMON_PROPERTIES = {
 };
 
 type BROADCASTED_DECLARE_TXN = {
+  type: 'DECLARE';
   contract_class: CONTRACT_CLASS;
   sender_address: ADDRESS;
 } & BROADCASTED_TXN_COMMON_PROPERTIES;
@@ -167,8 +168,8 @@ type BROADCASTED_DEPLOY_TXN = {
 } & DEPLOY_TXN_PROPERTIES;
 
 type DEPLOY_TXN_PROPERTIES = {
+  type: 'DEPLOY';
   version: NUM_AS_HEX;
-  type: TXN_TYPE;
   contract_address_salt: FELT;
   constructor_calldata: Array<FELT>;
 };
