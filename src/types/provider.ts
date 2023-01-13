@@ -3,6 +3,7 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 
+import { TransactionTraceResponse } from './api/sequencer';
 import {
   AllowArray,
   Call,
@@ -131,3 +132,10 @@ export type EstimateFeeAction =
       type: 'DEPLOY';
       payload: UniversalDeployerContractPayload;
     };
+
+export type EstimateFeeResponseBulk = Array<EstimateFeeResponse>;
+
+export interface TransactionSimulationResponse {
+  trace: TransactionTraceResponse;
+  fee_estimation: EstimateFeeResponse;
+}

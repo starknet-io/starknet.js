@@ -11,15 +11,18 @@ import {
   DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetContractAddressesResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   GetTransactionStatusResponse,
   Invocation,
+  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Sequencer,
+  TransactionSimulationResponse,
   TransactionTraceResponse,
 } from '../types';
 import fetch from '../utils/fetchPonyfill';
@@ -36,9 +39,9 @@ import {
 } from '../utils/number';
 import { parseContract, wait } from '../utils/provider';
 import { SequencerAPIResponseParser } from '../utils/responseParser/sequencer';
-import { randomAddress, signatureToDecimalArray } from '../utils/stark';
+import { formatSignature, randomAddress, signatureToDecimalArray } from '../utils/stark';
 import { buildUrl } from '../utils/url';
-import { GatewayError, HttpError } from './errors';
+import { GatewayError, HttpError, LibraryError } from './errors';
 import { ProviderInterface } from './interface';
 import { Block, BlockIdentifier } from './utils';
 
@@ -150,6 +153,7 @@ export class SequencerProvider implements ProviderInterface {
       'call_contract',
       'estimate_fee',
       'estimate_message_fee',
+      'estimate_fee_bulk',
       'simulate_transaction',
     ];
 
@@ -288,9 +292,11 @@ export class SequencerProvider implements ProviderInterface {
 
   public async getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {
     const txHashHex = toHex(txHash);
-    return this.fetchEndpoint('get_transaction', { transactionHash: txHashHex }).then((value) =>
-      this.responseParser.parseGetTransactionResponse(value)
-    );
+    return this.fetchEndpoint('get_transaction', { transactionHash: txHashHex }).then((result) => {
+      // throw for no matching transaction to unify behavior with RPC and avoid parsing errors
+      if (Object.values(result).length === 1) throw new LibraryError(result.status);
+      return this.responseParser.parseGetTransactionResponse(result);
+    });
   }
 
   public async getTransactionReceipt(txHash: BigNumberish): Promise<GetTransactionReceiptResponse> {
@@ -432,6 +438,47 @@ export class SequencerProvider implements ProviderInterface {
     ).then(this.responseParser.parseFeeEstimateResponse);
   }
 
+  public async getEstimateFeeBulk(
+    invocations: InvocationBulk,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<EstimateFeeResponseBulk> {
+    const params: Sequencer.EstimateFeeRequestBulk = invocations.map((invocation) => {
+      let res;
+      if (invocation.type === 'INVOKE_FUNCTION') {
+        res = {
+          type: invocation.type,
+          contract_address: invocation.contractAddress,
+          calldata: invocation.calldata ?? [],
+        };
+      } else if (invocation.type === 'DECLARE') {
+        res = {
+          type: invocation.type,
+          sender_address: invocation.senderAddress,
+          contract_class: invocation.contractDefinition,
+        };
+      } else {
+        res = {
+          type: invocation.type,
+          class_hash: toHex(toBigInt(invocation.classHash)),
+          constructor_calldata: bigNumberishArrayToDecimalStringArray(
+            invocation.constructorCalldata || []
+          ),
+          contract_address_salt: toHex(toBigInt(invocation.addressSalt || 0)),
+        };
+      }
+      return {
+        ...res,
+        signature: bigNumberishArrayToDecimalStringArray(formatSignature(invocation.signature)),
+        version: toHex(toBigInt(invocation?.version || 1)),
+        nonce: toHex(toBigInt(invocation.nonce)),
+      };
+    });
+
+    return this.fetchEndpoint('estimate_fee_bulk', { blockIdentifier }, params).then(
+      this.responseParser.parseFeeEstimateBulkResponse
+    );
+  }
+
   public async getCode(
     contractAddress: string,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
@@ -517,11 +564,11 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('estimate_message_fee', { blockIdentifier }, validCallL1Handler);
   }
 
-  public async simulateTransaction(
+  public async getSimulateTransaction(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<Sequencer.TransactionSimulationResponse> {
+  ): Promise<TransactionSimulationResponse> {
     return this.fetchEndpoint(
       'simulate_transaction',
       { blockIdentifier },
@@ -533,6 +580,6 @@ export class SequencerProvider implements ProviderInterface {
         version: toHex(invocationDetails?.version || 1),
         nonce: toHex(invocationDetails.nonce),
       }
-    );
+    ).then(this.responseParser.parseFeeSimulateTransactionResponse);
   }
 }

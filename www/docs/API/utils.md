@@ -96,11 +96,11 @@ await this.callContract({
 
 ### estimatedFeeToMaxFee
 
-`estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: number = 0.5): BN`
+`estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: number = 0.5): bigint`
 
 Function that calculates and returns maximum fee based on the previously estimated one.
 
-Returns a BN.
+Returns a BigInt.
 
 ---
 
@@ -108,10 +108,8 @@ Returns a BN.
 
 Various number formatting functions.
 
-`BN` is the `BigNum` representation imported from `bn.js` library.
-
 ```js
-export type BigNumberish = string | number | BN;
+export type BigNumberish = string | number | bigint;
 ```
 
 ### isHex
@@ -122,17 +120,17 @@ Check if number is in hex format.
 
 ### toBigInt
 
-`toBigInt(number: BigNumberish, base?: number | 'hex'): BN`
+`toBigInt(value: BigNumberish): bigint`
 
-Converts BigNumberish to BN.
+Converts BigNumberish to BigInt.
 
-Returns a BN.
+Returns a BigInt.
 
 ### toHex
 
-`toHex(number: BN): string`
+`toHex(number: BigNumberish): string`
 
-Converts BN to hex.
+Converts BigNumberish to hex.
 
 Returns a string.
 
@@ -154,7 +152,7 @@ Converts hex string to decimal string.
 
 `toFelt(num: BigNumberish): string`
 
-Converts BN to Felt.
+Converts BigNumberish to Felt.
 
 Returns a string.
 
@@ -163,7 +161,6 @@ Returns a string.
 `assertInRange(input: BigNumberish, lowerBound: BigNumberish, upperBound: BigNumberish, inputName = '')`
 
 Asserts input is equal to or greater then `lowerBound` and lower then `upperBound`. Assert message specifies inputName.
-`input`, `lowerBound`, and `upperBound` should be of type BN.
 `inputName` should be a string.
 
 ### bigNumberishArrayToDecimalStringArray
@@ -206,21 +203,21 @@ export interface Uint256 {
 
 ### uint256ToBN
 
-`uint256ToBN(uint256: Uint256): BN`
+`uint256ToBN(uint256: Uint256): bigint`
 
-Function to convert `Uint256` to `BN` (big number), which uses the `bn.js` library.
+Function to convert `Uint256` to `BigInt`.
 
 ### isUint256
 
 `isUint256(bn: BigNumberish): boolean`
 
-Function to check if `BN` is smaller or equal to `2**256-1`.
+Function to check if `BigNumberish` is smaller or equal to `2**256-1`.
 
 ### bnToUint256
 
 `bnToUint256(bignumber: BigNumberish): Uint256`
 
-Function to convert `BN` to `Uint256`.
+Function to convert `BigNumberish` to `Uint256`.
 
 ---
 

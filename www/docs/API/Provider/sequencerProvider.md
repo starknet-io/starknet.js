@@ -156,20 +156,3 @@ Gets the transaction trace from a tx hash.
   };
 }
 ```
-
----
-
-### simulateTransaction()
-
-provider.**simulateTransaction**(invocation, invocationDetails, blockIdentifier) => _Promise < TransactionSimulationResponse >_
-
-Simulates the transaction and returns the transaction trace and estimated fee.
-
-###### _TransactionSimulationResponse_
-
-```typescript
-{
-  trace: TransactionTraceResponse;
-  fee_estimation: EstimateFeeResponse;
-}
-```

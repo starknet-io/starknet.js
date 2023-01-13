@@ -1,7 +1,13 @@
-import { BlockNumber, GetBlockResponse, Provider, stark } from '../src';
+import { BlockNumber, GetBlockResponse, LibraryError, Provider, stark } from '../src';
 import { toBigInt } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
-import { compiledErc20, erc20ClassHash, getTestAccount, getTestProvider } from './fixtures';
+import {
+  compiledErc20,
+  erc20ClassHash,
+  getTestAccount,
+  getTestProvider,
+  wrongClassHash,
+} from './fixtures';
 
 const { compileCalldata } = stark;
 
@@ -88,14 +94,11 @@ describe('defaultProvider', () => {
       expect(classResponse).toHaveProperty('entry_points_by_type');
     });
 
-    // TODO see if feasible to split
-    describe('GetClassByHash', () => {
-      test('responses', async () => {
-        const classResponse = await testProvider.getClassByHash(erc20ClassHash);
-        expect(classResponse).toHaveProperty('program');
-        expect(classResponse).toHaveProperty('entry_points_by_type');
-        expect(classResponse).toHaveProperty('abi');
-      });
+    test('GetClassByHash', async () => {
+      const classResponse = await testProvider.getClassByHash(erc20ClassHash);
+      expect(classResponse).toHaveProperty('program');
+      expect(classResponse).toHaveProperty('entry_points_by_type');
+      expect(classResponse).toHaveProperty('abi');
     });
 
     describe('getStorageAt', () => {
@@ -114,6 +117,10 @@ describe('defaultProvider', () => {
           testProvider.getStorageAt(erc20ContractAddress, toBigInt('0x0'))
         ).resolves.not.toThrow();
       });
+    });
+
+    test('getTransaction() - failed retrieval', () => {
+      return expect(testProvider.getTransaction(wrongClassHash)).rejects.toThrow(LibraryError);
     });
 
     test('getTransaction() - successful deploy transaction', async () => {

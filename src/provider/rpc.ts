@@ -7,13 +7,16 @@ import {
   DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetCodeResponse,
   GetTransactionResponse,
   Invocation,
+  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   RPC,
+  TransactionSimulationResponse,
 } from '../types';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
@@ -22,6 +25,7 @@ import { BigNumberish, bigNumberishArrayToHexadecimalStringArray, toHex } from '
 import { parseCalldata, wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { signatureToHexArray } from '../utils/stark';
+import { LibraryError } from './errors';
 import { ProviderInterface } from './interface';
 import { Block, BlockIdentifier } from './utils';
 
@@ -74,7 +78,7 @@ export class RpcProvider implements ProviderInterface {
   protected errorHandler(error: any) {
     if (error) {
       const { code, message } = error;
-      throw new Error(`${code}: ${message}`);
+      throw new LibraryError(`${code}: ${message}`);
     }
   }
 
@@ -302,6 +306,13 @@ export class RpcProvider implements ProviderInterface {
     }).then(this.responseParser.parseFeeEstimateResponse);
   }
 
+  public async getEstimateFeeBulk(
+    _invocations: InvocationBulk,
+    _blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<EstimateFeeResponseBulk> {
+    throw new Error('RPC does not implement getInvokeEstimateFeeBulk function');
+  }
+
   // TODO: Revisit after Pathfinder release with JSON-RPC v0.2.1 RPC Spec
   public async declareContract(
     { contractDefinition, signature, senderAddress }: DeclareContractTransaction,
@@ -474,5 +485,13 @@ export class RpcProvider implements ProviderInterface {
    */
   public async getEvents(eventFilter: RPC.EventFilter): Promise<RPC.GetEventsResponse> {
     return this.fetchEndpoint('starknet_getEvents', { filter: eventFilter });
+  }
+
+  public async getSimulateTransaction(
+    _invocation: Invocation,
+    _invocationDetails: InvocationsDetailsWithNonce,
+    _blockIdentifier?: BlockIdentifier
+  ): Promise<TransactionSimulationResponse> {
+    throw new Error('RPC does not implement simulateTransaction function');
   }
 }
