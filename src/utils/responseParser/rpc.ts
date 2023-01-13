@@ -8,6 +8,7 @@ import {
   GetBlockResponse,
   GetTransactionResponse,
   RPC,
+  StateUpdateResponse,
 } from '../../types';
 import { toBN } from '../number';
 import { ResponseParser } from '.';
@@ -65,6 +66,27 @@ export class RPCResponseParser
   public parseCallContractResponse(res: Array<string>): CallContractResponse {
     return {
       result: res,
+    };
+  }
+
+  public parseGetStateUpdateResponse(res: RPC.StateUpdate): StateUpdateResponse {
+    const storageDiff = []
+      .concat(res.state_diff.storage_diffs as [])
+      .map(({ address, storage_entries }) => {
+        return {
+          [address]: storage_entries,
+        };
+      });
+    return {
+      block_hash: res.block_hash,
+      new_root: res.new_root,
+      old_root: res.old_root,
+      state_diff: {
+        storage_diffs: storageDiff,
+        declared_contract_hashes: res.state_diff.declared_contract_hashes,
+        deployed_contracts: res.state_diff.deployed_contracts,
+        nonces: res.state_diff.nonces,
+      },
     };
   }
 }

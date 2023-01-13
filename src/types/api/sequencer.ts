@@ -70,6 +70,21 @@ export type CallL1Handler = {
   payload: Array<string>;
 };
 
+export type StateDiffItem = {
+  key: string;
+  value: string;
+};
+
+export type DeployedContractItem = {
+  address: string;
+  class_hash: string;
+};
+
+export type Nonces = {
+  contract_address: string;
+  nonce: string;
+};
+
 export namespace Sequencer {
   export type DeclareTransaction = {
     type: 'DECLARE';
@@ -260,6 +275,20 @@ export namespace Sequencer {
 
   export type EstimateFeeResponseBulk = AllowArray<EstimateFeeResponse>;
 
+  export type StateUpdateResponse = {
+    block_hash: string;
+    new_root: string;
+    old_root: string;
+    state_diff: {
+      storage_diffs: Array<{
+        [address: string]: Array<StateDiffItem>;
+      }>;
+      declared_contract_hashes: Array<string>;
+      deployed_contracts: Array<DeployedContractItem>;
+      nonces: Array<Nonces>;
+    };
+  };
+
   export type Endpoints = {
     get_contract_addresses: {
       QUERY: never;
@@ -362,10 +391,10 @@ export namespace Sequencer {
     };
     get_state_update: {
       QUERY: {
-        blockHash: string;
+        blockIdentifier: BlockIdentifier;
       };
       REQUEST: never;
-      RESPONSE: any;
+      RESPONSE: StateUpdateResponse;
     };
     get_full_contract: {
       QUERY: {
