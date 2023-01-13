@@ -8,14 +8,17 @@ import {
   DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetCodeResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
+  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Status,
+  TransactionSimulationResponse,
 } from '../types';
 import { BigNumberish } from '../utils/number';
 import { ProviderInterface } from './interface';
@@ -99,6 +102,13 @@ export class Provider implements ProviderInterface {
     );
   }
 
+  public async getEstimateFeeBulk(
+    invocations: InvocationBulk,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<EstimateFeeResponseBulk> {
+    return this.provider.getEstimateFeeBulk(invocations, blockIdentifier);
+  }
+
   public async getNonceForAddress(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
@@ -179,5 +189,13 @@ export class Provider implements ProviderInterface {
     successStates?: Array<Status>
   ): Promise<GetTransactionReceiptResponse> {
     return this.provider.waitForTransaction(txHash, retryInterval, successStates);
+  }
+
+  public async getSimulateTransaction(
+    invocation: Invocation,
+    invocationDetails: InvocationsDetailsWithNonce,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<TransactionSimulationResponse> {
+    return this.provider.getSimulateTransaction(invocation, invocationDetails, blockIdentifier);
   }
 }

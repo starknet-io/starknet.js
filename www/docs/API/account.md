@@ -121,6 +121,34 @@ The _estimateFeeDetails_ object may include any of:
 
 ---
 
+### estimateFeeBulk()
+
+account.**estimateFeeBulk**(transaction[] [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse[] >_
+
+Estimate Fee for executing a list of transactions on starknet.
+
+The _transaction_ object structure:
+
+- transaction.**type** - the type of transaction : 'DECLARE' | 'DEPLOY' | 'INVOKE_FUNCTION' | 'DEPLOY_ACCOUNT'
+- transaction payload - the payload for the transaction
+
+The _estimateFeeDetails_ object may include any of:
+
+- estimateFeeDetails.**blockIdentifier** - Block Identifier for the transaction
+- estimateFeeDetails.**nonce** - Nonce for the transaction
+
+###### _EstimateFeeResponse_
+
+```typescript
+{
+  overall_fee: BN;
+  gas_consumed?: BN;
+  gas_price?: BN;
+}
+```
+
+---
+
 ### execute()
 
 account.**execute**(transactions [ , abi , transactionsDetail ]) => _Promise < InvokeFunctionResponse >_
@@ -460,3 +488,20 @@ Gets account address with the starknet id stark name.
 The _StarknetIdContract_ argument can be undefined, if it is, the function will automatically use official starknet id contracts of your network (It currently supports TESTNET 1 only).
 
 Returns directly the address in a string (Example: `0xff...34`).
+
+---
+
+### simulateTransaction()
+
+account.**simulateTransaction**(calls [ , estimateFeeDetails ]) => _Promise < TransactionSimulationResponse >_
+
+Simulates the transaction and returns the transaction trace and estimated fee.
+
+###### _TransactionSimulationResponse_
+
+```typescript
+{
+  trace: TransactionTraceResponse;
+  fee_estimation: EstimateFee;
+}
+```

@@ -7,11 +7,13 @@ import {
   DeclareContractResponse,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   InvokeFunctionResponse,
   Sequencer,
+  TransactionSimulationResponse,
 } from '../../types';
 import { toBigInt } from '../number';
 import { parseSignature } from '../stark';
@@ -100,6 +102,65 @@ export class SequencerAPIResponseParser extends ResponseParser {
     }
     return {
       overall_fee: toBigInt(res.amount),
+    };
+  }
+
+  public parseFeeEstimateBulkResponse(
+    res: Sequencer.EstimateFeeResponseBulk
+  ): EstimateFeeResponseBulk {
+    return [].concat(res as []).map((item: Sequencer.EstimateFeeResponse) => {
+      if ('overall_fee' in item) {
+        let gasInfo = {};
+
+        try {
+          gasInfo = {
+            gas_consumed: toBigInt(item.gas_usage),
+            gas_price: toBigInt(item.gas_price),
+          };
+        } catch {
+          // do nothing
+        }
+
+        return {
+          overall_fee: toBigInt(item.overall_fee),
+          ...gasInfo,
+        };
+      }
+      return {
+        overall_fee: toBigInt(item.amount),
+      };
+    });
+  }
+
+  public parseFeeSimulateTransactionResponse(
+    res: Sequencer.TransactionSimulationResponse
+  ): TransactionSimulationResponse {
+    if ('overall_fee' in res.fee_estimation) {
+      let gasInfo = {};
+
+      try {
+        gasInfo = {
+          gas_consumed: toBigInt(res.fee_estimation.gas_usage),
+          gas_price: toBigInt(res.fee_estimation.gas_price),
+        };
+      } catch {
+        // do nothing
+      }
+
+      return {
+        trace: res.trace,
+        fee_estimation: {
+          ...gasInfo,
+          overall_fee: toBigInt(res.fee_estimation.overall_fee),
+        },
+      };
+    }
+
+    return {
+      trace: res.trace,
+      fee_estimation: {
+        overall_fee: toBigInt(res.fee_estimation.amount),
+      },
     };
   }
 
