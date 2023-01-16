@@ -602,6 +602,7 @@ export class SequencerProvider implements ProviderInterface {
   public async getBlockTraces(
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<Sequencer.BlockTransactionTracesResponse> {
-    return this.fetchEndpoint('get_block_traces', { blockIdentifier });
+    const args = new Block(blockIdentifier).sequencerIdentifier;
+    return this.fetchEndpoint('get_block_traces', { ...args });
   }
 }

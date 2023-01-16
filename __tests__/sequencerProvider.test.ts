@@ -144,11 +144,21 @@ describeIfSequencer('SequencerProvider', () => {
     test(`getBlockTraces(blockHash=${exampleBlockHash}, blockNumber=undefined)`, async () => {
       const blockTraces = await sequencerProvider.getBlockTraces(exampleBlockHash);
       expect(blockTraces).toHaveProperty('traces');
+      expect(blockTraces.traces[0]).toHaveProperty('validate_invocation');
+      expect(blockTraces.traces[0]).toHaveProperty('function_invocation');
+      expect(blockTraces.traces[0]).toHaveProperty('fee_transfer_invocation');
+      expect(blockTraces.traces[0]).toHaveProperty('signature');
+      expect(blockTraces.traces[0]).toHaveProperty('transaction_hash');
     });
 
     test(`getBlockTraces(blockHash=undefined, blockNumber=${exampleBlockNumber})`, async () => {
       const blockTraces = await sequencerProvider.getBlockTraces(exampleBlockNumber);
       expect(blockTraces).toHaveProperty('traces');
+      expect(blockTraces.traces[0]).toHaveProperty('validate_invocation');
+      expect(blockTraces.traces[0]).toHaveProperty('function_invocation');
+      expect(blockTraces.traces[0]).toHaveProperty('fee_transfer_invocation');
+      expect(blockTraces.traces[0]).toHaveProperty('signature');
+      expect(blockTraces.traces[0]).toHaveProperty('transaction_hash');
     });
   });
 });
