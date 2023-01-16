@@ -169,7 +169,9 @@ Gets the transaction traces of an entire block
 
 ```typescript
 
-Array<TransactionTraceResponse & { transaction_hash: string }>
+{
+    traces: Array<TransactionTraceResponse & { transaction_hash: string }>;
+}
 
 {
   TransactionTraceResponse: {
@@ -177,7 +179,7 @@ Array<TransactionTraceResponse & { transaction_hash: string }>
     function_invocation?: FunctionInvocation;
     fee_transfer_invocation?: FunctionInvocation;
     signature: Signature;
-  }
+  };
 
   FunctionInvocation: {
     caller_address: string;
