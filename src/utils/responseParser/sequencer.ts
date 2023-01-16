@@ -202,10 +202,18 @@ export class SequencerAPIResponseParser extends ResponseParser {
         nonce: nonce as string,
       };
     });
+    const storage_diffs = []
+      .concat(res.state_diff.storage_diffs as [])
+      .map(({ address, storage_entries }) => {
+        return {
+          address,
+          storage_entries,
+        };
+      });
     return {
       ...res,
       state_diff: {
-        storage_diffs: res.state_diff.storage_diffs,
+        storage_diffs,
         declared_contract_hashes: res.state_diff.declared_contract_hashes,
         deployed_contracts: res.state_diff.deployed_contracts,
         nonces,

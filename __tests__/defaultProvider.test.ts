@@ -82,9 +82,19 @@ describe('defaultProvider', () => {
         return expect(block).toHaveProperty('block_number');
       });
 
-      test('getStateUpdate()', async () => {
-        const stateUpdate = await testProvider.getStateUpdate('latest');
+      test(`getStateUpdate(blockHash=${exampleBlockHash}, blockNumber=undefined)`, async () => {
+        const stateUpdate = await testProvider.getStateUpdate(exampleBlockHash);
         expect(stateUpdate).toHaveProperty('block_hash');
+        expect(stateUpdate.block_hash).toBe(exampleBlockHash);
+        expect(stateUpdate).toHaveProperty('new_root');
+        expect(stateUpdate).toHaveProperty('old_root');
+        expect(stateUpdate).toHaveProperty('state_diff');
+      });
+
+      test(`getStateUpdate(blockHash=undefined, blockNumber=${exampleBlockNumber})`, async () => {
+        const stateUpdate = await testProvider.getStateUpdate(exampleBlockNumber);
+        expect(stateUpdate).toHaveProperty('block_hash');
+        expect(stateUpdate.block_hash).toBe(exampleBlockHash);
         expect(stateUpdate).toHaveProperty('new_root');
         expect(stateUpdate).toHaveProperty('old_root');
         expect(stateUpdate).toHaveProperty('state_diff');

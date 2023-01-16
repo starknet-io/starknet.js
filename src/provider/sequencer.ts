@@ -1,7 +1,10 @@
+import { BN } from 'bn.js';
 import urljoin from 'url-join';
 
 import { StarknetChainId } from '../constants';
 import {
+  BlockNumber,
+  BlockTag,
   Call,
   CallContractResponse,
   CallL1Handler,
@@ -35,6 +38,7 @@ import {
   getDecimalString,
   getHexString,
   getHexStringArray,
+  isHex,
   toBN,
   toHex,
 } from '../utils/number';
@@ -44,7 +48,7 @@ import { randomAddress } from '../utils/stark';
 import { buildUrl } from '../utils/url';
 import { GatewayError, HttpError, LibraryError } from './errors';
 import { ProviderInterface } from './interface';
-import { Block, BlockIdentifier } from './utils';
+import { Block, BlockIdentifier, validBlockTags } from './utils';
 
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha' | 'goerli-alpha-2';
 
@@ -592,7 +596,19 @@ export class SequencerProvider implements ProviderInterface {
   public async getStateUpdate(
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<StateUpdateResponse> {
-    return this.fetchEndpoint('get_state_update', { blockIdentifier }).then(
+    const args: { blockHash?: string; blockNumber?: BlockNumber } = {};
+    if (typeof blockIdentifier === 'string' && isHex(blockIdentifier)) {
+      args.blockHash = blockIdentifier;
+    } else if (BN.isBN(blockIdentifier)) {
+      args.blockHash = toHex(blockIdentifier);
+    } else if (typeof blockIdentifier === 'number') {
+      args.blockNumber = blockIdentifier;
+    } else if (typeof blockIdentifier === 'string' && validBlockTags.includes(blockIdentifier)) {
+      args.blockNumber = blockIdentifier as BlockTag;
+    } else {
+      args.blockNumber = 'pending';
+    }
+    return this.fetchEndpoint('get_state_update', { ...args }).then(
       this.responseParser.parseGetStateUpdateResponse
     );
   }

@@ -7,7 +7,7 @@ import BN from 'bn.js';
 import {
   DeployedContractItem,
   Nonces,
-  StateDiffItem,
+  StorageDiffItem,
   TransactionTraceResponse,
 } from './api/sequencer';
 import {
@@ -151,9 +151,7 @@ export interface StateUpdateResponse {
   new_root: string;
   old_root: string;
   state_diff: {
-    storage_diffs: Array<{
-      [address: string]: Array<StateDiffItem>;
-    }>;
+    storage_diffs: Array<StorageDiffItem>;
     declared_contract_hashes: Array<string>;
     deployed_contracts: Array<DeployedContractItem>;
     nonces: Array<Nonces>;

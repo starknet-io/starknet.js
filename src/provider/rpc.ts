@@ -16,7 +16,6 @@ import {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   RPC,
-  StateUpdateResponse,
   TransactionSimulationResponse,
 } from '../types';
 import fetch from '../utils/fetchPonyfill';
@@ -168,11 +167,9 @@ export class RpcProvider implements ProviderInterface {
 
   public async getStateUpdate(
     blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<StateUpdateResponse> {
+  ): Promise<RPC.StateUpdate> {
     const block_id = new Block(blockIdentifier).identifier;
-    return this.fetchEndpoint('starknet_getStateUpdate', { block_id }).then(
-      this.responseParser.parseGetStateUpdateResponse
-    );
+    return this.fetchEndpoint('starknet_getStateUpdate', { block_id });
   }
 
   public async getStorageAt(

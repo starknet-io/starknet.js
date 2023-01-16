@@ -255,7 +255,7 @@ Wait for the transaction to be accepted on L2 or L1.
 
 ### getStateUpdate()
 
-provider.**getStateUpdate**(transaction, details) => _Promise < StateUpdateResponse >_
+provider.**getStateUpdate**(blockIdentifier) => _Promise < StateUpdateResponse >_
 
 Gets the state changes in a specific block
 
@@ -267,9 +267,7 @@ Gets the state changes in a specific block
   new_root: string;
   old_root: string;
   state_diff: {
-    storage_diffs: Array<{
-        [address: string]: Array<StateDiffItem>;
-    }>;
+    storage_diffs: Array<StorageDiffItem>;
     declared_contract_hashes: Array<string>;
     deployed_contracts: Array<DeployedContractItem>;
     nonces: Array<Nonces>;

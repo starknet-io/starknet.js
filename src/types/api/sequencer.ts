@@ -75,6 +75,11 @@ export type StateDiffItem = {
   value: string;
 };
 
+export type StorageDiffItem = {
+  address: string;
+  storage_entries: [key: string, value: string];
+};
+
 export type DeployedContractItem = {
   address: string;
   class_hash: string;
@@ -391,7 +396,8 @@ export namespace Sequencer {
     };
     get_state_update: {
       QUERY: {
-        blockIdentifier: BlockIdentifier;
+        blockHash?: string;
+        blockNumber?: BlockNumber;
       };
       REQUEST: never;
       RESPONSE: StateUpdateResponse;
