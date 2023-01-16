@@ -18,6 +18,7 @@ import type {
   InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  StateUpdateResponse,
   Status,
   TransactionSimulationResponse,
 } from '../types';
@@ -318,4 +319,12 @@ export abstract class ProviderInterface {
     invocationDetails: InvocationsDetailsWithNonce,
     blockIdentifier?: BlockIdentifier
   ): Promise<TransactionSimulationResponse>;
+
+  /**
+   * Gets the state changes in a specific block
+   *
+   * @param blockIdentifier - block identifier
+   * @returns StateUpdateResponse
+   */
+  public abstract getStateUpdate(blockIdentifier?: BlockIdentifier): Promise<StateUpdateResponse>;
 }

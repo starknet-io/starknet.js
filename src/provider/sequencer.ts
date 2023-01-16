@@ -22,6 +22,7 @@ import {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Sequencer,
+  StateUpdateResponse,
   TransactionSimulationResponse,
   TransactionTraceResponse,
 } from '../types';
@@ -586,5 +587,14 @@ export class SequencerProvider implements ProviderInterface {
         nonce: toHex(toBN(invocationDetails.nonce)),
       }
     ).then(this.responseParser.parseFeeSimulateTransactionResponse);
+  }
+
+  public async getStateUpdate(
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<StateUpdateResponse> {
+    const args = new Block(blockIdentifier).sequencerIdentifier;
+    return this.fetchEndpoint('get_state_update', { ...args }).then(
+      this.responseParser.parseGetStateUpdateResponse
+    );
   }
 }
