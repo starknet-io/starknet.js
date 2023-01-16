@@ -587,4 +587,11 @@ export class SequencerProvider implements ProviderInterface {
       }
     ).then(this.responseParser.parseFeeSimulateTransactionResponse);
   }
+
+  // consider adding an optional trace retrieval parameter to the getBlock method
+  public async getBlockTraces(
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<Sequencer.BlockTransactionTracesResponse> {
+    return this.fetchEndpoint('get_block_traces', { blockIdentifier });
+  }
 }
