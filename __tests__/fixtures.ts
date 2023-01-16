@@ -87,3 +87,4 @@ export const describeIfDevnetRpc = describeIf(IS_DEVNET_RPC);
 export const describeIfDevnetSequencer = describeIf(IS_DEVNET_SEQUENCER);
 
 export const erc20ClassHash = '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a';
+export const wrongClassHash = '0x000000000000000000000000000000000000000000000000000000000000000';

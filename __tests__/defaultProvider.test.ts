@@ -1,7 +1,13 @@
-import { BlockNumber, GetBlockResponse, Provider, stark } from '../src';
+import { BlockNumber, GetBlockResponse, LibraryError, Provider, stark } from '../src';
 import { toBN } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
-import { compiledErc20, erc20ClassHash, getTestAccount, getTestProvider } from './fixtures';
+import {
+  compiledErc20,
+  erc20ClassHash,
+  getTestAccount,
+  getTestProvider,
+  wrongClassHash,
+} from './fixtures';
 
 const { compileCalldata } = stark;
 
@@ -21,7 +27,7 @@ describe('defaultProvider', () => {
 
     const { deploy } = await account.declareDeploy({
       contract: compiledErc20,
-      classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+      classHash: erc20ClassHash,
       constructorCalldata: [encodeShortString('Token'), encodeShortString('ERC20'), wallet],
     });
 
@@ -115,6 +121,10 @@ describe('defaultProvider', () => {
           testProvider.getStorageAt(erc20ContractAddress, toBN('0x0'))
         ).resolves.not.toThrow();
       });
+    });
+
+    test('getTransaction() - failed retrieval', () => {
+      return expect(testProvider.getTransaction(wrongClassHash)).rejects.toThrow(LibraryError);
     });
 
     test('getTransaction() - successful deploy transaction', async () => {

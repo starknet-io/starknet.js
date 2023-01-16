@@ -1,3 +1,16 @@
+## [4.19.3](https://github.com/0xs34n/starknet.js/compare/v4.19.2...v4.19.3) (2023-01-12)
+
+### Bug Fixes
+
+- remove any type in simulateTransaction ([a94db18](https://github.com/0xs34n/starknet.js/commit/a94db1887c9fee676ac9b313190453abd5ea2554))
+- update account.simulateTransaction return type ([3c3d397](https://github.com/0xs34n/starknet.js/commit/3c3d397a4fb1042c7358f70f50df0a4ce2893220))
+
+## [4.19.2](https://github.com/0xs34n/starknet.js/compare/v4.19.1...v4.19.2) (2023-01-11)
+
+### Bug Fixes
+
+- repair and unify transaction retrieval error ([ea5e646](https://github.com/0xs34n/starknet.js/commit/ea5e64651bf47824b254ae73ed8aa88998a5be44))
+
 ## [4.19.1](https://github.com/0xs34n/starknet.js/compare/v4.19.0...v4.19.1) (2023-01-10)
 
 ### Bug Fixes

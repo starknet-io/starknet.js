@@ -1,5 +1,5 @@
 ---
-sidebar_position: 4
+sidebar_position: 15
 ---
 
 # Interact with more than one contract within one transaction
@@ -38,7 +38,7 @@ const multiCall = await account.execute(
     // Calling the first contract
     {
     contractAddress: contractAddress_1,
-    entrypoint: "approve", 
+    entrypoint: "approve",
     // approve 1 wei for bridge
     calldata: stark.compileCalldata({
         spender: contractAddress_2,

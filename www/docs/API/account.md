@@ -489,3 +489,20 @@ Gets account address with the starknet id stark name.
 The _StarknetIdContract_ argument can be undefined, if it is, the function will automatically use official starknet id contracts of your network (It currently supports TESTNET 1 only).
 
 Returns directly the address in a string (Example: `0xff...34`).
+
+---
+
+### simulateTransaction()
+
+account.**simulateTransaction**(calls [ , estimateFeeDetails ]) => _Promise < TransactionSimulationResponse >_
+
+Simulates the transaction and returns the transaction trace and estimated fee.
+
+###### _TransactionSimulationResponse_
+
+```typescript
+{
+  trace: TransactionTraceResponse;
+  fee_estimation: EstimateFee;
+}
+```

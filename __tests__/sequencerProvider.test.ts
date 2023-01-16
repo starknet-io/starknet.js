@@ -1,9 +1,6 @@
 import { Contract, Provider, SequencerProvider, stark } from '../src';
-import { ZERO } from '../src/constants';
-import { feeTransactionVersion } from '../src/utils/hash';
 import { toBN } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
-import { fromCallsToExecuteCalldata } from '../src/utils/transaction';
 import {
   compiledErc20,
   compiledL1L2,
@@ -48,36 +45,6 @@ describeIfSequencer('SequencerProvider', () => {
       const transactionTrace = await sequencerProvider.getTransactionTrace(exampleTransactionHash);
       // TODO test optional properties
       expect(transactionTrace).toHaveProperty('signature');
-    });
-
-    test('simulate transaction', async () => {
-      const call = {
-        contractAddress: exampleContractAddress,
-        entrypoint: 'transfer',
-        calldata: [exampleContractAddress, '10', '0'],
-      };
-      const calldata = fromCallsToExecuteCalldata([call]);
-      const nonce = toBN(await account.getNonce());
-      const version = toBN(feeTransactionVersion);
-      const chainId = await account.getChainId();
-      const signature = await account.signer.signTransaction([call], {
-        walletAddress: account.address,
-        nonce,
-        version,
-        maxFee: ZERO,
-        chainId,
-      });
-
-      const res = await sequencerProvider.simulateTransaction(
-        {
-          contractAddress: account.address,
-          calldata,
-          signature,
-        },
-        { version, nonce }
-      );
-      expect(res).toHaveProperty('trace');
-      expect(res).toHaveProperty('fee_estimation');
     });
 
     test('getCode() -> { bytecode }', async () => {
