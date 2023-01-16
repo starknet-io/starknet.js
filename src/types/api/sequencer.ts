@@ -90,6 +90,8 @@ export type Nonces = {
   nonce: string;
 };
 
+export type SequencerIdentifier = { blockHash: string } | { blockNumber: BlockNumber };
+
 export namespace Sequencer {
   export type DeclareTransaction = {
     type: 'DECLARE';
