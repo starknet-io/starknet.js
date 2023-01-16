@@ -4,7 +4,12 @@
  */
 import BN from 'bn.js';
 
-import { TransactionTraceResponse } from './api/sequencer';
+import {
+  DeployedContractItem,
+  Nonces,
+  StorageDiffItem,
+  TransactionTraceResponse,
+} from './api/sequencer';
 import {
   AllowArray,
   Call,
@@ -139,4 +144,16 @@ export type EstimateFeeResponseBulk = Array<EstimateFeeResponse>;
 export interface TransactionSimulationResponse {
   trace: TransactionTraceResponse;
   fee_estimation: EstimateFeeResponse;
+}
+
+export interface StateUpdateResponse {
+  block_hash: string;
+  new_root: string;
+  old_root: string;
+  state_diff: {
+    storage_diffs: Array<StorageDiffItem>;
+    declared_contract_hashes: Array<string>;
+    deployed_contracts: Array<DeployedContractItem>;
+    nonces: Array<Nonces>;
+  };
 }

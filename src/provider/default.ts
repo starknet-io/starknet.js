@@ -17,6 +17,7 @@ import {
   InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  StateUpdateResponse,
   Status,
   TransactionSimulationResponse,
 } from '../types';
@@ -201,5 +202,9 @@ export class Provider implements ProviderInterface {
     blockIdentifier?: BlockIdentifier
   ): Promise<TransactionSimulationResponse> {
     return this.provider.getSimulateTransaction(invocation, invocationDetails, blockIdentifier);
+  }
+
+  public async getStateUpdate(blockIdentifier?: BlockIdentifier): Promise<StateUpdateResponse> {
+    return this.provider.getStateUpdate(blockIdentifier);
   }
 }

@@ -20,16 +20,15 @@ To send a message from L1 to L2, you need a solidity smart contract in the L1 ne
 
 ```solidity
 /**
-      Sends a message to an L2 contract.
-      This function is payable, the payed amount is the message fee.
-      Returns the hash of the message and the nonce of the message.
-    */
-    function sendMessageToL2(
-        uint256 toAddress,
-        uint256 selector,
-        uint256[] calldata payload
-    ) external payable returns (bytes32, uint256);
-
+    Sends a message to an L2 contract.
+    This function is payable, the payed amount is the message fee.
+    Returns the hash of the message and the nonce of the message.
+*/
+function sendMessageToL2(
+    uint256 toAddress,
+    uint256 selector,
+    uint256[] calldata payload
+) external payable returns (bytes32, uint256);
 ```
 
 You have to pay in the L1 an extra fee when invoking `sendMessageToL2` (of course paid with the L1 fee TOKEN), to pay the L2 part of the messaging mechanism. You can estimate this fee with this function :
@@ -37,26 +36,29 @@ You have to pay in the L1 an extra fee when invoking `sendMessageToL2` (of cours
 ```typescript
 import { SequencerProvider } from "starknet";
 const provider = new SequencerProvider({ baseUrl: "https://alpha4.starknet.io" }); // for testnet 1
+
 const responseEstimateMessageFee = await provider.estimateMessageFee({
-        from_address: L1address,
-        to_address: L2address,
-        entry_point_selector: "handle_l1_mess",
-        payload: ["1234567890123456789","200"]
-    })
+    from_address: L1address,
+    to_address: L2address,
+    entry_point_selector: "handle_l1_mess",
+    payload: ["1234567890123456789","200"]
+})
 ```
 
 If the fee is paid in L1, the cairo contract at `to_Address` is automatically executed, function `entry_point_selector` (the function shall have a decorator `@l1_handler` in the Cairo code), with parameters `payload`.
 
 ## L2 ➡️ L1 messages
 
-To send a message to L1, you will just invoke a cairo contract function, paying a fee that will pay all the process (in L1 & L2).  
+To send a message to L1, you will just invoke a cairo contract function, paying a fee that will pay all the process (in L1 & L2).
+
 If necessary you can estimate this fee with the generic `estimateInvokeFee` function :
 
 ```typescript
 const { suggestedMaxFee: estimatedFee1 } = await account0.estimateInvokeFee({
 	contractAddress: testAddress,
 	entrypoint: "withdraw_to_L1",
-	calldata: ["123456789", "30"] });
+	calldata: ["123456789", "30"]
+});
 ```
 
 The result is in `estimatedFee1`, of type BN.
