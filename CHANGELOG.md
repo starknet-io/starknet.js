@@ -1,3 +1,14 @@
+# [4.20.0](https://github.com/0xs34n/starknet.js/compare/v4.19.3...v4.20.0) (2023-01-17)
+
+### Bug Fixes
+
+- add utility getter in Block class ([3a52292](https://github.com/0xs34n/starknet.js/commit/3a5229277978c3235eaf1f7003b39eeabecac53e))
+- update responseParser & query parameters for sequencer ([a72db02](https://github.com/0xs34n/starknet.js/commit/a72db020aa1ac6924b2c047d067d553ac1b87248))
+
+### Features
+
+- add support for get_state_update in provider ([76035a1](https://github.com/0xs34n/starknet.js/commit/76035a148e7863fa1dbe440920eca34498480aa9))
+
 ## [4.19.3](https://github.com/0xs34n/starknet.js/compare/v4.19.2...v4.19.3) (2023-01-12)
 
 ### Bug Fixes
