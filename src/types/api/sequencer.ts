@@ -282,6 +282,10 @@ export namespace Sequencer {
 
   export type EstimateFeeResponseBulk = AllowArray<EstimateFeeResponse>;
 
+  export type BlockTransactionTracesResponse = {
+    traces: Array<TransactionTraceResponse & { transaction_hash: string }>;
+  };
+
   export type StateUpdateResponse = {
     block_hash: string;
     new_root: string;
@@ -430,6 +434,14 @@ export namespace Sequencer {
       };
       REQUEST: EstimateFeeRequestBulk;
       RESPONSE: EstimateFeeResponseBulk;
+    };
+    get_block_traces: {
+      QUERY: {
+        blockHash?: string;
+        blockNumber?: BlockNumber;
+      };
+      REQUEST: never;
+      RESPONSE: BlockTransactionTracesResponse;
     };
   };
 }
