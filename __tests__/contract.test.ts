@@ -1,12 +1,15 @@
 import { isBN } from 'bn.js';
 
 import { Contract, ContractFactory, stark } from '../src';
+import { callData, felt, tuple, uint256 } from '../src/utils/calldata';
 import { getSelectorFromName } from '../src/utils/hash';
 import { BigNumberish, toBN } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
 import { compileCalldata } from '../src/utils/stark';
+import { uint256ToBN } from '../src/utils/uint256';
 import {
   compiledErc20,
+  compiledErc20Echo,
   compiledMulticall,
   compiledTypeTransformation,
   getTestAccount,
@@ -30,7 +33,7 @@ describe('contract module', () => {
         const { deploy } = await account.declareDeploy({
           contract: compiledErc20,
           classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
-          constructorCalldata: [encodeShortString('Token'), encodeShortString('ERC20'), wallet],
+          constructorCalldata,
         });
 
         erc20Contract = new Contract(compiledErc20.abi, deploy.contract_address!, provider);
@@ -139,7 +142,7 @@ describe('contract module', () => {
         });
 
         test('Parsing the tuple in request', async () => {
-          return expect(typeTransformedContract.request_tuple([1, 2])).resolves.not.toThrow();
+          return expect(typeTransformedContract.request_tuple(tuple(1, 2))).resolves.not.toThrow();
         });
 
         test('Parsing the multiple types in request', async () => {
@@ -196,12 +199,12 @@ describe('contract module', () => {
 
         test('Parsing the multiple types in response', async () => {
           const result = await typeTransformedContract.get_mixed_types();
-          const [tuple, number, array, point] = result;
-          expect(tuple).toStrictEqual([toBN(1), toBN(2)]);
+          const [aTuple, number, array, point] = result;
+          expect(aTuple).toStrictEqual([toBN(1), toBN(2)]);
           expect(number).toStrictEqual(toBN(3));
           expect(array).toStrictEqual([toBN(4)]);
           expect(point).toStrictEqual({ x: toBN(1), y: toBN(2) });
-          expect(tuple).toStrictEqual(result.tuple);
+          expect(aTuple).toStrictEqual(result.tuple);
           expect(number).toStrictEqual(result.number);
           expect(array).toStrictEqual(result.array);
           expect(point).toStrictEqual(result.point);
@@ -245,5 +248,275 @@ describe('contract module', () => {
       const erc20 = factory.attach(erc20Address);
       expect(erc20 instanceof Contract);
     });
+  });
+});
+
+describe('Contract interaction', () => {
+  let ierc20Contract: Contract;
+  const provider = getTestProvider();
+  const account = getTestAccount(provider);
+  const classHash = '0x03a00384217ad692b75a7b1bad47f269e7e3597c8498e6db939c952164130c09';
+  let factory;
+
+  beforeAll(async () => {
+    factory = new ContractFactory(compiledErc20Echo, classHash, account);
+    ierc20Contract = await factory.deploy(
+      'Token',
+      'ERC20',
+      18,
+      uint256('1000000000'),
+      account.address,
+      ['0x823d5a0c0eefdc9a6a1cb0e064079a6284f3b26566b677a32c71bbe7bf9f8c'],
+      22
+    );
+  });
+
+  test('contractFactory.deploy with raw arguments - all types constructor params', () => {
+    // executed in beforeAll
+    expect(ierc20Contract instanceof Contract);
+  });
+
+  test('contractFactory.deploy with callData - all types constructor params', async () => {
+    // Deploy with callData - OK
+    ierc20Contract = await factory.deploy(
+      callData({
+        name: 'Token',
+        symbol: 'ERC20',
+        decimals: '18', // number as string will stay same (not processed)
+        initial_supply: uint256('1000000000'),
+        recipient: account.address,
+        signers: ['0x823d5a0c0eefdc9a6a1cb0e064079a6284f3b26566b677a32c71bbe7bf9f8c'],
+        threshold: 1,
+      })
+    );
+    expect(ierc20Contract instanceof Contract);
+  });
+
+  test('declareDeploy with callData - all types using felt,uint256,tuple helpers', async () => {
+    const { deploy } = await account.declareDeploy({
+      contract: compiledErc20Echo,
+      classHash,
+      constructorCalldata: callData({
+        name: felt('Token'),
+        symbol: felt('ERC20'),
+        decimals: felt('18'),
+        initial_supply: uint256('1000000000'),
+        recipient: felt(account.address),
+        signers: ['0x823d5a0c0eefdc9a6a1cb0e064079a6284f3b26566b677a32c71bbe7bf9f8c'],
+        threshold: 1,
+      }),
+    });
+
+    ierc20Contract = new Contract(compiledErc20Echo.abi, deploy.contract_address!, provider);
+    expect(ierc20Contract instanceof Contract);
+  });
+
+  test('Assert helpers and non helpers structure produce same result', async () => {
+    const feltedData = callData({
+      name: felt('Token'),
+      symbol: felt('ERC20'),
+      decimals: felt(18),
+      initial_supply: uint256('1000000000'),
+      recipient: felt(account.address),
+      someArray: [1, 2, 3], // array doesn't need helper as it is defined as js array
+      someStruct: { a: 1, b: 2 }, // struct doesn't need helper as it is defined as js object
+      someTuple: tuple(10, '0x9', 'string'),
+    });
+
+    const composedData = callData({
+      name: 'Token',
+      symbol: 'ERC20',
+      decimals: 18,
+      initial_supply: { low: 1_000_000_000, high: 0 },
+      recipient: account.address,
+      someArray: [1, 2, 3],
+      someStruct: { a: 1, b: 2 },
+      someTuple: { 0: 10, 1: '0x9', 2: 'string' },
+    });
+
+    expect(JSON.stringify(feltedData)).toBe(JSON.stringify(composedData));
+  });
+
+  test('call contract method with raw arguments and callData arguments', async () => {
+    const data = {
+      f1: [1, 2, 3, 4, 5, 6],
+      u1: [uint256(1000), uint256(2000), uint256(3000), uint256(4000)],
+      s2: [
+        { discount_fix_bps: 10, discount_transfer_bps: 11 },
+        { discount_fix_bps: 20, discount_transfer_bps: 22 },
+      ],
+    };
+
+    const compiledData = callData(data);
+    // call function with compiled data
+    const result3 = await ierc20Contract.echo2(compiledData);
+
+    // call function with raw data as parameters
+    const result2 = await ierc20Contract.echo2(data.f1, data.u1, data.s2, {
+      parseRequest: true,
+      parseResponse: true,
+    });
+    console.log(compiledData);
+    console.log(result2);
+    console.log(result3);
+  });
+
+  test('call contract method with array params', async () => {
+    const data = {
+      f1: [1, 2, 3, 4, 5, 6],
+      u1: [uint256(1000), uint256(2000), uint256(3000), uint256(4000)],
+      s2: [
+        { discount_fix_bps: 10, discount_transfer_bps: 11 },
+        { discount_fix_bps: 20, discount_transfer_bps: 22 },
+      ],
+    };
+
+    const result2 = await ierc20Contract.echo2(data.f1, data.u1, data.s2, {
+      parseRequest: true,
+      parseResponse: true,
+    });
+    console.log(result2);
+  });
+
+  test('call contract method with encodeShortString, composed struct and nested tuple', async () => {
+    const result3 = await ierc20Contract.echo3(
+      encodeShortString('some text1'),
+      123,
+      encodeShortString('some text 2'),
+      [{ a: 1, b: { b: 2, c: tuple(3, 4, 5, 6) } }],
+      tuple(
+        1,
+        { x1: 2, x2: { y1: 3, y2: 4 }, x3: tuple(tuple(5, 6), tuple(tuple(7, 8), tuple(9, 10))) },
+        11
+      )
+    );
+    console.log(result3);
+  });
+
+  test('callData compatibility', async () => {
+    const compiledCallData = stark.compileCalldata({
+      name: encodeShortString('TokenMTK'),
+      symbol: encodeShortString('MTK'),
+      decimals: '18',
+      initial_supply: { type: 'struct', low: 100, high: 0 },
+      recipient: account.address,
+      owner: account.address,
+    });
+
+    console.log(compiledCallData);
+
+    const newCalldata = {
+      name: 'TokenMTK',
+      symbol: 'MTK',
+      decimals: 18,
+      decimals2: '1234', // will not be converted
+      initial_supply: uint256('1000000000000'),
+      recipient: account.address,
+      tuple1: tuple(10, 20, '0x30', toBN(40)),
+      struct1: {
+        a: 1,
+        b: 2,
+      },
+      structOfTuple: {
+        x: tuple(10, 20),
+        y: tuple(22, 33),
+      },
+      structOfTupleOfTuple: {
+        x: tuple(tuple(1, 2), tuple(3, 4)),
+        y: tuple(22, 33),
+      },
+      tupleOfStruct: tuple(
+        {
+          a: 1,
+          b: 33,
+        },
+        { c: 'Test', d: uint256('123333333') }
+      ),
+      tupleOfStructOfStruct: tuple({
+        a: {
+          a1: 1,
+          a2: tuple(2, 3),
+          a3: {
+            a31: 1,
+            a32: tuple(321, 322),
+          },
+        },
+        b: uint256(33),
+      }),
+      array1: ['123', '0x123'],
+      arrayOfStruct: [
+        { x: 1, y: 2 },
+        { x: 10, y: 20 },
+        { x: 100, y: 200 },
+      ],
+      arrayOfStructOfTuple: [
+        { x: tuple(111, 112), y: tuple(121, 122) },
+        { x: tuple(211, 212), y: tuple(221, 222) },
+      ],
+    };
+
+    const compiledNewCallData = callData(newCalldata);
+
+    console.log(compiledNewCallData);
+
+    const { balance: uint256Balance } = await ierc20Contract.balanceOf(account.address, {
+      parseRequest: true, // user can opt out from validation and paring request/response
+      parseResponse: true,
+    });
+    const bnBalance = uint256ToBN(uint256Balance);
+    const balance = bnBalance.toString();
+    expect(balance).toBe('1000000000');
+
+    // validating and parsing tuple in request and response are not supported because of possibility of complex nested structure
+    // users that use tuples can opt-out from request validation and response parsing and do it manually
+    // user can use callData to compile data with tuples
+    // TODO: create regex for nested tuple abi type parsing (support tuple in request validation and response parse)
+    const result = await ierc20Contract.echo(
+      callData({
+        // t1: tuple(felt(10), felt(20)),
+        f1: felt('someText'),
+        u1: uint256('5000'),
+        s1: {
+          discount_fix_bps: felt(1),
+          discount_transfer_bps: felt(2),
+        },
+        s2: {
+          info: {
+            discount_fix_bps: felt(1),
+            discount_transfer_bps: felt(2),
+          },
+          data: felt(200),
+          data2: tuple(felt(1), felt(2)),
+        },
+        /* t2: tuple(
+          {
+            info: {
+              discount_fix_bps: felt(1),
+              discount_transfer_bps: felt(2),
+            },
+            data: felt(200),
+            data2: tuple(felt(1), felt(2)),
+          },
+          felt(100)
+        ), */
+      })
+    );
+    console.log(result);
+
+    const test2Data = callData({
+      f1: [1, 2, 3, 4, 5, 6],
+      u1: [uint256(1000), uint256(2000), uint256(3000), uint256(4000)],
+      s2: [
+        { discount_fix_bps: 10, discount_transfer_bps: 11 },
+        { discount_fix_bps: 20, discount_transfer_bps: 22 },
+      ],
+    });
+
+    // call function with ready call data
+    const result2 = await ierc20Contract.echo2(test2Data, {
+      parseRequest: false,
+      parseResponse: true,
+    });
+    console.log(result2);
   });
 });

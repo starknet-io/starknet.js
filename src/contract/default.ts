@@ -1,4 +1,3 @@
-import BN from 'bn.js';
 import assert from 'minimalistic-assert';
 
 import { AccountInterface } from '../account';
@@ -22,14 +21,6 @@ import { CheckCallData } from '../utils/calldata';
 import { BigNumberish, toBN } from '../utils/number';
 import { CallOptions, ContractInterface } from './interface';
 
-function parseFelt(candidate: string): BN {
-  try {
-    return toBN(candidate);
-  } catch (e) {
-    throw Error('Could not parse felt');
-  }
-}
-
 /**
  * Adds call methods to the contract
  *
@@ -37,14 +28,28 @@ function parseFelt(candidate: string): BN {
 function buildCall(contract: Contract, functionAbi: FunctionAbi): AsyncContractFunction {
   return async function (...args: Array<any>): Promise<any> {
     let blockIdentifier: BlockTag | null = null;
+    let parseRequest: Boolean = true;
+    let parseResponse: Boolean = true;
 
+    // extract options
     args.forEach((arg) => {
-      if (arg.blockIdentifier) {
+      if (typeof arg !== 'object') return;
+      if ('blockIdentifier' in arg) {
         blockIdentifier = arg.blockIdentifier;
+      }
+      if ('parseRequest' in arg) {
+        parseRequest = arg.parseRequest;
+      }
+      if ('parseResponse' in arg) {
+        parseResponse = arg.parseResponse;
       }
     });
 
-    return contract.call(functionAbi.name, args, { blockIdentifier });
+    return contract.call(functionAbi.name, args, {
+      blockIdentifier,
+      parseRequest,
+      parseResponse,
+    });
   };
 }
 
@@ -234,7 +239,7 @@ export class Contract implements ContractInterface {
   public async call(
     method: string,
     args: Array<any> = [],
-    options: CallOptions = {}
+    options: CallOptions = { parseRequest: true, parseResponse: true }
   ): Promise<Result> {
     // default value also for null
     const blockIdentifier = options?.blockIdentifier || undefined;
@@ -242,12 +247,21 @@ export class Contract implements ContractInterface {
     // ensure contract is connected
     assert(this.address !== null, 'contract is not connected to an address');
 
-    // validate method and args
-    this.checkCalldata.validateMethodAndArgs('CALL', method, args);
-    const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
+    let calldata;
+    if (!options.parseRequest || args[0]?.compiled) {
+      // provided args are compiled callData
+      // eslint-disable-next-line prefer-destructuring
+      calldata = args[0];
+    } else {
+      // args are raw data
+      // validate method and args
+      this.checkCalldata.validateMethodAndArgs('CALL', method, args);
+      const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
 
-    // compile calldata
-    const calldata = this.checkCalldata.compileCalldata(args, inputs);
+      // compile calldata
+      calldata = this.checkCalldata.compileCalldata(args, inputs);
+    }
+
     return this.providerOrAccount
       .callContract(
         {
@@ -257,7 +271,7 @@ export class Contract implements ContractInterface {
         },
         blockIdentifier
       )
-      .then((x) => this.parseResponse(method, x.result));
+      .then((x) => (options.parseResponse ? this.parseResponse(method, x.result) : x.result));
   }
 
   public invoke(
@@ -357,7 +371,7 @@ export class Contract implements ContractInterface {
         return acc;
       }, {} as any);
     }
-    return parseFelt(responseIterator.next().value);
+    return toBN(responseIterator.next().value);
   }
 
   /**
@@ -376,10 +390,10 @@ export class Contract implements ContractInterface {
     const parsedDataArr: (BigNumberish | ParsedStruct)[] = [];
     switch (true) {
       case /_len$/.test(name):
-        return parseFelt(responseIterator.next().value).toNumber();
+        return toBN(responseIterator.next().value).toNumber();
       case /\(felt/.test(type):
         return type.split(',').reduce((acc) => {
-          acc.push(parseFelt(responseIterator.next().value));
+          acc.push(toBN(responseIterator.next().value));
           return acc;
         }, [] as BigNumberish[]);
       case /\*/.test(type):
@@ -395,7 +409,7 @@ export class Contract implements ContractInterface {
       case type in this.structs:
         return this.parseResponseStruct(responseIterator, type);
       default:
-        return parseFelt(responseIterator.next().value);
+        return toBN(responseIterator.next().value);
     }
   }
 

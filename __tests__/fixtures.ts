@@ -11,6 +11,7 @@ const readContract = (name: string): CompiledContract =>
 
 export const compiledOpenZeppelinAccount = readContract('Account');
 export const compiledErc20 = readContract('ERC20');
+export const compiledErc20Echo = readContract('ERC20-echo');
 export const compiledL1L2 = readContract('l1l2_compiled');
 export const compiledTypeTransformation = readContract('contract');
 export const compiledMulticall = readContract('multicall');

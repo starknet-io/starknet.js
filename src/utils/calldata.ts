@@ -1,8 +1,77 @@
+/* eslint-disable no-plusplus */
 import BN from 'bn.js';
 import assert from 'minimalistic-assert';
 
-import { Abi, AbiEntry, Calldata, FunctionAbi, ParsedStruct, StructAbi } from '../types';
-import { BigNumberish, toFelt } from './number';
+import { Abi, AbiEntry, Calldata, FunctionAbi, ParsedStruct, StructAbi, Tupled } from '../types';
+import { BigNumberish, toBN, toFelt } from './number';
+import { Uint256, isUint256 } from './uint256';
+
+const isLen = (name: string) => /_len$/.test(name);
+// ABI Types
+const isTypeFelt = (type: string) => type === 'felt';
+const isTypeFeltArray = (type: string) => type === 'felt*';
+const isTypeArray = (type: string) => /\*/.test(type);
+const isTypeTuple = (type: string) => /\(.*\)/i.test(type);
+const isTypeNamedTuple = (type: string) => /\(.*\)/i.test(type) && type.includes(':');
+
+function parseNamedTuple(namedTuple: string): any {
+  const name = namedTuple.substring(0, namedTuple.indexOf(':'));
+  const type = namedTuple.substring(name.length + ':'.length);
+  return { name, type };
+}
+
+function parseSubTuple(s: string) {
+  if (!s.includes('(')) return { subTuple: [], result: s };
+
+  const subTuple: string[] = [];
+  let result = '';
+  let i = 0;
+  while (i < s.length) {
+    if (s[i] === '(') {
+      let counter = 1;
+      const lBracket = i;
+      i++;
+      while (counter) {
+        if (s[i] === ')') counter--;
+        if (s[i] === '(') counter++;
+        i++;
+      }
+      subTuple.push(s.substring(lBracket, i));
+      result += ' ';
+      i--;
+    } else {
+      result += s[i];
+    }
+    i++;
+  }
+
+  return {
+    subTuple,
+    result,
+  };
+}
+
+function extractTupleMemberTypes(type: string): string[] {
+  const cleanType = type.replace(/\s/g, '').slice(1, -1); // remove first lvl () and spaces
+
+  // Decompose subTuple
+  const { subTuple, result } = parseSubTuple(cleanType);
+
+  // Recompose subTuple
+  let recomposed = result.split(',').map((it) => {
+    return subTuple.length ? it.replace(' ', subTuple.shift() as string) : it;
+  });
+
+  // Parse named tuple
+  if (isTypeNamedTuple(type)) {
+    recomposed = recomposed.reduce((acc, it) => {
+      return acc.concat(parseNamedTuple(it).type);
+    }, []);
+    // TODO: we can check also names in named tuple
+  }
+
+  return recomposed;
+}
 
 export class CheckCallData {
   abi: Abi;
@@ -23,29 +92,6 @@ export class CheckCallData {
   }
 
   /**
-   * Parse the calldata by using input fields from the abi for that method
-   *
-   * @param args - arguments passed the the method
-   * @param inputs  - list of inputs(fields) that are in the abi
-   * @return {Calldata} - parsed arguments in format that contract is expecting
-   */
-  public compileCalldata(args: Array<any>, inputs: AbiEntry[]): Calldata {
-    const argsIterator = args[Symbol.iterator]();
-    return inputs.reduce((acc, input) => {
-      if (/_len$/.test(input.name)) {
-        return acc;
-      }
-      const parsedData = this.parseCalldataField(argsIterator, input);
-      if (Array.isArray(parsedData)) {
-        acc.push(...parsedData);
-      } else {
-        acc.push(parsedData);
-      }
-      return acc;
-    }, [] as Calldata);
-  }
-
-  /**
    * Validates if all arguments that are passed to the method are corresponding to the ones in the abi
    *
    * @param type - type of the method
@@ -57,7 +103,7 @@ export class CheckCallData {
     method: string,
     args: Array<any> = []
   ) {
-    // ensure provided method exists
+    // ensure provided method of type exists
     if (type !== 'DEPLOY') {
       const invocableFunctionNames = this.abi
         .filter((abi) => {
@@ -72,67 +118,64 @@ export class CheckCallData {
       );
     }
 
-    // ensure args match abi type
+    // get requested method from abi
     const methodAbi = this.abi.find((abi) =>
       type === 'DEPLOY'
         ? abi.name === method && abi.type === method
         : abi.name === method && abi.type === 'function'
     ) as FunctionAbi;
-    let argPosition = 0;
-    methodAbi.inputs.forEach((input) => {
-      if (/_len$/.test(input.name)) {
-        return;
-      }
-      if (input.type === 'felt') {
+
+    // validate parameters
+    methodAbi.inputs.reduce((acc, input) => {
+      const parameter = args[acc];
+
+      // Skip for _len
+      if (isLen(input.name)) return acc;
+
+      // type Felt
+      if (isTypeFelt(input.type)) {
         assert(
-          typeof args[argPosition] === 'string' ||
-            typeof args[argPosition] === 'number' ||
-            args[argPosition] instanceof BN,
+          typeof parameter === 'string' || typeof parameter === 'number' || parameter instanceof BN,
           `arg ${input.name} should be a felt (string, number, BigNumber)`
         );
-        argPosition += 1;
-      } else if (input.type in this.structs && typeof args[argPosition] === 'object') {
-        if (Array.isArray(args[argPosition])) {
+
+        // type Struct
+      } else if (input.type in this.structs && typeof parameter === 'object') {
+        // Case when struct parameters are provided as array instead of object
+        if (Array.isArray(parameter)) {
           const structMembersLength = this.calculateStructMembers(input.type);
           assert(
-            args[argPosition].length === structMembersLength,
+            parameter.length === structMembersLength,
             `arg should be of length ${structMembersLength}`
           );
         } else {
           this.structs[input.type].members.forEach(({ name }) => {
-            assert(
-              Object.keys(args[argPosition]).includes(name),
-              `arg should have a property ${name}`
-            );
+            assert(Object.keys(parameter).includes(name), `arg should have a property ${name}`);
           });
         }
-        argPosition += 1;
+
+        // Type Tuple -> detected as object that is not part of abi struct
+      } else if (typeof parameter === 'object' && !Array.isArray(parameter)) {
+        // TODO: skip tuple validation for now
+        // Type Array
       } else {
-        assert(Array.isArray(args[argPosition]), `arg ${input.name} should be an Array`);
+        assert(Array.isArray(parameter), `arg ${input.name} should be an Array`);
+        // Array of Felts
         if (input.type === 'felt*') {
-          args[argPosition].forEach((felt: BigNumberish) => {
+          parameter.forEach((felty: BigNumberish) => {
             assert(
-              typeof felt === 'string' || typeof felt === 'number' || felt instanceof BN,
+              typeof felty === 'string' || typeof felty === 'number' || felty instanceof BN,
               `arg ${input.name} should be an array of string, number or BigNumber`
             );
           });
-          argPosition += 1;
+
+          // Array of Tuple
         } else if (/\(felt/.test(input.type)) {
-          const tupleLength = input.type.split(',').length;
-          assert(
-            args[argPosition].length === tupleLength,
-            `arg ${input.name} should have ${tupleLength} elements in tuple`
-          );
-          args[argPosition].forEach((felt: BigNumberish) => {
-            assert(
-              typeof felt === 'string' || typeof felt === 'number' || felt instanceof BN,
-              `arg ${input.name} should be an array of string, number or BigNumber`
-            );
-          });
-          argPosition += 1;
+          // TODO: This ex. code validate only most basic tuple structure, skip for validation
+          // Array of Struct
         } else {
           const arrayType = input.type.replace('*', '');
-          args[argPosition].forEach((struct: any) => {
+          parameter.forEach((struct: any) => {
             this.structs[arrayType].members.forEach(({ name }) => {
               if (Array.isArray(struct)) {
                 const structMembersLength = this.calculateStructMembers(arrayType);
@@ -148,16 +191,32 @@ export class CheckCallData {
               }
             });
           });
-          argPosition += 1;
         }
       }
-    });
+      return acc + 1;
+    }, 0);
+  }
+
+  /**
+   * Parse the calldata by using input fields from the abi for that method
+   *
+   * @param args - arguments passed the the method
+   * @param inputs  - list of inputs(fields) that are in the abi
+   * @return {Calldata} - parsed arguments in format that contract is expecting
+   */
+  public compileCalldata(args: Array<any>, inputs: AbiEntry[]): Calldata {
+    const argsIterator = args[Symbol.iterator]();
+    return inputs.reduce(
+      (acc, input) =>
+        isLen(input.name) ? acc : acc.concat(this.parseCalldataField(argsIterator, input)),
+      [] as Calldata
+    );
   }
 
   /**
    * Parse one field of the calldata by using input field from the abi for that method
    *
-   * @param args - value of the field
+   * @param argsIterator - Iterator<any> for value of the field
    * @param input  - input(field) information from the abi that will be used to parse the data
    * @return {string | string[]} - parsed arguments in format that contract is expecting
    */
@@ -165,28 +224,29 @@ export class CheckCallData {
     const { name, type } = input;
     const { value } = argsIterator.next();
 
-    const parsedCalldata: string[] = [];
     switch (true) {
-      case /\*/.test(type):
-        if (Array.isArray(value)) {
-          parsedCalldata.push(toFelt(value.length));
-          return (value as (BigNumberish | ParsedStruct)[]).reduce((acc, el) => {
-            if (/felt/.test(type)) {
-              acc.push(toFelt(el as BigNumberish));
-            } else {
-              acc.push(...this.parseCalldataValue(el, type.replace('*', '')));
-            }
-            return acc;
-          }, parsedCalldata);
+      // When type is Array
+      case isTypeArray(type):
+        if (!Array.isArray(value)) {
+          throw Error(`ABI expected parameter ${name} to be array, got ${value}`);
         }
-        throw Error(`Expected ${name} to be array`);
-      case type in this.structs:
+        // eslint-disable-next-line no-case-declarations
+        const result: string[] = [];
+        result.push(toFelt(value.length)); // Add length to array
+
+        return (value as (BigNumberish | ParsedStruct)[]).reduce((acc, el) => {
+          if (isTypeFeltArray(type)) {
+            acc.push(toFelt(el as BigNumberish));
+          } else {
+            // structure or tuple
+            acc.push(...this.parseCalldataValue(el, type.replace('*', '')));
+          }
+          return acc;
+        }, result);
+      // When type is Struct or Tuple
+      case type in this.structs || isTypeTuple(type):
         return this.parseCalldataValue(value as ParsedStruct | BigNumberish[], type);
-      case /\(felt/.test(type):
-        if (Array.isArray(value)) {
-          return value.map((el) => toFelt(el as BigNumberish));
-        }
-        throw Error(`Expected ${name} to be array`);
+      // When type is felt or unhandled
       default:
         return toFelt(value as BigNumberish);
     }
@@ -205,36 +265,42 @@ export class CheckCallData {
     type: string
   ): string | string[] {
     if (element === undefined) {
-      throw Error('Missing element in calldata');
+      throw Error(`Missing parameter for type ${type}`);
     }
     if (Array.isArray(element)) {
       const structMemberNum = this.calculateStructMembers(type);
       if (element.length !== structMemberNum) {
-        throw Error('Missing element in calldata');
+        throw Error(`Missing parameter for type ${type}`);
       }
       return element.map((el) => toFelt(el));
     }
-    // checking if the passed element is struct or element in struct
+    // checking if the passed element is struct
     if (this.structs[type] && this.structs[type].members.length) {
-      // going through all the members of the struct and parsing the value
-      return this.structs[type].members.reduce((acc, member: AbiEntry) => {
-        // if the member of the struct is another struct this will return array of the felts if not it will be single felt
+      const { members } = this.structs[type];
+      const subElement = element as any;
+
+      return members.reduce((acc, it: AbiEntry) => {
         // TODO: refactor types so member name can be used as keyof ParsedStruct
-        /* @ts-ignore */
-        const parsedData = this.parseCalldataValue(element[member.name], member.type);
-        if (typeof parsedData === 'string') {
-          acc.push(parsedData);
-        } else {
-          acc.push(...parsedData);
-        }
-        return acc;
+        return acc.concat(this.parseCalldataValue(subElement[it.name], it.type));
       }, [] as string[]);
+    }
+    // check if abi element is tuple
+    if (isTypeTuple(type)) {
+      const tupled = this.parseTuple(element as object, type);
+
+      return tupled.reduce((acc, it: Tupled) => {
+        const parsedData = this.parseCalldataValue(it.element, it.type);
+        return acc.concat(parsedData);
+      }, [] as string[]);
+    }
+    if (typeof element === 'object') {
+      throw Error(`Parameter ${element} do not align with abi parameter ${type}`);
     }
     return toFelt(element as BigNumberish);
   }
 
   /**
-   * Deep parse of the object that has been passed to the method
+   * Deep parse of the object that has been passed to the method // TODO: Check how to get here
    *
    * @param struct - struct that needs to be calculated
    * @return {number} - number of members for the given struct
@@ -247,4 +313,85 @@ export class CheckCallData {
       return acc + this.calculateStructMembers(member.type);
     }, 0);
   }
+
+  private parseTuple(element: object, typeStr: string): Tupled[] {
+    const memberTypes = extractTupleMemberTypes(typeStr);
+    const elements = Object.values(element);
+
+    if (elements.length !== memberTypes.length) {
+      throw Error('Provided and abi expected tuple size diff in parseTuple');
+    }
+
+    return memberTypes.map((type: any, dx: number) => {
+      return {
+        element: elements[dx],
+        type,
+      };
+    });
+  }
+}
+
+/**
+ * Uint256 cairo type (helper for common struct type)
+ */
+export function uint256(it: BigNumberish): Uint256 {
+  const bn = toBN(it);
+  if (!isUint256(bn)) throw new Error('Number is too large');
+  return {
+    low: bn.maskn(128).toString(10),
+    high: bn.shrn(128).toString(10),
+  };
+}
+
+/**
+ * 'unnamed' tuple cairo type (helper same as common struct type)
+ * named tuple can be defined as struct with js object
+ */
+export function tuple(...args: (BigNumberish | object)[]) {
+  return { ...args };
+}
+
+/**
+ * struct types are described as js object {}
+ */
+
+/**
+ * array types are described as js array []
+ */
+
+/**
+ * felt cairo type
+ */
+export const felt = (it: BigNumberish) => toFelt(it);
+
+/**
+ * Compile contract callData for sending request
+ * @param data Object representing cairo method arguments
+ * @returns string[]
+ */
+export function callData(data: object): string[] {
+  const createTree = (obj: object) => {
+    const getEntries = (o: object, prefix = ''): any => {
+      const oe = Array.isArray(o) ? [o.length.toString(), ...o] : o;
+      return Object.entries(oe).flatMap(([k, v]) => {
+        const kk = Array.isArray(oe) && k === '0' ? '$$len' : k;
+        if (BN.isBN(v)) return [[`${prefix}${kk}`, felt(v)]];
+        return Object(v) === v ? getEntries(v, `${prefix}${kk}.`) : [[`${prefix}${kk}`, felt(v)]];
+      });
+    };
+    return Object.fromEntries(getEntries(obj));
+  };
+
+  // flatten structs, tuples, add array length. Process leafs as Felt
+  const callTree = createTree(data);
+  // convert to array
+  const callTreeArray = Object.values(callTree);
+
+  // add compiled property to array object
+  Object.defineProperty(callTreeArray, 'compiled', {
+    enumerable: false,
+    writable: false,
+    value: true,
+  });
+  return callTreeArray;
 }

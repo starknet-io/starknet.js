@@ -38,8 +38,11 @@ export function formatSignature(sig?: Signature): string[] {
   }
 }
 
+/**
+ * @deprecated this function is deprecated use callData instead from calldata.ts
+ */
 export function compileCalldata(args: RawArgs): Calldata {
-  return Object.values(args).flatMap((value) => {
+  const compiledData = Object.values(args).flatMap((value) => {
     if (Array.isArray(value))
       return [toBN(value.length).toString(), ...value.map((x) => toBN(x).toString())];
     if (typeof value === 'object' && 'type' in value)
@@ -48,6 +51,12 @@ export function compileCalldata(args: RawArgs): Calldata {
         .map(([, v]) => toBN(v).toString());
     return toBN(value).toString();
   });
+  Object.defineProperty(compiledData, 'compiled', {
+    enumerable: false,
+    writable: false,
+    value: true,
+  });
+  return compiledData;
 }
 
 export function estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: number = 0.5): BN {

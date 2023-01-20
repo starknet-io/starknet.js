@@ -2,21 +2,27 @@ import BN from 'bn.js';
 import assert from 'minimalistic-assert';
 
 import { addHexPrefix, removeHexPrefix } from './encode';
+import { encodeShortString } from './shortString';
 
 export type BigNumberish = string | number | BN;
 
 export function isHex(hex: string): boolean {
   return /^0x[0-9a-f]*$/i.test(hex);
 }
+export const isStringWholeNumber = (value: string) => /^\d+$/.test(value);
 
 export function toBN(number: BigNumberish, base?: number | 'hex') {
-  if (typeof number === 'string') {
-    // eslint-disable-next-line no-param-reassign
-    number = number.toLowerCase();
+  const bigNumberish = typeof number === 'string' ? number.toLowerCase() : number;
+  const { value, theBase } =
+    typeof bigNumberish === 'string' && isHex(bigNumberish) && !base
+      ? { value: removeHexPrefix(bigNumberish), theBase: 'hex' }
+      : { value: bigNumberish, theBase: base };
+
+  try {
+    return new BN(value, theBase as any);
+  } catch (e) {
+    throw Error(`Error create BN from value: ${number}`);
   }
-  if (typeof number === 'string' && isHex(number) && !base)
-    return new BN(removeHexPrefix(number), 'hex');
-  return new BN(number, base);
 }
 
 export function toHex(number: BN): string {
@@ -27,11 +33,27 @@ export function hexToDecimalString(hex: string): string {
   return toBN(`0x${hex.replace(/^0x/, '')}`).toString();
 }
 
-export function toFelt(num: BigNumberish): string {
-  if (BN.isBN(num)) {
-    return num.toString();
+export function toFelt(it: BigNumberish): string {
+  // BN or number
+  if (BN.isBN(it) || (typeof it === 'number' && Number.isInteger(it))) {
+    return it.toString();
   }
-  return toBN(num).toString();
+  // string text
+  if (typeof it === 'string' && !isHex(it) && !isStringWholeNumber(it)) {
+    const encoded = encodeShortString(it);
+    return toBN(encoded).toString();
+  }
+  // hex string
+  if (typeof it === 'string' && isHex(it)) {
+    // toBN().toString
+    return toBN(it).toString();
+  }
+  // string number (already converted), or unhandled type
+  if (typeof it === 'string' && isStringWholeNumber(it)) {
+    return it;
+  }
+
+  throw new Error(`${it} can't be computed by toFelt()`);
 }
 
 /**
@@ -68,7 +90,6 @@ export function bigNumberishArrayToHexadecimalStringArray(rawCalldata: BigNumber
   return rawCalldata.map((x) => toHex(toBN(x)));
 }
 
-export const isStringWholeNumber = (value: string) => /^\d+$/.test(value);
 export const toHexString = (value: string) => toHex(toBN(value));
 
 export function getDecimalString(value: string) {

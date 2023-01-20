@@ -13,6 +13,8 @@ import {
 
 export type CallOptions = {
   blockIdentifier?: BlockIdentifier;
+  parseRequest: Boolean;
+  parseResponse: Boolean;
 };
 
 export abstract class ContractInterface {

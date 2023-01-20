@@ -108,6 +108,7 @@ export type EntryPointType = 'EXTERNAL';
 export type CompressedProgram = string;
 
 export type AbiEntry = { name: string; type: 'felt' | 'felt*' | string };
+export type Tupled = { element: any; type: string };
 
 export type FunctionAbi = {
   inputs: AbiEntry[];

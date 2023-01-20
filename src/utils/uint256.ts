@@ -21,7 +21,7 @@ export function isUint256(bn: BigNumberish): boolean {
   return toBN(bn).lte(UINT_256_MAX);
 }
 
-// function to convert BN to Uint256
+// function to convert BN to Uint256 hex
 export function bnToUint256(bignumber: BigNumberish): Uint256 {
   const bn = toBN(bignumber);
   if (!isUint256(bn)) throw new Error('Number is too large');

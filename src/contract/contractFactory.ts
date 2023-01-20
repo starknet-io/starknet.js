@@ -33,15 +33,33 @@ export class ContractFactory {
    * Deploys contract and returns new instance of the Contract
    *
    * @param args - Array of the constructor arguments for deployment
-   * @param addressSalt (optional) - Address Salt for deployment
+   * @param options (optional) Object - parseRequest, parseResponse, addressSalt
    * @returns deployed Contract
    */
-  public async deploy(args: Array<any> = [], addressSalt?: string | undefined): Promise<Contract> {
-    this.checkCalldata.validateMethodAndArgs('DEPLOY', 'constructor', args);
-    const { inputs } = this.abi.find((abi) => abi.type === 'constructor') as FunctionAbi;
+  public async deploy(...args: Array<any>): Promise<Contract> {
+    let constructorCalldata;
+    let parseRequest: Boolean = true;
+    let addressSalt: string | undefined;
 
-    // compile calldata
-    const constructorCalldata = this.checkCalldata.compileCalldata(args, inputs);
+    // extract options
+    args.forEach((arg) => {
+      if (typeof arg !== 'object') return;
+      if ('addressSalt' in arg) {
+        addressSalt = arg.addressSalt;
+      }
+      if ('parseRequest' in arg) {
+        parseRequest = arg.parseRequest;
+      }
+    });
+
+    if (!parseRequest || args[0]?.compiled) {
+      // eslint-disable-next-line prefer-destructuring
+      constructorCalldata = args[0];
+    } else {
+      this.checkCalldata.validateMethodAndArgs('DEPLOY', 'constructor', args);
+      const { inputs } = this.abi.find((abi) => abi.type === 'constructor') as FunctionAbi;
+      constructorCalldata = this.checkCalldata.compileCalldata(args, inputs);
+    }
 
     const {
       deploy: { contract_address, transaction_hash },
