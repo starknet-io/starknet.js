@@ -70,7 +70,7 @@ export function compileCalldata(args: RawArgs): Calldata {
     if (Array.isArray(value))
       return [toBigInt(value.length).toString(), ...value.map((x) => toBigInt(x).toString())];
     if (typeof value === 'object' && 'type' in value)
-      return Object.entries(value)
+      return Object.entries<BigNumberish>(value)
         .filter(([k]) => k !== 'type')
         .map(([, v]) => toBigInt(v).toString());
     return toBigInt(value).toString();
