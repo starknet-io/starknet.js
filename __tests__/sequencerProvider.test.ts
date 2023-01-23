@@ -1,4 +1,6 @@
-import { Contract, Provider, SequencerProvider, stark } from '../src';
+import { Contract, GatewayError, HttpError, Provider, SequencerProvider, stark } from '../src';
+import * as fetchModule from '../src/utils/fetchPonyfill';
+import { stringify } from '../src/utils/json';
 import { toBigInt } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
 import {
@@ -14,10 +16,42 @@ import {
 describeIfSequencer('SequencerProvider', () => {
   const sequencerProvider = getTestProvider() as SequencerProvider;
   const account = getTestAccount(sequencerProvider);
-  let customSequencerProvider: Provider;
-  let exampleContractAddress: string;
+
+  describe('Generic fetch', () => {
+    const fetchSpy = jest.spyOn(fetchModule, 'default');
+    const generateMockResponse = (ok: boolean, text: any): any => ({
+      ok,
+      text: async () => text,
+    });
+
+    afterAll(() => {
+      fetchSpy.mockRestore();
+    });
+
+    test('fetch unexpected error', async () => {
+      fetchSpy.mockResolvedValueOnce(generateMockResponse(false, null));
+      expect(sequencerProvider.fetch('')).rejects.toThrow(/^Could not GET from endpoint/);
+    });
+
+    test('fetch http error', async () => {
+      fetchSpy.mockResolvedValueOnce(generateMockResponse(false, 'wrong'));
+      expect(sequencerProvider.fetch('')).rejects.toThrow(HttpError);
+    });
+
+    test('fetch gateway error', async () => {
+      fetchSpy.mockResolvedValueOnce(generateMockResponse(false, stringify({})));
+      expect(sequencerProvider.fetch('')).rejects.toThrow(GatewayError);
+    });
+
+    test('fetch success', async () => {
+      fetchSpy.mockResolvedValueOnce(generateMockResponse(true, stringify({ success: '' })));
+      expect(sequencerProvider.fetch('')).resolves.toHaveProperty('success');
+    });
+  });
 
   describe('Gateway specific methods', () => {
+    let exampleContractAddress: string;
+
     let exampleTransactionHash: string;
 
     beforeAll(async () => {
@@ -93,6 +127,7 @@ describeIfSequencer('SequencerProvider', () => {
   });
 
   describeIfDevnet('Test calls with Custom Devnet Sequencer Provider', () => {
+    let customSequencerProvider: Provider;
     let erc20: Contract;
     const wallet = stark.randomAddress();
 
