@@ -406,7 +406,7 @@ describe('deploy and test Wallet', () => {
       await provider.waitForTransaction(declareAccount.transaction_hash);
 
       const privateKey = stark.randomAddress();
-      starkKeyPub = privateKey;
+      starkKeyPub = ec.starkCurve.getStarkKey(privateKey);
       precalculatedAddress = calculateContractAddressFromHash(
         starkKeyPub,
         accountClassHash,
