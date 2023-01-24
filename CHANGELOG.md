@@ -1,3 +1,18 @@
+# [5.0.0-beta.4](https://github.com/0xs34n/starknet.js/compare/v5.0.0-beta.3...v5.0.0-beta.4) (2023-01-24)
+
+### Bug Fixes
+
+- tests ([3b34c0c](https://github.com/0xs34n/starknet.js/commit/3b34c0c37c0cca3da087e5ff2a881fba8959bf4e))
+- weierstrass import ([c963f90](https://github.com/0xs34n/starknet.js/commit/c963f900cc0f3ffcadce16a704f7b9e592a014e1))
+
+### Features
+
+- add back ec for proper support ([649e0aa](https://github.com/0xs34n/starknet.js/commit/649e0aa032d77ba714fe5cb8d31252590e9eb7f4))
+- add public sequencer fetch method ([1dab230](https://github.com/0xs34n/starknet.js/commit/1dab2302d64f5f3f1df84c225a93e6007592090d))
+- add tests and make RawArgs more flexible ([db9f274](https://github.com/0xs34n/starknet.js/commit/db9f2745d2f55767acd0b3ded4a028d103a0d249))
+- allow BigNumberish in RawCallData ([9b897c7](https://github.com/0xs34n/starknet.js/commit/9b897c7fb653ae1830b3795b29bd35c8be8e2d22))
+- use ec internally ([3392d03](https://github.com/0xs34n/starknet.js/commit/3392d0362af48f283ff414bc7387586ba44ad9a2))
+
 # [5.0.0-beta.3](https://github.com/0xs34n/starknet.js/compare/v5.0.0-beta.2...v5.0.0-beta.3) (2023-01-13)
 
 ### Bug Fixes
