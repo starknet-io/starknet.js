@@ -1,4 +1,3 @@
-import { keccak, pedersen } from '@noble/curves/stark';
 /* eslint-disable no-param-reassign */
 /* eslint-disable import/extensions */
 import { keccak256 } from 'ethereum-cryptography/keccak.js';
@@ -6,6 +5,7 @@ import { hexToBytes } from 'ethereum-cryptography/utils.js';
 
 import { API_VERSION, MASK_250, StarknetChainId, TransactionHashPrefix } from '../constants';
 import { CompiledContract, RawCalldata } from '../types/lib';
+import { starkCurve } from './ec';
 import { addHexPrefix, buf2hex, removeHexPrefix, utf8ToArray } from './encode';
 import { parse, stringify } from './json';
 import {
@@ -74,7 +74,7 @@ export function getSelector(value: string) {
 
 export function computeHashOnElements(data: BigNumberish[]): string {
   return [...data, data.length]
-    .reduce((x: BigNumberish, y: BigNumberish) => pedersen(toBigInt(x), toBigInt(y)), 0)
+    .reduce((x: BigNumberish, y: BigNumberish) => starkCurve.pedersen(toBigInt(x), toBigInt(y)), 0)
     .toString();
 }
 
@@ -246,7 +246,7 @@ export default function computeHintedClassHash(compiledContract: CompiledContrac
       [false, '']
     )[1];
 
-  return addHexPrefix(keccak(utf8ToArray(serialisedJson)).toString(16));
+  return addHexPrefix(starkCurve.keccak(utf8ToArray(serialisedJson)).toString(16));
 }
 
 // Computes the class hash of a given contract class

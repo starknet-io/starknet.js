@@ -21,5 +21,6 @@ export * as merkle from './utils/merkle';
 export * as uint256 from './utils/uint256';
 export * as shortString from './utils/shortString';
 export * as typedData from './utils/typedData';
+export * as ec from './utils/ec';
 export * from './utils/address';
 export * from './utils/url';

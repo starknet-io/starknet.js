@@ -1,7 +1,6 @@
-import { getStarkKey, sign, utils } from '@noble/curves/stark';
-
 import { Abi, Call, DeclareSignerDetails, InvocationsSignerDetails, Signature } from '../types';
 import { DeployAccountSignerDetails } from '../types/signer';
+import { starkCurve } from '../utils/ec';
 import { buf2hex } from '../utils/encode';
 import {
   calculateDeclareTransactionHash,
@@ -16,17 +15,17 @@ import { SignerInterface } from './interface';
 export class Signer implements SignerInterface {
   protected pk: Uint8Array | string;
 
-  constructor(pk: Uint8Array | string = utils.randomPrivateKey()) {
+  constructor(pk: Uint8Array | string = starkCurve.utils.randomPrivateKey()) {
     this.pk = pk instanceof Uint8Array ? buf2hex(pk) : toHex(pk);
   }
 
   public async getPubKey(): Promise<string> {
-    return getStarkKey(this.pk);
+    return starkCurve.getStarkKey(this.pk);
   }
 
   public async signMessage(typedData: TypedData, accountAddress: string): Promise<Signature> {
     const msgHash = getMessageHash(typedData, accountAddress);
-    return sign(msgHash, this.pk);
+    return starkCurve.sign(msgHash, this.pk);
   }
 
   public async signTransaction(
@@ -50,7 +49,7 @@ export class Signer implements SignerInterface {
       transactionsDetail.nonce
     );
 
-    return sign(msgHash, this.pk);
+    return starkCurve.sign(msgHash, this.pk);
   }
 
   public async signDeployAccountTransaction({
@@ -74,7 +73,7 @@ export class Signer implements SignerInterface {
       nonce
     );
 
-    return sign(msgHash, this.pk);
+    return starkCurve.sign(msgHash, this.pk);
   }
 
   public async signDeclareTransaction(
@@ -90,6 +89,6 @@ export class Signer implements SignerInterface {
       nonce
     );
 
-    return sign(msgHash, this.pk);
+    return starkCurve.sign(msgHash, this.pk);
   }
 }
