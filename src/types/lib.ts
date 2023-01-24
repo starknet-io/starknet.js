@@ -12,7 +12,10 @@ export type RawCalldata = BigNumberish[];
 export type AllowArray<T> = T | T[];
 export type RawArgs =
   | {
-      [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
+      [inputName: string]:
+        | BigNumberish
+        | BigNumberish[]
+        | { type: 'struct'; [k: string]: BigNumberish };
     }
   | BigNumberish[];
 
