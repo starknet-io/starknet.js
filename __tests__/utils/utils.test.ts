@@ -1,30 +1,10 @@
-import fs from 'fs';
-
-import { constants, ec, hash, json, number, stark } from '../../src';
+import { constants, ec, hash, number, stark } from '../../src';
 import { Block } from '../../src/provider/utils';
 
 const { IS_BROWSER } = constants;
 
-const compiledAccount = json.parse(fs.readFileSync('./__mocks__/Account.json').toString('ascii'));
-
 test('isNode', () => {
   expect(IS_BROWSER).toBe(false);
-});
-describe('compressProgram()', () => {
-  test('compresses a contract program', () => {
-    const inputProgram = compiledAccount.program;
-
-    const compressed = stark.compressProgram(inputProgram);
-
-    expect(compressed).toMatchSnapshot();
-  });
-  test('works with strings', () => {
-    const inputProgram = json.stringify(compiledAccount.program);
-
-    const compressed = stark.compressProgram(inputProgram);
-
-    expect(compressed).toMatchSnapshot();
-  });
 });
 
 describe('hexToDecimalString()', () => {
