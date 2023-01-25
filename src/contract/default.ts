@@ -4,8 +4,6 @@ import { AccountInterface } from '../account';
 import { ProviderInterface, defaultProvider } from '../provider';
 import {
   Abi,
-  AbiEntry,
-  Args,
   AsyncContractFunction,
   BlockTag,
   Call,
@@ -13,12 +11,10 @@ import {
   FunctionAbi,
   InvokeFunctionResponse,
   Overrides,
-  ParsedStruct,
   Result,
   StructAbi,
 } from '../types';
 import { CheckCallData } from '../utils/calldata';
-import { BigNumberish, toBN } from '../utils/number';
 import { CallOptions, ContractInterface } from './interface';
 
 /**
@@ -271,7 +267,9 @@ export class Contract implements ContractInterface {
         },
         blockIdentifier
       )
-      .then((x) => (options.parseResponse ? this.parseResponse(method, x.result) : x.result));
+      .then((x) =>
+        options.parseResponse ? this.checkCalldata.parseResponse(method, x.result) : x.result
+      );
   }
 
   public invoke(
@@ -350,90 +348,5 @@ export class Contract implements ContractInterface {
       entrypoint: method,
       calldata: this.checkCalldata.compileCalldata(args, inputs),
     };
-  }
-
-  /**
-   * Parse of the response elements that are converted to Object (Struct) by using the abi
-   *
-   * @param responseIterator - iterator of the response
-   * @param type - type of the struct
-   * @return {BigNumberish | ParsedStruct} - parsed arguments in format that contract is expecting
-   */
-  protected parseResponseStruct(
-    responseIterator: Iterator<string>,
-    type: string
-  ): BigNumberish | ParsedStruct {
-    // check the type of current element
-    if (type in this.structs && this.structs[type]) {
-      return this.structs[type].members.reduce((acc, el) => {
-        // parse each member of the struct (member can felt or nested struct)
-        acc[el.name] = this.parseResponseStruct(responseIterator, el.type);
-        return acc;
-      }, {} as any);
-    }
-    return toBN(responseIterator.next().value);
-  }
-
-  /**
-   * Parse elements of the response and structuring them into one field by using output property from the abi for that method
-   *
-   * @param responseIterator - iterator of the response
-   * @param output  - output(field) information from the abi that will be used to parse the data
-   * @return - parsed response corresponding to the abi structure of the field
-   */
-  protected parseResponseField(
-    responseIterator: Iterator<string>,
-    output: AbiEntry,
-    parsedResult?: Args
-  ): any {
-    const { name, type } = output;
-    const parsedDataArr: (BigNumberish | ParsedStruct)[] = [];
-    switch (true) {
-      case /_len$/.test(name):
-        return toBN(responseIterator.next().value).toNumber();
-      case /\(felt/.test(type):
-        return type.split(',').reduce((acc) => {
-          acc.push(toBN(responseIterator.next().value));
-          return acc;
-        }, [] as BigNumberish[]);
-      case /\*/.test(type):
-        if (parsedResult && parsedResult[`${name}_len`]) {
-          const arrLen = parsedResult[`${name}_len`] as number;
-          while (parsedDataArr.length < arrLen) {
-            parsedDataArr.push(
-              this.parseResponseStruct(responseIterator, output.type.replace('*', ''))
-            );
-          }
-        }
-        return parsedDataArr;
-      case type in this.structs:
-        return this.parseResponseStruct(responseIterator, type);
-      default:
-        return toBN(responseIterator.next().value);
-    }
-  }
-
-  /**
-   * Parse elements of the response array and structuring them into response object
-   *
-   * @param method - method name
-   * @param response  - response from the method
-   * @return - parsed response corresponding to the abi
-   */
-  protected parseResponse(method: string, response: string[]): Result {
-    const { outputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
-    const responseIterator = response.flat()[Symbol.iterator]();
-    const resultObject = outputs.flat().reduce((acc, output) => {
-      acc[output.name] = this.parseResponseField(responseIterator, output, acc);
-      if (acc[output.name] && acc[`${output.name}_len`]) {
-        delete acc[`${output.name}_len`];
-      }
-      return acc;
-    }, {} as Args);
-    return Object.entries(resultObject).reduce((acc, [key, value]) => {
-      acc.push(value);
-      acc[key] = value;
-      return acc;
-    }, [] as Result);
   }
 }

@@ -2,7 +2,17 @@
 import BN from 'bn.js';
 import assert from 'minimalistic-assert';
 
-import { Abi, AbiEntry, Calldata, FunctionAbi, ParsedStruct, StructAbi, Tupled } from '../types';
+import {
+  Abi,
+  AbiEntry,
+  Args,
+  Calldata,
+  FunctionAbi,
+  ParsedStruct,
+  Result,
+  StructAbi,
+  Tupled,
+} from '../types';
 import { BigNumberish, toBN, toFelt } from './number';
 import { Uint256, isUint256 } from './uint256';
 
@@ -51,7 +61,7 @@ function parseSubTuple(s: string) {
   };
 }
 
-function extractTupleMemberTypes(type: string): string[] {
+function extractTupleMemberTypes(type: string): (string | object)[] {
   const cleanType = type.replace(/\s/g, '').slice(1, -1); // remove first lvl () and spaces
 
   // Decompose subTuple
@@ -65,7 +75,7 @@ function extractTupleMemberTypes(type: string): string[] {
   // Parse named tuple
   if (isTypeNamedTuple(type)) {
     recomposed = recomposed.reduce((acc, it) => {
-      return acc.concat(parseNamedTuple(it).type);
+      return acc.concat(parseNamedTuple(it));
     }, []);
     // TODO: we can check also names in named tuple
   }
@@ -177,6 +187,7 @@ export class CheckCallData {
           const arrayType = input.type.replace('*', '');
           parameter.forEach((struct: any) => {
             this.structs[arrayType].members.forEach(({ name }) => {
+              // Struct provided as Array, should not be valid
               if (Array.isArray(struct)) {
                 const structMembersLength = this.calculateStructMembers(arrayType);
                 assert(
@@ -268,6 +279,7 @@ export class CheckCallData {
       throw Error(`Missing parameter for type ${type}`);
     }
     if (Array.isArray(element)) {
+      // Structure or Tuple provided as Array, this should not be valid
       const structMemberNum = this.calculateStructMembers(type);
       if (element.length !== structMemberNum) {
         throw Error(`Missing parameter for type ${type}`);
@@ -322,12 +334,112 @@ export class CheckCallData {
       throw Error('Provided and abi expected tuple size diff in parseTuple');
     }
 
-    return memberTypes.map((type: any, dx: number) => {
+    return memberTypes.map((it: any, dx: number) => {
       return {
         element: elements[dx],
-        type,
+        type: it.type,
       };
     });
+  }
+
+  /**
+   * Parse elements of the response array and structuring them into response object
+   *
+   * @param method - method name
+   * @param response  - response from the method
+   * @return - parsed response corresponding to the abi
+   */
+  public parseResponse(method: string, response: string[]): Result {
+    const { outputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
+    const responseIterator = response.flat()[Symbol.iterator]();
+
+    const resultObject = outputs.flat().reduce((acc, output) => {
+      acc[output.name] = this.parseResponseField(responseIterator, output, acc);
+      if (acc[output.name] && acc[`${output.name}_len`]) {
+        delete acc[`${output.name}_len`];
+      }
+      return acc;
+    }, {} as Args);
+    // TODO: Remove this no need for it as user can do Object.values(response) to get indexed data
+    return Object.entries(resultObject).reduce((acc, [key, value]) => {
+      acc.push(value);
+      acc[key] = value;
+      return acc;
+    }, [] as Result);
+  }
+
+  /**
+   * Parse elements of the response and structuring them into one field by using output property from the abi for that method
+   *
+   * @param responseIterator - iterator of the response
+   * @param output  - output(field) information from the abi that will be used to parse the data
+   * @return - parsed response corresponding to the abi structure of the field
+   */
+  protected parseResponseField(
+    responseIterator: Iterator<string>,
+    output: AbiEntry,
+    parsedResult?: Args
+  ): any {
+    const { name, type } = output;
+    let temp;
+
+    switch (true) {
+      case isLen(name):
+        temp = responseIterator.next().value;
+        return toBN(temp).toNumber();
+      case isTypeArray(type):
+        // eslint-disable-next-line no-case-declarations
+        const parsedDataArr: (BigNumberish | ParsedStruct)[] = [];
+
+        if (parsedResult && parsedResult[`${name}_len`]) {
+          const arrLen = parsedResult[`${name}_len`] as number;
+          while (parsedDataArr.length < arrLen) {
+            parsedDataArr.push(
+              this.parseResponseStruct(responseIterator, output.type.replace('*', ''))
+            );
+          }
+        }
+        return parsedDataArr;
+      case type in this.structs || isTypeTuple(type):
+        return this.parseResponseStruct(responseIterator, type);
+      default:
+        temp = responseIterator.next().value;
+        return toBN(temp);
+    }
+  }
+
+  /**
+   * Parse of the response elements that are converted to Object (Struct) by using the abi
+   *
+   * @param responseIterator - iterator of the response
+   * @param type - type of the struct
+   * @return {BigNumberish | ParsedStruct} - parsed arguments in format that contract is expecting
+   */
+  protected parseResponseStruct(
+    responseIterator: Iterator<string>,
+    type: string
+  ): BigNumberish | ParsedStruct {
+    // type struct
+    if (type in this.structs && this.structs[type]) {
+      return this.structs[type].members.reduce((acc, el) => {
+        // parse each member of the struct (member can felt or nested struct)
+        acc[el.name] = this.parseResponseStruct(responseIterator, el.type);
+        return acc;
+      }, {} as any);
+    }
+    // todo: tuple
+    if (isTypeTuple(type)) {
+      const memberTypes = extractTupleMemberTypes(type);
+      const result = memberTypes.reduce((acc, it: any, idx) => {
+        const tName = it?.name ? it.name : idx;
+        const tType = it?.type ? it.type : it;
+        acc[tName] = this.parseResponseStruct(responseIterator, tType);
+        return acc;
+      }, {} as any);
+      return result;
+    }
+    const temp = responseIterator.next().value;
+    return toBN(temp);
   }
 }
 

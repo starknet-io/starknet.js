@@ -252,15 +252,15 @@ describe('contract module', () => {
 });
 
 describe('Contract interaction', () => {
-  let ierc20Contract: Contract;
+  let erc20Echo20Contract: Contract;
   const provider = getTestProvider();
   const account = getTestAccount(provider);
   const classHash = '0x03a00384217ad692b75a7b1bad47f269e7e3597c8498e6db939c952164130c09';
-  let factory;
+  let factory: ContractFactory;
 
   beforeAll(async () => {
     factory = new ContractFactory(compiledErc20Echo, classHash, account);
-    ierc20Contract = await factory.deploy(
+    erc20Echo20Contract = await factory.deploy(
       'Token',
       'ERC20',
       18,
@@ -273,12 +273,12 @@ describe('Contract interaction', () => {
 
   test('contractFactory.deploy with raw arguments - all types constructor params', () => {
     // executed in beforeAll
-    expect(ierc20Contract instanceof Contract);
+    expect(erc20Echo20Contract instanceof Contract);
   });
 
   test('contractFactory.deploy with callData - all types constructor params', async () => {
     // Deploy with callData - OK
-    ierc20Contract = await factory.deploy(
+    erc20Echo20Contract = await factory.deploy(
       callData({
         name: 'Token',
         symbol: 'ERC20',
@@ -289,7 +289,7 @@ describe('Contract interaction', () => {
         threshold: 1,
       })
     );
-    expect(ierc20Contract instanceof Contract);
+    expect(erc20Echo20Contract instanceof Contract);
   });
 
   test('declareDeploy with callData - all types using felt,uint256,tuple helpers', async () => {
@@ -307,8 +307,8 @@ describe('Contract interaction', () => {
       }),
     });
 
-    ierc20Contract = new Contract(compiledErc20Echo.abi, deploy.contract_address!, provider);
-    expect(ierc20Contract instanceof Contract);
+    erc20Echo20Contract = new Contract(compiledErc20Echo.abi, deploy.contract_address!, provider);
+    expect(erc20Echo20Contract instanceof Contract);
   });
 
   test('Assert helpers and non helpers structure produce same result', async () => {
@@ -337,7 +337,7 @@ describe('Contract interaction', () => {
     expect(JSON.stringify(feltedData)).toBe(JSON.stringify(composedData));
   });
 
-  test('call contract method with raw arguments and callData arguments', async () => {
+  test('call contract method array params, with raw arguments and callData arguments', async () => {
     const data = {
       f1: [1, 2, 3, 4, 5, 6],
       u1: [uint256(1000), uint256(2000), uint256(3000), uint256(4000)],
@@ -349,10 +349,10 @@ describe('Contract interaction', () => {
 
     const compiledData = callData(data);
     // call function with compiled data
-    const result3 = await ierc20Contract.echo2(compiledData);
+    const result3 = await erc20Echo20Contract.echo2(compiledData);
 
     // call function with raw data as parameters
-    const result2 = await ierc20Contract.echo2(data.f1, data.u1, data.s2, {
+    const result2 = await erc20Echo20Contract.echo2(data.f1, data.u1, data.s2, {
       parseRequest: true,
       parseResponse: true,
     });
@@ -361,25 +361,8 @@ describe('Contract interaction', () => {
     console.log(result3);
   });
 
-  test('call contract method with array params', async () => {
-    const data = {
-      f1: [1, 2, 3, 4, 5, 6],
-      u1: [uint256(1000), uint256(2000), uint256(3000), uint256(4000)],
-      s2: [
-        { discount_fix_bps: 10, discount_transfer_bps: 11 },
-        { discount_fix_bps: 20, discount_transfer_bps: 22 },
-      ],
-    };
-
-    const result2 = await ierc20Contract.echo2(data.f1, data.u1, data.s2, {
-      parseRequest: true,
-      parseResponse: true,
-    });
-    console.log(result2);
-  });
-
   test('call contract method with encodeShortString, composed struct and nested tuple', async () => {
-    const result3 = await ierc20Contract.echo3(
+    const result3 = await erc20Echo20Contract.echo3(
       encodeShortString('some text1'),
       123,
       encodeShortString('some text 2'),
@@ -459,7 +442,7 @@ describe('Contract interaction', () => {
 
     console.log(compiledNewCallData);
 
-    const { balance: uint256Balance } = await ierc20Contract.balanceOf(account.address, {
+    const { balance: uint256Balance } = await erc20Echo20Contract.balanceOf(account.address, {
       parseRequest: true, // user can opt out from validation and paring request/response
       parseResponse: true,
     });
@@ -467,11 +450,7 @@ describe('Contract interaction', () => {
     const balance = bnBalance.toString();
     expect(balance).toBe('1000000000');
 
-    // validating and parsing tuple in request and response are not supported because of possibility of complex nested structure
-    // users that use tuples can opt-out from request validation and response parsing and do it manually
-    // user can use callData to compile data with tuples
-    // TODO: create regex for nested tuple abi type parsing (support tuple in request validation and response parse)
-    const result = await ierc20Contract.echo(
+    const result = await erc20Echo20Contract.echo(
       callData({
         // t1: tuple(felt(10), felt(20)),
         f1: felt('someText'),
@@ -502,21 +481,5 @@ describe('Contract interaction', () => {
       })
     );
     console.log(result);
-
-    const test2Data = callData({
-      f1: [1, 2, 3, 4, 5, 6],
-      u1: [uint256(1000), uint256(2000), uint256(3000), uint256(4000)],
-      s2: [
-        { discount_fix_bps: 10, discount_transfer_bps: 11 },
-        { discount_fix_bps: 20, discount_transfer_bps: 22 },
-      ],
-    });
-
-    // call function with ready call data
-    const result2 = await ierc20Contract.echo2(test2Data, {
-      parseRequest: false,
-      parseResponse: true,
-    });
-    console.log(result2);
   });
 });
