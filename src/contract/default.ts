@@ -11,7 +11,6 @@ import {
   FunctionAbi,
   InvokeFunctionResponse,
   Overrides,
-  Result,
   StructAbi,
 } from '../types';
 import { CheckCallData } from '../utils/calldata';
@@ -26,6 +25,7 @@ function buildCall(contract: Contract, functionAbi: FunctionAbi): AsyncContractF
     let blockIdentifier: BlockTag | null = null;
     let parseRequest: Boolean = true;
     let parseResponse: Boolean = true;
+    let formatResponse = null;
 
     // extract options
     args.forEach((arg) => {
@@ -39,12 +39,16 @@ function buildCall(contract: Contract, functionAbi: FunctionAbi): AsyncContractF
       if ('parseResponse' in arg) {
         parseResponse = arg.parseResponse;
       }
+      if ('formatResponse' in arg) {
+        formatResponse = arg.formatResponse;
+      }
     });
 
     return contract.call(functionAbi.name, args, {
       blockIdentifier,
       parseRequest,
       parseResponse,
+      formatResponse,
     });
   };
 }
@@ -235,8 +239,8 @@ export class Contract implements ContractInterface {
   public async call(
     method: string,
     args: Array<any> = [],
-    options: CallOptions = { parseRequest: true, parseResponse: true }
-  ): Promise<Result> {
+    options: CallOptions = { parseRequest: true, parseResponse: true, formatResponse: undefined }
+  ): Promise<Object> {
     // default value also for null
     const blockIdentifier = options?.blockIdentifier || undefined;
 
@@ -267,9 +271,15 @@ export class Contract implements ContractInterface {
         },
         blockIdentifier
       )
-      .then((x) =>
-        options.parseResponse ? this.checkCalldata.parseResponse(method, x.result) : x.result
-      );
+      .then((x) => {
+        if (!options.parseResponse) {
+          return x.result;
+        }
+        if (options.formatResponse) {
+          return this.checkCalldata.formatResponse(method, x.result, options.formatResponse);
+        }
+        return this.checkCalldata.parseResponse(method, x.result);
+      });
   }
 
   public invoke(

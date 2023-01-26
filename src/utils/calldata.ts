@@ -9,11 +9,11 @@ import {
   Calldata,
   FunctionAbi,
   ParsedStruct,
-  Result,
   StructAbi,
   Tupled,
 } from '../types';
 import { BigNumberish, toBN, toFelt } from './number';
+import { decodeShortString } from './shortString';
 import { Uint256, isUint256 } from './uint256';
 
 const isLen = (name: string) => /_len$/.test(name);
@@ -349,23 +349,17 @@ export class CheckCallData {
    * @param response  - response from the method
    * @return - parsed response corresponding to the abi
    */
-  public parseResponse(method: string, response: string[]): Result {
+  public parseResponse(method: string, response: string[]): Object {
     const { outputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
     const responseIterator = response.flat()[Symbol.iterator]();
 
-    const resultObject = outputs.flat().reduce((acc, output) => {
+    return outputs.flat().reduce((acc, output) => {
       acc[output.name] = this.parseResponseField(responseIterator, output, acc);
       if (acc[output.name] && acc[`${output.name}_len`]) {
         delete acc[`${output.name}_len`];
       }
       return acc;
     }, {} as Args);
-    // TODO: Remove this no need for it as user can do Object.values(response) to get indexed data
-    return Object.entries(resultObject).reduce((acc, [key, value]) => {
-      acc.push(value);
-      acc[key] = value;
-      return acc;
-    }, [] as Result);
   }
 
   /**
@@ -440,6 +434,37 @@ export class CheckCallData {
     }
     const temp = responseIterator.next().value;
     return toBN(temp);
+  }
+
+  public formatResponse(method: string, response: string[], format: Object): Object {
+    const parsed = this.parseResponse(method, response);
+    return this.formatter(parsed, format);
+  }
+
+  protected formatter(data: any, type: any) {
+    // TODO: Remove this no need for it as user can do Object.values(response) to get indexed data
+    return Object.entries(type).reduce((acc, [key, value]) => {
+      if (value === 'string') {
+        acc[key] = decodeShortString(data[key].toString(16));
+        return acc;
+      }
+      if (value === 'number') {
+        acc[key] = data[key].toNumber();
+        return acc;
+      }
+      if (Array.isArray(value)) {
+        const arrayObj = this.formatter(data[key], type[key]);
+        acc[key] = Object.values(arrayObj);
+        return acc;
+      }
+      if (typeof value === 'object') {
+        acc[key] = this.formatter(data[key], type[key]);
+        return acc;
+      }
+
+      acc[key] = data[key];
+      return acc;
+    }, {} as any);
   }
 }
 

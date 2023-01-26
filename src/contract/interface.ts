@@ -8,13 +8,13 @@ import {
   Invocation,
   InvokeFunctionResponse,
   Overrides,
-  Result,
 } from '../types';
 
 export type CallOptions = {
   blockIdentifier?: BlockIdentifier;
   parseRequest: Boolean;
   parseResponse: Boolean;
+  formatResponse?: Object | null;
 };
 
 export abstract class ContractInterface {
@@ -66,7 +66,7 @@ export abstract class ContractInterface {
    * @param options optional blockIdentifier
    * @returns Result of the call as an array with key value pars
    */
-  public abstract call(method: string, args?: Array<any>, options?: CallOptions): Promise<Result>;
+  public abstract call(method: string, args?: Array<any>, options?: CallOptions): Promise<Object>;
 
   /**
    * Invokes a method on a contract

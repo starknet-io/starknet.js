@@ -361,19 +361,51 @@ describe('Contract interaction', () => {
     console.log(result3);
   });
 
-  test('call contract method with encodeShortString, composed struct and nested tuple', async () => {
-    const result3 = await erc20Echo20Contract.echo3(
-      encodeShortString('some text1'),
-      123,
-      encodeShortString('some text 2'),
-      [{ a: 1, b: { b: 2, c: tuple(3, 4, 5, 6) } }],
-      tuple(
-        1,
-        { x1: 2, x2: { y1: 3, y2: 4 }, x3: tuple(tuple(5, 6), tuple(tuple(7, 8), tuple(9, 10))) },
-        11
-      )
-    );
-    console.log(result3);
+  test('call contract method with string, composed struct and nested tuple', async () => {
+    const request = {
+      t1: 'demo text1',
+      n1: 123,
+      t2: 'some text 2',
+      k1: [{ a: 1, b: { b: 2, c: tuple(3, 4, 5, 6) } }],
+      k2: {
+        // named tuple
+        t1: 1,
+        t2: {
+          x1: 2,
+          x2: { y1: 3, y2: 4 },
+          x3: { tx1: tuple(5, 6), tx2: { tx21: { tx211: 7, tx212: 8 }, tx22: tuple(9, 10) } },
+        },
+        t3: 11,
+      },
+    };
+
+    // Test formatter, experimental
+    const formatResponse = {
+      t1: 'string',
+      n1: 'number',
+      t2: 'string',
+      k1: [
+        {
+          a: 'number',
+          b: { b: 'number', c: { 0: 'number', 1: 'number', 2: 'number', 3: 'number' } },
+        },
+      ],
+      k2: {
+        t1: 'number',
+        t2: {
+          x1: 'number',
+          x2: { y1: 'number', y2: 'number' },
+          x3: {
+            tx1: { 0: 'number', 1: 'number' },
+            tx2: { tx21: { tx211: 'number', tx212: 'number' }, tx22: { 0: 'number', 1: 'number' } },
+          },
+        },
+        t3: 'number',
+      },
+    };
+
+    const result = await erc20Echo20Contract.echo3(callData(request), { formatResponse });
+    expect(JSON.stringify(request)).toBe(JSON.stringify(result));
   });
 
   test('callData compatibility', async () => {
