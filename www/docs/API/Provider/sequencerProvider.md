@@ -156,3 +156,46 @@ Gets the transaction trace from a tx hash.
   };
 }
 ```
+
+---
+
+### getBlockTraces()
+
+provider.**getBlockTraces**(blockIdentifier) => _Promise < BlockTransactionTracesResponse >_
+
+Gets the transaction traces of an entire block
+
+###### _BlockTransactionTracesResponse_
+
+```typescript
+
+{
+    traces: Array<TransactionTraceResponse & { transaction_hash: string }>;
+}
+
+{
+  TransactionTraceResponse: {
+    validate_invocation?: FunctionInvocation;
+    function_invocation?: FunctionInvocation;
+    fee_transfer_invocation?: FunctionInvocation;
+    signature: Signature;
+  };
+
+  FunctionInvocation: {
+    caller_address: string;
+    contract_address: string;
+    calldata: {
+      [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
+    };
+    call_type?: string;
+    class_hash?: string;
+    selector?: string;
+    entry_point_type?: EntryPointType;
+    result: Array<any>;
+    execution_resources: ExecutionResources;
+    internal_calls: Array<FunctionInvocation>;
+    events: Array<any>;
+    messages: Array<any>;
+  };
+}
+```

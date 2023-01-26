@@ -13,6 +13,7 @@ import {
   GetTransactionResponse,
   InvokeFunctionResponse,
   Sequencer,
+  StateUpdateResponse,
   TransactionSimulationResponse,
 } from '../../types';
 import { toBN } from '../number';
@@ -191,6 +192,32 @@ export class SequencerAPIResponseParser extends ResponseParser {
     return {
       transaction_hash: res.transaction_hash,
       class_hash: res.class_hash as string,
+    };
+  }
+
+  public parseGetStateUpdateResponse(res: Sequencer.StateUpdateResponse): StateUpdateResponse {
+    const nonces = [].concat(res.state_diff.nonces as []).map(({ contract_address, nonce }) => {
+      return {
+        contract_address,
+        nonce: nonce as string,
+      };
+    });
+    const storage_diffs = []
+      .concat(res.state_diff.storage_diffs as [])
+      .map(({ address, storage_entries }) => {
+        return {
+          address,
+          storage_entries,
+        };
+      });
+    return {
+      ...res,
+      state_diff: {
+        storage_diffs,
+        declared_contract_hashes: res.state_diff.declared_contract_hashes,
+        deployed_contracts: res.state_diff.deployed_contracts,
+        nonces,
+      },
     };
   }
 }
