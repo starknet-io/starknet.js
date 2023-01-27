@@ -153,7 +153,7 @@ The _estimateFeeDetails_ object may include any of:
 
 account.**execute**(transactions [ , abi , transactionsDetail ]) => _Promise < InvokeFunctionResponse >_
 
-Executes one or multiple calls using the account contract.
+Executes one or multiple calls using the account contract. If there is only one call, _transactions_ will be an object contains parameters below. If there are multiple calls, _transactions_ will be an array contains several objects mentioned above.
 
 The _transactions_ object structure:
 
@@ -169,6 +169,63 @@ The _transactionsDetail_ object may include any of:
 - transactionsDetail.**maxFee** - Max Fee that that will be used to execute the call(s)
 - transactionsDetail.**nonce** - Nonce for the transaction
 - transactionsDetail.**version** - Version for the transaction (default is 1)
+
+Example:
+
+```typescript
+// When there is only one call
+const call = await account.execute(
+  {
+    contractAddress: '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',  // ETH contract address
+    entrypoint: 'approve',
+    calldata: starknet.stark.compileCalldata(
+      {
+        spender: "0x15e90f807a00a01df845460324fbcd33986f2df3cc9d981e9e8b5005b7f595e",
+        amount: {
+          type: 'struct',
+          low: '1',   // 1 wei
+          high: '0',
+        }
+      }
+    ),
+  }, 
+  undefined,
+  {
+    nonce: '10',
+  }
+);
+
+// When there are multiple calls
+const multiCall = await account.execute(
+  [
+    {
+      contractAddress: '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',  // ETH contract address
+      entrypoint: 'approve',
+      calldata: starknet.stark.compileCalldata(
+        {
+          spender: "0x15e90f807a00a01df845460324fbcd33986f2df3cc9d981e9e8b5005b7f595e",
+          amount: {
+            type: 'struct',
+            low: '1',   // 1 wei
+            high: '0',
+          }
+        }
+      ),
+    }, 
+    {
+      contractAddress: '0x15e90f807a00a01df845460324fbcd33986f2df3cc9d981e9e8b5005b7f595e',
+      entrypoint: 'transfer_ether',
+      calldata: ['1', '0'],  // 1 wei
+    }
+  ],
+  undefined,
+  {
+    nonce: '10',
+  }
+);
+```
+
+
 
 ###### _InvokeFunctionResponse_
 
