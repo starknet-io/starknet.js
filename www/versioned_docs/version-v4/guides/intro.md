@@ -1,7 +1,7 @@
 ---
 sidebar_position: 1
 ---
-in docs
+in version V4
 # Getting Started
 
 ## Installation
