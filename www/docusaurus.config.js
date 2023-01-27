@@ -16,17 +16,17 @@ const config = {
   organizationName: '0xs34n', // Usually your GitHub org/user name.
   projectName: 'starknet.js', // Usually your repo name.
 
-  plugins: [
-    [
-      '@docusaurus/plugin-content-docs',
-      {
-        id: 'guides',
-        path: 'guides',
-        routeBasePath: 'guides',
-        sidebarPath: require.resolve('./sidebars.js'),
-      },
-    ],
-  ],
+  // plugins: [
+  //   [
+  //     '@docusaurus/plugin-content-docs',
+  //     {
+  //       id: 'guides',
+  //       path: 'guides',
+  //       routeBasePath: 'guides',
+  //       sidebarPath: require.resolve('./sidebars.js'),
+  //     },
+  //   ],
+  // ],
 
   presets: [
     [
@@ -69,7 +69,7 @@ const config = {
           {
             position: 'left',
             label: 'Guides',
-            to: '/guides/intro',
+            to: '/docs/guides/intro',
           },
           // {to: '/blog', label: 'Blog', position: 'left'},
           {
@@ -91,7 +91,7 @@ const config = {
               },
               {
                 label: 'Guides',
-                to: '/guides/intro',
+                to: '/docs/guides/intro',
               },
             ],
           },
