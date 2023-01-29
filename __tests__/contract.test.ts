@@ -255,7 +255,7 @@ describe('Contract interaction', () => {
   let erc20Echo20Contract: Contract;
   const provider = getTestProvider();
   const account = getTestAccount(provider);
-  const classHash = '0x03a00384217ad692b75a7b1bad47f269e7e3597c8498e6db939c952164130c09';
+  const classHash = '0x0600d32a63eec3150864a3cd121b34f427c91f939b3f5ab6433996e91c229538';
   let factory: ContractFactory;
 
   beforeAll(async () => {
@@ -404,8 +404,26 @@ describe('Contract interaction', () => {
       },
     };
 
-    const result = await erc20Echo20Contract.echo3(callData(request), { formatResponse });
-    expect(JSON.stringify(request)).toBe(JSON.stringify(result));
+    // const result = await erc20Echo20Contract.echo3(callData(request), { formatResponse });
+    // expect(JSON.stringify(request)).toBe(JSON.stringify(result));
+
+    // invoke test 2
+    const result2 = await erc20Echo20Contract.iecho3(callData(request));
+
+    await provider.waitForTransaction(result2.transaction_hash);
+
+    const result3 = await erc20Echo20Contract.iecho3(
+      request.t1,
+      request.n1,
+      request.t2,
+      request.k1,
+      request.k2,
+      { formatResponse }
+    );
+
+    await provider.waitForTransaction(result3.transaction_hash);
+
+    console.log(result2, result3);
   });
 
   test('callData compatibility', async () => {

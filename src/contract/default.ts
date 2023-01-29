@@ -66,8 +66,13 @@ function buildInvoke(contract: Contract, functionAbi: FunctionAbi): AsyncContrac
       }
       return acc;
     }, 0);
-    const options = {};
-    if (inputsLength + 1 === args.length && typeof args[args.length - 1] === 'object') {
+    const options = {
+      parseRequest: true,
+    };
+    if (
+      (inputsLength + 1 === args.length && typeof args[args.length - 1] === 'object') ||
+      args[0].compiled
+    ) {
       Object.assign(options, args.pop());
     }
     return contract.invoke(functionAbi.name, args, options);
@@ -285,28 +290,38 @@ export class Contract implements ContractInterface {
   public invoke(
     method: string,
     args: Array<any> = [],
-    options: Overrides = {}
+    options: Overrides = {
+      parseRequest: true,
+    }
   ): Promise<InvokeFunctionResponse> {
     // ensure contract is connected
     assert(this.address !== null, 'contract is not connected to an address');
-    // validate method and args
-    this.checkCalldata.validateMethodAndArgs('INVOKE', method, args);
 
-    const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
-    const inputsLength = inputs.reduce((acc, input) => {
-      if (!/_len$/.test(input.name)) {
-        return acc + 1;
+    let calldata;
+    if (!options.parseRequest || args[0]?.compiled) {
+      // provided args are compiled callData
+      // eslint-disable-next-line prefer-destructuring
+      calldata = args[0];
+    } else {
+      // validate method and args
+      this.checkCalldata.validateMethodAndArgs('INVOKE', method, args);
+
+      const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
+      const inputsLength = inputs.reduce((acc, input) => {
+        if (!/_len$/.test(input.name)) {
+          return acc + 1;
+        }
+        return acc;
+      }, 0);
+
+      if (args.length !== inputsLength) {
+        throw Error(
+          `Invalid number of arguments, expected ${inputsLength} arguments, but got ${args.length}`
+        );
       }
-      return acc;
-    }, 0);
-
-    if (args.length !== inputsLength) {
-      throw Error(
-        `Invalid number of arguments, expected ${inputsLength} arguments, but got ${args.length}`
-      );
+      // compile calldata
+      calldata = this.checkCalldata.compileCalldata(args, inputs);
     }
-    // compile calldata
-    const calldata = this.checkCalldata.compileCalldata(args, inputs);
 
     const invocation = {
       contractAddress: this.address,

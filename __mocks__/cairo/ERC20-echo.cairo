@@ -17,6 +17,11 @@ func constructor{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr
     return ();
 }
 
+// Define a storage variable.
+@storage_var
+func testStorage() -> (res: felt) {
+}
+
 //
 // Getters
 //
@@ -127,6 +132,15 @@ func allowance{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
 //
 // Externals
 //
+
+@external
+func iecho3{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
+t1:felt, n1: felt, t2: felt, k1_len: felt, k1: Struct3*, k2: TupleX
+) -> (t1:felt, n1: felt, t2: felt, k1_len: felt, k1: Struct3*, k2: TupleX) {
+    let (res) = testStorage.read();
+    testStorage.write(res + t1);
+    return (t1, n1, t2, k1_len, k1, k2);
+}
 
 @external
 func transfer{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
