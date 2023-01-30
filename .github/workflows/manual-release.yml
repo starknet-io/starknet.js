@@ -10,18 +10,12 @@ on:
         description: 'Dry run'
         type: boolean
         default: true
+
 jobs:
   release:
     name: Release
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-        with:
-          node-version: lts/*
-          cache: 'npm'
-      - run: npm ci --ignore-scripts ${{ inputs.dry-run }}
-      - env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
-        run: npx semantic-release --debug ${{ inputs.debug }} --dry-run ${{ inputs.dry-run }}
+    uses: ./.github/workflows/_release.yml
+    with:
+      debug: ${{ inputs.debug }}
+      dry-run: ${{ inputs.dry-run }}
+    secrets: inherit
