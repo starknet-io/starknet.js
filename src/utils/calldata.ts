@@ -17,12 +17,26 @@ import { decodeShortString } from './shortString';
 import { Uint256, isUint256 } from './uint256';
 
 const isLen = (name: string) => /_len$/.test(name);
-// ABI Types
 const isTypeFelt = (type: string) => type === 'felt';
 const isTypeFeltArray = (type: string) => type === 'felt*';
 const isTypeArray = (type: string) => /\*/.test(type);
 const isTypeTuple = (type: string) => /\(.*\)/i.test(type);
 const isTypeNamedTuple = (type: string) => /\(.*\)/i.test(type) && type.includes(':');
+
+// Helpers
+export const abiInputsLength = (inputs: AbiEntry[]) =>
+  inputs.reduce((acc, input) => (!isLen(input.name) ? acc + 1 : acc), 0);
+
+export const getAbiStruct = (abi: Abi) =>
+  abi
+    .filter((abiEntry) => abiEntry.type === 'struct')
+    .reduce(
+      (acc, abiEntry) => ({
+        ...acc,
+        [abiEntry.name]: abiEntry,
+      }),
+      {}
+    );
 
 function parseNamedTuple(namedTuple: string): any {
   const name = namedTuple.substring(0, namedTuple.indexOf(':'));
@@ -90,15 +104,7 @@ export class CheckCallData {
 
   constructor(abi: Abi) {
     this.abi = abi;
-    this.structs = abi
-      .filter((abiEntry) => abiEntry.type === 'struct')
-      .reduce(
-        (acc, abiEntry) => ({
-          ...acc,
-          [abiEntry.name]: abiEntry,
-        }),
-        {}
-      );
+    this.structs = getAbiStruct(abi);
   }
 
   /**
@@ -134,6 +140,14 @@ export class CheckCallData {
         ? abi.name === method && abi.type === method
         : abi.name === method && abi.type === 'function'
     ) as FunctionAbi;
+
+    // validate arguments length
+    const inputsLength = abiInputsLength(methodAbi.inputs);
+    if (args.length !== inputsLength) {
+      throw Error(
+        `Invalid number of arguments, expected ${inputsLength} arguments, but got ${args.length}`
+      );
+    }
 
     // validate parameters
     methodAbi.inputs.reduce((acc, input) => {

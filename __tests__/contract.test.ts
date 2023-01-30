@@ -404,13 +404,13 @@ describe('Contract interaction', () => {
       },
     };
 
-    // const result = await erc20Echo20Contract.echo3(callData(request), { formatResponse });
-    // expect(JSON.stringify(request)).toBe(JSON.stringify(result));
+    const result = await erc20Echo20Contract.echo3(callData(request), { formatResponse });
+    expect(JSON.stringify(request)).toBe(JSON.stringify(result));
 
     // invoke test 2
-    const result2 = await erc20Echo20Contract.iecho3(callData(request));
+    const result23 = await erc20Echo20Contract.iecho3(callData(request));
 
-    await provider.waitForTransaction(result2.transaction_hash);
+    await provider.waitForTransaction(result23.transaction_hash);
 
     const result3 = await erc20Echo20Contract.iecho3(
       request.t1,
@@ -423,7 +423,15 @@ describe('Contract interaction', () => {
 
     await provider.waitForTransaction(result3.transaction_hash);
 
-    console.log(result2, result3);
+    console.log(result23, result3);
+
+    // Test PopulateTransaction
+    /*     const result22 = await erc20Echo20Contract.populateTransaction.echo3(callData(request));
+    console.log(result22); */
+
+    // Test estimate fee
+    const result2 = await erc20Echo20Contract.estimateFee.iecho3(callData(request));
+    console.log(result2);
   });
 
   test('callData compatibility', async () => {
