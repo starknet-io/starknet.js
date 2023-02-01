@@ -17,7 +17,9 @@ import {
   InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  StateUpdateResponse,
   Status,
+  TransactionSimulationResponse,
 } from '../types';
 import { BigNumberish } from '../utils/number';
 import { ProviderInterface } from './interface';
@@ -192,5 +194,17 @@ export class Provider implements ProviderInterface {
     successStates?: Array<Status>
   ): Promise<GetTransactionReceiptResponse> {
     return this.provider.waitForTransaction(txHash, retryInterval, successStates);
+  }
+
+  public async getSimulateTransaction(
+    invocation: Invocation,
+    invocationDetails: InvocationsDetailsWithNonce,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<TransactionSimulationResponse> {
+    return this.provider.getSimulateTransaction(invocation, invocationDetails, blockIdentifier);
+  }
+
+  public async getStateUpdate(blockIdentifier?: BlockIdentifier): Promise<StateUpdateResponse> {
+    return this.provider.getStateUpdate(blockIdentifier);
   }
 }

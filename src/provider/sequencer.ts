@@ -22,6 +22,8 @@ import {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Sequencer,
+  StateUpdateResponse,
+  TransactionSimulationResponse,
   TransactionTraceResponse,
 } from '../types';
 import fetch from '../utils/fetchPonyfill';
@@ -40,7 +42,7 @@ import { parseContract, wait } from '../utils/provider';
 import { SequencerAPIResponseParser } from '../utils/responseParser/sequencer';
 import { randomAddress } from '../utils/stark';
 import { buildUrl } from '../utils/url';
-import { GatewayError, HttpError } from './errors';
+import { GatewayError, HttpError, LibraryError } from './errors';
 import { ProviderInterface } from './interface';
 import { Block, BlockIdentifier } from './utils';
 
@@ -296,9 +298,11 @@ export class SequencerProvider implements ProviderInterface {
 
   public async getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {
     const txHashHex = toHex(toBN(txHash));
-    return this.fetchEndpoint('get_transaction', { transactionHash: txHashHex }).then((value) =>
-      this.responseParser.parseGetTransactionResponse(value)
-    );
+    return this.fetchEndpoint('get_transaction', { transactionHash: txHashHex }).then((result) => {
+      // throw for no matching transaction to unify behavior with RPC and avoid parsing errors
+      if (Object.values(result).length === 1) throw new LibraryError(result.status);
+      return this.responseParser.parseGetTransactionResponse(result);
+    });
   }
 
   public async getTransactionReceipt(txHash: BigNumberish): Promise<GetTransactionReceiptResponse> {
@@ -566,11 +570,11 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('estimate_message_fee', { blockIdentifier }, validCallL1Handler);
   }
 
-  public async simulateTransaction(
+  public async getSimulateTransaction(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<Sequencer.TransactionSimulationResponse> {
+  ): Promise<TransactionSimulationResponse> {
     return this.fetchEndpoint(
       'simulate_transaction',
       { blockIdentifier },
@@ -582,6 +586,23 @@ export class SequencerProvider implements ProviderInterface {
         version: toHex(toBN(invocationDetails?.version || 1)),
         nonce: toHex(toBN(invocationDetails.nonce)),
       }
+    ).then(this.responseParser.parseFeeSimulateTransactionResponse);
+  }
+
+  public async getStateUpdate(
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<StateUpdateResponse> {
+    const args = new Block(blockIdentifier).sequencerIdentifier;
+    return this.fetchEndpoint('get_state_update', { ...args }).then(
+      this.responseParser.parseGetStateUpdateResponse
     );
+  }
+
+  // consider adding an optional trace retrieval parameter to the getBlock method
+  public async getBlockTraces(
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<Sequencer.BlockTransactionTracesResponse> {
+    const args = new Block(blockIdentifier).sequencerIdentifier;
+    return this.fetchEndpoint('get_block_traces', { ...args });
   }
 }

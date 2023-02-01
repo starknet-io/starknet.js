@@ -1,3 +1,47 @@
+# [4.21.0](https://github.com/0xs34n/starknet.js/compare/v4.20.0...v4.21.0) (2023-01-18)
+
+### Bug Fixes
+
+- fix merge conflicts from develop ([a8b01e3](https://github.com/0xs34n/starknet.js/commit/a8b01e351bb2d62f98d874d836a3f4046d5e046f))
+
+### Features
+
+- add get_block_traces support in sequencer ([b8dec62](https://github.com/0xs34n/starknet.js/commit/b8dec62c06dabcd3b917d6b53f318df2a0a8dfe4))
+- update types get_block_traces in sequencer ([2a8d97a](https://github.com/0xs34n/starknet.js/commit/2a8d97a532bb2c9f84436daa2b88abc81a4efa41))
+
+# [4.20.0](https://github.com/0xs34n/starknet.js/compare/v4.19.3...v4.20.0) (2023-01-17)
+
+### Bug Fixes
+
+- add utility getter in Block class ([3a52292](https://github.com/0xs34n/starknet.js/commit/3a5229277978c3235eaf1f7003b39eeabecac53e))
+- update responseParser & query parameters for sequencer ([a72db02](https://github.com/0xs34n/starknet.js/commit/a72db020aa1ac6924b2c047d067d553ac1b87248))
+
+### Features
+
+- add support for get_state_update in provider ([76035a1](https://github.com/0xs34n/starknet.js/commit/76035a148e7863fa1dbe440920eca34498480aa9))
+
+## [4.19.3](https://github.com/0xs34n/starknet.js/compare/v4.19.2...v4.19.3) (2023-01-12)
+
+### Bug Fixes
+
+- remove any type in simulateTransaction ([a94db18](https://github.com/0xs34n/starknet.js/commit/a94db1887c9fee676ac9b313190453abd5ea2554))
+- update account.simulateTransaction return type ([3c3d397](https://github.com/0xs34n/starknet.js/commit/3c3d397a4fb1042c7358f70f50df0a4ce2893220))
+
+## [4.19.2](https://github.com/0xs34n/starknet.js/compare/v4.19.1...v4.19.2) (2023-01-11)
+
+### Bug Fixes
+
+- repair and unify transaction retrieval error ([ea5e646](https://github.com/0xs34n/starknet.js/commit/ea5e64651bf47824b254ae73ed8aa88998a5be44))
+
+## [4.19.1](https://github.com/0xs34n/starknet.js/compare/v4.19.0...v4.19.1) (2023-01-10)
+
+### Bug Fixes
+
+- describeIfDevnetSequencer ([4a088ad](https://github.com/0xs34n/starknet.js/commit/4a088ada404ef912976141d8fba1c66d791c273c))
+- es6 ([e85ad45](https://github.com/0xs34n/starknet.js/commit/e85ad45c5565d93417b1a18e3663bd6c5e8861c1))
+- estimate fee response bulk type ([78a1444](https://github.com/0xs34n/starknet.js/commit/78a14445c75b7ec259d6cfecd1cc17869b507dd8))
+- tests ([5ab047f](https://github.com/0xs34n/starknet.js/commit/5ab047ff0b272057e70a29e909084d083db36a96))
+
 # [4.19.0](https://github.com/0xs34n/starknet.js/compare/v4.18.0...v4.19.0) (2023-01-09)
 
 ### Bug Fixes

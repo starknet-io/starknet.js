@@ -40,7 +40,7 @@ Returns the nonce of the account.
 
 account.**estimateInvokeFee**(calls [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse >_
 
-Estimate Fee for executing an INVOKE transaction on starknet.
+Estimate Fee for executing an INVOKE transaction on StarkNet.
 
 The _calls_ object structure:
 
@@ -69,7 +69,7 @@ The _estimateFeeDetails_ object may include any of:
 
 account.**estimateDeclareFee**(contractPayload [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse >_
 
-Estimate Fee for executing a DECLARE transaction on starknet.
+Estimate Fee for executing a DECLARE transaction on StarkNet.
 
 The _contractPayload_ object structure:
 
@@ -153,7 +153,7 @@ The _estimateFeeDetails_ object may include any of:
 
 account.**execute**(transactions [ , abi , transactionsDetail ]) => _Promise < InvokeFunctionResponse >_
 
-Executes one or multiple calls using the account contract.
+Executes one or multiple calls using the account contract. If there is only one call, _transactions_ will be an object that contains parameters below. If there are multiple calls, _transactions_ will be an array that contains several objects mentioned above.
 
 The _transactions_ object structure:
 
@@ -169,6 +169,61 @@ The _transactionsDetail_ object may include any of:
 - transactionsDetail.**maxFee** - Max Fee that that will be used to execute the call(s)
 - transactionsDetail.**nonce** - Nonce for the transaction
 - transactionsDetail.**version** - Version for the transaction (default is 1)
+
+Example:
+
+```typescript
+// When there is only one call
+const call = await account.execute(
+  {
+    contractAddress: '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',  // ETH contract address
+    entrypoint: 'approve',
+    calldata: starknet.stark.compileCalldata(
+      {
+        spender: "0x15e90f807a00a01df845460324fbcd33986f2df3cc9d981e9e8b5005b7f595e",
+        amount: {
+          type: 'struct',
+          low: '1',   // 1 wei
+          high: '0',
+        }
+      }
+    ),
+  },
+  undefined,
+  {
+    nonce: '10',
+  }
+);
+
+// When there are multiple calls
+const multiCall = await account.execute(
+  [
+    {
+      contractAddress: '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',  // ETH contract address
+      entrypoint: 'approve',
+      calldata: starknet.stark.compileCalldata(
+        {
+          spender: "0x15e90f807a00a01df845460324fbcd33986f2df3cc9d981e9e8b5005b7f595e",
+          amount: {
+            type: 'struct',
+            low: '1',   // 1 wei
+            high: '0',
+          }
+        }
+      ),
+    },
+    {
+      contractAddress: '0x15e90f807a00a01df845460324fbcd33986f2df3cc9d981e9e8b5005b7f595e',
+      entrypoint: 'transfer_ether',
+      calldata: ['1', '0'],  // 1 wei
+    }
+  ],
+  undefined,
+  {
+    nonce: '10',
+  }
+);
+```
 
 ###### _InvokeFunctionResponse_
 
@@ -489,3 +544,20 @@ Gets account address with the starknet id stark name.
 The _StarknetIdContract_ argument can be undefined, if it is, the function will automatically use official starknet id contracts of your network (It currently supports TESTNET 1 only).
 
 Returns directly the address in a string (Example: `0xff...34`).
+
+---
+
+### simulateTransaction()
+
+account.**simulateTransaction**(calls [ , estimateFeeDetails ]) => _Promise < TransactionSimulationResponse >_
+
+Simulates the transaction and returns the transaction trace and estimated fee.
+
+###### _TransactionSimulationResponse_
+
+```typescript
+{
+  trace: TransactionTraceResponse;
+  fee_estimation: EstimateFee;
+}
+```

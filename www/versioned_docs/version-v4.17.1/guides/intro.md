@@ -48,16 +48,6 @@ export TEST_RPC_URL = "http://127.0.0.1:5050/rpc"
 npm run test ./__tests__/rpcProvider.test.ts
 ```
 
-## Running docs locally
-
-If you want to change documentation and see how it looks before making a PR:
-
-```bash
-cd www
-npm install # install docusaurus
-npm run start # fires up a local documentation site
-```
-
 ## Compiling StarkNet Contracts
 
 Please check the StarkNet documentation <ins>[here](https://www.cairo-lang.org/docs/hello_starknet/intro.html)</ins> to compile starknet contracts.

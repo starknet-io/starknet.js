@@ -159,17 +159,43 @@ Gets the transaction trace from a tx hash.
 
 ---
 
-### simulateTransaction()
+### getBlockTraces()
 
-provider.**simulateTransaction**(invocation, invocationDetails, blockIdentifier) => _Promise < TransactionSimulationResponse >_
+provider.**getBlockTraces**(blockIdentifier) => _Promise < BlockTransactionTracesResponse >_
 
-Simulates the transaction and returns the transaction trace and estimated fee.
+Gets the transaction traces of an entire block
 
-###### _TransactionSimulationResponse_
+###### _BlockTransactionTracesResponse_
 
 ```typescript
+
 {
-  trace: TransactionTraceResponse;
-  fee_estimation: EstimateFeeResponse;
+    traces: Array<TransactionTraceResponse & { transaction_hash: string }>;
+}
+
+{
+  TransactionTraceResponse: {
+    validate_invocation?: FunctionInvocation;
+    function_invocation?: FunctionInvocation;
+    fee_transfer_invocation?: FunctionInvocation;
+    signature: Signature;
+  };
+
+  FunctionInvocation: {
+    caller_address: string;
+    contract_address: string;
+    calldata: {
+      [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
+    };
+    call_type?: string;
+    class_hash?: string;
+    selector?: string;
+    entry_point_type?: EntryPointType;
+    result: Array<any>;
+    execution_resources: ExecutionResources;
+    internal_calls: Array<FunctionInvocation>;
+    events: Array<any>;
+    messages: Array<any>;
+  };
 }
 ```

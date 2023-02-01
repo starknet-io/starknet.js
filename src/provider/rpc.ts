@@ -16,6 +16,7 @@ import {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   RPC,
+  TransactionSimulationResponse,
 } from '../types';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
@@ -28,6 +29,7 @@ import {
 } from '../utils/number';
 import { parseCalldata, wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
+import { LibraryError } from './errors';
 import { ProviderInterface } from './interface';
 import { Block, BlockIdentifier } from './utils';
 
@@ -82,7 +84,7 @@ export class RpcProvider implements ProviderInterface {
   protected errorHandler(error: any) {
     if (error) {
       const { code, message } = error;
-      throw new Error(`${code}: ${message}`);
+      throw new LibraryError(`${code}: ${message}`);
     }
   }
 
@@ -489,5 +491,13 @@ export class RpcProvider implements ProviderInterface {
    */
   public async getEvents(eventFilter: RPC.EventFilter): Promise<RPC.GetEventsResponse> {
     return this.fetchEndpoint('starknet_getEvents', { filter: eventFilter });
+  }
+
+  public async getSimulateTransaction(
+    _invocation: Invocation,
+    _invocationDetails: InvocationsDetailsWithNonce,
+    _blockIdentifier?: BlockIdentifier
+  ): Promise<TransactionSimulationResponse> {
+    throw new Error('RPC does not implement simulateTransaction function');
   }
 }

@@ -18,7 +18,9 @@ import type {
   InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  StateUpdateResponse,
   Status,
+  TransactionSimulationResponse,
 } from '../types';
 import type { BigNumberish } from '../utils/number';
 import { BlockIdentifier } from './utils';
@@ -297,4 +299,32 @@ export abstract class ProviderInterface {
     retryInterval?: number,
     successStates?: Array<Status>
   ): Promise<GetTransactionReceiptResponse>;
+
+  /**
+   * Simulates the transaction and returns the transaction trace and estimated fee.
+   *
+   * @param invocation the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   * @param details - optional details containing:
+   * - nonce - optional nonce
+   * - version - optional version
+   * @param blockIdentifier - block identifier
+   * @returns the transaction trace and estimated fee
+   */
+  public abstract getSimulateTransaction(
+    invocation: Invocation,
+    invocationDetails: InvocationsDetailsWithNonce,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<TransactionSimulationResponse>;
+
+  /**
+   * Gets the state changes in a specific block
+   *
+   * @param blockIdentifier - block identifier
+   * @returns StateUpdateResponse
+   */
+  public abstract getStateUpdate(blockIdentifier?: BlockIdentifier): Promise<StateUpdateResponse>;
 }
