@@ -69,7 +69,8 @@ const config = {
           {
             position: 'left',
             label: 'Guides',
-            to: '/docs/guides/intro',
+            type: 'doc',
+            docId: 'guides/intro',
           },
           {
             type: 'docsVersionDropdown',
