@@ -18,7 +18,7 @@ Create an account is a bit tricky ; you have several steps :
 
 ## Create OZ (Open Zeppelin) account :
 
-Here, we will create a wallet with the Open Zeppelin smartcontract v0.5.1. The contract class is already implemented in both Testnet 1 & 2.
+Here, we will create a wallet with the Open Zeppelin smart contract v0.5.1. The contract class is already implemented in both Testnet 1 & 2.
 
 ```typescript
 import { Account, ec, json, stark, Provider, hash } from "starknet";
@@ -38,12 +38,12 @@ const starkKeyPair = ec.getKeyPair(privateKey);
 const starkKeyPub = ec.getStarkKey(starkKeyPair);
 console.log('publicKey=', starkKeyPub);
 
-const OZaccountClashHass = "0x2794ce20e5f2ff0d40e632cb53845b9f4e526ebd8471983f7dbd355b721d5a";
+const OZaccountClassHash = "0x2794ce20e5f2ff0d40e632cb53845b9f4e526ebd8471983f7dbd355b721d5a";
 // Calculate future address of the account
 const OZaccountConstructorCallData = stark.compileCalldata({ publicKey: starkKeyPub });
 const OZcontractAddress = hash.calculateContractAddressFromHash(
     starkKeyPub,
-    OZaccountClashHass,
+    OZaccountClassHash,
     OZaccountConstructorCallData,
     0
 );
@@ -57,7 +57,7 @@ Then you have to fund this address!
 How to proceed is out of the scope of this guide, by you can for example :
 
 - Transfer ETH from another wallet.
-- Bridge ETH to this Starknet address.
+- Bridge ETH to this StarkNet address.
 - Use a faucet. (https://faucet.goerli.starknet.io/)
 - Mint ETH on starknet-devnet, like so:
 
@@ -74,7 +74,7 @@ If you have sent enough fund to this new address, you can go forward to the fina
 const OZaccount = new Account(provider, OZcontractAddress, starkKeyPair);
 
 const { transaction_hash, contract_address } = await OZaccount.deployAccount({
-    classHash: OZaccountClashHass,
+    classHash: OZaccountClassHash,
     constructorCalldata: OZaccountConstructorCallData,
     addressSalt: starkKeyPub
 });
@@ -201,9 +201,9 @@ console.log('publicKey=', AAstarkKeyPub);
 
 // declare the contract
 const compiledAAaccount = json.parse(fs.readFileSync("./compiled_contracts/myAccountAbstraction.json").toString("ascii");
-const AAaccountClashHass = "0x5139780c7ec8246e21a22e49f4fa0ce430237df4a4b241214a3a5a5c120120d";
+const AAaccountClassHash = "0x5139780c7ec8246e21a22e49f4fa0ce430237df4a4b241214a3a5a5c120120d";
 const { transaction_hash: declTH, class_hash: decCH } = await account0.declare({
-    classHash: AAaccountClashHass,
+    classHash: AAaccountClassHash,
     contract: compiledAAaccount
 });
 console.log('Customized account class hash =', decCH);
@@ -216,7 +216,7 @@ const AAaccountConstructorCallData = stark.compileCalldata({
 });
 const AAcontractAddress = hash.calculateContractAddressFromHash(
     AAstarkKeyPub,
-    AAaccountClashHass,
+    AAaccountClassHash,
     AAaccountConstructorCallData,
     0
 );
@@ -229,7 +229,7 @@ console.log('Answer mint =', answer);
 // deploy account
 const AAaccount = new Account(provider, AAcontractAddress, AAstarkKeyPair);
 const { transaction_hash, contract_address } = await AAaccount.deployAccount({
-    classHash: AAaccountClashHass,
+    classHash: AAaccountClassHash,
     constructorCalldata: AAaccountConstructorCallData,
     addressSalt: AAstarkKeyPub
 });
@@ -237,4 +237,4 @@ await provider.waitForTransaction(transaction_hash);
 console.log('✅ New customized account created.\n   address =', contract_address);
 ```
 
-The pre-computed address has been funded automatically by minting new dummy ETH in Starknet-devnet!
+The pre-computed address has been funded automatically by minting new dummy ETH in StarkNet devnet!

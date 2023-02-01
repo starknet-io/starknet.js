@@ -4,7 +4,7 @@ sidebar_position: 12
 
 # Reading emitted events
 
-## Starknet events
+## StarkNet events
 
 A contract may emit events throughout its execution. Each event contains the following fields:
 

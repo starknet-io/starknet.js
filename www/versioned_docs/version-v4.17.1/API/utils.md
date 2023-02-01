@@ -8,7 +8,7 @@ Util functions are provided so you can use various low level functions in your a
 
 ## **address**
 
-Helper functions for starknet addresses.
+Helper functions for StarkNet addresses.
 
 ### validateAndParseAddress
 
@@ -20,7 +20,7 @@ Checks if the address is valid and, if it is, parses it to the correct format (0
 
 `getChecksumAddress(address: BigNumberish): string`
 
-This function accepts an address as a `BigNumberish` and returns the checksummed address as a string.
+This function accepts an address as a `BigNumberish` and returns the check-summed address as a string.
 An example:
 
 ```js
