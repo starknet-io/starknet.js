@@ -133,8 +133,8 @@ describeIfSequencer('SequencerProvider', () => {
     });
 
     test('Check ERC20 balance using Custom Sequencer Provider', async () => {
-      const { res } = await erc20.balanceOf(wallet);
-      expect(res.low).toStrictEqual(toBN(1000));
+      const { balance } = await erc20.balanceOf(wallet);
+      expect(balance.low).toStrictEqual(toBN(1000));
     });
   });
 
