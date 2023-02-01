@@ -27,7 +27,7 @@ This way, the ERC20 contract is absolutely sure that the caller of the transfer 
 
 ## ETH token is an ERC20 in Starknet
 
-In opposition with Ethereum, the ETH token is an ERC20 in Starknet, as all other tokens. In all networks, it's ERC20 contract address is :
+In opposition with Ethereum, the ETH token is an ERC20 in StarkNet, as all other tokens. In all networks, it's ERC20 contract address is :
 
 ```typescript
 const addrETH = "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7";
@@ -42,9 +42,9 @@ This example works with an ERC20 mintable (everybody can mint new tokens), that 
 First, let's initialize an account :
 
 ```typescript
-// intialize provider
+// initialize provider
 const provider = new Provider({ sequencer: { baseUrl:"http://127.0.0.1:5050"  } });
-// initialize existing predeployed account 0 of Devnet
+// initialize existing pre-deployed account 0 of Devnet
 const privateKey = "0xe3e70682c2094cac629f6fbed82c07cd";
 const starkKeyPair = ec.getKeyPair(privateKey);
 const accountAddress = "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a";
@@ -106,7 +106,7 @@ const { transaction_hash: mintTxHash } = await erc20.mint(
 );
 
 // Wait for the invoke transaction to be accepted on StarkNet
-console.log(`Waiting for Tx to be Accepted on Starknet - Minting...`);
+console.log(`Waiting for Tx to be Accepted on StarkNet - Minting...`);
 await provider.waitForTransaction(mintTxHash);
 
 // Check balance - should be 1100
@@ -131,7 +131,7 @@ const { transaction_hash: transferTxHash } = await account0.execute({
 );
 
 // Wait for the invoke transaction to be accepted on StarkNet
-console.log(`Waiting for Tx to be Accepted on Starknet - Transfer...`);
+console.log(`Waiting for Tx to be Accepted on StarkNet - Transfer...`);
 await provider.waitForTransaction(transferTxHash);
 
 // Check balance after transfer - should be 1090
