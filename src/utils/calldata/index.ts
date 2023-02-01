@@ -80,10 +80,10 @@ export class CallData {
 
   /**
    * Compile contract callData without abi
-   * @param data Object representing cairo method arguments
+   * @param data Object representing cairo method arguments or string array of compiled data
    * @returns string[]
    */
-  static compile(data: object): string[] {
+  static compile(data: object | string[]): string[] {
     const createTree = (obj: object) => {
       const getEntries = (o: object, prefix = ''): any => {
         const oe = Array.isArray(o) ? [o.length.toString(), ...o] : o;
@@ -96,10 +96,16 @@ export class CallData {
       return Object.fromEntries(getEntries(obj));
     };
 
-    // flatten structs, tuples, add array length. Process leafs as Felt
-    const callTree = createTree(data);
-    // convert to array
-    const callTreeArray = Object.values(callTree);
+    let callTreeArray;
+    if (!Array.isArray(data)) {
+      // flatten structs, tuples, add array length. Process leafs as Felt
+      const callTree = createTree(data);
+      // convert to array
+      callTreeArray = Object.values(callTree);
+    } else {
+      // data are already compiled or some missuses
+      callTreeArray = data;
+    }
 
     // add compiled property to array object
     Object.defineProperty(callTreeArray, 'compiled', {
