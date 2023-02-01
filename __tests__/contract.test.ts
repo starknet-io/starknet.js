@@ -1,7 +1,8 @@
 import { isBN } from 'bn.js';
 
 import { Contract, ContractFactory, stark } from '../src';
-import { callData, felt, tuple, uint256 } from '../src/utils/calldata';
+import { CallData } from '../src/utils/calldata';
+import { felt, tuple, uint256 } from '../src/utils/calldata/cairo';
 import { getSelectorFromName } from '../src/utils/hash';
 import { BigNumberish, toBN } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
@@ -62,10 +63,10 @@ describe('contract module', () => {
       });
 
       test('read initial balance of that account', async () => {
-        const result = await erc20Contract.balanceOf(wallet);
-        const [res] = result;
-        expect(res.low).toStrictEqual(toBN(1000));
-        expect(res).toStrictEqual(result.balance);
+        const { balance } = await erc20Contract.balanceOf(wallet, {
+          formatResponse: { balance: uint256ToBN },
+        });
+        expect(balance).toStrictEqual(toBN(1000));
       });
 
       test('read balance in a multicall', async () => {
@@ -82,13 +83,10 @@ describe('contract module', () => {
           Object.keys(args2).length,
           ...compileCalldata(args2),
         ];
-        const result = await multicallContract.aggregate(calls);
-        const [block_number, res] = result;
+        const { block_number, result } = await multicallContract.aggregate(calls);
         expect(isBN(block_number));
-        expect(Array.isArray(res));
-        (res as BigNumberish[]).forEach((el) => expect(isBN(el)));
-        expect(block_number).toStrictEqual(result.block_number);
-        expect(res).toStrictEqual(result.result);
+        expect(Array.isArray(result));
+        (result as BigNumberish[]).forEach((el) => expect(isBN(el)));
       });
     });
 
@@ -159,55 +157,45 @@ describe('contract module', () => {
         });
 
         test('Parsing the array of felt in response', async () => {
-          const result = await typeTransformedContract.get_array_of_felts();
-          const [res] = result;
+          const { res } = await typeTransformedContract.get_array_of_felts();
           expect(res).toStrictEqual([toBN(4), toBN(5)]);
-          expect(res).toStrictEqual(result.res);
         });
 
         test('Parsing the array of structs in response', async () => {
-          const result = await typeTransformedContract.get_struct();
-          const [res] = result;
+          const { res } = await typeTransformedContract.get_struct();
           expect(res).toStrictEqual({ x: toBN(1), y: toBN(2) });
-          expect(res).toStrictEqual(result.res);
         });
 
         test('Parsing the array of structs in response', async () => {
-          const result = await typeTransformedContract.get_array_of_structs();
-          const [res] = result;
+          const { res } = await typeTransformedContract.get_array_of_structs();
           expect(res).toStrictEqual([{ x: toBN(1), y: toBN(2) }]);
-          expect(res).toStrictEqual(result.res);
         });
 
         test('Parsing the nested structs in response', async () => {
-          const result = await typeTransformedContract.get_nested_structs();
-          const [res] = result;
+          const { res } = await typeTransformedContract.get_nested_structs();
           expect(res).toStrictEqual({
             p1: { x: toBN(1), y: toBN(2) },
             p2: { x: toBN(3), y: toBN(4) },
             extra: toBN(5),
           });
-          expect(res).toStrictEqual(result.res);
         });
 
         test('Parsing the tuple in response', async () => {
-          const result = await typeTransformedContract.get_tuple();
-          const [res] = result;
-          expect(res).toStrictEqual([toBN(1), toBN(2), toBN(3)]);
-          expect(res).toStrictEqual(result.res);
+          const { res } = await typeTransformedContract.get_tuple();
+          expect(res).toStrictEqual({ 0: toBN(1), 1: toBN(2), 2: toBN(3) });
         });
 
         test('Parsing the multiple types in response', async () => {
-          const result = await typeTransformedContract.get_mixed_types();
-          const [aTuple, number, array, point] = result;
-          expect(aTuple).toStrictEqual([toBN(1), toBN(2)]);
+          const {
+            tuple: aTuple,
+            number,
+            array,
+            point,
+          } = await typeTransformedContract.get_mixed_types();
+          expect(aTuple).toStrictEqual({ 0: toBN(1), 1: toBN(2) });
           expect(number).toStrictEqual(toBN(3));
           expect(array).toStrictEqual([toBN(4)]);
           expect(point).toStrictEqual({ x: toBN(1), y: toBN(2) });
-          expect(aTuple).toStrictEqual(result.tuple);
-          expect(number).toStrictEqual(result.number);
-          expect(array).toStrictEqual(result.array);
-          expect(point).toStrictEqual(result.point);
         });
       });
     });
@@ -255,7 +243,7 @@ describe('Contract interaction', () => {
   let erc20Echo20Contract: Contract;
   const provider = getTestProvider();
   const account = getTestAccount(provider);
-  const classHash = '0x0600d32a63eec3150864a3cd121b34f427c91f939b3f5ab6433996e91c229538';
+  const classHash = '0x01a76ad51ccafca47079059ebf9fd577d8bcbbcded0c497852129f42eaaf6bef';
   let factory: ContractFactory;
 
   beforeAll(async () => {
@@ -279,7 +267,7 @@ describe('Contract interaction', () => {
   test('contractFactory.deploy with callData - all types constructor params', async () => {
     // Deploy with callData - OK
     erc20Echo20Contract = await factory.deploy(
-      callData({
+      CallData.compile({
         name: 'Token',
         symbol: 'ERC20',
         decimals: '18', // number as string will stay same (not processed)
@@ -296,7 +284,7 @@ describe('Contract interaction', () => {
     const { deploy } = await account.declareDeploy({
       contract: compiledErc20Echo,
       classHash,
-      constructorCalldata: callData({
+      constructorCalldata: CallData.compile({
         name: felt('Token'),
         symbol: felt('ERC20'),
         decimals: felt('18'),
@@ -311,8 +299,8 @@ describe('Contract interaction', () => {
     expect(erc20Echo20Contract instanceof Contract);
   });
 
-  test('Assert helpers and non helpers structure produce same result', async () => {
-    const feltedData = callData({
+  test('Assert helpers and non helpers data produce same result', async () => {
+    const feltedData = CallData.compile({
       name: felt('Token'),
       symbol: felt('ERC20'),
       decimals: felt(18),
@@ -323,7 +311,7 @@ describe('Contract interaction', () => {
       someTuple: tuple(10, '0x9', 'string'),
     });
 
-    const composedData = callData({
+    const composedData = CallData.compile({
       name: 'Token',
       symbol: 'ERC20',
       decimals: 18,
@@ -337,31 +325,7 @@ describe('Contract interaction', () => {
     expect(JSON.stringify(feltedData)).toBe(JSON.stringify(composedData));
   });
 
-  test('call contract method array params, with raw arguments and callData arguments', async () => {
-    const data = {
-      f1: [1, 2, 3, 4, 5, 6],
-      u1: [uint256(1000), uint256(2000), uint256(3000), uint256(4000)],
-      s2: [
-        { discount_fix_bps: 10, discount_transfer_bps: 11 },
-        { discount_fix_bps: 20, discount_transfer_bps: 22 },
-      ],
-    };
-
-    const compiledData = callData(data);
-    // call function with compiled data
-    const result3 = await erc20Echo20Contract.echo2(compiledData);
-
-    // call function with raw data as parameters
-    const result2 = await erc20Echo20Contract.echo2(data.f1, data.u1, data.s2, {
-      parseRequest: true,
-      parseResponse: true,
-    });
-    console.log(compiledData);
-    console.log(result2);
-    console.log(result3);
-  });
-
-  test('call contract method with string, composed struct and nested tuple', async () => {
+  test('call composed and nested data types (felt, array, struct, tuples)', async () => {
     const request = {
       t1: 'demo text1',
       n1: 123,
@@ -377,9 +341,31 @@ describe('Contract interaction', () => {
         },
         t3: 11,
       },
+      // added from echo
+      u1: uint256('5000'),
+      s1: {
+        discount_fix_bps: felt(1),
+        discount_transfer_bps: felt(2),
+      },
+      s2: {
+        info: {
+          discount_fix_bps: felt(1),
+          discount_transfer_bps: felt(2),
+        },
+        data: felt(200),
+        data2: tuple(felt(1), felt(2)),
+      },
+      // added from echo2, (dodan a ispred svega)
+      af1: [1, 2, 3, 4, 5, 6],
+      au1: [uint256(1000), uint256(2000), uint256(3000), uint256(4000)],
+      as2: [
+        { discount_fix_bps: 10, discount_transfer_bps: 11 },
+        { discount_fix_bps: 20, discount_transfer_bps: 22 },
+      ],
     };
 
     // Test formatter, experimental
+    // Define JS types expected from response object instead of BN
     const formatResponse = {
       t1: 'string',
       n1: 'number',
@@ -404,15 +390,21 @@ describe('Contract interaction', () => {
       },
     };
 
-    const result = await erc20Echo20Contract.echo3(callData(request), { formatResponse });
+    const result = await erc20Echo20Contract.echo(CallData.compile(request), {
+      parseRequest: true,
+      parseResponse: true,
+      formatResponse,
+    });
     expect(JSON.stringify(request)).toBe(JSON.stringify(result));
 
+    // TODO: add raw parameters call test
+
     // invoke test 2
-    const result23 = await erc20Echo20Contract.iecho3(callData(request));
+    const result23 = await erc20Echo20Contract.iecho(CallData.compile(request));
 
     await provider.waitForTransaction(result23.transaction_hash);
 
-    const result3 = await erc20Echo20Contract.iecho3(
+    const result3 = await erc20Echo20Contract.iecho(
       request.t1,
       request.n1,
       request.t2,
@@ -426,11 +418,11 @@ describe('Contract interaction', () => {
     console.log(result23, result3);
 
     // Test PopulateTransaction
-    /*     const result22 = await erc20Echo20Contract.populateTransaction.echo3(callData(request));
-    console.log(result22); */
+    const result22 = await erc20Echo20Contract.populateTransaction.echo(CallData.compile(request));
+    console.log(result22);
 
     // Test estimate fee
-    const result2 = await erc20Echo20Contract.estimateFee.iecho3(callData(request));
+    const result2 = await erc20Echo20Contract.estimateFee.iecho(CallData.compile(request));
     console.log(result2);
   });
 
@@ -496,7 +488,7 @@ describe('Contract interaction', () => {
       ],
     };
 
-    const compiledNewCallData = callData(newCalldata);
+    const compiledNewCallData = CallData.compile(newCalldata);
 
     console.log(compiledNewCallData);
 
@@ -507,37 +499,5 @@ describe('Contract interaction', () => {
     const bnBalance = uint256ToBN(uint256Balance);
     const balance = bnBalance.toString();
     expect(balance).toBe('1000000000');
-
-    const result = await erc20Echo20Contract.echo(
-      callData({
-        // t1: tuple(felt(10), felt(20)),
-        f1: felt('someText'),
-        u1: uint256('5000'),
-        s1: {
-          discount_fix_bps: felt(1),
-          discount_transfer_bps: felt(2),
-        },
-        s2: {
-          info: {
-            discount_fix_bps: felt(1),
-            discount_transfer_bps: felt(2),
-          },
-          data: felt(200),
-          data2: tuple(felt(1), felt(2)),
-        },
-        /* t2: tuple(
-          {
-            info: {
-              discount_fix_bps: felt(1),
-              discount_transfer_bps: felt(2),
-            },
-            data: felt(200),
-            data2: tuple(felt(1), felt(2)),
-          },
-          felt(100)
-        ), */
-      })
-    );
-    console.log(result);
   });
 });

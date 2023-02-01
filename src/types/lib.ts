@@ -124,6 +124,8 @@ enum FunctionAbiType {
   'constructor',
 }
 
+export type abiStructs = { [name: string]: StructAbi };
+
 export type StructAbi = {
   members: (AbiEntry & { offset: number })[];
   name: string;

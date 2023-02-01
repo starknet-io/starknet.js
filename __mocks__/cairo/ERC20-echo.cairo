@@ -25,27 +25,21 @@ func testStorage() -> (res: felt) {
 //
 // Getters
 //
-
-// Tuple
 using Tuple1 = (min: felt, max: felt);
 
 using Tuple2 = (a: Struct2, b: felt);
 
-// Struct
 struct Struct1 {
     discount_fix_bps: felt,  // fix discount in BPS
     discount_transfer_bps: felt,  // transfer % discount in BPS
 }
 
-
-// Nested Struct Shits
 struct Struct2 {
     info: Struct1,
     data: felt,
     data2: Tuple1,
 }
 
-// k1
 struct Struct32 {
     b: felt,
     c: (felt, felt, felt, felt),
@@ -54,20 +48,6 @@ struct Struct32 {
 struct Struct3 {
     a: felt,
     b: Struct32,
-}
-
-@view
-func echo{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
-f1: felt, u1: Uint256, s1: Struct1, s2: Struct2
-) -> (f1: felt, u1: Uint256, s1: Struct1, s2: Struct2) {
-    return (f1, u1, s1, s2);
-}
-
-@view
-func echo2{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
-f1_len:felt, f1: felt*, u1_len: felt, u1: Uint256*, s1_len: felt, s1: Struct1*
-) -> (f1_len:felt, f1: felt*, u1_len: felt, u1: Uint256*, s1_len: felt, s1: Struct1*) {
-    return (f1_len, f1, u1_len, u1, s1_len, s1);
 }
 
 struct StructY {
@@ -84,10 +64,10 @@ struct StructX {
 using TupleX = (t1: felt, t2: StructX, t3: felt);
 
 @view
-func echo3{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
-t1:felt, n1: felt, t2: felt, k1_len: felt, k1: Struct3*, k2: TupleX
-) -> (t1:felt, n1: felt, t2: felt, k1_len: felt, k1: Struct3*, k2: TupleX) {
-    return (t1, n1, t2, k1_len, k1, k2);
+func echo{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
+t1:felt, n1: felt, t2: felt, k1_len: felt, k1: Struct3*, k2: TupleX, u1: Uint256, s1: Struct1, s2: Struct2, af1_len:felt, af1: felt*, au1_len: felt, au1: Uint256*, as1_len: felt, as1: Struct1*
+) -> (t1:felt, n1: felt, t2: felt, k1_len: felt, k1: Struct3*, k2: TupleX, u1: Uint256, s1: Struct1, s2: Struct2, af1_len:felt, af1: felt*, au1_len: felt, au1: Uint256*, as1_len: felt, as1: Struct1*) {
+    return (t1, n1, t2, k1_len, k1, k2, u1, s1, s2, af1_len, af1, au1_len, au1, as1_len, as1);
 }
 
 @view
@@ -132,14 +112,13 @@ func allowance{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
 //
 // Externals
 //
-
 @external
-func iecho3{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
-t1:felt, n1: felt, t2: felt, k1_len: felt, k1: Struct3*, k2: TupleX
-) -> (t1:felt, n1: felt, t2: felt, k1_len: felt, k1: Struct3*, k2: TupleX) {
+func iecho{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
+t1:felt, n1: felt, t2: felt, k1_len: felt, k1: Struct3*, k2: TupleX, u1: Uint256, s1: Struct1, s2: Struct2, af1_len:felt, af1: felt*, au1_len: felt, au1: Uint256*, as1_len: felt, as1: Struct1*
+) -> (t1:felt, n1: felt, t2: felt, k1_len: felt, k1: Struct3*, k2: TupleX, u1: Uint256, s1: Struct1, s2: Struct2, af1_len:felt, af1: felt*, au1_len: felt, au1: Uint256*, as1_len: felt, as1: Struct1*) {
     let (res) = testStorage.read();
     testStorage.write(res + t1);
-    return (t1, n1, t2, k1_len, k1, k2);
+    return (t1, n1, t2, k1_len, k1, k2, u1, s1, s2, af1_len, af1, au1_len, au1, as1_len, as1);
 }
 
 @external

@@ -2,7 +2,7 @@ import assert from 'minimalistic-assert';
 
 import { AccountInterface } from '../account';
 import { Abi, CompiledContract, FunctionAbi } from '../types';
-import { CheckCallData } from '../utils/calldata';
+import { CallData } from '../utils/calldata';
 import { Contract } from './default';
 
 export class ContractFactory {
@@ -14,7 +14,7 @@ export class ContractFactory {
 
   account: AccountInterface;
 
-  private checkCalldata: CheckCallData;
+  private callData: CallData;
 
   constructor(
     compiledContract: CompiledContract,
@@ -26,7 +26,7 @@ export class ContractFactory {
     this.compiledContract = compiledContract;
     this.account = account;
     this.classHash = classHash;
-    this.checkCalldata = new CheckCallData(abi);
+    this.callData = new CallData(abi);
   }
 
   /**
@@ -56,9 +56,9 @@ export class ContractFactory {
       // eslint-disable-next-line prefer-destructuring
       constructorCalldata = args[0];
     } else {
-      this.checkCalldata.validateMethodAndArgs('DEPLOY', 'constructor', args);
+      this.callData.validate('DEPLOY', 'constructor', args);
       const { inputs } = this.abi.find((abi) => abi.type === 'constructor') as FunctionAbi;
-      constructorCalldata = this.checkCalldata.compileCalldata(args, inputs);
+      constructorCalldata = this.callData.compile(args, inputs);
     }
 
     const {

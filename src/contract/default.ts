@@ -13,14 +13,15 @@ import {
   Overrides,
   StructAbi,
 } from '../types';
-import { CheckCallData, abiInputsLength, getAbiStruct } from '../utils/calldata';
+import { CallData } from '../utils/calldata';
 import { CallOptions, ContractInterface } from './interface';
 
 const splitArgsAndOptions = (abiInputs: AbiEntry[], args: any) =>
-  (abiInputsLength(abiInputs) + 1 === args.length && typeof args[args.length - 1] === 'object') ||
+  (CallData.abiInputsLength(abiInputs) + 1 === args.length &&
+    typeof args[args.length - 1] === 'object') ||
   (args[0]?.compiled && args[1])
     ? { args, options: args.pop() }
-    : { args, options: undefined };
+    : { args, options: {} };
 
 /**
  * Adds call methods to the contract
@@ -28,7 +29,11 @@ const splitArgsAndOptions = (abiInputs: AbiEntry[], args: any) =>
 function buildCall(contract: Contract, functionAbi: FunctionAbi): AsyncContractFunction {
   return async function (...args: Array<any>): Promise<any> {
     const params = splitArgsAndOptions(functionAbi.inputs, args);
-    return contract.call(functionAbi.name, params.args, params.options);
+    return contract.call(functionAbi.name, params.args, {
+      parseRequest: true,
+      parseResponse: true,
+      ...params.options,
+    });
   };
 }
 
@@ -38,7 +43,10 @@ function buildCall(contract: Contract, functionAbi: FunctionAbi): AsyncContractF
 function buildInvoke(contract: Contract, functionAbi: FunctionAbi): AsyncContractFunction {
   return async function (...args: Array<any>): Promise<any> {
     const params = splitArgsAndOptions(functionAbi.inputs, args);
-    return contract.invoke(functionAbi.name, params.args, params.options);
+    return contract.invoke(functionAbi.name, params.args, {
+      parseRequest: true,
+      ...params.options,
+    });
   };
 }
 
@@ -91,7 +99,7 @@ export class Contract implements ContractInterface {
 
   readonly [key: string]: AsyncContractFunction | any;
 
-  private checkCalldata: CheckCallData;
+  private callData: CallData;
 
   /**
    * Contract class to handle contract methods
@@ -107,16 +115,16 @@ export class Contract implements ContractInterface {
   ) {
     this.address = address && address.toLowerCase();
     this.providerOrAccount = providerOrAccount;
-    this.checkCalldata = new CheckCallData(abi);
-    this.structs = getAbiStruct(abi);
+    this.callData = new CallData(abi);
+    this.structs = CallData.getAbiStruct(abi);
     this.abi = abi;
 
     const options = { enumerable: true, value: {}, writable: false };
     Object.defineProperties(this, {
-      functions: options,
-      callStatic: options,
-      populateTransaction: options,
-      estimateFee: options,
+      functions: { enumerable: true, value: {}, writable: false },
+      callStatic: { enumerable: true, value: {}, writable: false },
+      populateTransaction: { enumerable: true, value: {}, writable: false },
+      estimateFee: { enumerable: true, value: {}, writable: false },
     });
     this.abi.forEach((abiElement) => {
       if (abiElement.type !== 'function') return;
@@ -182,8 +190,8 @@ export class Contract implements ContractInterface {
     if (options.parseRequest && !args[0]?.compiled) {
       const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
 
-      this.checkCalldata.validateMethodAndArgs('CALL', method, args);
-      calldata = this.checkCalldata.compileCalldata(args, inputs);
+      this.callData.validate('CALL', method, args);
+      calldata = this.callData.compile(args, inputs);
     }
 
     return this.providerOrAccount
@@ -200,9 +208,9 @@ export class Contract implements ContractInterface {
           return x.result;
         }
         if (options.formatResponse) {
-          return this.checkCalldata.formatResponse(method, x.result, options.formatResponse);
+          return this.callData.format(method, x.result, options.formatResponse);
         }
-        return this.checkCalldata.parseResponse(method, x.result);
+        return this.callData.parse(method, x.result);
       });
   }
 
@@ -219,8 +227,8 @@ export class Contract implements ContractInterface {
     if (options.parseRequest && !calldata?.compiled) {
       const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
 
-      this.checkCalldata.validateMethodAndArgs('INVOKE', method, args);
-      calldata = this.checkCalldata.compileCalldata(args, inputs);
+      this.callData.validate('INVOKE', method, args);
+      calldata = this.callData.compile(args, inputs);
     }
 
     const invocation = {
@@ -257,7 +265,7 @@ export class Contract implements ContractInterface {
     assert(this.address !== null, 'contract is not connected to an address');
 
     if (!args[0]?.compiled) {
-      this.checkCalldata.validateMethodAndArgs('INVOKE', method, args);
+      this.callData.validate('INVOKE', method, args);
     }
 
     const invocation = this.populateTransaction[method](...args);
@@ -269,9 +277,7 @@ export class Contract implements ContractInterface {
 
   public populate(method: string, args: Array<any> = []): Call {
     const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
-    const calldata = args?.[0]?.compiled
-      ? args?.[0]
-      : this.checkCalldata.compileCalldata(args, inputs);
+    const calldata = args?.[0]?.compiled ? args?.[0] : this.callData.compile(args, inputs);
 
     return {
       contractAddress: this.address,
