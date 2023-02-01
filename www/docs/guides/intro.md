@@ -59,7 +59,7 @@ npm run start # fires up a local documentation site
 
 ## Compiling StarkNet Contracts
 
-Please check the StarkNet documentation <ins>[here](https://www.cairo-lang.org/docs/hello_starknet/intro.html)</ins> to compile starknet contracts.
+Please check the StarkNet documentation <ins>[here](https://www.cairo-lang.org/docs/hello_starknet/intro.html)</ins> to compile StarkNet contracts.
 
 Additional helpful resources can also be found at <ins>[OpenZeppelin](https://docs.openzeppelin.com/contracts-cairo/0.5.0/)</ins> documentation site.
 

@@ -34,9 +34,9 @@ Private key: 0xe3e70682c2094cac629f6fbed82c07cd
 Then you can use this code :
 
 ```typescript
-// intialize provider
+// initialize provider
 const provider = new Provider({ sequencer: { baseUrl:"http://127.0.0.1:5050"  } });
-// initialize existing predeployed account 0 of Devnet
+// initialize existing pre-deployed account 0 of Devnet
 const privateKey = "0xe3e70682c2094cac629f6fbed82c07cd";
 const starkKeyPair = ec.getKeyPair(privateKey);
 const accountAddress = "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a";
@@ -60,7 +60,7 @@ For example, to connect an existing account to testnet, with a private key store
 import * as dotenv from "dotenv";
 dotenv.config();
 
-// intialize provider
+// initialize provider
 const provider = new Provider({ sequencer: { baseUrl:"goerli-alpha"  } });
 // initialize existing account
 const privateKey = process.env.OZ_NEW_ACCOUNT_PRIVKEY;

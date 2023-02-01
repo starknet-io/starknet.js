@@ -40,7 +40,7 @@ Returns the nonce of the account.
 
 account.**estimateInvokeFee**(calls [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse >_
 
-Estimate Fee for executing an INVOKE transaction on starknet.
+Estimate Fee for executing an INVOKE transaction on StarkNet.
 
 The _calls_ object structure:
 
@@ -69,7 +69,7 @@ The _estimateFeeDetails_ object may include any of:
 
 account.**estimateDeclareFee**(contractPayload [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse >_
 
-Estimate Fee for executing a DECLARE transaction on starknet.
+Estimate Fee for executing a DECLARE transaction on StarkNet.
 
 The _contractPayload_ object structure:
 
@@ -156,7 +156,7 @@ The _transactionsDetail_ object may include any of:
 
 account.**declare**(contractPayload [ , transactionsDetail ]) => _Promise < DeclareContractResponse >_
 
-Declares a given compiled contract (json) to starknet.
+Declares a given compiled contract (json) to StarkNet.
 
 The _contractPayload_ object consists of:
 
