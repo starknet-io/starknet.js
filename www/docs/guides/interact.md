@@ -74,7 +74,8 @@ const account0 = new Account(provider, account0Address, starkKeyPair0);
 
 // Connect the deployed Test contract in Tesnet
 const testAddress = "0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd";
-  // read abi of Test contract
+
+// read abi of Test contract
 const { abi: testAbi } = await provider.getClassAt(testAddress);
 if (testAbi === undefined) { throw new Error("no abi.") };
 const myTestContract = new Contract(testAbi, testAddress, provider);
@@ -85,16 +86,16 @@ myTestContract.connect(account0);
 // Interactions with the contract with call & invoke
 const bal1 = await myTestContract.call("get_balance");
 console.log("Initial balance =", bal1.res.toString());
-const resu = await myTestContract.invoke("increase_balance", [10, 30]);
+const res = await myTestContract.invoke("increase_balance", [10, 30]);
 
-await provider.waitForTransaction(resu.transaction_hash);
+await provider.waitForTransaction(res.transaction_hash);
 const bal2 = await myTestContract.call("get_balance");
 console.log("Initial balance =", bal2.res.toString());
 ```
 
 ## Use meta-class of Contract
 
-You have another way to interact with a contract - the meta-class : each `Contract` object as specific functions to interact. For example here, we have 2 additional functions for the Test contract object :
+You have another way to interact with a contract - the meta-class : each `Contract` object as specific functions to interact. For example here, we have 2 additional functions for the Test contract object:
 
 - `Contract.get_balance()`
 - `Contract.increase_balance()`
@@ -114,7 +115,7 @@ const account0 = new Account(provider, account0Address, starkKeyPair0);
 // Connect the deployed Test contract in Tesnet
 const testAddress = "0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd";
 
-  // read abi of Test contract
+// read abi of Test contract
 const { abi: testAbi } = await provider.getClassAt(testAddress);
 if (testAbi === undefined) { throw new Error("no abi.") };
 const myTestContract = new Contract(testAbi, testAddress, provider);
@@ -133,11 +134,11 @@ const bal2 = await myTestContract.get_balance();import { Provider, Contract, Acc
 console.log("Initial balance =", bal2.res.toString());
 ```
 
-## Write contract memory, with Account.execute
+## Write to contract memory, with Account.execute
 
 If you have to invoke a function of a contract that need the proof that you have the private key of the account, you have to invoke this function with `account.execute`.
 
-We will see this case more in detail in ERC20 scripts, but in summary, you use this command with the following parameters :
+We will see this case more in detail in ERC20 scripts, but in summary, you use this command with the following parameters:
 
 - address of the contract to invoke
 - name of the function to invoke

@@ -266,7 +266,7 @@ Returns a string.
 
 Calculates the transaction hash in the StarkNet network - a unique identifier of the transaction.
 
-Called internally in `calculateDeployTransactionHash` and `calculcateTransactionHash`.
+Called internally in `calculateDeployTransactionHash` and `calculateTransactionHash`.
 
 ### calculateDeployTransactionHash
 
@@ -283,7 +283,7 @@ Internally calls `calculateTransactionHashCommon` with `TransactionHashPrefix.DE
 Function that internally calls `calculateTransactionHashCommon`, with `TransactionHashPrefix.INVOKE`.
 
 ```js
-const hashMsg = calculcateTransactionHash(
+const hashMsg = calculateTransactionHash(
   account,
   transactionVersion,
   getSelectorFromName('__execute__'),

@@ -40,7 +40,7 @@ Returns the nonce of the account.
 
 account.**estimateInvokeFee**(calls [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse >_
 
-Estimate Fee for executing an INVOKE transaction on starknet.
+Estimate Fee for executing an INVOKE transaction on StarkNet.
 
 The _calls_ object structure:
 
@@ -69,7 +69,7 @@ The _estimateFeeDetails_ object may include any of:
 
 account.**estimateDeclareFee**(contractPayload [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse >_
 
-Estimate Fee for executing a DECLARE transaction on starknet.
+Estimate Fee for executing a DECLARE transaction on StarkNet.
 
 The _contractPayload_ object structure:
 
@@ -188,7 +188,7 @@ const call = await account.execute(
         }
       }
     ),
-  }, 
+  },
   undefined,
   {
     nonce: '10',
@@ -211,7 +211,7 @@ const multiCall = await account.execute(
           }
         }
       ),
-    }, 
+    },
     {
       contractAddress: '0x15e90f807a00a01df845460324fbcd33986f2df3cc9d981e9e8b5005b7f595e',
       entrypoint: 'transfer_ether',
@@ -224,8 +224,6 @@ const multiCall = await account.execute(
   }
 );
 ```
-
-
 
 ###### _InvokeFunctionResponse_
 
