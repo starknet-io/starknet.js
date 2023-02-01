@@ -153,7 +153,7 @@ The _estimateFeeDetails_ object may include any of:
 
 account.**execute**(transactions [ , abi , transactionsDetail ]) => _Promise < InvokeFunctionResponse >_
 
-Executes one or multiple calls using the account contract. If there is only one call, _transactions_ will be an object contains parameters below. If there are multiple calls, _transactions_ will be an array contains several objects mentioned above.
+Executes one or multiple calls using the account contract. If there is only one call, _transactions_ will be an object that contains parameters below. If there are multiple calls, _transactions_ will be an array that contains several objects mentioned above.
 
 The _transactions_ object structure:
 
