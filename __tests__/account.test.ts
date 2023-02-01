@@ -48,9 +48,8 @@ describe('deploy and test Wallet', () => {
     erc20Address = declareDeploy.deploy.contract_address;
     erc20 = new Contract(compiledErc20.abi, erc20Address, provider);
 
-    const x = await erc20.balanceOf(account.address);
-
-    expect(number.toBN(x[0].low).toString()).toStrictEqual(number.toBN(1000).toString());
+    const { balance } = await erc20.balanceOf(account.address);
+    expect(number.toBN(balance.low).toString()).toStrictEqual(number.toBN(1000).toString());
 
     const dappResponse = await account.declareDeploy({
       contract: compiledTestDapp,
@@ -119,9 +118,9 @@ describe('deploy and test Wallet', () => {
   });
 
   test('read balance of wallet', async () => {
-    const x = await erc20.balanceOf(account.address);
+    const { balance } = await erc20.balanceOf(account.address);
 
-    expect(number.toBN(x[0].low).toString()).toStrictEqual(number.toBN(1000).toString());
+    expect(number.toBN(balance.low).toString()).toStrictEqual(number.toBN(1000).toString());
   });
 
   test('execute by wallet owner', async () => {
