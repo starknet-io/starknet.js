@@ -205,7 +205,7 @@ When you perform a call, you have the result in an object :
 
 ## Handle Strings :
 
-In Javascript/Typecript, the max length of a string is nearly illimited. In Cairo, a string is limited to only 31 characters, and is called a ShortString.
+In Javascript/Typecript, the max length of a string is nearly limitless. In Cairo, a string is limited to only 31 characters, and is called a ShortString.
 
 ### Encode ShortString :
 
@@ -235,7 +235,7 @@ How to handle a string with more than 31 characters :
 
 1. The Cairo contract has to manage this string as array of ShortString (array of felt).
 2. The JS code has to split/encode the string before call/invoke.
-3. The JS code hast to decode/merge the BNs received from a call.
+3. The JS code has to decode/merge the BNs received from a call.
 
 ```typescript
 function splitString(myString: string): string[] {

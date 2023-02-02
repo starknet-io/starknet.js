@@ -6,9 +6,9 @@ sidebar_position: 13
 
 You can exchange messages between L1 & L2 networks :
 
-- L2 Starknet mainnet ↔️ L1 Ethereum.
-- L2 Starknet testnet 1 & 2 ↔️ L1 Goerli ETH testnet.
-- L2 local starknet devnet ↔️ L1 local ETH testnet (Ganache, ...).
+- L2 StarkNet mainnet ↔️ L1 Ethereum.
+- L2 StarkNet testnet 1 & 2 ↔️ L1 Goerli ETH testnet.
+- L2 local StarkNet devnet ↔️ L1 local ETH testnet (Ganache, ...).
 
 You can find explanation of the global mechanism [here](https://docs.starknet.io/documentation/architecture_and_concepts/L1-L2_Communication/messaging-mechanism/).
 
