@@ -83,7 +83,7 @@ export class CallData {
    * @param data Object representing cairo method arguments or string array of compiled data
    * @returns string[]
    */
-  static compile(data: object | string[]): string[] {
+  static compile(data: object | string[]): Calldata {
     const createTree = (obj: object) => {
       const getEntries = (o: object, prefix = ''): any => {
         const oe = Array.isArray(o) ? [o.length.toString(), ...o] : o;
