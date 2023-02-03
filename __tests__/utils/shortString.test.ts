@@ -20,11 +20,11 @@ describe('shortString', () => {
   });
 
   test('should convert hex number string to string', () => {
-    expect(decodeShortString('0x68656c6c6f')).toMatchInlineSnapshot(`"hello"`);
+    expect(JSON.stringify(decodeShortString('0x68656c6c6f'))).toBe('"hello"');
   });
 
   test('should convert decimal number string to string', () => {
-    expect(decodeShortString('448378203247')).toMatch(`hello`);
+    expect(JSON.stringify(decodeShortString('448378203247'))).toBe('"hello"');
   });
 
   test('should throw if decode input is not ascii chars', () => {
