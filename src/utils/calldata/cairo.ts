@@ -1,4 +1,7 @@
-import { BigNumberish, toBN, toFelt } from '../number';
+import BN from 'bn.js';
+
+import { BigNumberish, isHex, isStringWholeNumber, toBN } from '../number';
+import { encodeShortString, isShortString, isText } from '../shortString';
 import { Uint256, isUint256 } from '../uint256';
 
 export const isLen = (name: string) => /_len$/.test(name);
@@ -34,4 +37,29 @@ export const tuple = (...args: (BigNumberish | object)[]) => ({ ...args });
 /**
  * felt cairo type
  */
-export const felt = (it: BigNumberish) => toFelt(it);
+export function felt(it: BigNumberish): string {
+  // BN or number
+  if (BN.isBN(it) || (typeof it === 'number' && Number.isInteger(it))) {
+    return it.toString();
+  }
+  // string text
+  if (isText(it)) {
+    if (!isShortString(it as string))
+      throw new Error(
+        `${it} is a long string > 31 chars, felt can store short strings, split it to array of short strings`
+      );
+    const encoded = encodeShortString(it as string);
+    return toBN(encoded).toString();
+  }
+  // hex string
+  if (typeof it === 'string' && isHex(it)) {
+    // toBN().toString
+    return toBN(it).toString();
+  }
+  // string number (already converted), or unhandled type
+  if (typeof it === 'string' && isStringWholeNumber(it)) {
+    return it;
+  }
+
+  throw new Error(`${it} can't be computed by felt()`);
+}

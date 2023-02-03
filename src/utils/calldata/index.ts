@@ -2,6 +2,7 @@ import BN from 'bn.js';
 import assert from 'minimalistic-assert';
 
 import { Abi, AbiEntry, Args, Calldata, FunctionAbi, abiStructs } from '../../types';
+import { isLongText, splitLongString } from '../shortString';
 import { felt, isLen } from './cairo';
 import formatter from './formatter';
 import { parseCalldataField } from './requestParser';
@@ -88,9 +89,13 @@ export class CallData {
       const getEntries = (o: object, prefix = ''): any => {
         const oe = Array.isArray(o) ? [o.length.toString(), ...o] : o;
         return Object.entries(oe).flatMap(([k, v]) => {
+          let value = v;
+          if (isLongText(value)) value = splitLongString(value);
           const kk = Array.isArray(oe) && k === '0' ? '$$len' : k;
-          if (BN.isBN(v)) return [[`${prefix}${kk}`, felt(v)]];
-          return Object(v) === v ? getEntries(v, `${prefix}${kk}.`) : [[`${prefix}${kk}`, felt(v)]];
+          if (BN.isBN(value)) return [[`${prefix}${kk}`, felt(value)]];
+          return Object(value) === value
+            ? getEntries(value, `${prefix}${kk}.`)
+            : [[`${prefix}${kk}`, felt(value)]];
         });
       };
       return Object.fromEntries(getEntries(obj));

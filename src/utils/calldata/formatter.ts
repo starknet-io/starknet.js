@@ -26,8 +26,17 @@ export default function formatter(data: any, type: any) {
     }
 
     if (type[key] === 'string') {
+      if (Array.isArray(data[key])) {
+        // long string (felt*)
+        const arrayStr = formatter(
+          data[key],
+          data[key].map((_: any) => type[key])
+        );
+        acc[key] = Object.values(arrayStr).join('');
+        return acc;
+      }
       guard.isBN(data, type, key);
-      acc[key] = decodeShortString(value.toString(16));
+      acc[key] = decodeShortString(value);
       return acc;
     }
     if (type[key] === 'number') {

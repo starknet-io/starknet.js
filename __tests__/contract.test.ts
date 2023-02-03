@@ -244,7 +244,7 @@ describe('Complex interaction', () => {
   let erc20Echo20Contract: Contract;
   const provider = getTestProvider();
   const account = getTestAccount(provider);
-  const classHash = '0x01a76ad51ccafca47079059ebf9fd577d8bcbbcded0c497852129f42eaaf6bef';
+  const classHash = '0x06ea0b95e41a5fb7278ef2737ff81d606bd6e9066fd8973684cd7a6907dcf832';
   let factory: ContractFactory;
 
   beforeAll(async () => {
@@ -391,7 +391,7 @@ describe('Complex interaction', () => {
     const request = {
       t1: 'demo text1',
       n1: 123,
-      t2: 'some text 2',
+      tl2: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
       k1: [{ a: 1, b: { b: 2, c: tuple(3, 4, 5, 6) } }],
       k2: {
         // named tuple
@@ -428,7 +428,7 @@ describe('Complex interaction', () => {
     const formatResponse = {
       t1: 'string',
       n1: 'number',
-      t2: 'string',
+      tl2: 'string',
       k1: [
         {
           a: 'number',
@@ -496,7 +496,7 @@ describe('Complex interaction', () => {
         const result = await erc20Echo20Contract.echo(
           request.t1,
           request.n1,
-          request.t2,
+          request.tl2,
           request.k1,
           request.k2,
           request.u1,
@@ -525,7 +525,7 @@ describe('Complex interaction', () => {
         const result = await erc20Echo20Contract.iecho(
           request.t1,
           request.n1,
-          request.t2,
+          request.tl2,
           request.k1,
           request.k2,
           request.u1,
@@ -546,7 +546,7 @@ describe('Complex interaction', () => {
         CallData.compile(request)
       );
       expect(
-        '["474107654995566025798705","123","139552669917337096297914418","1","1","2","3","4","5","6","1","2","3","4","5","6","7","8","9","10","11","5000","0","1","2","1","2","200","1","2","6","1","2","3","4","5","6","4","1000","0","2000","0","3000","0","4000","0","2","10","11","20","22"]'
+        '["474107654995566025798705","123","8","135049554883004558383340439742929429255072943744440858662311072577337126766","203887170123222058415354283980421533276985178030994883159827760142323294308","196343614134218459150194337625778954700414868493373034945803514629145850912","191491606203201332235940470946533476219373216944002683254566549675726417440","150983476482645969577707455338206408996455974968365254240526141964709732462","196916864427988120570407658938236398782031728400132565646592333804118761826","196909666192589839125749789377187946419246316474617716408635151520594095469","2259304674248048077001042434290734","1","1","2","3","4","5","6","1","2","3","4","5","6","7","8","9","10","11","5000","0","1","2","1","2","200","1","2","6","1","2","3","4","5","6","4","1000","0","2000","0","3000","0","4000","0","2","10","11","20","22"]'
       ).toBe(JSON.stringify(populated.calldata));
 
       // mark data as compiled (it can be also done manually check defineProperty compiled in CallData.compile)

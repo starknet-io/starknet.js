@@ -1,6 +1,7 @@
 import { AbiEntry, ParsedStruct, Tupled, abiStructs } from '../../types';
-import { BigNumberish, toFelt } from '../number';
-import { isTypeArray, isTypeFeltArray, isTypeTuple } from './cairo';
+import { BigNumberish } from '../number';
+import { isText, splitLongString } from '../shortString';
+import { felt, isTypeArray, isTypeFeltArray, isTypeTuple } from './cairo';
 import extractTupleMemberTypes from './tuple';
 
 /**
@@ -63,7 +64,7 @@ function parseCalldataValue(
     if (element.length !== structMemberNum) {
       throw Error(`Missing parameter for type ${type}`);
     }
-    return element.map((el) => toFelt(el));
+    return element.map((el) => felt(el));
   }
   // checking if the passed element is struct
   if (structs[type] && structs[type].members.length) {
@@ -86,7 +87,7 @@ function parseCalldataValue(
   if (typeof element === 'object') {
     throw Error(`Parameter ${element} do not align with abi parameter ${type}`);
   }
-  return toFelt(element as BigNumberish);
+  return felt(element as BigNumberish);
 }
 
 /**
@@ -103,21 +104,25 @@ export function parseCalldataField(
   structs: abiStructs
 ): string | string[] {
   const { name, type } = input;
-  const { value } = argsIterator.next();
+  let { value } = argsIterator.next();
 
   switch (true) {
     // When type is Array
     case isTypeArray(type):
-      if (!Array.isArray(value)) {
-        throw Error(`ABI expected parameter ${name} to be array, got ${value}`);
+      if (!Array.isArray(value) && !isText(value)) {
+        throw Error(`ABI expected parameter ${name} to be array or long string, got ${value}`);
+      }
+      if (typeof value === 'string') {
+        // long string match cairo felt*
+        value = splitLongString(value);
       }
       // eslint-disable-next-line no-case-declarations
       const result: string[] = [];
-      result.push(toFelt(value.length)); // Add length to array
+      result.push(felt(value.length)); // Add length to array
 
       return (value as (BigNumberish | ParsedStruct)[]).reduce((acc, el) => {
         if (isTypeFeltArray(type)) {
-          acc.push(toFelt(el as BigNumberish));
+          acc.push(felt(el as BigNumberish));
         } else {
           // structure or tuple
           acc.push(...parseCalldataValue(el, type.replace('*', ''), structs));
@@ -129,6 +134,6 @@ export function parseCalldataField(
       return parseCalldataValue(value as ParsedStruct | BigNumberish[], type, structs);
     // When type is felt or unhandled
     default:
-      return toFelt(value as BigNumberish);
+      return felt(value as BigNumberish);
   }
 }

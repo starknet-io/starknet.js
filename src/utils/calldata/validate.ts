@@ -3,6 +3,7 @@ import assert from 'minimalistic-assert';
 
 import { FunctionAbi, abiStructs } from '../../types';
 import { BigNumberish } from '../number';
+import { isLongText } from '../shortString';
 import { isLen, isTypeFelt } from './cairo';
 import { calculateStructMembers } from './requestParser';
 
@@ -11,6 +12,7 @@ export default function validateFields(
   args: Array<any>,
   structs: abiStructs
 ) {
+  // TODO: This need to be refactored. It need to test by type and than test by parameter, with else throw unknown
   // validate parameters
   abiMethod.inputs.reduce((acc, input) => {
     const parameter = args[acc];
@@ -44,7 +46,12 @@ export default function validateFields(
     } else if (typeof parameter === 'object' && !Array.isArray(parameter)) {
       // TODO: skip tuple validation for now
       // Type Array
+      // TODO: fix, this is array is assumption
     } else {
+      // Long string
+      if (isLongText(parameter)) {
+        return acc + 1;
+      }
       assert(Array.isArray(parameter), `arg ${input.name} should be an Array`);
       // Array of Felts
       if (input.type === 'felt*') {
@@ -54,7 +61,6 @@ export default function validateFields(
             `arg ${input.name} should be an array of string, number or BigNumber`
           );
         });
-
         // Array of Tuple
       } else if (/\(felt/.test(input.type)) {
         // TODO: This ex. code validate only most basic tuple structure, skip for validation

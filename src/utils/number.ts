@@ -2,7 +2,6 @@ import BN from 'bn.js';
 import assert from 'minimalistic-assert';
 
 import { addHexPrefix, removeHexPrefix } from './encode';
-import { encodeShortString } from './shortString';
 
 export type BigNumberish = string | number | BN;
 
@@ -31,29 +30,6 @@ export function toHex(number: BN): string {
 
 export function hexToDecimalString(hex: string): string {
   return toBN(`0x${hex.replace(/^0x/, '')}`).toString();
-}
-
-export function toFelt(it: BigNumberish): string {
-  // BN or number
-  if (BN.isBN(it) || (typeof it === 'number' && Number.isInteger(it))) {
-    return it.toString();
-  }
-  // string text
-  if (typeof it === 'string' && !isHex(it) && !isStringWholeNumber(it)) {
-    const encoded = encodeShortString(it);
-    return toBN(encoded).toString();
-  }
-  // hex string
-  if (typeof it === 'string' && isHex(it)) {
-    // toBN().toString
-    return toBN(it).toString();
-  }
-  // string number (already converted), or unhandled type
-  if (typeof it === 'string' && isStringWholeNumber(it)) {
-    return it;
-  }
-
-  throw new Error(`${it} can't be computed by toFelt()`);
 }
 
 /**

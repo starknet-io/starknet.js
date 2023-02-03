@@ -14,17 +14,10 @@ import {
   ZERO,
 } from '../constants';
 import { RawCalldata } from '../types';
+import { felt } from './calldata/cairo';
 import { ec } from './ellipticCurve';
 import { addHexPrefix, buf2hex, removeHexPrefix, utf8ToArray } from './encode';
-import {
-  BigNumberish,
-  isHex,
-  isStringWholeNumber,
-  toBN,
-  toFelt,
-  toHex,
-  toHexString,
-} from './number';
+import { BigNumberish, isHex, isStringWholeNumber, toBN, toHex, toHexString } from './number';
 
 export const transactionVersion = 1;
 export const feeTransactionVersion = toBN(2).pow(toBN(128)).add(toBN(transactionVersion));
@@ -221,7 +214,7 @@ export function calculateContractAddressFromHash(
 ) {
   const constructorCalldataHash = computeHashOnElements(constructorCalldata);
 
-  const CONTRACT_ADDRESS_PREFIX = toFelt('0x535441524b4e45545f434f4e54524143545f41444452455353'); // Equivalent to 'STARKNET_CONTRACT_ADDRESS'
+  const CONTRACT_ADDRESS_PREFIX = felt('0x535441524b4e45545f434f4e54524143545f41444452455353'); // Equivalent to 'STARKNET_CONTRACT_ADDRESS'
 
   const dataToHash = [
     CONTRACT_ADDRESS_PREFIX,
