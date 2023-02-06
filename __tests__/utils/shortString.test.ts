@@ -1,3 +1,4 @@
+import { removeHexPrefix } from '../../src/utils/encode';
 import { decodeShortString, encodeShortString } from '../../src/utils/shortString';
 
 describe('shortString', () => {
@@ -37,5 +38,10 @@ describe('shortString', () => {
     expect(() => decodeShortString('Test')).toThrowErrorMatchingInlineSnapshot(
       `"Test is not Hex or decimal"`
     );
+  });
+
+  test('explicitly test removeHexPrefix', () => {
+    expect(removeHexPrefix('0x01')).toBe('01');
+    expect(removeHexPrefix('0X01')).toBe('01');
   });
 });
