@@ -1,3 +1,4 @@
+import { removeHexPrefix } from '../../src/utils/encode';
 import { decodeShortString, encodeShortString } from '../../src/utils/shortString';
 
 describe('shortString', () => {
@@ -20,11 +21,11 @@ describe('shortString', () => {
   });
 
   test('should convert hex number string to string', () => {
-    expect(decodeShortString('0x68656c6c6f')).toMatchInlineSnapshot(`"hello"`);
+    expect(JSON.stringify(decodeShortString('0x68656c6c6f'))).toBe('"hello"');
   });
 
   test('should convert decimal number string to string', () => {
-    expect(decodeShortString('448378203247')).toMatch(`hello`);
+    expect(JSON.stringify(decodeShortString('448378203247'))).toBe('"hello"');
   });
 
   test('should throw if decode input is not ascii chars', () => {
@@ -37,5 +38,10 @@ describe('shortString', () => {
     expect(() => decodeShortString('Test')).toThrowErrorMatchingInlineSnapshot(
       `"Test is not Hex or decimal"`
     );
+  });
+
+  test('explicitly test removeHexPrefix', () => {
+    expect(removeHexPrefix('0x01')).toBe('01');
+    expect(removeHexPrefix('0X01')).toBe('01');
   });
 });
