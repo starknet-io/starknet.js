@@ -14,9 +14,9 @@ On the other side, when a contract sends data to your DAPP (result of a call), y
 
 In Cairo, everything is felt, an integer on 251 bits.
 
-This type does not exists in JS/TS - you have Number, bigInt, string, array, objects... and types defined in libraries.
+This type does not exist in JS/TS - you have Number, bigInt, string, array, objects... and types defined in libraries.
 
-In Starknet.js, it's a bit ... complicated : you have the BigNumberish type and it can includes :
+In Starknet.js, it's a bit ... complicated : you have the BigNumberish type and it can include :
 
 - String : "123", "0xabc2"
 - Number (max 53 bits) : 123
@@ -164,7 +164,7 @@ Same for arrays - their elements must have the `BigNumberish` type.
 
 ### summary table for arguments
 
-These 4 types of arguments can't be used at your convenience everywhere. Here a table showing which types can be used in which function :
+These 4 types of arguments can't be used at your convenience everywhere. Here is a table showing which types can be used in which function :
 
 |                              Function | array of < BigNumberish > |        array of < string >         | object  | array of < any > | MultiInvoke |
 | ------------------------------------: | :-----------------------: | :--------------------------------: | :-----: | :--------------: | :---------: |
@@ -205,7 +205,7 @@ When you perform a call, you have the result in an object :
 
 ## Handle Strings :
 
-In Javascript/Typecript, the max length of a string is nearly limitless. In Cairo, a string is limited to only 31 characters, and is called a ShortString.
+In Javascript/Typescript, the max length of a string is nearly limitless. In Cairo, a string is limited to only 31 characters, and is called a ShortString.
 
 ### Encode ShortString :
 

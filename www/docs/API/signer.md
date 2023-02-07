@@ -46,7 +46,7 @@ string[]
 
 signer.**signMessage**(typedData, accountAddress) => _Promise < Signature >_
 
-Sign an JSON object for off-chain usage with the StarkNet private key and return the signature. This adds a message prefix so it cant be interchanged with transactions.
+Sign an JSON object for off-chain usage with the StarkNet private key and return the signature. This adds a message prefix so it can't be interchanged with transactions.
 
 _typedData_ - JSON object to be signed
 _accountAddress_ - calldata to be passed in deploy constructor
