@@ -14,9 +14,9 @@ On the other side, when a contract sends data to your DAPP (result of a call), y
 
 In Cairo, everything is felt, an integer on 251 bits.
 
-This type does not exists in JS/TS - you have Number, bigInt, string, array, objects... and types defined in libraries.
+This type does not exist in JS/TS - you have Number, bigInt, string, array, objects... and types defined in libraries.
 
-In Starknet.js, it's a bit ... complicated : you have the BigNumberish type and it can includes :
+In Starknet.js, it's a bit ... complicated : you have the BigNumberish type and it can include :
 
 - String : "123", "0xabc2"
 - Number (max 53 bits) : 123
@@ -164,7 +164,7 @@ Same for arrays - their elements must have the `BigNumberish` type.
 
 ### summary table for arguments
 
-These 4 types of arguments can't be used at your convenience everywhere. Here a table showing which types can be used in which function :
+These 4 types of arguments can't be used at your convenience everywhere. Here is a table showing which types can be used in which function :
 
 |                              Function | array of < BigNumberish > |        array of < string >         | object  | array of < any > | MultiInvoke |
 | ------------------------------------: | :-----------------------: | :--------------------------------: | :-----: | :--------------: | :---------: |
@@ -202,3 +202,62 @@ When you perform a call, you have the result in an object :
 | Uint256 (256 bits max)                | `func getV()->(balance:Uint256)`           | BN                                | `const balance = uint256.uint256toBN(result.balance)`              |
 | array of felt                         | `func getV()->(list_len:felt, list:felt*)` | BN[]                              | `const list= result.list`                                          |
 | shortString (31 ASCII characters max) | `func getV()->(title:felt)`                | string                            | `const title:string = shortString.decodeShortString(result.title)` |
+
+## Handle Strings :
+
+In Javascript/Typescript, the max length of a string is nearly limitless. In Cairo, a string is limited to only 31 characters, and is called a ShortString.
+
+### Encode ShortString :
+
+From JS to Cairo, you need to encode this ShortString to a number on 248 bits :
+
+```typescript
+const myText = "uri/pict/t38.jpg"; // 31 chars max
+const encodedText: string = shortString.encodeShortString(myText);
+```
+
+the result is Hex number string : "0x7572692f706963742f7433382e6a7067"
+
+### Decode ShortString :
+
+From Cairo to JS, you need to decode a BN (big number) to a string of 31 character max.
+
+```typescript
+const myShortString= new BN("156113730760229877043789998731456835687"); // or result of a Contract.call
+const myTextDecoded = shortString.decodeShortString(myShortString);
+```
+
+the result is : "uri/pict/t38.jpg"
+
+### LongString
+
+How to handle a string with more than 31 characters :
+
+1. The Cairo contract has to manage this string as array of ShortString (array of felt).
+2. The JS code has to split/encode the string before call/invoke.
+3. The JS code has to decode/merge the BNs received from a call.
+
+```typescript
+function splitString(myString: string): string[] {
+    const myShortStrings: string[] = [];
+    while (myString.length > 0) {
+        myShortStrings.push(myString.slice(0, 31));
+        myString = myString.slice(31);
+    }
+    return (myShortStrings);
+}
+let myString = "uri:myProject/atosmotor/recurr/monkey148.jpg";
+// encoding
+const myShortStrings = splitString(myString);
+const myShortStringsEncoded = myShortStrings.map((shortStr) => {
+    return shortString.encodeShortString(shortStr)
+}); // to use as input in call/invoke/deploy
+
+// decoding from a call
+// receiving a BN[]
+const stringsCoded: BN[] = result.token_uri;
+const myShortStringsDecoded = stringsCoded.map((shortStr: BN) => {
+    return shortString.decodeShortString(shortStr.toString())
+});
+const finalString = myShortStringsDecoded.join("");
+```

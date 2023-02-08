@@ -32,7 +32,7 @@ const compiledContract = json.parse(fs.readFileSync("./compiledContracts/test.js
 ## Connect the contract
 
 ```typescript
-// intialize provider
+// initialize provider
 const provider = new Provider({ sequencer: { baseUrl:"goerli-alpha"  } });
 
 // initialize deployed contract
