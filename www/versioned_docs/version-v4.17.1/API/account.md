@@ -8,7 +8,7 @@ An Account extends <ins>[`Provider`](/docs/API/provider)</ins> and inherits all 
 
 It also introduces new methods that allow Accounts to create and verify signatures with a custom <ins>[`Signer`](/docs/API/signer)</ins>, declare and deploy Contract and deploy new Account
 
-This API is the primary way to interact with an account contract on StarkNet.
+This API is the primary way to interact with an account contract on Starknet.
 
 ## Creating an instance
 
@@ -40,7 +40,7 @@ Returns the nonce of the account.
 
 account.**estimateInvokeFee**(calls [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse >_
 
-Estimate Fee for executing an INVOKE transaction on StarkNet.
+Estimate Fee for executing an INVOKE transaction on Starknet.
 
 The _calls_ object structure:
 
@@ -69,7 +69,7 @@ The _estimateFeeDetails_ object may include any of:
 
 account.**estimateDeclareFee**(contractPayload [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse >_
 
-Estimate Fee for executing a DECLARE transaction on StarkNet.
+Estimate Fee for executing a DECLARE transaction on Starknet.
 
 The _contractPayload_ object structure:
 
@@ -97,7 +97,7 @@ The _estimateFeeDetails_ object may include any of:
 
 account.**estimateAccountDeployFee**(contractPayload [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse >_
 
-Estimate Fee for executing a DEPLOY_ACCOUNT transaction on StarkNet
+Estimate Fee for executing a DEPLOY_ACCOUNT transaction on Starknet
 
 The _contractPayload_ object structure:
 
@@ -156,7 +156,7 @@ The _transactionsDetail_ object may include any of:
 
 account.**declare**(contractPayload [ , transactionsDetail ]) => _Promise < DeclareContractResponse >_
 
-Declares a given compiled contract (json) to StarkNet.
+Declares a given compiled contract (json) to Starknet.
 
 The _contractPayload_ object consists of:
 

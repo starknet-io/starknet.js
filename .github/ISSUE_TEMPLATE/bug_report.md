@@ -22,7 +22,7 @@ If applicable, add screenshots to help explain your problem.
 
 - Browser & version [e.g. chrome, safari, webworker]
 - Node version [e.g. 16.0.1]
-- StarkNet.js version
+- Starknet.js version
 - Network [devnet, testnet]
 
 **Additional context**
