@@ -33,7 +33,7 @@ function parseTuple(element: object, typeStr: string): Tupled[] {
  * @param structs - structs from abi
  * @return {number} - number of members for the given struct
  */
-export function calculateStructMembers(struct: string, structs: abiStructs): number {
+function calculateStructMembers(struct: string, structs: abiStructs): number {
   return structs[struct].members.reduce((acc, member) => {
     if (member.type === 'felt') {
       return acc + 1;

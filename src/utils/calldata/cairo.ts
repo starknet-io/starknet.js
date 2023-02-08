@@ -1,5 +1,6 @@
 import BN from 'bn.js';
 
+import { abiStructs } from '../../types';
 import { BigNumberish, isHex, isStringWholeNumber, toBN } from '../number';
 import { encodeShortString, isShortString, isText } from '../shortString';
 import { Uint256, isUint256 } from '../uint256';
@@ -10,6 +11,7 @@ export const isTypeFeltArray = (type: string) => type === 'felt*';
 export const isTypeArray = (type: string) => /\*/.test(type);
 export const isTypeTuple = (type: string) => /\(.*\)/i.test(type);
 export const isTypeNamedTuple = (type: string) => /\(.*\)/i.test(type) && type.includes(':');
+export const isTypeStruct = (type: string, structs: abiStructs) => type in structs;
 
 /**
  * named tuple are described as js object {}
