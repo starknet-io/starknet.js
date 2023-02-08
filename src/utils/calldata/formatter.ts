@@ -16,21 +16,23 @@ const guard = {
   },
 };
 
-export default function formatter(data: any, type: any) {
+export default function formatter(data: any, type: any, sameType?: any) {
   // match data element with type element
   return Object.entries(data).reduce((acc, [key, value]: [any, any]) => {
-    if (!(key in type)) {
+    const elType = sameType ?? type[key];
+
+    if (!(key in type) && !sameType) {
       // no type definition for element return original element
       acc[key] = value;
       return acc;
     }
 
-    if (type[key] === 'string') {
+    if (elType === 'string') {
       if (Array.isArray(data[key])) {
         // long string (felt*)
         const arrayStr = formatter(
           data[key],
-          data[key].map((_: any) => type[key])
+          data[key].map((_: any) => elType)
         );
         acc[key] = Object.values(arrayStr).join('');
         return acc;
@@ -39,22 +41,22 @@ export default function formatter(data: any, type: any) {
       acc[key] = decodeShortString(value);
       return acc;
     }
-    if (type[key] === 'number') {
+    if (elType === 'number') {
       guard.isBN(data, type, key);
       acc[key] = value.toNumber();
       return acc;
     }
-    if (typeof type[key] === 'function') {
-      acc[key] = type[key](value);
+    if (typeof elType === 'function') {
+      acc[key] = elType(value);
       return acc;
     }
-    if (Array.isArray(type[key])) {
-      const arrayObj = formatter(data[key], type[key]);
+    if (Array.isArray(elType)) {
+      const arrayObj = formatter(data[key], elType, elType[0]);
       acc[key] = Object.values(arrayObj);
       return acc;
     }
-    if (typeof type[key] === 'object') {
-      acc[key] = formatter(data[key], type[key]);
+    if (typeof elType === 'object') {
+      acc[key] = formatter(data[key], elType);
       return acc;
     }
 

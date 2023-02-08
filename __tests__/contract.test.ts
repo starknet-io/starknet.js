@@ -244,7 +244,7 @@ describe('Complex interaction', () => {
   let erc20Echo20Contract: Contract;
   const provider = getTestProvider();
   const account = getTestAccount(provider);
-  const classHash = '0x06ea0b95e41a5fb7278ef2737ff81d606bd6e9066fd8973684cd7a6907dcf832';
+  const classHash = '0x011ab8626b891bcb29f7cc36907af7670d6fb8a0528c7944330729d8f01e9ea3';
   let factory: ContractFactory;
 
   beforeAll(async () => {
@@ -422,6 +422,15 @@ describe('Complex interaction', () => {
         { discount_fix_bps: 10, discount_transfer_bps: 11 },
         { discount_fix_bps: 20, discount_transfer_bps: 22 },
       ],
+      atmk: [
+        { p1: { p1: { y1: 1, y2: 2 }, p2: 3 }, p2: 4 },
+        { p1: { p1: { y1: 1, y2: 2 }, p2: 3 }, p2: 4 },
+      ],
+      atmku: [
+        tuple(tuple({ y1: 1, y2: 2 }, 3), 4),
+        tuple(tuple({ y1: 1, y2: 2 }, 3), 4),
+        tuple(tuple({ y1: 1, y2: 2 }, 3), 4),
+      ],
     };
 
     // formatter(experimental) Define JS types expected from response object instead of BN
@@ -460,12 +469,11 @@ describe('Complex interaction', () => {
         data: 'number',
         data2: { min: 'number', max: 'number' },
       },
-      af1: ['number', 'number', 'number', 'number', 'number', 'number'],
-      au1: [uint256ToBN, uint256ToBN, uint256ToBN, uint256ToBN],
-      as1: [
-        { discount_fix_bps: 'number', discount_transfer_bps: 'number' },
-        { discount_fix_bps: 'number', discount_transfer_bps: 'number' },
-      ],
+      af1: ['number'],
+      au1: [uint256ToBN],
+      as1: [{ discount_fix_bps: 'number', discount_transfer_bps: 'number' }],
+      atmk: [{ p1: { p1: { y1: 'number', y2: 'number' }, p2: 'number' }, p2: 'number' }],
+      atmku: [tuple(tuple({ y1: 'number', y2: 'number' }, 'number'), 'number')],
     };
 
     test('call compiled data', async () => {
@@ -491,7 +499,7 @@ describe('Complex interaction', () => {
       expect(transaction.status).toBeDefined();
     });
 
-    describeIfDevnet('speedup live tests', () => {
+    describe('speedup live tests', () => {
       test('call parameterized data', async () => {
         const result = await erc20Echo20Contract.echo(
           request.t1,
@@ -505,6 +513,8 @@ describe('Complex interaction', () => {
           request.af1,
           request.au1,
           request.as1,
+          request.atmk,
+          request.atmku,
           {
             parseRequest: true,
             parseResponse: true,
@@ -518,7 +528,7 @@ describe('Complex interaction', () => {
           u1: uint256ToBN(request.u1),
           au1: request.au1.map((it) => uint256ToBN(it)),
         };
-        expect(JSON.stringify(compareRequest)).toBe(JSON.stringify(result));
+        expect(JSON.stringify(result)).toBe(JSON.stringify(compareRequest));
       });
 
       test('invoke parameterized data', async () => {
@@ -534,6 +544,8 @@ describe('Complex interaction', () => {
           request.af1,
           request.au1,
           request.as1,
+          request.atmk,
+          request.atmku,
           { formatResponse }
         );
         const transaction = await provider.waitForTransaction(result.transaction_hash);
@@ -546,7 +558,7 @@ describe('Complex interaction', () => {
         CallData.compile(request)
       );
       expect(
-        '["474107654995566025798705","123","8","135049554883004558383340439742929429255072943744440858662311072577337126766","203887170123222058415354283980421533276985178030994883159827760142323294308","196343614134218459150194337625778954700414868493373034945803514629145850912","191491606203201332235940470946533476219373216944002683254566549675726417440","150983476482645969577707455338206408996455974968365254240526141964709732462","196916864427988120570407658938236398782031728400132565646592333804118761826","196909666192589839125749789377187946419246316474617716408635151520594095469","2259304674248048077001042434290734","1","1","2","3","4","5","6","1","2","3","4","5","6","7","8","9","10","11","5000","0","1","2","1","2","200","1","2","6","1","2","3","4","5","6","4","1000","0","2000","0","3000","0","4000","0","2","10","11","20","22"]'
+        '["474107654995566025798705","123","8","135049554883004558383340439742929429255072943744440858662311072577337126766","203887170123222058415354283980421533276985178030994883159827760142323294308","196343614134218459150194337625778954700414868493373034945803514629145850912","191491606203201332235940470946533476219373216944002683254566549675726417440","150983476482645969577707455338206408996455974968365254240526141964709732462","196916864427988120570407658938236398782031728400132565646592333804118761826","196909666192589839125749789377187946419246316474617716408635151520594095469","2259304674248048077001042434290734","1","1","2","3","4","5","6","1","2","3","4","5","6","7","8","9","10","11","5000","0","1","2","1","2","200","1","2","6","1","2","3","4","5","6","4","1000","0","2000","0","3000","0","4000","0","2","10","11","20","22","2","1","2","3","4","1","2","3","4","3","1","2","3","4","1","2","3","4","1","2","3","4"]'
       ).toBe(JSON.stringify(populated.calldata));
 
       // mark data as compiled (it can be also done manually check defineProperty compiled in CallData.compile)

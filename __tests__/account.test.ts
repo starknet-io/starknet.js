@@ -2,6 +2,7 @@ import { isBN } from 'bn.js';
 
 import typedDataExample from '../__mocks__/typedDataExample.json';
 import { Account, Contract, Provider, ec, number, stark } from '../src';
+import { uint256 } from '../src/utils/calldata/cairo';
 import { getKeyPair, sign } from '../src/utils/ellipticCurve';
 import { parseUDCEvent } from '../src/utils/events';
 import {
@@ -207,7 +208,7 @@ describe('deploy and test Wallet', () => {
     });
 
     test('estimate gas fee for `mint`', async () => {
-      const res = await erc20.estimateFee.mint(wallet, ['10', '0']);
+      const res = await erc20.estimateFee.mint(wallet, uint256('10'));
       expect(res).toHaveProperty('overall_fee');
     });
 

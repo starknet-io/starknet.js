@@ -63,11 +63,17 @@ struct StructX {
 
 using TupleX = (t1: felt, t2: StructX, t3: felt);
 
+using TupleMix = (p1: StructY, p2: felt);
+using TupleMixK = (p1: TupleMix, p2: felt);
+
+using TupleMixU = (StructY, felt);
+using TupleMixUK = (TupleMixU, felt);
+
 @view
 func echo{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
-t1:felt, n1: felt, tl2_len: felt, tl2: felt*, k1_len: felt, k1: Struct3*, k2: TupleX, u1: Uint256, s1: Struct1, s2: Struct2, af1_len:felt, af1: felt*, au1_len: felt, au1: Uint256*, as1_len: felt, as1: Struct1*
-) -> (t1:felt, n1: felt, tl2_len: felt, tl2: felt*, k1_len: felt, k1: Struct3*, k2: TupleX, u1: Uint256, s1: Struct1, s2: Struct2, af1_len:felt, af1: felt*, au1_len: felt, au1: Uint256*, as1_len: felt, as1: Struct1*) {
-    return (t1, n1, tl2_len, tl2, k1_len, k1, k2, u1, s1, s2, af1_len, af1, au1_len, au1, as1_len, as1);
+t1:felt, n1: felt, tl2_len: felt, tl2: felt*, k1_len: felt, k1: Struct3*, k2: TupleX, u1: Uint256, s1: Struct1, s2: Struct2, af1_len:felt, af1: felt*, au1_len: felt, au1: Uint256*, as1_len: felt, as1: Struct1*, atmk_len: felt, atmk: TupleMixK*, atmku_len: felt, atmku: TupleMixUK*
+) -> (t1:felt, n1: felt, tl2_len: felt, tl2: felt*, k1_len: felt, k1: Struct3*, k2: TupleX, u1: Uint256, s1: Struct1, s2: Struct2, af1_len:felt, af1: felt*, au1_len: felt, au1: Uint256*, as1_len: felt, as1: Struct1*, atmk_len: felt, atmk: TupleMixK*, atmku_len: felt, atmku: TupleMixUK*) {
+    return (t1, n1, tl2_len, tl2, k1_len, k1, k2, u1, s1, s2, af1_len, af1, au1_len, au1, as1_len, as1, atmk_len, atmk, atmku_len, atmku);
 }
 
 @view
@@ -114,11 +120,11 @@ func allowance{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
 //
 @external
 func iecho{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}(
-t1:felt, n1: felt, tl2_len: felt, tl2: felt*, k1_len: felt, k1: Struct3*, k2: TupleX, u1: Uint256, s1: Struct1, s2: Struct2, af1_len:felt, af1: felt*, au1_len: felt, au1: Uint256*, as1_len: felt, as1: Struct1*
-) -> (t1:felt, n1: felt, tl2_len: felt, tl2: felt*, k1_len: felt, k1: Struct3*, k2: TupleX, u1: Uint256, s1: Struct1, s2: Struct2, af1_len:felt, af1: felt*, au1_len: felt, au1: Uint256*, as1_len: felt, as1: Struct1*) {
+t1:felt, n1: felt, tl2_len: felt, tl2: felt*, k1_len: felt, k1: Struct3*, k2: TupleX, u1: Uint256, s1: Struct1, s2: Struct2, af1_len:felt, af1: felt*, au1_len: felt, au1: Uint256*, as1_len: felt, as1: Struct1*, atmk_len: felt, atmk: TupleMixK*, atmku_len: felt, atmku: TupleMixUK*
+) -> (t1:felt, n1: felt, tl2_len: felt, tl2: felt*, k1_len: felt, k1: Struct3*, k2: TupleX, u1: Uint256, s1: Struct1, s2: Struct2, af1_len:felt, af1: felt*, au1_len: felt, au1: Uint256*, as1_len: felt, as1: Struct1*, atmk_len: felt, atmk: TupleMixK*, atmku_len: felt, atmku: TupleMixUK*) {
     let (res) = testStorage.read();
     testStorage.write(res + t1);
-    return (t1, n1, tl2_len, tl2, k1_len, k1, k2, u1, s1, s2, af1_len, af1, au1_len, au1, as1_len, as1);
+    return (t1, n1, tl2_len, tl2, k1_len, k1, k2, u1, s1, s2, af1_len, af1, au1_len, au1, as1_len, as1, atmk_len, atmk, atmku_len, atmku);
 }
 
 @external
