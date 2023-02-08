@@ -9,7 +9,7 @@ export const isLen = (name: string) => /_len$/.test(name);
 export const isTypeFelt = (type: string) => type === 'felt';
 export const isTypeFeltArray = (type: string) => type === 'felt*';
 export const isTypeArray = (type: string) => /\*/.test(type);
-export const isTypeTuple = (type: string) => /\(.*\)/i.test(type);
+export const isTypeTuple = (type: string) => /^\(.*\)$/i.test(type);
 export const isTypeNamedTuple = (type: string) => /\(.*\)/i.test(type) && type.includes(':');
 export const isTypeStruct = (type: string, structs: abiStructs) => type in structs;
 

@@ -24,6 +24,7 @@ const validateStruct = (parameter: any, input: AbiEntry, structs: abiStructs) =>
     `Validate: arg ${input.name} is cairo type struct (${input.type}), and should be defined as js object (not array)`
   );
 
+  // shallow struct validation, only first depth level
   structs[input.type].members.forEach(({ name }) => {
     assert(
       Object.keys(parameter).includes(name),
@@ -47,22 +48,23 @@ const validateArray = (parameter: any, input: AbiEntry, structs: abiStructs) => 
   if (isTypeFelt(baseType) && isLongText(parameter)) return;
 
   assert(Array.isArray(parameter), `Validate: arg ${input.name} should be an Array`);
-  // Array of Felts
-  if (isTypeFelt(baseType)) {
-    parameter.forEach((param: BigNumberish) => validateFelt(param, input));
-    // Array of Tuple
-  } else if (/\(felt/.test(input.type)) {
-    // todo: this is not true it can be like (Struct.. or (Tuple...)
-    // TODO: This ex. code validate only most basic tuple structure, skip for validation
-    // Array of Struct
-  } else if (isTypeStruct(baseType, structs)) {
-    parameter.forEach((structParam: any) =>
-      validateStruct(structParam, { name: input.name, type: baseType }, structs)
-    );
-  } else {
-    throw new Error(
-      `Validate Unhandled: argument ${input.name}, type ${input.type}, value ${parameter}`
-    );
+
+  switch (true) {
+    case isTypeFelt(baseType):
+      parameter.forEach((param: BigNumberish) => validateFelt(param, input));
+      break;
+    case isTypeTuple(baseType):
+      parameter.forEach((it: any) => validateTuple(it, { name: input.name, type: baseType }));
+      break;
+    case isTypeStruct(baseType, structs):
+      parameter.forEach((it: any) =>
+        validateStruct(it, { name: input.name, type: baseType }, structs)
+      );
+      break;
+    default:
+      throw new Error(
+        `Validate Unhandled: argument ${input.name}, type ${input.type}, value ${parameter}`
+      );
   }
 };
 

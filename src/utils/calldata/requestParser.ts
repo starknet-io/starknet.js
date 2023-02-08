@@ -21,7 +21,7 @@ function parseTuple(element: object, typeStr: string): Tupled[] {
   return memberTypes.map((it: any, dx: number) => {
     return {
       element: elements[dx],
-      type: it.type,
+      type: it.type ?? it,
     };
   });
 }
