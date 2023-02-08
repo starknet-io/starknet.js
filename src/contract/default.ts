@@ -4,7 +4,6 @@ import { AccountInterface } from '../account';
 import { ProviderInterface, defaultProvider } from '../provider';
 import {
   Abi,
-  AbiEntry,
   AsyncContractFunction,
   Call,
   ContractFunction,
@@ -16,19 +15,29 @@ import {
 import { CallData } from '../utils/calldata';
 import { CallOptions, ContractInterface } from './interface';
 
-const splitArgsAndOptions = (abiInputs: AbiEntry[], args: any) =>
-  (CallData.abiInputsLength(abiInputs) + 1 === args.length &&
-    typeof args[args.length - 1] === 'object') ||
-  (args[0]?.compiled && args[1])
-    ? { args, options: args.pop() }
-    : { args, options: {} };
+const splitArgsAndOptions = (args: any) => {
+  const options = [
+    'blockIdentifier',
+    'parseRequest',
+    'parseResponse',
+    'formatResponse',
+    'maxFee',
+    'nonce',
+    'signature',
+  ];
+  const lastArg = args[args.length - 1];
+  if (typeof lastArg === 'object' && options.some((x) => x in lastArg)) {
+    return { args, options: args.pop() };
+  }
+  return { args, options: {} };
+};
 
 /**
  * Adds call methods to the contract
  */
 function buildCall(contract: Contract, functionAbi: FunctionAbi): AsyncContractFunction {
   return async function (...args: Array<any>): Promise<any> {
-    const params = splitArgsAndOptions(functionAbi.inputs, args);
+    const params = splitArgsAndOptions(args);
     return contract.call(functionAbi.name, params.args, {
       parseRequest: true,
       parseResponse: true,
@@ -42,7 +51,7 @@ function buildCall(contract: Contract, functionAbi: FunctionAbi): AsyncContractF
  */
 function buildInvoke(contract: Contract, functionAbi: FunctionAbi): AsyncContractFunction {
   return async function (...args: Array<any>): Promise<any> {
-    const params = splitArgsAndOptions(functionAbi.inputs, args);
+    const params = splitArgsAndOptions(args);
     return contract.invoke(functionAbi.name, params.args, {
       parseRequest: true,
       ...params.options,
