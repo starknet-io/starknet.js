@@ -1,7 +1,7 @@
 import { AbiEntry, ParsedStruct, Tupled, abiStructs } from '../../types';
 import { BigNumberish } from '../number';
 import { isText, splitLongString } from '../shortString';
-import { felt, isTypeArray, isTypeFeltArray, isTypeTuple } from './cairo';
+import { felt, isTypeArray, isTypeFeltArray, isTypeStruct, isTypeTuple } from './cairo';
 import extractTupleMemberTypes from './tuple';
 
 /**
@@ -15,7 +15,11 @@ function parseTuple(element: object, typeStr: string): Tupled[] {
   const elements = Object.values(element);
 
   if (elements.length !== memberTypes.length) {
-    throw Error('Provided and abi expected tuple size diff in parseTuple');
+    throw Error(
+      `ParseTuple: provided and expected abi tuple size do not match.
+      provided: ${elements} 
+      expected: ${memberTypes}`
+    );
   }
 
   return memberTypes.map((it: any, dx: number) => {
@@ -24,22 +28,6 @@ function parseTuple(element: object, typeStr: string): Tupled[] {
       type: it.type ?? it,
     };
   });
-}
-
-/**
- * Deep parse of the object that has been passed to the method // TODO: Check how to get here
- *
- * @param struct - struct that needs to be calculated
- * @param structs - structs from abi
- * @return {number} - number of members for the given struct
- */
-function calculateStructMembers(struct: string, structs: abiStructs): number {
-  return structs[struct].members.reduce((acc, member) => {
-    if (member.type === 'felt') {
-      return acc + 1;
-    }
-    return acc + calculateStructMembers(member.type, structs);
-  }, 0);
 }
 
 /**
@@ -59,12 +47,7 @@ function parseCalldataValue(
     throw Error(`Missing parameter for type ${type}`);
   }
   if (Array.isArray(element)) {
-    // Structure or Tuple provided as Array, this should not be valid
-    const structMemberNum = calculateStructMembers(type, structs);
-    if (element.length !== structMemberNum) {
-      throw Error(`Missing parameter for type ${type}`);
-    }
-    return element.map((el) => felt(el));
+    throw Error(`Array inside array (nD) are not supported by cairo. Element: ${element} ${type}`);
   }
   // checking if the passed element is struct
   if (structs[type] && structs[type].members.length) {
@@ -107,7 +90,7 @@ export function parseCalldataField(
   let { value } = argsIterator.next();
 
   switch (true) {
-    // When type is Array
+    // Array
     case isTypeArray(type):
       if (!Array.isArray(value) && !isText(value)) {
         throw Error(`ABI expected parameter ${name} to be array or long string, got ${value}`);
@@ -129,10 +112,10 @@ export function parseCalldataField(
         }
         return acc;
       }, result);
-    // When type is Struct or Tuple
-    case type in structs || isTypeTuple(type):
+    // Struct or Tuple
+    case isTypeStruct(type, structs) || isTypeTuple(type):
       return parseCalldataValue(value as ParsedStruct | BigNumberish[], type, structs);
-    // When type is felt or unhandled
+    // Felt or unhandled
     default:
       return felt(value as BigNumberish);
   }
