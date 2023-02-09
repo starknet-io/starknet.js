@@ -1,17 +1,22 @@
-import type { ec as EC } from 'elliptic';
-
+import { weierstrass } from '../utils/ec';
 import type { BigNumberish } from '../utils/number';
 import { RPC } from './api/rpc';
 
-export type KeyPair = EC.KeyPair;
-export type Signature = string[];
+// Common Signature Type which needs to be imported from weierstrass
+// and imported at many places
+// This is because stark.ts doesn't export SignatureType
+export type Signature = weierstrass.SignatureType;
+
 export type RawCalldata = BigNumberish[];
 export type AllowArray<T> = T | T[];
 export type RawArgs =
   | {
-      [inputName: string]: string | string[] | { type: 'struct'; [k: string]: BigNumberish };
+      [inputName: string]:
+        | BigNumberish
+        | BigNumberish[]
+        | { type: 'struct'; [k: string]: BigNumberish };
     }
-  | string[];
+  | BigNumberish[];
 
 export interface ContractClass {
   program: CompressedProgram;
@@ -33,7 +38,7 @@ export type DeployContractPayload = {
 };
 
 export type DeployAccountContractPayload = {
-  classHash: BigNumberish;
+  classHash: string;
   constructorCalldata?: RawCalldata;
   addressSalt?: BigNumberish;
   contractAddress?: string;
@@ -48,11 +53,11 @@ export type DeployAccountContractTransaction = Omit<
 
 export type DeclareContractPayload = {
   contract: CompiledContract | string;
-  classHash: BigNumberish; // Once the classHash is included in CompiledContract, this can be removed
+  classHash?: string;
 };
 
-export type DeclareDeployContractPayload = DeclareContractPayload &
-  UniversalDeployerContractPayload;
+export type DeclareAndDeployContractPayload = Omit<UniversalDeployerContractPayload, 'classHash'> &
+  DeclareContractPayload;
 
 export type DeclareContractTransaction = {
   contractDefinition: ContractClass;
@@ -85,6 +90,23 @@ export enum TransactionStatus {
   ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
   REJECTED = 'REJECTED',
 }
+export type TransactionBulk = Array<
+  | ({ type: 'DECLARE' } & { payload: DeclareContractPayload })
+  | ({ type: 'DEPLOY' } & {
+      payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[];
+    })
+  | ({ type: 'DEPLOY_ACCOUNT' } & { payload: DeployAccountContractPayload })
+  | ({ type: 'INVOKE_FUNCTION' } & { payload: AllowArray<Call> })
+>;
+
+export type InvocationBulk = Array<
+  (
+    | ({ type: 'DECLARE' } & DeclareContractTransaction)
+    | ({ type: 'DEPLOY_ACCOUNT' } & DeployAccountContractTransaction)
+    | ({ type: 'INVOKE_FUNCTION' } & Invocation)
+  ) &
+    InvocationsDetailsWithNonce & { blockIdentifier: BlockNumber | BigNumberish }
+>;
 
 export type Status =
   | 'NOT_RECEIVED'
@@ -131,8 +153,21 @@ export type Abi = Array<FunctionAbi | EventAbi | StructAbi>;
 
 type EventAbi = any;
 
-export type EntryPointsByType = object;
-export type Program = Record<any, any>;
+export type ContractEntryPointFields = {
+  selector: string;
+  offset: string;
+};
+
+export type EntryPointsByType = {
+  CONSTRUCTOR: ContractEntryPointFields[];
+  EXTERNAL: ContractEntryPointFields[];
+  L1_HANDLER: ContractEntryPointFields[];
+};
+
+export interface Program extends Record<string, any> {
+  builtins: string[];
+  data: string[];
+}
 export type BlockTag = 'pending' | 'latest';
 export type BlockNumber = BlockTag | null | number;
 

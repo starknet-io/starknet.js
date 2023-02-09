@@ -14,7 +14,7 @@ This API is the primary way to interact with an account contract on StarkNet.
 
 To create a new instance of the Account, first an account contract must be deployed. Also there needs to be a Provider instance that will be passed in the constructor and key pair for the account.
 
-`new starknet.Account(Provider, address, starkKeyPair)`
+`new starknet.Account(Provider, address, pk)`
 
 ## Properties
 
@@ -103,6 +103,34 @@ The _contractPayload_ object structure:
 
 - contractPayload.**contract** - The compiled contract to be declared
 - contractPayload.**classHash** - This can be obtained by using starknet-cli. Once the classHash is included in CompiledContract, this can be removed
+
+The _estimateFeeDetails_ object may include any of:
+
+- estimateFeeDetails.**blockIdentifier** - Block Identifier for the transaction
+- estimateFeeDetails.**nonce** - Nonce for the transaction
+
+###### _EstimateFeeResponse_
+
+```typescript
+{
+  overall_fee: BN;
+  gas_consumed?: BN;
+  gas_price?: BN;
+}
+```
+
+---
+
+### estimateFeeBulk()
+
+account.**estimateFeeBulk**(transaction[] [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse[] >_
+
+Estimate Fee for executing a list of transactions on starknet.
+
+The _transaction_ object structure:
+
+- transaction.**type** - the type of transaction : 'DECLARE' | 'DEPLOY' | 'INVOKE_FUNCTION' | 'DEPLOY_ACCOUNT'
+- transaction payload - the payload for the transaction
 
 The _estimateFeeDetails_ object may include any of:
 
@@ -285,17 +313,17 @@ Example:
 
 ---
 
-### declareDeploy()
+### declareAndDeploy()
 
 ✅ NEW
 High level wrapper for declare & deploy. Doesn't require waitForTransaction. Functionality similar to deprecated provider deployContract. Declare and Deploy contract using single function.
 
-account.**declareDeploy**(payload [ , details ]) => _Promise < DeclareDeployUDCResponse >_
+account.**declareAndDeploy**(payload [ , details ]) => _Promise < DeclareDeployUDCResponse >_
 
 @param object **_payload_** DeclareDeployContractPayload
 
 - **contract**: compiled contract code
-- **classHash**: computed class hash of compiled contract
+- optional computed class hash of compiled contract
 - optional constructorCalldata: constructor calldata
 - optional salt: address salt - default random
 - optional unique: bool if true ensure unique salt - default true
@@ -328,7 +356,6 @@ Example:
 ```typescript
   const declareDeploy = await account.declareDeploy({
     contract: compiledErc20,
-    classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
     constructorCalldata: [
       encodeShortString('Token'),
       encodeShortString('ERC20'),
@@ -461,3 +488,20 @@ Gets account address with the starknet id stark name.
 The _StarknetIdContract_ argument can be undefined, if it is, the function will automatically use official starknet id contracts of your network (It currently supports TESTNET 1 only).
 
 Returns directly the address in a string (Example: `0xff...34`).
+
+---
+
+### simulateTransaction()
+
+account.**simulateTransaction**(calls [ , estimateFeeDetails ]) => _Promise < TransactionSimulationResponse >_
+
+Simulates the transaction and returns the transaction trace and estimated fee.
+
+###### _TransactionSimulationResponse_
+
+```typescript
+{
+  trace: TransactionTraceResponse;
+  fee_estimation: EstimateFee;
+}
+```

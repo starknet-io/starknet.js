@@ -11,17 +11,20 @@ import {
   DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetContractAddressesResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   GetTransactionStatusResponse,
-  GetTransactionTraceResponse,
   Invocation,
+  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Sequencer,
+  TransactionSimulationResponse,
   TransactionStatus,
+  TransactionTraceResponse,
   TransactionType,
   waitForTransactionOptions,
 } from '../types';
@@ -34,19 +37,21 @@ import {
   getDecimalString,
   getHexString,
   getHexStringArray,
-  toBN,
+  toBigInt,
   toHex,
 } from '../utils/number';
 import { parseContract, wait } from '../utils/provider';
 import { SequencerAPIResponseParser } from '../utils/responseParser/sequencer';
-import { randomAddress } from '../utils/stark';
+import { formatSignature, randomAddress, signatureToDecimalArray } from '../utils/stark';
 import { buildUrl } from '../utils/url';
-import { GatewayError, HttpError } from './errors';
+import { GatewayError, HttpError, LibraryError } from './errors';
 import { ProviderInterface } from './interface';
 import { Block, BlockIdentifier } from './utils';
 
+export type SequencerHttpMethod = 'POST' | 'GET';
+
 export type SequencerProviderOptions = {
-  headers?: object;
+  headers?: Record<string, string>;
   blockIdentifier?: BlockIdentifier;
 } & (
   | {
@@ -82,13 +87,13 @@ export class SequencerProvider implements ProviderInterface {
 
   public gatewayUrl: string;
 
-  public chainId: StarknetChainId;
-
-  public headers: object | undefined;
-
-  private responseParser = new SequencerAPIResponseParser();
+  public headers?: Record<string, string>;
 
   private blockIdentifier: BlockIdentifier;
+
+  private chainId: StarknetChainId;
+
+  private responseParser = new SequencerAPIResponseParser();
 
   constructor(optionsOrProvider: SequencerProviderOptions = defaultOptions) {
     if ('network' in optionsOrProvider) {
@@ -150,6 +155,8 @@ export class SequencerProvider implements ProviderInterface {
       'call_contract',
       'estimate_fee',
       'estimate_message_fee',
+      'estimate_fee_bulk',
+      'simulate_transaction',
     ];
 
     return postMethodEndpoints.includes(endpoint) ? 'POST' : 'GET';
@@ -172,7 +179,7 @@ export class SequencerProvider implements ProviderInterface {
     return `?${queryString}`;
   }
 
-  private getHeaders(method: 'POST' | 'GET'): object | undefined {
+  private getHeaders(method: SequencerHttpMethod): Record<string, string> | undefined {
     if (method === 'POST') {
       return {
         'Content-Type': 'application/json',
@@ -197,48 +204,52 @@ export class SequencerProvider implements ProviderInterface {
     const baseUrl = this.getFetchUrl(endpoint);
     const method = this.getFetchMethod(endpoint);
     const queryString = this.getQueryString(query);
-    const headers = this.getHeaders(method);
     const url = urljoin(baseUrl, endpoint, queryString);
 
+    return this.fetch(url, {
+      method,
+      body: request,
+    });
+  }
+
+  public async fetch(
+    endpoint: string,
+    options?: {
+      method?: SequencerHttpMethod;
+      body?: any;
+      parseAlwaysAsBigInt?: boolean;
+    }
+  ): Promise<any> {
+    const url = buildUrl(this.baseUrl, '', endpoint);
+    const method = options?.method ?? 'GET';
+    const headers = this.getHeaders(method);
+
     try {
-      const res = await fetch(url, {
+      const response = await fetch(url, {
         method,
-        body: stringify(request),
-        headers: headers as Record<string, string>,
+        body: stringify(options?.body),
+        headers,
       });
-      const textResponse = await res.text();
-      if (!res.ok) {
-        // This will allow user to handle contract errors
+      const textResponse = await response.text();
+
+      if (!response.ok) {
+        // This will allow the user to handle contract errors
         let responseBody: any;
         try {
           responseBody = parse(textResponse);
         } catch {
-          // if error parsing fails, return an http error
-          throw new HttpError(res.statusText, res.status);
+          throw new HttpError(response.statusText, response.status);
         }
-
-        const errorCode = responseBody.code || ((responseBody as any)?.status_code as string); // starknet-devnet uses status_code instead of code; They need to fix that
-        throw new GatewayError(responseBody.message, errorCode); // Caught locally, and re-thrown for the user
+        throw new GatewayError(responseBody.message, responseBody.code);
       }
 
-      if (endpoint === 'estimate_fee') {
-        return parseAlwaysAsBig(textResponse, (_, v) => {
-          if (v && typeof v === 'bigint') {
-            return toBN(v.toString());
-          }
-          return v;
-        });
-      }
-      return parse(textResponse) as Sequencer.Endpoints[T]['RESPONSE'];
-    } catch (err) {
-      // rethrow custom errors
-      if (err instanceof GatewayError || err instanceof HttpError) {
-        throw err;
-      }
-      if (err instanceof Error) {
-        throw Error(`Could not ${method} from endpoint \`${url}\`: ${err.message}`);
-      }
-      throw err;
+      const parseChoice = options?.parseAlwaysAsBigInt ? parseAlwaysAsBig : parse;
+      return parseChoice(textResponse);
+    } catch (error) {
+      if (error instanceof Error && !(error instanceof LibraryError))
+        throw Error(`Could not ${method} from endpoint \`${url}\`: ${error.message}`);
+
+      throw error;
     }
   }
 
@@ -282,7 +293,7 @@ export class SequencerProvider implements ProviderInterface {
     key: BigNumberish,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<BigNumberish> {
-    const parsedKey = toBN(key).toString(10);
+    const parsedKey = toBigInt(key).toString(10);
     return this.fetchEndpoint('get_storage_at', {
       blockIdentifier,
       contractAddress,
@@ -291,14 +302,16 @@ export class SequencerProvider implements ProviderInterface {
   }
 
   public async getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {
-    const txHashHex = toHex(toBN(txHash));
-    return this.fetchEndpoint('get_transaction', { transactionHash: txHashHex }).then((value) =>
-      this.responseParser.parseGetTransactionResponse(value)
-    );
+    const txHashHex = toHex(txHash);
+    return this.fetchEndpoint('get_transaction', { transactionHash: txHashHex }).then((result) => {
+      // throw for no matching transaction to unify behavior with RPC and avoid parsing errors
+      if (Object.values(result).length === 1) throw new LibraryError(result.status);
+      return this.responseParser.parseGetTransactionResponse(result);
+    });
   }
 
   public async getTransactionReceipt(txHash: BigNumberish): Promise<GetTransactionReceiptResponse> {
-    const txHashHex = toHex(toBN(txHash));
+    const txHashHex = toHex(txHash);
     return this.fetchEndpoint('get_transaction_receipt', { transactionHash: txHashHex }).then(
       this.responseParser.parseGetTransactionReceiptResponse
     );
@@ -332,10 +345,10 @@ export class SequencerProvider implements ProviderInterface {
       type: TransactionType.INVOKE,
       contract_address: functionInvocation.contractAddress,
       calldata: bigNumberishArrayToDecimalStringArray(functionInvocation.calldata ?? []),
-      signature: bigNumberishArrayToDecimalStringArray(functionInvocation.signature ?? []),
-      nonce: toHex(toBN(details.nonce)),
-      max_fee: toHex(toBN(details.maxFee || 0)),
-      version: toHex(toBN(details.version || 1)),
+      signature: signatureToDecimalArray(functionInvocation.signature),
+      nonce: toHex(details.nonce),
+      max_fee: toHex(details.maxFee || 0),
+      version: toHex(details.version || 1),
     }).then(this.responseParser.parseInvokeFunctionResponse);
   }
 
@@ -347,11 +360,11 @@ export class SequencerProvider implements ProviderInterface {
       type: TransactionType.DEPLOY_ACCOUNT,
       contract_address_salt: addressSalt ?? randomAddress(),
       constructor_calldata: bigNumberishArrayToDecimalStringArray(constructorCalldata ?? []),
-      class_hash: toHex(toBN(classHash)),
-      max_fee: toHex(toBN(details.maxFee || 0)),
-      version: toHex(toBN(details.version || 0)),
-      nonce: toHex(toBN(details.nonce)),
-      signature: bigNumberishArrayToDecimalStringArray(signature || []),
+      class_hash: toHex(classHash),
+      max_fee: toHex(details.maxFee || 0),
+      version: toHex(details.version || 0),
+      nonce: toHex(details.nonce),
+      signature: signatureToDecimalArray(signature),
     }).then(this.responseParser.parseDeployContractResponse);
   }
 
@@ -362,11 +375,11 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('add_transaction', undefined, {
       type: TransactionType.DECLARE,
       contract_class: contractDefinition,
-      nonce: toHex(toBN(details.nonce)),
-      signature: bigNumberishArrayToDecimalStringArray(signature || []),
+      nonce: toHex(details.nonce),
+      signature: signatureToDecimalArray(signature),
       sender_address: senderAddress,
-      max_fee: toHex(toBN(details.maxFee || 0)),
-      version: toHex(toBN(details.version || 1)),
+      max_fee: toHex(details.maxFee || 0),
+      version: toHex(details.version || 1),
     }).then(this.responseParser.parseDeclareContractResponse);
   }
 
@@ -390,9 +403,9 @@ export class SequencerProvider implements ProviderInterface {
         type: TransactionType.INVOKE,
         contract_address: invocation.contractAddress,
         calldata: invocation.calldata ?? [],
-        signature: bigNumberishArrayToDecimalStringArray(invocation.signature || []),
-        version: toHex(toBN(invocationDetails?.version || 1)),
-        nonce: toHex(toBN(invocationDetails.nonce)),
+        signature: signatureToDecimalArray(invocation.signature),
+        version: toHex(invocationDetails?.version || 1),
+        nonce: toHex(invocationDetails.nonce),
       }
     ).then(this.responseParser.parseFeeEstimateResponse);
   }
@@ -409,9 +422,9 @@ export class SequencerProvider implements ProviderInterface {
         type: TransactionType.DECLARE,
         sender_address: senderAddress,
         contract_class: contractDefinition,
-        signature: bigNumberishArrayToDecimalStringArray(signature || []),
-        version: toHex(toBN(details?.version || 1)),
-        nonce: toHex(toBN(details.nonce)),
+        signature: signatureToDecimalArray(signature),
+        version: toHex(details?.version || 1),
+        nonce: toHex(details.nonce),
       }
     ).then(this.responseParser.parseFeeEstimateResponse);
   }
@@ -426,14 +439,55 @@ export class SequencerProvider implements ProviderInterface {
       { blockIdentifier },
       {
         type: TransactionType.DEPLOY_ACCOUNT,
-        class_hash: toHex(toBN(classHash)),
+        class_hash: toHex(classHash),
         constructor_calldata: bigNumberishArrayToDecimalStringArray(constructorCalldata || []),
-        contract_address_salt: toHex(toBN(addressSalt || 0)),
-        signature: bigNumberishArrayToDecimalStringArray(signature || []),
-        version: toHex(toBN(details?.version || 0)),
-        nonce: toHex(toBN(details.nonce)),
+        contract_address_salt: toHex(addressSalt || 0),
+        signature: signatureToDecimalArray(signature),
+        version: toHex(details?.version || 0),
+        nonce: toHex(details.nonce),
       }
     ).then(this.responseParser.parseFeeEstimateResponse);
+  }
+
+  public async getEstimateFeeBulk(
+    invocations: InvocationBulk,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<EstimateFeeResponseBulk> {
+    const params: Sequencer.EstimateFeeRequestBulk = invocations.map((invocation) => {
+      let res;
+      if (invocation.type === 'INVOKE_FUNCTION') {
+        res = {
+          type: invocation.type,
+          contract_address: invocation.contractAddress,
+          calldata: invocation.calldata ?? [],
+        };
+      } else if (invocation.type === 'DECLARE') {
+        res = {
+          type: invocation.type,
+          sender_address: invocation.senderAddress,
+          contract_class: invocation.contractDefinition,
+        };
+      } else {
+        res = {
+          type: invocation.type,
+          class_hash: toHex(toBigInt(invocation.classHash)),
+          constructor_calldata: bigNumberishArrayToDecimalStringArray(
+            invocation.constructorCalldata || []
+          ),
+          contract_address_salt: toHex(toBigInt(invocation.addressSalt || 0)),
+        };
+      }
+      return {
+        ...res,
+        signature: bigNumberishArrayToDecimalStringArray(formatSignature(invocation.signature)),
+        version: toHex(toBigInt(invocation?.version || 1)),
+        nonce: toHex(toBigInt(invocation.nonce)),
+      };
+    });
+
+    return this.fetchEndpoint('estimate_fee_bulk', { blockIdentifier }, params).then(
+      this.responseParser.parseFeeEstimateBulkResponse
+    );
   }
 
   public async getCode(
@@ -488,7 +542,7 @@ export class SequencerProvider implements ProviderInterface {
    * @returns the transaction status object { block_number, tx_status: NOT_RECEIVED | RECEIVED | PENDING | REJECTED | ACCEPTED_ONCHAIN }
    */
   public async getTransactionStatus(txHash: BigNumberish): Promise<GetTransactionStatusResponse> {
-    const txHashHex = toHex(toBN(txHash));
+    const txHashHex = toHex(txHash);
     return this.fetchEndpoint('get_transaction_status', { transactionHash: txHashHex });
   }
 
@@ -508,8 +562,8 @@ export class SequencerProvider implements ProviderInterface {
    * @param txHash
    * @returns the transaction trace
    */
-  public async getTransactionTrace(txHash: BigNumberish): Promise<GetTransactionTraceResponse> {
-    const txHashHex = toHex(toBN(txHash));
+  public async getTransactionTrace(txHash: BigNumberish): Promise<TransactionTraceResponse> {
+    const txHashHex = toHex(txHash);
     return this.fetchEndpoint('get_transaction_trace', { transactionHash: txHashHex });
   }
 
@@ -525,5 +579,24 @@ export class SequencerProvider implements ProviderInterface {
     };
 
     return this.fetchEndpoint('estimate_message_fee', { blockIdentifier }, validCallL1Handler);
+  }
+
+  public async getSimulateTransaction(
+    invocation: Invocation,
+    invocationDetails: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<TransactionSimulationResponse> {
+    return this.fetchEndpoint(
+      'simulate_transaction',
+      { blockIdentifier },
+      {
+        type: 'INVOKE_FUNCTION',
+        contract_address: invocation.contractAddress,
+        calldata: invocation.calldata ?? [],
+        signature: signatureToDecimalArray(invocation.signature),
+        version: toHex(invocationDetails?.version || 1),
+        nonce: toHex(invocationDetails.nonce),
+      }
+    ).then(this.responseParser.parseFeeSimulateTransactionResponse);
   }
 }

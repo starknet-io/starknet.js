@@ -2,9 +2,18 @@
  * Common interface response
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
-import BN from 'bn.js';
 
-import { RawCalldata, Signature, Status } from './lib';
+import { TransactionTraceResponse } from './api/sequencer';
+import {
+  AllowArray,
+  Call,
+  DeclareContractPayload,
+  DeployAccountContractPayload,
+  RawCalldata,
+  Signature,
+  Status,
+  UniversalDeployerContractPayload,
+} from './lib';
 
 export interface GetBlockResponse {
   timestamp: number;
@@ -88,9 +97,9 @@ export interface InvokeTransactionReceiptResponse extends CommonTransactionRecei
 export type DeclareTransactionReceiptResponse = CommonTransactionReceiptResponse;
 
 export interface EstimateFeeResponse {
-  overall_fee: BN;
-  gas_consumed?: BN;
-  gas_price?: BN;
+  overall_fee: bigint;
+  gas_consumed?: bigint;
+  gas_price?: bigint;
 }
 
 export interface InvokeFunctionResponse {
@@ -105,3 +114,28 @@ export interface DeclareContractResponse {
 export type CallContractResponse = {
   result: Array<string>;
 };
+
+export type EstimateFeeAction =
+  | {
+      type: 'INVOKE';
+      payload: AllowArray<Call>;
+    }
+  | {
+      type: 'DECLARE';
+      payload: DeclareContractPayload;
+    }
+  | {
+      type: 'DEPLOY_ACCOUNT';
+      payload: DeployAccountContractPayload;
+    }
+  | {
+      type: 'DEPLOY';
+      payload: UniversalDeployerContractPayload;
+    };
+
+export type EstimateFeeResponseBulk = Array<EstimateFeeResponse>;
+
+export interface TransactionSimulationResponse {
+  trace: TransactionTraceResponse;
+  fee_estimation: EstimateFeeResponse;
+}

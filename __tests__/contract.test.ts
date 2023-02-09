@@ -1,8 +1,6 @@
-import { isBN } from 'bn.js';
-
 import { Contract, ContractFactory, stark } from '../src';
 import { getSelectorFromName } from '../src/utils/hash';
-import { BigNumberish, toBN } from '../src/utils/number';
+import { BigNumberish, isBigInt, toBigInt } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
 import { compileCalldata } from '../src/utils/stark';
 import {
@@ -27,17 +25,15 @@ describe('contract module', () => {
       let multicallContract: Contract;
 
       beforeAll(async () => {
-        const { deploy } = await account.declareDeploy({
+        const { deploy } = await account.declareAndDeploy({
           contract: compiledErc20,
-          classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
           constructorCalldata: [encodeShortString('Token'), encodeShortString('ERC20'), wallet],
         });
 
         erc20Contract = new Contract(compiledErc20.abi, deploy.contract_address!, provider);
 
-        const { deploy: multicallDeploy } = await account.declareDeploy({
+        const { deploy: multicallDeploy } = await account.declareAndDeploy({
           contract: compiledMulticall,
-          classHash: '0x06f94f3229a8d9c1d51cb84f1f5ec306c8552a805e307540727dda53c4936b43',
         });
 
         multicallContract = new Contract(
@@ -61,7 +57,7 @@ describe('contract module', () => {
       test('read initial balance of that account', async () => {
         const result = await erc20Contract.balanceOf(wallet);
         const [res] = result;
-        expect(res.low).toStrictEqual(toBN(1000));
+        expect(res.low).toStrictEqual(toBigInt(1000));
         expect(res).toStrictEqual(result.balance);
       });
 
@@ -81,9 +77,9 @@ describe('contract module', () => {
         ];
         const result = await multicallContract.aggregate(calls);
         const [block_number, res] = result;
-        expect(isBN(block_number));
+        expect(isBigInt(block_number));
         expect(Array.isArray(res));
-        (res as BigNumberish[]).forEach((el) => expect(isBN(el)));
+        (res as BigNumberish[]).forEach((el) => expect(isBigInt(el)));
         expect(block_number).toStrictEqual(result.block_number);
         expect(res).toStrictEqual(result.result);
       });
@@ -93,9 +89,8 @@ describe('contract module', () => {
       let typeTransformedContract: Contract;
 
       beforeAll(async () => {
-        const { deploy } = await account.declareDeploy({
+        const { deploy } = await account.declareAndDeploy({
           contract: compiledTypeTransformation,
-          classHash: '0x022a0e662b13d18a2aaa3ee54ae290de6569621b549022c18169c6e7893809ea',
         });
 
         typeTransformedContract = new Contract(
@@ -152,27 +147,27 @@ describe('contract module', () => {
       describe('Response Type Transformation', () => {
         test('Parsing the felt in response', async () => {
           const { res } = await typeTransformedContract.get_felt();
-          expect(res).toStrictEqual(toBN(4));
+          expect(res).toStrictEqual(toBigInt(4));
         });
 
         test('Parsing the array of felt in response', async () => {
           const result = await typeTransformedContract.get_array_of_felts();
           const [res] = result;
-          expect(res).toStrictEqual([toBN(4), toBN(5)]);
+          expect(res).toStrictEqual([toBigInt(4), toBigInt(5)]);
           expect(res).toStrictEqual(result.res);
         });
 
         test('Parsing the array of structs in response', async () => {
           const result = await typeTransformedContract.get_struct();
           const [res] = result;
-          expect(res).toStrictEqual({ x: toBN(1), y: toBN(2) });
+          expect(res).toStrictEqual({ x: toBigInt(1), y: toBigInt(2) });
           expect(res).toStrictEqual(result.res);
         });
 
         test('Parsing the array of structs in response', async () => {
           const result = await typeTransformedContract.get_array_of_structs();
           const [res] = result;
-          expect(res).toStrictEqual([{ x: toBN(1), y: toBN(2) }]);
+          expect(res).toStrictEqual([{ x: toBigInt(1), y: toBigInt(2) }]);
           expect(res).toStrictEqual(result.res);
         });
 
@@ -180,9 +175,9 @@ describe('contract module', () => {
           const result = await typeTransformedContract.get_nested_structs();
           const [res] = result;
           expect(res).toStrictEqual({
-            p1: { x: toBN(1), y: toBN(2) },
-            p2: { x: toBN(3), y: toBN(4) },
-            extra: toBN(5),
+            p1: { x: toBigInt(1), y: toBigInt(2) },
+            p2: { x: toBigInt(3), y: toBigInt(4) },
+            extra: toBigInt(5),
           });
           expect(res).toStrictEqual(result.res);
         });
@@ -190,17 +185,17 @@ describe('contract module', () => {
         test('Parsing the tuple in response', async () => {
           const result = await typeTransformedContract.get_tuple();
           const [res] = result;
-          expect(res).toStrictEqual([toBN(1), toBN(2), toBN(3)]);
+          expect(res).toStrictEqual([toBigInt(1), toBigInt(2), toBigInt(3)]);
           expect(res).toStrictEqual(result.res);
         });
 
         test('Parsing the multiple types in response', async () => {
           const result = await typeTransformedContract.get_mixed_types();
           const [tuple, number, array, point] = result;
-          expect(tuple).toStrictEqual([toBN(1), toBN(2)]);
-          expect(number).toStrictEqual(toBN(3));
-          expect(array).toStrictEqual([toBN(4)]);
-          expect(point).toStrictEqual({ x: toBN(1), y: toBN(2) });
+          expect(tuple).toStrictEqual([toBigInt(1), toBigInt(2)]);
+          expect(number).toStrictEqual(toBigInt(3));
+          expect(array).toStrictEqual([toBigInt(4)]);
+          expect(point).toStrictEqual({ x: toBigInt(1), y: toBigInt(2) });
           expect(tuple).toStrictEqual(result.tuple);
           expect(number).toStrictEqual(result.number);
           expect(array).toStrictEqual(result.array);
@@ -212,9 +207,8 @@ describe('contract module', () => {
 
   describe('class ContractFactory {}', () => {
     beforeAll(async () => {
-      await account.declareDeploy({
+      await account.declareAndDeploy({
         contract: compiledErc20,
-        classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
         constructorCalldata,
       });
     });

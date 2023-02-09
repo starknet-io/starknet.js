@@ -1,8 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 
-import { Account, ProviderInterface, RpcProvider, SequencerProvider, ec, json } from '../src';
+import { Account, ProviderInterface, RpcProvider, SequencerProvider, json } from '../src';
 import { CompiledContract } from '../src/types';
+import { toHex } from '../src/utils/number';
 
 const readContract = (name: string): CompiledContract =>
   json.parse(
@@ -34,6 +35,9 @@ const PROVIDER_URL = RPC_URL || BASE_URL;
 /* Detect is localhost devnet */
 export const IS_LOCALHOST_DEVNET =
   PROVIDER_URL.includes('localhost') || PROVIDER_URL.includes('127.0.0.1');
+
+export const IS_DEVNET_RPC = IS_LOCALHOST_DEVNET && PROVIDER_URL.includes('rpc');
+export const IS_DEVNET_SEQUENCER = IS_LOCALHOST_DEVNET && !PROVIDER_URL.includes('rpc');
 
 /* Definitions */
 export const IS_RPC = !!RPC_URL;
@@ -72,7 +76,7 @@ export const getTestAccount = (provider: ProviderInterface) => {
     testAccountPrivateKey = DEFAULT_TEST_ACCOUNT_PRIVATE_KEY;
   }
 
-  return new Account(provider, testAccountAddress, ec.getKeyPair(testAccountPrivateKey));
+  return new Account(provider, toHex(testAccountAddress), testAccountPrivateKey);
 };
 
 const describeIf = (condition: boolean) => (condition ? describe : describe.skip);
@@ -80,5 +84,8 @@ export const describeIfSequencer = describeIf(IS_SEQUENCER);
 export const describeIfRpc = describeIf(IS_RPC);
 export const describeIfNotDevnet = describeIf(!IS_LOCALHOST_DEVNET);
 export const describeIfDevnet = describeIf(IS_LOCALHOST_DEVNET);
+export const describeIfDevnetRpc = describeIf(IS_DEVNET_RPC);
+export const describeIfDevnetSequencer = describeIf(IS_DEVNET_SEQUENCER);
 
 export const erc20ClassHash = '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a';
+export const wrongClassHash = '0x000000000000000000000000000000000000000000000000000000000000000';

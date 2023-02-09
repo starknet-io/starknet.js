@@ -1,36 +1,29 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable import/extensions */
-import BN from 'bn.js';
 import { keccak256 } from 'ethereum-cryptography/keccak.js';
 import { hexToBytes } from 'ethereum-cryptography/utils.js';
-import assert from 'minimalistic-assert';
 
-import {
-  CONSTANT_POINTS,
-  FIELD_PRIME,
-  MASK_250,
-  ONE,
-  StarknetChainId,
-  TransactionHashPrefix,
-  ZERO,
-} from '../constants';
-import { RawCalldata } from '../types';
-import { ec } from './ellipticCurve';
+import { API_VERSION, MASK_250, StarknetChainId, TransactionHashPrefix } from '../constants';
+import { CompiledContract, RawCalldata } from '../types/lib';
+import { starkCurve } from './ec';
 import { addHexPrefix, buf2hex, removeHexPrefix, utf8ToArray } from './encode';
+import { parse, stringify } from './json';
 import {
   BigNumberish,
   isHex,
   isStringWholeNumber,
-  toBN,
+  toBigInt,
   toFelt,
   toHex,
   toHexString,
 } from './number';
+import { encodeShortString } from './shortString';
 
-export const transactionVersion = 1;
-export const feeTransactionVersion = toBN(2).pow(toBN(128)).add(toBN(transactionVersion));
+export const transactionVersion = 1n;
+export const feeTransactionVersion = 2n ** 128n + transactionVersion;
 
 export function keccakBn(value: BigNumberish): string {
-  const hexWithoutPrefix = removeHexPrefix(toHex(toBN(value)));
+  const hexWithoutPrefix = removeHexPrefix(toHex(BigInt(value)));
   const evenHex = hexWithoutPrefix.length % 2 === 0 ? hexWithoutPrefix : `0${hexWithoutPrefix}`;
   return addHexPrefix(buf2hex(keccak256(hexToBytes(evenHex))));
 }
@@ -46,8 +39,10 @@ function keccakHex(value: string): string {
  * @param value - string you want to get the starknetKeccak hash from
  * @returns starknet keccak hash as BigNumber
  */
-export function starknetKeccak(value: string): BN {
-  return toBN(keccakHex(value)).and(MASK_250);
+export function starknetKeccak(value: string): bigint {
+  const hash = BigInt(keccakHex(value));
+  // eslint-disable-next-line no-bitwise
+  return hash & MASK_250;
 }
 
 /**
@@ -77,31 +72,10 @@ export function getSelector(value: string) {
   return getSelectorFromName(value);
 }
 
-const constantPoints = CONSTANT_POINTS.map((coords: string[]) =>
-  ec.curve.point(coords[0], coords[1])
-);
-
-export function pedersen(input: [BigNumberish, BigNumberish]) {
-  let point = constantPoints[0];
-  for (let i = 0; i < input.length; i += 1) {
-    let x = toBN(input[i]);
-    assert(x.gte(ZERO) && x.lt(toBN(addHexPrefix(FIELD_PRIME))), `Invalid input: ${input[i]}`);
-    if (!x.isZero()) {
-      for (let j = 0; j < 252; j += 1) {
-        const pt = constantPoints[2 + i * 252 + j];
-        assert(!point.getX().eq(pt.getX()));
-        if (x.and(ONE).toNumber() !== 0) {
-          point = point.add(pt);
-        }
-        x = x.shrn(1);
-      }
-    }
-  }
-  return addHexPrefix(point.getX().toString(16));
-}
-
-export function computeHashOnElements(data: BigNumberish[]) {
-  return [...data, data.length].reduce((x, y) => pedersen([x, y]), 0).toString();
+export function computeHashOnElements(data: BigNumberish[]): string {
+  return [...data, data.length]
+    .reduce((x: BigNumberish, y: BigNumberish) => starkCurve.pedersen(toBigInt(x), toBigInt(y)), 0)
+    .toString();
 }
 
 // following implementation is based on this python implementation:
@@ -143,14 +117,13 @@ export function calculateDeployTransactionHash(
     contractAddress,
     getSelectorFromName('constructor'),
     constructorCalldata,
-    ZERO,
+    0,
     chainId
   );
 }
 
 export function calculateDeclareTransactionHash(
-  // contractClass: ContractClass, // Should be used once class hash is present in ContractClass
-  classHash: BigNumberish,
+  classHash: string,
   senderAddress: BigNumberish,
   version: BigNumberish,
   maxFee: BigNumberish,
@@ -223,13 +196,93 @@ export function calculateContractAddressFromHash(
 
   const CONTRACT_ADDRESS_PREFIX = toFelt('0x535441524b4e45545f434f4e54524143545f41444452455353'); // Equivalent to 'STARKNET_CONTRACT_ADDRESS'
 
-  const dataToHash = [
+  return computeHashOnElements([
     CONTRACT_ADDRESS_PREFIX,
     deployerAddress,
     salt,
     classHash,
     constructorCalldataHash,
-  ];
+  ]);
+}
 
-  return computeHashOnElements(dataToHash);
+function nullSkipReplacer(key: string, value: any) {
+  if (key === 'attributes' || key === 'accessible_scopes') {
+    return Array.isArray(value) && value.length === 0 ? undefined : value;
+  }
+
+  if (key === 'debug_info') {
+    return null;
+  }
+
+  return value === null ? undefined : value;
+}
+
+export default function computeHintedClassHash(compiledContract: CompiledContract) {
+  const { abi, program } = compiledContract;
+
+  const contractClass = { abi, program };
+
+  const serialisedJson = stringify(contractClass, nullSkipReplacer)
+    .split('')
+    .reduce<[boolean, string]>(
+      ([insideQuotes, newString], char) => {
+        if (char === '"' && newString[newString.length - 1] !== '\\') {
+          // ignore escaped quotes
+          insideQuotes = !insideQuotes;
+        }
+        if (insideQuotes) {
+          newString += char;
+          return [insideQuotes, newString];
+        }
+        if (char === ':' && !insideQuotes) {
+          newString += ': ';
+        } else if (char === ',' && !insideQuotes) {
+          newString += ', ';
+        } else {
+          newString += char;
+        }
+        return [insideQuotes, newString];
+      },
+      [false, '']
+    )[1];
+
+  return addHexPrefix(starkCurve.keccak(utf8ToArray(serialisedJson)).toString(16));
+}
+
+// Computes the class hash of a given contract class
+export function computeContractClassHash(contract: CompiledContract | string) {
+  const compiledContract =
+    typeof contract === 'string' ? (parse(contract) as CompiledContract) : contract;
+
+  const apiVersion = toHex(API_VERSION);
+
+  const externalEntryPointsHash = computeHashOnElements(
+    compiledContract.entry_points_by_type.EXTERNAL.flatMap((e) => [e.selector, e.offset])
+  );
+
+  const l1HandlerEntryPointsHash = computeHashOnElements(
+    compiledContract.entry_points_by_type.L1_HANDLER.flatMap((e) => [e.selector, e.offset])
+  );
+
+  const constructorEntryPointHash = computeHashOnElements(
+    compiledContract.entry_points_by_type.CONSTRUCTOR.flatMap((e) => [e.selector, e.offset])
+  );
+
+  const builtinsHash = computeHashOnElements(
+    compiledContract.program.builtins.map((s) => encodeShortString(s))
+  );
+
+  const hintedClassHash = computeHintedClassHash(compiledContract);
+
+  const dataHash = computeHashOnElements(compiledContract.program.data);
+
+  return computeHashOnElements([
+    apiVersion,
+    externalEntryPointsHash,
+    l1HandlerEntryPointsHash,
+    constructorEntryPointHash,
+    builtinsHash,
+    hintedClassHash,
+    dataHash,
+  ]);
 }

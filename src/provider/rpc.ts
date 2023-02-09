@@ -7,27 +7,27 @@ import {
   DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetCodeResponse,
   GetTransactionResponse,
   Invocation,
+  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   RPC,
+  TransactionSimulationResponse,
   TransactionStatus,
   waitForTransactionOptions,
 } from '../types';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
-import {
-  BigNumberish,
-  bigNumberishArrayToHexadecimalStringArray,
-  toBN,
-  toHex,
-} from '../utils/number';
+import { BigNumberish, bigNumberishArrayToHexadecimalStringArray, toHex } from '../utils/number';
 import { parseCalldata, wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
+import { signatureToHexArray } from '../utils/stark';
+import { LibraryError } from './errors';
 import { ProviderInterface } from './interface';
 import { Block, BlockIdentifier } from './utils';
 
@@ -49,9 +49,9 @@ const defaultOptions = {
 export class RpcProvider implements ProviderInterface {
   public nodeUrl: string;
 
-  public chainId!: StarknetChainId;
-
   public headers: object;
+
+  private chainId!: StarknetChainId;
 
   private responseParser = new RPCResponseParser();
 
@@ -66,9 +66,7 @@ export class RpcProvider implements ProviderInterface {
     this.headers = { ...defaultOptions.headers, ...headers };
     this.blockIdentifier = blockIdentifier || defaultOptions.blockIdentifier;
 
-    this.getChainId().then((chainId) => {
-      this.chainId = chainId;
-    });
+    this.getChainId();
   }
 
   public fetch(method: any, params: any): Promise<any> {
@@ -82,7 +80,7 @@ export class RpcProvider implements ProviderInterface {
   protected errorHandler(error: any) {
     if (error) {
       const { code, message } = error;
-      throw new Error(`${code}: ${message}`);
+      throw new LibraryError(`${code}: ${message}`);
     }
   }
 
@@ -102,11 +100,11 @@ export class RpcProvider implements ProviderInterface {
   }
 
   // Methods from Interface
-  public async getChainId(): Promise<any> {
-    return this.fetchEndpoint('starknet_chainId');
+  public async getChainId(): Promise<StarknetChainId> {
+    this.chainId ??= (await this.fetchEndpoint('starknet_chainId')) as StarknetChainId;
+    return this.chainId;
   }
 
-  // Methods from Interface
   public async getBlock(
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<GetBlockResponse> {
@@ -175,7 +173,7 @@ export class RpcProvider implements ProviderInterface {
     key: BigNumberish,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<BigNumberish> {
-    const parsedKey = toHex(toBN(key));
+    const parsedKey = toHex(key);
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getStorageAt', {
       contract_address: contractAddress,
@@ -254,10 +252,10 @@ export class RpcProvider implements ProviderInterface {
         type: RPC.TransactionType.INVOKE,
         sender_address: invocation.contractAddress,
         calldata: parseCalldata(invocation.calldata),
-        signature: bigNumberishArrayToHexadecimalStringArray(invocation.signature || []),
-        version: toHex(toBN(invocationDetails?.version || 0)),
-        nonce: toHex(toBN(invocationDetails.nonce)),
-        max_fee: toHex(toBN(invocationDetails?.maxFee || 0)),
+        signature: signatureToHexArray(invocation.signature),
+        version: toHex(invocationDetails?.version || 0),
+        nonce: toHex(invocationDetails.nonce),
+        max_fee: toHex(invocationDetails?.maxFee || 0),
       },
       block_id,
     }).then(this.responseParser.parseFeeEstimateResponse);
@@ -278,10 +276,10 @@ export class RpcProvider implements ProviderInterface {
           abi: contractDefinition.abi, // rpc 2.0
         },
         sender_address: senderAddress,
-        signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
-        version: toHex(toBN(details?.version || 0)),
-        nonce: toHex(toBN(details.nonce)),
-        max_fee: toHex(toBN(details?.maxFee || 0)),
+        signature: signatureToHexArray(signature),
+        version: toHex(details?.version || 0),
+        nonce: toHex(details.nonce),
+        max_fee: toHex(details?.maxFee || 0),
       },
       block_id,
     }).then(this.responseParser.parseFeeEstimateResponse);
@@ -297,15 +295,22 @@ export class RpcProvider implements ProviderInterface {
       request: {
         type: RPC.TransactionType.DEPLOY_ACCOUNT,
         constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
-        class_hash: toHex(toBN(classHash)),
-        contract_address_salt: toHex(toBN(addressSalt || 0)),
-        signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
-        version: toHex(toBN(details?.version || 0)),
-        nonce: toHex(toBN(details.nonce)),
-        max_fee: toHex(toBN(details?.maxFee || 0)),
+        class_hash: toHex(classHash),
+        contract_address_salt: toHex(addressSalt || 0),
+        signature: signatureToHexArray(signature),
+        version: toHex(details?.version || 0),
+        nonce: toHex(details.nonce),
+        max_fee: toHex(details?.maxFee || 0),
       },
       block_id,
     }).then(this.responseParser.parseFeeEstimateResponse);
+  }
+
+  public async getEstimateFeeBulk(
+    _invocations: InvocationBulk,
+    _blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<EstimateFeeResponseBulk> {
+    throw new Error('RPC does not implement getInvokeEstimateFeeBulk function');
   }
 
   // TODO: Revisit after Pathfinder release with JSON-RPC v0.2.1 RPC Spec
@@ -321,11 +326,11 @@ export class RpcProvider implements ProviderInterface {
           abi: contractDefinition.abi, // rpc 2.0
         },
         type: RPC.TransactionType.DECLARE,
-        version: toHex(toBN(details.version || 0)),
-        max_fee: toHex(toBN(details.maxFee || 0)),
-        signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
+        version: toHex(details.version || 0),
+        max_fee: toHex(details.maxFee || 0),
+        signature: signatureToHexArray(signature),
         sender_address: senderAddress,
-        nonce: toHex(toBN(details.nonce)),
+        nonce: toHex(details.nonce),
       },
     });
   }
@@ -337,13 +342,13 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_addDeployAccountTransaction', {
       deploy_account_transaction: {
         constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
-        class_hash: toHex(toBN(classHash)),
-        contract_address_salt: toHex(toBN(addressSalt || 0)),
+        class_hash: toHex(classHash),
+        contract_address_salt: toHex(addressSalt || 0),
         type: RPC.TransactionType.DEPLOY_ACCOUNT,
-        max_fee: toHex(toBN(details.maxFee || 0)),
-        version: toHex(toBN(details.version || 0)),
-        signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
-        nonce: toHex(toBN(details.nonce)),
+        max_fee: toHex(details.maxFee || 0),
+        version: toHex(details.version || 0),
+        signature: signatureToHexArray(signature),
+        nonce: toHex(details.nonce),
       },
     });
   }
@@ -357,10 +362,10 @@ export class RpcProvider implements ProviderInterface {
         sender_address: functionInvocation.contractAddress,
         calldata: parseCalldata(functionInvocation.calldata),
         type: RPC.TransactionType.INVOKE,
-        max_fee: toHex(toBN(details.maxFee || 0)),
-        version: toHex(toBN(details.version || 0)),
-        signature: bigNumberishArrayToHexadecimalStringArray(functionInvocation.signature || []),
-        nonce: toHex(toBN(details.nonce)),
+        max_fee: toHex(details.maxFee || 0),
+        version: toHex(details.version || 1),
+        signature: signatureToHexArray(functionInvocation.signature),
+        nonce: toHex(details.nonce),
       },
     });
   }
@@ -486,5 +491,13 @@ export class RpcProvider implements ProviderInterface {
    */
   public async getEvents(eventFilter: RPC.EventFilter): Promise<RPC.GetEventsResponse> {
     return this.fetchEndpoint('starknet_getEvents', { filter: eventFilter });
+  }
+
+  public async getSimulateTransaction(
+    _invocation: Invocation,
+    _invocationDetails: InvocationsDetailsWithNonce,
+    _blockIdentifier?: BlockIdentifier
+  ): Promise<TransactionSimulationResponse> {
+    throw new Error('RPC does not implement simulateTransaction function');
   }
 }

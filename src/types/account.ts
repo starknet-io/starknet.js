@@ -1,5 +1,3 @@
-import BN from 'bn.js';
-
 import { BlockIdentifier } from '../provider/utils';
 import { BigNumberish } from '../utils/number';
 import {
@@ -10,11 +8,17 @@ import {
   TransactionType,
   UniversalDeployerContractPayload,
 } from './lib';
-import { DeclareTransactionReceiptResponse, EstimateFeeResponse } from './provider';
+import {
+  DeclareTransactionReceiptResponse,
+  EstimateFeeResponse,
+  TransactionSimulationResponse,
+} from './provider';
 
 export interface EstimateFee extends EstimateFeeResponse {
-  suggestedMaxFee: BN;
+  suggestedMaxFee: bigint;
 }
+
+export type EstimateFeeBulk = Array<EstimateFee>;
 
 export interface EstimateFeeDetails {
   nonce?: BigNumberish;
@@ -67,3 +71,6 @@ export type EstimateFeeAction =
       type: TransactionType.DEPLOY;
       payload: UniversalDeployerContractPayload;
     };
+export interface TransactionSimulation extends TransactionSimulationResponse {
+  fee_estimation: EstimateFee;
+}

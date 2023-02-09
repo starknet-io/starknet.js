@@ -8,13 +8,16 @@ import {
   DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetCodeResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
+  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  TransactionSimulationResponse,
   waitForTransactionOptions,
 } from '../types';
 import { BigNumberish } from '../utils/number';
@@ -51,10 +54,6 @@ export class Provider implements ProviderInterface {
       // providerOrOptions is none, create SequencerProvider as default
       this.provider = new SequencerProvider();
     }
-  }
-
-  public get chainId(): StarknetChainId {
-    return this.provider.chainId;
   }
 
   public async getChainId(): Promise<StarknetChainId> {
@@ -101,6 +100,13 @@ export class Provider implements ProviderInterface {
       invocationDetails,
       blockIdentifier
     );
+  }
+
+  public async getEstimateFeeBulk(
+    invocations: InvocationBulk,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<EstimateFeeResponseBulk> {
+    return this.provider.getEstimateFeeBulk(invocations, blockIdentifier);
   }
 
   public async getNonceForAddress(
@@ -182,5 +188,13 @@ export class Provider implements ProviderInterface {
     options: waitForTransactionOptions
   ): Promise<GetTransactionReceiptResponse> {
     return this.provider.waitForTransaction(txHash, options);
+  }
+
+  public async getSimulateTransaction(
+    invocation: Invocation,
+    invocationDetails: InvocationsDetailsWithNonce,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<TransactionSimulationResponse> {
+    return this.provider.getSimulateTransaction(invocation, invocationDetails, blockIdentifier);
   }
 }
