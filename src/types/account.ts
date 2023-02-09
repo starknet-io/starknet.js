@@ -1,14 +1,6 @@
 import { BlockIdentifier } from '../provider/utils';
 import { BigNumberish } from '../utils/number';
 import {
-  AllowArray,
-  Call,
-  DeclareContractPayload,
-  DeployAccountContractPayload,
-  TransactionType,
-  UniversalDeployerContractPayload,
-} from './lib';
-import {
   DeclareTransactionReceiptResponse,
   EstimateFeeResponse,
   TransactionSimulationResponse,
@@ -54,23 +46,6 @@ export type DeclareDeployUDCResponse = {
   deploy: DeployContractUDCResponse;
 };
 
-export type EstimateFeeAction =
-  | {
-      type: TransactionType.INVOKE;
-      payload: AllowArray<Call>;
-    }
-  | {
-      type: TransactionType.DECLARE;
-      payload: DeclareContractPayload;
-    }
-  | {
-      type: TransactionType.DEPLOY_ACCOUNT;
-      payload: DeployAccountContractPayload;
-    }
-  | {
-      type: TransactionType.DEPLOY;
-      payload: UniversalDeployerContractPayload;
-    };
 export interface TransactionSimulation extends TransactionSimulationResponse {
   fee_estimation: EstimateFee;
 }

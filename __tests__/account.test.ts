@@ -1,5 +1,5 @@
 import typedDataExample from '../__mocks__/typedDataExample.json';
-import { Account, Contract, Provider, ec, number, stark } from '../src';
+import { Account, Contract, Provider, TransactionStatus, ec, number, stark } from '../src';
 import { parseUDCEvent } from '../src/utils/events';
 import { calculateContractAddressFromHash, feeTransactionVersion } from '../src/utils/hash';
 import { cleanHex, hexToDecimalString, toBigInt, toHex } from '../src/utils/number';
@@ -123,7 +123,9 @@ describe('deploy and test Wallet', () => {
       calldata: [erc20.address, '10', '0'],
     });
 
-    await provider.waitForTransaction(transaction_hash, { successStates: ['ACCEPTED_ON_L2'] });
+    await provider.waitForTransaction(transaction_hash, {
+      successStates: [TransactionStatus.ACCEPTED_ON_L2],
+    });
   });
 
   test('read balance of wallet after transfer', async () => {
@@ -162,7 +164,9 @@ describe('deploy and test Wallet', () => {
       },
     ]);
 
-    await provider.waitForTransaction(transaction_hash, { successStates: ['ACCEPTED_ON_L2'] });
+    await provider.waitForTransaction(transaction_hash, {
+      successStates: [TransactionStatus.ACCEPTED_ON_L2],
+    });
 
     const response = await dapp.get_number(account.address);
     expect(toBigInt(response.number as string).toString()).toStrictEqual('57');

@@ -194,5 +194,5 @@ export type ParsedStruct = {
 
 export type waitForTransactionOptions = {
   retryInterval?: number;
-  successStates?: Array<Status>;
+  successStates?: Array<TransactionStatus>;
 };

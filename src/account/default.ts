@@ -442,7 +442,7 @@ export class Account extends Provider implements AccountInterface {
     const { contract, constructorCalldata, salt, unique } = payload;
     const { transaction_hash, class_hash } = await this.declare({ contract }, details);
     const declare = await this.waitForTransaction(transaction_hash, {
-      successStates: TransactionStatus.ACCEPTED_ON_L2,
+      successStates: [TransactionStatus.ACCEPTED_ON_L2],
     });
     const deploy = await this.deployContract(
       { classHash: class_hash, salt, unique, constructorCalldata },
