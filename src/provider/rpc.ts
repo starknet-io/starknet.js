@@ -396,21 +396,18 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_traceBlockTransactions', { block_hash: blockHash });
   }
 
-  public async waitForTransaction(
-    txHash: string,
-    {
-      retryInterval = 8000,
-      successStates = [
-        TransactionStatus.ACCEPTED_ON_L1,
-        TransactionStatus.ACCEPTED_ON_L2,
-        TransactionStatus.PENDING,
-      ],
-    }: waitForTransactionOptions
-  ) {
+  public async waitForTransaction(txHash: string, options?: waitForTransactionOptions) {
     const errorStates = [TransactionStatus.RECEIVED, TransactionStatus.NOT_RECEIVED];
     let { retries } = this;
     let onchain = false;
     let txReceipt: any = {};
+
+    const retryInterval = options?.retryInterval ?? 8000;
+    const successStates = options?.successStates ?? [
+      TransactionStatus.ACCEPTED_ON_L1,
+      TransactionStatus.ACCEPTED_ON_L2,
+      TransactionStatus.PENDING,
+    ];
 
     while (!onchain) {
       // eslint-disable-next-line no-await-in-loop
