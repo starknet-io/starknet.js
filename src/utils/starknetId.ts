@@ -102,10 +102,10 @@ export function getStarknetIdContract(chainId: StarknetChainId): string {
     '0x05cf267a0af6101667013fc6bd3f6c11116a14cda9b8c4b1198520d59f900b17';
 
   switch (chainId) {
-    case StarknetChainId.MAINNET:
+    case StarknetChainId.SN_MAIN:
       return starknetIdMainnetContract;
 
-    case StarknetChainId.TESTNET:
+    case StarknetChainId.SN_GOERLI:
       return starknetIdTestnetContract;
 
     default:

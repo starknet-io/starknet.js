@@ -5,11 +5,24 @@ export const MASK_250 = 2n ** 250n - 1n; // 2 ** 250 - 1
 export const MASK_251 = 2n ** 251n;
 export const API_VERSION = ZERO;
 
-export enum StarknetChainId {
-  MAINNET = '0x534e5f4d41494e', // encodeShortString('SN_MAIN'),
-  TESTNET = '0x534e5f474f45524c49', // encodeShortString('SN_GOERLI'),
-  TESTNET2 = '0x534e5f474f45524c4932',
+export enum BaseUrl {
+  SN_MAIN = 'https://alpha-mainnet.starknet.io',
+  SN_GOERLI = 'https://alpha4.starknet.io',
+  SN_GOERLI2 = 'https://alpha4-2.starknet.io',
 }
+
+export enum NetworkName {
+  SN_MAIN = 'SN_MAIN',
+  SN_GOERLI = 'SN_GOERLI',
+  SN_GOERLI2 = 'SN_GOERLI2',
+}
+
+export enum StarknetChainId {
+  SN_MAIN = '0x534e5f4d41494e', // encodeShortString('SN_MAIN'),
+  SN_GOERLI = '0x534e5f474f45524c49', // encodeShortString('SN_GOERLI'),
+  SN_GOERLI2 = '0x534e5f474f45524c4932', // encodeShortString('SN_GOERLI2'),
+}
+
 export enum TransactionHashPrefix {
   DECLARE = '0x6465636c617265', // encodeShortString('declare'),
   DEPLOY = '0x6465706c6f79', // encodeShortString('deploy'),

@@ -12,7 +12,7 @@ import {
 } from '../lib';
 
 export type GetTransactionStatusResponse = {
-  tx_status: Status;
+  tx_status: TransactionStatus;
   block_hash?: string;
   tx_failure_reason?: {
     code: string;
@@ -116,7 +116,7 @@ export namespace Sequencer {
 
   export type AddTransactionResponse = {
     transaction_hash: string;
-    code?: TransactionStatus;
+    code?: 'TRANSACTION_RECEIVED';
     address?: string;
     class_hash?: string;
   };

@@ -14,7 +14,6 @@
     "target": "ES2020" /* Set the JavaScript language version for emitted JavaScript and include compatible library declarations. */,
     "lib": [
       "ES2020",
-      "es2017",
       "es7",
       "es6",
       "dom"

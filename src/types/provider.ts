@@ -12,6 +12,7 @@ import {
   RawCalldata,
   Signature,
   Status,
+  TransactionType,
   UniversalDeployerContractPayload,
 } from './lib';
 
@@ -117,19 +118,19 @@ export type CallContractResponse = {
 
 export type EstimateFeeAction =
   | {
-      type: 'INVOKE';
+      type: TransactionType.INVOKE;
       payload: AllowArray<Call>;
     }
   | {
-      type: 'DECLARE';
+      type: TransactionType.DECLARE;
       payload: DeclareContractPayload;
     }
   | {
-      type: 'DEPLOY_ACCOUNT';
+      type: TransactionType.DEPLOY_ACCOUNT;
       payload: DeployAccountContractPayload;
     }
   | {
-      type: 'DEPLOY';
+      type: TransactionType.DEPLOY;
       payload: UniversalDeployerContractPayload;
     };
 

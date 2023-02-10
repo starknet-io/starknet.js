@@ -82,6 +82,14 @@ export type InvocationsDetails = {
 
 export type InvocationsDetailsWithNonce = InvocationsDetails & { nonce: BigNumberish };
 
+export enum TransactionStatus {
+  NOT_RECEIVED = 'NOT_RECEIVED',
+  RECEIVED = 'RECEIVED',
+  PENDING = 'PENDING',
+  ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
+  ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
+  REJECTED = 'REJECTED',
+}
 export type TransactionBulk = Array<
   | ({ type: 'DECLARE' } & { payload: DeclareContractPayload })
   | ({ type: 'DEPLOY' } & {
@@ -107,8 +115,14 @@ export type Status =
   | 'ACCEPTED_ON_L2'
   | 'ACCEPTED_ON_L1'
   | 'REJECTED';
-export type TransactionStatus = 'TRANSACTION_RECEIVED';
-export type TransactionType = 'DECLARE' | 'DEPLOY' | 'INVOKE_FUNCTION' | 'DEPLOY_ACCOUNT';
+
+export enum TransactionType {
+  INVOKE = 'INVOKE_FUNCTION',
+  DECLARE = 'DECLARE',
+  DEPLOY = 'DEPLOY',
+  DEPLOY_ACCOUNT = 'DEPLOY_ACCOUNT',
+}
+
 export type EntryPointType = 'EXTERNAL';
 export type CompressedProgram = string;
 
@@ -176,4 +190,9 @@ export type Args = {
 };
 export type ParsedStruct = {
   [key: string]: BigNumberish | ParsedStruct;
+};
+
+export type waitForTransactionOptions = {
+  retryInterval?: number;
+  successStates?: Array<TransactionStatus>;
 };

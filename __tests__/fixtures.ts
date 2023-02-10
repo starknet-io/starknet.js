@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { Account, ProviderInterface, RpcProvider, SequencerProvider, json } from '../src';
-import { CompiledContract } from '../src/types';
+import { CompiledContract, waitForTransactionOptions } from '../src/types';
 import { toHex } from '../src/utils/number';
 
 const readContract = (name: string): CompiledContract =>
@@ -51,8 +51,11 @@ export const getTestProvider = (): ProviderInterface => {
   if (IS_LOCALHOST_DEVNET) {
     // accelerate the tests when running locally
     const originalWaitForTransaction = provider.waitForTransaction.bind(provider);
-    provider.waitForTransaction = (txHash: string, retryInterval?: number) => {
-      return originalWaitForTransaction(txHash, retryInterval || 1000);
+    provider.waitForTransaction = (
+      txHash: string,
+      { retryInterval }: waitForTransactionOptions = {}
+    ) => {
+      return originalWaitForTransaction(txHash, { retryInterval: retryInterval || 1000 });
     };
   }
 

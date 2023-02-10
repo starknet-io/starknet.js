@@ -26,6 +26,8 @@ import {
   MultiDeployContractResponse,
   Signature,
   TransactionBulk,
+  TransactionStatus,
+  TransactionType,
   UniversalDeployerContractPayload,
 } from '../types';
 import { EstimateFeeBulk, TransactionSimulation } from '../types/account';
@@ -109,13 +111,6 @@ export class Account extends Provider implements AccountInterface {
     } catch {
       return Error('Could not get address from stark name');
     }
-  }
-
-  public async estimateFee(
-    calls: AllowArray<Call>,
-    estimateFeeDetails?: EstimateFeeDetails | undefined
-  ): Promise<EstimateFee> {
-    return this.estimateInvokeFee(calls, estimateFeeDetails);
   }
 
   public async estimateInvokeFee(
@@ -315,7 +310,10 @@ export class Account extends Provider implements AccountInterface {
     const nonce = toBigInt(transactionsDetail.nonce ?? (await this.getNonce()));
     const maxFee =
       transactionsDetail.maxFee ??
-      (await this.getSuggestedMaxFee({ type: 'INVOKE', payload: calls }, transactionsDetail));
+      (await this.getSuggestedMaxFee(
+        { type: TransactionType.INVOKE, payload: calls },
+        transactionsDetail
+      ));
     const version = toBigInt(transactionVersion);
     const chainId = await this.getChainId();
 
@@ -352,7 +350,7 @@ export class Account extends Provider implements AccountInterface {
     const maxFee =
       transactionsDetail.maxFee ??
       (await this.getSuggestedMaxFee(
-        { type: 'DECLARE', payload: { classHash, contract } }, // Provide the classHash to avoid re-computing it
+        { type: TransactionType.DECLARE, payload: { classHash, contract } }, // Provide the classHash to avoid re-computing it
         transactionsDetail
       ));
 
@@ -431,9 +429,9 @@ export class Account extends Provider implements AccountInterface {
     details?: InvocationsDetails | undefined
   ): Promise<DeployContractUDCResponse> {
     const deployTx = await this.deploy(payload, details);
-    const txReceipt = await this.waitForTransaction(deployTx.transaction_hash, undefined, [
-      'ACCEPTED_ON_L2',
-    ]);
+    const txReceipt = await this.waitForTransaction(deployTx.transaction_hash, {
+      successStates: [TransactionStatus.ACCEPTED_ON_L2],
+    });
     return parseUDCEvent(txReceipt);
   }
 
@@ -443,7 +441,9 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<DeclareDeployUDCResponse> {
     const { contract, constructorCalldata, salt, unique } = payload;
     const { transaction_hash, class_hash } = await this.declare({ contract }, details);
-    const declare = await this.waitForTransaction(transaction_hash, undefined, ['ACCEPTED_ON_L2']);
+    const declare = await this.waitForTransaction(transaction_hash, {
+      successStates: [TransactionStatus.ACCEPTED_ON_L2],
+    });
     const deploy = await this.deployContract(
       { classHash: class_hash, salt, unique, constructorCalldata },
       details
@@ -472,7 +472,7 @@ export class Account extends Provider implements AccountInterface {
       transactionsDetail.maxFee ??
       (await this.getSuggestedMaxFee(
         {
-          type: 'DEPLOY_ACCOUNT',
+          type: TransactionType.DEPLOY_ACCOUNT,
           payload: { classHash, constructorCalldata, addressSalt, contractAddress },
         },
         transactionsDetail
@@ -535,19 +535,19 @@ export class Account extends Provider implements AccountInterface {
     let feeEstimate: EstimateFee;
 
     switch (type) {
-      case 'INVOKE':
+      case TransactionType.INVOKE:
         feeEstimate = await this.estimateInvokeFee(payload, details);
         break;
 
-      case 'DECLARE':
+      case TransactionType.DECLARE:
         feeEstimate = await this.estimateDeclareFee(payload, details);
         break;
 
-      case 'DEPLOY_ACCOUNT':
+      case TransactionType.DEPLOY_ACCOUNT:
         feeEstimate = await this.estimateAccountDeployFee(payload, details);
         break;
 
-      case 'DEPLOY':
+      case TransactionType.DEPLOY:
         feeEstimate = await this.estimateDeployFee(payload, details);
         break;
 

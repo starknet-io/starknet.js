@@ -17,8 +17,8 @@ import {
   InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
-  Status,
   TransactionSimulationResponse,
+  waitForTransactionOptions,
 } from '../types';
 import { BigNumberish } from '../utils/number';
 import { ProviderInterface } from './interface';
@@ -185,10 +185,9 @@ export class Provider implements ProviderInterface {
 
   public async waitForTransaction(
     txHash: BigNumberish,
-    retryInterval?: number,
-    successStates?: Array<Status>
+    options: waitForTransactionOptions
   ): Promise<GetTransactionReceiptResponse> {
-    return this.provider.waitForTransaction(txHash, retryInterval, successStates);
+    return this.provider.waitForTransaction(txHash, options);
   }
 
   public async getSimulateTransaction(

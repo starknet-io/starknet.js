@@ -56,7 +56,7 @@ test('hashMessage()', () => {
     transactionVersion,
     calldata,
     maxFee,
-    StarknetChainId.TESTNET,
+    StarknetChainId.SN_GOERLI,
     nonce
   );
 

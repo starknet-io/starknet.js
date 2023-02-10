@@ -1,6 +1,6 @@
 import urljoin from 'url-join';
 
-import { StarknetChainId } from '../constants';
+import { BaseUrl, NetworkName, StarknetChainId } from '../constants';
 import {
   Call,
   CallContractResponse,
@@ -23,7 +23,10 @@ import {
   InvokeFunctionResponse,
   Sequencer,
   TransactionSimulationResponse,
+  TransactionStatus,
   TransactionTraceResponse,
+  TransactionType,
+  waitForTransactionOptions,
 } from '../types';
 import fetch from '../utils/fetchPonyfill';
 import { getSelector, getSelectorFromName } from '../utils/hash';
@@ -45,7 +48,6 @@ import { GatewayError, HttpError, LibraryError } from './errors';
 import { ProviderInterface } from './interface';
 import { Block, BlockIdentifier } from './utils';
 
-export type NetworkName = 'mainnet-alpha' | 'goerli-alpha' | 'goerli-alpha-2';
 export type SequencerHttpMethod = 'POST' | 'GET';
 
 export type SequencerProviderOptions = {
@@ -74,7 +76,7 @@ function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
 }
 
 const defaultOptions = {
-  network: 'goerli-alpha-2' as NetworkName,
+  network: NetworkName.SN_GOERLI2,
   blockIdentifier: 'pending',
 };
 
@@ -115,14 +117,14 @@ export class SequencerProvider implements ProviderInterface {
 
   protected static getNetworkFromName(name: NetworkName | StarknetChainId) {
     switch (name) {
-      case 'mainnet-alpha' || StarknetChainId.MAINNET:
-        return 'https://alpha-mainnet.starknet.io';
-      case 'goerli-alpha' || StarknetChainId.TESTNET:
-        return 'https://alpha4.starknet.io';
-      case 'goerli-alpha-2' || StarknetChainId.TESTNET2:
-        return 'https://alpha4-2.starknet.io';
+      case NetworkName.SN_MAIN || StarknetChainId.SN_MAIN:
+        return BaseUrl.SN_MAIN;
+      case NetworkName.SN_GOERLI || StarknetChainId.SN_GOERLI:
+        return BaseUrl.SN_GOERLI;
+      case NetworkName.SN_GOERLI2 || StarknetChainId.SN_GOERLI2:
+        return BaseUrl.SN_GOERLI2;
       default:
-        return 'https://alpha4.starknet.io';
+        throw new Error('Could not detect base url from NetworkName');
     }
   }
 
@@ -130,21 +132,21 @@ export class SequencerProvider implements ProviderInterface {
     try {
       const url = new URL(baseUrl);
       if (url.host.includes('mainnet.starknet.io')) {
-        return StarknetChainId.MAINNET;
+        return StarknetChainId.SN_MAIN;
       }
       if (url.host.includes('alpha4-2.starknet.io')) {
-        return StarknetChainId.TESTNET2;
+        return StarknetChainId.SN_GOERLI2;
       }
+      return StarknetChainId.SN_GOERLI;
     } catch {
       // eslint-disable-next-line no-console
       console.error(`Could not parse baseUrl: ${baseUrl}`);
+      return StarknetChainId.SN_GOERLI;
     }
-    return StarknetChainId.TESTNET;
   }
 
   private getFetchUrl(endpoint: keyof Sequencer.Endpoints) {
     const gatewayUrlEndpoints = ['add_transaction'];
-
     return gatewayUrlEndpoints.includes(endpoint) ? this.gatewayUrl : this.feederGatewayUrl;
   }
 
@@ -341,7 +343,7 @@ export class SequencerProvider implements ProviderInterface {
     details: InvocationsDetailsWithNonce
   ): Promise<InvokeFunctionResponse> {
     return this.fetchEndpoint('add_transaction', undefined, {
-      type: 'INVOKE_FUNCTION',
+      type: TransactionType.INVOKE,
       contract_address: functionInvocation.contractAddress,
       calldata: bigNumberishArrayToDecimalStringArray(functionInvocation.calldata ?? []),
       signature: signatureToDecimalArray(functionInvocation.signature),
@@ -356,7 +358,7 @@ export class SequencerProvider implements ProviderInterface {
     details: InvocationsDetailsWithNonce
   ): Promise<DeployContractResponse> {
     return this.fetchEndpoint('add_transaction', undefined, {
-      type: 'DEPLOY_ACCOUNT',
+      type: TransactionType.DEPLOY_ACCOUNT,
       contract_address_salt: addressSalt ?? randomAddress(),
       constructor_calldata: bigNumberishArrayToDecimalStringArray(constructorCalldata ?? []),
       class_hash: toHex(classHash),
@@ -372,7 +374,7 @@ export class SequencerProvider implements ProviderInterface {
     details: InvocationsDetailsWithNonce
   ): Promise<DeclareContractResponse> {
     return this.fetchEndpoint('add_transaction', undefined, {
-      type: 'DECLARE',
+      type: TransactionType.DECLARE,
       contract_class: contractDefinition,
       nonce: toHex(details.nonce),
       signature: signatureToDecimalArray(signature),
@@ -399,7 +401,7 @@ export class SequencerProvider implements ProviderInterface {
       'estimate_fee',
       { blockIdentifier },
       {
-        type: 'INVOKE_FUNCTION',
+        type: TransactionType.INVOKE,
         contract_address: invocation.contractAddress,
         calldata: invocation.calldata ?? [],
         signature: signatureToDecimalArray(invocation.signature),
@@ -418,7 +420,7 @@ export class SequencerProvider implements ProviderInterface {
       'estimate_fee',
       { blockIdentifier },
       {
-        type: 'DECLARE',
+        type: TransactionType.DECLARE,
         sender_address: senderAddress,
         contract_class: contractDefinition,
         signature: signatureToDecimalArray(signature),
@@ -437,7 +439,7 @@ export class SequencerProvider implements ProviderInterface {
       'estimate_fee',
       { blockIdentifier },
       {
-        type: 'DEPLOY_ACCOUNT',
+        type: TransactionType.DEPLOY_ACCOUNT,
         class_hash: toHex(classHash),
         constructor_calldata: bigNumberishArrayToDecimalStringArray(constructorCalldata || []),
         contract_address_salt: toHex(addressSalt || 0),
@@ -496,14 +498,16 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('get_code', { contractAddress, blockIdentifier });
   }
 
-  public async waitForTransaction(
-    txHash: BigNumberish,
-    retryInterval: number = 8000,
-    successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING']
-  ) {
-    const errorStates = ['REJECTED', 'NOT_RECEIVED'];
+  public async waitForTransaction(txHash: BigNumberish, options?: waitForTransactionOptions) {
+    const errorStates = [TransactionStatus.RECEIVED, TransactionStatus.NOT_RECEIVED];
     let onchain = false;
     let res;
+    const retryInterval = options?.retryInterval ?? 8000;
+    const successStates = options?.successStates ?? [
+      TransactionStatus.ACCEPTED_ON_L1,
+      TransactionStatus.ACCEPTED_ON_L2,
+      TransactionStatus.PENDING,
+    ];
 
     while (!onchain) {
       // eslint-disable-next-line no-await-in-loop
