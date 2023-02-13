@@ -581,5 +581,13 @@ describe('Complex interaction', () => {
       expect(gas.overall_fee).toBeDefined();
       expect(gas.suggestedMaxFee).toBeDefined();
     });
+
+    test('estimate fee transfer', async () => {
+      const gas = await erc20Echo20Contract.estimateFee.transfer(stark.randomAddress(), uint256(1));
+      expect(gas.gas_consumed).toBeDefined();
+      expect(gas.gas_price).toBeDefined();
+      expect(gas.overall_fee).toBeDefined();
+      expect(gas.suggestedMaxFee).toBeDefined();
+    });
   });
 });
