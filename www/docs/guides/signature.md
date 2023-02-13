@@ -4,11 +4,13 @@ sidebar_position: 14
 
 # Signature
 
-You can use Starknet.js to sign a message outside of the network, using the standard methods of hash and sign of StarkNet.
+You can use Starknet.js to sign a message outside of the network, using the standard methods of hash and sign of StarkNet. By this way, in some cases, you have not to pay fees to store data in-chain ; you transfer the signed message off-chain, and the recipient can verify (without fee) on-chain the validity of the message.
 
 ## Sign and send a message
 
 Your message has to be an array of `BigNumberish`. You calculate the hash of this message, then you calculate the signature.
+
+> If the message do not respect some safety rules of composition, this method could be a way of attack of your smartcontract. If you have some doubt, prefer the [EIP712 like method](#sign-and-verify-following-eip712), which is safe, but is also more complicated.
 
 ```typescript
 import {ec, hash, number, json, Contract } from "starknet";
@@ -37,8 +39,8 @@ On receiver side, you can verify that :
 - the sender of this message owns the private key corresponding to the public key.
 
 2 ways to perform this verification :
-- outside of the network, using the full public key (very fast, but only for standard StarkNet hash & sign).
-- in the network, using the account address (slow, add workload to the node/sequencer, but can manage exotic account abstraction about hash or sign).
+- off-chain, using the full public key (very fast, but only for standard StarkNet hash & sign).
+- on-chain, using the account address (slow, add workload to the node/sequencer, but can manage exotic account abstraction about hash or sign).
 
 ### Verify outside of StarkNet :
 
@@ -91,41 +93,74 @@ console.log("Result (boolean) =", result2);
 
 ## Sign and verify following EIP712
 
-Previous example are valid for an array of numbers. In case of more complex structure of object, you have to work in accordance with [EIP 712](https://eips.ethereum.org/EIPS/eip-712). This json structure has 4 mandatory items : `types`, `primaryType`, `domain` and `message`.  
+Previous examples are valid for an array of numbers. In case of more complex structure of object, you have to work in the spirit of [EIP 712](https://eips.ethereum.org/EIPS/eip-712). This json structure has 4 mandatory items : `types`, `primaryType`, `domain` and `message`.  
 These items are designed to be able to be an interface with a wallet. At sign request, the wallet will display :
-- `message` will be displayed at the botton of the wallet display, showing clearly (not in hexa) the message to sign. Its structure has to be in accordance with the type listed in `primaryType`, described in `types`.
+- `message` will be displayed at the bottom of the wallet display, showing clearly (not in hexa) the message to sign. Its structure has to be in accordance with the type listed in `primaryType`, defined in `types`.
 - `domain` will be shown above the message. Its structure has to be in accordance with `StarkNetDomain`.
+
+The prefefined types that you can use :
+- felt : for an integer on 251 bits.
+- felt* : for an array of felt.
+- string : for a shortString of 31 ASCII characters max.
+- selector : for a name of a smartcontract function.
+- merkletree : for a Root of a Merkle tree. root is calculated with the provided data.
 
 ``` typescript
 import { Account, typedData } from "starknet";
 
 const typedDataValidate: typedData.TypedData = {
-    types: {
-        StarkNetDomain: [
-            { name: 'name', type: 'string' },
-            { name: 'version', type: 'felt' },
-            { name: 'chainId', type: 'felt' },
-            { name: 'verifyingContract', type: 'felt' },
-        ],
-        Validate: [
-            { name: 'from', type: 'felt' },
-            { name: 'starknetAddress', type: 'felt' },
-            { name: 'yourSelection', type: 'felt' },
-        ],
-    },
-    primaryType: 'Validate',
-    domain: {
-        name: 'Confirm the address',
-        version: '1',
-        chainId: "0x534e5f474f45524c49",
-        verifyingContract: '0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC',
-    },
-    message: {
-        from: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
-        starknetAddress: "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a",
-        yourSelection: "4",
-    },
-};
+        types: {
+            StarkNetDomain: [
+                { name: "name", type: "string" },
+                { name: "version", type: "felt" },
+                { name: "chainId", type: "felt" },
+            ],
+            Airdrop: [
+                { name: "address", type: "felt" },
+                { name: "amount", type: "felt" }
+            ],
+            Validate: [
+                { name: "id", type: "felt" },
+                { name: "from", type: "felt" },
+                { name: "amount", type: "felt" },
+                { name: "nameGamer", type: "string" },
+                { name: "endDate", type: "felt" },
+                { name: "itemsAuthorized", type: "felt*" }, // array of felt
+                { name: "chkFunction", type: "selector" }, // name of function
+                { name: "rootList", type: "merkletree", contains: "Airdrop" } // root of a merkle tree
+            ]
+        },
+        primaryType: "Validate",
+        domain: {
+            name: "myDapp", // put the name of your dapp to ensure that the signatures will not be used by other DAPP
+            version: "1",
+            chainId: shortString.encodeShortString("SN_GOERLI"), // shortString of 'SN_GOERLI' (or 'SN_MAIN' or 'SN_GOERLI2'), to be sure that signature can't be used by other network.
+        },
+        message: {
+            id: "0x0000004f000f",
+            from: "0x2c94f628d125cd0e86eaefea735ba24c262b9a441728f63e5776661829a4066",
+            amount: "400",
+            nameGamer: "Hector26",
+            endDate: "0x27d32a3033df4277caa9e9396100b7ca8c66a4ef8ea5f6765b91a7c17f0109c",
+            itemsAuthorized: ["0x01", "0x03", "0x0a", "0x0e"],
+            chkFunction: "check_authorization",
+            rootList: [
+                {
+                    address: "0x69b49c2cc8b16e80e86bfc5b0614a59aa8c9b601569c7b80dde04d3f3151b79",
+                    amount: "1554785",
+                }, {
+                    address: "0x7447084f620ba316a42c72ca5b8eefb3fe9a05ca5fe6430c65a69ecc4349b3b",
+                    amount: "2578248",
+                }, {
+                    address: "0x3cad9a072d3cf29729ab2fad2e08972b8cfde01d4979083fb6d15e8e66f8ab1",
+                    amount: "4732581",
+                }, {
+                    address: "0x7f14339f5d364946ae5e27eccbf60757a5c496bf45baf35ddf2ad30b583541a",
+                    amount: "913548",
+                },
+            ]
+        },
+    };
 
 // connect your account, then
 const signature4 = await account.signMessage(typedDataValidate);
