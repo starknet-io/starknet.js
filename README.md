@@ -58,7 +58,7 @@ Guides can be found [here](https://www.starknetjs.com/docs/guides/intro) :book:
 
 ## ✏️ Contributing
 
-If you consider to contribute to this project please read [CONTRIBUTING.md](https://github.com/starknet-io/starknet.js/blob/main/CONTRIBUTING.md) first.
+If you consider to contribute to this project please read [CONTRIBUTING.md](https://github.com/starknet-io/starknet.js/blob/main/CONTRIBUTING.md) first!
 
 ## ❤️ Special Thanks
 
