@@ -4,7 +4,7 @@ title: Provider
 id: 'provider'
 ---
 
-The **Provider** API allows you to interact with the StarkNet network, without signing transactions or messages.
+The **Provider** API allows you to interact with the Starknet network, without signing transactions or messages.
 
 Typically, these are _read_ calls on the blockchain.
 
@@ -67,7 +67,7 @@ Returns the chain Id for the current network.
 
 provider.**callContract**(call [ , blockIdentifier ]) => _Promise < CallContractResponse >_
 
-Calls a function on the StarkNet contract.
+Calls a function on the Starknet contract.
 
 The call object structure:
 

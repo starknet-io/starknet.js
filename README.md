@@ -4,7 +4,7 @@
 </p>
 
 <!-- tag line -->
-<h4 align='center'> JavaScript library for StarkNet.</h4>
+<h4 align='center'> JavaScript library for Starknet.</h4>
 
 <!-- primary badges -->
 <p align="center">

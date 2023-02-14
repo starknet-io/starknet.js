@@ -57,9 +57,9 @@ npm install # install docusaurus
 npm run start # fires up a local documentation site
 ```
 
-## Compiling StarkNet Contracts
+## Compiling Starknet Contracts
 
-Please check the StarkNet documentation <ins>[here](https://www.cairo-lang.org/docs/hello_starknet/intro.html)</ins> to compile StarkNet contracts.
+Please check the Starknet documentation <ins>[here](https://www.cairo-lang.org/docs/hello_starknet/intro.html)</ins> to compile Starknet contracts.
 
 Additional helpful resources can also be found at <ins>[OpenZeppelin](https://docs.openzeppelin.com/contracts-cairo/0.5.0/)</ins> documentation site.
 

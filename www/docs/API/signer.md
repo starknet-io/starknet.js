@@ -24,7 +24,7 @@ Returns the public key of the signer.
 
 signer.**signTransaction**(transactions, transactionsDetail [ , abi ]) => _Promise < Signature >_
 
-Signs a transaction with the StarkNet private key and returns the signature.
+Signs a transaction with the Starknet private key and returns the signature.
 
 The _transactions_ object for write methods may include any of:
 
@@ -46,7 +46,7 @@ string[]
 
 signer.**signMessage**(typedData, accountAddress) => _Promise < Signature >_
 
-Sign an JSON object for off-chain usage with the StarkNet private key and return the signature. This adds a message prefix so it can't be interchanged with transactions.
+Sign an JSON object for off-chain usage with the Starknet private key and return the signature. This adds a message prefix so it can't be interchanged with transactions.
 
 _typedData_ - JSON object to be signed
 _accountAddress_ - calldata to be passed in deploy constructor
@@ -63,7 +63,7 @@ string[]
 
 signer.**signDeployAccountTransaction**(transaction) => _Promise < Signature >_
 
-Signs a DEPLOY_ACCOUNT transaction with the StarkNet private key and returns the signature.
+Signs a DEPLOY_ACCOUNT transaction with the Starknet private key and returns the signature.
 
 The _transactions_ object for write methods may include any of:
 
@@ -87,7 +87,7 @@ string[]
 
 signer.**signDeclareTransaction**(transaction, transactionsDetail [ , abi ]) => _Promise < Signature >_
 
-Signs a DECLARE transaction with the StarkNet private key and returns the signature.
+Signs a DECLARE transaction with the Starknet private key and returns the signature.
 
 The _transaction_ object for write methods may include any of:
 
