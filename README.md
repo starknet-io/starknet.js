@@ -50,7 +50,7 @@ Import `starknet` and use the [API](https://www.starknetjs.com/docs/API/)
 
 Please refer to the following code example [here](https://github.com/0xs34n/starknet.js-workshop)
 
-Guides can be found [here](https://www.starknetjs.com/guides/intro)
+Guides can be found [here](https://www.starknetjs.com/docs/guides/intro)
 
 ## 🌐 API
 
