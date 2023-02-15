@@ -253,6 +253,30 @@ Wait for the transaction to be accepted on L2 or L1.
 
 ---
 
+### getStarkName()
+
+provider.**getStarkName**(address, StarknetIdContract) => _Promise<string | Error>_
+
+Gets starknet.id stark name with the address provided
+
+The _StarknetIdContract_ argument can be undefined, if it is, the function will automatically use official starknet id contracts of your network.
+
+Returns directly a string (Example: `vitalik.stark`).
+
+---
+
+### getAddressFromStarkName()
+
+provider.**getAddressFromStarkName**(name, StarknetIdContract) => _Promise<string | Error>_
+
+Gets account address with the starknet id stark name.
+
+The _StarknetIdContract_ argument can be undefined, if it is, the function will automatically use official starknet id contracts of your network.
+
+Returns directly the address in a string (Example: `0xff...34`).
+
+---
+
 ### getStateUpdate()
 
 provider.**getStateUpdate**(blockIdentifier) => _Promise < StateUpdateResponse >_
