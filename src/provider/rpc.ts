@@ -17,18 +17,16 @@ import {
   InvokeFunctionResponse,
   RPC,
   TransactionSimulationResponse,
+  TransactionStatus,
+  waitForTransactionOptions,
 } from '../types';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
-import {
-  BigNumberish,
-  bigNumberishArrayToHexadecimalStringArray,
-  toBN,
-  toHex,
-} from '../utils/number';
+import { BigNumberish, bigNumberishArrayToHexadecimalStringArray, toHex } from '../utils/number';
 import { parseCalldata, wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
+import { signatureToHexArray } from '../utils/stark';
 import { LibraryError } from './errors';
 import { ProviderInterface } from './interface';
 import { Block, BlockIdentifier } from './utils';
@@ -51,9 +49,9 @@ const defaultOptions = {
 export class RpcProvider implements ProviderInterface {
   public nodeUrl: string;
 
-  public chainId!: StarknetChainId;
-
   public headers: object;
+
+  private chainId!: StarknetChainId;
 
   private responseParser = new RPCResponseParser();
 
@@ -68,9 +66,7 @@ export class RpcProvider implements ProviderInterface {
     this.headers = { ...defaultOptions.headers, ...headers };
     this.blockIdentifier = blockIdentifier || defaultOptions.blockIdentifier;
 
-    this.getChainId().then((chainId) => {
-      this.chainId = chainId;
-    });
+    this.getChainId();
   }
 
   public fetch(method: any, params: any): Promise<any> {
@@ -104,11 +100,11 @@ export class RpcProvider implements ProviderInterface {
   }
 
   // Methods from Interface
-  public async getChainId(): Promise<any> {
-    return this.fetchEndpoint('starknet_chainId');
+  public async getChainId(): Promise<StarknetChainId> {
+    this.chainId ??= (await this.fetchEndpoint('starknet_chainId')) as StarknetChainId;
+    return this.chainId;
   }
 
-  // Methods from Interface
   public async getBlock(
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<GetBlockResponse> {
@@ -177,7 +173,7 @@ export class RpcProvider implements ProviderInterface {
     key: BigNumberish,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<BigNumberish> {
-    const parsedKey = toHex(toBN(key));
+    const parsedKey = toHex(key);
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getStorageAt', {
       contract_address: contractAddress,
@@ -253,19 +249,17 @@ export class RpcProvider implements ProviderInterface {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_estimateFee', {
       request: {
-        type: 'INVOKE',
+        type: RPC.TransactionType.INVOKE,
         sender_address: invocation.contractAddress,
         calldata: parseCalldata(invocation.calldata),
-        signature: bigNumberishArrayToHexadecimalStringArray(invocation.signature || []),
-        version: toHex(toBN(invocationDetails?.version || 0)),
-        nonce: toHex(toBN(invocationDetails.nonce)),
-        max_fee: toHex(toBN(invocationDetails?.maxFee || 0)),
+        signature: signatureToHexArray(invocation.signature),
+        version: toHex(invocationDetails?.version || 0),
+        nonce: toHex(invocationDetails.nonce),
+        max_fee: toHex(invocationDetails?.maxFee || 0),
       },
       block_id,
     }).then(this.responseParser.parseFeeEstimateResponse);
   }
-
-  // TODO: Revisit after Pathfinder release with JSON-RPC v0.2.1 RPC Spec
 
   public async getDeclareEstimateFee(
     { senderAddress, contractDefinition, signature }: DeclareContractTransaction,
@@ -275,17 +269,17 @@ export class RpcProvider implements ProviderInterface {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_estimateFee', {
       request: {
-        type: 'DECLARE',
+        type: RPC.TransactionType.DECLARE,
         contract_class: {
           program: contractDefinition.program,
           entry_points_by_type: contractDefinition.entry_points_by_type,
           abi: contractDefinition.abi, // rpc 2.0
         },
         sender_address: senderAddress,
-        signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
-        version: toHex(toBN(details?.version || 0)),
-        nonce: toHex(toBN(details.nonce)),
-        max_fee: toHex(toBN(details?.maxFee || 0)),
+        signature: signatureToHexArray(signature),
+        version: toHex(details?.version || 0),
+        nonce: toHex(details.nonce),
+        max_fee: toHex(details?.maxFee || 0),
       },
       block_id,
     }).then(this.responseParser.parseFeeEstimateResponse);
@@ -299,14 +293,14 @@ export class RpcProvider implements ProviderInterface {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_estimateFee', {
       request: {
-        type: 'DEPLOY_ACCOUNT',
+        type: RPC.TransactionType.DEPLOY_ACCOUNT,
         constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
-        class_hash: toHex(toBN(classHash)),
-        contract_address_salt: toHex(toBN(addressSalt || 0)),
-        signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
-        version: toHex(toBN(details?.version || 0)),
-        nonce: toHex(toBN(details.nonce)),
-        max_fee: toHex(toBN(details?.maxFee || 0)),
+        class_hash: toHex(classHash),
+        contract_address_salt: toHex(addressSalt || 0),
+        signature: signatureToHexArray(signature),
+        version: toHex(details?.version || 0),
+        nonce: toHex(details.nonce),
+        max_fee: toHex(details?.maxFee || 0),
       },
       block_id,
     }).then(this.responseParser.parseFeeEstimateResponse);
@@ -331,12 +325,12 @@ export class RpcProvider implements ProviderInterface {
           entry_points_by_type: contractDefinition.entry_points_by_type,
           abi: contractDefinition.abi, // rpc 2.0
         },
-        type: 'DECLARE',
-        version: toHex(toBN(details.version || 0)),
-        max_fee: toHex(toBN(details.maxFee || 0)),
-        signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
+        type: RPC.TransactionType.DECLARE,
+        version: toHex(details.version || 0),
+        max_fee: toHex(details.maxFee || 0),
+        signature: signatureToHexArray(signature),
         sender_address: senderAddress,
-        nonce: toHex(toBN(details.nonce)),
+        nonce: toHex(details.nonce),
       },
     });
   }
@@ -348,13 +342,13 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_addDeployAccountTransaction', {
       deploy_account_transaction: {
         constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
-        class_hash: toHex(toBN(classHash)),
-        contract_address_salt: toHex(toBN(addressSalt || 0)),
-        type: 'DEPLOY_ACCOUNT',
-        max_fee: toHex(toBN(details.maxFee || 0)),
-        version: toHex(toBN(details.version || 0)),
-        signature: bigNumberishArrayToHexadecimalStringArray(signature || []),
-        nonce: toHex(toBN(details.nonce)),
+        class_hash: toHex(classHash),
+        contract_address_salt: toHex(addressSalt || 0),
+        type: RPC.TransactionType.DEPLOY_ACCOUNT,
+        max_fee: toHex(details.maxFee || 0),
+        version: toHex(details.version || 0),
+        signature: signatureToHexArray(signature),
+        nonce: toHex(details.nonce),
       },
     });
   }
@@ -367,11 +361,11 @@ export class RpcProvider implements ProviderInterface {
       invoke_transaction: {
         sender_address: functionInvocation.contractAddress,
         calldata: parseCalldata(functionInvocation.calldata),
-        type: 'INVOKE',
-        max_fee: toHex(toBN(details.maxFee || 0)),
-        version: toHex(toBN(details.version || 1)),
-        signature: bigNumberishArrayToHexadecimalStringArray(functionInvocation.signature || []),
-        nonce: toHex(toBN(details.nonce)),
+        type: RPC.TransactionType.INVOKE,
+        max_fee: toHex(details.maxFee || 0),
+        version: toHex(details.version || 1),
+        signature: signatureToHexArray(functionInvocation.signature),
+        nonce: toHex(details.nonce),
       },
     });
   }
@@ -402,15 +396,18 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_traceBlockTransactions', { block_hash: blockHash });
   }
 
-  public async waitForTransaction(
-    txHash: string,
-    retryInterval: number = 8000,
-    successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING']
-  ) {
-    const errorStates = ['REJECTED', 'NOT_RECEIVED'];
+  public async waitForTransaction(txHash: string, options?: waitForTransactionOptions) {
+    const errorStates = [TransactionStatus.RECEIVED, TransactionStatus.NOT_RECEIVED];
     let { retries } = this;
     let onchain = false;
     let txReceipt: any = {};
+
+    const retryInterval = options?.retryInterval ?? 8000;
+    const successStates = options?.successStates ?? [
+      TransactionStatus.ACCEPTED_ON_L1,
+      TransactionStatus.ACCEPTED_ON_L2,
+      TransactionStatus.PENDING,
+    ];
 
     while (!onchain) {
       // eslint-disable-next-line no-await-in-loop
@@ -433,7 +430,7 @@ export class RpcProvider implements ProviderInterface {
           throw error;
         }
       } catch (error: unknown) {
-        if (error instanceof Error && errorStates.includes(error.message)) {
+        if (error instanceof Error && errorStates.includes(error.message as TransactionStatus)) {
           throw error;
         }
 

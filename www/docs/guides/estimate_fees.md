@@ -21,7 +21,7 @@ const { suggestedMaxFee: estimatedFee1 } = await account0.estimateDeclareFee({
 });
 ```
 
-The result is in `estimatedFee1`, of type BN.
+The result is in `estimatedFee1`, of type BigInt.
 
 ## estimateDeployFee
 
@@ -31,7 +31,7 @@ To estimate the cost to deploy a contract in the network :
 const { suggestedMaxFee: estimatedFee1 } = await account0.estimateDeployFee({ classHash: testClassHash });
 ```
 
-The result is in `estimatedFee1`, of type BN.
+The result is in `estimatedFee1`, of type BigInt.
 
 ## estimateAccountDeployFee
 
@@ -45,7 +45,7 @@ const { suggestedMaxFee: estimatedFee1 } = await account0.estimateAccountDeployF
 });
 ```
 
-The result is in `estimatedFee1`, of type BN.
+The result is in `estimatedFee1`, of type BigInt.
 
 ## estimateInvokeFee
 
@@ -59,7 +59,7 @@ const { suggestedMaxFee: estimatedFee1 } = await account0.estimateInvokeFee({
 });
 ```
 
-The result is in `estimatedFee1`, of type BN.
+The result is in `estimatedFee1`, of type BigInt.
 
 ## Fee limitation
 
@@ -67,15 +67,14 @@ In all non-free functions, you can add an optional parameter limiting the fee co
 If the fee has been previously estimated, you can use this value for this parameter, **but do not forget to add a margin of approximately 10%** :
 
 ```typescript
-import BN from "bn.js";
-estimatedFee1.mul(new BN(11)).div(new BN(10))
+estimatedFee1 * 11n / 10n
 ```
 
 You can also use the `stark.estimatedFeeToMaxFee` function :
 
 ```typescript
 import { stark } from "starknet";
-stark.estimatedFeeToMaxFee(estimatedFee1,0.1)
+stark.estimatedFeeToMaxFee(estimatedFee1, 0.1);
 ```
 
 Example for declare :
@@ -92,7 +91,7 @@ const declareResponse = await account0.declare(
     classHash: testClassHash
   },
   {
-    maxFee: estimatedFee1.mul(new BN(11)).div(new BN(10))
+    maxFee: estimatedFee1 * 11n / 10n
   }
 );
 ```

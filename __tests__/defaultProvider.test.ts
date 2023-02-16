@@ -1,5 +1,5 @@
 import { BlockNumber, GetBlockResponse, LibraryError, Provider, stark } from '../src';
-import { toBN } from '../src/utils/number';
+import { toBigInt } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
 import {
   compiledErc20,
@@ -25,9 +25,8 @@ describe('defaultProvider', () => {
   beforeAll(async () => {
     expect(testProvider).toBeInstanceOf(Provider);
 
-    const { deploy } = await account.declareDeploy({
+    const { deploy } = await account.declareAndDeploy({
       contract: compiledErc20,
-      classHash: erc20ClassHash,
       constructorCalldata: [encodeShortString('Token'), encodeShortString('ERC20'), wallet],
     });
 
@@ -103,7 +102,7 @@ describe('defaultProvider', () => {
 
     test('getNonceForAddress()', async () => {
       const nonce = await testProvider.getNonceForAddress(erc20ContractAddress);
-      return expect(toBN(nonce)).toEqual(toBN('0x0'));
+      return expect(toBigInt(nonce)).toEqual(toBigInt('0x0'));
     });
 
     test('getClassAt(contractAddress, blockNumber="latest")', async () => {
@@ -113,14 +112,11 @@ describe('defaultProvider', () => {
       expect(classResponse).toHaveProperty('entry_points_by_type');
     });
 
-    // TODO see if feasible to split
-    describe('GetClassByHash', () => {
-      test('responses', async () => {
-        const classResponse = await testProvider.getClassByHash(erc20ClassHash);
-        expect(classResponse).toHaveProperty('program');
-        expect(classResponse).toHaveProperty('entry_points_by_type');
-        expect(classResponse).toHaveProperty('abi');
-      });
+    test('GetClassByHash', async () => {
+      const classResponse = await testProvider.getClassByHash(erc20ClassHash);
+      expect(classResponse).toHaveProperty('program');
+      expect(classResponse).toHaveProperty('entry_points_by_type');
+      expect(classResponse).toHaveProperty('abi');
     });
 
     describe('getStorageAt', () => {
@@ -136,7 +132,7 @@ describe('defaultProvider', () => {
 
       test('with "key" type of BN', () => {
         return expect(
-          testProvider.getStorageAt(erc20ContractAddress, toBN('0x0'))
+          testProvider.getStorageAt(erc20ContractAddress, toBigInt('0x0'))
         ).resolves.not.toThrow();
       });
     });

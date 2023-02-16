@@ -10,7 +10,7 @@ describe('calculateTransactionHashCommon()', () => {
       '0x64',
       [],
       '0x0',
-      StarknetChainId.TESTNET
+      StarknetChainId.SN_GOERLI
     );
     expect(result).toBe('0x7d260744de9d8c55e7675a34512d1951a7b262c79e685d26599edd2948de959');
   });

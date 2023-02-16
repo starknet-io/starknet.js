@@ -20,6 +20,78 @@
 
 - add support for get_state_update in provider ([76035a1](https://github.com/0xs34n/starknet.js/commit/76035a148e7863fa1dbe440920eca34498480aa9))
 
+# [5.0.0-beta.4](https://github.com/0xs34n/starknet.js/compare/v5.0.0-beta.3...v5.0.0-beta.4) (2023-01-24)
+
+### Bug Fixes
+
+- tests ([3b34c0c](https://github.com/0xs34n/starknet.js/commit/3b34c0c37c0cca3da087e5ff2a881fba8959bf4e))
+- weierstrass import ([c963f90](https://github.com/0xs34n/starknet.js/commit/c963f900cc0f3ffcadce16a704f7b9e592a014e1))
+
+### Features
+
+- add back ec for proper support ([649e0aa](https://github.com/0xs34n/starknet.js/commit/649e0aa032d77ba714fe5cb8d31252590e9eb7f4))
+- add public sequencer fetch method ([1dab230](https://github.com/0xs34n/starknet.js/commit/1dab2302d64f5f3f1df84c225a93e6007592090d))
+- add tests and make RawArgs more flexible ([db9f274](https://github.com/0xs34n/starknet.js/commit/db9f2745d2f55767acd0b3ded4a028d103a0d249))
+- allow BigNumberish in RawCallData ([9b897c7](https://github.com/0xs34n/starknet.js/commit/9b897c7fb653ae1830b3795b29bd35c8be8e2d22))
+- use ec internally ([3392d03](https://github.com/0xs34n/starknet.js/commit/3392d0362af48f283ff414bc7387586ba44ad9a2))
+
+# [5.0.0-beta.3](https://github.com/0xs34n/starknet.js/compare/v5.0.0-beta.2...v5.0.0-beta.3) (2023-01-13)
+
+### Bug Fixes
+
+- describeIfDevnetSequencer ([4a088ad](https://github.com/0xs34n/starknet.js/commit/4a088ada404ef912976141d8fba1c66d791c273c))
+- es6 ([e85ad45](https://github.com/0xs34n/starknet.js/commit/e85ad45c5565d93417b1a18e3663bd6c5e8861c1))
+- estimate fee response bulk type ([78a1444](https://github.com/0xs34n/starknet.js/commit/78a14445c75b7ec259d6cfecd1cc17869b507dd8))
+- merge develop into feat/add_estimate_fee_bulk ([88e76af](https://github.com/0xs34n/starknet.js/commit/88e76af68dd711b3f277c0a6d4f1935710aba4d7))
+- remove any type in simulateTransaction ([a94db18](https://github.com/0xs34n/starknet.js/commit/a94db1887c9fee676ac9b313190453abd5ea2554))
+- repair and unify transaction retrieval error ([ea5e646](https://github.com/0xs34n/starknet.js/commit/ea5e64651bf47824b254ae73ed8aa88998a5be44))
+- tests ([5ab047f](https://github.com/0xs34n/starknet.js/commit/5ab047ff0b272057e70a29e909084d083db36a96))
+- update account.simulateTransaction return type ([3c3d397](https://github.com/0xs34n/starknet.js/commit/3c3d397a4fb1042c7358f70f50df0a4ce2893220))
+- update getEstimateFeeBulk function ([4b22c82](https://github.com/0xs34n/starknet.js/commit/4b22c8212f4586b37dc7c8ddfad77955e44b1b12))
+- update types & add separate responseParser for estimateFeeBulk ([52110b2](https://github.com/0xs34n/starknet.js/commit/52110b289e3dfbbe449cf195709b2714f295a70d))
+
+### Features
+
+- add function estimateInvokeFeeBulk ([e716a18](https://github.com/0xs34n/starknet.js/commit/e716a1882f3ac37d17eae72a51cd3c4fc4649bcb))
+- update estimateFeeBulk ([5ee94f7](https://github.com/0xs34n/starknet.js/commit/5ee94f78af681690905e1ead1de711e3a43c0774))
+- update estimateFeeBulk function & doc ([ce20139](https://github.com/0xs34n/starknet.js/commit/ce201394142a19c4810a1e44cb3f601b815a11fe))
+- update sequencer api ([a12f99e](https://github.com/0xs34n/starknet.js/commit/a12f99ea6e93fb5d44d4d07f7fa8cc2d997db91a))
+
+# [5.0.0-beta.2](https://github.com/0xs34n/starknet.js/compare/v5.0.0-beta.1...v5.0.0-beta.2) (2023-01-11)
+
+### Bug Fixes
+
+- bnToUint256 and add more tests ([baa9d61](https://github.com/0xs34n/starknet.js/commit/baa9d611b18725ba269818631f668183212988df))
+
+# [5.0.0-beta.1](https://github.com/0xs34n/starknet.js/compare/v4.18.0...v5.0.0-beta.1) (2023-01-07)
+
+### Bug Fixes
+
+- better ([cda4931](https://github.com/0xs34n/starknet.js/commit/cda49313b17d715463f915f9ec8f1bf7c4de93f2))
+- imports ([a151afc](https://github.com/0xs34n/starknet.js/commit/a151afce77eb175e39982fbf8bfcbe25001ee6db))
+- imports ([43f0e25](https://github.com/0xs34n/starknet.js/commit/43f0e25f22106da510a0152c65084b1ee677cc6f))
+- sequencer fetchEndpoint ([7206d77](https://github.com/0xs34n/starknet.js/commit/7206d776a497cab833f5bf2e00b9f2eb695e3c71))
+- **tests:** signature in account tests ([c8bc860](https://github.com/0xs34n/starknet.js/commit/c8bc8604d74d0e0556468afa3475150fe3579e7a))
+- trying fixing tests for sequencer ([480e20d](https://github.com/0xs34n/starknet.js/commit/480e20de6b8d3f8eb3048a84430380d73fe46dcc))
+- update lockfile ([ecf9ead](https://github.com/0xs34n/starknet.js/commit/ecf9ead06d137bd2b43816a75f66dca0626e9ecd))
+- use hex array for RPC signatures ([aa73351](https://github.com/0xs34n/starknet.js/commit/aa73351b024daf75af2bc997b78cbde56de567e9))
+
+- chore!: account and signer updates ([be0cbe8](https://github.com/0xs34n/starknet.js/commit/be0cbe88b409fa9db20de8125319e10d1e29677e))
+
+### Features
+
+- add computeClassHash functionality ([3f6d88e](https://github.com/0xs34n/starknet.js/commit/3f6d88e00d9620bf2044ecccea6369067f2192d0))
+- compute class hash tests ([31a52a2](https://github.com/0xs34n/starknet.js/commit/31a52a28994abb0081fb27a0a7801cf160bcd2ad))
+- initial commit to ue faster hashing ([722717d](https://github.com/0xs34n/starknet.js/commit/722717dcf23f6b62a528e58e9483f868f658ebf3))
+- initial poc ([eb26fbd](https://github.com/0xs34n/starknet.js/commit/eb26fbddc02d54bb1f9ecf12192f484122ab5df4))
+- make class hash optional for Declare Txn ([624ca8b](https://github.com/0xs34n/starknet.js/commit/624ca8b8d1885d9b9a405a31f05d869fdfc03c9c))
+- update declareAndDeploy method ([a47fbd5](https://github.com/0xs34n/starknet.js/commit/a47fbd5f523a375b988f912a5631c181e3a7159b))
+- use yarn ([ec1101e](https://github.com/0xs34n/starknet.js/commit/ec1101e6edaf53446e76181fa0cf4530befb9463))
+
+### BREAKING CHANGES
+
+- uses BigInt and Faster Hashing
+
 ## [4.19.3](https://github.com/0xs34n/starknet.js/compare/v4.19.2...v4.19.3) (2023-01-12)
 
 ### Bug Fixes

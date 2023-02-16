@@ -18,8 +18,8 @@ import {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   StateUpdateResponse,
-  Status,
   TransactionSimulationResponse,
+  waitForTransactionOptions,
 } from '../types';
 import { BigNumberish } from '../utils/number';
 import { ProviderInterface } from './interface';
@@ -55,10 +55,6 @@ export class Provider implements ProviderInterface {
       // providerOrOptions is none, create SequencerProvider as default
       this.provider = new SequencerProvider();
     }
-  }
-
-  public get chainId(): StarknetChainId {
-    return this.provider.chainId;
   }
 
   public async getChainId(): Promise<StarknetChainId> {
@@ -190,10 +186,9 @@ export class Provider implements ProviderInterface {
 
   public async waitForTransaction(
     txHash: BigNumberish,
-    retryInterval?: number,
-    successStates?: Array<Status>
+    options: waitForTransactionOptions
   ): Promise<GetTransactionReceiptResponse> {
-    return this.provider.waitForTransaction(txHash, retryInterval, successStates);
+    return this.provider.waitForTransaction(txHash, options);
   }
 
   public async getSimulateTransaction(

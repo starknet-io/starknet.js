@@ -1,8 +1,6 @@
 /* eslint-disable max-classes-per-file */
-import { BN } from 'bn.js';
-
 import type { BlockNumber, SequencerIdentifier } from '../types';
-import { BigNumberish, isHex, toBN, toHex } from '../utils/number';
+import { BigNumberish, isHex, toHex } from '../utils/number';
 
 /**
  *
@@ -13,7 +11,7 @@ import { BigNumberish, isHex, toBN, toHex } from '../utils/number';
  */
 export function formatHash(hashValue: BigNumberish): string {
   if (typeof hashValue === 'string') return hashValue;
-  return toHex(toBN(hashValue));
+  return toHex(hashValue);
 }
 
 /**
@@ -48,7 +46,7 @@ export class Block {
   private setIdentifier(__identifier: BlockIdentifier) {
     if (typeof __identifier === 'string' && isHex(__identifier)) {
       this.hash = __identifier;
-    } else if (BN.isBN(__identifier)) {
+    } else if (typeof __identifier === 'bigint') {
       this.hash = toHex(__identifier);
     } else if (typeof __identifier === 'number') {
       this.number = __identifier;

@@ -262,7 +262,7 @@ export class Contract implements ContractInterface {
     return this.providerOrAccount.invokeFunction(
       {
         ...invocation,
-        signature: options.signature || [],
+        signature: options.signature,
       },
       {
         nonce: options.nonce,
