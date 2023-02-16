@@ -1,7 +1,7 @@
-import BN from 'bn.js';
 import assert from 'minimalistic-assert';
 
 import { Abi, AbiEntry, Args, Calldata, FunctionAbi, abiStructs } from '../../types';
+import { isBigInt } from '../number';
 import { isLongText, splitLongString } from '../shortString';
 import { felt, isLen } from './cairo';
 import formatter from './formatter';
@@ -92,7 +92,7 @@ export class CallData {
           let value = v;
           if (isLongText(value)) value = splitLongString(value);
           const kk = Array.isArray(oe) && k === '0' ? '$$len' : k;
-          if (BN.isBN(value)) return [[`${prefix}${kk}`, felt(value)]];
+          if (isBigInt(value)) return [[`${prefix}${kk}`, felt(value)]];
           return Object(value) === value
             ? getEntries(value, `${prefix}${kk}.`)
             : [[`${prefix}${kk}`, felt(value)]];

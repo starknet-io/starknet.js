@@ -1,5 +1,5 @@
 import { AbiEntry, Args, ParsedStruct, abiStructs } from '../../types';
-import { BigNumberish, toBN } from '../number';
+import { BigNumberish } from '../number';
 import { isLen, isTypeArray, isTypeTuple } from './cairo';
 import extractTupleMemberTypes from './tuple';
 
@@ -34,7 +34,7 @@ function parseResponseStruct(
     }, {} as any);
   }
   const temp = responseIterator.next().value;
-  return toBN(temp);
+  return BigInt(temp);
 }
 
 /**
@@ -58,7 +58,7 @@ export default function responseParser(
   switch (true) {
     case isLen(name):
       temp = responseIterator.next().value;
-      return toBN(temp).toNumber();
+      return BigInt(temp);
     case isTypeArray(type):
       // eslint-disable-next-line no-case-declarations
       const parsedDataArr: (BigNumberish | ParsedStruct)[] = [];
@@ -76,6 +76,6 @@ export default function responseParser(
       return parseResponseStruct(responseIterator, type, structs);
     default:
       temp = responseIterator.next().value;
-      return toBN(temp);
+      return BigInt(temp);
   }
 }

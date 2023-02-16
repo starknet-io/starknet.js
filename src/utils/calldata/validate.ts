@@ -2,8 +2,6 @@
  * Validate cairo contract method arguments
  * Flow: Determine type from abi and than validate against parameter
  */
-
-import BN from 'bn.js';
 import assert from 'minimalistic-assert';
 
 import { AbiEntry, FunctionAbi, abiStructs } from '../../types';
@@ -13,7 +11,7 @@ import { isLen, isTypeArray, isTypeFelt, isTypeStruct, isTypeTuple } from './cai
 
 const validateFelt = (parameter: any, input: AbiEntry) => {
   assert(
-    typeof parameter === 'string' || typeof parameter === 'number' || parameter instanceof BN,
+    typeof parameter === 'string' || typeof parameter === 'number' || typeof parameter === 'bigint',
     `Validate: arg ${input.name} should be a felt (string, number, BigNumber)`
   );
 };

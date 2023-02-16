@@ -1,10 +1,9 @@
-import { isBN } from 'bn.js';
-
+import { isBigInt } from '../number';
 import { decodeShortString } from '../shortString';
 
 const guard = {
   isBN: (data: any, type: any, key: any) => {
-    if (!isBN(data[key]))
+    if (!isBigInt(data[key]))
       throw new Error(
         `Data and formatter mismatch on ${key}:${type[key]}, expected response data ${key}:${
           data[key]
@@ -43,7 +42,7 @@ export default function formatter(data: any, type: any, sameType?: any) {
     }
     if (elType === 'number') {
       guard.isBN(data, type, key);
-      acc[key] = value.toNumber();
+      acc[key] = Number(value);
       return acc;
     }
     if (typeof elType === 'function') {

@@ -1,9 +1,7 @@
-import BN from 'bn.js';
-
 import { abiStructs } from '../../types';
-import { BigNumberish, isHex, isStringWholeNumber, toBN } from '../number';
+import { BigNumberish, isBigInt, isHex, isStringWholeNumber } from '../number';
 import { encodeShortString, isShortString, isText } from '../shortString';
-import { Uint256, isUint256 } from '../uint256';
+import { UINT_128_MAX, Uint256, isUint256 } from '../uint256';
 
 export const isLen = (name: string) => /_len$/.test(name);
 export const isTypeFelt = (type: string) => type === 'felt';
@@ -23,11 +21,13 @@ export const isTypeStruct = (type: string, structs: abiStructs) => type in struc
  * Uint256 cairo type (helper for common struct type)
  */
 export const uint256 = (it: BigNumberish): Uint256 => {
-  const bn = toBN(it);
+  const bn = BigInt(it);
   if (!isUint256(bn)) throw new Error('Number is too large');
   return {
-    low: bn.maskn(128).toString(10),
-    high: bn.shrn(128).toString(10),
+    // eslint-disable-next-line no-bitwise
+    low: (bn & UINT_128_MAX).toString(10),
+    // eslint-disable-next-line no-bitwise
+    high: (bn >> 128n).toString(10),
   };
 };
 
@@ -41,7 +41,7 @@ export const tuple = (...args: (BigNumberish | object)[]) => ({ ...args });
  */
 export function felt(it: BigNumberish): string {
   // BN or number
-  if (BN.isBN(it) || (typeof it === 'number' && Number.isInteger(it))) {
+  if (isBigInt(it) || (typeof it === 'number' && Number.isInteger(it))) {
     return it.toString();
   }
   // string text
@@ -51,12 +51,12 @@ export function felt(it: BigNumberish): string {
         `${it} is a long string > 31 chars, felt can store short strings, split it to array of short strings`
       );
     const encoded = encodeShortString(it as string);
-    return toBN(encoded).toString();
+    return BigInt(encoded).toString();
   }
   // hex string
   if (typeof it === 'string' && isHex(it)) {
     // toBN().toString
-    return toBN(it).toString();
+    return BigInt(it).toString();
   }
   // string number (already converted), or unhandled type
   if (typeof it === 'string' && isStringWholeNumber(it)) {
