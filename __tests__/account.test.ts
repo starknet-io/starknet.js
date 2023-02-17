@@ -1,5 +1,6 @@
 import typedDataExample from '../__mocks__/typedDataExample.json';
-import { Account, Contract, Provider, TransactionStatus, ec, number, stark } from '../src';
+import { Account, Contract, Provider, TransactionStatus, ec, stark } from '../src';
+import { uint256 } from '../src/utils/calldata/cairo';
 import { parseUDCEvent } from '../src/utils/events';
 import { calculateContractAddressFromHash, feeTransactionVersion } from '../src/utils/hash';
 import { cleanHex, hexToDecimalString, toBigInt, toHex } from '../src/utils/number';
@@ -40,9 +41,8 @@ describe('deploy and test Wallet', () => {
     erc20Address = declareDeploy.deploy.contract_address;
     erc20 = new Contract(compiledErc20.abi, erc20Address, provider);
 
-    const x = await erc20.balanceOf(account.address);
-
-    expect(number.toBigInt(x[0].low).toString()).toStrictEqual(number.toBigInt(1000).toString());
+    const { balance } = await erc20.balanceOf(account.address);
+    expect(BigInt(balance.low).toString()).toStrictEqual(BigInt(1000).toString());
 
     const dappResponse = await account.declareAndDeploy({
       contract: compiledTestDapp,
@@ -111,9 +111,9 @@ describe('deploy and test Wallet', () => {
   });
 
   test('read balance of wallet', async () => {
-    const x = await erc20.balanceOf(account.address);
+    const { balance } = await erc20.balanceOf(account.address);
 
-    expect(number.toBigInt(x[0].low).toString()).toStrictEqual(number.toBigInt(1000).toString());
+    expect(BigInt(balance.low).toString()).toStrictEqual(BigInt(1000).toString());
   });
 
   test('execute by wallet owner', async () => {
@@ -211,7 +211,7 @@ describe('deploy and test Wallet', () => {
     });
 
     test('estimate gas fee for `mint`', async () => {
-      const res = await erc20.estimateFee.mint(wallet, ['10', '0']);
+      const res = await erc20.estimateFee.mint(wallet, uint256('10'));
       expect(res).toHaveProperty('overall_fee');
     });
 

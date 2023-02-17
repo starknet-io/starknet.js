@@ -1,3 +1,25 @@
+# [4.21.0](https://github.com/0xs34n/starknet.js/compare/v4.20.0...v4.21.0) (2023-01-18)
+
+### Bug Fixes
+
+- fix merge conflicts from develop ([a8b01e3](https://github.com/0xs34n/starknet.js/commit/a8b01e351bb2d62f98d874d836a3f4046d5e046f))
+
+### Features
+
+- add get_block_traces support in sequencer ([b8dec62](https://github.com/0xs34n/starknet.js/commit/b8dec62c06dabcd3b917d6b53f318df2a0a8dfe4))
+- update types get_block_traces in sequencer ([2a8d97a](https://github.com/0xs34n/starknet.js/commit/2a8d97a532bb2c9f84436daa2b88abc81a4efa41))
+
+# [4.20.0](https://github.com/0xs34n/starknet.js/compare/v4.19.3...v4.20.0) (2023-01-17)
+
+### Bug Fixes
+
+- add utility getter in Block class ([3a52292](https://github.com/0xs34n/starknet.js/commit/3a5229277978c3235eaf1f7003b39eeabecac53e))
+- update responseParser & query parameters for sequencer ([a72db02](https://github.com/0xs34n/starknet.js/commit/a72db020aa1ac6924b2c047d067d553ac1b87248))
+
+### Features
+
+- add support for get_state_update in provider ([76035a1](https://github.com/0xs34n/starknet.js/commit/76035a148e7863fa1dbe440920eca34498480aa9))
+
 # [5.0.0-beta.4](https://github.com/0xs34n/starknet.js/compare/v5.0.0-beta.3...v5.0.0-beta.4) (2023-01-24)
 
 ### Bug Fixes

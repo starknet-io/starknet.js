@@ -127,6 +127,7 @@ export type EntryPointType = 'EXTERNAL';
 export type CompressedProgram = string;
 
 export type AbiEntry = { name: string; type: 'felt' | 'felt*' | string };
+export type Tupled = { element: any; type: string };
 
 export type FunctionAbi = {
   inputs: AbiEntry[];
@@ -141,6 +142,8 @@ enum FunctionAbiType {
   'l1_handler',
   'constructor',
 }
+
+export type abiStructs = { [name: string]: StructAbi };
 
 export type StructAbi = {
   members: (AbiEntry & { offset: number })[];

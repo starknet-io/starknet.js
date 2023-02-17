@@ -67,6 +67,28 @@ export type CallL1Handler = {
   payload: Array<string>;
 };
 
+export type StateDiffItem = {
+  key: string;
+  value: string;
+};
+
+export type StorageDiffItem = {
+  address: string;
+  storage_entries: [key: string, value: string];
+};
+
+export type DeployedContractItem = {
+  address: string;
+  class_hash: string;
+};
+
+export type Nonces = {
+  contract_address: string;
+  nonce: string;
+};
+
+export type SequencerIdentifier = { blockHash: string } | { blockNumber: BlockNumber };
+
 export namespace Sequencer {
   export type DeclareTransaction = {
     type: 'DECLARE';
@@ -257,6 +279,24 @@ export namespace Sequencer {
 
   export type EstimateFeeResponseBulk = AllowArray<EstimateFeeResponse>;
 
+  export type BlockTransactionTracesResponse = {
+    traces: Array<TransactionTraceResponse & { transaction_hash: string }>;
+  };
+
+  export type StateUpdateResponse = {
+    block_hash: string;
+    new_root: string;
+    old_root: string;
+    state_diff: {
+      storage_diffs: Array<{
+        [address: string]: Array<StateDiffItem>;
+      }>;
+      declared_contract_hashes: Array<string>;
+      deployed_contracts: Array<DeployedContractItem>;
+      nonces: Array<Nonces>;
+    };
+  };
+
   export type Endpoints = {
     get_contract_addresses: {
       QUERY: never;
@@ -359,10 +399,11 @@ export namespace Sequencer {
     };
     get_state_update: {
       QUERY: {
-        blockHash: string;
+        blockHash?: string;
+        blockNumber?: BlockNumber;
       };
       REQUEST: never;
-      RESPONSE: any;
+      RESPONSE: StateUpdateResponse;
     };
     get_full_contract: {
       QUERY: {
@@ -390,6 +431,14 @@ export namespace Sequencer {
       };
       REQUEST: EstimateFeeRequestBulk;
       RESPONSE: EstimateFeeResponseBulk;
+    };
+    get_block_traces: {
+      QUERY: {
+        blockHash?: string;
+        blockNumber?: BlockNumber;
+      };
+      REQUEST: never;
+      RESPONSE: BlockTransactionTracesResponse;
     };
   };
 }

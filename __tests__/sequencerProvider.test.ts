@@ -1,7 +1,15 @@
-import { Contract, GatewayError, HttpError, Provider, SequencerProvider, stark } from '../src';
+import {
+  BlockNumber,
+  Contract,
+  GatewayError,
+  GetBlockResponse,
+  HttpError,
+  Provider,
+  SequencerProvider,
+  stark,
+} from '../src';
 import * as fetchModule from '../src/utils/fetchPonyfill';
 import { stringify } from '../src/utils/json';
-import { toBigInt } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
 import {
   compiledErc20,
@@ -16,6 +24,15 @@ import {
 describeIfSequencer('SequencerProvider', () => {
   const sequencerProvider = getTestProvider() as SequencerProvider;
   const account = getTestAccount(sequencerProvider);
+  let exampleBlock: GetBlockResponse;
+  let exampleBlockNumber: BlockNumber;
+  let exampleBlockHash: string;
+
+  beforeAll(async () => {
+    exampleBlock = await sequencerProvider.getBlock('latest');
+    exampleBlockHash = exampleBlock.block_hash;
+    exampleBlockNumber = exampleBlock.block_number;
+  });
 
   describe('Generic fetch', () => {
     const fetchSpy = jest.spyOn(fetchModule, 'default');
@@ -149,10 +166,30 @@ describeIfSequencer('SequencerProvider', () => {
     });
 
     test('Check ERC20 balance using Custom Sequencer Provider', async () => {
-      const result = await erc20.balanceOf(wallet);
-      const [res] = result;
-      expect(res.low).toStrictEqual(toBigInt(1000));
-      expect(res).toStrictEqual(result.balance);
+      const { balance } = await erc20.balanceOf(wallet);
+      expect(balance.low).toStrictEqual(BigInt(1000));
+    });
+  });
+
+  describe('getBlockTraces', () => {
+    test(`getBlockTraces(blockHash=${exampleBlockHash}, blockNumber=undefined)`, async () => {
+      const blockTraces = await sequencerProvider.getBlockTraces(exampleBlockHash);
+      expect(blockTraces).toHaveProperty('traces');
+      expect(blockTraces.traces[0]).toHaveProperty('validate_invocation');
+      expect(blockTraces.traces[0]).toHaveProperty('function_invocation');
+      expect(blockTraces.traces[0]).toHaveProperty('fee_transfer_invocation');
+      expect(blockTraces.traces[0]).toHaveProperty('signature');
+      expect(blockTraces.traces[0]).toHaveProperty('transaction_hash');
+    });
+
+    test(`getBlockTraces(blockHash=undefined, blockNumber=${exampleBlockNumber})`, async () => {
+      const blockTraces = await sequencerProvider.getBlockTraces(exampleBlockNumber);
+      expect(blockTraces).toHaveProperty('traces');
+      expect(blockTraces.traces[0]).toHaveProperty('validate_invocation');
+      expect(blockTraces.traces[0]).toHaveProperty('function_invocation');
+      expect(blockTraces.traces[0]).toHaveProperty('fee_transfer_invocation');
+      expect(blockTraces.traces[0]).toHaveProperty('signature');
+      expect(blockTraces.traces[0]).toHaveProperty('transaction_hash');
     });
   });
 });

@@ -65,8 +65,11 @@ export function parseSignature(sig?: string[]) {
   return new Signature(toBigInt(r), toBigInt(s));
 }
 
+/**
+ * @deprecated this function is deprecated use callData instead from calldata.ts
+ */
 export function compileCalldata(args: RawArgs): Calldata {
-  return Object.values(args).flatMap((value) => {
+  const compiledData = Object.values(args).flatMap((value) => {
     if (Array.isArray(value))
       return [toBigInt(value.length).toString(), ...value.map((x) => toBigInt(x).toString())];
     if (typeof value === 'object' && 'type' in value)
@@ -75,6 +78,12 @@ export function compileCalldata(args: RawArgs): Calldata {
         .map(([, v]) => toBigInt(v).toString());
     return toBigInt(value).toString();
   });
+  Object.defineProperty(compiledData, 'compiled', {
+    enumerable: false,
+    writable: false,
+    value: true,
+  });
+  return compiledData;
 }
 
 export function estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: number = 0.5): bigint {

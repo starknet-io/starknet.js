@@ -24,13 +24,6 @@ export function hexToDecimalString(hex: string): string {
   return BigInt(addHexPrefix(hex)).toString(10);
 }
 
-export function toFelt(num: BigNumberish): string {
-  if (isBigInt(num)) {
-    return num.toString();
-  }
-  return BigInt(num).toString();
-}
-
 /**
  * Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
  * @param hex string

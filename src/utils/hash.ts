@@ -5,18 +5,11 @@ import { hexToBytes } from 'ethereum-cryptography/utils.js';
 
 import { API_VERSION, MASK_250, StarknetChainId, TransactionHashPrefix } from '../constants';
 import { CompiledContract, RawCalldata } from '../types/lib';
+import { felt } from './calldata/cairo';
 import { starkCurve } from './ec';
 import { addHexPrefix, buf2hex, removeHexPrefix, utf8ToArray } from './encode';
 import { parse, stringify } from './json';
-import {
-  BigNumberish,
-  isHex,
-  isStringWholeNumber,
-  toBigInt,
-  toFelt,
-  toHex,
-  toHexString,
-} from './number';
+import { BigNumberish, isHex, isStringWholeNumber, toBigInt, toHex, toHexString } from './number';
 import { encodeShortString } from './shortString';
 
 export const transactionVersion = 1n;
@@ -194,7 +187,7 @@ export function calculateContractAddressFromHash(
 ) {
   const constructorCalldataHash = computeHashOnElements(constructorCalldata);
 
-  const CONTRACT_ADDRESS_PREFIX = toFelt('0x535441524b4e45545f434f4e54524143545f41444452455353'); // Equivalent to 'STARKNET_CONTRACT_ADDRESS'
+  const CONTRACT_ADDRESS_PREFIX = felt('0x535441524b4e45545f434f4e54524143545f41444452455353'); // Equivalent to 'STARKNET_CONTRACT_ADDRESS'
 
   return computeHashOnElements([
     CONTRACT_ADDRESS_PREFIX,
