@@ -397,7 +397,7 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async waitForTransaction(txHash: string, options?: waitForTransactionOptions) {
-    const errorStates = [TransactionStatus.RECEIVED, TransactionStatus.NOT_RECEIVED];
+    const errorStates = [TransactionStatus.REJECTED, TransactionStatus.NOT_RECEIVED];
     let { retries } = this;
     let onchain = false;
     let txReceipt: any = {};
