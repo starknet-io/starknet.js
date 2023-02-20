@@ -23,14 +23,14 @@ The easiest way to get started is:
 const provider = new starknet.Provider()
 ```
 
-The above snippet creates a Starknet Provider instance with `goerli-alpha` network.
+The above snippet creates a Starknet Provider instance with testnet `SN_GOERLI2` network.
 
-However, if you want to use `mainnet-alpha` or explicitly declare the network, you can use:
+However, if you want to use mainnet `SN_MAIN` or explicitly declare the network, you can use:
 
 ```typescript
 const provider = new starknet.Provider({
   sequencer: {
-    network: 'mainnet-alpha' // or 'goerli-alpha'
+    network: NetworkName.SN_MAIN // or NetworkName.SN_GOERLI2
   }
 })
 ```
@@ -40,14 +40,14 @@ If you want more control:
 ```typescript
 const provider = new starknet.Provider({
   sequencer: {
-    baseUrl: 'https://alpha4.starknet.io',
+    baseUrl: BaseUrl.SN_GOERLI,
     feederGatewayUrl: 'feeder_gateway',
     gatewayUrl: 'gateway',
   }
 })
 ```
 
-These are also the default options for the Provider constructor with `network: 'goerli-alpha'`.
+These are also the default options for the Provider constructor with `network: 'SN_GOERLI2'`.
 
 > **Note**
 >
@@ -247,7 +247,7 @@ Estimate fee for declare transaction.
 
 ### waitForTransaction()
 
-provider.**waitForTransaction**(txHash [ , retryInterval]) => _Promise < GetTransactionReceiptResponse >_
+provider.**waitForTransaction**(txHash [ , options]) => _Promise < GetTransactionReceiptResponse >_
 
 Wait for the transaction to be accepted on L2 or L1.
 

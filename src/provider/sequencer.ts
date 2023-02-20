@@ -500,7 +500,7 @@ export class SequencerProvider implements ProviderInterface {
   }
 
   public async waitForTransaction(txHash: BigNumberish, options?: waitForTransactionOptions) {
-    const errorStates = [TransactionStatus.RECEIVED, TransactionStatus.NOT_RECEIVED];
+    const errorStates = [TransactionStatus.REJECTED, TransactionStatus.NOT_RECEIVED];
     let onchain = false;
     let res;
     const retryInterval = options?.retryInterval ?? 8000;
