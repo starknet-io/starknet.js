@@ -15,14 +15,14 @@ import {Provider} from 'starknet';
 ## Connect your DAPP to StarkNet mainnet
 
 ```typescript
-const provider = new Provider({ sequencer: { network: 'mainnet-alpha' } })
+const provider = new Provider({ sequencer: { network: NetworkName.SN_MAIN } })
 ```
 
 ## Connect your DAPP to StarkNet testnet 1 & 2
 
 ```typescript
-const provider = new Provider({ sequencer: { network: 'goerli-alpha' } }) // for testnet 1
-const provider = new Provider({ sequencer: { network: 'goerli-alpha-2' } })  // for testnet 2
+const provider = new Provider({ sequencer: { network: NetworkName.SN_GOERLI } }) // for testnet 1
+const provider = new Provider({ sequencer: { network: NetworkName.SN_GOERLI2 } })  // for testnet 2
 ```
 
 ## Connect your DAPP to Starknet-devnet

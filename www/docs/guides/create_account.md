@@ -28,7 +28,7 @@ import { Account, ec, json, stark, Provider, hash } from "starknet";
 
 ```typescript
 // connect provider
-const provider = new Provider({ sequencer: { network: "goerli-alpha" } });
+const provider = new Provider({ sequencer: { network: NetworkName.SN_GOERLI } });
 
 // new Open Zeppelin account v0.5.1 :
     // Generate public and private key pair.
@@ -97,7 +97,7 @@ import { Account, ec, json, stark, Provider, hash } from "starknet";
 
 ```typescript
 // connect provider
-const provider = new Provider({ sequencer: { network: "goerli-alpha" } });
+const provider = new Provider({ sequencer: { network: NetworkName.SN_GOERLI } });
 
 //new Argent X account v0.2.3 :
 const argentXproxyClassHash = "0x25ec026985a3bf9d0cc1fe17326b245dfdc3ff89b8fde106542a3ea56c5a918";
