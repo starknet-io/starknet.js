@@ -2,7 +2,7 @@ import { Contract, ContractFactory, json, stark } from '../src';
 import { CallData } from '../src/utils/calldata';
 import { felt, tuple, uint256 } from '../src/utils/calldata/cairo';
 import { getSelectorFromName } from '../src/utils/hash';
-import { BigNumberish, toBigInt } from '../src/utils/number';
+import { BigNumberish, hexToDecimalString, toBigInt } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
 import { compileCalldata } from '../src/utils/stark';
 import { uint256ToBN } from '../src/utils/uint256';
@@ -376,8 +376,9 @@ describe('Complex interaction', () => {
 
     const compiled = CallData.compile(newCalldata);
     const doubleCompiled = CallData.compile(compiled);
-    const reference =
-      '["6084199704987259979","5067851","18","1234","1000000000000","0","3562055384976875123115280411327378123839557441680670463096306030682092229914","10","20","48","40","1","2","10","20","22","33","1","2","3","4","22","33","1","33","1415934836","123333333","0","1","2","3","1","321","322","33","0","2","123","291","3","1","2","10","20","100","200","2","111","112","121","122","211","212","221","222"]';
+    const reference = `["6084199704987259979","5067851","18","1234","1000000000000","0","${hexToDecimalString(
+      account.address
+    )}","10","20","48","40","1","2","10","20","22","33","1","2","3","4","22","33","1","33","1415934836","123333333","0","1","2","3","1","321","322","33","0","2","123","291","3","1","2","10","20","100","200","2","111","112","121","122","211","212","221","222"]`;
     expect(json.stringify(compiled)).toBe(reference);
     expect(json.stringify(doubleCompiled)).toBe(reference);
   });
