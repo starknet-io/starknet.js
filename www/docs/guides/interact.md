@@ -39,7 +39,7 @@ You have to use the call function : `contract.call("function_name",[params])` (h
 
 ```typescript
 //initialize Provider
-const provider = new Provider({ sequencer: { network: "goerli-alpha" } });
+const provider = new Provider({ sequencer: { network: NetworkName.SN_GOERLI } });
 // Connect the deployed Test contract in Tesnet
 const testAddress = "0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd";
 
@@ -64,7 +64,7 @@ Here is an example to increase and check the balance :
 
 ```typescript
 //initialize Provider
-const provider = new Provider({ sequencer: { network: "goerli-alpha" } });
+const provider = new Provider({ sequencer: { network: NetworkName.SN_GOERLI } });
 // connect your account. To adapt to your own account :
 const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
 const account0Address = "0x123....789";
@@ -104,7 +104,7 @@ The code can be modified this way :
 
 ```typescript
 //initialize Provider
-const provider = new Provider({ sequencer: { network: "goerli-alpha" } });
+const provider = new Provider({ sequencer: { network: NetworkName.SN_GOERLI } });
 // connect your account. To adapt to your own account :
 const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
 const account0Address = "0x123....789";

@@ -19,14 +19,14 @@ The options for the provider depend on the network. The structure of the options
 
 or
 
-- options.**network** - Either 'mainnet-alpha' or 'goerli-alpha'
+- options.**network** - NetworkName
 - options.**headers** - [Optional] custom fetch headers
 
 Example:
 
 ```typescript
 const provider = new starknet.SequencerProvider({
-  baseUrl: 'https://alpha4.starknet.io',
+  baseUrl: BaseUrl.SN_GOERLI,
   feederGatewayUrl: 'feeder_gateway',
   gatewayUrl: 'gateway',
 })
