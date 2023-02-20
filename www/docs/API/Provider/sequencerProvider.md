@@ -26,7 +26,7 @@ Example:
 
 ```typescript
 const provider = new starknet.SequencerProvider({
-  baseUrl: 'https://alpha4.starknet.io',
+  baseUrl: BaseUrl.SN_GOERLI,
   feederGatewayUrl: 'feeder_gateway',
   gatewayUrl: 'gateway',
 })

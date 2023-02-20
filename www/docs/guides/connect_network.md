@@ -65,7 +65,7 @@ For example, if you want to estimate the fee of a L1 ➡️ L2 message, you need
 
 ```typescript
 import { SequencerProvider } from "starknet";
-const provider = new SequencerProvider({ baseUrl: "https://alpha4-2.starknet.io" }); // for testnet 2
+const provider = new SequencerProvider({ baseUrl: BaseUrl.SN_GOERLI2 }); // for testnet 2
 const responseEstimateMessageFee = await provider.estimateMessageFee(.....)
 ```
 

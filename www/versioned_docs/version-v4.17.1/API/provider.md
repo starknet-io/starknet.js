@@ -42,7 +42,7 @@ If you want more control:
 ```typescript
 const provider = new starknet.Provider({
   sequencer: {
-    baseUrl: 'https://alpha4.starknet.io',
+    baseUrl: BaseUrl.SN_GOERLI,
     feederGatewayUrl: 'feeder_gateway',
     gatewayUrl: 'gateway',
   }
@@ -277,7 +277,7 @@ Example:
 
 ```typescript
 const provider = new starknet.SequencerProvider({
-  baseUrl: 'https://alpha4.starknet.io',
+  baseUrl: BaseUrl.SN_GOERLI,
   feederGatewayUrl: 'feeder_gateway',
   gatewayUrl: 'gateway',
 })
