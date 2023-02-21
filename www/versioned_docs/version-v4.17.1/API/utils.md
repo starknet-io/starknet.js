@@ -8,7 +8,7 @@ Util functions are provided so you can use various low level functions in your a
 
 ## **address**
 
-Helper functions for StarkNet addresses.
+Helper functions for Starknet addresses.
 
 ### validateAndParseAddress
 
@@ -264,7 +264,7 @@ Returns a string.
 
 `calculateTransactionHashCommon(txHashPrefix: TransactionHashPrefix, version: BigNumberish,contractAddress: BigNumberish, entryPointSelector: BigNumberish, calldata: BigNumberish[], maxFee: BigNumberish, chainId: StarknetChainId, additionalData: BigNumberish[] = []): string`
 
-Calculates the transaction hash in the StarkNet network - a unique identifier of the transaction.
+Calculates the transaction hash in the Starknet network - a unique identifier of the transaction.
 
 Called internally in `calculateDeployTransactionHash` and `calculateTransactionHash`.
 
@@ -272,7 +272,7 @@ Called internally in `calculateDeployTransactionHash` and `calculateTransactionH
 
 `calculateDeployTransactionHash(contractAddress: BigNumberish, constructorCalldata: BigNumberish[], version: BigNumberish, chainId: StarknetChainId): string`
 
-Function that calculates the deployment transaction hash in the StarkNet network.
+Function that calculates the deployment transaction hash in the Starknet network.
 
 Internally calls `calculateTransactionHashCommon` with `TransactionHashPrefix.DEPLOY`.
 

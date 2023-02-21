@@ -27,7 +27,7 @@ This way, the ERC20 contract is absolutely sure that the caller of the transfer 
 
 ## ETH token is an ERC20 in Starknet
 
-In opposition with Ethereum, the ETH token is an ERC20 in StarkNet, as all other tokens. In all networks, it's ERC20 contract address is :
+In opposition with Ethereum, the ETH token is an ERC20 in Starknet, as all other tokens. In all networks, it's ERC20 contract address is :
 
 ```typescript
 const addrETH = "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7";
@@ -56,7 +56,7 @@ Declaration and deployment of the ERC20 contract :
 
 ```typescript
 // Deploy an ERC20 contract
-console.log("Deployment Tx - ERC20 Contract to StarkNet...");
+console.log("Deployment Tx - ERC20 Contract to Starknet...");
 const compiledErc20mintable = json.parse(fs.readFileSync("compiled_contracts/ERC20MintableOZ051.json").toString("ascii"));
 const ERC20mintableClassHash = "0x795be772eab12ee65d5f3d9e8922d509d6672039978acc98697c0a563669e8";
 const initialTk = { low: 100, high: 0 };
@@ -92,7 +92,7 @@ Here we will read the balance, mint new tokens, and transfer tokens :
 
 ```typescript
 // Check balance - should be 100
-console.log(`Calling StarkNet for account balance...`);
+console.log(`Calling Starknet for account balance...`);
 const balanceInitial = await erc20.balanceOf(account0.address);
 console.log("account0 has a balance of :", uint256.uint256ToBN(balanceInitial.balance).toString());
 
@@ -105,12 +105,12 @@ const { transaction_hash: mintTxHash } = await erc20.mint(
 	{ maxFee: 900_000_000_000_000 }
 );
 
-// Wait for the invoke transaction to be accepted on StarkNet
-console.log(`Waiting for Tx to be Accepted on StarkNet - Minting...`);
+// Wait for the invoke transaction to be accepted on Starknet
+console.log(`Waiting for Tx to be Accepted on Starknet - Minting...`);
 await provider.waitForTransaction(mintTxHash);
 
 // Check balance - should be 1100
-console.log(`Calling StarkNet for account balance...`);
+console.log(`Calling Starknet for account balance...`);
 const balanceBeforeTransfer = await erc20.balanceOf(account0.address);
 console.log("account0 has a balance of :", uint256.uint256ToBN(balanceBeforeTransfer.balance).toString());
 
@@ -130,12 +130,12 @@ const { transaction_hash: transferTxHash } = await account0.execute({
 	{ maxFee: 900_000_000_000_000 }
 );
 
-// Wait for the invoke transaction to be accepted on StarkNet
-console.log(`Waiting for Tx to be Accepted on StarkNet - Transfer...`);
+// Wait for the invoke transaction to be accepted on Starknet
+console.log(`Waiting for Tx to be Accepted on Starknet - Transfer...`);
 await provider.waitForTransaction(transferTxHash);
 
 // Check balance after transfer - should be 1090
-console.log(`Calling StarkNet for account balance...`);
+console.log(`Calling Starknet for account balance...`);
 const balanceAfterTransfer = await erc20.balanceOf(account0.address);
 console.log("account0 has a balance of :", uint256.uint256ToBN(balanceAfterTransfer.balance).toString());
 console.log("✅ Script completed.");

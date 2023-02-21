@@ -6,7 +6,7 @@ sidebar_position: 7
 
 When you have compiled your new Cairo contract, you can deploy it in the network.
 
-In StarkNet, a new contract has to be added in two phases :
+In Starknet, a new contract has to be added in two phases :
 
 1. Create the contract class.
 2. Deploy an instance of the contract.

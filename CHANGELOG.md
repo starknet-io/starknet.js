@@ -1,3 +1,10 @@
+## [4.21.1](https://github.com/0xs34n/starknet.js/compare/v4.21.0...v4.21.1) (2023-02-20)
+
+### Bug Fixes
+
+- remove hex prefix should work insensitive, for both 0x and 0X ([53323d4](https://github.com/0xs34n/starknet.js/commit/53323d434d5edbeee03c4262935676c950a761d3))
+- repair decodeShortString for integer strings ([1d6adf0](https://github.com/0xs34n/starknet.js/commit/1d6adf01a64f93b7016d083b81dba4e409371e74))
+
 # [4.21.0](https://github.com/0xs34n/starknet.js/compare/v4.20.0...v4.21.0) (2023-01-18)
 
 ### Bug Fixes
