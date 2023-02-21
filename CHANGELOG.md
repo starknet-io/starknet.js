@@ -1,3 +1,31 @@
+# [5.0.0-beta.5](https://github.com/0xs34n/starknet.js/compare/v5.0.0-beta.4...v5.0.0-beta.5) (2023-02-21)
+
+### Bug Fixes
+
+- add utility getter in Block class ([3a52292](https://github.com/0xs34n/starknet.js/commit/3a5229277978c3235eaf1f7003b39eeabecac53e))
+- compile response ts type ([4b71970](https://github.com/0xs34n/starknet.js/commit/4b719702d3317af0fa753609e7205bb26416cda0))
+- contract related test ([6dfc010](https://github.com/0xs34n/starknet.js/commit/6dfc0102d15c5b4b339aebe25dba8767e63f0187))
+- fix merge conflicts from develop ([a8b01e3](https://github.com/0xs34n/starknet.js/commit/a8b01e351bb2d62f98d874d836a3f4046d5e046f))
+- invoke contract ([18b6337](https://github.com/0xs34n/starknet.js/commit/18b6337e9e87a9b35d585a68f76896dfe01983c6))
+- options split for edge case ([acfab34](https://github.com/0xs34n/starknet.js/commit/acfab34f3cdca670ecd1793954a9bf53104ae4f1))
+- post beta merge fixes ([aa6046f](https://github.com/0xs34n/starknet.js/commit/aa6046f2080e5f8c46e4cee7930d851b97312c3f))
+- repair decodeShortString for integer strings ([1d6adf0](https://github.com/0xs34n/starknet.js/commit/1d6adf01a64f93b7016d083b81dba4e409371e74))
+- strict tuple rule, type bugfix, basic tuple validator ([1c97279](https://github.com/0xs34n/starknet.js/commit/1c9727963d00dc3143af08d7479c040c0d171e5f))
+- tests ([85535e5](https://github.com/0xs34n/starknet.js/commit/85535e507cdc8307b4268ce7cef9c9fa4eb3c270))
+- transaction status fix ([2cfcb69](https://github.com/0xs34n/starknet.js/commit/2cfcb690f25f0025cd08734e31167c1c969056f9))
+- update responseParser & query parameters for sequencer ([a72db02](https://github.com/0xs34n/starknet.js/commit/a72db020aa1ac6924b2c047d067d553ac1b87248))
+
+### Features
+
+- add get_block_traces support in sequencer ([b8dec62](https://github.com/0xs34n/starknet.js/commit/b8dec62c06dabcd3b917d6b53f318df2a0a8dfe4))
+- add support for get_state_update in provider ([76035a1](https://github.com/0xs34n/starknet.js/commit/76035a148e7863fa1dbe440920eca34498480aa9))
+- format arbitrary length array, test edge case tuple arrays ([42357b6](https://github.com/0xs34n/starknet.js/commit/42357b6128e6cc8ebe1067f5a85b0c8704316288))
+- implement longText aka. long string into calldata, remove toFelt and resolve circular ref ([da58b5a](https://github.com/0xs34n/starknet.js/commit/da58b5a5a089a7ec82cf37c78f11bd1bf44144ff))
+- make compile work with already compiled data, complete test ([7e80837](https://github.com/0xs34n/starknet.js/commit/7e8083728c96efceb7b7163f2fe59293ebd63f04))
+- response formatter, refactored call method resturn object ([77ee9f4](https://github.com/0xs34n/starknet.js/commit/77ee9f434fb2ed66703976c97e348663f672fadb))
+- response parse tuple, moved to calldata class, test ([dbe04de](https://github.com/0xs34n/starknet.js/commit/dbe04de5ff2d026afeb20c09d1898caae3d6b708))
+- update types get_block_traces in sequencer ([2a8d97a](https://github.com/0xs34n/starknet.js/commit/2a8d97a532bb2c9f84436daa2b88abc81a4efa41))
+
 # [4.21.0](https://github.com/0xs34n/starknet.js/compare/v4.20.0...v4.21.0) (2023-01-18)
 
 ### Bug Fixes
