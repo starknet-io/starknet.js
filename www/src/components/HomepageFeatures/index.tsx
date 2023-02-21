@@ -14,7 +14,7 @@ const FeatureList: FeatureItem[] = [
     image: '/img/starknet-3.png',
     description: (
       <>
-        StarkNet supports scale, while preserving the security of L1 Ethereum by producing STARK proofs off-chain, and then verifying those proofs on-chain.
+        Starknet supports scale, while preserving the security of L1 Ethereum by producing STARK proofs off-chain, and then verifying those proofs on-chain.
       </>
     ),
   },
@@ -23,7 +23,7 @@ const FeatureList: FeatureItem[] = [
     image: '/img/starknet-2.png',
     description: (
       <>
-        On StarkNet, developers can easily deploy any business logic using StarkNet Contracts.
+        On Starknet, developers can easily deploy any business logic using Starknet Contracts.
       </>
     ),
   },
@@ -32,7 +32,7 @@ const FeatureList: FeatureItem[] = [
     image: '/img/starknet-1.png',
     description: (
       <>
-        StarkNet provides Ethereum-level composability – facilitating easy development and innovation.
+        Starknet provides Ethereum-level composability – facilitating easy development and innovation.
       </>
     ),
   },
