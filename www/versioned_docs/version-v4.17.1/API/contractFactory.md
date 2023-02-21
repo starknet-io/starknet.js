@@ -4,7 +4,7 @@ sidebar_position: 5
 
 # Contract Factory
 
-Contract Factory allow you to deploy contracts to StarkNet. To deploy a Contract, additional information is needed that is not available on a Contract object itself.
+Contract Factory allow you to deploy contracts to Starknet. To deploy a Contract, additional information is needed that is not available on a Contract object itself.
 
 ## Creating an instance
 

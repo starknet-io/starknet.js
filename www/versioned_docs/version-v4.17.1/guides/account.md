@@ -4,16 +4,16 @@ sidebar_position: 2
 
 # Creating an Account
 
-Since there are no Externally Owned Accounts (EOA) in StarkNet, all Accounts in StarkNet are contracts.
+Since there are no Externally Owned Accounts (EOA) in Starknet, all Accounts in Starknet are contracts.
 
-Unlike in Ethereum where a wallet is created with a public and private key pair, StarkNet Accounts are the only way to sign transactions and messages, and verify signatures. Therefore a Account - Contract interface is needed.
+Unlike in Ethereum where a wallet is created with a public and private key pair, Starknet Accounts are the only way to sign transactions and messages, and verify signatures. Therefore a Account - Contract interface is needed.
 
-> Account contracts on StarkNet cannot be deployed without paying a fee.
+> Account contracts on Starknet cannot be deployed without paying a fee.
 
 High level explanations from StarkWare can be found in this Notion [page](https://starkware.notion.site/Deploy-a-contract-and-an-account-on-StarkNet-ed2fd13301d2414e8223bb72bb90e386), but in short, the process is:
 
 1. Decide on your account type (OpenZeppelin, Argent, ...)
-2. Compute the address of our would-be account off-chain (adressess on StarkNet are deterministic)
+2. Compute the address of our would-be account off-chain (adressess on Starknet are deterministic)
 3. Send funds to this pre-computed address. The funds will be used to pay for the account contract deployment
 4. Actual deployment of the Account
 
@@ -101,7 +101,7 @@ curl -X POST http://127.0.0.1:5050/mint -d '{"address":"0x04a093c37ab61065d00155
 
 > NOTE: This step will fail if you haven't sent funds to the pre-calculated address.
 
-We need to use an already deployed account in order to declare ours. StarkNet will always have at least 1 already declared/deployed account for this purpose.
+We need to use an already deployed account in order to declare ours. Starknet will always have at least 1 already declared/deployed account for this purpose.
 
 ```javascript
 // In this case we will use the devnet's predeployed OZ account, after you start the devnet with: `starknet-devnet --seed 0`
@@ -121,7 +121,7 @@ await provider.waitForTransaction(declareTx.transaction_hash);
 
 ## Deploy Account Contract
 
-Deploy the Account contract and wait for it to be verified on StarkNet.
+Deploy the Account contract and wait for it to be verified on Starknet.
 
 > NOTE: This step will fail if you haven't sent funds to the pre-calculated address.
 

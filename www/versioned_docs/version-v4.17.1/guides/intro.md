@@ -48,9 +48,9 @@ export TEST_RPC_URL = "http://127.0.0.1:5050/rpc"
 npm run test ./__tests__/rpcProvider.test.ts
 ```
 
-## Compiling StarkNet Contracts
+## Compiling Starknet Contracts
 
-Please check the StarkNet documentation <ins>[here](https://www.cairo-lang.org/docs/hello_starknet/intro.html)</ins> to compile starknet contracts.
+Please check the Starknet documentation <ins>[here](https://www.cairo-lang.org/docs/hello_starknet/intro.html)</ins> to compile starknet contracts.
 
 Additional helpful resources can also be found at <ins>[OpenZeppelin](https://docs.openzeppelin.com/contracts-cairo/0.5.0/)</ins> documentation site.
 

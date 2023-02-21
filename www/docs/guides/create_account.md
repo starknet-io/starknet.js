@@ -4,11 +4,11 @@ sidebar_position: 8
 
 # Create account
 
-Since there are no Externally Owned Accounts (EOA) in StarkNet, all Accounts in StarkNet are contracts.
+Since there are no Externally Owned Accounts (EOA) in Starknet, all Accounts in Starknet are contracts.
 
-Unlike in Ethereum where a wallet is created with a public and private key pair, StarkNet Accounts are the only way to sign transactions and messages, and verify signatures. Therefore a Account - Contract interface is needed.
+Unlike in Ethereum where a wallet is created with a public and private key pair, Starknet Accounts are the only way to sign transactions and messages, and verify signatures. Therefore a Account - Contract interface is needed.
 
-Account contracts on StarkNet cannot be deployed without paying a fee.
+Account contracts on Starknet cannot be deployed without paying a fee.
 Create an account is a bit tricky ; you have several steps :
 
 1. Decide on your account type (OpenZeppelin, Argent, ...).
@@ -57,7 +57,7 @@ Then you have to fund this address!
 How to proceed is out of the scope of this guide, by you can for example :
 
 - Transfer ETH from another wallet.
-- Bridge ETH to this StarkNet address.
+- Bridge ETH to this Starknet address.
 - Use a faucet. (https://faucet.goerli.starknet.io/)
 - Mint ETH on starknet-devnet, like so:
 
@@ -237,4 +237,4 @@ await provider.waitForTransaction(transaction_hash);
 console.log('✅ New customized account created.\n   address =', contract_address);
 ```
 
-The pre-computed address has been funded automatically by minting new dummy ETH in StarkNet devnet!
+The pre-computed address has been funded automatically by minting new dummy ETH in Starknet devnet!

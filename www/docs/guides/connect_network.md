@@ -12,13 +12,13 @@ With the Provider object, you define which network to use.
 import {Provider} from 'starknet';
 ```
 
-## Connect your DAPP to StarkNet mainnet
+## Connect your DAPP to Starknet mainnet
 
 ```typescript
 const provider = new Provider({ sequencer: { network: 'mainnet-alpha' } })
 ```
 
-## Connect your DAPP to StarkNet testnet 1 & 2
+## Connect your DAPP to Starknet testnet 1 & 2
 
 ```typescript
 const provider = new Provider({ sequencer: { network: 'goerli-alpha' } }) // for testnet 1
@@ -33,7 +33,7 @@ const provider = new Provider({ sequencer: { baseUrl:"http://127.0.0.1:5050"} })
 
 > If you have customized host and port during starknet-devnet initialization, adapt in accordance to your script.
 
-## Connect your DAPP to a private StarkNet network
+## Connect your DAPP to a private Starknet network
 
 If necessary you can have a full control on the network access (for example, for your company private test network) :
 

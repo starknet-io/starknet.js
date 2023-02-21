@@ -1,9 +1,9 @@
 /**
  * Starknet RPC version 0.2.0
  *
- * StarkNet Node API 0.45.0 - rpc 0.2.1
- * StarkNet Node Write API 0.3.0 - rpc 0.2.1
- * StarkNet Trace API 0.4.0 - rpc 0.2.1
+ * Starknet Node API 0.45.0 - rpc 0.2.1
+ * Starknet Node Write API 0.3.0 - rpc 0.2.1
+ * Starknet Trace API 0.4.0 - rpc 0.2.1
  *
  * TypeScript Representation of OpenRpc protocol types
  */
