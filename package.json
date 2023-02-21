@@ -30,6 +30,8 @@
     "posttest": "npm run format",
     "test:watch": "jest --watch",
     "docs": "cd www && npm run start",
+    "docs:version": "v=$(npm run info:version -s) && cd www && npm run version ${npm_config_version_override=$v}",
+    "info:version": "npm pkg get version | xargs",
     "format": "prettier --loglevel warn --write \"**/*.{ts,js,md,yml,json}\"",
     "lint": "eslint . --cache --fix --ext .ts",
     "ts:check": "tsc --noEmit --resolveJsonModule --project tsconfig.eslint.json"
