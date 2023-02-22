@@ -85,7 +85,7 @@
   },
   "dependencies": {
     "@ethersproject/bytes": "^5.6.1",
-    "@noble/curves": "^0.5.1",
+    "@noble/curves": "^0.7.1",
     "ethereum-cryptography": "^1.0.3",
     "isomorphic-fetch": "^3.0.0",
     "json-bigint": "^1.0.0",
