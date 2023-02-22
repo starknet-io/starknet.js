@@ -1,3 +1,9 @@
+# [4.22.0](https://github.com/0xs34n/starknet.js/compare/v4.21.1...v4.22.0) (2023-02-22)
+
+### Features
+
+- move starkname to provider ([8e88ed0](https://github.com/0xs34n/starknet.js/commit/8e88ed0dd9f651dd9decea75dfdae2357e6bfa4a))
+
 ## [4.21.1](https://github.com/0xs34n/starknet.js/compare/v4.21.0...v4.21.1) (2023-02-20)
 
 ### Bug Fixes
