@@ -293,7 +293,7 @@ describe('deploy and test Wallet', () => {
       const address = await account.getAddressFromStarkName('ben.stark', namingAddress);
       expect(hexToDecimalString(address as string)).toEqual(hexToDecimalString(account.address));
 
-      const name = await account.getStarkName(namingAddress);
+      const name = await account.getStarkName(undefined, namingAddress);
       expect(name).toEqual('ben.stark');
     });
   });

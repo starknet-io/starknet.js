@@ -34,7 +34,7 @@ export abstract class ProviderInterface {
   public abstract getChainId(): Promise<StarknetChainId>;
 
   /**
-   * Calls a function on the StarkNet contract.
+   * Calls a function on the Starknet contract.
    *
    * @param call transaction to be called
    * @param blockIdentifier block identifier
