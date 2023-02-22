@@ -160,7 +160,8 @@ Returns a string.
 
 `assertInRange(input: BigNumberish, lowerBound: BigNumberish, upperBound: BigNumberish, inputName = '')`
 
-Asserts input is equal to or greater then `lowerBound` and lower then `upperBound`. Assert message specifies inputName.
+Asserts input is equal to or greater than `lowerBound` and lower than `upperBound`. Assert message specifies inputName.
+`input`, `lowerBound`, and `upperBound` should be of type BigNumberish.
 `inputName` should be a string.
 
 ### bigNumberishArrayToDecimalStringArray
@@ -253,7 +254,7 @@ Returns a string.
 
 `computeHashOnElements(data: BigNumberish[])`
 
-Function to compute a Pedersen hash on a array of elements.
+Function to compute a Pedersen hash on an array of elements.
 
 Returns a string.
 
@@ -261,7 +262,7 @@ Returns a string.
 
 `calculateTransactionHashCommon(txHashPrefix: TransactionHashPrefix, version: BigNumberish,contractAddress: BigNumberish, entryPointSelector: BigNumberish, calldata: BigNumberish[], maxFee: BigNumberish, chainId: StarknetChainId, additionalData: BigNumberish[] = []): string`
 
-Calculates the transaction hash in the StarkNet network - a unique identifier of the transaction.
+Calculates the transaction hash in the Starknet network - a unique identifier of the transaction.
 
 Called internally in `calculateDeployTransactionHash` and `calculateTransactionHash`.
 
@@ -269,7 +270,7 @@ Called internally in `calculateDeployTransactionHash` and `calculateTransactionH
 
 `calculateDeployTransactionHash(contractAddress: BigNumberish, constructorCalldata: BigNumberish[], version: BigNumberish, chainId: StarknetChainId): string`
 
-Function that calculates the deployment transaction hash in the StarkNet network.
+Function that calculates the deployment transaction hash in the Starknet network.
 
 Internally calls `calculateTransactionHashCommon` with `TransactionHashPrefix.DEPLOY`.
 

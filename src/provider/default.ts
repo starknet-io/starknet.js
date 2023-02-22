@@ -25,6 +25,7 @@ import { BigNumberish } from '../utils/number';
 import { ProviderInterface } from './interface';
 import { RpcProvider, RpcProviderOptions } from './rpc';
 import { SequencerProvider, SequencerProviderOptions } from './sequencer';
+import { getAddressFromStarkName, getStarkName } from './starknetId';
 import { BlockIdentifier } from './utils';
 
 export interface ProviderOptions {
@@ -201,5 +202,13 @@ export class Provider implements ProviderInterface {
 
   public async getStateUpdate(blockIdentifier?: BlockIdentifier): Promise<StateUpdateResponse> {
     return this.provider.getStateUpdate(blockIdentifier);
+  }
+
+  public async getStarkName(address: BigNumberish, StarknetIdContract?: string): Promise<string> {
+    return getStarkName(this, address, StarknetIdContract);
+  }
+
+  public async getAddressFromStarkName(name: string, StarknetIdContract?: string): Promise<string> {
+    return getAddressFromStarkName(this, name, StarknetIdContract);
   }
 }

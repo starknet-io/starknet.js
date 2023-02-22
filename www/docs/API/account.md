@@ -8,7 +8,7 @@ An Account extends <ins>[`Provider`](/docs/API/provider)</ins> and inherits all 
 
 It also introduces new methods that allow Accounts to create and verify signatures with a custom <ins>[`Signer`](/docs/API/signer)</ins>, declare and deploy Contract and deploy new Account
 
-This API is the primary way to interact with an account contract on StarkNet.
+This API is the primary way to interact with an account contract on Starknet.
 
 ## Creating an instance
 
@@ -40,7 +40,7 @@ Returns the nonce of the account.
 
 account.**estimateInvokeFee**(calls [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse >_
 
-Estimate Fee for executing an INVOKE transaction on StarkNet.
+Estimate Fee for executing an INVOKE transaction on Starknet.
 
 The _calls_ object structure:
 
@@ -69,7 +69,7 @@ The _estimateFeeDetails_ object may include any of:
 
 account.**estimateDeclareFee**(contractPayload [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse >_
 
-Estimate Fee for executing a DECLARE transaction on StarkNet.
+Estimate Fee for executing a DECLARE transaction on Starknet.
 
 The _contractPayload_ object structure:
 
@@ -97,7 +97,7 @@ The _estimateFeeDetails_ object may include any of:
 
 account.**estimateAccountDeployFee**(contractPayload [ , estimateFeeDetails ]) => _Promise < EstimateFeeResponse >_
 
-Estimate Fee for executing a DEPLOY_ACCOUNT transaction on StarkNet
+Estimate Fee for executing a DEPLOY_ACCOUNT transaction on Starknet
 
 The _contractPayload_ object structure:
 
@@ -524,25 +524,13 @@ The _details_ object may include any of:
 
 ### getStarkName()
 
-account.**getStarkName**(StarknetIdContract) => _Promise<string | Error>_
+account.**getStarkName**(address, StarknetIdContract) => _Promise<string | Error>_
 
-Gets starknet.id stark name with the address of the account
+Gets starknet.id stark name with the address provided, if `undefined` uses the address of the account
 
-The _StarknetIdContract_ argument can be undefined, if it is, the function will automatically use official starknet id contracts of your network (It currently supports TESTNET 1 only).
+The _StarknetIdContract_ argument can be undefined, if it is, the function will automatically use official starknet id contracts of your network.
 
 Returns directly a string (Example: `vitalik.stark`).
-
----
-
-### getAddressFromStarkName()
-
-account.**getAddressFromStarkName**(name, StarknetIdContract) => _Promise<string | Error>_
-
-Gets account address with the starknet id stark name.
-
-The _StarknetIdContract_ argument can be undefined, if it is, the function will automatically use official starknet id contracts of your network (It currently supports TESTNET 1 only).
-
-Returns directly the address in a string (Example: `0xff...34`).
 
 ---
 

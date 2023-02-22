@@ -2,40 +2,80 @@
 
 This website is built using [Docusaurus 2](https://docusaurus.io/), a modern static website generator.
 
-### Installation
+## Installation
 
-```
-$ yarn
+```bash
+yarn    # or npm i
 ```
 
-### Local Development
+## Local Development
 
-```
-$ yarn start
+```bash
+yarn start    # or npm run start
 ```
 
 This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
 
-### Build
+## Build
 
-```
-$ yarn build
+```bash
+yarn build    # or npm run build
 ```
 
 This command generates static content into the `build` directory and can be served using any static contents hosting service.
 
-### Deployment
+## Deployment
 
 Using SSH:
 
-```
-$ USE_SSH=true yarn deploy
+```bash
+USE_SSH=true yarn deploy    # or USE_SSH=true npm run deploy
 ```
 
 Not using SSH:
 
-```
-$ GIT_USER=<Your GitHub username> yarn deploy
+```bash
+GIT_USER=<Your GitHub username> yarn deploy    # or GIT_USER=<Your GitHub username> npm run deploy
 ```
 
 If you are using GitHub pages for hosting, this command is a convenient way to build the website and push to the `gh-pages` branch.
+
+## Documentation location
+
+Documentation for previous versions is located in [/www/versioned_docs](/www/versioned_docs) and normally does not need to be modified.
+Documentation for the future official release of your work is located in [/www/docs](/www/docs) of your branch. There you have the API documentation in [/www/docs/API](/www/docs/API) and the guides in [/www/docs/guides](/www/docs/guides).
+Official documentation is available to users at [www.starknetjs.com](https://www.starknetjs.com/). You can choose the documentation version you need in the top menu bar. NEXT version corresponds to the documentation of the last commit of the `develop` branch.
+
+## Update documentation
+
+Do not forget to include your methods documentation directly in your source code, in accordance with [JSDoc](https://jsdoc.app/) rules. Then you have to update manually the API documentation in `/www/docs/API` of your branch.
+If you need to update some guides, modify the files in `/www/docs/guides` of your branch.
+The administrators of the project will handle your PR:
+
+### Without creation of a new realease of Starknet.js
+
+Your modified files will just be merged in `/www/docs/` by the Pull Request. If it was merged in `develop`, it will be visible in the official documentation in NEXT.
+
+### With creation of a new release of Starknet.js
+
+Just before the release of a new version in the `main` branch, you need to perform the versioning of its documentation:
+
+- Ensure that all the necessary commits/PRs/merges are performed
+- Ensure that the API directory is up to date
+- Launch the documentation versioning with:
+
+```bash
+#from the root directory, use the module version from package.json
+npm run docs:version
+
+#from the root directory, manully set the version
+npm run docs:version --version-override=X.Y.Z
+
+# from the /www documentation directory, manully set the version
+npm run docusaurus docs:version X.Y.Z
+```
+
+- The official documentation (API + guides) of `X.Y.Z` is created.
+- Commit your work, and merge it in `develop`.
+- perform the official release of `X.Y.Z` in `main`.
+- In the official documentation, the new version of documentation for `X.Y.Z` is available, and NEXT version is temporarily identical.

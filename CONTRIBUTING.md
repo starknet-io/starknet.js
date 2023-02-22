@@ -16,7 +16,7 @@ _[Use GitHub interface](https://blog.sapegin.me/all/open-source-for-everyone/) f
 
 Start from the `develop` branch.
 
-To build you changes run:
+To build your changes, run:
 
 ```bash
 npm run build
@@ -34,7 +34,7 @@ Or run tests in watch mode:
 npm test --watch
 ```
 
-**Don’t forget to add tests and update documentation for your changes.**
+**Don’t forget to add tests and [update documentation](./www/README.md) for your changes.**
 Documentation can be archived by using JSDoc.
 
 **Please update the npm lock file (`package-lock.json`) if you add or update dependencies.**

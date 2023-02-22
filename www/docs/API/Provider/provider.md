@@ -4,7 +4,7 @@ title: Provider
 id: 'provider'
 ---
 
-The **Provider** API allows you to interact with the StarkNet network, without signing transactions or messages.
+The **Provider** API allows you to interact with the Starknet network, without signing transactions or messages.
 
 Typically, these are _read_ calls on the blockchain.
 
@@ -67,7 +67,7 @@ Returns the chain Id for the current network.
 
 provider.**callContract**(call [ , blockIdentifier ]) => _Promise < CallContractResponse >_
 
-Calls a function on the StarkNet contract.
+Calls a function on the Starknet contract.
 
 The call object structure:
 
@@ -250,6 +250,30 @@ Estimate fee for declare transaction.
 provider.**waitForTransaction**(txHash [ , options]) => _Promise < GetTransactionReceiptResponse >_
 
 Wait for the transaction to be accepted on L2 or L1.
+
+---
+
+### getStarkName()
+
+provider.**getStarkName**(address, StarknetIdContract) => _Promise<string | Error>_
+
+Gets starknet.id stark name with the address provided
+
+The _StarknetIdContract_ argument can be undefined, if it is, the function will automatically use official starknet id contracts of your network.
+
+Returns directly a string (Example: `vitalik.stark`).
+
+---
+
+### getAddressFromStarkName()
+
+provider.**getAddressFromStarkName**(name, StarknetIdContract) => _Promise<string | Error>_
+
+Gets account address with the starknet id stark name.
+
+The _StarknetIdContract_ argument can be undefined, if it is, the function will automatically use official starknet id contracts of your network.
+
+Returns directly the address in a string (Example: `0xff...34`).
 
 ---
 

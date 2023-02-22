@@ -7,7 +7,7 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Starknet.js',
-  tagline: 'JavaScript libray for StarkNet',
+  tagline: 'JavaScript library for Starknet',
   url: 'https://starknetjs.com',
   baseUrl: '/',
   onBrokenLinks: 'throw',
