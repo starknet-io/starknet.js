@@ -124,7 +124,7 @@ The _overrides_ object for write methods may include any of:
 
 There are several options to analyze properties and results of a write method without actually executing it.
 
-contract.estimateGas.**METHOD_NAME**( ...args ) => _Promise < EstimateFeeResponse >_
+contract.estimateFee.**METHOD_NAME**( ...args ) => _Promise < EstimateFeeResponse >_
 
 Returns the estimate units of gas that would be required to execute the METHOD_NAME with args and overrides.
 

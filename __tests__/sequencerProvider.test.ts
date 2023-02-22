@@ -1,12 +1,15 @@
 import {
   BlockNumber,
   Contract,
+  GatewayError,
   GetBlockResponse,
+  HttpError,
   Provider,
   SequencerProvider,
   stark,
 } from '../src';
-import { toBN } from '../src/utils/number';
+import * as fetchModule from '../src/utils/fetchPonyfill';
+import { stringify } from '../src/utils/json';
 import { encodeShortString } from '../src/utils/shortString';
 import {
   compiledErc20,
@@ -21,8 +24,6 @@ import {
 describeIfSequencer('SequencerProvider', () => {
   const sequencerProvider = getTestProvider() as SequencerProvider;
   const account = getTestAccount(sequencerProvider);
-  let customSequencerProvider: Provider;
-  let exampleContractAddress: string;
   let exampleBlock: GetBlockResponse;
   let exampleBlockNumber: BlockNumber;
   let exampleBlockHash: string;
@@ -33,13 +34,46 @@ describeIfSequencer('SequencerProvider', () => {
     exampleBlockNumber = exampleBlock.block_number;
   });
 
+  describe('Generic fetch', () => {
+    const fetchSpy = jest.spyOn(fetchModule, 'default');
+    const generateMockResponse = (ok: boolean, text: any): any => ({
+      ok,
+      text: async () => text,
+    });
+
+    afterAll(() => {
+      fetchSpy.mockRestore();
+    });
+
+    test('fetch unexpected error', async () => {
+      fetchSpy.mockResolvedValueOnce(generateMockResponse(false, null));
+      expect(sequencerProvider.fetch('')).rejects.toThrow(/^Could not GET from endpoint/);
+    });
+
+    test('fetch http error', async () => {
+      fetchSpy.mockResolvedValueOnce(generateMockResponse(false, 'wrong'));
+      expect(sequencerProvider.fetch('')).rejects.toThrow(HttpError);
+    });
+
+    test('fetch gateway error', async () => {
+      fetchSpy.mockResolvedValueOnce(generateMockResponse(false, stringify({})));
+      expect(sequencerProvider.fetch('')).rejects.toThrow(GatewayError);
+    });
+
+    test('fetch success', async () => {
+      fetchSpy.mockResolvedValueOnce(generateMockResponse(true, stringify({ success: '' })));
+      expect(sequencerProvider.fetch('')).resolves.toHaveProperty('success');
+    });
+  });
+
   describe('Gateway specific methods', () => {
+    let exampleContractAddress: string;
+
     let exampleTransactionHash: string;
 
     beforeAll(async () => {
-      const { deploy } = await account.declareDeploy({
+      const { deploy } = await account.declareAndDeploy({
         contract: compiledErc20,
-        classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
         constructorCalldata: [
           encodeShortString('Token'),
           encodeShortString('ERC20'),
@@ -82,9 +116,8 @@ describeIfSequencer('SequencerProvider', () => {
     let l1l2ContractAddress: string;
 
     beforeAll(async () => {
-      const { deploy } = await account.declareDeploy({
+      const { deploy } = await account.declareAndDeploy({
         contract: compiledL1L2,
-        classHash: '0x028d1671fb74ecb54d848d463cefccffaef6df3ae40db52130e19fe8299a7b43',
       });
       l1l2ContractAddress = deploy.contract_address;
     });
@@ -111,6 +144,7 @@ describeIfSequencer('SequencerProvider', () => {
   });
 
   describeIfDevnet('Test calls with Custom Devnet Sequencer Provider', () => {
+    let customSequencerProvider: Provider;
     let erc20: Contract;
     const wallet = stark.randomAddress();
 
@@ -123,9 +157,8 @@ describeIfSequencer('SequencerProvider', () => {
         },
       });
       const accountCustom = getTestAccount(customSequencerProvider);
-      const { deploy } = await accountCustom.declareDeploy({
+      const { deploy } = await accountCustom.declareAndDeploy({
         contract: compiledErc20,
-        classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
         constructorCalldata: [encodeShortString('Token'), encodeShortString('ERC20'), wallet],
       });
 
@@ -133,10 +166,8 @@ describeIfSequencer('SequencerProvider', () => {
     });
 
     test('Check ERC20 balance using Custom Sequencer Provider', async () => {
-      const result = await erc20.balanceOf(wallet);
-      const [res] = result;
-      expect(res.low).toStrictEqual(toBN(1000));
-      expect(res).toStrictEqual(result.balance);
+      const { balance } = await erc20.balanceOf(wallet);
+      expect(balance.low).toStrictEqual(BigInt(1000));
     });
   });
 

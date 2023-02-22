@@ -1,15 +1,9 @@
-import { isBN } from 'bn.js';
-
 import typedDataExample from '../__mocks__/typedDataExample.json';
-import { Account, Contract, Provider, ec, number, stark } from '../src';
-import { getKeyPair, sign } from '../src/utils/ellipticCurve';
+import { Account, Contract, Provider, TransactionStatus, ec, stark } from '../src';
+import { uint256 } from '../src/utils/calldata/cairo';
 import { parseUDCEvent } from '../src/utils/events';
-import {
-  calculateContractAddressFromHash,
-  feeTransactionVersion,
-  pedersen,
-} from '../src/utils/hash';
-import { cleanHex, hexToDecimalString, toBN } from '../src/utils/number';
+import { calculateContractAddressFromHash, feeTransactionVersion } from '../src/utils/hash';
+import { cleanHex, hexToDecimalString, toBigInt, toHex } from '../src/utils/number';
 import { encodeShortString } from '../src/utils/shortString';
 import { randomAddress } from '../src/utils/stark';
 import {
@@ -35,9 +29,8 @@ describe('deploy and test Wallet', () => {
   beforeAll(async () => {
     expect(account).toBeInstanceOf(Account);
 
-    const declareDeploy = await account.declareDeploy({
+    const declareDeploy = await account.declareAndDeploy({
       contract: compiledErc20,
-      classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
       constructorCalldata: [
         encodeShortString('Token'),
         encodeShortString('ERC20'),
@@ -48,11 +41,10 @@ describe('deploy and test Wallet', () => {
     erc20Address = declareDeploy.deploy.contract_address;
     erc20 = new Contract(compiledErc20.abi, erc20Address, provider);
 
-    const x = await erc20.balanceOf(account.address);
+    const { balance } = await erc20.balanceOf(account.address);
+    expect(BigInt(balance.low).toString()).toStrictEqual(BigInt(1000).toString());
 
-    expect(number.toBN(x[0].low).toString()).toStrictEqual(number.toBN(1000).toString());
-
-    const dappResponse = await account.declareDeploy({
+    const dappResponse = await account.declareAndDeploy({
       contract: compiledTestDapp,
       classHash: '0x04367b26fbb92235e8d1137d19c080e6e650a6889ded726d00658411cc1046f5',
     });
@@ -67,7 +59,7 @@ describe('deploy and test Wallet', () => {
       entrypoint: 'transfer',
       calldata: [erc20.address, '10', '0'],
     });
-    expect(isBN(overall_fee)).toBe(true);
+    expect(typeof overall_fee === 'bigint').toBe(true);
     expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
     innerInvokeEstFeeSpy.mockClear();
   });
@@ -96,7 +88,7 @@ describe('deploy and test Wallet', () => {
 
       expect(estimatedFeeBulk[0]).toHaveProperty('suggestedMaxFee');
       expect(estimatedFeeBulk.length).toEqual(2);
-      expect(isBN(estimatedFeeBulk[0].overall_fee)).toBe(true);
+      expect(typeof estimatedFeeBulk[0].overall_fee === 'bigint').toBe(true);
       expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
       innerInvokeEstFeeSpy.mockClear();
     });
@@ -119,9 +111,9 @@ describe('deploy and test Wallet', () => {
   });
 
   test('read balance of wallet', async () => {
-    const x = await erc20.balanceOf(account.address);
+    const { balance } = await erc20.balanceOf(account.address);
 
-    expect(number.toBN(x[0].low).toString()).toStrictEqual(number.toBN(1000).toString());
+    expect(BigInt(balance.low).toString()).toStrictEqual(BigInt(1000).toString());
   });
 
   test('execute by wallet owner', async () => {
@@ -131,18 +123,20 @@ describe('deploy and test Wallet', () => {
       calldata: [erc20.address, '10', '0'],
     });
 
-    await provider.waitForTransaction(transaction_hash, undefined, ['ACCEPTED_ON_L2']);
+    await provider.waitForTransaction(transaction_hash, {
+      successStates: [TransactionStatus.ACCEPTED_ON_L2],
+    });
   });
 
   test('read balance of wallet after transfer', async () => {
     const { balance } = await erc20.balanceOf(account.address);
 
-    expect(balance.low).toStrictEqual(toBN(990));
+    expect(balance.low).toStrictEqual(toBigInt(990));
   });
 
   test('execute with custom nonce', async () => {
     const result = await account.getNonce();
-    const nonce = toBN(result).toNumber();
+    const nonce = toBigInt(result);
     const { transaction_hash } = await account.execute(
       {
         contractAddress: erc20Address,
@@ -170,17 +164,26 @@ describe('deploy and test Wallet', () => {
       },
     ]);
 
-    await provider.waitForTransaction(transaction_hash, undefined, ['ACCEPTED_ON_L2']);
+    await provider.waitForTransaction(transaction_hash, {
+      successStates: [TransactionStatus.ACCEPTED_ON_L2],
+    });
 
     const response = await dapp.get_number(account.address);
-    expect(toBN(response.number as string).toString()).toStrictEqual('57');
+    expect(toBigInt(response.number as string).toString()).toStrictEqual('57');
   });
 
   test('sign and verify offchain message fail', async () => {
     const signature = await account.signMessage(typedDataExample);
+    const [r, s] = stark.formatSignature(signature);
+
     // change the signature to make it invalid
-    signature[0] += '123';
-    expect(await account.verifyMessage(typedDataExample, signature)).toBe(false);
+    const r2 = toBigInt(r) + 123n;
+
+    const signature2 = stark.parseSignature([r2.toString(), s]);
+
+    if (!signature2) return;
+
+    expect(await account.verifyMessage(typedDataExample, signature2)).toBe(false);
   });
 
   test('sign and verify offchain message', async () => {
@@ -208,7 +211,7 @@ describe('deploy and test Wallet', () => {
     });
 
     test('estimate gas fee for `mint`', async () => {
-      const res = await erc20.estimateFee.mint(wallet, ['10', '0']);
+      const res = await erc20.estimateFee.mint(wallet, uint256('10'));
       expect(res).toHaveProperty('overall_fee');
     });
 
@@ -224,16 +227,14 @@ describe('deploy and test Wallet', () => {
 
     test('Get the stark name of the account and account from stark name (using starknet.id)', async () => {
       // Deploy naming contract
-      const namingResponse = await account.declareDeploy({
+      const namingResponse = await account.declareAndDeploy({
         contract: compiledNamingContract,
-        classHash: '0x3f2f8c80ab2d404bcfb4182e8528708e4efa2c646dd711bdd7b721ecc6111f7',
       });
       const namingAddress = namingResponse.deploy.contract_address;
 
       // Deploy Starknet id contract
-      const idResponse = await account.declareDeploy({
+      const idResponse = await account.declareAndDeploy({
         contract: compiledStarknetId,
-        classHash: '0x1eb5a8308760d82321cb3ee8967581bb1d38348c7d2f082a07580040c52217c',
       });
       const idAddress = idResponse.deploy.contract_address;
 
@@ -242,12 +243,11 @@ describe('deploy and test Wallet', () => {
         '1893860513534673656759973582609638731665558071107553163765293299136715951024';
       const whitelistingPrivateKey =
         '301579081698031303837612923223391524790804435085778862878979120159194507372';
-      const hashed = pedersen([
-        pedersen([toBN('18925'), toBN('1922775124')]),
-        toBN(hexToDecimalString(account.address)),
-      ]);
-      const keyPair = getKeyPair(toBN(whitelistingPrivateKey));
-      const signed = sign(keyPair, hashed);
+      const hashed = ec.starkCurve.pedersen(
+        ec.starkCurve.pedersen(toBigInt('18925'), toBigInt('1922775124')),
+        toBigInt(account.address)
+      );
+      const signed = ec.starkCurve.sign(hashed, toHex(whitelistingPrivateKey));
 
       const { transaction_hash } = await account.execute([
         {
@@ -274,8 +274,8 @@ describe('deploy and test Wallet', () => {
             '1922775124', // Expiry
             '1', // Starknet id linked
             account.address, // receiver_address
-            signed[0], // sig 0 for whitelist
-            signed[1], // sig 1 for whitelist
+            signed.r, // sig 0 for whitelist
+            signed.s, // sig 1 for whitelist
           ],
         },
         {
@@ -301,7 +301,6 @@ describe('deploy and test Wallet', () => {
   describe('Declare and UDC Deploy Flow', () => {
     test('ERC20 Declare', async () => {
       const declareTx = await account.declare({
-        classHash: erc20ClassHash,
         contract: compiledErc20,
       });
 
@@ -411,15 +410,14 @@ describe('deploy and test Wallet', () => {
       await provider.waitForTransaction(declareAccount.transaction_hash);
 
       const privateKey = stark.randomAddress();
-      const starkKeyPair = ec.getKeyPair(privateKey);
-      starkKeyPub = ec.getStarkKey(starkKeyPair);
+      starkKeyPub = ec.starkCurve.getStarkKey(privateKey);
       precalculatedAddress = calculateContractAddressFromHash(
         starkKeyPub,
         accountClassHash,
         [starkKeyPub],
         0
       );
-      newAccount = new Account(provider, precalculatedAddress, starkKeyPair);
+      newAccount = new Account(provider, precalculatedAddress, privateKey);
     });
 
     test('deploy account & invoke functions', async () => {

@@ -1,4 +1,6 @@
-import { Account, GetBlockResponse, RpcProvider, ec } from '../src';
+import { getStarkKey, utils } from '@noble/curves/stark';
+
+import { Account, GetBlockResponse, RpcProvider } from '../src';
 import { StarknetChainId } from '../src/constants';
 import {
   compiledOpenZeppelinAccount,
@@ -15,15 +17,19 @@ describeIfRpc('RPCProvider', () => {
 
   beforeAll(async () => {
     expect(account).toBeInstanceOf(Account);
-    const accountKeyPair = ec.genKeyPair();
-    accountPublicKey = ec.getStarkKey(accountKeyPair);
+    const accountKeyPair = utils.randomPrivateKey();
+    accountPublicKey = getStarkKey(accountKeyPair);
   });
 
   test('getChainId', async () => {
-    const chainId = await rpcProvider.getChainId();
-    expect([StarknetChainId.TESTNET2, StarknetChainId.MAINNET, StarknetChainId.TESTNET]).toContain(
-      chainId
-    );
+    const fetchSpy = jest.spyOn(rpcProvider as any, 'fetchEndpoint');
+    (rpcProvider as any).chainId = undefined as unknown as StarknetChainId;
+    const chainId1 = await rpcProvider.getChainId();
+    const chainId2 = await rpcProvider.getChainId();
+    expect(fetchSpy.mock.calls.length).toBe(1);
+    expect(chainId1).toBe(chainId2);
+    expect(Object.values(StarknetChainId)).toContain(chainId1);
+    fetchSpy.mockRestore();
   });
 
   test('getTransactionCount', async () => {
@@ -90,9 +96,8 @@ describeIfRpc('RPCProvider', () => {
       let transaction_hash: string;
 
       beforeAll(async () => {
-        const { deploy } = await account.declareDeploy({
+        const { deploy } = await account.declareAndDeploy({
           contract: compiledOpenZeppelinAccount,
-          classHash: '0x058d97f7d76e78f44905cc30cb65b91ea49a4b908a76703c54197bca90f81773',
           constructorCalldata: [accountPublicKey],
           salt: accountPublicKey,
         });

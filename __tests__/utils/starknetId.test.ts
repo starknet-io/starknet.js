@@ -1,5 +1,3 @@
-import { BN } from 'bn.js';
-
 import { StarknetChainId } from '../../src/constants';
 import { getStarknetIdContract, useDecoded, useEncoded } from '../../src/utils/starknetId';
 
@@ -34,7 +32,7 @@ describe('Should tets StarknetId utils', () => {
 
   test('Should test useDecoded and useEncoded hook with an encoded number', () => {
     for (let index = 0; index < 2500; index += 1) {
-      const decoded = useDecoded([new BN(index)]);
+      const decoded = useDecoded([BigInt(index)]);
       expect(useEncoded(decoded.substring(0, decoded.length - 6)).toString()).toBe(
         index.toString()
       );
@@ -42,15 +40,15 @@ describe('Should tets StarknetId utils', () => {
   });
 
   test('Should test getStarknetIdContract', () => {
-    expect(getStarknetIdContract(StarknetChainId.TESTNET)).toBe(
+    expect(getStarknetIdContract(StarknetChainId.SN_GOERLI)).toBe(
       '0x05cf267a0af6101667013fc6bd3f6c11116a14cda9b8c4b1198520d59f900b17'
     );
 
     expect(() => {
-      getStarknetIdContract(StarknetChainId.TESTNET2);
+      getStarknetIdContract(StarknetChainId.SN_GOERLI2);
     }).toThrow();
 
-    expect(getStarknetIdContract(StarknetChainId.MAINNET)).toBe(
+    expect(getStarknetIdContract(StarknetChainId.SN_MAIN)).toBe(
       '0x6ac597f8116f886fa1c97a23fa4e08299975ecaf6b598873ca6792b9bbfb678'
     );
   });

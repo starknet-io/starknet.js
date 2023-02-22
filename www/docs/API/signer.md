@@ -8,7 +8,7 @@ The **Signer** API allows you to sign transactions and messages, and also allows
 
 ## Creating an instance
 
-`new starknet.Signer(keyPair)`
+`new starknet.Signer(pk)`
 
 ## Methods
 

@@ -19,15 +19,13 @@ import type {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   StateUpdateResponse,
-  Status,
   TransactionSimulationResponse,
+  waitForTransactionOptions,
 } from '../types';
 import type { BigNumberish } from '../utils/number';
 import { BlockIdentifier } from './utils';
 
 export abstract class ProviderInterface {
-  public abstract chainId: StarknetChainId;
-
   /**
    * Gets the Starknet chain Id
    *
@@ -296,8 +294,7 @@ export abstract class ProviderInterface {
    */
   public abstract waitForTransaction(
     txHash: BigNumberish,
-    retryInterval?: number,
-    successStates?: Array<Status>
+    options?: waitForTransactionOptions
   ): Promise<GetTransactionReceiptResponse>;
 
   /**

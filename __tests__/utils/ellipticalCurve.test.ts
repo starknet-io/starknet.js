@@ -1,31 +1,26 @@
+import { ec } from '../../src';
 import { StarknetChainId } from '../../src/constants';
-import { ec, getKeyPair, getStarkKey, sign, verify } from '../../src/utils/ellipticCurve';
-import { removeHexPrefix } from '../../src/utils/encode';
 import {
   calculateTransactionHash,
   computeHashOnElements,
-  pedersen,
   transactionVersion,
 } from '../../src/utils/hash';
-import { toBN, toHex } from '../../src/utils/number';
 import { fromCallsToExecuteCalldataWithNonce } from '../../src/utils/transaction';
 
 test('getKeyPair()', () => {
   const privateKey = '0x019800ea6a9a73f94aee6a3d2edf018fc770443e90c7ba121e8303ec6b349279';
-  const pair = getKeyPair(privateKey);
+  const starkKey = ec.starkCurve.getStarkKey(privateKey);
   // somehow needed, returns error else
-  expect(toHex(toBN(getStarkKey(pair)))).toBe(
-    '0x33f45f07e1bd1a51b45fc24ec8c8c9908db9e42191be9e169bfcac0c0d99745'
-  );
+  expect(starkKey).toBe('0x33f45f07e1bd1a51b45fc24ec8c8c9908db9e42191be9e169bfcac0c0d99745');
 });
 
 test('pedersen()', () => {
-  const own = pedersen(['0x12773', '0x872362']);
+  const own = ec.starkCurve.pedersen('0x12773', '0x872362');
   expect(own).toMatchSnapshot();
 });
 
 test('pedersen() with 0', () => {
-  const own = pedersen(['0x12773', '0x0']);
+  const own = ec.starkCurve.pedersen('0x12773', '0x0');
   expect(own).toMatchSnapshot();
 });
 
@@ -61,15 +56,16 @@ test('hashMessage()', () => {
     transactionVersion,
     calldata,
     maxFee,
-    StarknetChainId.TESTNET,
+    StarknetChainId.SN_GOERLI,
     nonce
   );
 
   expect(hashMsg).toMatchInlineSnapshot(
     `"0x6d1706bd3d1ba7c517be2a2a335996f63d4738e2f182144d078a1dd9997062e"`
   );
-  const keyPair = getKeyPair(privateKey);
-  const [r, s] = sign(keyPair, removeHexPrefix(hashMsg));
+
+  const { r, s } = ec.starkCurve.sign(hashMsg, privateKey);
+
   expect(r.toString()).toMatchInlineSnapshot(
     `"1427981024487605678086498726488552139932400435436186597196374630267616399345"`
   );
@@ -82,10 +78,8 @@ test('verify signed message()', () => {
   const pk = '0x019800ea6a9a73f94aee6a3d2edf018fc770443e90c7ba121e8303ec6b349279';
   const account = '0x33f45f07e1bd1a51b45fc24ec8c8c9908db9e42191be9e169bfcac0c0d99745';
   const price = '1';
-  const hashMsg = pedersen([account, price]);
-  const keyPair = getKeyPair(pk);
-  const signature = sign(keyPair, removeHexPrefix(hashMsg));
-  const pubKey = keyPair.getPublic('hex');
-  const pubKeyPair = ec.keyFromPublic(pubKey, 'hex');
-  expect(verify(pubKeyPair, removeHexPrefix(hashMsg), signature)).toBe(true);
+  const hashMsg = ec.starkCurve.pedersen(account, price);
+  const signature = ec.starkCurve.sign(hashMsg, pk);
+  const pubKey = ec.starkCurve.getPublicKey(pk);
+  expect(ec.starkCurve.verify(signature.toDERHex(), hashMsg, pubKey)).toBe(true);
 });

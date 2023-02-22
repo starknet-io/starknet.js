@@ -1,6 +1,4 @@
-import { BN } from 'bn.js';
-
-import { BigNumberish, hexToDecimalString, toBN, toHex } from '../utils/number';
+import { BigNumberish } from '../utils/number';
 import { compileCalldata } from '../utils/stark';
 import { getStarknetIdContract, useDecoded, useEncoded } from '../utils/starknetId';
 import { ProviderInterface } from './interface';
@@ -18,12 +16,10 @@ export async function getStarkName(
       contractAddress: contract,
       entrypoint: 'address_to_domain',
       calldata: compileCalldata({
-        address: toHex(toBN(address)),
+        address,
       }),
     });
-    const decimalDomain = hexDomain.result
-      .map((element) => new BN(hexToDecimalString(element)))
-      .slice(1);
+    const decimalDomain = hexDomain.result.map((element) => BigInt(element)).slice(1);
 
     const stringDomain = useDecoded(decimalDomain);
 

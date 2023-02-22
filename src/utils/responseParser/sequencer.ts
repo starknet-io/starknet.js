@@ -16,7 +16,8 @@ import {
   StateUpdateResponse,
   TransactionSimulationResponse,
 } from '../../types';
-import { toBN } from '../number';
+import { toBigInt } from '../number';
+import { parseSignature } from '../stark';
 import { ResponseParser } from '.';
 
 export class SequencerAPIResponseParser extends ResponseParser {
@@ -51,7 +52,8 @@ export class SequencerAPIResponseParser extends ResponseParser {
         'sender_address' in res.transaction
           ? (res.transaction.sender_address as string)
           : undefined,
-      signature: 'signature' in res.transaction ? res.transaction.signature : undefined,
+      signature:
+        'signature' in res.transaction ? parseSignature(res.transaction.signature) : undefined,
       transaction_hash:
         'transaction_hash' in res.transaction ? res.transaction.transaction_hash : undefined,
       version: 'version' in res.transaction ? (res.transaction.version as string) : undefined,
@@ -87,20 +89,20 @@ export class SequencerAPIResponseParser extends ResponseParser {
 
       try {
         gasInfo = {
-          gas_consumed: toBN(res.gas_usage),
-          gas_price: toBN(res.gas_price),
+          gas_consumed: toBigInt(res.gas_usage),
+          gas_price: toBigInt(res.gas_price),
         };
       } catch {
         // do nothing
       }
 
       return {
-        overall_fee: toBN(res.overall_fee),
+        overall_fee: toBigInt(res.overall_fee),
         ...gasInfo,
       };
     }
     return {
-      overall_fee: toBN(res.amount),
+      overall_fee: toBigInt(res.amount),
     };
   }
 
@@ -113,20 +115,20 @@ export class SequencerAPIResponseParser extends ResponseParser {
 
         try {
           gasInfo = {
-            gas_consumed: toBN(item.gas_usage),
-            gas_price: toBN(item.gas_price),
+            gas_consumed: toBigInt(item.gas_usage),
+            gas_price: toBigInt(item.gas_price),
           };
         } catch {
           // do nothing
         }
 
         return {
-          overall_fee: toBN(item.overall_fee),
+          overall_fee: toBigInt(item.overall_fee),
           ...gasInfo,
         };
       }
       return {
-        overall_fee: toBN(item.amount),
+        overall_fee: toBigInt(item.amount),
       };
     });
   }
@@ -139,8 +141,8 @@ export class SequencerAPIResponseParser extends ResponseParser {
 
       try {
         gasInfo = {
-          gas_consumed: toBN(res.fee_estimation.gas_usage),
-          gas_price: toBN(res.fee_estimation.gas_price),
+          gas_consumed: toBigInt(res.fee_estimation.gas_usage),
+          gas_price: toBigInt(res.fee_estimation.gas_price),
         };
       } catch {
         // do nothing
@@ -150,7 +152,7 @@ export class SequencerAPIResponseParser extends ResponseParser {
         trace: res.trace,
         fee_estimation: {
           ...gasInfo,
-          overall_fee: toBN(res.fee_estimation.overall_fee),
+          overall_fee: toBigInt(res.fee_estimation.overall_fee),
         },
       };
     }
@@ -158,7 +160,7 @@ export class SequencerAPIResponseParser extends ResponseParser {
     return {
       trace: res.trace,
       fee_estimation: {
-        overall_fee: toBN(res.fee_estimation.amount),
+        overall_fee: toBigInt(res.fee_estimation.amount),
       },
     };
   }

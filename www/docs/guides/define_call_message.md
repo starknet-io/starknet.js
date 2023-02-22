@@ -16,16 +16,11 @@ In Cairo, everything is felt, an integer on 251 bits.
 
 This type does not exist in JS/TS - you have Number, bigInt, string, array, objects... and types defined in libraries.
 
-In Starknet.js, it's a bit ... complicated : you have the BigNumberish type and it can include :
+In Starknet.js, it's a bit ... complicated : you have the BigNumberish type and it can include:
 
 - String : "123", "0xabc2"
 - Number (max 53 bits) : 123
-- BN (max 256 bits) : BigNum from [BN.js](https://github.com/indutny/bn.js/) 🤯.
-
-> To create a BigInt : `const myBigInt=BigInt(1234n);`  
-> To create a BN : `const myBN=new BN("0x12b4");`  
-> To convert a BigInt to BN : `const myBN=new BN(myBigInt.toString());`  
-> To convert a BN to BigInt : `const myBigInt=BigInt(myBN.toString());`
+- BigInt: 123n
 
 ## function argument types
 
@@ -39,7 +34,7 @@ You have to create by yourself this array of < BigNumberish >, in respect with t
 const myCallData = [ // array of <BigNumberish>
     123, // number 53 bits
     "0x2345", // string
-    bn1, // BN
+    bn1, // BigInt
     bi1.toString(), // BigInt converted to string
     num1, // number 53 bits
     initialUint256.low, initialUint256.high, //object converted to BigNumberish
@@ -86,7 +81,7 @@ You can create by yourself this array of < string >, in respect with the order o
 const myCallData = [
     "123",
     "0x2345",
-    bn1.toString(), // BN converted to string
+    bn1.toString(), // BigInt converted to string
     bi1.toString(), // BigInt converted to string
     number.toBN(num1).toString(), // Number 53 bits converted to string
     initialUint256.low.toString(), initialUint256.high.toString(),

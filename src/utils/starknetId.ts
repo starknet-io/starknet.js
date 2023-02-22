@@ -1,14 +1,12 @@
 /* eslint-disable no-param-reassign */
-import BN from 'bn.js';
-
-import { StarknetChainId } from '../constants';
+import { StarknetChainId, ZERO } from '../constants';
 
 const basicAlphabet = 'abcdefghijklmnopqrstuvwxyz0123456789-';
-const basicSizePlusOne = new BN(basicAlphabet.length + 1);
+const basicSizePlusOne = BigInt(basicAlphabet.length + 1);
 const bigAlphabet = '这来';
-const basicAlphabetSize = new BN(basicAlphabet.length);
-const bigAlphabetSize = new BN(bigAlphabet.length);
-const bigAlphabetSizePlusOne = new BN(bigAlphabet.length + 1);
+const basicAlphabetSize = BigInt(basicAlphabet.length);
+const bigAlphabetSize = BigInt(bigAlphabet.length);
+const bigAlphabetSizePlusOne = BigInt(bigAlphabet.length + 1);
 
 function extractStars(str: string): [string, number] {
   let k = 0;
@@ -19,26 +17,26 @@ function extractStars(str: string): [string, number] {
   return [str, k];
 }
 
-export function useDecoded(encoded: BN[]): string {
+export function useDecoded(encoded: bigint[]): string {
   let decoded = '';
 
   encoded.forEach((subdomain) => {
-    while (!subdomain.isZero()) {
-      const code = subdomain.mod(basicSizePlusOne).toNumber();
-      subdomain = subdomain.div(basicSizePlusOne);
-      if (code === basicAlphabet.length) {
-        const nextSubdomain = subdomain.div(bigAlphabetSizePlusOne);
-        if (nextSubdomain.isZero()) {
-          const code2 = subdomain.mod(bigAlphabetSizePlusOne).toNumber();
+    while (subdomain !== ZERO) {
+      const code = subdomain % basicSizePlusOne;
+      subdomain /= basicSizePlusOne;
+      if (code === BigInt(basicAlphabet.length)) {
+        const nextSubdomain = subdomain / bigAlphabetSizePlusOne;
+        if (nextSubdomain === ZERO) {
+          const code2 = subdomain % bigAlphabetSizePlusOne;
           subdomain = nextSubdomain;
-          if (code2 === 0) decoded += basicAlphabet[0];
-          else decoded += bigAlphabet[code2 - 1];
+          if (code2 === ZERO) decoded += basicAlphabet[0];
+          else decoded += bigAlphabet[Number(code2) - 1];
         } else {
-          const code2 = subdomain.mod(bigAlphabetSize).toNumber();
-          decoded += bigAlphabet[code2];
-          subdomain = subdomain.div(bigAlphabetSize);
+          const code2 = subdomain % bigAlphabetSize;
+          decoded += bigAlphabet[Number(code2)];
+          subdomain /= bigAlphabetSize;
         }
-      } else decoded += basicAlphabet[code];
+      } else decoded += basicAlphabet[Number(code)];
     }
 
     const [str, k] = extractStars(decoded);
@@ -60,9 +58,9 @@ export function useDecoded(encoded: BN[]): string {
   return decoded.concat('stark');
 }
 
-export function useEncoded(decoded: string): BN {
-  let encoded = new BN(0);
-  let multiplier = new BN(1);
+export function useEncoded(decoded: string): bigint {
+  let encoded = BigInt(0);
+  let multiplier = BigInt(1);
 
   if (decoded.endsWith(bigAlphabet[0] + basicAlphabet[1])) {
     const [str, k] = extractStars(decoded.substring(0, decoded.length - 2));
@@ -75,27 +73,27 @@ export function useEncoded(decoded: string): BN {
   for (let i = 0; i < decoded.length; i += 1) {
     const char = decoded[i];
     const index = basicAlphabet.indexOf(char);
-    const bnIndex = new BN(basicAlphabet.indexOf(char));
+    const bnIndex = BigInt(basicAlphabet.indexOf(char));
 
     if (index !== -1) {
       // add encoded + multiplier * index
       if (i === decoded.length - 1 && decoded[i] === basicAlphabet[0]) {
-        encoded = encoded.add(multiplier.mul(basicAlphabetSize));
-        multiplier = multiplier.mul(basicSizePlusOne);
+        encoded += multiplier * basicAlphabetSize;
+        multiplier *= basicSizePlusOne;
         // add 0
-        multiplier = multiplier.mul(basicSizePlusOne);
+        multiplier *= basicSizePlusOne;
       } else {
-        encoded = encoded.add(multiplier.mul(bnIndex));
-        multiplier = multiplier.mul(basicSizePlusOne);
+        encoded += multiplier * bnIndex;
+        multiplier *= basicSizePlusOne;
       }
     } else if (bigAlphabet.indexOf(char) !== -1) {
       // add encoded + multiplier * (basicAlphabetSize)
-      encoded = encoded.add(multiplier.mul(basicAlphabetSize));
-      multiplier = multiplier.mul(basicSizePlusOne);
+      encoded += multiplier * basicAlphabetSize;
+      multiplier *= basicSizePlusOne;
       // add encoded + multiplier * index
       const newid = (i === decoded.length - 1 ? 1 : 0) + bigAlphabet.indexOf(char);
-      encoded = encoded.add(multiplier.mul(new BN(newid)));
-      multiplier = multiplier.mul(bigAlphabetSize);
+      encoded += multiplier * BigInt(newid);
+      multiplier *= bigAlphabetSize;
     }
   }
 
@@ -109,10 +107,10 @@ export function getStarknetIdContract(chainId: StarknetChainId): string {
     '0x05cf267a0af6101667013fc6bd3f6c11116a14cda9b8c4b1198520d59f900b17';
 
   switch (chainId) {
-    case StarknetChainId.MAINNET:
+    case StarknetChainId.SN_MAIN:
       return starknetIdMainnetContract;
 
-    case StarknetChainId.TESTNET:
+    case StarknetChainId.SN_GOERLI:
       return starknetIdTestnetContract;
 
     default:
