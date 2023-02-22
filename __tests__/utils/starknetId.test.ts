@@ -28,6 +28,10 @@ describe('Should tets StarknetId utils', () => {
     }
   });
 
+  test('Should test useEncoded and useDecoded hook with an empty string', () => {
+    expect(useDecoded([])).toBe('');
+  });
+
   test('Should test useDecoded and useEncoded hook with an encoded number', () => {
     for (let index = 0; index < 2500; index += 1) {
       const decoded = useDecoded([new BN(index)]);

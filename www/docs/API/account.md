@@ -525,25 +525,13 @@ The _details_ object may include any of:
 
 ### getStarkName()
 
-account.**getStarkName**(StarknetIdContract) => _Promise<string | Error>_
+account.**getStarkName**(address, StarknetIdContract) => _Promise<string | Error>_
 
-Gets starknet.id stark name with the address of the account
+Gets starknet.id stark name with the address provided, if `undefined` uses the address of the account
 
-The _StarknetIdContract_ argument can be undefined, if it is, the function will automatically use official starknet id contracts of your network (It currently supports TESTNET 1 only).
+The _StarknetIdContract_ argument can be undefined, if it is, the function will automatically use official starknet id contracts of your network.
 
 Returns directly a string (Example: `vitalik.stark`).
-
----
-
-### getAddressFromStarkName()
-
-account.**getAddressFromStarkName**(name, StarknetIdContract) => _Promise<string | Error>_
-
-Gets account address with the starknet id stark name.
-
-The _StarknetIdContract_ argument can be undefined, if it is, the function will automatically use official starknet id contracts of your network (It currently supports TESTNET 1 only).
-
-Returns directly the address in a string (Example: `0xff...34`).
 
 ---
 

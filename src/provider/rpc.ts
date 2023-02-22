@@ -31,6 +31,7 @@ import { parseCalldata, wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { LibraryError } from './errors';
 import { ProviderInterface } from './interface';
+import { getAddressFromStarkName, getStarkName } from './starknetId';
 import { Block, BlockIdentifier } from './utils';
 
 export type RpcProviderOptions = {
@@ -499,5 +500,13 @@ export class RpcProvider implements ProviderInterface {
     _blockIdentifier?: BlockIdentifier
   ): Promise<TransactionSimulationResponse> {
     throw new Error('RPC does not implement simulateTransaction function');
+  }
+
+  public async getStarkName(address: BigNumberish, StarknetIdContract?: string): Promise<string> {
+    return getStarkName(this, address, StarknetIdContract);
+  }
+
+  public async getAddressFromStarkName(name: string, StarknetIdContract?: string): Promise<string> {
+    return getAddressFromStarkName(this, name, StarknetIdContract);
   }
 }

@@ -44,6 +44,7 @@ import { randomAddress } from '../utils/stark';
 import { buildUrl } from '../utils/url';
 import { GatewayError, HttpError, LibraryError } from './errors';
 import { ProviderInterface } from './interface';
+import { getAddressFromStarkName, getStarkName } from './starknetId';
 import { Block, BlockIdentifier } from './utils';
 
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha' | 'goerli-alpha-2';
@@ -604,5 +605,13 @@ export class SequencerProvider implements ProviderInterface {
   ): Promise<Sequencer.BlockTransactionTracesResponse> {
     const args = new Block(blockIdentifier).sequencerIdentifier;
     return this.fetchEndpoint('get_block_traces', { ...args });
+  }
+
+  public async getStarkName(address: BigNumberish, StarknetIdContract?: string): Promise<string> {
+    return getStarkName(this, address, StarknetIdContract);
+  }
+
+  public async getAddressFromStarkName(name: string, StarknetIdContract?: string): Promise<string> {
+    return getAddressFromStarkName(this, name, StarknetIdContract);
   }
 }
