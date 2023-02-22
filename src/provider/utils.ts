@@ -1,7 +1,7 @@
 /* eslint-disable max-classes-per-file */
 import { BN } from 'bn.js';
 
-import type { BlockNumber } from '../types';
+import type { BlockNumber, SequencerIdentifier } from '../types';
 import { BigNumberish, isHex, toBN, toHex } from '../utils/number';
 
 /**
@@ -97,4 +97,10 @@ export class Block {
   valueOf = () => this.number;
 
   toString = () => this.hash;
+
+  get sequencerIdentifier(): SequencerIdentifier {
+    return this.hash !== null
+      ? { blockHash: this.hash as string }
+      : { blockNumber: (this.number ?? this.tag) as BlockNumber };
+  }
 }

@@ -4,6 +4,7 @@ import { BlockIdentifier } from '../../provider/utils';
 import { BigNumberish } from '../../utils/number';
 import {
   Abi,
+  AllowArray,
   BlockNumber,
   ContractClass,
   EntryPointType,
@@ -55,7 +56,7 @@ export type ExecutionResources = {
   n_memory_holes: number;
 };
 
-export type GetTransactionTraceResponse = {
+export type TransactionTraceResponse = {
   validate_invocation?: FunctionInvocation;
   function_invocation?: FunctionInvocation;
   fee_transfer_invocation?: FunctionInvocation;
@@ -68,6 +69,28 @@ export type CallL1Handler = {
   entry_point_selector: string;
   payload: Array<string>;
 };
+
+export type StateDiffItem = {
+  key: string;
+  value: string;
+};
+
+export type StorageDiffItem = {
+  address: string;
+  storage_entries: [key: string, value: string];
+};
+
+export type DeployedContractItem = {
+  address: string;
+  class_hash: string;
+};
+
+export type Nonces = {
+  contract_address: string;
+  nonce: string;
+};
+
+export type SequencerIdentifier = { blockHash: string } | { blockNumber: BlockNumber };
 
 export namespace Sequencer {
   export type DeclareTransaction = {
@@ -233,17 +256,49 @@ export namespace Sequencer {
     | DeployEstimateFee
     | DeployAccountEstimateFee;
 
+  export type TransactionSimulationResponse = {
+    trace: TransactionTraceResponse;
+    fee_estimation: Sequencer.EstimateFeeResponse;
+  };
+
+  export type SimulateTransaction = Omit<InvokeFunctionTransaction, 'max_fee' | 'entry_point_type'>;
+
+  export type EstimateFeeRequestBulk = AllowArray<
+    InvokeEstimateFee | DeclareEstimateFee | DeployEstimateFee | DeployAccountEstimateFee
+  >;
+
   // Support 0.9.1 changes in a backward-compatible way
   export type EstimateFeeResponse =
     | {
         overall_fee: number;
         gas_price: number;
         gas_usage: number;
+        uint: string;
       }
     | {
         amount: BN;
         unit: string;
       };
+
+  export type EstimateFeeResponseBulk = AllowArray<EstimateFeeResponse>;
+
+  export type BlockTransactionTracesResponse = {
+    traces: Array<TransactionTraceResponse & { transaction_hash: string }>;
+  };
+
+  export type StateUpdateResponse = {
+    block_hash: string;
+    new_root: string;
+    old_root: string;
+    state_diff: {
+      storage_diffs: Array<{
+        [address: string]: Array<StateDiffItem>;
+      }>;
+      declared_contract_hashes: Array<string>;
+      deployed_contracts: Array<DeployedContractItem>;
+      nonces: Array<Nonces>;
+    };
+  };
 
   export type Endpoints = {
     get_contract_addresses: {
@@ -275,7 +330,7 @@ export namespace Sequencer {
         transactionHash: string;
       };
       REQUEST: never;
-      RESPONSE: GetTransactionTraceResponse;
+      RESPONSE: TransactionTraceResponse;
     };
     get_transaction_receipt: {
       QUERY: {
@@ -347,10 +402,11 @@ export namespace Sequencer {
     };
     get_state_update: {
       QUERY: {
-        blockHash: string;
+        blockHash?: string;
+        blockNumber?: BlockNumber;
       };
       REQUEST: never;
-      RESPONSE: any;
+      RESPONSE: StateUpdateResponse;
     };
     get_full_contract: {
       QUERY: {
@@ -364,6 +420,28 @@ export namespace Sequencer {
       QUERY: any;
       REQUEST: any;
       RESPONSE: EstimateFeeResponse;
+    };
+    simulate_transaction: {
+      QUERY: {
+        blockIdentifier: BlockIdentifier;
+      };
+      REQUEST: SimulateTransaction;
+      RESPONSE: TransactionSimulationResponse;
+    };
+    estimate_fee_bulk: {
+      QUERY: {
+        blockIdentifier: BlockIdentifier;
+      };
+      REQUEST: EstimateFeeRequestBulk;
+      RESPONSE: EstimateFeeResponseBulk;
+    };
+    get_block_traces: {
+      QUERY: {
+        blockHash?: string;
+        blockNumber?: BlockNumber;
+      };
+      REQUEST: never;
+      RESPONSE: BlockTransactionTracesResponse;
     };
   };
 }

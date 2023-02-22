@@ -52,6 +52,11 @@ export function useDecoded(encoded: BN[]): string {
           : bigAlphabet[bigAlphabet.length - 1].repeat((k - 1) / 2 + 1));
     decoded += '.';
   });
+
+  if (!decoded) {
+    return decoded;
+  }
+
   return decoded.concat('stark');
 }
 

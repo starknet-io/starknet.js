@@ -11,16 +11,20 @@ import {
   DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetContractAddressesResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   GetTransactionStatusResponse,
-  GetTransactionTraceResponse,
   Invocation,
+  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Sequencer,
+  StateUpdateResponse,
+  TransactionSimulationResponse,
+  TransactionTraceResponse,
 } from '../types';
 import fetch from '../utils/fetchPonyfill';
 import { getSelector, getSelectorFromName } from '../utils/hash';
@@ -38,8 +42,9 @@ import { parseContract, wait } from '../utils/provider';
 import { SequencerAPIResponseParser } from '../utils/responseParser/sequencer';
 import { randomAddress } from '../utils/stark';
 import { buildUrl } from '../utils/url';
-import { GatewayError, HttpError } from './errors';
+import { GatewayError, HttpError, LibraryError } from './errors';
 import { ProviderInterface } from './interface';
+import { getAddressFromStarkName, getStarkName } from './starknetId';
 import { Block, BlockIdentifier } from './utils';
 
 type NetworkName = 'mainnet-alpha' | 'goerli-alpha' | 'goerli-alpha-2';
@@ -150,6 +155,8 @@ export class SequencerProvider implements ProviderInterface {
       'call_contract',
       'estimate_fee',
       'estimate_message_fee',
+      'estimate_fee_bulk',
+      'simulate_transaction',
     ];
 
     return postMethodEndpoints.includes(endpoint) ? 'POST' : 'GET';
@@ -292,9 +299,11 @@ export class SequencerProvider implements ProviderInterface {
 
   public async getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {
     const txHashHex = toHex(toBN(txHash));
-    return this.fetchEndpoint('get_transaction', { transactionHash: txHashHex }).then((value) =>
-      this.responseParser.parseGetTransactionResponse(value)
-    );
+    return this.fetchEndpoint('get_transaction', { transactionHash: txHashHex }).then((result) => {
+      // throw for no matching transaction to unify behavior with RPC and avoid parsing errors
+      if (Object.values(result).length === 1) throw new LibraryError(result.status);
+      return this.responseParser.parseGetTransactionResponse(result);
+    });
   }
 
   public async getTransactionReceipt(txHash: BigNumberish): Promise<GetTransactionReceiptResponse> {
@@ -436,6 +445,47 @@ export class SequencerProvider implements ProviderInterface {
     ).then(this.responseParser.parseFeeEstimateResponse);
   }
 
+  public async getEstimateFeeBulk(
+    invocations: InvocationBulk,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<EstimateFeeResponseBulk> {
+    const params: Sequencer.EstimateFeeRequestBulk = invocations.map((invocation) => {
+      let res;
+      if (invocation.type === 'INVOKE_FUNCTION') {
+        res = {
+          type: invocation.type,
+          contract_address: invocation.contractAddress,
+          calldata: invocation.calldata ?? [],
+        };
+      } else if (invocation.type === 'DECLARE') {
+        res = {
+          type: invocation.type,
+          sender_address: invocation.senderAddress,
+          contract_class: invocation.contractDefinition,
+        };
+      } else {
+        res = {
+          type: invocation.type,
+          class_hash: toHex(toBN(invocation.classHash)),
+          constructor_calldata: bigNumberishArrayToDecimalStringArray(
+            invocation.constructorCalldata || []
+          ),
+          contract_address_salt: toHex(toBN(invocation.addressSalt || 0)),
+        };
+      }
+      return {
+        ...res,
+        signature: bigNumberishArrayToDecimalStringArray(invocation.signature || []),
+        version: toHex(toBN(invocation?.version || 1)),
+        nonce: toHex(toBN(invocation.nonce)),
+      };
+    });
+
+    return this.fetchEndpoint('estimate_fee_bulk', { blockIdentifier }, params).then(
+      this.responseParser.parseFeeEstimateBulkResponse
+    );
+  }
+
   public async getCode(
     contractAddress: string,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
@@ -502,7 +552,7 @@ export class SequencerProvider implements ProviderInterface {
    * @param txHash
    * @returns the transaction trace
    */
-  public async getTransactionTrace(txHash: BigNumberish): Promise<GetTransactionTraceResponse> {
+  public async getTransactionTrace(txHash: BigNumberish): Promise<TransactionTraceResponse> {
     const txHashHex = toHex(toBN(txHash));
     return this.fetchEndpoint('get_transaction_trace', { transactionHash: txHashHex });
   }
@@ -519,5 +569,49 @@ export class SequencerProvider implements ProviderInterface {
     };
 
     return this.fetchEndpoint('estimate_message_fee', { blockIdentifier }, validCallL1Handler);
+  }
+
+  public async getSimulateTransaction(
+    invocation: Invocation,
+    invocationDetails: InvocationsDetailsWithNonce,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<TransactionSimulationResponse> {
+    return this.fetchEndpoint(
+      'simulate_transaction',
+      { blockIdentifier },
+      {
+        type: 'INVOKE_FUNCTION',
+        contract_address: invocation.contractAddress,
+        calldata: invocation.calldata ?? [],
+        signature: bigNumberishArrayToDecimalStringArray(invocation.signature || []),
+        version: toHex(toBN(invocationDetails?.version || 1)),
+        nonce: toHex(toBN(invocationDetails.nonce)),
+      }
+    ).then(this.responseParser.parseFeeSimulateTransactionResponse);
+  }
+
+  public async getStateUpdate(
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<StateUpdateResponse> {
+    const args = new Block(blockIdentifier).sequencerIdentifier;
+    return this.fetchEndpoint('get_state_update', { ...args }).then(
+      this.responseParser.parseGetStateUpdateResponse
+    );
+  }
+
+  // consider adding an optional trace retrieval parameter to the getBlock method
+  public async getBlockTraces(
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<Sequencer.BlockTransactionTracesResponse> {
+    const args = new Block(blockIdentifier).sequencerIdentifier;
+    return this.fetchEndpoint('get_block_traces', { ...args });
+  }
+
+  public async getStarkName(address: BigNumberish, StarknetIdContract?: string): Promise<string> {
+    return getStarkName(this, address, StarknetIdContract);
+  }
+
+  public async getAddressFromStarkName(name: string, StarknetIdContract?: string): Promise<string> {
+    return getAddressFromStarkName(this, name, StarknetIdContract);
   }
 }

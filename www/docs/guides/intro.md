@@ -7,7 +7,6 @@ sidebar_position: 1
 ## Installation
 
 ```bash
-
 # use the main branch
 
 npm install starknet
@@ -21,13 +20,13 @@ npm install starknet@next
 
 ### With Devnet
 
-Example devnet version is `0.4.2`.
+Example devnet version is `0.7.1`.
 
 Get devnet with docker:
 
 ```bash
-docker pull shardlabs/starknet-devnet:0.4.2
-docker run -p 5050:5050 shardlabs/starknet-devnet:0.4.2 --seed 0
+docker pull shardlabs/starknet-devnet:0.7.1
+docker run -p 5050:5050 shardlabs/starknet-devnet:0.7.1 --seed 0
 ```
 
 Open new console tab, go to your starknet.js directory and run:
@@ -58,9 +57,9 @@ npm install # install docusaurus
 npm run start # fires up a local documentation site
 ```
 
-## Compiling StarkNet Contracts
+## Compiling Starknet Contracts
 
-Please check the StarkNet documentation <ins>[here](https://www.cairo-lang.org/docs/hello_starknet/intro.html)</ins> to compile starknet contracts.
+Please check the Starknet documentation <ins>[here](https://www.cairo-lang.org/docs/hello_starknet/intro.html)</ins> to compile Starknet contracts.
 
 Additional helpful resources can also be found at <ins>[OpenZeppelin](https://docs.openzeppelin.com/contracts-cairo/0.5.0/)</ins> documentation site.
 

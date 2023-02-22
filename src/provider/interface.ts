@@ -9,14 +9,18 @@ import type {
   DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetCodeResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
+  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  StateUpdateResponse,
   Status,
+  TransactionSimulationResponse,
 } from '../types';
 import type { BigNumberish } from '../utils/number';
 import { BlockIdentifier } from './utils';
@@ -32,7 +36,7 @@ export abstract class ProviderInterface {
   public abstract getChainId(): Promise<StarknetChainId>;
 
   /**
-   * Calls a function on the StarkNet contract.
+   * Calls a function on the Starknet contract.
    *
    * @param call transaction to be called
    * @param blockIdentifier block identifier
@@ -268,6 +272,23 @@ export abstract class ProviderInterface {
   ): Promise<EstimateFeeResponse>;
 
   /**
+   * Estimates the fee for a list of INVOKE transaction
+   *
+   * @param invocations the array of invocation and invocation details object containing:
+   * - contractAddress - the address of the account
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   * - nonce - optional nonce
+   * - version - optional version
+   * @param blockIdentifier - block identifier
+   * @returns the estimated fee
+   */
+  public abstract getEstimateFeeBulk(
+    invocations: InvocationBulk,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<EstimateFeeResponseBulk>;
+
+  /**
    * Wait for the transaction to be accepted
    * @param txHash - transaction hash
    * @param retryInterval - retry interval
@@ -278,4 +299,32 @@ export abstract class ProviderInterface {
     retryInterval?: number,
     successStates?: Array<Status>
   ): Promise<GetTransactionReceiptResponse>;
+
+  /**
+   * Simulates the transaction and returns the transaction trace and estimated fee.
+   *
+   * @param invocation the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   * @param details - optional details containing:
+   * - nonce - optional nonce
+   * - version - optional version
+   * @param blockIdentifier - block identifier
+   * @returns the transaction trace and estimated fee
+   */
+  public abstract getSimulateTransaction(
+    invocation: Invocation,
+    invocationDetails: InvocationsDetailsWithNonce,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<TransactionSimulationResponse>;
+
+  /**
+   * Gets the state changes in a specific block
+   *
+   * @param blockIdentifier - block identifier
+   * @returns StateUpdateResponse
+   */
+  public abstract getStateUpdate(blockIdentifier?: BlockIdentifier): Promise<StateUpdateResponse>;
 }

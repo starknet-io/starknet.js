@@ -1,3 +1,87 @@
+# [4.22.0](https://github.com/0xs34n/starknet.js/compare/v4.21.1...v4.22.0) (2023-02-22)
+
+### Features
+
+- move starkname to provider ([8e88ed0](https://github.com/0xs34n/starknet.js/commit/8e88ed0dd9f651dd9decea75dfdae2357e6bfa4a))
+
+## [4.21.1](https://github.com/0xs34n/starknet.js/compare/v4.21.0...v4.21.1) (2023-02-20)
+
+### Bug Fixes
+
+- remove hex prefix should work insensitive, for both 0x and 0X ([53323d4](https://github.com/0xs34n/starknet.js/commit/53323d434d5edbeee03c4262935676c950a761d3))
+- repair decodeShortString for integer strings ([1d6adf0](https://github.com/0xs34n/starknet.js/commit/1d6adf01a64f93b7016d083b81dba4e409371e74))
+
+# [4.21.0](https://github.com/0xs34n/starknet.js/compare/v4.20.0...v4.21.0) (2023-01-18)
+
+### Bug Fixes
+
+- fix merge conflicts from develop ([a8b01e3](https://github.com/0xs34n/starknet.js/commit/a8b01e351bb2d62f98d874d836a3f4046d5e046f))
+
+### Features
+
+- add get_block_traces support in sequencer ([b8dec62](https://github.com/0xs34n/starknet.js/commit/b8dec62c06dabcd3b917d6b53f318df2a0a8dfe4))
+- update types get_block_traces in sequencer ([2a8d97a](https://github.com/0xs34n/starknet.js/commit/2a8d97a532bb2c9f84436daa2b88abc81a4efa41))
+
+# [4.20.0](https://github.com/0xs34n/starknet.js/compare/v4.19.3...v4.20.0) (2023-01-17)
+
+### Bug Fixes
+
+- add utility getter in Block class ([3a52292](https://github.com/0xs34n/starknet.js/commit/3a5229277978c3235eaf1f7003b39eeabecac53e))
+- update responseParser & query parameters for sequencer ([a72db02](https://github.com/0xs34n/starknet.js/commit/a72db020aa1ac6924b2c047d067d553ac1b87248))
+
+### Features
+
+- add support for get_state_update in provider ([76035a1](https://github.com/0xs34n/starknet.js/commit/76035a148e7863fa1dbe440920eca34498480aa9))
+
+## [4.19.3](https://github.com/0xs34n/starknet.js/compare/v4.19.2...v4.19.3) (2023-01-12)
+
+### Bug Fixes
+
+- remove any type in simulateTransaction ([a94db18](https://github.com/0xs34n/starknet.js/commit/a94db1887c9fee676ac9b313190453abd5ea2554))
+- update account.simulateTransaction return type ([3c3d397](https://github.com/0xs34n/starknet.js/commit/3c3d397a4fb1042c7358f70f50df0a4ce2893220))
+
+## [4.19.2](https://github.com/0xs34n/starknet.js/compare/v4.19.1...v4.19.2) (2023-01-11)
+
+### Bug Fixes
+
+- repair and unify transaction retrieval error ([ea5e646](https://github.com/0xs34n/starknet.js/commit/ea5e64651bf47824b254ae73ed8aa88998a5be44))
+
+## [4.19.1](https://github.com/0xs34n/starknet.js/compare/v4.19.0...v4.19.1) (2023-01-10)
+
+### Bug Fixes
+
+- describeIfDevnetSequencer ([4a088ad](https://github.com/0xs34n/starknet.js/commit/4a088ada404ef912976141d8fba1c66d791c273c))
+- es6 ([e85ad45](https://github.com/0xs34n/starknet.js/commit/e85ad45c5565d93417b1a18e3663bd6c5e8861c1))
+- estimate fee response bulk type ([78a1444](https://github.com/0xs34n/starknet.js/commit/78a14445c75b7ec259d6cfecd1cc17869b507dd8))
+- tests ([5ab047f](https://github.com/0xs34n/starknet.js/commit/5ab047ff0b272057e70a29e909084d083db36a96))
+
+# [4.19.0](https://github.com/0xs34n/starknet.js/compare/v4.18.0...v4.19.0) (2023-01-09)
+
+### Bug Fixes
+
+- merge develop into feat/add_estimate_fee_bulk ([88e76af](https://github.com/0xs34n/starknet.js/commit/88e76af68dd711b3f277c0a6d4f1935710aba4d7))
+- update getEstimateFeeBulk function ([4b22c82](https://github.com/0xs34n/starknet.js/commit/4b22c8212f4586b37dc7c8ddfad77955e44b1b12))
+- update types & add separate responseParser for estimateFeeBulk ([52110b2](https://github.com/0xs34n/starknet.js/commit/52110b289e3dfbbe449cf195709b2714f295a70d))
+
+### Features
+
+- add function estimateInvokeFeeBulk ([e716a18](https://github.com/0xs34n/starknet.js/commit/e716a1882f3ac37d17eae72a51cd3c4fc4649bcb))
+- update estimateFeeBulk ([5ee94f7](https://github.com/0xs34n/starknet.js/commit/5ee94f78af681690905e1ead1de711e3a43c0774))
+- update estimateFeeBulk function & doc ([ce20139](https://github.com/0xs34n/starknet.js/commit/ce201394142a19c4810a1e44cb3f601b815a11fe))
+- update sequencer api ([a12f99e](https://github.com/0xs34n/starknet.js/commit/a12f99ea6e93fb5d44d4d07f7fa8cc2d997db91a))
+
+# [4.18.0](https://github.com/0xs34n/starknet.js/compare/v4.17.1...v4.18.0) (2022-12-23)
+
+### Bug Fixes
+
+- merge develop into branch ([21efcb1](https://github.com/0xs34n/starknet.js/commit/21efcb1cefd6ea70a9d49e060ff620e88002e3b6))
+
+### Features
+
+- simulate_transaction support on sequencer ([304c3cc](https://github.com/0xs34n/starknet.js/commit/304c3cc1af81bc8810581546f043caca01db173b))
+- update simulate tx ([8f3ea55](https://github.com/0xs34n/starknet.js/commit/8f3ea55eb1e23cefc0419902a2ebbe10ee373ccb))
+- update simulate tx in sequencer ([d79a9fa](https://github.com/0xs34n/starknet.js/commit/d79a9faa307936561504c120f67f3fb2f18423b6))
+
 ## [4.17.1](https://github.com/0xs34n/starknet.js/compare/v4.17.0...v4.17.1) (2022-12-14)
 
 ### Bug Fixes

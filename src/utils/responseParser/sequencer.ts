@@ -7,11 +7,14 @@ import {
   DeclareContractResponse,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   InvokeFunctionResponse,
   Sequencer,
+  StateUpdateResponse,
+  TransactionSimulationResponse,
 } from '../../types';
 import { toBN } from '../number';
 import { ResponseParser } from '.';
@@ -101,6 +104,65 @@ export class SequencerAPIResponseParser extends ResponseParser {
     };
   }
 
+  public parseFeeEstimateBulkResponse(
+    res: Sequencer.EstimateFeeResponseBulk
+  ): EstimateFeeResponseBulk {
+    return [].concat(res as []).map((item: Sequencer.EstimateFeeResponse) => {
+      if ('overall_fee' in item) {
+        let gasInfo = {};
+
+        try {
+          gasInfo = {
+            gas_consumed: toBN(item.gas_usage),
+            gas_price: toBN(item.gas_price),
+          };
+        } catch {
+          // do nothing
+        }
+
+        return {
+          overall_fee: toBN(item.overall_fee),
+          ...gasInfo,
+        };
+      }
+      return {
+        overall_fee: toBN(item.amount),
+      };
+    });
+  }
+
+  public parseFeeSimulateTransactionResponse(
+    res: Sequencer.TransactionSimulationResponse
+  ): TransactionSimulationResponse {
+    if ('overall_fee' in res.fee_estimation) {
+      let gasInfo = {};
+
+      try {
+        gasInfo = {
+          gas_consumed: toBN(res.fee_estimation.gas_usage),
+          gas_price: toBN(res.fee_estimation.gas_price),
+        };
+      } catch {
+        // do nothing
+      }
+
+      return {
+        trace: res.trace,
+        fee_estimation: {
+          ...gasInfo,
+          overall_fee: toBN(res.fee_estimation.overall_fee),
+        },
+      };
+    }
+
+    return {
+      trace: res.trace,
+      fee_estimation: {
+        overall_fee: toBN(res.fee_estimation.amount),
+      },
+    };
+  }
+
   public parseCallContractResponse(res: Sequencer.CallContractResponse): CallContractResponse {
     return {
       result: res.result,
@@ -130,6 +192,32 @@ export class SequencerAPIResponseParser extends ResponseParser {
     return {
       transaction_hash: res.transaction_hash,
       class_hash: res.class_hash as string,
+    };
+  }
+
+  public parseGetStateUpdateResponse(res: Sequencer.StateUpdateResponse): StateUpdateResponse {
+    const nonces = [].concat(res.state_diff.nonces as []).map(({ contract_address, nonce }) => {
+      return {
+        contract_address,
+        nonce: nonce as string,
+      };
+    });
+    const storage_diffs = []
+      .concat(res.state_diff.storage_diffs as [])
+      .map(({ address, storage_entries }) => {
+        return {
+          address,
+          storage_entries,
+        };
+      });
+    return {
+      ...res,
+      state_diff: {
+        storage_diffs,
+        declared_contract_hashes: res.state_diff.declared_contract_hashes,
+        deployed_contracts: res.state_diff.deployed_contracts,
+        nonces,
+      },
     };
   }
 }

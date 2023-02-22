@@ -5,6 +5,12 @@
 import BN from 'bn.js';
 
 import {
+  DeployedContractItem,
+  Nonces,
+  StorageDiffItem,
+  TransactionTraceResponse,
+} from './api/sequencer';
+import {
   AllowArray,
   Call,
   DeclareContractPayload,
@@ -132,3 +138,22 @@ export type EstimateFeeAction =
       type: 'DEPLOY';
       payload: UniversalDeployerContractPayload;
     };
+
+export type EstimateFeeResponseBulk = Array<EstimateFeeResponse>;
+
+export interface TransactionSimulationResponse {
+  trace: TransactionTraceResponse;
+  fee_estimation: EstimateFeeResponse;
+}
+
+export interface StateUpdateResponse {
+  block_hash: string;
+  new_root: string;
+  old_root: string;
+  state_diff: {
+    storage_diffs: Array<StorageDiffItem>;
+    declared_contract_hashes: Array<string>;
+    deployed_contracts: Array<DeployedContractItem>;
+    nonces: Array<Nonces>;
+  };
+}

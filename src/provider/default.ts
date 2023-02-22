@@ -8,19 +8,24 @@ import {
   DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetCodeResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
+  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  StateUpdateResponse,
   Status,
+  TransactionSimulationResponse,
 } from '../types';
 import { BigNumberish } from '../utils/number';
 import { ProviderInterface } from './interface';
 import { RpcProvider, RpcProviderOptions } from './rpc';
 import { SequencerProvider, SequencerProviderOptions } from './sequencer';
+import { getAddressFromStarkName, getStarkName } from './starknetId';
 import { BlockIdentifier } from './utils';
 
 export interface ProviderOptions {
@@ -103,6 +108,13 @@ export class Provider implements ProviderInterface {
     );
   }
 
+  public async getEstimateFeeBulk(
+    invocations: InvocationBulk,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<EstimateFeeResponseBulk> {
+    return this.provider.getEstimateFeeBulk(invocations, blockIdentifier);
+  }
+
   public async getNonceForAddress(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
@@ -183,5 +195,25 @@ export class Provider implements ProviderInterface {
     successStates?: Array<Status>
   ): Promise<GetTransactionReceiptResponse> {
     return this.provider.waitForTransaction(txHash, retryInterval, successStates);
+  }
+
+  public async getSimulateTransaction(
+    invocation: Invocation,
+    invocationDetails: InvocationsDetailsWithNonce,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<TransactionSimulationResponse> {
+    return this.provider.getSimulateTransaction(invocation, invocationDetails, blockIdentifier);
+  }
+
+  public async getStateUpdate(blockIdentifier?: BlockIdentifier): Promise<StateUpdateResponse> {
+    return this.provider.getStateUpdate(blockIdentifier);
+  }
+
+  public async getStarkName(address: BigNumberish, StarknetIdContract?: string): Promise<string> {
+    return getStarkName(this, address, StarknetIdContract);
+  }
+
+  public async getAddressFromStarkName(name: string, StarknetIdContract?: string): Promise<string> {
+    return getAddressFromStarkName(this, name, StarknetIdContract);
   }
 }

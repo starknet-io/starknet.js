@@ -21,7 +21,7 @@ export function buf2hex(buffer: Uint8Array) {
  */
 
 export function removeHexPrefix(hex: string): string {
-  return hex.replace(/^0x/, '');
+  return hex.replace(/^0x/i, '');
 }
 
 export function addHexPrefix(hex: string): string {
