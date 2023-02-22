@@ -1,3 +1,13 @@
+# [5.0.0-beta.6](https://github.com/0xs34n/starknet.js/compare/v5.0.0-beta.5...v5.0.0-beta.6) (2023-02-22)
+
+### Bug Fixes
+
+- remove hex prefix should work insensitive, for both 0x and 0X ([53323d4](https://github.com/0xs34n/starknet.js/commit/53323d434d5edbeee03c4262935676c950a761d3))
+
+### Features
+
+- move starkname to provider ([8e88ed0](https://github.com/0xs34n/starknet.js/commit/8e88ed0dd9f651dd9decea75dfdae2357e6bfa4a))
+
 # [4.22.0](https://github.com/0xs34n/starknet.js/compare/v4.21.1...v4.22.0) (2023-02-22)
 
 ### Features
