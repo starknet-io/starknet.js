@@ -4,13 +4,13 @@ sidebar_position: 14
 
 # Signature
 
-You can use Starknet.js to sign a message outside of the network, using the standard methods of hash and sign of StarkNet. By this way, in some cases, you have not to pay fees to store data in-chain ; you transfer the signed message off-chain, and the recipient can verify (without fee) on-chain the validity of the message.
+You can use Starknet.js to sign a message outside of the network, using the standard methods of hash and sign of Starknet. In this way, in some cases, you can avoid paying fees to store data in-chain; you transfer the signed message off-chain, and the recipient can verify (without fee) on-chain the validity of the message.
 
 ## Sign and send a message
 
-Your message has to be an array of `BigNumberish`. You calculate the hash of this message, then you calculate the signature.
+Your message has to be an array of `BigNumberish`. First calculate the hash of this message, then calculate the signature.
 
-> If the message do not respect some safety rules of composition, this method could be a way of attack of your smartcontract. If you have some doubt, prefer the [EIP712 like method](#sign-and-verify-following-eip712), which is safe, but is also more complicated.
+> If the message does not respect some safety rules of composition, this method could be a way of attack of your smart contract. If you have any doubts, prefer the [EIP712 like method](#sign-and-verify-following-eip712), which is safe, but is also more complicated.
 
 ```typescript
 import {ec, hash, number, json, Contract } from "starknet";
@@ -26,7 +26,7 @@ const msgHash = hash.computeHashOnElements(message);
 const signature = ec.sign(starkKeyPair, msgHash);
 ```
 
-Then you can send, by any means, to the recipient of the message :
+Then you can send, by any means, to the recipient of the message:
 
 - the message.
 - the signature.
@@ -34,24 +34,24 @@ Then you can send, by any means, to the recipient of the message :
 
 ## Receive and verify a message
 
-On receiver side, you can verify that : 
+On receiver side, you can verify that: 
 - the message has not been modified,
 - the sender of this message owns the private key corresponding to the public key.
 
-2 ways to perform this verification :
-- off-chain, using the full public key (very fast, but only for standard StarkNet hash & sign).
+2 ways to perform this verification:
+- off-chain, using the full public key (very fast, but only for standard Starknet hash & sign).
 - on-chain, using the account address (slow, add workload to the node/sequencer, but can manage exotic account abstraction about hash or sign).
 
-### Verify outside of StarkNet :
+### Verify outside of Starknet:
 
-The sender provides the message, the signature and the full public key. Verification :
+The sender provides the message, the signature and the full public key. Verification:
 ```typescript
 const starkKeyPair1 = ec.getKeyPairFromPublicKey(fullPublicKey);
 const msgHash1 = hash.computeHashOnElements(message);
 const result1 = ec.verify(starkKeyPair1, msgHash1, signature);
 console.log("Result (boolean) =", result1);
 ```
-> The sender can also provide its account address. Then, you can check that this full public key is linked to this account. The pubKey that you can read in the account contract is part (part X) of the full pubKey (parts X & Y) :
+> The sender can also provide their account address. Then you can check that this full public key is linked to this account. The pubKey that you can read in the account contract is part (part X) of the full pubKey (parts X & Y):
 
 Read the pubKey of the account :
 ```typescript
@@ -61,7 +61,7 @@ const accountAddress ="0x...."; // account of sender
 const contractAccount = new Contract(compiledAccount.abi, accountAddress, provider);
 const pubKey3 = await contractAccount.call("getPublicKey");
 ```
-Check that the pubKey of the account is part of the full pubKey :
+Check that the pubKey of the account is part of the full pubKey:
 ```typescript
 const isFullPubKeyRelatedToAccount: boolean = 
     BigInt(pubKey3.publicKey.toString()) == 
@@ -69,7 +69,7 @@ const isFullPubKeyRelatedToAccount: boolean =
 console.log("Result (boolean)=", isFullPubKeyRelatedToAccount);
 ```
 
-### Verify in StarkNet network, with the account :
+### Verify in Starknet network, with the account:
 
 The sender can provide an account address, in spite of a full public key. 
 
@@ -93,9 +93,9 @@ console.log("Result (boolean) =", result2);
 
 ## Sign and verify following EIP712
 
-Previous examples are valid for an array of numbers. In case of more complex structure of object, you have to work in the spirit of [EIP 712](https://eips.ethereum.org/EIPS/eip-712). This json structure has 4 mandatory items : `types`, `primaryType`, `domain` and `message`.  
-These items are designed to be able to be an interface with a wallet. At sign request, the wallet will display :
-- `message` will be displayed at the bottom of the wallet display, showing clearly (not in hexa) the message to sign. Its structure has to be in accordance with the type listed in `primaryType`, defined in `types`.
+Previous examples are valid for an array of numbers. In case of more complex structure of object, you have to work in the spirit of [EIP 712](https://eips.ethereum.org/EIPS/eip-712). This json structure has 4 mandatory items: `types`, `primaryType`, `domain` and `message`.  
+These items are designed to be able to be an interface with a wallet. At sign request, the wallet will display:
+- `message` will be displayed at the bottom of the wallet display, showing clearly (not in hex) the message to sign. Its structure has to be in accordance with the type listed in `primaryType`, defined in `types`.
 - `domain` will be shown above the message. Its structure has to be in accordance with `StarkNetDomain`.
 
 The prefefined types that you can use :
@@ -165,7 +165,7 @@ const typedDataValidate: typedData.TypedData = {
 // connect your account, then
 const signature4 = await account.signMessage(typedDataValidate);
 ```
-On receiver side, you receive the json, the signature and the account address. To verify the message :
+On receiver side, you receive the json, the signature and the account address. To verify the message:
 
 ``` typescript
 const compiledAccount = json.parse(fs.readFileSync("./compiledContracts/Account_0_5_1.json").toString("ascii"));
