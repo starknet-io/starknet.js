@@ -1,7 +1,6 @@
-import assert from 'minimalistic-assert';
-
 import { AccountInterface } from '../account';
 import { Abi, CompiledContract, FunctionAbi } from '../types';
+import assert from '../utils/assert';
 import { CallData } from '../utils/calldata';
 import { Contract } from './default';
 
