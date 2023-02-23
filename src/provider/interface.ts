@@ -18,6 +18,7 @@ import type {
   InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  RPC,
   StateUpdateResponse,
   TransactionSimulationResponse,
   waitForTransactionOptions,
@@ -71,7 +72,7 @@ export abstract class ProviderInterface {
   public abstract getClassAt(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
-  ): Promise<ContractClass>;
+  ): Promise<ContractClass | RPC.ContractClass>;
 
   /**
    * Returns the class hash deployed under the given address.
@@ -91,7 +92,7 @@ export abstract class ProviderInterface {
    * @param classHash - class hash
    * @returns Contract class of compiled contract
    */
-  public abstract getClassByHash(classHash: string): Promise<ContractClass>;
+  public abstract getClassByHash(classHash: string): Promise<ContractClass | RPC.ContractClass>;
 
   /**
    * Gets the nonce of a contract with respect to a specific block

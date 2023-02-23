@@ -2,6 +2,7 @@ import urljoin from 'url-join';
 
 import { BaseUrl, NetworkName, StarknetChainId } from '../constants';
 import {
+  CairoAssembly,
   Call,
   CallContractResponse,
   CallL1Handler,
@@ -336,8 +337,20 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('get_class_hash_at', { blockIdentifier, contractAddress });
   }
 
-  public async getClassByHash(classHash: string): Promise<ContractClass> {
-    return this.fetchEndpoint('get_class_by_hash', { classHash }).then(parseContract);
+  public async getClassByHash(
+    classHash: string,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<ContractClass> {
+    return this.fetchEndpoint('get_class_by_hash', { classHash, blockIdentifier }).then(
+      parseContract
+    );
+  }
+
+  public async getCompiledClassByClassHash(
+    classHash: string,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<CairoAssembly> {
+    return this.fetchEndpoint('get_compiled_class_by_class_hash', { classHash, blockIdentifier });
   }
 
   public async invokeFunction(

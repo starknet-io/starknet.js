@@ -4,7 +4,12 @@ import { keccak256 } from 'ethereum-cryptography/keccak.js';
 import { hexToBytes } from 'ethereum-cryptography/utils.js';
 
 import { API_VERSION, MASK_250, StarknetChainId, TransactionHashPrefix } from '../constants';
-import { CompiledContract, RawCalldata } from '../types/lib';
+import {
+  CompiledContract,
+  LegacyCompiledContract,
+  RawCalldata,
+  SieraContractClass,
+} from '../types/lib';
 import { felt } from './calldata/cairo';
 import { starkCurve } from './ec';
 import { addHexPrefix, buf2hex, removeHexPrefix, utf8ToArray } from './encode';
@@ -210,7 +215,7 @@ function nullSkipReplacer(key: string, value: any) {
   return value === null ? undefined : value;
 }
 
-export default function computeHintedClassHash(compiledContract: CompiledContract) {
+export default function computeHintedClassHash(compiledContract: LegacyCompiledContract) {
   const { abi, program } = compiledContract;
 
   const contractClass = { abi, program };
@@ -242,11 +247,7 @@ export default function computeHintedClassHash(compiledContract: CompiledContrac
   return addHexPrefix(starkCurve.keccak(utf8ToArray(serialisedJson)).toString(16));
 }
 
-// Computes the class hash of a given contract class
-export function computeContractClassHash(contract: CompiledContract | string) {
-  const compiledContract =
-    typeof contract === 'string' ? (parse(contract) as CompiledContract) : contract;
-
+function computeLegacyContractClassHash(compiledContract: LegacyCompiledContract) {
   const apiVersion = toHex(API_VERSION);
 
   const externalEntryPointsHash = computeHashOnElements(
@@ -278,4 +279,22 @@ export function computeContractClassHash(contract: CompiledContract | string) {
     hintedClassHash,
     dataHash,
   ]);
+}
+
+function computeSieraContractClassHash(contract: SieraContractClass | string) {
+  // TODO: add support
+  throw new Error(
+    `compute class hash for siera contract is not supported yet, contract: ${contract}`
+  );
+}
+
+// Computes the class hash of a given contract class
+export function computeContractClassHash(contract: CompiledContract | string) {
+  const compiledContract = typeof contract === 'string' ? parse(contract) : contract;
+
+  if ('program' in compiledContract) {
+    return computeLegacyContractClassHash(compiledContract as LegacyCompiledContract);
+  }
+
+  return computeSieraContractClassHash(compiledContract as SieraContractClass);
 }

@@ -309,6 +309,8 @@ export class Account extends Provider implements AccountInterface {
 
     const classHash = providedClassHash ?? computeContractClassHash(contract);
 
+    if (!classHash) throw new Error('declare classHash is undefined');
+
     const maxFee =
       transactionsDetail.maxFee ??
       (await this.getSuggestedMaxFee(
@@ -527,6 +529,7 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<DeclareContractTransaction> {
     const contractDefinition = parseContract(contract);
     const classHash = providedClassHash ?? computeContractClassHash(contract);
+    if (!classHash) throw new Error('buildDeclarePayload classHash is undefined');
     const signature = await this.signer.signDeclareTransaction({
       classHash,
       senderAddress: walletAddress,

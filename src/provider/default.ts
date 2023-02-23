@@ -17,6 +17,7 @@ import {
   InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  RPC,
   StateUpdateResponse,
   TransactionSimulationResponse,
   waitForTransactionOptions,
@@ -69,7 +70,7 @@ export class Provider implements ProviderInterface {
   public async getClassAt(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
-  ): Promise<ContractClass> {
+  ): Promise<ContractClass | RPC.ContractClass> {
     return this.provider.getClassAt(contractAddress, blockIdentifier);
   }
 
@@ -80,7 +81,7 @@ export class Provider implements ProviderInterface {
     return this.provider.getClassHashAt(contractAddress, blockIdentifier);
   }
 
-  public getClassByHash(classHash: string): Promise<ContractClass> {
+  public getClassByHash(classHash: string): Promise<ContractClass | RPC.ContractClass> {
     return this.provider.getClassByHash(classHash);
   }
 

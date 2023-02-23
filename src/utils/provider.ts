@@ -18,11 +18,13 @@ export function parseCalldata(calldata: RawCalldata = []) {
   });
 }
 
+// TODO: How can we receive string here ?
 export function parseContract(contract: CompiledContract | string) {
   const parsedContract =
     typeof contract === 'string' ? (parse(contract) as CompiledContract) : contract;
   return {
     ...parsedContract,
-    program: compressProgram(parsedContract.program),
+    // TODO: Why do we gzip program object?
+    ...('program' in parsedContract && { program: compressProgram(parsedContract.program) }),
   } as ContractClass;
 }

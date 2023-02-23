@@ -4,6 +4,9 @@ import {
   Abi,
   AllowArray,
   BlockNumber,
+  ByteCode,
+  CairoAssembly,
+  CompiledContract,
   ContractClass,
   EntryPointType,
   RawCalldata,
@@ -144,7 +147,7 @@ export namespace Sequencer {
   };
 
   export type GetCodeResponse = {
-    bytecode: string[];
+    bytecode: ByteCode;
     abi: Abi;
   };
 
@@ -385,9 +388,10 @@ export namespace Sequencer {
     get_class_by_hash: {
       QUERY: {
         classHash: string;
+        blockIdentifier?: BlockIdentifier;
       };
       REQUEST: never;
-      RESPONSE: any;
+      RESPONSE: CompiledContract;
     };
     get_class_hash_at: {
       QUERY: {
@@ -411,7 +415,7 @@ export namespace Sequencer {
         blockIdentifier?: BlockIdentifier;
       };
       REQUEST: never;
-      RESPONSE: any;
+      RESPONSE: CompiledContract;
     };
     estimate_message_fee: {
       QUERY: any;
@@ -439,6 +443,14 @@ export namespace Sequencer {
       };
       REQUEST: never;
       RESPONSE: BlockTransactionTracesResponse;
+    };
+    get_compiled_class_by_class_hash: {
+      QUERY: {
+        classHash: string;
+        blockIdentifier?: BlockIdentifier;
+      };
+      REQUEST: any;
+      RESPONSE: CairoAssembly;
     };
   };
 }

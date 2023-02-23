@@ -1,6 +1,5 @@
 import { weierstrass } from '../utils/ec';
 import type { BigNumberish } from '../utils/number';
-import { RPC } from './api/rpc';
 
 // Common Signature Type which needs to be imported from weierstrass
 // and imported at many places
@@ -18,11 +17,30 @@ export type RawArgs =
     }
   | BigNumberish[];
 
-export interface ContractClass {
+// Cairo Contract Class
+export type ContractClass = LegacyContractClass | SieraContractClass;
+
+// TODO: Clean this mess with types
+
+export type SieraContractClass = {
+  sierra_program: ByteCode;
+  sierra_program_debug_info: SieraProgramDebugInfo;
+  contract_class_version: string;
+  entry_points_by_type: EntryPointsByType;
+  abi: Abi;
+};
+
+export type SieraProgramDebugInfo = {
+  type_names: [number, string][];
+  libfunc_names: [number, string][];
+  user_func_names: [number, string][];
+};
+
+export type LegacyContractClass = {
   program: CompressedProgram;
-  entry_points_by_type: RPC.ContractClass['entry_points_by_type'];
-  abi?: Abi;
-}
+  entry_points_by_type: EntryPointsByType;
+  abi: Abi;
+};
 
 export type UniversalDeployerContractPayload = {
   classHash: BigNumberish;
@@ -170,18 +188,15 @@ export type EntryPointsByType = {
 export interface Program extends Record<string, any> {
   builtins: string[];
   data: string[];
+  // TODO: Add missing properties
 }
 export type BlockTag = 'pending' | 'latest';
 export type BlockNumber = BlockTag | null | number;
 
-export type CompiledContract = {
-  abi: Abi;
-  entry_points_by_type: EntryPointsByType;
-  program: Program;
-};
+export type CompiledContract = LegacyCompiledContract | SieraContractClass;
 
-export type CompressedCompiledContract = Omit<CompiledContract, 'program'> & {
-  program: CompressedProgram;
+export type LegacyCompiledContract = Omit<LegacyContractClass, 'program'> & {
+  program: Program;
 };
 
 export type Struct = {
@@ -199,3 +214,13 @@ export type waitForTransactionOptions = {
   retryInterval?: number;
   successStates?: Array<TransactionStatus>;
 };
+
+export type CairoAssembly = {
+  prime: string;
+  compiler_version: string;
+  bytecode: ByteCode;
+  hints: any[];
+  entry_points_by_type: EntryPointsByType;
+};
+
+export type ByteCode = string[];

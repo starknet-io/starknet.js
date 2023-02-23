@@ -11,6 +11,7 @@ import {
 } from './api/sequencer';
 import {
   AllowArray,
+  ByteCode,
   Call,
   DeclareContractPayload,
   DeployAccountContractPayload,
@@ -36,7 +37,7 @@ export interface GetBlockResponse {
 }
 
 export interface GetCodeResponse {
-  bytecode: string[];
+  bytecode: ByteCode;
   // abi: string; // is not consistent between rpc and sequencer (is it?), therefore not included in the provider interface
 }
 

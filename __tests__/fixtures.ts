@@ -2,10 +2,10 @@ import fs from 'fs';
 import path from 'path';
 
 import { Account, ProviderInterface, RpcProvider, SequencerProvider, json } from '../src';
-import { CompiledContract, waitForTransactionOptions } from '../src/types';
+import { LegacyCompiledContract, waitForTransactionOptions } from '../src/types';
 import { toHex } from '../src/utils/number';
 
-const readContract = (name: string): CompiledContract =>
+const readContract = (name: string): LegacyCompiledContract =>
   json.parse(
     fs.readFileSync(path.resolve(__dirname, `../__mocks__/${name}.json`)).toString('ascii')
   );
