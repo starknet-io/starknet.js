@@ -1,5 +1,4 @@
-import assert from 'minimalistic-assert';
-
+import assert from './assert';
 import { addHexPrefix } from './encode';
 
 export type BigNumberish = string | number | bigint;

@@ -1,5 +1,3 @@
-import assert from 'minimalistic-assert';
-
 import { AccountInterface } from '../account';
 import { ProviderInterface, defaultProvider } from '../provider';
 import {
@@ -12,6 +10,7 @@ import {
   Overrides,
   StructAbi,
 } from '../types';
+import assert from '../utils/assert';
 import { CallData } from '../utils/calldata';
 import { CallOptions, ContractInterface } from './interface';
 
