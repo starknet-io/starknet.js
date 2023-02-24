@@ -14,7 +14,7 @@ export * as constants from './constants';
 export * as encode from './utils/encode';
 export * as hash from './utils/hash';
 export * as json from './utils/json';
-export * as number from './utils/number';
+export * as num from './utils/num';
 export * as transaction from './utils/transaction';
 export * as stark from './utils/stark';
 export * as merkle from './utils/merkle';

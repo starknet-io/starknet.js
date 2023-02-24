@@ -1,4 +1,4 @@
-import { BigNumberish } from '../utils/number';
+import { BigNumberish } from '../utils/num';
 import { compileCalldata } from '../utils/stark';
 import { getStarknetIdContract, useDecoded, useEncoded } from '../utils/starknetId';
 import { ProviderInterface } from './interface';
