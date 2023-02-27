@@ -17,8 +17,10 @@ import {
   InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  Nonce,
   RPC,
   StateUpdateResponse,
+  Storage,
   TransactionSimulationResponse,
   waitForTransactionOptions,
 } from '../types';
@@ -115,7 +117,7 @@ export class Provider implements ProviderInterface {
   public async getNonceForAddress(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
-  ): Promise<BigNumberish> {
+  ): Promise<Nonce> {
     return this.provider.getNonceForAddress(contractAddress, blockIdentifier);
   }
 
@@ -123,7 +125,7 @@ export class Provider implements ProviderInterface {
     contractAddress: string,
     key: BigNumberish,
     blockIdentifier?: BlockIdentifier
-  ): Promise<BigNumberish> {
+  ): Promise<Storage> {
     return this.provider.getStorageAt(contractAddress, key, blockIdentifier);
   }
 

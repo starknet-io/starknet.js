@@ -1,5 +1,5 @@
 /**
- * Starknet RPC version 0.2.0
+ * Starknet RPC version 0.2.1
  *
  * Starknet Node API 0.45.0 - rpc 0.2.1
  * Starknet Node Write API 0.3.0 - rpc 0.2.1
@@ -252,9 +252,9 @@ type CONTRACT_ENTRY_POINT = {
   offset: NUM_AS_HEX;
   selector: FELT;
 };
-type CONTRACT_STORAGE_DIFF_ITEM = {
+export type CONTRACT_STORAGE_DIFF_ITEM = {
   address: FELT;
-  storage_entries: [key: FELT, value: FELT];
+  storage_entries: { key: FELT; value: FELT }[];
 };
 
 type DEPLOYED_CONTRACT_ITEM = {

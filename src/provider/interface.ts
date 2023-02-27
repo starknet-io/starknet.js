@@ -18,8 +18,10 @@ import type {
   InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  Nonce,
   RPC,
   StateUpdateResponse,
+  Storage,
   TransactionSimulationResponse,
   waitForTransactionOptions,
 } from '../types';
@@ -103,7 +105,7 @@ export abstract class ProviderInterface {
   public abstract getNonceForAddress(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
-  ): Promise<BigNumberish>;
+  ): Promise<Nonce>;
 
   /**
    * Gets the contract's storage variable at a specific key.
@@ -117,7 +119,7 @@ export abstract class ProviderInterface {
     contractAddress: string,
     key: BigNumberish,
     blockIdentifier?: BlockIdentifier
-  ): Promise<BigNumberish>;
+  ): Promise<Storage>;
 
   /**
    * Gets the transaction information from a tx id.

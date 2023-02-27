@@ -288,7 +288,7 @@ export class SequencerProvider implements ProviderInterface {
   public async getNonceForAddress(
     contractAddress: string,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<BigNumberish> {
+  ): Promise<Sequencer.Nonce> {
     return this.fetchEndpoint('get_nonce', { contractAddress, blockIdentifier });
   }
 
@@ -296,7 +296,7 @@ export class SequencerProvider implements ProviderInterface {
     contractAddress: string,
     key: BigNumberish,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<BigNumberish> {
+  ): Promise<Sequencer.Storage> {
     const parsedKey = toBigInt(key).toString(10);
     return this.fetchEndpoint('get_storage_at', {
       blockIdentifier,

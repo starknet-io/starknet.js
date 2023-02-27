@@ -3,12 +3,8 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 
-import {
-  DeployedContractItem,
-  Nonces,
-  StorageDiffItem,
-  TransactionTraceResponse,
-} from './api/sequencer';
+import { RPC } from './api/rpc';
+import { Sequencer, TransactionTraceResponse } from './api/sequencer';
 import {
   AllowArray,
   ByteCode,
@@ -142,19 +138,27 @@ export type EstimateFeeAction =
 
 export type EstimateFeeResponseBulk = Array<EstimateFeeResponse>;
 
+export type Storage = Sequencer.Storage;
+
+export type Nonce = Sequencer.Nonce;
+
 export interface TransactionSimulationResponse {
   trace: TransactionTraceResponse;
   fee_estimation: EstimateFeeResponse;
 }
 
+// As RPC and Sequencer response diverge, use RPC as common response
 export interface StateUpdateResponse {
   block_hash: string;
   new_root: string;
   old_root: string;
   state_diff: {
-    storage_diffs: Array<StorageDiffItem>;
-    declared_contract_hashes: Array<string>;
-    deployed_contracts: Array<DeployedContractItem>;
-    nonces: Array<Nonces>;
+    storage_diffs: RPC.StorageDiffs; // API DIFF
+    declared_contract_hashes?: RPC.DeclaredContractHashes; // RPC only
+    deployed_contracts: Sequencer.DeployedContracts;
+    nonces: RPC.Nonces; // API DIFF
+    old_declared_contracts?: Sequencer.OldDeclaredContracts; // Sequencer Only
+    declared_classes?: Sequencer.DeclaredClasses; // Sequencer Only
+    replaced_classes?: Sequencer.ReplacedClasses; // Sequencer Only
   };
 }

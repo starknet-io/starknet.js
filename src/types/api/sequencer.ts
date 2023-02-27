@@ -70,24 +70,9 @@ export type CallL1Handler = {
   payload: Array<string>;
 };
 
-export type StateDiffItem = {
-  key: string;
-  value: string;
-};
-
-export type StorageDiffItem = {
-  address: string;
-  storage_entries: [key: string, value: string];
-};
-
 export type DeployedContractItem = {
   address: string;
   class_hash: string;
-};
-
-export type Nonces = {
-  contract_address: string;
-  nonce: string;
 };
 
 export type SequencerIdentifier = { blockHash: string } | { blockNumber: BlockNumber };
@@ -286,19 +271,39 @@ export namespace Sequencer {
     traces: Array<TransactionTraceResponse & { transaction_hash: string }>;
   };
 
+  export type Storage = string;
+
   export type StateUpdateResponse = {
     block_hash: string;
     new_root: string;
     old_root: string;
     state_diff: {
-      storage_diffs: Array<{
-        [address: string]: Array<StateDiffItem>;
-      }>;
-      declared_contract_hashes: Array<string>;
+      storage_diffs: StorageDiffs;
+      nonces: Nonces;
       deployed_contracts: Array<DeployedContractItem>;
-      nonces: Array<Nonces>;
+      old_declared_contracts: OldDeclaredContracts;
+      declared_classes: DeclaredClasses;
+      replaced_classes: ReplacedClasses; // no definition is it array of string
     };
   };
+
+  export type StorageDiffs = { [address: string]: Array<StateDiffItem> };
+
+  export type StateDiffItem = { key: string; value: string };
+
+  export type Nonces = { [address: string]: Nonce };
+
+  export type Nonce = string;
+
+  export type DeployedContracts = DeployedContractItem[];
+
+  export type OldDeclaredContracts = string[];
+
+  export type DeclaredClasses = DeclaredClass[];
+
+  export type DeclaredClass = { class_hash: string; compiled_class_hash: string };
+
+  export type ReplacedClasses = string[]; // no definition is it array of string ?
 
   export type Endpoints = {
     get_contract_addresses: {
@@ -345,7 +350,7 @@ export namespace Sequencer {
         blockIdentifier: BlockIdentifier;
       };
       REQUEST: never;
-      RESPONSE: BigNumberish;
+      RESPONSE: Nonce;
     };
     get_storage_at: {
       QUERY: {
@@ -354,7 +359,7 @@ export namespace Sequencer {
         blockIdentifier: BlockIdentifier;
       };
       REQUEST: never;
-      RESPONSE: string;
+      RESPONSE: Storage;
     };
     get_code: {
       QUERY: {

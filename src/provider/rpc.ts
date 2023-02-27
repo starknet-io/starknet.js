@@ -173,7 +173,7 @@ export class RpcProvider implements ProviderInterface {
     contractAddress: string,
     key: BigNumberish,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<BigNumberish> {
+  ): Promise<RPC.Storage> {
     const parsedKey = toHex(key);
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getStorageAt', {
