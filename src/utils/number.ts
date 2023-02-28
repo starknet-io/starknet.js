@@ -1,5 +1,8 @@
+/* eslint-disable prettier/prettier */
+import { hexToBytes as hexToBytesNoble } from '@noble/curves/abstract/utils';
+
 import assert from './assert';
-import { addHexPrefix } from './encode';
+import { addHexPrefix, removeHexPrefix } from './encode';
 
 export type BigNumberish = string | number | bigint;
 
@@ -88,3 +91,19 @@ export function getHexStringArray(value: Array<string>) {
 }
 
 export const toCairoBool = (value: boolean): string => (+value).toString();
+
+/**
+ * Convert a hex string to an array of Bytes (Uint8Array)
+ * @param value hex string
+ * @returns an array of Bytes
+ */
+export function hexToBytes(value: string): Uint8Array {
+  if (!isHex(value)) throw new Error(`${value} need to be a hex-string`);
+
+  let adaptedValue: string = removeHexPrefix(value);
+  if (adaptedValue.length % 2 !== 0) {
+    // eslint-disable-next-line prefer-template
+    adaptedValue = `0${adaptedValue}`;
+  }
+  return hexToBytesNoble(adaptedValue);
+}
