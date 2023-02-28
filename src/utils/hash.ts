@@ -11,8 +11,6 @@ import { parse, stringify } from './json';
 import { BigNumberish, hexToBytes, isHex, isStringWholeNumber, toHex, toHexString } from './number';
 import { encodeShortString } from './shortString';
 
-export * as poseidon from '@noble/curves/abstract/poseidon';
-
 export const transactionVersion = 1n;
 export const feeTransactionVersion = 2n ** 128n + transactionVersion;
 
@@ -285,3 +283,18 @@ export function computeContractClassHash(contract: CompiledContract | string) {
     dataHash,
   ]);
 }
+
+// for Pedersen
+export { hashChain } from '@noble/curves/stark';
+
+// for Poseidon
+export {
+  Fp251,
+  Fp253,
+  _poseidonMDS,
+  PoseidonOpts,
+  poseidonBasic,
+  poseidonCreate,
+  poseidonHash,
+} from '@noble/curves/stark';
+export * as poseidon from '@noble/curves/abstract/poseidon';

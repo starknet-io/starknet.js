@@ -1,8 +1,13 @@
 import { Hex } from '@noble/curves/abstract/utils';
 import { SignatureType } from '@noble/curves/abstract/weierstrass';
-import { CURVE, verify } from '@noble/curves/stark';
+import {
+  CURVE,
+  getPublicKey as getPublicKeyNoble,
+  verify as verifyNoble,
+} from '@noble/curves/stark';
 
-import { buf2hex, sanitizeHex } from '../encode';
+import { addHexPrefix, buf2hex, sanitizeHex } from '../encode';
+import { BigNumberish, toHex } from '../number';
 
 /**
  * Verifies a message using the provided public key
@@ -11,7 +16,9 @@ import { buf2hex, sanitizeHex } from '../encode';
  * @param pubKey - public key. 512 bits full public key or 256 bits compressed (Starknet, without 0x02 or 0x03 head)
  * @returns true if the message is verified
  */
-function starknetVerify(signature: SignatureType | Hex, msgHash: Hex, pubKey: Hex): boolean {
+export function verify(signature: SignatureType | Hex, msgHash: Hex, pubKey: Hex): boolean {
+  // adapted because Noble verify() do not handle Starknet public key.
+
   /**
    * y² = x³ + ax + b: Short weierstrass curve formula
    * @returns y²
@@ -44,14 +51,24 @@ function starknetVerify(signature: SignatureType | Hex, msgHash: Hex, pubKey: He
   // eslint-disable-next-line prefer-template
   const pubKeySolution2 = '0x040' + x.toString(16) + '0' + yneg.toString(16);
 
-  const verif1 = verify(signature, msgHash, pubKeySolution1);
-  const verif2 = verify(signature, msgHash, pubKeySolution2);
+  const verif1 = verifyNoble(signature, msgHash, pubKeySolution1);
+  const verif2 = verifyNoble(signature, msgHash, pubKeySolution2);
   return verif1 || verif2;
 }
 
-export { starknetVerify as verify };
+/**
+ * Provides a hex public key, from a Hex private key.
+ * @param privKey - private key, on 32 bytes.
+ * @param isCompressed - optional format of key. Normaly not used with Starknet.
+ * @returns Hex string of the full public key (64 bytes), with 0x prefix.
+ */
+export function getPublicKey(privKey: BigNumberish, isCompressed = false): string {
+  // adapted due to Uint8Array return from Noble getPublicKey.
+  const privKeyHex = toHex(BigInt(privKey));
+  return addHexPrefix(buf2hex(getPublicKeyNoble(privKeyHex, isCompressed)));
+}
+
 export {
-  getPublicKey,
   getSharedSecret,
   sign,
   CURVE,

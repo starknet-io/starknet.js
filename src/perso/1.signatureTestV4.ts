@@ -5,7 +5,7 @@ import { toHex } from '../utils/number';
 // V4
 import { ec, encode, hash } from '..';
 
-const privateKey = '0x5b7d4f8710b3581ebb2b8b74efaa23d25ab0ffea2a4f3e269bf91bf9f63d633';
+const privateKey = '0x5b7d4f8710b3581ebb2b8b74efaa23d25ab0ffea2a4f3e269bf91bf9f63d634';
 const keyPair = ec.getKeyPair(privateKey);
 console.log('priv=', toHex(keyPair.getPrivate()));
 console.log('pub=', keyPair.getPublic());

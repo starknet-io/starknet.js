@@ -6,6 +6,9 @@ sidebar_position: 14
 
 You can use Starknet.js to sign a message outside of the network, using the standard methods of hash and sign of Starknet. In this way, in some cases, you can avoid paying fees to store data in-chain; you transfer the signed message off-chain, and the recipient can verify (without fee) on-chain the validity of the message.
 
+> From Starknet.js V5.0 onwards, a new and way more faster crypto library is available. Nevertheless, the API is significantly modified.  
+> The crypto V4 API are still available, for ascending compatibility purpose, but do not use them anymore for your new code.
+
 ## Sign and send a message
 
 Your message has to be an array of `BigNumberish`. First calculate the hash of this message, then calculate the signature.
