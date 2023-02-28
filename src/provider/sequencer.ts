@@ -40,7 +40,7 @@ import {
   getHexStringArray,
   toBigInt,
   toHex,
-} from '../utils/number';
+} from '../utils/number/number';
 import { parseContract, wait } from '../utils/provider';
 import { SequencerAPIResponseParser } from '../utils/responseParser/sequencer';
 import { formatSignature, randomAddress, signatureToDecimalArray } from '../utils/stark';

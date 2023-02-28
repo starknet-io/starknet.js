@@ -1,4 +1,4 @@
-import { isBigInt } from '../number';
+import { isBigInt } from '../number/number';
 import { decodeShortString } from '../shortString';
 
 const guard = {

@@ -16,7 +16,7 @@ import {
   bigNumberishArrayToHexadecimalStringArray,
   toBigInt,
   toHex,
-} from './number';
+} from './number/number';
 
 /**
  * Function to compress compiled cairo program

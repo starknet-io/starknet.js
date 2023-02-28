@@ -1,6 +1,6 @@
 import { Call, ParsedStruct } from '../types';
 import { getSelectorFromName } from './hash';
-import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBigInt } from './number';
+import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBigInt } from './number/number';
 
 /**
  * Transforms a list of Calls, each with their own calldata, into

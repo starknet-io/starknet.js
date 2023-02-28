@@ -1,4 +1,4 @@
-import { BigNumberish } from '../../utils/number';
+import { BigNumberish } from '../../utils/number/number';
 import { Signature } from '../lib';
 
 export type Calldata = string[];

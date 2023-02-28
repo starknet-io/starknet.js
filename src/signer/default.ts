@@ -1,13 +1,13 @@
 import { Abi, Call, DeclareSignerDetails, InvocationsSignerDetails, Signature } from '../types';
 import { DeployAccountSignerDetails } from '../types/signer';
-import { starkCurve } from '../utils/ec';
+import { starkCurve } from '../utils/ec/ec';
 import { buf2hex } from '../utils/encode';
 import {
   calculateDeclareTransactionHash,
   calculateDeployAccountTransactionHash,
   calculateTransactionHash,
 } from '../utils/hash';
-import { toHex } from '../utils/number';
+import { toHex } from '../utils/number/number';
 import { fromCallsToExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { SignerInterface } from './interface';
