@@ -30,7 +30,7 @@ Then you can send, by any means, to the recipient of the message:
 
 - the message.
 - the signature.
-- the full public key (or a wallet address).
+- the full public key, or the starknet public key, or a wallet address.
 
 ## Receive and verify a message
 
@@ -41,23 +41,23 @@ On receiver side, you can verify that:
 
 2 ways to perform this verification:
 
-- off-chain, using the full public key (very fast, but only for standard Starknet hash & sign).
+- off-chain, using the full public key or the Starknet public key (very fast, but only for standard Starknet hash & sign).
 - on-chain, using the account address (slow, add workload to the node/sequencer, but can manage exotic account abstraction about hash or sign).
 
 ### Verify outside of Starknet:
 
-The sender provides the message, the signature and the full public key. Verification:
+The sender provides the message, the signature and the full or Starknet public key. Verification:
 
 ```typescript
-const starkKeyPair1 = ec.getKeyPairFromPublicKey(fullPublicKey);
+const starkKeyPair1 = ec.getKeyPairFromPublicKey(publicKey);
 const msgHash1 = hash.computeHashOnElements(message);
 const result1 = ec.verify(starkKeyPair1, msgHash1, signature);
 console.log("Result (boolean) =", result1);
 ```
 
-> The sender can also provide their account address. Then you can check that this full public key is linked to this account. The pubKey that you can read in the account contract is part (part X) of the full pubKey (parts X & Y):
+> The sender can also provide the full public key and its account address. Then you can check that the full public key is linked to this account. The Starknet public key that you can read in the account contract is part (part X) of the full pubKey (parts X & Y):
 
-Read the pubKey of the account :
+Read the Starknet public key of the account :
 
 ```typescript
 const provider = new Provider({ sequencer: { baseUrl: "http://127.0.0.1:5050" } }); //devnet

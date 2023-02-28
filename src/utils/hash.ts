@@ -1,28 +1,31 @@
 /* eslint-disable no-param-reassign */
-/* eslint-disable import/extensions */
-import { keccak256 } from 'ethereum-cryptography/keccak.js';
-import { hexToBytes } from 'ethereum-cryptography/utils.js';
+import { Hex } from '@noble/curves/abstract/utils';
+// eslint-disable-next-line @typescript-eslint/no-unused-vars, prettier/prettier
+import { computeHashOnElements as computeHashOnElementsNoble, keccak } from '@noble/curves/stark';
 
 import { API_VERSION, MASK_250, StarknetChainId, TransactionHashPrefix } from '../constants';
 import { CompiledContract, RawCalldata } from '../types/lib';
 import { felt } from './calldata/cairo';
-import { starkCurve } from './ec';
-import { addHexPrefix, buf2hex, removeHexPrefix, utf8ToArray } from './encode';
+import { addHexPrefix, removeHexPrefix, utf8ToArray } from './encode';
 import { parse, stringify } from './json';
-import { BigNumberish, isHex, isStringWholeNumber, toBigInt, toHex, toHexString } from './number';
+import { BigNumberish, hexToBytes, isHex, isStringWholeNumber, toHex, toHexString } from './number';
 import { encodeShortString } from './shortString';
+
+export * as poseidon from '@noble/curves/abstract/poseidon';
 
 export const transactionVersion = 1n;
 export const feeTransactionVersion = 2n ** 128n + transactionVersion;
 
+export type PedersenArg = Hex | bigint | number;
+
 export function keccakBn(value: BigNumberish): string {
   const hexWithoutPrefix = removeHexPrefix(toHex(BigInt(value)));
   const evenHex = hexWithoutPrefix.length % 2 === 0 ? hexWithoutPrefix : `0${hexWithoutPrefix}`;
-  return addHexPrefix(buf2hex(keccak256(hexToBytes(evenHex))));
+  return addHexPrefix(keccak(hexToBytes(evenHex)).toString(16));
 }
 
 function keccakHex(value: string): string {
-  return addHexPrefix(buf2hex(keccak256(utf8ToArray(value))));
+  return addHexPrefix(keccak(utf8ToArray(value)).toString(16));
 }
 
 /**
@@ -65,10 +68,13 @@ export function getSelector(value: string) {
   return getSelectorFromName(value);
 }
 
+export { keccak };
+
+export { pedersen } from '@noble/curves/stark';
+
 export function computeHashOnElements(data: BigNumberish[]): string {
-  return [...data, data.length]
-    .reduce((x: BigNumberish, y: BigNumberish) => starkCurve.pedersen(toBigInt(x), toBigInt(y)), 0)
-    .toString();
+  const adaptedData: bigint[] = data.map(BigInt);
+  return computeHashOnElementsNoble(adaptedData) as string;
 }
 
 // following implementation is based on this python implementation:
@@ -239,7 +245,7 @@ export default function computeHintedClassHash(compiledContract: CompiledContrac
       [false, '']
     )[1];
 
-  return addHexPrefix(starkCurve.keccak(utf8ToArray(serialisedJson)).toString(16));
+  return addHexPrefix(keccak(utf8ToArray(serialisedJson)).toString(16));
 }
 
 // Computes the class hash of a given contract class
