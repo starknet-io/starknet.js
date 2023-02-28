@@ -258,7 +258,7 @@ export namespace Sequencer {
     fee_estimation: Sequencer.EstimateFeeResponse;
   };
 
-  export type SimulateTransaction = Omit<InvokeFunctionTransaction, 'max_fee' | 'entry_point_type'>;
+  export type SimulateTransaction = Omit<InvokeFunctionTransaction, 'entry_point_type'>;
 
   export type EstimateFeeRequestBulk = AllowArray<
     InvokeEstimateFee | DeclareEstimateFee | DeployEstimateFee | DeployAccountEstimateFee
