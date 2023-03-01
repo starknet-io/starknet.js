@@ -152,7 +152,14 @@
           "type": "string"
         },
         "signature": {
-          "type": "object"
+          "anyOf": [
+            {
+              "type": "array"
+            },
+            {
+              "type": "object"
+            }
+          ]
         },
         "max_fee": {
           "type": "string"
