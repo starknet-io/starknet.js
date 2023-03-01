@@ -571,6 +571,7 @@ describe('Complex interaction', () => {
     });
 
     test('estimate fee', async () => {
+      // TODO test
       const gas = await erc20Echo20Contract.estimateFee.iecho(CallData.compile(request));
       expect(gas.gas_consumed).toBeDefined();
       expect(gas.gas_price).toBeDefined();
@@ -579,6 +580,7 @@ describe('Complex interaction', () => {
     });
 
     test('estimate fee transfer', async () => {
+      // TODO test
       const gas = await erc20Echo20Contract.estimateFee.transfer(stark.randomAddress(), uint256(1));
       expect(gas.gas_consumed).toBeDefined();
       expect(gas.gas_price).toBeDefined();

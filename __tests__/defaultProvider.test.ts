@@ -46,6 +46,7 @@ describe('defaultProvider', () => {
 
     describe('getBlock', () => {
       test('getBlock(blockIdentifier=latest)', async () => {
+        // TODO test
         expect(exampleBlock).not.toBeNull();
         const { block_number, timestamp } = exampleBlock;
         expect(typeof block_number).toEqual('number');
@@ -53,6 +54,7 @@ describe('defaultProvider', () => {
       });
 
       test(`getBlock(blockHash=undefined, blockNumber=${exampleBlockNumber})`, async () => {
+        // TODO test
         const block = await testProvider.getBlock(exampleBlockNumber);
         expect(block).toHaveProperty('block_hash');
         expect(block).toHaveProperty('parent_hash');
@@ -65,6 +67,7 @@ describe('defaultProvider', () => {
       });
 
       test(`getBlock(blockHash=${exampleBlockHash}, blockNumber=undefined)`, async () => {
+        // TODO test
         const block = await testProvider.getBlock(exampleBlockHash);
         expect(block).toHaveProperty('block_hash');
         expect(block).toHaveProperty('parent_hash');
@@ -77,11 +80,13 @@ describe('defaultProvider', () => {
       });
 
       test('getBlock() -> { blockNumber }', async () => {
+        // TODO test
         const block = await testProvider.getBlock('latest');
         return expect(block).toHaveProperty('block_number');
       });
 
       test(`getStateUpdate(blockHash=${exampleBlockHash}, blockNumber=undefined)`, async () => {
+        // TODO test
         const stateUpdate = await testProvider.getStateUpdate(exampleBlockHash);
         expect(stateUpdate).toHaveProperty('block_hash');
         expect(stateUpdate.block_hash).toBe(exampleBlockHash);
@@ -91,6 +96,7 @@ describe('defaultProvider', () => {
       });
 
       test(`getStateUpdate(blockHash=undefined, blockNumber=${exampleBlockNumber})`, async () => {
+        // todo test
         const stateUpdate = await testProvider.getStateUpdate(exampleBlockNumber);
         expect(stateUpdate).toHaveProperty('block_hash');
         expect(stateUpdate.block_hash).toBe(exampleBlockHash);
@@ -106,6 +112,7 @@ describe('defaultProvider', () => {
     });
 
     test('getClassAt(contractAddress, blockNumber="latest")', async () => {
+      // TODO test
       const classResponse = await testProvider.getClassAt(erc20ContractAddress);
 
       expect(classResponse).toHaveProperty('program');
@@ -113,6 +120,7 @@ describe('defaultProvider', () => {
     });
 
     test('GetClassByHash', async () => {
+      // todo test
       const classResponse = await testProvider.getClassByHash(erc20ClassHash);
       expect(classResponse).toHaveProperty('program');
       expect(classResponse).toHaveProperty('entry_points_by_type');
@@ -142,12 +150,14 @@ describe('defaultProvider', () => {
     });
 
     test('getTransaction() - successful deploy transaction', async () => {
+      // TODO test
       const transaction = await testProvider.getTransaction(exampleTransactionHash);
 
       expect(transaction).toHaveProperty('transaction_hash');
     });
 
     test('getTransactionReceipt() - successful transaction', async () => {
+      // TODO test
       const transactionReceipt = await testProvider.getTransactionReceipt(exampleTransactionHash);
 
       expect(transactionReceipt).toHaveProperty('actual_fee');

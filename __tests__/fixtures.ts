@@ -1,9 +1,15 @@
 import fs from 'fs';
 import path from 'path';
 
+import { matchersWithOptions } from 'jest-json-schema';
+
 import { Account, ProviderInterface, RpcProvider, SequencerProvider, json } from '../src';
 import { CompiledContract, waitForTransactionOptions } from '../src/types';
 import { toHex } from '../src/utils/number';
+import accountSchemas from './schemas/account.json';
+import sequencerSchemas from './schemas/sequencer.json';
+
+const ajvKeywords = require('ajv-keywords');
 
 const readContract = (name: string): CompiledContract =>
   json.parse(
@@ -93,3 +99,23 @@ export const describeIfDevnetSequencer = describeIf(IS_DEVNET_SEQUENCER);
 
 export const erc20ClassHash = '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a';
 export const wrongClassHash = '0x000000000000000000000000000000000000000000000000000000000000000';
+
+export const initializeMatcher = (expect: jest.Expect) => {
+  expect.extend(
+    matchersWithOptions({ schemas: [accountSchemas, sequencerSchemas] }, (ajv) => {
+      // bigint is not supported in ajv, ajv-keywords, and jest-json-schema
+      // we need to add a custom keyword with custom validation function
+      // About depreciated warning when running tests see: https://github.com/ajv-validator/ajv/issues/2024
+      ajv.addKeyword('isBigInt', {
+        validate: (_schema: any, data: any) => {
+          return typeof data === 'bigint' && data < 2n ** 64n && data >= 0n;
+        },
+        errors: true,
+      });
+      // This uses the `ajv-keywords` library to add pre-made custom keywords to the Ajv instance.
+      ajvKeywords(ajv, ['typeof', 'instanceof']);
+    })
+  );
+  expect(accountSchemas).toBeValidSchema();
+  expect(sequencerSchemas).toBeValidSchema();
+};
