@@ -14,10 +14,46 @@
           "$ref": "sequencerSchemas#/definitions/FunctionInvocation"
         },
         "signature": {
-          "type": "array"
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
         }
       },
       "required": ["signature"]
+    },
+    "BlockTransactionTracesResponse": {
+      "type": "object",
+      "properties": {
+        "traces": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "validate_invocation": {
+                "$ref": "sequencerSchemas#/definitions/FunctionInvocation"
+              },
+              "function_invocation": {
+                "$ref": "sequencerSchemas#/definitions/FunctionInvocation"
+              },
+              "fee_transfer_invocation": {
+                "$ref": "sequencerSchemas#/definitions/FunctionInvocation"
+              },
+              "signature": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "transaction_hash": {
+                "type": "string"
+              }
+            },
+            "required": ["signature", "transaction_hash"]
+          }
+        }
+      },
+      "required": ["traces"]
     },
     "ExecutionResources": {
       "type": "object",

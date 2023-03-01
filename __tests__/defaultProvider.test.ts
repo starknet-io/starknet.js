@@ -8,6 +8,7 @@ import {
   getTestProvider,
   wrongClassHash,
 } from './fixtures';
+import { initializeMatcher } from './schema';
 
 const { compileCalldata } = stark;
 
@@ -21,6 +22,7 @@ describe('defaultProvider', () => {
   let exampleBlockHash: string;
   const wallet = stark.randomAddress();
   const account = getTestAccount(testProvider);
+  initializeMatcher(expect);
 
   beforeAll(async () => {
     expect(testProvider).toBeInstanceOf(Provider);
@@ -46,63 +48,55 @@ describe('defaultProvider', () => {
 
     describe('getBlock', () => {
       test('getBlock(blockIdentifier=latest)', async () => {
-        // TODO test
         expect(exampleBlock).not.toBeNull();
-        const { block_number, timestamp } = exampleBlock;
-        expect(typeof block_number).toEqual('number');
-        return expect(typeof timestamp).toEqual('number');
+        const blockSchema = {
+          $ref: 'providerSchemas#/definitions/GetBlockResponse',
+        };
+        expect(exampleBlock).toMatchSchema(blockSchema);
       });
 
       test(`getBlock(blockHash=undefined, blockNumber=${exampleBlockNumber})`, async () => {
-        // TODO test
         const block = await testProvider.getBlock(exampleBlockNumber);
-        expect(block).toHaveProperty('block_hash');
-        expect(block).toHaveProperty('parent_hash');
-        expect(block).toHaveProperty('block_number');
-        expect(block).toHaveProperty('status');
-        expect(block).toHaveProperty('new_root');
-        expect(block).toHaveProperty('timestamp');
-        expect(block).toHaveProperty('transactions');
-        expect(Array.isArray(block.transactions)).toBe(true);
+        const blockSchema = {
+          $ref: 'providerSchemas#/definitions/GetBlockResponse',
+        };
+        expect(block).toMatchSchema(blockSchema);
       });
 
       test(`getBlock(blockHash=${exampleBlockHash}, blockNumber=undefined)`, async () => {
-        // TODO test
         const block = await testProvider.getBlock(exampleBlockHash);
-        expect(block).toHaveProperty('block_hash');
-        expect(block).toHaveProperty('parent_hash');
-        expect(block).toHaveProperty('block_number');
-        expect(block).toHaveProperty('status');
-        expect(block).toHaveProperty('new_root');
-        expect(block).toHaveProperty('timestamp');
-        expect(block).toHaveProperty('transactions');
-        expect(Array.isArray(block.transactions)).toBe(true);
+        const blockSchema = {
+          $ref: 'providerSchemas#/definitions/GetBlockResponse',
+        };
+        expect(block).toMatchSchema(blockSchema);
       });
 
       test('getBlock() -> { blockNumber }', async () => {
-        // TODO test
         const block = await testProvider.getBlock('latest');
-        return expect(block).toHaveProperty('block_number');
+        const blockSchema = {
+          $ref: 'providerSchemas#/definitions/GetBlockResponse',
+        };
+        expect(block).toMatchSchema(blockSchema);
       });
 
       test(`getStateUpdate(blockHash=${exampleBlockHash}, blockNumber=undefined)`, async () => {
-        // TODO test
         const stateUpdate = await testProvider.getStateUpdate(exampleBlockHash);
-        expect(stateUpdate).toHaveProperty('block_hash');
         expect(stateUpdate.block_hash).toBe(exampleBlockHash);
-        expect(stateUpdate).toHaveProperty('new_root');
-        expect(stateUpdate).toHaveProperty('old_root');
-        expect(stateUpdate).toHaveProperty('state_diff');
+
+        const stateUpdateResponse = {
+          $ref: 'providerSchemas#/definitions/StateUpdateResponse',
+        };
+        expect(stateUpdate).toMatchSchema(stateUpdateResponse);
       });
 
       test(`getStateUpdate(blockHash=undefined, blockNumber=${exampleBlockNumber})`, async () => {
-        // todo test
         const stateUpdate = await testProvider.getStateUpdate(exampleBlockNumber);
-        expect(stateUpdate).toHaveProperty('block_hash');
         expect(stateUpdate.block_hash).toBe(exampleBlockHash);
-        expect(stateUpdate).toHaveProperty('new_root');
-        expect(stateUpdate).toHaveProperty('old_root');
-        expect(stateUpdate).toHaveProperty('state_diff');
+
+        const stateUpdateResponse = {
+          $ref: 'providerSchemas#/definitions/StateUpdateResponse',
+        };
+        expect(stateUpdate).toMatchSchema(stateUpdateResponse);
       });
     });
 
@@ -112,19 +106,21 @@ describe('defaultProvider', () => {
     });
 
     test('getClassAt(contractAddress, blockNumber="latest")', async () => {
-      // TODO test
       const classResponse = await testProvider.getClassAt(erc20ContractAddress);
 
-      expect(classResponse).toHaveProperty('program');
-      expect(classResponse).toHaveProperty('entry_points_by_type');
+      const classResponseSchema = {
+        $ref: 'libSchemas#/definitions/ContractClass',
+      };
+      expect(classResponse).toMatchSchema(classResponseSchema);
     });
 
     test('GetClassByHash', async () => {
-      // todo test
       const classResponse = await testProvider.getClassByHash(erc20ClassHash);
-      expect(classResponse).toHaveProperty('program');
-      expect(classResponse).toHaveProperty('entry_points_by_type');
-      expect(classResponse).toHaveProperty('abi');
+
+      const classResponseSchema = {
+        $ref: 'libSchemas#/definitions/ContractClass',
+      };
+      expect(classResponse).toMatchSchema(classResponseSchema);
     });
 
     describe('getStorageAt', () => {
@@ -150,20 +146,21 @@ describe('defaultProvider', () => {
     });
 
     test('getTransaction() - successful deploy transaction', async () => {
-      // TODO test
       const transaction = await testProvider.getTransaction(exampleTransactionHash);
 
-      expect(transaction).toHaveProperty('transaction_hash');
+      const transactionSchema = {
+        $ref: 'providerSchemas#/definitions/GetTransactionResponse',
+      };
+      expect(transaction).toMatchSchema(transactionSchema);
     });
 
     test('getTransactionReceipt() - successful transaction', async () => {
-      // TODO test
       const transactionReceipt = await testProvider.getTransactionReceipt(exampleTransactionHash);
 
-      expect(transactionReceipt).toHaveProperty('actual_fee');
-      expect(transactionReceipt).toHaveProperty('transaction_hash');
-      expect(transactionReceipt).toHaveProperty('status');
-      expect(transactionReceipt).toHaveProperty('actual_fee');
+      const txReceiptSchema = {
+        $ref: 'providerSchemas#/definitions/GetTransactionReceiptResponse',
+      };
+      expect(transactionReceipt).toMatchSchema(txReceiptSchema);
     });
 
     describe('callContract()', () => {

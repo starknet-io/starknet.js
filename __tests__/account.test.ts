@@ -17,8 +17,8 @@ import {
   erc20ClassHash,
   getTestAccount,
   getTestProvider,
-  initializeMatcher,
 } from './fixtures';
+import { initializeMatcher } from './schema';
 
 describe('deploy and test Wallet', () => {
   const provider = getTestProvider();
