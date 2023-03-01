@@ -6,7 +6,7 @@ import {
   verify as verifyNoble,
 } from '@noble/curves/stark';
 
-import { addHexPrefix, buf2hex, sanitizeHex } from '../encode';
+import { addHexPrefix, buf2hex } from '../encode';
 import { BigNumberish, toHex } from '../number/number';
 
 /**
@@ -32,10 +32,11 @@ export function verify(signature: SignatureType | Hex, msgHash: Hex, pubKey: Hex
     return CURVE.Fp.ZERO < num && num < CURVE.Fp.ORDER; // 0 is banned since it's not invertible FE
   }
 
-  const pubKeyHex = typeof pubKey === 'string' ? sanitizeHex(pubKey) : sanitizeHex(buf2hex(pubKey));
+  const pubKeyHex =
+    typeof pubKey === 'string' ? addHexPrefix(pubKey) : addHexPrefix(buf2hex(pubKey));
   if (pubKeyHex.slice(2, 4) === '04') {
     // full public key (512 bits)
-    return verify(signature, msgHash, pubKeyHex);
+    return verifyNoble(signature, msgHash, pubKeyHex);
   }
   const x = BigInt(pubKeyHex);
   if (!isValidFieldElement(x))

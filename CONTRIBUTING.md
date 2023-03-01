@@ -24,6 +24,22 @@ npm run build
 
 Run linters and tests:
 
+In a separate console, launch a Starknet devnet
+
+```bash
+starknet-devnet --seed 0
+```
+
+> If you do not include `seed 0`, you need to export account and private key of preseeded accounts from devnet :  
+> `export TEST_ACCOUNT_ADDRESS=0x0....`  
+> `export TEST_ACCOUNT_PRIVATE_KEY=123...`
+
+- to test sequencer : `export TEST_PROVIDER_BASE_URL=http://127.0.0.1:5050/`
+- to test rpc : `export TEST_RPC_URL=http://127.0.0.1:5050/rpc`
+- you can check if devnet is reachable : open page `http://127.0.0.1:5050/is_alive`
+
+Launch tests :
+
 ```bash
 npm test
 ```
@@ -56,4 +72,4 @@ For major changes that markedly transform the existing API or significantly alte
 
 ## Need help?
 
-If you want to contribute but have any questions, concerns or doubts, feel free to ping maintainers. Ideally create a pull request with `WIP` (Work in progress) in its title and ask questions in the pull request description.
+If you want to contribute but have any questions, concerns or doubts, feel free to ping maintainers. Ideally create a pull request with `WIP` (Work in progress) in its title and ask questions in the pull request description.

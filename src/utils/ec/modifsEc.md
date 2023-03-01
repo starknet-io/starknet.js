@@ -41,10 +41,10 @@ Will be **Hex string**.
 
 ## sign :
 
-| V4                                                   | current V5                                                                   | will be                                                                      |
-| :--------------------------------------------------- | :--------------------------------------------------------------------------- | :--------------------------------------------------------------------------- |
-| `ec.sign(keyPair: KeyPair, msgHash: string): string` | `ec.starkCourve.sign(msgHash: Hex, privKey: Hex, opts?: any): SignatureType` | `ec.starkCourve.sign(msgHash: Hex, privKey: Hex, opts?: any): SignatureType` |
-|                                                      |                                                                              | `@deprecated ec.sign(keyPair: KeyPair, msgHash: string): string`             |
+| V4                                                   | current V5                                                                  | will be                                                                     |
+| :--------------------------------------------------- | :-------------------------------------------------------------------------- | :-------------------------------------------------------------------------- |
+| `ec.sign(keyPair: KeyPair, msgHash: string): string` | `ec.starkCurve.sign(msgHash: Hex, privKey: Hex, opts?: any): SignatureType` | `ec.starkCurve.sign(msgHash: Hex, privKey: Hex, opts?: any): SignatureType` |
+|                                                      |                                                                             | `@deprecated ec.sign(keyPair: KeyPair, msgHash: string): string`            |
 
 ## verify :
 
@@ -55,7 +55,7 @@ Will be **Hex string**.
 
 V4 `ec.verify` do not handle starknet public key, **only** full public key.  
 Same thing with V5 `ec.verify`  
-V5 `ec.starkCurve.verify` handles full **and** Starknet public keys
+V5 `ec.starkCurve.verify` will handles full **and** Starknet public keys
 
 ## ec :
 
@@ -74,8 +74,7 @@ The following Noble constants/methods/interfaces about `ec` are rexeported witho
 - Signature,
 - utils,
 - grindKey,
-- getStarkKey,
 - ethSigToPrivate,
 - getAccountPath,
-- Fp251,
-- Fp253,
+
+There is no tests for these functions.

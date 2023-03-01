@@ -1,4 +1,4 @@
-import { constants, ec, hash, transaction } from '../../src';
+import { constants, ec, hash, number, transaction } from '../../src';
 // import { computeContractClassHash, getSelectorFromName } from '../../src/utils/hash';
 import {
   compiledErc20,
@@ -8,6 +8,20 @@ import {
 } from '../fixtures';
 
 describe('Hash Tester', () => {
+  test('keccakBn', () => {
+    const data = '0x019800ea6a9a73f94aee6a3d2edf018fc770443e90c7ba121e8303ec6b349279';
+    const ha = hash.keccakBn(data);
+    expect(ha).toBe('0x934d917421787dc6f797e97ebf96ef55fda2e0c22433544cb90da656ebb5a1c');
+  });
+
+  test('starknetKeccak', () => {
+    const data = '0x019800ea6a9a73f94aee6a3d2edf018fc770443e90c7ba121e8303ec6b349279';
+    const ha = hash.starknetKeccak(data);
+    expect(number.toHex(ha)).toBe(
+      '0x2fb0ce11acb684c1354cac9d3349dda7bf6cc71fde4267dab6b7e92c9631ff'
+    );
+  });
+
   test('Test getSelectorFromName', () => {
     const hash0 = hash.getSelectorFromName('__validate__');
     expect(hash0).toEqual('0x162da33a4585851fe8d3af3c2a9c60b557814e221e0d4f30ff0b2189d9c7775');

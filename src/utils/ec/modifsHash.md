@@ -23,7 +23,7 @@ With this PR, they are using Noble lib, and `ethereum-cryptography` lib is remov
 | :-- | :------------------------------------------------------------ | :--------------------------------------------------- |
 |     | `ec.starkCurve.hashChain(data: PedersenArg[], fn = pedersen)` | `hash.hashChain(data: PedersenArg[], fn = pedersen)` |
 
-new hashChain moved from `ec` to `hash`.
+new hashChain moved from `ec` to `hash`. No test for this function.
 
 ## poseidon hash :
 
