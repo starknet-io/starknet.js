@@ -7,7 +7,7 @@ import {
 } from '@noble/curves/stark';
 
 import { addHexPrefix, buf2hex, sanitizeHex } from '../encode';
-import { BigNumberish, toHex } from '../number';
+import { BigNumberish, toHex } from '../number/number';
 
 /**
  * Verifies a message using the provided public key

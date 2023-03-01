@@ -1,6 +1,6 @@
 /* eslint-disable max-classes-per-file */
 import type { BlockNumber, SequencerIdentifier } from '../types';
-import { BigNumberish, isHex, toHex } from '../utils/number';
+import { BigNumberish, isHex, toHex } from '../utils/number/number';
 
 /**
  *

@@ -24,7 +24,7 @@ import {
   TransactionSimulation,
   UniversalDeployerContractPayload,
 } from '../types';
-import { BigNumberish } from '../utils/number';
+import { BigNumberish } from '../utils/number/number';
 import { TypedData } from '../utils/typedData/types';
 
 export abstract class AccountInterface extends ProviderInterface {

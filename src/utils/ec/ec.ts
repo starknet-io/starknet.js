@@ -8,7 +8,7 @@ import {
 
 import { MAX_ECDSA_VAL, ZERO } from '../../constants';
 import { addHexPrefix, buf2hex, sanitizeHex } from '../encode';
-import { BigNumberish, assertInRange, toHex } from '../number';
+import { BigNumberish, assertInRange, toHex } from '../number/number';
 
 export * as starkCurve from './ecAdaptNoble';
 export * as weierstrass from '@noble/curves/abstract/weierstrass';

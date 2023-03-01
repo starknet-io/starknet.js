@@ -1,8 +1,8 @@
 /* eslint-disable prettier/prettier */
 import { hexToBytes as hexToBytesNoble } from '@noble/curves/abstract/utils';
 
-import assert from './assert';
-import { addHexPrefix, removeHexPrefix } from './encode';
+import assert from '../assert';
+import { addHexPrefix, removeHexPrefix } from '../encode';
 
 export type BigNumberish = string | number | bigint;
 

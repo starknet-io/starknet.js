@@ -1,5 +1,5 @@
 import { AbiEntry, Args, ParsedStruct, abiStructs } from '../../types';
-import { BigNumberish } from '../number';
+import { BigNumberish } from '../number/number';
 import { isLen, isTypeArray, isTypeTuple } from './cairo';
 import extractTupleMemberTypes from './tuple';
 

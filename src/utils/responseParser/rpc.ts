@@ -9,7 +9,7 @@ import {
   GetTransactionResponse,
   RPC,
 } from '../../types';
-import { toBigInt } from '../number';
+import { toBigInt } from '../number/number';
 import { ResponseParser } from '.';
 
 type RpcGetBlockResponse = RPC.GetBlockWithTxHashesResponse & {

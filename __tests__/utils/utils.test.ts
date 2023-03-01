@@ -1,4 +1,4 @@
-import { constants, ec, hash, number, stark } from '../../src';
+import { constants, hash, number, stark } from '../../src';
 import { Block } from '../../src/provider/utils';
 
 const { IS_BROWSER } = constants;
@@ -88,7 +88,7 @@ describe('calculateContractAddressFromHash()', () => {
     const classHash = '0x55187E68C60664A947048E0C9E5322F9BF55F7D435ECDCF17ED75724E77368F';
 
     // Any type of salt can be used. It depends on the dApp what kind of salt it wants to use.
-    const salt = ec.starkCurve.pedersen(ethAddress, daiAddress);
+    const salt = hash.pedersen(ethAddress, daiAddress);
 
     const res = hash.calculateContractAddressFromHash(
       salt,

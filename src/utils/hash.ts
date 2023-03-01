@@ -1,6 +1,5 @@
 /* eslint-disable no-param-reassign */
 import { Hex } from '@noble/curves/abstract/utils';
-// eslint-disable-next-line @typescript-eslint/no-unused-vars, prettier/prettier
 import { computeHashOnElements as computeHashOnElementsNoble, keccak } from '@noble/curves/stark';
 
 import { API_VERSION, MASK_250, StarknetChainId, TransactionHashPrefix } from '../constants';
@@ -8,7 +7,14 @@ import { CompiledContract, RawCalldata } from '../types/lib';
 import { felt } from './calldata/cairo';
 import { addHexPrefix, removeHexPrefix, utf8ToArray } from './encode';
 import { parse, stringify } from './json';
-import { BigNumberish, hexToBytes, isHex, isStringWholeNumber, toHex, toHexString } from './number';
+import {
+  BigNumberish,
+  hexToBytes,
+  isHex,
+  isStringWholeNumber,
+  toHex,
+  toHexString,
+} from './number/number';
 import { encodeShortString } from './shortString';
 
 export const transactionVersion = 1n;
@@ -19,7 +25,7 @@ export type PedersenArg = Hex | bigint | number;
 export function keccakBn(value: BigNumberish): string {
   const hexWithoutPrefix = removeHexPrefix(toHex(BigInt(value)));
   const evenHex = hexWithoutPrefix.length % 2 === 0 ? hexWithoutPrefix : `0${hexWithoutPrefix}`;
-  return addHexPrefix(keccak(hexToBytes(evenHex)).toString(16));
+  return addHexPrefix(keccak(hexToBytes(addHexPrefix(evenHex))).toString(16));
 }
 
 function keccakHex(value: string): string {

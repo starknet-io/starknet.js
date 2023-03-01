@@ -4,7 +4,7 @@ import typedDataStructArrayExample from '../../__mocks__/typedDataStructArrayExa
 import { number } from '../../src';
 import { getSelectorFromName } from '../../src/utils/hash';
 import { MerkleTree } from '../../src/utils/merkle';
-import { BigNumberish } from '../../src/utils/number';
+import { BigNumberish } from '../../src/utils/number/number';
 import {
   StarkNetDomain,
   encodeType,

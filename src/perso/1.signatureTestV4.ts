@@ -1,4 +1,4 @@
-import { toHex } from '../utils/number';
+import { toHex } from '../utils/number/number';
 /* eslint-disable no-console */
 /* eslint-disable prettier/prettier */
 /* eslint-disable @typescript-eslint/no-unused-vars */
