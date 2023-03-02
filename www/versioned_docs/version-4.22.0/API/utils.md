@@ -8,7 +8,7 @@ Util functions are provided so you can use various low level functions in your a
 
 ## **address**
 
-Helper functions for Starknet addresses.
+Helper functions for starknet addresses.
 
 ### validateAndParseAddress
 
@@ -20,7 +20,7 @@ Checks if the address is valid and, if it is, parses it to the correct format (0
 
 `getChecksumAddress(address: BigNumberish): string`
 
-This function accepts an address as a `BigNumberish` and returns the check-summed address as a string.
+This function accepts an address as a `BigNumberish` and returns the checksummed address as a string.
 An example:
 
 ```js
@@ -162,7 +162,7 @@ Returns a string.
 
 `assertInRange(input: BigNumberish, lowerBound: BigNumberish, upperBound: BigNumberish, inputName = '')`
 
-Asserts input is equal to or greater then `lowerBound` and lower then `upperBound`. Assert message specifies inputName.
+Asserts input is equal to or greater than `lowerBound` and lower than `upperBound`. Assert message specifies inputName.
 `input`, `lowerBound`, and `upperBound` should be of type BN.
 `inputName` should be a string.
 
@@ -256,7 +256,7 @@ Returns a string.
 
 `computeHashOnElements(data: BigNumberish[])`
 
-Function to compute a Pedersen hash on a array of elements.
+Function to compute a Pedersen hash on an array of elements.
 
 Returns a string.
 
@@ -339,9 +339,9 @@ Returns keyPair with public key only, which can be used to verify signatures, bu
 
 Signs a message using the provided key.
 
-keyPair should be an KeyPair with a valid private key.
+keyPair should be a KeyPair with a valid private key.
 
-Returns an Signature.
+Returns a Signature.
 
 ### verify
 
@@ -349,7 +349,7 @@ Returns an Signature.
 
 Verifies a message using the provided key.
 
-keyPair should be an KeyPair with a valid public key.
+keyPair should be a KeyPair with a valid public key.
 
 sig should be an Signature.
 

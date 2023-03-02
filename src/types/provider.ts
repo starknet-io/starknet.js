@@ -2,7 +2,6 @@
  * Common interface response
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
-import BN from 'bn.js';
 
 import {
   DeployedContractItem,
@@ -18,6 +17,7 @@ import {
   RawCalldata,
   Signature,
   Status,
+  TransactionType,
   UniversalDeployerContractPayload,
 } from './lib';
 
@@ -103,9 +103,9 @@ export interface InvokeTransactionReceiptResponse extends CommonTransactionRecei
 export type DeclareTransactionReceiptResponse = CommonTransactionReceiptResponse;
 
 export interface EstimateFeeResponse {
-  overall_fee: BN;
-  gas_consumed?: BN;
-  gas_price?: BN;
+  overall_fee: bigint;
+  gas_consumed?: bigint;
+  gas_price?: bigint;
 }
 
 export interface InvokeFunctionResponse {
@@ -123,19 +123,19 @@ export type CallContractResponse = {
 
 export type EstimateFeeAction =
   | {
-      type: 'INVOKE';
+      type: TransactionType.INVOKE;
       payload: AllowArray<Call>;
     }
   | {
-      type: 'DECLARE';
+      type: TransactionType.DECLARE;
       payload: DeclareContractPayload;
     }
   | {
-      type: 'DEPLOY_ACCOUNT';
+      type: TransactionType.DEPLOY_ACCOUNT;
       payload: DeployAccountContractPayload;
     }
   | {
-      type: 'DEPLOY';
+      type: TransactionType.DEPLOY;
       payload: UniversalDeployerContractPayload;
     };
 

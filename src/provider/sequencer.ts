@@ -1,6 +1,6 @@
 import urljoin from 'url-join';
 
-import { StarknetChainId } from '../constants';
+import { BaseUrl, NetworkName, StarknetChainId } from '../constants';
 import {
   Call,
   CallContractResponse,
@@ -24,7 +24,10 @@ import {
   Sequencer,
   StateUpdateResponse,
   TransactionSimulationResponse,
+  TransactionStatus,
   TransactionTraceResponse,
+  TransactionType,
+  waitForTransactionOptions,
 } from '../types';
 import fetch from '../utils/fetchPonyfill';
 import { getSelector, getSelectorFromName } from '../utils/hash';
@@ -35,22 +38,22 @@ import {
   getDecimalString,
   getHexString,
   getHexStringArray,
-  toBN,
+  toBigInt,
   toHex,
 } from '../utils/number';
 import { parseContract, wait } from '../utils/provider';
 import { SequencerAPIResponseParser } from '../utils/responseParser/sequencer';
-import { randomAddress } from '../utils/stark';
+import { formatSignature, randomAddress, signatureToDecimalArray } from '../utils/stark';
 import { buildUrl } from '../utils/url';
 import { GatewayError, HttpError, LibraryError } from './errors';
 import { ProviderInterface } from './interface';
 import { getAddressFromStarkName, getStarkName } from './starknetId';
 import { Block, BlockIdentifier } from './utils';
 
-type NetworkName = 'mainnet-alpha' | 'goerli-alpha' | 'goerli-alpha-2';
+export type SequencerHttpMethod = 'POST' | 'GET';
 
 export type SequencerProviderOptions = {
-  headers?: object;
+  headers?: Record<string, string>;
   blockIdentifier?: BlockIdentifier;
 } & (
   | {
@@ -75,7 +78,7 @@ function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
 }
 
 const defaultOptions = {
-  network: 'goerli-alpha-2' as NetworkName,
+  network: NetworkName.SN_GOERLI2,
   blockIdentifier: 'pending',
 };
 
@@ -86,13 +89,13 @@ export class SequencerProvider implements ProviderInterface {
 
   public gatewayUrl: string;
 
-  public chainId: StarknetChainId;
-
-  public headers: object | undefined;
-
-  private responseParser = new SequencerAPIResponseParser();
+  public headers?: Record<string, string>;
 
   private blockIdentifier: BlockIdentifier;
+
+  private chainId: StarknetChainId;
+
+  private responseParser = new SequencerAPIResponseParser();
 
   constructor(optionsOrProvider: SequencerProviderOptions = defaultOptions) {
     if ('network' in optionsOrProvider) {
@@ -116,14 +119,14 @@ export class SequencerProvider implements ProviderInterface {
 
   protected static getNetworkFromName(name: NetworkName | StarknetChainId) {
     switch (name) {
-      case 'mainnet-alpha' || StarknetChainId.MAINNET:
-        return 'https://alpha-mainnet.starknet.io';
-      case 'goerli-alpha' || StarknetChainId.TESTNET:
-        return 'https://alpha4.starknet.io';
-      case 'goerli-alpha-2' || StarknetChainId.TESTNET2:
-        return 'https://alpha4-2.starknet.io';
+      case NetworkName.SN_MAIN || StarknetChainId.SN_MAIN:
+        return BaseUrl.SN_MAIN;
+      case NetworkName.SN_GOERLI || StarknetChainId.SN_GOERLI:
+        return BaseUrl.SN_GOERLI;
+      case NetworkName.SN_GOERLI2 || StarknetChainId.SN_GOERLI2:
+        return BaseUrl.SN_GOERLI2;
       default:
-        return 'https://alpha4.starknet.io';
+        throw new Error('Could not detect base url from NetworkName');
     }
   }
 
@@ -131,21 +134,21 @@ export class SequencerProvider implements ProviderInterface {
     try {
       const url = new URL(baseUrl);
       if (url.host.includes('mainnet.starknet.io')) {
-        return StarknetChainId.MAINNET;
+        return StarknetChainId.SN_MAIN;
       }
       if (url.host.includes('alpha4-2.starknet.io')) {
-        return StarknetChainId.TESTNET2;
+        return StarknetChainId.SN_GOERLI2;
       }
+      return StarknetChainId.SN_GOERLI;
     } catch {
       // eslint-disable-next-line no-console
       console.error(`Could not parse baseUrl: ${baseUrl}`);
+      return StarknetChainId.SN_GOERLI;
     }
-    return StarknetChainId.TESTNET;
   }
 
   private getFetchUrl(endpoint: keyof Sequencer.Endpoints) {
     const gatewayUrlEndpoints = ['add_transaction'];
-
     return gatewayUrlEndpoints.includes(endpoint) ? this.gatewayUrl : this.feederGatewayUrl;
   }
 
@@ -179,7 +182,7 @@ export class SequencerProvider implements ProviderInterface {
     return `?${queryString}`;
   }
 
-  private getHeaders(method: 'POST' | 'GET'): object | undefined {
+  private getHeaders(method: SequencerHttpMethod): Record<string, string> | undefined {
     if (method === 'POST') {
       return {
         'Content-Type': 'application/json',
@@ -204,48 +207,52 @@ export class SequencerProvider implements ProviderInterface {
     const baseUrl = this.getFetchUrl(endpoint);
     const method = this.getFetchMethod(endpoint);
     const queryString = this.getQueryString(query);
-    const headers = this.getHeaders(method);
     const url = urljoin(baseUrl, endpoint, queryString);
 
+    return this.fetch(url, {
+      method,
+      body: request,
+    });
+  }
+
+  public async fetch(
+    endpoint: string,
+    options?: {
+      method?: SequencerHttpMethod;
+      body?: any;
+      parseAlwaysAsBigInt?: boolean;
+    }
+  ): Promise<any> {
+    const url = buildUrl(this.baseUrl, '', endpoint);
+    const method = options?.method ?? 'GET';
+    const headers = this.getHeaders(method);
+
     try {
-      const res = await fetch(url, {
+      const response = await fetch(url, {
         method,
-        body: stringify(request),
-        headers: headers as Record<string, string>,
+        body: stringify(options?.body),
+        headers,
       });
-      const textResponse = await res.text();
-      if (!res.ok) {
-        // This will allow user to handle contract errors
+      const textResponse = await response.text();
+
+      if (!response.ok) {
+        // This will allow the user to handle contract errors
         let responseBody: any;
         try {
           responseBody = parse(textResponse);
         } catch {
-          // if error parsing fails, return an http error
-          throw new HttpError(res.statusText, res.status);
+          throw new HttpError(response.statusText, response.status);
         }
-
-        const errorCode = responseBody.code || ((responseBody as any)?.status_code as string); // starknet-devnet uses status_code instead of code; They need to fix that
-        throw new GatewayError(responseBody.message, errorCode); // Caught locally, and re-thrown for the user
+        throw new GatewayError(responseBody.message, responseBody.code);
       }
 
-      if (endpoint === 'estimate_fee') {
-        return parseAlwaysAsBig(textResponse, (_, v) => {
-          if (v && typeof v === 'bigint') {
-            return toBN(v.toString());
-          }
-          return v;
-        });
-      }
-      return parse(textResponse) as Sequencer.Endpoints[T]['RESPONSE'];
-    } catch (err) {
-      // rethrow custom errors
-      if (err instanceof GatewayError || err instanceof HttpError) {
-        throw err;
-      }
-      if (err instanceof Error) {
-        throw Error(`Could not ${method} from endpoint \`${url}\`: ${err.message}`);
-      }
-      throw err;
+      const parseChoice = options?.parseAlwaysAsBigInt ? parseAlwaysAsBig : parse;
+      return parseChoice(textResponse);
+    } catch (error) {
+      if (error instanceof Error && !(error instanceof LibraryError))
+        throw Error(`Could not ${method} from endpoint \`${url}\`: ${error.message}`);
+
+      throw error;
     }
   }
 
@@ -289,7 +296,7 @@ export class SequencerProvider implements ProviderInterface {
     key: BigNumberish,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<BigNumberish> {
-    const parsedKey = toBN(key).toString(10);
+    const parsedKey = toBigInt(key).toString(10);
     return this.fetchEndpoint('get_storage_at', {
       blockIdentifier,
       contractAddress,
@@ -298,7 +305,7 @@ export class SequencerProvider implements ProviderInterface {
   }
 
   public async getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {
-    const txHashHex = toHex(toBN(txHash));
+    const txHashHex = toHex(txHash);
     return this.fetchEndpoint('get_transaction', { transactionHash: txHashHex }).then((result) => {
       // throw for no matching transaction to unify behavior with RPC and avoid parsing errors
       if (Object.values(result).length === 1) throw new LibraryError(result.status);
@@ -307,7 +314,7 @@ export class SequencerProvider implements ProviderInterface {
   }
 
   public async getTransactionReceipt(txHash: BigNumberish): Promise<GetTransactionReceiptResponse> {
-    const txHashHex = toHex(toBN(txHash));
+    const txHashHex = toHex(txHash);
     return this.fetchEndpoint('get_transaction_receipt', { transactionHash: txHashHex }).then(
       this.responseParser.parseGetTransactionReceiptResponse
     );
@@ -338,13 +345,13 @@ export class SequencerProvider implements ProviderInterface {
     details: InvocationsDetailsWithNonce
   ): Promise<InvokeFunctionResponse> {
     return this.fetchEndpoint('add_transaction', undefined, {
-      type: 'INVOKE_FUNCTION',
+      type: TransactionType.INVOKE,
       contract_address: functionInvocation.contractAddress,
       calldata: bigNumberishArrayToDecimalStringArray(functionInvocation.calldata ?? []),
-      signature: bigNumberishArrayToDecimalStringArray(functionInvocation.signature ?? []),
-      nonce: toHex(toBN(details.nonce)),
-      max_fee: toHex(toBN(details.maxFee || 0)),
-      version: toHex(toBN(details.version || 1)),
+      signature: signatureToDecimalArray(functionInvocation.signature),
+      nonce: toHex(details.nonce),
+      max_fee: toHex(details.maxFee || 0),
+      version: toHex(details.version || 1),
     }).then(this.responseParser.parseInvokeFunctionResponse);
   }
 
@@ -353,14 +360,14 @@ export class SequencerProvider implements ProviderInterface {
     details: InvocationsDetailsWithNonce
   ): Promise<DeployContractResponse> {
     return this.fetchEndpoint('add_transaction', undefined, {
-      type: 'DEPLOY_ACCOUNT',
+      type: TransactionType.DEPLOY_ACCOUNT,
       contract_address_salt: addressSalt ?? randomAddress(),
       constructor_calldata: bigNumberishArrayToDecimalStringArray(constructorCalldata ?? []),
-      class_hash: toHex(toBN(classHash)),
-      max_fee: toHex(toBN(details.maxFee || 0)),
-      version: toHex(toBN(details.version || 0)),
-      nonce: toHex(toBN(details.nonce)),
-      signature: bigNumberishArrayToDecimalStringArray(signature || []),
+      class_hash: toHex(classHash),
+      max_fee: toHex(details.maxFee || 0),
+      version: toHex(details.version || 0),
+      nonce: toHex(details.nonce),
+      signature: signatureToDecimalArray(signature),
     }).then(this.responseParser.parseDeployContractResponse);
   }
 
@@ -369,13 +376,13 @@ export class SequencerProvider implements ProviderInterface {
     details: InvocationsDetailsWithNonce
   ): Promise<DeclareContractResponse> {
     return this.fetchEndpoint('add_transaction', undefined, {
-      type: 'DECLARE',
+      type: TransactionType.DECLARE,
       contract_class: contractDefinition,
-      nonce: toHex(toBN(details.nonce)),
-      signature: bigNumberishArrayToDecimalStringArray(signature || []),
+      nonce: toHex(details.nonce),
+      signature: signatureToDecimalArray(signature),
       sender_address: senderAddress,
-      max_fee: toHex(toBN(details.maxFee || 0)),
-      version: toHex(toBN(details.version || 1)),
+      max_fee: toHex(details.maxFee || 0),
+      version: toHex(details.version || 1),
     }).then(this.responseParser.parseDeclareContractResponse);
   }
 
@@ -396,12 +403,12 @@ export class SequencerProvider implements ProviderInterface {
       'estimate_fee',
       { blockIdentifier },
       {
-        type: 'INVOKE_FUNCTION',
+        type: TransactionType.INVOKE,
         contract_address: invocation.contractAddress,
         calldata: invocation.calldata ?? [],
-        signature: bigNumberishArrayToDecimalStringArray(invocation.signature || []),
-        version: toHex(toBN(invocationDetails?.version || 1)),
-        nonce: toHex(toBN(invocationDetails.nonce)),
+        signature: signatureToDecimalArray(invocation.signature),
+        version: toHex(invocationDetails?.version || 1),
+        nonce: toHex(invocationDetails.nonce),
       }
     ).then(this.responseParser.parseFeeEstimateResponse);
   }
@@ -415,12 +422,12 @@ export class SequencerProvider implements ProviderInterface {
       'estimate_fee',
       { blockIdentifier },
       {
-        type: 'DECLARE',
+        type: TransactionType.DECLARE,
         sender_address: senderAddress,
         contract_class: contractDefinition,
-        signature: bigNumberishArrayToDecimalStringArray(signature || []),
-        version: toHex(toBN(details?.version || 1)),
-        nonce: toHex(toBN(details.nonce)),
+        signature: signatureToDecimalArray(signature),
+        version: toHex(details?.version || 1),
+        nonce: toHex(details.nonce),
       }
     ).then(this.responseParser.parseFeeEstimateResponse);
   }
@@ -434,13 +441,13 @@ export class SequencerProvider implements ProviderInterface {
       'estimate_fee',
       { blockIdentifier },
       {
-        type: 'DEPLOY_ACCOUNT',
-        class_hash: toHex(toBN(classHash)),
+        type: TransactionType.DEPLOY_ACCOUNT,
+        class_hash: toHex(classHash),
         constructor_calldata: bigNumberishArrayToDecimalStringArray(constructorCalldata || []),
-        contract_address_salt: toHex(toBN(addressSalt || 0)),
-        signature: bigNumberishArrayToDecimalStringArray(signature || []),
-        version: toHex(toBN(details?.version || 0)),
-        nonce: toHex(toBN(details.nonce)),
+        contract_address_salt: toHex(addressSalt || 0),
+        signature: signatureToDecimalArray(signature),
+        version: toHex(details?.version || 0),
+        nonce: toHex(details.nonce),
       }
     ).then(this.responseParser.parseFeeEstimateResponse);
   }
@@ -466,18 +473,18 @@ export class SequencerProvider implements ProviderInterface {
       } else {
         res = {
           type: invocation.type,
-          class_hash: toHex(toBN(invocation.classHash)),
+          class_hash: toHex(toBigInt(invocation.classHash)),
           constructor_calldata: bigNumberishArrayToDecimalStringArray(
             invocation.constructorCalldata || []
           ),
-          contract_address_salt: toHex(toBN(invocation.addressSalt || 0)),
+          contract_address_salt: toHex(toBigInt(invocation.addressSalt || 0)),
         };
       }
       return {
         ...res,
-        signature: bigNumberishArrayToDecimalStringArray(invocation.signature || []),
-        version: toHex(toBN(invocation?.version || 1)),
-        nonce: toHex(toBN(invocation.nonce)),
+        signature: bigNumberishArrayToDecimalStringArray(formatSignature(invocation.signature)),
+        version: toHex(toBigInt(invocation?.version || 1)),
+        nonce: toHex(toBigInt(invocation.nonce)),
       };
     });
 
@@ -493,14 +500,16 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('get_code', { contractAddress, blockIdentifier });
   }
 
-  public async waitForTransaction(
-    txHash: BigNumberish,
-    retryInterval: number = 8000,
-    successStates = ['ACCEPTED_ON_L1', 'ACCEPTED_ON_L2', 'PENDING']
-  ) {
-    const errorStates = ['REJECTED', 'NOT_RECEIVED'];
+  public async waitForTransaction(txHash: BigNumberish, options?: waitForTransactionOptions) {
+    const errorStates = [TransactionStatus.REJECTED, TransactionStatus.NOT_RECEIVED];
     let onchain = false;
     let res;
+    const retryInterval = options?.retryInterval ?? 8000;
+    const successStates = options?.successStates ?? [
+      TransactionStatus.ACCEPTED_ON_L1,
+      TransactionStatus.ACCEPTED_ON_L2,
+      TransactionStatus.PENDING,
+    ];
 
     while (!onchain) {
       // eslint-disable-next-line no-await-in-loop
@@ -532,7 +541,7 @@ export class SequencerProvider implements ProviderInterface {
    * @returns the transaction status object { block_number, tx_status: NOT_RECEIVED | RECEIVED | PENDING | REJECTED | ACCEPTED_ONCHAIN }
    */
   public async getTransactionStatus(txHash: BigNumberish): Promise<GetTransactionStatusResponse> {
-    const txHashHex = toHex(toBN(txHash));
+    const txHashHex = toHex(txHash);
     return this.fetchEndpoint('get_transaction_status', { transactionHash: txHashHex });
   }
 
@@ -553,7 +562,7 @@ export class SequencerProvider implements ProviderInterface {
    * @returns the transaction trace
    */
   public async getTransactionTrace(txHash: BigNumberish): Promise<TransactionTraceResponse> {
-    const txHashHex = toHex(toBN(txHash));
+    const txHashHex = toHex(txHash);
     return this.fetchEndpoint('get_transaction_trace', { transactionHash: txHashHex });
   }
 
@@ -583,9 +592,9 @@ export class SequencerProvider implements ProviderInterface {
         type: 'INVOKE_FUNCTION',
         contract_address: invocation.contractAddress,
         calldata: invocation.calldata ?? [],
-        signature: bigNumberishArrayToDecimalStringArray(invocation.signature || []),
-        version: toHex(toBN(invocationDetails?.version || 1)),
-        nonce: toHex(toBN(invocationDetails.nonce)),
+        signature: signatureToDecimalArray(invocation.signature),
+        version: toHex(invocationDetails?.version || 1),
+        nonce: toHex(invocationDetails.nonce),
       }
     ).then(this.responseParser.parseFeeSimulateTransactionResponse);
   }

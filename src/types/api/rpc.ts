@@ -42,4 +42,13 @@ export namespace RPC {
   export type DeclaredTransaction = OPENRPC.DeclaredTransaction;
   export type DeployedTransaction = OPENRPC.DeployedTransaction;
   export type Methods = OPENRPC.Methods;
+
+  // 'DECLARE' | 'DEPLOY' | 'DEPLOY_ACCOUNT' | 'INVOKE' | 'L1_HANDLER'
+  export enum TransactionType {
+    DECLARE = 'DECLARE',
+    DEPLOY = 'DEPLOY',
+    DEPLOY_ACCOUNT = 'DEPLOY_ACCOUNT',
+    INVOKE = 'INVOKE',
+    L1_HANDLER = 'L1_HANDLER',
+  }
 }

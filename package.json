@@ -1,6 +1,6 @@
 {
   "name": "starknet",
-  "version": "4.22.0",
+  "version": "5.0.1",
   "description": "JavaScript library for Starknet",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -30,6 +30,8 @@
     "posttest": "npm run format",
     "test:watch": "jest --watch",
     "docs": "cd www && npm run start",
+    "docs:version": "v=$(npm run info:version -s) && cd www && npm run version ${npm_config_version_override=$v}",
+    "info:version": "npm pkg get version | xargs",
     "format": "prettier --loglevel warn --write \"**/*.{ts,js,md,yml,json}\"",
     "lint": "eslint . --cache --fix --ext .ts",
     "ts:check": "tsc --noEmit --resolveJsonModule --project tsconfig.eslint.json"
@@ -56,11 +58,9 @@
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/npm": "^9.0.1",
     "@semantic-release/release-notes-generator": "^10.0.3",
-    "@types/elliptic": "^6.4.14",
     "@types/isomorphic-fetch": "^0.0.36",
     "@types/jest": "^28.1.1",
     "@types/json-bigint": "^1.0.1",
-    "@types/minimalistic-assert": "^1.0.1",
     "@types/pako": "^2.0.0",
     "@types/url-join": "^4.0.1",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
@@ -85,13 +85,10 @@
   },
   "dependencies": {
     "@ethersproject/bytes": "^5.6.1",
-    "bn.js": "^5.2.1",
-    "elliptic": "^6.5.4",
+    "@noble/curves": "^0.5.1",
     "ethereum-cryptography": "^1.0.3",
-    "hash.js": "^1.1.7",
     "isomorphic-fetch": "^3.0.0",
     "json-bigint": "^1.0.0",
-    "minimalistic-assert": "^1.0.1",
     "pako": "^2.0.4",
     "ts-custom-error": "^3.3.1",
     "url-join": "^4.0.1"

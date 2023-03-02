@@ -58,19 +58,24 @@ Your modified files will just be merged in `/www/docs/` by the Pull Request. If 
 
 ### With creation of a new release of Starknet.js
 
-Just before the release of a new version in the `main` branch, you need to perform the versioning of its documentation.
-For example, if a new `v4.22 has to be created:
+Just before the release of a new version in the `main` branch, you need to perform the versioning of its documentation:
 
-- Be sure that all the necessary commits/PR/merges are performed.
-- Be sure that API directory is up to date.
+- Ensure that all the necessary commits/PRs/merges are performed
+- Ensure that the API directory is up to date
 - Launch the documentation versioning with:
 
 ```bash
-cd /www
-npm run docusaurus docs:version v4.22
+#from the root directory, use the module version from package.json
+npm run docs:version
+
+#from the root directory, manully set the version
+npm run docs:version --version-override=X.Y.Z
+
+# from the /www documentation directory, manully set the version
+npm run docusaurus docs:version X.Y.Z
 ```
 
-- The official documentation (API + guides) of `v4.22` is created.
+- The official documentation (API + guides) of `X.Y.Z` is created.
 - Commit your work, and merge it in `develop`.
-- perform the official release of `v4.22` in `main`.
-- In the official documentation, the new version of documentation for `v4.22` is available, and NEXT version is temporarily identical.
+- perform the official release of `X.Y.Z` in `main`.
+- In the official documentation, the new version of documentation for `X.Y.Z` is available, and NEXT version is temporarily identical.

@@ -5,9 +5,9 @@ import {
   Abi,
   AllowArray,
   Call,
+  DeclareAndDeployContractPayload,
   DeclareContractPayload,
   DeclareContractResponse,
-  DeclareDeployContractPayload,
   DeclareDeployUDCResponse,
   DeployAccountContractPayload,
   DeployContractResponse,
@@ -31,22 +31,6 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract address: string;
 
   public abstract signer: SignerInterface;
-
-  /**
-   * @deprecated Use estimateInvokeFee or estimateDeclareFee instead
-   * Estimate Fee for executing an INVOKE transaction on starknet
-   *
-   * @param calls the invocation object containing:
-   * - contractAddress - the address of the contract
-   * - entrypoint - the entrypoint of the contract
-   * - calldata - (defaults to []) the calldata
-   *
-   * @returns response from estimate_fee
-   */
-  public abstract estimateFee(
-    calls: AllowArray<Call>,
-    estimateFeeDetails?: EstimateFeeDetails
-  ): Promise<EstimateFeeResponse>;
 
   /**
    * Estimate Fee for executing an INVOKE transaction on starknet
@@ -242,8 +226,8 @@ export abstract class AccountInterface extends ProviderInterface {
    *    - calldata
    *    - salt
    */
-  public abstract declareDeploy(
-    payload: DeclareDeployContractPayload,
+  public abstract declareAndDeploy(
+    payload: DeclareAndDeployContractPayload,
     details?: InvocationsDetails | undefined
   ): Promise<DeclareDeployUDCResponse>;
 
