@@ -1,3 +1,9 @@
+## [5.0.2](https://github.com/0xs34n/starknet.js/compare/v5.0.1...v5.0.2) (2023-03-02)
+
+### Bug Fixes
+
+- add max_fee to simulate_transaction ([95ae885](https://github.com/0xs34n/starknet.js/commit/95ae8857eb05daaeb75b4b853a0ee9377d9ac7df))
+
 ## [5.0.1](https://github.com/0xs34n/starknet.js/compare/v5.0.0...v5.0.1) (2023-03-02)
 
 ### Bug Fixes
