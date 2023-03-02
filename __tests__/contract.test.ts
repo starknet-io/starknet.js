@@ -577,7 +577,6 @@ describe('Complex interaction', () => {
       const estimateFeeSchema = {
         $ref: 'accountSchemas#/definitions/EstimateFee',
       };
-      expect(estimateFeeSchema).toBeValidSchema();
       expect(gas).toMatchSchema(estimateFeeSchema);
     });
 
@@ -586,7 +585,6 @@ describe('Complex interaction', () => {
       const estimateFeeSchema = {
         $ref: 'accountSchemas#/definitions/EstimateFee',
       };
-      expect(estimateFeeSchema).toBeValidSchema();
       expect(gas).toMatchSchema(estimateFeeSchema);
     });
   });

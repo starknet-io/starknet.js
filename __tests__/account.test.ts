@@ -65,7 +65,6 @@ describe('deploy and test Wallet', () => {
     const estimateFeeSchema = {
       $ref: 'accountSchemas#/definitions/EstimateFee',
     };
-    expect(estimateFeeSchema).toBeValidSchema();
     expect(result).toMatchSchema(estimateFeeSchema);
     expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
     innerInvokeEstFeeSpy.mockClear();
@@ -96,7 +95,6 @@ describe('deploy and test Wallet', () => {
       const estimateFeeSchema = {
         $ref: 'accountSchemas#/definitions/EstimateFee',
       };
-      expect(estimateFeeSchema).toBeValidSchema();
       estimatedFeeBulk.forEach((value) => {
         expect(value).toMatchSchema(estimateFeeSchema);
       });
@@ -118,7 +116,6 @@ describe('deploy and test Wallet', () => {
       const txSimulationSchema = {
         $ref: 'accountSchemas#/definitions/TransactionSimulation',
       };
-      expect(txSimulationSchema).toBeValidSchema();
       expect(res).toMatchSchema(txSimulationSchema);
 
       expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
@@ -241,7 +238,6 @@ describe('deploy and test Wallet', () => {
       const declareSchema = {
         $ref: 'accountSchemas#/definitions/DeclareContractResponse',
       };
-      expect(declareSchema).toBeValidSchema();
       expect(declareTx).toMatchSchema(declareSchema);
     });
 
@@ -329,7 +325,6 @@ describe('deploy and test Wallet', () => {
       const declareSchema = {
         $ref: 'accountSchemas#/definitions/DeclareContractResponse',
       };
-      expect(declareSchema).toBeValidSchema();
       expect(declareTx).toMatchSchema(declareSchema);
       expect(hexToDecimalString(declareTx.class_hash)).toEqual(hexToDecimalString(erc20ClassHash));
     });
@@ -347,7 +342,6 @@ describe('deploy and test Wallet', () => {
       const deployContractUDCSchema = {
         $ref: 'accountSchemas#/definitions/DeployContractUDCResponse',
       };
-      expect(deployContractUDCSchema).toBeValidSchema();
       expect(deployResponse).toMatchSchema(deployContractUDCSchema);
     });
 
@@ -368,7 +362,6 @@ describe('deploy and test Wallet', () => {
       const multiDeployContractSchema = {
         $ref: 'accountSchemas#/definitions/MultiDeployContractResponse',
       };
-      expect(multiDeployContractSchema).toBeValidSchema();
       expect(deployment).toMatchSchema(multiDeployContractSchema);
 
       // check pre-calculated address
@@ -394,7 +387,6 @@ describe('deploy and test Wallet', () => {
       const multiDeployContractSchema = {
         $ref: 'accountSchemas#/definitions/MultiDeployContractResponse',
       };
-      expect(multiDeployContractSchema).toBeValidSchema();
       expect(deployment).toMatchSchema(multiDeployContractSchema);
 
       // check pre-calculated address
@@ -420,7 +412,6 @@ describe('deploy and test Wallet', () => {
       const multiDeployContractSchema = {
         $ref: 'accountSchemas#/definitions/MultiDeployContractResponse',
       };
-      expect(multiDeployContractSchema).toBeValidSchema();
       expect(deployments).toMatchSchema(multiDeployContractSchema);
 
       await provider.waitForTransaction(deployments.transaction_hash);
@@ -490,7 +481,6 @@ describe('deploy and test Wallet', () => {
       const estimateFeeSchema = {
         $ref: 'accountSchemas#/definitions/EstimateFee',
       };
-      expect(estimateFeeSchema).toBeValidSchema();
       res.forEach((value) => {
         expect(value).toMatchSchema(estimateFeeSchema);
       });
@@ -536,7 +526,6 @@ describe('deploy and test Wallet', () => {
       const estimateFeeSchema = {
         $ref: 'accountSchemas#/definitions/EstimateFee',
       };
-      expect(estimateFeeSchema).toBeValidSchema();
       res.forEach((value) => {
         expect(value).toMatchSchema(estimateFeeSchema);
       });
