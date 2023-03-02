@@ -104,7 +104,7 @@ export function getStarknetIdContract(chainId: StarknetChainId): string {
   const starknetIdMainnetContract =
     '0x6ac597f8116f886fa1c97a23fa4e08299975ecaf6b598873ca6792b9bbfb678';
   const starknetIdTestnetContract =
-    '0x05cf267a0af6101667013fc6bd3f6c11116a14cda9b8c4b1198520d59f900b17';
+    '0x3bab268e932d2cecd1946f100ae67ce3dff9fd234119ea2f6da57d16d29fce';
 
   switch (chainId) {
     case StarknetChainId.SN_MAIN:
