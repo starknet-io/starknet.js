@@ -88,19 +88,19 @@ await this.callContract({
     contractAddress: this.address,
     entrypoint: 'is_valid_signature',
     calldata: compileCalldata({
-        hash: toBN(hash).toString(),
-        signature: signature.map((x) => toBN(x).toString()),
+        hash: toBigInt(hash).toString(),
+        signature: signature.map((x) => toBigInt(x).toString()),
     }),
 });
 ```
 
 ### estimatedFeeToMaxFee
 
-`estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: number = 0.5): BN`
+`estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: number = 0.5): bigint`
 
 Function that calculates and returns maximum fee based on the previously estimated one.
 
-Returns a BN.
+Returns a BigInt.
 
 ---
 
@@ -108,10 +108,8 @@ Returns a BN.
 
 Various number formatting functions.
 
-`BN` is the `BigNum` representation imported from `bn.js` library.
-
 ```js
-export type BigNumberish = string | number | BN;
+export type BigNumberish = string | number | bigint;
 ```
 
 ### isHex
@@ -120,19 +118,19 @@ export type BigNumberish = string | number | BN;
 
 Check if number is in hex format.
 
-### toBN
+### toBigInt
 
-`toBN(number: BigNumberish, base?: number | 'hex'): BN`
+`toBigInt(value: BigNumberish): bigint`
 
-Converts BigNumberish to BN.
+Converts BigNumberish to BigInt.
 
-Returns a BN.
+Returns a BigInt.
 
 ### toHex
 
-`toHex(number: BN): string`
+`toHex(number: BigNumberish): string`
 
-Converts BN to hex.
+Converts BigNumberish to hex.
 
 Returns a string.
 
@@ -154,7 +152,7 @@ Converts hex string to decimal string.
 
 `toFelt(num: BigNumberish): string`
 
-Converts BN to Felt.
+Converts BigNumberish to Felt.
 
 Returns a string.
 
@@ -163,7 +161,7 @@ Returns a string.
 `assertInRange(input: BigNumberish, lowerBound: BigNumberish, upperBound: BigNumberish, inputName = '')`
 
 Asserts input is equal to or greater than `lowerBound` and lower than `upperBound`. Assert message specifies inputName.
-`input`, `lowerBound`, and `upperBound` should be of type BN.
+`input`, `lowerBound`, and `upperBound` should be of type BigNumberish.
 `inputName` should be a string.
 
 ### bigNumberishArrayToDecimalStringArray
@@ -206,21 +204,21 @@ export interface Uint256 {
 
 ### uint256ToBN
 
-`uint256ToBN(uint256: Uint256): BN`
+`uint256ToBN(uint256: Uint256): bigint`
 
-Function to convert `Uint256` to `BN` (big number), which uses the `bn.js` library.
+Function to convert `Uint256` to `BigInt`.
 
 ### isUint256
 
 `isUint256(bn: BigNumberish): boolean`
 
-Function to check if `BN` is smaller or equal to `2**256-1`.
+Function to check if `BigNumberish` is smaller or equal to `2**256-1`.
 
 ### bnToUint256
 
 `bnToUint256(bignumber: BigNumberish): Uint256`
 
-Function to convert `BN` to `Uint256`.
+Function to convert `BigNumberish` to `Uint256`.
 
 ---
 
@@ -230,11 +228,11 @@ Various hashing helpers.
 
 ### starknetKeccak
 
-`starknetKeccak(value: string): BN`
+`starknetKeccak(value: string): bigint`
 
-Function to get the starknet keccak hash from a string. Returns starknet keccak hash as BigNumber.
+Function to get the starknet keccak hash from a string. Returns starknet keccak hash as bigint.
 
-Returns starknet keccak hash as BigNumber.
+Returns starknet keccak hash as bigint.
 
 ### getSelectorFromName
 
@@ -246,7 +244,7 @@ Returns hex selector of given abi function name.
 
 ### pedersen
 
-`pedersen(input: [BigNumberish, BigNumberish])`
+`pedersen(input: BigNumberish, BigNumberish)`
 
 Function to get the Pedersen hash for two arguments.
 
@@ -289,7 +287,7 @@ const hashMsg = calculateTransactionHash(
   getSelectorFromName('__execute__'),
   calldata,
   maxFee,
-  StarknetChainId.TESTNET
+  StarknetChainId.SN_GOERLI
 );
 ```
 
@@ -301,61 +299,15 @@ Function that calculates contract address from hash.
 
 Returns a string.
 
+### computeContractClassHash
+
+`computeContractClassHash(contract: CompiledContract | string)`
+
+Function that computes Class hash of a compiled contract
+
+Returns a string.
+
 ---
-
-## **ellipticCurve**
-
-Wrapper around the javascript `elliptic` library with additional functionality.
-
-### genKeyPair
-
-`ec.genKeyPair()`
-
-Generate a random key pair.
-
-### getKeyPair
-
-`getKeyPair(pk: BigNumberish): KeyPair`
-
-Get a key pair from a private key.
-
-### getStarkKey
-
-`getStarkKey(keyPair: KeyPair): string`
-
-Public key defined over a Stark-friendly elliptic curve that is different from the standard Ethereum elliptic curve
-
-### getKeyPairFromPublicKey
-
-`getKeyPairFromPublicKey(publicKey: BigNumberish): KeyPair`
-
-Takes a public key and casts it into `elliptic` KeyPair format.
-
-Returns keyPair with public key only, which can be used to verify signatures, but can't sign anything.
-
-### sign
-
-`sign(keyPair: KeyPair, msgHash: string): Signature`
-
-Signs a message using the provided key.
-
-keyPair should be a KeyPair with a valid private key.
-
-Returns a Signature.
-
-### verify
-
-`verify(keyPair: KeyPair | KeyPair[], msgHash: string, sig: Signature): boolean`
-
-Verifies a message using the provided key.
-
-keyPair should be a KeyPair with a valid public key.
-
-sig should be an Signature.
-
-Returns true if the verification succeeds.
-
-<hr />
 
 ## **calldata**
 

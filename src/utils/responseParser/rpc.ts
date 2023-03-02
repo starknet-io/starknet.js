@@ -9,7 +9,7 @@ import {
   GetTransactionResponse,
   RPC,
 } from '../../types';
-import { toBN } from '../number';
+import { toBigInt } from '../number/number';
 import { ResponseParser } from '.';
 
 type RpcGetBlockResponse = RPC.GetBlockWithTxHashesResponse & {
@@ -56,9 +56,9 @@ export class RPCResponseParser
 
   public parseFeeEstimateResponse(res: RPC.EstimateFeeResponse): EstimateFeeResponse {
     return {
-      overall_fee: toBN(res.overall_fee),
-      gas_consumed: toBN(res.gas_consumed),
-      gas_price: toBN(res.gas_price),
+      overall_fee: toBigInt(res.overall_fee),
+      gas_consumed: toBigInt(res.gas_consumed),
+      gas_price: toBigInt(res.gas_price),
     };
   }
 

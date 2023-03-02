@@ -1,11 +1,5 @@
-import {
-  Abi,
-  Call,
-  DeclareSignerDetails,
-  DeployAccountSignerDetails,
-  InvocationsSignerDetails,
-  Signature,
-} from '../types';
+import { Abi, Call, DeclareSignerDetails, InvocationsSignerDetails, Signature } from '../types';
+import { DeployAccountSignerDetails } from '../types/signer';
 import { TypedData } from '../utils/typedData';
 
 export abstract class SignerInterface {

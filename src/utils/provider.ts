@@ -1,6 +1,6 @@
 import { CompiledContract, ContractClass, RawCalldata } from '../types';
 import { parse } from './json';
-import { isHex, toBN, toHex } from './number';
+import { isHex, toHex } from './number/number';
 import { compressProgram } from './stark';
 
 export function wait(delay: number) {
@@ -14,7 +14,7 @@ export function parseCalldata(calldata: RawCalldata = []) {
     if (typeof data === 'string' && isHex(data as string)) {
       return data;
     }
-    return toHex(toBN(data));
+    return toHex(data);
   });
 }
 

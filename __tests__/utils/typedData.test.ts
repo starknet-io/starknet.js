@@ -4,7 +4,7 @@ import typedDataStructArrayExample from '../../__mocks__/typedDataStructArrayExa
 import { number } from '../../src';
 import { getSelectorFromName } from '../../src/utils/hash';
 import { MerkleTree } from '../../src/utils/merkle';
-import { BigNumberish } from '../../src/utils/number';
+import { BigNumberish } from '../../src/utils/number/number';
 import {
   StarkNetDomain,
   encodeType,
@@ -155,7 +155,7 @@ describe('typedData', () => {
   }
   function stringToStringStruct(str: string): StringStruct {
     const len = str.length;
-    const data = str.split('').map((char) => number.toHex(number.toBN(char.charCodeAt(0))));
+    const data = str.split('').map((char) => number.toHex(char.charCodeAt(0)));
     return { len, data };
   }
 

@@ -1,6 +1,6 @@
 import { computeHashOnElements, getSelectorFromName } from '../hash';
 import { MerkleTree } from '../merkle';
-import { BigNumberish, isHex, toBN, toHex } from '../number';
+import { BigNumberish, isHex, toHex } from '../number/number';
 import { encodeShortString } from '../shortString';
 import { StarkNetMerkleType, StarkNetType, TypedData } from './types';
 import { validateTypedData } from './utils';
@@ -9,10 +9,10 @@ export * from './types';
 
 function getHex(value: BigNumberish): string {
   try {
-    return toHex(toBN(value));
+    return toHex(value);
   } catch (e) {
     if (typeof value === 'string') {
-      return toHex(toBN(encodeShortString(value)));
+      return toHex(encodeShortString(value));
     }
     throw new Error(`Invalid BigNumberish: ${value}`);
   }

@@ -1,5 +1,5 @@
 import { StarknetChainId } from '../constants';
-import { BigNumberish } from '../utils/number';
+import { BigNumberish } from '../utils/number/number';
 import { DeployAccountContractPayload, InvocationsDetails } from './lib';
 
 export interface InvocationsSignerDetails extends Required<InvocationsDetails> {
@@ -8,8 +8,7 @@ export interface InvocationsSignerDetails extends Required<InvocationsDetails> {
 }
 
 export interface DeclareSignerDetails {
-  // contractClass: ContractClass,  // Should be used once class hash is present in ContractClass
-  classHash: BigNumberish;
+  classHash: string;
   senderAddress: BigNumberish;
   chainId: StarknetChainId;
   maxFee: BigNumberish;

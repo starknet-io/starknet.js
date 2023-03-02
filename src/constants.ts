@@ -1,18 +1,28 @@
-import { toBN } from './utils/number';
-
 export { IS_BROWSER } from './utils/encode';
 
-export const ZERO = toBN(0);
-export const ONE = toBN(1);
-export const TWO = toBN(2);
-export const MASK_250 = TWO.pow(toBN(250)).sub(ONE); // 2 ** 250 - 1
-export const MASK_251 = TWO.pow(toBN(251));
+export const ZERO = 0n;
+export const MASK_250 = 2n ** 250n - 1n; // 2 ** 250 - 1
+export const MASK_251 = 2n ** 251n;
+export const API_VERSION = ZERO;
+
+export enum BaseUrl {
+  SN_MAIN = 'https://alpha-mainnet.starknet.io',
+  SN_GOERLI = 'https://alpha4.starknet.io',
+  SN_GOERLI2 = 'https://alpha4-2.starknet.io',
+}
+
+export enum NetworkName {
+  SN_MAIN = 'SN_MAIN',
+  SN_GOERLI = 'SN_GOERLI',
+  SN_GOERLI2 = 'SN_GOERLI2',
+}
 
 export enum StarknetChainId {
-  MAINNET = '0x534e5f4d41494e', // encodeShortString('SN_MAIN'),
-  TESTNET = '0x534e5f474f45524c49', // encodeShortString('SN_GOERLI'),
-  TESTNET2 = '0x534e5f474f45524c4932',
+  SN_MAIN = '0x534e5f4d41494e', // encodeShortString('SN_MAIN'),
+  SN_GOERLI = '0x534e5f474f45524c49', // encodeShortString('SN_GOERLI'),
+  SN_GOERLI2 = '0x534e5f474f45524c4932', // encodeShortString('SN_GOERLI2'),
 }
+
 export enum TransactionHashPrefix {
   DECLARE = '0x6465636c617265', // encodeShortString('declare'),
   DEPLOY = '0x6465706c6f79', // encodeShortString('deploy'),

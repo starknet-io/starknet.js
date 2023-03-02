@@ -1,0 +1,91 @@
+[
+  {
+    "members": [
+      { "name": "to", "offset": 0, "type": "felt" },
+      { "name": "selector", "offset": 1, "type": "felt" },
+      { "name": "data_offset", "offset": 2, "type": "felt" },
+      { "name": "data_len", "offset": 3, "type": "felt" }
+    ],
+    "name": "AccountCallArray",
+    "size": 4,
+    "type": "struct"
+  },
+  {
+    "inputs": [{ "name": "publicKey", "type": "felt" }],
+    "name": "constructor",
+    "outputs": [],
+    "type": "constructor"
+  },
+  {
+    "inputs": [],
+    "name": "getPublicKey",
+    "outputs": [{ "name": "publicKey", "type": "felt" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "name": "interfaceId", "type": "felt" }],
+    "name": "supportsInterface",
+    "outputs": [{ "name": "success", "type": "felt" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "name": "newPublicKey", "type": "felt" }],
+    "name": "setPublicKey",
+    "outputs": [],
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "name": "hash", "type": "felt" },
+      { "name": "signature_len", "type": "felt" },
+      { "name": "signature", "type": "felt*" }
+    ],
+    "name": "isValidSignature",
+    "outputs": [{ "name": "isValid", "type": "felt" }],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "name": "call_array_len", "type": "felt" },
+      { "name": "call_array", "type": "AccountCallArray*" },
+      { "name": "calldata_len", "type": "felt" },
+      { "name": "calldata", "type": "felt*" }
+    ],
+    "name": "__validate__",
+    "outputs": [],
+    "type": "function"
+  },
+  {
+    "inputs": [{ "name": "class_hash", "type": "felt" }],
+    "name": "__validate_declare__",
+    "outputs": [],
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "name": "class_hash", "type": "felt" },
+      { "name": "salt", "type": "felt" },
+      { "name": "publicKey", "type": "felt" }
+    ],
+    "name": "__validate_deploy__",
+    "outputs": [],
+    "type": "function"
+  },
+  {
+    "inputs": [
+      { "name": "call_array_len", "type": "felt" },
+      { "name": "call_array", "type": "AccountCallArray*" },
+      { "name": "calldata_len", "type": "felt" },
+      { "name": "calldata", "type": "felt*" }
+    ],
+    "name": "__execute__",
+    "outputs": [
+      { "name": "response_len", "type": "felt" },
+      { "name": "response", "type": "felt*" }
+    ],
+    "type": "function"
+  }
+]

@@ -1,7 +1,5 @@
-import BN from 'bn.js';
-
 import { BlockIdentifier } from '../provider/utils';
-import { BigNumberish } from '../utils/number';
+import { BigNumberish } from '../utils/number/number';
 import {
   DeclareTransactionReceiptResponse,
   EstimateFeeResponse,
@@ -9,7 +7,7 @@ import {
 } from './provider';
 
 export interface EstimateFee extends EstimateFeeResponse {
-  suggestedMaxFee: BN;
+  suggestedMaxFee: bigint;
 }
 
 export type EstimateFeeBulk = Array<EstimateFee>;

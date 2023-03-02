@@ -1,37 +1,28 @@
-import BN from 'bn.js';
-import assert from 'minimalistic-assert';
+import { hexToBytes as hexToBytesNoble } from '@noble/curves/abstract/utils';
 
-import { addHexPrefix, removeHexPrefix } from './encode';
+import assert from '../assert';
+import { addHexPrefix, removeHexPrefix } from '../encode';
 
-export type BigNumberish = string | number | BN;
+export type BigNumberish = string | number | bigint;
 
 export function isHex(hex: string): boolean {
   return /^0x[0-9a-f]*$/i.test(hex);
 }
 
-export function toBN(number: BigNumberish, base?: number | 'hex') {
-  if (typeof number === 'string') {
-    // eslint-disable-next-line no-param-reassign
-    number = number.toLowerCase();
-  }
-  if (typeof number === 'string' && isHex(number) && !base)
-    return new BN(removeHexPrefix(number), 'hex');
-  return new BN(number, base);
+export function toBigInt(value: BigNumberish): bigint {
+  return BigInt(value);
 }
 
-export function toHex(number: BN): string {
-  return addHexPrefix(number.toString('hex'));
+export function isBigInt(value: any): value is bigint {
+  return typeof value === 'bigint';
+}
+
+export function toHex(number: BigNumberish): string {
+  return addHexPrefix(toBigInt(number).toString(16));
 }
 
 export function hexToDecimalString(hex: string): string {
-  return toBN(`0x${hex.replace(/^0x/, '')}`).toString();
-}
-
-export function toFelt(num: BigNumberish): string {
-  if (BN.isBN(num)) {
-    return num.toString();
-  }
-  return toBN(num).toString();
+  return BigInt(addHexPrefix(hex)).toString(10);
 }
 
 /**
@@ -53,23 +44,26 @@ export function assertInRange(
   inputName = ''
 ) {
   const messageSuffix = inputName === '' ? 'invalid length' : `invalid ${inputName} length`;
-  const inputBn = toBN(input);
+  const inputBigInt = BigInt(input);
+  const lowerBoundBigInt = BigInt(lowerBound);
+  const upperBoundBigInt = BigInt(upperBound);
+
   assert(
-    inputBn.gte(toBN(lowerBound)) && inputBn.lt(toBN(upperBound)),
+    inputBigInt >= lowerBoundBigInt && inputBigInt <= upperBoundBigInt,
     `Message not signable, ${messageSuffix}.`
   );
 }
 
 export function bigNumberishArrayToDecimalStringArray(rawCalldata: BigNumberish[]): string[] {
-  return rawCalldata.map((x) => toBN(x).toString(10));
+  return rawCalldata.map((x) => toBigInt(x).toString(10));
 }
 
 export function bigNumberishArrayToHexadecimalStringArray(rawCalldata: BigNumberish[]): string[] {
-  return rawCalldata.map((x) => toHex(toBN(x)));
+  return rawCalldata.map((x) => toHex(x));
 }
 
 export const isStringWholeNumber = (value: string) => /^\d+$/.test(value);
-export const toHexString = (value: string) => toHex(toBN(value));
+export const toHexString = (value: string) => toHex(value);
 
 export function getDecimalString(value: string) {
   if (isHex(value)) {
@@ -96,3 +90,18 @@ export function getHexStringArray(value: Array<string>) {
 }
 
 export const toCairoBool = (value: boolean): string => (+value).toString();
+
+/**
+ * Convert a hex string to an array of Bytes (Uint8Array)
+ * @param value hex string
+ * @returns an array of Bytes
+ */
+export function hexToBytes(value: string): Uint8Array {
+  if (!isHex(value)) throw new Error(`${value} need to be a hex-string`);
+
+  let adaptedValue: string = removeHexPrefix(value);
+  if (adaptedValue.length % 2 !== 0) {
+    adaptedValue = `0${adaptedValue}`;
+  }
+  return hexToBytesNoble(adaptedValue);
+}

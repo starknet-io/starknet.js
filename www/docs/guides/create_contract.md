@@ -48,7 +48,7 @@ Here, to declare & deploy a `Test.cairo` smartcontract, in Testnet 1 :
 
 ```typescript
 // connect provider
-const provider = new Provider({ sequencer: { network: "goerli-alpha" } });
+const provider = new Provider({ sequencer: { network: NetworkName.SN_GOERLI } });
 // connect your account. To adapt to your own account :
 const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
 const account0Address: string = "0x123....789";
@@ -73,7 +73,7 @@ If the contract class is already deployed, it's faster and cheaper to use `deplo
 
 ```typescript
 // connect provider
-const provider = new Provider({ sequencer: { network: "goerli-alpha" } });
+const provider = new Provider({ sequencer: { network: NetworkName.SN_GOERLI } });
 // connect your account. To adapt to your own account :
 const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
 const account0Address: string = "0x123....789";
@@ -101,7 +101,7 @@ If you want only declare a new Contract Class, use `declare()`.
 
 ```typescript
 // connect provider
-const provider = new Provider({ sequencer: { network: "goerli-alpha" } });
+const provider = new Provider({ sequencer: { network: NetworkName.SN_GOERLI } });
 // connect your account. To adapt to your own account :
 const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
 const account0Address: string = "0x123....789";

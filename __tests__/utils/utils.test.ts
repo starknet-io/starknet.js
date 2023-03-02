@@ -1,31 +1,10 @@
-import fs from 'fs';
-
-import { constants, hash, json, number, stark } from '../../src';
+import { constants, hash, number, stark } from '../../src';
 import { Block } from '../../src/provider/utils';
-import { pedersen } from '../../src/utils/hash';
 
 const { IS_BROWSER } = constants;
 
-const compiledAccount = json.parse(fs.readFileSync('./__mocks__/Account.json').toString('ascii'));
-
 test('isNode', () => {
   expect(IS_BROWSER).toBe(false);
-});
-describe('compressProgram()', () => {
-  test('compresses a contract program', () => {
-    const inputProgram = compiledAccount.program;
-
-    const compressed = stark.compressProgram(inputProgram);
-
-    expect(compressed).toMatchSnapshot();
-  });
-  test('works with strings', () => {
-    const inputProgram = json.stringify(compiledAccount.program);
-
-    const compressed = stark.compressProgram(inputProgram);
-
-    expect(compressed).toMatchSnapshot();
-  });
 });
 
 describe('hexToDecimalString()', () => {
@@ -78,9 +57,9 @@ describe('computeHashOnElements()', () => {
   });
   test('should return valid hash for valid array', () => {
     const res = hash.computeHashOnElements([
-      number.toBN(123782376),
-      number.toBN(213984),
-      number.toBN(128763521321),
+      number.toBigInt(123782376),
+      number.toBigInt(213984),
+      number.toBigInt(128763521321),
     ]);
     expect(res).toMatchInlineSnapshot(
       `"0x7b422405da6571242dfc245a43de3b0fe695e7021c148b918cd9cdb462cac59"`
@@ -89,12 +68,12 @@ describe('computeHashOnElements()', () => {
 });
 describe('estimatedFeeToMaxFee()', () => {
   test('should return maxFee for 0', () => {
-    const res = stark.estimatedFeeToMaxFee(0, 0.15).toNumber();
-    expect(res).toBe(0);
+    const res = stark.estimatedFeeToMaxFee(0, 0.15);
+    expect(res).toBe(0n);
   });
   test('should return maxFee for 10_000', () => {
-    const res = stark.estimatedFeeToMaxFee(10_000, 0.15).toNumber();
-    expect(res).toBe(11_500);
+    const res = stark.estimatedFeeToMaxFee(10_000, 0.15);
+    expect(res).toBe(11500n);
   });
 });
 
@@ -109,7 +88,7 @@ describe('calculateContractAddressFromHash()', () => {
     const classHash = '0x55187E68C60664A947048E0C9E5322F9BF55F7D435ECDCF17ED75724E77368F';
 
     // Any type of salt can be used. It depends on the dApp what kind of salt it wants to use.
-    const salt = pedersen([ethAddress, daiAddress]);
+    const salt = hash.pedersen(ethAddress, daiAddress);
 
     const res = hash.calculateContractAddressFromHash(
       salt,

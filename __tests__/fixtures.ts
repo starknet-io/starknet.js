@@ -1,8 +1,9 @@
 import fs from 'fs';
 import path from 'path';
 
-import { Account, ProviderInterface, RpcProvider, SequencerProvider, ec, json } from '../src';
-import { CompiledContract } from '../src/types';
+import { Account, ProviderInterface, RpcProvider, SequencerProvider, json } from '../src';
+import { CompiledContract, waitForTransactionOptions } from '../src/types';
+import { toHex } from '../src/utils/number/number';
 
 const readContract = (name: string): CompiledContract =>
   json.parse(
@@ -11,6 +12,7 @@ const readContract = (name: string): CompiledContract =>
 
 export const compiledOpenZeppelinAccount = readContract('Account');
 export const compiledErc20 = readContract('ERC20');
+export const compiledErc20Echo = readContract('ERC20-echo');
 export const compiledL1L2 = readContract('l1l2_compiled');
 export const compiledTypeTransformation = readContract('contract');
 export const compiledMulticall = readContract('multicall');
@@ -50,8 +52,11 @@ export const getTestProvider = (): ProviderInterface => {
   if (IS_LOCALHOST_DEVNET) {
     // accelerate the tests when running locally
     const originalWaitForTransaction = provider.waitForTransaction.bind(provider);
-    provider.waitForTransaction = (txHash: string, retryInterval?: number) => {
-      return originalWaitForTransaction(txHash, retryInterval || 1000);
+    provider.waitForTransaction = (
+      txHash: string,
+      { retryInterval }: waitForTransactionOptions = {}
+    ) => {
+      return originalWaitForTransaction(txHash, { retryInterval: retryInterval || 1000 });
     };
   }
 
@@ -75,7 +80,7 @@ export const getTestAccount = (provider: ProviderInterface) => {
     testAccountPrivateKey = DEFAULT_TEST_ACCOUNT_PRIVATE_KEY;
   }
 
-  return new Account(provider, testAccountAddress, ec.getKeyPair(testAccountPrivateKey));
+  return new Account(provider, toHex(testAccountAddress), testAccountPrivateKey);
 };
 
 const describeIf = (condition: boolean) => (condition ? describe : describe.skip);
