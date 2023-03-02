@@ -1,5 +1,5 @@
 import { addHexPrefix, removeHexPrefix } from './encode';
-import { isHex, isStringWholeNumber } from './number';
+import { isHex, isStringWholeNumber } from './number/number';
 
 const TEXT_TO_FELT_MAX_LEN = 31;
 

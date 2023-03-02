@@ -1,5 +1,5 @@
 import { AbiEntry, ParsedStruct, Tupled, abiStructs } from '../../types';
-import { BigNumberish } from '../number';
+import { BigNumberish } from '../number/number';
 import { isText, splitLongString } from '../shortString';
 import { felt, isTypeArray, isTypeFeltArray, isTypeStruct, isTypeTuple } from './cairo';
 import extractTupleMemberTypes from './tuple';

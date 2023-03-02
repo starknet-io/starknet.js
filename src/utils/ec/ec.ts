@@ -8,7 +8,7 @@ import {
 
 import { MAX_ECDSA_VAL, ZERO } from '../../constants';
 import { addHexPrefix, buf2hex, sanitizeHex } from '../encode';
-import { BigNumberish, assertInRange, toHex } from '../number';
+import { BigNumberish, assertInRange, toHex } from '../number/number';
 
 export * as starkCurve from './ecAdaptNoble';
 export * as weierstrass from '@noble/curves/abstract/weierstrass';
@@ -39,6 +39,7 @@ export class KeyPair {
   /**
    * get full public key
    * @deprecated Only for migration V4 -> V5. Do not use in new code using V5 onwards.
+   * Replaced by `ec.starkCurve.getPublicKey`
    * @param enc - optional. if 'hex' returns hex string, else returns a numString
    * @returns an Hex string with `0x04` prefix, or a numString.
    */
@@ -86,11 +87,14 @@ export function getKeyPair(pk: BigNumberish): KeyPair {
  * @deprecated Only for migration V4 -> V5. Do not use in new code using V5 onwards.
  * @returns key pair
  */
-export const genKeyPair = getKeyPair(addHexPrefix(buf2hex(utils.randomPrivateKey())));
+export function genKeyPair(): KeyPair {
+  return getKeyPair(addHexPrefix(buf2hex(utils.randomPrivateKey())));
+}
 
 /**
  * get the Starknet public key, from a KeyPair.
  * @deprecated Only for migration V4 -> V5. Do not use in new code using V5 onwards.
+ * Replaced by `ec.starkCurve.getStarkKey`
  * @param keyPair
  * @returns a Starknet public key (only X part of the 512 bits public key, without HEAD)
  */
@@ -116,6 +120,7 @@ export function getKeyPairFromPublicKey(publicKey: BigNumberish): KeyPair {
  * Signs a message using the provided key.
  *
  * @deprecated Only for migration V4 -> V5. Do not use in new code using V5 onwards.
+ * Replaced by `ec.starkCurve.sign`
  * @param keyPair should be an KeyPair with a valid private key.
  * @returns a Signature.
  */
@@ -130,7 +135,7 @@ export function sign(keyPair: KeyPair, msgHash: string): string {
  * Verifies a message using the provided key.
  * @deprecated Only for migration V4 -> V5.
  * Do not use in new code using V5 onwards.
- * Replaced by {@link TBD }
+ * Replaced by `ec.starkCurve.verify`
  * @param keyPair should be an KeyPair with a valid public key.
  * @param sig should be an Signature.
  * @returns true if the verification succeeds.

@@ -1,5 +1,5 @@
 import { pedersen } from './hash';
-import { toBigInt } from './number';
+import { toBigInt } from './number/number';
 
 export class MerkleTree {
   public leaves: string[];

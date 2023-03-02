@@ -16,7 +16,7 @@ import {
   StateUpdateResponse,
   TransactionSimulationResponse,
 } from '../../types';
-import { toBigInt } from '../number';
+import { toBigInt } from '../number/number';
 import { parseSignature } from '../stark';
 import { ResponseParser } from '.';
 
