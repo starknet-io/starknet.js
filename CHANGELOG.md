@@ -1,3 +1,10 @@
+## [5.0.1](https://github.com/0xs34n/starknet.js/compare/v5.0.0...v5.0.1) (2023-03-02)
+
+### Bug Fixes
+
+- add new starknet id contracts (testnet) ([343cf78](https://github.com/0xs34n/starknet.js/commit/343cf78a678b088ab4915407fe86f28fa91db6ea))
+- devnet tests ([8a5866e](https://github.com/0xs34n/starknet.js/commit/8a5866ee24b1a88ae3914fd7700d8a6e785979f1))
+
 # [5.0.0](https://github.com/0xs34n/starknet.js/compare/v4.22.0...v5.0.0) (2023-02-22)
 
 ### Bug Fixes
