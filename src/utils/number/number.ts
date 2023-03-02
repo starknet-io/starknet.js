@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import { hexToBytes as hexToBytesNoble } from '@noble/curves/abstract/utils';
 
 import assert from '../assert';
@@ -102,7 +101,6 @@ export function hexToBytes(value: string): Uint8Array {
 
   let adaptedValue: string = removeHexPrefix(value);
   if (adaptedValue.length % 2 !== 0) {
-    // eslint-disable-next-line prefer-template
     adaptedValue = `0${adaptedValue}`;
   }
   return hexToBytesNoble(adaptedValue);
