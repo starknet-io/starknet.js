@@ -1,5 +1,5 @@
 import { BlockNumber, GetBlockResponse, LibraryError, Provider, stark } from '../src';
-import { toBigInt } from '../src/utils/number';
+import { toBigInt } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import {
   compiledErc20,

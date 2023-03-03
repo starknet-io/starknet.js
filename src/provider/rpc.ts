@@ -23,7 +23,7 @@ import {
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
-import { BigNumberish, bigNumberishArrayToHexadecimalStringArray, toHex } from '../utils/number';
+import { BigNumberish, bigNumberishArrayToHexadecimalStringArray, toHex } from '../utils/num';
 import { parseCalldata, wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { signatureToHexArray } from '../utils/stark';

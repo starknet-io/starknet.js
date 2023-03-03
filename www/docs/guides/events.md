@@ -61,7 +61,7 @@ const txReceiptDeployTest = await provider.waitForTransaction(resu.transaction_h
 In Typescript, you have to change a little the code :
 
 ```typescript
-import { number, InvokeTransactionReceiptResponse } from "starknet";
+import { num, InvokeTransactionReceiptResponse } from "starknet";
 
 const resu = await myTestContract.invoke("my_func");
 const txReceiptDeployTest: InvokeTransactionReceiptResponse = await provider.waitForTransaction(resu.transaction_hash);
@@ -100,7 +100,7 @@ Use the contract deployment address, to filter the events and read the data from
 
 ```typescript
 const event = txReceiptDeployTest.events.find(
-  (it) => number.cleanHex(it.from_address) === number.cleanHex(testContractAddress)
+  (it) => num.cleanHex(it.from_address) === num.cleanHex(testContractAddress)
 ) || {data: []};
 
 const eventD1 = event.data[0];
