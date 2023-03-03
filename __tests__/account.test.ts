@@ -3,7 +3,7 @@ import { Account, Contract, Provider, TransactionStatus, ec, stark } from '../sr
 import { uint256 } from '../src/utils/calldata/cairo';
 import { parseUDCEvent } from '../src/utils/events';
 import { calculateContractAddressFromHash, feeTransactionVersion } from '../src/utils/hash';
-import { cleanHex, hexToDecimalString, toBigInt, toHex } from '../src/utils/number';
+import { cleanHex, hexToDecimalString, toBigInt, toHex } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import { randomAddress } from '../src/utils/stark';
 import {

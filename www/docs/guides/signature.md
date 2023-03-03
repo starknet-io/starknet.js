@@ -13,7 +13,7 @@ Your message has to be an array of `BigNumberish`. First calculate the hash of t
 > If the message does not respect some safety rules of composition, this method could be a way of attack of your smart contract. If you have any doubts, prefer the [EIP712 like method](#sign-and-verify-following-eip712), which is safe, but is also more complicated.
 
 ```typescript
-import {ec, hash, number, json, Contract } from "starknet";
+import {ec, hash, num, json, Contract } from "starknet";
 
 const privateKey = "0x1234567890987654321";
 const starkKeyPair = ec.getKeyPair(privateKey);

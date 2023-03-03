@@ -9,8 +9,10 @@ import { felt } from './calldata/cairo';
 import { starkCurve } from './ec';
 import { addHexPrefix, buf2hex, removeHexPrefix, utf8ToArray } from './encode';
 import { parse, stringify } from './json';
-import { BigNumberish, isHex, isStringWholeNumber, toBigInt, toHex, toHexString } from './number';
+import { BigNumberish, isHex, isStringWholeNumber, toBigInt, toHex, toHexString } from './num';
 import { encodeShortString } from './shortString';
+
+export * as poseidon from '@noble/curves/abstract/poseidon';
 
 export const transactionVersion = 1n;
 export const feeTransactionVersion = 2n ** 128n + transactionVersion;

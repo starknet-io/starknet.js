@@ -5,7 +5,7 @@ import * as starknet from 'starknet';
 
 const keyPair = starknet.ec.genKeyPair();
 const starkKey = starknet.ec.getStarkKey(keyPair);
-const starkKeyInt = starknet.number.toBigInt(starknet.encode.removeHexPrefix(starkKey), 16);
+const starkKeyInt = starknet.num.toBigInt(starknet.encode.removeHexPrefix(starkKey), 16);
 
 const { address: walletAddressLocal } = await provider.deployContract({
   contract: COMPILED_WALLET_CONTRACT_JSON,

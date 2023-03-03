@@ -1,5 +1,5 @@
 import { starkCurve } from './ec';
-import { toBigInt } from './number';
+import { toBigInt } from './num';
 
 export class MerkleTree {
   public leaves: string[];

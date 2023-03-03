@@ -2,7 +2,7 @@ import { Contract, ContractFactory, json, stark } from '../src';
 import { CallData } from '../src/utils/calldata';
 import { felt, tuple, uint256 } from '../src/utils/calldata/cairo';
 import { getSelectorFromName } from '../src/utils/hash';
-import { BigNumberish, hexToDecimalString, toBigInt } from '../src/utils/number';
+import { BigNumberish, hexToDecimalString, toBigInt } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import { compileCalldata } from '../src/utils/stark';
 import { uint256ToBN } from '../src/utils/uint256';
