@@ -12,7 +12,7 @@ const jestJsonMatchers = matchersWithOptions({ schemas }, (ajv: any) => {
   ajv.addKeyword({
     keyword: 'isBigInt',
     type: 'object',
-    validate: (_schema, data) => {
+    validate: (_schema: any, data: any) => {
       return typeof data === 'bigint' && data < 2n ** 64n && data >= 0n;
     },
     errors: true,
