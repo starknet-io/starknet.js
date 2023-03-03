@@ -1,3 +1,10 @@
+# [5.1.0](https://github.com/0xs34n/starknet.js/compare/v5.0.2...v5.1.0) (2023-03-03)
+
+### Features
+
+- expose base poseidon methods ([8459947](https://github.com/0xs34n/starknet.js/commit/84599474862416955da32d0e99957b8a112b4edd))
+- rename number utility namespace to num ([032aadc](https://github.com/0xs34n/starknet.js/commit/032aadcf1401f3a0ef40eac947c23b8acfd1a0f7))
+
 ## [5.0.2](https://github.com/0xs34n/starknet.js/compare/v5.0.1...v5.0.2) (2023-03-02)
 
 ### Bug Fixes
