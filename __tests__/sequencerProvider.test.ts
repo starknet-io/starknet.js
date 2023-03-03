@@ -96,10 +96,7 @@ describeIfSequencer('SequencerProvider', () => {
     test('transaction trace', async () => {
       const transactionTrace = await sequencerProvider.getTransactionTrace(exampleTransactionHash);
       // TODO test optional properties
-      const txTraceSchema = {
-        $ref: 'sequencerSchemas#/definitions/TransactionTraceResponse',
-      };
-      expect(transactionTrace).toMatchSchema(txTraceSchema);
+      expect(transactionTrace).toMatchSchemaRef('TransactionTraceResponse');
     });
 
     test('getCode() -> { bytecode }', async () => {
@@ -179,20 +176,12 @@ describeIfSequencer('SequencerProvider', () => {
   describe('getBlockTraces', () => {
     test(`getBlockTraces(blockHash=${exampleBlockHash}, blockNumber=undefined)`, async () => {
       const blockTraces = await sequencerProvider.getBlockTraces(exampleBlockHash);
-
-      const blockTracesSchema = {
-        $ref: 'sequencerSchemas#/definitions/BlockTransactionTracesResponse',
-      };
-      expect(blockTraces).toMatchSchema(blockTracesSchema);
+      expect(blockTraces).toMatchSchemaRef('BlockTransactionTracesResponse');
     });
 
     test(`getBlockTraces(blockHash=undefined, blockNumber=${exampleBlockNumber})`, async () => {
       const blockTraces = await sequencerProvider.getBlockTraces(exampleBlockNumber);
-
-      const blockTracesSchema = {
-        $ref: 'sequencerSchemas#/definitions/BlockTransactionTracesResponse',
-      };
-      expect(blockTraces).toMatchSchema(blockTracesSchema);
+      expect(blockTraces).toMatchSchemaRef('BlockTransactionTracesResponse');
     });
   });
 });

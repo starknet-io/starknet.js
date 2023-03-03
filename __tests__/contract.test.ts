@@ -574,18 +574,12 @@ describe('Complex interaction', () => {
 
     test('estimate fee', async () => {
       const gas = await erc20Echo20Contract.estimateFee.iecho(CallData.compile(request));
-      const estimateFeeSchema = {
-        $ref: 'accountSchemas#/definitions/EstimateFee',
-      };
-      expect(gas).toMatchSchema(estimateFeeSchema);
+      expect(gas).toMatchSchemaRef('EstimateFee');
     });
 
     test('estimate fee transfer', async () => {
       const gas = await erc20Echo20Contract.estimateFee.transfer(stark.randomAddress(), uint256(1));
-      const estimateFeeSchema = {
-        $ref: 'accountSchemas#/definitions/EstimateFee',
-      };
-      expect(gas).toMatchSchema(estimateFeeSchema);
+      expect(gas).toMatchSchemaRef('EstimateFee');
     });
   });
 });

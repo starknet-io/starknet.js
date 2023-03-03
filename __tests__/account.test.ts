@@ -62,10 +62,7 @@ describe('deploy and test Wallet', () => {
       calldata: [erc20.address, '10', '0'],
     });
 
-    const estimateFeeSchema = {
-      $ref: 'accountSchemas#/definitions/EstimateFee',
-    };
-    expect(result).toMatchSchema(estimateFeeSchema);
+    expect(result).toMatchSchemaRef('EstimateFee');
     expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
     innerInvokeEstFeeSpy.mockClear();
   });
@@ -92,11 +89,8 @@ describe('deploy and test Wallet', () => {
         },
       ]);
 
-      const estimateFeeSchema = {
-        $ref: 'accountSchemas#/definitions/EstimateFee',
-      };
       estimatedFeeBulk.forEach((value) => {
-        expect(value).toMatchSchema(estimateFeeSchema);
+        expect(value).toMatchSchemaRef('EstimateFee');
       });
       expect(estimatedFeeBulk.length).toEqual(2);
       expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
@@ -113,11 +107,7 @@ describe('deploy and test Wallet', () => {
         calldata: [erc20.address, '10', '0'],
       });
 
-      const txSimulationSchema = {
-        $ref: 'accountSchemas#/definitions/TransactionSimulation',
-      };
-      expect(res).toMatchSchema(txSimulationSchema);
-
+      expect(res).toMatchSchemaRef('TransactionSimulation');
       expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
       innerInvokeEstFeeSpy.mockClear();
     });
@@ -234,11 +224,7 @@ describe('deploy and test Wallet', () => {
         classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
       });
       await provider.waitForTransaction(declareTx.transaction_hash);
-
-      const declareSchema = {
-        $ref: 'accountSchemas#/definitions/DeclareContractResponse',
-      };
-      expect(declareTx).toMatchSchema(declareSchema);
+      expect(declareTx).toMatchSchemaRef('DeclareContractResponse');
     });
 
     test('Get the stark name of the account and account from stark name (using starknet.id)', async () => {
@@ -321,11 +307,7 @@ describe('deploy and test Wallet', () => {
       });
 
       await provider.waitForTransaction(declareTx.transaction_hash);
-
-      const declareSchema = {
-        $ref: 'accountSchemas#/definitions/DeclareContractResponse',
-      };
-      expect(declareTx).toMatchSchema(declareSchema);
+      expect(declareTx).toMatchSchemaRef('DeclareContractResponse');
       expect(hexToDecimalString(declareTx.class_hash)).toEqual(hexToDecimalString(erc20ClassHash));
     });
 
@@ -338,11 +320,7 @@ describe('deploy and test Wallet', () => {
           account.address,
         ],
       });
-
-      const deployContractUDCSchema = {
-        $ref: 'accountSchemas#/definitions/DeployContractUDCResponse',
-      };
-      expect(deployResponse).toMatchSchema(deployContractUDCSchema);
+      expect(deployResponse).toMatchSchemaRef('DeployContractUDCResponse');
     });
 
     test('UDC Deploy unique', async () => {
@@ -358,11 +336,7 @@ describe('deploy and test Wallet', () => {
         salt,
         unique: true,
       });
-
-      const multiDeployContractSchema = {
-        $ref: 'accountSchemas#/definitions/MultiDeployContractResponse',
-      };
-      expect(deployment).toMatchSchema(multiDeployContractSchema);
+      expect(deployment).toMatchSchemaRef('MultiDeployContractResponse');
 
       // check pre-calculated address
       const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
@@ -383,11 +357,7 @@ describe('deploy and test Wallet', () => {
         salt,
         unique: false,
       });
-
-      const multiDeployContractSchema = {
-        $ref: 'accountSchemas#/definitions/MultiDeployContractResponse',
-      };
-      expect(deployment).toMatchSchema(multiDeployContractSchema);
+      expect(deployment).toMatchSchemaRef('MultiDeployContractResponse');
 
       // check pre-calculated address
       const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
@@ -409,10 +379,7 @@ describe('deploy and test Wallet', () => {
           ],
         },
       ]);
-      const multiDeployContractSchema = {
-        $ref: 'accountSchemas#/definitions/MultiDeployContractResponse',
-      };
-      expect(deployments).toMatchSchema(multiDeployContractSchema);
+      expect(deployments).toMatchSchemaRef('MultiDeployContractResponse');
 
       await provider.waitForTransaction(deployments.transaction_hash);
     });
@@ -478,11 +445,8 @@ describe('deploy and test Wallet', () => {
         },
       ]);
       expect(res).toHaveLength(2);
-      const estimateFeeSchema = {
-        $ref: 'accountSchemas#/definitions/EstimateFee',
-      };
       res.forEach((value) => {
-        expect(value).toMatchSchema(estimateFeeSchema);
+        expect(value).toMatchSchemaRef('EstimateFee');
       });
     });
 
@@ -523,11 +487,8 @@ describe('deploy and test Wallet', () => {
         },
       ]);
       expect(res).toHaveLength(3);
-      const estimateFeeSchema = {
-        $ref: 'accountSchemas#/definitions/EstimateFee',
-      };
       res.forEach((value) => {
-        expect(value).toMatchSchema(estimateFeeSchema);
+        expect(value).toMatchSchemaRef('EstimateFee');
       });
     });
   });

@@ -49,54 +49,34 @@ describe('defaultProvider', () => {
     describe('getBlock', () => {
       test('getBlock(blockIdentifier=latest)', async () => {
         expect(exampleBlock).not.toBeNull();
-        const blockSchema = {
-          $ref: 'providerSchemas#/definitions/GetBlockResponse',
-        };
-        expect(exampleBlock).toMatchSchema(blockSchema);
+        expect(exampleBlock).toMatchSchemaRef('GetBlockResponse');
       });
 
       test(`getBlock(blockHash=undefined, blockNumber=${exampleBlockNumber})`, async () => {
         const block = await testProvider.getBlock(exampleBlockNumber);
-        const blockSchema = {
-          $ref: 'providerSchemas#/definitions/GetBlockResponse',
-        };
-        expect(block).toMatchSchema(blockSchema);
+        expect(block).toMatchSchemaRef('GetBlockResponse');
       });
 
       test(`getBlock(blockHash=${exampleBlockHash}, blockNumber=undefined)`, async () => {
         const block = await testProvider.getBlock(exampleBlockHash);
-        const blockSchema = {
-          $ref: 'providerSchemas#/definitions/GetBlockResponse',
-        };
-        expect(block).toMatchSchema(blockSchema);
+        expect(block).toMatchSchemaRef('GetBlockResponse');
       });
 
       test('getBlock() -> { blockNumber }', async () => {
         const block = await testProvider.getBlock('latest');
-        const blockSchema = {
-          $ref: 'providerSchemas#/definitions/GetBlockResponse',
-        };
-        expect(block).toMatchSchema(blockSchema);
+        expect(block).toMatchSchemaRef('GetBlockResponse');
       });
 
       test(`getStateUpdate(blockHash=${exampleBlockHash}, blockNumber=undefined)`, async () => {
         const stateUpdate = await testProvider.getStateUpdate(exampleBlockHash);
         expect(stateUpdate.block_hash).toBe(exampleBlockHash);
-
-        const stateUpdateResponse = {
-          $ref: 'providerSchemas#/definitions/StateUpdateResponse',
-        };
-        expect(stateUpdate).toMatchSchema(stateUpdateResponse);
+        expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
       });
 
       test(`getStateUpdate(blockHash=undefined, blockNumber=${exampleBlockNumber})`, async () => {
         const stateUpdate = await testProvider.getStateUpdate(exampleBlockNumber);
         expect(stateUpdate.block_hash).toBe(exampleBlockHash);
-
-        const stateUpdateResponse = {
-          $ref: 'providerSchemas#/definitions/StateUpdateResponse',
-        };
-        expect(stateUpdate).toMatchSchema(stateUpdateResponse);
+        expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
       });
     });
 
@@ -107,20 +87,12 @@ describe('defaultProvider', () => {
 
     test('getClassAt(contractAddress, blockNumber="latest")', async () => {
       const classResponse = await testProvider.getClassAt(erc20ContractAddress);
-
-      const classResponseSchema = {
-        $ref: 'libSchemas#/definitions/ContractClass',
-      };
-      expect(classResponse).toMatchSchema(classResponseSchema);
+      expect(classResponse).toMatchSchemaRef('ContractClass');
     });
 
     test('GetClassByHash', async () => {
       const classResponse = await testProvider.getClassByHash(erc20ClassHash);
-
-      const classResponseSchema = {
-        $ref: 'libSchemas#/definitions/ContractClass',
-      };
-      expect(classResponse).toMatchSchema(classResponseSchema);
+      expect(classResponse).toMatchSchemaRef('ContractClass');
     });
 
     describe('getStorageAt', () => {
@@ -147,20 +119,12 @@ describe('defaultProvider', () => {
 
     test('getTransaction() - successful deploy transaction', async () => {
       const transaction = await testProvider.getTransaction(exampleTransactionHash);
-
-      const transactionSchema = {
-        $ref: 'providerSchemas#/definitions/GetTransactionResponse',
-      };
-      expect(transaction).toMatchSchema(transactionSchema);
+      expect(transaction).toMatchSchemaRef('GetTransactionResponse');
     });
 
     test('getTransactionReceipt() - successful transaction', async () => {
       const transactionReceipt = await testProvider.getTransactionReceipt(exampleTransactionHash);
-
-      const txReceiptSchema = {
-        $ref: 'providerSchemas#/definitions/GetTransactionReceiptResponse',
-      };
-      expect(transactionReceipt).toMatchSchema(txReceiptSchema);
+      expect(transactionReceipt).toMatchSchemaRef('GetTransactionReceiptResponse');
     });
 
     describe('callContract()', () => {
