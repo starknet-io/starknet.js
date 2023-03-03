@@ -24,3 +24,12 @@ export * as typedData from './utils/typedData';
 export * as ec from './utils/ec';
 export * from './utils/address';
 export * from './utils/url';
+
+/**
+ * Deprecated
+ */
+/* eslint-disable import/first */
+import * as num from './utils/num';
+
+/** @deprecated prefer the 'num' naming */
+export const number = num;
