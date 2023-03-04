@@ -4,7 +4,7 @@ import { AbiEntry, FunctionAbi, abiStructs } from '../../types';
  * Flow: Determine type from abi and than validate against parameter
  */
 import assert from '../assert';
-import { BigNumberish } from '../number/number';
+import { BigNumberish } from '../num';
 import { isLongText } from '../shortString';
 import { isLen, isTypeArray, isTypeFelt, isTypeStruct, isTypeTuple } from './cairo';
 

@@ -1,5 +1,5 @@
-import { pedersen } from './hash';
-import { toBigInt } from './number/number';
+import { starkCurve } from './ec';
+import { toBigInt } from './num';
 
 export class MerkleTree {
   public leaves: string[];
@@ -33,7 +33,7 @@ export class MerkleTree {
 
   static hash(a: string, b: string) {
     const [aSorted, bSorted] = [toBigInt(a), toBigInt(b)].sort((x, y) => (x >= y ? 1 : -1));
-    return pedersen(aSorted, bSorted);
+    return starkCurve.pedersen(aSorted, bSorted);
   }
 
   public getProof(leaf: string, branch = this.leaves, hashPath: string[] = []): string[] {

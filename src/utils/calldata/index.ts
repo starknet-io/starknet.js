@@ -1,6 +1,6 @@
 import { Abi, AbiEntry, Args, Calldata, FunctionAbi, abiStructs } from '../../types';
 import assert from '../assert';
-import { isBigInt } from '../number/number';
+import { isBigInt } from '../num';
 import { isLongText, splitLongString } from '../shortString';
 import { felt, isLen } from './cairo';
 import formatter from './formatter';

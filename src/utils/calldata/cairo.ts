@@ -1,5 +1,5 @@
 import { abiStructs } from '../../types';
-import { BigNumberish, isBigInt, isHex, isStringWholeNumber } from '../number/number';
+import { BigNumberish, isBigInt, isHex, isStringWholeNumber } from '../num';
 import { encodeShortString, isShortString, isText } from '../shortString';
 import { UINT_128_MAX, Uint256, isUint256 } from '../uint256';
 

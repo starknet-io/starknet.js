@@ -4,7 +4,7 @@ import { arrayify } from '@ethersproject/bytes';
 import { MASK_251, ZERO } from '../constants';
 import { addHexPrefix, removeHexPrefix } from './encode';
 import { keccakBn } from './hash';
-import { BigNumberish, assertInRange, toHex } from './number/number';
+import { BigNumberish, assertInRange, toHex } from './num';
 
 export function addAddressPadding(address: BigNumberish): string {
   return addHexPrefix(removeHexPrefix(toHex(address)).padStart(64, '0'));

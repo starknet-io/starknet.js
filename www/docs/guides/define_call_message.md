@@ -83,7 +83,7 @@ const myCallData = [
     "0x2345",
     bn1.toString(), // BigInt converted to string
     bi1.toString(), // BigInt converted to string
-    number.toBN(num1).toString(), // Number 53 bits converted to string
+    num.toBN(num1).toString(), // Number 53 bits converted to string
     initialUint256.low.toString(), initialUint256.high.toString(),
     coord.x0.toString(), coord.y0.toString(), coord.z0.toString(),
     shortString.encodeShortString('A'),
