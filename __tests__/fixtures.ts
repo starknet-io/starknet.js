@@ -3,7 +3,7 @@ import path from 'path';
 
 import { Account, ProviderInterface, RpcProvider, SequencerProvider, json } from '../src';
 import { CompiledContract, waitForTransactionOptions } from '../src/types';
-import { toHex } from '../src/utils/number/number';
+import { toHex } from '../src/utils/num';
 
 const readContract = (name: string): CompiledContract =>
   json.parse(

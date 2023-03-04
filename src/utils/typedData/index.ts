@@ -1,6 +1,6 @@
 import { computeHashOnElements, getSelectorFromName } from '../hash';
 import { MerkleTree } from '../merkle';
-import { BigNumberish, isHex, toHex } from '../number/number';
+import { BigNumberish, isHex, toHex } from '../num';
 import { encodeShortString } from '../shortString';
 import { StarkNetMerkleType, StarkNetType, TypedData } from './types';
 import { validateTypedData } from './utils';

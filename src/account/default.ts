@@ -31,16 +31,15 @@ import {
   UniversalDeployerContractPayload,
 } from '../types';
 import { EstimateFeeBulk, TransactionSimulation } from '../types/account';
-// import { starkCurve } from '../utils/ec/ec';
+import { starkCurve } from '../utils/ec';
 import { parseUDCEvent } from '../utils/events';
 import {
   calculateContractAddressFromHash,
   computeContractClassHash,
   feeTransactionVersion,
-  pedersen,
   transactionVersion,
 } from '../utils/hash';
-import { BigNumberish, toBigInt, toCairoBool, toHex } from '../utils/number/number';
+import { BigNumberish, toBigInt, toCairoBool, toHex } from '../utils/num';
 import { parseContract } from '../utils/provider';
 import { compileCalldata, estimatedFeeToMaxFee, randomAddress } from '../utils/stark';
 import { fromCallsToExecuteCalldata } from '../utils/transaction';
@@ -369,7 +368,7 @@ export class Account extends Provider implements AccountInterface {
           ],
         },
         address: calculateContractAddressFromHash(
-          unique ? pedersen(this.address, deploySalt) : deploySalt,
+          unique ? starkCurve.pedersen(this.address, deploySalt) : deploySalt,
           classHash,
           compiledConstructorCallData,
           unique ? UDC.ADDRESS : 0

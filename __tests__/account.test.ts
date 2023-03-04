@@ -1,9 +1,9 @@
 import typedDataExample from '../__mocks__/typedDataExample.json';
-import { Account, Contract, Provider, TransactionStatus, ec, hash, stark } from '../src';
+import { Account, Contract, Provider, TransactionStatus, ec, stark } from '../src';
 import { uint256 } from '../src/utils/calldata/cairo';
 import { parseUDCEvent } from '../src/utils/events';
 import { calculateContractAddressFromHash, feeTransactionVersion } from '../src/utils/hash';
-import { cleanHex, hexToDecimalString, toBigInt, toHex } from '../src/utils/number/number';
+import { cleanHex, hexToDecimalString, toBigInt, toHex } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import { randomAddress } from '../src/utils/stark';
 import {
@@ -243,8 +243,8 @@ describe('deploy and test Wallet', () => {
         '1893860513534673656759973582609638731665558071107553163765293299136715951024';
       const whitelistingPrivateKey =
         '301579081698031303837612923223391524790804435085778862878979120159194507372';
-      const hashed = hash.pedersen(
-        hash.pedersen(toBigInt('18925'), toBigInt('1922775124')),
+      const hashed = ec.starkCurve.pedersen(
+        ec.starkCurve.pedersen(toBigInt('18925'), toBigInt('1922775124')),
         toBigInt(account.address)
       );
       const signed = ec.starkCurve.sign(hashed, toHex(whitelistingPrivateKey));
