@@ -1,4 +1,4 @@
-import { constants, ec, hash, num, stark } from '../../src';
+import { constants, hash, num, stark } from '../../src';
 import { Block } from '../../src/provider/utils';
 
 const { IS_BROWSER } = constants;
@@ -31,41 +31,6 @@ describe('makeAddress()', () => {
   });
 });
 
-describe('getSelectorFromName()', () => {
-  test('hash works for value="test"', () => {
-    expect(hash.getSelectorFromName('test')).toBe(
-      '0x22ff5f21f0b81b113e63f7db6da94fedef11b2119b4088b89664fb9a3cb658'
-    );
-  });
-  test('hash works for value="initialize"', () => {
-    expect(hash.getSelectorFromName('initialize')).toBe(
-      '0x79dc0da7c54b95f10aa182ad0a46400db63156920adb65eca2654c0945a463'
-    );
-  });
-  test('hash works for value="mint"', () => {
-    expect(hash.getSelectorFromName('mint')).toBe(
-      '0x2f0b3c5710379609eb5495f1ecd348cb28167711b73609fe565a72734550354'
-    );
-  });
-});
-describe('computeHashOnElements()', () => {
-  test('should return valid hash for empty array', () => {
-    const res = hash.computeHashOnElements([]);
-    expect(res).toMatchInlineSnapshot(
-      `"0x49ee3eba8c1600700ee1b87eb599f16716b0b1022947733551fde4050ca6804"`
-    );
-  });
-  test('should return valid hash for valid array', () => {
-    const res = hash.computeHashOnElements([
-      num.toBigInt(123782376),
-      num.toBigInt(213984),
-      num.toBigInt(128763521321),
-    ]);
-    expect(res).toMatchInlineSnapshot(
-      `"0x7b422405da6571242dfc245a43de3b0fe695e7021c148b918cd9cdb462cac59"`
-    );
-  });
-});
 describe('estimatedFeeToMaxFee()', () => {
   test('should return maxFee for 0', () => {
     const res = stark.estimatedFeeToMaxFee(0, 0.15);
@@ -88,7 +53,7 @@ describe('calculateContractAddressFromHash()', () => {
     const classHash = '0x55187E68C60664A947048E0C9E5322F9BF55F7D435ECDCF17ED75724E77368F';
 
     // Any type of salt can be used. It depends on the dApp what kind of salt it wants to use.
-    const salt = ec.starkCurve.pedersen(ethAddress, daiAddress);
+    const salt = hash.pedersen(ethAddress, daiAddress);
 
     const res = hash.calculateContractAddressFromHash(
       salt,

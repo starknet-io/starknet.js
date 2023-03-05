@@ -1,6 +1,6 @@
 import { Abi, Call, DeclareSignerDetails, InvocationsSignerDetails, Signature } from '../types';
 import { DeployAccountSignerDetails } from '../types/signer';
-import { starkCurve } from '../utils/ec';
+import { starkCurve } from '../utils/ec/ec';
 import { buf2hex } from '../utils/encode';
 import {
   calculateDeclareTransactionHash,

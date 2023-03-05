@@ -30,7 +30,7 @@ Then you can send, by any means, to the recipient of the message:
 
 - the message.
 - the signature.
-- the full public key (or a wallet address).
+- the full public key, or the Starknet public key, or a wallet address.
 
 ## Receive and verify a message
 
@@ -41,12 +41,15 @@ On receiver side, you can verify that:
 
 2 ways to perform this verification:
 
-- off-chain, using the full public key (very fast, but only for standard Starknet hash & sign).
+- off-chain, using the full public key or the Starknet public key (very fast, but only for standard Starknet hash & sign).
 - on-chain, using the account address (slow, add workload to the node/sequencer, but can manage exotic account abstraction about hash or sign).
 
 ### Verify outside of Starknet:
 
-The sender provides the message, the signature and the full public key. Verification:
+#### With the full public key:
+
+The sender provides the message, the signature and the full public key.  
+Verification:
 
 ```typescript
 const starkKeyPair1 = ec.getKeyPairFromPublicKey(fullPublicKey);
@@ -76,9 +79,14 @@ const isFullPubKeyRelatedToAccount: boolean =
 console.log("Result (boolean)=", isFullPubKeyRelatedToAccount);
 ```
 
+#### With the starknet public key:
+
+The sender provides the message, the signature and the Starknet public key.  
+With the Starknet public key, it's a bit more complicated. Use the code [here](https://github.com/0xs34n/starknet.js/issues/479) to proceed.
+
 ### Verify in Starknet network, with the account:
 
-The sender can provide an account address, in spite of a full public key.
+The sender can provide an account address, in spite of a public key.
 
 ```typescript
 const provider = new Provider({ sequencer: { baseUrl: "http://127.0.0.1:5050" } }); //devnet

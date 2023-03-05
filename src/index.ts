@@ -21,15 +21,19 @@ export * as merkle from './utils/merkle';
 export * as uint256 from './utils/uint256';
 export * as shortString from './utils/shortString';
 export * as typedData from './utils/typedData';
-export * as ec from './utils/ec';
+export * as cairo from './utils/calldata/cairo';
+export * as ec from './utils/ec/ec';
 export * from './utils/address';
 export * from './utils/url';
+
+// eslint-disable-next-line import/first, prettier/prettier
+import { felt } from './utils/calldata/cairo';
+// eslint-disable-next-line import/first, prettier/prettier
+import * as n from './utils/num';
 
 /**
  * Deprecated
  */
-/* eslint-disable import/first */
-import * as num from './utils/num';
 
 /** @deprecated prefer the 'num' naming */
-export const number = num;
+export const number = { ...n, toFelt: felt };

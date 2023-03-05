@@ -1,4 +1,4 @@
-import { weierstrass } from '../utils/ec';
+import { weierstrass } from '../utils/ec/ec';
 import type { BigNumberish } from '../utils/num';
 import { RPC } from './api/rpc';
 
