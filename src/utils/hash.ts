@@ -6,7 +6,7 @@ import { hexToBytes } from 'ethereum-cryptography/utils.js';
 import { API_VERSION, MASK_250, StarknetChainId, TransactionHashPrefix } from '../constants';
 import { CompiledContract, RawCalldata } from '../types/lib';
 import { felt } from './calldata/cairo';
-import { starkCurve } from './ec2/index';
+import { starkCurve } from './ec';
 import { addHexPrefix, buf2hex, removeHexPrefix, utf8ToArray } from './encode';
 import { parse, stringify } from './json';
 import { BigNumberish, isHex, isStringWholeNumber, toBigInt, toHex, toHexString } from './num';

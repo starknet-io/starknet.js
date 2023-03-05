@@ -1,0 +1,5 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`pedersen() 1`] = `"0x5ed2703dfdb505c587700ce2ebfcab5b3515cd7e6114817e6026ec9d4b364ca"`;
+
+exports[`pedersen() with 0 1`] = `"0x1a5c561f97b52c17a19f34c4499a745cd4e8412e29e4ed5e91e4481c7d53935"`;

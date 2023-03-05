@@ -11,11 +11,6 @@ export function btoaUniversal(b: ArrayBuffer): string {
   return IS_BROWSER ? btoa(arrayBufferToString(b)) : Buffer.from(b).toString('base64');
 }
 
-/**
- * convert an array of Bytes (Uint8Array) to an hex string
- * @param bufferarray of bytes
- * @returns an Hex string, without '0x' prefix
- */
 export function buf2hex(buffer: Uint8Array) {
   return [...buffer].map((x) => x.toString(16).padStart(2, '0')).join('');
 }
