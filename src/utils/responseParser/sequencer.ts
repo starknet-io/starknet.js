@@ -38,8 +38,6 @@ export class SequencerAPIResponseParser extends ResponseParser {
     return {
       ...res,
       calldata: 'calldata' in res.transaction ? (res.transaction.calldata as Array<string>) : [],
-      contract_address:
-        'contract_address' in res.transaction ? res.transaction.contract_address : undefined,
       contract_class:
         'contract_class' in res.transaction ? (res.transaction.contract_class as any) : undefined,
       entry_point_selector:

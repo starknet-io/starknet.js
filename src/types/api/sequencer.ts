@@ -109,7 +109,7 @@ export namespace Sequencer {
 
   export type InvokeFunctionTransaction = {
     type: 'INVOKE_FUNCTION';
-    contract_address: string;
+    sender_address: string;
     signature?: string[];
     entry_point_type?: EntryPointType;
     calldata?: RawCalldata;
@@ -221,10 +221,14 @@ export namespace Sequencer {
     starknet_version: string;
   };
 
-  export type CallContractTransaction = Omit<
-    InvokeFunctionTransaction,
-    'type' | 'entry_point_type' | 'nonce'
-  > & { entry_point_selector: string };
+  export type CallContractTransaction = {
+    contract_address: string;
+    signature?: string[];
+    calldata?: RawCalldata;
+    max_fee?: BigNumberish;
+    version?: BigNumberish;
+    entry_point_selector: string;
+  };
 
   export type CallContractResponse = {
     result: string[];
@@ -386,6 +390,7 @@ export namespace Sequencer {
     estimate_fee: {
       QUERY: {
         blockIdentifier: BlockIdentifier;
+        skip_validate: boolean;
       };
       REQUEST: EstimateFeeRequest;
       RESPONSE: EstimateFeeResponse;

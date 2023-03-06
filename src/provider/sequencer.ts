@@ -359,7 +359,7 @@ export class SequencerProvider implements ProviderInterface {
   ): Promise<InvokeFunctionResponse> {
     return this.fetchEndpoint('add_transaction', undefined, {
       type: TransactionType.INVOKE,
-      contract_address: functionInvocation.contractAddress,
+      sender_address: functionInvocation.contractAddress,
       calldata: bigNumberishArrayToDecimalStringArray(functionInvocation.calldata ?? []),
       signature: signatureToDecimalArray(functionInvocation.signature),
       nonce: toHex(details.nonce),
@@ -402,22 +402,24 @@ export class SequencerProvider implements ProviderInterface {
   public async getEstimateFee(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = this.blockIdentifier
+    blockIdentifier: BlockIdentifier = this.blockIdentifier,
+    skipValidate: boolean = false
   ): Promise<EstimateFeeResponse> {
-    return this.getInvokeEstimateFee(invocation, invocationDetails, blockIdentifier);
+    return this.getInvokeEstimateFee(invocation, invocationDetails, blockIdentifier, skipValidate);
   }
 
   public async getInvokeEstimateFee(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = this.blockIdentifier
+    blockIdentifier: BlockIdentifier = this.blockIdentifier,
+    skipValidate: boolean = false
   ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint(
       'estimate_fee',
-      { blockIdentifier },
+      { blockIdentifier, skip_validate: skipValidate },
       {
         type: TransactionType.INVOKE,
-        contract_address: invocation.contractAddress,
+        sender_address: invocation.contractAddress,
         calldata: invocation.calldata ?? [],
         signature: signatureToDecimalArray(invocation.signature),
         version: toHex(invocationDetails?.version || 1),
@@ -429,11 +431,12 @@ export class SequencerProvider implements ProviderInterface {
   public async getDeclareEstimateFee(
     { senderAddress, contractDefinition, signature }: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = this.blockIdentifier
+    blockIdentifier: BlockIdentifier = this.blockIdentifier,
+    skipValidate: boolean = false
   ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint(
       'estimate_fee',
-      { blockIdentifier },
+      { blockIdentifier, skip_validate: skipValidate },
       {
         type: TransactionType.DECLARE,
         sender_address: senderAddress,
@@ -448,11 +451,12 @@ export class SequencerProvider implements ProviderInterface {
   public async getDeployAccountEstimateFee(
     { classHash, addressSalt, constructorCalldata, signature }: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = this.blockIdentifier
+    blockIdentifier: BlockIdentifier = this.blockIdentifier,
+    skipValidate: boolean = false
   ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint(
       'estimate_fee',
-      { blockIdentifier },
+      { blockIdentifier, skip_validate: skipValidate },
       {
         type: TransactionType.DEPLOY_ACCOUNT,
         class_hash: toHex(classHash),
@@ -474,7 +478,7 @@ export class SequencerProvider implements ProviderInterface {
       if (invocation.type === 'INVOKE_FUNCTION') {
         res = {
           type: invocation.type,
-          contract_address: invocation.contractAddress,
+          sender_address: invocation.contractAddress,
           calldata: invocation.calldata ?? [],
         };
       } else if (invocation.type === 'DECLARE') {
@@ -603,7 +607,7 @@ export class SequencerProvider implements ProviderInterface {
       { blockIdentifier },
       {
         type: 'INVOKE_FUNCTION',
-        contract_address: invocation.contractAddress,
+        sender_address: invocation.contractAddress,
         calldata: invocation.calldata ?? [],
         signature: signatureToDecimalArray(invocation.signature),
         version: toHex(invocationDetails?.version || 1),

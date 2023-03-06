@@ -208,7 +208,8 @@ export abstract class ProviderInterface {
   public abstract getEstimateFee(
     invocation: Invocation,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<EstimateFeeResponse>;
 
   /**
@@ -228,7 +229,8 @@ export abstract class ProviderInterface {
   public abstract getInvokeEstimateFee(
     invocation: Invocation,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<EstimateFeeResponse>;
 
   /**
@@ -248,7 +250,8 @@ export abstract class ProviderInterface {
   public abstract getDeclareEstimateFee(
     transaction: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<EstimateFeeResponse>;
 
   /**
@@ -269,7 +272,8 @@ export abstract class ProviderInterface {
   public abstract getDeployAccountEstimateFee(
     transaction: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<EstimateFeeResponse>;
 
   /**

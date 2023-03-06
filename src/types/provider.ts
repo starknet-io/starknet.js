@@ -48,7 +48,8 @@ export interface CommonTransactionResponse {
 }
 
 export interface InvokeTransactionResponse extends CommonTransactionResponse {
-  contract_address?: string;
+  contract_address?: string; // TODO: Added for RPC comp, remove when rpc update to sender_address
+  sender_address?: string;
   entry_point_selector?: string;
   calldata: RawCalldata;
 }
