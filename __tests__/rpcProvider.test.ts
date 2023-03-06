@@ -9,6 +9,7 @@ import {
   getTestAccount,
   getTestProvider,
 } from './fixtures';
+import { initializeMatcher } from './schema';
 
 describeIfRpc('RPCProvider', () => {
   const rpcProvider = getTestProvider() as RpcProvider;
@@ -16,6 +17,7 @@ describeIfRpc('RPCProvider', () => {
   let accountPublicKey: string;
 
   beforeAll(async () => {
+    initializeMatcher(expect);
     expect(account).toBeInstanceOf(Account);
     const accountKeyPair = utils.randomPrivateKey();
     accountPublicKey = getStarkKey(accountKeyPair);
@@ -45,10 +47,7 @@ describeIfRpc('RPCProvider', () => {
 
   test('getStateUpdate', async () => {
     const stateUpdate = await rpcProvider.getStateUpdate('latest');
-    expect(stateUpdate).toHaveProperty('block_hash');
-    expect(stateUpdate).toHaveProperty('new_root');
-    expect(stateUpdate).toHaveProperty('old_root');
-    expect(stateUpdate).toHaveProperty('state_diff');
+    expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
   });
 
   xtest('getProtocolVersion - pathfinder not implement', async () => {
@@ -130,8 +129,7 @@ describeIfRpc('RPCProvider', () => {
       const contractClass = await rpcProvider.getClass(
         '0x058d97f7d76e78f44905cc30cb65b91ea49a4b908a76703c54197bca90f81773'
       );
-      expect(contractClass).toHaveProperty('program');
-      expect(contractClass).toHaveProperty('entry_points_by_type');
+      expect(contractClass).toMatchSchemaRef('ContractClass');
     });
   });
 });

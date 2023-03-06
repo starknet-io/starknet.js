@@ -15,6 +15,7 @@ import {
   getTestAccount,
   getTestProvider,
 } from './fixtures';
+import { initializeMatcher } from './schema';
 
 describe('contract module', () => {
   let erc20Address: string;
@@ -23,6 +24,7 @@ describe('contract module', () => {
   const account = getTestAccount(provider);
   const constructorCalldata = [encodeShortString('Token'), encodeShortString('ERC20'), wallet];
   const classHash = '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a';
+  initializeMatcher(expect);
 
   describe('class Contract {}', () => {
     describe('Basic Interaction', () => {
@@ -572,18 +574,12 @@ describe('Complex interaction', () => {
 
     test('estimate fee', async () => {
       const gas = await erc20Echo20Contract.estimateFee.iecho(CallData.compile(request));
-      expect(gas.gas_consumed).toBeDefined();
-      expect(gas.gas_price).toBeDefined();
-      expect(gas.overall_fee).toBeDefined();
-      expect(gas.suggestedMaxFee).toBeDefined();
+      expect(gas).toMatchSchemaRef('EstimateFee');
     });
 
     test('estimate fee transfer', async () => {
       const gas = await erc20Echo20Contract.estimateFee.transfer(stark.randomAddress(), uint256(1));
-      expect(gas.gas_consumed).toBeDefined();
-      expect(gas.gas_price).toBeDefined();
-      expect(gas.overall_fee).toBeDefined();
-      expect(gas.suggestedMaxFee).toBeDefined();
+      expect(gas).toMatchSchemaRef('EstimateFee');
     });
   });
 });
