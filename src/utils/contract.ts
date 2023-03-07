@@ -1,8 +1,7 @@
-import { parse } from 'json-bigint';
-
 import { CairoContract } from '../types/lib/contract/index';
 import { CompleteDeclareContractPayload, DeclareContractPayload } from '../types/lib/index';
 import { computeCompiledClassHash, computeContractClassHash } from './hash';
+import { parse } from './json';
 
 export function isSierra(contract: CairoContract | string) {
   const compiledContract = typeof contract === 'string' ? parse(contract) : contract;

@@ -61,7 +61,6 @@
     "@types/isomorphic-fetch": "^0.0.36",
     "@types/jest": "^28.1.1",
     "@types/jest-json-schema": "^6.1.1",
-    "@types/json-bigint": "^1.0.1",
     "@types/pako": "^2.0.0",
     "@types/url-join": "^4.0.1",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
@@ -90,7 +89,7 @@
   "dependencies": {
     "@noble/curves": "^0.8.2",
     "isomorphic-fetch": "^3.0.0",
-    "json-bigint": "^1.0.0",
+    "lossless-json": "^2.0.8",
     "micro-starknet": "^0.2.1",
     "pako": "^2.0.4",
     "ts-custom-error": "^3.3.1",

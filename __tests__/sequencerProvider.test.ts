@@ -48,7 +48,7 @@ describeIfSequencer('SequencerProvider', () => {
     });
 
     test('fetch unexpected error', async () => {
-      fetchSpy.mockResolvedValueOnce(generateMockResponse(false, null));
+      fetchSpy.mockResolvedValueOnce(generateMockResponse(false, 'null'));
       expect(sequencerProvider.fetch('')).rejects.toThrow(/^Could not GET from endpoint/);
     });
 
