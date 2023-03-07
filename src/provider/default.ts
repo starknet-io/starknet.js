@@ -187,7 +187,7 @@ export class Provider implements ProviderInterface {
 
   public async waitForTransaction(
     txHash: BigNumberish,
-    options: waitForTransactionOptions
+    options?: waitForTransactionOptions
   ): Promise<GetTransactionReceiptResponse> {
     return this.provider.waitForTransaction(txHash, options);
   }
