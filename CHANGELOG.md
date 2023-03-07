@@ -1,3 +1,9 @@
+## [5.1.1](https://github.com/0xs34n/starknet.js/compare/v5.1.0...v5.1.1) (2023-03-07)
+
+### Bug Fixes
+
+- rectify default provider wait parameter typing ([fc9fd66](https://github.com/0xs34n/starknet.js/commit/fc9fd6661b13317d203a61407817e6ecf3897ba8))
+
 # [5.1.0](https://github.com/0xs34n/starknet.js/compare/v5.0.2...v5.1.0) (2023-03-03)
 
 ### Features
