@@ -2,7 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { Account, ProviderInterface, RpcProvider, SequencerProvider, json } from '../src';
-import { CompiledContract, waitForTransactionOptions } from '../src/types';
+import { CompiledContract, CompiledSieraCasm, waitForTransactionOptions } from '../src/types';
 import { toHex } from '../src/utils/num';
 
 const readContract = (name: string): CompiledContract =>
@@ -10,7 +10,7 @@ const readContract = (name: string): CompiledContract =>
     fs.readFileSync(path.resolve(__dirname, `../__mocks__/${name}.json`)).toString('ascii')
   );
 
-const readContractCasm = (name: string): CompiledContract =>
+const readContractSieraCasm = (name: string): CompiledSieraCasm =>
   json.parse(
     fs.readFileSync(path.resolve(__dirname, `../__mocks__/${name}.casm`)).toString('ascii')
   );
@@ -24,7 +24,7 @@ export const compiledMulticall = readContract('multicall');
 export const compiledTestDapp = readContract('TestDapp');
 export const compiledStarknetId = readContract('starknetId_compiled');
 export const compiledNamingContract = readContract('naming_compiled');
-export const compiledHello = readContractCasm('cairo/helloSiera/hello');
+export const compiledHelloSiera = readContractSieraCasm('cairo/helloSiera/hello');
 
 /* Default test config based on run `starknet-devnet --seed 0` */
 const DEFAULT_TEST_PROVIDER_SEQUENCER_URL = 'http://127.0.0.1:5050/';

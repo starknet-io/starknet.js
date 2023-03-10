@@ -5,7 +5,7 @@ import {
 } from '../../src/utils/hash';
 import {
   compiledErc20,
-  compiledHello,
+  compiledHelloSiera,
   compiledOpenZeppelinAccount,
   compiledTestDapp,
   erc20ClassHash,
@@ -46,7 +46,7 @@ describe('Hash Tester', () => {
 
   describe('Compute Compiled Class Hash', () => {
     test('Hello Contract ClassHash', () => {
-      const classHash = computeCompiledClassHash(compiledHello);
+      const classHash = computeCompiledClassHash(compiledHelloSiera);
       expect(classHash).toEqual(
         '0x5308ae7d698bdb9cb9ee6e9c7dab4d3082a3db40933634645f179d9cad06446'
       );

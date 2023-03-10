@@ -6,7 +6,14 @@ import { hexToBytes } from 'ethereum-cryptography/utils.js';
 import { sort } from 'json-keys-sort';
 
 import { API_VERSION, MASK_250, StarknetChainId, TransactionHashPrefix } from '../constants';
-import { CompiledContract, RawCalldata } from '../types/lib';
+import {
+  Builtins,
+  CompiledContract,
+  CompiledSieraCasm,
+  ContractEntryPointFields,
+  Hints,
+  RawCalldata,
+} from '../types/lib';
 import { felt } from './calldata/cairo';
 import { starkCurve } from './ec';
 import { addHexPrefix, buf2hex, removeHexPrefix, utf8ToArray } from './encode';
@@ -214,36 +221,36 @@ function nullSkipReplacer(key: string, value: any) {
   return value === null ? undefined : value;
 }
 
+function formatSpaces(json: string) {
+  return json.split('').reduce<[boolean, string]>(
+    ([insideQuotes, newString], char) => {
+      if (char === '"' && newString[newString.length - 1] !== '\\') {
+        // ignore escaped quotes
+        insideQuotes = !insideQuotes;
+      }
+      if (insideQuotes) {
+        newString += char;
+        return [insideQuotes, newString];
+      }
+      if (char === ':' && !insideQuotes) {
+        newString += ': ';
+      } else if (char === ',' && !insideQuotes) {
+        newString += ', ';
+      } else {
+        newString += char;
+      }
+      return [insideQuotes, newString];
+    },
+    [false, '']
+  )[1];
+}
+
 export default function computeHintedClassHash(compiledContract: CompiledContract) {
   const { abi, program } = compiledContract;
-
   const contractClass = { abi, program };
+  const serializedJson = formatSpaces(stringify(contractClass, nullSkipReplacer));
 
-  const serialisedJson = stringify(contractClass, nullSkipReplacer)
-    .split('')
-    .reduce<[boolean, string]>(
-      ([insideQuotes, newString], char) => {
-        if (char === '"' && newString[newString.length - 1] !== '\\') {
-          // ignore escaped quotes
-          insideQuotes = !insideQuotes;
-        }
-        if (insideQuotes) {
-          newString += char;
-          return [insideQuotes, newString];
-        }
-        if (char === ':' && !insideQuotes) {
-          newString += ': ';
-        } else if (char === ',' && !insideQuotes) {
-          newString += ', ';
-        } else {
-          newString += char;
-        }
-        return [insideQuotes, newString];
-      },
-      [false, '']
-    )[1];
-
-  return addHexPrefix(starkCurve.keccak(utf8ToArray(serialisedJson)).toString(16));
+  return addHexPrefix(starkCurve.keccak(utf8ToArray(serializedJson)).toString(16));
 }
 
 // Computes the class hash of a given contract class
@@ -285,94 +292,62 @@ export function computeContractClassHash(contract: CompiledContract | string) {
 }
 
 // Cairo1 bellow
-
-function getBuiltins(data: any) {
+function hashBuiltins(builtins: Builtins) {
   return poseidonHashMany(
-    data.builtins.flatMap((it: any) => {
+    builtins.flatMap((it: any) => {
       return BigInt(encodeShortString(it));
     })
   );
 }
 
-function computePoseidonHashOnElements(data: any) {
+function hashEntryPoint(data: ContractEntryPointFields[]) {
   const base = data.flatMap((it: any) => {
-    return [BigInt(it.selector), BigInt(it.offset), getBuiltins(it)];
+    return [BigInt(it.selector), BigInt(it.offset), hashBuiltins(it.builtins)];
   });
   return poseidonHashMany(base);
 }
 
-function parseHints(casm: any) {
-  return casm.hints.reduce((cum, [hint_id, hint_codes]) => {
-    const sub = hint_codes.map((it) => ({
+function parseHints(hints: Hints) {
+  return hints.reduce((cum, [hint_id, hint_codes]) => {
+    cum[hint_id] = hint_codes.map((it) => ({
       code: it,
       accessible_scopes: [],
       flow_tracking_data: { ap_tracking: { group: 0, offset: 0 }, reference_ids: {} },
     }));
-
-    cum[hint_id] = sub;
     return cum;
-  }, {});
+  }, {} as any);
 }
 
 // Possible StarkWare will change to better hashing without stringify before testnet!
-function hintedProgram(casm: any) {
-  const { prime } = casm;
-  const data = casm.bytecode;
-  const builtins = [];
-  const hints = parseHints(casm);
-  const { compiler_version } = casm;
-
-  const hintedP = {
+function hintedProgram(casm: CompiledSieraCasm) {
+  const sortedHintedProgram = sort({
     program: {
-      prime,
-      data,
-      builtins,
-      hints,
-      compiler_version,
+      prime: casm.prime,
+      data: casm.bytecode,
+      builtins: [],
+      hints: parseHints(casm.hints),
+      compiler_version: casm.compiler_version,
     },
-  };
-  const sorted = sort(hintedP);
+  });
 
-  const serialized = stringify(sorted)
-    .split('')
-    .reduce<[boolean, string]>(
-      ([insideQuotes, newString], char) => {
-        if (char === '"' && newString[newString.length - 1] !== '\\') {
-          // ignore escaped quotes
-          insideQuotes = !insideQuotes;
-        }
-        if (insideQuotes) {
-          newString += char;
-          return [insideQuotes, newString];
-        }
-        if (char === ':' && !insideQuotes) {
-          newString += ': ';
-        } else if (char === ',' && !insideQuotes) {
-          newString += ', ';
-        } else {
-          newString += char;
-        }
-        return [insideQuotes, newString];
-      },
-      [false, '']
-    )[1];
+  const serialized = formatSpaces(stringify(sortedHintedProgram));
   return BigInt(addHexPrefix(starkCurve.keccak(utf8ToArray(serialized)).toString(16)));
 }
 
-export function computeCompiledClassHash(casm: any) {
+export function computeCompiledClassHash(casm: CompiledSieraCasm) {
   const COMPILED_CLASS_VERSION = 'COMPILED_CLASS_V1';
 
   // Hash compiled class version
   const compiledClassVersion = BigInt(encodeShortString(COMPILED_CLASS_VERSION));
 
   // Hash external entry points.
-  const externalEntryPointsHash = computePoseidonHashOnElements(casm.entry_points_by_type.EXTERNAL);
+  const externalEntryPointsHash = hashEntryPoint(casm.entry_points_by_type.EXTERNAL);
 
   // Hash L1 handler entry points.
-  const l1Handlers = computePoseidonHashOnElements(casm.entry_points_by_type.L1_HANDLER);
+  const l1Handlers = hashEntryPoint(casm.entry_points_by_type.L1_HANDLER);
 
   // Hash constructor entry points.
-  const constructor = computePoseidonHashOnElements(casm.entry_points_by_type.CONSTRUCTOR);
+  const constructor = hashEntryPoint(casm.entry_points_by_type.CONSTRUCTOR);
 
   // Hash hintedCompiledClassHash. ( starknet_keccak of the contract program, including its hints.)
   const hintedCompiledClassHash = hintedProgram(casm);

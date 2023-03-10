@@ -156,9 +156,12 @@ export type Abi = Array<FunctionAbi | EventAbi | StructAbi>;
 
 type EventAbi = any;
 
+export type Builtins = string[];
+
 export type ContractEntryPointFields = {
   selector: string;
   offset: string;
+  builtins?: Builtins;
 };
 
 export type EntryPointsByType = {
@@ -182,6 +185,16 @@ export type CompiledContract = {
 
 export type CompressedCompiledContract = Omit<CompiledContract, 'program'> & {
   program: CompressedProgram;
+};
+
+export type Hints = [number, string[]][];
+
+export type CompiledSieraCasm = {
+  prime: string;
+  compiler_version: string;
+  bytecode: string[];
+  hints: Hints;
+  entry_points_by_type: EntryPointsByType;
 };
 
 export type Struct = {
