@@ -1,5 +1,5 @@
 import { StarknetChainId } from '../constants';
-import { BigNumberish } from '../utils/number';
+import { BigNumberish } from '../utils/num';
 import { DeployAccountContractPayload, InvocationsDetails } from './lib';
 
 export interface InvocationsSignerDetails extends Required<InvocationsDetails> {

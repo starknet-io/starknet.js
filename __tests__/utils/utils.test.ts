@@ -1,4 +1,4 @@
-import { constants, ec, hash, number, stark } from '../../src';
+import { constants, ec, hash, num, stark } from '../../src';
 import { Block } from '../../src/provider/utils';
 
 const { IS_BROWSER } = constants;
@@ -9,15 +9,15 @@ test('isNode', () => {
 
 describe('hexToDecimalString()', () => {
   test('parse 0xa23', () => {
-    expect(number.hexToDecimalString('0xa23')).toBe('2595');
+    expect(num.hexToDecimalString('0xa23')).toBe('2595');
   });
 });
 
 describe('cleanHex()', () => {
   test('parse 0xa23', () => {
-    expect(number.cleanHex('0x023Ab')).toBe('0x23ab');
-    expect(number.cleanHex('0x000023Ab')).toBe('0x23ab');
-    expect(number.cleanHex('0x23Ab')).toBe('0x23ab');
+    expect(num.cleanHex('0x023Ab')).toBe('0x23ab');
+    expect(num.cleanHex('0x000023Ab')).toBe('0x23ab');
+    expect(num.cleanHex('0x23Ab')).toBe('0x23ab');
   });
 });
 
@@ -57,9 +57,9 @@ describe('computeHashOnElements()', () => {
   });
   test('should return valid hash for valid array', () => {
     const res = hash.computeHashOnElements([
-      number.toBigInt(123782376),
-      number.toBigInt(213984),
-      number.toBigInt(128763521321),
+      num.toBigInt(123782376),
+      num.toBigInt(213984),
+      num.toBigInt(128763521321),
     ]);
     expect(res).toMatchInlineSnapshot(
       `"0x7b422405da6571242dfc245a43de3b0fe695e7021c148b918cd9cdb462cac59"`

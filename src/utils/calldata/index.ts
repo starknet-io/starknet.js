@@ -1,7 +1,6 @@
-import assert from 'minimalistic-assert';
-
 import { Abi, AbiEntry, Args, Calldata, FunctionAbi, abiStructs } from '../../types';
-import { isBigInt } from '../number';
+import assert from '../assert';
+import { isBigInt } from '../num';
 import { isLongText, splitLongString } from '../shortString';
 import { felt, isLen } from './cairo';
 import formatter from './formatter';

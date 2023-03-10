@@ -1,5 +1,5 @@
 import { weierstrass } from '../utils/ec';
-import type { BigNumberish } from '../utils/number';
+import type { BigNumberish } from '../utils/num';
 import { RPC } from './api/rpc';
 
 // Common Signature Type which needs to be imported from weierstrass

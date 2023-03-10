@@ -21,7 +21,7 @@ import {
   TransactionSimulationResponse,
   waitForTransactionOptions,
 } from '../types';
-import { BigNumberish } from '../utils/number';
+import { BigNumberish } from '../utils/num';
 import { ProviderInterface } from './interface';
 import { RpcProvider, RpcProviderOptions } from './rpc';
 import { SequencerProvider, SequencerProviderOptions } from './sequencer';
@@ -187,7 +187,7 @@ export class Provider implements ProviderInterface {
 
   public async waitForTransaction(
     txHash: BigNumberish,
-    options: waitForTransactionOptions
+    options?: waitForTransactionOptions
   ): Promise<GetTransactionReceiptResponse> {
     return this.provider.waitForTransaction(txHash, options);
   }
