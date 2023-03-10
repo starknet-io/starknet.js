@@ -1,6 +1,11 @@
-import { computeContractClassHash, getSelectorFromName } from '../../src/utils/hash';
+import {
+  computeCompiledClassHash,
+  computeContractClassHash,
+  getSelectorFromName,
+} from '../../src/utils/hash';
 import {
   compiledErc20,
+  compiledHello,
   compiledOpenZeppelinAccount,
   compiledTestDapp,
   erc20ClassHash,
@@ -35,6 +40,15 @@ describe('Hash Tester', () => {
 
       expect(classHash).toMatchInlineSnapshot(
         `"0x4367b26fbb92235e8d1137d19c080e6e650a6889ded726d00658411cc1046f5"`
+      );
+    });
+  });
+
+  describe('Compute Compiled Class Hash', () => {
+    test('Hello Contract ClassHash', () => {
+      const classHash = computeCompiledClassHash(compiledHello);
+      expect(classHash).toEqual(
+        '0x5308ae7d698bdb9cb9ee6e9c7dab4d3082a3db40933634645f179d9cad06446'
       );
     });
   });

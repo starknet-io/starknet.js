@@ -10,6 +10,11 @@ const readContract = (name: string): CompiledContract =>
     fs.readFileSync(path.resolve(__dirname, `../__mocks__/${name}.json`)).toString('ascii')
   );
 
+const readContractCasm = (name: string): CompiledContract =>
+  json.parse(
+    fs.readFileSync(path.resolve(__dirname, `../__mocks__/${name}.casm`)).toString('ascii')
+  );
+
 export const compiledOpenZeppelinAccount = readContract('Account');
 export const compiledErc20 = readContract('ERC20');
 export const compiledErc20Echo = readContract('ERC20-echo');
@@ -19,6 +24,7 @@ export const compiledMulticall = readContract('multicall');
 export const compiledTestDapp = readContract('TestDapp');
 export const compiledStarknetId = readContract('starknetId_compiled');
 export const compiledNamingContract = readContract('naming_compiled');
+export const compiledHello = readContractCasm('cairo/helloSiera/hello');
 
 /* Default test config based on run `starknet-devnet --seed 0` */
 const DEFAULT_TEST_PROVIDER_SEQUENCER_URL = 'http://127.0.0.1:5050/';
