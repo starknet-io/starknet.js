@@ -1,0 +1,20 @@
+{
+  "$id": "libSchemas",
+  "definitions": {
+    "ContractClass": {
+      "type": "object",
+      "properties": {
+        "program": {
+          "type": "string"
+        },
+        "entry_points_by_type": {
+          "type": "object"
+        },
+        "abi": {
+          "type": "array"
+        }
+      },
+      "required": ["program", "entry_points_by_type"]
+    }
+  }
+}

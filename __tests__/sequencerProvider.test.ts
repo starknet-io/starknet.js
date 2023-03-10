@@ -20,6 +20,7 @@ import {
   getTestAccount,
   getTestProvider,
 } from './fixtures';
+import { initializeMatcher } from './schema';
 
 describeIfSequencer('SequencerProvider', () => {
   const sequencerProvider = getTestProvider() as SequencerProvider;
@@ -27,6 +28,7 @@ describeIfSequencer('SequencerProvider', () => {
   let exampleBlock: GetBlockResponse;
   let exampleBlockNumber: BlockNumber;
   let exampleBlockHash: string;
+  initializeMatcher(expect);
 
   beforeAll(async () => {
     exampleBlock = await sequencerProvider.getBlock('latest');
@@ -94,7 +96,7 @@ describeIfSequencer('SequencerProvider', () => {
     test('transaction trace', async () => {
       const transactionTrace = await sequencerProvider.getTransactionTrace(exampleTransactionHash);
       // TODO test optional properties
-      expect(transactionTrace).toHaveProperty('signature');
+      expect(transactionTrace).toMatchSchemaRef('TransactionTraceResponse');
     });
 
     test('getCode() -> { bytecode }', async () => {
@@ -174,22 +176,12 @@ describeIfSequencer('SequencerProvider', () => {
   describe('getBlockTraces', () => {
     test(`getBlockTraces(blockHash=${exampleBlockHash}, blockNumber=undefined)`, async () => {
       const blockTraces = await sequencerProvider.getBlockTraces(exampleBlockHash);
-      expect(blockTraces).toHaveProperty('traces');
-      expect(blockTraces.traces[0]).toHaveProperty('validate_invocation');
-      expect(blockTraces.traces[0]).toHaveProperty('function_invocation');
-      expect(blockTraces.traces[0]).toHaveProperty('fee_transfer_invocation');
-      expect(blockTraces.traces[0]).toHaveProperty('signature');
-      expect(blockTraces.traces[0]).toHaveProperty('transaction_hash');
+      expect(blockTraces).toMatchSchemaRef('BlockTransactionTracesResponse');
     });
 
     test(`getBlockTraces(blockHash=undefined, blockNumber=${exampleBlockNumber})`, async () => {
       const blockTraces = await sequencerProvider.getBlockTraces(exampleBlockNumber);
-      expect(blockTraces).toHaveProperty('traces');
-      expect(blockTraces.traces[0]).toHaveProperty('validate_invocation');
-      expect(blockTraces.traces[0]).toHaveProperty('function_invocation');
-      expect(blockTraces.traces[0]).toHaveProperty('fee_transfer_invocation');
-      expect(blockTraces.traces[0]).toHaveProperty('signature');
-      expect(blockTraces.traces[0]).toHaveProperty('transaction_hash');
+      expect(blockTraces).toMatchSchemaRef('BlockTransactionTracesResponse');
     });
   });
 });
