@@ -388,14 +388,27 @@ export class SequencerProvider implements ProviderInterface {
     { senderAddress, contractDefinition, signature }: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce
   ): Promise<DeclareContractResponse> {
+    if ('program' in contractDefinition) {
+      return this.fetchEndpoint('add_transaction', undefined, {
+        type: TransactionType.DECLARE,
+        contract_class: contractDefinition,
+        nonce: toHex(details.nonce),
+        signature: signatureToDecimalArray(signature),
+        sender_address: senderAddress,
+        max_fee: toHex(details.maxFee || 0),
+        version: '0x1',
+      }).then(this.responseParser.parseDeclareContractResponse);
+    }
+    // Cairo 1
     return this.fetchEndpoint('add_transaction', undefined, {
       type: TransactionType.DECLARE,
+      sender_address: senderAddress,
+      compiled_class_hash: details.compiledClassHash,
       contract_class: contractDefinition,
       nonce: toHex(details.nonce),
       signature: signatureToDecimalArray(signature),
-      sender_address: senderAddress,
       max_fee: toHex(details.maxFee || 0),
-      version: toHex(details.version || 1),
+      version: '0x2',
     }).then(this.responseParser.parseDeclareContractResponse);
   }
 

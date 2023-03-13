@@ -98,7 +98,10 @@ export type InvocationsDetails = {
   version?: BigNumberish;
 };
 
-export type InvocationsDetailsWithNonce = InvocationsDetails & { nonce: BigNumberish };
+export type InvocationsDetailsWithNonce = InvocationsDetails & {
+  nonce: BigNumberish;
+  compiledClassHash?: string;
+};
 
 export enum TransactionStatus {
   NOT_RECEIVED = 'NOT_RECEIVED',

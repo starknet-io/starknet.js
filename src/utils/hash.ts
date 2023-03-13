@@ -126,7 +126,8 @@ export function calculateDeclareTransactionHash(
   version: BigNumberish,
   maxFee: BigNumberish,
   chainId: StarknetChainId,
-  nonce: BigNumberish
+  nonce: BigNumberish,
+  compiledClassHash?: string
 ): string {
   return calculateTransactionHashCommon(
     TransactionHashPrefix.DECLARE,
@@ -136,7 +137,7 @@ export function calculateDeclareTransactionHash(
     [classHash],
     maxFee,
     chainId,
-    [nonce]
+    [nonce, ...(compiledClassHash ? [compiledClassHash] : [])]
   );
 }
 

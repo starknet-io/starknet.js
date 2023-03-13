@@ -86,6 +86,7 @@ export namespace Sequencer {
     nonce: BigNumberish;
     max_fee?: BigNumberish;
     version?: BigNumberish;
+    compiled_class_hash?: string; // v2 declare
   };
 
   export type DeployTransaction = {

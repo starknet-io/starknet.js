@@ -302,7 +302,7 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async declare(
-    { contract, classHash: providedClassHash }: DeclareContractPayload,
+    { contract, classHash: providedClassHash }: DeclareContractPayload, // TODO: compiledClassHash i casm
     transactionsDetail: InvocationsDetails = {}
   ): Promise<DeclareContractResponse> {
     const nonce = toBigInt(transactionsDetail.nonce ?? (await this.getNonce()));
