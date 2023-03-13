@@ -24,7 +24,8 @@ export const compiledMulticall = readContract('multicall');
 export const compiledTestDapp = readContract('TestDapp');
 export const compiledStarknetId = readContract('starknetId_compiled');
 export const compiledNamingContract = readContract('naming_compiled');
-export const compiledHelloSiera = readContractSieraCasm('cairo/helloSiera/hello');
+export const compiledHelloSiera = readContract('cairo/helloSiera/hello');
+export const compiledHelloSieraCasm = readContractSieraCasm('cairo/helloSiera/hello');
 
 /* Default test config based on run `starknet-devnet --seed 0` */
 const DEFAULT_TEST_PROVIDER_SEQUENCER_URL = 'http://127.0.0.1:5050/';
