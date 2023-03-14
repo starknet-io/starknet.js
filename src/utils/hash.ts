@@ -287,7 +287,7 @@ export function computeLegacyContractClassHash(contract: CompiledContract | stri
   ]);
 }
 
-// Cairo1 bellow
+// Cairo1 below
 function hashBuiltins(builtins: Builtins) {
   return poseidonHashMany(
     builtins.flatMap((it: any) => {
