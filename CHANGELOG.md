@@ -1,3 +1,11 @@
+# [5.2.0](https://github.com/0xs34n/starknet.js/compare/v5.1.1...v5.2.0) (2023-03-14)
+
+### Features
+
+- compiledClassHash implementation working without cleanup ([485793c](https://github.com/0xs34n/starknet.js/commit/485793ce6fd0763e3da56d0d11a50bffc9bab984))
+- comput chassHash for cairo 1 contract - computeSieraContractClassHash ([e20c1c5](https://github.com/0xs34n/starknet.js/commit/e20c1c5d01ce1d8abe2de527233a8396f7b9316d))
+- unify classHash for siera and legacy ([fac2bfe](https://github.com/0xs34n/starknet.js/commit/fac2bfe92e074207132296a0d3f73dae2ddaf735))
+
 ## [5.1.1](https://github.com/0xs34n/starknet.js/compare/v5.1.0...v5.1.1) (2023-03-07)
 
 ### Bug Fixes
