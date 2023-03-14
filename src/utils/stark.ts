@@ -1,4 +1,4 @@
-import { Signature, getStarkKey, utils } from '@noble/curves/stark';
+import { Signature, getStarkKey, utils } from 'micro-starknet';
 import { gzip } from 'pako';
 
 import {

@@ -1,4 +1,4 @@
-import { getStarkKey, utils } from '@noble/curves/stark';
+import { getStarkKey, utils } from 'micro-starknet';
 
 import { Account, GetBlockResponse, RpcProvider } from '../src';
 import { StarknetChainId } from '../src/constants';
