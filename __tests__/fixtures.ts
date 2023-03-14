@@ -2,7 +2,12 @@ import fs from 'fs';
 import path from 'path';
 
 import { Account, ProviderInterface, RpcProvider, SequencerProvider, json } from '../src';
-import { CompiledContract, CompiledSieraCasm, waitForTransactionOptions } from '../src/types';
+import {
+  CompiledContract,
+  CompiledSiera,
+  CompiledSieraCasm,
+  waitForTransactionOptions,
+} from '../src/types';
 import { toHex } from '../src/utils/num';
 
 const readContract = (name: string): CompiledContract =>
@@ -15,6 +20,11 @@ const readContractSieraCasm = (name: string): CompiledSieraCasm =>
     fs.readFileSync(path.resolve(__dirname, `../__mocks__/${name}.casm`)).toString('ascii')
   );
 
+const readContractSiera = (name: string): CompiledSiera =>
+  json.parse(
+    fs.readFileSync(path.resolve(__dirname, `../__mocks__/${name}.json`)).toString('ascii')
+  );
+
 export const compiledOpenZeppelinAccount = readContract('Account');
 export const compiledErc20 = readContract('ERC20');
 export const compiledErc20Echo = readContract('ERC20-echo');
@@ -24,7 +34,7 @@ export const compiledMulticall = readContract('multicall');
 export const compiledTestDapp = readContract('TestDapp');
 export const compiledStarknetId = readContract('starknetId_compiled');
 export const compiledNamingContract = readContract('naming_compiled');
-export const compiledHelloSiera = readContract('cairo/helloSiera/hello');
+export const compiledHelloSiera = readContractSiera('cairo/helloSiera/hello');
 export const compiledHelloSieraCasm = readContractSieraCasm('cairo/helloSiera/hello');
 
 /* Default test config based on run `starknet-devnet --seed 0` */

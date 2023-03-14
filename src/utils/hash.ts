@@ -256,7 +256,7 @@ export default function computeHintedClassHash(compiledContract: CompiledContrac
 }
 
 // Computes the class hash of a given contract class
-export function computeContractClassHash(contract: CompiledContract | string) {
+export function computeLegacyContractClassHash(contract: CompiledContract | string) {
   const compiledContract =
     typeof contract === 'string' ? (parse(contract) as CompiledContract) : contract;
 
@@ -412,4 +412,19 @@ export function computeSieraContractClassHash(siera: CompiledSiera) {
       sieraProgram,
     ])
   );
+}
+
+/**
+ * Compute ClassHash (siera or legacy) based on provided contract
+ * @param contract CompiledContract | CompiledSiera | string
+ * @returns HexString ClassHash
+ */
+export function computeContractClassHash(contract: CompiledContract | CompiledSiera | string) {
+  const compiledContract = typeof contract === 'string' ? parse(contract) : contract;
+
+  if ('sierra_program' in compiledContract) {
+    return computeSieraContractClassHash(compiledContract as CompiledSiera);
+  }
+
+  return computeLegacyContractClassHash(compiledContract as CompiledContract);
 }
