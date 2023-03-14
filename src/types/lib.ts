@@ -156,15 +156,29 @@ export type Abi = Array<FunctionAbi | EventAbi | StructAbi>;
 
 type EventAbi = any;
 
+export type Builtins = string[];
+
+export type SieraContractEntryPointFields = {
+  selector: string;
+  function_idx: number;
+};
+
 export type ContractEntryPointFields = {
   selector: string;
   offset: string;
+  builtins?: Builtins;
 };
 
 export type EntryPointsByType = {
   CONSTRUCTOR: ContractEntryPointFields[];
   EXTERNAL: ContractEntryPointFields[];
   L1_HANDLER: ContractEntryPointFields[];
+};
+
+export type SieraEntryPointsByType = {
+  CONSTRUCTOR: SieraContractEntryPointFields[];
+  EXTERNAL: SieraContractEntryPointFields[];
+  L1_HANDLER: SieraContractEntryPointFields[];
 };
 
 export interface Program extends Record<string, any> {
@@ -182,6 +196,24 @@ export type CompiledContract = {
 
 export type CompressedCompiledContract = Omit<CompiledContract, 'program'> & {
   program: CompressedProgram;
+};
+
+export type Hints = [number, string[]][];
+
+export type CompiledSieraCasm = {
+  prime: string;
+  compiler_version: string;
+  bytecode: string[];
+  hints: Hints;
+  entry_points_by_type: EntryPointsByType;
+};
+
+export type CompiledSiera = {
+  sierra_program: string[];
+  sierra_program_debug_info: any;
+  contract_class_version: string;
+  entry_points_by_type: SieraEntryPointsByType;
+  abi: Abi;
 };
 
 export type Struct = {
