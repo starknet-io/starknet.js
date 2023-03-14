@@ -224,27 +224,21 @@ function nullSkipReplacer(key: string, value: any) {
 }
 
 function formatSpaces(json: string) {
-  return json.split('').reduce<[boolean, string]>(
-    ([insideQuotes, newString], char) => {
-      if (char === '"' && newString[newString.length - 1] !== '\\') {
-        // ignore escaped quotes
-        insideQuotes = !insideQuotes;
-      }
-      if (insideQuotes) {
-        newString += char;
-        return [insideQuotes, newString];
-      }
-      if (char === ':' && !insideQuotes) {
-        newString += ': ';
-      } else if (char === ',' && !insideQuotes) {
-        newString += ', ';
-      } else {
-        newString += char;
-      }
-      return [insideQuotes, newString];
-    },
-    [false, '']
-  )[1];
+  let insideQuotes = false;
+  let newString = '';
+  // eslint-disable-next-line no-restricted-syntax
+  for (const char of json) {
+    if (char === '"' && newString.endsWith('\\') === false) {
+      insideQuotes = !insideQuotes;
+    }
+    if (insideQuotes) {
+      newString += char;
+    } else {
+      // eslint-disable-next-line no-nested-ternary
+      newString += char === ':' ? ': ' : char === ',' ? ', ' : char;
+    }
+  }
+  return newString;
 }
 
 export default function computeHintedClassHash(compiledContract: CompiledContract) {
