@@ -1,9 +1,9 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable import/extensions */
-import { poseidonHashMany } from '@noble/curves/stark';
 import { keccak256 } from 'ethereum-cryptography/keccak.js';
 import { hexToBytes } from 'ethereum-cryptography/utils.js';
 import { sort } from 'json-keys-sort';
+import { poseidonHashMany } from 'micro-starknet';
 
 import { API_VERSION, MASK_250, StarknetChainId, TransactionHashPrefix } from '../constants';
 import {
