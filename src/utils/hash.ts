@@ -1,9 +1,7 @@
+import { sort } from 'json-keys-sort';
 /* eslint-disable no-param-reassign */
 /* eslint-disable import/extensions */
-import { keccak256 } from 'ethereum-cryptography/keccak.js';
-import { hexToBytes } from 'ethereum-cryptography/utils.js';
-import { sort } from 'json-keys-sort';
-import { poseidonHashMany } from 'micro-starknet';
+import { keccak, poseidonHashMany } from 'micro-starknet';
 
 import { API_VERSION, MASK_250, StarknetChainId, TransactionHashPrefix } from '../constants';
 import {
@@ -18,9 +16,17 @@ import {
 } from '../types/lib';
 import { felt } from './calldata/cairo';
 import { starkCurve } from './ec';
-import { addHexPrefix, buf2hex, removeHexPrefix, utf8ToArray } from './encode';
+import { addHexPrefix, removeHexPrefix, utf8ToArray } from './encode';
 import { parse, stringify } from './json';
-import { BigNumberish, isHex, isStringWholeNumber, toBigInt, toHex, toHexString } from './num';
+import {
+  BigNumberish,
+  hexToBytes,
+  isHex,
+  isStringWholeNumber,
+  toBigInt,
+  toHex,
+  toHexString,
+} from './num';
 import { encodeShortString } from './shortString';
 
 export * as poseidon from '@noble/curves/abstract/poseidon';
@@ -31,11 +37,11 @@ export const feeTransactionVersion = 2n ** 128n + transactionVersion;
 export function keccakBn(value: BigNumberish): string {
   const hexWithoutPrefix = removeHexPrefix(toHex(BigInt(value)));
   const evenHex = hexWithoutPrefix.length % 2 === 0 ? hexWithoutPrefix : `0${hexWithoutPrefix}`;
-  return addHexPrefix(buf2hex(keccak256(hexToBytes(evenHex))));
+  return addHexPrefix(keccak(hexToBytes(addHexPrefix(evenHex))).toString(16));
 }
 
 function keccakHex(value: string): string {
-  return addHexPrefix(buf2hex(keccak256(utf8ToArray(value))));
+  return addHexPrefix(keccak(utf8ToArray(value)).toString(16));
 }
 
 /**
