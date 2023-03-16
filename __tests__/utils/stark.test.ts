@@ -1,7 +1,7 @@
 import fs from 'fs';
 
 import { RawArgs, json, stark } from '../../src';
-import { toBigInt, toHex } from '../../src/utils/number';
+import { toBigInt, toHex } from '../../src/utils/num';
 
 const compiledAccount = json.parse(fs.readFileSync('./__mocks__/Account.json').toString('ascii'));
 

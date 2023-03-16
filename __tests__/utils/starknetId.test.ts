@@ -41,7 +41,7 @@ describe('Should tets StarknetId utils', () => {
 
   test('Should test getStarknetIdContract', () => {
     expect(getStarknetIdContract(StarknetChainId.SN_GOERLI)).toBe(
-      '0x05cf267a0af6101667013fc6bd3f6c11116a14cda9b8c4b1198520d59f900b17'
+      '0x3bab268e932d2cecd1946f100ae67ce3dff9fd234119ea2f6da57d16d29fce'
     );
 
     expect(() => {

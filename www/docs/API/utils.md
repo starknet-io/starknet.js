@@ -104,7 +104,7 @@ Returns a BigInt.
 
 ---
 
-## **number**
+## **num**
 
 Various number formatting functions.
 

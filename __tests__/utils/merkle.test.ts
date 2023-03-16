@@ -1,4 +1,4 @@
-import { pedersen } from '@noble/curves/stark';
+import { pedersen } from 'micro-starknet';
 
 import { MerkleTree, proofMerklePath } from '../../src/utils/merkle';
 

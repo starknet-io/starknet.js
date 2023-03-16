@@ -1,3 +1,37 @@
+# [5.2.0](https://github.com/0xs34n/starknet.js/compare/v5.1.1...v5.2.0) (2023-03-14)
+
+### Features
+
+- compiledClassHash implementation working without cleanup ([485793c](https://github.com/0xs34n/starknet.js/commit/485793ce6fd0763e3da56d0d11a50bffc9bab984))
+- comput chassHash for cairo 1 contract - computeSieraContractClassHash ([e20c1c5](https://github.com/0xs34n/starknet.js/commit/e20c1c5d01ce1d8abe2de527233a8396f7b9316d))
+- unify classHash for siera and legacy ([fac2bfe](https://github.com/0xs34n/starknet.js/commit/fac2bfe92e074207132296a0d3f73dae2ddaf735))
+
+## [5.1.1](https://github.com/0xs34n/starknet.js/compare/v5.1.0...v5.1.1) (2023-03-07)
+
+### Bug Fixes
+
+- rectify default provider wait parameter typing ([fc9fd66](https://github.com/0xs34n/starknet.js/commit/fc9fd6661b13317d203a61407817e6ecf3897ba8))
+
+# [5.1.0](https://github.com/0xs34n/starknet.js/compare/v5.0.2...v5.1.0) (2023-03-03)
+
+### Features
+
+- expose base poseidon methods ([8459947](https://github.com/0xs34n/starknet.js/commit/84599474862416955da32d0e99957b8a112b4edd))
+- rename number utility namespace to num ([032aadc](https://github.com/0xs34n/starknet.js/commit/032aadcf1401f3a0ef40eac947c23b8acfd1a0f7))
+
+## [5.0.2](https://github.com/0xs34n/starknet.js/compare/v5.0.1...v5.0.2) (2023-03-02)
+
+### Bug Fixes
+
+- add max_fee to simulate_transaction ([95ae885](https://github.com/0xs34n/starknet.js/commit/95ae8857eb05daaeb75b4b853a0ee9377d9ac7df))
+
+## [5.0.1](https://github.com/0xs34n/starknet.js/compare/v5.0.0...v5.0.1) (2023-03-02)
+
+### Bug Fixes
+
+- add new starknet id contracts (testnet) ([343cf78](https://github.com/0xs34n/starknet.js/commit/343cf78a678b088ab4915407fe86f28fa91db6ea))
+- devnet tests ([8a5866e](https://github.com/0xs34n/starknet.js/commit/8a5866ee24b1a88ae3914fd7700d8a6e785979f1))
+
 # [5.0.0](https://github.com/0xs34n/starknet.js/compare/v4.22.0...v5.0.0) (2023-02-22)
 
 ### Bug Fixes

@@ -1,6 +1,6 @@
 /* eslint-disable no-bitwise */
 import { addHexPrefix } from './encode';
-import { BigNumberish, toBigInt } from './number';
+import { BigNumberish, toBigInt } from './num';
 
 // Represents an integer in the range [0, 2^256).
 export interface Uint256 {

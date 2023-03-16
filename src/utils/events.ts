@@ -1,6 +1,6 @@
 import { UDC } from '../constants';
 import { InvokeTransactionReceiptResponse } from '../types/provider';
-import { cleanHex } from './number';
+import { cleanHex } from './num';
 
 /**
  * Parse Transaction Receipt Event from UDC invoke transaction and

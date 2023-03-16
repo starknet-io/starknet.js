@@ -1,6 +1,6 @@
 import { CompiledContract, ContractClass, RawCalldata } from '../types';
 import { parse } from './json';
-import { isHex, toHex } from './number';
+import { isHex, toHex } from './num';
 import { compressProgram } from './stark';
 
 export function wait(delay: number) {

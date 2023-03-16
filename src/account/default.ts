@@ -39,7 +39,7 @@ import {
   feeTransactionVersion,
   transactionVersion,
 } from '../utils/hash';
-import { BigNumberish, toBigInt, toCairoBool, toHex } from '../utils/number';
+import { BigNumberish, toBigInt, toCairoBool, toHex } from '../utils/num';
 import { parseContract } from '../utils/provider';
 import { compileCalldata, estimatedFeeToMaxFee, randomAddress } from '../utils/stark';
 import { fromCallsToExecuteCalldata } from '../utils/transaction';

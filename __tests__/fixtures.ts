@@ -2,10 +2,25 @@ import fs from 'fs';
 import path from 'path';
 
 import { Account, ProviderInterface, RpcProvider, SequencerProvider, json } from '../src';
-import { LegacyCompiledContract, waitForTransactionOptions } from '../src/types';
-import { toHex } from '../src/utils/number';
+import {
+  CompiledSiera,
+  CompiledSieraCasm,
+  LegacyCompiledContract,
+  waitForTransactionOptions,
+} from '../src/types';
+import { toHex } from '../src/utils/num';
 
 const readContract = (name: string): LegacyCompiledContract =>
+  json.parse(
+    fs.readFileSync(path.resolve(__dirname, `../__mocks__/${name}.json`)).toString('ascii')
+  );
+
+const readContractSieraCasm = (name: string): CompiledSieraCasm =>
+  json.parse(
+    fs.readFileSync(path.resolve(__dirname, `../__mocks__/${name}.casm`)).toString('ascii')
+  );
+
+const readContractSiera = (name: string): CompiledSiera =>
   json.parse(
     fs.readFileSync(path.resolve(__dirname, `../__mocks__/${name}.json`)).toString('ascii')
   );
@@ -19,6 +34,8 @@ export const compiledMulticall = readContract('multicall');
 export const compiledTestDapp = readContract('TestDapp');
 export const compiledStarknetId = readContract('starknetId_compiled');
 export const compiledNamingContract = readContract('naming_compiled');
+export const compiledHelloSiera = readContractSiera('cairo/helloSiera/hello');
+export const compiledHelloSieraCasm = readContractSieraCasm('cairo/helloSiera/hello');
 
 /* Default test config based on run `starknet-devnet --seed 0` */
 const DEFAULT_TEST_PROVIDER_SEQUENCER_URL = 'http://127.0.0.1:5050/';

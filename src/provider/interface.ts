@@ -25,7 +25,7 @@ import type {
   TransactionSimulationResponse,
   waitForTransactionOptions,
 } from '../types';
-import type { BigNumberish } from '../utils/number';
+import type { BigNumberish } from '../utils/num';
 import { BlockIdentifier } from './utils';
 
 export abstract class ProviderInterface {

@@ -1,11 +1,10 @@
+import { AbiEntry, FunctionAbi, abiStructs } from '../../types';
 /**
  * Validate cairo contract method arguments
  * Flow: Determine type from abi and than validate against parameter
  */
-import assert from 'minimalistic-assert';
-
-import { AbiEntry, FunctionAbi, abiStructs } from '../../types';
-import { BigNumberish } from '../number';
+import assert from '../assert';
+import { BigNumberish } from '../num';
 import { isLongText } from '../shortString';
 import { isLen, isTypeArray, isTypeFelt, isTypeStruct, isTypeTuple } from './cairo';
 
