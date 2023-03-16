@@ -364,7 +364,7 @@ export class SequencerProvider implements ProviderInterface {
       signature: signatureToDecimalArray(functionInvocation.signature),
       nonce: toHex(details.nonce),
       max_fee: toHex(details.maxFee || 0),
-      version: toHex(details.version || 1),
+      version: '0x1',
     }).then(this.responseParser.parseInvokeFunctionResponse);
   }
 

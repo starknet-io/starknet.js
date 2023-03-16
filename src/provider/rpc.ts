@@ -332,7 +332,7 @@ export class RpcProvider implements ProviderInterface {
             abi: contractDefinition.abi, // rpc 2.0
           },
           type: RPC.TransactionType.DECLARE,
-          version: toHex(details.version || 0),
+          version: '0x1',
           max_fee: toHex(details.maxFee || 0),
           signature: signatureToHexArray(signature),
           sender_address: senderAddress,
@@ -372,7 +372,7 @@ export class RpcProvider implements ProviderInterface {
         calldata: parseCalldata(functionInvocation.calldata),
         type: RPC.TransactionType.INVOKE,
         max_fee: toHex(details.maxFee || 0),
-        version: toHex(details.version || 1),
+        version: '0x1',
         signature: signatureToHexArray(functionInvocation.signature),
         nonce: toHex(details.nonce),
       },
