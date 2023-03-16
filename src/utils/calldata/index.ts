@@ -1,4 +1,4 @@
-import { Abi, AbiEntry, Args, Calldata, FunctionAbi, abiStructs } from '../../types';
+import { Abi, AbiEntry, AbiStructs, Args, Calldata, FunctionAbi } from '../../types';
 import assert from '../assert';
 import { isBigInt } from '../num';
 import { isLongText, splitLongString } from '../shortString';
@@ -13,7 +13,7 @@ import validateFields from './validate';
 export class CallData {
   abi: Abi;
 
-  protected readonly structs: abiStructs;
+  protected readonly structs: AbiStructs;
 
   constructor(abi: Abi) {
     this.abi = abi;

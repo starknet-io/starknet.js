@@ -35,7 +35,7 @@ export type FunctionInvocation = {
   call_type?: string;
   class_hash?: string;
   selector?: string;
-  entry_point_type?: EntryPointType;
+  entry_point_type?: EntryPointType.EXTERNAL; // TODO: check this
   result: Array<any>;
   execution_resources: ExecutionResources;
   internal_calls: Array<FunctionInvocation>;
@@ -112,7 +112,7 @@ export namespace Sequencer {
     type: 'INVOKE_FUNCTION';
     sender_address: string;
     signature?: string[];
-    entry_point_type?: EntryPointType;
+    entry_point_type?: EntryPointType.EXTERNAL; // TODO: check this
     calldata?: RawCalldata;
     nonce: BigNumberish;
     max_fee?: BigNumberish;

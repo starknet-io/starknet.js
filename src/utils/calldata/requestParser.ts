@@ -1,4 +1,4 @@
-import { AbiEntry, ParsedStruct, Tupled, abiStructs } from '../../types';
+import { AbiEntry, AbiStructs, ParsedStruct, Tupled } from '../../types';
 import { BigNumberish } from '../num';
 import { isText, splitLongString } from '../shortString';
 import { felt, isTypeArray, isTypeFeltArray, isTypeStruct, isTypeTuple } from './cairo';
@@ -41,7 +41,7 @@ function parseTuple(element: object, typeStr: string): Tupled[] {
 function parseCalldataValue(
   element: ParsedStruct | BigNumberish | BigNumberish[],
   type: string,
-  structs: abiStructs
+  structs: AbiStructs
 ): string | string[] {
   if (element === undefined) {
     throw Error(`Missing parameter for type ${type}`);
@@ -84,7 +84,7 @@ function parseCalldataValue(
 export function parseCalldataField(
   argsIterator: Iterator<any>,
   input: AbiEntry,
-  structs: abiStructs
+  structs: AbiStructs
 ): string | string[] {
   const { name, type } = input;
   let { value } = argsIterator.next();

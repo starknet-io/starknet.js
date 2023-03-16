@@ -1,4 +1,4 @@
-import { abiStructs } from '../../types';
+import { AbiStructs } from '../../types';
 import { BigNumberish, isBigInt, isHex, isStringWholeNumber } from '../num';
 import { encodeShortString, isShortString, isText } from '../shortString';
 import { UINT_128_MAX, Uint256, isUint256 } from '../uint256';
@@ -9,7 +9,7 @@ export const isTypeFeltArray = (type: string) => type === 'felt*';
 export const isTypeArray = (type: string) => /\*/.test(type);
 export const isTypeTuple = (type: string) => /^\(.*\)$/i.test(type);
 export const isTypeNamedTuple = (type: string) => /\(.*\)/i.test(type) && type.includes(':');
-export const isTypeStruct = (type: string, structs: abiStructs) => type in structs;
+export const isTypeStruct = (type: string, structs: AbiStructs) => type in structs;
 
 /**
  * named tuple are described as js object {}
