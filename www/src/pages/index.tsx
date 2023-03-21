@@ -11,7 +11,7 @@ function HomepageHeader() {
   return (
     <header className={clsx('hero hero--primary', styles.heroBanner)}>
       <div className="container">
-        <img src="/img/logo.svg" />
+        <img src="/img/StarkNet-JS_logo.png" />
         <p className="hero__subtitle">{siteConfig.tagline}</p>
         <div className={styles.buttons}>
           <Link
