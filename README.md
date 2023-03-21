@@ -1,10 +1,7 @@
 <!-- logo -->
 <p align="center">
-  <img width='300' src="https://raw.githubusercontent.com/seanjameshan/starknet.js/main/img/logo.svg">
+  <img width='300' src="https://user-images.githubusercontent.com/2848732/226624229-7f1e5f8b-c550-47d4-85b2-5c90aee22417.png">
 </p>
-
-<!-- tag line -->
-<h4 align='center'> JavaScript library for Starknet.</h4>
 
 <!-- primary badges -->
 <p align="center">
@@ -66,7 +63,7 @@ Special thanks to all the [contributors](https://github.com/0xs34n/starknet.js/g
 
 Janek ([@janek26](https://github.com/janek26)) and Dhruv ([@dhruvkelawala](https://github.com/dhruvkelawala)) from [Argent](https://github.com/argentlabs)
 
-Toni ([@tabaktoni](https://github.com/tabaktoni)) and Ivan ([@ivpavici](https://github.com/ivpavici)) from [Shard Labs](https://shardlabs.io/)
+Toni ([@tabaktoni](https://github.com/tabaktoni)) and Ivan ([@ivpavici](https://github.com/ivpavici)) from [SpaceShard](https://www.spaceshard.io/)
 
 and of course the [StarkWare](https://starkware.co/) team for their dedicated support!
 
