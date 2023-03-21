@@ -1,12 +1,23 @@
-# 1. Compile to starknet siera json
+# 1.
 
-`cargo run --bin starknet-compile -- /Users/eedev/Work/ShardLabs/cairo1.0-contract-demo/hello/hello.cairo /Users/eedev/Work/ShardLabs/cairo1.0-contract-demo/hello/hello.json`
+Download cairo repo
+Switch to target tag version alpha6
+`cargo test`
 
-# 2. Compile to casm
+# 1.1. Compile to starknet siera json
 
-`cargo run --bin starknet-compile -- /Users/eedev/Work/ShardLabs/cairo1.0-contract-demo/hello/hello.cairo /Users/eedev/Work/ShardLabs/cairo1.0-contract-demo/hello/hello.json --allowed-libfuncs-list-name experimental_v0.1.0`
+`cargo run --bin starknet-compile -- hello.cairo hello.json --add-pythonic-hints`
 
-# 3. Get Compiled Class Hash
+# 1.2. Compile to casm
 
-`python3 cch.py /Users/eedev/Work/ShardLabs/cairo1.0-contract-demo/hello/hello.casm`
-0x5308ae7d698bdb9cb9ee6e9c7dab4d3082a3db40933634645f179d9cad06446
+`cargo run --bin starknet-sierra-compile -- hello.json hello.casm --add-pythonic-hints`
+
+# 2. Get Compiled Class Hash & Class Hash
+
+pip install cairo-lang==0.11.0a2
+
+`python3 cch.py hello.casm`
+compiled class hash
+0x5c82c98f2ab111bd50293ba64bb18cf49037374783ad2486c712709c4ba0d89
+class hash
+0x345df0a9b35ce05d03772ba7938acad66921c5c39c1a5af74aee72aa25c363e

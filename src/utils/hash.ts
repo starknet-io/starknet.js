@@ -2,7 +2,6 @@
 /* eslint-disable import/extensions */
 import { keccak256 } from 'ethereum-cryptography/keccak.js';
 import { hexToBytes } from 'ethereum-cryptography/utils.js';
-import { sort } from 'json-keys-sort';
 import { poseidonHashMany } from 'micro-starknet';
 
 import { API_VERSION, MASK_250, StarknetChainId, TransactionHashPrefix } from '../constants';
@@ -11,7 +10,6 @@ import {
   CompiledSiera,
   CompiledSieraCasm,
   ContractEntryPointFields,
-  Hints,
   LegacyCompiledContract,
   RawCalldata,
   SieraContractEntryPointFields,
@@ -304,33 +302,6 @@ function hashEntryPoint(data: ContractEntryPointFields[]) {
   return poseidonHashMany(base);
 }
 
-function parseHints(hints: Hints) {
-  return hints.reduce((cum, [hint_id, hint_codes]) => {
-    cum[hint_id] = hint_codes.map((it) => ({
-      code: it,
-      accessible_scopes: [],
-      flow_tracking_data: { ap_tracking: { group: 0, offset: 0 }, reference_ids: {} },
-    }));
-    return cum;
-  }, {} as any);
-}
-
-// Possible StarkWare will change to better hashing without stringify before testnet!
-function hintedProgram(casm: CompiledSieraCasm) {
-  const sortedHintedProgram = sort({
-    program: {
-      prime: casm.prime,
-      data: casm.bytecode,
-      builtins: [],
-      hints: parseHints(casm.hints),
-      compiler_version: casm.compiler_version,
-    },
-  });
-
-  const serialized = formatSpaces(stringify(sortedHintedProgram));
-  return BigInt(addHexPrefix(starkCurve.keccak(utf8ToArray(serialized)).toString(16)));
-}
-
 export function computeCompiledClassHash(casm: CompiledSieraCasm) {
   const COMPILED_CLASS_VERSION = 'COMPILED_CLASS_V1';
 
@@ -346,9 +317,6 @@ export function computeCompiledClassHash(casm: CompiledSieraCasm) {
   // Hash constructor entry points.
   const constructor = hashEntryPoint(casm.entry_points_by_type.CONSTRUCTOR);
 
-  // Hash hintedCompiledClassHash. ( starknet_keccak of the contract program, including its hints.)
-  const hintedCompiledClassHash = hintedProgram(casm);
-
   // Hash bytecode.
   const bytecode = poseidonHashMany(casm.bytecode.map((it: string) => BigInt(it)));
 
@@ -358,7 +326,6 @@ export function computeCompiledClassHash(casm: CompiledSieraCasm) {
       externalEntryPointsHash,
       l1Handlers,
       constructor,
-      hintedCompiledClassHash,
       bytecode,
     ])
   );
@@ -372,7 +339,7 @@ function hashEntryPointSiera(data: SieraContractEntryPointFields[]) {
 }
 
 function hashAbi(siera: CompiledSiera) {
-  const indentString = stringify(siera.abi, null, 2);
+  const indentString = formatSpaces(stringify(siera.abi, null));
   return BigInt(addHexPrefix(starkCurve.keccak(utf8ToArray(indentString)).toString(16)));
 }
 
