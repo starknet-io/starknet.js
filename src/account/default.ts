@@ -16,6 +16,7 @@ import {
   DeployAccountContractTransaction,
   DeployContractResponse,
   DeployContractUDCResponse,
+  Details,
   EstimateFee,
   EstimateFeeAction,
   EstimateFeeDetails,
@@ -31,11 +32,11 @@ import {
   UniversalDeployerContractPayload,
 } from '../types';
 import { EstimateFeeBulk, TransactionSimulation } from '../types/account';
+import { extractContractHashes } from '../utils/contract';
 import { starkCurve } from '../utils/ec';
 import { parseUDCEvent } from '../utils/events';
 import {
   calculateContractAddressFromHash,
-  computeContractClassHash,
   feeTransactionVersion,
   transactionVersion,
 } from '../utils/hash';
@@ -108,20 +109,20 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async estimateDeclareFee(
-    { contract, classHash: providedClassHash }: DeclareContractPayload,
+    { contract, classHash: providedClassHash, casm, compiledClassHash }: DeclareContractPayload,
     { blockIdentifier, nonce: providedNonce }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
     const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
     const version = toBigInt(feeTransactionVersion);
     const chainId = await this.getChainId();
 
-    const payload = await this.buildDeclarePayload(
-      { classHash: providedClassHash, contract },
+    const declareContractTransaction = await this.buildDeclarePayload(
+      { classHash: providedClassHash, contract, casm, compiledClassHash },
       { nonce, chainId, version, walletAddress: this.address, maxFee: ZERO }
     );
 
     const response = await super.getDeclareEstimateFee(
-      { ...payload },
+      declareContractTransaction,
       { version, nonce },
       blockIdentifier
     );
@@ -302,44 +303,31 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async declare(
-    { contract, classHash: providedClassHash }: DeclareContractPayload, // TODO: compiledClassHash i casm
+    payload: DeclareContractPayload,
     transactionsDetail: InvocationsDetails = {}
   ): Promise<DeclareContractResponse> {
-    const nonce = toBigInt(transactionsDetail.nonce ?? (await this.getNonce()));
+    const declareContractPayload = extractContractHashes(payload);
+    const details = {} as Details;
 
-    const classHash = providedClassHash ?? computeContractClassHash(contract);
-
-    if (!classHash) throw new Error('declare classHash is undefined');
-
-    const maxFee =
+    details.nonce = toBigInt(transactionsDetail.nonce ?? (await this.getNonce()));
+    details.maxFee =
       transactionsDetail.maxFee ??
       (await this.getSuggestedMaxFee(
-        { type: TransactionType.DECLARE, payload: { classHash, contract } }, // Provide the classHash to avoid re-computing it
+        {
+          type: TransactionType.DECLARE,
+          payload: declareContractPayload,
+        },
         transactionsDetail
       ));
+    details.version = toBigInt(transactionVersion);
+    details.chainId = await this.getChainId();
 
-    const version = toBigInt(transactionVersion);
-    const chainId = await this.getChainId();
-
-    const signature = await this.signer.signDeclareTransaction({
-      classHash,
-      senderAddress: this.address,
-      chainId,
-      maxFee,
-      version,
-      nonce,
+    const declareContractTransaction = await this.buildDeclarePayload(declareContractPayload, {
+      ...details,
+      walletAddress: this.address,
     });
 
-    const contractDefinition = parseContract(contract);
-
-    return this.declareContract(
-      { contractDefinition, senderAddress: this.address, signature },
-      {
-        nonce,
-        maxFee,
-        version,
-      }
-    );
+    return this.declareContract(declareContractTransaction, details);
   }
 
   public async deploy(
@@ -523,15 +511,18 @@ export class Account extends Provider implements AccountInterface {
     return feeEstimate.suggestedMaxFee.toString();
   }
 
+  /**
+   * @deprecated will be renamed to buildDeclareContractTransaction
+   */
   public async buildDeclarePayload(
-    { classHash: providedClassHash, contract }: DeclareContractPayload,
+    payload: DeclareContractPayload,
     { nonce, chainId, version, walletAddress, maxFee }: InvocationsSignerDetails
   ): Promise<DeclareContractTransaction> {
+    const { classHash, contract, compiledClassHash } = extractContractHashes(payload);
     const contractDefinition = parseContract(contract);
-    const classHash = providedClassHash ?? computeContractClassHash(contract);
-    if (!classHash) throw new Error('buildDeclarePayload classHash is undefined');
     const signature = await this.signer.signDeclareTransaction({
       classHash,
+      compiledClassHash,
       senderAddress: walletAddress,
       chainId,
       maxFee,

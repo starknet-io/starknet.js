@@ -30,6 +30,7 @@ import {
   TransactionType,
   waitForTransactionOptions,
 } from '../types';
+import { isSiera } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
 import { getSelector, getSelectorFromName } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
@@ -388,7 +389,7 @@ export class SequencerProvider implements ProviderInterface {
     { senderAddress, contractDefinition, signature }: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce
   ): Promise<DeclareContractResponse> {
-    if ('program' in contractDefinition) {
+    if (!isSiera(contractDefinition)) {
       return this.fetchEndpoint('add_transaction', undefined, {
         type: TransactionType.DECLARE,
         contract_class: contractDefinition,
@@ -429,7 +430,7 @@ export class SequencerProvider implements ProviderInterface {
   ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint(
       'estimate_fee',
-      { blockIdentifier, skip_validate: skipValidate },
+      { blockIdentifier, skipValidate },
       {
         type: TransactionType.INVOKE,
         sender_address: invocation.contractAddress,
@@ -449,7 +450,7 @@ export class SequencerProvider implements ProviderInterface {
   ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint(
       'estimate_fee',
-      { blockIdentifier, skip_validate: skipValidate },
+      { blockIdentifier, skipValidate },
       {
         type: TransactionType.DECLARE,
         sender_address: senderAddress,
@@ -469,7 +470,7 @@ export class SequencerProvider implements ProviderInterface {
   ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint(
       'estimate_fee',
-      { blockIdentifier, skip_validate: skipValidate },
+      { blockIdentifier, skipValidate },
       {
         type: TransactionType.DEPLOY_ACCOUNT,
         class_hash: toHex(classHash),

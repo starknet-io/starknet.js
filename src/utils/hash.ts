@@ -7,6 +7,7 @@ import { poseidonHashMany } from 'micro-starknet';
 import { API_VERSION, MASK_250, StarknetChainId, TransactionHashPrefix } from '../constants';
 import {
   Builtins,
+  CompiledContract,
   CompiledSiera,
   CompiledSieraCasm,
   ContractEntryPointFields,
@@ -381,9 +382,7 @@ export function computeSieraContractClassHash(siera: CompiledSiera) {
  * @param contract CompiledContract | CompiledSiera | string
  * @returns HexString ClassHash
  */
-export function computeContractClassHash(
-  contract: LegacyCompiledContract | CompiledSiera | string
-) {
+export function computeContractClassHash(contract: CompiledContract | string) {
   const compiledContract = typeof contract === 'string' ? parse(contract) : contract;
 
   if ('sierra_program' in compiledContract) {

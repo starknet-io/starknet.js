@@ -4,6 +4,7 @@ import { CompiledSiera, SieraContractClass } from './siera';
 // Final types
 export type ContractClass = LegacyContractClass | SieraContractClass;
 export type CompiledContract = LegacyCompiledContract | CompiledSiera;
+export type CairoContract = ContractClass | CompiledContract;
 
 // Basic elements
 export enum EntryPointType {

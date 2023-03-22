@@ -391,7 +391,7 @@ export namespace Sequencer {
     estimate_fee: {
       QUERY: {
         blockIdentifier: BlockIdentifier;
-        skip_validate: boolean;
+        skipValidate: boolean;
       };
       REQUEST: EstimateFeeRequest;
       RESPONSE: EstimateFeeResponse;
