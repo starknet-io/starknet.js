@@ -1,4 +1,4 @@
-name: Run Tests
+name: _ Run Tests
 on:
   workflow_call:
     secrets:
