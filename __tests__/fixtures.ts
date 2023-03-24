@@ -103,6 +103,7 @@ export const getTestAccount = (provider: ProviderInterface) => {
 const describeIf = (condition: boolean) => (condition ? describe : describe.skip);
 export const describeIfSequencer = describeIf(IS_SEQUENCER);
 export const describeIfRpc = describeIf(IS_RPC);
+export const describeIfNotRpc = describeIf(!IS_RPC);
 export const describeIfNotDevnet = describeIf(!IS_LOCALHOST_DEVNET);
 export const describeIfDevnet = describeIf(IS_LOCALHOST_DEVNET);
 export const describeIfDevnetRpc = describeIf(IS_DEVNET_RPC);

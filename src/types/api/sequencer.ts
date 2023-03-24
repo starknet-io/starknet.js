@@ -223,13 +223,17 @@ export namespace Sequencer {
   };
 
   export type CallContractTransaction = {
-    sender_address: string;
-    signature?: string[];
     calldata?: RawCalldata;
     max_fee?: BigNumberish;
     version?: BigNumberish;
     entry_point_selector: string;
-  };
+  } & ({
+    sender_address: string;
+    signature: string[];
+  } | {
+    contract_address: string;
+    signature?: never;
+  });
 
   export type CallContractResponse = {
     result: string[];
