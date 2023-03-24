@@ -534,6 +534,7 @@ export class Account extends Provider implements AccountInterface {
       senderAddress: walletAddress,
       signature,
       contractDefinition,
+      compiledClassHash,
     };
   }
 

@@ -223,7 +223,7 @@ function nullSkipReplacer(key: string, value: any) {
   return value === null ? undefined : value;
 }
 
-function formatSpaces(json: string) {
+export function formatSpaces(json: string) {
   let insideQuotes = false;
   let newString = '';
   // eslint-disable-next-line no-restricted-syntax

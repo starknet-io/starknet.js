@@ -8,6 +8,8 @@ import { encodeShortString } from '../src/utils/shortString';
 import { randomAddress } from '../src/utils/stark';
 import {
   compiledErc20,
+  compiledHelloSiera,
+  compiledHelloSieraCasm,
   compiledNamingContract,
   compiledOpenZeppelinAccount,
   compiledStarknetId,
@@ -491,5 +493,19 @@ describe('deploy and test Wallet', () => {
         expect(value).toMatchSchemaRef('EstimateFee');
       });
     });
+  });
+});
+
+describe('Test Cairo 1', () => {
+  const provider = getTestProvider();
+  const account = getTestAccount(provider);
+
+  test('Declare v2 - Hello Cairo 1 contract', async () => {
+    const declareTx = await account.declare({
+      contract: compiledHelloSiera,
+      casm: compiledHelloSieraCasm,
+    });
+    await provider.waitForTransaction(declareTx.transaction_hash);
+    expect(declareTx).toMatchSchemaRef('DeclareContractResponse');
   });
 });

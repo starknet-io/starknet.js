@@ -386,7 +386,7 @@ export class SequencerProvider implements ProviderInterface {
   }
 
   public async declareContract(
-    { senderAddress, contractDefinition, signature }: DeclareContractTransaction,
+    { senderAddress, contractDefinition, signature, compiledClassHash }: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce
   ): Promise<DeclareContractResponse> {
     if (!isSiera(contractDefinition)) {
@@ -404,7 +404,7 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('add_transaction', undefined, {
       type: TransactionType.DECLARE,
       sender_address: senderAddress,
-      compiled_class_hash: details.compiledClassHash,
+      compiled_class_hash: compiledClassHash,
       contract_class: contractDefinition,
       nonce: toHex(details.nonce),
       signature: signatureToDecimalArray(signature),
@@ -443,21 +443,37 @@ export class SequencerProvider implements ProviderInterface {
   }
 
   public async getDeclareEstimateFee(
-    { senderAddress, contractDefinition, signature }: DeclareContractTransaction,
+    { senderAddress, contractDefinition, signature, compiledClassHash }: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
     blockIdentifier: BlockIdentifier = this.blockIdentifier,
     skipValidate: boolean = false
   ): Promise<EstimateFeeResponse> {
+    if (!isSiera(contractDefinition)) {
+      return this.fetchEndpoint(
+        'estimate_fee',
+        { blockIdentifier, skipValidate },
+        {
+          type: TransactionType.DECLARE,
+          sender_address: senderAddress,
+          contract_class: contractDefinition,
+          signature: signatureToDecimalArray(signature),
+          version: '0x1',
+          nonce: toHex(details.nonce),
+        }
+      ).then(this.responseParser.parseFeeEstimateResponse);
+    }
+
     return this.fetchEndpoint(
       'estimate_fee',
       { blockIdentifier, skipValidate },
       {
         type: TransactionType.DECLARE,
         sender_address: senderAddress,
+        compiled_class_hash: compiledClassHash,
         contract_class: contractDefinition,
-        signature: signatureToDecimalArray(signature),
-        version: toHex(details?.version || 1),
         nonce: toHex(details.nonce),
+        signature: signatureToDecimalArray(signature),
+        version: '0x2',
       }
     ).then(this.responseParser.parseFeeEstimateResponse);
   }

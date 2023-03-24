@@ -67,6 +67,7 @@ export type DeclareContractTransaction = {
   contractDefinition: ContractClass;
   senderAddress: string;
   signature?: Signature;
+  compiledClassHash?: string;
 };
 
 export type CallDetails = {
@@ -96,7 +97,6 @@ export type Details = {
 
 export type InvocationsDetailsWithNonce = InvocationsDetails & {
   nonce: BigNumberish;
-  compiledClassHash?: string;
 };
 
 export enum TransactionStatus {
