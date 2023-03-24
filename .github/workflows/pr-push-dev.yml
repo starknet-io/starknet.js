@@ -24,6 +24,7 @@ jobs:
     needs: [skip_check]
     if: needs.skip_check.outputs.should_skip != 'true'
     strategy:
+      fail-fast: false
       matrix:
         name: [sequencer-devnet, rpc-devnet]
         include:

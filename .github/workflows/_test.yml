@@ -19,7 +19,15 @@ jobs:
     # TODO - periodically check if conditional services are supported; https://github.com/actions/runner/issues/822
     services:
       devnet:
-        image: shardlabs/starknet-devnet:0.4.4-seed0
+        # TODO - The image utilized is a temporary workaround to allow for the RPC request validation
+        # deactivation argument to be set since the service configuration lacks a corresponding
+        # functionality; https://github.com/actions/runner/issues/2276.
+        # It was generated from the following Dockerfile:
+        #   FROM shardlabs/starknet-devnet:0.5.0a0-seed0
+        #   CMD ["--disable-rpc-request-validation"]
+        # Switch back to the standard Devnet image once a full release is available.
+        image: penovicp/devnet-test:0.5.0a0
+        # image: shardlabs/starknet-devnet:0.5.0a0-seed0
         ports:
           - 5050:5050
 
