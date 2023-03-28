@@ -1,4 +1,4 @@
-name: Run Release
+name: _ Run Release
 on:
   workflow_call:
     inputs:

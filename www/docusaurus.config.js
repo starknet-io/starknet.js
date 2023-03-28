@@ -57,7 +57,7 @@ const config = {
         title: 'Home',
         logo: {
           alt: 'Starknet.js Logo',
-          src: 'img/logo.svg',
+          src: 'img/StarkNet-JS_navbar.png',
         },
         items: [
           {
@@ -107,7 +107,7 @@ const config = {
             items: [
               {
                 label: 'Twitter',
-                href: 'https://twitter.com/0xs34n',
+                href: 'https://twitter.com/starknetjs',
               },
             ],
           },
