@@ -25,6 +25,7 @@ import { encodeShortString } from './shortString';
 export * as poseidon from '@noble/curves/abstract/poseidon';
 
 export const transactionVersion = 1n;
+export const transactionVersion_2 = 2n;
 export const feeTransactionVersion = 2n ** 128n + transactionVersion;
 
 export function keccakBn(value: BigNumberish): string {

@@ -32,13 +32,14 @@ import {
   UniversalDeployerContractPayload,
 } from '../types';
 import { EstimateFeeBulk, TransactionSimulation } from '../types/account';
-import { extractContractHashes } from '../utils/contract';
+import { extractContractHashes, isSiera } from '../utils/contract';
 import { starkCurve } from '../utils/ec';
 import { parseUDCEvent } from '../utils/events';
 import {
   calculateContractAddressFromHash,
   feeTransactionVersion,
   transactionVersion,
+  transactionVersion_2,
 } from '../utils/hash';
 import { BigNumberish, toBigInt, toCairoBool, toHex } from '../utils/num';
 import { parseContract } from '../utils/provider';
@@ -113,7 +114,7 @@ export class Account extends Provider implements AccountInterface {
     { blockIdentifier, nonce: providedNonce }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
     const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
-    const version = toBigInt(feeTransactionVersion);
+    const version = !isSiera(contract) ? toBigInt(feeTransactionVersion) : transactionVersion_2;
     const chainId = await this.getChainId();
 
     const declareContractTransaction = await this.buildDeclarePayload(
@@ -319,7 +320,7 @@ export class Account extends Provider implements AccountInterface {
         },
         transactionsDetail
       ));
-    details.version = toBigInt(transactionVersion);
+    details.version = !isSiera(payload.contract) ? transactionVersion : transactionVersion_2;
     details.chainId = await this.getChainId();
 
     const declareContractTransaction = await this.buildDeclarePayload(declareContractPayload, {

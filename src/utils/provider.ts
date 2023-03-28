@@ -21,7 +21,7 @@ export function parseCalldata(calldata: RawCalldata = []) {
 }
 
 export function createSieraContractClass(contract: SieraContractClass): any {
-  const result = contract as any;
+  const result = { ...contract } as any;
   delete result.sierra_program_debug_info;
   result.abi = formatSpaces(stringify(contract.abi));
   result.sierra_program = formatSpaces(stringify(contract.sierra_program));
@@ -42,5 +42,5 @@ export function parseContract(contract: CompiledContract | string) {
     } as ContractClass;
   }
 
-  return createSieraContractClass(parsedContract);
+  return createSieraContractClass(parsedContract as SieraContractClass);
 }

@@ -499,6 +499,7 @@ describe('deploy and test Wallet', () => {
 describe('Test Cairo 1', () => {
   const provider = getTestProvider();
   const account = getTestAccount(provider);
+  initializeMatcher(expect);
 
   test('Declare v2 - Hello Cairo 1 contract', async () => {
     const declareTx = await account.declare({

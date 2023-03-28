@@ -32,7 +32,7 @@ import {
 } from '../types';
 import { isSiera } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
-import { getSelector, getSelectorFromName } from '../utils/hash';
+import { feeTransactionVersion, getSelector, getSelectorFromName } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
 import {
   BigNumberish,
@@ -271,7 +271,7 @@ export class SequencerProvider implements ProviderInterface {
       { blockIdentifier },
       {
         signature: [],
-        contract_address: contractAddress,
+        sender_address: contractAddress,
         entry_point_selector: getSelectorFromName(entryPointSelector),
         calldata,
       }
@@ -457,7 +457,7 @@ export class SequencerProvider implements ProviderInterface {
           sender_address: senderAddress,
           contract_class: contractDefinition,
           signature: signatureToDecimalArray(signature),
-          version: '0x1',
+          version: toHex(details?.version || toBigInt(feeTransactionVersion)),
           nonce: toHex(details.nonce),
         }
       ).then(this.responseParser.parseFeeEstimateResponse);
