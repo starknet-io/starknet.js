@@ -14,7 +14,7 @@ export type CallOptions = {
   blockIdentifier?: BlockIdentifier;
   parseRequest: Boolean;
   parseResponse: Boolean;
-  formatResponse?: Object | null;
+  formatResponse?: object | null;
 };
 
 export abstract class ContractInterface {
