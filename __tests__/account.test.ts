@@ -15,7 +15,6 @@ import {
   compiledStarknetId,
   compiledTestDapp,
   describeIfDevnetSequencer,
-  describeIfNotRpc,
   describeIfSequencer,
   erc20ClassHash,
   getTestAccount,
@@ -497,7 +496,9 @@ describe('deploy and test Wallet', () => {
   });
 });
 
-describeIfNotRpc('not implemented for RPC', () => {
+describeIfDevnetSequencer('not implemented for RPC', () => {
+  // Testnet will not accept declare v2 with same compiledClassHash,
+  // aka. we can't redeclare same contract
   describe('Test Cairo 1', () => {
     const provider = getTestProvider();
     const account = getTestAccount(provider);
