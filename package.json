@@ -91,7 +91,6 @@
     "@noble/curves": "^0.8.2",
     "isomorphic-fetch": "^3.0.0",
     "json-bigint": "^1.0.0",
-    "json-keys-sort": "^2.1.0",
     "micro-starknet": "^0.2.1",
     "pako": "^2.0.4",
     "ts-custom-error": "^3.3.1",

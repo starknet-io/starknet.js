@@ -8,6 +8,8 @@ import { encodeShortString } from '../src/utils/shortString';
 import { randomAddress } from '../src/utils/stark';
 import {
   compiledErc20,
+  compiledHelloSierra,
+  compiledHelloSierraCasm,
   compiledNamingContract,
   compiledOpenZeppelinAccount,
   compiledStarknetId,
@@ -490,6 +492,25 @@ describe('deploy and test Wallet', () => {
       res.forEach((value) => {
         expect(value).toMatchSchemaRef('EstimateFee');
       });
+    });
+  });
+});
+
+describeIfDevnetSequencer('not implemented for RPC', () => {
+  // Testnet will not accept declare v2 with same compiledClassHash,
+  // aka. we can't redeclare same contract
+  describe('Test Cairo 1', () => {
+    const provider = getTestProvider();
+    const account = getTestAccount(provider);
+    initializeMatcher(expect);
+
+    test('Declare v2 - Hello Cairo 1 contract', async () => {
+      const declareTx = await account.declare({
+        contract: compiledHelloSierra,
+        casm: compiledHelloSierraCasm,
+      });
+      await provider.waitForTransaction(declareTx.transaction_hash);
+      expect(declareTx).toMatchSchemaRef('DeclareContractResponse');
     });
   });
 });

@@ -14,6 +14,7 @@ export interface DeclareSignerDetails {
   maxFee: BigNumberish;
   version: BigNumberish;
   nonce: BigNumberish;
+  compiledClassHash?: string;
 }
 
 export type DeployAccountSignerDetails = Required<DeployAccountContractPayload> &

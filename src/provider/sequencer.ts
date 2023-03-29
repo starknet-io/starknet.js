@@ -2,6 +2,7 @@ import urljoin from 'url-join';
 
 import { BaseUrl, NetworkName, StarknetChainId } from '../constants';
 import {
+  CairoAssembly,
   Call,
   CallContractResponse,
   CallL1Handler,
@@ -29,8 +30,9 @@ import {
   TransactionType,
   waitForTransactionOptions,
 } from '../types';
+import { isSierra } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
-import { getSelector, getSelectorFromName } from '../utils/hash';
+import { feeTransactionVersion, getSelector, getSelectorFromName } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
 import {
   BigNumberish,
@@ -268,7 +270,9 @@ export class SequencerProvider implements ProviderInterface {
       'call_contract',
       { blockIdentifier },
       {
-        signature: [],
+        // TODO - determine best choice once both are fully supported in devnet
+        // signature: [],
+        // sender_address: contractAddress,
         contract_address: contractAddress,
         entry_point_selector: getSelectorFromName(entryPointSelector),
         calldata,
@@ -287,7 +291,7 @@ export class SequencerProvider implements ProviderInterface {
   public async getNonceForAddress(
     contractAddress: string,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<BigNumberish> {
+  ): Promise<Sequencer.Nonce> {
     return this.fetchEndpoint('get_nonce', { contractAddress, blockIdentifier });
   }
 
@@ -295,7 +299,7 @@ export class SequencerProvider implements ProviderInterface {
     contractAddress: string,
     key: BigNumberish,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<BigNumberish> {
+  ): Promise<Sequencer.Storage> {
     const parsedKey = toBigInt(key).toString(10);
     return this.fetchEndpoint('get_storage_at', {
       blockIdentifier,
@@ -336,8 +340,20 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('get_class_hash_at', { blockIdentifier, contractAddress });
   }
 
-  public async getClassByHash(classHash: string): Promise<ContractClass> {
-    return this.fetchEndpoint('get_class_by_hash', { classHash }).then(parseContract);
+  public async getClassByHash(
+    classHash: string,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<ContractClass> {
+    return this.fetchEndpoint('get_class_by_hash', { classHash, blockIdentifier }).then(
+      parseContract
+    );
+  }
+
+  public async getCompiledClassByClassHash(
+    classHash: string,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ): Promise<CairoAssembly> {
+    return this.fetchEndpoint('get_compiled_class_by_class_hash', { classHash, blockIdentifier });
   }
 
   public async invokeFunction(
@@ -346,12 +362,12 @@ export class SequencerProvider implements ProviderInterface {
   ): Promise<InvokeFunctionResponse> {
     return this.fetchEndpoint('add_transaction', undefined, {
       type: TransactionType.INVOKE,
-      contract_address: functionInvocation.contractAddress,
+      sender_address: functionInvocation.contractAddress,
       calldata: bigNumberishArrayToDecimalStringArray(functionInvocation.calldata ?? []),
       signature: signatureToDecimalArray(functionInvocation.signature),
       nonce: toHex(details.nonce),
       max_fee: toHex(details.maxFee || 0),
-      version: toHex(details.version || 1),
+      version: '0x1',
     }).then(this.responseParser.parseInvokeFunctionResponse);
   }
 
@@ -372,39 +388,54 @@ export class SequencerProvider implements ProviderInterface {
   }
 
   public async declareContract(
-    { senderAddress, contractDefinition, signature }: DeclareContractTransaction,
+    { senderAddress, contractDefinition, signature, compiledClassHash }: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce
   ): Promise<DeclareContractResponse> {
+    if (!isSierra(contractDefinition)) {
+      return this.fetchEndpoint('add_transaction', undefined, {
+        type: TransactionType.DECLARE,
+        contract_class: contractDefinition,
+        nonce: toHex(details.nonce),
+        signature: signatureToDecimalArray(signature),
+        sender_address: senderAddress,
+        max_fee: toHex(details.maxFee || 0),
+        version: '0x1',
+      }).then(this.responseParser.parseDeclareContractResponse);
+    }
+    // Cairo 1
     return this.fetchEndpoint('add_transaction', undefined, {
       type: TransactionType.DECLARE,
+      sender_address: senderAddress,
+      compiled_class_hash: compiledClassHash,
       contract_class: contractDefinition,
       nonce: toHex(details.nonce),
       signature: signatureToDecimalArray(signature),
-      sender_address: senderAddress,
       max_fee: toHex(details.maxFee || 0),
-      version: toHex(details.version || 1),
+      version: '0x2',
     }).then(this.responseParser.parseDeclareContractResponse);
   }
 
   public async getEstimateFee(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = this.blockIdentifier
+    blockIdentifier: BlockIdentifier = this.blockIdentifier,
+    skipValidate: boolean = false
   ): Promise<EstimateFeeResponse> {
-    return this.getInvokeEstimateFee(invocation, invocationDetails, blockIdentifier);
+    return this.getInvokeEstimateFee(invocation, invocationDetails, blockIdentifier, skipValidate);
   }
 
   public async getInvokeEstimateFee(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = this.blockIdentifier
+    blockIdentifier: BlockIdentifier = this.blockIdentifier,
+    skipValidate: boolean = false
   ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint(
       'estimate_fee',
-      { blockIdentifier },
+      { blockIdentifier, skipValidate },
       {
         type: TransactionType.INVOKE,
-        contract_address: invocation.contractAddress,
+        sender_address: invocation.contractAddress,
         calldata: invocation.calldata ?? [],
         signature: signatureToDecimalArray(invocation.signature),
         version: toHex(invocationDetails?.version || 1),
@@ -414,20 +445,37 @@ export class SequencerProvider implements ProviderInterface {
   }
 
   public async getDeclareEstimateFee(
-    { senderAddress, contractDefinition, signature }: DeclareContractTransaction,
+    { senderAddress, contractDefinition, signature, compiledClassHash }: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = this.blockIdentifier
+    blockIdentifier: BlockIdentifier = this.blockIdentifier,
+    skipValidate: boolean = false
   ): Promise<EstimateFeeResponse> {
+    if (!isSierra(contractDefinition)) {
+      return this.fetchEndpoint(
+        'estimate_fee',
+        { blockIdentifier, skipValidate },
+        {
+          type: TransactionType.DECLARE,
+          sender_address: senderAddress,
+          contract_class: contractDefinition,
+          signature: signatureToDecimalArray(signature),
+          version: toHex(details?.version || toBigInt(feeTransactionVersion)),
+          nonce: toHex(details.nonce),
+        }
+      ).then(this.responseParser.parseFeeEstimateResponse);
+    }
+
     return this.fetchEndpoint(
       'estimate_fee',
-      { blockIdentifier },
+      { blockIdentifier, skipValidate },
       {
         type: TransactionType.DECLARE,
         sender_address: senderAddress,
+        compiled_class_hash: compiledClassHash,
         contract_class: contractDefinition,
-        signature: signatureToDecimalArray(signature),
-        version: toHex(details?.version || 1),
         nonce: toHex(details.nonce),
+        signature: signatureToDecimalArray(signature),
+        version: '0x2',
       }
     ).then(this.responseParser.parseFeeEstimateResponse);
   }
@@ -435,11 +483,12 @@ export class SequencerProvider implements ProviderInterface {
   public async getDeployAccountEstimateFee(
     { classHash, addressSalt, constructorCalldata, signature }: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = this.blockIdentifier
+    blockIdentifier: BlockIdentifier = this.blockIdentifier,
+    skipValidate: boolean = false
   ): Promise<EstimateFeeResponse> {
     return this.fetchEndpoint(
       'estimate_fee',
-      { blockIdentifier },
+      { blockIdentifier, skipValidate },
       {
         type: TransactionType.DEPLOY_ACCOUNT,
         class_hash: toHex(classHash),
@@ -461,7 +510,7 @@ export class SequencerProvider implements ProviderInterface {
       if (invocation.type === 'INVOKE_FUNCTION') {
         res = {
           type: invocation.type,
-          contract_address: invocation.contractAddress,
+          sender_address: invocation.contractAddress,
           calldata: invocation.calldata ?? [],
         };
       } else if (invocation.type === 'DECLARE') {
@@ -583,14 +632,15 @@ export class SequencerProvider implements ProviderInterface {
   public async getSimulateTransaction(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = this.blockIdentifier
+    blockIdentifier: BlockIdentifier = this.blockIdentifier,
+    skipValidate: boolean = false
   ): Promise<TransactionSimulationResponse> {
     return this.fetchEndpoint(
       'simulate_transaction',
-      { blockIdentifier },
+      { blockIdentifier, skipValidate },
       {
         type: 'INVOKE_FUNCTION',
-        contract_address: invocation.contractAddress,
+        sender_address: invocation.contractAddress,
         calldata: invocation.calldata ?? [],
         signature: signatureToDecimalArray(invocation.signature),
         version: toHex(invocationDetails?.version || 1),

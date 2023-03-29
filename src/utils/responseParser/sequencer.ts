@@ -38,8 +38,6 @@ export class SequencerAPIResponseParser extends ResponseParser {
     return {
       ...res,
       calldata: 'calldata' in res.transaction ? (res.transaction.calldata as Array<string>) : [],
-      contract_address:
-        'contract_address' in res.transaction ? res.transaction.contract_address : undefined,
       contract_class:
         'contract_class' in res.transaction ? (res.transaction.contract_class as any) : undefined,
       entry_point_selector:
@@ -198,26 +196,19 @@ export class SequencerAPIResponseParser extends ResponseParser {
   }
 
   public parseGetStateUpdateResponse(res: Sequencer.StateUpdateResponse): StateUpdateResponse {
-    const nonces = [].concat(res.state_diff.nonces as []).map(({ contract_address, nonce }) => {
-      return {
-        contract_address,
-        nonce: nonce as string,
-      };
-    });
-    const storage_diffs = []
-      .concat(res.state_diff.storage_diffs as [])
-      .map(({ address, storage_entries }) => {
-        return {
-          address,
-          storage_entries,
-        };
-      });
+    const nonces = Object.entries(res.state_diff.nonces).map(([contract_address, nonce]) => ({
+      contract_address,
+      nonce,
+    }));
+    const storage_diffs = Object.entries(res.state_diff.storage_diffs).map(
+      ([address, storage_entries]) => ({ address, storage_entries })
+    );
+
     return {
       ...res,
       state_diff: {
+        ...res.state_diff,
         storage_diffs,
-        declared_contract_hashes: res.state_diff.declared_contract_hashes,
-        deployed_contracts: res.state_diff.deployed_contracts,
         nonces,
       },
     };

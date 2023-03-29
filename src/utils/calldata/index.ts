@@ -1,4 +1,4 @@
-import { Abi, AbiEntry, Args, Calldata, FunctionAbi, abiStructs } from '../../types';
+import { Abi, AbiEntry, AbiStructs, Args, Calldata, FunctionAbi } from '../../types';
 import assert from '../assert';
 import { isBigInt } from '../num';
 import { isLongText, splitLongString } from '../shortString';
@@ -13,7 +13,7 @@ import validateFields from './validate';
 export class CallData {
   abi: Abi;
 
-  protected readonly structs: abiStructs;
+  protected readonly structs: AbiStructs;
 
   constructor(abi: Abi) {
     this.abi = abi;
@@ -126,7 +126,7 @@ export class CallData {
    * @param response  - response from the method
    * @return - parsed response corresponding to the abi
    */
-  public parse(method: string, response: string[]): Object {
+  public parse(method: string, response: string[]): object {
     const { outputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
     const responseIterator = response.flat()[Symbol.iterator]();
 
@@ -146,7 +146,7 @@ export class CallData {
    * @param format - formatter object schema
    * @returns parsed and formatted response object
    */
-  public format(method: string, response: string[], format: Object): Object {
+  public format(method: string, response: string[], format: object): object {
     const parsed = this.parse(method, response);
     return formatter(parsed, format);
   }

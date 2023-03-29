@@ -18,7 +18,10 @@ import type {
   InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  Nonce,
+  RPC,
   StateUpdateResponse,
+  Storage,
   TransactionSimulationResponse,
   waitForTransactionOptions,
 } from '../types';
@@ -71,7 +74,7 @@ export abstract class ProviderInterface {
   public abstract getClassAt(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
-  ): Promise<ContractClass>;
+  ): Promise<ContractClass | RPC.ContractClass>;
 
   /**
    * Returns the class hash deployed under the given address.
@@ -91,7 +94,7 @@ export abstract class ProviderInterface {
    * @param classHash - class hash
    * @returns Contract class of compiled contract
    */
-  public abstract getClassByHash(classHash: string): Promise<ContractClass>;
+  public abstract getClassByHash(classHash: string): Promise<ContractClass | RPC.ContractClass>;
 
   /**
    * Gets the nonce of a contract with respect to a specific block
@@ -102,7 +105,7 @@ export abstract class ProviderInterface {
   public abstract getNonceForAddress(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
-  ): Promise<BigNumberish>;
+  ): Promise<Nonce>;
 
   /**
    * Gets the contract's storage variable at a specific key.
@@ -116,7 +119,7 @@ export abstract class ProviderInterface {
     contractAddress: string,
     key: BigNumberish,
     blockIdentifier?: BlockIdentifier
-  ): Promise<BigNumberish>;
+  ): Promise<Storage>;
 
   /**
    * Gets the transaction information from a tx id.
@@ -196,16 +199,18 @@ export abstract class ProviderInterface {
    * - entrypoint - the entrypoint of the contract
    * - calldata - (defaults to []) the calldata
    * - signature - (defaults to []) the signature
-   * @param blockIdentifier - block identifier
    * @param details - optional details containing:
    * - nonce - optional nonce
    * - version - optional version
+   * @param blockIdentifier - (optional) block identifier
+   * @param skipValidate - (optional) skip cairo __validate__ method
    * @returns the estimated fee
    */
   public abstract getEstimateFee(
     invocation: Invocation,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<EstimateFeeResponse>;
 
   /**
@@ -216,16 +221,18 @@ export abstract class ProviderInterface {
    * - entrypoint - the entrypoint of the contract
    * - calldata - (defaults to []) the calldata
    * - signature - (defaults to []) the signature
-   * @param blockIdentifier - block identifier
    * @param details - optional details containing:
    * - nonce - optional nonce
    * - version - optional version
+   * @param blockIdentifier - (optional) block identifier
+   * @param skipValidate - (optional) skip cairo __validate__ method
    * @returns the estimated fee
    */
   public abstract getInvokeEstimateFee(
     invocation: Invocation,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<EstimateFeeResponse>;
 
   /**
@@ -239,13 +246,15 @@ export abstract class ProviderInterface {
    * - nonce
    * - version - optional version
    * - optional maxFee
-   * @param blockIdentifier - block identifier
+   * @param blockIdentifier - (optional) block identifier
+   * @param skipValidate - (optional) skip cairo __validate__ method
    * @returns the estimated fee
    */
   public abstract getDeclareEstimateFee(
     transaction: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<EstimateFeeResponse>;
 
   /**
@@ -260,13 +269,15 @@ export abstract class ProviderInterface {
    * - nonce
    * - version - optional version
    * - optional maxFee
-   * @param blockIdentifier - block identifier
+   * @param blockIdentifier - (optional) block identifier
+   * @param skipValidate - (optional) skip cairo __validate__ method
    * @returns the estimated fee
    */
   public abstract getDeployAccountEstimateFee(
     transaction: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<EstimateFeeResponse>;
 
   /**
@@ -308,13 +319,15 @@ export abstract class ProviderInterface {
    * @param details - optional details containing:
    * - nonce - optional nonce
    * - version - optional version
-   * @param blockIdentifier - block identifier
+   * @param blockIdentifier - (optional) block identifier
+   * @param skipValidate - (optional) skip cairo __validate__ method
    * @returns the transaction trace and estimated fee
    */
   public abstract getSimulateTransaction(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<TransactionSimulationResponse>;
 
   /**

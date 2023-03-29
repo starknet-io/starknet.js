@@ -135,7 +135,9 @@ export abstract class AccountInterface extends ProviderInterface {
    * 
    * @param contractPayload transaction payload to be deployed containing:
   - contract: compiled contract code
-  - classHash: computed class hash of compiled contract
+  - (optional) classHash: computed class hash of compiled contract. Pre-compute it for faster execution.
+  - (required for Cairo1 without compiledClassHash) casm: CompiledContract | string;
+  - (optional for Cairo1 with casm) compiledClassHash: compiled class hash from casm. Pre-compute it for faster execution.
    * @param transactionsDetail Invocation Details containing:
   - optional nonce
   - optional version

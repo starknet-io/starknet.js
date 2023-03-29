@@ -1,4 +1,4 @@
-import { AbiEntry, Args, ParsedStruct, abiStructs } from '../../types';
+import { AbiEntry, AbiStructs, Args, ParsedStruct } from '../../types';
 import { BigNumberish } from '../num';
 import { isLen, isTypeArray, isTypeTuple } from './cairo';
 import extractTupleMemberTypes from './tuple';
@@ -14,7 +14,7 @@ import extractTupleMemberTypes from './tuple';
 function parseResponseStruct(
   responseIterator: Iterator<string>,
   type: string,
-  structs: abiStructs
+  structs: AbiStructs
 ): BigNumberish | ParsedStruct {
   // type struct
   if (type in structs && structs[type]) {
@@ -49,7 +49,7 @@ function parseResponseStruct(
 export default function responseParser(
   responseIterator: Iterator<string>,
   output: AbiEntry,
-  structs: abiStructs,
+  structs: AbiStructs,
   parsedResult?: Args
 ): any {
   const { name, type } = output;

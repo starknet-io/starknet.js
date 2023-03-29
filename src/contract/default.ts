@@ -190,7 +190,7 @@ export class Contract implements ContractInterface {
     method: string,
     args: Array<any> = [],
     options: CallOptions = { parseRequest: true, parseResponse: true, formatResponse: undefined }
-  ): Promise<Object> {
+  ): Promise<object> {
     assert(this.address !== null, 'contract is not connected to an address');
     const blockIdentifier = options?.blockIdentifier || undefined;
     let calldata = args[0];

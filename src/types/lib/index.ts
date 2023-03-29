@@ -1,6 +1,7 @@
-import { weierstrass } from '../utils/ec';
-import type { BigNumberish } from '../utils/num';
-import { RPC } from './api/rpc';
+import { StarknetChainId } from '../../constants';
+import { weierstrass } from '../../utils/ec';
+import type { BigNumberish } from '../../utils/num';
+import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 
 // Common Signature Type which needs to be imported from weierstrass
 // and imported at many places
@@ -17,12 +18,6 @@ export type RawArgs =
         | { type: 'struct'; [k: string]: BigNumberish };
     }
   | BigNumberish[];
-
-export interface ContractClass {
-  program: CompressedProgram;
-  entry_points_by_type: RPC.ContractClass['entry_points_by_type'];
-  abi?: Abi;
-}
 
 export type UniversalDeployerContractPayload = {
   classHash: BigNumberish;
@@ -54,6 +49,15 @@ export type DeployAccountContractTransaction = Omit<
 export type DeclareContractPayload = {
   contract: CompiledContract | string;
   classHash?: string;
+  casm?: CompiledSierraCasm;
+  compiledClassHash?: string;
+};
+
+export type CompleteDeclareContractPayload = {
+  contract: CompiledContract | string;
+  classHash: string;
+  casm?: CompiledSierraCasm;
+  compiledClassHash?: string;
 };
 
 export type DeclareAndDeployContractPayload = Omit<UniversalDeployerContractPayload, 'classHash'> &
@@ -63,6 +67,7 @@ export type DeclareContractTransaction = {
   contractDefinition: ContractClass;
   senderAddress: string;
   signature?: Signature;
+  compiledClassHash?: string;
 };
 
 export type CallDetails = {
@@ -80,7 +85,19 @@ export type InvocationsDetails = {
   version?: BigNumberish;
 };
 
-export type InvocationsDetailsWithNonce = InvocationsDetails & { nonce: BigNumberish };
+/**
+ * Contain all additional details params
+ */
+export type Details = {
+  nonce: BigNumberish;
+  maxFee: BigNumberish;
+  version: BigNumberish;
+  chainId: StarknetChainId;
+};
+
+export type InvocationsDetailsWithNonce = InvocationsDetails & {
+  nonce: BigNumberish;
+};
 
 export enum TransactionStatus {
   NOT_RECEIVED = 'NOT_RECEIVED',
@@ -123,98 +140,9 @@ export enum TransactionType {
   DEPLOY_ACCOUNT = 'DEPLOY_ACCOUNT',
 }
 
-export type EntryPointType = 'EXTERNAL';
-export type CompressedProgram = string;
-
-export type AbiEntry = { name: string; type: 'felt' | 'felt*' | string };
 export type Tupled = { element: any; type: string };
-
-export type FunctionAbi = {
-  inputs: AbiEntry[];
-  name: string;
-  outputs: AbiEntry[];
-  stateMutability?: 'view';
-  type: FunctionAbiType;
-};
-
-enum FunctionAbiType {
-  'function',
-  'l1_handler',
-  'constructor',
-}
-
-export type abiStructs = { [name: string]: StructAbi };
-
-export type StructAbi = {
-  members: (AbiEntry & { offset: number })[];
-  name: string;
-  size: number;
-  type: 'struct';
-};
-
-export type Abi = Array<FunctionAbi | EventAbi | StructAbi>;
-
-type EventAbi = any;
-
-export type Builtins = string[];
-
-export type SieraContractEntryPointFields = {
-  selector: string;
-  function_idx: number;
-};
-
-export type ContractEntryPointFields = {
-  selector: string;
-  offset: string;
-  builtins?: Builtins;
-};
-
-export type EntryPointsByType = {
-  CONSTRUCTOR: ContractEntryPointFields[];
-  EXTERNAL: ContractEntryPointFields[];
-  L1_HANDLER: ContractEntryPointFields[];
-};
-
-export type SieraEntryPointsByType = {
-  CONSTRUCTOR: SieraContractEntryPointFields[];
-  EXTERNAL: SieraContractEntryPointFields[];
-  L1_HANDLER: SieraContractEntryPointFields[];
-};
-
-export interface Program extends Record<string, any> {
-  builtins: string[];
-  data: string[];
-}
 export type BlockTag = 'pending' | 'latest';
 export type BlockNumber = BlockTag | null | number;
-
-export type CompiledContract = {
-  abi: Abi;
-  entry_points_by_type: EntryPointsByType;
-  program: Program;
-};
-
-export type CompressedCompiledContract = Omit<CompiledContract, 'program'> & {
-  program: CompressedProgram;
-};
-
-export type Hints = [number, string[]][];
-
-export type CompiledSieraCasm = {
-  prime: string;
-  compiler_version: string;
-  bytecode: string[];
-  hints: Hints;
-  entry_points_by_type: EntryPointsByType;
-};
-
-export type CompiledSiera = {
-  sierra_program: string[];
-  sierra_program_debug_info: any;
-  contract_class_version: string;
-  entry_points_by_type: SieraEntryPointsByType;
-  abi: Abi;
-};
 
 export type Struct = {
   type: 'struct';
@@ -231,3 +159,5 @@ export type waitForTransactionOptions = {
   retryInterval?: number;
   successStates?: Array<TransactionStatus>;
 };
+
+export * from './contract';

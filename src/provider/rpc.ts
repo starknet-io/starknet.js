@@ -173,7 +173,7 @@ export class RpcProvider implements ProviderInterface {
     contractAddress: string,
     key: BigNumberish,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<BigNumberish> {
+  ): Promise<RPC.Storage> {
     const parsedKey = toHex(key);
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getStorageAt', {
@@ -268,22 +268,26 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<EstimateFeeResponse> {
     const block_id = new Block(blockIdentifier).identifier;
-    return this.fetchEndpoint('starknet_estimateFee', {
-      request: {
-        type: RPC.TransactionType.DECLARE,
-        contract_class: {
-          program: contractDefinition.program,
-          entry_points_by_type: contractDefinition.entry_points_by_type,
-          abi: contractDefinition.abi, // rpc 2.0
+    if ('program' in contractDefinition) {
+      return this.fetchEndpoint('starknet_estimateFee', {
+        request: {
+          type: RPC.TransactionType.DECLARE,
+          contract_class: {
+            program: contractDefinition.program,
+            entry_points_by_type: contractDefinition.entry_points_by_type,
+            abi: contractDefinition.abi, // rpc 2.0
+          },
+          sender_address: senderAddress,
+          signature: signatureToHexArray(signature),
+          version: toHex(details?.version || 0),
+          nonce: toHex(details.nonce),
+          max_fee: toHex(details?.maxFee || 0),
         },
-        sender_address: senderAddress,
-        signature: signatureToHexArray(signature),
-        version: toHex(details?.version || 0),
-        nonce: toHex(details.nonce),
-        max_fee: toHex(details?.maxFee || 0),
-      },
-      block_id,
-    }).then(this.responseParser.parseFeeEstimateResponse);
+        block_id,
+      }).then(this.responseParser.parseFeeEstimateResponse);
+    }
+    // TODO: When RPC Update implement Sierra
+    throw new Error('RPC do not support Sierra Contracts yet');
   }
 
   public async getDeployAccountEstimateFee(
@@ -319,21 +323,25 @@ export class RpcProvider implements ProviderInterface {
     { contractDefinition, signature, senderAddress }: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce
   ): Promise<DeclareContractResponse> {
-    return this.fetchEndpoint('starknet_addDeclareTransaction', {
-      declare_transaction: {
-        contract_class: {
-          program: contractDefinition.program,
-          entry_points_by_type: contractDefinition.entry_points_by_type,
-          abi: contractDefinition.abi, // rpc 2.0
+    if ('program' in contractDefinition) {
+      return this.fetchEndpoint('starknet_addDeclareTransaction', {
+        declare_transaction: {
+          contract_class: {
+            program: contractDefinition.program,
+            entry_points_by_type: contractDefinition.entry_points_by_type,
+            abi: contractDefinition.abi, // rpc 2.0
+          },
+          type: RPC.TransactionType.DECLARE,
+          version: '0x1',
+          max_fee: toHex(details.maxFee || 0),
+          signature: signatureToHexArray(signature),
+          sender_address: senderAddress,
+          nonce: toHex(details.nonce),
         },
-        type: RPC.TransactionType.DECLARE,
-        version: toHex(details.version || 0),
-        max_fee: toHex(details.maxFee || 0),
-        signature: signatureToHexArray(signature),
-        sender_address: senderAddress,
-        nonce: toHex(details.nonce),
-      },
-    });
+      });
+    }
+    // TODO: When RPC Update implement Sierra
+    throw new Error('RPC do not support Sierra Contracts yet');
   }
 
   public async deployAccountContract(
@@ -364,7 +372,7 @@ export class RpcProvider implements ProviderInterface {
         calldata: parseCalldata(functionInvocation.calldata),
         type: RPC.TransactionType.INVOKE,
         max_fee: toHex(details.maxFee || 0),
-        version: toHex(details.version || 1),
+        version: '0x1',
         signature: signatureToHexArray(functionInvocation.signature),
         nonce: toHex(details.nonce),
       },

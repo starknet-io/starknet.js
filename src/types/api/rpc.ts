@@ -1,4 +1,4 @@
-import { ADDRESS, FELT, OPENRPC } from './openrpc';
+import { ADDRESS, CONTRACT_STORAGE_DIFF_ITEM, FELT, OPENRPC } from './openrpc';
 
 export namespace RPC {
   export type Response = {
@@ -42,8 +42,8 @@ export namespace RPC {
   export type DeclaredTransaction = OPENRPC.DeclaredTransaction;
   export type DeployedTransaction = OPENRPC.DeployedTransaction;
   export type Methods = OPENRPC.Methods;
+  export type Storage = OPENRPC.Storage;
 
-  // 'DECLARE' | 'DEPLOY' | 'DEPLOY_ACCOUNT' | 'INVOKE' | 'L1_HANDLER'
   export enum TransactionType {
     DECLARE = 'DECLARE',
     DEPLOY = 'DEPLOY',
@@ -51,4 +51,12 @@ export namespace RPC {
     INVOKE = 'INVOKE',
     L1_HANDLER = 'L1_HANDLER',
   }
+
+  // Exported Diff on Sequencer (can be removed when diff resolved by new RPC v)
+  export type StorageDiffs = Array<CONTRACT_STORAGE_DIFF_ITEM>;
+  export type DeclaredContractHashes = Array<FELT>;
+  export type Nonces = Array<{
+    contract_address: ADDRESS;
+    nonce: FELT;
+  }>;
 }

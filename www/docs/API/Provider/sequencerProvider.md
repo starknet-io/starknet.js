@@ -63,7 +63,7 @@ Gets the smart contract address on the network.
 
 ```typescript
 {
-  bytecode: string[];
+  bytecode: ByteCode;
   abi: Abi;
 }
 ```

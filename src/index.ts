@@ -24,6 +24,7 @@ export * as typedData from './utils/typedData';
 export * as ec from './utils/ec';
 export * from './utils/address';
 export * from './utils/url';
+export * from './utils/calldata';
 
 /**
  * Deprecated

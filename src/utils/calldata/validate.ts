@@ -1,4 +1,4 @@
-import { AbiEntry, FunctionAbi, abiStructs } from '../../types';
+import { AbiEntry, AbiStructs, FunctionAbi } from '../../types';
 /**
  * Validate cairo contract method arguments
  * Flow: Determine type from abi and than validate against parameter
@@ -15,7 +15,7 @@ const validateFelt = (parameter: any, input: AbiEntry) => {
   );
 };
 
-const validateStruct = (parameter: any, input: AbiEntry, structs: abiStructs) => {
+const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) => {
   assert(
     typeof parameter === 'object' && !Array.isArray(parameter),
     `Validate: arg ${input.name} is cairo type struct (${input.type}), and should be defined as js object (not array)`
@@ -38,7 +38,7 @@ const validateTuple = (parameter: any, input: AbiEntry) => {
   // todo: skip tuple structural validation for now
 };
 
-const validateArray = (parameter: any, input: AbiEntry, structs: abiStructs) => {
+const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs) => {
   const baseType = input.type.replace('*', '');
 
   // Long text (special case when parameter is not an array but long text)
@@ -68,7 +68,7 @@ const validateArray = (parameter: any, input: AbiEntry, structs: abiStructs) => 
 export default function validateFields(
   abiMethod: FunctionAbi,
   args: Array<any>,
-  structs: abiStructs
+  structs: AbiStructs
 ) {
   abiMethod.inputs.reduce((acc, input) => {
     const parameter = args[acc];

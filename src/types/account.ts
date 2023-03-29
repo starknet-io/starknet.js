@@ -15,6 +15,7 @@ export type EstimateFeeBulk = Array<EstimateFee>;
 export interface EstimateFeeDetails {
   nonce?: BigNumberish;
   blockIdentifier?: BlockIdentifier;
+  skipValidate?: boolean;
 }
 
 export interface DeployContractResponse {

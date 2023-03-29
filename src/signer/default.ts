@@ -78,7 +78,15 @@ export class Signer implements SignerInterface {
 
   public async signDeclareTransaction(
     // contractClass: ContractClass,  // Should be used once class hash is present in ContractClass
-    { classHash, senderAddress, chainId, maxFee, version, nonce }: DeclareSignerDetails
+    {
+      classHash,
+      senderAddress,
+      chainId,
+      maxFee,
+      version,
+      nonce,
+      compiledClassHash,
+    }: DeclareSignerDetails
   ) {
     const msgHash = calculateDeclareTransactionHash(
       classHash,
@@ -86,7 +94,8 @@ export class Signer implements SignerInterface {
       version,
       maxFee,
       chainId,
-      nonce
+      nonce,
+      compiledClassHash
     );
 
     return starkCurve.sign(msgHash, this.pk);
