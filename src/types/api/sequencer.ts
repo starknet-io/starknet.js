@@ -443,6 +443,7 @@ export namespace Sequencer {
     simulate_transaction: {
       QUERY: {
         blockIdentifier: BlockIdentifier;
+        skipValidate: boolean;
       };
       REQUEST: SimulateTransaction;
       RESPONSE: TransactionSimulationResponse;

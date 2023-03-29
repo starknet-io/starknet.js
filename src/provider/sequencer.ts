@@ -632,11 +632,12 @@ export class SequencerProvider implements ProviderInterface {
   public async getSimulateTransaction(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = this.blockIdentifier
+    blockIdentifier: BlockIdentifier = this.blockIdentifier,
+    skipValidate: boolean = false
   ): Promise<TransactionSimulationResponse> {
     return this.fetchEndpoint(
       'simulate_transaction',
-      { blockIdentifier },
+      { blockIdentifier, skipValidate },
       {
         type: 'INVOKE_FUNCTION',
         sender_address: invocation.contractAddress,

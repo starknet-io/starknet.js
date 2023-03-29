@@ -79,7 +79,7 @@ export class Account extends Provider implements AccountInterface {
 
   public async estimateInvokeFee(
     calls: AllowArray<Call>,
-    { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
+    { nonce: providedNonce, blockIdentifier, skipValidate }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
@@ -98,7 +98,8 @@ export class Account extends Provider implements AccountInterface {
     const response = await super.getInvokeEstimateFee(
       { ...invocation },
       { version, nonce },
-      blockIdentifier
+      blockIdentifier,
+      skipValidate
     );
 
     const suggestedMaxFee = estimatedFeeToMaxFee(response.overall_fee);
@@ -111,7 +112,7 @@ export class Account extends Provider implements AccountInterface {
 
   public async estimateDeclareFee(
     { contract, classHash: providedClassHash, casm, compiledClassHash }: DeclareContractPayload,
-    { blockIdentifier, nonce: providedNonce }: EstimateFeeDetails = {}
+    { blockIdentifier, nonce: providedNonce, skipValidate }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
     const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
     const version = !isSierra(contract) ? toBigInt(feeTransactionVersion) : transactionVersion_2;
@@ -125,7 +126,8 @@ export class Account extends Provider implements AccountInterface {
     const response = await super.getDeclareEstimateFee(
       declareContractTransaction,
       { version, nonce },
-      blockIdentifier
+      blockIdentifier,
+      skipValidate
     );
     const suggestedMaxFee = estimatedFeeToMaxFee(response.overall_fee);
 
@@ -142,7 +144,7 @@ export class Account extends Provider implements AccountInterface {
       constructorCalldata = [],
       contractAddress: providedContractAddress,
     }: DeployAccountContractPayload,
-    { blockIdentifier }: EstimateFeeDetails = {}
+    { blockIdentifier, skipValidate }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
     const version = toBigInt(feeTransactionVersion);
     const nonce = ZERO; // DEPLOY_ACCOUNT transaction will have a nonce zero as it is the first transaction in the account
@@ -156,7 +158,8 @@ export class Account extends Provider implements AccountInterface {
     const response = await super.getDeployAccountEstimateFee(
       { ...payload },
       { version, nonce },
-      blockIdentifier
+      blockIdentifier,
+      skipValidate
     );
     const suggestedMaxFee = estimatedFeeToMaxFee(response.overall_fee);
 
@@ -600,7 +603,7 @@ export class Account extends Provider implements AccountInterface {
 
   public async simulateTransaction(
     calls: AllowArray<Call>,
-    { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
+    { nonce: providedNonce, blockIdentifier, skipValidate }: EstimateFeeDetails = {}
   ): Promise<TransactionSimulation> {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
@@ -619,7 +622,8 @@ export class Account extends Provider implements AccountInterface {
     const response = await super.getSimulateTransaction(
       invocation,
       { version, nonce },
-      blockIdentifier
+      blockIdentifier,
+      skipValidate
     );
 
     const suggestedMaxFee = estimatedFeeToMaxFee(response.fee_estimation.overall_fee);

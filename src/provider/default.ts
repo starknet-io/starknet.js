@@ -98,12 +98,14 @@ export class Provider implements ProviderInterface {
   public async getInvokeEstimateFee(
     invocationWithTxType: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<EstimateFeeResponse> {
     return this.provider.getInvokeEstimateFee(
       invocationWithTxType,
       invocationDetails,
-      blockIdentifier
+      blockIdentifier,
+      skipValidate
     );
   }
 
@@ -168,17 +170,24 @@ export class Provider implements ProviderInterface {
   public async getDeclareEstimateFee(
     transaction: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<EstimateFeeResponse> {
-    return this.provider.getDeclareEstimateFee(transaction, details, blockIdentifier);
+    return this.provider.getDeclareEstimateFee(transaction, details, blockIdentifier, skipValidate);
   }
 
   public getDeployAccountEstimateFee(
     transaction: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<EstimateFeeResponse> {
-    return this.provider.getDeployAccountEstimateFee(transaction, details, blockIdentifier);
+    return this.provider.getDeployAccountEstimateFee(
+      transaction,
+      details,
+      blockIdentifier,
+      skipValidate
+    );
   }
 
   public async getCode(
@@ -198,9 +207,15 @@ export class Provider implements ProviderInterface {
   public async getSimulateTransaction(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<TransactionSimulationResponse> {
-    return this.provider.getSimulateTransaction(invocation, invocationDetails, blockIdentifier);
+    return this.provider.getSimulateTransaction(
+      invocation,
+      invocationDetails,
+      blockIdentifier,
+      skipValidate
+    );
   }
 
   public async getStateUpdate(blockIdentifier?: BlockIdentifier): Promise<StateUpdateResponse> {

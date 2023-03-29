@@ -199,10 +199,11 @@ export abstract class ProviderInterface {
    * - entrypoint - the entrypoint of the contract
    * - calldata - (defaults to []) the calldata
    * - signature - (defaults to []) the signature
-   * @param blockIdentifier - block identifier
    * @param details - optional details containing:
    * - nonce - optional nonce
    * - version - optional version
+   * @param blockIdentifier - (optional) block identifier
+   * @param skipValidate - (optional) skip cairo __validate__ method
    * @returns the estimated fee
    */
   public abstract getEstimateFee(
@@ -220,10 +221,11 @@ export abstract class ProviderInterface {
    * - entrypoint - the entrypoint of the contract
    * - calldata - (defaults to []) the calldata
    * - signature - (defaults to []) the signature
-   * @param blockIdentifier - block identifier
    * @param details - optional details containing:
    * - nonce - optional nonce
    * - version - optional version
+   * @param blockIdentifier - (optional) block identifier
+   * @param skipValidate - (optional) skip cairo __validate__ method
    * @returns the estimated fee
    */
   public abstract getInvokeEstimateFee(
@@ -244,7 +246,8 @@ export abstract class ProviderInterface {
    * - nonce
    * - version - optional version
    * - optional maxFee
-   * @param blockIdentifier - block identifier
+   * @param blockIdentifier - (optional) block identifier
+   * @param skipValidate - (optional) skip cairo __validate__ method
    * @returns the estimated fee
    */
   public abstract getDeclareEstimateFee(
@@ -266,7 +269,8 @@ export abstract class ProviderInterface {
    * - nonce
    * - version - optional version
    * - optional maxFee
-   * @param blockIdentifier - block identifier
+   * @param blockIdentifier - (optional) block identifier
+   * @param skipValidate - (optional) skip cairo __validate__ method
    * @returns the estimated fee
    */
   public abstract getDeployAccountEstimateFee(
@@ -315,13 +319,15 @@ export abstract class ProviderInterface {
    * @param details - optional details containing:
    * - nonce - optional nonce
    * - version - optional version
-   * @param blockIdentifier - block identifier
+   * @param blockIdentifier - (optional) block identifier
+   * @param skipValidate - (optional) skip cairo __validate__ method
    * @returns the transaction trace and estimated fee
    */
   public abstract getSimulateTransaction(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<TransactionSimulationResponse>;
 
   /**
