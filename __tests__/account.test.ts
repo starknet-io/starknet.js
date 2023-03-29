@@ -15,6 +15,7 @@ import {
   compiledStarknetId,
   compiledTestDapp,
   describeIfDevnetSequencer,
+  describeIfNotRpc,
   describeIfSequencer,
   erc20ClassHash,
   getTestAccount,
@@ -496,17 +497,19 @@ describe('deploy and test Wallet', () => {
   });
 });
 
-describe('Test Cairo 1', () => {
-  const provider = getTestProvider();
-  const account = getTestAccount(provider);
-  initializeMatcher(expect);
+describeIfNotRpc('not implemented for RPC', () => {
+  describe('Test Cairo 1', () => {
+    const provider = getTestProvider();
+    const account = getTestAccount(provider);
+    initializeMatcher(expect);
 
-  test('Declare v2 - Hello Cairo 1 contract', async () => {
-    const declareTx = await account.declare({
-      contract: compiledHelloSierra,
-      casm: compiledHelloSierraCasm,
+    test('Declare v2 - Hello Cairo 1 contract', async () => {
+      const declareTx = await account.declare({
+        contract: compiledHelloSierra,
+        casm: compiledHelloSierraCasm,
+      });
+      await provider.waitForTransaction(declareTx.transaction_hash);
+      expect(declareTx).toMatchSchemaRef('DeclareContractResponse');
     });
-    await provider.waitForTransaction(declareTx.transaction_hash);
-    expect(declareTx).toMatchSchemaRef('DeclareContractResponse');
   });
 });

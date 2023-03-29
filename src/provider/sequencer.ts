@@ -270,8 +270,10 @@ export class SequencerProvider implements ProviderInterface {
       'call_contract',
       { blockIdentifier },
       {
-        signature: [],
-        sender_address: contractAddress,
+        // TODO - determine best choice once both are fully supported in devnet
+        // signature: [],
+        // sender_address: contractAddress,
+        contract_address: contractAddress,
         entry_point_selector: getSelectorFromName(entryPointSelector),
         calldata,
       }

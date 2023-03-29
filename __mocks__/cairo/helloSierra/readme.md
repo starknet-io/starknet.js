@@ -4,11 +4,11 @@ Download cairo repo
 Switch to target tag version alpha6
 `cargo test`
 
-# 1.1. Compile to starknet siera json
+# 1.1. Compile to Starknet Sierra json
 
 `cargo run --bin starknet-compile -- hello.cairo hello.json --add-pythonic-hints`
 
-# 1.2. Compile to casm
+# 1.2. Compile to Casm
 
 `cargo run --bin starknet-sierra-compile -- hello.json hello.casm --add-pythonic-hints`
 
