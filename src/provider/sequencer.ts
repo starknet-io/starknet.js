@@ -30,7 +30,7 @@ import {
   TransactionType,
   waitForTransactionOptions,
 } from '../types';
-import { isSiera } from '../utils/contract';
+import { isSierra } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
 import { feeTransactionVersion, getSelector, getSelectorFromName } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
@@ -389,7 +389,7 @@ export class SequencerProvider implements ProviderInterface {
     { senderAddress, contractDefinition, signature, compiledClassHash }: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce
   ): Promise<DeclareContractResponse> {
-    if (!isSiera(contractDefinition)) {
+    if (!isSierra(contractDefinition)) {
       return this.fetchEndpoint('add_transaction', undefined, {
         type: TransactionType.DECLARE,
         contract_class: contractDefinition,
@@ -448,7 +448,7 @@ export class SequencerProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier = this.blockIdentifier,
     skipValidate: boolean = false
   ): Promise<EstimateFeeResponse> {
-    if (!isSiera(contractDefinition)) {
+    if (!isSierra(contractDefinition)) {
       return this.fetchEndpoint(
         'estimate_fee',
         { blockIdentifier, skipValidate },

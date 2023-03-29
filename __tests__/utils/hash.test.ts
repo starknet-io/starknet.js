@@ -1,13 +1,13 @@
 import {
   computeCompiledClassHash,
   computeContractClassHash,
-  computeSieraContractClassHash,
+  computeSierraContractClassHash,
   getSelectorFromName,
 } from '../../src/utils/hash';
 import {
   compiledErc20,
-  compiledHelloSiera,
-  compiledHelloSieraCasm,
+  compiledHelloSierra,
+  compiledHelloSierraCasm,
   compiledOpenZeppelinAccount,
   compiledTestDapp,
   erc20ClassHash,
@@ -48,14 +48,14 @@ describe('Hash Tester', () => {
 
   describe('Compute CompiledClassHash & ClassHash Cairo1', () => {
     test('Hello - CompiledClassHash', () => {
-      const compiledClassHash = computeCompiledClassHash(compiledHelloSieraCasm);
+      const compiledClassHash = computeCompiledClassHash(compiledHelloSierraCasm);
       expect(compiledClassHash).toEqual(
         '0x5c82c98f2ab111bd50293ba64bb18cf49037374783ad2486c712709c4ba0d89'
       );
     });
 
     test('Hello - ClassHash', () => {
-      const classHash = computeSieraContractClassHash(compiledHelloSiera);
+      const classHash = computeSierraContractClassHash(compiledHelloSierra);
       expect(classHash).toEqual(
         '0x345df0a9b35ce05d03772ba7938acad66921c5c39c1a5af74aee72aa25c363e'
       );

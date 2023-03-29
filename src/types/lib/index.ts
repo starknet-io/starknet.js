@@ -1,7 +1,7 @@
 import { StarknetChainId } from '../../constants';
 import { weierstrass } from '../../utils/ec';
 import type { BigNumberish } from '../../utils/num';
-import { CompiledContract, CompiledSieraCasm, ContractClass } from './contract';
+import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 
 // Common Signature Type which needs to be imported from weierstrass
 // and imported at many places
@@ -49,14 +49,14 @@ export type DeployAccountContractTransaction = Omit<
 export type DeclareContractPayload = {
   contract: CompiledContract | string;
   classHash?: string;
-  casm?: CompiledSieraCasm;
+  casm?: CompiledSierraCasm;
   compiledClassHash?: string;
 };
 
 export type CompleteDeclareContractPayload = {
   contract: CompiledContract | string;
   classHash: string;
-  casm?: CompiledSieraCasm;
+  casm?: CompiledSierraCasm;
   compiledClassHash?: string;
 };
 

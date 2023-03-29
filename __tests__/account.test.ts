@@ -8,8 +8,8 @@ import { encodeShortString } from '../src/utils/shortString';
 import { randomAddress } from '../src/utils/stark';
 import {
   compiledErc20,
-  compiledHelloSiera,
-  compiledHelloSieraCasm,
+  compiledHelloSierra,
+  compiledHelloSierraCasm,
   compiledNamingContract,
   compiledOpenZeppelinAccount,
   compiledStarknetId,
@@ -503,8 +503,8 @@ describe('Test Cairo 1', () => {
 
   test('Declare v2 - Hello Cairo 1 contract', async () => {
     const declareTx = await account.declare({
-      contract: compiledHelloSiera,
-      casm: compiledHelloSieraCasm,
+      contract: compiledHelloSierra,
+      casm: compiledHelloSierraCasm,
     });
     await provider.waitForTransaction(declareTx.transaction_hash);
     expect(declareTx).toMatchSchemaRef('DeclareContractResponse');

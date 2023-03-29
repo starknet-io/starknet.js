@@ -6,12 +6,12 @@ import { API_VERSION, MASK_250, StarknetChainId, TransactionHashPrefix } from '.
 import {
   Builtins,
   CompiledContract,
-  CompiledSiera,
-  CompiledSieraCasm,
+  CompiledSierra,
+  CompiledSierraCasm,
   ContractEntryPointFields,
   LegacyCompiledContract,
   RawCalldata,
-  SieraContractEntryPointFields,
+  SierraContractEntryPointFields,
 } from '../types/lib';
 import { felt } from './calldata/cairo';
 import { starkCurve } from './ec';
@@ -310,7 +310,7 @@ function hashEntryPoint(data: ContractEntryPointFields[]) {
   return poseidonHashMany(base);
 }
 
-export function computeCompiledClassHash(casm: CompiledSieraCasm) {
+export function computeCompiledClassHash(casm: CompiledSierraCasm) {
   const COMPILED_CLASS_VERSION = 'COMPILED_CLASS_V1';
 
   // Hash compiled class version
@@ -339,38 +339,38 @@ export function computeCompiledClassHash(casm: CompiledSieraCasm) {
   );
 }
 
-function hashEntryPointSiera(data: SieraContractEntryPointFields[]) {
+function hashEntryPointSierra(data: SierraContractEntryPointFields[]) {
   const base = data.flatMap((it: any) => {
     return [BigInt(it.selector), BigInt(it.function_idx)];
   });
   return poseidonHashMany(base);
 }
 
-function hashAbi(siera: CompiledSiera) {
-  const indentString = formatSpaces(stringify(siera.abi, null));
+function hashAbi(sierra: CompiledSierra) {
+  const indentString = formatSpaces(stringify(sierra.abi, null));
   return BigInt(addHexPrefix(starkCurve.keccak(utf8ToArray(indentString)).toString(16)));
 }
 
-export function computeSieraContractClassHash(siera: CompiledSiera) {
+export function computeSierraContractClassHash(sierra: CompiledSierra) {
   const CONTRACT_CLASS_VERSION = 'CONTRACT_CLASS_V0.1.0';
 
   // Hash class version
   const compiledClassVersion = BigInt(encodeShortString(CONTRACT_CLASS_VERSION));
 
   // Hash external entry points.
-  const externalEntryPointsHash = hashEntryPointSiera(siera.entry_points_by_type.EXTERNAL);
+  const externalEntryPointsHash = hashEntryPointSierra(sierra.entry_points_by_type.EXTERNAL);
 
   // Hash L1 handler entry points.
-  const l1Handlers = hashEntryPointSiera(siera.entry_points_by_type.L1_HANDLER);
+  const l1Handlers = hashEntryPointSierra(sierra.entry_points_by_type.L1_HANDLER);
 
   // Hash constructor entry points.
-  const constructor = hashEntryPointSiera(siera.entry_points_by_type.CONSTRUCTOR);
+  const constructor = hashEntryPointSierra(sierra.entry_points_by_type.CONSTRUCTOR);
 
   // Hash abi_hash.
-  const abiHash = hashAbi(siera);
+  const abiHash = hashAbi(sierra);
 
   // Hash Sierra program.
-  const sieraProgram = poseidonHashMany(siera.sierra_program.map((it: string) => BigInt(it)));
+  const sierraProgram = poseidonHashMany(sierra.sierra_program.map((it: string) => BigInt(it)));
 
   return toHex(
     poseidonHashMany([
@@ -379,21 +379,21 @@ export function computeSieraContractClassHash(siera: CompiledSiera) {
       l1Handlers,
       constructor,
       abiHash,
-      sieraProgram,
+      sierraProgram,
     ])
   );
 }
 
 /**
- * Compute ClassHash (siera or legacy) based on provided contract
- * @param contract CompiledContract | CompiledSiera | string
+ * Compute ClassHash (sierra or legacy) based on provided contract
+ * @param contract CompiledContract | CompiledSierra | string
  * @returns HexString ClassHash
  */
 export function computeContractClassHash(contract: CompiledContract | string) {
   const compiledContract = typeof contract === 'string' ? parse(contract) : contract;
 
   if ('sierra_program' in compiledContract) {
-    return computeSieraContractClassHash(compiledContract as CompiledSiera);
+    return computeSierraContractClassHash(compiledContract as CompiledSierra);
   }
 
   return computeLegacyContractClassHash(compiledContract as LegacyCompiledContract);

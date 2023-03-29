@@ -4,7 +4,7 @@ import { CairoContract } from '../types/lib/contract/index';
 import { CompleteDeclareContractPayload, DeclareContractPayload } from '../types/lib/index';
 import { computeCompiledClassHash, computeContractClassHash } from './hash';
 
-export function isSiera(contract: CairoContract | string) {
+export function isSierra(contract: CairoContract | string) {
   const compiledContract = typeof contract === 'string' ? parse(contract) : contract;
   return 'sierra_program' in compiledContract;
 }
@@ -14,7 +14,7 @@ export function extractContractHashes(
 ): CompleteDeclareContractPayload {
   const response = { ...payload } as CompleteDeclareContractPayload;
 
-  if (isSiera(payload.contract)) {
+  if (isSierra(payload.contract)) {
     if (!payload.compiledClassHash && payload.casm) {
       response.compiledClassHash = computeCompiledClassHash(payload.casm);
     }

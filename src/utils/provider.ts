@@ -1,5 +1,5 @@
-import { CompiledContract, ContractClass, RawCalldata, SieraContractClass } from '../types';
-import { isSiera } from './contract';
+import { CompiledContract, ContractClass, RawCalldata, SierraContractClass } from '../types';
+import { isSierra } from './contract';
 import { formatSpaces } from './hash';
 import { parse, stringify } from './json';
 import { isHex, toHex } from './num';
@@ -20,7 +20,7 @@ export function parseCalldata(calldata: RawCalldata = []) {
   });
 }
 
-export function createSieraContractClass(contract: SieraContractClass): any {
+export function createSierraContractClass(contract: SierraContractClass): any {
   const result = { ...contract } as any;
   delete result.sierra_program_debug_info;
   result.abi = formatSpaces(stringify(contract.abi));
@@ -34,7 +34,7 @@ export function parseContract(contract: CompiledContract | string) {
   const parsedContract =
     typeof contract === 'string' ? (parse(contract) as CompiledContract) : contract;
 
-  if (!isSiera(contract)) {
+  if (!isSierra(contract)) {
     return {
       ...parsedContract,
       // TODO: Why do we gzip program object?
@@ -42,5 +42,5 @@ export function parseContract(contract: CompiledContract | string) {
     } as ContractClass;
   }
 
-  return createSieraContractClass(parsedContract as SieraContractClass);
+  return createSierraContractClass(parsedContract as SierraContractClass);
 }

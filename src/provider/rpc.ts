@@ -286,8 +286,8 @@ export class RpcProvider implements ProviderInterface {
         block_id,
       }).then(this.responseParser.parseFeeEstimateResponse);
     }
-    // TODO: When RPC Update implement Siera
-    throw new Error('RPC do not support Siera Contracts yet');
+    // TODO: When RPC Update implement Sierra
+    throw new Error('RPC do not support Sierra Contracts yet');
   }
 
   public async getDeployAccountEstimateFee(
@@ -340,8 +340,8 @@ export class RpcProvider implements ProviderInterface {
         },
       });
     }
-    // TODO: When RPC Update implement Siera
-    throw new Error('RPC do not support Siera Contracts yet');
+    // TODO: When RPC Update implement Sierra
+    throw new Error('RPC do not support Sierra Contracts yet');
   }
 
   public async deployAccountContract(
