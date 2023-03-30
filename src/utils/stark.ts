@@ -2,11 +2,13 @@ import { Signature, getStarkKey, utils } from 'micro-starknet';
 import { gzip } from 'pako';
 
 import {
+  AnySignatureType,
+  ArraySignatureType,
   Calldata,
   CompressedProgram,
   Program,
   RawArgs,
-  Signature as SignatureType,
+  WeierstrassSignatureType,
 } from '../types';
 import { addHexPrefix, btoaUniversal } from './encode';
 import { stringify } from './json';
@@ -40,26 +42,32 @@ export function makeAddress(input: string): string {
   return addHexPrefix(input).toLowerCase();
 }
 
-export function formatSignature(sig?: SignatureType): string[] {
-  if (!sig) return [];
+export function formatSignature(sig?: AnySignatureType): ArraySignatureType {
+  if (!sig) throw Error('formatSignature: provided signature is undefined');
+  if (typeof sig === 'string' || typeof sig === 'number') {
+    return [toHex(sig)];
+  }
+  if (Array.isArray(sig)) {
+    return sig.map((it) => toHex(it));
+  }
   try {
     const { r, s } = sig;
     return [toHex(r), toHex(s)];
   } catch (e) {
-    return [];
+    throw new Error('Signature need to be WeierstrassSignatureType or an array');
   }
 }
 
-export function signatureToDecimalArray(sig?: SignatureType): string[] {
+export function signatureToDecimalArray(sig?: AnySignatureType): ArraySignatureType {
   return bigNumberishArrayToDecimalStringArray(formatSignature(sig));
 }
 
-export function signatureToHexArray(sig?: SignatureType): string[] {
+export function signatureToHexArray(sig?: AnySignatureType): ArraySignatureType {
   return bigNumberishArrayToHexadecimalStringArray(formatSignature(sig));
 }
 
-export function parseSignature(sig?: string[]) {
-  if (!sig) return undefined;
+export function parseSignature(sig?: ArraySignatureType): WeierstrassSignatureType {
+  if (!sig) throw Error('parseSignature: provided signature is undefined');
 
   const [r, s] = sig;
   return new Signature(toBigInt(r), toBigInt(s));

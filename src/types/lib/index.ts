@@ -3,10 +3,10 @@ import { weierstrass } from '../../utils/ec';
 import type { BigNumberish } from '../../utils/num';
 import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 
-// Common Signature Type which needs to be imported from weierstrass
-// and imported at many places
-// This is because stark.ts doesn't export SignatureType
-export type Signature = weierstrass.SignatureType;
+export type WeierstrassSignatureType = weierstrass.SignatureType;
+export type ArraySignatureType = string[];
+export type AnySignatureType = string | number | ArraySignatureType | WeierstrassSignatureType;
+export type Signature = ArraySignatureType | WeierstrassSignatureType;
 
 export type RawCalldata = BigNumberish[];
 export type AllowArray<T> = T | T[];

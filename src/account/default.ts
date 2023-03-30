@@ -41,9 +41,14 @@ import {
   transactionVersion,
   transactionVersion_2,
 } from '../utils/hash';
-import { BigNumberish, toBigInt, toCairoBool, toHex } from '../utils/num';
+import { BigNumberish, toBigInt, toCairoBool } from '../utils/num';
 import { parseContract } from '../utils/provider';
-import { compileCalldata, estimatedFeeToMaxFee, randomAddress } from '../utils/stark';
+import {
+  compileCalldata,
+  estimatedFeeToMaxFee,
+  formatSignature,
+  randomAddress,
+} from '../utils/stark';
 import { fromCallsToExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
@@ -470,7 +475,7 @@ export class Account extends Provider implements AccountInterface {
         entrypoint: 'isValidSignature',
         calldata: compileCalldata({
           hash: toBigInt(hash).toString(),
-          signature: [toHex(signature.r), toHex(signature.s)],
+          signature: formatSignature(signature),
         }),
       });
       return true;
