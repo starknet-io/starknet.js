@@ -25,6 +25,7 @@ import {
   InvocationsSignerDetails,
   InvokeFunctionResponse,
   MultiDeployContractResponse,
+  Nonce,
   Signature,
   TransactionBulk,
   TransactionStatus,
@@ -66,7 +67,7 @@ export class Account extends Provider implements AccountInterface {
         : pkOrSigner;
   }
 
-  public async getNonce(blockIdentifier?: BlockIdentifier): Promise<BigNumberish> {
+  public async getNonce(blockIdentifier?: BlockIdentifier): Promise<Nonce> {
     return super.getNonceForAddress(this.address, blockIdentifier);
   }
 
@@ -512,7 +513,7 @@ export class Account extends Provider implements AccountInterface {
         break;
     }
 
-    return feeEstimate.suggestedMaxFee.toString();
+    return feeEstimate.suggestedMaxFee;
   }
 
   /**
