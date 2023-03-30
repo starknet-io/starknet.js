@@ -19,6 +19,7 @@ import {
   InvocationsDetails,
   InvokeFunctionResponse,
   MultiDeployContractResponse,
+  Nonce,
   Signature,
   TransactionBulk,
   TransactionSimulation,
@@ -299,7 +300,7 @@ export abstract class AccountInterface extends ProviderInterface {
    * @param  {BlockIdentifier} blockIdentifier - optional blockIdentifier. Defaults to 'pending'
    * @returns nonce of the account
    */
-  public abstract getNonce(blockIdentifier?: BlockIdentifier): Promise<BigNumberish>;
+  public abstract getNonce(blockIdentifier?: BlockIdentifier): Promise<Nonce>;
 
   /**
    * Gets Suggested Max Fee based on the transaction type
@@ -311,7 +312,7 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract getSuggestedMaxFee(
     estimateFeeAction: EstimateFeeAction,
     details: EstimateFeeDetails
-  ): Promise<BigNumberish>;
+  ): Promise<bigint>;
 
   /**
    * Simulates the transaction and returns the transaction trace and estimated fee.
