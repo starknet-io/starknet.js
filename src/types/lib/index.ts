@@ -79,10 +79,13 @@ export type Invocation = CallDetails & { signature?: Signature };
 
 export type Call = CallDetails & { entrypoint: string };
 
+export type CairoVersion = '0' | '1';
+
 export type InvocationsDetails = {
   nonce?: BigNumberish;
   maxFee?: BigNumberish;
   version?: BigNumberish;
+  cairoVersion?: CairoVersion;
 };
 
 /**
@@ -159,5 +162,11 @@ export type waitForTransactionOptions = {
   retryInterval?: number;
   successStates?: Array<TransactionStatus>;
 };
+
+export interface CallStruct {
+  to: string;
+  selector: string;
+  calldata: string[];
+}
 
 export * from './contract';

@@ -8,7 +8,7 @@ import {
   calculateTransactionHash,
 } from '../utils/hash';
 import { toHex } from '../utils/num';
-import { fromCallsToExecuteCalldata } from '../utils/transaction';
+import { getExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { SignerInterface } from './interface';
 
@@ -38,7 +38,7 @@ export class Signer implements SignerInterface {
     }
     // now use abi to display decoded data somewhere, but as this signer is headless, we can't do that
 
-    const calldata = fromCallsToExecuteCalldata(transactions);
+    const calldata = getExecuteCalldata(transactions, transactionsDetail.cairoVersion);
 
     const msgHash = calculateTransactionHash(
       transactionsDetail.walletAddress,
