@@ -9,7 +9,7 @@ export interface InvocationsSignerDetails extends Required<InvocationsDetails> {
 
 export interface DeclareSignerDetails {
   classHash: string;
-  senderAddress: BigNumberish;
+  senderAddress: string;
   chainId: StarknetChainId;
   maxFee: BigNumberish;
   version: BigNumberish;
@@ -18,7 +18,7 @@ export interface DeclareSignerDetails {
 }
 
 export type DeployAccountSignerDetails = Required<DeployAccountContractPayload> &
-  Required<InvocationsDetails> & {
+  Omit<Required<InvocationsDetails>, 'cairoVersion'> & {
     contractAddress: BigNumberish;
     chainId: StarknetChainId;
   };

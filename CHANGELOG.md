@@ -1,3 +1,26 @@
+# [5.4.0](https://github.com/0xs34n/starknet.js/compare/v5.3.0...v5.4.0) (2023-04-03)
+
+### Bug Fixes
+
+- adjust suggested max fee response type ([78b1f81](https://github.com/0xs34n/starknet.js/commit/78b1f814f2a65fa0b28ed27912b69d3dfbc022ad))
+
+### Features
+
+- support cairo1 execute calldata ([1f7f001](https://github.com/0xs34n/starknet.js/commit/1f7f00155ae89ff871cdf987cd3b5238377d5450))
+
+# [5.3.0](https://github.com/0xs34n/starknet.js/compare/v5.2.0...v5.3.0) (2023-03-29)
+
+### Features
+
+- declare v2 from account ([bc861b7](https://github.com/0xs34n/starknet.js/commit/bc861b753b443b4f75f9af7d1d9eb1a350273376))
+- declare v2 intermidiate ([a8fdfe3](https://github.com/0xs34n/starknet.js/commit/a8fdfe3e6f00ee08f7aec55a8babda46043f1783))
+- get_compiled_class_by_class_hash, get_class_by_hash, ContractClass, rpc hotfix ([fc33d19](https://github.com/0xs34n/starknet.js/commit/fc33d196adadbf899e450aec88ef9d8d7365f726))
+- get_state_update, fix types, fix responseParser, fix BigNumberish api response, fix OPENRPC ([50a2c29](https://github.com/0xs34n/starknet.js/commit/50a2c29b53feb960a6b2a0eea7651c55cff5fc0b))
+- minimal changes api ([7cec344](https://github.com/0xs34n/starknet.js/commit/7cec344c5b9a70bac9597354b20773388e5a4145))
+- remove version 0 invoke and declare ([08bd65c](https://github.com/0xs34n/starknet.js/commit/08bd65cf20d6db0fecb1fb014b2464f19dc64a6c))
+- skipValidate full impl ([8b20e2e](https://github.com/0xs34n/starknet.js/commit/8b20e2e461ae73b9b6840972ea6c17a00b3efddc))
+- update hashing to cairo-lang 0.11.0, cairo 1.0.0.alpha-6 ([b6669b5](https://github.com/0xs34n/starknet.js/commit/b6669b577b159bd98369a16e295ba847eea55688))
+
 # [5.2.0](https://github.com/0xs34n/starknet.js/compare/v5.1.1...v5.2.0) (2023-03-14)
 
 ### Features
