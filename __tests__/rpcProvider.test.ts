@@ -129,7 +129,7 @@ describeIfRpc('RPCProvider', () => {
       const contractClass = await rpcProvider.getClass(
         '0x058d97f7d76e78f44905cc30cb65b91ea49a4b908a76703c54197bca90f81773'
       );
-      expect(contractClass).toMatchSchemaRef('ContractClass');
+      expect(contractClass).toMatchSchemaRef('LegacyContractClass');
     });
   });
 });

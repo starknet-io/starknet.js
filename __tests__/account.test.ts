@@ -1,5 +1,13 @@
 import typedDataExample from '../__mocks__/typedDataExample.json';
-import { Account, Contract, Provider, TransactionStatus, ec, stark } from '../src';
+import {
+  Account,
+  Contract,
+  Provider,
+  SequencerProvider,
+  TransactionStatus,
+  ec,
+  stark,
+} from '../src';
 import { uint256 } from '../src/utils/calldata/cairo';
 import { parseUDCEvent } from '../src/utils/events';
 import { calculateContractAddressFromHash, feeTransactionVersion } from '../src/utils/hash';
@@ -499,9 +507,10 @@ describe('deploy and test Wallet', () => {
 describeIfDevnetSequencer('not implemented for RPC', () => {
   // Testnet will not accept declare v2 with same compiledClassHash,
   // aka. we can't redeclare same contract
-  describe('Test Cairo 1', () => {
-    const provider = getTestProvider();
+  describe('Cairo 1', () => {
+    const provider = getTestProvider() as SequencerProvider;
     const account = getTestAccount(provider);
+    let classHash;
     initializeMatcher(expect);
 
     test('Declare v2 - Hello Cairo 1 contract', async () => {
@@ -509,8 +518,19 @@ describeIfDevnetSequencer('not implemented for RPC', () => {
         contract: compiledHelloSierra,
         casm: compiledHelloSierraCasm,
       });
+      classHash = declareTx.class_hash;
       await provider.waitForTransaction(declareTx.transaction_hash);
       expect(declareTx).toMatchSchemaRef('DeclareContractResponse');
+    });
+
+    test('getCompiledClassByClassHash', async () => {
+      const compiledClass = await provider.getCompiledClassByClassHash(classHash);
+      expect(compiledClass).toMatchSchemaRef('CompiledClass');
+    });
+
+    test('GetClassByHash', async () => {
+      const classResponse = await provider.getClassByHash(classHash);
+      expect(classResponse).toMatchSchemaRef('SierraContractClass');
     });
   });
 });

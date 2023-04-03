@@ -92,6 +92,37 @@
       },
       "required": ["transaction_hash", "class_hash"]
     },
+    "CompiledClass": {
+      "type": "object",
+      "properties": {
+        "prime": {
+          "type": "string"
+        },
+        "compiler_version": {
+          "type": "string"
+        },
+        "bytecode": {
+          "type": "array"
+        },
+        "hints": {
+          "type": "array"
+        },
+        "pythonic_hints": {
+          "type": "array"
+        },
+        "entry_points_by_type": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "prime",
+        "compiler_version",
+        "bytecode",
+        "hints",
+        "pythonic_hints",
+        "entry_points_by_type"
+      ]
+    },
     "TransactionSimulation": {
       "type": "object",
       "properties": {

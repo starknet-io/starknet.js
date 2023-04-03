@@ -13,6 +13,7 @@ import {
   GetTransactionResponse,
   InvokeFunctionResponse,
   Sequencer,
+  SierraContractClass,
   StateUpdateResponse,
   TransactionSimulationResponse,
 } from '../../types';
@@ -211,6 +212,14 @@ export class SequencerAPIResponseParser extends ResponseParser {
         storage_diffs,
         nonces,
       },
+    };
+  }
+
+  // TODO: Define response as new type as it diff from ContractClass
+  public parseGetClassByHashResponse(res: any): SierraContractClass {
+    return {
+      ...res,
+      abi: JSON.parse(res.abi),
     };
   }
 }
