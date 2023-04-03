@@ -1,3 +1,13 @@
+# [5.4.0](https://github.com/0xs34n/starknet.js/compare/v5.3.0...v5.4.0) (2023-04-03)
+
+### Bug Fixes
+
+- adjust suggested max fee response type ([78b1f81](https://github.com/0xs34n/starknet.js/commit/78b1f814f2a65fa0b28ed27912b69d3dfbc022ad))
+
+### Features
+
+- support cairo1 execute calldata ([1f7f001](https://github.com/0xs34n/starknet.js/commit/1f7f00155ae89ff871cdf987cd3b5238377d5450))
+
 # [5.3.0](https://github.com/0xs34n/starknet.js/compare/v5.2.0...v5.3.0) (2023-03-29)
 
 ### Features
