@@ -1,3 +1,10 @@
+## [5.4.1](https://github.com/0xs34n/starknet.js/compare/v5.4.0...v5.4.1) (2023-04-03)
+
+### Bug Fixes
+
+- remove AnySignatureType and parseSignature method ([358bfad](https://github.com/0xs34n/starknet.js/commit/358bfad8e70ab3d4b2c784e0444780c4d7c5f71a))
+- signature tight flexible resolution ([4990cd8](https://github.com/0xs34n/starknet.js/commit/4990cd8a4d6fd8b87c3016fd27c7eb1b2d5a4a8a))
+
 # [5.4.0](https://github.com/0xs34n/starknet.js/compare/v5.3.0...v5.4.0) (2023-04-03)
 
 ### Bug Fixes
