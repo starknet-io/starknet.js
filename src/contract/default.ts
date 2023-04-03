@@ -8,6 +8,7 @@ import {
   FunctionAbi,
   InvokeFunctionResponse,
   Overrides,
+  Result,
   StructAbi,
 } from '../types';
 import assert from '../utils/assert';
@@ -190,7 +191,7 @@ export class Contract implements ContractInterface {
     method: string,
     args: Array<any> = [],
     options: CallOptions = { parseRequest: true, parseResponse: true, formatResponse: undefined }
-  ): Promise<object> {
+  ): Promise<Result> {
     assert(this.address !== null, 'contract is not connected to an address');
     const blockIdentifier = options?.blockIdentifier || undefined;
     let calldata = args[0];
