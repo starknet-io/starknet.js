@@ -5,7 +5,6 @@ import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract'
 
 export type WeierstrassSignatureType = weierstrass.SignatureType;
 export type ArraySignatureType = string[];
-export type AnySignatureType = string | number | ArraySignatureType | WeierstrassSignatureType;
 export type Signature = ArraySignatureType | WeierstrassSignatureType;
 
 export type RawCalldata = BigNumberish[];

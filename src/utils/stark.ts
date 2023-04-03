@@ -1,14 +1,13 @@
-import { Signature, getStarkKey, utils } from 'micro-starknet';
+import { getStarkKey, utils } from 'micro-starknet';
 import { gzip } from 'pako';
 
 import {
-  AnySignatureType,
   ArraySignatureType,
   Calldata,
   CompressedProgram,
   Program,
   RawArgs,
-  WeierstrassSignatureType,
+  Signature,
 } from '../types';
 import { addHexPrefix, btoaUniversal } from './encode';
 import { stringify } from './json';
@@ -42,11 +41,8 @@ export function makeAddress(input: string): string {
   return addHexPrefix(input).toLowerCase();
 }
 
-export function formatSignature(sig?: AnySignatureType): ArraySignatureType {
+export function formatSignature(sig?: Signature): ArraySignatureType {
   if (!sig) throw Error('formatSignature: provided signature is undefined');
-  if (typeof sig === 'string' || typeof sig === 'number') {
-    return [toHex(sig)];
-  }
   if (Array.isArray(sig)) {
     return sig.map((it) => toHex(it));
   }
@@ -54,23 +50,16 @@ export function formatSignature(sig?: AnySignatureType): ArraySignatureType {
     const { r, s } = sig;
     return [toHex(r), toHex(s)];
   } catch (e) {
-    throw new Error('Signature need to be WeierstrassSignatureType or an array');
+    throw new Error('Signature need to be weierstrass.SignatureType or an array for custom');
   }
 }
 
-export function signatureToDecimalArray(sig?: AnySignatureType): ArraySignatureType {
+export function signatureToDecimalArray(sig?: Signature): ArraySignatureType {
   return bigNumberishArrayToDecimalStringArray(formatSignature(sig));
 }
 
-export function signatureToHexArray(sig?: AnySignatureType): ArraySignatureType {
+export function signatureToHexArray(sig?: Signature): ArraySignatureType {
   return bigNumberishArrayToHexadecimalStringArray(formatSignature(sig));
-}
-
-export function parseSignature(sig?: ArraySignatureType): WeierstrassSignatureType {
-  if (!sig) throw Error('parseSignature: provided signature is undefined');
-
-  const [r, s] = sig;
-  return new Signature(toBigInt(r), toBigInt(s));
 }
 
 /**
