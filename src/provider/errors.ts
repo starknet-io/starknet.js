@@ -1,5 +1,5 @@
 /* eslint-disable max-classes-per-file */
-import { CustomError } from 'ts-custom-error';
+import { CustomError } from 'ts-custom-error/dist/custom-error';
 
 export class LibraryError extends CustomError {}
 
