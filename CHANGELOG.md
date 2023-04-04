@@ -1,3 +1,9 @@
+## [5.4.2](https://github.com/0xs34n/starknet.js/compare/v5.4.1...v5.4.2) (2023-04-04)
+
+### Bug Fixes
+
+- implement custom ts error localy ([fa90a3e](https://github.com/0xs34n/starknet.js/commit/fa90a3e7dcbe8c0952b0681be903dffb4b4c74c6))
+
 ## [5.4.1](https://github.com/0xs34n/starknet.js/compare/v5.4.0...v5.4.1) (2023-04-03)
 
 ### Bug Fixes
