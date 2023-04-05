@@ -1,3 +1,5 @@
+import { Signature } from 'micro-starknet';
+
 import typedDataExample from '../__mocks__/typedDataExample.json';
 import {
   Account,
@@ -192,7 +194,7 @@ describe('deploy and test Wallet', () => {
     // change the signature to make it invalid
     const r2 = toBigInt(r) + 123n;
 
-    const signature2 = stark.parseSignature([r2.toString(), s]);
+    const signature2 = new Signature(toBigInt(r2.toString()), toBigInt(s));
 
     if (!signature2) return;
 

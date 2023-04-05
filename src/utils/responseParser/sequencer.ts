@@ -18,7 +18,6 @@ import {
   TransactionSimulationResponse,
 } from '../../types';
 import { toBigInt } from '../num';
-import { parseSignature } from '../stark';
 import { ResponseParser } from '.';
 
 export class SequencerAPIResponseParser extends ResponseParser {
@@ -51,8 +50,7 @@ export class SequencerAPIResponseParser extends ResponseParser {
         'sender_address' in res.transaction
           ? (res.transaction.sender_address as string)
           : undefined,
-      signature:
-        'signature' in res.transaction ? parseSignature(res.transaction.signature) : undefined,
+      signature: 'signature' in res.transaction ? res.transaction.signature : undefined,
       transaction_hash:
         'transaction_hash' in res.transaction ? res.transaction.transaction_hash : undefined,
       version: 'version' in res.transaction ? (res.transaction.version as string) : undefined,

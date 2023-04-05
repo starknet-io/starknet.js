@@ -1,4 +1,4 @@
-import { Call, ParsedStruct } from '../types';
+import { CairoVersion, Call, CallStruct, ParsedStruct } from '../types';
 import { getSelectorFromName } from './hash';
 import { BigNumberish, bigNumberishArrayToDecimalStringArray, toBigInt } from './num';
 
@@ -53,4 +53,48 @@ export const fromCallsToExecuteCalldataWithNonce = (
   nonce: BigNumberish
 ): string[] => {
   return [...fromCallsToExecuteCalldata(calls), toBigInt(nonce).toString()];
+};
+
+/**
+ * Transforms a list of Calls, each with their own calldata, into
+ * two arrays: one with the entrypoints, and one with the concatenated calldata.
+ * @param calls
+ * @returns
+ */
+export const transformCallsToMulticallArrays_cairo1 = (calls: Call[]) => {
+  const callArray = calls.map<CallStruct>((call) => ({
+    to: toBigInt(call.contractAddress).toString(10),
+    selector: toBigInt(getSelectorFromName(call.entrypoint)).toString(10),
+    calldata: bigNumberishArrayToDecimalStringArray(call.calldata || []),
+  }));
+  return callArray;
+};
+
+/**
+ * Transforms a list of calls in the full flattened calldata expected
+ * by the __execute__ protocol.
+ * @param calls
+ * @returns
+ */
+export const fromCallsToExecuteCalldata_cairo1 = (calls: Call[]): string[] => {
+  const callArray = transformCallsToMulticallArrays_cairo1(calls);
+  return [
+    callArray.length.toString(), // Call size
+    ...callArray
+      .map(({ to, selector, calldata }) => [to, selector, calldata.length.toString(), ...calldata])
+      .flat(),
+  ];
+};
+
+/**
+ *
+ * @param calls Call array
+ * @param cairoVersion Defaults to 0
+ * @returns string[] of calldata
+ */
+export const getExecuteCalldata = (calls: Call[], cairoVersion: CairoVersion = '0'): string[] => {
+  if (cairoVersion === '1') {
+    return fromCallsToExecuteCalldata_cairo1(calls);
+  }
+  return fromCallsToExecuteCalldata(calls);
 };
