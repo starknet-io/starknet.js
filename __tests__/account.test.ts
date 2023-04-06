@@ -512,9 +512,9 @@ describeIfDevnetSequencer('not implemented for RPC', () => {
   describe('Cairo 1', () => {
     const provider = getTestProvider() as SequencerProvider;
     const account = getTestAccount(provider);
-    let classHash;
-    let contractAddress;
-    let declareV2Tx;
+    let classHash: any;
+    let contractAddress: any;
+    let declareV2Tx: any;
     initializeMatcher(expect);
 
     beforeAll(async () => {
