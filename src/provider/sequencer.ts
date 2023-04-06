@@ -329,7 +329,12 @@ export class SequencerProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<ContractClass> {
     return this.fetchEndpoint('get_full_contract', { blockIdentifier, contractAddress }).then(
-      parseContract
+      (res) => {
+        if (isSierra(res)) {
+          return this.responseParser.parseSierraContractClassResponse(res);
+        }
+        return parseContract(res);
+      }
     );
   }
 
@@ -346,7 +351,7 @@ export class SequencerProvider implements ProviderInterface {
   ): Promise<ContractClass> {
     return this.fetchEndpoint('get_class_by_hash', { classHash, blockIdentifier }).then((res) => {
       if (isSierra(res)) {
-        return this.responseParser.parseGetClassByHashResponse(res);
+        return this.responseParser.parseSierraContractClassResponse(res);
       }
       return parseContract(res);
     });

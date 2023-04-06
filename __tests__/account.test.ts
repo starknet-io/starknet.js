@@ -513,16 +513,24 @@ describeIfDevnetSequencer('not implemented for RPC', () => {
     const provider = getTestProvider() as SequencerProvider;
     const account = getTestAccount(provider);
     let classHash;
+    let contractAddress;
+    let declareV2Tx;
     initializeMatcher(expect);
 
-    test('Declare v2 - Hello Cairo 1 contract', async () => {
-      const declareTx = await account.declare({
+    beforeAll(async () => {
+      declareV2Tx = await account.declare({
         contract: compiledHelloSierra,
         casm: compiledHelloSierraCasm,
       });
-      classHash = declareTx.class_hash;
-      await provider.waitForTransaction(declareTx.transaction_hash);
-      expect(declareTx).toMatchSchemaRef('DeclareContractResponse');
+      classHash = declareV2Tx.class_hash;
+      await provider.waitForTransaction(declareV2Tx.transaction_hash);
+      const { transaction_hash, contract_address } = await account.deploy({ classHash });
+      [contractAddress] = contract_address;
+      await provider.waitForTransaction(transaction_hash);
+    });
+
+    test('Declare v2 - Hello Cairo 1 contract', async () => {
+      expect(declareV2Tx).toMatchSchemaRef('DeclareContractResponse');
     });
 
     test('getCompiledClassByClassHash', async () => {
@@ -533,6 +541,16 @@ describeIfDevnetSequencer('not implemented for RPC', () => {
     test('GetClassByHash', async () => {
       const classResponse = await provider.getClassByHash(classHash);
       expect(classResponse).toMatchSchemaRef('SierraContractClass');
+    });
+
+    test('GetClassAt', async () => {
+      const classResponse = await provider.getClassAt(contractAddress);
+      expect(classResponse).toMatchSchemaRef('SierraContractClass');
+    });
+
+    test('getCompiledClassByClassHash', async () => {
+      const compiledClass = await provider.getCompiledClassByClassHash(classHash);
+      expect(compiledClass).toMatchSchemaRef('CairoAssembly');
     });
   });
 });

@@ -214,7 +214,7 @@ export class SequencerAPIResponseParser extends ResponseParser {
   }
 
   // TODO: Define response as new type as it diff from ContractClass
-  public parseGetClassByHashResponse(res: any): SierraContractClass {
+  public parseSierraContractClassResponse(res: any): SierraContractClass {
     return {
       ...res,
       abi: JSON.parse(res.abi),

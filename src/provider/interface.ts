@@ -300,7 +300,9 @@ export abstract class ProviderInterface {
   /**
    * Wait for the transaction to be accepted
    * @param txHash - transaction hash
-   * @param retryInterval - retry interval
+   * @param options
+   * - (optional) retryInterval: number | undefined;
+   * - (optional) successStates: TransactionStatus[] | undefined;
    * @return GetTransactionReceiptResponse
    */
   public abstract waitForTransaction(

@@ -36,6 +36,37 @@
         }
       },
       "required": ["sierra_program", "contract_class_version", "entry_points_by_type", "abi"]
+    },
+    "CairoAssembly": {
+      "type": "object",
+      "properties": {
+        "bytecode": {
+          "type": "array"
+        },
+        "compiler_version": {
+          "type": "string"
+        },
+        "entry_points_by_type": {
+          "type": "object"
+        },
+        "hints": {
+          "type": "array"
+        },
+        "prime": {
+          "type": "string"
+        },
+        "pythonic_hints": {
+          "type": "array"
+        }
+      },
+      "required": [
+        "bytecode",
+        "compiler_version",
+        "entry_points_by_type",
+        "hints",
+        "prime",
+        "pythonic_hints"
+      ]
     }
   }
 }
