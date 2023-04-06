@@ -6,11 +6,11 @@ Switch to target tag version alpha6
 
 # 1.1. Compile to Starknet Sierra json
 
-`cargo run --bin starknet-compile -- hello.cairo hello.json --add-pythonic-hints`
+`cargo run --bin starknet-compile -- hello.cairo hello.json`
 
 # 1.2. Compile to Casm
 
-`cargo run --bin starknet-sierra-compile -- hello.json hello.casm --add-pythonic-hints`
+`cargo run --bin starknet-sierra-compile -- hello.json hello.casm`
 
 # 2. Get Compiled Class Hash & Class Hash
 

@@ -518,7 +518,7 @@ describeIfDevnetSequencer('not implemented for RPC', () => {
     initializeMatcher(expect);
 
     beforeAll(async () => {
-      /*       declareV2Tx = await account.declare({
+      declareV2Tx = await account.declare({
         contract: compiledHelloSierra,
         casm: compiledHelloSierraCasm,
       });
@@ -526,7 +526,7 @@ describeIfDevnetSequencer('not implemented for RPC', () => {
       await provider.waitForTransaction(declareV2Tx.transaction_hash);
       const { transaction_hash, contract_address } = await account.deploy({ classHash });
       [contractAddress] = contract_address;
-      await provider.waitForTransaction(transaction_hash); */
+      await provider.waitForTransaction(transaction_hash);
     });
 
     test('Declare v2 - Hello Cairo 1 contract', async () => {
