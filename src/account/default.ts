@@ -421,8 +421,8 @@ export class Account extends Provider implements AccountInterface {
     payload: DeclareAndDeployContractPayload,
     details?: InvocationsDetails | undefined
   ): Promise<DeclareDeployUDCResponse> {
-    const { contract, constructorCalldata, salt, unique } = payload;
-    const { transaction_hash, class_hash } = await this.declare({ contract }, details);
+    const { constructorCalldata, salt, unique } = payload;
+    const { transaction_hash, class_hash } = await this.declare(payload, details);
     const declare = await this.waitForTransaction(transaction_hash, {
       successStates: [TransactionStatus.ACCEPTED_ON_L2],
     });
