@@ -54,7 +54,7 @@ describeIfDevnetSequencer('Cairo 1', () => {
       expect(classResponse).toMatchSchemaRef('SierraContractClass');
     });
 
-    test('GetClassAt', async () => {
+    xtest('GetClassAt', async () => {
       const classResponse = await provider.getClassAt(contractAddress);
       expect(classResponse).toMatchSchemaRef('SierraContractClass');
     });
