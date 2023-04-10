@@ -33,7 +33,7 @@ export class CallData {
       const invocableFunctionNames = this.abi
         .filter((abi) => {
           if (abi.type !== 'function') return false;
-          const isView = abi.stateMutability === 'view';
+          const isView = abi.stateMutability === 'view' || abi.state_mutability === 'view';
           return type === 'INVOKE' ? !isView : isView;
         })
         .map((abi) => abi.name);

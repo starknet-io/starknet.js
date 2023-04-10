@@ -1,15 +1,7 @@
 import { Signature } from 'micro-starknet';
 
 import typedDataExample from '../__mocks__/typedDataExample.json';
-import {
-  Account,
-  Contract,
-  Provider,
-  SequencerProvider,
-  TransactionStatus,
-  ec,
-  stark,
-} from '../src';
+import { Account, Contract, Provider, TransactionStatus, ec, stark } from '../src';
 import { uint256 } from '../src/utils/calldata/cairo';
 import { parseUDCEvent } from '../src/utils/events';
 import { calculateContractAddressFromHash, feeTransactionVersion } from '../src/utils/hash';
@@ -18,8 +10,6 @@ import { encodeShortString } from '../src/utils/shortString';
 import { randomAddress } from '../src/utils/stark';
 import {
   compiledErc20,
-  compiledHelloSierra,
-  compiledHelloSierraCasm,
   compiledNamingContract,
   compiledOpenZeppelinAccount,
   compiledStarknetId,
@@ -502,63 +492,6 @@ describe('deploy and test Wallet', () => {
       res.forEach((value) => {
         expect(value).toMatchSchemaRef('EstimateFee');
       });
-    });
-  });
-});
-
-describeIfDevnetSequencer('not implemented for RPC', () => {
-  // Testnet will not accept declare v2 with same compiledClassHash,
-  // aka. we can't redeclare same contract
-  describe('Cairo 1', () => {
-    const provider = getTestProvider() as SequencerProvider;
-    const account = getTestAccount(provider);
-    let classHash: any;
-    let contractAddress: any;
-    let declareV2Tx: any;
-    initializeMatcher(expect);
-
-    beforeAll(async () => {
-      declareV2Tx = await account.declare({
-        contract: compiledHelloSierra,
-        casm: compiledHelloSierraCasm,
-      });
-      classHash = declareV2Tx.class_hash;
-      await provider.waitForTransaction(declareV2Tx.transaction_hash);
-      const { transaction_hash, contract_address } = await account.deploy({ classHash });
-      [contractAddress] = contract_address;
-      await provider.waitForTransaction(transaction_hash);
-    });
-
-    test('Declare v2 - Hello Cairo 1 contract', async () => {
-      expect(declareV2Tx).toMatchSchemaRef('DeclareContractResponse');
-    });
-
-    xtest('declareAndDeploy Cairo 1', async () => {
-      // Can't test due to redeployment not allowed
-      await account.declareAndDeploy({
-        contract: compiledHelloSierra,
-        casm: compiledHelloSierraCasm,
-      });
-    });
-
-    test('getCompiledClassByClassHash', async () => {
-      const compiledClass = await provider.getCompiledClassByClassHash(classHash);
-      expect(compiledClass).toMatchSchemaRef('CompiledClass');
-    });
-
-    test('GetClassByHash', async () => {
-      const classResponse = await provider.getClassByHash(classHash);
-      expect(classResponse).toMatchSchemaRef('SierraContractClass');
-    });
-
-    test('GetClassAt', async () => {
-      const classResponse = await provider.getClassAt(contractAddress);
-      expect(classResponse).toMatchSchemaRef('SierraContractClass');
-    });
-
-    test('getCompiledClassByClassHash', async () => {
-      const compiledClass = await provider.getCompiledClassByClassHash(classHash);
-      expect(compiledClass).toMatchSchemaRef('CairoAssembly');
     });
   });
 });

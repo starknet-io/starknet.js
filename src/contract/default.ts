@@ -63,7 +63,7 @@ function buildInvoke(contract: Contract, functionAbi: FunctionAbi): AsyncContrac
  * Adds call/invoke methods to the contract
  */
 function buildDefault(contract: Contract, functionAbi: FunctionAbi): AsyncContractFunction {
-  if (functionAbi.stateMutability === 'view') {
+  if (functionAbi.stateMutability === 'view' || functionAbi.state_mutability === 'view') {
     return buildCall(contract, functionAbi);
   }
   return buildInvoke(contract, functionAbi);
