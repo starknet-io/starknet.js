@@ -1,3 +1,13 @@
+# [5.5.0](https://github.com/0xs34n/starknet.js/compare/v5.4.2...v5.5.0) (2023-04-10)
+
+### Bug Fixes
+
+- update DeclareAndDeploy with cairo 1 declare ([71072cf](https://github.com/0xs34n/starknet.js/commit/71072cffadb8ac118780cec21cb8c4f83e74d7ae))
+
+### Features
+
+- response parsing and types ([09a46af](https://github.com/0xs34n/starknet.js/commit/09a46af02e88376dc49e0aa39468fded99b94ee2))
+
 ## [5.4.2](https://github.com/0xs34n/starknet.js/compare/v5.4.1...v5.4.2) (2023-04-04)
 
 ### Bug Fixes
