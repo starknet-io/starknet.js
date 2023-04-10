@@ -1,7 +1,7 @@
 {
   "$id": "libSchemas",
   "definitions": {
-    "ContractClass": {
+    "LegacyContractClass": {
       "type": "object",
       "properties": {
         "program": {
@@ -15,6 +15,27 @@
         }
       },
       "required": ["program", "entry_points_by_type"]
+    },
+    "SierraContractClass": {
+      "type": "object",
+      "properties": {
+        "sierra_program": {
+          "type": "array"
+        },
+        "sierra_program_debug_info": {
+          "type": "object"
+        },
+        "contract_class_version": {
+          "type": "string"
+        },
+        "entry_points_by_type": {
+          "type": "object"
+        },
+        "abi": {
+          "type": "array"
+        }
+      },
+      "required": ["sierra_program", "contract_class_version", "entry_points_by_type", "abi"]
     }
   }
 }

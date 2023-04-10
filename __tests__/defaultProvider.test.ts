@@ -87,12 +87,12 @@ describe('defaultProvider', () => {
 
     test('getClassAt(contractAddress, blockNumber="latest")', async () => {
       const classResponse = await testProvider.getClassAt(erc20ContractAddress);
-      expect(classResponse).toMatchSchemaRef('ContractClass');
+      expect(classResponse).toMatchSchemaRef('LegacyContractClass');
     });
 
     test('GetClassByHash', async () => {
       const classResponse = await testProvider.getClassByHash(erc20ClassHash);
-      expect(classResponse).toMatchSchemaRef('ContractClass');
+      expect(classResponse).toMatchSchemaRef('LegacyContractClass');
     });
 
     describe('getStorageAt', () => {
