@@ -76,5 +76,17 @@ describeIfDevnetSequencer('Cairo 1', () => {
 
       expect(toBigInt(balance[0])).toBe(100n);
     });
+
+    test('Cairo 1 Contract Interaction - with validation', async () => {
+      const cairo1Contract = new Contract(compiledHelloSierra.abi, contractAddress, account);
+
+      const tx = await cairo1Contract.increase_balance(100);
+
+      await account.waitForTransaction(tx.transaction_hash);
+
+      const balance = await cairo1Contract.get_balance();
+
+      expect(toBigInt(balance[0])).toBe(200n);
+    });
   });
 });

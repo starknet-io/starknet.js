@@ -130,10 +130,11 @@ export class CallData {
     const { outputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
     const responseIterator = response.flat()[Symbol.iterator]();
 
-    return outputs.flat().reduce((acc, output) => {
-      acc[output.name] = responseParser(responseIterator, output, this.structs, acc);
-      if (acc[output.name] && acc[`${output.name}_len`]) {
-        delete acc[`${output.name}_len`];
+    return outputs.flat().reduce((acc, output, idx) => {
+      const propName = output.name ?? idx;
+      acc[propName] = responseParser(responseIterator, output, this.structs, acc);
+      if (acc[propName] && acc[`${propName}_len`]) {
+        delete acc[`${propName}_len`];
       }
       return acc;
     }, {} as Args);
