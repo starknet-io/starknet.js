@@ -1,7 +1,7 @@
 import { AbiEntry, AbiStructs, ParsedStruct, Tupled } from '../../types';
 import { BigNumberish } from '../num';
 import { isText, splitLongString } from '../shortString';
-import { felt, isTypeArray, isTypeFeltArray, isTypeStruct, isTypeTuple } from './cairo';
+import { felt, isTypeArray, isTypeBool, isTypeFeltArray, isTypeStruct, isTypeTuple } from './cairo';
 import extractTupleMemberTypes from './tuple';
 
 /**
@@ -115,6 +115,8 @@ export function parseCalldataField(
     // Struct or Tuple
     case isTypeStruct(type, structs) || isTypeTuple(type):
       return parseCalldataValue(value as ParsedStruct | BigNumberish[], type, structs);
+    case isTypeBool(type):
+      return value;
     // Felt or unhandled
     default:
       return felt(value as BigNumberish);

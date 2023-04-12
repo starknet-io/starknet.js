@@ -91,5 +91,25 @@ describeIfDevnetSequencer('Cairo 1', () => {
       const balance = await cairo1Contract.get_balance_u8();
       expect(toBigInt(balance[0])).toBe(255n);
     });
+
+    test('Cairo 1 Contract Interaction - bool', async () => {
+      let tx = await cairo1Contract.set_status(true);
+      await account.waitForTransaction(tx.transaction_hash);
+      let status = await cairo1Contract.get_status();
+
+      expect(status[0]).toBe(true);
+
+      tx = await cairo1Contract.set_status(false);
+      await account.waitForTransaction(tx.transaction_hash);
+      status = await cairo1Contract.get_status();
+
+      expect(status[0]).toBe(false);
+
+      tx = await cairo1Contract.set_status(true);
+      await account.waitForTransaction(tx.transaction_hash);
+      status = await cairo1Contract.get_status();
+
+      expect(status[0]).toBe(true);
+    });
   });
 });

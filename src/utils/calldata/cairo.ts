@@ -20,6 +20,7 @@ export const isTypeTuple = (type: string) => /^\(.*\)$/i.test(type);
 export const isTypeNamedTuple = (type: string) => /\(.*\)/i.test(type) && type.includes(':');
 export const isTypeStruct = (type: string, structs: AbiStructs) => type in structs;
 export const isTypeUint = (type: string) => Object.values(Uint).includes(type as Uint);
+export const isTypeBool = (type: string) => type === 'core::bool';
 
 /**
  * named tuple are described as js object {}

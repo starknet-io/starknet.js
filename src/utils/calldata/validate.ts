@@ -10,6 +10,7 @@ import {
   Uint,
   isLen,
   isTypeArray,
+  isTypeBool,
   isTypeFelt,
   isTypeStruct,
   isTypeTuple,
@@ -85,6 +86,13 @@ const validateUint = (parameter: any, input: AbiEntry) => {
   }
 };
 
+const validateBool = (parameter: any, input: AbiEntry) => {
+  assert(
+    typeof parameter === 'boolean',
+    `Validate: arg ${input.name} of cairo type ${input.type} should be type (Boolean)`
+  );
+};
+
 const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) => {
   assert(
     typeof parameter === 'object' && !Array.isArray(parameter),
@@ -151,6 +159,9 @@ export default function validateFields(
         break;
       case isTypeUint(input.type):
         validateUint(parameter, input);
+        break;
+      case isTypeBool(input.type):
+        validateBool(parameter, input);
         break;
       case isTypeStruct(input.type, structs):
         validateStruct(parameter, input, structs);
