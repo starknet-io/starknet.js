@@ -18,6 +18,7 @@ describeIfDevnetSequencer('Cairo 1', () => {
     let classHash: any;
     let contractAddress: any;
     let declareV2Tx: any;
+    let cairo1Contract: Contract;
     initializeMatcher(expect);
 
     beforeAll(async () => {
@@ -30,6 +31,8 @@ describeIfDevnetSequencer('Cairo 1', () => {
       const { transaction_hash, contract_address } = await account.deploy({ classHash });
       [contractAddress] = contract_address;
       await provider.waitForTransaction(transaction_hash);
+
+      cairo1Contract = new Contract(compiledHelloSierra.abi, contractAddress, account);
     });
 
     test('Declare v2 - Hello Cairo 1 contract', async () => {
@@ -60,8 +63,6 @@ describeIfDevnetSequencer('Cairo 1', () => {
     });
 
     test('Cairo 1 Contract Interaction - skip invoke validation & call parsing', async () => {
-      const cairo1Contract = new Contract(compiledHelloSierra.abi, contractAddress, account);
-
       const tx = await cairo1Contract.increase_balance(
         CallData.compile({
           amount: 100,
@@ -77,16 +78,18 @@ describeIfDevnetSequencer('Cairo 1', () => {
       expect(toBigInt(balance[0])).toBe(100n);
     });
 
-    test('Cairo 1 Contract Interaction - with validation', async () => {
-      const cairo1Contract = new Contract(compiledHelloSierra.abi, contractAddress, account);
-
+    test('Cairo 1 Contract Interaction - felt252', async () => {
       const tx = await cairo1Contract.increase_balance(100);
-
       await account.waitForTransaction(tx.transaction_hash);
-
       const balance = await cairo1Contract.get_balance();
-
       expect(toBigInt(balance[0])).toBe(200n);
+    });
+
+    test('Cairo 1 Contract Interaction - uint', async () => {
+      const tx = await cairo1Contract.increase_balance_u8(255);
+      await account.waitForTransaction(tx.transaction_hash);
+      const balance = await cairo1Contract.get_balance_u8();
+      expect(toBigInt(balance[0])).toBe(255n);
     });
   });
 });
