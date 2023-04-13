@@ -98,12 +98,12 @@ type PENDING_BLOCK_WITH_TX_HASHES = BLOCK_BODY_WITH_TX_HASHES & {
 };
 // transaction_hash, nonce, type optional because of pathfinder not implemented
 type COMMON_TXN_PROPERTIES = {
-  transaction_hash?: TXN_HASH;
+  transaction_hash: TXN_HASH;
 } & BROADCASTED_TXN_COMMON_PROPERTIES;
 type FUNCTION_CALL = {
-  contract_address?: ADDRESS;
-  entry_point_selector?: FELT;
-  calldata?: Array<FELT>;
+  contract_address: ADDRESS;
+  entry_point_selector: FELT;
+  calldata: Array<FELT>;
 };
 type INVOKE_TXN = COMMON_TXN_PROPERTIES & (INVOKE_TXN_V0 | INVOKE_TXN_V1);
 type DECLARE_TXN = COMMON_TXN_PROPERTIES & {
