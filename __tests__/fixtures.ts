@@ -34,6 +34,8 @@ export const compiledMulticall = readContract('multicall');
 export const compiledTestDapp = readContract('TestDapp');
 export const compiledStarknetId = readContract('starknetId_compiled');
 export const compiledNamingContract = readContract('naming_compiled');
+export const compiledHashSierra = readContractSierra('cairo/hash/hash');
+export const compiledHashSierraCasm = readContractSierraCasm('cairo/hash/hash');
 export const compiledHelloSierra = readContractSierra('cairo/helloSierra/hello');
 export const compiledHelloSierraCasm = readContractSierraCasm('cairo/helloSierra/hello');
 

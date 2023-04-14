@@ -1,7 +1,17 @@
 import { AbiEntry, AbiStructs, ParsedStruct, Tupled } from '../../types';
 import { BigNumberish } from '../num';
 import { isText, splitLongString } from '../shortString';
-import { felt, isTypeArray, isTypeBool, isTypeFeltArray, isTypeStruct, isTypeTuple } from './cairo';
+import {
+  felt,
+  getArrayType,
+  isTypeArray,
+  isTypeBool,
+  isTypeContractAddress,
+  isTypeFelt,
+  isTypeStruct,
+  isTypeTuple,
+  isTypeUint,
+} from './cairo';
 import extractTupleMemberTypes from './tuple';
 
 /**
@@ -103,12 +113,17 @@ export function parseCalldataField(
       const result: string[] = [];
       result.push(felt(value.length)); // Add length to array
 
+      // eslint-disable-next-line no-case-declarations
+      const arrayType = getArrayType(input.type);
+
       return (value as (BigNumberish | ParsedStruct)[]).reduce((acc, el) => {
-        if (isTypeFeltArray(type)) {
+        if (isTypeFelt(arrayType) || isTypeUint(arrayType) || isTypeContractAddress(arrayType)) {
           acc.push(felt(el as BigNumberish));
+        } else if (isTypeBool(arrayType)) {
+          acc.push(el);
         } else {
           // structure or tuple
-          acc.push(...parseCalldataValue(el, type.replace('*', ''), structs));
+          acc.push(...parseCalldataValue(el, arrayType, structs));
         }
         return acc;
       }, result);

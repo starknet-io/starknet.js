@@ -8,9 +8,11 @@ import { BigNumberish, toBigInt } from '../num';
 import { isLongText } from '../shortString';
 import {
   Uint,
+  getArrayType,
   isLen,
   isTypeArray,
   isTypeBool,
+  isTypeContractAddress,
   isTypeFelt,
   isTypeStruct,
   isTypeTuple,
@@ -117,7 +119,7 @@ const validateTuple = (parameter: any, input: AbiEntry) => {
 };
 
 const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs) => {
-  const baseType = input.type.replace('*', '');
+  const baseType = getArrayType(input.type);
 
   // Long text (special case when parameter is not an array but long text)
   if (isTypeFelt(baseType) && isLongText(parameter)) return;
@@ -135,6 +137,12 @@ const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs) => 
       parameter.forEach((it: any) =>
         validateStruct(it, { name: input.name, type: baseType }, structs)
       );
+      break;
+    case isTypeUint(baseType):
+      parameter.forEach((param: BigNumberish) => validateUint(param, input));
+      break;
+    case isTypeBool(baseType):
+      parameter.forEach((param: BigNumberish) => validateBool(param, input));
       break;
     default:
       throw new Error(
@@ -162,6 +170,9 @@ export default function validateFields(
         break;
       case isTypeBool(input.type):
         validateBool(parameter, input);
+        break;
+      case isTypeContractAddress(input.type):
+        // TODO: ??
         break;
       case isTypeStruct(input.type, structs):
         validateStruct(parameter, input, structs);

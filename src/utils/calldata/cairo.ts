@@ -14,13 +14,20 @@ export enum Uint {
 
 export const isLen = (name: string) => /_len$/.test(name);
 export const isTypeFelt = (type: string) => type === 'felt' || type === 'core::felt252';
-export const isTypeFeltArray = (type: string) => type === 'felt*';
-export const isTypeArray = (type: string) => /\*/.test(type);
+export const isTypeArray = (type: string) =>
+  /\*/.test(type) || type.includes('core::array::Array::');
 export const isTypeTuple = (type: string) => /^\(.*\)$/i.test(type);
 export const isTypeNamedTuple = (type: string) => /\(.*\)/i.test(type) && type.includes(':');
 export const isTypeStruct = (type: string, structs: AbiStructs) => type in structs;
 export const isTypeUint = (type: string) => Object.values(Uint).includes(type as Uint);
 export const isTypeBool = (type: string) => type === 'core::bool';
+export const isTypeContractAddress = (type: string) =>
+  type === 'core::starknet::contract_address::ContractAddress';
+export const isCairo1Type = (type: string) => type.includes('core::');
+
+export const getArrayType = (type: string) =>
+  // clean for Cairo0 . clean for Cairo1
+  type.replace('*', '').substring(type.indexOf('<') + 1, type.indexOf('>'));
 
 /**
  * named tuple are described as js object {}

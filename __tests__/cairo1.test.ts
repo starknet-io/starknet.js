@@ -1,4 +1,5 @@
 import { CallData, Contract, SequencerProvider } from '../src';
+import { tuple } from '../src/utils/calldata/cairo';
 import { toBigInt } from '../src/utils/num';
 import {
   compiledHelloSierra,
@@ -15,7 +16,7 @@ describeIfDevnetSequencer('Cairo 1', () => {
   describe('Sequencer API', () => {
     const provider = getTestProvider() as SequencerProvider;
     const account = getTestAccount(provider);
-    let classHash: any;
+    let classHash: any; // = '0x5b3507904c785fcceff17b34b4269f729bbddc1a432e4a63145c70071383413';
     let contractAddress: any;
     let declareV2Tx: any;
     let cairo1Contract: Contract;
@@ -57,7 +58,7 @@ describeIfDevnetSequencer('Cairo 1', () => {
       expect(classResponse).toMatchSchemaRef('SierraContractClass');
     });
 
-    xtest('GetClassAt', async () => {
+    test('GetClassAt', async () => {
       const classResponse = await provider.getClassAt(contractAddress);
       expect(classResponse).toMatchSchemaRef('SierraContractClass');
     });
@@ -110,6 +111,38 @@ describeIfDevnetSequencer('Cairo 1', () => {
       status = await cairo1Contract.get_status();
 
       expect(status[0]).toBe(true);
+    });
+
+    test('Cairo 1 Contract Interaction - ContractAddress', async () => {
+      const tx = await cairo1Contract.set_ca('123');
+      await account.waitForTransaction(tx.transaction_hash);
+      const status = await cairo1Contract.get_ca();
+
+      expect(status[0]).toBe(123n);
+    });
+
+    test('Cairo 1 Contract Interaction - echo flat un-named un-nested tuple', async () => {
+      // TODO: flatten result ?
+      const status = await cairo1Contract.echo_un_tuple(tuple(77, 123));
+      expect(status[0][0]).toBe(77n);
+      expect(status[0][1]).toBe(123n);
+    });
+
+    xtest('Cairo 1 Contract Interaction - echo Array', async () => {
+      // TODO: complete array
+      const status = await cairo1Contract.echo_array([123, 55, 77, 255]);
+      expect(status[0]).toBe(123n);
+      expect(status[1]).toBe(55);
+      expect(status[2]).toBe(77);
+      expect(status[3]).toBe(255);
+    });
+
+    xtest('Cairo 1 Contract Interaction - echo Array', async () => {
+      // TODO: Do Structure
+      const status = await cairo1Contract.echo_struct({
+        val: 'simple',
+      });
+      expect(status[0]).toBe('simple');
     });
   });
 });

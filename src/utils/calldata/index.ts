@@ -8,7 +8,7 @@ import { parseCalldataField } from './requestParser';
 import responseParser from './responseParser';
 import validateFields from './validate';
 
-// Helpers
+export * as cairo from './cairo';
 
 export class CallData {
   abi: Abi;
