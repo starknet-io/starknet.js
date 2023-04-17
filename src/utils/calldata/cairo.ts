@@ -25,9 +25,12 @@ export const isTypeContractAddress = (type: string) =>
   type === 'core::starknet::contract_address::ContractAddress';
 export const isCairo1Type = (type: string) => type.includes('core::');
 
-export const getArrayType = (type: string) =>
-  // clean for Cairo0 . clean for Cairo1
-  type.replace('*', '').substring(type.indexOf('<') + 1, type.indexOf('>'));
+export const getArrayType = (type: string) => {
+  if (isCairo1Type(type)) {
+    return type.substring(type.indexOf('<') + 1, type.indexOf('>'));
+  }
+  return type.replace('*', '');
+};
 
 /**
  * named tuple are described as js object {}
