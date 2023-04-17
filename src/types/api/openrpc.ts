@@ -290,6 +290,10 @@ type EVENT_FILTER = {
   address?: ADDRESS;
   keys?: Array<Array<FELT>>;
 };
+type EVENTS_CHUNK = {
+  events: Array<EMITTED_EVENT>;
+  continuation_token?: string;
+};
 type RESULT_PAGE_REQUEST = {
   continuation_token?: string;
   chunk_size: number;
@@ -359,11 +363,9 @@ export namespace OPENRPC {
   export type CHAIN_ID = string;
   export type PendingTransactions = Array<TXN>;
   export type SyncingStatus = false | SYNC_STATUS;
-  export type Events = {
-    events: Array<EMITTED_EVENT>;
-    continuation_token: string;
-  };
+  export type Events = EVENTS_CHUNK;
   export type Trace = TRACE_ROOT;
+
   export type Traces = Array<{
     transaction_hash: FELT;
     trace_root: TRACE_ROOT;
