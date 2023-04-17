@@ -150,8 +150,8 @@ export interface TransactionSimulationResponse {
 
 // As RPC and Sequencer response diverge, use RPC as common response
 export interface StateUpdateResponse {
-  block_hash: string;
-  new_root: string;
+  block_hash?: string;
+  new_root?: string;
   old_root: string;
   state_diff: {
     storage_diffs: RPC.StorageDiffs; // API DIFF

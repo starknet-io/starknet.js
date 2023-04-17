@@ -272,6 +272,8 @@ type DEPLOYED_CONTRACT_ITEM = {
 type STATE_UPDATE = {
   block_hash: BLOCK_HASH;
   new_root: FELT;
+} & PENDING_STATE_UPDATE;
+type PENDING_STATE_UPDATE = {
   old_root: FELT;
   state_diff: {
     storage_diffs: Array<CONTRACT_STORAGE_DIFF_ITEM>;
@@ -348,7 +350,7 @@ export namespace OPENRPC {
   export type Nonce = FELT;
   export type BlockWithTxHashes = BLOCK_WITH_TX_HASHES | PENDING_BLOCK_WITH_TX_HASHES;
   export type BlockWithTxs = BLOCK_WITH_TXS | PENDING_BLOCK_WITH_TXS;
-  export type StateUpdate = STATE_UPDATE;
+  export type StateUpdate = STATE_UPDATE | PENDING_STATE_UPDATE;
   export type Storage = FELT;
   export type Transaction = TXN;
   export type TransactionReceipt = TXN_RECEIPT;
@@ -365,7 +367,6 @@ export namespace OPENRPC {
   export type SyncingStatus = false | SYNC_STATUS;
   export type Events = EVENTS_CHUNK;
   export type Trace = TRACE_ROOT;
-
   export type Traces = Array<{
     transaction_hash: FELT;
     trace_root: TRACE_ROOT;
