@@ -119,8 +119,8 @@ export function parseCalldataField(
       return (value as (BigNumberish | ParsedStruct)[]).reduce((acc, el) => {
         if (isTypeFelt(arrayType) || isTypeUint(arrayType) || isTypeContractAddress(arrayType)) {
           acc.push(felt(el as BigNumberish));
-        } else if (isTypeBool(arrayType)) {
-          acc.push(el);
+        } else if (isTypeBool(arrayType) && typeof el === 'boolean') {
+          acc.push((el as boolean).toString());
         } else {
           // structure or tuple
           acc.push(...parseCalldataValue(el, arrayType, structs));

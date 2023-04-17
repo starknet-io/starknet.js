@@ -16,7 +16,7 @@ describeIfDevnetSequencer('Cairo 1', () => {
   describe('Sequencer API', () => {
     const provider = getTestProvider() as SequencerProvider;
     const account = getTestAccount(provider);
-    let classHash: any; // = '0x5b3507904c785fcceff17b34b4269f729bbddc1a432e4a63145c70071383413';
+    let classHash: any; //= '0x5b3507904c785fcceff17b34b4269f729bbddc1a432e4a63145c70071383413';
     let contractAddress: any;
     let declareV2Tx: any;
     let cairo1Contract: Contract;
@@ -83,14 +83,14 @@ describeIfDevnetSequencer('Cairo 1', () => {
       const tx = await cairo1Contract.increase_balance(100);
       await account.waitForTransaction(tx.transaction_hash);
       const balance = await cairo1Contract.get_balance();
-      expect(toBigInt(balance[0])).toBe(200n);
+      expect(toBigInt(balance)).toBe(200n);
     });
 
     test('Cairo 1 Contract Interaction - uint', async () => {
       const tx = await cairo1Contract.increase_balance_u8(255);
       await account.waitForTransaction(tx.transaction_hash);
       const balance = await cairo1Contract.get_balance_u8();
-      expect(toBigInt(balance[0])).toBe(255n);
+      expect(toBigInt(balance)).toBe(255n);
     });
 
     test('Cairo 1 Contract Interaction - bool', async () => {
@@ -98,19 +98,19 @@ describeIfDevnetSequencer('Cairo 1', () => {
       await account.waitForTransaction(tx.transaction_hash);
       let status = await cairo1Contract.get_status();
 
-      expect(status[0]).toBe(true);
+      expect(status).toBe(true);
 
       tx = await cairo1Contract.set_status(false);
       await account.waitForTransaction(tx.transaction_hash);
       status = await cairo1Contract.get_status();
 
-      expect(status[0]).toBe(false);
+      expect(status).toBe(false);
 
       tx = await cairo1Contract.set_status(true);
       await account.waitForTransaction(tx.transaction_hash);
       status = await cairo1Contract.get_status();
 
-      expect(status[0]).toBe(true);
+      expect(status).toBe(true);
     });
 
     test('Cairo 1 Contract Interaction - ContractAddress', async () => {
@@ -118,31 +118,27 @@ describeIfDevnetSequencer('Cairo 1', () => {
       await account.waitForTransaction(tx.transaction_hash);
       const status = await cairo1Contract.get_ca();
 
-      expect(status[0]).toBe(123n);
+      expect(status).toBe(123n);
     });
 
     test('Cairo 1 Contract Interaction - echo flat un-named un-nested tuple', async () => {
       // TODO: flatten result ?
       const status = await cairo1Contract.echo_un_tuple(tuple(77, 123));
-      expect(status[0][0]).toBe(77n);
-      expect(status[0][1]).toBe(123n);
+      expect(Object.values(status)).toEqual([77n, 123n]);
     });
 
-    xtest('Cairo 1 Contract Interaction - echo Array', async () => {
+    test('Cairo 1 Contract Interaction - echo flat un-nested Array', async () => {
       // TODO: complete array
       const status = await cairo1Contract.echo_array([123, 55, 77, 255]);
-      expect(status[0]).toBe(123n);
-      expect(status[1]).toBe(55);
-      expect(status[2]).toBe(77);
-      expect(status[3]).toBe(255);
+      expect(status).toEqual([123n, 55n, 77n, 255n]);
     });
 
-    xtest('Cairo 1 Contract Interaction - echo Array', async () => {
+    xtest('Cairo 1 Contract Interaction - echo flat un-nested Struct', async () => {
       // TODO: Do Structure
       const status = await cairo1Contract.echo_struct({
         val: 'simple',
       });
-      expect(status[0]).toBe('simple');
+      expect(status).toBe('simple');
     });
   });
 });
