@@ -480,7 +480,11 @@ export namespace OPENRPC {
     starknet_getEvents: {
       params: { filter: EVENT_FILTER & RESULT_PAGE_REQUEST };
       result: Events;
-      errors: Errors.PAGE_SIZE_TOO_BIG | Errors.INVALID_CONTINUATION_TOKEN | Errors.BLOCK_NOT_FOUND;
+      errors:
+        | Errors.PAGE_SIZE_TOO_BIG
+        | Errors.INVALID_CONTINUATION_TOKEN
+        | Errors.BLOCK_NOT_FOUND
+        | Errors.TOO_MANY_KEYS_IN_FILTER;
     };
     starknet_getNonce: {
       params: { block_id: BLOCK_ID; contract_address: ADDRESS };
@@ -587,6 +591,11 @@ export namespace Errors {
   export interface INVALID_CONTINUATION_TOKEN {
     code: 33;
     message: 'The supplied continuation token is invalid or unknown';
+  }
+
+  export interface TOO_MANY_KEYS_IN_FILTER {
+    code: 34;
+    message: 'Too many keys provided in a filter';
   }
 
   export interface CONTRACT_ERROR {
