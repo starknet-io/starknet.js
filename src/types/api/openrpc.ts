@@ -294,9 +294,10 @@ type PENDING_STATE_UPDATE = {
   old_root: FELT;
   state_diff: {
     storage_diffs: Array<CONTRACT_STORAGE_DIFF_ITEM>;
-    deprecated_declared_contract_hashes: Array<FELT>;
-    declared_contract_hashes: Array<{ class_hash: FELT; compiled_class_hash: FELT }>;
+    deprecated_declared_hashes: Array<FELT>;
+    declared_hashes: Array<{ class_hash: FELT; compiled_class_hash: FELT }>;
     deployed_contracts: Array<DEPLOYED_CONTRACT_ITEM>;
+    replaces_classes: Array<{ contract_address: ADDRESS; class_hash: FELT }>;
     nonces: Array<{
       contract_address: ADDRESS;
       nonce: FELT;
