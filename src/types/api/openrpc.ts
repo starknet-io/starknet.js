@@ -106,11 +106,13 @@ type FUNCTION_CALL = {
   calldata: Array<FELT>;
 };
 type INVOKE_TXN = { type: 'INVOKE' } & COMMON_TXN_PROPERTIES & (INVOKE_TXN_V0 | INVOKE_TXN_V1);
-type DECLARE_TXN = COMMON_TXN_PROPERTIES & {
+type DECLARE_TXN = DECLARE_TXN_V1 | DECLARE_TXN_V2;
+type DECLARE_TXN_V1 = COMMON_TXN_PROPERTIES & {
   type: 'DECLARE';
   class_hash: FELT;
   sender_address: ADDRESS;
 };
+type DECLARE_TXN_V2 = DECLARE_TXN_V1 & { compiled_class_hash: FELT };
 type DEPLOY_TXN = {
   transaction_hash: TXN_HASH;
   class_hash: FELT;
@@ -149,7 +151,6 @@ type BROADCASTED_DEPLOY_ACCOUNT_TXN = BROADCASTED_TXN_COMMON_PROPERTIES &
 type BROADCASTED_TXN =
   | BROADCASTED_INVOKE_TXN
   | BROADCASTED_DECLARE_TXN
-  | BROADCASTED_DEPLOY_TXN
   | BROADCASTED_DEPLOY_ACCOUNT_TXN;
 
 type BROADCASTED_INVOKE_TXN = BROADCASTED_TXN_COMMON_PROPERTIES & { type: 'INVOKE' } & (
@@ -164,15 +165,19 @@ type BROADCASTED_TXN_COMMON_PROPERTIES = {
   nonce: FELT;
 };
 
-type BROADCASTED_DECLARE_TXN = {
-  type: 'DECLARE';
-  contract_class: CONTRACT_CLASS;
+type BROADCASTED_DECLARE_TXN = BROADCASTED_DECLARE_TXN_V1 | BROADCASTED_DECLARE_TXN_V2;
+
+type BROADCASTED_DECLARE_TXN_V1 = {
+  contract_class: DEPRECATED_CONTRACT_CLASS;
   sender_address: ADDRESS;
 } & BROADCASTED_TXN_COMMON_PROPERTIES;
 
-type BROADCASTED_DEPLOY_TXN = {
+type BROADCASTED_DECLARE_TXN_V2 = {
+  type: 'DECLARE';
   contract_class: CONTRACT_CLASS;
-} & DEPLOY_TXN_PROPERTIES;
+  sender_address: ADDRESS;
+  compiled_class_hash: ADDRESS;
+} & BROADCASTED_TXN_COMMON_PROPERTIES;
 
 type DEPLOY_TXN_PROPERTIES = {
   type: 'DEPLOY';
@@ -202,11 +207,22 @@ type PENDING_BLOCK_WITH_TXS = BLOCK_BODY_WITH_TXS & {
 };
 
 type CONTRACT_CLASS = {
+  sierra_program: Array<FELT>;
+  sierra_version: string;
+  entry_points_by_type: {
+    CONSTRUCTOR: Array<SIERRA_ENTRY_POINT>;
+    EXTERNAL: Array<SIERRA_ENTRY_POINT>;
+    L1_HANDLER: Array<SIERRA_ENTRY_POINT>;
+  };
+  abi?: string;
+};
+
+type DEPRECATED_CONTRACT_CLASS = {
   program: string;
   entry_points_by_type: {
-    CONSTRUCTOR: CONTRACT_ENTRY_POINT_LIST;
-    EXTERNAL: CONTRACT_ENTRY_POINT_LIST;
-    L1_HANDLER: CONTRACT_ENTRY_POINT_LIST;
+    CONSTRUCTOR: Array<DEPRECATED_CAIRO_ENTRY_POINT>;
+    EXTERNAL: Array<DEPRECATED_CAIRO_ENTRY_POINT>;
+    L1_HANDLER: Array<DEPRECATED_CAIRO_ENTRY_POINT>;
   };
   abi?: CONTRACT_ABI;
 };
@@ -255,11 +271,12 @@ type TYPED_PARAMETER = {
   type: string;
 };
 
-type CONTRACT_ENTRY_POINT_LIST = Array<CONTRACT_ENTRY_POINT>;
-type CONTRACT_ENTRY_POINT = {
+type DEPRECATED_CAIRO_ENTRY_POINT = {
   offset: NUM_AS_HEX;
   selector: FELT;
 };
+type SIERRA_ENTRY_POINT = { selector: FELT; function_idx: number };
+
 export type CONTRACT_STORAGE_DIFF_ITEM = {
   address: FELT;
   storage_entries: { key: FELT; value: FELT }[];
@@ -277,7 +294,8 @@ type PENDING_STATE_UPDATE = {
   old_root: FELT;
   state_diff: {
     storage_diffs: Array<CONTRACT_STORAGE_DIFF_ITEM>;
-    declared_contract_hashes: Array<FELT>;
+    deprecated_declared_contract_hashes: Array<FELT>;
+    declared_contract_hashes: Array<{ class_hash: FELT; compiled_class_hash: FELT }>;
     deployed_contracts: Array<DEPLOYED_CONTRACT_ITEM>;
     nonces: Array<{
       contract_address: ADDRESS;
@@ -355,6 +373,7 @@ export namespace OPENRPC {
   export type Transaction = TXN;
   export type TransactionReceipt = TXN_RECEIPT;
   export type ContractClass = CONTRACT_CLASS;
+  export type DeprecatedContractClass = DEPRECATED_CONTRACT_CLASS;
   export type CallResponse = Array<FELT>;
   export type EstimatedFee = FEE_ESTIMATE;
   export type BlockNumber = BLOCK_NUMBER;
@@ -418,7 +437,7 @@ export namespace OPENRPC {
     };
     starknet_getClass: {
       params: { block_id: BLOCK_ID; class_hash: FELT };
-      result: ContractClass;
+      result: ContractClass | DeprecatedContractClass;
       errors: Errors.BLOCK_NOT_FOUND | Errors.CLASS_HASH_NOT_FOUND;
     };
     starknet_getClassHashAt: {
@@ -428,7 +447,7 @@ export namespace OPENRPC {
     };
     starknet_getClassAt: {
       params: { block_id: BLOCK_ID; contract_address: ADDRESS };
-      result: ContractClass;
+      result: ContractClass | DeprecatedContractClass;
       errors: Errors.BLOCK_NOT_FOUND | Errors.CONTRACT_NOT_FOUND;
     };
     starknet_getBlockTransactionCount: {
@@ -505,13 +524,6 @@ export namespace OPENRPC {
         declare_transaction: BROADCASTED_DECLARE_TXN;
       };
       result: DeclaredTransaction;
-      errors: Errors.INVALID_CONTRACT_CLASS;
-    };
-    starknet_addDeployTransaction: {
-      params: {
-        deploy_transaction: BROADCASTED_DEPLOY_TXN;
-      };
-      result: DeployedTransaction;
       errors: Errors.INVALID_CONTRACT_CLASS;
     };
     starknet_addDeployAccountTransaction: {
