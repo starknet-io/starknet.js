@@ -16,7 +16,7 @@ export namespace RPC {
   export type ContractAddress = ADDRESS;
   export type Felt = FELT;
   export type Nonce = OPENRPC.Nonce;
-  export type ContractClass = OPENRPC.ContractClass;
+  export type ContractClass = OPENRPC.ContractClass | OPENRPC.DeprecatedContractClass;
   export type StateUpdate = OPENRPC.StateUpdate;
   export type Transaction = OPENRPC.Transaction;
   export type PendingTransactions = OPENRPC.PendingTransactions;
