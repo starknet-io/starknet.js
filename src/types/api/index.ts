@@ -7,5 +7,5 @@ export type Overrides = {
   maxFee?: BigNumberish;
   nonce?: BigNumberish;
   signature?: Signature;
-  parseRequest: Boolean;
+  parseRequest?: Boolean;
 };
