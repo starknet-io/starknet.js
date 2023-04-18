@@ -24,7 +24,7 @@ jobs:
         # functionality; https://github.com/actions/runner/issues/2276.
         # It was generated from the following Dockerfile:
         #   FROM shardlabs/starknet-devnet:0.5.0-seed0
-        #   CMD ["--disable-rpc-request-validation"]
+        #   CMD ["--disable-rpc-request-validation", "--timeout", "600"]
         # Switch back to the standard Devnet image once a full release is available.
         image: penovicp/devnet-test:0.5.0
         # image: shardlabs/starknet-devnet:0.5.0-seed0
