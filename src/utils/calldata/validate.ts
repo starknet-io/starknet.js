@@ -29,7 +29,7 @@ const validateFelt = (parameter: any, input: AbiEntry) => {
 const validateUint = (parameter: any, input: AbiEntry) => {
   if (typeof parameter === 'number') {
     assert(
-      parameter < Number.MAX_SAFE_INTEGER,
+      parameter <= Number.MAX_SAFE_INTEGER,
       `Validation: Parameter is to large to be typed as Number use (BigInt or String)`
     );
   }
