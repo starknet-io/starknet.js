@@ -1,3 +1,16 @@
+# [5.6.0](https://github.com/0xs34n/starknet.js/compare/v5.5.0...v5.6.0) (2023-04-19)
+
+### Bug Fixes
+
+- optional param in contract invoke ([da094e4](https://github.com/0xs34n/starknet.js/commit/da094e4172ed43ce93604e92adbba2a5ecb1498e))
+
+### Features
+
+- cairo 1 bool ([52fed30](https://github.com/0xs34n/starknet.js/commit/52fed30f04b70bcce80f829dba6975101f6f3644))
+- cairo1 array, fix invoke response, hash separate test ([4637cd7](https://github.com/0xs34n/starknet.js/commit/4637cd74481ba85b3164ddb93c258b9ca8b9b949))
+- felt252 implementation ([3d20ea4](https://github.com/0xs34n/starknet.js/commit/3d20ea44b49d1c7ba90d8a46a307f54e737c3285))
+- uint validate and parsing supprot ([c1acd29](https://github.com/0xs34n/starknet.js/commit/c1acd298d63758ba27fc20bcb4b0c00cca82078f))
+
 # [5.5.0](https://github.com/0xs34n/starknet.js/compare/v5.4.2...v5.5.0) (2023-04-10)
 
 ### Bug Fixes
