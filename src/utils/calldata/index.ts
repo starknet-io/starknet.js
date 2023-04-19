@@ -1,4 +1,4 @@
-import { Abi, AbiEntry, AbiStructs, Args, Calldata, FunctionAbi } from '../../types';
+import { Abi, AbiEntry, AbiStructs, Args, Calldata, FunctionAbi, Result } from '../../types';
 import assert from '../assert';
 import { isBigInt } from '../num';
 import { isLongText, splitLongString } from '../shortString';
@@ -8,7 +8,7 @@ import { parseCalldataField } from './requestParser';
 import responseParser from './responseParser';
 import validateFields from './validate';
 
-// Helpers
+export * as cairo from './cairo';
 
 export class CallData {
   abi: Abi;
@@ -126,17 +126,21 @@ export class CallData {
    * @param response  - response from the method
    * @return - parsed response corresponding to the abi
    */
-  public parse(method: string, response: string[]): object {
+  public parse(method: string, response: string[]): Result {
     const { outputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
     const responseIterator = response.flat()[Symbol.iterator]();
 
-    return outputs.flat().reduce((acc, output) => {
-      acc[output.name] = responseParser(responseIterator, output, this.structs, acc);
-      if (acc[output.name] && acc[`${output.name}_len`]) {
-        delete acc[`${output.name}_len`];
+    const parsed = outputs.flat().reduce((acc, output, idx) => {
+      const propName = output.name ?? idx;
+      acc[propName] = responseParser(responseIterator, output, this.structs, acc);
+      if (acc[propName] && acc[`${propName}_len`]) {
+        delete acc[`${propName}_len`];
       }
       return acc;
     }, {} as Args);
+
+    // Cairo1 avoid object.0 structure
+    return Object.keys(parsed).length === 1 && 0 in parsed ? (parsed[0] as Result) : parsed;
   }
 
   /**

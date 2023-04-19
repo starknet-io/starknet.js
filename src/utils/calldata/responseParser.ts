@@ -1,6 +1,6 @@
 import { AbiEntry, AbiStructs, Args, ParsedStruct } from '../../types';
 import { BigNumberish } from '../num';
-import { isLen, isTypeArray, isTypeTuple } from './cairo';
+import { isCairo1Type, isLen, isTypeArray, isTypeBool, isTypeTuple } from './cairo';
 import extractTupleMemberTypes from './tuple';
 
 /**
@@ -59,9 +59,24 @@ export default function responseParser(
     case isLen(name):
       temp = responseIterator.next().value;
       return BigInt(temp);
+    case isTypeBool(type):
+      temp = responseIterator.next().value;
+      return Boolean(BigInt(temp));
     case isTypeArray(type):
       // eslint-disable-next-line no-case-declarations
       const parsedDataArr: (BigNumberish | ParsedStruct)[] = [];
+
+      // Cairo 1 Array
+      if (isCairo1Type(type)) {
+        responseIterator.next(); // skip length
+        let it = responseIterator.next();
+
+        while (!it.done) {
+          parsedDataArr.push(BigInt(it.value));
+          it = responseIterator.next();
+        }
+        return parsedDataArr;
+      }
 
       if (parsedResult && parsedResult[`${name}_len`]) {
         const arrLen = parsedResult[`${name}_len`] as number;

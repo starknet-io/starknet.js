@@ -3,13 +3,34 @@ import { BigNumberish, isBigInt, isHex, isStringWholeNumber } from '../num';
 import { encodeShortString, isShortString, isText } from '../shortString';
 import { UINT_128_MAX, Uint256, isUint256 } from '../uint256';
 
+export enum Uint {
+  u8 = 'core::integer::u8',
+  u16 = 'core::integer::u16',
+  u32 = 'core::integer::u32',
+  u64 = 'core::integer::u64',
+  u128 = 'core::integer::u128',
+  u256 = 'core::integer::u256',
+}
+
 export const isLen = (name: string) => /_len$/.test(name);
-export const isTypeFelt = (type: string) => type === 'felt';
-export const isTypeFeltArray = (type: string) => type === 'felt*';
-export const isTypeArray = (type: string) => /\*/.test(type);
+export const isTypeFelt = (type: string) => type === 'felt' || type === 'core::felt252';
+export const isTypeArray = (type: string) =>
+  /\*/.test(type) || type.includes('core::array::Array::');
 export const isTypeTuple = (type: string) => /^\(.*\)$/i.test(type);
 export const isTypeNamedTuple = (type: string) => /\(.*\)/i.test(type) && type.includes(':');
 export const isTypeStruct = (type: string, structs: AbiStructs) => type in structs;
+export const isTypeUint = (type: string) => Object.values(Uint).includes(type as Uint);
+export const isTypeBool = (type: string) => type === 'core::bool';
+export const isTypeContractAddress = (type: string) =>
+  type === 'core::starknet::contract_address::ContractAddress';
+export const isCairo1Type = (type: string) => type.includes('core::');
+
+export const getArrayType = (type: string) => {
+  if (isCairo1Type(type)) {
+    return type.substring(type.indexOf('<') + 1, type.indexOf('>'));
+  }
+  return type.replace('*', '');
+};
 
 /**
  * named tuple are described as js object {}
