@@ -12,23 +12,23 @@ import { initializeMatcher } from './schema';
 
 // Testnet will not accept declare v2 with same compiledClassHash,
 // aka. we can't redeclare same contract
-describeIfDevnetSequencer('Cairo 1', () => {
+describeIfDevnetSequencer('Cairo 1 Devnet', () => {
   describe('Sequencer API', () => {
     const provider = getTestProvider() as SequencerProvider;
     const account = getTestAccount(provider);
-    let classHash: any; // = '0x5b3507904c785fcceff17b34b4269f729bbddc1a432e4a63145c70071383413';
+    const classHash: any = '0x3e2e625998f89befe4d429d5d958275f86421310bfb00440c2431140e8c90ba';
     let contractAddress: any;
     let declareV2Tx: any;
     let cairo1Contract: Contract;
     initializeMatcher(expect);
 
     beforeAll(async () => {
-      declareV2Tx = await account.declare({
+      /*       declareV2Tx = await account.declare({
         contract: compiledHelloSierra,
         casm: compiledHelloSierraCasm,
       });
       classHash = declareV2Tx.class_hash;
-      await provider.waitForTransaction(declareV2Tx.transaction_hash);
+      await provider.waitForTransaction(declareV2Tx.transaction_hash); */
       const { transaction_hash, contract_address } = await account.deploy({ classHash });
       [contractAddress] = contract_address;
       await provider.waitForTransaction(transaction_hash);
@@ -83,14 +83,25 @@ describeIfDevnetSequencer('Cairo 1', () => {
       const tx = await cairo1Contract.increase_balance(100);
       await account.waitForTransaction(tx.transaction_hash);
       const balance = await cairo1Contract.get_balance();
-      expect(toBigInt(balance)).toBe(200n);
+      expect(balance).toBe(200n);
     });
 
     test('Cairo 1 Contract Interaction - uint', async () => {
-      const tx = await cairo1Contract.increase_balance_u8(255);
+      const tx = await cairo1Contract.increase_balance_u8(255n);
       await account.waitForTransaction(tx.transaction_hash);
       const balance = await cairo1Contract.get_balance_u8();
-      expect(toBigInt(balance)).toBe(255n);
+      expect(balance).toBe(255n);
+
+      let result = await cairo1Contract.test_u16(255n);
+      expect(result).toBe(256n);
+      result = await cairo1Contract.test_u32(255n);
+      expect(result).toBe(256n);
+      result = await cairo1Contract.test_u64(255n);
+      expect(result).toBe(256n);
+      result = await cairo1Contract.test_u128(255n);
+      expect(result).toBe(256n);
+      result = await cairo1Contract.test_u256(255n);
+      expect(result).toBe(256n);
     });
 
     test('Cairo 1 Contract Interaction - bool', async () => {
