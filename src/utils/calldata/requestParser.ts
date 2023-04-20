@@ -11,6 +11,8 @@ import {
   isTypeStruct,
   isTypeTuple,
   isTypeUint,
+  isTypeUint256,
+  uint256,
 } from './cairo';
 import extractTupleMemberTypes from './tuple';
 
@@ -58,6 +60,11 @@ function parseCalldataValue(
   }
   if (Array.isArray(element)) {
     throw Error(`Array inside array (nD) are not supported by cairo. Element: ${element} ${type}`);
+  }
+  // is cairo 1 uint256
+  if (isTypeUint256(type)) {
+    const el_uint256 = uint256(element as BigNumberish);
+    return [felt(el_uint256.low as BigNumberish), felt(el_uint256.high as BigNumberish)];
   }
   // checking if the passed element is struct
   if (structs[type] && structs[type].members.length) {
@@ -128,7 +135,7 @@ export function parseCalldataField(
         return acc;
       }, result);
     // Struct or Tuple
-    case isTypeStruct(type, structs) || isTypeTuple(type):
+    case isTypeStruct(type, structs) || isTypeTuple(type) || isTypeUint256(type):
       return parseCalldataValue(value as ParsedStruct | BigNumberish[], type, structs);
     case isTypeBool(type):
       return value;

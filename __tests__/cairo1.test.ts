@@ -86,7 +86,7 @@ describeIfDevnetSequencer('Cairo 1 Devnet', () => {
       expect(balance).toBe(200n);
     });
 
-    test('Cairo 1 Contract Interaction - uint', async () => {
+    test('Cairo 1 Contract Interaction - uint 8, 16, 32, 64, 128', async () => {
       const tx = await cairo1Contract.increase_balance_u8(255n);
       await account.waitForTransaction(tx.transaction_hash);
       const balance = await cairo1Contract.get_balance_u8();
@@ -100,8 +100,11 @@ describeIfDevnetSequencer('Cairo 1 Devnet', () => {
       expect(result).toBe(256n);
       result = await cairo1Contract.test_u128(255n);
       expect(result).toBe(256n);
-      result = await cairo1Contract.test_u256(255n);
-      expect(result).toBe(256n);
+    });
+
+    test('Cairo 1 - uint256 struct', async () => {
+      const result = await cairo1Contract.test_u256(2n ** 256n - 2n);
+      expect(result).toBe(2n ** 256n - 1n);
     });
 
     test('Cairo 1 Contract Interaction - bool', async () => {
