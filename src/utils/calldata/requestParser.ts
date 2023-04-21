@@ -138,7 +138,7 @@ export function parseCalldataField(
     case isTypeStruct(type, structs) || isTypeTuple(type) || isTypeUint256(type):
       return parseCalldataValue(value as ParsedStruct | BigNumberish[], type, structs);
     case isTypeBool(type):
-      return value;
+      return `${+value}`;
     // Felt or unhandled
     default:
       return felt(value as BigNumberish);

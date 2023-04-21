@@ -5,6 +5,7 @@ import {
   compiledHelloSierra,
   compiledHelloSierraCasm,
   describeIfDevnetSequencer,
+  describeIfSequencerTestnet2,
   getTestAccount,
   getTestProvider,
 } from './fixtures';
@@ -16,19 +17,19 @@ describeIfDevnetSequencer('Cairo 1 Devnet', () => {
   describe('Sequencer API', () => {
     const provider = getTestProvider() as SequencerProvider;
     const account = getTestAccount(provider);
-    const classHash: any = '0x3e2e625998f89befe4d429d5d958275f86421310bfb00440c2431140e8c90ba';
+    let classHash: any; // = '0x3e2e625998f89befe4d429d5d958275f86421310bfb00440c2431140e8c90ba';
     let contractAddress: any;
     let declareV2Tx: any;
     let cairo1Contract: Contract;
     initializeMatcher(expect);
 
     beforeAll(async () => {
-      /*       declareV2Tx = await account.declare({
+      declareV2Tx = await account.declare({
         contract: compiledHelloSierra,
         casm: compiledHelloSierraCasm,
       });
       classHash = declareV2Tx.class_hash;
-      await provider.waitForTransaction(declareV2Tx.transaction_hash); */
+      await provider.waitForTransaction(declareV2Tx.transaction_hash);
       const { transaction_hash, contract_address } = await account.deploy({ classHash });
       [contractAddress] = contract_address;
       await provider.waitForTransaction(transaction_hash);
@@ -136,7 +137,6 @@ describeIfDevnetSequencer('Cairo 1 Devnet', () => {
     });
 
     test('Cairo 1 Contract Interaction - echo flat un-named un-nested tuple', async () => {
-      // TODO: flatten result ?
       const status = await cairo1Contract.echo_un_tuple(tuple(77, 123));
       expect(Object.values(status)).toEqual([77n, 123n]);
     });
@@ -153,6 +153,66 @@ describeIfDevnetSequencer('Cairo 1 Devnet', () => {
         val: 'simple',
       });
       expect(status).toBe('simple');
+    });
+  });
+});
+
+describeIfSequencerTestnet2('Cairo1 Testnet2', () => {
+  describe('Sequencer API', () => {
+    const provider = getTestProvider() as SequencerProvider;
+    const account = getTestAccount(provider);
+    const classHash: any = '0x028b6f2ee9ae00d55a32072d939a55a6eb522974a283880f3c73a64c2f9fd6d6';
+    const contractAddress: any =
+      '0x771bbe2ba64fa5ab52f0c142b4296fc67460a3a2372b4cdce752c620e3e8194';
+    let cairo1Contract: Contract;
+    initializeMatcher(expect);
+
+    beforeAll(async () => {
+      const cairoClass = await provider.getClassByHash(classHash);
+      cairo1Contract = new Contract(cairoClass.abi, contractAddress, account);
+    });
+
+    test('getCompiledClassByClassHash', async () => {
+      const compiledClass = await provider.getCompiledClassByClassHash(classHash);
+      expect(compiledClass).toMatchSchemaRef('CompiledClass');
+    });
+
+    test('GetClassByHash', async () => {
+      const classResponse = await provider.getClassByHash(classHash);
+      expect(classResponse).toMatchSchemaRef('SierraContractClass');
+    });
+
+    test('GetClassAt', async () => {
+      const classResponse = await provider.getClassAt(contractAddress);
+      expect(classResponse).toMatchSchemaRef('SierraContractClass');
+    });
+
+    test('Cairo 1 Contract Interaction - felt252', async () => {
+      const result = await cairo1Contract.test_felt252(100);
+      expect(result).toBe(101n);
+    });
+
+    test('Cairo 1 Contract Interaction - uint 8, 16, 32, 64, 128', async () => {
+      let result = await cairo1Contract.test_u8(100n);
+      expect(result).toBe(107n);
+      result = await cairo1Contract.test_u16(100n);
+      expect(result).toBe(106n);
+      result = await cairo1Contract.test_u32(100n);
+      expect(result).toBe(104n);
+      result = await cairo1Contract.test_u64(255n);
+      expect(result).toBe(258n);
+      result = await cairo1Contract.test_u128(255n);
+      expect(result).toBe(257n);
+    });
+
+    test('Cairo 1 - uint256 struct', async () => {
+      const result = await cairo1Contract.test_u256(2n ** 256n - 2n);
+      expect(result).toBe(2n ** 256n - 1n);
+    });
+
+    test('Cairo 1 Contract Interaction - bool', async () => {
+      const tx = await cairo1Contract.test_bool();
+      expect(tx).toBe(true);
     });
   });
 });
