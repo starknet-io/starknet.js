@@ -4,6 +4,7 @@ import { SignerInterface } from '../signer';
 import {
   Abi,
   AllowArray,
+  CairoVersion,
   Call,
   DeclareAndDeployContractPayload,
   DeclareContractPayload,
@@ -32,6 +33,8 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract address: string;
 
   public abstract signer: SignerInterface;
+
+  public abstract cairoVersion: CairoVersion;
 
   /**
    * Estimate Fee for executing an INVOKE transaction on starknet
