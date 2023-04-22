@@ -1,3 +1,10 @@
+## [5.6.1](https://github.com/0xs34n/starknet.js/compare/v5.6.0...v5.6.1) (2023-04-21)
+
+### Bug Fixes
+
+- uint256 struct ([4ce2d02](https://github.com/0xs34n/starknet.js/commit/4ce2d0255594831e7ad816368e3cfa14449feaa5))
+- uint256, view bool, compiled in contract.call ([346cd51](https://github.com/0xs34n/starknet.js/commit/346cd5197d377966d148a8b218e6ee03af7170f2))
+
 # [5.6.0](https://github.com/0xs34n/starknet.js/compare/v5.5.0...v5.6.0) (2023-04-19)
 
 ### Bug Fixes

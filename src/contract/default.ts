@@ -204,9 +204,9 @@ export class Contract implements ContractInterface {
   ): Promise<Result> {
     assert(this.address !== null, 'contract is not connected to an address');
     const blockIdentifier = options?.blockIdentifier || undefined;
-    let calldata = args[0];
+    let calldata = 'compiled' in args ? args : args[0];
 
-    if (options.parseRequest && !args[0]?.compiled) {
+    if (options.parseRequest && !calldata?.compiled) {
       const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
 
       this.callData.validate('CALL', method, args);
@@ -241,8 +241,8 @@ export class Contract implements ContractInterface {
     }
   ): Promise<InvokeFunctionResponse> {
     assert(this.address !== null, 'contract is not connected to an address');
+    let calldata = 'compiled' in args ? args : args[0];
 
-    let calldata = args?.[0];
     if (options.parseRequest && !calldata?.compiled) {
       const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
 

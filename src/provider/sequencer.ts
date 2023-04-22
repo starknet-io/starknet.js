@@ -228,11 +228,11 @@ export class SequencerProvider implements ProviderInterface {
     const url = buildUrl(this.baseUrl, '', endpoint);
     const method = options?.method ?? 'GET';
     const headers = this.getHeaders(method);
-
+    const body = stringify(options?.body);
     try {
       const response = await fetch(url, {
         method,
-        body: stringify(options?.body),
+        body,
         headers,
       });
       const textResponse = await response.text();
