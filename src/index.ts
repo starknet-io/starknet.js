@@ -22,6 +22,7 @@ export * as uint256 from './utils/uint256';
 export * as shortString from './utils/shortString';
 export * as typedData from './utils/typedData';
 export * as ec from './utils/ec';
+export * as starknetId from './utils/starknetId';
 export * from './utils/address';
 export * from './utils/url';
 export * from './utils/calldata';
