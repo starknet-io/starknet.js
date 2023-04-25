@@ -16,7 +16,7 @@ describeIfDevnetSequencer('Cairo 1', () => {
   describe('Sequencer API', () => {
     const provider = getTestProvider() as SequencerProvider;
     const account = getTestAccount(provider);
-    let classHash: any; // = '0x5b3507904c785fcceff17b34b4269f729bbddc1a432e4a63145c70071383413';
+    let classHash: any; // = '0x3e2e625998f89befe4d429d5d958275f86421310bfb00440c2431140e8c90ba';
     let contractAddress: any;
     let declareV2Tx: any;
     let cairo1Contract: Contract;
@@ -94,6 +94,9 @@ describeIfDevnetSequencer('Cairo 1', () => {
     });
 
     test('Cairo 1 Contract Interaction - bool', async () => {
+      const cdata = CallData.compile({ false: false, true: true });
+      expect(cdata).toEqual(['0', '1']);
+
       let tx = await cairo1Contract.set_status(true);
       await account.waitForTransaction(tx.transaction_hash);
       let status = await cairo1Contract.get_status();
