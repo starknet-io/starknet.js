@@ -1,3 +1,9 @@
+# [5.7.0](https://github.com/0xs34n/starknet.js/compare/v5.6.1...v5.7.0) (2023-04-25)
+
+### Features
+
+- expose more starknetId addresses ([863736e](https://github.com/0xs34n/starknet.js/commit/863736e0d1daf30b9b6c1bab7c5213cda29f3d61))
+
 ## [5.6.1](https://github.com/0xs34n/starknet.js/compare/v5.6.0...v5.6.1) (2023-04-21)
 
 ### Bug Fixes
