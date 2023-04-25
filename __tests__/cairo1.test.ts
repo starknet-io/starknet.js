@@ -16,19 +16,19 @@ describeIfDevnetSequencer('Cairo 1', () => {
   describe('Sequencer API', () => {
     const provider = getTestProvider() as SequencerProvider;
     const account = getTestAccount(provider);
-    let classHash: any; // = '0x3e2e625998f89befe4d429d5d958275f86421310bfb00440c2431140e8c90ba';
+    const classHash: any = '0x3e2e625998f89befe4d429d5d958275f86421310bfb00440c2431140e8c90ba';
     let contractAddress: any;
     let declareV2Tx: any;
     let cairo1Contract: Contract;
     initializeMatcher(expect);
 
     beforeAll(async () => {
-      declareV2Tx = await account.declare({
+      /*       declareV2Tx = await account.declare({
         contract: compiledHelloSierra,
         casm: compiledHelloSierraCasm,
       });
       classHash = declareV2Tx.class_hash;
-      await provider.waitForTransaction(declareV2Tx.transaction_hash);
+      await provider.waitForTransaction(declareV2Tx.transaction_hash); */
       const { transaction_hash, contract_address } = await account.deploy({ classHash });
       [contractAddress] = contract_address;
       await provider.waitForTransaction(transaction_hash);
@@ -46,6 +46,16 @@ describeIfDevnetSequencer('Cairo 1', () => {
         contract: compiledHelloSierra,
         casm: compiledHelloSierraCasm,
       });
+    });
+
+    test('deployContract Cairo 1 with false cairoVersion UDC parameter', async () => {
+      const deploy = await account.deployContract(
+        {
+          classHash,
+        },
+        { cairoVersion: '1' }
+      );
+      expect(deploy).toHaveProperty('address');
     });
 
     test('getCompiledClassByClassHash', async () => {

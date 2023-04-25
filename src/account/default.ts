@@ -398,7 +398,10 @@ export class Account extends Provider implements AccountInterface {
 
     const calls = params.map((it) => it.call);
     const addresses = params.map((it) => it.address);
-    const invokeResponse = await this.execute(calls, undefined, details);
+    const invokeResponse = await this.execute(calls, undefined, {
+      ...details,
+      cairoVersion: '0', // UDC is Cairo0 Contract
+    });
 
     return {
       ...invokeResponse,
