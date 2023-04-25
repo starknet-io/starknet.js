@@ -10,11 +10,14 @@ export type Signature = ArraySignatureType | WeierstrassSignatureType;
 
 export type RawCalldata = BigNumberish[];
 export type AllowArray<T> = T | T[];
-export type RawArgs =
-  | {
-      [inputName: string]: MultiType | MultiType[] | RawArgs;
-    }
-  | Array<MultiType | MultiType[] | RawArgs>;
+
+export type RawArgs = RawArgsObject | RawArgsArray;
+
+export type RawArgsObject = {
+  [inputName: string]: MultiType | MultiType[] | RawArgs;
+};
+
+export type RawArgsArray = Array<MultiType | MultiType[] | RawArgs>;
 
 export type MultiType = BigNumberish | Uint256 | object | boolean;
 

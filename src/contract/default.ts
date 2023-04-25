@@ -2,12 +2,16 @@ import { AccountInterface } from '../account';
 import { ProviderInterface, defaultProvider } from '../provider';
 import {
   Abi,
+  ArgsOrCalldata,
   AsyncContractFunction,
   Call,
+  Calldata,
   ContractFunction,
+  EstimateFeeResponse,
   FunctionAbi,
   InvokeFunctionResponse,
   Overrides,
+  RawArgsArray,
   Result,
   StructAbi,
 } from '../types';
@@ -85,6 +89,15 @@ function buildEstimate(contract: Contract, functionAbi: FunctionAbi): ContractFu
   return function (...args: Array<any>): any {
     return contract.estimate(functionAbi.name, args);
   };
+}
+
+function getCalldata(args: RawArgsArray | [Calldata] | Calldata, callback: Function): Calldata {
+  // Check if Calldata in args or args[0] else compile
+  // @ts-ignore
+  if (args?.compiled) return args as Calldata;
+  // @ts-ignore
+  if (args[0]?.compiled) return args[0] as Calldata;
+  return callback();
 }
 
 /**
@@ -197,19 +210,27 @@ export class Contract implements ContractInterface {
 
   public async call(
     method: string,
-    args: Array<any> = [],
-    options: CallOptions = { parseRequest: true, parseResponse: true, formatResponse: undefined }
+    args: ArgsOrCalldata = [],
+    {
+      parseRequest = true,
+      parseResponse = true,
+      formatResponse = undefined,
+      blockIdentifier = undefined,
+    }: CallOptions = {}
   ): Promise<Result> {
     assert(this.address !== null, 'contract is not connected to an address');
-    const blockIdentifier = options?.blockIdentifier || undefined;
-    let calldata = 'compiled' in args ? args : args[0];
 
-    if (options.parseRequest && !calldata?.compiled) {
-      const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
+    const calldata = getCalldata(args, () => {
+      if (parseRequest) {
+        const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
 
-      this.callData.validate('CALL', method, args);
-      calldata = this.callData.compile(args, inputs);
-    }
+        this.callData.validate('CALL', method, args);
+        return this.callData.compile(args, inputs);
+      }
+      // eslint-disable-next-line no-console
+      console.warn('Call skipped parsing but provided rawArgs, possible malfunction request');
+      return args;
+    });
 
     return this.providerOrAccount
       .callContract(
@@ -221,11 +242,11 @@ export class Contract implements ContractInterface {
         blockIdentifier
       )
       .then((x) => {
-        if (!options.parseResponse) {
+        if (!parseResponse) {
           return x.result;
         }
-        if (options.formatResponse) {
-          return this.callData.format(method, x.result, options.formatResponse);
+        if (formatResponse) {
+          return this.callData.format(method, x.result, formatResponse);
         }
         return this.callData.parse(method, x.result);
       });
@@ -233,20 +254,22 @@ export class Contract implements ContractInterface {
 
   public invoke(
     method: string,
-    args: Array<any> = [],
-    options: Overrides = {
-      parseRequest: true,
-    }
+    args: ArgsOrCalldata = [],
+    { parseRequest = true, maxFee, nonce, signature }: Overrides = {}
   ): Promise<InvokeFunctionResponse> {
     assert(this.address !== null, 'contract is not connected to an address');
-    let calldata = 'compiled' in args ? args : args[0];
 
-    if (options.parseRequest && !calldata?.compiled) {
-      const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
+    const calldata = getCalldata(args, () => {
+      if (parseRequest) {
+        const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
 
-      this.callData.validate('INVOKE', method, args);
-      calldata = this.callData.compile(args, inputs);
-    }
+        this.callData.validate('INVOKE', method, args);
+        return this.callData.compile(args, inputs);
+      }
+      // eslint-disable-next-line no-console
+      console.warn('Invoke skipped parsing but provided rawArgs, possible malfunction request');
+      return args;
+    });
 
     const invocation = {
       contractAddress: this.address,
@@ -255,46 +278,43 @@ export class Contract implements ContractInterface {
     };
     if ('execute' in this.providerOrAccount) {
       return this.providerOrAccount.execute(invocation, undefined, {
-        maxFee: options.maxFee,
-        nonce: options.nonce,
+        maxFee,
+        nonce,
       });
     }
 
-    if (!options.nonce) {
-      throw new Error(`Nonce is required when invoking a function without an account`);
-    }
-
+    if (!nonce) throw new Error(`Nonce is required when invoking a function without an account`);
     // eslint-disable-next-line no-console
     console.warn(`Invoking ${method} without an account. This will not work on a public node.`);
 
     return this.providerOrAccount.invokeFunction(
       {
         ...invocation,
-        signature: options.signature,
+        signature,
       },
       {
-        nonce: options.nonce,
+        nonce,
       }
     );
   }
 
-  public async estimate(method: string, args: Array<any> = []) {
+  public async estimate(method: string, args: ArgsOrCalldata = []): Promise<EstimateFeeResponse> {
     assert(this.address !== null, 'contract is not connected to an address');
 
-    if (!args[0]?.compiled) {
+    if (!getCalldata(args, () => false)) {
       this.callData.validate('INVOKE', method, args);
     }
 
-    const invocation = this.populateTransaction[method](...args);
+    const invocation = this.populate(method, args);
     if ('estimateInvokeFee' in this.providerOrAccount) {
       return this.providerOrAccount.estimateInvokeFee(invocation);
     }
     throw Error('Contract must be connected to the account contract to estimate');
   }
 
-  public populate(method: string, args: Array<any> = []): Call {
+  public populate(method: string, args: ArgsOrCalldata = []): Call {
     const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
-    const calldata = args?.[0]?.compiled ? args?.[0] : this.callData.compile(args, inputs);
+    const calldata = getCalldata(args, () => this.callData.compile(args, inputs));
 
     return {
       contractAddress: this.address,

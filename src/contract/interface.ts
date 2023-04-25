@@ -3,17 +3,20 @@ import { ProviderInterface } from '../provider';
 import { BlockIdentifier } from '../provider/utils';
 import {
   Abi,
+  ArgsOrCalldata,
   AsyncContractFunction,
   ContractFunction,
+  EstimateFeeResponse,
   Invocation,
   InvokeFunctionResponse,
   Overrides,
+  Result,
 } from '../types';
 
 export type CallOptions = {
   blockIdentifier?: BlockIdentifier;
-  parseRequest: Boolean;
-  parseResponse: Boolean;
+  parseRequest?: Boolean;
+  parseResponse?: Boolean;
   formatResponse?: object | null;
 };
 
@@ -66,19 +69,23 @@ export abstract class ContractInterface {
    * @param options optional blockIdentifier
    * @returns Result of the call as an array with key value pars
    */
-  public abstract call(method: string, args?: Array<any>, options?: CallOptions): Promise<Object>;
+  public abstract call(
+    method: string,
+    args?: ArgsOrCalldata,
+    options?: CallOptions
+  ): Promise<Result>;
 
   /**
    * Invokes a method on a contract
    *
    * @param method name of the method
-   * @param args Array of the arguments for the invoke
+   * @param args Array of the arguments for the invoke or Calldata
    * @param options
    * @returns Add Transaction Response
    */
   public abstract invoke(
     method: string,
-    args?: Array<any>,
+    args?: ArgsOrCalldata,
     options?: Overrides
   ): Promise<InvokeFunctionResponse>;
 
@@ -86,23 +93,23 @@ export abstract class ContractInterface {
    * Estimates a method on a contract
    *
    * @param method name of the method
-   * @param args Array of the arguments for the call
+   * @param args Array of the arguments for the call or Calldata
    * @param options optional blockIdentifier
    */
   public abstract estimate(
     method: string,
-    args?: Array<any>,
+    args?: ArgsOrCalldata,
     options?: {
       blockIdentifier?: BlockIdentifier;
     }
-  ): Promise<any>;
+  ): Promise<EstimateFeeResponse>;
 
   /**
    * Calls a method on a contract
    *
    * @param method name of the method
-   * @param args Array of the arguments for the call
+   * @param args Array of the arguments for the call or Calldata
    * @returns Invocation object
    */
-  public abstract populate(method: string, args?: Array<any>): Invocation;
+  public abstract populate(method: string, args?: ArgsOrCalldata): Invocation;
 }
