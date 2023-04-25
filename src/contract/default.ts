@@ -87,10 +87,13 @@ function buildEstimate(contract: Contract, functionAbi: FunctionAbi): ContractFu
   };
 }
 
-const detectCairoVersion = (abi: Abi) => {
+/**
+ * Not used at the moment
+ */
+/* const detectCairoVersion = (abi: Abi) => {
   if (!abi) return '0';
   return abi.find((it) => 'state_mutability' in it) ? '1' : '0';
-};
+}; */
 
 export class Contract implements ContractInterface {
   abi: Abi;
@@ -115,28 +118,23 @@ export class Contract implements ContractInterface {
 
   private callData: CallData;
 
-  private version: string = '0';
-
   /**
    * Contract class to handle contract methods
    *
    * @param abi - Abi of the contract object
    * @param address (optional) - address to connect to
    * @param providerOrAccount (optional) - Provider or Account to attach to
-   * @param cairoVersion (optional) - default '0', for Cairo 1 set '1'
    */
   constructor(
     abi: Abi,
     address: string,
-    providerOrAccount: ProviderInterface | AccountInterface = defaultProvider,
-    cairoVersion: string = detectCairoVersion(abi)
+    providerOrAccount: ProviderInterface | AccountInterface = defaultProvider
   ) {
     this.address = address && address.toLowerCase();
     this.providerOrAccount = providerOrAccount;
     this.callData = new CallData(abi);
     this.structs = CallData.getAbiStruct(abi);
     this.abi = abi;
-    this.version = cairoVersion;
 
     const options = { enumerable: true, value: {}, writable: false };
     Object.defineProperties(this, {

@@ -80,7 +80,7 @@ export class ContractFactory {
   }
 
   /**
-   * Attaches to new Provider or Account
+   * Attaches to new Account
    *
    * @param account - new Provider or Account to attach to
    * @returns ContractFactory
@@ -91,7 +91,7 @@ export class ContractFactory {
   }
 
   /**
-   * Attaches current abi and provider or account to the new address
+   * Attaches current abi and account to the new address
    *
    * @param address - Contract address
    * @returns Contract
