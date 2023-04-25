@@ -77,6 +77,32 @@ mod HelloStarknet {
         balance_u8::read()
     }
 
+    #[view]
+    fn test_u16(p1: u16) -> u16 {
+        p1 + 1_u16
+    }
+
+    #[view]
+    fn test_u32(p1: u32) -> u32 {
+        p1 + 1_u32
+    }
+    
+    #[view]
+    fn test_u64(p1: u64) -> u64 {
+        p1 + 1_u64
+    }
+
+    #[view]
+    fn test_u128(p1: u128) -> u128 {
+        p1 + 1_u128
+    }
+
+    #[view]
+    fn test_u256(p1: u256) -> u256 {
+        let to_add = u256 { low: 1_u128, high: 0_u128 };
+        p1 + to_add
+    }
+
     // echo Array
     #[view]
     fn echo_array(data: Array<u8>) -> Array<u8> {

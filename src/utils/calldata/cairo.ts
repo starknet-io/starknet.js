@@ -9,7 +9,7 @@ export enum Uint {
   u32 = 'core::integer::u32',
   u64 = 'core::integer::u64',
   u128 = 'core::integer::u128',
-  u256 = 'core::integer::u256',
+  u256 = 'core::integer::u256', // This one is struct
 }
 
 export const isLen = (name: string) => /_len$/.test(name);
@@ -20,6 +20,7 @@ export const isTypeTuple = (type: string) => /^\(.*\)$/i.test(type);
 export const isTypeNamedTuple = (type: string) => /\(.*\)/i.test(type) && type.includes(':');
 export const isTypeStruct = (type: string, structs: AbiStructs) => type in structs;
 export const isTypeUint = (type: string) => Object.values(Uint).includes(type as Uint);
+export const isTypeUint256 = (type: string) => type === 'core::integer::u256';
 export const isTypeBool = (type: string) => type === 'core::bool';
 export const isTypeContractAddress = (type: string) =>
   type === 'core::starknet::contract_address::ContractAddress';
