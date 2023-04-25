@@ -1,5 +1,5 @@
+import { CallData } from '../utils/calldata';
 import { BigNumberish } from '../utils/num';
-import { compileCalldata } from '../utils/stark';
 import { getStarknetIdContract, useDecoded, useEncoded } from '../utils/starknetId';
 import { ProviderInterface } from './interface';
 
@@ -15,7 +15,7 @@ export async function getStarkName(
     const hexDomain = await provider.callContract({
       contractAddress: contract,
       entrypoint: 'address_to_domain',
-      calldata: compileCalldata({
+      calldata: CallData.compile({
         address,
       }),
     });
@@ -48,7 +48,7 @@ export async function getAddressFromStarkName(
     const addressData = await provider.callContract({
       contractAddress: contract,
       entrypoint: 'domain_to_address',
-      calldata: compileCalldata({
+      calldata: CallData.compile({
         domain: [useEncoded(name.replace('.stark', '')).toString(10)],
       }),
     });

@@ -40,7 +40,7 @@ const multiCall = await account.execute(
     contractAddress: contractAddress_1,
     entrypoint: "approve",
     // approve 1 wei for bridge
-    calldata: stark.compileCalldata({
+    calldata: CallData.compile({
         spender: contractAddress_2,
         amount: {type: 'struct', low: '1', high: '0'},
       })
@@ -50,7 +50,7 @@ const multiCall = await account.execute(
       contractAddress: contractAddress_2,
       entrypoint: "transfer_ether",
       // transfer 1 wei to the contract address
-      calldata: stark.compileCalldata({
+      calldata: CallData.compile({
           amount: {type: 'struct', low: '1', high: '0'},
       })
     }

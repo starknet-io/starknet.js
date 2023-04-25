@@ -1,10 +1,9 @@
-import { Contract, ContractFactory, json, stark } from '../src';
+import { Contract, ContractFactory, RawArgs, json, stark } from '../src';
 import { CallData } from '../src/utils/calldata';
 import { felt, tuple, uint256 } from '../src/utils/calldata/cairo';
 import { getSelectorFromName } from '../src/utils/hash';
 import { BigNumberish, hexToDecimalString, toBigInt } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
-import { compileCalldata } from '../src/utils/stark';
 import { uint256ToBN } from '../src/utils/uint256';
 import {
   compiledErc20,
@@ -76,12 +75,12 @@ describe('contract module', () => {
           erc20Contract.address,
           getSelectorFromName('balanceOf'),
           Object.keys(args1).length,
-          ...compileCalldata(args1),
+          ...CallData.compile(args1),
 
           erc20Contract.address,
           getSelectorFromName('decimals'),
           Object.keys(args2).length,
-          ...compileCalldata(args2),
+          ...CallData.compile(args2),
         ];
         const { block_number, result } = await multicallContract.aggregate(calls);
         expect(BigInt(block_number));
@@ -210,7 +209,7 @@ describe('contract module', () => {
     test('deployment of new contract', async () => {
       const factory = new ContractFactory(compiledErc20, classHash, account);
       const erc20 = await factory.deploy(
-        compileCalldata({
+        CallData.compile({
           name: encodeShortString('Token'),
           symbol: encodeShortString('ERC20'),
           recipient: wallet,
@@ -221,7 +220,7 @@ describe('contract module', () => {
     test('wait for deployment transaction', async () => {
       const factory = new ContractFactory(compiledErc20, classHash, account);
       const contract = await factory.deploy(
-        compileCalldata({
+        CallData.compile({
           name: encodeShortString('Token'),
           symbol: encodeShortString('ERC20'),
           recipient: wallet,
@@ -326,7 +325,7 @@ describe('Complex interaction', () => {
   });
 
   test('callData compile', async () => {
-    const newCalldata = {
+    const newCalldata: RawArgs = {
       name: 'TokenMTK',
       symbol: 'MTK',
       decimals: 18,

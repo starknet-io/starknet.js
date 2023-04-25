@@ -1,4 +1,13 @@
-import { Abi, AbiEntry, AbiStructs, Args, Calldata, FunctionAbi, Result } from '../../types';
+import {
+  Abi,
+  AbiEntry,
+  AbiStructs,
+  Args,
+  Calldata,
+  FunctionAbi,
+  RawArgs,
+  Result,
+} from '../../types';
 import assert from '../assert';
 import { isBigInt } from '../num';
 import { isLongText, splitLongString } from '../shortString';
@@ -83,7 +92,7 @@ export class CallData {
    * @param data Object representing cairo method arguments or string array of compiled data
    * @returns string[]
    */
-  static compile(data: object | string[]): Calldata {
+  static compile(data: RawArgs): Calldata {
     const createTree = (obj: object) => {
       const getEntries = (o: object, prefix = ''): any => {
         const oe = Array.isArray(o) ? [o.length.toString(), ...o] : o;
@@ -107,8 +116,11 @@ export class CallData {
       // convert to array
       callTreeArray = Object.values(callTree);
     } else {
-      // data are already compiled or some missuses
-      callTreeArray = data;
+      // already compiled data but modified or raw args provided as array, recompile it
+      // recreate three
+      const callObj = { ...data };
+      const callTree = createTree(callObj);
+      callTreeArray = Object.values(callTree);
     }
 
     // add compiled property to array object

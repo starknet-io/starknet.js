@@ -1,6 +1,7 @@
 import { StarknetChainId } from '../../constants';
 import { weierstrass } from '../../utils/ec';
 import type { BigNumberish } from '../../utils/num';
+import { Uint256 } from '../../utils/uint256';
 import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 
 export type WeierstrassSignatureType = weierstrass.SignatureType;
@@ -11,12 +12,11 @@ export type RawCalldata = BigNumberish[];
 export type AllowArray<T> = T | T[];
 export type RawArgs =
   | {
-      [inputName: string]:
-        | BigNumberish
-        | BigNumberish[]
-        | { type: 'struct'; [k: string]: BigNumberish };
+      [inputName: string]: MultiType | MultiType[] | RawArgs;
     }
-  | BigNumberish[];
+  | Array<MultiType | MultiType[] | RawArgs>;
+
+export type MultiType = BigNumberish | Uint256 | object | boolean;
 
 export type UniversalDeployerContractPayload = {
   classHash: BigNumberish;

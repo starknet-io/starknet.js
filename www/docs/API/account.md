@@ -178,7 +178,7 @@ const call = await account.execute(
   {
     contractAddress: '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',  // ETH contract address
     entrypoint: 'approve',
-    calldata: starknet.stark.compileCalldata(
+    calldata: starknet.CallData.compile(
       {
         spender: "0x15e90f807a00a01df845460324fbcd33986f2df3cc9d981e9e8b5005b7f595e",
         amount: {
@@ -201,7 +201,7 @@ const multiCall = await account.execute(
     {
       contractAddress: '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',  // ETH contract address
       entrypoint: 'approve',
-      calldata: starknet.stark.compileCalldata(
+      calldata: starknet.CallData.compile(
         {
           spender: "0x15e90f807a00a01df845460324fbcd33986f2df3cc9d981e9e8b5005b7f595e",
           amount: {
