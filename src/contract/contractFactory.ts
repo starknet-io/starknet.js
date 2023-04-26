@@ -1,8 +1,8 @@
 import { AccountInterface } from '../account';
-import { Abi, CompiledContract, FunctionAbi } from '../types';
+import { Abi, ArgsOrCalldataWithOptions, CompiledContract } from '../types';
 import assert from '../utils/assert';
 import { CallData } from '../utils/calldata';
-import { Contract } from './default';
+import { Contract, getCalldata, splitArgsAndOptions } from './default';
 
 export class ContractFactory {
   abi: Abi;
@@ -13,7 +13,7 @@ export class ContractFactory {
 
   account: AccountInterface;
 
-  private callData: CallData;
+  private CallData: CallData;
 
   constructor(
     compiledContract: CompiledContract,
@@ -25,7 +25,7 @@ export class ContractFactory {
     this.compiledContract = compiledContract;
     this.account = account;
     this.classHash = classHash;
-    this.callData = new CallData(abi);
+    this.CallData = new CallData(abi);
   }
 
   /**
@@ -35,37 +35,25 @@ export class ContractFactory {
    * @param options (optional) Object - parseRequest, parseResponse, addressSalt
    * @returns deployed Contract
    */
-  public async deploy(...args: Array<any>): Promise<Contract> {
-    let constructorCalldata;
-    let parseRequest: Boolean = true;
-    let addressSalt: string | undefined;
+  public async deploy(...args: ArgsOrCalldataWithOptions): Promise<Contract> {
+    const { args: param, options = { parseRequest: true } } = splitArgsAndOptions(args);
 
-    // extract options
-    args.forEach((arg) => {
-      if (typeof arg !== 'object') return;
-      if ('addressSalt' in arg) {
-        addressSalt = arg.addressSalt;
+    const constructorCalldata = getCalldata(param, () => {
+      if (options.parseRequest) {
+        this.CallData.validate('DEPLOY', 'constructor', param);
+        return this.CallData.compile('constructor', param);
       }
-      if ('parseRequest' in arg) {
-        parseRequest = arg.parseRequest;
-      }
+      // eslint-disable-next-line no-console
+      console.warn('Call skipped parsing but provided rawArgs, possible malfunction request');
+      return param;
     });
-
-    if (!parseRequest || args[0]?.compiled) {
-      // eslint-disable-next-line prefer-destructuring
-      constructorCalldata = args[0];
-    } else {
-      this.callData.validate('DEPLOY', 'constructor', args);
-      const { inputs } = this.abi.find((abi) => abi.type === 'constructor') as FunctionAbi;
-      constructorCalldata = this.callData.compile(args, inputs);
-    }
 
     const {
       deploy: { contract_address, transaction_hash },
     } = await this.account.declareAndDeploy({
       contract: this.compiledContract,
       constructorCalldata,
-      salt: addressSalt,
+      salt: options.addressSalt,
     });
     assert(Boolean(contract_address), 'Deployment of the contract failed');
 

@@ -3,6 +3,7 @@ import {
   AbiEntry,
   AbiStructs,
   Args,
+  ArgsOrCalldata,
   Calldata,
   FunctionAbi,
   RawArgs,
@@ -36,7 +37,7 @@ export class CallData {
    * @param method  - name of the method
    * @param args - arguments that are passed to the method
    */
-  public validate(type: 'INVOKE' | 'CALL' | 'DEPLOY', method: string, args: Array<any> = []) {
+  public validate(type: 'INVOKE' | 'CALL' | 'DEPLOY', method: string, args: ArgsOrCalldata = []) {
     // ensure provided method of type exists
     if (type !== 'DEPLOY') {
       const invocableFunctionNames = this.abi
@@ -78,8 +79,9 @@ export class CallData {
    * @param inputs  - list of inputs(fields) that are in the abi
    * @return {Calldata} - parsed arguments in format that contract is expecting
    */
-  public compile(args: Array<any>, inputs: AbiEntry[]): Calldata {
+  public compile(method: string, args: ArgsOrCalldata): Calldata {
     const argsIterator = args[Symbol.iterator]();
+    const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
     return inputs.reduce(
       (acc, input) =>
         isLen(input.name) ? acc : acc.concat(parseCalldataField(argsIterator, input, this.structs)),
@@ -162,7 +164,7 @@ export class CallData {
    * @param format - formatter object schema
    * @returns parsed and formatted response object
    */
-  public format(method: string, response: string[], format: object): object {
+  public format(method: string, response: string[], format: object): Result {
     const parsed = this.parse(method, response);
     return formatter(parsed, format);
   }

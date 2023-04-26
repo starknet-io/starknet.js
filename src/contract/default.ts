@@ -3,23 +3,26 @@ import { ProviderInterface, defaultProvider } from '../provider';
 import {
   Abi,
   ArgsOrCalldata,
+  ArgsOrCalldataWithOptions,
   AsyncContractFunction,
   Call,
+  CallOptions,
   Calldata,
   ContractFunction,
+  ContractOptions,
   EstimateFeeResponse,
   FunctionAbi,
   InvokeFunctionResponse,
-  Overrides,
+  InvokeOptions,
   RawArgsArray,
   Result,
   StructAbi,
 } from '../types';
 import assert from '../utils/assert';
 import { CallData } from '../utils/calldata';
-import { CallOptions, ContractInterface } from './interface';
+import { ContractInterface } from './interface';
 
-const splitArgsAndOptions = (args: any) => {
+export const splitArgsAndOptions = (args: ArgsOrCalldataWithOptions) => {
   const options = [
     'blockIdentifier',
     'parseRequest',
@@ -28,19 +31,20 @@ const splitArgsAndOptions = (args: any) => {
     'maxFee',
     'nonce',
     'signature',
+    'addressSalt',
   ];
   const lastArg = args[args.length - 1];
   if (typeof lastArg === 'object' && options.some((x) => x in lastArg)) {
-    return { args, options: args.pop() };
+    return { args: args as ArgsOrCalldata, options: args.pop() as ContractOptions };
   }
-  return { args, options: {} };
+  return { args: args as ArgsOrCalldata, options: {} as ContractOptions };
 };
 
 /**
  * Adds call methods to the contract
  */
 function buildCall(contract: Contract, functionAbi: FunctionAbi): AsyncContractFunction {
-  return async function (...args: Array<any>): Promise<any> {
+  return async function (...args: ArgsOrCalldataWithOptions): Promise<any> {
     const params = splitArgsAndOptions(args);
     return contract.call(functionAbi.name, params.args, {
       parseRequest: true,
@@ -91,7 +95,10 @@ function buildEstimate(contract: Contract, functionAbi: FunctionAbi): ContractFu
   };
 }
 
-function getCalldata(args: RawArgsArray | [Calldata] | Calldata, callback: Function): Calldata {
+export function getCalldata(
+  args: RawArgsArray | [Calldata] | Calldata,
+  callback: Function
+): Calldata {
   // Check if Calldata in args or args[0] else compile
   // @ts-ignore
   if (args?.compiled) return args as Calldata;
@@ -222,10 +229,8 @@ export class Contract implements ContractInterface {
 
     const calldata = getCalldata(args, () => {
       if (parseRequest) {
-        const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
-
         this.callData.validate('CALL', method, args);
-        return this.callData.compile(args, inputs);
+        return this.callData.compile(method, args);
       }
       // eslint-disable-next-line no-console
       console.warn('Call skipped parsing but provided rawArgs, possible malfunction request');
@@ -255,16 +260,14 @@ export class Contract implements ContractInterface {
   public invoke(
     method: string,
     args: ArgsOrCalldata = [],
-    { parseRequest = true, maxFee, nonce, signature }: Overrides = {}
+    { parseRequest = true, maxFee, nonce, signature }: InvokeOptions = {}
   ): Promise<InvokeFunctionResponse> {
     assert(this.address !== null, 'contract is not connected to an address');
 
     const calldata = getCalldata(args, () => {
       if (parseRequest) {
-        const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
-
         this.callData.validate('INVOKE', method, args);
-        return this.callData.compile(args, inputs);
+        return this.callData.compile(method, args);
       }
       // eslint-disable-next-line no-console
       console.warn('Invoke skipped parsing but provided rawArgs, possible malfunction request');
@@ -313,8 +316,7 @@ export class Contract implements ContractInterface {
   }
 
   public populate(method: string, args: ArgsOrCalldata = []): Call {
-    const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
-    const calldata = getCalldata(args, () => this.callData.compile(args, inputs));
+    const calldata = getCalldata(args, () => this.callData.compile(method, args));
 
     return {
       contractAddress: this.address,

@@ -1,8 +1,9 @@
-import { Calldata } from './api';
-import { RawArgsArray } from './lib';
+import { BlockIdentifier } from '../provider/utils';
+import { BigNumberish } from '../utils/num';
+import { RawArgsArray, Signature } from './lib';
 
-export type AsyncContractFunction<T = any> = (...args: Array<any>) => Promise<T>;
-export type ContractFunction = (...args: Array<any>) => any;
+export type AsyncContractFunction<T = any> = (...args: ArgsOrCalldataWithOptions) => Promise<T>;
+export type ContractFunction = (...args: ArgsOrCalldataWithOptions) => any;
 export type Result =
   | {
       [key: string]: any;
@@ -11,4 +12,26 @@ export type Result =
   | bigint
   | string
   | boolean;
+export type Calldata = string[] & { readonly compiled?: boolean };
 export type ArgsOrCalldata = RawArgsArray | [Calldata] | Calldata;
+export type ArgsOrCalldataWithOptions = ArgsOrCalldata & ContractOptions;
+export type ContractOptions = {
+  blockIdentifier?: BlockIdentifier;
+  parseRequest?: boolean;
+  parseResponse?: boolean;
+  formatResponse?: { [key: string]: any };
+  maxFee?: BigNumberish;
+  nonce?: BigNumberish;
+  signature?: Signature;
+  addressSalt?: string;
+};
+
+export type CallOptions = Pick<
+  ContractOptions,
+  'blockIdentifier' | 'parseRequest' | 'parseResponse' | 'formatResponse'
+>;
+
+export type InvokeOptions = Pick<
+  ContractOptions,
+  'maxFee' | 'nonce' | 'signature' | 'parseRequest'
+>;

@@ -5,20 +5,14 @@ import {
   Abi,
   ArgsOrCalldata,
   AsyncContractFunction,
+  CallOptions,
   ContractFunction,
   EstimateFeeResponse,
   Invocation,
   InvokeFunctionResponse,
-  Overrides,
+  InvokeOptions,
   Result,
 } from '../types';
-
-export type CallOptions = {
-  blockIdentifier?: BlockIdentifier;
-  parseRequest?: Boolean;
-  parseResponse?: Boolean;
-  formatResponse?: object | null;
-};
 
 export abstract class ContractInterface {
   public abstract abi: Abi;
@@ -86,7 +80,7 @@ export abstract class ContractInterface {
   public abstract invoke(
     method: string,
     args?: ArgsOrCalldata,
-    options?: Overrides
+    options?: InvokeOptions
   ): Promise<InvokeFunctionResponse>;
 
   /**
