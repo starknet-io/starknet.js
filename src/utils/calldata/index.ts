@@ -126,7 +126,7 @@ export class CallData {
     }
 
     // add compiled property to array object
-    Object.defineProperty(callTreeArray, 'compiled', {
+    Object.defineProperty(callTreeArray, '__compiled__', {
       enumerable: false,
       writable: false,
       value: true,

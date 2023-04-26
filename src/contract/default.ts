@@ -14,7 +14,6 @@ import {
   FunctionAbi,
   InvokeFunctionResponse,
   InvokeOptions,
-  RawArgsArray,
   Result,
   StructAbi,
 } from '../types';
@@ -37,7 +36,7 @@ export const splitArgsAndOptions = (args: ArgsOrCalldataWithOptions) => {
   if (typeof lastArg === 'object' && options.some((x) => x in lastArg)) {
     return { args: args as ArgsOrCalldata, options: args.pop() as ContractOptions };
   }
-  return { args: args as ArgsOrCalldata, options: {} as ContractOptions };
+  return { args: args as ArgsOrCalldata };
 };
 
 /**
@@ -95,15 +94,10 @@ function buildEstimate(contract: Contract, functionAbi: FunctionAbi): ContractFu
   };
 }
 
-export function getCalldata(
-  args: RawArgsArray | [Calldata] | Calldata,
-  callback: Function
-): Calldata {
+export function getCalldata(args: ArgsOrCalldata, callback: Function): Calldata {
   // Check if Calldata in args or args[0] else compile
-  // @ts-ignore
-  if (args?.compiled) return args as Calldata;
-  // @ts-ignore
-  if (args[0]?.compiled) return args[0] as Calldata;
+  if ('__compiled__' in args) return args as Calldata;
+  if (Array.isArray(args[0]) && '__compiled__' in args[0]) return args[0] as Calldata;
   return callback();
 }
 
