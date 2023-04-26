@@ -119,7 +119,7 @@ export class CallData {
       callTreeArray = Object.values(callTree);
     } else {
       // already compiled data but modified or raw args provided as array, recompile it
-      // recreate three
+      // recreate tree
       const callObj = { ...data };
       const callTree = createTree(callObj);
       callTreeArray = Object.values(callTree);
