@@ -84,6 +84,10 @@ export function felt(it: BigNumberish): string {
   if (typeof it === 'string' && isStringWholeNumber(it)) {
     return it;
   }
+  // bool to felt
+  if (typeof it === 'boolean') {
+    return `${+it}`;
+  }
 
   throw new Error(`${it} can't be computed by felt()`);
 }

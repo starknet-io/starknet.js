@@ -104,6 +104,7 @@ export interface EstimateFeeResponse {
   overall_fee: bigint;
   gas_consumed?: bigint;
   gas_price?: bigint;
+  suggestedMaxFee?: bigint;
 }
 
 export interface InvokeFunctionResponse {

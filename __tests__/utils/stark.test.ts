@@ -1,9 +1,8 @@
-import fs from 'fs';
-
-import { RawArgs, json, stark } from '../../src';
+import { CallData, RawArgs, json, stark } from '../../src';
 import { toBigInt, toHex } from '../../src/utils/num';
+import { compiledOpenZeppelinAccount } from '../fixtures';
 
-const compiledAccount = json.parse(fs.readFileSync('./__mocks__/Account.json').toString('ascii'));
+const compiledAccount = compiledOpenZeppelinAccount;
 
 describe('stark', () => {
   describe('compressProgram()', () => {
@@ -23,11 +22,11 @@ describe('stark', () => {
     });
   });
 
-  describe('compileCalldata() ', () => {
+  describe('CallData.compile() ', () => {
     test('compiles BigNumberish[] calldata', () => {
       const callData = ['0x000', 2n, 10000];
 
-      const compiled = stark.compileCalldata(callData);
+      const compiled = CallData.compile(callData);
 
       expect(compiled).toEqual(['0', '2', '10000']);
     });
@@ -40,7 +39,7 @@ describe('stark', () => {
         d: [1n, 2n, '0x3'],
       };
 
-      const compiled = stark.compileCalldata(callData);
+      const compiled = CallData.compile(callData);
 
       expect(compiled).toEqual(['0', '2', '10000', '3', '1', '2', '3']);
     });
@@ -48,7 +47,6 @@ describe('stark', () => {
     test('compiles Struct type calldata', () => {
       const calldata: RawArgs = {
         a: {
-          type: 'struct',
           x: 1n,
           y: 2n,
           z: 3n,
@@ -57,7 +55,7 @@ describe('stark', () => {
         c: ['1', '2', toBigInt(3), toHex(4)],
       };
 
-      const compiled = stark.compileCalldata(calldata);
+      const compiled = CallData.compile(calldata);
 
       expect(compiled).toEqual(['1', '2', '3', '10000000000', '4', '1', '2', '3', '4']);
     });

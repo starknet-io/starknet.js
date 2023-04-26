@@ -49,6 +49,16 @@ describeIfDevnetSequencer('Cairo 1 Devnet', () => {
       });
     });
 
+    test('deployContract Cairo 1 with false cairoVersion UDC parameter', async () => {
+      const deploy = await account.deployContract(
+        {
+          classHash,
+        },
+        { cairoVersion: '1' }
+      );
+      expect(deploy).toHaveProperty('address');
+    });
+
     test('getCompiledClassByClassHash', async () => {
       const compiledClass = await provider.getCompiledClassByClassHash(classHash);
       expect(compiledClass).toMatchSchemaRef('CompiledClass');
@@ -109,6 +119,9 @@ describeIfDevnetSequencer('Cairo 1 Devnet', () => {
     });
 
     test('Cairo 1 Contract Interaction - bool', async () => {
+      const cdata = CallData.compile({ false: false, true: true });
+      expect(cdata).toEqual(['0', '1']);
+
       let tx = await cairo1Contract.set_status(true);
       await account.waitForTransaction(tx.transaction_hash);
       let status = await cairo1Contract.get_status();
