@@ -31,11 +31,10 @@ export class CallData {
   }
 
   /**
-   * Validates if all arguments that are passed to the method are corresponding to the ones in the abi
-   *
-   * @param type - type of the method
-   * @param method  - name of the method
-   * @param args - arguments that are passed to the method
+   * Validate arguments passed to the method as corresponding to the ones in the abi
+   * @param type string - type of the method
+   * @param method string - name of the method
+   * @param args ArgsOrCalldata - arguments that are passed to the method
    */
   public validate(type: 'INVOKE' | 'CALL' | 'DEPLOY', method: string, args: ArgsOrCalldata = []) {
     // ensure provided method of type exists
@@ -73,11 +72,11 @@ export class CallData {
   }
 
   /**
+   * Compile contract callData with abi
    * Parse the calldata by using input fields from the abi for that method
-   *
-   * @param args - arguments passed the the method
-   * @param inputs  - list of inputs(fields) that are in the abi
-   * @return {Calldata} - parsed arguments in format that contract is expecting
+   * @param method string - method name
+   * @param args ArgsOrCalldata - arguments passed to the method
+   * @return Calldata - parsed arguments in format that contract is expecting
    */
   public compile(method: string, args: ArgsOrCalldata): Calldata {
     const argsIterator = args[Symbol.iterator]();
@@ -91,10 +90,10 @@ export class CallData {
 
   /**
    * Compile contract callData without abi
-   * @param data Object representing cairo method arguments or string array of compiled data
-   * @returns string[]
+   * @param rawArgs RawArgs representing cairo method arguments or string array of compiled data
+   * @returns Calldata
    */
-  static compile(data: RawArgs): Calldata {
+  static compile(rawArgs: RawArgs): Calldata {
     const createTree = (obj: object) => {
       const getEntries = (o: object, prefix = ''): any => {
         const oe = Array.isArray(o) ? [o.length.toString(), ...o] : o;
@@ -112,15 +111,15 @@ export class CallData {
     };
 
     let callTreeArray;
-    if (!Array.isArray(data)) {
+    if (!Array.isArray(rawArgs)) {
       // flatten structs, tuples, add array length. Process leafs as Felt
-      const callTree = createTree(data);
+      const callTree = createTree(rawArgs);
       // convert to array
       callTreeArray = Object.values(callTree);
     } else {
       // already compiled data but modified or raw args provided as array, recompile it
       // recreate tree
-      const callObj = { ...data };
+      const callObj = { ...rawArgs };
       const callTree = createTree(callObj);
       callTreeArray = Object.values(callTree);
     }
@@ -136,9 +135,9 @@ export class CallData {
 
   /**
    * Parse elements of the response array and structuring them into response object
-   * @param method - method name
-   * @param response  - response from the method
-   * @return - parsed response corresponding to the abi
+   * @param method string - method name
+   * @param response string[] - response from the method
+   * @return Result - parsed response corresponding to the abi
    */
   public parse(method: string, response: string[]): Result {
     const { outputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
@@ -159,23 +158,31 @@ export class CallData {
 
   /**
    * Format cairo method response data to native js values based on provided format schema
-   * @param method - cairo method name
-   * @param response - cairo method response
-   * @param format - formatter object schema
-   * @returns parsed and formatted response object
+   * @param method string - cairo method name
+   * @param response string[] - cairo method response
+   * @param format object - formatter object schema
+   * @returns Result - parsed and formatted response object
    */
   public format(method: string, response: string[], format: object): Result {
     const parsed = this.parse(method, response);
     return formatter(parsed, format);
   }
 
-  // Helper to calculate inputs
+  /**
+   * Helper to calculate inputs from abi
+   * @param inputs AbiEntry
+   * @returns number
+   */
   static abiInputsLength(inputs: AbiEntry[]) {
     return inputs.reduce((acc, input) => (!isLen(input.name) ? acc + 1 : acc), 0);
   }
 
-  // Helper to extract structs
-  static getAbiStruct(abi: Abi) {
+  /**
+   * Helper to extract structs from abi
+   * @param abi Abi
+   * @returns AbiStructs - structs from abi
+   */
+  static getAbiStruct(abi: Abi): AbiStructs {
     return abi
       .filter((abiEntry) => abiEntry.type === 'struct')
       .reduce(
