@@ -1,3 +1,18 @@
+# [5.8.0](https://github.com/0xs34n/starknet.js/compare/v5.7.0...v5.8.0) (2023-04-26)
+
+### Bug Fixes
+
+- contract types, interface, cleanup, extend tests ([02c6b72](https://github.com/0xs34n/starknet.js/commit/02c6b72ec41016fdd75537044889e7cffd624b27))
+- contractfactory, contract, interface cleanup cleanup & ts ([b25047e](https://github.com/0xs34n/starknet.js/commit/b25047ece2eed313eaa776b2a132b9a04c3fbc2f))
+- lapsus lingua, dangling, cleanup 🚀 ([a79d55c](https://github.com/0xs34n/starknet.js/commit/a79d55c2990e81bc6b0e58583142d3eb7bbddfa2))
+- prevent missusage of cairoVersion on deploy ([d920dbe](https://github.com/0xs34n/starknet.js/commit/d920dbe6144006438c917727b153a043fec2531b))
+- remove unused cairoVersion from Contract ([e4fcf24](https://github.com/0xs34n/starknet.js/commit/e4fcf244fa1dfd01301addfa7492bf90dac5a854))
+
+### Features
+
+- boolean to felt - cairo 1, compile() ([ef34e0a](https://github.com/0xs34n/starknet.js/commit/ef34e0a25a52be7a6ac76714bda43233a2f1a6f1))
+- remove deprecated compileCalldata ([e5adca4](https://github.com/0xs34n/starknet.js/commit/e5adca449a9d1142339d5e63adb857698c5913d6))
+
 # [5.7.0](https://github.com/0xs34n/starknet.js/compare/v5.6.1...v5.7.0) (2023-04-25)
 
 ### Features
