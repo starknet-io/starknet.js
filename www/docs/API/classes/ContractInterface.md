@@ -28,7 +28,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:21](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/interface.ts#L21)
+[src/contract/interface.ts:18](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/interface.ts#L18)
 
 ---
 
@@ -38,7 +38,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:23](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/interface.ts#L23)
+[src/contract/interface.ts:20](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/interface.ts#L20)
 
 ---
 
@@ -48,7 +48,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:25](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/interface.ts#L25)
+[src/contract/interface.ts:22](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/interface.ts#L22)
 
 ---
 
@@ -58,7 +58,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:27](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/interface.ts#L27)
+[src/contract/interface.ts:24](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/interface.ts#L24)
 
 ---
 
@@ -72,7 +72,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:29](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/interface.ts#L29)
+[src/contract/interface.ts:26](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/interface.ts#L26)
 
 ---
 
@@ -86,7 +86,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:31](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/interface.ts#L31)
+[src/contract/interface.ts:28](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/interface.ts#L28)
 
 ---
 
@@ -100,7 +100,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:33](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/interface.ts#L33)
+[src/contract/interface.ts:30](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/interface.ts#L30)
 
 ---
 
@@ -114,7 +114,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:35](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/interface.ts#L35)
+[src/contract/interface.ts:32](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/interface.ts#L32)
 
 ## Methods
 
@@ -136,7 +136,7 @@ Saves the address of the contract deployed on network that will be used for inte
 
 #### Defined in
 
-[src/contract/interface.ts:44](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/interface.ts#L44)
+[src/contract/interface.ts:41](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/interface.ts#L41)
 
 ---
 
@@ -158,7 +158,7 @@ Attaches to new Provider or Account
 
 #### Defined in
 
-[src/contract/interface.ts:51](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/interface.ts#L51)
+[src/contract/interface.ts:48](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/interface.ts#L48)
 
 ---
 
@@ -180,33 +180,33 @@ Promise that resolves when contract is deployed on the network or when no deploy
 
 #### Defined in
 
-[src/contract/interface.ts:59](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/interface.ts#L59)
+[src/contract/interface.ts:56](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/interface.ts#L56)
 
 ---
 
 ### call
 
-▸ `Abstract` **call**(`method`, `args?`, `options?`): `Promise`<`Object`\>
+▸ `Abstract` **call**(`method`, `args?`, `options?`): `Promise`<[`Result`](../modules.md#result)\>
 
 Calls a method on a contract
 
 #### Parameters
 
-| Name       | Type                                       | Description                         |
-| :--------- | :----------------------------------------- | :---------------------------------- |
-| `method`   | `string`                                   | name of the method                  |
-| `args?`    | `any`[]                                    | Array of the arguments for the call |
-| `options?` | [`CallOptions`](../modules.md#calloptions) | optional blockIdentifier            |
+| Name       | Type                                             | Description                         |
+| :--------- | :----------------------------------------------- | :---------------------------------- |
+| `method`   | `string`                                         | name of the method                  |
+| `args?`    | [`ArgsOrCalldata`](../modules.md#argsorcalldata) | Array of the arguments for the call |
+| `options?` | [`CallOptions`](../modules.md#calloptions)       | optional blockIdentifier            |
 
 #### Returns
 
-`Promise`<`Object`\>
+`Promise`<[`Result`](../modules.md#result)\>
 
 Result of the call as an array with key value pars
 
 #### Defined in
 
-[src/contract/interface.ts:69](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/interface.ts#L69)
+[src/contract/interface.ts:66](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/interface.ts#L66)
 
 ---
 
@@ -218,11 +218,11 @@ Invokes a method on a contract
 
 #### Parameters
 
-| Name       | Type                                   | Description                           |
-| :--------- | :------------------------------------- | :------------------------------------ |
-| `method`   | `string`                               | name of the method                    |
-| `args?`    | `any`[]                                | Array of the arguments for the invoke |
-| `options?` | [`Overrides`](../modules.md#overrides) |                                       |
+| Name       | Type                                             | Description                                       |
+| :--------- | :----------------------------------------------- | :------------------------------------------------ |
+| `method`   | `string`                                         | name of the method                                |
+| `args?`    | [`ArgsOrCalldata`](../modules.md#argsorcalldata) | Array of the arguments for the invoke or Calldata |
+| `options?` | [`InvokeOptions`](../modules.md#invokeoptions)   |                                                   |
 
 #### Returns
 
@@ -232,32 +232,32 @@ Add Transaction Response
 
 #### Defined in
 
-[src/contract/interface.ts:79](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/interface.ts#L79)
+[src/contract/interface.ts:80](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/interface.ts#L80)
 
 ---
 
 ### estimate
 
-▸ `Abstract` **estimate**(`method`, `args?`, `options?`): `Promise`<`any`\>
+▸ `Abstract` **estimate**(`method`, `args?`, `options?`): `Promise`<[`EstimateFeeResponse`](../interfaces/EstimateFeeResponse.md)\>
 
 Estimates a method on a contract
 
 #### Parameters
 
-| Name                       | Type              | Description                         |
-| :------------------------- | :---------------- | :---------------------------------- |
-| `method`                   | `string`          | name of the method                  |
-| `args?`                    | `any`[]           | Array of the arguments for the call |
-| `options?`                 | `Object`          | optional blockIdentifier            |
-| `options.blockIdentifier?` | `BlockIdentifier` | -                                   |
+| Name                       | Type                                             | Description                                     |
+| :------------------------- | :----------------------------------------------- | :---------------------------------------------- |
+| `method`                   | `string`                                         | name of the method                              |
+| `args?`                    | [`ArgsOrCalldata`](../modules.md#argsorcalldata) | Array of the arguments for the call or Calldata |
+| `options?`                 | `Object`                                         | optional blockIdentifier                        |
+| `options.blockIdentifier?` | `BlockIdentifier`                                | -                                               |
 
 #### Returns
 
-`Promise`<`any`\>
+`Promise`<[`EstimateFeeResponse`](../interfaces/EstimateFeeResponse.md)\>
 
 #### Defined in
 
-[src/contract/interface.ts:92](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/interface.ts#L92)
+[src/contract/interface.ts:93](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/interface.ts#L93)
 
 ---
 
@@ -269,10 +269,10 @@ Calls a method on a contract
 
 #### Parameters
 
-| Name     | Type     | Description                         |
-| :------- | :------- | :---------------------------------- |
-| `method` | `string` | name of the method                  |
-| `args?`  | `any`[]  | Array of the arguments for the call |
+| Name     | Type                                             | Description                                     |
+| :------- | :----------------------------------------------- | :---------------------------------------------- |
+| `method` | `string`                                         | name of the method                              |
+| `args?`  | [`ArgsOrCalldata`](../modules.md#argsorcalldata) | Array of the arguments for the call or Calldata |
 
 #### Returns
 
@@ -282,4 +282,4 @@ Invocation object
 
 #### Defined in
 
-[src/contract/interface.ts:107](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/interface.ts#L107)
+[src/contract/interface.ts:108](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/interface.ts#L108)

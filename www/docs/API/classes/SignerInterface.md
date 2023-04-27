@@ -32,13 +32,13 @@ public key of signer as hex string with 0x prefix
 
 #### Defined in
 
-[src/signer/interface.ts:11](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/signer/interface.ts#L11)
+[src/signer/interface.ts:11](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/signer/interface.ts#L11)
 
 ---
 
 ### signMessage
 
-▸ `Abstract` **signMessage**(`typedData`, `accountAddress`): `Promise`<[`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)\>
+▸ `Abstract` **signMessage**(`typedData`, `accountAddress`): `Promise`<[`Signature`](../modules.md#signature)\>
 
 Sign an JSON object for off-chain usage with the starknet private key and return the signature
 This adds a message prefix so it cant be interchanged with transactions
@@ -56,19 +56,19 @@ if the JSON object is not a valid JSON
 
 #### Returns
 
-`Promise`<[`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)\>
+`Promise`<[`Signature`](../modules.md#signature)\>
 
 the signature of the JSON object
 
 #### Defined in
 
-[src/signer/interface.ts:22](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/signer/interface.ts#L22)
+[src/signer/interface.ts:22](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/signer/interface.ts#L22)
 
 ---
 
 ### signTransaction
 
-▸ `Abstract` **signTransaction**(`transactions`, `transactionsDetail`, `abis?`): `Promise`<[`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)\>
+▸ `Abstract` **signTransaction**(`transactions`, `transactionsDetail`, `abis?`): `Promise`<[`Signature`](../modules.md#signature)\>
 
 Signs a transaction with the starknet private key and returns the signature
 
@@ -82,19 +82,19 @@ Signs a transaction with the starknet private key and returns the signature
 
 #### Returns
 
-`Promise`<[`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)\>
+`Promise`<[`Signature`](../modules.md#signature)\>
 
 signature
 
 #### Defined in
 
-[src/signer/interface.ts:35](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/signer/interface.ts#L35)
+[src/signer/interface.ts:35](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/signer/interface.ts#L35)
 
 ---
 
 ### signDeployAccountTransaction
 
-▸ `Abstract` **signDeployAccountTransaction**(`transaction`): `Promise`<[`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)\>
+▸ `Abstract` **signDeployAccountTransaction**(`transaction`): `Promise`<[`Signature`](../modules.md#signature)\>
 
 Signs a DEPLOY_ACCOUNT transaction with the starknet private key and returns the signature
 
@@ -106,19 +106,19 @@ Signs a DEPLOY_ACCOUNT transaction with the starknet private key and returns the
 
 #### Returns
 
-`Promise`<[`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)\>
+`Promise`<[`Signature`](../modules.md#signature)\>
 
 signature
 
 #### Defined in
 
-[src/signer/interface.ts:54](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/signer/interface.ts#L54)
+[src/signer/interface.ts:54](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/signer/interface.ts#L54)
 
 ---
 
 ### signDeclareTransaction
 
-▸ `Abstract` **signDeclareTransaction**(`transaction`): `Promise`<[`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)\>
+▸ `Abstract` **signDeclareTransaction**(`transaction`): `Promise`<[`Signature`](../modules.md#signature)\>
 
 Signs a DECLARE transaction with the starknet private key and returns the signature
 
@@ -130,10 +130,10 @@ Signs a DECLARE transaction with the starknet private key and returns the signat
 
 #### Returns
 
-`Promise`<[`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)\>
+`Promise`<[`Signature`](../modules.md#signature)\>
 
 signature
 
 #### Defined in
 
-[src/signer/interface.ts:70](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/signer/interface.ts#L70)
+[src/signer/interface.ts:70](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/signer/interface.ts#L70)

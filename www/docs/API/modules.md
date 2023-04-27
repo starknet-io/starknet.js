@@ -1,6 +1,6 @@
 ---
 id: 'modules'
-title: 'Starknet.js API - v5.1.0'
+title: 'Starknet.js API - v5.8.0'
 sidebar_label: 'Exports'
 sidebar_position: 0.5
 custom_edit_url: null
@@ -12,6 +12,7 @@ custom_edit_url: null
 - [ContractInterface](classes/ContractInterface.md)
 - [ContractFactory](classes/ContractFactory.md)
 - [Provider](classes/Provider.md)
+- [CustomError](classes/CustomError.md)
 - [LibraryError](classes/LibraryError.md)
 - [GatewayError](classes/GatewayError.md)
 - [HttpError](classes/HttpError.md)
@@ -22,6 +23,7 @@ custom_edit_url: null
 - [AccountInterface](classes/AccountInterface.md)
 - [SignerInterface](classes/SignerInterface.md)
 - [Signer](classes/Signer.md)
+- [CallData](classes/CallData.md)
 
 ## Namespaces
 
@@ -37,17 +39,20 @@ custom_edit_url: null
 - [shortString](namespaces/shortString.md)
 - [typedData](namespaces/typedData.md)
 - [ec](namespaces/ec.md)
+- [starknetId](namespaces/starknetId.md)
 - [Sequencer](namespaces/Sequencer.md)
 - [RPC](namespaces/RPC.md)
+- [cairo](namespaces/cairo.md)
 
 ## Enumerations
 
 - [TransactionStatus](enums/TransactionStatus.md)
 - [TransactionType](enums/TransactionType.md)
+- [EntryPointType](enums/EntryPointType.md)
 
 ## Interfaces
 
-- [ContractClass](interfaces/ContractClass.md)
+- [CallStruct](interfaces/CallStruct.md)
 - [Program](interfaces/Program.md)
 - [InvocationsSignerDetails](interfaces/InvocationsSignerDetails.md)
 - [DeclareSignerDetails](interfaces/DeclareSignerDetails.md)
@@ -75,61 +80,33 @@ custom_edit_url: null
 
 ## Type Aliases
 
-### CallOptions
+### WeierstrassSignatureType
 
-Ƭ **CallOptions**: `Object`
-
-#### Type declaration
-
-| Name               | Type               |
-| :----------------- | :----------------- |
-| `blockIdentifier?` | `BlockIdentifier`  |
-| `parseRequest`     | `Boolean`          |
-| `parseResponse`    | `Boolean`          |
-| `formatResponse?`  | `Object` \| `null` |
+Ƭ **WeierstrassSignatureType**: [`SignatureType`](interfaces/ec.weierstrass.SignatureType.md)
 
 #### Defined in
 
-[src/contract/interface.ts:13](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/interface.ts#L13)
+[src/types/lib/index.ts:7](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L7)
 
 ---
 
-### Calldata
+### ArraySignatureType
 
-Ƭ **Calldata**: `string`[]
-
-#### Defined in
-
-[src/types/api/index.ts:4](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/index.ts#L4)
-
----
-
-### Overrides
-
-Ƭ **Overrides**: `Object`
-
-#### Type declaration
-
-| Name           | Type                                             |
-| :------------- | :----------------------------------------------- |
-| `maxFee?`      | [`BigNumberish`](namespaces/num.md#bignumberish) |
-| `nonce?`       | [`BigNumberish`](namespaces/num.md#bignumberish) |
-| `signature?`   | [`Signature`](modules.md#signature)              |
-| `parseRequest` | `Boolean`                                        |
+Ƭ **ArraySignatureType**: `string`[]
 
 #### Defined in
 
-[src/types/api/index.ts:6](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/index.ts#L6)
+[src/types/lib/index.ts:8](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L8)
 
 ---
 
 ### Signature
 
-Ƭ **Signature**: [`SignatureType`](interfaces/ec.weierstrass.SignatureType.md)
+Ƭ **Signature**: [`ArraySignatureType`](modules.md#arraysignaturetype) \| [`WeierstrassSignatureType`](modules.md#weierstrasssignaturetype)
 
 #### Defined in
 
-[src/types/lib.ts:8](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L8)
+[src/types/lib/index.ts:9](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L9)
 
 ---
 
@@ -139,7 +116,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib.ts:10](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L10)
+[src/types/lib/index.ts:11](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L11)
 
 ---
 
@@ -155,17 +132,51 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib.ts:11](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L11)
+[src/types/lib/index.ts:12](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L12)
 
 ---
 
 ### RawArgs
 
-Ƭ **RawArgs**: { `[inputName: string]`: [`BigNumberish`](namespaces/num.md#bignumberish) \| [`BigNumberish`](namespaces/num.md#bignumberish)[] \| { `[k: string]`: [`BigNumberish`](namespaces/num.md#bignumberish); `type`: `"struct"` }; } \| [`BigNumberish`](namespaces/num.md#bignumberish)[]
+Ƭ **RawArgs**: [`RawArgsObject`](modules.md#rawargsobject) \| [`RawArgsArray`](modules.md#rawargsarray)
 
 #### Defined in
 
-[src/types/lib.ts:12](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L12)
+[src/types/lib/index.ts:14](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L14)
+
+---
+
+### RawArgsObject
+
+Ƭ **RawArgsObject**: `Object`
+
+#### Index signature
+
+▪ [inputName: `string`]: [`MultiType`](modules.md#multitype) \| [`MultiType`](modules.md#multitype)[] \| [`RawArgs`](modules.md#rawargs)
+
+#### Defined in
+
+[src/types/lib/index.ts:16](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L16)
+
+---
+
+### RawArgsArray
+
+Ƭ **RawArgsArray**: ([`MultiType`](modules.md#multitype) \| [`MultiType`](modules.md#multitype)[] \| [`RawArgs`](modules.md#rawargs))[]
+
+#### Defined in
+
+[src/types/lib/index.ts:20](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L20)
+
+---
+
+### MultiType
+
+Ƭ **MultiType**: [`BigNumberish`](namespaces/num.md#bignumberish) \| [`Uint256`](interfaces/uint256.Uint256.md) \| `object` \| `boolean`
+
+#### Defined in
+
+[src/types/lib/index.ts:22](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L22)
 
 ---
 
@@ -184,7 +195,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib.ts:27](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L27)
+[src/types/lib/index.ts:24](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L24)
 
 ---
 
@@ -202,7 +213,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib.ts:34](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L34)
+[src/types/lib/index.ts:31](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L31)
 
 ---
 
@@ -221,7 +232,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib.ts:40](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L40)
+[src/types/lib/index.ts:37](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L37)
 
 ---
 
@@ -231,7 +242,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib.ts:47](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L47)
+[src/types/lib/index.ts:44](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L44)
 
 ---
 
@@ -241,14 +252,35 @@ custom_edit_url: null
 
 #### Type declaration
 
-| Name         | Type                                                          |
-| :----------- | :------------------------------------------------------------ |
-| `contract`   | [`CompiledContract`](modules.md#compiledcontract) \| `string` |
-| `classHash?` | `string`                                                      |
+| Name                 | Type                                                          |
+| :------------------- | :------------------------------------------------------------ |
+| `contract`           | [`CompiledContract`](modules.md#compiledcontract) \| `string` |
+| `classHash?`         | `string`                                                      |
+| `casm?`              | [`CompiledSierraCasm`](modules.md#compiledsierracasm)         |
+| `compiledClassHash?` | `string`                                                      |
 
 #### Defined in
 
-[src/types/lib.ts:54](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L54)
+[src/types/lib/index.ts:51](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L51)
+
+---
+
+### CompleteDeclareContractPayload
+
+Ƭ **CompleteDeclareContractPayload**: `Object`
+
+#### Type declaration
+
+| Name                 | Type                                                          |
+| :------------------- | :------------------------------------------------------------ |
+| `contract`           | [`CompiledContract`](modules.md#compiledcontract) \| `string` |
+| `classHash`          | `string`                                                      |
+| `casm?`              | [`CompiledSierraCasm`](modules.md#compiledsierracasm)         |
+| `compiledClassHash?` | `string`                                                      |
+
+#### Defined in
+
+[src/types/lib/index.ts:58](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L58)
 
 ---
 
@@ -258,7 +290,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib.ts:59](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L59)
+[src/types/lib/index.ts:65](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L65)
 
 ---
 
@@ -268,15 +300,16 @@ custom_edit_url: null
 
 #### Type declaration
 
-| Name                 | Type                                           |
-| :------------------- | :--------------------------------------------- |
-| `contractDefinition` | [`ContractClass`](interfaces/ContractClass.md) |
-| `senderAddress`      | `string`                                       |
-| `signature?`         | [`Signature`](modules.md#signature)            |
+| Name                 | Type                                        |
+| :------------------- | :------------------------------------------ |
+| `contractDefinition` | [`ContractClass`](modules.md#contractclass) |
+| `senderAddress`      | `string`                                    |
+| `signature?`         | [`Signature`](modules.md#signature)         |
+| `compiledClassHash?` | `string`                                    |
 
 #### Defined in
 
-[src/types/lib.ts:62](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L62)
+[src/types/lib/index.ts:68](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L68)
 
 ---
 
@@ -293,7 +326,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib.ts:68](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L68)
+[src/types/lib/index.ts:75](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L75)
 
 ---
 
@@ -303,7 +336,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib.ts:73](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L73)
+[src/types/lib/index.ts:80](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L80)
 
 ---
 
@@ -313,7 +346,17 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib.ts:75](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L75)
+[src/types/lib/index.ts:82](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L82)
+
+---
+
+### CairoVersion
+
+Ƭ **CairoVersion**: `"0"` \| `"1"`
+
+#### Defined in
+
+[src/types/lib/index.ts:84](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L84)
 
 ---
 
@@ -323,15 +366,37 @@ custom_edit_url: null
 
 #### Type declaration
 
-| Name       | Type                                             |
-| :--------- | :----------------------------------------------- |
-| `nonce?`   | [`BigNumberish`](namespaces/num.md#bignumberish) |
-| `maxFee?`  | [`BigNumberish`](namespaces/num.md#bignumberish) |
-| `version?` | [`BigNumberish`](namespaces/num.md#bignumberish) |
+| Name            | Type                                             |
+| :-------------- | :----------------------------------------------- |
+| `nonce?`        | [`BigNumberish`](namespaces/num.md#bignumberish) |
+| `maxFee?`       | [`BigNumberish`](namespaces/num.md#bignumberish) |
+| `version?`      | [`BigNumberish`](namespaces/num.md#bignumberish) |
+| `cairoVersion?` | [`CairoVersion`](modules.md#cairoversion)        |
 
 #### Defined in
 
-[src/types/lib.ts:77](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L77)
+[src/types/lib/index.ts:86](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L86)
+
+---
+
+### Details
+
+Ƭ **Details**: `Object`
+
+Contain all additional details params
+
+#### Type declaration
+
+| Name      | Type                                                    |
+| :-------- | :------------------------------------------------------ |
+| `nonce`   | [`BigNumberish`](namespaces/num.md#bignumberish)        |
+| `maxFee`  | [`BigNumberish`](namespaces/num.md#bignumberish)        |
+| `version` | [`BigNumberish`](namespaces/num.md#bignumberish)        |
+| `chainId` | [`StarknetChainId`](enums/constants.StarknetChainId.md) |
+
+#### Defined in
+
+[src/types/lib/index.ts:96](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L96)
 
 ---
 
@@ -341,7 +406,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib.ts:83](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L83)
+[src/types/lib/index.ts:103](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L103)
 
 ---
 
@@ -351,7 +416,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib.ts:93](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L93)
+[src/types/lib/index.ts:115](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L115)
 
 ---
 
@@ -361,7 +426,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib.ts:102](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L102)
+[src/types/lib/index.ts:124](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L124)
 
 ---
 
@@ -371,44 +436,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib.ts:111](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L111)
-
----
-
-### EntryPointType
-
-Ƭ **EntryPointType**: `"EXTERNAL"`
-
-#### Defined in
-
-[src/types/lib.ts:126](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L126)
-
----
-
-### CompressedProgram
-
-Ƭ **CompressedProgram**: `string`
-
-#### Defined in
-
-[src/types/lib.ts:127](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L127)
-
----
-
-### AbiEntry
-
-Ƭ **AbiEntry**: `Object`
-
-#### Type declaration
-
-| Name   | Type                              |
-| :----- | :-------------------------------- |
-| `name` | `string`                          |
-| `type` | `"felt"` \| `"felt*"` \| `string` |
-
-#### Defined in
-
-[src/types/lib.ts:129](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L129)
+[src/types/lib/index.ts:133](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L133)
 
 ---
 
@@ -425,105 +453,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib.ts:130](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L130)
-
----
-
-### FunctionAbi
-
-Ƭ **FunctionAbi**: `Object`
-
-#### Type declaration
-
-| Name               | Type                                |
-| :----------------- | :---------------------------------- |
-| `inputs`           | [`AbiEntry`](modules.md#abientry)[] |
-| `name`             | `string`                            |
-| `outputs`          | [`AbiEntry`](modules.md#abientry)[] |
-| `stateMutability?` | `"view"`                            |
-| `type`             | `FunctionAbiType`                   |
-
-#### Defined in
-
-[src/types/lib.ts:132](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L132)
-
----
-
-### abiStructs
-
-Ƭ **abiStructs**: `Object`
-
-#### Index signature
-
-▪ [name: `string`]: [`StructAbi`](modules.md#structabi)
-
-#### Defined in
-
-[src/types/lib.ts:146](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L146)
-
----
-
-### StructAbi
-
-Ƭ **StructAbi**: `Object`
-
-#### Type declaration
-
-| Name      | Type                                                         |
-| :-------- | :----------------------------------------------------------- |
-| `members` | [`AbiEntry`](modules.md#abientry) & { `offset`: `number` }[] |
-| `name`    | `string`                                                     |
-| `size`    | `number`                                                     |
-| `type`    | `"struct"`                                                   |
-
-#### Defined in
-
-[src/types/lib.ts:148](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L148)
-
----
-
-### Abi
-
-Ƭ **Abi**: ([`FunctionAbi`](modules.md#functionabi) \| `EventAbi` \| [`StructAbi`](modules.md#structabi))[]
-
-#### Defined in
-
-[src/types/lib.ts:155](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L155)
-
----
-
-### ContractEntryPointFields
-
-Ƭ **ContractEntryPointFields**: `Object`
-
-#### Type declaration
-
-| Name       | Type     |
-| :--------- | :------- |
-| `selector` | `string` |
-| `offset`   | `string` |
-
-#### Defined in
-
-[src/types/lib.ts:159](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L159)
-
----
-
-### EntryPointsByType
-
-Ƭ **EntryPointsByType**: `Object`
-
-#### Type declaration
-
-| Name          | Type                                                                |
-| :------------ | :------------------------------------------------------------------ |
-| `CONSTRUCTOR` | [`ContractEntryPointFields`](modules.md#contractentrypointfields)[] |
-| `EXTERNAL`    | [`ContractEntryPointFields`](modules.md#contractentrypointfields)[] |
-| `L1_HANDLER`  | [`ContractEntryPointFields`](modules.md#contractentrypointfields)[] |
-
-#### Defined in
-
-[src/types/lib.ts:164](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L164)
+[src/types/lib/index.ts:148](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L148)
 
 ---
 
@@ -533,7 +463,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib.ts:174](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L174)
+[src/types/lib/index.ts:149](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L149)
 
 ---
 
@@ -543,35 +473,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib.ts:175](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L175)
-
----
-
-### CompiledContract
-
-Ƭ **CompiledContract**: `Object`
-
-#### Type declaration
-
-| Name                   | Type                                                |
-| :--------------------- | :-------------------------------------------------- |
-| `abi`                  | [`Abi`](modules.md#abi)                             |
-| `entry_points_by_type` | [`EntryPointsByType`](modules.md#entrypointsbytype) |
-| `program`              | [`Program`](interfaces/Program.md)                  |
-
-#### Defined in
-
-[src/types/lib.ts:177](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L177)
-
----
-
-### CompressedCompiledContract
-
-Ƭ **CompressedCompiledContract**: `Omit`<[`CompiledContract`](modules.md#compiledcontract), `"program"`\> & { `program`: [`CompressedProgram`](modules.md#compressedprogram) }
-
-#### Defined in
-
-[src/types/lib.ts:183](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L183)
+[src/types/lib/index.ts:150](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L150)
 
 ---
 
@@ -591,7 +493,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib.ts:187](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L187)
+[src/types/lib/index.ts:152](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L152)
 
 ---
 
@@ -605,7 +507,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib.ts:191](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L191)
+[src/types/lib/index.ts:156](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L156)
 
 ---
 
@@ -619,7 +521,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib.ts:194](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L194)
+[src/types/lib/index.ts:159](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L159)
 
 ---
 
@@ -636,23 +538,364 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib.ts:198](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/lib.ts#L198)
+[src/types/lib/index.ts:163](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L163)
+
+---
+
+### ContractClass
+
+Ƭ **ContractClass**: [`LegacyContractClass`](modules.md#legacycontractclass) \| [`SierraContractClass`](modules.md#sierracontractclass)
+
+#### Defined in
+
+[src/types/lib/contract/index.ts:5](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/index.ts#L5)
+
+---
+
+### CompiledContract
+
+Ƭ **CompiledContract**: [`LegacyCompiledContract`](modules.md#legacycompiledcontract) \| [`CompiledSierra`](modules.md#compiledsierra)
+
+#### Defined in
+
+[src/types/lib/contract/index.ts:6](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/index.ts#L6)
+
+---
+
+### CairoContract
+
+Ƭ **CairoContract**: [`ContractClass`](modules.md#contractclass) \| [`CompiledContract`](modules.md#compiledcontract)
+
+#### Defined in
+
+[src/types/lib/contract/index.ts:7](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/index.ts#L7)
+
+---
+
+### Abi
+
+Ƭ **Abi**: ([`FunctionAbi`](modules.md#functionabi) \| `EventAbi` \| [`StructAbi`](modules.md#structabi))[]
+
+ABI
+
+#### Defined in
+
+[src/types/lib/contract/abi.ts:2](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/abi.ts#L2)
+
+---
+
+### AbiEntry
+
+Ƭ **AbiEntry**: `Object`
+
+#### Type declaration
+
+| Name   | Type                              |
+| :----- | :-------------------------------- |
+| `name` | `string`                          |
+| `type` | `"felt"` \| `"felt*"` \| `string` |
+
+#### Defined in
+
+[src/types/lib/contract/abi.ts:5](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/abi.ts#L5)
+
+---
+
+### FunctionAbi
+
+Ƭ **FunctionAbi**: `Object`
+
+#### Type declaration
+
+| Name                | Type                                |
+| :------------------ | :---------------------------------- |
+| `inputs`            | [`AbiEntry`](modules.md#abientry)[] |
+| `name`              | `string`                            |
+| `outputs`           | [`AbiEntry`](modules.md#abientry)[] |
+| `stateMutability?`  | `"view"`                            |
+| `state_mutability?` | `string`                            |
+| `type`              | `FunctionAbiType`                   |
+
+#### Defined in
+
+[src/types/lib/contract/abi.ts:14](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/abi.ts#L14)
+
+---
+
+### AbiStructs
+
+Ƭ **AbiStructs**: `Object`
+
+#### Index signature
+
+▪ [name: `string`]: [`StructAbi`](modules.md#structabi)
+
+#### Defined in
+
+[src/types/lib/contract/abi.ts:23](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/abi.ts#L23)
+
+---
+
+### StructAbi
+
+Ƭ **StructAbi**: `Object`
+
+#### Type declaration
+
+| Name      | Type                                                         |
+| :-------- | :----------------------------------------------------------- |
+| `members` | [`AbiEntry`](modules.md#abientry) & { `offset`: `number` }[] |
+| `name`    | `string`                                                     |
+| `size`    | `number`                                                     |
+| `type`    | `"struct"`                                                   |
+
+#### Defined in
+
+[src/types/lib/contract/abi.ts:25](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/abi.ts#L25)
+
+---
+
+### LegacyContractClass
+
+Ƭ **LegacyContractClass**: `Object`
+
+LEGACY CONTRACT
+
+#### Type declaration
+
+| Name                   | Type                                                |
+| :--------------------- | :-------------------------------------------------- |
+| `program`              | [`CompressedProgram`](modules.md#compressedprogram) |
+| `entry_points_by_type` | [`EntryPointsByType`](modules.md#entrypointsbytype) |
+| `abi`                  | [`Abi`](modules.md#abi)                             |
+
+#### Defined in
+
+[src/types/lib/contract/legacy.ts:4](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/legacy.ts#L4)
+
+---
+
+### LegacyCompiledContract
+
+Ƭ **LegacyCompiledContract**: `Omit`<[`LegacyContractClass`](modules.md#legacycontractclass), `"program"`\> & { `program`: [`Program`](interfaces/Program.md) }
+
+#### Defined in
+
+[src/types/lib/contract/legacy.ts:10](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/legacy.ts#L10)
+
+---
+
+### Builtins
+
+Ƭ **Builtins**: `string`[]
+
+SUBTYPES
+
+#### Defined in
+
+[src/types/lib/contract/legacy.ts:15](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/legacy.ts#L15)
+
+---
+
+### CompressedProgram
+
+Ƭ **CompressedProgram**: `string`
+
+#### Defined in
+
+[src/types/lib/contract/legacy.ts:16](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/legacy.ts#L16)
+
+---
+
+### EntryPointsByType
+
+Ƭ **EntryPointsByType**: `Object`
+
+#### Type declaration
+
+| Name          | Type                                                                |
+| :------------ | :------------------------------------------------------------------ |
+| `CONSTRUCTOR` | [`ContractEntryPointFields`](modules.md#contractentrypointfields)[] |
+| `EXTERNAL`    | [`ContractEntryPointFields`](modules.md#contractentrypointfields)[] |
+| `L1_HANDLER`  | [`ContractEntryPointFields`](modules.md#contractentrypointfields)[] |
+
+#### Defined in
+
+[src/types/lib/contract/legacy.ts:18](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/legacy.ts#L18)
+
+---
+
+### ContractEntryPointFields
+
+Ƭ **ContractEntryPointFields**: `Object`
+
+#### Type declaration
+
+| Name        | Type                              |
+| :---------- | :-------------------------------- |
+| `selector`  | `string`                          |
+| `offset`    | `string`                          |
+| `builtins?` | [`Builtins`](modules.md#builtins) |
+
+#### Defined in
+
+[src/types/lib/contract/legacy.ts:24](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/legacy.ts#L24)
+
+---
+
+### CairoAssembly
+
+Ƭ **CairoAssembly**: `Object`
+
+SYSTEM TYPES
+
+#### Type declaration
+
+| Name                   | Type                                                |
+| :--------------------- | :-------------------------------------------------- |
+| `prime`                | `string`                                            |
+| `compiler_version`     | `string`                                            |
+| `bytecode`             | [`ByteCode`](modules.md#bytecode)                   |
+| `hints`                | `any`[]                                             |
+| `pythonic_hints`       | [`PythonicHints`](modules.md#pythonichints)         |
+| `entry_points_by_type` | [`EntryPointsByType`](modules.md#entrypointsbytype) |
+
+#### Defined in
+
+[src/types/lib/contract/sierra.ts:5](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/sierra.ts#L5)
+
+---
+
+### SierraContractClass
+
+Ƭ **SierraContractClass**: `Object`
+
+#### Type declaration
+
+| Name                        | Type                                                            |
+| :-------------------------- | :-------------------------------------------------------------- |
+| `sierra_program`            | [`ByteCode`](modules.md#bytecode)                               |
+| `sierra_program_debug_info` | [`SierraProgramDebugInfo`](modules.md#sierraprogramdebuginfo)   |
+| `contract_class_version`    | `string`                                                        |
+| `entry_points_by_type`      | [`SierraEntryPointsByType`](modules.md#sierraentrypointsbytype) |
+| `abi`                       | [`Abi`](modules.md#abi)                                         |
+
+#### Defined in
+
+[src/types/lib/contract/sierra.ts:14](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/sierra.ts#L14)
+
+---
+
+### CompiledSierra
+
+Ƭ **CompiledSierra**: [`SierraContractClass`](modules.md#sierracontractclass)
+
+COMPILED CONTRACT
+
+#### Defined in
+
+[src/types/lib/contract/sierra.ts:23](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/sierra.ts#L23)
+
+---
+
+### CompiledSierraCasm
+
+Ƭ **CompiledSierraCasm**: [`CairoAssembly`](modules.md#cairoassembly)
+
+#### Defined in
+
+[src/types/lib/contract/sierra.ts:24](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/sierra.ts#L24)
+
+---
+
+### ByteCode
+
+Ƭ **ByteCode**: `string`[]
+
+SUBTYPES
+
+#### Defined in
+
+[src/types/lib/contract/sierra.ts:27](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/sierra.ts#L27)
+
+---
+
+### PythonicHints
+
+Ƭ **PythonicHints**: [`number`, `string`[]][]
+
+#### Defined in
+
+[src/types/lib/contract/sierra.ts:28](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/sierra.ts#L28)
+
+---
+
+### SierraProgramDebugInfo
+
+Ƭ **SierraProgramDebugInfo**: `Object`
+
+#### Type declaration
+
+| Name              | Type                   |
+| :---------------- | :--------------------- |
+| `type_names`      | [`number`, `string`][] |
+| `libfunc_names`   | [`number`, `string`][] |
+| `user_func_names` | [`number`, `string`][] |
+
+#### Defined in
+
+[src/types/lib/contract/sierra.ts:30](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/sierra.ts#L30)
+
+---
+
+### SierraEntryPointsByType
+
+Ƭ **SierraEntryPointsByType**: `Object`
+
+#### Type declaration
+
+| Name          | Type                                                                            |
+| :------------ | :------------------------------------------------------------------------------ |
+| `CONSTRUCTOR` | [`SierraContractEntryPointFields`](modules.md#sierracontractentrypointfields)[] |
+| `EXTERNAL`    | [`SierraContractEntryPointFields`](modules.md#sierracontractentrypointfields)[] |
+| `L1_HANDLER`  | [`SierraContractEntryPointFields`](modules.md#sierracontractentrypointfields)[] |
+
+#### Defined in
+
+[src/types/lib/contract/sierra.ts:36](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/sierra.ts#L36)
+
+---
+
+### SierraContractEntryPointFields
+
+Ƭ **SierraContractEntryPointFields**: `Object`
+
+#### Type declaration
+
+| Name           | Type     |
+| :------------- | :------- |
+| `selector`     | `string` |
+| `function_idx` | `number` |
+
+#### Defined in
+
+[src/types/lib/contract/sierra.ts:42](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/sierra.ts#L42)
 
 ---
 
 ### DeployAccountSignerDetails
 
-Ƭ **DeployAccountSignerDetails**: `Required`<[`DeployAccountContractPayload`](modules.md#deployaccountcontractpayload)\> & `Required`<[`InvocationsDetails`](modules.md#invocationsdetails)\> & { `contractAddress`: [`BigNumberish`](namespaces/num.md#bignumberish) ; `chainId`: [`StarknetChainId`](enums/constants.StarknetChainId.md) }
+Ƭ **DeployAccountSignerDetails**: `Required`<[`DeployAccountContractPayload`](modules.md#deployaccountcontractpayload)\> & `Omit`<`Required`<[`InvocationsDetails`](modules.md#invocationsdetails)\>, `"cairoVersion"`\> & { `contractAddress`: [`BigNumberish`](namespaces/num.md#bignumberish) ; `chainId`: [`StarknetChainId`](enums/constants.StarknetChainId.md) }
 
 #### Defined in
 
-[src/types/signer.ts:19](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/signer.ts#L19)
+[src/types/signer.ts:20](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/signer.ts#L20)
 
 ---
 
 ### AsyncContractFunction
 
-Ƭ **AsyncContractFunction**<`T`\>: (...`args`: `any`[]) => `Promise`<`T`\>
+Ƭ **AsyncContractFunction**<`T`\>: (...`args`: [`ArgsOrCalldataWithOptions`](modules.md#argsorcalldatawithoptions)) => `Promise`<`T`\>
 
 #### Type parameters
 
@@ -666,9 +909,9 @@ custom_edit_url: null
 
 ##### Parameters
 
-| Name      | Type    |
-| :-------- | :------ |
-| `...args` | `any`[] |
+| Name      | Type                                                                |
+| :-------- | :------------------------------------------------------------------ |
+| `...args` | [`ArgsOrCalldataWithOptions`](modules.md#argsorcalldatawithoptions) |
 
 ##### Returns
 
@@ -676,13 +919,13 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/contract.ts:1](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/contract.ts#L1)
+[src/types/contract.ts:5](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/contract.ts#L5)
 
 ---
 
 ### ContractFunction
 
-Ƭ **ContractFunction**: (...`args`: `any`[]) => `any`
+Ƭ **ContractFunction**: (...`args`: [`ArgsOrCalldataWithOptions`](modules.md#argsorcalldatawithoptions)) => `any`
 
 #### Type declaration
 
@@ -690,9 +933,9 @@ custom_edit_url: null
 
 ##### Parameters
 
-| Name      | Type    |
-| :-------- | :------ |
-| `...args` | `any`[] |
+| Name      | Type                                                                |
+| :-------- | :------------------------------------------------------------------ |
+| `...args` | [`ArgsOrCalldataWithOptions`](modules.md#argsorcalldatawithoptions) |
 
 ##### Returns
 
@@ -700,7 +943,90 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/contract.ts:2](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/contract.ts#L2)
+[src/types/contract.ts:6](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/contract.ts#L6)
+
+---
+
+### Result
+
+Ƭ **Result**: { `[key: string]`: `any`; } \| [`Result`](modules.md#result)[] \| `bigint` \| `string` \| `boolean`
+
+#### Defined in
+
+[src/types/contract.ts:7](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/contract.ts#L7)
+
+---
+
+### Calldata
+
+Ƭ **Calldata**: `string`[] & { `__compiled__?`: `boolean` }
+
+#### Defined in
+
+[src/types/contract.ts:15](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/contract.ts#L15)
+
+---
+
+### ArgsOrCalldata
+
+Ƭ **ArgsOrCalldata**: [`RawArgsArray`](modules.md#rawargsarray) \| [[`Calldata`](modules.md#calldata)] \| [`Calldata`](modules.md#calldata)
+
+#### Defined in
+
+[src/types/contract.ts:16](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/contract.ts#L16)
+
+---
+
+### ArgsOrCalldataWithOptions
+
+Ƭ **ArgsOrCalldataWithOptions**: [`ArgsOrCalldata`](modules.md#argsorcalldata) & [`ContractOptions`](modules.md#contractoptions)
+
+#### Defined in
+
+[src/types/contract.ts:17](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/contract.ts#L17)
+
+---
+
+### ContractOptions
+
+Ƭ **ContractOptions**: `Object`
+
+#### Type declaration
+
+| Name               | Type                                             |
+| :----------------- | :----------------------------------------------- |
+| `blockIdentifier?` | `BlockIdentifier`                                |
+| `parseRequest?`    | `boolean`                                        |
+| `parseResponse?`   | `boolean`                                        |
+| `formatResponse?`  | { `[key: string]`: `any`; }                      |
+| `maxFee?`          | [`BigNumberish`](namespaces/num.md#bignumberish) |
+| `nonce?`           | [`BigNumberish`](namespaces/num.md#bignumberish) |
+| `signature?`       | [`Signature`](modules.md#signature)              |
+| `addressSalt?`     | `string`                                         |
+
+#### Defined in
+
+[src/types/contract.ts:18](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/contract.ts#L18)
+
+---
+
+### CallOptions
+
+Ƭ **CallOptions**: `Pick`<[`ContractOptions`](modules.md#contractoptions), `"blockIdentifier"` \| `"parseRequest"` \| `"parseResponse"` \| `"formatResponse"`\>
+
+#### Defined in
+
+[src/types/contract.ts:29](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/contract.ts#L29)
+
+---
+
+### InvokeOptions
+
+Ƭ **InvokeOptions**: `Pick`<[`ContractOptions`](modules.md#contractoptions), `"maxFee"` \| `"nonce"` \| `"signature"` \| `"parseRequest"`\>
+
+#### Defined in
+
+[src/types/contract.ts:34](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/contract.ts#L34)
 
 ---
 
@@ -710,7 +1036,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/account.ts:13](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/account.ts#L13)
+[src/types/account.ts:14](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/account.ts#L14)
 
 ---
 
@@ -727,7 +1053,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/account.ts:25](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/account.ts#L25)
+[src/types/account.ts:28](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/account.ts#L28)
 
 ---
 
@@ -751,7 +1077,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/account.ts:30](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/account.ts#L30)
+[src/types/account.ts:33](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/account.ts#L33)
 
 ---
 
@@ -768,7 +1094,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/account.ts:42](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/account.ts#L42)
+[src/types/account.ts:45](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/account.ts#L45)
 
 ---
 
@@ -778,7 +1104,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:43](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L43)
+[src/types/provider.ts:40](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L40)
 
 ---
 
@@ -788,7 +1114,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:69](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L69)
+[src/types/provider.ts:67](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L67)
 
 ---
 
@@ -798,7 +1124,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:103](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L103)
+[src/types/provider.ts:101](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L101)
 
 ---
 
@@ -814,7 +1140,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:120](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L120)
+[src/types/provider.ts:119](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L119)
 
 ---
 
@@ -824,7 +1150,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:124](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L124)
+[src/types/provider.ts:123](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L123)
 
 ---
 
@@ -834,7 +1160,27 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:142](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L142)
+[src/types/provider.ts:141](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L141)
+
+---
+
+### Storage
+
+Ƭ **Storage**: [`Storage`](namespaces/Sequencer.md#storage)
+
+#### Defined in
+
+[src/types/provider.ts:143](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L143)
+
+---
+
+### Nonce
+
+Ƭ **Nonce**: [`Nonce`](namespaces/Sequencer.md#nonce)
+
+#### Defined in
+
+[src/types/provider.ts:145](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L145)
 
 ---
 
@@ -854,7 +1200,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:14](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/sequencer.ts#L14)
+[src/types/api/sequencer.ts:17](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L17)
 
 ---
 
@@ -871,7 +1217,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:23](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/sequencer.ts#L23)
+[src/types/api/sequencer.ts:26](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L26)
 
 ---
 
@@ -889,7 +1235,7 @@ custom_edit_url: null
 | `call_type?`          | `string`                                                |
 | `class_hash?`         | `string`                                                |
 | `selector?`           | `string`                                                |
-| `entry_point_type?`   | [`EntryPointType`](modules.md#entrypointtype)           |
+| `entry_point_type?`   | [`EXTERNAL`](enums/EntryPointType.md#external)          |
 | `result`              | `any`[]                                                 |
 | `execution_resources` | [`ExecutionResources`](modules.md#executionresources)   |
 | `internal_calls`      | [`FunctionInvocation`](modules.md#functioninvocation)[] |
@@ -898,7 +1244,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:28](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/sequencer.ts#L28)
+[src/types/api/sequencer.ts:31](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L31)
 
 ---
 
@@ -922,7 +1268,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:43](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/sequencer.ts#L43)
+[src/types/api/sequencer.ts:46](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L46)
 
 ---
 
@@ -941,7 +1287,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:56](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/sequencer.ts#L56)
+[src/types/api/sequencer.ts:59](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L59)
 
 ---
 
@@ -960,41 +1306,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:63](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/sequencer.ts#L63)
-
----
-
-### StateDiffItem
-
-Ƭ **StateDiffItem**: `Object`
-
-#### Type declaration
-
-| Name    | Type     |
-| :------ | :------- |
-| `key`   | `string` |
-| `value` | `string` |
-
-#### Defined in
-
-[src/types/api/sequencer.ts:70](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/sequencer.ts#L70)
-
----
-
-### StorageDiffItem
-
-Ƭ **StorageDiffItem**: `Object`
-
-#### Type declaration
-
-| Name              | Type                         |
-| :---------------- | :--------------------------- |
-| `address`         | `string`                     |
-| `storage_entries` | [key: string, value: string] |
-
-#### Defined in
-
-[src/types/api/sequencer.ts:75](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/sequencer.ts#L75)
+[src/types/api/sequencer.ts:66](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L66)
 
 ---
 
@@ -1011,24 +1323,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:80](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/sequencer.ts#L80)
-
----
-
-### Nonces
-
-Ƭ **Nonces**: `Object`
-
-#### Type declaration
-
-| Name               | Type     |
-| :----------------- | :------- |
-| `contract_address` | `string` |
-| `nonce`            | `string` |
-
-#### Defined in
-
-[src/types/api/sequencer.ts:85](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/sequencer.ts#L85)
+[src/types/api/sequencer.ts:73](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L73)
 
 ---
 
@@ -1038,7 +1333,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:90](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/sequencer.ts#L90)
+[src/types/api/sequencer.ts:78](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L78)
 
 ---
 
@@ -1048,7 +1343,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:53](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/sequencer.ts#L53)
+[src/provider/sequencer.ts:55](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/sequencer.ts#L55)
 
 ---
 
@@ -1058,7 +1353,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:55](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/sequencer.ts#L55)
+[src/provider/sequencer.ts:57](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/sequencer.ts#L57)
 
 ---
 
@@ -1077,7 +1372,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/rpc.ts:35](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/rpc.ts#L35)
+[src/provider/rpc.ts:35](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/rpc.ts#L35)
 
 ## Variables
 
@@ -1091,7 +1386,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/index.ts:35](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/index.ts#L35)
+[src/index.ts:37](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/index.ts#L37)
 
 ---
 
@@ -1101,9 +1396,92 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/provider/index.ts:9](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/index.ts#L9)
+[src/provider/index.ts:9](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/index.ts#L9)
 
 ## Functions
+
+### getCalldata
+
+▸ **getCalldata**(`args`, `callback`): [`Calldata`](modules.md#calldata)
+
+#### Parameters
+
+| Name       | Type                                          |
+| :--------- | :-------------------------------------------- |
+| `args`     | [`ArgsOrCalldata`](modules.md#argsorcalldata) |
+| `callback` | `Function`                                    |
+
+#### Returns
+
+[`Calldata`](modules.md#calldata)
+
+#### Defined in
+
+[src/contract/default.ts:97](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/default.ts#L97)
+
+---
+
+### splitArgsAndOptions
+
+▸ **splitArgsAndOptions**(`args`): { `args`: [`ArgsOrCalldata`](modules.md#argsorcalldata) ; `options`: [`ContractOptions`](modules.md#contractoptions) } \| { `args`: [`ArgsOrCalldata`](modules.md#argsorcalldata) ; `options`: `undefined` }
+
+#### Parameters
+
+| Name   | Type                                                                |
+| :----- | :------------------------------------------------------------------ |
+| `args` | [`ArgsOrCalldataWithOptions`](modules.md#argsorcalldatawithoptions) |
+
+#### Returns
+
+{ `args`: [`ArgsOrCalldata`](modules.md#argsorcalldata) ; `options`: [`ContractOptions`](modules.md#contractoptions) } \| { `args`: [`ArgsOrCalldata`](modules.md#argsorcalldata) ; `options`: `undefined` }
+
+#### Defined in
+
+[src/contract/default.ts:24](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/default.ts#L24)
+
+---
+
+### fixStack
+
+▸ **fixStack**(`target`, `fn?`): `void`
+
+#### Parameters
+
+| Name     | Type       | Default value        |
+| :------- | :--------- | :------------------- |
+| `target` | `Error`    | `undefined`          |
+| `fn`     | `Function` | `target.constructor` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[src/provider/errors.ts:2](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/errors.ts#L2)
+
+---
+
+### fixProto
+
+▸ **fixProto**(`target`, `prototype`): `void`
+
+#### Parameters
+
+| Name        | Type     |
+| :---------- | :------- |
+| `target`    | `Error`  |
+| `prototype` | `Object` |
+
+#### Returns
+
+`void`
+
+#### Defined in
+
+[src/provider/errors.ts:8](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/errors.ts#L8)
+
+---
 
 ### addAddressPadding
 
@@ -1121,7 +1499,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/utils/address.ts:9](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/address.ts#L9)
+[src/utils/address.ts:9](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/address.ts#L9)
 
 ---
 
@@ -1141,7 +1519,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/utils/address.ts:13](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/address.ts#L13)
+[src/utils/address.ts:13](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/address.ts#L13)
 
 ---
 
@@ -1161,7 +1539,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/utils/address.ts:26](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/address.ts#L26)
+[src/utils/address.ts:26](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/address.ts#L26)
 
 ---
 
@@ -1181,7 +1559,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/utils/address.ts:42](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/address.ts#L42)
+[src/utils/address.ts:43](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/address.ts#L43)
 
 ---
 
@@ -1203,7 +1581,7 @@ Loosely validate a URL `string`.
 
 #### Defined in
 
-[src/utils/url.ts:22](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/url.ts#L22)
+[src/utils/url.ts:22](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/url.ts#L22)
 
 ---
 
@@ -1225,4 +1603,4 @@ Loosely validate a URL `string`.
 
 #### Defined in
 
-[src/utils/url.ts:51](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/url.ts#L51)
+[src/utils/url.ts:51](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/url.ts#L51)

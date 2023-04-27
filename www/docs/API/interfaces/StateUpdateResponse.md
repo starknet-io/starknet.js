@@ -14,7 +14,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:150](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L150)
+[src/types/provider.ts:154](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L154)
 
 ---
 
@@ -24,7 +24,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:151](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L151)
+[src/types/provider.ts:155](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L155)
 
 ---
 
@@ -34,7 +34,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:152](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L152)
+[src/types/provider.ts:156](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L156)
 
 ---
 
@@ -44,13 +44,16 @@ custom_edit_url: null
 
 #### Type declaration
 
-| Name                       | Type                                                           |
-| :------------------------- | :------------------------------------------------------------- |
-| `storage_diffs`            | [`StorageDiffItem`](../modules.md#storagediffitem)[]           |
-| `declared_contract_hashes` | `string`[]                                                     |
-| `deployed_contracts`       | [`DeployedContractItem`](../modules.md#deployedcontractitem)[] |
-| `nonces`                   | [`Nonces`](../modules.md#nonces)[]                             |
+| Name                        | Type                                                                      |
+| :-------------------------- | :------------------------------------------------------------------------ |
+| `storage_diffs`             | [`StorageDiffs`](../namespaces/RPC.md#storagediffs)                       |
+| `declared_contract_hashes?` | [`DeclaredContractHashes`](../namespaces/RPC.md#declaredcontracthashes)   |
+| `deployed_contracts`        | [`DeployedContracts`](../namespaces/Sequencer.md#deployedcontracts)       |
+| `nonces`                    | [`Nonces`](../namespaces/RPC.md#nonces)                                   |
+| `old_declared_contracts?`   | [`OldDeclaredContracts`](../namespaces/Sequencer.md#olddeclaredcontracts) |
+| `declared_classes?`         | [`DeclaredClasses`](../namespaces/Sequencer.md#declaredclasses)           |
+| `replaced_classes?`         | [`ReplacedClasses`](../namespaces/Sequencer.md#replacedclasses)           |
 
 #### Defined in
 
-[src/types/provider.ts:153](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L153)
+[src/types/provider.ts:157](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L157)

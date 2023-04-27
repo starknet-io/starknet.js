@@ -8,7 +8,7 @@ custom_edit_url: null
 
 ## Hierarchy
 
-- `CustomError`
+- [`CustomError`](CustomError.md)
 
   ↳ **`LibraryError`**
 
@@ -20,22 +20,21 @@ custom_edit_url: null
 
 ### constructor
 
-• **new LibraryError**(`message?`, `options?`)
+• **new LibraryError**(`message?`)
 
 #### Parameters
 
-| Name       | Type           |
-| :--------- | :------------- |
-| `message?` | `string`       |
-| `options?` | `ErrorOptions` |
+| Name       | Type     |
+| :--------- | :------- |
+| `message?` | `string` |
 
 #### Inherited from
 
-CustomError.constructor
+[CustomError](CustomError.md).[constructor](CustomError.md#constructor)
 
 #### Defined in
 
-node_modules/ts-custom-error/dist/custom-error.d.ts:6
+[src/provider/errors.ts:18](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/errors.ts#L18)
 
 ## Properties
 
@@ -66,7 +65,7 @@ https://v8.dev/docs/stack-trace-api#customizing-stack-traces
 
 #### Inherited from
 
-CustomError.prepareStackTrace
+[CustomError](CustomError.md).[prepareStackTrace](CustomError.md#preparestacktrace)
 
 #### Defined in
 
@@ -80,7 +79,7 @@ node_modules/@types/node/globals.d.ts:11
 
 #### Inherited from
 
-CustomError.stackTraceLimit
+[CustomError](CustomError.md).[stackTraceLimit](CustomError.md#stacktracelimit)
 
 #### Defined in
 
@@ -94,11 +93,11 @@ node_modules/@types/node/globals.d.ts:13
 
 #### Inherited from
 
-CustomError.name
+[CustomError](CustomError.md).[name](CustomError.md#name)
 
 #### Defined in
 
-node_modules/ts-custom-error/dist/custom-error.d.ts:5
+[src/provider/errors.ts:16](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/errors.ts#L16)
 
 ---
 
@@ -108,7 +107,7 @@ node_modules/ts-custom-error/dist/custom-error.d.ts:5
 
 #### Inherited from
 
-CustomError.message
+[CustomError](CustomError.md).[message](CustomError.md#message)
 
 #### Defined in
 
@@ -122,7 +121,7 @@ www/node_modules/typescript/lib/lib.es5.d.ts:1054
 
 #### Inherited from
 
-CustomError.stack
+[CustomError](CustomError.md).[stack](CustomError.md#stack)
 
 #### Defined in
 
@@ -149,7 +148,7 @@ Create .stack property on a target object
 
 #### Inherited from
 
-CustomError.captureStackTrace
+[CustomError](CustomError.md).[captureStackTrace](CustomError.md#capturestacktrace)
 
 #### Defined in
 

@@ -24,7 +24,7 @@ Use l2_to_l1_messages
 
 #### Defined in
 
-[src/types/provider.ts:98](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L98)
+[src/types/provider.ts:96](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L96)
 
 ---
 
@@ -34,7 +34,7 @@ Use l2_to_l1_messages
 
 #### Defined in
 
-[src/types/provider.ts:99](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L99)
+[src/types/provider.ts:97](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L97)
 
 ---
 
@@ -44,7 +44,7 @@ Use l2_to_l1_messages
 
 #### Defined in
 
-[src/types/provider.ts:100](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L100)
+[src/types/provider.ts:98](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L98)
 
 ---
 
@@ -58,7 +58,7 @@ Use l2_to_l1_messages
 
 #### Defined in
 
-[src/types/provider.ts:74](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L74)
+[src/types/provider.ts:72](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L72)
 
 ---
 
@@ -72,7 +72,7 @@ Use l2_to_l1_messages
 
 #### Defined in
 
-[src/types/provider.ts:75](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L75)
+[src/types/provider.ts:73](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L73)
 
 ---
 
@@ -86,7 +86,7 @@ Use l2_to_l1_messages
 
 #### Defined in
 
-[src/types/provider.ts:76](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L76)
+[src/types/provider.ts:74](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L74)
 
 ---
 
@@ -100,4 +100,4 @@ Use l2_to_l1_messages
 
 #### Defined in
 
-[src/types/provider.ts:77](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L77)
+[src/types/provider.ts:75](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L75)

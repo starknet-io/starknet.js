@@ -14,17 +14,17 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/signer.ts:11](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/signer.ts#L11)
+[src/types/signer.ts:11](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/signer.ts#L11)
 
 ---
 
 ### senderAddress
 
-• **senderAddress**: [`BigNumberish`](../namespaces/num.md#bignumberish)
+• **senderAddress**: `string`
 
 #### Defined in
 
-[src/types/signer.ts:12](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/signer.ts#L12)
+[src/types/signer.ts:12](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/signer.ts#L12)
 
 ---
 
@@ -34,7 +34,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/signer.ts:13](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/signer.ts#L13)
+[src/types/signer.ts:13](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/signer.ts#L13)
 
 ---
 
@@ -44,7 +44,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/signer.ts:14](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/signer.ts#L14)
+[src/types/signer.ts:14](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/signer.ts#L14)
 
 ---
 
@@ -54,7 +54,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/signer.ts:15](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/signer.ts#L15)
+[src/types/signer.ts:15](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/signer.ts#L15)
 
 ---
 
@@ -64,4 +64,14 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/signer.ts:16](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/signer.ts#L16)
+[src/types/signer.ts:16](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/signer.ts#L16)
+
+---
+
+### compiledClassHash
+
+• `Optional` **compiledClassHash**: `string`
+
+#### Defined in
+
+[src/types/signer.ts:17](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/signer.ts#L17)

@@ -23,7 +23,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/contractFactory.ts:18](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/contractFactory.ts#L18)
+[src/contract/contractFactory.ts:18](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/contractFactory.ts#L18)
 
 ## Properties
 
@@ -33,7 +33,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/contractFactory.ts:8](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/contractFactory.ts#L8)
+[src/contract/contractFactory.ts:8](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/contractFactory.ts#L8)
 
 ---
 
@@ -43,7 +43,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/contractFactory.ts:10](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/contractFactory.ts#L10)
+[src/contract/contractFactory.ts:10](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/contractFactory.ts#L10)
 
 ---
 
@@ -53,7 +53,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/contractFactory.ts:12](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/contractFactory.ts#L12)
+[src/contract/contractFactory.ts:12](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/contractFactory.ts#L12)
 
 ---
 
@@ -63,17 +63,17 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/contractFactory.ts:14](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/contractFactory.ts#L14)
+[src/contract/contractFactory.ts:14](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/contractFactory.ts#L14)
 
 ---
 
-### callData
+### CallData
 
-• `Private` **callData**: `CallData`
+• `Private` **CallData**: [`CallData`](CallData.md)
 
 #### Defined in
 
-[src/contract/contractFactory.ts:16](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/contractFactory.ts#L16)
+[src/contract/contractFactory.ts:16](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/contractFactory.ts#L16)
 
 ## Methods
 
@@ -85,9 +85,9 @@ Deploys contract and returns new instance of the Contract
 
 #### Parameters
 
-| Name      | Type    | Description                                       |
-| :-------- | :------ | :------------------------------------------------ |
-| `...args` | `any`[] | Array of the constructor arguments for deployment |
+| Name      | Type                                                                   | Description                                       |
+| :-------- | :--------------------------------------------------------------------- | :------------------------------------------------ |
+| `...args` | [`ArgsOrCalldataWithOptions`](../modules.md#argsorcalldatawithoptions) | Array of the constructor arguments for deployment |
 
 #### Returns
 
@@ -97,7 +97,7 @@ deployed Contract
 
 #### Defined in
 
-[src/contract/contractFactory.ts:38](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/contractFactory.ts#L38)
+[src/contract/contractFactory.ts:38](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/contractFactory.ts#L38)
 
 ---
 
@@ -105,7 +105,7 @@ deployed Contract
 
 ▸ **connect**(`account`): [`ContractFactory`](ContractFactory.md)
 
-Attaches to new Provider or Account
+Attaches to new Account
 
 #### Parameters
 
@@ -121,7 +121,7 @@ ContractFactory
 
 #### Defined in
 
-[src/contract/contractFactory.ts:88](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/contractFactory.ts#L88)
+[src/contract/contractFactory.ts:76](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/contractFactory.ts#L76)
 
 ---
 
@@ -129,7 +129,7 @@ ContractFactory
 
 ▸ **attach**(`address`): [`Contract`](Contract.md)
 
-Attaches current abi and provider or account to the new address
+Attaches current abi and account to the new address
 
 #### Parameters
 
@@ -145,4 +145,4 @@ Contract
 
 #### Defined in
 
-[src/contract/contractFactory.ts:99](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/contractFactory.ts#L99)
+[src/contract/contractFactory.ts:87](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/contractFactory.ts#L87)

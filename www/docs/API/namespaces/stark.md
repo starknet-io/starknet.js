@@ -30,7 +30,7 @@ Compressed cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:28](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/stark.ts#L28)
+[src/utils/stark.ts:22](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/stark.ts#L22)
 
 ---
 
@@ -44,7 +44,7 @@ Compressed cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:34](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/stark.ts#L34)
+[src/utils/stark.ts:28](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/stark.ts#L28)
 
 ---
 
@@ -64,111 +64,67 @@ Compressed cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:39](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/stark.ts#L39)
+[src/utils/stark.ts:33](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/stark.ts#L33)
 
 ---
 
 ### formatSignature
 
-▸ **formatSignature**(`sig?`): `string`[]
+▸ **formatSignature**(`sig?`): [`ArraySignatureType`](../modules.md#arraysignaturetype)
 
 #### Parameters
 
-| Name   | Type                                                             |
-| :----- | :--------------------------------------------------------------- |
-| `sig?` | [`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md) |
+| Name   | Type                                   |
+| :----- | :------------------------------------- |
+| `sig?` | [`Signature`](../modules.md#signature) |
 
 #### Returns
 
-`string`[]
+[`ArraySignatureType`](../modules.md#arraysignaturetype)
 
 #### Defined in
 
-[src/utils/stark.ts:43](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/stark.ts#L43)
+[src/utils/stark.ts:37](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/stark.ts#L37)
 
 ---
 
 ### signatureToDecimalArray
 
-▸ **signatureToDecimalArray**(`sig?`): `string`[]
+▸ **signatureToDecimalArray**(`sig?`): [`ArraySignatureType`](../modules.md#arraysignaturetype)
 
 #### Parameters
 
-| Name   | Type                                                             |
-| :----- | :--------------------------------------------------------------- |
-| `sig?` | [`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md) |
+| Name   | Type                                   |
+| :----- | :------------------------------------- |
+| `sig?` | [`Signature`](../modules.md#signature) |
 
 #### Returns
 
-`string`[]
+[`ArraySignatureType`](../modules.md#arraysignaturetype)
 
 #### Defined in
 
-[src/utils/stark.ts:53](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/stark.ts#L53)
+[src/utils/stark.ts:50](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/stark.ts#L50)
 
 ---
 
 ### signatureToHexArray
 
-▸ **signatureToHexArray**(`sig?`): `string`[]
+▸ **signatureToHexArray**(`sig?`): [`ArraySignatureType`](../modules.md#arraysignaturetype)
 
 #### Parameters
 
-| Name   | Type                                                             |
-| :----- | :--------------------------------------------------------------- |
-| `sig?` | [`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md) |
+| Name   | Type                                   |
+| :----- | :------------------------------------- |
+| `sig?` | [`Signature`](../modules.md#signature) |
 
 #### Returns
 
-`string`[]
+[`ArraySignatureType`](../modules.md#arraysignaturetype)
 
 #### Defined in
 
-[src/utils/stark.ts:57](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/stark.ts#L57)
-
----
-
-### parseSignature
-
-▸ **parseSignature**(`sig?`): `undefined` \| [`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)
-
-#### Parameters
-
-| Name   | Type       |
-| :----- | :--------- |
-| `sig?` | `string`[] |
-
-#### Returns
-
-`undefined` \| [`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)
-
-#### Defined in
-
-[src/utils/stark.ts:61](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/stark.ts#L61)
-
----
-
-### compileCalldata
-
-▸ **compileCalldata**(`args`): [`Calldata`](../modules.md#calldata)
-
-**`Deprecated`**
-
-this function is deprecated use callData instead from calldata.ts
-
-#### Parameters
-
-| Name   | Type                               |
-| :----- | :--------------------------------- |
-| `args` | [`RawArgs`](../modules.md#rawargs) |
-
-#### Returns
-
-[`Calldata`](../modules.md#calldata)
-
-#### Defined in
-
-[src/utils/stark.ts:71](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/stark.ts#L71)
+[src/utils/stark.ts:54](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/stark.ts#L54)
 
 ---
 
@@ -189,4 +145,4 @@ this function is deprecated use callData instead from calldata.ts
 
 #### Defined in
 
-[src/utils/stark.ts:89](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/stark.ts#L89)
+[src/utils/stark.ts:58](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/stark.ts#L58)

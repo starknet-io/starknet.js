@@ -10,16 +10,13 @@ custom_edit_url: null
 
 ### parse
 
-▸ **parse**(`text`, `reviver?`): `any`
-
-Converts a JavaScript Object Notation (JSON) string into an object.
+▸ **parse**(`x`): `any`
 
 #### Parameters
 
-| Name       | Type                                                      | Description                                                                                                                                                                                         |
-| :--------- | :-------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `text`     | `string`                                                  | A valid JSON string.                                                                                                                                                                                |
-| `reviver?` | (`this`: `any`, `key`: `string`, `value`: `any`) => `any` | A function that transforms the results. This function is called for each member of the object. If a member contains nested objects, the nested objects are transformed before the parent object is. |
+| Name | Type     |
+| :--- | :------- |
+| `x`  | `string` |
 
 #### Returns
 
@@ -27,66 +24,19 @@ Converts a JavaScript Object Notation (JSON) string into an object.
 
 #### Defined in
 
-www/node_modules/typescript/lib/lib.es5.d.ts:1139
-
----
-
-### stringify
-
-▸ **stringify**(`value`, `replacer?`, `space?`): `string`
-
-Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
-
-#### Parameters
-
-| Name        | Type                                                      | Description                                                                                                       |
-| :---------- | :-------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------- |
-| `value`     | `any`                                                     | A JavaScript value, usually an object or array, to be converted.                                                  |
-| `replacer?` | (`this`: `any`, `key`: `string`, `value`: `any`) => `any` | A function that transforms the results.                                                                           |
-| `space?`    | `string` \| `number`                                      | Adds indentation, white space, and line break characters to the return-value JSON text to make it easier to read. |
-
-#### Returns
-
-`string`
-
-#### Defined in
-
-www/node_modules/typescript/lib/lib.es5.d.ts:1146
-
-▸ **stringify**(`value`, `replacer?`, `space?`): `string`
-
-Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
-
-#### Parameters
-
-| Name        | Type                               | Description                                                                                                                 |
-| :---------- | :--------------------------------- | :-------------------------------------------------------------------------------------------------------------------------- |
-| `value`     | `any`                              | A JavaScript value, usually an object or array, to be converted.                                                            |
-| `replacer?` | `null` \| (`string` \| `number`)[] | An array of strings and numbers that acts as an approved list for selecting the object properties that will be stringified. |
-| `space?`    | `string` \| `number`               | Adds indentation, white space, and line break characters to the return-value JSON text to make it easier to read.           |
-
-#### Returns
-
-`string`
-
-#### Defined in
-
-www/node_modules/typescript/lib/lib.es5.d.ts:1153
+[src/utils/json.ts:12](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/json.ts#L12)
 
 ---
 
 ### parseAlwaysAsBig
 
-▸ **parseAlwaysAsBig**(`text`, `reviver?`): `any`
-
-Converts a JavaScript Object Notation (JSON) string into an object.
+▸ **parseAlwaysAsBig**(`x`): `any`
 
 #### Parameters
 
-| Name       | Type                                                      | Description                                                                                                                                                                                         |
-| :--------- | :-------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `text`     | `string`                                                  | A valid JSON string.                                                                                                                                                                                |
-| `reviver?` | (`this`: `any`, `key`: `string`, `value`: `any`) => `any` | A function that transforms the results. This function is called for each member of the object. If a member contains nested objects, the nested objects are transformed before the parent object is. |
+| Name | Type     |
+| :--- | :------- |
+| `x`  | `string` |
 
 #### Returns
 
@@ -94,23 +44,41 @@ Converts a JavaScript Object Notation (JSON) string into an object.
 
 #### Defined in
 
-www/node_modules/typescript/lib/lib.es5.d.ts:1139
+[src/utils/json.ts:13](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/json.ts#L13)
+
+---
+
+### stringify
+
+▸ **stringify**(`...p`): `string`
+
+#### Parameters
+
+| Name   | Type                                                                                                         |
+| :----- | :----------------------------------------------------------------------------------------------------------- |
+| `...p` | [value: JavaScriptValue, replacer?: any, space?: string \| number, numberStringifiers?: NumberStringifier[]] |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[src/utils/json.ts:18](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/json.ts#L18)
 
 ---
 
 ### stringifyAlwaysAsBig
 
-▸ **stringifyAlwaysAsBig**(`value`, `replacer?`, `space?`): `string`
+▸ **stringifyAlwaysAsBig**(`...p`): `string`
 
-Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
+**`Deprecated`**
 
 #### Parameters
 
-| Name        | Type                                                      | Description                                                                                                       |
-| :---------- | :-------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------- |
-| `value`     | `any`                                                     | A JavaScript value, usually an object or array, to be converted.                                                  |
-| `replacer?` | (`this`: `any`, `key`: `string`, `value`: `any`) => `any` | A function that transforms the results.                                                                           |
-| `space?`    | `string` \| `number`                                      | Adds indentation, white space, and line break characters to the return-value JSON text to make it easier to read. |
+| Name   | Type                                                                                                         |
+| :----- | :----------------------------------------------------------------------------------------------------------- |
+| `...p` | [value: JavaScriptValue, replacer?: any, space?: string \| number, numberStringifiers?: NumberStringifier[]] |
 
 #### Returns
 
@@ -118,24 +86,4 @@ Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
 
 #### Defined in
 
-www/node_modules/typescript/lib/lib.es5.d.ts:1146
-
-▸ **stringifyAlwaysAsBig**(`value`, `replacer?`, `space?`): `string`
-
-Converts a JavaScript value to a JavaScript Object Notation (JSON) string.
-
-#### Parameters
-
-| Name        | Type                               | Description                                                                                                                 |
-| :---------- | :--------------------------------- | :-------------------------------------------------------------------------------------------------------------------------- |
-| `value`     | `any`                              | A JavaScript value, usually an object or array, to be converted.                                                            |
-| `replacer?` | `null` \| (`string` \| `number`)[] | An array of strings and numbers that acts as an approved list for selecting the object properties that will be stringified. |
-| `space?`    | `string` \| `number`               | Adds indentation, white space, and line break characters to the return-value JSON text to make it easier to read.           |
-
-#### Returns
-
-`string`
-
-#### Defined in
-
-www/node_modules/typescript/lib/lib.es5.d.ts:1153
+[src/utils/json.ts:18](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/json.ts#L18)

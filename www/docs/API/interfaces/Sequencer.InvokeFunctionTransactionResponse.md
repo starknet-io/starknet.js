@@ -21,7 +21,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:152](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/sequencer.ts#L152)
+[src/types/api/sequencer.ts:141](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L141)
 
 ---
 
@@ -31,7 +31,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:153](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/sequencer.ts#L153)
+[src/types/api/sequencer.ts:142](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L142)
 
 ---
 
@@ -45,21 +45,21 @@ InvokeFunctionTransaction.type
 
 #### Defined in
 
-[src/types/api/sequencer.ts:123](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/sequencer.ts#L123)
+[src/types/api/sequencer.ts:112](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L112)
 
 ---
 
-### contract_address
+### sender_address
 
-• **contract_address**: `string`
+• **sender_address**: `string`
 
 #### Inherited from
 
-InvokeFunctionTransaction.contract_address
+InvokeFunctionTransaction.sender_address
 
 #### Defined in
 
-[src/types/api/sequencer.ts:124](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/sequencer.ts#L124)
+[src/types/api/sequencer.ts:113](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L113)
 
 ---
 
@@ -73,13 +73,13 @@ InvokeFunctionTransaction.signature
 
 #### Defined in
 
-[src/types/api/sequencer.ts:125](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/sequencer.ts#L125)
+[src/types/api/sequencer.ts:114](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L114)
 
 ---
 
 ### entry_point_type
 
-• `Optional` **entry_point_type**: `"EXTERNAL"`
+• `Optional` **entry_point_type**: [`EXTERNAL`](../enums/EntryPointType.md#external)
 
 #### Inherited from
 
@@ -87,7 +87,7 @@ InvokeFunctionTransaction.entry_point_type
 
 #### Defined in
 
-[src/types/api/sequencer.ts:126](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/sequencer.ts#L126)
+[src/types/api/sequencer.ts:115](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L115)
 
 ---
 
@@ -101,7 +101,7 @@ InvokeFunctionTransaction.calldata
 
 #### Defined in
 
-[src/types/api/sequencer.ts:127](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/sequencer.ts#L127)
+[src/types/api/sequencer.ts:116](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L116)
 
 ---
 
@@ -115,7 +115,7 @@ InvokeFunctionTransaction.nonce
 
 #### Defined in
 
-[src/types/api/sequencer.ts:128](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/sequencer.ts#L128)
+[src/types/api/sequencer.ts:117](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L117)
 
 ---
 
@@ -129,7 +129,7 @@ InvokeFunctionTransaction.max_fee
 
 #### Defined in
 
-[src/types/api/sequencer.ts:129](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/sequencer.ts#L129)
+[src/types/api/sequencer.ts:118](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L118)
 
 ---
 
@@ -143,4 +143,4 @@ InvokeFunctionTransaction.version
 
 #### Defined in
 
-[src/types/api/sequencer.ts:130](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/api/sequencer.ts#L130)
+[src/types/api/sequencer.ts:119](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L119)

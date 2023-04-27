@@ -20,7 +20,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:65](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L65)
+[src/types/provider.ts:63](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L63)
 
 ---
 
@@ -30,7 +30,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:66](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L66)
+[src/types/provider.ts:64](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L64)
 
 ---
 
@@ -44,7 +44,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:46](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L46)
+[src/types/provider.ts:43](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L43)
 
 ---
 
@@ -58,13 +58,13 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:47](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L47)
+[src/types/provider.ts:44](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L44)
 
 ---
 
 ### signature
 
-• `Optional` **signature**: [`SignatureType`](ec.weierstrass.SignatureType.md)
+• `Optional` **signature**: [`Signature`](../modules.md#signature)
 
 #### Inherited from
 
@@ -72,7 +72,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:48](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L48)
+[src/types/provider.ts:45](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L45)
 
 ---
 
@@ -86,7 +86,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:49](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L49)
+[src/types/provider.ts:46](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L46)
 
 ---
 
@@ -100,4 +100,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:50](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L50)
+[src/types/provider.ts:47](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L47)

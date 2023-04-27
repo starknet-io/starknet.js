@@ -18,7 +18,17 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:17](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/hash.ts#L17)
+[src/utils/hash.ts:33](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L33)
+
+---
+
+### transactionVersion_2
+
+• `Const` **transactionVersion_2**: `2n`
+
+#### Defined in
+
+[src/utils/hash.ts:34](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L34)
 
 ---
 
@@ -28,7 +38,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:18](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/hash.ts#L18)
+[src/utils/hash.ts:35](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L35)
 
 ## Functions
 
@@ -48,7 +58,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:20](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/hash.ts#L20)
+[src/utils/hash.ts:37](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L37)
 
 ---
 
@@ -74,7 +84,7 @@ starknet keccak hash as BigNumber
 
 #### Defined in
 
-[src/utils/hash.ts:37](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/hash.ts#L37)
+[src/utils/hash.ts:54](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L54)
 
 ---
 
@@ -100,7 +110,7 @@ hex selector of given abi function name
 
 #### Defined in
 
-[src/utils/hash.ts:50](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/hash.ts#L50)
+[src/utils/hash.ts:67](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L67)
 
 ---
 
@@ -124,7 +134,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:60](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/hash.ts#L60)
+[src/utils/hash.ts:77](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L77)
 
 ---
 
@@ -144,7 +154,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:70](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/hash.ts#L70)
+[src/utils/hash.ts:87](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L87)
 
 ---
 
@@ -171,7 +181,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:79](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/hash.ts#L79)
+[src/utils/hash.ts:96](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L96)
 
 ---
 
@@ -194,24 +204,25 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:103](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/hash.ts#L103)
+[src/utils/hash.ts:120](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L120)
 
 ---
 
 ### calculateDeclareTransactionHash
 
-▸ **calculateDeclareTransactionHash**(`classHash`, `senderAddress`, `version`, `maxFee`, `chainId`, `nonce`): `string`
+▸ **calculateDeclareTransactionHash**(`classHash`, `senderAddress`, `version`, `maxFee`, `chainId`, `nonce`, `compiledClassHash?`): `string`
 
 #### Parameters
 
-| Name            | Type                                                       |
-| :-------------- | :--------------------------------------------------------- |
-| `classHash`     | `string`                                                   |
-| `senderAddress` | [`BigNumberish`](num.md#bignumberish)                      |
-| `version`       | [`BigNumberish`](num.md#bignumberish)                      |
-| `maxFee`        | [`BigNumberish`](num.md#bignumberish)                      |
-| `chainId`       | [`StarknetChainId`](../enums/constants.StarknetChainId.md) |
-| `nonce`         | [`BigNumberish`](num.md#bignumberish)                      |
+| Name                 | Type                                                       |
+| :------------------- | :--------------------------------------------------------- |
+| `classHash`          | `string`                                                   |
+| `senderAddress`      | [`BigNumberish`](num.md#bignumberish)                      |
+| `version`            | [`BigNumberish`](num.md#bignumberish)                      |
+| `maxFee`             | [`BigNumberish`](num.md#bignumberish)                      |
+| `chainId`            | [`StarknetChainId`](../enums/constants.StarknetChainId.md) |
+| `nonce`              | [`BigNumberish`](num.md#bignumberish)                      |
+| `compiledClassHash?` | `string`                                                   |
 
 #### Returns
 
@@ -219,7 +230,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:120](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/hash.ts#L120)
+[src/utils/hash.ts:137](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L137)
 
 ---
 
@@ -246,7 +257,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:140](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/hash.ts#L140)
+[src/utils/hash.ts:158](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L158)
 
 ---
 
@@ -271,7 +282,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:164](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/hash.ts#L164)
+[src/utils/hash.ts:182](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L182)
 
 ---
 
@@ -294,7 +305,27 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:184](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/hash.ts#L184)
+[src/utils/hash.ts:202](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L202)
+
+---
+
+### formatSpaces
+
+▸ **formatSpaces**(`json`): `string`
+
+#### Parameters
+
+| Name   | Type     |
+| :----- | :------- |
+| `json` | `string` |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[src/utils/hash.ts:233](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L233)
 
 ---
 
@@ -304,9 +335,9 @@ Hex selector
 
 #### Parameters
 
-| Name               | Type                                                 |
-| :----------------- | :--------------------------------------------------- |
-| `compiledContract` | [`CompiledContract`](../modules.md#compiledcontract) |
+| Name               | Type                                                             |
+| :----------------- | :--------------------------------------------------------------- |
+| `compiledContract` | [`LegacyCompiledContract`](../modules.md#legacycompiledcontract) |
 
 #### Returns
 
@@ -314,7 +345,67 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:215](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/hash.ts#L215)
+[src/utils/hash.ts:251](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L251)
+
+---
+
+### computeLegacyContractClassHash
+
+▸ **computeLegacyContractClassHash**(`contract`): `string`
+
+#### Parameters
+
+| Name       | Type                                                                         |
+| :--------- | :--------------------------------------------------------------------------- |
+| `contract` | `string` \| [`LegacyCompiledContract`](../modules.md#legacycompiledcontract) |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[src/utils/hash.ts:260](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L260)
+
+---
+
+### computeCompiledClassHash
+
+▸ **computeCompiledClassHash**(`casm`): `string`
+
+#### Parameters
+
+| Name   | Type                                           |
+| :----- | :--------------------------------------------- |
+| `casm` | [`CairoAssembly`](../modules.md#cairoassembly) |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[src/utils/hash.ts:313](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L313)
+
+---
+
+### computeSierraContractClassHash
+
+▸ **computeSierraContractClassHash**(`sierra`): `string`
+
+#### Parameters
+
+| Name     | Type                                                       |
+| :------- | :--------------------------------------------------------- |
+| `sierra` | [`SierraContractClass`](../modules.md#sierracontractclass) |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[src/utils/hash.ts:354](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L354)
 
 ---
 
@@ -322,16 +413,20 @@ Hex selector
 
 ▸ **computeContractClassHash**(`contract`): `string`
 
+Compute ClassHash (sierra or legacy) based on provided contract
+
 #### Parameters
 
-| Name       | Type                                                             |
-| :--------- | :--------------------------------------------------------------- |
-| `contract` | `string` \| [`CompiledContract`](../modules.md#compiledcontract) |
+| Name       | Type                                                             | Description                                  |
+| :--------- | :--------------------------------------------------------------- | :------------------------------------------- |
+| `contract` | `string` \| [`CompiledContract`](../modules.md#compiledcontract) | CompiledContract \| CompiledSierra \| string |
 
 #### Returns
 
 `string`
 
+HexString ClassHash
+
 #### Defined in
 
-[src/utils/hash.ts:248](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/utils/hash.ts#L248)
+[src/utils/hash.ts:392](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L392)

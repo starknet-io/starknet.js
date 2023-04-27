@@ -11,13 +11,13 @@ custom_edit_url: null
 
 ### ProjectivePoint
 
-Ƭ **ProjectivePoint**: [`ProjPointType`](../interfaces/ec.weierstrass.ProjPointType.md)<`bigint`\>
+Ƭ **ProjectivePoint**: `ProjPointType`<`bigint`\>
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:4
+node_modules/micro-starknet/lib/index.d.ts:6
 
-node_modules/@noble/curves/stark.d.ts:41
+node_modules/micro-starknet/lib/index.d.ts:44
 
 ---
 
@@ -27,59 +27,69 @@ node_modules/@noble/curves/stark.d.ts:41
 
 #### Type declaration
 
-| Name            | Type               |
-| :-------------- | :----------------- |
-| `Fp`            | `Field`<`bigint`\> |
-| `rate`          | `number`           |
-| `capacity`      | `number`           |
-| `roundsFull`    | `number`           |
-| `roundsPartial` | `number`           |
+| Name            | Type                |
+| :-------------- | :------------------ |
+| `Fp`            | `IField`<`bigint`\> |
+| `rate`          | `number`            |
+| `capacity`      | `number`            |
+| `roundsFull`    | `number`            |
+| `roundsPartial` | `number`            |
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:60
+node_modules/micro-starknet/lib/index.d.ts:63
+
+---
+
+### PoseidonFn
+
+Ƭ **PoseidonFn**: `ReturnType`<typeof `poseidon`\> & { `m`: `number` ; `rate`: `number` ; `capacity`: `number` }
+
+#### Defined in
+
+node_modules/micro-starknet/lib/index.d.ts:70
 
 ## Variables
 
 ### \_starkCurve
 
-• `Const` **\_starkCurve**: [`weierstrass`](ec.weierstrass.md)
+• `Const` **\_starkCurve**: `CurveFn`
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:5
+node_modules/micro-starknet/lib/index.d.ts:7
 
 ---
 
 ### CURVE
 
-• `Const` **CURVE**: `Readonly`<{ `nBitLength`: `number` ; `nByteLength`: `number` ; `Fp`: `Field`<`bigint`\> ; `n`: `bigint` ; `h`: `bigint` ; `hEff?`: `bigint` ; `Gx`: `bigint` ; `Gy`: `bigint` ; `allowInfinityPoint?`: `boolean` ; `a`: `bigint` ; `b`: `bigint` ; `allowedPrivateKeyLengths?`: readonly `number`[] ; `wrapPrivateKey?`: `boolean` ; `endo?`: { `beta`: `bigint` ; `splitScalar`: (`k`: `bigint`) => { `k1neg`: `boolean` ; `k1`: `bigint` ; `k2neg`: `boolean` ; `k2`: `bigint` } } ; `isTorsionFree?`: (`c`: [`weierstrass`](ec.weierstrass.md), `point`: [`ProjPointType`](../interfaces/ec.weierstrass.ProjPointType.md)<`bigint`\>) => `boolean` ; `clearCofactor?`: (`c`: [`weierstrass`](ec.weierstrass.md), `point`: [`ProjPointType`](../interfaces/ec.weierstrass.ProjPointType.md)<`bigint`\>) => [`ProjPointType`](../interfaces/ec.weierstrass.ProjPointType.md)<`bigint`\> ; `hash`: `CHash` ; `hmac`: (`key`: `Uint8Array`, ...`messages`: `Uint8Array`[]) => `Uint8Array` ; `randomBytes`: (`bytesLength?`: `number`) => `Uint8Array` ; `lowS`: `boolean` ; `bits2int?`: (`bytes`: `Uint8Array`) => `bigint` ; `bits2int_modN?`: (`bytes`: `Uint8Array`) => `bigint` }\>
+• `Const` **CURVE**: `Readonly`<{ `nBitLength`: `number` ; `nByteLength`: `number` ; `Fp`: `IField`<`bigint`\> ; `n`: `bigint` ; `h`: `bigint` ; `hEff?`: `bigint` ; `Gx`: `bigint` ; `Gy`: `bigint` ; `allowInfinityPoint?`: `boolean` ; `a`: `bigint` ; `b`: `bigint` ; `allowedPrivateKeyLengths?`: readonly `number`[] ; `wrapPrivateKey?`: `boolean` ; `endo?`: { `beta`: `bigint` ; `splitScalar`: (`k`: `bigint`) => { `k1neg`: `boolean` ; `k1`: `bigint` ; `k2neg`: `boolean` ; `k2`: `bigint` } } ; `isTorsionFree?`: (`c`: `ProjConstructor`, `point`: `ProjPointType`<`bigint`\>) => `boolean` ; `clearCofactor?`: (`c`: `ProjConstructor`, `point`: `ProjPointType`<`bigint`\>) => `ProjPointType`<`bigint`\> ; `hash`: `u.CHash` ; `hmac`: (`key`: `Uint8Array`, ...`messages`: `Uint8Array`[]) => `Uint8Array` ; `randomBytes`: (`bytesLength?`: `number`) => `Uint8Array` ; `lowS`: `boolean` ; `bits2int?`: (`bytes`: `Uint8Array`) => `bigint` ; `bits2int_modN?`: (`bytes`: `Uint8Array`) => `bigint` ; `p`: `bigint` }\>
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:10
+node_modules/micro-starknet/lib/index.d.ts:12
 
 ---
 
 ### ProjectivePoint
 
-• **ProjectivePoint**: [`ProjConstructor`](../interfaces/ec.weierstrass.ProjConstructor.md)<`bigint`\>
+• **ProjectivePoint**: `ProjConstructor`<`bigint`\>
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:4
+node_modules/micro-starknet/lib/index.d.ts:6
 
-node_modules/@noble/curves/stark.d.ts:41
+node_modules/micro-starknet/lib/index.d.ts:44
 
 ---
 
 ### Signature
 
-• `Const` **Signature**: [`weierstrass`](ec.weierstrass.md)
+• `Const` **Signature**: `SignatureConstructor`
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:41
+node_modules/micro-starknet/lib/index.d.ts:44
 
 ---
 
@@ -89,36 +99,36 @@ node_modules/@noble/curves/stark.d.ts:41
 
 #### Type declaration
 
-| Name                     | Type                                                                                                                                                                                            |
-| :----------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `normPrivateKeyToScalar` | (`key`: `PrivKey`) => `bigint`                                                                                                                                                                  |
-| `randomPrivateKey`       | () => `Uint8Array`                                                                                                                                                                              |
-| `precompute`             | (`windowSize?`: `number`, `point?`: [`ProjPointType`](../interfaces/ec.weierstrass.ProjPointType.md)<`bigint`\>) => [`ProjPointType`](../interfaces/ec.weierstrass.ProjPointType.md)<`bigint`\> |
-| `isValidPrivateKey`      | (`privateKey`: `PrivKey`) => `boolean`                                                                                                                                                          |
+| Name                     | Type                                                                                          |
+| :----------------------- | :-------------------------------------------------------------------------------------------- |
+| `normPrivateKeyToScalar` | (`key`: `u.PrivKey`) => `bigint`                                                              |
+| `randomPrivateKey`       | () => `Uint8Array`                                                                            |
+| `precompute`             | (`windowSize?`: `number`, `point?`: `ProjPointType`<`bigint`\>) => `ProjPointType`<`bigint`\> |
+| `isValidPrivateKey`      | (`privateKey`: `PrivKey`) => `boolean`                                                        |
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:41
+node_modules/micro-starknet/lib/index.d.ts:44
 
 ---
 
 ### Fp253
 
-• `Const` **Fp253**: `Readonly`<`Field`<`bigint`\> & `Required`<`Pick`<`Field`<`bigint`\>, `"isOdd"`\>\>\>
+• `Const` **Fp253**: `Readonly`<`IField`<`bigint`\> & `Required`<`Pick`<`IField`<`bigint`\>, `"isOdd"`\>\>\>
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:57
+node_modules/micro-starknet/lib/index.d.ts:60
 
 ---
 
 ### Fp251
 
-• `Const` **Fp251**: `Readonly`<`Field`<`bigint`\> & `Required`<`Pick`<`Field`<`bigint`\>, `"isOdd"`\>\>\>
+• `Const` **Fp251**: `Readonly`<`IField`<`bigint`\> & `Required`<`Pick`<`IField`<`bigint`\>, `"isOdd"`\>\>\>
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:58
+node_modules/micro-starknet/lib/index.d.ts:61
 
 ## Functions
 
@@ -139,7 +149,7 @@ node_modules/@noble/curves/stark.d.ts:58
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:6
+node_modules/micro-starknet/lib/index.d.ts:8
 
 ---
 
@@ -160,13 +170,13 @@ node_modules/@noble/curves/stark.d.ts:6
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:7
+node_modules/micro-starknet/lib/index.d.ts:9
 
 ---
 
 ### sign
 
-▸ **sign**(`msgHash`, `privKey`, `opts?`): [`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)
+▸ **sign**(`msgHash`, `privKey`, `opts?`): `SignatureType`
 
 #### Parameters
 
@@ -178,11 +188,11 @@ node_modules/@noble/curves/stark.d.ts:7
 
 #### Returns
 
-[`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)
+`SignatureType`
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:8
+node_modules/micro-starknet/lib/index.d.ts:10
 
 ---
 
@@ -192,11 +202,11 @@ node_modules/@noble/curves/stark.d.ts:8
 
 #### Parameters
 
-| Name        | Type                                                                      |
-| :---------- | :------------------------------------------------------------------------ |
-| `signature` | [`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md) \| `Hex` |
-| `msgHash`   | `Hex`                                                                     |
-| `pubKey`    | `Hex`                                                                     |
+| Name        | Type                     |
+| :---------- | :----------------------- |
+| `signature` | `Hex` \| `SignatureType` |
+| `msgHash`   | `Hex`                    |
+| `pubKey`    | `Hex`                    |
 
 #### Returns
 
@@ -204,7 +214,7 @@ node_modules/@noble/curves/stark.d.ts:8
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:9
+node_modules/micro-starknet/lib/index.d.ts:11
 
 ---
 
@@ -224,7 +234,7 @@ node_modules/@noble/curves/stark.d.ts:9
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:48
+node_modules/micro-starknet/lib/index.d.ts:51
 
 ---
 
@@ -244,7 +254,7 @@ node_modules/@noble/curves/stark.d.ts:48
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:49
+node_modules/micro-starknet/lib/index.d.ts:52
 
 ---
 
@@ -264,7 +274,7 @@ node_modules/@noble/curves/stark.d.ts:49
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:50
+node_modules/micro-starknet/lib/index.d.ts:53
 
 ---
 
@@ -287,7 +297,7 @@ node_modules/@noble/curves/stark.d.ts:50
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:51
+node_modules/micro-starknet/lib/index.d.ts:54
 
 ---
 
@@ -308,7 +318,7 @@ node_modules/@noble/curves/stark.d.ts:51
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:53
+node_modules/micro-starknet/lib/index.d.ts:56
 
 ---
 
@@ -329,7 +339,7 @@ node_modules/@noble/curves/stark.d.ts:53
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:54
+node_modules/micro-starknet/lib/index.d.ts:57
 
 ---
 
@@ -339,12 +349,12 @@ node_modules/@noble/curves/stark.d.ts:54
 
 #### Parameters
 
-| Name       | Type               |
-| :--------- | :----------------- |
-| `Fp`       | `Field`<`bigint`\> |
-| `name`     | `string`           |
-| `m`        | `number`           |
-| `attempt?` | `number`           |
+| Name       | Type                |
+| :--------- | :------------------ |
+| `Fp`       | `IField`<`bigint`\> |
+| `name`     | `string`            |
+| `m`        | `number`            |
+| `attempt?` | `number`            |
 
 #### Returns
 
@@ -352,13 +362,13 @@ node_modules/@noble/curves/stark.d.ts:54
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:59
+node_modules/micro-starknet/lib/index.d.ts:62
 
 ---
 
 ### poseidonBasic
 
-▸ **poseidonBasic**(`opts`, `mds`): (`values`: `bigint`[]) => `bigint`[]
+▸ **poseidonBasic**(`opts`, `mds`): [`PoseidonFn`](ec.starkCurve.md#poseidonfn)
 
 #### Parameters
 
@@ -369,33 +379,17 @@ node_modules/@noble/curves/stark.d.ts:59
 
 #### Returns
 
-`fn`
-
-▸ (`values`): `bigint`[]
-
-##### Parameters
-
-| Name     | Type       |
-| :------- | :--------- |
-| `values` | `bigint`[] |
-
-##### Returns
-
-`bigint`[]
-
-| Name             | Type         |
-| :--------------- | :----------- |
-| `roundConstants` | `bigint`[][] |
+[`PoseidonFn`](ec.starkCurve.md#poseidonfn)
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:67
+node_modules/micro-starknet/lib/index.d.ts:75
 
 ---
 
 ### poseidonCreate
 
-▸ **poseidonCreate**(`opts`, `mdsAttempt?`): (`values`: `bigint`[]) => `bigint`[]
+▸ **poseidonCreate**(`opts`, `mdsAttempt?`): [`PoseidonFn`](ec.starkCurve.md#poseidonfn)
 
 #### Parameters
 
@@ -406,27 +400,11 @@ node_modules/@noble/curves/stark.d.ts:67
 
 #### Returns
 
-`fn`
-
-▸ (`values`): `bigint`[]
-
-##### Parameters
-
-| Name     | Type       |
-| :------- | :--------- |
-| `values` | `bigint`[] |
-
-##### Returns
-
-`bigint`[]
-
-| Name             | Type         |
-| :--------------- | :----------- |
-| `roundConstants` | `bigint`[][] |
+[`PoseidonFn`](ec.starkCurve.md#poseidonfn)
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:71
+node_modules/micro-starknet/lib/index.d.ts:76
 
 ---
 
@@ -436,12 +414,11 @@ node_modules/@noble/curves/stark.d.ts:71
 
 #### Parameters
 
-| Name                | Type                                 |
-| :------------------ | :----------------------------------- |
-| `x`                 | `bigint`                             |
-| `y`                 | `bigint`                             |
-| `fn?`               | (`values`: `bigint`[]) => `bigint`[] |
-| `fn.roundConstants` | `bigint`[][]                         |
+| Name  | Type                                        |
+| :---- | :------------------------------------------ |
+| `x`   | `bigint`                                    |
+| `y`   | `bigint`                                    |
+| `fn?` | [`PoseidonFn`](ec.starkCurve.md#poseidonfn) |
 
 #### Returns
 
@@ -449,7 +426,71 @@ node_modules/@noble/curves/stark.d.ts:71
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:79
+node_modules/micro-starknet/lib/index.d.ts:78
+
+---
+
+### poseidonHashFunc
+
+▸ **poseidonHashFunc**(`x`, `y`, `fn?`): `Uint8Array`
+
+#### Parameters
+
+| Name  | Type                                        |
+| :---- | :------------------------------------------ |
+| `x`   | `Uint8Array`                                |
+| `y`   | `Uint8Array`                                |
+| `fn?` | [`PoseidonFn`](ec.starkCurve.md#poseidonfn) |
+
+#### Returns
+
+`Uint8Array`
+
+#### Defined in
+
+node_modules/micro-starknet/lib/index.d.ts:79
+
+---
+
+### poseidonHashSingle
+
+▸ **poseidonHashSingle**(`x`, `fn?`): `bigint`
+
+#### Parameters
+
+| Name  | Type                                        |
+| :---- | :------------------------------------------ |
+| `x`   | `bigint`                                    |
+| `fn?` | [`PoseidonFn`](ec.starkCurve.md#poseidonfn) |
+
+#### Returns
+
+`bigint`
+
+#### Defined in
+
+node_modules/micro-starknet/lib/index.d.ts:80
+
+---
+
+### poseidonHashMany
+
+▸ **poseidonHashMany**(`values`, `fn?`): `bigint`
+
+#### Parameters
+
+| Name     | Type                                        |
+| :------- | :------------------------------------------ |
+| `values` | `bigint`[]                                  |
+| `fn?`    | [`PoseidonFn`](ec.starkCurve.md#poseidonfn) |
+
+#### Returns
+
+`bigint`
+
+#### Defined in
+
+node_modules/micro-starknet/lib/index.d.ts:81
 
 ---
 
@@ -470,7 +511,7 @@ node_modules/@noble/curves/stark.d.ts:79
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:55
+node_modules/micro-starknet/lib/index.d.ts:58
 
 ---
 
@@ -490,7 +531,7 @@ node_modules/@noble/curves/stark.d.ts:55
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:56
+node_modules/micro-starknet/lib/index.d.ts:59
 
 ---
 
@@ -510,4 +551,4 @@ node_modules/@noble/curves/stark.d.ts:56
 
 #### Defined in
 
-node_modules/@noble/curves/stark.d.ts:76
+node_modules/micro-starknet/node_modules/@noble/curves/abstract/poseidon.d.ts:27

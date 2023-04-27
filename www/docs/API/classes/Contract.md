@@ -6,6 +6,8 @@ sidebar_position: 0
 custom_edit_url: null
 ---
 
+Not used at the moment
+
 ## Implements
 
 - [`ContractInterface`](ContractInterface.md)
@@ -32,7 +34,7 @@ Contract class to handle contract methods
 
 #### Defined in
 
-[src/contract/default.ts:119](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/default.ts#L119)
+[src/contract/default.ts:142](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/default.ts#L142)
 
 ## Properties
 
@@ -46,7 +48,7 @@ Contract class to handle contract methods
 
 #### Defined in
 
-[src/contract/default.ts:90](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/default.ts#L90)
+[src/contract/default.ts:113](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/default.ts#L113)
 
 ---
 
@@ -60,7 +62,7 @@ Contract class to handle contract methods
 
 #### Defined in
 
-[src/contract/default.ts:92](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/default.ts#L92)
+[src/contract/default.ts:115](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/default.ts#L115)
 
 ---
 
@@ -74,7 +76,7 @@ Contract class to handle contract methods
 
 #### Defined in
 
-[src/contract/default.ts:94](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/default.ts#L94)
+[src/contract/default.ts:117](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/default.ts#L117)
 
 ---
 
@@ -88,7 +90,7 @@ Contract class to handle contract methods
 
 #### Defined in
 
-[src/contract/default.ts:96](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/default.ts#L96)
+[src/contract/default.ts:119](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/default.ts#L119)
 
 ---
 
@@ -102,7 +104,7 @@ Contract class to handle contract methods
 
 #### Defined in
 
-[src/contract/default.ts:98](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/default.ts#L98)
+[src/contract/default.ts:121](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/default.ts#L121)
 
 ---
 
@@ -120,7 +122,7 @@ Contract class to handle contract methods
 
 #### Defined in
 
-[src/contract/default.ts:100](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/default.ts#L100)
+[src/contract/default.ts:123](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/default.ts#L123)
 
 ---
 
@@ -138,7 +140,7 @@ Contract class to handle contract methods
 
 #### Defined in
 
-[src/contract/default.ts:102](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/default.ts#L102)
+[src/contract/default.ts:125](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/default.ts#L125)
 
 ---
 
@@ -156,7 +158,7 @@ Contract class to handle contract methods
 
 #### Defined in
 
-[src/contract/default.ts:104](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/default.ts#L104)
+[src/contract/default.ts:127](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/default.ts#L127)
 
 ---
 
@@ -174,17 +176,17 @@ Contract class to handle contract methods
 
 #### Defined in
 
-[src/contract/default.ts:106](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/default.ts#L106)
+[src/contract/default.ts:129](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/default.ts#L129)
 
 ---
 
 ### callData
 
-• `Private` **callData**: `CallData`
+• `Private` **callData**: [`CallData`](CallData.md)
 
 #### Defined in
 
-[src/contract/default.ts:110](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/default.ts#L110)
+[src/contract/default.ts:133](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/default.ts#L133)
 
 ## Methods
 
@@ -210,7 +212,7 @@ Saves the address of the contract deployed on network that will be used for inte
 
 #### Defined in
 
-[src/contract/default.ts:173](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/default.ts#L173)
+[src/contract/default.ts:196](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/default.ts#L196)
 
 ---
 
@@ -236,7 +238,7 @@ Attaches to new Provider or Account
 
 #### Defined in
 
-[src/contract/default.ts:177](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/default.ts#L177)
+[src/contract/default.ts:200](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/default.ts#L200)
 
 ---
 
@@ -262,27 +264,27 @@ Promise that resolves when contract is deployed on the network or when no deploy
 
 #### Defined in
 
-[src/contract/default.ts:181](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/default.ts#L181)
+[src/contract/default.ts:204](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/default.ts#L204)
 
 ---
 
 ### call
 
-▸ **call**(`method`, `args?`, `options?`): `Promise`<`Object`\>
+▸ **call**(`method`, `args?`, `«destructured»?`): `Promise`<[`Result`](../modules.md#result)\>
 
 Calls a method on a contract
 
 #### Parameters
 
-| Name      | Type                                       | Default value | Description                         |
-| :-------- | :----------------------------------------- | :------------ | :---------------------------------- |
-| `method`  | `string`                                   | `undefined`   | name of the method                  |
-| `args`    | `any`[]                                    | `[]`          | Array of the arguments for the call |
-| `options` | [`CallOptions`](../modules.md#calloptions) | `undefined`   | optional blockIdentifier            |
+| Name             | Type                                             | Default value | Description                         |
+| :--------------- | :----------------------------------------------- | :------------ | :---------------------------------- |
+| `method`         | `string`                                         | `undefined`   | name of the method                  |
+| `args`           | [`ArgsOrCalldata`](../modules.md#argsorcalldata) | `[]`          | Array of the arguments for the call |
+| `«destructured»` | [`CallOptions`](../modules.md#calloptions)       | `{}`          | optional blockIdentifier            |
 
 #### Returns
 
-`Promise`<`Object`\>
+`Promise`<[`Result`](../modules.md#result)\>
 
 Result of the call as an array with key value pars
 
@@ -292,23 +294,23 @@ Result of the call as an array with key value pars
 
 #### Defined in
 
-[src/contract/default.ts:189](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/default.ts#L189)
+[src/contract/default.ts:212](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/default.ts#L212)
 
 ---
 
 ### invoke
 
-▸ **invoke**(`method`, `args?`, `options?`): `Promise`<[`InvokeFunctionResponse`](../interfaces/InvokeFunctionResponse.md)\>
+▸ **invoke**(`method`, `args?`, `«destructured»?`): `Promise`<[`InvokeFunctionResponse`](../interfaces/InvokeFunctionResponse.md)\>
 
 Invokes a method on a contract
 
 #### Parameters
 
-| Name      | Type                                   | Default value | Description                           |
-| :-------- | :------------------------------------- | :------------ | :------------------------------------ |
-| `method`  | `string`                               | `undefined`   | name of the method                    |
-| `args`    | `any`[]                                | `[]`          | Array of the arguments for the invoke |
-| `options` | [`Overrides`](../modules.md#overrides) | `undefined`   |                                       |
+| Name             | Type                                             | Default value | Description                                       |
+| :--------------- | :----------------------------------------------- | :------------ | :------------------------------------------------ |
+| `method`         | `string`                                         | `undefined`   | name of the method                                |
+| `args`           | [`ArgsOrCalldata`](../modules.md#argsorcalldata) | `[]`          | Array of the arguments for the invoke or Calldata |
+| `«destructured»` | [`InvokeOptions`](../modules.md#invokeoptions)   | `{}`          |                                                   |
 
 #### Returns
 
@@ -322,7 +324,7 @@ Add Transaction Response
 
 #### Defined in
 
-[src/contract/default.ts:225](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/default.ts#L225)
+[src/contract/default.ts:254](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/default.ts#L254)
 
 ---
 
@@ -334,10 +336,10 @@ Estimates a method on a contract
 
 #### Parameters
 
-| Name     | Type     | Default value | Description                         |
-| :------- | :------- | :------------ | :---------------------------------- |
-| `method` | `string` | `undefined`   | name of the method                  |
-| `args`   | `any`[]  | `[]`          | Array of the arguments for the call |
+| Name     | Type                                             | Default value | Description                                     |
+| :------- | :----------------------------------------------- | :------------ | :---------------------------------------------- |
+| `method` | `string`                                         | `undefined`   | name of the method                              |
+| `args`   | [`ArgsOrCalldata`](../modules.md#argsorcalldata) | `[]`          | Array of the arguments for the call or Calldata |
 
 #### Returns
 
@@ -349,7 +351,7 @@ Estimates a method on a contract
 
 #### Defined in
 
-[src/contract/default.ts:272](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/default.ts#L272)
+[src/contract/default.ts:298](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/default.ts#L298)
 
 ---
 
@@ -361,10 +363,10 @@ Calls a method on a contract
 
 #### Parameters
 
-| Name     | Type     | Default value | Description                         |
-| :------- | :------- | :------------ | :---------------------------------- |
-| `method` | `string` | `undefined`   | name of the method                  |
-| `args`   | `any`[]  | `[]`          | Array of the arguments for the call |
+| Name     | Type                                             | Default value | Description                                     |
+| :------- | :----------------------------------------------- | :------------ | :---------------------------------------------- |
+| `method` | `string`                                         | `undefined`   | name of the method                              |
+| `args`   | [`ArgsOrCalldata`](../modules.md#argsorcalldata) | `[]`          | Array of the arguments for the call or Calldata |
 
 #### Returns
 
@@ -378,4 +380,4 @@ Invocation object
 
 #### Defined in
 
-[src/contract/default.ts:286](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/contract/default.ts#L286)
+[src/contract/default.ts:312](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/default.ts#L312)

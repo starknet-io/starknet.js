@@ -10,8 +10,8 @@ custom_edit_url: null
 
 ### bytecode
 
-• **bytecode**: `string`[]
+• **bytecode**: [`ByteCode`](../modules.md#bytecode)
 
 #### Defined in
 
-[src/types/provider.ts:39](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L39)
+[src/types/provider.ts:36](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L36)

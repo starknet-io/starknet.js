@@ -18,9 +18,13 @@ custom_edit_url: null
 
 • **suggestedMaxFee**: `bigint`
 
+#### Overrides
+
+[EstimateFeeResponse](EstimateFeeResponse.md).[suggestedMaxFee](EstimateFeeResponse.md#suggestedmaxfee)
+
 #### Defined in
 
-[src/types/account.ts:10](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/account.ts#L10)
+[src/types/account.ts:11](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/account.ts#L11)
 
 ---
 
@@ -34,7 +38,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:106](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L106)
+[src/types/provider.ts:104](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L104)
 
 ---
 
@@ -48,7 +52,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:107](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L107)
+[src/types/provider.ts:105](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L105)
 
 ---
 
@@ -62,4 +66,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:108](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/provider.ts#L108)
+[src/types/provider.ts:106](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L106)

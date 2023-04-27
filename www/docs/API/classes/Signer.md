@@ -24,7 +24,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/signer/default.ts:18](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/signer/default.ts#L18)
+[src/signer/default.ts:18](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/signer/default.ts#L18)
 
 ## Properties
 
@@ -34,7 +34,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/signer/default.ts:16](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/signer/default.ts#L16)
+[src/signer/default.ts:16](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/signer/default.ts#L16)
 
 ## Methods
 
@@ -56,13 +56,13 @@ public key of signer as hex string with 0x prefix
 
 #### Defined in
 
-[src/signer/default.ts:22](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/signer/default.ts#L22)
+[src/signer/default.ts:22](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/signer/default.ts#L22)
 
 ---
 
 ### signMessage
 
-▸ **signMessage**(`typedData`, `accountAddress`): `Promise`<[`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)\>
+▸ **signMessage**(`typedData`, `accountAddress`): `Promise`<[`Signature`](../modules.md#signature)\>
 
 Sign an JSON object for off-chain usage with the starknet private key and return the signature
 This adds a message prefix so it cant be interchanged with transactions
@@ -80,7 +80,7 @@ if the JSON object is not a valid JSON
 
 #### Returns
 
-`Promise`<[`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)\>
+`Promise`<[`Signature`](../modules.md#signature)\>
 
 the signature of the JSON object
 
@@ -90,13 +90,13 @@ the signature of the JSON object
 
 #### Defined in
 
-[src/signer/default.ts:26](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/signer/default.ts#L26)
+[src/signer/default.ts:26](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/signer/default.ts#L26)
 
 ---
 
 ### signTransaction
 
-▸ **signTransaction**(`transactions`, `transactionsDetail`, `abis?`): `Promise`<[`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)\>
+▸ **signTransaction**(`transactions`, `transactionsDetail`, `abis?`): `Promise`<[`Signature`](../modules.md#signature)\>
 
 Signs a transaction with the starknet private key and returns the signature
 
@@ -110,7 +110,7 @@ Signs a transaction with the starknet private key and returns the signature
 
 #### Returns
 
-`Promise`<[`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)\>
+`Promise`<[`Signature`](../modules.md#signature)\>
 
 signature
 
@@ -120,13 +120,13 @@ signature
 
 #### Defined in
 
-[src/signer/default.ts:31](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/signer/default.ts#L31)
+[src/signer/default.ts:31](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/signer/default.ts#L31)
 
 ---
 
 ### signDeployAccountTransaction
 
-▸ **signDeployAccountTransaction**(`«destructured»`): `Promise`<[`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)\>
+▸ **signDeployAccountTransaction**(`«destructured»`): `Promise`<`SignatureType`\>
 
 Signs a DEPLOY_ACCOUNT transaction with the starknet private key and returns the signature
 
@@ -138,7 +138,7 @@ Signs a DEPLOY_ACCOUNT transaction with the starknet private key and returns the
 
 #### Returns
 
-`Promise`<[`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)\>
+`Promise`<`SignatureType`\>
 
 signature
 
@@ -148,13 +148,13 @@ signature
 
 #### Defined in
 
-[src/signer/default.ts:55](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/signer/default.ts#L55)
+[src/signer/default.ts:55](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/signer/default.ts#L55)
 
 ---
 
 ### signDeclareTransaction
 
-▸ **signDeclareTransaction**(`«destructured»`): `Promise`<[`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)\>
+▸ **signDeclareTransaction**(`«destructured»`): `Promise`<`SignatureType`\>
 
 Signs a DECLARE transaction with the starknet private key and returns the signature
 
@@ -166,7 +166,7 @@ Signs a DECLARE transaction with the starknet private key and returns the signat
 
 #### Returns
 
-`Promise`<[`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)\>
+`Promise`<`SignatureType`\>
 
 signature
 
@@ -176,4 +176,4 @@ signature
 
 #### Defined in
 
-[src/signer/default.ts:79](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/signer/default.ts#L79)
+[src/signer/default.ts:79](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/signer/default.ts#L79)

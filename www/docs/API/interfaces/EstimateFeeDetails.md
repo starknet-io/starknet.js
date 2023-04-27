@@ -14,7 +14,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/account.ts:16](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/account.ts#L16)
+[src/types/account.ts:17](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/account.ts#L17)
 
 ---
 
@@ -24,4 +24,24 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/account.ts:17](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/types/account.ts#L17)
+[src/types/account.ts:18](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/account.ts#L18)
+
+---
+
+### skipValidate
+
+• `Optional` **skipValidate**: `boolean`
+
+#### Defined in
+
+[src/types/account.ts:19](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/account.ts#L19)
+
+---
+
+### cairoVersion
+
+• `Optional` **cairoVersion**: [`CairoVersion`](../modules.md#cairoversion)
+
+#### Defined in
+
+[src/types/account.ts:20](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/account.ts#L20)

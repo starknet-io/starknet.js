@@ -36,7 +36,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/account/default.ts:54](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L54)
+[src/account/default.ts:58](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L58)
 
 ## Properties
 
@@ -50,7 +50,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/account/default.ts:50](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L50)
+[src/account/default.ts:54](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L54)
 
 ---
 
@@ -64,13 +64,13 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/account/default.ts:52](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L52)
+[src/account/default.ts:56](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L56)
 
 ## Methods
 
 ### getNonce
 
-▸ **getNonce**(`blockIdentifier?`): `Promise`<[`BigNumberish`](../namespaces/num.md#bignumberish)\>
+▸ **getNonce**(`blockIdentifier?`): `Promise`<`string`\>
 
 Gets the nonce of the account with respect to a specific block
 
@@ -82,7 +82,7 @@ Gets the nonce of the account with respect to a specific block
 
 #### Returns
 
-`Promise`<[`BigNumberish`](../namespaces/num.md#bignumberish)\>
+`Promise`<`string`\>
 
 nonce of the account
 
@@ -92,7 +92,7 @@ nonce of the account
 
 #### Defined in
 
-[src/account/default.ts:67](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L67)
+[src/account/default.ts:71](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L71)
 
 ---
 
@@ -113,7 +113,7 @@ nonce of the account
 
 #### Defined in
 
-[src/account/default.ts:71](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L71)
+[src/account/default.ts:75](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L75)
 
 ---
 
@@ -142,7 +142,7 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/default.ts:78](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L78)
+[src/account/default.ts:82](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L82)
 
 ---
 
@@ -171,7 +171,7 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/default.ts:110](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L110)
+[src/account/default.ts:116](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L116)
 
 ---
 
@@ -200,7 +200,7 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/default.ts:136](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L136)
+[src/account/default.ts:150](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L150)
 
 ---
 
@@ -228,7 +228,7 @@ This is different from the normal DEPLOY transaction as it goes through the Univ
 
 #### Defined in
 
-[src/account/default.ts:167](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L167)
+[src/account/default.ts:189](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L189)
 
 ---
 
@@ -258,7 +258,7 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/default.ts:175](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L175)
+[src/account/default.ts:197](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L197)
 
 ---
 
@@ -279,7 +279,7 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/default.ts:252](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L252)
+[src/account/default.ts:275](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L275)
 
 ---
 
@@ -309,22 +309,22 @@ response from addTransaction
 
 #### Defined in
 
-[src/account/default.ts:266](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L266)
+[src/account/default.ts:289](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L289)
 
 ---
 
 ### declare
 
-▸ **declare**(`«destructured»`, `transactionsDetail?`): `Promise`<[`DeclareContractResponse`](../interfaces/DeclareContractResponse.md)\>
+▸ **declare**(`payload`, `transactionsDetail?`): `Promise`<[`DeclareContractResponse`](../interfaces/DeclareContractResponse.md)\>
 
 Declares a given compiled contract (json) to starknet
 
 #### Parameters
 
-| Name                 | Type                                                             | Description                                                                                                                             |
-| :------------------- | :--------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------- |
-| `«destructured»`     | [`DeclareContractPayload`](../modules.md#declarecontractpayload) | transaction payload to be deployed containing: - contract: compiled contract code - classHash: computed class hash of compiled contract |
-| `transactionsDetail` | [`InvocationsDetails`](../modules.md#invocationsdetails)         | Invocation Details containing: - optional nonce - optional version - optional maxFee                                                    |
+| Name                 | Type                                                             | Description                                                                                                                                                                                                                                                                                                                                                                                           |
+| :------------------- | :--------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `payload`            | [`DeclareContractPayload`](../modules.md#declarecontractpayload) | transaction payload to be deployed containing: - contract: compiled contract code - (optional) classHash: computed class hash of compiled contract. Pre-compute it for faster execution. - (required for Cairo1 without compiledClassHash) casm: CompiledContract \| string; - (optional for Cairo1 with casm) compiledClassHash: compiled class hash from casm. Pre-compute it for faster execution. |
+| `transactionsDetail` | [`InvocationsDetails`](../modules.md#invocationsdetails)         | Invocation Details containing: - optional nonce - optional version - optional maxFee                                                                                                                                                                                                                                                                                                                  |
 
 #### Returns
 
@@ -338,7 +338,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/account/default.ts:304](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L304)
+[src/account/default.ts:330](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L330)
 
 ---
 
@@ -369,7 +369,7 @@ support multicall
 
 #### Defined in
 
-[src/account/default.ts:343](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L343)
+[src/account/default.ts:359](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L359)
 
 ---
 
@@ -407,7 +407,7 @@ Internal wait for L2 transaction, support multicall
 
 #### Defined in
 
-[src/account/default.ts:389](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L389)
+[src/account/default.ts:408](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L408)
 
 ---
 
@@ -448,7 +448,7 @@ Internal wait for L2 transaction, do not support multicall
 
 #### Defined in
 
-[src/account/default.ts:400](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L400)
+[src/account/default.ts:419](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L419)
 
 ---
 
@@ -477,13 +477,13 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/account/default.ts:416](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L416)
+[src/account/default.ts:435](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L435)
 
 ---
 
 ### signMessage
 
-▸ **signMessage**(`typedData`): `Promise`<[`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)\>
+▸ **signMessage**(`typedData`): `Promise`<[`Signature`](../modules.md#signature)\>
 
 Sign an JSON object for off-chain usage with the starknet private key and return the signature
 This adds a message prefix so it cant be interchanged with transactions
@@ -500,7 +500,7 @@ if the JSON object is not a valid JSON
 
 #### Returns
 
-`Promise`<[`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)\>
+`Promise`<[`Signature`](../modules.md#signature)\>
 
 the signature of the JSON object
 
@@ -510,7 +510,7 @@ the signature of the JSON object
 
 #### Defined in
 
-[src/account/default.ts:464](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L464)
+[src/account/default.ts:483](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L483)
 
 ---
 
@@ -543,7 +543,7 @@ the hash of the JSON object
 
 #### Defined in
 
-[src/account/default.ts:468](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L468)
+[src/account/default.ts:487](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L487)
 
 ---
 
@@ -563,10 +563,10 @@ if the signature is not a valid signature
 
 #### Parameters
 
-| Name        | Type                                                             | Description           |
-| :---------- | :--------------------------------------------------------------- | :-------------------- |
-| `hash`      | [`BigNumberish`](../namespaces/num.md#bignumberish)              | hash to be verified   |
-| `signature` | [`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md) | signature of the hash |
+| Name        | Type                                                | Description           |
+| :---------- | :-------------------------------------------------- | :-------------------- |
+| `hash`      | [`BigNumberish`](../namespaces/num.md#bignumberish) | hash to be verified   |
+| `signature` | [`Signature`](../modules.md#signature)              | signature of the hash |
 
 #### Returns
 
@@ -580,7 +580,7 @@ true if the signature is valid, false otherwise
 
 #### Defined in
 
-[src/account/default.ts:472](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L472)
+[src/account/default.ts:491](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L491)
 
 ---
 
@@ -596,10 +596,10 @@ if the JSON object is not a valid JSON or the signature is not a valid signature
 
 #### Parameters
 
-| Name        | Type                                                             | Description                  |
-| :---------- | :--------------------------------------------------------------- | :--------------------------- |
-| `typedData` | [`TypedData`](../interfaces/typedData.TypedData.md)              | JSON object to be verified   |
-| `signature` | [`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md) | signature of the JSON object |
+| Name        | Type                                                | Description                  |
+| :---------- | :-------------------------------------------------- | :--------------------------- |
+| `typedData` | [`TypedData`](../interfaces/typedData.TypedData.md) | JSON object to be verified   |
+| `signature` | [`Signature`](../modules.md#signature)              | signature of the JSON object |
 
 #### Returns
 
@@ -613,13 +613,13 @@ true if the signature is valid, false otherwise
 
 #### Defined in
 
-[src/account/default.ts:488](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L488)
+[src/account/default.ts:507](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L507)
 
 ---
 
 ### getSuggestedMaxFee
 
-▸ **getSuggestedMaxFee**(`«destructured»`, `details`): `Promise`<`string`\>
+▸ **getSuggestedMaxFee**(`«destructured»`, `details`): `Promise`<`bigint`\>
 
 Gets Suggested Max Fee based on the transaction type
 
@@ -632,7 +632,7 @@ Gets Suggested Max Fee based on the transaction type
 
 #### Returns
 
-`Promise`<`string`\>
+`Promise`<`bigint`\>
 
 suggestedMaxFee
 
@@ -642,19 +642,23 @@ suggestedMaxFee
 
 #### Defined in
 
-[src/account/default.ts:493](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L493)
+[src/account/default.ts:512](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L512)
 
 ---
 
 ### buildDeclarePayload
 
-▸ **buildDeclarePayload**(`«destructured»`, `«destructured»`): `Promise`<[`DeclareContractTransaction`](../modules.md#declarecontracttransaction)\>
+▸ **buildDeclarePayload**(`payload`, `«destructured»`): `Promise`<[`DeclareContractTransaction`](../modules.md#declarecontracttransaction)\>
+
+**`Deprecated`**
+
+will be renamed to buildDeclareContractTransaction
 
 #### Parameters
 
 | Name             | Type                                                                    |
 | :--------------- | :---------------------------------------------------------------------- |
-| `«destructured»` | [`DeclareContractPayload`](../modules.md#declarecontractpayload)        |
+| `payload`        | [`DeclareContractPayload`](../modules.md#declarecontractpayload)        |
 | `«destructured»` | [`InvocationsSignerDetails`](../interfaces/InvocationsSignerDetails.md) |
 
 #### Returns
@@ -663,7 +667,7 @@ suggestedMaxFee
 
 #### Defined in
 
-[src/account/default.ts:524](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L524)
+[src/account/default.ts:546](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L546)
 
 ---
 
@@ -684,7 +688,7 @@ suggestedMaxFee
 
 #### Defined in
 
-[src/account/default.ts:546](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L546)
+[src/account/default.ts:570](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L570)
 
 ---
 
@@ -704,7 +708,7 @@ suggestedMaxFee
 
 #### Defined in
 
-[src/account/default.ts:578](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L578)
+[src/account/default.ts:602](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L602)
 
 ---
 
@@ -733,7 +737,7 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/default.ts:605](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L605)
+[src/account/default.ts:629](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L629)
 
 ---
 
@@ -758,7 +762,7 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/default.ts:640](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/account/default.ts#L640)
+[src/account/default.ts:666](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/account/default.ts#L666)
 
 ---
 
@@ -784,7 +788,7 @@ the chain Id
 
 #### Defined in
 
-[src/provider/default.ts:61](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L61)
+[src/provider/default.ts:64](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L64)
 
 ---
 
@@ -816,13 +820,13 @@ the block object
 
 #### Defined in
 
-[src/provider/default.ts:65](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L65)
+[src/provider/default.ts:68](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L68)
 
 ---
 
 ### getClassAt
 
-▸ **getClassAt**(`contractAddress`, `blockIdentifier?`): `Promise`<[`ContractClass`](../interfaces/ContractClass.md)\>
+▸ **getClassAt**(`contractAddress`, `blockIdentifier?`): `Promise`<[`ContractClass`](../modules.md#contractclass) \| `CONTRACT_CLASS`\>
 
 Gets the contract class of the deployed contract.
 
@@ -835,7 +839,7 @@ Gets the contract class of the deployed contract.
 
 #### Returns
 
-`Promise`<[`ContractClass`](../interfaces/ContractClass.md)\>
+`Promise`<[`ContractClass`](../modules.md#contractclass) \| `CONTRACT_CLASS`\>
 
 Contract class of compiled contract
 
@@ -849,7 +853,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/default.ts:69](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L69)
+[src/provider/default.ts:72](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L72)
 
 ---
 
@@ -882,13 +886,13 @@ Class hash
 
 #### Defined in
 
-[src/provider/default.ts:76](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L76)
+[src/provider/default.ts:79](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L79)
 
 ---
 
 ### getClassByHash
 
-▸ **getClassByHash**(`classHash`): `Promise`<[`ContractClass`](../interfaces/ContractClass.md)\>
+▸ **getClassByHash**(`classHash`): `Promise`<[`ContractClass`](../modules.md#contractclass) \| `CONTRACT_CLASS`\>
 
 Returns the contract class deployed under the given class hash.
 
@@ -900,7 +904,7 @@ Returns the contract class deployed under the given class hash.
 
 #### Returns
 
-`Promise`<[`ContractClass`](../interfaces/ContractClass.md)\>
+`Promise`<[`ContractClass`](../modules.md#contractclass) \| `CONTRACT_CLASS`\>
 
 Contract class of compiled contract
 
@@ -914,7 +918,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/default.ts:83](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L83)
+[src/provider/default.ts:86](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L86)
 
 ---
 
@@ -934,7 +938,7 @@ Please use getInvokeEstimateFee or getDeclareEstimateFee instead. Should not be 
 | :--------------------- | :------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `invocationWithTxType` | [`Invocation`](../modules.md#invocation)                                   | the invocation object containing: - contractAddress - the address of the contract - entrypoint - the entrypoint of the contract - calldata - (defaults to []) the calldata - signature - (defaults to []) the signature |
 | `invocationDetails`    | [`InvocationsDetailsWithNonce`](../modules.md#invocationsdetailswithnonce) | optional details containing: - nonce - optional nonce - version - optional version                                                                                                                                      |
-| `blockIdentifier`      | `BlockIdentifier`                                                          | block identifier                                                                                                                                                                                                        |
+| `blockIdentifier`      | `BlockIdentifier`                                                          | (optional) block identifier                                                                                                                                                                                             |
 
 #### Returns
 
@@ -952,13 +956,13 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:87](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L87)
+[src/provider/default.ts:90](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L90)
 
 ---
 
 ### getInvokeEstimateFee
 
-▸ **getInvokeEstimateFee**(`invocationWithTxType`, `invocationDetails`, `blockIdentifier?`): `Promise`<[`EstimateFeeResponse`](../interfaces/EstimateFeeResponse.md)\>
+▸ **getInvokeEstimateFee**(`invocationWithTxType`, `invocationDetails`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`EstimateFeeResponse`](../interfaces/EstimateFeeResponse.md)\>
 
 Estimates the fee for a given INVOKE transaction
 
@@ -968,7 +972,8 @@ Estimates the fee for a given INVOKE transaction
 | :--------------------- | :------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `invocationWithTxType` | [`Invocation`](../modules.md#invocation)                                   | the invocation object containing: - contractAddress - the address of the contract - entrypoint - the entrypoint of the contract - calldata - (defaults to []) the calldata - signature - (defaults to []) the signature |
 | `invocationDetails`    | [`InvocationsDetailsWithNonce`](../modules.md#invocationsdetailswithnonce) | optional details containing: - nonce - optional nonce - version - optional version                                                                                                                                      |
-| `blockIdentifier?`     | `BlockIdentifier`                                                          | block identifier                                                                                                                                                                                                        |
+| `blockIdentifier?`     | `BlockIdentifier`                                                          | (optional) block identifier                                                                                                                                                                                             |
+| `skipValidate?`        | `boolean`                                                                  | (optional) skip cairo **validate** method                                                                                                                                                                               |
 
 #### Returns
 
@@ -986,7 +991,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:95](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L95)
+[src/provider/default.ts:98](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L98)
 
 ---
 
@@ -1019,13 +1024,13 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:107](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L107)
+[src/provider/default.ts:112](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L112)
 
 ---
 
 ### getNonceForAddress
 
-▸ **getNonceForAddress**(`contractAddress`, `blockIdentifier?`): `Promise`<[`BigNumberish`](../namespaces/num.md#bignumberish)\>
+▸ **getNonceForAddress**(`contractAddress`, `blockIdentifier?`): `Promise`<`string`\>
 
 Gets the nonce of a contract with respect to a specific block
 
@@ -1038,7 +1043,7 @@ Gets the nonce of a contract with respect to a specific block
 
 #### Returns
 
-`Promise`<[`BigNumberish`](../namespaces/num.md#bignumberish)\>
+`Promise`<`string`\>
 
 the hex nonce
 
@@ -1052,13 +1057,13 @@ the hex nonce
 
 #### Defined in
 
-[src/provider/default.ts:114](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L114)
+[src/provider/default.ts:119](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L119)
 
 ---
 
 ### getStorageAt
 
-▸ **getStorageAt**(`contractAddress`, `key`, `blockIdentifier?`): `Promise`<[`BigNumberish`](../namespaces/num.md#bignumberish)\>
+▸ **getStorageAt**(`contractAddress`, `key`, `blockIdentifier?`): `Promise`<`string`\>
 
 Gets the contract's storage variable at a specific key.
 
@@ -1072,7 +1077,7 @@ Gets the contract's storage variable at a specific key.
 
 #### Returns
 
-`Promise`<[`BigNumberish`](../namespaces/num.md#bignumberish)\>
+`Promise`<`string`\>
 
 the value of the storage variable
 
@@ -1086,7 +1091,7 @@ the value of the storage variable
 
 #### Defined in
 
-[src/provider/default.ts:121](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L121)
+[src/provider/default.ts:126](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L126)
 
 ---
 
@@ -1118,7 +1123,7 @@ the transaction object { transaction_id, status, transaction, block_number?, blo
 
 #### Defined in
 
-[src/provider/default.ts:129](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L129)
+[src/provider/default.ts:134](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L134)
 
 ---
 
@@ -1150,7 +1155,7 @@ the transaction receipt object
 
 #### Defined in
 
-[src/provider/default.ts:133](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L133)
+[src/provider/default.ts:138](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L138)
 
 ---
 
@@ -1183,7 +1188,7 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[src/provider/default.ts:137](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L137)
+[src/provider/default.ts:142](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L142)
 
 ---
 
@@ -1220,7 +1225,7 @@ response from addTransaction
 
 #### Defined in
 
-[src/provider/default.ts:144](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L144)
+[src/provider/default.ts:149](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L149)
 
 ---
 
@@ -1253,7 +1258,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/default.ts:151](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L151)
+[src/provider/default.ts:156](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L156)
 
 ---
 
@@ -1286,13 +1291,13 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/default.ts:158](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L158)
+[src/provider/default.ts:163](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L163)
 
 ---
 
 ### getDeclareEstimateFee
 
-▸ **getDeclareEstimateFee**(`transaction`, `details`, `blockIdentifier?`): `Promise`<[`EstimateFeeResponse`](../interfaces/EstimateFeeResponse.md)\>
+▸ **getDeclareEstimateFee**(`transaction`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`EstimateFeeResponse`](../interfaces/EstimateFeeResponse.md)\>
 
 Estimates the fee for a given DECLARE transaction
 
@@ -1302,7 +1307,8 @@ Estimates the fee for a given DECLARE transaction
 | :----------------- | :------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------ |
 | `transaction`      | [`DeclareContractTransaction`](../modules.md#declarecontracttransaction)   | transaction payload to be declared containing: - compiled contract code - sender address - signature - (defaults to []) the signature |
 | `details`          | [`InvocationsDetailsWithNonce`](../modules.md#invocationsdetailswithnonce) | optional details containing: - nonce - version - optional version - optional maxFee                                                   |
-| `blockIdentifier?` | `BlockIdentifier`                                                          | block identifier                                                                                                                      |
+| `blockIdentifier?` | `BlockIdentifier`                                                          | (optional) block identifier                                                                                                           |
+| `skipValidate?`    | `boolean`                                                                  | (optional) skip cairo **validate** method                                                                                             |
 
 #### Returns
 
@@ -1320,13 +1326,13 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:165](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L165)
+[src/provider/default.ts:170](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L170)
 
 ---
 
 ### getDeployAccountEstimateFee
 
-▸ **getDeployAccountEstimateFee**(`transaction`, `details`, `blockIdentifier?`): `Promise`<[`EstimateFeeResponse`](../interfaces/EstimateFeeResponse.md)\>
+▸ **getDeployAccountEstimateFee**(`transaction`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`EstimateFeeResponse`](../interfaces/EstimateFeeResponse.md)\>
 
 Estimates the fee for a given DEPLOY_ACCOUNT transaction
 
@@ -1336,7 +1342,8 @@ Estimates the fee for a given DEPLOY_ACCOUNT transaction
 | :----------------- | :----------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------ |
 | `transaction`      | [`DeployAccountContractTransaction`](../modules.md#deployaccountcontracttransaction) | transaction payload to be deployed containing: - classHash - constructorCalldata - addressSalt - signature - (defaults to []) the signature |
 | `details`          | [`InvocationsDetailsWithNonce`](../modules.md#invocationsdetailswithnonce)           | optional details containing: - nonce - version - optional version - optional maxFee                                                         |
-| `blockIdentifier?` | `BlockIdentifier`                                                                    | block identifier                                                                                                                            |
+| `blockIdentifier?` | `BlockIdentifier`                                                                    | (optional) block identifier                                                                                                                 |
+| `skipValidate?`    | `boolean`                                                                            | (optional) skip cairo **validate** method                                                                                                   |
 
 #### Returns
 
@@ -1354,7 +1361,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:173](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L173)
+[src/provider/default.ts:179](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L179)
 
 ---
 
@@ -1387,22 +1394,22 @@ The method should not be used
 
 #### Defined in
 
-[src/provider/default.ts:181](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L181)
+[src/provider/default.ts:193](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L193)
 
 ---
 
 ### waitForTransaction
 
-▸ **waitForTransaction**(`txHash`, `options`): `Promise`<[`GetTransactionReceiptResponse`](../modules.md#gettransactionreceiptresponse)\>
+▸ **waitForTransaction**(`txHash`, `options?`): `Promise`<[`GetTransactionReceiptResponse`](../modules.md#gettransactionreceiptresponse)\>
 
 Wait for the transaction to be accepted
 
 #### Parameters
 
-| Name      | Type                                                                   | Description      |
-| :-------- | :--------------------------------------------------------------------- | :--------------- |
-| `txHash`  | [`BigNumberish`](../namespaces/num.md#bignumberish)                    | transaction hash |
-| `options` | [`waitForTransactionOptions`](../modules.md#waitfortransactionoptions) | -                |
+| Name       | Type                                                                   | Description                                                                                                  |
+| :--------- | :--------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------- |
+| `txHash`   | [`BigNumberish`](../namespaces/num.md#bignumberish)                    | transaction hash                                                                                             |
+| `options?` | [`waitForTransactionOptions`](../modules.md#waitfortransactionoptions) | (optional) retryInterval: number \| undefined; - (optional) successStates: TransactionStatus[] \| undefined; |
 
 #### Returns
 
@@ -1420,13 +1427,13 @@ GetTransactionReceiptResponse
 
 #### Defined in
 
-[src/provider/default.ts:188](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L188)
+[src/provider/default.ts:200](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L200)
 
 ---
 
 ### getSimulateTransaction
 
-▸ **getSimulateTransaction**(`invocation`, `invocationDetails`, `blockIdentifier?`): `Promise`<[`TransactionSimulationResponse`](../interfaces/TransactionSimulationResponse.md)\>
+▸ **getSimulateTransaction**(`invocation`, `invocationDetails`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`TransactionSimulationResponse`](../interfaces/TransactionSimulationResponse.md)\>
 
 Simulates the transaction and returns the transaction trace and estimated fee.
 
@@ -1436,7 +1443,8 @@ Simulates the transaction and returns the transaction trace and estimated fee.
 | :------------------ | :------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `invocation`        | [`Invocation`](../modules.md#invocation)                                   | the invocation object containing: - contractAddress - the address of the contract - entrypoint - the entrypoint of the contract - calldata - (defaults to []) the calldata - signature - (defaults to []) the signature |
 | `invocationDetails` | [`InvocationsDetailsWithNonce`](../modules.md#invocationsdetailswithnonce) | -                                                                                                                                                                                                                       |
-| `blockIdentifier?`  | `BlockIdentifier`                                                          | block identifier                                                                                                                                                                                                        |
+| `blockIdentifier?`  | `BlockIdentifier`                                                          | (optional) block identifier                                                                                                                                                                                             |
+| `skipValidate?`     | `boolean`                                                                  | (optional) skip cairo **validate** method                                                                                                                                                                               |
 
 #### Returns
 
@@ -1454,7 +1462,7 @@ the transaction trace and estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:195](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L195)
+[src/provider/default.ts:207](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L207)
 
 ---
 
@@ -1486,7 +1494,7 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/default.ts:203](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L203)
+[src/provider/default.ts:221](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L221)
 
 ---
 
@@ -1511,4 +1519,4 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/default.ts:211](https://github.com/PhilippeR26/starknet.js/blob/689c0e5/src/provider/default.ts#L211)
+[src/provider/default.ts:229](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L229)
