@@ -6,11 +6,14 @@ import {
   ArgsOrCalldata,
   Calldata,
   FunctionAbi,
+  HexCalldata,
   RawArgs,
+  RawCalldata,
   Result,
 } from '../../types';
 import assert from '../assert';
-import { isBigInt } from '../num';
+import { getSelectorFromName } from '../hash';
+import { isBigInt, toHex } from '../num';
 import { isLongText, splitLongString } from '../shortString';
 import { felt, isLen } from './cairo';
 import formatter from './formatter';
@@ -100,6 +103,7 @@ export class CallData {
         return Object.entries(oe).flatMap(([k, v]) => {
           let value = v;
           if (isLongText(value)) value = splitLongString(value);
+          if (k === 'entrypoint') value = getSelectorFromName(value);
           const kk = Array.isArray(oe) && k === '0' ? '$$len' : k;
           if (isBigInt(value)) return [[`${prefix}${kk}`, felt(value)]];
           return Object(value) === value
@@ -192,5 +196,24 @@ export class CallData {
         }),
         {}
       );
+  }
+
+  /**
+   * Helper: Compile RawCalldata to Calldata
+   * @param rawCalldata
+   * @returns Calldata
+   */
+  static toCalldata(rawCalldata: RawCalldata = []): Calldata {
+    return CallData.compile(rawCalldata);
+  }
+
+  /**
+   * Helper: Convert RawCalldata to HexCalldata
+   * @param rawCalldata
+   * @returns HexCalldata
+   */
+  static toHex(rawCalldata: RawCalldata = []): HexCalldata {
+    const calldata = CallData.compile(rawCalldata);
+    return calldata.map((it) => toHex(it));
   }
 }

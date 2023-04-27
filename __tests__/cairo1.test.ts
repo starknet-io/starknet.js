@@ -17,7 +17,7 @@ describeIfDevnetSequencer('Cairo 1 Devnet', () => {
   describe('Sequencer API', () => {
     const provider = getTestProvider() as SequencerProvider;
     const account = getTestAccount(provider);
-    let classHash: any; // = '0x3e2e625998f89befe4d429d5d958275f86421310bfb00440c2431140e8c90ba';
+    let classHash: any; //= '0x3e2e625998f89befe4d429d5d958275f86421310bfb00440c2431140e8c90ba';
     let contractAddress: any;
     let declareV2Tx: any;
     let cairo1Contract: Contract;

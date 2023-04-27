@@ -445,9 +445,10 @@ export class Account extends Provider implements AccountInterface {
     const nonce = ZERO; // DEPLOY_ACCOUNT transaction will have a nonce zero as it is the first transaction in the account
     const chainId = await this.getChainId();
 
+    const compiledCalldata = CallData.compile(constructorCalldata);
     const contractAddress =
       providedContractAddress ??
-      calculateContractAddressFromHash(addressSalt, classHash, constructorCalldata, 0);
+      calculateContractAddressFromHash(addressSalt, classHash, compiledCalldata, 0);
 
     const maxFee =
       transactionsDetail.maxFee ??
@@ -576,9 +577,10 @@ export class Account extends Provider implements AccountInterface {
     }: DeployAccountContractPayload,
     { nonce, chainId, version, maxFee }: InvocationsSignerDetails
   ): Promise<DeployAccountContractTransaction> {
+    const compiledCalldata = CallData.compile(constructorCalldata);
     const contractAddress =
       providedContractAddress ??
-      calculateContractAddressFromHash(addressSalt, classHash, constructorCalldata, 0);
+      calculateContractAddressFromHash(addressSalt, classHash, compiledCalldata, 0);
 
     const signature = await this.signer.signDeployAccountTransaction({
       classHash,
