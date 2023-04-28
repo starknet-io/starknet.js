@@ -2,8 +2,38 @@
 import { AbiEntry, AbiStructs, Args, ParsedStruct } from '../../types';
 import { BigNumberish } from '../num';
 import { uint256ToBN } from '../uint256';
-import { isCairo1Type, isLen, isTypeArray, isTypeBool, isTypeTuple, isTypeUint256 } from './cairo';
+import {
+  getArrayType,
+  isCairo1Type,
+  isLen,
+  isTypeArray,
+  isTypeBool,
+  isTypeTuple,
+  isTypeUint256,
+} from './cairo';
 import extractTupleMemberTypes from './tuple';
+
+/**
+ * Parse base types
+ * @param type type of element
+ * @param it iterator
+ * @returns bigint | boolean
+ */
+function parseBaseTypes(type: string, it: Iterator<string>) {
+  let temp;
+  switch (true) {
+    case isTypeBool(type):
+      temp = it.next().value;
+      return Boolean(BigInt(temp));
+    case isTypeUint256(type):
+      const low = it.next().value;
+      const high = it.next().value;
+      return uint256ToBN({ low, high });
+    default:
+      temp = it.next().value;
+      return BigInt(temp);
+  }
+}
 
 /**
  * Parse of the response elements that are converted to Object (Struct) by using the abi
@@ -17,7 +47,7 @@ function parseResponseStruct(
   responseIterator: Iterator<string>,
   type: string,
   structs: AbiStructs
-): BigNumberish | ParsedStruct {
+): BigNumberish | ParsedStruct | boolean {
   // type struct
   if (type in structs && structs[type]) {
     return structs[type].members.reduce((acc, el) => {
@@ -35,8 +65,8 @@ function parseResponseStruct(
       return acc;
     }, {} as any);
   }
-  const temp = responseIterator.next().value;
-  return BigInt(temp);
+  // base type
+  return parseBaseTypes(type, responseIterator);
 }
 
 /**
@@ -61,25 +91,16 @@ export default function responseParser(
     case isLen(name):
       temp = responseIterator.next().value;
       return BigInt(temp);
-    case isTypeBool(type):
-      temp = responseIterator.next().value;
-      return Boolean(BigInt(temp));
-    case isTypeUint256(type):
-      const low = responseIterator.next().value;
-      const high = responseIterator.next().value;
-      return uint256ToBN({ low, high });
     case isTypeArray(type):
       // eslint-disable-next-line no-case-declarations
-      const parsedDataArr: (BigNumberish | ParsedStruct)[] = [];
+      const parsedDataArr: (BigNumberish | ParsedStruct | boolean)[] = [];
 
       // Cairo 1 Array
       if (isCairo1Type(type)) {
-        responseIterator.next(); // skip length
-        let it = responseIterator.next();
-
-        while (!it.done) {
-          parsedDataArr.push(BigInt(it.value));
-          it = responseIterator.next();
+        const arrayType = getArrayType(type);
+        const len = BigInt(responseIterator.next().value); // get length
+        while (parsedDataArr.length < len) {
+          parsedDataArr.push(parseResponseStruct(responseIterator, arrayType, structs));
         }
         return parsedDataArr;
       }
@@ -96,7 +117,6 @@ export default function responseParser(
     case type in structs || isTypeTuple(type):
       return parseResponseStruct(responseIterator, type, structs);
     default:
-      temp = responseIterator.next().value;
-      return BigInt(temp);
+      return parseBaseTypes(type, responseIterator);
   }
 }
