@@ -12,7 +12,13 @@ export type Result =
   | bigint
   | string
   | boolean;
+
+/**
+ * Compiled calldata ready to be sent
+ * decimal-string array
+ */
 export type Calldata = string[] & { readonly __compiled__?: boolean };
+
 export type ArgsOrCalldata = RawArgsArray | [Calldata] | Calldata;
 export type ArgsOrCalldataWithOptions = ArgsOrCalldata & ContractOptions;
 export type ContractOptions = {

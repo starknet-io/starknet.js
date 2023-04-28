@@ -8,7 +8,17 @@ export type WeierstrassSignatureType = weierstrass.SignatureType;
 export type ArraySignatureType = string[];
 export type Signature = ArraySignatureType | WeierstrassSignatureType;
 
+/**
+ * BigNumberish array
+ * use CallData.compile() to convert to Calldata
+ */
 export type RawCalldata = BigNumberish[];
+
+/**
+ * Hexadecimal-string array
+ */
+export type HexCalldata = string[];
+
 export type AllowArray<T> = T | T[];
 
 export type RawArgs = RawArgsObject | RawArgsArray;

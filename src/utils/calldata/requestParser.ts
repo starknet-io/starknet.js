@@ -5,16 +5,29 @@ import {
   felt,
   getArrayType,
   isTypeArray,
-  isTypeBool,
-  isTypeContractAddress,
-  isTypeFelt,
   isTypeStruct,
   isTypeTuple,
-  isTypeUint,
   isTypeUint256,
   uint256,
 } from './cairo';
 import extractTupleMemberTypes from './tuple';
+
+/**
+ * parse base types
+ * @param type type from abi
+ * @param val value provided
+ * @returns string | string[]
+ */
+function parseBaseTypes(type: string, val: BigNumberish) {
+  switch (true) {
+    case isTypeUint256(type):
+      // eslint-disable-next-line no-case-declarations
+      const el_uint256 = uint256(val);
+      return [felt(el_uint256.low), felt(el_uint256.high)];
+    default:
+      return felt(val);
+  }
+}
 
 /**
  * Parse tuple type string to array of known objects
@@ -61,11 +74,6 @@ function parseCalldataValue(
   if (Array.isArray(element)) {
     throw Error(`Array inside array (nD) are not supported by cairo. Element: ${element} ${type}`);
   }
-  // is cairo 1 uint256
-  if (isTypeUint256(type)) {
-    const el_uint256 = uint256(element as BigNumberish);
-    return [felt(el_uint256.low as BigNumberish), felt(el_uint256.high as BigNumberish)];
-  }
   // checking if the passed element is struct
   if (structs[type] && structs[type].members.length) {
     const { members } = structs[type];
@@ -87,7 +95,7 @@ function parseCalldataValue(
   if (typeof element === 'object') {
     throw Error(`Parameter ${element} do not align with abi parameter ${type}`);
   }
-  return felt(element as BigNumberish);
+  return parseBaseTypes(type, element);
 }
 
 /**
@@ -124,23 +132,20 @@ export function parseCalldataField(
       const arrayType = getArrayType(input.type);
 
       return (value as (BigNumberish | ParsedStruct)[]).reduce((acc, el) => {
-        if (isTypeFelt(arrayType) || isTypeUint(arrayType) || isTypeContractAddress(arrayType)) {
-          acc.push(felt(el as BigNumberish));
-        } else if (isTypeBool(arrayType) && typeof el === 'boolean') {
-          acc.push((el as boolean).toString());
-        } else {
-          // structure or tuple
+        // struct or tuple or (subarray when supported)
+        if (isTypeStruct(arrayType, structs) || isTypeTuple(arrayType) || isTypeArray(arrayType)) {
           acc.push(...parseCalldataValue(el, arrayType, structs));
+        } else {
+          return acc.concat(parseBaseTypes(arrayType, el as BigNumberish));
         }
         return acc;
       }, result);
     // Struct or Tuple
-    case isTypeStruct(type, structs) || isTypeTuple(type) || isTypeUint256(type):
+    case isTypeStruct(type, structs) || isTypeTuple(type):
       return parseCalldataValue(value as ParsedStruct | BigNumberish[], type, structs);
-    case isTypeBool(type):
-      return `${+value}`;
+
     // Felt or unhandled
     default:
-      return felt(value as BigNumberish);
+      return parseBaseTypes(type, value);
   }
 }

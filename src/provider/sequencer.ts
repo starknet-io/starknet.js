@@ -30,6 +30,7 @@ import {
   TransactionType,
   waitForTransactionOptions,
 } from '../types';
+import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
 import { feeTransactionVersion, getSelector, getSelectorFromName } from '../utils/hash';
@@ -371,7 +372,7 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('add_transaction', undefined, {
       type: TransactionType.INVOKE,
       sender_address: functionInvocation.contractAddress,
-      calldata: bigNumberishArrayToDecimalStringArray(functionInvocation.calldata ?? []),
+      calldata: CallData.compile(functionInvocation.calldata ?? []),
       signature: signatureToDecimalArray(functionInvocation.signature),
       nonce: toHex(details.nonce),
       max_fee: toHex(details.maxFee || 0),
@@ -386,7 +387,7 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('add_transaction', undefined, {
       type: TransactionType.DEPLOY_ACCOUNT,
       contract_address_salt: addressSalt ?? randomAddress(),
-      constructor_calldata: bigNumberishArrayToDecimalStringArray(constructorCalldata ?? []),
+      constructor_calldata: CallData.compile(constructorCalldata ?? []),
       class_hash: toHex(classHash),
       max_fee: toHex(details.maxFee || 0),
       version: toHex(details.version || 0),
@@ -500,7 +501,7 @@ export class SequencerProvider implements ProviderInterface {
       {
         type: TransactionType.DEPLOY_ACCOUNT,
         class_hash: toHex(classHash),
-        constructor_calldata: bigNumberishArrayToDecimalStringArray(constructorCalldata || []),
+        constructor_calldata: CallData.compile(constructorCalldata || []),
         contract_address_salt: toHex(addressSalt || 0),
         signature: signatureToDecimalArray(signature),
         version: toHex(details?.version || 0),
@@ -531,9 +532,7 @@ export class SequencerProvider implements ProviderInterface {
         res = {
           type: invocation.type,
           class_hash: toHex(toBigInt(invocation.classHash)),
-          constructor_calldata: bigNumberishArrayToDecimalStringArray(
-            invocation.constructorCalldata || []
-          ),
+          constructor_calldata: CallData.compile(invocation.constructorCalldata || []),
           contract_address_salt: toHex(toBigInt(invocation.addressSalt || 0)),
         };
       }

@@ -1,8 +1,7 @@
-import { CompiledContract, ContractClass, RawCalldata, SierraContractClass } from '../types';
+import { CompiledContract, ContractClass, SierraContractClass } from '../types';
 import { isSierra } from './contract';
 import { formatSpaces } from './hash';
 import { parse, stringify } from './json';
-import { isHex, toHex } from './num';
 import { compressProgram } from './stark';
 
 export function wait(delay: number) {
@@ -11,16 +10,7 @@ export function wait(delay: number) {
   });
 }
 
-export function parseCalldata(calldata: RawCalldata = []) {
-  return calldata.map((data) => {
-    if (typeof data === 'string' && isHex(data as string)) {
-      return data;
-    }
-    return toHex(data);
-  });
-}
-
-export function createSierraContractClass(contract: SierraContractClass): any {
+export function createSierraContractClass(contract: SierraContractClass): SierraContractClass {
   const result = { ...contract } as any;
   delete result.sierra_program_debug_info;
   result.abi = formatSpaces(stringify(contract.abi));
@@ -30,7 +20,7 @@ export function createSierraContractClass(contract: SierraContractClass): any {
 }
 
 // TODO: How can we receive string here ?
-export function parseContract(contract: CompiledContract | string) {
+export function parseContract(contract: CompiledContract | string): ContractClass {
   const parsedContract =
     typeof contract === 'string' ? (parse(contract) as CompiledContract) : contract;
 

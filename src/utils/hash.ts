@@ -98,7 +98,7 @@ export function calculateTransactionHashCommon(
   version: BigNumberish,
   contractAddress: BigNumberish,
   entryPointSelector: BigNumberish,
-  calldata: BigNumberish[],
+  calldata: RawCalldata,
   maxFee: BigNumberish,
   chainId: StarknetChainId,
   additionalData: BigNumberish[] = []
@@ -119,7 +119,7 @@ export function calculateTransactionHashCommon(
 
 export function calculateDeployTransactionHash(
   contractAddress: BigNumberish,
-  constructorCalldata: BigNumberish[],
+  constructorCalldata: RawCalldata,
   version: BigNumberish,
   chainId: StarknetChainId
 ): string {
@@ -158,7 +158,7 @@ export function calculateDeclareTransactionHash(
 export function calculateDeployAccountTransactionHash(
   contractAddress: BigNumberish,
   classHash: BigNumberish,
-  constructorCalldata: BigNumberish[],
+  constructorCalldata: RawCalldata,
   salt: BigNumberish,
   version: BigNumberish,
   maxFee: BigNumberish,
@@ -182,7 +182,7 @@ export function calculateDeployAccountTransactionHash(
 export function calculateTransactionHash(
   contractAddress: BigNumberish,
   version: BigNumberish,
-  calldata: BigNumberish[],
+  calldata: RawCalldata,
   maxFee: BigNumberish,
   chainId: StarknetChainId,
   nonce: BigNumberish
