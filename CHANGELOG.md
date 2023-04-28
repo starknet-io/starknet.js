@@ -1,3 +1,10 @@
+# [5.9.0](https://github.com/0xs34n/starknet.js/compare/v5.8.0...v5.9.0) (2023-04-28)
+
+### Features
+
+- complex c1 Struct with forced abi, complex ci arrays, refactor parser ([8f28462](https://github.com/0xs34n/starknet.js/commit/8f2846290a88c7b3b2985f32c61446a378566679))
+- helpers toHex, Calldata, executeCallData, compile entrypoint, type improvements ([a452d64](https://github.com/0xs34n/starknet.js/commit/a452d64f1aa4e1005378bbba4d7748a054cae2be))
+
 # [5.8.0](https://github.com/0xs34n/starknet.js/compare/v5.7.0...v5.8.0) (2023-04-26)
 
 ### Bug Fixes
