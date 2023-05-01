@@ -6,6 +6,7 @@ import { AbiEntry, AbiStructs, FunctionAbi } from '../../types';
 import assert from '../assert';
 import { BigNumberish, toBigInt } from '../num';
 import { isLongText } from '../shortString';
+import { uint256ToBN } from '../uint256';
 import {
   Uint,
   getArrayType,
@@ -33,12 +34,14 @@ const validateUint = (parameter: any, input: AbiEntry) => {
       `Validation: Parameter is to large to be typed as Number use (BigInt or String)`
     );
   }
-
   assert(
-    typeof parameter === 'string' || typeof parameter === 'number' || typeof parameter === 'bigint',
-    `Validate: arg ${input.name} of cairo type ${input.type} should be type (String, Number or BigInt)`
+    typeof parameter === 'string' ||
+      typeof parameter === 'number' ||
+      typeof parameter === 'bigint' ||
+      (typeof parameter === 'object' && 'low' in parameter && 'high' in parameter),
+    `Validate: arg ${input.name} of cairo ZORG type ${input.type} should be type (String, Number or BigInt)`
   );
-  const param = toBigInt(parameter);
+  const param = typeof parameter === 'object' ? uint256ToBN(parameter) : toBigInt(parameter);
 
   switch (input.type) {
     case Uint.u8:
