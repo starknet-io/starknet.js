@@ -1,11 +1,3 @@
----
-id: 'index'
-title: 'Starknet.js API - v5.8.0'
-sidebar_label: 'Readme'
-sidebar_position: 0
-custom_edit_url: null
----
-
 This API is based on the <ins>[Starknet.js V3](https://github.com/0xs34n/starknet.js/discussions/102)</ins> Interface write up by <ins>[Janek](https://twitter.com/0xjanek)</ins> of <ins>[Argent](https://www.argent.xyz/)</ins>
 
 ## Provider
