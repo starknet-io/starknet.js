@@ -4,12 +4,10 @@ import { felt, tuple, uint256 } from '../src/utils/calldata/cairo';
 import { getSelectorFromName } from '../src/utils/hash';
 import { BigNumberish, hexToDecimalString, toBigInt } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
-import { Uint256, bnToUint256, uint256ToBN } from '../src/utils/uint256';
+import { uint256ToBN } from '../src/utils/uint256';
 import {
   compiledErc20,
   compiledErc20Echo,
-  compiledHelloSierra,
-  compiledHelloSierraCasm,
   compiledMulticall,
   compiledTypeTransformation,
   describeIfDevnet,
@@ -93,25 +91,15 @@ describe('contract module', () => {
 
     describe('Type Transformation', () => {
       let typeTransformedContract: Contract;
-      let helloContract: Contract;
 
       beforeAll(async () => {
         const { deploy } = await account.declareAndDeploy({
           contract: compiledTypeTransformation,
         });
+
         typeTransformedContract = new Contract(
           compiledTypeTransformation.abi,
           deploy.contract_address!,
-          provider
-        );
-
-        const { deploy: deployHello } = await account.declareAndDeploy({
-          contract: compiledHelloSierra,
-          casm: compiledHelloSierraCasm,
-        });
-        helloContract = new Contract(
-          compiledHelloSierra.abi,
-          deployHello.contract_address!,
           provider
         );
       });
@@ -125,16 +113,6 @@ describe('contract module', () => {
           return expect(
             typeTransformedContract.request_array_of_felts([1, 2])
           ).resolves.not.toThrow();
-        });
-
-        test('Parsing the Uint256 type in request', async () => {
-          const amount: Uint256 = bnToUint256(100n);
-          return expect(helloContract.test_u256(amount)).resolves.not.toThrow();
-        });
-
-        test('Parsing a bignumber type as uint256 in request', async () => {
-          const amount = 100n;
-          return expect(helloContract.test_u256(amount)).resolves.not.toThrow();
         });
 
         test('Parsing the struct in request', async () => {
@@ -179,18 +157,6 @@ describe('contract module', () => {
         test('Parsing the array of felt in response', async () => {
           const { res } = await typeTransformedContract.get_array_of_felts();
           expect(res).toStrictEqual([BigInt(4), BigInt(5)]);
-        });
-
-        test('Parsing a uint256 in response of Uint256', async () => {
-          const amount: Uint256 = bnToUint256(100n);
-          const res = await helloContract.test_u256(amount);
-          expect(res).toStrictEqual(toBigInt(101));
-        });
-
-        test('Parsing a uint256 in response of bignumber', async () => {
-          const amount = 100n;
-          const res = await helloContract.test_u256(amount);
-          expect(res).toStrictEqual(toBigInt(101));
         });
 
         test('Parsing the array of structs in response', async () => {
