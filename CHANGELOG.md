@@ -1,3 +1,11 @@
+## [5.9.1](https://github.com/0xs34n/starknet.js/compare/v5.9.0...v5.9.1) (2023-05-02)
+
+### Bug Fixes
+
+- add tests for uint256 ([5914170](https://github.com/0xs34n/starknet.js/commit/5914170770fd75909779a6b7e7b3cb2c6b1b2a9f))
+- correct test ([a35548e](https://github.com/0xs34n/starknet.js/commit/a35548e4d9892630645645bb43737ea2e2ae79a5))
+- uint256 in contract call ([0cc05e0](https://github.com/0xs34n/starknet.js/commit/0cc05e073bc025c2afdc5105b5b87e5d23c1d487))
+
 # [5.9.0](https://github.com/0xs34n/starknet.js/compare/v5.8.0...v5.9.0) (2023-04-28)
 
 ### Features
