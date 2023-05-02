@@ -2,6 +2,7 @@ import { CallData, Contract, SequencerProvider } from '../src';
 import { tuple } from '../src/utils/calldata/cairo';
 import { toBigInt } from '../src/utils/num';
 import { decodeShortString } from '../src/utils/shortString';
+import { bnToUint256 } from '../src/utils/uint256';
 import {
   compiledHelloSierra,
   compiledHelloSierraCasm,
@@ -85,7 +86,6 @@ describeIfDevnetSequencer('Cairo 1 Devnet', () => {
       await account.waitForTransaction(tx.transaction_hash);
 
       const balance = await cairo1Contract.get_balance({
-        parseRequest: false,
         parseResponse: false,
       });
 
@@ -255,6 +255,12 @@ describeIfSequencerTestnet2('Cairo1 Testnet2', () => {
     });
 
     test('Cairo 1 - uint256 struct', async () => {
+      const myUint256 = bnToUint256(2n ** 256n - 2n);
+      const result = await cairo1Contract.test_u256(myUint256);
+      expect(result).toBe(2n ** 256n - 1n);
+    });
+
+    test('Cairo 1 - uint256 by a bignumber', async () => {
       const result = await cairo1Contract.test_u256(2n ** 256n - 2n);
       expect(result).toBe(2n ** 256n - 1n);
     });

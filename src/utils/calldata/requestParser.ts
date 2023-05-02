@@ -144,6 +144,15 @@ export function parseCalldataField(
     case isTypeStruct(type, structs) || isTypeTuple(type):
       return parseCalldataValue(value as ParsedStruct | BigNumberish[], type, structs);
 
+    // Uint256 (object or num)
+    case isTypeUint256(type):
+      if (typeof value === 'object') {
+        return [felt(value.low), felt(value.high)];
+      }
+      // eslint-disable-next-line no-case-declarations
+      const el_uint256 = uint256(value);
+      return [felt(el_uint256.low), felt(el_uint256.high)];
+
     // Felt or unhandled
     default:
       return parseBaseTypes(type, value);
