@@ -1,3 +1,9 @@
+## [5.9.2](https://github.com/0xs34n/starknet.js/compare/v5.9.1...v5.9.2) (2023-05-03)
+
+### Bug Fixes
+
+- revert doc changes ([356b04d](https://github.com/0xs34n/starknet.js/commit/356b04d94a398ba7642cae6bffa8961213dda33c))
+
 ## [5.9.1](https://github.com/0xs34n/starknet.js/compare/v5.9.0...v5.9.1) (2023-05-02)
 
 ### Bug Fixes
