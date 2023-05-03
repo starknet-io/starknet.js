@@ -88,7 +88,7 @@ describe('defaultProvider', () => {
       expect(classResponse).toMatchSchemaRef('LegacyContractClass');
     });
 
-    test('GetClassByHash', async () => {
+    test('getClassByHash', async () => {
       const classResponse = await testProvider.getClassByHash(erc20ClassHash);
       expect(classResponse).toMatchSchemaRef('LegacyContractClass');
     });
