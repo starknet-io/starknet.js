@@ -1,3 +1,24 @@
+## [5.9.2](https://github.com/0xs34n/starknet.js/compare/v5.9.1...v5.9.2) (2023-05-03)
+
+### Bug Fixes
+
+- revert doc changes ([356b04d](https://github.com/0xs34n/starknet.js/commit/356b04d94a398ba7642cae6bffa8961213dda33c))
+
+## [5.9.1](https://github.com/0xs34n/starknet.js/compare/v5.9.0...v5.9.1) (2023-05-02)
+
+### Bug Fixes
+
+- add tests for uint256 ([5914170](https://github.com/0xs34n/starknet.js/commit/5914170770fd75909779a6b7e7b3cb2c6b1b2a9f))
+- correct test ([a35548e](https://github.com/0xs34n/starknet.js/commit/a35548e4d9892630645645bb43737ea2e2ae79a5))
+- uint256 in contract call ([0cc05e0](https://github.com/0xs34n/starknet.js/commit/0cc05e073bc025c2afdc5105b5b87e5d23c1d487))
+
+# [5.9.0](https://github.com/0xs34n/starknet.js/compare/v5.8.0...v5.9.0) (2023-04-28)
+
+### Features
+
+- complex c1 Struct with forced abi, complex ci arrays, refactor parser ([8f28462](https://github.com/0xs34n/starknet.js/commit/8f2846290a88c7b3b2985f32c61446a378566679))
+- helpers toHex, Calldata, executeCallData, compile entrypoint, type improvements ([a452d64](https://github.com/0xs34n/starknet.js/commit/a452d64f1aa4e1005378bbba4d7748a054cae2be))
+
 # [5.8.0](https://github.com/0xs34n/starknet.js/compare/v5.7.0...v5.8.0) (2023-04-26)
 
 ### Bug Fixes

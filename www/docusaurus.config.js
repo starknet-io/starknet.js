@@ -132,6 +132,53 @@ const config = {
         darkTheme: darkCodeTheme,
       },
     }),
+  plugins: [
+    [
+      'docusaurus-plugin-typedoc',
+
+      // Plugin / TypeDoc options
+      {
+        entryPoints: ['../src/index.ts'],
+        tsconfig: '../tsconfig.json',
+        out: 'API',
+        name: 'Starknet.js API',
+        includeVersion: true,
+        includeExtension: true,
+        visibilityFilters: {
+          protected: false,
+          private: false,
+        },
+        sort: ['kind'],
+        kindSortOrder: [
+          'Reference',
+          'Project',
+          'Module',
+          'Class',
+          'Namespace',
+          'Enum',
+          'EnumMember',
+          'Interface',
+          'TypeAlias',
+          'Constructor',
+          'Property',
+          'Variable',
+          'Function',
+          'Accessor',
+          'Method',
+          'ObjectLiteral',
+          'Parameter',
+          'TypeParameter',
+          'TypeLiteral',
+          'CallSignature',
+          'ConstructorSignature',
+          'IndexSignature',
+          'GetSignature',
+          'SetSignature',
+        ],
+        readme: './ApiTitle.md',
+      },
+    ],
+  ],
 };
 
 module.exports = config;

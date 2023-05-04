@@ -277,10 +277,10 @@ type STATE_UPDATE = {
 };
 type STORAGE_KEY = string;
 type EVENT_FILTER = {
-  from_block?: BLOCK_ID;
-  to_block?: BLOCK_ID;
-  address?: ADDRESS;
-  keys?: Array<FELT>;
+  from_block: BLOCK_ID;
+  to_block: BLOCK_ID;
+  address: ADDRESS;
+  keys: Array<FELT>;
 };
 type RESULT_PAGE_REQUEST = {
   continuation_token?: string;

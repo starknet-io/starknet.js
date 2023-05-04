@@ -594,7 +594,7 @@ export class SequencerProvider implements ProviderInterface {
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L48-L52)
    *
    * @param txHash
-   * @returns the transaction status object { block_number, tx_status: NOT_RECEIVED | RECEIVED | PENDING | REJECTED | ACCEPTED_ONCHAIN }
+   * @returns the transaction status object \{ block_number, tx_status: NOT_RECEIVED | RECEIVED | PENDING | REJECTED | ACCEPTED_ONCHAIN \}
    */
   public async getTransactionStatus(txHash: BigNumberish): Promise<GetTransactionStatusResponse> {
     const txHashHex = toHex(txHash);
