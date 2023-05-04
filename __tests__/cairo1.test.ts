@@ -1,8 +1,11 @@
-import { CallData, Contract, SequencerProvider } from '../src';
+import { Account, CallData, Contract, SequencerProvider, cairo, ec, hash, stark } from '../src';
 import { tuple } from '../src/utils/calldata/cairo';
 import { toBigInt } from '../src/utils/num';
 import { decodeShortString } from '../src/utils/shortString';
 import {
+  compiledC1Account,
+  compiledC1AccountCasm,
+  compiledErc20,
   compiledHelloSierra,
   compiledHelloSierraCasm,
   describeIfDevnetSequencer,
@@ -14,8 +17,8 @@ import { initializeMatcher } from './schema';
 
 // Testnet will not accept declare v2 with same compiledClassHash,
 // aka. we can't redeclare same contract
-describeIfDevnetSequencer('Cairo 1 Devnet', () => {
-  describe('Sequencer API', () => {
+describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
+  describe('Sequencer API &  Contract interactions', () => {
     const provider = getTestProvider() as SequencerProvider;
     const account = getTestAccount(provider);
     let classHash: any; // = '0x2daf503eec96f469b6069b3294be67ef7ffc1dce89c09535d400550d884e82e';
@@ -202,6 +205,73 @@ describeIfDevnetSequencer('Cairo 1 Devnet', () => {
         amount: 1000n,
       };
       expect(expected).toEqual(status);
+    });
+  });
+
+  describe('Cairo1 Account contract', () => {
+    const provider = getTestProvider() as SequencerProvider;
+    const account = getTestAccount(provider);
+    let accountC1: Account;
+
+    beforeAll(async () => {
+      // Deploy Cairo 1 Account
+      const priKey = stark.randomAddress();
+      const pubKey = ec.starkCurve.getStarkKey(priKey);
+
+      const calldata = { publicKey: pubKey };
+
+      // declare account
+      const declareAccount = await account.declare({
+        contract: compiledC1Account,
+        casm: compiledC1AccountCasm,
+      });
+      await account.waitForTransaction(declareAccount.transaction_hash);
+      const accountClassHash = declareAccount.class_hash;
+
+      // fund new account
+      const tobeAccountAddress = hash.calculateContractAddressFromHash(
+        pubKey,
+        accountClassHash,
+        calldata,
+        0
+      );
+      const devnetERC20Address =
+        '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
+      const { transaction_hash } = await account.execute({
+        contractAddress: devnetERC20Address,
+        entrypoint: 'transfer',
+        calldata: {
+          recipient: tobeAccountAddress,
+          amount: cairo.uint256(1_000_000_000_000_000),
+        },
+      });
+      await account.waitForTransaction(transaction_hash);
+
+      // deploy account
+      accountC1 = new Account(provider, tobeAccountAddress, priKey);
+      const deployed = await accountC1.deploySelf({
+        classHash: accountClassHash,
+        constructorCalldata: calldata,
+        addressSalt: pubKey,
+      });
+      const receipt = await account.waitForTransaction(deployed.transaction_hash);
+      expect(receipt).toMatchSchemaRef('GetTransactionReceiptResponse');
+    });
+
+    test('deploy Cairo1 Account from Cairo0 Account', () => {
+      expect(accountC1 instanceof Account);
+    });
+
+    xtest('declare & deploy C0 ERC20 from C1 Acc', async () => {
+      // const declareDeploy =
+      await accountC1.declareAndDeploy(
+        {
+          contract: compiledErc20,
+          constructorCalldata: ['Token', 'ERC20', accountC1.address],
+        },
+        { cairoVersion: '1', maxFee: 1_000_000_000_000_000 }
+      );
+      // const erc20Address = declareDeploy.deploy.contract_address;
     });
   });
 });
