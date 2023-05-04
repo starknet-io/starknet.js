@@ -208,13 +208,7 @@ describe('contract module', () => {
     });
     test('deployment of new contract', async () => {
       const factory = new ContractFactory(compiledErc20, classHash, account);
-      const erc20 = await factory.deploy(
-        CallData.compile({
-          name: encodeShortString('Token'),
-          symbol: encodeShortString('ERC20'),
-          recipient: wallet,
-        })
-      );
+      const erc20 = await factory.deploy('Token', 'ERC20', wallet);
       expect(erc20 instanceof Contract);
     });
     test('wait for deployment transaction', async () => {

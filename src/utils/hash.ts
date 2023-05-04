@@ -1,8 +1,8 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable import/extensions */
-import { keccak, poseidonHashMany } from 'micro-starknet';
+import { poseidonHashMany } from 'micro-starknet';
 
-import { API_VERSION, MASK_250, StarknetChainId, TransactionHashPrefix } from '../constants';
+import { API_VERSION, StarknetChainId, TransactionHashPrefix } from '../constants';
 import {
   Builtins,
   CompiledContract,
@@ -10,79 +10,25 @@ import {
   CompiledSierraCasm,
   ContractEntryPointFields,
   LegacyCompiledContract,
+  RawArgs,
   RawCalldata,
   SierraContractEntryPointFields,
 } from '../types/lib';
+import { CallData } from './calldata';
 import { felt } from './calldata/cairo';
 import { starkCurve } from './ec';
-import { addHexPrefix, removeHexPrefix, utf8ToArray } from './encode';
+import { addHexPrefix, utf8ToArray } from './encode';
 import { parse, stringify } from './json';
-import {
-  BigNumberish,
-  hexToBytes,
-  isHex,
-  isStringWholeNumber,
-  toBigInt,
-  toHex,
-  toHexString,
-} from './num';
+import { BigNumberish, toBigInt, toHex } from './num';
+import { getSelectorFromName } from './selector';
 import { encodeShortString } from './shortString';
 
 export * as poseidon from '@noble/curves/abstract/poseidon';
+export * from './selector'; // Preserve legacy export structure
 
 export const transactionVersion = 1n;
 export const transactionVersion_2 = 2n;
 export const feeTransactionVersion = 2n ** 128n + transactionVersion;
-
-export function keccakBn(value: BigNumberish): string {
-  const hexWithoutPrefix = removeHexPrefix(toHex(BigInt(value)));
-  const evenHex = hexWithoutPrefix.length % 2 === 0 ? hexWithoutPrefix : `0${hexWithoutPrefix}`;
-  return addHexPrefix(keccak(hexToBytes(addHexPrefix(evenHex))).toString(16));
-}
-
-function keccakHex(value: string): string {
-  return addHexPrefix(keccak(utf8ToArray(value)).toString(16));
-}
-
-/**
- * Function to get the starknet keccak hash from a string
- *
- * [Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/public/abi.py#L17-L22)
- * @param value - string you want to get the starknetKeccak hash from
- * @returns starknet keccak hash as BigNumber
- */
-export function starknetKeccak(value: string): bigint {
-  const hash = BigInt(keccakHex(value));
-  // eslint-disable-next-line no-bitwise
-  return hash & MASK_250;
-}
-
-/**
- * Function to get the hex selector from a given function name
- *
- * [Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/public/abi.py#L25-L26)
- * @param funcName - selectors abi function name
- * @returns hex selector of given abi function name
- */
-export function getSelectorFromName(funcName: string) {
-  // sometimes BigInteger pads the hex string with zeros, which is not allowed in the starknet api
-  return toHex(starknetKeccak(funcName));
-}
-
-/**
- * Function to get hex selector from function name, decimal string or hex string
- * @param value hex string | decimal string | string
- * @returns Hex selector
- */
-export function getSelector(value: string) {
-  if (isHex(value)) {
-    return value;
-  }
-  if (isStringWholeNumber(value)) {
-    return toHexString(value);
-  }
-  return getSelectorFromName(value);
-}
 
 export function computeHashOnElements(data: BigNumberish[]): string {
   return [...data, data.length]
@@ -202,10 +148,11 @@ export function calculateTransactionHash(
 export function calculateContractAddressFromHash(
   salt: BigNumberish,
   classHash: BigNumberish,
-  constructorCalldata: RawCalldata,
+  constructorCalldata: RawArgs,
   deployerAddress: BigNumberish
 ) {
-  const constructorCalldataHash = computeHashOnElements(constructorCalldata);
+  const compiledCalldata = CallData.compile(constructorCalldata);
+  const constructorCalldataHash = computeHashOnElements(compiledCalldata);
 
   const CONTRACT_ADDRESS_PREFIX = felt('0x535441524b4e45545f434f4e54524143545f41444452455353'); // Equivalent to 'STARKNET_CONTRACT_ADDRESS'
 

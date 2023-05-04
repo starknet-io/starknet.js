@@ -1,15 +1,15 @@
 /**
  * @jest-environment jsdom
  */
-import fs from 'fs';
 import { TextEncoder } from 'util';
 
 import * as constants from '../../src/constants';
 import * as json from '../../src/utils/json';
+import { compiledOpenZeppelinAccount } from '../fixtures';
 
 const { IS_BROWSER } = constants;
 
-const compiledAccount = json.parse(fs.readFileSync('./__mocks__/Account.json').toString('ascii'));
+const compiledAccount = compiledOpenZeppelinAccount;
 
 test('isBrowser', () => {
   expect(IS_BROWSER).toBe(true);

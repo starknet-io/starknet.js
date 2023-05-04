@@ -276,7 +276,7 @@ export class SequencerProvider implements ProviderInterface {
         // sender_address: contractAddress,
         contract_address: contractAddress,
         entry_point_selector: getSelectorFromName(entryPointSelector),
-        calldata,
+        calldata: CallData.compile(calldata),
       }
     ).then(this.responseParser.parseCallContractResponse);
   }
@@ -445,7 +445,7 @@ export class SequencerProvider implements ProviderInterface {
       {
         type: TransactionType.INVOKE,
         sender_address: invocation.contractAddress,
-        calldata: invocation.calldata ?? [],
+        calldata: CallData.compile(invocation.calldata ?? []),
         signature: signatureToDecimalArray(invocation.signature),
         version: toHex(invocationDetails?.version || 1),
         nonce: toHex(invocationDetails.nonce),
@@ -520,7 +520,7 @@ export class SequencerProvider implements ProviderInterface {
         res = {
           type: invocation.type,
           sender_address: invocation.contractAddress,
-          calldata: invocation.calldata ?? [],
+          calldata: CallData.compile(invocation.calldata ?? []),
         };
       } else if (invocation.type === 'DECLARE') {
         res = {
@@ -648,7 +648,7 @@ export class SequencerProvider implements ProviderInterface {
       {
         type: 'INVOKE_FUNCTION',
         sender_address: invocation.contractAddress,
-        calldata: invocation.calldata ?? [],
+        calldata: CallData.compile(invocation.calldata ?? []),
         signature: signatureToDecimalArray(invocation.signature),
         version: toHex(invocationDetails?.version || 1),
         nonce: toHex(invocationDetails.nonce),

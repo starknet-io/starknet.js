@@ -33,7 +33,7 @@ describe('Hash Tester', () => {
       const classHash = computeContractClassHash(compiledOpenZeppelinAccount);
 
       expect(classHash).toMatchInlineSnapshot(
-        `"0x58d97f7d76e78f44905cc30cb65b91ea49a4b908a76703c54197bca90f81773"`
+        `"0x36c7e49a16f8fc760a6fbdf71dde543d98be1fee2eda5daff59a0eeae066ed9"`
       );
     });
 
