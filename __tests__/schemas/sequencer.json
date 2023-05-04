@@ -116,7 +116,7 @@
         },
         "entry_point_type": {
           "type": "string",
-          "enum": ["EXTERNAL"]
+          "enum": ["EXTERNAL", "CONSTRUCTOR"]
         },
         "result": {
           "type": "array"
