@@ -4,12 +4,22 @@ import { MASK_250 } from '../constants';
 import { addHexPrefix, removeHexPrefix, utf8ToArray } from './encode';
 import { BigNumberish, hexToBytes, isHex, isStringWholeNumber, toHex, toHexString } from './num';
 
+/**
+ * Keccak hash BigNumberish value
+ * @param value BigNumberish
+ * @returns string - hexadecimal string
+ */
 export function keccakBn(value: BigNumberish): string {
   const hexWithoutPrefix = removeHexPrefix(toHex(BigInt(value)));
   const evenHex = hexWithoutPrefix.length % 2 === 0 ? hexWithoutPrefix : `0${hexWithoutPrefix}`;
   return addHexPrefix(keccak(hexToBytes(addHexPrefix(evenHex))).toString(16));
 }
 
+/**
+ * Keccak hash string value
+ * @param value string
+ * @returns string - hexadecimal string
+ */
 function keccakHex(value: string): string {
   return addHexPrefix(keccak(utf8ToArray(value)).toString(16));
 }

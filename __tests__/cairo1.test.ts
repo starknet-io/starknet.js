@@ -6,7 +6,6 @@ import { bnToUint256 } from '../src/utils/uint256';
 import {
   compiledC1Account,
   compiledC1AccountCasm,
-  compiledErc20,
   compiledHelloSierra,
   compiledHelloSierraCasm,
   describeIfDevnetSequencer,
@@ -229,7 +228,7 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
       const accountClassHash = declareAccount.class_hash;
 
       // fund new account
-      const tobeAccountAddress = hash.calculateContractAddressFromHash(
+      const toBeAccountAddress = hash.calculateContractAddressFromHash(
         pubKey,
         accountClassHash,
         calldata,
@@ -241,14 +240,14 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
         contractAddress: devnetERC20Address,
         entrypoint: 'transfer',
         calldata: {
-          recipient: tobeAccountAddress,
+          recipient: toBeAccountAddress,
           amount: cairo.uint256(1_000_000_000_000_000),
         },
       });
       await account.waitForTransaction(transaction_hash);
 
       // deploy account
-      accountC1 = new Account(provider, tobeAccountAddress, priKey);
+      accountC1 = new Account(provider, toBeAccountAddress, priKey);
       const deployed = await accountC1.deploySelf({
         classHash: accountClassHash,
         constructorCalldata: calldata,
@@ -260,18 +259,6 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
 
     test('deploy Cairo1 Account from Cairo0 Account', () => {
       expect(accountC1 instanceof Account);
-    });
-
-    xtest('declare & deploy C0 ERC20 from C1 Acc', async () => {
-      // const declareDeploy =
-      await accountC1.declareAndDeploy(
-        {
-          contract: compiledErc20,
-          constructorCalldata: ['Token', 'ERC20', accountC1.address],
-        },
-        { cairoVersion: '1', maxFee: 1_000_000_000_000_000 }
-      );
-      // const erc20Address = declareDeploy.deploy.contract_address;
     });
   });
 });
