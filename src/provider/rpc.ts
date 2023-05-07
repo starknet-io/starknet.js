@@ -271,7 +271,6 @@ export class RpcProvider implements ProviderInterface {
     if ('program' in contractDefinition) {
       return this.fetchEndpoint('starknet_estimateFee', {
         request: {
-          type: RPC.TransactionType.DECLARE,
           contract_class: {
             program: contractDefinition.program,
             entry_points_by_type: contractDefinition.entry_points_by_type,
