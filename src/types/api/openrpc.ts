@@ -339,7 +339,7 @@ type FEE_ESTIMATE = {
 };
 
 enum CALL_TYPE {
-  'DELEGATE',
+  'LIBRARY_CALL',
   'CALL',
 }
 enum ENTRY_POINT_TYPE {
@@ -359,11 +359,37 @@ type FUNCTION_INVOCATION = FUNCTION_CALL & {
 };
 type NESTED_CALL = FUNCTION_INVOCATION;
 
-type TRACE_ROOT = {
-  nonce: FELT;
-  signature: FELT;
+type INVOKE_TXN_TRACE = {
+  validate_invocation: FUNCTION_INVOCATION;
+  execute_invocation: FUNCTION_INVOCATION;
+  fee_transfer_invocation: FUNCTION_INVOCATION;
+};
+
+type DECLARE_TXN_TRACE = {
+  validate_invocation: FUNCTION_INVOCATION;
+  fee_transfer_invocation: FUNCTION_INVOCATION;
+};
+
+type DEPLOY_ACCOUNT_TXN_TRACE = {
+  validate_invocation: FUNCTION_INVOCATION;
+  constructor_invocation: FUNCTION_INVOCATION;
+  fee_transfer_invocation: FUNCTION_INVOCATION;
+};
+
+type L1_HANDLER_TXN_TRACE = {
   function_invocation: FUNCTION_INVOCATION;
 };
+
+type TRANSACTION_TRACE =
+  | INVOKE_TXN_TRACE
+  | DECLARE_TXN_TRACE
+  | DEPLOY_ACCOUNT_TXN_TRACE
+  | L1_HANDLER_TXN_TRACE;
+
+enum SIMULATION_FLAG {
+  SKIP_VALIDATE,
+  SKIP_EXECUTE,
+}
 
 export namespace OPENRPC {
   export type Nonce = FELT;
@@ -386,10 +412,10 @@ export namespace OPENRPC {
   export type PendingTransactions = Array<TXN>;
   export type SyncingStatus = false | SYNC_STATUS;
   export type Events = EVENTS_CHUNK;
-  export type Trace = TRACE_ROOT;
+  export type Trace = TRANSACTION_TRACE;
   export type Traces = Array<{
     transaction_hash: FELT;
-    trace_root: TRACE_ROOT;
+    trace_root: TRANSACTION_TRACE;
   }>;
   export type TransactionHash = TXN_HASH;
   export type BlockHash = BLOCK_HASH;
@@ -552,6 +578,25 @@ export namespace OPENRPC {
       params: { block_hash: BLOCK_HASH };
       result: Traces;
       errors: Errors.INVALID_BLOCK_HASH;
+    };
+    starknet_simulateTransaction: {
+      params: {
+        block_id: BLOCK_ID;
+        transaction: BROADCASTED_TXN;
+        simulation_flags: SIMULATION_FLAG;
+      };
+      result: {
+        simulated_transaction: {
+          transaction_trace: TRANSACTION_TRACE;
+          fee_estimation: FEE_ESTIMATE;
+        };
+      };
+      errors:
+        | Errors.CONTRACT_NOT_FOUND
+        | Errors.INVALID_MESSAGE_SELECTOR
+        | Errors.INVALID_CALL_DATA
+        | Errors.CONTRACT_ERROR
+        | Errors.BLOCK_NOT_FOUND;
     };
   };
 }
