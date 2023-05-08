@@ -4,6 +4,9 @@
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
+const generateSourceLinkTemplate = (gitRevision) =>
+  `https://github.com/0xs34n/starknet.js/blob/${gitRevision || '{gitRevision}'}/{path}#L{line}`;
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Starknet.js',
@@ -16,33 +19,11 @@ const config = {
   organizationName: '0xs34n', // Usually your GitHub org/user name.
   projectName: 'starknet.js', // Usually your repo name.
 
-  // plugins: [
-  //   [
-  //     '@docusaurus/plugin-content-docs',
-  //     {
-  //       id: 'guides',
-  //       path: 'guides',
-  //       routeBasePath: 'guides',
-  //       sidebarPath: require.resolve('./sidebars.js'),
-  //     },
-  //   ],
-  // ],
-
   presets: [
     [
       'classic',
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
-        docs: {
-          sidebarPath: require.resolve('./sidebars.js'),
-          // Please change this to your repo.
-          editUrl: 'https://github.com/0xs34n/starknet.js',
-        },
-        blog: {
-          showReadingTime: true,
-          // Please change this to your repo.
-          editUrl: 'https://github.com/0xs34n/starknet.js',
-        },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
@@ -61,27 +42,25 @@ const config = {
         },
         items: [
           {
-            type: 'doc',
-            docId: 'API/index',
-            position: 'left',
             label: 'API',
+            docId: 'API/index',
+            type: 'doc',
+            position: 'left',
           },
           {
-            position: 'left',
             label: 'Guides',
-            type: 'doc',
             docId: 'guides/intro',
+            type: 'doc',
+            position: 'left',
           },
           {
             type: 'docsVersionDropdown',
-            position: 'left',
-            // dropdownItemsAfter: [{ to: '/versions', label: 'All versions' }],
             dropdownActiveClassDisabled: true,
+            position: 'left',
           },
-          // {to: '/blog', label: 'Blog', position: 'left'},
           {
-            href: 'https://github.com/0xs34n/starknet.js',
             label: 'GitHub',
+            href: 'https://github.com/0xs34n/starknet.js',
             position: 'right',
           },
         ],
@@ -114,10 +93,6 @@ const config = {
           {
             title: 'More',
             items: [
-              // {
-              //   label: 'Blog',
-              //   to: '/blog',
-              // },
               {
                 label: 'GitHub',
                 href: 'https://github.com/0xs34n/starknet.js',
@@ -132,11 +107,10 @@ const config = {
         darkTheme: darkCodeTheme,
       },
     }),
+
   plugins: [
     [
       'docusaurus-plugin-typedoc',
-
-      // Plugin / TypeDoc options
       {
         entryPoints: ['../src/index.ts'],
         tsconfig: '../tsconfig.json',
@@ -144,7 +118,9 @@ const config = {
         name: 'Starknet.js API',
         includeVersion: true,
         includeExtension: true,
-        sourceLinkTemplate: 'https://github.com/0xs34n/starknet.js/blob/{gitRevision}/{path}#L{line}',
+        sourceLinkTemplate: generateSourceLinkTemplate(
+          process.env.GIT_REVISION_OVERRIDE || 'develop'
+        ),
         visibilityFilters: {
           protected: false,
           private: false,
