@@ -23,7 +23,7 @@ import {
 import { initializeMatcher } from './schema';
 
 describe('deploy and test Wallet', () => {
-  const provider = getTestProvider();
+  const provider = new Provider(getTestProvider());
   const account = getTestAccount(provider);
   let erc20: Contract;
   let erc20Address: string;
