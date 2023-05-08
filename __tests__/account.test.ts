@@ -499,7 +499,7 @@ describe('deploy and test Wallet', () => {
 });
 
 describe('unit', () => {
-  describe('devnet sequencer', () => {
+  describeIfDevnetSequencer('devnet sequencer', () => {
     initializeMatcher(expect);
     const provider = getTestProvider();
     const account = getTestAccount(provider);
