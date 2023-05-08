@@ -39,19 +39,23 @@ function parseBaseTypes(type: string, it: Iterator<string>) {
  * Parse of the response elements that are converted to Object (Struct) by using the abi
  *
  * @param responseIterator - iterator of the response
- * @param type - type of the struct
+ * @param name - name of the field
+ * @param type - type of the field
  * @param structs - structs from abi
- * @return {BigNumberish | ParsedStruct} - parsed arguments in format that contract is expecting
+ * @param parsedResult
+ * @return {any} - parsed arguments in format that contract is expecting
  */
 function parseResponseStruct(
   responseIterator: Iterator<string>,
+  name: string,
   type: string,
-  structs: AbiStructs
-): BigNumberish | ParsedStruct | boolean {
+  structs: AbiStructs,
+  parsedResult?: Args
+): any {
   // type struct
   if (type in structs && structs[type]) {
     return structs[type].members.reduce((acc, el) => {
-      acc[el.name] = parseResponseStruct(responseIterator, el.type, structs);
+      acc[el.name] = parseResponseStruct(responseIterator, el.name, el.type, structs, parsedResult);
       return acc;
     }, {} as any);
   }
@@ -61,9 +65,35 @@ function parseResponseStruct(
     return memberTypes.reduce((acc, it: any, idx) => {
       const tName = it?.name ? it.name : idx;
       const tType = it?.type ? it.type : it;
-      acc[tName] = parseResponseStruct(responseIterator, tType, structs);
+      acc[tName] = parseResponseStruct(responseIterator, tName, tType, structs, parsedResult);
       return acc;
     }, {} as any);
+  }
+
+  if (isTypeArray(type)) {
+    // eslint-disable-next-line no-case-declarations
+    const parsedDataArr: (BigNumberish | ParsedStruct | boolean)[] = [];
+
+    // Cairo 1 Array
+    if (isCairo1Type(type)) {
+      const arrayType = getArrayType(type);
+      const len = BigInt(responseIterator.next().value); // get length
+      while (parsedDataArr.length < len) {
+        parsedDataArr.push(
+          parseResponseStruct(responseIterator, '', arrayType, structs, parsedResult)
+        );
+      }
+      return parsedDataArr;
+    } else if (parsedResult && parsedResult[`${name}_len`]) {
+      // Cairo 0.x Array
+      const arrLen = parsedResult[`${name}_len`] as number;
+      while (parsedDataArr.length < arrLen) {
+        parsedDataArr.push(
+          parseResponseStruct(responseIterator, '', type.replace('*', ''), structs, parsedResult)
+        );
+      }
+    }
+    return parsedDataArr;
   }
   // base type
   return parseBaseTypes(type, responseIterator);
@@ -91,31 +121,8 @@ export default function responseParser(
     case isLen(name):
       temp = responseIterator.next().value;
       return BigInt(temp);
-    case isTypeArray(type):
-      // eslint-disable-next-line no-case-declarations
-      const parsedDataArr: (BigNumberish | ParsedStruct | boolean)[] = [];
-
-      // Cairo 1 Array
-      if (isCairo1Type(type)) {
-        const arrayType = getArrayType(type);
-        const len = BigInt(responseIterator.next().value); // get length
-        while (parsedDataArr.length < len) {
-          parsedDataArr.push(parseResponseStruct(responseIterator, arrayType, structs));
-        }
-        return parsedDataArr;
-      }
-
-      if (parsedResult && parsedResult[`${name}_len`]) {
-        const arrLen = parsedResult[`${name}_len`] as number;
-        while (parsedDataArr.length < arrLen) {
-          parsedDataArr.push(
-            parseResponseStruct(responseIterator, output.type.replace('*', ''), structs)
-          );
-        }
-      }
-      return parsedDataArr;
-    case type in structs || isTypeTuple(type):
-      return parseResponseStruct(responseIterator, type, structs);
+    case type in structs || isTypeTuple(type) || isTypeArray(type):
+      return parseResponseStruct(responseIterator, name, type, structs, parsedResult);
     default:
       return parseBaseTypes(type, responseIterator);
   }
