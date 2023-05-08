@@ -10,6 +10,8 @@ import { encodeShortString } from '../src/utils/shortString';
 import { randomAddress } from '../src/utils/stark';
 import {
   compiledErc20,
+  compiledHelloSierra,
+  compiledHelloSierraCasm,
   compiledNamingContract,
   compiledOpenZeppelinAccount,
   compiledStarknetId,
@@ -492,6 +494,35 @@ describe('deploy and test Wallet', () => {
       res.forEach((value) => {
         expect(value).toMatchSchemaRef('EstimateFee');
       });
+    });
+  });
+});
+
+describe('unit', () => {
+  describe('devnet sequencer', () => {
+    initializeMatcher(expect);
+    const provider = getTestProvider();
+    const account = getTestAccount(provider);
+
+    test('declareIfNot', async () => {
+      const declare = await account.declareIfNot({
+        contract: compiledHelloSierra,
+        casm: compiledHelloSierraCasm,
+      });
+      expect(declare).toMatchSchemaRef('DeclareContractResponse');
+
+      await expect(
+        account.declare({
+          contract: compiledHelloSierra,
+          casm: compiledHelloSierraCasm,
+        })
+      ).rejects.toThrow();
+
+      const redeclare = await account.declareIfNot({
+        contract: compiledHelloSierra,
+        casm: compiledHelloSierraCasm,
+      });
+      expect(redeclare.class_hash).toBe(declare.class_hash);
     });
   });
 });
