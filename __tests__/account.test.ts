@@ -280,9 +280,9 @@ describe('deploy and test Wallet', () => {
     });
 
     test('change from provider to account', async () => {
-      expect(erc20.providerOrAccount instanceof Provider);
+      expect(erc20.providerOrAccount).toBeInstanceOf(Provider);
       erc20.connect(account);
-      expect(erc20.providerOrAccount instanceof Account);
+      expect(erc20.providerOrAccount).toBeInstanceOf(Account);
     });
 
     test('estimate gas fee for `mint`', async () => {

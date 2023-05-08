@@ -258,7 +258,7 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
     });
 
     test('deploy Cairo1 Account from Cairo0 Account', () => {
-      expect(accountC1 instanceof Account);
+      expect(accountC1).toBeInstanceOf(Account);
     });
   });
 });

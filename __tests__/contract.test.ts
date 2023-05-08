@@ -209,7 +209,7 @@ describe('contract module', () => {
     test('deployment of new contract', async () => {
       const factory = new ContractFactory(compiledErc20, classHash, account);
       const erc20 = await factory.deploy('Token', 'ERC20', wallet);
-      expect(erc20 instanceof Contract);
+      expect(erc20).toBeInstanceOf(Contract);
     });
     test('wait for deployment transaction', async () => {
       const factory = new ContractFactory(compiledErc20, classHash, account);
@@ -225,7 +225,7 @@ describe('contract module', () => {
     test('attach new contract', async () => {
       const factory = new ContractFactory(compiledErc20, classHash, account);
       const erc20 = factory.attach(erc20Address);
-      expect(erc20 instanceof Contract);
+      expect(erc20).toBeInstanceOf(Contract);
     });
   });
 });
@@ -252,7 +252,7 @@ describe('Complex interaction', () => {
 
   test('contractFactory.deploy with raw arguments - all types constructor params', () => {
     // executed in beforeAll
-    expect(erc20Echo20Contract instanceof Contract);
+    expect(erc20Echo20Contract).toBeInstanceOf(Contract);
   });
 
   describeIfDevnet('speedup live tests', () => {
@@ -272,7 +272,7 @@ describe('Complex interaction', () => {
       });
 
       erc20Echo20Contract = new Contract(compiledErc20Echo.abi, deploy.contract_address!, provider);
-      expect(erc20Echo20Contract instanceof Contract);
+      expect(erc20Echo20Contract).toBeInstanceOf(Contract);
     });
 
     test('contractFactory.deploy with callData - all types constructor params', async () => {
@@ -288,7 +288,7 @@ describe('Complex interaction', () => {
           threshold: 1,
         })
       );
-      expect(erc20Echo20Contract instanceof Contract);
+      expect(erc20Echo20Contract).toBeInstanceOf(Contract);
     });
   });
 
