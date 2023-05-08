@@ -15,7 +15,7 @@ export enum Uint {
 export const isLen = (name: string) => /_len$/.test(name);
 export const isTypeFelt = (type: string) => type === 'felt' || type === 'core::felt252';
 export const isTypeArray = (type: string) =>
-  /\*/.test(type) || type.includes('core::array::Array::');
+  /\*/.test(type) || type.startsWith('core::array::Array::');
 export const isTypeTuple = (type: string) => /^\(.*\)$/i.test(type);
 export const isTypeNamedTuple = (type: string) => /\(.*\)/i.test(type) && type.includes(':');
 export const isTypeStruct = (type: string, structs: AbiStructs) => type in structs;
