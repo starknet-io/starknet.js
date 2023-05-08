@@ -299,12 +299,12 @@ Gets all the events filtered
 
 ```typescript
 type EventFilter = {
-  fromBlock?: string;
-  toBlock?: string;
-  address?: string;
-  keys?: string[][];
-  continuation_token?: string;
-  chunk_size: number
+  fromBlock: string;
+  toBlock: string;
+  address: string;
+  keys: string[][];
+  page_size: number;
+  page_number: number;
 };
 ```
 
@@ -313,6 +313,7 @@ type EventFilter = {
 ```typescript
 {
   events: StarknetEmittedEvent[];
-  continuation_token?: string;
+  page_number: number;
+  is_last_page: number;
 }
 ```
