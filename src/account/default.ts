@@ -327,6 +327,30 @@ export class Account extends Provider implements AccountInterface {
     );
   }
 
+  /**
+   * First check if contract is already declared, if not declare it
+   * If contract already declared returned transaction_hash is ''.
+   * Method will pass even if contract is already declared
+   * @param payload DeclareContractPayload
+   * @param transactionsDetail (optional) InvocationsDetails = {}
+   * @returns DeclareContractResponse
+   */
+  public async declareIfNot(
+    payload: DeclareContractPayload,
+    transactionsDetail: InvocationsDetails = {}
+  ): Promise<DeclareContractResponse> {
+    const declareContractPayload = extractContractHashes(payload);
+    try {
+      await this.getClassByHash(declareContractPayload.classHash);
+    } catch (error) {
+      return this.declare(payload, transactionsDetail);
+    }
+    return {
+      transaction_hash: '',
+      class_hash: declareContractPayload.classHash,
+    };
+  }
+
   public async declare(
     payload: DeclareContractPayload,
     transactionsDetail: InvocationsDetails = {}
@@ -421,15 +445,18 @@ export class Account extends Provider implements AccountInterface {
     details?: InvocationsDetails | undefined
   ): Promise<DeclareDeployUDCResponse> {
     const { constructorCalldata, salt, unique } = payload;
-    const { transaction_hash, class_hash } = await this.declare(payload, details);
-    const declare = await this.waitForTransaction(transaction_hash, {
-      successStates: [TransactionStatus.ACCEPTED_ON_L2],
-    });
+    let declare = await this.declareIfNot(payload, details);
+    if (declare.transaction_hash !== '') {
+      const tx = await this.waitForTransaction(declare.transaction_hash, {
+        successStates: [TransactionStatus.ACCEPTED_ON_L2],
+      });
+      declare = { ...declare, ...tx };
+    }
     const deploy = await this.deployContract(
-      { classHash: class_hash, salt, unique, constructorCalldata },
+      { classHash: declare.class_hash, salt, unique, constructorCalldata },
       details
     );
-    return { declare: { ...declare, class_hash }, deploy };
+    return { declare: { ...declare }, deploy };
   }
 
   public async deployAccount(
