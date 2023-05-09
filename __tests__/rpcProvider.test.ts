@@ -187,6 +187,7 @@ describeIfRpc('RPCProvider', () => {
     describe('deploy contract related tests', () => {
       let contract_address: string;
       let transaction_hash: string;
+      let ozClassHash: string;
 
       beforeAll(async () => {
         const { deploy } = await account.declareAndDeploy({
@@ -197,6 +198,7 @@ describeIfRpc('RPCProvider', () => {
 
         contract_address = deploy.contract_address;
         transaction_hash = deploy.transaction_hash;
+        ozClassHash = deploy.classHash;
       });
 
       test('declareDeploy()', () => {
@@ -227,13 +229,11 @@ describeIfRpc('RPCProvider', () => {
         const classAt = await rpcProvider.getClassAt(contract_address);
         expect(classAt).toMatchSchemaRef('LegacyContractClass');
       });
-    });
 
-    test('getClass classHash 0x058d97f7d76e78f44905cc30cb65b91ea49a4b908a76703c54197bca90f81773', async () => {
-      const contractClass = await rpcProvider.getClass(
-        '0x058d97f7d76e78f44905cc30cb65b91ea49a4b908a76703c54197bca90f81773'
-      );
-      expect(contractClass).toMatchSchemaRef('LegacyContractClass');
+      test('getClass classHash', async () => {
+        const contractClass = await rpcProvider.getClass(ozClassHash);
+        expect(contractClass).toMatchSchemaRef('LegacyContractClass');
+      });
     });
   });
 });

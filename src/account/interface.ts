@@ -4,6 +4,7 @@ import { SignerInterface } from '../signer';
 import {
   Abi,
   AllowArray,
+  CairoVersion,
   Call,
   DeclareAndDeployContractPayload,
   DeclareContractPayload,
@@ -32,6 +33,8 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract address: string;
 
   public abstract signer: SignerInterface;
+
+  public abstract cairoVersion: CairoVersion;
 
   /**
    * Estimate Fee for executing an INVOKE transaction on starknet
@@ -204,6 +207,7 @@ export abstract class AccountInterface extends ProviderInterface {
   /**
    * Declares and Deploy a given compiled contract (json) to starknet using UDC
    * Internal wait for L2 transaction, do not support multicall
+   * Method will pass even if contract is already declared (internal using DeclareIfNot)
    *
    * @param  containing
    * - contract: compiled contract code

@@ -24,7 +24,7 @@ import { CallData } from '../utils/calldata';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
-import { BigNumberish, bigNumberishArrayToHexadecimalStringArray, toHex } from '../utils/num';
+import { BigNumberish, toHex } from '../utils/num';
 import { wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { signatureToHexArray } from '../utils/stark';
@@ -300,7 +300,7 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_estimateFee', {
       request: {
         type: RPC.TransactionType.DEPLOY_ACCOUNT,
-        constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
+        constructor_calldata: CallData.toHex(constructorCalldata || []),
         class_hash: toHex(classHash),
         contract_address_salt: toHex(addressSalt || 0),
         signature: signatureToHexArray(signature),
@@ -351,7 +351,7 @@ export class RpcProvider implements ProviderInterface {
   ): Promise<DeployContractResponse> {
     return this.fetchEndpoint('starknet_addDeployAccountTransaction', {
       deploy_account_transaction: {
-        constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
+        constructor_calldata: CallData.toHex(constructorCalldata || []),
         class_hash: toHex(classHash),
         contract_address_salt: toHex(addressSalt || 0),
         type: RPC.TransactionType.DEPLOY_ACCOUNT,

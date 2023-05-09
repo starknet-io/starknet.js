@@ -1,5 +1,6 @@
 import { Abi, Call, DeclareSignerDetails, InvocationsSignerDetails, Signature } from '../types';
 import { DeployAccountSignerDetails } from '../types/signer';
+import { CallData } from '../utils/calldata';
 import { starkCurve } from '../utils/ec';
 import { buf2hex } from '../utils/encode';
 import {
@@ -65,7 +66,7 @@ export class Signer implements SignerInterface {
     const msgHash = calculateDeployAccountTransactionHash(
       contractAddress,
       classHash,
-      constructorCalldata,
+      CallData.compile(constructorCalldata),
       addressSalt,
       version,
       maxFee,
