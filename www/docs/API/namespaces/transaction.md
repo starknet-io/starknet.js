@@ -32,7 +32,7 @@ two arrays: one with the entrypoints, and one with the concatenated calldata.
 
 #### Defined in
 
-[src/utils/transaction.ts:12](https://github.com/notV4l/starknet.js/blob/47ca727/src/utils/transaction.ts#L12)
+[src/utils/transaction.ts:12](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/transaction.ts#L12)
 
 ---
 
@@ -55,7 +55,7 @@ by the **execute** protocol.
 
 #### Defined in
 
-[src/utils/transaction.ts:37](https://github.com/notV4l/starknet.js/blob/47ca727/src/utils/transaction.ts#L37)
+[src/utils/transaction.ts:37](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/transaction.ts#L37)
 
 ---
 
@@ -76,7 +76,7 @@ by the **execute** protocol.
 
 #### Defined in
 
-[src/utils/transaction.ts:43](https://github.com/notV4l/starknet.js/blob/47ca727/src/utils/transaction.ts#L43)
+[src/utils/transaction.ts:43](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/transaction.ts#L43)
 
 ---
 
@@ -100,7 +100,7 @@ CallStruct
 
 #### Defined in
 
-[src/utils/transaction.ts:53](https://github.com/notV4l/starknet.js/blob/47ca727/src/utils/transaction.ts#L53)
+[src/utils/transaction.ts:53](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/transaction.ts#L53)
 
 ---
 
@@ -125,7 +125,7 @@ Calldata
 
 #### Defined in
 
-[src/utils/transaction.ts:69](https://github.com/notV4l/starknet.js/blob/47ca727/src/utils/transaction.ts#L69)
+[src/utils/transaction.ts:69](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/transaction.ts#L69)
 
 ---
 
@@ -148,4 +148,4 @@ string[] of calldata
 
 #### Defined in
 
-[src/utils/transaction.ts:79](https://github.com/notV4l/starknet.js/blob/47ca727/src/utils/transaction.ts#L79)
+[src/utils/transaction.ts:79](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/transaction.ts#L79)

@@ -34,7 +34,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/account/interface.ts:32](https://github.com/notV4l/starknet.js/blob/47ca727/src/account/interface.ts#L32)
+[src/account/interface.ts:32](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/account/interface.ts#L32)
 
 ---
 
@@ -44,7 +44,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/account/interface.ts:34](https://github.com/notV4l/starknet.js/blob/47ca727/src/account/interface.ts#L34)
+[src/account/interface.ts:34](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/account/interface.ts#L34)
 
 ## Methods
 
@@ -69,7 +69,7 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/interface.ts:46](https://github.com/notV4l/starknet.js/blob/47ca727/src/account/interface.ts#L46)
+[src/account/interface.ts:46](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/account/interface.ts#L46)
 
 ---
 
@@ -94,7 +94,7 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/interface.ts:60](https://github.com/notV4l/starknet.js/blob/47ca727/src/account/interface.ts#L60)
+[src/account/interface.ts:60](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/account/interface.ts#L60)
 
 ---
 
@@ -119,7 +119,7 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/interface.ts:76](https://github.com/notV4l/starknet.js/blob/47ca727/src/account/interface.ts#L76)
+[src/account/interface.ts:76](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/account/interface.ts#L76)
 
 ---
 
@@ -143,7 +143,7 @@ This is different from the normal DEPLOY transaction as it goes through the Univ
 
 #### Defined in
 
-[src/account/interface.ts:96](https://github.com/notV4l/starknet.js/blob/47ca727/src/account/interface.ts#L96)
+[src/account/interface.ts:96](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/account/interface.ts#L96)
 
 ---
 
@@ -169,7 +169,7 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/interface.ts:111](https://github.com/notV4l/starknet.js/blob/47ca727/src/account/interface.ts#L111)
+[src/account/interface.ts:111](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/account/interface.ts#L111)
 
 ---
 
@@ -195,7 +195,7 @@ response from addTransaction
 
 #### Defined in
 
-[src/account/interface.ts:128](https://github.com/notV4l/starknet.js/blob/47ca727/src/account/interface.ts#L128)
+[src/account/interface.ts:128](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/account/interface.ts#L128)
 
 ---
 
@@ -220,7 +220,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/account/interface.ts:148](https://github.com/notV4l/starknet.js/blob/47ca727/src/account/interface.ts#L148)
+[src/account/interface.ts:148](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/account/interface.ts#L148)
 
 ---
 
@@ -247,7 +247,7 @@ support multicall
 
 #### Defined in
 
-[src/account/interface.ts:170](https://github.com/notV4l/starknet.js/blob/47ca727/src/account/interface.ts#L170)
+[src/account/interface.ts:170](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/account/interface.ts#L170)
 
 ---
 
@@ -281,7 +281,7 @@ Internal wait for L2 transaction, support multicall
 
 #### Defined in
 
-[src/account/interface.ts:199](https://github.com/notV4l/starknet.js/blob/47ca727/src/account/interface.ts#L199)
+[src/account/interface.ts:199](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/account/interface.ts#L199)
 
 ---
 
@@ -318,7 +318,7 @@ Internal wait for L2 transaction, do not support multicall
 
 #### Defined in
 
-[src/account/interface.ts:232](https://github.com/notV4l/starknet.js/blob/47ca727/src/account/interface.ts#L232)
+[src/account/interface.ts:232](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/account/interface.ts#L232)
 
 ---
 
@@ -343,7 +343,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/account/interface.ts:251](https://github.com/notV4l/starknet.js/blob/47ca727/src/account/interface.ts#L251)
+[src/account/interface.ts:251](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/account/interface.ts#L251)
 
 ---
 
@@ -372,7 +372,7 @@ the signature of the JSON object
 
 #### Defined in
 
-[src/account/interface.ts:264](https://github.com/notV4l/starknet.js/blob/47ca727/src/account/interface.ts#L264)
+[src/account/interface.ts:264](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/account/interface.ts#L264)
 
 ---
 
@@ -401,7 +401,7 @@ the hash of the JSON object
 
 #### Defined in
 
-[src/account/interface.ts:274](https://github.com/notV4l/starknet.js/blob/47ca727/src/account/interface.ts#L274)
+[src/account/interface.ts:274](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/account/interface.ts#L274)
 
 ---
 
@@ -430,7 +430,7 @@ true if the signature is valid, false otherwise
 
 #### Defined in
 
-[src/account/interface.ts:284](https://github.com/notV4l/starknet.js/blob/47ca727/src/account/interface.ts#L284)
+[src/account/interface.ts:284](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/account/interface.ts#L284)
 
 ---
 
@@ -463,7 +463,7 @@ true if the signature is valid, false otherwise
 
 #### Defined in
 
-[src/account/interface.ts:295](https://github.com/notV4l/starknet.js/blob/47ca727/src/account/interface.ts#L295)
+[src/account/interface.ts:295](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/account/interface.ts#L295)
 
 ---
 
@@ -487,7 +487,7 @@ nonce of the account
 
 #### Defined in
 
-[src/account/interface.ts:303](https://github.com/notV4l/starknet.js/blob/47ca727/src/account/interface.ts#L303)
+[src/account/interface.ts:303](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/account/interface.ts#L303)
 
 ---
 
@@ -512,7 +512,7 @@ suggestedMaxFee
 
 #### Defined in
 
-[src/account/interface.ts:312](https://github.com/notV4l/starknet.js/blob/47ca727/src/account/interface.ts#L312)
+[src/account/interface.ts:312](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/account/interface.ts#L312)
 
 ---
 
@@ -537,7 +537,7 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/interface.ts:327](https://github.com/notV4l/starknet.js/blob/47ca727/src/account/interface.ts#L327)
+[src/account/interface.ts:327](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/account/interface.ts#L327)
 
 ---
 
@@ -559,7 +559,7 @@ the chain Id
 
 #### Defined in
 
-[src/provider/interface.ts:37](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/interface.ts#L37)
+[src/provider/interface.ts:37](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/interface.ts#L37)
 
 ---
 
@@ -588,7 +588,7 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[src/provider/interface.ts:46](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/interface.ts#L46)
+[src/provider/interface.ts:46](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/interface.ts#L46)
 
 ---
 
@@ -616,7 +616,7 @@ the block object
 
 #### Defined in
 
-[src/provider/interface.ts:57](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/interface.ts#L57)
+[src/provider/interface.ts:57](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/interface.ts#L57)
 
 ---
 
@@ -645,7 +645,7 @@ The method should not be used
 
 #### Defined in
 
-[src/provider/interface.ts:62](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/interface.ts#L62)
+[src/provider/interface.ts:62](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/interface.ts#L62)
 
 ---
 
@@ -674,7 +674,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/interface.ts:74](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/interface.ts#L74)
+[src/provider/interface.ts:74](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/interface.ts#L74)
 
 ---
 
@@ -703,7 +703,7 @@ Class hash
 
 #### Defined in
 
-[src/provider/interface.ts:86](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/interface.ts#L86)
+[src/provider/interface.ts:86](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/interface.ts#L86)
 
 ---
 
@@ -731,7 +731,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/interface.ts:97](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/interface.ts#L97)
+[src/provider/interface.ts:97](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/interface.ts#L97)
 
 ---
 
@@ -760,7 +760,7 @@ the hex nonce
 
 #### Defined in
 
-[src/provider/interface.ts:105](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/interface.ts#L105)
+[src/provider/interface.ts:105](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/interface.ts#L105)
 
 ---
 
@@ -790,7 +790,7 @@ the value of the storage variable
 
 #### Defined in
 
-[src/provider/interface.ts:118](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/interface.ts#L118)
+[src/provider/interface.ts:118](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/interface.ts#L118)
 
 ---
 
@@ -818,7 +818,7 @@ the transaction object { transaction_id, status, transaction, block_number?, blo
 
 #### Defined in
 
-[src/provider/interface.ts:130](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/interface.ts#L130)
+[src/provider/interface.ts:130](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/interface.ts#L130)
 
 ---
 
@@ -846,7 +846,7 @@ the transaction receipt object
 
 #### Defined in
 
-[src/provider/interface.ts:138](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/interface.ts#L138)
+[src/provider/interface.ts:138](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/interface.ts#L138)
 
 ---
 
@@ -875,7 +875,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/interface.ts:151](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/interface.ts#L151)
+[src/provider/interface.ts:151](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/interface.ts#L151)
 
 ---
 
@@ -908,7 +908,7 @@ response from addTransaction
 
 #### Defined in
 
-[src/provider/interface.ts:171](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/interface.ts#L171)
+[src/provider/interface.ts:171](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/interface.ts#L171)
 
 ---
 
@@ -937,7 +937,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/interface.ts:188](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/interface.ts#L188)
+[src/provider/interface.ts:188](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/interface.ts#L188)
 
 ---
 
@@ -972,7 +972,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:209](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/interface.ts#L209)
+[src/provider/interface.ts:209](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/interface.ts#L209)
 
 ---
 
@@ -1003,7 +1003,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:231](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/interface.ts#L231)
+[src/provider/interface.ts:231](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/interface.ts#L231)
 
 ---
 
@@ -1034,7 +1034,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:253](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/interface.ts#L253)
+[src/provider/interface.ts:253](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/interface.ts#L253)
 
 ---
 
@@ -1065,7 +1065,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:276](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/interface.ts#L276)
+[src/provider/interface.ts:276](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/interface.ts#L276)
 
 ---
 
@@ -1094,7 +1094,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:295](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/interface.ts#L295)
+[src/provider/interface.ts:295](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/interface.ts#L295)
 
 ---
 
@@ -1123,7 +1123,7 @@ GetTransactionReceiptResponse
 
 #### Defined in
 
-[src/provider/interface.ts:308](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/interface.ts#L308)
+[src/provider/interface.ts:308](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/interface.ts#L308)
 
 ---
 
@@ -1154,7 +1154,7 @@ the transaction trace and estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:328](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/interface.ts#L328)
+[src/provider/interface.ts:328](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/interface.ts#L328)
 
 ---
 
@@ -1182,4 +1182,4 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/interface.ts:341](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/interface.ts#L341)
+[src/provider/interface.ts:341](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/interface.ts#L341)

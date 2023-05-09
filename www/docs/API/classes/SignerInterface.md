@@ -32,7 +32,7 @@ public key of signer as hex string with 0x prefix
 
 #### Defined in
 
-[src/signer/interface.ts:11](https://github.com/notV4l/starknet.js/blob/47ca727/src/signer/interface.ts#L11)
+[src/signer/interface.ts:11](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/signer/interface.ts#L11)
 
 ---
 
@@ -62,7 +62,7 @@ the signature of the JSON object
 
 #### Defined in
 
-[src/signer/interface.ts:22](https://github.com/notV4l/starknet.js/blob/47ca727/src/signer/interface.ts#L22)
+[src/signer/interface.ts:22](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/signer/interface.ts#L22)
 
 ---
 
@@ -88,7 +88,7 @@ signature
 
 #### Defined in
 
-[src/signer/interface.ts:35](https://github.com/notV4l/starknet.js/blob/47ca727/src/signer/interface.ts#L35)
+[src/signer/interface.ts:35](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/signer/interface.ts#L35)
 
 ---
 
@@ -112,7 +112,7 @@ signature
 
 #### Defined in
 
-[src/signer/interface.ts:54](https://github.com/notV4l/starknet.js/blob/47ca727/src/signer/interface.ts#L54)
+[src/signer/interface.ts:54](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/signer/interface.ts#L54)
 
 ---
 
@@ -136,4 +136,4 @@ signature
 
 #### Defined in
 
-[src/signer/interface.ts:70](https://github.com/notV4l/starknet.js/blob/47ca727/src/signer/interface.ts#L70)
+[src/signer/interface.ts:70](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/signer/interface.ts#L70)

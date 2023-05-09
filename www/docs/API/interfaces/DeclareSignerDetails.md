@@ -14,7 +14,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/signer.ts:11](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/signer.ts#L11)
+[src/types/signer.ts:11](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/types/signer.ts#L11)
 
 ---
 
@@ -24,7 +24,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/signer.ts:12](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/signer.ts#L12)
+[src/types/signer.ts:12](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/types/signer.ts#L12)
 
 ---
 
@@ -34,7 +34,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/signer.ts:13](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/signer.ts#L13)
+[src/types/signer.ts:13](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/types/signer.ts#L13)
 
 ---
 
@@ -44,7 +44,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/signer.ts:14](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/signer.ts#L14)
+[src/types/signer.ts:14](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/types/signer.ts#L14)
 
 ---
 
@@ -54,7 +54,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/signer.ts:15](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/signer.ts#L15)
+[src/types/signer.ts:15](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/types/signer.ts#L15)
 
 ---
 
@@ -64,7 +64,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/signer.ts:16](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/signer.ts#L16)
+[src/types/signer.ts:16](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/types/signer.ts#L16)
 
 ---
 
@@ -74,4 +74,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/signer.ts:17](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/signer.ts#L17)
+[src/types/signer.ts:17](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/types/signer.ts#L17)

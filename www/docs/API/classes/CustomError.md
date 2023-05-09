@@ -32,7 +32,7 @@ Error.constructor
 
 #### Defined in
 
-[src/provider/errors.ts:18](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/errors.ts#L18)
+[src/provider/errors.ts:18](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/errors.ts#L18)
 
 ## Properties
 
@@ -95,7 +95,7 @@ Error.name
 
 #### Defined in
 
-[src/provider/errors.ts:16](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/errors.ts#L16)
+[src/provider/errors.ts:16](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/errors.ts#L16)
 
 ---
 

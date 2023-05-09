@@ -14,4 +14,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:111](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/provider.ts#L111)
+[src/types/provider.ts:111](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/types/provider.ts#L111)

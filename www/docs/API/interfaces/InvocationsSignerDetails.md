@@ -20,7 +20,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/signer.ts:6](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/signer.ts#L6)
+[src/types/signer.ts:6](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/types/signer.ts#L6)
 
 ---
 
@@ -30,7 +30,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/signer.ts:7](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/signer.ts#L7)
+[src/types/signer.ts:7](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/types/signer.ts#L7)
 
 ---
 
@@ -44,7 +44,7 @@ Required.nonce
 
 #### Defined in
 
-[src/types/lib/index.ts:97](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L97)
+[src/types/lib/index.ts:97](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/types/lib/index.ts#L97)
 
 ---
 
@@ -58,7 +58,7 @@ Required.maxFee
 
 #### Defined in
 
-[src/types/lib/index.ts:98](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L98)
+[src/types/lib/index.ts:98](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/types/lib/index.ts#L98)
 
 ---
 
@@ -72,7 +72,7 @@ Required.version
 
 #### Defined in
 
-[src/types/lib/index.ts:99](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L99)
+[src/types/lib/index.ts:99](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/types/lib/index.ts#L99)
 
 ---
 
@@ -86,4 +86,4 @@ Required.cairoVersion
 
 #### Defined in
 
-[src/types/lib/index.ts:100](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L100)
+[src/types/lib/index.ts:100](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/types/lib/index.ts#L100)

@@ -31,7 +31,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/errors.ts:40](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/errors.ts#L40)
+[src/provider/errors.ts:40](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/errors.ts#L40)
 
 ## Properties
 
@@ -90,7 +90,7 @@ node_modules/@types/node/globals.d.ts:13
 
 #### Defined in
 
-[src/provider/errors.ts:40](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/errors.ts#L40)
+[src/provider/errors.ts:40](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/errors.ts#L40)
 
 ---
 
@@ -104,7 +104,7 @@ node_modules/@types/node/globals.d.ts:13
 
 #### Defined in
 
-[src/provider/errors.ts:16](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/errors.ts#L16)
+[src/provider/errors.ts:16](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/errors.ts#L16)
 
 ---
 
