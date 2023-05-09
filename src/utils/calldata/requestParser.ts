@@ -71,9 +71,18 @@ function parseCalldataValue(
   if (element === undefined) {
     throw Error(`Missing parameter for type ${type}`);
   }
+
+  // value is Array
   if (Array.isArray(element)) {
-    throw Error(`Array inside array (nD) are not supported by cairo. Element: ${element} ${type}`);
+    const result: string[] = [];
+    result.push(felt(element.length)); // Add length to array
+    const arrayType = getArrayType(type);
+
+    return element.reduce((acc, it) => {
+      return acc.concat(parseCalldataValue(it, arrayType, structs));
+    }, result);
   }
+
   // checking if the passed element is struct
   if (structs[type] && structs[type].members.length) {
     const { members } = structs[type];
@@ -124,22 +133,8 @@ export function parseCalldataField(
         // long string match cairo felt*
         value = splitLongString(value);
       }
-      // eslint-disable-next-line no-case-declarations
-      const result: string[] = [];
-      result.push(felt(value.length)); // Add length to array
+      return parseCalldataValue(value, input.type, structs);
 
-      // eslint-disable-next-line no-case-declarations
-      const arrayType = getArrayType(input.type);
-
-      return (value as (BigNumberish | ParsedStruct)[]).reduce((acc, el) => {
-        // struct or tuple or (subarray when supported)
-        if (isTypeStruct(arrayType, structs) || isTypeTuple(arrayType) || isTypeArray(arrayType)) {
-          acc.push(...parseCalldataValue(el, arrayType, structs));
-        } else {
-          return acc.concat(parseBaseTypes(arrayType, el as BigNumberish));
-        }
-        return acc;
-      }, result);
     // Struct or Tuple
     case isTypeStruct(type, structs) || isTypeTuple(type):
       return parseCalldataValue(value as ParsedStruct | BigNumberish[], type, structs);

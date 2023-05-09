@@ -147,6 +147,11 @@ const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs) => 
     case isTypeBool(baseType):
       parameter.forEach((param: BigNumberish) => validateBool(param, input));
       break;
+    case isTypeArray(baseType):
+      parameter.forEach((param: BigNumberish) =>
+        validateArray(param, { name: '', type: baseType }, structs)
+      );
+      break;
     default:
       throw new Error(
         `Validate Unhandled: argument ${input.name}, type ${input.type}, value ${parameter}`

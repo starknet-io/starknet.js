@@ -418,7 +418,12 @@ mod HelloStarknet {
     }
 
     #[view]
-    fn array2d(test: Array<Array<felt252>>) -> felt252 {
+    fn array2d_array(test: Array<Array<felt252>>) -> Array<Array<felt252>> {
+        return test;
+    }
+
+    #[view]
+    fn array2d_felt(test: Array<Array<felt252>>) -> felt252 {
         return *(test.at(0_u32)).at(0_u32);
     }
 
