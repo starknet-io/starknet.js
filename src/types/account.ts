@@ -43,7 +43,7 @@ export type DeployContractUDCResponse = {
 export type DeclareDeployUDCResponse = {
   declare: {
     class_hash: BigNumberish;
-  } & DeclareTransactionReceiptResponse;
+  } & Partial<DeclareTransactionReceiptResponse>;
   deploy: DeployContractUDCResponse;
 };
 
