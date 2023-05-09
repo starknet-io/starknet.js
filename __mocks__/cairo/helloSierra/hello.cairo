@@ -276,6 +276,8 @@ mod HelloStarknet {
     use starknet::ContractAddress;
     use super::Foo;
     use starknet::get_caller_address;
+    use array::ArrayTrait;
+    use array::SpanTrait;
 
     //bet
     use super::Bet;
@@ -407,6 +409,17 @@ mod HelloStarknet {
     #[view]
     fn get_user() -> UserData {
         user::read()
+    }
+
+    // Nested Array 2d
+    #[external]
+    fn array2d_ex(test: Array<Array<felt252>>) -> felt252 {
+        return *(test.at(0_u32)).at(0_u32);
+    }
+
+    #[view]
+    fn array2d(test: Array<Array<felt252>>) -> felt252 {
+        return *(test.at(0_u32)).at(0_u32);
     }
 
 }

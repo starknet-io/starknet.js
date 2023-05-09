@@ -203,6 +203,25 @@ describeIfDevnetSequencer('Cairo 1 Devnet', () => {
       };
       expect(expected).toEqual(status);
     });
+
+    test('C1 Array 2D', async () => {
+      const tx = await cairo1Contract.array2d_ex([[1,2],[3,4]]);
+      account.waitForTransaction(tx.transaction_hash);
+
+      const result = await cairo1Contract.array2d([[1,2],[3,4]]);
+      console.log(result)
+
+      const cd = CallData.compile({
+        test: [[1,2],[3,4]]
+      });
+
+      const tx1 = await cairo1Contract.array2d_ex(cd);
+      account.waitForTransaction(tx1.transaction_hash);
+
+      const result1 = await cairo1Contract.array2d(cd);
+      console.log(result1)
+    })
+
   });
 });
 
