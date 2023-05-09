@@ -1,13 +1,19 @@
 import {
+  Account,
   CallData,
   Contract,
   DeclareDeployUDCResponse,
   SequencerProvider,
   cairo,
+  ec,
+  hash,
   num,
   shortString,
+  stark,
 } from '../src';
 import {
+  compiledC1Account,
+  compiledC1AccountCasm,
   compiledHelloSierra,
   compiledHelloSierraCasm,
   describeIfDevnetSequencer,
@@ -17,8 +23,8 @@ import {
 } from './fixtures';
 import { initializeMatcher } from './schema';
 
-describeIfDevnetSequencer('Cairo 1 Devnet', () => {
-  describe('Sequencer API', () => {
+describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
+  describe('Sequencer API &  Contract interactions', () => {
     const provider = getTestProvider() as SequencerProvider;
     const account = getTestAccount(provider);
     let dd: DeclareDeployUDCResponse;
@@ -40,13 +46,10 @@ describeIfDevnetSequencer('Cairo 1 Devnet', () => {
       expect(cairo1Contract).toBeInstanceOf(Contract);
     });
 
-    test('deployContract Cairo 1 with false cairoVersion UDC parameter', async () => {
-      const deploy = await account.deployContract(
-        {
-          classHash: dd.deploy.classHash,
-        },
-        { cairoVersion: '1' }
-      );
+    test('deployContract Cairo1', async () => {
+      const deploy = await account.deployContract({
+        classHash: dd.deploy.classHash,
+      });
       expect(deploy).toHaveProperty('address');
     });
 
@@ -190,6 +193,61 @@ describeIfDevnetSequencer('Cairo 1 Devnet', () => {
         amount: 1000n,
       };
       expect(expected).toEqual(status);
+    });
+  });
+
+  describe('Cairo1 Account contract', () => {
+    const provider = getTestProvider() as SequencerProvider;
+    const account = getTestAccount(provider);
+    let accountC1: Account;
+
+    beforeAll(async () => {
+      // Deploy Cairo 1 Account
+      const priKey = stark.randomAddress();
+      const pubKey = ec.starkCurve.getStarkKey(priKey);
+
+      const calldata = { publicKey: pubKey };
+
+      // declare account
+      const declareAccount = await account.declare({
+        contract: compiledC1Account,
+        casm: compiledC1AccountCasm,
+      });
+      await account.waitForTransaction(declareAccount.transaction_hash);
+      const accountClassHash = declareAccount.class_hash;
+
+      // fund new account
+      const toBeAccountAddress = hash.calculateContractAddressFromHash(
+        pubKey,
+        accountClassHash,
+        calldata,
+        0
+      );
+      const devnetERC20Address =
+        '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
+      const { transaction_hash } = await account.execute({
+        contractAddress: devnetERC20Address,
+        entrypoint: 'transfer',
+        calldata: {
+          recipient: toBeAccountAddress,
+          amount: cairo.uint256(1_000_000_000_000_000),
+        },
+      });
+      await account.waitForTransaction(transaction_hash);
+
+      // deploy account
+      accountC1 = new Account(provider, toBeAccountAddress, priKey);
+      const deployed = await accountC1.deploySelf({
+        classHash: accountClassHash,
+        constructorCalldata: calldata,
+        addressSalt: pubKey,
+      });
+      const receipt = await account.waitForTransaction(deployed.transaction_hash);
+      expect(receipt).toMatchSchemaRef('GetTransactionReceiptResponse');
+    });
+
+    test('deploy Cairo1 Account from Cairo0 Account', () => {
+      expect(accountC1).toBeInstanceOf(Account);
     });
   });
 });

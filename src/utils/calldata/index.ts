@@ -8,12 +8,11 @@ import {
   FunctionAbi,
   HexCalldata,
   RawArgs,
-  RawCalldata,
   Result,
 } from '../../types';
 import assert from '../assert';
-import { getSelectorFromName } from '../hash';
 import { isBigInt, toHex } from '../num';
+import { getSelectorFromName } from '../selector';
 import { isLongText, splitLongString } from '../shortString';
 import { felt, isLen } from './cairo';
 import formatter from './formatter';
@@ -199,21 +198,21 @@ export class CallData {
   }
 
   /**
-   * Helper: Compile RawCalldata to Calldata
-   * @param rawCalldata
+   * Helper: Compile HexCalldata | RawCalldata | RawArgs
+   * @param rawCalldata HexCalldata | RawCalldata | RawArgs
    * @returns Calldata
    */
-  static toCalldata(rawCalldata: RawCalldata = []): Calldata {
+  static toCalldata(rawCalldata: RawArgs = []): Calldata {
     return CallData.compile(rawCalldata);
   }
 
   /**
-   * Helper: Convert RawCalldata to HexCalldata
-   * @param rawCalldata
+   * Helper: Convert raw to HexCalldata
+   * @param raw HexCalldata | RawCalldata | RawArgs
    * @returns HexCalldata
    */
-  static toHex(rawCalldata: RawCalldata = []): HexCalldata {
-    const calldata = CallData.compile(rawCalldata);
+  static toHex(raw: RawArgs = []): HexCalldata {
+    const calldata = CallData.compile(raw);
     return calldata.map((it) => toHex(it));
   }
 }
