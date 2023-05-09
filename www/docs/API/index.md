@@ -6,7 +6,7 @@ sidebar_position: 0
 custom_edit_url: null
 ---
 
-This API is based on the <ins>[Starknet.js V3](https://github.com/0xs34n/starknet.js/discussions/102)</ins> Interface write up by <ins>[Janek](https://twitter.com/0xjanek)</ins> of <ins>[Argent](https://www.argent.xyz/)</ins>
+This API is based on the <ins>[Starknet.js V3](https://github.com/0xs34n/starknet.js/discussions/102)</ins> Interface write up by <ins>[Janek](https://twitter.com/0xjanek)</ins> of <ins>[Argent](https://www.argent.xyz/)</ins>.
 
 ## Provider
 
@@ -14,7 +14,7 @@ The Provider [**API**](./classes/Provider.md) allows you to interact with the St
 
 Typically, these are _read_ calls on the blockchain.
 
-Guide is [**here**](../guides/connect_network.md).
+The guide is [**here**](../guides/connect_network.md).
 
 ## Account
 
@@ -24,7 +24,7 @@ It also introduces new methods that allow Accounts to create and verify signatur
 
 This [**API**](./classes/Account.md) is the primary way to interact with an account contract on Starknet.
 
-Guide is [**here**](../guides/create_account.md).
+The guide is [**here**](../guides/create_account.md).
 
 ## Contract
 
@@ -32,7 +32,7 @@ Contracts [**API**](./classes/Contract.md) can do data transformations in JavaSc
 
 Contracts allow you to transform Cairo values, like `Uint256` to `BigNumber`. It could also allow users to pass their own transformers, similar to `JSON.parse`.
 
-Guide is [**here**](../guides/create_contract.md).
+The guide is [**here**](../guides/create_contract.md).
 
 ## Signer
 
