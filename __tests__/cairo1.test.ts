@@ -194,6 +194,42 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
       };
       expect(expected).toEqual(status);
     });
+
+    test('C1 Array 2D', async () => {
+      const cd = CallData.compile({
+        test: [
+          [1, 2],
+          [3, 4],
+        ],
+      });
+
+      const tx = await cairo1Contract.array2d_ex([
+        [1, 2],
+        [3, 4],
+      ]);
+      const tx1 = await cairo1Contract.array2d_ex(cd);
+      await account.waitForTransaction(tx.transaction_hash);
+      await account.waitForTransaction(tx1.transaction_hash);
+
+      const result0 = await cairo1Contract.array2d_felt([
+        [1, 2],
+        [3, 4],
+      ]);
+      const result01 = await cairo1Contract.array2d_felt(cd);
+      expect(result0).toBe(1n);
+      expect(result0).toBe(result01);
+
+      const result1 = await cairo1Contract.array2d_array([
+        [1, 2],
+        [3, 4],
+      ]);
+      const result11 = await cairo1Contract.array2d_array(cd);
+      expect(result1).toEqual([
+        [1n, 2n],
+        [3n, 4n],
+      ]);
+      expect(result1).toEqual(result11);
+    });
   });
 
   describe('Cairo1 Account contract', () => {
