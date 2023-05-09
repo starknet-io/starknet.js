@@ -20,7 +20,6 @@
     "dist"
   ],
   "scripts": {
-    "tscversion": "tsc -v",
     "prepare": "npm run build && husky install",
     "build": "tsup && npm run build:esm && npm run build:iife && npm run build:dts",
     "build:esm": "tsup --clean false --format esm --platform node",
