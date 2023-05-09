@@ -1,29 +1,10 @@
 ---
 id: 'modules'
-title: 'Starknet.js API - v5.8.0'
+title: 'Starknet.js API - v5.9.2'
 sidebar_label: 'Exports'
 sidebar_position: 0.5
 custom_edit_url: null
 ---
-
-## Classes
-
-- [Contract](classes/Contract.md)
-- [ContractInterface](classes/ContractInterface.md)
-- [ContractFactory](classes/ContractFactory.md)
-- [Provider](classes/Provider.md)
-- [CustomError](classes/CustomError.md)
-- [LibraryError](classes/LibraryError.md)
-- [GatewayError](classes/GatewayError.md)
-- [HttpError](classes/HttpError.md)
-- [SequencerProvider](classes/SequencerProvider.md)
-- [ProviderInterface](classes/ProviderInterface.md)
-- [RpcProvider](classes/RpcProvider.md)
-- [Account](classes/Account.md)
-- [AccountInterface](classes/AccountInterface.md)
-- [SignerInterface](classes/SignerInterface.md)
-- [Signer](classes/Signer.md)
-- [CallData](classes/CallData.md)
 
 ## Namespaces
 
@@ -49,6 +30,25 @@ custom_edit_url: null
 - [TransactionStatus](enums/TransactionStatus.md)
 - [TransactionType](enums/TransactionType.md)
 - [EntryPointType](enums/EntryPointType.md)
+
+## Classes
+
+- [Contract](classes/Contract.md)
+- [ContractInterface](classes/ContractInterface.md)
+- [ContractFactory](classes/ContractFactory.md)
+- [Provider](classes/Provider.md)
+- [CustomError](classes/CustomError.md)
+- [LibraryError](classes/LibraryError.md)
+- [GatewayError](classes/GatewayError.md)
+- [HttpError](classes/HttpError.md)
+- [SequencerProvider](classes/SequencerProvider.md)
+- [ProviderInterface](classes/ProviderInterface.md)
+- [RpcProvider](classes/RpcProvider.md)
+- [Account](classes/Account.md)
+- [AccountInterface](classes/AccountInterface.md)
+- [SignerInterface](classes/SignerInterface.md)
+- [Signer](classes/Signer.md)
+- [CallData](classes/CallData.md)
 
 ## Interfaces
 
@@ -86,7 +86,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:7](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L7)
+[src/types/lib/index.ts:7](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L7)
 
 ---
 
@@ -96,7 +96,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:8](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L8)
+[src/types/lib/index.ts:8](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L8)
 
 ---
 
@@ -106,7 +106,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:9](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L9)
+[src/types/lib/index.ts:9](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L9)
 
 ---
 
@@ -114,9 +114,24 @@ custom_edit_url: null
 
 Ƭ **RawCalldata**: [`BigNumberish`](namespaces/num.md#bignumberish)[]
 
+BigNumberish array
+use CallData.compile() to convert to Calldata
+
 #### Defined in
 
-[src/types/lib/index.ts:11](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L11)
+[src/types/lib/index.ts:15](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L15)
+
+---
+
+### HexCalldata
+
+Ƭ **HexCalldata**: `string`[]
+
+Hexadecimal-string array
+
+#### Defined in
+
+[src/types/lib/index.ts:20](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L20)
 
 ---
 
@@ -132,7 +147,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:12](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L12)
+[src/types/lib/index.ts:22](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L22)
 
 ---
 
@@ -142,7 +157,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:14](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L14)
+[src/types/lib/index.ts:24](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L24)
 
 ---
 
@@ -156,7 +171,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:16](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L16)
+[src/types/lib/index.ts:26](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L26)
 
 ---
 
@@ -166,7 +181,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:20](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L20)
+[src/types/lib/index.ts:30](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L30)
 
 ---
 
@@ -176,7 +191,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:22](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L22)
+[src/types/lib/index.ts:32](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L32)
 
 ---
 
@@ -195,7 +210,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:24](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L24)
+[src/types/lib/index.ts:34](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L34)
 
 ---
 
@@ -213,7 +228,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:31](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L31)
+[src/types/lib/index.ts:41](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L41)
 
 ---
 
@@ -232,7 +247,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:37](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L37)
+[src/types/lib/index.ts:47](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L47)
 
 ---
 
@@ -242,7 +257,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:44](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L44)
+[src/types/lib/index.ts:54](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L54)
 
 ---
 
@@ -261,7 +276,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:51](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L51)
+[src/types/lib/index.ts:61](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L61)
 
 ---
 
@@ -280,7 +295,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:58](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L58)
+[src/types/lib/index.ts:68](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L68)
 
 ---
 
@@ -290,7 +305,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:65](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L65)
+[src/types/lib/index.ts:75](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L75)
 
 ---
 
@@ -309,7 +324,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:68](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L68)
+[src/types/lib/index.ts:78](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L78)
 
 ---
 
@@ -326,7 +341,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:75](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L75)
+[src/types/lib/index.ts:85](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L85)
 
 ---
 
@@ -336,7 +351,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:80](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L80)
+[src/types/lib/index.ts:90](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L90)
 
 ---
 
@@ -346,7 +361,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:82](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L82)
+[src/types/lib/index.ts:92](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L92)
 
 ---
 
@@ -356,7 +371,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:84](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L84)
+[src/types/lib/index.ts:94](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L94)
 
 ---
 
@@ -375,7 +390,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:86](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L86)
+[src/types/lib/index.ts:96](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L96)
 
 ---
 
@@ -396,7 +411,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:96](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L96)
+[src/types/lib/index.ts:106](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L106)
 
 ---
 
@@ -406,7 +421,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:103](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L103)
+[src/types/lib/index.ts:113](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L113)
 
 ---
 
@@ -416,7 +431,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:115](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L115)
+[src/types/lib/index.ts:125](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L125)
 
 ---
 
@@ -426,7 +441,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:124](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L124)
+[src/types/lib/index.ts:134](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L134)
 
 ---
 
@@ -436,7 +451,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:133](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L133)
+[src/types/lib/index.ts:143](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L143)
 
 ---
 
@@ -453,7 +468,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:148](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L148)
+[src/types/lib/index.ts:158](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L158)
 
 ---
 
@@ -463,7 +478,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:149](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L149)
+[src/types/lib/index.ts:159](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L159)
 
 ---
 
@@ -473,7 +488,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:150](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L150)
+[src/types/lib/index.ts:160](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L160)
 
 ---
 
@@ -493,7 +508,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:152](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L152)
+[src/types/lib/index.ts:162](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L162)
 
 ---
 
@@ -507,7 +522,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:156](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L156)
+[src/types/lib/index.ts:166](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L166)
 
 ---
 
@@ -521,7 +536,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:159](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L159)
+[src/types/lib/index.ts:169](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L169)
 
 ---
 
@@ -538,7 +553,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:163](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L163)
+[src/types/lib/index.ts:173](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/index.ts#L173)
 
 ---
 
@@ -548,7 +563,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/contract/index.ts:5](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/index.ts#L5)
+[src/types/lib/contract/index.ts:5](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/index.ts#L5)
 
 ---
 
@@ -558,7 +573,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/contract/index.ts:6](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/index.ts#L6)
+[src/types/lib/contract/index.ts:6](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/index.ts#L6)
 
 ---
 
@@ -568,7 +583,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/contract/index.ts:7](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/index.ts#L7)
+[src/types/lib/contract/index.ts:7](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/index.ts#L7)
 
 ---
 
@@ -580,7 +595,7 @@ ABI
 
 #### Defined in
 
-[src/types/lib/contract/abi.ts:2](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/abi.ts#L2)
+[src/types/lib/contract/abi.ts:2](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/abi.ts#L2)
 
 ---
 
@@ -597,7 +612,7 @@ ABI
 
 #### Defined in
 
-[src/types/lib/contract/abi.ts:5](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/abi.ts#L5)
+[src/types/lib/contract/abi.ts:5](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/abi.ts#L5)
 
 ---
 
@@ -618,7 +633,7 @@ ABI
 
 #### Defined in
 
-[src/types/lib/contract/abi.ts:14](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/abi.ts#L14)
+[src/types/lib/contract/abi.ts:14](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/abi.ts#L14)
 
 ---
 
@@ -632,7 +647,7 @@ ABI
 
 #### Defined in
 
-[src/types/lib/contract/abi.ts:23](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/abi.ts#L23)
+[src/types/lib/contract/abi.ts:23](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/abi.ts#L23)
 
 ---
 
@@ -651,7 +666,7 @@ ABI
 
 #### Defined in
 
-[src/types/lib/contract/abi.ts:25](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/abi.ts#L25)
+[src/types/lib/contract/abi.ts:25](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/abi.ts#L25)
 
 ---
 
@@ -671,7 +686,7 @@ LEGACY CONTRACT
 
 #### Defined in
 
-[src/types/lib/contract/legacy.ts:4](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/legacy.ts#L4)
+[src/types/lib/contract/legacy.ts:4](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/legacy.ts#L4)
 
 ---
 
@@ -681,7 +696,7 @@ LEGACY CONTRACT
 
 #### Defined in
 
-[src/types/lib/contract/legacy.ts:10](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/legacy.ts#L10)
+[src/types/lib/contract/legacy.ts:10](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/legacy.ts#L10)
 
 ---
 
@@ -693,7 +708,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/legacy.ts:15](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/legacy.ts#L15)
+[src/types/lib/contract/legacy.ts:15](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/legacy.ts#L15)
 
 ---
 
@@ -703,7 +718,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/legacy.ts:16](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/legacy.ts#L16)
+[src/types/lib/contract/legacy.ts:16](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/legacy.ts#L16)
 
 ---
 
@@ -721,7 +736,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/legacy.ts:18](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/legacy.ts#L18)
+[src/types/lib/contract/legacy.ts:18](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/legacy.ts#L18)
 
 ---
 
@@ -739,7 +754,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/legacy.ts:24](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/legacy.ts#L24)
+[src/types/lib/contract/legacy.ts:24](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/legacy.ts#L24)
 
 ---
 
@@ -762,7 +777,7 @@ SYSTEM TYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:5](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/sierra.ts#L5)
+[src/types/lib/contract/sierra.ts:5](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/sierra.ts#L5)
 
 ---
 
@@ -782,7 +797,7 @@ SYSTEM TYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:14](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/sierra.ts#L14)
+[src/types/lib/contract/sierra.ts:14](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/sierra.ts#L14)
 
 ---
 
@@ -794,7 +809,7 @@ COMPILED CONTRACT
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:23](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/sierra.ts#L23)
+[src/types/lib/contract/sierra.ts:23](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/sierra.ts#L23)
 
 ---
 
@@ -804,7 +819,7 @@ COMPILED CONTRACT
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:24](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/sierra.ts#L24)
+[src/types/lib/contract/sierra.ts:24](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/sierra.ts#L24)
 
 ---
 
@@ -816,7 +831,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:27](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/sierra.ts#L27)
+[src/types/lib/contract/sierra.ts:27](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/sierra.ts#L27)
 
 ---
 
@@ -826,7 +841,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:28](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/sierra.ts#L28)
+[src/types/lib/contract/sierra.ts:28](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/sierra.ts#L28)
 
 ---
 
@@ -844,7 +859,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:30](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/sierra.ts#L30)
+[src/types/lib/contract/sierra.ts:30](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/sierra.ts#L30)
 
 ---
 
@@ -862,7 +877,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:36](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/sierra.ts#L36)
+[src/types/lib/contract/sierra.ts:36](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/sierra.ts#L36)
 
 ---
 
@@ -879,7 +894,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:42](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/sierra.ts#L42)
+[src/types/lib/contract/sierra.ts:42](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/lib/contract/sierra.ts#L42)
 
 ---
 
@@ -889,7 +904,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/signer.ts:20](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/signer.ts#L20)
+[src/types/signer.ts:20](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/signer.ts#L20)
 
 ---
 
@@ -919,7 +934,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/contract.ts:5](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/contract.ts#L5)
+[src/types/contract.ts:5](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/contract.ts#L5)
 
 ---
 
@@ -943,7 +958,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/contract.ts:6](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/contract.ts#L6)
+[src/types/contract.ts:6](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/contract.ts#L6)
 
 ---
 
@@ -953,7 +968,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/contract.ts:7](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/contract.ts#L7)
+[src/types/contract.ts:7](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/contract.ts#L7)
 
 ---
 
@@ -961,9 +976,12 @@ SUBTYPES
 
 Ƭ **Calldata**: `string`[] & { `__compiled__?`: `boolean` }
 
+Compiled calldata ready to be sent
+decimal-string array
+
 #### Defined in
 
-[src/types/contract.ts:15](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/contract.ts#L15)
+[src/types/contract.ts:20](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/contract.ts#L20)
 
 ---
 
@@ -973,7 +991,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/contract.ts:16](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/contract.ts#L16)
+[src/types/contract.ts:22](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/contract.ts#L22)
 
 ---
 
@@ -983,7 +1001,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/contract.ts:17](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/contract.ts#L17)
+[src/types/contract.ts:23](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/contract.ts#L23)
 
 ---
 
@@ -1006,7 +1024,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/contract.ts:18](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/contract.ts#L18)
+[src/types/contract.ts:24](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/contract.ts#L24)
 
 ---
 
@@ -1016,7 +1034,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/contract.ts:29](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/contract.ts#L29)
+[src/types/contract.ts:35](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/contract.ts#L35)
 
 ---
 
@@ -1026,7 +1044,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/contract.ts:34](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/contract.ts#L34)
+[src/types/contract.ts:40](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/contract.ts#L40)
 
 ---
 
@@ -1036,7 +1054,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/account.ts:14](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/account.ts#L14)
+[src/types/account.ts:14](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/account.ts#L14)
 
 ---
 
@@ -1053,7 +1071,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/account.ts:28](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/account.ts#L28)
+[src/types/account.ts:28](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/account.ts#L28)
 
 ---
 
@@ -1077,7 +1095,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/account.ts:33](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/account.ts#L33)
+[src/types/account.ts:33](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/account.ts#L33)
 
 ---
 
@@ -1094,7 +1112,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/account.ts:45](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/account.ts#L45)
+[src/types/account.ts:45](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/account.ts#L45)
 
 ---
 
@@ -1104,7 +1122,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider.ts:40](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L40)
+[src/types/provider.ts:40](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/provider.ts#L40)
 
 ---
 
@@ -1114,7 +1132,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider.ts:67](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L67)
+[src/types/provider.ts:67](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/provider.ts#L67)
 
 ---
 
@@ -1124,7 +1142,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider.ts:101](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L101)
+[src/types/provider.ts:101](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/provider.ts#L101)
 
 ---
 
@@ -1140,7 +1158,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider.ts:119](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L119)
+[src/types/provider.ts:119](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/provider.ts#L119)
 
 ---
 
@@ -1150,7 +1168,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider.ts:123](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L123)
+[src/types/provider.ts:123](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/provider.ts#L123)
 
 ---
 
@@ -1160,7 +1178,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider.ts:141](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L141)
+[src/types/provider.ts:141](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/provider.ts#L141)
 
 ---
 
@@ -1170,7 +1188,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider.ts:143](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L143)
+[src/types/provider.ts:143](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/provider.ts#L143)
 
 ---
 
@@ -1180,7 +1198,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider.ts:145](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L145)
+[src/types/provider.ts:145](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/provider.ts#L145)
 
 ---
 
@@ -1200,7 +1218,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/api/sequencer.ts:17](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L17)
+[src/types/api/sequencer.ts:17](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/api/sequencer.ts#L17)
 
 ---
 
@@ -1217,7 +1235,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/api/sequencer.ts:26](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L26)
+[src/types/api/sequencer.ts:26](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/api/sequencer.ts#L26)
 
 ---
 
@@ -1244,7 +1262,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/api/sequencer.ts:31](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L31)
+[src/types/api/sequencer.ts:31](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/api/sequencer.ts#L31)
 
 ---
 
@@ -1268,7 +1286,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/api/sequencer.ts:46](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L46)
+[src/types/api/sequencer.ts:46](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/api/sequencer.ts#L46)
 
 ---
 
@@ -1287,7 +1305,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/api/sequencer.ts:59](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L59)
+[src/types/api/sequencer.ts:59](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/api/sequencer.ts#L59)
 
 ---
 
@@ -1306,7 +1324,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/api/sequencer.ts:66](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L66)
+[src/types/api/sequencer.ts:66](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/api/sequencer.ts#L66)
 
 ---
 
@@ -1323,7 +1341,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/api/sequencer.ts:73](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L73)
+[src/types/api/sequencer.ts:73](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/api/sequencer.ts#L73)
 
 ---
 
@@ -1333,7 +1351,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/api/sequencer.ts:78](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L78)
+[src/types/api/sequencer.ts:78](https://github.com/notV4l/starknet.js/blob/47ca727/src/types/api/sequencer.ts#L78)
 
 ---
 
@@ -1343,7 +1361,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/provider/sequencer.ts:55](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/sequencer.ts#L55)
+[src/provider/sequencer.ts:56](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/sequencer.ts#L56)
 
 ---
 
@@ -1353,7 +1371,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/provider/sequencer.ts:57](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/sequencer.ts#L57)
+[src/provider/sequencer.ts:58](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/sequencer.ts#L58)
 
 ---
 
@@ -1372,7 +1390,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/provider/rpc.ts:35](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/rpc.ts#L35)
+[src/provider/rpc.ts:36](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/rpc.ts#L36)
 
 ## Variables
 
@@ -1386,7 +1404,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/index.ts:37](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/index.ts#L37)
+[src/index.ts:37](https://github.com/notV4l/starknet.js/blob/47ca727/src/index.ts#L37)
 
 ---
 
@@ -1396,7 +1414,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/provider/index.ts:9](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/index.ts#L9)
+[src/provider/index.ts:9](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/index.ts#L9)
 
 ## Functions
 
@@ -1417,13 +1435,13 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/contract/default.ts:97](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/default.ts#L97)
+[src/contract/default.ts:97](https://github.com/notV4l/starknet.js/blob/47ca727/src/contract/default.ts#L97)
 
 ---
 
 ### splitArgsAndOptions
 
-▸ **splitArgsAndOptions**(`args`): { `args`: [`ArgsOrCalldata`](modules.md#argsorcalldata) ; `options`: [`ContractOptions`](modules.md#contractoptions) } \| { `args`: [`ArgsOrCalldata`](modules.md#argsorcalldata) ; `options`: `undefined` }
+▸ **splitArgsAndOptions**(`args`): { `args`: [`ArgsOrCalldata`](modules.md#argsorcalldata) ; `options`: [`ContractOptions`](modules.md#contractoptions) } \| { `args`: [`ArgsOrCalldata`](modules.md#argsorcalldata) ; `options?`: `undefined` }
 
 #### Parameters
 
@@ -1433,11 +1451,11 @@ prefer the 'num' naming
 
 #### Returns
 
-{ `args`: [`ArgsOrCalldata`](modules.md#argsorcalldata) ; `options`: [`ContractOptions`](modules.md#contractoptions) } \| { `args`: [`ArgsOrCalldata`](modules.md#argsorcalldata) ; `options`: `undefined` }
+{ `args`: [`ArgsOrCalldata`](modules.md#argsorcalldata) ; `options`: [`ContractOptions`](modules.md#contractoptions) } \| { `args`: [`ArgsOrCalldata`](modules.md#argsorcalldata) ; `options?`: `undefined` }
 
 #### Defined in
 
-[src/contract/default.ts:24](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/contract/default.ts#L24)
+[src/contract/default.ts:24](https://github.com/notV4l/starknet.js/blob/47ca727/src/contract/default.ts#L24)
 
 ---
 
@@ -1458,7 +1476,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/provider/errors.ts:2](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/errors.ts#L2)
+[src/provider/errors.ts:2](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/errors.ts#L2)
 
 ---
 
@@ -1479,7 +1497,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/provider/errors.ts:8](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/errors.ts#L8)
+[src/provider/errors.ts:8](https://github.com/notV4l/starknet.js/blob/47ca727/src/provider/errors.ts#L8)
 
 ---
 
@@ -1499,7 +1517,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/utils/address.ts:9](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/address.ts#L9)
+[src/utils/address.ts:9](https://github.com/notV4l/starknet.js/blob/47ca727/src/utils/address.ts#L9)
 
 ---
 
@@ -1519,7 +1537,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/utils/address.ts:13](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/address.ts#L13)
+[src/utils/address.ts:13](https://github.com/notV4l/starknet.js/blob/47ca727/src/utils/address.ts#L13)
 
 ---
 
@@ -1539,7 +1557,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/utils/address.ts:26](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/address.ts#L26)
+[src/utils/address.ts:26](https://github.com/notV4l/starknet.js/blob/47ca727/src/utils/address.ts#L26)
 
 ---
 
@@ -1559,7 +1577,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/utils/address.ts:43](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/address.ts#L43)
+[src/utils/address.ts:43](https://github.com/notV4l/starknet.js/blob/47ca727/src/utils/address.ts#L43)
 
 ---
 
@@ -1581,7 +1599,7 @@ Loosely validate a URL `string`.
 
 #### Defined in
 
-[src/utils/url.ts:22](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/url.ts#L22)
+[src/utils/url.ts:22](https://github.com/notV4l/starknet.js/blob/47ca727/src/utils/url.ts#L22)
 
 ---
 
@@ -1603,4 +1621,4 @@ Loosely validate a URL `string`.
 
 #### Defined in
 
-[src/utils/url.ts:51](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/url.ts#L51)
+[src/utils/url.ts:51](https://github.com/notV4l/starknet.js/blob/47ca727/src/utils/url.ts#L51)

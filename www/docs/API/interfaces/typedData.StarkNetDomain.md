@@ -23,7 +23,7 @@ The EIP712 domain struct. Any of these fields are optional, but it must contain 
 
 #### Defined in
 
-[src/utils/typedData/types.ts:24](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/typedData/types.ts#L24)
+[src/utils/typedData/types.ts:24](https://github.com/notV4l/starknet.js/blob/47ca727/src/utils/typedData/types.ts#L24)
 
 ---
 
@@ -33,7 +33,7 @@ The EIP712 domain struct. Any of these fields are optional, but it must contain 
 
 #### Defined in
 
-[src/utils/typedData/types.ts:25](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/typedData/types.ts#L25)
+[src/utils/typedData/types.ts:25](https://github.com/notV4l/starknet.js/blob/47ca727/src/utils/typedData/types.ts#L25)
 
 ---
 
@@ -43,4 +43,4 @@ The EIP712 domain struct. Any of these fields are optional, but it must contain 
 
 #### Defined in
 
-[src/utils/typedData/types.ts:26](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/typedData/types.ts#L26)
+[src/utils/typedData/types.ts:26](https://github.com/notV4l/starknet.js/blob/47ca727/src/utils/typedData/types.ts#L26)

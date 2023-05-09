@@ -24,7 +24,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/signer/default.ts:18](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/signer/default.ts#L18)
+[src/signer/default.ts:18](https://github.com/notV4l/starknet.js/blob/47ca727/src/signer/default.ts#L18)
 
 ## Properties
 
@@ -34,7 +34,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/signer/default.ts:16](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/signer/default.ts#L16)
+[src/signer/default.ts:16](https://github.com/notV4l/starknet.js/blob/47ca727/src/signer/default.ts#L16)
 
 ## Methods
 
@@ -56,7 +56,7 @@ public key of signer as hex string with 0x prefix
 
 #### Defined in
 
-[src/signer/default.ts:22](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/signer/default.ts#L22)
+[src/signer/default.ts:22](https://github.com/notV4l/starknet.js/blob/47ca727/src/signer/default.ts#L22)
 
 ---
 
@@ -90,7 +90,7 @@ the signature of the JSON object
 
 #### Defined in
 
-[src/signer/default.ts:26](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/signer/default.ts#L26)
+[src/signer/default.ts:26](https://github.com/notV4l/starknet.js/blob/47ca727/src/signer/default.ts#L26)
 
 ---
 
@@ -120,13 +120,13 @@ signature
 
 #### Defined in
 
-[src/signer/default.ts:31](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/signer/default.ts#L31)
+[src/signer/default.ts:31](https://github.com/notV4l/starknet.js/blob/47ca727/src/signer/default.ts#L31)
 
 ---
 
 ### signDeployAccountTransaction
 
-▸ **signDeployAccountTransaction**(`«destructured»`): `Promise`<`SignatureType`\>
+▸ **signDeployAccountTransaction**(`«destructured»`): `Promise`<[`Signature`](../modules.md#signature)\>
 
 Signs a DEPLOY_ACCOUNT transaction with the starknet private key and returns the signature
 
@@ -138,7 +138,7 @@ Signs a DEPLOY_ACCOUNT transaction with the starknet private key and returns the
 
 #### Returns
 
-`Promise`<`SignatureType`\>
+`Promise`<[`Signature`](../modules.md#signature)\>
 
 signature
 
@@ -148,13 +148,13 @@ signature
 
 #### Defined in
 
-[src/signer/default.ts:55](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/signer/default.ts#L55)
+[src/signer/default.ts:55](https://github.com/notV4l/starknet.js/blob/47ca727/src/signer/default.ts#L55)
 
 ---
 
 ### signDeclareTransaction
 
-▸ **signDeclareTransaction**(`«destructured»`): `Promise`<`SignatureType`\>
+▸ **signDeclareTransaction**(`«destructured»`): `Promise`<[`Signature`](../modules.md#signature)\>
 
 Signs a DECLARE transaction with the starknet private key and returns the signature
 
@@ -166,7 +166,7 @@ Signs a DECLARE transaction with the starknet private key and returns the signat
 
 #### Returns
 
-`Promise`<`SignatureType`\>
+`Promise`<[`Signature`](../modules.md#signature)\>
 
 signature
 
@@ -176,4 +176,4 @@ signature
 
 #### Defined in
 
-[src/signer/default.ts:79](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/signer/default.ts#L79)
+[src/signer/default.ts:79](https://github.com/notV4l/starknet.js/blob/47ca727/src/signer/default.ts#L79)
