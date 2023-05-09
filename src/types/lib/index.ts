@@ -100,7 +100,6 @@ export type InvocationsDetails = {
   nonce?: BigNumberish;
   maxFee?: BigNumberish;
   version?: BigNumberish;
-  cairoVersion?: CairoVersion;
 };
 
 /**
