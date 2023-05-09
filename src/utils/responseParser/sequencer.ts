@@ -11,6 +11,7 @@ import {
   GetBlockResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
+  HexCalldata,
   InvokeFunctionResponse,
   Sequencer,
   SierraContractClass,
@@ -37,7 +38,7 @@ export class SequencerAPIResponseParser extends ResponseParser {
   ): GetTransactionResponse {
     return {
       ...res,
-      calldata: 'calldata' in res.transaction ? (res.transaction.calldata as Array<string>) : [],
+      calldata: 'calldata' in res.transaction ? (res.transaction.calldata as HexCalldata) : [],
       contract_class:
         'contract_class' in res.transaction ? (res.transaction.contract_class as any) : undefined,
       entry_point_selector:

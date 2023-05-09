@@ -13,7 +13,7 @@ export const transformCallsToMulticallArrays = (calls: Call[]) => {
   const callArray: ParsedStruct[] = [];
   const calldata: BigNumberish[] = [];
   calls.forEach((call) => {
-    const data = call.calldata || [];
+    const data = CallData.compile(call.calldata || []);
     callArray.push({
       to: toBigInt(call.contractAddress).toString(10),
       selector: toBigInt(getSelectorFromName(call.entrypoint)).toString(10),

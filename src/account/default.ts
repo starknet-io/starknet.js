@@ -432,6 +432,8 @@ export class Account extends Provider implements AccountInterface {
     return { declare: { ...declare, class_hash }, deploy };
   }
 
+  public deploySelf = this.deployAccount;
+
   public async deployAccount(
     {
       classHash,
@@ -455,14 +457,19 @@ export class Account extends Provider implements AccountInterface {
       (await this.getSuggestedMaxFee(
         {
           type: TransactionType.DEPLOY_ACCOUNT,
-          payload: { classHash, constructorCalldata, addressSalt, contractAddress },
+          payload: {
+            classHash,
+            constructorCalldata: compiledCalldata,
+            addressSalt,
+            contractAddress,
+          },
         },
         transactionsDetail
       ));
 
     const signature = await this.signer.signDeployAccountTransaction({
       classHash,
-      constructorCalldata,
+      constructorCalldata: compiledCalldata,
       contractAddress,
       addressSalt,
       chainId,
@@ -542,7 +549,7 @@ export class Account extends Provider implements AccountInterface {
   }
 
   /**
-   * @deprecated will be renamed to buildDeclareContractTransaction
+   * will be renamed to buildDeclareContractTransaction
    */
   public async buildDeclarePayload(
     payload: DeclareContractPayload,
@@ -590,13 +597,13 @@ export class Account extends Provider implements AccountInterface {
       version,
       nonce,
       addressSalt,
-      constructorCalldata,
+      constructorCalldata: compiledCalldata,
     });
 
     return {
       classHash,
       addressSalt,
-      constructorCalldata,
+      constructorCalldata: compiledCalldata,
       signature,
     };
   }
