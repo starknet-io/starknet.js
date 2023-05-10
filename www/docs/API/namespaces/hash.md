@@ -18,7 +18,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:33](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/hash.ts#L33)
+[src/utils/hash.ts:33](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L33)
 
 ---
 
@@ -28,7 +28,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:34](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/hash.ts#L34)
+[src/utils/hash.ts:34](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L34)
 
 ---
 
@@ -38,7 +38,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:35](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/hash.ts#L35)
+[src/utils/hash.ts:35](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L35)
 
 ## Functions
 
@@ -58,7 +58,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:37](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/hash.ts#L37)
+[src/utils/hash.ts:37](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L37)
 
 ---
 
@@ -84,7 +84,7 @@ starknet keccak hash as BigNumber
 
 #### Defined in
 
-[src/utils/hash.ts:54](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/hash.ts#L54)
+[src/utils/hash.ts:54](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L54)
 
 ---
 
@@ -110,7 +110,7 @@ hex selector of given abi function name
 
 #### Defined in
 
-[src/utils/hash.ts:67](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/hash.ts#L67)
+[src/utils/hash.ts:67](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L67)
 
 ---
 
@@ -134,7 +134,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:77](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/hash.ts#L77)
+[src/utils/hash.ts:77](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L77)
 
 ---
 
@@ -154,7 +154,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:87](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/hash.ts#L87)
+[src/utils/hash.ts:87](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L87)
 
 ---
 
@@ -170,7 +170,7 @@ Hex selector
 | `version`            | [`BigNumberish`](num.md#bignumberish)                                  | `undefined`   |
 | `contractAddress`    | [`BigNumberish`](num.md#bignumberish)                                  | `undefined`   |
 | `entryPointSelector` | [`BigNumberish`](num.md#bignumberish)                                  | `undefined`   |
-| `calldata`           | [`RawCalldata`](../modules.md#rawcalldata)                             | `undefined`   |
+| `calldata`           | [`BigNumberish`](num.md#bignumberish)[]                                | `undefined`   |
 | `maxFee`             | [`BigNumberish`](num.md#bignumberish)                                  | `undefined`   |
 | `chainId`            | [`StarknetChainId`](../enums/constants.StarknetChainId.md)             | `undefined`   |
 | `additionalData`     | [`BigNumberish`](num.md#bignumberish)[]                                | `[]`          |
@@ -181,7 +181,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:96](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/hash.ts#L96)
+[src/utils/hash.ts:96](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L96)
 
 ---
 
@@ -194,7 +194,7 @@ Hex selector
 | Name                  | Type                                                       |
 | :-------------------- | :--------------------------------------------------------- |
 | `contractAddress`     | [`BigNumberish`](num.md#bignumberish)                      |
-| `constructorCalldata` | [`RawCalldata`](../modules.md#rawcalldata)                 |
+| `constructorCalldata` | [`BigNumberish`](num.md#bignumberish)[]                    |
 | `version`             | [`BigNumberish`](num.md#bignumberish)                      |
 | `chainId`             | [`StarknetChainId`](../enums/constants.StarknetChainId.md) |
 
@@ -204,7 +204,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:120](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/hash.ts#L120)
+[src/utils/hash.ts:120](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L120)
 
 ---
 
@@ -230,7 +230,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:137](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/hash.ts#L137)
+[src/utils/hash.ts:137](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L137)
 
 ---
 
@@ -244,7 +244,7 @@ Hex selector
 | :-------------------- | :--------------------------------------------------------- |
 | `contractAddress`     | [`BigNumberish`](num.md#bignumberish)                      |
 | `classHash`           | [`BigNumberish`](num.md#bignumberish)                      |
-| `constructorCalldata` | [`RawCalldata`](../modules.md#rawcalldata)                 |
+| `constructorCalldata` | [`BigNumberish`](num.md#bignumberish)[]                    |
 | `salt`                | [`BigNumberish`](num.md#bignumberish)                      |
 | `version`             | [`BigNumberish`](num.md#bignumberish)                      |
 | `maxFee`              | [`BigNumberish`](num.md#bignumberish)                      |
@@ -257,7 +257,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:158](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/hash.ts#L158)
+[src/utils/hash.ts:158](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L158)
 
 ---
 
@@ -271,7 +271,7 @@ Hex selector
 | :---------------- | :--------------------------------------------------------- |
 | `contractAddress` | [`BigNumberish`](num.md#bignumberish)                      |
 | `version`         | [`BigNumberish`](num.md#bignumberish)                      |
-| `calldata`        | [`RawCalldata`](../modules.md#rawcalldata)                 |
+| `calldata`        | [`BigNumberish`](num.md#bignumberish)[]                    |
 | `maxFee`          | [`BigNumberish`](num.md#bignumberish)                      |
 | `chainId`         | [`StarknetChainId`](../enums/constants.StarknetChainId.md) |
 | `nonce`           | [`BigNumberish`](num.md#bignumberish)                      |
@@ -282,7 +282,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:182](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/hash.ts#L182)
+[src/utils/hash.ts:182](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L182)
 
 ---
 
@@ -305,7 +305,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:202](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/hash.ts#L202)
+[src/utils/hash.ts:202](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L202)
 
 ---
 
@@ -325,7 +325,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:233](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/hash.ts#L233)
+[src/utils/hash.ts:233](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L233)
 
 ---
 
@@ -345,7 +345,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:251](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/hash.ts#L251)
+[src/utils/hash.ts:251](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L251)
 
 ---
 
@@ -365,7 +365,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:260](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/hash.ts#L260)
+[src/utils/hash.ts:260](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L260)
 
 ---
 
@@ -385,7 +385,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:313](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/hash.ts#L313)
+[src/utils/hash.ts:313](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L313)
 
 ---
 
@@ -405,7 +405,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:354](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/hash.ts#L354)
+[src/utils/hash.ts:354](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L354)
 
 ---
 
@@ -429,4 +429,4 @@ HexString ClassHash
 
 #### Defined in
 
-[src/utils/hash.ts:392](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/utils/hash.ts#L392)
+[src/utils/hash.ts:392](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L392)

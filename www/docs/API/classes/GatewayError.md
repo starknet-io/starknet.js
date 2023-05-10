@@ -31,7 +31,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/errors.ts:40](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/errors.ts#L40)
+[src/provider/errors.ts:40](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/errors.ts#L40)
 
 ## Properties
 
@@ -90,7 +90,7 @@ node_modules/@types/node/globals.d.ts:13
 
 #### Defined in
 
-[src/provider/errors.ts:40](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/errors.ts#L40)
+[src/provider/errors.ts:40](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/errors.ts#L40)
 
 ---
 
@@ -104,7 +104,7 @@ node_modules/@types/node/globals.d.ts:13
 
 #### Defined in
 
-[src/provider/errors.ts:16](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/provider/errors.ts#L16)
+[src/provider/errors.ts:16](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/errors.ts#L16)
 
 ---
 
@@ -118,7 +118,7 @@ node_modules/@types/node/globals.d.ts:13
 
 #### Defined in
 
-www/node_modules/typescript/lib/lib.es5.d.ts:1055
+www/node_modules/typescript/lib/lib.es5.d.ts:1054
 
 ---
 
@@ -132,7 +132,7 @@ www/node_modules/typescript/lib/lib.es5.d.ts:1055
 
 #### Defined in
 
-www/node_modules/typescript/lib/lib.es5.d.ts:1056
+www/node_modules/typescript/lib/lib.es5.d.ts:1055
 
 ## Methods
 

@@ -1,6 +1,6 @@
 ---
 id: 'index'
-title: 'Starknet.js API'
+title: 'Starknet.js API - v5.8.0'
 sidebar_label: 'Readme'
 sidebar_position: 0
 custom_edit_url: null

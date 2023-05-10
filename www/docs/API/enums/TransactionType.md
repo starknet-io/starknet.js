@@ -14,7 +14,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:152](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/types/lib/index.ts#L152)
+[src/types/lib/index.ts:142](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L142)
 
 ---
 
@@ -24,7 +24,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:153](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/types/lib/index.ts#L153)
+[src/types/lib/index.ts:143](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L143)
 
 ---
 
@@ -34,7 +34,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:154](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/types/lib/index.ts#L154)
+[src/types/lib/index.ts:144](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L144)
 
 ---
 
@@ -44,4 +44,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:155](https://github.com/notV4l/starknet.js/blob/c20c3bd/src/types/lib/index.ts#L155)
+[src/types/lib/index.ts:145](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/index.ts#L145)
