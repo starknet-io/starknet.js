@@ -493,8 +493,8 @@ export namespace OPENRPC {
         | Errors.BLOCK_NOT_FOUND;
     };
     starknet_estimateFee: {
-      params: { request: BROADCASTED_TXN; block_id: BLOCK_ID };
-      result: FEE_ESTIMATE;
+      params: { request: Array<BROADCASTED_TXN>; block_id: BLOCK_ID };
+      result: Array<FEE_ESTIMATE>;
       errors:
         | Errors.CONTRACT_NOT_FOUND
         | Errors.INVALID_MESSAGE_SELECTOR

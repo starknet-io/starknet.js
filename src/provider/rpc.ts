@@ -249,15 +249,17 @@ export class RpcProvider implements ProviderInterface {
   ): Promise<EstimateFeeResponse> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_estimateFee', {
-      request: {
-        type: RPC.TransactionType.INVOKE,
-        sender_address: invocation.contractAddress,
-        calldata: parseCalldata(invocation.calldata),
-        signature: signatureToHexArray(invocation.signature),
-        version: toHex(invocationDetails?.version || 0),
-        nonce: toHex(invocationDetails.nonce),
-        max_fee: toHex(invocationDetails?.maxFee || 0),
-      },
+      request: [
+        {
+          type: RPC.TransactionType.INVOKE,
+          sender_address: invocation.contractAddress,
+          calldata: parseCalldata(invocation.calldata),
+          signature: signatureToHexArray(invocation.signature),
+          version: toHex(invocationDetails?.version || 0),
+          nonce: toHex(invocationDetails.nonce),
+          max_fee: toHex(invocationDetails?.maxFee || 0),
+        },
+      ],
       block_id,
     }).then(this.responseParser.parseFeeEstimateResponse);
   }
@@ -270,18 +272,20 @@ export class RpcProvider implements ProviderInterface {
     const block_id = new Block(blockIdentifier).identifier;
     if ('program' in contractDefinition) {
       return this.fetchEndpoint('starknet_estimateFee', {
-        request: {
-          contract_class: {
-            program: contractDefinition.program,
-            entry_points_by_type: contractDefinition.entry_points_by_type,
-            abi: contractDefinition.abi, // rpc 2.0
+        request: [
+          {
+            contract_class: {
+              program: contractDefinition.program,
+              entry_points_by_type: contractDefinition.entry_points_by_type,
+              abi: contractDefinition.abi, // rpc 2.0
+            },
+            sender_address: senderAddress,
+            signature: signatureToHexArray(signature),
+            version: toHex(details?.version || 0),
+            nonce: toHex(details.nonce),
+            max_fee: toHex(details?.maxFee || 0),
           },
-          sender_address: senderAddress,
-          signature: signatureToHexArray(signature),
-          version: toHex(details?.version || 0),
-          nonce: toHex(details.nonce),
-          max_fee: toHex(details?.maxFee || 0),
-        },
+        ],
         block_id,
       }).then(this.responseParser.parseFeeEstimateResponse);
     }
@@ -296,16 +300,20 @@ export class RpcProvider implements ProviderInterface {
   ): Promise<EstimateFeeResponse> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_estimateFee', {
-      request: {
-        type: RPC.TransactionType.DEPLOY_ACCOUNT,
-        constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
-        class_hash: toHex(classHash),
-        contract_address_salt: toHex(addressSalt || 0),
-        signature: signatureToHexArray(signature),
-        version: toHex(details?.version || 0),
-        nonce: toHex(details.nonce),
-        max_fee: toHex(details?.maxFee || 0),
-      },
+      request: [
+        {
+          type: RPC.TransactionType.DEPLOY_ACCOUNT,
+          constructor_calldata: bigNumberishArrayToHexadecimalStringArray(
+            constructorCalldata || []
+          ),
+          class_hash: toHex(classHash),
+          contract_address_salt: toHex(addressSalt || 0),
+          signature: signatureToHexArray(signature),
+          version: toHex(details?.version || 0),
+          nonce: toHex(details.nonce),
+          max_fee: toHex(details?.maxFee || 0),
+        },
+      ],
       block_id,
     }).then(this.responseParser.parseFeeEstimateResponse);
   }

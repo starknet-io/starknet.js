@@ -55,11 +55,11 @@ export class RPCResponseParser
     };
   }
 
-  public parseFeeEstimateResponse(res: RPC.EstimateFeeResponse): EstimateFeeResponse {
+  public parseFeeEstimateResponse(res: Array<RPC.EstimateFeeResponse>): EstimateFeeResponse {
     return {
-      overall_fee: toBigInt(res.overall_fee),
-      gas_consumed: toBigInt(res.gas_consumed),
-      gas_price: toBigInt(res.gas_price),
+      overall_fee: toBigInt(res[0].overall_fee),
+      gas_consumed: toBigInt(res[0].gas_consumed),
+      gas_price: toBigInt(res[0].gas_price),
     };
   }
 
