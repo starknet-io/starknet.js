@@ -38,6 +38,9 @@ export type UniversalDeployerContractPayload = {
   constructorCalldata?: RawArgs;
 };
 
+/**
+ * @deprecated deprecated due to no direct deploy, unused - can be removed
+ */
 export type DeployContractPayload = {
   contract: CompiledContract | string;
   constructorCalldata?: RawCalldata;
@@ -46,7 +49,7 @@ export type DeployContractPayload = {
 
 export type DeployAccountContractPayload = {
   classHash: string;
-  constructorCalldata?: RawCalldata;
+  constructorCalldata?: RawArgs;
   addressSalt?: BigNumberish;
   contractAddress?: string;
 };
@@ -84,7 +87,7 @@ export type DeclareContractTransaction = {
 
 export type CallDetails = {
   contractAddress: string;
-  calldata?: RawCalldata;
+  calldata?: RawArgs;
 };
 
 export type Invocation = CallDetails & { signature?: Signature };
@@ -97,7 +100,6 @@ export type InvocationsDetails = {
   nonce?: BigNumberish;
   maxFee?: BigNumberish;
   version?: BigNumberish;
-  cairoVersion?: CairoVersion;
 };
 
 /**

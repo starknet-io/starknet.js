@@ -1,15 +1,12 @@
 /**
  * @jest-environment jsdom
  */
-import fs from 'fs';
 import { TextEncoder } from 'util';
 
 import * as constants from '../../src/constants';
 import * as json from '../../src/utils/json';
 
 const { IS_BROWSER } = constants;
-
-const compiledAccount = json.parse(fs.readFileSync('./__mocks__/Account.json').toString('ascii'));
 
 test('isBrowser', () => {
   expect(IS_BROWSER).toBe(true);
@@ -27,6 +24,10 @@ describe('compressProgram()', () => {
   };
   // loaded dynamically to allow the TextEncoder initialization to take effect
   const { stark } = require('../../src'); // eslint-disable-line global-require
+
+  // eslint-disable-next-line global-require
+  const fixtures = require('../fixtures');
+  const compiledAccount = fixtures.compiledOpenZeppelinAccount;
 
   test('compresses a contract program', () => {
     const compressed = stark.compressProgram(compiledAccount.program);
