@@ -144,6 +144,7 @@ const config = {
         name: 'Starknet.js API',
         includeVersion: true,
         includeExtension: true,
+        sourceLinkTemplate: 'https://github.com/0xs34n/starknet.js/blob/{gitRevision}/{path}#L{line}',
         visibilityFilters: {
           protected: false,
           private: false,
