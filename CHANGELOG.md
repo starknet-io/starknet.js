@@ -1,3 +1,17 @@
+# [5.10.0](https://github.com/0xs34n/starknet.js/compare/v5.9.2...v5.10.0) (2023-05-10)
+
+### Bug Fixes
+
+- merge next and cleanup ([067673f](https://github.com/0xs34n/starknet.js/commit/067673ffbc9f414c33018d5cd83c29a001c5e9ab))
+- nested 2d arrays request and response ([cccf518](https://github.com/0xs34n/starknet.js/commit/cccf518acc950bfed7579513c812df33cebb774d))
+- ts getClassHashAt oprional blockid ([f54bfd0](https://github.com/0xs34n/starknet.js/commit/f54bfd0e9591d1ec1dccf20668de68272834fa46))
+
+### Features
+
+- declareIfNot, update declareAndDeploy with it, cleanup cairo1 test ([494dbb8](https://github.com/0xs34n/starknet.js/commit/494dbb8a84608415a279b2bfa84103667321a84e))
+- improve usage by extending RawCalldata to RawArgs in all major flows ([0ef1ec8](https://github.com/0xs34n/starknet.js/commit/0ef1ec8624e294a526f8e97d856e70b6426a9ae3))
+- make cairoVersion a property of Account ([b6a7d38](https://github.com/0xs34n/starknet.js/commit/b6a7d38e98c65e24cffac5485819797560b5571c))
+
 ## [5.9.2](https://github.com/0xs34n/starknet.js/compare/v5.9.1...v5.9.2) (2023-05-03)
 
 ### Bug Fixes
