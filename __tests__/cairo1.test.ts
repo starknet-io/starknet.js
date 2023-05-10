@@ -230,6 +230,13 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
       ]);
       expect(result1).toEqual(result11);
     });
+
+    test('mix tuples', async () => {
+      // TODO arrays inside tuples c1.0
+      // tuple inside the struct c1.0
+      const res = await cairo1Contract.mix_req([1, 2, 3], true);
+      expect(res).toEqual([1n, 2n, 3n, 1n, 2n]);
+    });
   });
 
   describe('Cairo1 Account contract', () => {
