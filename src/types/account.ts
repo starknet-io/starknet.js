@@ -1,6 +1,5 @@
 import { BlockIdentifier } from '../provider/utils';
 import { BigNumberish } from '../utils/num';
-import { CairoVersion } from './lib';
 import {
   DeclareTransactionReceiptResponse,
   EstimateFeeResponse,
@@ -17,7 +16,6 @@ export interface EstimateFeeDetails {
   nonce?: BigNumberish;
   blockIdentifier?: BlockIdentifier;
   skipValidate?: boolean;
-  cairoVersion?: CairoVersion;
 }
 
 export interface DeployContractResponse {
@@ -45,7 +43,7 @@ export type DeployContractUDCResponse = {
 export type DeclareDeployUDCResponse = {
   declare: {
     class_hash: BigNumberish;
-  } & DeclareTransactionReceiptResponse;
+  } & Partial<DeclareTransactionReceiptResponse>;
   deploy: DeployContractUDCResponse;
 };
 

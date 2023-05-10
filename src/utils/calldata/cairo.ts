@@ -15,7 +15,7 @@ export enum Uint {
 export const isLen = (name: string) => /_len$/.test(name);
 export const isTypeFelt = (type: string) => type === 'felt' || type === 'core::felt252';
 export const isTypeArray = (type: string) =>
-  /\*/.test(type) || type.includes('core::array::Array::');
+  /\*/.test(type) || type.startsWith('core::array::Array::');
 export const isTypeTuple = (type: string) => /^\(.*\)$/i.test(type);
 export const isTypeNamedTuple = (type: string) => /\(.*\)/i.test(type) && type.includes(':');
 export const isTypeStruct = (type: string, structs: AbiStructs) => type in structs;
@@ -28,7 +28,7 @@ export const isCairo1Type = (type: string) => type.includes('core::');
 
 export const getArrayType = (type: string) => {
   if (isCairo1Type(type)) {
-    return type.substring(type.indexOf('<') + 1, type.indexOf('>'));
+    return type.substring(type.indexOf('<') + 1, type.lastIndexOf('>'));
   }
   return type.replace('*', '');
 };
@@ -56,7 +56,7 @@ export const uint256 = (it: BigNumberish): Uint256 => {
 /**
  * unnamed tuple cairo type (helper same as common struct type)
  */
-export const tuple = (...args: (BigNumberish | object)[]) => ({ ...args });
+export const tuple = (...args: (BigNumberish | object | boolean)[]) => ({ ...args });
 
 /**
  * felt cairo type

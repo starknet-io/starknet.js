@@ -39,34 +39,49 @@ function parseBaseTypes(type: string, it: Iterator<string>) {
  * Parse of the response elements that are converted to Object (Struct) by using the abi
  *
  * @param responseIterator - iterator of the response
- * @param type - type of the struct
+ * @param element - element of the field {name: string, type: string}
  * @param structs - structs from abi
- * @return {BigNumberish | ParsedStruct} - parsed arguments in format that contract is expecting
+ * @return {any} - parsed arguments in format that contract is expecting
  */
-function parseResponseStruct(
+function parseResponseValue(
   responseIterator: Iterator<string>,
-  type: string,
+  element: { name: string; type: string },
   structs: AbiStructs
-): BigNumberish | ParsedStruct | boolean {
+): BigNumberish | ParsedStruct | boolean | any[] {
   // type struct
-  if (type in structs && structs[type]) {
-    return structs[type].members.reduce((acc, el) => {
-      acc[el.name] = parseResponseStruct(responseIterator, el.type, structs);
+  if (element.type in structs && structs[element.type]) {
+    return structs[element.type].members.reduce((acc, el) => {
+      acc[el.name] = parseResponseValue(responseIterator, el, structs);
       return acc;
     }, {} as any);
   }
+
   // type tuple
-  if (isTypeTuple(type)) {
-    const memberTypes = extractTupleMemberTypes(type);
+  if (isTypeTuple(element.type)) {
+    const memberTypes = extractTupleMemberTypes(element.type);
     return memberTypes.reduce((acc, it: any, idx) => {
-      const tName = it?.name ? it.name : idx;
-      const tType = it?.type ? it.type : it;
-      acc[tName] = parseResponseStruct(responseIterator, tType, structs);
+      const name = it?.name ? it.name : idx;
+      const type = it?.type ? it.type : it;
+      const el = { name, type };
+      acc[name] = parseResponseValue(responseIterator, el, structs);
       return acc;
     }, {} as any);
   }
+
+  // type c1 array
+  if (isTypeArray(element.type)) {
+    // eslint-disable-next-line no-case-declarations
+    const parsedDataArr: (BigNumberish | ParsedStruct | boolean | any[])[] = [];
+    const el = { name: '', type: getArrayType(element.type) };
+    const len = BigInt(responseIterator.next().value); // get length
+    while (parsedDataArr.length < len) {
+      parsedDataArr.push(parseResponseValue(responseIterator, el, structs));
+    }
+    return parsedDataArr;
+  }
+
   // base type
-  return parseBaseTypes(type, responseIterator);
+  return parseBaseTypes(element.type, responseIterator);
 }
 
 /**
@@ -91,31 +106,32 @@ export default function responseParser(
     case isLen(name):
       temp = responseIterator.next().value;
       return BigInt(temp);
+
+    case type in structs || isTypeTuple(type):
+      return parseResponseValue(responseIterator, output, structs);
+
     case isTypeArray(type):
-      // eslint-disable-next-line no-case-declarations
-      const parsedDataArr: (BigNumberish | ParsedStruct | boolean)[] = [];
-
-      // Cairo 1 Array
+      // C1 Array
       if (isCairo1Type(type)) {
-        const arrayType = getArrayType(type);
-        const len = BigInt(responseIterator.next().value); // get length
-        while (parsedDataArr.length < len) {
-          parsedDataArr.push(parseResponseStruct(responseIterator, arrayType, structs));
-        }
-        return parsedDataArr;
+        return parseResponseValue(responseIterator, output, structs);
       }
-
+      // C0 Array
+      // eslint-disable-next-line no-case-declarations
+      const parsedDataArr: (BigNumberish | ParsedStruct | boolean | any[])[] = [];
       if (parsedResult && parsedResult[`${name}_len`]) {
         const arrLen = parsedResult[`${name}_len`] as number;
         while (parsedDataArr.length < arrLen) {
           parsedDataArr.push(
-            parseResponseStruct(responseIterator, output.type.replace('*', ''), structs)
+            parseResponseValue(
+              responseIterator,
+              { name, type: output.type.replace('*', '') },
+              structs
+            )
           );
         }
       }
       return parsedDataArr;
-    case type in structs || isTypeTuple(type):
-      return parseResponseStruct(responseIterator, type, structs);
+
     default:
       return parseBaseTypes(type, responseIterator);
   }

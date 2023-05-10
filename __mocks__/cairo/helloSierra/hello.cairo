@@ -276,6 +276,8 @@ mod HelloStarknet {
     use starknet::ContractAddress;
     use super::Foo;
     use starknet::get_caller_address;
+    use array::ArrayTrait;
+    use array::SpanTrait;
 
     //bet
     use super::Bet;
@@ -408,5 +410,63 @@ mod HelloStarknet {
     fn get_user() -> UserData {
         user::read()
     }
+
+    // Nested Array 2d
+    #[external]
+    fn array2d_ex(test: Array<Array<felt252>>) -> felt252 {
+        return *(test.at(0_u32)).at(0_u32);
+    }
+
+    #[view]
+    fn array2d_array(test: Array<Array<felt252>>) -> Array<Array<felt252>> {
+        return test;
+    }
+
+    #[view]
+    fn array2d_felt(test: Array<Array<felt252>>) -> felt252 {
+        return *(test.at(0_u32)).at(0_u32);
+    }
+
+    //mix request
+    #[view]
+    fn mix_req(mut a:core::array::Array::<felt252>, b:bool) -> core::array::Array::<felt252> {
+        a.append(1);
+        a.append(2);
+        a
+    }
+
+    // tuple req array,bool
+    //#[view]
+    //fn tuple_mix_req(a: (core::array::Array::<felt252>, core::array::Array::<felt252>)) -> (core::array::Array::<felt252>, core::array::Array::<felt252>) {
+    //    {t:a r:123}
+    //}
+
+    //#[view]
+    //fn b() -> (core::array::Array::<felt252>, core::array::Array::<felt252>) {
+    //    let x = ArrayTrait::new();
+    //    let y = ArrayTrait::new();
+    //    (x, y)
+    //}  
+
+    //#[view]
+    //fn tuple_mix_req(a: (core::array::Array::<felt252>, core::array::Array::<felt252>)) -> (core::array::Array::<felt252>, core::array::Array::<felt252>) {
+    //    a
+    //}
+
+    //mix Tuple array,bool
+    //#[view]
+    //fn tuple_mix_req(mut a:core::array::Array::<felt252>, b:bool) -> core::array::Array::<felt252> {
+    //    a.append(1);
+    //    a.append(2);
+    //    a
+    //}
+
+    //#[external]
+    //fn tuple_mix_ex() -> (core::array::Array::<felt252>, bool) {
+    //    let mut ret = ArrayTrait::new();
+    //   ret.append(1);
+    //    ret.append(2);
+    //    (ret, true)
+    //}
 
 }
