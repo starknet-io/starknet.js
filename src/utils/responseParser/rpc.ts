@@ -63,6 +63,16 @@ export class RPCResponseParser
     };
   }
 
+  public parseFeeEstimateOriginalResponse(
+    res: Array<RPC.EstimateFeeResponse>
+  ): Array<EstimateFeeResponse> {
+    return res.map((val) => ({
+      overall_fee: toBigInt(val.overall_fee),
+      gas_consumed: toBigInt(val.gas_consumed),
+      gas_price: toBigInt(val.gas_price),
+    }));
+  }
+
   public parseCallContractResponse(res: Array<string>): CallContractResponse {
     return {
       result: res,

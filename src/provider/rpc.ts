@@ -234,6 +234,61 @@ export class RpcProvider implements ProviderInterface {
     throw new Error('RPC does not implement getCode function');
   }
 
+  public async estimateFee_original(
+    invocations: InvocationBulk,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ) {
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint('starknet_estimateFee', {
+      request: invocations.map((invocation) => {
+        if (invocation.type === 'INVOKE_FUNCTION') {
+          return {
+            type: RPC.TransactionType.INVOKE,
+            sender_address: invocation.contractAddress,
+            calldata: parseCalldata(invocation.calldata),
+            signature: signatureToHexArray(invocation.signature),
+            version: toHex(invocation.version || 0),
+            nonce: toHex(invocation.nonce),
+            max_fee: toHex(invocation.maxFee || 0),
+          };
+        }
+
+        if (invocation.type === 'DECLARE') {
+          if ('program' in invocation.contractDefinition) {
+            return {
+              contract_class: {
+                program: invocation.contractDefinition.program,
+                entry_points_by_type: invocation.contractDefinition.entry_points_by_type,
+                abi: invocation.contractDefinition.abi, // rpc 2.0
+              },
+              sender_address: invocation.senderAddress,
+              signature: signatureToHexArray(invocation.signature),
+              version: toHex(invocation.version || 0),
+              nonce: toHex(invocation.nonce),
+              max_fee: toHex(invocation.maxFee || 0),
+            };
+          }
+          // TODO: When RPC Update implement Sierra
+          throw new Error('RPC do not support Sierra Contracts yet');
+        }
+
+        return {
+          type: RPC.TransactionType.DEPLOY_ACCOUNT,
+          constructor_calldata: bigNumberishArrayToHexadecimalStringArray(
+            invocation.constructorCalldata || []
+          ),
+          class_hash: toHex(invocation.classHash),
+          contract_address_salt: toHex(invocation.addressSalt || 0),
+          signature: signatureToHexArray(invocation.signature),
+          version: toHex(invocation.version || 0),
+          nonce: toHex(invocation.nonce),
+          max_fee: toHex(invocation.maxFee || 0),
+        };
+      }),
+      block_id,
+    }).then(this.responseParser.parseFeeEstimateOriginalResponse);
+  }
+
   public async getEstimateFee(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
