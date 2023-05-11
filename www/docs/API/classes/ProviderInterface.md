@@ -40,7 +40,7 @@ the chain Id
 
 #### Defined in
 
-[src/provider/interface.ts:37](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/interface.ts#L37)
+[src/provider/interface.ts:37](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L37)
 
 ---
 
@@ -65,7 +65,7 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[src/provider/interface.ts:46](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/interface.ts#L46)
+[src/provider/interface.ts:46](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L46)
 
 ---
 
@@ -89,7 +89,7 @@ the block object
 
 #### Defined in
 
-[src/provider/interface.ts:57](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/interface.ts#L57)
+[src/provider/interface.ts:57](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L57)
 
 ---
 
@@ -114,7 +114,7 @@ The method should not be used
 
 #### Defined in
 
-[src/provider/interface.ts:62](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/interface.ts#L62)
+[src/provider/interface.ts:62](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L62)
 
 ---
 
@@ -139,7 +139,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/interface.ts:74](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/interface.ts#L74)
+[src/provider/interface.ts:74](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L74)
 
 ---
 
@@ -164,7 +164,7 @@ Class hash
 
 #### Defined in
 
-[src/provider/interface.ts:86](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/interface.ts#L86)
+[src/provider/interface.ts:86](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L86)
 
 ---
 
@@ -188,7 +188,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/interface.ts:97](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/interface.ts#L97)
+[src/provider/interface.ts:97](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L97)
 
 ---
 
@@ -213,7 +213,7 @@ the hex nonce
 
 #### Defined in
 
-[src/provider/interface.ts:105](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/interface.ts#L105)
+[src/provider/interface.ts:105](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L105)
 
 ---
 
@@ -239,7 +239,7 @@ the value of the storage variable
 
 #### Defined in
 
-[src/provider/interface.ts:118](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/interface.ts#L118)
+[src/provider/interface.ts:118](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L118)
 
 ---
 
@@ -263,7 +263,7 @@ the transaction object { transaction_id, status, transaction, block_number?, blo
 
 #### Defined in
 
-[src/provider/interface.ts:130](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/interface.ts#L130)
+[src/provider/interface.ts:130](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L130)
 
 ---
 
@@ -287,7 +287,7 @@ the transaction receipt object
 
 #### Defined in
 
-[src/provider/interface.ts:138](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/interface.ts#L138)
+[src/provider/interface.ts:138](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L138)
 
 ---
 
@@ -312,7 +312,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/interface.ts:151](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/interface.ts#L151)
+[src/provider/interface.ts:151](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L151)
 
 ---
 
@@ -341,7 +341,7 @@ response from addTransaction
 
 #### Defined in
 
-[src/provider/interface.ts:171](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/interface.ts#L171)
+[src/provider/interface.ts:171](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L171)
 
 ---
 
@@ -366,7 +366,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/interface.ts:188](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/interface.ts#L188)
+[src/provider/interface.ts:188](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L188)
 
 ---
 
@@ -397,7 +397,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:209](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/interface.ts#L209)
+[src/provider/interface.ts:209](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L209)
 
 ---
 
@@ -424,7 +424,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:231](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/interface.ts#L231)
+[src/provider/interface.ts:231](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L231)
 
 ---
 
@@ -451,7 +451,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:253](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/interface.ts#L253)
+[src/provider/interface.ts:253](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L253)
 
 ---
 
@@ -478,7 +478,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:276](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/interface.ts#L276)
+[src/provider/interface.ts:276](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L276)
 
 ---
 
@@ -503,7 +503,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:295](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/interface.ts#L295)
+[src/provider/interface.ts:295](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L295)
 
 ---
 
@@ -528,7 +528,7 @@ GetTransactionReceiptResponse
 
 #### Defined in
 
-[src/provider/interface.ts:308](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/interface.ts#L308)
+[src/provider/interface.ts:308](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L308)
 
 ---
 
@@ -555,7 +555,7 @@ the transaction trace and estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:328](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/interface.ts#L328)
+[src/provider/interface.ts:328](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L328)
 
 ---
 
@@ -579,4 +579,4 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/interface.ts:341](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/interface.ts#L341)
+[src/provider/interface.ts:341](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L341)

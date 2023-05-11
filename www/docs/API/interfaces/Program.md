@@ -20,7 +20,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/contract/legacy.ts:31](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/legacy.ts#L31)
+[src/types/lib/contract/legacy.ts:31](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/legacy.ts#L31)
 
 ---
 
@@ -30,4 +30,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/contract/legacy.ts:32](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/lib/contract/legacy.ts#L32)
+[src/types/lib/contract/legacy.ts:32](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/legacy.ts#L32)

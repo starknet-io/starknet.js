@@ -31,7 +31,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:81](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L81)
+[src/types/api/sequencer.ts:81](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L81)
 
 ---
 
@@ -51,7 +51,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:92](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L92)
+[src/types/api/sequencer.ts:92](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L92)
 
 ---
 
@@ -74,7 +74,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:100](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L100)
+[src/types/api/sequencer.ts:100](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L100)
 
 ---
 
@@ -97,7 +97,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:111](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L111)
+[src/types/api/sequencer.ts:111](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L111)
 
 ---
 
@@ -107,7 +107,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:122](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L122)
+[src/types/api/sequencer.ts:122](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L122)
 
 ---
 
@@ -126,7 +126,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:128](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L128)
+[src/types/api/sequencer.ts:128](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L128)
 
 ---
 
@@ -143,7 +143,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:135](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L135)
+[src/types/api/sequencer.ts:135](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L135)
 
 ---
 
@@ -153,7 +153,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:145](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L145)
+[src/types/api/sequencer.ts:145](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L145)
 
 ---
 
@@ -173,7 +173,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:150](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L150)
+[src/types/api/sequencer.ts:150](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L150)
 
 ---
 
@@ -193,7 +193,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:158](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L158)
+[src/types/api/sequencer.ts:158](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L158)
 
 ---
 
@@ -203,7 +203,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:167](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L167)
+[src/types/api/sequencer.ts:167](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L167)
 
 ---
 
@@ -213,7 +213,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:169](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L169)
+[src/types/api/sequencer.ts:169](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L169)
 
 ---
 
@@ -237,7 +237,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:173](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L173)
+[src/types/api/sequencer.ts:173](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L173)
 
 ---
 
@@ -259,7 +259,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:185](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L185)
+[src/types/api/sequencer.ts:185](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L185)
 
 ---
 
@@ -285,7 +285,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:196](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L196)
+[src/types/api/sequencer.ts:196](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L196)
 
 ---
 
@@ -295,7 +295,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:225](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L225)
+[src/types/api/sequencer.ts:225](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L225)
 
 ---
 
@@ -311,7 +311,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:241](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L241)
+[src/types/api/sequencer.ts:241](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L241)
 
 ---
 
@@ -321,7 +321,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:245](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L245)
+[src/types/api/sequencer.ts:245](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L245)
 
 ---
 
@@ -331,7 +331,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:246](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L246)
+[src/types/api/sequencer.ts:246](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L246)
 
 ---
 
@@ -341,7 +341,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:247](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L247)
+[src/types/api/sequencer.ts:247](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L247)
 
 ---
 
@@ -351,7 +351,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:248](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L248)
+[src/types/api/sequencer.ts:248](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L248)
 
 ---
 
@@ -361,7 +361,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:250](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L250)
+[src/types/api/sequencer.ts:250](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L250)
 
 ---
 
@@ -378,7 +378,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:256](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L256)
+[src/types/api/sequencer.ts:256](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L256)
 
 ---
 
@@ -388,7 +388,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:261](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L261)
+[src/types/api/sequencer.ts:261](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L261)
 
 ---
 
@@ -398,7 +398,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:263](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L263)
+[src/types/api/sequencer.ts:263](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L263)
 
 ---
 
@@ -408,7 +408,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:268](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L268)
+[src/types/api/sequencer.ts:268](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L268)
 
 ---
 
@@ -418,7 +418,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:280](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L280)
+[src/types/api/sequencer.ts:280](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L280)
 
 ---
 
@@ -434,7 +434,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:282](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L282)
+[src/types/api/sequencer.ts:282](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L282)
 
 ---
 
@@ -444,7 +444,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:286](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L286)
+[src/types/api/sequencer.ts:286](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L286)
 
 ---
 
@@ -469,7 +469,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:288](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L288)
+[src/types/api/sequencer.ts:288](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L288)
 
 ---
 
@@ -483,7 +483,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:302](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L302)
+[src/types/api/sequencer.ts:302](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L302)
 
 ---
 
@@ -500,7 +500,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:304](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L304)
+[src/types/api/sequencer.ts:304](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L304)
 
 ---
 
@@ -514,7 +514,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:306](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L306)
+[src/types/api/sequencer.ts:306](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L306)
 
 ---
 
@@ -524,7 +524,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:308](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L308)
+[src/types/api/sequencer.ts:308](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L308)
 
 ---
 
@@ -534,7 +534,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:310](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L310)
+[src/types/api/sequencer.ts:310](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L310)
 
 ---
 
@@ -544,7 +544,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:312](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L312)
+[src/types/api/sequencer.ts:312](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L312)
 
 ---
 
@@ -554,7 +554,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:314](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L314)
+[src/types/api/sequencer.ts:314](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L314)
 
 ---
 
@@ -571,7 +571,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:316](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L316)
+[src/types/api/sequencer.ts:316](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L316)
 
 ---
 
@@ -581,7 +581,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:318](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L318)
+[src/types/api/sequencer.ts:318](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L318)
 
 ---
 
@@ -710,4 +710,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:320](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/api/sequencer.ts#L320)
+[src/types/api/sequencer.ts:320](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L320)

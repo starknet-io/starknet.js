@@ -34,7 +34,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/errors.ts:18](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/errors.ts#L18)
+[src/provider/errors.ts:18](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/errors.ts#L18)
 
 ## Properties
 
@@ -97,7 +97,7 @@ node_modules/@types/node/globals.d.ts:13
 
 #### Defined in
 
-[src/provider/errors.ts:16](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/errors.ts#L16)
+[src/provider/errors.ts:16](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/errors.ts#L16)
 
 ---
 

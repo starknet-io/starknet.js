@@ -17,7 +17,7 @@ The complete typed data, with all the structs, domain data, primary type of the 
 
 #### Defined in
 
-[src/utils/typedData/types.ts:33](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/typedData/types.ts#L33)
+[src/utils/typedData/types.ts:33](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/types.ts#L33)
 
 ---
 
@@ -27,7 +27,7 @@ The complete typed data, with all the structs, domain data, primary type of the 
 
 #### Defined in
 
-[src/utils/typedData/types.ts:34](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/typedData/types.ts#L34)
+[src/utils/typedData/types.ts:34](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/types.ts#L34)
 
 ---
 
@@ -37,7 +37,7 @@ The complete typed data, with all the structs, domain data, primary type of the 
 
 #### Defined in
 
-[src/utils/typedData/types.ts:35](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/typedData/types.ts#L35)
+[src/utils/typedData/types.ts:35](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/types.ts#L35)
 
 ---
 
@@ -47,4 +47,4 @@ The complete typed data, with all the structs, domain data, primary type of the 
 
 #### Defined in
 
-[src/utils/typedData/types.ts:36](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/typedData/types.ts#L36)
+[src/utils/typedData/types.ts:36](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/types.ts#L36)

@@ -20,7 +20,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/calldata/index.ts:28](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/calldata/index.ts#L28)
+[src/utils/calldata/index.ts:30](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L30)
 
 ## Properties
 
@@ -30,7 +30,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/calldata/index.ts:24](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/calldata/index.ts#L24)
+[src/utils/calldata/index.ts:26](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L26)
 
 ---
 
@@ -40,7 +40,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/calldata/index.ts:26](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/calldata/index.ts#L26)
+[src/utils/calldata/index.ts:28](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L28)
 
 ## Methods
 
@@ -64,7 +64,7 @@ Calldata
 
 #### Defined in
 
-[src/utils/calldata/index.ts:96](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/calldata/index.ts#L96)
+[src/utils/calldata/index.ts:98](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L98)
 
 ---
 
@@ -88,7 +88,7 @@ number
 
 #### Defined in
 
-[src/utils/calldata/index.ts:176](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/calldata/index.ts#L176)
+[src/utils/calldata/index.ts:179](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L179)
 
 ---
 
@@ -112,7 +112,55 @@ AbiStructs - structs from abi
 
 #### Defined in
 
-[src/utils/calldata/index.ts:185](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/calldata/index.ts#L185)
+[src/utils/calldata/index.ts:188](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L188)
+
+---
+
+### toCalldata
+
+▸ `Static` **toCalldata**(`rawCalldata?`): [`Calldata`](../modules.md#calldata)
+
+Helper: Compile HexCalldata | RawCalldata | RawArgs
+
+#### Parameters
+
+| Name          | Type                               | Default value | Description                           |
+| :------------ | :--------------------------------- | :------------ | :------------------------------------ |
+| `rawCalldata` | [`RawArgs`](../modules.md#rawargs) | `[]`          | HexCalldata \| RawCalldata \| RawArgs |
+
+#### Returns
+
+[`Calldata`](../modules.md#calldata)
+
+Calldata
+
+#### Defined in
+
+[src/utils/calldata/index.ts:205](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L205)
+
+---
+
+### toHex
+
+▸ `Static` **toHex**(`raw?`): [`HexCalldata`](../modules.md#hexcalldata)
+
+Helper: Convert raw to HexCalldata
+
+#### Parameters
+
+| Name  | Type                               | Default value | Description                           |
+| :---- | :--------------------------------- | :------------ | :------------------------------------ |
+| `raw` | [`RawArgs`](../modules.md#rawargs) | `[]`          | HexCalldata \| RawCalldata \| RawArgs |
+
+#### Returns
+
+[`HexCalldata`](../modules.md#hexcalldata)
+
+HexCalldata
+
+#### Defined in
+
+[src/utils/calldata/index.ts:214](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L214)
 
 ---
 
@@ -136,7 +184,7 @@ Validate arguments passed to the method as corresponding to the ones in the abi
 
 #### Defined in
 
-[src/utils/calldata/index.ts:39](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/calldata/index.ts#L39)
+[src/utils/calldata/index.ts:41](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L41)
 
 ---
 
@@ -162,7 +210,7 @@ Calldata - parsed arguments in format that contract is expecting
 
 #### Defined in
 
-[src/utils/calldata/index.ts:81](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/calldata/index.ts#L81)
+[src/utils/calldata/index.ts:83](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L83)
 
 ---
 
@@ -187,7 +235,7 @@ Result - parsed response corresponding to the abi
 
 #### Defined in
 
-[src/utils/calldata/index.ts:142](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/calldata/index.ts#L142)
+[src/utils/calldata/index.ts:145](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L145)
 
 ---
 
@@ -213,4 +261,4 @@ Result - parsed and formatted response object
 
 #### Defined in
 
-[src/utils/calldata/index.ts:166](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/calldata/index.ts#L166)
+[src/utils/calldata/index.ts:169](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L169)

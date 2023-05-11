@@ -28,17 +28,17 @@ two arrays: one with the entrypoints, and one with the concatenated calldata.
 | Name        | Type                                           |
 | :---------- | :--------------------------------------------- |
 | `callArray` | [`ParsedStruct`](../modules.md#parsedstruct)[] |
-| `calldata`  | `string`[]                                     |
+| `calldata`  | [`Calldata`](../modules.md#calldata)           |
 
 #### Defined in
 
-[src/utils/transaction.ts:11](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/transaction.ts#L11)
+[src/utils/transaction.ts:12](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L12)
 
 ---
 
 ### fromCallsToExecuteCalldata
 
-▸ **fromCallsToExecuteCalldata**(`calls`): `string`[]
+▸ **fromCallsToExecuteCalldata**(`calls`): [`Calldata`](../modules.md#calldata)
 
 Transforms a list of calls in the full flattened calldata expected
 by the **execute** protocol.
@@ -51,17 +51,17 @@ by the **execute** protocol.
 
 #### Returns
 
-`string`[]
+[`Calldata`](../modules.md#calldata)
 
 #### Defined in
 
-[src/utils/transaction.ts:36](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/transaction.ts#L36)
+[src/utils/transaction.ts:37](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L37)
 
 ---
 
 ### fromCallsToExecuteCalldataWithNonce
 
-▸ **fromCallsToExecuteCalldataWithNonce**(`calls`, `nonce`): `string`[]
+▸ **fromCallsToExecuteCalldataWithNonce**(`calls`, `nonce`): [`Calldata`](../modules.md#calldata)
 
 #### Parameters
 
@@ -72,11 +72,11 @@ by the **execute** protocol.
 
 #### Returns
 
-`string`[]
+[`Calldata`](../modules.md#calldata)
 
 #### Defined in
 
-[src/utils/transaction.ts:51](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/transaction.ts#L51)
+[src/utils/transaction.ts:43](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L43)
 
 ---
 
@@ -84,28 +84,29 @@ by the **execute** protocol.
 
 ▸ **transformCallsToMulticallArrays_cairo1**(`calls`): [`CallStruct`](../interfaces/CallStruct.md)[]
 
-Transforms a list of Calls, each with their own calldata, into
-two arrays: one with the entrypoints, and one with the concatenated calldata.
+Format Data inside Calls
 
 #### Parameters
 
-| Name    | Type                           |
-| :------ | :----------------------------- |
-| `calls` | [`Call`](../modules.md#call)[] |
+| Name    | Type                           | Description |
+| :------ | :----------------------------- | :---------- |
+| `calls` | [`Call`](../modules.md#call)[] | Call[]      |
 
 #### Returns
 
 [`CallStruct`](../interfaces/CallStruct.md)[]
 
+CallStruct
+
 #### Defined in
 
-[src/utils/transaction.ts:64](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/transaction.ts#L64)
+[src/utils/transaction.ts:53](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L53)
 
 ---
 
 ### fromCallsToExecuteCalldata_cairo1
 
-▸ **fromCallsToExecuteCalldata_cairo1**(`calls`): `string`[]
+▸ **fromCallsToExecuteCalldata_cairo1**(`calls`): [`Calldata`](../modules.md#calldata)
 
 Transforms a list of calls in the full flattened calldata expected
 by the **execute** protocol.
@@ -118,17 +119,19 @@ by the **execute** protocol.
 
 #### Returns
 
-`string`[]
+[`Calldata`](../modules.md#calldata)
+
+Calldata
 
 #### Defined in
 
-[src/utils/transaction.ts:79](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/transaction.ts#L79)
+[src/utils/transaction.ts:69](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L69)
 
 ---
 
 ### getExecuteCalldata
 
-▸ **getExecuteCalldata**(`calls`, `cairoVersion?`): `string`[]
+▸ **getExecuteCalldata**(`calls`, `cairoVersion?`): [`Calldata`](../modules.md#calldata)
 
 #### Parameters
 
@@ -139,10 +142,10 @@ by the **execute** protocol.
 
 #### Returns
 
-`string`[]
+[`Calldata`](../modules.md#calldata)
 
 string[] of calldata
 
 #### Defined in
 
-[src/utils/transaction.ts:95](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/transaction.ts#L95)
+[src/utils/transaction.ts:79](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L79)

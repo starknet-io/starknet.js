@@ -30,7 +30,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/default.ts:42](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L42)
+[src/provider/default.ts:42](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L42)
 
 ## Properties
 
@@ -40,7 +40,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/default.ts:40](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L40)
+[src/provider/default.ts:40](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L40)
 
 ## Methods
 
@@ -62,7 +62,7 @@ the chain Id
 
 #### Defined in
 
-[src/provider/default.ts:64](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L64)
+[src/provider/default.ts:64](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L64)
 
 ---
 
@@ -90,7 +90,7 @@ the block object
 
 #### Defined in
 
-[src/provider/default.ts:68](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L68)
+[src/provider/default.ts:68](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L68)
 
 ---
 
@@ -119,22 +119,22 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/default.ts:72](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L72)
+[src/provider/default.ts:72](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L72)
 
 ---
 
 ### getClassHashAt
 
-▸ **getClassHashAt**(`contractAddress`, `blockIdentifier`): `Promise`<`string`\>
+▸ **getClassHashAt**(`contractAddress`, `blockIdentifier?`): `Promise`<`string`\>
 
 Returns the class hash deployed under the given address.
 
 #### Parameters
 
-| Name              | Type              | Description      |
-| :---------------- | :---------------- | :--------------- |
-| `contractAddress` | `string`          | contract address |
-| `blockIdentifier` | `BlockIdentifier` | block identifier |
+| Name               | Type              | Description      |
+| :----------------- | :---------------- | :--------------- |
+| `contractAddress`  | `string`          | contract address |
+| `blockIdentifier?` | `BlockIdentifier` | block identifier |
 
 #### Returns
 
@@ -148,7 +148,7 @@ Class hash
 
 #### Defined in
 
-[src/provider/default.ts:79](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L79)
+[src/provider/default.ts:79](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L79)
 
 ---
 
@@ -176,7 +176,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/default.ts:86](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L86)
+[src/provider/default.ts:86](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L86)
 
 ---
 
@@ -210,7 +210,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:90](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L90)
+[src/provider/default.ts:90](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L90)
 
 ---
 
@@ -241,7 +241,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:98](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L98)
+[src/provider/default.ts:98](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L98)
 
 ---
 
@@ -270,7 +270,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:112](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L112)
+[src/provider/default.ts:112](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L112)
 
 ---
 
@@ -299,7 +299,7 @@ the hex nonce
 
 #### Defined in
 
-[src/provider/default.ts:119](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L119)
+[src/provider/default.ts:119](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L119)
 
 ---
 
@@ -329,7 +329,7 @@ the value of the storage variable
 
 #### Defined in
 
-[src/provider/default.ts:126](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L126)
+[src/provider/default.ts:126](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L126)
 
 ---
 
@@ -357,7 +357,7 @@ the transaction object { transaction_id, status, transaction, block_number?, blo
 
 #### Defined in
 
-[src/provider/default.ts:134](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L134)
+[src/provider/default.ts:134](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L134)
 
 ---
 
@@ -385,7 +385,7 @@ the transaction receipt object
 
 #### Defined in
 
-[src/provider/default.ts:138](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L138)
+[src/provider/default.ts:138](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L138)
 
 ---
 
@@ -414,7 +414,7 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[src/provider/default.ts:142](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L142)
+[src/provider/default.ts:142](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L142)
 
 ---
 
@@ -447,7 +447,7 @@ response from addTransaction
 
 #### Defined in
 
-[src/provider/default.ts:149](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L149)
+[src/provider/default.ts:149](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L149)
 
 ---
 
@@ -476,7 +476,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/default.ts:156](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L156)
+[src/provider/default.ts:156](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L156)
 
 ---
 
@@ -505,7 +505,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/default.ts:163](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L163)
+[src/provider/default.ts:163](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L163)
 
 ---
 
@@ -536,7 +536,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:170](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L170)
+[src/provider/default.ts:170](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L170)
 
 ---
 
@@ -567,7 +567,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:179](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L179)
+[src/provider/default.ts:179](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L179)
 
 ---
 
@@ -596,7 +596,7 @@ The method should not be used
 
 #### Defined in
 
-[src/provider/default.ts:193](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L193)
+[src/provider/default.ts:193](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L193)
 
 ---
 
@@ -625,7 +625,7 @@ GetTransactionReceiptResponse
 
 #### Defined in
 
-[src/provider/default.ts:200](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L200)
+[src/provider/default.ts:200](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L200)
 
 ---
 
@@ -656,7 +656,7 @@ the transaction trace and estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:207](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L207)
+[src/provider/default.ts:207](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L207)
 
 ---
 
@@ -684,7 +684,7 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/default.ts:221](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L221)
+[src/provider/default.ts:221](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L221)
 
 ---
 
@@ -705,7 +705,7 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/default.ts:225](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L225)
+[src/provider/default.ts:225](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L225)
 
 ---
 
@@ -726,4 +726,4 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/default.ts:229](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/provider/default.ts#L229)
+[src/provider/default.ts:229](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L229)

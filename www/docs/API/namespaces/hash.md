@@ -18,7 +18,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:33](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L33)
+[src/utils/hash.ts:29](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L29)
 
 ---
 
@@ -28,7 +28,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:34](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L34)
+[src/utils/hash.ts:30](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L30)
 
 ---
 
@@ -38,105 +38,9 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:35](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L35)
+[src/utils/hash.ts:31](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L31)
 
 ## Functions
-
-### keccakBn
-
-▸ **keccakBn**(`value`): `string`
-
-#### Parameters
-
-| Name    | Type                                  |
-| :------ | :------------------------------------ |
-| `value` | [`BigNumberish`](num.md#bignumberish) |
-
-#### Returns
-
-`string`
-
-#### Defined in
-
-[src/utils/hash.ts:37](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L37)
-
----
-
-### starknetKeccak
-
-▸ **starknetKeccak**(`value`): `bigint`
-
-Function to get the starknet keccak hash from a string
-
-[Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/public/abi.py#L17-L22)
-
-#### Parameters
-
-| Name    | Type     | Description                                         |
-| :------ | :------- | :-------------------------------------------------- |
-| `value` | `string` | string you want to get the starknetKeccak hash from |
-
-#### Returns
-
-`bigint`
-
-starknet keccak hash as BigNumber
-
-#### Defined in
-
-[src/utils/hash.ts:54](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L54)
-
----
-
-### getSelectorFromName
-
-▸ **getSelectorFromName**(`funcName`): `string`
-
-Function to get the hex selector from a given function name
-
-[Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/public/abi.py#L25-L26)
-
-#### Parameters
-
-| Name       | Type     | Description                 |
-| :--------- | :------- | :-------------------------- |
-| `funcName` | `string` | selectors abi function name |
-
-#### Returns
-
-`string`
-
-hex selector of given abi function name
-
-#### Defined in
-
-[src/utils/hash.ts:67](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L67)
-
----
-
-### getSelector
-
-▸ **getSelector**(`value`): `string`
-
-Function to get hex selector from function name, decimal string or hex string
-
-#### Parameters
-
-| Name    | Type     | Description                            |
-| :------ | :------- | :------------------------------------- |
-| `value` | `string` | hex string \| decimal string \| string |
-
-#### Returns
-
-`string`
-
-Hex selector
-
-#### Defined in
-
-[src/utils/hash.ts:77](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L77)
-
----
 
 ### computeHashOnElements
 
@@ -154,7 +58,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:87](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L87)
+[src/utils/hash.ts:33](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L33)
 
 ---
 
@@ -170,7 +74,7 @@ Hex selector
 | `version`            | [`BigNumberish`](num.md#bignumberish)                                  | `undefined`   |
 | `contractAddress`    | [`BigNumberish`](num.md#bignumberish)                                  | `undefined`   |
 | `entryPointSelector` | [`BigNumberish`](num.md#bignumberish)                                  | `undefined`   |
-| `calldata`           | [`BigNumberish`](num.md#bignumberish)[]                                | `undefined`   |
+| `calldata`           | [`RawCalldata`](../modules.md#rawcalldata)                             | `undefined`   |
 | `maxFee`             | [`BigNumberish`](num.md#bignumberish)                                  | `undefined`   |
 | `chainId`            | [`StarknetChainId`](../enums/constants.StarknetChainId.md)             | `undefined`   |
 | `additionalData`     | [`BigNumberish`](num.md#bignumberish)[]                                | `[]`          |
@@ -181,7 +85,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:96](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L96)
+[src/utils/hash.ts:42](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L42)
 
 ---
 
@@ -194,7 +98,7 @@ Hex selector
 | Name                  | Type                                                       |
 | :-------------------- | :--------------------------------------------------------- |
 | `contractAddress`     | [`BigNumberish`](num.md#bignumberish)                      |
-| `constructorCalldata` | [`BigNumberish`](num.md#bignumberish)[]                    |
+| `constructorCalldata` | [`RawCalldata`](../modules.md#rawcalldata)                 |
 | `version`             | [`BigNumberish`](num.md#bignumberish)                      |
 | `chainId`             | [`StarknetChainId`](../enums/constants.StarknetChainId.md) |
 
@@ -204,7 +108,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:120](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L120)
+[src/utils/hash.ts:66](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L66)
 
 ---
 
@@ -230,7 +134,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:137](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L137)
+[src/utils/hash.ts:83](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L83)
 
 ---
 
@@ -244,7 +148,7 @@ Hex selector
 | :-------------------- | :--------------------------------------------------------- |
 | `contractAddress`     | [`BigNumberish`](num.md#bignumberish)                      |
 | `classHash`           | [`BigNumberish`](num.md#bignumberish)                      |
-| `constructorCalldata` | [`BigNumberish`](num.md#bignumberish)[]                    |
+| `constructorCalldata` | [`RawCalldata`](../modules.md#rawcalldata)                 |
 | `salt`                | [`BigNumberish`](num.md#bignumberish)                      |
 | `version`             | [`BigNumberish`](num.md#bignumberish)                      |
 | `maxFee`              | [`BigNumberish`](num.md#bignumberish)                      |
@@ -257,7 +161,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:158](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L158)
+[src/utils/hash.ts:104](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L104)
 
 ---
 
@@ -271,7 +175,7 @@ Hex selector
 | :---------------- | :--------------------------------------------------------- |
 | `contractAddress` | [`BigNumberish`](num.md#bignumberish)                      |
 | `version`         | [`BigNumberish`](num.md#bignumberish)                      |
-| `calldata`        | [`BigNumberish`](num.md#bignumberish)[]                    |
+| `calldata`        | [`RawCalldata`](../modules.md#rawcalldata)                 |
 | `maxFee`          | [`BigNumberish`](num.md#bignumberish)                      |
 | `chainId`         | [`StarknetChainId`](../enums/constants.StarknetChainId.md) |
 | `nonce`           | [`BigNumberish`](num.md#bignumberish)                      |
@@ -282,7 +186,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:182](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L182)
+[src/utils/hash.ts:128](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L128)
 
 ---
 
@@ -292,12 +196,12 @@ Hex selector
 
 #### Parameters
 
-| Name                  | Type                                       |
-| :-------------------- | :----------------------------------------- |
-| `salt`                | [`BigNumberish`](num.md#bignumberish)      |
-| `classHash`           | [`BigNumberish`](num.md#bignumberish)      |
-| `constructorCalldata` | [`RawCalldata`](../modules.md#rawcalldata) |
-| `deployerAddress`     | [`BigNumberish`](num.md#bignumberish)      |
+| Name                  | Type                                  |
+| :-------------------- | :------------------------------------ |
+| `salt`                | [`BigNumberish`](num.md#bignumberish) |
+| `classHash`           | [`BigNumberish`](num.md#bignumberish) |
+| `constructorCalldata` | [`RawArgs`](../modules.md#rawargs)    |
+| `deployerAddress`     | [`BigNumberish`](num.md#bignumberish) |
 
 #### Returns
 
@@ -305,7 +209,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:202](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L202)
+[src/utils/hash.ts:148](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L148)
 
 ---
 
@@ -325,7 +229,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:233](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L233)
+[src/utils/hash.ts:180](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L180)
 
 ---
 
@@ -345,7 +249,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:251](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L251)
+[src/utils/hash.ts:198](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L198)
 
 ---
 
@@ -365,7 +269,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:260](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L260)
+[src/utils/hash.ts:207](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L207)
 
 ---
 
@@ -385,7 +289,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:313](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L313)
+[src/utils/hash.ts:260](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L260)
 
 ---
 
@@ -405,7 +309,7 @@ Hex selector
 
 #### Defined in
 
-[src/utils/hash.ts:354](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L354)
+[src/utils/hash.ts:301](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L301)
 
 ---
 
@@ -429,4 +333,104 @@ HexString ClassHash
 
 #### Defined in
 
-[src/utils/hash.ts:392](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/hash.ts#L392)
+[src/utils/hash.ts:339](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L339)
+
+---
+
+### keccakBn
+
+▸ **keccakBn**(`value`): `string`
+
+Keccak hash BigNumberish value
+
+#### Parameters
+
+| Name    | Type                                  | Description  |
+| :------ | :------------------------------------ | :----------- |
+| `value` | [`BigNumberish`](num.md#bignumberish) | BigNumberish |
+
+#### Returns
+
+`string`
+
+string - hexadecimal string
+
+#### Defined in
+
+[src/utils/selector.ts:12](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/selector.ts#L12)
+
+---
+
+### starknetKeccak
+
+▸ **starknetKeccak**(`value`): `bigint`
+
+Function to get the starknet keccak hash from a string
+
+[Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/public/abi.py#L17-L22)
+
+#### Parameters
+
+| Name    | Type     | Description                                         |
+| :------ | :------- | :-------------------------------------------------- |
+| `value` | `string` | string you want to get the starknetKeccak hash from |
+
+#### Returns
+
+`bigint`
+
+starknet keccak hash as BigNumber
+
+#### Defined in
+
+[src/utils/selector.ts:34](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/selector.ts#L34)
+
+---
+
+### getSelectorFromName
+
+▸ **getSelectorFromName**(`funcName`): `string`
+
+Function to get the hex selector from a given function name
+
+[Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/public/abi.py#L25-L26)
+
+#### Parameters
+
+| Name       | Type     | Description                 |
+| :--------- | :------- | :-------------------------- |
+| `funcName` | `string` | selectors abi function name |
+
+#### Returns
+
+`string`
+
+hex selector of given abi function name
+
+#### Defined in
+
+[src/utils/selector.ts:47](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/selector.ts#L47)
+
+---
+
+### getSelector
+
+▸ **getSelector**(`value`): `string`
+
+Function to get hex selector from function name, decimal string or hex string
+
+#### Parameters
+
+| Name    | Type     | Description                            |
+| :------ | :------- | :------------------------------------- |
+| `value` | `string` | hex string \| decimal string \| string |
+
+#### Returns
+
+`string`
+
+Hex selector
+
+#### Defined in
+
+[src/utils/selector.ts:57](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/selector.ts#L57)

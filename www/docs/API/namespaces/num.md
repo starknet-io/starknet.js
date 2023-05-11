@@ -14,7 +14,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/num.ts:6](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/num.ts#L6)
+[src/utils/num.ts:6](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L6)
 
 ## Functions
 
@@ -34,7 +34,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/num.ts:8](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/num.ts#L8)
+[src/utils/num.ts:8](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L8)
 
 ---
 
@@ -54,7 +54,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/num.ts:12](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/num.ts#L12)
+[src/utils/num.ts:12](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L12)
 
 ---
 
@@ -74,7 +74,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:16](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/num.ts#L16)
+[src/utils/num.ts:16](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L16)
 
 ---
 
@@ -94,7 +94,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:20](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/num.ts#L20)
+[src/utils/num.ts:20](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L20)
 
 ---
 
@@ -114,7 +114,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:24](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/num.ts#L24)
+[src/utils/num.ts:24](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L24)
 
 ---
 
@@ -137,7 +137,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:40](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/num.ts#L40)
+[src/utils/num.ts:40](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L40)
 
 ---
 
@@ -157,7 +157,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:57](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/num.ts#L57)
+[src/utils/num.ts:57](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L57)
 
 ---
 
@@ -177,7 +177,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:61](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/num.ts#L61)
+[src/utils/num.ts:61](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L61)
 
 ---
 
@@ -197,7 +197,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:68](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/num.ts#L68)
+[src/utils/num.ts:68](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L68)
 
 ---
 
@@ -217,7 +217,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:78](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/num.ts#L78)
+[src/utils/num.ts:78](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L78)
 
 ---
 
@@ -237,7 +237,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:88](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/num.ts#L88)
+[src/utils/num.ts:88](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L88)
 
 ---
 
@@ -261,7 +261,7 @@ an array of Bytes
 
 #### Defined in
 
-[src/utils/num.ts:99](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/num.ts#L99)
+[src/utils/num.ts:99](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L99)
 
 ---
 
@@ -283,7 +283,7 @@ Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
 
 #### Defined in
 
-[src/utils/num.ts:32](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/num.ts#L32)
+[src/utils/num.ts:32](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L32)
 
 ---
 
@@ -303,7 +303,7 @@ Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
 
 #### Defined in
 
-[src/utils/num.ts:65](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/num.ts#L65)
+[src/utils/num.ts:65](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L65)
 
 ---
 
@@ -323,7 +323,7 @@ Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
 
 #### Defined in
 
-[src/utils/num.ts:66](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/num.ts#L66)
+[src/utils/num.ts:66](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L66)
 
 ---
 
@@ -343,4 +343,4 @@ Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
 
 #### Defined in
 
-[src/utils/num.ts:92](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/num.ts#L92)
+[src/utils/num.ts:92](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L92)

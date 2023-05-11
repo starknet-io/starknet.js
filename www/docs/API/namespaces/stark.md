@@ -30,7 +30,7 @@ Compressed cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:22](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/stark.ts#L22)
+[src/utils/stark.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L22)
 
 ---
 
@@ -44,7 +44,7 @@ Compressed cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:28](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/stark.ts#L28)
+[src/utils/stark.ts:28](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L28)
 
 ---
 
@@ -64,7 +64,7 @@ Compressed cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:33](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/stark.ts#L33)
+[src/utils/stark.ts:33](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L33)
 
 ---
 
@@ -84,7 +84,7 @@ Compressed cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:37](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/stark.ts#L37)
+[src/utils/stark.ts:37](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L37)
 
 ---
 
@@ -104,7 +104,7 @@ Compressed cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:50](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/stark.ts#L50)
+[src/utils/stark.ts:50](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L50)
 
 ---
 
@@ -124,7 +124,7 @@ Compressed cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:54](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/stark.ts#L54)
+[src/utils/stark.ts:54](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L54)
 
 ---
 
@@ -145,4 +145,4 @@ Compressed cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:58](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/stark.ts#L58)
+[src/utils/stark.ts:58](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L58)

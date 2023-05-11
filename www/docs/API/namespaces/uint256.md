@@ -18,7 +18,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/uint256.ts:18](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/uint256.ts#L18)
+[src/utils/uint256.ts:18](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L18)
 
 ---
 
@@ -28,7 +28,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/uint256.ts:19](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/uint256.ts#L19)
+[src/utils/uint256.ts:19](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L19)
 
 ## Functions
 
@@ -48,7 +48,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/uint256.ts:14](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/uint256.ts#L14)
+[src/utils/uint256.ts:14](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L14)
 
 ---
 
@@ -68,7 +68,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/uint256.ts:21](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/uint256.ts#L21)
+[src/utils/uint256.ts:21](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L21)
 
 ---
 
@@ -88,4 +88,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/uint256.ts:26](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/uint256.ts#L26)
+[src/utils/uint256.ts:26](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L26)

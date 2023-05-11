@@ -20,7 +20,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:148](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L148)
+[src/types/provider.ts:148](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider.ts#L148)
 
 ---
 
@@ -30,4 +30,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:149](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L149)
+[src/types/provider.ts:149](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider.ts#L149)

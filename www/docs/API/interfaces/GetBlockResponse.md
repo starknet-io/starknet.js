@@ -14,7 +14,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:22](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L22)
+[src/types/provider.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider.ts#L22)
 
 ---
 
@@ -24,7 +24,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:23](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L23)
+[src/types/provider.ts:23](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider.ts#L23)
 
 ---
 
@@ -34,7 +34,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:24](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L24)
+[src/types/provider.ts:24](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider.ts#L24)
 
 ---
 
@@ -44,7 +44,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:25](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L25)
+[src/types/provider.ts:25](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider.ts#L25)
 
 ---
 
@@ -54,7 +54,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:26](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L26)
+[src/types/provider.ts:26](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider.ts#L26)
 
 ---
 
@@ -64,7 +64,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:27](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L27)
+[src/types/provider.ts:27](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider.ts#L27)
 
 ---
 
@@ -74,7 +74,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:28](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L28)
+[src/types/provider.ts:28](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider.ts#L28)
 
 ---
 
@@ -84,7 +84,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:29](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L29)
+[src/types/provider.ts:29](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider.ts#L29)
 
 ---
 
@@ -94,7 +94,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:30](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L30)
+[src/types/provider.ts:30](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider.ts#L30)
 
 ---
 
@@ -104,7 +104,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:31](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L31)
+[src/types/provider.ts:31](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider.ts#L31)
 
 ---
 
@@ -114,4 +114,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider.ts:32](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/types/provider.ts#L32)
+[src/types/provider.ts:32](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider.ts#L32)

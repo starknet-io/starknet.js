@@ -27,7 +27,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/typedData/types.ts:1](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/typedData/types.ts#L1)
+[src/utils/typedData/types.ts:1](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/types.ts#L1)
 
 ---
 
@@ -42,7 +42,7 @@ standard.
 
 #### Defined in
 
-[src/utils/typedData/types.ts:13](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/typedData/types.ts#L13)
+[src/utils/typedData/types.ts:13](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/types.ts#L13)
 
 ## Functions
 
@@ -62,7 +62,7 @@ standard.
 
 #### Defined in
 
-[src/utils/typedData/index.ts:21](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/typedData/index.ts#L21)
+[src/utils/typedData/index.ts:21](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/index.ts#L21)
 
 ---
 
@@ -82,7 +82,7 @@ type is StarkNetMerkleType
 
 #### Defined in
 
-[src/utils/typedData/index.ts:25](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/typedData/index.ts#L25)
+[src/utils/typedData/index.ts:25](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/index.ts#L25)
 
 ---
 
@@ -107,7 +107,7 @@ in the resulting array.
 
 #### Defined in
 
-[src/utils/typedData/index.ts:43](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/typedData/index.ts#L43)
+[src/utils/typedData/index.ts:43](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/index.ts#L43)
 
 ---
 
@@ -130,7 +130,7 @@ Encode a type to a string. All dependant types are alphabetically sorted.
 
 #### Defined in
 
-[src/utils/typedData/index.ts:99](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/typedData/index.ts#L99)
+[src/utils/typedData/index.ts:99](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/index.ts#L99)
 
 ---
 
@@ -153,7 +153,7 @@ Get a type string as hash.
 
 #### Defined in
 
-[src/utils/typedData/index.ts:117](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/typedData/index.ts#L117)
+[src/utils/typedData/index.ts:117](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/index.ts#L117)
 
 ---
 
@@ -179,7 +179,7 @@ an array of ABI compatible types, and an array of corresponding values.
 
 #### Defined in
 
-[src/utils/typedData/index.ts:130](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/typedData/index.ts#L130)
+[src/utils/typedData/index.ts:130](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/index.ts#L130)
 
 ---
 
@@ -210,7 +210,7 @@ dependant types are automatically encoded.
 
 #### Defined in
 
-[src/utils/typedData/index.ts:182](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/typedData/index.ts#L182)
+[src/utils/typedData/index.ts:182](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/index.ts#L182)
 
 ---
 
@@ -241,7 +241,7 @@ types are automatically encoded.
 
 #### Defined in
 
-[src/utils/typedData/index.ts:219](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/typedData/index.ts#L219)
+[src/utils/typedData/index.ts:219](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/index.ts#L219)
 
 ---
 
@@ -264,4 +264,4 @@ Get the EIP-191 encoded message to sign, from the typedData object.
 
 #### Defined in
 
-[src/utils/typedData/index.ts:234](https://github.com/PhilippeR26/starknet.js/blob/d3c8cca/src/utils/typedData/index.ts#L234)
+[src/utils/typedData/index.ts:234](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/index.ts#L234)
