@@ -252,11 +252,13 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
       const calldata = { publicKey: pubKey };
 
       // declare account
-      const declareAccount = await account.declare({
+      const declareAccount = await account.declareIfNot({
         contract: compiledC1Account,
         casm: compiledC1AccountCasm,
       });
-      await account.waitForTransaction(declareAccount.transaction_hash);
+      if (declareAccount.transaction_hash) {
+        await account.waitForTransaction(declareAccount.transaction_hash);
+      }
       const accountClassHash = declareAccount.class_hash;
 
       // fund new account
@@ -279,7 +281,7 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
       await account.waitForTransaction(transaction_hash);
 
       // deploy account
-      accountC1 = new Account(provider, toBeAccountAddress, priKey);
+      accountC1 = new Account(provider, toBeAccountAddress, priKey, '1');
       const deployed = await accountC1.deploySelf({
         classHash: accountClassHash,
         constructorCalldata: calldata,

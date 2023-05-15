@@ -59,7 +59,6 @@ export const transformCallsToMulticallArrays_cairo1 = (calls: Call[]) => {
   return callArray;
 };
 
-// TT: Can be removed ?
 /**
  * Transforms a list of calls in the full flattened calldata expected
  * by the __execute__ protocol.
@@ -67,7 +66,14 @@ export const transformCallsToMulticallArrays_cairo1 = (calls: Call[]) => {
  * @returns Calldata
  */
 export const fromCallsToExecuteCalldata_cairo1 = (calls: Call[]) => {
-  return CallData.compile({ calls });
+  // ensure property order
+  const orderCalls = calls.map((call) => ({
+    contractAddress: call.contractAddress,
+    entrypoint: call.entrypoint,
+    calldata: call.calldata,
+  }));
+
+  return CallData.compile({ orderCalls });
 };
 
 /**
@@ -78,7 +84,7 @@ export const fromCallsToExecuteCalldata_cairo1 = (calls: Call[]) => {
  */
 export const getExecuteCalldata = (calls: Call[], cairoVersion: CairoVersion = '0') => {
   if (cairoVersion === '1') {
-    return CallData.compile({ calls });
+    return fromCallsToExecuteCalldata_cairo1(calls);
   }
   return fromCallsToExecuteCalldata(calls);
 };
