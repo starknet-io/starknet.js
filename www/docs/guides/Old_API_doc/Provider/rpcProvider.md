@@ -302,7 +302,7 @@ type EventFilter = {
   fromBlock: string;
   toBlock: string;
   address: string;
-  keys: string[][];
+  keys: string[];
   page_size: number;
   page_number: number;
 };
