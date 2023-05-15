@@ -146,7 +146,7 @@ describeIfRpc('RPCProvider', () => {
           from_block: { block_number: 0 },
           to_block: { block_number: blockNumber },
           address: deploy.contract_address,
-          keys: [transferSelector],
+          keys: [[transferSelector]],
           chunk_size: 2,
         });
 
@@ -160,7 +160,7 @@ describeIfRpc('RPCProvider', () => {
           from_block: { block_number: 0 },
           to_block: { block_number: blockNumber },
           address: deploy.contract_address,
-          keys: [transferSelector],
+          keys: [[transferSelector]],
           chunk_size: 2,
           continuation_token: result.continuation_token,
         });
