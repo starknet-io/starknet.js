@@ -93,7 +93,7 @@ const myCallData = [
 // in Typescript, this object type is : `Calldata`
 ```
 
-Or you can use the function `stark.compileCalldata()`, that converts an object type to an `array of string` type.
+Or you can use the function `CallData.compile()`, that converts an object type to an `array of string` type.
 
 For a cairo contract, with this constructor :
 
@@ -107,7 +107,7 @@ You will have to create in your code this set of data :
 
 ```typescript
 const initialTk = uint256.bnToUint256(100);
-const ERC20ConstructorCallData = stark.compileCalldata({
+const ERC20ConstructorCallData = CallData.compile({
 	name: shortString.encodeShortString('MyToken'),
 	symbol: shortString.encodeShortString('MTK'),
 	decimals: "18",

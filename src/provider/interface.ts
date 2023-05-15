@@ -125,7 +125,7 @@ export abstract class ProviderInterface {
    * Gets the transaction information from a tx id.
    *
    * @param txHash
-   * @returns the transaction object { transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? }
+   * @returns the transaction object \{ transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? \}
    */
   public abstract getTransaction(transactionHash: BigNumberish): Promise<GetTransactionResponse>;
 
@@ -300,7 +300,9 @@ export abstract class ProviderInterface {
   /**
    * Wait for the transaction to be accepted
    * @param txHash - transaction hash
-   * @param retryInterval - retry interval
+   * @param options
+   * - (optional) retryInterval: number | undefined;
+   * - (optional) successStates: TransactionStatus[] | undefined;
    * @return GetTransactionReceiptResponse
    */
   public abstract waitForTransaction(

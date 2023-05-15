@@ -78,7 +78,7 @@ export class Provider implements ProviderInterface {
 
   public async getClassHashAt(
     contractAddress: string,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier?: BlockIdentifier
   ): Promise<string> {
     return this.provider.getClassHashAt(contractAddress, blockIdentifier);
   }

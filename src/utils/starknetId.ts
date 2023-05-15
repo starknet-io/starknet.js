@@ -100,18 +100,18 @@ export function useEncoded(decoded: string): bigint {
   return encoded;
 }
 
-export function getStarknetIdContract(chainId: StarknetChainId): string {
-  const starknetIdMainnetContract =
-    '0x6ac597f8116f886fa1c97a23fa4e08299975ecaf6b598873ca6792b9bbfb678';
-  const starknetIdTestnetContract =
-    '0x3bab268e932d2cecd1946f100ae67ce3dff9fd234119ea2f6da57d16d29fce';
+export const enum StarknetIdContract {
+  MAINNET = '0x6ac597f8116f886fa1c97a23fa4e08299975ecaf6b598873ca6792b9bbfb678',
+  TESTNET = '0x3bab268e932d2cecd1946f100ae67ce3dff9fd234119ea2f6da57d16d29fce',
+}
 
+export function getStarknetIdContract(chainId: StarknetChainId): string {
   switch (chainId) {
     case StarknetChainId.SN_MAIN:
-      return starknetIdMainnetContract;
+      return StarknetIdContract.MAINNET;
 
     case StarknetChainId.SN_GOERLI:
-      return starknetIdTestnetContract;
+      return StarknetIdContract.TESTNET;
 
     default:
       throw new Error('Starknet.id is not yet deployed on this network');

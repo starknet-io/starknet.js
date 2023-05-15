@@ -1,13 +1,27 @@
-name: PR/Push Development
+name: '[PR|Push] Development'
 on:
   pull_request:
     branches:
       - beta
       - develop
+    paths:
+      - '__mocks__/**'
+      - '__tests__/**'
+      - 'src/**'
+      - 'package*'
+      - 'ts*'
+      - '!www/**'
   push:
     branches:
       - beta
       - develop
+    paths:
+      - '__mocks__/**'
+      - '__tests__/**'
+      - 'src/**'
+      - 'package*'
+      - 'ts*'
+      - '!www/**'
 
 jobs:
   skip_check:
@@ -18,6 +32,8 @@ jobs:
     steps:
       - id: skip_duplicate
         uses: fkirc/skip-duplicate-actions@v5
+        with:
+          cancel_others: 'true'
 
   tests:
     name: Run test on ${{ matrix.name }}

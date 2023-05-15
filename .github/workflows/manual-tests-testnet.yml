@@ -1,4 +1,4 @@
-name: Manual Test Testnet
+name: '[Manual] Test Testnet'
 on: workflow_dispatch
 
 jobs:

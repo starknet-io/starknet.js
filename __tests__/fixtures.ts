@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { Account, ProviderInterface, RpcProvider, SequencerProvider, json } from '../src';
+import { BaseUrl } from '../src/constants';
 import {
   CompiledSierra,
   CompiledSierraCasm,
@@ -34,8 +35,12 @@ export const compiledMulticall = readContract('multicall');
 export const compiledTestDapp = readContract('TestDapp');
 export const compiledStarknetId = readContract('starknetId_compiled');
 export const compiledNamingContract = readContract('naming_compiled');
+export const compiledHashSierra = readContractSierra('cairo/hash/hash');
+export const compiledHashSierraCasm = readContractSierraCasm('cairo/hash/hash');
 export const compiledHelloSierra = readContractSierra('cairo/helloSierra/hello');
 export const compiledHelloSierraCasm = readContractSierraCasm('cairo/helloSierra/hello');
+export const compiledC1Account = readContractSierra('cairo/account/account');
+export const compiledC1AccountCasm = readContractSierraCasm('cairo/account/account');
 
 /* Default test config based on run `starknet-devnet --seed 0` */
 const DEFAULT_TEST_PROVIDER_SEQUENCER_URL = 'http://127.0.0.1:5050/';
@@ -60,6 +65,7 @@ export const IS_DEVNET_SEQUENCER = IS_LOCALHOST_DEVNET && !PROVIDER_URL.includes
 /* Definitions */
 export const IS_RPC = !!RPC_URL;
 export const IS_SEQUENCER = !RPC_URL;
+export const IS_SEQUENCER_TESTNET2 = PROVIDER_URL.includes(BaseUrl.SN_GOERLI2);
 
 export const getTestProvider = (): ProviderInterface => {
   const provider = RPC_URL
@@ -108,6 +114,7 @@ export const describeIfNotDevnet = describeIf(!IS_LOCALHOST_DEVNET);
 export const describeIfDevnet = describeIf(IS_LOCALHOST_DEVNET);
 export const describeIfDevnetRpc = describeIf(IS_DEVNET_RPC);
 export const describeIfDevnetSequencer = describeIf(IS_DEVNET_SEQUENCER);
+export const describeIfSequencerTestnet2 = describeIf(IS_SEQUENCER_TESTNET2);
 
 export const erc20ClassHash = '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a';
 export const wrongClassHash = '0x000000000000000000000000000000000000000000000000000000000000000';

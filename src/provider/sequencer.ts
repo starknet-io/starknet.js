@@ -30,6 +30,7 @@ import {
   TransactionType,
   waitForTransactionOptions,
 } from '../types';
+import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
 import { feeTransactionVersion, getSelector, getSelectorFromName } from '../utils/hash';
@@ -228,11 +229,11 @@ export class SequencerProvider implements ProviderInterface {
     const url = buildUrl(this.baseUrl, '', endpoint);
     const method = options?.method ?? 'GET';
     const headers = this.getHeaders(method);
-
+    const body = stringify(options?.body);
     try {
       const response = await fetch(url, {
         method,
-        body: stringify(options?.body),
+        body,
         headers,
       });
       const textResponse = await response.text();
@@ -275,7 +276,7 @@ export class SequencerProvider implements ProviderInterface {
         // sender_address: contractAddress,
         contract_address: contractAddress,
         entry_point_selector: getSelectorFromName(entryPointSelector),
-        calldata,
+        calldata: CallData.compile(calldata),
       }
     ).then(this.responseParser.parseCallContractResponse);
   }
@@ -329,7 +330,12 @@ export class SequencerProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<ContractClass> {
     return this.fetchEndpoint('get_full_contract', { blockIdentifier, contractAddress }).then(
-      parseContract
+      (res) => {
+        if (isSierra(res)) {
+          return this.responseParser.parseSierraContractClassResponse(res);
+        }
+        return parseContract(res);
+      }
     );
   }
 
@@ -344,9 +350,12 @@ export class SequencerProvider implements ProviderInterface {
     classHash: string,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<ContractClass> {
-    return this.fetchEndpoint('get_class_by_hash', { classHash, blockIdentifier }).then(
-      parseContract
-    );
+    return this.fetchEndpoint('get_class_by_hash', { classHash, blockIdentifier }).then((res) => {
+      if (isSierra(res)) {
+        return this.responseParser.parseSierraContractClassResponse(res);
+      }
+      return parseContract(res);
+    });
   }
 
   public async getCompiledClassByClassHash(
@@ -363,7 +372,7 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('add_transaction', undefined, {
       type: TransactionType.INVOKE,
       sender_address: functionInvocation.contractAddress,
-      calldata: bigNumberishArrayToDecimalStringArray(functionInvocation.calldata ?? []),
+      calldata: CallData.compile(functionInvocation.calldata ?? []),
       signature: signatureToDecimalArray(functionInvocation.signature),
       nonce: toHex(details.nonce),
       max_fee: toHex(details.maxFee || 0),
@@ -378,7 +387,7 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('add_transaction', undefined, {
       type: TransactionType.DEPLOY_ACCOUNT,
       contract_address_salt: addressSalt ?? randomAddress(),
-      constructor_calldata: bigNumberishArrayToDecimalStringArray(constructorCalldata ?? []),
+      constructor_calldata: CallData.compile(constructorCalldata ?? []),
       class_hash: toHex(classHash),
       max_fee: toHex(details.maxFee || 0),
       version: toHex(details.version || 0),
@@ -436,7 +445,7 @@ export class SequencerProvider implements ProviderInterface {
       {
         type: TransactionType.INVOKE,
         sender_address: invocation.contractAddress,
-        calldata: invocation.calldata ?? [],
+        calldata: CallData.compile(invocation.calldata ?? []),
         signature: signatureToDecimalArray(invocation.signature),
         version: toHex(invocationDetails?.version || 1),
         nonce: toHex(invocationDetails.nonce),
@@ -492,7 +501,7 @@ export class SequencerProvider implements ProviderInterface {
       {
         type: TransactionType.DEPLOY_ACCOUNT,
         class_hash: toHex(classHash),
-        constructor_calldata: bigNumberishArrayToDecimalStringArray(constructorCalldata || []),
+        constructor_calldata: CallData.compile(constructorCalldata || []),
         contract_address_salt: toHex(addressSalt || 0),
         signature: signatureToDecimalArray(signature),
         version: toHex(details?.version || 0),
@@ -511,7 +520,7 @@ export class SequencerProvider implements ProviderInterface {
         res = {
           type: invocation.type,
           sender_address: invocation.contractAddress,
-          calldata: invocation.calldata ?? [],
+          calldata: CallData.compile(invocation.calldata ?? []),
         };
       } else if (invocation.type === 'DECLARE') {
         res = {
@@ -523,9 +532,7 @@ export class SequencerProvider implements ProviderInterface {
         res = {
           type: invocation.type,
           class_hash: toHex(toBigInt(invocation.classHash)),
-          constructor_calldata: bigNumberishArrayToDecimalStringArray(
-            invocation.constructorCalldata || []
-          ),
+          constructor_calldata: CallData.compile(invocation.constructorCalldata || []),
           contract_address_salt: toHex(toBigInt(invocation.addressSalt || 0)),
         };
       }
@@ -587,7 +594,7 @@ export class SequencerProvider implements ProviderInterface {
    * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L48-L52)
    *
    * @param txHash
-   * @returns the transaction status object { block_number, tx_status: NOT_RECEIVED | RECEIVED | PENDING | REJECTED | ACCEPTED_ONCHAIN }
+   * @returns the transaction status object \{ block_number, tx_status: NOT_RECEIVED | RECEIVED | PENDING | REJECTED | ACCEPTED_ONCHAIN \}
    */
   public async getTransactionStatus(txHash: BigNumberish): Promise<GetTransactionStatusResponse> {
     const txHashHex = toHex(txHash);
@@ -641,7 +648,7 @@ export class SequencerProvider implements ProviderInterface {
       {
         type: 'INVOKE_FUNCTION',
         sender_address: invocation.contractAddress,
-        calldata: invocation.calldata ?? [],
+        calldata: CallData.compile(invocation.calldata ?? []),
         signature: signatureToDecimalArray(invocation.signature),
         version: toHex(invocationDetails?.version || 1),
         nonce: toHex(invocationDetails.nonce),

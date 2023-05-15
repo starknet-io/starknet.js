@@ -1,3 +1,89 @@
+# [5.10.0](https://github.com/0xs34n/starknet.js/compare/v5.9.2...v5.10.0) (2023-05-10)
+
+### Bug Fixes
+
+- merge next and cleanup ([067673f](https://github.com/0xs34n/starknet.js/commit/067673ffbc9f414c33018d5cd83c29a001c5e9ab))
+- nested 2d arrays request and response ([cccf518](https://github.com/0xs34n/starknet.js/commit/cccf518acc950bfed7579513c812df33cebb774d))
+- ts getClassHashAt oprional blockid ([f54bfd0](https://github.com/0xs34n/starknet.js/commit/f54bfd0e9591d1ec1dccf20668de68272834fa46))
+
+### Features
+
+- declareIfNot, update declareAndDeploy with it, cleanup cairo1 test ([494dbb8](https://github.com/0xs34n/starknet.js/commit/494dbb8a84608415a279b2bfa84103667321a84e))
+- improve usage by extending RawCalldata to RawArgs in all major flows ([0ef1ec8](https://github.com/0xs34n/starknet.js/commit/0ef1ec8624e294a526f8e97d856e70b6426a9ae3))
+- make cairoVersion a property of Account ([b6a7d38](https://github.com/0xs34n/starknet.js/commit/b6a7d38e98c65e24cffac5485819797560b5571c))
+
+## [5.9.2](https://github.com/0xs34n/starknet.js/compare/v5.9.1...v5.9.2) (2023-05-03)
+
+### Bug Fixes
+
+- revert doc changes ([356b04d](https://github.com/0xs34n/starknet.js/commit/356b04d94a398ba7642cae6bffa8961213dda33c))
+
+## [5.9.1](https://github.com/0xs34n/starknet.js/compare/v5.9.0...v5.9.1) (2023-05-02)
+
+### Bug Fixes
+
+- add tests for uint256 ([5914170](https://github.com/0xs34n/starknet.js/commit/5914170770fd75909779a6b7e7b3cb2c6b1b2a9f))
+- correct test ([a35548e](https://github.com/0xs34n/starknet.js/commit/a35548e4d9892630645645bb43737ea2e2ae79a5))
+- uint256 in contract call ([0cc05e0](https://github.com/0xs34n/starknet.js/commit/0cc05e073bc025c2afdc5105b5b87e5d23c1d487))
+
+# [5.9.0](https://github.com/0xs34n/starknet.js/compare/v5.8.0...v5.9.0) (2023-04-28)
+
+### Features
+
+- complex c1 Struct with forced abi, complex ci arrays, refactor parser ([8f28462](https://github.com/0xs34n/starknet.js/commit/8f2846290a88c7b3b2985f32c61446a378566679))
+- helpers toHex, Calldata, executeCallData, compile entrypoint, type improvements ([a452d64](https://github.com/0xs34n/starknet.js/commit/a452d64f1aa4e1005378bbba4d7748a054cae2be))
+
+# [5.8.0](https://github.com/0xs34n/starknet.js/compare/v5.7.0...v5.8.0) (2023-04-26)
+
+### Bug Fixes
+
+- contract types, interface, cleanup, extend tests ([02c6b72](https://github.com/0xs34n/starknet.js/commit/02c6b72ec41016fdd75537044889e7cffd624b27))
+- contractfactory, contract, interface cleanup cleanup & ts ([b25047e](https://github.com/0xs34n/starknet.js/commit/b25047ece2eed313eaa776b2a132b9a04c3fbc2f))
+- lapsus lingua, dangling, cleanup 🚀 ([a79d55c](https://github.com/0xs34n/starknet.js/commit/a79d55c2990e81bc6b0e58583142d3eb7bbddfa2))
+- prevent missusage of cairoVersion on deploy ([d920dbe](https://github.com/0xs34n/starknet.js/commit/d920dbe6144006438c917727b153a043fec2531b))
+- remove unused cairoVersion from Contract ([e4fcf24](https://github.com/0xs34n/starknet.js/commit/e4fcf244fa1dfd01301addfa7492bf90dac5a854))
+
+### Features
+
+- boolean to felt - cairo 1, compile() ([ef34e0a](https://github.com/0xs34n/starknet.js/commit/ef34e0a25a52be7a6ac76714bda43233a2f1a6f1))
+- remove deprecated compileCalldata ([e5adca4](https://github.com/0xs34n/starknet.js/commit/e5adca449a9d1142339d5e63adb857698c5913d6))
+
+# [5.7.0](https://github.com/0xs34n/starknet.js/compare/v5.6.1...v5.7.0) (2023-04-25)
+
+### Features
+
+- expose more starknetId addresses ([863736e](https://github.com/0xs34n/starknet.js/commit/863736e0d1daf30b9b6c1bab7c5213cda29f3d61))
+
+## [5.6.1](https://github.com/0xs34n/starknet.js/compare/v5.6.0...v5.6.1) (2023-04-21)
+
+### Bug Fixes
+
+- uint256 struct ([4ce2d02](https://github.com/0xs34n/starknet.js/commit/4ce2d0255594831e7ad816368e3cfa14449feaa5))
+- uint256, view bool, compiled in contract.call ([346cd51](https://github.com/0xs34n/starknet.js/commit/346cd5197d377966d148a8b218e6ee03af7170f2))
+
+# [5.6.0](https://github.com/0xs34n/starknet.js/compare/v5.5.0...v5.6.0) (2023-04-19)
+
+### Bug Fixes
+
+- optional param in contract invoke ([da094e4](https://github.com/0xs34n/starknet.js/commit/da094e4172ed43ce93604e92adbba2a5ecb1498e))
+
+### Features
+
+- cairo 1 bool ([52fed30](https://github.com/0xs34n/starknet.js/commit/52fed30f04b70bcce80f829dba6975101f6f3644))
+- cairo1 array, fix invoke response, hash separate test ([4637cd7](https://github.com/0xs34n/starknet.js/commit/4637cd74481ba85b3164ddb93c258b9ca8b9b949))
+- felt252 implementation ([3d20ea4](https://github.com/0xs34n/starknet.js/commit/3d20ea44b49d1c7ba90d8a46a307f54e737c3285))
+- uint validate and parsing supprot ([c1acd29](https://github.com/0xs34n/starknet.js/commit/c1acd298d63758ba27fc20bcb4b0c00cca82078f))
+
+# [5.5.0](https://github.com/0xs34n/starknet.js/compare/v5.4.2...v5.5.0) (2023-04-10)
+
+### Bug Fixes
+
+- update DeclareAndDeploy with cairo 1 declare ([71072cf](https://github.com/0xs34n/starknet.js/commit/71072cffadb8ac118780cec21cb8c4f83e74d7ae))
+
+### Features
+
+- response parsing and types ([09a46af](https://github.com/0xs34n/starknet.js/commit/09a46af02e88376dc49e0aa39468fded99b94ee2))
+
 ## [5.4.2](https://github.com/0xs34n/starknet.js/compare/v5.4.1...v5.4.2) (2023-04-04)
 
 ### Bug Fixes

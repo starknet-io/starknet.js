@@ -23,11 +23,11 @@ jobs:
         # deactivation argument to be set since the service configuration lacks a corresponding
         # functionality; https://github.com/actions/runner/issues/2276.
         # It was generated from the following Dockerfile:
-        #   FROM shardlabs/starknet-devnet:0.5.0a1-seed0
-        #   CMD ["--disable-rpc-request-validation"]
+        #   FROM shardlabs/starknet-devnet:0.5.1-seed0
+        #   CMD ["--disable-rpc-request-validation", "--timeout", "600"]
         # Switch back to the standard Devnet image once a full release is available.
-        image: penovicp/devnet-test:0.5.0a1
-        # image: shardlabs/starknet-devnet:0.5.0a1-seed0
+        image: penovicp/devnet-test:0.5.1
+        # image: shardlabs/starknet-devnet:0.5.1-seed0
         ports:
           - 5050:5050
 

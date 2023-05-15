@@ -20,8 +20,8 @@ type TXN_STATUS = 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
 export type TXN_TYPE = 'DECLARE' | 'DEPLOY' | 'DEPLOY_ACCOUNT' | 'INVOKE' | 'L1_HANDLER';
 type BLOCK_STATUS = 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
 enum BLOCK_TAG {
-  'latest',
-  'pending',
+  latest = 'latest',
+  pending = 'pending',
 }
 type BLOCK_ID = { block_hash: BLOCK_HASH } | { block_number: BLOCK_NUMBER } | BLOCK_TAG;
 type MSG_TO_L1 = {
@@ -306,10 +306,10 @@ type PENDING_STATE_UPDATE = {
 };
 type STORAGE_KEY = string;
 type EVENT_FILTER = {
-  from_block?: BLOCK_ID;
-  to_block?: BLOCK_ID;
-  address?: ADDRESS;
-  keys?: Array<Array<FELT>>;
+  from_block: BLOCK_ID;
+  to_block: BLOCK_ID;
+  address: ADDRESS;
+  keys: Array<Array<FELT>>;
 };
 type EVENTS_CHUNK = {
   events: Array<EMITTED_EVENT>;

@@ -16,6 +16,7 @@ export type FunctionAbi = {
   name: string;
   outputs: AbiEntry[];
   stateMutability?: 'view';
+  state_mutability?: string; // Cairo 1 Abi
   type: FunctionAbiType;
 };
 

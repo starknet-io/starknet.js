@@ -6,7 +6,8 @@ export type CairoAssembly = {
   prime: string;
   compiler_version: string;
   bytecode: ByteCode;
-  hints: Hints;
+  hints: any[];
+  pythonic_hints: PythonicHints;
   entry_points_by_type: EntryPointsByType;
 };
 
@@ -24,7 +25,7 @@ export type CompiledSierraCasm = CairoAssembly;
 
 /** SUBTYPES */
 export type ByteCode = string[];
-export type Hints = [number, string[]][];
+export type PythonicHints = [number, string[]][];
 
 export type SierraProgramDebugInfo = {
   type_names: [number, string][];

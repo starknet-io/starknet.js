@@ -11,8 +11,10 @@ import {
   GetBlockResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
+  HexCalldata,
   InvokeFunctionResponse,
   Sequencer,
+  SierraContractClass,
   StateUpdateResponse,
   TransactionSimulationResponse,
 } from '../../types';
@@ -36,7 +38,7 @@ export class SequencerAPIResponseParser extends ResponseParser {
   ): GetTransactionResponse {
     return {
       ...res,
-      calldata: 'calldata' in res.transaction ? (res.transaction.calldata as Array<string>) : [],
+      calldata: 'calldata' in res.transaction ? (res.transaction.calldata as HexCalldata) : [],
       contract_class:
         'contract_class' in res.transaction ? (res.transaction.contract_class as any) : undefined,
       entry_point_selector:
@@ -209,6 +211,14 @@ export class SequencerAPIResponseParser extends ResponseParser {
         storage_diffs,
         nonces,
       },
+    };
+  }
+
+  // TODO: Define response as new type as it diff from ContractClass
+  public parseSierraContractClassResponse(res: any): SierraContractClass {
+    return {
+      ...res,
+      abi: JSON.parse(res.abi),
     };
   }
 }

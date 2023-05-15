@@ -21,7 +21,7 @@ Create an account is a bit tricky ; you have several steps :
 Here, we will create a wallet with the Open Zeppelin smart contract v0.5.1. The contract class is already implemented in both Testnet 1 & 2.
 
 ```typescript
-import { Account, ec, json, stark, Provider, hash } from "starknet";
+import { Account, ec, json, stark, Provider, hash, CallData } from "starknet";
 ```
 
 ### compute address :
@@ -40,7 +40,7 @@ console.log('publicKey=', starkKeyPub);
 
 const OZaccountClassHash = "0x2794ce20e5f2ff0d40e632cb53845b9f4e526ebd8471983f7dbd355b721d5a";
 // Calculate future address of the account
-const OZaccountConstructorCallData = stark.compileCalldata({ publicKey: starkKeyPub });
+const OZaccountConstructorCallData = CallData.compile({ publicKey: starkKeyPub });
 const OZcontractAddress = hash.calculateContractAddressFromHash(
     starkKeyPub,
     OZaccountClassHash,
@@ -90,7 +90,7 @@ Here, we will create a wallet with the Argent smart contract v0.2.3. This case i
 > If necessary OZ contracts can also be created with a proxy.
 
 ```typescript
-import { Account, ec, json, stark, Provider, hash } from "starknet";
+import { Account, ec, json, stark, Provider, hash, CallData } from "starknet";
 ```
 
 ### compute address
@@ -111,10 +111,10 @@ const starkKeyPubAX = ec.getStarkKey(starkKeyPairAX);
 console.log('AX_ACCOUNT_PUBLIC_KEY=', starkKeyPubAX);
 
 // Calculate future address of the ArgentX account
-const AXproxyConstructorCallData = stark.compileCalldata({
+const AXproxyConstructorCallData = CallData.compile({
     implementation: argentXaccountClassHash,
     selector: hash.getSelectorFromName("initialize"),
-    calldata: stark.compileCalldata({ signer: starkKeyPubAX, guardian: "0" }),
+    calldata: CallData.compile({ signer: starkKeyPubAX, guardian: "0" }),
 });
 const AXcontractAddress = hash.calculateContractAddressFromHash(
     starkKeyPubAX,
@@ -177,7 +177,7 @@ Here is an example of a customized wallet, including super administrator managem
 > launch `starknet-devnet --seed 0` before using this script
 
 ```typescript
-import { Account, ec, json, stark, Provider, hash } from "starknet";
+import { Account, ec, json, stark, Provider, hash, CallData } from "starknet";
 import axios from "axios";
 ```
 
@@ -210,7 +210,7 @@ console.log('Customized account class hash =', decCH);
 await provider.waitForTransaction(declTH);
 
 // Calculate future address of the account
-const AAaccountConstructorCallData = stark.compileCalldata({
+const AAaccountConstructorCallData = CallData.compile({
     super_admin_address: account0.address,
     publicKey: AAstarkKeyPub
 });

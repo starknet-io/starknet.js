@@ -61,7 +61,7 @@ const compiledErc20mintable = json.parse(fs.readFileSync("compiled_contracts/ERC
 const ERC20mintableClassHash = "0x795be772eab12ee65d5f3d9e8922d509d6672039978acc98697c0a563669e8";
 const initialTk = { low: 100, high: 0 };
 
-const ERC20ConstructorCallData = stark.compileCalldata({
+const ERC20ConstructorCallData = CallData.compile({
     name: shortString.encodeShortString('MyToken'),
     symbol: shortString.encodeShortString('MTK'),
     decimals: "18",
@@ -117,7 +117,7 @@ console.log("account0 has a balance of :", uint256.uint256ToBN(balanceBeforeTran
 // Execute tx transfer of 10 tokens
 console.log(`Invoke Tx - Transfer 10 tokens back to erc20 contract...`);
 const toTransferTk: uint256.Uint256 = uint256.bnToUint256(10);
-const transferCallData = stark.compileCalldata({
+const transferCallData = CallData.compile({
 	recipient: erc20Address,
 	initial_supply: { type: 'struct', low: toTransferTk.low, high: toTransferTk.high }
 });

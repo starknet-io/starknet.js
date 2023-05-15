@@ -1,22 +1,35 @@
 import { StarknetChainId } from '../../constants';
 import { weierstrass } from '../../utils/ec';
 import type { BigNumberish } from '../../utils/num';
+import { Uint256 } from '../../utils/uint256';
 import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 
 export type WeierstrassSignatureType = weierstrass.SignatureType;
 export type ArraySignatureType = string[];
 export type Signature = ArraySignatureType | WeierstrassSignatureType;
 
+/**
+ * BigNumberish array
+ * use CallData.compile() to convert to Calldata
+ */
 export type RawCalldata = BigNumberish[];
+
+/**
+ * Hexadecimal-string array
+ */
+export type HexCalldata = string[];
+
 export type AllowArray<T> = T | T[];
-export type RawArgs =
-  | {
-      [inputName: string]:
-        | BigNumberish
-        | BigNumberish[]
-        | { type: 'struct'; [k: string]: BigNumberish };
-    }
-  | BigNumberish[];
+
+export type RawArgs = RawArgsObject | RawArgsArray;
+
+export type RawArgsObject = {
+  [inputName: string]: MultiType | MultiType[] | RawArgs;
+};
+
+export type RawArgsArray = Array<MultiType | MultiType[] | RawArgs>;
+
+export type MultiType = BigNumberish | Uint256 | object | boolean;
 
 export type UniversalDeployerContractPayload = {
   classHash: BigNumberish;
@@ -25,6 +38,9 @@ export type UniversalDeployerContractPayload = {
   constructorCalldata?: RawArgs;
 };
 
+/**
+ * @deprecated deprecated due to no direct deploy, unused - can be removed
+ */
 export type DeployContractPayload = {
   contract: CompiledContract | string;
   constructorCalldata?: RawCalldata;
@@ -33,7 +49,7 @@ export type DeployContractPayload = {
 
 export type DeployAccountContractPayload = {
   classHash: string;
-  constructorCalldata?: RawCalldata;
+  constructorCalldata?: RawArgs;
   addressSalt?: BigNumberish;
   contractAddress?: string;
 };
@@ -71,7 +87,7 @@ export type DeclareContractTransaction = {
 
 export type CallDetails = {
   contractAddress: string;
-  calldata?: RawCalldata;
+  calldata?: RawArgs;
 };
 
 export type Invocation = CallDetails & { signature?: Signature };
@@ -84,7 +100,6 @@ export type InvocationsDetails = {
   nonce?: BigNumberish;
   maxFee?: BigNumberish;
   version?: BigNumberish;
-  cairoVersion?: CairoVersion;
 };
 
 /**

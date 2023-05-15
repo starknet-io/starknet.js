@@ -20,11 +20,12 @@ import {
   TransactionStatus,
   waitForTransactionOptions,
 } from '../types';
+import { CallData } from '../utils/calldata';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
-import { BigNumberish, bigNumberishArrayToHexadecimalStringArray, toHex } from '../utils/num';
-import { parseCalldata, wait } from '../utils/provider';
+import { BigNumberish, toHex } from '../utils/num';
+import { wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { signatureToHexArray } from '../utils/stark';
 import { LibraryError } from './errors';
@@ -245,7 +246,7 @@ export class RpcProvider implements ProviderInterface {
           return {
             type: RPC.TransactionType.INVOKE,
             sender_address: invocation.contractAddress,
-            calldata: parseCalldata(invocation.calldata),
+            calldata: CallData.toHex(invocation.calldata),
             signature: signatureToHexArray(invocation.signature),
             version: toHex(invocation.version || 0),
             nonce: toHex(invocation.nonce),
@@ -274,9 +275,7 @@ export class RpcProvider implements ProviderInterface {
 
         return {
           type: RPC.TransactionType.DEPLOY_ACCOUNT,
-          constructor_calldata: bigNumberishArrayToHexadecimalStringArray(
-            invocation.constructorCalldata || []
-          ),
+          constructor_calldata: CallData.toHex(invocation.constructorCalldata || []),
           class_hash: toHex(invocation.classHash),
           contract_address_salt: toHex(invocation.addressSalt || 0),
           signature: signatureToHexArray(invocation.signature),
@@ -308,7 +307,7 @@ export class RpcProvider implements ProviderInterface {
         {
           type: RPC.TransactionType.INVOKE,
           sender_address: invocation.contractAddress,
-          calldata: parseCalldata(invocation.calldata),
+          calldata: CallData.toHex(invocation.calldata),
           signature: signatureToHexArray(invocation.signature),
           version: toHex(invocationDetails?.version || 0),
           nonce: toHex(invocationDetails.nonce),
@@ -358,9 +357,7 @@ export class RpcProvider implements ProviderInterface {
       request: [
         {
           type: RPC.TransactionType.DEPLOY_ACCOUNT,
-          constructor_calldata: bigNumberishArrayToHexadecimalStringArray(
-            constructorCalldata || []
-          ),
+          constructor_calldata: CallData.toHex(constructorCalldata || []),
           class_hash: toHex(classHash),
           contract_address_salt: toHex(addressSalt || 0),
           signature: signatureToHexArray(signature),
@@ -412,7 +409,7 @@ export class RpcProvider implements ProviderInterface {
   ): Promise<DeployContractResponse> {
     return this.fetchEndpoint('starknet_addDeployAccountTransaction', {
       deploy_account_transaction: {
-        constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
+        constructor_calldata: CallData.toHex(constructorCalldata || []),
         class_hash: toHex(classHash),
         contract_address_salt: toHex(addressSalt || 0),
         type: RPC.TransactionType.DEPLOY_ACCOUNT,
@@ -431,7 +428,7 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_addInvokeTransaction', {
       invoke_transaction: {
         sender_address: functionInvocation.contractAddress,
-        calldata: parseCalldata(functionInvocation.calldata),
+        calldata: CallData.toHex(functionInvocation.calldata),
         type: RPC.TransactionType.INVOKE,
         max_fee: toHex(details.maxFee || 0),
         version: '0x1',
@@ -451,7 +448,7 @@ export class RpcProvider implements ProviderInterface {
       request: {
         contract_address: call.contractAddress,
         entry_point_selector: getSelectorFromName(call.entrypoint),
-        calldata: parseCalldata(call.calldata),
+        calldata: CallData.toHex(call.calldata),
       },
       block_id,
     });

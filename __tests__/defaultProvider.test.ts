@@ -1,4 +1,4 @@
-import { BlockNumber, GetBlockResponse, LibraryError, Provider, stark } from '../src';
+import { BlockNumber, CallData, GetBlockResponse, LibraryError, Provider, stark } from '../src';
 import { toBigInt } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import {
@@ -9,8 +9,6 @@ import {
   wrongClassHash,
 } from './fixtures';
 import { initializeMatcher } from './schema';
-
-const { compileCalldata } = stark;
 
 const testProvider = new Provider(getTestProvider());
 
@@ -87,12 +85,12 @@ describe('defaultProvider', () => {
 
     test('getClassAt(contractAddress, blockNumber="latest")', async () => {
       const classResponse = await testProvider.getClassAt(erc20ContractAddress);
-      expect(classResponse).toMatchSchemaRef('ContractClass');
+      expect(classResponse).toMatchSchemaRef('LegacyContractClass');
     });
 
-    test('GetClassByHash', async () => {
+    test('getClassByHash', async () => {
       const classResponse = await testProvider.getClassByHash(erc20ClassHash);
-      expect(classResponse).toMatchSchemaRef('ContractClass');
+      expect(classResponse).toMatchSchemaRef('LegacyContractClass');
     });
 
     describe('getStorageAt', () => {
@@ -133,7 +131,7 @@ describe('defaultProvider', () => {
           testProvider.callContract({
             contractAddress: erc20ContractAddress,
             entrypoint: 'balanceOf',
-            calldata: compileCalldata({
+            calldata: CallData.compile({
               user: '0x9ff64f4ab0e1fe88df4465ade98d1ea99d5732761c39279b8e1374fa943e9b',
             }),
           })
@@ -146,7 +144,7 @@ describe('defaultProvider', () => {
             .callContract({
               contractAddress: erc20ContractAddress,
               entrypoint: 'balanceOf',
-              calldata: compileCalldata({
+              calldata: CallData.compile({
                 user: wallet,
               }),
             })
@@ -161,7 +159,7 @@ describe('defaultProvider', () => {
           testProvider.callContract({
             contractAddress: erc20ContractAddress,
             entrypoint: 'non_existent_entrypoint',
-            calldata: compileCalldata({
+            calldata: CallData.compile({
               user: '0xdeadbeef',
             }),
           })

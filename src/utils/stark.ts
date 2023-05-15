@@ -1,14 +1,7 @@
 import { getStarkKey, utils } from 'micro-starknet';
 import { gzip } from 'pako';
 
-import {
-  ArraySignatureType,
-  Calldata,
-  CompressedProgram,
-  Program,
-  RawArgs,
-  Signature,
-} from '../types';
+import { ArraySignatureType, CompressedProgram, Program, Signature } from '../types';
 import { addHexPrefix, btoaUniversal } from './encode';
 import { stringify } from './json';
 import {
@@ -60,27 +53,6 @@ export function signatureToDecimalArray(sig?: Signature): ArraySignatureType {
 
 export function signatureToHexArray(sig?: Signature): ArraySignatureType {
   return bigNumberishArrayToHexadecimalStringArray(formatSignature(sig));
-}
-
-/**
- * @deprecated this function is deprecated use callData instead from calldata.ts
- */
-export function compileCalldata(args: RawArgs): Calldata {
-  const compiledData = Object.values(args).flatMap((value) => {
-    if (Array.isArray(value))
-      return [toBigInt(value.length).toString(), ...value.map((x) => toBigInt(x).toString())];
-    if (typeof value === 'object' && 'type' in value)
-      return Object.entries<BigNumberish>(value)
-        .filter(([k]) => k !== 'type')
-        .map(([, v]) => toBigInt(v).toString());
-    return toBigInt(value).toString();
-  });
-  Object.defineProperty(compiledData, 'compiled', {
-    enumerable: false,
-    writable: false,
-    value: true,
-  });
-  return compiledData;
 }
 
 export function estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: number = 0.5): bigint {
