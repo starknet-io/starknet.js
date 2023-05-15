@@ -156,11 +156,11 @@ export interface StateUpdateResponse {
   old_root: string;
   state_diff: {
     storage_diffs: RPC.StorageDiffs; // API DIFF
-    declared_contract_hashes?: RPC.DeclaredContractHashes; // RPC only
     deployed_contracts: Sequencer.DeployedContracts;
     nonces: RPC.Nonces; // API DIFF
     old_declared_contracts?: Sequencer.OldDeclaredContracts; // Sequencer Only
-    declared_classes?: Sequencer.DeclaredClasses; // Sequencer Only
-    replaced_classes?: Sequencer.ReplacedClasses; // Sequencer Only
+    declared_classes?: Sequencer.DeclaredClasses;
+    replaced_classes?: Sequencer.ReplacedClasses | RPC.ReplacedClasses;
+    deprecated_declared_classes?: RPC.DeprecatedDeclaredClasses; // RPC Only
   };
 }

@@ -54,9 +54,10 @@ export namespace RPC {
 
   // Exported Diff on Sequencer (can be removed when diff resolved by new RPC v)
   export type StorageDiffs = Array<CONTRACT_STORAGE_DIFF_ITEM>;
-  export type DeclaredContractHashes = Array<FELT>;
+  export type DeprecatedDeclaredClasses = Array<FELT>;
   export type Nonces = Array<{
     contract_address: ADDRESS;
     nonce: FELT;
   }>;
+  export type ReplacedClasses = Array<{ contract_address: ADDRESS; class_hash: FELT }>;
 }
