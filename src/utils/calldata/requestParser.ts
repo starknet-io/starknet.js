@@ -101,6 +101,15 @@ function parseCalldataValue(
       return acc.concat(parsedData);
     }, [] as string[]);
   }
+  // check if u256
+  if (isTypeUint256(type)) {
+    if (typeof element === 'object') {
+      const { low, high } = element;
+      return [felt(low as BigNumberish), felt(high as BigNumberish)];
+    }
+    const el_uint256 = uint256(element);
+    return [felt(el_uint256.low), felt(el_uint256.high)];
+  }
   if (typeof element === 'object') {
     throw Error(`Parameter ${element} do not align with abi parameter ${type}`);
   }
