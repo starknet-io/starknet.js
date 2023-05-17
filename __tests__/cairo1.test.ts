@@ -107,8 +107,13 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
     });
 
     test('Cairo 1 - uint256', async () => {
+      // defined as number
       const result = await cairo1Contract.test_u256(2n ** 256n - 2n);
       expect(result).toBe(2n ** 256n - 1n);
+
+      // defined as struct
+      const result1 = await cairo1Contract.test_u256(cairo.uint256(2n ** 256n - 2n));
+      expect(result1).toBe(2n ** 256n - 1n);
     });
 
     test('Cairo 1 Contract Interaction - bool', async () => {
@@ -151,8 +156,18 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
       const status = await cairo1Contract.echo_array([123, 55, 77, 255]);
       expect(status).toEqual([123n, 55n, 77n, 255n]);
 
+      // uint256 defiend as number
       const status1 = await cairo1Contract.echo_array_u256([123, 55, 77, 255]);
       expect(status1).toEqual([123n, 55n, 77n, 255n]);
+
+      // uint256 defined as struct
+      const status11 = await cairo1Contract.echo_array_u256([
+        cairo.uint256(123),
+        cairo.uint256(55),
+        cairo.uint256(77),
+        cairo.uint256(255),
+      ]);
+      expect(status11).toEqual([123n, 55n, 77n, 255n]);
 
       const status2 = await cairo1Contract.echo_array_bool([true, true, false, false]);
       expect(status2).toEqual([true, true, false, false]);
