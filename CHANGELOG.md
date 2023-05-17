@@ -1,3 +1,9 @@
+## [5.10.2](https://github.com/0xs34n/starknet.js/compare/v5.10.1...v5.10.2) (2023-05-17)
+
+### Bug Fixes
+
+- use of uint256 in array in calls ([969b3c1](https://github.com/0xs34n/starknet.js/commit/969b3c1670902d7cc55156d5b3f6a8e7d45c731b))
+
 ## [5.10.1](https://github.com/0xs34n/starknet.js/compare/v5.10.0...v5.10.1) (2023-05-16)
 
 ### Bug Fixes
