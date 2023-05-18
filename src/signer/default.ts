@@ -62,7 +62,7 @@ export class Signer implements SignerInterface {
     version,
     chainId,
     nonce,
-  }: DeployAccountSignerDetails) {
+  }: DeployAccountSignerDetails): Promise<Signature> {
     const msgHash = calculateDeployAccountTransactionHash(
       contractAddress,
       classHash,
@@ -88,7 +88,7 @@ export class Signer implements SignerInterface {
       nonce,
       compiledClassHash,
     }: DeclareSignerDetails
-  ) {
+  ): Promise<Signature> {
     const msgHash = calculateDeclareTransactionHash(
       classHash,
       senderAddress,

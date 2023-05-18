@@ -84,9 +84,9 @@
     "lint-staged": "^13.0.1",
     "prettier": "^2.7.0",
     "prettier-plugin-import-sort": "^0.0.7",
-    "tsup": "~6.3.0",
-    "typedoc": "^0.22.17",
-    "typescript": "^4.7.3"
+    "tsup": "^6.7.0",
+    "typedoc": "^0.24.7",
+    "typescript": "^5.0.4"
   },
   "dependencies": {
     "@noble/curves": "^0.8.2",
