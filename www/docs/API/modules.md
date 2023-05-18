@@ -1,29 +1,10 @@
 ---
 id: 'modules'
-title: 'Starknet.js API - v5.10.1'
+title: 'Starknet.js API - v5.10.2'
 sidebar_label: 'Exports'
 sidebar_position: 0.5
 custom_edit_url: null
 ---
-
-## Classes
-
-- [Contract](classes/Contract.md)
-- [ContractInterface](classes/ContractInterface.md)
-- [ContractFactory](classes/ContractFactory.md)
-- [Provider](classes/Provider.md)
-- [CustomError](classes/CustomError.md)
-- [LibraryError](classes/LibraryError.md)
-- [GatewayError](classes/GatewayError.md)
-- [HttpError](classes/HttpError.md)
-- [SequencerProvider](classes/SequencerProvider.md)
-- [ProviderInterface](classes/ProviderInterface.md)
-- [RpcProvider](classes/RpcProvider.md)
-- [Account](classes/Account.md)
-- [AccountInterface](classes/AccountInterface.md)
-- [SignerInterface](classes/SignerInterface.md)
-- [Signer](classes/Signer.md)
-- [CallData](classes/CallData.md)
 
 ## Namespaces
 
@@ -49,6 +30,25 @@ custom_edit_url: null
 - [TransactionStatus](enums/TransactionStatus.md)
 - [TransactionType](enums/TransactionType.md)
 - [EntryPointType](enums/EntryPointType.md)
+
+## Classes
+
+- [Contract](classes/Contract.md)
+- [ContractInterface](classes/ContractInterface.md)
+- [ContractFactory](classes/ContractFactory.md)
+- [Provider](classes/Provider.md)
+- [CustomError](classes/CustomError.md)
+- [LibraryError](classes/LibraryError.md)
+- [GatewayError](classes/GatewayError.md)
+- [HttpError](classes/HttpError.md)
+- [SequencerProvider](classes/SequencerProvider.md)
+- [ProviderInterface](classes/ProviderInterface.md)
+- [RpcProvider](classes/RpcProvider.md)
+- [Account](classes/Account.md)
+- [AccountInterface](classes/AccountInterface.md)
+- [SignerInterface](classes/SignerInterface.md)
+- [Signer](classes/Signer.md)
+- [CallData](classes/CallData.md)
 
 ## Interfaces
 
@@ -1444,7 +1444,7 @@ prefer the 'num' naming
 
 ### splitArgsAndOptions
 
-▸ **splitArgsAndOptions**(`args`): { `args`: [`ArgsOrCalldata`](modules.md#argsorcalldata) ; `options`: [`ContractOptions`](modules.md#contractoptions) } \| { `args`: [`ArgsOrCalldata`](modules.md#argsorcalldata) ; `options`: `undefined` }
+▸ **splitArgsAndOptions**(`args`): { `args`: [`ArgsOrCalldata`](modules.md#argsorcalldata) ; `options`: [`ContractOptions`](modules.md#contractoptions) } \| { `args`: [`ArgsOrCalldata`](modules.md#argsorcalldata) ; `options?`: `undefined` }
 
 #### Parameters
 
@@ -1454,7 +1454,7 @@ prefer the 'num' naming
 
 #### Returns
 
-{ `args`: [`ArgsOrCalldata`](modules.md#argsorcalldata) ; `options`: [`ContractOptions`](modules.md#contractoptions) } \| { `args`: [`ArgsOrCalldata`](modules.md#argsorcalldata) ; `options`: `undefined` }
+{ `args`: [`ArgsOrCalldata`](modules.md#argsorcalldata) ; `options`: [`ContractOptions`](modules.md#contractoptions) } \| { `args`: [`ArgsOrCalldata`](modules.md#argsorcalldata) ; `options?`: `undefined` }
 
 #### Defined in
 

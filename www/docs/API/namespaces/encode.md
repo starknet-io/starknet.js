@@ -6,15 +6,11 @@ sidebar_position: 0
 custom_edit_url: null
 ---
 
-## Variables
+## References
 
 ### IS_BROWSER
 
-• `Const` **IS_BROWSER**: `boolean`
-
-#### Defined in
-
-[src/utils/encode.ts:2](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L2)
+Re-exports [IS_BROWSER](constants.md#is_browser)
 
 ## Functions
 

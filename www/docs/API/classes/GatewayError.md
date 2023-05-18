@@ -118,7 +118,7 @@ node_modules/@types/node/globals.d.ts:13
 
 #### Defined in
 
-www/node_modules/typescript/lib/lib.es5.d.ts:1054
+www/node_modules/typescript/lib/lib.es5.d.ts:1055
 
 ---
 
@@ -132,7 +132,7 @@ www/node_modules/typescript/lib/lib.es5.d.ts:1054
 
 #### Defined in
 
-www/node_modules/typescript/lib/lib.es5.d.ts:1055
+www/node_modules/typescript/lib/lib.es5.d.ts:1056
 
 ## Methods
 
