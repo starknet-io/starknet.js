@@ -151,8 +151,18 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
       const status = await cairo1Contract.echo_array([123, 55, 77, 255]);
       expect(status).toEqual([123n, 55n, 77n, 255n]);
 
+      // uint256 provided as number
       const status1 = await cairo1Contract.echo_array_u256([123, 55, 77, 255]);
       expect(status1).toEqual([123n, 55n, 77n, 255n]);
+
+      // uint256 provided as struct
+      const status11 = await cairo1Contract.echo_array_u256([
+        cairo.uint256(123),
+        cairo.uint256(55),
+        cairo.uint256(77),
+        cairo.uint256(255),
+      ]);
+      expect(status11).toEqual([123n, 55n, 77n, 255n]);
 
       const status2 = await cairo1Contract.echo_array_bool([true, true, false, false]);
       expect(status2).toEqual([true, true, false, false]);
@@ -232,10 +242,17 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
     });
 
     test('mix tuples', async () => {
-      // TODO arrays inside tuples c1.0
-      // tuple inside the struct c1.0
-      const res = await cairo1Contract.mix_req([1, 2, 3], true);
-      expect(res).toEqual([1n, 2n, 3n, 1n, 2n]);
+      const res = await cairo1Contract.array_bool_tuple([1, 2, 3], true);
+      expect(res).toEqual({
+        0: [1n, 2n, 3n, 1n, 2n],
+        1: true,
+      });
+
+      const res1 = await cairo1Contract.tuple_echo(cairo.tuple([1, 2, 3], [4, 5, 6]));
+      expect(res1).toEqual({
+        0: [1n, 2n, 3n],
+        1: [4n, 5n, 6n],
+      });
     });
   });
 
