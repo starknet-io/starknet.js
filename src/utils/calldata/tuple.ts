@@ -59,7 +59,7 @@ function extractCairo0Tuple(type: string) {
 }
 
 function extractCairo1Tuple(type: string) {
-  // un-nested un-named tuples support
+  // un-named tuples support
   const cleanType = type.replace(/\s/g, '').slice(1, -1); // remove first lvl () and spaces
   const { subTuple, result } = parseSubTuple(cleanType);
   const recomposed = result.split(',').map((it) => {
