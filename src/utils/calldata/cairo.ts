@@ -56,7 +56,9 @@ export const uint256 = (it: BigNumberish): Uint256 => {
 /**
  * unnamed tuple cairo type (helper same as common struct type)
  */
-export const tuple = (...args: (BigNumberish | object | boolean)[]) => ({ ...args });
+export const tuple = (
+  ...args: (BigNumberish | object | boolean)[]
+): Record<number, BigNumberish | object | boolean> => ({ ...args });
 
 /**
  * felt cairo type

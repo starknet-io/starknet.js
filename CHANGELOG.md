@@ -1,3 +1,15 @@
+## [5.10.2](https://github.com/0xs34n/starknet.js/compare/v5.10.1...v5.10.2) (2023-05-17)
+
+### Bug Fixes
+
+- use of uint256 in array in calls ([969b3c1](https://github.com/0xs34n/starknet.js/commit/969b3c1670902d7cc55156d5b3f6a8e7d45c731b))
+
+## [5.10.1](https://github.com/0xs34n/starknet.js/compare/v5.10.0...v5.10.1) (2023-05-16)
+
+### Bug Fixes
+
+- c1 acc execute props order, c1 test flag, local testing fix ([d86057c](https://github.com/0xs34n/starknet.js/commit/d86057cefe9e4053dac6d45d043401605246d3ed))
+
 # [5.10.0](https://github.com/0xs34n/starknet.js/compare/v5.9.2...v5.10.0) (2023-05-10)
 
 ### Bug Fixes

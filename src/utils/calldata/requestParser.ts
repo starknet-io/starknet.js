@@ -101,6 +101,15 @@ function parseCalldataValue(
       return acc.concat(parsedData);
     }, [] as string[]);
   }
+  // check if u256
+  if (isTypeUint256(type)) {
+    if (typeof element === 'object') {
+      const { low, high } = element;
+      return [felt(low as BigNumberish), felt(high as BigNumberish)];
+    }
+    const el_uint256 = uint256(element);
+    return [felt(el_uint256.low), felt(el_uint256.high)];
+  }
   if (typeof element === 'object') {
     throw Error(`Parameter ${element} do not align with abi parameter ${type}`);
   }
@@ -136,17 +145,8 @@ export function parseCalldataField(
       return parseCalldataValue(value, input.type, structs);
 
     // Struct or Tuple
-    case isTypeStruct(type, structs) || isTypeTuple(type):
+    case isTypeStruct(type, structs) || isTypeTuple(type) || isTypeUint256(type):
       return parseCalldataValue(value as ParsedStruct | BigNumberish[], type, structs);
-
-    // Uint256 (object or num)
-    case isTypeUint256(type):
-      if (typeof value === 'object') {
-        return [felt(value.low), felt(value.high)];
-      }
-      // eslint-disable-next-line no-case-declarations
-      const el_uint256 = uint256(value);
-      return [felt(el_uint256.low), felt(el_uint256.high)];
 
     // Felt or unhandled
     default:

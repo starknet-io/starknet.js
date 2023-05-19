@@ -109,7 +109,7 @@ Error.message
 
 #### Defined in
 
-www/node_modules/typescript/lib/lib.es5.d.ts:1054
+www/node_modules/typescript/lib/lib.es5.d.ts:1055
 
 ---
 
@@ -123,7 +123,7 @@ Error.stack
 
 #### Defined in
 
-www/node_modules/typescript/lib/lib.es5.d.ts:1055
+www/node_modules/typescript/lib/lib.es5.d.ts:1056
 
 ## Methods
 

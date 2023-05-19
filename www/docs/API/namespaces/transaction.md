@@ -125,7 +125,7 @@ Calldata
 
 #### Defined in
 
-[src/utils/transaction.ts:69](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L69)
+[src/utils/transaction.ts:68](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L68)
 
 ---
 
@@ -148,4 +148,4 @@ string[] of calldata
 
 #### Defined in
 
-[src/utils/transaction.ts:79](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L79)
+[src/utils/transaction.ts:85](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L85)

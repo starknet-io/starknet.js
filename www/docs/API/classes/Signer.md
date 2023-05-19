@@ -126,7 +126,7 @@ signature
 
 ### signDeployAccountTransaction
 
-▸ **signDeployAccountTransaction**(`«destructured»`): `Promise`<`SignatureType`\>
+▸ **signDeployAccountTransaction**(`«destructured»`): `Promise`<[`Signature`](../modules.md#signature)\>
 
 Signs a DEPLOY_ACCOUNT transaction with the starknet private key and returns the signature
 
@@ -138,7 +138,7 @@ Signs a DEPLOY_ACCOUNT transaction with the starknet private key and returns the
 
 #### Returns
 
-`Promise`<`SignatureType`\>
+`Promise`<[`Signature`](../modules.md#signature)\>
 
 signature
 
@@ -154,7 +154,7 @@ signature
 
 ### signDeclareTransaction
 
-▸ **signDeclareTransaction**(`«destructured»`): `Promise`<`SignatureType`\>
+▸ **signDeclareTransaction**(`«destructured»`): `Promise`<[`Signature`](../modules.md#signature)\>
 
 Signs a DECLARE transaction with the starknet private key and returns the signature
 
@@ -166,7 +166,7 @@ Signs a DECLARE transaction with the starknet private key and returns the signat
 
 #### Returns
 
-`Promise`<`SignatureType`\>
+`Promise`<[`Signature`](../modules.md#signature)\>
 
 signature
 
