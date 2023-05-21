@@ -16,20 +16,19 @@ function errorU256(key: string) {
   );
 }
 export default function orderPropsByAbi(
-  myInputObj: RawArgsObject,
+  unorderedObject: RawArgsObject,
   abiOfObject: AbiEntry[],
   structs: AbiStructs
 ): object {
-  const orderStruct = (myObj: RawArgsObject, abiObject: AbiEntry[]): object => {
-    const paramProperty = { enumerable: true };
-    const newObj2 = abiObject.reduce((newObj, abiParam) => {
-      const copyProperty2struct = () =>
-        Object.defineProperty(newObj, abiParam.name, {
-          ...paramProperty,
-          value: myObj[abiParam.name],
+  const orderStruct = (unorderedObject2: RawArgsObject, abiObject: AbiEntry[]): object => {
+    const orderedObject2 = abiObject.reduce((orderedObject, abiParam) => {
+      const setProperty = (value?: any) =>
+        Object.defineProperty(orderedObject, abiParam.name, {
+          enumerable: true,
+          value: value ?? unorderedObject2[abiParam.name],
         });
 
-      if (myObj[abiParam.name] === 'undefined') {
+      if (unorderedObject2[abiParam.name] === 'undefined') {
         if (
           isCairo1Type(abiParam.type) ||
           (!isCairo1Type(abiParam.type) && !isLen(abiParam.name))
@@ -39,58 +38,49 @@ export default function orderPropsByAbi(
       }
       switch (true) {
         case isTypeStruct(abiParam.type, structs):
-          Object.defineProperty(newObj, abiParam.name, {
-            ...paramProperty,
-            value: orderStruct(
-              myObj[abiParam.name] as RawArgsObject,
+          setProperty(
+            orderStruct(
+              unorderedObject2[abiParam.name] as RawArgsObject,
               structs[abiParam.type].members
-            ),
-          });
+            )
+          );
+
           break;
-        case isTypeUint256(abiParam.type):
-          {
-            const u256 = myObj[abiParam.name];
-            if (typeof u256 === 'object') {
-              if ('low' in u256 && 'high' in u256) {
-                Object.defineProperty(newObj, abiParam.name, {
-                  ...paramProperty,
-                  value: { low: u256.low, high: u256.high },
-                });
-              } else {
-                // object without 'low' & 'high'
-                errorU256(abiParam.name);
-              }
-            } else {
-              // BigNumberish --> just copy
-              copyProperty2struct();
-            }
+        case isTypeUint256(abiParam.type): {
+          const u256 = unorderedObject2[abiParam.name];
+          if (typeof u256 !== 'object') {
+            // BigNumberish --> just copy
+            setProperty();
+            break;
+          }
+          if (!('low' in u256 && 'high' in u256)) {
+            // object without 'low' & 'high'
+            errorU256(abiParam.name);
+          } else {
+            setProperty({ low: u256.low, high: u256.high });
           }
           break;
+        }
+
         case isTypeTuple(abiParam.type):
-          Object.defineProperty(newObj, abiParam.name, {
-            ...paramProperty,
-            // eslint-disable-next-line @typescript-eslint/no-use-before-define
-            value: orderTuple(myObj[abiParam.name] as RawArgsObject, abiParam),
-          });
+          // eslint-disable-next-line @typescript-eslint/no-use-before-define
+          setProperty(orderTuple(unorderedObject2[abiParam.name] as RawArgsObject, abiParam));
 
           break;
         case isTypeArray(abiParam.type):
-          Object.defineProperty(newObj, abiParam.name, {
-            ...paramProperty,
-            // eslint-disable-next-line @typescript-eslint/no-use-before-define
-            value: orderArray(myObj[abiParam.name] as Array<any>, abiParam),
-          });
+          // eslint-disable-next-line @typescript-eslint/no-use-before-define
+          setProperty(orderArray(unorderedObject2[abiParam.name] as Array<any>, abiParam));
 
           break;
         case !isCairo1Type(abiParam.type) && isLen(abiParam.name):
           // Cairo 0 array_len. Nothing to do, go to next abi item
           break;
         default: // do not needs recursion --> just copy
-          copyProperty2struct();
+          setProperty();
       }
-      return newObj;
+      return orderedObject;
     }, {});
-    return newObj2;
+    return orderedObject2;
   };
 
   const orderArray = (myArray: Array<any> | string, abiParam: AbiEntry): Array<any> | string => {
@@ -122,68 +112,62 @@ export default function orderPropsByAbi(
     }
   };
 
-  const orderTuple = (myObj: RawArgsObject, abiParam: AbiEntry): object => {
-    const paramProperty = { enumerable: true };
+  const orderTuple = (unorderedObject2: RawArgsObject, abiParam: AbiEntry): object => {
     const typeList = extractTupleMemberTypes(abiParam.type);
-    const newObj2 = typeList.reduce((newObj: object, abiTypeCairoX: any, index) => {
-      const myObjKeys: string[] = Object.keys(myObj);
-      const copyProperty2Tuple = () =>
-        Object.defineProperty(newObj, index.toString(), {
-          ...paramProperty,
-          value: myObj[myObjKeys[index]],
+    const orderedObject2 = typeList.reduce((orderedObject: object, abiTypeCairoX: any, index) => {
+      const myObjKeys: string[] = Object.keys(unorderedObject2);
+      const setProperty = (value?: any) =>
+        Object.defineProperty(orderedObject, index.toString(), {
+          enumerable: true,
+          value: value ?? unorderedObject2[myObjKeys[index]],
         });
       const abiType: string = abiTypeCairoX?.type ? abiTypeCairoX.type : abiTypeCairoX; // Named tuple, or tuple
 
       switch (true) {
         case isTypeStruct(abiType, structs):
-          Object.defineProperty(newObj, index.toString(), {
-            ...paramProperty,
-            value: orderStruct(myObj[myObjKeys[index]] as RawArgsObject, structs[abiType].members),
-          });
+          setProperty(
+            orderStruct(
+              unorderedObject2[myObjKeys[index]] as RawArgsObject,
+              structs[abiType].members
+            )
+          );
           break;
-        case isTypeUint256(abiType):
-          {
-            const u256 = myObj[myObjKeys[index]];
-            if (typeof u256 === 'object') {
-              if ('low' in u256 && 'high' in u256) {
-                Object.defineProperty(newObj, index.toString(), {
-                  ...paramProperty,
-                  value: { low: u256.low, high: u256.high },
-                });
-              } else {
-                // object without 'low' & 'high'
-                errorU256(abiParam.name);
-              }
-            } else {
-              // BigNumberish --> just copy
-              copyProperty2Tuple();
-            }
+        case isTypeUint256(abiType): {
+          const u256 = unorderedObject2[myObjKeys[index]];
+          if (typeof u256 !== 'object') {
+            // BigNumberish --> just copy
+            setProperty();
+          } else if (!('low' in u256 && 'high' in u256)) {
+            // object without 'low' & 'high'
+            errorU256(abiParam.name);
+          } else {
+            setProperty({ low: u256.low, high: u256.high });
           }
+
           break;
+        }
         case isTypeTuple(abiType):
-          Object.defineProperty(newObj, index.toString(), {
-            ...paramProperty,
-            value: orderTuple(myObj[myObjKeys[index]] as RawArgsObject, {
+          setProperty(
+            orderTuple(unorderedObject2[myObjKeys[index]] as RawArgsObject, {
               name: '0',
               type: abiType,
-            }),
-          });
+            })
+          );
           break;
         case isTypeArray(abiType):
-          Object.defineProperty(newObj, index.toString(), {
-            ...paramProperty,
-            value: orderArray(myObj[myObjKeys[index]] as Array<any>, {
+          setProperty(
+            orderArray(unorderedObject2[myObjKeys[index]] as Array<any>, {
               name: '0',
               type: abiType,
-            }),
-          });
+            })
+          );
           break;
         default: // litterals, do not needs recursion --> just copy
-          copyProperty2Tuple();
+          setProperty();
       }
-      return newObj;
+      return orderedObject;
     }, {});
-    return newObj2;
+    return orderedObject2;
   };
-  return orderStruct(myInputObj, abiOfObject);
+  return orderStruct(unorderedObject, abiOfObject);
 }
