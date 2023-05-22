@@ -11,7 +11,7 @@ import {
 import extractTupleMemberTypes from './tuple';
 
 function errorU256(key: string) {
-  throw Error(
+  return Error(
     `Your object includes the property : ${key}, containing an Uint256 object without the 'low' and 'high' keys.`
   );
 }
@@ -55,7 +55,7 @@ export default function orderPropsByAbi(
           }
           if (!('low' in u256 && 'high' in u256)) {
             // object without 'low' & 'high'
-            errorU256(abiParam.name);
+            throw errorU256(abiParam.name);
           } else {
             setProperty({ low: u256.low, high: u256.high });
           }
@@ -98,7 +98,7 @@ export default function orderPropsByAbi(
               return { low: u256.low, high: u256.high };
             }
             // object without 'low' & 'high'
-            errorU256(abiParam.name);
+            throw errorU256(abiParam.name);
           }
           return u256;
         });
@@ -139,7 +139,7 @@ export default function orderPropsByAbi(
             setProperty();
           } else if (!('low' in u256 && 'high' in u256)) {
             // object without 'low' & 'high'
-            errorU256(abiParam.name);
+            throw errorU256(abiParam.name);
           } else {
             setProperty({ low: u256.low, high: u256.high });
           }
