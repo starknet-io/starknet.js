@@ -1,9 +1,10 @@
 import { ProviderInterface } from '../provider';
-import { BlockIdentifier } from '../provider/utils';
 import { SignerInterface } from '../signer';
 import {
   Abi,
   AllowArray,
+  BigNumberish,
+  BlockIdentifier,
   CairoVersion,
   Call,
   DeclareAndDeployContractPayload,
@@ -24,10 +25,9 @@ import {
   Signature,
   TransactionBulk,
   TransactionSimulation,
+  TypedData,
   UniversalDeployerContractPayload,
 } from '../types';
-import { BigNumberish } from '../utils/num';
-import { TypedData } from '../utils/typedData/types';
 
 export abstract class AccountInterface extends ProviderInterface {
   public abstract address: string;

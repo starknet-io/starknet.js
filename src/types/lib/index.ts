@@ -1,12 +1,22 @@
 import { StarknetChainId } from '../../constants';
 import { weierstrass } from '../../utils/ec';
-import type { BigNumberish } from '../../utils/num';
-import { Uint256 } from '../../utils/uint256';
 import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 
 export type WeierstrassSignatureType = weierstrass.SignatureType;
 export type ArraySignatureType = string[];
 export type Signature = ArraySignatureType | WeierstrassSignatureType;
+
+export type BigNumberish = string | number | bigint;
+
+/**
+ * Represents an integer in the range [0, 2^256)
+ */
+export interface Uint256 {
+  // The low 128 bits of the value
+  low: BigNumberish;
+  // The high 128 bits of the value
+  high: BigNumberish;
+}
 
 /**
  * BigNumberish array
@@ -158,8 +168,13 @@ export enum TransactionType {
 }
 
 export type Tupled = { element: any; type: string };
+
 export type BlockTag = 'pending' | 'latest';
 export type BlockNumber = BlockTag | null | number;
+// hex string and BN are detected as block hashes
+// decimal string and number are detected as block numbers
+// null appends nothing to the request url
+export type BlockIdentifier = BlockNumber | BigNumberish;
 
 export type Struct = {
   type: 'struct';

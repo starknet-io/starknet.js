@@ -1,5 +1,6 @@
 import {
   Account,
+  BigNumberish,
   CallData,
   Calldata,
   Contract,
@@ -260,8 +261,8 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
     test('myCallData.compile for Cairo 1', async () => {
       const myFalseUint256 = { high: 1, low: 23456 }; // wrong order
       type Order2 = {
-        p1: num.BigNumberish;
-        p2: num.BigNumberish[];
+        p1: BigNumberish;
+        p2: BigNumberish[];
       };
 
       const myOrder2bis: Order2 = {

@@ -1,11 +1,11 @@
-import { computeHashOnElements, getSelectorFromName } from '../hash';
-import { MerkleTree } from '../merkle';
-import { BigNumberish, isHex, toHex } from '../num';
-import { encodeShortString } from '../shortString';
-import { StarkNetMerkleType, StarkNetType, TypedData } from './types';
-import { validateTypedData } from './utils';
+import { BigNumberish, StarkNetMerkleType, StarkNetType, TypedData } from '../types';
+import { computeHashOnElements, getSelectorFromName } from './hash';
+import { MerkleTree } from './merkle';
+import { isHex, toHex } from './num';
+import { encodeShortString } from './shortString';
 
-export * from './types';
+/** @deprecated prefer importing from 'types' over 'typedData' */
+export * from '../types/typedData';
 
 function getHex(value: BigNumberish): string {
   try {
@@ -17,6 +17,21 @@ function getHex(value: BigNumberish): string {
     throw new Error(`Invalid BigNumberish: ${value}`);
   }
 }
+
+/**
+ * Validates that `data` matches the EIP-712 JSON schema.
+ *
+ * @param {any} data
+ * @return {boolean}
+ */
+const validateTypedData = (data: unknown): data is TypedData => {
+  const typedData = data as TypedData;
+
+  // Validate that the data matches the EIP-712 JSON schema
+  const valid = Boolean(typedData.types && typedData.primaryType && typedData.message);
+
+  return valid;
+};
 
 export function prepareSelector(selector: string): string {
   return isHex(selector) ? selector : getSelectorFromName(selector);

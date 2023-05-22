@@ -1,9 +1,11 @@
 import { hexToBytes as hexToBytesNoble } from '@noble/curves/abstract/utils';
 
+import { BigNumberish } from '../types';
 import assert from './assert';
 import { addHexPrefix, removeHexPrefix } from './encode';
 
-export type BigNumberish = string | number | bigint;
+/** @deprecated prefer importing from 'types' over 'num' */
+export type { BigNumberish };
 
 export function isHex(hex: string): boolean {
   return /^0x[0-9a-f]*$/i.test(hex);

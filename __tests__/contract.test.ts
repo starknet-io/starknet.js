@@ -1,8 +1,8 @@
-import { Contract, ContractFactory, RawArgs, json, stark } from '../src';
+import { BigNumberish, Contract, ContractFactory, RawArgs, json, stark } from '../src';
 import { CallData } from '../src/utils/calldata';
 import { felt, tuple, uint256 } from '../src/utils/calldata/cairo';
 import { getSelectorFromName } from '../src/utils/hash';
-import { BigNumberish, hexToDecimalString, toBigInt } from '../src/utils/num';
+import { hexToDecimalString, toBigInt } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import { uint256ToBN } from '../src/utils/uint256';
 import {

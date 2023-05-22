@@ -1,5 +1,7 @@
 import { StarknetChainId } from '../constants';
 import {
+  BigNumberish,
+  BlockIdentifier,
   Call,
   CallContractResponse,
   ContractClass,
@@ -18,23 +20,19 @@ import {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Nonce,
+  ProviderOptions,
   RPC,
+  RpcProviderOptions,
+  SequencerProviderOptions,
   StateUpdateResponse,
   Storage,
   TransactionSimulationResponse,
   waitForTransactionOptions,
 } from '../types';
-import { BigNumberish } from '../utils/num';
 import { ProviderInterface } from './interface';
-import { RpcProvider, RpcProviderOptions } from './rpc';
-import { SequencerProvider, SequencerProviderOptions } from './sequencer';
+import { RpcProvider } from './rpc';
+import { SequencerProvider } from './sequencer';
 import { getAddressFromStarkName, getStarkName } from './starknetId';
-import { BlockIdentifier } from './utils';
-
-export interface ProviderOptions {
-  sequencer?: SequencerProviderOptions;
-  rpc?: RpcProviderOptions;
-}
 
 export class Provider implements ProviderInterface {
   private provider!: ProviderInterface;

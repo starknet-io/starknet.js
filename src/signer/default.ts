@@ -1,5 +1,12 @@
-import { Abi, Call, DeclareSignerDetails, InvocationsSignerDetails, Signature } from '../types';
-import { DeployAccountSignerDetails } from '../types/signer';
+import {
+  Abi,
+  Call,
+  DeclareSignerDetails,
+  DeployAccountSignerDetails,
+  InvocationsSignerDetails,
+  Signature,
+  TypedData,
+} from '../types';
 import { CallData } from '../utils/calldata';
 import { starkCurve } from '../utils/ec';
 import { buf2hex } from '../utils/encode';
@@ -10,7 +17,7 @@ import {
 } from '../utils/hash';
 import { toHex } from '../utils/num';
 import { getExecuteCalldata } from '../utils/transaction';
-import { TypedData, getMessageHash } from '../utils/typedData';
+import { getMessageHash } from '../utils/typedData';
 import { SignerInterface } from './interface';
 
 export class Signer implements SignerInterface {
