@@ -1,7 +1,7 @@
-import { AbiStructs } from '../../types';
-import { BigNumberish, isBigInt, isHex, isStringWholeNumber } from '../num';
+import { AbiStructs, BigNumberish, Uint256 } from '../../types';
+import { isBigInt, isHex, isStringWholeNumber } from '../num';
 import { encodeShortString, isShortString, isText } from '../shortString';
-import { UINT_128_MAX, Uint256, isUint256 } from '../uint256';
+import { UINT_128_MAX, isUint256 } from '../uint256';
 
 export enum Uint {
   u8 = 'core::integer::u8',

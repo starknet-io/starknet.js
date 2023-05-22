@@ -1,6 +1,10 @@
 import { StarknetChainId } from '../constants';
-import { BigNumberish } from '../utils/num';
-import { CairoVersion, DeployAccountContractPayload, InvocationsDetails } from './lib';
+import {
+  BigNumberish,
+  CairoVersion,
+  DeployAccountContractPayload,
+  InvocationsDetails,
+} from './lib';
 
 export interface InvocationsSignerDetails extends Required<InvocationsDetails> {
   walletAddress: string;

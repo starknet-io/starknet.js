@@ -1,10 +1,10 @@
 import { AccountInterface } from '../account';
 import { ProviderInterface } from '../provider';
-import { BlockIdentifier } from '../provider/utils';
 import {
   Abi,
   ArgsOrCalldata,
   AsyncContractFunction,
+  BlockIdentifier,
   CallOptions,
   ContractFunction,
   EstimateFeeResponse,

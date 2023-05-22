@@ -1,6 +1,5 @@
 /* eslint-disable no-case-declarations */
-import { AbiEntry, AbiStructs, Args, ParsedStruct } from '../../types';
-import { BigNumberish } from '../num';
+import { AbiEntry, AbiStructs, Args, BigNumberish, ParsedStruct } from '../../types';
 import { uint256ToBN } from '../uint256';
 import {
   getArrayType,

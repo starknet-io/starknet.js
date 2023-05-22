@@ -1,11 +1,14 @@
 /**
  * Main
  */
-export * from './contract';
-export * from './types';
-export * from './provider';
 export * from './account';
+export * from './contract';
+export * from './provider';
 export * from './signer';
+
+// TODO: decide on final export style
+export * from './types';
+export * as types from './types';
 
 /**
  * Utils

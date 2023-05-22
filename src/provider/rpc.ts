@@ -1,5 +1,7 @@
 import { StarknetChainId } from '../constants';
 import {
+  BigNumberish,
+  BlockIdentifier,
   Call,
   CallContractResponse,
   DeclareContractResponse,
@@ -16,6 +18,7 @@ import {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   RPC,
+  RpcProviderOptions,
   TransactionSimulationResponse,
   TransactionStatus,
   waitForTransactionOptions,
@@ -24,22 +27,14 @@ import { CallData } from '../utils/calldata';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
-import { BigNumberish, toHex } from '../utils/num';
+import { toHex } from '../utils/num';
 import { wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { signatureToHexArray } from '../utils/stark';
 import { LibraryError } from './errors';
 import { ProviderInterface } from './interface';
 import { getAddressFromStarkName, getStarkName } from './starknetId';
-import { Block, BlockIdentifier } from './utils';
-
-export type RpcProviderOptions = {
-  nodeUrl: string;
-  retries?: number;
-  headers?: object;
-  blockIdentifier?: BlockIdentifier;
-  chainId?: StarknetChainId;
-};
+import { Block } from './utils';
 
 // Default Pathfinder disabled pending block https://github.com/eqlabs/pathfinder/blob/main/README.md
 // Note that pending support is disabled by default and must be enabled by setting poll-pending=true in the configuration options.

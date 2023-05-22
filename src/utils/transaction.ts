@@ -1,7 +1,7 @@
-import { CairoVersion, Call, CallStruct, Calldata, ParsedStruct } from '../types';
+import { BigNumberish, CairoVersion, Call, CallStruct, Calldata, ParsedStruct } from '../types';
 import { CallData } from './calldata';
 import { getSelectorFromName } from './hash';
-import { BigNumberish, toBigInt } from './num';
+import { toBigInt } from './num';
 
 /**
  * Transforms a list of Calls, each with their own calldata, into

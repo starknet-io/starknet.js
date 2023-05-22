@@ -3,8 +3,8 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 
-import { RPC } from './api/rpc';
-import { Sequencer, TransactionTraceResponse } from './api/sequencer';
+import { RPC } from '../api/rpc';
+import { Sequencer, TransactionTraceResponse } from '../api/sequencer';
 import {
   AllowArray,
   ByteCode,
@@ -16,7 +16,7 @@ import {
   Status,
   TransactionType,
   UniversalDeployerContractPayload,
-} from './lib';
+} from '../lib';
 
 export interface GetBlockResponse {
   timestamp: number;

@@ -1,5 +1,4 @@
-import { BlockIdentifier } from '../provider/utils';
-import { BigNumberish } from '../utils/num';
+import { BigNumberish, BlockIdentifier } from './lib';
 import {
   DeclareTransactionReceiptResponse,
   EstimateFeeResponse,

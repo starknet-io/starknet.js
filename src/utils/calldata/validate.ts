@@ -1,10 +1,10 @@
-import { AbiEntry, AbiStructs, FunctionAbi } from '../../types';
 /**
  * Validate cairo contract method arguments
  * Flow: Determine type from abi and than validate against parameter
  */
+import { AbiEntry, AbiStructs, BigNumberish, FunctionAbi } from '../../types';
 import assert from '../assert';
-import { BigNumberish, toBigInt } from '../num';
+import { toBigInt } from '../num';
 import { isLongText } from '../shortString';
 import { uint256ToBN } from '../uint256';
 import {

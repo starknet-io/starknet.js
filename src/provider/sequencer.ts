@@ -2,6 +2,8 @@ import urljoin from 'url-join';
 
 import { BaseUrl, NetworkName, StarknetChainId } from '../constants';
 import {
+  BigNumberish,
+  BlockIdentifier,
   CairoAssembly,
   Call,
   CallContractResponse,
@@ -23,6 +25,8 @@ import {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Sequencer,
+  SequencerHttpMethod,
+  SequencerProviderOptions,
   StateUpdateResponse,
   TransactionSimulationResponse,
   TransactionStatus,
@@ -36,7 +40,6 @@ import fetch from '../utils/fetchPonyfill';
 import { feeTransactionVersion, getSelector, getSelectorFromName } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
 import {
-  BigNumberish,
   bigNumberishArrayToDecimalStringArray,
   getDecimalString,
   getHexString,
@@ -51,25 +54,7 @@ import { buildUrl } from '../utils/url';
 import { GatewayError, HttpError, LibraryError } from './errors';
 import { ProviderInterface } from './interface';
 import { getAddressFromStarkName, getStarkName } from './starknetId';
-import { Block, BlockIdentifier } from './utils';
-
-export type SequencerHttpMethod = 'POST' | 'GET';
-
-export type SequencerProviderOptions = {
-  headers?: Record<string, string>;
-  blockIdentifier?: BlockIdentifier;
-} & (
-  | {
-      network: NetworkName | StarknetChainId;
-      chainId?: StarknetChainId;
-    }
-  | {
-      baseUrl: string;
-      feederGatewayUrl?: string;
-      gatewayUrl?: string;
-      chainId?: StarknetChainId;
-    }
-);
+import { Block } from './utils';
 
 function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
   return (
