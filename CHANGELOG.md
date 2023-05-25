@@ -1,3 +1,9 @@
+# [5.11.0](https://github.com/0xs34n/starknet.js/compare/v5.10.2...v5.11.0) (2023-05-25)
+
+### Features
+
+- allow unordered RawArgsObject usage for the calldata compilation utility ([9d0cedf](https://github.com/0xs34n/starknet.js/commit/9d0cedf0c7e007028402ead9b400ac83887f9b3e))
+
 ## [5.10.2](https://github.com/0xs34n/starknet.js/compare/v5.10.1...v5.10.2) (2023-05-17)
 
 ### Bug Fixes
