@@ -40,6 +40,7 @@ export const compiledHashSierra = readContractSierra('cairo/hash/hash');
 export const compiledHashSierraCasm = readContractSierraCasm('cairo/hash/hash');
 export const compiledHelloSierra = readContractSierra('cairo/helloSierra/hello');
 export const compiledHelloSierraCasm = readContractSierraCasm('cairo/helloSierra/hello');
+export const compiledComplexSierra = readContractSierra('cairo/complexInput/complexInput');
 export const compiledC1Account = readContractSierra('cairo/account/account');
 export const compiledC1AccountCasm = readContractSierraCasm('cairo/account/account');
 
