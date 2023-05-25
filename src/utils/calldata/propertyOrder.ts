@@ -29,10 +29,7 @@ export default function orderPropsByAbi(
         });
 
       if (unorderedObject2[abiParam.name] === 'undefined') {
-        if (
-          isCairo1Type(abiParam.type) ||
-          (!isCairo1Type(abiParam.type) && !isLen(abiParam.name))
-        ) {
+        if (isCairo1Type(abiParam.type) || !isLen(abiParam.name)) {
           throw Error(`Your object needs a property with key : ${abiParam.name} .`);
         }
       }
@@ -44,7 +41,6 @@ export default function orderPropsByAbi(
               structs[abiParam.type].members
             )
           );
-
           break;
         case isTypeUint256(abiParam.type): {
           const u256 = unorderedObject2[abiParam.name];
@@ -54,23 +50,16 @@ export default function orderPropsByAbi(
             break;
           }
           if (!('low' in u256 && 'high' in u256)) {
-            // object without 'low' & 'high'
             throw errorU256(abiParam.name);
-          } else {
-            setProperty({ low: u256.low, high: u256.high });
           }
+          setProperty({ low: u256.low, high: u256.high });
           break;
         }
-
         case isTypeTuple(abiParam.type):
-          // eslint-disable-next-line @typescript-eslint/no-use-before-define
           setProperty(orderTuple(unorderedObject2[abiParam.name] as RawArgsObject, abiParam));
-
           break;
         case isTypeArray(abiParam.type):
-          // eslint-disable-next-line @typescript-eslint/no-use-before-define
           setProperty(orderArray(unorderedObject2[abiParam.name] as Array<any>, abiParam));
-
           break;
         case !isCairo1Type(abiParam.type) && isLen(abiParam.name):
           // Cairo 0 array_len. Nothing to do, go to next abi item
@@ -83,7 +72,7 @@ export default function orderPropsByAbi(
     return orderedObject2;
   };
 
-  const orderArray = (myArray: Array<any> | string, abiParam: AbiEntry): Array<any> | string => {
+  function orderArray(myArray: Array<any> | string, abiParam: AbiEntry): Array<any> | string {
     const typeInArray = getArrayType(abiParam.type);
     if (typeof myArray === 'string') {
       return myArray; // longstring
@@ -93,26 +82,24 @@ export default function orderPropsByAbi(
         return myArray.map((myObj) => orderStruct(myObj, structs[typeInArray].members));
       case typeInArray === 'core::integer::u256':
         return myArray.map((u256) => {
-          if (typeof u256 === 'object') {
-            if ('low' in u256 && 'high' in u256) {
-              return { low: u256.low, high: u256.high };
-            }
-            // object without 'low' & 'high'
+          if (typeof u256 !== 'object') {
+            return u256;
+          }
+          if (!('low' in u256 && 'high' in u256)) {
             throw errorU256(abiParam.name);
           }
-          return u256;
+          return { low: u256.low, high: u256.high };
         });
       case isTypeTuple(typeInArray):
-        // eslint-disable-next-line @typescript-eslint/no-use-before-define
         return myArray.map((myElem) => orderTuple(myElem, { name: '0', type: typeInArray }));
       case isTypeArray(typeInArray):
         return myArray.map((myElem) => orderArray(myElem, { name: '0', type: typeInArray }));
       default: // is an array of litterals
         return myArray;
     }
-  };
+  }
 
-  const orderTuple = (unorderedObject2: RawArgsObject, abiParam: AbiEntry): object => {
+  function orderTuple(unorderedObject2: RawArgsObject, abiParam: AbiEntry): object {
     const typeList = extractTupleMemberTypes(abiParam.type);
     const orderedObject2 = typeList.reduce((orderedObject: object, abiTypeCairoX: any, index) => {
       const myObjKeys: string[] = Object.keys(unorderedObject2);
@@ -137,13 +124,12 @@ export default function orderPropsByAbi(
           if (typeof u256 !== 'object') {
             // BigNumberish --> just copy
             setProperty();
-          } else if (!('low' in u256 && 'high' in u256)) {
-            // object without 'low' & 'high'
-            throw errorU256(abiParam.name);
-          } else {
-            setProperty({ low: u256.low, high: u256.high });
+            break;
           }
-
+          if (!('low' in u256 && 'high' in u256)) {
+            throw errorU256(abiParam.name);
+          }
+          setProperty({ low: u256.low, high: u256.high });
           break;
         }
         case isTypeTuple(abiType):
@@ -168,6 +154,6 @@ export default function orderPropsByAbi(
       return orderedObject;
     }, {});
     return orderedObject2;
-  };
+  }
   return orderStruct(unorderedObject, abiOfObject);
 }

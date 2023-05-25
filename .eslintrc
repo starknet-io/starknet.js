@@ -23,6 +23,7 @@
     "import/prefer-default-export": 0,
     "@typescript-eslint/naming-convention": 0,
     "@typescript-eslint/no-unused-vars": ["error", { "argsIgnorePattern": "^_" }],
+    "@typescript-eslint/no-use-before-define": ["error", "nofunc"],
     "func-names": 0
   }
 }
