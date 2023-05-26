@@ -60,6 +60,7 @@ export type TransactionTraceResponse = {
   validate_invocation?: FunctionInvocation;
   function_invocation?: FunctionInvocation;
   fee_transfer_invocation?: FunctionInvocation;
+  constructor_invocation?: FunctionInvocation;
   signature: string[];
 };
 
@@ -253,12 +254,21 @@ export namespace Sequencer {
     | DeployEstimateFee
     | DeployAccountEstimateFee;
 
-  export type TransactionSimulationResponse = {
-    trace: TransactionTraceResponse;
-    fee_estimation: Sequencer.EstimateFeeResponse;
+  export type SimulateTransactionResponse = {
+    simulated_transactions: Array<{
+      trace: TransactionTraceResponse; // diff with OPENRPC "transaction_trace"
+      fee_estimation: Sequencer.EstimateFeeResponse;
+    }>;
   };
 
-  export type SimulateTransaction = Omit<InvokeFunctionTransaction, 'entry_point_type'>;
+  export type SimulateTransaction = {
+    transaction: Array<SimulateTransactionItem>;
+  };
+
+  export type SimulateTransactionItem =
+    | Omit<InvokeEstimateFee, 'sender_address'>
+    | Omit<DeclareEstimateFee, 'sender_address'>
+    | Omit<DeployAccountEstimateFee, 'sender_address'>;
 
   export type EstimateFeeRequestBulk = AllowArray<
     InvokeEstimateFee | DeclareEstimateFee | DeployEstimateFee | DeployAccountEstimateFee
@@ -444,9 +454,10 @@ export namespace Sequencer {
       QUERY: {
         blockIdentifier: BlockIdentifier;
         skipValidate: boolean;
+        skipExecute: boolean;
       };
       REQUEST: SimulateTransaction;
-      RESPONSE: TransactionSimulationResponse;
+      RESPONSE: SimulateTransactionResponse;
     };
     estimate_fee_bulk: {
       QUERY: {

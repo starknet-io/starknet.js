@@ -168,6 +168,7 @@ type BROADCASTED_TXN_COMMON_PROPERTIES = {
 type BROADCASTED_DECLARE_TXN = BROADCASTED_DECLARE_TXN_V1 | BROADCASTED_DECLARE_TXN_V2;
 
 type BROADCASTED_DECLARE_TXN_V1 = {
+  type: 'DECLARE';
   contract_class: DEPRECATED_CONTRACT_CLASS;
   sender_address: ADDRESS;
 } & BROADCASTED_TXN_COMMON_PROPERTIES;
@@ -208,7 +209,7 @@ type PENDING_BLOCK_WITH_TXS = BLOCK_BODY_WITH_TXS & {
 
 type CONTRACT_CLASS = {
   sierra_program: Array<FELT>;
-  sierra_version: string;
+  contract_class_version: string;
   entry_points_by_type: {
     CONSTRUCTOR: Array<SIERRA_ENTRY_POINT>;
     EXTERNAL: Array<SIERRA_ENTRY_POINT>;
@@ -423,6 +424,9 @@ export namespace OPENRPC {
   export type InvokedTransaction = { transaction_hash: TXN_HASH };
   export type DeclaredTransaction = { transaction_hash: TXN_HASH; class_hash: FELT };
   export type DeployedTransaction = { transaction_hash: TXN_HASH; contract_address: FELT };
+  export type BroadcastedTransaction = BROADCASTED_TXN;
+
+  export type SimulationFlags = Array<SIMULATION_FLAG>;
 
   // Final Methods
   export type Methods = {
@@ -580,21 +584,21 @@ export namespace OPENRPC {
       errors: Errors.INVALID_BLOCK_HASH;
     };
     starknet_simulateTransaction: {
-      params: Array<{
+      params: {
         block_id: BLOCK_ID;
-        transaction: BROADCASTED_TXN;
+        transaction: Array<BROADCASTED_TXN>;
         simulation_flags: Array<SIMULATION_FLAG>;
-      }>;
+      };
       result: {
-        simulated_transaction: {
+        simulated_transactions: Array<{
           transaction_trace: TRANSACTION_TRACE;
           fee_estimation: FEE_ESTIMATE;
-        };
+        }>;
       };
       errors:
         | Errors.CONTRACT_NOT_FOUND
-        | Errors.INVALID_MESSAGE_SELECTOR
-        | Errors.INVALID_CALL_DATA
+        // | Errors.INVALID_MESSAGE_SELECTOR
+        // | Errors.INVALID_CALL_DATA
         | Errors.CONTRACT_ERROR
         | Errors.BLOCK_NOT_FOUND;
     };

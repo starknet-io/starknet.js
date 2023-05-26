@@ -1,10 +1,6 @@
 import { BlockIdentifier } from '../provider/utils';
 import { BigNumberish } from '../utils/num';
-import {
-  DeclareTransactionReceiptResponse,
-  EstimateFeeResponse,
-  TransactionSimulationResponse,
-} from './provider';
+import { DeclareTransactionReceiptResponse, EstimateFeeResponse } from './provider';
 
 export interface EstimateFee extends EstimateFeeResponse {
   suggestedMaxFee: bigint;
@@ -47,6 +43,14 @@ export type DeclareDeployUDCResponse = {
   deploy: DeployContractUDCResponse;
 };
 
-export interface TransactionSimulation extends TransactionSimulationResponse {
-  fee_estimation: EstimateFee;
+export type SimulateTransactionDetails = {
+  nonce?: BigNumberish;
+  blockIdentifier?: BlockIdentifier;
+  skipValidate?: boolean;
+  skipExecute?: boolean;
+};
+
+export enum SIMULATION_FLAG {
+  SKIP_VALIDATE,
+  SKIP_EXECUTE,
 }

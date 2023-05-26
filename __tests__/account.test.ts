@@ -16,6 +16,7 @@ import {
   compiledOpenZeppelinAccount,
   compiledStarknetId,
   compiledTestDapp,
+  describeIfDevnetRpc,
   describeIfDevnetSequencer,
   describeIfSequencer,
   erc20ClassHash,
@@ -173,18 +174,26 @@ describe('deploy and test Wallet', () => {
       innerInvokeEstFeeSpy.mockClear();
     });
 
-    test('simulate transaction', async () => {
-      const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
-      const res = await account.simulateTransaction({
-        contractAddress: erc20Address,
-        entrypoint: 'transfer',
-        calldata: [erc20.address, '10', '0'],
-      });
+    // TODO: update when sequencer implements simulateTransaction
+    // test('simulate transaction', async () => {
+    //   const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
+    //   const res = await account.simulateTransaction({
+    //     type: 'INVOKE_FUNCTION',
+    //     contractAddress: erc20Address,
+    //     entrypoint: 'transfer',
+    //     calldata: [erc20.address, '10', '0'],
+    //   },
+    //   {
+    //     type: 'INVOKE_FUNCTION',
+    //     contractAddress: erc20Address,
+    //     entrypoint: 'transfer',
+    //     calldata: [erc20.address, '10', '0'],
+    //   });
 
-      expect(res).toMatchSchemaRef('TransactionSimulation');
-      expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
-      innerInvokeEstFeeSpy.mockClear();
-    });
+    //   expect(res).toMatchSchemaRef('SimulateTransactionResponse');
+    //   expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
+    //   innerInvokeEstFeeSpy.mockClear();
+    // });
   });
 
   test('read balance of wallet', async () => {
@@ -564,7 +573,34 @@ describe('deploy and test Wallet', () => {
       });
     });
   });
+
+  describeIfDevnetRpc('Simulate Transaction', () => {
+    test('simulate transaction', async () => {
+      const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
+      const res = await account.simulateTransaction([
+        {
+          type: 'INVOKE_FUNCTION',
+          contractAddress: erc20Address,
+          entrypoint: 'transfer',
+          calldata: [erc20.address, '10', '0'],
+        },
+        {
+          type: 'INVOKE_FUNCTION',
+          contractAddress: erc20Address,
+          entrypoint: 'transfer',
+          calldata: [erc20.address, '10', '0'],
+        },
+        // TODO : test other tx type / tx version
+      ]);
+
+      expect(res).toMatchSchemaRef('SimulateTransactionResponse');
+      expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
+      innerInvokeEstFeeSpy.mockClear();
+    });
+  });
 });
+
+// TODO: add tests for transaction type v0/v1/v2
 
 describe('unit', () => {
   describeIfDevnetSequencer('devnet sequencer', () => {

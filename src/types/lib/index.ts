@@ -88,6 +88,7 @@ export type DeclareContractTransaction = {
 export type CallDetails = {
   contractAddress: string;
   calldata?: RawArgs;
+  entrypoint?: string; // TODO: check if required
 };
 
 export type Invocation = CallDetails & { signature?: Signature };
@@ -133,14 +134,19 @@ export type TransactionBulk = Array<
   | ({ type: 'INVOKE_FUNCTION' } & { payload: AllowArray<Call> })
 >;
 
-export type InvocationBulk = Array<
-  (
-    | ({ type: 'DECLARE' } & DeclareContractTransaction)
-    | ({ type: 'DEPLOY_ACCOUNT' } & DeployAccountContractTransaction)
-    | ({ type: 'INVOKE_FUNCTION' } & Invocation)
-  ) &
-    InvocationsDetailsWithNonce & { blockIdentifier: BlockNumber | BigNumberish }
->;
+export type InvocationBulkItem = (
+  | ({ type: 'DECLARE' } & DeclareContractTransaction)
+  | ({ type: 'DEPLOY_ACCOUNT' } & DeployAccountContractTransaction)
+  | ({ type: 'INVOKE_FUNCTION' } & Invocation)
+) &
+  InvocationsDetailsWithNonce & { blockIdentifier: BlockNumber | BigNumberish };
+
+export type InvocationBulkItemSimple =
+  | ({ type: 'DECLARE' } & DeclareContractTransaction)
+  | ({ type: 'DEPLOY_ACCOUNT' } & DeployAccountContractTransaction)
+  | ({ type: 'INVOKE_FUNCTION' } & Invocation);
+
+export type InvocationBulk = Array<InvocationBulkItem>;
 
 export type Status =
   | 'NOT_RECEIVED'

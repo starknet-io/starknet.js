@@ -8,8 +8,10 @@ import {
   GetBlockResponse,
   GetTransactionResponse,
   RPC,
+  SimulateTransactionResponse,
 } from '../../types';
 import { toBigInt } from '../num';
+import { estimatedFeeToMaxFee } from '../stark';
 import { ResponseParser } from '.';
 
 type RpcGetBlockResponse = RPC.GetBlockWithTxHashesResponse & {
@@ -76,6 +78,22 @@ export class RPCResponseParser
   public parseCallContractResponse(res: Array<string>): CallContractResponse {
     return {
       result: res,
+    };
+  }
+
+  public parseSimulateTransactionResponse(
+    res: RPC.SimulateTransactionResponse
+  ): SimulateTransactionResponse {
+    const withMaxFees = res.simulated_transactions.map((simulated) => {
+      return {
+        transaction_trace: simulated.transaction_trace,
+        fee_estimation: simulated.fee_estimation,
+        suggestedMaxFees: estimatedFeeToMaxFee(BigInt(simulated.fee_estimation.overall_fee)),
+      };
+    });
+
+    return {
+      simulated_transactions: withMaxFees,
     };
   }
 }

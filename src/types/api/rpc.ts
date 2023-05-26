@@ -41,8 +41,18 @@ export namespace RPC {
   export type InvokedTransaction = OPENRPC.InvokedTransaction;
   export type DeclaredTransaction = OPENRPC.DeclaredTransaction;
   export type DeployedTransaction = OPENRPC.DeployedTransaction;
+  export type SimulationFlags = OPENRPC.SimulationFlags;
+  export type BroadcastedTransaction = OPENRPC.BroadcastedTransaction;
+  export type EstimatedFee = OPENRPC.EstimatedFee;
   export type Methods = OPENRPC.Methods;
   export type Storage = OPENRPC.Storage;
+
+  export type SimulateTransactionResponse = {
+    simulated_transactions: Array<{
+      transaction_trace: Trace;
+      fee_estimation: EstimateFeeResponse;
+    }>;
+  };
 
   export enum TransactionType {
     DECLARE = 'DECLARE',

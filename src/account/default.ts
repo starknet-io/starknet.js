@@ -22,18 +22,20 @@ import {
   EstimateFeeAction,
   EstimateFeeDetails,
   Invocation,
+  InvocationBulkItemSimple,
   InvocationsDetails,
   InvocationsSignerDetails,
   InvokeFunctionResponse,
   MultiDeployContractResponse,
   Nonce,
   Signature,
+  SimulateTransactionResponse,
   TransactionBulk,
   TransactionStatus,
   TransactionType,
   UniversalDeployerContractPayload,
 } from '../types';
-import { EstimateFeeBulk, TransactionSimulation } from '../types/account';
+import { EstimateFeeBulk, SimulateTransactionDetails } from '../types/account';
 import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { starkCurve } from '../utils/ec';
@@ -124,7 +126,7 @@ export class Account extends Provider implements AccountInterface {
     { blockIdentifier, nonce: providedNonce, skipValidate }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
     const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
-    const version = !isSierra(contract) ? toBigInt(feeTransactionVersion) : transactionVersion_2;
+    const version = !isSierra(contract) ? transactionVersion : transactionVersion_2;
     const chainId = await this.getChainId();
 
     const declareContractTransaction = await this.buildDeclarePayload(
@@ -664,40 +666,78 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async simulateTransaction(
-    calls: AllowArray<Call>,
-    { nonce: providedNonce, blockIdentifier, skipValidate }: EstimateFeeDetails = {}
-  ): Promise<TransactionSimulation> {
+    calls: AllowArray<InvocationBulkItemSimple>,
+    {
+      nonce: providedNonce,
+      blockIdentifier,
+      skipValidate,
+      skipExecute,
+    }: SimulateTransactionDetails = {}
+  ): Promise<SimulateTransactionResponse> {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
     const version = toBigInt(feeTransactionVersion);
     const chainId = await this.getChainId();
 
-    const signerDetails: InvocationsSignerDetails = {
-      walletAddress: this.address,
-      nonce,
-      maxFee: ZERO,
-      version,
-      chainId,
-      cairoVersion: this.cairoVersion,
-    };
+    const invocationBulk: any = await Promise.all(
+      [].concat(transactions as []).map(async (transaction: any, index: number) => {
+        const signerDetails: InvocationsSignerDetails = {
+          walletAddress: this.address,
+          nonce: toBigInt(Number(nonce) + index),
+          maxFee: ZERO,
+          version,
+          chainId,
+          cairoVersion: this.cairoVersion,
+        };
 
-    const invocation = await this.buildInvocation(transactions, signerDetails);
-    const response = await super.getSimulateTransaction(
-      invocation,
-      { version, nonce },
-      blockIdentifier,
-      skipValidate
+        const txPayload = transaction.payload ? transaction.payload : transaction;
+
+        let res;
+        if (typeof transaction === 'object' && transaction.type === 'INVOKE_FUNCTION') {
+          const invocation = await this.buildInvocation(
+            Array.isArray(txPayload) ? txPayload : [txPayload],
+            signerDetails
+          );
+          res = {
+            type: 'INVOKE_FUNCTION',
+            ...invocation,
+            version,
+            nonce: toBigInt(Number(nonce) + index),
+            blockIdentifier,
+          };
+        } else if (typeof transaction === 'object' && transaction.type === 'DECLARE') {
+          const declareContractPayload = await this.buildDeclarePayload(txPayload, signerDetails);
+          res = {
+            type: 'DECLARE',
+            ...declareContractPayload,
+            version,
+            nonce: toBigInt(Number(nonce) + index),
+            blockIdentifier,
+          };
+        } else if (typeof transaction === 'object' && transaction.type === 'DEPLOY_ACCOUNT') {
+          const payload = await this.buildAccountDeployPayload(txPayload, signerDetails);
+          res = {
+            type: 'DEPLOY_ACCOUNT',
+            ...payload,
+            version,
+            nonce: toBigInt(Number(nonce) + index),
+            blockIdentifier,
+          };
+        }
+
+        return res;
+      })
     );
 
-    const suggestedMaxFee = estimatedFeeToMaxFee(response.fee_estimation.overall_fee);
+    const response = await super.getSimulateTransaction(
+      invocationBulk,
 
-    return {
-      ...response,
-      fee_estimation: {
-        ...response.fee_estimation,
-        suggestedMaxFee,
-      },
-    };
+      blockIdentifier,
+      skipValidate,
+      skipExecute
+    );
+
+    return response;
   }
 
   public override async getStarkName(

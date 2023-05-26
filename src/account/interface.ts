@@ -17,13 +17,15 @@ import {
   EstimateFeeDetails,
   EstimateFeeResponse,
   EstimateFeeResponseBulk,
+  InvocationBulkItemSimple,
   InvocationsDetails,
   InvokeFunctionResponse,
   MultiDeployContractResponse,
   Nonce,
   Signature,
+  SimulateTransactionDetails,
+  SimulateTransactionResponse,
   TransactionBulk,
-  TransactionSimulation,
   UniversalDeployerContractPayload,
 } from '../types';
 import { BigNumberish } from '../utils/num';
@@ -319,17 +321,16 @@ export abstract class AccountInterface extends ProviderInterface {
   ): Promise<bigint>;
 
   /**
-   * Simulates the transaction and returns the transaction trace and estimated fee.
+   * Simulates an array of transaction and returns an array of transaction trace and estimated fee.
    *
    * @param calls the invocation object containing:
-   * - contractAddress - the address of the contract
-   * - entrypoint - the entrypoint of the contract
-   * - calldata - (defaults to []) the calldata
+   * - type - transaction type ( DECLARE, DEPLOY_ACCOUNT, INVOKE_FUNCTION)
+   * - DeclareContractTransaction | DeployAccountContractTransaction | Invocation
    *
-   * @returns response from estimate_fee
+   * @returns response from simulate_transaction
    */
   public abstract simulateTransaction(
-    calls: AllowArray<Call>,
-    estimateFeeDetails?: EstimateFeeDetails
-  ): Promise<TransactionSimulation>;
+    calls: AllowArray<InvocationBulkItemSimple>,
+    simulateTransactionDetails?: SimulateTransactionDetails
+  ): Promise<SimulateTransactionResponse>;
 }

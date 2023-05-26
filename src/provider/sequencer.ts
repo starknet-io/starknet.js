@@ -20,11 +20,12 @@ import {
   GetTransactionStatusResponse,
   Invocation,
   InvocationBulk,
+  InvocationBulkItem,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Sequencer,
+  SimulateTransactionResponse,
   StateUpdateResponse,
-  TransactionSimulationResponse,
   TransactionStatus,
   TransactionTraceResponse,
   TransactionType,
@@ -637,24 +638,22 @@ export class SequencerProvider implements ProviderInterface {
   }
 
   public async getSimulateTransaction(
-    invocation: Invocation,
-    invocationDetails: InvocationsDetailsWithNonce,
+    invocations: InvocationBulk,
     blockIdentifier: BlockIdentifier = this.blockIdentifier,
-    skipValidate: boolean = false
-  ): Promise<TransactionSimulationResponse> {
+    skipValidate?: boolean,
+    skipExecute?: boolean
+  ): Promise<SimulateTransactionResponse> {
     return this.fetchEndpoint(
       'simulate_transaction',
-      { blockIdentifier, skipValidate },
       {
-        type: 'INVOKE_FUNCTION',
-        sender_address: invocation.contractAddress,
-        calldata: CallData.compile(invocation.calldata ?? []),
-        signature: signatureToDecimalArray(invocation.signature),
-        version: toHex(invocationDetails?.version || 1),
-        nonce: toHex(invocationDetails.nonce),
-        max_fee: toHex(invocationDetails?.maxFee || 0),
+        blockIdentifier,
+        skipValidate: skipValidate ?? false,
+        skipExecute: skipExecute ?? false,
+      },
+      {
+        transaction: invocations.map(this.buildInvocation),
       }
-    ).then(this.responseParser.parseFeeSimulateTransactionResponse);
+    ).then(this.responseParser.parseSimulateTransactionResponse);
   }
 
   public async getStateUpdate(
@@ -680,5 +679,65 @@ export class SequencerProvider implements ProviderInterface {
 
   public async getAddressFromStarkName(name: string, StarknetIdContract?: string): Promise<string> {
     return getAddressFromStarkName(this, name, StarknetIdContract);
+  }
+
+  public buildInvocation(invocation: InvocationBulkItem): Sequencer.SimulateTransactionItem {
+    if (invocation.type === 'INVOKE_FUNCTION') {
+      return {
+        type: 'INVOKE_FUNCTION',
+        // sender_address: invocation.contractAddress,
+        calldata: CallData.toHex(invocation.calldata),
+        signature: signatureToDecimalArray(invocation.signature),
+        version: toHex(invocation.version || 0),
+        nonce: toHex(invocation.nonce),
+        // max_fee: toHex(invocation.maxFee || 0),
+      };
+    }
+
+    if (invocation.type === 'DECLARE') {
+      if ('program' in invocation.contractDefinition) {
+        return {
+          type: 'DECLARE',
+          contract_class: {
+            program: invocation.contractDefinition.program,
+            entry_points_by_type: invocation.contractDefinition.entry_points_by_type,
+            abi: invocation.contractDefinition.abi, // rpc 2.0
+          },
+          // sender_address: invocation.senderAddress,
+          signature: signatureToDecimalArray(invocation.signature),
+          version: '0x1', // toHex(invocation.version || 0),
+          nonce: toHex(invocation.nonce),
+          // max_fee: toHex(invocation.maxFee || 0),
+        };
+      }
+      // TODO: When RPC Update implement Sierra
+      // throw new Error('RPC do not support Sierra Contracts yet');
+      return {
+        type: 'DECLARE',
+        contract_class: {
+          sierra_program: invocation.contractDefinition.sierra_program,
+          contract_class_version: invocation.contractDefinition.contract_class_version,
+          entry_points_by_type: invocation.contractDefinition.entry_points_by_type,
+          abi: invocation.contractDefinition.abi,
+        },
+        compiled_class_hash: invocation.compiledClassHash || '',
+        // sender_address: invocation.senderAddress,
+        signature: signatureToDecimalArray(invocation.signature),
+        version: '0x2', // toHex(invocation.version || 0),
+        nonce: toHex(invocation.nonce),
+        // max_fee: toHex(invocation.maxFee || 0),
+      };
+    }
+
+    return {
+      type: 'DEPLOY_ACCOUNT',
+      constructor_calldata: CallData.toHex(invocation.constructorCalldata || []),
+      class_hash: toHex(invocation.classHash),
+      contract_address_salt: toHex(invocation.addressSalt || 0),
+      signature: signatureToDecimalArray(invocation.signature),
+      version: toHex(invocation.version || 0),
+      nonce: toHex(invocation.nonce),
+      // max_fee: toHex(invocation.maxFee || 0),
+    };
   }
 }

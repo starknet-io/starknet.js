@@ -4,7 +4,7 @@
  */
 
 import { RPC } from './api/rpc';
-import { Sequencer, TransactionTraceResponse } from './api/sequencer';
+import { Sequencer } from './api/sequencer';
 import {
   AllowArray,
   ByteCode,
@@ -144,9 +144,14 @@ export type Storage = Sequencer.Storage;
 
 export type Nonce = Sequencer.Nonce;
 
-export interface TransactionSimulationResponse {
-  trace: TransactionTraceResponse;
-  fee_estimation: EstimateFeeResponse;
+export type SimulationFlags = RPC.SimulationFlags;
+
+export interface SimulateTransactionResponse {
+  simulated_transactions: Array<{
+    transaction_trace: RPC.Trace;
+    fee_estimation: RPC.EstimateFeeResponse;
+    suggestedMaxFees?: string | bigint;
+  }>;
 }
 
 // As RPC and Sequencer response diverge, use RPC as common response

@@ -19,9 +19,9 @@ import {
   InvokeFunctionResponse,
   Nonce,
   RPC,
+  SimulateTransactionResponse,
   StateUpdateResponse,
   Storage,
-  TransactionSimulationResponse,
   waitForTransactionOptions,
 } from '../types';
 import { BigNumberish } from '../utils/num';
@@ -205,15 +205,15 @@ export class Provider implements ProviderInterface {
   }
 
   public async getSimulateTransaction(
-    invocation: Invocation,
-    invocationDetails: InvocationsDetailsWithNonce,
+    invocations: InvocationBulk,
     blockIdentifier?: BlockIdentifier,
-    skipValidate?: boolean
-  ): Promise<TransactionSimulationResponse> {
+    skipValidate?: boolean,
+    skipExecute?: boolean
+  ): Promise<SimulateTransactionResponse> {
     return this.provider.getSimulateTransaction(
-      invocation,
-      invocationDetails,
+      invocations,
       blockIdentifier,
+      skipExecute,
       skipValidate
     );
   }

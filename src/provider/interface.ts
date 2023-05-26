@@ -20,9 +20,9 @@ import type {
   InvokeFunctionResponse,
   Nonce,
   RPC,
+  SimulateTransactionResponse,
   StateUpdateResponse,
   Storage,
-  TransactionSimulationResponse,
   waitForTransactionOptions,
 } from '../types';
 import type { BigNumberish } from '../utils/num';
@@ -313,24 +313,20 @@ export abstract class ProviderInterface {
   /**
    * Simulates the transaction and returns the transaction trace and estimated fee.
    *
-   * @param invocation the invocation object containing:
-   * - contractAddress - the address of the contract
-   * - entrypoint - the entrypoint of the contract
-   * - calldata - (defaults to []) the calldata
-   * - signature - (defaults to []) the signature
-   * @param details - optional details containing:
-   * - nonce - optional nonce
-   * - version - optional version
+   * @param invocations an array of invocations object containing:
+ 
    * @param blockIdentifier - (optional) block identifier
    * @param skipValidate - (optional) skip cairo __validate__ method
-   * @returns the transaction trace and estimated fee
+   * @param skipExecute - (optional) skip cairo __execute__ method
+   * @returns an array of  transaction trace and estimated fee
    */
+
   public abstract getSimulateTransaction(
-    invocation: Invocation,
-    invocationDetails: InvocationsDetailsWithNonce,
+    invocations: InvocationBulk,
     blockIdentifier?: BlockIdentifier,
-    skipValidate?: boolean
-  ): Promise<TransactionSimulationResponse>;
+    skipValidate?: boolean,
+    skipExecute?: boolean
+  ): Promise<SimulateTransactionResponse>;
 
   /**
    * Gets the state changes in a specific block
