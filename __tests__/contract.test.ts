@@ -1,10 +1,9 @@
-import { Contract, ContractFactory, json, stark } from '../src';
+import { Contract, ContractFactory, RawArgs, json, stark } from '../src';
 import { CallData } from '../src/utils/calldata';
 import { felt, tuple, uint256 } from '../src/utils/calldata/cairo';
 import { getSelectorFromName } from '../src/utils/hash';
 import { BigNumberish, hexToDecimalString, toBigInt } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
-import { compileCalldata } from '../src/utils/stark';
 import { uint256ToBN } from '../src/utils/uint256';
 import {
   compiledErc20,
@@ -76,12 +75,12 @@ describe('contract module', () => {
           erc20Contract.address,
           getSelectorFromName('balanceOf'),
           Object.keys(args1).length,
-          ...compileCalldata(args1),
+          ...CallData.compile(args1),
 
           erc20Contract.address,
           getSelectorFromName('decimals'),
           Object.keys(args2).length,
-          ...compileCalldata(args2),
+          ...CallData.compile(args2),
         ];
         const { block_number, result } = await multicallContract.aggregate(calls);
         expect(BigInt(block_number));
@@ -209,19 +208,13 @@ describe('contract module', () => {
     });
     test('deployment of new contract', async () => {
       const factory = new ContractFactory(compiledErc20, classHash, account);
-      const erc20 = await factory.deploy(
-        compileCalldata({
-          name: encodeShortString('Token'),
-          symbol: encodeShortString('ERC20'),
-          recipient: wallet,
-        })
-      );
-      expect(erc20 instanceof Contract);
+      const erc20 = await factory.deploy('Token', 'ERC20', wallet);
+      expect(erc20).toBeInstanceOf(Contract);
     });
     test('wait for deployment transaction', async () => {
       const factory = new ContractFactory(compiledErc20, classHash, account);
       const contract = await factory.deploy(
-        compileCalldata({
+        CallData.compile({
           name: encodeShortString('Token'),
           symbol: encodeShortString('ERC20'),
           recipient: wallet,
@@ -232,7 +225,7 @@ describe('contract module', () => {
     test('attach new contract', async () => {
       const factory = new ContractFactory(compiledErc20, classHash, account);
       const erc20 = factory.attach(erc20Address);
-      expect(erc20 instanceof Contract);
+      expect(erc20).toBeInstanceOf(Contract);
     });
   });
 });
@@ -259,7 +252,7 @@ describe('Complex interaction', () => {
 
   test('contractFactory.deploy with raw arguments - all types constructor params', () => {
     // executed in beforeAll
-    expect(erc20Echo20Contract instanceof Contract);
+    expect(erc20Echo20Contract).toBeInstanceOf(Contract);
   });
 
   describeIfDevnet('speedup live tests', () => {
@@ -279,7 +272,7 @@ describe('Complex interaction', () => {
       });
 
       erc20Echo20Contract = new Contract(compiledErc20Echo.abi, deploy.contract_address!, provider);
-      expect(erc20Echo20Contract instanceof Contract);
+      expect(erc20Echo20Contract).toBeInstanceOf(Contract);
     });
 
     test('contractFactory.deploy with callData - all types constructor params', async () => {
@@ -295,7 +288,7 @@ describe('Complex interaction', () => {
           threshold: 1,
         })
       );
-      expect(erc20Echo20Contract instanceof Contract);
+      expect(erc20Echo20Contract).toBeInstanceOf(Contract);
     });
   });
 
@@ -326,7 +319,7 @@ describe('Complex interaction', () => {
   });
 
   test('callData compile', async () => {
-    const newCalldata = {
+    const newCalldata: RawArgs = {
       name: 'TokenMTK',
       symbol: 'MTK',
       decimals: 18,
@@ -475,9 +468,22 @@ describe('Complex interaction', () => {
     };
 
     test('call compiled data', async () => {
-      const result = await erc20Echo20Contract.echo(CallData.compile(request), {
+      const calldata = CallData.compile(request);
+      const args = Object.values(request);
+
+      const result = await erc20Echo20Contract.echo(calldata, {
         parseRequest: true,
         parseResponse: true,
+        formatResponse,
+      });
+
+      const result2 = await erc20Echo20Contract.echo(...args, {
+        formatResponse,
+      });
+      const result3 = await erc20Echo20Contract.call('echo', calldata, {
+        formatResponse,
+      });
+      const result4 = await erc20Echo20Contract.call('echo', args, {
         formatResponse,
       });
 
@@ -488,6 +494,146 @@ describe('Complex interaction', () => {
         au1: request.au1.map((it) => uint256ToBN(it)),
       };
       expect(json.stringify(compareRequest)).toBe(json.stringify(result));
+      expect(json.stringify(compareRequest)).toBe(json.stringify(result2));
+      expect(json.stringify(compareRequest)).toBe(json.stringify(result3));
+      expect(json.stringify(compareRequest)).toBe(json.stringify(result4));
+    });
+
+    test('myCallData.compile for Cairo 0', async () => {
+      const requestNonOrdered = {
+        t1: 'demo text1',
+        n1: 123,
+        k1: [{ a: 1, b: { b: 2, c: tuple(3, 4, 5, 6) } }], // not ordered
+        tl2: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        k2: {
+          // named tuple
+          t1: 1,
+          t2: {
+            x2: { y1: 3, y2: 4 }, // not ordered
+            x1: 2,
+            x3: { tx1: tuple(5, 6), tx2: { tx21: { tx211: 7, tx212: 8 }, tx22: tuple(9, 10) } },
+          },
+          t3: 11,
+        },
+        u1: { high: 0, low: 5000 }, // not ordered Uint256
+        s1: {
+          discount_fix_bps: 1,
+          discount_transfer_bps: 2,
+        },
+        s2: {
+          info: {
+            discount_fix_bps: 1,
+            discount_transfer_bps: 2,
+          },
+          data: 200,
+          data2: { min: 1, max: 2 },
+        },
+        af1: [1, 2, 3, 4, 5, 6],
+        au1: [uint256(1000), uint256(2000), uint256(3000), uint256(4000)],
+        as1: [
+          { discount_fix_bps: 10, discount_transfer_bps: 11 },
+          { discount_fix_bps: 20, discount_transfer_bps: 22 },
+        ],
+        atmk: [
+          { p1: { p1: { y1: 1, y2: 2 }, p2: 3 }, p2: 4 },
+          { p1: { p1: { y1: 1, y2: 2 }, p2: 3 }, p2: 4 },
+        ],
+        atmku: [
+          tuple(tuple({ y1: 1, y2: 2 }, 3), 4),
+          tuple(tuple({ y1: 1, y2: 2 }, 3), 4),
+          tuple(tuple({ y1: 1, y2: 2 }, 3), 4),
+        ],
+      };
+      const myCallData = new CallData(erc20Echo20Contract.abi);
+      const myRawArgsObject = requestNonOrdered;
+      const myRawArgsArray = Object.values(request);
+      const callDataFromObject = myCallData.compile('echo', myRawArgsObject);
+      const callDataFromArray = myCallData.compile('echo', myRawArgsArray);
+      const expectedResult = [
+        '474107654995566025798705',
+        '123',
+        '8',
+        '135049554883004558383340439742929429255072943744440858662311072577337126766',
+        '203887170123222058415354283980421533276985178030994883159827760142323294308',
+        '196343614134218459150194337625778954700414868493373034945803514629145850912',
+        '191491606203201332235940470946533476219373216944002683254566549675726417440',
+        '150983476482645969577707455338206408996455974968365254240526141964709732462',
+        '196916864427988120570407658938236398782031728400132565646592333804118761826',
+        '196909666192589839125749789377187946419246316474617716408635151520594095469',
+        '2259304674248048077001042434290734',
+        '1',
+        '1',
+        '2',
+        '3',
+        '4',
+        '5',
+        '6',
+        '1',
+        '2',
+        '3',
+        '4',
+        '5',
+        '6',
+        '7',
+        '8',
+        '9',
+        '10',
+        '11',
+        '5000',
+        '0',
+        '1',
+        '2',
+        '1',
+        '2',
+        '200',
+        '1',
+        '2',
+        '6',
+        '1',
+        '2',
+        '3',
+        '4',
+        '5',
+        '6',
+        '4',
+        '1000',
+        '0',
+        '2000',
+        '0',
+        '3000',
+        '0',
+        '4000',
+        '0',
+        '2',
+        '10',
+        '11',
+        '20',
+        '22',
+        '2',
+        '1',
+        '2',
+        '3',
+        '4',
+        '1',
+        '2',
+        '3',
+        '4',
+        '3',
+        '1',
+        '2',
+        '3',
+        '4',
+        '1',
+        '2',
+        '3',
+        '4',
+        '1',
+        '2',
+        '3',
+        '4',
+      ];
+      expect(callDataFromObject).toStrictEqual(expectedResult);
+      expect(callDataFromArray).toStrictEqual(expectedResult);
     });
 
     test('invoke compiled data', async () => {
@@ -495,6 +641,28 @@ describe('Complex interaction', () => {
       const transaction = await provider.waitForTransaction(result.transaction_hash);
 
       expect(transaction.status).toBeDefined();
+    });
+
+    // skip on live for performance
+    test('invoke unit test arguments', async () => {
+      const calldata = CallData.compile(request);
+      const args = Object.values(request);
+
+      const result = await erc20Echo20Contract.iecho(calldata);
+      const transaction = await provider.waitForTransaction(result.transaction_hash);
+      expect(transaction.status).toBeDefined();
+
+      const result1 = await erc20Echo20Contract.iecho(...args);
+      const transaction1 = await provider.waitForTransaction(result1.transaction_hash);
+      expect(transaction1.status).toBeDefined();
+
+      const result2 = await erc20Echo20Contract.invoke('iecho', calldata);
+      const transaction2 = await provider.waitForTransaction(result2.transaction_hash);
+      expect(transaction2.status).toBeDefined();
+
+      const result3 = await erc20Echo20Contract.invoke('iecho', args);
+      const transaction3 = await provider.waitForTransaction(result3.transaction_hash);
+      expect(transaction3.status).toBeDefined();
     });
 
     describe('speedup live tests', () => {
@@ -552,15 +720,27 @@ describe('Complex interaction', () => {
     });
 
     test('populate transaction and call with populated data', async () => {
-      const populated = await erc20Echo20Contract.populateTransaction.echo(
-        CallData.compile(request)
-      );
-      expect(
-        '["474107654995566025798705","123","8","135049554883004558383340439742929429255072943744440858662311072577337126766","203887170123222058415354283980421533276985178030994883159827760142323294308","196343614134218459150194337625778954700414868493373034945803514629145850912","191491606203201332235940470946533476219373216944002683254566549675726417440","150983476482645969577707455338206408996455974968365254240526141964709732462","196916864427988120570407658938236398782031728400132565646592333804118761826","196909666192589839125749789377187946419246316474617716408635151520594095469","2259304674248048077001042434290734","1","1","2","3","4","5","6","1","2","3","4","5","6","7","8","9","10","11","5000","0","1","2","1","2","200","1","2","6","1","2","3","4","5","6","4","1000","0","2000","0","3000","0","4000","0","2","10","11","20","22","2","1","2","3","4","1","2","3","4","3","1","2","3","4","1","2","3","4","1","2","3","4"]'
-      ).toBe(json.stringify(populated.calldata));
+      const args = Object.values(request);
+      // populateTransaction
+      const populated1 = erc20Echo20Contract.populateTransaction.echo(...args);
+      // populate
+      const populated2 = erc20Echo20Contract.populate('echo', args);
+      // populate with apply
+      const populated3 = erc20Echo20Contract.populate.apply(erc20Echo20Contract, ['echo', args]);
+      // populateTransaction with compiledCalldata
+      const calldata = CallData.compile(request);
+      const populated4 = erc20Echo20Contract.populateTransaction.echo(calldata);
+      const populated5 = erc20Echo20Contract.populate('echo', calldata);
+      const expected =
+        '["474107654995566025798705","123","8","135049554883004558383340439742929429255072943744440858662311072577337126766","203887170123222058415354283980421533276985178030994883159827760142323294308","196343614134218459150194337625778954700414868493373034945803514629145850912","191491606203201332235940470946533476219373216944002683254566549675726417440","150983476482645969577707455338206408996455974968365254240526141964709732462","196916864427988120570407658938236398782031728400132565646592333804118761826","196909666192589839125749789377187946419246316474617716408635151520594095469","2259304674248048077001042434290734","1","1","2","3","4","5","6","1","2","3","4","5","6","7","8","9","10","11","5000","0","1","2","1","2","200","1","2","6","1","2","3","4","5","6","4","1000","0","2000","0","3000","0","4000","0","2","10","11","20","22","2","1","2","3","4","1","2","3","4","3","1","2","3","4","1","2","3","4","1","2","3","4"]';
+      expect(expected).toBe(json.stringify(populated1.calldata));
+      expect(expected).toBe(json.stringify(populated2.calldata));
+      expect(expected).toBe(json.stringify(populated3.calldata));
+      expect(expected).toBe(json.stringify(populated4.calldata));
+      expect(expected).toBe(json.stringify(populated5.calldata));
 
       // mark data as compiled (it can be also done manually check defineProperty compiled in CallData.compile)
-      const compiledCallData = CallData.compile(populated.calldata);
+      const compiledCallData = CallData.compile(populated4.calldata);
       const result = await erc20Echo20Contract.echo(compiledCallData, { formatResponse });
 
       // Convert request uint256 to match response
@@ -573,8 +753,16 @@ describe('Complex interaction', () => {
     });
 
     test('estimate fee', async () => {
-      const gas = await erc20Echo20Contract.estimateFee.iecho(CallData.compile(request));
-      expect(gas).toMatchSchemaRef('EstimateFee');
+      const args = Object.values(request);
+      const calldata = CallData.compile(request);
+      const gas1 = await erc20Echo20Contract.estimateFee.iecho(calldata);
+      const gas2 = await erc20Echo20Contract.estimateFee.iecho(...args);
+      const gas3 = await erc20Echo20Contract.estimate('iecho', calldata);
+      const gas4 = await erc20Echo20Contract.estimate('iecho', args);
+      expect(gas1).toMatchSchemaRef('EstimateFee');
+      expect(gas2).toMatchSchemaRef('EstimateFee');
+      expect(gas3).toMatchSchemaRef('EstimateFee');
+      expect(gas4).toMatchSchemaRef('EstimateFee');
     });
 
     test('estimate fee transfer', async () => {

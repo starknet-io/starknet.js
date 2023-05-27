@@ -4,6 +4,7 @@ import { SignerInterface } from '../signer';
 import {
   Abi,
   AllowArray,
+  CairoVersion,
   Call,
   DeclareAndDeployContractPayload,
   DeclareContractPayload,
@@ -19,6 +20,7 @@ import {
   InvocationsDetails,
   InvokeFunctionResponse,
   MultiDeployContractResponse,
+  Nonce,
   Signature,
   TransactionBulk,
   TransactionSimulation,
@@ -31,6 +33,8 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract address: string;
 
   public abstract signer: SignerInterface;
+
+  public abstract cairoVersion: CairoVersion;
 
   /**
    * Estimate Fee for executing an INVOKE transaction on starknet
@@ -135,7 +139,9 @@ export abstract class AccountInterface extends ProviderInterface {
    * 
    * @param contractPayload transaction payload to be deployed containing:
   - contract: compiled contract code
-  - classHash: computed class hash of compiled contract
+  - (optional) classHash: computed class hash of compiled contract. Pre-compute it for faster execution.
+  - (required for Cairo1 without compiledClassHash) casm: CompiledContract | string;
+  - (optional for Cairo1 with casm) compiledClassHash: compiled class hash from casm. Pre-compute it for faster execution.
    * @param transactionsDetail Invocation Details containing:
   - optional nonce
   - optional version
@@ -201,6 +207,7 @@ export abstract class AccountInterface extends ProviderInterface {
   /**
    * Declares and Deploy a given compiled contract (json) to starknet using UDC
    * Internal wait for L2 transaction, do not support multicall
+   * Method will pass even if contract is already declared (internal using DeclareIfNot)
    *
    * @param  containing
    * - contract: compiled contract code
@@ -297,7 +304,7 @@ export abstract class AccountInterface extends ProviderInterface {
    * @param  {BlockIdentifier} blockIdentifier - optional blockIdentifier. Defaults to 'pending'
    * @returns nonce of the account
    */
-  public abstract getNonce(blockIdentifier?: BlockIdentifier): Promise<BigNumberish>;
+  public abstract getNonce(blockIdentifier?: BlockIdentifier): Promise<Nonce>;
 
   /**
    * Gets Suggested Max Fee based on the transaction type
@@ -309,7 +316,7 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract getSuggestedMaxFee(
     estimateFeeAction: EstimateFeeAction,
     details: EstimateFeeDetails
-  ): Promise<BigNumberish>;
+  ): Promise<bigint>;
 
   /**
    * Simulates the transaction and returns the transaction trace and estimated fee.

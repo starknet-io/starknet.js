@@ -3,14 +3,11 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 
-import {
-  DeployedContractItem,
-  Nonces,
-  StorageDiffItem,
-  TransactionTraceResponse,
-} from './api/sequencer';
+import { RPC } from './api/rpc';
+import { Sequencer, TransactionTraceResponse } from './api/sequencer';
 import {
   AllowArray,
+  ByteCode,
   Call,
   DeclareContractPayload,
   DeployAccountContractPayload,
@@ -36,7 +33,7 @@ export interface GetBlockResponse {
 }
 
 export interface GetCodeResponse {
-  bytecode: string[];
+  bytecode: ByteCode;
   // abi: string; // is not consistent between rpc and sequencer (is it?), therefore not included in the provider interface
 }
 
@@ -51,7 +48,8 @@ export interface CommonTransactionResponse {
 }
 
 export interface InvokeTransactionResponse extends CommonTransactionResponse {
-  contract_address?: string;
+  contract_address?: string; // TODO: Added for RPC comp, remove when rpc update to sender_address
+  sender_address?: string;
   entry_point_selector?: string;
   calldata: RawCalldata;
 }
@@ -106,6 +104,7 @@ export interface EstimateFeeResponse {
   overall_fee: bigint;
   gas_consumed?: bigint;
   gas_price?: bigint;
+  suggestedMaxFee?: bigint;
 }
 
 export interface InvokeFunctionResponse {
@@ -141,19 +140,27 @@ export type EstimateFeeAction =
 
 export type EstimateFeeResponseBulk = Array<EstimateFeeResponse>;
 
+export type Storage = Sequencer.Storage;
+
+export type Nonce = Sequencer.Nonce;
+
 export interface TransactionSimulationResponse {
   trace: TransactionTraceResponse;
   fee_estimation: EstimateFeeResponse;
 }
 
+// As RPC and Sequencer response diverge, use RPC as common response
 export interface StateUpdateResponse {
   block_hash: string;
   new_root: string;
   old_root: string;
   state_diff: {
-    storage_diffs: Array<StorageDiffItem>;
-    declared_contract_hashes: Array<string>;
-    deployed_contracts: Array<DeployedContractItem>;
-    nonces: Array<Nonces>;
+    storage_diffs: RPC.StorageDiffs; // API DIFF
+    declared_contract_hashes?: RPC.DeclaredContractHashes; // RPC only
+    deployed_contracts: Sequencer.DeployedContracts;
+    nonces: RPC.Nonces; // API DIFF
+    old_declared_contracts?: Sequencer.OldDeclaredContracts; // Sequencer Only
+    declared_classes?: Sequencer.DeclaredClasses; // Sequencer Only
+    replaced_classes?: Sequencer.ReplacedClasses; // Sequencer Only
   };
 }

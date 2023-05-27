@@ -1,10 +1,11 @@
-name: Manual Devnet Test
+name: '[Manual] Test Devnet'
 on: workflow_dispatch
 
 jobs:
   tests:
     name: Run test on ${{ matrix.name }}
     strategy:
+      fail-fast: false
       matrix:
         name: [sequencer-devnet, rpc-devnet]
         include:

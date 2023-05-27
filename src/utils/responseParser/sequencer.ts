@@ -11,13 +11,14 @@ import {
   GetBlockResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
+  HexCalldata,
   InvokeFunctionResponse,
   Sequencer,
+  SierraContractClass,
   StateUpdateResponse,
   TransactionSimulationResponse,
 } from '../../types';
 import { toBigInt } from '../num';
-import { parseSignature } from '../stark';
 import { ResponseParser } from '.';
 
 export class SequencerAPIResponseParser extends ResponseParser {
@@ -37,9 +38,7 @@ export class SequencerAPIResponseParser extends ResponseParser {
   ): GetTransactionResponse {
     return {
       ...res,
-      calldata: 'calldata' in res.transaction ? (res.transaction.calldata as Array<string>) : [],
-      contract_address:
-        'contract_address' in res.transaction ? res.transaction.contract_address : undefined,
+      calldata: 'calldata' in res.transaction ? (res.transaction.calldata as HexCalldata) : [],
       contract_class:
         'contract_class' in res.transaction ? (res.transaction.contract_class as any) : undefined,
       entry_point_selector:
@@ -52,8 +51,7 @@ export class SequencerAPIResponseParser extends ResponseParser {
         'sender_address' in res.transaction
           ? (res.transaction.sender_address as string)
           : undefined,
-      signature:
-        'signature' in res.transaction ? parseSignature(res.transaction.signature) : undefined,
+      signature: 'signature' in res.transaction ? res.transaction.signature : undefined,
       transaction_hash:
         'transaction_hash' in res.transaction ? res.transaction.transaction_hash : undefined,
       version: 'version' in res.transaction ? (res.transaction.version as string) : undefined,
@@ -198,28 +196,29 @@ export class SequencerAPIResponseParser extends ResponseParser {
   }
 
   public parseGetStateUpdateResponse(res: Sequencer.StateUpdateResponse): StateUpdateResponse {
-    const nonces = [].concat(res.state_diff.nonces as []).map(({ contract_address, nonce }) => {
-      return {
-        contract_address,
-        nonce: nonce as string,
-      };
-    });
-    const storage_diffs = []
-      .concat(res.state_diff.storage_diffs as [])
-      .map(({ address, storage_entries }) => {
-        return {
-          address,
-          storage_entries,
-        };
-      });
+    const nonces = Object.entries(res.state_diff.nonces).map(([contract_address, nonce]) => ({
+      contract_address,
+      nonce,
+    }));
+    const storage_diffs = Object.entries(res.state_diff.storage_diffs).map(
+      ([address, storage_entries]) => ({ address, storage_entries })
+    );
+
     return {
       ...res,
       state_diff: {
+        ...res.state_diff,
         storage_diffs,
-        declared_contract_hashes: res.state_diff.declared_contract_hashes,
-        deployed_contracts: res.state_diff.deployed_contracts,
         nonces,
       },
+    };
+  }
+
+  // TODO: Define response as new type as it diff from ContractClass
+  public parseSierraContractClassResponse(res: any): SierraContractClass {
+    return {
+      ...res,
+      abi: JSON.parse(res.abi),
     };
   }
 }

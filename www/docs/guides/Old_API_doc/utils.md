@@ -77,9 +77,9 @@ Function that formats a Signature to BigNum and then to string array.
 
 Returns a string array.
 
-### compileCalldata
+### CallData.compile
 
-`compileCalldata(args: RawArgs): Calldata`
+`CallData.compile(args: RawArgs): Calldata`
 
 Function that creates calldata that gets sent to the contract.
 
@@ -87,7 +87,7 @@ Function that creates calldata that gets sent to the contract.
 await this.callContract({
     contractAddress: this.address,
     entrypoint: 'is_valid_signature',
-    calldata: compileCalldata({
+    calldata: CallData.compile({
         hash: toBigInt(hash).toString(),
         signature: signature.map((x) => toBigInt(x).toString()),
     }),
@@ -315,12 +315,12 @@ Functions to compile and validate arguments passed in invoke, call and deploy fu
 
 ### compile
 
-`compileCalldata(args: Array<any>, inputs: AbiEntry[]): Calldata`
+`compile(args: Array<any>, inputs: AbiEntry[]): Calldata`
 
 Parse the calldata by using input fields from the abi for that method.
 
 ### validate
 
-`validateMethodAndArgs(type: 'INVOKE' | 'CALL' | 'DEPLOY', method: string, args: Array<any> = [])`
+`validate(type: 'INVOKE' | 'CALL' | 'DEPLOY', method: string, args: Array<any> = [])`
 
 Validates if all arguments that are passed to the method are corresponding to the ones in the abi.

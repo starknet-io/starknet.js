@@ -1,8 +1,33 @@
-import { AbiEntry, ParsedStruct, Tupled, abiStructs } from '../../types';
+import { AbiEntry, AbiStructs, ParsedStruct, Tupled } from '../../types';
 import { BigNumberish } from '../num';
 import { isText, splitLongString } from '../shortString';
-import { felt, isTypeArray, isTypeFeltArray, isTypeStruct, isTypeTuple } from './cairo';
+import {
+  felt,
+  getArrayType,
+  isTypeArray,
+  isTypeStruct,
+  isTypeTuple,
+  isTypeUint256,
+  uint256,
+} from './cairo';
 import extractTupleMemberTypes from './tuple';
+
+/**
+ * parse base types
+ * @param type type from abi
+ * @param val value provided
+ * @returns string | string[]
+ */
+function parseBaseTypes(type: string, val: BigNumberish) {
+  switch (true) {
+    case isTypeUint256(type):
+      // eslint-disable-next-line no-case-declarations
+      const el_uint256 = uint256(val);
+      return [felt(el_uint256.low), felt(el_uint256.high)];
+    default:
+      return felt(val);
+  }
+}
 
 /**
  * Parse tuple type string to array of known objects
@@ -41,14 +66,23 @@ function parseTuple(element: object, typeStr: string): Tupled[] {
 function parseCalldataValue(
   element: ParsedStruct | BigNumberish | BigNumberish[],
   type: string,
-  structs: abiStructs
+  structs: AbiStructs
 ): string | string[] {
   if (element === undefined) {
     throw Error(`Missing parameter for type ${type}`);
   }
+
+  // value is Array
   if (Array.isArray(element)) {
-    throw Error(`Array inside array (nD) are not supported by cairo. Element: ${element} ${type}`);
+    const result: string[] = [];
+    result.push(felt(element.length)); // Add length to array
+    const arrayType = getArrayType(type);
+
+    return element.reduce((acc, it) => {
+      return acc.concat(parseCalldataValue(it, arrayType, structs));
+    }, result);
   }
+
   // checking if the passed element is struct
   if (structs[type] && structs[type].members.length) {
     const { members } = structs[type];
@@ -67,10 +101,19 @@ function parseCalldataValue(
       return acc.concat(parsedData);
     }, [] as string[]);
   }
+  // check if u256
+  if (isTypeUint256(type)) {
+    if (typeof element === 'object') {
+      const { low, high } = element;
+      return [felt(low as BigNumberish), felt(high as BigNumberish)];
+    }
+    const el_uint256 = uint256(element);
+    return [felt(el_uint256.low), felt(el_uint256.high)];
+  }
   if (typeof element === 'object') {
     throw Error(`Parameter ${element} do not align with abi parameter ${type}`);
   }
-  return felt(element as BigNumberish);
+  return parseBaseTypes(type, element);
 }
 
 /**
@@ -84,7 +127,7 @@ function parseCalldataValue(
 export function parseCalldataField(
   argsIterator: Iterator<any>,
   input: AbiEntry,
-  structs: abiStructs
+  structs: AbiStructs
 ): string | string[] {
   const { name, type } = input;
   let { value } = argsIterator.next();
@@ -99,24 +142,14 @@ export function parseCalldataField(
         // long string match cairo felt*
         value = splitLongString(value);
       }
-      // eslint-disable-next-line no-case-declarations
-      const result: string[] = [];
-      result.push(felt(value.length)); // Add length to array
+      return parseCalldataValue(value, input.type, structs);
 
-      return (value as (BigNumberish | ParsedStruct)[]).reduce((acc, el) => {
-        if (isTypeFeltArray(type)) {
-          acc.push(felt(el as BigNumberish));
-        } else {
-          // structure or tuple
-          acc.push(...parseCalldataValue(el, type.replace('*', ''), structs));
-        }
-        return acc;
-      }, result);
     // Struct or Tuple
-    case isTypeStruct(type, structs) || isTypeTuple(type):
+    case isTypeStruct(type, structs) || isTypeTuple(type) || isTypeUint256(type):
       return parseCalldataValue(value as ParsedStruct | BigNumberish[], type, structs);
+
     // Felt or unhandled
     default:
-      return felt(value as BigNumberish);
+      return parseBaseTypes(type, value);
   }
 }

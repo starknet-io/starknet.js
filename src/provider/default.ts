@@ -17,7 +17,10 @@ import {
   InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  Nonce,
+  RPC,
   StateUpdateResponse,
+  Storage,
   TransactionSimulationResponse,
   waitForTransactionOptions,
 } from '../types';
@@ -69,18 +72,18 @@ export class Provider implements ProviderInterface {
   public async getClassAt(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
-  ): Promise<ContractClass> {
+  ): Promise<ContractClass | RPC.ContractClass> {
     return this.provider.getClassAt(contractAddress, blockIdentifier);
   }
 
   public async getClassHashAt(
     contractAddress: string,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier?: BlockIdentifier
   ): Promise<string> {
     return this.provider.getClassHashAt(contractAddress, blockIdentifier);
   }
 
-  public getClassByHash(classHash: string): Promise<ContractClass> {
+  public getClassByHash(classHash: string): Promise<ContractClass | RPC.ContractClass> {
     return this.provider.getClassByHash(classHash);
   }
 
@@ -95,12 +98,14 @@ export class Provider implements ProviderInterface {
   public async getInvokeEstimateFee(
     invocationWithTxType: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<EstimateFeeResponse> {
     return this.provider.getInvokeEstimateFee(
       invocationWithTxType,
       invocationDetails,
-      blockIdentifier
+      blockIdentifier,
+      skipValidate
     );
   }
 
@@ -114,7 +119,7 @@ export class Provider implements ProviderInterface {
   public async getNonceForAddress(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
-  ): Promise<BigNumberish> {
+  ): Promise<Nonce> {
     return this.provider.getNonceForAddress(contractAddress, blockIdentifier);
   }
 
@@ -122,7 +127,7 @@ export class Provider implements ProviderInterface {
     contractAddress: string,
     key: BigNumberish,
     blockIdentifier?: BlockIdentifier
-  ): Promise<BigNumberish> {
+  ): Promise<Storage> {
     return this.provider.getStorageAt(contractAddress, key, blockIdentifier);
   }
 
@@ -165,17 +170,24 @@ export class Provider implements ProviderInterface {
   public async getDeclareEstimateFee(
     transaction: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<EstimateFeeResponse> {
-    return this.provider.getDeclareEstimateFee(transaction, details, blockIdentifier);
+    return this.provider.getDeclareEstimateFee(transaction, details, blockIdentifier, skipValidate);
   }
 
   public getDeployAccountEstimateFee(
     transaction: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<EstimateFeeResponse> {
-    return this.provider.getDeployAccountEstimateFee(transaction, details, blockIdentifier);
+    return this.provider.getDeployAccountEstimateFee(
+      transaction,
+      details,
+      blockIdentifier,
+      skipValidate
+    );
   }
 
   public async getCode(
@@ -195,9 +207,15 @@ export class Provider implements ProviderInterface {
   public async getSimulateTransaction(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<TransactionSimulationResponse> {
-    return this.provider.getSimulateTransaction(invocation, invocationDetails, blockIdentifier);
+    return this.provider.getSimulateTransaction(
+      invocation,
+      invocationDetails,
+      blockIdentifier,
+      skipValidate
+    );
   }
 
   public async getStateUpdate(blockIdentifier?: BlockIdentifier): Promise<StateUpdateResponse> {

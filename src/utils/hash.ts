@@ -1,71 +1,34 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable import/extensions */
-import { keccak256 } from 'ethereum-cryptography/keccak.js';
-import { hexToBytes } from 'ethereum-cryptography/utils.js';
+import { poseidonHashMany } from 'micro-starknet';
 
-import { API_VERSION, MASK_250, StarknetChainId, TransactionHashPrefix } from '../constants';
-import { CompiledContract, RawCalldata } from '../types/lib';
+import { API_VERSION, StarknetChainId, TransactionHashPrefix } from '../constants';
+import {
+  Builtins,
+  CompiledContract,
+  CompiledSierra,
+  CompiledSierraCasm,
+  ContractEntryPointFields,
+  LegacyCompiledContract,
+  RawArgs,
+  RawCalldata,
+  SierraContractEntryPointFields,
+} from '../types/lib';
+import { CallData } from './calldata';
 import { felt } from './calldata/cairo';
 import { starkCurve } from './ec';
-import { addHexPrefix, buf2hex, removeHexPrefix, utf8ToArray } from './encode';
+import { addHexPrefix, utf8ToArray } from './encode';
 import { parse, stringify } from './json';
-import { BigNumberish, isHex, isStringWholeNumber, toBigInt, toHex, toHexString } from './num';
+import { BigNumberish, toBigInt, toHex } from './num';
+import { getSelectorFromName } from './selector';
 import { encodeShortString } from './shortString';
 
 export * as poseidon from '@noble/curves/abstract/poseidon';
+export * from './selector'; // Preserve legacy export structure
 
 export const transactionVersion = 1n;
+export const transactionVersion_2 = 2n;
 export const feeTransactionVersion = 2n ** 128n + transactionVersion;
-
-export function keccakBn(value: BigNumberish): string {
-  const hexWithoutPrefix = removeHexPrefix(toHex(BigInt(value)));
-  const evenHex = hexWithoutPrefix.length % 2 === 0 ? hexWithoutPrefix : `0${hexWithoutPrefix}`;
-  return addHexPrefix(buf2hex(keccak256(hexToBytes(evenHex))));
-}
-
-function keccakHex(value: string): string {
-  return addHexPrefix(buf2hex(keccak256(utf8ToArray(value))));
-}
-
-/**
- * Function to get the starknet keccak hash from a string
- *
- * [Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/public/abi.py#L17-L22)
- * @param value - string you want to get the starknetKeccak hash from
- * @returns starknet keccak hash as BigNumber
- */
-export function starknetKeccak(value: string): bigint {
-  const hash = BigInt(keccakHex(value));
-  // eslint-disable-next-line no-bitwise
-  return hash & MASK_250;
-}
-
-/**
- * Function to get the hex selector from a given function name
- *
- * [Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/public/abi.py#L25-L26)
- * @param funcName - selectors abi function name
- * @returns hex selector of given abi function name
- */
-export function getSelectorFromName(funcName: string) {
-  // sometimes BigInteger pads the hex string with zeros, which is not allowed in the starknet api
-  return toHex(starknetKeccak(funcName));
-}
-
-/**
- * Function to get hex selector from function name, decimal string or hex string
- * @param value hex string | decimal string | string
- * @returns Hex selector
- */
-export function getSelector(value: string) {
-  if (isHex(value)) {
-    return value;
-  }
-  if (isStringWholeNumber(value)) {
-    return toHexString(value);
-  }
-  return getSelectorFromName(value);
-}
 
 export function computeHashOnElements(data: BigNumberish[]): string {
   return [...data, data.length]
@@ -81,7 +44,7 @@ export function calculateTransactionHashCommon(
   version: BigNumberish,
   contractAddress: BigNumberish,
   entryPointSelector: BigNumberish,
-  calldata: BigNumberish[],
+  calldata: RawCalldata,
   maxFee: BigNumberish,
   chainId: StarknetChainId,
   additionalData: BigNumberish[] = []
@@ -102,7 +65,7 @@ export function calculateTransactionHashCommon(
 
 export function calculateDeployTransactionHash(
   contractAddress: BigNumberish,
-  constructorCalldata: BigNumberish[],
+  constructorCalldata: RawCalldata,
   version: BigNumberish,
   chainId: StarknetChainId
 ): string {
@@ -123,7 +86,8 @@ export function calculateDeclareTransactionHash(
   version: BigNumberish,
   maxFee: BigNumberish,
   chainId: StarknetChainId,
-  nonce: BigNumberish
+  nonce: BigNumberish,
+  compiledClassHash?: string
 ): string {
   return calculateTransactionHashCommon(
     TransactionHashPrefix.DECLARE,
@@ -133,14 +97,14 @@ export function calculateDeclareTransactionHash(
     [classHash],
     maxFee,
     chainId,
-    [nonce]
+    [nonce, ...(compiledClassHash ? [compiledClassHash] : [])]
   );
 }
 
 export function calculateDeployAccountTransactionHash(
   contractAddress: BigNumberish,
   classHash: BigNumberish,
-  constructorCalldata: BigNumberish[],
+  constructorCalldata: RawCalldata,
   salt: BigNumberish,
   version: BigNumberish,
   maxFee: BigNumberish,
@@ -164,7 +128,7 @@ export function calculateDeployAccountTransactionHash(
 export function calculateTransactionHash(
   contractAddress: BigNumberish,
   version: BigNumberish,
-  calldata: BigNumberish[],
+  calldata: RawCalldata,
   maxFee: BigNumberish,
   chainId: StarknetChainId,
   nonce: BigNumberish
@@ -184,10 +148,11 @@ export function calculateTransactionHash(
 export function calculateContractAddressFromHash(
   salt: BigNumberish,
   classHash: BigNumberish,
-  constructorCalldata: RawCalldata,
+  constructorCalldata: RawArgs,
   deployerAddress: BigNumberish
 ) {
-  const constructorCalldataHash = computeHashOnElements(constructorCalldata);
+  const compiledCalldata = CallData.compile(constructorCalldata);
+  const constructorCalldataHash = computeHashOnElements(compiledCalldata);
 
   const CONTRACT_ADDRESS_PREFIX = felt('0x535441524b4e45545f434f4e54524143545f41444452455353'); // Equivalent to 'STARKNET_CONTRACT_ADDRESS'
 
@@ -212,42 +177,36 @@ function nullSkipReplacer(key: string, value: any) {
   return value === null ? undefined : value;
 }
 
-export default function computeHintedClassHash(compiledContract: CompiledContract) {
+export function formatSpaces(json: string) {
+  let insideQuotes = false;
+  let newString = '';
+  // eslint-disable-next-line no-restricted-syntax
+  for (const char of json) {
+    if (char === '"' && newString.endsWith('\\') === false) {
+      insideQuotes = !insideQuotes;
+    }
+    if (insideQuotes) {
+      newString += char;
+    } else {
+      // eslint-disable-next-line no-nested-ternary
+      newString += char === ':' ? ': ' : char === ',' ? ', ' : char;
+    }
+  }
+  return newString;
+}
+
+export default function computeHintedClassHash(compiledContract: LegacyCompiledContract) {
   const { abi, program } = compiledContract;
-
   const contractClass = { abi, program };
+  const serializedJson = formatSpaces(stringify(contractClass, nullSkipReplacer));
 
-  const serialisedJson = stringify(contractClass, nullSkipReplacer)
-    .split('')
-    .reduce<[boolean, string]>(
-      ([insideQuotes, newString], char) => {
-        if (char === '"' && newString[newString.length - 1] !== '\\') {
-          // ignore escaped quotes
-          insideQuotes = !insideQuotes;
-        }
-        if (insideQuotes) {
-          newString += char;
-          return [insideQuotes, newString];
-        }
-        if (char === ':' && !insideQuotes) {
-          newString += ': ';
-        } else if (char === ',' && !insideQuotes) {
-          newString += ', ';
-        } else {
-          newString += char;
-        }
-        return [insideQuotes, newString];
-      },
-      [false, '']
-    )[1];
-
-  return addHexPrefix(starkCurve.keccak(utf8ToArray(serialisedJson)).toString(16));
+  return addHexPrefix(starkCurve.keccak(utf8ToArray(serializedJson)).toString(16));
 }
 
 // Computes the class hash of a given contract class
-export function computeContractClassHash(contract: CompiledContract | string) {
+export function computeLegacyContractClassHash(contract: LegacyCompiledContract | string) {
   const compiledContract =
-    typeof contract === 'string' ? (parse(contract) as CompiledContract) : contract;
+    typeof contract === 'string' ? (parse(contract) as LegacyCompiledContract) : contract;
 
   const apiVersion = toHex(API_VERSION);
 
@@ -280,4 +239,109 @@ export function computeContractClassHash(contract: CompiledContract | string) {
     hintedClassHash,
     dataHash,
   ]);
+}
+
+// Cairo1 below
+function hashBuiltins(builtins: Builtins) {
+  return poseidonHashMany(
+    builtins.flatMap((it: any) => {
+      return BigInt(encodeShortString(it));
+    })
+  );
+}
+
+function hashEntryPoint(data: ContractEntryPointFields[]) {
+  const base = data.flatMap((it: any) => {
+    return [BigInt(it.selector), BigInt(it.offset), hashBuiltins(it.builtins)];
+  });
+  return poseidonHashMany(base);
+}
+
+export function computeCompiledClassHash(casm: CompiledSierraCasm) {
+  const COMPILED_CLASS_VERSION = 'COMPILED_CLASS_V1';
+
+  // Hash compiled class version
+  const compiledClassVersion = BigInt(encodeShortString(COMPILED_CLASS_VERSION));
+
+  // Hash external entry points.
+  const externalEntryPointsHash = hashEntryPoint(casm.entry_points_by_type.EXTERNAL);
+
+  // Hash L1 handler entry points.
+  const l1Handlers = hashEntryPoint(casm.entry_points_by_type.L1_HANDLER);
+
+  // Hash constructor entry points.
+  const constructor = hashEntryPoint(casm.entry_points_by_type.CONSTRUCTOR);
+
+  // Hash bytecode.
+  const bytecode = poseidonHashMany(casm.bytecode.map((it: string) => BigInt(it)));
+
+  return toHex(
+    poseidonHashMany([
+      compiledClassVersion,
+      externalEntryPointsHash,
+      l1Handlers,
+      constructor,
+      bytecode,
+    ])
+  );
+}
+
+function hashEntryPointSierra(data: SierraContractEntryPointFields[]) {
+  const base = data.flatMap((it: any) => {
+    return [BigInt(it.selector), BigInt(it.function_idx)];
+  });
+  return poseidonHashMany(base);
+}
+
+function hashAbi(sierra: CompiledSierra) {
+  const indentString = formatSpaces(stringify(sierra.abi, null));
+  return BigInt(addHexPrefix(starkCurve.keccak(utf8ToArray(indentString)).toString(16)));
+}
+
+export function computeSierraContractClassHash(sierra: CompiledSierra) {
+  const CONTRACT_CLASS_VERSION = 'CONTRACT_CLASS_V0.1.0';
+
+  // Hash class version
+  const compiledClassVersion = BigInt(encodeShortString(CONTRACT_CLASS_VERSION));
+
+  // Hash external entry points.
+  const externalEntryPointsHash = hashEntryPointSierra(sierra.entry_points_by_type.EXTERNAL);
+
+  // Hash L1 handler entry points.
+  const l1Handlers = hashEntryPointSierra(sierra.entry_points_by_type.L1_HANDLER);
+
+  // Hash constructor entry points.
+  const constructor = hashEntryPointSierra(sierra.entry_points_by_type.CONSTRUCTOR);
+
+  // Hash abi_hash.
+  const abiHash = hashAbi(sierra);
+
+  // Hash Sierra program.
+  const sierraProgram = poseidonHashMany(sierra.sierra_program.map((it: string) => BigInt(it)));
+
+  return toHex(
+    poseidonHashMany([
+      compiledClassVersion,
+      externalEntryPointsHash,
+      l1Handlers,
+      constructor,
+      abiHash,
+      sierraProgram,
+    ])
+  );
+}
+
+/**
+ * Compute ClassHash (sierra or legacy) based on provided contract
+ * @param contract CompiledContract | CompiledSierra | string
+ * @returns HexString ClassHash
+ */
+export function computeContractClassHash(contract: CompiledContract | string) {
+  const compiledContract = typeof contract === 'string' ? parse(contract) : contract;
+
+  if ('sierra_program' in compiledContract) {
+    return computeSierraContractClassHash(compiledContract as CompiledSierra);
+  }
+
+  return computeLegacyContractClassHash(compiledContract as LegacyCompiledContract);
 }

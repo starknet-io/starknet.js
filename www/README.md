@@ -58,24 +58,44 @@ Your modified files will just be merged in `/www/docs/` by the Pull Request. If 
 
 ### With creation of a new release of Starknet.js
 
-Just before the release of a new version in the `main` branch, you need to perform the versioning of its documentation:
+Just before the release of a new version in the `main` branch documentation versioning should be performed:
+
+#### Through CI
+
+- Execute the `[Manual] Documentation Version PR` CI workflow to generate an appropriate PR
+
+#### Manually
 
 - Ensure that all the necessary commits/PRs/merges are performed
-- Ensure that the API directory is up to date
-- Launch the documentation versioning with:
+- Ensure that the `www` directory is up to date
+
+- Execute the documentation build with the appropriate version tag used in the documentation code links with one of the following:
 
 ```bash
-#from the root directory, use the module version from package.json
+# from the root directory, use the module version from package.json
+npm run docs:build:version
+
+# from the root directory, manually set the version
+npm run docs:build --git-revision-override=vX.Y.Z
+
+# from the /www documentation directory, manually set the version
+GIT_REVISION_OVERRIDE=vX.Y.Z npm run build
+```
+
+- Launch the documentation versioning with one of the following:
+
+```bash
+# from the root directory, use the module version from package.json
 npm run docs:version
 
-#from the root directory, manully set the version
+# from the root directory, manually set the version
 npm run docs:version --version-override=X.Y.Z
 
-# from the /www documentation directory, manully set the version
+# from the /www documentation directory, manually set the version
 npm run docusaurus docs:version X.Y.Z
 ```
 
-- The official documentation (API + guides) of `X.Y.Z` is created.
-- Commit your work, and merge it in `develop`.
-- perform the official release of `X.Y.Z` in `main`.
-- In the official documentation, the new version of documentation for `X.Y.Z` is available, and NEXT version is temporarily identical.
+- The official documentation (API + guides) of `X.Y.Z` is created
+- Commit your work, and merge it in `develop`
+- perform the official release of `X.Y.Z` in `main`
+- In the official documentation, the new version of documentation for `X.Y.Z` is available, and NEXT version is temporarily identical

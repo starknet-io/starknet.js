@@ -1,5 +1,5 @@
 /**
- * Starknet RPC version 0.2.0
+ * Starknet RPC version 0.2.1
  *
  * Starknet Node API 0.45.0 - rpc 0.2.1
  * Starknet Node Write API 0.3.0 - rpc 0.2.1
@@ -20,8 +20,8 @@ type TXN_STATUS = 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
 export type TXN_TYPE = 'DECLARE' | 'DEPLOY' | 'DEPLOY_ACCOUNT' | 'INVOKE' | 'L1_HANDLER';
 type BLOCK_STATUS = 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
 enum BLOCK_TAG {
-  'latest',
-  'pending',
+  latest = 'latest',
+  pending = 'pending',
 }
 type BLOCK_ID = { block_hash: BLOCK_HASH } | { block_number: BLOCK_NUMBER } | BLOCK_TAG;
 type MSG_TO_L1 = {
@@ -252,9 +252,9 @@ type CONTRACT_ENTRY_POINT = {
   offset: NUM_AS_HEX;
   selector: FELT;
 };
-type CONTRACT_STORAGE_DIFF_ITEM = {
+export type CONTRACT_STORAGE_DIFF_ITEM = {
   address: FELT;
-  storage_entries: [key: FELT, value: FELT];
+  storage_entries: { key: FELT; value: FELT }[];
 };
 
 type DEPLOYED_CONTRACT_ITEM = {
@@ -277,10 +277,10 @@ type STATE_UPDATE = {
 };
 type STORAGE_KEY = string;
 type EVENT_FILTER = {
-  from_block?: BLOCK_ID;
-  to_block?: BLOCK_ID;
-  address?: ADDRESS;
-  keys?: Array<FELT>;
+  from_block: BLOCK_ID;
+  to_block: BLOCK_ID;
+  address: ADDRESS;
+  keys: Array<FELT>;
 };
 type RESULT_PAGE_REQUEST = {
   continuation_token?: string;

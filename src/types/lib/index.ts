@@ -1,28 +1,35 @@
-import { weierstrass } from '../utils/ec';
-import type { BigNumberish } from '../utils/num';
-import { RPC } from './api/rpc';
+import { StarknetChainId } from '../../constants';
+import { weierstrass } from '../../utils/ec';
+import type { BigNumberish } from '../../utils/num';
+import { Uint256 } from '../../utils/uint256';
+import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 
-// Common Signature Type which needs to be imported from weierstrass
-// and imported at many places
-// This is because stark.ts doesn't export SignatureType
-export type Signature = weierstrass.SignatureType;
+export type WeierstrassSignatureType = weierstrass.SignatureType;
+export type ArraySignatureType = string[];
+export type Signature = ArraySignatureType | WeierstrassSignatureType;
 
+/**
+ * BigNumberish array
+ * use CallData.compile() to convert to Calldata
+ */
 export type RawCalldata = BigNumberish[];
-export type AllowArray<T> = T | T[];
-export type RawArgs =
-  | {
-      [inputName: string]:
-        | BigNumberish
-        | BigNumberish[]
-        | { type: 'struct'; [k: string]: BigNumberish };
-    }
-  | BigNumberish[];
 
-export interface ContractClass {
-  program: CompressedProgram;
-  entry_points_by_type: RPC.ContractClass['entry_points_by_type'];
-  abi?: Abi;
-}
+/**
+ * Hexadecimal-string array
+ */
+export type HexCalldata = string[];
+
+export type AllowArray<T> = T | T[];
+
+export type RawArgs = RawArgsObject | RawArgsArray;
+
+export type RawArgsObject = {
+  [inputName: string]: MultiType | MultiType[] | RawArgs;
+};
+
+export type RawArgsArray = Array<MultiType | MultiType[] | RawArgs>;
+
+export type MultiType = BigNumberish | Uint256 | object | boolean;
 
 export type UniversalDeployerContractPayload = {
   classHash: BigNumberish;
@@ -31,6 +38,9 @@ export type UniversalDeployerContractPayload = {
   constructorCalldata?: RawArgs;
 };
 
+/**
+ * @deprecated deprecated due to no direct deploy, unused - can be removed
+ */
 export type DeployContractPayload = {
   contract: CompiledContract | string;
   constructorCalldata?: RawCalldata;
@@ -39,7 +49,7 @@ export type DeployContractPayload = {
 
 export type DeployAccountContractPayload = {
   classHash: string;
-  constructorCalldata?: RawCalldata;
+  constructorCalldata?: RawArgs;
   addressSalt?: BigNumberish;
   contractAddress?: string;
 };
@@ -54,6 +64,15 @@ export type DeployAccountContractTransaction = Omit<
 export type DeclareContractPayload = {
   contract: CompiledContract | string;
   classHash?: string;
+  casm?: CompiledSierraCasm;
+  compiledClassHash?: string;
+};
+
+export type CompleteDeclareContractPayload = {
+  contract: CompiledContract | string;
+  classHash: string;
+  casm?: CompiledSierraCasm;
+  compiledClassHash?: string;
 };
 
 export type DeclareAndDeployContractPayload = Omit<UniversalDeployerContractPayload, 'classHash'> &
@@ -63,16 +82,19 @@ export type DeclareContractTransaction = {
   contractDefinition: ContractClass;
   senderAddress: string;
   signature?: Signature;
+  compiledClassHash?: string;
 };
 
 export type CallDetails = {
   contractAddress: string;
-  calldata?: RawCalldata;
+  calldata?: RawArgs;
 };
 
 export type Invocation = CallDetails & { signature?: Signature };
 
 export type Call = CallDetails & { entrypoint: string };
+
+export type CairoVersion = '0' | '1';
 
 export type InvocationsDetails = {
   nonce?: BigNumberish;
@@ -80,7 +102,19 @@ export type InvocationsDetails = {
   version?: BigNumberish;
 };
 
-export type InvocationsDetailsWithNonce = InvocationsDetails & { nonce: BigNumberish };
+/**
+ * Contain all additional details params
+ */
+export type Details = {
+  nonce: BigNumberish;
+  maxFee: BigNumberish;
+  version: BigNumberish;
+  chainId: StarknetChainId;
+};
+
+export type InvocationsDetailsWithNonce = InvocationsDetails & {
+  nonce: BigNumberish;
+};
 
 export enum TransactionStatus {
   NOT_RECEIVED = 'NOT_RECEIVED',
@@ -123,66 +157,9 @@ export enum TransactionType {
   DEPLOY_ACCOUNT = 'DEPLOY_ACCOUNT',
 }
 
-export type EntryPointType = 'EXTERNAL';
-export type CompressedProgram = string;
-
-export type AbiEntry = { name: string; type: 'felt' | 'felt*' | string };
 export type Tupled = { element: any; type: string };
-
-export type FunctionAbi = {
-  inputs: AbiEntry[];
-  name: string;
-  outputs: AbiEntry[];
-  stateMutability?: 'view';
-  type: FunctionAbiType;
-};
-
-enum FunctionAbiType {
-  'function',
-  'l1_handler',
-  'constructor',
-}
-
-export type abiStructs = { [name: string]: StructAbi };
-
-export type StructAbi = {
-  members: (AbiEntry & { offset: number })[];
-  name: string;
-  size: number;
-  type: 'struct';
-};
-
-export type Abi = Array<FunctionAbi | EventAbi | StructAbi>;
-
-type EventAbi = any;
-
-export type ContractEntryPointFields = {
-  selector: string;
-  offset: string;
-};
-
-export type EntryPointsByType = {
-  CONSTRUCTOR: ContractEntryPointFields[];
-  EXTERNAL: ContractEntryPointFields[];
-  L1_HANDLER: ContractEntryPointFields[];
-};
-
-export interface Program extends Record<string, any> {
-  builtins: string[];
-  data: string[];
-}
 export type BlockTag = 'pending' | 'latest';
 export type BlockNumber = BlockTag | null | number;
-
-export type CompiledContract = {
-  abi: Abi;
-  entry_points_by_type: EntryPointsByType;
-  program: Program;
-};
-
-export type CompressedCompiledContract = Omit<CompiledContract, 'program'> & {
-  program: CompressedProgram;
-};
 
 export type Struct = {
   type: 'struct';
@@ -199,3 +176,11 @@ export type waitForTransactionOptions = {
   retryInterval?: number;
   successStates?: Array<TransactionStatus>;
 };
+
+export interface CallStruct {
+  to: string;
+  selector: string;
+  calldata: string[];
+}
+
+export * from './contract';

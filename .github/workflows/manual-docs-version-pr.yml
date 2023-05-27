@@ -1,0 +1,44 @@
+name: '[Manual] Documentation Version PR'
+on:
+  workflow_dispatch:
+    inputs:
+      version-override:
+        description: 'Version override'
+        type: string
+
+jobs:
+  build_docs:
+    name: Documentation build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: lts/*
+          cache: 'npm'
+      - name: Setup
+        run: |
+          npm ci --ignore-scripts
+          cd www/
+          npm ci --ignore-scripts
+      - name: Build
+        run: |
+          args=()
+          [[ "${{ inputs.version-override }}" != "" ]] && args+=( '--version-override=${{ inputs.version-override }}' )
+          [[ "${{ inputs.version-override }}" != "" ]] && args+=( '--git-revision-override=v${{ inputs.version-override }}' )
+          npm run docs:build:version "${args[@]}"
+          npm run docs:version "${args[@]}"
+          npm run format
+          git add www/versioned_docs www/versioned_sidebars www/versions.json
+          git checkout .
+      - name: Create pull request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          branch: ci/docs-version
+          commiter: CI <noreply@github.com>
+          author: CI <noreply@github.com>
+          commit-message: 'docs: generate documentation version'
+          title: 'CI documentation version'
+          body: ''
+          delete-branch: true
+          reviewers: penovicp, ${{ github.triggering_actor }}

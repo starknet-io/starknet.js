@@ -1,5 +1,5 @@
 /* eslint-disable no-plusplus */
-import { isTypeNamedTuple } from './cairo';
+import { isCairo1Type, isTypeNamedTuple } from './cairo';
 
 function parseNamedTuple(namedTuple: string): any {
   const name = namedTuple.substring(0, namedTuple.indexOf(':'));
@@ -37,12 +37,7 @@ function parseSubTuple(s: string) {
   };
 }
 
-/**
- * Convert tuple string definition into object like definition
- * @param type tuple string definition
- * @returns object like tuple
- */
-export default function extractTupleMemberTypes(type: string): (string | object)[] {
+function extractCairo0Tuple(type: string) {
   const cleanType = type.replace(/\s/g, '').slice(1, -1); // remove first lvl () and spaces
 
   // Decompose subTuple
@@ -61,4 +56,26 @@ export default function extractTupleMemberTypes(type: string): (string | object)
   }
 
   return recomposed;
+}
+
+function extractCairo1Tuple(type: string) {
+  // un-named tuples support
+  const cleanType = type.replace(/\s/g, '').slice(1, -1); // remove first lvl () and spaces
+  const { subTuple, result } = parseSubTuple(cleanType);
+  const recomposed = result.split(',').map((it) => {
+    return subTuple.length ? it.replace(' ', subTuple.shift() as string) : it;
+  });
+  return recomposed;
+}
+
+/**
+ * Convert tuple string definition into object like definition
+ * @param type tuple string definition
+ * @returns object like tuple
+ */
+export default function extractTupleMemberTypes(type: string): (string | object)[] {
+  if (isCairo1Type(type)) {
+    return extractCairo1Tuple(type);
+  }
+  return extractCairo0Tuple(type);
 }

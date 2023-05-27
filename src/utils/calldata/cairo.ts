@@ -1,15 +1,37 @@
-import { abiStructs } from '../../types';
+import { AbiStructs } from '../../types';
 import { BigNumberish, isBigInt, isHex, isStringWholeNumber } from '../num';
 import { encodeShortString, isShortString, isText } from '../shortString';
 import { UINT_128_MAX, Uint256, isUint256 } from '../uint256';
 
+export enum Uint {
+  u8 = 'core::integer::u8',
+  u16 = 'core::integer::u16',
+  u32 = 'core::integer::u32',
+  u64 = 'core::integer::u64',
+  u128 = 'core::integer::u128',
+  u256 = 'core::integer::u256', // This one is struct
+}
+
 export const isLen = (name: string) => /_len$/.test(name);
-export const isTypeFelt = (type: string) => type === 'felt';
-export const isTypeFeltArray = (type: string) => type === 'felt*';
-export const isTypeArray = (type: string) => /\*/.test(type);
+export const isTypeFelt = (type: string) => type === 'felt' || type === 'core::felt252';
+export const isTypeArray = (type: string) =>
+  /\*/.test(type) || type.startsWith('core::array::Array::');
 export const isTypeTuple = (type: string) => /^\(.*\)$/i.test(type);
 export const isTypeNamedTuple = (type: string) => /\(.*\)/i.test(type) && type.includes(':');
-export const isTypeStruct = (type: string, structs: abiStructs) => type in structs;
+export const isTypeStruct = (type: string, structs: AbiStructs) => type in structs;
+export const isTypeUint = (type: string) => Object.values(Uint).includes(type as Uint);
+export const isTypeUint256 = (type: string) => type === 'core::integer::u256';
+export const isTypeBool = (type: string) => type === 'core::bool';
+export const isTypeContractAddress = (type: string) =>
+  type === 'core::starknet::contract_address::ContractAddress';
+export const isCairo1Type = (type: string) => type.includes('core::');
+
+export const getArrayType = (type: string) => {
+  if (isCairo1Type(type)) {
+    return type.substring(type.indexOf('<') + 1, type.lastIndexOf('>'));
+  }
+  return type.replace('*', '');
+};
 
 /**
  * named tuple are described as js object {}
@@ -34,7 +56,9 @@ export const uint256 = (it: BigNumberish): Uint256 => {
 /**
  * unnamed tuple cairo type (helper same as common struct type)
  */
-export const tuple = (...args: (BigNumberish | object)[]) => ({ ...args });
+export const tuple = (
+  ...args: (BigNumberish | object | boolean)[]
+): Record<number, BigNumberish | object | boolean> => ({ ...args });
 
 /**
  * felt cairo type
@@ -61,6 +85,10 @@ export function felt(it: BigNumberish): string {
   // string number (already converted), or unhandled type
   if (typeof it === 'string' && isStringWholeNumber(it)) {
     return it;
+  }
+  // bool to felt
+  if (typeof it === 'boolean') {
+    return `${+it}`;
   }
 
   throw new Error(`${it} can't be computed by felt()`);

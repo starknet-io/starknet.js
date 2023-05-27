@@ -1,4 +1,4 @@
-name: Run Release
+name: _ Run Release
 on:
   workflow_call:
     inputs:
@@ -14,12 +14,15 @@ on:
       #   required: true
       NPM_TOKEN:
         required: true
+
 jobs:
   release:
     name: Run release
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.ref }}
       - uses: actions/setup-node@v3
         with:
           node-version: lts/*

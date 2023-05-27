@@ -149,7 +149,7 @@ const executeHash = await account.execute(
   {
     contractAddress: myContractAddress,
     entrypoint: 'transfer',
-    calldata: stark.compileCalldata({
+    calldata: CallData.compile({
       recipient: receiverAddress,
       amount: ['10']
     })

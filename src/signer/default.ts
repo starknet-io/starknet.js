@@ -1,5 +1,6 @@
 import { Abi, Call, DeclareSignerDetails, InvocationsSignerDetails, Signature } from '../types';
 import { DeployAccountSignerDetails } from '../types/signer';
+import { CallData } from '../utils/calldata';
 import { starkCurve } from '../utils/ec';
 import { buf2hex } from '../utils/encode';
 import {
@@ -8,7 +9,7 @@ import {
   calculateTransactionHash,
 } from '../utils/hash';
 import { toHex } from '../utils/num';
-import { fromCallsToExecuteCalldata } from '../utils/transaction';
+import { getExecuteCalldata } from '../utils/transaction';
 import { TypedData, getMessageHash } from '../utils/typedData';
 import { SignerInterface } from './interface';
 
@@ -38,7 +39,7 @@ export class Signer implements SignerInterface {
     }
     // now use abi to display decoded data somewhere, but as this signer is headless, we can't do that
 
-    const calldata = fromCallsToExecuteCalldata(transactions);
+    const calldata = getExecuteCalldata(transactions, transactionsDetail.cairoVersion);
 
     const msgHash = calculateTransactionHash(
       transactionsDetail.walletAddress,
@@ -61,11 +62,11 @@ export class Signer implements SignerInterface {
     version,
     chainId,
     nonce,
-  }: DeployAccountSignerDetails) {
+  }: DeployAccountSignerDetails): Promise<Signature> {
     const msgHash = calculateDeployAccountTransactionHash(
       contractAddress,
       classHash,
-      constructorCalldata,
+      CallData.compile(constructorCalldata),
       addressSalt,
       version,
       maxFee,
@@ -78,15 +79,24 @@ export class Signer implements SignerInterface {
 
   public async signDeclareTransaction(
     // contractClass: ContractClass,  // Should be used once class hash is present in ContractClass
-    { classHash, senderAddress, chainId, maxFee, version, nonce }: DeclareSignerDetails
-  ) {
+    {
+      classHash,
+      senderAddress,
+      chainId,
+      maxFee,
+      version,
+      nonce,
+      compiledClassHash,
+    }: DeclareSignerDetails
+  ): Promise<Signature> {
     const msgHash = calculateDeclareTransactionHash(
       classHash,
       senderAddress,
       version,
       maxFee,
       chainId,
-      nonce
+      nonce,
+      compiledClassHash
     );
 
     return starkCurve.sign(msgHash, this.pk);

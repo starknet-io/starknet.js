@@ -1,0 +1,23 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`JSON utility tests parse 1`] = `
+Object {
+  "constructor": "c",
+  "n0": 9007199254740991,
+  "n1": 9007199254740992n,
+  "n2": 12,
+  "n3": 1.1,
+}
+`;
+
+exports[`JSON utility tests parseAlwaysAsBig 1`] = `
+Object {
+  "constructor": "c",
+  "n0": 9007199254740991n,
+  "n1": 9007199254740992n,
+  "n2": 12n,
+  "n3": 1.1,
+}
+`;
+
+exports[`JSON utility tests stringify 1`] = `"{\\"provider\\":{\\"responseParser\\":{},\\"baseUrl\\":\\"https://alpha4-2.starknet.io\\",\\"feederGatewayUrl\\":\\"https://alpha4-2.starknet.io/feeder_gateway\\",\\"gatewayUrl\\":\\"https://alpha4-2.starknet.io/gateway\\",\\"chainId\\":\\"0x534e5f474f45524c4932\\",\\"blockIdentifier\\":\\"pending\\"}}"`;

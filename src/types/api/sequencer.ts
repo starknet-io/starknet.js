@@ -4,6 +4,9 @@ import {
   Abi,
   AllowArray,
   BlockNumber,
+  ByteCode,
+  CairoAssembly,
+  CompiledContract,
   ContractClass,
   EntryPointType,
   RawCalldata,
@@ -32,7 +35,7 @@ export type FunctionInvocation = {
   call_type?: string;
   class_hash?: string;
   selector?: string;
-  entry_point_type?: EntryPointType;
+  entry_point_type?: EntryPointType.EXTERNAL; // TODO: check this
   result: Array<any>;
   execution_resources: ExecutionResources;
   internal_calls: Array<FunctionInvocation>;
@@ -67,24 +70,9 @@ export type CallL1Handler = {
   payload: Array<string>;
 };
 
-export type StateDiffItem = {
-  key: string;
-  value: string;
-};
-
-export type StorageDiffItem = {
-  address: string;
-  storage_entries: [key: string, value: string];
-};
-
 export type DeployedContractItem = {
   address: string;
   class_hash: string;
-};
-
-export type Nonces = {
-  contract_address: string;
-  nonce: string;
 };
 
 export type SequencerIdentifier = { blockHash: string } | { blockNumber: BlockNumber };
@@ -98,6 +86,7 @@ export namespace Sequencer {
     nonce: BigNumberish;
     max_fee?: BigNumberish;
     version?: BigNumberish;
+    compiled_class_hash?: string; // v2 declare
   };
 
   export type DeployTransaction = {
@@ -121,9 +110,9 @@ export namespace Sequencer {
 
   export type InvokeFunctionTransaction = {
     type: 'INVOKE_FUNCTION';
-    contract_address: string;
+    sender_address: string;
     signature?: string[];
-    entry_point_type?: EntryPointType;
+    entry_point_type?: EntryPointType.EXTERNAL; // TODO: check this
     calldata?: RawCalldata;
     nonce: BigNumberish;
     max_fee?: BigNumberish;
@@ -144,7 +133,7 @@ export namespace Sequencer {
   };
 
   export type GetCodeResponse = {
-    bytecode: string[];
+    bytecode: ByteCode;
     abi: Abi;
   };
 
@@ -233,10 +222,21 @@ export namespace Sequencer {
     starknet_version: string;
   };
 
-  export type CallContractTransaction = Omit<
-    InvokeFunctionTransaction,
-    'type' | 'entry_point_type' | 'nonce'
-  > & { entry_point_selector: string };
+  export type CallContractTransaction = {
+    calldata?: RawCalldata;
+    max_fee?: BigNumberish;
+    version?: BigNumberish;
+    entry_point_selector: string;
+  } & (
+    | {
+        sender_address: string;
+        signature: string[];
+      }
+    | {
+        contract_address: string;
+        signature?: never;
+      }
+  );
 
   export type CallContractResponse = {
     result: string[];
@@ -283,19 +283,39 @@ export namespace Sequencer {
     traces: Array<TransactionTraceResponse & { transaction_hash: string }>;
   };
 
+  export type Storage = string;
+
   export type StateUpdateResponse = {
     block_hash: string;
     new_root: string;
     old_root: string;
     state_diff: {
-      storage_diffs: Array<{
-        [address: string]: Array<StateDiffItem>;
-      }>;
-      declared_contract_hashes: Array<string>;
+      storage_diffs: StorageDiffs;
+      nonces: Nonces;
       deployed_contracts: Array<DeployedContractItem>;
-      nonces: Array<Nonces>;
+      old_declared_contracts: OldDeclaredContracts;
+      declared_classes: DeclaredClasses;
+      replaced_classes: ReplacedClasses; // no definition is it array of string
     };
   };
+
+  export type StorageDiffs = { [address: string]: Array<StateDiffItem> };
+
+  export type StateDiffItem = { key: string; value: string };
+
+  export type Nonces = { [address: string]: Nonce };
+
+  export type Nonce = string;
+
+  export type DeployedContracts = DeployedContractItem[];
+
+  export type OldDeclaredContracts = string[];
+
+  export type DeclaredClasses = DeclaredClass[];
+
+  export type DeclaredClass = { class_hash: string; compiled_class_hash: string };
+
+  export type ReplacedClasses = string[]; // no definition is it array of string ?
 
   export type Endpoints = {
     get_contract_addresses: {
@@ -342,7 +362,7 @@ export namespace Sequencer {
         blockIdentifier: BlockIdentifier;
       };
       REQUEST: never;
-      RESPONSE: BigNumberish;
+      RESPONSE: Nonce;
     };
     get_storage_at: {
       QUERY: {
@@ -351,7 +371,7 @@ export namespace Sequencer {
         blockIdentifier: BlockIdentifier;
       };
       REQUEST: never;
-      RESPONSE: string;
+      RESPONSE: Storage;
     };
     get_code: {
       QUERY: {
@@ -378,6 +398,7 @@ export namespace Sequencer {
     estimate_fee: {
       QUERY: {
         blockIdentifier: BlockIdentifier;
+        skipValidate: boolean;
       };
       REQUEST: EstimateFeeRequest;
       RESPONSE: EstimateFeeResponse;
@@ -385,9 +406,10 @@ export namespace Sequencer {
     get_class_by_hash: {
       QUERY: {
         classHash: string;
+        blockIdentifier?: BlockIdentifier;
       };
       REQUEST: never;
-      RESPONSE: any;
+      RESPONSE: CompiledContract;
     };
     get_class_hash_at: {
       QUERY: {
@@ -411,7 +433,7 @@ export namespace Sequencer {
         blockIdentifier?: BlockIdentifier;
       };
       REQUEST: never;
-      RESPONSE: any;
+      RESPONSE: CompiledContract;
     };
     estimate_message_fee: {
       QUERY: any;
@@ -421,6 +443,7 @@ export namespace Sequencer {
     simulate_transaction: {
       QUERY: {
         blockIdentifier: BlockIdentifier;
+        skipValidate: boolean;
       };
       REQUEST: SimulateTransaction;
       RESPONSE: TransactionSimulationResponse;
@@ -439,6 +462,14 @@ export namespace Sequencer {
       };
       REQUEST: never;
       RESPONSE: BlockTransactionTracesResponse;
+    };
+    get_compiled_class_by_class_hash: {
+      QUERY: {
+        classHash: string;
+        blockIdentifier?: BlockIdentifier;
+      };
+      REQUEST: any;
+      RESPONSE: CairoAssembly;
     };
   };
 }

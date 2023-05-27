@@ -15,6 +15,7 @@ export type EstimateFeeBulk = Array<EstimateFee>;
 export interface EstimateFeeDetails {
   nonce?: BigNumberish;
   blockIdentifier?: BlockIdentifier;
+  skipValidate?: boolean;
 }
 
 export interface DeployContractResponse {
@@ -42,7 +43,7 @@ export type DeployContractUDCResponse = {
 export type DeclareDeployUDCResponse = {
   declare: {
     class_hash: BigNumberish;
-  } & DeclareTransactionReceiptResponse;
+  } & Partial<DeclareTransactionReceiptResponse>;
   deploy: DeployContractUDCResponse;
 };
 

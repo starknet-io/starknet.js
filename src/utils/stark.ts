@@ -1,13 +1,7 @@
-import { Signature, getStarkKey, utils } from '@noble/curves/stark';
+import { getStarkKey, utils } from 'micro-starknet';
 import { gzip } from 'pako';
 
-import {
-  Calldata,
-  CompressedProgram,
-  Program,
-  RawArgs,
-  Signature as SignatureType,
-} from '../types';
+import { ArraySignatureType, CompressedProgram, Program, Signature } from '../types';
 import { addHexPrefix, btoaUniversal } from './encode';
 import { stringify } from './json';
 import {
@@ -40,50 +34,25 @@ export function makeAddress(input: string): string {
   return addHexPrefix(input).toLowerCase();
 }
 
-export function formatSignature(sig?: SignatureType): string[] {
-  if (!sig) return [];
+export function formatSignature(sig?: Signature): ArraySignatureType {
+  if (!sig) throw Error('formatSignature: provided signature is undefined');
+  if (Array.isArray(sig)) {
+    return sig.map((it) => toHex(it));
+  }
   try {
     const { r, s } = sig;
     return [toHex(r), toHex(s)];
   } catch (e) {
-    return [];
+    throw new Error('Signature need to be weierstrass.SignatureType or an array for custom');
   }
 }
 
-export function signatureToDecimalArray(sig?: SignatureType): string[] {
+export function signatureToDecimalArray(sig?: Signature): ArraySignatureType {
   return bigNumberishArrayToDecimalStringArray(formatSignature(sig));
 }
 
-export function signatureToHexArray(sig?: SignatureType): string[] {
+export function signatureToHexArray(sig?: Signature): ArraySignatureType {
   return bigNumberishArrayToHexadecimalStringArray(formatSignature(sig));
-}
-
-export function parseSignature(sig?: string[]) {
-  if (!sig) return undefined;
-
-  const [r, s] = sig;
-  return new Signature(toBigInt(r), toBigInt(s));
-}
-
-/**
- * @deprecated this function is deprecated use callData instead from calldata.ts
- */
-export function compileCalldata(args: RawArgs): Calldata {
-  const compiledData = Object.values(args).flatMap((value) => {
-    if (Array.isArray(value))
-      return [toBigInt(value.length).toString(), ...value.map((x) => toBigInt(x).toString())];
-    if (typeof value === 'object' && 'type' in value)
-      return Object.entries<BigNumberish>(value)
-        .filter(([k]) => k !== 'type')
-        .map(([, v]) => toBigInt(v).toString());
-    return toBigInt(value).toString();
-  });
-  Object.defineProperty(compiledData, 'compiled', {
-    enumerable: false,
-    writable: false,
-    value: true,
-  });
-  return compiledData;
 }
 
 export function estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: number = 0.5): bigint {

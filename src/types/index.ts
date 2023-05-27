@@ -1,5 +1,4 @@
 export * from './lib';
-export { Calldata, Overrides } from './api';
 export * from './signer';
 export * from './contract';
 export * from './account';

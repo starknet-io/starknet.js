@@ -20,11 +20,12 @@ import {
   TransactionStatus,
   waitForTransactionOptions,
 } from '../types';
+import { CallData } from '../utils/calldata';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
-import { BigNumberish, bigNumberishArrayToHexadecimalStringArray, toHex } from '../utils/num';
-import { parseCalldata, wait } from '../utils/provider';
+import { BigNumberish, toHex } from '../utils/num';
+import { wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { signatureToHexArray } from '../utils/stark';
 import { LibraryError } from './errors';
@@ -173,7 +174,7 @@ export class RpcProvider implements ProviderInterface {
     contractAddress: string,
     key: BigNumberish,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<BigNumberish> {
+  ): Promise<RPC.Storage> {
     const parsedKey = toHex(key);
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getStorageAt', {
@@ -252,7 +253,7 @@ export class RpcProvider implements ProviderInterface {
       request: {
         type: RPC.TransactionType.INVOKE,
         sender_address: invocation.contractAddress,
-        calldata: parseCalldata(invocation.calldata),
+        calldata: CallData.toHex(invocation.calldata),
         signature: signatureToHexArray(invocation.signature),
         version: toHex(invocationDetails?.version || 0),
         nonce: toHex(invocationDetails.nonce),
@@ -268,22 +269,26 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<EstimateFeeResponse> {
     const block_id = new Block(blockIdentifier).identifier;
-    return this.fetchEndpoint('starknet_estimateFee', {
-      request: {
-        type: RPC.TransactionType.DECLARE,
-        contract_class: {
-          program: contractDefinition.program,
-          entry_points_by_type: contractDefinition.entry_points_by_type,
-          abi: contractDefinition.abi, // rpc 2.0
+    if ('program' in contractDefinition) {
+      return this.fetchEndpoint('starknet_estimateFee', {
+        request: {
+          type: RPC.TransactionType.DECLARE,
+          contract_class: {
+            program: contractDefinition.program,
+            entry_points_by_type: contractDefinition.entry_points_by_type,
+            abi: contractDefinition.abi, // rpc 2.0
+          },
+          sender_address: senderAddress,
+          signature: signatureToHexArray(signature),
+          version: toHex(details?.version || 0),
+          nonce: toHex(details.nonce),
+          max_fee: toHex(details?.maxFee || 0),
         },
-        sender_address: senderAddress,
-        signature: signatureToHexArray(signature),
-        version: toHex(details?.version || 0),
-        nonce: toHex(details.nonce),
-        max_fee: toHex(details?.maxFee || 0),
-      },
-      block_id,
-    }).then(this.responseParser.parseFeeEstimateResponse);
+        block_id,
+      }).then(this.responseParser.parseFeeEstimateResponse);
+    }
+    // TODO: When RPC Update implement Sierra
+    throw new Error('RPC do not support Sierra Contracts yet');
   }
 
   public async getDeployAccountEstimateFee(
@@ -295,7 +300,7 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_estimateFee', {
       request: {
         type: RPC.TransactionType.DEPLOY_ACCOUNT,
-        constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
+        constructor_calldata: CallData.toHex(constructorCalldata || []),
         class_hash: toHex(classHash),
         contract_address_salt: toHex(addressSalt || 0),
         signature: signatureToHexArray(signature),
@@ -319,21 +324,25 @@ export class RpcProvider implements ProviderInterface {
     { contractDefinition, signature, senderAddress }: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce
   ): Promise<DeclareContractResponse> {
-    return this.fetchEndpoint('starknet_addDeclareTransaction', {
-      declare_transaction: {
-        contract_class: {
-          program: contractDefinition.program,
-          entry_points_by_type: contractDefinition.entry_points_by_type,
-          abi: contractDefinition.abi, // rpc 2.0
+    if ('program' in contractDefinition) {
+      return this.fetchEndpoint('starknet_addDeclareTransaction', {
+        declare_transaction: {
+          contract_class: {
+            program: contractDefinition.program,
+            entry_points_by_type: contractDefinition.entry_points_by_type,
+            abi: contractDefinition.abi, // rpc 2.0
+          },
+          type: RPC.TransactionType.DECLARE,
+          version: '0x1',
+          max_fee: toHex(details.maxFee || 0),
+          signature: signatureToHexArray(signature),
+          sender_address: senderAddress,
+          nonce: toHex(details.nonce),
         },
-        type: RPC.TransactionType.DECLARE,
-        version: toHex(details.version || 0),
-        max_fee: toHex(details.maxFee || 0),
-        signature: signatureToHexArray(signature),
-        sender_address: senderAddress,
-        nonce: toHex(details.nonce),
-      },
-    });
+      });
+    }
+    // TODO: When RPC Update implement Sierra
+    throw new Error('RPC do not support Sierra Contracts yet');
   }
 
   public async deployAccountContract(
@@ -342,7 +351,7 @@ export class RpcProvider implements ProviderInterface {
   ): Promise<DeployContractResponse> {
     return this.fetchEndpoint('starknet_addDeployAccountTransaction', {
       deploy_account_transaction: {
-        constructor_calldata: bigNumberishArrayToHexadecimalStringArray(constructorCalldata || []),
+        constructor_calldata: CallData.toHex(constructorCalldata || []),
         class_hash: toHex(classHash),
         contract_address_salt: toHex(addressSalt || 0),
         type: RPC.TransactionType.DEPLOY_ACCOUNT,
@@ -361,10 +370,10 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_addInvokeTransaction', {
       invoke_transaction: {
         sender_address: functionInvocation.contractAddress,
-        calldata: parseCalldata(functionInvocation.calldata),
+        calldata: CallData.toHex(functionInvocation.calldata),
         type: RPC.TransactionType.INVOKE,
         max_fee: toHex(details.maxFee || 0),
-        version: toHex(details.version || 1),
+        version: '0x1',
         signature: signatureToHexArray(functionInvocation.signature),
         nonce: toHex(details.nonce),
       },
@@ -381,7 +390,7 @@ export class RpcProvider implements ProviderInterface {
       request: {
         contract_address: call.contractAddress,
         entry_point_selector: getSelectorFromName(call.entrypoint),
-        calldata: parseCalldata(call.calldata),
+        calldata: CallData.toHex(call.calldata),
       },
       block_id,
     });

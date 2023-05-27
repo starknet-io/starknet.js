@@ -1,19 +1,34 @@
-import { Abi, AbiEntry, Args, Calldata, FunctionAbi, abiStructs } from '../../types';
+/* eslint-disable no-plusplus */
+import {
+  Abi,
+  AbiEntry,
+  AbiStructs,
+  Args,
+  ArgsOrCalldata,
+  Calldata,
+  FunctionAbi,
+  HexCalldata,
+  RawArgs,
+  RawArgsArray,
+  Result,
+} from '../../types';
 import assert from '../assert';
-import { isBigInt } from '../num';
+import { isBigInt, toHex } from '../num';
+import { getSelectorFromName } from '../selector';
 import { isLongText, splitLongString } from '../shortString';
 import { felt, isLen } from './cairo';
 import formatter from './formatter';
+import orderPropsByAbi from './propertyOrder';
 import { parseCalldataField } from './requestParser';
 import responseParser from './responseParser';
 import validateFields from './validate';
 
-// Helpers
+export * as cairo from './cairo';
 
 export class CallData {
   abi: Abi;
 
-  protected readonly structs: abiStructs;
+  protected readonly structs: AbiStructs;
 
   constructor(abi: Abi) {
     this.abi = abi;
@@ -21,19 +36,18 @@ export class CallData {
   }
 
   /**
-   * Validates if all arguments that are passed to the method are corresponding to the ones in the abi
-   *
-   * @param type - type of the method
-   * @param method  - name of the method
-   * @param args - arguments that are passed to the method
+   * Validate arguments passed to the method as corresponding to the ones in the abi
+   * @param type string - type of the method
+   * @param method string - name of the method
+   * @param args ArgsOrCalldata - arguments that are passed to the method
    */
-  public validate(type: 'INVOKE' | 'CALL' | 'DEPLOY', method: string, args: Array<any> = []) {
+  public validate(type: 'INVOKE' | 'CALL' | 'DEPLOY', method: string, args: ArgsOrCalldata = []) {
     // ensure provided method of type exists
     if (type !== 'DEPLOY') {
       const invocableFunctionNames = this.abi
         .filter((abi) => {
           if (abi.type !== 'function') return false;
-          const isView = abi.stateMutability === 'view';
+          const isView = abi.stateMutability === 'view' || abi.state_mutability === 'view';
           return type === 'INVOKE' ? !isView : isView;
         })
         .map((abi) => abi.name);
@@ -63,15 +77,35 @@ export class CallData {
   }
 
   /**
+   * Compile contract callData with abi
    * Parse the calldata by using input fields from the abi for that method
-   *
-   * @param args - arguments passed the the method
-   * @param inputs  - list of inputs(fields) that are in the abi
-   * @return {Calldata} - parsed arguments in format that contract is expecting
+   * @param method string - method name
+   * @param args RawArgs - arguments passed to the method. Can be an array of arguments (in the order of abi definition), or an object constructed in conformity with abi (in this case, the parameter can be in a wrong order).
+   * @return Calldata - parsed arguments in format that contract is expecting
+   * @example
+   * ```typescript
+   * const calldata = myCallData.compile("constructor",["0x34a",[1,3n]]);
+   * ```
+   * ```typescript
+   * const calldata2 = myCallData.compile("constructor",{list:[1,3n],balance:"0x34"}); // wrong order is valid
+   * ```
    */
-  public compile(args: Array<any>, inputs: AbiEntry[]): Calldata {
+  public compile(method: string, argsCalldata: RawArgs): Calldata {
+    const abiMethod = this.abi.find((abi) => abi.name === method) as FunctionAbi;
+
+    let args: RawArgsArray;
+    if (Array.isArray(argsCalldata)) {
+      args = argsCalldata;
+    } else {
+      // order the object
+      const orderedObject = orderPropsByAbi(argsCalldata, abiMethod.inputs, this.structs);
+      args = Object.values(orderedObject);
+      //   // validate array elements to abi
+      validateFields(abiMethod, args, this.structs);
+    }
+
     const argsIterator = args[Symbol.iterator]();
-    return inputs.reduce(
+    return abiMethod.inputs.reduce(
       (acc, input) =>
         isLen(input.name) ? acc : acc.concat(parseCalldataField(argsIterator, input, this.structs)),
       [] as Calldata
@@ -80,16 +114,17 @@ export class CallData {
 
   /**
    * Compile contract callData without abi
-   * @param data Object representing cairo method arguments or string array of compiled data
-   * @returns string[]
+   * @param rawArgs RawArgs representing cairo method arguments or string array of compiled data
+   * @returns Calldata
    */
-  static compile(data: object | string[]): Calldata {
+  static compile(rawArgs: RawArgs): Calldata {
     const createTree = (obj: object) => {
       const getEntries = (o: object, prefix = ''): any => {
         const oe = Array.isArray(o) ? [o.length.toString(), ...o] : o;
         return Object.entries(oe).flatMap(([k, v]) => {
           let value = v;
           if (isLongText(value)) value = splitLongString(value);
+          if (k === 'entrypoint') value = getSelectorFromName(value);
           const kk = Array.isArray(oe) && k === '0' ? '$$len' : k;
           if (isBigInt(value)) return [[`${prefix}${kk}`, felt(value)]];
           return Object(value) === value
@@ -101,18 +136,21 @@ export class CallData {
     };
 
     let callTreeArray;
-    if (!Array.isArray(data)) {
+    if (!Array.isArray(rawArgs)) {
       // flatten structs, tuples, add array length. Process leafs as Felt
-      const callTree = createTree(data);
+      const callTree = createTree(rawArgs);
       // convert to array
       callTreeArray = Object.values(callTree);
     } else {
-      // data are already compiled or some missuses
-      callTreeArray = data;
+      // already compiled data but modified or raw args provided as array, recompile it
+      // recreate tree
+      const callObj = { ...rawArgs };
+      const callTree = createTree(callObj);
+      callTreeArray = Object.values(callTree);
     }
 
     // add compiled property to array object
-    Object.defineProperty(callTreeArray, 'compiled', {
+    Object.defineProperty(callTreeArray, '__compiled__', {
       enumerable: false,
       writable: false,
       value: true,
@@ -122,42 +160,54 @@ export class CallData {
 
   /**
    * Parse elements of the response array and structuring them into response object
-   * @param method - method name
-   * @param response  - response from the method
-   * @return - parsed response corresponding to the abi
+   * @param method string - method name
+   * @param response string[] - response from the method
+   * @return Result - parsed response corresponding to the abi
    */
-  public parse(method: string, response: string[]): Object {
+  public parse(method: string, response: string[]): Result {
     const { outputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
     const responseIterator = response.flat()[Symbol.iterator]();
 
-    return outputs.flat().reduce((acc, output) => {
-      acc[output.name] = responseParser(responseIterator, output, this.structs, acc);
-      if (acc[output.name] && acc[`${output.name}_len`]) {
-        delete acc[`${output.name}_len`];
+    const parsed = outputs.flat().reduce((acc, output, idx) => {
+      const propName = output.name ?? idx;
+      acc[propName] = responseParser(responseIterator, output, this.structs, acc);
+      if (acc[propName] && acc[`${propName}_len`]) {
+        delete acc[`${propName}_len`];
       }
       return acc;
     }, {} as Args);
+
+    // Cairo1 avoid object.0 structure
+    return Object.keys(parsed).length === 1 && 0 in parsed ? (parsed[0] as Result) : parsed;
   }
 
   /**
    * Format cairo method response data to native js values based on provided format schema
-   * @param method - cairo method name
-   * @param response - cairo method response
-   * @param format - formatter object schema
-   * @returns parsed and formatted response object
+   * @param method string - cairo method name
+   * @param response string[] - cairo method response
+   * @param format object - formatter object schema
+   * @returns Result - parsed and formatted response object
    */
-  public format(method: string, response: string[], format: Object): Object {
+  public format(method: string, response: string[], format: object): Result {
     const parsed = this.parse(method, response);
     return formatter(parsed, format);
   }
 
-  // Helper to calculate inputs
+  /**
+   * Helper to calculate inputs from abi
+   * @param inputs AbiEntry
+   * @returns number
+   */
   static abiInputsLength(inputs: AbiEntry[]) {
     return inputs.reduce((acc, input) => (!isLen(input.name) ? acc + 1 : acc), 0);
   }
 
-  // Helper to extract structs
-  static getAbiStruct(abi: Abi) {
+  /**
+   * Helper to extract structs from abi
+   * @param abi Abi
+   * @returns AbiStructs - structs from abi
+   */
+  static getAbiStruct(abi: Abi): AbiStructs {
     return abi
       .filter((abiEntry) => abiEntry.type === 'struct')
       .reduce(
@@ -167,5 +217,24 @@ export class CallData {
         }),
         {}
       );
+  }
+
+  /**
+   * Helper: Compile HexCalldata | RawCalldata | RawArgs
+   * @param rawCalldata HexCalldata | RawCalldata | RawArgs
+   * @returns Calldata
+   */
+  static toCalldata(rawCalldata: RawArgs = []): Calldata {
+    return CallData.compile(rawCalldata);
+  }
+
+  /**
+   * Helper: Convert raw to HexCalldata
+   * @param raw HexCalldata | RawCalldata | RawArgs
+   * @returns HexCalldata
+   */
+  static toHex(raw: RawArgs = []): HexCalldata {
+    const calldata = CallData.compile(raw);
+    return calldata.map((it) => toHex(it));
   }
 }
