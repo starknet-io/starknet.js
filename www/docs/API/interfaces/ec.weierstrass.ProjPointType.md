@@ -67,6 +67,34 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:59
 
 node_modules/@noble/curves/abstract/weierstrass.d.ts:60
 
+## Accessors
+
+### x
+
+• `get` **x**(): `T`
+
+#### Returns
+
+`T`
+
+#### Defined in
+
+node_modules/@noble/curves/abstract/weierstrass.d.ts:61
+
+---
+
+### y
+
+• `get` **y**(): `T`
+
+#### Returns
+
+`T`
+
+#### Defined in
+
+node_modules/@noble/curves/abstract/weierstrass.d.ts:62
+
 ## Methods
 
 ### multiply
@@ -89,7 +117,7 @@ Group.multiply
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:61
+node_modules/@noble/curves/abstract/weierstrass.d.ts:63
 
 ---
 
@@ -109,7 +137,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:61
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:62
+node_modules/@noble/curves/abstract/weierstrass.d.ts:64
 
 ---
 
@@ -123,7 +151,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:62
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:63
+node_modules/@noble/curves/abstract/weierstrass.d.ts:65
 
 ---
 
@@ -137,7 +165,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:63
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:64
+node_modules/@noble/curves/abstract/weierstrass.d.ts:66
 
 ---
 
@@ -151,7 +179,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:64
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:65
+node_modules/@noble/curves/abstract/weierstrass.d.ts:67
 
 ---
 
@@ -165,7 +193,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:65
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:66
+node_modules/@noble/curves/abstract/weierstrass.d.ts:68
 
 ---
 
@@ -185,7 +213,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:66
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:67
+node_modules/@noble/curves/abstract/weierstrass.d.ts:69
 
 ---
 
@@ -205,7 +233,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:67
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:68
+node_modules/@noble/curves/abstract/weierstrass.d.ts:70
 
 ---
 
@@ -225,7 +253,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:68
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:69
+node_modules/@noble/curves/abstract/weierstrass.d.ts:71
 
 ---
 
@@ -247,7 +275,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:69
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:70
+node_modules/@noble/curves/abstract/weierstrass.d.ts:72
 
 ---
 
@@ -267,7 +295,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:70
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:71
+node_modules/@noble/curves/abstract/weierstrass.d.ts:73
 
 ---
 
