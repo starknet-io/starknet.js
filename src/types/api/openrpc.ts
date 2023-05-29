@@ -1,9 +1,9 @@
 /**
- * Starknet RPC version 0.2.1
+ * Starknet RPC version 0.3.0
  *
- * Starknet Node API 0.45.0 - rpc 0.2.1
- * Starknet Node Write API 0.3.0 - rpc 0.2.1
- * Starknet Trace API 0.4.0 - rpc 0.2.1
+ * Starknet Node API 0.50.0 - rpc 0.3.0
+ * Starknet Node Write API 0.4.0 - rpc 0.3.0
+ * Starknet Trace API 0.4.0 - rpc 0.3.0
  *
  * TypeScript Representation of OpenRpc protocol types
  */
@@ -177,7 +177,7 @@ type BROADCASTED_DECLARE_TXN_V2 = {
   type: 'DECLARE';
   contract_class: CONTRACT_CLASS;
   sender_address: ADDRESS;
-  compiled_class_hash: ADDRESS;
+  compiled_class_hash: FELT;
 } & BROADCASTED_TXN_COMMON_PROPERTIES;
 
 type DEPLOY_TXN_PROPERTIES = {
@@ -501,8 +501,8 @@ export namespace OPENRPC {
       result: Array<FEE_ESTIMATE>;
       errors:
         | Errors.CONTRACT_NOT_FOUND
-        | Errors.INVALID_MESSAGE_SELECTOR
-        | Errors.INVALID_CALL_DATA
+        // | Errors.INVALID_MESSAGE_SELECTOR
+        // | Errors.INVALID_CALL_DATA
         | Errors.CONTRACT_ERROR
         | Errors.BLOCK_NOT_FOUND;
     };
@@ -555,7 +555,7 @@ export namespace OPENRPC {
         declare_transaction: BROADCASTED_DECLARE_TXN;
       };
       result: DeclaredTransaction;
-      errors: Errors.INVALID_CONTRACT_CLASS;
+      errors: Errors.INVALID_CONTRACT_CLASS | Errors.CLASS_ALREADY_DECLARED;
     };
     starknet_addDeployAccountTransaction: {
       params: {
@@ -669,6 +669,11 @@ export namespace Errors {
   export interface INVALID_CONTRACT_CLASS {
     code: 50;
     message: 'Invalid contract class';
+  }
+
+  export interface CLASS_ALREADY_DECLARED {
+    code: 51;
+    message: 'Class already declared';
   }
 
   export interface NO_TRACE_AVAILABLE {
