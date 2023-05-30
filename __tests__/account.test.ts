@@ -176,7 +176,7 @@ describe('deploy and test Wallet', () => {
 
     test('simulate transaction', async () => {
       const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
-      const res = await account.simulateTransaction(
+      const res = await account.simulateTransaction([
         {
           type: 'INVOKE_FUNCTION',
           contractAddress: erc20Address,
@@ -188,8 +188,8 @@ describe('deploy and test Wallet', () => {
           contractAddress: erc20Address,
           entrypoint: 'transfer',
           calldata: [erc20.address, '10', '0'],
-        }
-      );
+        },
+      ]);
 
       expect(res).toMatchSchemaRef('SimulateTransactionResponse');
       expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
