@@ -1,3 +1,9 @@
+## [5.11.1](https://github.com/0xs34n/starknet.js/compare/v5.11.0...v5.11.1) (2023-05-30)
+
+### Bug Fixes
+
+- expose RPC provider chain id override ([e6b74fe](https://github.com/0xs34n/starknet.js/commit/e6b74fe62687671fe1ff985474c56d66cd5abd66))
+
 # [5.11.0](https://github.com/0xs34n/starknet.js/compare/v5.10.2...v5.11.0) (2023-05-25)
 
 ### Features
