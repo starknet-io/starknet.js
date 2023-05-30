@@ -1,6 +1,6 @@
 ---
 id: 'modules'
-title: 'Starknet.js API - v5.11.0'
+title: 'Starknet.js API - v5.11.1'
 sidebar_label: 'Exports'
 sidebar_position: 0.5
 custom_edit_url: null
@@ -1384,12 +1384,13 @@ decimal-string array
 
 #### Type declaration
 
-| Name               | Type              |
-| :----------------- | :---------------- |
-| `nodeUrl`          | `string`          |
-| `retries?`         | `number`          |
-| `headers?`         | `object`          |
-| `blockIdentifier?` | `BlockIdentifier` |
+| Name               | Type                                                    |
+| :----------------- | :------------------------------------------------------ |
+| `nodeUrl`          | `string`                                                |
+| `retries?`         | `number`                                                |
+| `headers?`         | `object`                                                |
+| `blockIdentifier?` | `BlockIdentifier`                                       |
+| `chainId?`         | [`StarknetChainId`](enums/constants.StarknetChainId.md) |
 
 #### Defined in
 
