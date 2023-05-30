@@ -19,7 +19,7 @@ import {
   StateUpdateResponse,
 } from '../../types';
 import { toBigInt } from '../num';
-// import { estimatedFeeToMaxFee } from '../stark';
+import { estimatedFeeToMaxFee } from '../stark';
 import { ResponseParser } from '.';
 
 export class SequencerAPIResponseParser extends ResponseParser {
@@ -133,21 +133,23 @@ export class SequencerAPIResponseParser extends ResponseParser {
   }
 
   public parseSimulateTransactionResponse(
-    _res: Sequencer.SimulateTransactionResponse
+    res: Sequencer.SimulateTransactionResponse
   ): SimulateTransactionResponse {
-    // const withMaxFees = res.simulated_transactions.map((item) => {
-    //   const suggestedMaxFees = 'overall_fee' in item.fee_estimation ? item.fee_estimation.overall_fee : item.fee_estimation.amount
-    //   return {
-    //     transaction_trace: item.trace,
-    //     fee_estimation: item.fee_estimation,
-    //     suggestedMaxFees: estimatedFeeToMaxFee(BigInt(suggestedMaxFees)),
-    //   };
-    // });
+    const withMaxFees = res.simulated_transactions.map((item) => {
+      const suggestedMaxFees =
+        'overall_fee' in item.fee_estimation
+          ? item.fee_estimation.overall_fee
+          : item.fee_estimation.amount;
+      return {
+        transaction_trace: item.trace,
+        fee_estimation: item.fee_estimation,
+        suggestedMaxFees: estimatedFeeToMaxFee(BigInt(suggestedMaxFees)),
+      };
+    });
 
-    // return {
-    //   simulated_transactions: withMaxFees,
-    // };
-    throw Error('Not implemented');
+    return {
+      simulated_transactions: withMaxFees,
+    };
   }
 
   public parseCallContractResponse(res: Sequencer.CallContractResponse): CallContractResponse {

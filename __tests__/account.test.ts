@@ -16,8 +16,8 @@ import {
   compiledOpenZeppelinAccount,
   compiledStarknetId,
   compiledTestDapp,
-  describeIfDevnetRpc,
   describeIfDevnetSequencer,
+  describeIfRpc,
   describeIfSequencer,
   erc20ClassHash,
   getTestAccount,
@@ -574,7 +574,7 @@ describe('deploy and test Wallet', () => {
     });
   });
 
-  describeIfDevnetRpc('Simulate Transaction', () => {
+  describeIfRpc('Simulate Transaction', () => {
     test('simulate transaction', async () => {
       const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
       const res = await account.simulateTransaction([
@@ -599,8 +599,6 @@ describe('deploy and test Wallet', () => {
     });
   });
 });
-
-// TODO: add tests for transaction type v0/v1/v2
 
 describe('unit', () => {
   describeIfDevnetSequencer('devnet sequencer', () => {

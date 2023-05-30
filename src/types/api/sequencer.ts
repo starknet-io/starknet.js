@@ -56,14 +56,6 @@ export type ExecutionResources = {
   n_memory_holes: number;
 };
 
-export type TransactionTraceResponse = {
-  validate_invocation?: FunctionInvocation;
-  function_invocation?: FunctionInvocation;
-  fee_transfer_invocation?: FunctionInvocation;
-  constructor_invocation?: FunctionInvocation;
-  signature: string[];
-};
-
 export type CallL1Handler = {
   from_address: string;
   to_address: string;
@@ -79,6 +71,14 @@ export type DeployedContractItem = {
 export type SequencerIdentifier = { blockHash: string } | { blockNumber: BlockNumber };
 
 export namespace Sequencer {
+  export type TransactionTraceResponse = {
+    validate_invocation?: FunctionInvocation;
+    function_invocation?: FunctionInvocation;
+    fee_transfer_invocation?: FunctionInvocation;
+    constructor_invocation?: FunctionInvocation;
+    signature: string[];
+  };
+
   export type DeclareTransaction = {
     type: 'DECLARE';
     sender_address: string;

@@ -237,17 +237,6 @@ export class RpcProvider implements ProviderInterface {
     throw new Error('RPC does not implement getCode function');
   }
 
-  public async estimateFee_original(
-    invocations: InvocationBulk,
-    blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ) {
-    const block_id = new Block(blockIdentifier).identifier;
-    return this.fetchEndpoint('starknet_estimateFee', {
-      request: invocations.map(this.buildInvocation),
-      block_id,
-    }).then(this.responseParser.parseFeeEstimateOriginalResponse);
-  }
-
   public async getEstimateFee(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
@@ -350,10 +339,14 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getEstimateFeeBulk(
-    _invocations: InvocationBulk,
-    _blockIdentifier: BlockIdentifier = this.blockIdentifier
+    invocations: InvocationBulk,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<EstimateFeeResponseBulk> {
-    throw new Error('RPC does not implement getInvokeEstimateFeeBulk function');
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint('starknet_estimateFee', {
+      request: invocations.map(this.buildInvocation),
+      block_id,
+    }).then(this.responseParser.parseFeeEstimateOriginalResponse);
   }
 
   // TODO: Revisit after Pathfinder release with JSON-RPC v0.2.1 RPC Spec

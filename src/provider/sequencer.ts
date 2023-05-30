@@ -27,7 +27,6 @@ import {
   SimulateTransactionResponse,
   StateUpdateResponse,
   TransactionStatus,
-  TransactionTraceResponse,
   TransactionType,
   waitForTransactionOptions,
 } from '../types';
@@ -618,7 +617,9 @@ export class SequencerProvider implements ProviderInterface {
    * @param txHash
    * @returns the transaction trace
    */
-  public async getTransactionTrace(txHash: BigNumberish): Promise<TransactionTraceResponse> {
+  public async getTransactionTrace(
+    txHash: BigNumberish
+  ): Promise<Sequencer.TransactionTraceResponse> {
     const txHashHex = toHex(txHash);
     return this.fetchEndpoint('get_transaction_trace', { transactionHash: txHashHex });
   }
@@ -710,12 +711,11 @@ export class SequencerProvider implements ProviderInterface {
           // max_fee: toHex(invocation.maxFee || 0),
         };
       }
-      // TODO: When RPC Update implement Sierra
-      // throw new Error('RPC do not support Sierra Contracts yet');
       return {
         type: 'DECLARE',
         contract_class: {
           sierra_program: invocation.contractDefinition.sierra_program,
+          sierra_program_debug_info: invocation.contractDefinition.sierra_program_debug_info,
           contract_class_version: invocation.contractDefinition.contract_class_version,
           entry_points_by_type: invocation.contractDefinition.entry_points_by_type,
           abi: invocation.contractDefinition.abi,

@@ -148,8 +148,8 @@ export type SimulationFlags = RPC.SimulationFlags;
 
 export interface SimulateTransactionResponse {
   simulated_transactions: Array<{
-    transaction_trace: RPC.Trace;
-    fee_estimation: RPC.EstimateFeeResponse;
+    transaction_trace: RPC.Trace | Sequencer.TransactionTraceResponse;
+    fee_estimation: RPC.EstimateFeeResponse | Sequencer.EstimateFeeResponse;
     suggestedMaxFees?: string | bigint;
   }>;
 }
