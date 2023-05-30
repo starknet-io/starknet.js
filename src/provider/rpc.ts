@@ -38,6 +38,7 @@ export type RpcProviderOptions = {
   retries?: number;
   headers?: object;
   blockIdentifier?: BlockIdentifier;
+  chainId?: StarknetChainId;
 };
 
 // Default Pathfinder disabled pending block https://github.com/eqlabs/pathfinder/blob/main/README.md
@@ -53,22 +54,22 @@ export class RpcProvider implements ProviderInterface {
 
   public headers: object;
 
-  private chainId!: StarknetChainId;
-
   private responseParser = new RPCResponseParser();
 
   private retries: number;
 
   private blockIdentifier: BlockIdentifier;
 
+  private chainId?: StarknetChainId;
+
   constructor(optionsOrProvider: RpcProviderOptions) {
-    const { nodeUrl, retries, headers, blockIdentifier } = optionsOrProvider;
+    const { nodeUrl, retries, headers, blockIdentifier, chainId } = optionsOrProvider;
     this.nodeUrl = nodeUrl;
     this.retries = retries || defaultOptions.retries;
     this.headers = { ...defaultOptions.headers, ...headers };
     this.blockIdentifier = blockIdentifier || defaultOptions.blockIdentifier;
-
-    this.getChainId();
+    this.chainId = chainId;
+    this.getChainId(); // internally skipped if chainId has value
   }
 
   public fetch(method: any, params: any): Promise<any> {
