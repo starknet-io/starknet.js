@@ -6,9 +6,11 @@ sidebar_position: 0
 custom_edit_url: null
 ---
 
-## Interfaces
+## References
 
-- [Uint256](../interfaces/uint256.Uint256.md)
+### Uint256
+
+Re-exports [Uint256](../interfaces/types.Uint256.md)
 
 ## Variables
 
@@ -18,7 +20,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/uint256.ts:18](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L18)
+[src/utils/uint256.ts:14](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L14)
 
 ---
 
@@ -28,7 +30,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/uint256.ts:19](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L19)
+[src/utils/uint256.ts:15](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L15)
 
 ## Functions
 
@@ -38,9 +40,9 @@ custom_edit_url: null
 
 #### Parameters
 
-| Name      | Type                                          |
-| :-------- | :-------------------------------------------- |
-| `uint256` | [`Uint256`](../interfaces/uint256.Uint256.md) |
+| Name      | Type                                        |
+| :-------- | :------------------------------------------ |
+| `uint256` | [`Uint256`](../interfaces/types.Uint256.md) |
 
 #### Returns
 
@@ -48,7 +50,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/uint256.ts:14](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L14)
+[src/utils/uint256.ts:10](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L10)
 
 ---
 
@@ -58,9 +60,9 @@ custom_edit_url: null
 
 #### Parameters
 
-| Name | Type                                  |
-| :--- | :------------------------------------ |
-| `bn` | [`BigNumberish`](num.md#bignumberish) |
+| Name | Type                                    |
+| :--- | :-------------------------------------- |
+| `bn` | [`BigNumberish`](types.md#bignumberish) |
 
 #### Returns
 
@@ -68,24 +70,24 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/uint256.ts:21](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L21)
+[src/utils/uint256.ts:17](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L17)
 
 ---
 
 ### bnToUint256
 
-▸ **bnToUint256**(`bignumber`): [`Uint256`](../interfaces/uint256.Uint256.md)
+▸ **bnToUint256**(`bignumber`): [`Uint256`](../interfaces/types.Uint256.md)
 
 #### Parameters
 
-| Name        | Type                                  |
-| :---------- | :------------------------------------ |
-| `bignumber` | [`BigNumberish`](num.md#bignumberish) |
+| Name        | Type                                    |
+| :---------- | :-------------------------------------- |
+| `bignumber` | [`BigNumberish`](types.md#bignumberish) |
 
 #### Returns
 
-[`Uint256`](../interfaces/uint256.Uint256.md)
+[`Uint256`](../interfaces/types.Uint256.md)
 
 #### Defined in
 
-[src/utils/uint256.ts:26](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L26)
+[src/utils/uint256.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L22)

@@ -32,13 +32,13 @@ public key of signer as hex string with 0x prefix
 
 #### Defined in
 
-[src/signer/interface.ts:11](https://github.com/0xs34n/starknet.js/blob/develop/src/signer/interface.ts#L11)
+[src/signer/interface.ts:17](https://github.com/0xs34n/starknet.js/blob/develop/src/signer/interface.ts#L17)
 
 ---
 
 ### signMessage
 
-▸ `Abstract` **signMessage**(`typedData`, `accountAddress`): `Promise`<[`Signature`](../modules.md#signature)\>
+▸ `Abstract` **signMessage**(`typedData`, `accountAddress`): `Promise`<[`Signature`](../namespaces/types.md#signature)\>
 
 Sign an JSON object for off-chain usage with the starknet private key and return the signature
 This adds a message prefix so it cant be interchanged with transactions
@@ -49,91 +49,91 @@ if the JSON object is not a valid JSON
 
 #### Parameters
 
-| Name             | Type                                                | Description              |
-| :--------------- | :-------------------------------------------------- | :----------------------- |
-| `typedData`      | [`TypedData`](../interfaces/typedData.TypedData.md) | JSON object to be signed |
-| `accountAddress` | `string`                                            | account                  |
+| Name             | Type                                            | Description              |
+| :--------------- | :---------------------------------------------- | :----------------------- |
+| `typedData`      | [`TypedData`](../interfaces/types.TypedData.md) | JSON object to be signed |
+| `accountAddress` | `string`                                        | account                  |
 
 #### Returns
 
-`Promise`<[`Signature`](../modules.md#signature)\>
+`Promise`<[`Signature`](../namespaces/types.md#signature)\>
 
 the signature of the JSON object
 
 #### Defined in
 
-[src/signer/interface.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/signer/interface.ts#L22)
+[src/signer/interface.ts:28](https://github.com/0xs34n/starknet.js/blob/develop/src/signer/interface.ts#L28)
 
 ---
 
 ### signTransaction
 
-▸ `Abstract` **signTransaction**(`transactions`, `transactionsDetail`, `abis?`): `Promise`<[`Signature`](../modules.md#signature)\>
+▸ `Abstract` **signTransaction**(`transactions`, `transactionsDetail`, `abis?`): `Promise`<[`Signature`](../namespaces/types.md#signature)\>
 
 Signs a transaction with the starknet private key and returns the signature
 
 #### Parameters
 
-| Name                 | Type                                                                    |
-| :------------------- | :---------------------------------------------------------------------- |
-| `transactions`       | [`Call`](../modules.md#call)[]                                          |
-| `transactionsDetail` | [`InvocationsSignerDetails`](../interfaces/InvocationsSignerDetails.md) |
-| `abis?`              | [`Abi`](../modules.md#abi)[]                                            |
+| Name                 | Type                                                                          |
+| :------------------- | :---------------------------------------------------------------------------- |
+| `transactions`       | [`Call`](../namespaces/types.md#call)[]                                       |
+| `transactionsDetail` | [`InvocationsSignerDetails`](../interfaces/types.InvocationsSignerDetails.md) |
+| `abis?`              | [`Abi`](../namespaces/types.md#abi)[]                                         |
 
 #### Returns
 
-`Promise`<[`Signature`](../modules.md#signature)\>
+`Promise`<[`Signature`](../namespaces/types.md#signature)\>
 
 signature
 
 #### Defined in
 
-[src/signer/interface.ts:35](https://github.com/0xs34n/starknet.js/blob/develop/src/signer/interface.ts#L35)
+[src/signer/interface.ts:41](https://github.com/0xs34n/starknet.js/blob/develop/src/signer/interface.ts#L41)
 
 ---
 
 ### signDeployAccountTransaction
 
-▸ `Abstract` **signDeployAccountTransaction**(`transaction`): `Promise`<[`Signature`](../modules.md#signature)\>
+▸ `Abstract` **signDeployAccountTransaction**(`transaction`): `Promise`<[`Signature`](../namespaces/types.md#signature)\>
 
 Signs a DEPLOY_ACCOUNT transaction with the starknet private key and returns the signature
 
 #### Parameters
 
-| Name          | Type                                                                     | Description                                                                                                                                                                                                                                                                                                                              |
-| :------------ | :----------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `transaction` | [`DeployAccountSignerDetails`](../modules.md#deployaccountsignerdetails) | contractAddress - the computed address of the contract - constructorCalldata - calldata to be passed in deploy constructor - addressSalt - contract address salt - chainId - the chainId to declare contract on - maxFee - maxFee for the declare transaction - version - transaction version - nonce - Nonce of the declare transaction |
+| Name          | Type                                                                              | Description                                                                                                                                                                                                                                                                                                                              |
+| :------------ | :-------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `transaction` | [`DeployAccountSignerDetails`](../namespaces/types.md#deployaccountsignerdetails) | contractAddress - the computed address of the contract - constructorCalldata - calldata to be passed in deploy constructor - addressSalt - contract address salt - chainId - the chainId to declare contract on - maxFee - maxFee for the declare transaction - version - transaction version - nonce - Nonce of the declare transaction |
 
 #### Returns
 
-`Promise`<[`Signature`](../modules.md#signature)\>
+`Promise`<[`Signature`](../namespaces/types.md#signature)\>
 
 signature
 
 #### Defined in
 
-[src/signer/interface.ts:54](https://github.com/0xs34n/starknet.js/blob/develop/src/signer/interface.ts#L54)
+[src/signer/interface.ts:60](https://github.com/0xs34n/starknet.js/blob/develop/src/signer/interface.ts#L60)
 
 ---
 
 ### signDeclareTransaction
 
-▸ `Abstract` **signDeclareTransaction**(`transaction`): `Promise`<[`Signature`](../modules.md#signature)\>
+▸ `Abstract` **signDeclareTransaction**(`transaction`): `Promise`<[`Signature`](../namespaces/types.md#signature)\>
 
 Signs a DECLARE transaction with the starknet private key and returns the signature
 
 #### Parameters
 
-| Name          | Type                                                            | Description                                                                                                                                                                                                                                                                                                                                     |
-| :------------ | :-------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `transaction` | [`DeclareSignerDetails`](../interfaces/DeclareSignerDetails.md) | classHash - computed class hash. Will be replaced by ContractClass in future once class hash is present in CompiledContract - senderAddress - the address of the sender - chainId - the chainId to declare contract on - maxFee - maxFee for the declare transaction - version - transaction version - nonce - Nonce of the declare transaction |
+| Name          | Type                                                                  | Description                                                                                                                                                                                                                                                                                                                                     |
+| :------------ | :-------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `transaction` | [`DeclareSignerDetails`](../interfaces/types.DeclareSignerDetails.md) | classHash - computed class hash. Will be replaced by ContractClass in future once class hash is present in CompiledContract - senderAddress - the address of the sender - chainId - the chainId to declare contract on - maxFee - maxFee for the declare transaction - version - transaction version - nonce - Nonce of the declare transaction |
 
 #### Returns
 
-`Promise`<[`Signature`](../modules.md#signature)\>
+`Promise`<[`Signature`](../namespaces/types.md#signature)\>
 
 signature
 
 #### Defined in
 
-[src/signer/interface.ts:70](https://github.com/0xs34n/starknet.js/blob/develop/src/signer/interface.ts#L70)
+[src/signer/interface.ts:76](https://github.com/0xs34n/starknet.js/blob/develop/src/signer/interface.ts#L76)

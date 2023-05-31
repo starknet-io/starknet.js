@@ -18,7 +18,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:29](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L29)
+[src/utils/hash.ts:30](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L30)
 
 ---
 
@@ -28,7 +28,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:30](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L30)
+[src/utils/hash.ts:31](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L31)
 
 ---
 
@@ -38,7 +38,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:31](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L31)
+[src/utils/hash.ts:32](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L32)
 
 ## Functions
 
@@ -48,9 +48,9 @@ custom_edit_url: null
 
 #### Parameters
 
-| Name   | Type                                    |
-| :----- | :-------------------------------------- |
-| `data` | [`BigNumberish`](num.md#bignumberish)[] |
+| Name   | Type                                      |
+| :----- | :---------------------------------------- |
+| `data` | [`BigNumberish`](types.md#bignumberish)[] |
 
 #### Returns
 
@@ -58,7 +58,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:33](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L33)
+[src/utils/hash.ts:34](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L34)
 
 ---
 
@@ -71,13 +71,13 @@ custom_edit_url: null
 | Name                 | Type                                                                   | Default value |
 | :------------------- | :--------------------------------------------------------------------- | :------------ |
 | `txHashPrefix`       | [`TransactionHashPrefix`](../enums/constants.TransactionHashPrefix.md) | `undefined`   |
-| `version`            | [`BigNumberish`](num.md#bignumberish)                                  | `undefined`   |
-| `contractAddress`    | [`BigNumberish`](num.md#bignumberish)                                  | `undefined`   |
-| `entryPointSelector` | [`BigNumberish`](num.md#bignumberish)                                  | `undefined`   |
-| `calldata`           | [`RawCalldata`](../modules.md#rawcalldata)                             | `undefined`   |
-| `maxFee`             | [`BigNumberish`](num.md#bignumberish)                                  | `undefined`   |
+| `version`            | [`BigNumberish`](types.md#bignumberish)                                | `undefined`   |
+| `contractAddress`    | [`BigNumberish`](types.md#bignumberish)                                | `undefined`   |
+| `entryPointSelector` | [`BigNumberish`](types.md#bignumberish)                                | `undefined`   |
+| `calldata`           | [`RawCalldata`](types.md#rawcalldata)                                  | `undefined`   |
+| `maxFee`             | [`BigNumberish`](types.md#bignumberish)                                | `undefined`   |
 | `chainId`            | [`StarknetChainId`](../enums/constants.StarknetChainId.md)             | `undefined`   |
-| `additionalData`     | [`BigNumberish`](num.md#bignumberish)[]                                | `[]`          |
+| `additionalData`     | [`BigNumberish`](types.md#bignumberish)[]                              | `[]`          |
 
 #### Returns
 
@@ -85,7 +85,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:42](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L42)
+[src/utils/hash.ts:43](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L43)
 
 ---
 
@@ -97,9 +97,9 @@ custom_edit_url: null
 
 | Name                  | Type                                                       |
 | :-------------------- | :--------------------------------------------------------- |
-| `contractAddress`     | [`BigNumberish`](num.md#bignumberish)                      |
-| `constructorCalldata` | [`RawCalldata`](../modules.md#rawcalldata)                 |
-| `version`             | [`BigNumberish`](num.md#bignumberish)                      |
+| `contractAddress`     | [`BigNumberish`](types.md#bignumberish)                    |
+| `constructorCalldata` | [`RawCalldata`](types.md#rawcalldata)                      |
+| `version`             | [`BigNumberish`](types.md#bignumberish)                    |
 | `chainId`             | [`StarknetChainId`](../enums/constants.StarknetChainId.md) |
 
 #### Returns
@@ -108,7 +108,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:66](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L66)
+[src/utils/hash.ts:67](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L67)
 
 ---
 
@@ -121,11 +121,11 @@ custom_edit_url: null
 | Name                 | Type                                                       |
 | :------------------- | :--------------------------------------------------------- |
 | `classHash`          | `string`                                                   |
-| `senderAddress`      | [`BigNumberish`](num.md#bignumberish)                      |
-| `version`            | [`BigNumberish`](num.md#bignumberish)                      |
-| `maxFee`             | [`BigNumberish`](num.md#bignumberish)                      |
+| `senderAddress`      | [`BigNumberish`](types.md#bignumberish)                    |
+| `version`            | [`BigNumberish`](types.md#bignumberish)                    |
+| `maxFee`             | [`BigNumberish`](types.md#bignumberish)                    |
 | `chainId`            | [`StarknetChainId`](../enums/constants.StarknetChainId.md) |
-| `nonce`              | [`BigNumberish`](num.md#bignumberish)                      |
+| `nonce`              | [`BigNumberish`](types.md#bignumberish)                    |
 | `compiledClassHash?` | `string`                                                   |
 
 #### Returns
@@ -134,7 +134,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:83](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L83)
+[src/utils/hash.ts:84](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L84)
 
 ---
 
@@ -146,14 +146,14 @@ custom_edit_url: null
 
 | Name                  | Type                                                       |
 | :-------------------- | :--------------------------------------------------------- |
-| `contractAddress`     | [`BigNumberish`](num.md#bignumberish)                      |
-| `classHash`           | [`BigNumberish`](num.md#bignumberish)                      |
-| `constructorCalldata` | [`RawCalldata`](../modules.md#rawcalldata)                 |
-| `salt`                | [`BigNumberish`](num.md#bignumberish)                      |
-| `version`             | [`BigNumberish`](num.md#bignumberish)                      |
-| `maxFee`              | [`BigNumberish`](num.md#bignumberish)                      |
+| `contractAddress`     | [`BigNumberish`](types.md#bignumberish)                    |
+| `classHash`           | [`BigNumberish`](types.md#bignumberish)                    |
+| `constructorCalldata` | [`RawCalldata`](types.md#rawcalldata)                      |
+| `salt`                | [`BigNumberish`](types.md#bignumberish)                    |
+| `version`             | [`BigNumberish`](types.md#bignumberish)                    |
+| `maxFee`              | [`BigNumberish`](types.md#bignumberish)                    |
 | `chainId`             | [`StarknetChainId`](../enums/constants.StarknetChainId.md) |
-| `nonce`               | [`BigNumberish`](num.md#bignumberish)                      |
+| `nonce`               | [`BigNumberish`](types.md#bignumberish)                    |
 
 #### Returns
 
@@ -161,7 +161,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:104](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L104)
+[src/utils/hash.ts:105](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L105)
 
 ---
 
@@ -173,12 +173,12 @@ custom_edit_url: null
 
 | Name              | Type                                                       |
 | :---------------- | :--------------------------------------------------------- |
-| `contractAddress` | [`BigNumberish`](num.md#bignumberish)                      |
-| `version`         | [`BigNumberish`](num.md#bignumberish)                      |
-| `calldata`        | [`RawCalldata`](../modules.md#rawcalldata)                 |
-| `maxFee`          | [`BigNumberish`](num.md#bignumberish)                      |
+| `contractAddress` | [`BigNumberish`](types.md#bignumberish)                    |
+| `version`         | [`BigNumberish`](types.md#bignumberish)                    |
+| `calldata`        | [`RawCalldata`](types.md#rawcalldata)                      |
+| `maxFee`          | [`BigNumberish`](types.md#bignumberish)                    |
 | `chainId`         | [`StarknetChainId`](../enums/constants.StarknetChainId.md) |
-| `nonce`           | [`BigNumberish`](num.md#bignumberish)                      |
+| `nonce`           | [`BigNumberish`](types.md#bignumberish)                    |
 
 #### Returns
 
@@ -186,7 +186,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:128](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L128)
+[src/utils/hash.ts:129](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L129)
 
 ---
 
@@ -196,12 +196,12 @@ custom_edit_url: null
 
 #### Parameters
 
-| Name                  | Type                                  |
-| :-------------------- | :------------------------------------ |
-| `salt`                | [`BigNumberish`](num.md#bignumberish) |
-| `classHash`           | [`BigNumberish`](num.md#bignumberish) |
-| `constructorCalldata` | [`RawArgs`](../modules.md#rawargs)    |
-| `deployerAddress`     | [`BigNumberish`](num.md#bignumberish) |
+| Name                  | Type                                    |
+| :-------------------- | :-------------------------------------- |
+| `salt`                | [`BigNumberish`](types.md#bignumberish) |
+| `classHash`           | [`BigNumberish`](types.md#bignumberish) |
+| `constructorCalldata` | [`RawArgs`](types.md#rawargs)           |
+| `deployerAddress`     | [`BigNumberish`](types.md#bignumberish) |
 
 #### Returns
 
@@ -209,7 +209,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:148](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L148)
+[src/utils/hash.ts:149](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L149)
 
 ---
 
@@ -229,7 +229,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:180](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L180)
+[src/utils/hash.ts:181](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L181)
 
 ---
 
@@ -239,9 +239,9 @@ custom_edit_url: null
 
 #### Parameters
 
-| Name               | Type                                                             |
-| :----------------- | :--------------------------------------------------------------- |
-| `compiledContract` | [`LegacyCompiledContract`](../modules.md#legacycompiledcontract) |
+| Name               | Type                                                        |
+| :----------------- | :---------------------------------------------------------- |
+| `compiledContract` | [`LegacyCompiledContract`](types.md#legacycompiledcontract) |
 
 #### Returns
 
@@ -249,7 +249,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:198](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L198)
+[src/utils/hash.ts:199](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L199)
 
 ---
 
@@ -259,9 +259,9 @@ custom_edit_url: null
 
 #### Parameters
 
-| Name       | Type                                                                         |
-| :--------- | :--------------------------------------------------------------------------- |
-| `contract` | `string` \| [`LegacyCompiledContract`](../modules.md#legacycompiledcontract) |
+| Name       | Type                                                                    |
+| :--------- | :---------------------------------------------------------------------- |
+| `contract` | `string` \| [`LegacyCompiledContract`](types.md#legacycompiledcontract) |
 
 #### Returns
 
@@ -269,7 +269,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:207](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L207)
+[src/utils/hash.ts:208](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L208)
 
 ---
 
@@ -279,9 +279,9 @@ custom_edit_url: null
 
 #### Parameters
 
-| Name   | Type                                           |
-| :----- | :--------------------------------------------- |
-| `casm` | [`CairoAssembly`](../modules.md#cairoassembly) |
+| Name   | Type                                      |
+| :----- | :---------------------------------------- |
+| `casm` | [`CairoAssembly`](types.md#cairoassembly) |
 
 #### Returns
 
@@ -289,7 +289,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:260](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L260)
+[src/utils/hash.ts:261](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L261)
 
 ---
 
@@ -299,9 +299,9 @@ custom_edit_url: null
 
 #### Parameters
 
-| Name     | Type                                                       |
-| :------- | :--------------------------------------------------------- |
-| `sierra` | [`SierraContractClass`](../modules.md#sierracontractclass) |
+| Name     | Type                                                  |
+| :------- | :---------------------------------------------------- |
+| `sierra` | [`SierraContractClass`](types.md#sierracontractclass) |
 
 #### Returns
 
@@ -309,7 +309,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:301](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L301)
+[src/utils/hash.ts:302](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L302)
 
 ---
 
@@ -321,9 +321,9 @@ Compute ClassHash (sierra or legacy) based on provided contract
 
 #### Parameters
 
-| Name       | Type                                                             | Description                                  |
-| :--------- | :--------------------------------------------------------------- | :------------------------------------------- |
-| `contract` | `string` \| [`CompiledContract`](../modules.md#compiledcontract) | CompiledContract \| CompiledSierra \| string |
+| Name       | Type                                                        | Description                                  |
+| :--------- | :---------------------------------------------------------- | :------------------------------------------- |
+| `contract` | `string` \| [`CompiledContract`](types.md#compiledcontract) | CompiledContract \| CompiledSierra \| string |
 
 #### Returns
 
@@ -333,7 +333,7 @@ HexString ClassHash
 
 #### Defined in
 
-[src/utils/hash.ts:339](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L339)
+[src/utils/hash.ts:340](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L340)
 
 ---
 
@@ -345,9 +345,9 @@ Keccak hash BigNumberish value
 
 #### Parameters
 
-| Name    | Type                                  | Description  |
-| :------ | :------------------------------------ | :----------- |
-| `value` | [`BigNumberish`](num.md#bignumberish) | BigNumberish |
+| Name    | Type                                    | Description  |
+| :------ | :-------------------------------------- | :----------- |
+| `value` | [`BigNumberish`](types.md#bignumberish) | BigNumberish |
 
 #### Returns
 
@@ -357,7 +357,7 @@ string - hexadecimal string
 
 #### Defined in
 
-[src/utils/selector.ts:12](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/selector.ts#L12)
+[src/utils/selector.ts:13](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/selector.ts#L13)
 
 ---
 
@@ -383,7 +383,7 @@ starknet keccak hash as BigNumber
 
 #### Defined in
 
-[src/utils/selector.ts:34](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/selector.ts#L34)
+[src/utils/selector.ts:35](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/selector.ts#L35)
 
 ---
 
@@ -409,7 +409,7 @@ hex selector of given abi function name
 
 #### Defined in
 
-[src/utils/selector.ts:47](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/selector.ts#L47)
+[src/utils/selector.ts:48](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/selector.ts#L48)
 
 ---
 
@@ -433,4 +433,4 @@ Hex selector
 
 #### Defined in
 
-[src/utils/selector.ts:57](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/selector.ts#L57)
+[src/utils/selector.ts:58](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/selector.ts#L58)

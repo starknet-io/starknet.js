@@ -14,9 +14,9 @@ custom_edit_url: null
 
 #### Parameters
 
-| Name  | Type                       |
-| :---- | :------------------------- |
-| `abi` | [`Abi`](../modules.md#abi) |
+| Name  | Type                                |
+| :---- | :---------------------------------- |
+| `abi` | [`Abi`](../namespaces/types.md#abi) |
 
 #### Defined in
 
@@ -26,7 +26,7 @@ custom_edit_url: null
 
 ### abi
 
-• **abi**: [`Abi`](../modules.md#abi)
+• **abi**: [`Abi`](../namespaces/types.md#abi)
 
 #### Defined in
 
@@ -36,7 +36,7 @@ custom_edit_url: null
 
 ### structs
 
-• `Protected` `Readonly` **structs**: [`AbiStructs`](../modules.md#abistructs)
+• `Protected` `Readonly` **structs**: [`AbiStructs`](../namespaces/types.md#abistructs)
 
 #### Defined in
 
@@ -46,19 +46,19 @@ custom_edit_url: null
 
 ### compile
 
-▸ `Static` **compile**(`rawArgs`): [`Calldata`](../modules.md#calldata)
+▸ `Static` **compile**(`rawArgs`): [`Calldata`](../namespaces/types.md#calldata)
 
 Compile contract callData without abi
 
 #### Parameters
 
-| Name      | Type                               | Description                                                                  |
-| :-------- | :--------------------------------- | :--------------------------------------------------------------------------- |
-| `rawArgs` | [`RawArgs`](../modules.md#rawargs) | RawArgs representing cairo method arguments or string array of compiled data |
+| Name      | Type                                        | Description                                                                  |
+| :-------- | :------------------------------------------ | :--------------------------------------------------------------------------- |
+| `rawArgs` | [`RawArgs`](../namespaces/types.md#rawargs) | RawArgs representing cairo method arguments or string array of compiled data |
 
 #### Returns
 
-[`Calldata`](../modules.md#calldata)
+[`Calldata`](../namespaces/types.md#calldata)
 
 Calldata
 
@@ -76,9 +76,9 @@ Helper to calculate inputs from abi
 
 #### Parameters
 
-| Name     | Type                                   | Description |
-| :------- | :------------------------------------- | :---------- |
-| `inputs` | [`AbiEntry`](../modules.md#abientry)[] | AbiEntry    |
+| Name     | Type                                            | Description |
+| :------- | :---------------------------------------------- | :---------- |
+| `inputs` | [`AbiEntry`](../namespaces/types.md#abientry)[] | AbiEntry    |
 
 #### Returns
 
@@ -94,19 +94,19 @@ number
 
 ### getAbiStruct
 
-▸ `Static` **getAbiStruct**(`abi`): [`AbiStructs`](../modules.md#abistructs)
+▸ `Static` **getAbiStruct**(`abi`): [`AbiStructs`](../namespaces/types.md#abistructs)
 
 Helper to extract structs from abi
 
 #### Parameters
 
-| Name  | Type                       | Description |
-| :---- | :------------------------- | :---------- |
-| `abi` | [`Abi`](../modules.md#abi) | Abi         |
+| Name  | Type                                | Description |
+| :---- | :---------------------------------- | :---------- |
+| `abi` | [`Abi`](../namespaces/types.md#abi) | Abi         |
 
 #### Returns
 
-[`AbiStructs`](../modules.md#abistructs)
+[`AbiStructs`](../namespaces/types.md#abistructs)
 
 AbiStructs - structs from abi
 
@@ -118,19 +118,19 @@ AbiStructs - structs from abi
 
 ### toCalldata
 
-▸ `Static` **toCalldata**(`rawCalldata?`): [`Calldata`](../modules.md#calldata)
+▸ `Static` **toCalldata**(`rawCalldata?`): [`Calldata`](../namespaces/types.md#calldata)
 
 Helper: Compile HexCalldata | RawCalldata | RawArgs
 
 #### Parameters
 
-| Name          | Type                               | Default value | Description                           |
-| :------------ | :--------------------------------- | :------------ | :------------------------------------ |
-| `rawCalldata` | [`RawArgs`](../modules.md#rawargs) | `[]`          | HexCalldata \| RawCalldata \| RawArgs |
+| Name          | Type                                        | Default value | Description                           |
+| :------------ | :------------------------------------------ | :------------ | :------------------------------------ |
+| `rawCalldata` | [`RawArgs`](../namespaces/types.md#rawargs) | `[]`          | HexCalldata \| RawCalldata \| RawArgs |
 
 #### Returns
 
-[`Calldata`](../modules.md#calldata)
+[`Calldata`](../namespaces/types.md#calldata)
 
 Calldata
 
@@ -142,19 +142,19 @@ Calldata
 
 ### toHex
 
-▸ `Static` **toHex**(`raw?`): [`HexCalldata`](../modules.md#hexcalldata)
+▸ `Static` **toHex**(`raw?`): [`HexCalldata`](../namespaces/types.md#hexcalldata)
 
 Helper: Convert raw to HexCalldata
 
 #### Parameters
 
-| Name  | Type                               | Default value | Description                           |
-| :---- | :--------------------------------- | :------------ | :------------------------------------ |
-| `raw` | [`RawArgs`](../modules.md#rawargs) | `[]`          | HexCalldata \| RawCalldata \| RawArgs |
+| Name  | Type                                        | Default value | Description                           |
+| :---- | :------------------------------------------ | :------------ | :------------------------------------ |
+| `raw` | [`RawArgs`](../namespaces/types.md#rawargs) | `[]`          | HexCalldata \| RawCalldata \| RawArgs |
 
 #### Returns
 
-[`HexCalldata`](../modules.md#hexcalldata)
+[`HexCalldata`](../namespaces/types.md#hexcalldata)
 
 HexCalldata
 
@@ -172,11 +172,11 @@ Validate arguments passed to the method as corresponding to the ones in the abi
 
 #### Parameters
 
-| Name     | Type                                             | Default value | Description                                              |
-| :------- | :----------------------------------------------- | :------------ | :------------------------------------------------------- |
-| `type`   | `"DEPLOY"` \| `"INVOKE"` \| `"CALL"`             | `undefined`   | string - type of the method                              |
-| `method` | `string`                                         | `undefined`   | string - name of the method                              |
-| `args`   | [`ArgsOrCalldata`](../modules.md#argsorcalldata) | `[]`          | ArgsOrCalldata - arguments that are passed to the method |
+| Name     | Type                                                      | Default value | Description                                              |
+| :------- | :-------------------------------------------------------- | :------------ | :------------------------------------------------------- |
+| `type`   | `"DEPLOY"` \| `"INVOKE"` \| `"CALL"`                      | `undefined`   | string - type of the method                              |
+| `method` | `string`                                                  | `undefined`   | string - name of the method                              |
+| `args`   | [`ArgsOrCalldata`](../namespaces/types.md#argsorcalldata) | `[]`          | ArgsOrCalldata - arguments that are passed to the method |
 
 #### Returns
 
@@ -190,7 +190,7 @@ Validate arguments passed to the method as corresponding to the ones in the abi
 
 ### compile
 
-▸ **compile**(`method`, `argsCalldata`): [`Calldata`](../modules.md#calldata)
+▸ **compile**(`method`, `argsCalldata`): [`Calldata`](../namespaces/types.md#calldata)
 
 Compile contract callData with abi
 Parse the calldata by using input fields from the abi for that method
@@ -207,14 +207,14 @@ const calldata2 = myCallData.compile("constructor",{list:[1,3n],balance:"0x34"})
 
 #### Parameters
 
-| Name           | Type                               | Description          |
-| :------------- | :--------------------------------- | :------------------- |
-| `method`       | `string`                           | string - method name |
-| `argsCalldata` | [`RawArgs`](../modules.md#rawargs) | -                    |
+| Name           | Type                                        | Description          |
+| :------------- | :------------------------------------------ | :------------------- |
+| `method`       | `string`                                    | string - method name |
+| `argsCalldata` | [`RawArgs`](../namespaces/types.md#rawargs) | -                    |
 
 #### Returns
 
-[`Calldata`](../modules.md#calldata)
+[`Calldata`](../namespaces/types.md#calldata)
 
 Calldata - parsed arguments in format that contract is expecting
 
@@ -226,7 +226,7 @@ Calldata - parsed arguments in format that contract is expecting
 
 ### parse
 
-▸ **parse**(`method`, `response`): [`Result`](../modules.md#result)
+▸ **parse**(`method`, `response`): [`Result`](../namespaces/types.md#result)
 
 Parse elements of the response array and structuring them into response object
 
@@ -239,7 +239,7 @@ Parse elements of the response array and structuring them into response object
 
 #### Returns
 
-[`Result`](../modules.md#result)
+[`Result`](../namespaces/types.md#result)
 
 Result - parsed response corresponding to the abi
 
@@ -251,7 +251,7 @@ Result - parsed response corresponding to the abi
 
 ### format
 
-▸ **format**(`method`, `response`, `format`): [`Result`](../modules.md#result)
+▸ **format**(`method`, `response`, `format`): [`Result`](../namespaces/types.md#result)
 
 Format cairo method response data to native js values based on provided format schema
 
@@ -265,7 +265,7 @@ Format cairo method response data to native js values based on provided format s
 
 #### Returns
 
-[`Result`](../modules.md#result)
+[`Result`](../namespaces/types.md#result)
 
 Result - parsed and formatted response object
 

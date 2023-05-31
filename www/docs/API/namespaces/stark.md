@@ -10,7 +10,7 @@ custom_edit_url: null
 
 ### compressProgram
 
-▸ **compressProgram**(`jsonProgram`): [`CompressedProgram`](../modules.md#compressedprogram)
+▸ **compressProgram**(`jsonProgram`): [`CompressedProgram`](types.md#compressedprogram)
 
 Function to compress compiled cairo program
 
@@ -18,19 +18,19 @@ Function to compress compiled cairo program
 
 #### Parameters
 
-| Name          | Type                                              | Description                                       |
-| :------------ | :------------------------------------------------ | :------------------------------------------------ |
-| `jsonProgram` | `string` \| [`Program`](../interfaces/Program.md) | json file representing the compiled cairo program |
+| Name          | Type                                                    | Description                                       |
+| :------------ | :------------------------------------------------------ | :------------------------------------------------ |
+| `jsonProgram` | `string` \| [`Program`](../interfaces/types.Program.md) | json file representing the compiled cairo program |
 
 #### Returns
 
-[`CompressedProgram`](../modules.md#compressedprogram)
+[`CompressedProgram`](types.md#compressedprogram)
 
 Compressed cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L22)
+[src/utils/stark.ts:21](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L21)
 
 ---
 
@@ -44,7 +44,7 @@ Compressed cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:28](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L28)
+[src/utils/stark.ts:27](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L27)
 
 ---
 
@@ -64,67 +64,67 @@ Compressed cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:33](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L33)
+[src/utils/stark.ts:32](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L32)
 
 ---
 
 ### formatSignature
 
-▸ **formatSignature**(`sig?`): [`ArraySignatureType`](../modules.md#arraysignaturetype)
+▸ **formatSignature**(`sig?`): [`ArraySignatureType`](types.md#arraysignaturetype)
 
 #### Parameters
 
-| Name   | Type                                   |
-| :----- | :------------------------------------- |
-| `sig?` | [`Signature`](../modules.md#signature) |
+| Name   | Type                              |
+| :----- | :-------------------------------- |
+| `sig?` | [`Signature`](types.md#signature) |
 
 #### Returns
 
-[`ArraySignatureType`](../modules.md#arraysignaturetype)
+[`ArraySignatureType`](types.md#arraysignaturetype)
 
 #### Defined in
 
-[src/utils/stark.ts:37](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L37)
+[src/utils/stark.ts:36](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L36)
 
 ---
 
 ### signatureToDecimalArray
 
-▸ **signatureToDecimalArray**(`sig?`): [`ArraySignatureType`](../modules.md#arraysignaturetype)
+▸ **signatureToDecimalArray**(`sig?`): [`ArraySignatureType`](types.md#arraysignaturetype)
 
 #### Parameters
 
-| Name   | Type                                   |
-| :----- | :------------------------------------- |
-| `sig?` | [`Signature`](../modules.md#signature) |
+| Name   | Type                              |
+| :----- | :-------------------------------- |
+| `sig?` | [`Signature`](types.md#signature) |
 
 #### Returns
 
-[`ArraySignatureType`](../modules.md#arraysignaturetype)
+[`ArraySignatureType`](types.md#arraysignaturetype)
 
 #### Defined in
 
-[src/utils/stark.ts:50](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L50)
+[src/utils/stark.ts:49](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L49)
 
 ---
 
 ### signatureToHexArray
 
-▸ **signatureToHexArray**(`sig?`): [`ArraySignatureType`](../modules.md#arraysignaturetype)
+▸ **signatureToHexArray**(`sig?`): [`ArraySignatureType`](types.md#arraysignaturetype)
 
 #### Parameters
 
-| Name   | Type                                   |
-| :----- | :------------------------------------- |
-| `sig?` | [`Signature`](../modules.md#signature) |
+| Name   | Type                              |
+| :----- | :-------------------------------- |
+| `sig?` | [`Signature`](types.md#signature) |
 
 #### Returns
 
-[`ArraySignatureType`](../modules.md#arraysignaturetype)
+[`ArraySignatureType`](types.md#arraysignaturetype)
 
 #### Defined in
 
-[src/utils/stark.ts:54](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L54)
+[src/utils/stark.ts:53](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L53)
 
 ---
 
@@ -134,10 +134,10 @@ Compressed cairo program
 
 #### Parameters
 
-| Name           | Type                                  | Default value |
-| :------------- | :------------------------------------ | :------------ |
-| `estimatedFee` | [`BigNumberish`](num.md#bignumberish) | `undefined`   |
-| `overhead`     | `number`                              | `0.5`         |
+| Name           | Type                                    | Default value |
+| :------------- | :-------------------------------------- | :------------ |
+| `estimatedFee` | [`BigNumberish`](types.md#bignumberish) | `undefined`   |
+| `overhead`     | `number`                                | `0.5`         |
 
 #### Returns
 
@@ -145,4 +145,4 @@ Compressed cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:58](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L58)
+[src/utils/stark.ts:57](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L57)

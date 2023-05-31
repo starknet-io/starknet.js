@@ -24,12 +24,12 @@ custom_edit_url: null
 
 #### Parameters
 
-| Name                | Type                                                                                                 | Default value |
-| :------------------ | :--------------------------------------------------------------------------------------------------- | :------------ |
-| `providerOrOptions` | [`ProviderInterface`](ProviderInterface.md) \| [`ProviderOptions`](../interfaces/ProviderOptions.md) | `undefined`   |
-| `address`           | `string`                                                                                             | `undefined`   |
-| `pkOrSigner`        | `string` \| `Uint8Array` \| [`SignerInterface`](SignerInterface.md)                                  | `undefined`   |
-| `cairoVersion`      | [`CairoVersion`](../modules.md#cairoversion)                                                         | `'0'`         |
+| Name                | Type                                                                                                       | Default value |
+| :------------------ | :--------------------------------------------------------------------------------------------------------- | :------------ |
+| `providerOrOptions` | [`ProviderOptions`](../interfaces/types.ProviderOptions.md) \| [`ProviderInterface`](ProviderInterface.md) | `undefined`   |
+| `address`           | `string`                                                                                                   | `undefined`   |
+| `pkOrSigner`        | `string` \| `Uint8Array` \| [`SignerInterface`](SignerInterface.md)                                        | `undefined`   |
+| `cairoVersion`      | [`CairoVersion`](../namespaces/types.md#cairoversion)                                                      | `'0'`         |
 
 #### Overrides
 
@@ -37,7 +37,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/account/default.ts:61](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L61)
+[src/account/default.ts:65](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L65)
 
 ## Properties
 
@@ -51,7 +51,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/account/default.ts:55](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L55)
+[src/account/default.ts:59](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L59)
 
 ---
 
@@ -65,13 +65,13 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/account/default.ts:57](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L57)
+[src/account/default.ts:61](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L61)
 
 ---
 
 ### cairoVersion
 
-• **cairoVersion**: [`CairoVersion`](../modules.md#cairoversion)
+• **cairoVersion**: [`CairoVersion`](../namespaces/types.md#cairoversion)
 
 #### Implementation of
 
@@ -79,32 +79,32 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/account/default.ts:59](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L59)
+[src/account/default.ts:63](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L63)
 
 ---
 
 ### deploySelf
 
-• **deploySelf**: (`__namedParameters`: [`DeployAccountContractPayload`](../modules.md#deployaccountcontractpayload), `transactionsDetail`: [`InvocationsDetails`](../modules.md#invocationsdetails)) => `Promise`<[`DeployContractResponse`](../interfaces/DeployContractResponse.md)\>
+• **deploySelf**: (`__namedParameters`: [`DeployAccountContractPayload`](../namespaces/types.md#deployaccountcontractpayload), `transactionsDetail`: [`InvocationsDetails`](../namespaces/types.md#invocationsdetails)) => `Promise`<[`DeployContractResponse`](../interfaces/types.DeployContractResponse.md)\>
 
 #### Type declaration
 
-▸ (`«destructured»`, `transactionsDetail?`): `Promise`<[`DeployContractResponse`](../interfaces/DeployContractResponse.md)\>
+▸ (`«destructured»`, `transactionsDetail?`): `Promise`<[`DeployContractResponse`](../interfaces/types.DeployContractResponse.md)\>
 
 ##### Parameters
 
-| Name                 | Type                                                                         |
-| :------------------- | :--------------------------------------------------------------------------- |
-| `«destructured»`     | [`DeployAccountContractPayload`](../modules.md#deployaccountcontractpayload) |
-| `transactionsDetail` | [`InvocationsDetails`](../modules.md#invocationsdetails)                     |
+| Name                 | Type                                                                                  |
+| :------------------- | :------------------------------------------------------------------------------------ |
+| `«destructured»`     | [`DeployAccountContractPayload`](../namespaces/types.md#deployaccountcontractpayload) |
+| `transactionsDetail` | [`InvocationsDetails`](../namespaces/types.md#invocationsdetails)                     |
 
 ##### Returns
 
-`Promise`<[`DeployContractResponse`](../interfaces/DeployContractResponse.md)\>
+`Promise`<[`DeployContractResponse`](../interfaces/types.DeployContractResponse.md)\>
 
 #### Defined in
 
-[src/account/default.ts:463](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L463)
+[src/account/default.ts:467](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L467)
 
 ## Methods
 
@@ -116,9 +116,9 @@ Gets the nonce of the account with respect to a specific block
 
 #### Parameters
 
-| Name               | Type              | Description                                     |
-| :----------------- | :---------------- | :---------------------------------------------- |
-| `blockIdentifier?` | `BlockIdentifier` | optional blockIdentifier. Defaults to 'pending' |
+| Name               | Type                                                        | Description                                     |
+| :----------------- | :---------------------------------------------------------- | :---------------------------------------------- |
+| `blockIdentifier?` | [`BlockIdentifier`](../namespaces/types.md#blockidentifier) | optional blockIdentifier. Defaults to 'pending' |
 
 #### Returns
 
@@ -132,47 +132,47 @@ nonce of the account
 
 #### Defined in
 
-[src/account/default.ts:77](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L77)
+[src/account/default.ts:81](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L81)
 
 ---
 
 ### estimateFee
 
-▸ **estimateFee**(`calls`, `estimateFeeDetails?`): `Promise`<[`EstimateFee`](../interfaces/EstimateFee.md)\>
+▸ **estimateFee**(`calls`, `estimateFeeDetails?`): `Promise`<[`EstimateFee`](../interfaces/types.EstimateFee.md)\>
 
 #### Parameters
 
-| Name                  | Type                                                                    |
-| :-------------------- | :---------------------------------------------------------------------- |
-| `calls`               | [`AllowArray`](../modules.md#allowarray)<[`Call`](../modules.md#call)\> |
-| `estimateFeeDetails?` | [`EstimateFeeDetails`](../interfaces/EstimateFeeDetails.md)             |
+| Name                  | Type                                                                                      |
+| :-------------------- | :---------------------------------------------------------------------------------------- |
+| `calls`               | [`AllowArray`](../namespaces/types.md#allowarray)<[`Call`](../namespaces/types.md#call)\> |
+| `estimateFeeDetails?` | [`EstimateFeeDetails`](../interfaces/types.EstimateFeeDetails.md)                         |
 
 #### Returns
 
-`Promise`<[`EstimateFee`](../interfaces/EstimateFee.md)\>
+`Promise`<[`EstimateFee`](../interfaces/types.EstimateFee.md)\>
 
 #### Defined in
 
-[src/account/default.ts:81](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L81)
+[src/account/default.ts:85](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L85)
 
 ---
 
 ### estimateInvokeFee
 
-▸ **estimateInvokeFee**(`calls`, `«destructured»?`): `Promise`<[`EstimateFee`](../interfaces/EstimateFee.md)\>
+▸ **estimateInvokeFee**(`calls`, `«destructured»?`): `Promise`<[`EstimateFee`](../interfaces/types.EstimateFee.md)\>
 
 Estimate Fee for executing an INVOKE transaction on starknet
 
 #### Parameters
 
-| Name             | Type                                                                    | Description                                                                                                                                                                |
-| :--------------- | :---------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `calls`          | [`AllowArray`](../modules.md#allowarray)<[`Call`](../modules.md#call)\> | the invocation object containing: - contractAddress - the address of the contract - entrypoint - the entrypoint of the contract - calldata - (defaults to []) the calldata |
-| `«destructured»` | [`EstimateFeeDetails`](../interfaces/EstimateFeeDetails.md)             | -                                                                                                                                                                          |
+| Name             | Type                                                                                      | Description                                                                                                                                                                |
+| :--------------- | :---------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `calls`          | [`AllowArray`](../namespaces/types.md#allowarray)<[`Call`](../namespaces/types.md#call)\> | the invocation object containing: - contractAddress - the address of the contract - entrypoint - the entrypoint of the contract - calldata - (defaults to []) the calldata |
+| `«destructured»` | [`EstimateFeeDetails`](../interfaces/types.EstimateFeeDetails.md)                         | -                                                                                                                                                                          |
 
 #### Returns
 
-`Promise`<[`EstimateFee`](../interfaces/EstimateFee.md)\>
+`Promise`<[`EstimateFee`](../interfaces/types.EstimateFee.md)\>
 
 response from estimate_fee
 
@@ -182,26 +182,26 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/default.ts:88](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L88)
+[src/account/default.ts:92](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L92)
 
 ---
 
 ### estimateDeclareFee
 
-▸ **estimateDeclareFee**(`«destructured»`, `«destructured»?`): `Promise`<[`EstimateFee`](../interfaces/EstimateFee.md)\>
+▸ **estimateDeclareFee**(`«destructured»`, `«destructured»?`): `Promise`<[`EstimateFee`](../interfaces/types.EstimateFee.md)\>
 
 Estimate Fee for executing a DECLARE transaction on starknet
 
 #### Parameters
 
-| Name             | Type                                                             | Description                                                                                                                                                                         |
-| :--------------- | :--------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `«destructured»` | [`DeclareContractPayload`](../modules.md#declarecontractpayload) | the payload object containing: - contract - the compiled contract to be declared - classHash - the class hash of the compiled contract. This can be obtained by using starknet-cli. |
-| `«destructured»` | [`EstimateFeeDetails`](../interfaces/EstimateFeeDetails.md)      | -                                                                                                                                                                                   |
+| Name             | Type                                                                      | Description                                                                                                                                                                         |
+| :--------------- | :------------------------------------------------------------------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `«destructured»` | [`DeclareContractPayload`](../namespaces/types.md#declarecontractpayload) | the payload object containing: - contract - the compiled contract to be declared - classHash - the class hash of the compiled contract. This can be obtained by using starknet-cli. |
+| `«destructured»` | [`EstimateFeeDetails`](../interfaces/types.EstimateFeeDetails.md)         | -                                                                                                                                                                                   |
 
 #### Returns
 
-`Promise`<[`EstimateFee`](../interfaces/EstimateFee.md)\>
+`Promise`<[`EstimateFee`](../interfaces/types.EstimateFee.md)\>
 
 response from estimate_fee
 
@@ -211,26 +211,26 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/default.ts:122](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L122)
+[src/account/default.ts:126](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L126)
 
 ---
 
 ### estimateAccountDeployFee
 
-▸ **estimateAccountDeployFee**(`«destructured»`, `«destructured»?`): `Promise`<[`EstimateFee`](../interfaces/EstimateFee.md)\>
+▸ **estimateAccountDeployFee**(`«destructured»`, `«destructured»?`): `Promise`<[`EstimateFee`](../interfaces/types.EstimateFee.md)\>
 
 Estimate Fee for executing a DEPLOY_ACCOUNT transaction on starknet
 
 #### Parameters
 
-| Name             | Type                                                                         | Description                                                                                                                                        |
-| :--------------- | :--------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `«destructured»` | [`DeployAccountContractPayload`](../modules.md#deployaccountcontractpayload) | contract - the compiled contract to be deployed - classHash - the class hash of the compiled contract. This can be obtained by using starknet-cli. |
-| `«destructured»` | [`EstimateFeeDetails`](../interfaces/EstimateFeeDetails.md)                  | optional blockIdentifier - constant nonce = 0                                                                                                      |
+| Name             | Type                                                                                  | Description                                                                                                                                        |
+| :--------------- | :------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `«destructured»` | [`DeployAccountContractPayload`](../namespaces/types.md#deployaccountcontractpayload) | contract - the compiled contract to be deployed - classHash - the class hash of the compiled contract. This can be obtained by using starknet-cli. |
+| `«destructured»` | [`EstimateFeeDetails`](../interfaces/types.EstimateFeeDetails.md)                     | optional blockIdentifier - constant nonce = 0                                                                                                      |
 
 #### Returns
 
-`Promise`<[`EstimateFee`](../interfaces/EstimateFee.md)\>
+`Promise`<[`EstimateFee`](../interfaces/types.EstimateFee.md)\>
 
 response from estimate_fee
 
@@ -240,27 +240,27 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/default.ts:156](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L156)
+[src/account/default.ts:160](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L160)
 
 ---
 
 ### estimateDeployFee
 
-▸ **estimateDeployFee**(`payload`, `transactionsDetail?`): `Promise`<[`EstimateFee`](../interfaces/EstimateFee.md)\>
+▸ **estimateDeployFee**(`payload`, `transactionsDetail?`): `Promise`<[`EstimateFee`](../interfaces/types.EstimateFee.md)\>
 
 Estimate Fee for executing a UDC DEPLOY transaction on starknet
 This is different from the normal DEPLOY transaction as it goes through the Universal Deployer Contract (UDC)
 
 #### Parameters
 
-| Name                  | Type                                                                                                                                                                           | Description                                                                                                                                                      |
-| :-------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `payload`             | [`UniversalDeployerContractPayload`](../modules.md#universaldeployercontractpayload) \| [`UniversalDeployerContractPayload`](../modules.md#universaldeployercontractpayload)[] | containing - classHash: computed class hash of compiled contract - salt: address salt - unique: bool if true ensure unique salt - calldata: constructor calldata |
-| `transactionsDetail?` | [`InvocationsDetails`](../modules.md#invocationsdetails)                                                                                                                       | Invocation Details containing: - optional nonce - optional version - optional maxFee                                                                             |
+| Name                  | Type                                                                                                                                                                                             | Description                                                                                                                                                      |
+| :-------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `payload`             | [`UniversalDeployerContractPayload`](../namespaces/types.md#universaldeployercontractpayload) \| [`UniversalDeployerContractPayload`](../namespaces/types.md#universaldeployercontractpayload)[] | containing - classHash: computed class hash of compiled contract - salt: address salt - unique: bool if true ensure unique salt - calldata: constructor calldata |
+| `transactionsDetail?` | [`InvocationsDetails`](../namespaces/types.md#invocationsdetails)                                                                                                                                | Invocation Details containing: - optional nonce - optional version - optional maxFee                                                                             |
 
 #### Returns
 
-`Promise`<[`EstimateFee`](../interfaces/EstimateFee.md)\>
+`Promise`<[`EstimateFee`](../interfaces/types.EstimateFee.md)\>
 
 #### Implementation of
 
@@ -268,27 +268,27 @@ This is different from the normal DEPLOY transaction as it goes through the Univ
 
 #### Defined in
 
-[src/account/default.ts:195](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L195)
+[src/account/default.ts:199](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L199)
 
 ---
 
 ### estimateFeeBulk
 
-▸ **estimateFeeBulk**(`transactions`, `«destructured»?`): `Promise`<[`EstimateFeeBulk`](../modules.md#estimatefeebulk)\>
+▸ **estimateFeeBulk**(`transactions`, `«destructured»?`): `Promise`<[`EstimateFeeBulk`](../namespaces/types.md#estimatefeebulk)\>
 
 Estimate Fee for executing a list of transactions on starknet
 Contract must be deployed for fee estimation to be possible
 
 #### Parameters
 
-| Name             | Type                                                        | Description                                                                                                                                                                           |
-| :--------------- | :---------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `transactions`   | [`TransactionBulk`](../modules.md#transactionbulk)          | array of transaction object containing : - type - the type of transaction : 'DECLARE' \| 'DEPLOY' \| 'INVOKE_FUNCTION' \| 'DEPLOY_ACCOUNT' - payload - the payload of the transaction |
-| `«destructured»` | [`EstimateFeeDetails`](../interfaces/EstimateFeeDetails.md) | -                                                                                                                                                                                     |
+| Name             | Type                                                              | Description                                                                                                                                                                           |
+| :--------------- | :---------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `transactions`   | [`TransactionBulk`](../namespaces/types.md#transactionbulk)       | array of transaction object containing : - type - the type of transaction : 'DECLARE' \| 'DEPLOY' \| 'INVOKE_FUNCTION' \| 'DEPLOY_ACCOUNT' - payload - the payload of the transaction |
+| `«destructured»` | [`EstimateFeeDetails`](../interfaces/types.EstimateFeeDetails.md) | -                                                                                                                                                                                     |
 
 #### Returns
 
-`Promise`<[`EstimateFeeBulk`](../modules.md#estimatefeebulk)\>
+`Promise`<[`EstimateFeeBulk`](../namespaces/types.md#estimatefeebulk)\>
 
 response from estimate_fee
 
@@ -298,48 +298,48 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/default.ts:203](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L203)
+[src/account/default.ts:207](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L207)
 
 ---
 
 ### buildInvocation
 
-▸ **buildInvocation**(`call`, `signerDetails`): `Promise`<[`Invocation`](../modules.md#invocation)\>
+▸ **buildInvocation**(`call`, `signerDetails`): `Promise`<[`Invocation`](../namespaces/types.md#invocation)\>
 
 #### Parameters
 
-| Name            | Type                                                                    |
-| :-------------- | :---------------------------------------------------------------------- |
-| `call`          | [`Call`](../modules.md#call)[]                                          |
-| `signerDetails` | [`InvocationsSignerDetails`](../interfaces/InvocationsSignerDetails.md) |
+| Name            | Type                                                                          |
+| :-------------- | :---------------------------------------------------------------------------- |
+| `call`          | [`Call`](../namespaces/types.md#call)[]                                       |
+| `signerDetails` | [`InvocationsSignerDetails`](../interfaces/types.InvocationsSignerDetails.md) |
 
 #### Returns
 
-`Promise`<[`Invocation`](../modules.md#invocation)\>
+`Promise`<[`Invocation`](../namespaces/types.md#invocation)\>
 
 #### Defined in
 
-[src/account/default.ts:281](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L281)
+[src/account/default.ts:285](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L285)
 
 ---
 
 ### execute
 
-▸ **execute**(`calls`, `abis?`, `transactionsDetail?`): `Promise`<[`InvokeFunctionResponse`](../interfaces/InvokeFunctionResponse.md)\>
+▸ **execute**(`calls`, `abis?`, `transactionsDetail?`): `Promise`<[`InvokeFunctionResponse`](../interfaces/types.InvokeFunctionResponse.md)\>
 
 Invoke execute function in account contract
 
 #### Parameters
 
-| Name                 | Type                                                                    | Default value | Description                                                                                                                                                                                                                                  |
-| :------------------- | :---------------------------------------------------------------------- | :------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `calls`              | [`AllowArray`](../modules.md#allowarray)<[`Call`](../modules.md#call)\> | `undefined`   | the invocation object or an array of them, containing: - contractAddress - the address of the contract - entrypoint - the entrypoint of the contract - calldata - (defaults to []) the calldata - signature - (defaults to []) the signature |
-| `abis`               | `undefined` \| [`Abi`](../modules.md#abi)[]                             | `undefined`   | -                                                                                                                                                                                                                                            |
-| `transactionsDetail` | [`InvocationsDetails`](../modules.md#invocationsdetails)                | `{}`          | -                                                                                                                                                                                                                                            |
+| Name                 | Type                                                                                      | Default value | Description                                                                                                                                                                                                                                  |
+| :------------------- | :---------------------------------------------------------------------------------------- | :------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `calls`              | [`AllowArray`](../namespaces/types.md#allowarray)<[`Call`](../namespaces/types.md#call)\> | `undefined`   | the invocation object or an array of them, containing: - contractAddress - the address of the contract - entrypoint - the entrypoint of the contract - calldata - (defaults to []) the calldata - signature - (defaults to []) the signature |
+| `abis`               | `undefined` \| [`Abi`](../namespaces/types.md#abi)[]                                      | `undefined`   | -                                                                                                                                                                                                                                            |
+| `transactionsDetail` | [`InvocationsDetails`](../namespaces/types.md#invocationsdetails)                         | `{}`          | -                                                                                                                                                                                                                                            |
 
 #### Returns
 
-`Promise`<[`InvokeFunctionResponse`](../interfaces/InvokeFunctionResponse.md)\>
+`Promise`<[`InvokeFunctionResponse`](../interfaces/types.InvokeFunctionResponse.md)\>
 
 response from addTransaction
 
@@ -349,13 +349,13 @@ response from addTransaction
 
 #### Defined in
 
-[src/account/default.ts:295](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L295)
+[src/account/default.ts:299](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L299)
 
 ---
 
 ### declareIfNot
 
-▸ **declareIfNot**(`payload`, `transactionsDetail?`): `Promise`<[`DeclareContractResponse`](../interfaces/DeclareContractResponse.md)\>
+▸ **declareIfNot**(`payload`, `transactionsDetail?`): `Promise`<[`DeclareContractResponse`](../interfaces/types.DeclareContractResponse.md)\>
 
 First check if contract is already declared, if not declare it
 If contract already declared returned transaction_hash is ''.
@@ -363,39 +363,39 @@ Method will pass even if contract is already declared
 
 #### Parameters
 
-| Name                 | Type                                                             | Description                        |
-| :------------------- | :--------------------------------------------------------------- | :--------------------------------- |
-| `payload`            | [`DeclareContractPayload`](../modules.md#declarecontractpayload) | DeclareContractPayload             |
-| `transactionsDetail` | [`InvocationsDetails`](../modules.md#invocationsdetails)         | (optional) InvocationsDetails = {} |
+| Name                 | Type                                                                      | Description                        |
+| :------------------- | :------------------------------------------------------------------------ | :--------------------------------- |
+| `payload`            | [`DeclareContractPayload`](../namespaces/types.md#declarecontractpayload) | DeclareContractPayload             |
+| `transactionsDetail` | [`InvocationsDetails`](../namespaces/types.md#invocationsdetails)         | (optional) InvocationsDetails = {} |
 
 #### Returns
 
-`Promise`<[`DeclareContractResponse`](../interfaces/DeclareContractResponse.md)\>
+`Promise`<[`DeclareContractResponse`](../interfaces/types.DeclareContractResponse.md)\>
 
 DeclareContractResponse
 
 #### Defined in
 
-[src/account/default.ts:342](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L342)
+[src/account/default.ts:346](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L346)
 
 ---
 
 ### declare
 
-▸ **declare**(`payload`, `transactionsDetail?`): `Promise`<[`DeclareContractResponse`](../interfaces/DeclareContractResponse.md)\>
+▸ **declare**(`payload`, `transactionsDetail?`): `Promise`<[`DeclareContractResponse`](../interfaces/types.DeclareContractResponse.md)\>
 
 Declares a given compiled contract (json) to starknet
 
 #### Parameters
 
-| Name                 | Type                                                             | Description                                                                                                                                                                                                                                                                                                                                                                                           |
-| :------------------- | :--------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `payload`            | [`DeclareContractPayload`](../modules.md#declarecontractpayload) | transaction payload to be deployed containing: - contract: compiled contract code - (optional) classHash: computed class hash of compiled contract. Pre-compute it for faster execution. - (required for Cairo1 without compiledClassHash) casm: CompiledContract \| string; - (optional for Cairo1 with casm) compiledClassHash: compiled class hash from casm. Pre-compute it for faster execution. |
-| `transactionsDetail` | [`InvocationsDetails`](../modules.md#invocationsdetails)         | Invocation Details containing: - optional nonce - optional version - optional maxFee                                                                                                                                                                                                                                                                                                                  |
+| Name                 | Type                                                                      | Description                                                                                                                                                                                                                                                                                                                                                                                           |
+| :------------------- | :------------------------------------------------------------------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `payload`            | [`DeclareContractPayload`](../namespaces/types.md#declarecontractpayload) | transaction payload to be deployed containing: - contract: compiled contract code - (optional) classHash: computed class hash of compiled contract. Pre-compute it for faster execution. - (required for Cairo1 without compiledClassHash) casm: CompiledContract \| string; - (optional for Cairo1 with casm) compiledClassHash: compiled class hash from casm. Pre-compute it for faster execution. |
+| `transactionsDetail` | [`InvocationsDetails`](../namespaces/types.md#invocationsdetails)         | Invocation Details containing: - optional nonce - optional version - optional maxFee                                                                                                                                                                                                                                                                                                                  |
 
 #### Returns
 
-`Promise`<[`DeclareContractResponse`](../interfaces/DeclareContractResponse.md)\>
+`Promise`<[`DeclareContractResponse`](../interfaces/types.DeclareContractResponse.md)\>
 
 a confirmation of sending a transaction on the starknet contract
 
@@ -405,27 +405,27 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/account/default.ts:358](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L358)
+[src/account/default.ts:362](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L362)
 
 ---
 
 ### deploy
 
-▸ **deploy**(`payload`, `details?`): `Promise`<[`MultiDeployContractResponse`](../modules.md#multideploycontractresponse)\>
+▸ **deploy**(`payload`, `details?`): `Promise`<[`MultiDeployContractResponse`](../namespaces/types.md#multideploycontractresponse)\>
 
 Deploys a declared contract to starknet - using Universal Deployer Contract (UDC)
 support multicall
 
 #### Parameters
 
-| Name       | Type                                                                                                                                                                           | Description                                                                                                                                                                            |
-| :--------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `payload`  | [`UniversalDeployerContractPayload`](../modules.md#universaldeployercontractpayload) \| [`UniversalDeployerContractPayload`](../modules.md#universaldeployercontractpayload)[] | classHash: computed class hash of compiled contract - [constructorCalldata] contract constructor calldata - [salt=pseudorandom] deploy address salt - [unique=true] ensure unique salt |
-| `details?` | [`InvocationsDetails`](../modules.md#invocationsdetails)                                                                                                                       | [nonce=getNonce] - [version=transactionVersion] - [maxFee=getSuggestedMaxFee]                                                                                                          |
+| Name       | Type                                                                                                                                                                                             | Description                                                                                                                                                                            |
+| :--------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `payload`  | [`UniversalDeployerContractPayload`](../namespaces/types.md#universaldeployercontractpayload) \| [`UniversalDeployerContractPayload`](../namespaces/types.md#universaldeployercontractpayload)[] | classHash: computed class hash of compiled contract - [constructorCalldata] contract constructor calldata - [salt=pseudorandom] deploy address salt - [unique=true] ensure unique salt |
+| `details?` | [`InvocationsDetails`](../namespaces/types.md#invocationsdetails)                                                                                                                                | [nonce=getNonce] - [version=transactionVersion] - [maxFee=getSuggestedMaxFee]                                                                                                          |
 
 #### Returns
 
-`Promise`<[`MultiDeployContractResponse`](../modules.md#multideploycontractresponse)\>
+`Promise`<[`MultiDeployContractResponse`](../namespaces/types.md#multideploycontractresponse)\>
 
 - contract_address[]
 - transaction_hash
@@ -436,27 +436,27 @@ support multicall
 
 #### Defined in
 
-[src/account/default.ts:387](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L387)
+[src/account/default.ts:391](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L391)
 
 ---
 
 ### deployContract
 
-▸ **deployContract**(`payload`, `details?`): `Promise`<[`DeployContractUDCResponse`](../modules.md#deploycontractudcresponse)\>
+▸ **deployContract**(`payload`, `details?`): `Promise`<[`DeployContractUDCResponse`](../namespaces/types.md#deploycontractudcresponse)\>
 
 Simplify deploy simulating old DeployContract with same response + UDC specific response
 Internal wait for L2 transaction, support multicall
 
 #### Parameters
 
-| Name       | Type                                                                                                                                                                           | Description                                                                                                                                                                            |
-| :--------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `payload`  | [`UniversalDeployerContractPayload`](../modules.md#universaldeployercontractpayload) \| [`UniversalDeployerContractPayload`](../modules.md#universaldeployercontractpayload)[] | classHash: computed class hash of compiled contract - [constructorCalldata] contract constructor calldata - [salt=pseudorandom] deploy address salt - [unique=true] ensure unique salt |
-| `details?` | [`InvocationsDetails`](../modules.md#invocationsdetails)                                                                                                                       | [nonce=getNonce] - [version=transactionVersion] - [maxFee=getSuggestedMaxFee]                                                                                                          |
+| Name       | Type                                                                                                                                                                                             | Description                                                                                                                                                                            |
+| :--------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `payload`  | [`UniversalDeployerContractPayload`](../namespaces/types.md#universaldeployercontractpayload) \| [`UniversalDeployerContractPayload`](../namespaces/types.md#universaldeployercontractpayload)[] | classHash: computed class hash of compiled contract - [constructorCalldata] contract constructor calldata - [salt=pseudorandom] deploy address salt - [unique=true] ensure unique salt |
+| `details?` | [`InvocationsDetails`](../namespaces/types.md#invocationsdetails)                                                                                                                                | [nonce=getNonce] - [version=transactionVersion] - [maxFee=getSuggestedMaxFee]                                                                                                          |
 
 #### Returns
 
-`Promise`<[`DeployContractUDCResponse`](../modules.md#deploycontractudcresponse)\>
+`Promise`<[`DeployContractUDCResponse`](../namespaces/types.md#deploycontractudcresponse)\>
 
 - contract_address
 - transaction_hash
@@ -474,13 +474,13 @@ Internal wait for L2 transaction, support multicall
 
 #### Defined in
 
-[src/account/default.ts:433](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L433)
+[src/account/default.ts:437](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L437)
 
 ---
 
 ### declareAndDeploy
 
-▸ **declareAndDeploy**(`payload`, `details?`): `Promise`<[`DeclareDeployUDCResponse`](../modules.md#declaredeployudcresponse)\>
+▸ **declareAndDeploy**(`payload`, `details?`): `Promise`<[`DeclareDeployUDCResponse`](../namespaces/types.md#declaredeployudcresponse)\>
 
 Declares and Deploy a given compiled contract (json) to starknet using UDC
 Internal wait for L2 transaction, do not support multicall
@@ -488,14 +488,14 @@ Method will pass even if contract is already declared (internal using DeclareIfN
 
 #### Parameters
 
-| Name       | Type                                                                               | Description                                                                   |
-| :--------- | :--------------------------------------------------------------------------------- | :---------------------------------------------------------------------------- |
-| `payload`  | [`DeclareAndDeployContractPayload`](../modules.md#declareanddeploycontractpayload) | -                                                                             |
-| `details?` | [`InvocationsDetails`](../modules.md#invocationsdetails)                           | [nonce=getNonce] - [version=transactionVersion] - [maxFee=getSuggestedMaxFee] |
+| Name       | Type                                                                                        | Description                                                                   |
+| :--------- | :------------------------------------------------------------------------------------------ | :---------------------------------------------------------------------------- |
+| `payload`  | [`DeclareAndDeployContractPayload`](../namespaces/types.md#declareanddeploycontractpayload) | -                                                                             |
+| `details?` | [`InvocationsDetails`](../namespaces/types.md#invocationsdetails)                           | [nonce=getNonce] - [version=transactionVersion] - [maxFee=getSuggestedMaxFee] |
 
 #### Returns
 
-`Promise`<[`DeclareDeployUDCResponse`](../modules.md#declaredeployudcresponse)\>
+`Promise`<[`DeclareDeployUDCResponse`](../namespaces/types.md#declaredeployudcresponse)\>
 
 - declare
   - transaction_hash
@@ -516,26 +516,26 @@ Method will pass even if contract is already declared (internal using DeclareIfN
 
 #### Defined in
 
-[src/account/default.ts:444](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L444)
+[src/account/default.ts:448](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L448)
 
 ---
 
 ### deployAccount
 
-▸ **deployAccount**(`«destructured»`, `transactionsDetail?`): `Promise`<[`DeployContractResponse`](../interfaces/DeployContractResponse.md)\>
+▸ **deployAccount**(`«destructured»`, `transactionsDetail?`): `Promise`<[`DeployContractResponse`](../interfaces/types.DeployContractResponse.md)\>
 
 Deploy the account on Starknet
 
 #### Parameters
 
-| Name                 | Type                                                                         | Description                                                                                                                                                                             |
-| :------------------- | :--------------------------------------------------------------------------- | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `«destructured»`     | [`DeployAccountContractPayload`](../modules.md#deployaccountcontractpayload) | transaction payload to be deployed containing: - classHash: computed class hash of compiled contract - optional constructor calldata - optional address salt - optional contractAddress |
-| `transactionsDetail` | [`InvocationsDetails`](../modules.md#invocationsdetails)                     | Invocation Details containing: - constant nonce = 0 - optional version - optional maxFee                                                                                                |
+| Name                 | Type                                                                                  | Description                                                                                                                                                                             |
+| :------------------- | :------------------------------------------------------------------------------------ | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `«destructured»`     | [`DeployAccountContractPayload`](../namespaces/types.md#deployaccountcontractpayload) | transaction payload to be deployed containing: - classHash: computed class hash of compiled contract - optional constructor calldata - optional address salt - optional contractAddress |
+| `transactionsDetail` | [`InvocationsDetails`](../namespaces/types.md#invocationsdetails)                     | Invocation Details containing: - constant nonce = 0 - optional version - optional maxFee                                                                                                |
 
 #### Returns
 
-`Promise`<[`DeployContractResponse`](../interfaces/DeployContractResponse.md)\>
+`Promise`<[`DeployContractResponse`](../interfaces/types.DeployContractResponse.md)\>
 
 a confirmation of sending a transaction on the starknet contract
 
@@ -545,13 +545,13 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/account/default.ts:465](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L465)
+[src/account/default.ts:469](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L469)
 
 ---
 
 ### signMessage
 
-▸ **signMessage**(`typedData`): `Promise`<[`Signature`](../modules.md#signature)\>
+▸ **signMessage**(`typedData`): `Promise`<[`Signature`](../namespaces/types.md#signature)\>
 
 Sign an JSON object for off-chain usage with the starknet private key and return the signature
 This adds a message prefix so it cant be interchanged with transactions
@@ -562,13 +562,13 @@ if the JSON object is not a valid JSON
 
 #### Parameters
 
-| Name        | Type                                                |
-| :---------- | :-------------------------------------------------- |
-| `typedData` | [`TypedData`](../interfaces/typedData.TypedData.md) |
+| Name        | Type                                            |
+| :---------- | :---------------------------------------------- |
+| `typedData` | [`TypedData`](../interfaces/types.TypedData.md) |
 
 #### Returns
 
-`Promise`<[`Signature`](../modules.md#signature)\>
+`Promise`<[`Signature`](../namespaces/types.md#signature)\>
 
 the signature of the JSON object
 
@@ -578,7 +578,7 @@ the signature of the JSON object
 
 #### Defined in
 
-[src/account/default.ts:519](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L519)
+[src/account/default.ts:523](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L523)
 
 ---
 
@@ -595,9 +595,9 @@ if the JSON object is not a valid JSON
 
 #### Parameters
 
-| Name        | Type                                                |
-| :---------- | :-------------------------------------------------- |
-| `typedData` | [`TypedData`](../interfaces/typedData.TypedData.md) |
+| Name        | Type                                            |
+| :---------- | :---------------------------------------------- |
+| `typedData` | [`TypedData`](../interfaces/types.TypedData.md) |
 
 #### Returns
 
@@ -611,7 +611,7 @@ the hash of the JSON object
 
 #### Defined in
 
-[src/account/default.ts:523](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L523)
+[src/account/default.ts:527](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L527)
 
 ---
 
@@ -631,10 +631,10 @@ if the signature is not a valid signature
 
 #### Parameters
 
-| Name        | Type                                                | Description           |
-| :---------- | :-------------------------------------------------- | :-------------------- |
-| `hash`      | [`BigNumberish`](../namespaces/num.md#bignumberish) | hash to be verified   |
-| `signature` | [`Signature`](../modules.md#signature)              | signature of the hash |
+| Name        | Type                                                  | Description           |
+| :---------- | :---------------------------------------------------- | :-------------------- |
+| `hash`      | [`BigNumberish`](../namespaces/types.md#bignumberish) | hash to be verified   |
+| `signature` | [`Signature`](../namespaces/types.md#signature)       | signature of the hash |
 
 #### Returns
 
@@ -648,7 +648,7 @@ true if the signature is valid, false otherwise
 
 #### Defined in
 
-[src/account/default.ts:527](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L527)
+[src/account/default.ts:531](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L531)
 
 ---
 
@@ -664,10 +664,10 @@ if the JSON object is not a valid JSON or the signature is not a valid signature
 
 #### Parameters
 
-| Name        | Type                                                | Description                  |
-| :---------- | :-------------------------------------------------- | :--------------------------- |
-| `typedData` | [`TypedData`](../interfaces/typedData.TypedData.md) | JSON object to be verified   |
-| `signature` | [`Signature`](../modules.md#signature)              | signature of the JSON object |
+| Name        | Type                                            | Description                  |
+| :---------- | :---------------------------------------------- | :--------------------------- |
+| `typedData` | [`TypedData`](../interfaces/types.TypedData.md) | JSON object to be verified   |
+| `signature` | [`Signature`](../namespaces/types.md#signature) | signature of the JSON object |
 
 #### Returns
 
@@ -681,7 +681,7 @@ true if the signature is valid, false otherwise
 
 #### Defined in
 
-[src/account/default.ts:543](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L543)
+[src/account/default.ts:547](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L547)
 
 ---
 
@@ -693,10 +693,10 @@ Gets Suggested Max Fee based on the transaction type
 
 #### Parameters
 
-| Name             | Type                                                        |
-| :--------------- | :---------------------------------------------------------- |
-| `«destructured»` | [`EstimateFeeAction`](../modules.md#estimatefeeaction)      |
-| `details`        | [`EstimateFeeDetails`](../interfaces/EstimateFeeDetails.md) |
+| Name             | Type                                                              |
+| :--------------- | :---------------------------------------------------------------- |
+| `«destructured»` | [`EstimateFeeAction`](../namespaces/types.md#estimatefeeaction)   |
+| `details`        | [`EstimateFeeDetails`](../interfaces/types.EstimateFeeDetails.md) |
 
 #### Returns
 
@@ -710,90 +710,90 @@ suggestedMaxFee
 
 #### Defined in
 
-[src/account/default.ts:548](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L548)
+[src/account/default.ts:552](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L552)
 
 ---
 
 ### buildDeclarePayload
 
-▸ **buildDeclarePayload**(`payload`, `«destructured»`): `Promise`<[`DeclareContractTransaction`](../modules.md#declarecontracttransaction)\>
+▸ **buildDeclarePayload**(`payload`, `«destructured»`): `Promise`<[`DeclareContractTransaction`](../namespaces/types.md#declarecontracttransaction)\>
 
 will be renamed to buildDeclareContractTransaction
 
 #### Parameters
 
-| Name             | Type                                                                    |
-| :--------------- | :---------------------------------------------------------------------- |
-| `payload`        | [`DeclareContractPayload`](../modules.md#declarecontractpayload)        |
-| `«destructured»` | [`InvocationsSignerDetails`](../interfaces/InvocationsSignerDetails.md) |
+| Name             | Type                                                                          |
+| :--------------- | :---------------------------------------------------------------------------- |
+| `payload`        | [`DeclareContractPayload`](../namespaces/types.md#declarecontractpayload)     |
+| `«destructured»` | [`InvocationsSignerDetails`](../interfaces/types.InvocationsSignerDetails.md) |
 
 #### Returns
 
-`Promise`<[`DeclareContractTransaction`](../modules.md#declarecontracttransaction)\>
+`Promise`<[`DeclareContractTransaction`](../namespaces/types.md#declarecontracttransaction)\>
 
 #### Defined in
 
-[src/account/default.ts:582](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L582)
+[src/account/default.ts:586](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L586)
 
 ---
 
 ### buildAccountDeployPayload
 
-▸ **buildAccountDeployPayload**(`«destructured»`, `«destructured»`): `Promise`<[`DeployAccountContractTransaction`](../modules.md#deployaccountcontracttransaction)\>
+▸ **buildAccountDeployPayload**(`«destructured»`, `«destructured»`): `Promise`<[`DeployAccountContractTransaction`](../namespaces/types.md#deployaccountcontracttransaction)\>
 
 #### Parameters
 
-| Name             | Type                                                                         |
-| :--------------- | :--------------------------------------------------------------------------- |
-| `«destructured»` | [`DeployAccountContractPayload`](../modules.md#deployaccountcontractpayload) |
-| `«destructured»` | [`InvocationsSignerDetails`](../interfaces/InvocationsSignerDetails.md)      |
+| Name             | Type                                                                                  |
+| :--------------- | :------------------------------------------------------------------------------------ |
+| `«destructured»` | [`DeployAccountContractPayload`](../namespaces/types.md#deployaccountcontractpayload) |
+| `«destructured»` | [`InvocationsSignerDetails`](../interfaces/types.InvocationsSignerDetails.md)         |
 
 #### Returns
 
-`Promise`<[`DeployAccountContractTransaction`](../modules.md#deployaccountcontracttransaction)\>
+`Promise`<[`DeployAccountContractTransaction`](../namespaces/types.md#deployaccountcontracttransaction)\>
 
 #### Defined in
 
-[src/account/default.ts:606](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L606)
+[src/account/default.ts:610](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L610)
 
 ---
 
 ### buildUDCContractPayload
 
-▸ **buildUDCContractPayload**(`payload`): [`Call`](../modules.md#call)[]
+▸ **buildUDCContractPayload**(`payload`): [`Call`](../namespaces/types.md#call)[]
 
 #### Parameters
 
-| Name      | Type                                                                                                                                                                           |
-| :-------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `payload` | [`UniversalDeployerContractPayload`](../modules.md#universaldeployercontractpayload) \| [`UniversalDeployerContractPayload`](../modules.md#universaldeployercontractpayload)[] |
+| Name      | Type                                                                                                                                                                                             |
+| :-------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `payload` | [`UniversalDeployerContractPayload`](../namespaces/types.md#universaldeployercontractpayload) \| [`UniversalDeployerContractPayload`](../namespaces/types.md#universaldeployercontractpayload)[] |
 
 #### Returns
 
-[`Call`](../modules.md#call)[]
+[`Call`](../namespaces/types.md#call)[]
 
 #### Defined in
 
-[src/account/default.ts:639](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L639)
+[src/account/default.ts:643](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L643)
 
 ---
 
 ### simulateTransaction
 
-▸ **simulateTransaction**(`calls`, `«destructured»?`): `Promise`<[`TransactionSimulation`](../interfaces/TransactionSimulation.md)\>
+▸ **simulateTransaction**(`calls`, `«destructured»?`): `Promise`<[`TransactionSimulation`](../interfaces/types.TransactionSimulation.md)\>
 
 Simulates the transaction and returns the transaction trace and estimated fee.
 
 #### Parameters
 
-| Name             | Type                                                                    | Description                                                                                                                                                                |
-| :--------------- | :---------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `calls`          | [`AllowArray`](../modules.md#allowarray)<[`Call`](../modules.md#call)\> | the invocation object containing: - contractAddress - the address of the contract - entrypoint - the entrypoint of the contract - calldata - (defaults to []) the calldata |
-| `«destructured»` | [`EstimateFeeDetails`](../interfaces/EstimateFeeDetails.md)             | -                                                                                                                                                                          |
+| Name             | Type                                                                                      | Description                                                                                                                                                                |
+| :--------------- | :---------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `calls`          | [`AllowArray`](../namespaces/types.md#allowarray)<[`Call`](../namespaces/types.md#call)\> | the invocation object containing: - contractAddress - the address of the contract - entrypoint - the entrypoint of the contract - calldata - (defaults to []) the calldata |
+| `«destructured»` | [`EstimateFeeDetails`](../interfaces/types.EstimateFeeDetails.md)                         | -                                                                                                                                                                          |
 
 #### Returns
 
-`Promise`<[`TransactionSimulation`](../interfaces/TransactionSimulation.md)\>
+`Promise`<[`TransactionSimulation`](../interfaces/types.TransactionSimulation.md)\>
 
 response from estimate_fee
 
@@ -803,7 +803,7 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/default.ts:666](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L666)
+[src/account/default.ts:670](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L670)
 
 ---
 
@@ -813,10 +813,10 @@ response from estimate_fee
 
 #### Parameters
 
-| Name                  | Type                                                |
-| :-------------------- | :-------------------------------------------------- |
-| `address`             | [`BigNumberish`](../namespaces/num.md#bignumberish) |
-| `StarknetIdContract?` | `string`                                            |
+| Name                  | Type                                                  |
+| :-------------------- | :---------------------------------------------------- |
+| `address`             | [`BigNumberish`](../namespaces/types.md#bignumberish) |
+| `StarknetIdContract?` | `string`                                              |
 
 #### Returns
 
@@ -828,7 +828,7 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/default.ts:703](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L703)
+[src/account/default.ts:707](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L707)
 
 ---
 
@@ -854,25 +854,25 @@ the chain Id
 
 #### Defined in
 
-[src/provider/default.ts:64](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L64)
+[src/provider/default.ts:62](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L62)
 
 ---
 
 ### getBlock
 
-▸ **getBlock**(`blockIdentifier`): `Promise`<[`GetBlockResponse`](../interfaces/GetBlockResponse.md)\>
+▸ **getBlock**(`blockIdentifier`): `Promise`<[`GetBlockResponse`](../interfaces/types.GetBlockResponse.md)\>
 
 Gets the block information
 
 #### Parameters
 
-| Name              | Type              | Description      |
-| :---------------- | :---------------- | :--------------- |
-| `blockIdentifier` | `BlockIdentifier` | block identifier |
+| Name              | Type                                                        | Description      |
+| :---------------- | :---------------------------------------------------------- | :--------------- |
+| `blockIdentifier` | [`BlockIdentifier`](../namespaces/types.md#blockidentifier) | block identifier |
 
 #### Returns
 
-`Promise`<[`GetBlockResponse`](../interfaces/GetBlockResponse.md)\>
+`Promise`<[`GetBlockResponse`](../interfaces/types.GetBlockResponse.md)\>
 
 the block object
 
@@ -886,26 +886,26 @@ the block object
 
 #### Defined in
 
-[src/provider/default.ts:68](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L68)
+[src/provider/default.ts:66](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L66)
 
 ---
 
 ### getClassAt
 
-▸ **getClassAt**(`contractAddress`, `blockIdentifier?`): `Promise`<[`ContractClass`](../modules.md#contractclass) \| `CONTRACT_CLASS`\>
+▸ **getClassAt**(`contractAddress`, `blockIdentifier?`): `Promise`<[`ContractClass`](../namespaces/types.md#contractclass) \| `CONTRACT_CLASS`\>
 
 Gets the contract class of the deployed contract.
 
 #### Parameters
 
-| Name               | Type              | Description      |
-| :----------------- | :---------------- | :--------------- |
-| `contractAddress`  | `string`          | contract address |
-| `blockIdentifier?` | `BlockIdentifier` | block identifier |
+| Name               | Type                                                        | Description      |
+| :----------------- | :---------------------------------------------------------- | :--------------- |
+| `contractAddress`  | `string`                                                    | contract address |
+| `blockIdentifier?` | [`BlockIdentifier`](../namespaces/types.md#blockidentifier) | block identifier |
 
 #### Returns
 
-`Promise`<[`ContractClass`](../modules.md#contractclass) \| `CONTRACT_CLASS`\>
+`Promise`<[`ContractClass`](../namespaces/types.md#contractclass) \| `CONTRACT_CLASS`\>
 
 Contract class of compiled contract
 
@@ -919,7 +919,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/default.ts:72](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L72)
+[src/provider/default.ts:70](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L70)
 
 ---
 
@@ -931,10 +931,10 @@ Returns the class hash deployed under the given address.
 
 #### Parameters
 
-| Name               | Type              | Description      |
-| :----------------- | :---------------- | :--------------- |
-| `contractAddress`  | `string`          | contract address |
-| `blockIdentifier?` | `BlockIdentifier` | block identifier |
+| Name               | Type                                                        | Description      |
+| :----------------- | :---------------------------------------------------------- | :--------------- |
+| `contractAddress`  | `string`                                                    | contract address |
+| `blockIdentifier?` | [`BlockIdentifier`](../namespaces/types.md#blockidentifier) | block identifier |
 
 #### Returns
 
@@ -952,13 +952,13 @@ Class hash
 
 #### Defined in
 
-[src/provider/default.ts:79](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L79)
+[src/provider/default.ts:77](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L77)
 
 ---
 
 ### getClassByHash
 
-▸ **getClassByHash**(`classHash`): `Promise`<[`ContractClass`](../modules.md#contractclass) \| `CONTRACT_CLASS`\>
+▸ **getClassByHash**(`classHash`): `Promise`<[`ContractClass`](../namespaces/types.md#contractclass) \| `CONTRACT_CLASS`\>
 
 Returns the contract class deployed under the given class hash.
 
@@ -970,7 +970,7 @@ Returns the contract class deployed under the given class hash.
 
 #### Returns
 
-`Promise`<[`ContractClass`](../modules.md#contractclass) \| `CONTRACT_CLASS`\>
+`Promise`<[`ContractClass`](../namespaces/types.md#contractclass) \| `CONTRACT_CLASS`\>
 
 Contract class of compiled contract
 
@@ -984,13 +984,13 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/default.ts:86](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L86)
+[src/provider/default.ts:84](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L84)
 
 ---
 
 ### getEstimateFee
 
-▸ **getEstimateFee**(`invocationWithTxType`, `invocationDetails`, `blockIdentifier`): `Promise`<[`EstimateFeeResponse`](../interfaces/EstimateFeeResponse.md)\>
+▸ **getEstimateFee**(`invocationWithTxType`, `invocationDetails`, `blockIdentifier`): `Promise`<[`EstimateFeeResponse`](../interfaces/types.EstimateFeeResponse.md)\>
 
 Estimates the fee for a given INVOKE transaction
 
@@ -1000,15 +1000,15 @@ Please use getInvokeEstimateFee or getDeclareEstimateFee instead. Should not be 
 
 #### Parameters
 
-| Name                   | Type                                                                       | Description                                                                                                                                                                                                             |
-| :--------------------- | :------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `invocationWithTxType` | [`Invocation`](../modules.md#invocation)                                   | the invocation object containing: - contractAddress - the address of the contract - entrypoint - the entrypoint of the contract - calldata - (defaults to []) the calldata - signature - (defaults to []) the signature |
-| `invocationDetails`    | [`InvocationsDetailsWithNonce`](../modules.md#invocationsdetailswithnonce) | optional details containing: - nonce - optional nonce - version - optional version                                                                                                                                      |
-| `blockIdentifier`      | `BlockIdentifier`                                                          | (optional) block identifier                                                                                                                                                                                             |
+| Name                   | Type                                                                                | Description                                                                                                                                                                                                             |
+| :--------------------- | :---------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `invocationWithTxType` | [`Invocation`](../namespaces/types.md#invocation)                                   | the invocation object containing: - contractAddress - the address of the contract - entrypoint - the entrypoint of the contract - calldata - (defaults to []) the calldata - signature - (defaults to []) the signature |
+| `invocationDetails`    | [`InvocationsDetailsWithNonce`](../namespaces/types.md#invocationsdetailswithnonce) | optional details containing: - nonce - optional nonce - version - optional version                                                                                                                                      |
+| `blockIdentifier`      | [`BlockIdentifier`](../namespaces/types.md#blockidentifier)                         | (optional) block identifier                                                                                                                                                                                             |
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponse`](../interfaces/EstimateFeeResponse.md)\>
+`Promise`<[`EstimateFeeResponse`](../interfaces/types.EstimateFeeResponse.md)\>
 
 the estimated fee
 
@@ -1022,28 +1022,28 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:90](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L90)
+[src/provider/default.ts:88](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L88)
 
 ---
 
 ### getInvokeEstimateFee
 
-▸ **getInvokeEstimateFee**(`invocationWithTxType`, `invocationDetails`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`EstimateFeeResponse`](../interfaces/EstimateFeeResponse.md)\>
+▸ **getInvokeEstimateFee**(`invocationWithTxType`, `invocationDetails`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`EstimateFeeResponse`](../interfaces/types.EstimateFeeResponse.md)\>
 
 Estimates the fee for a given INVOKE transaction
 
 #### Parameters
 
-| Name                   | Type                                                                       | Description                                                                                                                                                                                                             |
-| :--------------------- | :------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `invocationWithTxType` | [`Invocation`](../modules.md#invocation)                                   | the invocation object containing: - contractAddress - the address of the contract - entrypoint - the entrypoint of the contract - calldata - (defaults to []) the calldata - signature - (defaults to []) the signature |
-| `invocationDetails`    | [`InvocationsDetailsWithNonce`](../modules.md#invocationsdetailswithnonce) | optional details containing: - nonce - optional nonce - version - optional version                                                                                                                                      |
-| `blockIdentifier?`     | `BlockIdentifier`                                                          | (optional) block identifier                                                                                                                                                                                             |
-| `skipValidate?`        | `boolean`                                                                  | (optional) skip cairo **validate** method                                                                                                                                                                               |
+| Name                   | Type                                                                                | Description                                                                                                                                                                                                             |
+| :--------------------- | :---------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `invocationWithTxType` | [`Invocation`](../namespaces/types.md#invocation)                                   | the invocation object containing: - contractAddress - the address of the contract - entrypoint - the entrypoint of the contract - calldata - (defaults to []) the calldata - signature - (defaults to []) the signature |
+| `invocationDetails`    | [`InvocationsDetailsWithNonce`](../namespaces/types.md#invocationsdetailswithnonce) | optional details containing: - nonce - optional nonce - version - optional version                                                                                                                                      |
+| `blockIdentifier?`     | [`BlockIdentifier`](../namespaces/types.md#blockidentifier)                         | (optional) block identifier                                                                                                                                                                                             |
+| `skipValidate?`        | `boolean`                                                                           | (optional) skip cairo **validate** method                                                                                                                                                                               |
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponse`](../interfaces/EstimateFeeResponse.md)\>
+`Promise`<[`EstimateFeeResponse`](../interfaces/types.EstimateFeeResponse.md)\>
 
 the estimated fee
 
@@ -1057,26 +1057,26 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:98](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L98)
+[src/provider/default.ts:96](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L96)
 
 ---
 
 ### getEstimateFeeBulk
 
-▸ **getEstimateFeeBulk**(`invocations`, `blockIdentifier?`): `Promise`<[`EstimateFeeResponseBulk`](../modules.md#estimatefeeresponsebulk)\>
+▸ **getEstimateFeeBulk**(`invocations`, `blockIdentifier?`): `Promise`<[`EstimateFeeResponseBulk`](../namespaces/types.md#estimatefeeresponsebulk)\>
 
 Estimates the fee for a list of INVOKE transaction
 
 #### Parameters
 
-| Name               | Type                                             | Description                                                                                                                                                                                                                                                    |
-| :----------------- | :----------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `invocations`      | [`InvocationBulk`](../modules.md#invocationbulk) | the array of invocation and invocation details object containing: - contractAddress - the address of the account - calldata - (defaults to []) the calldata - signature - (defaults to []) the signature - nonce - optional nonce - version - optional version |
-| `blockIdentifier?` | `BlockIdentifier`                                | block identifier                                                                                                                                                                                                                                               |
+| Name               | Type                                                        | Description                                                                                                                                                                                                                                                    |
+| :----------------- | :---------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `invocations`      | [`InvocationBulk`](../namespaces/types.md#invocationbulk)   | the array of invocation and invocation details object containing: - contractAddress - the address of the account - calldata - (defaults to []) the calldata - signature - (defaults to []) the signature - nonce - optional nonce - version - optional version |
+| `blockIdentifier?` | [`BlockIdentifier`](../namespaces/types.md#blockidentifier) | block identifier                                                                                                                                                                                                                                               |
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponseBulk`](../modules.md#estimatefeeresponsebulk)\>
+`Promise`<[`EstimateFeeResponseBulk`](../namespaces/types.md#estimatefeeresponsebulk)\>
 
 the estimated fee
 
@@ -1090,7 +1090,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:112](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L112)
+[src/provider/default.ts:110](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L110)
 
 ---
 
@@ -1102,10 +1102,10 @@ Gets the nonce of a contract with respect to a specific block
 
 #### Parameters
 
-| Name               | Type              | Description      |
-| :----------------- | :---------------- | :--------------- |
-| `contractAddress`  | `string`          | contract address |
-| `blockIdentifier?` | `BlockIdentifier` | -                |
+| Name               | Type                                                        | Description      |
+| :----------------- | :---------------------------------------------------------- | :--------------- |
+| `contractAddress`  | `string`                                                    | contract address |
+| `blockIdentifier?` | [`BlockIdentifier`](../namespaces/types.md#blockidentifier) | -                |
 
 #### Returns
 
@@ -1123,7 +1123,7 @@ the hex nonce
 
 #### Defined in
 
-[src/provider/default.ts:119](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L119)
+[src/provider/default.ts:117](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L117)
 
 ---
 
@@ -1135,11 +1135,11 @@ Gets the contract's storage variable at a specific key.
 
 #### Parameters
 
-| Name               | Type                                                | Description                                                |
-| :----------------- | :-------------------------------------------------- | :--------------------------------------------------------- |
-| `contractAddress`  | `string`                                            |                                                            |
-| `key`              | [`BigNumberish`](../namespaces/num.md#bignumberish) | from getStorageVarAddress('<STORAGE_VARIABLE_NAME>') (WIP) |
-| `blockIdentifier?` | `BlockIdentifier`                                   | block identifier                                           |
+| Name               | Type                                                        | Description                                                |
+| :----------------- | :---------------------------------------------------------- | :--------------------------------------------------------- |
+| `contractAddress`  | `string`                                                    |                                                            |
+| `key`              | [`BigNumberish`](../namespaces/types.md#bignumberish)       | from getStorageVarAddress('<STORAGE_VARIABLE_NAME>') (WIP) |
+| `blockIdentifier?` | [`BlockIdentifier`](../namespaces/types.md#blockidentifier) | block identifier                                           |
 
 #### Returns
 
@@ -1157,25 +1157,25 @@ the value of the storage variable
 
 #### Defined in
 
-[src/provider/default.ts:126](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L126)
+[src/provider/default.ts:124](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L124)
 
 ---
 
 ### getTransaction
 
-▸ **getTransaction**(`txHash`): `Promise`<[`GetTransactionResponse`](../modules.md#gettransactionresponse)\>
+▸ **getTransaction**(`txHash`): `Promise`<[`GetTransactionResponse`](../namespaces/types.md#gettransactionresponse)\>
 
 Gets the transaction information from a tx id.
 
 #### Parameters
 
-| Name     | Type                                                |
-| :------- | :-------------------------------------------------- |
-| `txHash` | [`BigNumberish`](../namespaces/num.md#bignumberish) |
+| Name     | Type                                                  |
+| :------- | :---------------------------------------------------- |
+| `txHash` | [`BigNumberish`](../namespaces/types.md#bignumberish) |
 
 #### Returns
 
-`Promise`<[`GetTransactionResponse`](../modules.md#gettransactionresponse)\>
+`Promise`<[`GetTransactionResponse`](../namespaces/types.md#gettransactionresponse)\>
 
 the transaction object { transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? }
 
@@ -1189,25 +1189,25 @@ the transaction object { transaction_id, status, transaction, block_number?, blo
 
 #### Defined in
 
-[src/provider/default.ts:134](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L134)
+[src/provider/default.ts:132](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L132)
 
 ---
 
 ### getTransactionReceipt
 
-▸ **getTransactionReceipt**(`txHash`): `Promise`<[`GetTransactionReceiptResponse`](../modules.md#gettransactionreceiptresponse)\>
+▸ **getTransactionReceipt**(`txHash`): `Promise`<[`GetTransactionReceiptResponse`](../namespaces/types.md#gettransactionreceiptresponse)\>
 
 Gets the transaction receipt from a tx hash.
 
 #### Parameters
 
-| Name     | Type                                                |
-| :------- | :-------------------------------------------------- |
-| `txHash` | [`BigNumberish`](../namespaces/num.md#bignumberish) |
+| Name     | Type                                                  |
+| :------- | :---------------------------------------------------- |
+| `txHash` | [`BigNumberish`](../namespaces/types.md#bignumberish) |
 
 #### Returns
 
-`Promise`<[`GetTransactionReceiptResponse`](../modules.md#gettransactionreceiptresponse)\>
+`Promise`<[`GetTransactionReceiptResponse`](../namespaces/types.md#gettransactionreceiptresponse)\>
 
 the transaction receipt object
 
@@ -1221,26 +1221,26 @@ the transaction receipt object
 
 #### Defined in
 
-[src/provider/default.ts:138](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L138)
+[src/provider/default.ts:136](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L136)
 
 ---
 
 ### callContract
 
-▸ **callContract**(`request`, `blockIdentifier?`): `Promise`<[`CallContractResponse`](../modules.md#callcontractresponse)\>
+▸ **callContract**(`request`, `blockIdentifier?`): `Promise`<[`CallContractResponse`](../namespaces/types.md#callcontractresponse)\>
 
 Calls a function on the Starknet contract.
 
 #### Parameters
 
-| Name               | Type                         | Description              |
-| :----------------- | :--------------------------- | :----------------------- |
-| `request`          | [`Call`](../modules.md#call) | transaction to be called |
-| `blockIdentifier?` | `BlockIdentifier`            | block identifier         |
+| Name               | Type                                                        | Description              |
+| :----------------- | :---------------------------------------------------------- | :----------------------- |
+| `request`          | [`Call`](../namespaces/types.md#call)                       | transaction to be called |
+| `blockIdentifier?` | [`BlockIdentifier`](../namespaces/types.md#blockidentifier) | block identifier         |
 
 #### Returns
 
-`Promise`<[`CallContractResponse`](../modules.md#callcontractresponse)\>
+`Promise`<[`CallContractResponse`](../namespaces/types.md#callcontractresponse)\>
 
 the result of the function on the smart contract.
 
@@ -1254,13 +1254,13 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[src/provider/default.ts:142](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L142)
+[src/provider/default.ts:140](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L140)
 
 ---
 
 ### invokeFunction
 
-▸ **invokeFunction**(`functionInvocation`, `details`): `Promise`<[`InvokeFunctionResponse`](../interfaces/InvokeFunctionResponse.md)\>
+▸ **invokeFunction**(`functionInvocation`, `details`): `Promise`<[`InvokeFunctionResponse`](../interfaces/types.InvokeFunctionResponse.md)\>
 
 Invokes a function on starknet
 
@@ -1270,14 +1270,14 @@ This method wont be supported as soon as fees are mandatory. Should not be used 
 
 #### Parameters
 
-| Name                 | Type                                                                       | Description                                                                                                                                                                                                             |
-| :------------------- | :------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `functionInvocation` | [`Invocation`](../modules.md#invocation)                                   | the invocation object containing: - contractAddress - the address of the contract - entrypoint - the entrypoint of the contract - calldata - (defaults to []) the calldata - signature - (defaults to []) the signature |
-| `details`            | [`InvocationsDetailsWithNonce`](../modules.md#invocationsdetailswithnonce) | optional details containing: - nonce - optional nonce - version - optional version - maxFee - optional maxFee                                                                                                           |
+| Name                 | Type                                                                                | Description                                                                                                                                                                                                             |
+| :------------------- | :---------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `functionInvocation` | [`Invocation`](../namespaces/types.md#invocation)                                   | the invocation object containing: - contractAddress - the address of the contract - entrypoint - the entrypoint of the contract - calldata - (defaults to []) the calldata - signature - (defaults to []) the signature |
+| `details`            | [`InvocationsDetailsWithNonce`](../namespaces/types.md#invocationsdetailswithnonce) | optional details containing: - nonce - optional nonce - version - optional version - maxFee - optional maxFee                                                                                                           |
 
 #### Returns
 
-`Promise`<[`InvokeFunctionResponse`](../interfaces/InvokeFunctionResponse.md)\>
+`Promise`<[`InvokeFunctionResponse`](../interfaces/types.InvokeFunctionResponse.md)\>
 
 response from addTransaction
 
@@ -1291,26 +1291,26 @@ response from addTransaction
 
 #### Defined in
 
-[src/provider/default.ts:149](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L149)
+[src/provider/default.ts:147](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L147)
 
 ---
 
 ### deployAccountContract
 
-▸ **deployAccountContract**(`payload`, `details`): `Promise`<[`DeployContractResponse`](../interfaces/DeployContractResponse.md)\>
+▸ **deployAccountContract**(`payload`, `details`): `Promise`<[`DeployContractResponse`](../interfaces/types.DeployContractResponse.md)\>
 
 Deploys a given compiled Account contract (json) to starknet
 
 #### Parameters
 
-| Name      | Type                                                                                 | Description                                                                                       |
-| :-------- | :----------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------ |
-| `payload` | [`DeployAccountContractTransaction`](../modules.md#deployaccountcontracttransaction) | payload to be deployed containing: - compiled contract code - constructor calldata - address salt |
-| `details` | [`InvocationsDetailsWithNonce`](../modules.md#invocationsdetailswithnonce)           | -                                                                                                 |
+| Name      | Type                                                                                          | Description                                                                                       |
+| :-------- | :-------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------ |
+| `payload` | [`DeployAccountContractTransaction`](../namespaces/types.md#deployaccountcontracttransaction) | payload to be deployed containing: - compiled contract code - constructor calldata - address salt |
+| `details` | [`InvocationsDetailsWithNonce`](../namespaces/types.md#invocationsdetailswithnonce)           | -                                                                                                 |
 
 #### Returns
 
-`Promise`<[`DeployContractResponse`](../interfaces/DeployContractResponse.md)\>
+`Promise`<[`DeployContractResponse`](../interfaces/types.DeployContractResponse.md)\>
 
 a confirmation of sending a transaction on the starknet contract
 
@@ -1324,26 +1324,26 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/default.ts:156](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L156)
+[src/provider/default.ts:154](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L154)
 
 ---
 
 ### declareContract
 
-▸ **declareContract**(`transaction`, `details`): `Promise`<[`DeclareContractResponse`](../interfaces/DeclareContractResponse.md)\>
+▸ **declareContract**(`transaction`, `details`): `Promise`<[`DeclareContractResponse`](../interfaces/types.DeclareContractResponse.md)\>
 
 Declares a given compiled contract (json) to starknet
 
 #### Parameters
 
-| Name          | Type                                                                       | Description                                                                                          |
-| :------------ | :------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------- |
-| `transaction` | [`DeclareContractTransaction`](../modules.md#declarecontracttransaction)   | transaction payload to be deployed containing: - compiled contract code - sender address - signature |
-| `details`     | [`InvocationsDetailsWithNonce`](../modules.md#invocationsdetailswithnonce) | Invocation Details containing: - nonce - optional version - optional maxFee                          |
+| Name          | Type                                                                                | Description                                                                                          |
+| :------------ | :---------------------------------------------------------------------------------- | :--------------------------------------------------------------------------------------------------- |
+| `transaction` | [`DeclareContractTransaction`](../namespaces/types.md#declarecontracttransaction)   | transaction payload to be deployed containing: - compiled contract code - sender address - signature |
+| `details`     | [`InvocationsDetailsWithNonce`](../namespaces/types.md#invocationsdetailswithnonce) | Invocation Details containing: - nonce - optional version - optional maxFee                          |
 
 #### Returns
 
-`Promise`<[`DeclareContractResponse`](../interfaces/DeclareContractResponse.md)\>
+`Promise`<[`DeclareContractResponse`](../interfaces/types.DeclareContractResponse.md)\>
 
 a confirmation of sending a transaction on the starknet contract
 
@@ -1357,28 +1357,28 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/default.ts:163](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L163)
+[src/provider/default.ts:161](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L161)
 
 ---
 
 ### getDeclareEstimateFee
 
-▸ **getDeclareEstimateFee**(`transaction`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`EstimateFeeResponse`](../interfaces/EstimateFeeResponse.md)\>
+▸ **getDeclareEstimateFee**(`transaction`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`EstimateFeeResponse`](../interfaces/types.EstimateFeeResponse.md)\>
 
 Estimates the fee for a given DECLARE transaction
 
 #### Parameters
 
-| Name               | Type                                                                       | Description                                                                                                                           |
-| :----------------- | :------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------ |
-| `transaction`      | [`DeclareContractTransaction`](../modules.md#declarecontracttransaction)   | transaction payload to be declared containing: - compiled contract code - sender address - signature - (defaults to []) the signature |
-| `details`          | [`InvocationsDetailsWithNonce`](../modules.md#invocationsdetailswithnonce) | optional details containing: - nonce - version - optional version - optional maxFee                                                   |
-| `blockIdentifier?` | `BlockIdentifier`                                                          | (optional) block identifier                                                                                                           |
-| `skipValidate?`    | `boolean`                                                                  | (optional) skip cairo **validate** method                                                                                             |
+| Name               | Type                                                                                | Description                                                                                                                           |
+| :----------------- | :---------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------ |
+| `transaction`      | [`DeclareContractTransaction`](../namespaces/types.md#declarecontracttransaction)   | transaction payload to be declared containing: - compiled contract code - sender address - signature - (defaults to []) the signature |
+| `details`          | [`InvocationsDetailsWithNonce`](../namespaces/types.md#invocationsdetailswithnonce) | optional details containing: - nonce - version - optional version - optional maxFee                                                   |
+| `blockIdentifier?` | [`BlockIdentifier`](../namespaces/types.md#blockidentifier)                         | (optional) block identifier                                                                                                           |
+| `skipValidate?`    | `boolean`                                                                           | (optional) skip cairo **validate** method                                                                                             |
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponse`](../interfaces/EstimateFeeResponse.md)\>
+`Promise`<[`EstimateFeeResponse`](../interfaces/types.EstimateFeeResponse.md)\>
 
 the estimated fee
 
@@ -1392,28 +1392,28 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:170](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L170)
+[src/provider/default.ts:168](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L168)
 
 ---
 
 ### getDeployAccountEstimateFee
 
-▸ **getDeployAccountEstimateFee**(`transaction`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`EstimateFeeResponse`](../interfaces/EstimateFeeResponse.md)\>
+▸ **getDeployAccountEstimateFee**(`transaction`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`EstimateFeeResponse`](../interfaces/types.EstimateFeeResponse.md)\>
 
 Estimates the fee for a given DEPLOY_ACCOUNT transaction
 
 #### Parameters
 
-| Name               | Type                                                                                 | Description                                                                                                                                 |
-| :----------------- | :----------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------ |
-| `transaction`      | [`DeployAccountContractTransaction`](../modules.md#deployaccountcontracttransaction) | transaction payload to be deployed containing: - classHash - constructorCalldata - addressSalt - signature - (defaults to []) the signature |
-| `details`          | [`InvocationsDetailsWithNonce`](../modules.md#invocationsdetailswithnonce)           | optional details containing: - nonce - version - optional version - optional maxFee                                                         |
-| `blockIdentifier?` | `BlockIdentifier`                                                                    | (optional) block identifier                                                                                                                 |
-| `skipValidate?`    | `boolean`                                                                            | (optional) skip cairo **validate** method                                                                                                   |
+| Name               | Type                                                                                          | Description                                                                                                                                 |
+| :----------------- | :-------------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------ |
+| `transaction`      | [`DeployAccountContractTransaction`](../namespaces/types.md#deployaccountcontracttransaction) | transaction payload to be deployed containing: - classHash - constructorCalldata - addressSalt - signature - (defaults to []) the signature |
+| `details`          | [`InvocationsDetailsWithNonce`](../namespaces/types.md#invocationsdetailswithnonce)           | optional details containing: - nonce - version - optional version - optional maxFee                                                         |
+| `blockIdentifier?` | [`BlockIdentifier`](../namespaces/types.md#blockidentifier)                                   | (optional) block identifier                                                                                                                 |
+| `skipValidate?`    | `boolean`                                                                                     | (optional) skip cairo **validate** method                                                                                                   |
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponse`](../interfaces/EstimateFeeResponse.md)\>
+`Promise`<[`EstimateFeeResponse`](../interfaces/types.EstimateFeeResponse.md)\>
 
 the estimated fee
 
@@ -1427,13 +1427,13 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:179](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L179)
+[src/provider/default.ts:177](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L177)
 
 ---
 
 ### getCode
 
-▸ **getCode**(`contractAddress`, `blockIdentifier?`): `Promise`<[`GetCodeResponse`](../interfaces/GetCodeResponse.md)\>
+▸ **getCode**(`contractAddress`, `blockIdentifier?`): `Promise`<[`GetCodeResponse`](../interfaces/types.GetCodeResponse.md)\>
 
 **`Deprecated`**
 
@@ -1441,14 +1441,14 @@ The method should not be used
 
 #### Parameters
 
-| Name               | Type              |
-| :----------------- | :---------------- |
-| `contractAddress`  | `string`          |
-| `blockIdentifier?` | `BlockIdentifier` |
+| Name               | Type                                                        |
+| :----------------- | :---------------------------------------------------------- |
+| `contractAddress`  | `string`                                                    |
+| `blockIdentifier?` | [`BlockIdentifier`](../namespaces/types.md#blockidentifier) |
 
 #### Returns
 
-`Promise`<[`GetCodeResponse`](../interfaces/GetCodeResponse.md)\>
+`Promise`<[`GetCodeResponse`](../interfaces/types.GetCodeResponse.md)\>
 
 #### Implementation of
 
@@ -1460,26 +1460,26 @@ The method should not be used
 
 #### Defined in
 
-[src/provider/default.ts:193](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L193)
+[src/provider/default.ts:191](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L191)
 
 ---
 
 ### waitForTransaction
 
-▸ **waitForTransaction**(`txHash`, `options?`): `Promise`<[`GetTransactionReceiptResponse`](../modules.md#gettransactionreceiptresponse)\>
+▸ **waitForTransaction**(`txHash`, `options?`): `Promise`<[`GetTransactionReceiptResponse`](../namespaces/types.md#gettransactionreceiptresponse)\>
 
 Wait for the transaction to be accepted
 
 #### Parameters
 
-| Name       | Type                                                                   | Description                                                                                                  |
-| :--------- | :--------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------- |
-| `txHash`   | [`BigNumberish`](../namespaces/num.md#bignumberish)                    | transaction hash                                                                                             |
-| `options?` | [`waitForTransactionOptions`](../modules.md#waitfortransactionoptions) | (optional) retryInterval: number \| undefined; - (optional) successStates: TransactionStatus[] \| undefined; |
+| Name       | Type                                                                            | Description                                                                                                  |
+| :--------- | :------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------------------- |
+| `txHash`   | [`BigNumberish`](../namespaces/types.md#bignumberish)                           | transaction hash                                                                                             |
+| `options?` | [`waitForTransactionOptions`](../namespaces/types.md#waitfortransactionoptions) | (optional) retryInterval: number \| undefined; - (optional) successStates: TransactionStatus[] \| undefined; |
 
 #### Returns
 
-`Promise`<[`GetTransactionReceiptResponse`](../modules.md#gettransactionreceiptresponse)\>
+`Promise`<[`GetTransactionReceiptResponse`](../namespaces/types.md#gettransactionreceiptresponse)\>
 
 GetTransactionReceiptResponse
 
@@ -1493,28 +1493,28 @@ GetTransactionReceiptResponse
 
 #### Defined in
 
-[src/provider/default.ts:200](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L200)
+[src/provider/default.ts:198](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L198)
 
 ---
 
 ### getSimulateTransaction
 
-▸ **getSimulateTransaction**(`invocation`, `invocationDetails`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`TransactionSimulationResponse`](../interfaces/TransactionSimulationResponse.md)\>
+▸ **getSimulateTransaction**(`invocation`, `invocationDetails`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`TransactionSimulationResponse`](../interfaces/types.TransactionSimulationResponse.md)\>
 
 Simulates the transaction and returns the transaction trace and estimated fee.
 
 #### Parameters
 
-| Name                | Type                                                                       | Description                                                                                                                                                                                                             |
-| :------------------ | :------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `invocation`        | [`Invocation`](../modules.md#invocation)                                   | the invocation object containing: - contractAddress - the address of the contract - entrypoint - the entrypoint of the contract - calldata - (defaults to []) the calldata - signature - (defaults to []) the signature |
-| `invocationDetails` | [`InvocationsDetailsWithNonce`](../modules.md#invocationsdetailswithnonce) | -                                                                                                                                                                                                                       |
-| `blockIdentifier?`  | `BlockIdentifier`                                                          | (optional) block identifier                                                                                                                                                                                             |
-| `skipValidate?`     | `boolean`                                                                  | (optional) skip cairo **validate** method                                                                                                                                                                               |
+| Name                | Type                                                                                | Description                                                                                                                                                                                                             |
+| :------------------ | :---------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `invocation`        | [`Invocation`](../namespaces/types.md#invocation)                                   | the invocation object containing: - contractAddress - the address of the contract - entrypoint - the entrypoint of the contract - calldata - (defaults to []) the calldata - signature - (defaults to []) the signature |
+| `invocationDetails` | [`InvocationsDetailsWithNonce`](../namespaces/types.md#invocationsdetailswithnonce) | -                                                                                                                                                                                                                       |
+| `blockIdentifier?`  | [`BlockIdentifier`](../namespaces/types.md#blockidentifier)                         | (optional) block identifier                                                                                                                                                                                             |
+| `skipValidate?`     | `boolean`                                                                           | (optional) skip cairo **validate** method                                                                                                                                                                               |
 
 #### Returns
 
-`Promise`<[`TransactionSimulationResponse`](../interfaces/TransactionSimulationResponse.md)\>
+`Promise`<[`TransactionSimulationResponse`](../interfaces/types.TransactionSimulationResponse.md)\>
 
 the transaction trace and estimated fee
 
@@ -1528,25 +1528,25 @@ the transaction trace and estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:207](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L207)
+[src/provider/default.ts:205](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L205)
 
 ---
 
 ### getStateUpdate
 
-▸ **getStateUpdate**(`blockIdentifier?`): `Promise`<[`StateUpdateResponse`](../interfaces/StateUpdateResponse.md)\>
+▸ **getStateUpdate**(`blockIdentifier?`): `Promise`<[`StateUpdateResponse`](../interfaces/types.StateUpdateResponse.md)\>
 
 Gets the state changes in a specific block
 
 #### Parameters
 
-| Name               | Type              | Description      |
-| :----------------- | :---------------- | :--------------- |
-| `blockIdentifier?` | `BlockIdentifier` | block identifier |
+| Name               | Type                                                        | Description      |
+| :----------------- | :---------------------------------------------------------- | :--------------- |
+| `blockIdentifier?` | [`BlockIdentifier`](../namespaces/types.md#blockidentifier) | block identifier |
 
 #### Returns
 
-`Promise`<[`StateUpdateResponse`](../interfaces/StateUpdateResponse.md)\>
+`Promise`<[`StateUpdateResponse`](../interfaces/types.StateUpdateResponse.md)\>
 
 StateUpdateResponse
 
@@ -1560,7 +1560,7 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/default.ts:221](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L221)
+[src/provider/default.ts:219](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L219)
 
 ---
 
@@ -1585,4 +1585,4 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/default.ts:229](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L229)
+[src/provider/default.ts:227](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L227)
