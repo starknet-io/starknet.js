@@ -1,6 +1,4 @@
-import { BlockIdentifier } from '../provider/utils';
-import { BigNumberish } from '../utils/num';
-import { RawArgsArray, Signature } from './lib';
+import { BigNumberish, BlockIdentifier, RawArgsArray, Signature } from './lib';
 
 export type AsyncContractFunction<T = any> = (...args: ArgsOrCalldataWithOptions) => Promise<T>;
 export type ContractFunction = (...args: ArgsOrCalldataWithOptions) => any;

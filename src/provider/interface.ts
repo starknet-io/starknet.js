@@ -1,5 +1,7 @@
 import { StarknetChainId } from '../constants';
 import type {
+  BigNumberish,
+  BlockIdentifier,
   Call,
   CallContractResponse,
   ContractClass,
@@ -25,8 +27,6 @@ import type {
   Storage,
   waitForTransactionOptions,
 } from '../types';
-import type { BigNumberish } from '../utils/num';
-import { BlockIdentifier } from './utils';
 
 export abstract class ProviderInterface {
   /**

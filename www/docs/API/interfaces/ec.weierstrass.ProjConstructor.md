@@ -39,7 +39,7 @@ GroupConstructor<ProjPointType<T\>\>.constructor
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:74
+node_modules/@noble/curves/abstract/weierstrass.d.ts:76
 
 ## Properties
 
@@ -87,7 +87,7 @@ node_modules/@noble/curves/abstract/curve.d.ts:20
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:75
+node_modules/@noble/curves/abstract/weierstrass.d.ts:77
 
 ---
 
@@ -107,7 +107,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:75
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:76
+node_modules/@noble/curves/abstract/weierstrass.d.ts:78
 
 ---
 
@@ -127,7 +127,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:76
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:77
+node_modules/@noble/curves/abstract/weierstrass.d.ts:79
 
 ---
 
@@ -147,4 +147,4 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:77
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:78
+node_modules/@noble/curves/abstract/weierstrass.d.ts:80

@@ -1,11 +1,10 @@
 import { getStarkKey, utils } from 'micro-starknet';
 import { gzip } from 'pako';
 
-import { ArraySignatureType, CompressedProgram, Program, Signature } from '../types';
+import { ArraySignatureType, BigNumberish, CompressedProgram, Program, Signature } from '../types';
 import { addHexPrefix, btoaUniversal } from './encode';
 import { stringify } from './json';
 import {
-  BigNumberish,
   bigNumberishArrayToDecimalStringArray,
   bigNumberishArrayToHexadecimalStringArray,
   toBigInt,

@@ -4,6 +4,7 @@ import { poseidonHashMany } from 'micro-starknet';
 
 import { API_VERSION, StarknetChainId, TransactionHashPrefix } from '../constants';
 import {
+  BigNumberish,
   Builtins,
   CompiledContract,
   CompiledSierra,
@@ -13,13 +14,13 @@ import {
   RawArgs,
   RawCalldata,
   SierraContractEntryPointFields,
-} from '../types/lib';
+} from '../types';
 import { CallData } from './calldata';
 import { felt } from './calldata/cairo';
 import { starkCurve } from './ec';
 import { addHexPrefix, utf8ToArray } from './encode';
 import { parse, stringify } from './json';
-import { BigNumberish, toBigInt, toHex } from './num';
+import { toBigInt, toHex } from './num';
 import { getSelectorFromName } from './selector';
 import { encodeShortString } from './shortString';
 

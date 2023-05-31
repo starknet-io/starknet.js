@@ -1,7 +1,7 @@
-import { AbiStructs } from '../../types';
-import { BigNumberish, isBigInt, isHex, isStringWholeNumber } from '../num';
+import { AbiStructs, BigNumberish, Uint256 } from '../../types';
+import { isBigInt, isHex, isStringWholeNumber } from '../num';
 import { encodeShortString, isShortString, isText } from '../shortString';
-import { UINT_128_MAX, Uint256, isUint256 } from '../uint256';
+import { UINT_128_MAX, isUint256 } from '../uint256';
 
 export enum Uint {
   u8 = 'core::integer::u8',
@@ -56,7 +56,9 @@ export const uint256 = (it: BigNumberish): Uint256 => {
 /**
  * unnamed tuple cairo type (helper same as common struct type)
  */
-export const tuple = (...args: (BigNumberish | object | boolean)[]) => ({ ...args });
+export const tuple = (
+  ...args: (BigNumberish | object | boolean)[]
+): Record<number, BigNumberish | object | boolean> => ({ ...args });
 
 /**
  * felt cairo type

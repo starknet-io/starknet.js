@@ -1,11 +1,12 @@
 import { UDC, ZERO } from '../constants';
-import { ProviderInterface, ProviderOptions } from '../provider';
+import { ProviderInterface } from '../provider';
 import { Provider } from '../provider/default';
-import { BlockIdentifier } from '../provider/utils';
 import { Signer, SignerInterface } from '../signer';
 import {
   Abi,
   AllowArray,
+  BigNumberish,
+  BlockIdentifier,
   CairoVersion,
   Call,
   DeclareAndDeployContractPayload,
@@ -20,6 +21,7 @@ import {
   Details,
   EstimateFee,
   EstimateFeeAction,
+  EstimateFeeBulk,
   EstimateFeeDetails,
   Invocation,
   InvocationBulkItemSimple,
@@ -28,14 +30,16 @@ import {
   InvokeFunctionResponse,
   MultiDeployContractResponse,
   Nonce,
+  ProviderOptions,
   Signature,
+  SimulateTransactionDetails,
   SimulateTransactionResponse,
   TransactionBulk,
   TransactionStatus,
   TransactionType,
+  TypedData,
   UniversalDeployerContractPayload,
 } from '../types';
-import { EstimateFeeBulk, SimulateTransactionDetails } from '../types/account';
 import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { starkCurve } from '../utils/ec';
@@ -46,11 +50,11 @@ import {
   transactionVersion,
   transactionVersion_2,
 } from '../utils/hash';
-import { BigNumberish, toBigInt, toCairoBool } from '../utils/num';
+import { toBigInt, toCairoBool } from '../utils/num';
 import { parseContract } from '../utils/provider';
 import { estimatedFeeToMaxFee, formatSignature, randomAddress } from '../utils/stark';
 import { getExecuteCalldata } from '../utils/transaction';
-import { TypedData, getMessageHash } from '../utils/typedData';
+import { getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
 
 export class Account extends Provider implements AccountInterface {

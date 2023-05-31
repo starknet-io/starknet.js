@@ -1,8 +1,9 @@
 import { keccak } from 'micro-starknet';
 
 import { MASK_250 } from '../constants';
+import { BigNumberish } from '../types';
 import { addHexPrefix, removeHexPrefix, utf8ToArray } from './encode';
-import { BigNumberish, hexToBytes, isHex, isStringWholeNumber, toHex, toHexString } from './num';
+import { hexToBytes, isHex, isStringWholeNumber, toHex, toHexString } from './num';
 
 /**
  * Keccak hash BigNumberish value

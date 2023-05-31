@@ -14,57 +14,57 @@ custom_edit_url: null
 
 #### Parameters
 
-| Name  | Type                       |
-| :---- | :------------------------- |
-| `abi` | [`Abi`](../modules.md#abi) |
+| Name  | Type                                |
+| :---- | :---------------------------------- |
+| `abi` | [`Abi`](../namespaces/types.md#abi) |
 
 #### Defined in
 
-[src/utils/calldata/index.ts:30](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L30)
+[src/utils/calldata/index.ts:33](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L33)
 
 ## Properties
 
 ### abi
 
-• **abi**: [`Abi`](../modules.md#abi)
+• **abi**: [`Abi`](../namespaces/types.md#abi)
 
 #### Defined in
 
-[src/utils/calldata/index.ts:26](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L26)
+[src/utils/calldata/index.ts:29](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L29)
 
 ---
 
 ### structs
 
-• `Protected` `Readonly` **structs**: [`AbiStructs`](../modules.md#abistructs)
+• `Protected` `Readonly` **structs**: [`AbiStructs`](../namespaces/types.md#abistructs)
 
 #### Defined in
 
-[src/utils/calldata/index.ts:28](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L28)
+[src/utils/calldata/index.ts:31](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L31)
 
 ## Methods
 
 ### compile
 
-▸ `Static` **compile**(`rawArgs`): [`Calldata`](../modules.md#calldata)
+▸ `Static` **compile**(`rawArgs`): [`Calldata`](../namespaces/types.md#calldata)
 
 Compile contract callData without abi
 
 #### Parameters
 
-| Name      | Type                               | Description                                                                  |
-| :-------- | :--------------------------------- | :--------------------------------------------------------------------------- |
-| `rawArgs` | [`RawArgs`](../modules.md#rawargs) | RawArgs representing cairo method arguments or string array of compiled data |
+| Name      | Type                                        | Description                                                                  |
+| :-------- | :------------------------------------------ | :--------------------------------------------------------------------------- |
+| `rawArgs` | [`RawArgs`](../namespaces/types.md#rawargs) | RawArgs representing cairo method arguments or string array of compiled data |
 
 #### Returns
 
-[`Calldata`](../modules.md#calldata)
+[`Calldata`](../namespaces/types.md#calldata)
 
 Calldata
 
 #### Defined in
 
-[src/utils/calldata/index.ts:98](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L98)
+[src/utils/calldata/index.ts:120](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L120)
 
 ---
 
@@ -76,9 +76,9 @@ Helper to calculate inputs from abi
 
 #### Parameters
 
-| Name     | Type                                   | Description |
-| :------- | :------------------------------------- | :---------- |
-| `inputs` | [`AbiEntry`](../modules.md#abientry)[] | AbiEntry    |
+| Name     | Type                                            | Description |
+| :------- | :---------------------------------------------- | :---------- |
+| `inputs` | [`AbiEntry`](../namespaces/types.md#abientry)[] | AbiEntry    |
 
 #### Returns
 
@@ -88,79 +88,79 @@ number
 
 #### Defined in
 
-[src/utils/calldata/index.ts:179](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L179)
+[src/utils/calldata/index.ts:201](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L201)
 
 ---
 
 ### getAbiStruct
 
-▸ `Static` **getAbiStruct**(`abi`): [`AbiStructs`](../modules.md#abistructs)
+▸ `Static` **getAbiStruct**(`abi`): [`AbiStructs`](../namespaces/types.md#abistructs)
 
 Helper to extract structs from abi
 
 #### Parameters
 
-| Name  | Type                       | Description |
-| :---- | :------------------------- | :---------- |
-| `abi` | [`Abi`](../modules.md#abi) | Abi         |
+| Name  | Type                                | Description |
+| :---- | :---------------------------------- | :---------- |
+| `abi` | [`Abi`](../namespaces/types.md#abi) | Abi         |
 
 #### Returns
 
-[`AbiStructs`](../modules.md#abistructs)
+[`AbiStructs`](../namespaces/types.md#abistructs)
 
 AbiStructs - structs from abi
 
 #### Defined in
 
-[src/utils/calldata/index.ts:188](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L188)
+[src/utils/calldata/index.ts:210](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L210)
 
 ---
 
 ### toCalldata
 
-▸ `Static` **toCalldata**(`rawCalldata?`): [`Calldata`](../modules.md#calldata)
+▸ `Static` **toCalldata**(`rawCalldata?`): [`Calldata`](../namespaces/types.md#calldata)
 
 Helper: Compile HexCalldata | RawCalldata | RawArgs
 
 #### Parameters
 
-| Name          | Type                               | Default value | Description                           |
-| :------------ | :--------------------------------- | :------------ | :------------------------------------ |
-| `rawCalldata` | [`RawArgs`](../modules.md#rawargs) | `[]`          | HexCalldata \| RawCalldata \| RawArgs |
+| Name          | Type                                        | Default value | Description                           |
+| :------------ | :------------------------------------------ | :------------ | :------------------------------------ |
+| `rawCalldata` | [`RawArgs`](../namespaces/types.md#rawargs) | `[]`          | HexCalldata \| RawCalldata \| RawArgs |
 
 #### Returns
 
-[`Calldata`](../modules.md#calldata)
+[`Calldata`](../namespaces/types.md#calldata)
 
 Calldata
 
 #### Defined in
 
-[src/utils/calldata/index.ts:205](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L205)
+[src/utils/calldata/index.ts:227](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L227)
 
 ---
 
 ### toHex
 
-▸ `Static` **toHex**(`raw?`): [`HexCalldata`](../modules.md#hexcalldata)
+▸ `Static` **toHex**(`raw?`): [`HexCalldata`](../namespaces/types.md#hexcalldata)
 
 Helper: Convert raw to HexCalldata
 
 #### Parameters
 
-| Name  | Type                               | Default value | Description                           |
-| :---- | :--------------------------------- | :------------ | :------------------------------------ |
-| `raw` | [`RawArgs`](../modules.md#rawargs) | `[]`          | HexCalldata \| RawCalldata \| RawArgs |
+| Name  | Type                                        | Default value | Description                           |
+| :---- | :------------------------------------------ | :------------ | :------------------------------------ |
+| `raw` | [`RawArgs`](../namespaces/types.md#rawargs) | `[]`          | HexCalldata \| RawCalldata \| RawArgs |
 
 #### Returns
 
-[`HexCalldata`](../modules.md#hexcalldata)
+[`HexCalldata`](../namespaces/types.md#hexcalldata)
 
 HexCalldata
 
 #### Defined in
 
-[src/utils/calldata/index.ts:214](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L214)
+[src/utils/calldata/index.ts:236](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L236)
 
 ---
 
@@ -172,11 +172,11 @@ Validate arguments passed to the method as corresponding to the ones in the abi
 
 #### Parameters
 
-| Name     | Type                                             | Default value | Description                                              |
-| :------- | :----------------------------------------------- | :------------ | :------------------------------------------------------- |
-| `type`   | `"DEPLOY"` \| `"INVOKE"` \| `"CALL"`             | `undefined`   | string - type of the method                              |
-| `method` | `string`                                         | `undefined`   | string - name of the method                              |
-| `args`   | [`ArgsOrCalldata`](../modules.md#argsorcalldata) | `[]`          | ArgsOrCalldata - arguments that are passed to the method |
+| Name     | Type                                                      | Default value | Description                                              |
+| :------- | :-------------------------------------------------------- | :------------ | :------------------------------------------------------- |
+| `type`   | `"DEPLOY"` \| `"INVOKE"` \| `"CALL"`                      | `undefined`   | string - type of the method                              |
+| `method` | `string`                                                  | `undefined`   | string - name of the method                              |
+| `args`   | [`ArgsOrCalldata`](../namespaces/types.md#argsorcalldata) | `[]`          | ArgsOrCalldata - arguments that are passed to the method |
 
 #### Returns
 
@@ -184,39 +184,49 @@ Validate arguments passed to the method as corresponding to the ones in the abi
 
 #### Defined in
 
-[src/utils/calldata/index.ts:41](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L41)
+[src/utils/calldata/index.ts:44](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L44)
 
 ---
 
 ### compile
 
-▸ **compile**(`method`, `args`): [`Calldata`](../modules.md#calldata)
+▸ **compile**(`method`, `argsCalldata`): [`Calldata`](../namespaces/types.md#calldata)
 
 Compile contract callData with abi
 Parse the calldata by using input fields from the abi for that method
 
+**`Example`**
+
+```typescript
+const calldata = myCallData.compile("constructor",["0x34a",[1,3n]]);
+```
+
+```typescript
+const calldata2 = myCallData.compile("constructor",{list:[1,3n],balance:"0x34"}); // wrong order is valid
+```
+
 #### Parameters
 
-| Name     | Type                                             | Description                                     |
-| :------- | :----------------------------------------------- | :---------------------------------------------- |
-| `method` | `string`                                         | string - method name                            |
-| `args`   | [`ArgsOrCalldata`](../modules.md#argsorcalldata) | ArgsOrCalldata - arguments passed to the method |
+| Name           | Type                                        | Description          |
+| :------------- | :------------------------------------------ | :------------------- |
+| `method`       | `string`                                    | string - method name |
+| `argsCalldata` | [`RawArgs`](../namespaces/types.md#rawargs) | -                    |
 
 #### Returns
 
-[`Calldata`](../modules.md#calldata)
+[`Calldata`](../namespaces/types.md#calldata)
 
 Calldata - parsed arguments in format that contract is expecting
 
 #### Defined in
 
-[src/utils/calldata/index.ts:83](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L83)
+[src/utils/calldata/index.ts:93](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L93)
 
 ---
 
 ### parse
 
-▸ **parse**(`method`, `response`): [`Result`](../modules.md#result)
+▸ **parse**(`method`, `response`): [`Result`](../namespaces/types.md#result)
 
 Parse elements of the response array and structuring them into response object
 
@@ -229,19 +239,19 @@ Parse elements of the response array and structuring them into response object
 
 #### Returns
 
-[`Result`](../modules.md#result)
+[`Result`](../namespaces/types.md#result)
 
 Result - parsed response corresponding to the abi
 
 #### Defined in
 
-[src/utils/calldata/index.ts:145](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L145)
+[src/utils/calldata/index.ts:167](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L167)
 
 ---
 
 ### format
 
-▸ **format**(`method`, `response`, `format`): [`Result`](../modules.md#result)
+▸ **format**(`method`, `response`, `format`): [`Result`](../namespaces/types.md#result)
 
 Format cairo method response data to native js values based on provided format schema
 
@@ -255,10 +265,10 @@ Format cairo method response data to native js values based on provided format s
 
 #### Returns
 
-[`Result`](../modules.md#result)
+[`Result`](../namespaces/types.md#result)
 
 Result - parsed and formatted response object
 
 #### Defined in
 
-[src/utils/calldata/index.ts:169](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L169)
+[src/utils/calldata/index.ts:191](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L191)

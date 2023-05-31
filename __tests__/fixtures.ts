@@ -4,6 +4,7 @@ import path from 'path';
 import { Account, ProviderInterface, RpcProvider, SequencerProvider, json } from '../src';
 import { BaseUrl } from '../src/constants';
 import {
+  CairoVersion,
   CompiledSierra,
   CompiledSierraCasm,
   LegacyCompiledContract,
@@ -39,6 +40,7 @@ export const compiledHashSierra = readContractSierra('cairo/hash/hash');
 export const compiledHashSierraCasm = readContractSierraCasm('cairo/hash/hash');
 export const compiledHelloSierra = readContractSierra('cairo/helloSierra/hello');
 export const compiledHelloSierraCasm = readContractSierraCasm('cairo/helloSierra/hello');
+export const compiledComplexSierra = readContractSierra('cairo/complexInput/complexInput');
 export const compiledC1Account = readContractSierra('cairo/account/account');
 export const compiledC1AccountCasm = readContractSierraCasm('cairo/account/account');
 
@@ -102,8 +104,9 @@ export const getTestAccount = (provider: ProviderInterface) => {
     testAccountAddress = DEFAULT_TEST_ACCOUNT_ADDRESS;
     testAccountPrivateKey = DEFAULT_TEST_ACCOUNT_PRIVATE_KEY;
   }
+  const cairoVersion = (process.env.ACCOUNT_CAIRO_VERSION as CairoVersion) || '0';
 
-  return new Account(provider, toHex(testAccountAddress), testAccountPrivateKey);
+  return new Account(provider, toHex(testAccountAddress), testAccountPrivateKey, cairoVersion);
 };
 
 const describeIf = (condition: boolean) => (condition ? describe : describe.skip);

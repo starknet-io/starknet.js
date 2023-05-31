@@ -14,12 +14,12 @@ custom_edit_url: null
 
 #### Parameters
 
-| Name               | Type                                                 | Default value          |
-| :----------------- | :--------------------------------------------------- | :--------------------- |
-| `compiledContract` | [`CompiledContract`](../modules.md#compiledcontract) | `undefined`            |
-| `classHash`        | `string`                                             | `undefined`            |
-| `account`          | [`AccountInterface`](AccountInterface.md)            | `undefined`            |
-| `abi`              | [`Abi`](../modules.md#abi)                           | `compiledContract.abi` |
+| Name               | Type                                                          | Default value          |
+| :----------------- | :------------------------------------------------------------ | :--------------------- |
+| `compiledContract` | [`CompiledContract`](../namespaces/types.md#compiledcontract) | `undefined`            |
+| `classHash`        | `string`                                                      | `undefined`            |
+| `account`          | [`AccountInterface`](AccountInterface.md)                     | `undefined`            |
+| `abi`              | [`Abi`](../namespaces/types.md#abi)                           | `compiledContract.abi` |
 
 #### Defined in
 
@@ -29,7 +29,7 @@ custom_edit_url: null
 
 ### abi
 
-• **abi**: [`Abi`](../modules.md#abi)
+• **abi**: [`Abi`](../namespaces/types.md#abi)
 
 #### Defined in
 
@@ -39,7 +39,7 @@ custom_edit_url: null
 
 ### compiledContract
 
-• **compiledContract**: [`CompiledContract`](../modules.md#compiledcontract)
+• **compiledContract**: [`CompiledContract`](../namespaces/types.md#compiledcontract)
 
 #### Defined in
 
@@ -85,9 +85,9 @@ Deploys contract and returns new instance of the Contract
 
 #### Parameters
 
-| Name      | Type                                                                   | Description                                       |
-| :-------- | :--------------------------------------------------------------------- | :------------------------------------------------ |
-| `...args` | [`ArgsOrCalldataWithOptions`](../modules.md#argsorcalldatawithoptions) | Array of the constructor arguments for deployment |
+| Name      | Type                                                                            | Description                                       |
+| :-------- | :------------------------------------------------------------------------------ | :------------------------------------------------ |
+| `...args` | [`ArgsOrCalldataWithOptions`](../namespaces/types.md#argsorcalldatawithoptions) | Array of the constructor arguments for deployment |
 
 #### Returns
 

@@ -17,18 +17,18 @@ two arrays: one with the entrypoints, and one with the concatenated calldata.
 
 #### Parameters
 
-| Name    | Type                           |
-| :------ | :----------------------------- |
-| `calls` | [`Call`](../modules.md#call)[] |
+| Name    | Type                      |
+| :------ | :------------------------ |
+| `calls` | [`Call`](types.md#call)[] |
 
 #### Returns
 
 `Object`
 
-| Name        | Type                                           |
-| :---------- | :--------------------------------------------- |
-| `callArray` | [`ParsedStruct`](../modules.md#parsedstruct)[] |
-| `calldata`  | [`Calldata`](../modules.md#calldata)           |
+| Name        | Type                                      |
+| :---------- | :---------------------------------------- |
+| `callArray` | [`ParsedStruct`](types.md#parsedstruct)[] |
+| `calldata`  | [`Calldata`](types.md#calldata)           |
 
 #### Defined in
 
@@ -38,20 +38,20 @@ two arrays: one with the entrypoints, and one with the concatenated calldata.
 
 ### fromCallsToExecuteCalldata
 
-▸ **fromCallsToExecuteCalldata**(`calls`): [`Calldata`](../modules.md#calldata)
+▸ **fromCallsToExecuteCalldata**(`calls`): [`Calldata`](types.md#calldata)
 
 Transforms a list of calls in the full flattened calldata expected
 by the **execute** protocol.
 
 #### Parameters
 
-| Name    | Type                           |
-| :------ | :----------------------------- |
-| `calls` | [`Call`](../modules.md#call)[] |
+| Name    | Type                      |
+| :------ | :------------------------ |
+| `calls` | [`Call`](types.md#call)[] |
 
 #### Returns
 
-[`Calldata`](../modules.md#calldata)
+[`Calldata`](types.md#calldata)
 
 #### Defined in
 
@@ -61,18 +61,18 @@ by the **execute** protocol.
 
 ### fromCallsToExecuteCalldataWithNonce
 
-▸ **fromCallsToExecuteCalldataWithNonce**(`calls`, `nonce`): [`Calldata`](../modules.md#calldata)
+▸ **fromCallsToExecuteCalldataWithNonce**(`calls`, `nonce`): [`Calldata`](types.md#calldata)
 
 #### Parameters
 
-| Name    | Type                                  |
-| :------ | :------------------------------------ |
-| `calls` | [`Call`](../modules.md#call)[]        |
-| `nonce` | [`BigNumberish`](num.md#bignumberish) |
+| Name    | Type                                    |
+| :------ | :-------------------------------------- |
+| `calls` | [`Call`](types.md#call)[]               |
+| `nonce` | [`BigNumberish`](types.md#bignumberish) |
 
 #### Returns
 
-[`Calldata`](../modules.md#calldata)
+[`Calldata`](types.md#calldata)
 
 #### Defined in
 
@@ -82,19 +82,19 @@ by the **execute** protocol.
 
 ### transformCallsToMulticallArrays_cairo1
 
-▸ **transformCallsToMulticallArrays_cairo1**(`calls`): [`CallStruct`](../interfaces/CallStruct.md)[]
+▸ **transformCallsToMulticallArrays_cairo1**(`calls`): [`CallStruct`](../interfaces/types.CallStruct.md)[]
 
 Format Data inside Calls
 
 #### Parameters
 
-| Name    | Type                           | Description |
-| :------ | :----------------------------- | :---------- |
-| `calls` | [`Call`](../modules.md#call)[] | Call[]      |
+| Name    | Type                      | Description |
+| :------ | :------------------------ | :---------- |
+| `calls` | [`Call`](types.md#call)[] | Call[]      |
 
 #### Returns
 
-[`CallStruct`](../interfaces/CallStruct.md)[]
+[`CallStruct`](../interfaces/types.CallStruct.md)[]
 
 CallStruct
 
@@ -106,46 +106,46 @@ CallStruct
 
 ### fromCallsToExecuteCalldata_cairo1
 
-▸ **fromCallsToExecuteCalldata_cairo1**(`calls`): [`Calldata`](../modules.md#calldata)
+▸ **fromCallsToExecuteCalldata_cairo1**(`calls`): [`Calldata`](types.md#calldata)
 
 Transforms a list of calls in the full flattened calldata expected
 by the **execute** protocol.
 
 #### Parameters
 
-| Name    | Type                           |
-| :------ | :----------------------------- |
-| `calls` | [`Call`](../modules.md#call)[] |
+| Name    | Type                      |
+| :------ | :------------------------ |
+| `calls` | [`Call`](types.md#call)[] |
 
 #### Returns
 
-[`Calldata`](../modules.md#calldata)
+[`Calldata`](types.md#calldata)
 
 Calldata
 
 #### Defined in
 
-[src/utils/transaction.ts:69](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L69)
+[src/utils/transaction.ts:68](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L68)
 
 ---
 
 ### getExecuteCalldata
 
-▸ **getExecuteCalldata**(`calls`, `cairoVersion?`): [`Calldata`](../modules.md#calldata)
+▸ **getExecuteCalldata**(`calls`, `cairoVersion?`): [`Calldata`](types.md#calldata)
 
 #### Parameters
 
-| Name           | Type                                         | Default value | Description   |
-| :------------- | :------------------------------------------- | :------------ | :------------ |
-| `calls`        | [`Call`](../modules.md#call)[]               | `undefined`   | Call array    |
-| `cairoVersion` | [`CairoVersion`](../modules.md#cairoversion) | `'0'`         | Defaults to 0 |
+| Name           | Type                                    | Default value | Description   |
+| :------------- | :-------------------------------------- | :------------ | :------------ |
+| `calls`        | [`Call`](types.md#call)[]               | `undefined`   | Call array    |
+| `cairoVersion` | [`CairoVersion`](types.md#cairoversion) | `'0'`         | Defaults to 0 |
 
 #### Returns
 
-[`Calldata`](../modules.md#calldata)
+[`Calldata`](types.md#calldata)
 
 string[] of calldata
 
 #### Defined in
 
-[src/utils/transaction.ts:79](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L79)
+[src/utils/transaction.ts:85](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L85)
