@@ -6,43 +6,29 @@ sidebar_position: 0
 custom_edit_url: null
 ---
 
-## Interfaces
-
-- [StarkNetDomain](../interfaces/typedData.StarkNetDomain.md)
-- [TypedData](../interfaces/typedData.TypedData.md)
-
-## Type Aliases
+## References
 
 ### StarkNetMerkleType
 
-Ƭ **StarkNetMerkleType**: `Object`
-
-#### Type declaration
-
-| Name       | Type           |
-| :--------- | :------------- |
-| `name`     | `string`       |
-| `type`     | `"merkletree"` |
-| `contains` | `string`       |
-
-#### Defined in
-
-[src/utils/typedData/types.ts:1](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/types.ts#L1)
+Re-exports [StarkNetMerkleType](types.md#starknetmerkletype)
 
 ---
 
 ### StarkNetType
 
-Ƭ **StarkNetType**: { `name`: `string` ; `type`: `string` } \| [`StarkNetMerkleType`](typedData.md#starknetmerkletype)
+Re-exports [StarkNetType](types.md#starknettype)
 
-A single type, as part of a struct. The `type` field can be any of the EIP-712 supported types.
+---
 
-Note that the `uint` and `int` aliases like in Solidity, and fixed point numbers are not supported by the EIP-712
-standard.
+### StarkNetDomain
 
-#### Defined in
+Re-exports [StarkNetDomain](../interfaces/types.StarkNetDomain.md)
 
-[src/utils/typedData/types.ts:13](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/types.ts#L13)
+---
+
+### TypedData
+
+Re-exports [TypedData](../interfaces/types.TypedData.md)
 
 ## Functions
 
@@ -62,7 +48,7 @@ standard.
 
 #### Defined in
 
-[src/utils/typedData/index.ts:21](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/index.ts#L21)
+[src/utils/typedData.ts:36](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData.ts#L36)
 
 ---
 
@@ -72,9 +58,9 @@ standard.
 
 #### Parameters
 
-| Name   | Type                                        |
-| :----- | :------------------------------------------ |
-| `type` | [`StarkNetType`](typedData.md#starknettype) |
+| Name   | Type                                    |
+| :----- | :-------------------------------------- |
+| `type` | [`StarkNetType`](types.md#starknettype) |
 
 #### Returns
 
@@ -82,7 +68,7 @@ type is StarkNetMerkleType
 
 #### Defined in
 
-[src/utils/typedData/index.ts:25](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/index.ts#L25)
+[src/utils/typedData.ts:40](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData.ts#L40)
 
 ---
 
@@ -95,11 +81,11 @@ in the resulting array.
 
 #### Parameters
 
-| Name            | Type                                                               | Default value |
-| :-------------- | :----------------------------------------------------------------- | :------------ |
-| `types`         | `Record`<`string`, [`StarkNetType`](typedData.md#starknettype)[]\> | `undefined`   |
-| `type`          | `string`                                                           | `undefined`   |
-| `dependencies?` | `string`[]                                                         | `[]`          |
+| Name            | Type                                                           | Default value |
+| :-------------- | :------------------------------------------------------------- | :------------ |
+| `types`         | `Record`<`string`, [`StarkNetType`](types.md#starknettype)[]\> | `undefined`   |
+| `type`          | `string`                                                       | `undefined`   |
+| `dependencies?` | `string`[]                                                     | `[]`          |
 
 #### Returns
 
@@ -107,7 +93,7 @@ in the resulting array.
 
 #### Defined in
 
-[src/utils/typedData/index.ts:43](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/index.ts#L43)
+[src/utils/typedData.ts:58](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData.ts#L58)
 
 ---
 
@@ -119,10 +105,10 @@ Encode a type to a string. All dependant types are alphabetically sorted.
 
 #### Parameters
 
-| Name    | Type                                                               |
-| :------ | :----------------------------------------------------------------- |
-| `types` | `Record`<`string`, [`StarkNetType`](typedData.md#starknettype)[]\> |
-| `type`  | `string`                                                           |
+| Name    | Type                                                           |
+| :------ | :------------------------------------------------------------- |
+| `types` | `Record`<`string`, [`StarkNetType`](types.md#starknettype)[]\> |
+| `type`  | `string`                                                       |
 
 #### Returns
 
@@ -130,7 +116,7 @@ Encode a type to a string. All dependant types are alphabetically sorted.
 
 #### Defined in
 
-[src/utils/typedData/index.ts:99](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/index.ts#L99)
+[src/utils/typedData.ts:114](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData.ts#L114)
 
 ---
 
@@ -142,10 +128,10 @@ Get a type string as hash.
 
 #### Parameters
 
-| Name    | Type                                                               |
-| :------ | :----------------------------------------------------------------- |
-| `types` | `Record`<`string`, [`StarkNetType`](typedData.md#starknettype)[]\> |
-| `type`  | `string`                                                           |
+| Name    | Type                                                           |
+| :------ | :------------------------------------------------------------- |
+| `types` | `Record`<`string`, [`StarkNetType`](types.md#starknettype)[]\> |
+| `type`  | `string`                                                       |
 
 #### Returns
 
@@ -153,7 +139,7 @@ Get a type string as hash.
 
 #### Defined in
 
-[src/utils/typedData/index.ts:117](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/index.ts#L117)
+[src/utils/typedData.ts:132](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData.ts#L132)
 
 ---
 
@@ -166,12 +152,12 @@ an array of ABI compatible types, and an array of corresponding values.
 
 #### Parameters
 
-| Name    | Type                                                               |
-| :------ | :----------------------------------------------------------------- |
-| `types` | `Record`<`string`, [`StarkNetType`](typedData.md#starknettype)[]\> |
-| `type`  | `string`                                                           |
-| `data`  | `unknown`                                                          |
-| `ctx`   | `Context`                                                          |
+| Name    | Type                                                           |
+| :------ | :------------------------------------------------------------- |
+| `types` | `Record`<`string`, [`StarkNetType`](types.md#starknettype)[]\> |
+| `type`  | `string`                                                       |
+| `data`  | `unknown`                                                      |
+| `ctx`   | `Context`                                                      |
 
 #### Returns
 
@@ -179,7 +165,7 @@ an array of ABI compatible types, and an array of corresponding values.
 
 #### Defined in
 
-[src/utils/typedData/index.ts:130](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/index.ts#L130)
+[src/utils/typedData.ts:145](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData.ts#L145)
 
 ---
 
@@ -192,9 +178,9 @@ dependant types are automatically encoded.
 
 #### Type parameters
 
-| Name | Type                                                        |
-| :--- | :---------------------------------------------------------- |
-| `T`  | extends [`TypedData`](../interfaces/typedData.TypedData.md) |
+| Name | Type                                                    |
+| :--- | :------------------------------------------------------ |
+| `T`  | extends [`TypedData`](../interfaces/types.TypedData.md) |
 
 #### Parameters
 
@@ -210,7 +196,7 @@ dependant types are automatically encoded.
 
 #### Defined in
 
-[src/utils/typedData/index.ts:182](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/index.ts#L182)
+[src/utils/typedData.ts:197](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData.ts#L197)
 
 ---
 
@@ -223,9 +209,9 @@ types are automatically encoded.
 
 #### Type parameters
 
-| Name | Type                                                        |
-| :--- | :---------------------------------------------------------- |
-| `T`  | extends [`TypedData`](../interfaces/typedData.TypedData.md) |
+| Name | Type                                                    |
+| :--- | :------------------------------------------------------ |
+| `T`  | extends [`TypedData`](../interfaces/types.TypedData.md) |
 
 #### Parameters
 
@@ -241,7 +227,7 @@ types are automatically encoded.
 
 #### Defined in
 
-[src/utils/typedData/index.ts:219](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/index.ts#L219)
+[src/utils/typedData.ts:234](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData.ts#L234)
 
 ---
 
@@ -253,10 +239,10 @@ Get the EIP-191 encoded message to sign, from the typedData object.
 
 #### Parameters
 
-| Name        | Type                                                |
-| :---------- | :-------------------------------------------------- |
-| `typedData` | [`TypedData`](../interfaces/typedData.TypedData.md) |
-| `account`   | [`BigNumberish`](num.md#bignumberish)               |
+| Name        | Type                                            |
+| :---------- | :---------------------------------------------- |
+| `typedData` | [`TypedData`](../interfaces/types.TypedData.md) |
+| `account`   | [`BigNumberish`](types.md#bignumberish)         |
 
 #### Returns
 
@@ -264,4 +250,4 @@ Get the EIP-191 encoded message to sign, from the typedData object.
 
 #### Defined in
 
-[src/utils/typedData/index.ts:234](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData/index.ts#L234)
+[src/utils/typedData.ts:249](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/typedData.ts#L249)

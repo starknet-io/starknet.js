@@ -1,5 +1,4 @@
-import { AbiEntry, AbiStructs, ParsedStruct, Tupled } from '../../types';
-import { BigNumberish } from '../num';
+import { AbiEntry, AbiStructs, BigNumberish, ParsedStruct, Tupled } from '../../types';
 import { isText, splitLongString } from '../shortString';
 import {
   felt,

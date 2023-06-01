@@ -16,5 +16,5 @@ export const parseAlwaysAsBig = (x: string): any =>
 // NOTE: the not-null assertion is used so the return type conforms to JSON.stringify()
 // which can also return undefined but is not represented in the default typing
 export const stringify = (...p: Parameters<typeof json.stringify>): string => json.stringify(...p)!;
-/** @deprecated */
+/** @deprecated equivalent to 'stringify', alias will be removed */
 export const stringifyAlwaysAsBig = stringify;

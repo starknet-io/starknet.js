@@ -1,6 +1,6 @@
 {
   "name": "starknet",
-  "version": "5.10.2",
+  "version": "5.11.1",
   "description": "JavaScript library for Starknet",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -58,10 +58,10 @@
     "@semantic-release/changelog": "^6.0.1",
     "@semantic-release/commit-analyzer": "^9.0.2",
     "@semantic-release/git": "^10.0.1",
-    "@semantic-release/npm": "^9.0.1",
-    "@semantic-release/release-notes-generator": "^10.0.3",
+    "@semantic-release/npm": "^10.0.0",
+    "@semantic-release/release-notes-generator": "^11.0.0",
     "@types/isomorphic-fetch": "^0.0.36",
-    "@types/jest": "^28.1.1",
+    "@types/jest": "^29.5.0",
     "@types/jest-json-schema": "^6.1.1",
     "@types/pako": "^2.0.0",
     "@types/url-join": "^4.0.1",
@@ -78,8 +78,8 @@
     "fetch-intercept": "^2.4.0",
     "husky": "^8.0.1",
     "import-sort-style-module": "^6.0.0",
-    "jest": "^28.1.1",
-    "jest-environment-jsdom": "^28.1.1",
+    "jest": "^29.5.0",
+    "jest-environment-jsdom": "^29.5.0",
     "jest-json-schema": "^6.1.0",
     "lint-staged": "^13.0.1",
     "prettier": "^2.7.0",
@@ -89,10 +89,10 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@noble/curves": "^0.8.2",
+    "@noble/curves": "~1.0.0",
     "isomorphic-fetch": "^3.0.0",
     "lossless-json": "^2.0.8",
-    "micro-starknet": "^0.2.1",
+    "micro-starknet": "~0.2.1",
     "pako": "^2.0.4",
     "url-join": "^4.0.1"
   },
@@ -101,6 +101,10 @@
     "*.{ts,js,md,yml,json}": "prettier --write"
   },
   "jest": {
+    "snapshotFormat": {
+      "escapeString": true,
+      "printBasicPrototype": true
+    },
     "testMatch": [
       "**/__tests__/**/(*.)+(spec|test).[jt]s?(x)"
     ],

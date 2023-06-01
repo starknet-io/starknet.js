@@ -11,7 +11,7 @@ custom_edit_url: null
 
 ### ProjectivePoint
 
-Ƭ **ProjectivePoint**: `ProjPointType`<`bigint`\>
+Ƭ **ProjectivePoint**: [`ProjPointType`](../interfaces/ec.weierstrass.ProjPointType.md)<`bigint`\>
 
 #### Defined in
 
@@ -43,7 +43,7 @@ node_modules/micro-starknet/lib/index.d.ts:63
 
 ### PoseidonFn
 
-Ƭ **PoseidonFn**: `ReturnType`<typeof `poseidon`\> & { `m`: `number` ; `rate`: `number` ; `capacity`: `number` }
+Ƭ **PoseidonFn**: `ReturnType`<typeof [`poseidon`](hash.poseidon.md#poseidon)\> & { `m`: `number` ; `rate`: `number` ; `capacity`: `number` }
 
 #### Defined in
 
@@ -53,7 +53,7 @@ node_modules/micro-starknet/lib/index.d.ts:70
 
 ### \_starkCurve
 
-• `Const` **\_starkCurve**: `CurveFn`
+• `Const` **\_starkCurve**: [`weierstrass`](ec.weierstrass.md)
 
 #### Defined in
 
@@ -63,7 +63,7 @@ node_modules/micro-starknet/lib/index.d.ts:7
 
 ### CURVE
 
-• `Const` **CURVE**: `Readonly`<{ `nBitLength`: `number` ; `nByteLength`: `number` ; `Fp`: `IField`<`bigint`\> ; `n`: `bigint` ; `h`: `bigint` ; `hEff?`: `bigint` ; `Gx`: `bigint` ; `Gy`: `bigint` ; `allowInfinityPoint?`: `boolean` ; `a`: `bigint` ; `b`: `bigint` ; `allowedPrivateKeyLengths?`: readonly `number`[] ; `wrapPrivateKey?`: `boolean` ; `endo?`: { `beta`: `bigint` ; `splitScalar`: (`k`: `bigint`) => { `k1neg`: `boolean` ; `k1`: `bigint` ; `k2neg`: `boolean` ; `k2`: `bigint` } } ; `isTorsionFree?`: (`c`: `ProjConstructor`, `point`: `ProjPointType`<`bigint`\>) => `boolean` ; `clearCofactor?`: (`c`: `ProjConstructor`, `point`: `ProjPointType`<`bigint`\>) => `ProjPointType`<`bigint`\> ; `hash`: `u.CHash` ; `hmac`: (`key`: `Uint8Array`, ...`messages`: `Uint8Array`[]) => `Uint8Array` ; `randomBytes`: (`bytesLength?`: `number`) => `Uint8Array` ; `lowS`: `boolean` ; `bits2int?`: (`bytes`: `Uint8Array`) => `bigint` ; `bits2int_modN?`: (`bytes`: `Uint8Array`) => `bigint` ; `p`: `bigint` }\>
+• `Const` **CURVE**: `Readonly`<{ `nBitLength`: `number` ; `nByteLength`: `number` ; `Fp`: `IField`<`bigint`\> ; `n`: `bigint` ; `h`: `bigint` ; `hEff?`: `bigint` ; `Gx`: `bigint` ; `Gy`: `bigint` ; `allowInfinityPoint?`: `boolean` ; `a`: `bigint` ; `b`: `bigint` ; `allowedPrivateKeyLengths?`: readonly `number`[] ; `wrapPrivateKey?`: `boolean` ; `endo?`: { `beta`: `bigint` ; `splitScalar`: (`k`: `bigint`) => { `k1neg`: `boolean` ; `k1`: `bigint` ; `k2neg`: `boolean` ; `k2`: `bigint` } } ; `isTorsionFree?`: (`c`: [`weierstrass`](ec.weierstrass.md), `point`: [`ProjPointType`](../interfaces/ec.weierstrass.ProjPointType.md)<`bigint`\>) => `boolean` ; `clearCofactor?`: (`c`: [`weierstrass`](ec.weierstrass.md), `point`: [`ProjPointType`](../interfaces/ec.weierstrass.ProjPointType.md)<`bigint`\>) => [`ProjPointType`](../interfaces/ec.weierstrass.ProjPointType.md)<`bigint`\> ; `hash`: `u.CHash` ; `hmac`: (`key`: `Uint8Array`, ...`messages`: `Uint8Array`[]) => `Uint8Array` ; `randomBytes`: (`bytesLength?`: `number`) => `Uint8Array` ; `lowS`: `boolean` ; `bits2int?`: (`bytes`: `Uint8Array`) => `bigint` ; `bits2int_modN?`: (`bytes`: `Uint8Array`) => `bigint` ; `p`: `bigint` }\>
 
 #### Defined in
 
@@ -73,7 +73,7 @@ node_modules/micro-starknet/lib/index.d.ts:12
 
 ### ProjectivePoint
 
-• **ProjectivePoint**: `ProjConstructor`<`bigint`\>
+• **ProjectivePoint**: [`ProjConstructor`](../interfaces/ec.weierstrass.ProjConstructor.md)<`bigint`\>
 
 #### Defined in
 
@@ -85,7 +85,7 @@ node_modules/micro-starknet/lib/index.d.ts:44
 
 ### Signature
 
-• `Const` **Signature**: `SignatureConstructor`
+• `Const` **Signature**: [`weierstrass`](ec.weierstrass.md)
 
 #### Defined in
 
@@ -99,12 +99,12 @@ node_modules/micro-starknet/lib/index.d.ts:44
 
 #### Type declaration
 
-| Name                     | Type                                                                                          |
-| :----------------------- | :-------------------------------------------------------------------------------------------- |
-| `normPrivateKeyToScalar` | (`key`: `u.PrivKey`) => `bigint`                                                              |
-| `randomPrivateKey`       | () => `Uint8Array`                                                                            |
-| `precompute`             | (`windowSize?`: `number`, `point?`: `ProjPointType`<`bigint`\>) => `ProjPointType`<`bigint`\> |
-| `isValidPrivateKey`      | (`privateKey`: `PrivKey`) => `boolean`                                                        |
+| Name                     | Type                                                                                                                                                                                            |
+| :----------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `normPrivateKeyToScalar` | (`key`: `u.PrivKey`) => `bigint`                                                                                                                                                                |
+| `randomPrivateKey`       | () => `Uint8Array`                                                                                                                                                                              |
+| `precompute`             | (`windowSize?`: `number`, `point?`: [`ProjPointType`](../interfaces/ec.weierstrass.ProjPointType.md)<`bigint`\>) => [`ProjPointType`](../interfaces/ec.weierstrass.ProjPointType.md)<`bigint`\> |
+| `isValidPrivateKey`      | (`privateKey`: `PrivKey`) => `boolean`                                                                                                                                                          |
 
 #### Defined in
 
@@ -176,7 +176,7 @@ node_modules/micro-starknet/lib/index.d.ts:9
 
 ### sign
 
-▸ **sign**(`msgHash`, `privKey`, `opts?`): `SignatureType`
+▸ **sign**(`msgHash`, `privKey`, `opts?`): [`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)
 
 #### Parameters
 
@@ -188,7 +188,7 @@ node_modules/micro-starknet/lib/index.d.ts:9
 
 #### Returns
 
-`SignatureType`
+[`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)
 
 #### Defined in
 
@@ -202,11 +202,11 @@ node_modules/micro-starknet/lib/index.d.ts:10
 
 #### Parameters
 
-| Name        | Type                     |
-| :---------- | :----------------------- |
-| `signature` | `Hex` \| `SignatureType` |
-| `msgHash`   | `Hex`                    |
-| `pubKey`    | `Hex`                    |
+| Name        | Type                                                                      |
+| :---------- | :------------------------------------------------------------------------ |
+| `signature` | [`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md) \| `Hex` |
+| `msgHash`   | `Hex`                                                                     |
+| `pubKey`    | `Hex`                                                                     |
 
 #### Returns
 
@@ -551,4 +551,4 @@ node_modules/micro-starknet/lib/index.d.ts:59
 
 #### Defined in
 
-node_modules/micro-starknet/node_modules/@noble/curves/abstract/poseidon.d.ts:27
+node_modules/@noble/curves/abstract/poseidon.d.ts:27

@@ -1,14 +1,10 @@
 /* eslint-disable no-bitwise */
+import { BigNumberish, Uint256 } from '../types';
 import { addHexPrefix } from './encode';
-import { BigNumberish, toBigInt } from './num';
+import { toBigInt } from './num';
 
-// Represents an integer in the range [0, 2^256).
-export interface Uint256 {
-  // The low 128 bits of the value.
-  low: BigNumberish;
-  // The high 128 bits of the value.
-  high: BigNumberish;
-}
+/** @deprecated prefer importing from 'types' over 'uint256' */
+export type { Uint256 };
 
 // function to convert Uint256 to BN
 export function uint256ToBN(uint256: Uint256) {

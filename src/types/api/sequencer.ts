@@ -1,8 +1,8 @@
-import { BlockIdentifier } from '../../provider/utils';
-import { BigNumberish } from '../../utils/num';
 import {
   Abi,
   AllowArray,
+  BigNumberish,
+  BlockIdentifier,
   BlockNumber,
   ByteCode,
   CairoAssembly,

@@ -14,7 +14,7 @@ Not used at the moment
 
 ## Indexable
 
-▪ [key: `string`]: [`AsyncContractFunction`](../modules.md#asynccontractfunction) \| `any`
+▪ [key: `string`]: [`AsyncContractFunction`](../namespaces/types.md#asynccontractfunction) \| `any`
 
 ## Constructors
 
@@ -28,7 +28,7 @@ Contract class to handle contract methods
 
 | Name                | Type                                                                                     | Default value     | Description                                   |
 | :------------------ | :--------------------------------------------------------------------------------------- | :---------------- | :-------------------------------------------- |
-| `abi`               | [`Abi`](../modules.md#abi)                                                               | `undefined`       | Abi of the contract object                    |
+| `abi`               | [`Abi`](../namespaces/types.md#abi)                                                      | `undefined`       | Abi of the contract object                    |
 | `address`           | `string`                                                                                 | `undefined`       | (optional) - address to connect to            |
 | `providerOrAccount` | [`ProviderInterface`](ProviderInterface.md) \| [`AccountInterface`](AccountInterface.md) | `defaultProvider` | (optional) - Provider or Account to attach to |
 
@@ -40,7 +40,7 @@ Contract class to handle contract methods
 
 ### abi
 
-• **abi**: [`Abi`](../modules.md#abi)
+• **abi**: [`Abi`](../namespaces/types.md#abi)
 
 #### Implementation of
 
@@ -100,7 +100,7 @@ Contract class to handle contract methods
 
 #### Index signature
 
-▪ [name: `string`]: [`StructAbi`](../modules.md#structabi)
+▪ [name: `string`]: [`StructAbi`](../namespaces/types.md#structabi)
 
 #### Defined in
 
@@ -114,7 +114,7 @@ Contract class to handle contract methods
 
 #### Index signature
 
-▪ [name: `string`]: [`AsyncContractFunction`](../modules.md#asynccontractfunction)
+▪ [name: `string`]: [`AsyncContractFunction`](../namespaces/types.md#asynccontractfunction)
 
 #### Implementation of
 
@@ -132,7 +132,7 @@ Contract class to handle contract methods
 
 #### Index signature
 
-▪ [name: `string`]: [`AsyncContractFunction`](../modules.md#asynccontractfunction)
+▪ [name: `string`]: [`AsyncContractFunction`](../namespaces/types.md#asynccontractfunction)
 
 #### Implementation of
 
@@ -150,7 +150,7 @@ Contract class to handle contract methods
 
 #### Index signature
 
-▪ [name: `string`]: [`ContractFunction`](../modules.md#contractfunction)
+▪ [name: `string`]: [`ContractFunction`](../namespaces/types.md#contractfunction)
 
 #### Implementation of
 
@@ -168,7 +168,7 @@ Contract class to handle contract methods
 
 #### Index signature
 
-▪ [name: `string`]: [`ContractFunction`](../modules.md#contractfunction)
+▪ [name: `string`]: [`ContractFunction`](../namespaces/types.md#contractfunction)
 
 #### Implementation of
 
@@ -270,21 +270,21 @@ Promise that resolves when contract is deployed on the network or when no deploy
 
 ### call
 
-▸ **call**(`method`, `args?`, `«destructured»?`): `Promise`<[`Result`](../modules.md#result)\>
+▸ **call**(`method`, `args?`, `«destructured»?`): `Promise`<[`Result`](../namespaces/types.md#result)\>
 
 Calls a method on a contract
 
 #### Parameters
 
-| Name             | Type                                             | Default value | Description                         |
-| :--------------- | :----------------------------------------------- | :------------ | :---------------------------------- |
-| `method`         | `string`                                         | `undefined`   | name of the method                  |
-| `args`           | [`ArgsOrCalldata`](../modules.md#argsorcalldata) | `[]`          | Array of the arguments for the call |
-| `«destructured»` | [`CallOptions`](../modules.md#calloptions)       | `{}`          | optional blockIdentifier            |
+| Name             | Type                                                      | Default value | Description                         |
+| :--------------- | :-------------------------------------------------------- | :------------ | :---------------------------------- |
+| `method`         | `string`                                                  | `undefined`   | name of the method                  |
+| `args`           | [`ArgsOrCalldata`](../namespaces/types.md#argsorcalldata) | `[]`          | Array of the arguments for the call |
+| `«destructured»` | [`CallOptions`](../namespaces/types.md#calloptions)       | `{}`          | optional blockIdentifier            |
 
 #### Returns
 
-`Promise`<[`Result`](../modules.md#result)\>
+`Promise`<[`Result`](../namespaces/types.md#result)\>
 
 Result of the call as an array with key value pars
 
@@ -300,21 +300,21 @@ Result of the call as an array with key value pars
 
 ### invoke
 
-▸ **invoke**(`method`, `args?`, `«destructured»?`): `Promise`<[`InvokeFunctionResponse`](../interfaces/InvokeFunctionResponse.md)\>
+▸ **invoke**(`method`, `args?`, `«destructured»?`): `Promise`<[`InvokeFunctionResponse`](../interfaces/types.InvokeFunctionResponse.md)\>
 
 Invokes a method on a contract
 
 #### Parameters
 
-| Name             | Type                                             | Default value | Description                                       |
-| :--------------- | :----------------------------------------------- | :------------ | :------------------------------------------------ |
-| `method`         | `string`                                         | `undefined`   | name of the method                                |
-| `args`           | [`ArgsOrCalldata`](../modules.md#argsorcalldata) | `[]`          | Array of the arguments for the invoke or Calldata |
-| `«destructured»` | [`InvokeOptions`](../modules.md#invokeoptions)   | `{}`          |                                                   |
+| Name             | Type                                                      | Default value | Description                                       |
+| :--------------- | :-------------------------------------------------------- | :------------ | :------------------------------------------------ |
+| `method`         | `string`                                                  | `undefined`   | name of the method                                |
+| `args`           | [`ArgsOrCalldata`](../namespaces/types.md#argsorcalldata) | `[]`          | Array of the arguments for the invoke or Calldata |
+| `«destructured»` | [`InvokeOptions`](../namespaces/types.md#invokeoptions)   | `{}`          |                                                   |
 
 #### Returns
 
-`Promise`<[`InvokeFunctionResponse`](../interfaces/InvokeFunctionResponse.md)\>
+`Promise`<[`InvokeFunctionResponse`](../interfaces/types.InvokeFunctionResponse.md)\>
 
 Add Transaction Response
 
@@ -330,20 +330,20 @@ Add Transaction Response
 
 ### estimate
 
-▸ **estimate**(`method`, `args?`): `Promise`<[`EstimateFeeResponse`](../interfaces/EstimateFeeResponse.md)\>
+▸ **estimate**(`method`, `args?`): `Promise`<[`EstimateFeeResponse`](../interfaces/types.EstimateFeeResponse.md)\>
 
 Estimates a method on a contract
 
 #### Parameters
 
-| Name     | Type                                             | Default value | Description                                     |
-| :------- | :----------------------------------------------- | :------------ | :---------------------------------------------- |
-| `method` | `string`                                         | `undefined`   | name of the method                              |
-| `args`   | [`ArgsOrCalldata`](../modules.md#argsorcalldata) | `[]`          | Array of the arguments for the call or Calldata |
+| Name     | Type                                                      | Default value | Description                                     |
+| :------- | :-------------------------------------------------------- | :------------ | :---------------------------------------------- |
+| `method` | `string`                                                  | `undefined`   | name of the method                              |
+| `args`   | [`ArgsOrCalldata`](../namespaces/types.md#argsorcalldata) | `[]`          | Array of the arguments for the call or Calldata |
 
 #### Returns
 
-`Promise`<[`EstimateFeeResponse`](../interfaces/EstimateFeeResponse.md)\>
+`Promise`<[`EstimateFeeResponse`](../interfaces/types.EstimateFeeResponse.md)\>
 
 #### Implementation of
 
@@ -357,20 +357,20 @@ Estimates a method on a contract
 
 ### populate
 
-▸ **populate**(`method`, `args?`): [`Call`](../modules.md#call)
+▸ **populate**(`method`, `args?`): [`Call`](../namespaces/types.md#call)
 
 Calls a method on a contract
 
 #### Parameters
 
-| Name     | Type                                             | Default value | Description                                     |
-| :------- | :----------------------------------------------- | :------------ | :---------------------------------------------- |
-| `method` | `string`                                         | `undefined`   | name of the method                              |
-| `args`   | [`ArgsOrCalldata`](../modules.md#argsorcalldata) | `[]`          | Array of the arguments for the call or Calldata |
+| Name     | Type                                                      | Default value | Description                                     |
+| :------- | :-------------------------------------------------------- | :------------ | :---------------------------------------------- |
+| `method` | `string`                                                  | `undefined`   | name of the method                              |
+| `args`   | [`ArgsOrCalldata`](../namespaces/types.md#argsorcalldata) | `[]`          | Array of the arguments for the call or Calldata |
 
 #### Returns
 
-[`Call`](../modules.md#call)
+[`Call`](../namespaces/types.md#call)
 
 Invocation object
 

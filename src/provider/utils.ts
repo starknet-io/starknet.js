@@ -1,6 +1,9 @@
 /* eslint-disable max-classes-per-file */
-import type { BlockNumber, SequencerIdentifier } from '../types';
-import { BigNumberish, isHex, toHex } from '../utils/num';
+import type { BigNumberish, BlockIdentifier, BlockNumber, SequencerIdentifier } from '../types';
+import { isHex, toHex } from '../utils/num';
+
+/** @deprecated prefer importing from 'types' over 'provider/utils' */
+export type { BlockIdentifier };
 
 /**
  *
@@ -29,11 +32,6 @@ export function txIdentifier(txHash?: BigNumberish, txId?: BigNumberish): string
   return `transactionHash=${hashString}`;
 }
 
-// hex string and BN are detected as block hashes
-// decimal string and number are detected as block numbers
-// null appends nothing to the request url
-
-export type BlockIdentifier = BlockNumber | BigNumberish;
 export const validBlockTags = ['latest', 'pending'];
 
 export class Block {

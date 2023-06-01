@@ -6,15 +6,11 @@ sidebar_position: 0
 custom_edit_url: null
 ---
 
-## Type Aliases
+## References
 
 ### BigNumberish
 
-Ƭ **BigNumberish**: `string` \| `number` \| `bigint`
-
-#### Defined in
-
-[src/utils/num.ts:6](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L6)
+Re-exports [BigNumberish](types.md#bignumberish)
 
 ## Functions
 
@@ -34,7 +30,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/num.ts:8](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L8)
+[src/utils/num.ts:10](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L10)
 
 ---
 
@@ -44,9 +40,9 @@ custom_edit_url: null
 
 #### Parameters
 
-| Name    | Type                                  |
-| :------ | :------------------------------------ |
-| `value` | [`BigNumberish`](num.md#bignumberish) |
+| Name    | Type                                    |
+| :------ | :-------------------------------------- |
+| `value` | [`BigNumberish`](types.md#bignumberish) |
 
 #### Returns
 
@@ -54,7 +50,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/num.ts:12](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L12)
+[src/utils/num.ts:14](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L14)
 
 ---
 
@@ -74,7 +70,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:16](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L16)
+[src/utils/num.ts:18](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L18)
 
 ---
 
@@ -84,9 +80,9 @@ value is bigint
 
 #### Parameters
 
-| Name     | Type                                  |
-| :------- | :------------------------------------ |
-| `number` | [`BigNumberish`](num.md#bignumberish) |
+| Name     | Type                                    |
+| :------- | :-------------------------------------- |
+| `number` | [`BigNumberish`](types.md#bignumberish) |
 
 #### Returns
 
@@ -94,7 +90,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:20](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L20)
+[src/utils/num.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L22)
 
 ---
 
@@ -114,7 +110,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:24](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L24)
+[src/utils/num.ts:26](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L26)
 
 ---
 
@@ -124,12 +120,12 @@ value is bigint
 
 #### Parameters
 
-| Name         | Type                                  | Default value |
-| :----------- | :------------------------------------ | :------------ |
-| `input`      | [`BigNumberish`](num.md#bignumberish) | `undefined`   |
-| `lowerBound` | [`BigNumberish`](num.md#bignumberish) | `undefined`   |
-| `upperBound` | [`BigNumberish`](num.md#bignumberish) | `undefined`   |
-| `inputName`  | `string`                              | `''`          |
+| Name         | Type                                    | Default value |
+| :----------- | :-------------------------------------- | :------------ |
+| `input`      | [`BigNumberish`](types.md#bignumberish) | `undefined`   |
+| `lowerBound` | [`BigNumberish`](types.md#bignumberish) | `undefined`   |
+| `upperBound` | [`BigNumberish`](types.md#bignumberish) | `undefined`   |
+| `inputName`  | `string`                                | `''`          |
 
 #### Returns
 
@@ -137,7 +133,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:40](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L40)
+[src/utils/num.ts:42](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L42)
 
 ---
 
@@ -147,9 +143,9 @@ value is bigint
 
 #### Parameters
 
-| Name          | Type                                    |
-| :------------ | :-------------------------------------- |
-| `rawCalldata` | [`BigNumberish`](num.md#bignumberish)[] |
+| Name          | Type                                      |
+| :------------ | :---------------------------------------- |
+| `rawCalldata` | [`BigNumberish`](types.md#bignumberish)[] |
 
 #### Returns
 
@@ -157,7 +153,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:57](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L57)
+[src/utils/num.ts:59](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L59)
 
 ---
 
@@ -167,9 +163,9 @@ value is bigint
 
 #### Parameters
 
-| Name          | Type                                    |
-| :------------ | :-------------------------------------- |
-| `rawCalldata` | [`BigNumberish`](num.md#bignumberish)[] |
+| Name          | Type                                      |
+| :------------ | :---------------------------------------- |
+| `rawCalldata` | [`BigNumberish`](types.md#bignumberish)[] |
 
 #### Returns
 
@@ -177,7 +173,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:61](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L61)
+[src/utils/num.ts:63](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L63)
 
 ---
 
@@ -197,7 +193,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:68](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L68)
+[src/utils/num.ts:70](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L70)
 
 ---
 
@@ -217,7 +213,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:78](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L78)
+[src/utils/num.ts:80](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L80)
 
 ---
 
@@ -237,7 +233,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:88](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L88)
+[src/utils/num.ts:90](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L90)
 
 ---
 
@@ -261,7 +257,7 @@ an array of Bytes
 
 #### Defined in
 
-[src/utils/num.ts:99](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L99)
+[src/utils/num.ts:101](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L101)
 
 ---
 
@@ -283,7 +279,7 @@ Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
 
 #### Defined in
 
-[src/utils/num.ts:32](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L32)
+[src/utils/num.ts:34](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L34)
 
 ---
 
@@ -303,7 +299,7 @@ Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
 
 #### Defined in
 
-[src/utils/num.ts:65](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L65)
+[src/utils/num.ts:67](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L67)
 
 ---
 
@@ -323,7 +319,7 @@ Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
 
 #### Defined in
 
-[src/utils/num.ts:66](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L66)
+[src/utils/num.ts:68](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L68)
 
 ---
 
@@ -343,4 +339,4 @@ Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
 
 #### Defined in
 
-[src/utils/num.ts:92](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L92)
+[src/utils/num.ts:94](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L94)

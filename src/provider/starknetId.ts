@@ -1,5 +1,5 @@
+import { BigNumberish } from '../types';
 import { CallData } from '../utils/calldata';
-import { BigNumberish } from '../utils/num';
 import { getStarknetIdContract, useDecoded, useEncoded } from '../utils/starknetId';
 import { ProviderInterface } from './interface';
 

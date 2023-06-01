@@ -1,3 +1,4 @@
+/* eslint-disable no-plusplus */
 import {
   Abi,
   AbiEntry,
@@ -8,6 +9,7 @@ import {
   FunctionAbi,
   HexCalldata,
   RawArgs,
+  RawArgsArray,
   Result,
 } from '../../types';
 import assert from '../assert';
@@ -16,6 +18,7 @@ import { getSelectorFromName } from '../selector';
 import { isLongText, splitLongString } from '../shortString';
 import { felt, isLen } from './cairo';
 import formatter from './formatter';
+import orderPropsByAbi from './propertyOrder';
 import { parseCalldataField } from './requestParser';
 import responseParser from './responseParser';
 import validateFields from './validate';
@@ -77,13 +80,32 @@ export class CallData {
    * Compile contract callData with abi
    * Parse the calldata by using input fields from the abi for that method
    * @param method string - method name
-   * @param args ArgsOrCalldata - arguments passed to the method
+   * @param args RawArgs - arguments passed to the method. Can be an array of arguments (in the order of abi definition), or an object constructed in conformity with abi (in this case, the parameter can be in a wrong order).
    * @return Calldata - parsed arguments in format that contract is expecting
+   * @example
+   * ```typescript
+   * const calldata = myCallData.compile("constructor",["0x34a",[1,3n]]);
+   * ```
+   * ```typescript
+   * const calldata2 = myCallData.compile("constructor",{list:[1,3n],balance:"0x34"}); // wrong order is valid
+   * ```
    */
-  public compile(method: string, args: ArgsOrCalldata): Calldata {
+  public compile(method: string, argsCalldata: RawArgs): Calldata {
+    const abiMethod = this.abi.find((abi) => abi.name === method) as FunctionAbi;
+
+    let args: RawArgsArray;
+    if (Array.isArray(argsCalldata)) {
+      args = argsCalldata;
+    } else {
+      // order the object
+      const orderedObject = orderPropsByAbi(argsCalldata, abiMethod.inputs, this.structs);
+      args = Object.values(orderedObject);
+      //   // validate array elements to abi
+      validateFields(abiMethod, args, this.structs);
+    }
+
     const argsIterator = args[Symbol.iterator]();
-    const { inputs } = this.abi.find((abi) => abi.name === method) as FunctionAbi;
-    return inputs.reduce(
+    return abiMethod.inputs.reduce(
       (acc, input) =>
         isLen(input.name) ? acc : acc.concat(parseCalldataField(argsIterator, input, this.structs)),
       [] as Calldata

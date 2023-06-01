@@ -20,9 +20,9 @@ felt cairo type
 
 #### Parameters
 
-| Name | Type                                  |
-| :--- | :------------------------------------ |
-| `it` | [`BigNumberish`](num.md#bignumberish) |
+| Name | Type                                    |
+| :--- | :-------------------------------------- |
+| `it` | [`BigNumberish`](types.md#bignumberish) |
 
 #### Returns
 
@@ -140,10 +140,10 @@ felt cairo type
 
 #### Parameters
 
-| Name      | Type                                     |
-| :-------- | :--------------------------------------- |
-| `type`    | `string`                                 |
-| `structs` | [`AbiStructs`](../modules.md#abistructs) |
+| Name      | Type                                |
+| :-------- | :---------------------------------- |
+| `type`    | `string`                            |
+| `structs` | [`AbiStructs`](types.md#abistructs) |
 
 #### Returns
 
@@ -277,19 +277,19 @@ felt cairo type
 
 ### uint256
 
-▸ **uint256**(`it`): [`Uint256`](../interfaces/uint256.Uint256.md)
+▸ **uint256**(`it`): [`Uint256`](../interfaces/types.Uint256.md)
 
 Uint256 cairo type (helper for common struct type)
 
 #### Parameters
 
-| Name | Type                                  |
-| :--- | :------------------------------------ |
-| `it` | [`BigNumberish`](num.md#bignumberish) |
+| Name | Type                                    |
+| :--- | :-------------------------------------- |
+| `it` | [`BigNumberish`](types.md#bignumberish) |
 
 #### Returns
 
-[`Uint256`](../interfaces/uint256.Uint256.md)
+[`Uint256`](../interfaces/types.Uint256.md)
 
 #### Defined in
 
@@ -299,19 +299,19 @@ Uint256 cairo type (helper for common struct type)
 
 ### tuple
 
-▸ **tuple**(`...args`): `Record`<`number`, `boolean` \| `object` \| [`BigNumberish`](num.md#bignumberish)\>
+▸ **tuple**(`...args`): `Record`<`number`, `boolean` \| `object` \| [`BigNumberish`](types.md#bignumberish)\>
 
 unnamed tuple cairo type (helper same as common struct type)
 
 #### Parameters
 
-| Name      | Type                                                               |
-| :-------- | :----------------------------------------------------------------- |
-| `...args` | (`boolean` \| `object` \| [`BigNumberish`](num.md#bignumberish))[] |
+| Name      | Type                                                                 |
+| :-------- | :------------------------------------------------------------------- |
+| `...args` | (`boolean` \| `object` \| [`BigNumberish`](types.md#bignumberish))[] |
 
 #### Returns
 
-`Record`<`number`, `boolean` \| `object` \| [`BigNumberish`](num.md#bignumberish)\>
+`Record`<`number`, `boolean` \| `object` \| [`BigNumberish`](types.md#bignumberish)\>
 
 #### Defined in
 

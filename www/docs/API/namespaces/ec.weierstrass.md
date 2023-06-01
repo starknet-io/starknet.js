@@ -84,7 +84,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:32
 
 ### CurvePointsType
 
-Ƭ **CurvePointsType**<`T`\>: [`BasicWCurve`](ec.weierstrass.md#basicwcurve)<`T`\> & { `fromBytes`: (`bytes`: `Uint8Array`) => [`AffinePoint`](ec.weierstrass.md#affinepoint)<`T`\> ; `toBytes`: (`c`: [`ProjConstructor`](../interfaces/ec.weierstrass.ProjConstructor.md)<`T`\>, `point`: [`ProjPointType`](../interfaces/ec.weierstrass.ProjPointType.md)<`T`\>, `compressed`: `boolean`) => `Uint8Array` }
+Ƭ **CurvePointsType**<`T`\>: [`BasicWCurve`](ec.weierstrass.md#basicwcurve)<`T`\> & { `fromBytes?`: (`bytes`: `Uint8Array`) => [`AffinePoint`](ec.weierstrass.md#affinepoint)<`T`\> ; `toBytes?`: (`c`: [`ProjConstructor`](../interfaces/ec.weierstrass.ProjConstructor.md)<`T`\>, `point`: [`ProjPointType`](../interfaces/ec.weierstrass.ProjPointType.md)<`T`\>, `isCompressed`: `boolean`) => `Uint8Array` }
 
 #### Type parameters
 
@@ -94,7 +94,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:32
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:80
+node_modules/@noble/curves/abstract/weierstrass.d.ts:82
 
 ---
 
@@ -119,7 +119,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:80
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:84
+node_modules/@noble/curves/abstract/weierstrass.d.ts:86
 
 ---
 
@@ -151,7 +151,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:84
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:110
+node_modules/@noble/curves/abstract/weierstrass.d.ts:154
 
 ---
 
@@ -161,7 +161,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:110
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:119
+node_modules/@noble/curves/abstract/weierstrass.d.ts:163
 
 ---
 
@@ -171,7 +171,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:119
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:120
+node_modules/@noble/curves/abstract/weierstrass.d.ts:164
 
 ---
 
@@ -198,7 +198,26 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:120
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:152
+node_modules/@noble/curves/abstract/weierstrass.d.ts:197
+
+## Variables
+
+### DER
+
+• `Const` **DER**: `Object`
+
+#### Type declaration
+
+| Name         | Type                                                                                |
+| :----------- | :---------------------------------------------------------------------------------- |
+| `Err`        | (`m?`: `string`) => { `name`: `string` ; `message`: `string` ; `stack?`: `string` } |
+| `_parseInt`  | (`data`: `Uint8Array`) => { `d`: `bigint` ; `l`: `Uint8Array` }                     |
+| `toSig`      | (`hex`: `string` \| `Uint8Array`) => { `r`: `bigint` ; `s`: `bigint` }              |
+| `hexFromSig` | (`sig`: { `r`: `bigint` ; `s`: `bigint` }) => `string`                              |
+
+#### Defined in
+
+node_modules/@noble/curves/abstract/weierstrass.d.ts:92
 
 ## Functions
 
@@ -222,16 +241,17 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:152
 
 `Object`
 
-| Name                     | Type                                                                       |
-| :----------------------- | :------------------------------------------------------------------------- |
-| `ProjectivePoint`        | [`ProjConstructor`](../interfaces/ec.weierstrass.ProjConstructor.md)<`T`\> |
-| `normPrivateKeyToScalar` | (`key`: `PrivKey`) => `bigint`                                             |
-| `weierstrassEquation`    | (`x`: `T`) => `T`                                                          |
-| `isWithinCurveOrder`     | (`num`: `bigint`) => `boolean`                                             |
+| Name                     | Type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               |
+| :----------------------- | :----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `CURVE`                  | `Readonly`<{ `nBitLength`: `number` ; `nByteLength`: `number` ; `Fp`: `mod.IField`<`T`\> ; `n`: `bigint` ; `h`: `bigint` ; `hEff?`: `bigint` ; `Gx`: `T` ; `Gy`: `T` ; `allowInfinityPoint?`: `boolean` ; `a`: `T` ; `b`: `T` ; `allowedPrivateKeyLengths?`: readonly `number`[] ; `wrapPrivateKey?`: `boolean` ; `endo?`: `EndomorphismOpts` ; `isTorsionFree?`: (`c`: [`ProjConstructor`](../interfaces/ec.weierstrass.ProjConstructor.md)<`T`\>, `point`: [`ProjPointType`](../interfaces/ec.weierstrass.ProjPointType.md)<`T`\>) => `boolean` ; `clearCofactor?`: (`c`: [`ProjConstructor`](../interfaces/ec.weierstrass.ProjConstructor.md)<`T`\>, `point`: [`ProjPointType`](../interfaces/ec.weierstrass.ProjPointType.md)<`T`\>) => [`ProjPointType`](../interfaces/ec.weierstrass.ProjPointType.md)<`T`\> ; `fromBytes?`: (`bytes`: `Uint8Array`) => [`AffinePoint`](ec.weierstrass.md#affinepoint)<`T`\> ; `toBytes?`: (`c`: [`ProjConstructor`](../interfaces/ec.weierstrass.ProjConstructor.md)<`T`\>, `point`: [`ProjPointType`](../interfaces/ec.weierstrass.ProjPointType.md)<`T`\>, `isCompressed`: `boolean`) => `Uint8Array` ; `p`: `bigint` }\> |
+| `ProjectivePoint`        | [`ProjConstructor`](../interfaces/ec.weierstrass.ProjConstructor.md)<`T`\>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
+| `normPrivateKeyToScalar` | (`key`: `PrivKey`) => `bigint`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+| `weierstrassEquation`    | (`x`: `T`) => `T`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| `isWithinCurveOrder`     | (`num`: `bigint`) => `boolean`                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:90
+node_modules/@noble/curves/abstract/weierstrass.d.ts:113
 
 ---
 
@@ -251,7 +271,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:90
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:167
+node_modules/@noble/curves/abstract/weierstrass.d.ts:212
 
 ---
 
@@ -267,10 +287,10 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:167
 
 #### Parameters
 
-| Name | Type          |
-| :--- | :------------ |
-| `Fp` | `Field`<`T`\> |
-| `Z`  | `T`           |
+| Name | Type           |
+| :--- | :------------- |
+| `Fp` | `IField`<`T`\> |
+| `Z`  | `T`            |
 
 #### Returns
 
@@ -296,7 +316,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:167
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:168
+node_modules/@noble/curves/abstract/weierstrass.d.ts:213
 
 ---
 
@@ -312,13 +332,13 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:168
 
 #### Parameters
 
-| Name     | Type          |
-| :------- | :------------ |
-| `Fp`     | `Field`<`T`\> |
-| `opts`   | `Object`      |
-| `opts.A` | `T`           |
-| `opts.B` | `T`           |
-| `opts.Z` | `T`           |
+| Name     | Type           |
+| :------- | :------------- |
+| `Fp`     | `IField`<`T`\> |
+| `opts`   | `Object`       |
+| `opts.A` | `T`            |
+| `opts.B` | `T`            |
+| `opts.Z` | `T`            |
 
 #### Returns
 
@@ -343,4 +363,4 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:168
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:172
+node_modules/@noble/curves/abstract/weierstrass.d.ts:217

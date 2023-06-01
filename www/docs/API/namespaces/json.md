@@ -74,6 +74,8 @@ custom_edit_url: null
 
 **`Deprecated`**
 
+equivalent to 'stringify', alias will be removed
+
 #### Parameters
 
 | Name   | Type                                                                                                         |

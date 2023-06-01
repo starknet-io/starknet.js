@@ -15,7 +15,7 @@ custom_edit_url: null
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:97
+node_modules/@noble/curves/abstract/weierstrass.d.ts:141
 
 ---
 
@@ -25,7 +25,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:97
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:98
+node_modules/@noble/curves/abstract/weierstrass.d.ts:142
 
 ---
 
@@ -35,7 +35,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:98
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:99
+node_modules/@noble/curves/abstract/weierstrass.d.ts:143
 
 ## Methods
 
@@ -49,7 +49,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:99
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:100
+node_modules/@noble/curves/abstract/weierstrass.d.ts:144
 
 ---
 
@@ -69,7 +69,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:100
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:101
+node_modules/@noble/curves/abstract/weierstrass.d.ts:145
 
 ---
 
@@ -83,7 +83,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:101
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:102
+node_modules/@noble/curves/abstract/weierstrass.d.ts:146
 
 ---
 
@@ -97,7 +97,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:102
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:103
+node_modules/@noble/curves/abstract/weierstrass.d.ts:147
 
 ---
 
@@ -117,7 +117,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:103
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:104
+node_modules/@noble/curves/abstract/weierstrass.d.ts:148
 
 ---
 
@@ -131,7 +131,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:104
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:105
+node_modules/@noble/curves/abstract/weierstrass.d.ts:149
 
 ---
 
@@ -145,7 +145,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:105
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:106
+node_modules/@noble/curves/abstract/weierstrass.d.ts:150
 
 ---
 
@@ -165,7 +165,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:106
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:107
+node_modules/@noble/curves/abstract/weierstrass.d.ts:151
 
 ---
 
@@ -185,4 +185,4 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:107
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:108
+node_modules/@noble/curves/abstract/weierstrass.d.ts:152
