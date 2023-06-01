@@ -252,10 +252,17 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
     });
 
     test('mix tuples', async () => {
-      // TODO arrays inside tuples c1.0
-      // tuple inside the struct c1.0
-      const res = await cairo1Contract.mix_req([1, 2, 3], true);
-      expect(res).toEqual([1n, 2n, 3n, 1n, 2n]);
+      const res = await cairo1Contract.array_bool_tuple([1, 2, 3], true);
+      expect(res).toEqual({
+        0: [1n, 2n, 3n, 1n, 2n],
+        1: true,
+      });
+
+      const res1 = await cairo1Contract.tuple_echo(cairo.tuple([1, 2, 3], [4, 5, 6]));
+      expect(res1).toEqual({
+        0: [1n, 2n, 3n],
+        1: [4n, 5n, 6n],
+      });
     });
 
     test('myCallData.compile for Cairo 1', async () => {
