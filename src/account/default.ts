@@ -680,7 +680,7 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<SimulateTransactionResponse> {
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
-    const version = toBigInt(feeTransactionVersion);
+    const version = toBigInt(transactionVersion);
     const chainId = await this.getChainId();
 
     const invocationBulk: any = await Promise.all(
@@ -698,6 +698,7 @@ export class Account extends Provider implements AccountInterface {
 
         let res;
         if (typeof transaction === 'object' && transaction.type === 'INVOKE_FUNCTION') {
+          // signerDetails.version = toBigInt(feeTransactionVersion); // TODO: Check why test expect feeTransactionVersion here ?
           const invocation = await this.buildInvocation(
             Array.isArray(txPayload) ? txPayload : [txPayload],
             signerDetails
@@ -710,6 +711,9 @@ export class Account extends Provider implements AccountInterface {
             blockIdentifier,
           };
         } else if (typeof transaction === 'object' && transaction.type === 'DECLARE') {
+          signerDetails.version = isSierra(txPayload.contract)
+            ? toBigInt(transactionVersion_2)
+            : toBigInt(transactionVersion);
           const declareContractPayload = await this.buildDeclarePayload(txPayload, signerDetails);
           res = {
             type: 'DECLARE',
@@ -735,7 +739,6 @@ export class Account extends Provider implements AccountInterface {
 
     const response = await super.getSimulateTransaction(
       invocationBulk,
-
       blockIdentifier,
       skipValidate,
       skipExecute

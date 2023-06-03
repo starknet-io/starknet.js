@@ -427,6 +427,11 @@ export namespace OPENRPC {
   export type BroadcastedTransaction = BROADCASTED_TXN;
 
   export type SimulationFlags = Array<SIMULATION_FLAG>;
+  export type SimulatedTransaction = {
+    transaction_trace: Trace;
+    fee_estimation: EstimatedFee;
+  };
+  export type SimulatedTransactions = SimulatedTransaction[];
 
   // Final Methods
   export type Methods = {
@@ -589,12 +594,7 @@ export namespace OPENRPC {
         transaction: Array<BROADCASTED_TXN>;
         simulation_flags: Array<SIMULATION_FLAG>;
       };
-      result: {
-        simulated_transactions: Array<{
-          transaction_trace: TRANSACTION_TRACE;
-          fee_estimation: FEE_ESTIMATE;
-        }>;
-      };
+      result: SimulatedTransactions;
       errors:
         | Errors.CONTRACT_NOT_FOUND
         // | Errors.INVALID_MESSAGE_SELECTOR

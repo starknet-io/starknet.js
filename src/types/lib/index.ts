@@ -99,6 +99,7 @@ export type CallDetails = {
   contractAddress: string;
   calldata?: RawArgs;
   entrypoint?: string; // TODO: check if required
+  // sender_address?: string; // Required by Sequencer SimulateTransaction single transaction
 };
 
 export type Invocation = CallDetails & { signature?: Signature };

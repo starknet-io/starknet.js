@@ -135,21 +135,14 @@ export class SequencerAPIResponseParser extends ResponseParser {
   public parseSimulateTransactionResponse(
     res: Sequencer.SimulateTransactionResponse
   ): SimulateTransactionResponse {
-    const withMaxFees = res.simulated_transactions.map((item) => {
-      const suggestedMaxFees =
-        'overall_fee' in item.fee_estimation
-          ? item.fee_estimation.overall_fee
-          : item.fee_estimation.amount;
-      return {
-        transaction_trace: item.trace,
-        fee_estimation: item.fee_estimation,
-        suggestedMaxFees: estimatedFeeToMaxFee(BigInt(suggestedMaxFees)),
-      };
-    });
-
-    return {
-      simulated_transactions: withMaxFees,
-    };
+    const suggestedMaxFees =
+      'overall_fee' in res.fee_estimation 
+      ? res.fee_estimation.overall_fee : res.fee_estimation.amount;
+    return [{
+      transaction_trace: res.trace,
+      fee_estimation: res.fee_estimation,
+      suggestedMaxFees: estimatedFeeToMaxFee(BigInt(suggestedMaxFees)),
+    }];
   }
 
   public parseCallContractResponse(res: Sequencer.CallContractResponse): CallContractResponse {

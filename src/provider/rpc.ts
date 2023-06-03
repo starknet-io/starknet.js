@@ -27,7 +27,7 @@ import {
 } from '../types';
 import { CallData } from '../utils/calldata';
 import fetch from '../utils/fetchPonyfill';
-import { getSelectorFromName } from '../utils/hash';
+import { getSelectorFromName, transactionVersion, transactionVersion_2 } from '../utils/hash';
 import { stringify } from '../utils/json';
 import { toHex } from '../utils/num';
 import { wait } from '../utils/provider';
@@ -555,7 +555,7 @@ export class RpcProvider implements ProviderInterface {
 
     return this.fetchEndpoint('starknet_simulateTransaction', {
       block_id,
-      transaction: invocations.map(this.buildInvocation),
+      transactions: invocations.map(this.buildInvocation), // Pathfinder 0.5.6 bug, should be transaction
       simulation_flags: simulationFlags,
     }).then(this.responseParser.parseSimulateTransactionResponse);
   }
@@ -570,6 +570,7 @@ export class RpcProvider implements ProviderInterface {
 
   public buildInvocation(invocation: InvocationBulkItem): RPC.BroadcastedTransaction {
     if (invocation.type === 'INVOKE_FUNCTION') {
+      // Diff between sequencer and rpc invoke type
       return {
         type: RPC.TransactionType.INVOKE,
         sender_address: invocation.contractAddress,
@@ -577,45 +578,42 @@ export class RpcProvider implements ProviderInterface {
         signature: signatureToHexArray(invocation.signature),
         version: toHex(invocation.version || 0),
         nonce: toHex(invocation.nonce),
-        max_fee: toHex(invocation.maxFee || 0),
+        // max_fee: toHex(invocation.maxFee || 0),
       };
     }
 
-    if (invocation.type === 'DECLARE') {
+    if (invocation.type === RPC.TransactionType.DECLARE) {
       if ('program' in invocation.contractDefinition) {
         return {
-          type: RPC.TransactionType.DECLARE,
-          contract_class: {
-            program: invocation.contractDefinition.program,
-            entry_points_by_type: invocation.contractDefinition.entry_points_by_type,
-            abi: invocation.contractDefinition.abi, // rpc 2.0
-          },
+          type: invocation.type,
+          contract_class: invocation.contractDefinition,
           sender_address: invocation.senderAddress,
           signature: signatureToHexArray(invocation.signature),
-          version: '0x1', // toHex(invocation.version || 0),
+          version: toHex(transactionVersion),
           nonce: toHex(invocation.nonce),
-          max_fee: toHex(invocation.maxFee || 0),
+          // max_fee: toHex(invocation.maxFee || 0),
         };
       }
       return {
-        type: RPC.TransactionType.DECLARE,
-        contract_class: {
+        type: invocation.type,
+        contract_class: invocation.contractDefinition,
+/*         contract_class: {
           sierra_program: invocation.contractDefinition.sierra_program,
           contract_class_version: invocation.contractDefinition.contract_class_version,
           entry_points_by_type: invocation.contractDefinition.entry_points_by_type,
           abi: stringify(invocation.contractDefinition.abi),
-        },
+        }, */
         compiled_class_hash: invocation.compiledClassHash || '',
         sender_address: invocation.senderAddress,
         signature: signatureToHexArray(invocation.signature),
-        version: '0x2', // toHex(invocation.version || 0),
+        version: toHex(transactionVersion_2),
         nonce: toHex(invocation.nonce),
         max_fee: toHex(invocation.maxFee || 0),
       };
     }
 
     return {
-      type: RPC.TransactionType.DEPLOY_ACCOUNT,
+      type: invocation.type,
       constructor_calldata: CallData.toHex(invocation.constructorCalldata || []),
       class_hash: toHex(invocation.classHash),
       contract_address_salt: toHex(invocation.addressSalt || 0),

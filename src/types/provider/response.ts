@@ -146,13 +146,13 @@ export type Nonce = Sequencer.Nonce;
 
 export type SimulationFlags = RPC.SimulationFlags;
 
-export interface SimulateTransactionResponse {
-  simulated_transactions: Array<{
-    transaction_trace: RPC.Trace | Sequencer.TransactionTraceResponse;
-    fee_estimation: RPC.EstimateFeeResponse | Sequencer.EstimateFeeResponse;
-    suggestedMaxFees?: string | bigint;
-  }>;
-}
+export type SimulatedTransaction = {
+  transaction_trace: RPC.Trace | Sequencer.TransactionTraceResponse;
+  fee_estimation: RPC.EstimateFeeResponse | Sequencer.EstimateFeeResponse;
+  suggestedMaxFees?: string | bigint;
+};
+
+export type SimulateTransactionResponse = SimulatedTransaction[];
 
 // As RPC and Sequencer response diverge, use RPC as common response
 export interface StateUpdateResponse {

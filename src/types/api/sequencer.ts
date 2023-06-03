@@ -255,19 +255,15 @@ export namespace Sequencer {
     | DeployAccountEstimateFee;
 
   export type SimulateTransactionResponse = {
-    simulated_transactions: Array<{
-      trace: TransactionTraceResponse; // diff with OPENRPC "transaction_trace"
-      fee_estimation: Sequencer.EstimateFeeResponse;
-    }>;
+    trace: TransactionTraceResponse; // diff with OPENRPC "transaction_trace"
+    fee_estimation: Sequencer.EstimateFeeResponse;
   };
 
-  export type SimulateTransaction = {
-    transaction: Array<SimulateTransactionItem>;
-  };
+  export type SimulateTransaction = SimulateTransactionItem;
 
   export type SimulateTransactionItem =
-    | Omit<InvokeEstimateFee, 'sender_address'>
-    | Omit<DeclareEstimateFee, 'sender_address'>
+    | InvokeEstimateFee
+    | DeclareEstimateFee
     | Omit<DeployAccountEstimateFee, 'sender_address'>;
 
   export type EstimateFeeRequestBulk = AllowArray<
@@ -454,7 +450,6 @@ export namespace Sequencer {
       QUERY: {
         blockIdentifier: BlockIdentifier;
         skipValidate: boolean;
-        skipExecute: boolean;
       };
       REQUEST: SimulateTransaction;
       RESPONSE: SimulateTransactionResponse;

@@ -37,7 +37,7 @@ import {
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
-import { feeTransactionVersion, getSelector, getSelectorFromName } from '../utils/hash';
+import { feeTransactionVersion, getSelector, getSelectorFromName, transactionVersion, transactionVersion_2 } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
 import {
   bigNumberishArrayToDecimalStringArray,
@@ -623,21 +623,31 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('estimate_message_fee', { blockIdentifier }, validCallL1Handler);
   }
 
+  /**
+   * Simulate transaction using Sequencer provider
+   * WARNING!: Sequencer will process only first element from invocations array
+   *
+   * @param invocations Array of invocations, but only first invocation will be processed
+   * @param blockIdentifier block identifier, default 'latest'
+   * @param skipValidate Skip Account __validate__ method
+   * @returns
+   */
   public async getSimulateTransaction(
     invocations: InvocationBulk,
     blockIdentifier: BlockIdentifier = this.blockIdentifier,
-    skipValidate?: boolean,
-    skipExecute?: boolean
+    skipValidate?: boolean
   ): Promise<SimulateTransactionResponse> {
+    if (invocations.length > 1) {
+      console.warn('Sequencer simulate process only first element from invocations list');
+    }
     return this.fetchEndpoint(
       'simulate_transaction',
       {
         blockIdentifier,
         skipValidate: skipValidate ?? false,
-        skipExecute: skipExecute ?? false,
       },
       {
-        transaction: invocations.map(this.buildInvocation),
+        ...this.buildInvocation(invocations[0]),
       }
     ).then(this.responseParser.parseSimulateTransactionResponse);
   }
@@ -668,61 +678,47 @@ export class SequencerProvider implements ProviderInterface {
   }
 
   public buildInvocation(invocation: InvocationBulkItem): Sequencer.SimulateTransactionItem {
-    if (invocation.type === 'INVOKE_FUNCTION') {
+    if (invocation.type === TransactionType.INVOKE) {
       return {
-        type: 'INVOKE_FUNCTION',
-        // sender_address: invocation.contractAddress,
+        type: invocation.type,
+        sender_address: invocation.contractAddress,
         calldata: CallData.toHex(invocation.calldata),
         signature: signatureToDecimalArray(invocation.signature),
-        version: toHex(invocation.version || 0),
+        version: toHex(invocation.version || 1),
         nonce: toHex(invocation.nonce),
-        // max_fee: toHex(invocation.maxFee || 0),
       };
     }
 
-    if (invocation.type === 'DECLARE') {
-      if ('program' in invocation.contractDefinition) {
+    if (invocation.type === TransactionType.DECLARE) {
+      if (!isSierra(invocation.contractDefinition)) {
         return {
-          type: 'DECLARE',
-          contract_class: {
-            program: invocation.contractDefinition.program,
-            entry_points_by_type: invocation.contractDefinition.entry_points_by_type,
-            abi: invocation.contractDefinition.abi, // rpc 2.0
-          },
-          // sender_address: invocation.senderAddress,
+          type: invocation.type,
+          contract_class: invocation.contractDefinition,
+          sender_address: invocation.senderAddress,
           signature: signatureToDecimalArray(invocation.signature),
-          version: '0x1', // toHex(invocation.version || 0),
+          version: toHex(transactionVersion),
           nonce: toHex(invocation.nonce),
-          // max_fee: toHex(invocation.maxFee || 0),
         };
       }
       return {
-        type: 'DECLARE',
-        contract_class: {
-          sierra_program: invocation.contractDefinition.sierra_program,
-          sierra_program_debug_info: invocation.contractDefinition.sierra_program_debug_info,
-          contract_class_version: invocation.contractDefinition.contract_class_version,
-          entry_points_by_type: invocation.contractDefinition.entry_points_by_type,
-          abi: invocation.contractDefinition.abi,
-        },
-        compiled_class_hash: invocation.compiledClassHash || '',
-        // sender_address: invocation.senderAddress,
+        type: invocation.type,
+        contract_class: invocation.contractDefinition,
+        compiled_class_hash: invocation.compiledClassHash,
+        sender_address: invocation.senderAddress,
         signature: signatureToDecimalArray(invocation.signature),
-        version: '0x2', // toHex(invocation.version || 0),
+        version: toHex(transactionVersion_2),
         nonce: toHex(invocation.nonce),
-        // max_fee: toHex(invocation.maxFee || 0),
       };
     }
 
     return {
-      type: 'DEPLOY_ACCOUNT',
+      type: invocation.type,
       constructor_calldata: CallData.toHex(invocation.constructorCalldata || []),
       class_hash: toHex(invocation.classHash),
       contract_address_salt: toHex(invocation.addressSalt || 0),
       signature: signatureToDecimalArray(invocation.signature),
       version: toHex(invocation.version || 0),
       nonce: toHex(invocation.nonce),
-      // max_fee: toHex(invocation.maxFee || 0),
     };
   }
 }

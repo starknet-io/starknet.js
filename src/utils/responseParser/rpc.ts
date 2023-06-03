@@ -84,16 +84,11 @@ export class RPCResponseParser
   public parseSimulateTransactionResponse(
     res: RPC.SimulateTransactionResponse
   ): SimulateTransactionResponse {
-    const withMaxFees = res.simulated_transactions.map((simulated) => {
+    return res.map((it) => {
       return {
-        transaction_trace: simulated.transaction_trace,
-        fee_estimation: simulated.fee_estimation,
-        suggestedMaxFees: estimatedFeeToMaxFee(BigInt(simulated.fee_estimation.overall_fee)),
+        ...it,
+        suggestedMaxFees: estimatedFeeToMaxFee(BigInt(it.fee_estimation.overall_fee)),
       };
     });
-
-    return {
-      simulated_transactions: withMaxFees,
-    };
   }
 }
