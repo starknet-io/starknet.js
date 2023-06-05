@@ -1,4 +1,5 @@
 import {
+  Abi,
   Account,
   BigNumberish,
   CallData,
@@ -481,7 +482,8 @@ describeIfSequencerTestnet2('Cairo1 Testnet2', () => {
 
     beforeAll(async () => {
       const cairoClass = await provider.getClassByHash(classHash);
-      cairo1Contract = new Contract(cairoClass.abi, contractAddress, account);
+      // TODO: Fix typing and responses for abi
+      cairo1Contract = new Contract(cairoClass.abi as Abi, contractAddress, account);
     });
 
     test('getCompiledClassByClassHash', async () => {

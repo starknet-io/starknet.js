@@ -590,7 +590,7 @@ export class Account extends Provider implements AccountInterface {
     { nonce, chainId, version, walletAddress, maxFee }: InvocationsSignerDetails
   ): Promise<DeclareContractTransaction> {
     const { classHash, contract, compiledClassHash } = extractContractHashes(payload);
-    const contractDefinition = parseContract(contract);
+    const compressedCompiledContract = parseContract(contract);
     const signature = await this.signer.signDeclareTransaction({
       classHash,
       compiledClassHash,
@@ -604,7 +604,7 @@ export class Account extends Provider implements AccountInterface {
     return {
       senderAddress: walletAddress,
       signature,
-      contractDefinition,
+      contract: compressedCompiledContract,
       compiledClassHash,
     };
   }
@@ -679,7 +679,14 @@ export class Account extends Provider implements AccountInterface {
     }: SimulateTransactionDetails = {}
   ): Promise<SimulateTransactionResponse> {
     const transactions = Array.isArray(calls) ? calls : [calls];
-    const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
+    // Patch DEPLOY_ACCOUNT: RPC getNonce for non-existing address will result in error, on Sequencer it is '0x0'
+    let nonce = 0n;
+    try {
+      nonce = toBigInt(providedNonce ?? (await this.getNonce()));
+    } catch (error) {
+      /* empty */
+    }
+
     const version = toBigInt(transactionVersion);
     const chainId = await this.getChainId();
 

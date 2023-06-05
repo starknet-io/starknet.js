@@ -1,12 +1,18 @@
 import { Abi } from './abi';
 
 /** LEGACY CONTRACT */
+/**
+ * format produced after compressing 'program' property
+ */
 export type LegacyContractClass = {
   program: CompressedProgram;
   entry_points_by_type: EntryPointsByType;
   abi: Abi;
 };
 
+/**
+ * format produced after compile .cairo to .json
+ */
 export type LegacyCompiledContract = Omit<LegacyContractClass, 'program'> & {
   program: Program;
 };

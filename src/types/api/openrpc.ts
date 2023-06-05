@@ -591,7 +591,7 @@ export namespace OPENRPC {
     starknet_simulateTransaction: {
       params: {
         block_id: BLOCK_ID;
-        transaction: Array<BROADCASTED_TXN>;
+        transactions: Array<BROADCASTED_TXN>; // Pathfinder 0.5.6 bug, should be transaction
         simulation_flags: Array<SIMULATION_FLAG>;
       };
       result: SimulatedTransactions;

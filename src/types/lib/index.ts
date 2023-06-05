@@ -89,7 +89,7 @@ export type DeclareAndDeployContractPayload = Omit<UniversalDeployerContractPayl
   DeclareContractPayload;
 
 export type DeclareContractTransaction = {
-  contractDefinition: ContractClass;
+  contract: ContractClass;
   senderAddress: string;
   signature?: Signature;
   compiledClassHash?: string;
@@ -99,7 +99,6 @@ export type CallDetails = {
   contractAddress: string;
   calldata?: RawArgs;
   entrypoint?: string; // TODO: check if required
-  // sender_address?: string; // Required by Sequencer SimulateTransaction single transaction
 };
 
 export type Invocation = CallDetails & { signature?: Signature };
@@ -153,8 +152,8 @@ export type InvocationBulkItem = (
   InvocationsDetailsWithNonce & { blockIdentifier: BlockNumber | BigNumberish };
 
 export type InvocationBulkItemSimple =
-  | ({ type: 'DECLARE' } & DeclareContractTransaction)
-  | ({ type: 'DEPLOY_ACCOUNT' } & DeployAccountContractTransaction)
+  | ({ type: 'DECLARE' } & DeclareContractPayload)
+  | ({ type: 'DEPLOY_ACCOUNT' } & DeployAccountContractPayload)
   | ({ type: 'INVOKE_FUNCTION' } & Invocation);
 
 export type InvocationBulk = Array<InvocationBulkItem>;

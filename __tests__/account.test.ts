@@ -26,7 +26,6 @@ import {
   compiledStarknetId,
   compiledTestDapp,
   describeIfDevnetSequencer,
-  describeIfRpc,
   describeIfSequencer,
   erc20ClassHash,
   getTestAccount,
@@ -57,7 +56,7 @@ describe('deploy and test Wallet', () => {
     erc20Address = declareDeploy.deploy.contract_address;
     erc20 = new Contract(compiledErc20.abi, erc20Address, provider);
 
-/*     const { balance } = await erc20.balanceOf(account.address);
+    const { balance } = await erc20.balanceOf(account.address);
     expect(BigInt(balance.low).toString()).toStrictEqual(BigInt(1000).toString());
 
     const dappResponse = await account.declareAndDeploy({
@@ -65,7 +64,7 @@ describe('deploy and test Wallet', () => {
       classHash: '0x04367b26fbb92235e8d1137d19c080e6e650a6889ded726d00658411cc1046f5',
     });
 
-    dapp = new Contract(compiledTestDapp.abi, dappResponse.deploy.contract_address!, provider); */
+    dapp = new Contract(compiledTestDapp.abi, dappResponse.deploy.contract_address!, provider);
   });
 
   test('estimate fee', async () => {
@@ -630,31 +629,6 @@ describe('deploy and test Wallet', () => {
       });
     });
   });
-
-/*   describeIfRpc('Simulate Transaction', () => {
-    test('simulate transaction', async () => {
-      const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
-      const res = await account.simulateTransaction([
-        {
-          type: 'INVOKE_FUNCTION',
-          contractAddress: erc20Address,
-          entrypoint: 'transfer',
-          calldata: [erc20.address, '10', '0'],
-        },
-        {
-          type: 'INVOKE_FUNCTION',
-          contractAddress: erc20Address,
-          entrypoint: 'transfer',
-          calldata: [erc20.address, '10', '0'],
-        },
-        // TODO : test other tx type / tx version
-      ]);
-
-      expect(res).toMatchSchemaRef('SimulateTransactionResponse');
-      expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
-      innerInvokeEstFeeSpy.mockClear();
-    });
-  }); */
 });
 
 describe('unit', () => {

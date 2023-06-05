@@ -18,21 +18,25 @@ import {
   InvocationBulkItem,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  LegacyContractClass,
   RPC,
   RpcProviderOptions,
   SIMULATION_FLAG,
+  SierraContractClass,
   SimulateTransactionResponse,
   TransactionStatus,
+  TransactionType,
   waitForTransactionOptions,
 } from '../types';
 import { CallData } from '../utils/calldata';
+import { isSierra } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName, transactionVersion, transactionVersion_2 } from '../utils/hash';
 import { stringify } from '../utils/json';
 import { toHex } from '../utils/num';
 import { wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
-import { signatureToHexArray } from '../utils/stark';
+import { decompressProgram, signatureToHexArray } from '../utils/stark';
 import { LibraryError } from './errors';
 import { ProviderInterface } from './interface';
 import { getAddressFromStarkName, getStarkName } from './starknetId';
@@ -70,9 +74,10 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public fetch(method: any, params: any): Promise<any> {
+    const body = stringify({ method, jsonrpc: '2.0', params, id: 0 });
     return fetch(this.nodeUrl, {
       method: 'POST',
-      body: stringify({ method, jsonrpc: '2.0', params, id: 0 }),
+      body,
       headers: this.headers as Record<string, string>,
     });
   }
@@ -264,24 +269,25 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getDeclareEstimateFee(
-    { senderAddress, contractDefinition, signature, compiledClassHash }: DeclareContractTransaction,
+    { senderAddress, contract, signature, compiledClassHash }: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<EstimateFeeResponse> {
     const block_id = new Block(blockIdentifier).identifier;
-    if ('program' in contractDefinition) {
+    if (!isSierra(contract)) {
+      const legacyContract = contract as LegacyContractClass;
       return this.fetchEndpoint('starknet_estimateFee', {
         request: [
           {
             type: RPC.TransactionType.DECLARE,
             contract_class: {
-              program: contractDefinition.program,
-              entry_points_by_type: contractDefinition.entry_points_by_type,
-              abi: contractDefinition.abi, // rpc 2.0
+              program: legacyContract.program,
+              entry_points_by_type: legacyContract.entry_points_by_type,
+              abi: legacyContract.abi,
             },
             sender_address: senderAddress,
             signature: signatureToHexArray(signature),
-            version: '0x1', // toHex(details?.version || 0),
+            version: toHex(transactionVersion),
             nonce: toHex(details.nonce),
             max_fee: toHex(details?.maxFee || 0),
           },
@@ -289,20 +295,21 @@ export class RpcProvider implements ProviderInterface {
         block_id,
       }).then(this.responseParser.parseFeeEstimateResponse);
     }
+    const sierraContract = contract as SierraContractClass;
     return this.fetchEndpoint('starknet_estimateFee', {
       request: [
         {
           type: RPC.TransactionType.DECLARE,
           contract_class: {
-            sierra_program: contractDefinition.sierra_program,
-            contract_class_version: contractDefinition.contract_class_version,
-            entry_points_by_type: contractDefinition.entry_points_by_type,
-            abi: stringify(contractDefinition.abi),
+            sierra_program: decompressProgram(sierraContract.sierra_program),
+            contract_class_version: sierraContract.contract_class_version,
+            entry_points_by_type: sierraContract.entry_points_by_type,
+            abi: sierraContract.abi,
           },
           compiled_class_hash: compiledClassHash || '',
           sender_address: senderAddress,
           signature: signatureToHexArray(signature),
-          version: '0x2', // toHex(details?.version || 0),
+          version: toHex(transactionVersion_2),
           nonce: toHex(details.nonce),
           max_fee: toHex(details?.maxFee || 0),
         },
@@ -345,21 +352,21 @@ export class RpcProvider implements ProviderInterface {
     }).then(this.responseParser.parseFeeEstimateOriginalResponse);
   }
 
-  // TODO: Revisit after Pathfinder release with JSON-RPC v0.2.1 RPC Spec
   public async declareContract(
-    { contractDefinition, signature, senderAddress, compiledClassHash }: DeclareContractTransaction,
+    { contract, signature, senderAddress, compiledClassHash }: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce
   ): Promise<DeclareContractResponse> {
-    if ('program' in contractDefinition) {
+    if (!isSierra(contract)) {
+      const legacyContract = contract as LegacyContractClass;
       return this.fetchEndpoint('starknet_addDeclareTransaction', {
         declare_transaction: {
           type: RPC.TransactionType.DECLARE,
           contract_class: {
-            program: contractDefinition.program,
-            entry_points_by_type: contractDefinition.entry_points_by_type,
-            abi: contractDefinition.abi, // rpc 2.0
+            program: legacyContract.program,
+            entry_points_by_type: legacyContract.entry_points_by_type,
+            abi: legacyContract.abi,
           },
-          version: '0x1',
+          version: toHex(transactionVersion),
           max_fee: toHex(details.maxFee || 0),
           signature: signatureToHexArray(signature),
           sender_address: senderAddress,
@@ -367,17 +374,18 @@ export class RpcProvider implements ProviderInterface {
         },
       });
     }
+    const sierraContract = contract as SierraContractClass;
     return this.fetchEndpoint('starknet_addDeclareTransaction', {
       declare_transaction: {
         type: RPC.TransactionType.DECLARE,
         contract_class: {
-          sierra_program: contractDefinition.sierra_program,
-          contract_class_version: contractDefinition.contract_class_version,
-          entry_points_by_type: contractDefinition.entry_points_by_type,
-          abi: stringify(contractDefinition.abi),
+          sierra_program: decompressProgram(sierraContract.sierra_program),
+          contract_class_version: sierraContract.contract_class_version,
+          entry_points_by_type: sierraContract.entry_points_by_type,
+          abi: sierraContract.abi,
         },
         compiled_class_hash: compiledClassHash || '',
-        version: '0x2',
+        version: toHex(transactionVersion_2),
         max_fee: toHex(details.maxFee || 0),
         signature: signatureToHexArray(signature),
         sender_address: senderAddress,
@@ -569,7 +577,7 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public buildInvocation(invocation: InvocationBulkItem): RPC.BroadcastedTransaction {
-    if (invocation.type === 'INVOKE_FUNCTION') {
+    if (invocation.type === TransactionType.INVOKE) {
       // Diff between sequencer and rpc invoke type
       return {
         type: RPC.TransactionType.INVOKE,
@@ -578,31 +586,28 @@ export class RpcProvider implements ProviderInterface {
         signature: signatureToHexArray(invocation.signature),
         version: toHex(invocation.version || 0),
         nonce: toHex(invocation.nonce),
-        // max_fee: toHex(invocation.maxFee || 0),
+        max_fee: toHex(invocation.maxFee || 0),
       };
     }
 
     if (invocation.type === RPC.TransactionType.DECLARE) {
-      if ('program' in invocation.contractDefinition) {
+      if ('program' in invocation.contract) {
         return {
           type: invocation.type,
-          contract_class: invocation.contractDefinition,
+          contract_class: invocation.contract,
           sender_address: invocation.senderAddress,
           signature: signatureToHexArray(invocation.signature),
           version: toHex(transactionVersion),
           nonce: toHex(invocation.nonce),
-          // max_fee: toHex(invocation.maxFee || 0),
+          max_fee: toHex(invocation.maxFee || 0),
         };
       }
       return {
         type: invocation.type,
-        contract_class: invocation.contractDefinition,
-/*         contract_class: {
-          sierra_program: invocation.contractDefinition.sierra_program,
-          contract_class_version: invocation.contractDefinition.contract_class_version,
-          entry_points_by_type: invocation.contractDefinition.entry_points_by_type,
-          abi: stringify(invocation.contractDefinition.abi),
-        }, */
+        contract_class: {
+          ...invocation.contract,
+          sierra_program: decompressProgram(invocation.contract.sierra_program),
+        },
         compiled_class_hash: invocation.compiledClassHash || '',
         sender_address: invocation.senderAddress,
         signature: signatureToHexArray(invocation.signature),

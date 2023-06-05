@@ -37,7 +37,13 @@ import {
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
-import { feeTransactionVersion, getSelector, getSelectorFromName, transactionVersion, transactionVersion_2 } from '../utils/hash';
+import {
+  feeTransactionVersion,
+  getSelector,
+  getSelectorFromName,
+  transactionVersion,
+  transactionVersion_2,
+} from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
 import {
   bigNumberishArrayToDecimalStringArray,
@@ -382,18 +388,18 @@ export class SequencerProvider implements ProviderInterface {
   }
 
   public async declareContract(
-    { senderAddress, contractDefinition, signature, compiledClassHash }: DeclareContractTransaction,
+    { senderAddress, contract, signature, compiledClassHash }: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce
   ): Promise<DeclareContractResponse> {
-    if (!isSierra(contractDefinition)) {
+    if (!isSierra(contract)) {
       return this.fetchEndpoint('add_transaction', undefined, {
         type: TransactionType.DECLARE,
-        contract_class: contractDefinition,
+        contract_class: contract,
         nonce: toHex(details.nonce),
         signature: signatureToDecimalArray(signature),
         sender_address: senderAddress,
         max_fee: toHex(details.maxFee || 0),
-        version: '0x1',
+        version: toHex(transactionVersion),
       }).then(this.responseParser.parseDeclareContractResponse);
     }
     // Cairo 1
@@ -401,11 +407,11 @@ export class SequencerProvider implements ProviderInterface {
       type: TransactionType.DECLARE,
       sender_address: senderAddress,
       compiled_class_hash: compiledClassHash,
-      contract_class: contractDefinition,
+      contract_class: contract,
       nonce: toHex(details.nonce),
       signature: signatureToDecimalArray(signature),
       max_fee: toHex(details.maxFee || 0),
-      version: '0x2',
+      version: toHex(transactionVersion_2),
     }).then(this.responseParser.parseDeclareContractResponse);
   }
 
@@ -439,21 +445,21 @@ export class SequencerProvider implements ProviderInterface {
   }
 
   public async getDeclareEstimateFee(
-    { senderAddress, contractDefinition, signature, compiledClassHash }: DeclareContractTransaction,
+    { senderAddress, contract, signature, compiledClassHash }: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
     blockIdentifier: BlockIdentifier = this.blockIdentifier,
     skipValidate: boolean = false
   ): Promise<EstimateFeeResponse> {
-    if (!isSierra(contractDefinition)) {
+    if (!isSierra(contract)) {
       return this.fetchEndpoint(
         'estimate_fee',
         { blockIdentifier, skipValidate },
         {
           type: TransactionType.DECLARE,
           sender_address: senderAddress,
-          contract_class: contractDefinition,
+          contract_class: contract,
           signature: signatureToDecimalArray(signature),
-          version: toHex(details?.version || toBigInt(feeTransactionVersion)),
+          version: toHex(feeTransactionVersion),
           nonce: toHex(details.nonce),
         }
       ).then(this.responseParser.parseFeeEstimateResponse);
@@ -466,10 +472,10 @@ export class SequencerProvider implements ProviderInterface {
         type: TransactionType.DECLARE,
         sender_address: senderAddress,
         compiled_class_hash: compiledClassHash,
-        contract_class: contractDefinition,
+        contract_class: contract,
         nonce: toHex(details.nonce),
         signature: signatureToDecimalArray(signature),
-        version: '0x2',
+        version: toHex(transactionVersion_2),
       }
     ).then(this.responseParser.parseFeeEstimateResponse);
   }
@@ -501,17 +507,17 @@ export class SequencerProvider implements ProviderInterface {
   ): Promise<EstimateFeeResponseBulk> {
     const params: Sequencer.EstimateFeeRequestBulk = invocations.map((invocation) => {
       let res;
-      if (invocation.type === 'INVOKE_FUNCTION') {
+      if (invocation.type === TransactionType.INVOKE) {
         res = {
           type: invocation.type,
           sender_address: invocation.contractAddress,
           calldata: CallData.compile(invocation.calldata ?? []),
         };
-      } else if (invocation.type === 'DECLARE') {
+      } else if (invocation.type === TransactionType.DECLARE) {
         res = {
           type: invocation.type,
           sender_address: invocation.senderAddress,
-          contract_class: invocation.contractDefinition,
+          contract_class: invocation.contract,
         };
       } else {
         res = {
@@ -521,6 +527,8 @@ export class SequencerProvider implements ProviderInterface {
           contract_address_salt: toHex(toBigInt(invocation.addressSalt || 0)),
         };
       }
+
+      // TODO: TT: What case is this ??? This will never enter ?
       return {
         ...res,
         signature: bigNumberishArrayToDecimalStringArray(formatSignature(invocation.signature)),
@@ -638,6 +646,7 @@ export class SequencerProvider implements ProviderInterface {
     skipValidate?: boolean
   ): Promise<SimulateTransactionResponse> {
     if (invocations.length > 1) {
+      // eslint-disable-next-line no-console
       console.warn('Sequencer simulate process only first element from invocations list');
     }
     return this.fetchEndpoint(
@@ -690,10 +699,10 @@ export class SequencerProvider implements ProviderInterface {
     }
 
     if (invocation.type === TransactionType.DECLARE) {
-      if (!isSierra(invocation.contractDefinition)) {
+      if (!isSierra(invocation.contract)) {
         return {
           type: invocation.type,
-          contract_class: invocation.contractDefinition,
+          contract_class: invocation.contract,
           sender_address: invocation.senderAddress,
           signature: signatureToDecimalArray(invocation.signature),
           version: toHex(transactionVersion),
@@ -702,7 +711,7 @@ export class SequencerProvider implements ProviderInterface {
       }
       return {
         type: invocation.type,
-        contract_class: invocation.contractDefinition,
+        contract_class: invocation.contract,
         compiled_class_hash: invocation.compiledClassHash,
         sender_address: invocation.senderAddress,
         signature: signatureToDecimalArray(invocation.signature),
