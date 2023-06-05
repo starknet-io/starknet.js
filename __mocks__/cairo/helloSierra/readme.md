@@ -1,8 +1,7 @@
-SW cairo repo tag Cairo v1.0.0-rc0
+Compiled with SW cairo repo tag Cairo v1.1.0
 
-# 1.
+# 1.Download cairo repo
 
-Download cairo repo
 Switch to target tag version
 `cargo test`
 
