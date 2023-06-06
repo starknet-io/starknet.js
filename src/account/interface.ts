@@ -18,7 +18,7 @@ import {
   EstimateFeeDetails,
   EstimateFeeResponse,
   EstimateFeeResponseBulk,
-  InvocationBulkItemSimple,
+  Invocations,
   InvocationsDetails,
   InvokeFunctionResponse,
   MultiDeployContractResponse,
@@ -330,7 +330,7 @@ export abstract class AccountInterface extends ProviderInterface {
    * @returns response from simulate_transaction
    */
   public abstract simulateTransaction(
-    calls: AllowArray<InvocationBulkItemSimple>,
+    calls: Invocations,
     simulateTransactionDetails?: SimulateTransactionDetails
   ): Promise<SimulateTransactionResponse>;
 }

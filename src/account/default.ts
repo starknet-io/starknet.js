@@ -24,7 +24,7 @@ import {
   EstimateFeeBulk,
   EstimateFeeDetails,
   Invocation,
-  InvocationBulkItemSimple,
+  Invocations,
   InvocationsDetails,
   InvocationsSignerDetails,
   InvokeFunctionResponse,
@@ -669,8 +669,17 @@ export class Account extends Provider implements AccountInterface {
     return calls;
   }
 
+  private async getNonceSafe(nonce?: BigNumberish) {
+    // Patch DEPLOY_ACCOUNT: RPC getNonce for non-existing address will result in error, on Sequencer it is '0x0'
+    try {
+      return toBigInt(nonce ?? (await this.getNonce()));
+    } catch (error) {
+      return 0n;
+    }
+  }
+
   public async simulateTransaction(
-    calls: AllowArray<InvocationBulkItemSimple>,
+    invocations: Invocations,
     {
       nonce: providedNonce,
       blockIdentifier,
@@ -678,20 +687,13 @@ export class Account extends Provider implements AccountInterface {
       skipExecute,
     }: SimulateTransactionDetails = {}
   ): Promise<SimulateTransactionResponse> {
-    const transactions = Array.isArray(calls) ? calls : [calls];
-    // Patch DEPLOY_ACCOUNT: RPC getNonce for non-existing address will result in error, on Sequencer it is '0x0'
-    let nonce = 0n;
-    try {
-      nonce = toBigInt(providedNonce ?? (await this.getNonce()));
-    } catch (error) {
-      /* empty */
-    }
-
+    const invocationsArr = ([] as Invocations).concat(invocations);
+    const nonce = await this.getNonceSafe(providedNonce);
     const version = toBigInt(transactionVersion);
     const chainId = await this.getChainId();
 
-    const invocationBulk: any = await Promise.all(
-      [].concat(transactions as []).map(async (transaction: any, index: number) => {
+    const accountInvocations: any = await Promise.all(
+      ([] as Invocations).concat(invocationsArr).map(async (transaction: any, index: number) => {
         const signerDetails: InvocationsSignerDetails = {
           walletAddress: this.address,
           nonce: toBigInt(Number(nonce) + index),
@@ -703,9 +705,8 @@ export class Account extends Provider implements AccountInterface {
 
         const txPayload = transaction.payload ? transaction.payload : transaction;
 
-        let res;
+        let res: any; // AccountInvocations
         if (typeof transaction === 'object' && transaction.type === 'INVOKE_FUNCTION') {
-          // signerDetails.version = toBigInt(feeTransactionVersion); // TODO: Check why test expect feeTransactionVersion here ?
           const invocation = await this.buildInvocation(
             Array.isArray(txPayload) ? txPayload : [txPayload],
             signerDetails
@@ -744,12 +745,11 @@ export class Account extends Provider implements AccountInterface {
       })
     );
 
-    const response = await super.getSimulateTransaction(
-      invocationBulk,
+    const response = await super.getSimulateTransaction(accountInvocations, {
       blockIdentifier,
       skipValidate,
-      skipExecute
-    );
+      skipExecute,
+    });
 
     return response;
   }

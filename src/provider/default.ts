@@ -1,5 +1,6 @@
 import { StarknetChainId } from '../constants';
 import {
+  AccountInvocations,
   BigNumberish,
   BlockIdentifier,
   Call,
@@ -16,7 +17,6 @@ import {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
-  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Nonce,
@@ -27,6 +27,7 @@ import {
   SimulateTransactionResponse,
   StateUpdateResponse,
   Storage,
+  getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
 import { ProviderInterface } from './interface';
@@ -108,7 +109,7 @@ export class Provider implements ProviderInterface {
   }
 
   public async getEstimateFeeBulk(
-    invocations: InvocationBulk,
+    invocations: AccountInvocations,
     blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponseBulk> {
     return this.provider.getEstimateFeeBulk(invocations, blockIdentifier);
@@ -203,17 +204,10 @@ export class Provider implements ProviderInterface {
   }
 
   public async getSimulateTransaction(
-    invocations: InvocationBulk,
-    blockIdentifier?: BlockIdentifier,
-    skipValidate?: boolean,
-    skipExecute?: boolean
+    invocations: AccountInvocations,
+    options?: getSimulateTransactionOptions
   ): Promise<SimulateTransactionResponse> {
-    return this.provider.getSimulateTransaction(
-      invocations,
-      blockIdentifier,
-      skipExecute,
-      skipValidate
-    );
+    return this.provider.getSimulateTransaction(invocations, options);
   }
 
   public async getStateUpdate(blockIdentifier?: BlockIdentifier): Promise<StateUpdateResponse> {

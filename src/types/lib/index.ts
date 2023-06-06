@@ -31,6 +31,8 @@ export type HexCalldata = string[];
 
 export type AllowArray<T> = T | T[];
 
+export type OptionalPayload<T> = { payload: T } | T;
+
 export type RawArgs = RawArgsObject | RawArgsArray;
 
 export type RawArgsObject = {
@@ -135,28 +137,39 @@ export enum TransactionStatus {
   ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
   REJECTED = 'REJECTED',
 }
+
+// TODO: mabe can be removed ?!
 export type TransactionBulk = Array<
   | ({ type: 'DECLARE' } & { payload: DeclareContractPayload })
-  | ({ type: 'DEPLOY' } & {
-      payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[];
-    })
+  | ({ type: 'DEPLOY' } & { payload: AllowArray<UniversalDeployerContractPayload> })
   | ({ type: 'DEPLOY_ACCOUNT' } & { payload: DeployAccountContractPayload })
   | ({ type: 'INVOKE_FUNCTION' } & { payload: AllowArray<Call> })
 >;
 
-export type InvocationBulkItem = (
+/**
+ * items used by AccountInvocations
+ */
+export type AccountInvocationItem = (
   | ({ type: 'DECLARE' } & DeclareContractTransaction)
   | ({ type: 'DEPLOY_ACCOUNT' } & DeployAccountContractTransaction)
   | ({ type: 'INVOKE_FUNCTION' } & Invocation)
 ) &
   InvocationsDetailsWithNonce & { blockIdentifier: BlockNumber | BigNumberish };
 
-export type InvocationBulkItemSimple =
-  | ({ type: 'DECLARE' } & DeclareContractPayload)
-  | ({ type: 'DEPLOY_ACCOUNT' } & DeployAccountContractPayload)
-  | ({ type: 'INVOKE_FUNCTION' } & Invocation);
+/**
+ * Complete invocations array with account details (internal type from account -> provider)
+ */
+export type AccountInvocations = AccountInvocationItem[];
 
-export type InvocationBulk = Array<InvocationBulkItem>;
+/**
+ * Invocations array user provide to bulk method (simulate)
+ */
+export type Invocations = Array<
+  | ({ type: 'DECLARE' } & OptionalPayload<DeclareContractPayload>)
+  | ({ type: 'DEPLOY' } & OptionalPayload<AllowArray<UniversalDeployerContractPayload>>)
+  | ({ type: 'DEPLOY_ACCOUNT' } & OptionalPayload<DeployAccountContractPayload>)
+  | ({ type: 'INVOKE_FUNCTION' } & OptionalPayload<AllowArray<Call>>)
+>;
 
 export type Status =
   | 'NOT_RECEIVED'
@@ -196,6 +209,12 @@ export type ParsedStruct = {
 export type waitForTransactionOptions = {
   retryInterval?: number;
   successStates?: Array<TransactionStatus>;
+};
+
+export type getSimulateTransactionOptions = {
+  blockIdentifier?: BlockIdentifier;
+  skipValidate?: boolean;
+  skipExecute?: boolean;
 };
 
 export interface CallStruct {

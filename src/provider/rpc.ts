@@ -1,5 +1,7 @@
 import { StarknetChainId } from '../constants';
 import {
+  AccountInvocationItem,
+  AccountInvocations,
   BigNumberish,
   BlockIdentifier,
   Call,
@@ -14,8 +16,6 @@ import {
   GetCodeResponse,
   GetTransactionResponse,
   Invocation,
-  InvocationBulk,
-  InvocationBulkItem,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   LegacyContractClass,
@@ -26,6 +26,7 @@ import {
   SimulateTransactionResponse,
   TransactionStatus,
   TransactionType,
+  getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
 import { CallData } from '../utils/calldata';
@@ -342,7 +343,7 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getEstimateFeeBulk(
-    invocations: InvocationBulk,
+    invocations: AccountInvocations,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<EstimateFeeResponseBulk> {
     const block_id = new Block(blockIdentifier).identifier;
@@ -550,10 +551,12 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getSimulateTransaction(
-    invocations: InvocationBulk,
-    blockIdentifier: BlockIdentifier = this.blockIdentifier,
-    skipValidate?: boolean,
-    skipExecute?: boolean
+    invocations: AccountInvocations,
+    {
+      blockIdentifier = this.blockIdentifier,
+      skipValidate = false,
+      skipExecute = false,
+    }: getSimulateTransactionOptions
   ): Promise<SimulateTransactionResponse> {
     const block_id = new Block(blockIdentifier).identifier;
 
@@ -576,7 +579,7 @@ export class RpcProvider implements ProviderInterface {
     return getAddressFromStarkName(this, name, StarknetIdContract);
   }
 
-  public buildInvocation(invocation: InvocationBulkItem): RPC.BroadcastedTransaction {
+  public buildInvocation(invocation: AccountInvocationItem): RPC.BroadcastedTransaction {
     if (invocation.type === TransactionType.INVOKE) {
       // Diff between sequencer and rpc invoke type
       return {

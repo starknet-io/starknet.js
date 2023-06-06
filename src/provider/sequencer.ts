@@ -2,6 +2,8 @@ import urljoin from 'url-join';
 
 import { BaseUrl, NetworkName, StarknetChainId } from '../constants';
 import {
+  AccountInvocationItem,
+  AccountInvocations,
   BigNumberish,
   BlockIdentifier,
   CairoAssembly,
@@ -21,8 +23,6 @@ import {
   GetTransactionResponse,
   GetTransactionStatusResponse,
   Invocation,
-  InvocationBulk,
-  InvocationBulkItem,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Sequencer,
@@ -32,13 +32,13 @@ import {
   StateUpdateResponse,
   TransactionStatus,
   TransactionType,
+  getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
 import {
-  feeTransactionVersion,
   getSelector,
   getSelectorFromName,
   transactionVersion,
@@ -459,7 +459,7 @@ export class SequencerProvider implements ProviderInterface {
           sender_address: senderAddress,
           contract_class: contract,
           signature: signatureToDecimalArray(signature),
-          version: toHex(feeTransactionVersion),
+          version: toHex(transactionVersion),
           nonce: toHex(details.nonce),
         }
       ).then(this.responseParser.parseFeeEstimateResponse);
@@ -502,7 +502,7 @@ export class SequencerProvider implements ProviderInterface {
   }
 
   public async getEstimateFeeBulk(
-    invocations: InvocationBulk,
+    invocations: AccountInvocations,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<EstimateFeeResponseBulk> {
     const params: Sequencer.EstimateFeeRequestBulk = invocations.map((invocation) => {
@@ -641,13 +641,20 @@ export class SequencerProvider implements ProviderInterface {
    * @returns
    */
   public async getSimulateTransaction(
-    invocations: InvocationBulk,
-    blockIdentifier: BlockIdentifier = this.blockIdentifier,
-    skipValidate?: boolean
+    invocations: AccountInvocations,
+    {
+      blockIdentifier = this.blockIdentifier,
+      skipValidate = false,
+      skipExecute = false,
+    }: getSimulateTransactionOptions
   ): Promise<SimulateTransactionResponse> {
     if (invocations.length > 1) {
       // eslint-disable-next-line no-console
       console.warn('Sequencer simulate process only first element from invocations list');
+    }
+    if (skipExecute) {
+      // eslint-disable-next-line no-console
+      console.warn("Sequencer can't skip account __execute__");
     }
     return this.fetchEndpoint(
       'simulate_transaction',
@@ -686,7 +693,7 @@ export class SequencerProvider implements ProviderInterface {
     return getAddressFromStarkName(this, name, StarknetIdContract);
   }
 
-  public buildInvocation(invocation: InvocationBulkItem): Sequencer.SimulateTransactionItem {
+  public buildInvocation(invocation: AccountInvocationItem): Sequencer.SimulateTransactionItem {
     if (invocation.type === TransactionType.INVOKE) {
       return {
         type: invocation.type,
