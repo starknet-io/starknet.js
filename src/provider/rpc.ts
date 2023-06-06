@@ -26,13 +26,20 @@ import {
   SimulateTransactionResponse,
   TransactionStatus,
   TransactionType,
+  getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
-import { getSelectorFromName, transactionVersion, transactionVersion_2 } from '../utils/hash';
+import {
+  feeTransactionVersion,
+  feeTransactionVersion_2,
+  getSelectorFromName,
+  transactionVersion,
+  transactionVersion_2,
+} from '../utils/hash';
 import { stringify } from '../utils/json';
 import { toHex } from '../utils/num';
 import { wait } from '../utils/provider';
@@ -344,11 +351,14 @@ export class RpcProvider implements ProviderInterface {
 
   public async getEstimateFeeBulk(
     invocations: AccountInvocations,
-    blockIdentifier: BlockIdentifier = this.blockIdentifier
+    { blockIdentifier = this.blockIdentifier, skipValidate = false }: getEstimateFeeBulkOptions
   ): Promise<EstimateFeeResponseBulk> {
+    if (skipValidate) {
+      console.warn('getEstimateFeeBulk RPC does not support skipValidate');
+    }
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_estimateFee', {
-      request: invocations.map(this.buildInvocation),
+      request: invocations.map((it) => this.buildInvocation(it, 'estimate')),
       block_id,
     }).then(this.responseParser.parseFeeEstimateOriginalResponse);
   }
@@ -566,7 +576,7 @@ export class RpcProvider implements ProviderInterface {
 
     return this.fetchEndpoint('starknet_simulateTransaction', {
       block_id,
-      transactions: invocations.map(this.buildInvocation), // Pathfinder 0.5.6 bug, should be transaction
+      transactions: invocations.map((it) => this.buildInvocation(it, 'simulate')), // Pathfinder 0.5.6 bug, should be transaction
       simulation_flags: simulationFlags,
     }).then(this.responseParser.parseSimulateTransactionResponse);
   }
@@ -579,7 +589,14 @@ export class RpcProvider implements ProviderInterface {
     return getAddressFromStarkName(this, name, StarknetIdContract);
   }
 
-  public buildInvocation(invocation: AccountInvocationItem): RPC.BroadcastedTransaction {
+  public buildInvocation(
+    invocation: AccountInvocationItem,
+    versionType?: string
+  ): RPC.BroadcastedTransaction {
+    const defVersion = versionType === 'simulate' ? transactionVersion : feeTransactionVersion;
+    const defVersion_2 =
+      versionType === 'simulate' ? transactionVersion_2 : feeTransactionVersion_2;
+
     if (invocation.type === TransactionType.INVOKE) {
       // Diff between sequencer and rpc invoke type
       return {
@@ -587,25 +604,27 @@ export class RpcProvider implements ProviderInterface {
         sender_address: invocation.contractAddress,
         calldata: CallData.toHex(invocation.calldata),
         signature: signatureToHexArray(invocation.signature),
-        version: toHex(invocation.version || 0),
+        version: toHex(invocation.version || defVersion),
         nonce: toHex(invocation.nonce),
         max_fee: toHex(invocation.maxFee || 0),
       };
     }
 
     if (invocation.type === RPC.TransactionType.DECLARE) {
+      // TODO: use isSierra after fixing ContractClass types
       if ('program' in invocation.contract) {
         return {
           type: invocation.type,
           contract_class: invocation.contract,
           sender_address: invocation.senderAddress,
           signature: signatureToHexArray(invocation.signature),
-          version: toHex(transactionVersion),
+          version: toHex(invocation.version || defVersion),
           nonce: toHex(invocation.nonce),
           max_fee: toHex(invocation.maxFee || 0),
         };
       }
       return {
+        // compiled_class_hash
         type: invocation.type,
         contract_class: {
           ...invocation.contract,
@@ -614,7 +633,7 @@ export class RpcProvider implements ProviderInterface {
         compiled_class_hash: invocation.compiledClassHash || '',
         sender_address: invocation.senderAddress,
         signature: signatureToHexArray(invocation.signature),
-        version: toHex(transactionVersion_2),
+        version: toHex(invocation.version || defVersion_2),
         nonce: toHex(invocation.nonce),
         max_fee: toHex(invocation.maxFee || 0),
       };
@@ -626,7 +645,7 @@ export class RpcProvider implements ProviderInterface {
       class_hash: toHex(invocation.classHash),
       contract_address_salt: toHex(invocation.addressSalt || 0),
       signature: signatureToHexArray(invocation.signature),
-      version: toHex(invocation.version || 0),
+      version: toHex(invocation.version || defVersion),
       nonce: toHex(invocation.nonce),
       max_fee: toHex(invocation.maxFee || 0),
     };

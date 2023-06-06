@@ -457,6 +457,7 @@ export namespace Sequencer {
     estimate_fee_bulk: {
       QUERY: {
         blockIdentifier: BlockIdentifier;
+        skipValidate: boolean;
       };
       REQUEST: EstimateFeeRequestBulk;
       RESPONSE: EstimateFeeResponseBulk;

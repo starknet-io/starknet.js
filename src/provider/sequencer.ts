@@ -32,6 +32,7 @@ import {
   StateUpdateResponse,
   TransactionStatus,
   TransactionType,
+  getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
@@ -503,7 +504,7 @@ export class SequencerProvider implements ProviderInterface {
 
   public async getEstimateFeeBulk(
     invocations: AccountInvocations,
-    blockIdentifier: BlockIdentifier = this.blockIdentifier
+    { blockIdentifier = this.blockIdentifier, skipValidate = false }: getEstimateFeeBulkOptions
   ): Promise<EstimateFeeResponseBulk> {
     const params: Sequencer.EstimateFeeRequestBulk = invocations.map((invocation) => {
       let res;
@@ -514,10 +515,18 @@ export class SequencerProvider implements ProviderInterface {
           calldata: CallData.compile(invocation.calldata ?? []),
         };
       } else if (invocation.type === TransactionType.DECLARE) {
+        if (!isSierra(invocation.contract)) {
+          res = {
+            type: invocation.type,
+            contract_class: invocation.contract,
+            sender_address: invocation.senderAddress,
+          };
+        }
         res = {
           type: invocation.type,
-          sender_address: invocation.senderAddress,
           contract_class: invocation.contract,
+          compiled_class_hash: invocation.compiledClassHash,
+          sender_address: invocation.senderAddress,
         };
       } else {
         res = {
@@ -537,7 +546,7 @@ export class SequencerProvider implements ProviderInterface {
       };
     });
 
-    return this.fetchEndpoint('estimate_fee_bulk', { blockIdentifier }, params).then(
+    return this.fetchEndpoint('estimate_fee_bulk', { blockIdentifier, skipValidate }, params).then(
       this.responseParser.parseFeeEstimateBulkResponse
     );
   }

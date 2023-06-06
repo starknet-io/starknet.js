@@ -31,6 +31,7 @@ export const transactionVersion = 1n;
 export const transactionVersion_2 = 2n;
 // TODO: check do we need to use feeTransactionVersion at all for feeEstimation ?
 export const feeTransactionVersion = 2n ** 128n + transactionVersion;
+export const feeTransactionVersion_2 = 2n ** 128n + transactionVersion_2;
 
 export function computeHashOnElements(data: BigNumberish[]): string {
   return [...data, data.length]

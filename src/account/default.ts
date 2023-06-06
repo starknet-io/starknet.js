@@ -4,6 +4,7 @@ import { Provider } from '../provider/default';
 import { Signer, SignerInterface } from '../signer';
 import {
   Abi,
+  AccountInvocationsFactoryDetails,
   AllowArray,
   BigNumberish,
   BlockIdentifier,
@@ -34,7 +35,6 @@ import {
   Signature,
   SimulateTransactionDetails,
   SimulateTransactionResponse,
-  TransactionBulk,
   TransactionStatus,
   TransactionType,
   TypedData,
@@ -47,6 +47,7 @@ import { parseUDCEvent } from '../utils/events';
 import {
   calculateContractAddressFromHash,
   feeTransactionVersion,
+  feeTransactionVersion_2,
   transactionVersion,
   transactionVersion_2,
 } from '../utils/hash';
@@ -207,15 +208,15 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async estimateFeeBulk(
-    transactions: TransactionBulk,
-    { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
+    invocations: Invocations,
+    { nonce: providedNonce, blockIdentifier, skipValidate }: EstimateFeeDetails = {}
   ): Promise<EstimateFeeBulk> {
-    const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
+    const nonce = this.getNonceSafe(providedNonce);
     const version = toBigInt(feeTransactionVersion);
     const chainId = await this.getChainId();
 
     const params: any = await Promise.all(
-      [].concat(transactions as []).map(async (transaction: any, index: number) => {
+      ([] as Invocations).concat(invocations).map(async (transaction: any, index: number) => {
         const signerDetails: InvocationsSignerDetails = {
           walletAddress: this.address,
           nonce: toBigInt(Number(nonce) + index),
@@ -225,7 +226,7 @@ export class Account extends Provider implements AccountInterface {
           cairoVersion: this.cairoVersion,
         };
 
-        const txPayload = transaction.payload;
+        const txPayload = transaction.payload ?? transaction;
 
         let res;
         if (typeof transaction === 'object' && transaction.type === 'INVOKE_FUNCTION') {
@@ -241,11 +242,14 @@ export class Account extends Provider implements AccountInterface {
             blockIdentifier,
           };
         } else if (typeof transaction === 'object' && transaction.type === 'DECLARE') {
+          signerDetails.version = isSierra(txPayload.contract)
+            ? toBigInt(feeTransactionVersion_2)
+            : toBigInt(feeTransactionVersion);
           const declareContractPayload = await this.buildDeclarePayload(txPayload, signerDetails);
           res = {
             type: 'DECLARE',
             ...declareContractPayload,
-            version,
+            version: signerDetails.version,
             nonce: toBigInt(Number(nonce) + index),
             blockIdentifier,
           };
@@ -273,7 +277,7 @@ export class Account extends Provider implements AccountInterface {
       })
     );
 
-    const response = await super.getEstimateFeeBulk(params, blockIdentifier);
+    const response = await super.getEstimateFeeBulk(params, { blockIdentifier, skipValidate });
 
     return [].concat(response as []).map((elem: any) => {
       const suggestedMaxFee = estimatedFeeToMaxFee(elem.overall_fee);
@@ -687,13 +691,12 @@ export class Account extends Provider implements AccountInterface {
       skipExecute,
     }: SimulateTransactionDetails = {}
   ): Promise<SimulateTransactionResponse> {
-    const invocationsArr = ([] as Invocations).concat(invocations);
     const nonce = await this.getNonceSafe(providedNonce);
     const version = toBigInt(transactionVersion);
     const chainId = await this.getChainId();
 
     const accountInvocations: any = await Promise.all(
-      ([] as Invocations).concat(invocationsArr).map(async (transaction: any, index: number) => {
+      ([] as Invocations).concat(invocations).map(async (transaction: any, index: number) => {
         const signerDetails: InvocationsSignerDetails = {
           walletAddress: this.address,
           nonce: toBigInt(Number(nonce) + index),
@@ -703,7 +706,7 @@ export class Account extends Provider implements AccountInterface {
           cairoVersion: this.cairoVersion,
         };
 
-        const txPayload = transaction.payload ? transaction.payload : transaction;
+        const txPayload = transaction.payload ?? transaction;
 
         let res: any; // AccountInvocations
         if (typeof transaction === 'object' && transaction.type === 'INVOKE_FUNCTION') {
@@ -726,7 +729,7 @@ export class Account extends Provider implements AccountInterface {
           res = {
             type: 'DECLARE',
             ...declareContractPayload,
-            version,
+            version: signerDetails.version,
             nonce: toBigInt(Number(nonce) + index),
             blockIdentifier,
           };
@@ -735,6 +738,16 @@ export class Account extends Provider implements AccountInterface {
           res = {
             type: 'DEPLOY_ACCOUNT',
             ...payload,
+            version,
+            nonce: toBigInt(Number(nonce) + index),
+            blockIdentifier,
+          };
+        } else if (typeof transaction === 'object' && transaction.type === 'DEPLOY') {
+          const calls = this.buildUDCContractPayload(txPayload);
+          const invocation = await this.buildInvocation(calls, signerDetails);
+          res = {
+            type: 'INVOKE_FUNCTION',
+            ...invocation,
             version,
             nonce: toBigInt(Number(nonce) + index),
             blockIdentifier,
@@ -752,6 +765,84 @@ export class Account extends Provider implements AccountInterface {
     });
 
     return response;
+  }
+
+  public async accountInvocationsFactory(
+    invocations: Invocations,
+    { versions, nonce, blockIdentifier }: AccountInvocationsFactoryDetails
+  ) {
+    const version = versions[0];
+    const safeNonce = await this.getNonceSafe(nonce);
+    const chainId = await this.getChainId();
+
+    return Promise.all(
+      ([] as Invocations).concat(invocations).map(async (transaction: any, index: number) => {
+        const signerDetails: InvocationsSignerDetails = {
+          walletAddress: this.address,
+          nonce: toBigInt(Number(safeNonce) + index),
+          maxFee: ZERO,
+          version,
+          chainId,
+          cairoVersion: this.cairoVersion,
+        };
+
+        const txPayload = transaction.payload ?? transaction;
+
+        let res: any; // AccountInvocations
+        if (typeof transaction === 'object' && transaction.type === TransactionType.INVOKE) {
+          const invocation = await this.buildInvocation(
+            Array.isArray(txPayload) ? txPayload : [txPayload],
+            signerDetails
+          );
+          res = {
+            type: transaction.type,
+            ...invocation,
+            version,
+            nonce: toBigInt(Number(safeNonce) + index),
+            blockIdentifier,
+          };
+        } else if (
+          typeof transaction === 'object' &&
+          transaction.type === TransactionType.DECLARE
+        ) {
+          signerDetails.version = isSierra(txPayload.contract)
+            ? toBigInt(versions[0])
+            : toBigInt(versions[1]);
+          const declareContractPayload = await this.buildDeclarePayload(txPayload, signerDetails);
+          res = {
+            type: transaction.type,
+            ...declareContractPayload,
+            version: signerDetails.version,
+            nonce: toBigInt(Number(safeNonce) + index),
+            blockIdentifier,
+          };
+        } else if (
+          typeof transaction === 'object' &&
+          transaction.type === TransactionType.DEPLOY_ACCOUNT
+        ) {
+          const payload = await this.buildAccountDeployPayload(txPayload, signerDetails);
+          res = {
+            type: transaction.type,
+            ...payload,
+            version,
+            nonce: toBigInt(Number(safeNonce) + index),
+            blockIdentifier,
+          };
+        } else if (typeof transaction === 'object' && transaction.type === TransactionType.DEPLOY) {
+          const calls = this.buildUDCContractPayload(txPayload);
+          const invocation = await this.buildInvocation(calls, signerDetails);
+          res = {
+            type: TransactionType.INVOKE,
+            ...invocation,
+            version,
+            nonce: toBigInt(Number(safeNonce) + index),
+            blockIdentifier,
+          };
+        }
+
+        return res;
+      })
+    );
   }
 
   public override async getStarkName(

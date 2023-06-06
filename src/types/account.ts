@@ -7,6 +7,12 @@ export interface EstimateFee extends EstimateFeeResponse {
 
 export type EstimateFeeBulk = Array<EstimateFee>;
 
+export type AccountInvocationsFactoryDetails = {
+  versions: bigint[];
+  nonce?: BigNumberish;
+  blockIdentifier?: BlockIdentifier;
+};
+
 export interface EstimateFeeDetails {
   nonce?: BigNumberish;
   blockIdentifier?: BlockIdentifier;

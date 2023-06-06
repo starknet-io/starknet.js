@@ -27,6 +27,7 @@ import {
   SimulateTransactionResponse,
   StateUpdateResponse,
   Storage,
+  getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
@@ -110,9 +111,9 @@ export class Provider implements ProviderInterface {
 
   public async getEstimateFeeBulk(
     invocations: AccountInvocations,
-    blockIdentifier?: BlockIdentifier
+    options: getEstimateFeeBulkOptions
   ): Promise<EstimateFeeResponseBulk> {
-    return this.provider.getEstimateFeeBulk(invocations, blockIdentifier);
+    return this.provider.getEstimateFeeBulk(invocations, options);
   }
 
   public async getNonceForAddress(

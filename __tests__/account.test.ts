@@ -203,6 +203,26 @@ describe('deploy and test Wallet', () => {
       ]);
       expect(res).toMatchSchemaRef('SimulateTransactionResponse');
     });
+    test('simulate multi INVOKE', async () => {
+      const res = await account.simulateTransaction([
+        {
+          type: TransactionType.INVOKE,
+          payload: [
+            {
+              contractAddress: erc20Address,
+              entrypoint: 'transfer',
+              calldata: [erc20.address, '10', '0'],
+            },
+            {
+              contractAddress: erc20Address,
+              entrypoint: 'transfer',
+              calldata: [erc20.address, '10', '0'],
+            },
+          ],
+        },
+      ]);
+      expect(res).toMatchSchemaRef('SimulateTransactionResponse');
+    });
     test('simulate DECLARE - Cairo 0 Contract', async () => {
       const res = await account.simulateTransaction([
         {
@@ -222,7 +242,41 @@ describe('deploy and test Wallet', () => {
       ]);
       expect(res).toMatchSchemaRef('SimulateTransactionResponse');
     });
-
+    test('simulate DEPLOY - Cairo 0 Contract', async () => {
+      const res = await account.simulateTransaction([
+        {
+          type: TransactionType.DEPLOY,
+          classHash: erc20ClassHash,
+          constructorCalldata: [
+            encodeShortString('Token'),
+            encodeShortString('ERC20'),
+            account.address,
+          ],
+        },
+      ]);
+      expect(res).toMatchSchemaRef('SimulateTransactionResponse');
+    });
+    test('simulate multi DEPLOY - Cairo 0 Contract', async () => {
+      const res = await account.simulateTransaction([
+        {
+          type: TransactionType.DEPLOY,
+          payload: [
+            {
+              classHash: '0x04367b26fbb92235e8d1137d19c080e6e650a6889ded726d00658411cc1046f5',
+            },
+            {
+              classHash: erc20ClassHash,
+              constructorCalldata: [
+                encodeShortString('Token'),
+                encodeShortString('ERC20'),
+                account.address,
+              ],
+            },
+          ],
+        },
+      ]);
+      expect(res).toMatchSchemaRef('SimulateTransactionResponse');
+    });
     test('simulate DEPLOY_ACCOUNT - Cairo 0 Account', async () => {
       const declareAccount = await account.declare({
         contract: compiledOpenZeppelinAccount,
@@ -590,7 +644,14 @@ describe('deploy and test Wallet', () => {
 
     test('declare, deploy & invoke functions', async () => {
       const res = await account.estimateFeeBulk([
+        /* {
+          // Cairo 1.1.0, can't redeclare same contract
+          type: TransactionType.DECLARE,
+          contract: compiledHelloSierra,
+          casm: compiledHelloSierraCasm,
+        }, */
         {
+          // Cairo 0
           type: 'DECLARE',
           payload: {
             contract: compiledErc20,

@@ -138,14 +138,6 @@ export enum TransactionStatus {
   REJECTED = 'REJECTED',
 }
 
-// TODO: mabe can be removed ?!
-export type TransactionBulk = Array<
-  | ({ type: 'DECLARE' } & { payload: DeclareContractPayload })
-  | ({ type: 'DEPLOY' } & { payload: AllowArray<UniversalDeployerContractPayload> })
-  | ({ type: 'DEPLOY_ACCOUNT' } & { payload: DeployAccountContractPayload })
-  | ({ type: 'INVOKE_FUNCTION' } & { payload: AllowArray<Call> })
->;
-
 /**
  * items used by AccountInvocations
  */
@@ -215,6 +207,11 @@ export type getSimulateTransactionOptions = {
   blockIdentifier?: BlockIdentifier;
   skipValidate?: boolean;
   skipExecute?: boolean;
+};
+
+export type getEstimateFeeBulkOptions = {
+  blockIdentifier?: BlockIdentifier;
+  skipValidate?: boolean;
 };
 
 export interface CallStruct {

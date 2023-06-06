@@ -25,6 +25,7 @@ import type {
   SimulateTransactionResponse,
   StateUpdateResponse,
   Storage,
+  getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
@@ -284,24 +285,21 @@ export abstract class ProviderInterface {
   /**
    * Estimates the fee for a list of INVOKE transaction
    *
-   * @param invocations the array of invocation and invocation details object containing:
-   * - contractAddress - the address of the account
-   * - calldata - (defaults to []) the calldata
-   * - signature - (defaults to []) the signature
-   * - nonce - optional nonce
-   * - version - optional version
-   * @param blockIdentifier - block identifier
+   * @param invocations AccountInvocations - Complete invocations array with account details
+   * @param options getEstimateFeeBulkOptions
+   * - (optional) blockIdentifier - BlockIdentifier
+   * - (optional) skipValidate - boolean (default false)
    * @returns the estimated fee
    */
   public abstract getEstimateFeeBulk(
     invocations: AccountInvocations,
-    blockIdentifier?: BlockIdentifier
+    options?: getEstimateFeeBulkOptions
   ): Promise<EstimateFeeResponseBulk>;
 
   /**
    * Wait for the transaction to be accepted
    * @param txHash - transaction hash
-   * @param options
+   * @param options waitForTransactionOptions
    * - (optional) retryInterval: number | undefined;
    * - (optional) successStates: TransactionStatus[] | undefined;
    * @return GetTransactionReceiptResponse
@@ -314,12 +312,12 @@ export abstract class ProviderInterface {
   /**
    * Simulates the transaction and returns the transaction trace and estimated fee.
    *
-   * @param invocations an array of invocations object containing:
- 
-   * @param blockIdentifier - (optional) block identifier
-   * @param skipValidate - (optional) skip cairo __validate__ method
-   * @param skipExecute - (optional) skip cairo __execute__ method
-   * @returns an array of  transaction trace and estimated fee
+   * @param invocations AccountInvocations - Complete invocations array with account details
+   * @param options - getSimulateTransactionOptions
+   *  - (optional) blockIdentifier - block identifier
+   *  - (optional) skipValidate - skip cairo __validate__ method
+   *  - (optional) skipExecute - skip cairo __execute__ method
+   * @returns an array of transaction trace and estimated fee
    */
 
   public abstract getSimulateTransaction(
