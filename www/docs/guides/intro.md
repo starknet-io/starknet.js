@@ -20,13 +20,13 @@ npm install starknet@next
 
 ### With Devnet
 
-Example devnet version is `0.7.1`.
+Example devnet version is `0.5.3`.
 
 Get devnet with docker:
 
 ```bash
-docker pull shardlabs/starknet-devnet:0.7.1
-docker run -p 5050:5050 shardlabs/starknet-devnet:0.7.1 --seed 0
+docker pull shardlabs/starknet-devnet:0.5.3
+docker run -p 5050:5050 shardlabs/starknet-devnet:0.5.3 --seed 0
 ```
 
 Open new console tab, go to your starknet.js directory and run:
@@ -61,12 +61,14 @@ npm run start # fires up a local documentation site
 
 Please check the Starknet documentation <ins>[here](https://www.cairo-lang.org/docs/hello_starknet/intro.html)</ins> to compile Starknet contracts.
 
-Additional helpful resources can also be found at <ins>[OpenZeppelin](https://docs.openzeppelin.com/contracts-cairo/0.5.0/)</ins> documentation site.
-
-Get the class hash of a contract: [starkli](https://github.com/xJonathanLEI/starkli).
+Additional helpful resources can also be found at <ins>[OpenZeppelin](https://docs.openzeppelin.com/contracts-cairo/0.6.1/)</ins> documentation site.
 
 ## Full example with account & erc20 deployments
 
 Please take a look at our workshop using OpenZeppelin contracts <ins>[here](https://github.com/0xs34n/starknet.js-workshop)</ins>.
 
 Example with Argent contract <ins>[here](https://github.com/0xs34n/starknet.js-account)</ins>.
+
+## contracts used in the guides
+
+You can find the compiled contracts used in these guides in `compiled_contracts` directory.

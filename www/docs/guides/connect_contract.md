@@ -9,22 +9,28 @@ Once your provider is initialized, you can connect a contract already deployed i
 You need 2 data :
 
 - the address of the contract
-- the ABI file of the contract (or the compiled contract file, that includes the abi)
+- the ABI file of the contract (or the compiled/compressed contract file, that includes the abi)
 
-> If you don't have the abi file, the `provider.getClassAt()` command can help you.
+> If you don't have the abi file, the `provider.getClassAt()` and `provider.getClassByHash()` commands will recover the compressed contract file. As these methods generates a significant workload to the sequencer/node, it's recommended to store the result in your computer, to be able to reuse it later without using the provider :
+
+```typescript
+import fs from "fs";
+const compressedContract = await provider.getClassAt(addrContract);
+fs.writeFileSync('./myAbi.json', json.stringify( compressedContract.abi, undefined, 2));
+```
 
 > When possible, prefer to read the compiled contract from a local Json file, as it's much more faster, using the `json.parse` util provided by Starknet.js, as shown below.
 
-## Get the abi from a compiled file
+## Get the abi from a compiled/compressed file
 
 ```typescript
 import { Provider, Contract, json } from "starknet";
 ```
 
-If you have the compiled file of the contract, use this code to recover all data, including ABI :
+If you have the compiled/compressed file of the contract, use this code to recover all data, including ABI :
 
 ```typescript
-const compiledContract = json.parse(fs.readFileSync("./compiledContracts/test.json").toString("ascii"));
+const compiledContract = json.parse(fs.readFileSync( "./compiledContracts/test.json").toString( "ascii"));
 ```
 
 > Note the `json.parse` util provided by Starknet.js
@@ -33,11 +39,11 @@ const compiledContract = json.parse(fs.readFileSync("./compiledContracts/test.js
 
 ```typescript
 // initialize provider
-const provider = new Provider({ sequencer: { network: NetworkName.SN_GOERLI } });
+const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } });
 
 // initialize deployed contract
 const testAddress = "0x7667469b8e93faa642573078b6bf8c790d3a6184b2a1bb39c5c923a732862e1";
-const compiledTest = json.parse(fs.readFileSync("./compiledContracts/test.json").toString("ascii"));
+const compiledTest = json.parse(fs.readFileSync( "./compiledContracts/test.json").toString("ascii"));
 
 // connect the contract
 const myTestContract = new Contract(compiledTest.abi, testAddress, provider);

@@ -10,27 +10,26 @@ You can use Starknet.js to sign a message outside of the network, using the stan
 
 Your message has to be an array of `BigNumberish`. First calculate the hash of this message, then calculate the signature.
 
-> If the message does not respect some safety rules of composition, this method could be a way of attack of your smart contract. If you have any doubts, prefer the [EIP712 like method](#sign-and-verify-following-eip712), which is safe, but is also more complicated.
+> If the message does not respect some safety rules of composition, this method could be a way of attack of your smart contract. If you have any doubt, prefer the [EIP712 like method](#sign-and-verify-following-eip712), which is safe, but is also more complicated.
 
 ```typescript
 import {ec, hash, num, json, Contract } from "starknet";
 
 const privateKey = "0x1234567890987654321";
-const starkKeyPair = ec.getKeyPair(privateKey);
-const starknetPublicKey = ec.getStarkKey(starkKeyPair);
-const fullPublicKey=starkKeyPair.getPublic("hex");
+const starknetPublicKey = ec.starkCurve.getStarkKey(privateKey);
+const fullPublicKey = encode.addHexPrefix( encode.buf2hex( ec.starkCurve.getPublicKey( privateKey, false)));
 
 const message : BigNumberish[] = [1, 128, 18, 14];
 
 const msgHash = hash.computeHashOnElements(message);
-const signature = ec.sign(starkKeyPair, msgHash);
+const signature: weierstrass.SignatureType = ec.starkCurve.sign(msgHash,privateKey);
 ```
 
 Then you can send, by any means, to the recipient of the message:
 
 - the message.
 - the signature.
-- the full public key (or a wallet address).
+- the full public key (or an account address using this private key).
 
 ## Receive and verify a message
 
@@ -49,9 +48,8 @@ On receiver side, you can verify that:
 The sender provides the message, the signature and the full public key. Verification:
 
 ```typescript
-const starkKeyPair1 = ec.getKeyPairFromPublicKey(fullPublicKey);
 const msgHash1 = hash.computeHashOnElements(message);
-const result1 = ec.verify(starkKeyPair1, msgHash1, signature);
+const result1 = ec.starkCurve.verify(signature, msgHash1, fullPublicKey);
 console.log("Result (boolean) =", result1);
 ```
 
@@ -71,8 +69,7 @@ Check that the pubKey of the account is part of the full pubKey:
 
 ```typescript
 const isFullPubKeyRelatedToAccount: boolean =
-    BigInt(pubKey3.publicKey.toString()) ==
-    BigInt(encode.addHexPrefix(fullPublicKey.slice(4, 68)));
+    publicKey.publicKey == BigInt(encode.addHexPrefix( fullPublicKey.slice( 4, 68)));
 console.log("Result (boolean)=", isFullPubKeyRelatedToAccount);
 ```
 
@@ -90,7 +87,7 @@ const msgHash2 = hash.computeHashOnElements(message);
 // The call of isValidSignature will generate an error if not valid
     let result2: boolean;
     try {
-        await contractAccount.call("isValidSignature", [msgHash2, signature]);
+        await contractAccount.isValidSignature(msgHash2, [signature.r,signature.s]);
         result2 = true;
     } catch {
         result2 = false;
@@ -172,7 +169,8 @@ const typedDataValidate: typedData.TypedData = {
     };
 
 // connect your account, then
-const signature4 = await account.signMessage(typedDataValidate);
+const signature2: weierstrass.SignatureType = await account.signMessage(typedDataValidate) as weierstrass.SignatureType;
+
 ```
 
 On receiver side, you receive the json, the signature and the account address. To verify the message:
@@ -185,7 +183,7 @@ const msgHash5 = typedData.getMessageHash(typedDataValidate, accountAddress);
 // The call of isValidSignature will generate an error if not valid
 let result5: boolean;
 try {
-    await contractAccount.call("isValidSignature", [msgHash5, signature5]);
+    await contractAccount.isValidSignature(msgHash5, [signature2.r, signature2.s]);
     result5 = true;
 } catch {
     result5 = false;

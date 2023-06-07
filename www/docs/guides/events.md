@@ -16,7 +16,7 @@ The events are stored in a block on the blockchain.
 
 ## Events in the Cairo code
 
-You have to analyze the Cairo code of your smart contract, to recover the list of data emitted by the event :
+You have to analyze the Cairo code of your smart contract, to recover the list of data emitted by the event. An example in Cairo 0 :
 
 ```cairo
 @event
@@ -53,17 +53,10 @@ Once compiled, this code will generate an abi file containing :
 
 Once the `my_func` is invoked, the event is stored in the blockchain and you get in return the transaction hash.
 
-```javascript
-const resu = await myTestContract.invoke("my_func");
-const txReceiptDeployTest = await provider.waitForTransaction(resu.transaction_hash);
-```
-
-In Typescript, you have to change a little the code :
-
 ```typescript
-import { num, InvokeTransactionReceiptResponse } from "starknet";
+import { InvokeTransactionReceiptResponse } from "starknet";
 
-const resu = await myTestContract.invoke("my_func");
+const resu = await myTestContract.my_func();
 const txReceiptDeployTest: InvokeTransactionReceiptResponse = await provider.waitForTransaction(resu.transaction_hash);
 console.log("events =",txReceiptDeployTest.events);
 ```
@@ -96,7 +89,7 @@ Now, you have all the events of the block. Here, we have 2 events - the last one
 
 ```
 
-Use the contract deployment address, to filter the events and read the data from your smart contract :
+Use the contract deployment address `testContractAddress`, to filter the events and read the data from your smart contract :
 
 ```typescript
 const event = txReceiptDeployTest.events.find(
@@ -107,3 +100,5 @@ const eventD1 = event.data[0];
 const eventD2 = event.data[1];
 const eventD3 = event.data[2];
 ```
+
+If you do not have the transaction hash, you have to search in the blocks of Starknet. See an example [here](connect_network#specific-rpc-methods).
