@@ -354,6 +354,7 @@ export class RpcProvider implements ProviderInterface {
     { blockIdentifier = this.blockIdentifier, skipValidate = false }: getEstimateFeeBulkOptions
   ): Promise<EstimateFeeResponseBulk> {
     if (skipValidate) {
+      // eslint-disable-next-line no-console
       console.warn('getEstimateFeeBulk RPC does not support skipValidate');
     }
     const block_id = new Block(blockIdentifier).identifier;

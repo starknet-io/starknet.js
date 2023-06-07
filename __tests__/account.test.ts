@@ -26,7 +26,6 @@ import {
   compiledStarknetId,
   compiledTestDapp,
   describeIfDevnetSequencer,
-  describeIfSequencer,
   erc20ClassHash,
   getTestAccount,
   getTestProvider,
@@ -151,35 +150,6 @@ describe('deploy and test Wallet', () => {
         },
       ]);
       expect(deployments).toMatchSchemaRef('MultiDeployContractResponse');
-    });
-
-    test('estimate fee bulk', async () => {
-      const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
-      const estimatedFeeBulk = await account.estimateFeeBulk([
-        {
-          type: 'INVOKE_FUNCTION',
-          payload: {
-            contractAddress: erc20Address,
-            entrypoint: 'transfer',
-            calldata: [erc20.address, '10', '0'],
-          },
-        },
-        {
-          type: 'INVOKE_FUNCTION',
-          payload: {
-            contractAddress: erc20Address,
-            entrypoint: 'transfer',
-            calldata: [erc20.address, '10', '0'],
-          },
-        },
-      ]);
-
-      estimatedFeeBulk.forEach((value) => {
-        expect(value).toMatchSchemaRef('EstimateFee');
-      });
-      expect(estimatedFeeBulk.length).toEqual(2);
-      expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
-      innerInvokeEstFeeSpy.mockClear();
     });
   });
 
@@ -578,7 +548,7 @@ describe('deploy and test Wallet', () => {
     });
   });
 
-  describeIfSequencer('Estimate fee bulk', () => {
+  describe('Estimate fee bulk', () => {
     let accountClassHash: string;
     let precalculatedAddress: string;
     let starkKeyPub: string;
@@ -602,7 +572,36 @@ describe('deploy and test Wallet', () => {
       newAccount = new Account(provider, precalculatedAddress, privateKey);
     });
 
-    test('deploy account & invoke functions', async () => {
+    test('estimate fee bulk invoke functions', async () => {
+      const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
+      const estimatedFeeBulk = await account.estimateFeeBulk([
+        {
+          type: 'INVOKE_FUNCTION',
+          payload: {
+            contractAddress: erc20Address,
+            entrypoint: 'transfer',
+            calldata: [erc20.address, '10', '0'],
+          },
+        },
+        {
+          type: 'INVOKE_FUNCTION',
+          payload: {
+            contractAddress: erc20Address,
+            entrypoint: 'transfer',
+            calldata: [erc20.address, '10', '0'],
+          },
+        },
+      ]);
+
+      estimatedFeeBulk.forEach((value) => {
+        expect(value).toMatchSchemaRef('EstimateFee');
+      });
+      expect(estimatedFeeBulk.length).toEqual(2);
+      expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
+      innerInvokeEstFeeSpy.mockClear();
+    });
+
+    test('deploy account & multi invoke functions', async () => {
       const { transaction_hash } = await account.execute({
         contractAddress: erc20Address,
         entrypoint: 'transfer',
@@ -642,7 +641,7 @@ describe('deploy and test Wallet', () => {
       });
     });
 
-    test('declare, deploy & invoke functions', async () => {
+    test('declare, deploy & multi invoke functions', async () => {
       const res = await account.estimateFeeBulk([
         /* {
           // Cairo 1.1.0, can't redeclare same contract
