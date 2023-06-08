@@ -179,9 +179,3 @@ const amountIn: uint256.Uint256 = cairo.uint256(50000n);
 
 In your DAPP React code, you can connect to ArgentX or Braavos wallets, using get-starknet library. The current v2.1.0 version isn't compatible with starknet.js v5.  
 An update is expected.
-
-```typescript
-// v4
-
-// v5
-```
