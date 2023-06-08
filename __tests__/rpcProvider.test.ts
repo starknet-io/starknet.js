@@ -5,7 +5,6 @@ import { StarknetChainId } from '../src/constants';
 import { CallData } from '../src/utils/calldata';
 import { felt, uint256 } from '../src/utils/calldata/cairo';
 import { toHexString } from '../src/utils/num';
-// import { toBigInt } from '../src/utils/num';
 import {
   compiledErc20Echo,
   compiledOpenZeppelinAccount,

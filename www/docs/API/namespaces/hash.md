@@ -38,9 +38,48 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:32](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L32)
+[src/utils/hash.ts:33](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L33)
+
+---
+
+### feeTransactionVersion_2
+
+• `Const` **feeTransactionVersion_2**: `bigint`
+
+#### Defined in
+
+[src/utils/hash.ts:34](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L34)
 
 ## Functions
+
+### getVersionsByType
+
+▸ **getVersionsByType**(`versionType?`): `Object`
+
+Return versions based on version type, default transaction versions
+
+#### Parameters
+
+| Name           | Type                       | Description            |
+| :------------- | :------------------------- | :--------------------- |
+| `versionType?` | `"fee"` \| `"transaction"` | 'fee' \| 'transaction' |
+
+#### Returns
+
+`Object`
+
+versions { v1: bigint; v2: bigint; }
+
+| Name | Type     |
+| :--- | :------- |
+| `v1` | `bigint` |
+| `v2` | `bigint` |
+
+#### Defined in
+
+[src/utils/hash.ts:41](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L41)
+
+---
 
 ### computeHashOnElements
 
@@ -58,7 +97,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:34](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L34)
+[src/utils/hash.ts:47](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L47)
 
 ---
 
@@ -85,7 +124,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:43](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L43)
+[src/utils/hash.ts:56](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L56)
 
 ---
 
@@ -108,7 +147,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:67](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L67)
+[src/utils/hash.ts:80](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L80)
 
 ---
 
@@ -134,7 +173,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:84](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L84)
+[src/utils/hash.ts:97](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L97)
 
 ---
 
@@ -161,7 +200,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:105](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L105)
+[src/utils/hash.ts:118](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L118)
 
 ---
 
@@ -186,7 +225,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:129](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L129)
+[src/utils/hash.ts:142](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L142)
 
 ---
 
@@ -209,7 +248,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:149](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L149)
+[src/utils/hash.ts:162](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L162)
 
 ---
 
@@ -229,7 +268,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:181](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L181)
+[src/utils/hash.ts:194](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L194)
 
 ---
 
@@ -249,7 +288,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:199](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L199)
+[src/utils/hash.ts:212](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L212)
 
 ---
 
@@ -269,7 +308,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:208](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L208)
+[src/utils/hash.ts:221](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L221)
 
 ---
 
@@ -289,7 +328,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:261](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L261)
+[src/utils/hash.ts:274](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L274)
 
 ---
 
@@ -299,9 +338,9 @@ custom_edit_url: null
 
 #### Parameters
 
-| Name     | Type                                                  |
-| :------- | :---------------------------------------------------- |
-| `sierra` | [`SierraContractClass`](types.md#sierracontractclass) |
+| Name     | Type                                        |
+| :------- | :------------------------------------------ |
+| `sierra` | [`CompiledSierra`](types.md#compiledsierra) |
 
 #### Returns
 
@@ -309,7 +348,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:302](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L302)
+[src/utils/hash.ts:315](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L315)
 
 ---
 
@@ -333,7 +372,7 @@ HexString ClassHash
 
 #### Defined in
 
-[src/utils/hash.ts:340](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L340)
+[src/utils/hash.ts:353](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L353)
 
 ---
 

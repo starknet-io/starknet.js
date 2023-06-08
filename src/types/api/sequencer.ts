@@ -248,27 +248,21 @@ export namespace Sequencer {
   export type DeployAccountEstimateFee = Omit<DeployAccountTransaction, 'max_fee'>;
   export type DeployEstimateFee = DeployTransaction;
 
-  export type EstimateFeeRequest =
-    | InvokeEstimateFee
-    | DeclareEstimateFee
-    | DeployEstimateFee
-    | DeployAccountEstimateFee;
-
   export type SimulateTransactionResponse = {
     trace: TransactionTraceResponse; // diff with OPENRPC "transaction_trace"
     fee_estimation: Sequencer.EstimateFeeResponse;
   };
 
-  export type SimulateTransaction = SimulateTransactionItem;
-
-  export type SimulateTransactionItem =
+  export type AccountTransactionItem =
     | InvokeEstimateFee
     | DeclareEstimateFee
-    | Omit<DeployAccountEstimateFee, 'sender_address'>;
+    | DeployEstimateFee
+    | DeployAccountEstimateFee;
 
-  export type EstimateFeeRequestBulk = AllowArray<
-    InvokeEstimateFee | DeclareEstimateFee | DeployEstimateFee | DeployAccountEstimateFee
-  >;
+  /**
+   * Transaction filled with account data
+   */
+  export type AccountTransaction = AllowArray<AccountTransactionItem>;
 
   // Support 0.9.1 changes in a backward-compatible way
   export type EstimateFeeResponse =
@@ -406,7 +400,7 @@ export namespace Sequencer {
         blockIdentifier: BlockIdentifier;
         skipValidate: boolean;
       };
-      REQUEST: EstimateFeeRequest;
+      REQUEST: AccountTransactionItem;
       RESPONSE: EstimateFeeResponse;
     };
     get_class_by_hash: {
@@ -451,7 +445,7 @@ export namespace Sequencer {
         blockIdentifier: BlockIdentifier;
         skipValidate: boolean;
       };
-      REQUEST: SimulateTransaction;
+      REQUEST: AccountTransaction;
       RESPONSE: SimulateTransactionResponse;
     };
     estimate_fee_bulk: {
@@ -459,7 +453,7 @@ export namespace Sequencer {
         blockIdentifier: BlockIdentifier;
         skipValidate: boolean;
       };
-      REQUEST: EstimateFeeRequestBulk;
+      REQUEST: AccountTransaction;
       RESPONSE: EstimateFeeResponseBulk;
     };
     get_block_traces: {

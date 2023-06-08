@@ -28,10 +28,7 @@ export type CompiledSierra = {
  * format produced after compressing 'sierra_program', stringifies 'abi' property and omit sierra_program_debug_info
  * CompressedCompiledSierra
  */
-export type SierraContractClass = Omit<
-  CompiledSierra,
-  'sierra_program' | 'abi' | 'sierra_program_debug_info'
-> & {
+export type SierraContractClass = Omit<CompiledSierra, 'abi' | 'sierra_program_debug_info'> & {
   sierra_program: string;
   abi: string;
 };

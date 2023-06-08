@@ -5,7 +5,7 @@ import type {
   BlockIdentifier,
   Call,
   CallContractResponse,
-  ContractClass,
+  ContractClassResponse,
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractPayload,
@@ -21,7 +21,6 @@ import type {
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Nonce,
-  RPC,
   SimulateTransactionResponse,
   StateUpdateResponse,
   Storage,
@@ -76,7 +75,7 @@ export abstract class ProviderInterface {
   public abstract getClassAt(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
-  ): Promise<ContractClass | RPC.ContractClass>;
+  ): Promise<ContractClassResponse>;
 
   /**
    * Returns the class hash deployed under the given address.
@@ -96,7 +95,7 @@ export abstract class ProviderInterface {
    * @param classHash - class hash
    * @returns Contract class of compiled contract
    */
-  public abstract getClassByHash(classHash: string): Promise<ContractClass | RPC.ContractClass>;
+  public abstract getClassByHash(classHash: string): Promise<ContractClassResponse>;
 
   /**
    * Gets the nonce of a contract with respect to a specific block
@@ -319,7 +318,6 @@ export abstract class ProviderInterface {
    *  - (optional) skipExecute - skip cairo __execute__ method
    * @returns an array of transaction trace and estimated fee
    */
-
   public abstract getSimulateTransaction(
     invocations: AccountInvocations,
     options?: getSimulateTransactionOptions

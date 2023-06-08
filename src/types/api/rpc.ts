@@ -25,7 +25,6 @@ export namespace RPC {
   export type Traces = OPENRPC.Traces;
   export type BlockHash = OPENRPC.BlockHash;
   export type BlockHashAndNumber = OPENRPC.BlockHashAndNumber;
-  export type GetClassResponse = OPENRPC.ContractClass;
   export type EstimateFeeResponse = OPENRPC.EstimatedFee;
   export type GetBlockWithTxHashesResponse = OPENRPC.BlockWithTxHashes;
   export type GetBlockWithTxs = OPENRPC.BlockWithTxs;

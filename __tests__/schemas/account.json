@@ -128,20 +128,20 @@
       "description": "The execution trace and consumed resources of the required transactions",
       "type": "array",
       "items": {
-          "schema": {
-              "type": "object",
-              "properties": {
-                  "transaction_trace": {
-                      "title": "the transaction's trace",
-                      "$ref": "sequencerSchemas#/definitions/TransactionTraceResponse"
-                  },
-                  "fee_estimation": {
-                      "title": "the transaction's resources and fee",
-                      "$ref": "accountSchemas#/definitions/EstimateFee"
-                  }
-              },
-              "required": ["fee_estimation", "transaction_trace"]
-          }
+        "schema": {
+          "type": "object",
+          "properties": {
+            "transaction_trace": {
+              "title": "the transaction's trace",
+              "$ref": "sequencerSchemas#/definitions/TransactionTraceResponse"
+            },
+            "fee_estimation": {
+              "title": "the transaction's resources and fee",
+              "$ref": "accountSchemas#/definitions/EstimateFee"
+            }
+          },
+          "required": ["fee_estimation", "transaction_trace"]
+        }
       }
     }
   }

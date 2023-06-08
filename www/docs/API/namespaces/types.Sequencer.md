@@ -13,6 +13,26 @@ custom_edit_url: null
 
 ## Type Aliases
 
+### TransactionTraceResponse
+
+Ƭ **TransactionTraceResponse**: `Object`
+
+#### Type declaration
+
+| Name                       | Type                                                |
+| :------------------------- | :-------------------------------------------------- |
+| `validate_invocation?`     | [`FunctionInvocation`](types.md#functioninvocation) |
+| `function_invocation?`     | [`FunctionInvocation`](types.md#functioninvocation) |
+| `fee_transfer_invocation?` | [`FunctionInvocation`](types.md#functioninvocation) |
+| `constructor_invocation?`  | [`FunctionInvocation`](types.md#functioninvocation) |
+| `signature`                | `string`[]                                          |
+
+#### Defined in
+
+[src/types/api/sequencer.ts:74](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L74)
+
+---
+
 ### DeclareTransaction
 
 Ƭ **DeclareTransaction**: `Object`
@@ -32,7 +52,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:81](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L81)
+[src/types/api/sequencer.ts:82](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L82)
 
 ---
 
@@ -52,7 +72,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:92](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L92)
+[src/types/api/sequencer.ts:93](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L93)
 
 ---
 
@@ -75,7 +95,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:100](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L100)
+[src/types/api/sequencer.ts:101](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L101)
 
 ---
 
@@ -98,7 +118,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:111](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L111)
+[src/types/api/sequencer.ts:112](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L112)
 
 ---
 
@@ -108,7 +128,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:122](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L122)
+[src/types/api/sequencer.ts:123](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L123)
 
 ---
 
@@ -127,7 +147,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:128](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L128)
+[src/types/api/sequencer.ts:129](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L129)
 
 ---
 
@@ -144,7 +164,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:135](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L135)
+[src/types/api/sequencer.ts:136](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L136)
 
 ---
 
@@ -154,7 +174,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:145](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L145)
+[src/types/api/sequencer.ts:146](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L146)
 
 ---
 
@@ -174,7 +194,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:150](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L150)
+[src/types/api/sequencer.ts:151](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L151)
 
 ---
 
@@ -194,7 +214,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:158](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L158)
+[src/types/api/sequencer.ts:159](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L159)
 
 ---
 
@@ -204,7 +224,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:167](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L167)
+[src/types/api/sequencer.ts:168](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L168)
 
 ---
 
@@ -214,7 +234,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:169](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L169)
+[src/types/api/sequencer.ts:170](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L170)
 
 ---
 
@@ -238,7 +258,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:173](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L173)
+[src/types/api/sequencer.ts:174](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L174)
 
 ---
 
@@ -260,7 +280,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:185](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L185)
+[src/types/api/sequencer.ts:186](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L186)
 
 ---
 
@@ -286,7 +306,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:196](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L196)
+[src/types/api/sequencer.ts:197](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L197)
 
 ---
 
@@ -296,7 +316,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:225](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L225)
+[src/types/api/sequencer.ts:226](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L226)
 
 ---
 
@@ -312,7 +332,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:241](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L241)
+[src/types/api/sequencer.ts:242](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L242)
 
 ---
 
@@ -322,7 +342,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:245](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L245)
+[src/types/api/sequencer.ts:246](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L246)
 
 ---
 
@@ -332,7 +352,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:246](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L246)
+[src/types/api/sequencer.ts:247](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L247)
 
 ---
 
@@ -342,7 +362,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:247](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L247)
+[src/types/api/sequencer.ts:248](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L248)
 
 ---
 
@@ -352,30 +372,30 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:248](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L248)
+[src/types/api/sequencer.ts:249](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L249)
 
 ---
 
-### EstimateFeeRequest
+### SimulateTransactionResponse
 
-Ƭ **EstimateFeeRequest**: [`InvokeEstimateFee`](types.Sequencer.md#invokeestimatefee) \| [`DeclareEstimateFee`](types.Sequencer.md#declareestimatefee) \| [`DeployEstimateFee`](types.Sequencer.md#deployestimatefee) \| [`DeployAccountEstimateFee`](types.Sequencer.md#deployaccountestimatefee)
-
-#### Defined in
-
-[src/types/api/sequencer.ts:250](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L250)
-
----
-
-### TransactionSimulationResponse
-
-Ƭ **TransactionSimulationResponse**: `Object`
+Ƭ **SimulateTransactionResponse**: `Object`
 
 #### Type declaration
 
-| Name             | Type                                                            |
-| :--------------- | :-------------------------------------------------------------- |
-| `trace`          | [`TransactionTraceResponse`](types.md#transactiontraceresponse) |
-| `fee_estimation` | [`EstimateFeeResponse`](types.Sequencer.md#estimatefeeresponse) |
+| Name             | Type                                                                      |
+| :--------------- | :------------------------------------------------------------------------ |
+| `trace`          | [`TransactionTraceResponse`](types.Sequencer.md#transactiontraceresponse) |
+| `fee_estimation` | [`EstimateFeeResponse`](types.Sequencer.md#estimatefeeresponse)           |
+
+#### Defined in
+
+[src/types/api/sequencer.ts:251](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L251)
+
+---
+
+### AccountTransactionItem
+
+Ƭ **AccountTransactionItem**: [`InvokeEstimateFee`](types.Sequencer.md#invokeestimatefee) \| [`DeclareEstimateFee`](types.Sequencer.md#declareestimatefee) \| [`DeployEstimateFee`](types.Sequencer.md#deployestimatefee) \| [`DeployAccountEstimateFee`](types.Sequencer.md#deployaccountestimatefee)
 
 #### Defined in
 
@@ -383,23 +403,15 @@ custom_edit_url: null
 
 ---
 
-### SimulateTransaction
+### AccountTransaction
 
-Ƭ **SimulateTransaction**: `Omit`<[`InvokeFunctionTransaction`](types.Sequencer.md#invokefunctiontransaction), `"entry_point_type"`\>
+Ƭ **AccountTransaction**: [`AllowArray`](types.md#allowarray)<[`AccountTransactionItem`](types.Sequencer.md#accounttransactionitem)\>
 
-#### Defined in
-
-[src/types/api/sequencer.ts:261](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L261)
-
----
-
-### EstimateFeeRequestBulk
-
-Ƭ **EstimateFeeRequestBulk**: [`AllowArray`](types.md#allowarray)<[`InvokeEstimateFee`](types.Sequencer.md#invokeestimatefee) \| [`DeclareEstimateFee`](types.Sequencer.md#declareestimatefee) \| [`DeployEstimateFee`](types.Sequencer.md#deployestimatefee) \| [`DeployAccountEstimateFee`](types.Sequencer.md#deployaccountestimatefee)\>
+Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:263](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L263)
+[src/types/api/sequencer.ts:265](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L265)
 
 ---
 
@@ -429,9 +441,9 @@ custom_edit_url: null
 
 #### Type declaration
 
-| Name     | Type                                                                                                 |
-| :------- | :--------------------------------------------------------------------------------------------------- |
-| `traces` | [`TransactionTraceResponse`](types.md#transactiontraceresponse) & { `transaction_hash`: `string` }[] |
+| Name     | Type                                                                                                           |
+| :------- | :------------------------------------------------------------------------------------------------------------- |
+| `traces` | [`TransactionTraceResponse`](types.Sequencer.md#transactiontraceresponse) & { `transaction_hash`: `string` }[] |
 
 #### Defined in
 
@@ -592,122 +604,123 @@ custom_edit_url: null
 
 #### Type declaration
 
-| Name                                                      | Type                                                                                                                                                                                                                                                                                         |
-| :-------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `get_contract_addresses`                                  | { `QUERY`: `never` ; `REQUEST`: `never` ; `RESPONSE`: [`GetContractAddressesResponse`](types.md#getcontractaddressesresponse) }                                                                                                                                                              |
-| `get_contract_addresses.QUERY`                            | `never`                                                                                                                                                                                                                                                                                      |
-| `get_contract_addresses.REQUEST`                          | `never`                                                                                                                                                                                                                                                                                      |
-| `get_contract_addresses.RESPONSE`                         | [`GetContractAddressesResponse`](types.md#getcontractaddressesresponse)                                                                                                                                                                                                                      |
-| `add_transaction`                                         | { `QUERY`: `never` ; `REQUEST`: [`Transaction`](types.Sequencer.md#transaction) ; `RESPONSE`: [`AddTransactionResponse`](types.Sequencer.md#addtransactionresponse) }                                                                                                                        |
-| `add_transaction.QUERY`                                   | `never`                                                                                                                                                                                                                                                                                      |
-| `add_transaction.REQUEST`                                 | [`Transaction`](types.Sequencer.md#transaction)                                                                                                                                                                                                                                              |
-| `add_transaction.RESPONSE`                                | [`AddTransactionResponse`](types.Sequencer.md#addtransactionresponse)                                                                                                                                                                                                                        |
-| `get_transaction`                                         | { `QUERY`: { `transactionHash`: `string` } ; `REQUEST`: `never` ; `RESPONSE`: [`GetTransactionResponse`](types.Sequencer.md#gettransactionresponse) }                                                                                                                                        |
-| `get_transaction.QUERY`                                   | { `transactionHash`: `string` }                                                                                                                                                                                                                                                              |
-| `get_transaction.QUERY.transactionHash`                   | `string`                                                                                                                                                                                                                                                                                     |
-| `get_transaction.REQUEST`                                 | `never`                                                                                                                                                                                                                                                                                      |
-| `get_transaction.RESPONSE`                                | [`GetTransactionResponse`](types.Sequencer.md#gettransactionresponse)                                                                                                                                                                                                                        |
-| `get_transaction_status`                                  | { `QUERY`: { `transactionHash`: `string` } ; `REQUEST`: `never` ; `RESPONSE`: [`GetTransactionStatusResponse`](types.md#gettransactionstatusresponse) }                                                                                                                                      |
-| `get_transaction_status.QUERY`                            | { `transactionHash`: `string` }                                                                                                                                                                                                                                                              |
-| `get_transaction_status.QUERY.transactionHash`            | `string`                                                                                                                                                                                                                                                                                     |
-| `get_transaction_status.REQUEST`                          | `never`                                                                                                                                                                                                                                                                                      |
-| `get_transaction_status.RESPONSE`                         | [`GetTransactionStatusResponse`](types.md#gettransactionstatusresponse)                                                                                                                                                                                                                      |
-| `get_transaction_trace`                                   | { `QUERY`: { `transactionHash`: `string` } ; `REQUEST`: `never` ; `RESPONSE`: [`TransactionTraceResponse`](types.md#transactiontraceresponse) }                                                                                                                                              |
-| `get_transaction_trace.QUERY`                             | { `transactionHash`: `string` }                                                                                                                                                                                                                                                              |
-| `get_transaction_trace.QUERY.transactionHash`             | `string`                                                                                                                                                                                                                                                                                     |
-| `get_transaction_trace.REQUEST`                           | `never`                                                                                                                                                                                                                                                                                      |
-| `get_transaction_trace.RESPONSE`                          | [`TransactionTraceResponse`](types.md#transactiontraceresponse)                                                                                                                                                                                                                              |
-| `get_transaction_receipt`                                 | { `QUERY`: { `transactionHash`: `string` } ; `REQUEST`: `never` ; `RESPONSE`: [`TransactionReceiptResponse`](types.Sequencer.md#transactionreceiptresponse) }                                                                                                                                |
-| `get_transaction_receipt.QUERY`                           | { `transactionHash`: `string` }                                                                                                                                                                                                                                                              |
-| `get_transaction_receipt.QUERY.transactionHash`           | `string`                                                                                                                                                                                                                                                                                     |
-| `get_transaction_receipt.REQUEST`                         | `never`                                                                                                                                                                                                                                                                                      |
-| `get_transaction_receipt.RESPONSE`                        | [`TransactionReceiptResponse`](types.Sequencer.md#transactionreceiptresponse)                                                                                                                                                                                                                |
-| `get_nonce`                                               | { `QUERY`: { `contractAddress`: `string` ; `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) } ; `REQUEST`: `never` ; `RESPONSE`: [`Nonce`](types.Sequencer.md#nonce) }                                                                                                       |
-| `get_nonce.QUERY`                                         | { `contractAddress`: `string` ; `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) }                                                                                                                                                                                           |
-| `get_nonce.QUERY.contractAddress`                         | `string`                                                                                                                                                                                                                                                                                     |
-| `get_nonce.QUERY.blockIdentifier`                         | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                                |
-| `get_nonce.REQUEST`                                       | `never`                                                                                                                                                                                                                                                                                      |
-| `get_nonce.RESPONSE`                                      | [`Nonce`](types.Sequencer.md#nonce)                                                                                                                                                                                                                                                          |
-| `get_storage_at`                                          | { `QUERY`: { `contractAddress`: `string` ; `key`: [`BigNumberish`](types.md#bignumberish) ; `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) } ; `REQUEST`: `never` ; `RESPONSE`: [`Storage`](types.Sequencer.md#storage) }                                                  |
-| `get_storage_at.QUERY`                                    | { `contractAddress`: `string` ; `key`: [`BigNumberish`](types.md#bignumberish) ; `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) }                                                                                                                                          |
-| `get_storage_at.QUERY.contractAddress`                    | `string`                                                                                                                                                                                                                                                                                     |
-| `get_storage_at.QUERY.key`                                | [`BigNumberish`](types.md#bignumberish)                                                                                                                                                                                                                                                      |
-| `get_storage_at.QUERY.blockIdentifier`                    | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                                |
-| `get_storage_at.REQUEST`                                  | `never`                                                                                                                                                                                                                                                                                      |
-| `get_storage_at.RESPONSE`                                 | [`Storage`](types.Sequencer.md#storage)                                                                                                                                                                                                                                                      |
-| `get_code`                                                | { `QUERY`: { `contractAddress`: `string` ; `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) } ; `REQUEST`: `never` ; `RESPONSE`: [`GetCodeResponse`](types.Sequencer.md#getcoderesponse) }                                                                                   |
-| `get_code.QUERY`                                          | { `contractAddress`: `string` ; `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) }                                                                                                                                                                                           |
-| `get_code.QUERY.contractAddress`                          | `string`                                                                                                                                                                                                                                                                                     |
-| `get_code.QUERY.blockIdentifier`                          | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                                |
-| `get_code.REQUEST`                                        | `never`                                                                                                                                                                                                                                                                                      |
-| `get_code.RESPONSE`                                       | [`GetCodeResponse`](types.Sequencer.md#getcoderesponse)                                                                                                                                                                                                                                      |
-| `get_block`                                               | { `QUERY`: { `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) } ; `REQUEST`: `never` ; `RESPONSE`: [`GetBlockResponse`](types.Sequencer.md#getblockresponse) }                                                                                                               |
-| `get_block.QUERY`                                         | { `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) }                                                                                                                                                                                                                         |
-| `get_block.QUERY.blockIdentifier`                         | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                                |
-| `get_block.REQUEST`                                       | `never`                                                                                                                                                                                                                                                                                      |
-| `get_block.RESPONSE`                                      | [`GetBlockResponse`](types.Sequencer.md#getblockresponse)                                                                                                                                                                                                                                    |
-| `call_contract`                                           | { `QUERY`: { `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) } ; `REQUEST`: [`CallContractTransaction`](types.Sequencer.md#callcontracttransaction) ; `RESPONSE`: [`CallContractResponse`](types.Sequencer.md#callcontractresponse) }                                       |
-| `call_contract.QUERY`                                     | { `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) }                                                                                                                                                                                                                         |
-| `call_contract.QUERY.blockIdentifier`                     | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                                |
-| `call_contract.REQUEST`                                   | [`CallContractTransaction`](types.Sequencer.md#callcontracttransaction)                                                                                                                                                                                                                      |
-| `call_contract.RESPONSE`                                  | [`CallContractResponse`](types.Sequencer.md#callcontractresponse)                                                                                                                                                                                                                            |
-| `estimate_fee`                                            | { `QUERY`: { `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) ; `skipValidate`: `boolean` } ; `REQUEST`: [`EstimateFeeRequest`](types.Sequencer.md#estimatefeerequest) ; `RESPONSE`: [`EstimateFeeResponse`](types.Sequencer.md#estimatefeeresponse) }                       |
-| `estimate_fee.QUERY`                                      | { `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) ; `skipValidate`: `boolean` }                                                                                                                                                                                             |
-| `estimate_fee.QUERY.blockIdentifier`                      | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                                |
-| `estimate_fee.QUERY.skipValidate`                         | `boolean`                                                                                                                                                                                                                                                                                    |
-| `estimate_fee.REQUEST`                                    | [`EstimateFeeRequest`](types.Sequencer.md#estimatefeerequest)                                                                                                                                                                                                                                |
-| `estimate_fee.RESPONSE`                                   | [`EstimateFeeResponse`](types.Sequencer.md#estimatefeeresponse)                                                                                                                                                                                                                              |
-| `get_class_by_hash`                                       | { `QUERY`: { `classHash`: `string` ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) } ; `REQUEST`: `never` ; `RESPONSE`: [`CompiledContract`](types.md#compiledcontract) }                                                                                                |
-| `get_class_by_hash.QUERY`                                 | { `classHash`: `string` ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) }                                                                                                                                                                                                |
-| `get_class_by_hash.QUERY.classHash`                       | `string`                                                                                                                                                                                                                                                                                     |
-| `get_class_by_hash.QUERY.blockIdentifier?`                | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                                |
-| `get_class_by_hash.REQUEST`                               | `never`                                                                                                                                                                                                                                                                                      |
-| `get_class_by_hash.RESPONSE`                              | [`CompiledContract`](types.md#compiledcontract)                                                                                                                                                                                                                                              |
-| `get_class_hash_at`                                       | { `QUERY`: { `contractAddress`: `string` ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) } ; `REQUEST`: `never` ; `RESPONSE`: `string` }                                                                                                                                 |
-| `get_class_hash_at.QUERY`                                 | { `contractAddress`: `string` ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) }                                                                                                                                                                                          |
-| `get_class_hash_at.QUERY.contractAddress`                 | `string`                                                                                                                                                                                                                                                                                     |
-| `get_class_hash_at.QUERY.blockIdentifier?`                | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                                |
-| `get_class_hash_at.REQUEST`                               | `never`                                                                                                                                                                                                                                                                                      |
-| `get_class_hash_at.RESPONSE`                              | `string`                                                                                                                                                                                                                                                                                     |
-| `get_state_update`                                        | { `QUERY`: { `blockHash?`: `string` ; `blockNumber?`: [`BlockNumber`](types.md#blocknumber) } ; `REQUEST`: `never` ; `RESPONSE`: [`StateUpdateResponse`](types.Sequencer.md#stateupdateresponse) }                                                                                           |
-| `get_state_update.QUERY`                                  | { `blockHash?`: `string` ; `blockNumber?`: [`BlockNumber`](types.md#blocknumber) }                                                                                                                                                                                                           |
-| `get_state_update.QUERY.blockHash?`                       | `string`                                                                                                                                                                                                                                                                                     |
-| `get_state_update.QUERY.blockNumber?`                     | [`BlockNumber`](types.md#blocknumber)                                                                                                                                                                                                                                                        |
-| `get_state_update.REQUEST`                                | `never`                                                                                                                                                                                                                                                                                      |
-| `get_state_update.RESPONSE`                               | [`StateUpdateResponse`](types.Sequencer.md#stateupdateresponse)                                                                                                                                                                                                                              |
-| `get_full_contract`                                       | { `QUERY`: { `contractAddress`: `string` ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) } ; `REQUEST`: `never` ; `RESPONSE`: [`CompiledContract`](types.md#compiledcontract) }                                                                                          |
-| `get_full_contract.QUERY`                                 | { `contractAddress`: `string` ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) }                                                                                                                                                                                          |
-| `get_full_contract.QUERY.contractAddress`                 | `string`                                                                                                                                                                                                                                                                                     |
-| `get_full_contract.QUERY.blockIdentifier?`                | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                                |
-| `get_full_contract.REQUEST`                               | `never`                                                                                                                                                                                                                                                                                      |
-| `get_full_contract.RESPONSE`                              | [`CompiledContract`](types.md#compiledcontract)                                                                                                                                                                                                                                              |
-| `estimate_message_fee`                                    | { `QUERY`: `any` ; `REQUEST`: `any` ; `RESPONSE`: [`EstimateFeeResponse`](types.Sequencer.md#estimatefeeresponse) }                                                                                                                                                                          |
-| `estimate_message_fee.QUERY`                              | `any`                                                                                                                                                                                                                                                                                        |
-| `estimate_message_fee.REQUEST`                            | `any`                                                                                                                                                                                                                                                                                        |
-| `estimate_message_fee.RESPONSE`                           | [`EstimateFeeResponse`](types.Sequencer.md#estimatefeeresponse)                                                                                                                                                                                                                              |
-| `simulate_transaction`                                    | { `QUERY`: { `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) ; `skipValidate`: `boolean` } ; `REQUEST`: [`SimulateTransaction`](types.Sequencer.md#simulatetransaction) ; `RESPONSE`: [`TransactionSimulationResponse`](types.Sequencer.md#transactionsimulationresponse) } |
-| `simulate_transaction.QUERY`                              | { `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) ; `skipValidate`: `boolean` }                                                                                                                                                                                             |
-| `simulate_transaction.QUERY.blockIdentifier`              | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                                |
-| `simulate_transaction.QUERY.skipValidate`                 | `boolean`                                                                                                                                                                                                                                                                                    |
-| `simulate_transaction.REQUEST`                            | [`SimulateTransaction`](types.Sequencer.md#simulatetransaction)                                                                                                                                                                                                                              |
-| `simulate_transaction.RESPONSE`                           | [`TransactionSimulationResponse`](types.Sequencer.md#transactionsimulationresponse)                                                                                                                                                                                                          |
-| `estimate_fee_bulk`                                       | { `QUERY`: { `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) } ; `REQUEST`: [`EstimateFeeRequestBulk`](types.Sequencer.md#estimatefeerequestbulk) ; `RESPONSE`: [`EstimateFeeResponseBulk`](types.Sequencer.md#estimatefeeresponsebulk) }                                   |
-| `estimate_fee_bulk.QUERY`                                 | { `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) }                                                                                                                                                                                                                         |
-| `estimate_fee_bulk.QUERY.blockIdentifier`                 | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                                |
-| `estimate_fee_bulk.REQUEST`                               | [`EstimateFeeRequestBulk`](types.Sequencer.md#estimatefeerequestbulk)                                                                                                                                                                                                                        |
-| `estimate_fee_bulk.RESPONSE`                              | [`EstimateFeeResponseBulk`](types.Sequencer.md#estimatefeeresponsebulk)                                                                                                                                                                                                                      |
-| `get_block_traces`                                        | { `QUERY`: { `blockHash?`: `string` ; `blockNumber?`: [`BlockNumber`](types.md#blocknumber) } ; `REQUEST`: `never` ; `RESPONSE`: [`BlockTransactionTracesResponse`](types.Sequencer.md#blocktransactiontracesresponse) }                                                                     |
-| `get_block_traces.QUERY`                                  | { `blockHash?`: `string` ; `blockNumber?`: [`BlockNumber`](types.md#blocknumber) }                                                                                                                                                                                                           |
-| `get_block_traces.QUERY.blockHash?`                       | `string`                                                                                                                                                                                                                                                                                     |
-| `get_block_traces.QUERY.blockNumber?`                     | [`BlockNumber`](types.md#blocknumber)                                                                                                                                                                                                                                                        |
-| `get_block_traces.REQUEST`                                | `never`                                                                                                                                                                                                                                                                                      |
-| `get_block_traces.RESPONSE`                               | [`BlockTransactionTracesResponse`](types.Sequencer.md#blocktransactiontracesresponse)                                                                                                                                                                                                        |
-| `get_compiled_class_by_class_hash`                        | { `QUERY`: { `classHash`: `string` ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) } ; `REQUEST`: `any` ; `RESPONSE`: [`CairoAssembly`](types.md#cairoassembly) }                                                                                                        |
-| `get_compiled_class_by_class_hash.QUERY`                  | { `classHash`: `string` ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) }                                                                                                                                                                                                |
-| `get_compiled_class_by_class_hash.QUERY.classHash`        | `string`                                                                                                                                                                                                                                                                                     |
-| `get_compiled_class_by_class_hash.QUERY.blockIdentifier?` | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                                |
-| `get_compiled_class_by_class_hash.REQUEST`                | `any`                                                                                                                                                                                                                                                                                        |
-| `get_compiled_class_by_class_hash.RESPONSE`               | [`CairoAssembly`](types.md#cairoassembly)                                                                                                                                                                                                                                                    |
+| Name                                                      | Type                                                                                                                                                                                                                                                                                   |
+| :-------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `get_contract_addresses`                                  | { `QUERY`: `never` ; `REQUEST`: `never` ; `RESPONSE`: [`GetContractAddressesResponse`](types.md#getcontractaddressesresponse) }                                                                                                                                                        |
+| `get_contract_addresses.QUERY`                            | `never`                                                                                                                                                                                                                                                                                |
+| `get_contract_addresses.REQUEST`                          | `never`                                                                                                                                                                                                                                                                                |
+| `get_contract_addresses.RESPONSE`                         | [`GetContractAddressesResponse`](types.md#getcontractaddressesresponse)                                                                                                                                                                                                                |
+| `add_transaction`                                         | { `QUERY`: `never` ; `REQUEST`: [`Transaction`](types.Sequencer.md#transaction) ; `RESPONSE`: [`AddTransactionResponse`](types.Sequencer.md#addtransactionresponse) }                                                                                                                  |
+| `add_transaction.QUERY`                                   | `never`                                                                                                                                                                                                                                                                                |
+| `add_transaction.REQUEST`                                 | [`Transaction`](types.Sequencer.md#transaction)                                                                                                                                                                                                                                        |
+| `add_transaction.RESPONSE`                                | [`AddTransactionResponse`](types.Sequencer.md#addtransactionresponse)                                                                                                                                                                                                                  |
+| `get_transaction`                                         | { `QUERY`: { `transactionHash`: `string` } ; `REQUEST`: `never` ; `RESPONSE`: [`GetTransactionResponse`](types.Sequencer.md#gettransactionresponse) }                                                                                                                                  |
+| `get_transaction.QUERY`                                   | { `transactionHash`: `string` }                                                                                                                                                                                                                                                        |
+| `get_transaction.QUERY.transactionHash`                   | `string`                                                                                                                                                                                                                                                                               |
+| `get_transaction.REQUEST`                                 | `never`                                                                                                                                                                                                                                                                                |
+| `get_transaction.RESPONSE`                                | [`GetTransactionResponse`](types.Sequencer.md#gettransactionresponse)                                                                                                                                                                                                                  |
+| `get_transaction_status`                                  | { `QUERY`: { `transactionHash`: `string` } ; `REQUEST`: `never` ; `RESPONSE`: [`GetTransactionStatusResponse`](types.md#gettransactionstatusresponse) }                                                                                                                                |
+| `get_transaction_status.QUERY`                            | { `transactionHash`: `string` }                                                                                                                                                                                                                                                        |
+| `get_transaction_status.QUERY.transactionHash`            | `string`                                                                                                                                                                                                                                                                               |
+| `get_transaction_status.REQUEST`                          | `never`                                                                                                                                                                                                                                                                                |
+| `get_transaction_status.RESPONSE`                         | [`GetTransactionStatusResponse`](types.md#gettransactionstatusresponse)                                                                                                                                                                                                                |
+| `get_transaction_trace`                                   | { `QUERY`: { `transactionHash`: `string` } ; `REQUEST`: `never` ; `RESPONSE`: [`TransactionTraceResponse`](types.Sequencer.md#transactiontraceresponse) }                                                                                                                              |
+| `get_transaction_trace.QUERY`                             | { `transactionHash`: `string` }                                                                                                                                                                                                                                                        |
+| `get_transaction_trace.QUERY.transactionHash`             | `string`                                                                                                                                                                                                                                                                               |
+| `get_transaction_trace.REQUEST`                           | `never`                                                                                                                                                                                                                                                                                |
+| `get_transaction_trace.RESPONSE`                          | [`TransactionTraceResponse`](types.Sequencer.md#transactiontraceresponse)                                                                                                                                                                                                              |
+| `get_transaction_receipt`                                 | { `QUERY`: { `transactionHash`: `string` } ; `REQUEST`: `never` ; `RESPONSE`: [`TransactionReceiptResponse`](types.Sequencer.md#transactionreceiptresponse) }                                                                                                                          |
+| `get_transaction_receipt.QUERY`                           | { `transactionHash`: `string` }                                                                                                                                                                                                                                                        |
+| `get_transaction_receipt.QUERY.transactionHash`           | `string`                                                                                                                                                                                                                                                                               |
+| `get_transaction_receipt.REQUEST`                         | `never`                                                                                                                                                                                                                                                                                |
+| `get_transaction_receipt.RESPONSE`                        | [`TransactionReceiptResponse`](types.Sequencer.md#transactionreceiptresponse)                                                                                                                                                                                                          |
+| `get_nonce`                                               | { `QUERY`: { `contractAddress`: `string` ; `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) } ; `REQUEST`: `never` ; `RESPONSE`: [`Nonce`](types.Sequencer.md#nonce) }                                                                                                 |
+| `get_nonce.QUERY`                                         | { `contractAddress`: `string` ; `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) }                                                                                                                                                                                     |
+| `get_nonce.QUERY.contractAddress`                         | `string`                                                                                                                                                                                                                                                                               |
+| `get_nonce.QUERY.blockIdentifier`                         | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                          |
+| `get_nonce.REQUEST`                                       | `never`                                                                                                                                                                                                                                                                                |
+| `get_nonce.RESPONSE`                                      | [`Nonce`](types.Sequencer.md#nonce)                                                                                                                                                                                                                                                    |
+| `get_storage_at`                                          | { `QUERY`: { `contractAddress`: `string` ; `key`: [`BigNumberish`](types.md#bignumberish) ; `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) } ; `REQUEST`: `never` ; `RESPONSE`: [`Storage`](types.Sequencer.md#storage) }                                            |
+| `get_storage_at.QUERY`                                    | { `contractAddress`: `string` ; `key`: [`BigNumberish`](types.md#bignumberish) ; `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) }                                                                                                                                    |
+| `get_storage_at.QUERY.contractAddress`                    | `string`                                                                                                                                                                                                                                                                               |
+| `get_storage_at.QUERY.key`                                | [`BigNumberish`](types.md#bignumberish)                                                                                                                                                                                                                                                |
+| `get_storage_at.QUERY.blockIdentifier`                    | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                          |
+| `get_storage_at.REQUEST`                                  | `never`                                                                                                                                                                                                                                                                                |
+| `get_storage_at.RESPONSE`                                 | [`Storage`](types.Sequencer.md#storage)                                                                                                                                                                                                                                                |
+| `get_code`                                                | { `QUERY`: { `contractAddress`: `string` ; `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) } ; `REQUEST`: `never` ; `RESPONSE`: [`GetCodeResponse`](types.Sequencer.md#getcoderesponse) }                                                                             |
+| `get_code.QUERY`                                          | { `contractAddress`: `string` ; `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) }                                                                                                                                                                                     |
+| `get_code.QUERY.contractAddress`                          | `string`                                                                                                                                                                                                                                                                               |
+| `get_code.QUERY.blockIdentifier`                          | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                          |
+| `get_code.REQUEST`                                        | `never`                                                                                                                                                                                                                                                                                |
+| `get_code.RESPONSE`                                       | [`GetCodeResponse`](types.Sequencer.md#getcoderesponse)                                                                                                                                                                                                                                |
+| `get_block`                                               | { `QUERY`: { `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) } ; `REQUEST`: `never` ; `RESPONSE`: [`GetBlockResponse`](types.Sequencer.md#getblockresponse) }                                                                                                         |
+| `get_block.QUERY`                                         | { `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) }                                                                                                                                                                                                                   |
+| `get_block.QUERY.blockIdentifier`                         | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                          |
+| `get_block.REQUEST`                                       | `never`                                                                                                                                                                                                                                                                                |
+| `get_block.RESPONSE`                                      | [`GetBlockResponse`](types.Sequencer.md#getblockresponse)                                                                                                                                                                                                                              |
+| `call_contract`                                           | { `QUERY`: { `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) } ; `REQUEST`: [`CallContractTransaction`](types.Sequencer.md#callcontracttransaction) ; `RESPONSE`: [`CallContractResponse`](types.Sequencer.md#callcontractresponse) }                                 |
+| `call_contract.QUERY`                                     | { `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) }                                                                                                                                                                                                                   |
+| `call_contract.QUERY.blockIdentifier`                     | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                          |
+| `call_contract.REQUEST`                                   | [`CallContractTransaction`](types.Sequencer.md#callcontracttransaction)                                                                                                                                                                                                                |
+| `call_contract.RESPONSE`                                  | [`CallContractResponse`](types.Sequencer.md#callcontractresponse)                                                                                                                                                                                                                      |
+| `estimate_fee`                                            | { `QUERY`: { `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) ; `skipValidate`: `boolean` } ; `REQUEST`: [`AccountTransactionItem`](types.Sequencer.md#accounttransactionitem) ; `RESPONSE`: [`EstimateFeeResponse`](types.Sequencer.md#estimatefeeresponse) }         |
+| `estimate_fee.QUERY`                                      | { `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) ; `skipValidate`: `boolean` }                                                                                                                                                                                       |
+| `estimate_fee.QUERY.blockIdentifier`                      | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                          |
+| `estimate_fee.QUERY.skipValidate`                         | `boolean`                                                                                                                                                                                                                                                                              |
+| `estimate_fee.REQUEST`                                    | [`AccountTransactionItem`](types.Sequencer.md#accounttransactionitem)                                                                                                                                                                                                                  |
+| `estimate_fee.RESPONSE`                                   | [`EstimateFeeResponse`](types.Sequencer.md#estimatefeeresponse)                                                                                                                                                                                                                        |
+| `get_class_by_hash`                                       | { `QUERY`: { `classHash`: `string` ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) } ; `REQUEST`: `never` ; `RESPONSE`: [`CompiledContract`](types.md#compiledcontract) }                                                                                          |
+| `get_class_by_hash.QUERY`                                 | { `classHash`: `string` ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) }                                                                                                                                                                                          |
+| `get_class_by_hash.QUERY.classHash`                       | `string`                                                                                                                                                                                                                                                                               |
+| `get_class_by_hash.QUERY.blockIdentifier?`                | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                          |
+| `get_class_by_hash.REQUEST`                               | `never`                                                                                                                                                                                                                                                                                |
+| `get_class_by_hash.RESPONSE`                              | [`CompiledContract`](types.md#compiledcontract)                                                                                                                                                                                                                                        |
+| `get_class_hash_at`                                       | { `QUERY`: { `contractAddress`: `string` ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) } ; `REQUEST`: `never` ; `RESPONSE`: `string` }                                                                                                                           |
+| `get_class_hash_at.QUERY`                                 | { `contractAddress`: `string` ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) }                                                                                                                                                                                    |
+| `get_class_hash_at.QUERY.contractAddress`                 | `string`                                                                                                                                                                                                                                                                               |
+| `get_class_hash_at.QUERY.blockIdentifier?`                | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                          |
+| `get_class_hash_at.REQUEST`                               | `never`                                                                                                                                                                                                                                                                                |
+| `get_class_hash_at.RESPONSE`                              | `string`                                                                                                                                                                                                                                                                               |
+| `get_state_update`                                        | { `QUERY`: { `blockHash?`: `string` ; `blockNumber?`: [`BlockNumber`](types.md#blocknumber) } ; `REQUEST`: `never` ; `RESPONSE`: [`StateUpdateResponse`](types.Sequencer.md#stateupdateresponse) }                                                                                     |
+| `get_state_update.QUERY`                                  | { `blockHash?`: `string` ; `blockNumber?`: [`BlockNumber`](types.md#blocknumber) }                                                                                                                                                                                                     |
+| `get_state_update.QUERY.blockHash?`                       | `string`                                                                                                                                                                                                                                                                               |
+| `get_state_update.QUERY.blockNumber?`                     | [`BlockNumber`](types.md#blocknumber)                                                                                                                                                                                                                                                  |
+| `get_state_update.REQUEST`                                | `never`                                                                                                                                                                                                                                                                                |
+| `get_state_update.RESPONSE`                               | [`StateUpdateResponse`](types.Sequencer.md#stateupdateresponse)                                                                                                                                                                                                                        |
+| `get_full_contract`                                       | { `QUERY`: { `contractAddress`: `string` ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) } ; `REQUEST`: `never` ; `RESPONSE`: [`CompiledContract`](types.md#compiledcontract) }                                                                                    |
+| `get_full_contract.QUERY`                                 | { `contractAddress`: `string` ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) }                                                                                                                                                                                    |
+| `get_full_contract.QUERY.contractAddress`                 | `string`                                                                                                                                                                                                                                                                               |
+| `get_full_contract.QUERY.blockIdentifier?`                | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                          |
+| `get_full_contract.REQUEST`                               | `never`                                                                                                                                                                                                                                                                                |
+| `get_full_contract.RESPONSE`                              | [`CompiledContract`](types.md#compiledcontract)                                                                                                                                                                                                                                        |
+| `estimate_message_fee`                                    | { `QUERY`: `any` ; `REQUEST`: `any` ; `RESPONSE`: [`EstimateFeeResponse`](types.Sequencer.md#estimatefeeresponse) }                                                                                                                                                                    |
+| `estimate_message_fee.QUERY`                              | `any`                                                                                                                                                                                                                                                                                  |
+| `estimate_message_fee.REQUEST`                            | `any`                                                                                                                                                                                                                                                                                  |
+| `estimate_message_fee.RESPONSE`                           | [`EstimateFeeResponse`](types.Sequencer.md#estimatefeeresponse)                                                                                                                                                                                                                        |
+| `simulate_transaction`                                    | { `QUERY`: { `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) ; `skipValidate`: `boolean` } ; `REQUEST`: [`AccountTransaction`](types.Sequencer.md#accounttransaction) ; `RESPONSE`: [`SimulateTransactionResponse`](types.Sequencer.md#simulatetransactionresponse) } |
+| `simulate_transaction.QUERY`                              | { `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) ; `skipValidate`: `boolean` }                                                                                                                                                                                       |
+| `simulate_transaction.QUERY.blockIdentifier`              | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                          |
+| `simulate_transaction.QUERY.skipValidate`                 | `boolean`                                                                                                                                                                                                                                                                              |
+| `simulate_transaction.REQUEST`                            | [`AccountTransaction`](types.Sequencer.md#accounttransaction)                                                                                                                                                                                                                          |
+| `simulate_transaction.RESPONSE`                           | [`SimulateTransactionResponse`](types.Sequencer.md#simulatetransactionresponse)                                                                                                                                                                                                        |
+| `estimate_fee_bulk`                                       | { `QUERY`: { `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) ; `skipValidate`: `boolean` } ; `REQUEST`: [`AccountTransaction`](types.Sequencer.md#accounttransaction) ; `RESPONSE`: [`EstimateFeeResponseBulk`](types.Sequencer.md#estimatefeeresponsebulk) }         |
+| `estimate_fee_bulk.QUERY`                                 | { `blockIdentifier`: [`BlockIdentifier`](types.md#blockidentifier) ; `skipValidate`: `boolean` }                                                                                                                                                                                       |
+| `estimate_fee_bulk.QUERY.blockIdentifier`                 | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                          |
+| `estimate_fee_bulk.QUERY.skipValidate`                    | `boolean`                                                                                                                                                                                                                                                                              |
+| `estimate_fee_bulk.REQUEST`                               | [`AccountTransaction`](types.Sequencer.md#accounttransaction)                                                                                                                                                                                                                          |
+| `estimate_fee_bulk.RESPONSE`                              | [`EstimateFeeResponseBulk`](types.Sequencer.md#estimatefeeresponsebulk)                                                                                                                                                                                                                |
+| `get_block_traces`                                        | { `QUERY`: { `blockHash?`: `string` ; `blockNumber?`: [`BlockNumber`](types.md#blocknumber) } ; `REQUEST`: `never` ; `RESPONSE`: [`BlockTransactionTracesResponse`](types.Sequencer.md#blocktransactiontracesresponse) }                                                               |
+| `get_block_traces.QUERY`                                  | { `blockHash?`: `string` ; `blockNumber?`: [`BlockNumber`](types.md#blocknumber) }                                                                                                                                                                                                     |
+| `get_block_traces.QUERY.blockHash?`                       | `string`                                                                                                                                                                                                                                                                               |
+| `get_block_traces.QUERY.blockNumber?`                     | [`BlockNumber`](types.md#blocknumber)                                                                                                                                                                                                                                                  |
+| `get_block_traces.REQUEST`                                | `never`                                                                                                                                                                                                                                                                                |
+| `get_block_traces.RESPONSE`                               | [`BlockTransactionTracesResponse`](types.Sequencer.md#blocktransactiontracesresponse)                                                                                                                                                                                                  |
+| `get_compiled_class_by_class_hash`                        | { `QUERY`: { `classHash`: `string` ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) } ; `REQUEST`: `any` ; `RESPONSE`: [`CairoAssembly`](types.md#cairoassembly) }                                                                                                  |
+| `get_compiled_class_by_class_hash.QUERY`                  | { `classHash`: `string` ; `blockIdentifier?`: [`BlockIdentifier`](types.md#blockidentifier) }                                                                                                                                                                                          |
+| `get_compiled_class_by_class_hash.QUERY.classHash`        | `string`                                                                                                                                                                                                                                                                               |
+| `get_compiled_class_by_class_hash.QUERY.blockIdentifier?` | [`BlockIdentifier`](types.md#blockidentifier)                                                                                                                                                                                                                                          |
+| `get_compiled_class_by_class_hash.REQUEST`                | `any`                                                                                                                                                                                                                                                                                  |
+| `get_compiled_class_by_class_hash.RESPONSE`               | [`CairoAssembly`](types.md#cairoassembly)                                                                                                                                                                                                                                              |
 
 #### Defined in
 

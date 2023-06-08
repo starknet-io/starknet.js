@@ -6,9 +6,11 @@
 import { RPC } from '../api/rpc';
 import { Sequencer } from '../api/sequencer';
 import {
+  Abi,
   AllowArray,
   ByteCode,
   Call,
+  ContractClass,
   DeclareContractPayload,
   DeployAccountContractPayload,
   RawCalldata,
@@ -149,7 +151,7 @@ export type SimulationFlags = RPC.SimulationFlags;
 export type SimulatedTransaction = {
   transaction_trace: RPC.Trace | Sequencer.TransactionTraceResponse;
   fee_estimation: RPC.EstimateFeeResponse | Sequencer.EstimateFeeResponse;
-  suggestedMaxFees?: string | bigint;
+  suggestedMaxFee?: string | bigint;
 };
 
 export type SimulateTransactionResponse = SimulatedTransaction[];
@@ -169,3 +171,5 @@ export interface StateUpdateResponse {
     deprecated_declared_classes?: RPC.DeprecatedDeclaredClasses; // RPC Only
   };
 }
+
+export type ContractClassResponse = Omit<ContractClass, 'abi'> & { abi?: Abi };

@@ -22,7 +22,7 @@ import {
   compiledComplexSierra,
   compiledHelloSierra,
   compiledHelloSierraCasm,
-  describeIfDevnetRpc,
+  describeIfDevnet,
   describeIfDevnetSequencer,
   describeIfSequencerTestnet2,
   getTestAccount,
@@ -30,41 +30,9 @@ import {
 } from './fixtures';
 import { initializeMatcher } from './schema';
 
-describeIfDevnetRpc('Cairo 1 Devnet RPC', () => {
-  const provider = getTestProvider() as RPCProvider;
-  const account = getTestAccount(provider);
-  let dd: DeclareDeployUDCResponse;
-  /* eslint-disable @typescript-eslint/no-unused-vars */
-  let cairo1Contract: Contract;
-  initializeMatcher(expect);
-
-  beforeAll(async () => {
-    dd = await account.declareAndDeploy({
-      contract: compiledHelloSierra,
-      casm: compiledHelloSierraCasm,
-    });
-
-    cairo1Contract = new Contract(compiledHelloSierra.abi, dd.deploy.contract_address, account);
-  });
-
-  test('deployContract Cairo1', async () => {
-    const deploy = await account.deployContract({
-      classHash: dd.deploy.classHash,
-    });
-    expect(deploy).toHaveProperty('address');
-
-    // const classAt = await account.getClassAt(deploy.address);
-    // console.log(classAt)
-
-    // const classByhash = await provider.getClassByHash(deploy.classHash);
-    // console.log(classByhash);
-  });
-});
-
-// TODO: change to describeIfDevnet ?
-describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
-  describe('Sequencer API &  Contract interactions', () => {
-    const provider = getTestProvider() as SequencerProvider;
+describeIfDevnet('Cairo 1 Devnet', () => {
+  describe('API &  Contract interactions', () => {
+    const provider = getTestProvider();
     const account = getTestAccount(provider);
     let dd: DeclareDeployUDCResponse;
     let cairo1Contract: Contract;
@@ -90,14 +58,6 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
         classHash: dd.deploy.classHash,
       });
       expect(deploy).toHaveProperty('address');
-
-      const classAt = await account.getClassAt(deploy.address);
-      console.log(classAt);
-    });
-
-    test('getCompiledClassByClassHash', async () => {
-      const compiledClass = await provider.getCompiledClassByClassHash(dd.deploy.classHash);
-      expect(compiledClass).toMatchSchemaRef('CompiledClass');
     });
 
     test('GetClassByHash', async () => {
@@ -446,10 +406,19 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
       expect(callDataFromObject).toStrictEqual(expectedResult);
       expect(callDataFromArray).toStrictEqual(expectedResult);
     });
+
+    describeIfDevnetSequencer('Sequencer only', () => {
+      test('getCompiledClassByClassHash', async () => {
+        const compiledClass = await (provider as SequencerProvider).getCompiledClassByClassHash(
+          dd.deploy.classHash
+        );
+        expect(compiledClass).toMatchSchemaRef('CompiledClass');
+      });
+    });
   });
 
   describe('Cairo1 Account contract', () => {
-    const provider = getTestProvider() as SequencerProvider;
+    const provider = getTestProvider();
     const account = getTestAccount(provider);
     let accountC1: Account;
 

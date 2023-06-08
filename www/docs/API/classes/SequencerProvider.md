@@ -24,7 +24,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:88](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L88)
+[src/provider/sequencer.ts:89](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L89)
 
 ## Properties
 
@@ -34,7 +34,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:74](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L74)
+[src/provider/sequencer.ts:75](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L75)
 
 ---
 
@@ -44,7 +44,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:76](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L76)
+[src/provider/sequencer.ts:77](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L77)
 
 ---
 
@@ -54,7 +54,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:78](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L78)
+[src/provider/sequencer.ts:79](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L79)
 
 ---
 
@@ -64,7 +64,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:80](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L80)
+[src/provider/sequencer.ts:81](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L81)
 
 ---
 
@@ -74,7 +74,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:82](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L82)
+[src/provider/sequencer.ts:83](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L83)
 
 ---
 
@@ -84,7 +84,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:84](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L84)
+[src/provider/sequencer.ts:85](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L85)
 
 ---
 
@@ -94,7 +94,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:86](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L86)
+[src/provider/sequencer.ts:87](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L87)
 
 ## Methods
 
@@ -114,7 +114,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:108](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L108)
+[src/provider/sequencer.ts:109](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L109)
 
 ---
 
@@ -134,7 +134,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:121](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L121)
+[src/provider/sequencer.ts:122](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L122)
 
 ---
 
@@ -154,7 +154,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:138](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L138)
+[src/provider/sequencer.ts:139](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L139)
 
 ---
 
@@ -174,7 +174,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:143](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L143)
+[src/provider/sequencer.ts:144](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L144)
 
 ---
 
@@ -194,7 +194,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:156](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L156)
+[src/provider/sequencer.ts:157](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L157)
 
 ---
 
@@ -214,7 +214,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:173](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L173)
+[src/provider/sequencer.ts:174](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L174)
 
 ---
 
@@ -241,7 +241,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:184](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L184)
+[src/provider/sequencer.ts:185](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L185)
 
 ---
 
@@ -265,7 +265,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:206](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L206)
+[src/provider/sequencer.ts:207](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L207)
 
 ---
 
@@ -287,7 +287,7 @@ the chain Id
 
 #### Defined in
 
-[src/provider/sequencer.ts:247](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L247)
+[src/provider/sequencer.ts:248](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L248)
 
 ---
 
@@ -316,7 +316,7 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[src/provider/sequencer.ts:251](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L251)
+[src/provider/sequencer.ts:252](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L252)
 
 ---
 
@@ -344,7 +344,7 @@ the block object
 
 #### Defined in
 
-[src/provider/sequencer.ts:269](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L269)
+[src/provider/sequencer.ts:270](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L270)
 
 ---
 
@@ -373,7 +373,7 @@ the hex nonce
 
 #### Defined in
 
-[src/provider/sequencer.ts:277](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L277)
+[src/provider/sequencer.ts:278](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L278)
 
 ---
 
@@ -403,7 +403,7 @@ the value of the storage variable
 
 #### Defined in
 
-[src/provider/sequencer.ts:284](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L284)
+[src/provider/sequencer.ts:285](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L285)
 
 ---
 
@@ -431,7 +431,7 @@ the transaction object { transaction_id, status, transaction, block_number?, blo
 
 #### Defined in
 
-[src/provider/sequencer.ts:297](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L297)
+[src/provider/sequencer.ts:298](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L298)
 
 ---
 
@@ -459,7 +459,7 @@ the transaction receipt object
 
 #### Defined in
 
-[src/provider/sequencer.ts:306](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L306)
+[src/provider/sequencer.ts:307](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L307)
 
 ---
 
@@ -488,7 +488,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/sequencer.ts:313](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L313)
+[src/provider/sequencer.ts:314](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L314)
 
 ---
 
@@ -517,7 +517,7 @@ Class hash
 
 #### Defined in
 
-[src/provider/sequencer.ts:327](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L327)
+[src/provider/sequencer.ts:328](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L328)
 
 ---
 
@@ -546,7 +546,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/sequencer.ts:334](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L334)
+[src/provider/sequencer.ts:335](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L335)
 
 ---
 
@@ -567,7 +567,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/sequencer.ts:346](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L346)
+[src/provider/sequencer.ts:347](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L347)
 
 ---
 
@@ -600,7 +600,7 @@ response from addTransaction
 
 #### Defined in
 
-[src/provider/sequencer.ts:353](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L353)
+[src/provider/sequencer.ts:354](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L354)
 
 ---
 
@@ -629,7 +629,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/sequencer.ts:368](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L368)
+[src/provider/sequencer.ts:369](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L369)
 
 ---
 
@@ -658,7 +658,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/sequencer.ts:384](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L384)
+[src/provider/sequencer.ts:385](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L385)
 
 ---
 
@@ -693,7 +693,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/sequencer.ts:412](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L412)
+[src/provider/sequencer.ts:413](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L413)
 
 ---
 
@@ -724,13 +724,13 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/sequencer.ts:421](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L421)
+[src/provider/sequencer.ts:422](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L422)
 
 ---
 
 ### getDeclareEstimateFee
 
-▸ **getDeclareEstimateFee**(`«destructured»`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`EstimateFeeResponse`](../interfaces/types.EstimateFeeResponse.md)\>
+▸ **getDeclareEstimateFee**(`invocation`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`EstimateFeeResponse`](../interfaces/types.EstimateFeeResponse.md)\>
 
 Estimates the fee for a given DECLARE transaction
 
@@ -738,7 +738,7 @@ Estimates the fee for a given DECLARE transaction
 
 | Name              | Type                                                                                | Default value | Description                                                                                                                           |
 | :---------------- | :---------------------------------------------------------------------------------- | :------------ | :------------------------------------------------------------------------------------------------------------------------------------ |
-| `«destructured»`  | [`DeclareContractTransaction`](../namespaces/types.md#declarecontracttransaction)   | `undefined`   | transaction payload to be declared containing: - compiled contract code - sender address - signature - (defaults to []) the signature |
+| `invocation`      | [`DeclareContractTransaction`](../namespaces/types.md#declarecontracttransaction)   | `undefined`   | transaction payload to be declared containing: - compiled contract code - sender address - signature - (defaults to []) the signature |
 | `details`         | [`InvocationsDetailsWithNonce`](../namespaces/types.md#invocationsdetailswithnonce) | `undefined`   | optional details containing: - nonce - version - optional version - optional maxFee                                                   |
 | `blockIdentifier` | [`BlockIdentifier`](../namespaces/types.md#blockidentifier)                         | `undefined`   | (optional) block identifier                                                                                                           |
 | `skipValidate`    | `boolean`                                                                           | `false`       | (optional) skip cairo **validate** method                                                                                             |
@@ -761,7 +761,7 @@ the estimated fee
 
 ### getDeployAccountEstimateFee
 
-▸ **getDeployAccountEstimateFee**(`«destructured»`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`EstimateFeeResponse`](../interfaces/types.EstimateFeeResponse.md)\>
+▸ **getDeployAccountEstimateFee**(`invocation`, `details`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`EstimateFeeResponse`](../interfaces/types.EstimateFeeResponse.md)\>
 
 Estimates the fee for a given DEPLOY_ACCOUNT transaction
 
@@ -769,7 +769,7 @@ Estimates the fee for a given DEPLOY_ACCOUNT transaction
 
 | Name              | Type                                                                                          | Default value | Description                                                                                                                                 |
 | :---------------- | :-------------------------------------------------------------------------------------------- | :------------ | :------------------------------------------------------------------------------------------------------------------------------------------ |
-| `«destructured»`  | [`DeployAccountContractTransaction`](../namespaces/types.md#deployaccountcontracttransaction) | `undefined`   | transaction payload to be deployed containing: - classHash - constructorCalldata - addressSalt - signature - (defaults to []) the signature |
+| `invocation`      | [`DeployAccountContractTransaction`](../namespaces/types.md#deployaccountcontracttransaction) | `undefined`   | transaction payload to be deployed containing: - classHash - constructorCalldata - addressSalt - signature - (defaults to []) the signature |
 | `details`         | [`InvocationsDetailsWithNonce`](../namespaces/types.md#invocationsdetailswithnonce)           | `undefined`   | optional details containing: - nonce - version - optional version - optional maxFee                                                         |
 | `blockIdentifier` | [`BlockIdentifier`](../namespaces/types.md#blockidentifier)                                   | `undefined`   | (optional) block identifier                                                                                                                 |
 | `skipValidate`    | `boolean`                                                                                     | `false`       | (optional) skip cairo **validate** method                                                                                                   |
@@ -786,22 +786,22 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/sequencer.ts:477](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L477)
+[src/provider/sequencer.ts:460](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L460)
 
 ---
 
 ### getEstimateFeeBulk
 
-▸ **getEstimateFeeBulk**(`invocations`, `blockIdentifier?`): `Promise`<[`EstimateFeeResponseBulk`](../namespaces/types.md#estimatefeeresponsebulk)\>
+▸ **getEstimateFeeBulk**(`invocations`, `«destructured»`): `Promise`<[`EstimateFeeResponseBulk`](../namespaces/types.md#estimatefeeresponsebulk)\>
 
 Estimates the fee for a list of INVOKE transaction
 
 #### Parameters
 
-| Name              | Type                                                        | Description                                                                                                                                                                                                                                                    |
-| :---------------- | :---------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `invocations`     | [`InvocationBulk`](../namespaces/types.md#invocationbulk)   | the array of invocation and invocation details object containing: - contractAddress - the address of the account - calldata - (defaults to []) the calldata - signature - (defaults to []) the signature - nonce - optional nonce - version - optional version |
-| `blockIdentifier` | [`BlockIdentifier`](../namespaces/types.md#blockidentifier) | block identifier                                                                                                                                                                                                                                               |
+| Name             | Type                                                                            | Description                                                                                                                  |
+| :--------------- | :------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------------------------------------------- |
+| `invocations`    | [`AccountInvocations`](../namespaces/types.md#accountinvocations)               | AccountInvocations - Complete invocations array with account details                                                         |
+| `«destructured»` | [`getEstimateFeeBulkOptions`](../namespaces/types.md#getestimatefeebulkoptions) | getEstimateFeeBulkOptions - (optional) blockIdentifier - BlockIdentifier - (optional) skipValidate - boolean (default false) |
 
 #### Returns
 
@@ -815,7 +815,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/sequencer.ts:498](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L498)
+[src/provider/sequencer.ts:479](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L479)
 
 ---
 
@@ -844,7 +844,7 @@ The method should not be used
 
 #### Defined in
 
-[src/provider/sequencer.ts:537](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L537)
+[src/provider/sequencer.ts:491](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L491)
 
 ---
 
@@ -856,10 +856,10 @@ Wait for the transaction to be accepted
 
 #### Parameters
 
-| Name       | Type                                                                            | Description                                                                                                  |
-| :--------- | :------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------------------- |
-| `txHash`   | [`BigNumberish`](../namespaces/types.md#bignumberish)                           | transaction hash                                                                                             |
-| `options?` | [`waitForTransactionOptions`](../namespaces/types.md#waitfortransactionoptions) | (optional) retryInterval: number \| undefined; - (optional) successStates: TransactionStatus[] \| undefined; |
+| Name       | Type                                                                            | Description                                                                                                                              |
+| :--------- | :------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------- |
+| `txHash`   | [`BigNumberish`](../namespaces/types.md#bignumberish)                           | transaction hash                                                                                                                         |
+| `options?` | [`waitForTransactionOptions`](../namespaces/types.md#waitfortransactionoptions) | waitForTransactionOptions - (optional) retryInterval: number \| undefined; - (optional) successStates: TransactionStatus[] \| undefined; |
 
 #### Returns
 
@@ -873,7 +873,7 @@ GetTransactionReceiptResponse
 
 #### Defined in
 
-[src/provider/sequencer.ts:544](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L544)
+[src/provider/sequencer.ts:498](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L498)
 
 ---
 
@@ -883,23 +883,21 @@ GetTransactionReceiptResponse
 
 Gets the status of a transaction.
 
-[Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L48-L52)
-
 #### Parameters
 
-| Name     | Type                                                  |
-| :------- | :---------------------------------------------------- |
-| `txHash` | [`BigNumberish`](../namespaces/types.md#bignumberish) |
+| Name     | Type                                                  | Description  |
+| :------- | :---------------------------------------------------- | :----------- |
+| `txHash` | [`BigNumberish`](../namespaces/types.md#bignumberish) | BigNumberish |
 
 #### Returns
 
 `Promise`<[`GetTransactionStatusResponse`](../namespaces/types.md#gettransactionstatusresponse)\>
 
-the transaction status object { block_number, tx_status: NOT_RECEIVED | RECEIVED | PENDING | REJECTED | ACCEPTED_ONCHAIN }
+GetTransactionStatusResponse - the transaction status object
 
 #### Defined in
 
-[src/provider/sequencer.ts:584](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L584)
+[src/provider/sequencer.ts:535](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L535)
 
 ---
 
@@ -909,41 +907,39 @@ the transaction status object { block_number, tx_status: NOT_RECEIVED | RECEIVED
 
 Gets the smart contract address on the goerli testnet.
 
-[Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L13-L15)
-
 #### Returns
 
 `Promise`<[`GetContractAddressesResponse`](../namespaces/types.md#getcontractaddressesresponse)\>
 
-starknet smart contract addresses
+GetContractAddressesResponse - starknet smart contract addresses
 
 #### Defined in
 
-[src/provider/sequencer.ts:595](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L595)
+[src/provider/sequencer.ts:544](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L544)
 
 ---
 
 ### getTransactionTrace
 
-▸ **getTransactionTrace**(`txHash`): `Promise`<[`TransactionTraceResponse`](../namespaces/types.md#transactiontraceresponse)\>
+▸ **getTransactionTrace**(`txHash`): `Promise`<[`TransactionTraceResponse`](../namespaces/types.Sequencer.md#transactiontraceresponse)\>
 
 Gets the transaction trace from a tx id.
 
 #### Parameters
 
-| Name     | Type                                                  |
-| :------- | :---------------------------------------------------- |
-| `txHash` | [`BigNumberish`](../namespaces/types.md#bignumberish) |
+| Name     | Type                                                  | Description  |
+| :------- | :---------------------------------------------------- | :----------- |
+| `txHash` | [`BigNumberish`](../namespaces/types.md#bignumberish) | BigNumberish |
 
 #### Returns
 
-`Promise`<[`TransactionTraceResponse`](../namespaces/types.md#transactiontraceresponse)\>
+`Promise`<[`TransactionTraceResponse`](../namespaces/types.Sequencer.md#transactiontraceresponse)\>
 
-the transaction trace
+TransactionTraceResponse - the transaction trace
 
 #### Defined in
 
-[src/provider/sequencer.ts:605](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L605)
+[src/provider/sequencer.ts:553](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L553)
 
 ---
 
@@ -964,30 +960,27 @@ the transaction trace
 
 #### Defined in
 
-[src/provider/sequencer.ts:610](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L610)
+[src/provider/sequencer.ts:560](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L560)
 
 ---
 
 ### getSimulateTransaction
 
-▸ **getSimulateTransaction**(`invocation`, `invocationDetails`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`TransactionSimulationResponse`](../interfaces/types.TransactionSimulationResponse.md)\>
+▸ **getSimulateTransaction**(`invocations`, `«destructured»`): `Promise`<[`SimulateTransactionResponse`](../namespaces/types.md#simulatetransactionresponse)\>
 
-Simulates the transaction and returns the transaction trace and estimated fee.
+Simulate transaction using Sequencer provider
+WARNING!: Sequencer will process only first element from invocations array
 
 #### Parameters
 
-| Name                | Type                                                                                | Default value | Description                                                                                                                                                                                                             |
-| :------------------ | :---------------------------------------------------------------------------------- | :------------ | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `invocation`        | [`Invocation`](../namespaces/types.md#invocation)                                   | `undefined`   | the invocation object containing: - contractAddress - the address of the contract - entrypoint - the entrypoint of the contract - calldata - (defaults to []) the calldata - signature - (defaults to []) the signature |
-| `invocationDetails` | [`InvocationsDetailsWithNonce`](../namespaces/types.md#invocationsdetailswithnonce) | `undefined`   | -                                                                                                                                                                                                                       |
-| `blockIdentifier`   | [`BlockIdentifier`](../namespaces/types.md#blockidentifier)                         | `undefined`   | (optional) block identifier                                                                                                                                                                                             |
-| `skipValidate`      | `boolean`                                                                           | `false`       | (optional) skip cairo **validate** method                                                                                                                                                                               |
+| Name             | Type                                                                                    | Description                                                       |
+| :--------------- | :-------------------------------------------------------------------------------------- | :---------------------------------------------------------------- |
+| `invocations`    | [`AccountInvocations`](../namespaces/types.md#accountinvocations)                       | Array of invocations, but only first invocation will be processed |
+| `«destructured»` | [`getSimulateTransactionOptions`](../namespaces/types.md#getsimulatetransactionoptions) | -                                                                 |
 
 #### Returns
 
-`Promise`<[`TransactionSimulationResponse`](../interfaces/types.TransactionSimulationResponse.md)\>
-
-the transaction trace and estimated fee
+`Promise`<[`SimulateTransactionResponse`](../namespaces/types.md#simulatetransactionresponse)\>
 
 #### Implementation of
 
@@ -995,7 +988,7 @@ the transaction trace and estimated fee
 
 #### Defined in
 
-[src/provider/sequencer.ts:624](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L624)
+[src/provider/sequencer.ts:583](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L583)
 
 ---
 
@@ -1023,7 +1016,7 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/sequencer.ts:645](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L645)
+[src/provider/sequencer.ts:610](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L610)
 
 ---
 
@@ -1043,7 +1036,7 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/sequencer.ts:655](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L655)
+[src/provider/sequencer.ts:620](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L620)
 
 ---
 
@@ -1064,7 +1057,7 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/sequencer.ts:662](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L662)
+[src/provider/sequencer.ts:627](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L627)
 
 ---
 
@@ -1085,4 +1078,29 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/sequencer.ts:666](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L666)
+[src/provider/sequencer.ts:631](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L631)
+
+---
+
+### buildTransaction
+
+▸ **buildTransaction**(`invocation`, `versionType?`): [`AccountTransactionItem`](../namespaces/types.Sequencer.md#accounttransactionitem)
+
+Build Single AccountTransaction from Single AccountInvocation
+
+#### Parameters
+
+| Name           | Type                                                                    | Description                                                 |
+| :------------- | :---------------------------------------------------------------------- | :---------------------------------------------------------- |
+| `invocation`   | [`AccountInvocationItem`](../namespaces/types.md#accountinvocationitem) | AccountInvocationItem                                       |
+| `versionType?` | `"fee"` \| `"transaction"`                                              | 'fee' \| 'transaction' - used to determine default versions |
+
+#### Returns
+
+[`AccountTransactionItem`](../namespaces/types.Sequencer.md#accounttransactionitem)
+
+AccountTransactionItem
+
+#### Defined in
+
+[src/provider/sequencer.ts:641](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L641)

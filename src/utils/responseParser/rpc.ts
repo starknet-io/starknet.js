@@ -4,7 +4,9 @@
  */
 import {
   CallContractResponse,
+  ContractClassResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetTransactionResponse,
   RPC,
@@ -65,9 +67,9 @@ export class RPCResponseParser
     };
   }
 
-  public parseFeeEstimateOriginalResponse(
+  public parseFeeEstimateBulkResponse(
     res: Array<RPC.EstimateFeeResponse>
-  ): Array<EstimateFeeResponse> {
+  ): EstimateFeeResponseBulk {
     return res.map((val) => ({
       overall_fee: toBigInt(val.overall_fee),
       gas_consumed: toBigInt(val.gas_consumed),
@@ -87,8 +89,15 @@ export class RPCResponseParser
     return res.map((it) => {
       return {
         ...it,
-        suggestedMaxFees: estimatedFeeToMaxFee(BigInt(it.fee_estimation.overall_fee)),
+        suggestedMaxFee: estimatedFeeToMaxFee(BigInt(it.fee_estimation.overall_fee)),
       };
     });
+  }
+
+  public parseContractClassResponse(res: RPC.ContractClass): ContractClassResponse {
+    return {
+      ...res,
+      abi: typeof res.abi === 'string' ? JSON.parse(res.abi) : res.abi,
+    };
   }
 }
