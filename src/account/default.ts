@@ -141,7 +141,7 @@ export class Account extends Provider implements AccountInterface {
     { blockIdentifier, nonce: providedNonce, skipValidate }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
     const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
-    const version = !isSierra(contract) ? transactionVersion : transactionVersion_2;
+    const version = !isSierra(contract) ? feeTransactionVersion : feeTransactionVersion_2;
     const chainId = await this.getChainId();
 
     const declareContractTransaction = await this.buildDeclarePayload(

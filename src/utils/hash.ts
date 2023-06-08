@@ -33,6 +33,17 @@ export const transactionVersion_2 = 2n;
 export const feeTransactionVersion = 2n ** 128n + transactionVersion;
 export const feeTransactionVersion_2 = 2n ** 128n + transactionVersion_2;
 
+/**
+ * Return versions based on version type, default transaction versions
+ * @param versionType 'fee' | 'transaction'
+ * @returns versions { v1: bigint; v2: bigint; }
+ */
+export function getVersionsByType(versionType?: 'fee' | 'transaction') {
+  return versionType === 'fee'
+    ? { v1: feeTransactionVersion, v2: feeTransactionVersion_2 }
+    : { v1: transactionVersion, v2: transactionVersion_2 };
+}
+
 export function computeHashOnElements(data: BigNumberish[]): string {
   return [...data, data.length]
     .reduce((x: BigNumberish, y: BigNumberish) => starkCurve.pedersen(toBigInt(x), toBigInt(y)), 0)
