@@ -55,7 +55,7 @@ const tmp = a % b; // a & b are bigint
 const c = tmp >= 0n ? tmp : tmp + b;
 ```
 
-- .toarray() : can be replaced by `num.hexToBytes(a)`.
+- `.toarray()` : can be replaced by `num.hexToBytes(a)`.
 
 ## ec (elliptic curve)
 
