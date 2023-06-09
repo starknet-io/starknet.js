@@ -10,7 +10,7 @@ If you encounter any missing changes, please let us know and we will update this
 
 ## ~~number~~ replaced by num
 
-To avoid confusion with the native `number` command, the `number` namspace has been renamed `num`.
+To avoid confusion with the native `number` command, the `number` namespace has been renamed to `num`.
 
 ```typescript
 // v4
