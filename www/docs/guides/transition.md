@@ -24,7 +24,7 @@ const res = num.isHex(d1);
 
 ## 🪦 R.I.P. BigNumbers
 
-Bignumber are very slow to process ; too slow for Starknet.js. They have been replaced by native bigint.
+bignumber.js library used before by Starknet.js was very slow. It has been replaced by the native JavaScript `BigInt` data type.
 
 ```typescript
 // v4
