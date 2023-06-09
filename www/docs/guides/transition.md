@@ -62,7 +62,8 @@ const c = tmp >= 0n ? tmp : tmp + b;
 BN elliptic curves library has been replaced by a bigint library.  
 Many functions have been relocated/modified.
 The concept of key pair has been removed :  
-`ec.getKeyPair(privateKey)`, `ec.getKeyPairFromPublicKey(pubKey)` and `ec.genKeyPair()` do not exists anymore. Methods are using now directly the private key :  
+`ec.getKeyPair(privateKey)`, `ec.getKeyPairFromPublicKey(pubKey)` and `ec.genKeyPair()` do not exist anymore.
+Methods are now using the private key directly:
 For an Account creation :
 
 ```typescript
