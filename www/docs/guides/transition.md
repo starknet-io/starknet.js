@@ -132,7 +132,7 @@ const response = await account0.declareDeploy({ contract: compiledTest, classHas
 const response = await account0.declareAndDeploy({ contract: compiledHelloSierra, casm: compiledHelloCasm });
 ```
 
-> Nota : `declare` and `declareAndDeploy` do not needs anymore the classHash ; the new ec library is now able to calculate it quickly and automatically. If the contrat has been written in Cairo 1, the casm property is needed.
+> Note : `declare` and `declareAndDeploy` do not need anymore the classHash! The new ec library is now able to calculate it quickly and automatically. If the contract has been written in Cairo 1, the casm property is needed.
 
 ## Calldata and returned values
 
