@@ -35,7 +35,7 @@ const qty1 = BigInt("0x4a8bc");
 const qty2 = 32786324915918425n;
 ```
 
-So, the BigNumberish type is now defined as :
+So, the `BigNumberish` type is now defined as :
 
 - String representing a number : "123", "0xabc2"
 - Number (max 53 bits) : 123
