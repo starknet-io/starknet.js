@@ -44,7 +44,7 @@ So, the `BigNumberish` type is now defined as :
 All methods of BN type are of course removed, but have equivalences :
 
 - .mul() and .div() : common operators can be used with bigints : + - \* /
-- .umod() : can easily be replaced :
+- .umod() : can easily be replaced with :
 
 ```typescript
 // v4
