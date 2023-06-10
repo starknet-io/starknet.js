@@ -74,7 +74,7 @@ Special thanks to all the [contributors](https://github.com/starknet-io/starknet
 
 ...and of course the [StarkWare](https://starkware.co/) team for their dedicated support!
 
-This library would not be possible without these rockstars.
+This library would not be possible without these rockstars!
 
 ## 📜 License
 
