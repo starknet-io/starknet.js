@@ -843,10 +843,10 @@ prefer the 'num' naming
 
 #### Parameters
 
-| Name       | Type                                                   |
-| :--------- | :----------------------------------------------------- |
-| `args`     | [`ArgsOrCalldata`](namespaces/types.md#argsorcalldata) |
-| `callback` | `Function`                                             |
+| Name       | Type                                     |
+| :--------- | :--------------------------------------- |
+| `args`     | [`RawArgs`](namespaces/types.md#rawargs) |
+| `callback` | `Function`                               |
 
 #### Returns
 
@@ -854,7 +854,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/contract/default.ts:97](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L97)
+[src/contract/default.ts:98](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L98)
 
 ---
 
@@ -874,7 +874,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/contract/default.ts:24](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L24)
+[src/contract/default.ts:25](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L25)
 
 ---
 
