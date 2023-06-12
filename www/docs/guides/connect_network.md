@@ -82,7 +82,7 @@ For example, if you want to read the events recorded in a range of blocks, you n
 ```typescript
 import { RpcProvider } from "starknet";
 const providerRPC = new RpcProvider({ nodeUrl: "http://192.168.1.99:9545" }); // for a pathfinder node located in a PC in the local network
-const lastBlock=await providerRPC.getBlock('latest');
+const lastBlock = await providerRPC.getBlock('latest');
 let eventsList = await providerRPC.getEvents({
     address: myContractAddress,
     from_block: {block_number: lastBlock.block_number-2},
