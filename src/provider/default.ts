@@ -1,5 +1,6 @@
 import { StarknetChainId } from '../constants';
 import {
+  AccountInvocations,
   BigNumberish,
   BlockIdentifier,
   Call,
@@ -16,7 +17,6 @@ import {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
-  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Nonce,
@@ -24,9 +24,11 @@ import {
   RPC,
   RpcProviderOptions,
   SequencerProviderOptions,
+  SimulateTransactionResponse,
   StateUpdateResponse,
   Storage,
-  TransactionSimulationResponse,
+  getEstimateFeeBulkOptions,
+  getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
 import { ProviderInterface } from './interface';
@@ -108,10 +110,10 @@ export class Provider implements ProviderInterface {
   }
 
   public async getEstimateFeeBulk(
-    invocations: InvocationBulk,
-    blockIdentifier?: BlockIdentifier
+    invocations: AccountInvocations,
+    options: getEstimateFeeBulkOptions
   ): Promise<EstimateFeeResponseBulk> {
-    return this.provider.getEstimateFeeBulk(invocations, blockIdentifier);
+    return this.provider.getEstimateFeeBulk(invocations, options);
   }
 
   public async getNonceForAddress(
@@ -203,17 +205,10 @@ export class Provider implements ProviderInterface {
   }
 
   public async getSimulateTransaction(
-    invocation: Invocation,
-    invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier,
-    skipValidate?: boolean
-  ): Promise<TransactionSimulationResponse> {
-    return this.provider.getSimulateTransaction(
-      invocation,
-      invocationDetails,
-      blockIdentifier,
-      skipValidate
-    );
+    invocations: AccountInvocations,
+    options?: getSimulateTransactionOptions
+  ): Promise<SimulateTransactionResponse> {
+    return this.provider.getSimulateTransaction(invocations, options);
   }
 
   public async getStateUpdate(blockIdentifier?: BlockIdentifier): Promise<StateUpdateResponse> {

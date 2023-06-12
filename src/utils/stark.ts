@@ -1,9 +1,9 @@
 import { getStarkKey, utils } from 'micro-starknet';
-import { gzip } from 'pako';
+import { gzip, ungzip } from 'pako';
 
 import { ArraySignatureType, BigNumberish, CompressedProgram, Program, Signature } from '../types';
-import { addHexPrefix, btoaUniversal } from './encode';
-import { stringify } from './json';
+import { addHexPrefix, arrayBufferToString, atobUniversal, btoaUniversal } from './encode';
+import { parse, stringify } from './json';
 import {
   bigNumberishArrayToDecimalStringArray,
   bigNumberishArrayToHexadecimalStringArray,
@@ -22,6 +22,18 @@ export function compressProgram(jsonProgram: Program | string): CompressedProgra
   const stringified = typeof jsonProgram === 'string' ? jsonProgram : stringify(jsonProgram);
   const compressedProgram = gzip(stringified);
   return btoaUniversal(compressedProgram);
+}
+
+/**
+ * Function to decompress compressed compiled cairo program
+ *
+ * @param base64 CompressedProgram
+ * @returns parsed decompressed compiled cairo program
+ */
+export function decompressProgram(base64: CompressedProgram) {
+  if (Array.isArray(base64)) return base64;
+  const decompressed = arrayBufferToString(ungzip(atobUniversal(base64)));
+  return parse(decompressed);
 }
 
 export function randomAddress(): string {

@@ -123,17 +123,26 @@
         "entry_points_by_type"
       ]
     },
-    "TransactionSimulation": {
-      "type": "object",
-      "properties": {
-        "fee_estimation": {
-          "$ref": "accountSchemas#/definitions/EstimateFee"
-        },
-        "trace": {
-          "$ref": "sequencerSchemas#/definitions/TransactionTraceResponse"
+    "SimulateTransactionResponse": {
+      "name": "simulated_transactions",
+      "description": "The execution trace and consumed resources of the required transactions",
+      "type": "array",
+      "items": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "transaction_trace": {
+              "title": "the transaction's trace",
+              "$ref": "sequencerSchemas#/definitions/TransactionTraceResponse"
+            },
+            "fee_estimation": {
+              "title": "the transaction's resources and fee",
+              "$ref": "accountSchemas#/definitions/EstimateFee"
+            }
+          },
+          "required": ["fee_estimation", "transaction_trace"]
         }
-      },
-      "required": ["fee_estimation", "trace"]
+      }
     }
   }
 }

@@ -56,13 +56,6 @@ export type ExecutionResources = {
   n_memory_holes: number;
 };
 
-export type TransactionTraceResponse = {
-  validate_invocation?: FunctionInvocation;
-  function_invocation?: FunctionInvocation;
-  fee_transfer_invocation?: FunctionInvocation;
-  signature: string[];
-};
-
 export type CallL1Handler = {
   from_address: string;
   to_address: string;
@@ -78,6 +71,14 @@ export type DeployedContractItem = {
 export type SequencerIdentifier = { blockHash: string } | { blockNumber: BlockNumber };
 
 export namespace Sequencer {
+  export type TransactionTraceResponse = {
+    validate_invocation?: FunctionInvocation;
+    function_invocation?: FunctionInvocation;
+    fee_transfer_invocation?: FunctionInvocation;
+    constructor_invocation?: FunctionInvocation;
+    signature: string[];
+  };
+
   export type DeclareTransaction = {
     type: 'DECLARE';
     sender_address: string;
@@ -247,22 +248,21 @@ export namespace Sequencer {
   export type DeployAccountEstimateFee = Omit<DeployAccountTransaction, 'max_fee'>;
   export type DeployEstimateFee = DeployTransaction;
 
-  export type EstimateFeeRequest =
+  export type SimulateTransactionResponse = {
+    trace: TransactionTraceResponse; // diff with OPENRPC "transaction_trace"
+    fee_estimation: Sequencer.EstimateFeeResponse;
+  };
+
+  export type AccountTransactionItem =
     | InvokeEstimateFee
     | DeclareEstimateFee
     | DeployEstimateFee
     | DeployAccountEstimateFee;
 
-  export type TransactionSimulationResponse = {
-    trace: TransactionTraceResponse;
-    fee_estimation: Sequencer.EstimateFeeResponse;
-  };
-
-  export type SimulateTransaction = Omit<InvokeFunctionTransaction, 'entry_point_type'>;
-
-  export type EstimateFeeRequestBulk = AllowArray<
-    InvokeEstimateFee | DeclareEstimateFee | DeployEstimateFee | DeployAccountEstimateFee
-  >;
+  /**
+   * Transaction filled with account data
+   */
+  export type AccountTransaction = AllowArray<AccountTransactionItem>;
 
   // Support 0.9.1 changes in a backward-compatible way
   export type EstimateFeeResponse =
@@ -400,7 +400,7 @@ export namespace Sequencer {
         blockIdentifier: BlockIdentifier;
         skipValidate: boolean;
       };
-      REQUEST: EstimateFeeRequest;
+      REQUEST: AccountTransactionItem;
       RESPONSE: EstimateFeeResponse;
     };
     get_class_by_hash: {
@@ -445,14 +445,15 @@ export namespace Sequencer {
         blockIdentifier: BlockIdentifier;
         skipValidate: boolean;
       };
-      REQUEST: SimulateTransaction;
-      RESPONSE: TransactionSimulationResponse;
+      REQUEST: AccountTransaction;
+      RESPONSE: SimulateTransactionResponse;
     };
     estimate_fee_bulk: {
       QUERY: {
         blockIdentifier: BlockIdentifier;
+        skipValidate: boolean;
       };
-      REQUEST: EstimateFeeRequestBulk;
+      REQUEST: AccountTransaction;
       RESPONSE: EstimateFeeResponseBulk;
     };
     get_block_traces: {

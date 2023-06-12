@@ -363,4 +363,10 @@ mod HelloStarknet {
         a.append(2);
         (a, b)
     }
+
+    // used for changes to redeclare contract
+    #[view]
+    fn array2ddd_felt(testdd: Array<Array<felt252>>) -> felt252 {
+        return *(testdd.at(0_u32)).at(0_u32);
+    }
 }

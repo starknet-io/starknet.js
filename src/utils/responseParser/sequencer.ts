@@ -15,10 +15,11 @@ import {
   InvokeFunctionResponse,
   Sequencer,
   SierraContractClass,
+  SimulateTransactionResponse,
   StateUpdateResponse,
-  TransactionSimulationResponse,
 } from '../../types';
 import { toBigInt } from '../num';
+import { estimatedFeeToMaxFee } from '../stark';
 import { ResponseParser } from '.';
 
 export class SequencerAPIResponseParser extends ResponseParser {
@@ -131,36 +132,20 @@ export class SequencerAPIResponseParser extends ResponseParser {
     });
   }
 
-  public parseFeeSimulateTransactionResponse(
-    res: Sequencer.TransactionSimulationResponse
-  ): TransactionSimulationResponse {
-    if ('overall_fee' in res.fee_estimation) {
-      let gasInfo = {};
-
-      try {
-        gasInfo = {
-          gas_consumed: toBigInt(res.fee_estimation.gas_usage),
-          gas_price: toBigInt(res.fee_estimation.gas_price),
-        };
-      } catch {
-        // do nothing
-      }
-
-      return {
-        trace: res.trace,
-        fee_estimation: {
-          ...gasInfo,
-          overall_fee: toBigInt(res.fee_estimation.overall_fee),
-        },
-      };
-    }
-
-    return {
-      trace: res.trace,
-      fee_estimation: {
-        overall_fee: toBigInt(res.fee_estimation.amount),
+  public parseSimulateTransactionResponse(
+    res: Sequencer.SimulateTransactionResponse
+  ): SimulateTransactionResponse {
+    const suggestedMaxFee =
+      'overall_fee' in res.fee_estimation
+        ? res.fee_estimation.overall_fee
+        : res.fee_estimation.amount;
+    return [
+      {
+        transaction_trace: res.trace,
+        fee_estimation: res.fee_estimation,
+        suggestedMaxFee: estimatedFeeToMaxFee(BigInt(suggestedMaxFee)),
       },
-    };
+    ];
   }
 
   public parseCallContractResponse(res: Sequencer.CallContractResponse): CallContractResponse {

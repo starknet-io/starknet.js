@@ -16,7 +16,7 @@ export namespace RPC {
   export type ContractAddress = ADDRESS;
   export type Felt = FELT;
   export type Nonce = OPENRPC.Nonce;
-  export type ContractClass = OPENRPC.ContractClass;
+  export type ContractClass = OPENRPC.ContractClass | OPENRPC.DeprecatedContractClass;
   export type StateUpdate = OPENRPC.StateUpdate;
   export type Transaction = OPENRPC.Transaction;
   export type PendingTransactions = OPENRPC.PendingTransactions;
@@ -41,8 +41,12 @@ export namespace RPC {
   export type InvokedTransaction = OPENRPC.InvokedTransaction;
   export type DeclaredTransaction = OPENRPC.DeclaredTransaction;
   export type DeployedTransaction = OPENRPC.DeployedTransaction;
+  export type SimulationFlags = OPENRPC.SimulationFlags;
+  export type BroadcastedTransaction = OPENRPC.BroadcastedTransaction;
+  export type EstimatedFee = OPENRPC.EstimatedFee;
   export type Methods = OPENRPC.Methods;
   export type Storage = OPENRPC.Storage;
+  export type SimulateTransactionResponse = OPENRPC.SimulatedTransactions;
 
   export enum TransactionType {
     DECLARE = 'DECLARE',
@@ -54,9 +58,10 @@ export namespace RPC {
 
   // Exported Diff on Sequencer (can be removed when diff resolved by new RPC v)
   export type StorageDiffs = Array<CONTRACT_STORAGE_DIFF_ITEM>;
-  export type DeclaredContractHashes = Array<FELT>;
+  export type DeprecatedDeclaredClasses = Array<FELT>;
   export type Nonces = Array<{
     contract_address: ADDRESS;
     nonce: FELT;
   }>;
+  export type ReplacedClasses = Array<{ contract_address: ADDRESS; class_hash: FELT }>;
 }

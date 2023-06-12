@@ -11,7 +11,12 @@ export type CairoAssembly = {
   entry_points_by_type: EntryPointsByType;
 };
 
-export type SierraContractClass = {
+/** COMPILED CONTRACT */
+/**
+ * format produced after starknet-compile .cairo to .json
+ * sierra_program is hex array
+ */
+export type CompiledSierra = {
   sierra_program: ByteCode;
   sierra_program_debug_info: SierraProgramDebugInfo;
   contract_class_version: string;
@@ -19,8 +24,17 @@ export type SierraContractClass = {
   abi: Abi;
 };
 
-/** COMPILED CONTRACT */
-export type CompiledSierra = SierraContractClass;
+/**
+ * format produced after compressing 'sierra_program', stringifies 'abi' property and omit sierra_program_debug_info
+ * CompressedCompiledSierra
+ */
+export type SierraContractClass = Omit<
+  CompiledSierra,
+  'sierra_program' | 'abi' | 'sierra_program_debug_info'
+> & {
+  sierra_program: string;
+  abi: string;
+};
 export type CompiledSierraCasm = CairoAssembly;
 
 /** SUBTYPES */

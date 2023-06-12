@@ -5,11 +5,14 @@
 import {
   CallContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetTransactionResponse,
   RPC,
+  SimulateTransactionResponse,
 } from '../../types';
 import { toBigInt } from '../num';
+import { estimatedFeeToMaxFee } from '../stark';
 import { ResponseParser } from '.';
 
 type RpcGetBlockResponse = RPC.GetBlockWithTxHashesResponse & {
@@ -55,17 +58,38 @@ export class RPCResponseParser
     };
   }
 
-  public parseFeeEstimateResponse(res: RPC.EstimateFeeResponse): EstimateFeeResponse {
+  public parseFeeEstimateResponse(res: Array<RPC.EstimateFeeResponse>): EstimateFeeResponse {
     return {
-      overall_fee: toBigInt(res.overall_fee),
-      gas_consumed: toBigInt(res.gas_consumed),
-      gas_price: toBigInt(res.gas_price),
+      overall_fee: toBigInt(res[0].overall_fee),
+      gas_consumed: toBigInt(res[0].gas_consumed),
+      gas_price: toBigInt(res[0].gas_price),
     };
+  }
+
+  public parseFeeEstimateBulkResponse(
+    res: Array<RPC.EstimateFeeResponse>
+  ): EstimateFeeResponseBulk {
+    return res.map((val) => ({
+      overall_fee: toBigInt(val.overall_fee),
+      gas_consumed: toBigInt(val.gas_consumed),
+      gas_price: toBigInt(val.gas_price),
+    }));
   }
 
   public parseCallContractResponse(res: Array<string>): CallContractResponse {
     return {
       result: res,
     };
+  }
+
+  public parseSimulateTransactionResponse(
+    res: RPC.SimulateTransactionResponse
+  ): SimulateTransactionResponse {
+    return res.map((it) => {
+      return {
+        ...it,
+        suggestedMaxFee: estimatedFeeToMaxFee(BigInt(it.fee_estimation.overall_fee)),
+      };
+    });
   }
 }

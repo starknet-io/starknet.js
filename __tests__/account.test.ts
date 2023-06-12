@@ -1,7 +1,17 @@
 import { Signature } from 'micro-starknet';
 
 import typedDataExample from '../__mocks__/typedDataExample.json';
-import { Account, Contract, Provider, TransactionStatus, ec, hash, stark } from '../src';
+import {
+  Account,
+  Contract,
+  DeclareDeployUDCResponse,
+  Provider,
+  TransactionStatus,
+  TransactionType,
+  ec,
+  hash,
+  stark,
+} from '../src';
 import { uint256 } from '../src/utils/calldata/cairo';
 import { parseUDCEvent } from '../src/utils/events';
 import { calculateContractAddressFromHash, feeTransactionVersion } from '../src/utils/hash';
@@ -17,7 +27,6 @@ import {
   compiledStarknetId,
   compiledTestDapp,
   describeIfDevnetSequencer,
-  describeIfSequencer,
   erc20ClassHash,
   getTestAccount,
   getTestProvider,
@@ -58,7 +67,7 @@ describe('deploy and test Wallet', () => {
     dapp = new Contract(compiledTestDapp.abi, dappResponse.deploy.contract_address!, provider);
   });
 
-  test('estimate fee', async () => {
+  test('estimateInvokeFee Cairo 0', async () => {
     const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
     const result = await account.estimateInvokeFee({
       contractAddress: erc20Address,
@@ -69,6 +78,10 @@ describe('deploy and test Wallet', () => {
     expect(result).toMatchSchemaRef('EstimateFee');
     expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
     innerInvokeEstFeeSpy.mockClear();
+  });
+
+  xtest('estimateDeclareFee Cairo 0 &  Cairo 1', async () => {
+    // this is tested indirectly true declareAndDeploy while declaring
   });
 
   describeIfDevnetSequencer('Test on Devnet Sequencer', () => {
@@ -143,47 +156,140 @@ describe('deploy and test Wallet', () => {
       ]);
       expect(deployments).toMatchSchemaRef('MultiDeployContractResponse');
     });
+  });
 
-    test('estimate fee bulk', async () => {
-      const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
-      const estimatedFeeBulk = await account.estimateFeeBulk([
+  describe('simulate transaction - single transaction S0.11.2', () => {
+    test('simulate INVOKE Cairo 0', async () => {
+      // INFO: Sequencer S0.11.2 support only one transaction per simulate request
+      const res = await account.simulateTransaction([
         {
-          type: 'INVOKE_FUNCTION',
-          payload: {
-            contractAddress: erc20Address,
-            entrypoint: 'transfer',
-            calldata: [erc20.address, '10', '0'],
+          type: TransactionType.INVOKE,
+          contractAddress: erc20Address,
+          entrypoint: 'transfer',
+          calldata: {
+            recipient: erc20.address,
+            amount: uint256(10),
           },
         },
+        // This transaction will be skipped on sequencer
         {
-          type: 'INVOKE_FUNCTION',
-          payload: {
-            contractAddress: erc20Address,
-            entrypoint: 'transfer',
-            calldata: [erc20.address, '10', '0'],
+          type: TransactionType.INVOKE,
+          contractAddress: erc20Address,
+          entrypoint: 'transfer',
+          calldata: {
+            recipient: erc20.address,
+            amount: uint256(10),
           },
         },
       ]);
-
-      estimatedFeeBulk.forEach((value) => {
-        expect(value).toMatchSchemaRef('EstimateFee');
-      });
-      expect(estimatedFeeBulk.length).toEqual(2);
-      expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
-      innerInvokeEstFeeSpy.mockClear();
+      expect(res).toMatchSchemaRef('SimulateTransactionResponse');
     });
-
-    test('simulate transaction', async () => {
-      const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
-      const res = await account.simulateTransaction({
-        contractAddress: erc20Address,
-        entrypoint: 'transfer',
-        calldata: [erc20.address, '10', '0'],
+    test('simulate multi INVOKE Cairo 0', async () => {
+      const res = await account.simulateTransaction([
+        {
+          type: TransactionType.INVOKE,
+          payload: [
+            {
+              contractAddress: erc20Address,
+              entrypoint: 'transfer',
+              calldata: {
+                recipient: erc20.address,
+                amount: uint256(10),
+              },
+            },
+            {
+              contractAddress: erc20Address,
+              entrypoint: 'transfer',
+              calldata: {
+                recipient: erc20.address,
+                amount: uint256(10),
+              },
+            },
+          ],
+        },
+      ]);
+      expect(res).toMatchSchemaRef('SimulateTransactionResponse');
+    });
+    test('simulate DECLARE - Cairo 0 Contract', async () => {
+      const res = await account.simulateTransaction([
+        {
+          type: TransactionType.DECLARE,
+          contract: compiledErc20,
+        },
+      ]);
+      expect(res).toMatchSchemaRef('SimulateTransactionResponse');
+    });
+    test('simulate DECLARE - Cairo 1 Contract', async () => {
+      const res = await account.simulateTransaction([
+        {
+          type: TransactionType.DECLARE,
+          contract: compiledHelloSierra,
+          casm: compiledHelloSierraCasm,
+        },
+      ]);
+      expect(res).toMatchSchemaRef('SimulateTransactionResponse');
+    });
+    test('simulate DEPLOY - Cairo 0 Contract', async () => {
+      const res = await account.simulateTransaction([
+        {
+          type: TransactionType.DEPLOY,
+          classHash: erc20ClassHash,
+          constructorCalldata: {
+            name: 'Token',
+            symbol: 'ERC20',
+            recipient: account.address,
+          },
+        },
+      ]);
+      expect(res).toMatchSchemaRef('SimulateTransactionResponse');
+    });
+    test('simulate multi DEPLOY - Cairo 0 Contract', async () => {
+      const res = await account.simulateTransaction([
+        {
+          type: TransactionType.DEPLOY,
+          payload: [
+            {
+              classHash: '0x04367b26fbb92235e8d1137d19c080e6e650a6889ded726d00658411cc1046f5',
+            },
+            {
+              classHash: erc20ClassHash,
+              constructorCalldata: {
+                name: 'Token',
+                symbol: 'ERC20',
+                recipient: account.address,
+              },
+            },
+          ],
+        },
+      ]);
+      expect(res).toMatchSchemaRef('SimulateTransactionResponse');
+    });
+    test('simulate DEPLOY_ACCOUNT - Cairo 0 Account', async () => {
+      const declareAccount = await account.declare({
+        contract: compiledOpenZeppelinAccount,
       });
+      const accountClassHash = declareAccount.class_hash;
+      await provider.waitForTransaction(declareAccount.transaction_hash);
+      const privateKey = stark.randomAddress();
+      const starkKeyPub = ec.starkCurve.getStarkKey(privateKey);
+      const precalculatedAddress = calculateContractAddressFromHash(
+        starkKeyPub,
+        accountClassHash,
+        { publicKey: starkKeyPub },
+        0
+      );
+      const newAccount = new Account(provider, precalculatedAddress, privateKey);
 
-      expect(res).toMatchSchemaRef('TransactionSimulation');
-      expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
-      innerInvokeEstFeeSpy.mockClear();
+      const res = await newAccount.simulateTransaction([
+        {
+          type: TransactionType.DEPLOY_ACCOUNT,
+          classHash: accountClassHash,
+          constructorCalldata: { publicKey: starkKeyPub },
+          addressSalt: starkKeyPub,
+          contractAddress: precalculatedAddress,
+        },
+      ]);
+      expect(res).toMatchSchemaRef('SimulateTransactionResponse');
     });
   });
 
@@ -459,7 +565,7 @@ describe('deploy and test Wallet', () => {
     });
   });
 
-  describeIfSequencer('Estimate fee bulk', () => {
+  describe('Estimate fee bulk & estimate fee', () => {
     let accountClassHash: string;
     let precalculatedAddress: string;
     let starkKeyPub: string;
@@ -483,7 +589,54 @@ describe('deploy and test Wallet', () => {
       newAccount = new Account(provider, precalculatedAddress, privateKey);
     });
 
-    test('deploy account & invoke functions', async () => {
+    test('estimateAccountDeployFee Cairo 0', async () => {
+      /*       const { transaction_hash } = await account.execute({
+        contractAddress: erc20Address,
+        entrypoint: 'transfer',
+        calldata: [precalculatedAddress, uint256(10)],
+      });
+      await provider.waitForTransaction(transaction_hash); */
+
+      // const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
+      const result = await newAccount.estimateAccountDeployFee({
+        classHash: accountClassHash,
+        constructorCalldata: { publicKey: starkKeyPub },
+        addressSalt: starkKeyPub,
+        contractAddress: precalculatedAddress,
+      });
+      expect(result).toMatchSchemaRef('EstimateFee');
+    });
+
+    test('estimate fee bulk invoke functions', async () => {
+      const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
+      const estimatedFeeBulk = await account.estimateFeeBulk([
+        {
+          type: 'INVOKE_FUNCTION',
+          payload: {
+            contractAddress: erc20Address,
+            entrypoint: 'transfer',
+            calldata: [erc20.address, '10', '0'],
+          },
+        },
+        {
+          type: 'INVOKE_FUNCTION',
+          payload: {
+            contractAddress: erc20Address,
+            entrypoint: 'transfer',
+            calldata: [erc20.address, '10', '0'],
+          },
+        },
+      ]);
+
+      estimatedFeeBulk.forEach((value) => {
+        expect(value).toMatchSchemaRef('EstimateFee');
+      });
+      expect(estimatedFeeBulk.length).toEqual(2);
+      expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
+      innerInvokeEstFeeSpy.mockClear();
+    });
+
+    test('deploy account & multi invoke functions', async () => {
       const { transaction_hash } = await account.execute({
         contractAddress: erc20Address,
         entrypoint: 'transfer',
@@ -523,9 +676,16 @@ describe('deploy and test Wallet', () => {
       });
     });
 
-    test('declare, deploy & invoke functions', async () => {
+    test('declare, deploy & multi invoke functions', async () => {
       const res = await account.estimateFeeBulk([
+        /*         {
+          // Cairo 1.1.0, if declared estimate error with can't redeclare same contract
+          type: TransactionType.DECLARE,
+          contract: compiledHelloSierra,
+          casm: compiledHelloSierraCasm,
+        }, */
         {
+          // Cairo 0
           type: 'DECLARE',
           payload: {
             contract: compiledErc20,
@@ -562,6 +722,27 @@ describe('deploy and test Wallet', () => {
       res.forEach((value) => {
         expect(value).toMatchSchemaRef('EstimateFee');
       });
+    });
+
+    // Order is important, declare c1 must be last else estimate and simulate will error
+    // with contract already declared
+    test('estimateInvokeFee Cairo 1', async () => {
+      // Cairo 1 contract
+      const ddc1: DeclareDeployUDCResponse = await account.declareAndDeploy({
+        contract: compiledHelloSierra,
+        casm: compiledHelloSierraCasm,
+      });
+
+      const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
+      const result = await account.estimateInvokeFee({
+        contractAddress: ddc1.deploy.address,
+        entrypoint: 'increase_balance',
+        calldata: [100],
+      });
+
+      expect(result).toMatchSchemaRef('EstimateFee');
+      expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
+      innerInvokeEstFeeSpy.mockClear();
     });
   });
 });

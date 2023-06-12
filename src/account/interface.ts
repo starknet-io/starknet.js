@@ -18,13 +18,14 @@ import {
   EstimateFeeDetails,
   EstimateFeeResponse,
   EstimateFeeResponseBulk,
+  Invocations,
   InvocationsDetails,
   InvokeFunctionResponse,
   MultiDeployContractResponse,
   Nonce,
   Signature,
-  TransactionBulk,
-  TransactionSimulation,
+  SimulateTransactionDetails,
+  SimulateTransactionResponse,
   TypedData,
   UniversalDeployerContractPayload,
 } from '../types';
@@ -106,14 +107,14 @@ export abstract class AccountInterface extends ProviderInterface {
    * Contract must be deployed for fee estimation to be possible
    *
    * @param transactions array of transaction object containing :
-   * - type - the type of transaction : 'DECLARE' | 'DEPLOY' | 'INVOKE_FUNCTION' | 'DEPLOY_ACCOUNT'
+   * - type - the type of transaction : 'DECLARE' | (multi)'DEPLOY' | (multi)'INVOKE_FUNCTION' | 'DEPLOY_ACCOUNT'
    * - payload - the payload of the transaction
    *
    * @returns response from estimate_fee
    */
   public abstract estimateFeeBulk(
-    transactions: TransactionBulk,
-    estimateFeeDetails?: EstimateFeeDetails
+    invocations: Invocations,
+    details?: EstimateFeeDetails
   ): Promise<EstimateFeeResponseBulk>;
 
   /**
@@ -319,17 +320,16 @@ export abstract class AccountInterface extends ProviderInterface {
   ): Promise<bigint>;
 
   /**
-   * Simulates the transaction and returns the transaction trace and estimated fee.
+   * Simulates an array of transaction and returns an array of transaction trace and estimated fee.
    *
-   * @param calls the invocation object containing:
-   * - contractAddress - the address of the contract
-   * - entrypoint - the entrypoint of the contract
-   * - calldata - (defaults to []) the calldata
+   * @param invocations Invocations containing:
+   * - type - transaction type: DECLARE, (multi)DEPLOY, DEPLOY_ACCOUNT, (multi)INVOKE_FUNCTION
+   * @param details SimulateTransactionDetails
    *
-   * @returns response from estimate_fee
+   * @returns response from simulate_transaction
    */
   public abstract simulateTransaction(
-    calls: AllowArray<Call>,
-    estimateFeeDetails?: EstimateFeeDetails
-  ): Promise<TransactionSimulation>;
+    invocations: Invocations,
+    details?: SimulateTransactionDetails
+  ): Promise<SimulateTransactionResponse>;
 }
