@@ -43,7 +43,7 @@ const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_G
 
 // initialize deployed contract
 const testAddress = "0x7667469b8e93faa642573078b6bf8c790d3a6184b2a1bb39c5c923a732862e1";
-const compiledTest = json.parse(fs.readFileSync( "./compiledContracts/test.json").toString("ascii"));
+const compiledTest = json.parse(fs.readFileSync("./compiledContracts/test.json").toString("ascii"));
 
 // connect the contract
 const myTestContract = new Contract(compiledTest.abi, testAddress, provider);
