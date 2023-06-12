@@ -69,6 +69,6 @@ Please take a look at our workshop using OpenZeppelin contracts <ins>[here](http
 
 Example with Argent contract <ins>[here](https://github.com/0xs34n/starknet.js-account)</ins>.
 
-## contracts used in the guides
+## Contracts used in the guides
 
 You can find the compiled contracts used in these guides in `compiled_contracts` directory.
