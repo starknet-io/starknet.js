@@ -148,7 +148,7 @@ const deployResponse = await account0.deployContract({
 
 Properties have to be ordered in conformity with the abi.
 
-Even more easy :
+Even easier:
 
 ```typescript
 const contractConstructor: Calldata = CallData.compile([ 'niceToken', "http://addressOfMyERC721pictures/image1.jpg", myArray1]);
