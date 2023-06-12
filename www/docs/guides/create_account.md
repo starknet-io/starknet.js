@@ -310,4 +310,4 @@ console.log('✅ New customized account created.\n   address =', contract_addres
 ## Account update
 
 For ArgentX and Braavos wallets, if you have created the privkey inside the browser wallet, necessary upgrades will be automatically managed in the wallet.  
-However, if you have created yourself the private key, it become your responsibility to update the account implementation class when it's necessary. It can be done with the `upgrade` function of the implementation class.
+However, if you have created yourself the private key, it becomes your responsibility to update the account implementation class when it's necessary. It can be done with the `upgrade` function of the implementation class.
