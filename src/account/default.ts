@@ -4,6 +4,7 @@ import { Provider } from '../provider/default';
 import { Signer, SignerInterface } from '../signer';
 import {
   Abi,
+  AccountInvocationItem,
   AccountInvocations,
   AccountInvocationsFactoryDetails,
   AllowArray,
@@ -652,7 +653,7 @@ export class Account extends Provider implements AccountInterface {
     const chainId = await this.getChainId();
 
     return Promise.all(
-      ([] as Invocations).concat(invocations).map(async (transaction: any, index: number) => {
+      ([] as Invocations).concat(invocations).map(async (transaction, index: number) => {
         const signerDetails: InvocationsSignerDetails = {
           walletAddress: this.address,
           nonce: toBigInt(Number(safeNonce) + index),
@@ -661,62 +662,52 @@ export class Account extends Provider implements AccountInterface {
           chainId,
           cairoVersion: this.cairoVersion,
         };
+        const txPayload: any = 'payload' in transaction ? transaction.payload : transaction;
+        const common = {
+          type: transaction.type,
+          version,
+          nonce: toBigInt(Number(safeNonce) + index),
+          blockIdentifier,
+        };
 
-        const txPayload = transaction.payload ?? transaction;
-
-        let res: any; // AccountInvocations
-        if (typeof transaction === 'object' && transaction.type === TransactionType.INVOKE) {
-          const invocation = await this.buildInvocation(
-            Array.isArray(txPayload) ? txPayload : [txPayload],
+        if (transaction.type === TransactionType.INVOKE) {
+          const payload = await this.buildInvocation(
+            ([] as Call[]).concat(txPayload),
             signerDetails
           );
-          res = {
-            type: transaction.type,
-            ...invocation,
-            version,
-            nonce: toBigInt(Number(safeNonce) + index),
-            blockIdentifier,
-          };
-        } else if (
-          typeof transaction === 'object' &&
-          transaction.type === TransactionType.DECLARE
-        ) {
+          return {
+            ...common,
+            ...payload,
+          } as AccountInvocationItem;
+        }
+        if (transaction.type === TransactionType.DECLARE) {
           signerDetails.version = !isSierra(txPayload.contract)
             ? toBigInt(versions[0])
             : toBigInt(versions[1]);
-          const declareContractPayload = await this.buildDeclarePayload(txPayload, signerDetails);
-          res = {
-            type: transaction.type,
-            ...declareContractPayload,
-            version: signerDetails.version,
-            nonce: toBigInt(Number(safeNonce) + index),
-            blockIdentifier,
-          };
-        } else if (
-          typeof transaction === 'object' &&
-          transaction.type === TransactionType.DEPLOY_ACCOUNT
-        ) {
-          const payload = await this.buildAccountDeployPayload(txPayload, signerDetails);
-          res = {
-            type: transaction.type,
+          const payload = await this.buildDeclarePayload(txPayload, signerDetails);
+          return {
+            ...common,
             ...payload,
-            version,
-            nonce: toBigInt(Number(safeNonce) + index),
-            blockIdentifier,
-          };
-        } else if (typeof transaction === 'object' && transaction.type === TransactionType.DEPLOY) {
-          const calls = this.buildUDCContractPayload(txPayload);
-          const invocation = await this.buildInvocation(calls, signerDetails);
-          res = {
-            type: TransactionType.INVOKE,
-            ...invocation,
-            version,
-            nonce: toBigInt(Number(safeNonce) + index),
-            blockIdentifier,
-          };
+            version: signerDetails.version,
+          } as AccountInvocationItem;
         }
-
-        return res;
+        if (transaction.type === TransactionType.DEPLOY_ACCOUNT) {
+          const payload = await this.buildAccountDeployPayload(txPayload, signerDetails);
+          return {
+            ...common,
+            ...payload,
+          } as AccountInvocationItem;
+        }
+        if (transaction.type === TransactionType.DEPLOY) {
+          const calls = this.buildUDCContractPayload(txPayload);
+          const payload = await this.buildInvocation(calls, signerDetails);
+          return {
+            ...common,
+            ...payload,
+            type: TransactionType.INVOKE,
+          } as AccountInvocationItem;
+        }
+        throw Error(`accountInvocationsFactory: unsupported transaction type: ${transaction}`);
       })
     ) as Promise<AccountInvocations>;
   }
