@@ -137,7 +137,7 @@ const res = await myTestContract[listFn[fnChoice]](200, 234567897n, 865423);
 
 ### Light and fast call
 
-If you want to have a very fast execution, with the minimum of ressource usage :
+If you want to have a very fast execution, with the minimum of resource usage :
 
 ```typescript
 const specialParameters: Calldata = [
