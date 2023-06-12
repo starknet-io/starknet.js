@@ -151,7 +151,7 @@ Properties have to be ordered in conformity with the abi.
 Even easier:
 
 ```typescript
-const contractConstructor: Calldata = CallData.compile([ 'niceToken', "http://addressOfMyERC721pictures/image1.jpg", myArray1]);
+const contractConstructor: Calldata = CallData.compile(['niceToken', "http://addressOfMyERC721pictures/image1.jpg", myArray1]);
 ```
 
 ## `declare()` for a new class
