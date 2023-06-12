@@ -64,7 +64,7 @@ The result is in `estimatedFee1`, of type BigInt.
 ## Fee limitation
 
 In all non-free functions, you can add an optional parameter limiting the fee consumption.  
-If the fee has been previously estimated, you can use this value for this parameter, but sometime this value is under-evaluated : **don't hesitate to add a margin of approximately 10%** :
+If the fee has been previously estimated, you can use this value for this parameter, but sometimes this value is under-evaluated : **don't hesitate to add a margin of approximately 10%** :
 
 ```typescript
 estimatedFee1 * 11n / 10n
