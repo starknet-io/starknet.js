@@ -1,3 +1,39 @@
+# [5.13.0](https://github.com/0xs34n/starknet.js/compare/v5.12.0...v5.13.0) (2023-06-12)
+
+### Bug Fixes
+
+- class / simulate types ([823e144](https://github.com/0xs34n/starknet.js/commit/823e144257cf3afdf8ca64f3e6e1afd1c2525161))
+- getClass return type ([5251337](https://github.com/0xs34n/starknet.js/commit/52513373fc90af4764f3d8bf7f24a6a65db8dc52))
+- removed doc modification ([f45b532](https://github.com/0xs34n/starknet.js/commit/f45b53204fbd4fe8a8ccc46fdf401cd32b732883))
+- suggestedMaxFees to suggestedMaxFee ([80cfbb9](https://github.com/0xs34n/starknet.js/commit/80cfbb9c3eca55ddb0eae6a152523b72f3ba9699))
+- test error ([2117e75](https://github.com/0xs34n/starknet.js/commit/2117e75b92c4b025e3d69a2719454fca3af76aa2))
+- type ([67bf6d8](https://github.com/0xs34n/starknet.js/commit/67bf6d8c31c62107eb1ea4b21923b43e0ca7c921))
+- type not requested anymore ([4446acb](https://github.com/0xs34n/starknet.js/commit/4446acbe8ab06fa981a8ccecb7fad67b2df73899))
+- typescript wrong types for getStateUpdate ([0c309d5](https://github.com/0xs34n/starknet.js/commit/0c309d5c1e3450fa274e8fb798c510984b6467b5))
+- uncomment sequencer simulate transaction test ([9a60b9f](https://github.com/0xs34n/starknet.js/commit/9a60b9ffae9a67a17b307aa5bbbffe897416ccab))
+- update rpc versions, small fixes ([4f8b24f](https://github.com/0xs34n/starknet.js/commit/4f8b24fcd402b033415af9902f5e0137e03c5db9))
+- wip simulate type cleanup, version bugfix ([045bb25](https://github.com/0xs34n/starknet.js/commit/045bb251a095ff1f7ec8eaa141547c247f3fabb2))
+
+### Features
+
+- accountInvocationsFactory ([acdaab4](https://github.com/0xs34n/starknet.js/commit/acdaab4458406b8bb55238cb9400c16724486da0))
+- add EVENTS_CHUNK (PR 70 from starknet-specs) ([2f15593](https://github.com/0xs34n/starknet.js/commit/2f155932a748400d37926b45e4abe6fa894ae9b3))
+- add replaced classes and rename properties (PR 76 from starknet-specs), rpc.ts fix coming next ([eb095c5](https://github.com/0xs34n/starknet.js/commit/eb095c583fe93a9e8157c5157885cbb19de8a00d))
+- add simulate_transaction and sierra support (untested) ([47bca37](https://github.com/0xs34n/starknet.js/commit/47bca377f2f4cde658a467143cc54f80c385bc93))
+- added missing TOO_MANY_KEYS_IN_FILTER error (PR 55 from starknet-specs) ([32e2bf5](https://github.com/0xs34n/starknet.js/commit/32e2bf5521461402b5d524311e1a53a7f434f314))
+- consolidation of invokes in provider, except basic transactions ([92c2a98](https://github.com/0xs34n/starknet.js/commit/92c2a985538486065328b3243d22fc578b726ea6))
+- fix remaining issues ([23d0a96](https://github.com/0xs34n/starknet.js/commit/23d0a96a525f7e2317021db5cfb9a2cf5a5ff9cf))
+- implemented estimateFeeOriginal ([aba6707](https://github.com/0xs34n/starknet.js/commit/aba67074cadab64389908f0102bdfc904064ae5e))
+- make transaction type explicit (PR 68 from starknet-specs) ([8857e08](https://github.com/0xs34n/starknet.js/commit/8857e08696df1e4ed8ca16ed922326350f74dc67))
+- multiple updates and fixes for simulate and estimate, interface, wip ([12ed49b](https://github.com/0xs34n/starknet.js/commit/12ed49bf182da6ecfdb6560fd10d0659ad2acae9))
+- simulate transaction implementation wip ([b604de0](https://github.com/0xs34n/starknet.js/commit/b604de005148a53d6ee6ac5f67e2e004e5222be5))
+- simulate transaction rpc & sequencer ([8a47562](https://github.com/0xs34n/starknet.js/commit/8a475623799778a97f385b935d7f951f388cff13))
+- starknet 0.11.0 adjustments (PR 65 from starknet-specs), rpc.ts fix coming next ([cffdaca](https://github.com/0xs34n/starknet.js/commit/cffdacaa66fe944dcbf050d8572d1e053d59480c))
+- state update response split to pending/none pending (PR 74 from starknet-specs) ([2c6945f](https://github.com/0xs34n/starknet.js/commit/2c6945f03c9bd8ab5787cc2505a0fd803d0bbe72))
+- supported multiple values in event filters (PR 55 from starknet-specs) ([4492704](https://github.com/0xs34n/starknet.js/commit/4492704224632f51990b1ba3b3138f4e4c902e65))
+- supported new required properties (PR 67 from starknet-specs) ([1759ac4](https://github.com/0xs34n/starknet.js/commit/1759ac4c84d8bcea8460745f4e48518511976835))
+- supported the new api bulk for estimateFee on existing rpc methods ([b8dd210](https://github.com/0xs34n/starknet.js/commit/b8dd2107ab614e0d5c99545d0fe61cbd727db5ab))
+
 # [5.12.0](https://github.com/0xs34n/starknet.js/compare/v5.11.1...v5.12.0) (2023-06-12)
 
 ### Features
