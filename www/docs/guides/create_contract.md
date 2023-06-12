@@ -111,7 +111,7 @@ You have several ways to define these inputs :
 
 ### myCalldata.compile
 
-It's the recommended way to proceed :
+This is the recommended way to proceed :
 
 ```typescript
 const myArray1: RawCalldata = ["0x0a", 24, 36n];
