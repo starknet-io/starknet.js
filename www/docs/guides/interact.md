@@ -127,7 +127,7 @@ Some other useful method to interact with Starknet :
 
 ### Function name defined in the code
 
-If you want to call a function with its name caontained in a variable :
+If you want to call a function with its name contained in a variable :
 
 ```typescript
 const listFn = ["calc-sum","calc-hash","calc-proof"];
