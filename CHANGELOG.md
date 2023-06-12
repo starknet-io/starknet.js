@@ -1,3 +1,9 @@
+# [5.12.0](https://github.com/0xs34n/starknet.js/compare/v5.11.1...v5.12.0) (2023-06-12)
+
+### Features
+
+- add RawArgs in Account.populate ([6b539a3](https://github.com/0xs34n/starknet.js/commit/6b539a37815ecafb6c8b738b8585dd75d534b3cf))
+
 ## [5.11.1](https://github.com/0xs34n/starknet.js/compare/v5.11.0...v5.11.1) (2023-05-30)
 
 ### Bug Fixes
