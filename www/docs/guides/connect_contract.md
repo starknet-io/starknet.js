@@ -30,7 +30,7 @@ import { Provider, Contract, json } from "starknet";
 If you have the compiled/compressed file of the contract, use this code to recover all data, including ABI :
 
 ```typescript
-const compiledContract = json.parse(fs.readFileSync( "./compiledContracts/test.json").toString( "ascii"));
+const compiledContract = json.parse(fs.readFileSync("./compiledContracts/test.json").toString("ascii"));
 ```
 
 > Note the `json.parse` util provided by Starknet.js
