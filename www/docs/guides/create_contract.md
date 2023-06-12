@@ -131,7 +131,7 @@ Starknet.js will perform a full verification of conformity with the abi. Propert
 
 ### CallData.compile
 
-For very simple constructors, you can use `CalData.compile` :
+For very simple constructors, you can use `CallData.compile` :
 
 ```typescript
 const myArray1: RawCalldata = ["0x0a", 24, 36n];
