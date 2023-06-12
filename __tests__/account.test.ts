@@ -637,12 +637,12 @@ describe('deploy and test Wallet', () => {
     });
 
     test('deploy account & multi invoke functions', async () => {
-      /*       const { transaction_hash } = await account.execute({
+      const { transaction_hash } = await account.execute({
         contractAddress: erc20Address,
         entrypoint: 'transfer',
         calldata: [precalculatedAddress, uint256(10)],
       });
-      await provider.waitForTransaction(transaction_hash); */
+      await provider.waitForTransaction(transaction_hash);
 
       const res = await newAccount.estimateFeeBulk([
         {
