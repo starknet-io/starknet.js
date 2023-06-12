@@ -14,6 +14,7 @@ import {
   FunctionAbi,
   InvokeFunctionResponse,
   InvokeOptions,
+  RawArgs,
   Result,
   StructAbi,
 } from '../types';
@@ -94,10 +95,11 @@ function buildEstimate(contract: Contract, functionAbi: FunctionAbi): ContractFu
   };
 }
 
-export function getCalldata(args: ArgsOrCalldata, callback: Function): Calldata {
+export function getCalldata(args: RawArgs, callback: Function): Calldata {
   // Check if Calldata in args or args[0] else compile
-  if ('__compiled__' in args) return args as Calldata;
-  if (Array.isArray(args[0]) && '__compiled__' in args[0]) return args[0] as Calldata;
+  if (Array.isArray(args) && '__compiled__' in args) return args as Calldata;
+  if (Array.isArray(args) && Array.isArray(args[0]) && '__compiled__' in args[0])
+    return args[0] as Calldata;
   return callback();
 }
 
@@ -309,7 +311,7 @@ export class Contract implements ContractInterface {
     throw Error('Contract must be connected to the account contract to estimate');
   }
 
-  public populate(method: string, args: ArgsOrCalldata = []): Call {
+  public populate(method: string, args: RawArgs = []): Call {
     const calldata = getCalldata(args, () => this.callData.compile(method, args));
 
     return {
