@@ -325,7 +325,7 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_estimateFee', {
       request: invocations.map((it) => this.buildTransaction(it, 'fee')),
       block_id,
-    }).then(this.responseParser.parseFeeEstimateOriginalResponse);
+    }).then(this.responseParser.parseFeeEstimateBulkResponse);
   }
 
   public async declareContract(
@@ -541,7 +541,7 @@ export class RpcProvider implements ProviderInterface {
 
     return this.fetchEndpoint('starknet_simulateTransaction', {
       block_id,
-      transactions: invocations.map((it) => this.buildTransaction(it)), // Pathfinder 0.5.6 bug, should be transaction
+      transactions: invocations.map((it) => this.buildTransaction(it)), // TODO: Pathfinder 0.5.6 bug, should be transaction
       simulation_flags: simulationFlags,
     }).then(this.responseParser.parseSimulateTransactionResponse);
   }

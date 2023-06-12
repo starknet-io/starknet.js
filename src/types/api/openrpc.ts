@@ -504,12 +504,7 @@ export namespace OPENRPC {
     starknet_estimateFee: {
       params: { request: Array<BROADCASTED_TXN>; block_id: BLOCK_ID };
       result: Array<FEE_ESTIMATE>;
-      errors:
-        | Errors.CONTRACT_NOT_FOUND
-        // | Errors.INVALID_MESSAGE_SELECTOR
-        // | Errors.INVALID_CALL_DATA
-        | Errors.CONTRACT_ERROR
-        | Errors.BLOCK_NOT_FOUND;
+      errors: Errors.CONTRACT_NOT_FOUND | Errors.CONTRACT_ERROR | Errors.BLOCK_NOT_FOUND;
     };
     starknet_blockNumber: {
       params: {};
@@ -595,12 +590,7 @@ export namespace OPENRPC {
         simulation_flags: Array<SIMULATION_FLAG>;
       };
       result: SimulatedTransactions;
-      errors:
-        | Errors.CONTRACT_NOT_FOUND
-        // | Errors.INVALID_MESSAGE_SELECTOR
-        // | Errors.INVALID_CALL_DATA
-        | Errors.CONTRACT_ERROR
-        | Errors.BLOCK_NOT_FOUND;
+      errors: Errors.CONTRACT_NOT_FOUND | Errors.CONTRACT_ERROR | Errors.BLOCK_NOT_FOUND;
     };
   };
 }

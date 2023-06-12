@@ -146,7 +146,7 @@ export type AccountInvocationItem = (
   | ({ type: 'DEPLOY_ACCOUNT' } & DeployAccountContractTransaction)
   | ({ type: 'INVOKE_FUNCTION' } & Invocation)
 ) &
-  InvocationsDetailsWithNonce /* & { blockIdentifier: BlockNumber | BigNumberish } */;
+  InvocationsDetailsWithNonce;
 
 /**
  * Complete invocations array with account details (internal type from account -> provider)

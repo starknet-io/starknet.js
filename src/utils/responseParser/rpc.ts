@@ -5,6 +5,7 @@
 import {
   CallContractResponse,
   EstimateFeeResponse,
+  EstimateFeeResponseBulk,
   GetBlockResponse,
   GetTransactionResponse,
   RPC,
@@ -65,9 +66,9 @@ export class RPCResponseParser
     };
   }
 
-  public parseFeeEstimateOriginalResponse(
+  public parseFeeEstimateBulkResponse(
     res: Array<RPC.EstimateFeeResponse>
-  ): Array<EstimateFeeResponse> {
+  ): EstimateFeeResponseBulk {
     return res.map((val) => ({
       overall_fee: toBigInt(val.overall_fee),
       gas_consumed: toBigInt(val.gas_consumed),

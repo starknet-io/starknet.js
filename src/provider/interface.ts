@@ -319,7 +319,6 @@ export abstract class ProviderInterface {
    *  - (optional) skipExecute - skip cairo __execute__ method
    * @returns an array of transaction trace and estimated fee
    */
-
   public abstract getSimulateTransaction(
     invocations: AccountInvocations,
     options?: getSimulateTransactionOptions
