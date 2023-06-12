@@ -87,7 +87,7 @@ export class RPCResponseParser
     return res.map((it) => {
       return {
         ...it,
-        suggestedMaxFees: estimatedFeeToMaxFee(BigInt(it.fee_estimation.overall_fee)),
+        suggestedMaxFee: estimatedFeeToMaxFee(BigInt(it.fee_estimation.overall_fee)),
       };
     });
   }

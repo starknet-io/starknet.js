@@ -135,7 +135,7 @@ export class SequencerAPIResponseParser extends ResponseParser {
   public parseSimulateTransactionResponse(
     res: Sequencer.SimulateTransactionResponse
   ): SimulateTransactionResponse {
-    const suggestedMaxFees =
+    const suggestedMaxFee =
       'overall_fee' in res.fee_estimation
         ? res.fee_estimation.overall_fee
         : res.fee_estimation.amount;
@@ -143,7 +143,7 @@ export class SequencerAPIResponseParser extends ResponseParser {
       {
         transaction_trace: res.trace,
         fee_estimation: res.fee_estimation,
-        suggestedMaxFees: estimatedFeeToMaxFee(BigInt(suggestedMaxFees)),
+        suggestedMaxFee: estimatedFeeToMaxFee(BigInt(suggestedMaxFee)),
       },
     ];
   }
