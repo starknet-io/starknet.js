@@ -101,7 +101,7 @@ console.log("Final balance =", bal2.res.toString());
 
 In a Starknet transaction, you can include several invoke operations. It will be performed with `account.execute`.
 
-We will see later this case more in detail in this dedicated [guide](multiCall.md) , but in summary, you use this command with the following parameters:
+We will later see this case more in detail in this dedicated [guide](multiCall.md) , but in summary, you use this command with the following parameters:
 
 - address of the contract to invoke
 - name of the function to invoke
