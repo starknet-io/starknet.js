@@ -34,6 +34,30 @@ Compressed cairo program
 
 ---
 
+### decompressProgram
+
+▸ **decompressProgram**(`base64`): `any`
+
+Function to decompress compressed compiled cairo program
+
+#### Parameters
+
+| Name     | Type     | Description       |
+| :------- | :------- | :---------------- |
+| `base64` | `string` | CompressedProgram |
+
+#### Returns
+
+`any`
+
+parsed decompressed compiled cairo program
+
+#### Defined in
+
+[src/utils/stark.ts:33](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L33)
+
+---
+
 ### randomAddress
 
 ▸ **randomAddress**(): `string`
@@ -44,7 +68,7 @@ Compressed cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:27](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L27)
+[src/utils/stark.ts:39](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L39)
 
 ---
 
@@ -64,7 +88,7 @@ Compressed cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:32](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L32)
+[src/utils/stark.ts:44](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L44)
 
 ---
 
@@ -84,7 +108,7 @@ Compressed cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:36](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L36)
+[src/utils/stark.ts:48](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L48)
 
 ---
 
@@ -104,7 +128,7 @@ Compressed cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:49](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L49)
+[src/utils/stark.ts:61](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L61)
 
 ---
 
@@ -124,7 +148,7 @@ Compressed cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:53](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L53)
+[src/utils/stark.ts:65](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L65)
 
 ---
 
@@ -145,4 +169,4 @@ Compressed cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:57](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L57)
+[src/utils/stark.ts:69](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L69)

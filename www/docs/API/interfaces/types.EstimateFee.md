@@ -25,7 +25,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/account.ts:9](https://github.com/0xs34n/starknet.js/blob/develop/src/types/account.ts#L9)
+[src/types/account.ts:5](https://github.com/0xs34n/starknet.js/blob/develop/src/types/account.ts#L5)
 
 ---
 

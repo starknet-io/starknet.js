@@ -11,21 +11,21 @@ custom_edit_url: null
 
 ### block_hash
 
-• **block_hash**: `string`
+• `Optional` **block_hash**: `string`
 
 #### Defined in
 
-[src/types/provider/response.ts:154](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L154)
+[src/types/provider/response.ts:159](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L159)
 
 ---
 
 ### new_root
 
-• **new_root**: `string`
+• `Optional` **new_root**: `string`
 
 #### Defined in
 
-[src/types/provider/response.ts:155](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L155)
+[src/types/provider/response.ts:160](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L160)
 
 ---
 
@@ -35,7 +35,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider/response.ts:156](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L156)
+[src/types/provider/response.ts:161](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L161)
 
 ---
 
@@ -45,16 +45,16 @@ custom_edit_url: null
 
 #### Type declaration
 
-| Name                        | Type                                                                            |
-| :-------------------------- | :------------------------------------------------------------------------------ |
-| `storage_diffs`             | [`StorageDiffs`](../namespaces/types.RPC.md#storagediffs)                       |
-| `declared_contract_hashes?` | [`DeclaredContractHashes`](../namespaces/types.RPC.md#declaredcontracthashes)   |
-| `deployed_contracts`        | [`DeployedContracts`](../namespaces/types.Sequencer.md#deployedcontracts)       |
-| `nonces`                    | [`Nonces`](../namespaces/types.RPC.md#nonces)                                   |
-| `old_declared_contracts?`   | [`OldDeclaredContracts`](../namespaces/types.Sequencer.md#olddeclaredcontracts) |
-| `declared_classes?`         | [`DeclaredClasses`](../namespaces/types.Sequencer.md#declaredclasses)           |
-| `replaced_classes?`         | [`ReplacedClasses`](../namespaces/types.Sequencer.md#replacedclasses)           |
+| Name                           | Type                                                                                                                                     |
+| :----------------------------- | :--------------------------------------------------------------------------------------------------------------------------------------- |
+| `storage_diffs`                | [`StorageDiffs`](../namespaces/types.RPC.md#storagediffs)                                                                                |
+| `deployed_contracts`           | [`DeployedContracts`](../namespaces/types.Sequencer.md#deployedcontracts)                                                                |
+| `nonces`                       | [`Nonces`](../namespaces/types.RPC.md#nonces)                                                                                            |
+| `old_declared_contracts?`      | [`OldDeclaredContracts`](../namespaces/types.Sequencer.md#olddeclaredcontracts)                                                          |
+| `declared_classes?`            | [`DeclaredClasses`](../namespaces/types.Sequencer.md#declaredclasses)                                                                    |
+| `replaced_classes?`            | [`ReplacedClasses`](../namespaces/types.RPC.md#replacedclasses) \| [`ReplacedClasses`](../namespaces/types.Sequencer.md#replacedclasses) |
+| `deprecated_declared_classes?` | [`DeprecatedDeclaredClasses`](../namespaces/types.RPC.md#deprecateddeclaredclasses)                                                      |
 
 #### Defined in
 
-[src/types/provider/response.ts:157](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L157)
+[src/types/provider/response.ts:162](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L162)

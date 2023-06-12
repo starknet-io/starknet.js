@@ -86,7 +86,7 @@ custom_edit_url: null
 
 ### ContractClass
 
-Ƭ **ContractClass**: `OPENRPC.ContractClass`
+Ƭ **ContractClass**: `OPENRPC.ContractClass` \| `OPENRPC.DeprecatedContractClass`
 
 #### Defined in
 
@@ -334,13 +334,43 @@ custom_edit_url: null
 
 ---
 
+### SimulationFlags
+
+Ƭ **SimulationFlags**: `OPENRPC.SimulationFlags`
+
+#### Defined in
+
+[src/types/api/rpc.ts:44](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L44)
+
+---
+
+### BroadcastedTransaction
+
+Ƭ **BroadcastedTransaction**: `OPENRPC.BroadcastedTransaction`
+
+#### Defined in
+
+[src/types/api/rpc.ts:45](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L45)
+
+---
+
+### EstimatedFee
+
+Ƭ **EstimatedFee**: `OPENRPC.EstimatedFee`
+
+#### Defined in
+
+[src/types/api/rpc.ts:46](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L46)
+
+---
+
 ### Methods
 
 Ƭ **Methods**: `OPENRPC.Methods`
 
 #### Defined in
 
-[src/types/api/rpc.ts:44](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L44)
+[src/types/api/rpc.ts:47](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L47)
 
 ---
 
@@ -350,7 +380,17 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:45](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L45)
+[src/types/api/rpc.ts:48](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L48)
+
+---
+
+### SimulateTransactionResponse
+
+Ƭ **SimulateTransactionResponse**: `OPENRPC.SimulatedTransactions`
+
+#### Defined in
+
+[src/types/api/rpc.ts:49](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L49)
 
 ---
 
@@ -360,17 +400,17 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:56](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L56)
+[src/types/api/rpc.ts:60](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L60)
 
 ---
 
-### DeclaredContractHashes
+### DeprecatedDeclaredClasses
 
-Ƭ **DeclaredContractHashes**: `FELT`[]
+Ƭ **DeprecatedDeclaredClasses**: `FELT`[]
 
 #### Defined in
 
-[src/types/api/rpc.ts:57](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L57)
+[src/types/api/rpc.ts:61](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L61)
 
 ---
 
@@ -380,4 +420,14 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:58](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L58)
+[src/types/api/rpc.ts:62](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L62)
+
+---
+
+### ReplacedClasses
+
+Ƭ **ReplacedClasses**: { `contract_address`: `ADDRESS` ; `class_hash`: `FELT` }[]
+
+#### Defined in
+
+[src/types/api/rpc.ts:66](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L66)

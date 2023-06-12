@@ -1,6 +1,6 @@
 ---
 id: 'modules'
-title: 'Starknet.js API - v5.11.1'
+title: 'Starknet.js API - v5.12.0'
 sidebar_label: 'Exports'
 sidebar_position: 0.5
 custom_edit_url: null
@@ -57,6 +57,12 @@ Re-exports [EstimateFeeBulk](namespaces/types.md#estimatefeebulk)
 
 ---
 
+### AccountInvocationsFactoryDetails
+
+Re-exports [AccountInvocationsFactoryDetails](namespaces/types.md#accountinvocationsfactorydetails)
+
+---
+
 ### EstimateFeeDetails
 
 Re-exports [EstimateFeeDetails](interfaces/types.EstimateFeeDetails.md)
@@ -87,9 +93,15 @@ Re-exports [DeclareDeployUDCResponse](namespaces/types.md#declaredeployudcrespon
 
 ---
 
-### TransactionSimulation
+### SimulateTransactionDetails
 
-Re-exports [TransactionSimulation](interfaces/types.TransactionSimulation.md)
+Re-exports [SimulateTransactionDetails](namespaces/types.md#simulatetransactiondetails)
+
+---
+
+### SIMULATION_FLAG
+
+Re-exports [SIMULATION_FLAG](enums/types.SIMULATION_FLAG.md)
 
 ---
 
@@ -192,6 +204,12 @@ Re-exports [HexCalldata](namespaces/types.md#hexcalldata)
 ### AllowArray
 
 Re-exports [AllowArray](namespaces/types.md#allowarray)
+
+---
+
+### OptionalPayload
+
+Re-exports [OptionalPayload](namespaces/types.md#optionalpayload)
 
 ---
 
@@ -315,15 +333,21 @@ Re-exports [TransactionStatus](enums/types.TransactionStatus.md)
 
 ---
 
-### TransactionBulk
+### AccountInvocationItem
 
-Re-exports [TransactionBulk](namespaces/types.md#transactionbulk)
+Re-exports [AccountInvocationItem](namespaces/types.md#accountinvocationitem)
 
 ---
 
-### InvocationBulk
+### AccountInvocations
 
-Re-exports [InvocationBulk](namespaces/types.md#invocationbulk)
+Re-exports [AccountInvocations](namespaces/types.md#accountinvocations)
+
+---
+
+### Invocations
+
+Re-exports [Invocations](namespaces/types.md#invocations)
 
 ---
 
@@ -384,6 +408,18 @@ Re-exports [ParsedStruct](namespaces/types.md#parsedstruct)
 ### waitForTransactionOptions
 
 Re-exports [waitForTransactionOptions](namespaces/types.md#waitfortransactionoptions)
+
+---
+
+### getSimulateTransactionOptions
+
+Re-exports [getSimulateTransactionOptions](namespaces/types.md#getsimulatetransactionoptions)
+
+---
+
+### getEstimateFeeBulkOptions
+
+Re-exports [getEstimateFeeBulkOptions](namespaces/types.md#getestimatefeebulkoptions)
 
 ---
 
@@ -495,15 +531,15 @@ Re-exports [CairoAssembly](namespaces/types.md#cairoassembly)
 
 ---
 
-### SierraContractClass
-
-Re-exports [SierraContractClass](namespaces/types.md#sierracontractclass)
-
----
-
 ### CompiledSierra
 
 Re-exports [CompiledSierra](namespaces/types.md#compiledsierra)
+
+---
+
+### SierraContractClass
+
+Re-exports [SierraContractClass](namespaces/types.md#sierracontractclass)
 
 ---
 
@@ -699,9 +735,21 @@ Re-exports [Nonce](namespaces/types.md#nonce)
 
 ---
 
-### TransactionSimulationResponse
+### SimulationFlags
 
-Re-exports [TransactionSimulationResponse](interfaces/types.TransactionSimulationResponse.md)
+Re-exports [SimulationFlags](namespaces/types.md#simulationflags)
+
+---
+
+### SimulatedTransaction
+
+Re-exports [SimulatedTransaction](namespaces/types.md#simulatedtransaction)
+
+---
+
+### SimulateTransactionResponse
+
+Re-exports [SimulateTransactionResponse](namespaces/types.md#simulatetransactionresponse)
 
 ---
 
@@ -774,12 +822,6 @@ Re-exports [FunctionInvocation](namespaces/types.md#functioninvocation)
 ### ExecutionResources
 
 Re-exports [ExecutionResources](namespaces/types.md#executionresources)
-
----
-
-### TransactionTraceResponse
-
-Re-exports [TransactionTraceResponse](namespaces/types.md#transactiontraceresponse)
 
 ---
 

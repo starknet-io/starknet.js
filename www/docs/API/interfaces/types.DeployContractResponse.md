@@ -15,7 +15,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/account.ts:21](https://github.com/0xs34n/starknet.js/blob/develop/src/types/account.ts#L21)
+[src/types/account.ts:23](https://github.com/0xs34n/starknet.js/blob/develop/src/types/account.ts#L23)
 
 ---
 
@@ -25,4 +25,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/account.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/types/account.ts#L22)
+[src/types/account.ts:24](https://github.com/0xs34n/starknet.js/blob/develop/src/types/account.ts#L24)
