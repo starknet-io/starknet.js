@@ -16,6 +16,7 @@ import {
   shortString,
   stark,
 } from '../src';
+import { starknetKeccak } from '../src/utils/selector';
 import {
   compiledC1Account,
   compiledC1AccountCasm,
@@ -147,6 +148,44 @@ describeIfDevnet('Cairo 1 Devnet', () => {
       const status = await cairo1Contract.get_ca();
 
       expect(status).toBe(123n);
+    });
+
+    test('Cairo1 simple getStorageAt variables', async () => {
+      let tx = await cairo1Contract.increase_balance(100);
+      await account.waitForTransaction(tx.transaction_hash);
+      const balance = await cairo1Contract.get_balance();
+
+      let key = starknetKeccak('balance');
+      let storage = await account.getStorageAt(cairo1Contract.address, key);
+      expect(BigInt(storage)).toBe(balance);
+
+      tx = await cairo1Contract.set_ca('123');
+      await account.waitForTransaction(tx.transaction_hash);
+      const ca = await cairo1Contract.get_ca();
+
+      key = starknetKeccak('ca');
+      storage = await account.getStorageAt(cairo1Contract.address, key);
+      expect(BigInt(storage)).toBe(ca);
+
+      tx = await cairo1Contract.set_status(true);
+      await account.waitForTransaction(tx.transaction_hash);
+      const status = await cairo1Contract.get_status();
+
+      key = starknetKeccak('status');
+      storage = await account.getStorageAt(cairo1Contract.address, key);
+      expect(Boolean(BigInt(storage))).toBe(status);
+
+      //---
+      /*       tx = await cairo1Contract.set_bet();
+      await account.waitForTransaction(tx.transaction_hash);
+      const test = await cairo1Contract.get_bet(1, {
+        formatResponse: { name: 'string', description: 'string' },
+      });
+
+      key = pedersen(starknetKeccak('testbet'), starknetKeccak('amount'));
+      storage = await account.getStorageAt(cairo1Contract.address, key);
+
+      console.log(storage); */
     });
 
     test('Cairo 1 Contract Interaction - echo flat un-named un-nested tuple', async () => {
