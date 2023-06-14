@@ -759,6 +759,12 @@ Re-exports [StateUpdateResponse](interfaces/types.StateUpdateResponse.md)
 
 ---
 
+### ContractClassResponse
+
+Re-exports [ContractClassResponse](namespaces/types.md#contractclassresponse)
+
+---
+
 ### InvocationsSignerDetails
 
 Re-exports [InvocationsSignerDetails](interfaces/types.InvocationsSignerDetails.md)

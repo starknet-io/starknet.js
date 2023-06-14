@@ -1118,7 +1118,7 @@ sierra_program is hex array
 
 ### SierraContractClass
 
-Ƭ **SierraContractClass**: `Omit`<[`CompiledSierra`](types.md#compiledsierra), `"sierra_program"` \| `"abi"` \| `"sierra_program_debug_info"`\> & { `sierra_program`: `string` ; `abi`: `string` }
+Ƭ **SierraContractClass**: `Omit`<[`CompiledSierra`](types.md#compiledsierra), `"abi"` \| `"sierra_program_debug_info"`\> & { `sierra_program`: `string` ; `abi`: `string` }
 
 format produced after compressing 'sierra_program', stringifies 'abi' property and omit sierra_program_debug_info
 CompressedCompiledSierra
@@ -1135,7 +1135,7 @@ CompressedCompiledSierra
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:38](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L38)
+[src/types/lib/contract/sierra.ts:35](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L35)
 
 ---
 
@@ -1147,7 +1147,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:41](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L41)
+[src/types/lib/contract/sierra.ts:38](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L38)
 
 ---
 
@@ -1157,7 +1157,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:42](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L42)
+[src/types/lib/contract/sierra.ts:39](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L39)
 
 ---
 
@@ -1175,7 +1175,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:44](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L44)
+[src/types/lib/contract/sierra.ts:41](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L41)
 
 ---
 
@@ -1193,7 +1193,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:50](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L50)
+[src/types/lib/contract/sierra.ts:47](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L47)
 
 ---
 
@@ -1210,7 +1210,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:56](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L56)
+[src/types/lib/contract/sierra.ts:53](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L53)
 
 ---
 
@@ -1260,7 +1260,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:40](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L40)
+[src/types/provider/response.ts:42](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L42)
 
 ---
 
@@ -1270,7 +1270,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:67](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L67)
+[src/types/provider/response.ts:69](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L69)
 
 ---
 
@@ -1280,7 +1280,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:101](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L101)
+[src/types/provider/response.ts:103](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L103)
 
 ---
 
@@ -1296,7 +1296,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:119](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L119)
+[src/types/provider/response.ts:121](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L121)
 
 ---
 
@@ -1306,7 +1306,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:123](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L123)
+[src/types/provider/response.ts:125](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L125)
 
 ---
 
@@ -1316,7 +1316,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:141](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L141)
+[src/types/provider/response.ts:143](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L143)
 
 ---
 
@@ -1326,7 +1326,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:143](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L143)
+[src/types/provider/response.ts:145](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L145)
 
 ---
 
@@ -1336,7 +1336,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:145](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L145)
+[src/types/provider/response.ts:147](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L147)
 
 ---
 
@@ -1346,7 +1346,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:147](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L147)
+[src/types/provider/response.ts:149](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L149)
 
 ---
 
@@ -1364,7 +1364,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:149](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L149)
+[src/types/provider/response.ts:151](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L151)
 
 ---
 
@@ -1374,7 +1374,17 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:155](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L155)
+[src/types/provider/response.ts:157](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L157)
+
+---
+
+### ContractClassResponse
+
+Ƭ **ContractClassResponse**: `Omit`<[`ContractClass`](types.md#contractclass), `"abi"`\> & { `abi?`: [`Abi`](types.md#abi) }
+
+#### Defined in
+
+[src/types/provider/response.ts:175](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L175)
 
 ---
 
