@@ -17,7 +17,7 @@ Users have the feeling that their tokens are stored in their wallet, but it's ab
 
 If you want to have your balance of a token, ask its ERC20 contract, with the function `ERC20contract.balanceOf(accountAddress)`.
 
-When you want to transfer some tokens in you possession, you have to use the ERC20 contract function `transfer`, through the `account.execute` function. In this way, Starknet.js will send to the account contract function `Execute` a message signed with the private key.
+When you want to transfer some tokens in you possession, you have to use the ERC20 contract function `transfer`, through the `account.execute` function (or meta-class methods). In this way, Starknet.js will send to the account contract a message signed with the private key.
 
 This message contains the name of the function to call in the ERC20 contract, with its optional parameters.
 
@@ -46,10 +46,9 @@ First, let's initialize an account :
 const provider = new Provider({ sequencer: { baseUrl:"http://127.0.0.1:5050"  } });
 // initialize existing pre-deployed account 0 of Devnet
 const privateKey = "0xe3e70682c2094cac629f6fbed82c07cd";
-const starkKeyPair = ec.getKeyPair(privateKey);
 const accountAddress = "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a";
 
-const account0 = new Account(provider, accountAddress, starkKeyPair);
+const account0 = new Account(provider, accountAddress, privateKey);
 ```
 
 Declaration and deployment of the ERC20 contract :
@@ -58,26 +57,24 @@ Declaration and deployment of the ERC20 contract :
 // Deploy an ERC20 contract
 console.log("Deployment Tx - ERC20 Contract to Starknet...");
 const compiledErc20mintable = json.parse(fs.readFileSync("compiled_contracts/ERC20MintableOZ051.json").toString("ascii"));
-const ERC20mintableClassHash = "0x795be772eab12ee65d5f3d9e8922d509d6672039978acc98697c0a563669e8";
-const initialTk = { low: 100, high: 0 };
+    const initialTk: Uint256 = cairo.uint256(100);
+    const erc20CallData: CallData = new CallData(compiledErc20mintable.abi);
+    const ERC20ConstructorCallData: Calldata = erc20CallData.compile("constructor", {
+        name: "niceToken",
+        symbol: "NIT",
+        decimals: 18,
+        initial_supply: initialTk,
+        recipient: account0.address,
+        owner: account0.address
+    });
 
-const ERC20ConstructorCallData = CallData.compile({
-    name: shortString.encodeShortString('MyToken'),
-    symbol: shortString.encodeShortString('MTK'),
-    decimals: "18",
-    initial_supply: { type: 'struct', low: initialTk.low, high: initialTk.high },
-    recipient: account0.address,
-    owner: account0.address
-});
-console.log("constructor=", ERC20ConstructorCallData);
-
-const deployERC20Response = await account0.declareDeploy({
-    classHash: ERC20mintableClassHash,
-    contract: compiledErc20mintable,
-    constructorCalldata: ERC20ConstructorCallData
-});
-
-console.log("ERC20 deployed at address: ", deployERC20Response.deploy.contract_address);
+    console.log("constructor=", ERC20ConstructorCallData);
+    const deployERC20Response = await account0.declareAndDeploy({
+        contract: compiledErc20mintable,
+        constructorCalldata: ERC20ConstructorCallData
+    });
+    console.log("ERC20 declared hash: ", deployERC20Response.declare.class_hash);
+    console.log("ERC20 deployed at address: ", deployERC20Response.deploy.contract_address);
 
 // Get the erc20 contract address
 const erc20Address = deployERC20Response.deploy.contract_address;
@@ -94,10 +91,10 @@ Here we will read the balance, mint new tokens, and transfer tokens :
 // Check balance - should be 100
 console.log(`Calling Starknet for account balance...`);
 const balanceInitial = await erc20.balanceOf(account0.address);
-console.log("account0 has a balance of :", uint256.uint256ToBN(balanceInitial.balance).toString());
+console.log("account0 has a balance of :", uint256.uint256ToBN(balanceInitial.balance).toString()); // Cairo 0 response
 
 // Mint 1000 tokens to account address
-const amountToMint = uint256.bnToUint256(1000);
+const amountToMint = cairo.uint256(1000);
 console.log("Invoke Tx - Minting 1000 tokens to account0...");
 const { transaction_hash: mintTxHash } = await erc20.mint(
 	account0.address,
@@ -112,23 +109,16 @@ await provider.waitForTransaction(mintTxHash);
 // Check balance - should be 1100
 console.log(`Calling Starknet for account balance...`);
 const balanceBeforeTransfer = await erc20.balanceOf(account0.address);
-console.log("account0 has a balance of :", uint256.uint256ToBN(balanceBeforeTransfer.balance).toString());
+console.log("account0 has a balance of :", uint256.uint256ToBN(balanceBeforeTransfer.balance).toString()); // Cairo 0 response
 
 // Execute tx transfer of 10 tokens
 console.log(`Invoke Tx - Transfer 10 tokens back to erc20 contract...`);
-const toTransferTk: uint256.Uint256 = uint256.bnToUint256(10);
-const transferCallData = CallData.compile({
-	recipient: erc20Address,
-	initial_supply: { type: 'struct', low: toTransferTk.low, high: toTransferTk.high }
+const toTransferTk: Uint256 = cairo.uint256(10);
+const transferCallData: Call = erc20.populate("transfer", {
+        recipient: erc20Address,
+        amount: toTransferTk // with Cairo 1 contract, 'toTransferTk' can be replaced by '10n'
 });
-
-const { transaction_hash: transferTxHash } = await account0.execute({
-	contractAddress: erc20Address,
-	entrypoint: "transfer",
-	calldata: transferCallData, },
-	undefined,
-	{ maxFee: 900_000_000_000_000 }
-);
+     const { transaction_hash: transferTxHash } = await erc20.transfer( ...transferCallData.calldata);
 
 // Wait for the invoke transaction to be accepted on Starknet
 console.log(`Waiting for Tx to be Accepted on Starknet - Transfer...`);
@@ -137,6 +127,6 @@ await provider.waitForTransaction(transferTxHash);
 // Check balance after transfer - should be 1090
 console.log(`Calling Starknet for account balance...`);
 const balanceAfterTransfer = await erc20.balanceOf(account0.address);
-console.log("account0 has a balance of :", uint256.uint256ToBN(balanceAfterTransfer.balance).toString());
+console.log("account0 has a balance of :", uint256.uint256ToBN(balanceAfterTransfer.balance).toString()); // Cairo 0 response
 console.log("✅ Script completed.");
 ```

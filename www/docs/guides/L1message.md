@@ -35,7 +35,7 @@ You have to pay in the L1 an extra fee when invoking `sendMessageToL2` (of cours
 
 ```typescript
 import { SequencerProvider } from "starknet";
-const provider = new SequencerProvider({ baseUrl: BaseUrl.SN_GOERLI }); // for testnet 1
+const provider = new SequencerProvider({ baseUrl: constants.BaseUrl.SN_GOERLI }); // for testnet 1
 
 const responseEstimateMessageFee = await provider.estimateMessageFee({
     from_address: L1address,

@@ -18,7 +18,7 @@ import {ec, hash, number, json, Contract } from "starknet";
 const privateKey = "0x1234567890987654321";
 const starkKeyPair = ec.getKeyPair(privateKey);
 const starknetPublicKey = ec.getStarkKey(starkKeyPair);
-const fullPublicKey=starkKeyPair.getPublic("hex");
+const fullPublicKey=encode.addHexPrefix(starkKeyPair.getPublic("hex"));
 
 const message : BigNumberish[] = [1, 128, 18, 14];
 
