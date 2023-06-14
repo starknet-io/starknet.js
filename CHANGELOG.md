@@ -1,3 +1,9 @@
+## [5.13.1](https://github.com/0xs34n/starknet.js/compare/v5.13.0...v5.13.1) (2023-06-14)
+
+### Bug Fixes
+
+- common abi type for ContractClassResponse ([55a8d98](https://github.com/0xs34n/starknet.js/commit/55a8d981be4ee4d861c7a3f988c012801af3d905))
+
 # [5.13.0](https://github.com/0xs34n/starknet.js/compare/v5.12.0...v5.13.0) (2023-06-12)
 
 ### Bug Fixes
