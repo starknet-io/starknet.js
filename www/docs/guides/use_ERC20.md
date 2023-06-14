@@ -57,7 +57,7 @@ Declaration and deployment of the ERC20 contract :
 // Deploy an ERC20 contract
 console.log("Deployment Tx - ERC20 Contract to Starknet...");
 const compiledErc20mintable = json.parse(fs.readFileSync("compiled_contracts/ERC20MintableOZ051.json").toString("ascii"));
-    const initialTk: uint256.Uint256 = cairo.uint256(100);
+    const initialTk: Uint256 = cairo.uint256(100);
     const erc20CallData: CallData = new CallData(compiledErc20mintable.abi);
     const ERC20ConstructorCallData: Calldata = erc20CallData.compile("constructor", {
         name: "niceToken",
@@ -113,7 +113,7 @@ console.log("account0 has a balance of :", uint256.uint256ToBN(balanceBeforeTran
 
 // Execute tx transfer of 10 tokens
 console.log(`Invoke Tx - Transfer 10 tokens back to erc20 contract...`);
-const toTransferTk: uint256.Uint256 = cairo.uint256(10);
+const toTransferTk: Uint256 = cairo.uint256(10);
 const transferCallData: Call = erc20.populate("transfer", {
         recipient: erc20Address,
         amount: toTransferTk // with Cairo 1 contract, 'toTransferTk' can be replaced by '10n'

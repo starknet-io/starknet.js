@@ -1,32 +1,39 @@
 // Collection of functions for Braavos account creation
 // coded with Starknet.js v5.11.1, 01/jun/2023
 
-import { CallData, Provider, constants, ec, hash, num, stark } from 'starknet';
 import {
+  BigNumberish,
   CairoVersion,
+  CallData,
   Calldata,
   DeployAccountContractPayload,
   DeployAccountContractTransaction,
   DeployContractResponse,
   EstimateFeeDetails,
   InvocationsSignerDetails,
+  Provider,
   RawCalldata,
+  constants,
+  ec,
+  hash,
+  num,
+  stark,
 } from 'starknet';
 
-const BraavosProxyClassHash: num.BigNumberish =
+const BraavosProxyClassHash: BigNumberish =
   '0x03131fa018d520a037686ce3efddeab8f28895662f019ca3ca18a626650f7d1e';
 const BraavosInitialClassHash = '0x5aa23d5bb71ddaa783da7ea79d405315bafa7cf0387a74f4593578c3e9e6570';
 const BraavosAccountClassHash = '0x2c2b8f559e1221468140ad7b2352b1a5be32660d0bf1a3ae3a054a4ec5254e4'; // will probably change over time
 
 export function getBraavosSignature(
-  BraavosProxyAddress: num.BigNumberish,
+  BraavosProxyAddress: BigNumberish,
   BraavosProxyConstructorCallData: RawCalldata,
-  starkKeyPubBraavos: num.BigNumberish,
+  starkKeyPubBraavos: BigNumberish,
   version: bigint,
-  max_fee: num.BigNumberish,
+  max_fee: BigNumberish,
   chainId: constants.StarknetChainId,
   nonce: bigint,
-  privateKeyBraavos: num.BigNumberish
+  privateKeyBraavos: BigNumberish
 ): string[] {
   const txnHash = hash.calculateDeployAccountTransactionHash(
     BraavosProxyAddress,
@@ -63,7 +70,7 @@ const BraavosProxyConstructor = (BraavosInitializer: Calldata) =>
     calldata: [...BraavosInitializer],
   });
 
-export function calculateAddressBraavos(privateKeyBraavos: num.BigNumberish): string {
+export function calculateAddressBraavos(privateKeyBraavos: BigNumberish): string {
   const starkKeyPubBraavos = ec.starkCurve.getStarkKey(num.toHex(privateKeyBraavos));
   const BraavosInitializer = calcBraavosInit(starkKeyPubBraavos);
   const BraavosProxyConstructorCallData = BraavosProxyConstructor(BraavosInitializer);
@@ -77,7 +84,7 @@ export function calculateAddressBraavos(privateKeyBraavos: num.BigNumberish): st
 }
 
 async function buildBraavosAccountDeployPayload(
-  privateKeyBraavos: num.BigNumberish,
+  privateKeyBraavos: BigNumberish,
   {
     classHash,
     addressSalt,
@@ -108,7 +115,7 @@ async function buildBraavosAccountDeployPayload(
 }
 
 export async function estimateBraavosAccountDeployFee(
-  privateKeyBraavos: num.BigNumberish,
+  privateKeyBraavos: BigNumberish,
   provider: Provider,
   { blockIdentifier, skipValidate }: EstimateFeeDetails = {}
 ): Promise<bigint> {
@@ -135,7 +142,7 @@ export async function estimateBraavosAccountDeployFee(
       version,
       walletAddress: BraavosProxyAddress,
       maxFee: constants.ZERO,
-      cairoVersion: cairoVersion,
+      cairoVersion,
     }
   );
 
@@ -151,9 +158,9 @@ export async function estimateBraavosAccountDeployFee(
 }
 
 export async function deployBraavosAccount(
-  privateKeyBraavos: num.BigNumberish,
+  privateKeyBraavos: BigNumberish,
   provider: Provider,
-  max_fee?: num.BigNumberish
+  max_fee?: BigNumberish
 ): Promise<DeployContractResponse> {
   const nonce = constants.ZERO;
   const starkKeyPubBraavos = ec.starkCurve.getStarkKey(num.toHex(privateKeyBraavos));

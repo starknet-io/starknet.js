@@ -41,8 +41,8 @@ In Starknet.js, it's a bit ... complicated : you have the BigNumberish type and 
 - BigInt (max 255 bits): 12345612345n
 
 ```typescript
-import {num} from "starknet";
-const decimals:num.BigNumberish = 18;
+import { BigNumberish } from "starknet";
+const decimals: BigNumberish = 18;
 ```
 
 ## Preparation of data before delivery
@@ -81,9 +81,9 @@ await myContract2.my_function(12345678, "13456789765", "0xe23a40b543f", 15345667
 In specific cases that we will see hereunder, you can use an object, with the following format :
 
 ```typescript
-const a1: uint256.Uint256 = cairo.uint256("0x05f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd")
-const a2: uint256.Uint256 = {low: "0xeb5337d9a885be319366b5205a414fdd", high: "0x05f7cd1fd465baff2ba9d2d1501ad0a2"};
-const a3: uint256.Uint256 = {low: a1.low,high: a1.high};
+const a1: Uint256 = cairo.uint256("0x05f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd")
+const a2: Uint256 = {low: "0xeb5337d9a885be319366b5205a414fdd", high: "0x05f7cd1fd465baff2ba9d2d1501ad0a2"};
+const a3: Uint256 = {low: a1.low,high: a1.high};
 ```
 
 ### string
@@ -202,8 +202,8 @@ All these examples are valid :
 
 ```typescript
 type Order2 = {
-        p1: num.BigNumberish;
-        p2: num.BigNumberish[];
+        p1: BigNumberish;
+        p2: BigNumberish[];
     }; // struct
 const myOrder2: Order2 = {
         p1: 17,
@@ -284,8 +284,8 @@ This is the recommended type of inputs to use, especially for complex ABI.
 ```typescript
 const myFalseUint256 = { high: 1, low: 23456 }; // wrong order ; should be low first
 type Order2 = {
-    p1: num.BigNumberish,
-    p2: num.BigNumberish[]
+    p1: BigNumberish,
+    p2: BigNumberish[]
 }
 const myOrder2bis: Order2 = {// wrong order ; p1 should be first
     p2: [234, 467456745457n, "0x56ec"],

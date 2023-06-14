@@ -112,9 +112,7 @@ The prefefined types that you can use :
 - merkletree : for a Root of a Merkle tree. root is calculated with the provided data.
 
 ```typescript
-import { Account, typedData } from "starknet";
-
-const typedDataValidate: typedData.TypedData = {
+const typedDataValidate: TypedData = {
         types: {
             StarkNetDomain: [
                 { name: "name", type: "string" },
