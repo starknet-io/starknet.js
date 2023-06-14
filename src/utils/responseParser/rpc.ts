@@ -4,6 +4,7 @@
  */
 import {
   CallContractResponse,
+  ContractClassResponse,
   EstimateFeeResponse,
   EstimateFeeResponseBulk,
   GetBlockResponse,
@@ -91,5 +92,12 @@ export class RPCResponseParser
         suggestedMaxFee: estimatedFeeToMaxFee(BigInt(it.fee_estimation.overall_fee)),
       };
     });
+  }
+
+  public parseContractClassResponse(res: RPC.ContractClass): ContractClassResponse {
+    return {
+      ...res,
+      abi: typeof res.abi === 'string' ? JSON.parse(res.abi) : res.abi,
+    };
   }
 }

@@ -6,6 +6,7 @@ import {
   BlockIdentifier,
   Call,
   CallContractResponse,
+  ContractClassResponse,
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
@@ -215,27 +216,30 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_getTransactionReceipt', { transaction_hash: txHash });
   }
 
-  public async getClassByHash(classHash: RPC.Felt): Promise<RPC.ContractClass> {
+  public async getClassByHash(classHash: RPC.Felt): Promise<ContractClassResponse> {
     return this.getClass(classHash);
   }
 
   public async getClass(
     classHash: RPC.Felt,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<RPC.ContractClass> {
+  ): Promise<ContractClassResponse> {
     const block_id = new Block(blockIdentifier).identifier;
-    return this.fetchEndpoint('starknet_getClass', { class_hash: classHash, block_id });
+    return this.fetchEndpoint('starknet_getClass', {
+      class_hash: classHash,
+      block_id,
+    }).then(this.responseParser.parseContractClassResponse);
   }
 
   public async getClassAt(
     contractAddress: string,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<RPC.ContractClass> {
+  ): Promise<ContractClassResponse> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getClassAt', {
       block_id,
       contract_address: contractAddress,
-    });
+    }).then(this.responseParser.parseContractClassResponse);
   }
 
   public async getCode(

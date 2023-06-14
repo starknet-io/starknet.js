@@ -5,7 +5,7 @@ import {
   BlockIdentifier,
   Call,
   CallContractResponse,
-  ContractClass,
+  ContractClassResponse,
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
@@ -21,7 +21,6 @@ import {
   InvokeFunctionResponse,
   Nonce,
   ProviderOptions,
-  RPC,
   RpcProviderOptions,
   SequencerProviderOptions,
   SimulateTransactionResponse,
@@ -72,7 +71,7 @@ export class Provider implements ProviderInterface {
   public async getClassAt(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
-  ): Promise<ContractClass | RPC.ContractClass> {
+  ): Promise<ContractClassResponse> {
     return this.provider.getClassAt(contractAddress, blockIdentifier);
   }
 
@@ -83,7 +82,7 @@ export class Provider implements ProviderInterface {
     return this.provider.getClassHashAt(contractAddress, blockIdentifier);
   }
 
-  public getClassByHash(classHash: string): Promise<ContractClass | RPC.ContractClass> {
+  public getClassByHash(classHash: string): Promise<ContractClassResponse> {
     return this.provider.getClassByHash(classHash);
   }
 

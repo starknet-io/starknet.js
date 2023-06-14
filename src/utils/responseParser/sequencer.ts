@@ -2,8 +2,11 @@
  * Map Sequencer Response to common interface response
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
+
 import {
   CallContractResponse,
+  CompiledContract,
+  ContractClassResponse,
   DeclareContractResponse,
   DeployContractResponse,
   EstimateFeeResponse,
@@ -14,11 +17,12 @@ import {
   HexCalldata,
   InvokeFunctionResponse,
   Sequencer,
-  SierraContractClass,
   SimulateTransactionResponse,
   StateUpdateResponse,
 } from '../../types';
+import { isSierra } from '../contract';
 import { toBigInt } from '../num';
+import { parseContract } from '../provider';
 import { estimatedFeeToMaxFee } from '../stark';
 import { ResponseParser } from '.';
 
@@ -199,11 +203,11 @@ export class SequencerAPIResponseParser extends ResponseParser {
     };
   }
 
-  // TODO: Define response as new type as it diff from ContractClass
-  public parseSierraContractClassResponse(res: any): SierraContractClass {
+  public parseContractClassResponse(res: CompiledContract): ContractClassResponse {
+    const response = isSierra(res) ? res : parseContract(res);
     return {
-      ...res,
-      abi: JSON.parse(res.abi),
+      ...response,
+      abi: typeof response.abi === 'string' ? JSON.parse(response.abi) : response.abi,
     };
   }
 }

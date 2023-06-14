@@ -10,7 +10,7 @@ import {
   Call,
   CallContractResponse,
   CallL1Handler,
-  ContractClass,
+  ContractClassResponse,
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
@@ -48,7 +48,7 @@ import {
 } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
 import { getDecimalString, getHexString, getHexStringArray, toBigInt, toHex } from '../utils/num';
-import { parseContract, wait } from '../utils/provider';
+import { wait } from '../utils/provider';
 import { SequencerAPIResponseParser } from '../utils/responseParser/sequencer';
 import { randomAddress, signatureToDecimalArray } from '../utils/stark';
 import { buildUrl } from '../utils/url';
@@ -314,14 +314,9 @@ export class SequencerProvider implements ProviderInterface {
   public async getClassAt(
     contractAddress: string,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<ContractClass> {
+  ): Promise<ContractClassResponse> {
     return this.fetchEndpoint('get_full_contract', { blockIdentifier, contractAddress }).then(
-      (res) => {
-        if (isSierra(res)) {
-          return this.responseParser.parseSierraContractClassResponse(res);
-        }
-        return parseContract(res);
-      }
+      this.responseParser.parseContractClassResponse
     );
   }
 
@@ -335,13 +330,10 @@ export class SequencerProvider implements ProviderInterface {
   public async getClassByHash(
     classHash: string,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<ContractClass> {
-    return this.fetchEndpoint('get_class_by_hash', { classHash, blockIdentifier }).then((res) => {
-      if (isSierra(res)) {
-        return this.responseParser.parseSierraContractClassResponse(res);
-      }
-      return parseContract(res);
-    });
+  ): Promise<ContractClassResponse> {
+    return this.fetchEndpoint('get_class_by_hash', { classHash, blockIdentifier }).then(
+      this.responseParser.parseContractClassResponse
+    );
   }
 
   public async getCompiledClassByClassHash(

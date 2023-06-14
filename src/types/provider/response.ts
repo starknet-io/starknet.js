@@ -6,9 +6,11 @@
 import { RPC } from '../api/rpc';
 import { Sequencer } from '../api/sequencer';
 import {
+  Abi,
   AllowArray,
   ByteCode,
   Call,
+  ContractClass,
   DeclareContractPayload,
   DeployAccountContractPayload,
   RawCalldata,
@@ -169,3 +171,5 @@ export interface StateUpdateResponse {
     deprecated_declared_classes?: RPC.DeprecatedDeclaredClasses; // RPC Only
   };
 }
+
+export type ContractClassResponse = Omit<ContractClass, 'abi'> & { abi?: Abi };

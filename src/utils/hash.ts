@@ -191,22 +191,23 @@ function nullSkipReplacer(key: string, value: any) {
   return value === null ? undefined : value;
 }
 
+// about 10x to 100x faster using array to build string
 export function formatSpaces(json: string) {
   let insideQuotes = false;
-  let newString = '';
+  const newString = [];
   // eslint-disable-next-line no-restricted-syntax
   for (const char of json) {
-    if (char === '"' && newString.endsWith('\\') === false) {
+    if (char === '"' && (newString.length > 0 && newString.slice(-1)[0] === '\\') === false) {
       insideQuotes = !insideQuotes;
     }
     if (insideQuotes) {
-      newString += char;
+      newString.push(char);
     } else {
       // eslint-disable-next-line no-nested-ternary
-      newString += char === ':' ? ': ' : char === ',' ? ', ' : char;
+      newString.push(char === ':' ? ': ' : char === ',' ? ', ' : char);
     }
   }
-  return newString;
+  return newString.join('');
 }
 
 export default function computeHintedClassHash(compiledContract: LegacyCompiledContract) {
