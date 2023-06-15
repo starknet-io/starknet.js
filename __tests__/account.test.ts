@@ -13,6 +13,7 @@ import {
   stark,
 } from '../src';
 import { uint256 } from '../src/utils/calldata/cairo';
+import { extractContractHashes } from '../src/utils/contract';
 import { parseUDCEvent } from '../src/utils/events';
 import { calculateContractAddressFromHash, feeTransactionVersion } from '../src/utils/hash';
 import { cleanHex, hexToDecimalString, toBigInt, toHex } from '../src/utils/num';
@@ -219,15 +220,29 @@ describe('deploy and test Wallet', () => {
       ]);
       expect(res).toMatchSchemaRef('SimulateTransactionResponse');
     });
-    test('simulate DECLARE - Cairo 1 Contract', async () => {
-      const res = await account.simulateTransaction([
-        {
-          type: TransactionType.DECLARE,
-          contract: compiledHelloSierra,
-          casm: compiledHelloSierraCasm,
-        },
-      ]);
-      expect(res).toMatchSchemaRef('SimulateTransactionResponse');
+    test('simulate DECLARE - Cairo 1 Contract - test if not already declared', async () => {
+      const declareContractPayload = extractContractHashes({
+        contract: compiledHelloSierra,
+        casm: compiledHelloSierraCasm,
+      });
+      let skip = false;
+      try {
+        await account.getClassByHash(declareContractPayload.classHash);
+        skip = true;
+      } catch (error) {
+        /* empty */
+      }
+
+      if (!skip) {
+        const res = await account.simulateTransaction([
+          {
+            type: TransactionType.DECLARE,
+            contract: compiledHelloSierra,
+            casm: compiledHelloSierraCasm,
+          },
+        ]);
+        expect(res).toMatchSchemaRef('SimulateTransactionResponse');
+      }
     });
     test('simulate DEPLOY - Cairo 0 Contract', async () => {
       const res = await account.simulateTransaction([
