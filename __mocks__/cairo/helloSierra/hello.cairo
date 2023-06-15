@@ -213,6 +213,7 @@ mod HelloStarknet {
         ca: ContractAddress,
         testbet: Bet,
         user: UserData,
+        user1: UserData,
     }
 
     // Felt252 test.
@@ -326,6 +327,22 @@ mod HelloStarknet {
     #[view]
     fn get_bet(test: felt252) -> Bet {
         testbet::read()
+    }
+
+    //#[external]
+    //fn set_user() {
+    //    let newUser = UserData{address: 0xff, is_claimed: true};
+    //    user::write(newUser);
+    //}
+
+    #[external]
+    fn set_user1(user: UserData) {
+        user1::write(user);
+    }
+
+    #[view]
+    fn get_user1() -> UserData {
+        user1::read()
     }
 
     // this method is required so that ABI have UserData definition in structs
