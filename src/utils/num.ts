@@ -23,6 +23,18 @@ export function toHex(number: BigNumberish): string {
   return addHexPrefix(toBigInt(number).toString(16));
 }
 
+/**
+ * Convert BigNumberish to STORAGE_KEY
+ * Same as toHex but conforming pattern STORAGE_KEY pattern ^0x0[0-7]{1}[a-fA-F0-9]{0,62}$
+ * A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
+ * 0x0 + [0-7] + 62 hex = 0x + 64 hex
+ * @param number BigNumberish
+ */
+export function toStorageKey(number: BigNumberish): string {
+  const res = addHexPrefix(toBigInt(number).toString(16).padStart(64, '0'));
+  return res;
+}
+
 export function hexToDecimalString(hex: string): string {
   return BigInt(addHexPrefix(hex)).toString(10);
 }

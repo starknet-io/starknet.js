@@ -41,7 +41,7 @@ import {
   transactionVersion_2,
 } from '../utils/hash';
 import { stringify } from '../utils/json';
-import { toHex } from '../utils/num';
+import { toHex, toStorageKey } from '../utils/num';
 import { wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { decompressProgram, signatureToHexArray } from '../utils/stark';
@@ -186,7 +186,7 @@ export class RpcProvider implements ProviderInterface {
     key: BigNumberish,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<RPC.Storage> {
-    const parsedKey = toHex(key);
+    const parsedKey = toStorageKey(key);
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getStorageAt', {
       contract_address: contractAddress,

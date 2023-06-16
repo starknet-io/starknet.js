@@ -16,6 +16,7 @@ import {
   shortString,
   stark,
 } from '../src';
+import { starknetKeccak } from '../src/utils/selector';
 import {
   compiledC1Account,
   compiledC1AccountCasm,
@@ -147,6 +148,47 @@ describeIfDevnet('Cairo 1 Devnet', () => {
       const status = await cairo1Contract.get_ca();
 
       expect(status).toBe(123n);
+    });
+
+    test('Cairo1 simple getStorageAt variables retrieval', async () => {
+      // u8
+      let tx = await cairo1Contract.increase_balance(100);
+      await account.waitForTransaction(tx.transaction_hash);
+      const balance = await cairo1Contract.get_balance();
+      let key = starknetKeccak('balance');
+      let storage = await account.getStorageAt(cairo1Contract.address, key);
+      expect(BigInt(storage)).toBe(balance);
+
+      // felt
+      tx = await cairo1Contract.set_ca('123');
+      await account.waitForTransaction(tx.transaction_hash);
+      const ca = await cairo1Contract.get_ca();
+      key = starknetKeccak('ca');
+      storage = await account.getStorageAt(cairo1Contract.address, key);
+      expect(BigInt(storage)).toBe(ca);
+
+      // bool
+      tx = await cairo1Contract.set_status(true);
+      await account.waitForTransaction(tx.transaction_hash);
+      const status = await cairo1Contract.get_status();
+      key = starknetKeccak('status');
+      storage = await account.getStorageAt(cairo1Contract.address, key);
+      expect(Boolean(BigInt(storage))).toBe(status);
+
+      // simple struct
+      tx = await cairo1Contract.set_user1({
+        address: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+        is_claimed: true,
+      });
+      await account.waitForTransaction(tx.transaction_hash);
+      const user = await cairo1Contract.get_user1();
+      key = starknetKeccak('user1');
+      const storage1 = await account.getStorageAt(cairo1Contract.address, key);
+      const storage2 = await account.getStorageAt(cairo1Contract.address, key + 1n);
+      expect(BigInt(storage1)).toBe(user.address);
+      expect(Boolean(BigInt(storage2))).toBe(user.is_claimed);
+
+      // TODO: Complex mapping - https://docs.starknet.io/documentation/architecture_and_concepts/Contracts/contract-storage/
     });
 
     test('Cairo 1 Contract Interaction - echo flat un-named un-nested tuple', async () => {
