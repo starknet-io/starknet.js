@@ -329,12 +329,6 @@ mod HelloStarknet {
         testbet::read()
     }
 
-    //#[external]
-    //fn set_user() {
-    //    let newUser = UserData{address: 0xff, is_claimed: true};
-    //    user::write(newUser);
-    //}
-
     #[external]
     fn set_user1(user: UserData) {
         user1::write(user);
