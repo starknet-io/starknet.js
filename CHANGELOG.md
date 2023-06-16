@@ -1,3 +1,9 @@
+## [5.13.2](https://github.com/0xs34n/starknet.js/compare/v5.13.1...v5.13.2) (2023-06-16)
+
+### Bug Fixes
+
+- rpc storage key & added simple storage test ([6c66202](https://github.com/0xs34n/starknet.js/commit/6c66202a966003509460dedf91e98177f7f4af27))
+
 ## [5.13.1](https://github.com/0xs34n/starknet.js/compare/v5.13.0...v5.13.1) (2023-06-14)
 
 ### Bug Fixes
