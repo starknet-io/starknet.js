@@ -150,7 +150,7 @@ describeIfDevnet('Cairo 1 Devnet', () => {
       expect(status).toBe(123n);
     });
 
-    test('Cairo1 simple getStorageAt variables retreaval', async () => {
+    test('Cairo1 simple getStorageAt variables retrieval', async () => {
       // u8
       let tx = await cairo1Contract.increase_balance(100);
       await account.waitForTransaction(tx.transaction_hash);
