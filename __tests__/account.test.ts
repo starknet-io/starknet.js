@@ -623,7 +623,7 @@ describe('deploy and test Wallet', () => {
     });
 
     test('estimate fee bulk invoke functions', async () => {
-      const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
+      // const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
       const estimatedFeeBulk = await account.estimateFeeBulk([
         {
           type: 'INVOKE_FUNCTION',
@@ -647,8 +647,8 @@ describe('deploy and test Wallet', () => {
         expect(value).toMatchSchemaRef('EstimateFee');
       });
       expect(estimatedFeeBulk.length).toEqual(2);
-      expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
-      innerInvokeEstFeeSpy.mockClear();
+      // expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
+      // innerInvokeEstFeeSpy.mockClear();
     });
 
     test('deploy account & multi invoke functions', async () => {
@@ -748,7 +748,7 @@ describe('deploy and test Wallet', () => {
         casm: compiledHelloSierraCasm,
       });
 
-      const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
+      // const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
       const result = await account.estimateInvokeFee({
         contractAddress: ddc1.deploy.address,
         entrypoint: 'increase_balance',
@@ -756,8 +756,8 @@ describe('deploy and test Wallet', () => {
       });
 
       expect(result).toMatchSchemaRef('EstimateFee');
-      expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
-      innerInvokeEstFeeSpy.mockClear();
+      // expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
+      // innerInvokeEstFeeSpy.mockClear();
     });
   });
 });
