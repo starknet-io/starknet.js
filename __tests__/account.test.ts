@@ -623,6 +623,7 @@ describe('deploy and test Wallet', () => {
     });
 
     test('estimate fee bulk invoke functions', async () => {
+      // TODO @dhruvkelawala check expectation for feeTransactionVersion
       // const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
       const estimatedFeeBulk = await account.estimateFeeBulk([
         {
@@ -742,6 +743,7 @@ describe('deploy and test Wallet', () => {
     // Order is important, declare c1 must be last else estimate and simulate will error
     // with contract already declared
     test('estimateInvokeFee Cairo 1', async () => {
+      // TODO @dhruvkelawala check expectation for feeTransactionVersion
       // Cairo 1 contract
       const ddc1: DeclareDeployUDCResponse = await account.declareAndDeploy({
         contract: compiledHelloSierra,
