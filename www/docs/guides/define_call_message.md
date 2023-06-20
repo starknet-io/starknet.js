@@ -436,6 +436,14 @@ const amount = myContract.call(...);
 | Struct                                                    | ` func get_v() -> MyStruct`        | MyStruct = { account: bigint, amount: bigint} | `const res: MyStruct = myContract.call(...`                                                                                                                          |
 | complex array                                             | `func get_v() -> Array<fMyStruct>` | MyStruct[]                                    | `const res: MyStruct[] = myContract.call(...`                                                                                                                        |
 
+If you don't know if your Contract object is interacting with a Cairo 0 or a Cairo 1 contract, you have these methods:
+
+```typescript
+import { cairo } from "starknet";
+const isCairo1: boolean = myContract.isCairo1();
+const isAbiCairo1: boolean = cairo.isCairo1Abi(myAbi);
+```
+
 ## Parse configuration
 
 ### parseRequest
