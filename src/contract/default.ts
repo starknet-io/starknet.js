@@ -19,7 +19,7 @@ import {
   StructAbi,
 } from '../types';
 import assert from '../utils/assert';
-import { CallData } from '../utils/calldata';
+import { CallData, cairo } from '../utils/calldata';
 import { ContractInterface } from './interface';
 
 export const splitArgsAndOptions = (args: ArgsOrCalldataWithOptions) => {
@@ -319,5 +319,9 @@ export class Contract implements ContractInterface {
       entrypoint: method,
       calldata,
     };
+  }
+
+  public isCairo1(): boolean {
+    return cairo.isCairo1Abi(this.abi);
   }
 }

@@ -106,4 +106,15 @@ export abstract class ContractInterface {
    * @returns Invocation object
    */
   public abstract populate(method: string, args?: ArgsOrCalldata): Invocation;
+
+  /**
+   * tells if the contract comes from a Cairo 1 contract
+   *
+   * @returns TRUE if the contract comes from a Cairo1 contract
+   * @example
+   * ```typescript
+   * const isCairo1: boolean = myContract.isCairo1();
+   * ```
+   */
+  public abstract isCairo1(): boolean;
 }

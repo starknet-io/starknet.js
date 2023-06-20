@@ -16,6 +16,7 @@ import {
   shortString,
   stark,
 } from '../src';
+import { isCairo1Abi } from '../src/utils/calldata/cairo';
 import { starknetKeccak } from '../src/utils/selector';
 import {
   compiledC1Account,
@@ -69,6 +70,13 @@ describeIfDevnet('Cairo 1 Devnet', () => {
     test('GetClassAt', async () => {
       const classResponse = await provider.getClassAt(dd.deploy.contract_address);
       expect(classResponse).toMatchSchemaRef('SierraContractClass');
+    });
+
+    test('isCairo1', async () => {
+      const isContractCairo1 = cairo1Contract.isCairo1();
+      expect(isContractCairo1).toBe(true);
+      const isAbiCairo1 = isCairo1Abi(cairo1Contract.abi);
+      expect(isAbiCairo1).toBe(true);
     });
 
     test('Cairo 1 Contract Interaction - skip invoke validation & call parsing', async () => {

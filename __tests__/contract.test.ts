@@ -1,6 +1,6 @@
 import { BigNumberish, Contract, ContractFactory, RawArgs, json, stark } from '../src';
 import { CallData } from '../src/utils/calldata';
-import { felt, tuple, uint256 } from '../src/utils/calldata/cairo';
+import { felt, isCairo1Abi, tuple, uint256 } from '../src/utils/calldata/cairo';
 import { getSelectorFromName } from '../src/utils/hash';
 import { hexToDecimalString, toBigInt } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
@@ -48,6 +48,13 @@ describe('contract module', () => {
           multicallDeploy.contract_address!,
           provider
         );
+      });
+
+      test('isCairo1', async () => {
+        const isContractCairo1: boolean = erc20Contract.isCairo1();
+        expect(isContractCairo1).toBe(false);
+        const isAbiCairo1: boolean = isCairo1Abi(erc20Contract.abi);
+        expect(isAbiCairo1).toBe(false);
       });
 
       test('populate transaction for initial balance of that account', async () => {
