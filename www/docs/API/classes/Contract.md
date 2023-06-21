@@ -381,3 +381,31 @@ Invocation object
 #### Defined in
 
 [src/contract/default.ts:314](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L314)
+
+---
+
+### isCairo1
+
+▸ **isCairo1**(): `boolean`
+
+tells if the contract comes from a Cairo 1 contract
+
+**`Example`**
+
+```typescript
+const isCairo1: boolean = myContract.isCairo1();
+```
+
+#### Returns
+
+`boolean`
+
+TRUE if the contract comes from a Cairo1 contract
+
+#### Implementation of
+
+[ContractInterface](ContractInterface.md).[isCairo1](ContractInterface.md#iscairo1)
+
+#### Defined in
+
+[src/contract/default.ts:324](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L324)

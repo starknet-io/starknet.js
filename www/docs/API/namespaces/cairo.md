@@ -12,6 +12,36 @@ custom_edit_url: null
 
 ## Functions
 
+### isCairo1Abi
+
+▸ **isCairo1Abi**(`abi`): `boolean`
+
+tells if an ABI comes from a Cairo 1 contract
+
+**`Example`**
+
+```typescript
+const isCairo1: boolean = isCairo1Abi(myAbi: Abi);
+```
+
+#### Parameters
+
+| Name  | Type                  | Description                                    |
+| :---- | :-------------------- | :--------------------------------------------- |
+| `abi` | [`Abi`](types.md#abi) | representing the interface of a Cairo contract |
+
+#### Returns
+
+`boolean`
+
+TRUE if it is an ABI from a Cairo1 contract
+
+#### Defined in
+
+[src/utils/calldata/cairo.ts:46](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L46)
+
+---
+
 ### felt
 
 ▸ **felt**(`it`): `string`
@@ -30,7 +60,7 @@ felt cairo type
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:66](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L66)
+[src/utils/calldata/cairo.ts:90](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L90)
 
 ---
 
@@ -293,7 +323,7 @@ Uint256 cairo type (helper for common struct type)
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:45](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L45)
+[src/utils/calldata/cairo.ts:69](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L69)
 
 ---
 
@@ -315,4 +345,4 @@ unnamed tuple cairo type (helper same as common struct type)
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:59](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L59)
+[src/utils/calldata/cairo.ts:83](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L83)
