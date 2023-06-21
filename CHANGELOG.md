@@ -1,3 +1,9 @@
+# [5.14.0](https://github.com/0xs34n/starknet.js/compare/v5.13.2...v5.14.0) (2023-06-21)
+
+### Features
+
+- add isCairo1 utility methods ([78e9f87](https://github.com/0xs34n/starknet.js/commit/78e9f874e0d812a9d1c896846e5ec6c95a6cffca))
+
 ## [5.13.2](https://github.com/0xs34n/starknet.js/compare/v5.13.1...v5.13.2) (2023-06-16)
 
 ### Bug Fixes
