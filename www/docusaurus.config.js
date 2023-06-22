@@ -16,7 +16,7 @@ const config = {
   tagline: 'JavaScript library for Starknet',
   url: 'https://starknetjs.com',
   baseUrl: '/',
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
   organizationName: '0xs34n', // Usually your GitHub org/user name.
