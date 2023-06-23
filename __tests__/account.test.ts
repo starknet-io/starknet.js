@@ -1,5 +1,3 @@
-import { Signature } from 'micro-starknet';
-
 import typedDataExample from '../__mocks__/typedDataExample.json';
 import {
   Account,
@@ -8,20 +6,16 @@ import {
   Provider,
   TransactionStatus,
   TransactionType,
+  cairo,
+  contractClassResponseToLegacyCompiledContract,
   ec,
+  extractContractHashes,
   hash,
+  num,
+  parseUDCEvent,
+  shortString,
   stark,
 } from '../src';
-import { uint256 } from '../src/utils/calldata/cairo';
-import {
-  contractClassResponseToLegacyCompiledContract,
-  extractContractHashes,
-} from '../src/utils/contract';
-import { parseUDCEvent } from '../src/utils/events';
-import { calculateContractAddressFromHash, feeTransactionVersion } from '../src/utils/hash';
-import { cleanHex, hexToDecimalString, toBigInt, toHex } from '../src/utils/num';
-import { encodeShortString } from '../src/utils/shortString';
-import { randomAddress } from '../src/utils/stark';
 import {
   compiledErc20,
   compiledHelloSierra,
@@ -36,6 +30,12 @@ import {
   getTestProvider,
 } from './fixtures';
 import { initializeMatcher } from './schema';
+
+const { cleanHex, hexToDecimalString, toBigInt, toHex } = num;
+const { encodeShortString } = shortString;
+const { randomAddress } = stark;
+const { uint256 } = cairo;
+const { Signature } = ec.starkCurve;
 
 describe('deploy and test Wallet', () => {
   const provider = new Provider(getTestProvider());
@@ -94,7 +94,7 @@ describe('deploy and test Wallet', () => {
     });
 
     expect(result).toMatchSchemaRef('EstimateFee');
-    expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
+    expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(hash.feeTransactionVersion);
     innerInvokeEstFeeSpy.mockClear();
   });
 
@@ -304,7 +304,7 @@ describe('deploy and test Wallet', () => {
       await provider.waitForTransaction(declareAccount.transaction_hash);
       const privateKey = stark.randomAddress();
       const starkKeyPub = ec.starkCurve.getStarkKey(privateKey);
-      const precalculatedAddress = calculateContractAddressFromHash(
+      const precalculatedAddress = hash.calculateContractAddressFromHash(
         starkKeyPub,
         accountClassHash,
         { publicKey: starkKeyPub },
@@ -612,7 +612,7 @@ describe('deploy and test Wallet', () => {
 
       const privateKey = stark.randomAddress();
       starkKeyPub = ec.starkCurve.getStarkKey(privateKey);
-      precalculatedAddress = calculateContractAddressFromHash(
+      precalculatedAddress = hash.calculateContractAddressFromHash(
         starkKeyPub,
         accountClassHash,
         { publicKey: starkKeyPub },
