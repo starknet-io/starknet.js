@@ -7,10 +7,15 @@ import { CompiledSierra, SierraContractClass } from './sierra';
  * CompressedCompiledContract
  */
 export type ContractClass = LegacyContractClass | SierraContractClass;
+
 /**
  * format produced after compile .cairo to .json
  */
 export type CompiledContract = LegacyCompiledContract | CompiledSierra;
+
+/**
+ * Compressed or decompressed Cairo0 or Cairo1 Contract
+ */
 export type CairoContract = ContractClass | CompiledContract;
 
 // Basic elements

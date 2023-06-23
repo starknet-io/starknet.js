@@ -33,7 +33,6 @@ export function parseContract(contract: CompiledContract | string): ContractClas
   if (!isSierra(contract)) {
     return {
       ...parsedContract,
-      // TODO: Why do we gzip program object?
       ...('program' in parsedContract && { program: compressProgram(parsedContract.program) }),
     } as LegacyContractClass;
   }

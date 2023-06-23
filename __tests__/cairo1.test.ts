@@ -4,6 +4,7 @@ import {
   BigNumberish,
   CallData,
   Calldata,
+  CompiledSierra,
   Contract,
   DeclareDeployUDCResponse,
   RawArgsArray,
@@ -16,6 +17,7 @@ import {
   shortString,
   stark,
 } from '../src';
+import { toHex } from '../src/utils/num';
 import { starknetKeccak } from '../src/utils/selector';
 import {
   compiledC1Account,
@@ -52,6 +54,21 @@ describeIfDevnet('Cairo 1 Devnet', () => {
       expect(dd.declare).toMatchSchemaRef('DeclareContractResponse');
       expect(dd.deploy).toMatchSchemaRef('DeployContractUDCResponse');
       expect(cairo1Contract).toBeInstanceOf(Contract);
+    });
+
+    xtest('validate TS for redeclare - skip testing', async () => {
+      const cc0 = await account.getClassAt(dd.deploy.address);
+      const cc0_1 = await account.getClassByHash(toHex(dd.declare.class_hash));
+
+      await account.declare({
+        contract: cc0 as CompiledSierra,
+        casm: compiledHelloSierraCasm,
+      });
+
+      await account.declare({
+        contract: cc0_1 as CompiledSierra,
+        casm: compiledHelloSierraCasm,
+      });
     });
 
     test('deployContract Cairo1', async () => {

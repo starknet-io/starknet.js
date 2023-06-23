@@ -13,7 +13,10 @@ import {
   stark,
 } from '../src';
 import { uint256 } from '../src/utils/calldata/cairo';
-import { extractContractHashes } from '../src/utils/contract';
+import {
+  contractClassResponseToLegacyCompiledContract,
+  extractContractHashes,
+} from '../src/utils/contract';
 import { parseUDCEvent } from '../src/utils/events';
 import { calculateContractAddressFromHash, feeTransactionVersion } from '../src/utils/hash';
 import { cleanHex, hexToDecimalString, toBigInt, toHex } from '../src/utils/num';
@@ -40,12 +43,13 @@ describe('deploy and test Wallet', () => {
   let erc20: Contract;
   let erc20Address: string;
   let dapp: Contract;
+  let dd: DeclareDeployUDCResponse;
 
   beforeAll(async () => {
     initializeMatcher(expect);
     expect(account).toBeInstanceOf(Account);
 
-    const declareDeploy = await account.declareAndDeploy({
+    dd = await account.declareAndDeploy({
       contract: compiledErc20,
       constructorCalldata: [
         encodeShortString('Token'),
@@ -54,7 +58,7 @@ describe('deploy and test Wallet', () => {
       ],
     });
 
-    erc20Address = declareDeploy.deploy.contract_address;
+    erc20Address = dd.deploy.contract_address;
     erc20 = new Contract(compiledErc20.abi, erc20Address, provider);
 
     const { balance } = await erc20.balanceOf(account.address);
@@ -66,6 +70,19 @@ describe('deploy and test Wallet', () => {
     });
 
     dapp = new Contract(compiledTestDapp.abi, dappResponse.deploy.contract_address!, provider);
+  });
+
+  xtest('validate TS for redeclare - skip testing', async () => {
+    const cc0 = await account.getClassAt(dd.deploy.address);
+    const cc0_1 = await account.getClassByHash(toHex(dd.declare.class_hash));
+
+    await account.declare({
+      contract: contractClassResponseToLegacyCompiledContract(cc0),
+    });
+
+    await account.declare({
+      contract: contractClassResponseToLegacyCompiledContract(cc0_1),
+    });
   });
 
   test('estimateInvokeFee Cairo 0', async () => {

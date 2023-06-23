@@ -1,7 +1,15 @@
-import { CairoContract, CompiledSierra, SierraContractClass } from '../types/lib/contract/index';
+import { ContractClassResponse } from '../types';
+import {
+  CairoContract,
+  CompiledSierra,
+  LegacyCompiledContract,
+  LegacyContractClass,
+  SierraContractClass,
+} from '../types/lib/contract/index';
 import { CompleteDeclareContractPayload, DeclareContractPayload } from '../types/lib/index';
 import { computeCompiledClassHash, computeContractClassHash } from './hash';
 import { parse } from './json';
+import { decompressProgram } from './stark';
 
 export function isSierra(
   contract: CairoContract | string
@@ -30,4 +38,17 @@ export function extractContractHashes(
     throw new Error('Extract classHash failed, provide (CompiledContract).json file or classHash');
 
   return response;
+}
+
+/**
+ * Helper to redeclare response Cairo0 contract
+ * @param ccr ContractClassResponse
+ * @returns LegacyCompiledContract
+ */
+export function contractClassResponseToLegacyCompiledContract(ccr: ContractClassResponse) {
+  if (isSierra(ccr)) {
+    throw Error('ContractClassResponse need to be LegacyContractClass (cairo0 response class)');
+  }
+  const contract = ccr as LegacyContractClass;
+  return { ...contract, program: decompressProgram(contract.program) } as LegacyCompiledContract;
 }
