@@ -17,6 +17,7 @@ import {
   shortString,
   stark,
 } from '../src';
+import { isCairo1Abi } from '../src/utils/calldata/cairo';
 import { toHex } from '../src/utils/num';
 import { starknetKeccak } from '../src/utils/selector';
 import {
@@ -86,6 +87,13 @@ describeIfDevnet('Cairo 1 Devnet', () => {
     test('GetClassAt', async () => {
       const classResponse = await provider.getClassAt(dd.deploy.contract_address);
       expect(classResponse).toMatchSchemaRef('SierraContractClass');
+    });
+
+    test('isCairo1', async () => {
+      const isContractCairo1 = cairo1Contract.isCairo1();
+      expect(isContractCairo1).toBe(true);
+      const isAbiCairo1 = isCairo1Abi(cairo1Contract.abi);
+      expect(isAbiCairo1).toBe(true);
     });
 
     test('Cairo 1 Contract Interaction - skip invoke validation & call parsing', async () => {
@@ -167,7 +175,7 @@ describeIfDevnet('Cairo 1 Devnet', () => {
       expect(status).toBe(123n);
     });
 
-    test('Cairo1 simple getStorageAt variables retreaval', async () => {
+    test('Cairo1 simple getStorageAt variables retrieval', async () => {
       // u8
       let tx = await cairo1Contract.increase_balance(100);
       await account.waitForTransaction(tx.transaction_hash);

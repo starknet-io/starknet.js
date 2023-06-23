@@ -94,6 +94,31 @@ value is bigint
 
 ---
 
+### toStorageKey
+
+▸ **toStorageKey**(`number`): `string`
+
+Convert BigNumberish to STORAGE_KEY
+Same as toHex but conforming pattern STORAGE_KEY pattern ^0x0[0-7]{1}[a-fA-F0-9]{0,62}$
+A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
+0x0 + [0-7] + 62 hex = 0x + 64 hex
+
+#### Parameters
+
+| Name     | Type                                    | Description  |
+| :------- | :-------------------------------------- | :----------- |
+| `number` | [`BigNumberish`](types.md#bignumberish) | BigNumberish |
+
+#### Returns
+
+`string`
+
+#### Defined in
+
+[src/utils/num.ts:33](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L33)
+
+---
+
 ### hexToDecimalString
 
 ▸ **hexToDecimalString**(`hex`): `string`
@@ -110,7 +135,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:26](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L26)
+[src/utils/num.ts:38](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L38)
 
 ---
 
@@ -133,7 +158,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:42](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L42)
+[src/utils/num.ts:54](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L54)
 
 ---
 
@@ -153,7 +178,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:59](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L59)
+[src/utils/num.ts:71](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L71)
 
 ---
 
@@ -173,7 +198,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:63](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L63)
+[src/utils/num.ts:75](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L75)
 
 ---
 
@@ -193,7 +218,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:70](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L70)
+[src/utils/num.ts:82](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L82)
 
 ---
 
@@ -213,7 +238,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:80](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L80)
+[src/utils/num.ts:92](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L92)
 
 ---
 
@@ -233,7 +258,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:90](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L90)
+[src/utils/num.ts:102](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L102)
 
 ---
 
@@ -257,7 +282,7 @@ an array of Bytes
 
 #### Defined in
 
-[src/utils/num.ts:101](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L101)
+[src/utils/num.ts:113](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L113)
 
 ---
 
@@ -279,7 +304,7 @@ Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
 
 #### Defined in
 
-[src/utils/num.ts:34](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L34)
+[src/utils/num.ts:46](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L46)
 
 ---
 
@@ -299,7 +324,7 @@ Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
 
 #### Defined in
 
-[src/utils/num.ts:67](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L67)
+[src/utils/num.ts:79](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L79)
 
 ---
 
@@ -319,7 +344,7 @@ Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
 
 #### Defined in
 
-[src/utils/num.ts:68](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L68)
+[src/utils/num.ts:80](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L80)
 
 ---
 
@@ -339,4 +364,4 @@ Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
 
 #### Defined in
 
-[src/utils/num.ts:94](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L94)
+[src/utils/num.ts:106](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L106)

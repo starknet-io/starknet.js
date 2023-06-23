@@ -1,50 +1,37 @@
+# [5.14.0](https://github.com/0xs34n/starknet.js/compare/v5.13.2...v5.14.0) (2023-06-21)
+
+### Features
+
+- add isCairo1 utility methods ([78e9f87](https://github.com/0xs34n/starknet.js/commit/78e9f874e0d812a9d1c896846e5ec6c95a6cffca))
+
+## [5.13.2](https://github.com/0xs34n/starknet.js/compare/v5.13.1...v5.13.2) (2023-06-16)
+
+### Bug Fixes
+
+- conform storage key to RPC specification ([6c66202](https://github.com/0xs34n/starknet.js/commit/6c66202a966003509460dedf91e98177f7f4af27))
+
 ## [5.13.1](https://github.com/0xs34n/starknet.js/compare/v5.13.0...v5.13.1) (2023-06-14)
 
 ### Bug Fixes
 
-- common abi type for ContractClassResponse ([55a8d98](https://github.com/0xs34n/starknet.js/commit/55a8d981be4ee4d861c7a3f988c012801af3d905))
+- introduce common ABI type for contract class response ([55a8d98](https://github.com/0xs34n/starknet.js/commit/55a8d981be4ee4d861c7a3f988c012801af3d905))
 
 # [5.13.0](https://github.com/0xs34n/starknet.js/compare/v5.12.0...v5.13.0) (2023-06-12)
 
-### Bug Fixes
+### Info: Skipped tests during the release pipeline
 
-- class / simulate types ([823e144](https://github.com/0xs34n/starknet.js/commit/823e144257cf3afdf8ca64f3e6e1afd1c2525161))
-- getClass return type ([5251337](https://github.com/0xs34n/starknet.js/commit/52513373fc90af4764f3d8bf7f24a6a65db8dc52))
-- removed doc modification ([f45b532](https://github.com/0xs34n/starknet.js/commit/f45b53204fbd4fe8a8ccc46fdf401cd32b732883))
-- suggestedMaxFees to suggestedMaxFee ([80cfbb9](https://github.com/0xs34n/starknet.js/commit/80cfbb9c3eca55ddb0eae6a152523b72f3ba9699))
-- test error ([2117e75](https://github.com/0xs34n/starknet.js/commit/2117e75b92c4b025e3d69a2719454fca3af76aa2))
-- type ([67bf6d8](https://github.com/0xs34n/starknet.js/commit/67bf6d8c31c62107eb1ea4b21923b43e0ca7c921))
-- type not requested anymore ([4446acb](https://github.com/0xs34n/starknet.js/commit/4446acbe8ab06fa981a8ccecb7fad67b2df73899))
-- typescript wrong types for getStateUpdate ([0c309d5](https://github.com/0xs34n/starknet.js/commit/0c309d5c1e3450fa274e8fb798c510984b6467b5))
-- uncomment sequencer simulate transaction test ([9a60b9f](https://github.com/0xs34n/starknet.js/commit/9a60b9ffae9a67a17b307aa5bbbffe897416ccab))
-- update rpc versions, small fixes ([4f8b24f](https://github.com/0xs34n/starknet.js/commit/4f8b24fcd402b033415af9902f5e0137e03c5db9))
-- wip simulate type cleanup, version bugfix ([045bb25](https://github.com/0xs34n/starknet.js/commit/045bb251a095ff1f7ec8eaa141547c247f3fabb2))
+- Devnet partial support RPC v0.3.0 (simulate)
+- Infura (Pathfinder) default node on RPC v0.2.x
 
 ### Features
 
-- accountInvocationsFactory ([acdaab4](https://github.com/0xs34n/starknet.js/commit/acdaab4458406b8bb55238cb9400c16724486da0))
-- add EVENTS_CHUNK (PR 70 from starknet-specs) ([2f15593](https://github.com/0xs34n/starknet.js/commit/2f155932a748400d37926b45e4abe6fa894ae9b3))
-- add replaced classes and rename properties (PR 76 from starknet-specs), rpc.ts fix coming next ([eb095c5](https://github.com/0xs34n/starknet.js/commit/eb095c583fe93a9e8157c5157885cbb19de8a00d))
-- add simulate_transaction and sierra support (untested) ([47bca37](https://github.com/0xs34n/starknet.js/commit/47bca377f2f4cde658a467143cc54f80c385bc93))
-- added missing TOO_MANY_KEYS_IN_FILTER error (PR 55 from starknet-specs) ([32e2bf5](https://github.com/0xs34n/starknet.js/commit/32e2bf5521461402b5d524311e1a53a7f434f314))
-- consolidation of invokes in provider, except basic transactions ([92c2a98](https://github.com/0xs34n/starknet.js/commit/92c2a985538486065328b3243d22fc578b726ea6))
-- fix remaining issues ([23d0a96](https://github.com/0xs34n/starknet.js/commit/23d0a96a525f7e2317021db5cfb9a2cf5a5ff9cf))
-- implemented estimateFeeOriginal ([aba6707](https://github.com/0xs34n/starknet.js/commit/aba67074cadab64389908f0102bdfc904064ae5e))
-- make transaction type explicit (PR 68 from starknet-specs) ([8857e08](https://github.com/0xs34n/starknet.js/commit/8857e08696df1e4ed8ca16ed922326350f74dc67))
-- multiple updates and fixes for simulate and estimate, interface, wip ([12ed49b](https://github.com/0xs34n/starknet.js/commit/12ed49bf182da6ecfdb6560fd10d0659ad2acae9))
-- simulate transaction implementation wip ([b604de0](https://github.com/0xs34n/starknet.js/commit/b604de005148a53d6ee6ac5f67e2e004e5222be5))
-- simulate transaction rpc & sequencer ([8a47562](https://github.com/0xs34n/starknet.js/commit/8a475623799778a97f385b935d7f951f388cff13))
-- starknet 0.11.0 adjustments (PR 65 from starknet-specs), rpc.ts fix coming next ([cffdaca](https://github.com/0xs34n/starknet.js/commit/cffdacaa66fe944dcbf050d8572d1e053d59480c))
-- state update response split to pending/none pending (PR 74 from starknet-specs) ([2c6945f](https://github.com/0xs34n/starknet.js/commit/2c6945f03c9bd8ab5787cc2505a0fd803d0bbe72))
-- supported multiple values in event filters (PR 55 from starknet-specs) ([4492704](https://github.com/0xs34n/starknet.js/commit/4492704224632f51990b1ba3b3138f4e4c902e65))
-- supported new required properties (PR 67 from starknet-specs) ([1759ac4](https://github.com/0xs34n/starknet.js/commit/1759ac4c84d8bcea8460745f4e48518511976835))
-- supported the new api bulk for estimateFee on existing rpc methods ([b8dd210](https://github.com/0xs34n/starknet.js/commit/b8dd2107ab614e0d5c99545d0fe61cbd727db5ab))
+- adapt RPC methods to v0.3.0 specification ([32188fb](https://github.com/0xs34n/starknet.js/commit/32188fba03506f45c82b61e24574e6a8fb0a5c1f))
 
 # [5.12.0](https://github.com/0xs34n/starknet.js/compare/v5.11.1...v5.12.0) (2023-06-12)
 
 ### Features
 
-- add RawArgs in Account.populate ([6b539a3](https://github.com/0xs34n/starknet.js/commit/6b539a37815ecafb6c8b738b8585dd75d534b3cf))
+- update Account.populate() to accept RawArgs type ([6b539a3](https://github.com/0xs34n/starknet.js/commit/6b539a37815ecafb6c8b738b8585dd75d534b3cf))
 
 ## [5.11.1](https://github.com/0xs34n/starknet.js/compare/v5.11.0...v5.11.1) (2023-05-30)
 
@@ -62,62 +49,58 @@
 
 ### Bug Fixes
 
-- use of uint256 in array in calls ([969b3c1](https://github.com/0xs34n/starknet.js/commit/969b3c1670902d7cc55156d5b3f6a8e7d45c731b))
+- repair Uint256 array handling for calldata compilation ([969b3c1](https://github.com/0xs34n/starknet.js/commit/969b3c1670902d7cc55156d5b3f6a8e7d45c731b))
 
 ## [5.10.1](https://github.com/0xs34n/starknet.js/compare/v5.10.0...v5.10.1) (2023-05-16)
 
 ### Bug Fixes
 
-- c1 acc execute props order, c1 test flag, local testing fix ([d86057c](https://github.com/0xs34n/starknet.js/commit/d86057cefe9e4053dac6d45d043401605246d3ed))
+- ensure valid Cairo1 property order for call execution ([d86057c](https://github.com/0xs34n/starknet.js/commit/d86057cefe9e4053dac6d45d043401605246d3ed))
 
 # [5.10.0](https://github.com/0xs34n/starknet.js/compare/v5.9.2...v5.10.0) (2023-05-10)
 
 ### Bug Fixes
 
-- merge next and cleanup ([067673f](https://github.com/0xs34n/starknet.js/commit/067673ffbc9f414c33018d5cd83c29a001c5e9ab))
-- nested 2d arrays request and response ([cccf518](https://github.com/0xs34n/starknet.js/commit/cccf518acc950bfed7579513c812df33cebb774d))
-- ts getClassHashAt oprional blockid ([f54bfd0](https://github.com/0xs34n/starknet.js/commit/f54bfd0e9591d1ec1dccf20668de68272834fa46))
+- repair nested 2d array handling ([cccf518](https://github.com/0xs34n/starknet.js/commit/cccf518acc950bfed7579513c812df33cebb774d))
+- mark getClassHashAt blockIdentifier parameter as optional ([f54bfd0](https://github.com/0xs34n/starknet.js/commit/f54bfd0e9591d1ec1dccf20668de68272834fa46))
 
 ### Features
 
-- declareIfNot, update declareAndDeploy with it, cleanup cairo1 test ([494dbb8](https://github.com/0xs34n/starknet.js/commit/494dbb8a84608415a279b2bfa84103667321a84e))
+- introduce declareIfNot utility Account method ([494dbb8](https://github.com/0xs34n/starknet.js/commit/494dbb8a84608415a279b2bfa84103667321a84e))
 - improve usage by extending RawCalldata to RawArgs in all major flows ([0ef1ec8](https://github.com/0xs34n/starknet.js/commit/0ef1ec8624e294a526f8e97d856e70b6426a9ae3))
 - make cairoVersion a property of Account ([b6a7d38](https://github.com/0xs34n/starknet.js/commit/b6a7d38e98c65e24cffac5485819797560b5571c))
 
 ## [5.9.2](https://github.com/0xs34n/starknet.js/compare/v5.9.1...v5.9.2) (2023-05-03)
 
-### Bug Fixes
+### Info
 
-- revert doc changes ([356b04d](https://github.com/0xs34n/starknet.js/commit/356b04d94a398ba7642cae6bffa8961213dda33c))
+- _no changes_
 
 ## [5.9.1](https://github.com/0xs34n/starknet.js/compare/v5.9.0...v5.9.1) (2023-05-02)
 
 ### Bug Fixes
 
-- add tests for uint256 ([5914170](https://github.com/0xs34n/starknet.js/commit/5914170770fd75909779a6b7e7b3cb2c6b1b2a9f))
-- correct test ([a35548e](https://github.com/0xs34n/starknet.js/commit/a35548e4d9892630645645bb43737ea2e2ae79a5))
-- uint256 in contract call ([0cc05e0](https://github.com/0xs34n/starknet.js/commit/0cc05e073bc025c2afdc5105b5b87e5d23c1d487))
+- repair Uint256 contract call handling ([0cc05e0](https://github.com/0xs34n/starknet.js/commit/0cc05e073bc025c2afdc5105b5b87e5d23c1d487))
 
 # [5.9.0](https://github.com/0xs34n/starknet.js/compare/v5.8.0...v5.9.0) (2023-04-28)
 
 ### Features
 
-- complex c1 Struct with forced abi, complex ci arrays, refactor parser ([8f28462](https://github.com/0xs34n/starknet.js/commit/8f2846290a88c7b3b2985f32c61446a378566679))
-- helpers toHex, Calldata, executeCallData, compile entrypoint, type improvements ([a452d64](https://github.com/0xs34n/starknet.js/commit/a452d64f1aa4e1005378bbba4d7748a054cae2be))
+- support complex Cairo1 Struct with forced ABI and complex Cairo1 arrays, refactor parser ([8f28462](https://github.com/0xs34n/starknet.js/commit/8f2846290a88c7b3b2985f32c61446a378566679))
+- add toHex and expand Calldata and executeCallData helpers, allow entrypoint compilation ([a452d64](https://github.com/0xs34n/starknet.js/commit/a452d64f1aa4e1005378bbba4d7748a054cae2be))
 
 # [5.8.0](https://github.com/0xs34n/starknet.js/compare/v5.7.0...v5.8.0) (2023-04-26)
 
 ### Bug Fixes
 
-- contract types, interface, cleanup, extend tests ([02c6b72](https://github.com/0xs34n/starknet.js/commit/02c6b72ec41016fdd75537044889e7cffd624b27))
-- contractfactory, contract, interface cleanup cleanup & ts ([b25047e](https://github.com/0xs34n/starknet.js/commit/b25047ece2eed313eaa776b2a132b9a04c3fbc2f))
-- lapsus lingua, dangling, cleanup 🚀 ([a79d55c](https://github.com/0xs34n/starknet.js/commit/a79d55c2990e81bc6b0e58583142d3eb7bbddfa2))
+- clean up Contract interfaces ([02c6b72](https://github.com/0xs34n/starknet.js/commit/02c6b72ec41016fdd75537044889e7cffd624b27))
+- clean up ContractFactory and Contract interfaces ([b25047e](https://github.com/0xs34n/starknet.js/commit/b25047ece2eed313eaa776b2a132b9a04c3fbc2f))
 - prevent missusage of cairoVersion on deploy ([d920dbe](https://github.com/0xs34n/starknet.js/commit/d920dbe6144006438c917727b153a043fec2531b))
 - remove unused cairoVersion from Contract ([e4fcf24](https://github.com/0xs34n/starknet.js/commit/e4fcf244fa1dfd01301addfa7492bf90dac5a854))
 
 ### Features
 
-- boolean to felt - cairo 1, compile() ([ef34e0a](https://github.com/0xs34n/starknet.js/commit/ef34e0a25a52be7a6ac76714bda43233a2f1a6f1))
+- add boolean to felt support for Cairo1 ([ef34e0a](https://github.com/0xs34n/starknet.js/commit/ef34e0a25a52be7a6ac76714bda43233a2f1a6f1))
 - remove deprecated compileCalldata ([e5adca4](https://github.com/0xs34n/starknet.js/commit/e5adca449a9d1142339d5e63adb857698c5913d6))
 
 # [5.7.0](https://github.com/0xs34n/starknet.js/compare/v5.6.1...v5.7.0) (2023-04-25)
@@ -130,44 +113,42 @@
 
 ### Bug Fixes
 
-- uint256 struct ([4ce2d02](https://github.com/0xs34n/starknet.js/commit/4ce2d0255594831e7ad816368e3cfa14449feaa5))
-- uint256, view bool, compiled in contract.call ([346cd51](https://github.com/0xs34n/starknet.js/commit/346cd5197d377966d148a8b218e6ee03af7170f2))
+- fix support for Cairo1 Uint256 types ([e2b03b2](https://github.com/0xs34n/starknet.js/commit/e2b03b2c587cc774bba9c6961d710aac782f829f))
 
 # [5.6.0](https://github.com/0xs34n/starknet.js/compare/v5.5.0...v5.6.0) (2023-04-19)
 
 ### Bug Fixes
 
-- optional param in contract invoke ([da094e4](https://github.com/0xs34n/starknet.js/commit/da094e4172ed43ce93604e92adbba2a5ecb1498e))
+- mark optional param in contract invoke ([da094e4](https://github.com/0xs34n/starknet.js/commit/da094e4172ed43ce93604e92adbba2a5ecb1498e))
 
 ### Features
 
-- cairo 1 bool ([52fed30](https://github.com/0xs34n/starknet.js/commit/52fed30f04b70bcce80f829dba6975101f6f3644))
-- cairo1 array, fix invoke response, hash separate test ([4637cd7](https://github.com/0xs34n/starknet.js/commit/4637cd74481ba85b3164ddb93c258b9ca8b9b949))
-- felt252 implementation ([3d20ea4](https://github.com/0xs34n/starknet.js/commit/3d20ea44b49d1c7ba90d8a46a307f54e737c3285))
-- uint validate and parsing supprot ([c1acd29](https://github.com/0xs34n/starknet.js/commit/c1acd298d63758ba27fc20bcb4b0c00cca82078f))
+- add Cairo1 bool implementation ([52fed30](https://github.com/0xs34n/starknet.js/commit/52fed30f04b70bcce80f829dba6975101f6f3644))
+- support Cairo1 array, fix invoke response ([4637cd7](https://github.com/0xs34n/starknet.js/commit/4637cd74481ba85b3164ddb93c258b9ca8b9b949))
+- add felt252 implementation ([3d20ea4](https://github.com/0xs34n/starknet.js/commit/3d20ea44b49d1c7ba90d8a46a307f54e737c3285))
+- support uint parsing and validation ([c1acd29](https://github.com/0xs34n/starknet.js/commit/c1acd298d63758ba27fc20bcb4b0c00cca82078f))
 
 # [5.5.0](https://github.com/0xs34n/starknet.js/compare/v5.4.2...v5.5.0) (2023-04-10)
 
 ### Bug Fixes
 
-- update DeclareAndDeploy with cairo 1 declare ([71072cf](https://github.com/0xs34n/starknet.js/commit/71072cffadb8ac118780cec21cb8c4f83e74d7ae))
+- update DeclareAndDeploy with Cairo1 declare ([71072cf](https://github.com/0xs34n/starknet.js/commit/71072cffadb8ac118780cec21cb8c4f83e74d7ae))
 
 ### Features
 
-- response parsing and types ([09a46af](https://github.com/0xs34n/starknet.js/commit/09a46af02e88376dc49e0aa39468fded99b94ee2))
+- expand Cairo1 response parsing and types ([09a46af](https://github.com/0xs34n/starknet.js/commit/09a46af02e88376dc49e0aa39468fded99b94ee2))
 
 ## [5.4.2](https://github.com/0xs34n/starknet.js/compare/v5.4.1...v5.4.2) (2023-04-04)
 
 ### Bug Fixes
 
-- implement custom ts error localy ([fa90a3e](https://github.com/0xs34n/starknet.js/commit/fa90a3e7dcbe8c0952b0681be903dffb4b4c74c6))
+- implement custom ts error locally ([fa90a3e](https://github.com/0xs34n/starknet.js/commit/fa90a3e7dcbe8c0952b0681be903dffb4b4c74c6))
 
 ## [5.4.1](https://github.com/0xs34n/starknet.js/compare/v5.4.0...v5.4.1) (2023-04-03)
 
 ### Bug Fixes
 
-- remove AnySignatureType and parseSignature method ([358bfad](https://github.com/0xs34n/starknet.js/commit/358bfad8e70ab3d4b2c784e0444780c4d7c5f71a))
-- signature tight flexible resolution ([4990cd8](https://github.com/0xs34n/starknet.js/commit/4990cd8a4d6fd8b87c3016fd27c7eb1b2d5a4a8a))
+- fix call response type and signature type ([c6c42e0](https://github.com/0xs34n/starknet.js/commit/c6c42e06ab7dd464e472b319cc16f52c75bef7cb))
 
 # [5.4.0](https://github.com/0xs34n/starknet.js/compare/v5.3.0...v5.4.0) (2023-04-03)
 
@@ -177,28 +158,28 @@
 
 ### Features
 
-- support cairo1 execute calldata ([1f7f001](https://github.com/0xs34n/starknet.js/commit/1f7f00155ae89ff871cdf987cd3b5238377d5450))
+- support Cairo1 execute calldata ([1f7f001](https://github.com/0xs34n/starknet.js/commit/1f7f00155ae89ff871cdf987cd3b5238377d5450))
 
 # [5.3.0](https://github.com/0xs34n/starknet.js/compare/v5.2.0...v5.3.0) (2023-03-29)
 
 ### Features
 
 - declare v2 from account ([bc861b7](https://github.com/0xs34n/starknet.js/commit/bc861b753b443b4f75f9af7d1d9eb1a350273376))
-- declare v2 intermidiate ([a8fdfe3](https://github.com/0xs34n/starknet.js/commit/a8fdfe3e6f00ee08f7aec55a8babda46043f1783))
+- declare v2 intermediate ([a8fdfe3](https://github.com/0xs34n/starknet.js/commit/a8fdfe3e6f00ee08f7aec55a8babda46043f1783))
 - get_compiled_class_by_class_hash, get_class_by_hash, ContractClass, rpc hotfix ([fc33d19](https://github.com/0xs34n/starknet.js/commit/fc33d196adadbf899e450aec88ef9d8d7365f726))
 - get_state_update, fix types, fix responseParser, fix BigNumberish api response, fix OPENRPC ([50a2c29](https://github.com/0xs34n/starknet.js/commit/50a2c29b53feb960a6b2a0eea7651c55cff5fc0b))
-- minimal changes api ([7cec344](https://github.com/0xs34n/starknet.js/commit/7cec344c5b9a70bac9597354b20773388e5a4145))
+- update contract address to sender address parameters ([7cec344](https://github.com/0xs34n/starknet.js/commit/7cec344c5b9a70bac9597354b20773388e5a4145))
 - remove version 0 invoke and declare ([08bd65c](https://github.com/0xs34n/starknet.js/commit/08bd65cf20d6db0fecb1fb014b2464f19dc64a6c))
-- skipValidate full impl ([8b20e2e](https://github.com/0xs34n/starknet.js/commit/8b20e2e461ae73b9b6840972ea6c17a00b3efddc))
+- implement skipValidate ([8b20e2e](https://github.com/0xs34n/starknet.js/commit/8b20e2e461ae73b9b6840972ea6c17a00b3efddc))
 - update hashing to cairo-lang 0.11.0, cairo 1.0.0.alpha-6 ([b6669b5](https://github.com/0xs34n/starknet.js/commit/b6669b577b159bd98369a16e295ba847eea55688))
 
 # [5.2.0](https://github.com/0xs34n/starknet.js/compare/v5.1.1...v5.2.0) (2023-03-14)
 
 ### Features
 
-- compiledClassHash implementation working without cleanup ([485793c](https://github.com/0xs34n/starknet.js/commit/485793ce6fd0763e3da56d0d11a50bffc9bab984))
-- comput chassHash for cairo 1 contract - computeSieraContractClassHash ([e20c1c5](https://github.com/0xs34n/starknet.js/commit/e20c1c5d01ce1d8abe2de527233a8396f7b9316d))
-- unify classHash for siera and legacy ([fac2bfe](https://github.com/0xs34n/starknet.js/commit/fac2bfe92e074207132296a0d3f73dae2ddaf735))
+- implement compiledClassHash ([485793c](https://github.com/0xs34n/starknet.js/commit/485793ce6fd0763e3da56d0d11a50bffc9bab984))
+- compute chassHash for Cairo1 contract - computeSieraContractClassHash ([e20c1c5](https://github.com/0xs34n/starknet.js/commit/e20c1c5d01ce1d8abe2de527233a8396f7b9316d))
+- unify classHash for Sierra and legacy ([fac2bfe](https://github.com/0xs34n/starknet.js/commit/fac2bfe92e074207132296a0d3f73dae2ddaf735))
 
 ## [5.1.1](https://github.com/0xs34n/starknet.js/compare/v5.1.0...v5.1.1) (2023-03-07)
 
@@ -224,57 +205,29 @@
 ### Bug Fixes
 
 - add new starknet id contracts (testnet) ([343cf78](https://github.com/0xs34n/starknet.js/commit/343cf78a678b088ab4915407fe86f28fa91db6ea))
-- devnet tests ([8a5866e](https://github.com/0xs34n/starknet.js/commit/8a5866ee24b1a88ae3914fd7700d8a6e785979f1))
 
 # [5.0.0](https://github.com/0xs34n/starknet.js/compare/v4.22.0...v5.0.0) (2023-02-22)
 
 ### Bug Fixes
 
-- better ([cda4931](https://github.com/0xs34n/starknet.js/commit/cda49313b17d715463f915f9ec8f1bf7c4de93f2))
-- bnToUint256 and add more tests ([baa9d61](https://github.com/0xs34n/starknet.js/commit/baa9d611b18725ba269818631f668183212988df))
-- compile response ts type ([4b71970](https://github.com/0xs34n/starknet.js/commit/4b719702d3317af0fa753609e7205bb26416cda0))
-- contract related test ([6dfc010](https://github.com/0xs34n/starknet.js/commit/6dfc0102d15c5b4b339aebe25dba8767e63f0187))
-- imports ([a151afc](https://github.com/0xs34n/starknet.js/commit/a151afce77eb175e39982fbf8bfcbe25001ee6db))
-- imports ([43f0e25](https://github.com/0xs34n/starknet.js/commit/43f0e25f22106da510a0152c65084b1ee677cc6f))
-- invoke contract ([18b6337](https://github.com/0xs34n/starknet.js/commit/18b6337e9e87a9b35d585a68f76896dfe01983c6))
-- options split for edge case ([acfab34](https://github.com/0xs34n/starknet.js/commit/acfab34f3cdca670ecd1793954a9bf53104ae4f1))
-- post beta merge fixes ([aa6046f](https://github.com/0xs34n/starknet.js/commit/aa6046f2080e5f8c46e4cee7930d851b97312c3f))
-- sequencer fetchEndpoint ([7206d77](https://github.com/0xs34n/starknet.js/commit/7206d776a497cab833f5bf2e00b9f2eb695e3c71))
-- strict tuple rule, type bugfix, basic tuple validator ([1c97279](https://github.com/0xs34n/starknet.js/commit/1c9727963d00dc3143af08d7479c040c0d171e5f))
-- tests ([3b34c0c](https://github.com/0xs34n/starknet.js/commit/3b34c0c37c0cca3da087e5ff2a881fba8959bf4e))
-- tests ([85535e5](https://github.com/0xs34n/starknet.js/commit/85535e507cdc8307b4268ce7cef9c9fa4eb3c270))
-- **tests:** signature in account tests ([c8bc860](https://github.com/0xs34n/starknet.js/commit/c8bc8604d74d0e0556468afa3475150fe3579e7a))
-- transaction status fix ([2cfcb69](https://github.com/0xs34n/starknet.js/commit/2cfcb690f25f0025cd08734e31167c1c969056f9))
-- trying fixing tests for sequencer ([480e20d](https://github.com/0xs34n/starknet.js/commit/480e20de6b8d3f8eb3048a84430380d73fe46dcc))
-- update lockfile ([ecf9ead](https://github.com/0xs34n/starknet.js/commit/ecf9ead06d137bd2b43816a75f66dca0626e9ecd))
-- use hex array for RPC signatures ([aa73351](https://github.com/0xs34n/starknet.js/commit/aa73351b024daf75af2bc997b78cbde56de567e9))
-- weierstrass import ([c963f90](https://github.com/0xs34n/starknet.js/commit/c963f900cc0f3ffcadce16a704f7b9e592a014e1))
-
-- chore!: account and signer updates ([be0cbe8](https://github.com/0xs34n/starknet.js/commit/be0cbe88b409fa9db20de8125319e10d1e29677e))
+- remove the chain id property from the provider interface ([425b223](https://github.com/0xs34n/starknet.js/commit/425b22339118a7c3743ee1de8cc1683d2998bbdc))
+- repair bnToUint256 ([baa9d61](https://github.com/0xs34n/starknet.js/commit/baa9d611b18725ba269818631f668183212988df))
+- repair and unify transaction retrieval error ([ea5e646](https://github.com/0xs34n/starknet.js/commit/ea5e64651bf47824b254ae73ed8aa88998a5be44))
+- remove hex prefix should work insensitive, for both 0x and 0X ([53323d4](https://github.com/0xs34n/starknet.js/commit/53323d434d5edbeee03c4262935676c950a761d3))
 
 ### Features
 
-- add back ec for proper support ([649e0aa](https://github.com/0xs34n/starknet.js/commit/649e0aa032d77ba714fe5cb8d31252590e9eb7f4))
-- add computeClassHash functionality ([3f6d88e](https://github.com/0xs34n/starknet.js/commit/3f6d88e00d9620bf2044ecccea6369067f2192d0))
+- switch to native BigInt support ([ec56c29](https://github.com/0xs34n/starknet.js/commit/ec56c29672c2e09e00d6ce5d500e4b10b6598269))
+- expose elliptic curve utility methods ([649e0aa](https://github.com/0xs34n/starknet.js/commit/649e0aa032d77ba714fe5cb8d31252590e9eb7f4))
 - add public sequencer fetch method ([1dab230](https://github.com/0xs34n/starknet.js/commit/1dab2302d64f5f3f1df84c225a93e6007592090d))
-- add tests and make RawArgs more flexible ([db9f274](https://github.com/0xs34n/starknet.js/commit/db9f2745d2f55767acd0b3ded4a028d103a0d249))
 - allow BigNumberish in RawCallData ([9b897c7](https://github.com/0xs34n/starknet.js/commit/9b897c7fb653ae1830b3795b29bd35c8be8e2d22))
-- compute class hash tests ([31a52a2](https://github.com/0xs34n/starknet.js/commit/31a52a28994abb0081fb27a0a7801cf160bcd2ad))
-- format arbitrary length array, test edge case tuple arrays ([42357b6](https://github.com/0xs34n/starknet.js/commit/42357b6128e6cc8ebe1067f5a85b0c8704316288))
-- implement longText aka. long string into calldata, remove toFelt and resolve circular ref ([da58b5a](https://github.com/0xs34n/starknet.js/commit/da58b5a5a089a7ec82cf37c78f11bd1bf44144ff))
-- initial commit to ue faster hashing ([722717d](https://github.com/0xs34n/starknet.js/commit/722717dcf23f6b62a528e58e9483f868f658ebf3))
-- initial poc ([eb26fbd](https://github.com/0xs34n/starknet.js/commit/eb26fbddc02d54bb1f9ecf12192f484122ab5df4))
-- make class hash optional for Declare Txn ([624ca8b](https://github.com/0xs34n/starknet.js/commit/624ca8b8d1885d9b9a405a31f05d869fdfc03c9c))
-- make compile work with already compiled data, complete test ([7e80837](https://github.com/0xs34n/starknet.js/commit/7e8083728c96efceb7b7163f2fe59293ebd63f04))
-- response formatter, refactored call method resturn object ([77ee9f4](https://github.com/0xs34n/starknet.js/commit/77ee9f434fb2ed66703976c97e348663f672fadb))
-- response parse tuple, moved to calldata class, test ([dbe04de](https://github.com/0xs34n/starknet.js/commit/dbe04de5ff2d026afeb20c09d1898caae3d6b708))
-- update declareAndDeploy method ([a47fbd5](https://github.com/0xs34n/starknet.js/commit/a47fbd5f523a375b988f912a5631c181e3a7159b))
-- use ec internally ([3392d03](https://github.com/0xs34n/starknet.js/commit/3392d0362af48f283ff414bc7387586ba44ad9a2))
-- use yarn ([ec1101e](https://github.com/0xs34n/starknet.js/commit/ec1101e6edaf53446e76181fa0cf4530befb9463))
+- rework contract interaction API ([2ee199e](https://github.com/0xs34n/starknet.js/commit/2ee199e16c4fa2aa4432816482930a418e41b327))
+- rework waitForTransaction API ([e17ff17](https://github.com/0xs34n/starknet.js/commit/e17ff1744d0ff9f93d7228e48168dc2bbaf63652))
 
 ### BREAKING CHANGES
 
-- uses BigInt and Faster Hashing
+- multiple BN values replaced by BigInt
+- major API refactoring
 
 # [5.0.0-beta.6](https://github.com/0xs34n/starknet.js/compare/v5.0.0-beta.5...v5.0.0-beta.6) (2023-02-22)
 
