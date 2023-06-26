@@ -18,7 +18,7 @@ export type CairoAssembly = {
  */
 export type CompiledSierra = {
   sierra_program: ByteCode;
-  sierra_program_debug_info: SierraProgramDebugInfo;
+  sierra_program_debug_info?: SierraProgramDebugInfo;
   contract_class_version: string;
   entry_points_by_type: SierraEntryPointsByType;
   abi: Abi;

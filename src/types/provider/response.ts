@@ -6,13 +6,13 @@
 import { RPC } from '../api/rpc';
 import { Sequencer } from '../api/sequencer';
 import {
-  Abi,
   AllowArray,
   ByteCode,
   Call,
-  ContractClass,
+  CompiledSierra,
   DeclareContractPayload,
   DeployAccountContractPayload,
+  LegacyContractClass,
   RawCalldata,
   Signature,
   Status,
@@ -172,4 +172,12 @@ export interface StateUpdateResponse {
   };
 }
 
-export type ContractClassResponse = Omit<ContractClass, 'abi'> & { abi?: Abi };
+/**
+ * Standardized type
+ * Cairo0 program compressed and Cairo1 sierra_program decompressed
+ * abi Abi
+ * CompiledSierra without '.sierra_program_debug_info'
+ */
+export type ContractClassResponse =
+  | LegacyContractClass
+  | Omit<CompiledSierra, 'sierra_program_debug_info'>;

@@ -4,6 +4,7 @@ import {
   BigNumberish,
   CallData,
   Calldata,
+  CompiledSierra,
   Contract,
   DeclareDeployUDCResponse,
   RawArgsArray,
@@ -13,11 +14,10 @@ import {
   ec,
   hash,
   num,
+  selector,
   shortString,
   stark,
 } from '../src';
-import { isCairo1Abi } from '../src/utils/calldata/cairo';
-import { starknetKeccak } from '../src/utils/selector';
 import {
   compiledC1Account,
   compiledC1AccountCasm,
@@ -31,6 +31,10 @@ import {
   getTestProvider,
 } from './fixtures';
 import { initializeMatcher } from './schema';
+
+const { uint256, tuple, isCairo1Abi } = cairo;
+const { toHex } = num;
+const { starknetKeccak } = selector;
 
 describeIfDevnet('Cairo 1 Devnet', () => {
   describe('API &  Contract interactions', () => {
@@ -53,6 +57,21 @@ describeIfDevnet('Cairo 1 Devnet', () => {
       expect(dd.declare).toMatchSchemaRef('DeclareContractResponse');
       expect(dd.deploy).toMatchSchemaRef('DeployContractUDCResponse');
       expect(cairo1Contract).toBeInstanceOf(Contract);
+    });
+
+    xtest('validate TS for redeclare - skip testing', async () => {
+      const cc0 = await account.getClassAt(dd.deploy.address);
+      const cc0_1 = await account.getClassByHash(toHex(dd.declare.class_hash));
+
+      await account.declare({
+        contract: cc0 as CompiledSierra,
+        casm: compiledHelloSierraCasm,
+      });
+
+      await account.declare({
+        contract: cc0_1 as CompiledSierra,
+        casm: compiledHelloSierraCasm,
+      });
     });
 
     test('deployContract Cairo1', async () => {
@@ -123,7 +142,7 @@ describeIfDevnet('Cairo 1 Devnet', () => {
       expect(result).toBe(2n ** 256n - 1n);
 
       // defined as struct
-      const result1 = await cairo1Contract.test_u256(cairo.uint256(2n ** 256n - 2n));
+      const result1 = await cairo1Contract.test_u256(uint256(2n ** 256n - 2n));
       expect(result1).toBe(2n ** 256n - 1n);
     });
 
@@ -200,7 +219,7 @@ describeIfDevnet('Cairo 1 Devnet', () => {
     });
 
     test('Cairo 1 Contract Interaction - echo flat un-named un-nested tuple', async () => {
-      const status = await cairo1Contract.echo_un_tuple(cairo.tuple(77, 123));
+      const status = await cairo1Contract.echo_un_tuple(tuple(77, 123));
       expect(Object.values(status)).toEqual([77n, 123n]);
     });
 
@@ -214,10 +233,10 @@ describeIfDevnet('Cairo 1 Devnet', () => {
 
       // uint256 defined as struct
       const status11 = await cairo1Contract.echo_array_u256([
-        cairo.uint256(123),
-        cairo.uint256(55),
-        cairo.uint256(77),
-        cairo.uint256(255),
+        uint256(123),
+        uint256(55),
+        uint256(77),
+        uint256(255),
       ]);
       expect(status11).toEqual([123n, 55n, 77n, 255n]);
 
@@ -305,7 +324,7 @@ describeIfDevnet('Cairo 1 Devnet', () => {
         1: true,
       });
 
-      const res1 = await cairo1Contract.tuple_echo(cairo.tuple([1, 2, 3], [4, 5, 6]));
+      const res1 = await cairo1Contract.tuple_echo(tuple([1, 2, 3], [4, 5, 6]));
       expect(res1).toEqual({
         0: [1n, 2n, 3n],
         1: [4n, 5n, 6n],
@@ -331,7 +350,7 @@ describeIfDevnet('Cairo 1 Devnet', () => {
         initial_supply: myFalseUint256,
         recipient: '0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a',
         decimals: 18,
-        tupoftup: cairo.tuple(cairo.tuple(34, '0x5e'), myFalseUint256),
+        tupoftup: tuple(tuple(34, '0x5e'), myFalseUint256),
         card: myOrder2bis,
         longText: 'Bug is back, for ever, here and everywhere',
         array1: [100, 101, 102],
@@ -342,9 +361,9 @@ describeIfDevnet('Cairo 1 Devnet', () => {
         ],
         array3: [myOrder2bis, myOrder2bis],
         array4: [myFalseUint256, myFalseUint256],
-        tuple1: cairo.tuple(40000n, myOrder2bis, [54, 55n, '0xae'], 'texte'),
+        tuple1: tuple(40000n, myOrder2bis, [54, 55n, '0xae'], 'texte'),
         name: 'niceToken',
-        array5: [cairo.tuple(251, 40000n), cairo.tuple(252, 40001n)],
+        array5: [tuple(251, 40000n), tuple(252, 40001n)],
       };
       const myRawArgsArray: RawArgsArray = [
         'niceToken',
@@ -503,7 +522,7 @@ describeIfDevnet('Cairo 1 Devnet', () => {
         entrypoint: 'transfer',
         calldata: {
           recipient: toBeAccountAddress,
-          amount: cairo.uint256(1_000_000_000_000_000),
+          amount: uint256(1_000_000_000_000_000),
         },
       });
       await account.waitForTransaction(transaction_hash);
@@ -575,7 +594,7 @@ describeIfSequencerTestnet2('Cairo1 Testnet2', () => {
     });
 
     test('Cairo 1 - uint256 struct', async () => {
-      const myUint256 = cairo.uint256(2n ** 256n - 2n);
+      const myUint256 = uint256(2n ** 256n - 2n);
       const result = await cairo1Contract.test_u256(myUint256);
       expect(result).toBe(2n ** 256n - 1n);
     });

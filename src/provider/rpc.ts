@@ -337,14 +337,13 @@ export class RpcProvider implements ProviderInterface {
     details: InvocationsDetailsWithNonce
   ): Promise<DeclareContractResponse> {
     if (!isSierra(contract)) {
-      const legacyContract = contract as LegacyContractClass;
       return this.fetchEndpoint('starknet_addDeclareTransaction', {
         declare_transaction: {
           type: RPC.TransactionType.DECLARE,
           contract_class: {
-            program: legacyContract.program,
-            entry_points_by_type: legacyContract.entry_points_by_type,
-            abi: legacyContract.abi,
+            program: contract.program,
+            entry_points_by_type: contract.entry_points_by_type,
+            abi: contract.abi,
           },
           version: toHex(transactionVersion),
           max_fee: toHex(details.maxFee || 0),
@@ -354,15 +353,14 @@ export class RpcProvider implements ProviderInterface {
         },
       });
     }
-    const sierraContract = contract as SierraContractClass;
     return this.fetchEndpoint('starknet_addDeclareTransaction', {
       declare_transaction: {
         type: RPC.TransactionType.DECLARE,
         contract_class: {
-          sierra_program: decompressProgram(sierraContract.sierra_program),
-          contract_class_version: sierraContract.contract_class_version,
-          entry_points_by_type: sierraContract.entry_points_by_type,
-          abi: sierraContract.abi,
+          sierra_program: decompressProgram(contract.sierra_program),
+          contract_class_version: contract.contract_class_version,
+          entry_points_by_type: contract.entry_points_by_type,
+          abi: contract.abi,
         },
         compiled_class_hash: compiledClassHash || '',
         version: toHex(transactionVersion_2),
