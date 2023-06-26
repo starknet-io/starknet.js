@@ -883,7 +883,7 @@ format produced after compile .cairo to .json
 
 #### Defined in
 
-[src/types/lib/contract/index.ts:13](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/index.ts#L13)
+[src/types/lib/contract/index.ts:14](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/index.ts#L14)
 
 ---
 
@@ -891,9 +891,11 @@ format produced after compile .cairo to .json
 
 Ƭ **CairoContract**: [`ContractClass`](types.md#contractclass) \| [`CompiledContract`](types.md#compiledcontract)
 
+Compressed or decompressed Cairo0 or Cairo1 Contract
+
 #### Defined in
 
-[src/types/lib/contract/index.ts:14](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/index.ts#L14)
+[src/types/lib/contract/index.ts:19](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/index.ts#L19)
 
 ---
 
@@ -1102,13 +1104,13 @@ sierra_program is hex array
 
 #### Type declaration
 
-| Name                        | Type                                                          |
-| :-------------------------- | :------------------------------------------------------------ |
-| `sierra_program`            | [`ByteCode`](types.md#bytecode)                               |
-| `sierra_program_debug_info` | [`SierraProgramDebugInfo`](types.md#sierraprogramdebuginfo)   |
-| `contract_class_version`    | `string`                                                      |
-| `entry_points_by_type`      | [`SierraEntryPointsByType`](types.md#sierraentrypointsbytype) |
-| `abi`                       | [`Abi`](types.md#abi)                                         |
+| Name                         | Type                                                          |
+| :--------------------------- | :------------------------------------------------------------ |
+| `sierra_program`             | [`ByteCode`](types.md#bytecode)                               |
+| `sierra_program_debug_info?` | [`SierraProgramDebugInfo`](types.md#sierraprogramdebuginfo)   |
+| `contract_class_version`     | `string`                                                      |
+| `entry_points_by_type`       | [`SierraEntryPointsByType`](types.md#sierraentrypointsbytype) |
+| `abi`                        | [`Abi`](types.md#abi)                                         |
 
 #### Defined in
 
@@ -1380,11 +1382,16 @@ SUBTYPES
 
 ### ContractClassResponse
 
-Ƭ **ContractClassResponse**: `Omit`<[`ContractClass`](types.md#contractclass), `"abi"`\> & { `abi?`: [`Abi`](types.md#abi) }
+Ƭ **ContractClassResponse**: [`LegacyContractClass`](types.md#legacycontractclass) \| `Omit`<[`CompiledSierra`](types.md#compiledsierra), `"sierra_program_debug_info"`\>
+
+Standardized type
+Cairo0 program compressed and Cairo1 sierra_program decompressed
+abi Abi
+CompiledSierra without '.sierra_program_debug_info'
 
 #### Defined in
 
-[src/types/provider/response.ts:175](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L175)
+[src/types/provider/response.ts:181](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L181)
 
 ---
 

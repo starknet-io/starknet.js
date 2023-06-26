@@ -1,6 +1,6 @@
 ---
 id: 'modules'
-title: 'Starknet.js API - v5.14.0'
+title: 'Starknet.js API - v5.14.1'
 sidebar_label: 'Exports'
 sidebar_position: 0.5
 custom_edit_url: null
@@ -22,6 +22,8 @@ custom_edit_url: null
 - [typedData](namespaces/typedData.md)
 - [ec](namespaces/ec.md)
 - [starknetId](namespaces/starknetId.md)
+- [provider](namespaces/provider-1.md)
+- [selector](namespaces/selector.md)
 - [cairo](namespaces/cairo.md)
 
 ## Classes
@@ -871,7 +873,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/index.ts:40](https://github.com/0xs34n/starknet.js/blob/develop/src/index.ts#L40)
+[src/index.ts:44](https://github.com/0xs34n/starknet.js/blob/develop/src/index.ts#L44)
 
 ---
 
@@ -1089,3 +1091,104 @@ Loosely validate a URL `string`.
 #### Defined in
 
 [src/utils/url.ts:51](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/url.ts#L51)
+
+---
+
+### isSierra
+
+▸ **isSierra**(`contract`): contract is CompiledSierra \| SierraContractClass
+
+#### Parameters
+
+| Name       | Type                                                             |
+| :--------- | :--------------------------------------------------------------- |
+| `contract` | `string` \| [`CairoContract`](namespaces/types.md#cairocontract) |
+
+#### Returns
+
+contract is CompiledSierra \| SierraContractClass
+
+#### Defined in
+
+[src/utils/contract.ts:14](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/contract.ts#L14)
+
+---
+
+### extractContractHashes
+
+▸ **extractContractHashes**(`payload`): [`CompleteDeclareContractPayload`](namespaces/types.md#completedeclarecontractpayload)
+
+#### Parameters
+
+| Name      | Type                                                                   |
+| :-------- | :--------------------------------------------------------------------- |
+| `payload` | [`DeclareContractPayload`](namespaces/types.md#declarecontractpayload) |
+
+#### Returns
+
+[`CompleteDeclareContractPayload`](namespaces/types.md#completedeclarecontractpayload)
+
+#### Defined in
+
+[src/utils/contract.ts:21](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/contract.ts#L21)
+
+---
+
+### contractClassResponseToLegacyCompiledContract
+
+▸ **contractClassResponseToLegacyCompiledContract**(`ccr`): [`LegacyCompiledContract`](namespaces/types.md#legacycompiledcontract)
+
+Helper to redeclare response Cairo0 contract
+
+#### Parameters
+
+| Name  | Type                                                                 | Description           |
+| :---- | :------------------------------------------------------------------- | :-------------------- |
+| `ccr` | [`ContractClassResponse`](namespaces/types.md#contractclassresponse) | ContractClassResponse |
+
+#### Returns
+
+[`LegacyCompiledContract`](namespaces/types.md#legacycompiledcontract)
+
+LegacyCompiledContract
+
+#### Defined in
+
+[src/utils/contract.ts:48](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/contract.ts#L48)
+
+---
+
+### parseUDCEvent
+
+▸ **parseUDCEvent**(`txReceipt`): `Object`
+
+Parse Transaction Receipt Event from UDC invoke transaction and
+create DeployContractResponse compatibile response with adition of UDC Event data
+
+#### Parameters
+
+| Name        | Type                                                                                       |
+| :---------- | :----------------------------------------------------------------------------------------- |
+| `txReceipt` | [`InvokeTransactionReceiptResponse`](interfaces/types.InvokeTransactionReceiptResponse.md) |
+
+#### Returns
+
+`Object`
+
+DeployContractResponse | UDC Event Response data
+
+| Name               | Type       |
+| :----------------- | :--------- |
+| `transaction_hash` | `string`   |
+| `contract_address` | `string`   |
+| `address`          | `string`   |
+| `deployer`         | `string`   |
+| `unique`           | `string`   |
+| `classHash`        | `string`   |
+| `calldata_len`     | `string`   |
+| `calldata`         | `string`[] |
+| `salt`             | `string`   |
+
+#### Defined in
+
+[src/utils/events.ts:12](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/events.ts#L12)

@@ -815,7 +815,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/rpc.ts:377](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L377)
+[src/provider/rpc.ts:375](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L375)
 
 ---
 
@@ -848,7 +848,7 @@ response from addTransaction
 
 #### Defined in
 
-[src/provider/rpc.ts:395](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L395)
+[src/provider/rpc.ts:393](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L393)
 
 ---
 
@@ -877,7 +877,7 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[src/provider/rpc.ts:413](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L413)
+[src/provider/rpc.ts:411](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L411)
 
 ---
 
@@ -897,7 +897,7 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[src/provider/rpc.ts:430](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L430)
+[src/provider/rpc.ts:428](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L428)
 
 ---
 
@@ -917,7 +917,7 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[src/provider/rpc.ts:434](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L434)
+[src/provider/rpc.ts:432](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L432)
 
 ---
 
@@ -946,7 +946,7 @@ GetTransactionReceiptResponse
 
 #### Defined in
 
-[src/provider/rpc.ts:438](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L438)
+[src/provider/rpc.ts:436](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L436)
 
 ---
 
@@ -970,7 +970,7 @@ Number of transactions
 
 #### Defined in
 
-[src/provider/rpc.ts:495](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L495)
+[src/provider/rpc.ts:493](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L493)
 
 ---
 
@@ -988,7 +988,7 @@ Number of the latest block
 
 #### Defined in
 
-[src/provider/rpc.ts:508](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L508)
+[src/provider/rpc.ts:506](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L506)
 
 ---
 
@@ -1006,7 +1006,7 @@ Object with the stats data
 
 #### Defined in
 
-[src/provider/rpc.ts:518](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L518)
+[src/provider/rpc.ts:516](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L516)
 
 ---
 
@@ -1030,7 +1030,7 @@ events and the pagination of the events
 
 #### Defined in
 
-[src/provider/rpc.ts:528](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L528)
+[src/provider/rpc.ts:526](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L526)
 
 ---
 
@@ -1059,7 +1059,7 @@ an array of transaction trace and estimated fee
 
 #### Defined in
 
-[src/provider/rpc.ts:532](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L532)
+[src/provider/rpc.ts:530](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L530)
 
 ---
 
@@ -1080,7 +1080,7 @@ an array of transaction trace and estimated fee
 
 #### Defined in
 
-[src/provider/rpc.ts:553](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L553)
+[src/provider/rpc.ts:551](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L551)
 
 ---
 
@@ -1101,7 +1101,7 @@ an array of transaction trace and estimated fee
 
 #### Defined in
 
-[src/provider/rpc.ts:557](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L557)
+[src/provider/rpc.ts:555](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L555)
 
 ---
 
@@ -1122,4 +1122,4 @@ an array of transaction trace and estimated fee
 
 #### Defined in
 
-[src/provider/rpc.ts:561](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L561)
+[src/provider/rpc.ts:559](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L559)
