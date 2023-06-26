@@ -1,6 +1,10 @@
-name: Run Tests
+name: _ Run Tests
 on:
   workflow_call:
+    inputs:
+      is-rpc:
+        type: boolean
+        default: false
     secrets:
       TEST_PROVIDER_BASE_URL:
         required: false
@@ -19,7 +23,8 @@ jobs:
     # TODO - periodically check if conditional services are supported; https://github.com/actions/runner/issues/822
     services:
       devnet:
-        image: shardlabs/starknet-devnet:0.4.4-seed0
+        # image: ${{ inputs.is-rpc && 'shardlabs/starknet-devnet:0.5.3-seed0' || 'shardlabs/starknet-devnet:0.5.2-seed0' }}
+        image: shardlabs/starknet-devnet:0.5.4-seed0
         ports:
           - 5050:5050
 

@@ -1,13 +1,14 @@
 /* eslint-disable no-bitwise */
-import { arrayify } from '@ethersproject/bytes';
+import { hexToBytes } from '@noble/curves/abstract/utils';
 
 import { MASK_251, ZERO } from '../constants';
+import { BigNumberish } from '../types';
 import { addHexPrefix, removeHexPrefix } from './encode';
 import { keccakBn } from './hash';
-import { BigNumberish, assertInRange, toBN, toHex } from './number';
+import { assertInRange, toHex } from './num';
 
 export function addAddressPadding(address: BigNumberish): string {
-  return addHexPrefix(removeHexPrefix(toHex(toBN(address))).padStart(64, '0'));
+  return addHexPrefix(removeHexPrefix(toHex(address)).padStart(64, '0'));
 }
 
 export function validateAndParseAddress(address: BigNumberish): string {
@@ -25,7 +26,8 @@ export function validateAndParseAddress(address: BigNumberish): string {
 // from https://github.com/ethers-io/ethers.js/blob/fc1e006575d59792fa97b4efb9ea2f8cca1944cf/packages/address/src.ts/index.ts#L12
 export function getChecksumAddress(address: BigNumberish): string {
   const chars = removeHexPrefix(validateAndParseAddress(address)).toLowerCase().split('');
-  const hashed = arrayify(keccakBn(address), { hexPad: 'left' }); // in case the hash is 251 bits (63 chars) we need to pad it to 64 chars without changing the number value ("left")
+  const hex = removeHexPrefix(keccakBn(address));
+  const hashed = hexToBytes(hex.padStart(64, '0'));
 
   for (let i = 0; i < chars.length; i += 2) {
     if (hashed[i >> 1] >> 4 >= 8) {

@@ -1,21 +1,21 @@
-import BN from 'bn.js';
-
-import { BlockIdentifier } from '../../provider/utils';
-import { BigNumberish } from '../../utils/number';
 import {
   Abi,
   AllowArray,
+  BigNumberish,
+  BlockIdentifier,
   BlockNumber,
+  ByteCode,
+  CairoAssembly,
+  CompiledContract,
   ContractClass,
   EntryPointType,
   RawCalldata,
-  Signature,
   Status,
   TransactionStatus,
 } from '../lib';
 
 export type GetTransactionStatusResponse = {
-  tx_status: Status;
+  tx_status: TransactionStatus;
   block_hash?: string;
   tx_failure_reason?: {
     code: string;
@@ -35,7 +35,7 @@ export type FunctionInvocation = {
   call_type?: string;
   class_hash?: string;
   selector?: string;
-  entry_point_type?: EntryPointType;
+  entry_point_type?: EntryPointType.EXTERNAL; // TODO: check this
   result: Array<any>;
   execution_resources: ExecutionResources;
   internal_calls: Array<FunctionInvocation>;
@@ -56,13 +56,6 @@ export type ExecutionResources = {
   n_memory_holes: number;
 };
 
-export type TransactionTraceResponse = {
-  validate_invocation?: FunctionInvocation;
-  function_invocation?: FunctionInvocation;
-  fee_transfer_invocation?: FunctionInvocation;
-  signature: Signature;
-};
-
 export type CallL1Handler = {
   from_address: string;
   to_address: string;
@@ -70,37 +63,31 @@ export type CallL1Handler = {
   payload: Array<string>;
 };
 
-export type StateDiffItem = {
-  key: string;
-  value: string;
-};
-
-export type StorageDiffItem = {
-  address: string;
-  storage_entries: [key: string, value: string];
-};
-
 export type DeployedContractItem = {
   address: string;
   class_hash: string;
 };
 
-export type Nonces = {
-  contract_address: string;
-  nonce: string;
-};
-
 export type SequencerIdentifier = { blockHash: string } | { blockNumber: BlockNumber };
 
 export namespace Sequencer {
+  export type TransactionTraceResponse = {
+    validate_invocation?: FunctionInvocation;
+    function_invocation?: FunctionInvocation;
+    fee_transfer_invocation?: FunctionInvocation;
+    constructor_invocation?: FunctionInvocation;
+    signature: string[];
+  };
+
   export type DeclareTransaction = {
     type: 'DECLARE';
     sender_address: string;
     contract_class: ContractClass;
-    signature?: Signature;
+    signature?: string[];
     nonce: BigNumberish;
     max_fee?: BigNumberish;
     version?: BigNumberish;
+    compiled_class_hash?: string; // v2 declare
   };
 
   export type DeployTransaction = {
@@ -116,7 +103,7 @@ export namespace Sequencer {
     class_hash: string;
     contract_address_salt: BigNumberish;
     constructor_calldata: string[];
-    signature?: Signature;
+    signature?: string[];
     max_fee?: BigNumberish;
     version?: BigNumberish;
     nonce?: BigNumberish;
@@ -124,9 +111,9 @@ export namespace Sequencer {
 
   export type InvokeFunctionTransaction = {
     type: 'INVOKE_FUNCTION';
-    contract_address: string;
-    signature?: Signature;
-    entry_point_type?: EntryPointType;
+    sender_address: string;
+    signature?: string[];
+    entry_point_type?: EntryPointType.EXTERNAL; // TODO: check this
     calldata?: RawCalldata;
     nonce: BigNumberish;
     max_fee?: BigNumberish;
@@ -141,13 +128,13 @@ export namespace Sequencer {
 
   export type AddTransactionResponse = {
     transaction_hash: string;
-    code?: TransactionStatus;
+    code?: 'TRANSACTION_RECEIVED';
     address?: string;
     class_hash?: string;
   };
 
   export type GetCodeResponse = {
-    bytecode: string[];
+    bytecode: ByteCode;
     abi: Abi;
   };
 
@@ -236,10 +223,21 @@ export namespace Sequencer {
     starknet_version: string;
   };
 
-  export type CallContractTransaction = Omit<
-    InvokeFunctionTransaction,
-    'type' | 'entry_point_type' | 'nonce'
-  > & { entry_point_selector: string };
+  export type CallContractTransaction = {
+    calldata?: RawCalldata;
+    max_fee?: BigNumberish;
+    version?: BigNumberish;
+    entry_point_selector: string;
+  } & (
+    | {
+        sender_address: string;
+        signature: string[];
+      }
+    | {
+        contract_address: string;
+        signature?: never;
+      }
+  );
 
   export type CallContractResponse = {
     result: string[];
@@ -250,22 +248,21 @@ export namespace Sequencer {
   export type DeployAccountEstimateFee = Omit<DeployAccountTransaction, 'max_fee'>;
   export type DeployEstimateFee = DeployTransaction;
 
-  export type EstimateFeeRequest =
+  export type SimulateTransactionResponse = {
+    trace: TransactionTraceResponse; // diff with OPENRPC "transaction_trace"
+    fee_estimation: Sequencer.EstimateFeeResponse;
+  };
+
+  export type AccountTransactionItem =
     | InvokeEstimateFee
     | DeclareEstimateFee
     | DeployEstimateFee
     | DeployAccountEstimateFee;
 
-  export type TransactionSimulationResponse = {
-    trace: TransactionTraceResponse;
-    fee_estimation: Sequencer.EstimateFeeResponse;
-  };
-
-  export type SimulateTransaction = Omit<InvokeFunctionTransaction, 'max_fee' | 'entry_point_type'>;
-
-  export type EstimateFeeRequestBulk = AllowArray<
-    InvokeEstimateFee | DeclareEstimateFee | DeployEstimateFee | DeployAccountEstimateFee
-  >;
+  /**
+   * Transaction filled with account data
+   */
+  export type AccountTransaction = AllowArray<AccountTransactionItem>;
 
   // Support 0.9.1 changes in a backward-compatible way
   export type EstimateFeeResponse =
@@ -276,7 +273,7 @@ export namespace Sequencer {
         uint: string;
       }
     | {
-        amount: BN;
+        amount: bigint;
         unit: string;
       };
 
@@ -286,19 +283,39 @@ export namespace Sequencer {
     traces: Array<TransactionTraceResponse & { transaction_hash: string }>;
   };
 
+  export type Storage = string;
+
   export type StateUpdateResponse = {
     block_hash: string;
     new_root: string;
     old_root: string;
     state_diff: {
-      storage_diffs: Array<{
-        [address: string]: Array<StateDiffItem>;
-      }>;
-      declared_contract_hashes: Array<string>;
+      storage_diffs: StorageDiffs;
+      nonces: Nonces;
       deployed_contracts: Array<DeployedContractItem>;
-      nonces: Array<Nonces>;
+      old_declared_contracts: OldDeclaredContracts;
+      declared_classes: DeclaredClasses;
+      replaced_classes: ReplacedClasses; // no definition is it array of string
     };
   };
+
+  export type StorageDiffs = { [address: string]: Array<StateDiffItem> };
+
+  export type StateDiffItem = { key: string; value: string };
+
+  export type Nonces = { [address: string]: Nonce };
+
+  export type Nonce = string;
+
+  export type DeployedContracts = DeployedContractItem[];
+
+  export type OldDeclaredContracts = string[];
+
+  export type DeclaredClasses = DeclaredClass[];
+
+  export type DeclaredClass = { class_hash: string; compiled_class_hash: string };
+
+  export type ReplacedClasses = string[]; // no definition is it array of string ?
 
   export type Endpoints = {
     get_contract_addresses: {
@@ -345,7 +362,7 @@ export namespace Sequencer {
         blockIdentifier: BlockIdentifier;
       };
       REQUEST: never;
-      RESPONSE: BigNumberish;
+      RESPONSE: Nonce;
     };
     get_storage_at: {
       QUERY: {
@@ -354,7 +371,7 @@ export namespace Sequencer {
         blockIdentifier: BlockIdentifier;
       };
       REQUEST: never;
-      RESPONSE: string;
+      RESPONSE: Storage;
     };
     get_code: {
       QUERY: {
@@ -381,16 +398,18 @@ export namespace Sequencer {
     estimate_fee: {
       QUERY: {
         blockIdentifier: BlockIdentifier;
+        skipValidate: boolean;
       };
-      REQUEST: EstimateFeeRequest;
+      REQUEST: AccountTransactionItem;
       RESPONSE: EstimateFeeResponse;
     };
     get_class_by_hash: {
       QUERY: {
         classHash: string;
+        blockIdentifier?: BlockIdentifier;
       };
       REQUEST: never;
-      RESPONSE: any;
+      RESPONSE: CompiledContract;
     };
     get_class_hash_at: {
       QUERY: {
@@ -414,7 +433,7 @@ export namespace Sequencer {
         blockIdentifier?: BlockIdentifier;
       };
       REQUEST: never;
-      RESPONSE: any;
+      RESPONSE: CompiledContract;
     };
     estimate_message_fee: {
       QUERY: any;
@@ -424,15 +443,17 @@ export namespace Sequencer {
     simulate_transaction: {
       QUERY: {
         blockIdentifier: BlockIdentifier;
+        skipValidate: boolean;
       };
-      REQUEST: SimulateTransaction;
-      RESPONSE: TransactionSimulationResponse;
+      REQUEST: AccountTransaction;
+      RESPONSE: SimulateTransactionResponse;
     };
     estimate_fee_bulk: {
       QUERY: {
         blockIdentifier: BlockIdentifier;
+        skipValidate: boolean;
       };
-      REQUEST: EstimateFeeRequestBulk;
+      REQUEST: AccountTransaction;
       RESPONSE: EstimateFeeResponseBulk;
     };
     get_block_traces: {
@@ -442,6 +463,14 @@ export namespace Sequencer {
       };
       REQUEST: never;
       RESPONSE: BlockTransactionTracesResponse;
+    };
+    get_compiled_class_by_class_hash: {
+      QUERY: {
+        classHash: string;
+        blockIdentifier?: BlockIdentifier;
+      };
+      REQUEST: any;
+      RESPONSE: CairoAssembly;
     };
   };
 }

@@ -1,0 +1,224 @@
+{
+  "$id": "providerSchemas",
+  "definitions": {
+    "GetBlockResponse": {
+      "type": "object",
+      "properties": {
+        "timestamp": {
+          "type": "number"
+        },
+        "block_hash": {
+          "type": "string"
+        },
+        "block_number": {
+          "type": "number"
+        },
+        "new_root": {
+          "type": "string"
+        },
+        "parent_hash": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "NOT_RECEIVED",
+            "RECEIVED",
+            "PENDING",
+            "ACCEPTED_ON_L2",
+            "ACCEPTED_ON_L1",
+            "REJECTED"
+          ]
+        },
+        "transactions": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "gas_price": {
+          "type": "string"
+        },
+        "sequencer_address": {
+          "type": "string"
+        },
+        "starknet_version": {
+          "type": "string"
+        },
+        "transaction_receipts": {
+          "type": "array"
+        }
+      },
+      "required": [
+        "timestamp",
+        "block_hash",
+        "block_number",
+        "new_root",
+        "parent_hash",
+        "status",
+        "transactions"
+      ]
+    },
+    "StateUpdateResponse": {
+      "type": "object",
+      "properties": {
+        "block_hash": {
+          "type": "string"
+        },
+        "new_root": {
+          "type": "string"
+        },
+        "old_root": {
+          "type": "string"
+        },
+        "state_diff": {
+          "ref": "providerSchemas#/definitions/StateDiff"
+        }
+      },
+      "required": ["block_hash", "new_root", "old_root", "state_diff"]
+    },
+    "StateDiff": {
+      "type": "object",
+      "properties": {
+        "storage_diffs": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "address": {
+                "type": "string"
+              },
+              "storage_entries": {
+                "type": "object",
+                "properties": {
+                  "key": {
+                    "type": "string"
+                  },
+                  "value": {
+                    "type": "string"
+                  }
+                }
+              }
+            },
+            "required": ["address", "storage_entries"]
+          }
+        },
+        "declared_contract_hashes": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "deployed_contracts": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "address": {
+                "type": "string"
+              },
+              "class_hash": {
+                "type": "string"
+              }
+            },
+            "required": ["address", "class_hash"]
+          }
+        },
+        "nonce": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "contract_address": {
+                "type": "string"
+              },
+              "nonce": {
+                "type": "string"
+              }
+            },
+            "required": ["contract_address", "nonce"]
+          }
+        }
+      },
+      "required": ["storage_diffs", "declared_contract_hashes", "deployed_contracts", "nonce"]
+    },
+    "GetTransactionResponse": {
+      "type": "object",
+      "properties": {
+        "transaction_hash": {
+          "type": "string"
+        },
+        "version": {
+          "type": "string"
+        },
+        "signature": {
+          "anyOf": [
+            {
+              "type": "array"
+            },
+            {
+              "type": "object"
+            }
+          ]
+        },
+        "max_fee": {
+          "type": "string"
+        },
+        "nonce": {
+          "type": "string"
+        },
+        "contract_address": {
+          "type": "string"
+        },
+        "entry_point_selector": {
+          "type": "string"
+        },
+        "calldata": {
+          "type": "array"
+        },
+        "contract_class": {
+          "type": "string"
+        },
+        "sender_address": {
+          "type": "string"
+        }
+      },
+      "required": ["calldata"]
+    },
+    "GetTransactionReceiptResponse": {
+      "type": "object",
+      "properties": {
+        "transaction_hash": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": [
+            "NOT_RECEIVED",
+            "RECEIVED",
+            "PENDING",
+            "ACCEPTED_ON_L2",
+            "ACCEPTED_ON_L1",
+            "REJECTED"
+          ]
+        },
+        "actual_fee": {
+          "type": "string"
+        },
+        "status_data": {
+          "type": "string"
+        },
+        "messages_sent": {
+          "type": "array"
+        },
+        "events": {
+          "type": "array"
+        },
+        "l1_origin_message": {
+          "type": "object"
+        }
+      },
+      "required": ["transaction_hash"]
+    }
+  }
+}

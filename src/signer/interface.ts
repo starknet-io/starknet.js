@@ -5,8 +5,8 @@ import {
   DeployAccountSignerDetails,
   InvocationsSignerDetails,
   Signature,
+  TypedData,
 } from '../types';
-import { TypedData } from '../utils/typedData';
 
 export abstract class SignerInterface {
   /**

@@ -1,12 +1,10 @@
 import typedDataExample from '../../__mocks__/typedDataExample.json';
 import typedDataSessionExample from '../../__mocks__/typedDataSessionExample.json';
 import typedDataStructArrayExample from '../../__mocks__/typedDataStructArrayExample.json';
-import { number } from '../../src';
+import { BigNumberish, StarkNetDomain, num } from '../../src';
 import { getSelectorFromName } from '../../src/utils/hash';
 import { MerkleTree } from '../../src/utils/merkle';
-import { BigNumberish } from '../../src/utils/number';
 import {
-  StarkNetDomain,
   encodeType,
   encodeValue,
   getMessageHash,
@@ -155,7 +153,7 @@ describe('typedData', () => {
   }
   function stringToStringStruct(str: string): StringStruct {
     const len = str.length;
-    const data = str.split('').map((char) => number.toHex(number.toBN(char.charCodeAt(0))));
+    const data = str.split('').map((char) => num.toHex(char.charCodeAt(0)));
     return { len, data };
   }
 

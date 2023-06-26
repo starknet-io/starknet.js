@@ -39,7 +39,31 @@ Documentation can be archived by using JSDoc.
 
 **Please update the npm lock file (`package-lock.json`) if you add or update dependencies.**
 
+### Commit messages
+
 **For commit messages use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/), like so: `feat(scope): topic`**
+
+Note that the `feat` and `fix` commit messages are used for compiling the changelog. They should be relative to the current state of the target branch they should be merged into and not the feature branch where they are initially committed.
+
+Example of **_incorrect_** commit messages:
+
+```
+fix: repair some bug
+fix: rectify failing test
+fix: adjust formatting
+fix: add comments
+fix: repair some other bug
+```
+
+Example of **_correct_** commit messages:
+
+```
+fix: repair some bug
+test: rectify failing test
+chore: adjust formatting
+chore: add comments
+fix: repair some other bug
+```
 
 ### Pull request targets
 

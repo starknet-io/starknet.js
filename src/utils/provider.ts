@@ -1,6 +1,13 @@
-import { CompiledContract, ContractClass, RawCalldata } from '../types';
-import { parse } from './json';
-import { isHex, toBN, toHex } from './number';
+import {
+  CompiledContract,
+  CompiledSierra,
+  ContractClass,
+  LegacyContractClass,
+  SierraContractClass,
+} from '../types';
+import { isSierra } from './contract';
+import { formatSpaces } from './hash';
+import { parse, stringify } from './json';
 import { compressProgram } from './stark';
 
 export function wait(delay: number) {
@@ -9,20 +16,26 @@ export function wait(delay: number) {
   });
 }
 
-export function parseCalldata(calldata: RawCalldata = []) {
-  return calldata.map((data) => {
-    if (typeof data === 'string' && isHex(data as string)) {
-      return data;
-    }
-    return toHex(toBN(data));
-  });
+export function createSierraContractClass(contract: CompiledSierra): SierraContractClass {
+  const result = { ...contract } as any;
+  delete result.sierra_program_debug_info;
+  result.abi = formatSpaces(stringify(contract.abi));
+  result.sierra_program = formatSpaces(stringify(contract.sierra_program));
+  result.sierra_program = compressProgram(result.sierra_program);
+  return result;
 }
 
-export function parseContract(contract: CompiledContract | string) {
+// TODO: How can we receive string here ?
+export function parseContract(contract: CompiledContract | string): ContractClass {
   const parsedContract =
     typeof contract === 'string' ? (parse(contract) as CompiledContract) : contract;
-  return {
-    ...parsedContract,
-    program: compressProgram(parsedContract.program),
-  } as ContractClass;
+
+  if (!isSierra(contract)) {
+    return {
+      ...parsedContract,
+      ...('program' in parsedContract && { program: compressProgram(parsedContract.program) }),
+    } as LegacyContractClass;
+  }
+
+  return createSierraContractClass(parsedContract as CompiledSierra);
 }

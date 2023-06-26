@@ -1,4 +1,5 @@
 **/*.tgz
+**/Dockerfile
 .DS_Store
 .env
 .eslintcache

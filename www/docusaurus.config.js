@@ -4,45 +4,29 @@
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
+const generateSourceLinkTemplate = (gitRevision) =>
+  `https://github.com/0xs34n/starknet.js/blob/${gitRevision || '{gitRevision}'}/{path}#L{line}`;
+
+// TODO: remove the /next/ fragment after the v5 official release
+const migrationGuideLink = '/docs/next/guides/migrate';
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Starknet.js',
   tagline: 'JavaScript library for Starknet',
   url: 'https://starknetjs.com',
   baseUrl: '/',
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
   organizationName: '0xs34n', // Usually your GitHub org/user name.
   projectName: 'starknet.js', // Usually your repo name.
-
-  // plugins: [
-  //   [
-  //     '@docusaurus/plugin-content-docs',
-  //     {
-  //       id: 'guides',
-  //       path: 'guides',
-  //       routeBasePath: 'guides',
-  //       sidebarPath: require.resolve('./sidebars.js'),
-  //     },
-  //   ],
-  // ],
 
   presets: [
     [
       'classic',
       /** @type {import('@docusaurus/preset-classic').Options} */
       ({
-        docs: {
-          sidebarPath: require.resolve('./sidebars.js'),
-          // Please change this to your repo.
-          editUrl: 'https://github.com/0xs34n/starknet.js',
-        },
-        blog: {
-          showReadingTime: true,
-          // Please change this to your repo.
-          editUrl: 'https://github.com/0xs34n/starknet.js',
-        },
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
         },
@@ -53,35 +37,37 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      announcementBar: {
+        content: `<a href="${migrationGuideLink}">Migrate from v4</a>`,
+        backgroundColor: 'rgb(230 231 232)',
+      },
       navbar: {
         title: 'Home',
         logo: {
           alt: 'Starknet.js Logo',
-          src: 'img/logo.svg',
+          src: 'img/StarkNet-JS_navbar.png',
         },
         items: [
           {
-            type: 'doc',
-            docId: 'API/index',
-            position: 'left',
             label: 'API',
+            docId: 'API/index',
+            type: 'doc',
+            position: 'left',
           },
           {
-            position: 'left',
             label: 'Guides',
-            type: 'doc',
             docId: 'guides/intro',
+            type: 'doc',
+            position: 'left',
           },
           {
             type: 'docsVersionDropdown',
-            position: 'left',
-            // dropdownItemsAfter: [{ to: '/versions', label: 'All versions' }],
             dropdownActiveClassDisabled: true,
+            position: 'left',
           },
-          // {to: '/blog', label: 'Blog', position: 'left'},
           {
-            href: 'https://github.com/0xs34n/starknet.js',
             label: 'GitHub',
+            href: 'https://github.com/0xs34n/starknet.js',
             position: 'right',
           },
         ],
@@ -100,6 +86,10 @@ const config = {
                 label: 'Guides',
                 to: '/docs/guides/intro',
               },
+              {
+                label: 'Migrate from v4',
+                to: migrationGuideLink,
+              },
             ],
           },
           {
@@ -107,17 +97,13 @@ const config = {
             items: [
               {
                 label: 'Twitter',
-                href: 'https://twitter.com/0xs34n',
+                href: 'https://twitter.com/starknetjs',
               },
             ],
           },
           {
             title: 'More',
             items: [
-              // {
-              //   label: 'Blog',
-              //   to: '/blog',
-              // },
               {
                 label: 'GitHub',
                 href: 'https://github.com/0xs34n/starknet.js',
@@ -132,6 +118,55 @@ const config = {
         darkTheme: darkCodeTheme,
       },
     }),
+
+  plugins: [
+    [
+      'docusaurus-plugin-typedoc',
+      {
+        entryPoints: ['../src/index.ts'],
+        tsconfig: '../tsconfig.json',
+        out: 'API',
+        name: 'Starknet.js API',
+        includeVersion: true,
+        includeExtension: true,
+        sourceLinkTemplate: generateSourceLinkTemplate(
+          process.env.GIT_REVISION_OVERRIDE || 'develop'
+        ),
+        visibilityFilters: {
+          protected: false,
+          private: false,
+        },
+        sort: ['kind'],
+        kindSortOrder: [
+          'Reference',
+          'Project',
+          'Module',
+          'Class',
+          'Namespace',
+          'Enum',
+          'EnumMember',
+          'Interface',
+          'TypeAlias',
+          'Constructor',
+          'Property',
+          'Variable',
+          'Function',
+          'Accessor',
+          'Method',
+          'ObjectLiteral',
+          'Parameter',
+          'TypeParameter',
+          'TypeLiteral',
+          'CallSignature',
+          'ConstructorSignature',
+          'IndexSignature',
+          'GetSignature',
+          'SetSignature',
+        ],
+        readme: './ApiTitle.md',
+      },
+    ],
+  ],
 };
 
 module.exports = config;

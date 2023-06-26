@@ -1,19 +1,18 @@
 import { AccountInterface } from '../account';
 import { ProviderInterface } from '../provider';
-import { BlockIdentifier } from '../provider/utils';
 import {
   Abi,
+  ArgsOrCalldata,
   AsyncContractFunction,
+  BlockIdentifier,
+  CallOptions,
   ContractFunction,
+  EstimateFeeResponse,
   Invocation,
   InvokeFunctionResponse,
-  Overrides,
+  InvokeOptions,
   Result,
 } from '../types';
-
-export type CallOptions = {
-  blockIdentifier?: BlockIdentifier;
-};
 
 export abstract class ContractInterface {
   public abstract abi: Abi;
@@ -64,43 +63,58 @@ export abstract class ContractInterface {
    * @param options optional blockIdentifier
    * @returns Result of the call as an array with key value pars
    */
-  public abstract call(method: string, args?: Array<any>, options?: CallOptions): Promise<Result>;
+  public abstract call(
+    method: string,
+    args?: ArgsOrCalldata,
+    options?: CallOptions
+  ): Promise<Result>;
 
   /**
    * Invokes a method on a contract
    *
    * @param method name of the method
-   * @param args Array of the arguments for the invoke
+   * @param args Array of the arguments for the invoke or Calldata
    * @param options
    * @returns Add Transaction Response
    */
   public abstract invoke(
     method: string,
-    args?: Array<any>,
-    options?: Overrides
+    args?: ArgsOrCalldata,
+    options?: InvokeOptions
   ): Promise<InvokeFunctionResponse>;
 
   /**
    * Estimates a method on a contract
    *
    * @param method name of the method
-   * @param args Array of the arguments for the call
+   * @param args Array of the arguments for the call or Calldata
    * @param options optional blockIdentifier
    */
   public abstract estimate(
     method: string,
-    args?: Array<any>,
+    args?: ArgsOrCalldata,
     options?: {
       blockIdentifier?: BlockIdentifier;
     }
-  ): Promise<any>;
+  ): Promise<EstimateFeeResponse>;
 
   /**
    * Calls a method on a contract
    *
    * @param method name of the method
-   * @param args Array of the arguments for the call
+   * @param args Array of the arguments for the call or Calldata
    * @returns Invocation object
    */
-  public abstract populate(method: string, args?: Array<any>): Invocation;
+  public abstract populate(method: string, args?: ArgsOrCalldata): Invocation;
+
+  /**
+   * tells if the contract comes from a Cairo 1 contract
+   *
+   * @returns TRUE if the contract comes from a Cairo1 contract
+   * @example
+   * ```typescript
+   * const isCairo1: boolean = myContract.isCairo1();
+   * ```
+   */
+  public abstract isCairo1(): boolean;
 }

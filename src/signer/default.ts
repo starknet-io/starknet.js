@@ -4,33 +4,36 @@ import {
   DeclareSignerDetails,
   DeployAccountSignerDetails,
   InvocationsSignerDetails,
-  KeyPair,
   Signature,
+  TypedData,
 } from '../types';
-import { genKeyPair, getStarkKey, sign } from '../utils/ellipticCurve';
+import { CallData } from '../utils/calldata';
+import { starkCurve } from '../utils/ec';
+import { buf2hex } from '../utils/encode';
 import {
   calculateDeclareTransactionHash,
   calculateDeployAccountTransactionHash,
   calculateTransactionHash,
 } from '../utils/hash';
-import { fromCallsToExecuteCalldata } from '../utils/transaction';
-import { TypedData, getMessageHash } from '../utils/typedData';
+import { toHex } from '../utils/num';
+import { getExecuteCalldata } from '../utils/transaction';
+import { getMessageHash } from '../utils/typedData';
 import { SignerInterface } from './interface';
 
 export class Signer implements SignerInterface {
-  protected keyPair: KeyPair;
+  protected pk: Uint8Array | string;
 
-  constructor(keyPair: KeyPair = genKeyPair()) {
-    this.keyPair = keyPair;
+  constructor(pk: Uint8Array | string = starkCurve.utils.randomPrivateKey()) {
+    this.pk = pk instanceof Uint8Array ? buf2hex(pk) : toHex(pk);
   }
 
   public async getPubKey(): Promise<string> {
-    return getStarkKey(this.keyPair);
+    return starkCurve.getStarkKey(this.pk);
   }
 
   public async signMessage(typedData: TypedData, accountAddress: string): Promise<Signature> {
     const msgHash = getMessageHash(typedData, accountAddress);
-    return sign(this.keyPair, msgHash);
+    return starkCurve.sign(msgHash, this.pk);
   }
 
   public async signTransaction(
@@ -43,7 +46,7 @@ export class Signer implements SignerInterface {
     }
     // now use abi to display decoded data somewhere, but as this signer is headless, we can't do that
 
-    const calldata = fromCallsToExecuteCalldata(transactions);
+    const calldata = getExecuteCalldata(transactions, transactionsDetail.cairoVersion);
 
     const msgHash = calculateTransactionHash(
       transactionsDetail.walletAddress,
@@ -54,7 +57,7 @@ export class Signer implements SignerInterface {
       transactionsDetail.nonce
     );
 
-    return sign(this.keyPair, msgHash);
+    return starkCurve.sign(msgHash, this.pk);
   }
 
   public async signDeployAccountTransaction({
@@ -66,11 +69,11 @@ export class Signer implements SignerInterface {
     version,
     chainId,
     nonce,
-  }: DeployAccountSignerDetails) {
+  }: DeployAccountSignerDetails): Promise<Signature> {
     const msgHash = calculateDeployAccountTransactionHash(
       contractAddress,
       classHash,
-      constructorCalldata,
+      CallData.compile(constructorCalldata),
       addressSalt,
       version,
       maxFee,
@@ -78,22 +81,31 @@ export class Signer implements SignerInterface {
       nonce
     );
 
-    return sign(this.keyPair, msgHash);
+    return starkCurve.sign(msgHash, this.pk);
   }
 
   public async signDeclareTransaction(
     // contractClass: ContractClass,  // Should be used once class hash is present in ContractClass
-    { classHash, senderAddress, chainId, maxFee, version, nonce }: DeclareSignerDetails
-  ) {
+    {
+      classHash,
+      senderAddress,
+      chainId,
+      maxFee,
+      version,
+      nonce,
+      compiledClassHash,
+    }: DeclareSignerDetails
+  ): Promise<Signature> {
     const msgHash = calculateDeclareTransactionHash(
       classHash,
       senderAddress,
       version,
       maxFee,
       chainId,
-      nonce
+      nonce,
+      compiledClassHash
     );
 
-    return sign(this.keyPair, msgHash);
+    return starkCurve.sign(msgHash, this.pk);
   }
 }

@@ -1,9 +1,8 @@
-import assert from 'minimalistic-assert';
-
 import { AccountInterface } from '../account';
-import { Abi, CompiledContract, FunctionAbi } from '../types';
-import { CheckCallData } from '../utils/calldata';
-import { Contract } from './default';
+import { Abi, ArgsOrCalldataWithOptions, CompiledContract } from '../types';
+import assert from '../utils/assert';
+import { CallData } from '../utils/calldata';
+import { Contract, getCalldata, splitArgsAndOptions } from './default';
 
 export class ContractFactory {
   abi: Abi;
@@ -14,7 +13,7 @@ export class ContractFactory {
 
   account: AccountInterface;
 
-  private checkCalldata: CheckCallData;
+  private CallData: CallData;
 
   constructor(
     compiledContract: CompiledContract,
@@ -26,30 +25,35 @@ export class ContractFactory {
     this.compiledContract = compiledContract;
     this.account = account;
     this.classHash = classHash;
-    this.checkCalldata = new CheckCallData(abi);
+    this.CallData = new CallData(abi);
   }
 
   /**
    * Deploys contract and returns new instance of the Contract
    *
    * @param args - Array of the constructor arguments for deployment
-   * @param addressSalt (optional) - Address Salt for deployment
+   * @param options (optional) Object - parseRequest, parseResponse, addressSalt
    * @returns deployed Contract
    */
-  public async deploy(args: Array<any> = [], addressSalt?: string | undefined): Promise<Contract> {
-    this.checkCalldata.validateMethodAndArgs('DEPLOY', 'constructor', args);
-    const { inputs } = this.abi.find((abi) => abi.type === 'constructor') as FunctionAbi;
+  public async deploy(...args: ArgsOrCalldataWithOptions): Promise<Contract> {
+    const { args: param, options = { parseRequest: true } } = splitArgsAndOptions(args);
 
-    // compile calldata
-    const constructorCalldata = this.checkCalldata.compileCalldata(args, inputs);
+    const constructorCalldata = getCalldata(param, () => {
+      if (options.parseRequest) {
+        this.CallData.validate('DEPLOY', 'constructor', param);
+        return this.CallData.compile('constructor', param);
+      }
+      // eslint-disable-next-line no-console
+      console.warn('Call skipped parsing but provided rawArgs, possible malfunction request');
+      return param;
+    });
 
     const {
       deploy: { contract_address, transaction_hash },
-    } = await this.account.declareDeploy({
+    } = await this.account.declareAndDeploy({
       contract: this.compiledContract,
-      classHash: this.classHash,
       constructorCalldata,
-      salt: addressSalt,
+      salt: options.addressSalt,
     });
     assert(Boolean(contract_address), 'Deployment of the contract failed');
 
@@ -64,7 +68,7 @@ export class ContractFactory {
   }
 
   /**
-   * Attaches to new Provider or Account
+   * Attaches to new Account
    *
    * @param account - new Provider or Account to attach to
    * @returns ContractFactory
@@ -75,7 +79,7 @@ export class ContractFactory {
   }
 
   /**
-   * Attaches current abi and provider or account to the new address
+   * Attaches current abi and account to the new address
    *
    * @param address - Contract address
    * @returns Contract

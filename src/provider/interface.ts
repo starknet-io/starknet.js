@@ -1,8 +1,11 @@
 import { StarknetChainId } from '../constants';
 import type {
+  AccountInvocations,
+  BigNumberish,
+  BlockIdentifier,
   Call,
   CallContractResponse,
-  ContractClass,
+  ContractClassResponse,
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractPayload,
@@ -15,19 +18,18 @@ import type {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
-  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  Nonce,
+  SimulateTransactionResponse,
   StateUpdateResponse,
-  Status,
-  TransactionSimulationResponse,
+  Storage,
+  getEstimateFeeBulkOptions,
+  getSimulateTransactionOptions,
+  waitForTransactionOptions,
 } from '../types';
-import type { BigNumberish } from '../utils/number';
-import { BlockIdentifier } from './utils';
 
 export abstract class ProviderInterface {
-  public abstract chainId: StarknetChainId;
-
   /**
    * Gets the Starknet chain Id
    *
@@ -73,7 +75,7 @@ export abstract class ProviderInterface {
   public abstract getClassAt(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
-  ): Promise<ContractClass>;
+  ): Promise<ContractClassResponse>;
 
   /**
    * Returns the class hash deployed under the given address.
@@ -93,7 +95,7 @@ export abstract class ProviderInterface {
    * @param classHash - class hash
    * @returns Contract class of compiled contract
    */
-  public abstract getClassByHash(classHash: string): Promise<ContractClass>;
+  public abstract getClassByHash(classHash: string): Promise<ContractClassResponse>;
 
   /**
    * Gets the nonce of a contract with respect to a specific block
@@ -104,7 +106,7 @@ export abstract class ProviderInterface {
   public abstract getNonceForAddress(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
-  ): Promise<BigNumberish>;
+  ): Promise<Nonce>;
 
   /**
    * Gets the contract's storage variable at a specific key.
@@ -118,13 +120,13 @@ export abstract class ProviderInterface {
     contractAddress: string,
     key: BigNumberish,
     blockIdentifier?: BlockIdentifier
-  ): Promise<BigNumberish>;
+  ): Promise<Storage>;
 
   /**
    * Gets the transaction information from a tx id.
    *
    * @param txHash
-   * @returns the transaction object { transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? }
+   * @returns the transaction object \{ transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? \}
    */
   public abstract getTransaction(transactionHash: BigNumberish): Promise<GetTransactionResponse>;
 
@@ -198,16 +200,18 @@ export abstract class ProviderInterface {
    * - entrypoint - the entrypoint of the contract
    * - calldata - (defaults to []) the calldata
    * - signature - (defaults to []) the signature
-   * @param blockIdentifier - block identifier
    * @param details - optional details containing:
    * - nonce - optional nonce
    * - version - optional version
+   * @param blockIdentifier - (optional) block identifier
+   * @param skipValidate - (optional) skip cairo __validate__ method
    * @returns the estimated fee
    */
   public abstract getEstimateFee(
     invocation: Invocation,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<EstimateFeeResponse>;
 
   /**
@@ -218,16 +222,18 @@ export abstract class ProviderInterface {
    * - entrypoint - the entrypoint of the contract
    * - calldata - (defaults to []) the calldata
    * - signature - (defaults to []) the signature
-   * @param blockIdentifier - block identifier
    * @param details - optional details containing:
    * - nonce - optional nonce
    * - version - optional version
+   * @param blockIdentifier - (optional) block identifier
+   * @param skipValidate - (optional) skip cairo __validate__ method
    * @returns the estimated fee
    */
   public abstract getInvokeEstimateFee(
     invocation: Invocation,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<EstimateFeeResponse>;
 
   /**
@@ -241,13 +247,15 @@ export abstract class ProviderInterface {
    * - nonce
    * - version - optional version
    * - optional maxFee
-   * @param blockIdentifier - block identifier
+   * @param blockIdentifier - (optional) block identifier
+   * @param skipValidate - (optional) skip cairo __validate__ method
    * @returns the estimated fee
    */
   public abstract getDeclareEstimateFee(
     transaction: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<EstimateFeeResponse>;
 
   /**
@@ -262,63 +270,58 @@ export abstract class ProviderInterface {
    * - nonce
    * - version - optional version
    * - optional maxFee
-   * @param blockIdentifier - block identifier
+   * @param blockIdentifier - (optional) block identifier
+   * @param skipValidate - (optional) skip cairo __validate__ method
    * @returns the estimated fee
    */
   public abstract getDeployAccountEstimateFee(
     transaction: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<EstimateFeeResponse>;
 
   /**
    * Estimates the fee for a list of INVOKE transaction
    *
-   * @param invocations the array of invocation and invocation details object containing:
-   * - contractAddress - the address of the account
-   * - calldata - (defaults to []) the calldata
-   * - signature - (defaults to []) the signature
-   * - nonce - optional nonce
-   * - version - optional version
-   * @param blockIdentifier - block identifier
+   * @param invocations AccountInvocations - Complete invocations array with account details
+   * @param options getEstimateFeeBulkOptions
+   * - (optional) blockIdentifier - BlockIdentifier
+   * - (optional) skipValidate - boolean (default false)
    * @returns the estimated fee
    */
   public abstract getEstimateFeeBulk(
-    invocations: InvocationBulk,
-    blockIdentifier?: BlockIdentifier
+    invocations: AccountInvocations,
+    options?: getEstimateFeeBulkOptions
   ): Promise<EstimateFeeResponseBulk>;
 
   /**
    * Wait for the transaction to be accepted
    * @param txHash - transaction hash
-   * @param retryInterval - retry interval
+   * @param options waitForTransactionOptions
+   * - (optional) retryInterval: number | undefined;
+   * - (optional) successStates: TransactionStatus[] | undefined;
    * @return GetTransactionReceiptResponse
    */
   public abstract waitForTransaction(
     txHash: BigNumberish,
-    retryInterval?: number,
-    successStates?: Array<Status>
+    options?: waitForTransactionOptions
   ): Promise<GetTransactionReceiptResponse>;
 
   /**
    * Simulates the transaction and returns the transaction trace and estimated fee.
    *
-   * @param invocation the invocation object containing:
-   * - contractAddress - the address of the contract
-   * - entrypoint - the entrypoint of the contract
-   * - calldata - (defaults to []) the calldata
-   * - signature - (defaults to []) the signature
-   * @param details - optional details containing:
-   * - nonce - optional nonce
-   * - version - optional version
-   * @param blockIdentifier - block identifier
-   * @returns the transaction trace and estimated fee
+   * @param invocations AccountInvocations - Complete invocations array with account details
+   * @param options - getSimulateTransactionOptions
+   *  - (optional) blockIdentifier - block identifier
+   *  - (optional) skipValidate - skip cairo __validate__ method
+   *  - (optional) skipExecute - skip cairo __execute__ method
+   * @returns an array of transaction trace and estimated fee
    */
   public abstract getSimulateTransaction(
-    invocation: Invocation,
-    invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
-  ): Promise<TransactionSimulationResponse>;
+    invocations: AccountInvocations,
+    options?: getSimulateTransactionOptions
+  ): Promise<SimulateTransactionResponse>;
 
   /**
    * Gets the state changes in a specific block

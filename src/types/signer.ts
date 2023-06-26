@@ -1,20 +1,25 @@
 import { StarknetChainId } from '../constants';
-import { BigNumberish } from '../utils/number';
-import { DeployAccountContractPayload, InvocationsDetails } from './lib';
+import {
+  BigNumberish,
+  CairoVersion,
+  DeployAccountContractPayload,
+  InvocationsDetails,
+} from './lib';
 
 export interface InvocationsSignerDetails extends Required<InvocationsDetails> {
   walletAddress: string;
   chainId: StarknetChainId;
+  cairoVersion: CairoVersion;
 }
 
 export interface DeclareSignerDetails {
-  // contractClass: ContractClass,  // Should be used once class hash is present in ContractClass
-  classHash: BigNumberish;
-  senderAddress: BigNumberish;
+  classHash: string;
+  senderAddress: string;
   chainId: StarknetChainId;
   maxFee: BigNumberish;
   version: BigNumberish;
   nonce: BigNumberish;
+  compiledClassHash?: string;
 }
 
 export type DeployAccountSignerDetails = Required<DeployAccountContractPayload> &

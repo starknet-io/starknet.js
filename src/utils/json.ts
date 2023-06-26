@@ -1,15 +1,20 @@
-import Json from 'json-bigint';
+// the ts-ignore suppresses an esm to cjs import error that is resolved with bundling
+// @ts-ignore
+import * as json from 'lossless-json';
 
-const json = (alwaysParseAsBig: boolean) => {
-  return Json({
-    alwaysParseAsBig,
-    useNativeBigInt: true,
-    protoAction: 'preserve',
-    constructorAction: 'preserve',
-  });
+const parseIntAsNumberOrBigInt = (x: string) => {
+  if (!json.isInteger(x)) return parseFloat(x);
+  const v = parseInt(x, 10);
+  return Number.isSafeInteger(v) ? v : BigInt(x);
 };
+// NOTE: the String() wrapping is used so the behaviour conforms to JSON.parse()
+// which can accept simple data types but is not represented in the default typing
+export const parse = (x: string): any => json.parse(String(x), null, parseIntAsNumberOrBigInt);
+export const parseAlwaysAsBig = (x: string): any =>
+  json.parse(String(x), null, json.parseNumberAndBigInt);
 
-export const { parse, stringify } = json(false);
-export const { parse: parseAlwaysAsBig, stringify: stringifyAlwaysAsBig } = json(true);
-
-export default { parse, stringify };
+// NOTE: the not-null assertion is used so the return type conforms to JSON.stringify()
+// which can also return undefined but is not represented in the default typing
+export const stringify = (...p: Parameters<typeof json.stringify>): string => json.stringify(...p)!;
+/** @deprecated equivalent to 'stringify', alias will be removed */
+export const stringifyAlwaysAsBig = stringify;

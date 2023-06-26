@@ -1,8 +1,9 @@
 /* eslint-disable max-classes-per-file */
-import { BN } from 'bn.js';
+import type { BigNumberish, BlockIdentifier, BlockNumber, SequencerIdentifier } from '../types';
+import { isHex, toHex } from '../utils/num';
 
-import type { BlockNumber, SequencerIdentifier } from '../types';
-import { BigNumberish, isHex, toBN, toHex } from '../utils/number';
+/** @deprecated prefer importing from 'types' over 'provider/utils' */
+export type { BlockIdentifier };
 
 /**
  *
@@ -13,7 +14,7 @@ import { BigNumberish, isHex, toBN, toHex } from '../utils/number';
  */
 export function formatHash(hashValue: BigNumberish): string {
   if (typeof hashValue === 'string') return hashValue;
-  return toHex(toBN(hashValue));
+  return toHex(hashValue);
 }
 
 /**
@@ -31,11 +32,6 @@ export function txIdentifier(txHash?: BigNumberish, txId?: BigNumberish): string
   return `transactionHash=${hashString}`;
 }
 
-// hex string and BN are detected as block hashes
-// decimal string and number are detected as block numbers
-// null appends nothing to the request url
-
-export type BlockIdentifier = BlockNumber | BigNumberish;
 export const validBlockTags = ['latest', 'pending'];
 
 export class Block {
@@ -48,7 +44,7 @@ export class Block {
   private setIdentifier(__identifier: BlockIdentifier) {
     if (typeof __identifier === 'string' && isHex(__identifier)) {
       this.hash = __identifier;
-    } else if (BN.isBN(__identifier)) {
+    } else if (typeof __identifier === 'bigint') {
       this.hash = toHex(__identifier);
     } else if (typeof __identifier === 'number') {
       this.number = __identifier;

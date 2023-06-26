@@ -1,11 +1,15 @@
-import BN from 'bn.js';
-import { gzip } from 'pako';
+import { getStarkKey, utils } from 'micro-starknet';
+import { gzip, ungzip } from 'pako';
 
-import { Calldata, CompressedProgram, Program, RawArgs, Signature } from '../types';
-import { genKeyPair, getStarkKey } from './ellipticCurve';
-import { addHexPrefix, btoaUniversal } from './encode';
-import { stringify } from './json';
-import { BigNumberish, toBN } from './number';
+import { ArraySignatureType, BigNumberish, CompressedProgram, Program, Signature } from '../types';
+import { addHexPrefix, arrayBufferToString, atobUniversal, btoaUniversal } from './encode';
+import { parse, stringify } from './json';
+import {
+  bigNumberishArrayToDecimalStringArray,
+  bigNumberishArrayToHexadecimalStringArray,
+  toBigInt,
+  toHex,
+} from './num';
 
 /**
  * Function to compress compiled cairo program
@@ -20,8 +24,20 @@ export function compressProgram(jsonProgram: Program | string): CompressedProgra
   return btoaUniversal(compressedProgram);
 }
 
+/**
+ * Function to decompress compressed compiled cairo program
+ *
+ * @param base64 CompressedProgram
+ * @returns parsed decompressed compiled cairo program
+ */
+export function decompressProgram(base64: CompressedProgram) {
+  if (Array.isArray(base64)) return base64;
+  const decompressed = arrayBufferToString(ungzip(atobUniversal(base64)));
+  return parse(decompressed);
+}
+
 export function randomAddress(): string {
-  const randomKeyPair = genKeyPair();
+  const randomKeyPair = utils.randomPrivateKey();
   return getStarkKey(randomKeyPair);
 }
 
@@ -29,29 +45,29 @@ export function makeAddress(input: string): string {
   return addHexPrefix(input).toLowerCase();
 }
 
-export function formatSignature(sig?: Signature): string[] {
-  if (!sig) return [];
+export function formatSignature(sig?: Signature): ArraySignatureType {
+  if (!sig) throw Error('formatSignature: provided signature is undefined');
+  if (Array.isArray(sig)) {
+    return sig.map((it) => toHex(it));
+  }
   try {
-    return sig.map((x) => toBN(x)).map((x) => x.toString());
+    const { r, s } = sig;
+    return [toHex(r), toHex(s)];
   } catch (e) {
-    return [];
+    throw new Error('Signature need to be weierstrass.SignatureType or an array for custom');
   }
 }
 
-export function compileCalldata(args: RawArgs): Calldata {
-  return Object.values(args).flatMap((value) => {
-    if (Array.isArray(value))
-      return [toBN(value.length).toString(), ...value.map((x) => toBN(x).toString())];
-    if (typeof value === 'object' && 'type' in value)
-      return Object.entries(value)
-        .filter(([k]) => k !== 'type')
-        .map(([, v]) => toBN(v).toString());
-    return toBN(value).toString();
-  });
+export function signatureToDecimalArray(sig?: Signature): ArraySignatureType {
+  return bigNumberishArrayToDecimalStringArray(formatSignature(sig));
 }
 
-export function estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: number = 0.5): BN {
+export function signatureToHexArray(sig?: Signature): ArraySignatureType {
+  return bigNumberishArrayToHexadecimalStringArray(formatSignature(sig));
+}
+
+export function estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: number = 0.5): bigint {
   // BN can only handle Integers, so we need to do all calulations with integers
   const overHeadPercent = Math.round((1 + overhead) * 100);
-  return toBN(estimatedFee).mul(toBN(overHeadPercent)).div(toBN(100));
+  return (toBigInt(estimatedFee) * toBigInt(overHeadPercent)) / 100n;
 }

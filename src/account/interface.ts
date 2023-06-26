@@ -1,13 +1,15 @@
 import { ProviderInterface } from '../provider';
-import { BlockIdentifier } from '../provider/utils';
 import { SignerInterface } from '../signer';
 import {
   Abi,
   AllowArray,
+  BigNumberish,
+  BlockIdentifier,
+  CairoVersion,
   Call,
+  DeclareAndDeployContractPayload,
   DeclareContractPayload,
   DeclareContractResponse,
-  DeclareDeployContractPayload,
   DeclareDeployUDCResponse,
   DeployAccountContractPayload,
   DeployContractResponse,
@@ -16,37 +18,24 @@ import {
   EstimateFeeDetails,
   EstimateFeeResponse,
   EstimateFeeResponseBulk,
+  Invocations,
   InvocationsDetails,
   InvokeFunctionResponse,
   MultiDeployContractResponse,
+  Nonce,
   Signature,
-  TransactionBulk,
-  TransactionSimulation,
+  SimulateTransactionDetails,
+  SimulateTransactionResponse,
+  TypedData,
   UniversalDeployerContractPayload,
 } from '../types';
-import { BigNumberish } from '../utils/number';
-import { TypedData } from '../utils/typedData/types';
 
 export abstract class AccountInterface extends ProviderInterface {
   public abstract address: string;
 
   public abstract signer: SignerInterface;
 
-  /**
-   * @deprecated Use estimateInvokeFee or estimateDeclareFee instead
-   * Estimate Fee for executing an INVOKE transaction on starknet
-   *
-   * @param calls the invocation object containing:
-   * - contractAddress - the address of the contract
-   * - entrypoint - the entrypoint of the contract
-   * - calldata - (defaults to []) the calldata
-   *
-   * @returns response from estimate_fee
-   */
-  public abstract estimateFee(
-    calls: AllowArray<Call>,
-    estimateFeeDetails?: EstimateFeeDetails
-  ): Promise<EstimateFeeResponse>;
+  public abstract cairoVersion: CairoVersion;
 
   /**
    * Estimate Fee for executing an INVOKE transaction on starknet
@@ -118,14 +107,14 @@ export abstract class AccountInterface extends ProviderInterface {
    * Contract must be deployed for fee estimation to be possible
    *
    * @param transactions array of transaction object containing :
-   * - type - the type of transaction : 'DECLARE' | 'DEPLOY' | 'INVOKE_FUNCTION' | 'DEPLOY_ACCOUNT'
+   * - type - the type of transaction : 'DECLARE' | (multi)'DEPLOY' | (multi)'INVOKE_FUNCTION' | 'DEPLOY_ACCOUNT'
    * - payload - the payload of the transaction
    *
    * @returns response from estimate_fee
    */
   public abstract estimateFeeBulk(
-    transactions: TransactionBulk,
-    estimateFeeDetails?: EstimateFeeDetails
+    invocations: Invocations,
+    details?: EstimateFeeDetails
   ): Promise<EstimateFeeResponseBulk>;
 
   /**
@@ -151,7 +140,9 @@ export abstract class AccountInterface extends ProviderInterface {
    * 
    * @param contractPayload transaction payload to be deployed containing:
   - contract: compiled contract code
-  - classHash: computed class hash of compiled contract
+  - (optional) classHash: computed class hash of compiled contract. Pre-compute it for faster execution.
+  - (required for Cairo1 without compiledClassHash) casm: CompiledContract | string;
+  - (optional for Cairo1 with casm) compiledClassHash: compiled class hash from casm. Pre-compute it for faster execution.
    * @param transactionsDetail Invocation Details containing:
   - optional nonce
   - optional version
@@ -217,6 +208,7 @@ export abstract class AccountInterface extends ProviderInterface {
   /**
    * Declares and Deploy a given compiled contract (json) to starknet using UDC
    * Internal wait for L2 transaction, do not support multicall
+   * Method will pass even if contract is already declared (internal using DeclareIfNot)
    *
    * @param  containing
    * - contract: compiled contract code
@@ -242,8 +234,8 @@ export abstract class AccountInterface extends ProviderInterface {
    *    - calldata
    *    - salt
    */
-  public abstract declareDeploy(
-    payload: DeclareDeployContractPayload,
+  public abstract declareAndDeploy(
+    payload: DeclareAndDeployContractPayload,
     details?: InvocationsDetails | undefined
   ): Promise<DeclareDeployUDCResponse>;
 
@@ -313,7 +305,7 @@ export abstract class AccountInterface extends ProviderInterface {
    * @param  {BlockIdentifier} blockIdentifier - optional blockIdentifier. Defaults to 'pending'
    * @returns nonce of the account
    */
-  public abstract getNonce(blockIdentifier?: BlockIdentifier): Promise<BigNumberish>;
+  public abstract getNonce(blockIdentifier?: BlockIdentifier): Promise<Nonce>;
 
   /**
    * Gets Suggested Max Fee based on the transaction type
@@ -325,20 +317,19 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract getSuggestedMaxFee(
     estimateFeeAction: EstimateFeeAction,
     details: EstimateFeeDetails
-  ): Promise<BigNumberish>;
+  ): Promise<bigint>;
 
   /**
-   * Simulates the transaction and returns the transaction trace and estimated fee.
+   * Simulates an array of transaction and returns an array of transaction trace and estimated fee.
    *
-   * @param calls the invocation object containing:
-   * - contractAddress - the address of the contract
-   * - entrypoint - the entrypoint of the contract
-   * - calldata - (defaults to []) the calldata
+   * @param invocations Invocations containing:
+   * - type - transaction type: DECLARE, (multi)DEPLOY, DEPLOY_ACCOUNT, (multi)INVOKE_FUNCTION
+   * @param details SimulateTransactionDetails
    *
-   * @returns response from estimate_fee
+   * @returns response from simulate_transaction
    */
   public abstract simulateTransaction(
-    calls: AllowArray<Call>,
-    estimateFeeDetails?: EstimateFeeDetails
-  ): Promise<TransactionSimulation>;
+    invocations: Invocations,
+    details?: SimulateTransactionDetails
+  ): Promise<SimulateTransactionResponse>;
 }

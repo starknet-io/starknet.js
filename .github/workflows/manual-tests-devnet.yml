@@ -1,10 +1,11 @@
-name: Manual Devnet Test
+name: '[Manual] Test Devnet'
 on: workflow_dispatch
 
 jobs:
   tests:
     name: Run test on ${{ matrix.name }}
     strategy:
+      fail-fast: false
       matrix:
         name: [sequencer-devnet, rpc-devnet]
         include:
@@ -14,6 +15,8 @@ jobs:
             TEST_RPC_URL: http://127.0.0.1:5050/rpc
 
     uses: ./.github/workflows/_test.yml
+    with:
+      is-rpc: ${{ matrix.TEST_RPC_URL != '' }}
     secrets:
       TEST_PROVIDER_BASE_URL: ${{ matrix.TEST_PROVIDER_BASE_URL }}
       TEST_RPC_URL: ${{ matrix.TEST_RPC_URL }}

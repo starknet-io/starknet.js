@@ -1,0 +1,148 @@
+{
+  "$id": "accountSchemas",
+  "definitions": {
+    "EstimateFee": {
+      "type": "object",
+      "properties": {
+        "overall_fee": {
+          "isBigInt": "true"
+        },
+        "suggestedMaxFee": {
+          "isBigInt": "true"
+        },
+        "gas_consumed": {
+          "isBigInt": "true"
+        },
+        "gas_price": {
+          "isBigInt": "true"
+        }
+      },
+      "required": ["overall_fee", "suggestedMaxFee"]
+    },
+    "MultiDeployContractResponse": {
+      "type": "object",
+      "properties": {
+        "contract_address": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "transaction_hash": {
+          "type": "string"
+        }
+      },
+      "required": ["contract_address", "transaction_hash"]
+    },
+    "DeployContractUDCResponse": {
+      "type": "object",
+      "properties": {
+        "contract_address": {
+          "type": "string"
+        },
+        "transaction_hash": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "deployer": {
+          "type": "string"
+        },
+        "unique": {
+          "type": "string"
+        },
+        "classHash": {
+          "type": "string"
+        },
+        "calldata_len": {
+          "type": "string"
+        },
+        "calldata": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "salt": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "contract_address",
+        "transaction_hash",
+        "address",
+        "deployer",
+        "unique",
+        "classHash",
+        "calldata_len",
+        "calldata",
+        "salt"
+      ]
+    },
+    "DeclareContractResponse": {
+      "type": "object",
+      "properties": {
+        "transaction_hash": {
+          "type": "string"
+        },
+        "class_hash": {
+          "type": "string"
+        }
+      },
+      "required": ["transaction_hash", "class_hash"]
+    },
+    "CompiledClass": {
+      "type": "object",
+      "properties": {
+        "prime": {
+          "type": "string"
+        },
+        "compiler_version": {
+          "type": "string"
+        },
+        "bytecode": {
+          "type": "array"
+        },
+        "hints": {
+          "type": "array"
+        },
+        "pythonic_hints": {
+          "type": "array"
+        },
+        "entry_points_by_type": {
+          "type": "object"
+        }
+      },
+      "required": [
+        "prime",
+        "compiler_version",
+        "bytecode",
+        "hints",
+        "pythonic_hints",
+        "entry_points_by_type"
+      ]
+    },
+    "SimulateTransactionResponse": {
+      "name": "simulated_transactions",
+      "description": "The execution trace and consumed resources of the required transactions",
+      "type": "array",
+      "items": {
+        "schema": {
+          "type": "object",
+          "properties": {
+            "transaction_trace": {
+              "title": "the transaction's trace",
+              "$ref": "sequencerSchemas#/definitions/TransactionTraceResponse"
+            },
+            "fee_estimation": {
+              "title": "the transaction's resources and fee",
+              "$ref": "accountSchemas#/definitions/EstimateFee"
+            }
+          },
+          "required": ["fee_estimation", "transaction_trace"]
+        }
+      }
+    }
+  }
+}

@@ -2,8 +2,11 @@
  * Map Sequencer Response to common interface response
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
+
 import {
   CallContractResponse,
+  CompiledContract,
+  ContractClassResponse,
   DeclareContractResponse,
   DeployContractResponse,
   EstimateFeeResponse,
@@ -11,12 +14,16 @@ import {
   GetBlockResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
+  HexCalldata,
   InvokeFunctionResponse,
   Sequencer,
+  SimulateTransactionResponse,
   StateUpdateResponse,
-  TransactionSimulationResponse,
 } from '../../types';
-import { toBN } from '../number';
+import { isSierra } from '../contract';
+import { toBigInt } from '../num';
+import { parseContract } from '../provider';
+import { estimatedFeeToMaxFee } from '../stark';
 import { ResponseParser } from '.';
 
 export class SequencerAPIResponseParser extends ResponseParser {
@@ -36,9 +43,7 @@ export class SequencerAPIResponseParser extends ResponseParser {
   ): GetTransactionResponse {
     return {
       ...res,
-      calldata: 'calldata' in res.transaction ? (res.transaction.calldata as Array<string>) : [],
-      contract_address:
-        'contract_address' in res.transaction ? res.transaction.contract_address : undefined,
+      calldata: 'calldata' in res.transaction ? (res.transaction.calldata as HexCalldata) : [],
       contract_class:
         'contract_class' in res.transaction ? (res.transaction.contract_class as any) : undefined,
       entry_point_selector:
@@ -87,20 +92,20 @@ export class SequencerAPIResponseParser extends ResponseParser {
 
       try {
         gasInfo = {
-          gas_consumed: toBN(res.gas_usage),
-          gas_price: toBN(res.gas_price),
+          gas_consumed: toBigInt(res.gas_usage),
+          gas_price: toBigInt(res.gas_price),
         };
       } catch {
         // do nothing
       }
 
       return {
-        overall_fee: toBN(res.overall_fee),
+        overall_fee: toBigInt(res.overall_fee),
         ...gasInfo,
       };
     }
     return {
-      overall_fee: toBN(res.amount),
+      overall_fee: toBigInt(res.amount),
     };
   }
 
@@ -113,54 +118,38 @@ export class SequencerAPIResponseParser extends ResponseParser {
 
         try {
           gasInfo = {
-            gas_consumed: toBN(item.gas_usage),
-            gas_price: toBN(item.gas_price),
+            gas_consumed: toBigInt(item.gas_usage),
+            gas_price: toBigInt(item.gas_price),
           };
         } catch {
           // do nothing
         }
 
         return {
-          overall_fee: toBN(item.overall_fee),
+          overall_fee: toBigInt(item.overall_fee),
           ...gasInfo,
         };
       }
       return {
-        overall_fee: toBN(item.amount),
+        overall_fee: toBigInt(item.amount),
       };
     });
   }
 
-  public parseFeeSimulateTransactionResponse(
-    res: Sequencer.TransactionSimulationResponse
-  ): TransactionSimulationResponse {
-    if ('overall_fee' in res.fee_estimation) {
-      let gasInfo = {};
-
-      try {
-        gasInfo = {
-          gas_consumed: toBN(res.fee_estimation.gas_usage),
-          gas_price: toBN(res.fee_estimation.gas_price),
-        };
-      } catch {
-        // do nothing
-      }
-
-      return {
-        trace: res.trace,
-        fee_estimation: {
-          ...gasInfo,
-          overall_fee: toBN(res.fee_estimation.overall_fee),
-        },
-      };
-    }
-
-    return {
-      trace: res.trace,
-      fee_estimation: {
-        overall_fee: toBN(res.fee_estimation.amount),
+  public parseSimulateTransactionResponse(
+    res: Sequencer.SimulateTransactionResponse
+  ): SimulateTransactionResponse {
+    const suggestedMaxFee =
+      'overall_fee' in res.fee_estimation
+        ? res.fee_estimation.overall_fee
+        : res.fee_estimation.amount;
+    return [
+      {
+        transaction_trace: res.trace,
+        fee_estimation: res.fee_estimation,
+        suggestedMaxFee: estimatedFeeToMaxFee(BigInt(suggestedMaxFee)),
       },
-    };
+    ];
   }
 
   public parseCallContractResponse(res: Sequencer.CallContractResponse): CallContractResponse {
@@ -196,28 +185,29 @@ export class SequencerAPIResponseParser extends ResponseParser {
   }
 
   public parseGetStateUpdateResponse(res: Sequencer.StateUpdateResponse): StateUpdateResponse {
-    const nonces = [].concat(res.state_diff.nonces as []).map(({ contract_address, nonce }) => {
-      return {
-        contract_address,
-        nonce: nonce as string,
-      };
-    });
-    const storage_diffs = []
-      .concat(res.state_diff.storage_diffs as [])
-      .map(({ address, storage_entries }) => {
-        return {
-          address,
-          storage_entries,
-        };
-      });
+    const nonces = Object.entries(res.state_diff.nonces).map(([contract_address, nonce]) => ({
+      contract_address,
+      nonce,
+    }));
+    const storage_diffs = Object.entries(res.state_diff.storage_diffs).map(
+      ([address, storage_entries]) => ({ address, storage_entries })
+    );
+
     return {
       ...res,
       state_diff: {
+        ...res.state_diff,
         storage_diffs,
-        declared_contract_hashes: res.state_diff.declared_contract_hashes,
-        deployed_contracts: res.state_diff.deployed_contracts,
         nonces,
       },
+    };
+  }
+
+  public parseContractClassResponse(res: CompiledContract): ContractClassResponse {
+    const response = isSierra(res) ? res : parseContract(res);
+    return {
+      ...response,
+      abi: typeof response.abi === 'string' ? JSON.parse(response.abi) : response.abi,
     };
   }
 }

@@ -1,4 +1,4 @@
-import { ADDRESS, FELT, OPENRPC } from './openrpc';
+import { ADDRESS, CONTRACT_STORAGE_DIFF_ITEM, FELT, OPENRPC } from './openrpc';
 
 export namespace RPC {
   export type Response = {
@@ -16,7 +16,7 @@ export namespace RPC {
   export type ContractAddress = ADDRESS;
   export type Felt = FELT;
   export type Nonce = OPENRPC.Nonce;
-  export type ContractClass = OPENRPC.ContractClass;
+  export type ContractClass = OPENRPC.ContractClass | OPENRPC.DeprecatedContractClass;
   export type StateUpdate = OPENRPC.StateUpdate;
   export type Transaction = OPENRPC.Transaction;
   export type PendingTransactions = OPENRPC.PendingTransactions;
@@ -25,7 +25,6 @@ export namespace RPC {
   export type Traces = OPENRPC.Traces;
   export type BlockHash = OPENRPC.BlockHash;
   export type BlockHashAndNumber = OPENRPC.BlockHashAndNumber;
-  export type GetClassResponse = OPENRPC.ContractClass;
   export type EstimateFeeResponse = OPENRPC.EstimatedFee;
   export type GetBlockWithTxHashesResponse = OPENRPC.BlockWithTxHashes;
   export type GetBlockWithTxs = OPENRPC.BlockWithTxs;
@@ -41,5 +40,27 @@ export namespace RPC {
   export type InvokedTransaction = OPENRPC.InvokedTransaction;
   export type DeclaredTransaction = OPENRPC.DeclaredTransaction;
   export type DeployedTransaction = OPENRPC.DeployedTransaction;
+  export type SimulationFlags = OPENRPC.SimulationFlags;
+  export type BroadcastedTransaction = OPENRPC.BroadcastedTransaction;
+  export type EstimatedFee = OPENRPC.EstimatedFee;
   export type Methods = OPENRPC.Methods;
+  export type Storage = OPENRPC.Storage;
+  export type SimulateTransactionResponse = OPENRPC.SimulatedTransactions;
+
+  export enum TransactionType {
+    DECLARE = 'DECLARE',
+    DEPLOY = 'DEPLOY',
+    DEPLOY_ACCOUNT = 'DEPLOY_ACCOUNT',
+    INVOKE = 'INVOKE',
+    L1_HANDLER = 'L1_HANDLER',
+  }
+
+  // Exported Diff on Sequencer (can be removed when diff resolved by new RPC v)
+  export type StorageDiffs = Array<CONTRACT_STORAGE_DIFF_ITEM>;
+  export type DeprecatedDeclaredClasses = Array<FELT>;
+  export type Nonces = Array<{
+    contract_address: ADDRESS;
+    nonce: FELT;
+  }>;
+  export type ReplacedClasses = Array<{ contract_address: ADDRESS; class_hash: FELT }>;
 }

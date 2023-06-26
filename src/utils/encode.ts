@@ -7,6 +7,14 @@ export function arrayBufferToString(array: ArrayBuffer): string {
   return new Uint8Array(array).reduce((data, byte) => data + String.fromCharCode(byte), '');
 }
 
+export function stringToArrayBuffer(s: string): Uint8Array {
+  return Uint8Array.from(s, (c) => c.charCodeAt(0));
+}
+
+export function atobUniversal(a: string): Uint8Array {
+  return IS_BROWSER ? stringToArrayBuffer(atob(a)) : Buffer.from(a, 'base64');
+}
+
 export function btoaUniversal(b: ArrayBuffer): string {
   return IS_BROWSER ? btoa(arrayBufferToString(b)) : Buffer.from(b).toString('base64');
 }
