@@ -1,3 +1,10 @@
+## [5.14.1](https://github.com/0xs34n/starknet.js/compare/v5.14.0...v5.14.1) (2023-06-26)
+
+### Bug Fixes
+
+- export utils provider,selector, contract, events. Simulate dev import on tests ([00b7bdf](https://github.com/0xs34n/starknet.js/commit/00b7bdf756c516a1905ce1ecc9036472800989af))
+- redeclare contract ([10da77e](https://github.com/0xs34n/starknet.js/commit/10da77efc6a5e1896af089508e4c403726e9cbf4))
+
 # [5.14.0](https://github.com/0xs34n/starknet.js/compare/v5.13.2...v5.14.0) (2023-06-21)
 
 ### Features
