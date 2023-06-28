@@ -495,7 +495,6 @@ export class SequencerProvider implements ProviderInterface {
     const successStates = options?.successStates ?? [
       TransactionStatus.ACCEPTED_ON_L1,
       TransactionStatus.ACCEPTED_ON_L2,
-      TransactionStatus.PENDING,
     ];
 
     while (!onchain) {

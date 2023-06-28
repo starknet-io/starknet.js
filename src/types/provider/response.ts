@@ -7,6 +7,7 @@ import { RPC } from '../api/rpc';
 import { Sequencer } from '../api/sequencer';
 import {
   AllowArray,
+  BlockStatus,
   ByteCode,
   Call,
   CompiledSierra,
@@ -15,7 +16,7 @@ import {
   LegacyContractClass,
   RawCalldata,
   Signature,
-  Status,
+  TransactionStatus,
   TransactionType,
   UniversalDeployerContractPayload,
 } from '../lib';
@@ -26,7 +27,7 @@ export interface GetBlockResponse {
   block_number: number;
   new_root: string;
   parent_hash: string;
-  status: Status;
+  status: BlockStatus;
   transactions: Array<string>;
   gas_price?: string;
   sequencer_address?: string;
@@ -72,7 +73,7 @@ export type GetTransactionReceiptResponse =
 
 export interface CommonTransactionReceiptResponse {
   transaction_hash: string;
-  status?: Status;
+  status?: `${TransactionStatus}`;
   actual_fee?: string;
   status_data?: string;
 }
