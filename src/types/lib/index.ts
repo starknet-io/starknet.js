@@ -190,10 +190,6 @@ export type Invocations = Array<
 
 export type Tupled = { element: any; type: string };
 
-export type Struct = {
-  type: 'struct';
-  [k: string]: BigNumberish;
-};
 export type Args = {
   [inputName: string]: BigNumberish | BigNumberish[] | ParsedStruct | ParsedStruct[];
 };
