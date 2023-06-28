@@ -50,15 +50,6 @@ export type UniversalDeployerContractPayload = {
   constructorCalldata?: RawArgs;
 };
 
-/**
- * @deprecated deprecated due to no direct deploy, unused - can be removed
- */
-export type DeployContractPayload = {
-  contract: CompiledContract | string;
-  constructorCalldata?: RawCalldata;
-  addressSalt?: string;
-};
-
 export type DeployAccountContractPayload = {
   classHash: string;
   constructorCalldata?: RawArgs;
