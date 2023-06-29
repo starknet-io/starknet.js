@@ -6,6 +6,7 @@ import {
   AccountInvocations,
   BigNumberish,
   BlockIdentifier,
+  BlockTag,
   CairoAssembly,
   Call,
   CallContractResponse,
@@ -68,7 +69,7 @@ function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
 
 const defaultOptions = {
   network: NetworkName.SN_GOERLI2,
-  blockIdentifier: 'pending',
+  blockIdentifier: BlockTag.pending,
 };
 
 export class SequencerProvider implements ProviderInterface {
