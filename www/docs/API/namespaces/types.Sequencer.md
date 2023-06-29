@@ -29,7 +29,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:74](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L74)
+[src/types/api/sequencer.ts:75](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L75)
 
 ---
 
@@ -39,20 +39,20 @@ custom_edit_url: null
 
 #### Type declaration
 
-| Name                   | Type                                      |
-| :--------------------- | :---------------------------------------- |
-| `type`                 | `"DECLARE"`                               |
-| `sender_address`       | `string`                                  |
-| `contract_class`       | [`ContractClass`](types.md#contractclass) |
-| `signature?`           | `string`[]                                |
-| `nonce`                | [`BigNumberish`](types.md#bignumberish)   |
-| `max_fee?`             | [`BigNumberish`](types.md#bignumberish)   |
-| `version?`             | [`BigNumberish`](types.md#bignumberish)   |
-| `compiled_class_hash?` | `string`                                  |
+| Name                   | Type                                                   |
+| :--------------------- | :----------------------------------------------------- |
+| `type`                 | [`DECLARE`](../enums/types.TransactionType.md#declare) |
+| `sender_address`       | `string`                                               |
+| `contract_class`       | [`ContractClass`](types.md#contractclass)              |
+| `signature?`           | `string`[]                                             |
+| `nonce`                | [`BigNumberish`](types.md#bignumberish)                |
+| `max_fee?`             | [`BigNumberish`](types.md#bignumberish)                |
+| `version?`             | [`BigNumberish`](types.md#bignumberish)                |
+| `compiled_class_hash?` | `string`                                               |
 
 #### Defined in
 
-[src/types/api/sequencer.ts:82](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L82)
+[src/types/api/sequencer.ts:83](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L83)
 
 ---
 
@@ -62,17 +62,17 @@ custom_edit_url: null
 
 #### Type declaration
 
-| Name                    | Type                                      |
-| :---------------------- | :---------------------------------------- |
-| `type`                  | `"DEPLOY"`                                |
-| `contract_definition`   | [`ContractClass`](types.md#contractclass) |
-| `contract_address_salt` | [`BigNumberish`](types.md#bignumberish)   |
-| `constructor_calldata`  | `string`[]                                |
-| `nonce?`                | [`BigNumberish`](types.md#bignumberish)   |
+| Name                    | Type                                                 |
+| :---------------------- | :--------------------------------------------------- |
+| `type`                  | [`DEPLOY`](../enums/types.TransactionType.md#deploy) |
+| `contract_definition`   | [`ContractClass`](types.md#contractclass)            |
+| `contract_address_salt` | [`BigNumberish`](types.md#bignumberish)              |
+| `constructor_calldata`  | `string`[]                                           |
+| `nonce?`                | [`BigNumberish`](types.md#bignumberish)              |
 
 #### Defined in
 
-[src/types/api/sequencer.ts:93](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L93)
+[src/types/api/sequencer.ts:94](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L94)
 
 ---
 
@@ -82,20 +82,20 @@ custom_edit_url: null
 
 #### Type declaration
 
-| Name                    | Type                                    |
-| :---------------------- | :-------------------------------------- |
-| `type`                  | `"DEPLOY_ACCOUNT"`                      |
-| `class_hash`            | `string`                                |
-| `contract_address_salt` | [`BigNumberish`](types.md#bignumberish) |
-| `constructor_calldata`  | `string`[]                              |
-| `signature?`            | `string`[]                              |
-| `max_fee?`              | [`BigNumberish`](types.md#bignumberish) |
-| `version?`              | [`BigNumberish`](types.md#bignumberish) |
-| `nonce?`                | [`BigNumberish`](types.md#bignumberish) |
+| Name                    | Type                                                                 |
+| :---------------------- | :------------------------------------------------------------------- |
+| `type`                  | [`DEPLOY_ACCOUNT`](../enums/types.TransactionType.md#deploy_account) |
+| `class_hash`            | `string`                                                             |
+| `contract_address_salt` | [`BigNumberish`](types.md#bignumberish)                              |
+| `constructor_calldata`  | `string`[]                                                           |
+| `signature?`            | `string`[]                                                           |
+| `max_fee?`              | [`BigNumberish`](types.md#bignumberish)                              |
+| `version?`              | [`BigNumberish`](types.md#bignumberish)                              |
+| `nonce?`                | [`BigNumberish`](types.md#bignumberish)                              |
 
 #### Defined in
 
-[src/types/api/sequencer.ts:101](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L101)
+[src/types/api/sequencer.ts:102](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L102)
 
 ---
 
@@ -107,7 +107,7 @@ custom_edit_url: null
 
 | Name                | Type                                                    |
 | :------------------ | :------------------------------------------------------ |
-| `type`              | `"INVOKE_FUNCTION"`                                     |
+| `type`              | [`INVOKE`](../enums/types.TransactionType.md#invoke)    |
 | `sender_address`    | `string`                                                |
 | `signature?`        | `string`[]                                              |
 | `entry_point_type?` | [`EXTERNAL`](../enums/types.EntryPointType.md#external) |
@@ -118,7 +118,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:112](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L112)
+[src/types/api/sequencer.ts:113](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L113)
 
 ---
 
@@ -128,7 +128,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:123](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L123)
+[src/types/api/sequencer.ts:124](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L124)
 
 ---
 
@@ -147,7 +147,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:129](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L129)
+[src/types/api/sequencer.ts:130](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L130)
 
 ---
 
@@ -164,7 +164,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:136](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L136)
+[src/types/api/sequencer.ts:137](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L137)
 
 ---
 
@@ -174,7 +174,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:146](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L146)
+[src/types/api/sequencer.ts:147](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L147)
 
 ---
 
@@ -186,7 +186,7 @@ custom_edit_url: null
 
 | Name                | Type                                                            |
 | :------------------ | :-------------------------------------------------------------- |
-| `status`            | [`Status`](types.md#status)                                     |
+| `status`            | [`TransactionStatus`](../enums/types.TransactionStatus.md)      |
 | `transaction`       | [`TransactionResponse`](types.Sequencer.md#transactionresponse) |
 | `block_hash`        | `string`                                                        |
 | `block_number`      | [`BlockNumber`](types.md#blocknumber)                           |
@@ -194,7 +194,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:151](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L151)
+[src/types/api/sequencer.ts:152](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L152)
 
 ---
 
@@ -206,7 +206,7 @@ custom_edit_url: null
 
 | Name                                       | Type                                                            |
 | :----------------------------------------- | :-------------------------------------------------------------- |
-| `status`                                   | `"REJECTED"`                                                    |
+| `status`                                   | [`REJECTED`](../enums/types.TransactionStatus.md#rejected)      |
 | `transaction_failure_reason`               | { `code`: `string` ; `error_message`: `string` }                |
 | `transaction_failure_reason.code`          | `string`                                                        |
 | `transaction_failure_reason.error_message` | `string`                                                        |
@@ -214,7 +214,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:159](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L159)
+[src/types/api/sequencer.ts:160](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L160)
 
 ---
 
@@ -224,7 +224,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:168](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L168)
+[src/types/api/sequencer.ts:169](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L169)
 
 ---
 
@@ -234,7 +234,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:170](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L170)
+[src/types/api/sequencer.ts:171](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L171)
 
 ---
 
@@ -244,21 +244,21 @@ custom_edit_url: null
 
 #### Type declaration
 
-| Name                  | Type                                                |
-| :-------------------- | :-------------------------------------------------- |
-| `status`              | [`Status`](types.md#status)                         |
-| `transaction_hash`    | `string`                                            |
-| `transaction_index`   | `number`                                            |
-| `block_hash`          | `string`                                            |
-| `block_number`        | [`BlockNumber`](types.md#blocknumber)               |
-| `l2_to_l1_messages`   | `string`[]                                          |
-| `events`              | `string`[]                                          |
-| `actual_fee`          | `string`                                            |
-| `execution_resources` | [`ExecutionResources`](types.md#executionresources) |
+| Name                  | Type                                                       |
+| :-------------------- | :--------------------------------------------------------- |
+| `status`              | [`TransactionStatus`](../enums/types.TransactionStatus.md) |
+| `transaction_hash`    | `string`                                                   |
+| `transaction_index`   | `number`                                                   |
+| `block_hash`          | `string`                                                   |
+| `block_number`        | [`BlockNumber`](types.md#blocknumber)                      |
+| `l2_to_l1_messages`   | `string`[]                                                 |
+| `events`              | `string`[]                                                 |
+| `actual_fee`          | `string`                                                   |
+| `execution_resources` | [`ExecutionResources`](types.md#executionresources)        |
 
 #### Defined in
 
-[src/types/api/sequencer.ts:174](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L174)
+[src/types/api/sequencer.ts:175](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L175)
 
 ---
 
@@ -268,19 +268,19 @@ custom_edit_url: null
 
 #### Type declaration
 
-| Name                                       | Type                                             |
-| :----------------------------------------- | :----------------------------------------------- |
-| `status`                                   | `"REJECTED"`                                     |
-| `transaction_failure_reason`               | { `code`: `string` ; `error_message`: `string` } |
-| `transaction_failure_reason.code`          | `string`                                         |
-| `transaction_failure_reason.error_message` | `string`                                         |
-| `transaction_hash`                         | `string`                                         |
-| `l2_to_l1_messages`                        | `string`[]                                       |
-| `events`                                   | `string`[]                                       |
+| Name                                       | Type                                                       |
+| :----------------------------------------- | :--------------------------------------------------------- |
+| `status`                                   | [`REJECTED`](../enums/types.TransactionStatus.md#rejected) |
+| `transaction_failure_reason`               | { `code`: `string` ; `error_message`: `string` }           |
+| `transaction_failure_reason.code`          | `string`                                                   |
+| `transaction_failure_reason.error_message` | `string`                                                   |
+| `transaction_hash`                         | `string`                                                   |
+| `l2_to_l1_messages`                        | `string`[]                                                 |
+| `events`                                   | `string`[]                                                 |
 
 #### Defined in
 
-[src/types/api/sequencer.ts:186](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L186)
+[src/types/api/sequencer.ts:187](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L187)
 
 ---
 
@@ -290,23 +290,23 @@ custom_edit_url: null
 
 #### Type declaration
 
-| Name                   | Type                                                                                                                                                                                                                                                                                                                      |
-| :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `block_number`         | `number`                                                                                                                                                                                                                                                                                                                  |
-| `state_root`           | `string`                                                                                                                                                                                                                                                                                                                  |
-| `block_hash`           | `string`                                                                                                                                                                                                                                                                                                                  |
-| `transactions`         | { `[txHash: string]`: [`TransactionResponse`](types.Sequencer.md#transactionresponse); }                                                                                                                                                                                                                                  |
-| `timestamp`            | `number`                                                                                                                                                                                                                                                                                                                  |
-| `transaction_receipts` | { `[txHash: string]`: { `block_hash`: `string` ; `transaction_hash`: `string` ; `l2_to_l1_messages`: { `to_address`: `string` ; `payload`: `string`[] ; `from_address`: `string` }[] ; `block_number`: [`BlockNumber`](types.md#blocknumber) ; `status`: [`Status`](types.md#status) ; `transaction_index`: `number` }; } |
-| `parent_block_hash`    | `string`                                                                                                                                                                                                                                                                                                                  |
-| `status`               | [`Status`](types.md#status)                                                                                                                                                                                                                                                                                               |
-| `gas_price`            | `string`                                                                                                                                                                                                                                                                                                                  |
-| `sequencer_address`    | `string`                                                                                                                                                                                                                                                                                                                  |
-| `starknet_version`     | `string`                                                                                                                                                                                                                                                                                                                  |
+| Name                   | Type                                                                                                                                                                                                                                                                                                                                                     |
+| :--------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `block_number`         | `number`                                                                                                                                                                                                                                                                                                                                                 |
+| `state_root`           | `string`                                                                                                                                                                                                                                                                                                                                                 |
+| `block_hash`           | `string`                                                                                                                                                                                                                                                                                                                                                 |
+| `transactions`         | { `[txHash: string]`: [`TransactionResponse`](types.Sequencer.md#transactionresponse); }                                                                                                                                                                                                                                                                 |
+| `timestamp`            | `number`                                                                                                                                                                                                                                                                                                                                                 |
+| `transaction_receipts` | { `[txHash: string]`: { `block_hash`: `string` ; `transaction_hash`: `string` ; `l2_to_l1_messages`: { `to_address`: `string` ; `payload`: `string`[] ; `from_address`: `string` }[] ; `block_number`: [`BlockNumber`](types.md#blocknumber) ; `status`: [`TransactionStatus`](../enums/types.TransactionStatus.md) ; `transaction_index`: `number` }; } |
+| `parent_block_hash`    | `string`                                                                                                                                                                                                                                                                                                                                                 |
+| `status`               | [`BlockStatus`](../enums/types.BlockStatus.md)                                                                                                                                                                                                                                                                                                           |
+| `gas_price`            | `string`                                                                                                                                                                                                                                                                                                                                                 |
+| `sequencer_address`    | `string`                                                                                                                                                                                                                                                                                                                                                 |
+| `starknet_version`     | `string`                                                                                                                                                                                                                                                                                                                                                 |
 
 #### Defined in
 
-[src/types/api/sequencer.ts:197](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L197)
+[src/types/api/sequencer.ts:198](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L198)
 
 ---
 
@@ -316,7 +316,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:226](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L226)
+[src/types/api/sequencer.ts:227](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L227)
 
 ---
 
@@ -332,7 +332,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:242](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L242)
+[src/types/api/sequencer.ts:243](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L243)
 
 ---
 
@@ -342,7 +342,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:246](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L246)
+[src/types/api/sequencer.ts:247](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L247)
 
 ---
 
@@ -352,7 +352,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:247](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L247)
+[src/types/api/sequencer.ts:248](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L248)
 
 ---
 
@@ -362,7 +362,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:248](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L248)
+[src/types/api/sequencer.ts:249](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L249)
 
 ---
 
@@ -372,7 +372,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:249](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L249)
+[src/types/api/sequencer.ts:250](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L250)
 
 ---
 
@@ -389,7 +389,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:251](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L251)
+[src/types/api/sequencer.ts:252](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L252)
 
 ---
 
@@ -399,7 +399,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:256](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L256)
+[src/types/api/sequencer.ts:257](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L257)
 
 ---
 
@@ -411,7 +411,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:265](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L265)
+[src/types/api/sequencer.ts:266](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L266)
 
 ---
 
@@ -421,7 +421,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:268](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L268)
+[src/types/api/sequencer.ts:269](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L269)
 
 ---
 
@@ -431,7 +431,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:280](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L280)
+[src/types/api/sequencer.ts:281](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L281)
 
 ---
 
@@ -447,7 +447,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:282](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L282)
+[src/types/api/sequencer.ts:283](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L283)
 
 ---
 
@@ -457,7 +457,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:286](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L286)
+[src/types/api/sequencer.ts:287](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L287)
 
 ---
 
@@ -482,7 +482,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:288](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L288)
+[src/types/api/sequencer.ts:289](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L289)
 
 ---
 
@@ -496,7 +496,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:302](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L302)
+[src/types/api/sequencer.ts:303](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L303)
 
 ---
 
@@ -513,7 +513,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:304](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L304)
+[src/types/api/sequencer.ts:305](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L305)
 
 ---
 
@@ -527,7 +527,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:306](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L306)
+[src/types/api/sequencer.ts:307](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L307)
 
 ---
 
@@ -537,7 +537,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:308](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L308)
+[src/types/api/sequencer.ts:309](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L309)
 
 ---
 
@@ -547,7 +547,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:310](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L310)
+[src/types/api/sequencer.ts:311](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L311)
 
 ---
 
@@ -557,7 +557,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:312](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L312)
+[src/types/api/sequencer.ts:313](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L313)
 
 ---
 
@@ -567,7 +567,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:314](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L314)
+[src/types/api/sequencer.ts:315](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L315)
 
 ---
 
@@ -584,7 +584,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:316](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L316)
+[src/types/api/sequencer.ts:317](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L317)
 
 ---
 
@@ -594,7 +594,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:318](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L318)
+[src/types/api/sequencer.ts:319](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L319)
 
 ---
 
@@ -724,4 +724,4 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:320](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L320)
+[src/types/api/sequencer.ts:321](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L321)

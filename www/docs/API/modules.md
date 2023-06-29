@@ -1,6 +1,6 @@
 ---
 id: 'modules'
-title: 'Starknet.js API - v5.14.1'
+title: 'Starknet.js API - v5.15.0'
 sidebar_label: 'Exports'
 sidebar_position: 0.5
 custom_edit_url: null
@@ -245,12 +245,6 @@ Re-exports [UniversalDeployerContractPayload](namespaces/types.md#universaldeplo
 
 ---
 
-### DeployContractPayload
-
-Re-exports [DeployContractPayload](namespaces/types.md#deploycontractpayload)
-
----
-
 ### DeployAccountContractPayload
 
 Re-exports [DeployAccountContractPayload](namespaces/types.md#deployaccountcontractpayload)
@@ -329,45 +323,21 @@ Re-exports [InvocationsDetailsWithNonce](namespaces/types.md#invocationsdetailsw
 
 ---
 
-### TransactionStatus
-
-Re-exports [TransactionStatus](enums/types.TransactionStatus.md)
-
----
-
-### AccountInvocationItem
-
-Re-exports [AccountInvocationItem](namespaces/types.md#accountinvocationitem)
-
----
-
-### AccountInvocations
-
-Re-exports [AccountInvocations](namespaces/types.md#accountinvocations)
-
----
-
-### Invocations
-
-Re-exports [Invocations](namespaces/types.md#invocations)
-
----
-
-### Status
-
-Re-exports [Status](namespaces/types.md#status)
-
----
-
 ### TransactionType
 
 Re-exports [TransactionType](enums/types.TransactionType.md)
 
 ---
 
-### Tupled
+### TransactionStatus
 
-Re-exports [Tupled](namespaces/types.md#tupled)
+Re-exports [TransactionStatus](enums/types.TransactionStatus.md)
+
+---
+
+### BlockStatus
+
+Re-exports [BlockStatus](enums/types.BlockStatus.md)
 
 ---
 
@@ -389,9 +359,27 @@ Re-exports [BlockIdentifier](namespaces/types.md#blockidentifier)
 
 ---
 
-### Struct
+### AccountInvocationItem
 
-Re-exports [Struct](namespaces/types.md#struct)
+Re-exports [AccountInvocationItem](namespaces/types.md#accountinvocationitem)
+
+---
+
+### AccountInvocations
+
+Re-exports [AccountInvocations](namespaces/types.md#accountinvocations)
+
+---
+
+### Invocations
+
+Re-exports [Invocations](namespaces/types.md#invocations)
+
+---
+
+### Tupled
+
+Re-exports [Tupled](namespaces/types.md#tupled)
 
 ---
 

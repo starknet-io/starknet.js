@@ -14,8 +14,9 @@ custom_edit_url: null
 ## Enumerations
 
 - [SIMULATION_FLAG](../enums/types.SIMULATION_FLAG.md)
-- [TransactionStatus](../enums/types.TransactionStatus.md)
 - [TransactionType](../enums/types.TransactionType.md)
+- [TransactionStatus](../enums/types.TransactionStatus.md)
+- [BlockStatus](../enums/types.BlockStatus.md)
 - [EntryPointType](../enums/types.EntryPointType.md)
 
 ## Interfaces
@@ -454,28 +455,6 @@ Hexadecimal-string array
 
 ---
 
-### DeployContractPayload
-
-Ƭ **DeployContractPayload**: `Object`
-
-**`Deprecated`**
-
-deprecated due to no direct deploy, unused - can be removed
-
-#### Type declaration
-
-| Name                   | Type                                                        |
-| :--------------------- | :---------------------------------------------------------- |
-| `contract`             | [`CompiledContract`](types.md#compiledcontract) \| `string` |
-| `constructorCalldata?` | [`RawCalldata`](types.md#rawcalldata)                       |
-| `addressSalt?`         | `string`                                                    |
-
-#### Defined in
-
-[src/types/lib/index.ts:56](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L56)
-
----
-
 ### DeployAccountContractPayload
 
 Ƭ **DeployAccountContractPayload**: `Object`
@@ -491,7 +470,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:62](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L62)
+[src/types/lib/index.ts:53](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L53)
 
 ---
 
@@ -501,7 +480,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:69](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L69)
+[src/types/lib/index.ts:60](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L60)
 
 ---
 
@@ -520,7 +499,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:76](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L76)
+[src/types/lib/index.ts:67](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L67)
 
 ---
 
@@ -539,7 +518,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:83](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L83)
+[src/types/lib/index.ts:74](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L74)
 
 ---
 
@@ -549,7 +528,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:90](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L90)
+[src/types/lib/index.ts:81](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L81)
 
 ---
 
@@ -568,7 +547,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:93](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L93)
+[src/types/lib/index.ts:84](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L84)
 
 ---
 
@@ -586,7 +565,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:100](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L100)
+[src/types/lib/index.ts:91](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L91)
 
 ---
 
@@ -596,7 +575,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:106](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L106)
+[src/types/lib/index.ts:97](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L97)
 
 ---
 
@@ -606,7 +585,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:108](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L108)
+[src/types/lib/index.ts:99](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L99)
 
 ---
 
@@ -616,7 +595,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:110](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L110)
+[src/types/lib/index.ts:101](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L101)
 
 ---
 
@@ -634,7 +613,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:112](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L112)
+[src/types/lib/index.ts:103](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L103)
 
 ---
 
@@ -655,7 +634,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:121](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L121)
+[src/types/lib/index.ts:112](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L112)
 
 ---
 
@@ -665,19 +644,53 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:128](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L128)
+[src/types/lib/index.ts:119](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L119)
+
+---
+
+### BlockTag
+
+Ƭ **BlockTag**: `"pending"` \| `"latest"`
+
+#### Defined in
+
+[src/types/lib/index.ts:145](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L145)
+
+---
+
+### BlockNumber
+
+Ƭ **BlockNumber**: [`BlockTag`](types.md#blocktag) \| `null` \| `number`
+
+#### Defined in
+
+[src/types/lib/index.ts:146](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L146)
+
+---
+
+### BlockIdentifier
+
+Ƭ **BlockIdentifier**: [`BlockNumber`](types.md#blocknumber) \| [`BigNumberish`](types.md#bignumberish)
+
+hex string and BN are detected as block hashes
+decimal string and number are detected as block numbers
+null appends nothing to the request url
+
+#### Defined in
+
+[src/types/lib/index.ts:153](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L153)
 
 ---
 
 ### AccountInvocationItem
 
-Ƭ **AccountInvocationItem**: { `type`: `"DECLARE"` } & [`DeclareContractTransaction`](types.md#declarecontracttransaction) \| { `type`: `"DEPLOY_ACCOUNT"` } & [`DeployAccountContractTransaction`](types.md#deployaccountcontracttransaction) \| { `type`: `"INVOKE_FUNCTION"` } & [`Invocation`](types.md#invocation) & [`InvocationsDetailsWithNonce`](types.md#invocationsdetailswithnonce)
+Ƭ **AccountInvocationItem**: { `type`: [`DECLARE`](../enums/types.TransactionType.md#declare) } & [`DeclareContractTransaction`](types.md#declarecontracttransaction) \| { `type`: [`DEPLOY_ACCOUNT`](../enums/types.TransactionType.md#deploy_account) } & [`DeployAccountContractTransaction`](types.md#deployaccountcontracttransaction) \| { `type`: [`INVOKE`](../enums/types.TransactionType.md#invoke) } & [`Invocation`](types.md#invocation) & [`InvocationsDetailsWithNonce`](types.md#invocationsdetailswithnonce)
 
 items used by AccountInvocations
 
 #### Defined in
 
-[src/types/lib/index.ts:144](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L144)
+[src/types/lib/index.ts:158](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L158)
 
 ---
 
@@ -689,29 +702,19 @@ Complete invocations array with account details (internal type from account -> p
 
 #### Defined in
 
-[src/types/lib/index.ts:154](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L154)
+[src/types/lib/index.ts:168](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L168)
 
 ---
 
 ### Invocations
 
-Ƭ **Invocations**: ({ `type`: `"DECLARE"` } & [`OptionalPayload`](types.md#optionalpayload)<[`DeclareContractPayload`](types.md#declarecontractpayload)\> \| { `type`: `"DEPLOY"` } & [`OptionalPayload`](types.md#optionalpayload)<[`AllowArray`](types.md#allowarray)<[`UniversalDeployerContractPayload`](types.md#universaldeployercontractpayload)\>\> \| { `type`: `"DEPLOY_ACCOUNT"` } & [`OptionalPayload`](types.md#optionalpayload)<[`DeployAccountContractPayload`](types.md#deployaccountcontractpayload)\> \| { `type`: `"INVOKE_FUNCTION"` } & [`OptionalPayload`](types.md#optionalpayload)<[`AllowArray`](types.md#allowarray)<[`Call`](types.md#call)\>\>)[]
+Ƭ **Invocations**: ({ `type`: [`DECLARE`](../enums/types.TransactionType.md#declare) } & [`OptionalPayload`](types.md#optionalpayload)<[`DeclareContractPayload`](types.md#declarecontractpayload)\> \| { `type`: [`DEPLOY`](../enums/types.TransactionType.md#deploy) } & [`OptionalPayload`](types.md#optionalpayload)<[`AllowArray`](types.md#allowarray)<[`UniversalDeployerContractPayload`](types.md#universaldeployercontractpayload)\>\> \| { `type`: [`DEPLOY_ACCOUNT`](../enums/types.TransactionType.md#deploy_account) } & [`OptionalPayload`](types.md#optionalpayload)<[`DeployAccountContractPayload`](types.md#deployaccountcontractpayload)\> \| { `type`: [`INVOKE`](../enums/types.TransactionType.md#invoke) } & [`OptionalPayload`](types.md#optionalpayload)<[`AllowArray`](types.md#allowarray)<[`Call`](types.md#call)\>\>)[]
 
 Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:159](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L159)
-
----
-
-### Status
-
-Ƭ **Status**: `"NOT_RECEIVED"` \| `"RECEIVED"` \| `"PENDING"` \| `"ACCEPTED_ON_L2"` \| `"ACCEPTED_ON_L1"` \| `"REJECTED"`
-
-#### Defined in
-
-[src/types/lib/index.ts:166](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L166)
+[src/types/lib/index.ts:173](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L173)
 
 ---
 
@@ -728,57 +731,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:181](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L181)
-
----
-
-### BlockTag
-
-Ƭ **BlockTag**: `"pending"` \| `"latest"`
-
-#### Defined in
-
-[src/types/lib/index.ts:183](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L183)
-
----
-
-### BlockNumber
-
-Ƭ **BlockNumber**: [`BlockTag`](types.md#blocktag) \| `null` \| `number`
-
-#### Defined in
-
-[src/types/lib/index.ts:184](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L184)
-
----
-
-### BlockIdentifier
-
-Ƭ **BlockIdentifier**: [`BlockNumber`](types.md#blocknumber) \| [`BigNumberish`](types.md#bignumberish)
-
-#### Defined in
-
-[src/types/lib/index.ts:188](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L188)
-
----
-
-### Struct
-
-Ƭ **Struct**: `Object`
-
-#### Index signature
-
-▪ [k: `string`]: [`BigNumberish`](types.md#bignumberish)
-
-#### Type declaration
-
-| Name   | Type       |
-| :----- | :--------- |
-| `type` | `"struct"` |
-
-#### Defined in
-
-[src/types/lib/index.ts:190](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L190)
+[src/types/lib/index.ts:182](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L182)
 
 ---
 
@@ -792,7 +745,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:194](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L194)
+[src/types/lib/index.ts:184](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L184)
 
 ---
 
@@ -806,7 +759,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:197](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L197)
+[src/types/lib/index.ts:187](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L187)
 
 ---
 
@@ -823,7 +776,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:201](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L201)
+[src/types/lib/index.ts:191](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L191)
 
 ---
 
@@ -841,7 +794,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:206](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L206)
+[src/types/lib/index.ts:196](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L196)
 
 ---
 
@@ -858,7 +811,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:212](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L212)
+[src/types/lib/index.ts:202](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L202)
 
 ---
 
@@ -1262,7 +1215,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:42](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L42)
+[src/types/provider/response.ts:43](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L43)
 
 ---
 
@@ -1272,7 +1225,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:69](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L69)
+[src/types/provider/response.ts:70](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L70)
 
 ---
 
@@ -1282,7 +1235,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:103](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L103)
+[src/types/provider/response.ts:104](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L104)
 
 ---
 
@@ -1298,7 +1251,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:121](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L121)
+[src/types/provider/response.ts:122](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L122)
 
 ---
 
@@ -1308,7 +1261,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:125](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L125)
+[src/types/provider/response.ts:126](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L126)
 
 ---
 
@@ -1318,7 +1271,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:143](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L143)
+[src/types/provider/response.ts:144](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L144)
 
 ---
 
@@ -1328,7 +1281,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:145](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L145)
+[src/types/provider/response.ts:146](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L146)
 
 ---
 
@@ -1338,7 +1291,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:147](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L147)
+[src/types/provider/response.ts:148](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L148)
 
 ---
 
@@ -1348,7 +1301,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:149](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L149)
+[src/types/provider/response.ts:150](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L150)
 
 ---
 
@@ -1366,7 +1319,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:151](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L151)
+[src/types/provider/response.ts:152](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L152)
 
 ---
 
@@ -1376,7 +1329,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:157](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L157)
+[src/types/provider/response.ts:158](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L158)
 
 ---
 
@@ -1391,7 +1344,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 #### Defined in
 
-[src/types/provider/response.ts:181](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L181)
+[src/types/provider/response.ts:182](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L182)
 
 ---
 
@@ -1454,7 +1407,7 @@ standard.
 
 #### Defined in
 
-[src/types/api/sequencer.ts:17](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L17)
+[src/types/api/sequencer.ts:18](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L18)
 
 ---
 
@@ -1471,7 +1424,7 @@ standard.
 
 #### Defined in
 
-[src/types/api/sequencer.ts:26](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L26)
+[src/types/api/sequencer.ts:27](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L27)
 
 ---
 
@@ -1498,7 +1451,7 @@ standard.
 
 #### Defined in
 
-[src/types/api/sequencer.ts:31](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L31)
+[src/types/api/sequencer.ts:32](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L32)
 
 ---
 
@@ -1522,7 +1475,7 @@ standard.
 
 #### Defined in
 
-[src/types/api/sequencer.ts:46](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L46)
+[src/types/api/sequencer.ts:47](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L47)
 
 ---
 
@@ -1541,7 +1494,7 @@ standard.
 
 #### Defined in
 
-[src/types/api/sequencer.ts:59](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L59)
+[src/types/api/sequencer.ts:60](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L60)
 
 ---
 
@@ -1558,7 +1511,7 @@ standard.
 
 #### Defined in
 
-[src/types/api/sequencer.ts:66](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L66)
+[src/types/api/sequencer.ts:67](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L67)
 
 ---
 
@@ -1568,4 +1521,4 @@ standard.
 
 #### Defined in
 
-[src/types/api/sequencer.ts:71](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L71)
+[src/types/api/sequencer.ts:72](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L72)

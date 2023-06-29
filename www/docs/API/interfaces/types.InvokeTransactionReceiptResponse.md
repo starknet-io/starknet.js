@@ -25,7 +25,7 @@ Use l2_to_l1_messages
 
 #### Defined in
 
-[src/types/provider/response.ts:98](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L98)
+[src/types/provider/response.ts:99](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L99)
 
 ---
 
@@ -35,7 +35,7 @@ Use l2_to_l1_messages
 
 #### Defined in
 
-[src/types/provider/response.ts:99](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L99)
+[src/types/provider/response.ts:100](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L100)
 
 ---
 
@@ -45,7 +45,7 @@ Use l2_to_l1_messages
 
 #### Defined in
 
-[src/types/provider/response.ts:100](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L100)
+[src/types/provider/response.ts:101](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L101)
 
 ---
 
@@ -59,13 +59,13 @@ Use l2_to_l1_messages
 
 #### Defined in
 
-[src/types/provider/response.ts:74](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L74)
+[src/types/provider/response.ts:75](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L75)
 
 ---
 
 ### status
 
-• `Optional` **status**: [`Status`](../namespaces/types.md#status)
+• `Optional` **status**: `"NOT_RECEIVED"` \| `"RECEIVED"` \| `"ACCEPTED_ON_L2"` \| `"ACCEPTED_ON_L1"` \| `"REJECTED"`
 
 #### Inherited from
 
@@ -73,7 +73,7 @@ Use l2_to_l1_messages
 
 #### Defined in
 
-[src/types/provider/response.ts:75](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L75)
+[src/types/provider/response.ts:76](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L76)
 
 ---
 
@@ -87,7 +87,7 @@ Use l2_to_l1_messages
 
 #### Defined in
 
-[src/types/provider/response.ts:76](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L76)
+[src/types/provider/response.ts:77](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L77)
 
 ---
 
@@ -101,4 +101,4 @@ Use l2_to_l1_messages
 
 #### Defined in
 
-[src/types/provider/response.ts:77](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L77)
+[src/types/provider/response.ts:78](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L78)

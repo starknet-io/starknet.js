@@ -897,7 +897,7 @@ GetTransactionStatusResponse - the transaction status object
 
 #### Defined in
 
-[src/provider/sequencer.ts:527](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L527)
+[src/provider/sequencer.ts:526](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L526)
 
 ---
 
@@ -915,7 +915,7 @@ GetContractAddressesResponse - starknet smart contract addresses
 
 #### Defined in
 
-[src/provider/sequencer.ts:536](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L536)
+[src/provider/sequencer.ts:535](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L535)
 
 ---
 
@@ -939,7 +939,7 @@ TransactionTraceResponse - the transaction trace
 
 #### Defined in
 
-[src/provider/sequencer.ts:545](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L545)
+[src/provider/sequencer.ts:544](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L544)
 
 ---
 
@@ -960,7 +960,7 @@ TransactionTraceResponse - the transaction trace
 
 #### Defined in
 
-[src/provider/sequencer.ts:552](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L552)
+[src/provider/sequencer.ts:551](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L551)
 
 ---
 
@@ -988,7 +988,7 @@ WARNING!: Sequencer will process only first element from invocations array
 
 #### Defined in
 
-[src/provider/sequencer.ts:575](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L575)
+[src/provider/sequencer.ts:574](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L574)
 
 ---
 
@@ -1016,7 +1016,7 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/sequencer.ts:602](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L602)
+[src/provider/sequencer.ts:601](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L601)
 
 ---
 
@@ -1036,7 +1036,7 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/sequencer.ts:612](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L612)
+[src/provider/sequencer.ts:611](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L611)
 
 ---
 
@@ -1057,7 +1057,7 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/sequencer.ts:619](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L619)
+[src/provider/sequencer.ts:618](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L618)
 
 ---
 
@@ -1078,7 +1078,7 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/sequencer.ts:623](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L623)
+[src/provider/sequencer.ts:622](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L622)
 
 ---
 
@@ -1103,4 +1103,4 @@ AccountTransactionItem
 
 #### Defined in
 
-[src/provider/sequencer.ts:633](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L633)
+[src/provider/sequencer.ts:632](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L632)

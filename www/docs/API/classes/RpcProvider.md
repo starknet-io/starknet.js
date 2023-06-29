@@ -970,7 +970,7 @@ Number of transactions
 
 #### Defined in
 
-[src/provider/rpc.ts:493](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L493)
+[src/provider/rpc.ts:492](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L492)
 
 ---
 
@@ -988,7 +988,7 @@ Number of the latest block
 
 #### Defined in
 
-[src/provider/rpc.ts:506](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L506)
+[src/provider/rpc.ts:505](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L505)
 
 ---
 
@@ -1006,7 +1006,7 @@ Object with the stats data
 
 #### Defined in
 
-[src/provider/rpc.ts:516](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L516)
+[src/provider/rpc.ts:515](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L515)
 
 ---
 
@@ -1030,7 +1030,7 @@ events and the pagination of the events
 
 #### Defined in
 
-[src/provider/rpc.ts:526](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L526)
+[src/provider/rpc.ts:525](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L525)
 
 ---
 
@@ -1059,7 +1059,7 @@ an array of transaction trace and estimated fee
 
 #### Defined in
 
-[src/provider/rpc.ts:530](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L530)
+[src/provider/rpc.ts:529](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L529)
 
 ---
 
@@ -1080,7 +1080,7 @@ an array of transaction trace and estimated fee
 
 #### Defined in
 
-[src/provider/rpc.ts:551](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L551)
+[src/provider/rpc.ts:550](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L550)
 
 ---
 
@@ -1101,7 +1101,7 @@ an array of transaction trace and estimated fee
 
 #### Defined in
 
-[src/provider/rpc.ts:555](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L555)
+[src/provider/rpc.ts:554](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L554)
 
 ---
 
@@ -1122,4 +1122,4 @@ an array of transaction trace and estimated fee
 
 #### Defined in
 
-[src/provider/rpc.ts:559](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L559)
+[src/provider/rpc.ts:558](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/rpc.ts#L558)
