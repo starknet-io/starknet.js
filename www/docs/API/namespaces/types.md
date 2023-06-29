@@ -17,7 +17,10 @@ custom_edit_url: null
 - [TransactionType](../enums/types.TransactionType.md)
 - [TransactionStatus](../enums/types.TransactionStatus.md)
 - [BlockStatus](../enums/types.BlockStatus.md)
+- [BlockTag](../enums/types.BlockTag.md)
 - [EntryPointType](../enums/types.EntryPointType.md)
+- [ValidateType](../enums/types.ValidateType.md)
+- [Uint](../enums/types.Uint.md)
 
 ## Interfaces
 
@@ -648,23 +651,13 @@ Contain all additional details params
 
 ---
 
-### BlockTag
-
-Ƭ **BlockTag**: `"pending"` \| `"latest"`
-
-#### Defined in
-
-[src/types/lib/index.ts:145](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L145)
-
----
-
 ### BlockNumber
 
-Ƭ **BlockNumber**: [`BlockTag`](types.md#blocktag) \| `null` \| `number`
+Ƭ **BlockNumber**: [`BlockTag`](../enums/types.BlockTag.md) \| `null` \| `number`
 
 #### Defined in
 
-[src/types/lib/index.ts:146](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L146)
+[src/types/lib/index.ts:150](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L150)
 
 ---
 
@@ -678,7 +671,7 @@ null appends nothing to the request url
 
 #### Defined in
 
-[src/types/lib/index.ts:153](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L153)
+[src/types/lib/index.ts:157](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L157)
 
 ---
 
@@ -690,7 +683,7 @@ items used by AccountInvocations
 
 #### Defined in
 
-[src/types/lib/index.ts:158](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L158)
+[src/types/lib/index.ts:162](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L162)
 
 ---
 
@@ -702,7 +695,7 @@ Complete invocations array with account details (internal type from account -> p
 
 #### Defined in
 
-[src/types/lib/index.ts:168](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L168)
+[src/types/lib/index.ts:172](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L172)
 
 ---
 
@@ -714,7 +707,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:173](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L173)
+[src/types/lib/index.ts:177](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L177)
 
 ---
 
@@ -731,7 +724,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:182](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L182)
+[src/types/lib/index.ts:186](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L186)
 
 ---
 
@@ -745,7 +738,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:184](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L184)
+[src/types/lib/index.ts:188](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L188)
 
 ---
 
@@ -759,7 +752,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:187](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L187)
+[src/types/lib/index.ts:191](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L191)
 
 ---
 
@@ -776,7 +769,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:191](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L191)
+[src/types/lib/index.ts:195](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L195)
 
 ---
 
@@ -794,7 +787,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:196](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L196)
+[src/types/lib/index.ts:200](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L200)
 
 ---
 
@@ -811,7 +804,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:202](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L202)
+[src/types/lib/index.ts:206](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L206)
 
 ---
 

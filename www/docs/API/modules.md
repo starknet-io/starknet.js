@@ -343,7 +343,7 @@ Re-exports [BlockStatus](enums/types.BlockStatus.md)
 
 ### BlockTag
 
-Re-exports [BlockTag](namespaces/types.md#blocktag)
+Re-exports [BlockTag](enums/types.BlockTag.md)
 
 ---
 
@@ -849,6 +849,18 @@ Re-exports [Sequencer](namespaces/types.Sequencer.md)
 
 Re-exports [RPC](namespaces/types.RPC.md)
 
+---
+
+### ValidateType
+
+Re-exports [ValidateType](enums/types.ValidateType.md)
+
+---
+
+### Uint
+
+Re-exports [Uint](enums/types.Uint.md)
+
 ## Variables
 
 ### number
@@ -892,7 +904,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/contract/default.ts:98](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L98)
+[src/contract/default.ts:99](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L99)
 
 ---
 
@@ -912,7 +924,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/contract/default.ts:25](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L25)
+[src/contract/default.ts:26](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L26)
 
 ---
 
