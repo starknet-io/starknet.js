@@ -1,3 +1,14 @@
+# [5.15.0](https://github.com/0xs34n/starknet.js/compare/v5.14.1...v5.15.0) (2023-06-29)
+
+### Bug Fixes
+
+- remove DeployContractPayload type ([8908a90](https://github.com/0xs34n/starknet.js/commit/8908a900986244d615b91d35d61906d2dba580b4))
+- removed old Struct type ([8ec8a0d](https://github.com/0xs34n/starknet.js/commit/8ec8a0dca2e5548d6ad0d5d63d1431c84f668410))
+
+### Features
+
+- removed pending transaction status, typing update ([a76b35c](https://github.com/0xs34n/starknet.js/commit/a76b35cf5bd9eb8c0a5b9ea33d689ed53c8ff8ab))
+
 ## [5.14.1](https://github.com/0xs34n/starknet.js/compare/v5.14.0...v5.14.1) (2023-06-26)
 
 ### Bug Fixes
