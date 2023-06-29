@@ -1,3 +1,9 @@
+## [5.15.1](https://github.com/0xs34n/starknet.js/compare/v5.15.0...v5.15.1) (2023-06-29)
+
+### Bug Fixes
+
+- eradicate static strings ([597d2b5](https://github.com/0xs34n/starknet.js/commit/597d2b525709c0fa2607af70b6f8b6289fb32448))
+
 # [5.15.0](https://github.com/0xs34n/starknet.js/compare/v5.14.1...v5.15.0) (2023-06-29)
 
 ### Bug Fixes
