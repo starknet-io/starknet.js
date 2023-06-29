@@ -17,6 +17,7 @@ import {
   RawArgs,
   Result,
   StructAbi,
+  ValidateType,
 } from '../types';
 import assert from '../utils/assert';
 import { CallData, cairo } from '../utils/calldata';
@@ -225,7 +226,7 @@ export class Contract implements ContractInterface {
 
     const calldata = getCalldata(args, () => {
       if (parseRequest) {
-        this.callData.validate('CALL', method, args);
+        this.callData.validate(ValidateType.CALL, method, args);
         return this.callData.compile(method, args);
       }
       // eslint-disable-next-line no-console
@@ -262,7 +263,7 @@ export class Contract implements ContractInterface {
 
     const calldata = getCalldata(args, () => {
       if (parseRequest) {
-        this.callData.validate('INVOKE', method, args);
+        this.callData.validate(ValidateType.INVOKE, method, args);
         return this.callData.compile(method, args);
       }
       // eslint-disable-next-line no-console
@@ -301,7 +302,7 @@ export class Contract implements ContractInterface {
     assert(this.address !== null, 'contract is not connected to an address');
 
     if (!getCalldata(args, () => false)) {
-      this.callData.validate('INVOKE', method, args);
+      this.callData.validate(ValidateType.INVOKE, method, args);
     }
 
     const invocation = this.populate(method, args);

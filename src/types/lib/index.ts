@@ -142,7 +142,11 @@ export enum BlockStatus {
   REJECTED = 'REJECTED',
 }
 
-export type BlockTag = 'pending' | 'latest';
+export enum BlockTag {
+  pending = 'pending',
+  latest = 'latest',
+}
+
 export type BlockNumber = BlockTag | null | number;
 
 /**

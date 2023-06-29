@@ -1,5 +1,5 @@
 import { AccountInterface } from '../account';
-import { Abi, ArgsOrCalldataWithOptions, CompiledContract } from '../types';
+import { Abi, ArgsOrCalldataWithOptions, CompiledContract, ValidateType } from '../types';
 import assert from '../utils/assert';
 import { CallData } from '../utils/calldata';
 import { Contract, getCalldata, splitArgsAndOptions } from './default';
@@ -40,7 +40,7 @@ export class ContractFactory {
 
     const constructorCalldata = getCalldata(param, () => {
       if (options.parseRequest) {
-        this.CallData.validate('DEPLOY', 'constructor', param);
+        this.CallData.validate(ValidateType.DEPLOY, 'constructor', param);
         return this.CallData.compile('constructor', param);
       }
       // eslint-disable-next-line no-console

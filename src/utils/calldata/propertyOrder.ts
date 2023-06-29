@@ -1,4 +1,4 @@
-import { AbiEntry, AbiStructs, RawArgsObject } from '../../types';
+import { AbiEntry, AbiStructs, RawArgsObject, Uint } from '../../types';
 import {
   getArrayType,
   isCairo1Type,
@@ -80,7 +80,7 @@ export default function orderPropsByAbi(
     switch (true) {
       case typeInArray in structs:
         return myArray.map((myObj) => orderStruct(myObj, structs[typeInArray].members));
-      case typeInArray === 'core::integer::u256':
+      case typeInArray === Uint.u256:
         return myArray.map((u256) => {
           if (typeof u256 !== 'object') {
             return u256;

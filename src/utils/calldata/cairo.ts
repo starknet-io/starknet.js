@@ -1,16 +1,7 @@
-import { Abi, AbiStructs, BigNumberish, Uint256 } from '../../types';
+import { Abi, AbiStructs, BigNumberish, Uint, Uint256 } from '../../types';
 import { isBigInt, isHex, isStringWholeNumber } from '../num';
 import { encodeShortString, isShortString, isText } from '../shortString';
 import { UINT_128_MAX, isUint256 } from '../uint256';
-
-export enum Uint {
-  u8 = 'core::integer::u8',
-  u16 = 'core::integer::u16',
-  u32 = 'core::integer::u32',
-  u64 = 'core::integer::u64',
-  u128 = 'core::integer::u128',
-  u256 = 'core::integer::u256', // This one is struct
-}
 
 export const isLen = (name: string) => /_len$/.test(name);
 export const isTypeFelt = (type: string) => type === 'felt' || type === 'core::felt252';
