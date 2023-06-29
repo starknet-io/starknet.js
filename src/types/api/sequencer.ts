@@ -4,14 +4,15 @@ import {
   BigNumberish,
   BlockIdentifier,
   BlockNumber,
+  BlockStatus,
   ByteCode,
   CairoAssembly,
   CompiledContract,
   ContractClass,
   EntryPointType,
   RawCalldata,
-  Status,
   TransactionStatus,
+  TransactionType,
 } from '../lib';
 
 export type GetTransactionStatusResponse = {
@@ -80,7 +81,7 @@ export namespace Sequencer {
   };
 
   export type DeclareTransaction = {
-    type: 'DECLARE';
+    type: TransactionType.DECLARE;
     sender_address: string;
     contract_class: ContractClass;
     signature?: string[];
@@ -91,7 +92,7 @@ export namespace Sequencer {
   };
 
   export type DeployTransaction = {
-    type: 'DEPLOY';
+    type: TransactionType.DEPLOY;
     contract_definition: ContractClass;
     contract_address_salt: BigNumberish;
     constructor_calldata: string[];
@@ -99,7 +100,7 @@ export namespace Sequencer {
   };
 
   export type DeployAccountTransaction = {
-    type: 'DEPLOY_ACCOUNT';
+    type: TransactionType.DEPLOY_ACCOUNT;
     class_hash: string;
     contract_address_salt: BigNumberish;
     constructor_calldata: string[];
@@ -110,7 +111,7 @@ export namespace Sequencer {
   };
 
   export type InvokeFunctionTransaction = {
-    type: 'INVOKE_FUNCTION';
+    type: TransactionType.INVOKE;
     sender_address: string;
     signature?: string[];
     entry_point_type?: EntryPointType.EXTERNAL; // TODO: check this
@@ -149,7 +150,7 @@ export namespace Sequencer {
     | InvokeFunctionTransactionResponse;
 
   export type SuccessfulTransactionResponse = {
-    status: Status;
+    status: TransactionStatus;
     transaction: TransactionResponse;
     block_hash: string;
     block_number: BlockNumber;
@@ -157,7 +158,7 @@ export namespace Sequencer {
   };
 
   export type FailedTransactionResponse = {
-    status: 'REJECTED';
+    status: TransactionStatus.REJECTED;
     transaction_failure_reason: {
       code: string;
       error_message: string;
@@ -172,7 +173,7 @@ export namespace Sequencer {
     | FailedTransactionReceiptResponse;
 
   export type SuccessfulTransactionReceiptResponse = {
-    status: Status;
+    status: TransactionStatus;
     transaction_hash: string;
     transaction_index: number;
     block_hash: string;
@@ -184,7 +185,7 @@ export namespace Sequencer {
   };
 
   export type FailedTransactionReceiptResponse = {
-    status: 'REJECTED';
+    status: TransactionStatus.REJECTED;
     transaction_failure_reason: {
       code: string;
       error_message: string;
@@ -212,12 +213,12 @@ export namespace Sequencer {
           from_address: string;
         }[];
         block_number: BlockNumber;
-        status: Status;
+        status: TransactionStatus;
         transaction_index: number;
       };
     };
     parent_block_hash: string;
-    status: Status;
+    status: BlockStatus;
     gas_price: string;
     sequencer_address: string;
     starknet_version: string;

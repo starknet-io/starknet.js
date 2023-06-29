@@ -443,7 +443,6 @@ export class RpcProvider implements ProviderInterface {
     const successStates = options?.successStates ?? [
       TransactionStatus.ACCEPTED_ON_L1,
       TransactionStatus.ACCEPTED_ON_L2,
-      TransactionStatus.PENDING,
     ];
 
     while (!onchain) {
@@ -454,7 +453,7 @@ export class RpcProvider implements ProviderInterface {
         txReceipt = await this.getTransactionReceipt(txHash);
 
         if (!('status' in txReceipt)) {
-          const error = new Error('pending transaction');
+          const error = new Error('transaction status');
           throw error;
         }
 
