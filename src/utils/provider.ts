@@ -1,4 +1,10 @@
-import { CompiledContract, ContractClass, SierraContractClass } from '../types';
+import {
+  CompiledContract,
+  CompiledSierra,
+  ContractClass,
+  LegacyContractClass,
+  SierraContractClass,
+} from '../types';
 import { isSierra } from './contract';
 import { formatSpaces } from './hash';
 import { parse, stringify } from './json';
@@ -10,7 +16,7 @@ export function wait(delay: number) {
   });
 }
 
-export function createSierraContractClass(contract: SierraContractClass): SierraContractClass {
+export function createSierraContractClass(contract: CompiledSierra): SierraContractClass {
   const result = { ...contract } as any;
   delete result.sierra_program_debug_info;
   result.abi = formatSpaces(stringify(contract.abi));
@@ -27,10 +33,9 @@ export function parseContract(contract: CompiledContract | string): ContractClas
   if (!isSierra(contract)) {
     return {
       ...parsedContract,
-      // TODO: Why do we gzip program object?
       ...('program' in parsedContract && { program: compressProgram(parsedContract.program) }),
-    } as ContractClass;
+    } as LegacyContractClass;
   }
 
-  return createSierraContractClass(parsedContract as SierraContractClass);
+  return createSierraContractClass(parsedContract as CompiledSierra);
 }

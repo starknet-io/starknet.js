@@ -15,23 +15,13 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:130](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L130)
+[src/types/lib/index.ts:131](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L131)
 
 ---
 
 ### RECEIVED
 
 • **RECEIVED** = `"RECEIVED"`
-
-#### Defined in
-
-[src/types/lib/index.ts:131](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L131)
-
----
-
-### PENDING
-
-• **PENDING** = `"PENDING"`
 
 #### Defined in
 

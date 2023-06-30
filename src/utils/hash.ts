@@ -29,7 +29,20 @@ export * from './selector'; // Preserve legacy export structure
 
 export const transactionVersion = 1n;
 export const transactionVersion_2 = 2n;
+// TODO: check do we need to use feeTransactionVersion at all for feeEstimation ?
 export const feeTransactionVersion = 2n ** 128n + transactionVersion;
+export const feeTransactionVersion_2 = 2n ** 128n + transactionVersion_2;
+
+/**
+ * Return versions based on version type, default transaction versions
+ * @param versionType 'fee' | 'transaction'
+ * @returns versions { v1: bigint; v2: bigint; }
+ */
+export function getVersionsByType(versionType?: 'fee' | 'transaction') {
+  return versionType === 'fee'
+    ? { v1: feeTransactionVersion, v2: feeTransactionVersion_2 }
+    : { v1: transactionVersion, v2: transactionVersion_2 };
+}
 
 export function computeHashOnElements(data: BigNumberish[]): string {
   return [...data, data.length]
@@ -178,22 +191,23 @@ function nullSkipReplacer(key: string, value: any) {
   return value === null ? undefined : value;
 }
 
+// about 10x to 100x faster using array to build string
 export function formatSpaces(json: string) {
   let insideQuotes = false;
-  let newString = '';
+  const newString = [];
   // eslint-disable-next-line no-restricted-syntax
   for (const char of json) {
-    if (char === '"' && newString.endsWith('\\') === false) {
+    if (char === '"' && (newString.length > 0 && newString.slice(-1)[0] === '\\') === false) {
       insideQuotes = !insideQuotes;
     }
     if (insideQuotes) {
-      newString += char;
+      newString.push(char);
     } else {
       // eslint-disable-next-line no-nested-ternary
-      newString += char === ':' ? ': ' : char === ',' ? ', ' : char;
+      newString.push(char === ':' ? ': ' : char === ',' ? ', ' : char);
     }
   }
-  return newString;
+  return newString.join('');
 }
 
 export default function computeHintedClassHash(compiledContract: LegacyCompiledContract) {

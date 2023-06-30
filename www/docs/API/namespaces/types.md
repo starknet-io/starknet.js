@@ -13,16 +13,20 @@ custom_edit_url: null
 
 ## Enumerations
 
-- [TransactionStatus](../enums/types.TransactionStatus.md)
+- [SIMULATION_FLAG](../enums/types.SIMULATION_FLAG.md)
 - [TransactionType](../enums/types.TransactionType.md)
+- [TransactionStatus](../enums/types.TransactionStatus.md)
+- [BlockStatus](../enums/types.BlockStatus.md)
+- [BlockTag](../enums/types.BlockTag.md)
 - [EntryPointType](../enums/types.EntryPointType.md)
+- [ValidateType](../enums/types.ValidateType.md)
+- [Uint](../enums/types.Uint.md)
 
 ## Interfaces
 
 - [EstimateFee](../interfaces/types.EstimateFee.md)
 - [EstimateFeeDetails](../interfaces/types.EstimateFeeDetails.md)
 - [DeployContractResponse](../interfaces/types.DeployContractResponse.md)
-- [TransactionSimulation](../interfaces/types.TransactionSimulation.md)
 - [Uint256](../interfaces/types.Uint256.md)
 - [CallStruct](../interfaces/types.CallStruct.md)
 - [Program](../interfaces/types.Program.md)
@@ -41,7 +45,6 @@ custom_edit_url: null
 - [EstimateFeeResponse](../interfaces/types.EstimateFeeResponse.md)
 - [InvokeFunctionResponse](../interfaces/types.InvokeFunctionResponse.md)
 - [DeclareContractResponse](../interfaces/types.DeclareContractResponse.md)
-- [TransactionSimulationResponse](../interfaces/types.TransactionSimulationResponse.md)
 - [StateUpdateResponse](../interfaces/types.StateUpdateResponse.md)
 - [InvocationsSignerDetails](../interfaces/types.InvocationsSignerDetails.md)
 - [DeclareSignerDetails](../interfaces/types.DeclareSignerDetails.md)
@@ -56,7 +59,25 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/account.ts:12](https://github.com/0xs34n/starknet.js/blob/develop/src/types/account.ts#L12)
+[src/types/account.ts:8](https://github.com/0xs34n/starknet.js/blob/develop/src/types/account.ts#L8)
+
+---
+
+### AccountInvocationsFactoryDetails
+
+Ƭ **AccountInvocationsFactoryDetails**: `Object`
+
+#### Type declaration
+
+| Name               | Type                                          |
+| :----------------- | :-------------------------------------------- |
+| `versions`         | `bigint`[]                                    |
+| `nonce?`           | [`BigNumberish`](types.md#bignumberish)       |
+| `blockIdentifier?` | [`BlockIdentifier`](types.md#blockidentifier) |
+
+#### Defined in
+
+[src/types/account.ts:10](https://github.com/0xs34n/starknet.js/blob/develop/src/types/account.ts#L10)
 
 ---
 
@@ -73,7 +94,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/account.ts:25](https://github.com/0xs34n/starknet.js/blob/develop/src/types/account.ts#L25)
+[src/types/account.ts:27](https://github.com/0xs34n/starknet.js/blob/develop/src/types/account.ts#L27)
 
 ---
 
@@ -97,7 +118,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/account.ts:30](https://github.com/0xs34n/starknet.js/blob/develop/src/types/account.ts#L30)
+[src/types/account.ts:32](https://github.com/0xs34n/starknet.js/blob/develop/src/types/account.ts#L32)
 
 ---
 
@@ -114,7 +135,26 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/account.ts:42](https://github.com/0xs34n/starknet.js/blob/develop/src/types/account.ts#L42)
+[src/types/account.ts:44](https://github.com/0xs34n/starknet.js/blob/develop/src/types/account.ts#L44)
+
+---
+
+### SimulateTransactionDetails
+
+Ƭ **SimulateTransactionDetails**: `Object`
+
+#### Type declaration
+
+| Name               | Type                                          |
+| :----------------- | :-------------------------------------------- |
+| `nonce?`           | [`BigNumberish`](types.md#bignumberish)       |
+| `blockIdentifier?` | [`BlockIdentifier`](types.md#blockidentifier) |
+| `skipValidate?`    | `boolean`                                     |
+| `skipExecute?`     | `boolean`                                     |
+
+#### Defined in
+
+[src/types/account.ts:51](https://github.com/0xs34n/starknet.js/blob/develop/src/types/account.ts#L51)
 
 ---
 
@@ -339,13 +379,29 @@ Hexadecimal-string array
 
 ---
 
+### OptionalPayload
+
+Ƭ **OptionalPayload**<`T`\>: { `payload`: `T` } \| `T`
+
+#### Type parameters
+
+| Name |
+| :--- |
+| `T`  |
+
+#### Defined in
+
+[src/types/lib/index.ts:34](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L34)
+
+---
+
 ### RawArgs
 
 Ƭ **RawArgs**: [`RawArgsObject`](types.md#rawargsobject) \| [`RawArgsArray`](types.md#rawargsarray)
 
 #### Defined in
 
-[src/types/lib/index.ts:34](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L34)
+[src/types/lib/index.ts:36](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L36)
 
 ---
 
@@ -359,7 +415,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:36](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L36)
+[src/types/lib/index.ts:38](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L38)
 
 ---
 
@@ -369,7 +425,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:40](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L40)
+[src/types/lib/index.ts:42](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L42)
 
 ---
 
@@ -379,7 +435,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:42](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L42)
+[src/types/lib/index.ts:44](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L44)
 
 ---
 
@@ -398,29 +454,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:44](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L44)
-
----
-
-### DeployContractPayload
-
-Ƭ **DeployContractPayload**: `Object`
-
-**`Deprecated`**
-
-deprecated due to no direct deploy, unused - can be removed
-
-#### Type declaration
-
-| Name                   | Type                                                        |
-| :--------------------- | :---------------------------------------------------------- |
-| `contract`             | [`CompiledContract`](types.md#compiledcontract) \| `string` |
-| `constructorCalldata?` | [`RawCalldata`](types.md#rawcalldata)                       |
-| `addressSalt?`         | `string`                                                    |
-
-#### Defined in
-
-[src/types/lib/index.ts:54](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L54)
+[src/types/lib/index.ts:46](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L46)
 
 ---
 
@@ -439,7 +473,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:60](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L60)
+[src/types/lib/index.ts:53](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L53)
 
 ---
 
@@ -449,7 +483,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:67](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L67)
+[src/types/lib/index.ts:60](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L60)
 
 ---
 
@@ -468,7 +502,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:74](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L74)
+[src/types/lib/index.ts:67](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L67)
 
 ---
 
@@ -487,7 +521,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:81](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L81)
+[src/types/lib/index.ts:74](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L74)
 
 ---
 
@@ -497,7 +531,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:88](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L88)
+[src/types/lib/index.ts:81](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L81)
 
 ---
 
@@ -509,14 +543,14 @@ deprecated due to no direct deploy, unused - can be removed
 
 | Name                 | Type                                      |
 | :------------------- | :---------------------------------------- |
-| `contractDefinition` | [`ContractClass`](types.md#contractclass) |
+| `contract`           | [`ContractClass`](types.md#contractclass) |
 | `senderAddress`      | `string`                                  |
 | `signature?`         | [`Signature`](types.md#signature)         |
 | `compiledClassHash?` | `string`                                  |
 
 #### Defined in
 
-[src/types/lib/index.ts:91](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L91)
+[src/types/lib/index.ts:84](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L84)
 
 ---
 
@@ -530,10 +564,11 @@ deprecated due to no direct deploy, unused - can be removed
 | :---------------- | :---------------------------- |
 | `contractAddress` | `string`                      |
 | `calldata?`       | [`RawArgs`](types.md#rawargs) |
+| `entrypoint?`     | `string`                      |
 
 #### Defined in
 
-[src/types/lib/index.ts:98](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L98)
+[src/types/lib/index.ts:91](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L91)
 
 ---
 
@@ -543,7 +578,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:103](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L103)
+[src/types/lib/index.ts:97](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L97)
 
 ---
 
@@ -553,7 +588,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:105](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L105)
+[src/types/lib/index.ts:99](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L99)
 
 ---
 
@@ -563,7 +598,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:107](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L107)
+[src/types/lib/index.ts:101](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L101)
 
 ---
 
@@ -581,7 +616,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:109](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L109)
+[src/types/lib/index.ts:103](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L103)
 
 ---
 
@@ -602,7 +637,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:118](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L118)
+[src/types/lib/index.ts:112](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L112)
 
 ---
 
@@ -612,37 +647,67 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:125](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L125)
+[src/types/lib/index.ts:119](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L119)
 
 ---
 
-### TransactionBulk
+### BlockNumber
 
-Ƭ **TransactionBulk**: ({ `type`: `"DECLARE"` } & { `payload`: [`DeclareContractPayload`](types.md#declarecontractpayload) } \| { `type`: `"DEPLOY"` } & { `payload`: [`UniversalDeployerContractPayload`](types.md#universaldeployercontractpayload) \| [`UniversalDeployerContractPayload`](types.md#universaldeployercontractpayload)[] } \| { `type`: `"DEPLOY_ACCOUNT"` } & { `payload`: [`DeployAccountContractPayload`](types.md#deployaccountcontractpayload) } \| { `type`: `"INVOKE_FUNCTION"` } & { `payload`: [`AllowArray`](types.md#allowarray)<[`Call`](types.md#call)\> })[]
+Ƭ **BlockNumber**: [`BlockTag`](../enums/types.BlockTag.md) \| `null` \| `number`
 
 #### Defined in
 
-[src/types/lib/index.ts:137](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L137)
+[src/types/lib/index.ts:150](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L150)
 
 ---
 
-### InvocationBulk
+### BlockIdentifier
 
-Ƭ **InvocationBulk**: { `type`: `"DECLARE"` } & [`DeclareContractTransaction`](types.md#declarecontracttransaction) \| { `type`: `"DEPLOY_ACCOUNT"` } & [`DeployAccountContractTransaction`](types.md#deployaccountcontracttransaction) \| { `type`: `"INVOKE_FUNCTION"` } & [`Invocation`](types.md#invocation) & [`InvocationsDetailsWithNonce`](types.md#invocationsdetailswithnonce) & { `blockIdentifier`: [`BlockNumber`](types.md#blocknumber) \| [`BigNumberish`](types.md#bignumberish) }[]
+Ƭ **BlockIdentifier**: [`BlockNumber`](types.md#blocknumber) \| [`BigNumberish`](types.md#bignumberish)
+
+hex string and BN are detected as block hashes
+decimal string and number are detected as block numbers
+null appends nothing to the request url
 
 #### Defined in
 
-[src/types/lib/index.ts:146](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L146)
+[src/types/lib/index.ts:157](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L157)
 
 ---
 
-### Status
+### AccountInvocationItem
 
-Ƭ **Status**: `"NOT_RECEIVED"` \| `"RECEIVED"` \| `"PENDING"` \| `"ACCEPTED_ON_L2"` \| `"ACCEPTED_ON_L1"` \| `"REJECTED"`
+Ƭ **AccountInvocationItem**: { `type`: [`DECLARE`](../enums/types.TransactionType.md#declare) } & [`DeclareContractTransaction`](types.md#declarecontracttransaction) \| { `type`: [`DEPLOY_ACCOUNT`](../enums/types.TransactionType.md#deploy_account) } & [`DeployAccountContractTransaction`](types.md#deployaccountcontracttransaction) \| { `type`: [`INVOKE`](../enums/types.TransactionType.md#invoke) } & [`Invocation`](types.md#invocation) & [`InvocationsDetailsWithNonce`](types.md#invocationsdetailswithnonce)
+
+items used by AccountInvocations
 
 #### Defined in
 
-[src/types/lib/index.ts:155](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L155)
+[src/types/lib/index.ts:162](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L162)
+
+---
+
+### AccountInvocations
+
+Ƭ **AccountInvocations**: [`AccountInvocationItem`](types.md#accountinvocationitem)[]
+
+Complete invocations array with account details (internal type from account -> provider)
+
+#### Defined in
+
+[src/types/lib/index.ts:172](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L172)
+
+---
+
+### Invocations
+
+Ƭ **Invocations**: ({ `type`: [`DECLARE`](../enums/types.TransactionType.md#declare) } & [`OptionalPayload`](types.md#optionalpayload)<[`DeclareContractPayload`](types.md#declarecontractpayload)\> \| { `type`: [`DEPLOY`](../enums/types.TransactionType.md#deploy) } & [`OptionalPayload`](types.md#optionalpayload)<[`AllowArray`](types.md#allowarray)<[`UniversalDeployerContractPayload`](types.md#universaldeployercontractpayload)\>\> \| { `type`: [`DEPLOY_ACCOUNT`](../enums/types.TransactionType.md#deploy_account) } & [`OptionalPayload`](types.md#optionalpayload)<[`DeployAccountContractPayload`](types.md#deployaccountcontractpayload)\> \| { `type`: [`INVOKE`](../enums/types.TransactionType.md#invoke) } & [`OptionalPayload`](types.md#optionalpayload)<[`AllowArray`](types.md#allowarray)<[`Call`](types.md#call)\>\>)[]
+
+Invocations array user provide to bulk method (simulate)
+
+#### Defined in
+
+[src/types/lib/index.ts:177](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L177)
 
 ---
 
@@ -659,57 +724,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:170](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L170)
-
----
-
-### BlockTag
-
-Ƭ **BlockTag**: `"pending"` \| `"latest"`
-
-#### Defined in
-
-[src/types/lib/index.ts:172](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L172)
-
----
-
-### BlockNumber
-
-Ƭ **BlockNumber**: [`BlockTag`](types.md#blocktag) \| `null` \| `number`
-
-#### Defined in
-
-[src/types/lib/index.ts:173](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L173)
-
----
-
-### BlockIdentifier
-
-Ƭ **BlockIdentifier**: [`BlockNumber`](types.md#blocknumber) \| [`BigNumberish`](types.md#bignumberish)
-
-#### Defined in
-
-[src/types/lib/index.ts:177](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L177)
-
----
-
-### Struct
-
-Ƭ **Struct**: `Object`
-
-#### Index signature
-
-▪ [k: `string`]: [`BigNumberish`](types.md#bignumberish)
-
-#### Type declaration
-
-| Name   | Type       |
-| :----- | :--------- |
-| `type` | `"struct"` |
-
-#### Defined in
-
-[src/types/lib/index.ts:179](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L179)
+[src/types/lib/index.ts:186](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L186)
 
 ---
 
@@ -723,7 +738,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:183](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L183)
+[src/types/lib/index.ts:188](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L188)
 
 ---
 
@@ -737,7 +752,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:186](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L186)
+[src/types/lib/index.ts:191](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L191)
 
 ---
 
@@ -754,7 +769,42 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:190](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L190)
+[src/types/lib/index.ts:195](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L195)
+
+---
+
+### getSimulateTransactionOptions
+
+Ƭ **getSimulateTransactionOptions**: `Object`
+
+#### Type declaration
+
+| Name               | Type                                          |
+| :----------------- | :-------------------------------------------- |
+| `blockIdentifier?` | [`BlockIdentifier`](types.md#blockidentifier) |
+| `skipValidate?`    | `boolean`                                     |
+| `skipExecute?`     | `boolean`                                     |
+
+#### Defined in
+
+[src/types/lib/index.ts:200](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L200)
+
+---
+
+### getEstimateFeeBulkOptions
+
+Ƭ **getEstimateFeeBulkOptions**: `Object`
+
+#### Type declaration
+
+| Name               | Type                                          |
+| :----------------- | :-------------------------------------------- |
+| `blockIdentifier?` | [`BlockIdentifier`](types.md#blockidentifier) |
+| `skipValidate?`    | `boolean`                                     |
+
+#### Defined in
+
+[src/types/lib/index.ts:206](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L206)
 
 ---
 
@@ -762,9 +812,12 @@ Contain all additional details params
 
 Ƭ **ContractClass**: [`LegacyContractClass`](types.md#legacycontractclass) \| [`SierraContractClass`](types.md#sierracontractclass)
 
+format produced after compressing compiled contract
+CompressedCompiledContract
+
 #### Defined in
 
-[src/types/lib/contract/index.ts:5](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/index.ts#L5)
+[src/types/lib/contract/index.ts:9](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/index.ts#L9)
 
 ---
 
@@ -772,9 +825,11 @@ Contain all additional details params
 
 Ƭ **CompiledContract**: [`LegacyCompiledContract`](types.md#legacycompiledcontract) \| [`CompiledSierra`](types.md#compiledsierra)
 
+format produced after compile .cairo to .json
+
 #### Defined in
 
-[src/types/lib/contract/index.ts:6](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/index.ts#L6)
+[src/types/lib/contract/index.ts:14](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/index.ts#L14)
 
 ---
 
@@ -782,9 +837,11 @@ Contain all additional details params
 
 Ƭ **CairoContract**: [`ContractClass`](types.md#contractclass) \| [`CompiledContract`](types.md#compiledcontract)
 
+Compressed or decompressed Cairo0 or Cairo1 Contract
+
 #### Defined in
 
-[src/types/lib/contract/index.ts:7](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/index.ts#L7)
+[src/types/lib/contract/index.ts:19](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/index.ts#L19)
 
 ---
 
@@ -875,7 +932,7 @@ ABI
 
 Ƭ **LegacyContractClass**: `Object`
 
-LEGACY CONTRACT
+format produced after compressing 'program' property
 
 #### Type declaration
 
@@ -887,7 +944,7 @@ LEGACY CONTRACT
 
 #### Defined in
 
-[src/types/lib/contract/legacy.ts:4](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/legacy.ts#L4)
+[src/types/lib/contract/legacy.ts:7](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/legacy.ts#L7)
 
 ---
 
@@ -895,9 +952,11 @@ LEGACY CONTRACT
 
 Ƭ **LegacyCompiledContract**: `Omit`<[`LegacyContractClass`](types.md#legacycontractclass), `"program"`\> & { `program`: [`Program`](../interfaces/types.Program.md) }
 
+format produced after compile .cairo to .json
+
 #### Defined in
 
-[src/types/lib/contract/legacy.ts:10](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/legacy.ts#L10)
+[src/types/lib/contract/legacy.ts:16](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/legacy.ts#L16)
 
 ---
 
@@ -909,7 +968,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/legacy.ts:15](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/legacy.ts#L15)
+[src/types/lib/contract/legacy.ts:21](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/legacy.ts#L21)
 
 ---
 
@@ -919,7 +978,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/legacy.ts:16](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/legacy.ts#L16)
+[src/types/lib/contract/legacy.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/legacy.ts#L22)
 
 ---
 
@@ -937,7 +996,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/legacy.ts:18](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/legacy.ts#L18)
+[src/types/lib/contract/legacy.ts:24](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/legacy.ts#L24)
 
 ---
 
@@ -955,7 +1014,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/legacy.ts:24](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/legacy.ts#L24)
+[src/types/lib/contract/legacy.ts:30](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/legacy.ts#L30)
 
 ---
 
@@ -982,35 +1041,39 @@ SYSTEM TYPES
 
 ---
 
-### SierraContractClass
+### CompiledSierra
 
-Ƭ **SierraContractClass**: `Object`
+Ƭ **CompiledSierra**: `Object`
+
+format produced after starknet-compile .cairo to .json
+sierra_program is hex array
 
 #### Type declaration
 
-| Name                        | Type                                                          |
-| :-------------------------- | :------------------------------------------------------------ |
-| `sierra_program`            | [`ByteCode`](types.md#bytecode)                               |
-| `sierra_program_debug_info` | [`SierraProgramDebugInfo`](types.md#sierraprogramdebuginfo)   |
-| `contract_class_version`    | `string`                                                      |
-| `entry_points_by_type`      | [`SierraEntryPointsByType`](types.md#sierraentrypointsbytype) |
-| `abi`                       | [`Abi`](types.md#abi)                                         |
+| Name                         | Type                                                          |
+| :--------------------------- | :------------------------------------------------------------ |
+| `sierra_program`             | [`ByteCode`](types.md#bytecode)                               |
+| `sierra_program_debug_info?` | [`SierraProgramDebugInfo`](types.md#sierraprogramdebuginfo)   |
+| `contract_class_version`     | `string`                                                      |
+| `entry_points_by_type`       | [`SierraEntryPointsByType`](types.md#sierraentrypointsbytype) |
+| `abi`                        | [`Abi`](types.md#abi)                                         |
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:14](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L14)
+[src/types/lib/contract/sierra.ts:19](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L19)
 
 ---
 
-### CompiledSierra
+### SierraContractClass
 
-Ƭ **CompiledSierra**: [`SierraContractClass`](types.md#sierracontractclass)
+Ƭ **SierraContractClass**: `Omit`<[`CompiledSierra`](types.md#compiledsierra), `"abi"` \| `"sierra_program_debug_info"`\> & { `sierra_program`: `string` ; `abi`: `string` }
 
-COMPILED CONTRACT
+format produced after compressing 'sierra_program', stringifies 'abi' property and omit sierra_program_debug_info
+CompressedCompiledSierra
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:23](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L23)
+[src/types/lib/contract/sierra.ts:31](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L31)
 
 ---
 
@@ -1020,7 +1083,7 @@ COMPILED CONTRACT
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:24](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L24)
+[src/types/lib/contract/sierra.ts:35](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L35)
 
 ---
 
@@ -1032,7 +1095,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:27](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L27)
+[src/types/lib/contract/sierra.ts:38](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L38)
 
 ---
 
@@ -1042,7 +1105,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:28](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L28)
+[src/types/lib/contract/sierra.ts:39](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L39)
 
 ---
 
@@ -1060,7 +1123,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:30](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L30)
+[src/types/lib/contract/sierra.ts:41](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L41)
 
 ---
 
@@ -1078,7 +1141,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:36](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L36)
+[src/types/lib/contract/sierra.ts:47](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L47)
 
 ---
 
@@ -1095,7 +1158,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:42](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L42)
+[src/types/lib/contract/sierra.ts:53](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/sierra.ts#L53)
 
 ---
 
@@ -1145,7 +1208,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:40](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L40)
+[src/types/provider/response.ts:43](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L43)
 
 ---
 
@@ -1155,7 +1218,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:67](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L67)
+[src/types/provider/response.ts:70](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L70)
 
 ---
 
@@ -1165,7 +1228,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:101](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L101)
+[src/types/provider/response.ts:104](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L104)
 
 ---
 
@@ -1181,7 +1244,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:119](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L119)
+[src/types/provider/response.ts:122](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L122)
 
 ---
 
@@ -1191,7 +1254,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:123](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L123)
+[src/types/provider/response.ts:126](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L126)
 
 ---
 
@@ -1201,7 +1264,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:141](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L141)
+[src/types/provider/response.ts:144](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L144)
 
 ---
 
@@ -1211,7 +1274,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:143](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L143)
+[src/types/provider/response.ts:146](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L146)
 
 ---
 
@@ -1221,7 +1284,60 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:145](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L145)
+[src/types/provider/response.ts:148](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L148)
+
+---
+
+### SimulationFlags
+
+Ƭ **SimulationFlags**: [`SimulationFlags`](types.RPC.md#simulationflags)
+
+#### Defined in
+
+[src/types/provider/response.ts:150](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L150)
+
+---
+
+### SimulatedTransaction
+
+Ƭ **SimulatedTransaction**: `Object`
+
+#### Type declaration
+
+| Name                | Type                                                                                                                         |
+| :------------------ | :--------------------------------------------------------------------------------------------------------------------------- |
+| `transaction_trace` | [`Trace`](types.RPC.md#trace) \| [`TransactionTraceResponse`](types.Sequencer.md#transactiontraceresponse)                   |
+| `fee_estimation`    | [`EstimateFeeResponse`](types.RPC.md#estimatefeeresponse) \| [`EstimateFeeResponse`](types.Sequencer.md#estimatefeeresponse) |
+| `suggestedMaxFee?`  | `string` \| `bigint`                                                                                                         |
+
+#### Defined in
+
+[src/types/provider/response.ts:152](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L152)
+
+---
+
+### SimulateTransactionResponse
+
+Ƭ **SimulateTransactionResponse**: [`SimulatedTransaction`](types.md#simulatedtransaction)[]
+
+#### Defined in
+
+[src/types/provider/response.ts:158](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L158)
+
+---
+
+### ContractClassResponse
+
+Ƭ **ContractClassResponse**: [`LegacyContractClass`](types.md#legacycontractclass) \| `Omit`<[`CompiledSierra`](types.md#compiledsierra), `"sierra_program_debug_info"`\>
+
+Standardized type
+Cairo0 program compressed and Cairo1 sierra_program decompressed
+abi Abi
+CompiledSierra without '.sierra_program_debug_info'
+
+#### Defined in
+
+[src/types/provider/response.ts:182](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L182)
 
 ---
 
@@ -1284,7 +1400,7 @@ standard.
 
 #### Defined in
 
-[src/types/api/sequencer.ts:17](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L17)
+[src/types/api/sequencer.ts:18](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L18)
 
 ---
 
@@ -1301,7 +1417,7 @@ standard.
 
 #### Defined in
 
-[src/types/api/sequencer.ts:26](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L26)
+[src/types/api/sequencer.ts:27](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L27)
 
 ---
 
@@ -1328,7 +1444,7 @@ standard.
 
 #### Defined in
 
-[src/types/api/sequencer.ts:31](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L31)
+[src/types/api/sequencer.ts:32](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L32)
 
 ---
 
@@ -1352,26 +1468,7 @@ standard.
 
 #### Defined in
 
-[src/types/api/sequencer.ts:46](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L46)
-
----
-
-### TransactionTraceResponse
-
-Ƭ **TransactionTraceResponse**: `Object`
-
-#### Type declaration
-
-| Name                       | Type                                                |
-| :------------------------- | :-------------------------------------------------- |
-| `validate_invocation?`     | [`FunctionInvocation`](types.md#functioninvocation) |
-| `function_invocation?`     | [`FunctionInvocation`](types.md#functioninvocation) |
-| `fee_transfer_invocation?` | [`FunctionInvocation`](types.md#functioninvocation) |
-| `signature`                | `string`[]                                          |
-
-#### Defined in
-
-[src/types/api/sequencer.ts:59](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L59)
+[src/types/api/sequencer.ts:47](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L47)
 
 ---
 
@@ -1390,7 +1487,7 @@ standard.
 
 #### Defined in
 
-[src/types/api/sequencer.ts:66](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L66)
+[src/types/api/sequencer.ts:60](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L60)
 
 ---
 
@@ -1407,7 +1504,7 @@ standard.
 
 #### Defined in
 
-[src/types/api/sequencer.ts:73](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L73)
+[src/types/api/sequencer.ts:67](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L67)
 
 ---
 
@@ -1417,4 +1514,4 @@ standard.
 
 #### Defined in
 
-[src/types/api/sequencer.ts:78](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L78)
+[src/types/api/sequencer.ts:72](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L72)

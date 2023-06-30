@@ -11,6 +11,7 @@ import {
   RawArgs,
   RawArgsArray,
   Result,
+  ValidateType,
 } from '../../types';
 import assert from '../assert';
 import { isBigInt, toHex } from '../num';
@@ -37,29 +38,29 @@ export class CallData {
 
   /**
    * Validate arguments passed to the method as corresponding to the ones in the abi
-   * @param type string - type of the method
+   * @param type ValidateType - type of the method
    * @param method string - name of the method
    * @param args ArgsOrCalldata - arguments that are passed to the method
    */
-  public validate(type: 'INVOKE' | 'CALL' | 'DEPLOY', method: string, args: ArgsOrCalldata = []) {
+  public validate(type: ValidateType, method: string, args: ArgsOrCalldata = []) {
     // ensure provided method of type exists
-    if (type !== 'DEPLOY') {
+    if (type !== ValidateType.DEPLOY) {
       const invocableFunctionNames = this.abi
         .filter((abi) => {
           if (abi.type !== 'function') return false;
           const isView = abi.stateMutability === 'view' || abi.state_mutability === 'view';
-          return type === 'INVOKE' ? !isView : isView;
+          return type === ValidateType.INVOKE ? !isView : isView;
         })
         .map((abi) => abi.name);
       assert(
         invocableFunctionNames.includes(method),
-        `${type === 'INVOKE' ? 'invocable' : 'viewable'} method not found in abi`
+        `${type === ValidateType.INVOKE ? 'invocable' : 'viewable'} method not found in abi`
       );
     }
 
     // get requested method from abi
     const abiMethod = this.abi.find((abi) =>
-      type === 'DEPLOY'
+      type === ValidateType.DEPLOY
         ? abi.name === method && abi.type === method
         : abi.name === method && abi.type === 'function'
     ) as FunctionAbi;

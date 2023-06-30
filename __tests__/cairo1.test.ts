@@ -1,8 +1,10 @@
 import {
+  Abi,
   Account,
   BigNumberish,
   CallData,
   Calldata,
+  CompiledSierra,
   Contract,
   DeclareDeployUDCResponse,
   RawArgsArray,
@@ -12,6 +14,7 @@ import {
   ec,
   hash,
   num,
+  selector,
   shortString,
   stark,
 } from '../src';
@@ -21,6 +24,7 @@ import {
   compiledComplexSierra,
   compiledHelloSierra,
   compiledHelloSierraCasm,
+  describeIfDevnet,
   describeIfDevnetSequencer,
   describeIfSequencerTestnet2,
   getTestAccount,
@@ -28,9 +32,13 @@ import {
 } from './fixtures';
 import { initializeMatcher } from './schema';
 
-describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
-  describe('Sequencer API &  Contract interactions', () => {
-    const provider = getTestProvider() as SequencerProvider;
+const { uint256, tuple, isCairo1Abi } = cairo;
+const { toHex } = num;
+const { starknetKeccak } = selector;
+
+describeIfDevnet('Cairo 1 Devnet', () => {
+  describe('API &  Contract interactions', () => {
+    const provider = getTestProvider();
     const account = getTestAccount(provider);
     let dd: DeclareDeployUDCResponse;
     let cairo1Contract: Contract;
@@ -51,16 +59,26 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
       expect(cairo1Contract).toBeInstanceOf(Contract);
     });
 
+    xtest('validate TS for redeclare - skip testing', async () => {
+      const cc0 = await account.getClassAt(dd.deploy.address);
+      const cc0_1 = await account.getClassByHash(toHex(dd.declare.class_hash));
+
+      await account.declare({
+        contract: cc0 as CompiledSierra,
+        casm: compiledHelloSierraCasm,
+      });
+
+      await account.declare({
+        contract: cc0_1 as CompiledSierra,
+        casm: compiledHelloSierraCasm,
+      });
+    });
+
     test('deployContract Cairo1', async () => {
       const deploy = await account.deployContract({
         classHash: dd.deploy.classHash,
       });
       expect(deploy).toHaveProperty('address');
-    });
-
-    test('getCompiledClassByClassHash', async () => {
-      const compiledClass = await provider.getCompiledClassByClassHash(dd.deploy.classHash);
-      expect(compiledClass).toMatchSchemaRef('CompiledClass');
     });
 
     test('GetClassByHash', async () => {
@@ -71,6 +89,13 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
     test('GetClassAt', async () => {
       const classResponse = await provider.getClassAt(dd.deploy.contract_address);
       expect(classResponse).toMatchSchemaRef('SierraContractClass');
+    });
+
+    test('isCairo1', async () => {
+      const isContractCairo1 = cairo1Contract.isCairo1();
+      expect(isContractCairo1).toBe(true);
+      const isAbiCairo1 = isCairo1Abi(cairo1Contract.abi);
+      expect(isAbiCairo1).toBe(true);
     });
 
     test('Cairo 1 Contract Interaction - skip invoke validation & call parsing', async () => {
@@ -117,7 +142,7 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
       expect(result).toBe(2n ** 256n - 1n);
 
       // defined as struct
-      const result1 = await cairo1Contract.test_u256(cairo.uint256(2n ** 256n - 2n));
+      const result1 = await cairo1Contract.test_u256(uint256(2n ** 256n - 2n));
       expect(result1).toBe(2n ** 256n - 1n);
     });
 
@@ -152,8 +177,49 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
       expect(status).toBe(123n);
     });
 
+    test('Cairo1 simple getStorageAt variables retrieval', async () => {
+      // u8
+      let tx = await cairo1Contract.increase_balance(100);
+      await account.waitForTransaction(tx.transaction_hash);
+      const balance = await cairo1Contract.get_balance();
+      let key = starknetKeccak('balance');
+      let storage = await account.getStorageAt(cairo1Contract.address, key);
+      expect(BigInt(storage)).toBe(balance);
+
+      // felt
+      tx = await cairo1Contract.set_ca('123');
+      await account.waitForTransaction(tx.transaction_hash);
+      const ca = await cairo1Contract.get_ca();
+      key = starknetKeccak('ca');
+      storage = await account.getStorageAt(cairo1Contract.address, key);
+      expect(BigInt(storage)).toBe(ca);
+
+      // bool
+      tx = await cairo1Contract.set_status(true);
+      await account.waitForTransaction(tx.transaction_hash);
+      const status = await cairo1Contract.get_status();
+      key = starknetKeccak('status');
+      storage = await account.getStorageAt(cairo1Contract.address, key);
+      expect(Boolean(BigInt(storage))).toBe(status);
+
+      // simple struct
+      tx = await cairo1Contract.set_user1({
+        address: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+        is_claimed: true,
+      });
+      await account.waitForTransaction(tx.transaction_hash);
+      const user = await cairo1Contract.get_user1();
+      key = starknetKeccak('user1');
+      const storage1 = await account.getStorageAt(cairo1Contract.address, key);
+      const storage2 = await account.getStorageAt(cairo1Contract.address, key + 1n);
+      expect(BigInt(storage1)).toBe(user.address);
+      expect(Boolean(BigInt(storage2))).toBe(user.is_claimed);
+
+      // TODO: Complex mapping - https://docs.starknet.io/documentation/architecture_and_concepts/Contracts/contract-storage/
+    });
+
     test('Cairo 1 Contract Interaction - echo flat un-named un-nested tuple', async () => {
-      const status = await cairo1Contract.echo_un_tuple(cairo.tuple(77, 123));
+      const status = await cairo1Contract.echo_un_tuple(tuple(77, 123));
       expect(Object.values(status)).toEqual([77n, 123n]);
     });
 
@@ -167,10 +233,10 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
 
       // uint256 defined as struct
       const status11 = await cairo1Contract.echo_array_u256([
-        cairo.uint256(123),
-        cairo.uint256(55),
-        cairo.uint256(77),
-        cairo.uint256(255),
+        uint256(123),
+        uint256(55),
+        uint256(77),
+        uint256(255),
       ]);
       expect(status11).toEqual([123n, 55n, 77n, 255n]);
 
@@ -258,7 +324,7 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
         1: true,
       });
 
-      const res1 = await cairo1Contract.tuple_echo(cairo.tuple([1, 2, 3], [4, 5, 6]));
+      const res1 = await cairo1Contract.tuple_echo(tuple([1, 2, 3], [4, 5, 6]));
       expect(res1).toEqual({
         0: [1n, 2n, 3n],
         1: [4n, 5n, 6n],
@@ -284,7 +350,7 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
         initial_supply: myFalseUint256,
         recipient: '0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a',
         decimals: 18,
-        tupoftup: cairo.tuple(cairo.tuple(34, '0x5e'), myFalseUint256),
+        tupoftup: tuple(tuple(34, '0x5e'), myFalseUint256),
         card: myOrder2bis,
         longText: 'Bug is back, for ever, here and everywhere',
         array1: [100, 101, 102],
@@ -295,9 +361,9 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
         ],
         array3: [myOrder2bis, myOrder2bis],
         array4: [myFalseUint256, myFalseUint256],
-        tuple1: cairo.tuple(40000n, myOrder2bis, [54, 55n, '0xae'], 'texte'),
+        tuple1: tuple(40000n, myOrder2bis, [54, 55n, '0xae'], 'texte'),
         name: 'niceToken',
-        array5: [cairo.tuple(251, 40000n), cairo.tuple(252, 40001n)],
+        array5: [tuple(251, 40000n), tuple(252, 40001n)],
       };
       const myRawArgsArray: RawArgsArray = [
         'niceToken',
@@ -409,10 +475,19 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
       expect(callDataFromObject).toStrictEqual(expectedResult);
       expect(callDataFromArray).toStrictEqual(expectedResult);
     });
+
+    describeIfDevnetSequencer('Sequencer only', () => {
+      test('getCompiledClassByClassHash', async () => {
+        const compiledClass = await (provider as SequencerProvider).getCompiledClassByClassHash(
+          dd.deploy.classHash
+        );
+        expect(compiledClass).toMatchSchemaRef('CompiledClass');
+      });
+    });
   });
 
   describe('Cairo1 Account contract', () => {
-    const provider = getTestProvider() as SequencerProvider;
+    const provider = getTestProvider();
     const account = getTestAccount(provider);
     let accountC1: Account;
 
@@ -447,7 +522,7 @@ describeIfDevnetSequencer('Cairo 1 Devnet Sequencer', () => {
         entrypoint: 'transfer',
         calldata: {
           recipient: toBeAccountAddress,
-          amount: cairo.uint256(1_000_000_000_000_000),
+          amount: uint256(1_000_000_000_000_000),
         },
       });
       await account.waitForTransaction(transaction_hash);
@@ -481,7 +556,8 @@ describeIfSequencerTestnet2('Cairo1 Testnet2', () => {
 
     beforeAll(async () => {
       const cairoClass = await provider.getClassByHash(classHash);
-      cairo1Contract = new Contract(cairoClass.abi, contractAddress, account);
+      // TODO: Fix typing and responses for abi
+      cairo1Contract = new Contract(cairoClass.abi as Abi, contractAddress, account);
     });
 
     test('getCompiledClassByClassHash', async () => {
@@ -518,7 +594,7 @@ describeIfSequencerTestnet2('Cairo1 Testnet2', () => {
     });
 
     test('Cairo 1 - uint256 struct', async () => {
-      const myUint256 = cairo.uint256(2n ** 256n - 2n);
+      const myUint256 = uint256(2n ** 256n - 2n);
       const result = await cairo1Contract.test_u256(myUint256);
       expect(result).toBe(2n ** 256n - 1n);
     });

@@ -2,8 +2,11 @@
  * Map Sequencer Response to common interface response
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
+
 import {
   CallContractResponse,
+  CompiledContract,
+  ContractClassResponse,
   DeclareContractResponse,
   DeployContractResponse,
   EstimateFeeResponse,
@@ -14,11 +17,13 @@ import {
   HexCalldata,
   InvokeFunctionResponse,
   Sequencer,
-  SierraContractClass,
+  SimulateTransactionResponse,
   StateUpdateResponse,
-  TransactionSimulationResponse,
 } from '../../types';
+import { isSierra } from '../contract';
 import { toBigInt } from '../num';
+import { parseContract } from '../provider';
+import { estimatedFeeToMaxFee } from '../stark';
 import { ResponseParser } from '.';
 
 export class SequencerAPIResponseParser extends ResponseParser {
@@ -131,36 +136,20 @@ export class SequencerAPIResponseParser extends ResponseParser {
     });
   }
 
-  public parseFeeSimulateTransactionResponse(
-    res: Sequencer.TransactionSimulationResponse
-  ): TransactionSimulationResponse {
-    if ('overall_fee' in res.fee_estimation) {
-      let gasInfo = {};
-
-      try {
-        gasInfo = {
-          gas_consumed: toBigInt(res.fee_estimation.gas_usage),
-          gas_price: toBigInt(res.fee_estimation.gas_price),
-        };
-      } catch {
-        // do nothing
-      }
-
-      return {
-        trace: res.trace,
-        fee_estimation: {
-          ...gasInfo,
-          overall_fee: toBigInt(res.fee_estimation.overall_fee),
-        },
-      };
-    }
-
-    return {
-      trace: res.trace,
-      fee_estimation: {
-        overall_fee: toBigInt(res.fee_estimation.amount),
+  public parseSimulateTransactionResponse(
+    res: Sequencer.SimulateTransactionResponse
+  ): SimulateTransactionResponse {
+    const suggestedMaxFee =
+      'overall_fee' in res.fee_estimation
+        ? res.fee_estimation.overall_fee
+        : res.fee_estimation.amount;
+    return [
+      {
+        transaction_trace: res.trace,
+        fee_estimation: res.fee_estimation,
+        suggestedMaxFee: estimatedFeeToMaxFee(BigInt(suggestedMaxFee)),
       },
-    };
+    ];
   }
 
   public parseCallContractResponse(res: Sequencer.CallContractResponse): CallContractResponse {
@@ -214,11 +203,11 @@ export class SequencerAPIResponseParser extends ResponseParser {
     };
   }
 
-  // TODO: Define response as new type as it diff from ContractClass
-  public parseSierraContractClassResponse(res: any): SierraContractClass {
+  public parseContractClassResponse(res: CompiledContract): ContractClassResponse {
+    const response = isSierra(res) ? res : parseContract(res);
     return {
-      ...res,
-      abi: JSON.parse(res.abi),
+      ...response,
+      abi: typeof response.abi === 'string' ? JSON.parse(response.abi) : response.abi,
     };
   }
 }

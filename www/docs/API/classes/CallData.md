@@ -20,7 +20,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/calldata/index.ts:33](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L33)
+[src/utils/calldata/index.ts:34](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L34)
 
 ## Properties
 
@@ -30,7 +30,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/calldata/index.ts:29](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L29)
+[src/utils/calldata/index.ts:30](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L30)
 
 ---
 
@@ -40,7 +40,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/calldata/index.ts:31](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L31)
+[src/utils/calldata/index.ts:32](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L32)
 
 ## Methods
 
@@ -64,7 +64,7 @@ Calldata
 
 #### Defined in
 
-[src/utils/calldata/index.ts:120](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L120)
+[src/utils/calldata/index.ts:121](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L121)
 
 ---
 
@@ -88,7 +88,7 @@ number
 
 #### Defined in
 
-[src/utils/calldata/index.ts:201](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L201)
+[src/utils/calldata/index.ts:202](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L202)
 
 ---
 
@@ -112,7 +112,7 @@ AbiStructs - structs from abi
 
 #### Defined in
 
-[src/utils/calldata/index.ts:210](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L210)
+[src/utils/calldata/index.ts:211](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L211)
 
 ---
 
@@ -136,7 +136,7 @@ Calldata
 
 #### Defined in
 
-[src/utils/calldata/index.ts:227](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L227)
+[src/utils/calldata/index.ts:228](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L228)
 
 ---
 
@@ -160,7 +160,7 @@ HexCalldata
 
 #### Defined in
 
-[src/utils/calldata/index.ts:236](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L236)
+[src/utils/calldata/index.ts:237](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L237)
 
 ---
 
@@ -174,7 +174,7 @@ Validate arguments passed to the method as corresponding to the ones in the abi
 
 | Name     | Type                                                      | Default value | Description                                              |
 | :------- | :-------------------------------------------------------- | :------------ | :------------------------------------------------------- |
-| `type`   | `"DEPLOY"` \| `"INVOKE"` \| `"CALL"`                      | `undefined`   | string - type of the method                              |
+| `type`   | [`ValidateType`](../enums/types.ValidateType.md)          | `undefined`   | ValidateType - type of the method                        |
 | `method` | `string`                                                  | `undefined`   | string - name of the method                              |
 | `args`   | [`ArgsOrCalldata`](../namespaces/types.md#argsorcalldata) | `[]`          | ArgsOrCalldata - arguments that are passed to the method |
 
@@ -184,7 +184,7 @@ Validate arguments passed to the method as corresponding to the ones in the abi
 
 #### Defined in
 
-[src/utils/calldata/index.ts:44](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L44)
+[src/utils/calldata/index.ts:45](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L45)
 
 ---
 
@@ -220,7 +220,7 @@ Calldata - parsed arguments in format that contract is expecting
 
 #### Defined in
 
-[src/utils/calldata/index.ts:93](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L93)
+[src/utils/calldata/index.ts:94](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L94)
 
 ---
 
@@ -245,7 +245,7 @@ Result - parsed response corresponding to the abi
 
 #### Defined in
 
-[src/utils/calldata/index.ts:167](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L167)
+[src/utils/calldata/index.ts:168](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L168)
 
 ---
 
@@ -271,4 +271,4 @@ Result - parsed and formatted response object
 
 #### Defined in
 
-[src/utils/calldata/index.ts:191](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L191)
+[src/utils/calldata/index.ts:192](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L192)

@@ -1,6 +1,6 @@
 ---
 id: 'modules'
-title: 'Starknet.js API - v5.11.1'
+title: 'Starknet.js API - v5.15.0'
 sidebar_label: 'Exports'
 sidebar_position: 0.5
 custom_edit_url: null
@@ -22,6 +22,8 @@ custom_edit_url: null
 - [typedData](namespaces/typedData.md)
 - [ec](namespaces/ec.md)
 - [starknetId](namespaces/starknetId.md)
+- [provider](namespaces/provider-1.md)
+- [selector](namespaces/selector.md)
 - [cairo](namespaces/cairo.md)
 
 ## Classes
@@ -57,6 +59,12 @@ Re-exports [EstimateFeeBulk](namespaces/types.md#estimatefeebulk)
 
 ---
 
+### AccountInvocationsFactoryDetails
+
+Re-exports [AccountInvocationsFactoryDetails](namespaces/types.md#accountinvocationsfactorydetails)
+
+---
+
 ### EstimateFeeDetails
 
 Re-exports [EstimateFeeDetails](interfaces/types.EstimateFeeDetails.md)
@@ -87,9 +95,15 @@ Re-exports [DeclareDeployUDCResponse](namespaces/types.md#declaredeployudcrespon
 
 ---
 
-### TransactionSimulation
+### SimulateTransactionDetails
 
-Re-exports [TransactionSimulation](interfaces/types.TransactionSimulation.md)
+Re-exports [SimulateTransactionDetails](namespaces/types.md#simulatetransactiondetails)
+
+---
+
+### SIMULATION_FLAG
+
+Re-exports [SIMULATION_FLAG](enums/types.SIMULATION_FLAG.md)
 
 ---
 
@@ -195,6 +209,12 @@ Re-exports [AllowArray](namespaces/types.md#allowarray)
 
 ---
 
+### OptionalPayload
+
+Re-exports [OptionalPayload](namespaces/types.md#optionalpayload)
+
+---
+
 ### RawArgs
 
 Re-exports [RawArgs](namespaces/types.md#rawargs)
@@ -222,12 +242,6 @@ Re-exports [MultiType](namespaces/types.md#multitype)
 ### UniversalDeployerContractPayload
 
 Re-exports [UniversalDeployerContractPayload](namespaces/types.md#universaldeployercontractpayload)
-
----
-
-### DeployContractPayload
-
-Re-exports [DeployContractPayload](namespaces/types.md#deploycontractpayload)
 
 ---
 
@@ -309,45 +323,27 @@ Re-exports [InvocationsDetailsWithNonce](namespaces/types.md#invocationsdetailsw
 
 ---
 
-### TransactionStatus
-
-Re-exports [TransactionStatus](enums/types.TransactionStatus.md)
-
----
-
-### TransactionBulk
-
-Re-exports [TransactionBulk](namespaces/types.md#transactionbulk)
-
----
-
-### InvocationBulk
-
-Re-exports [InvocationBulk](namespaces/types.md#invocationbulk)
-
----
-
-### Status
-
-Re-exports [Status](namespaces/types.md#status)
-
----
-
 ### TransactionType
 
 Re-exports [TransactionType](enums/types.TransactionType.md)
 
 ---
 
-### Tupled
+### TransactionStatus
 
-Re-exports [Tupled](namespaces/types.md#tupled)
+Re-exports [TransactionStatus](enums/types.TransactionStatus.md)
+
+---
+
+### BlockStatus
+
+Re-exports [BlockStatus](enums/types.BlockStatus.md)
 
 ---
 
 ### BlockTag
 
-Re-exports [BlockTag](namespaces/types.md#blocktag)
+Re-exports [BlockTag](enums/types.BlockTag.md)
 
 ---
 
@@ -363,9 +359,27 @@ Re-exports [BlockIdentifier](namespaces/types.md#blockidentifier)
 
 ---
 
-### Struct
+### AccountInvocationItem
 
-Re-exports [Struct](namespaces/types.md#struct)
+Re-exports [AccountInvocationItem](namespaces/types.md#accountinvocationitem)
+
+---
+
+### AccountInvocations
+
+Re-exports [AccountInvocations](namespaces/types.md#accountinvocations)
+
+---
+
+### Invocations
+
+Re-exports [Invocations](namespaces/types.md#invocations)
+
+---
+
+### Tupled
+
+Re-exports [Tupled](namespaces/types.md#tupled)
 
 ---
 
@@ -384,6 +398,18 @@ Re-exports [ParsedStruct](namespaces/types.md#parsedstruct)
 ### waitForTransactionOptions
 
 Re-exports [waitForTransactionOptions](namespaces/types.md#waitfortransactionoptions)
+
+---
+
+### getSimulateTransactionOptions
+
+Re-exports [getSimulateTransactionOptions](namespaces/types.md#getsimulatetransactionoptions)
+
+---
+
+### getEstimateFeeBulkOptions
+
+Re-exports [getEstimateFeeBulkOptions](namespaces/types.md#getestimatefeebulkoptions)
 
 ---
 
@@ -495,15 +521,15 @@ Re-exports [CairoAssembly](namespaces/types.md#cairoassembly)
 
 ---
 
-### SierraContractClass
-
-Re-exports [SierraContractClass](namespaces/types.md#sierracontractclass)
-
----
-
 ### CompiledSierra
 
 Re-exports [CompiledSierra](namespaces/types.md#compiledsierra)
+
+---
+
+### SierraContractClass
+
+Re-exports [SierraContractClass](namespaces/types.md#sierracontractclass)
 
 ---
 
@@ -699,15 +725,33 @@ Re-exports [Nonce](namespaces/types.md#nonce)
 
 ---
 
-### TransactionSimulationResponse
+### SimulationFlags
 
-Re-exports [TransactionSimulationResponse](interfaces/types.TransactionSimulationResponse.md)
+Re-exports [SimulationFlags](namespaces/types.md#simulationflags)
+
+---
+
+### SimulatedTransaction
+
+Re-exports [SimulatedTransaction](namespaces/types.md#simulatedtransaction)
+
+---
+
+### SimulateTransactionResponse
+
+Re-exports [SimulateTransactionResponse](namespaces/types.md#simulatetransactionresponse)
 
 ---
 
 ### StateUpdateResponse
 
 Re-exports [StateUpdateResponse](interfaces/types.StateUpdateResponse.md)
+
+---
+
+### ContractClassResponse
+
+Re-exports [ContractClassResponse](namespaces/types.md#contractclassresponse)
 
 ---
 
@@ -777,12 +821,6 @@ Re-exports [ExecutionResources](namespaces/types.md#executionresources)
 
 ---
 
-### TransactionTraceResponse
-
-Re-exports [TransactionTraceResponse](namespaces/types.md#transactiontraceresponse)
-
----
-
 ### CallL1Handler
 
 Re-exports [CallL1Handler](namespaces/types.md#calll1handler)
@@ -811,6 +849,18 @@ Re-exports [Sequencer](namespaces/types.Sequencer.md)
 
 Re-exports [RPC](namespaces/types.RPC.md)
 
+---
+
+### ValidateType
+
+Re-exports [ValidateType](enums/types.ValidateType.md)
+
+---
+
+### Uint
+
+Re-exports [Uint](enums/types.Uint.md)
+
 ## Variables
 
 ### number
@@ -823,7 +873,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/index.ts:40](https://github.com/0xs34n/starknet.js/blob/develop/src/index.ts#L40)
+[src/index.ts:44](https://github.com/0xs34n/starknet.js/blob/develop/src/index.ts#L44)
 
 ---
 
@@ -843,10 +893,10 @@ prefer the 'num' naming
 
 #### Parameters
 
-| Name       | Type                                                   |
-| :--------- | :----------------------------------------------------- |
-| `args`     | [`ArgsOrCalldata`](namespaces/types.md#argsorcalldata) |
-| `callback` | `Function`                                             |
+| Name       | Type                                     |
+| :--------- | :--------------------------------------- |
+| `args`     | [`RawArgs`](namespaces/types.md#rawargs) |
+| `callback` | `Function`                               |
 
 #### Returns
 
@@ -854,7 +904,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/contract/default.ts:97](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L97)
+[src/contract/default.ts:99](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L99)
 
 ---
 
@@ -874,7 +924,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/contract/default.ts:24](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L24)
+[src/contract/default.ts:26](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L26)
 
 ---
 
@@ -1041,3 +1091,104 @@ Loosely validate a URL `string`.
 #### Defined in
 
 [src/utils/url.ts:51](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/url.ts#L51)
+
+---
+
+### isSierra
+
+▸ **isSierra**(`contract`): contract is CompiledSierra \| SierraContractClass
+
+#### Parameters
+
+| Name       | Type                                                             |
+| :--------- | :--------------------------------------------------------------- |
+| `contract` | `string` \| [`CairoContract`](namespaces/types.md#cairocontract) |
+
+#### Returns
+
+contract is CompiledSierra \| SierraContractClass
+
+#### Defined in
+
+[src/utils/contract.ts:14](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/contract.ts#L14)
+
+---
+
+### extractContractHashes
+
+▸ **extractContractHashes**(`payload`): [`CompleteDeclareContractPayload`](namespaces/types.md#completedeclarecontractpayload)
+
+#### Parameters
+
+| Name      | Type                                                                   |
+| :-------- | :--------------------------------------------------------------------- |
+| `payload` | [`DeclareContractPayload`](namespaces/types.md#declarecontractpayload) |
+
+#### Returns
+
+[`CompleteDeclareContractPayload`](namespaces/types.md#completedeclarecontractpayload)
+
+#### Defined in
+
+[src/utils/contract.ts:21](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/contract.ts#L21)
+
+---
+
+### contractClassResponseToLegacyCompiledContract
+
+▸ **contractClassResponseToLegacyCompiledContract**(`ccr`): [`LegacyCompiledContract`](namespaces/types.md#legacycompiledcontract)
+
+Helper to redeclare response Cairo0 contract
+
+#### Parameters
+
+| Name  | Type                                                                 | Description           |
+| :---- | :------------------------------------------------------------------- | :-------------------- |
+| `ccr` | [`ContractClassResponse`](namespaces/types.md#contractclassresponse) | ContractClassResponse |
+
+#### Returns
+
+[`LegacyCompiledContract`](namespaces/types.md#legacycompiledcontract)
+
+LegacyCompiledContract
+
+#### Defined in
+
+[src/utils/contract.ts:48](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/contract.ts#L48)
+
+---
+
+### parseUDCEvent
+
+▸ **parseUDCEvent**(`txReceipt`): `Object`
+
+Parse Transaction Receipt Event from UDC invoke transaction and
+create DeployContractResponse compatibile response with adition of UDC Event data
+
+#### Parameters
+
+| Name        | Type                                                                                       |
+| :---------- | :----------------------------------------------------------------------------------------- |
+| `txReceipt` | [`InvokeTransactionReceiptResponse`](interfaces/types.InvokeTransactionReceiptResponse.md) |
+
+#### Returns
+
+`Object`
+
+DeployContractResponse | UDC Event Response data
+
+| Name               | Type       |
+| :----------------- | :--------- |
+| `transaction_hash` | `string`   |
+| `contract_address` | `string`   |
+| `address`          | `string`   |
+| `deployer`         | `string`   |
+| `unique`           | `string`   |
+| `classHash`        | `string`   |
+| `calldata_len`     | `string`   |
+| `calldata`         | `string`[] |
+| `salt`             | `string`   |
+
+#### Defined in
+
+[src/utils/events.ts:12](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/events.ts#L12)

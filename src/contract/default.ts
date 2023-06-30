@@ -14,11 +14,13 @@ import {
   FunctionAbi,
   InvokeFunctionResponse,
   InvokeOptions,
+  RawArgs,
   Result,
   StructAbi,
+  ValidateType,
 } from '../types';
 import assert from '../utils/assert';
-import { CallData } from '../utils/calldata';
+import { CallData, cairo } from '../utils/calldata';
 import { ContractInterface } from './interface';
 
 export const splitArgsAndOptions = (args: ArgsOrCalldataWithOptions) => {
@@ -94,10 +96,11 @@ function buildEstimate(contract: Contract, functionAbi: FunctionAbi): ContractFu
   };
 }
 
-export function getCalldata(args: ArgsOrCalldata, callback: Function): Calldata {
+export function getCalldata(args: RawArgs, callback: Function): Calldata {
   // Check if Calldata in args or args[0] else compile
-  if ('__compiled__' in args) return args as Calldata;
-  if (Array.isArray(args[0]) && '__compiled__' in args[0]) return args[0] as Calldata;
+  if (Array.isArray(args) && '__compiled__' in args) return args as Calldata;
+  if (Array.isArray(args) && Array.isArray(args[0]) && '__compiled__' in args[0])
+    return args[0] as Calldata;
   return callback();
 }
 
@@ -223,7 +226,7 @@ export class Contract implements ContractInterface {
 
     const calldata = getCalldata(args, () => {
       if (parseRequest) {
-        this.callData.validate('CALL', method, args);
+        this.callData.validate(ValidateType.CALL, method, args);
         return this.callData.compile(method, args);
       }
       // eslint-disable-next-line no-console
@@ -260,7 +263,7 @@ export class Contract implements ContractInterface {
 
     const calldata = getCalldata(args, () => {
       if (parseRequest) {
-        this.callData.validate('INVOKE', method, args);
+        this.callData.validate(ValidateType.INVOKE, method, args);
         return this.callData.compile(method, args);
       }
       // eslint-disable-next-line no-console
@@ -299,7 +302,7 @@ export class Contract implements ContractInterface {
     assert(this.address !== null, 'contract is not connected to an address');
 
     if (!getCalldata(args, () => false)) {
-      this.callData.validate('INVOKE', method, args);
+      this.callData.validate(ValidateType.INVOKE, method, args);
     }
 
     const invocation = this.populate(method, args);
@@ -309,7 +312,7 @@ export class Contract implements ContractInterface {
     throw Error('Contract must be connected to the account contract to estimate');
   }
 
-  public populate(method: string, args: ArgsOrCalldata = []): Call {
+  public populate(method: string, args: RawArgs = []): Call {
     const calldata = getCalldata(args, () => this.callData.compile(method, args));
 
     return {
@@ -317,5 +320,9 @@ export class Contract implements ContractInterface {
       entrypoint: method,
       calldata,
     };
+  }
+
+  public isCairo1(): boolean {
+    return cairo.isCairo1Abi(this.abi);
   }
 }

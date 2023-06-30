@@ -1,9 +1,12 @@
 import { StarknetChainId } from '../constants';
 import {
+  AccountInvocationItem,
+  AccountInvocations,
   BigNumberish,
   BlockIdentifier,
   Call,
   CallContractResponse,
+  ContractClassResponse,
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
@@ -14,23 +17,34 @@ import {
   GetCodeResponse,
   GetTransactionResponse,
   Invocation,
-  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
+  LegacyContractClass,
   RPC,
   RpcProviderOptions,
-  TransactionSimulationResponse,
+  SIMULATION_FLAG,
+  SierraContractClass,
+  SimulateTransactionResponse,
   TransactionStatus,
+  TransactionType,
+  getEstimateFeeBulkOptions,
+  getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
 import { CallData } from '../utils/calldata';
+import { isSierra } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
-import { getSelectorFromName } from '../utils/hash';
+import {
+  getSelectorFromName,
+  getVersionsByType,
+  transactionVersion,
+  transactionVersion_2,
+} from '../utils/hash';
 import { stringify } from '../utils/json';
-import { toHex } from '../utils/num';
+import { toHex, toStorageKey } from '../utils/num';
 import { wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
-import { signatureToHexArray } from '../utils/stark';
+import { decompressProgram, signatureToHexArray } from '../utils/stark';
 import { LibraryError } from './errors';
 import { ProviderInterface } from './interface';
 import { getAddressFromStarkName, getStarkName } from './starknetId';
@@ -68,9 +82,10 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public fetch(method: any, params: any): Promise<any> {
+    const body = stringify({ method, jsonrpc: '2.0', params, id: 0 });
     return fetch(this.nodeUrl, {
       method: 'POST',
-      body: stringify({ method, jsonrpc: '2.0', params, id: 0 }),
+      body,
       headers: this.headers as Record<string, string>,
     });
   }
@@ -171,7 +186,7 @@ export class RpcProvider implements ProviderInterface {
     key: BigNumberish,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<RPC.Storage> {
-    const parsedKey = toHex(key);
+    const parsedKey = toStorageKey(key);
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getStorageAt', {
       contract_address: contractAddress,
@@ -201,27 +216,30 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_getTransactionReceipt', { transaction_hash: txHash });
   }
 
-  public async getClassByHash(classHash: RPC.Felt): Promise<RPC.ContractClass> {
+  public async getClassByHash(classHash: RPC.Felt): Promise<ContractClassResponse> {
     return this.getClass(classHash);
   }
 
   public async getClass(
     classHash: RPC.Felt,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<RPC.ContractClass> {
+  ): Promise<ContractClassResponse> {
     const block_id = new Block(blockIdentifier).identifier;
-    return this.fetchEndpoint('starknet_getClass', { class_hash: classHash, block_id });
+    return this.fetchEndpoint('starknet_getClass', {
+      class_hash: classHash,
+      block_id,
+    }).then(this.responseParser.parseContractClassResponse);
   }
 
   public async getClassAt(
     contractAddress: string,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<RPC.ContractClass> {
+  ): Promise<ContractClassResponse> {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getClassAt', {
       block_id,
       contract_address: contractAddress,
-    });
+    }).then(this.responseParser.parseContractClassResponse);
   }
 
   public async getCode(
@@ -245,91 +263,89 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<EstimateFeeResponse> {
     const block_id = new Block(blockIdentifier).identifier;
-    return this.fetchEndpoint('starknet_estimateFee', {
-      request: {
-        type: RPC.TransactionType.INVOKE,
-        sender_address: invocation.contractAddress,
-        calldata: CallData.toHex(invocation.calldata),
-        signature: signatureToHexArray(invocation.signature),
-        version: toHex(invocationDetails?.version || 0),
-        nonce: toHex(invocationDetails.nonce),
-        max_fee: toHex(invocationDetails?.maxFee || 0),
+    const transaction = this.buildTransaction(
+      {
+        type: TransactionType.INVOKE,
+        ...invocation,
+        ...invocationDetails,
       },
+      'fee'
+    );
+    return this.fetchEndpoint('starknet_estimateFee', {
+      request: [transaction],
       block_id,
     }).then(this.responseParser.parseFeeEstimateResponse);
   }
 
   public async getDeclareEstimateFee(
-    { senderAddress, contractDefinition, signature }: DeclareContractTransaction,
+    invocation: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<EstimateFeeResponse> {
     const block_id = new Block(blockIdentifier).identifier;
-    if ('program' in contractDefinition) {
-      return this.fetchEndpoint('starknet_estimateFee', {
-        request: {
-          type: RPC.TransactionType.DECLARE,
-          contract_class: {
-            program: contractDefinition.program,
-            entry_points_by_type: contractDefinition.entry_points_by_type,
-            abi: contractDefinition.abi, // rpc 2.0
-          },
-          sender_address: senderAddress,
-          signature: signatureToHexArray(signature),
-          version: toHex(details?.version || 0),
-          nonce: toHex(details.nonce),
-          max_fee: toHex(details?.maxFee || 0),
-        },
-        block_id,
-      }).then(this.responseParser.parseFeeEstimateResponse);
-    }
-    // TODO: When RPC Update implement Sierra
-    throw new Error('RPC do not support Sierra Contracts yet');
+    const transaction = this.buildTransaction(
+      {
+        type: TransactionType.DECLARE,
+        ...invocation,
+        ...details,
+      },
+      'fee'
+    );
+    return this.fetchEndpoint('starknet_estimateFee', {
+      request: [transaction],
+      block_id,
+    }).then(this.responseParser.parseFeeEstimateResponse);
   }
 
   public async getDeployAccountEstimateFee(
-    { classHash, constructorCalldata, addressSalt, signature }: DeployAccountContractTransaction,
+    invocation: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<EstimateFeeResponse> {
     const block_id = new Block(blockIdentifier).identifier;
-    return this.fetchEndpoint('starknet_estimateFee', {
-      request: {
-        type: RPC.TransactionType.DEPLOY_ACCOUNT,
-        constructor_calldata: CallData.toHex(constructorCalldata || []),
-        class_hash: toHex(classHash),
-        contract_address_salt: toHex(addressSalt || 0),
-        signature: signatureToHexArray(signature),
-        version: toHex(details?.version || 0),
-        nonce: toHex(details.nonce),
-        max_fee: toHex(details?.maxFee || 0),
+    const transaction = this.buildTransaction(
+      {
+        type: TransactionType.DEPLOY_ACCOUNT,
+        ...invocation,
+        ...details,
       },
+      'fee'
+    );
+    return this.fetchEndpoint('starknet_estimateFee', {
+      request: [transaction],
       block_id,
     }).then(this.responseParser.parseFeeEstimateResponse);
   }
 
   public async getEstimateFeeBulk(
-    _invocations: InvocationBulk,
-    _blockIdentifier: BlockIdentifier = this.blockIdentifier
+    invocations: AccountInvocations,
+    { blockIdentifier = this.blockIdentifier, skipValidate = false }: getEstimateFeeBulkOptions
   ): Promise<EstimateFeeResponseBulk> {
-    throw new Error('RPC does not implement getInvokeEstimateFeeBulk function');
+    if (skipValidate) {
+      // eslint-disable-next-line no-console
+      console.warn('getEstimateFeeBulk RPC does not support skipValidate');
+    }
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint('starknet_estimateFee', {
+      request: invocations.map((it) => this.buildTransaction(it, 'fee')),
+      block_id,
+    }).then(this.responseParser.parseFeeEstimateBulkResponse);
   }
 
-  // TODO: Revisit after Pathfinder release with JSON-RPC v0.2.1 RPC Spec
   public async declareContract(
-    { contractDefinition, signature, senderAddress }: DeclareContractTransaction,
+    { contract, signature, senderAddress, compiledClassHash }: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce
   ): Promise<DeclareContractResponse> {
-    if ('program' in contractDefinition) {
+    if (!isSierra(contract)) {
       return this.fetchEndpoint('starknet_addDeclareTransaction', {
         declare_transaction: {
-          contract_class: {
-            program: contractDefinition.program,
-            entry_points_by_type: contractDefinition.entry_points_by_type,
-            abi: contractDefinition.abi, // rpc 2.0
-          },
           type: RPC.TransactionType.DECLARE,
-          version: '0x1',
+          contract_class: {
+            program: contract.program,
+            entry_points_by_type: contract.entry_points_by_type,
+            abi: contract.abi,
+          },
+          version: toHex(transactionVersion),
           max_fee: toHex(details.maxFee || 0),
           signature: signatureToHexArray(signature),
           sender_address: senderAddress,
@@ -337,8 +353,23 @@ export class RpcProvider implements ProviderInterface {
         },
       });
     }
-    // TODO: When RPC Update implement Sierra
-    throw new Error('RPC do not support Sierra Contracts yet');
+    return this.fetchEndpoint('starknet_addDeclareTransaction', {
+      declare_transaction: {
+        type: RPC.TransactionType.DECLARE,
+        contract_class: {
+          sierra_program: decompressProgram(contract.sierra_program),
+          contract_class_version: contract.contract_class_version,
+          entry_points_by_type: contract.entry_points_by_type,
+          abi: contract.abi,
+        },
+        compiled_class_hash: compiledClassHash || '',
+        version: toHex(transactionVersion_2),
+        max_fee: toHex(details.maxFee || 0),
+        signature: signatureToHexArray(signature),
+        sender_address: senderAddress,
+        nonce: toHex(details.nonce),
+      },
+    });
   }
 
   public async deployAccountContract(
@@ -412,7 +443,6 @@ export class RpcProvider implements ProviderInterface {
     const successStates = options?.successStates ?? [
       TransactionStatus.ACCEPTED_ON_L1,
       TransactionStatus.ACCEPTED_ON_L2,
-      TransactionStatus.PENDING,
     ];
 
     while (!onchain) {
@@ -423,7 +453,7 @@ export class RpcProvider implements ProviderInterface {
         txReceipt = await this.getTransactionReceipt(txHash);
 
         if (!('status' in txReceipt)) {
-          const error = new Error('pending transaction');
+          const error = new Error('transaction status');
           throw error;
         }
 
@@ -497,11 +527,24 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getSimulateTransaction(
-    _invocation: Invocation,
-    _invocationDetails: InvocationsDetailsWithNonce,
-    _blockIdentifier?: BlockIdentifier
-  ): Promise<TransactionSimulationResponse> {
-    throw new Error('RPC does not implement simulateTransaction function');
+    invocations: AccountInvocations,
+    {
+      blockIdentifier = this.blockIdentifier,
+      skipValidate = false,
+      skipExecute = false,
+    }: getSimulateTransactionOptions
+  ): Promise<SimulateTransactionResponse> {
+    const block_id = new Block(blockIdentifier).identifier;
+
+    const simulationFlags = [];
+    if (skipValidate) simulationFlags.push(SIMULATION_FLAG.SKIP_VALIDATE);
+    if (skipExecute) simulationFlags.push(SIMULATION_FLAG.SKIP_EXECUTE);
+
+    return this.fetchEndpoint('starknet_simulateTransaction', {
+      block_id,
+      transactions: invocations.map((it) => this.buildTransaction(it)), // TODO: Pathfinder 0.5.6 bug, should be transaction
+      simulation_flags: simulationFlags,
+    }).then(this.responseParser.parseSimulateTransactionResponse);
   }
 
   public async getStarkName(address: BigNumberish, StarknetIdContract?: string): Promise<string> {
@@ -510,5 +553,63 @@ export class RpcProvider implements ProviderInterface {
 
   public async getAddressFromStarkName(name: string, StarknetIdContract?: string): Promise<string> {
     return getAddressFromStarkName(this, name, StarknetIdContract);
+  }
+
+  public buildTransaction(
+    invocation: AccountInvocationItem,
+    versionType?: 'fee' | 'transaction'
+  ): RPC.BroadcastedTransaction {
+    const defaultVersions = getVersionsByType(versionType);
+    const details = {
+      signature: signatureToHexArray(invocation.signature),
+      nonce: toHex(invocation.nonce),
+      max_fee: toHex(invocation.maxFee || 0),
+    };
+
+    if (invocation.type === TransactionType.INVOKE) {
+      return {
+        type: RPC.TransactionType.INVOKE, // Diff between sequencer and rpc invoke type
+        sender_address: invocation.contractAddress,
+        calldata: CallData.toHex(invocation.calldata),
+        version: toHex(invocation.version || defaultVersions.v1),
+        ...details,
+      };
+    }
+    if (invocation.type === RPC.TransactionType.DECLARE) {
+      if (!isSierra(invocation.contract)) {
+        const legacyContract = invocation.contract as LegacyContractClass;
+        return {
+          type: invocation.type,
+          contract_class: legacyContract,
+          sender_address: invocation.senderAddress,
+          version: toHex(invocation.version || defaultVersions.v1),
+          ...details,
+        };
+      }
+      const sierraContract = invocation.contract as SierraContractClass;
+      return {
+        // compiled_class_hash
+        type: invocation.type,
+        contract_class: {
+          ...sierraContract,
+          sierra_program: decompressProgram(sierraContract.sierra_program),
+        },
+        compiled_class_hash: invocation.compiledClassHash || '',
+        sender_address: invocation.senderAddress,
+        version: toHex(invocation.version || defaultVersions.v2),
+        ...details,
+      };
+    }
+    if (invocation.type === TransactionType.DEPLOY_ACCOUNT) {
+      return {
+        type: invocation.type,
+        constructor_calldata: CallData.toHex(invocation.constructorCalldata || []),
+        class_hash: toHex(invocation.classHash),
+        contract_address_salt: toHex(invocation.addressSalt || 0),
+        version: toHex(invocation.version || defaultVersions.v1),
+        ...details,
+      };
+    }
+    throw Error('RPC buildTransaction received unknown TransactionType');
   }
 }

@@ -21,17 +21,17 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider/response.ts:72](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L72)
+[src/types/provider/response.ts:75](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L75)
 
 ---
 
 ### status
 
-• `Optional` **status**: [`Status`](../namespaces/types.md#status)
+• `Optional` **status**: `"NOT_RECEIVED"` \| `"RECEIVED"` \| `"ACCEPTED_ON_L2"` \| `"ACCEPTED_ON_L1"` \| `"REJECTED"`
 
 #### Defined in
 
-[src/types/provider/response.ts:73](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L73)
+[src/types/provider/response.ts:76](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L76)
 
 ---
 
@@ -41,7 +41,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider/response.ts:74](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L74)
+[src/types/provider/response.ts:77](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L77)
 
 ---
 
@@ -51,4 +51,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider/response.ts:75](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L75)
+[src/types/provider/response.ts:78](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L78)

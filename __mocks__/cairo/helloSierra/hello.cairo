@@ -213,6 +213,7 @@ mod HelloStarknet {
         ca: ContractAddress,
         testbet: Bet,
         user: UserData,
+        user1: UserData,
     }
 
     // Felt252 test.
@@ -328,6 +329,16 @@ mod HelloStarknet {
         testbet::read()
     }
 
+    #[external]
+    fn set_user1(user: UserData) {
+        user1::write(user);
+    }
+
+    #[view]
+    fn get_user1() -> UserData {
+        user1::read()
+    }
+
     // this method is required so that ABI have UserData definition in structs
     #[view]
     fn get_user() -> UserData {
@@ -362,5 +373,11 @@ mod HelloStarknet {
         a.append(1);
         a.append(2);
         (a, b)
+    }
+
+    // used for changes to redeclare contract
+    #[view]
+    fn array2ddd_felt(testdd: Array<Array<felt252>>) -> felt252 {
+        return *(testdd.at(0_u32)).at(0_u32);
     }
 }

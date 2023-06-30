@@ -40,7 +40,7 @@ the chain Id
 
 #### Defined in
 
-[src/provider/interface.ts:37](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L37)
+[src/provider/interface.ts:38](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L38)
 
 ---
 
@@ -65,7 +65,7 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[src/provider/interface.ts:46](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L46)
+[src/provider/interface.ts:47](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L47)
 
 ---
 
@@ -89,7 +89,7 @@ the block object
 
 #### Defined in
 
-[src/provider/interface.ts:57](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L57)
+[src/provider/interface.ts:58](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L58)
 
 ---
 
@@ -114,13 +114,13 @@ The method should not be used
 
 #### Defined in
 
-[src/provider/interface.ts:62](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L62)
+[src/provider/interface.ts:63](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L63)
 
 ---
 
 ### getClassAt
 
-▸ `Abstract` **getClassAt**(`contractAddress`, `blockIdentifier?`): `Promise`<[`ContractClass`](../namespaces/types.md#contractclass) \| `CONTRACT_CLASS`\>
+▸ `Abstract` **getClassAt**(`contractAddress`, `blockIdentifier?`): `Promise`<[`ContractClassResponse`](../namespaces/types.md#contractclassresponse)\>
 
 Gets the contract class of the deployed contract.
 
@@ -133,13 +133,13 @@ Gets the contract class of the deployed contract.
 
 #### Returns
 
-`Promise`<[`ContractClass`](../namespaces/types.md#contractclass) \| `CONTRACT_CLASS`\>
+`Promise`<[`ContractClassResponse`](../namespaces/types.md#contractclassresponse)\>
 
 Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/interface.ts:74](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L74)
+[src/provider/interface.ts:75](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L75)
 
 ---
 
@@ -164,13 +164,13 @@ Class hash
 
 #### Defined in
 
-[src/provider/interface.ts:86](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L86)
+[src/provider/interface.ts:87](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L87)
 
 ---
 
 ### getClassByHash
 
-▸ `Abstract` **getClassByHash**(`classHash`): `Promise`<[`ContractClass`](../namespaces/types.md#contractclass) \| `CONTRACT_CLASS`\>
+▸ `Abstract` **getClassByHash**(`classHash`): `Promise`<[`ContractClassResponse`](../namespaces/types.md#contractclassresponse)\>
 
 Returns the contract class deployed under the given class hash.
 
@@ -182,13 +182,13 @@ Returns the contract class deployed under the given class hash.
 
 #### Returns
 
-`Promise`<[`ContractClass`](../namespaces/types.md#contractclass) \| `CONTRACT_CLASS`\>
+`Promise`<[`ContractClassResponse`](../namespaces/types.md#contractclassresponse)\>
 
 Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/interface.ts:97](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L97)
+[src/provider/interface.ts:98](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L98)
 
 ---
 
@@ -213,7 +213,7 @@ the hex nonce
 
 #### Defined in
 
-[src/provider/interface.ts:105](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L105)
+[src/provider/interface.ts:106](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L106)
 
 ---
 
@@ -239,7 +239,7 @@ the value of the storage variable
 
 #### Defined in
 
-[src/provider/interface.ts:118](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L118)
+[src/provider/interface.ts:119](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L119)
 
 ---
 
@@ -263,7 +263,7 @@ the transaction object { transaction_id, status, transaction, block_number?, blo
 
 #### Defined in
 
-[src/provider/interface.ts:130](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L130)
+[src/provider/interface.ts:131](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L131)
 
 ---
 
@@ -287,7 +287,7 @@ the transaction receipt object
 
 #### Defined in
 
-[src/provider/interface.ts:138](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L138)
+[src/provider/interface.ts:139](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L139)
 
 ---
 
@@ -312,7 +312,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/interface.ts:151](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L151)
+[src/provider/interface.ts:152](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L152)
 
 ---
 
@@ -341,7 +341,7 @@ response from addTransaction
 
 #### Defined in
 
-[src/provider/interface.ts:171](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L171)
+[src/provider/interface.ts:172](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L172)
 
 ---
 
@@ -366,7 +366,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/interface.ts:188](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L188)
+[src/provider/interface.ts:189](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L189)
 
 ---
 
@@ -397,7 +397,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:209](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L209)
+[src/provider/interface.ts:210](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L210)
 
 ---
 
@@ -424,7 +424,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:231](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L231)
+[src/provider/interface.ts:232](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L232)
 
 ---
 
@@ -451,7 +451,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:253](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L253)
+[src/provider/interface.ts:254](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L254)
 
 ---
 
@@ -478,22 +478,22 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:276](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L276)
+[src/provider/interface.ts:277](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L277)
 
 ---
 
 ### getEstimateFeeBulk
 
-▸ `Abstract` **getEstimateFeeBulk**(`invocations`, `blockIdentifier?`): `Promise`<[`EstimateFeeResponseBulk`](../namespaces/types.md#estimatefeeresponsebulk)\>
+▸ `Abstract` **getEstimateFeeBulk**(`invocations`, `options?`): `Promise`<[`EstimateFeeResponseBulk`](../namespaces/types.md#estimatefeeresponsebulk)\>
 
 Estimates the fee for a list of INVOKE transaction
 
 #### Parameters
 
-| Name               | Type                                                        | Description                                                                                                                                                                                                                                                    |
-| :----------------- | :---------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `invocations`      | [`InvocationBulk`](../namespaces/types.md#invocationbulk)   | the array of invocation and invocation details object containing: - contractAddress - the address of the account - calldata - (defaults to []) the calldata - signature - (defaults to []) the signature - nonce - optional nonce - version - optional version |
-| `blockIdentifier?` | [`BlockIdentifier`](../namespaces/types.md#blockidentifier) | block identifier                                                                                                                                                                                                                                               |
+| Name          | Type                                                                            | Description                                                                                                                  |
+| :------------ | :------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------------------------------------------- |
+| `invocations` | [`AccountInvocations`](../namespaces/types.md#accountinvocations)               | AccountInvocations - Complete invocations array with account details                                                         |
+| `options?`    | [`getEstimateFeeBulkOptions`](../namespaces/types.md#getestimatefeebulkoptions) | getEstimateFeeBulkOptions - (optional) blockIdentifier - BlockIdentifier - (optional) skipValidate - boolean (default false) |
 
 #### Returns
 
@@ -503,7 +503,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:295](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L295)
+[src/provider/interface.ts:293](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L293)
 
 ---
 
@@ -515,10 +515,10 @@ Wait for the transaction to be accepted
 
 #### Parameters
 
-| Name       | Type                                                                            | Description                                                                                                  |
-| :--------- | :------------------------------------------------------------------------------ | :----------------------------------------------------------------------------------------------------------- |
-| `txHash`   | [`BigNumberish`](../namespaces/types.md#bignumberish)                           | transaction hash                                                                                             |
-| `options?` | [`waitForTransactionOptions`](../namespaces/types.md#waitfortransactionoptions) | (optional) retryInterval: number \| undefined; - (optional) successStates: TransactionStatus[] \| undefined; |
+| Name       | Type                                                                            | Description                                                                                                                              |
+| :--------- | :------------------------------------------------------------------------------ | :--------------------------------------------------------------------------------------------------------------------------------------- |
+| `txHash`   | [`BigNumberish`](../namespaces/types.md#bignumberish)                           | transaction hash                                                                                                                         |
+| `options?` | [`waitForTransactionOptions`](../namespaces/types.md#waitfortransactionoptions) | waitForTransactionOptions - (optional) retryInterval: number \| undefined; - (optional) successStates: TransactionStatus[] \| undefined; |
 
 #### Returns
 
@@ -528,34 +528,32 @@ GetTransactionReceiptResponse
 
 #### Defined in
 
-[src/provider/interface.ts:308](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L308)
+[src/provider/interface.ts:306](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L306)
 
 ---
 
 ### getSimulateTransaction
 
-▸ `Abstract` **getSimulateTransaction**(`invocation`, `invocationDetails`, `blockIdentifier?`, `skipValidate?`): `Promise`<[`TransactionSimulationResponse`](../interfaces/types.TransactionSimulationResponse.md)\>
+▸ `Abstract` **getSimulateTransaction**(`invocations`, `options?`): `Promise`<[`SimulateTransactionResponse`](../namespaces/types.md#simulatetransactionresponse)\>
 
 Simulates the transaction and returns the transaction trace and estimated fee.
 
 #### Parameters
 
-| Name                | Type                                                                                | Description                                                                                                                                                                                                             |
-| :------------------ | :---------------------------------------------------------------------------------- | :---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `invocation`        | [`Invocation`](../namespaces/types.md#invocation)                                   | the invocation object containing: - contractAddress - the address of the contract - entrypoint - the entrypoint of the contract - calldata - (defaults to []) the calldata - signature - (defaults to []) the signature |
-| `invocationDetails` | [`InvocationsDetailsWithNonce`](../namespaces/types.md#invocationsdetailswithnonce) | -                                                                                                                                                                                                                       |
-| `blockIdentifier?`  | [`BlockIdentifier`](../namespaces/types.md#blockidentifier)                         | (optional) block identifier                                                                                                                                                                                             |
-| `skipValidate?`     | `boolean`                                                                           | (optional) skip cairo **validate** method                                                                                                                                                                               |
+| Name          | Type                                                                                    | Description                                                                                                                                                                                       |
+| :------------ | :-------------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `invocations` | [`AccountInvocations`](../namespaces/types.md#accountinvocations)                       | AccountInvocations - Complete invocations array with account details                                                                                                                              |
+| `options?`    | [`getSimulateTransactionOptions`](../namespaces/types.md#getsimulatetransactionoptions) | getSimulateTransactionOptions - (optional) blockIdentifier - block identifier - (optional) skipValidate - skip cairo **validate** method - (optional) skipExecute - skip cairo **execute** method |
 
 #### Returns
 
-`Promise`<[`TransactionSimulationResponse`](../interfaces/types.TransactionSimulationResponse.md)\>
+`Promise`<[`SimulateTransactionResponse`](../namespaces/types.md#simulatetransactionresponse)\>
 
-the transaction trace and estimated fee
+an array of transaction trace and estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:328](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L328)
+[src/provider/interface.ts:321](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L321)
 
 ---
 
@@ -579,4 +577,4 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/interface.ts:341](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L341)
+[src/provider/interface.ts:332](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L332)

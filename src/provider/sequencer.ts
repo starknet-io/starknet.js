@@ -2,13 +2,16 @@ import urljoin from 'url-join';
 
 import { BaseUrl, NetworkName, StarknetChainId } from '../constants';
 import {
+  AccountInvocationItem,
+  AccountInvocations,
   BigNumberish,
   BlockIdentifier,
+  BlockTag,
   CairoAssembly,
   Call,
   CallContractResponse,
   CallL1Handler,
-  ContractClass,
+  ContractClassResponse,
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
@@ -21,35 +24,34 @@ import {
   GetTransactionResponse,
   GetTransactionStatusResponse,
   Invocation,
-  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Sequencer,
   SequencerHttpMethod,
   SequencerProviderOptions,
+  SimulateTransactionResponse,
   StateUpdateResponse,
-  TransactionSimulationResponse,
   TransactionStatus,
-  TransactionTraceResponse,
   TransactionType,
+  getEstimateFeeBulkOptions,
+  getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
-import { feeTransactionVersion, getSelector, getSelectorFromName } from '../utils/hash';
-import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
 import {
-  bigNumberishArrayToDecimalStringArray,
-  getDecimalString,
-  getHexString,
-  getHexStringArray,
-  toBigInt,
-  toHex,
-} from '../utils/num';
-import { parseContract, wait } from '../utils/provider';
+  getSelector,
+  getSelectorFromName,
+  getVersionsByType,
+  transactionVersion,
+  transactionVersion_2,
+} from '../utils/hash';
+import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
+import { getDecimalString, getHexString, getHexStringArray, toBigInt, toHex } from '../utils/num';
+import { wait } from '../utils/provider';
 import { SequencerAPIResponseParser } from '../utils/responseParser/sequencer';
-import { formatSignature, randomAddress, signatureToDecimalArray } from '../utils/stark';
+import { randomAddress, signatureToDecimalArray } from '../utils/stark';
 import { buildUrl } from '../utils/url';
 import { GatewayError, HttpError, LibraryError } from './errors';
 import { ProviderInterface } from './interface';
@@ -67,7 +69,7 @@ function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
 
 const defaultOptions = {
   network: NetworkName.SN_GOERLI2,
-  blockIdentifier: 'pending',
+  blockIdentifier: BlockTag.pending,
 };
 
 export class SequencerProvider implements ProviderInterface {
@@ -313,14 +315,9 @@ export class SequencerProvider implements ProviderInterface {
   public async getClassAt(
     contractAddress: string,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<ContractClass> {
+  ): Promise<ContractClassResponse> {
     return this.fetchEndpoint('get_full_contract', { blockIdentifier, contractAddress }).then(
-      (res) => {
-        if (isSierra(res)) {
-          return this.responseParser.parseSierraContractClassResponse(res);
-        }
-        return parseContract(res);
-      }
+      this.responseParser.parseContractClassResponse
     );
   }
 
@@ -334,13 +331,10 @@ export class SequencerProvider implements ProviderInterface {
   public async getClassByHash(
     classHash: string,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
-  ): Promise<ContractClass> {
-    return this.fetchEndpoint('get_class_by_hash', { classHash, blockIdentifier }).then((res) => {
-      if (isSierra(res)) {
-        return this.responseParser.parseSierraContractClassResponse(res);
-      }
-      return parseContract(res);
-    });
+  ): Promise<ContractClassResponse> {
+    return this.fetchEndpoint('get_class_by_hash', { classHash, blockIdentifier }).then(
+      this.responseParser.parseContractClassResponse
+    );
   }
 
   public async getCompiledClassByClassHash(
@@ -382,18 +376,18 @@ export class SequencerProvider implements ProviderInterface {
   }
 
   public async declareContract(
-    { senderAddress, contractDefinition, signature, compiledClassHash }: DeclareContractTransaction,
+    { senderAddress, contract, signature, compiledClassHash }: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce
   ): Promise<DeclareContractResponse> {
-    if (!isSierra(contractDefinition)) {
+    if (!isSierra(contract)) {
       return this.fetchEndpoint('add_transaction', undefined, {
         type: TransactionType.DECLARE,
-        contract_class: contractDefinition,
+        contract_class: contract,
         nonce: toHex(details.nonce),
         signature: signatureToDecimalArray(signature),
         sender_address: senderAddress,
         max_fee: toHex(details.maxFee || 0),
-        version: '0x1',
+        version: toHex(transactionVersion),
       }).then(this.responseParser.parseDeclareContractResponse);
     }
     // Cairo 1
@@ -401,11 +395,11 @@ export class SequencerProvider implements ProviderInterface {
       type: TransactionType.DECLARE,
       sender_address: senderAddress,
       compiled_class_hash: compiledClassHash,
-      contract_class: contractDefinition,
+      contract_class: contract,
       nonce: toHex(details.nonce),
       signature: signatureToDecimalArray(signature),
       max_fee: toHex(details.maxFee || 0),
-      version: '0x2',
+      version: toHex(transactionVersion_2),
     }).then(this.responseParser.parseDeclareContractResponse);
   }
 
@@ -424,114 +418,67 @@ export class SequencerProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier = this.blockIdentifier,
     skipValidate: boolean = false
   ): Promise<EstimateFeeResponse> {
-    return this.fetchEndpoint(
-      'estimate_fee',
-      { blockIdentifier, skipValidate },
+    const transaction = this.buildTransaction(
       {
         type: TransactionType.INVOKE,
-        sender_address: invocation.contractAddress,
-        calldata: CallData.compile(invocation.calldata ?? []),
-        signature: signatureToDecimalArray(invocation.signature),
-        version: toHex(invocationDetails?.version || 1),
-        nonce: toHex(invocationDetails.nonce),
-      }
-    ).then(this.responseParser.parseFeeEstimateResponse);
+        ...invocation,
+        ...invocationDetails,
+      },
+      'fee'
+    );
+    return this.fetchEndpoint('estimate_fee', { blockIdentifier, skipValidate }, transaction).then(
+      this.responseParser.parseFeeEstimateResponse
+    );
   }
 
   public async getDeclareEstimateFee(
-    { senderAddress, contractDefinition, signature, compiledClassHash }: DeclareContractTransaction,
+    invocation: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
     blockIdentifier: BlockIdentifier = this.blockIdentifier,
     skipValidate: boolean = false
   ): Promise<EstimateFeeResponse> {
-    if (!isSierra(contractDefinition)) {
-      return this.fetchEndpoint(
-        'estimate_fee',
-        { blockIdentifier, skipValidate },
-        {
-          type: TransactionType.DECLARE,
-          sender_address: senderAddress,
-          contract_class: contractDefinition,
-          signature: signatureToDecimalArray(signature),
-          version: toHex(details?.version || toBigInt(feeTransactionVersion)),
-          nonce: toHex(details.nonce),
-        }
-      ).then(this.responseParser.parseFeeEstimateResponse);
-    }
-
-    return this.fetchEndpoint(
-      'estimate_fee',
-      { blockIdentifier, skipValidate },
+    const transaction = this.buildTransaction(
       {
         type: TransactionType.DECLARE,
-        sender_address: senderAddress,
-        compiled_class_hash: compiledClassHash,
-        contract_class: contractDefinition,
-        nonce: toHex(details.nonce),
-        signature: signatureToDecimalArray(signature),
-        version: '0x2',
-      }
-    ).then(this.responseParser.parseFeeEstimateResponse);
+        ...invocation,
+        ...details,
+      },
+      'fee'
+    );
+    return this.fetchEndpoint('estimate_fee', { blockIdentifier, skipValidate }, transaction).then(
+      this.responseParser.parseFeeEstimateResponse
+    );
   }
 
   public async getDeployAccountEstimateFee(
-    { classHash, addressSalt, constructorCalldata, signature }: DeployAccountContractTransaction,
+    invocation: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,
     blockIdentifier: BlockIdentifier = this.blockIdentifier,
     skipValidate: boolean = false
   ): Promise<EstimateFeeResponse> {
-    return this.fetchEndpoint(
-      'estimate_fee',
-      { blockIdentifier, skipValidate },
+    const transaction = this.buildTransaction(
       {
         type: TransactionType.DEPLOY_ACCOUNT,
-        class_hash: toHex(classHash),
-        constructor_calldata: CallData.compile(constructorCalldata || []),
-        contract_address_salt: toHex(addressSalt || 0),
-        signature: signatureToDecimalArray(signature),
-        version: toHex(details?.version || 0),
-        nonce: toHex(details.nonce),
-      }
-    ).then(this.responseParser.parseFeeEstimateResponse);
+        ...invocation,
+        ...details,
+      },
+      'fee'
+    );
+    return this.fetchEndpoint('estimate_fee', { blockIdentifier, skipValidate }, transaction).then(
+      this.responseParser.parseFeeEstimateResponse
+    );
   }
 
   public async getEstimateFeeBulk(
-    invocations: InvocationBulk,
-    blockIdentifier: BlockIdentifier = this.blockIdentifier
+    invocations: AccountInvocations,
+    { blockIdentifier = this.blockIdentifier, skipValidate = false }: getEstimateFeeBulkOptions
   ): Promise<EstimateFeeResponseBulk> {
-    const params: Sequencer.EstimateFeeRequestBulk = invocations.map((invocation) => {
-      let res;
-      if (invocation.type === 'INVOKE_FUNCTION') {
-        res = {
-          type: invocation.type,
-          sender_address: invocation.contractAddress,
-          calldata: CallData.compile(invocation.calldata ?? []),
-        };
-      } else if (invocation.type === 'DECLARE') {
-        res = {
-          type: invocation.type,
-          sender_address: invocation.senderAddress,
-          contract_class: invocation.contractDefinition,
-        };
-      } else {
-        res = {
-          type: invocation.type,
-          class_hash: toHex(toBigInt(invocation.classHash)),
-          constructor_calldata: CallData.compile(invocation.constructorCalldata || []),
-          contract_address_salt: toHex(toBigInt(invocation.addressSalt || 0)),
-        };
-      }
-      return {
-        ...res,
-        signature: bigNumberishArrayToDecimalStringArray(formatSignature(invocation.signature)),
-        version: toHex(toBigInt(invocation?.version || 1)),
-        nonce: toHex(toBigInt(invocation.nonce)),
-      };
-    });
-
-    return this.fetchEndpoint('estimate_fee_bulk', { blockIdentifier }, params).then(
-      this.responseParser.parseFeeEstimateBulkResponse
-    );
+    const transactions = invocations.map((it) => this.buildTransaction(it, 'fee'));
+    return this.fetchEndpoint(
+      'estimate_fee_bulk',
+      { blockIdentifier, skipValidate },
+      transactions
+    ).then(this.responseParser.parseFeeEstimateBulkResponse);
   }
 
   public async getCode(
@@ -549,7 +496,6 @@ export class SequencerProvider implements ProviderInterface {
     const successStates = options?.successStates ?? [
       TransactionStatus.ACCEPTED_ON_L1,
       TransactionStatus.ACCEPTED_ON_L2,
-      TransactionStatus.PENDING,
     ];
 
     while (!onchain) {
@@ -575,11 +521,8 @@ export class SequencerProvider implements ProviderInterface {
 
   /**
    * Gets the status of a transaction.
-   *
-   * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L48-L52)
-   *
-   * @param txHash
-   * @returns the transaction status object \{ block_number, tx_status: NOT_RECEIVED | RECEIVED | PENDING | REJECTED | ACCEPTED_ONCHAIN \}
+   * @param txHash BigNumberish
+   * @returns GetTransactionStatusResponse - the transaction status object
    */
   public async getTransactionStatus(txHash: BigNumberish): Promise<GetTransactionStatusResponse> {
     const txHashHex = toHex(txHash);
@@ -588,9 +531,7 @@ export class SequencerProvider implements ProviderInterface {
 
   /**
    * Gets the smart contract address on the goerli testnet.
-   *
-   * [Reference](https://github.com/starkware-libs/cairo-lang/blob/f464ec4797361b6be8989e36e02ec690e74ef285/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L13-L15)
-   * @returns starknet smart contract addresses
+   * @returns GetContractAddressesResponse - starknet smart contract addresses
    */
   public async getContractAddresses(): Promise<GetContractAddressesResponse> {
     return this.fetchEndpoint('get_contract_addresses');
@@ -598,11 +539,12 @@ export class SequencerProvider implements ProviderInterface {
 
   /**
    * Gets the transaction trace from a tx id.
-   *
-   * @param txHash
-   * @returns the transaction trace
+   * @param txHash BigNumberish
+   * @returns TransactionTraceResponse - the transaction trace
    */
-  public async getTransactionTrace(txHash: BigNumberish): Promise<TransactionTraceResponse> {
+  public async getTransactionTrace(
+    txHash: BigNumberish
+  ): Promise<Sequencer.TransactionTraceResponse> {
     const txHashHex = toHex(txHash);
     return this.fetchEndpoint('get_transaction_trace', { transactionHash: txHashHex });
   }
@@ -621,25 +563,40 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('estimate_message_fee', { blockIdentifier }, validCallL1Handler);
   }
 
+  /**
+   * Simulate transaction using Sequencer provider
+   * WARNING!: Sequencer will process only first element from invocations array
+   *
+   * @param invocations Array of invocations, but only first invocation will be processed
+   * @param blockIdentifier block identifier, default 'latest'
+   * @param skipValidate Skip Account __validate__ method
+   * @returns
+   */
   public async getSimulateTransaction(
-    invocation: Invocation,
-    invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier = this.blockIdentifier,
-    skipValidate: boolean = false
-  ): Promise<TransactionSimulationResponse> {
+    invocations: AccountInvocations,
+    {
+      blockIdentifier = this.blockIdentifier,
+      skipValidate = false,
+      skipExecute = false,
+    }: getSimulateTransactionOptions
+  ): Promise<SimulateTransactionResponse> {
+    if (invocations.length > 1) {
+      // eslint-disable-next-line no-console
+      console.warn('Sequencer simulate process only first element from invocations list');
+    }
+    if (skipExecute) {
+      // eslint-disable-next-line no-console
+      console.warn("Sequencer can't skip account __execute__");
+    }
+    const transaction = this.buildTransaction(invocations[0]);
     return this.fetchEndpoint(
       'simulate_transaction',
-      { blockIdentifier, skipValidate },
       {
-        type: 'INVOKE_FUNCTION',
-        sender_address: invocation.contractAddress,
-        calldata: CallData.compile(invocation.calldata ?? []),
-        signature: signatureToDecimalArray(invocation.signature),
-        version: toHex(invocationDetails?.version || 1),
-        nonce: toHex(invocationDetails.nonce),
-        max_fee: toHex(invocationDetails?.maxFee || 0),
-      }
-    ).then(this.responseParser.parseFeeSimulateTransactionResponse);
+        blockIdentifier,
+        skipValidate: skipValidate ?? false,
+      },
+      transaction
+    ).then(this.responseParser.parseSimulateTransactionResponse);
   }
 
   public async getStateUpdate(
@@ -665,5 +622,62 @@ export class SequencerProvider implements ProviderInterface {
 
   public async getAddressFromStarkName(name: string, StarknetIdContract?: string): Promise<string> {
     return getAddressFromStarkName(this, name, StarknetIdContract);
+  }
+
+  /**
+   * Build Single AccountTransaction from Single AccountInvocation
+   * @param invocation AccountInvocationItem
+   * @param versionType 'fee' | 'transaction' - used to determine default versions
+   * @returns AccountTransactionItem
+   */
+  public buildTransaction(
+    invocation: AccountInvocationItem,
+    versionType?: 'fee' | 'transaction'
+  ): Sequencer.AccountTransactionItem {
+    const defaultVersions = getVersionsByType(versionType);
+    const details = {
+      signature: signatureToDecimalArray(invocation.signature),
+      nonce: toHex(invocation.nonce),
+    };
+
+    if (invocation.type === TransactionType.INVOKE) {
+      return {
+        type: invocation.type,
+        sender_address: invocation.contractAddress,
+        calldata: CallData.compile(invocation.calldata ?? []),
+        version: toHex(invocation.version || defaultVersions.v1),
+        ...details,
+      };
+    }
+    if (invocation.type === TransactionType.DECLARE) {
+      if (!isSierra(invocation.contract)) {
+        return {
+          type: invocation.type,
+          contract_class: invocation.contract,
+          sender_address: invocation.senderAddress,
+          version: toHex(invocation.version || defaultVersions.v1), // fee from getDeclareEstimateFee use t.v. instead of feet.v.
+          ...details,
+        };
+      }
+      return {
+        type: invocation.type,
+        contract_class: invocation.contract,
+        compiled_class_hash: invocation.compiledClassHash,
+        sender_address: invocation.senderAddress,
+        version: toHex(invocation.version || defaultVersions.v2), // fee on getDeclareEstimateFee use t.v. instead of feet.v.
+        ...details,
+      };
+    }
+    if (invocation.type === TransactionType.DEPLOY_ACCOUNT) {
+      return {
+        type: invocation.type,
+        constructor_calldata: CallData.compile(invocation.constructorCalldata || []),
+        class_hash: toHex(invocation.classHash),
+        contract_address_salt: toHex(invocation.addressSalt || 0),
+        version: toHex(invocation.version || defaultVersions.v1),
+        ...details,
+      };
+    }
+    throw Error('Sequencer buildTransaction received unknown TransactionType');
   }
 }

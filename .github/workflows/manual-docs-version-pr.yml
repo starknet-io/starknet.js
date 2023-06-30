@@ -35,7 +35,7 @@ jobs:
         uses: peter-evans/create-pull-request@v5
         with:
           branch: ci/docs-version
-          commiter: CI <noreply@github.com>
+          committer: CI <noreply@github.com>
           author: CI <noreply@github.com>
           commit-message: 'docs: generate documentation version'
           title: 'CI documentation version'

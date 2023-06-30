@@ -4,16 +4,19 @@
  */
 
 import { RPC } from '../api/rpc';
-import { Sequencer, TransactionTraceResponse } from '../api/sequencer';
+import { Sequencer } from '../api/sequencer';
 import {
   AllowArray,
+  BlockStatus,
   ByteCode,
   Call,
+  CompiledSierra,
   DeclareContractPayload,
   DeployAccountContractPayload,
+  LegacyContractClass,
   RawCalldata,
   Signature,
-  Status,
+  TransactionStatus,
   TransactionType,
   UniversalDeployerContractPayload,
 } from '../lib';
@@ -24,7 +27,7 @@ export interface GetBlockResponse {
   block_number: number;
   new_root: string;
   parent_hash: string;
-  status: Status;
+  status: BlockStatus;
   transactions: Array<string>;
   gas_price?: string;
   sequencer_address?: string;
@@ -70,7 +73,7 @@ export type GetTransactionReceiptResponse =
 
 export interface CommonTransactionReceiptResponse {
   transaction_hash: string;
-  status?: Status;
+  status?: `${TransactionStatus}`;
   actual_fee?: string;
   status_data?: string;
 }
@@ -144,23 +147,38 @@ export type Storage = Sequencer.Storage;
 
 export type Nonce = Sequencer.Nonce;
 
-export interface TransactionSimulationResponse {
-  trace: TransactionTraceResponse;
-  fee_estimation: EstimateFeeResponse;
-}
+export type SimulationFlags = RPC.SimulationFlags;
+
+export type SimulatedTransaction = {
+  transaction_trace: RPC.Trace | Sequencer.TransactionTraceResponse;
+  fee_estimation: RPC.EstimateFeeResponse | Sequencer.EstimateFeeResponse;
+  suggestedMaxFee?: string | bigint;
+};
+
+export type SimulateTransactionResponse = SimulatedTransaction[];
 
 // As RPC and Sequencer response diverge, use RPC as common response
 export interface StateUpdateResponse {
-  block_hash: string;
-  new_root: string;
+  block_hash?: string;
+  new_root?: string;
   old_root: string;
   state_diff: {
     storage_diffs: RPC.StorageDiffs; // API DIFF
-    declared_contract_hashes?: RPC.DeclaredContractHashes; // RPC only
     deployed_contracts: Sequencer.DeployedContracts;
     nonces: RPC.Nonces; // API DIFF
     old_declared_contracts?: Sequencer.OldDeclaredContracts; // Sequencer Only
-    declared_classes?: Sequencer.DeclaredClasses; // Sequencer Only
-    replaced_classes?: Sequencer.ReplacedClasses; // Sequencer Only
+    declared_classes?: Sequencer.DeclaredClasses;
+    replaced_classes?: Sequencer.ReplacedClasses | RPC.ReplacedClasses;
+    deprecated_declared_classes?: RPC.DeprecatedDeclaredClasses; // RPC Only
   };
 }
+
+/**
+ * Standardized type
+ * Cairo0 program compressed and Cairo1 sierra_program decompressed
+ * abi Abi
+ * CompiledSierra without '.sierra_program_debug_info'
+ */
+export type ContractClassResponse =
+  | LegacyContractClass
+  | Omit<CompiledSierra, 'sierra_program_debug_info'>;

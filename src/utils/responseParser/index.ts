@@ -7,6 +7,7 @@ import {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   InvokeFunctionResponse,
+  SimulateTransactionResponse,
 } from '../../types';
 
 export abstract class ResponseParser {
@@ -25,4 +26,6 @@ export abstract class ResponseParser {
   abstract parseDeployContractResponse(res: any): DeployContractResponse;
 
   abstract parseDeclareContractResponse(res: any): DeclareContractResponse;
+
+  abstract parseSimulateTransactionResponse(res: any): SimulateTransactionResponse;
 }

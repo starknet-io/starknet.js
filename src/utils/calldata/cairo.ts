@@ -1,16 +1,7 @@
-import { AbiStructs, BigNumberish, Uint256 } from '../../types';
+import { Abi, AbiStructs, BigNumberish, Uint, Uint256 } from '../../types';
 import { isBigInt, isHex, isStringWholeNumber } from '../num';
 import { encodeShortString, isShortString, isText } from '../shortString';
 import { UINT_128_MAX, isUint256 } from '../uint256';
-
-export enum Uint {
-  u8 = 'core::integer::u8',
-  u16 = 'core::integer::u16',
-  u32 = 'core::integer::u32',
-  u64 = 'core::integer::u64',
-  u128 = 'core::integer::u128',
-  u256 = 'core::integer::u256', // This one is struct
-}
 
 export const isLen = (name: string) => /_len$/.test(name);
 export const isTypeFelt = (type: string) => type === 'felt' || type === 'core::felt252';
@@ -32,6 +23,30 @@ export const getArrayType = (type: string) => {
   }
   return type.replace('*', '');
 };
+
+/**
+ * tells if an ABI comes from a Cairo 1 contract
+ *
+ * @param abi representing the interface of a Cairo contract
+ * @returns TRUE if it is an ABI from a Cairo1 contract
+ * @example
+ * ```typescript
+ * const isCairo1: boolean = isCairo1Abi(myAbi: Abi);
+ * ```
+ */
+export function isCairo1Abi(abi: Abi): boolean {
+  const firstFunction = abi.find((entry) => entry.type === 'function');
+  if (!firstFunction) {
+    throw new Error(`Error in ABI. No function in ABI.`);
+  }
+  if (firstFunction.inputs.length) {
+    return isCairo1Type(firstFunction.inputs[0].type);
+  }
+  if (firstFunction.outputs.length) {
+    return isCairo1Type(firstFunction.outputs[0].type);
+  }
+  throw new Error(`Error in ABI. No input/output in function ${firstFunction.name}`);
+}
 
 /**
  * named tuple are described as js object {}

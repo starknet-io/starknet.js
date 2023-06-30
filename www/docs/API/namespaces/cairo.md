@@ -6,11 +6,37 @@ sidebar_position: 0
 custom_edit_url: null
 ---
 
-## Enumerations
-
-- [Uint](../enums/cairo.Uint.md)
-
 ## Functions
+
+### isCairo1Abi
+
+▸ **isCairo1Abi**(`abi`): `boolean`
+
+tells if an ABI comes from a Cairo 1 contract
+
+**`Example`**
+
+```typescript
+const isCairo1: boolean = isCairo1Abi(myAbi: Abi);
+```
+
+#### Parameters
+
+| Name  | Type                  | Description                                    |
+| :---- | :-------------------- | :--------------------------------------------- |
+| `abi` | [`Abi`](types.md#abi) | representing the interface of a Cairo contract |
+
+#### Returns
+
+`boolean`
+
+TRUE if it is an ABI from a Cairo1 contract
+
+#### Defined in
+
+[src/utils/calldata/cairo.ts:37](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L37)
+
+---
 
 ### felt
 
@@ -30,7 +56,7 @@ felt cairo type
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:66](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L66)
+[src/utils/calldata/cairo.ts:81](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L81)
 
 ---
 
@@ -50,7 +76,7 @@ felt cairo type
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:15](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L15)
+[src/utils/calldata/cairo.ts:6](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L6)
 
 ---
 
@@ -70,7 +96,7 @@ felt cairo type
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:16](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L16)
+[src/utils/calldata/cairo.ts:7](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L7)
 
 ---
 
@@ -90,7 +116,7 @@ felt cairo type
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:17](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L17)
+[src/utils/calldata/cairo.ts:8](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L8)
 
 ---
 
@@ -110,7 +136,7 @@ felt cairo type
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:19](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L19)
+[src/utils/calldata/cairo.ts:10](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L10)
 
 ---
 
@@ -130,7 +156,7 @@ felt cairo type
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:20](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L20)
+[src/utils/calldata/cairo.ts:11](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L11)
 
 ---
 
@@ -151,7 +177,7 @@ felt cairo type
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:21](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L21)
+[src/utils/calldata/cairo.ts:12](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L12)
 
 ---
 
@@ -171,7 +197,7 @@ felt cairo type
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L22)
+[src/utils/calldata/cairo.ts:13](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L13)
 
 ---
 
@@ -191,7 +217,7 @@ felt cairo type
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:23](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L23)
+[src/utils/calldata/cairo.ts:14](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L14)
 
 ---
 
@@ -211,7 +237,7 @@ felt cairo type
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:24](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L24)
+[src/utils/calldata/cairo.ts:15](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L15)
 
 ---
 
@@ -231,7 +257,7 @@ felt cairo type
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:25](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L25)
+[src/utils/calldata/cairo.ts:16](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L16)
 
 ---
 
@@ -251,7 +277,7 @@ felt cairo type
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:27](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L27)
+[src/utils/calldata/cairo.ts:18](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L18)
 
 ---
 
@@ -271,7 +297,7 @@ felt cairo type
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:29](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L29)
+[src/utils/calldata/cairo.ts:20](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L20)
 
 ---
 
@@ -293,7 +319,7 @@ Uint256 cairo type (helper for common struct type)
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:45](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L45)
+[src/utils/calldata/cairo.ts:60](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L60)
 
 ---
 
@@ -315,4 +341,4 @@ unnamed tuple cairo type (helper same as common struct type)
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:59](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L59)
+[src/utils/calldata/cairo.ts:74](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L74)

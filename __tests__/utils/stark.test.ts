@@ -8,17 +8,22 @@ describe('stark', () => {
   describe('compressProgram()', () => {
     test('compresses a contract program', () => {
       const inputProgram = compiledAccount.program;
-
       const compressed = stark.compressProgram(inputProgram);
-
       expect(compressed).toMatchSnapshot();
     });
     test('works with strings', () => {
       const inputProgram = json.stringify(compiledAccount.program);
-
       const compressed = stark.compressProgram(inputProgram);
-
       expect(compressed).toMatchSnapshot();
+    });
+  });
+
+  describe('decompressProgram()', () => {
+    test('decompress a contract program', () => {
+      const inputProgram = compiledAccount.program;
+      const compressed = stark.compressProgram(inputProgram);
+      const decompressed = stark.decompressProgram(compressed);
+      expect(decompressed).toMatchObject(compiledAccount.program);
     });
   });
 

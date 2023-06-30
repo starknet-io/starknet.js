@@ -4,6 +4,9 @@ import { Provider } from '../provider/default';
 import { Signer, SignerInterface } from '../signer';
 import {
   Abi,
+  AccountInvocationItem,
+  AccountInvocations,
+  AccountInvocationsFactoryDetails,
   AllowArray,
   BigNumberish,
   BlockIdentifier,
@@ -24,6 +27,7 @@ import {
   EstimateFeeBulk,
   EstimateFeeDetails,
   Invocation,
+  Invocations,
   InvocationsDetails,
   InvocationsSignerDetails,
   InvokeFunctionResponse,
@@ -31,8 +35,8 @@ import {
   Nonce,
   ProviderOptions,
   Signature,
-  TransactionBulk,
-  TransactionSimulation,
+  SimulateTransactionDetails,
+  SimulateTransactionResponse,
   TransactionStatus,
   TransactionType,
   TypedData,
@@ -45,6 +49,7 @@ import { parseUDCEvent } from '../utils/events';
 import {
   calculateContractAddressFromHash,
   feeTransactionVersion,
+  feeTransactionVersion_2,
   transactionVersion,
   transactionVersion_2,
 } from '../utils/hash';
@@ -80,6 +85,15 @@ export class Account extends Provider implements AccountInterface {
 
   public async getNonce(blockIdentifier?: BlockIdentifier): Promise<Nonce> {
     return super.getNonceForAddress(this.address, blockIdentifier);
+  }
+
+  private async getNonceSafe(nonce?: BigNumberish) {
+    // Patch DEPLOY_ACCOUNT: RPC getNonce for non-existing address will result in error, on Sequencer it is '0x0'
+    try {
+      return toBigInt(nonce ?? (await this.getNonce()));
+    } catch (error) {
+      return 0n;
+    }
   }
 
   public async estimateFee(
@@ -128,7 +142,7 @@ export class Account extends Provider implements AccountInterface {
     { blockIdentifier, nonce: providedNonce, skipValidate }: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
     const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
-    const version = !isSierra(contract) ? toBigInt(feeTransactionVersion) : transactionVersion_2;
+    const version = !isSierra(contract) ? feeTransactionVersion : feeTransactionVersion_2;
     const chainId = await this.getChainId();
 
     const declareContractTransaction = await this.buildDeclarePayload(
@@ -205,73 +219,19 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async estimateFeeBulk(
-    transactions: TransactionBulk,
-    { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
+    invocations: Invocations,
+    { nonce, blockIdentifier, skipValidate }: EstimateFeeDetails = {}
   ): Promise<EstimateFeeBulk> {
-    const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
-    const version = toBigInt(feeTransactionVersion);
-    const chainId = await this.getChainId();
+    const accountInvocations = await this.accountInvocationsFactory(invocations, {
+      versions: [feeTransactionVersion, feeTransactionVersion_2],
+      nonce,
+      blockIdentifier,
+    });
 
-    const params: any = await Promise.all(
-      [].concat(transactions as []).map(async (transaction: any, index: number) => {
-        const signerDetails: InvocationsSignerDetails = {
-          walletAddress: this.address,
-          nonce: toBigInt(Number(nonce) + index),
-          maxFee: ZERO,
-          version,
-          chainId,
-          cairoVersion: this.cairoVersion,
-        };
-
-        const txPayload = transaction.payload;
-
-        let res;
-        if (typeof transaction === 'object' && transaction.type === 'INVOKE_FUNCTION') {
-          const invocation = await this.buildInvocation(
-            Array.isArray(txPayload) ? txPayload : [txPayload],
-            signerDetails
-          );
-          res = {
-            type: 'INVOKE_FUNCTION',
-            ...invocation,
-            version,
-            nonce: toBigInt(Number(nonce) + index),
-            blockIdentifier,
-          };
-        } else if (typeof transaction === 'object' && transaction.type === 'DECLARE') {
-          const declareContractPayload = await this.buildDeclarePayload(txPayload, signerDetails);
-          res = {
-            type: 'DECLARE',
-            ...declareContractPayload,
-            version,
-            nonce: toBigInt(Number(nonce) + index),
-            blockIdentifier,
-          };
-        } else if (typeof transaction === 'object' && transaction.type === 'DEPLOY_ACCOUNT') {
-          const payload = await this.buildAccountDeployPayload(txPayload, signerDetails);
-          res = {
-            type: 'DEPLOY_ACCOUNT',
-            ...payload,
-            version,
-            nonce,
-            blockIdentifier,
-          };
-        } else if (typeof transaction === 'object' && transaction.type === 'DEPLOY') {
-          const calls = this.buildUDCContractPayload(txPayload);
-          const invocation = await this.buildInvocation(calls, signerDetails);
-          res = {
-            type: 'INVOKE_FUNCTION',
-            ...invocation,
-            version,
-            nonce: toBigInt(Number(nonce) + index),
-            blockIdentifier,
-          };
-        }
-        return res;
-      })
-    );
-
-    const response = await super.getEstimateFeeBulk(params, blockIdentifier);
+    const response = await super.getEstimateFeeBulk(accountInvocations, {
+      blockIdentifier,
+      skipValidate,
+    });
 
     return [].concat(response as []).map((elem: any) => {
       const suggestedMaxFee = estimatedFeeToMaxFee(elem.overall_fee);
@@ -588,7 +548,7 @@ export class Account extends Provider implements AccountInterface {
     { nonce, chainId, version, walletAddress, maxFee }: InvocationsSignerDetails
   ): Promise<DeclareContractTransaction> {
     const { classHash, contract, compiledClassHash } = extractContractHashes(payload);
-    const contractDefinition = parseContract(contract);
+    const compressedCompiledContract = parseContract(contract);
     const signature = await this.signer.signDeclareTransaction({
       classHash,
       compiledClassHash,
@@ -602,7 +562,7 @@ export class Account extends Provider implements AccountInterface {
     return {
       senderAddress: walletAddress,
       signature,
-      contractDefinition,
+      contract: compressedCompiledContract,
       compiledClassHash,
     };
   }
@@ -668,40 +628,88 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async simulateTransaction(
-    calls: AllowArray<Call>,
-    { nonce: providedNonce, blockIdentifier, skipValidate }: EstimateFeeDetails = {}
-  ): Promise<TransactionSimulation> {
-    const transactions = Array.isArray(calls) ? calls : [calls];
-    const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
-    const version = toBigInt(feeTransactionVersion);
+    invocations: Invocations,
+    { nonce, blockIdentifier, skipValidate, skipExecute }: SimulateTransactionDetails = {}
+  ): Promise<SimulateTransactionResponse> {
+    const accountInvocations = await this.accountInvocationsFactory(invocations, {
+      versions: [transactionVersion, transactionVersion_2],
+      nonce,
+      blockIdentifier,
+    });
+
+    return super.getSimulateTransaction(accountInvocations, {
+      blockIdentifier,
+      skipValidate,
+      skipExecute,
+    });
+  }
+
+  public async accountInvocationsFactory(
+    invocations: Invocations,
+    { versions, nonce, blockIdentifier }: AccountInvocationsFactoryDetails
+  ) {
+    const version = versions[0];
+    const safeNonce = await this.getNonceSafe(nonce);
     const chainId = await this.getChainId();
 
-    const signerDetails: InvocationsSignerDetails = {
-      walletAddress: this.address,
-      nonce,
-      maxFee: ZERO,
-      version,
-      chainId,
-      cairoVersion: this.cairoVersion,
-    };
+    return Promise.all(
+      ([] as Invocations).concat(invocations).map(async (transaction, index: number) => {
+        const signerDetails: InvocationsSignerDetails = {
+          walletAddress: this.address,
+          nonce: toBigInt(Number(safeNonce) + index),
+          maxFee: ZERO,
+          version,
+          chainId,
+          cairoVersion: this.cairoVersion,
+        };
+        const txPayload: any = 'payload' in transaction ? transaction.payload : transaction;
+        const common = {
+          type: transaction.type,
+          version,
+          nonce: toBigInt(Number(safeNonce) + index),
+          blockIdentifier,
+        };
 
-    const invocation = await this.buildInvocation(transactions, signerDetails);
-    const response = await super.getSimulateTransaction(
-      invocation,
-      { version, nonce },
-      blockIdentifier,
-      skipValidate
-    );
-
-    const suggestedMaxFee = estimatedFeeToMaxFee(response.fee_estimation.overall_fee);
-
-    return {
-      ...response,
-      fee_estimation: {
-        ...response.fee_estimation,
-        suggestedMaxFee,
-      },
-    };
+        if (transaction.type === TransactionType.INVOKE) {
+          const payload = await this.buildInvocation(
+            ([] as Call[]).concat(txPayload),
+            signerDetails
+          );
+          return {
+            ...common,
+            ...payload,
+          } as AccountInvocationItem;
+        }
+        if (transaction.type === TransactionType.DECLARE) {
+          signerDetails.version = !isSierra(txPayload.contract)
+            ? toBigInt(versions[0])
+            : toBigInt(versions[1]);
+          const payload = await this.buildDeclarePayload(txPayload, signerDetails);
+          return {
+            ...common,
+            ...payload,
+            version: signerDetails.version,
+          } as AccountInvocationItem;
+        }
+        if (transaction.type === TransactionType.DEPLOY_ACCOUNT) {
+          const payload = await this.buildAccountDeployPayload(txPayload, signerDetails);
+          return {
+            ...common,
+            ...payload,
+          } as AccountInvocationItem;
+        }
+        if (transaction.type === TransactionType.DEPLOY) {
+          const calls = this.buildUDCContractPayload(txPayload);
+          const payload = await this.buildInvocation(calls, signerDetails);
+          return {
+            ...common,
+            ...payload,
+            type: TransactionType.INVOKE,
+          } as AccountInvocationItem;
+        }
+        throw Error(`accountInvocationsFactory: unsupported transaction type: ${transaction}`);
+      })
+    ) as Promise<AccountInvocations>;
   }
 
   public override async getStarkName(

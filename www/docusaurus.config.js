@@ -7,13 +7,16 @@ const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 const generateSourceLinkTemplate = (gitRevision) =>
   `https://github.com/0xs34n/starknet.js/blob/${gitRevision || '{gitRevision}'}/{path}#L{line}`;
 
+// TODO: remove the /next/ fragment after the v5 official release
+const migrationGuideLink = '/docs/next/guides/migrate';
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Starknet.js',
   tagline: 'JavaScript library for Starknet',
   url: 'https://starknetjs.com',
   baseUrl: '/',
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
   organizationName: '0xs34n', // Usually your GitHub org/user name.
@@ -34,6 +37,10 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      announcementBar: {
+        content: `<a href="${migrationGuideLink}">Migrate from v4</a>`,
+        backgroundColor: 'rgb(230 231 232)',
+      },
       navbar: {
         title: 'Home',
         logo: {
@@ -78,6 +85,10 @@ const config = {
               {
                 label: 'Guides',
                 to: '/docs/guides/intro',
+              },
+              {
+                label: 'Migrate from v4',
+                to: migrationGuideLink,
               },
             ],
           },

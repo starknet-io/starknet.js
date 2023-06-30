@@ -31,6 +31,8 @@ export type HexCalldata = string[];
 
 export type AllowArray<T> = T | T[];
 
+export type OptionalPayload<T> = { payload: T } | T;
+
 export type RawArgs = RawArgsObject | RawArgsArray;
 
 export type RawArgsObject = {
@@ -46,15 +48,6 @@ export type UniversalDeployerContractPayload = {
   salt?: string;
   unique?: boolean;
   constructorCalldata?: RawArgs;
-};
-
-/**
- * @deprecated deprecated due to no direct deploy, unused - can be removed
- */
-export type DeployContractPayload = {
-  contract: CompiledContract | string;
-  constructorCalldata?: RawCalldata;
-  addressSalt?: string;
 };
 
 export type DeployAccountContractPayload = {
@@ -89,7 +82,7 @@ export type DeclareAndDeployContractPayload = Omit<UniversalDeployerContractPayl
   DeclareContractPayload;
 
 export type DeclareContractTransaction = {
-  contractDefinition: ContractClass;
+  contract: ContractClass;
   senderAddress: string;
   signature?: Signature;
   compiledClassHash?: string;
@@ -98,6 +91,7 @@ export type DeclareContractTransaction = {
 export type CallDetails = {
   contractAddress: string;
   calldata?: RawArgs;
+  entrypoint?: string; // TODO: check if required
 };
 
 export type Invocation = CallDetails & { signature?: Signature };
@@ -126,60 +120,71 @@ export type InvocationsDetailsWithNonce = InvocationsDetails & {
   nonce: BigNumberish;
 };
 
+export enum TransactionType {
+  DECLARE = 'DECLARE',
+  DEPLOY = 'DEPLOY',
+  DEPLOY_ACCOUNT = 'DEPLOY_ACCOUNT',
+  INVOKE = 'INVOKE_FUNCTION',
+}
+
 export enum TransactionStatus {
   NOT_RECEIVED = 'NOT_RECEIVED',
   RECEIVED = 'RECEIVED',
-  PENDING = 'PENDING',
   ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
   ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
   REJECTED = 'REJECTED',
 }
-export type TransactionBulk = Array<
-  | ({ type: 'DECLARE' } & { payload: DeclareContractPayload })
-  | ({ type: 'DEPLOY' } & {
-      payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[];
-    })
-  | ({ type: 'DEPLOY_ACCOUNT' } & { payload: DeployAccountContractPayload })
-  | ({ type: 'INVOKE_FUNCTION' } & { payload: AllowArray<Call> })
->;
 
-export type InvocationBulk = Array<
-  (
-    | ({ type: 'DECLARE' } & DeclareContractTransaction)
-    | ({ type: 'DEPLOY_ACCOUNT' } & DeployAccountContractTransaction)
-    | ({ type: 'INVOKE_FUNCTION' } & Invocation)
-  ) &
-    InvocationsDetailsWithNonce & { blockIdentifier: BlockNumber | BigNumberish }
->;
-
-export type Status =
-  | 'NOT_RECEIVED'
-  | 'RECEIVED'
-  | 'PENDING'
-  | 'ACCEPTED_ON_L2'
-  | 'ACCEPTED_ON_L1'
-  | 'REJECTED';
-
-export enum TransactionType {
-  INVOKE = 'INVOKE_FUNCTION',
-  DECLARE = 'DECLARE',
-  DEPLOY = 'DEPLOY',
-  DEPLOY_ACCOUNT = 'DEPLOY_ACCOUNT',
+export enum BlockStatus {
+  PENDING = 'PENDING',
+  ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
+  ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
+  REJECTED = 'REJECTED',
 }
+
+export enum BlockTag {
+  pending = 'pending',
+  latest = 'latest',
+}
+
+export type BlockNumber = BlockTag | null | number;
+
+/**
+ * hex string and BN are detected as block hashes
+ * decimal string and number are detected as block numbers
+ * null appends nothing to the request url
+ */
+export type BlockIdentifier = BlockNumber | BigNumberish;
+
+/**
+ * items used by AccountInvocations
+ */
+export type AccountInvocationItem = (
+  | ({ type: TransactionType.DECLARE } & DeclareContractTransaction)
+  | ({ type: TransactionType.DEPLOY_ACCOUNT } & DeployAccountContractTransaction)
+  | ({ type: TransactionType.INVOKE } & Invocation)
+) &
+  InvocationsDetailsWithNonce;
+
+/**
+ * Complete invocations array with account details (internal type from account -> provider)
+ */
+export type AccountInvocations = AccountInvocationItem[];
+
+/**
+ * Invocations array user provide to bulk method (simulate)
+ */
+export type Invocations = Array<
+  | ({ type: TransactionType.DECLARE } & OptionalPayload<DeclareContractPayload>)
+  | ({ type: TransactionType.DEPLOY } & OptionalPayload<
+      AllowArray<UniversalDeployerContractPayload>
+    >)
+  | ({ type: TransactionType.DEPLOY_ACCOUNT } & OptionalPayload<DeployAccountContractPayload>)
+  | ({ type: TransactionType.INVOKE } & OptionalPayload<AllowArray<Call>>)
+>;
 
 export type Tupled = { element: any; type: string };
 
-export type BlockTag = 'pending' | 'latest';
-export type BlockNumber = BlockTag | null | number;
-// hex string and BN are detected as block hashes
-// decimal string and number are detected as block numbers
-// null appends nothing to the request url
-export type BlockIdentifier = BlockNumber | BigNumberish;
-
-export type Struct = {
-  type: 'struct';
-  [k: string]: BigNumberish;
-};
 export type Args = {
   [inputName: string]: BigNumberish | BigNumberish[] | ParsedStruct | ParsedStruct[];
 };
@@ -190,6 +195,17 @@ export type ParsedStruct = {
 export type waitForTransactionOptions = {
   retryInterval?: number;
   successStates?: Array<TransactionStatus>;
+};
+
+export type getSimulateTransactionOptions = {
+  blockIdentifier?: BlockIdentifier;
+  skipValidate?: boolean;
+  skipExecute?: boolean;
+};
+
+export type getEstimateFeeBulkOptions = {
+  blockIdentifier?: BlockIdentifier;
+  skipValidate?: boolean;
 };
 
 export interface CallStruct {

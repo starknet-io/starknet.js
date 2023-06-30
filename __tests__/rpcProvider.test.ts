@@ -4,7 +4,7 @@ import { Account, Contract, GetBlockResponse, RpcProvider, stark } from '../src'
 import { StarknetChainId } from '../src/constants';
 import { CallData } from '../src/utils/calldata';
 import { felt, uint256 } from '../src/utils/calldata/cairo';
-// import { toBigInt } from '../src/utils/num';
+import { toHexString } from '../src/utils/num';
 import {
   compiledErc20Echo,
   compiledOpenZeppelinAccount,
@@ -116,8 +116,9 @@ describeIfRpc('RPCProvider', () => {
       test('getEvents ', async () => {
         const randomWallet = stark.randomAddress();
         const classHash = '0x011ab8626b891bcb29f7cc36907af7670d6fb8a0528c7944330729d8f01e9ea3';
-        const transferSelector =
-          '271746229759260285552388728919865295615886751538523744128730118297934206697';
+        const transferSelector = toHexString(
+          '271746229759260285552388728919865295615886751538523744128730118297934206697'
+        );
 
         const { deploy } = await account.declareAndDeploy({
           contract: compiledErc20Echo,
@@ -146,7 +147,7 @@ describeIfRpc('RPCProvider', () => {
           from_block: { block_number: 0 },
           to_block: { block_number: blockNumber },
           address: deploy.contract_address,
-          keys: [transferSelector],
+          keys: [[transferSelector]],
           chunk_size: 2,
         });
 
@@ -160,7 +161,7 @@ describeIfRpc('RPCProvider', () => {
           from_block: { block_number: 0 },
           to_block: { block_number: blockNumber },
           address: deploy.contract_address,
-          keys: [transferSelector],
+          keys: [[transferSelector]],
           chunk_size: 2,
           continuation_token: result.continuation_token,
         });

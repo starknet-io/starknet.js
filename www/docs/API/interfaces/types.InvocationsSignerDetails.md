@@ -55,7 +55,7 @@ Required.nonce
 
 #### Defined in
 
-[src/types/lib/index.ts:110](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L110)
+[src/types/lib/index.ts:104](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L104)
 
 ---
 
@@ -69,7 +69,7 @@ Required.maxFee
 
 #### Defined in
 
-[src/types/lib/index.ts:111](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L111)
+[src/types/lib/index.ts:105](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L105)
 
 ---
 
@@ -83,4 +83,4 @@ Required.version
 
 #### Defined in
 
-[src/types/lib/index.ts:112](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L112)
+[src/types/lib/index.ts:106](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L106)

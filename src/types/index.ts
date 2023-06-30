@@ -6,3 +6,4 @@ export * from './signer';
 export * from './typedData';
 export * from './api/sequencer';
 export * from './api/rpc';
+export * from './calldata';
