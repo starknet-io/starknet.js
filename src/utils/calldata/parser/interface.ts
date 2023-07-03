@@ -1,4 +1,4 @@
-import { FunctionAbi } from '../../../types';
+import { Abi, FunctionAbi } from '../../../types';
 
 export abstract class AbiParserInterface {
   /**
@@ -7,4 +7,5 @@ export abstract class AbiParserInterface {
    */
   public abstract methodInputsLength(abiMethod: FunctionAbi): number;
   public abstract getMethod(name: string): FunctionAbi | undefined;
+  public abstract getLegacyFormat(): Abi;
 }

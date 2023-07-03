@@ -21,4 +21,13 @@ export class AbiParser2 implements AbiParserInterface {
     const intf = this.abi.find((it) => it.type === 'interface');
     return intf.items.find((it) => it.name === name);
   }
+
+  public getLegacyFormat() {
+    return this.abi.flatMap((e) => {
+      if (e.type === 'interface') {
+        return e.items;
+      }
+      return e;
+    });
+  }
 }

@@ -18,7 +18,8 @@ import { getSelectorFromName } from '../selector';
 import { isLongText, splitLongString } from '../shortString';
 import { felt, isLen } from './cairo';
 import formatter from './formatter';
-import { AbiParser } from './parser';
+import { createAbiParser } from './parser';
+import { AbiParserInterface } from './parser/interface';
 import orderPropsByAbi from './propertyOrder';
 import { parseCalldataField } from './requestParser';
 import responseParser from './responseParser';
@@ -29,14 +30,15 @@ export * as cairo from './cairo';
 export class CallData {
   abi: Abi;
 
-  parser: AbiParser;
+  parser: AbiParserInterface;
 
   protected readonly structs: AbiStructs;
 
   constructor(abi: Abi) {
-    this.abi = abi;
+    // this.abi = abi;
     this.structs = CallData.getAbiStruct(abi);
-    this.parser = new AbiParser(abi);
+    this.parser = createAbiParser(abi);
+    this.abi = this.parser.getLegacyFormat();
   }
 
   /**
@@ -64,7 +66,7 @@ export class CallData {
     // get requested method from abi
     const abiMethod = this.abi.find((abi) =>
       type === ValidateType.DEPLOY
-        ? abi.name === method && abi.type === method
+        ? abi.name === method && abi.type === 'constructor'
         : abi.name === method && abi.type === 'function'
     ) as FunctionAbi;
 

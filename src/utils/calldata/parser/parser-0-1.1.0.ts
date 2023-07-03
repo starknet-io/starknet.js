@@ -22,4 +22,8 @@ export class AbiParser1 implements AbiParserInterface {
   public getMethod(name: string): FunctionAbi | undefined {
     return this.abi.find((it) => it.name === name);
   }
+
+  public getLegacyFormat() {
+    return this.abi;
+  }
 }
