@@ -21,6 +21,7 @@ import {
 } from '../types';
 import assert from '../utils/assert';
 import { CallData, cairo } from '../utils/calldata';
+import { createAbiParser } from '../utils/calldata/parser';
 import { ContractInterface } from './interface';
 
 export const splitArgsAndOptions = (args: ArgsOrCalldataWithOptions) => {
@@ -151,7 +152,8 @@ export class Contract implements ContractInterface {
     this.providerOrAccount = providerOrAccount;
     this.callData = new CallData(abi);
     this.structs = CallData.getAbiStruct(abi);
-    this.abi = abi;
+    const parser = createAbiParser(abi);
+    this.abi = parser.getLegacyFormat();
 
     const options = { enumerable: true, value: {}, writable: false };
     Object.defineProperties(this, {
