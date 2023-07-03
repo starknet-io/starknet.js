@@ -1,4 +1,4 @@
-import { AbiEntry, AbiStructs, BigNumberish, ParsedStruct, Tupled } from '../../types';
+import { AbiEntry, AbiStructs, BigNumberish, ParsedStruct, Tupled, Uint256 } from '../../types';
 import { isText, splitLongString } from '../shortString';
 import {
   felt,
@@ -54,6 +54,15 @@ function parseTuple(element: object, typeStr: string): Tupled[] {
   });
 }
 
+function parseUint256(element: object | BigNumberish) {
+  if (typeof element === 'object') {
+    const { low, high } = element as Uint256;
+    return [felt(low as BigNumberish), felt(high as BigNumberish)];
+  }
+  const el_uint256 = uint256(element);
+  return [felt(el_uint256.low), felt(el_uint256.high)];
+}
+
 /**
  * Deep parse of the object that has been passed to the method
  *
@@ -84,6 +93,10 @@ function parseCalldataValue(
 
   // checking if the passed element is struct
   if (structs[type] && structs[type].members.length) {
+    if (isTypeUint256(type)) {
+      return parseUint256(element);
+    }
+
     const { members } = structs[type];
     const subElement = element as any;
 
@@ -100,14 +113,9 @@ function parseCalldataValue(
       return acc.concat(parsedData);
     }, [] as string[]);
   }
-  // check if u256
+  // check if u256 C1v0
   if (isTypeUint256(type)) {
-    if (typeof element === 'object') {
-      const { low, high } = element;
-      return [felt(low as BigNumberish), felt(high as BigNumberish)];
-    }
-    const el_uint256 = uint256(element);
-    return [felt(el_uint256.low), felt(el_uint256.high)];
+    return parseUint256(element);
   }
   if (typeof element === 'object') {
     throw Error(`Parameter ${element} do not align with abi parameter ${type}`);
