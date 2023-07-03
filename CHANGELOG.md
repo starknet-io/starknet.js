@@ -1,3 +1,11 @@
+# [5.16.0](https://github.com/0xs34n/starknet.js/compare/v5.15.1...v5.16.0) (2023-07-03)
+
+### Features
+
+- cairo1 version2 support ([e564033](https://github.com/0xs34n/starknet.js/commit/e564033273ac49e971bbf1db843fb3de236976c0))
+- extract parser from CallData and Cairo ([b7eba2a](https://github.com/0xs34n/starknet.js/commit/b7eba2a1eada3dddb4dc0575c16ac76a42a78678))
+- parsers ([cce9029](https://github.com/0xs34n/starknet.js/commit/cce90299e59e60090b568be14331378de3918924))
+
 ## [5.15.1](https://github.com/0xs34n/starknet.js/compare/v5.15.0...v5.15.1) (2023-06-29)
 
 ### Bug Fixes
