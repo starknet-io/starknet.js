@@ -19,10 +19,19 @@ export class AbiParser1 implements AbiParserInterface {
     return abiMethod.inputs.reduce((acc, input) => (!isLen(input.name) ? acc + 1 : acc), 0);
   }
 
+  /**
+   * get method definition from abi
+   * @param name string
+   * @returns FunctionAbi | undefined
+   */
   public getMethod(name: string): FunctionAbi | undefined {
     return this.abi.find((it) => it.name === name);
   }
 
+  /**
+   * Get Abi in legacy format
+   * @returns Abi
+   */
   public getLegacyFormat() {
     return this.abi;
   }

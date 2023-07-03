@@ -35,7 +35,6 @@ export class CallData {
   protected readonly structs: AbiStructs;
 
   constructor(abi: Abi) {
-    // this.abi = abi;
     this.structs = CallData.getAbiStruct(abi);
     this.parser = createAbiParser(abi);
     this.abi = this.parser.getLegacyFormat();

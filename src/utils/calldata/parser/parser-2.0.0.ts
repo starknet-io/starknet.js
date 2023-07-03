@@ -9,7 +9,7 @@ export class AbiParser2 implements AbiParserInterface {
   }
 
   /**
-   * abi method inputs length without
+   * abi method inputs length
    * @param abiMethod FunctionAbi
    * @returns number
    */
@@ -17,12 +17,21 @@ export class AbiParser2 implements AbiParserInterface {
     return abiMethod.inputs.length;
   }
 
+  /**
+   * get method definition from abi
+   * @param name string
+   * @returns FunctionAbi | undefined
+   */
   public getMethod(name: string): FunctionAbi | undefined {
     const intf = this.abi.find((it) => it.type === 'interface');
-    return intf.items.find((it) => it.name === name);
+    return intf.items.find((it: any) => it.name === name);
   }
 
-  public getLegacyFormat() {
+  /**
+   * Get Abi in legacy format
+   * @returns Abi
+   */
+  public getLegacyFormat(): Abi {
     return this.abi.flatMap((e) => {
       if (e.type === 'interface') {
         return e.items;
