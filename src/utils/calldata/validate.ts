@@ -98,6 +98,12 @@ const validateBool = (parameter: any, input: AbiEntry) => {
 };
 
 const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) => {
+  // c1v2 uint256 in struct
+  if (input.type === Uint.u256) {
+    validateUint(parameter, input);
+    return;
+  }
+
   assert(
     typeof parameter === 'object' && !Array.isArray(parameter),
     `Validate: arg ${input.name} is cairo type struct (${input.type}), and should be defined as js object (not array)`

@@ -1,7 +1,6 @@
 /* eslint-disable no-plusplus */
 import {
   Abi,
-  AbiEntry,
   AbiStructs,
   Args,
   ArgsOrCalldata,
@@ -19,6 +18,8 @@ import { getSelectorFromName } from '../selector';
 import { isLongText, splitLongString } from '../shortString';
 import { felt, isLen } from './cairo';
 import formatter from './formatter';
+import { createAbiParser } from './parser';
+import { AbiParserInterface } from './parser/interface';
 import orderPropsByAbi from './propertyOrder';
 import { parseCalldataField } from './requestParser';
 import responseParser from './responseParser';
@@ -29,11 +30,14 @@ export * as cairo from './cairo';
 export class CallData {
   abi: Abi;
 
+  parser: AbiParserInterface;
+
   protected readonly structs: AbiStructs;
 
   constructor(abi: Abi) {
-    this.abi = abi;
     this.structs = CallData.getAbiStruct(abi);
+    this.parser = createAbiParser(abi);
+    this.abi = this.parser.getLegacyFormat();
   }
 
   /**
@@ -61,12 +65,12 @@ export class CallData {
     // get requested method from abi
     const abiMethod = this.abi.find((abi) =>
       type === ValidateType.DEPLOY
-        ? abi.name === method && abi.type === method
+        ? abi.name === method && abi.type === 'constructor'
         : abi.name === method && abi.type === 'function'
     ) as FunctionAbi;
 
     // validate arguments length
-    const inputsLength = CallData.abiInputsLength(abiMethod.inputs);
+    const inputsLength = this.parser.methodInputsLength(abiMethod);
     if (args.length !== inputsLength) {
       throw Error(
         `Invalid number of arguments, expected ${inputsLength} arguments, but got ${args.length}`
@@ -192,15 +196,6 @@ export class CallData {
   public format(method: string, response: string[], format: object): Result {
     const parsed = this.parse(method, response);
     return formatter(parsed, format);
-  }
-
-  /**
-   * Helper to calculate inputs from abi
-   * @param inputs AbiEntry
-   * @returns number
-   */
-  static abiInputsLength(inputs: AbiEntry[]) {
-    return inputs.reduce((acc, input) => (!isLen(input.name) ? acc + 1 : acc), 0);
   }
 
   /**

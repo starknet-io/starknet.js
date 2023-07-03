@@ -37,6 +37,10 @@ export const getArrayType = (type: string) => {
 export function isCairo1Abi(abi: Abi): boolean {
   const firstFunction = abi.find((entry) => entry.type === 'function');
   if (!firstFunction) {
+    if (abi.find((it) => it.type === 'interface')) {
+      // Expected in Cairo1 version 2
+      return true;
+    }
     throw new Error(`Error in ABI. No function in ABI.`);
   }
   if (firstFunction.inputs.length) {

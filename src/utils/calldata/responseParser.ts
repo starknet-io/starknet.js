@@ -47,6 +47,13 @@ function parseResponseValue(
   element: { name: string; type: string },
   structs: AbiStructs
 ): BigNumberish | ParsedStruct | boolean | any[] {
+  // type uint256 struct (c1v2)
+  if (isTypeUint256(element.type)) {
+    const low = responseIterator.next().value;
+    const high = responseIterator.next().value;
+    return uint256ToBN({ low, high });
+  }
+
   // type struct
   if (element.type in structs && structs[element.type]) {
     return structs[element.type].members.reduce((acc, el) => {
