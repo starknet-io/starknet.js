@@ -6,7 +6,7 @@ sidebar_position: 4
 
 Once your provider is initialized, you can connect an existing account.
 
-You need 2 data pieces of:
+You need 2 pieces of data:
 
 - the address of the account
 - the private key of this account
@@ -45,15 +45,15 @@ const account = new Account(provider, accountAddress, privateKey);
 
 Your account is now connected, and you can use it.
 
-## 👛 Connect to a existing account (in any network)
+## 👛 Connect to an existing account (in any network)
 
-The code is exactly the same, you just have to:
+The code is the same, you just have to:
 
 - connect to the appropriate network.
 - use the address of this account (public data).
 - use the private key of this account (very sensitive data: your code MUST not disclose it).
 
-For example, to connect an existing account to testnet, with a private key stored in .env non archived file:
+For example, to connect an existing account on testnet, with a private key stored in a .env non-archived file:
 
 ```typescript
 import * as dotenv from "dotenv";

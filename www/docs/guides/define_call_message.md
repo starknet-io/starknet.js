@@ -9,9 +9,9 @@ This guide is the most important of all this documentation. Take your time, and 
 Cairo contracts and Javascript/Typescript languages do not have the same types of data. To exchange data with Starknet, the data have to be transformed and formatted in a list of numbers.
 
 So, it's necessary to prepare the data before sending them to a contract.
-On the other side, when a contract sends data to your DAPP (result of a call), you also have to transform them before using them in your code.
+On the other side, when a contract sends data to your DAPP (the result of a call), you also have to transform them before using them in your code.
 
-In Starknet.js, you can perform these transformations manually, but you can take advantage of methods that performs these transformations.
+In Starknet.js, you can perform these transformations manually, but you can take advantage of methods that perform these transformations.
 
 ## Types of data
 
@@ -20,23 +20,23 @@ In Starknet.js, you can perform these transformations manually, but you can take
 Cairo has 2 versions, involving 2 types of data:
 
 - **Cairo 0**: here, everything is felt, an integer on 251 bits.  
-  Available: array, struct, tuple, named tuple, a mix of these elements.
+  Available: array, struct, tuple, named tuple, or a mix of these elements.
 - **Cairo 1**: with plethora of literal types: u8, u16, u32, usize, u64, u128, felt252, u256, bool, address.  
-  Available: array, struct, tuple, a mix of these elements.
+  Available: array, struct, tuple, or a mix of these elements.
 
 Starknet.js is compatible with both versions.
 
 ### Starknet
 
-Starknet is waiting a list of felts, and answers with the same format.
+Starknet is waiting for a list of felts, and answers with the same format.
 
 ### Javascript / Typescript
 
-These types does not exist in JS/TS - you have Number, bigInt, string, array, objects... and types defined in libraries.
+These types do not exist in JS/TS - you have Number, bigInt, string, array, objects... and types defined in libraries.
 
 In Starknet.js, it's a bit ... complicated: you have the BigNumberish type and it can include:
 
-- String representing a number: "123", "0xabc2"
+- String (representing a number): "123", "0xabc2"
 - Number (max 53 bits): 123
 - BigInt (max 255 bits): 12345612345n
 
@@ -47,11 +47,11 @@ const decimals: BigNumberish = 18;
 
 ## Preparation of data before delivery
 
-If your Cairo smart-contract is waiting a:
+If your Cairo smart contract is waiting for a:
 
 ### felt, u8, u16, u32, usize, u64, u128, felt252, address
 
-Starknet is waiting a felt.  
+Starknet is waiting for a felt.  
 You can send to Starknet.js methods: bigNumberish.
 
 ```typescript
@@ -60,7 +60,7 @@ await myContract.my_function(12,"13","0xe",15n);
 
 ### bool
 
-Starknet is waiting a felt, containing 0 or 1.  
+Starknet is waiting for a felt, containing 0 or 1.  
 You can send to Starknet.js methods: boolean, bigNumberish.
 
 ```typescript
@@ -69,7 +69,7 @@ await myContract.my_function(true,1);
 
 ### u256
 
-Starknet is waiting 2 felts, the first including the lowest 128 bits, the second including the 128 highest bits.  
+Starknet is waiting for 2 felts, the first including the lowest 128 bits, the second including the 128 highest bits.  
 You can send to Starknet.js methods: bigNumberish (Cairo 1 only), Uint256 object (both Cairo 0 & 1).
 
 ```typescript
@@ -88,7 +88,7 @@ const a3: Uint256 = {low: a1.low,high: a1.high};
 
 ### string
 
-Starknet is waiting a felt, including 31 ASCII characters max.
+Starknet is waiting for a felt, including 31 ASCII characters max.
 You can send to Starknet.js methods: string, bigNumberish.
 
 ```typescript
@@ -112,7 +112,7 @@ The result is: "uri/pict/t38.jpg"
 ### longString
 
 longString is a string that may contain more than 31 characters.
-Starknet is waiting an array of felt: string_len, string1, string2, ...  
+Starknet is waiting for an array of felt: string_len, string1, string2, ...  
 You can send to Starknet.js methods: string, bigNumberish[].
 
 ```typescript
@@ -133,8 +133,8 @@ const longString: string[] = shortString.splitLongString("http://addressOfMyERC7
 
 ### tuple
 
-Starknet is waiting a list of felts.  
-You can send to Starknet.js methods: `cairo.tuple()`, object.
+Starknet is waiting for a list of felts.  
+You can send it to Starknet.js methods: `cairo.tuple()`, object.
 
 ```typescript
 const myTpl = cairo.tuple("0x0a", 200);
@@ -151,7 +151,7 @@ const myTpl = {"0": "0x0a", "1": 200};
 
 > Only for Cairo 0.
 
-Starknet is waiting a list of felts.  
+Starknet is waiting for a list of felts.  
 You can send to Starknet.js methods: an object, `cairo.tuple()`, list of bigNumberish.  
 From this ABI:
 
@@ -183,8 +183,8 @@ await myContract.my_function(myStruct);
 
 ### array
 
-Starknet is waiting an array of felts: array_len, array1, array2, ...  
-You can send to Starknet.js methods: bigNumberish[].
+Starknet is waiting for an array of felts: array_len, array1, array2, ...  
+You can send it to Starknet.js methods: bigNumberish[].
 
 ```typescript
 Const myArray = [10,"0xaa",567n];
@@ -195,9 +195,9 @@ await myContract.my_function(myArray);
 
 ### complex types
 
-You can mix and nest literals, arrays, structs and tuples.
+You can mix and nest literals, arrays, structs, and tuples.
 
-Starknet is waiting a list of felts.  
+Starknet is waiting for a list of felts.  
 All these examples are valid:
 
 ```typescript
@@ -223,7 +223,7 @@ There are 12 methods using contract parameters. Some types are authorized for ea
 ### list of parameters
 
 Only meta-class methods are using a list of parameters (as illustrated in the previous chapter).  
-A Meta-Class is a Class which has any of its properties determined at run-time. The Contract object uses a Contract's ABI to determine what methods are available.
+A Meta-Class is a Class that has any of its properties determined at run-time. The Contract object uses a Contract's ABI to determine what methods are available.
 
 ```typescript
 await myContract.my_function("TOKEN", "13", [10, 11, 12], 135438734812n);
@@ -247,7 +247,7 @@ const txResp = await account0.execute({
     calldata: myParams});
 ```
 
-All Starknet.js methods accepts this type of input, except meta-class, that needs 3 dots prefix:
+All Starknet.js methods accept this type of input, except meta-class, which needs 3 dots prefix:
 
 ```typescript
 const myParams = ["TOKEN", "13", [10, 11, 12], 135438734812n];
@@ -261,7 +261,7 @@ await myContract[functionName](...myParams);
 
 ### Object (without ABI conformity check)
 
-Use of objects allows a clear representation of the list of parameters:
+The use of objects allows a clear representation of the list of parameters:
 
 ```typescript
 const myParams = {
@@ -279,7 +279,7 @@ This type is available for: `CallData.compile(), hash.calculateContractAddressFr
 
 ### Object (with ABI conformity check)
 
-This is the recommended type of inputs to use, especially for complex ABI.
+This is the recommended type of input to use, especially for complex ABI.
 
 ```typescript
 const myFalseUint256 = { high: 1, low: 23456 }; // wrong order ; should be low first
@@ -321,9 +321,9 @@ const myCall: Call = myContract.populate("get_elements", functionParameters);
 const res = await myContract.get_elements(...myCall.calldata);
 ```
 
-It can be used only with methods that knows the abi: `Contract.populate, myCallData.compile`.  
-Starknet.js will perform a full check of conformity with the ABI of the contract, reorder the objects properties if necessary, stop if something is wrong or missing, remove not requested properties, convert everything to Starknet format.  
-Starknet.js will alert earlier of errors in your parameters (with human comprehensible words), before call to Starknet. So, no more incomprehensible Starknet messages due to parameters construction.
+It can be used only with methods that know the abi: `Contract.populate, myCallData.compile`.  
+Starknet.js will perform a full check of conformity with the ABI of the contract, reorder the object's properties if necessary, stop if something is wrong or missing, remove not requested properties, and convert everything to Starknet format.  
+Starknet.js will alert you earlier of errors in your parameters (with human comprehensible words), before the call to Starknet. So, no more incomprehensible Starknet messages due to parameters construction.
 
 If a property `array_len` has been added before an array, this property is ignored as it's automatically managed by Starknet.js.
 
@@ -364,9 +364,9 @@ const tx = await account0.execute([myCall1, myCall2, myCall3]);
 
 ### Array of strings (representing numbers)
 
-This type is particularly useful when you need the maximum of performance and speed in your code ; You have no automatic transformation, no checks with ABI, no parsing.
+This type is particularly useful when you need the maximum performance and speed in your code; You have no automatic transformation, no checks with ABI, and no parsing.
 
-You provide to starknet.js the low level data expected by Starknet:
+You provide to starknet.js the low-level data expected by Starknet:
 
 ```typescript
 const specialParameters: Calldata = [
@@ -408,9 +408,9 @@ These types of arguments can't be used at your convenience everywhere. Here is a
 
 ## Receive data from a Cairo contract
 
-When you perform a call, the result depends of the contract language:
+When you perform a call, the result depends on the contract language:
 
-- In Cairo 0, then answer is an object, with keys using the Cairo variables names.
+- In Cairo 0, the answer is an object, with keys using the Cairo variable's names.
 
 Example:
 
@@ -450,7 +450,7 @@ const isAbiCairo1: boolean = cairo.isCairo1Abi(myAbi);
 
 ### parseRequest
 
-If for any reason (mainly for speed of processing), you want to define yourself the low level parameters to send to Starknet, you can use the `parseRequest` option.  
+If for any reason (mainly for speed of processing), you want to define yourself the low-level parameters to send to Starknet, you can use the `parseRequest` option.  
 Parameters are an array of strings (representing numbers).
 
 ```typescript
@@ -464,20 +464,20 @@ const txH = await myContract.send_tk([
 
 ### parseResponse
 
-If for any reason, you want to receive a low level answer from Starknet, you can use the parseResponse option.
+If for any reason, you want to receive a low-level answer from Starknet, you can use the parseResponse option.
 
 ```typescript
 const result = await myContract.call("get_bals",100n, {parseResponse: false});
 ```
 
-Answer is an array of strings (representing numbers).
+The answer is an array of strings (representing numbers).
 
 ### formatResponse
 
 As seen above, the strings returned by Starknet are not automatically parsed, because ABI does not inform when a contract returns a string.  
 But there is a way to have automatic parsing of a string.
 
-As example, if a contract returns a struct containing a shortString and a longString:
+For example, if a contract returns a struct containing a shortString and a longString:
 
 ```typescript
 { name: felt252, description: Array<felt252> }

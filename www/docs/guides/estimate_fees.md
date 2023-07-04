@@ -4,9 +4,9 @@ sidebar_position: 10
 
 # Estimate fees
 
-By default, all non free Starknet commands (declare, deploy, invoke) work without any limitation of cost.
+By default, all nonfree Starknet commands (declare, deploy, invoke) work without any limitation of cost.
 
-Nevertheless, you might want to inform the DAPP user of the cost of the incoming transaction before proceeding, and request its validation.
+Nevertheless, you might want to inform the DAPP user of the cost of the incoming transaction before proceeding and requesting its validation.
 
 Starknet.js proposes several functions to estimate the fees:
 
@@ -77,7 +77,7 @@ import { stark } from "starknet";
 stark.estimatedFeeToMaxFee(estimatedFee1, 0.1);
 ```
 
-Example for declare:
+Example for declaring:
 
 ```typescript
 const { suggestedMaxFee: estimatedFee1 } = await account0.estimateDeclareFee({ contract: compiledTest });

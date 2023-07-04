@@ -4,13 +4,13 @@ sidebar_position: 6
 
 # Interact with your contract
 
-Once your provider, contract and account are connected, you can interact with the contract:
+Once your provider, contract, and account are connected, you can interact with the contract:
 
 - you can read the memory of the contract, without fees.
 - you can write to memory, but you have to pay fees.
-  - On Mainnet, you have to pay fees with bridged ETH token.
-  - On Testnet 1 & 2, you have to pay with bridged Goerli ETH token.
-  - On devnet, you have to pay with dummy ETH token.
+  - On Mainnet, you have to pay fees with a bridged ETH token.
+  - On Testnet 1 & 2, you have to pay with a bridged Goerli ETH token.
+  - On devnet, you have to pay with a dummy ETH token.
 
 Your account should be funded enough to pay fees (0.01 ETH should be enough to start).
 
@@ -35,7 +35,7 @@ import { Provider, Contract, Account, ec, json } from "starknet";
 ## 🔍 Read from contract memory, with meta-class
 
 To read the balance, you need to connect a Provider and a Contract.  
-You have to call Starknet, with use of the meta-class method: `contract.function_name(params)` (here `params` is not necessary, because there are no parameters for the `get_balance` function).
+You have to call Starknet, with the use of the meta-class method: `contract.function_name(params)` (here `params` is not necessary, because there are no parameters for the `get_balance` function).
 
 ```typescript
 //initialize Provider
@@ -62,7 +62,7 @@ You have to invoke Starknet, with the use of the meta-class method: `contract.fu
 
 > After the invoke, you have to wait the incorporation of the modification of Balance in the network, with `await provider.waitForTransaction(transaction_hash)`
 
-Here is an example on how to increase and check the balance:
+Here is an example of how to increase and check the balance:
 
 ```typescript
 //initialize Provider
@@ -124,7 +124,7 @@ We will later see this case more in detail in this dedicated [guide](multiCall.m
 
 - address of the contract to invoke
 - name of the function to invoke
-- and array of parameters for this function
+- and an array of parameters for this function
 
 ```typescript
 const result = await account.execute(
@@ -156,7 +156,7 @@ const res = await myTestContract[listFn[fnChoice]](200, 234567897n, 865423);
 
 ### Light and fast call
 
-If you want to have a very fast execution, with the minimum of resource usage:
+If you want to have a very fast execution, with minimum resource usage:
 
 ```typescript
 const specialParameters: Calldata = [
@@ -171,4 +171,4 @@ const getResponse = await myAccount.call(
 );
 ```
 
-You provide the low level numbers expected by Starknet, without any parsing or check. See more details [here](define_call_message.md#parse-configuration).
+You provide the low-level numbers expected by Starknet, without any parsing or checking. See more details [here](define_call_message.md#parse-configuration).

@@ -11,23 +11,23 @@ Based on what has been seen in the previous pages of this guide, we will use an 
 As in Ethereum, a token has an ERC20 contract to manage it. This contract contains a table, that lists the quantity of tokens owned by each involved account:
 ![](./pictures/ERC20.png)
 
-For example, the Account address 2 owns 100 token of this ERC20 contract.
+For example, Account address 2 owns 100 tokens of this ERC20 contract.
 
-Users have the feeling that their tokens are stored in their wallet, but it's absolutely false. You have no list of assets stored in your account contract. In fact, a token has its own ERC20 contract, and the amount of token owned by your account address is stored in this contract.
+Users have the feeling that their tokens are stored in their wallets, but it's absolutely false. You have no list of assets stored in your account contract. In fact, a token has its own ERC20 contract, and the amount of token owned by your account address is stored in this contract.
 
-If you want to have your balance of a token, ask its ERC20 contract, with the function `ERC20contract.balanceOf(accountAddress)`.
+If you want to have your balance of a token, ask for its ERC20 contract, with the function `ERC20contract.balanceOf(accountAddress)`.
 
-When you want to transfer some tokens in you possession, you have to use the ERC20 contract function `transfer`, through the `account.execute` function (or meta-class methods). In this way, Starknet.js will send to the account contract a message signed with the private key.
+When you want to transfer some tokens in your possession, you have to use the ERC20 contract function `transfer`, through the `account.execute` function (or meta-class methods). In this way, Starknet.js will send to the account contract a message signed with the private key.
 
 This message contains the name of the function to call in the ERC20 contract, with its optional parameters.
 
-The account contract will use the public key to check that you have the private key, then will ask to the ERC20 contract to execute the requested function.
+The account contract will use the public key to check that you have the private key, then will ask the ERC20 contract to execute the requested function.
 
 This way, the ERC20 contract is absolutely sure that the caller of the transfer function knows the private key of this account.
 
 ## ETH token is an ERC20 in Starknet
 
-In opposition with Ethereum, the ETH token is an ERC20 in Starknet, as all other tokens. In all networks, it's ERC20 contract address is:
+In opposition to Ethereum, the ETH token is an ERC20 in Starknet, like all other tokens. In all networks, its ERC20 contract address is:
 
 ```typescript
 const addrETH = "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7";
@@ -35,7 +35,7 @@ const addrETH = "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004
 
 ## Deploy an ERC20
 
-Lets dive down the rabbit hole!
+Let's dive down the rabbit hole!
 
 This example works with an ERC20 mintable (everybody can mint new tokens), that we will deploy on the devnet (launched with `starknet-devnet --seed 0`).
 

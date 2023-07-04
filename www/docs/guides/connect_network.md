@@ -4,7 +4,7 @@ sidebar_position: 3
 
 # Provider object 🔌 connect to the network
 
-First thing to do - define with which network you want to interact.
+The first thing to do is to define with which network you want to interact.
 
 With the Provider object, you define which network to use.
 
@@ -35,7 +35,7 @@ const provider = new Provider({ sequencer: { baseUrl:"http://127.0.0.1:5050"} })
 
 ## Connect your DAPP to a private Starknet network
 
-If necessary you can have a full control on the network access (for example, for your company private test network):
+If necessary you can have full control of the network access (for example, for your company's private test network):
 
 ```typescript
 const provider = new Provider({
@@ -55,7 +55,7 @@ For a local [Pathfinder](https://github.com/eqlabs/pathfinder) node:
 const provider = new Provider({ rpc: { nodeUrl: '127.0.0.1:9545' } })
 ```
 
-Your node can be located in your local network (example: pathfinder node running nn a computer on your network, launched with this additional option: `--http-rpc 0.0.0.0:9545`).
+Your node can be located in your local network (example: pathfinder node running on a computer on your network, launched with this additional option: `--http-rpc 0.0.0.0:9545`).
 You can connect with:
 
 ```typescript
@@ -68,7 +68,7 @@ Some methods are available only if connected to a sequencer, and some others are
 
 ### Specific sequencer methods
 
-For example, if you want to estimate the fee of a L1 ➡️ L2 message, you need to use a method that is available only in the sequencer. The class `SequencerProvider` is available for this case:
+For example, if you want to estimate the fee of an L1 ➡️ L2 message, you need to use a method that is available only in the sequencer. The class `SequencerProvider` is available for this case:
 
 ```typescript
 import { SequencerProvider, constants } from "starknet";
@@ -78,7 +78,7 @@ const responseEstimateMessageFee = await provider.estimateMessageFee(.....)
 
 ### Specific RPC methods
 
-For example, if you want to read the events recorded in a range of blocks, you need to use a method available from a RPC node. The class `RpcProvider` is available for this case:
+For example, if you want to read the events recorded in a range of blocks, you need to use a method available from an RPC node. The class `RpcProvider` is available for this case:
 
 ```typescript
 import { RpcProvider } from "starknet";

@@ -10,9 +10,9 @@ You can exchange messages between L1 & L2 networks:
 - L2 Starknet testnet 1 & 2 ↔️ L1 Goerli ETH testnet.
 - L2 local Starknet devnet ↔️ L1 local ETH testnet (Ganache, ...).
 
-You can find explanation of the global mechanism [here](https://docs.starknet.io/documentation/architecture_and_concepts/L1-L2_Communication/messaging-mechanism/).
+You can find an explanation of the global mechanism [here](https://docs.starknet.io/documentation/architecture_and_concepts/L1-L2_Communication/messaging-mechanism/).
 
-Most of the code for this message process will be written in Cairo, but Starknet.js provides some functionalities for this subject.
+Most of the code for this messaging process will be written in Cairo, but Starknet.js provides some functionalities for this subject.
 
 ## L1 ➡️ L2 messages
 
@@ -46,11 +46,11 @@ const responseEstimateMessageFee = await provider.estimateMessageFee({
 })
 ```
 
-If the fee is paid in L1, the cairo contract at `to_Address` is automatically executed, function `entry_point_selector` (the function shall have a decorator `@l1_handler` in the Cairo code), with parameters `payload`.
+If the fee is paid in L1, the Cairo contract at `to_Address` is automatically executed, function `entry_point_selector` (the function shall have a decorator `@l1_handler` in the Cairo code), with parameters `payload`.
 
 ## L2 ➡️ L1 messages
 
-To send a message to L1, you will just invoke a cairo contract function, paying a fee that will pay all the process (in L1 & L2).
+To send a message to L1, you will just invoke a Cairo contract function, paying a fee that will pay all the processes (in L1 & L2).
 
 If necessary you can estimate this fee with the generic `estimateInvokeFee` function:
 
