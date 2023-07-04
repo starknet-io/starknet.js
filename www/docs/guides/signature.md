@@ -19,7 +19,7 @@ const privateKey = "0x1234567890987654321";
 const starknetPublicKey = ec.starkCurve.getStarkKey(privateKey);
 const fullPublicKey = encode.addHexPrefix( encode.buf2hex( ec.starkCurve.getPublicKey( privateKey, false)));
 
-const message : BigNumberish[] = [1, 128, 18, 14];
+const message: BigNumberish[] = [1, 128, 18, 14];
 
 const msgHash = hash.computeHashOnElements(message);
 const signature: weierstrass.SignatureType = ec.starkCurve.sign(msgHash,privateKey);
@@ -55,7 +55,7 @@ console.log("Result (boolean) =", result1);
 
 > The sender can also provide their account address. Then you can check that this full public key is linked to this account. The pubKey that you can read in the account contract is part (part X) of the full pubKey (parts X & Y):
 
-Read the pubKey of the account :
+Read the pubKey of the account:
 
 ```typescript
 const provider = new Provider({ sequencer: { baseUrl: "http://127.0.0.1:5050" } }); //devnet
@@ -103,7 +103,7 @@ These items are designed to be able to be an interface with a wallet. At sign re
 - `message` will be displayed at the bottom of the wallet display, showing clearly (not in hex) the message to sign. Its structure has to be in accordance with the type listed in `primaryType`, defined in `types`.
 - `domain` will be shown above the message. Its structure has to be in accordance with `StarkNetDomain`.
 
-The prefefined types that you can use :
+The predefined types that you can use :
 
 - felt : for an integer on 251 bits.
 - felt\* : for an array of felt.

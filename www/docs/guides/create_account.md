@@ -2,23 +2,23 @@
 sidebar_position: 8
 ---
 
-# Create account
+# Create an account
 
 Since there are no Externally Owned Accounts (EOA) in Starknet, all Accounts in Starknet are contracts.
 
 Unlike in Ethereum where a wallet is created with a public and private key pair, Starknet Accounts are the only way to sign transactions and messages, and verify signatures. Therefore a Account - Contract interface is needed.
 
 Account contracts on Starknet cannot be deployed without paying a fee.
-Create an account is a bit tricky ; you have several steps :
+Create an account is a bit tricky ; you have several steps:
 
 1. Decide on your account type (OpenZeppelin, ArgentX, Braavos, ...).
 2. Compute the address of your future account.
 3. Send funds to this pre-computed address. The funds will be used to pay for the account contract deployment, and remains will fund the new account.
 4. Actual deployment of the Account
 
-## Create OZ (Open Zeppelin) account :
+## Create an OZ (Open Zeppelin) account
 
-> Level : easy.
+> Level: easy.
 
 Here, we will create a wallet with the Open Zeppelin smart contract v0.5.1. The contract class is already implemented in both Testnet 1 & 2.  
 This contract is coded in Cairo 0, so it will not survive to the upcoming regenesis of Starknet.
@@ -27,16 +27,16 @@ This contract is coded in Cairo 0, so it will not survive to the upcoming regene
 import { Account, constants, ec, json, stark, Provider, hash, CallData } from "starknet";
 ```
 
-### compute address :
+### compute address
 
 ```typescript
 // connect provider
 const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } });
 
-// new Open Zeppelin account v0.5.1 :
-    // Generate public and private key pair.
+// new Open Zeppelin account v0.5.1
+// Generate public and private key pair.
 const privateKey = stark.randomAddress();
-console.log('New OZ account :\nprivateKey=', privateKey);
+console.log('New OZ account:\nprivateKey=', privateKey);
 const starkKeyPub = ec.starkCurve.getStarkKey(privateKey);
 console.log('publicKey=', starkKeyPub);
 
@@ -56,7 +56,7 @@ If you want a specific private key, replace `stark.randomAddress()` by your choi
 
 Then you have to fund this address!
 
-How to proceed is out of the scope of this guide, but you can for example :
+How to proceed is out of the scope of this guide, but you can for example:
 
 - Transfer ETH from another wallet.
 - Bridge ETH to this Starknet address.
@@ -70,7 +70,7 @@ curl -X POST http://127.0.0.1:5050/mint -d '{"address":"0x04a093c37ab61065d00155
 
 ### deployment of the new account
 
-If you have sent enough fund to this new address, you can go forward to the final step :
+If you have sent enough fund to this new address, you can go forward to the final step:
 
 ```typescript
 const OZaccount = new Account(provider, OZcontractAddress, privateKey);
@@ -85,9 +85,9 @@ await provider.waitForTransaction(transaction_hash);
 console.log('✅ New OpenZeppelin account created.\n   address =', contract_address);
 ```
 
-## Create Argent account
+## Create an Argent account
 
-> Level : medium.
+> Level: medium.
 
 Here, we will create a wallet with the Argent smart contract v0.2.3. This case is more complicated, because we will have the account behind a proxy contract (this way, the wallet contract can be updated). The contract classes of both contracts are already implemented in both Testnet 1 & 2.
 
@@ -103,7 +103,7 @@ import { Account, ec, json, stark, Provider, hash, CallData } from "starknet";
 // connect provider
 const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } });
 
-//new Argent X account v0.2.3 :
+//new Argent X account v0.2.3
 const argentXproxyClassHash = "0x25ec026985a3bf9d0cc1fe17326b245dfdc3ff89b8fde106542a3ea56c5a918";
 const argentXaccountClassHash = "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2";
 
@@ -134,7 +134,7 @@ Then you have to fund this address.
 
 ### deployment of the new account
 
-If you have sent enough fund to this new address, you can go forward to the final step :
+If you have sent enough fund to this new address, you can go forward to the final step:
 
 ```typescript
 const accountAX = new Account(provider, AXcontractAddress, privateKeyAX);
@@ -146,22 +146,22 @@ const deployAccountPayload = {
     addressSalt: starkKeyPubAX };
 
 const { transaction_hash: AXdAth, contract_address: AXcontractFinalAdress } = await accountAX.deployAccount(deployAccountPayload);
-console.log('✅ ArgentX wallet deployed at :',AXcontractFinalAdress);
+console.log('✅ ArgentX wallet deployed at:',AXcontractFinalAdress);
 ```
 
-## Create Braavos account
+## Create a Braavos account
 
-> Level : hard.
+> Level: hard.
 
 Even more complicated, a Braavos account needs also a proxy, but needs in addition a specific signature. Starknet.js is handling only Starknet standard signatures ; so we needs extra code to handle this specific signature for account creation. These nearly 200 lines of code are not displayed here, but are available in a module [here](./compiled_contracts/deployBraavos.ts).
 
-We will deploy hereunder a Braavos account in devnet. So launch starknet-devnet with these parameters :
+We will deploy hereunder a Braavos account in devnet. So launch starknet-devnet with these parameters:
 
 ```bash
 starknet-devnet --seed 0 --fork-network alpha-goerli
 ```
 
-Initialization :
+Initialization:
 
 ```typescript
 import { Provider, Account, num, stark } from "starknet";
@@ -172,7 +172,7 @@ import { calculateAddressBraavos,
 import axios from "axios";
 ```
 
-If you want to create yourself the private key, for example with a random number :
+If you want to create yourself the private key, for example with a random number:
 
 ```typescript
 const privateKeyBraavos = stark.randomAddress();
@@ -228,7 +228,7 @@ The computed address has been funded automatically by minting new dummy ETH in S
 
 You are not limited to these 3 contracts contracts. You can create your own contract for wallet. It's the concept of Account Abstraction.
 
-You can customize entirely the wallet - for example :
+You can customize entirely the wallet - for example:
 
 - use a different concept of keys.
 
@@ -246,7 +246,7 @@ You can customize entirely the wallet - for example :
 
 The only limitation is your imagination...
 
-Here is an example of a customized wallet, including super administrator management, on a local starknet-devnet :
+Here is an example of a customized wallet, including super administrator management, on a local starknet-devnet:
 
 > launch `starknet-devnet --seed 0` before using this script
 
@@ -265,10 +265,10 @@ const privateKey0 = "0xe3e70682c2094cac629f6fbed82c07cd";
 const accountAddress0 = "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a";
 const account0 = new Account(provider, accountAddress0, privateKey0);
 
-// new account abstraction :
+// new account abstraction
 // Generate public and private key pair.
 const AAprivateKey = stark.randomAddress();
-console.log('New account :\nprivateKey=', AAprivateKey);
+console.log('New account:\nprivateKey=', AAprivateKey);
 const AAstarkKeyPub = ec.starkCurve.getStarkKey(AAprivateKey);
 console.log('publicKey=', AAstarkKeyPub);
 
