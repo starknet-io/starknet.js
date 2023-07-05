@@ -4,19 +4,20 @@ sidebar_position: 13
 
 # Messages with L1 network
 
-You can exchange messages between L1 & L2 networks :
+You can exchange messages between L1 & L2 networks:
 
 - L2 Starknet mainnet ↔️ L1 Ethereum.
 - L2 Starknet testnet 1 & 2 ↔️ L1 Goerli ETH testnet.
 - L2 local Starknet devnet ↔️ L1 local ETH testnet (Ganache, ...).
 
-You can find explanation of the global mechanism [here](https://docs.starknet.io/documentation/architecture_and_concepts/L1-L2_Communication/messaging-mechanism/).
+You can find an explanation of the global mechanism [here](https://docs.starknet.io/documentation/architecture_and_concepts/L1-L2_Communication/messaging-mechanism/).
 
-Most of the code for this message process will be written in Cairo, but Starknet.js provides some functionalities for this subject.
+Most of the code for this messaging process will be written in Cairo, but Starknet.js provides some functionalities for this subject.
 
 ## L1 ➡️ L2 messages
 
-To send a message from L1 to L2, you need a solidity smart contract in the L1 network, calling the `SendMessageToL2` function of the Starknet core contract. The interface of this function :
+To send a message from L1 to L2, you need a solidity smart contract in the L1 network, calling the `SendMessageToL2` function of the Starknet core contract.
+The interface of this function:
 
 ```solidity
 /**
@@ -31,7 +32,7 @@ function sendMessageToL2(
 ) external payable returns (bytes32, uint256);
 ```
 
-You have to pay in the L1 an extra fee when invoking `sendMessageToL2` (of course paid with the L1 fee TOKEN), to pay the L2 part of the messaging mechanism. You can estimate this fee with this function :
+You have to pay in the L1 an extra fee when invoking `sendMessageToL2` (of course paid with the L1 fee TOKEN), to pay the L2 part of the messaging mechanism. You can estimate this fee with this function:
 
 ```typescript
 import { SequencerProvider } from "starknet";
@@ -45,13 +46,13 @@ const responseEstimateMessageFee = await provider.estimateMessageFee({
 })
 ```
 
-If the fee is paid in L1, the cairo contract at `to_Address` is automatically executed, function `entry_point_selector` (the function shall have a decorator `@l1_handler` in the Cairo code), with parameters `payload`.
+If the fee is paid in L1, the Cairo contract at `to_Address` is automatically executed, function `entry_point_selector` (the function shall have a decorator `@l1_handler` in the Cairo code), with parameters `payload`.
 
 ## L2 ➡️ L1 messages
 
-To send a message to L1, you will just invoke a cairo contract function, paying a fee that will pay all the process (in L1 & L2).
+To send a message to L1, you will just invoke a Cairo contract function, paying a fee that will pay all the processes (in L1 & L2).
 
-If necessary you can estimate this fee with the generic `estimateInvokeFee` function :
+If necessary you can estimate this fee with the generic `estimateInvokeFee` function:
 
 ```typescript
 const { suggestedMaxFee: estimatedFee1 } = await account0.estimateInvokeFee({
