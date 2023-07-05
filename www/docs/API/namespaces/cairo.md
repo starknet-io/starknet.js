@@ -56,7 +56,7 @@ felt cairo type
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:81](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L81)
+[src/utils/calldata/cairo.ts:85](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L85)
 
 ---
 
@@ -319,7 +319,7 @@ Uint256 cairo type (helper for common struct type)
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:60](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L60)
+[src/utils/calldata/cairo.ts:64](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L64)
 
 ---
 
@@ -341,4 +341,4 @@ unnamed tuple cairo type (helper same as common struct type)
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:74](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L74)
+[src/utils/calldata/cairo.ts:78](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L78)

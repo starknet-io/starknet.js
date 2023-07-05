@@ -130,16 +130,17 @@ versions { v1: bigint; v2: bigint; }
 
 ### calculateDeployTransactionHash
 
-▸ **calculateDeployTransactionHash**(`contractAddress`, `constructorCalldata`, `version`, `chainId`): `string`
+▸ **calculateDeployTransactionHash**(`contractAddress`, `constructorCalldata`, `version`, `chainId`, `constructorName?`): `string`
 
 #### Parameters
 
-| Name                  | Type                                                       |
-| :-------------------- | :--------------------------------------------------------- |
-| `contractAddress`     | [`BigNumberish`](types.md#bignumberish)                    |
-| `constructorCalldata` | [`RawCalldata`](types.md#rawcalldata)                      |
-| `version`             | [`BigNumberish`](types.md#bignumberish)                    |
-| `chainId`             | [`StarknetChainId`](../enums/constants.StarknetChainId.md) |
+| Name                  | Type                                                       | Default value   |
+| :-------------------- | :--------------------------------------------------------- | :-------------- |
+| `contractAddress`     | [`BigNumberish`](types.md#bignumberish)                    | `undefined`     |
+| `constructorCalldata` | [`RawCalldata`](types.md#rawcalldata)                      | `undefined`     |
+| `version`             | [`BigNumberish`](types.md#bignumberish)                    | `undefined`     |
+| `chainId`             | [`StarknetChainId`](../enums/constants.StarknetChainId.md) | `undefined`     |
+| `constructorName`     | `string`                                                   | `'constructor'` |
 
 #### Returns
 
@@ -173,7 +174,7 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:97](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L97)
+[src/utils/hash.ts:98](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L98)
 
 ---
 
@@ -200,7 +201,7 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:118](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L118)
+[src/utils/hash.ts:119](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L119)
 
 ---
 
@@ -225,7 +226,7 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:142](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L142)
+[src/utils/hash.ts:143](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L143)
 
 ---
 
@@ -248,7 +249,7 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:162](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L162)
+[src/utils/hash.ts:163](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L163)
 
 ---
 
@@ -268,7 +269,7 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:195](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L195)
+[src/utils/hash.ts:196](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L196)
 
 ---
 
@@ -288,7 +289,7 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:213](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L213)
+[src/utils/hash.ts:214](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L214)
 
 ---
 
@@ -308,7 +309,7 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:222](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L222)
+[src/utils/hash.ts:223](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L223)
 
 ---
 
@@ -328,7 +329,7 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:275](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L275)
+[src/utils/hash.ts:276](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L276)
 
 ---
 
@@ -348,7 +349,7 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:316](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L316)
+[src/utils/hash.ts:317](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L317)
 
 ---
 
@@ -372,7 +373,7 @@ HexString ClassHash
 
 #### Defined in
 
-[src/utils/hash.ts:354](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L354)
+[src/utils/hash.ts:355](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L355)
 
 ---
 
