@@ -49,6 +49,18 @@ struct Bet {
     amount: u256,
 }
 
+#[derive(Copy, Drop, Serde)]
+struct Order {
+    p1: felt252,
+    p2: u16,
+}
+
+#[derive(Copy, Drop, Serde)]
+enum MyEnum {
+    Response: Order,
+    Warning: felt252,
+    Error: u16,
+}
 
 #[starknet::interface]
 trait IHelloStarknet<TContractState> {
@@ -106,6 +118,10 @@ trait IHelloStarknet<TContractState> {
 
     // used for changes to redeclare contract
     fn array2ddd_felt(self: @TContractState, testdd: Array<Array<felt252>>) -> felt252;
+    fn my_enum_output(self: @TContractState, val1: u16) -> MyEnum;
+    fn option_u8_output(self: @TContractState, val1: u8) -> Option<u8>;
+    fn option_order_output(self: @TContractState, val1: u16) -> Option<Order>;
+    fn option_order_input(self: @TContractState, inp: Option<Order>) -> u16;
 }
 
 // MAIN APP
@@ -139,6 +155,7 @@ mod HelloStarknet {
     use super::Bet;
     use super::UserData;
     use super::Foo;
+    use super::{Order, MyEnum};
 
     #[storage]
     struct Storage {
@@ -150,6 +167,17 @@ mod HelloStarknet {
         user: UserData,
         user1: UserData,
     }
+
+    #[l1_handler]
+    fn increase_bal(ref self: ContractState, from_address: felt252, amount: felt252) {
+        let current = self.balance.read();
+        self.balance.write(current + amount);
+    }
+
+
+    #[constructor]
+    fn constructor(ref self: ContractState) {}
+
 
     #[external(v0)]
     impl IHelloStarknetImpl of super::IHelloStarknet<ContractState> {
@@ -311,6 +339,42 @@ mod HelloStarknet {
         // used for changes to redeclare contract
         fn array2ddd_felt(self: @ContractState, testdd: Array<Array<felt252>>) -> felt252 {
             return *(testdd.at(0_u32)).at(0_u32);
+        }
+
+        // return MyEnum
+        fn my_enum_output(self: @ContractState, val1: u16) -> MyEnum {
+            if val1 < 100 {
+                return MyEnum::Error(3);
+            }
+            if val1 == 100 {
+                return MyEnum::Warning('attention:100');
+            }
+            MyEnum::Response(Order { p1: 1, p2: val1 })
+        }
+        // return Option<litteral>
+        fn option_u8_output(self: @ContractState, val1: u8) -> Option<u8> {
+            if val1 < 100 {
+                return Option::None(());
+            }
+            Option::Some(val1 + 1)
+        }
+        // return Option<Order>
+        fn option_order_output(self: @ContractState, val1: u16) -> Option<Order> {
+            if val1 < 100 {
+                return Option::None(());
+            }
+            Option::Some(Order { p1: 18, p2: val1 })
+        }
+        // use as input Option<Order>
+        fn option_order_input(self: @ContractState, inp: Option<Order>) -> u16 {
+            match inp {
+                Option::Some(x) => {
+                    return x.p2;
+                },
+                Option::None(()) => {
+                    return 17;
+                }
+            }
         }
     }
 }
