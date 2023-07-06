@@ -3,8 +3,8 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 
-import { RPC } from '../api/rpc';
-import { Sequencer } from '../api/sequencer';
+import * as RPC from '../api/rpc';
+import * as Sequencer from '../api/sequencer';
 import {
   AllowArray,
   BlockStatus,
