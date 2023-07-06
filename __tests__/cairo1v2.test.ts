@@ -290,8 +290,8 @@ describe('Cairo 1 Devnet', () => {
         [1, 2],
         [3, 4],
       ]);
-      const tx1 = await cairo1Contract.array2d_ex(cd);
       await account.waitForTransaction(tx.transaction_hash);
+      const tx1 = await cairo1Contract.array2d_ex(cd);
       await account.waitForTransaction(tx1.transaction_hash);
 
       const result0 = await cairo1Contract.array2d_felt([
