@@ -10,7 +10,7 @@ import assert from '../utils/assert';
 import { CallData } from '../utils/calldata';
 import { Contract, getCalldata, splitArgsAndOptions } from './default';
 
-export type CFParams = {
+export type ContractFactoryParams = {
   compiledContract: CompiledContract;
   account: any;
   casm?: CairoAssembly;
@@ -35,7 +35,6 @@ export class ContractFactory {
   private CallData: CallData;
 
   /**
-   *
    * @param params CFParams
    *  - compiledContract: CompiledContract;
    *  - account: AccountInterface;
@@ -44,7 +43,7 @@ export class ContractFactory {
    *  - compiledClassHash?: string;
    *  - abi?: Abi;
    */
-  constructor(params: CFParams) {
+  constructor(params: ContractFactoryParams) {
     this.compiledContract = params.compiledContract;
     this.account = params.account;
     this.casm = params.casm;
