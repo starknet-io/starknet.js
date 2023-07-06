@@ -56,7 +56,7 @@ export class ContractFactory {
 
   /**
    * Deploys contract and returns new instance of the Contract
-   * If contract not declared it will first declare it than deploy
+   * If contract is not declared it will first declare it, and then deploy
    *
    * @param args - Array of the constructor arguments for deployment
    * @param options (optional) Object - parseRequest, parseResponse, addressSalt
