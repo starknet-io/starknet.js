@@ -1,6 +1,6 @@
 ---
 id: 'modules'
-title: 'Starknet.js API - v5.15.0'
+title: 'Starknet.js API - v5.16.0'
 sidebar_label: 'Exports'
 sidebar_position: 0.5
 custom_edit_url: null
@@ -904,7 +904,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/contract/default.ts:99](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L99)
+[src/contract/default.ts:100](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L100)
 
 ---
 
@@ -924,7 +924,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/contract/default.ts:26](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L26)
+[src/contract/default.ts:27](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L27)
 
 ---
 

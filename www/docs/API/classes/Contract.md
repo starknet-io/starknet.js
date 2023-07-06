@@ -34,7 +34,7 @@ Contract class to handle contract methods
 
 #### Defined in
 
-[src/contract/default.ts:145](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L145)
+[src/contract/default.ts:146](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L146)
 
 ## Properties
 
@@ -48,7 +48,7 @@ Contract class to handle contract methods
 
 #### Defined in
 
-[src/contract/default.ts:116](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L116)
+[src/contract/default.ts:117](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L117)
 
 ---
 
@@ -62,7 +62,7 @@ Contract class to handle contract methods
 
 #### Defined in
 
-[src/contract/default.ts:118](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L118)
+[src/contract/default.ts:119](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L119)
 
 ---
 
@@ -76,7 +76,7 @@ Contract class to handle contract methods
 
 #### Defined in
 
-[src/contract/default.ts:120](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L120)
+[src/contract/default.ts:121](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L121)
 
 ---
 
@@ -90,7 +90,7 @@ Contract class to handle contract methods
 
 #### Defined in
 
-[src/contract/default.ts:122](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L122)
+[src/contract/default.ts:123](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L123)
 
 ---
 
@@ -104,7 +104,7 @@ Contract class to handle contract methods
 
 #### Defined in
 
-[src/contract/default.ts:124](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L124)
+[src/contract/default.ts:125](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L125)
 
 ---
 
@@ -122,7 +122,7 @@ Contract class to handle contract methods
 
 #### Defined in
 
-[src/contract/default.ts:126](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L126)
+[src/contract/default.ts:127](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L127)
 
 ---
 
@@ -140,7 +140,7 @@ Contract class to handle contract methods
 
 #### Defined in
 
-[src/contract/default.ts:128](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L128)
+[src/contract/default.ts:129](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L129)
 
 ---
 
@@ -158,7 +158,7 @@ Contract class to handle contract methods
 
 #### Defined in
 
-[src/contract/default.ts:130](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L130)
+[src/contract/default.ts:131](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L131)
 
 ---
 
@@ -176,7 +176,7 @@ Contract class to handle contract methods
 
 #### Defined in
 
-[src/contract/default.ts:132](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L132)
+[src/contract/default.ts:133](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L133)
 
 ---
 
@@ -186,7 +186,7 @@ Contract class to handle contract methods
 
 #### Defined in
 
-[src/contract/default.ts:136](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L136)
+[src/contract/default.ts:137](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L137)
 
 ## Methods
 
@@ -212,7 +212,7 @@ Saves the address of the contract deployed on network that will be used for inte
 
 #### Defined in
 
-[src/contract/default.ts:199](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L199)
+[src/contract/default.ts:201](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L201)
 
 ---
 
@@ -238,7 +238,7 @@ Attaches to new Provider or Account
 
 #### Defined in
 
-[src/contract/default.ts:203](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L203)
+[src/contract/default.ts:205](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L205)
 
 ---
 
@@ -264,7 +264,7 @@ Promise that resolves when contract is deployed on the network or when no deploy
 
 #### Defined in
 
-[src/contract/default.ts:207](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L207)
+[src/contract/default.ts:209](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L209)
 
 ---
 
@@ -294,7 +294,7 @@ Result of the call as an array with key value pars
 
 #### Defined in
 
-[src/contract/default.ts:215](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L215)
+[src/contract/default.ts:217](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L217)
 
 ---
 
@@ -324,7 +324,7 @@ Add Transaction Response
 
 #### Defined in
 
-[src/contract/default.ts:257](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L257)
+[src/contract/default.ts:259](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L259)
 
 ---
 
@@ -351,7 +351,7 @@ Estimates a method on a contract
 
 #### Defined in
 
-[src/contract/default.ts:301](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L301)
+[src/contract/default.ts:303](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L303)
 
 ---
 
@@ -380,7 +380,7 @@ Invocation object
 
 #### Defined in
 
-[src/contract/default.ts:315](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L315)
+[src/contract/default.ts:317](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L317)
 
 ---
 
@@ -408,4 +408,4 @@ TRUE if the contract comes from a Cairo1 contract
 
 #### Defined in
 
-[src/contract/default.ts:325](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L325)
+[src/contract/default.ts:327](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L327)

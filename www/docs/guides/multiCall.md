@@ -30,7 +30,7 @@ const account = new Account(
 
 ## Interact with contracts
 
-Interact with more than one contract by using `account.execute([calls])`. Example is as follows.
+Interact with more than one contract by using `account.execute([calls])`. The example is as follows.
 
 ```javascript
 const multiCall = await account.execute(
