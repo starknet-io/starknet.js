@@ -125,15 +125,12 @@ describeIfSequencer('SequencerProvider', () => {
     });
 
     test('estimate message fee', async () => {
-      const estimation = await sequencerProvider.estimateMessageFee(
-        {
-          from_address: L1_ADDRESS,
-          to_address: l1l2ContractAddress,
-          entry_point_selector: 'deposit',
-          payload: ['556', '123'],
-        },
-        'latest'
-      );
+      const estimation = await sequencerProvider.estimateMessageFee({
+        from_address: L1_ADDRESS,
+        to_address: l1l2ContractAddress,
+        entry_point_selector: 'deposit',
+        payload: ['556', '123'],
+      });
       expect(estimation).toEqual(
         expect.objectContaining({
           overall_fee: expect.anything(),

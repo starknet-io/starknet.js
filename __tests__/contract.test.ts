@@ -214,12 +214,12 @@ describe('contract module', () => {
       });
     });
     test('deployment of new contract', async () => {
-      const factory = new ContractFactory(compiledErc20, classHash, account);
+      const factory = new ContractFactory({ compiledContract: compiledErc20, classHash, account });
       const erc20 = await factory.deploy('Token', 'ERC20', wallet);
       expect(erc20).toBeInstanceOf(Contract);
     });
     test('wait for deployment transaction', async () => {
-      const factory = new ContractFactory(compiledErc20, classHash, account);
+      const factory = new ContractFactory({ compiledContract: compiledErc20, classHash, account });
       const contract = await factory.deploy(
         CallData.compile({
           name: encodeShortString('Token'),
@@ -230,7 +230,7 @@ describe('contract module', () => {
       expect(contract.deployed()).resolves.not.toThrow();
     });
     test('attach new contract', async () => {
-      const factory = new ContractFactory(compiledErc20, classHash, account);
+      const factory = new ContractFactory({ compiledContract: compiledErc20, classHash, account });
       const erc20 = factory.attach(erc20Address);
       expect(erc20).toBeInstanceOf(Contract);
     });
@@ -245,7 +245,7 @@ describe('Complex interaction', () => {
   let factory: ContractFactory;
 
   beforeAll(async () => {
-    factory = new ContractFactory(compiledErc20Echo, classHash, account);
+    factory = new ContractFactory({ compiledContract: compiledErc20Echo, classHash, account });
     erc20Echo20Contract = await factory.deploy(
       'Token',
       'ERC20',
