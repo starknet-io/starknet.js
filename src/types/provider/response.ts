@@ -40,7 +40,12 @@ export interface GetCodeResponse {
   // abi: string; // is not consistent between rpc and sequencer (is it?), therefore not included in the provider interface
 }
 
-export type GetTransactionResponse = InvokeTransactionResponse & DeclareTransactionResponse;
+export type GetTransactionResponse = (InvokeTransactionResponse | DeclareTransactionResponse) & {
+  transaction_failure_reason?: {
+    code: string;
+    error_message: string;
+  };
+};
 
 export interface CommonTransactionResponse {
   transaction_hash?: string;
@@ -67,9 +72,15 @@ export interface DeclareTransactionResponse extends CommonTransactionResponse {
   sender_address?: string;
 }
 
-export type GetTransactionReceiptResponse =
+export type GetTransactionReceiptResponse = (
   | InvokeTransactionReceiptResponse
-  | DeclareTransactionReceiptResponse;
+  | DeclareTransactionReceiptResponse
+) & {
+  transaction_failure_reason?: {
+    code: string;
+    error_message: string;
+  };
+};
 
 export interface CommonTransactionReceiptResponse {
   transaction_hash: string;
