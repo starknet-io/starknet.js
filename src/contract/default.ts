@@ -315,8 +315,7 @@ export class Contract implements ContractInterface {
   }
 
   public populate(method: string, args: RawArgs = []): Call {
-    const calldata = getCalldata(args, () => this.callData.compile(method, args));
-
+    const calldata: Calldata = getCalldata(args, () => this.callData.compile(method, args));
     return {
       contractAddress: this.address,
       entrypoint: method,

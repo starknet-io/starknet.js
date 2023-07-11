@@ -141,6 +141,23 @@ describe('Cairo 1 Devnet', () => {
       // defined as struct
       const result1 = await cairo1Contract.test_u256(uint256(2n ** 256n - 2n));
       expect(result1).toBe(2n ** 256n - 1n);
+
+      // using Contract.populate result in meta-class
+      const functionParameters: RawArgsObject = { p1: cairo.uint256(15) };
+      const myCall0 = cairo1Contract.populate('test_u256', functionParameters);
+      const res0 = await cairo1Contract.test_u256(myCall0.calldata);
+      expect(res0).toBe(16n);
+
+      // using myCallData.compile result in meta-class
+      const contractCallData: CallData = new CallData(cairo1Contract.abi);
+      const myCalldata: Calldata = contractCallData.compile('test_u256', functionParameters);
+      const res1 = await cairo1Contract.test_u256(myCalldata);
+      expect(res1).toBe(16n);
+
+      // using CallData.compile result in meta-class
+      const contractCallData2: Calldata = CallData.compile(functionParameters);
+      const res2 = await cairo1Contract.test_u256(contractCallData2);
+      expect(res2).toBe(16n);
     });
 
     test('Cairo 1 Contract Interaction - bool', async () => {
@@ -290,8 +307,8 @@ describe('Cairo 1 Devnet', () => {
         [1, 2],
         [3, 4],
       ]);
-      const tx1 = await cairo1Contract.array2d_ex(cd);
       await account.waitForTransaction(tx.transaction_hash);
+      const tx1 = await cairo1Contract.array2d_ex(cd);
       await account.waitForTransaction(tx1.transaction_hash);
 
       const result0 = await cairo1Contract.array2d_felt([

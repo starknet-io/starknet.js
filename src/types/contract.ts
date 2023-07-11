@@ -1,4 +1,4 @@
-import { BigNumberish, BlockIdentifier, RawArgsArray, Signature } from './lib';
+import { BigNumberish, BlockIdentifier, Calldata, RawArgsArray, Signature } from './lib';
 
 export type AsyncContractFunction<T = any> = (...args: ArgsOrCalldataWithOptions) => Promise<T>;
 export type ContractFunction = (...args: ArgsOrCalldataWithOptions) => any;
@@ -10,12 +10,6 @@ export type Result =
   | bigint
   | string
   | boolean;
-
-/**
- * Compiled calldata ready to be sent
- * decimal-string array
- */
-export type Calldata = string[] & { readonly __compiled__?: boolean };
 
 export type ArgsOrCalldata = RawArgsArray | [Calldata] | Calldata;
 export type ArgsOrCalldataWithOptions = ArgsOrCalldata & ContractOptions;
