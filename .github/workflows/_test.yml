@@ -24,7 +24,7 @@ jobs:
     services:
       devnet:
         # image: ${{ inputs.is-rpc && 'shardlabs/starknet-devnet:0.5.3-seed0' || 'shardlabs/starknet-devnet:0.5.2-seed0' }}
-        image: shardlabs/starknet-devnet:0.5.4-seed0
+        image: shardlabs/starknet-devnet:0.5.5-seed0
         ports:
           - 5050:5050
 
