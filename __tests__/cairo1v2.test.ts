@@ -1,6 +1,8 @@
 import {
   Account,
   BigNumberish,
+  CairoCustomEnum,
+  CairoOption,
   CallData,
   Calldata,
   CompiledSierra,
@@ -343,6 +345,39 @@ describe('Cairo 1 Devnet', () => {
         0: [1n, 2n, 3n],
         1: [4n, 5n, 6n],
       });
+    });
+
+    test('CairoEnums', async () => {
+      type Order = {
+        p1: BigNumberish;
+        p2: BigNumberish;
+      };
+      // return a Cairo Custom Enum
+      const myCairoEnum: CairoCustomEnum = await cairo1Contract.my_enum_output(50);
+      expect(myCairoEnum.unwrap()).toEqual(3n);
+      expect(myCairoEnum.activeVariant()).toEqual('Error');
+
+      const myCairoEnum2: CairoCustomEnum = await cairo1Contract.my_enum_output(100);
+      expect(myCairoEnum2.unwrap()).toEqual(BigInt(shortString.encodeShortString('attention:100')));
+      expect(myCairoEnum2.activeVariant()).toEqual('Warning');
+
+      const myCairoEnum3: CairoCustomEnum = await cairo1Contract.my_enum_output(150);
+      const res: Order = myCairoEnum3.unwrap();
+      expect(res).toEqual({ p1: 1n, p2: 150n });
+      expect(myCairoEnum3.activeVariant()).toEqual('Response');
+
+      // return a Cairo Option
+      const myCairoOption: CairoOption<Order> = await cairo1Contract.option_order_output(50);
+      expect(myCairoOption.unwrap()).toEqual(undefined);
+      expect(myCairoOption.isNone()).toEqual(true);
+      expect(myCairoOption.isSome()).toEqual(false);
+
+      const myCairoOption2: CairoOption<Order> = await cairo1Contract.option_order_output(150);
+      expect(myCairoOption2.unwrap()).toEqual({ p1: 18n, p2: 150n });
+      expect(myCairoOption2.isNone()).toEqual(false);
+      expect(myCairoOption2.isSome()).toEqual(true);
+
+      // TODO : Cairo Result will be tested when Cairo >=v2.1.0 will be implemented in Starknet devnet.
     });
 
     test('myCallData.compile for Cairo 1', async () => {

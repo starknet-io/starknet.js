@@ -29,4 +29,12 @@ export type StructAbi = {
   type: 'struct';
 };
 
+export type AbiEnums = { [name: string]: EnumAbi };
+export type EnumAbi = {
+  variants: (AbiEntry & { offset: number })[];
+  name: string;
+  size: number;
+  type: 'enum';
+};
+
 type EventAbi = any;

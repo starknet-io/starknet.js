@@ -1,6 +1,7 @@
 /* eslint-disable no-plusplus */
 import {
   Abi,
+  AbiEnums,
   AbiStructs,
   Args,
   ArgsOrCalldata,
@@ -34,8 +35,11 @@ export class CallData {
 
   protected readonly structs: AbiStructs;
 
+  protected readonly enums: AbiEnums;
+
   constructor(abi: Abi) {
     this.structs = CallData.getAbiStruct(abi);
+    this.enums = CallData.getAbiEnum(abi);
     this.parser = createAbiParser(abi);
     this.abi = this.parser.getLegacyFormat();
   }
@@ -192,7 +196,7 @@ export class CallData {
 
     const parsed = outputs.flat().reduce((acc, output, idx) => {
       const propName = output.name ?? idx;
-      acc[propName] = responseParser(responseIterator, output, this.structs, acc);
+      acc[propName] = responseParser(responseIterator, output, this.structs, this.enums, acc);
       if (acc[propName] && acc[`${propName}_len`]) {
         delete acc[`${propName}_len`];
       }
@@ -230,6 +234,25 @@ export class CallData {
         }),
         {}
       );
+  }
+
+  /**
+   * Helper to extract enums from abi
+   * @param abi Abi
+   * @returns AbiEnums - enums from abi
+   */
+  static getAbiEnum(abi: Abi): AbiEnums {
+    const fullEnumList = abi
+      .filter((abiEntry) => abiEntry.type === 'enum')
+      .reduce(
+        (acc, abiEntry) => ({
+          ...acc,
+          [abiEntry.name]: abiEntry,
+        }),
+        {}
+      );
+    delete fullEnumList['core::bool'];
+    return fullEnumList;
   }
 
   /**
