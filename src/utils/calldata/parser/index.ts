@@ -1,4 +1,4 @@
-import { Abi } from '../../../types';
+import { Abi, FunctionAbi, RawArgs } from '../../../types';
 import { isCairo1Abi } from '../cairo';
 import { AbiParserInterface } from './interface';
 import { AbiParser1 } from './parser-0-1.1.0';
@@ -19,4 +19,13 @@ export function getAbiVersion(abi: Abi) {
   if (abi.find((it) => it.type === 'interface')) return 2;
   if (isCairo1Abi(abi)) return 1;
   return 0;
+}
+
+export function isNoConstructorValid(
+  method: string,
+  argsCalldata: RawArgs,
+  abiMethod?: FunctionAbi
+) {
+  // No constructor in abi and validly empty args
+  return method === 'constructor' && !abiMethod && !argsCalldata.length;
 }

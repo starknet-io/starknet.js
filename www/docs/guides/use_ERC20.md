@@ -115,10 +115,10 @@ console.log("account0 has a balance of:", uint256.uint256ToBN(balanceBeforeTrans
 console.log(`Invoke Tx - Transfer 10 tokens back to erc20 contract...`);
 const toTransferTk: Uint256 = cairo.uint256(10);
 const transferCallData: Call = erc20.populate("transfer", {
-        recipient: erc20Address,
-        amount: toTransferTk // with Cairo 1 contract, 'toTransferTk' can be replaced by '10n'
+    recipient: erc20Address,
+    amount: toTransferTk // with Cairo 1 contract, 'toTransferTk' can be replaced by '10n'
 });
-     const { transaction_hash: transferTxHash } = await erc20.transfer( ...transferCallData.calldata);
+    const { transaction_hash: transferTxHash } = await erc20.transfer( transferCallData.calldata);
 
 // Wait for the invoke transaction to be accepted on Starknet
 console.log(`Waiting for Tx to be Accepted on Starknet - Transfer...`);

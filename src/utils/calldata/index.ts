@@ -18,7 +18,7 @@ import { getSelectorFromName } from '../selector';
 import { isLongText, splitLongString } from '../shortString';
 import { felt, isLen } from './cairo';
 import formatter from './formatter';
-import { createAbiParser } from './parser';
+import { createAbiParser, isNoConstructorValid } from './parser';
 import { AbiParserInterface } from './parser/interface';
 import orderPropsByAbi from './propertyOrder';
 import { parseCalldataField } from './requestParser';
@@ -69,6 +69,10 @@ export class CallData {
         : abi.name === method && abi.type === 'function'
     ) as FunctionAbi;
 
+    if (isNoConstructorValid(method, args, abiMethod)) {
+      return;
+    }
+
     // validate arguments length
     const inputsLength = this.parser.methodInputsLength(abiMethod);
     if (args.length !== inputsLength) {
@@ -98,6 +102,10 @@ export class CallData {
   public compile(method: string, argsCalldata: RawArgs): Calldata {
     const abiMethod = this.abi.find((abi) => abi.name === method) as FunctionAbi;
 
+    if (isNoConstructorValid(method, argsCalldata, abiMethod)) {
+      return [];
+    }
+
     let args: RawArgsArray;
     if (Array.isArray(argsCalldata)) {
       args = argsCalldata;
@@ -110,11 +118,20 @@ export class CallData {
     }
 
     const argsIterator = args[Symbol.iterator]();
-    return abiMethod.inputs.reduce(
+
+    const callArray = abiMethod.inputs.reduce(
       (acc, input) =>
         isLen(input.name) ? acc : acc.concat(parseCalldataField(argsIterator, input, this.structs)),
       [] as Calldata
     );
+
+    // add compiled property to array object
+    Object.defineProperty(callArray, '__compiled__', {
+      enumerable: false,
+      writable: false,
+      value: true,
+    });
+    return callArray;
   }
 
   /**

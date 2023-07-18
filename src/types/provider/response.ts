@@ -3,8 +3,8 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 
-import { RPC } from '../api/rpc';
-import { Sequencer } from '../api/sequencer';
+import * as RPC from '../api/rpc';
+import * as Sequencer from '../api/sequencer';
 import {
   AllowArray,
   BlockStatus,
@@ -40,7 +40,18 @@ export interface GetCodeResponse {
   // abi: string; // is not consistent between rpc and sequencer (is it?), therefore not included in the provider interface
 }
 
-export type GetTransactionResponse = InvokeTransactionResponse & DeclareTransactionResponse;
+export type RejectedTransactionResponse = {
+  status: `${TransactionStatus.REJECTED}`;
+  transaction_failure_reason: {
+    code: string;
+    error_message: string;
+  };
+};
+
+export type GetTransactionResponse =
+  | InvokeTransactionResponse
+  | DeclareTransactionResponse
+  | RejectedTransactionResponse;
 
 export interface CommonTransactionResponse {
   transaction_hash?: string;
@@ -67,9 +78,13 @@ export interface DeclareTransactionResponse extends CommonTransactionResponse {
   sender_address?: string;
 }
 
+export type RejectedTransactionReceiptResponse = RejectedTransactionResponse &
+  (InvokeTransactionReceiptResponse | DeclareTransactionReceiptResponse);
+
 export type GetTransactionReceiptResponse =
   | InvokeTransactionReceiptResponse
-  | DeclareTransactionReceiptResponse;
+  | DeclareTransactionReceiptResponse
+  | RejectedTransactionReceiptResponse;
 
 export interface CommonTransactionReceiptResponse {
   transaction_hash: string;
