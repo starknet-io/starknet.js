@@ -9,6 +9,12 @@ export type Signature = ArraySignatureType | WeierstrassSignatureType;
 export type BigNumberish = string | number | bigint;
 
 /**
+ * Compiled calldata ready to be sent
+ * decimal-string array
+ */
+export type Calldata = string[] & { readonly __compiled__?: boolean };
+
+/**
  * Represents an integer in the range [0, 2^256)
  */
 export interface Uint256 {
@@ -90,7 +96,7 @@ export type DeclareContractTransaction = {
 
 export type CallDetails = {
   contractAddress: string;
-  calldata?: RawArgs;
+  calldata?: RawArgs | Calldata;
   entrypoint?: string; // TODO: check if required
 };
 

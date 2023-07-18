@@ -118,11 +118,20 @@ export class CallData {
     }
 
     const argsIterator = args[Symbol.iterator]();
-    return abiMethod.inputs.reduce(
+
+    const callArray = abiMethod.inputs.reduce(
       (acc, input) =>
         isLen(input.name) ? acc : acc.concat(parseCalldataField(argsIterator, input, this.structs)),
       [] as Calldata
     );
+
+    // add compiled property to array object
+    Object.defineProperty(callArray, '__compiled__', {
+      enumerable: false,
+      writable: false,
+      value: true,
+    });
+    return callArray;
   }
 
   /**

@@ -318,7 +318,7 @@ const myCall: Call = myContract.populate("setup_elements", functionParameters);
 const tx = await account0.execute(myCall);
 // or
 const myCall: Call = myContract.populate("get_elements", functionParameters);
-const res = await myContract.get_elements(...myCall.calldata);
+const res = await myContract.get_elements(myCall.calldata);
 ```
 
 It can be used only with methods that know the abi: `Contract.populate, myCallData.compile`.  
@@ -392,7 +392,7 @@ These types of arguments can't be used at your convenience everywhere. Here is a
 
 |                                                    Function | array of parameters | ordered object  | non ordered object |       Call & MultiCall       | list of parameters | array of strings (\*) | array of strings (\*\*) |
 | ----------------------------------------------------------: | :-----------------: | :-------------: | :----------------: | :--------------------------: | :----------------: | :-------------------: | :---------------------: |
-|                                         **Typescript type** | [] <br /> Calldata  | {} RawArgsArray |  {} RawArgsObject  |        Call & Call[]         |    ...Calldata     |       string[]        |        string[]         |
+|                                         **Typescript type** |         N/A         | {} RawArgsArray |  {} RawArgsObject  |        Call & Call[]         |       ...[]        |       string[]        |        string[]         |
 |                 contract.metaClass() contract\[metaclass]() |                     |                 |                    |                              |         ✔️         |          ✔️           |           ✔️            |
 |                             contract.call / contract.invoke |         ✔️          |                 |                    |                              |                    |          ✔️           |           ✔️            |
 | account.execute <br /><br />(with 3 params, incl. calldata) |   <br /><br /> ✔️   | <br /><br /> ✔️ |                    | ✔️ <br /><br /><br /> <br /> |                    |                       |     <br /><br /> ✔️     |
