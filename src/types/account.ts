@@ -56,6 +56,6 @@ export type SimulateTransactionDetails = {
 };
 
 export enum SIMULATION_FLAG {
-  SKIP_VALIDATE,
-  SKIP_EXECUTE,
+  SKIP_VALIDATE = "SKIP_VALIDATE",
+  SKIP_EXECUTE = "SKIP_EXECUTE",
 }
