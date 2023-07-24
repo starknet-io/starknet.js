@@ -1,3 +1,5 @@
+import { Abi as AbiKanabi } from 'abi-wan-kanabi';
+
 import { AccountInterface } from '../account';
 import { ProviderInterface, defaultProvider } from '../provider';
 import {
@@ -22,7 +24,7 @@ import {
 import assert from '../utils/assert';
 import { CallData, cairo } from '../utils/calldata';
 import { createAbiParser } from '../utils/calldata/parser';
-import { ContractInterface } from './interface';
+import { ContractInterface, TypedContract } from './interface';
 
 export const splitArgsAndOptions = (args: ArgsOrCalldataWithOptions) => {
   const options = [
@@ -325,5 +327,9 @@ export class Contract implements ContractInterface {
 
   public isCairo1(): boolean {
     return cairo.isCairo1Abi(this.abi);
+  }
+
+  public typed<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContract<TAbi> {
+    return this as TypedContract<typeof tAbi>;
   }
 }

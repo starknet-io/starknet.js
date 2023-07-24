@@ -1,3 +1,5 @@
+import { Abi as AbiKanabi, TypedContract as AbiWanTypedContract } from 'abi-wan-kanabi';
+
 import { AccountInterface } from '../account';
 import { ProviderInterface } from '../provider';
 import {
@@ -13,6 +15,8 @@ import {
   InvokeOptions,
   Result,
 } from '../types';
+
+export type TypedContract<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & ContractInterface;
 
 export abstract class ContractInterface {
   public abstract abi: Abi;
@@ -117,4 +121,6 @@ export abstract class ContractInterface {
    * ```
    */
   public abstract isCairo1(): boolean;
+
+  public abstract typed<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContract<TAbi>;
 }

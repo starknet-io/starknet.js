@@ -90,6 +90,7 @@
   },
   "dependencies": {
     "@noble/curves": "~1.0.0",
+    "abi-wan-kanabi": "github:haroune-mohammedi/abi-wan-kanabi#rebase-contract-functions",
     "isomorphic-fetch": "^3.0.0",
     "lossless-json": "^2.0.8",
     "micro-starknet": "~0.2.1",
