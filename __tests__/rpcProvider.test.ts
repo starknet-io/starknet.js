@@ -152,11 +152,7 @@ describeIfRpc('RPCProvider', () => {
         });
 
         const result1 = await rpcProvider.getEvents({
-          from_block: { block_number: 0 },
-          to_block: { block_number: blockNumber },
-          // address: deploy.contract_address,
-          // keys: [[transferSelector]],
-          chunk_size: 2,
+          chunk_size: 2, // all optional paramaters removed
         });
 
         expect(result).toHaveProperty('continuation_token');
