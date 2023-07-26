@@ -31,7 +31,8 @@ import {
   SequencerProviderOptions,
   SimulateTransactionResponse,
   StateUpdateResponse,
-  TransactionStatus,
+  TransactionExecutionStatus,
+  TransactionFinalityStatus,
   TransactionType,
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
@@ -489,27 +490,46 @@ export class SequencerProvider implements ProviderInterface {
   }
 
   public async waitForTransaction(txHash: BigNumberish, options?: waitForTransactionOptions) {
-    const errorStates = [TransactionStatus.REJECTED, TransactionStatus.NOT_RECEIVED];
-    let onchain = false;
     let res;
-    const retryInterval = options?.retryInterval ?? 8000;
+    let completed = false;
+    let retries = 0;
+    const retryInterval = options?.retryInterval ?? 5000;
+    const errorStates = options?.errorStates ?? [
+      TransactionExecutionStatus.REJECTED,
+      TransactionFinalityStatus.NOT_RECEIVED,
+      TransactionExecutionStatus.REVERTED,
+    ];
     const successStates = options?.successStates ?? [
-      TransactionStatus.ACCEPTED_ON_L1,
-      TransactionStatus.ACCEPTED_ON_L2,
+      TransactionExecutionStatus.SUCCEEDED,
+      TransactionFinalityStatus.ACCEPTED_ON_L1,
+      TransactionFinalityStatus.ACCEPTED_ON_L2,
     ];
 
-    while (!onchain) {
+    while (!completed) {
       // eslint-disable-next-line no-await-in-loop
       await wait(retryInterval);
       // eslint-disable-next-line no-await-in-loop
       res = await this.getTransactionStatus(txHash);
 
-      if (successStates.includes(res.tx_status)) {
-        onchain = true;
-      } else if (errorStates.includes(res.tx_status)) {
-        const message = res.tx_failure_reason
-          ? `${res.tx_status}: ${res.tx_failure_reason.code}\n${res.tx_failure_reason.error_message}`
-          : res.tx_status;
+      if (TransactionFinalityStatus.NOT_RECEIVED === res.finality_status && retries < 3) {
+        retries += 1;
+      } else if (
+        successStates.includes(res.finality_status) ||
+        successStates.includes(res.execution_status)
+      ) {
+        completed = true;
+      } else if (
+        errorStates.includes(res.finality_status) ||
+        errorStates.includes(res.execution_status)
+      ) {
+        let message;
+        if (res.tx_failure_reason) {
+          message = `${res.tx_status}: ${res.tx_failure_reason.code}\n${res.tx_failure_reason.error_message}`;
+        } else if (res.tx_revert_reason) {
+          message = `${res.tx_status}: ${res.tx_revert_reason}`;
+        } else {
+          message = res.tx_status;
+        }
         const error = new Error(message) as Error & { response: GetTransactionStatusResponse };
         error.response = res;
         throw error;

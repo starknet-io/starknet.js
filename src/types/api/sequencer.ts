@@ -11,6 +11,8 @@ import {
   ContractClass,
   EntryPointType,
   RawCalldata,
+  TransactionExecutionStatus,
+  TransactionFinalityStatus,
   TransactionStatus,
   TransactionType,
 } from '../lib';
@@ -18,11 +20,14 @@ import {
 // #region | originally not included in the namespace
 export type GetTransactionStatusResponse = {
   tx_status: TransactionStatus;
+  execution_status: TransactionExecutionStatus;
+  finality_status: TransactionFinalityStatus;
   block_hash?: string;
   tx_failure_reason?: {
     code: string;
     error_message: string;
   };
+  tx_revert_reason?: string;
 };
 
 export type GetContractAddressesResponse = {

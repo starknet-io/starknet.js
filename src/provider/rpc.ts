@@ -434,13 +434,15 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async waitForTransaction(txHash: string, options?: waitForTransactionOptions) {
-    const errorStates = [TransactionStatus.REJECTED, TransactionStatus.NOT_RECEIVED];
     let { retries } = this;
     let onchain = false;
     let txReceipt: any = {};
-
-    const retryInterval = options?.retryInterval ?? 8000;
-    const successStates = options?.successStates ?? [
+    const retryInterval = options?.retryInterval ?? 5000;
+    const errorStates: any = options?.errorStates ?? [
+      TransactionStatus.REJECTED,
+      TransactionStatus.NOT_RECEIVED,
+    ];
+    const successStates: any = options?.successStates ?? [
       TransactionStatus.ACCEPTED_ON_L1,
       TransactionStatus.ACCEPTED_ON_L2,
     ];
@@ -451,9 +453,8 @@ export class RpcProvider implements ProviderInterface {
       try {
         // eslint-disable-next-line no-await-in-loop
         txReceipt = await this.getTransactionReceipt(txHash);
-
         if (!('status' in txReceipt)) {
-          const error = new Error('transaction status');
+          const error = new Error('waiting for transaction status');
           throw error;
         }
 
