@@ -1,3 +1,18 @@
+# [5.17.0](https://github.com/0xs34n/starknet.js/compare/v5.16.0...v5.17.0) (2023-07-18)
+
+### Bug Fixes
+
+- add FailedTransactionResponse ([994925e](https://github.com/0xs34n/starknet.js/commit/994925e87a4fde3cfcffd9103793d44bc96fc96c))
+- remedy type declaration roll-up issues ([48625f4](https://github.com/0xs34n/starknet.js/commit/48625f4a9eaf4e3c294ad840dae78ebab4ab9a12))
+- transaction_failure_reason ([77329b7](https://github.com/0xs34n/starknet.js/commit/77329b7ddfc63d708685f0dcbffbe1b9094f7824))
+
+### Features
+
+- add Enum in contract ([515e233](https://github.com/0xs34n/starknet.js/commit/515e233a0b29e125936192da540b83af8591b507)), closes [#670](https://github.com/0xs34n/starknet.js/issues/670) [#665](https://github.com/0xs34n/starknet.js/issues/665) [#664](https://github.com/0xs34n/starknet.js/issues/664) [#1](https://github.com/0xs34n/starknet.js/issues/1)
+- calldata result in populate ([d44dc56](https://github.com/0xs34n/starknet.js/commit/d44dc56c0b6db68fcd664b8f02d7a4b72bcdfd28)), closes [#675](https://github.com/0xs34n/starknet.js/issues/675) [#1](https://github.com/0xs34n/starknet.js/issues/1)
+- contractFactory Cairo1 & changed constructor signature, 0.12 test fixes ([9b44c54](https://github.com/0xs34n/starknet.js/commit/9b44c54857896019c2545c945695e525392e8dbd))
+- rename Failed to Rejected for transaction type ([65b1ef4](https://github.com/0xs34n/starknet.js/commit/65b1ef432e2eda9f37574771d60b409a3f7ab049))
+
 # [5.16.0](https://github.com/0xs34n/starknet.js/compare/v5.15.1...v5.16.0) (2023-07-03)
 
 ### Features
