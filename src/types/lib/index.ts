@@ -226,6 +226,7 @@ export type getSimulateTransactionOptions = {
   blockIdentifier?: BlockIdentifier;
   skipValidate?: boolean;
   skipExecute?: boolean;
+  skipFeeCharge?: boolean;
 };
 
 export type getEstimateFeeBulkOptions = {
