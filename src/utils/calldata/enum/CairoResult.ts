@@ -18,6 +18,9 @@ export class CairoResult<T, U> {
   readonly Err?: U;
 
   constructor(variant: CairoResultVariant, resultContent: T | U) {
+    if (!(variant in CairoResultVariant)) {
+      throw new Error('Wrong variant : should be CairoResultVariant.Ok or .Err.');
+    }
     if (variant === CairoResultVariant.Ok) {
       this.Ok = resultContent as T;
       this.Err = undefined;

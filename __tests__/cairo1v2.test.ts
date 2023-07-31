@@ -3,6 +3,7 @@ import {
   BigNumberish,
   CairoCustomEnum,
   CairoOption,
+  CairoOptionVariant,
   CallData,
   Calldata,
   CompiledSierra,
@@ -366,6 +367,50 @@ describe('Cairo 1 Devnet', () => {
       expect(res).toEqual({ p1: 1n, p2: 150n });
       expect(myCairoEnum3.activeVariant()).toEqual('Response');
 
+      // Send a Cairo Custom Enum
+      const res2 = (await cairo1Contract.call('my_enum_input', [
+        new CairoCustomEnum({ Error: 100 }),
+      ])) as bigint;
+      const myOrder: Order = { p1: 100, p2: 200 };
+      const res3 = (await cairo1Contract.my_enum_input(
+        new CairoCustomEnum({ Response: myOrder })
+      )) as bigint;
+      expect(res2).toEqual(100n);
+      expect(res3).toEqual(200n);
+
+      const comp2 = CallData.compile([
+        new CairoCustomEnum({
+          Response: undefined,
+          Warning: undefined,
+          Error: 100,
+        }),
+      ]);
+      const res2a = (await cairo1Contract.call('my_enum_input', comp2)) as bigint;
+      const comp3 = CallData.compile([
+        new CairoCustomEnum({
+          Response: myOrder,
+          Warning: undefined,
+          Error: undefined,
+        }),
+      ]);
+      const res3a = (await cairo1Contract.my_enum_input(comp3)) as bigint;
+      expect(res2a).toEqual(100n);
+      expect(res3a).toEqual(200n);
+
+      const comp2b = cairo1Contract.populate('my_enum_input', {
+        customEnum: new CairoCustomEnum({ Error: 100 }),
+      });
+      const res2b = (await cairo1Contract.call(
+        'my_enum_input',
+        comp2b.calldata as Calldata
+      )) as bigint;
+      const comp3b = cairo1Contract.populate('my_enum_input', {
+        customEnum: new CairoCustomEnum({ Response: myOrder }),
+      });
+      const res3b = (await cairo1Contract.my_enum_input(comp3b.calldata)) as bigint;
+      expect(res2b).toEqual(100n);
+      expect(res3b).toEqual(200n);
+
       // return a Cairo Option
       const myCairoOption: CairoOption<Order> = await cairo1Contract.option_order_output(50);
       expect(myCairoOption.unwrap()).toEqual(undefined);
@@ -376,6 +421,22 @@ describe('Cairo 1 Devnet', () => {
       expect(myCairoOption2.unwrap()).toEqual({ p1: 18n, p2: 150n });
       expect(myCairoOption2.isNone()).toEqual(false);
       expect(myCairoOption2.isSome()).toEqual(true);
+
+      // send a Cairo Option
+      const cairoOption1 = new CairoOption<Order>(CairoOptionVariant.None);
+      const res4 = (await cairo1Contract.call('option_order_input', [cairoOption1])) as bigint;
+      const comp4a = CallData.compile([cairoOption1]);
+      const res4a = (await cairo1Contract.call('option_order_input', comp4a)) as bigint;
+      const res5 = (await cairo1Contract.option_order_input(
+        new CairoOption<Order>(CairoOptionVariant.Some, myOrder)
+      )) as bigint;
+      const res5a = (await cairo1Contract.option_order_input(
+        CallData.compile([new CairoOption<Order>(CairoOptionVariant.Some, myOrder)])
+      )) as bigint;
+      expect(res4).toEqual(17n);
+      expect(res4a).toEqual(17n);
+      expect(res5).toEqual(200n);
+      expect(res5a).toEqual(200n);
 
       // TODO : Cairo Result will be tested when Cairo >=v2.1.0 will be implemented in Starknet devnet.
     });

@@ -21,8 +21,20 @@ export class CairoCustomEnum {
    */
   readonly variant: CairoEnumRaw;
 
+  /**
+   * @param enumContent an object with the variants as keys and the content as value. Only one content shall be defined.
+   */
   constructor(enumContent: CairoEnumRaw) {
-    // TODO for request Parser : add checks of validity of enumContent
+    const variantsList = Object.values(enumContent);
+    if (variantsList.length === 0) {
+      throw new Error('This Enum must have a least 1 variant');
+    }
+    const nbActiveVariants = variantsList.filter(
+      (content) => typeof content !== 'undefined'
+    ).length;
+    if (nbActiveVariants !== 1) {
+      throw new Error('This Enum must have exactly one active variant');
+    }
     this.variant = enumContent;
   }
 

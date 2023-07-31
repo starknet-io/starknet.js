@@ -18,6 +18,9 @@ export class CairoOption<T> {
   readonly None?: boolean;
 
   constructor(variant: CairoOptionVariant, someContent?: T) {
+    if (!(variant in CairoOptionVariant)) {
+      throw new Error('Wrong variant : should be CairoOptionVariant.Some or .None.');
+    }
     if (variant === CairoOptionVariant.Some) {
       if (typeof someContent === 'undefined') {
         throw new Error(
