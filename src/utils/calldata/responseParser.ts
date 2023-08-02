@@ -18,7 +18,7 @@ import extractTupleMemberTypes from './tuple';
  * @param it iterator
  * @returns bigint | boolean
  */
-function parseBaseTypes(type: string, it: Iterator<string>) {
+export function parseBaseTypes(type: string, it: Iterator<string>) {
   let temp;
   switch (true) {
     case isTypeBool(type):
@@ -42,7 +42,7 @@ function parseBaseTypes(type: string, it: Iterator<string>) {
  * @param structs - structs from abi
  * @return {any} - parsed arguments in format that contract is expecting
  */
-function parseResponseValue(
+export function parseResponseValue(
   responseIterator: Iterator<string>,
   element: { name: string; type: string },
   structs: AbiStructs

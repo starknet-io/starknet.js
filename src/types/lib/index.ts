@@ -195,7 +195,7 @@ export type Args = {
   [inputName: string]: BigNumberish | BigNumberish[] | ParsedStruct | ParsedStruct[];
 };
 export type ParsedStruct = {
-  [key: string]: BigNumberish | ParsedStruct;
+  [key: string]: BigNumberish | BigNumberish[] | ParsedStruct | Uint256;
 };
 
 export type waitForTransactionOptions = {

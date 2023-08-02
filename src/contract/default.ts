@@ -2,6 +2,7 @@ import { AccountInterface } from '../account';
 import { ProviderInterface, defaultProvider } from '../provider';
 import {
   Abi,
+  AbiEvents,
   ArgsOrCalldata,
   ArgsOrCalldataWithOptions,
   AsyncContractFunction,
@@ -12,8 +13,11 @@ import {
   ContractOptions,
   EstimateFeeResponse,
   FunctionAbi,
+  GetTransactionReceiptResponse,
   InvokeFunctionResponse,
   InvokeOptions,
+  InvokeTransactionReceiptResponse,
+  ParsedEvents,
   RawArgs,
   Result,
   StructAbi,
@@ -22,6 +26,8 @@ import {
 import assert from '../utils/assert';
 import { CallData, cairo } from '../utils/calldata';
 import { createAbiParser } from '../utils/calldata/parser';
+import { getAbiEvents, parseEvents as parseRawEvents } from '../utils/events/index';
+import { cleanHex } from '../utils/num';
 import { ContractInterface } from './interface';
 
 export const splitArgsAndOptions = (args: ArgsOrCalldataWithOptions) => {
@@ -124,6 +130,8 @@ export class Contract implements ContractInterface {
 
   protected readonly structs: { [name: string]: StructAbi };
 
+  protected readonly events: AbiEvents;
+
   readonly functions!: { [name: string]: AsyncContractFunction };
 
   readonly callStatic!: { [name: string]: AsyncContractFunction };
@@ -152,6 +160,7 @@ export class Contract implements ContractInterface {
     this.providerOrAccount = providerOrAccount;
     this.callData = new CallData(abi);
     this.structs = CallData.getAbiStruct(abi);
+    this.events = getAbiEvents(abi);
     const parser = createAbiParser(abi);
     this.abi = parser.getLegacyFormat();
 
@@ -321,6 +330,16 @@ export class Contract implements ContractInterface {
       entrypoint: method,
       calldata,
     };
+  }
+
+  public parseEvents(receipt: GetTransactionReceiptResponse): ParsedEvents {
+    return parseRawEvents(
+      (receipt as InvokeTransactionReceiptResponse).events?.filter((event) => {
+        return cleanHex(event.from_address) === cleanHex(this.address);
+      }, []) || [],
+      this.events,
+      this.structs
+    );
   }
 
   public isCairo1(): boolean {
