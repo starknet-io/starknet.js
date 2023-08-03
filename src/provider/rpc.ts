@@ -8,6 +8,7 @@ import {
   AccountInvocations,
   BigNumberish,
   BlockIdentifier,
+  BlockTag,
   Call,
   CallContractResponse,
   ContractClassResponse,
@@ -38,6 +39,7 @@ import {
 } from '../types/api/rpc';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
+import { pascalToSnake } from '../utils/encode';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName, getVersionsByType } from '../utils/hash';
 import { stringify } from '../utils/json';
@@ -54,7 +56,7 @@ import { Block } from './utils';
 // Note that pending support is disabled by default and must be enabled by setting poll-pending=true in the configuration options.
 const defaultOptions = {
   headers: { 'Content-Type': 'application/json' },
-  blockIdentifier: 'latest',
+  blockIdentifier: BlockTag.pending,
   retries: 200,
 };
 
@@ -454,23 +456,21 @@ export class RpcProvider implements ProviderInterface {
         // eslint-disable-next-line no-await-in-loop
         txReceipt = await this.getTransactionReceipt(txHash);
 
-        if (!txReceipt.execution_status || !txReceipt.finality_status) {
+        // TODO: Hotfix until Pathfinder release fixed casing
+        const executionStatus = pascalToSnake(txReceipt.execution_status);
+        const finalityStatus = pascalToSnake(txReceipt.finality_status);
+
+        if (!executionStatus || !finalityStatus) {
           // Transaction is potentially REJECTED or NOT_RECEIVED but RPC doesn't have dose statuses
           // so we will retry '{ retries }' times
           const error = new Error('waiting for transaction status');
           throw error;
         }
 
-        if (
-          successStates.includes(txReceipt.execution_status) ||
-          successStates.includes(txReceipt.finality_status)
-        ) {
+        if (successStates.includes(executionStatus) || successStates.includes(finalityStatus)) {
           onchain = true;
-        } else if (
-          errorStates.includes(txReceipt.execution_status) ||
-          errorStates.includes(txReceipt.finality_status)
-        ) {
-          const message = `${txReceipt.execution_status}: ${txReceipt.finality_status}: ${txReceipt.revert_reason}`;
+        } else if (errorStates.includes(executionStatus) || errorStates.includes(finalityStatus)) {
+          const message = `${executionStatus}: ${finalityStatus}: ${txReceipt.revert_reason}`;
           const error = new Error(message) as Error & { response: RPC.TransactionReceipt };
           error.response = txReceipt;
           isErrorState = true;
@@ -583,7 +583,7 @@ export class RpcProvider implements ProviderInterface {
         type: RPC.TransactionType.INVOKE, // Diff between sequencer and rpc invoke type
         sender_address: invocation.contractAddress,
         calldata: CallData.toHex(invocation.calldata),
-        version: HEX_STR_TRANSACTION_VERSION_1,
+        version: toHex(invocation.version || defaultVersions.v1), // HEX_STR_TRANSACTION_VERSION_1,
         ...details,
       };
     }
@@ -593,7 +593,7 @@ export class RpcProvider implements ProviderInterface {
           type: invocation.type,
           contract_class: invocation.contract,
           sender_address: invocation.senderAddress,
-          version: HEX_STR_TRANSACTION_VERSION_1,
+          version: toHex(invocation.version || defaultVersions.v1), // HEX_STR_TRANSACTION_VERSION_1,
           ...details,
         };
       }
@@ -606,7 +606,7 @@ export class RpcProvider implements ProviderInterface {
         },
         compiled_class_hash: invocation.compiledClassHash || '',
         sender_address: invocation.senderAddress,
-        version: HEX_STR_TRANSACTION_VERSION_2,
+        version: toHex(invocation.version || defaultVersions.v2), // HEX_STR_TRANSACTION_VERSION_2,
         ...details,
       };
     }
