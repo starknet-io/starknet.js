@@ -3,7 +3,7 @@ import { isBigInt, isHex, isStringWholeNumber } from '../num';
 import { encodeShortString, isShortString, isText } from '../shortString';
 import { UINT_128_MAX, isUint256 } from '../uint256';
 
-export const isLen = (name: string) => /_len$/.test(name);
+export const isLen = (name: string) => !Boolean(name);
 export const isTypeFelt = (type: string) => type === 'felt' || type === 'core::felt252';
 export const isTypeArray = (type: string) =>
   /\*/.test(type) || type.startsWith('core::array::Array::');
