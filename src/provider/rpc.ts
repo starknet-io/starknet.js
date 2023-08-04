@@ -543,7 +543,7 @@ export class RpcProvider implements ProviderInterface {
       blockIdentifier = this.blockIdentifier,
       skipValidate = false,
       skipExecute = false, // @deprecated
-      skipFeeCharge = false,
+      skipFeeCharge = true, // Pathfinder currently does not support `starknet_simulateTransactions` without `SKIP_FEE_CHARGE` simulation flag being set. This will become supported in a future release
     }: getSimulateTransactionOptions
   ): Promise<SimulateTransactionResponse> {
     const block_id = new Block(blockIdentifier).identifier;
@@ -583,7 +583,7 @@ export class RpcProvider implements ProviderInterface {
         type: RPC.TransactionType.INVOKE, // Diff between sequencer and rpc invoke type
         sender_address: invocation.contractAddress,
         calldata: CallData.toHex(invocation.calldata),
-        version: toHex(invocation.version || defaultVersions.v1), // HEX_STR_TRANSACTION_VERSION_1,
+        version: toHex(invocation.version || defaultVersions.v1) as any, // HEX_STR_TRANSACTION_VERSION_1, // as any HOTFIX TODO: Resolve spec version
         ...details,
       };
     }
@@ -593,7 +593,7 @@ export class RpcProvider implements ProviderInterface {
           type: invocation.type,
           contract_class: invocation.contract,
           sender_address: invocation.senderAddress,
-          version: toHex(invocation.version || defaultVersions.v1), // HEX_STR_TRANSACTION_VERSION_1,
+          version: toHex(invocation.version || defaultVersions.v1) as any, // HEX_STR_TRANSACTION_VERSION_1, // as any HOTFIX TODO: Resolve spec version
           ...details,
         };
       }
@@ -606,7 +606,7 @@ export class RpcProvider implements ProviderInterface {
         },
         compiled_class_hash: invocation.compiledClassHash || '',
         sender_address: invocation.senderAddress,
-        version: toHex(invocation.version || defaultVersions.v2), // HEX_STR_TRANSACTION_VERSION_2,
+        version: toHex(invocation.version || defaultVersions.v2) as any, // HEX_STR_TRANSACTION_VERSION_2, // as any HOTFIX TODO: Resolve spec version
         ...details,
       };
     }

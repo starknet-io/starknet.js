@@ -4,9 +4,11 @@
  */
 
 import * as RPC from '../api/rpc';
+import { BlockHash } from '../api/rpc';
 import * as Sequencer from '../api/sequencer';
 import {
   AllowArray,
+  BlockNumber,
   BlockStatus,
   ByteCode,
   Call,
@@ -16,6 +18,8 @@ import {
   LegacyContractClass,
   RawCalldata,
   Signature,
+  TransactionExecutionStatus,
+  TransactionFinalityStatus,
   TransactionStatus,
   TransactionType,
   UniversalDeployerContractPayload,
@@ -40,13 +44,10 @@ export interface GetCodeResponse {
   // abi: string; // is not consistent between rpc and sequencer (is it?), therefore not included in the provider interface
 }
 
-export type RejectedTransactionResponse = {
-  status: `${TransactionStatus.REJECTED}`;
-  transaction_failure_reason: {
-    code: string;
-    error_message: string;
-  };
-};
+export interface ContractEntryPoint {
+  offset: string;
+  selector: string;
+}
 
 export type GetTransactionResponse =
   | InvokeTransactionResponse
@@ -68,29 +69,9 @@ export interface InvokeTransactionResponse extends CommonTransactionResponse {
   calldata: RawCalldata;
 }
 
-export interface ContractEntryPoint {
-  offset: string;
-  selector: string;
-}
-
 export interface DeclareTransactionResponse extends CommonTransactionResponse {
   contract_class?: any;
   sender_address?: string;
-}
-
-export type RejectedTransactionReceiptResponse = RejectedTransactionResponse &
-  (InvokeTransactionReceiptResponse | DeclareTransactionReceiptResponse);
-
-export type GetTransactionReceiptResponse =
-  | InvokeTransactionReceiptResponse
-  | DeclareTransactionReceiptResponse
-  | RejectedTransactionReceiptResponse;
-
-export interface CommonTransactionReceiptResponse {
-  transaction_hash: string;
-  status?: `${TransactionStatus}`;
-  actual_fee?: string;
-  status_data?: string;
 }
 
 export interface MessageToL1 {
@@ -109,14 +90,82 @@ export interface MessageToL2 {
   payload: Array<string>;
 }
 
-export interface InvokeTransactionReceiptResponse extends CommonTransactionReceiptResponse {
-  /** @deprecated Use l2_to_l1_messages */
-  messages_sent?: Array<MessageToL1>;
-  events?: Array<Event>;
-  l1_origin_message?: MessageToL2;
+export type RejectedTransactionResponse = {
+  status: `${TransactionStatus.REJECTED}`;
+  transaction_failure_reason: {
+    code: string;
+    error_message: string;
+  };
+};
+
+export type GetTransactionReceiptResponse =
+  | SuccessfulTransactionReceiptResponse
+  | RevertedTransactionReceiptResponse
+  | RejectedTransactionReceiptResponse;
+
+export type SuccessfulTransactionReceiptResponse =
+  | InvokeTransactionReceiptResponse
+  | DeclareTransactionReceiptResponse;
+
+export interface InvokeTransactionReceiptResponse {
+  type?: TransactionType; // RPC only
+  execution_status: TransactionExecutionStatus;
+  finality_status: TransactionFinalityStatus;
+  status?: `${TransactionStatus}`; // SEQ only
+  actual_fee: string;
+  block_hash: BlockHash;
+  block_number: BlockNumber;
+  transaction_hash: string;
+  transaction_index?: number; // SEQ only
+  messages_sent: Array<MessageToL1>; // Casted SEQ l2_to_l1_messages
+  events: any[];
+  execution_resources?: any; // SEQ Only
 }
 
-export type DeclareTransactionReceiptResponse = CommonTransactionReceiptResponse;
+export type DeclareTransactionReceiptResponse = {
+  type?: TransactionType; // RPC only
+  execution_status: TransactionExecutionStatus;
+  finality_status: TransactionFinalityStatus;
+  status?: `${TransactionStatus}`; // SEQ only
+  actual_fee: string;
+  block_hash: BlockHash;
+  block_number: BlockNumber;
+  transaction_hash: string;
+  transaction_index?: number; // SEQ only
+  messages_sent: Array<MessageToL1>; // Casted SEQ l2_to_l1_messages
+  events: any[];
+};
+
+// TODO: Missing DEPLOY_TXN_RECEIPT
+
+// TODO: Missing DEPLOY_ACCOUNT_TXN_RECEIPT
+
+// TODO: Missing PENDING_TXN_RECEIPT
+
+// TODO: Missing L1_HANDLER_TXN_RECEIPT
+
+export type RejectedTransactionReceiptResponse = {
+  status: `${TransactionStatus.REJECTED}`;
+  transaction_failure_reason: {
+    code: string;
+    error_message: string;
+  };
+} & SuccessfulTransactionReceiptResponse;
+
+export type RevertedTransactionReceiptResponse = {
+  type?: TransactionType; // RPC only
+  execution_status: TransactionExecutionStatus.REVERTED;
+  finality_status: TransactionFinalityStatus;
+  status?: TransactionStatus; // SEQ only
+  actual_fee: string;
+  block_hash: string;
+  block_number: BlockNumber;
+  transaction_hash: string;
+  transaction_index?: number; // SEQ only
+  messages_sent: Array<MessageToL1>; // SEQ Casted l2_to_l1_messages
+  events: any[];
+  revert_reason: string; // SEQ Casted revert_error
+};
 
 export interface EstimateFeeResponse {
   overall_fee: bigint;
