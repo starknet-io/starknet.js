@@ -1,4 +1,13 @@
-import { ADDRESS, CONTRACT_STORAGE_DIFF_ITEM, FELT, OPENRPC } from './openrpc';
+import {
+  ADDRESS,
+  CONTRACT_STORAGE_DIFF_ITEM,
+  FELT,
+  OPENRPC,
+  SIMULATION_FLAG,
+  TXN_EXECUTION_STATUS,
+  TXN_FINALITY_STATUS,
+  TXN_TYPE,
+} from './openrpc';
 
 export type Response = {
   id: number;
@@ -40,19 +49,15 @@ export type InvokedTransaction = OPENRPC.InvokedTransaction;
 export type DeclaredTransaction = OPENRPC.DeclaredTransaction;
 export type DeployedTransaction = OPENRPC.DeployedTransaction;
 export type SimulationFlags = OPENRPC.SimulationFlags;
-export type BroadcastedTransaction = OPENRPC.BroadcastedTransaction;
 export type EstimatedFee = OPENRPC.EstimatedFee;
 export type Methods = OPENRPC.Methods;
 export type Storage = OPENRPC.Storage;
 export type SimulateTransactionResponse = OPENRPC.SimulatedTransactions;
-
-export enum TransactionType {
-  DECLARE = 'DECLARE',
-  DEPLOY = 'DEPLOY',
-  DEPLOY_ACCOUNT = 'DEPLOY_ACCOUNT',
-  INVOKE = 'INVOKE',
-  L1_HANDLER = 'L1_HANDLER',
-}
+export const TransactionType = TXN_TYPE;
+export const SimulationFlag = SIMULATION_FLAG;
+export const TransactionFinalityStatus = TXN_FINALITY_STATUS;
+export const TransactionExecutionStatus = TXN_EXECUTION_STATUS;
+export type BaseTransaction = OPENRPC.BaseTransaction & { version: string };
 
 // Exported Diff on Sequencer (can be removed when diff resolved by new RPC v)
 export type StorageDiffs = Array<CONTRACT_STORAGE_DIFF_ITEM>;

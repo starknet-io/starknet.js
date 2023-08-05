@@ -11,6 +11,8 @@ import {
   ContractClass,
   EntryPointType,
   RawCalldata,
+  TransactionExecutionStatus,
+  TransactionFinalityStatus,
   TransactionStatus,
   TransactionType,
 } from '../lib';
@@ -18,11 +20,14 @@ import {
 // #region | originally not included in the namespace
 export type GetTransactionStatusResponse = {
   tx_status: TransactionStatus;
+  execution_status: TransactionExecutionStatus;
+  finality_status: TransactionFinalityStatus;
   block_hash?: string;
   tx_failure_reason?: {
     code: string;
     error_message: string;
   };
+  tx_revert_reason?: string;
 };
 
 export type GetContractAddressesResponse = {
@@ -151,11 +156,24 @@ export type TransactionResponse =
   | InvokeFunctionTransactionResponse;
 
 export type SuccessfulTransactionResponse = {
+  execution_status: TransactionExecutionStatus.SUCCEEDED;
+  finality_status: TransactionFinalityStatus;
   status: TransactionStatus;
-  transaction: TransactionResponse;
   block_hash: string;
   block_number: BlockNumber;
   transaction_index: number;
+  transaction: TransactionResponse;
+};
+
+export type RevertedTransactionResponse = {
+  execution_status: TransactionExecutionStatus.REVERTED;
+  finality_status: TransactionFinalityStatus;
+  status: TransactionStatus;
+  block_hash: string;
+  block_number: BlockNumber;
+  transaction_index: number;
+  transaction: TransactionResponse;
+  revert_error: string;
 };
 
 export type FailedTransactionResponse = {
@@ -167,33 +185,55 @@ export type FailedTransactionResponse = {
   transaction: TransactionResponse;
 };
 
-export type GetTransactionResponse = SuccessfulTransactionResponse | FailedTransactionResponse;
+export type GetTransactionResponse =
+  | SuccessfulTransactionResponse
+  | RevertedTransactionResponse
+  | FailedTransactionResponse;
 
 export type TransactionReceiptResponse =
   | SuccessfulTransactionReceiptResponse
-  | FailedTransactionReceiptResponse;
+  | RevertedTransactionReceiptResponse
+  | RejectedTransactionReceiptResponse;
 
 export type SuccessfulTransactionReceiptResponse = {
+  execution_status: TransactionExecutionStatus.SUCCEEDED;
+  finality_status: TransactionFinalityStatus;
   status: TransactionStatus;
-  transaction_hash: string;
-  transaction_index: number;
+  actual_fee: string;
   block_hash: string;
   block_number: BlockNumber;
+  transaction_hash: string;
+  transaction_index: number;
   l2_to_l1_messages: string[];
   events: string[];
-  actual_fee: string;
-  execution_resources: ExecutionResources;
+  execution_resources?: ExecutionResources; // INVOKE ONLY
 };
 
-export type FailedTransactionReceiptResponse = {
+export type RevertedTransactionReceiptResponse = {
+  execution_status: TransactionExecutionStatus.REVERTED;
+  finality_status: TransactionFinalityStatus;
+  status: TransactionStatus.REVERTED;
+  actual_fee: string;
+  block_hash: string;
+  block_number: BlockNumber;
+  transaction_hash: string;
+  transaction_index: number;
+  l2_to_l1_messages: string[];
+  events: string[];
+  revert_error: string;
+};
+
+export type RejectedTransactionReceiptResponse = {
+  execution_status: TransactionExecutionStatus.REJECTED;
+  finality_status: TransactionFinalityStatus;
   status: TransactionStatus.REJECTED;
+  transaction_hash: string;
+  l2_to_l1_messages: string[];
+  events: string[];
   transaction_failure_reason: {
     code: string;
     error_message: string;
   };
-  transaction_hash: string;
-  l2_to_l1_messages: string[];
-  events: string[];
 };
 
 export type GetBlockResponse = {
