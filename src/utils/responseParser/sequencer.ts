@@ -3,6 +3,7 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 
+import { LibraryError } from '../../provider/errors';
 import {
   CallContractResponse,
   CompiledContract,
@@ -19,6 +20,8 @@ import {
   Sequencer,
   SimulateTransactionResponse,
   StateUpdateResponse,
+  TransactionFinalityStatus,
+  TransactionStatus,
 } from '../../types';
 import { isSierra } from '../contract';
 import { toBigInt } from '../num';
@@ -41,6 +44,13 @@ export class SequencerAPIResponseParser extends ResponseParser {
   public parseGetTransactionResponse(
     res: Sequencer.GetTransactionResponse
   ): GetTransactionResponse {
+    if (
+      res.status === TransactionStatus.NOT_RECEIVED &&
+      res.finality_status === TransactionFinalityStatus.NOT_RECEIVED
+    ) {
+      throw new LibraryError();
+    }
+
     return {
       ...res,
       calldata: 'calldata' in res.transaction ? (res.transaction.calldata as HexCalldata) : [],
