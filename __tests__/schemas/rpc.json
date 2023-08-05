@@ -2,34 +2,41 @@
   "$id": "rpcSchemas",
   "definitions": {
     "GetSyncingStatsResponse": {
-      "type": "object",
-      "properties": {
-        "current_block_hash": {
-          "type": "string"
+      "oneOf": [
+        {
+          "type": "object",
+          "properties": {
+            "current_block_hash": {
+              "type": "string"
+            },
+            "current_block_num": {
+              "type": "number"
+            },
+            "highest_block_hash": {
+              "type": "string"
+            },
+            "highest_block_num": {
+              "type": "number"
+            },
+            "starting_block_hash": {
+              "type": "string"
+            },
+            "starting_block_num": {
+              "type": "number"
+            }
+          },
+          "required": [
+            "current_block_hash",
+            "current_block_num",
+            "highest_block_hash",
+            "highest_block_num",
+            "starting_block_hash",
+            "starting_block_num"
+          ]
         },
-        "current_block_num": {
-          "type": "string"
-        },
-        "highest_block_hash": {
-          "type": "string"
-        },
-        "highest_block_num": {
-          "type": "string"
-        },
-        "starting_block_hash": {
-          "type": "string"
-        },
-        "starting_block_num": {
-          "type": "string"
+        {
+          "type": "boolean"
         }
-      },
-      "required": [
-        "current_block_hash",
-        "current_block_num",
-        "highest_block_hash",
-        "highest_block_num",
-        "starting_block_hash",
-        "starting_block_num"
       ]
     },
     "StarknetEmittedEvent": {
