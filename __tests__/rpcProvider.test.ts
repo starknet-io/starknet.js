@@ -151,8 +151,13 @@ describeIfRpc('RPCProvider', () => {
           chunk_size: 2,
         });
 
+        const result1 = await rpcProvider.getEvents({
+          chunk_size: 2, // all optional paramaters removed
+        });
+
         expect(result).toHaveProperty('continuation_token');
         expect(result).toHaveProperty('events');
+        expect(result1).toHaveProperty('events');
         expect(Array.isArray(result?.events)).toBe(true);
         expect(result?.events?.length).toBe(2);
         expect(result.events[0]).toMatchSchemaRef('StarknetEmittedEvent');
