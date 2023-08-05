@@ -17,7 +17,7 @@ Represents an integer in the range [0, 2^256)
 
 #### Defined in
 
-[src/types/lib/index.ts:16](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L16)
+[src/types/lib/index.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L22)
 
 ---
 
@@ -27,4 +27,4 @@ Represents an integer in the range [0, 2^256)
 
 #### Defined in
 
-[src/types/lib/index.ts:18](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L18)
+[src/types/lib/index.ts:24](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L24)

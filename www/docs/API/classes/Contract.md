@@ -408,4 +408,4 @@ TRUE if the contract comes from a Cairo1 contract
 
 #### Defined in
 
-[src/contract/default.ts:327](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L327)
+[src/contract/default.ts:326](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L326)
