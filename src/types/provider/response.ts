@@ -105,6 +105,7 @@ export type GetTransactionReceiptResponse =
 
 export type SuccessfulTransactionReceiptResponse =
   | InvokeTransactionReceiptResponse
+  | DeployTransactionReceiptResponse
   | DeclareTransactionReceiptResponse;
 
 export interface InvokeTransactionReceiptResponse {
@@ -136,13 +137,13 @@ export type DeclareTransactionReceiptResponse = {
   events: any[];
 };
 
-// TODO: Missing DEPLOY_TXN_RECEIPT
+export type DeployTransactionReceiptResponse = InvokeTransactionReceiptResponse;
 
-// TODO: Missing DEPLOY_ACCOUNT_TXN_RECEIPT
+// TODO: Missing RPC DEPLOY_ACCOUNT_TXN_RECEIPT
 
-// TODO: Missing PENDING_TXN_RECEIPT
+// TODO: Missing RPC PENDING_TXN_RECEIPT
 
-// TODO: Missing L1_HANDLER_TXN_RECEIPT
+// TODO: Missing RPC L1_HANDLER_TXN_RECEIPT
 
 export type RejectedTransactionReceiptResponse = {
   status: `${TransactionStatus.REJECTED}`;
@@ -150,21 +151,21 @@ export type RejectedTransactionReceiptResponse = {
     code: string;
     error_message: string;
   };
-} & SuccessfulTransactionReceiptResponse;
+};
 
 export type RevertedTransactionReceiptResponse = {
-  type?: TransactionType; // RPC only
-  execution_status: TransactionExecutionStatus.REVERTED;
-  finality_status: TransactionFinalityStatus;
+  type?: TransactionType | any; // RPC only // any due to RPC Spec issue
+  execution_status: TransactionExecutionStatus.REVERTED | any; // any due to RPC Spec issue
+  finality_status: TransactionFinalityStatus | any;
   status?: TransactionStatus; // SEQ only
   actual_fee: string;
-  block_hash: string;
-  block_number: BlockNumber;
+  block_hash?: string; // ?~ optional due to RPC spec issue
+  block_number?: BlockNumber; // ?~ optional due to RCP spec issue
   transaction_hash: string;
   transaction_index?: number; // SEQ only
   messages_sent: Array<MessageToL1>; // SEQ Casted l2_to_l1_messages
   events: any[];
-  revert_reason: string; // SEQ Casted revert_error
+  revert_reason?: string; // SEQ Casted revert_error // ?~ optional due to RCP spec issue
 };
 
 export interface EstimateFeeResponse {

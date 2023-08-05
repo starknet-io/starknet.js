@@ -3,6 +3,7 @@ import {
   Account,
   Contract,
   DeclareDeployUDCResponse,
+  DeployTransactionReceiptResponse,
   Provider,
   TransactionType,
   cairo,
@@ -547,7 +548,7 @@ describe('deploy and test Wallet', () => {
 
       // check pre-calculated address
       const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
-      const udcEvent = parseUDCEvent(txReceipt);
+      const udcEvent = parseUDCEvent(txReceipt as DeployTransactionReceiptResponse);
       expect(cleanHex(deployment.contract_address[0])).toBe(cleanHex(udcEvent.contract_address));
     });
 
@@ -568,7 +569,7 @@ describe('deploy and test Wallet', () => {
 
       // check pre-calculated address
       const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
-      const udcEvent = parseUDCEvent(txReceipt);
+      const udcEvent = parseUDCEvent(txReceipt as DeployTransactionReceiptResponse);
       expect(cleanHex(deployment.contract_address[0])).toBe(cleanHex(udcEvent.contract_address));
     });
 

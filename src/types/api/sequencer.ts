@@ -198,7 +198,7 @@ export type TransactionReceiptResponse =
 export type SuccessfulTransactionReceiptResponse = {
   execution_status: TransactionExecutionStatus.SUCCEEDED;
   finality_status: TransactionFinalityStatus;
-  status: Omit<TransactionStatus, TransactionStatus.REJECTED | TransactionStatus.REVERTED>;
+  status: TransactionStatus;
   actual_fee: string;
   block_hash: string;
   block_number: BlockNumber;
