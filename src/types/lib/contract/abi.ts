@@ -33,16 +33,16 @@ export type StructAbi = {
 
 export type AbiEvents = { [hash: string]: EventAbi };
 
-export type EventAbi = UpToDateEvent | OldEvent;
+export type EventAbi = Cairo1Event | LegacyEvent;
 
-export type UpToDateEvent = {
+export type Cairo1Event = {
   name: string;
   members: EventEntry[];
   kind: 'struct';
   type: 'event';
 };
 
-export type OldEvent = {
+export type LegacyEvent = {
   name: string;
   type: 'event';
   data: EventEntry[];

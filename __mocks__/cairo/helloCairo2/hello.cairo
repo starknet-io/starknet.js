@@ -86,6 +86,22 @@ trait IHelloStarknet<TContractState> {
     fn test_u128(self: @TContractState, p1: u128) -> u128;
     fn test_u256(self: @TContractState, p1: u256) -> u256;
 
+    // event test
+    fn emitEventRegular(
+        ref self: TContractState,
+        simpleKeyVariable: u8,
+        simpleKeyStruct: HelloStarknet::SimpleStruct,
+        simpleKeyArray: Array<u8>,
+        simpleDataVariable: u8,
+        simpleDataStruct: HelloStarknet::SimpleStruct,
+        simpleDataArray: Array<u8>
+    );
+    fn emitEventNested(
+        ref self: TContractState,
+        nestedKeyStruct: HelloStarknet::NestedStruct,
+        nestedDataStruct: HelloStarknet::NestedStruct
+    );
+
     // echo Array
     fn echo_array(self: @TContractState, data: Array<u8>) -> Array<u8>;
     fn echo_array_u256(self: @TContractState, data: Array<u256>) -> Array<u256>;
@@ -168,6 +184,45 @@ mod HelloStarknet {
         user1: UserData,
     }
 
+    #[event]
+    #[derive(Drop, starknet::Event)]
+    enum Event {
+        EventRegular: EventRegular,
+        EventNested: EventNested,
+    }
+    
+    #[derive(Drop, Serde)]
+    struct SimpleStruct {
+        first: u8,
+        second: u16,
+    }
+
+    #[derive(Drop, Serde)]
+    struct NestedStruct {
+        simpleStruct: SimpleStruct,
+        simpleArray: Array<u8>,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct EventRegular {
+        #[key]
+        simpleKeyVariable: u8,
+        #[key]
+        simpleKeyStruct: SimpleStruct,
+        #[key]
+        simpleKeyArray: Array<u8>,
+        simpleDataVariable: u8,
+        simpleDataStruct: SimpleStruct,
+        simpleDataArray: Array<u8>,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct EventNested {
+        #[key]
+        nestedKeyStruct: NestedStruct,
+        nestedDataStruct: NestedStruct,
+    }
+
     #[l1_handler]
     fn increase_bal(ref self: ContractState, from_address: felt252, amount: felt252) {
         let current = self.balance.read();
@@ -236,6 +291,43 @@ mod HelloStarknet {
         fn test_u256(self: @ContractState, p1: u256) -> u256 {
             let to_add = u256 { low: 1_u128, high: 0_u128 };
             p1 + to_add
+        }
+
+        // event test
+        fn emitEventRegular(
+            ref self: ContractState,
+            simpleKeyVariable: u8,
+            simpleKeyStruct: SimpleStruct,
+            simpleKeyArray: Array<u8>,
+            simpleDataVariable: u8,
+            simpleDataStruct: SimpleStruct,
+            simpleDataArray: Array<u8>
+        ) {
+            self
+                .emit(
+                    Event::EventRegular(
+                        EventRegular {
+                            simpleKeyVariable: simpleKeyVariable,
+                            simpleKeyStruct: simpleKeyStruct,
+                            simpleKeyArray: simpleKeyArray,
+                            simpleDataVariable: simpleDataVariable,
+                            simpleDataStruct: simpleDataStruct,
+                            simpleDataArray: simpleDataArray
+                        }
+                    )
+                );
+        }
+        fn emitEventNested(
+            ref self: ContractState, nestedKeyStruct: NestedStruct, nestedDataStruct: NestedStruct
+        ) {
+            self
+                .emit(
+                    Event::EventNested(
+                        EventNested {
+                            nestedKeyStruct: nestedKeyStruct, nestedDataStruct: nestedDataStruct, 
+                        }
+                    )
+                )
         }
 
         // echo Array

@@ -334,9 +334,10 @@ export class Contract implements ContractInterface {
 
   public parseEvents(receipt: GetTransactionReceiptResponse): ParsedEvents {
     return parseRawEvents(
-      (receipt as InvokeTransactionReceiptResponse).events?.filter((event) => {
-        return cleanHex(event.from_address) === cleanHex(this.address);
-      }, []) || [],
+      (receipt as InvokeTransactionReceiptResponse).events?.filter(
+        (event) => cleanHex(event.from_address) === cleanHex(this.address),
+        []
+      ) || [],
       this.events,
       this.structs
     );

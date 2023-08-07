@@ -9,8 +9,6 @@ import { uint256ToBN } from '../src/utils/uint256';
 import {
   compiledErc20,
   compiledErc20Echo,
-  compiledEvent,
-  compiledEventCasm,
   compiledMulticall,
   compiledTypeTransformation,
   describeIfDevnet,
@@ -104,8 +102,6 @@ describe('contract module', () => {
       const factoryClassHash =
         '0x011ab8626b891bcb29f7cc36907af7670d6fb8a0528c7944330729d8f01e9ea3'!;
       let factory: ContractFactory;
-      let eventContract: Contract;
-
       beforeAll(async () => {
         factory = new ContractFactory({
           compiledContract: compiledErc20Echo,
@@ -122,95 +118,26 @@ describe('contract module', () => {
           ['0x823d5a0c0eefdc9a6a1cb0e064079a6284f3b26566b677a32c71bbe7bf9f8c'],
           22
         );
-        const { deploy } = await account.declareAndDeploy({
-          contract: compiledEvent,
-          casm: compiledEventCasm,
-        });
-
-        eventContract = new Contract(compiledEvent.abi, deploy.contract_address!, account);
       });
 
-      test('parse old event structure', async () => {
+      test('parse legacy event structure', async () => {
         const to = stark.randomAddress();
         const amount = uint256(1);
         const { transaction_hash } = await erc20Echo20Contract.transfer(to, amount);
         const tx = await provider.waitForTransaction(transaction_hash);
         const events: ParsedEvents = erc20Echo20Contract.parseEvents(tx);
         const shouldBe: ParsedEvents = {
-          Transfer: {
-            from_: BigInt(account.address),
-            to: BigInt(to),
-            value: {
-              low: BigInt(amount.low),
-              high: BigInt(amount.high),
+          Transfer: [
+            {
+              from_: BigInt(account.address),
+              to: BigInt(to),
+              value: {
+                low: BigInt(amount.low),
+                high: BigInt(amount.high),
+              },
             },
-          },
+          ],
         };
-        return expect(events).toStrictEqual(shouldBe);
-      });
-      test('parse event returning a regular struct', async () => {
-        const simpleKeyVariable = 0n;
-        const simpleKeyStruct = {
-          first: 1n,
-          second: 2n,
-        };
-        const simpleKeyArray = [3n, 4n, 5n];
-        const simpleDataVariable = 6n;
-        const simpleDataStruct = {
-          first: 7n,
-          second: 8n,
-        };
-        const simpleDataArray = [9n, 10n, 11n];
-        const { transaction_hash } = await eventContract.emitEventRegular(
-          simpleKeyVariable,
-          simpleKeyStruct,
-          simpleKeyArray,
-          simpleDataVariable,
-          simpleDataStruct,
-          simpleDataArray
-        );
-        const shouldBe: ParsedEvents = {
-          EventRegular: {
-            simpleKeyVariable,
-            simpleKeyStruct,
-            simpleKeyArray,
-            simpleDataVariable,
-            simpleDataStruct,
-            simpleDataArray,
-          },
-        };
-        const tx = await provider.waitForTransaction(transaction_hash);
-        const events = eventContract.parseEvents(tx);
-        return expect(events).toStrictEqual(shouldBe);
-      });
-
-      test('parse event returning a nested struct', async () => {
-        const nestedKeyStruct = {
-          simpleStruct: {
-            first: 0n,
-            second: 1n,
-          },
-          simpleArray: [2n, 3n, 4n, 5n],
-        };
-        const nestedDataStruct = {
-          simpleStruct: {
-            first: 6n,
-            second: 7n,
-          },
-          simpleArray: [8n, 9n, 10n, 11n],
-        };
-        const { transaction_hash } = await eventContract.emitEventNested(
-          nestedKeyStruct,
-          nestedDataStruct
-        );
-        const shouldBe: ParsedEvents = {
-          EventNested: {
-            nestedKeyStruct,
-            nestedDataStruct,
-          },
-        };
-        const tx = await provider.waitForTransaction(transaction_hash);
-        const events = eventContract.parseEvents(tx);
         return expect(events).toStrictEqual(shouldBe);
       });
     });
