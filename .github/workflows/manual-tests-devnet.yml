@@ -16,7 +16,8 @@ jobs:
 
     uses: ./.github/workflows/_test.yml
     with:
-      is-rpc: ${{ matrix.TEST_RPC_URL != '' }}
+      use-rpc-devnet: ${{ matrix.TEST_RPC_URL != '' }}
+      use-seq-devnet: ${{ matrix.TEST_PROVIDER_BASE_URL != '' }}
     secrets:
       TEST_PROVIDER_BASE_URL: ${{ matrix.TEST_PROVIDER_BASE_URL }}
       TEST_RPC_URL: ${{ matrix.TEST_RPC_URL }}
