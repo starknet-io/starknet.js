@@ -4,6 +4,7 @@ on:
     branches:
       - beta
       - develop
+      - next-version
     paths:
       - '__mocks__/**'
       - '__tests__/**'
@@ -15,6 +16,7 @@ on:
     branches:
       - beta
       - develop
+      - next-version
     paths:
       - '__mocks__/**'
       - '__tests__/**'
@@ -51,7 +53,8 @@ jobs:
 
     uses: ./.github/workflows/_test.yml
     with:
-      is-rpc: ${{ matrix.TEST_RPC_URL != '' }}
+      use-rpc-devnet: ${{ matrix.TEST_RPC_URL != '' }}
+      use-seq-devnet: ${{ matrix.TEST_PROVIDER_BASE_URL != '' }}
     secrets:
       TEST_PROVIDER_BASE_URL: ${{ matrix.TEST_PROVIDER_BASE_URL }}
       TEST_RPC_URL: ${{ matrix.TEST_RPC_URL }}

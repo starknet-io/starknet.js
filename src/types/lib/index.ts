@@ -133,12 +133,30 @@ export enum TransactionType {
   INVOKE = 'INVOKE_FUNCTION',
 }
 
+/**
+ * new statuses are defined by props: finality_status and execution_status
+ * to be #deprecated
+ */
 export enum TransactionStatus {
   NOT_RECEIVED = 'NOT_RECEIVED',
   RECEIVED = 'RECEIVED',
   ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
   ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
   REJECTED = 'REJECTED',
+  REVERTED = 'REVERTED',
+}
+
+export enum TransactionFinalityStatus {
+  NOT_RECEIVED = 'NOT_RECEIVED',
+  RECEIVED = 'RECEIVED',
+  ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
+  ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
+}
+
+export enum TransactionExecutionStatus {
+  REJECTED = 'REJECTED',
+  REVERTED = 'REVERTED',
+  SUCCEEDED = 'SUCCEEDED',
 }
 
 export enum BlockStatus {
@@ -200,13 +218,15 @@ export type ParsedStruct = {
 
 export type waitForTransactionOptions = {
   retryInterval?: number;
-  successStates?: Array<TransactionStatus>;
+  successStates?: Array<TransactionFinalityStatus | TransactionExecutionStatus>;
+  errorStates?: Array<TransactionFinalityStatus | TransactionExecutionStatus>;
 };
 
 export type getSimulateTransactionOptions = {
   blockIdentifier?: BlockIdentifier;
   skipValidate?: boolean;
   skipExecute?: boolean;
+  skipFeeCharge?: boolean;
 };
 
 export type getEstimateFeeBulkOptions = {
