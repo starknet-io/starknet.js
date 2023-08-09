@@ -126,9 +126,9 @@ describe('contract module', () => {
         const { transaction_hash } = await erc20Echo20Contract.transfer(to, amount);
         const tx = await provider.waitForTransaction(transaction_hash);
         const events: ParsedEvents = erc20Echo20Contract.parseEvents(tx);
-        const shouldBe: ParsedEvents = {
-          Transfer: [
-            {
+        const shouldBe: ParsedEvents = [
+          {
+            Transfer: {
               from_: BigInt(account.address),
               to: BigInt(to),
               value: {
@@ -136,8 +136,8 @@ describe('contract module', () => {
                 high: BigInt(amount.high),
               },
             },
-          ],
-        };
+          },
+        ];
         return expect(events).toStrictEqual(shouldBe);
       });
     });

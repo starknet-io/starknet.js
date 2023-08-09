@@ -41,8 +41,6 @@ export type InvokeOptions = Pick<
   'maxFee' | 'nonce' | 'signature' | 'parseRequest'
 >;
 
-export type ParsedEvent = ParsedStruct;
+export type ParsedEvent = { [name: string]: ParsedStruct };
 
-export type ParsedEvents = {
-  [name: string]: Array<ParsedEvent> | ParsedEvent;
-};
+export type ParsedEvents = Array<ParsedEvent>;

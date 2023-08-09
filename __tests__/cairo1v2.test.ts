@@ -602,9 +602,9 @@ describe('Cairo 1 Devnet', () => {
         simpleDataStruct,
         simpleDataArray
       );
-      const shouldBe: types.ParsedEvents = {
-        EventRegular: [
-          {
+      const shouldBe: types.ParsedEvents = [
+        {
+          EventRegular: {
             simpleKeyVariable,
             simpleKeyStruct,
             simpleKeyArray,
@@ -612,8 +612,8 @@ describe('Cairo 1 Devnet', () => {
             simpleDataStruct,
             simpleDataArray,
           },
-        ],
-      };
+        },
+      ];
       const tx = await provider.waitForTransaction(transaction_hash);
       const events = eventContract.parseEvents(tx);
       return expect(events).toStrictEqual(shouldBe);
@@ -624,24 +624,24 @@ describe('Cairo 1 Devnet', () => {
         nestedKeyStruct,
         nestedDataStruct
       );
-      const shouldBe: types.ParsedEvents = {
-        EventNested: [
-          {
+      const shouldBe: types.ParsedEvents = [
+        {
+          EventNested: {
             nestedKeyStruct,
             nestedDataStruct,
           },
-        ],
-      };
+        },
+      ];
       const tx = await provider.waitForTransaction(transaction_hash);
       const events = eventContract.parseEvents(tx);
       return expect(events).toStrictEqual(shouldBe);
     });
 
-    test('parse tx returning multiple events', async () => {
+    test('parse tx returning multiple similar events', async () => {
       const anotherKeyVariable = 100n;
-      const shouldBe: types.ParsedEvents = {
-        EventRegular: [
-          {
+      const shouldBe: types.ParsedEvents = [
+        {
+          EventRegular: {
             simpleKeyVariable,
             simpleKeyStruct,
             simpleKeyArray,
@@ -649,7 +649,9 @@ describe('Cairo 1 Devnet', () => {
             simpleDataStruct,
             simpleDataArray,
           },
-          {
+        },
+        {
+          EventRegular: {
             simpleKeyVariable: anotherKeyVariable,
             simpleKeyStruct,
             simpleKeyArray,
@@ -657,8 +659,8 @@ describe('Cairo 1 Devnet', () => {
             simpleDataStruct,
             simpleDataArray,
           },
-        ],
-      };
+        },
+      ];
       const callData1 = eventContract.populate('emitEventRegular', [
         simpleKeyVariable,
         simpleKeyStruct,
@@ -674,6 +676,42 @@ describe('Cairo 1 Devnet', () => {
         simpleDataVariable,
         simpleDataStruct,
         simpleDataArray,
+      ]);
+      const { transaction_hash } = await account.execute([callData1, callData2]);
+      const tx = await provider.waitForTransaction(transaction_hash);
+      const events = eventContract.parseEvents(tx);
+      return expect(events).toStrictEqual(shouldBe);
+    });
+    test('parse tx returning multiple different events', async () => {
+      const shouldBe: types.ParsedEvents = [
+        {
+          EventRegular: {
+            simpleKeyVariable,
+            simpleKeyStruct,
+            simpleKeyArray,
+            simpleDataVariable,
+            simpleDataStruct,
+            simpleDataArray,
+          },
+        },
+        {
+          EventNested: {
+            nestedKeyStruct,
+            nestedDataStruct,
+          },
+        },
+      ];
+      const callData1 = eventContract.populate('emitEventRegular', [
+        simpleKeyVariable,
+        simpleKeyStruct,
+        simpleKeyArray,
+        simpleDataVariable,
+        simpleDataStruct,
+        simpleDataArray,
+      ]);
+      const callData2 = eventContract.populate('emitEventNested', [
+        nestedKeyStruct,
+        nestedDataStruct,
       ]);
       const { transaction_hash } = await account.execute([callData1, callData2]);
       const tx = await provider.waitForTransaction(transaction_hash);

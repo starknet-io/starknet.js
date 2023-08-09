@@ -47,7 +47,7 @@ export function parseEvents(
 
     // Create our final event object
     const parsedEvent: ParsedEvent = {};
-
+    parsedEvent[abiEvent.name] = {};
     // Remove the event's name hashed from the keys array
     recEvent.keys.shift();
 
@@ -62,18 +62,24 @@ export function parseEvents(
       (abiEvent as LegacyEvent).data;
 
     abiEventKeys.forEach((key) => {
-      parsedEvent[key.name] = responseParser(keysIter, key, abiStructs, parsedEvent);
+      parsedEvent[abiEvent.name][key.name] = responseParser(
+        keysIter,
+        key,
+        abiStructs,
+        parsedEvent[abiEvent.name]
+      );
     });
 
     abiEventData.forEach((data) => {
-      parsedEvent[data.name] = responseParser(dataIter, data, abiStructs, parsedEvent);
+      parsedEvent[abiEvent.name][data.name] = responseParser(
+        dataIter,
+        data,
+        abiStructs,
+        parsedEvent[abiEvent.name]
+      );
     });
-
-    (acc[abiEvent.name] as Array<ParsedEvent>) = (
-      (acc[abiEvent.name] as Array<ParsedEvent>) ?? []
-    ).concat(parsedEvent) || [parsedEvent];
-
+    acc.push(parsedEvent);
     return acc;
-  }, {} as ParsedEvents);
+  }, [] as ParsedEvents);
   return ret;
 }
