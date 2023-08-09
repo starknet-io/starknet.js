@@ -2,6 +2,7 @@ import {
   BigNumberish,
   Contract,
   ContractFactory,
+  ParsedEvents,
   RawArgs,
   SuccessfulTransactionReceiptResponse,
   json,
@@ -101,6 +102,51 @@ describe('contract module', () => {
         expect(BigInt(block_number));
         expect(Array.isArray(result));
         (result as BigNumberish[]).forEach((el) => expect(BigInt(el)));
+      });
+    });
+
+    describe('Event Parsing', () => {
+      let erc20Echo20Contract: Contract;
+      const factoryClassHash =
+        '0x011ab8626b891bcb29f7cc36907af7670d6fb8a0528c7944330729d8f01e9ea3'!;
+      let factory: ContractFactory;
+      beforeAll(async () => {
+        factory = new ContractFactory({
+          compiledContract: compiledErc20Echo,
+          classHash: factoryClassHash,
+          account,
+        });
+
+        erc20Echo20Contract = await factory.deploy(
+          'Token',
+          'ERC20',
+          18,
+          uint256('1000000000'),
+          account.address,
+          ['0x823d5a0c0eefdc9a6a1cb0e064079a6284f3b26566b677a32c71bbe7bf9f8c'],
+          22
+        );
+      });
+
+      test('parse legacy event structure', async () => {
+        const to = stark.randomAddress();
+        const amount = uint256(1);
+        const { transaction_hash } = await erc20Echo20Contract.transfer(to, amount);
+        const tx = await provider.waitForTransaction(transaction_hash);
+        const events: ParsedEvents = erc20Echo20Contract.parseEvents(tx);
+        const shouldBe: ParsedEvents = [
+          {
+            Transfer: {
+              from_: BigInt(account.address),
+              to: BigInt(to),
+              value: {
+                low: BigInt(amount.low),
+                high: BigInt(amount.high),
+              },
+            },
+          },
+        ];
+        return expect(events).toStrictEqual(shouldBe);
       });
     });
 

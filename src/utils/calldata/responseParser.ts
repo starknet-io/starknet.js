@@ -1,5 +1,5 @@
 /* eslint-disable no-case-declarations */
-import { AbiEntry, AbiStructs, Args, BigNumberish, ParsedStruct } from '../../types';
+import { AbiEntry, AbiStructs, Args, BigNumberish, EventEntry, ParsedStruct } from '../../types';
 import { uint256ToBN } from '../uint256';
 import {
   getArrayType,
@@ -101,9 +101,9 @@ function parseResponseValue(
  */
 export default function responseParser(
   responseIterator: Iterator<string>,
-  output: AbiEntry,
+  output: AbiEntry | EventEntry,
   structs: AbiStructs,
-  parsedResult?: Args
+  parsedResult?: Args | ParsedStruct
 ): any {
   const { name, type } = output;
   let temp;

@@ -16,6 +16,7 @@ import {
   selector,
   shortString,
   stark,
+  types,
 } from '../src';
 import {
   compiledC1Account,
@@ -34,9 +35,9 @@ const { toHex } = num;
 const { starknetKeccak } = selector;
 
 describe('Cairo 1 Devnet', () => {
+  const provider = getTestProvider();
+  const account = getTestAccount(provider);
   describe('API &  Contract interactions', () => {
-    const provider = getTestProvider();
-    const account = getTestAccount(provider);
     let dd: DeclareDeployUDCResponse;
     let cairo1Contract: Contract;
     initializeMatcher(expect);
@@ -501,8 +502,6 @@ describe('Cairo 1 Devnet', () => {
   });
 
   describe('Cairo1 Account contract', () => {
-    const provider = getTestProvider();
-    const account = getTestAccount(provider);
     let accountC1: Account;
 
     beforeAll(async () => {
@@ -554,6 +553,170 @@ describe('Cairo 1 Devnet', () => {
 
     test('deploy Cairo1 Account from Cairo0 Account', () => {
       expect(accountC1).toBeInstanceOf(Account);
+    });
+  });
+
+  describe('Event Parsing', () => {
+    let eventContract: Contract;
+    const simpleKeyVariable = 0n;
+    const simpleKeyStruct = {
+      first: 1n,
+      second: 2n,
+    };
+    const simpleKeyArray = [3n, 4n, 5n];
+    const simpleDataVariable = 6n;
+    const simpleDataStruct = {
+      first: 7n,
+      second: 8n,
+    };
+    const simpleDataArray = [9n, 10n, 11n];
+    const nestedKeyStruct = {
+      simpleStruct: {
+        first: 0n,
+        second: 1n,
+      },
+      simpleArray: [2n, 3n, 4n, 5n],
+    };
+    const nestedDataStruct = {
+      simpleStruct: {
+        first: 6n,
+        second: 7n,
+      },
+      simpleArray: [8n, 9n, 10n, 11n],
+    };
+    beforeAll(async () => {
+      const { deploy } = await account.declareAndDeploy({
+        contract: compiledC1v2,
+        casm: compiledC1v2Casm,
+      });
+
+      eventContract = new Contract(compiledC1v2.abi, deploy.contract_address!, account);
+    });
+
+    test('parse event returning a regular struct', async () => {
+      const { transaction_hash } = await eventContract.emitEventRegular(
+        simpleKeyVariable,
+        simpleKeyStruct,
+        simpleKeyArray,
+        simpleDataVariable,
+        simpleDataStruct,
+        simpleDataArray
+      );
+      const shouldBe: types.ParsedEvents = [
+        {
+          EventRegular: {
+            simpleKeyVariable,
+            simpleKeyStruct,
+            simpleKeyArray,
+            simpleDataVariable,
+            simpleDataStruct,
+            simpleDataArray,
+          },
+        },
+      ];
+      const tx = await provider.waitForTransaction(transaction_hash);
+      const events = eventContract.parseEvents(tx);
+      return expect(events).toStrictEqual(shouldBe);
+    });
+
+    test('parse event returning a nested struct', async () => {
+      const { transaction_hash } = await eventContract.emitEventNested(
+        nestedKeyStruct,
+        nestedDataStruct
+      );
+      const shouldBe: types.ParsedEvents = [
+        {
+          EventNested: {
+            nestedKeyStruct,
+            nestedDataStruct,
+          },
+        },
+      ];
+      const tx = await provider.waitForTransaction(transaction_hash);
+      const events = eventContract.parseEvents(tx);
+      return expect(events).toStrictEqual(shouldBe);
+    });
+
+    test('parse tx returning multiple similar events', async () => {
+      const anotherKeyVariable = 100n;
+      const shouldBe: types.ParsedEvents = [
+        {
+          EventRegular: {
+            simpleKeyVariable,
+            simpleKeyStruct,
+            simpleKeyArray,
+            simpleDataVariable,
+            simpleDataStruct,
+            simpleDataArray,
+          },
+        },
+        {
+          EventRegular: {
+            simpleKeyVariable: anotherKeyVariable,
+            simpleKeyStruct,
+            simpleKeyArray,
+            simpleDataVariable,
+            simpleDataStruct,
+            simpleDataArray,
+          },
+        },
+      ];
+      const callData1 = eventContract.populate('emitEventRegular', [
+        simpleKeyVariable,
+        simpleKeyStruct,
+        simpleKeyArray,
+        simpleDataVariable,
+        simpleDataStruct,
+        simpleDataArray,
+      ]);
+      const callData2 = eventContract.populate('emitEventRegular', [
+        anotherKeyVariable,
+        simpleKeyStruct,
+        simpleKeyArray,
+        simpleDataVariable,
+        simpleDataStruct,
+        simpleDataArray,
+      ]);
+      const { transaction_hash } = await account.execute([callData1, callData2]);
+      const tx = await provider.waitForTransaction(transaction_hash);
+      const events = eventContract.parseEvents(tx);
+      return expect(events).toStrictEqual(shouldBe);
+    });
+    test('parse tx returning multiple different events', async () => {
+      const shouldBe: types.ParsedEvents = [
+        {
+          EventRegular: {
+            simpleKeyVariable,
+            simpleKeyStruct,
+            simpleKeyArray,
+            simpleDataVariable,
+            simpleDataStruct,
+            simpleDataArray,
+          },
+        },
+        {
+          EventNested: {
+            nestedKeyStruct,
+            nestedDataStruct,
+          },
+        },
+      ];
+      const callData1 = eventContract.populate('emitEventRegular', [
+        simpleKeyVariable,
+        simpleKeyStruct,
+        simpleKeyArray,
+        simpleDataVariable,
+        simpleDataStruct,
+        simpleDataArray,
+      ]);
+      const callData2 = eventContract.populate('emitEventNested', [
+        nestedKeyStruct,
+        nestedDataStruct,
+      ]);
+      const { transaction_hash } = await account.execute([callData1, callData2]);
+      const tx = await provider.waitForTransaction(transaction_hash);
+      const events = eventContract.parseEvents(tx);
+      return expect(events).toStrictEqual(shouldBe);
     });
   });
 });
