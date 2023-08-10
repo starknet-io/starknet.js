@@ -1,3 +1,4 @@
+// coded with Cairo v2.0.0
 use array::ArrayTrait;
 use array::SpanTrait;
 use option::OptionTrait;
@@ -15,6 +16,9 @@ use starknet::storage_read_syscall;
 use starknet::storage_write_syscall;
 use starknet::storage_address_from_base_and_offset;
 use starknet::storage_base_address_from_felt252;
+use starknet::ClassHash;
+use starknet::EthAddress;
+use starknet::Span;
 
 use traits::Into;
 use starknet::storage_access::StorageAddressSerde;
@@ -141,6 +145,15 @@ trait IHelloStarknet<TContractState> {
     fn option_order_input(self: @TContractState, inp: Option<Order>) -> u16;
     fn enum_result_output(self: @TContractState, val1: u16) -> Result<Order, u16>;
     fn enum_result_input(self: @TContractState, inp: Result<Order, u16>) -> u16;
+    fn new_types(
+        self: @TContractState, ch: ClassHash, eth_addr: EthAddress, contr_address: ContractAddress
+    ) -> (ClassHash, EthAddress, ContractAddress);
+    fn new_span(self: @TContractState, my_span: Span<u16>) -> Span<u16>;
+    fn array_new_types(
+        self: @TContractState,
+        tup: (ContractAddress, EthAddress, ClassHash),
+        tupa: (Array<ContractAddress>, Array<EthAddress>, Array<ClassHash>)
+    ) -> (Array<ContractAddress>, Array<EthAddress>, Array<ClassHash>);
 }
 
 // MAIN APP
@@ -165,7 +178,9 @@ mod HelloStarknet {
     use starknet::storage_write_syscall;
     use starknet::storage_address_from_base_and_offset;
     use starknet::storage_base_address_from_felt252;
-
+    use starknet::ClassHash;
+    use starknet::EthAddress;
+    use starknet::Span;
     use traits::Into;
     use starknet::storage_access::StorageAddressSerde;
     use box::BoxTrait;
@@ -462,6 +477,22 @@ mod HelloStarknet {
             }
         }
 
+
+        // MyEnum as input
+        fn my_enum_input(self: @ContractState, customEnum: MyEnum) -> u16 {
+            match customEnum {
+                MyEnum::Response(my_order) => {
+                    return my_order.p2;
+                },
+                MyEnum::Warning(val) => {
+                    return 0x13_u16;
+                },
+                MyEnum::Error(a) => {
+                    return a;
+                }
+            }
+        }
+
         // return Option<litteral>
         fn option_u8_output(self: @ContractState, val1: u8) -> Option<u8> {
             if val1 < 100 {
@@ -505,6 +536,28 @@ mod HelloStarknet {
                     return y;
                 }
             }
+            
+        // new types from Cairo
+        fn new_types(
+            self: @ContractState,
+            ch: ClassHash,
+            eth_addr: EthAddress,
+            contr_address: ContractAddress
+        ) -> (ClassHash, EthAddress, ContractAddress) {
+            (ch, eth_addr, contr_address)
+        }
+
+        fn array_new_types(
+            self: @ContractState,
+            tup: (ContractAddress, EthAddress, ClassHash),
+            tupa: (Array<ContractAddress>, Array<EthAddress>, Array<ClassHash>)
+        ) -> (Array<ContractAddress>, Array<EthAddress>, Array<ClassHash>) {
+            let (aca, aetha, ach) = tupa;
+            (aca, aetha, ach)
+        }
+
+        fn new_span(self: @ContractState, my_span: Span<u16>) -> Span<u16> {
+            my_span
         }
     }
 }

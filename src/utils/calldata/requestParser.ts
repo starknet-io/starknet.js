@@ -124,6 +124,9 @@ function parseCalldataValue(
       return parseUint256(element);
     }
 
+    if (type === 'core::starknet::eth_address::EthAddress')
+      return parseBaseTypes(type, element as BigNumberish);
+
     const { members } = structs[type];
     const subElement = element as any;
 
@@ -265,6 +268,8 @@ export function parseCalldataField(
       }
       return parseCalldataValue(value, input.type, structs, enums);
 
+    case type === 'core::starknet::eth_address::EthAddress':
+      return parseBaseTypes(type, value);
     // Struct or Tuple
     case isTypeStruct(type, structs) || isTypeTuple(type) || isTypeUint256(type):
       return parseCalldataValue(value as ParsedStruct | BigNumberish[], type, structs, enums);

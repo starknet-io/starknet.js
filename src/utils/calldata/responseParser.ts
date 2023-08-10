@@ -46,6 +46,9 @@ function parseBaseTypes(type: string, it: Iterator<string>) {
       const low = it.next().value;
       const high = it.next().value;
       return uint256ToBN({ low, high });
+    case type === 'core::starknet::eth_address::EthAddress':
+      temp = it.next().value;
+      return BigInt(temp);
     default:
       temp = it.next().value;
       return BigInt(temp);
@@ -76,8 +79,23 @@ function parseResponseValue(
     return uint256ToBN({ low, high });
   }
 
+  // type c1 array
+  if (isTypeArray(element.type)) {
+    // eslint-disable-next-line no-case-declarations
+    const parsedDataArr: (BigNumberish | ParsedStruct | boolean | any[])[] = [];
+    const el = { name: '', type: getArrayType(element.type) };
+    const len = BigInt(responseIterator.next().value); // get length
+    while (parsedDataArr.length < len) {
+      parsedDataArr.push(parseResponseValue(responseIterator, el, structs));
+    }
+    return parsedDataArr;
+  }
+
   // type struct
   if (element.type in structs && structs[element.type]) {
+    if (element.type === 'core::starknet::eth_address::EthAddress') {
+      return parseBaseTypes(element.type, responseIterator);
+    }
     return structs[element.type].members.reduce((acc, el) => {
       acc[el.name] = parseResponseValue(responseIterator, el, structs, enums);
       return acc;
