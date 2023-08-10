@@ -1,4 +1,4 @@
-import { Abi, AbiEnums, AbiStructs, BigNumberish, Uint, Uint256 } from '../../types';
+import { Abi, AbiEnums, AbiStructs, BigNumberish, Litteral, Uint, Uint256 } from '../../types';
 import { isBigInt, isHex, isStringWholeNumber } from '../num';
 import { encodeShortString, isShortString, isText } from '../shortString';
 import { UINT_128_MAX, isUint256 } from '../uint256';
@@ -6,7 +6,9 @@ import { UINT_128_MAX, isUint256 } from '../uint256';
 export const isLen = (name: string) => /_len$/.test(name);
 export const isTypeFelt = (type: string) => type === 'felt' || type === 'core::felt252';
 export const isTypeArray = (type: string) =>
-  /\*/.test(type) || type.startsWith('core::array::Array::');
+  /\*/.test(type) ||
+  type.startsWith('core::array::Array::') ||
+  type.startsWith('core::array::Span::');
 export const isTypeTuple = (type: string) => /^\(.*\)$/i.test(type);
 export const isTypeNamedTuple = (type: string) => /\(.*\)/i.test(type) && type.includes(':');
 export const isTypeStruct = (type: string, structs: AbiStructs) => type in structs;
@@ -14,10 +16,13 @@ export const isTypeEnum = (type: string, enums: AbiEnums) => type in enums;
 export const isTypeOption = (type: string) => type.startsWith('core::option::Option::');
 export const isTypeResult = (type: string) => type.startsWith('core::result::Result::');
 export const isTypeUint = (type: string) => Object.values(Uint).includes(type as Uint);
+export const isTypeLitteral = (type: string) => Object.values(Litteral).includes(type as Litteral);
 export const isTypeUint256 = (type: string) => type === 'core::integer::u256';
 export const isTypeBool = (type: string) => type === 'core::bool';
 export const isTypeContractAddress = (type: string) =>
   type === 'core::starknet::contract_address::ContractAddress';
+export const isTypeEthAddress = (type: string) =>
+  type === 'core::starknet::eth_address::EthAddress';
 export const isCairo1Type = (type: string) => type.includes('core::');
 
 export const getArrayType = (type: string) => {

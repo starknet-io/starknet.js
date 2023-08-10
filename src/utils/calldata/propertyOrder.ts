@@ -5,6 +5,7 @@ import {
   isLen,
   isTypeArray,
   isTypeEnum,
+  isTypeEthAddress,
   isTypeOption,
   isTypeResult,
   isTypeStruct,
@@ -42,6 +43,9 @@ export default function orderPropsByAbi(
     }
     if (isTypeTuple(abiType)) {
       return orderTuple(unorderedItem, abiType);
+    }
+    if (isTypeEthAddress(abiType)) {
+      return unorderedItem;
     }
     if (isTypeStruct(abiType, structs)) {
       const abiOfStruct = structs[abiType].members;

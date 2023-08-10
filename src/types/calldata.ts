@@ -12,3 +12,8 @@ export enum Uint {
   u128 = 'core::integer::u128',
   u256 = 'core::integer::u256', // This one is struct
 }
+
+export enum Litteral {
+  ClassHash = 'core::starknet::class_hash::ClassHash',
+  ContractAddress = 'core::starknet::contract_address::ContractAddress',
+}

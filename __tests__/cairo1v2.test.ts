@@ -123,7 +123,7 @@ describe('Cairo 1 Devnet', () => {
       expect(balance).toBe(200n);
     });
 
-    test('Cairo 1 Contract Interaction - uint 8, 16, 32, 64, 128', async () => {
+    test('Cairo 1 Contract Interaction - uint 8, 16, 32, 64, 128, litterals', async () => {
       const tx = await cairo1Contract.increase_balance_u8(255n);
       await account.waitForTransaction(tx.transaction_hash);
       const balance = await cairo1Contract.get_balance_u8();
@@ -189,12 +189,36 @@ describe('Cairo 1 Devnet', () => {
       expect(status).toBe(true);
     });
 
-    test('Cairo 1 Contract Interaction - ContractAddress', async () => {
+    test('Cairo 1 Contract Interaction - ContractAddress, ClassHash, EthAddress', async () => {
       const tx = await cairo1Contract.set_ca('123');
       await account.waitForTransaction(tx.transaction_hash);
       const status = await cairo1Contract.get_ca();
-
       expect(status).toBe(123n);
+
+      // new types Cairo v2.0.0
+      const compiled = cairo1Contract.populate('new_types', {
+        ch: 123456789n,
+        eth_addr: 987654321n,
+        contr_address: 657563474357n,
+      });
+      const result = await cairo1Contract.call('new_types', compiled.calldata as Calldata);
+      expect(result).toStrictEqual({ '0': 123456789n, '1': 987654321n, '2': 657563474357n });
+
+      const myCalldata = new CallData(compiledC1v2.abi); // test arrays
+      const compiled2 = myCalldata.compile('array_new_types', {
+        tup: cairo.tuple(256, '0x1234567890', '0xe3456'),
+        tupa: cairo.tuple(
+          ['0x1234567890', '0xe3456'], // ContractAddress
+          ['0x1234567891', '0xe3457'], // EthAddress
+          ['0x1234567892', '0xe3458'] // ClassHash
+        ),
+      });
+      const res1 = await cairo1Contract.call('array_new_types', compiled2);
+      expect(res1).toStrictEqual({
+        '0': [78187493520n, 930902n],
+        '1': [78187493521n, 930903n],
+        '2': [78187493522n, 930904n],
+      });
     });
 
     test('Cairo1 simple getStorageAt variables retrieval', async () => {
@@ -262,6 +286,11 @@ describe('Cairo 1 Devnet', () => {
 
       const status2 = await cairo1Contract.echo_array_bool([true, true, false, false]);
       expect(status2).toEqual([true, true, false, false]);
+
+      // Span type
+      const comp = cairo1Contract.populate('new_span', { my_span: [1, 2, 3] });
+      const resp = await cairo1Contract.call('new_span', comp.calldata as Calldata);
+      expect(resp).toEqual([1n, 2n, 3n]);
     });
 
     test('Cairo 1 Contract Interaction - echo flat un-nested Struct', async () => {
