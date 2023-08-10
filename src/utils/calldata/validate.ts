@@ -2,9 +2,17 @@
  * Validate cairo contract method arguments
  * Flow: Determine type from abi and than validate against parameter
  */
-import { AbiEntry, AbiEnums, AbiStructs, BigNumberish, FunctionAbi, Uint } from '../../types';
+import {
+  AbiEntry,
+  AbiEnums,
+  AbiStructs,
+  BigNumberish,
+  FunctionAbi,
+  Litteral,
+  Uint,
+} from '../../types';
 import assert from '../assert';
-import { toBigInt } from '../num';
+import { isHex, toBigInt } from '../num';
 import { isLongText } from '../shortString';
 import { uint256ToBN } from '../uint256';
 import {
@@ -15,6 +23,7 @@ import {
   isTypeContractAddress,
   isTypeEnum,
   isTypeFelt,
+  isTypeLitteral,
   isTypeOption,
   isTypeResult,
   isTypeStruct,
@@ -26,6 +35,13 @@ const validateFelt = (parameter: any, input: AbiEntry) => {
   assert(
     typeof parameter === 'string' || typeof parameter === 'number' || typeof parameter === 'bigint',
     `Validate: arg ${input.name} should be a felt typed as (String, Number or BigInt)`
+  );
+  if (typeof parameter === 'string' && !isHex(parameter)) return; // shortstring
+  const param = BigInt(parameter.toString(10));
+  assert(
+    // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1266
+    param >= 0n && param <= 2n ** 252n - 1n,
+    `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^252-1]`
   );
 };
 
@@ -41,7 +57,9 @@ const validateUint = (parameter: any, input: AbiEntry) => {
       typeof parameter === 'number' ||
       typeof parameter === 'bigint' ||
       (typeof parameter === 'object' && 'low' in parameter && 'high' in parameter),
-    `Validate: arg ${input.name} of cairo ZORG type ${input.type} should be type (String, Number or BigInt)`
+    `Validate: arg ${input.name} of cairo type ${
+      input.type
+    } should be type (String, Number or BigInt), but is ${typeof parameter} ${parameter}.`
   );
   const param = typeof parameter === 'object' ? uint256ToBN(parameter) : toBigInt(parameter);
 
@@ -88,6 +106,21 @@ const validateUint = (parameter: any, input: AbiEntry) => {
       );
       break;
 
+    case Litteral.ClassHash:
+      assert(
+        // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1670
+        param >= 0n && param <= 2n ** 252n - 1n,
+        `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^252-1]`
+      );
+      break;
+
+    case Litteral.ContractAddress:
+      assert(
+        // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1245
+        param >= 0n && param <= 2n ** 252n - 1n,
+        `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^252-1]`
+      );
+      break;
     default:
       break;
   }
@@ -104,6 +137,20 @@ const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) =>
   // c1v2 uint256 in struct
   if (input.type === Uint.u256) {
     validateUint(parameter, input);
+    return;
+  }
+
+  if (input.type === 'core::starknet::eth_address::EthAddress') {
+    assert(
+      typeof parameter !== 'object',
+      `EthAdress type is waiting a BigNumberish. Got ${parameter}`
+    );
+    const param = BigInt(parameter.toString(10));
+    assert(
+      // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1259
+      param >= 0n && param <= 2n ** 160n - 1n,
+      `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^160-1]`
+    );
     return;
   }
 
@@ -175,6 +222,7 @@ const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs, enu
     case isTypeTuple(baseType):
       parameter.forEach((it: any) => validateTuple(it, { name: input.name, type: baseType }));
       break;
+
     case isTypeStruct(baseType, structs):
       parameter.forEach((it: any) =>
         validateStruct(it, { name: input.name, type: baseType }, structs)
@@ -216,7 +264,7 @@ export default function validateFields(
       case isTypeFelt(input.type):
         validateFelt(parameter, input);
         break;
-      case isTypeUint(input.type):
+      case isTypeUint(input.type) || isTypeLitteral(input.type):
         validateUint(parameter, input);
         break;
       case isTypeBool(input.type):

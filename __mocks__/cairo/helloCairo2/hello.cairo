@@ -477,22 +477,6 @@ mod HelloStarknet {
             }
         }
 
-
-        // MyEnum as input
-        fn my_enum_input(self: @ContractState, customEnum: MyEnum) -> u16 {
-            match customEnum {
-                MyEnum::Response(my_order) => {
-                    return my_order.p2;
-                },
-                MyEnum::Warning(val) => {
-                    return 0x13_u16;
-                },
-                MyEnum::Error(a) => {
-                    return a;
-                }
-            }
-        }
-
         // return Option<litteral>
         fn option_u8_output(self: @ContractState, val1: u8) -> Option<u8> {
             if val1 < 100 {
@@ -536,7 +520,8 @@ mod HelloStarknet {
                     return y;
                 }
             }
-            
+        }
+
         // new types from Cairo
         fn new_types(
             self: @ContractState,
