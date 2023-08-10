@@ -31,6 +31,7 @@ export * as selector from './utils/selector';
 export * from './utils/address';
 export * from './utils/url';
 export * from './utils/calldata';
+export * from './utils/calldata/enum';
 export * from './utils/contract';
 export * from './utils/events';
 

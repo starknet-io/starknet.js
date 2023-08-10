@@ -1,14 +1,33 @@
-import { AbiEntry, AbiStructs, BigNumberish, ParsedStruct, Tupled, Uint256 } from '../../types';
+import {
+  AbiEntry,
+  AbiEnums,
+  AbiStructs,
+  BigNumberish,
+  CairoEnum,
+  ParsedStruct,
+  Tupled,
+  Uint256,
+} from '../../types';
 import { isText, splitLongString } from '../shortString';
 import {
   felt,
   getArrayType,
   isTypeArray,
+  isTypeEnum,
+  isTypeOption,
+  isTypeResult,
   isTypeStruct,
   isTypeTuple,
   isTypeUint256,
   uint256,
 } from './cairo';
+import {
+  CairoCustomEnum,
+  CairoOption,
+  CairoOptionVariant,
+  CairoResult,
+  CairoResultVariant,
+} from './enum';
 import extractTupleMemberTypes from './tuple';
 
 /**
@@ -69,12 +88,20 @@ function parseUint256(element: object | BigNumberish) {
  * @param element - element that needs to be parsed
  * @param type  - name of the method
  * @param structs - structs from abi
+ * @param enums - enums from abi
  * @return {string | string[]} - parsed arguments in format that contract is expecting
  */
 function parseCalldataValue(
-  element: ParsedStruct | BigNumberish | BigNumberish[],
+  element:
+    | ParsedStruct
+    | BigNumberish
+    | BigNumberish[]
+    | CairoOption<any>
+    | CairoResult<any, any>
+    | CairoEnum,
   type: string,
-  structs: AbiStructs
+  structs: AbiStructs,
+  enums: AbiEnums
 ): string | string[] {
   if (element === undefined) {
     throw Error(`Missing parameter for type ${type}`);
@@ -87,7 +114,7 @@ function parseCalldataValue(
     const arrayType = getArrayType(type);
 
     return element.reduce((acc, it) => {
-      return acc.concat(parseCalldataValue(it, arrayType, structs));
+      return acc.concat(parseCalldataValue(it, arrayType, structs, enums));
     }, result);
   }
 
@@ -101,7 +128,7 @@ function parseCalldataValue(
     const subElement = element as any;
 
     return members.reduce((acc, it: AbiEntry) => {
-      return acc.concat(parseCalldataValue(subElement[it.name], it.type, structs));
+      return acc.concat(parseCalldataValue(subElement[it.name], it.type, structs, enums));
     }, [] as string[]);
   }
   // check if abi element is tuple
@@ -109,7 +136,7 @@ function parseCalldataValue(
     const tupled = parseTuple(element as object, type);
 
     return tupled.reduce((acc, it: Tupled) => {
-      const parsedData = parseCalldataValue(it.element, it.type, structs);
+      const parsedData = parseCalldataValue(it.element, it.type, structs, enums);
       return acc.concat(parsedData);
     }, [] as string[]);
   }
@@ -117,6 +144,91 @@ function parseCalldataValue(
   if (isTypeUint256(type)) {
     return parseUint256(element);
   }
+  // check if Enum
+  if (isTypeEnum(type, enums)) {
+    const { variants } = enums[type];
+    // Option Enum
+    if (isTypeOption(type)) {
+      const myOption = element as CairoOption<any>;
+      if (myOption.isSome()) {
+        const listTypeVariant = variants.find((variant) => variant.name === 'Some');
+        if (typeof listTypeVariant === 'undefined') {
+          throw Error(`Error in abi : Option has no 'Some' variant.`);
+        }
+        const typeVariantSome = listTypeVariant.type;
+        if (typeVariantSome === '()') {
+          return CairoOptionVariant.Some.toString();
+        }
+        const parsedParameter = parseCalldataValue(
+          myOption.unwrap(),
+          typeVariantSome,
+          structs,
+          enums
+        );
+        if (Array.isArray(parsedParameter)) {
+          return [CairoOptionVariant.Some.toString(), ...parsedParameter];
+        }
+        return [CairoOptionVariant.Some.toString(), parsedParameter];
+      }
+      return CairoOptionVariant.None.toString();
+    }
+    // Result Enum
+    if (isTypeResult(type)) {
+      const myResult = element as CairoResult<any, any>;
+      if (myResult.isOk()) {
+        const listTypeVariant = variants.find((variant) => variant.name === 'Ok');
+        if (typeof listTypeVariant === 'undefined') {
+          throw Error(`Error in abi : Result has no 'Ok' variant.`);
+        }
+        const typeVariantOk = listTypeVariant.type;
+        if (typeVariantOk === '()') {
+          return CairoResultVariant.Ok.toString();
+        }
+        const parsedParameter = parseCalldataValue(
+          myResult.unwrap(),
+          typeVariantOk,
+          structs,
+          enums
+        );
+        if (Array.isArray(parsedParameter)) {
+          return [CairoResultVariant.Ok.toString(), ...parsedParameter];
+        }
+        return [CairoResultVariant.Ok.toString(), parsedParameter];
+      }
+      // is Result::Err
+      const listTypeVariant = variants.find((variant) => variant.name === 'Err');
+      if (typeof listTypeVariant === 'undefined') {
+        throw Error(`Error in abi : Result has no 'Err' variant.`);
+      }
+      const typeVariantErr = listTypeVariant.type;
+      if (typeVariantErr === '()') {
+        return CairoResultVariant.Err.toString();
+      }
+      const parsedParameter = parseCalldataValue(myResult.unwrap(), typeVariantErr, structs, enums);
+      if (Array.isArray(parsedParameter)) {
+        return [CairoResultVariant.Err.toString(), ...parsedParameter];
+      }
+      return [CairoResultVariant.Err.toString(), parsedParameter];
+    }
+    // Custom Enum
+    const myEnum = element as CairoCustomEnum;
+    const activeVariant: string = myEnum.activeVariant();
+    const listTypeVariant = variants.find((variant) => variant.name === activeVariant);
+    if (typeof listTypeVariant === 'undefined') {
+      throw Error(`Not find in abi : Enum has no '${activeVariant}' variant.`);
+    }
+    const typeActiveVariant = listTypeVariant.type;
+    const numActiveVariant = variants.findIndex((variant) => variant.name === activeVariant); // can not fail due to check of listTypeVariant
+    if (typeActiveVariant === '()') {
+      return numActiveVariant.toString();
+    }
+    const parsedParameter = parseCalldataValue(myEnum.unwrap(), typeActiveVariant, structs, enums);
+    if (Array.isArray(parsedParameter)) {
+      return [numActiveVariant.toString(), ...parsedParameter];
+    }
+    return [numActiveVariant.toString(), parsedParameter];
+  }
+
   if (typeof element === 'object') {
     throw Error(`Parameter ${element} do not align with abi parameter ${type}`);
   }
@@ -129,12 +241,14 @@ function parseCalldataValue(
  * @param argsIterator - Iterator<any> for value of the field
  * @param input  - input(field) information from the abi that will be used to parse the data
  * @param structs - structs from abi
+ * @param enums - enums from abi
  * @return {string | string[]} - parsed arguments in format that contract is expecting
  */
 export function parseCalldataField(
   argsIterator: Iterator<any>,
   input: AbiEntry,
-  structs: AbiStructs
+  structs: AbiStructs,
+  enums: AbiEnums
 ): string | string[] {
   const { name, type } = input;
   let { value } = argsIterator.next();
@@ -149,11 +263,20 @@ export function parseCalldataField(
         // long string match cairo felt*
         value = splitLongString(value);
       }
-      return parseCalldataValue(value, input.type, structs);
+      return parseCalldataValue(value, input.type, structs, enums);
 
     // Struct or Tuple
     case isTypeStruct(type, structs) || isTypeTuple(type) || isTypeUint256(type):
-      return parseCalldataValue(value as ParsedStruct | BigNumberish[], type, structs);
+      return parseCalldataValue(value as ParsedStruct | BigNumberish[], type, structs, enums);
+
+    // Enums
+    case isTypeEnum(type, enums):
+      return parseCalldataValue(
+        value as CairoOption<any> | CairoResult<any, any> | CairoEnum,
+        type,
+        structs,
+        enums
+      );
 
     // Felt or unhandled
     default:

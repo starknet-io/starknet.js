@@ -1,3 +1,4 @@
+import { CairoEnum } from './cairoEnum';
 import {
   BigNumberish,
   BlockIdentifier,
@@ -9,6 +10,7 @@ import {
 
 export type AsyncContractFunction<T = any> = (...args: ArgsOrCalldataWithOptions) => Promise<T>;
 export type ContractFunction = (...args: ArgsOrCalldataWithOptions) => any;
+
 export type Result =
   | {
       [key: string]: any;
@@ -16,7 +18,8 @@ export type Result =
   | Result[]
   | bigint
   | string
-  | boolean;
+  | boolean
+  | CairoEnum;
 
 export type ArgsOrCalldata = RawArgsArray | [Calldata] | Calldata;
 export type ArgsOrCalldataWithOptions = ArgsOrCalldata & ContractOptions;

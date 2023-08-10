@@ -1,4 +1,4 @@
-import { Abi, AbiStructs, BigNumberish, Uint, Uint256 } from '../../types';
+import { Abi, AbiEnums, AbiStructs, BigNumberish, Uint, Uint256 } from '../../types';
 import { isBigInt, isHex, isStringWholeNumber } from '../num';
 import { encodeShortString, isShortString, isText } from '../shortString';
 import { UINT_128_MAX, isUint256 } from '../uint256';
@@ -10,6 +10,9 @@ export const isTypeArray = (type: string) =>
 export const isTypeTuple = (type: string) => /^\(.*\)$/i.test(type);
 export const isTypeNamedTuple = (type: string) => /\(.*\)/i.test(type) && type.includes(':');
 export const isTypeStruct = (type: string, structs: AbiStructs) => type in structs;
+export const isTypeEnum = (type: string, enums: AbiEnums) => type in enums;
+export const isTypeOption = (type: string) => type.startsWith('core::option::Option::');
+export const isTypeResult = (type: string) => type.startsWith('core::result::Result::');
 export const isTypeUint = (type: string) => Object.values(Uint).includes(type as Uint);
 export const isTypeUint256 = (type: string) => type === 'core::integer::u256';
 export const isTypeBool = (type: string) => type === 'core::bool';

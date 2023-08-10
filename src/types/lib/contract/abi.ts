@@ -31,6 +31,14 @@ export type StructAbi = {
   type: 'struct';
 };
 
+export type AbiEnums = { [name: string]: EnumAbi };
+export type EnumAbi = {
+  variants: (AbiEntry & { offset: number })[];
+  name: string;
+  size: number;
+  type: 'enum';
+};
+
 export type AbiEvents = { [hash: string]: EventAbi };
 
 export type EventAbi = Cairo1Event | LegacyEvent;
