@@ -28,6 +28,8 @@ import {
   compiledC1AccountCasm,
   compiledC1v2,
   compiledC1v2Casm,
+  compiledC210,
+  compiledC210Casm,
   compiledComplexSierra,
   describeIfDevnetSequencer,
   getTestAccount,
@@ -45,6 +47,8 @@ describe('Cairo 1 Devnet', () => {
   describe('API &  Contract interactions', () => {
     let dd: DeclareDeployUDCResponse;
     let cairo1Contract: Contract;
+    let dd2: DeclareDeployUDCResponse;
+    let cairo210Contract: Contract;
     initializeMatcher(expect);
 
     beforeAll(async () => {
@@ -52,14 +56,20 @@ describe('Cairo 1 Devnet', () => {
         contract: compiledC1v2,
         casm: compiledC1v2Casm,
       });
-
       cairo1Contract = new Contract(compiledC1v2.abi, dd.deploy.contract_address, account);
+
+      dd2 = await account.declareAndDeploy({
+        contract: compiledC210,
+        casm: compiledC210Casm,
+      });
+      cairo210Contract = new Contract(compiledC210.abi, dd2.deploy.contract_address, account);
     });
 
     test('Declare & deploy v2 - Hello Cairo 1 contract', async () => {
       expect(dd.declare).toMatchSchemaRef('DeclareContractResponse');
       expect(dd.deploy).toMatchSchemaRef('DeployContractUDCResponse');
       expect(cairo1Contract).toBeInstanceOf(Contract);
+      expect(cairo210Contract).toBeInstanceOf(Contract);
     });
 
     xtest('validate TS for redeclare - skip testing', async () => {
@@ -498,6 +508,11 @@ describe('Cairo 1 Devnet', () => {
       expect(res6a).toEqual(18n);
       expect(res7).toEqual(200n);
       expect(res7a).toEqual(200n);
+    });
+
+    test('Cairo 2.1.0 simple contract', async () => {
+      const res = await cairo210Contract.test_felt(1, 100, 3);
+      expect(res).toEqual(101n);
     });
 
     test('myCallData.compile for Cairo 1', async () => {
