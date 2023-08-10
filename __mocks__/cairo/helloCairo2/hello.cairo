@@ -7,7 +7,7 @@ use serde::Serde;
 // bet part
 use starknet::ContractAddress;
 use starknet::get_caller_address;
-use starknet::StorageAccess;
+use starknet::Store;
 use starknet::storage_access;
 use starknet::StorageBaseAddress;
 use starknet::SyscallResult;
@@ -27,13 +27,13 @@ struct Foo {
 }
 
 // Complex Structs
-#[derive(Copy, Drop, Serde, storage_access::StorageAccess)]
+#[derive(Copy, Drop, Serde, starknet::Store)]
 struct UserData {
     address: ContractAddress,
     is_claimed: bool,
 }
 
-#[derive(Copy, Drop, Serde, storage_access::StorageAccess)]
+#[derive(Copy, Drop, Serde, starknet::Store)]
 struct Bet {
     name: felt252,
     description: felt252,
@@ -123,6 +123,8 @@ trait IHelloStarknet<TContractState> {
     fn option_u8_output(self: @TContractState, val1: u8) -> Option<u8>;
     fn option_order_output(self: @TContractState, val1: u16) -> Option<Order>;
     fn option_order_input(self: @TContractState, inp: Option<Order>) -> u16;
+    fn enum_result_output(self: @TContractState, val1: u16) -> Result<Order, u16>;
+    fn enum_result_input(self: @TContractState, inp: Result<Order, u16>) -> u16;
 }
 
 // MAIN APP
@@ -139,7 +141,7 @@ mod HelloStarknet {
     // bet part
     use starknet::ContractAddress;
     use starknet::get_caller_address;
-    use starknet::StorageAccess;
+    use starknet::Store;
     use starknet::storage_access;
     use starknet::StorageBaseAddress;
     use starknet::SyscallResult;
@@ -384,6 +386,25 @@ mod HelloStarknet {
                 },
                 Option::None(()) => {
                     return 17;
+                }
+            }
+        }
+
+        // return Result<Order>
+        fn enum_result_output(self: @ContractState, val1: u16) -> Result<Order, u16> {
+            if val1 < 100 {
+                return Result::Err(14);
+            }
+            Result::Ok(Order { p2: val1, p1: 8 })
+        }
+        // use as input Result<Order>
+        fn enum_result_input(self: @ContractState, inp: Result<Order, u16>) -> u16 {
+            match inp {
+                Result::Ok(x) => {
+                    return x.p2;
+                },
+                Result::Err(y) => {
+                    return y;
                 }
             }
         }

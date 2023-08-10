@@ -4,6 +4,8 @@ import {
   CairoCustomEnum,
   CairoOption,
   CairoOptionVariant,
+  CairoResult,
+  CairoResultVariant,
   CallData,
   Calldata,
   CompiledSierra,
@@ -438,7 +440,34 @@ describe('Cairo 1 Devnet', () => {
       expect(res5).toEqual(200n);
       expect(res5a).toEqual(200n);
 
-      // TODO : Cairo Result will be tested when Cairo >=v2.1.0 will be implemented in Starknet devnet.
+      // return a Cairo Result
+      const myCairoResult: CairoResult<Order, BigNumberish> =
+        await cairo1Contract.enum_result_output(50);
+      expect(myCairoResult.unwrap()).toEqual(14n);
+      expect(myCairoResult.isErr()).toEqual(true);
+      expect(myCairoResult.isOk()).toEqual(false);
+
+      const myCairoResult2: CairoResult<Order, BigNumberish> =
+        await cairo1Contract.enum_result_output(150);
+      expect(myCairoResult2.unwrap()).toEqual({ p1: 8n, p2: 150n });
+      expect(myCairoResult2.isErr()).toEqual(false);
+      expect(myCairoResult2.isOk()).toEqual(true);
+
+      // send a Cairo Result
+      const cairoResult1 = new CairoResult<Order, BigNumberish>(CairoResultVariant.Err, 18n);
+      const res6 = (await cairo1Contract.call('enum_result_input', [cairoResult1])) as bigint;
+      const comp6a = CallData.compile([cairoResult1]);
+      const res6a = (await cairo1Contract.call('enum_result_input', comp6a)) as bigint;
+      const res7 = (await cairo1Contract.enum_result_input(
+        new CairoResult<Order, BigNumberish>(CairoResultVariant.Ok, myOrder)
+      )) as bigint;
+      const res7a = (await cairo1Contract.enum_result_input(
+        CallData.compile([new CairoResult<Order, BigNumberish>(CairoResultVariant.Ok, myOrder)])
+      )) as bigint;
+      expect(res6).toEqual(18n);
+      expect(res6a).toEqual(18n);
+      expect(res7).toEqual(200n);
+      expect(res7a).toEqual(200n);
     });
 
     test('myCallData.compile for Cairo 1', async () => {
