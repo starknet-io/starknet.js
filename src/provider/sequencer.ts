@@ -110,11 +110,14 @@ export class SequencerProvider implements ProviderInterface {
 
   protected static getNetworkFromName(name: NetworkName | StarknetChainId) {
     switch (name) {
-      case NetworkName.SN_MAIN || StarknetChainId.SN_MAIN:
+      case NetworkName.SN_MAIN:
+      case StarknetChainId.SN_MAIN:
         return BaseUrl.SN_MAIN;
-      case NetworkName.SN_GOERLI || StarknetChainId.SN_GOERLI:
+      case NetworkName.SN_GOERLI:
+      case StarknetChainId.SN_GOERLI:
         return BaseUrl.SN_GOERLI;
-      case NetworkName.SN_GOERLI2 || StarknetChainId.SN_GOERLI2:
+      case NetworkName.SN_GOERLI2:
+      case StarknetChainId.SN_GOERLI2:
         return BaseUrl.SN_GOERLI2;
       default:
         throw new Error('Could not detect base url from NetworkName');
