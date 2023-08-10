@@ -21,6 +21,8 @@ export const isTypeUint256 = (type: string) => type === 'core::integer::u256';
 export const isTypeBool = (type: string) => type === 'core::bool';
 export const isTypeContractAddress = (type: string) =>
   type === 'core::starknet::contract_address::ContractAddress';
+export const isTypeEthAddress = (type: string) =>
+  type === 'core::starknet::eth_address::EthAddress';
 export const isCairo1Type = (type: string) => type.includes('core::');
 
 export const getArrayType = (type: string) => {

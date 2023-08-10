@@ -223,6 +223,11 @@ const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs, enu
       parameter.forEach((it: any) => validateTuple(it, { name: input.name, type: baseType }));
       break;
 
+    case isTypeArray(baseType):
+      parameter.forEach((param: BigNumberish) =>
+        validateArray(param, { name: '', type: baseType }, structs, enums)
+      );
+      break;
     case isTypeStruct(baseType, structs):
       parameter.forEach((it: any) =>
         validateStruct(it, { name: input.name, type: baseType }, structs)
@@ -236,11 +241,6 @@ const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs, enu
       break;
     case isTypeBool(baseType):
       parameter.forEach((param: BigNumberish) => validateBool(param, input));
-      break;
-    case isTypeArray(baseType):
-      parameter.forEach((param: BigNumberish) =>
-        validateArray(param, { name: '', type: baseType }, structs, enums)
-      );
       break;
     default:
       throw new Error(
@@ -273,6 +273,9 @@ export default function validateFields(
       case isTypeContractAddress(input.type):
         // TODO: ??
         break;
+      case isTypeArray(input.type):
+        validateArray(parameter, input, structs, enums);
+        break;
       case isTypeStruct(input.type, structs):
         validateStruct(parameter, input, structs);
         break;
@@ -281,9 +284,6 @@ export default function validateFields(
         break;
       case isTypeTuple(input.type):
         validateTuple(parameter, input);
-        break;
-      case isTypeArray(input.type):
-        validateArray(parameter, input, structs, enums);
         break;
       default:
         throw new Error(

@@ -82,11 +82,11 @@ function parseResponseValue(
   // type c1 array
   if (isTypeArray(element.type)) {
     // eslint-disable-next-line no-case-declarations
-    const parsedDataArr: (BigNumberish | ParsedStruct | boolean | any[])[] = [];
-    const el = { name: '', type: getArrayType(element.type) };
+    const parsedDataArr: (BigNumberish | ParsedStruct | boolean | any[] | CairoEnum)[] = [];
+    const el: AbiEntry = { name: '', type: getArrayType(element.type) };
     const len = BigInt(responseIterator.next().value); // get length
     while (parsedDataArr.length < len) {
-      parsedDataArr.push(parseResponseValue(responseIterator, el, structs));
+      parsedDataArr.push(parseResponseValue(responseIterator, el, structs, enums));
     }
     return parsedDataArr;
   }
