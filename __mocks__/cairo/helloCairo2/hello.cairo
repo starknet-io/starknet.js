@@ -135,7 +135,7 @@ trait IHelloStarknet<TContractState> {
     // used for changes to redeclare contract
     fn array2ddd_felt(self: @TContractState, testdd: Array<Array<felt252>>) -> felt252;
     fn my_enum_output(self: @TContractState, val1: u16) -> MyEnum;
-    fn my_enum_input(self: @TContractState, customEnum:MyEnum ) -> u16;
+    fn my_enum_input(self: @TContractState, customEnum: MyEnum) -> u16;
     fn option_u8_output(self: @TContractState, val1: u8) -> Option<u8>;
     fn option_order_output(self: @TContractState, val1: u16) -> Option<Order>;
     fn option_order_input(self: @TContractState, inp: Option<Order>) -> u16;
@@ -193,7 +193,7 @@ mod HelloStarknet {
         EventRegular: EventRegular,
         EventNested: EventNested,
     }
-    
+
     #[derive(Drop, Serde)]
     struct SimpleStruct {
         first: u8,
@@ -448,11 +448,17 @@ mod HelloStarknet {
         }
 
         // MyEnum as input
-        fn my_enum_input(self: @ContractState, customEnum:MyEnum ) -> u16{
-            match customEnum{
-                MyEnum::Response(my_order)=>{return my_order.p2;},
-                MyEnum::Warning(val)=>{return 0x13_u16;},
-                MyEnum::Error(a)=>{return a;}
+        fn my_enum_input(self: @ContractState, customEnum: MyEnum) -> u16 {
+            match customEnum {
+                MyEnum::Response(my_order) => {
+                    return my_order.p2;
+                },
+                MyEnum::Warning(val) => {
+                    return 0x13_u16;
+                },
+                MyEnum::Error(a) => {
+                    return a;
+                }
             }
         }
 
