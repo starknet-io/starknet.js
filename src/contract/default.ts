@@ -339,7 +339,8 @@ export class Contract implements ContractInterface {
         []
       ) || [],
       this.events,
-      this.structs
+      this.structs,
+      CallData.getAbiEnum(this.abi)
     );
   }
 

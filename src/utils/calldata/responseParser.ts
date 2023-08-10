@@ -6,7 +6,7 @@ import {
   Args,
   BigNumberish,
   CairoEnum,
-  EventEntry
+  EventEntry,
   ParsedStruct,
 } from '../../types';
 import { uint256ToBN } from '../uint256';

@@ -1,5 +1,6 @@
 import {
   Abi,
+  AbiEnums,
   AbiEvents,
   AbiStructs,
   Cairo1Event,
@@ -37,7 +38,8 @@ export function getAbiEvents(abi: Abi): AbiEvents {
 export function parseEvents(
   providerReceivedEvents: Array<ProviderEvent>,
   abiEvents: AbiEvents,
-  abiStructs: AbiStructs
+  abiStructs: AbiStructs,
+  abiEnums: AbiEnums
 ): ParsedEvents {
   const ret = providerReceivedEvents.flat().reduce((acc, recEvent) => {
     const abiEvent: EventAbi = abiEvents[recEvent.keys[0]];
@@ -66,6 +68,7 @@ export function parseEvents(
         keysIter,
         key,
         abiStructs,
+        abiEnums,
         parsedEvent[abiEvent.name]
       );
     });
@@ -75,6 +78,7 @@ export function parseEvents(
         dataIter,
         data,
         abiStructs,
+        abiEnums,
         parsedEvent[abiEvent.name]
       );
     });

@@ -1,5 +1,4 @@
 import { CairoEnum } from './cairoEnum';
-
 import {
   BigNumberish,
   BlockIdentifier,
