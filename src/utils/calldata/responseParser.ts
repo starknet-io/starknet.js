@@ -66,8 +66,8 @@ function parseBaseTypes(type: string, it: Iterator<string>) {
 function parseResponseValue(
   responseIterator: Iterator<string>,
   element: { name: string; type: string },
-  structs: AbiStructs,
-  enums: AbiEnums
+  structs?: AbiStructs,
+  enums?: AbiEnums
 ): BigNumberish | ParsedStruct | boolean | any[] | CairoEnum {
   if (element.type === '()') {
     return {};
@@ -92,7 +92,7 @@ function parseResponseValue(
   }
 
   // type struct
-  if (element.type in structs && structs[element.type]) {
+  if (structs && element.type in structs && structs[element.type]) {
     if (element.type === 'core::starknet::eth_address::EthAddress') {
       return parseBaseTypes(element.type, responseIterator);
     }
@@ -103,7 +103,7 @@ function parseResponseValue(
   }
 
   // type Enum (only CustomEnum)
-  if (element.type in enums && enums[element.type]) {
+  if (enums && element.type in enums && enums[element.type]) {
     const variantNum: number = Number(responseIterator.next().value); // get variant number
     const rawEnum = enums[element.type].variants.reduce((acc, variant, num) => {
       if (num === variantNum) {
@@ -178,8 +178,8 @@ function parseResponseValue(
 export default function responseParser(
   responseIterator: Iterator<string>,
   output: AbiEntry | EventEntry,
-  structs: AbiStructs,
-  enums: AbiEnums,
+  structs?: AbiStructs,
+  enums?: AbiEnums,
   parsedResult?: Args | ParsedStruct
 ): any {
   const { name, type } = output;
@@ -190,10 +190,10 @@ export default function responseParser(
       temp = responseIterator.next().value;
       return BigInt(temp);
 
-    case type in structs || isTypeTuple(type):
+    case (structs && type in structs) || isTypeTuple(type):
       return parseResponseValue(responseIterator, output, structs, enums);
 
-    case isTypeEnum(type, enums):
+    case enums && isTypeEnum(type, enums):
       return parseResponseValue(responseIterator, output, structs, enums);
 
     case isTypeArray(type):
