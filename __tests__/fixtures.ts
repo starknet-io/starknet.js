@@ -45,6 +45,8 @@ export const compiledC1Account = readContractSierra('cairo/account/account');
 export const compiledC1AccountCasm = readContractSierraCasm('cairo/account/account');
 export const compiledC1v2 = readContractSierra('cairo/helloCairo2/compiled');
 export const compiledC1v2Casm = readContractSierraCasm('cairo/helloCairo2/compiled');
+export const compiledC210 = readContractSierra('cairo/cairo210/cairo210.sierra');
+export const compiledC210Casm = readContractSierraCasm('cairo/cairo210/cairo210');
 
 /* Default test config based on run `starknet-devnet --seed 0` */
 const DEFAULT_TEST_PROVIDER_SEQUENCER_URL = 'http://127.0.0.1:5050/';
