@@ -1,5 +1,13 @@
 import { CairoEnum } from './cairoEnum';
-import { BigNumberish, BlockIdentifier, Calldata, RawArgsArray, Signature } from './lib';
+
+import {
+  BigNumberish,
+  BlockIdentifier,
+  Calldata,
+  ParsedStruct,
+  RawArgsArray,
+  Signature,
+} from './lib';
 
 export type AsyncContractFunction<T = any> = (...args: ArgsOrCalldataWithOptions) => Promise<T>;
 export type ContractFunction = (...args: ArgsOrCalldataWithOptions) => any;
@@ -36,3 +44,7 @@ export type InvokeOptions = Pick<
   ContractOptions,
   'maxFee' | 'nonce' | 'signature' | 'parseRequest'
 >;
+
+export type ParsedEvent = { [name: string]: ParsedStruct };
+
+export type ParsedEvents = Array<ParsedEvent>;

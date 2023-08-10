@@ -6,6 +6,7 @@ import {
   Args,
   BigNumberish,
   CairoEnum,
+  EventEntry
   ParsedStruct,
 } from '../../types';
 import { uint256ToBN } from '../uint256';
@@ -158,10 +159,10 @@ function parseResponseValue(
  */
 export default function responseParser(
   responseIterator: Iterator<string>,
-  output: AbiEntry,
+  output: AbiEntry | EventEntry,
   structs: AbiStructs,
   enums: AbiEnums,
-  parsedResult?: Args
+  parsedResult?: Args | ParsedStruct
 ): any {
   const { name, type } = output;
   let temp;
