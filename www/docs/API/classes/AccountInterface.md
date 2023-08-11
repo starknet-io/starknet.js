@@ -305,10 +305,10 @@ Method will pass even if contract is already declared (internal using DeclareIfN
 
 #### Parameters
 
-| Name       | Type                                                                                        | Description                                                                                                                                                                                                                                                                                                          |
-| :--------- | :------------------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `payload`  | [`DeclareAndDeployContractPayload`](../namespaces/types.md#declareanddeploycontractpayload) | contract: compiled contract code - [casm=cairo1]: CairoAssembly \| undefined; - [compiledClassHash]: string \| undefined; - [classHash]: computed class hash of compiled contract - [constructorCalldata] contract constructor calldata - [salt=pseudorandom] deploy address salt - [unique=true] ensure unique salt |
-| `details?` | [`InvocationsDetails`](../namespaces/types.md#invocationsdetails)                           | [nonce=getNonce] - [version=transactionVersion] - [maxFee=getSuggestedMaxFee]                                                                                                                                                                                                                                        |
+| Name       | Type                                                                                        | Description                                                                   |
+| :--------- | :------------------------------------------------------------------------------------------ | :---------------------------------------------------------------------------- |
+| `payload`  | [`DeclareAndDeployContractPayload`](../namespaces/types.md#declareanddeploycontractpayload) | -                                                                             |
+| `details?` | [`InvocationsDetails`](../namespaces/types.md#invocationsdetails)                           | [nonce=getNonce] - [version=transactionVersion] - [maxFee=getSuggestedMaxFee] |
 
 #### Returns
 
@@ -329,7 +329,7 @@ Method will pass even if contract is already declared (internal using DeclareIfN
 
 #### Defined in
 
-[src/account/interface.ts:239](https://github.com/0xs34n/starknet.js/blob/develop/src/account/interface.ts#L239)
+[src/account/interface.ts:237](https://github.com/0xs34n/starknet.js/blob/develop/src/account/interface.ts#L237)
 
 ---
 
@@ -354,7 +354,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/account/interface.ts:258](https://github.com/0xs34n/starknet.js/blob/develop/src/account/interface.ts#L258)
+[src/account/interface.ts:256](https://github.com/0xs34n/starknet.js/blob/develop/src/account/interface.ts#L256)
 
 ---
 
@@ -383,7 +383,7 @@ the signature of the JSON object
 
 #### Defined in
 
-[src/account/interface.ts:271](https://github.com/0xs34n/starknet.js/blob/develop/src/account/interface.ts#L271)
+[src/account/interface.ts:269](https://github.com/0xs34n/starknet.js/blob/develop/src/account/interface.ts#L269)
 
 ---
 
@@ -412,7 +412,7 @@ the hash of the JSON object
 
 #### Defined in
 
-[src/account/interface.ts:281](https://github.com/0xs34n/starknet.js/blob/develop/src/account/interface.ts#L281)
+[src/account/interface.ts:279](https://github.com/0xs34n/starknet.js/blob/develop/src/account/interface.ts#L279)
 
 ---
 
@@ -441,7 +441,7 @@ true if the signature is valid, false otherwise
 
 #### Defined in
 
-[src/account/interface.ts:291](https://github.com/0xs34n/starknet.js/blob/develop/src/account/interface.ts#L291)
+[src/account/interface.ts:289](https://github.com/0xs34n/starknet.js/blob/develop/src/account/interface.ts#L289)
 
 ---
 
@@ -474,7 +474,7 @@ true if the signature is valid, false otherwise
 
 #### Defined in
 
-[src/account/interface.ts:302](https://github.com/0xs34n/starknet.js/blob/develop/src/account/interface.ts#L302)
+[src/account/interface.ts:300](https://github.com/0xs34n/starknet.js/blob/develop/src/account/interface.ts#L300)
 
 ---
 
@@ -498,7 +498,7 @@ nonce of the account
 
 #### Defined in
 
-[src/account/interface.ts:310](https://github.com/0xs34n/starknet.js/blob/develop/src/account/interface.ts#L310)
+[src/account/interface.ts:308](https://github.com/0xs34n/starknet.js/blob/develop/src/account/interface.ts#L308)
 
 ---
 
@@ -523,7 +523,7 @@ suggestedMaxFee
 
 #### Defined in
 
-[src/account/interface.ts:319](https://github.com/0xs34n/starknet.js/blob/develop/src/account/interface.ts#L319)
+[src/account/interface.ts:317](https://github.com/0xs34n/starknet.js/blob/develop/src/account/interface.ts#L317)
 
 ---
 
@@ -548,7 +548,7 @@ response from simulate_transaction
 
 #### Defined in
 
-[src/account/interface.ts:333](https://github.com/0xs34n/starknet.js/blob/develop/src/account/interface.ts#L333)
+[src/account/interface.ts:331](https://github.com/0xs34n/starknet.js/blob/develop/src/account/interface.ts#L331)
 
 ---
 

@@ -11,48 +11,6 @@ custom_edit_url: null
 
 - [InvokeFunctionTransactionResponse](../interfaces/types.Sequencer.InvokeFunctionTransactionResponse.md)
 
-## References
-
-### GetTransactionStatusResponse
-
-Re-exports [GetTransactionStatusResponse](types.md#gettransactionstatusresponse)
-
----
-
-### GetContractAddressesResponse
-
-Re-exports [GetContractAddressesResponse](types.md#getcontractaddressesresponse)
-
----
-
-### FunctionInvocation
-
-Re-exports [FunctionInvocation](types.md#functioninvocation)
-
----
-
-### ExecutionResources
-
-Re-exports [ExecutionResources](types.md#executionresources)
-
----
-
-### CallL1Handler
-
-Re-exports [CallL1Handler](types.md#calll1handler)
-
----
-
-### DeployedContractItem
-
-Re-exports [DeployedContractItem](types.md#deployedcontractitem)
-
----
-
-### SequencerIdentifier
-
-Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
-
 ## Type Aliases
 
 ### TransactionTraceResponse
@@ -71,7 +29,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:81](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L81)
+[src/types/api/sequencer.ts:75](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L75)
 
 ---
 
@@ -94,7 +52,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:89](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L89)
+[src/types/api/sequencer.ts:83](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L83)
 
 ---
 
@@ -114,7 +72,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:100](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L100)
+[src/types/api/sequencer.ts:94](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L94)
 
 ---
 
@@ -137,7 +95,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:108](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L108)
+[src/types/api/sequencer.ts:102](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L102)
 
 ---
 
@@ -160,7 +118,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:119](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L119)
+[src/types/api/sequencer.ts:113](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L113)
 
 ---
 
@@ -170,7 +128,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:130](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L130)
+[src/types/api/sequencer.ts:124](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L124)
 
 ---
 
@@ -189,7 +147,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:136](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L136)
+[src/types/api/sequencer.ts:130](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L130)
 
 ---
 
@@ -206,7 +164,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:143](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L143)
+[src/types/api/sequencer.ts:137](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L137)
 
 ---
 
@@ -216,7 +174,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:153](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L153)
+[src/types/api/sequencer.ts:147](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L147)
 
 ---
 
@@ -226,42 +184,17 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Type declaration
 
-| Name                | Type                                                                       |
-| :------------------ | :------------------------------------------------------------------------- |
-| `execution_status`  | [`SUCCEEDED`](../enums/types.TransactionExecutionStatus.md#succeeded)      |
-| `finality_status`   | [`TransactionFinalityStatus`](../enums/types.TransactionFinalityStatus.md) |
-| `status`            | [`TransactionStatus`](../enums/types.TransactionStatus.md)                 |
-| `block_hash`        | `string`                                                                   |
-| `block_number`      | [`BlockNumber`](types.md#blocknumber)                                      |
-| `transaction_index` | `number`                                                                   |
-| `transaction`       | [`TransactionResponse`](types.Sequencer.md#transactionresponse)            |
+| Name                | Type                                                            |
+| :------------------ | :-------------------------------------------------------------- |
+| `status`            | [`TransactionStatus`](../enums/types.TransactionStatus.md)      |
+| `transaction`       | [`TransactionResponse`](types.Sequencer.md#transactionresponse) |
+| `block_hash`        | `string`                                                        |
+| `block_number`      | [`BlockNumber`](types.md#blocknumber)                           |
+| `transaction_index` | `number`                                                        |
 
 #### Defined in
 
-[src/types/api/sequencer.ts:158](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L158)
-
----
-
-### RevertedTransactionResponse
-
-Ƭ **RevertedTransactionResponse**: `Object`
-
-#### Type declaration
-
-| Name                | Type                                                                       |
-| :------------------ | :------------------------------------------------------------------------- |
-| `execution_status`  | [`REVERTED`](../enums/types.TransactionExecutionStatus.md#reverted)        |
-| `finality_status`   | [`TransactionFinalityStatus`](../enums/types.TransactionFinalityStatus.md) |
-| `status`            | [`TransactionStatus`](../enums/types.TransactionStatus.md)                 |
-| `block_hash`        | `string`                                                                   |
-| `block_number`      | [`BlockNumber`](types.md#blocknumber)                                      |
-| `transaction_index` | `number`                                                                   |
-| `transaction`       | [`TransactionResponse`](types.Sequencer.md#transactionresponse)            |
-| `revert_error`      | `string`                                                                   |
-
-#### Defined in
-
-[src/types/api/sequencer.ts:168](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L168)
+[src/types/api/sequencer.ts:152](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L152)
 
 ---
 
@@ -281,27 +214,27 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:179](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L179)
+[src/types/api/sequencer.ts:160](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L160)
 
 ---
 
 ### GetTransactionResponse
 
-Ƭ **GetTransactionResponse**: [`SuccessfulTransactionResponse`](types.Sequencer.md#successfultransactionresponse) \| [`RevertedTransactionResponse`](types.Sequencer.md#revertedtransactionresponse) \| [`FailedTransactionResponse`](types.Sequencer.md#failedtransactionresponse)
+Ƭ **GetTransactionResponse**: [`SuccessfulTransactionResponse`](types.Sequencer.md#successfultransactionresponse) \| [`FailedTransactionResponse`](types.Sequencer.md#failedtransactionresponse)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:188](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L188)
+[src/types/api/sequencer.ts:169](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L169)
 
 ---
 
 ### TransactionReceiptResponse
 
-Ƭ **TransactionReceiptResponse**: [`SuccessfulTransactionReceiptResponse`](types.Sequencer.md#successfultransactionreceiptresponse) \| [`RevertedTransactionReceiptResponse`](types.Sequencer.md#revertedtransactionreceiptresponse) \| [`RejectedTransactionReceiptResponse`](types.Sequencer.md#rejectedtransactionreceiptresponse)
+Ƭ **TransactionReceiptResponse**: [`SuccessfulTransactionReceiptResponse`](types.Sequencer.md#successfultransactionreceiptresponse) \| [`FailedTransactionReceiptResponse`](types.Sequencer.md#failedtransactionreceiptresponse)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:193](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L193)
+[src/types/api/sequencer.ts:171](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L171)
 
 ---
 
@@ -311,73 +244,43 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Type declaration
 
-| Name                   | Type                                                                       |
-| :--------------------- | :------------------------------------------------------------------------- |
-| `execution_status`     | [`SUCCEEDED`](../enums/types.TransactionExecutionStatus.md#succeeded)      |
-| `finality_status`      | [`TransactionFinalityStatus`](../enums/types.TransactionFinalityStatus.md) |
-| `status`               | [`TransactionStatus`](../enums/types.TransactionStatus.md)                 |
-| `actual_fee`           | `string`                                                                   |
-| `block_hash`           | `string`                                                                   |
-| `block_number`         | [`BlockNumber`](types.md#blocknumber)                                      |
-| `transaction_hash`     | `string`                                                                   |
-| `transaction_index`    | `number`                                                                   |
-| `l2_to_l1_messages`    | `string`[]                                                                 |
-| `events`               | `string`[]                                                                 |
-| `execution_resources?` | [`ExecutionResources`](types.md#executionresources)                        |
+| Name                  | Type                                                       |
+| :-------------------- | :--------------------------------------------------------- |
+| `status`              | [`TransactionStatus`](../enums/types.TransactionStatus.md) |
+| `transaction_hash`    | `string`                                                   |
+| `transaction_index`   | `number`                                                   |
+| `block_hash`          | `string`                                                   |
+| `block_number`        | [`BlockNumber`](types.md#blocknumber)                      |
+| `l2_to_l1_messages`   | `string`[]                                                 |
+| `events`              | `string`[]                                                 |
+| `actual_fee`          | `string`                                                   |
+| `execution_resources` | [`ExecutionResources`](types.md#executionresources)        |
 
 #### Defined in
 
-[src/types/api/sequencer.ts:198](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L198)
+[src/types/api/sequencer.ts:175](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L175)
 
 ---
 
-### RevertedTransactionReceiptResponse
+### FailedTransactionReceiptResponse
 
-Ƭ **RevertedTransactionReceiptResponse**: `Object`
-
-#### Type declaration
-
-| Name                | Type                                                                       |
-| :------------------ | :------------------------------------------------------------------------- |
-| `execution_status`  | [`REVERTED`](../enums/types.TransactionExecutionStatus.md#reverted)        |
-| `finality_status`   | [`TransactionFinalityStatus`](../enums/types.TransactionFinalityStatus.md) |
-| `status`            | [`REVERTED`](../enums/types.TransactionStatus.md#reverted)                 |
-| `actual_fee`        | `string`                                                                   |
-| `block_hash`        | `string`                                                                   |
-| `block_number`      | [`BlockNumber`](types.md#blocknumber)                                      |
-| `transaction_hash`  | `string`                                                                   |
-| `transaction_index` | `number`                                                                   |
-| `l2_to_l1_messages` | `string`[]                                                                 |
-| `events`            | `string`[]                                                                 |
-| `revert_error`      | `string`                                                                   |
-
-#### Defined in
-
-[src/types/api/sequencer.ts:212](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L212)
-
----
-
-### RejectedTransactionReceiptResponse
-
-Ƭ **RejectedTransactionReceiptResponse**: `Object`
+Ƭ **FailedTransactionReceiptResponse**: `Object`
 
 #### Type declaration
 
-| Name                                       | Type                                                                       |
-| :----------------------------------------- | :------------------------------------------------------------------------- |
-| `execution_status`                         | [`REJECTED`](../enums/types.TransactionExecutionStatus.md#rejected)        |
-| `finality_status`                          | [`TransactionFinalityStatus`](../enums/types.TransactionFinalityStatus.md) |
-| `status`                                   | [`REJECTED`](../enums/types.TransactionStatus.md#rejected)                 |
-| `transaction_hash`                         | `string`                                                                   |
-| `l2_to_l1_messages`                        | `string`[]                                                                 |
-| `events`                                   | `string`[]                                                                 |
-| `transaction_failure_reason`               | { `code`: `string` ; `error_message`: `string` }                           |
-| `transaction_failure_reason.code`          | `string`                                                                   |
-| `transaction_failure_reason.error_message` | `string`                                                                   |
+| Name                                       | Type                                                       |
+| :----------------------------------------- | :--------------------------------------------------------- |
+| `status`                                   | [`REJECTED`](../enums/types.TransactionStatus.md#rejected) |
+| `transaction_failure_reason`               | { `code`: `string` ; `error_message`: `string` }           |
+| `transaction_failure_reason.code`          | `string`                                                   |
+| `transaction_failure_reason.error_message` | `string`                                                   |
+| `transaction_hash`                         | `string`                                                   |
+| `l2_to_l1_messages`                        | `string`[]                                                 |
+| `events`                                   | `string`[]                                                 |
 
 #### Defined in
 
-[src/types/api/sequencer.ts:226](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L226)
+[src/types/api/sequencer.ts:187](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L187)
 
 ---
 
@@ -403,7 +306,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:239](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L239)
+[src/types/api/sequencer.ts:198](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L198)
 
 ---
 
@@ -413,7 +316,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:268](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L268)
+[src/types/api/sequencer.ts:227](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L227)
 
 ---
 
@@ -429,7 +332,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:284](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L284)
+[src/types/api/sequencer.ts:243](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L243)
 
 ---
 
@@ -439,7 +342,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:288](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L288)
+[src/types/api/sequencer.ts:247](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L247)
 
 ---
 
@@ -449,7 +352,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:289](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L289)
+[src/types/api/sequencer.ts:248](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L248)
 
 ---
 
@@ -459,7 +362,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:290](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L290)
+[src/types/api/sequencer.ts:249](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L249)
 
 ---
 
@@ -469,7 +372,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:291](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L291)
+[src/types/api/sequencer.ts:250](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L250)
 
 ---
 
@@ -486,7 +389,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:293](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L293)
+[src/types/api/sequencer.ts:252](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L252)
 
 ---
 
@@ -496,7 +399,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:298](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L298)
+[src/types/api/sequencer.ts:257](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L257)
 
 ---
 
@@ -508,7 +411,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:307](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L307)
+[src/types/api/sequencer.ts:266](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L266)
 
 ---
 
@@ -518,7 +421,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:310](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L310)
+[src/types/api/sequencer.ts:269](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L269)
 
 ---
 
@@ -528,7 +431,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:322](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L322)
+[src/types/api/sequencer.ts:281](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L281)
 
 ---
 
@@ -544,7 +447,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:324](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L324)
+[src/types/api/sequencer.ts:283](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L283)
 
 ---
 
@@ -554,7 +457,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:328](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L328)
+[src/types/api/sequencer.ts:287](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L287)
 
 ---
 
@@ -579,7 +482,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:330](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L330)
+[src/types/api/sequencer.ts:289](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L289)
 
 ---
 
@@ -593,7 +496,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:344](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L344)
+[src/types/api/sequencer.ts:303](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L303)
 
 ---
 
@@ -610,7 +513,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:346](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L346)
+[src/types/api/sequencer.ts:305](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L305)
 
 ---
 
@@ -624,7 +527,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:348](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L348)
+[src/types/api/sequencer.ts:307](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L307)
 
 ---
 
@@ -634,7 +537,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:350](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L350)
+[src/types/api/sequencer.ts:309](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L309)
 
 ---
 
@@ -644,7 +547,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:352](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L352)
+[src/types/api/sequencer.ts:311](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L311)
 
 ---
 
@@ -654,7 +557,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:354](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L354)
+[src/types/api/sequencer.ts:313](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L313)
 
 ---
 
@@ -664,7 +567,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:356](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L356)
+[src/types/api/sequencer.ts:315](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L315)
 
 ---
 
@@ -681,7 +584,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:358](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L358)
+[src/types/api/sequencer.ts:317](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L317)
 
 ---
 
@@ -691,7 +594,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:360](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L360)
+[src/types/api/sequencer.ts:319](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L319)
 
 ---
 
@@ -821,4 +724,4 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:362](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L362)
+[src/types/api/sequencer.ts:321](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L321)

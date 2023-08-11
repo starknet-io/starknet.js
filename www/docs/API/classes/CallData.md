@@ -74,7 +74,7 @@ Calldata
 
 #### Defined in
 
-[src/utils/calldata/index.ts:142](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L142)
+[src/utils/calldata/index.ts:125](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L125)
 
 ---
 
@@ -98,7 +98,7 @@ AbiStructs - structs from abi
 
 #### Defined in
 
-[src/utils/calldata/index.ts:223](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L223)
+[src/utils/calldata/index.ts:206](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L206)
 
 ---
 
@@ -122,7 +122,7 @@ Calldata
 
 #### Defined in
 
-[src/utils/calldata/index.ts:240](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L240)
+[src/utils/calldata/index.ts:223](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L223)
 
 ---
 
@@ -146,7 +146,7 @@ HexCalldata
 
 #### Defined in
 
-[src/utils/calldata/index.ts:249](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L249)
+[src/utils/calldata/index.ts:232](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L232)
 
 ---
 
@@ -206,7 +206,7 @@ Calldata - parsed arguments in format that contract is expecting
 
 #### Defined in
 
-[src/utils/calldata/index.ts:102](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L102)
+[src/utils/calldata/index.ts:98](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L98)
 
 ---
 
@@ -231,7 +231,7 @@ Result - parsed response corresponding to the abi
 
 #### Defined in
 
-[src/utils/calldata/index.ts:189](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L189)
+[src/utils/calldata/index.ts:172](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L172)
 
 ---
 
@@ -257,4 +257,4 @@ Result - parsed and formatted response object
 
 #### Defined in
 
-[src/utils/calldata/index.ts:213](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L213)
+[src/utils/calldata/index.ts:196](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L196)

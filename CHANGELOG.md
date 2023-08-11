@@ -1,22 +1,3 @@
-# [5.18.0](https://github.com/0xs34n/starknet.js/compare/v5.17.0...v5.18.0) (2023-08-05)
-
-### Bug Fixes
-
-- getevents range blocks optional ([a746354](https://github.com/0xs34n/starknet.js/commit/a746354db49260cc3538c10a1c8278ad680c660e))
-- hotfixed deault provider to issued RPC spec ([4a8f4f9](https://github.com/0xs34n/starknet.js/commit/4a8f4f9aba89aaf52dd8c9048f87294df21edfc0))
-- optional keys and address in eventfilters ([4077b48](https://github.com/0xs34n/starknet.js/commit/4077b48cfa8f7e739897b1b2327a6658f3b33029))
-- pathfinder pascal status patch, fixed GetSyncingStatsResponse schema ([89c0f25](https://github.com/0xs34n/starknet.js/commit/89c0f25fa0295f9f6f1bc25aac0848abe5187ea6))
-- repair RPC simulation flag serialization ([e5af0a0](https://github.com/0xs34n/starknet.js/commit/e5af0a091321bb6519ca15d8733f8ffbc56db2cd))
-- string ([c6ae7bd](https://github.com/0xs34n/starknet.js/commit/c6ae7bd89ca2f5a8d682b73925efbc321bfa7a48))
-- undefined transaction GetTransactionResponse provide LibraryError ([f57e844](https://github.com/0xs34n/starknet.js/commit/f57e844fe9b70457fcda22942e5d2329d7198ba1))
-- unfinished get_transaction_receipt default provider types ([6589b2c](https://github.com/0xs34n/starknet.js/commit/6589b2cb0850216ce3abe6b842ec68a49f6cd489))
-
-### Features
-
-- rpc 0.4.0-rc3, no cleanup ([54674cb](https://github.com/0xs34n/starknet.js/commit/54674cb203d0989c4e8ee5a14aec65fdd63f36e2))
-- rpc default to pending block tag (fix wrong nonce issue), reverted estimate versio of rpc spec ([2049b4f](https://github.com/0xs34n/starknet.js/commit/2049b4f9dba383357650a7d8d10a2ee176507787))
-- waitForTransaction Sequencer reworked with execution and finality status, 5s steps, not_rec ([f4e414f](https://github.com/0xs34n/starknet.js/commit/f4e414fac6a2cb05c8dff9d55107cf5a58a274ca))
-
 # [5.17.0](https://github.com/0xs34n/starknet.js/compare/v5.16.0...v5.17.0) (2023-07-18)
 
 ### Bug Fixes

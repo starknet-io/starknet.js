@@ -10,19 +10,32 @@ custom_edit_url: null
 
 ### constructor
 
-• **new ContractFactory**(`params`)
+• **new ContractFactory**(`compiledContract`, `classHash`, `account`, `abi?`)
 
 #### Parameters
 
-| Name     | Type                                                           | Description                                                                                                                                                          |
-| :------- | :------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `params` | [`ContractFactoryParams`](../modules.md#contractfactoryparams) | CFParams - compiledContract: CompiledContract; - account: AccountInterface; - casm?: CairoAssembly; - classHash?: string; - compiledClassHash?: string; - abi?: Abi; |
+| Name               | Type                                                          | Default value          |
+| :----------------- | :------------------------------------------------------------ | :--------------------- |
+| `compiledContract` | [`CompiledContract`](../namespaces/types.md#compiledcontract) | `undefined`            |
+| `classHash`        | `string`                                                      | `undefined`            |
+| `account`          | [`AccountInterface`](AccountInterface.md)                     | `undefined`            |
+| `abi`              | [`Abi`](../namespaces/types.md#abi)                           | `compiledContract.abi` |
 
 #### Defined in
 
-[src/contract/contractFactory.ts:46](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L46)
+[src/contract/contractFactory.ts:18](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L18)
 
 ## Properties
+
+### abi
+
+• **abi**: [`Abi`](../namespaces/types.md#abi)
+
+#### Defined in
+
+[src/contract/contractFactory.ts:8](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L8)
+
+---
 
 ### compiledContract
 
@@ -30,7 +43,17 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/contractFactory.ts:23](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L23)
+[src/contract/contractFactory.ts:10](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L10)
+
+---
+
+### classHash
+
+• **classHash**: `string`
+
+#### Defined in
+
+[src/contract/contractFactory.ts:12](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L12)
 
 ---
 
@@ -40,47 +63,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/contractFactory.ts:25](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L25)
-
----
-
-### abi
-
-• **abi**: [`Abi`](../namespaces/types.md#abi)
-
-#### Defined in
-
-[src/contract/contractFactory.ts:27](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L27)
-
----
-
-### classHash
-
-• `Optional` **classHash**: `string`
-
-#### Defined in
-
-[src/contract/contractFactory.ts:29](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L29)
-
----
-
-### casm
-
-• `Optional` **casm**: [`CairoAssembly`](../namespaces/types.md#cairoassembly)
-
-#### Defined in
-
-[src/contract/contractFactory.ts:31](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L31)
-
----
-
-### compiledClassHash
-
-• `Optional` **compiledClassHash**: `string`
-
-#### Defined in
-
-[src/contract/contractFactory.ts:33](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L33)
+[src/contract/contractFactory.ts:14](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L14)
 
 ---
 
@@ -90,7 +73,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/contractFactory.ts:35](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L35)
+[src/contract/contractFactory.ts:16](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L16)
 
 ## Methods
 
@@ -99,7 +82,6 @@ custom_edit_url: null
 ▸ **deploy**(`...args`): `Promise`<[`Contract`](Contract.md)\>
 
 Deploys contract and returns new instance of the Contract
-If contract is not declared it will first declare it, and then deploy
 
 #### Parameters
 
@@ -115,7 +97,7 @@ deployed Contract
 
 #### Defined in
 
-[src/contract/contractFactory.ts:64](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L64)
+[src/contract/contractFactory.ts:38](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L38)
 
 ---
 
@@ -139,7 +121,7 @@ ContractFactory
 
 #### Defined in
 
-[src/contract/contractFactory.ts:105](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L105)
+[src/contract/contractFactory.ts:76](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L76)
 
 ---
 
@@ -163,4 +145,4 @@ Contract
 
 #### Defined in
 
-[src/contract/contractFactory.ts:116](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L116)
+[src/contract/contractFactory.ts:87](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L87)

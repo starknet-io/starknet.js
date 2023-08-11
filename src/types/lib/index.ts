@@ -1,5 +1,6 @@
 import { StarknetChainId } from '../../constants';
 import { weierstrass } from '../../utils/ec';
+import { CairoEnum } from '../cairoEnum';
 import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 
 export type WeierstrassSignatureType = weierstrass.SignatureType;
@@ -47,7 +48,7 @@ export type RawArgsObject = {
 
 export type RawArgsArray = Array<MultiType | MultiType[] | RawArgs>;
 
-export type MultiType = BigNumberish | Uint256 | object | boolean;
+export type MultiType = BigNumberish | Uint256 | object | boolean | CairoEnum;
 
 export type UniversalDeployerContractPayload = {
   classHash: BigNumberish;
@@ -213,7 +214,7 @@ export type Args = {
   [inputName: string]: BigNumberish | BigNumberish[] | ParsedStruct | ParsedStruct[];
 };
 export type ParsedStruct = {
-  [key: string]: BigNumberish | ParsedStruct;
+  [key: string]: BigNumberish | BigNumberish[] | ParsedStruct | Uint256;
 };
 
 export type waitForTransactionOptions = {

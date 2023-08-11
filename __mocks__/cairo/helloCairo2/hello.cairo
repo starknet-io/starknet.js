@@ -1,3 +1,4 @@
+// coded with Cairo v2.1.0
 use array::ArrayTrait;
 use array::SpanTrait;
 use option::OptionTrait;
@@ -7,7 +8,7 @@ use serde::Serde;
 // bet part
 use starknet::ContractAddress;
 use starknet::get_caller_address;
-use starknet::StorageAccess;
+use starknet::Store;
 use starknet::storage_access;
 use starknet::StorageBaseAddress;
 use starknet::SyscallResult;
@@ -15,6 +16,9 @@ use starknet::storage_read_syscall;
 use starknet::storage_write_syscall;
 use starknet::storage_address_from_base_and_offset;
 use starknet::storage_base_address_from_felt252;
+use starknet::ClassHash;
+use starknet::EthAddress;
+use starknet::Span;
 
 use traits::Into;
 use starknet::storage_access::StorageAddressSerde;
@@ -27,13 +31,13 @@ struct Foo {
 }
 
 // Complex Structs
-#[derive(Copy, Drop, Serde, storage_access::StorageAccess)]
+#[derive(Copy, Drop, Serde, starknet::Store)]
 struct UserData {
     address: ContractAddress,
     is_claimed: bool,
 }
 
-#[derive(Copy, Drop, Serde, storage_access::StorageAccess)]
+#[derive(Copy, Drop, Serde, starknet::Store)]
 struct Bet {
     name: felt252,
     description: felt252,
@@ -86,6 +90,22 @@ trait IHelloStarknet<TContractState> {
     fn test_u128(self: @TContractState, p1: u128) -> u128;
     fn test_u256(self: @TContractState, p1: u256) -> u256;
 
+    // event test
+    fn emitEventRegular(
+        ref self: TContractState,
+        simpleKeyVariable: u8,
+        simpleKeyStruct: HelloStarknet::SimpleStruct,
+        simpleKeyArray: Array<u8>,
+        simpleDataVariable: u8,
+        simpleDataStruct: HelloStarknet::SimpleStruct,
+        simpleDataArray: Array<u8>
+    );
+    fn emitEventNested(
+        ref self: TContractState,
+        nestedKeyStruct: HelloStarknet::NestedStruct,
+        nestedDataStruct: HelloStarknet::NestedStruct
+    );
+
     // echo Array
     fn echo_array(self: @TContractState, data: Array<u8>) -> Array<u8>;
     fn echo_array_u256(self: @TContractState, data: Array<u256>) -> Array<u256>;
@@ -119,9 +139,21 @@ trait IHelloStarknet<TContractState> {
     // used for changes to redeclare contract
     fn array2ddd_felt(self: @TContractState, testdd: Array<Array<felt252>>) -> felt252;
     fn my_enum_output(self: @TContractState, val1: u16) -> MyEnum;
+    fn my_enum_input(self: @TContractState, customEnum: MyEnum) -> u16;
     fn option_u8_output(self: @TContractState, val1: u8) -> Option<u8>;
     fn option_order_output(self: @TContractState, val1: u16) -> Option<Order>;
     fn option_order_input(self: @TContractState, inp: Option<Order>) -> u16;
+    fn enum_result_output(self: @TContractState, val1: u16) -> Result<Order, u16>;
+    fn enum_result_input(self: @TContractState, inp: Result<Order, u16>) -> u16;
+    fn new_types(
+        self: @TContractState, ch: ClassHash, eth_addr: EthAddress, contr_address: ContractAddress
+    ) -> (ClassHash, EthAddress, ContractAddress);
+    fn new_span(self: @TContractState, my_span: Span<u16>) -> Span<u16>;
+    fn array_new_types(
+        self: @TContractState,
+        tup: (ContractAddress, EthAddress, ClassHash),
+        tupa: (Array<ContractAddress>, Array<EthAddress>, Array<ClassHash>)
+    ) -> (Array<ContractAddress>, Array<EthAddress>, Array<ClassHash>);
 }
 
 // MAIN APP
@@ -138,7 +170,7 @@ mod HelloStarknet {
     // bet part
     use starknet::ContractAddress;
     use starknet::get_caller_address;
-    use starknet::StorageAccess;
+    use starknet::Store;
     use starknet::storage_access;
     use starknet::StorageBaseAddress;
     use starknet::SyscallResult;
@@ -146,7 +178,9 @@ mod HelloStarknet {
     use starknet::storage_write_syscall;
     use starknet::storage_address_from_base_and_offset;
     use starknet::storage_base_address_from_felt252;
-
+    use starknet::ClassHash;
+    use starknet::EthAddress;
+    use starknet::Span;
     use traits::Into;
     use starknet::storage_access::StorageAddressSerde;
     use box::BoxTrait;
@@ -166,6 +200,45 @@ mod HelloStarknet {
         testbet: Bet,
         user: UserData,
         user1: UserData,
+    }
+
+    #[event]
+    #[derive(Drop, starknet::Event)]
+    enum Event {
+        EventRegular: EventRegular,
+        EventNested: EventNested,
+    }
+
+    #[derive(Drop, Serde)]
+    struct SimpleStruct {
+        first: u8,
+        second: u16,
+    }
+
+    #[derive(Drop, Serde)]
+    struct NestedStruct {
+        simpleStruct: SimpleStruct,
+        simpleArray: Array<u8>,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct EventRegular {
+        #[key]
+        simpleKeyVariable: u8,
+        #[key]
+        simpleKeyStruct: SimpleStruct,
+        #[key]
+        simpleKeyArray: Array<u8>,
+        simpleDataVariable: u8,
+        simpleDataStruct: SimpleStruct,
+        simpleDataArray: Array<u8>,
+    }
+
+    #[derive(Drop, starknet::Event)]
+    struct EventNested {
+        #[key]
+        nestedKeyStruct: NestedStruct,
+        nestedDataStruct: NestedStruct,
     }
 
     #[l1_handler]
@@ -236,6 +309,43 @@ mod HelloStarknet {
         fn test_u256(self: @ContractState, p1: u256) -> u256 {
             let to_add = u256 { low: 1_u128, high: 0_u128 };
             p1 + to_add
+        }
+
+        // event test
+        fn emitEventRegular(
+            ref self: ContractState,
+            simpleKeyVariable: u8,
+            simpleKeyStruct: SimpleStruct,
+            simpleKeyArray: Array<u8>,
+            simpleDataVariable: u8,
+            simpleDataStruct: SimpleStruct,
+            simpleDataArray: Array<u8>
+        ) {
+            self
+                .emit(
+                    Event::EventRegular(
+                        EventRegular {
+                            simpleKeyVariable: simpleKeyVariable,
+                            simpleKeyStruct: simpleKeyStruct,
+                            simpleKeyArray: simpleKeyArray,
+                            simpleDataVariable: simpleDataVariable,
+                            simpleDataStruct: simpleDataStruct,
+                            simpleDataArray: simpleDataArray
+                        }
+                    )
+                );
+        }
+        fn emitEventNested(
+            ref self: ContractState, nestedKeyStruct: NestedStruct, nestedDataStruct: NestedStruct
+        ) {
+            self
+                .emit(
+                    Event::EventNested(
+                        EventNested {
+                            nestedKeyStruct: nestedKeyStruct, nestedDataStruct: nestedDataStruct, 
+                        }
+                    )
+                )
         }
 
         // echo Array
@@ -351,6 +461,22 @@ mod HelloStarknet {
             }
             MyEnum::Response(Order { p1: 1, p2: val1 })
         }
+
+        // MyEnum as input
+        fn my_enum_input(self: @ContractState, customEnum: MyEnum) -> u16 {
+            match customEnum {
+                MyEnum::Response(my_order) => {
+                    return my_order.p2;
+                },
+                MyEnum::Warning(val) => {
+                    return 0x13_u16;
+                },
+                MyEnum::Error(a) => {
+                    return a;
+                }
+            }
+        }
+
         // return Option<litteral>
         fn option_u8_output(self: @ContractState, val1: u8) -> Option<u8> {
             if val1 < 100 {
@@ -375,6 +501,48 @@ mod HelloStarknet {
                     return 17;
                 }
             }
+        }
+
+        // return Result<Order>
+        fn enum_result_output(self: @ContractState, val1: u16) -> Result<Order, u16> {
+            if val1 < 100 {
+                return Result::Err(14);
+            }
+            Result::Ok(Order { p2: val1, p1: 8 })
+        }
+        // use as input Result<Order>
+        fn enum_result_input(self: @ContractState, inp: Result<Order, u16>) -> u16 {
+            match inp {
+                Result::Ok(x) => {
+                    return x.p2;
+                },
+                Result::Err(y) => {
+                    return y;
+                }
+            }
+        }
+
+        // new types from Cairo
+        fn new_types(
+            self: @ContractState,
+            ch: ClassHash,
+            eth_addr: EthAddress,
+            contr_address: ContractAddress
+        ) -> (ClassHash, EthAddress, ContractAddress) {
+            (ch, eth_addr, contr_address)
+        }
+
+        fn array_new_types(
+            self: @ContractState,
+            tup: (ContractAddress, EthAddress, ClassHash),
+            tupa: (Array<ContractAddress>, Array<EthAddress>, Array<ClassHash>)
+        ) -> (Array<ContractAddress>, Array<EthAddress>, Array<ClassHash>) {
+            let (aca, aetha, ach) = tupa;
+            (aca, aetha, ach)
+        }
+
+        fn new_span(self: @ContractState, my_span: Span<u16>) -> Span<u16> {
+            my_span
         }
     }
 }

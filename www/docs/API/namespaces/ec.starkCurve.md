@@ -204,7 +204,7 @@ node_modules/micro-starknet/lib/index.d.ts:10
 
 | Name        | Type                                                                      |
 | :---------- | :------------------------------------------------------------------------ |
-| `signature` | `Hex` \| [`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md) |
+| `signature` | [`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md) \| `Hex` |
 | `msgHash`   | `Hex`                                                                     |
 | `pubKey`    | `Hex`                                                                     |
 

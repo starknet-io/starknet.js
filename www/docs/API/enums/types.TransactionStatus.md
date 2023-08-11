@@ -7,9 +7,6 @@ custom_edit_url: null
 
 [types](../namespaces/types.md).TransactionStatus
 
-new statuses are defined by props: finality_status and execution_status
-to be #deprecated
-
 ## Enumeration Members
 
 ### NOT_RECEIVED
@@ -18,7 +15,7 @@ to be #deprecated
 
 #### Defined in
 
-[src/types/lib/index.ts:141](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L141)
+[src/types/lib/index.ts:131](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L131)
 
 ---
 
@@ -28,7 +25,7 @@ to be #deprecated
 
 #### Defined in
 
-[src/types/lib/index.ts:142](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L142)
+[src/types/lib/index.ts:132](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L132)
 
 ---
 
@@ -38,7 +35,7 @@ to be #deprecated
 
 #### Defined in
 
-[src/types/lib/index.ts:143](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L143)
+[src/types/lib/index.ts:133](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L133)
 
 ---
 
@@ -48,7 +45,7 @@ to be #deprecated
 
 #### Defined in
 
-[src/types/lib/index.ts:144](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L144)
+[src/types/lib/index.ts:134](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L134)
 
 ---
 
@@ -58,14 +55,4 @@ to be #deprecated
 
 #### Defined in
 
-[src/types/lib/index.ts:145](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L145)
-
----
-
-### REVERTED
-
-• **REVERTED** = `"REVERTED"`
-
-#### Defined in
-
-[src/types/lib/index.ts:146](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L146)
+[src/types/lib/index.ts:135](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L135)

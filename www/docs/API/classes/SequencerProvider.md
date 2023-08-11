@@ -24,7 +24,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:91](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L91)
+[src/provider/sequencer.ts:90](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L90)
 
 ## Properties
 
@@ -34,7 +34,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:77](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L77)
+[src/provider/sequencer.ts:76](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L76)
 
 ---
 
@@ -44,7 +44,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:79](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L79)
+[src/provider/sequencer.ts:78](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L78)
 
 ---
 
@@ -54,7 +54,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:81](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L81)
+[src/provider/sequencer.ts:80](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L80)
 
 ---
 
@@ -64,7 +64,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:83](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L83)
+[src/provider/sequencer.ts:82](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L82)
 
 ---
 
@@ -74,7 +74,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:85](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L85)
+[src/provider/sequencer.ts:84](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L84)
 
 ---
 
@@ -84,7 +84,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:87](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L87)
+[src/provider/sequencer.ts:86](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L86)
 
 ---
 
@@ -94,7 +94,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:89](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L89)
+[src/provider/sequencer.ts:88](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L88)
 
 ## Methods
 
@@ -114,7 +114,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:111](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L111)
+[src/provider/sequencer.ts:110](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L110)
 
 ---
 
@@ -134,7 +134,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:124](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L124)
+[src/provider/sequencer.ts:123](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L123)
 
 ---
 
@@ -154,7 +154,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:141](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L141)
+[src/provider/sequencer.ts:140](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L140)
 
 ---
 
@@ -174,7 +174,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:146](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L146)
+[src/provider/sequencer.ts:145](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L145)
 
 ---
 
@@ -194,7 +194,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:159](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L159)
+[src/provider/sequencer.ts:158](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L158)
 
 ---
 
@@ -214,7 +214,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:176](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L176)
+[src/provider/sequencer.ts:175](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L175)
 
 ---
 
@@ -241,7 +241,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:187](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L187)
+[src/provider/sequencer.ts:186](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L186)
 
 ---
 
@@ -265,7 +265,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/sequencer.ts:209](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L209)
+[src/provider/sequencer.ts:208](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L208)
 
 ---
 
@@ -287,7 +287,7 @@ the chain Id
 
 #### Defined in
 
-[src/provider/sequencer.ts:250](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L250)
+[src/provider/sequencer.ts:249](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L249)
 
 ---
 
@@ -316,7 +316,7 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[src/provider/sequencer.ts:254](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L254)
+[src/provider/sequencer.ts:253](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L253)
 
 ---
 
@@ -344,7 +344,7 @@ the block object
 
 #### Defined in
 
-[src/provider/sequencer.ts:272](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L272)
+[src/provider/sequencer.ts:271](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L271)
 
 ---
 
@@ -373,7 +373,7 @@ the hex nonce
 
 #### Defined in
 
-[src/provider/sequencer.ts:280](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L280)
+[src/provider/sequencer.ts:279](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L279)
 
 ---
 
@@ -403,7 +403,7 @@ the value of the storage variable
 
 #### Defined in
 
-[src/provider/sequencer.ts:287](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L287)
+[src/provider/sequencer.ts:286](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L286)
 
 ---
 
@@ -431,7 +431,7 @@ the transaction object { transaction_id, status, transaction, block_number?, blo
 
 #### Defined in
 
-[src/provider/sequencer.ts:300](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L300)
+[src/provider/sequencer.ts:299](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L299)
 
 ---
 
@@ -459,7 +459,7 @@ the transaction receipt object
 
 #### Defined in
 
-[src/provider/sequencer.ts:309](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L309)
+[src/provider/sequencer.ts:308](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L308)
 
 ---
 
@@ -488,7 +488,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/sequencer.ts:316](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L316)
+[src/provider/sequencer.ts:315](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L315)
 
 ---
 
@@ -517,7 +517,7 @@ Class hash
 
 #### Defined in
 
-[src/provider/sequencer.ts:325](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L325)
+[src/provider/sequencer.ts:324](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L324)
 
 ---
 
@@ -546,7 +546,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/sequencer.ts:332](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L332)
+[src/provider/sequencer.ts:331](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L331)
 
 ---
 
@@ -567,7 +567,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/sequencer.ts:341](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L341)
+[src/provider/sequencer.ts:340](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L340)
 
 ---
 
@@ -600,7 +600,7 @@ response from addTransaction
 
 #### Defined in
 
-[src/provider/sequencer.ts:348](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L348)
+[src/provider/sequencer.ts:347](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L347)
 
 ---
 
@@ -629,7 +629,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/sequencer.ts:363](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L363)
+[src/provider/sequencer.ts:362](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L362)
 
 ---
 
@@ -658,7 +658,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/sequencer.ts:379](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L379)
+[src/provider/sequencer.ts:378](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L378)
 
 ---
 
@@ -693,7 +693,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/sequencer.ts:407](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L407)
+[src/provider/sequencer.ts:406](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L406)
 
 ---
 
@@ -724,7 +724,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/sequencer.ts:416](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L416)
+[src/provider/sequencer.ts:415](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L415)
 
 ---
 
@@ -755,7 +755,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/sequencer.ts:435](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L435)
+[src/provider/sequencer.ts:434](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L434)
 
 ---
 
@@ -786,7 +786,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/sequencer.ts:454](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L454)
+[src/provider/sequencer.ts:453](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L453)
 
 ---
 
@@ -815,7 +815,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/sequencer.ts:473](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L473)
+[src/provider/sequencer.ts:472](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L472)
 
 ---
 
@@ -844,7 +844,7 @@ The method should not be used
 
 #### Defined in
 
-[src/provider/sequencer.ts:485](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L485)
+[src/provider/sequencer.ts:484](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L484)
 
 ---
 
@@ -873,7 +873,7 @@ GetTransactionReceiptResponse
 
 #### Defined in
 
-[src/provider/sequencer.ts:492](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L492)
+[src/provider/sequencer.ts:491](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L491)
 
 ---
 
@@ -897,7 +897,7 @@ GetTransactionStatusResponse - the transaction status object
 
 #### Defined in
 
-[src/provider/sequencer.ts:547](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L547)
+[src/provider/sequencer.ts:527](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L527)
 
 ---
 
@@ -915,7 +915,7 @@ GetContractAddressesResponse - starknet smart contract addresses
 
 #### Defined in
 
-[src/provider/sequencer.ts:556](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L556)
+[src/provider/sequencer.ts:536](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L536)
 
 ---
 
@@ -939,7 +939,7 @@ TransactionTraceResponse - the transaction trace
 
 #### Defined in
 
-[src/provider/sequencer.ts:565](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L565)
+[src/provider/sequencer.ts:545](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L545)
 
 ---
 
@@ -960,7 +960,7 @@ TransactionTraceResponse - the transaction trace
 
 #### Defined in
 
-[src/provider/sequencer.ts:572](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L572)
+[src/provider/sequencer.ts:552](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L552)
 
 ---
 
@@ -988,7 +988,7 @@ WARNING!: Sequencer will process only first element from invocations array
 
 #### Defined in
 
-[src/provider/sequencer.ts:595](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L595)
+[src/provider/sequencer.ts:575](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L575)
 
 ---
 
@@ -1016,7 +1016,7 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/sequencer.ts:622](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L622)
+[src/provider/sequencer.ts:602](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L602)
 
 ---
 
@@ -1036,7 +1036,7 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/sequencer.ts:632](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L632)
+[src/provider/sequencer.ts:612](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L612)
 
 ---
 
@@ -1057,7 +1057,7 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/sequencer.ts:639](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L639)
+[src/provider/sequencer.ts:619](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L619)
 
 ---
 
@@ -1078,7 +1078,7 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/sequencer.ts:643](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L643)
+[src/provider/sequencer.ts:623](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L623)
 
 ---
 
@@ -1103,4 +1103,4 @@ AccountTransactionItem
 
 #### Defined in
 
-[src/provider/sequencer.ts:653](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L653)
+[src/provider/sequencer.ts:633](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/sequencer.ts#L633)

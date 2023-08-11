@@ -7,6 +7,10 @@ custom_edit_url: null
 
 [types](types.md).RPC
 
+## Enumerations
+
+- [TransactionType](../enums/types.RPC.TransactionType.md)
+
 ## Type Aliases
 
 ### Response
@@ -26,7 +30,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:12](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L12)
+[src/types/api/rpc.ts:4](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L4)
 
 ---
 
@@ -36,7 +40,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L22)
+[src/types/api/rpc.ts:14](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L14)
 
 ---
 
@@ -46,7 +50,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:23](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L23)
+[src/types/api/rpc.ts:15](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L15)
 
 ---
 
@@ -56,7 +60,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:24](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L24)
+[src/types/api/rpc.ts:16](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L16)
 
 ---
 
@@ -66,7 +70,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:25](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L25)
+[src/types/api/rpc.ts:17](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L17)
 
 ---
 
@@ -76,7 +80,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:26](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L26)
+[src/types/api/rpc.ts:18](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L18)
 
 ---
 
@@ -86,7 +90,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:27](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L27)
+[src/types/api/rpc.ts:19](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L19)
 
 ---
 
@@ -96,7 +100,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:28](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L28)
+[src/types/api/rpc.ts:20](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L20)
 
 ---
 
@@ -106,7 +110,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:29](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L29)
+[src/types/api/rpc.ts:21](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L21)
 
 ---
 
@@ -116,7 +120,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:30](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L30)
+[src/types/api/rpc.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L22)
 
 ---
 
@@ -126,7 +130,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:31](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L31)
+[src/types/api/rpc.ts:23](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L23)
 
 ---
 
@@ -136,7 +140,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:32](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L32)
+[src/types/api/rpc.ts:24](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L24)
 
 ---
 
@@ -146,7 +150,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:33](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L33)
+[src/types/api/rpc.ts:25](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L25)
 
 ---
 
@@ -156,7 +160,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:34](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L34)
+[src/types/api/rpc.ts:26](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L26)
 
 ---
 
@@ -166,7 +170,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:35](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L35)
+[src/types/api/rpc.ts:27](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L27)
 
 ---
 
@@ -176,7 +180,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:36](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L36)
+[src/types/api/rpc.ts:28](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L28)
 
 ---
 
@@ -186,7 +190,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:37](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L37)
+[src/types/api/rpc.ts:29](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L29)
 
 ---
 
@@ -196,7 +200,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:38](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L38)
+[src/types/api/rpc.ts:30](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L30)
 
 ---
 
@@ -206,7 +210,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:39](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L39)
+[src/types/api/rpc.ts:31](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L31)
 
 ---
 
@@ -216,7 +220,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:40](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L40)
+[src/types/api/rpc.ts:32](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L32)
 
 ---
 
@@ -226,7 +230,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:41](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L41)
+[src/types/api/rpc.ts:33](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L33)
 
 ---
 
@@ -236,7 +240,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:42](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L42)
+[src/types/api/rpc.ts:34](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L34)
 
 ---
 
@@ -246,7 +250,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:43](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L43)
+[src/types/api/rpc.ts:35](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L35)
 
 ---
 
@@ -256,7 +260,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:44](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L44)
+[src/types/api/rpc.ts:36](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L36)
 
 ---
 
@@ -266,7 +270,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:45](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L45)
+[src/types/api/rpc.ts:37](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L37)
 
 ---
 
@@ -276,7 +280,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:46](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L46)
+[src/types/api/rpc.ts:38](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L38)
 
 ---
 
@@ -286,7 +290,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:47](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L47)
+[src/types/api/rpc.ts:39](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L39)
 
 ---
 
@@ -296,7 +300,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:48](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L48)
+[src/types/api/rpc.ts:40](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L40)
 
 ---
 
@@ -306,7 +310,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:49](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L49)
+[src/types/api/rpc.ts:41](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L41)
 
 ---
 
@@ -316,7 +320,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:50](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L50)
+[src/types/api/rpc.ts:42](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L42)
 
 ---
 
@@ -326,7 +330,17 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:51](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L51)
+[src/types/api/rpc.ts:43](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L43)
+
+---
+
+### BroadcastedTransaction
+
+Ƭ **BroadcastedTransaction**: `OPENRPC.BroadcastedTransaction`
+
+#### Defined in
+
+[src/types/api/rpc.ts:44](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L44)
 
 ---
 
@@ -336,7 +350,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:52](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L52)
+[src/types/api/rpc.ts:45](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L45)
 
 ---
 
@@ -346,7 +360,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:53](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L53)
+[src/types/api/rpc.ts:46](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L46)
 
 ---
 
@@ -356,7 +370,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:54](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L54)
+[src/types/api/rpc.ts:47](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L47)
 
 ---
 
@@ -366,17 +380,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:55](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L55)
-
----
-
-### BaseTransaction
-
-Ƭ **BaseTransaction**: `OPENRPC.BaseTransaction` & { `version`: `string` }
-
-#### Defined in
-
-[src/types/api/rpc.ts:60](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L60)
+[src/types/api/rpc.ts:48](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L48)
 
 ---
 
@@ -386,7 +390,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:63](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L63)
+[src/types/api/rpc.ts:59](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L59)
 
 ---
 
@@ -396,7 +400,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:64](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L64)
+[src/types/api/rpc.ts:60](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L60)
 
 ---
 
@@ -406,7 +410,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:65](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L65)
+[src/types/api/rpc.ts:61](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L61)
 
 ---
 
@@ -416,44 +420,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:69](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L69)
-
-## Variables
-
-### TransactionType
-
-• `Const` **TransactionType**: typeof `TXN_TYPE` = `TXN_TYPE`
-
-#### Defined in
-
-[src/types/api/rpc.ts:56](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L56)
-
----
-
-### SimulationFlag
-
-• `Const` **SimulationFlag**: typeof `SIMULATION_FLAG` = `SIMULATION_FLAG`
-
-#### Defined in
-
-[src/types/api/rpc.ts:57](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L57)
-
----
-
-### TransactionFinalityStatus
-
-• `Const` **TransactionFinalityStatus**: typeof `TXN_FINALITY_STATUS` = `TXN_FINALITY_STATUS`
-
-#### Defined in
-
-[src/types/api/rpc.ts:58](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L58)
-
----
-
-### TransactionExecutionStatus
-
-• `Const` **TransactionExecutionStatus**: typeof `TXN_EXECUTION_STATUS` = `TXN_EXECUTION_STATUS`
-
-#### Defined in
-
-[src/types/api/rpc.ts:59](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L59)
+[src/types/api/rpc.ts:65](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/rpc.ts#L65)

@@ -1,6 +1,6 @@
 ---
 id: 'modules'
-title: 'Starknet.js API - v5.17.0'
+title: 'Starknet.js API - v5.16.0'
 sidebar_label: 'Exports'
 sidebar_position: 0.5
 custom_edit_url: null
@@ -46,60 +46,6 @@ custom_edit_url: null
 - [CallData](classes/CallData.md)
 
 ## References
-
-### RPC
-
-Re-exports [RPC](namespaces/types.RPC.md)
-
----
-
-### CallL1Handler
-
-Re-exports [CallL1Handler](namespaces/types.md#calll1handler)
-
----
-
-### DeployedContractItem
-
-Re-exports [DeployedContractItem](namespaces/types.md#deployedcontractitem)
-
----
-
-### ExecutionResources
-
-Re-exports [ExecutionResources](namespaces/types.md#executionresources)
-
----
-
-### FunctionInvocation
-
-Re-exports [FunctionInvocation](namespaces/types.md#functioninvocation)
-
----
-
-### GetContractAddressesResponse
-
-Re-exports [GetContractAddressesResponse](namespaces/types.md#getcontractaddressesresponse)
-
----
-
-### GetTransactionStatusResponse
-
-Re-exports [GetTransactionStatusResponse](namespaces/types.md#gettransactionstatusresponse)
-
----
-
-### SequencerIdentifier
-
-Re-exports [SequencerIdentifier](namespaces/types.md#sequenceridentifier)
-
----
-
-### Sequencer
-
-Re-exports [Sequencer](namespaces/types.Sequencer.md)
-
----
 
 ### EstimateFee
 
@@ -161,18 +107,6 @@ Re-exports [SIMULATION_FLAG](enums/types.SIMULATION_FLAG.md)
 
 ---
 
-### ValidateType
-
-Re-exports [ValidateType](enums/types.ValidateType.md)
-
----
-
-### Uint
-
-Re-exports [Uint](enums/types.Uint.md)
-
----
-
 ### AsyncContractFunction
 
 Re-exports [AsyncContractFunction](namespaces/types.md#asynccontractfunction)
@@ -188,6 +122,12 @@ Re-exports [ContractFunction](namespaces/types.md#contractfunction)
 ### Result
 
 Re-exports [Result](namespaces/types.md#result)
+
+---
+
+### Calldata
+
+Re-exports [Calldata](namespaces/types.md#calldata)
 
 ---
 
@@ -242,12 +182,6 @@ Re-exports [Signature](namespaces/types.md#signature)
 ### BigNumberish
 
 Re-exports [BigNumberish](namespaces/types.md#bignumberish)
-
----
-
-### Calldata
-
-Re-exports [Calldata](namespaces/types.md#calldata)
 
 ---
 
@@ -398,18 +332,6 @@ Re-exports [TransactionType](enums/types.TransactionType.md)
 ### TransactionStatus
 
 Re-exports [TransactionStatus](enums/types.TransactionStatus.md)
-
----
-
-### TransactionFinalityStatus
-
-Re-exports [TransactionFinalityStatus](enums/types.TransactionFinalityStatus.md)
-
----
-
-### TransactionExecutionStatus
-
-Re-exports [TransactionExecutionStatus](enums/types.TransactionExecutionStatus.md)
 
 ---
 
@@ -683,12 +605,6 @@ Re-exports [GetCodeResponse](interfaces/types.GetCodeResponse.md)
 
 ---
 
-### ContractEntryPoint
-
-Re-exports [ContractEntryPoint](interfaces/types.ContractEntryPoint.md)
-
----
-
 ### GetTransactionResponse
 
 Re-exports [GetTransactionResponse](namespaces/types.md#gettransactionresponse)
@@ -707,9 +623,27 @@ Re-exports [InvokeTransactionResponse](interfaces/types.InvokeTransactionRespons
 
 ---
 
+### ContractEntryPoint
+
+Re-exports [ContractEntryPoint](interfaces/types.ContractEntryPoint.md)
+
+---
+
 ### DeclareTransactionResponse
 
 Re-exports [DeclareTransactionResponse](interfaces/types.DeclareTransactionResponse.md)
+
+---
+
+### GetTransactionReceiptResponse
+
+Re-exports [GetTransactionReceiptResponse](namespaces/types.md#gettransactionreceiptresponse)
+
+---
+
+### CommonTransactionReceiptResponse
+
+Re-exports [CommonTransactionReceiptResponse](interfaces/types.CommonTransactionReceiptResponse.md)
 
 ---
 
@@ -731,24 +665,6 @@ Re-exports [MessageToL2](interfaces/types.MessageToL2.md)
 
 ---
 
-### RejectedTransactionResponse
-
-Re-exports [RejectedTransactionResponse](namespaces/types.md#rejectedtransactionresponse)
-
----
-
-### GetTransactionReceiptResponse
-
-Re-exports [GetTransactionReceiptResponse](namespaces/types.md#gettransactionreceiptresponse)
-
----
-
-### SuccessfulTransactionReceiptResponse
-
-Re-exports [SuccessfulTransactionReceiptResponse](namespaces/types.md#successfultransactionreceiptresponse)
-
----
-
 ### InvokeTransactionReceiptResponse
 
 Re-exports [InvokeTransactionReceiptResponse](interfaces/types.InvokeTransactionReceiptResponse.md)
@@ -758,24 +674,6 @@ Re-exports [InvokeTransactionReceiptResponse](interfaces/types.InvokeTransaction
 ### DeclareTransactionReceiptResponse
 
 Re-exports [DeclareTransactionReceiptResponse](namespaces/types.md#declaretransactionreceiptresponse)
-
----
-
-### DeployTransactionReceiptResponse
-
-Re-exports [DeployTransactionReceiptResponse](namespaces/types.md#deploytransactionreceiptresponse)
-
----
-
-### RejectedTransactionReceiptResponse
-
-Re-exports [RejectedTransactionReceiptResponse](namespaces/types.md#rejectedtransactionreceiptresponse)
-
----
-
-### RevertedTransactionReceiptResponse
-
-Re-exports [RevertedTransactionReceiptResponse](namespaces/types.md#revertedtransactionreceiptresponse)
 
 ---
 
@@ -897,26 +795,71 @@ Re-exports [StarkNetDomain](interfaces/types.StarkNetDomain.md)
 
 Re-exports [TypedData](interfaces/types.TypedData.md)
 
-## Type Aliases
+---
 
-### ContractFactoryParams
+### GetTransactionStatusResponse
 
-Ƭ **ContractFactoryParams**: `Object`
+Re-exports [GetTransactionStatusResponse](namespaces/types.md#gettransactionstatusresponse)
 
-#### Type declaration
+---
 
-| Name                 | Type                                                       |
-| :------------------- | :--------------------------------------------------------- |
-| `compiledContract`   | [`CompiledContract`](namespaces/types.md#compiledcontract) |
-| `account`            | `any`                                                      |
-| `casm?`              | [`CairoAssembly`](namespaces/types.md#cairoassembly)       |
-| `classHash?`         | `string`                                                   |
-| `compiledClassHash?` | `string`                                                   |
-| `abi?`               | [`Abi`](namespaces/types.md#abi)                           |
+### GetContractAddressesResponse
 
-#### Defined in
+Re-exports [GetContractAddressesResponse](namespaces/types.md#getcontractaddressesresponse)
 
-[src/contract/contractFactory.ts:13](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L13)
+---
+
+### FunctionInvocation
+
+Re-exports [FunctionInvocation](namespaces/types.md#functioninvocation)
+
+---
+
+### ExecutionResources
+
+Re-exports [ExecutionResources](namespaces/types.md#executionresources)
+
+---
+
+### CallL1Handler
+
+Re-exports [CallL1Handler](namespaces/types.md#calll1handler)
+
+---
+
+### DeployedContractItem
+
+Re-exports [DeployedContractItem](namespaces/types.md#deployedcontractitem)
+
+---
+
+### SequencerIdentifier
+
+Re-exports [SequencerIdentifier](namespaces/types.md#sequenceridentifier)
+
+---
+
+### Sequencer
+
+Re-exports [Sequencer](namespaces/types.Sequencer.md)
+
+---
+
+### RPC
+
+Re-exports [RPC](namespaces/types.RPC.md)
+
+---
+
+### ValidateType
+
+Re-exports [ValidateType](enums/types.ValidateType.md)
+
+---
+
+### Uint
+
+Re-exports [Uint](enums/types.Uint.md)
 
 ## Variables
 
@@ -1234,17 +1177,17 @@ create DeployContractResponse compatibile response with adition of UDC Event dat
 
 DeployContractResponse | UDC Event Response data
 
-| Name               | Type     |
-| :----------------- | :------- |
-| `transaction_hash` | `string` |
-| `contract_address` | `any`    |
-| `address`          | `any`    |
-| `deployer`         | `any`    |
-| `unique`           | `any`    |
-| `classHash`        | `any`    |
-| `calldata_len`     | `any`    |
-| `calldata`         | `any`    |
-| `salt`             | `any`    |
+| Name               | Type       |
+| :----------------- | :--------- |
+| `transaction_hash` | `string`   |
+| `contract_address` | `string`   |
+| `address`          | `string`   |
+| `deployer`         | `string`   |
+| `unique`           | `string`   |
+| `classHash`        | `string`   |
+| `calldata_len`     | `string`   |
+| `calldata`         | `string`[] |
+| `salt`             | `string`   |
 
 #### Defined in
 

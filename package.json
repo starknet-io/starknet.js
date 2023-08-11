@@ -1,6 +1,6 @@
 {
   "name": "starknet",
-  "version": "5.18.0",
+  "version": "5.17.0",
   "description": "JavaScript library for Starknet",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

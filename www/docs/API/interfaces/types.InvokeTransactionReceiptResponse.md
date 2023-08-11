@@ -7,75 +7,45 @@ custom_edit_url: null
 
 [types](../namespaces/types.md).InvokeTransactionReceiptResponse
 
+## Hierarchy
+
+- [`CommonTransactionReceiptResponse`](types.CommonTransactionReceiptResponse.md)
+
+  ↳ **`InvokeTransactionReceiptResponse`**
+
 ## Properties
 
-### type
+### messages_sent
 
-• `Optional` **type**: [`TransactionType`](../enums/types.TransactionType.md)
+• `Optional` **messages_sent**: [`MessageToL1`](types.MessageToL1.md)[]
+
+**`Deprecated`**
+
+Use l2_to_l1_messages
 
 #### Defined in
 
-[src/types/provider/response.ts:112](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L112)
+[src/types/provider/response.ts:99](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L99)
 
 ---
 
-### execution_status
+### events
 
-• **execution_status**: [`TransactionExecutionStatus`](../enums/types.TransactionExecutionStatus.md)
+• `Optional` **events**: [`Event`](types.Event.md)[]
 
 #### Defined in
 
-[src/types/provider/response.ts:113](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L113)
+[src/types/provider/response.ts:100](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L100)
 
 ---
 
-### finality_status
+### l1_origin_message
 
-• **finality_status**: [`TransactionFinalityStatus`](../enums/types.TransactionFinalityStatus.md)
-
-#### Defined in
-
-[src/types/provider/response.ts:114](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L114)
-
----
-
-### status
-
-• `Optional` **status**: `"NOT_RECEIVED"` \| `"RECEIVED"` \| `"ACCEPTED_ON_L2"` \| `"ACCEPTED_ON_L1"` \| `"REJECTED"` \| `"REVERTED"`
+• `Optional` **l1_origin_message**: [`MessageToL2`](types.MessageToL2.md)
 
 #### Defined in
 
-[src/types/provider/response.ts:115](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L115)
-
----
-
-### actual_fee
-
-• **actual_fee**: `string`
-
-#### Defined in
-
-[src/types/provider/response.ts:116](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L116)
-
----
-
-### block_hash
-
-• **block_hash**: `string`
-
-#### Defined in
-
-[src/types/provider/response.ts:117](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L117)
-
----
-
-### block_number
-
-• **block_number**: [`BlockNumber`](../namespaces/types.md#blocknumber)
-
-#### Defined in
-
-[src/types/provider/response.ts:118](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L118)
+[src/types/provider/response.ts:101](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L101)
 
 ---
 
@@ -83,46 +53,52 @@ custom_edit_url: null
 
 • **transaction_hash**: `string`
 
+#### Inherited from
+
+[CommonTransactionReceiptResponse](types.CommonTransactionReceiptResponse.md).[transaction_hash](types.CommonTransactionReceiptResponse.md#transaction_hash)
+
 #### Defined in
 
-[src/types/provider/response.ts:119](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L119)
+[src/types/provider/response.ts:75](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L75)
 
 ---
 
-### transaction_index
+### status
 
-• `Optional` **transaction_index**: `number`
+• `Optional` **status**: `"NOT_RECEIVED"` \| `"RECEIVED"` \| `"ACCEPTED_ON_L2"` \| `"ACCEPTED_ON_L1"` \| `"REJECTED"`
+
+#### Inherited from
+
+[CommonTransactionReceiptResponse](types.CommonTransactionReceiptResponse.md).[status](types.CommonTransactionReceiptResponse.md#status)
 
 #### Defined in
 
-[src/types/provider/response.ts:120](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L120)
+[src/types/provider/response.ts:76](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L76)
 
 ---
 
-### messages_sent
+### actual_fee
 
-• **messages_sent**: [`MessageToL1`](types.MessageToL1.md)[]
+• `Optional` **actual_fee**: `string`
+
+#### Inherited from
+
+[CommonTransactionReceiptResponse](types.CommonTransactionReceiptResponse.md).[actual_fee](types.CommonTransactionReceiptResponse.md#actual_fee)
 
 #### Defined in
 
-[src/types/provider/response.ts:121](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L121)
+[src/types/provider/response.ts:77](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L77)
 
 ---
 
-### events
+### status_data
 
-• **events**: `any`[]
+• `Optional` **status_data**: `string`
 
-#### Defined in
+#### Inherited from
 
-[src/types/provider/response.ts:122](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L122)
-
----
-
-### execution_resources
-
-• `Optional` **execution_resources**: `any`
+[CommonTransactionReceiptResponse](types.CommonTransactionReceiptResponse.md).[status_data](types.CommonTransactionReceiptResponse.md#status_data)
 
 #### Defined in
 
-[src/types/provider/response.ts:123](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L123)
+[src/types/provider/response.ts:78](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L78)
