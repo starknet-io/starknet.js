@@ -78,18 +78,12 @@ const responseEstimateMessageFee = await provider.estimateMessageFee(.....)
 
 ### Specific RPC methods
 
-For example, if you want to read the events recorded in a range of blocks, you need to use a method available from an RPC node. The class `RpcProvider` is available for this case:
+For example, if you want to read the list of pending transactions, you need to use a method available from an RPC node. The class `RpcProvider` is available for this case:
 
 ```typescript
 import { RpcProvider } from "starknet";
 const providerRPC = new RpcProvider({ nodeUrl: "http://192.168.1.99:9545" }); // for a pathfinder node located in a PC in the local network
-const lastBlock = await providerRPC.getBlock('latest');
-let eventsList = await providerRPC.getEvents({
-    address: myContractAddress,
-    from_block: {block_number: lastBlock.block_number-2},
-    to_block: {block_number: lastBlock.block_number},
-    chunk_size: 400
-});
+const pendingTx = await providerRPC.getPendingTransactions();
 ```
 
 RPC providers are for example Infura, Alchemy, Chainstack... Or you can spin up your own Pathfinder node!
