@@ -437,6 +437,21 @@ describe('Complex interaction', () => {
     )}","10","20","48","40","1","2","10","20","22","33","1","2","3","4","22","33","1","33","1415934836","123333333","0","1","2","3","1","321","322","33","0","2","123","291","3","1","2","10","20","100","200","2","111","112","121","122","211","212","221","222"]`;
     expect(json.stringify(compiled)).toBe(reference);
     expect(json.stringify(doubleCompiled)).toBe(reference);
+
+    // mix of complex and litteral
+    const mySetArgs = {
+      validators: [234, 235],
+      powers: { a1: 562, a2: 567 },
+      valsetNonce: uint256(49),
+    };
+    const compiledArr = CallData.compile([mySetArgs, 456789]);
+    const compiledObj = CallData.compile({
+      currentValset: mySetArgs,
+      relayerRouterAddress: 456789,
+    });
+    const expectedResult = ['2', '234', '235', '562', '567', '49', '0', '456789'];
+    expect(compiledArr).toStrictEqual(expectedResult);
+    expect(compiledObj).toStrictEqual(expectedResult);
   });
 
   describe('Composed and nested data types (felt, array, struct, tuples), formatter', () => {
