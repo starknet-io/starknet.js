@@ -160,7 +160,7 @@ export class CallData {
    */
   static compile(rawArgs: RawArgs): Calldata {
     const createTree = (obj: object) => {
-      const getEntries = (o: object, prefix = ''): any => {
+      const getEntries = (o: object, prefix = '.'): any => {
         const oe = Array.isArray(o) ? [o.length.toString(), ...o] : o;
         return Object.entries(oe).flatMap(([k, v]) => {
           let value = v;
