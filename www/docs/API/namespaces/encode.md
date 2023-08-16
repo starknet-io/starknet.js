@@ -259,3 +259,28 @@ enc-utils is no dependency to avoid using `Buffer` which just works in node and 
 #### Defined in
 
 [src/utils/encode.ts:72](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L72)
+
+---
+
+### pascalToSnake
+
+▸ **pascalToSnake**(`text`): `string`
+
+String transformation util
+pascal case to screaming snake case
+
+#### Parameters
+
+| Name   | Type     | Description |
+| :----- | :------- | :---------- |
+| `text` | `string` | string      |
+
+#### Returns
+
+`string`
+
+string
+
+#### Defined in
+
+[src/utils/encode.ts:82](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L82)

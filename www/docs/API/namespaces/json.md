@@ -50,13 +50,16 @@ custom_edit_url: null
 
 ### stringify
 
-▸ **stringify**(`...p`): `string`
+▸ **stringify**(`value`, `replacer?`, `space?`, `numberStringifiers?`): `string`
 
 #### Parameters
 
-| Name   | Type                                                                                                         |
-| :----- | :----------------------------------------------------------------------------------------------------------- |
-| `...p` | [value: JavaScriptValue, replacer?: any, space?: string \| number, numberStringifiers?: NumberStringifier[]] |
+| Name                  | Type                  |
+| :-------------------- | :-------------------- |
+| `value`               | `unknown`             |
+| `replacer?`           | `any`                 |
+| `space?`              | `string` \| `number`  |
+| `numberStringifiers?` | `NumberStringifier`[] |
 
 #### Returns
 
@@ -70,7 +73,7 @@ custom_edit_url: null
 
 ### stringifyAlwaysAsBig
 
-▸ **stringifyAlwaysAsBig**(`...p`): `string`
+▸ **stringifyAlwaysAsBig**(`value`, `replacer?`, `space?`, `numberStringifiers?`): `string`
 
 **`Deprecated`**
 
@@ -78,9 +81,12 @@ equivalent to 'stringify', alias will be removed
 
 #### Parameters
 
-| Name   | Type                                                                                                         |
-| :----- | :----------------------------------------------------------------------------------------------------------- |
-| `...p` | [value: JavaScriptValue, replacer?: any, space?: string \| number, numberStringifiers?: NumberStringifier[]] |
+| Name                  | Type                  |
+| :-------------------- | :-------------------- |
+| `value`               | `unknown`             |
+| `replacer?`           | `any`                 |
+| `space?`              | `string` \| `number`  |
+| `numberStringifiers?` | `NumberStringifier`[] |
 
 #### Returns
 
