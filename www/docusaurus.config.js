@@ -75,7 +75,7 @@ const config = {
         title: 'Home',
         logo: {
           alt: 'Starknet.js Logo',
-          src: 'img/StarkNet-JS_navbar.png',
+          src: 'img/Starknet-JS_navbar.png',
         },
         items: [
           {
