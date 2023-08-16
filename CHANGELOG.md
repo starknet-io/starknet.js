@@ -1,3 +1,9 @@
+## [5.19.1](https://github.com/0xs34n/starknet.js/compare/v5.19.0...v5.19.1) (2023-08-16)
+
+### Bug Fixes
+
+- repair CallData compilation faulty ordering ([e8cbedc](https://github.com/0xs34n/starknet.js/commit/e8cbedc3eac39cb0662e958ad5056750f8dc4069))
+
 # [5.19.0](https://github.com/0xs34n/starknet.js/compare/v5.18.0...v5.19.0) (2023-08-11)
 
 ### Bug Fixes
