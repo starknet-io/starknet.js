@@ -25,7 +25,7 @@ Example of Cairo code for an event :
     }
 ```
 
-Here an event called `EventPanic`, with an u8 stored in keys, and a felt252 (text) in data.
+Here we have an event called `EventPanic`, with an u8 stored in keys, and a felt252 (text) in data.
 
 ## Why events ?
 
@@ -36,7 +36,7 @@ Some cases :
 - When a specific value is reached in a contract, an event can be created to store the fact that this value has been reached at a specific block number.
 - When the L1 network has triggered the execution of a L2 contract, you can store in the event some results and when it occurs.
 
-An event can be useful also when you invoke a contract. When you invoke a Cairo function (meaning to write in the network), the API do not authorize any response (only call functions can provide an answer). To generate an event in the code is a way to provide a response (for example for the creation of an account, an event is generated to return the account address).
+An event can be useful also when you invoke a contract. When you invoke a Cairo function (meaning to write in the network), the API does not authorize any response (only call functions can provide an answer). To generate an event in the code is a way to provide a response (for example for the creation of an account, an event is generated to return the account address).
 
 ## With the Transaction hash
 
@@ -83,7 +83,7 @@ The first parameter in the `keys` array is a hash of the name of the event, calc
 const nameHash = num.toHex( hash.starknetKeccak("EventPanic"));
 ```
 
-The second parameter is the `errorType` variable content (stored in keys array because of the `#[key]`flag in the Cairo code).
+The second parameter is the `errorType` variable content (stored in keys array because of the `#[key]` flag in the Cairo code).
 
 The `data` array contains the `errorDescription` variable content (`'0x4d6567612050616e69632e'` corresponds to the encoded value of "Mega Panic.")
 
@@ -93,10 +93,10 @@ You can decode it with :
 const ErrorMessage =  shortString.decodeShortString("0x4d6567612050616e69632e")
 ```
 
-### parsed response
+### Parsed response
 
 Once you have the transaction receipt, you can parse the events to have something easier to process.  
-We will perform this parse this way :
+We will perform parsing this way :
 
 ```typescript
 const events = myTestContract.parseEvents(txReceipt);
@@ -146,7 +146,7 @@ console.log("data length =", event.data.length, "key length =", event.keys.lengt
 console.log("\nkeys =", event.keys, "data =", event.data);
 ```
 
-To limit the workload of the node, the parameter `chunk_size` defines a size of chunk to read. If the request need an additional chunk, the response includes a key `continuation_token` containing a string to use in the next request.  
+To limit the workload of the node, the parameter `chunk_size` defines a size of chunk to read. If the request needs an additional chunk, the response includes a key `continuation_token` containing a string to use in the next request.  
 Hereunder a code to read all the chunks of a request :
 
 ```typescript
