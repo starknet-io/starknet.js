@@ -220,7 +220,7 @@ describe('TS validation for API &  Contract interactions - tests skipped', () =>
     const status = await cairo1Contract.echo_array([123, 55, 77, 255]);
     expect(status).toEqual([123n, 55n, 77n, 255n]);
 
-    // uint256 defiend as number
+    // uint256 defined as number
     const status1 = await cairo1Contract.echo_array_u256([123, 55, 77, 255]);
     expect(status1).toEqual([123n, 55n, 77n, 255n]);
 
