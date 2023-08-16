@@ -49,7 +49,7 @@ const decimals: BigNumberish = 18;
 
 If your Cairo smart contract is waiting for a:
 
-### felt, u8, u16, u32, usize, u64, u128, felt252, address
+### felt, u8, u16, u32, usize, u64, u128, felt252, ContractAddress, EthAddress, ClassHash
 
 Starknet is waiting for a felt.  
 You can send to Starknet.js methods: bigNumberish.
@@ -57,6 +57,9 @@ You can send to Starknet.js methods: bigNumberish.
 ```typescript
 await myContract.my_function(12,"13","0xe",15n);
 ```
+
+> `EthAddress` is limited to 160 bits.
+> `felt, felt252, ClassHash` and `ContractAddress` are limited to 252 bits.
 
 ### bool
 
@@ -192,6 +195,8 @@ await myContract.my_function(myArray);
 ```
 
 > Do not add the `array_len` parameter before your array. Starknet.js will manage this element automatically.
+
+> It's also applicable for Cairo `Span` type.
 
 ### complex types
 

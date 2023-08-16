@@ -10,9 +10,11 @@ import {
   CallOptions,
   ContractFunction,
   EstimateFeeResponse,
+  GetTransactionReceiptResponse,
   Invocation,
   InvokeFunctionResponse,
   InvokeOptions,
+  ParsedEvents,
   Result,
 } from '../types';
 
@@ -110,6 +112,14 @@ export abstract class ContractInterface {
    * @returns Invocation object
    */
   public abstract populate(method: string, args?: ArgsOrCalldata): Invocation;
+
+  /**
+   * Parse contract events of a GetTransactionReceiptResponse received from waitForTransaction. Based on contract's abi
+   *
+   * @param receipt transaction receipt
+   * @returns Events parsed
+   */
+  public abstract parseEvents(receipt: GetTransactionReceiptResponse): ParsedEvents;
 
   /**
    * tells if the contract comes from a Cairo 1 contract

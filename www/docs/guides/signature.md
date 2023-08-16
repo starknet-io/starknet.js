@@ -13,7 +13,7 @@ Your message has to be an array of `BigNumberish`. First, calculate the hash of 
 > If the message does not respect some safety rules of composition, this method could be a way of attack of your smart contract. If you have any doubt, prefer the [EIP712 like method](#sign-and-verify-following-eip712), which is safe, but is also more complicated.
 
 ```typescript
-import {ec, hash, num, json, Contract } from "starknet";
+import {ec, hash, num, json, Contract, WeierstrassSignatureType } from "starknet";
 
 const privateKey = "0x1234567890987654321";
 const starknetPublicKey = ec.starkCurve.getStarkKey(privateKey);
@@ -22,7 +22,7 @@ const fullPublicKey = encode.addHexPrefix( encode.buf2hex( ec.starkCurve.getPubl
 const message: BigNumberish[] = [1, 128, 18, 14];
 
 const msgHash = hash.computeHashOnElements(message);
-const signature: weierstrass.SignatureType = ec.starkCurve.sign(msgHash,privateKey);
+const signature: WeierstrassSignatureType = ec.starkCurve.sign(msgHash,privateKey);
 ```
 
 Then you can send, by any means, to the recipient of the message:
@@ -167,7 +167,7 @@ const typedDataValidate: TypedData = {
     };
 
 // connect your account, then
-const signature2: weierstrass.SignatureType = await account.signMessage(typedDataValidate) as weierstrass.SignatureType;
+const signature2 = await account.signMessage(typedDataValidate) as WeierstrassSignatureType;
 
 ```
 

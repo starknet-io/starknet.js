@@ -1,5 +1,6 @@
 import { StarknetChainId } from '../../constants';
 import { weierstrass } from '../../utils/ec';
+import { CairoEnum } from '../cairoEnum';
 import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 
 export type WeierstrassSignatureType = weierstrass.SignatureType;
@@ -47,7 +48,7 @@ export type RawArgsObject = {
 
 export type RawArgsArray = Array<MultiType | MultiType[] | RawArgs>;
 
-export type MultiType = BigNumberish | Uint256 | object | boolean;
+export type MultiType = BigNumberish | Uint256 | object | boolean | CairoEnum;
 
 export type UniversalDeployerContractPayload = {
   classHash: BigNumberish;
@@ -133,12 +134,30 @@ export enum TransactionType {
   INVOKE = 'INVOKE_FUNCTION',
 }
 
+/**
+ * new statuses are defined by props: finality_status and execution_status
+ * to be #deprecated
+ */
 export enum TransactionStatus {
   NOT_RECEIVED = 'NOT_RECEIVED',
   RECEIVED = 'RECEIVED',
   ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
   ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
   REJECTED = 'REJECTED',
+  REVERTED = 'REVERTED',
+}
+
+export enum TransactionFinalityStatus {
+  NOT_RECEIVED = 'NOT_RECEIVED',
+  RECEIVED = 'RECEIVED',
+  ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
+  ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
+}
+
+export enum TransactionExecutionStatus {
+  REJECTED = 'REJECTED',
+  REVERTED = 'REVERTED',
+  SUCCEEDED = 'SUCCEEDED',
 }
 
 export enum BlockStatus {
@@ -195,18 +214,20 @@ export type Args = {
   [inputName: string]: BigNumberish | BigNumberish[] | ParsedStruct | ParsedStruct[];
 };
 export type ParsedStruct = {
-  [key: string]: BigNumberish | ParsedStruct;
+  [key: string]: BigNumberish | BigNumberish[] | ParsedStruct | Uint256;
 };
 
 export type waitForTransactionOptions = {
   retryInterval?: number;
-  successStates?: Array<TransactionStatus>;
+  successStates?: Array<TransactionFinalityStatus | TransactionExecutionStatus>;
+  errorStates?: Array<TransactionFinalityStatus | TransactionExecutionStatus>;
 };
 
 export type getSimulateTransactionOptions = {
   blockIdentifier?: BlockIdentifier;
   skipValidate?: boolean;
   skipExecute?: boolean;
+  skipFeeCharge?: boolean;
 };
 
 export type getEstimateFeeBulkOptions = {

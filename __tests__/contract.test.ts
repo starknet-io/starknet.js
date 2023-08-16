@@ -1,4 +1,13 @@
-import { BigNumberish, Contract, ContractFactory, RawArgs, json, stark } from '../src';
+import {
+  BigNumberish,
+  Contract,
+  ContractFactory,
+  ParsedEvents,
+  RawArgs,
+  SuccessfulTransactionReceiptResponse,
+  json,
+  stark,
+} from '../src';
 import { CallData } from '../src/utils/calldata';
 import { felt, isCairo1Abi, tuple, uint256 } from '../src/utils/calldata/cairo';
 import { getSelectorFromName } from '../src/utils/hash';
@@ -93,6 +102,51 @@ describe('contract module', () => {
         expect(BigInt(block_number));
         expect(Array.isArray(result));
         (result as BigNumberish[]).forEach((el) => expect(BigInt(el)));
+      });
+    });
+
+    describe('Event Parsing', () => {
+      let erc20Echo20Contract: Contract;
+      const factoryClassHash =
+        '0x011ab8626b891bcb29f7cc36907af7670d6fb8a0528c7944330729d8f01e9ea3'!;
+      let factory: ContractFactory;
+      beforeAll(async () => {
+        factory = new ContractFactory({
+          compiledContract: compiledErc20Echo,
+          classHash: factoryClassHash,
+          account,
+        });
+
+        erc20Echo20Contract = await factory.deploy(
+          'Token',
+          'ERC20',
+          18,
+          uint256('1000000000'),
+          account.address,
+          ['0x823d5a0c0eefdc9a6a1cb0e064079a6284f3b26566b677a32c71bbe7bf9f8c'],
+          22
+        );
+      });
+
+      test('parse legacy event structure', async () => {
+        const to = stark.randomAddress();
+        const amount = uint256(1);
+        const { transaction_hash } = await erc20Echo20Contract.transfer(to, amount);
+        const tx = await provider.waitForTransaction(transaction_hash);
+        const events: ParsedEvents = erc20Echo20Contract.parseEvents(tx);
+        const shouldBe: ParsedEvents = [
+          {
+            Transfer: {
+              from_: BigInt(account.address),
+              to: BigInt(to),
+              value: {
+                low: BigInt(amount.low),
+                high: BigInt(amount.high),
+              },
+            },
+          },
+        ];
+        return expect(events).toStrictEqual(shouldBe);
       });
     });
 
@@ -646,8 +700,7 @@ describe('Complex interaction', () => {
     test('invoke compiled data', async () => {
       const result = await erc20Echo20Contract.iecho(CallData.compile(request));
       const transaction = await provider.waitForTransaction(result.transaction_hash);
-
-      expect(transaction.status).toBeDefined();
+      expect((transaction as SuccessfulTransactionReceiptResponse).execution_status).toBeDefined();
     });
 
     // skip on live for performance
@@ -657,19 +710,19 @@ describe('Complex interaction', () => {
 
       const result = await erc20Echo20Contract.iecho(calldata);
       const transaction = await provider.waitForTransaction(result.transaction_hash);
-      expect(transaction.status).toBeDefined();
+      expect((transaction as SuccessfulTransactionReceiptResponse).execution_status).toBeDefined();
 
       const result1 = await erc20Echo20Contract.iecho(...args);
       const transaction1 = await provider.waitForTransaction(result1.transaction_hash);
-      expect(transaction1.status).toBeDefined();
+      expect((transaction1 as SuccessfulTransactionReceiptResponse).execution_status).toBeDefined();
 
       const result2 = await erc20Echo20Contract.invoke('iecho', calldata);
       const transaction2 = await provider.waitForTransaction(result2.transaction_hash);
-      expect(transaction2.status).toBeDefined();
+      expect((transaction2 as SuccessfulTransactionReceiptResponse).execution_status).toBeDefined();
 
       const result3 = await erc20Echo20Contract.invoke('iecho', args);
       const transaction3 = await provider.waitForTransaction(result3.transaction_hash);
-      expect(transaction3.status).toBeDefined();
+      expect((transaction3 as SuccessfulTransactionReceiptResponse).execution_status).toBeDefined();
     });
 
     describe('speedup live tests', () => {
@@ -722,7 +775,9 @@ describe('Complex interaction', () => {
           { formatResponse }
         );
         const transaction = await provider.waitForTransaction(result.transaction_hash);
-        expect(transaction.status).toBeDefined();
+        expect(
+          (transaction as SuccessfulTransactionReceiptResponse).execution_status
+        ).toBeDefined();
       });
     });
 

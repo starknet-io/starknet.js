@@ -1,5 +1,8 @@
 export { IS_BROWSER } from './utils/encode';
 
+export const HEX_STR_TRANSACTION_VERSION_1 = '0x1';
+export const HEX_STR_TRANSACTION_VERSION_2 = '0x2';
+
 export const ZERO = 0n;
 export const MASK_250 = 2n ** 250n - 1n; // 2 ** 250 - 1
 export const MASK_251 = 2n ** 251n;

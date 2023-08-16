@@ -21,6 +21,7 @@ import {
   DeployAccountContractTransaction,
   DeployContractResponse,
   DeployContractUDCResponse,
+  DeployTransactionReceiptResponse,
   Details,
   EstimateFee,
   EstimateFeeAction,
@@ -399,7 +400,7 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<DeployContractUDCResponse> {
     const deployTx = await this.deploy(payload, details);
     const txReceipt = await this.waitForTransaction(deployTx.transaction_hash);
-    return parseUDCEvent(txReceipt);
+    return parseUDCEvent(txReceipt as DeployTransactionReceiptResponse);
   }
 
   public async declareAndDeploy(
