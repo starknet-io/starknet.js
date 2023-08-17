@@ -6,7 +6,7 @@ sidebar_position: 18
 
 Starknet.js has integrated [Abi-Wan-Kanabi](https://github.com/keep-starknet-strange/abi-wan-kanabi), the standalone TypeScript parser for Cairo smart contracts.
 
-It enables on-the-fly typechecking and autocompletion for contracts call directly in typescript. Developers can now catch typing mistakes early, prior to executing the call on-chain, and thus enhancing the overall Dapp development experience.
+It enables on-the-fly typechecking and autocompletion for contract calls directly in TypeScript. Developers can now catch typing mistakes early, prior to executing a call on-chain, thus enhancing the overall DAPP development experience.
 
 ## Usage
 
