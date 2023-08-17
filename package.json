@@ -90,7 +90,7 @@
   },
   "dependencies": {
     "@noble/curves": "~1.0.0",
-    "abi-wan-kanabi": "^1.0.2",
+    "abi-wan-kanabi": "^1.0.3",
     "isomorphic-fetch": "^3.0.0",
     "lossless-json": "^2.0.8",
     "micro-starknet": "~0.2.1",
