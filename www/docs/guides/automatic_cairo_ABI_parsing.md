@@ -31,7 +31,9 @@ export const tAbi = [
 ] as const;
 ```
 
-Usage in our code:
+Later on, to use it in our code, we have 2 options.
+
+### Option 1
 
 ```js
 import { tAbi } from '../__mocks__/hello';
@@ -46,4 +48,18 @@ For example:
 
 ```js
 const tx = await cairo1Contract.increase_balance(100);
+```
+
+### Option 2
+
+```js
+import { tAbi } from '../__mocks__/hello';
+
+// ...
+
+let cairo1Contract = new Contract(compiledHelloSierra.abi, dd.deploy.contract_address, account);
+
+let cairo1ContractTyped = cairo1Contract.typed(tAbi);
+
+cairo1ContractTyped.test_bool();
 ```
