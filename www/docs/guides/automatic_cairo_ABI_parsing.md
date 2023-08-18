@@ -8,6 +8,10 @@ Starknet.js has integrated [Abi-Wan-Kanabi](https://github.com/keep-starknet-str
 
 It enables on-the-fly typechecking and autocompletion for contract calls directly in TypeScript. Developers can now catch typing mistakes early, prior to executing a call on-chain, thus enhancing the overall DAPP development experience.
 
+## Supported Cairo ABI-s
+
+Please take a look on the Abi-Wan [documentation](https://github.com/keep-starknet-strange/abi-wan-kanabi#cairo-versions) for a list of supported Cairo ABI-s.
+
 ## Usage
 
 First, you need to wrap your ABI in a array and export it as a `const`.
