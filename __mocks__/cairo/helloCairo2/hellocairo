@@ -1,4 +1,4 @@
-// coded with Cairo v2.1.0
+// coded with Cairo v2.0.0
 use array::ArrayTrait;
 use array::SpanTrait;
 use option::OptionTrait;
@@ -154,6 +154,7 @@ trait IHelloStarknet<TContractState> {
         tup: (ContractAddress, EthAddress, ClassHash),
         tupa: (Array<ContractAddress>, Array<EthAddress>, Array<ClassHash>)
     ) -> (Array<ContractAddress>, Array<EthAddress>, Array<ClassHash>);
+    fn array_contract_addr(self: @TContractState, arr:Array<ContractAddress>)->Array<ContractAddress>;
 }
 
 // MAIN APP
@@ -521,7 +522,7 @@ mod HelloStarknet {
                 }
             }
         }
-
+            
         // new types from Cairo
         fn new_types(
             self: @ContractState,
@@ -539,6 +540,10 @@ mod HelloStarknet {
         ) -> (Array<ContractAddress>, Array<EthAddress>, Array<ClassHash>) {
             let (aca, aetha, ach) = tupa;
             (aca, aetha, ach)
+        }
+
+        fn array_contract_addr(self: @ContractState, arr:Array<ContractAddress>)->Array<ContractAddress> {
+            arr
         }
 
         fn new_span(self: @ContractState, my_span: Span<u16>) -> Span<u16> {

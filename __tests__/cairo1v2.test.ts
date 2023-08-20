@@ -229,6 +229,8 @@ describe('Cairo 1 Devnet', () => {
         '1': [78187493521n, 930903n],
         '2': [78187493522n, 930904n],
       });
+      const res2 = await cairo1Contract.call('array_contract_addr', [['0x1234567892', '0xe3458']]);
+      expect(res2).toStrictEqual([78187493522n, 930904n]);
     });
 
     test('Cairo1 simple getStorageAt variables retrieval', async () => {
