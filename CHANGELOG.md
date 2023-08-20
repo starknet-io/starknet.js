@@ -1,3 +1,9 @@
+## [5.19.2](https://github.com/0xs34n/starknet.js/compare/v5.19.1...v5.19.2) (2023-08-20)
+
+### Bug Fixes
+
+- handle ContractAddress array validation ([0748ec6](https://github.com/0xs34n/starknet.js/commit/0748ec61b510d4d2939b1feb8ca19c15740a0f2a))
+
 ## [5.19.1](https://github.com/0xs34n/starknet.js/compare/v5.19.0...v5.19.1) (2023-08-16)
 
 ### Bug Fixes
