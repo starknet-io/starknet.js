@@ -20,7 +20,6 @@ import {
   isLen,
   isTypeArray,
   isTypeBool,
-  isTypeContractAddress,
   isTypeEnum,
   isTypeFelt,
   isTypeLitteral,
@@ -236,7 +235,7 @@ const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs, enu
     case isTypeEnum(baseType, enums):
       parameter.forEach((it: any) => validateEnum(it, { name: input.name, type: baseType }));
       break;
-    case isTypeUint(baseType):
+    case isTypeUint(baseType) || isTypeLitteral(baseType):
       parameter.forEach((param: BigNumberish) => validateUint(param, input));
       break;
     case isTypeBool(baseType):
@@ -269,9 +268,6 @@ export default function validateFields(
         break;
       case isTypeBool(input.type):
         validateBool(parameter, input);
-        break;
-      case isTypeContractAddress(input.type):
-        // TODO: ??
         break;
       case isTypeArray(input.type):
         validateArray(parameter, input, structs, enums);
