@@ -1,3 +1,9 @@
+## [5.19.3](https://github.com/0xs34n/starknet.js/compare/v5.19.2...v5.19.3) (2023-08-22)
+
+### Bug Fixes
+
+- expose event parsing utilities ([50cb64c](https://github.com/0xs34n/starknet.js/commit/50cb64cadc9a382a336e20e25bdf65814efca332))
+
 ## [5.19.2](https://github.com/0xs34n/starknet.js/compare/v5.19.1...v5.19.2) (2023-08-20)
 
 ### Bug Fixes
