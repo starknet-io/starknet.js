@@ -28,6 +28,7 @@ export * as ec from './utils/ec';
 export * as starknetId from './utils/starknetId';
 export * as provider from './utils/provider';
 export * as selector from './utils/selector';
+export * as events from './utils/events/index';
 export * from './utils/address';
 export * from './utils/url';
 export * from './utils/calldata';
