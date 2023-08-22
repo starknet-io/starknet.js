@@ -1,6 +1,6 @@
 ---
 id: 'modules'
-title: 'Starknet.js API - v5.19.1'
+title: 'Starknet.js API - v5.19.2'
 sidebar_label: 'Exports'
 sidebar_position: 0.5
 custom_edit_url: null
@@ -24,6 +24,7 @@ custom_edit_url: null
 - [starknetId](namespaces/starknetId.md)
 - [provider](namespaces/provider-1.md)
 - [selector](namespaces/selector.md)
+- [events](namespaces/events.md)
 - [cairo](namespaces/cairo.md)
 
 ## Enumerations
@@ -1034,7 +1035,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/index.ts:45](https://github.com/0xs34n/starknet.js/blob/develop/src/index.ts#L45)
+[src/index.ts:46](https://github.com/0xs34n/starknet.js/blob/develop/src/index.ts#L46)
 
 ---
 
