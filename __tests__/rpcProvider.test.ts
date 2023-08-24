@@ -1,4 +1,4 @@
-import { getStarkKey, utils } from 'micro-starknet';
+import { getStarkKey, utils } from '@scure/starknet';
 
 import { Account, Contract, GetBlockResponse, RpcProvider, stark } from '../src';
 import { StarknetChainId } from '../src/constants';

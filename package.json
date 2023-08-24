@@ -89,11 +89,11 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@noble/curves": "~1.0.0",
+    "@noble/curves": "~1.2.0",
+    "@scure/starknet": "~0.3.0",
     "abi-wan-kanabi": "^1.0.3",
     "isomorphic-fetch": "^3.0.0",
     "lossless-json": "^2.0.8",
-    "micro-starknet": "~0.2.1",
     "pako": "^2.0.4",
     "url-join": "^4.0.1"
   },
