@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable import/extensions */
-import { poseidonHashMany } from 'micro-starknet';
+import { poseidonHashMany } from '@scure/starknet';
 
 import { API_VERSION, StarknetChainId, TransactionHashPrefix } from '../constants';
 import {

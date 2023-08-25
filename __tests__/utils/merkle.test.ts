@@ -1,4 +1,4 @@
-import { pedersen } from 'micro-starknet';
+import { pedersen } from '@scure/starknet';
 
 import { MerkleTree, proofMerklePath } from '../../src/utils/merkle';
 

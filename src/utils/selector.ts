@@ -1,4 +1,4 @@
-import { keccak } from 'micro-starknet';
+import { keccak } from '@scure/starknet';
 
 import { MASK_250 } from '../constants';
 import { BigNumberish } from '../types';
