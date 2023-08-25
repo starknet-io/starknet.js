@@ -123,6 +123,16 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:86
 
 ---
 
+### RecoveredSignatureType
+
+Ƭ **RecoveredSignatureType**: [`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md) & { `recovery`: `number` }
+
+#### Defined in
+
+node_modules/@noble/curves/abstract/weierstrass.d.ts:154
+
+---
+
 ### SignatureConstructor
 
 Ƭ **SignatureConstructor**: `Object`
@@ -151,7 +161,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:86
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:154
+node_modules/@noble/curves/abstract/weierstrass.d.ts:157
 
 ---
 
@@ -161,7 +171,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:154
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:163
+node_modules/@noble/curves/abstract/weierstrass.d.ts:166
 
 ---
 
@@ -171,7 +181,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:163
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:164
+node_modules/@noble/curves/abstract/weierstrass.d.ts:167
 
 ---
 
@@ -186,7 +196,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:164
 | `CURVE`                        | `ReturnType`<typeof `validateOpts`\>                                                                                                                                                                                                                                                                                                                                                |
 | `getPublicKey`                 | (`privateKey`: `PrivKey`, `isCompressed?`: `boolean`) => `Uint8Array`                                                                                                                                                                                                                                                                                                               |
 | `getSharedSecret`              | (`privateA`: `PrivKey`, `publicB`: `Hex`, `isCompressed?`: `boolean`) => `Uint8Array`                                                                                                                                                                                                                                                                                               |
-| `sign`                         | (`msgHash`: `Hex`, `privKey`: `PrivKey`, `opts?`: [`SignOpts`](ec.weierstrass.md#signopts)) => [`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md)                                                                                                                                                                                                                     |
+| `sign`                         | (`msgHash`: `Hex`, `privKey`: `PrivKey`, `opts?`: [`SignOpts`](ec.weierstrass.md#signopts)) => [`RecoveredSignatureType`](ec.weierstrass.md#recoveredsignaturetype)                                                                                                                                                                                                                 |
 | `verify`                       | (`signature`: `Hex` \| `SignatureLike`, `msgHash`: `Hex`, `publicKey`: `Hex`, `opts?`: [`VerOpts`](ec.weierstrass.md#veropts)) => `boolean`                                                                                                                                                                                                                                         |
 | `ProjectivePoint`              | [`ProjConstructor`](../interfaces/ec.weierstrass.ProjConstructor.md)<`bigint`\>                                                                                                                                                                                                                                                                                                     |
 | `Signature`                    | [`SignatureConstructor`](ec.weierstrass.md#signatureconstructor)                                                                                                                                                                                                                                                                                                                    |
@@ -198,7 +208,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:164
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:197
+node_modules/@noble/curves/abstract/weierstrass.d.ts:200
 
 ## Variables
 
@@ -271,13 +281,18 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:113
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:212
+node_modules/@noble/curves/abstract/weierstrass.d.ts:215
 
 ---
 
 ### SWUFpSqrtRatio
 
 ▸ **SWUFpSqrtRatio**<`T`\>(`Fp`, `Z`): (`u`: `T`, `v`: `T`) => { `isValid`: `boolean` ; `value`: `T` }
+
+Implementation of the Shallue and van de Woestijne method for any weierstrass curve.
+TODO: check if there is a way to merge this with uvRatio in Edwards; move to modular.
+b = True and y = sqrt(u / v) if (u / v) is square in F, and
+b = False and y = sqrt(Z \* (u / v)) otherwise.
 
 #### Type parameters
 
@@ -316,13 +331,16 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:212
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:213
+node_modules/@noble/curves/abstract/weierstrass.d.ts:225
 
 ---
 
 ### mapToCurveSimpleSWU
 
 ▸ **mapToCurveSimpleSWU**<`T`\>(`Fp`, `opts`): (`u`: `T`) => { `x`: `T` ; `y`: `T` }
+
+Simplified Shallue-van de Woestijne-Ulas Method
+https://www.rfc-editor.org/rfc/rfc9380#section-6.6.2
 
 #### Type parameters
 
@@ -363,4 +381,4 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:213
 
 #### Defined in
 
-node_modules/@noble/curves/abstract/weierstrass.d.ts:217
+node_modules/@noble/curves/abstract/weierstrass.d.ts:233
