@@ -457,8 +457,12 @@ export class RpcProvider implements ProviderInterface {
         txReceipt = await this.getTransactionReceipt(txHash);
 
         // TODO: Hotfix until Pathfinder release fixed casing
-        const executionStatus = pascalToSnake(txReceipt.execution_status);
-        const finalityStatus = pascalToSnake(txReceipt.finality_status);
+        let executionStatus = txReceipt.execution_status;
+        let finalityStatus = txReceipt.finality_status;
+        if (/[a-z]/.test(txReceipt.execution_status)) {
+          executionStatus = pascalToSnake(txReceipt.execution_status);
+          finalityStatus = pascalToSnake(txReceipt.finality_status);
+        }
 
         if (!executionStatus || !finalityStatus) {
           // Transaction is potentially REJECTED or NOT_RECEIVED but RPC doesn't have dose statuses
