@@ -80,7 +80,7 @@ export function utf8ToArray(str: string): Uint8Array {
  * @returns string
  */
 export const pascalToSnake = (text: string) =>
-  !/[a-z]/.test(text)
+  /[a-z]/.test(text)
     ? text
         .split(/(?=[A-Z])/)
         .join('_')
