@@ -163,7 +163,9 @@ describe('Cairo 1 Devnet', () => {
       const myCall0 = cairo1Contract.populate('test_u256', functionParameters);
       const res0 = await cairo1Contract.test_u256(myCall0.calldata);
       expect(res0).toBe(16n);
-
+      const myCall0a = cairo1Contract.populate('test_u256', { p1: 15 });
+      const res0a = await cairo1Contract.test_u256(myCall0a.calldata);
+      expect(res0a).toBe(16n);
       // using myCallData.compile result in meta-class
       const contractCallData: CallData = new CallData(cairo1Contract.abi);
       const myCalldata: Calldata = contractCallData.compile('test_u256', functionParameters);

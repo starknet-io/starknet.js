@@ -1,3 +1,10 @@
+## [5.19.4](https://github.com/0xs34n/starknet.js/compare/v5.19.3...v5.19.4) (2023-08-29)
+
+### Bug Fixes
+
+- use BigNumberish for u256 ([3a7be10](https://github.com/0xs34n/starknet.js/commit/3a7be1075b0ca4f217cf28aabaa870c93c08f6d1))
+- waitForTransaction for Infura ([c871fe6](https://github.com/0xs34n/starknet.js/commit/c871fe65a0b08e368218f51327cd64591f2b7f49))
+
 ## [5.19.3](https://github.com/0xs34n/starknet.js/compare/v5.19.2...v5.19.3) (2023-08-22)
 
 ### Bug Fixes

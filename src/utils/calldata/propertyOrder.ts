@@ -47,11 +47,6 @@ export default function orderPropsByAbi(
     if (isTypeEthAddress(abiType)) {
       return unorderedItem;
     }
-    if (isTypeStruct(abiType, structs)) {
-      const abiOfStruct = structs[abiType].members;
-      // eslint-disable-next-line @typescript-eslint/no-use-before-define
-      return orderStruct(unorderedItem, abiOfStruct);
-    }
     if (isTypeUint256(abiType)) {
       const u256 = unorderedItem;
       if (typeof u256 !== 'object') {
@@ -62,6 +57,11 @@ export default function orderPropsByAbi(
         throw errorU256(abiType);
       }
       return { low: u256.low, high: u256.high };
+    }
+    if (isTypeStruct(abiType, structs)) {
+      const abiOfStruct = structs[abiType].members;
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      return orderStruct(unorderedItem, abiOfStruct);
     }
     // litterals
     return unorderedItem;
