@@ -6,6 +6,7 @@ import { CallData } from '../src/utils/calldata';
 import { felt, uint256 } from '../src/utils/calldata/cairo';
 import { toHexString } from '../src/utils/num';
 import {
+  compiledErc20,
   compiledErc20Echo,
   compiledOpenZeppelinAccount,
   describeIfDevnet,
@@ -14,6 +15,11 @@ import {
   getTestAccount,
   getTestProvider,
 } from './fixtures';
+import {
+  Invocation,
+  InvocationsDetailsWithNonce,
+  EstimateFeeResponse,
+} from '../src/types';
 import { initializeMatcher } from './schema';
 
 describeIfRpc('RPCProvider', () => {
@@ -98,6 +104,29 @@ describeIfRpc('RPCProvider', () => {
       );
       expect(transaction).toHaveProperty('transaction_hash');
     });
+
+    test('getInvokeEstimateFee', async () => {
+      const fetchSpy = jest.spyOn(rpcProvider as any, 'fetchEndpoint');
+
+      const randomWallet = stark.randomAddress();
+      const invocation: Invocation = {
+        contractAddress: randomWallet,
+        entrypoint: 'transfer',
+        calldata: [randomWallet, '10', '0'],
+        signature: [],
+      }
+      const invocationDetails: InvocationsDetailsWithNonce = {
+        ...invocation,
+        nonce: '',
+      }
+      const transaction = await rpcProvider.getInvokeEstimateFee(
+        invocation,
+        invocationDetails,
+        latestBlock.block_number,
+      );
+      expect(fetchSpy).toHaveBeenCalledWith('starknet_estimateFee', expect.anything());
+    });
+
 
     xtest('traceBlockTransactions', async () => {
       await rpcProvider.traceBlockTransactions(latestBlock.block_hash);
