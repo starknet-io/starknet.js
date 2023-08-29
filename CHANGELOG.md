@@ -1,3 +1,9 @@
+## [5.19.5](https://github.com/0xs34n/starknet.js/compare/v5.19.4...v5.19.5) (2023-08-29)
+
+### Bug Fixes
+
+- status case ([5ba7983](https://github.com/0xs34n/starknet.js/commit/5ba798309d2c8567840b8f6a6031ec0e6b582d53))
+
 ## [5.19.4](https://github.com/0xs34n/starknet.js/compare/v5.19.3...v5.19.4) (2023-08-29)
 
 ### Bug Fixes
