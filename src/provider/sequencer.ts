@@ -71,7 +71,10 @@ const defaultOptions = {
   network: NetworkName.SN_GOERLI2,
   blockIdentifier: BlockTag.pending,
 };
-
+/**
+ * @deprecated Feeder gateway will be removed during October 2023, as Network is switching to P2P Nodes.
+ * Use RPC Provider or Default provider (Default provider will be RPC Provider with public nodes and common interface/response)
+ */
 export class SequencerProvider implements ProviderInterface {
   public baseUrl: string;
 
