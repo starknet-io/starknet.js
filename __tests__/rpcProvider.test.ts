@@ -114,19 +114,18 @@ describeIfRpc('RPCProvider', () => {
         entrypoint: 'transfer',
         calldata: [randomWallet, '10', '0'],
         signature: [],
-      }
+      };
       const invocationDetails: InvocationsDetailsWithNonce = {
         ...invocation,
         nonce: '',
-      }
-      const transaction = await rpcProvider.getInvokeEstimateFee(
+      };
+      await rpcProvider.getInvokeEstimateFee(
         invocation,
         invocationDetails,
         latestBlock.block_number,
       );
       expect(fetchSpy).toHaveBeenCalledWith('starknet_estimateFee', expect.anything());
     });
-
 
     xtest('traceBlockTransactions', async () => {
       await rpcProvider.traceBlockTransactions(latestBlock.block_hash);
