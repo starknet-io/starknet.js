@@ -45,6 +45,14 @@ const account = new Account(provider, accountAddress, privateKey);
 
 Your account is now connected, and you can use it.
 
+> **IMPORTANT :** If this account is based on a Cairo v2 contract (for example OpenZeppelin account 0.7.0 or later), do not forget to add the parameter "1" after the privateKey parameter :
+
+```typescript
+const account = new Account(provider, accountAddress, privateKey, "1");
+```
+
+> Take care that this added parameter is a string, NOT a number.
+
 ## 👛 Connect to an existing account (in any network)
 
 The code is the same, you just have to:
@@ -66,4 +74,6 @@ const privateKey = process.env.OZ_NEW_ACCOUNT_PRIVKEY;
 const accountAddress = "0x051158d244c7636dde39ec822873b29e6c9a758c6a9812d005b6287564908667";
 
 const account = new Account(provider, accountAddress, privateKey);
+// add ,"1" after privateKey if this account is not a Cairo 0 contract
+
 ```
