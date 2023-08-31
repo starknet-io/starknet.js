@@ -1,5 +1,7 @@
 import {
   Abi,
+  AbstractionHashs,
+  AbstractionSigns,
   Call,
   DeclareSignerDetails,
   DeployAccountSignerDetails,
@@ -23,8 +25,22 @@ import { SignerInterface } from './interface';
 export class Signer implements SignerInterface {
   protected pk: Uint8Array | string;
 
-  constructor(pk: Uint8Array | string = starkCurve.utils.randomPrivateKey()) {
+  abstractionSigns: AbstractionSigns | undefined;
+
+  abstractionHashs: AbstractionHashs | undefined;
+
+  /**
+   * Creation of a Signer Object
+   * @param pk Private key : string or Uint8Array
+   */
+  constructor(
+    pk: Uint8Array | string = starkCurve.utils.randomPrivateKey(),
+    abstractedSigns?: AbstractionSigns,
+    abstractedHashs?: AbstractionHashs
+  ) {
     this.pk = pk instanceof Uint8Array ? buf2hex(pk) : toHex(pk);
+    this.abstractionSigns = abstractedSigns;
+    this.abstractionHashs = abstractedHashs;
   }
 
   public async getPubKey(): Promise<string> {

@@ -22,6 +22,20 @@ export interface DeclareSignerDetails {
   compiledClassHash?: string;
 }
 
+export interface AbstractionSigns {
+  abstractedTransactionSign?: Function;
+  abstractedAccountDeploySign?: Function;
+  abstractedContractDeploySign?: Function;
+  abstractedMessageSign?: Function;
+}
+
+export interface AbstractionHashs {
+  abstractedTransactionHash?: Function;
+  abstractedAccountDeployHash?: Function;
+  abstractedContractDeployHash?: Function;
+  abstractedMessageHash?: Function;
+}
+
 export type DeployAccountSignerDetails = Required<DeployAccountContractPayload> &
   Required<InvocationsDetails> & {
     contractAddress: BigNumberish;
