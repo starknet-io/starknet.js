@@ -85,6 +85,14 @@ await provider.waitForTransaction(transaction_hash);
 console.log('✅ New OpenZeppelin account created.\n   address =', contract_address);
 ```
 
+> **IMPORTANT :** If this account is based on a Cairo v2 contract (for example OpenZeppelin account 0.7.0 or later), do not forget to add the parameter "1" after the privateKey parameter :
+
+```typescript
+const OZaccount = new Account(provider, OZcontractAddress, privateKey, "1");
+```
+
+> Take care that this added parameter is a string, NOT a number.
+
 ## Create an Argent account
 
 > Level: medium.
@@ -264,6 +272,7 @@ const provider = new Provider({ sequencer: { network: "http://127.0.0.1:5050" } 
 const privateKey0 = "0xe3e70682c2094cac629f6fbed82c07cd";
 const accountAddress0 = "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a";
 const account0 = new Account(provider, accountAddress0, privateKey0);
+// add ,"1" after privateKey0 if this account is not a Cairo 0 contract
 
 // new account abstraction
 // Generate public and private key pair.
@@ -298,6 +307,7 @@ console.log('Answer mint =', answer);
 
 // deploy account
 const AAaccount = new Account(provider, AAcontractAddress, AAprivateKey);
+// add ,"1" after AAprivateKey if this account is not a Cairo 0 contract
 const { transaction_hash, contract_address } = await AAaccount.deployAccount({
     classHash: AAaccountClassHash,
     constructorCalldata: AAaccountConstructorCallData,
