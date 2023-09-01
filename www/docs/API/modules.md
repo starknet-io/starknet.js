@@ -1,6 +1,6 @@
 ---
 id: 'modules'
-title: 'Starknet.js API - v5.19.3'
+title: 'Starknet.js API - v5.19.5'
 sidebar_label: 'Exports'
 sidebar_position: 0.5
 custom_edit_url: null
