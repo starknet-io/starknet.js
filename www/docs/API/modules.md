@@ -1,6 +1,6 @@
 ---
 id: 'modules'
-title: 'Starknet.js API - v5.14.1'
+title: 'Starknet.js API - v5.19.5'
 sidebar_label: 'Exports'
 sidebar_position: 0.5
 custom_edit_url: null
@@ -24,7 +24,13 @@ custom_edit_url: null
 - [starknetId](namespaces/starknetId.md)
 - [provider](namespaces/provider-1.md)
 - [selector](namespaces/selector.md)
+- [events](namespaces/events.md)
 - [cairo](namespaces/cairo.md)
+
+## Enumerations
+
+- [CairoOptionVariant](enums/CairoOptionVariant.md)
+- [CairoResultVariant](enums/CairoResultVariant.md)
 
 ## Classes
 
@@ -44,8 +50,65 @@ custom_edit_url: null
 - [SignerInterface](classes/SignerInterface.md)
 - [Signer](classes/Signer.md)
 - [CallData](classes/CallData.md)
+- [CairoCustomEnum](classes/CairoCustomEnum.md)
+- [CairoOption](classes/CairoOption.md)
+- [CairoResult](classes/CairoResult.md)
 
 ## References
+
+### RPC
+
+Re-exports [RPC](namespaces/types.RPC.md)
+
+---
+
+### CallL1Handler
+
+Re-exports [CallL1Handler](namespaces/types.md#calll1handler)
+
+---
+
+### DeployedContractItem
+
+Re-exports [DeployedContractItem](namespaces/types.md#deployedcontractitem)
+
+---
+
+### ExecutionResources
+
+Re-exports [ExecutionResources](namespaces/types.md#executionresources)
+
+---
+
+### FunctionInvocation
+
+Re-exports [FunctionInvocation](namespaces/types.md#functioninvocation)
+
+---
+
+### GetContractAddressesResponse
+
+Re-exports [GetContractAddressesResponse](namespaces/types.md#getcontractaddressesresponse)
+
+---
+
+### GetTransactionStatusResponse
+
+Re-exports [GetTransactionStatusResponse](namespaces/types.md#gettransactionstatusresponse)
+
+---
+
+### SequencerIdentifier
+
+Re-exports [SequencerIdentifier](namespaces/types.md#sequenceridentifier)
+
+---
+
+### Sequencer
+
+Re-exports [Sequencer](namespaces/types.Sequencer.md)
+
+---
 
 ### EstimateFee
 
@@ -107,6 +170,24 @@ Re-exports [SIMULATION_FLAG](enums/types.SIMULATION_FLAG.md)
 
 ---
 
+### ValidateType
+
+Re-exports [ValidateType](enums/types.ValidateType.md)
+
+---
+
+### Uint
+
+Re-exports [Uint](enums/types.Uint.md)
+
+---
+
+### Litteral
+
+Re-exports [Litteral](enums/types.Litteral.md)
+
+---
+
 ### AsyncContractFunction
 
 Re-exports [AsyncContractFunction](namespaces/types.md#asynccontractfunction)
@@ -122,12 +203,6 @@ Re-exports [ContractFunction](namespaces/types.md#contractfunction)
 ### Result
 
 Re-exports [Result](namespaces/types.md#result)
-
----
-
-### Calldata
-
-Re-exports [Calldata](namespaces/types.md#calldata)
 
 ---
 
@@ -161,6 +236,18 @@ Re-exports [InvokeOptions](namespaces/types.md#invokeoptions)
 
 ---
 
+### ParsedEvent
+
+Re-exports [ParsedEvent](namespaces/types.md#parsedevent)
+
+---
+
+### ParsedEvents
+
+Re-exports [ParsedEvents](namespaces/types.md#parsedevents)
+
+---
+
 ### WeierstrassSignatureType
 
 Re-exports [WeierstrassSignatureType](namespaces/types.md#weierstrasssignaturetype)
@@ -182,6 +269,12 @@ Re-exports [Signature](namespaces/types.md#signature)
 ### BigNumberish
 
 Re-exports [BigNumberish](namespaces/types.md#bignumberish)
+
+---
+
+### Calldata
+
+Re-exports [Calldata](namespaces/types.md#calldata)
 
 ---
 
@@ -242,12 +335,6 @@ Re-exports [MultiType](namespaces/types.md#multitype)
 ### UniversalDeployerContractPayload
 
 Re-exports [UniversalDeployerContractPayload](namespaces/types.md#universaldeployercontractpayload)
-
----
-
-### DeployContractPayload
-
-Re-exports [DeployContractPayload](namespaces/types.md#deploycontractpayload)
 
 ---
 
@@ -329,9 +416,51 @@ Re-exports [InvocationsDetailsWithNonce](namespaces/types.md#invocationsdetailsw
 
 ---
 
+### TransactionType
+
+Re-exports [TransactionType](enums/types.TransactionType.md)
+
+---
+
 ### TransactionStatus
 
 Re-exports [TransactionStatus](enums/types.TransactionStatus.md)
+
+---
+
+### TransactionFinalityStatus
+
+Re-exports [TransactionFinalityStatus](enums/types.TransactionFinalityStatus.md)
+
+---
+
+### TransactionExecutionStatus
+
+Re-exports [TransactionExecutionStatus](enums/types.TransactionExecutionStatus.md)
+
+---
+
+### BlockStatus
+
+Re-exports [BlockStatus](enums/types.BlockStatus.md)
+
+---
+
+### BlockTag
+
+Re-exports [BlockTag](enums/types.BlockTag.md)
+
+---
+
+### BlockNumber
+
+Re-exports [BlockNumber](namespaces/types.md#blocknumber)
+
+---
+
+### BlockIdentifier
+
+Re-exports [BlockIdentifier](namespaces/types.md#blockidentifier)
 
 ---
 
@@ -353,45 +482,9 @@ Re-exports [Invocations](namespaces/types.md#invocations)
 
 ---
 
-### Status
-
-Re-exports [Status](namespaces/types.md#status)
-
----
-
-### TransactionType
-
-Re-exports [TransactionType](enums/types.TransactionType.md)
-
----
-
 ### Tupled
 
 Re-exports [Tupled](namespaces/types.md#tupled)
-
----
-
-### BlockTag
-
-Re-exports [BlockTag](namespaces/types.md#blocktag)
-
----
-
-### BlockNumber
-
-Re-exports [BlockNumber](namespaces/types.md#blocknumber)
-
----
-
-### BlockIdentifier
-
-Re-exports [BlockIdentifier](namespaces/types.md#blockidentifier)
-
----
-
-### Struct
-
-Re-exports [Struct](namespaces/types.md#struct)
 
 ---
 
@@ -467,6 +560,12 @@ Re-exports [AbiEntry](namespaces/types.md#abientry)
 
 ---
 
+### EventEntry
+
+Re-exports [EventEntry](namespaces/types.md#evententry)
+
+---
+
 ### FunctionAbi
 
 Re-exports [FunctionAbi](namespaces/types.md#functionabi)
@@ -482,6 +581,42 @@ Re-exports [AbiStructs](namespaces/types.md#abistructs)
 ### StructAbi
 
 Re-exports [StructAbi](namespaces/types.md#structabi)
+
+---
+
+### AbiEnums
+
+Re-exports [AbiEnums](namespaces/types.md#abienums)
+
+---
+
+### EnumAbi
+
+Re-exports [EnumAbi](namespaces/types.md#enumabi)
+
+---
+
+### AbiEvents
+
+Re-exports [AbiEvents](namespaces/types.md#abievents)
+
+---
+
+### EventAbi
+
+Re-exports [EventAbi](namespaces/types.md#eventabi)
+
+---
+
+### Cairo1Event
+
+Re-exports [Cairo1Event](namespaces/types.md#cairo1event)
+
+---
+
+### LegacyEvent
+
+Re-exports [LegacyEvent](namespaces/types.md#legacyevent)
 
 ---
 
@@ -617,6 +752,12 @@ Re-exports [GetCodeResponse](interfaces/types.GetCodeResponse.md)
 
 ---
 
+### ContractEntryPoint
+
+Re-exports [ContractEntryPoint](interfaces/types.ContractEntryPoint.md)
+
+---
+
 ### GetTransactionResponse
 
 Re-exports [GetTransactionResponse](namespaces/types.md#gettransactionresponse)
@@ -635,27 +776,9 @@ Re-exports [InvokeTransactionResponse](interfaces/types.InvokeTransactionRespons
 
 ---
 
-### ContractEntryPoint
-
-Re-exports [ContractEntryPoint](interfaces/types.ContractEntryPoint.md)
-
----
-
 ### DeclareTransactionResponse
 
 Re-exports [DeclareTransactionResponse](interfaces/types.DeclareTransactionResponse.md)
-
----
-
-### GetTransactionReceiptResponse
-
-Re-exports [GetTransactionReceiptResponse](namespaces/types.md#gettransactionreceiptresponse)
-
----
-
-### CommonTransactionReceiptResponse
-
-Re-exports [CommonTransactionReceiptResponse](interfaces/types.CommonTransactionReceiptResponse.md)
 
 ---
 
@@ -677,6 +800,24 @@ Re-exports [MessageToL2](interfaces/types.MessageToL2.md)
 
 ---
 
+### RejectedTransactionResponse
+
+Re-exports [RejectedTransactionResponse](namespaces/types.md#rejectedtransactionresponse)
+
+---
+
+### GetTransactionReceiptResponse
+
+Re-exports [GetTransactionReceiptResponse](namespaces/types.md#gettransactionreceiptresponse)
+
+---
+
+### SuccessfulTransactionReceiptResponse
+
+Re-exports [SuccessfulTransactionReceiptResponse](namespaces/types.md#successfultransactionreceiptresponse)
+
+---
+
 ### InvokeTransactionReceiptResponse
 
 Re-exports [InvokeTransactionReceiptResponse](interfaces/types.InvokeTransactionReceiptResponse.md)
@@ -686,6 +827,24 @@ Re-exports [InvokeTransactionReceiptResponse](interfaces/types.InvokeTransaction
 ### DeclareTransactionReceiptResponse
 
 Re-exports [DeclareTransactionReceiptResponse](namespaces/types.md#declaretransactionreceiptresponse)
+
+---
+
+### DeployTransactionReceiptResponse
+
+Re-exports [DeployTransactionReceiptResponse](namespaces/types.md#deploytransactionreceiptresponse)
+
+---
+
+### RejectedTransactionReceiptResponse
+
+Re-exports [RejectedTransactionReceiptResponse](namespaces/types.md#rejectedtransactionreceiptresponse)
+
+---
+
+### RevertedTransactionReceiptResponse
+
+Re-exports [RevertedTransactionReceiptResponse](namespaces/types.md#revertedtransactionreceiptresponse)
 
 ---
 
@@ -809,57 +968,60 @@ Re-exports [TypedData](interfaces/types.TypedData.md)
 
 ---
 
-### GetTransactionStatusResponse
+### CairoEnum
 
-Re-exports [GetTransactionStatusResponse](namespaces/types.md#gettransactionstatusresponse)
+Re-exports [CairoEnum](namespaces/types.md#cairoenum)
 
----
+## Type Aliases
 
-### GetContractAddressesResponse
+### TypedContract
 
-Re-exports [GetContractAddressesResponse](namespaces/types.md#getcontractaddressesresponse)
+Ƭ **TypedContract**<`TAbi`\>: `AbiWanTypedContract`<`TAbi`\> & [`ContractInterface`](classes/ContractInterface.md)
 
----
+#### Type parameters
 
-### FunctionInvocation
+| Name   | Type                |
+| :----- | :------------------ |
+| `TAbi` | extends `AbiKanabi` |
 
-Re-exports [FunctionInvocation](namespaces/types.md#functioninvocation)
+#### Defined in
 
----
-
-### ExecutionResources
-
-Re-exports [ExecutionResources](namespaces/types.md#executionresources)
+[src/contract/interface.ts:21](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L21)
 
 ---
 
-### CallL1Handler
+### ContractFactoryParams
 
-Re-exports [CallL1Handler](namespaces/types.md#calll1handler)
+Ƭ **ContractFactoryParams**: `Object`
 
----
+#### Type declaration
 
-### DeployedContractItem
+| Name                 | Type                                                       |
+| :------------------- | :--------------------------------------------------------- |
+| `compiledContract`   | [`CompiledContract`](namespaces/types.md#compiledcontract) |
+| `account`            | `any`                                                      |
+| `casm?`              | [`CairoAssembly`](namespaces/types.md#cairoassembly)       |
+| `classHash?`         | `string`                                                   |
+| `compiledClassHash?` | `string`                                                   |
+| `abi?`               | [`Abi`](namespaces/types.md#abi)                           |
 
-Re-exports [DeployedContractItem](namespaces/types.md#deployedcontractitem)
+#### Defined in
 
----
-
-### SequencerIdentifier
-
-Re-exports [SequencerIdentifier](namespaces/types.md#sequenceridentifier)
-
----
-
-### Sequencer
-
-Re-exports [Sequencer](namespaces/types.Sequencer.md)
+[src/contract/contractFactory.ts:13](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L13)
 
 ---
 
-### RPC
+### CairoEnumRaw
 
-Re-exports [RPC](namespaces/types.RPC.md)
+Ƭ **CairoEnumRaw**: `Object`
+
+#### Index signature
+
+▪ [key: `string`]: `any`
+
+#### Defined in
+
+[src/utils/calldata/enum/CairoCustomEnum.ts:1](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/enum/CairoCustomEnum.ts#L1)
 
 ## Variables
 
@@ -873,7 +1035,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/index.ts:44](https://github.com/0xs34n/starknet.js/blob/develop/src/index.ts#L44)
+[src/index.ts:46](https://github.com/0xs34n/starknet.js/blob/develop/src/index.ts#L46)
 
 ---
 
@@ -904,7 +1066,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/contract/default.ts:98](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L98)
+[src/contract/default.ts:108](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L108)
 
 ---
 
@@ -924,7 +1086,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/contract/default.ts:25](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L25)
+[src/contract/default.ts:35](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L35)
 
 ---
 
@@ -1177,17 +1339,17 @@ create DeployContractResponse compatibile response with adition of UDC Event dat
 
 DeployContractResponse | UDC Event Response data
 
-| Name               | Type       |
-| :----------------- | :--------- |
-| `transaction_hash` | `string`   |
-| `contract_address` | `string`   |
-| `address`          | `string`   |
-| `deployer`         | `string`   |
-| `unique`           | `string`   |
-| `classHash`        | `string`   |
-| `calldata_len`     | `string`   |
-| `calldata`         | `string`[] |
-| `salt`             | `string`   |
+| Name               | Type     |
+| :----------------- | :------- |
+| `transaction_hash` | `string` |
+| `contract_address` | `any`    |
+| `address`          | `any`    |
+| `deployer`         | `any`    |
+| `unique`           | `any`    |
+| `classHash`        | `any`    |
+| `calldata_len`     | `any`    |
+| `calldata`         | `any`    |
+| `salt`             | `any`    |
 
 #### Defined in
 

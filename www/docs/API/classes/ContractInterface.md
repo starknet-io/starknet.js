@@ -28,7 +28,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:18](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L18)
+[src/contract/interface.ts:24](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L24)
 
 ---
 
@@ -38,7 +38,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:20](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L20)
+[src/contract/interface.ts:26](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L26)
 
 ---
 
@@ -48,7 +48,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L22)
+[src/contract/interface.ts:28](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L28)
 
 ---
 
@@ -58,7 +58,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:24](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L24)
+[src/contract/interface.ts:30](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L30)
 
 ---
 
@@ -72,7 +72,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:26](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L26)
+[src/contract/interface.ts:32](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L32)
 
 ---
 
@@ -86,7 +86,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:28](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L28)
+[src/contract/interface.ts:34](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L34)
 
 ---
 
@@ -100,7 +100,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:30](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L30)
+[src/contract/interface.ts:36](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L36)
 
 ---
 
@@ -114,7 +114,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:32](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L32)
+[src/contract/interface.ts:38](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L38)
 
 ## Methods
 
@@ -136,7 +136,7 @@ Saves the address of the contract deployed on network that will be used for inte
 
 #### Defined in
 
-[src/contract/interface.ts:41](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L41)
+[src/contract/interface.ts:47](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L47)
 
 ---
 
@@ -158,7 +158,7 @@ Attaches to new Provider or Account
 
 #### Defined in
 
-[src/contract/interface.ts:48](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L48)
+[src/contract/interface.ts:54](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L54)
 
 ---
 
@@ -180,7 +180,7 @@ Promise that resolves when contract is deployed on the network or when no deploy
 
 #### Defined in
 
-[src/contract/interface.ts:56](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L56)
+[src/contract/interface.ts:62](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L62)
 
 ---
 
@@ -206,7 +206,7 @@ Result of the call as an array with key value pars
 
 #### Defined in
 
-[src/contract/interface.ts:66](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L66)
+[src/contract/interface.ts:72](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L72)
 
 ---
 
@@ -232,7 +232,7 @@ Add Transaction Response
 
 #### Defined in
 
-[src/contract/interface.ts:80](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L80)
+[src/contract/interface.ts:86](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L86)
 
 ---
 
@@ -257,7 +257,7 @@ Estimates a method on a contract
 
 #### Defined in
 
-[src/contract/interface.ts:93](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L93)
+[src/contract/interface.ts:99](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L99)
 
 ---
 
@@ -282,7 +282,31 @@ Invocation object
 
 #### Defined in
 
-[src/contract/interface.ts:108](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L108)
+[src/contract/interface.ts:114](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L114)
+
+---
+
+### parseEvents
+
+▸ `Abstract` **parseEvents**(`receipt`): [`ParsedEvents`](../namespaces/types.md#parsedevents)
+
+Parse contract events of a GetTransactionReceiptResponse received from waitForTransaction. Based on contract's abi
+
+#### Parameters
+
+| Name      | Type                                                                                    | Description         |
+| :-------- | :-------------------------------------------------------------------------------------- | :------------------ |
+| `receipt` | [`GetTransactionReceiptResponse`](../namespaces/types.md#gettransactionreceiptresponse) | transaction receipt |
+
+#### Returns
+
+[`ParsedEvents`](../namespaces/types.md#parsedevents)
+
+Events parsed
+
+#### Defined in
+
+[src/contract/interface.ts:122](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L122)
 
 ---
 
@@ -306,4 +330,30 @@ TRUE if the contract comes from a Cairo1 contract
 
 #### Defined in
 
-[src/contract/interface.ts:119](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L119)
+[src/contract/interface.ts:133](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L133)
+
+---
+
+### typed
+
+▸ `Abstract` **typed**<`TAbi`\>(`tAbi`): [`TypedContract`](../modules.md#typedcontract)<`TAbi`\>
+
+#### Type parameters
+
+| Name   | Type                                                                         |
+| :----- | :--------------------------------------------------------------------------- |
+| `TAbi` | extends readonly (`AbiFunction` \| `AbiEvent` \| `AbiStruct` \| `AbiEnum`)[] |
+
+#### Parameters
+
+| Name   | Type   |
+| :----- | :----- |
+| `tAbi` | `TAbi` |
+
+#### Returns
+
+[`TypedContract`](../modules.md#typedcontract)<`TAbi`\>
+
+#### Defined in
+
+[src/contract/interface.ts:135](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L135)

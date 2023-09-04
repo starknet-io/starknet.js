@@ -6,6 +6,7 @@ import {
   Calldata,
   CompiledSierra,
   Contract,
+  ContractFactory,
   DeclareDeployUDCResponse,
   RawArgsArray,
   RawArgsObject,
@@ -57,6 +58,16 @@ describeIfDevnet('Cairo 1 Devnet', () => {
       expect(dd.declare).toMatchSchemaRef('DeclareContractResponse');
       expect(dd.deploy).toMatchSchemaRef('DeployContractUDCResponse');
       expect(cairo1Contract).toBeInstanceOf(Contract);
+    });
+
+    test('ContractFactory on Cairo1', async () => {
+      const c1CFactory = new ContractFactory({
+        compiledContract: compiledHelloSierra,
+        casm: compiledHelloSierraCasm,
+        account,
+      });
+      const cfContract = await c1CFactory.deploy();
+      expect(cfContract).toBeInstanceOf(Contract);
     });
 
     xtest('validate TS for redeclare - skip testing', async () => {

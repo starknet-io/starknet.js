@@ -9,23 +9,13 @@ custom_edit_url: null
 
 ## Enumeration Members
 
-### INVOKE
-
-• **INVOKE** = `"INVOKE_FUNCTION"`
-
-#### Defined in
-
-[src/types/lib/index.ts:175](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L175)
-
----
-
 ### DECLARE
 
 • **DECLARE** = `"DECLARE"`
 
 #### Defined in
 
-[src/types/lib/index.ts:176](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L176)
+[src/types/lib/index.ts:131](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L131)
 
 ---
 
@@ -35,7 +25,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:177](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L177)
+[src/types/lib/index.ts:132](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L132)
 
 ---
 
@@ -45,4 +35,14 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:178](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L178)
+[src/types/lib/index.ts:133](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L133)
+
+---
+
+### INVOKE
+
+• **INVOKE** = `"INVOKE_FUNCTION"`
+
+#### Defined in
+
+[src/types/lib/index.ts:134](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L134)

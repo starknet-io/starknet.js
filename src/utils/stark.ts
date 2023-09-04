@@ -1,4 +1,4 @@
-import { getStarkKey, utils } from 'micro-starknet';
+import { getStarkKey, utils } from '@scure/starknet';
 import { gzip, ungzip } from 'pako';
 
 import { ArraySignatureType, BigNumberish, CompressedProgram, Program, Signature } from '../types';

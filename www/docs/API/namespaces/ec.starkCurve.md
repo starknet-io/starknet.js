@@ -15,9 +15,9 @@ custom_edit_url: null
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:6
+node_modules/@scure/starknet/lib/index.d.ts:6
 
-node_modules/micro-starknet/lib/index.d.ts:44
+node_modules/@scure/starknet/lib/index.d.ts:45
 
 ---
 
@@ -37,7 +37,7 @@ node_modules/micro-starknet/lib/index.d.ts:44
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:63
+node_modules/@scure/starknet/lib/index.d.ts:62
 
 ---
 
@@ -47,9 +47,19 @@ node_modules/micro-starknet/lib/index.d.ts:63
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:70
+node_modules/@scure/starknet/lib/index.d.ts:69
 
 ## Variables
+
+### MAX_VALUE
+
+• `Const` **MAX_VALUE**: `bigint`
+
+#### Defined in
+
+node_modules/@scure/starknet/lib/index.d.ts:7
+
+---
 
 ### \_starkCurve
 
@@ -57,7 +67,7 @@ node_modules/micro-starknet/lib/index.d.ts:70
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:7
+node_modules/@scure/starknet/lib/index.d.ts:8
 
 ---
 
@@ -67,7 +77,7 @@ node_modules/micro-starknet/lib/index.d.ts:7
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:12
+node_modules/@scure/starknet/lib/index.d.ts:13
 
 ---
 
@@ -77,9 +87,9 @@ node_modules/micro-starknet/lib/index.d.ts:12
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:6
+node_modules/@scure/starknet/lib/index.d.ts:6
 
-node_modules/micro-starknet/lib/index.d.ts:44
+node_modules/@scure/starknet/lib/index.d.ts:45
 
 ---
 
@@ -89,7 +99,7 @@ node_modules/micro-starknet/lib/index.d.ts:44
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:44
+node_modules/@scure/starknet/lib/index.d.ts:45
 
 ---
 
@@ -108,17 +118,7 @@ node_modules/micro-starknet/lib/index.d.ts:44
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:44
-
----
-
-### Fp253
-
-• `Const` **Fp253**: `Readonly`<`IField`<`bigint`\> & `Required`<`Pick`<`IField`<`bigint`\>, `"isOdd"`\>\>\>
-
-#### Defined in
-
-node_modules/micro-starknet/lib/index.d.ts:60
+node_modules/@scure/starknet/lib/index.d.ts:45
 
 ---
 
@@ -128,7 +128,7 @@ node_modules/micro-starknet/lib/index.d.ts:60
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:61
+node_modules/@scure/starknet/lib/index.d.ts:60
 
 ## Functions
 
@@ -149,7 +149,7 @@ node_modules/micro-starknet/lib/index.d.ts:61
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:8
+node_modules/@scure/starknet/lib/index.d.ts:9
 
 ---
 
@@ -170,7 +170,7 @@ node_modules/micro-starknet/lib/index.d.ts:8
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:9
+node_modules/@scure/starknet/lib/index.d.ts:10
 
 ---
 
@@ -192,7 +192,7 @@ node_modules/micro-starknet/lib/index.d.ts:9
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:10
+node_modules/@scure/starknet/lib/index.d.ts:11
 
 ---
 
@@ -204,7 +204,7 @@ node_modules/micro-starknet/lib/index.d.ts:10
 
 | Name        | Type                                                                      |
 | :---------- | :------------------------------------------------------------------------ |
-| `signature` | [`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md) \| `Hex` |
+| `signature` | `Hex` \| [`SignatureType`](../interfaces/ec.weierstrass.SignatureType.md) |
 | `msgHash`   | `Hex`                                                                     |
 | `pubKey`    | `Hex`                                                                     |
 
@@ -214,7 +214,7 @@ node_modules/micro-starknet/lib/index.d.ts:10
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:11
+node_modules/@scure/starknet/lib/index.d.ts:12
 
 ---
 
@@ -234,7 +234,7 @@ node_modules/micro-starknet/lib/index.d.ts:11
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:51
+node_modules/@scure/starknet/lib/index.d.ts:52
 
 ---
 
@@ -254,7 +254,7 @@ node_modules/micro-starknet/lib/index.d.ts:51
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:52
+node_modules/@scure/starknet/lib/index.d.ts:53
 
 ---
 
@@ -274,7 +274,7 @@ node_modules/micro-starknet/lib/index.d.ts:52
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:53
+node_modules/@scure/starknet/lib/index.d.ts:54
 
 ---
 
@@ -297,7 +297,7 @@ node_modules/micro-starknet/lib/index.d.ts:53
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:54
+node_modules/@scure/starknet/lib/index.d.ts:55
 
 ---
 
@@ -318,28 +318,7 @@ node_modules/micro-starknet/lib/index.d.ts:54
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:56
-
----
-
-### hashChain
-
-▸ **hashChain**(`data`, `fn?`): `PedersenArg`
-
-#### Parameters
-
-| Name   | Type                                                 |
-| :----- | :--------------------------------------------------- |
-| `data` | `PedersenArg`[]                                      |
-| `fn?`  | (`x`: `PedersenArg`, `y`: `PedersenArg`) => `string` |
-
-#### Returns
-
-`PedersenArg`
-
-#### Defined in
-
-node_modules/micro-starknet/lib/index.d.ts:57
+node_modules/@scure/starknet/lib/index.d.ts:57
 
 ---
 
@@ -362,7 +341,7 @@ node_modules/micro-starknet/lib/index.d.ts:57
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:62
+node_modules/@scure/starknet/lib/index.d.ts:61
 
 ---
 
@@ -383,7 +362,7 @@ node_modules/micro-starknet/lib/index.d.ts:62
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:75
+node_modules/@scure/starknet/lib/index.d.ts:74
 
 ---
 
@@ -404,7 +383,7 @@ node_modules/micro-starknet/lib/index.d.ts:75
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:76
+node_modules/@scure/starknet/lib/index.d.ts:75
 
 ---
 
@@ -426,7 +405,7 @@ node_modules/micro-starknet/lib/index.d.ts:76
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:78
+node_modules/@scure/starknet/lib/index.d.ts:77
 
 ---
 
@@ -448,7 +427,7 @@ node_modules/micro-starknet/lib/index.d.ts:78
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:79
+node_modules/@scure/starknet/lib/index.d.ts:78
 
 ---
 
@@ -469,7 +448,7 @@ node_modules/micro-starknet/lib/index.d.ts:79
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:80
+node_modules/@scure/starknet/lib/index.d.ts:79
 
 ---
 
@@ -490,7 +469,7 @@ node_modules/micro-starknet/lib/index.d.ts:80
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:81
+node_modules/@scure/starknet/lib/index.d.ts:80
 
 ---
 
@@ -511,7 +490,7 @@ node_modules/micro-starknet/lib/index.d.ts:81
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:58
+node_modules/@scure/starknet/lib/index.d.ts:58
 
 ---
 
@@ -531,7 +510,7 @@ node_modules/micro-starknet/lib/index.d.ts:58
 
 #### Defined in
 
-node_modules/micro-starknet/lib/index.d.ts:59
+node_modules/@scure/starknet/lib/index.d.ts:59
 
 ---
 

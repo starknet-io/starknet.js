@@ -72,3 +72,17 @@ export function sanitizeHex(hex: string): string {
 export function utf8ToArray(str: string): Uint8Array {
   return new TextEncoder().encode(str);
 }
+
+/**
+ * String transformation util
+ * pascal case to screaming snake case
+ * @param text string
+ * @returns string
+ */
+export const pascalToSnake = (text: string) =>
+  /[a-z]/.test(text)
+    ? text
+        .split(/(?=[A-Z])/)
+        .join('_')
+        .toUpperCase()
+    : text;

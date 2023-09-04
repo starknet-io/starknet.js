@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable import/extensions */
-import { poseidonHashMany } from 'micro-starknet';
+import { poseidonHashMany } from '@scure/starknet';
 
 import { API_VERSION, StarknetChainId, TransactionHashPrefix } from '../constants';
 import {
@@ -81,13 +81,14 @@ export function calculateDeployTransactionHash(
   contractAddress: BigNumberish,
   constructorCalldata: RawCalldata,
   version: BigNumberish,
-  chainId: StarknetChainId
+  chainId: StarknetChainId,
+  constructorName: string = 'constructor'
 ): string {
   return calculateTransactionHashCommon(
     TransactionHashPrefix.DEPLOY,
     version,
     contractAddress,
-    getSelectorFromName('constructor'),
+    getSelectorFromName(constructorName),
     constructorCalldata,
     0,
     chainId

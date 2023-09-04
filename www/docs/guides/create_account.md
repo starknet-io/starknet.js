@@ -2,41 +2,41 @@
 sidebar_position: 8
 ---
 
-# Create account
+# Create an account
 
 Since there are no Externally Owned Accounts (EOA) in Starknet, all Accounts in Starknet are contracts.
 
-Unlike in Ethereum where a wallet is created with a public and private key pair, Starknet Accounts are the only way to sign transactions and messages, and verify signatures. Therefore a Account - Contract interface is needed.
+Unlike in Ethereum where a wallet is created with a public and private key pair, Starknet Accounts are the only way to sign transactions and messages and verify signatures. Therefore an Account - Contract interface is needed.
 
 Account contracts on Starknet cannot be deployed without paying a fee.
-Create an account is a bit tricky ; you have several steps :
+Creating an account is a bit tricky; you have several steps:
 
 1. Decide on your account type (OpenZeppelin, ArgentX, Braavos, ...).
 2. Compute the address of your future account.
-3. Send funds to this pre-computed address. The funds will be used to pay for the account contract deployment, and remains will fund the new account.
+3. Send funds to this pre-computed address. The funds will be used to pay for the account contract deployment and remains will fund the new account.
 4. Actual deployment of the Account
 
-## Create OZ (Open Zeppelin) account :
+## Create an OZ (Open Zeppelin) account
 
-> Level : easy.
+> Level: easy.
 
 Here, we will create a wallet with the Open Zeppelin smart contract v0.5.1. The contract class is already implemented in both Testnet 1 & 2.  
-This contract is coded in Cairo 0, so it will not survive to the upcoming regenesis of Starknet.
+This contract is coded in Cairo 0, so it will not survive the upcoming re-genesis of Starknet.
 
 ```typescript
 import { Account, constants, ec, json, stark, Provider, hash, CallData } from "starknet";
 ```
 
-### compute address :
+### compute address
 
 ```typescript
 // connect provider
 const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } });
 
-// new Open Zeppelin account v0.5.1 :
-    // Generate public and private key pair.
+// new Open Zeppelin account v0.5.1
+// Generate public and private key pair.
 const privateKey = stark.randomAddress();
-console.log('New OZ account :\nprivateKey=', privateKey);
+console.log('New OZ account:\nprivateKey=', privateKey);
 const starkKeyPub = ec.starkCurve.getStarkKey(privateKey);
 console.log('publicKey=', starkKeyPub);
 
@@ -52,11 +52,11 @@ const OZcontractAddress = hash.calculateContractAddressFromHash(
 console.log('Precalculated account address=', OZcontractAddress);
 ```
 
-If you want a specific private key, replace `stark.randomAddress()` by your choice.
+If you want a specific private key, replace `stark.randomAddress`()` with your choice.
 
 Then you have to fund this address!
 
-How to proceed is out of the scope of this guide, but you can for example :
+How to proceed is out of the scope of this guide, but you can for example:
 
 - Transfer ETH from another wallet.
 - Bridge ETH to this Starknet address.
@@ -70,7 +70,7 @@ curl -X POST http://127.0.0.1:5050/mint -d '{"address":"0x04a093c37ab61065d00155
 
 ### deployment of the new account
 
-If you have sent enough fund to this new address, you can go forward to the final step :
+If you have sent enough funds to this new address, you can go forward to the final step:
 
 ```typescript
 const OZaccount = new Account(provider, OZcontractAddress, privateKey);
@@ -85,11 +85,19 @@ await provider.waitForTransaction(transaction_hash);
 console.log('✅ New OpenZeppelin account created.\n   address =', contract_address);
 ```
 
-## Create Argent account
+> **IMPORTANT :** If this account is based on a Cairo v2 contract (for example OpenZeppelin account 0.7.0 or later), do not forget to add the parameter "1" after the privateKey parameter :
 
-> Level : medium.
+```typescript
+const OZaccount = new Account(provider, OZcontractAddress, privateKey, "1");
+```
 
-Here, we will create a wallet with the Argent smart contract v0.2.3. This case is more complicated, because we will have the account behind a proxy contract (this way, the wallet contract can be updated). The contract classes of both contracts are already implemented in both Testnet 1 & 2.
+> Take care that this added parameter is a string, NOT a number.
+
+## Create an Argent account
+
+> Level: medium.
+
+Here, we will create a wallet with the Argent smart contract v0.2.3. This case is more complicated because we will have the account behind a proxy contract (this way, the wallet contract can be updated). The contract classes of both contracts are already implemented in both Testnet 1 & 2.
 
 > If necessary OZ contracts can also be created with a proxy.
 
@@ -103,7 +111,7 @@ import { Account, ec, json, stark, Provider, hash, CallData } from "starknet";
 // connect provider
 const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } });
 
-//new Argent X account v0.2.3 :
+//new Argent X account v0.2.3
 const argentXproxyClassHash = "0x25ec026985a3bf9d0cc1fe17326b245dfdc3ff89b8fde106542a3ea56c5a918";
 const argentXaccountClassHash = "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2";
 
@@ -128,13 +136,13 @@ const AXcontractAddress = hash.calculateContractAddressFromHash(
 console.log('Precalculated account address=', AXcontractAddress);
 ```
 
-If you want a specific private key, replace `stark.randomAddress()` by your choice.
+If you want a specific private key, replace `stark.randomAddress`()` with your choice.
 
 Then you have to fund this address.
 
 ### deployment of the new account
 
-If you have sent enough fund to this new address, you can go forward to the final step :
+If you have sent enough funds to this new address, you can go forward to the final step:
 
 ```typescript
 const accountAX = new Account(provider, AXcontractAddress, privateKeyAX);
@@ -146,22 +154,22 @@ const deployAccountPayload = {
     addressSalt: starkKeyPubAX };
 
 const { transaction_hash: AXdAth, contract_address: AXcontractFinalAdress } = await accountAX.deployAccount(deployAccountPayload);
-console.log('✅ ArgentX wallet deployed at :',AXcontractFinalAdress);
+console.log('✅ ArgentX wallet deployed at:',AXcontractFinalAdress);
 ```
 
-## Create Braavos account
+## Create a Braavos account
 
-> Level : hard.
+> Level: hard.
 
-Even more complicated, a Braavos account needs also a proxy, but needs in addition a specific signature. Starknet.js is handling only Starknet standard signatures ; so we needs extra code to handle this specific signature for account creation. These nearly 200 lines of code are not displayed here, but are available in a module [here](./compiled_contracts/deployBraavos.ts).
+Even more complicated, a Braavos account needs also a proxy but needs in addition a specific signature. Starknet.js is handling only Starknet standard signatures; so we need extra code to handle this specific signature for account creation. These nearly 200 lines of code are not displayed here but are available in a module [here](./compiled_contracts/deployBraavos.ts).
 
-We will deploy hereunder a Braavos account in devnet. So launch starknet-devnet with these parameters :
+We will deploy hereunder a Braavos account in devnet. So launch starknet-devnet with these parameters:
 
 ```bash
 starknet-devnet --seed 0 --fork-network alpha-goerli
 ```
 
-Initialization :
+Initialization:
 
 ```typescript
 import { Provider, Account, num, stark } from "starknet";
@@ -172,7 +180,7 @@ import { calculateAddressBraavos,
 import axios from "axios";
 ```
 
-If you want to create yourself the private key, for example with a random number :
+If you want to create the private key, for example with a random number:
 
 ```typescript
 const privateKeyBraavos = stark.randomAddress();
@@ -222,23 +230,23 @@ await providerDevnet.waitForTransaction(transaction_hash);
 console.log('✅ Braavos wallet deployed at', BraavosAccountFinalAddress);
 ```
 
-The computed address has been funded automatically by minting new dummy ETH in Starknet devnet!
+The computed address has been funded automatically by minting a new dummy ETH in Starknet devnet!
 
 ## Create your account abstraction
 
-You are not limited to these 3 contracts contracts. You can create your own contract for wallet. It's the concept of Account Abstraction.
+You are not limited to these 3 contracts. You can create your own contract for the wallet. It's the concept of Account Abstraction.
 
-You can customize entirely the wallet - for example :
+You can customize entirely the wallet - for example:
 
 - use a different concept of keys.
 
 - add a guardian to save your account.
 
-- have the possibility to transfer the ownership of the wallet.
+- have the possibility to transfer ownership of the wallet.
 
 - add some administrators or a super-administrator.
 
-- whitelist of address for transfer.
+- whitelist of addresses for transfer.
 
 - multisig.
 
@@ -246,7 +254,7 @@ You can customize entirely the wallet - for example :
 
 The only limitation is your imagination...
 
-Here is an example of a customized wallet, including super administrator management, on a local starknet-devnet :
+Here is an example of a customized wallet, including super administrator management, on a local starknet-devnet:
 
 > launch `starknet-devnet --seed 0` before using this script
 
@@ -264,11 +272,12 @@ const provider = new Provider({ sequencer: { network: "http://127.0.0.1:5050" } 
 const privateKey0 = "0xe3e70682c2094cac629f6fbed82c07cd";
 const accountAddress0 = "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a";
 const account0 = new Account(provider, accountAddress0, privateKey0);
+// add ,"1" after privateKey0 if this account is not a Cairo 0 contract
 
-// new account abstraction :
+// new account abstraction
 // Generate public and private key pair.
 const AAprivateKey = stark.randomAddress();
-console.log('New account :\nprivateKey=', AAprivateKey);
+console.log('New account:\nprivateKey=', AAprivateKey);
 const AAstarkKeyPub = ec.starkCurve.getStarkKey(AAprivateKey);
 console.log('publicKey=', AAstarkKeyPub);
 
@@ -298,6 +307,7 @@ console.log('Answer mint =', answer);
 
 // deploy account
 const AAaccount = new Account(provider, AAcontractAddress, AAprivateKey);
+// add ,"1" after AAprivateKey if this account is not a Cairo 0 contract
 const { transaction_hash, contract_address } = await AAaccount.deployAccount({
     classHash: AAaccountClassHash,
     constructorCalldata: AAaccountConstructorCallData,
@@ -309,5 +319,5 @@ console.log('✅ New customized account created.\n   address =', contract_addres
 
 ## Account update
 
-For ArgentX and Braavos wallets, if you have created the privkey inside the browser wallet, necessary upgrades will be automatically managed in the wallet.  
-However, if you have created yourself the private key, it becomes your responsibility to update the account implementation class when it's necessary. It can be done with the `upgrade` function of the implementation class.
+For ArgentX and Braavos wallets, if you have created the private key inside the browser wallet, necessary upgrades will be automatically managed in the wallet.  
+However, if you have created the private key by yourself, it becomes your responsibility to update the account implementation class when it's necessary. It can be done with the `upgrade` function of the implementation class.

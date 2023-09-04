@@ -21,6 +21,7 @@ import {
   DeployAccountContractTransaction,
   DeployContractResponse,
   DeployContractUDCResponse,
+  DeployTransactionReceiptResponse,
   Details,
   EstimateFee,
   EstimateFeeAction,
@@ -37,7 +38,6 @@ import {
   Signature,
   SimulateTransactionDetails,
   SimulateTransactionResponse,
-  TransactionStatus,
   TransactionType,
   TypedData,
   UniversalDeployerContractPayload,
@@ -399,10 +399,8 @@ export class Account extends Provider implements AccountInterface {
     details?: InvocationsDetails | undefined
   ): Promise<DeployContractUDCResponse> {
     const deployTx = await this.deploy(payload, details);
-    const txReceipt = await this.waitForTransaction(deployTx.transaction_hash, {
-      successStates: [TransactionStatus.ACCEPTED_ON_L2],
-    });
-    return parseUDCEvent(txReceipt);
+    const txReceipt = await this.waitForTransaction(deployTx.transaction_hash);
+    return parseUDCEvent(txReceipt as DeployTransactionReceiptResponse);
   }
 
   public async declareAndDeploy(
@@ -412,9 +410,7 @@ export class Account extends Provider implements AccountInterface {
     const { constructorCalldata, salt, unique } = payload;
     let declare = await this.declareIfNot(payload, details);
     if (declare.transaction_hash !== '') {
-      const tx = await this.waitForTransaction(declare.transaction_hash, {
-        successStates: [TransactionStatus.ACCEPTED_ON_L2],
-      });
+      const tx = await this.waitForTransaction(declare.transaction_hash);
       declare = { ...declare, ...tx };
     }
     const deploy = await this.deployContract(

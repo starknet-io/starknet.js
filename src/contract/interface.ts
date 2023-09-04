@@ -1,3 +1,5 @@
+import { Abi as AbiKanabi, TypedContract as AbiWanTypedContract } from 'abi-wan-kanabi';
+
 import { AccountInterface } from '../account';
 import { ProviderInterface } from '../provider';
 import {
@@ -8,11 +10,15 @@ import {
   CallOptions,
   ContractFunction,
   EstimateFeeResponse,
+  GetTransactionReceiptResponse,
   Invocation,
   InvokeFunctionResponse,
   InvokeOptions,
+  ParsedEvents,
   Result,
 } from '../types';
+
+export type TypedContract<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & ContractInterface;
 
 export abstract class ContractInterface {
   public abstract abi: Abi;
@@ -108,6 +114,14 @@ export abstract class ContractInterface {
   public abstract populate(method: string, args?: ArgsOrCalldata): Invocation;
 
   /**
+   * Parse contract events of a GetTransactionReceiptResponse received from waitForTransaction. Based on contract's abi
+   *
+   * @param receipt transaction receipt
+   * @returns Events parsed
+   */
+  public abstract parseEvents(receipt: GetTransactionReceiptResponse): ParsedEvents;
+
+  /**
    * tells if the contract comes from a Cairo 1 contract
    *
    * @returns TRUE if the contract comes from a Cairo1 contract
@@ -117,4 +131,6 @@ export abstract class ContractInterface {
    * ```
    */
   public abstract isCairo1(): boolean;
+
+  public abstract typed<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContract<TAbi>;
 }

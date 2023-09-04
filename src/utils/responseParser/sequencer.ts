@@ -3,6 +3,7 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 
+import { LibraryError } from '../../provider/errors';
 import {
   CallContractResponse,
   CompiledContract,
@@ -19,6 +20,8 @@ import {
   Sequencer,
   SimulateTransactionResponse,
   StateUpdateResponse,
+  TransactionFinalityStatus,
+  TransactionStatus,
 } from '../../types';
 import { isSierra } from '../contract';
 import { toBigInt } from '../num';
@@ -41,6 +44,13 @@ export class SequencerAPIResponseParser extends ResponseParser {
   public parseGetTransactionResponse(
     res: Sequencer.GetTransactionResponse
   ): GetTransactionResponse {
+    if (
+      res.status === TransactionStatus.NOT_RECEIVED &&
+      res.finality_status === TransactionFinalityStatus.NOT_RECEIVED
+    ) {
+      throw new LibraryError();
+    }
+
     return {
       ...res,
       calldata: 'calldata' in res.transaction ? (res.transaction.calldata as HexCalldata) : [],
@@ -67,22 +77,9 @@ export class SequencerAPIResponseParser extends ResponseParser {
     res: Sequencer.TransactionReceiptResponse
   ): GetTransactionReceiptResponse {
     return {
-      transaction_hash: res.transaction_hash,
-      status: res.status,
-      messages_sent: res.l2_to_l1_messages as any, // TODO: parse
-      events: res.events as any,
-      ...('block_hash' in res && { block_hash: res.block_hash }),
-      ...('block_number' in res && { block_number: res.block_number }),
-      ...('actual_fee' in res && { actual_fee: res.actual_fee }),
-      ...('transaction_index' in res && { transaction_index: res.transaction_index }),
-      ...('execution_resources' in res && { execution_resources: res.execution_resources }),
-      ...('l1_to_l2_consumed_message' in res && {
-        // eslint-disable-next-line @typescript-eslint/dot-notation
-        l1_to_l2_consumed_message: res['l1_to_l2_consumed_message'],
-      }),
-      ...('transaction_failure_reason' in res && {
-        transaction_failure_reason: res.transaction_failure_reason,
-      }),
+      ...res,
+      messages_sent: res.l2_to_l1_messages as any,
+      ...('revert_error' in res && { revert_reason: res.revert_error }),
     };
   }
 

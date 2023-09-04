@@ -20,7 +20,7 @@ npm install starknet@next
 
 ### With Devnet
 
-Example devnet version is `0.5.3`.
+The example devnet version is `0.5.3`.
 
 Get devnet with docker:
 
@@ -29,14 +29,14 @@ docker pull shardlabs/starknet-devnet:0.5.3
 docker run -p 5050:5050 shardlabs/starknet-devnet:0.5.3 --seed 0
 ```
 
-Open new console tab, go to your starknet.js directory and run:
+Open a new console tab, go to your starknet.js directory, and run:
 
 ```bash
 npm run test # all tests
 npm run test ./__tests__/contract.test.ts # just one test suite
 ```
 
-By default `defaultProvider` tests will be ran through the `Sequencer`.
+By default, `defaultProvider` tests will be run through the `Sequencer`.
 
 If you want to run `defaultProvider` through the `RPC` run:
 
@@ -67,7 +67,7 @@ Additional helpful resources can also be found at <ins>[OpenZeppelin](https://do
 
 Please take a look at our workshop using OpenZeppelin contracts <ins>[here](https://github.com/0xs34n/starknet.js-workshop)</ins>.
 
-Example with Argent contract <ins>[here](https://github.com/0xs34n/starknet.js-account)</ins>.
+Example with the Argent contract <ins>[here](https://github.com/0xs34n/starknet.js-account)</ins>.
 
 ## Contracts used in the guides
 

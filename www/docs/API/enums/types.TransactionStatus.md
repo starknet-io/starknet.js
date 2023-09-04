@@ -7,6 +7,9 @@ custom_edit_url: null
 
 [types](../namespaces/types.md).TransactionStatus
 
+new statuses are defined by props: finality_status and execution_status
+to be #deprecated
+
 ## Enumeration Members
 
 ### NOT_RECEIVED
@@ -15,7 +18,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:133](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L133)
+[src/types/lib/index.ts:142](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L142)
 
 ---
 
@@ -25,17 +28,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:134](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L134)
-
----
-
-### PENDING
-
-• **PENDING** = `"PENDING"`
-
-#### Defined in
-
-[src/types/lib/index.ts:135](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L135)
+[src/types/lib/index.ts:143](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L143)
 
 ---
 
@@ -45,7 +38,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:136](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L136)
+[src/types/lib/index.ts:144](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L144)
 
 ---
 
@@ -55,7 +48,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:137](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L137)
+[src/types/lib/index.ts:145](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L145)
 
 ---
 
@@ -65,4 +58,14 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:138](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L138)
+[src/types/lib/index.ts:146](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L146)
+
+---
+
+### REVERTED
+
+• **REVERTED** = `"REVERTED"`
+
+#### Defined in
+
+[src/types/lib/index.ts:147](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L147)

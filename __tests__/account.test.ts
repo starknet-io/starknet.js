@@ -3,8 +3,8 @@ import {
   Account,
   Contract,
   DeclareDeployUDCResponse,
+  DeployTransactionReceiptResponse,
   Provider,
-  TransactionStatus,
   TransactionType,
   cairo,
   contractClassResponseToLegacyCompiledContract,
@@ -338,9 +338,7 @@ describe('deploy and test Wallet', () => {
       calldata: [erc20.address, '10', '0'],
     });
 
-    await provider.waitForTransaction(transaction_hash, {
-      successStates: [TransactionStatus.ACCEPTED_ON_L2],
-    });
+    await provider.waitForTransaction(transaction_hash);
   });
 
   test('read balance of wallet after transfer', async () => {
@@ -379,9 +377,7 @@ describe('deploy and test Wallet', () => {
       },
     ]);
 
-    await provider.waitForTransaction(transaction_hash, {
-      successStates: [TransactionStatus.ACCEPTED_ON_L2],
-    });
+    await provider.waitForTransaction(transaction_hash);
 
     const response = await dapp.get_number(account.address);
     expect(toBigInt(response.number as string).toString()).toStrictEqual('57');
@@ -552,7 +548,7 @@ describe('deploy and test Wallet', () => {
 
       // check pre-calculated address
       const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
-      const udcEvent = parseUDCEvent(txReceipt);
+      const udcEvent = parseUDCEvent(txReceipt as DeployTransactionReceiptResponse);
       expect(cleanHex(deployment.contract_address[0])).toBe(cleanHex(udcEvent.contract_address));
     });
 
@@ -573,7 +569,7 @@ describe('deploy and test Wallet', () => {
 
       // check pre-calculated address
       const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
-      const udcEvent = parseUDCEvent(txReceipt);
+      const udcEvent = parseUDCEvent(txReceipt as DeployTransactionReceiptResponse);
       expect(cleanHex(deployment.contract_address[0])).toBe(cleanHex(udcEvent.contract_address));
     });
 
@@ -644,7 +640,7 @@ describe('deploy and test Wallet', () => {
       // const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
       const estimatedFeeBulk = await account.estimateFeeBulk([
         {
-          type: 'INVOKE_FUNCTION',
+          type: TransactionType.INVOKE,
           payload: {
             contractAddress: erc20Address,
             entrypoint: 'transfer',
@@ -652,7 +648,7 @@ describe('deploy and test Wallet', () => {
           },
         },
         {
-          type: 'INVOKE_FUNCTION',
+          type: TransactionType.INVOKE,
           payload: {
             contractAddress: erc20Address,
             entrypoint: 'transfer',
@@ -679,7 +675,7 @@ describe('deploy and test Wallet', () => {
 
       const res = await newAccount.estimateFeeBulk([
         {
-          type: 'DEPLOY_ACCOUNT',
+          type: TransactionType.DEPLOY_ACCOUNT,
           payload: {
             classHash: accountClassHash,
             constructorCalldata: { publicKey: starkKeyPub },
@@ -688,7 +684,7 @@ describe('deploy and test Wallet', () => {
           },
         },
         {
-          type: 'INVOKE_FUNCTION',
+          type: TransactionType.INVOKE,
           payload: [
             {
               contractAddress: erc20Address,
@@ -719,21 +715,21 @@ describe('deploy and test Wallet', () => {
         }, */
         {
           // Cairo 0
-          type: 'DECLARE',
+          type: TransactionType.DECLARE,
           payload: {
             contract: compiledErc20,
             classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
           },
         },
         {
-          type: 'DEPLOY',
+          type: TransactionType.DEPLOY,
           payload: {
             classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
             constructorCalldata: ['Token', 'ERC20', account.address],
           },
         },
         {
-          type: 'INVOKE_FUNCTION',
+          type: TransactionType.INVOKE,
           payload: [
             {
               contractAddress: erc20Address,

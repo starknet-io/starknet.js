@@ -210,9 +210,11 @@ export abstract class AccountInterface extends ProviderInterface {
    * Internal wait for L2 transaction, do not support multicall
    * Method will pass even if contract is already declared (internal using DeclareIfNot)
    *
-   * @param  containing
+   * @param payload
    * - contract: compiled contract code
-   * - classHash: computed class hash of compiled contract
+   * - [casm=cairo1]: CairoAssembly | undefined;
+   * - [compiledClassHash]: string | undefined;
+   * - [classHash]: computed class hash of compiled contract
    * - [constructorCalldata] contract constructor calldata
    * - [salt=pseudorandom] deploy address salt
    * - [unique=true] ensure unique salt

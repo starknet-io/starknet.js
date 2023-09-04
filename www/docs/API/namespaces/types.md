@@ -8,14 +8,21 @@ custom_edit_url: null
 
 ## Namespaces
 
-- [Sequencer](types.Sequencer.md)
 - [RPC](types.RPC.md)
+- [Sequencer](types.Sequencer.md)
 
 ## Enumerations
 
 - [SIMULATION_FLAG](../enums/types.SIMULATION_FLAG.md)
-- [TransactionStatus](../enums/types.TransactionStatus.md)
+- [ValidateType](../enums/types.ValidateType.md)
+- [Uint](../enums/types.Uint.md)
+- [Litteral](../enums/types.Litteral.md)
 - [TransactionType](../enums/types.TransactionType.md)
+- [TransactionStatus](../enums/types.TransactionStatus.md)
+- [TransactionFinalityStatus](../enums/types.TransactionFinalityStatus.md)
+- [TransactionExecutionStatus](../enums/types.TransactionExecutionStatus.md)
+- [BlockStatus](../enums/types.BlockStatus.md)
+- [BlockTag](../enums/types.BlockTag.md)
 - [EntryPointType](../enums/types.EntryPointType.md)
 
 ## Interfaces
@@ -29,11 +36,10 @@ custom_edit_url: null
 - [ProviderOptions](../interfaces/types.ProviderOptions.md)
 - [GetBlockResponse](../interfaces/types.GetBlockResponse.md)
 - [GetCodeResponse](../interfaces/types.GetCodeResponse.md)
+- [ContractEntryPoint](../interfaces/types.ContractEntryPoint.md)
 - [CommonTransactionResponse](../interfaces/types.CommonTransactionResponse.md)
 - [InvokeTransactionResponse](../interfaces/types.InvokeTransactionResponse.md)
-- [ContractEntryPoint](../interfaces/types.ContractEntryPoint.md)
 - [DeclareTransactionResponse](../interfaces/types.DeclareTransactionResponse.md)
-- [CommonTransactionReceiptResponse](../interfaces/types.CommonTransactionReceiptResponse.md)
 - [MessageToL1](../interfaces/types.MessageToL1.md)
 - [Event](../interfaces/types.Event.md)
 - [MessageToL2](../interfaces/types.MessageToL2.md)
@@ -48,6 +54,143 @@ custom_edit_url: null
 - [TypedData](../interfaces/types.TypedData.md)
 
 ## Type Aliases
+
+### CallL1Handler
+
+Ƭ **CallL1Handler**: `Object`
+
+#### Type declaration
+
+| Name                   | Type       |
+| :--------------------- | :--------- |
+| `from_address`         | `string`   |
+| `to_address`           | `string`   |
+| `entry_point_selector` | `string`   |
+| `payload`              | `string`[] |
+
+#### Defined in
+
+[src/types/api/sequencer.ts:66](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L66)
+
+---
+
+### DeployedContractItem
+
+Ƭ **DeployedContractItem**: `Object`
+
+#### Type declaration
+
+| Name         | Type     |
+| :----------- | :------- |
+| `address`    | `string` |
+| `class_hash` | `string` |
+
+#### Defined in
+
+[src/types/api/sequencer.ts:73](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L73)
+
+---
+
+### ExecutionResources
+
+Ƭ **ExecutionResources**: `Object`
+
+#### Type declaration
+
+| Name                                           | Type                                                                                                                                                                                   |
+| :--------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `n_steps`                                      | `number`                                                                                                                                                                               |
+| `builtin_instance_counter`                     | { `pedersen_builtin`: `number` ; `range_check_builtin`: `number` ; `bitwise_builtin`: `number` ; `output_builtin`: `number` ; `ecdsa_builtin`: `number` ; `ec_op_builtin?`: `number` } |
+| `builtin_instance_counter.pedersen_builtin`    | `number`                                                                                                                                                                               |
+| `builtin_instance_counter.range_check_builtin` | `number`                                                                                                                                                                               |
+| `builtin_instance_counter.bitwise_builtin`     | `number`                                                                                                                                                                               |
+| `builtin_instance_counter.output_builtin`      | `number`                                                                                                                                                                               |
+| `builtin_instance_counter.ecdsa_builtin`       | `number`                                                                                                                                                                               |
+| `builtin_instance_counter.ec_op_builtin?`      | `number`                                                                                                                                                                               |
+| `n_memory_holes`                               | `number`                                                                                                                                                                               |
+
+#### Defined in
+
+[src/types/api/sequencer.ts:53](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L53)
+
+---
+
+### FunctionInvocation
+
+Ƭ **FunctionInvocation**: `Object`
+
+#### Type declaration
+
+| Name                  | Type                                                    |
+| :-------------------- | :------------------------------------------------------ |
+| `caller_address`      | `string`                                                |
+| `contract_address`    | `string`                                                |
+| `calldata`            | [`RawCalldata`](types.md#rawcalldata)                   |
+| `call_type?`          | `string`                                                |
+| `class_hash?`         | `string`                                                |
+| `selector?`           | `string`                                                |
+| `entry_point_type?`   | [`EXTERNAL`](../enums/types.EntryPointType.md#external) |
+| `result`              | `any`[]                                                 |
+| `execution_resources` | [`ExecutionResources`](types.md#executionresources)     |
+| `internal_calls`      | [`FunctionInvocation`](types.md#functioninvocation)[]   |
+| `events`              | `any`[]                                                 |
+| `messages`            | `any`[]                                                 |
+
+#### Defined in
+
+[src/types/api/sequencer.ts:38](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L38)
+
+---
+
+### GetContractAddressesResponse
+
+Ƭ **GetContractAddressesResponse**: `Object`
+
+#### Type declaration
+
+| Name                   | Type     |
+| :--------------------- | :------- |
+| `Starknet`             | `string` |
+| `GpsStatementVerifier` | `string` |
+
+#### Defined in
+
+[src/types/api/sequencer.ts:33](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L33)
+
+---
+
+### GetTransactionStatusResponse
+
+Ƭ **GetTransactionStatusResponse**: `Object`
+
+#### Type declaration
+
+| Name                              | Type                                                                         |
+| :-------------------------------- | :--------------------------------------------------------------------------- |
+| `tx_status`                       | [`TransactionStatus`](../enums/types.TransactionStatus.md)                   |
+| `execution_status`                | [`TransactionExecutionStatus`](../enums/types.TransactionExecutionStatus.md) |
+| `finality_status`                 | [`TransactionFinalityStatus`](../enums/types.TransactionFinalityStatus.md)   |
+| `block_hash?`                     | `string`                                                                     |
+| `tx_failure_reason?`              | { `code`: `string` ; `error_message`: `string` }                             |
+| `tx_failure_reason.code`          | `string`                                                                     |
+| `tx_failure_reason.error_message` | `string`                                                                     |
+| `tx_revert_reason?`               | `string`                                                                     |
+
+#### Defined in
+
+[src/types/api/sequencer.ts:21](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L21)
+
+---
+
+### SequencerIdentifier
+
+Ƭ **SequencerIdentifier**: { `blockHash`: `string` } \| { `blockNumber`: [`BlockNumber`](types.md#blocknumber) }
+
+#### Defined in
+
+[src/types/api/sequencer.ts:78](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L78)
+
+---
 
 ### EstimateFeeBulk
 
@@ -180,7 +323,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/contract.ts:3](https://github.com/0xs34n/starknet.js/blob/develop/src/types/contract.ts#L3)
+[src/types/contract.ts:11](https://github.com/0xs34n/starknet.js/blob/develop/src/types/contract.ts#L11)
 
 ---
 
@@ -204,30 +347,17 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/contract.ts:4](https://github.com/0xs34n/starknet.js/blob/develop/src/types/contract.ts#L4)
+[src/types/contract.ts:12](https://github.com/0xs34n/starknet.js/blob/develop/src/types/contract.ts#L12)
 
 ---
 
 ### Result
 
-Ƭ **Result**: { `[key: string]`: `any`; } \| [`Result`](types.md#result)[] \| `bigint` \| `string` \| `boolean`
+Ƭ **Result**: { `[key: string]`: `any`; } \| [`Result`](types.md#result)[] \| `bigint` \| `string` \| `boolean` \| [`CairoEnum`](types.md#cairoenum)
 
 #### Defined in
 
-[src/types/contract.ts:5](https://github.com/0xs34n/starknet.js/blob/develop/src/types/contract.ts#L5)
-
----
-
-### Calldata
-
-Ƭ **Calldata**: `string`[] & { `__compiled__?`: `boolean` }
-
-Compiled calldata ready to be sent
-decimal-string array
-
-#### Defined in
-
-[src/types/contract.ts:18](https://github.com/0xs34n/starknet.js/blob/develop/src/types/contract.ts#L18)
+[src/types/contract.ts:14](https://github.com/0xs34n/starknet.js/blob/develop/src/types/contract.ts#L14)
 
 ---
 
@@ -237,7 +367,7 @@ decimal-string array
 
 #### Defined in
 
-[src/types/contract.ts:20](https://github.com/0xs34n/starknet.js/blob/develop/src/types/contract.ts#L20)
+[src/types/contract.ts:24](https://github.com/0xs34n/starknet.js/blob/develop/src/types/contract.ts#L24)
 
 ---
 
@@ -247,7 +377,7 @@ decimal-string array
 
 #### Defined in
 
-[src/types/contract.ts:21](https://github.com/0xs34n/starknet.js/blob/develop/src/types/contract.ts#L21)
+[src/types/contract.ts:25](https://github.com/0xs34n/starknet.js/blob/develop/src/types/contract.ts#L25)
 
 ---
 
@@ -270,7 +400,7 @@ decimal-string array
 
 #### Defined in
 
-[src/types/contract.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/types/contract.ts#L22)
+[src/types/contract.ts:26](https://github.com/0xs34n/starknet.js/blob/develop/src/types/contract.ts#L26)
 
 ---
 
@@ -280,7 +410,7 @@ decimal-string array
 
 #### Defined in
 
-[src/types/contract.ts:33](https://github.com/0xs34n/starknet.js/blob/develop/src/types/contract.ts#L33)
+[src/types/contract.ts:37](https://github.com/0xs34n/starknet.js/blob/develop/src/types/contract.ts#L37)
 
 ---
 
@@ -290,7 +420,31 @@ decimal-string array
 
 #### Defined in
 
-[src/types/contract.ts:38](https://github.com/0xs34n/starknet.js/blob/develop/src/types/contract.ts#L38)
+[src/types/contract.ts:42](https://github.com/0xs34n/starknet.js/blob/develop/src/types/contract.ts#L42)
+
+---
+
+### ParsedEvent
+
+Ƭ **ParsedEvent**: `Object`
+
+#### Index signature
+
+▪ [name: `string`]: [`ParsedStruct`](types.md#parsedstruct)
+
+#### Defined in
+
+[src/types/contract.ts:47](https://github.com/0xs34n/starknet.js/blob/develop/src/types/contract.ts#L47)
+
+---
+
+### ParsedEvents
+
+Ƭ **ParsedEvents**: [`ParsedEvent`](types.md#parsedevent)[]
+
+#### Defined in
+
+[src/types/contract.ts:49](https://github.com/0xs34n/starknet.js/blob/develop/src/types/contract.ts#L49)
 
 ---
 
@@ -300,7 +454,7 @@ decimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:5](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L5)
+[src/types/lib/index.ts:6](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L6)
 
 ---
 
@@ -310,7 +464,7 @@ decimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:6](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L6)
+[src/types/lib/index.ts:7](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L7)
 
 ---
 
@@ -320,7 +474,7 @@ decimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:7](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L7)
+[src/types/lib/index.ts:8](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L8)
 
 ---
 
@@ -330,7 +484,20 @@ decimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:9](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L9)
+[src/types/lib/index.ts:10](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L10)
+
+---
+
+### Calldata
+
+Ƭ **Calldata**: `string`[] & { `__compiled__?`: `boolean` }
+
+Compiled calldata ready to be sent
+decimal-string array
+
+#### Defined in
+
+[src/types/lib/index.ts:16](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L16)
 
 ---
 
@@ -343,7 +510,7 @@ use CallData.compile() to convert to Calldata
 
 #### Defined in
 
-[src/types/lib/index.ts:25](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L25)
+[src/types/lib/index.ts:32](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L32)
 
 ---
 
@@ -355,7 +522,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:30](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L30)
+[src/types/lib/index.ts:37](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L37)
 
 ---
 
@@ -371,7 +538,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:32](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L32)
+[src/types/lib/index.ts:39](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L39)
 
 ---
 
@@ -387,7 +554,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:34](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L34)
+[src/types/lib/index.ts:41](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L41)
 
 ---
 
@@ -397,7 +564,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:36](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L36)
+[src/types/lib/index.ts:43](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L43)
 
 ---
 
@@ -411,7 +578,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:38](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L38)
+[src/types/lib/index.ts:45](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L45)
 
 ---
 
@@ -421,17 +588,17 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:42](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L42)
+[src/types/lib/index.ts:49](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L49)
 
 ---
 
 ### MultiType
 
-Ƭ **MultiType**: [`BigNumberish`](types.md#bignumberish) \| [`Uint256`](../interfaces/types.Uint256.md) \| `object` \| `boolean`
+Ƭ **MultiType**: [`BigNumberish`](types.md#bignumberish) \| [`Uint256`](../interfaces/types.Uint256.md) \| `object` \| `boolean` \| [`CairoEnum`](types.md#cairoenum)
 
 #### Defined in
 
-[src/types/lib/index.ts:44](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L44)
+[src/types/lib/index.ts:51](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L51)
 
 ---
 
@@ -450,29 +617,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:46](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L46)
-
----
-
-### DeployContractPayload
-
-Ƭ **DeployContractPayload**: `Object`
-
-**`Deprecated`**
-
-deprecated due to no direct deploy, unused - can be removed
-
-#### Type declaration
-
-| Name                   | Type                                                        |
-| :--------------------- | :---------------------------------------------------------- |
-| `contract`             | [`CompiledContract`](types.md#compiledcontract) \| `string` |
-| `constructorCalldata?` | [`RawCalldata`](types.md#rawcalldata)                       |
-| `addressSalt?`         | `string`                                                    |
-
-#### Defined in
-
-[src/types/lib/index.ts:56](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L56)
+[src/types/lib/index.ts:53](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L53)
 
 ---
 
@@ -491,7 +636,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:62](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L62)
+[src/types/lib/index.ts:60](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L60)
 
 ---
 
@@ -501,7 +646,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:69](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L69)
+[src/types/lib/index.ts:67](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L67)
 
 ---
 
@@ -520,7 +665,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:76](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L76)
+[src/types/lib/index.ts:74](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L74)
 
 ---
 
@@ -539,7 +684,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:83](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L83)
+[src/types/lib/index.ts:81](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L81)
 
 ---
 
@@ -549,7 +694,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:90](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L90)
+[src/types/lib/index.ts:88](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L88)
 
 ---
 
@@ -568,7 +713,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:93](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L93)
+[src/types/lib/index.ts:91](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L91)
 
 ---
 
@@ -578,15 +723,15 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Type declaration
 
-| Name              | Type                          |
-| :---------------- | :---------------------------- |
-| `contractAddress` | `string`                      |
-| `calldata?`       | [`RawArgs`](types.md#rawargs) |
-| `entrypoint?`     | `string`                      |
+| Name              | Type                                                             |
+| :---------------- | :--------------------------------------------------------------- |
+| `contractAddress` | `string`                                                         |
+| `calldata?`       | [`RawArgs`](types.md#rawargs) \| [`Calldata`](types.md#calldata) |
+| `entrypoint?`     | `string`                                                         |
 
 #### Defined in
 
-[src/types/lib/index.ts:100](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L100)
+[src/types/lib/index.ts:98](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L98)
 
 ---
 
@@ -596,7 +741,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:106](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L106)
+[src/types/lib/index.ts:104](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L104)
 
 ---
 
@@ -606,7 +751,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:108](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L108)
+[src/types/lib/index.ts:106](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L106)
 
 ---
 
@@ -616,7 +761,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:110](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L110)
+[src/types/lib/index.ts:108](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L108)
 
 ---
 
@@ -634,7 +779,7 @@ deprecated due to no direct deploy, unused - can be removed
 
 #### Defined in
 
-[src/types/lib/index.ts:112](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L112)
+[src/types/lib/index.ts:110](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L110)
 
 ---
 
@@ -655,7 +800,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:121](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L121)
+[src/types/lib/index.ts:119](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L119)
 
 ---
 
@@ -665,19 +810,43 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:128](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L128)
+[src/types/lib/index.ts:126](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L126)
+
+---
+
+### BlockNumber
+
+Ƭ **BlockNumber**: [`BlockTag`](../enums/types.BlockTag.md) \| `null` \| `number`
+
+#### Defined in
+
+[src/types/lib/index.ts:175](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L175)
+
+---
+
+### BlockIdentifier
+
+Ƭ **BlockIdentifier**: [`BlockNumber`](types.md#blocknumber) \| [`BigNumberish`](types.md#bignumberish)
+
+hex string and BN are detected as block hashes
+decimal string and number are detected as block numbers
+null appends nothing to the request url
+
+#### Defined in
+
+[src/types/lib/index.ts:182](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L182)
 
 ---
 
 ### AccountInvocationItem
 
-Ƭ **AccountInvocationItem**: { `type`: `"DECLARE"` } & [`DeclareContractTransaction`](types.md#declarecontracttransaction) \| { `type`: `"DEPLOY_ACCOUNT"` } & [`DeployAccountContractTransaction`](types.md#deployaccountcontracttransaction) \| { `type`: `"INVOKE_FUNCTION"` } & [`Invocation`](types.md#invocation) & [`InvocationsDetailsWithNonce`](types.md#invocationsdetailswithnonce)
+Ƭ **AccountInvocationItem**: { `type`: [`DECLARE`](../enums/types.TransactionType.md#declare) } & [`DeclareContractTransaction`](types.md#declarecontracttransaction) \| { `type`: [`DEPLOY_ACCOUNT`](../enums/types.TransactionType.md#deploy_account) } & [`DeployAccountContractTransaction`](types.md#deployaccountcontracttransaction) \| { `type`: [`INVOKE`](../enums/types.TransactionType.md#invoke) } & [`Invocation`](types.md#invocation) & [`InvocationsDetailsWithNonce`](types.md#invocationsdetailswithnonce)
 
 items used by AccountInvocations
 
 #### Defined in
 
-[src/types/lib/index.ts:144](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L144)
+[src/types/lib/index.ts:187](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L187)
 
 ---
 
@@ -689,29 +858,19 @@ Complete invocations array with account details (internal type from account -> p
 
 #### Defined in
 
-[src/types/lib/index.ts:154](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L154)
+[src/types/lib/index.ts:197](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L197)
 
 ---
 
 ### Invocations
 
-Ƭ **Invocations**: ({ `type`: `"DECLARE"` } & [`OptionalPayload`](types.md#optionalpayload)<[`DeclareContractPayload`](types.md#declarecontractpayload)\> \| { `type`: `"DEPLOY"` } & [`OptionalPayload`](types.md#optionalpayload)<[`AllowArray`](types.md#allowarray)<[`UniversalDeployerContractPayload`](types.md#universaldeployercontractpayload)\>\> \| { `type`: `"DEPLOY_ACCOUNT"` } & [`OptionalPayload`](types.md#optionalpayload)<[`DeployAccountContractPayload`](types.md#deployaccountcontractpayload)\> \| { `type`: `"INVOKE_FUNCTION"` } & [`OptionalPayload`](types.md#optionalpayload)<[`AllowArray`](types.md#allowarray)<[`Call`](types.md#call)\>\>)[]
+Ƭ **Invocations**: ({ `type`: [`DECLARE`](../enums/types.TransactionType.md#declare) } & [`OptionalPayload`](types.md#optionalpayload)<[`DeclareContractPayload`](types.md#declarecontractpayload)\> \| { `type`: [`DEPLOY`](../enums/types.TransactionType.md#deploy) } & [`OptionalPayload`](types.md#optionalpayload)<[`AllowArray`](types.md#allowarray)<[`UniversalDeployerContractPayload`](types.md#universaldeployercontractpayload)\>\> \| { `type`: [`DEPLOY_ACCOUNT`](../enums/types.TransactionType.md#deploy_account) } & [`OptionalPayload`](types.md#optionalpayload)<[`DeployAccountContractPayload`](types.md#deployaccountcontractpayload)\> \| { `type`: [`INVOKE`](../enums/types.TransactionType.md#invoke) } & [`OptionalPayload`](types.md#optionalpayload)<[`AllowArray`](types.md#allowarray)<[`Call`](types.md#call)\>\>)[]
 
 Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:159](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L159)
-
----
-
-### Status
-
-Ƭ **Status**: `"NOT_RECEIVED"` \| `"RECEIVED"` \| `"PENDING"` \| `"ACCEPTED_ON_L2"` \| `"ACCEPTED_ON_L1"` \| `"REJECTED"`
-
-#### Defined in
-
-[src/types/lib/index.ts:166](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L166)
+[src/types/lib/index.ts:202](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L202)
 
 ---
 
@@ -728,57 +887,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:181](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L181)
-
----
-
-### BlockTag
-
-Ƭ **BlockTag**: `"pending"` \| `"latest"`
-
-#### Defined in
-
-[src/types/lib/index.ts:183](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L183)
-
----
-
-### BlockNumber
-
-Ƭ **BlockNumber**: [`BlockTag`](types.md#blocktag) \| `null` \| `number`
-
-#### Defined in
-
-[src/types/lib/index.ts:184](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L184)
-
----
-
-### BlockIdentifier
-
-Ƭ **BlockIdentifier**: [`BlockNumber`](types.md#blocknumber) \| [`BigNumberish`](types.md#bignumberish)
-
-#### Defined in
-
-[src/types/lib/index.ts:188](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L188)
-
----
-
-### Struct
-
-Ƭ **Struct**: `Object`
-
-#### Index signature
-
-▪ [k: `string`]: [`BigNumberish`](types.md#bignumberish)
-
-#### Type declaration
-
-| Name   | Type       |
-| :----- | :--------- |
-| `type` | `"struct"` |
-
-#### Defined in
-
-[src/types/lib/index.ts:190](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L190)
+[src/types/lib/index.ts:211](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L211)
 
 ---
 
@@ -792,7 +901,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:194](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L194)
+[src/types/lib/index.ts:213](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L213)
 
 ---
 
@@ -802,11 +911,11 @@ Invocations array user provide to bulk method (simulate)
 
 #### Index signature
 
-▪ [key: `string`]: [`BigNumberish`](types.md#bignumberish) \| [`ParsedStruct`](types.md#parsedstruct)
+▪ [key: `string`]: [`BigNumberish`](types.md#bignumberish) \| [`BigNumberish`](types.md#bignumberish)[] \| [`ParsedStruct`](types.md#parsedstruct) \| [`Uint256`](../interfaces/types.Uint256.md)
 
 #### Defined in
 
-[src/types/lib/index.ts:197](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L197)
+[src/types/lib/index.ts:216](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L216)
 
 ---
 
@@ -816,14 +925,15 @@ Invocations array user provide to bulk method (simulate)
 
 #### Type declaration
 
-| Name             | Type                                                         |
-| :--------------- | :----------------------------------------------------------- |
-| `retryInterval?` | `number`                                                     |
-| `successStates?` | [`TransactionStatus`](../enums/types.TransactionStatus.md)[] |
+| Name             | Type                                                                                                                                                           |
+| :--------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `retryInterval?` | `number`                                                                                                                                                       |
+| `successStates?` | ([`TransactionFinalityStatus`](../enums/types.TransactionFinalityStatus.md) \| [`TransactionExecutionStatus`](../enums/types.TransactionExecutionStatus.md))[] |
+| `errorStates?`   | ([`TransactionFinalityStatus`](../enums/types.TransactionFinalityStatus.md) \| [`TransactionExecutionStatus`](../enums/types.TransactionExecutionStatus.md))[] |
 
 #### Defined in
 
-[src/types/lib/index.ts:201](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L201)
+[src/types/lib/index.ts:220](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L220)
 
 ---
 
@@ -838,10 +948,11 @@ Invocations array user provide to bulk method (simulate)
 | `blockIdentifier?` | [`BlockIdentifier`](types.md#blockidentifier) |
 | `skipValidate?`    | `boolean`                                     |
 | `skipExecute?`     | `boolean`                                     |
+| `skipFeeCharge?`   | `boolean`                                     |
 
 #### Defined in
 
-[src/types/lib/index.ts:206](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L206)
+[src/types/lib/index.ts:226](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L226)
 
 ---
 
@@ -858,7 +969,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:212](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L212)
+[src/types/lib/index.ts:233](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L233)
 
 ---
 
@@ -901,7 +1012,7 @@ Compressed or decompressed Cairo0 or Cairo1 Contract
 
 ### Abi
 
-Ƭ **Abi**: ([`FunctionAbi`](types.md#functionabi) \| `EventAbi` \| [`StructAbi`](types.md#structabi))[]
+Ƭ **Abi**: ([`FunctionAbi`](types.md#functionabi) \| [`EventAbi`](types.md#eventabi) \| [`StructAbi`](types.md#structabi) \| `any`)[]
 
 ABI
 
@@ -928,6 +1039,24 @@ ABI
 
 ---
 
+### EventEntry
+
+Ƭ **EventEntry**: `Object`
+
+#### Type declaration
+
+| Name   | Type                              |
+| :----- | :-------------------------------- |
+| `name` | `string`                          |
+| `type` | `"felt"` \| `"felt*"` \| `string` |
+| `kind` | `"key"` \| `"data"`               |
+
+#### Defined in
+
+[src/types/lib/contract/abi.ts:7](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/abi.ts#L7)
+
+---
+
 ### FunctionAbi
 
 Ƭ **FunctionAbi**: `Object`
@@ -945,7 +1074,7 @@ ABI
 
 #### Defined in
 
-[src/types/lib/contract/abi.ts:14](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/abi.ts#L14)
+[src/types/lib/contract/abi.ts:16](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/abi.ts#L16)
 
 ---
 
@@ -959,7 +1088,7 @@ ABI
 
 #### Defined in
 
-[src/types/lib/contract/abi.ts:23](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/abi.ts#L23)
+[src/types/lib/contract/abi.ts:25](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/abi.ts#L25)
 
 ---
 
@@ -978,7 +1107,102 @@ ABI
 
 #### Defined in
 
-[src/types/lib/contract/abi.ts:25](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/abi.ts#L25)
+[src/types/lib/contract/abi.ts:27](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/abi.ts#L27)
+
+---
+
+### AbiEnums
+
+Ƭ **AbiEnums**: `Object`
+
+#### Index signature
+
+▪ [name: `string`]: [`EnumAbi`](types.md#enumabi)
+
+#### Defined in
+
+[src/types/lib/contract/abi.ts:34](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/abi.ts#L34)
+
+---
+
+### EnumAbi
+
+Ƭ **EnumAbi**: `Object`
+
+#### Type declaration
+
+| Name       | Type                                                       |
+| :--------- | :--------------------------------------------------------- |
+| `variants` | [`AbiEntry`](types.md#abientry) & { `offset`: `number` }[] |
+| `name`     | `string`                                                   |
+| `size`     | `number`                                                   |
+| `type`     | `"enum"`                                                   |
+
+#### Defined in
+
+[src/types/lib/contract/abi.ts:35](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/abi.ts#L35)
+
+---
+
+### AbiEvents
+
+Ƭ **AbiEvents**: `Object`
+
+#### Index signature
+
+▪ [hash: `string`]: [`EventAbi`](types.md#eventabi)
+
+#### Defined in
+
+[src/types/lib/contract/abi.ts:42](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/abi.ts#L42)
+
+---
+
+### EventAbi
+
+Ƭ **EventAbi**: [`Cairo1Event`](types.md#cairo1event) \| [`LegacyEvent`](types.md#legacyevent)
+
+#### Defined in
+
+[src/types/lib/contract/abi.ts:44](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/abi.ts#L44)
+
+---
+
+### Cairo1Event
+
+Ƭ **Cairo1Event**: `Object`
+
+#### Type declaration
+
+| Name      | Type                                  |
+| :-------- | :------------------------------------ |
+| `name`    | `string`                              |
+| `members` | [`EventEntry`](types.md#evententry)[] |
+| `kind`    | `"struct"`                            |
+| `type`    | `"event"`                             |
+
+#### Defined in
+
+[src/types/lib/contract/abi.ts:46](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/abi.ts#L46)
+
+---
+
+### LegacyEvent
+
+Ƭ **LegacyEvent**: `Object`
+
+#### Type declaration
+
+| Name   | Type                                  |
+| :----- | :------------------------------------ |
+| `name` | `string`                              |
+| `type` | `"event"`                             |
+| `data` | [`EventEntry`](types.md#evententry)[] |
+| `keys` | [`EventEntry`](types.md#evententry)[] |
+
+#### Defined in
+
+[src/types/lib/contract/abi.ts:53](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/contract/abi.ts#L53)
 
 ---
 
@@ -1258,31 +1482,132 @@ SUBTYPES
 
 ### GetTransactionResponse
 
-Ƭ **GetTransactionResponse**: [`InvokeTransactionResponse`](../interfaces/types.InvokeTransactionResponse.md) & [`DeclareTransactionResponse`](../interfaces/types.DeclareTransactionResponse.md)
+Ƭ **GetTransactionResponse**: [`InvokeTransactionResponse`](../interfaces/types.InvokeTransactionResponse.md) \| [`DeclareTransactionResponse`](../interfaces/types.DeclareTransactionResponse.md) \| [`RejectedTransactionResponse`](types.md#rejectedtransactionresponse)
 
 #### Defined in
 
-[src/types/provider/response.ts:42](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L42)
+[src/types/provider/response.ts:52](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L52)
+
+---
+
+### RejectedTransactionResponse
+
+Ƭ **RejectedTransactionResponse**: `Object`
+
+#### Type declaration
+
+| Name                                       | Type                                             |
+| :----------------------------------------- | :----------------------------------------------- |
+| `status`                                   | \`${REJECTED}\`                                  |
+| `transaction_failure_reason`               | { `code`: `string` ; `error_message`: `string` } |
+| `transaction_failure_reason.code`          | `string`                                         |
+| `transaction_failure_reason.error_message` | `string`                                         |
+
+#### Defined in
+
+[src/types/provider/response.ts:93](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L93)
 
 ---
 
 ### GetTransactionReceiptResponse
 
-Ƭ **GetTransactionReceiptResponse**: [`InvokeTransactionReceiptResponse`](../interfaces/types.InvokeTransactionReceiptResponse.md) \| [`DeclareTransactionReceiptResponse`](types.md#declaretransactionreceiptresponse)
+Ƭ **GetTransactionReceiptResponse**: [`SuccessfulTransactionReceiptResponse`](types.md#successfultransactionreceiptresponse) \| [`RevertedTransactionReceiptResponse`](types.md#revertedtransactionreceiptresponse) \| [`RejectedTransactionReceiptResponse`](types.md#rejectedtransactionreceiptresponse)
 
 #### Defined in
 
-[src/types/provider/response.ts:69](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L69)
+[src/types/provider/response.ts:101](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L101)
+
+---
+
+### SuccessfulTransactionReceiptResponse
+
+Ƭ **SuccessfulTransactionReceiptResponse**: [`InvokeTransactionReceiptResponse`](../interfaces/types.InvokeTransactionReceiptResponse.md) \| [`DeployTransactionReceiptResponse`](types.md#deploytransactionreceiptresponse) \| [`DeclareTransactionReceiptResponse`](types.md#declaretransactionreceiptresponse)
+
+#### Defined in
+
+[src/types/provider/response.ts:106](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L106)
 
 ---
 
 ### DeclareTransactionReceiptResponse
 
-Ƭ **DeclareTransactionReceiptResponse**: [`CommonTransactionReceiptResponse`](../interfaces/types.CommonTransactionReceiptResponse.md)
+Ƭ **DeclareTransactionReceiptResponse**: `Object`
+
+#### Type declaration
+
+| Name                 | Type                                                                         |
+| :------------------- | :--------------------------------------------------------------------------- |
+| `type?`              | [`TransactionType`](../enums/types.TransactionType.md)                       |
+| `execution_status`   | [`TransactionExecutionStatus`](../enums/types.TransactionExecutionStatus.md) |
+| `finality_status`    | [`TransactionFinalityStatus`](../enums/types.TransactionFinalityStatus.md)   |
+| `status?`            | \`${TransactionStatus}\`                                                     |
+| `actual_fee`         | `string`                                                                     |
+| `block_hash`         | [`BlockHash`](types.RPC.md#blockhash)                                        |
+| `block_number`       | [`BlockNumber`](types.md#blocknumber)                                        |
+| `transaction_hash`   | `string`                                                                     |
+| `transaction_index?` | `number`                                                                     |
+| `messages_sent`      | [`MessageToL1`](../interfaces/types.MessageToL1.md)[]                        |
+| `events`             | `any`[]                                                                      |
 
 #### Defined in
 
-[src/types/provider/response.ts:103](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L103)
+[src/types/provider/response.ts:126](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L126)
+
+---
+
+### DeployTransactionReceiptResponse
+
+Ƭ **DeployTransactionReceiptResponse**: [`InvokeTransactionReceiptResponse`](../interfaces/types.InvokeTransactionReceiptResponse.md)
+
+#### Defined in
+
+[src/types/provider/response.ts:140](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L140)
+
+---
+
+### RejectedTransactionReceiptResponse
+
+Ƭ **RejectedTransactionReceiptResponse**: `Object`
+
+#### Type declaration
+
+| Name                                       | Type                                             |
+| :----------------------------------------- | :----------------------------------------------- |
+| `status`                                   | \`${REJECTED}\`                                  |
+| `transaction_failure_reason`               | { `code`: `string` ; `error_message`: `string` } |
+| `transaction_failure_reason.code`          | `string`                                         |
+| `transaction_failure_reason.error_message` | `string`                                         |
+
+#### Defined in
+
+[src/types/provider/response.ts:148](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L148)
+
+---
+
+### RevertedTransactionReceiptResponse
+
+Ƭ **RevertedTransactionReceiptResponse**: `Object`
+
+#### Type declaration
+
+| Name                 | Type                                                                                |
+| :------------------- | :---------------------------------------------------------------------------------- |
+| `type?`              | [`TransactionType`](../enums/types.TransactionType.md) \| `any`                     |
+| `execution_status`   | [`REVERTED`](../enums/types.TransactionExecutionStatus.md#reverted) \| `any`        |
+| `finality_status`    | [`TransactionFinalityStatus`](../enums/types.TransactionFinalityStatus.md) \| `any` |
+| `status?`            | [`TransactionStatus`](../enums/types.TransactionStatus.md)                          |
+| `actual_fee`         | `string`                                                                            |
+| `block_hash?`        | `string`                                                                            |
+| `block_number?`      | [`BlockNumber`](types.md#blocknumber)                                               |
+| `transaction_hash`   | `string`                                                                            |
+| `transaction_index?` | `number`                                                                            |
+| `messages_sent`      | [`MessageToL1`](../interfaces/types.MessageToL1.md)[]                               |
+| `events`             | `any`[]                                                                             |
+| `revert_reason?`     | `string`                                                                            |
+
+#### Defined in
+
+[src/types/provider/response.ts:156](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L156)
 
 ---
 
@@ -1298,7 +1623,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:121](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L121)
+[src/types/provider/response.ts:187](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L187)
 
 ---
 
@@ -1308,7 +1633,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:125](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L125)
+[src/types/provider/response.ts:191](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L191)
 
 ---
 
@@ -1318,7 +1643,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:143](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L143)
+[src/types/provider/response.ts:209](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L209)
 
 ---
 
@@ -1328,7 +1653,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:145](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L145)
+[src/types/provider/response.ts:211](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L211)
 
 ---
 
@@ -1338,7 +1663,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:147](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L147)
+[src/types/provider/response.ts:213](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L213)
 
 ---
 
@@ -1348,7 +1673,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:149](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L149)
+[src/types/provider/response.ts:215](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L215)
 
 ---
 
@@ -1366,7 +1691,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:151](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L151)
+[src/types/provider/response.ts:217](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L217)
 
 ---
 
@@ -1376,7 +1701,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:157](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L157)
+[src/types/provider/response.ts:223](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L223)
 
 ---
 
@@ -1391,7 +1716,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 #### Defined in
 
-[src/types/provider/response.ts:181](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L181)
+[src/types/provider/response.ts:247](https://github.com/0xs34n/starknet.js/blob/develop/src/types/provider/response.ts#L247)
 
 ---
 
@@ -1438,134 +1763,10 @@ standard.
 
 ---
 
-### GetTransactionStatusResponse
+### CairoEnum
 
-Ƭ **GetTransactionStatusResponse**: `Object`
-
-#### Type declaration
-
-| Name                              | Type                                                       |
-| :-------------------------------- | :--------------------------------------------------------- |
-| `tx_status`                       | [`TransactionStatus`](../enums/types.TransactionStatus.md) |
-| `block_hash?`                     | `string`                                                   |
-| `tx_failure_reason?`              | { `code`: `string` ; `error_message`: `string` }           |
-| `tx_failure_reason.code`          | `string`                                                   |
-| `tx_failure_reason.error_message` | `string`                                                   |
+Ƭ **CairoEnum**: [`CairoCustomEnum`](../classes/CairoCustomEnum.md) \| [`CairoOption`](../classes/CairoOption.md)<`any`\> \| [`CairoResult`](../classes/CairoResult.md)<`any`, `any`\>
 
 #### Defined in
 
-[src/types/api/sequencer.ts:17](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L17)
-
----
-
-### GetContractAddressesResponse
-
-Ƭ **GetContractAddressesResponse**: `Object`
-
-#### Type declaration
-
-| Name                   | Type     |
-| :--------------------- | :------- |
-| `Starknet`             | `string` |
-| `GpsStatementVerifier` | `string` |
-
-#### Defined in
-
-[src/types/api/sequencer.ts:26](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L26)
-
----
-
-### FunctionInvocation
-
-Ƭ **FunctionInvocation**: `Object`
-
-#### Type declaration
-
-| Name                  | Type                                                    |
-| :-------------------- | :------------------------------------------------------ |
-| `caller_address`      | `string`                                                |
-| `contract_address`    | `string`                                                |
-| `calldata`            | [`RawCalldata`](types.md#rawcalldata)                   |
-| `call_type?`          | `string`                                                |
-| `class_hash?`         | `string`                                                |
-| `selector?`           | `string`                                                |
-| `entry_point_type?`   | [`EXTERNAL`](../enums/types.EntryPointType.md#external) |
-| `result`              | `any`[]                                                 |
-| `execution_resources` | [`ExecutionResources`](types.md#executionresources)     |
-| `internal_calls`      | [`FunctionInvocation`](types.md#functioninvocation)[]   |
-| `events`              | `any`[]                                                 |
-| `messages`            | `any`[]                                                 |
-
-#### Defined in
-
-[src/types/api/sequencer.ts:31](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L31)
-
----
-
-### ExecutionResources
-
-Ƭ **ExecutionResources**: `Object`
-
-#### Type declaration
-
-| Name                                           | Type                                                                                                                                                                                   |
-| :--------------------------------------------- | :------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `n_steps`                                      | `number`                                                                                                                                                                               |
-| `builtin_instance_counter`                     | { `pedersen_builtin`: `number` ; `range_check_builtin`: `number` ; `bitwise_builtin`: `number` ; `output_builtin`: `number` ; `ecdsa_builtin`: `number` ; `ec_op_builtin?`: `number` } |
-| `builtin_instance_counter.pedersen_builtin`    | `number`                                                                                                                                                                               |
-| `builtin_instance_counter.range_check_builtin` | `number`                                                                                                                                                                               |
-| `builtin_instance_counter.bitwise_builtin`     | `number`                                                                                                                                                                               |
-| `builtin_instance_counter.output_builtin`      | `number`                                                                                                                                                                               |
-| `builtin_instance_counter.ecdsa_builtin`       | `number`                                                                                                                                                                               |
-| `builtin_instance_counter.ec_op_builtin?`      | `number`                                                                                                                                                                               |
-| `n_memory_holes`                               | `number`                                                                                                                                                                               |
-
-#### Defined in
-
-[src/types/api/sequencer.ts:46](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L46)
-
----
-
-### CallL1Handler
-
-Ƭ **CallL1Handler**: `Object`
-
-#### Type declaration
-
-| Name                   | Type       |
-| :--------------------- | :--------- |
-| `from_address`         | `string`   |
-| `to_address`           | `string`   |
-| `entry_point_selector` | `string`   |
-| `payload`              | `string`[] |
-
-#### Defined in
-
-[src/types/api/sequencer.ts:59](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L59)
-
----
-
-### DeployedContractItem
-
-Ƭ **DeployedContractItem**: `Object`
-
-#### Type declaration
-
-| Name         | Type     |
-| :----------- | :------- |
-| `address`    | `string` |
-| `class_hash` | `string` |
-
-#### Defined in
-
-[src/types/api/sequencer.ts:66](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L66)
-
----
-
-### SequencerIdentifier
-
-Ƭ **SequencerIdentifier**: { `blockHash`: `string` } \| { `blockNumber`: [`BlockNumber`](types.md#blocknumber) }
-
-#### Defined in
-
-[src/types/api/sequencer.ts:71](https://github.com/0xs34n/starknet.js/blob/develop/src/types/api/sequencer.ts#L71)
+[src/types/cairoEnum.ts:3](https://github.com/0xs34n/starknet.js/blob/develop/src/types/cairoEnum.ts#L3)

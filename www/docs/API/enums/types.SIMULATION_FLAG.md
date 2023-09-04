@@ -11,7 +11,7 @@ custom_edit_url: null
 
 ### SKIP_VALIDATE
 
-• **SKIP_VALIDATE** = `0`
+• **SKIP_VALIDATE** = `"SKIP_VALIDATE"`
 
 #### Defined in
 
@@ -21,7 +21,7 @@ custom_edit_url: null
 
 ### SKIP_EXECUTE
 
-• **SKIP_EXECUTE** = `1`
+• **SKIP_EXECUTE** = `"SKIP_EXECUTE"`
 
 #### Defined in
 

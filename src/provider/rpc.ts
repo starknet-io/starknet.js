@@ -1,9 +1,14 @@
-import { StarknetChainId } from '../constants';
+import {
+  HEX_STR_TRANSACTION_VERSION_1,
+  HEX_STR_TRANSACTION_VERSION_2,
+  StarknetChainId,
+} from '../constants';
 import {
   AccountInvocationItem,
   AccountInvocations,
   BigNumberish,
   BlockIdentifier,
+  BlockTag,
   Call,
   CallContractResponse,
   ContractClassResponse,
@@ -19,27 +24,24 @@ import {
   Invocation,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
-  LegacyContractClass,
   RPC,
   RpcProviderOptions,
-  SIMULATION_FLAG,
-  SierraContractClass,
   SimulateTransactionResponse,
-  TransactionStatus,
   TransactionType,
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
+import {
+  SimulationFlag,
+  TransactionExecutionStatus,
+  TransactionFinalityStatus,
+} from '../types/api/rpc';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
+import { pascalToSnake } from '../utils/encode';
 import fetch from '../utils/fetchPonyfill';
-import {
-  getSelectorFromName,
-  getVersionsByType,
-  transactionVersion,
-  transactionVersion_2,
-} from '../utils/hash';
+import { getSelectorFromName, getVersionsByType } from '../utils/hash';
 import { stringify } from '../utils/json';
 import { toHex, toStorageKey } from '../utils/num';
 import { wait } from '../utils/provider';
@@ -54,7 +56,7 @@ import { Block } from './utils';
 // Note that pending support is disabled by default and must be enabled by setting poll-pending=true in the configuration options.
 const defaultOptions = {
   headers: { 'Content-Type': 'application/json' },
-  blockIdentifier: 'latest',
+  blockIdentifier: BlockTag.pending,
   retries: 200,
 };
 
@@ -345,7 +347,7 @@ export class RpcProvider implements ProviderInterface {
             entry_points_by_type: contract.entry_points_by_type,
             abi: contract.abi,
           },
-          version: toHex(transactionVersion),
+          version: HEX_STR_TRANSACTION_VERSION_1,
           max_fee: toHex(details.maxFee || 0),
           signature: signatureToHexArray(signature),
           sender_address: senderAddress,
@@ -363,7 +365,7 @@ export class RpcProvider implements ProviderInterface {
           abi: contract.abi,
         },
         compiled_class_hash: compiledClassHash || '',
-        version: toHex(transactionVersion_2),
+        version: HEX_STR_TRANSACTION_VERSION_2,
         max_fee: toHex(details.maxFee || 0),
         signature: signatureToHexArray(signature),
         sender_address: senderAddress,
@@ -434,16 +436,17 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async waitForTransaction(txHash: string, options?: waitForTransactionOptions) {
-    const errorStates = [TransactionStatus.REJECTED, TransactionStatus.NOT_RECEIVED];
     let { retries } = this;
     let onchain = false;
+    let isErrorState = false;
+    // eslint-disable-next-line no-undef-init
     let txReceipt: any = {};
-
-    const retryInterval = options?.retryInterval ?? 8000;
-    const successStates = options?.successStates ?? [
-      TransactionStatus.ACCEPTED_ON_L1,
-      TransactionStatus.ACCEPTED_ON_L2,
-      TransactionStatus.PENDING,
+    const retryInterval = options?.retryInterval ?? 5000;
+    const errorStates: any = options?.errorStates ?? [TransactionExecutionStatus.REVERTED];
+    const successStates: any = options?.successStates ?? [
+      TransactionExecutionStatus.SUCCEEDED,
+      TransactionFinalityStatus.ACCEPTED_ON_L1,
+      TransactionFinalityStatus.ACCEPTED_ON_L2,
     ];
 
     while (!onchain) {
@@ -453,21 +456,28 @@ export class RpcProvider implements ProviderInterface {
         // eslint-disable-next-line no-await-in-loop
         txReceipt = await this.getTransactionReceipt(txHash);
 
-        if (!('status' in txReceipt)) {
-          const error = new Error('pending transaction');
+        // TODO: Hotfix until Pathfinder release fixed casing
+        const executionStatus = pascalToSnake(txReceipt.execution_status);
+        const finalityStatus = pascalToSnake(txReceipt.finality_status);
+
+        if (!executionStatus || !finalityStatus) {
+          // Transaction is potentially REJECTED or NOT_RECEIVED but RPC doesn't have dose statuses
+          // so we will retry '{ retries }' times
+          const error = new Error('waiting for transaction status');
           throw error;
         }
 
-        if (txReceipt.status && successStates.includes(txReceipt.status)) {
+        if (successStates.includes(executionStatus) || successStates.includes(finalityStatus)) {
           onchain = true;
-        } else if (txReceipt.status && errorStates.includes(txReceipt.status)) {
-          const message = txReceipt.status;
-          const error = new Error(message) as Error & { response: any };
+        } else if (errorStates.includes(executionStatus) || errorStates.includes(finalityStatus)) {
+          const message = `${executionStatus}: ${finalityStatus}: ${txReceipt.revert_reason}`;
+          const error = new Error(message) as Error & { response: RPC.TransactionReceipt };
           error.response = txReceipt;
+          isErrorState = true;
           throw error;
         }
-      } catch (error: unknown) {
-        if (error instanceof Error && errorStates.includes(error.message as TransactionStatus)) {
+      } catch (error) {
+        if (error instanceof Error && isErrorState) {
           throw error;
         }
 
@@ -532,18 +542,19 @@ export class RpcProvider implements ProviderInterface {
     {
       blockIdentifier = this.blockIdentifier,
       skipValidate = false,
-      skipExecute = false,
+      skipExecute = false, // @deprecated
+      skipFeeCharge = true, // Pathfinder currently does not support `starknet_simulateTransactions` without `SKIP_FEE_CHARGE` simulation flag being set. This will become supported in a future release
     }: getSimulateTransactionOptions
   ): Promise<SimulateTransactionResponse> {
     const block_id = new Block(blockIdentifier).identifier;
 
     const simulationFlags = [];
-    if (skipValidate) simulationFlags.push(SIMULATION_FLAG.SKIP_VALIDATE);
-    if (skipExecute) simulationFlags.push(SIMULATION_FLAG.SKIP_EXECUTE);
+    if (skipValidate) simulationFlags.push(SimulationFlag.SKIP_VALIDATE);
+    if (skipExecute || skipFeeCharge) simulationFlags.push(SimulationFlag.SKIP_FEE_CHARGE);
 
-    return this.fetchEndpoint('starknet_simulateTransaction', {
+    return this.fetchEndpoint('starknet_simulateTransactions', {
       block_id,
-      transactions: invocations.map((it) => this.buildTransaction(it)), // TODO: Pathfinder 0.5.6 bug, should be transaction
+      transactions: invocations.map((it) => this.buildTransaction(it)),
       simulation_flags: simulationFlags,
     }).then(this.responseParser.parseSimulateTransactionResponse);
   }
@@ -559,7 +570,7 @@ export class RpcProvider implements ProviderInterface {
   public buildTransaction(
     invocation: AccountInvocationItem,
     versionType?: 'fee' | 'transaction'
-  ): RPC.BroadcastedTransaction {
+  ): RPC.BaseTransaction {
     const defaultVersions = getVersionsByType(versionType);
     const details = {
       signature: signatureToHexArray(invocation.signature),
@@ -572,32 +583,30 @@ export class RpcProvider implements ProviderInterface {
         type: RPC.TransactionType.INVOKE, // Diff between sequencer and rpc invoke type
         sender_address: invocation.contractAddress,
         calldata: CallData.toHex(invocation.calldata),
-        version: toHex(invocation.version || defaultVersions.v1),
+        version: toHex(invocation.version || defaultVersions.v1) as any, // HEX_STR_TRANSACTION_VERSION_1, // as any HOTFIX TODO: Resolve spec version
         ...details,
       };
     }
-    if (invocation.type === RPC.TransactionType.DECLARE) {
+    if (invocation.type === TransactionType.DECLARE) {
       if (!isSierra(invocation.contract)) {
-        const legacyContract = invocation.contract as LegacyContractClass;
         return {
           type: invocation.type,
-          contract_class: legacyContract,
+          contract_class: invocation.contract,
           sender_address: invocation.senderAddress,
-          version: toHex(invocation.version || defaultVersions.v1),
+          version: toHex(invocation.version || defaultVersions.v1) as any, // HEX_STR_TRANSACTION_VERSION_1, // as any HOTFIX TODO: Resolve spec version
           ...details,
         };
       }
-      const sierraContract = invocation.contract as SierraContractClass;
       return {
         // compiled_class_hash
         type: invocation.type,
         contract_class: {
-          ...sierraContract,
-          sierra_program: decompressProgram(sierraContract.sierra_program),
+          ...invocation.contract,
+          sierra_program: decompressProgram(invocation.contract.sierra_program),
         },
         compiled_class_hash: invocation.compiledClassHash || '',
         sender_address: invocation.senderAddress,
-        version: toHex(invocation.version || defaultVersions.v2),
+        version: toHex(invocation.version || defaultVersions.v2) as any, // HEX_STR_TRANSACTION_VERSION_2, // as any HOTFIX TODO: Resolve spec version
         ...details,
       };
     }

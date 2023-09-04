@@ -1,3 +1,96 @@
+## [5.19.5](https://github.com/0xs34n/starknet.js/compare/v5.19.4...v5.19.5) (2023-08-29)
+
+### Bug Fixes
+
+- status case ([5ba7983](https://github.com/0xs34n/starknet.js/commit/5ba798309d2c8567840b8f6a6031ec0e6b582d53))
+
+## [5.19.4](https://github.com/0xs34n/starknet.js/compare/v5.19.3...v5.19.4) (2023-08-29)
+
+### Bug Fixes
+
+- use BigNumberish for u256 ([3a7be10](https://github.com/0xs34n/starknet.js/commit/3a7be1075b0ca4f217cf28aabaa870c93c08f6d1))
+- waitForTransaction for Infura ([c871fe6](https://github.com/0xs34n/starknet.js/commit/c871fe65a0b08e368218f51327cd64591f2b7f49))
+
+## [5.19.3](https://github.com/0xs34n/starknet.js/compare/v5.19.2...v5.19.3) (2023-08-22)
+
+### Bug Fixes
+
+- expose event parsing utilities ([50cb64c](https://github.com/0xs34n/starknet.js/commit/50cb64cadc9a382a336e20e25bdf65814efca332))
+
+## [5.19.2](https://github.com/0xs34n/starknet.js/compare/v5.19.1...v5.19.2) (2023-08-20)
+
+### Bug Fixes
+
+- handle ContractAddress array validation ([0748ec6](https://github.com/0xs34n/starknet.js/commit/0748ec61b510d4d2939b1feb8ca19c15740a0f2a))
+
+## [5.19.1](https://github.com/0xs34n/starknet.js/compare/v5.19.0...v5.19.1) (2023-08-16)
+
+### Bug Fixes
+
+- repair CallData compilation faulty ordering ([e8cbedc](https://github.com/0xs34n/starknet.js/commit/e8cbedc3eac39cb0662e958ad5056750f8dc4069))
+
+# [5.19.0](https://github.com/0xs34n/starknet.js/compare/v5.18.0...v5.19.0) (2023-08-11)
+
+### Bug Fixes
+
+- add function definition to the contract interface + doc ([06498d5](https://github.com/0xs34n/starknet.js/commit/06498d539bc2b816982e0245ae3b6508665f03f7))
+- contract test status ([53cfaf9](https://github.com/0xs34n/starknet.js/commit/53cfaf935d1b053f5bcd17ffcb1ae48d9e8a4eef))
+- fix multiple same events + add cairo code + seperate tests, legacy and Cairo1 ([7c93157](https://github.com/0xs34n/starknet.js/commit/7c93157d60864989efec37a05521979a2548e4d8))
+- modify parseEvents structure + add testcase for multiple different event in same tx ([b63b0d6](https://github.com/0xs34n/starknet.js/commit/b63b0d631d163e181c8a42a634f107d2761e35ca))
+- optional struct and enum in responseParser ([14d3cca](https://github.com/0xs34n/starknet.js/commit/14d3cca97a3cebedf07466f98dd46639999421c2))
+- patch merge, and add enums to event parser ([00f8073](https://github.com/0xs34n/starknet.js/commit/00f8073418eef1e2eebf105884357561b959fb7c))
+- remove exports from responseParser functions ([3d86446](https://github.com/0xs34n/starknet.js/commit/3d864463579fc68c4538bbbc7820420ec64b15eb))
+- repair SequencerProvider network resolution ([e42dfc1](https://github.com/0xs34n/starknet.js/commit/e42dfc1e722d4a77bc52102a94295ee7ab6a460d))
+- restore package-lock to previous state ([2fe0564](https://github.com/0xs34n/starknet.js/commit/2fe0564ed042537e480ea8481c787fe7359ba4a8))
+
+### Features
+
+- add ethAddress handling ([2a93f90](https://github.com/0xs34n/starknet.js/commit/2a93f90cc9e7e697a153e42b9ebd19dec6f1880f))
+- cairo enum in request parser ([ad44481](https://github.com/0xs34n/starknet.js/commit/ad4448129058b76fede61675d46a37a6c74f0d16))
+- cairo enum in response parser ([a936a11](https://github.com/0xs34n/starknet.js/commit/a936a11ca34af628ec187740616b8c5a804e9d65)), closes [#670](https://github.com/0xs34n/starknet.js/issues/670) [#665](https://github.com/0xs34n/starknet.js/issues/665) [#664](https://github.com/0xs34n/starknet.js/issues/664) [#1](https://github.com/0xs34n/starknet.js/issues/1) [#675](https://github.com/0xs34n/starknet.js/issues/675) [#1](https://github.com/0xs34n/starknet.js/issues/1) [#675](https://github.com/0xs34n/starknet.js/issues/675) [#1](https://github.com/0xs34n/starknet.js/issues/1) [#670](https://github.com/0xs34n/starknet.js/issues/670) [#665](https://github.com/0xs34n/starknet.js/issues/665) [#664](https://github.com/0xs34n/starknet.js/issues/664) [#1](https://github.com/0xs34n/starknet.js/issues/1) [#675](https://github.com/0xs34n/starknet.js/issues/675) [#1](https://github.com/0xs34n/starknet.js/issues/1)
+- implement event parsing ([86cc430](https://github.com/0xs34n/starknet.js/commit/86cc430cff2b6f338edecce29819260b475a3907))
+- new Cairo types ([f9db09e](https://github.com/0xs34n/starknet.js/commit/f9db09eeab05fd0c1692229fcdbbc020b4954f3e))
+
+# [5.17.0](https://github.com/0xs34n/starknet.js/compare/v5.16.0...v5.17.0) (2023-07-18)
+
+### Bug Fixes
+
+- add FailedTransactionResponse ([994925e](https://github.com/0xs34n/starknet.js/commit/994925e87a4fde3cfcffd9103793d44bc96fc96c))
+- remedy type declaration roll-up issues ([48625f4](https://github.com/0xs34n/starknet.js/commit/48625f4a9eaf4e3c294ad840dae78ebab4ab9a12))
+- transaction_failure_reason ([77329b7](https://github.com/0xs34n/starknet.js/commit/77329b7ddfc63d708685f0dcbffbe1b9094f7824))
+
+### Features
+
+- add Enum in contract ([515e233](https://github.com/0xs34n/starknet.js/commit/515e233a0b29e125936192da540b83af8591b507)), closes [#670](https://github.com/0xs34n/starknet.js/issues/670) [#665](https://github.com/0xs34n/starknet.js/issues/665) [#664](https://github.com/0xs34n/starknet.js/issues/664) [#1](https://github.com/0xs34n/starknet.js/issues/1)
+- calldata result in populate ([d44dc56](https://github.com/0xs34n/starknet.js/commit/d44dc56c0b6db68fcd664b8f02d7a4b72bcdfd28)), closes [#675](https://github.com/0xs34n/starknet.js/issues/675) [#1](https://github.com/0xs34n/starknet.js/issues/1)
+- contractFactory Cairo1 & changed constructor signature, 0.12 test fixes ([9b44c54](https://github.com/0xs34n/starknet.js/commit/9b44c54857896019c2545c945695e525392e8dbd))
+- rename Failed to Rejected for transaction type ([65b1ef4](https://github.com/0xs34n/starknet.js/commit/65b1ef432e2eda9f37574771d60b409a3f7ab049))
+
+# [5.16.0](https://github.com/0xs34n/starknet.js/compare/v5.15.1...v5.16.0) (2023-07-03)
+
+### Features
+
+- cairo1 version2 support ([e564033](https://github.com/0xs34n/starknet.js/commit/e564033273ac49e971bbf1db843fb3de236976c0))
+- extract parser from CallData and Cairo ([b7eba2a](https://github.com/0xs34n/starknet.js/commit/b7eba2a1eada3dddb4dc0575c16ac76a42a78678))
+- parsers ([cce9029](https://github.com/0xs34n/starknet.js/commit/cce90299e59e60090b568be14331378de3918924))
+
+## [5.15.1](https://github.com/0xs34n/starknet.js/compare/v5.15.0...v5.15.1) (2023-06-29)
+
+### Bug Fixes
+
+- eradicate static strings ([597d2b5](https://github.com/0xs34n/starknet.js/commit/597d2b525709c0fa2607af70b6f8b6289fb32448))
+
+# [5.15.0](https://github.com/0xs34n/starknet.js/compare/v5.14.1...v5.15.0) (2023-06-29)
+
+### Bug Fixes
+
+- remove DeployContractPayload type ([8908a90](https://github.com/0xs34n/starknet.js/commit/8908a900986244d615b91d35d61906d2dba580b4))
+- removed old Struct type ([8ec8a0d](https://github.com/0xs34n/starknet.js/commit/8ec8a0dca2e5548d6ad0d5d63d1431c84f668410))
+
+### Features
+
+- removed pending transaction status, typing update ([a76b35c](https://github.com/0xs34n/starknet.js/commit/a76b35cf5bd9eb8c0a5b9ea33d689ed53c8ff8ab))
+
 ## [5.14.1](https://github.com/0xs34n/starknet.js/compare/v5.14.0...v5.14.1) (2023-06-26)
 
 ### Bug Fixes

@@ -1,5 +1,11 @@
 /* eslint-disable max-classes-per-file */
-import type { BigNumberish, BlockIdentifier, BlockNumber, SequencerIdentifier } from '../types';
+import {
+  BigNumberish,
+  BlockIdentifier,
+  BlockNumber,
+  BlockTag,
+  SequencerIdentifier,
+} from '../types';
 import { isHex, toHex } from '../utils/num';
 
 /** @deprecated prefer importing from 'types' over 'provider/utils' */
@@ -32,7 +38,7 @@ export function txIdentifier(txHash?: BigNumberish, txId?: BigNumberish): string
   return `transactionHash=${hashString}`;
 }
 
-export const validBlockTags = ['latest', 'pending'];
+export const validBlockTags = Object.values(BlockTag);
 
 export class Block {
   hash: BlockIdentifier = null;
@@ -48,11 +54,14 @@ export class Block {
       this.hash = toHex(__identifier);
     } else if (typeof __identifier === 'number') {
       this.number = __identifier;
-    } else if (typeof __identifier === 'string' && validBlockTags.includes(__identifier)) {
+    } else if (
+      typeof __identifier === 'string' &&
+      validBlockTags.includes(__identifier as BlockTag)
+    ) {
       this.tag = __identifier;
     } else {
       // default
-      this.tag = 'pending';
+      this.tag = BlockTag.pending;
     }
   }
 

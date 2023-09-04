@@ -55,7 +55,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:144
 
 ### addRecoveryBit
 
-▸ **addRecoveryBit**(`recovery`): [`SignatureType`](ec.weierstrass.SignatureType.md)
+▸ **addRecoveryBit**(`recovery`): [`RecoveredSignatureType`](../namespaces/ec.weierstrass.md#recoveredsignaturetype)
 
 #### Parameters
 
@@ -65,7 +65,7 @@ node_modules/@noble/curves/abstract/weierstrass.d.ts:144
 
 #### Returns
 
-[`SignatureType`](ec.weierstrass.SignatureType.md)
+[`RecoveredSignatureType`](../namespaces/ec.weierstrass.md#recoveredsignaturetype)
 
 #### Defined in
 

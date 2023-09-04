@@ -2,7 +2,10 @@ name: _ Run Tests
 on:
   workflow_call:
     inputs:
-      is-rpc:
+      use-rpc-devnet:
+        type: boolean
+        default: false
+      use-seq-devnet:
         type: boolean
         default: false
     secrets:
@@ -23,10 +26,14 @@ jobs:
     # TODO - periodically check if conditional services are supported; https://github.com/actions/runner/issues/822
     services:
       devnet:
-        # image: ${{ inputs.is-rpc && 'shardlabs/starknet-devnet:0.5.3-seed0' || 'shardlabs/starknet-devnet:0.5.2-seed0' }}
-        image: shardlabs/starknet-devnet:0.5.4-seed0
+        # image: ${{ inputs.use-rpc-devnet && 'shardlabs/starknet-devnet:0.6.1-seed0' || inputs.use-seq-devnet && 'shardlabs/starknet-devnet:0.6.1-seed0' || '' }}
+        image: ${{ (inputs.use-rpc-devnet || inputs.use-seq-devnet) && 'shardlabs/starknet-devnet:0.6.1-seed0' || '' }}
+        # image: shardlabs/starknet-devnet:0.6.1-seed0
         ports:
           - 5050:5050
+
+    # TODO - temporary conditional, remove if/when devnet RPC support is restored
+    if: ${{ (!inputs.use-rpc-devnet) }}
 
     env:
       TEST_PROVIDER_BASE_URL: ${{ secrets.TEST_PROVIDER_BASE_URL }}

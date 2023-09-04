@@ -20,7 +20,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/calldata/index.ts:33](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L33)
+[src/utils/calldata/index.ts:47](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L47)
 
 ## Properties
 
@@ -30,7 +30,17 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/calldata/index.ts:29](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L29)
+[src/utils/calldata/index.ts:39](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L39)
+
+---
+
+### parser
+
+• **parser**: `AbiParserInterface`
+
+#### Defined in
+
+[src/utils/calldata/index.ts:41](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L41)
 
 ---
 
@@ -40,7 +50,17 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/calldata/index.ts:31](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L31)
+[src/utils/calldata/index.ts:43](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L43)
+
+---
+
+### enums
+
+• `Protected` `Readonly` **enums**: [`AbiEnums`](../namespaces/types.md#abienums)
+
+#### Defined in
+
+[src/utils/calldata/index.ts:45](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L45)
 
 ## Methods
 
@@ -64,31 +84,7 @@ Calldata
 
 #### Defined in
 
-[src/utils/calldata/index.ts:120](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L120)
-
----
-
-### abiInputsLength
-
-▸ `Static` **abiInputsLength**(`inputs`): `number`
-
-Helper to calculate inputs from abi
-
-#### Parameters
-
-| Name     | Type                                            | Description |
-| :------- | :---------------------------------------------- | :---------- |
-| `inputs` | [`AbiEntry`](../namespaces/types.md#abientry)[] | AbiEntry    |
-
-#### Returns
-
-`number`
-
-number
-
-#### Defined in
-
-[src/utils/calldata/index.ts:201](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L201)
+[src/utils/calldata/index.ts:161](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L161)
 
 ---
 
@@ -112,7 +108,31 @@ AbiStructs - structs from abi
 
 #### Defined in
 
-[src/utils/calldata/index.ts:210](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L210)
+[src/utils/calldata/index.ts:279](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L279)
+
+---
+
+### getAbiEnum
+
+▸ `Static` **getAbiEnum**(`abi`): [`AbiEnums`](../namespaces/types.md#abienums)
+
+Helper to extract enums from abi
+
+#### Parameters
+
+| Name  | Type                                | Description |
+| :---- | :---------------------------------- | :---------- |
+| `abi` | [`Abi`](../namespaces/types.md#abi) | Abi         |
+
+#### Returns
+
+[`AbiEnums`](../namespaces/types.md#abienums)
+
+AbiEnums - enums from abi
+
+#### Defined in
+
+[src/utils/calldata/index.ts:296](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L296)
 
 ---
 
@@ -136,7 +156,7 @@ Calldata
 
 #### Defined in
 
-[src/utils/calldata/index.ts:227](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L227)
+[src/utils/calldata/index.ts:315](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L315)
 
 ---
 
@@ -160,7 +180,7 @@ HexCalldata
 
 #### Defined in
 
-[src/utils/calldata/index.ts:236](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L236)
+[src/utils/calldata/index.ts:324](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L324)
 
 ---
 
@@ -174,7 +194,7 @@ Validate arguments passed to the method as corresponding to the ones in the abi
 
 | Name     | Type                                                      | Default value | Description                                              |
 | :------- | :-------------------------------------------------------- | :------------ | :------------------------------------------------------- |
-| `type`   | `"DEPLOY"` \| `"INVOKE"` \| `"CALL"`                      | `undefined`   | string - type of the method                              |
+| `type`   | [`ValidateType`](../enums/types.ValidateType.md)          | `undefined`   | ValidateType - type of the method                        |
 | `method` | `string`                                                  | `undefined`   | string - name of the method                              |
 | `args`   | [`ArgsOrCalldata`](../namespaces/types.md#argsorcalldata) | `[]`          | ArgsOrCalldata - arguments that are passed to the method |
 
@@ -184,7 +204,7 @@ Validate arguments passed to the method as corresponding to the ones in the abi
 
 #### Defined in
 
-[src/utils/calldata/index.ts:44](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L44)
+[src/utils/calldata/index.ts:60](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L60)
 
 ---
 
@@ -220,7 +240,7 @@ Calldata - parsed arguments in format that contract is expecting
 
 #### Defined in
 
-[src/utils/calldata/index.ts:93](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L93)
+[src/utils/calldata/index.ts:113](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L113)
 
 ---
 
@@ -245,7 +265,7 @@ Result - parsed response corresponding to the abi
 
 #### Defined in
 
-[src/utils/calldata/index.ts:167](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L167)
+[src/utils/calldata/index.ts:245](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L245)
 
 ---
 
@@ -271,4 +291,4 @@ Result - parsed and formatted response object
 
 #### Defined in
 
-[src/utils/calldata/index.ts:191](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L191)
+[src/utils/calldata/index.ts:269](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/index.ts#L269)
