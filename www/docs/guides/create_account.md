@@ -157,11 +157,81 @@ const { transaction_hash: AXdAth, contract_address: AXcontractFinalAdress } = aw
 console.log('✅ ArgentX wallet deployed at:',AXcontractFinalAdress);
 ```
 
+> If you have activated the Argent Shield (2FA) for this account, the standard `Account` instance of Starknet.js is no more able to handle new transactions. In this case you need to use the account abstraction to define how are signed the transactions in this case (by creating a specific signer).
+
 ## Create a Braavos account
 
 > Level: hard.
 
-Even more complicated, a Braavos account needs also a proxy but needs in addition a specific signature. Starknet.js is handling only Starknet standard signatures; so we need extra code to handle this specific signature for account creation. These nearly 200 lines of code are not displayed here but are available in a module [here](./compiled_contracts/deployBraavos.ts).
+Even more complicated, a Braavos account needs also a proxy but needs in addition a specific signature. Starknet.js is handling specific signatures. Save the following code in a file named `braavosAbstraction.ts` :
+
+```typescript
+import { Calldata, num, Signature, ec, hash, CallData, BigNumberish, DeployAccountSignerDetails, AbstractionSigns } from "starknet";
+
+export const BraavosInitialClassHash = "0x5aa23d5bb71ddaa783da7ea79d405315bafa7cf0387a74f4593578c3e9e6570";
+export const BraavosProxyClassHash = "0x03131fa018d520a037686ce3efddeab8f28895662f019ca3ca18a626650f7d1e";
+
+export function proxyConstructorBraavos(starkKeyPubBraavos: string): Calldata {
+    const BraavosInitializer: Calldata = CallData.compile({ public_key: starkKeyPubBraavos });;
+    return CallData.compile({
+        implementation_address: BraavosInitialClassHash,
+        initializer_selector: hash.getSelectorFromName("initializer"),
+        calldata: [...BraavosInitializer]
+    });
+}
+
+export function calculateAddressBraavos(privateKeyBraavos: BigNumberish): string {
+    const starkKeyPubBraavos = ec.starkCurve.getStarkKey(num.toHex(privateKeyBraavos));
+
+    const proxyConstructorCalldata = proxyConstructorBraavos(starkKeyPubBraavos);
+
+    return hash.calculateContractAddressFromHash(
+        starkKeyPubBraavos,
+        BraavosProxyClassHash,
+        proxyConstructorCalldata,
+        0);
+
+}
+
+export function signDeployAccountBraavos(standardInputData: DeployAccountSignerDetails,
+    privateKeyBraavos: string,
+    ...additionalParams: string[]): Signature {
+    if (additionalParams.length < 8) {
+        throw new Error(`Braavos deploy account signer is waiting 8 additional parameters. Got: ${additionalParams.length} params!`);
+    }
+    const braavosAccountClassHash = additionalParams[0];
+    const hardwareSigner = additionalParams.slice(1, 8);
+
+    const txnHash = hash.computeHashOnElements([hash.calculateDeployAccountTransactionHash(
+        standardInputData.contractAddress,
+        standardInputData.classHash,
+        CallData.compile(standardInputData.constructorCalldata),
+        standardInputData.addressSalt,
+        standardInputData.version,
+        standardInputData.maxFee,
+        standardInputData.chainId,
+        standardInputData.nonce
+    ),
+    braavosAccountClassHash,
+    ...hardwareSigner,
+    ]);
+
+    const { r, s } = ec.starkCurve.sign(
+        txnHash,
+        privateKeyBraavos,
+    );
+    const signature = [r.toString(), s.toString(), braavosAccountClassHash, ...hardwareSigner];
+    return signature
+}
+
+export const abstractionFnsBraavos: AbstractionSigns = {
+    abstractedDeployAccountSign: signDeployAccountBraavos
+}
+```
+
+At the beginning of the code, somme helpers to create the address and the constructor.  
+Then the code in `signDeployAccountBraavos` is describing how to hash and sign a deployement of a Braavos account.  
+The `abstractionFnsBraavos` lists the functions to use for abstraction ; here a function to sign an account deployement.
 
 We will deploy hereunder a Braavos account in devnet. So launch starknet-devnet with these parameters:
 
@@ -172,24 +242,18 @@ starknet-devnet --seed 0 --fork-network alpha-goerli
 Initialization:
 
 ```typescript
-import { Provider, Account, num, stark } from "starknet";
-import { calculateAddressBraavos,
-    deployBraavosAccount,
-    estimateBraavosAccountDeployFee
-} from "./deployBraavos";
+import { Provider,  Account,  Calldata, Signer, BigNumberish, ec } from "starknet";
+import { account3BraavosTestnetPrivateKey } from "../../privateStorage";
+import { calculateAddressBraavos, abstractionFnsBraavos, proxyConstructorBraavos, BraavosProxyClassHash } from "./braavosAbstraction";
 import axios from "axios";
 ```
 
-If you want to create the private key, for example with a random number:
+Here, the private key has been created manually in the Braavos browser wallet, without deploying the account, and stored in a file.
+
+If you want to create the private key with a random number:
 
 ```typescript
 const privateKeyBraavos = stark.randomAddress();
-```
-
-If you want to use a private key generated by your browser wallet, create a new account (without deploying it), then copy/paste the account private key (it's useless to copy the public key).
-
-```typescript
-const privateKeyBraavos = "0x02e8....e12";
 ```
 
 ### Compute address
@@ -198,15 +262,32 @@ const privateKeyBraavos = "0x02e8....e12";
 // initialize Provider
 const providerDevnet = new Provider({ sequencer: { baseUrl: "http://127.0.0.1:5050" } });
 // address
-const BraavosProxyAddress = calculateAddressBraavos(privateKeyBraavos);
-console.log('Calculated account address=', BraavosProxyAddress);
+const privateKeyBraavos = account3BraavosTestnetPrivateKey;
+    const signerBraavos = new Signer(privateKeyBraavos, abstractionFnsBraavos);
+    const starkKeyPubBraavos = ec.starkCurve.getStarkKey(privateKeyBraavos);
+    const proxyAddressBraavos = calculateAddressBraavos(privateKeyBraavos);
+    const accountClassHashBraavos = "0x0105c0cf7aadb6605c9538199797920884694b5ce84fc68f92c832b0c9f57ad9"; // 27/aug/2023, will probably change over time
+    const accountBraavos = new Account(provider, proxyAddressBraavos, signerBraavos);
+console.log('Calculated account address=', accountBraavos.address);
 ```
+
+We have created a customized Signer, that uses the `abstractionFnsBraavos` list of functions. A new `Account` instance is created with this signer.
 
 ### Estimate fees
 
 ```typescript
 // estimate fees
-const estimatedFee = await estimateBraavosAccountDeployFee(privateKeyBraavos, providerDevnet);
+const proxyConstructor: Calldata = proxyConstructorBraavos(starkKeyPubBraavos);
+const signatureAddsDeployAccountBraavos: BigNumberish[] = [
+    accountClassHashBraavos,
+    0, 0, 0, 0, 0, 0, 0]; // if no hardware signer, put 7x zero.
+const estimatedFee  = await accountBraavos.estimateAccountDeployFee({
+        classHash: BraavosProxyClassHash,
+        constructorCalldata: proxyConstructor,
+        contractAddress: proxyAddressBraavos,
+        addressSalt: starkKeyPubBraavos
+    }, undefined,
+        ...signatureAddsDeployAccountBraavos);
 console.log("calculated fee =", estimatedFee);
 ```
 
@@ -222,39 +303,44 @@ const { data: answer } = await axios.post('http://127.0.0.1:5050/mint', {
 console.log('Answer mint =', answer); // 10 ETH
 
 // deploy Braavos account
-const { transaction_hash, contract_address: BraavosAccountFinalAddress } =
-    await deployBraavosAccount(privateKeyBraavos, providerDevnet,estimatedFee);
-    // estimatedFee is optional
+
+const { transaction_hash, contract_address: BraavosAccountFinalAddress } = await accountBraavos.deployAccount({
+    classHash: BraavosProxyClassHash,
+    constructorCalldata: proxyConstructor,
+    contractAddress: proxyAddressBraavos,
+    addressSalt: starkKeyPubBraavos
+},
+    { maxFee: estimatedFee },
+    ...signatureAddsDeployAccountBraavos
+);
+// estimatedFee is optional
 console.log('Transaction hash =', transaction_hash);
-await providerDevnet.waitForTransaction(transaction_hash);
 console.log('✅ Braavos wallet deployed at', BraavosAccountFinalAddress);
+await providerDevnet.waitForTransaction(transaction_hash);
 ```
 
 The computed address has been funded automatically by minting a new dummy ETH in Starknet devnet!
 
 ## Create your account abstraction
 
-You are not limited to these 3 contracts. You can create your own contract for the wallet. It's the concept of Account Abstraction.
+You are not limited to these 3 contracts. You can create your own account contract. It's the concept of Account Abstraction.
 
-You can customize entirely the wallet - for example:
+You can customize entirely the account - for example:
 
-- use a different concept of keys.
-
+- use a different concept of signature.
 - add a guardian to save your account.
-
+- add a 2FA code to the signature.
 - have the possibility to transfer ownership of the wallet.
-
 - add some administrators or a super-administrator.
-
 - whitelist of addresses for transfer.
-
 - multisig.
-
 - delayed withdraw.
 
 The only limitation is your imagination...
 
-Here is an example of a customized wallet, including super administrator management, on a local starknet-devnet:
+### Abstraction without specific signature
+
+Here is an example of a customized wallet, including super administrator management, on a local starknet-devnet. This example uses standard signatures.
 
 > launch `starknet-devnet --seed 0` before using this script
 
@@ -315,6 +401,137 @@ const { transaction_hash, contract_address } = await AAaccount.deployAccount({
 });
 await provider.waitForTransaction(transaction_hash);
 console.log('✅ New customized account created.\n   address =', contract_address);
+```
+
+### Abstraction with a specific signature
+
+We have already seen this case with the deployement of a [**Braavos account**](#create-a-braavos-account).  
+To perform :
+
+- Define a list of specific functions of signature. There are 5 possible functions :
+
+|                                           Starknet.js method |  Custom hash function   | Custom signature function | Custom hash + signature function |       Account contract function        |
+| -----------------------------------------------------------: | :---------------------: | :-----------------------: | :------------------------------: | :------------------------------------: |
+| myContract.invoke myAccount.execute myAccount.deployContract |           N/A           |            N/A            |   abstractedTransactionSign()    | \_\_validate\_\_ <br />\_\_execute\_\_ |
+|                                      myAccount.deployAccount |           N/A           |            N/A            |  abstractedDeployAccountSign()   |        \_\_validate-deploy\_\_         |
+|                                            myAccount.declare |           N/A           |            N/A            |     abstractedDeclareSign()      |        \_\_validate-declare\_\_        |
+|                  myAccount.signMessage myAccount.hashMessage | abstractedMessageHash() |  abstractedMessageSign()  |               N/A                |           isValidSignature()           |
+
+> Create only the necessary functions ; the missing functions will be replaced by standard hashs and signs.
+
+An example of definition :
+
+```typescript
+export const abstractionFns: AbstractionFunctions = {
+    abstractedDeployAccountSign: signDeployAccount,
+    abstractedTransactionSign: signTransaction,
+    abstractedDeclareSign: signDeclare,
+    abstractedMessageHash: hashMessage,
+    abstractedMessageSign: signMessage
+}
+```
+
+- Create the code of these functions.
+
+You have to respect the followings signatures :
+
+```typescript
+export type AbstractionDeployAccountFunctionSign = (
+  standardInputData: DeployAccountSignerDetails,
+  privateKey: string,
+  ...additionalParams: string[]
+) => Signature;
+
+export type AbstractionTransactionFunctionSign = (
+  standardInputData: {
+    contractAddress: BigNumberish;
+    version: BigNumberish;
+    calldata: RawCalldata;
+    maxFee: BigNumberish;
+    chainId: StarknetChainId;
+    nonce: BigNumberish;
+  },
+  privateKey: string,
+  ...additionalParams: string[]
+) => Signature;
+
+export type AbstractionDeclareFunctionSign = (
+  standardInputData: DeclareSignerDetails,
+  privateKey: string,
+  ...additionalParams: string[]
+) => Signature;
+
+export type AbstractionMessageFunctionHash = (
+  typedData: TypedData,
+  accountAddress: string,
+  ...additionalParams: string[]
+) => string;
+
+export type AbstractionMessageFunctionSign = (
+  msgHash: string,
+  privateKey: string,
+  ...additionalParams: string[]
+) => Signature;
+```
+
+For Example, the function for the deploy account signature, using a 2FA code on 3 felts :
+
+```typescript
+export function signDeployAccount(standardInputData: DeployAccountSignerDetails,
+    privateKey: string,
+    ...additionalParams: string[]
+): Signature {
+    if (additionalParams.length < 3) {
+        throw new Error(`Abstracted deploy account signer is waiting 3 additional parameters. Got: ${additionalParams.length} params!`);
+    }
+    const signer2FA = additionalParams;
+
+    const txnHash = hash.computeHashOnElements([hash.calculateDeployAccountTransactionHash(
+        standardInputData.contractAddress,
+        standardInputData.classHash,
+        CallData.compile(standardInputData.constructorCalldata),
+        standardInputData.addressSalt,
+        standardInputData.version,
+        standardInputData.maxFee,
+        standardInputData.chainId,
+        standardInputData.nonce
+    ),
+    ...signer2FA // the smart contract will check that the 2FA is 0x01, 0x02, 0x03
+    ]);
+
+    const { r, s } = ec.starkCurve.sign(
+        txnHash,
+        privateKey,
+    );
+    const signature = [r.toString(), s.toString(), ...signer2FA];
+    return signature
+}
+```
+
+- Create a specific signer, using this list of functions.
+
+```typescript
+const signerAbstraction = new Signer(privateKeyAbstraction, abstractionFns);
+```
+
+- Create an Account instance, using this signer.
+
+```typescript
+const accountAbstraction = new Account(provider, addressAbstraction, signerAbstraction, "1"); // "1" for a Cairo 1 account contract
+```
+
+- Interact with Starknet, with some additional sign parameters (if needed).
+
+```typescript
+const { transaction_hash, contract_address } = await accountAbstraction.deployAccount({
+        classHash: classHashContract,
+        constructorCalldata: constructor,
+        contractAddress: addressAbstraction,
+        addressSalt: starkKeyPubAbstraction
+    },
+        undefined,
+        1, 2, 3 // abstraction is here
+    );
 ```
 
 ## Account update

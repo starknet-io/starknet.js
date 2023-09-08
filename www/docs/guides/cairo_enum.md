@@ -7,7 +7,7 @@ sidebar_position: 16
 ## Cairo Enums usage
 
 Cairo-lang v0.12.0 (includes Cairo v2.0.0) introduces a new type of data that can be exchanged with Starknet : the Enums. Not related to the Typescript Enums, the Cairo Enums are identical to Rust Enums.  
-More information in the Starknet book [here](https://book.starknet.io/chapter_2/enums.html).  
+More information in the Starknet book [**here**](https://book.starknet.io/chapter_2/enums.html).  
 In the following paragraphers, you will see how to send and receive Enums with the Starknet network.
 
 ## Cairo Option

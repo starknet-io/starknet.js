@@ -272,13 +272,16 @@ export abstract class ProviderInterface {
    * - optional maxFee
    * @param blockIdentifier - (optional) block identifier
    * @param skipValidate - (optional) skip cairo __validate__ method
+   * @param addsAbstraction an array of BigNumberish, used as additional parameters for account abstraction, for message hash and signature.
+   
    * @returns the estimated fee
    */
   public abstract getDeployAccountEstimateFee(
     transaction: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,
     blockIdentifier?: BlockIdentifier,
-    skipValidate?: boolean
+    skipValidate?: boolean,
+    ...addsAbstraction: BigNumberish[]
   ): Promise<EstimateFeeResponse>;
 
   /**

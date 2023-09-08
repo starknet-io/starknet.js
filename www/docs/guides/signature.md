@@ -6,11 +6,13 @@ sidebar_position: 14
 
 You can use Starknet.js to sign a message outside of the network, using the standard methods of hash and sign of Starknet. In this way, in some cases, you can avoid paying fees to store data in-chain; you transfer the signed message off-chain, and the recipient can verify (without fee) on-chain the validity of the message.
 
-## Sign and send a message
+## Standard signature & verification of a BigNumberish[]
+
+### Standard signature of a BigNumberish[]
 
 Your message has to be an array of `BigNumberish`. First, calculate the hash of this message, then calculate the signature.
 
-> If the message does not respect some safety rules of composition, this method could be a way of attack of your smart contract. If you have any doubt, prefer the [EIP712 like method](#sign-and-verify-following-eip712), which is safe, but is also more complicated.
+> If the message does not respect some safety rules of composition, this method could be a way of attack of your smart contract. If you have any doubt, prefer the [EIP712 like method](#sign-and-verify-following-eip712-like-standard), which is safe, but is also more complicated.
 
 ```typescript
 import {ec, hash, num, json, Contract, WeierstrassSignatureType } from "starknet";
@@ -31,7 +33,7 @@ Then you can send, by any means, to the recipient of the message:
 - the signature.
 - the full public key (or an account address using this private key).
 
-## Receive and verify a message
+### Receive and verify a message
 
 On the receiver side, you can verify that:
 
@@ -43,9 +45,10 @@ On the receiver side, you can verify that:
 - off-chain, using the full public key (very fast, but only for standard Starknet hash & sign).
 - on-chain, using the account address (slow, add workload to the node/sequencer, but can manage exotic account abstraction about hash or sign).
 
-### Verify outside of Starknet:
+#### Verify outside of Starknet
 
-The sender provides the message, the signature, and the full public key. Verification:
+The sender provides the message, the signature, and the full public key.  
+Verification:
 
 ```typescript
 const msgHash1 = hash.computeHashOnElements(message);
@@ -69,13 +72,12 @@ Check that the Public Key of the account is part of the full public Key:
 
 ```typescript
 const isFullPubKeyRelatedToAccount: boolean =
-    publicKey.publicKey == BigInt(encode.addHexPrefix( fullPublicKey.slice( 4, 68)));
-console.log("Result (boolean)=", isFullPubKeyRelatedToAccount);
+publicKey.publicKey == BigInt(encode.addHexPrefix( fullPublicKey.slice( 4, 68)));
 ```
 
-### Verify in the Starknet network, with the account:
+#### Verify in the Starknet network, with the account
 
-The sender can provide an account address, despite a full public key.
+The sender can provide an account address, instead of a full public key.
 
 ```typescript
 const provider = new Provider({ sequencer: { baseUrl: "http://127.0.0.1:5050" } }); //devnet
@@ -95,7 +97,68 @@ const msgHash2 = hash.computeHashOnElements(message);
 console.log("Result (boolean) =", result2);
 ```
 
-## Sign and verify the following EIP712
+## Abstracted signature & verification of a BigNumberish[]
+
+### Abstracted signature of a BigNumberish[]
+
+Define the function that will perform the abstracted signature :
+
+```typescript
+function signMyMessage(
+    msgHash: string,
+    privateKey: string,
+    ...additionalParams: string[]
+): Signature {
+    if (additionalParams.length < 3) {
+        throw new Error(`Abstracted message signer is waiting 3 additional parameters. Got: ${additionalParams.length} params!`);
+    }
+    const signer2FA = additionalParams;
+    const { r, s } = ec.starkCurve.sign(
+        msgHash,
+        privateKey,
+    );
+    const signature = [r.toString(), s.toString(), ...signer2FA]; // the smart contract will check that the 2FA is 0x0a, 0x0b, 0x0c
+    return signature;
+}
+```
+
+Sign the message with the abstraction parameters at the end :
+
+```typescript
+const signer2FA = [10, 11, 12];
+const msgHash = hash.computeHashOnElements([...message, ...signer2FA]);
+const signature = signMyMessage(
+    msgHash,
+    privateKey,
+    ...signer2FA // abstraction is here
+    );
+```
+
+### Abstracted verification of a BigNumberish[]
+
+The sender provides the contract address, the message, the signature and the signer2FA.
+The verification can be done only in Starknet.
+
+```typescript
+const provider = new Provider({ sequencer: { baseUrl: "http://127.0.0.1:5050" } }); //devnet
+const compiledAccount = json.parse(fs.readFileSync("./compiled_contracts/Account_abstracted.json").toString("ascii"));
+
+const signer2FA = [10, 11, 12];
+const accountAddress ="0x..."; // account of sender
+const contractAccount = new Contract(compiledAccount.abi, accountAddress, provider);
+const msgHash2 = hash.computeHashOnElements([...message, ...signer2FA]);
+// The call of isValidSignature will generate an error if not valid
+    let result2: boolean;
+    try {
+        await contractAccount.isValidSignature(msgHash2, signature);
+        result2 = true;
+    } catch {
+        result2 = false;
+    }
+console.log("Result (boolean) =", result2);
+```
+
+## Sign and verify, following EIP712 like standard
 
 Previous examples are valid for an array of numbers. In the case of a more complex structure of an object, you have to work in the spirit of [EIP 712](https://eips.ethereum.org/EIPS/eip-712). This JSON structure has 4 mandatory items: `types`, `primaryType`, `domain`, and `message`.  
 These items are designed to be able to be an interface with a wallet. At sign request, the wallet will display:
@@ -165,26 +228,64 @@ const typedDataValidate: TypedData = {
             ]
         },
     };
-
-// connect your account, then
-const signature2 = await account.signMessage(typedDataValidate) as WeierstrassSignatureType;
-
 ```
 
-On the receiver side, you receive the JSON, the signature, and the account address. To verify the message:
+### Sign EIP712 message with abstraction
+
+Define the functions that hash and sign the JSON message :
 
 ```typescript
-const compiledAccount = json.parse(fs.readFileSync("./compiledContracts/Account_0_5_1.json").toString("ascii"));
-const contractAccount = new Contract(compiledAccount.abi, accountAddress, provider);
-
-const msgHash5 = typedData.getMessageHash(typedDataValidate, accountAddress);
-// The call of isValidSignature will generate an error if not valid
-let result5: boolean;
-try {
-    await contractAccount.isValidSignature(msgHash5, [signature2.r, signature2.s]);
-    result5 = true;
-} catch {
-    result5 = false;
+export function hashMessage(
+    eip712json: TypedData,
+    accountAddress: string,
+    ...additionalParams: string[]
+): string {
+    if (additionalParams.length < 3) {
+        throw new Error(`Abstracted message hasher is waiting 3 additional parameters. Got: ${additionalParams.length} params!`);
+    }
+    const signer2FA = additionalParams;
+    const msgHash = hash.computeHashOnElements([
+        typedData.getMessageHash(eip712json, accountAddress),
+        ...signer2FA // the smart contract will check that the 2FA is 0x0a, 0x0b, 0x0c
+    ]);
+    return msgHash;
 }
+
+export function signMessage(
+    msgHash: string,
+    privateKey: string,
+    ...additionalParams: string[]
+): Signature {
+    if (additionalParams.length < 3) {
+        throw new Error(`Abstracted message signer is waiting 3 additional parameters. Got: ${additionalParams.length} params!`);
+    }
+    const signer2FA = additionalParams;
+    const { r, s } = ec.starkCurve.sign(
+        msgHash,
+        privateKey,
+    );
+    const signature = [r.toString(), s.toString(), ...signer2FA]; // the smart contract will check that the 2FA is 0x0a, 0x0b, 0x0c
+    return signature;
+}
+export const abstractionFns: AbstractionFunctions = {
+    abstractedMessageHash: hashMessage,
+    abstractedMessageSign: signMessage
+}
+```
+
+```typescript
+const signerAbstraction = new Signer(privateKeyAbstraction, abstractionFns);
+const accountAbstraction = new Account(provider, addressAbstraction, signerAbstraction, "1");
+const signature = await accountAbstraction.signMessage(typedDataValidate);
+```
+
+### Verify EIP712 message with abstraction
+
+On the receiver side, you receive the JSON, the signature, and the account address.  
+To verify the message, create a dummy Account instance, using the same signer than the Account instance that created the signature (whatever the privateKey ; it's not used for this operation).  
+Then, verify the message in Starknet :
+
+```typescript
+const result5 = await accountAbstraction.verifyMessage(typedDataValidate, signature);
 console.log("Result5 (boolean) =", result5);
 ```

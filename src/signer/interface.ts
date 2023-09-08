@@ -1,5 +1,6 @@
 import {
   Abi,
+  AbstractionFunctions,
   Call,
   DeclareSignerDetails,
   DeployAccountSignerDetails,
@@ -9,6 +10,8 @@ import {
 } from '../types';
 
 export abstract class SignerInterface {
+  public abstract abstractionFunctions: AbstractionFunctions | undefined;
+
   /**
    * Method to get the public key of the signer
    *
@@ -22,10 +25,15 @@ export abstract class SignerInterface {
    *
    * @param typedData - JSON object to be signed
    * @param accountAddress - account
+   * @param adds an array of string, used as additional parameters for account abstraction, for message hash and signature.
    * @returns the signature of the JSON object
    * @throws {Error} if the JSON object is not a valid JSON
    */
-  public abstract signMessage(typedData: TypedData, accountAddress: string): Promise<Signature>;
+  public abstract signMessage(
+    typedData: TypedData,
+    accountAddress: string,
+    ...adds: string[]
+  ): Promise<Signature>;
 
   /**
    * Signs a transaction with the starknet private key and returns the signature
@@ -35,13 +43,15 @@ export abstract class SignerInterface {
    * - entrypoint - the entrypoint of the contract
    * - calldata - (defaults to []) the calldata
    * @param abi (optional) the abi of the contract for better displaying
+   * @param adds an array of string, used as additional parameters for account abstraction, for message hash and signature.
    *
    * @returns signature
    */
   public abstract signTransaction(
     transactions: Call[],
     transactionsDetail: InvocationsSignerDetails,
-    abis?: Abi[]
+    abis?: Abi[],
+    ...adds: string[]
   ): Promise<Signature>;
 
   /**
@@ -55,10 +65,12 @@ export abstract class SignerInterface {
    * - maxFee - maxFee for the declare transaction
    * - version - transaction version
    * - nonce - Nonce of the declare transaction
+   * @param adds an array of string, used as additional parameters for account abstraction, for message hash and signature.
    * @returns signature
    */
   public abstract signDeployAccountTransaction(
-    transaction: DeployAccountSignerDetails
+    transaction: DeployAccountSignerDetails,
+    ...adds: string[]
   ): Promise<Signature>;
 
   /**
@@ -71,7 +83,11 @@ export abstract class SignerInterface {
    * - maxFee - maxFee for the declare transaction
    * - version - transaction version
    * - nonce - Nonce of the declare transaction
+   * @param adds an array of string, used as additional parameters for account abstraction, for message hash and signature.
    * @returns signature
    */
-  public abstract signDeclareTransaction(transaction: DeclareSignerDetails): Promise<Signature>;
+  public abstract signDeclareTransaction(
+    transaction: DeclareSignerDetails,
+    ...adds: string[]
+  ): Promise<Signature>;
 }

@@ -6,7 +6,7 @@ import {
   Abi,
   ArgsOrCalldata,
   AsyncContractFunction,
-  BlockIdentifier,
+  BigNumberish,
   CallOptions,
   ContractFunction,
   EstimateFeeResponse,
@@ -81,12 +81,14 @@ export abstract class ContractInterface {
    * @param method name of the method
    * @param args Array of the arguments for the invoke or Calldata
    * @param options
+   * @param addsAbstraction an array of BigNumberish, used as additional parameters for account abstraction, for message hash and signature.
    * @returns Add Transaction Response
    */
   public abstract invoke(
     method: string,
     args?: ArgsOrCalldata,
-    options?: InvokeOptions
+    options?: InvokeOptions,
+    ...addsAbstraction: BigNumberish[]
   ): Promise<InvokeFunctionResponse>;
 
   /**
@@ -94,14 +96,12 @@ export abstract class ContractInterface {
    *
    * @param method name of the method
    * @param args Array of the arguments for the call or Calldata
-   * @param options optional blockIdentifier
+   * @param addsAbstraction an array of BigNumberish, used as additional parameters for account abstraction, for message hash and signature.
    */
   public abstract estimate(
     method: string,
     args?: ArgsOrCalldata,
-    options?: {
-      blockIdentifier?: BlockIdentifier;
-    }
+    ...addsAbstraction: BigNumberish[]
   ): Promise<EstimateFeeResponse>;
 
   /**

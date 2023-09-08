@@ -32,6 +32,7 @@ export type ContractOptions = {
   nonce?: BigNumberish;
   signature?: Signature;
   addressSalt?: string;
+  addsAbstraction?: BigNumberish[];
 };
 
 export type CallOptions = Pick<
@@ -41,7 +42,7 @@ export type CallOptions = Pick<
 
 export type InvokeOptions = Pick<
   ContractOptions,
-  'maxFee' | 'nonce' | 'signature' | 'parseRequest'
+  'maxFee' | 'nonce' | 'signature' | 'parseRequest' | 'addsAbstraction'
 >;
 
 export type ParsedEvent = { [name: string]: ParsedStruct };

@@ -77,3 +77,7 @@ const account = new Account(provider, accountAddress, privateKey);
 // add ,"1" after privateKey if this account is not a Cairo 0 contract
 
 ```
+
+## 👛 Connect to an existing account using account abstraction
+
+TODO

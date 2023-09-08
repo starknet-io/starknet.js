@@ -45,11 +45,16 @@ export abstract class AccountInterface extends ProviderInterface {
    * - entrypoint - the entrypoint of the contract
    * - calldata - (defaults to []) the calldata
    *
+   * @param estimateFeeDetails -
+   * - optional blockIdentifier
+   * - constant nonce = 0
+   * @param addsAbstraction an array of BigNumberish, used as additional parameters for account abstraction, for message hash and signature.
    * @returns response from estimate_fee
    */
   public abstract estimateInvokeFee(
     calls: AllowArray<Call>,
-    estimateFeeDetails?: EstimateFeeDetails
+    estimateFeeDetails?: EstimateFeeDetails,
+    ...addsAbstraction: BigNumberish[]
   ): Promise<EstimateFeeResponse>;
 
   /**
@@ -59,11 +64,16 @@ export abstract class AccountInterface extends ProviderInterface {
    * - contract - the compiled contract to be declared
    * - classHash - the class hash of the compiled contract. This can be obtained by using starknet-cli.
    *
+   * @param estimateFeeDetails -
+   * - optional blockIdentifier
+   * - constant nonce = 0
+   * @param addsAbstraction an array of BigNumberish, used as additional parameters for account abstraction, for message hash and signature.
    * @returns response from estimate_fee
    */
   public abstract estimateDeclareFee(
     contractPayload: DeclareContractPayload,
-    estimateFeeDetails?: EstimateFeeDetails
+    estimateFeeDetails?: EstimateFeeDetails,
+    ...addsAbstraction: BigNumberish[]
   ): Promise<EstimateFeeResponse>;
 
   /**
@@ -75,11 +85,13 @@ export abstract class AccountInterface extends ProviderInterface {
    * @param estimateFeeDetails -
    * - optional blockIdentifier
    * - constant nonce = 0
+   * @param addsAbstraction an array of BigNumberish, used as additional parameters for account abstraction, for message hash and signature.
    * @returns response from estimate_fee
    */
   public abstract estimateAccountDeployFee(
     contractPayload: DeployAccountContractPayload,
-    estimateFeeDetails?: EstimateFeeDetails
+    estimateFeeDetails?: EstimateFeeDetails,
+    ...addsAbstraction: BigNumberish[]
   ): Promise<EstimateFeeResponse>;
 
   /**
@@ -96,10 +108,12 @@ export abstract class AccountInterface extends ProviderInterface {
    *  - optional nonce
    *  - optional version
    *  - optional maxFee
+   * @param addsAbstraction an array of BigNumberish, used as additional parameters for account abstraction, for message hash and signature.
    */
   public abstract estimateDeployFee(
     deployContractPayload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
-    transactionsDetail?: InvocationsDetails
+    transactionsDetail?: InvocationsDetails,
+    ...addsAbstraction: BigNumberish[]
   ): Promise<EstimateFeeResponse>;
 
   /**
@@ -109,12 +123,13 @@ export abstract class AccountInterface extends ProviderInterface {
    * @param transactions array of transaction object containing :
    * - type - the type of transaction : 'DECLARE' | (multi)'DEPLOY' | (multi)'INVOKE_FUNCTION' | 'DEPLOY_ACCOUNT'
    * - payload - the payload of the transaction
-   *
+   * @param addsAbstraction an array of BigNumberish, used as additional parameters for account abstraction, for message hash and signature.
    * @returns response from estimate_fee
    */
   public abstract estimateFeeBulk(
     invocations: Invocations,
-    details?: EstimateFeeDetails
+    details?: EstimateFeeDetails,
+    ...addsAbstraction: BigNumberish[]
   ): Promise<EstimateFeeResponseBulk>;
 
   /**
@@ -126,32 +141,40 @@ export abstract class AccountInterface extends ProviderInterface {
    * - calldata - (defaults to []) the calldata
    * - signature - (defaults to []) the signature
    * @param abi (optional) the abi of the contract for better displaying
+   * @param transactionsDetail Invocation Details containing:
+   *  - optional nonce
+   *  - optional version
+   *  - optional maxFee
+   * @param addsAbstraction an array of BigNumberish, used as additional parameters for account abstraction, for message hash and signature.
    *
    * @returns response from addTransaction
    */
   public abstract execute(
     transactions: AllowArray<Call>,
     abis?: Abi[],
-    transactionsDetail?: InvocationsDetails
+    transactionsDetail?: InvocationsDetails,
+    ...addsAbstraction: BigNumberish[]
   ): Promise<InvokeFunctionResponse>;
 
   /**
    * Declares a given compiled contract (json) to starknet
-   * 
+   *
    * @param contractPayload transaction payload to be deployed containing:
-  - contract: compiled contract code
-  - (optional) classHash: computed class hash of compiled contract. Pre-compute it for faster execution.
-  - (required for Cairo1 without compiledClassHash) casm: CompiledContract | string;
-  - (optional for Cairo1 with casm) compiledClassHash: compiled class hash from casm. Pre-compute it for faster execution.
+   * - contract: compiled contract code
+   * - (optional) classHash: computed class hash of compiled contract. Pre-compute it for faster execution.
+   * - (required for Cairo1 without compiledClassHash) casm: CompiledContract | string;
+   * - (optional for Cairo1 with casm) compiledClassHash: compiled class hash from casm. * Pre-compute it for faster execution.
    * @param transactionsDetail Invocation Details containing:
-  - optional nonce
-  - optional version
-  - optional maxFee
+   * - optional nonce
+   * - optional version
+   * - optional maxFee
+   * @param addsAbstraction an array of BigNumberish, used as additional parameters for account abstraction, for message hash and signature.
    * @returns a confirmation of sending a transaction on the starknet contract
    */
   public abstract declare(
     contractPayload: DeclareContractPayload,
-    transactionsDetail?: InvocationsDetails
+    transactionsDetail?: InvocationsDetails,
+    ...addsAbstraction: BigNumberish[]
   ): Promise<DeclareContractResponse>;
 
   /**
@@ -167,13 +190,15 @@ export abstract class AccountInterface extends ProviderInterface {
    * - [nonce=getNonce]
    * - [version=transactionVersion]
    * - [maxFee=getSuggestedMaxFee]
+   * @param addsAbstraction an array of BigNumberish, used as additional parameters for account abstraction, for message hash and signature.
    * @returns
    * - contract_address[]
    * - transaction_hash
    */
   public abstract deploy(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
-    details?: InvocationsDetails | undefined
+    details?: InvocationsDetails | undefined,
+    ...addsAbstraction: BigNumberish[]
   ): Promise<MultiDeployContractResponse>;
 
   /**
@@ -189,6 +214,7 @@ export abstract class AccountInterface extends ProviderInterface {
    * - [nonce=getNonce]
    * - [version=transactionVersion]
    * - [maxFee=getSuggestedMaxFee]
+   * @param addsAbstraction an array of BigNumberish, used as additional parameters for account abstraction, for message hash and signature.
    * @returns
    *  - contract_address
    *  - transaction_hash
@@ -202,7 +228,8 @@ export abstract class AccountInterface extends ProviderInterface {
    */
   public abstract deployContract(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
-    details?: InvocationsDetails | undefined
+    details?: InvocationsDetails | undefined,
+    ...addsAbstraction: BigNumberish[]
   ): Promise<DeployContractUDCResponse>;
 
   /**
@@ -222,6 +249,8 @@ export abstract class AccountInterface extends ProviderInterface {
    * - [nonce=getNonce]
    * - [version=transactionVersion]
    * - [maxFee=getSuggestedMaxFee]
+   * @param addsAbstractionDeclare additional parameters for account abstraction, for declare
+   * @param addsAbstractionDeploy additional parameters for account abstraction, for deploy
    * @returns
    * - declare
    *    - transaction_hash
@@ -238,50 +267,63 @@ export abstract class AccountInterface extends ProviderInterface {
    */
   public abstract declareAndDeploy(
     payload: DeclareAndDeployContractPayload,
-    details?: InvocationsDetails | undefined
+    details?: InvocationsDetails | undefined,
+    addsAbstractionDeclare?: BigNumberish[],
+    addsAbstractionDeploy?: BigNumberish[]
   ): Promise<DeclareDeployUDCResponse>;
 
   /**
    * Deploy the account on Starknet
-   * 
+   *
    * @param contractPayload transaction payload to be deployed containing:
-  - classHash: computed class hash of compiled contract
-  - optional constructor calldata
-  - optional address salt  
-  - optional contractAddress
+   * - classHash: computed class hash of compiled contract
+   * - optional constructor calldata
+   * - optional address salt
+   * - optional contractAddress
    * @param transactionsDetail Invocation Details containing:
-  - constant nonce = 0
-  - optional version
-  - optional maxFee
+   *- constant nonce = 0
+   *- optional version
+   *- optional maxFee
+   * @param addsAbstraction an array of BigNumberish, used as additional parameters for account abstraction, for message hash and signature.
    * @returns a confirmation of sending a transaction on the starknet contract
    */
   public abstract deployAccount(
     contractPayload: DeployAccountContractPayload,
-    transactionsDetail?: InvocationsDetails
+    transactionsDetail?: InvocationsDetails,
+    ...addsAbstraction: BigNumberish[]
   ): Promise<DeployContractResponse>;
 
   /**
    * Sign an JSON object for off-chain usage with the starknet private key and return the signature
    * This adds a message prefix so it cant be interchanged with transactions
    *
-   * @param json - JSON object to be signed
-   * @returns the signature of the JSON object
+   * @param typedData - JSON object to be signed
+   * @param addsAbstraction an array of BigNumberish, used as additional parameters for account abstraction, for message hash and signature.
+   * @returns the hash and the signature of the JSON object
    * @throws {Error} if the JSON object is not a valid JSON
    */
-  public abstract signMessage(typedData: TypedData): Promise<Signature>;
+  public abstract signMessage(
+    typedData: TypedData,
+    ...addsAbstraction: BigNumberish[]
+  ): Promise<Signature>;
 
   /**
-   * Hash a JSON object with pederson hash and return the hash
-   * This adds a message prefix so it cant be interchanged with transactions
+   * Hash a JSON object with pederson hash and return the hash.
+   * This adds a message prefix so it cant be interchanged with transactions.
+   * Standard hash : Do not handle account abstraction. If you have a non standard hash, you have to code it yourself, or use myAccount.signMessage().
    *
-   * @param json - JSON object to be hashed
+   * @param json - JSON conform to EIP712 for Starknet
+   * @param addsAbstraction an array of BigNumberish, used as additional parameters for account abstraction, for message hash and signature.
    * @returns the hash of the JSON object
    * @throws {Error} if the JSON object is not a valid JSON
    */
-  public abstract hashMessage(typedData: TypedData): Promise<string>;
+  public abstract hashMessage(
+    typedData: TypedData,
+    ...addsAbstraction: BigNumberish[]
+  ): Promise<string>;
 
   /**
-   * Verify a signature of a JSON object
+   * Verify in Starknet network a signature of a JSON object.
    *
    * @param typedData - JSON object to be verified
    * @param signature - signature of the JSON object
@@ -291,7 +333,22 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract verifyMessage(typedData: TypedData, signature: Signature): Promise<boolean>;
 
   /**
-   * Verify a signature of a given hash
+   * Verify in Starknet.js a signature of a JSON object. To use only with a Starknet signature.
+   *
+   * @param myEIP712json - JSON object to be verified
+   * @param signature - signature of the JSON object. Only Starknet signature, with .r and .s, or an array with .r first, .s second, and some optional additionnal values.
+   * @param addsAbstraction an array of BigNumberish, used as additional parameters for account abstraction, for message hash and signature.
+   * @returns true if the signature is valid, false otherwise
+   * @throws {Error} if the JSON object is not a valid JSON or the signature is not a valid signature
+   */
+  public abstract verifyMessageLocally(
+    myEIP712json: TypedData,
+    signature: Signature,
+    ...addsAbstraction: BigNumberish[]
+  ): Promise<boolean>;
+
+  /**
+   * Verify in Starknet.js a signature of a given hash. Handle account abstraction signature. The account contract shall have a `isValidSignature` function (in Camel Case).
    * @warning This method is not recommended, use verifyMessage instead
    *
    * @param hash - hash to be verified
@@ -314,11 +371,13 @@ export abstract class AccountInterface extends ProviderInterface {
    *
    * @param  {EstimateFeeAction} estimateFeeAction
    * @param  {EstimateFeeDetails} details
+   * @param addsAbstraction an array of string, used as additional parameters for account abstraction, for message hash and signature.
    * @returns suggestedMaxFee
    */
   public abstract getSuggestedMaxFee(
     estimateFeeAction: EstimateFeeAction,
-    details: EstimateFeeDetails
+    details: EstimateFeeDetails,
+    ...addsAbstraction: string[]
   ): Promise<bigint>;
 
   /**
@@ -327,11 +386,12 @@ export abstract class AccountInterface extends ProviderInterface {
    * @param invocations Invocations containing:
    * - type - transaction type: DECLARE, (multi)DEPLOY, DEPLOY_ACCOUNT, (multi)INVOKE_FUNCTION
    * @param details SimulateTransactionDetails
-   *
+   * @param addsAbstraction an array of BigNumberish, used as additional parameters for account abstraction, for message hash and signature.
    * @returns response from simulate_transaction
    */
   public abstract simulateTransaction(
     invocations: Invocations,
-    details?: SimulateTransactionDetails
+    details?: SimulateTransactionDetails,
+    ...addsAbstraction: BigNumberish[]
   ): Promise<SimulateTransactionResponse>;
 }

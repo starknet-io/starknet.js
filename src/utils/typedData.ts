@@ -241,10 +241,10 @@ export const getStructHash = <T extends TypedData>(
 
 /**
  * Get the EIP-191 encoded message to sign, from the typedData object.
- *
- * @param {TypedData} typedData
- * @param {BigNumberish} account
- * @return {string}
+ * Do not handle account abstraction.
+ * @param  typedData
+ * @param  account
+ * @return string
  */
 export const getMessageHash = (typedData: TypedData, account: BigNumberish): string => {
   if (!validateTypedData(typedData)) {

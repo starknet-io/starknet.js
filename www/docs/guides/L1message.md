@@ -10,7 +10,7 @@ You can exchange messages between L1 & L2 networks:
 - L2 Starknet testnet 1 & 2 ↔️ L1 Goerli ETH testnet.
 - L2 local Starknet devnet ↔️ L1 local ETH testnet (Ganache, ...).
 
-You can find an explanation of the global mechanism [here](https://docs.starknet.io/documentation/architecture_and_concepts/L1-L2_Communication/messaging-mechanism/).
+You can find an explanation of the global mechanism [**here**](https://docs.starknet.io/documentation/architecture_and_concepts/L1-L2_Communication/messaging-mechanism/).
 
 Most of the code for this messaging process will be written in Cairo, but Starknet.js provides some functionalities for this subject.
 

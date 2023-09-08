@@ -172,4 +172,68 @@ const getResponse = await myAccount.call(
 );
 ```
 
-You provide the low-level numbers expected by Starknet, without any parsing or checking. See more details [here](define_call_message.md#parse-configuration).
+You provide the low-level numbers expected by Starknet, without any parsing or checking. See more details [**here**](define_call_message.md#parse-configuration).
+
+## Invoke with account abstraction
+
+When you want to write a transaction in the blockchain, if the account abstraction requests a customized signature, you have to :
+
+- define a specific function of signature, and code it :
+
+```typescript
+export function signTransaction(
+    standardInputData: {
+        contractAddress: BigNumberish;
+        version: BigNumberish;
+        calldata: RawCalldata;
+        maxFee: BigNumberish;
+        chainId: StarknetChainId;
+        nonce: BigNumberish;
+    },
+    privateKey: string,
+    ...additionalParams: string[]
+): Signature {
+    if (additionalParams.length < 3) {
+        throw new Error(`Abstracted transaction signer is waiting 3 additional parameters. Got: ${additionalParams.length} params!`);
+    }
+    const signer2FA = additionalParams;
+
+    const txnHash = hash.computeHashOnElements([hash.calculateTransactionHash(
+        standardInputData.contractAddress,
+        standardInputData.version,
+        standardInputData.calldata,
+        standardInputData.maxFee,
+        standardInputData.chainId,
+        standardInputData.nonce
+    ),
+    ...signer2FA // the smart contract will check that the 2FA is 0x04, 0x05, 0x06
+    ]);
+
+    const { r, s } = ec.starkCurve.sign(
+        txnHash,
+        privateKey,
+    );
+    const signature = [r.toString(), s.toString(), ...signer2FA];
+    return signature
+}
+
+export const abstractionFnsAccount: AbstractionSigns = {
+    abstractedTransactionSign: signTransactioAccount}
+```
+
+- interact with Starknet, with some additional sign parameters (if needed).
+
+```typescript
+const signerAbstraction = new Signer(privateKeyAbstraction, abstractionFns);
+const accountAbstraction = new Account(provider, addressAbstraction, signerAbstraction, "1"); // "1" for Cairo 1 account contract
+const call2 = contractETH.populate("transfer", {
+        recipient: accountAddress0,
+        amount: 300_000
+    });
+const { transaction_hash: th2 } = await accountAbstraction.execute(
+    call2,
+    undefined,
+    undefined,
+    4, 5, 6); // abstraction is here
+
+```

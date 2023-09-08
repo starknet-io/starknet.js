@@ -8,6 +8,7 @@ import {
   ArgsOrCalldata,
   ArgsOrCalldataWithOptions,
   AsyncContractFunction,
+  BigNumberish,
   Call,
   CallOptions,
   Calldata,
@@ -29,7 +30,7 @@ import assert from '../utils/assert';
 import { CallData, cairo } from '../utils/calldata';
 import { createAbiParser } from '../utils/calldata/parser';
 import { getAbiEvents, parseEvents as parseRawEvents } from '../utils/events/index';
-import { cleanHex } from '../utils/num';
+import { cleanHex, toHex } from '../utils/num';
 import { ContractInterface, TypedContract } from './interface';
 
 export const splitArgsAndOptions = (args: ArgsOrCalldataWithOptions) => {
@@ -42,6 +43,7 @@ export const splitArgsAndOptions = (args: ArgsOrCalldataWithOptions) => {
     'nonce',
     'signature',
     'addressSalt',
+    'addsAbstraction',
   ];
   const lastArg = args[args.length - 1];
   if (typeof lastArg === 'object' && options.some((x) => x in lastArg)) {
@@ -73,6 +75,7 @@ function buildInvoke(contract: Contract, functionAbi: FunctionAbi): AsyncContrac
     return contract.invoke(functionAbi.name, params.args, {
       parseRequest: true,
       ...params.options,
+      ...params.options?.addsAbstraction,
     });
   };
 }
@@ -270,10 +273,11 @@ export class Contract implements ContractInterface {
   public invoke(
     method: string,
     args: ArgsOrCalldata = [],
-    { parseRequest = true, maxFee, nonce, signature }: InvokeOptions = {}
+    { parseRequest = true, maxFee, nonce, signature }: InvokeOptions = {},
+    ...addsAbstraction: BigNumberish[]
   ): Promise<InvokeFunctionResponse> {
     assert(this.address !== null, 'contract is not connected to an address');
-
+    const adds: string[] = addsAbstraction.map((param) => toHex(param));
     const calldata = getCalldata(args, () => {
       if (parseRequest) {
         this.callData.validate(ValidateType.INVOKE, method, args);
@@ -290,10 +294,15 @@ export class Contract implements ContractInterface {
       entrypoint: method,
     };
     if ('execute' in this.providerOrAccount) {
-      return this.providerOrAccount.execute(invocation, undefined, {
-        maxFee,
-        nonce,
-      });
+      return this.providerOrAccount.execute(
+        invocation,
+        undefined,
+        {
+          maxFee,
+          nonce,
+        },
+        ...adds
+      );
     }
 
     if (!nonce) throw new Error(`Nonce is required when invoking a function without an account`);
@@ -311,8 +320,13 @@ export class Contract implements ContractInterface {
     );
   }
 
-  public async estimate(method: string, args: ArgsOrCalldata = []): Promise<EstimateFeeResponse> {
+  public async estimate(
+    method: string,
+    args: ArgsOrCalldata = [],
+    ...addsAbstraction: BigNumberish[]
+  ): Promise<EstimateFeeResponse> {
     assert(this.address !== null, 'contract is not connected to an address');
+    const adds: string[] = addsAbstraction.map((param) => toHex(param));
 
     if (!getCalldata(args, () => false)) {
       this.callData.validate(ValidateType.INVOKE, method, args);
@@ -320,9 +334,9 @@ export class Contract implements ContractInterface {
 
     const invocation = this.populate(method, args);
     if ('estimateInvokeFee' in this.providerOrAccount) {
-      return this.providerOrAccount.estimateInvokeFee(invocation);
+      return this.providerOrAccount.estimateInvokeFee(invocation, undefined, ...adds);
     }
-    throw Error('Contract must be connected to the account contract to estimate');
+    throw Error('Contract must be connected to an account contract to estimate');
   }
 
   public populate(method: string, args: RawArgs = []): Call {

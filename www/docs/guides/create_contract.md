@@ -178,3 +178,79 @@ console.log('Test Contract declared with classHash =', declareResponse.class_has
 await provider.waitForTransaction(declareResponse.transaction_hash);
 console.log("✅ Test Completed.");
 ```
+
+## Declare / Deploy contract with account abstraction
+
+You have to define the function to hash & sign the declare request :
+
+```typescript
+export function signDeclare(
+    standardInputData: DeclareSignerDetails,
+    privateKey: string,
+    ...additionalParams: string[]
+): Signature {
+    if (additionalParams.length < 3) {
+        throw new Error(`Abstracted declare signer is waiting 3 additional parameters. Got: ${additionalParams.length} params!`);
+    }
+    const signer2FA = additionalParams;
+
+    const txnHash = hash.computeHashOnElements([hash.calculateDeclareTransactionHash(
+        standardInputData.classHash,
+        standardInputData.senderAddress,
+        standardInputData.version,
+        standardInputData.maxFee,
+        standardInputData.chainId,
+        standardInputData.nonce,
+        standardInputData.compiledClassHash
+    ),
+    ...signer2FA // the smart contract will check that the 2FA is 0x07, 0x08, 0x09
+    ]);
+
+    const { r, s } = ec.starkCurve.sign(
+        txnHash,
+        privateKey,
+    );
+    const signature = [r.toString(), s.toString(), ...signer2FA];
+    return signature
+}
+export const abstractionFns: AbstractionFunctions = {
+    abstractedDeclareSign: signDeclare,
+}
+```
+
+declare the class with abstraction (for declare) :
+
+```typescript
+const signerAbstraction = new Signer(privateKeyAbstraction, abstractionFns);
+const accountAbstraction = new Account(provider, addressAbstraction, signerAbstraction, "1"); // "1" for a Cairo 1 account contract
+const compiledSierra = json.parse(fs.readFileSync("./ccompiledContracts/cairo200/erc20/erc20.sierra.json").toString("ascii"));
+const compiledCasm = json.parse(fs.readFileSync("./compiledContracts/cairo200/erc20/erc20.casm.json").toString("ascii"));
+
+const declareResponse = await accountAbstraction.declare(
+    { contract: compiledSierra, casm: compiledCasm },
+    undefined,
+    7, 8, 9 // abstraction is here
+
+);
+```
+
+Then to deploy with abstraction (for this case : use abstraction for transaction ; see [**here**](./interact.md#invoke-with-account-abstraction)) :
+
+```typescript
+const respDeploy = await accountAbstraction.deploy({
+        classHash: declareResponse..class_hash,
+        constructorCalldata: constructorERC20 },
+        undefined,
+        4, 5, 6); // abstraction is here
+```
+
+With the `declareAndDeploy` function, the abstraction parameters are splitted in two arrays :
+
+```typescript
+const response = await accountAbstraction.declareAndDeploy(
+        { contract: compiled2Sierra, casm: compiled2Casm },
+        undefined,
+        [7, 8, 9], // abstraction for declare
+        [4, 5, 6]  // abstraction for deploy
+    );
+```

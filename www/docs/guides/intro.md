@@ -59,15 +59,15 @@ npm run start # fires up a local documentation site
 
 ## Compiling Starknet Contracts
 
-Please check the Starknet documentation <ins>[here](https://www.cairo-lang.org/docs/hello_starknet/intro.html)</ins> to compile Starknet contracts.
+Please check the Starknet documentation <ins>[**here**](https://www.cairo-lang.org/docs/hello_starknet/intro.html)</ins> to compile Starknet contracts.
 
 Additional helpful resources can also be found at <ins>[OpenZeppelin](https://docs.openzeppelin.com/contracts-cairo/0.6.1/)</ins> documentation site.
 
 ## Full example with account & erc20 deployments
 
-Please take a look at our workshop using OpenZeppelin contracts <ins>[here](https://github.com/0xs34n/starknet.js-workshop)</ins>.
+Please take a look at our workshop using OpenZeppelin contracts <ins>[**here**](https://github.com/0xs34n/starknet.js-workshop)</ins>.
 
-Example with the Argent contract <ins>[here](https://github.com/0xs34n/starknet.js-account)</ins>.
+Example with the Argent contract <ins>[**here**](https://github.com/0xs34n/starknet.js-account)</ins>.
 
 ## Contracts used in the guides
 
