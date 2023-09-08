@@ -2,7 +2,15 @@
 /* eslint-disable import/extensions */
 import { poseidonHashMany } from '@scure/starknet';
 
-import { API_VERSION, StarknetChainId, TransactionHashPrefix } from '../constants';
+import {
+  API_VERSION,
+  BN_FEE_TRANSACTION_VERSION_1,
+  BN_FEE_TRANSACTION_VERSION_2,
+  BN_TRANSACTION_VERSION_1,
+  BN_TRANSACTION_VERSION_2,
+  StarknetChainId,
+  TransactionHashPrefix,
+} from '../constants';
 import {
   BigNumberish,
   Builtins,
@@ -27,14 +35,13 @@ import { encodeShortString } from './shortString';
 export * as poseidon from '@noble/curves/abstract/poseidon';
 export * from './selector'; // Preserve legacy export structure
 
-export const transactionVersion = 1n;
-export const transactionVersion_2 = 2n;
-// TODO: check do we need to use feeTransactionVersion at all for feeEstimation ?
-export const feeTransactionVersion = 2n ** 128n + transactionVersion;
-export const feeTransactionVersion_2 = 2n ** 128n + transactionVersion_2;
+export const transactionVersion = BN_TRANSACTION_VERSION_1;
+export const transactionVersion_2 = BN_TRANSACTION_VERSION_2;
+export const feeTransactionVersion = BN_FEE_TRANSACTION_VERSION_1;
+export const feeTransactionVersion_2 = BN_FEE_TRANSACTION_VERSION_2;
 
 /**
- * Return versions based on version type, default transaction versions
+ * Return transaction versions based on version type, default version type is 'transaction'
  * @param versionType 'fee' | 'transaction'
  * @returns versions { v1: bigint; v2: bigint; }
  */
@@ -44,15 +51,30 @@ export function getVersionsByType(versionType?: 'fee' | 'transaction') {
     : { v1: transactionVersion, v2: transactionVersion_2 };
 }
 
+/**
+ * Compute pedersen hash from data
+ * @param data BigNumberish[]
+ * @returns hex-string - pedersen hash
+ */
 export function computeHashOnElements(data: BigNumberish[]): string {
   return [...data, data.length]
     .reduce((x: BigNumberish, y: BigNumberish) => starkCurve.pedersen(toBigInt(x), toBigInt(y)), 0)
     .toString();
 }
 
-// following implementation is based on this python implementation:
-// https://github.com/starkware-libs/cairo-lang/blob/b614d1867c64f3fb2cf4a4879348cfcf87c3a5a7/src/starkware/starknet/core/os/transaction_hash/transaction_hash.py
-
+/**
+ * Calculate transaction pedersen hash for common properties
+ * following implementation is based on this python implementation: https://github.com/starkware-libs/cairo-lang/blob/b614d1867c64f3fb2cf4a4879348cfcf87c3a5a7/src/starkware/starknet/core/os/transaction_hash/transaction_hash.py
+ * @param txHashPrefix TransactionHashPrefix
+ * @param version BigNumberish
+ * @param contractAddress BigNumberish
+ * @param entryPointSelector BigNumberish
+ * @param calldata RawCalldata
+ * @param maxFee BigNumberish
+ * @param chainId StarknetChainId
+ * @param additionalData BigNumberish[]
+ * @returns hex-string
+ */
 export function calculateTransactionHashCommon(
   txHashPrefix: TransactionHashPrefix,
   version: BigNumberish,
@@ -77,6 +99,15 @@ export function calculateTransactionHashCommon(
   return computeHashOnElements(dataToHash);
 }
 
+/**
+ * Calculate deploy transaction hash
+ * @param contractAddress BigNumberish
+ * @param constructorCalldata RawCalldata
+ * @param version BigNumberish
+ * @param chainId StarknetChainId
+ * @param constructorName string
+ * @returns hex-string
+ */
 export function calculateDeployTransactionHash(
   contractAddress: BigNumberish,
   constructorCalldata: RawCalldata,
@@ -95,6 +126,17 @@ export function calculateDeployTransactionHash(
   );
 }
 
+/**
+ * Calculate declare transaction hash
+ * @param classHash hex-string
+ * @param senderAddress BigNumberish
+ * @param version BigNumberish
+ * @param maxFee BigNumberish
+ * @param chainId StarknetChainId
+ * @param nonce BigNumberish
+ * @param compiledClassHash hex-string
+ * @returns hex-string
+ */
 export function calculateDeclareTransactionHash(
   classHash: string,
   senderAddress: BigNumberish,
@@ -116,6 +158,18 @@ export function calculateDeclareTransactionHash(
   );
 }
 
+/**
+ * Calculate deploy_account transaction hash
+ * @param contractAddress BigNumberish
+ * @param classHash BigNumberish
+ * @param constructorCalldata RawCalldata
+ * @param salt BigNumberish
+ * @param version BigNumberish
+ * @param maxFee BigNumberish
+ * @param chainId StarknetChainId
+ * @param nonce BigNumberish
+ * @returns hex-string
+ */
 export function calculateDeployAccountTransactionHash(
   contractAddress: BigNumberish,
   classHash: BigNumberish,
@@ -140,6 +194,16 @@ export function calculateDeployAccountTransactionHash(
   );
 }
 
+/**
+ * Calculate invoke transaction hash
+ * @param contractAddress BigNumberish
+ * @param version BigNumberish
+ * @param calldata RawCalldata
+ * @param maxFee BigNumberish
+ * @param chainId StarknetChainId
+ * @param nonce BigNumberish
+ * @returns hex-string
+ */
 export function calculateTransactionHash(
   contractAddress: BigNumberish,
   version: BigNumberish,
@@ -160,6 +224,14 @@ export function calculateTransactionHash(
   );
 }
 
+/**
+ * Calculate contract address from class hash
+ * @param salt BigNumberish
+ * @param classHash BigNumberish
+ * @param constructorCalldata RawArgs
+ * @param deployerAddress BigNumberish
+ * @returns hex-string
+ */
 export function calculateContractAddressFromHash(
   salt: BigNumberish,
   classHash: BigNumberish,
@@ -192,7 +264,11 @@ function nullSkipReplacer(key: string, value: any) {
   return value === null ? undefined : value;
 }
 
-// about 10x to 100x faster using array to build string
+/**
+ * Format json-string to conform starknet json-string
+ * @param json json-string
+ * @returns json-string
+ */
 export function formatSpaces(json: string) {
   let insideQuotes = false;
   const newString = [];
@@ -211,6 +287,11 @@ export function formatSpaces(json: string) {
   return newString.join('');
 }
 
+/**
+ * Compute hinted class hash for legacy compiled contract (Cairo 0)
+ * @param compiledContract LegacyCompiledContract
+ * @returns hex-string
+ */
 export default function computeHintedClassHash(compiledContract: LegacyCompiledContract) {
   const { abi, program } = compiledContract;
   const contractClass = { abi, program };
@@ -219,7 +300,11 @@ export default function computeHintedClassHash(compiledContract: LegacyCompiledC
   return addHexPrefix(starkCurve.keccak(utf8ToArray(serializedJson)).toString(16));
 }
 
-// Computes the class hash of a given contract class
+/**
+ * Computes the class hash for legacy compiled contract (Cairo 0)
+ * @param contract LegacyCompiledContract
+ * @returns hex-string
+ */
 export function computeLegacyContractClassHash(contract: LegacyCompiledContract | string) {
   const compiledContract =
     typeof contract === 'string' ? (parse(contract) as LegacyCompiledContract) : contract;
@@ -257,7 +342,8 @@ export function computeLegacyContractClassHash(contract: LegacyCompiledContract 
   ]);
 }
 
-// Cairo1 below
+// Cairo 1 code
+
 function hashBuiltins(builtins: Builtins) {
   return poseidonHashMany(
     builtins.flatMap((it: any) => {
@@ -273,6 +359,11 @@ function hashEntryPoint(data: ContractEntryPointFields[]) {
   return poseidonHashMany(base);
 }
 
+/**
+ * Compute compiled class hash for contract (Cairo 1)
+ * @param casm CompiledSierraCasm
+ * @returns hex-string
+ */
 export function computeCompiledClassHash(casm: CompiledSierraCasm) {
   const COMPILED_CLASS_VERSION = 'COMPILED_CLASS_V1';
 
@@ -314,6 +405,11 @@ function hashAbi(sierra: CompiledSierra) {
   return BigInt(addHexPrefix(starkCurve.keccak(utf8ToArray(indentString)).toString(16)));
 }
 
+/**
+ * Compute sierra contract class hash (Cairo 1)
+ * @param sierra CompiledSierra
+ * @returns hex-string
+ */
 export function computeSierraContractClassHash(sierra: CompiledSierra) {
   const CONTRACT_CLASS_VERSION = 'CONTRACT_CLASS_V0.1.0';
 
@@ -350,7 +446,7 @@ export function computeSierraContractClassHash(sierra: CompiledSierra) {
 /**
  * Compute ClassHash (sierra or legacy) based on provided contract
  * @param contract CompiledContract | CompiledSierra | string
- * @returns HexString ClassHash
+ * @returns hex-string ClassHash
  */
 export function computeContractClassHash(contract: CompiledContract | string) {
   const compiledContract = typeof contract === 'string' ? parse(contract) : contract;

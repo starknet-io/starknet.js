@@ -10,12 +10,23 @@ import { formatSpaces } from './hash';
 import { parse, stringify } from './json';
 import { compressProgram } from './stark';
 
+/**
+ * Helper - Async Sleep for 'delay' time
+ * @param delay number
+ * @returns Promise
+ */
 export function wait(delay: number) {
   return new Promise((res) => {
     setTimeout(res, delay);
   });
 }
 
+/**
+ * Create Sierra Contract Class from a given Compiled Sierra
+ * CompiledSierra -> SierraContractClass
+ * @param contract CompiledSierra
+ * @returns SierraContractClass
+ */
 export function createSierraContractClass(contract: CompiledSierra): SierraContractClass {
   const result = { ...contract } as any;
   delete result.sierra_program_debug_info;
@@ -25,7 +36,12 @@ export function createSierraContractClass(contract: CompiledSierra): SierraContr
   return result;
 }
 
-// TODO: How can we receive string here ?
+/**
+ * Create Contract Class from a given CompiledContract or string
+ * (CompiledContract or string) -> ContractClass
+ * @param contract CompiledContract | string
+ * @returns ContractClass
+ */
 export function parseContract(contract: CompiledContract | string): ContractClass {
   const parsedContract =
     typeof contract === 'string' ? (parse(contract) as CompiledContract) : contract;

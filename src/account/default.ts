@@ -80,7 +80,7 @@ export class Account extends Provider implements AccountInterface {
         ? new Signer(pkOrSigner)
         : pkOrSigner;
 
-    this.cairoVersion = cairoVersion;
+    this.cairoVersion = cairoVersion.toString() as CairoVersion;
   }
 
   public async getNonce(blockIdentifier?: BlockIdentifier): Promise<Nonce> {
