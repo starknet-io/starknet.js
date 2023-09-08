@@ -3,6 +3,7 @@ import { isBigInt, isHex, isStringWholeNumber } from '../num';
 import { encodeShortString, isShortString, isText } from '../shortString';
 import { UINT_128_MAX, isUint256 } from '../uint256';
 
+// Intended for internal usage, maybe should be exported somewhere else and not exported to utils
 export const isLen = (name: string) => /_len$/.test(name);
 export const isTypeFelt = (type: string) => type === 'felt' || type === 'core::felt252';
 export const isTypeArray = (type: string) =>
@@ -24,7 +25,6 @@ export const isTypeContractAddress = (type: string) =>
 export const isTypeEthAddress = (type: string) =>
   type === 'core::starknet::eth_address::EthAddress';
 export const isCairo1Type = (type: string) => type.includes('core::');
-
 export const getArrayType = (type: string) => {
   if (isCairo1Type(type)) {
     return type.substring(type.indexOf('<') + 1, type.lastIndexOf('>'));
@@ -33,10 +33,9 @@ export const getArrayType = (type: string) => {
 };
 
 /**
- * tells if an ABI comes from a Cairo 1 contract
- *
- * @param abi representing the interface of a Cairo contract
- * @returns TRUE if it is an ABI from a Cairo1 contract
+ * Test if an ABI comes from a Cairo 1 contract
+ * @param abi Abi - representing the interface of a Cairo contract
+ * @returns boolean - TRUE if it is an ABI from a Cairo1 contract
  * @example
  * ```typescript
  * const isCairo1: boolean = isCairo1Abi(myAbi: Abi);
@@ -61,13 +60,19 @@ export function isCairo1Abi(abi: Abi): boolean {
 }
 
 /**
- * named tuple are described as js object {}
- * struct types are described as js object {}
- * array types are described as js array []
+ * named tuple cairo type are described as js object {}
+ * struct cairo type are described as js object {}
+ * array cairo type are described as js array []
  */
 
 /**
- * Uint256 cairo type (helper for common struct type)
+ * Create Uint256 Cairo type (helper for common struct type)
+ * @param it BigNumberish
+ * @returns Uint256
+ * @example
+ * ```typescript
+ * uint256('892349863487563453485768723498');
+ * ```
  */
 export const uint256 = (it: BigNumberish): Uint256 => {
   const bn = BigInt(it);
@@ -83,12 +88,23 @@ export const uint256 = (it: BigNumberish): Uint256 => {
 /**
  * unnamed tuple cairo type (helper same as common struct type)
  */
+/**
+ * Create unnamed tuple Cairo type (helper same as common struct type)
+ * @param args BigNumberish[] | object[] | boolean[]
+ * @returns Record
+ * @example
+ * ```typescript
+ * tuple(1,'0x101',16);
+ * ```
+ */
 export const tuple = (
   ...args: (BigNumberish | object | boolean)[]
 ): Record<number, BigNumberish | object | boolean> => ({ ...args });
 
 /**
- * felt cairo type
+ * Create felt Cairo type (cairo type helper)
+ * @param it BigNumberish
+ * @returns felt-string
  */
 export function felt(it: BigNumberish): string {
   // BN or number
