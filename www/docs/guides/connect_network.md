@@ -74,7 +74,7 @@ const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:6060' });
 
 ### Other node clients
 
-Other examples (some needs a secret key) :
+Other examples (some need a secret key) :
 
 **Mainnet :**
 
