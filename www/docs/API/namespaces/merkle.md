@@ -16,13 +16,15 @@ custom_edit_url: null
 
 ▸ **proofMerklePath**(`root`, `leaf`, `path`): `boolean`
 
+Test Merkle tree path
+
 #### Parameters
 
-| Name   | Type       |
-| :----- | :--------- |
-| `root` | `string`   |
-| `leaf` | `string`   |
-| `path` | `string`[] |
+| Name   | Type       | Description      |
+| :----- | :--------- | :--------------- |
+| `root` | `string`   | hex-string       |
+| `leaf` | `string`   | hex-string       |
+| `path` | `string`[] | hex-string array |
 
 #### Returns
 
@@ -30,4 +32,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/merkle.ts:63](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/merkle.ts#L63)
+[src/utils/merkle.ts:85](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/merkle.ts#L85)

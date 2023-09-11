@@ -12,6 +12,8 @@ custom_edit_url: null
 
 ▸ **isASCII**(`str`): `boolean`
 
+Test if string contains only ASCII characters (string can be ascii text)
+
 #### Parameters
 
 | Name  | Type     |
@@ -24,7 +26,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/shortString.ts:6](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/shortString.ts#L6)
+[src/utils/shortString.ts:8](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/shortString.ts#L8)
 
 ---
 
@@ -32,6 +34,8 @@ custom_edit_url: null
 
 ▸ **isShortString**(`str`): `boolean`
 
+Test if string is a Cairo short string (string has less or equal 31 characters)
+
 #### Parameters
 
 | Name  | Type     |
@@ -44,19 +48,21 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/shortString.ts:12](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/shortString.ts#L12)
+[src/utils/shortString.ts:16](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/shortString.ts#L16)
 
 ---
 
 ### isDecimalString
 
-▸ **isDecimalString**(`decim`): `boolean`
+▸ **isDecimalString**(`str`): `boolean`
+
+Test if string contains only numbers (string can be converted to decimal number)
 
 #### Parameters
 
-| Name    | Type     |
-| :------ | :------- |
-| `decim` | `string` |
+| Name  | Type     |
+| :---- | :------- |
+| `str` | `string` |
 
 #### Returns
 
@@ -64,7 +70,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/shortString.ts:17](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/shortString.ts#L17)
+[src/utils/shortString.ts:23](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/shortString.ts#L23)
 
 ---
 
@@ -72,113 +78,7 @@ custom_edit_url: null
 
 ▸ **isText**(`val`): `boolean`
 
-check if value is string text, and not string-hex, string-number
-
-#### Parameters
-
-| Name  | Type  | Description |
-| :---- | :---- | :---------- |
-| `val` | `any` | any         |
-
-#### Returns
-
-`boolean`
-
-boolean
-
-#### Defined in
-
-[src/utils/shortString.ts:26](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/shortString.ts#L26)
-
----
-
-### splitLongString
-
-▸ **splitLongString**(`longStr`): `string`[]
-
-#### Parameters
-
-| Name      | Type     |
-| :-------- | :------- |
-| `longStr` | `string` |
-
-#### Returns
-
-`string`[]
-
-#### Defined in
-
-[src/utils/shortString.ts:33](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/shortString.ts#L33)
-
----
-
-### encodeShortString
-
-▸ **encodeShortString**(`str`): `string`
-
-Convert an ASCII string to an hexadecimal string.
-
-**`Example`**
-
-```typescript
-const myEncodedString: string = encodeShortString("uri/pict/t38.jpg");
-```
-
-returns : string : "0x7572692f706963742f7433382e6a7067"
-
-#### Parameters
-
-| Name  | Type     | Description                                              |
-| :---- | :------- | :------------------------------------------------------- |
-| `str` | `string` | ASCII string - 31 characters maxi. Ex : "uri/item23.jpg" |
-
-#### Returns
-
-`string`
-
-a string representing an Hex number 248 bits max.
-
-#### Defined in
-
-[src/utils/shortString.ts:49](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/shortString.ts#L49)
-
----
-
-### decodeShortString
-
-▸ **decodeShortString**(`str`): `string`
-
-Convert an hexadecimal or decimal string to an ASCII string.
-
-**`Example`**
-
-```typescript
-const myDecodedString: string = decodeShortString("0x7572692f706963742f7433382e6a7067");
-```
-
-return : string : "uri/pict/t38.jpg"
-
-#### Parameters
-
-| Name  | Type     | Description                                                                                              |
-| :---- | :------- | :------------------------------------------------------------------------------------------------------- |
-| `str` | `string` | string - representing a 248 bits max number. Ex : hex : "0x1A4F64EA56" or decimal : "236942575435676423" |
-
-#### Returns
-
-`string`
-
-a string with 31 characters max.
-
-#### Defined in
-
-[src/utils/shortString.ts:67](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/shortString.ts#L67)
-
----
-
-### isShortText
-
-▸ **isShortText**(`val`): `boolean`
+Test if value is a free-from string text, and not a hex string or number string
 
 #### Parameters
 
@@ -196,9 +96,95 @@ a string with 31 characters max.
 
 ---
 
-### isLongText
+### splitLongString
 
-▸ **isLongText**(`val`): `boolean`
+▸ **splitLongString**(`longStr`): `string`[]
+
+Split long text into short strings
+
+#### Parameters
+
+| Name      | Type     |
+| :-------- | :------- |
+| `longStr` | `string` |
+
+#### Returns
+
+`string`[]
+
+#### Defined in
+
+[src/utils/shortString.ts:47](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/shortString.ts#L47)
+
+---
+
+### encodeShortString
+
+▸ **encodeShortString**(`str`): `string`
+
+Convert an ASCII string to a hexadecimal string.
+
+**`Example`**
+
+```typescript
+const myEncodedString: string = encodeShortString("uri/pict/t38.jpg");
+// return hex string (ex."0x7572692f706963742f7433382e6a7067")
+```
+
+#### Parameters
+
+| Name  | Type     | Description                                    |
+| :---- | :------- | :--------------------------------------------- |
+| `str` | `string` | short string (ASCII string, 31 characters max) |
+
+#### Returns
+
+`string`
+
+format: hex-string; 248 bits max
+
+#### Defined in
+
+[src/utils/shortString.ts:62](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/shortString.ts#L62)
+
+---
+
+### decodeShortString
+
+▸ **decodeShortString**(`str`): `string`
+
+Convert a hexadecimal or decimal string to an ASCII string.
+
+**`Example`**
+
+```typescript
+const myDecodedString: string = decodeShortString("0x7572692f706963742f7433382e6a7067");
+// return string (ex."uri/pict/t38.jpg")
+```
+
+#### Parameters
+
+| Name  | Type     | Description                                                                    |
+| :---- | :------- | :----------------------------------------------------------------------------- |
+| `str` | `string` | representing a 248 bit max number (ex. "0x1A4F64EA56" or "236942575435676423") |
+
+#### Returns
+
+`string`
+
+format: short string; 31 characters max
+
+#### Defined in
+
+[src/utils/shortString.ts:78](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/shortString.ts#L78)
+
+---
+
+### isShortText
+
+▸ **isShortText**(`val`): `boolean`
+
+Test if value is short text
 
 #### Parameters
 
@@ -212,4 +198,26 @@ a string with 31 characters max.
 
 #### Defined in
 
-[src/utils/shortString.ts:31](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/shortString.ts#L31)
+[src/utils/shortString.ts:37](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/shortString.ts#L37)
+
+---
+
+### isLongText
+
+▸ **isLongText**(`val`): `boolean`
+
+Test if value is long text
+
+#### Parameters
+
+| Name  | Type  |
+| :---- | :---- |
+| `val` | `any` |
+
+#### Returns
+
+`boolean`
+
+#### Defined in
+
+[src/utils/shortString.ts:42](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/shortString.ts#L42)

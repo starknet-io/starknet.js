@@ -18,11 +18,13 @@ Re-exports [BigNumberish](types.md#bignumberish)
 
 ▸ **isHex**(`hex`): `boolean`
 
+Test if string is hex-string
+
 #### Parameters
 
-| Name  | Type     |
-| :---- | :------- |
-| `hex` | `string` |
+| Name  | Type     | Description |
+| :---- | :------- | :---------- |
+| `hex` | `string` | hex-string  |
 
 #### Returns
 
@@ -30,13 +32,15 @@ Re-exports [BigNumberish](types.md#bignumberish)
 
 #### Defined in
 
-[src/utils/num.ts:10](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L10)
+[src/utils/num.ts:14](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L14)
 
 ---
 
 ### toBigInt
 
 ▸ **toBigInt**(`value`): `bigint`
+
+Convert BigNumberish to bigint
 
 #### Parameters
 
@@ -50,13 +54,15 @@ Re-exports [BigNumberish](types.md#bignumberish)
 
 #### Defined in
 
-[src/utils/num.ts:14](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L14)
+[src/utils/num.ts:21](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L21)
 
 ---
 
 ### isBigInt
 
 ▸ **isBigInt**(`value`): value is bigint
+
+Test if value is bigint
 
 #### Parameters
 
@@ -70,13 +76,15 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:18](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L18)
+[src/utils/num.ts:28](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L28)
 
 ---
 
 ### toHex
 
 ▸ **toHex**(`number`): `string`
+
+Convert BigNumberish to hex-string
 
 #### Parameters
 
@@ -88,9 +96,11 @@ value is bigint
 
 `string`
 
+format: hex-string
+
 #### Defined in
 
-[src/utils/num.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L22)
+[src/utils/num.ts:36](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L36)
 
 ---
 
@@ -98,24 +108,28 @@ value is bigint
 
 ▸ **toStorageKey**(`number`): `string`
 
-Convert BigNumberish to STORAGE_KEY
-Same as toHex but conforming pattern STORAGE_KEY pattern ^0x0[0-7]{1}[a-fA-F0-9]{0,62}$
-A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
-0x0 + [0-7] + 62 hex = 0x + 64 hex
+Convert BigNumberish to storage-key-string
+
+Same as toHex but conforming to the STORAGE_KEY pattern `^0x0[0-7]{1}[a-fA-F0-9]{0,62}$`.
+
+A storage key is represented as up to 62 hex digits, 3 bits, and 5 leading zeroes:
+`0x0 + [0-7] + 62 hex = 0x + 64 hex`
 
 #### Parameters
 
-| Name     | Type                                    | Description  |
-| :------- | :-------------------------------------- | :----------- |
-| `number` | [`BigNumberish`](types.md#bignumberish) | BigNumberish |
+| Name     | Type                                    |
+| :------- | :-------------------------------------- |
+| `number` | [`BigNumberish`](types.md#bignumberish) |
 
 #### Returns
 
 `string`
 
+format: storage-key-string
+
 #### Defined in
 
-[src/utils/num.ts:33](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L33)
+[src/utils/num.ts:54](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L54)
 
 ---
 
@@ -123,25 +137,33 @@ A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
 
 ▸ **hexToDecimalString**(`hex`): `string`
 
+Convert hexadecimal string to decimal string
+
 #### Parameters
 
-| Name  | Type     |
-| :---- | :------- |
-| `hex` | `string` |
+| Name  | Type     | Description |
+| :---- | :------- | :---------- |
+| `hex` | `string` | hex-string  |
 
 #### Returns
 
 `string`
 
+format: decimal string
+
 #### Defined in
 
-[src/utils/num.ts:38](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L38)
+[src/utils/num.ts:64](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L64)
 
 ---
 
 ### assertInRange
 
 ▸ **assertInRange**(`input`, `lowerBound`, `upperBound`, `inputName?`): `void`
+
+Asserts input is equal to or greater then lowerBound and lower then upperBound.
+
+The `inputName` parameter is used in the assertion message.
 
 #### Parameters
 
@@ -158,7 +180,7 @@ A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
 
 #### Defined in
 
-[src/utils/num.ts:54](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L54)
+[src/utils/num.ts:81](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L81)
 
 ---
 
@@ -166,6 +188,8 @@ A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
 
 ▸ **bigNumberishArrayToDecimalStringArray**(`rawCalldata`): `string`[]
 
+Convert BigNumberish array to decimal string array
+
 #### Parameters
 
 | Name          | Type                                      |
@@ -176,9 +200,11 @@ A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
 
 `string`[]
 
+format: decimal string array
+
 #### Defined in
 
-[src/utils/num.ts:71](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L71)
+[src/utils/num.ts:102](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L102)
 
 ---
 
@@ -186,6 +212,8 @@ A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
 
 ▸ **bigNumberishArrayToHexadecimalStringArray**(`rawCalldata`): `string`[]
 
+Convert BigNumberish array to hexadecimal string array
+
 #### Parameters
 
 | Name          | Type                                      |
@@ -196,9 +224,11 @@ A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
 
 `string`[]
 
+format: hex-string array
+
 #### Defined in
 
-[src/utils/num.ts:75](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L75)
+[src/utils/num.ts:110](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L110)
 
 ---
 
@@ -206,6 +236,8 @@ A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
 
 ▸ **getDecimalString**(`value`): `string`
 
+Convert string to decimal string
+
 #### Parameters
 
 | Name    | Type     |
@@ -216,9 +248,11 @@ A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
 
 `string`
 
+format: decimal string
+
 #### Defined in
 
-[src/utils/num.ts:82](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L82)
+[src/utils/num.ts:123](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L123)
 
 ---
 
@@ -226,6 +260,8 @@ A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
 
 ▸ **getHexString**(`value`): `string`
 
+Convert string to hexadecimal string
+
 #### Parameters
 
 | Name    | Type     |
@@ -236,15 +272,19 @@ A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
 
 `string`
 
+format: hex-string
+
 #### Defined in
 
-[src/utils/num.ts:92](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L92)
+[src/utils/num.ts:137](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L137)
 
 ---
 
 ### getHexStringArray
 
 ▸ **getHexStringArray**(`value`): `string`[]
+
+Convert string array to hex-string array
 
 #### Parameters
 
@@ -256,9 +296,11 @@ A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
 
 `string`[]
 
+format: hex-string array
+
 #### Defined in
 
-[src/utils/num.ts:102](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L102)
+[src/utils/num.ts:151](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L151)
 
 ---
 
@@ -266,37 +308,35 @@ A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
 
 ▸ **hexToBytes**(`value`): `Uint8Array`
 
-Convert a hex string to an array of Bytes (Uint8Array)
+Convert hex-string to an array of Bytes (Uint8Array)
 
 #### Parameters
 
 | Name    | Type     | Description |
 | :------ | :------- | :---------- |
-| `value` | `string` | hex string  |
+| `value` | `string` | hex-string  |
 
 #### Returns
 
 `Uint8Array`
 
-an array of Bytes
-
 #### Defined in
 
-[src/utils/num.ts:113](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L113)
+[src/utils/num.ts:164](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L164)
 
 ---
 
-### cleanHex
+### toHexString
 
-▸ **cleanHex**(`hex`): `string`
+▸ **toHexString**(`number`): `string`
 
-Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
+Alias of ToHex
 
 #### Parameters
 
-| Name  | Type     | Description |
-| :---- | :------- | :---------- |
-| `hex` | `string` | string      |
+| Name     | Type                                    |
+| :------- | :-------------------------------------- |
+| `number` | [`BigNumberish`](types.md#bignumberish) |
 
 #### Returns
 
@@ -304,13 +344,45 @@ Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
 
 #### Defined in
 
-[src/utils/num.ts:46](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L46)
+[src/utils/num.ts:36](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L36)
+
+---
+
+### cleanHex
+
+▸ **cleanHex**(`hex`): `string`
+
+Remove hex string leading zero and lowercase it
+
+**`Example`**
+
+```ts
+'0x01A...' -> '0x1a..'
+```
+
+#### Parameters
+
+| Name  | Type     | Description |
+| :---- | :------- | :---------- |
+| `hex` | `string` | hex-string  |
+
+#### Returns
+
+`string`
+
+format: hex-string
+
+#### Defined in
+
+[src/utils/num.ts:74](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L74)
 
 ---
 
 ### isStringWholeNumber
 
 ▸ **isStringWholeNumber**(`value`): `boolean`
+
+Test if string is whole number (0,1,2,3...)
 
 #### Parameters
 
@@ -324,33 +396,15 @@ Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
 
 #### Defined in
 
-[src/utils/num.ts:79](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L79)
-
----
-
-### toHexString
-
-▸ **toHexString**(`value`): `string`
-
-#### Parameters
-
-| Name    | Type     |
-| :------ | :------- |
-| `value` | `string` |
-
-#### Returns
-
-`string`
-
-#### Defined in
-
-[src/utils/num.ts:80](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L80)
+[src/utils/num.ts:117](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L117)
 
 ---
 
 ### toCairoBool
 
 ▸ **toCairoBool**(`value`): `string`
+
+Convert boolean to "0" or "1"
 
 #### Parameters
 
@@ -364,4 +418,4 @@ Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
 
 #### Defined in
 
-[src/utils/num.ts:106](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L106)
+[src/utils/num.ts:158](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/num.ts#L158)

@@ -18,7 +18,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:30](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L30)
+[src/utils/hash.ts:38](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L38)
 
 ---
 
@@ -28,27 +28,27 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:31](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L31)
+[src/utils/hash.ts:39](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L39)
 
 ---
 
 ### feeTransactionVersion
 
-• `Const` **feeTransactionVersion**: `bigint`
+• `Const` **feeTransactionVersion**: `bigint` = `BN_FEE_TRANSACTION_VERSION_1`
 
 #### Defined in
 
-[src/utils/hash.ts:33](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L33)
+[src/utils/hash.ts:40](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L40)
 
 ---
 
 ### feeTransactionVersion_2
 
-• `Const` **feeTransactionVersion_2**: `bigint`
+• `Const` **feeTransactionVersion_2**: `bigint` = `BN_FEE_TRANSACTION_VERSION_2`
 
 #### Defined in
 
-[src/utils/hash.ts:34](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L34)
+[src/utils/hash.ts:41](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L41)
 
 ## Functions
 
@@ -56,19 +56,17 @@ custom_edit_url: null
 
 ▸ **getVersionsByType**(`versionType?`): `Object`
 
-Return versions based on version type, default transaction versions
+Return transaction versions based on version type, default version type is 'transaction'
 
 #### Parameters
 
-| Name           | Type                       | Description            |
-| :------------- | :------------------------- | :--------------------- |
-| `versionType?` | `"fee"` \| `"transaction"` | 'fee' \| 'transaction' |
+| Name           | Type                       |
+| :------------- | :------------------------- |
+| `versionType?` | `"fee"` \| `"transaction"` |
 
 #### Returns
 
 `Object`
-
-versions { v1: bigint; v2: bigint; }
 
 | Name | Type     |
 | :--- | :------- |
@@ -77,13 +75,15 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:41](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L41)
+[src/utils/hash.ts:46](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L46)
 
 ---
 
 ### computeHashOnElements
 
 ▸ **computeHashOnElements**(`data`): `string`
+
+Compute pedersen hash from data
 
 #### Parameters
 
@@ -95,15 +95,21 @@ versions { v1: bigint; v2: bigint; }
 
 `string`
 
+format: hex-string - pedersen hash
+
 #### Defined in
 
-[src/utils/hash.ts:47](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L47)
+[src/utils/hash.ts:56](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L56)
 
 ---
 
 ### calculateTransactionHashCommon
 
 ▸ **calculateTransactionHashCommon**(`txHashPrefix`, `version`, `contractAddress`, `entryPointSelector`, `calldata`, `maxFee`, `chainId`, `additionalData?`): `string`
+
+Calculate transaction pedersen hash for common properties
+
+Following implementation is based on this python [implementation #](https://github.com/starkware-libs/cairo-lang/blob/b614d1867c64f3fb2cf4a4879348cfcf87c3a5a7/src/starkware/starknet/core/os/transaction_hash/transaction_hash.py)
 
 #### Parameters
 
@@ -122,15 +128,19 @@ versions { v1: bigint; v2: bigint; }
 
 `string`
 
+format: hex-string
+
 #### Defined in
 
-[src/utils/hash.ts:56](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L56)
+[src/utils/hash.ts:68](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L68)
 
 ---
 
 ### calculateDeployTransactionHash
 
 ▸ **calculateDeployTransactionHash**(`contractAddress`, `constructorCalldata`, `version`, `chainId`, `constructorName?`): `string`
+
+Calculate deploy transaction hash
 
 #### Parameters
 
@@ -146,9 +156,11 @@ versions { v1: bigint; v2: bigint; }
 
 `string`
 
+format: hex-string
+
 #### Defined in
 
-[src/utils/hash.ts:80](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L80)
+[src/utils/hash.ts:96](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L96)
 
 ---
 
@@ -156,31 +168,37 @@ versions { v1: bigint; v2: bigint; }
 
 ▸ **calculateDeclareTransactionHash**(`classHash`, `senderAddress`, `version`, `maxFee`, `chainId`, `nonce`, `compiledClassHash?`): `string`
 
+Calculate declare transaction hash
+
 #### Parameters
 
-| Name                 | Type                                                       |
-| :------------------- | :--------------------------------------------------------- |
-| `classHash`          | `string`                                                   |
-| `senderAddress`      | [`BigNumberish`](types.md#bignumberish)                    |
-| `version`            | [`BigNumberish`](types.md#bignumberish)                    |
-| `maxFee`             | [`BigNumberish`](types.md#bignumberish)                    |
-| `chainId`            | [`StarknetChainId`](../enums/constants.StarknetChainId.md) |
-| `nonce`              | [`BigNumberish`](types.md#bignumberish)                    |
-| `compiledClassHash?` | `string`                                                   |
+| Name                 | Type                                                       | Description |
+| :------------------- | :--------------------------------------------------------- | :---------- |
+| `classHash`          | `string`                                                   | hex-string  |
+| `senderAddress`      | [`BigNumberish`](types.md#bignumberish)                    | -           |
+| `version`            | [`BigNumberish`](types.md#bignumberish)                    | -           |
+| `maxFee`             | [`BigNumberish`](types.md#bignumberish)                    | -           |
+| `chainId`            | [`StarknetChainId`](../enums/constants.StarknetChainId.md) | -           |
+| `nonce`              | [`BigNumberish`](types.md#bignumberish)                    | -           |
+| `compiledClassHash?` | `string`                                                   | hex-string  |
 
 #### Returns
 
 `string`
 
+format: hex-string
+
 #### Defined in
 
-[src/utils/hash.ts:98](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L98)
+[src/utils/hash.ts:120](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L120)
 
 ---
 
 ### calculateDeployAccountTransactionHash
 
 ▸ **calculateDeployAccountTransactionHash**(`contractAddress`, `classHash`, `constructorCalldata`, `salt`, `version`, `maxFee`, `chainId`, `nonce`): `string`
+
+Calculate deploy_account transaction hash
 
 #### Parameters
 
@@ -199,15 +217,19 @@ versions { v1: bigint; v2: bigint; }
 
 `string`
 
+format: hex-string
+
 #### Defined in
 
-[src/utils/hash.ts:119](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L119)
+[src/utils/hash.ts:145](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L145)
 
 ---
 
 ### calculateTransactionHash
 
 ▸ **calculateTransactionHash**(`contractAddress`, `version`, `calldata`, `maxFee`, `chainId`, `nonce`): `string`
+
+Calculate invoke transaction hash
 
 #### Parameters
 
@@ -224,15 +246,19 @@ versions { v1: bigint; v2: bigint; }
 
 `string`
 
+format: hex-string
+
 #### Defined in
 
-[src/utils/hash.ts:143](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L143)
+[src/utils/hash.ts:173](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L173)
 
 ---
 
 ### calculateContractAddressFromHash
 
 ▸ **calculateContractAddressFromHash**(`salt`, `classHash`, `constructorCalldata`, `deployerAddress`): `string`
+
+Calculate contract address from class hash
 
 #### Parameters
 
@@ -247,9 +273,11 @@ versions { v1: bigint; v2: bigint; }
 
 `string`
 
+format: hex-string
+
 #### Defined in
 
-[src/utils/hash.ts:163](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L163)
+[src/utils/hash.ts:197](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L197)
 
 ---
 
@@ -257,25 +285,31 @@ versions { v1: bigint; v2: bigint; }
 
 ▸ **formatSpaces**(`json`): `string`
 
+Format json-string to conform starknet json-string
+
 #### Parameters
 
-| Name   | Type     |
-| :----- | :------- |
-| `json` | `string` |
+| Name   | Type     | Description |
+| :----- | :------- | :---------- |
+| `json` | `string` | json-string |
 
 #### Returns
 
 `string`
 
+format: json-string
+
 #### Defined in
 
-[src/utils/hash.ts:196](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L196)
+[src/utils/hash.ts:234](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L234)
 
 ---
 
 ### default
 
 ▸ **default**(`compiledContract`): `string`
+
+Compute hinted class hash for legacy compiled contract (Cairo 0)
 
 #### Parameters
 
@@ -287,15 +321,19 @@ versions { v1: bigint; v2: bigint; }
 
 `string`
 
+format: hex-string
+
 #### Defined in
 
-[src/utils/hash.ts:214](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L214)
+[src/utils/hash.ts:256](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L256)
 
 ---
 
 ### computeLegacyContractClassHash
 
 ▸ **computeLegacyContractClassHash**(`contract`): `string`
+
+Computes the class hash for legacy compiled contract (Cairo 0)
 
 #### Parameters
 
@@ -307,15 +345,19 @@ versions { v1: bigint; v2: bigint; }
 
 `string`
 
+format: hex-string
+
 #### Defined in
 
-[src/utils/hash.ts:223](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L223)
+[src/utils/hash.ts:268](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L268)
 
 ---
 
 ### computeCompiledClassHash
 
 ▸ **computeCompiledClassHash**(`casm`): `string`
+
+Compute compiled class hash for contract (Cairo 1)
 
 #### Parameters
 
@@ -327,15 +369,19 @@ versions { v1: bigint; v2: bigint; }
 
 `string`
 
+format: hex-string
+
 #### Defined in
 
-[src/utils/hash.ts:276](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L276)
+[src/utils/hash.ts:326](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L326)
 
 ---
 
 ### computeSierraContractClassHash
 
 ▸ **computeSierraContractClassHash**(`sierra`): `string`
+
+Compute sierra contract class hash (Cairo 1)
 
 #### Parameters
 
@@ -347,9 +393,11 @@ versions { v1: bigint; v2: bigint; }
 
 `string`
 
+format: hex-string
+
 #### Defined in
 
-[src/utils/hash.ts:317](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L317)
+[src/utils/hash.ts:371](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L371)
 
 ---
 
@@ -361,19 +409,19 @@ Compute ClassHash (sierra or legacy) based on provided contract
 
 #### Parameters
 
-| Name       | Type                                                        | Description                                  |
-| :--------- | :---------------------------------------------------------- | :------------------------------------------- |
-| `contract` | `string` \| [`CompiledContract`](types.md#compiledcontract) | CompiledContract \| CompiledSierra \| string |
+| Name       | Type                                                        |
+| :--------- | :---------------------------------------------------------- |
+| `contract` | `string` \| [`CompiledContract`](types.md#compiledcontract) |
 
 #### Returns
 
 `string`
 
-HexString ClassHash
+format: hex-string
 
 #### Defined in
 
-[src/utils/hash.ts:355](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L355)
+[src/utils/hash.ts:408](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/hash.ts#L408)
 
 ---
 
@@ -381,49 +429,53 @@ HexString ClassHash
 
 ▸ **keccakBn**(`value`): `string`
 
-Keccak hash BigNumberish value
+Calculate hex-string keccak hash for a given BigNumberish
+
+BigNumberish -> hex-string keccak hash
 
 #### Parameters
 
-| Name    | Type                                    | Description  |
-| :------ | :-------------------------------------- | :----------- |
-| `value` | [`BigNumberish`](types.md#bignumberish) | BigNumberish |
+| Name    | Type                                    |
+| :------ | :-------------------------------------- |
+| `value` | [`BigNumberish`](types.md#bignumberish) |
 
 #### Returns
 
 `string`
 
-string - hexadecimal string
+format: hex-string
 
 #### Defined in
 
-[src/utils/selector.ts:13](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/selector.ts#L13)
+[src/utils/selector.ts:14](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/selector.ts#L14)
 
 ---
 
 ### starknetKeccak
 
-▸ **starknetKeccak**(`value`): `bigint`
+▸ **starknetKeccak**(`str`): `bigint`
 
-Function to get the starknet keccak hash from a string
+Calculate bigint keccak hash for a given string
+
+String -> bigint keccak hash
 
 [Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/public/abi.py#L17-L22)
 
 #### Parameters
 
-| Name    | Type     | Description                                         |
-| :------ | :------- | :-------------------------------------------------- |
-| `value` | `string` | string you want to get the starknetKeccak hash from |
+| Name  | Type     | Description                                    |
+| :---- | :------- | :--------------------------------------------- |
+| `str` | `string` | the value you want to get the keccak hash from |
 
 #### Returns
 
 `bigint`
 
-starknet keccak hash as BigNumber
+starknet keccak hash as BigInt
 
 #### Defined in
 
-[src/utils/selector.ts:35](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/selector.ts#L35)
+[src/utils/selector.ts:39](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/selector.ts#L39)
 
 ---
 
@@ -431,25 +483,27 @@ starknet keccak hash as BigNumber
 
 ▸ **getSelectorFromName**(`funcName`): `string`
 
-Function to get the hex selector from a given function name
+Calculate hex-string selector for a given abi-function-name
+
+Abi-function-name -> hex-string selector
 
 [Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/public/abi.py#L25-L26)
 
 #### Parameters
 
-| Name       | Type     | Description                 |
-| :--------- | :------- | :-------------------------- |
-| `funcName` | `string` | selectors abi function name |
+| Name       | Type     | Description                         |
+| :--------- | :------- | :---------------------------------- |
+| `funcName` | `string` | ascii-string of 'abi function name' |
 
 #### Returns
 
 `string`
 
-hex selector of given abi function name
+format: hex-string; selector for 'abi function name'
 
 #### Defined in
 
-[src/utils/selector.ts:48](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/selector.ts#L48)
+[src/utils/selector.ts:54](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/selector.ts#L54)
 
 ---
 
@@ -457,20 +511,22 @@ hex selector of given abi function name
 
 ▸ **getSelector**(`value`): `string`
 
-Function to get hex selector from function name, decimal string or hex string
+Calculate hex-string selector from abi-function-name, decimal string or hex string
+
+('abi-function-name' or dec-string or hex-string) -> hex-string selector
 
 #### Parameters
 
-| Name    | Type     | Description                            |
-| :------ | :------- | :------------------------------------- |
-| `value` | `string` | hex string \| decimal string \| string |
+| Name    | Type     | Description                              |
+| :------ | :------- | :--------------------------------------- |
+| `value` | `string` | hex-string \| dec-string \| ascii-string |
 
 #### Returns
 
 `string`
 
-Hex selector
+format: hex-string
 
 #### Defined in
 
-[src/utils/selector.ts:58](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/selector.ts#L58)
+[src/utils/selector.ts:67](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/selector.ts#L67)

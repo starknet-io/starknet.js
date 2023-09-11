@@ -20,7 +20,7 @@ Re-exports [Uint256](../interfaces/types.Uint256.md)
 
 #### Defined in
 
-[src/utils/uint256.ts:14](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L14)
+[src/utils/uint256.ts:9](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L9)
 
 ---
 
@@ -30,13 +30,15 @@ Re-exports [Uint256](../interfaces/types.Uint256.md)
 
 #### Defined in
 
-[src/utils/uint256.ts:15](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L15)
+[src/utils/uint256.ts:10](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L10)
 
 ## Functions
 
 ### uint256ToBN
 
 ▸ **uint256ToBN**(`uint256`): `bigint`
+
+Convert Uint256 to bigint
 
 #### Parameters
 
@@ -50,13 +52,15 @@ Re-exports [Uint256](../interfaces/types.Uint256.md)
 
 #### Defined in
 
-[src/utils/uint256.ts:10](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L10)
+[src/utils/uint256.ts:15](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L15)
 
 ---
 
 ### isUint256
 
 ▸ **isUint256**(`bn`): `boolean`
+
+Test BigNumberish is smaller or equal 2\*\*256-1
 
 #### Parameters
 
@@ -70,19 +74,21 @@ Re-exports [Uint256](../interfaces/types.Uint256.md)
 
 #### Defined in
 
-[src/utils/uint256.ts:17](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L17)
+[src/utils/uint256.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L22)
 
 ---
 
 ### bnToUint256
 
-▸ **bnToUint256**(`bignumber`): [`Uint256`](../interfaces/types.Uint256.md)
+▸ **bnToUint256**(`bn`): [`Uint256`](../interfaces/types.Uint256.md)
+
+Convert BigNumberish (string | number | bigint) to Uint256 (hex)
 
 #### Parameters
 
-| Name        | Type                                    |
-| :---------- | :-------------------------------------- |
-| `bignumber` | [`BigNumberish`](types.md#bignumberish) |
+| Name | Type                                    |
+| :--- | :-------------------------------------- |
+| `bn` | [`BigNumberish`](types.md#bignumberish) |
 
 #### Returns
 
@@ -90,4 +96,4 @@ Re-exports [Uint256](../interfaces/types.Uint256.md)
 
 #### Defined in
 
-[src/utils/uint256.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L22)
+[src/utils/uint256.ts:29](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/uint256.ts#L29)
