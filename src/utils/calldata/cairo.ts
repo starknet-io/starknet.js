@@ -60,7 +60,7 @@ export function isCairo1Abi(abi: Abi): boolean {
 }
 
 /**
- * named tuple cairo type are described as js object {}
+ * named tuple cairo type is described as js object {}
  * struct cairo type are described as js object {}
  * array cairo type are described as js array []
  */
