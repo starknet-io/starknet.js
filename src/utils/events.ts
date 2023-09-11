@@ -6,7 +6,6 @@ import { cleanHex } from './num';
  * Parse Transaction Receipt Event from UDC invoke transaction and
  * create DeployContractResponse compatible response with addition of the UDC Event data
  *
- * @param txReceipt InvokeTransactionReceiptResponse
  * @returns DeployContractResponse | UDC Event Response data
  */
 export function parseUDCEvent(txReceipt: InvokeTransactionReceiptResponse) {

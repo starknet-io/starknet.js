@@ -14,9 +14,9 @@ export class MerkleTree {
   }
 
   /**
-   * Create Merkle three
-   * @param leaves hex-string[]
-   * @returns hex-string - root
+   * Create Merkle tree
+   * @param leaves hex-string array
+   * @returns format: hex-string; Merkle tree root
    */
   private build(leaves: string[]): string {
     if (leaves.length === 1) {
@@ -38,9 +38,7 @@ export class MerkleTree {
 
   /**
    * Create pedersen hash from a and b
-   * @param a string
-   * @param b string
-   * @returns hex-string
+   * @returns format: hex-string
    */
   static hash(a: string, b: string) {
     const [aSorted, bSorted] = [toBigInt(a), toBigInt(b)].sort((x, y) => (x >= y ? 1 : -1));
@@ -50,9 +48,9 @@ export class MerkleTree {
   /**
    * Return path to leaf
    * @param leaf hex-string
-   * @param branch hex-string[]
-   * @param hashPath hex-string[]
-   * @returns hex-string[]
+   * @param branch hex-string array
+   * @param hashPath hex-string array
+   * @returns format: hex-string array
    */
   public getProof(leaf: string, branch = this.leaves, hashPath: string[] = []): string[] {
     const index = branch.indexOf(leaf);
@@ -82,8 +80,7 @@ export class MerkleTree {
  * Test Merkle tree path
  * @param root hex-string
  * @param leaf hex-string
- * @param path hex-string[]
- * @returns boolean
+ * @param path hex-string array
  */
 export function proofMerklePath(root: string, leaf: string, path: string[]): boolean {
   if (path.length === 0) {

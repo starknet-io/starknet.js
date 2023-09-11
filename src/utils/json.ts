@@ -4,8 +4,6 @@ import * as json from 'lossless-json';
 
 /**
  * Convert string to number or bigint based on size
- * @param x string
- * @returns number | bigint
  */
 const parseIntAsNumberOrBigInt = (x: string) => {
   if (!json.isInteger(x)) return parseFloat(x);
@@ -14,31 +12,27 @@ const parseIntAsNumberOrBigInt = (x: string) => {
 };
 
 /**
- * Convert json-string to json-object
+ * Convert JSON string to JSON object
+ *
  * NOTE: the String() wrapping is used so the behavior conforms to JSON.parse()
  * which can accept simple data types but is not represented in the default typing
- * @param x json-string
- * @returns json-object
+ * @param x JSON string
  */
 export const parse = (x: string): any => json.parse(String(x), undefined, parseIntAsNumberOrBigInt);
 
 /**
- * Convert json-string to json-object with all numbers as bigint
- * @param x json-string
- * @returns json-object
+ * Convert JSON string to JSON object with all numbers as bigint
+ * @param x JSON string
  */
 export const parseAlwaysAsBig = (x: string): any =>
   json.parse(String(x), undefined, json.parseNumberAndBigInt);
 
 /**
- * Convert json-object to json-string
+ * Convert JSON object to JSON string
+ *
  * NOTE: the not-null assertion is used so the return type conforms to JSON.stringify()
  * which can also return undefined but is not represented in the default typing
- * @param value JavaScriptValue
- * @param replacer any
- * @param space string | number | undefined
- * @param numberStringifiers json.NumberStringifier[] | undefined
- * @returns json-string
+ * @returns JSON string
  */
 export const stringify = (
   value: json.JavaScriptValue,
