@@ -13,9 +13,9 @@ import {
 
 /**
  * Compress compiled Cairo program
+ *
  * [Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/services/api/gateway/transaction.py#L54-L58)
- * @param jsonProgram Program | string - representing the compiled cairo program
- * @returns CompressedProgram
+ * @param jsonProgram Representing the compiled cairo program
  */
 export function compressProgram(jsonProgram: Program | string): CompressedProgram {
   const stringified = typeof jsonProgram === 'string' ? jsonProgram : stringify(jsonProgram);
@@ -25,8 +25,8 @@ export function compressProgram(jsonProgram: Program | string): CompressedProgra
 
 /**
  * Decompress compressed compiled Cairo program
- * @param base64 CompressedProgram
- * @returns any - parsed decompressed compiled Cairo program
+ * @param base64 Compressed program
+ * @returns Parsed decompressed compiled Cairo program
  */
 export function decompressProgram(base64: CompressedProgram) {
   if (Array.isArray(base64)) return base64;
@@ -36,7 +36,6 @@ export function decompressProgram(base64: CompressedProgram) {
 
 /**
  * Random Address based on random keyPair
- * @returns string
  */
 export function randomAddress(): string {
   const randomKeyPair = utils.randomPrivateKey();
@@ -44,10 +43,9 @@ export function randomAddress(): string {
 }
 
 /**
- * @deprecated not used internally, naming is confusing based on functionality
  * Lowercase and hex prefix string
- * @param input string
- * @returns string
+ *
+ * @deprecated Not used internally, naming is confusing based on functionality
  */
 export function makeAddress(input: string): string {
   return addHexPrefix(input).toLowerCase();
@@ -55,8 +53,7 @@ export function makeAddress(input: string): string {
 
 /**
  * Format Signature to standard type (hex array)
- * @param sig Signature
- * @returns ArraySignatureType (custom hex array or weierstrass.SignatureType hex array)
+ * @returns Custom hex array or weierstrass.SignatureType hex array
  */
 export function formatSignature(sig?: Signature): ArraySignatureType {
   if (!sig) throw Error('formatSignature: provided signature is undefined');
@@ -73,17 +70,13 @@ export function formatSignature(sig?: Signature): ArraySignatureType {
 
 /**
  * Format Signature to decimal string array
- * @param sig Signature
- * @returns ArraySignatureType
  */
 export function signatureToDecimalArray(sig?: Signature): ArraySignatureType {
   return bigNumberishArrayToDecimalStringArray(formatSignature(sig));
 }
 
 /**
- * Format Signature to Hex string array
- * @param sig Signature
- * @returns ArraySignatureType
+ * Format Signature to hex string array
  */
 export function signatureToHexArray(sig?: Signature): ArraySignatureType {
   return bigNumberishArrayToHexadecimalStringArray(formatSignature(sig));
@@ -91,9 +84,6 @@ export function signatureToHexArray(sig?: Signature): ArraySignatureType {
 
 /**
  * Convert estimated fee to max fee with overhead
- * @param estimatedFee BigNumberish
- * @param overhead number
- * @returns bigint
  */
 export function estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: number = 0.5): bigint {
   // BN can only handle Integers, so we need to do all calulations with integers

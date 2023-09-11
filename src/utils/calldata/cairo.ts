@@ -34,8 +34,8 @@ export const getArrayType = (type: string) => {
 
 /**
  * Test if an ABI comes from a Cairo 1 contract
- * @param abi Abi - representing the interface of a Cairo contract
- * @returns boolean - TRUE if it is an ABI from a Cairo1 contract
+ * @param abi representing the interface of a Cairo contract
+ * @returns TRUE if it is an ABI from a Cairo1 contract
  * @example
  * ```typescript
  * const isCairo1: boolean = isCairo1Abi(myAbi: Abi);
@@ -67,8 +67,6 @@ export function isCairo1Abi(abi: Abi): boolean {
 
 /**
  * Create Uint256 Cairo type (helper for common struct type)
- * @param it BigNumberish
- * @returns Uint256
  * @example
  * ```typescript
  * uint256('892349863487563453485768723498');
@@ -86,12 +84,7 @@ export const uint256 = (it: BigNumberish): Uint256 => {
 };
 
 /**
- * unnamed tuple cairo type (helper same as common struct type)
- */
-/**
  * Create unnamed tuple Cairo type (helper same as common struct type)
- * @param args BigNumberish[] | object[] | boolean[]
- * @returns Record
  * @example
  * ```typescript
  * tuple(1,'0x101',16);
@@ -103,8 +96,7 @@ export const tuple = (
 
 /**
  * Create felt Cairo type (cairo type helper)
- * @param it BigNumberish
- * @returns felt-string
+ * @returns format: felt-string
  */
 export function felt(it: BigNumberish): string {
   // BN or number

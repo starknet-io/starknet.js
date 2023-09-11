@@ -299,9 +299,7 @@ export class Account extends Provider implements AccountInterface {
    * First check if contract is already declared, if not declare it
    * If contract already declared returned transaction_hash is ''.
    * Method will pass even if contract is already declared
-   * @param payload DeclareContractPayload
-   * @param transactionsDetail (optional) InvocationsDetails = \{\}
-   * @returns DeclareContractResponse
+   * @param transactionsDetail (optional)
    */
   public async declareIfNot(
     payload: DeclareContractPayload,
