@@ -32,7 +32,7 @@ two arrays: one with the entrypoints, and one with the concatenated calldata.
 
 #### Defined in
 
-[src/utils/transaction.ts:12](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L12)
+[src/utils/transaction.ts:10](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L10)
 
 ---
 
@@ -40,8 +40,7 @@ two arrays: one with the entrypoints, and one with the concatenated calldata.
 
 ▸ **fromCallsToExecuteCalldata**(`calls`): [`Calldata`](types.md#calldata)
 
-Transforms a list of calls in the full flattened calldata expected
-by the **execute** protocol.
+Transforms a list of calls into the Cairo 0 `__execute__` calldata.
 
 #### Parameters
 
@@ -55,13 +54,17 @@ by the **execute** protocol.
 
 #### Defined in
 
-[src/utils/transaction.ts:37](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L37)
+[src/utils/transaction.ts:32](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L32)
 
 ---
 
 ### fromCallsToExecuteCalldataWithNonce
 
 ▸ **fromCallsToExecuteCalldataWithNonce**(`calls`, `nonce`): [`Calldata`](types.md#calldata)
+
+Transforms a list of calls into the Cairo 0 `__execute__` calldata including nonce.
+
+**`Deprecated`**
 
 #### Parameters
 
@@ -86,21 +89,23 @@ by the **execute** protocol.
 
 Format Data inside Calls
 
+**`Deprecated`**
+
+Not required for getting execute Calldata
+
 #### Parameters
 
-| Name    | Type                      | Description |
-| :------ | :------------------------ | :---------- |
-| `calls` | [`Call`](types.md#call)[] | Call[]      |
+| Name    | Type                      |
+| :------ | :------------------------ |
+| `calls` | [`Call`](types.md#call)[] |
 
 #### Returns
 
 [`CallStruct`](../interfaces/types.CallStruct.md)[]
 
-CallStruct
-
 #### Defined in
 
-[src/utils/transaction.ts:53](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L53)
+[src/utils/transaction.ts:52](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L52)
 
 ---
 
@@ -108,8 +113,7 @@ CallStruct
 
 ▸ **fromCallsToExecuteCalldata_cairo1**(`calls`): [`Calldata`](types.md#calldata)
 
-Transforms a list of calls in the full flattened calldata expected
-by the **execute** protocol.
+Transforms a list of calls into the Cairo 1 `__execute__` calldata.
 
 #### Parameters
 
@@ -121,11 +125,9 @@ by the **execute** protocol.
 
 [`Calldata`](types.md#calldata)
 
-Calldata
-
 #### Defined in
 
-[src/utils/transaction.ts:68](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L68)
+[src/utils/transaction.ts:64](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L64)
 
 ---
 
@@ -133,19 +135,19 @@ Calldata
 
 ▸ **getExecuteCalldata**(`calls`, `cairoVersion?`): [`Calldata`](types.md#calldata)
 
+Create `__execute__` Calldata from Calls based on Cairo versions
+
 #### Parameters
 
-| Name           | Type                                    | Default value | Description   |
-| :------------- | :-------------------------------------- | :------------ | :------------ |
-| `calls`        | [`Call`](types.md#call)[]               | `undefined`   | Call array    |
-| `cairoVersion` | [`CairoVersion`](types.md#cairoversion) | `'0'`         | Defaults to 0 |
+| Name           | Type                                    | Default value |
+| :------------- | :-------------------------------------- | :------------ |
+| `calls`        | [`Call`](types.md#call)[]               | `undefined`   |
+| `cairoVersion` | [`CairoVersion`](types.md#cairoversion) | `'0'`         |
 
 #### Returns
 
 [`Calldata`](types.md#calldata)
 
-string[] of calldata
-
 #### Defined in
 
-[src/utils/transaction.ts:85](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L85)
+[src/utils/transaction.ts:78](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/transaction.ts#L78)

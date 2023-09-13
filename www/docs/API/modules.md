@@ -1230,7 +1230,7 @@ Loosely validate a URL `string`.
 
 #### Defined in
 
-[src/utils/url.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/url.ts#L22)
+[src/utils/url.ts:20](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/url.ts#L20)
 
 ---
 
@@ -1252,7 +1252,7 @@ Loosely validate a URL `string`.
 
 #### Defined in
 
-[src/utils/url.ts:51](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/url.ts#L51)
+[src/utils/url.ts:49](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/url.ts#L49)
 
 ---
 
@@ -1304,19 +1304,17 @@ Helper to redeclare response Cairo0 contract
 
 #### Parameters
 
-| Name  | Type                                                                 | Description           |
-| :---- | :------------------------------------------------------------------- | :-------------------- |
-| `ccr` | [`ContractClassResponse`](namespaces/types.md#contractclassresponse) | ContractClassResponse |
+| Name  | Type                                                                 |
+| :---- | :------------------------------------------------------------------- |
+| `ccr` | [`ContractClassResponse`](namespaces/types.md#contractclassresponse) |
 
 #### Returns
 
 [`LegacyCompiledContract`](namespaces/types.md#legacycompiledcontract)
 
-LegacyCompiledContract
-
 #### Defined in
 
-[src/utils/contract.ts:48](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/contract.ts#L48)
+[src/utils/contract.ts:46](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/contract.ts#L46)
 
 ---
 
@@ -1325,7 +1323,7 @@ LegacyCompiledContract
 ▸ **parseUDCEvent**(`txReceipt`): `Object`
 
 Parse Transaction Receipt Event from UDC invoke transaction and
-create DeployContractResponse compatibile response with adition of UDC Event data
+create DeployContractResponse compatible response with addition of the UDC Event data
 
 #### Parameters
 
@@ -1353,4 +1351,4 @@ DeployContractResponse | UDC Event Response data
 
 #### Defined in
 
-[src/utils/events.ts:12](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/events.ts#L12)
+[src/utils/events.ts:11](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/events.ts#L11)

@@ -6,8 +6,6 @@ import { toBigInt } from './num';
 /**
  * Transforms a list of Calls, each with their own calldata, into
  * two arrays: one with the entrypoints, and one with the concatenated calldata.
- * @param calls
- * @returns
  */
 export const transformCallsToMulticallArrays = (calls: Call[]) => {
   const callArray: ParsedStruct[] = [];
@@ -29,10 +27,7 @@ export const transformCallsToMulticallArrays = (calls: Call[]) => {
 };
 
 /**
- * Transforms a list of calls in the full flattened calldata expected
- * by the __execute__ protocol.
- * @param calls
- * @returns
+ * Transforms a list of calls into the Cairo 0 `__execute__` calldata.
  */
 export const fromCallsToExecuteCalldata = (calls: Call[]) => {
   const { callArray, calldata } = transformCallsToMulticallArrays(calls);
@@ -40,15 +35,19 @@ export const fromCallsToExecuteCalldata = (calls: Call[]) => {
   return [...compiledCalls, ...calldata] as Calldata;
 };
 
+/**
+ * Transforms a list of calls into the Cairo 0 `__execute__` calldata including nonce.
+ *
+ * @deprecated
+ */
 export const fromCallsToExecuteCalldataWithNonce = (calls: Call[], nonce: BigNumberish) => {
   return [...fromCallsToExecuteCalldata(calls), toBigInt(nonce).toString()] as Calldata;
 };
 
-// TT: Can be removed ?
 /**
  * Format Data inside Calls
- * @param calls Call[]
- * @returns CallStruct
+ *
+ * @deprecated Not required for getting execute Calldata
  */
 export const transformCallsToMulticallArrays_cairo1 = (calls: Call[]) => {
   const callArray = calls.map<CallStruct>((call) => ({
@@ -60,10 +59,7 @@ export const transformCallsToMulticallArrays_cairo1 = (calls: Call[]) => {
 };
 
 /**
- * Transforms a list of calls in the full flattened calldata expected
- * by the __execute__ protocol.
- * @param calls
- * @returns Calldata
+ * Transforms a list of calls into the Cairo 1 `__execute__` calldata.
  */
 export const fromCallsToExecuteCalldata_cairo1 = (calls: Call[]) => {
   // ensure property order
@@ -77,10 +73,7 @@ export const fromCallsToExecuteCalldata_cairo1 = (calls: Call[]) => {
 };
 
 /**
- *
- * @param calls Call array
- * @param cairoVersion Defaults to 0
- * @returns string[] of calldata
+ * Create `__execute__` Calldata from Calls based on Cairo versions
  */
 export const getExecuteCalldata = (calls: Call[], cairoVersion: CairoVersion = '0') => {
   if (cairoVersion === '1') {

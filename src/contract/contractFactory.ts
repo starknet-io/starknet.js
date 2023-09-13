@@ -55,11 +55,8 @@ export class ContractFactory {
 
   /**
    * Deploys contract and returns new instance of the Contract
-   * If contract is not declared it will first declare it, and then deploy
    *
-   * @param args - Array of the constructor arguments for deployment
-   * @param options (optional) Object - parseRequest, parseResponse, addressSalt
-   * @returns deployed Contract
+   * If contract is not declared it will first declare it, and then deploy
    */
   public async deploy(...args: ArgsOrCalldataWithOptions): Promise<Contract> {
     const { args: param, options = { parseRequest: true } } = splitArgsAndOptions(args);
@@ -99,8 +96,7 @@ export class ContractFactory {
   /**
    * Attaches to new Account
    *
-   * @param account - new Provider or Account to attach to
-   * @returns ContractFactory
+   * @param account - new Account to attach to
    */
   connect(account: AccountInterface): ContractFactory {
     this.account = account;
@@ -109,9 +105,6 @@ export class ContractFactory {
 
   /**
    * Attaches current abi and account to the new address
-   *
-   * @param address - Contract address
-   * @returns Contract
    */
   attach(address: string): Contract {
     return new Contract(this.abi, address, this.account);

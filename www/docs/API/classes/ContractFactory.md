@@ -99,23 +99,22 @@ custom_edit_url: null
 ▸ **deploy**(`...args`): `Promise`<[`Contract`](Contract.md)\>
 
 Deploys contract and returns new instance of the Contract
+
 If contract is not declared it will first declare it, and then deploy
 
 #### Parameters
 
-| Name      | Type                                                                            | Description                                       |
-| :-------- | :------------------------------------------------------------------------------ | :------------------------------------------------ |
-| `...args` | [`ArgsOrCalldataWithOptions`](../namespaces/types.md#argsorcalldatawithoptions) | Array of the constructor arguments for deployment |
+| Name      | Type                                                                            |
+| :-------- | :------------------------------------------------------------------------------ |
+| `...args` | [`ArgsOrCalldataWithOptions`](../namespaces/types.md#argsorcalldatawithoptions) |
 
 #### Returns
 
 `Promise`<[`Contract`](Contract.md)\>
 
-deployed Contract
-
 #### Defined in
 
-[src/contract/contractFactory.ts:64](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L64)
+[src/contract/contractFactory.ts:61](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L61)
 
 ---
 
@@ -127,19 +126,17 @@ Attaches to new Account
 
 #### Parameters
 
-| Name      | Type                                      | Description                          |
-| :-------- | :---------------------------------------- | :----------------------------------- |
-| `account` | [`AccountInterface`](AccountInterface.md) | new Provider or Account to attach to |
+| Name      | Type                                      | Description              |
+| :-------- | :---------------------------------------- | :----------------------- |
+| `account` | [`AccountInterface`](AccountInterface.md) | new Account to attach to |
 
 #### Returns
 
 [`ContractFactory`](ContractFactory.md)
 
-ContractFactory
-
 #### Defined in
 
-[src/contract/contractFactory.ts:105](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L105)
+[src/contract/contractFactory.ts:101](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L101)
 
 ---
 
@@ -151,16 +148,14 @@ Attaches current abi and account to the new address
 
 #### Parameters
 
-| Name      | Type     | Description      |
-| :-------- | :------- | :--------------- |
-| `address` | `string` | Contract address |
+| Name      | Type     |
+| :-------- | :------- |
+| `address` | `string` |
 
 #### Returns
 
 [`Contract`](Contract.md)
 
-Contract
-
 #### Defined in
 
-[src/contract/contractFactory.ts:116](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L116)
+[src/contract/contractFactory.ts:109](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/contractFactory.ts#L109)

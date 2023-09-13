@@ -59,6 +59,8 @@ custom_edit_url: null
 
 ▸ `Static` **hash**(`a`, `b`): `string`
 
+Create pedersen hash from a and b
+
 #### Parameters
 
 | Name | Type     |
@@ -70,9 +72,11 @@ custom_edit_url: null
 
 `string`
 
+format: hex-string
+
 #### Defined in
 
-[src/utils/merkle.ts:34](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/merkle.ts#L34)
+[src/utils/merkle.ts:43](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/merkle.ts#L43)
 
 ---
 
@@ -80,19 +84,23 @@ custom_edit_url: null
 
 ▸ `Private` **build**(`leaves`): `string`
 
+Create Merkle tree
+
 #### Parameters
 
-| Name     | Type       |
-| :------- | :--------- |
-| `leaves` | `string`[] |
+| Name     | Type       | Description      |
+| :------- | :--------- | :--------------- |
+| `leaves` | `string`[] | hex-string array |
 
 #### Returns
 
 `string`
 
+format: hex-string; Merkle tree root
+
 #### Defined in
 
-[src/utils/merkle.ts:16](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/merkle.ts#L16)
+[src/utils/merkle.ts:21](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/merkle.ts#L21)
 
 ---
 
@@ -100,18 +108,22 @@ custom_edit_url: null
 
 ▸ **getProof**(`leaf`, `branch?`, `hashPath?`): `string`[]
 
+Return path to leaf
+
 #### Parameters
 
-| Name       | Type       | Default value |
-| :--------- | :--------- | :------------ |
-| `leaf`     | `string`   | `undefined`   |
-| `branch`   | `string`[] | `undefined`   |
-| `hashPath` | `string`[] | `[]`          |
+| Name       | Type       | Default value | Description      |
+| :--------- | :--------- | :------------ | :--------------- |
+| `leaf`     | `string`   | `undefined`   | hex-string       |
+| `branch`   | `string`[] | `undefined`   | hex-string array |
+| `hashPath` | `string`[] | `[]`          | hex-string array |
 
 #### Returns
 
 `string`[]
 
+format: hex-string array
+
 #### Defined in
 
-[src/utils/merkle.ts:39](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/merkle.ts#L39)
+[src/utils/merkle.ts:55](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/merkle.ts#L55)
