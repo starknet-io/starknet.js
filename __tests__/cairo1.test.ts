@@ -1,5 +1,4 @@
 import {
-  Abi,
   Account,
   BigNumberish,
   CallData,
@@ -27,7 +26,6 @@ import {
   compiledHelloSierraCasm,
   describeIfDevnet,
   describeIfDevnetSequencer,
-  describeIfSequencerTestnet2,
   getTestAccount,
   getTestProvider,
 } from './fixtures';
@@ -555,7 +553,8 @@ describeIfDevnet('Cairo 1 Devnet', () => {
   });
 });
 
-describeIfSequencerTestnet2('Cairo1 Testnet2', () => {
+// TODO: Refactor to Testnet
+/* describeIfSequencerTestnet2('Cairo1 Testnet2', () => {
   describe('Sequencer API - C1 T2 C:0x771bbe2ba64f...', () => {
     const provider = getTestProvider() as SequencerProvider;
     const account = getTestAccount(provider);
@@ -620,4 +619,4 @@ describeIfSequencerTestnet2('Cairo1 Testnet2', () => {
       expect(tx).toBe(true);
     });
   });
-});
+}); */
