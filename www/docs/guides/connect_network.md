@@ -100,15 +100,6 @@ const providerBlastTestnet = new RpcProvider({ nodeUrl: 'https://starknet-testne
 const providerAlchemyTestnet = new RpcProvider({ nodeUrl: 'https://starknet-goerli.g.alchemy.com/v2/' + alchemyKey });
 ```
 
-**Testnet2 :**
-
-```typescript
-// Infura node rpc for Testnet2 :
-const providerInfuraTestnet2 = new RpcProvider({ nodeUrl: 'https://starknet-goerli2.infura.io/v3/' + infuraKey });
-// Blast node rpc for Testnet2 :
-const providerBlastTestnet2 = new RpcProvider({ nodeUrl: 'https://starknet-testnet-2.blastapi.io/' + blastKey + "/rpc/v0.4" });
-```
-
 ## Specific methods
 
 Some methods are available only if connected to a sequencer, and some others are available only if connected to a node (using RPC).
