@@ -276,7 +276,8 @@ export const abstractionFns: AbstractionFunctions = {
 ```typescript
 const signerAbstraction = new Signer(privateKeyAbstraction, abstractionFns);
 const accountAbstraction = new Account(provider, addressAbstraction, signerAbstraction, "1");
-const signature = await accountAbstraction.signMessage(typedDataValidate);
+const signature = await accountAbstraction.signMessage(typedDataValidate, 10, 11, 12);
+const msgHash = await accountAbstraction.hashMessage(typedDataValidate, 10, 11, 12);
 ```
 
 ### Verify EIP712 message with abstraction
@@ -286,6 +287,6 @@ To verify the message, create a dummy Account instance, using the same signer th
 Then, verify the message in Starknet :
 
 ```typescript
-const result5 = await accountAbstraction.verifyMessage(typedDataValidate, signature);
+const result5 = await accountAbstraction.verifyMessage(typedDataValidate, signature, 10, 11, 12);
 console.log("Result5 (boolean) =", result5);
 ```

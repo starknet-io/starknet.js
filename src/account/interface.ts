@@ -327,13 +327,18 @@ export abstract class AccountInterface extends ProviderInterface {
    *
    * @param typedData - JSON object to be verified
    * @param signature - signature of the JSON object
+   * @param addsAbstraction an array of BigNumberish, used as additional parameters for account abstraction, for message hash and signature.
    * @returns true if the signature is valid, false otherwise
    * @throws {Error} if the JSON object is not a valid JSON or the signature is not a valid signature
    */
-  public abstract verifyMessage(typedData: TypedData, signature: Signature): Promise<boolean>;
+  public abstract verifyMessage(
+    typedData: TypedData,
+    signature: Signature,
+    ...addsAbstraction: BigNumberish[]
+  ): Promise<boolean>;
 
   /**
-   * Verify in Starknet.js a signature of a JSON object. To use only with a Starknet signature.
+   * Verify in Starknet.js a signature of a JSON object. To use only if the abstraction is based on a Starknet signature.
    *
    * @param myEIP712json - JSON object to be verified
    * @param signature - signature of the JSON object. Only Starknet signature, with .r and .s, or an array with .r first, .s second, and some optional additionnal values.

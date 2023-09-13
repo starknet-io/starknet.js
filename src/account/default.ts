@@ -1,4 +1,5 @@
 import { SignatureType } from '@noble/curves/abstract/weierstrass';
+import { Signature as WeierstrassSignature } from '@scure/starknet';
 
 import { UDC, ZERO } from '../constants';
 import { ProviderInterface } from '../provider';
@@ -292,8 +293,9 @@ export class Account extends Provider implements AccountInterface {
     const maxFee =
       transactionsDetail.maxFee ??
       (await this.getSuggestedMaxFee(
-        { type: TransactionType.INVOKE, payload: calls, ...adds },
-        transactionsDetail
+        { type: TransactionType.INVOKE, payload: calls },
+        transactionsDetail,
+        ...adds
       ));
     const version = toBigInt(transactionVersion);
     const chainId = await this.getChainId();
@@ -573,9 +575,10 @@ export class Account extends Provider implements AccountInterface {
 
   public async verifyMessage(
     proposedJson: TypedData,
-    ProposedSignature: Signature
+    ProposedSignature: Signature,
+    ...addsAbstraction: BigNumberish[]
   ): Promise<boolean> {
-    const hash = await this.hashMessage(proposedJson);
+    const hash = await this.hashMessage(proposedJson, ...addsAbstraction);
     return this.verifyMessageHash(hash, ProposedSignature);
   }
 
@@ -586,7 +589,13 @@ export class Account extends Provider implements AccountInterface {
     ...addsAbstraction: BigNumberish[]
   ): Promise<boolean> {
     const msgHash = await this.hashMessage(myEIP712json, ...addsAbstraction);
-    return starkCurve.verify(signature as SignatureType, msgHash, fullPublicKey);
+    let signatureT: SignatureType;
+    if (Array.isArray(signature)) {
+      signatureT = new WeierstrassSignature(toBigInt(signature[0]), toBigInt(signature[1]));
+    } else {
+      signatureT = signature;
+    }
+    return starkCurve.verify(signatureT, msgHash, fullPublicKey);
   }
 
   public async getSuggestedMaxFee(

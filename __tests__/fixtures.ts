@@ -47,7 +47,16 @@ export const compiledC1v2 = readContractSierra('cairo/helloCairo2/compiled');
 export const compiledC1v2Casm = readContractSierraCasm('cairo/helloCairo2/compiled');
 export const compiledC210 = readContractSierra('cairo/cairo210/cairo210.sierra');
 export const compiledC210Casm = readContractSierraCasm('cairo/cairo210/cairo210');
-
+export const compiledAccountAbstractionSierra = readContractSierra(
+  'cairo/accountAbstraction/account_abstraction.sierra'
+);
+export const compiledAccountAbstractionCasm = readContractSierraCasm(
+  'cairo/accountAbstraction/account_abstraction'
+);
+export const compiledDummy1Sierra = readContractSierra('cairo/accountAbstraction/dummy1.sierra');
+export const compiledDummy1Casm = readContractSierraCasm('cairo/accountAbstraction/dummy1');
+export const compiledDummy2Sierra = readContractSierra('cairo/accountAbstraction/dummy2.sierra');
+export const compiledDummy2Casm = readContractSierraCasm('cairo/accountAbstraction/dummy2');
 /* Default test config based on run `starknet-devnet --seed 0` */
 const DEFAULT_TEST_PROVIDER_SEQUENCER_URL = 'http://127.0.0.1:5050/';
 const DEFAULT_TEST_ACCOUNT_ADDRESS =
