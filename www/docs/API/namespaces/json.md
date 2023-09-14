@@ -12,11 +12,16 @@ custom_edit_url: null
 
 ▸ **parse**(`x`): `any`
 
+Convert JSON string to JSON object
+
+NOTE: the String() wrapping is used so the behavior conforms to JSON.parse()
+which can accept simple data types but is not represented in the default typing
+
 #### Parameters
 
-| Name | Type     |
-| :--- | :------- |
-| `x`  | `string` |
+| Name | Type     | Description |
+| :--- | :------- | :---------- |
+| `x`  | `string` | JSON string |
 
 #### Returns
 
@@ -24,7 +29,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/json.ts:12](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/json.ts#L12)
+[src/utils/json.ts:21](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/json.ts#L21)
 
 ---
 
@@ -32,11 +37,13 @@ custom_edit_url: null
 
 ▸ **parseAlwaysAsBig**(`x`): `any`
 
+Convert JSON string to JSON object with all numbers as bigint
+
 #### Parameters
 
-| Name | Type     |
-| :--- | :------- |
-| `x`  | `string` |
+| Name | Type     | Description |
+| :--- | :------- | :---------- |
+| `x`  | `string` | JSON string |
 
 #### Returns
 
@@ -44,13 +51,18 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/json.ts:13](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/json.ts#L13)
+[src/utils/json.ts:27](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/json.ts#L27)
 
 ---
 
 ### stringify
 
 ▸ **stringify**(`value`, `replacer?`, `space?`, `numberStringifiers?`): `string`
+
+Convert JSON object to JSON string
+
+NOTE: the not-null assertion is used so the return type conforms to JSON.stringify()
+which can also return undefined but is not represented in the default typing
 
 #### Parameters
 
@@ -65,9 +77,11 @@ custom_edit_url: null
 
 `string`
 
+JSON string
+
 #### Defined in
 
-[src/utils/json.ts:18](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/json.ts#L18)
+[src/utils/json.ts:37](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/json.ts#L37)
 
 ---
 
@@ -94,4 +108,4 @@ equivalent to 'stringify', alias will be removed
 
 #### Defined in
 
-[src/utils/json.ts:18](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/json.ts#L18)
+[src/utils/json.ts:37](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/json.ts#L37)

@@ -106,10 +106,6 @@ function getMerkleTreeType(types: TypedData['types'], ctx: Context) {
 
 /**
  * Encode a type to a string. All dependant types are alphabetically sorted.
- *
- * @param {TypedData} typedData
- * @param {string} type
- * @return {string}
  */
 export const encodeType = (types: TypedData['types'], type: string): string => {
   const [primary, ...dependencies] = getDependencies(types, type);
@@ -124,10 +120,6 @@ export const encodeType = (types: TypedData['types'], type: string): string => {
 
 /**
  * Get a type string as hash.
- *
- * @param {TypedData} typedData
- * @param {string} type
- * @return {string}
  */
 export const getTypeHash = (types: TypedData['types'], type: string): string => {
   return getSelectorFromName(encodeType(types, type));
@@ -136,11 +128,6 @@ export const getTypeHash = (types: TypedData['types'], type: string): string => 
 /**
  * Encodes a single value to an ABI serialisable string, number or Buffer. Returns the data as tuple, which consists of
  * an array of ABI compatible types, and an array of corresponding values.
- *
- * @param {TypedData} typedData
- * @param {string} type
- * @param {any} data
- * @returns {[string, string]}
  */
 export const encodeValue = (
   types: TypedData['types'],
@@ -189,10 +176,6 @@ export const encodeValue = (
 /**
  * Encode the data to an ABI encoded Buffer. The data should be a key -> value object with all the required values. All
  * dependant types are automatically encoded.
- *
- * @param {TypedData} typedData
- * @param {string} type
- * @param {Record<string, any>} data
  */
 export const encodeData = <T extends TypedData>(
   types: T['types'],
@@ -225,11 +208,6 @@ export const encodeData = <T extends TypedData>(
 /**
  * Get encoded data as a hash. The data should be a key -> value object with all the required values. All dependant
  * types are automatically encoded.
- *
- * @param {TypedData} typedData
- * @param {string} type
- * @param {Record<string, any>} data
- * @return {Buffer}
  */
 export const getStructHash = <T extends TypedData>(
   types: T['types'],

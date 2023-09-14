@@ -1,3 +1,11 @@
+## [5.19.6](https://github.com/0xs34n/starknet.js/compare/v5.19.5...v5.19.6) (2023-09-11)
+
+### Bug Fixes
+
+- cleanup and docs update, string types descriptive ([08bd45f](https://github.com/0xs34n/starknet.js/commit/08bd45faa3d4719ab4a2e50d75df731199e34033))
+- interface fix and docs update ([97a08c5](https://github.com/0xs34n/starknet.js/commit/97a08c5949a0f96fd218ded30e1ce36fae07f319))
+- remove ec constants ([b7e6b01](https://github.com/0xs34n/starknet.js/commit/b7e6b017b3f78d3c50470dedf18a20e362e3b360))
+
 ## [5.19.5](https://github.com/0xs34n/starknet.js/compare/v5.19.4...v5.19.5) (2023-08-29)
 
 ### Bug Fixes

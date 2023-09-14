@@ -12,6 +12,8 @@ custom_edit_url: null
 
 ▸ **wait**(`delay`): `Promise`<`unknown`\>
 
+Helper - Async Sleep for 'delay' time
+
 #### Parameters
 
 | Name    | Type     |
@@ -24,13 +26,17 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/provider.ts:13](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/provider.ts#L13)
+[src/utils/provider.ts:16](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/provider.ts#L16)
 
 ---
 
 ### createSierraContractClass
 
 ▸ **createSierraContractClass**(`contract`): [`SierraContractClass`](types.md#sierracontractclass)
+
+Create Sierra Contract Class from a given Compiled Sierra
+
+CompiledSierra -> SierraContractClass
 
 #### Parameters
 
@@ -44,13 +50,17 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/provider.ts:19](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/provider.ts#L19)
+[src/utils/provider.ts:27](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/provider.ts#L27)
 
 ---
 
 ### parseContract
 
 ▸ **parseContract**(`contract`): [`ContractClass`](types.md#contractclass)
+
+Create Contract Class from a given CompiledContract or string
+
+(CompiledContract or string) -> ContractClass
 
 #### Parameters
 
@@ -64,4 +74,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/provider.ts:29](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/provider.ts#L29)
+[src/utils/provider.ts:41](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/provider.ts#L41)

@@ -18,6 +18,10 @@ Re-exports [IS_BROWSER](constants.md#is_browser)
 
 ▸ **arrayBufferToString**(`array`): `string`
 
+Convert array buffer to string
+
+_[internal usage]_
+
 #### Parameters
 
 | Name    | Type          |
@@ -30,13 +34,17 @@ Re-exports [IS_BROWSER](constants.md#is_browser)
 
 #### Defined in
 
-[src/utils/encode.ts:6](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L6)
+[src/utils/encode.ts:16](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L16)
 
 ---
 
 ### stringToArrayBuffer
 
 ▸ **stringToArrayBuffer**(`s`): `Uint8Array`
+
+Convert string to array buffer
+
+_[internal usage]_
 
 #### Parameters
 
@@ -50,13 +58,15 @@ Re-exports [IS_BROWSER](constants.md#is_browser)
 
 #### Defined in
 
-[src/utils/encode.ts:10](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L10)
+[src/utils/encode.ts:25](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L25)
 
 ---
 
 ### atobUniversal
 
 ▸ **atobUniversal**(`a`): `Uint8Array`
+
+Convert string to array buffer (browser and node compatible)
 
 #### Parameters
 
@@ -70,13 +80,15 @@ Re-exports [IS_BROWSER](constants.md#is_browser)
 
 #### Defined in
 
-[src/utils/encode.ts:14](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L14)
+[src/utils/encode.ts:32](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L32)
 
 ---
 
 ### btoaUniversal
 
 ▸ **btoaUniversal**(`b`): `string`
+
+Convert array buffer to string (browser and node compatible)
 
 #### Parameters
 
@@ -90,13 +102,15 @@ Re-exports [IS_BROWSER](constants.md#is_browser)
 
 #### Defined in
 
-[src/utils/encode.ts:18](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L18)
+[src/utils/encode.ts:39](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L39)
 
 ---
 
 ### buf2hex
 
 ▸ **buf2hex**(`buffer`): `string`
+
+Convert array buffer to hex-string
 
 #### Parameters
 
@@ -108,9 +122,11 @@ Re-exports [IS_BROWSER](constants.md#is_browser)
 
 `string`
 
+format: hex-string
+
 #### Defined in
 
-[src/utils/encode.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L22)
+[src/utils/encode.ts:47](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L47)
 
 ---
 
@@ -118,22 +134,23 @@ Re-exports [IS_BROWSER](constants.md#is_browser)
 
 ▸ **removeHexPrefix**(`hex`): `string`
 
-Some function imported from https://github.com/pedrouid/enc-utils/blob/master/src/index.ts
-enc-utils is no dependency to avoid using `Buffer` which just works in node and no browsers
+Remove hex prefix '0x' from hex-string
 
 #### Parameters
 
-| Name  | Type     |
-| :---- | :------- |
-| `hex` | `string` |
+| Name  | Type     | Description |
+| :---- | :------- | :---------- |
+| `hex` | `string` | hex-string  |
 
 #### Returns
 
 `string`
 
+format: base16-string
+
 #### Defined in
 
-[src/utils/encode.ts:31](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L31)
+[src/utils/encode.ts:56](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L56)
 
 ---
 
@@ -141,25 +158,31 @@ enc-utils is no dependency to avoid using `Buffer` which just works in node and 
 
 ▸ **addHexPrefix**(`hex`): `string`
 
+Add hex prefix '0x' to base16-string
+
 #### Parameters
 
-| Name  | Type     |
-| :---- | :------- |
-| `hex` | `string` |
+| Name  | Type     | Description   |
+| :---- | :------- | :------------ |
+| `hex` | `string` | base16-string |
 
 #### Returns
 
 `string`
 
+format: hex-string
+
 #### Defined in
 
-[src/utils/encode.ts:35](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L35)
+[src/utils/encode.ts:65](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L65)
 
 ---
 
 ### padLeft
 
 ▸ **padLeft**(`str`, `length`, `padding?`): `string`
+
+Prepend string (default with '0')
 
 #### Parameters
 
@@ -175,19 +198,23 @@ enc-utils is no dependency to avoid using `Buffer` which just works in node and 
 
 #### Defined in
 
-[src/utils/encode.ts:49](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L49)
+[src/utils/encode.ts:87](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L87)
 
 ---
 
 ### calcByteLength
 
-▸ **calcByteLength**(`length`, `byteSize?`): `number`
+▸ **calcByteLength**(`str`, `byteSize?`): `number`
+
+Calculate byte length of string
+
+_[no internal usage]_
 
 #### Parameters
 
 | Name       | Type     | Default value |
 | :--------- | :------- | :------------ |
-| `length`   | `number` | `undefined`   |
+| `str`      | `string` | `undefined`   |
 | `byteSize` | `number` | `8`           |
 
 #### Returns
@@ -196,13 +223,17 @@ enc-utils is no dependency to avoid using `Buffer` which just works in node and 
 
 #### Defined in
 
-[src/utils/encode.ts:53](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L53)
+[src/utils/encode.ts:96](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L96)
 
 ---
 
 ### sanitizeBytes
 
 ▸ **sanitizeBytes**(`str`, `byteSize?`, `padding?`): `string`
+
+Prepend '0' to string bytes
+
+_[no internal usage]_
 
 #### Parameters
 
@@ -218,7 +249,7 @@ enc-utils is no dependency to avoid using `Buffer` which just works in node and 
 
 #### Defined in
 
-[src/utils/encode.ts:58](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L58)
+[src/utils/encode.ts:107](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L107)
 
 ---
 
@@ -226,19 +257,25 @@ enc-utils is no dependency to avoid using `Buffer` which just works in node and 
 
 ▸ **sanitizeHex**(`hex`): `string`
 
+Prepend '0' to hex-string bytes
+
+_[no internal usage]_
+
 #### Parameters
 
-| Name  | Type     |
-| :---- | :------- |
-| `hex` | `string` |
+| Name  | Type     | Description |
+| :---- | :------- | :---------- |
+| `hex` | `string` | hex-string  |
 
 #### Returns
 
 `string`
 
+format: hex-string
+
 #### Defined in
 
-[src/utils/encode.ts:62](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L62)
+[src/utils/encode.ts:118](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L118)
 
 ---
 
@@ -246,11 +283,15 @@ enc-utils is no dependency to avoid using `Buffer` which just works in node and 
 
 ▸ **utf8ToArray**(`str`): `Uint8Array`
 
+Convert utf8-string to Uint8Array
+
+Implemented using TextEncoder to make it isomorphic
+
 #### Parameters
 
-| Name  | Type     |
-| :---- | :------- |
-| `str` | `string` |
+| Name  | Type     | Description |
+| :---- | :------- | :---------- |
+| `str` | `string` | utf8-string |
 
 #### Returns
 
@@ -258,7 +299,7 @@ enc-utils is no dependency to avoid using `Buffer` which just works in node and 
 
 #### Defined in
 
-[src/utils/encode.ts:72](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L72)
+[src/utils/encode.ts:133](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L133)
 
 ---
 
@@ -267,20 +308,19 @@ enc-utils is no dependency to avoid using `Buffer` which just works in node and 
 ▸ **pascalToSnake**(`text`): `string`
 
 String transformation util
-pascal case to screaming snake case
+
+Pascal case to screaming snake case
 
 #### Parameters
 
-| Name   | Type     | Description |
-| :----- | :------- | :---------- |
-| `text` | `string` | string      |
+| Name   | Type     |
+| :----- | :------- |
+| `text` | `string` |
 
 #### Returns
 
 `string`
 
-string
-
 #### Defined in
 
-[src/utils/encode.ts:82](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L82)
+[src/utils/encode.ts:142](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/encode.ts#L142)

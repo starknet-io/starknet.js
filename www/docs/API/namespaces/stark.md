@@ -12,25 +12,23 @@ custom_edit_url: null
 
 ▸ **compressProgram**(`jsonProgram`): [`CompressedProgram`](types.md#compressedprogram)
 
-Function to compress compiled cairo program
+Compress compiled Cairo program
 
 [Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/services/api/gateway/transaction.py#L54-L58)
 
 #### Parameters
 
-| Name          | Type                                                    | Description                                       |
-| :------------ | :------------------------------------------------------ | :------------------------------------------------ |
-| `jsonProgram` | `string` \| [`Program`](../interfaces/types.Program.md) | json file representing the compiled cairo program |
+| Name          | Type                                                    | Description                             |
+| :------------ | :------------------------------------------------------ | :-------------------------------------- |
+| `jsonProgram` | `string` \| [`Program`](../interfaces/types.Program.md) | Representing the compiled cairo program |
 
 #### Returns
 
 [`CompressedProgram`](types.md#compressedprogram)
 
-Compressed cairo program
-
 #### Defined in
 
-[src/utils/stark.ts:21](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L21)
+[src/utils/stark.ts:20](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L20)
 
 ---
 
@@ -38,23 +36,23 @@ Compressed cairo program
 
 ▸ **decompressProgram**(`base64`): `any`
 
-Function to decompress compressed compiled cairo program
+Decompress compressed compiled Cairo program
 
 #### Parameters
 
-| Name     | Type     | Description       |
-| :------- | :------- | :---------------- |
-| `base64` | `string` | CompressedProgram |
+| Name     | Type     | Description        |
+| :------- | :------- | :----------------- |
+| `base64` | `string` | Compressed program |
 
 #### Returns
 
 `any`
 
-parsed decompressed compiled cairo program
+Parsed decompressed compiled Cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:33](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L33)
+[src/utils/stark.ts:31](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L31)
 
 ---
 
@@ -62,19 +60,27 @@ parsed decompressed compiled cairo program
 
 ▸ **randomAddress**(): `string`
 
+Random Address based on random keyPair
+
 #### Returns
 
 `string`
 
 #### Defined in
 
-[src/utils/stark.ts:39](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L39)
+[src/utils/stark.ts:40](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L40)
 
 ---
 
 ### makeAddress
 
 ▸ **makeAddress**(`input`): `string`
+
+Lowercase and hex prefix string
+
+**`Deprecated`**
+
+Not used internally, naming is confusing based on functionality
 
 #### Parameters
 
@@ -88,7 +94,7 @@ parsed decompressed compiled cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:44](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L44)
+[src/utils/stark.ts:50](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L50)
 
 ---
 
@@ -96,6 +102,8 @@ parsed decompressed compiled cairo program
 
 ▸ **formatSignature**(`sig?`): [`ArraySignatureType`](types.md#arraysignaturetype)
 
+Format Signature to standard type (hex array)
+
 #### Parameters
 
 | Name   | Type                              |
@@ -106,9 +114,11 @@ parsed decompressed compiled cairo program
 
 [`ArraySignatureType`](types.md#arraysignaturetype)
 
+Custom hex array or weierstrass.SignatureType hex array
+
 #### Defined in
 
-[src/utils/stark.ts:48](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L48)
+[src/utils/stark.ts:58](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L58)
 
 ---
 
@@ -116,6 +126,8 @@ parsed decompressed compiled cairo program
 
 ▸ **signatureToDecimalArray**(`sig?`): [`ArraySignatureType`](types.md#arraysignaturetype)
 
+Format Signature to decimal string array
+
 #### Parameters
 
 | Name   | Type                              |
@@ -128,7 +140,7 @@ parsed decompressed compiled cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:61](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L61)
+[src/utils/stark.ts:74](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L74)
 
 ---
 
@@ -136,6 +148,8 @@ parsed decompressed compiled cairo program
 
 ▸ **signatureToHexArray**(`sig?`): [`ArraySignatureType`](types.md#arraysignaturetype)
 
+Format Signature to hex string array
+
 #### Parameters
 
 | Name   | Type                              |
@@ -148,13 +162,15 @@ parsed decompressed compiled cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:65](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L65)
+[src/utils/stark.ts:81](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L81)
 
 ---
 
 ### estimatedFeeToMaxFee
 
 ▸ **estimatedFeeToMaxFee**(`estimatedFee`, `overhead?`): `bigint`
+
+Convert estimated fee to max fee with overhead
 
 #### Parameters
 
@@ -169,4 +185,4 @@ parsed decompressed compiled cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:69](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L69)
+[src/utils/stark.ts:88](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/stark.ts#L88)

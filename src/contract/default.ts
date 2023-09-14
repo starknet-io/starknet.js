@@ -116,14 +116,6 @@ export function getCalldata(args: RawArgs, callback: Function): Calldata {
   return callback();
 }
 
-/**
- * Not used at the moment
- */
-/* const detectCairoVersion = (abi: Abi) => {
-  if (!abi) return '0';
-  return abi.find((it) => 'state_mutability' in it) ? '1' : '0';
-}; */
-
 export class Contract implements ContractInterface {
   abi: Abi;
 

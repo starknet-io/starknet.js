@@ -42,8 +42,6 @@ export function extractContractHashes(
 
 /**
  * Helper to redeclare response Cairo0 contract
- * @param ccr ContractClassResponse
- * @returns LegacyCompiledContract
  */
 export function contractClassResponseToLegacyCompiledContract(ccr: ContractClassResponse) {
   if (isSierra(ccr)) {

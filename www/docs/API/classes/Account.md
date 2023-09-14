@@ -104,7 +104,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/account/default.ts:423](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L423)
+[src/account/default.ts:421](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L421)
 
 ## Methods
 
@@ -383,20 +383,18 @@ Method will pass even if contract is already declared
 
 #### Parameters
 
-| Name                 | Type                                                                      | Description                        |
-| :------------------- | :------------------------------------------------------------------------ | :--------------------------------- |
-| `payload`            | [`DeclareContractPayload`](../namespaces/types.md#declarecontractpayload) | DeclareContractPayload             |
-| `transactionsDetail` | [`InvocationsDetails`](../namespaces/types.md#invocationsdetails)         | (optional) InvocationsDetails = {} |
+| Name                 | Type                                                                      | Description |
+| :------------------- | :------------------------------------------------------------------------ | :---------- |
+| `payload`            | [`DeclareContractPayload`](../namespaces/types.md#declarecontractpayload) | -           |
+| `transactionsDetail` | [`InvocationsDetails`](../namespaces/types.md#invocationsdetails)         | (optional)  |
 
 #### Returns
 
 `Promise`<[`DeclareContractResponse`](../interfaces/types.DeclareContractResponse.md)\>
 
-DeclareContractResponse
-
 #### Defined in
 
-[src/account/default.ts:306](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L306)
+[src/account/default.ts:304](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L304)
 
 ---
 
@@ -425,7 +423,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/account/default.ts:322](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L322)
+[src/account/default.ts:320](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L320)
 
 ---
 
@@ -456,7 +454,7 @@ support multicall
 
 #### Defined in
 
-[src/account/default.ts:351](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L351)
+[src/account/default.ts:349](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L349)
 
 ---
 
@@ -494,7 +492,7 @@ Internal wait for L2 transaction, support multicall
 
 #### Defined in
 
-[src/account/default.ts:397](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L397)
+[src/account/default.ts:395](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L395)
 
 ---
 
@@ -536,7 +534,7 @@ Method will pass even if contract is already declared (internal using DeclareIfN
 
 #### Defined in
 
-[src/account/default.ts:406](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L406)
+[src/account/default.ts:404](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L404)
 
 ---
 
@@ -565,7 +563,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/account/default.ts:425](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L425)
+[src/account/default.ts:423](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L423)
 
 ---
 
@@ -598,7 +596,7 @@ the signature of the JSON object
 
 #### Defined in
 
-[src/account/default.ts:479](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L479)
+[src/account/default.ts:477](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L477)
 
 ---
 
@@ -631,7 +629,7 @@ the hash of the JSON object
 
 #### Defined in
 
-[src/account/default.ts:483](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L483)
+[src/account/default.ts:481](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L481)
 
 ---
 
@@ -668,7 +666,7 @@ true if the signature is valid, false otherwise
 
 #### Defined in
 
-[src/account/default.ts:487](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L487)
+[src/account/default.ts:485](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L485)
 
 ---
 
@@ -701,7 +699,7 @@ true if the signature is valid, false otherwise
 
 #### Defined in
 
-[src/account/default.ts:503](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L503)
+[src/account/default.ts:501](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L501)
 
 ---
 
@@ -730,7 +728,7 @@ suggestedMaxFee
 
 #### Defined in
 
-[src/account/default.ts:508](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L508)
+[src/account/default.ts:506](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L506)
 
 ---
 
@@ -753,7 +751,7 @@ will be renamed to buildDeclareContractTransaction
 
 #### Defined in
 
-[src/account/default.ts:542](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L542)
+[src/account/default.ts:540](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L540)
 
 ---
 
@@ -774,7 +772,7 @@ will be renamed to buildDeclareContractTransaction
 
 #### Defined in
 
-[src/account/default.ts:566](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L566)
+[src/account/default.ts:564](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L564)
 
 ---
 
@@ -794,7 +792,7 @@ will be renamed to buildDeclareContractTransaction
 
 #### Defined in
 
-[src/account/default.ts:599](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L599)
+[src/account/default.ts:597](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L597)
 
 ---
 
@@ -823,7 +821,7 @@ response from simulate_transaction
 
 #### Defined in
 
-[src/account/default.ts:626](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L626)
+[src/account/default.ts:624](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L624)
 
 ---
 
@@ -844,7 +842,7 @@ response from simulate_transaction
 
 #### Defined in
 
-[src/account/default.ts:643](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L643)
+[src/account/default.ts:641](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L641)
 
 ---
 
@@ -869,7 +867,7 @@ response from simulate_transaction
 
 #### Defined in
 
-[src/account/default.ts:711](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L711)
+[src/account/default.ts:709](https://github.com/0xs34n/starknet.js/blob/develop/src/account/default.ts#L709)
 
 ---
 

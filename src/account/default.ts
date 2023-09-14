@@ -83,7 +83,7 @@ export class Account extends Provider implements AccountInterface {
         ? new Signer(pkOrSigner)
         : pkOrSigner;
 
-    this.cairoVersion = cairoVersion;
+    this.cairoVersion = cairoVersion.toString() as CairoVersion;
   }
 
   public async getNonce(blockIdentifier?: BlockIdentifier): Promise<Nonce> {
@@ -327,9 +327,7 @@ export class Account extends Provider implements AccountInterface {
    * First check if contract is already declared, if not declare it
    * If contract already declared returned transaction_hash is ''.
    * Method will pass even if contract is already declared
-   * @param payload DeclareContractPayload
-   * @param transactionsDetail (optional) InvocationsDetails = \{\}
-   * @returns DeclareContractResponse
+   * @param transactionsDetail (optional)
    */
   public async declareIfNot(
     payload: DeclareContractPayload,
