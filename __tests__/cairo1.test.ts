@@ -274,15 +274,15 @@ describeIfDevnet('Cairo 1 Devnet', () => {
         description: 'dec',
         expire_date: 1n,
         creation_time: 1n,
-        creator: 3562055384976875123115280411327378123839557441680670463096306030682092229914n,
+        creator: BigInt(account.address),
         is_cancelled: false,
         is_voted: false,
         bettor: {
-          address: 3562055384976875123115280411327378123839557441680670463096306030682092229914n,
+          address: BigInt(account.address),
           is_claimed: false,
         },
         counter_bettor: {
-          address: 3562055384976875123115280411327378123839557441680670463096306030682092229914n,
+          address: BigInt(account.address),
           is_claimed: false,
         },
         winner: false,
