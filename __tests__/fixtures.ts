@@ -2,6 +2,7 @@ import fs from 'fs';
 import path from 'path';
 
 import { Account, ProviderInterface, RpcProvider, SequencerProvider, json } from '../src';
+import { BaseUrl } from '../src/constants';
 import {
   CairoVersion,
   CompiledSierra,
@@ -70,6 +71,7 @@ export const IS_DEVNET_SEQUENCER = IS_LOCALHOST_DEVNET && !PROVIDER_URL.includes
 /* Definitions */
 export const IS_RPC = !!RPC_URL;
 export const IS_SEQUENCER = !RPC_URL;
+export const IS_SEQUENCER_GOERLI = PROVIDER_URL.includes(BaseUrl.SN_GOERLI);
 
 export const getTestProvider = (): ProviderInterface => {
   const provider = RPC_URL
@@ -119,6 +121,7 @@ export const describeIfNotDevnet = describeIf(!IS_LOCALHOST_DEVNET);
 export const describeIfDevnet = describeIf(IS_LOCALHOST_DEVNET);
 export const describeIfDevnetRpc = describeIf(IS_DEVNET_RPC);
 export const describeIfDevnetSequencer = describeIf(IS_DEVNET_SEQUENCER);
+export const describeIfSequencerGoerli = describeIf(IS_SEQUENCER_GOERLI);
 
 export const erc20ClassHash = '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a';
 export const wrongClassHash = '0x000000000000000000000000000000000000000000000000000000000000000';

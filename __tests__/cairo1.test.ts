@@ -27,7 +27,7 @@ import {
   compiledHelloSierraCasm,
   describeIfDevnet,
   describeIfDevnetSequencer,
-  describeIfSequencer,
+  describeIfSequencerGoerli,
   getTestAccount,
   getTestProvider,
 } from './fixtures';
@@ -555,8 +555,7 @@ describeIfDevnet('Cairo 1 Devnet', () => {
   });
 });
 
-// TODO: Refactor to Testnet
-describeIfSequencer('Cairo1 Testnet', () => {
+describeIfSequencerGoerli('Cairo1 Testnet', () => {
   describe('Sequencer API - C1 Testnet C:0x00305e...', () => {
     const provider = getTestProvider() as SequencerProvider;
     const account = getTestAccount(provider);
