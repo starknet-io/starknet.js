@@ -173,7 +173,7 @@ export default function orderPropsByAbi(
         enumerable: true,
         value,
       });
-    if (isLen(abiParam.name)) {
+    if (isLen(abiParam.name) && !isCairo1Type(abiParam.type)) {
       return orderedObject;
     }
     setProperty(orderInput(unorderedObject[abiParam.name], abiParam.type));

@@ -17,7 +17,7 @@ import assert from '../assert';
 import { isBigInt, toHex } from '../num';
 import { getSelectorFromName } from '../selector';
 import { isLongText, splitLongString } from '../shortString';
-import { felt, isLen } from './cairo';
+import { felt, isCairo1Type, isLen } from './cairo';
 import {
   CairoCustomEnum,
   CairoOption,
@@ -138,7 +138,7 @@ export class CallData {
 
     const callArray = abiMethod.inputs.reduce(
       (acc, input) =>
-        isLen(input.name)
+        isLen(input.name) && !isCairo1Type(input.type)
           ? acc
           : acc.concat(parseCalldataField(argsIterator, input, this.structs, this.enums)),
       [] as Calldata
