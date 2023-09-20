@@ -214,8 +214,6 @@ mod Account {
         fn validate_deploy_account(self: @ContractState) -> felt252 {
             let tx_info = get_tx_info().unbox();
             let tx_hash = tx_info.transaction_hash;
-            // 1.print();
-            // tx_hash.print();
 
             let signature = tx_info.signature;
             assert(signature.len() == 5, 'Signature deplAcc needs 5 felts');
@@ -228,14 +226,7 @@ mod Account {
             let abstracted_hash = pedersen(
                 pedersen(pedersen(pedersen(pedersen(0, tx_hash), twoFA0), twoFA1), twoFA2),
                 4_felt252
-            ); // pedersen::pedersen () with Cairo v2.2.0
-            // 2.print();
-            // abstracted_hash.print();
-            // 3.print();
-            // let r = *signature.at(0);
-            // r.print();
-            // let s = *signature.at(1);
-            // s.print();
+            ); 
             assert(
                 self._is_valid_signature(abstracted_hash, signature),
                 'Account depl: invalid signature'
@@ -246,8 +237,6 @@ mod Account {
         fn validate_declare(self: @ContractState) -> felt252 {
             let tx_info = get_tx_info().unbox();
             let tx_hash = tx_info.transaction_hash;
-            // 1.print();
-            // tx_hash.print();
 
             let signature = tx_info.signature;
             assert(signature.len() == 5, 'Signature decl needs 5 felts');
@@ -260,16 +249,9 @@ mod Account {
             let abstracted_hash = pedersen(
                 pedersen(pedersen(pedersen(pedersen(0, tx_hash), twoFA0), twoFA1), twoFA2),
                 4_felt252
-            ); // pedersen::pedersen () with Cairo v2.2.0
-            // 2.print();
-            // abstracted_hash.print();
-            // 3.print();
-            // let r = *signature.at(0);
-            // r.print();
-            // let s = *signature.at(1);
-            // s.print();
+            ); 
             assert(
-                self._is_valid_signature(abstracted_hash, signature), 'Declare: invalid signature'
+            self._is_valid_signature(abstracted_hash, signature), 'Declare: invalid signature'
             );
             starknet::VALIDATED
         }
@@ -303,16 +285,10 @@ mod Account {
         fn _is_valid_signature(
             self: @ContractState, hash: felt252, signature: Span<felt252>
         ) -> bool {
-            //let valid_length = signature.len() == 2_u32;
-
-            //if valid_length {
-            check_ecdsa_signature(
+             check_ecdsa_signature(
                 hash, self.public_key.read(), *signature.at(0_u32), *signature.at(1_u32)
             )
-        // } else {
-        //     false
-        // }
-        }
+         }
     }
 
     #[internal]

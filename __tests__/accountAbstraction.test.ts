@@ -34,6 +34,7 @@ import {
   getTestProvider,
 } from './fixtures';
 import { initializeMatcher } from './schema';
+import { ethAddress } from './utils/utils.test';
 
 describe('Test account abstraction of Cairo 1 account', () => {
   const provider = new Provider(getTestProvider());
@@ -43,7 +44,6 @@ describe('Test account abstraction of Cairo 1 account', () => {
   const fullPublicKey = encode.addHexPrefix(
     encode.buf2hex(ec.starkCurve.getPublicKey(privateKeyAbstraction, false))
   );
-  const ethAddress = '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7';
 
   let accountAbstraction: Account;
 
@@ -79,7 +79,6 @@ describe('Test account abstraction of Cairo 1 account', () => {
 
       const { r, s } = ec.starkCurve.sign(txnHash, privateKey);
       const signature = [r.toString(), s.toString(), ...signer2FA];
-      // console.log('deploy account Hash =', txnHash, '\nSignature :', num.toHex(r), num.toHex(s));
       return signature;
     }
 
@@ -329,7 +328,7 @@ describe('Test account abstraction of Cairo 1 account', () => {
             Collection: 'Stupid monkeys',
             Address: '0x69b49c2cc8b16e80e86bfc5b0614a59aa8c9b601569c7b80dde04d3f3151b79',
             Nft_id: 112,
-            Negociated_for: {
+            Negotiated_for: {
               Qty: '18.4569325643',
               Unit: 'ETH',
               Token_address: '0x69b49c2cc8b16e80e86bfc5b0614a59aa8c9b601569c7b80dde04d3f3151b79',
@@ -366,7 +365,7 @@ describe('Test account abstraction of Cairo 1 account', () => {
               type: 'felt',
             },
             {
-              name: 'Negociated_for',
+              name: 'Negotiated_for',
               type: 'Transaction',
             },
           ],
