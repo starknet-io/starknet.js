@@ -15,7 +15,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/constants.ts:33](https://github.com/0xs34n/starknet.js/blob/develop/src/constants.ts#L33)
+[src/constants.ts:31](https://github.com/0xs34n/starknet.js/blob/develop/src/constants.ts#L31)
 
 ---
 
@@ -25,14 +25,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/constants.ts:34](https://github.com/0xs34n/starknet.js/blob/develop/src/constants.ts#L34)
-
----
-
-### SN_GOERLI2
-
-• **SN_GOERLI2** = `"0x534e5f474f45524c4932"`
-
-#### Defined in
-
-[src/constants.ts:35](https://github.com/0xs34n/starknet.js/blob/develop/src/constants.ts#L35)
+[src/constants.ts:32](https://github.com/0xs34n/starknet.js/blob/develop/src/constants.ts#L32)

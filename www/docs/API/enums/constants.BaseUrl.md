@@ -26,13 +26,3 @@ custom_edit_url: null
 #### Defined in
 
 [src/constants.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/constants.ts#L22)
-
----
-
-### SN_GOERLI2
-
-• **SN_GOERLI2** = `"https://alpha4-2.starknet.io"`
-
-#### Defined in
-
-[src/constants.ts:23](https://github.com/0xs34n/starknet.js/blob/develop/src/constants.ts#L23)
