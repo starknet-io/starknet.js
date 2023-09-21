@@ -47,3 +47,5 @@ export const UDC = {
   ADDRESS: '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
   ENTRYPOINT: 'deployContract',
 };
+
+export const DEFAULT_ACCOUNT_CAIRO_VERSION = '0';

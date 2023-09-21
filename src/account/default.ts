@@ -1,4 +1,4 @@
-import { UDC, ZERO } from '../constants';
+import { DEFAULT_ACCOUNT_CAIRO_VERSION, UDC, ZERO } from '../constants';
 import { ProviderInterface } from '../provider';
 import { Provider } from '../provider/default';
 import { Signer, SignerInterface } from '../signer';
@@ -43,6 +43,7 @@ import {
   UniversalDeployerContractPayload,
 } from '../types';
 import { CallData } from '../utils/calldata';
+import { isCairo1Abi } from '../utils/calldata/cairo';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { starkCurve } from '../utils/ec';
 import { parseUDCEvent } from '../utils/events';
@@ -81,6 +82,24 @@ export class Account extends Provider implements AccountInterface {
         : pkOrSigner;
 
     this.cairoVersion = cairoVersion.toString() as CairoVersion;
+  }
+
+  public static async new(
+    provider: Provider,
+    address: string,
+    pkOrSigner: Uint8Array | string | SignerInterface,
+    cairoVersion?: CairoVersion
+  ): Promise<Account> {
+    let cairoV: CairoVersion | undefined;
+    if (!cairoVersion) {
+      try {
+        const { abi } = await provider.getClassAt(address);
+        cairoV = isCairo1Abi(abi) ? '1' : '0';
+      } catch {
+        cairoV = DEFAULT_ACCOUNT_CAIRO_VERSION;
+      }
+    } else cairoV = cairoVersion;
+    return new Account(provider, address, pkOrSigner, cairoV);
   }
 
   public async getNonce(blockIdentifier?: BlockIdentifier): Promise<Nonce> {
