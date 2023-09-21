@@ -1,3 +1,14 @@
+# [5.20.0](https://github.com/0xs34n/starknet.js/compare/v5.19.6...v5.20.0) (2023-09-21)
+
+### Bug Fixes
+
+- cairo 1 variable with \_len in name ([551adfa](https://github.com/0xs34n/starknet.js/commit/551adfa1d41192a5e725941537f25a15c8ee3380))
+- goerli sequencer fixture ([0c6d153](https://github.com/0xs34n/starknet.js/commit/0c6d1532104327b06cae46e38f51b601d7fa0901))
+
+### Features
+
+- remove testnet2(SN_GOERLI2) ([02e17de](https://github.com/0xs34n/starknet.js/commit/02e17ded113ced1c4dc01146159c4f8c6c67a243))
+
 ## [5.19.6](https://github.com/0xs34n/starknet.js/compare/v5.19.5...v5.19.6) (2023-09-11)
 
 ### Bug Fixes
