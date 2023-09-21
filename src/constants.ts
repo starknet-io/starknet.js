@@ -20,19 +20,16 @@ export const API_VERSION = ZERO;
 export enum BaseUrl {
   SN_MAIN = 'https://alpha-mainnet.starknet.io',
   SN_GOERLI = 'https://alpha4.starknet.io',
-  SN_GOERLI2 = 'https://alpha4-2.starknet.io',
 }
 
 export enum NetworkName {
   SN_MAIN = 'SN_MAIN',
   SN_GOERLI = 'SN_GOERLI',
-  SN_GOERLI2 = 'SN_GOERLI2',
 }
 
 export enum StarknetChainId {
   SN_MAIN = '0x534e5f4d41494e', // encodeShortString('SN_MAIN'),
-  SN_GOERLI = '0x534e5f474f45524c49', // encodeShortString('SN_GOERLI'),
-  SN_GOERLI2 = '0x534e5f474f45524c4932', // encodeShortString('SN_GOERLI2'),
+  SN_GOERLI = '0x534e5f474f45524c49', // encodeShortString('SN_GOERLI')
 }
 
 export enum TransactionHashPrefix {

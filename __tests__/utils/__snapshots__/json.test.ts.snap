@@ -20,4 +20,4 @@ Object {
 }
 `;
 
-exports[`JSON utility tests stringify 1`] = `"{\\"provider\\":{\\"responseParser\\":{},\\"baseUrl\\":\\"https://alpha4-2.starknet.io\\",\\"feederGatewayUrl\\":\\"https://alpha4-2.starknet.io/feeder_gateway\\",\\"gatewayUrl\\":\\"https://alpha4-2.starknet.io/gateway\\",\\"chainId\\":\\"0x534e5f474f45524c4932\\",\\"blockIdentifier\\":\\"pending\\"}}"`;
+exports[`JSON utility tests stringify 1`] = `"{\\"provider\\":{\\"responseParser\\":{},\\"baseUrl\\":\\"https://alpha4.starknet.io\\",\\"feederGatewayUrl\\":\\"https://alpha4.starknet.io/feeder_gateway\\",\\"gatewayUrl\\":\\"https://alpha4.starknet.io/gateway\\",\\"chainId\\":\\"0x534e5f474f45524c49\\",\\"blockIdentifier\\":\\"pending\\"}}"`;

@@ -27,7 +27,7 @@ import {
   compiledHelloSierraCasm,
   describeIfDevnet,
   describeIfDevnetSequencer,
-  describeIfSequencerTestnet2,
+  describeIfSequencerGoerli,
   getTestAccount,
   getTestProvider,
 } from './fixtures';
@@ -555,13 +555,13 @@ describeIfDevnet('Cairo 1 Devnet', () => {
   });
 });
 
-describeIfSequencerTestnet2('Cairo1 Testnet2', () => {
-  describe('Sequencer API - C1 T2 C:0x771bbe2ba64f...', () => {
+describeIfSequencerGoerli('Cairo1 Testnet', () => {
+  describe('Sequencer API - C1 Testnet C:0x00305e...', () => {
     const provider = getTestProvider() as SequencerProvider;
     const account = getTestAccount(provider);
-    const classHash: any = '0x028b6f2ee9ae00d55a32072d939a55a6eb522974a283880f3c73a64c2f9fd6d6';
+    const classHash: any = '0x022332bb9c1e22ae13ae7fd9f3101eced4644533c6bfe51a25cf8dea028e5045';
     const contractAddress: any =
-      '0x771bbe2ba64fa5ab52f0c142b4296fc67460a3a2372b4cdce752c620e3e8194';
+      '0x00305ef61e86F4566b8726d8867EF252d4f37F4B6418Cad4288052738ee22A5d';
     let cairo1Contract: Contract;
     initializeMatcher(expect);
 
@@ -616,7 +616,7 @@ describeIfSequencerTestnet2('Cairo1 Testnet2', () => {
     });
 
     test('Cairo 1 Contract Interaction - bool', async () => {
-      const tx = await cairo1Contract.test_bool();
+      const tx = await cairo1Contract.test_bool(true);
       expect(tx).toBe(true);
     });
   });
