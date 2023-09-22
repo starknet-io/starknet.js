@@ -24,7 +24,8 @@ describe('cleanHex()', () => {
 
 describe('makeAddress()', () => {
   test('test on eth address', () => {
-    const starkAddress = stark.makeAddress(ethAddress);
+    const ethAddr = '0xdFD0F27FCe99b50909de0bDD328Aed6eAbe76BC5';
+    const starkAddress = stark.makeAddress(ethAddr);
 
     expect(starkAddress).toBe('0xdfd0f27fce99b50909de0bdd328aed6eabe76bc5');
   });
