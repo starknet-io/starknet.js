@@ -5,6 +5,7 @@ export * from './account';
 export * from './contract';
 export * from './provider';
 export * from './signer';
+export { AbstractedSigner } from './abstractedSigner';
 
 // TODO: decide on final export style
 export * from './types';
