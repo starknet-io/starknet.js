@@ -69,7 +69,7 @@ function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
 }
 
 const defaultOptions = {
-  network: NetworkName.SN_GOERLI2,
+  network: NetworkName.SN_GOERLI,
   blockIdentifier: BlockTag.pending,
 };
 
@@ -116,9 +116,6 @@ export class SequencerProvider implements ProviderInterface {
       case NetworkName.SN_GOERLI:
       case StarknetChainId.SN_GOERLI:
         return BaseUrl.SN_GOERLI;
-      case NetworkName.SN_GOERLI2:
-      case StarknetChainId.SN_GOERLI2:
-        return BaseUrl.SN_GOERLI2;
       default:
         throw new Error('Could not detect base url from NetworkName');
     }
@@ -129,9 +126,6 @@ export class SequencerProvider implements ProviderInterface {
       const url = new URL(baseUrl);
       if (url.host.includes('mainnet.starknet.io')) {
         return StarknetChainId.SN_MAIN;
-      }
-      if (url.host.includes('alpha4-2.starknet.io')) {
-        return StarknetChainId.SN_GOERLI2;
       }
       return StarknetChainId.SN_GOERLI;
     } catch {

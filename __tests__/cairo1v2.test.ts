@@ -517,6 +517,9 @@ describe('Cairo 1 Devnet', () => {
     test('Cairo 2.1.0 simple contract', async () => {
       const res = await cairo210Contract.test_felt(1, 100, 3);
       expect(res).toEqual(101n);
+
+      const call1 = cairo210Contract.populate('test_len', { p1: 100, string_len: 200 });
+      expect(call1.calldata).toEqual(['100', '200']);
     });
 
     test('myCallData.compile for Cairo 1', async () => {

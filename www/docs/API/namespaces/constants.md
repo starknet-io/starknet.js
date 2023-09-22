@@ -152,4 +152,4 @@ Cairo Felt support storing max 31 character
 
 #### Defined in
 
-[src/constants.ts:46](https://github.com/0xs34n/starknet.js/blob/develop/src/constants.ts#L46)
+[src/constants.ts:43](https://github.com/0xs34n/starknet.js/blob/develop/src/constants.ts#L43)

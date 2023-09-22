@@ -153,10 +153,10 @@ Constants for `Provider` initialization have been updated:
 
 ```typescript
 // v4
-const providerTestnet2 = new Provider({ sequencer: { network: "goerli-alpha-2" } });
+const providerTestnet = new Provider({ sequencer: { network: "goerli-alpha" } });
 
 // v5
- const providerTestnet2 = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI2 } }); // or SN_GOERLI or SN_MAIN
+ const providerTestnet = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } }); // or SN_MAIN
 ```
 
 `Provider.chainId()` has been removed, `Provider.getChainId()` should be used.
