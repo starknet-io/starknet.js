@@ -103,6 +103,9 @@ describe('deploy and test Wallet', () => {
   });
 
   describeIfDevnetSequencer('Test on Devnet Sequencer', () => {
+    let accountOZ: Account;
+    let accountOZ2: Account;
+    let accountOZ3: Account;
     test('deployAccount with rawArgs - test on devnet', async () => {
       const priKey = stark.randomAddress();
       const pubKey = ec.starkCurve.getStarkKey(priKey);
@@ -136,7 +139,7 @@ describe('deploy and test Wallet', () => {
       await account.waitForTransaction(transaction_hash);
 
       // deploy account
-      const accountOZ = new Account(provider, tobeAccountAddress, priKey);
+      accountOZ = new Account(provider, tobeAccountAddress, priKey);
       const deployed = await accountOZ.deploySelf({
         classHash: accountClassHash,
         constructorCalldata: calldata,
@@ -144,6 +147,8 @@ describe('deploy and test Wallet', () => {
       });
       const receipt = await account.waitForTransaction(deployed.transaction_hash);
       expect(receipt).toMatchSchemaRef('GetTransactionReceiptResponse');
+      accountOZ2 = new Account(provider, tobeAccountAddress, priKey);
+      accountOZ3 = new Account(provider, tobeAccountAddress, priKey, '0');
     });
 
     test('deploy with rawArgs', async () => {
@@ -156,6 +161,14 @@ describe('deploy and test Wallet', () => {
         },
       });
       expect(deployment).toMatchSchemaRef('MultiDeployContractResponse');
+    });
+
+    test('auto completion of cairoVersion', async () => {
+      expect(accountOZ.cairoVersion).toEqual('0');
+      await accountOZ2.getCairoVersion();
+      expect(accountOZ2.cairoVersion).toEqual('0');
+      await accountOZ3.getCairoVersion();
+      expect(accountOZ3.cairoVersion).toEqual('0');
     });
 
     test('multideploy with rawArgs', async () => {

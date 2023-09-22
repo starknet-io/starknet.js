@@ -33,7 +33,7 @@ import { Account, constants, ec, json, stark, Provider, hash, CallData } from "s
 // connect provider
 const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } });
 
-// new Open Zeppelin account v0.5.1
+// new Open Zeppelin account v0.5.1 (Cairo 0)
 // Generate public and private key pair.
 const privateKey = stark.randomAddress();
 console.log('New OZ account:\nprivateKey=', privateKey);
@@ -73,7 +73,7 @@ curl -X POST http://127.0.0.1:5050/mint -d '{"address":"0x04a093c37ab61065d00155
 If you have sent enough funds to this new address, you can go forward to the final step:
 
 ```typescript
-const OZaccount = new Account(provider, OZcontractAddress, privateKey);
+const OZaccount = new Account(provider, OZcontractAddress, privateKey,"0");
 
 const { transaction_hash, contract_address } = await OZaccount.deployAccount({
     classHash: OZaccountClassHash,
@@ -85,7 +85,7 @@ await provider.waitForTransaction(transaction_hash);
 console.log('✅ New OpenZeppelin account created.\n   address =', contract_address);
 ```
 
-> **IMPORTANT :** If this account is based on a Cairo 0 contract (for example OpenZeppelin account 0.7.0 or later), do not forget to add the parameter "1" after the privateKey parameter :
+> **IMPORTANT :** If this account is based on a Cairo 1 contract (for example OpenZeppelin account 0.7.0 or later), do not forget to use the parameter "1" after the privateKey parameter :
 
 ```typescript
 const OZaccount = new Account(provider, OZcontractAddress, privateKey, "1");
@@ -109,7 +109,7 @@ import { Account, ec, json, stark, Provider, hash, CallData } from "starknet";
 // connect provider
 const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } });
 
-//new Argent X account v0.2.3
+//new Argent X account v0.2.3 (Cairo 0)
 const argentXproxyClassHash = "0x25ec026985a3bf9d0cc1fe17326b245dfdc3ff89b8fde106542a3ea56c5a918";
 const argentXaccountClassHash = "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d1be20ee482f044dabe2";
 
@@ -143,7 +143,7 @@ Then you have to fund this address.
 If you have sent enough funds to this new address, you can go forward to the final step:
 
 ```typescript
-const accountAX = new Account(provider, AXcontractAddress, privateKeyAX);
+const accountAX = new Account(provider, AXcontractAddress, privateKeyAX,"0");
 
 const deployAccountPayload = {
     classHash: argentXproxyClassHash,
@@ -270,7 +270,6 @@ const provider = new Provider({ sequencer: { network: "http://127.0.0.1:5050" } 
 const privateKey0 = "0xe3e70682c2094cac629f6fbed82c07cd";
 const accountAddress0 = "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a";
 const account0 = new Account(provider, accountAddress0, privateKey0);
-// add ,"1" after privateKey0 if this account is not a Cairo 0 contract
 
 // new account abstraction
 // Generate public and private key pair.
@@ -304,8 +303,8 @@ const { data: answer } = await axios.post('http://127.0.0.1:5050/mint', { "addre
 console.log('Answer mint =', answer);
 
 // deploy account
-const AAaccount = new Account(provider, AAcontractAddress, AAprivateKey);
-// add ,"1" after AAprivateKey if this account is not a Cairo 0 contract
+const AAaccount = new Account(provider, AAcontractAddress, AAprivateKey,"0");
+// use "1" after AAprivateKey if this account is not a Cairo 0 contract
 const { transaction_hash, contract_address } = await AAaccount.deployAccount({
     classHash: AAaccountClassHash,
     constructorCalldata: AAaccountConstructorCallData,

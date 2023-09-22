@@ -501,6 +501,8 @@ describeIfDevnet('Cairo 1 Devnet', () => {
     const provider = getTestProvider();
     const account = getTestAccount(provider);
     let accountC1: Account;
+    let accountC1a: Account;
+    let accountC1b: Account;
 
     beforeAll(async () => {
       // Deploy Cairo 1 Account
@@ -547,10 +549,17 @@ describeIfDevnet('Cairo 1 Devnet', () => {
       });
       const receipt = await account.waitForTransaction(deployed.transaction_hash);
       expect(receipt).toMatchSchemaRef('GetTransactionReceiptResponse');
+      accountC1a = new Account(provider, toBeAccountAddress, priKey);
+      accountC1b = new Account(provider, toBeAccountAddress, priKey, '1');
     });
 
-    test('deploy Cairo1 Account from Cairo0 Account', () => {
+    test('deploy Cairo1 Account from Cairo0 Account', async () => {
       expect(accountC1).toBeInstanceOf(Account);
+      expect(accountC1.cairoVersion).toEqual('1');
+      await accountC1a.getCairoVersion();
+      expect(accountC1a.cairoVersion).toEqual('1'); // verify auto completion of cairoVersion
+      await accountC1b.getCairoVersion();
+      expect(accountC1b.cairoVersion).toEqual('1');
     });
   });
 });

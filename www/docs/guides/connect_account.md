@@ -72,6 +72,5 @@ const privateKey = process.env.OZ_NEW_ACCOUNT_PRIVKEY;
 const accountAddress = "0x051158d244c7636dde39ec822873b29e6c9a758c6a9812d005b6287564908667";
 
 const account = new Account(provider, accountAddress, privateKey);
-// add ,"1" after privateKey if this account is not a Cairo 0 contract
 
 ```
