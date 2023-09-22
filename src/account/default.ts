@@ -71,7 +71,7 @@ export class Account extends Provider implements AccountInterface {
     providerOrOptions: ProviderOptions | ProviderInterface,
     address: string,
     pkOrSigner: Uint8Array | string | SignerInterface,
-    cairoVersion: CairoVersion = '0'
+    cairoVersion?: CairoVersion
   ) {
     super(providerOrOptions);
     this.address = address.toLowerCase();
@@ -80,7 +80,9 @@ export class Account extends Provider implements AccountInterface {
         ? new Signer(pkOrSigner)
         : pkOrSigner;
 
-    this.cairoVersion = cairoVersion.toString() as CairoVersion;
+    if (cairoVersion) {
+      this.cairoVersion = cairoVersion.toString() as CairoVersion;
+    }
   }
 
   public async getNonce(blockIdentifier?: BlockIdentifier): Promise<Nonce> {
@@ -94,6 +96,18 @@ export class Account extends Provider implements AccountInterface {
     } catch (error) {
       return 0n;
     }
+  }
+
+  /**
+   * Async Get cairo version (auto set it, if not set by user)
+   * @param version CairoVersion
+   */
+  public async getCairoVersion() {
+    if (!this.cairoVersion) {
+      const { cairo } = await super.getContractVersion(this.address);
+      this.cairoVersion = cairo;
+    }
+    return this.cairoVersion;
   }
 
   public async estimateFee(
@@ -118,7 +132,7 @@ export class Account extends Provider implements AccountInterface {
       maxFee: ZERO,
       version,
       chainId,
-      cairoVersion: this.cairoVersion,
+      cairoVersion: await this.getCairoVersion(),
     };
 
     const invocation = await this.buildInvocation(transactions, signerDetails);
@@ -153,7 +167,7 @@ export class Account extends Provider implements AccountInterface {
         version,
         walletAddress: this.address,
         maxFee: ZERO,
-        cairoVersion: this.cairoVersion,
+        cairoVersion: await this.getCairoVersion(),
       }
     );
 
@@ -192,7 +206,7 @@ export class Account extends Provider implements AccountInterface {
         version,
         walletAddress: this.address,
         maxFee: ZERO,
-        cairoVersion: this.cairoVersion,
+        cairoVersion: await this.getCairoVersion(),
       }
     );
 
@@ -246,7 +260,7 @@ export class Account extends Provider implements AccountInterface {
     call: Array<Call>,
     signerDetails: InvocationsSignerDetails
   ): Promise<Invocation> {
-    const calldata = getExecuteCalldata(call, this.cairoVersion);
+    const calldata = getExecuteCalldata(call, await this.getCairoVersion());
     const signature = await this.signer.signTransaction(call, signerDetails);
 
     return {
@@ -278,12 +292,12 @@ export class Account extends Provider implements AccountInterface {
       maxFee,
       version,
       chainId,
-      cairoVersion: this.cairoVersion,
+      cairoVersion: await this.getCairoVersion(),
     };
 
     const signature = await this.signer.signTransaction(transactions, signerDetails, abis);
 
-    const calldata = getExecuteCalldata(transactions, this.cairoVersion);
+    const calldata = getExecuteCalldata(transactions, await this.getCairoVersion());
 
     return this.invokeFunction(
       { contractAddress: this.address, calldata, signature },
@@ -340,7 +354,7 @@ export class Account extends Provider implements AccountInterface {
     const declareContractTransaction = await this.buildDeclarePayload(declareContractPayload, {
       ...details,
       walletAddress: this.address,
-      cairoVersion: this.cairoVersion,
+      cairoVersion: await this.getCairoVersion(),
     });
 
     return this.declareContract(declareContractTransaction, details);
@@ -654,7 +668,7 @@ export class Account extends Provider implements AccountInterface {
           maxFee: ZERO,
           version,
           chainId,
-          cairoVersion: this.cairoVersion,
+          cairoVersion: await this.getCairoVersion(),
         };
         const txPayload: any = 'payload' in transaction ? transaction.payload : transaction;
         const common = {

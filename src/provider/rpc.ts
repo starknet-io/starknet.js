@@ -12,6 +12,7 @@ import {
   Call,
   CallContractResponse,
   ContractClassResponse,
+  ContractVersion,
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
@@ -256,14 +257,14 @@ export class RpcProvider implements ProviderInterface {
   public async getContractVersion(
     contractAddress: string,
     { blockIdentifier = this.blockIdentifier, compiler = true }: getContractVersionOptions
-  ) {
+  ): Promise<ContractVersion> {
     const contractClass = await this.getClassAt(contractAddress, blockIdentifier);
     if (isSierra(contractClass)) {
       if (compiler) {
         const abiTest = getAbiContractVersion(contractClass.abi);
         return { cairo: '1', compiler: abiTest.compiler };
       }
-      return { cairo: '1', compiler: 'unknown' };
+      return { cairo: '1', compiler: undefined };
     }
     return { cairo: '0', compiler: '0' };
   }

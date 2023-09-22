@@ -86,7 +86,7 @@ export function getAbiContractVersion(abi: Abi): ContractVersion {
     (it) => it.type === 'function' && (it.inputs.length || it.outputs.length)
   );
   if (!testFunction) {
-    return { cairo: 'unknown', compiler: 'unknown' };
+    return { cairo: undefined, compiler: undefined };
   }
   const io = testFunction.inputs.length ? testFunction.inputs : testFunction.outputs;
   if (isCairo1Type(io[0].type)) {

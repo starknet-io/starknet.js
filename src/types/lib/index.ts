@@ -105,7 +105,8 @@ export type Invocation = CallDetails & { signature?: Signature };
 
 export type Call = CallDetails & { entrypoint: string };
 
-export type CairoVersion = '0' | '1';
+export type CairoVersion = '0' | '1' | undefined;
+export type CompilerVersion = '0' | '1' | '2' | undefined;
 
 export type InvocationsDetails = {
   nonce?: BigNumberish;
@@ -252,8 +253,8 @@ export interface CallStruct {
  * compiler: version of the cairo compiler used to compile the contract
  */
 export type ContractVersion = {
-  cairo: string | 'unknown';
-  compiler: string | 'unknown';
+  cairo: CairoVersion;
+  compiler: CompilerVersion;
 };
 
 export * from './contract';

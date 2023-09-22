@@ -12,6 +12,7 @@ import {
   CallContractResponse,
   CallL1Handler,
   ContractClassResponse,
+  ContractVersion,
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
@@ -350,14 +351,14 @@ export class SequencerProvider implements ProviderInterface {
       blockIdentifier: this.blockIdentifier,
       compiler: true,
     }
-  ) {
+  ): Promise<ContractVersion> {
     const contractClass = await this.getClassAt(contractAddress, blockIdentifier);
     if (isSierra(contractClass)) {
       if (compiler) {
         const abiTest = getAbiContractVersion(contractClass.abi);
         return { cairo: '1', compiler: abiTest.compiler };
       }
-      return { cairo: '1', compiler: 'unknown' };
+      return { cairo: '1', compiler: undefined };
     }
     return { cairo: '0', compiler: '0' };
   }
