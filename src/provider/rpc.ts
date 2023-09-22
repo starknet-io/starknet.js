@@ -28,6 +28,7 @@ import {
   RpcProviderOptions,
   SimulateTransactionResponse,
   TransactionType,
+  getContractVersionOptions,
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
@@ -38,6 +39,7 @@ import {
   TransactionFinalityStatus,
 } from '../types/api/rpc';
 import { CallData } from '../utils/calldata';
+import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { isSierra } from '../utils/contract';
 import { pascalToSnake } from '../utils/encode';
 import fetch from '../utils/fetchPonyfill';
@@ -249,6 +251,21 @@ export class RpcProvider implements ProviderInterface {
     _blockIdentifier?: BlockIdentifier
   ): Promise<GetCodeResponse> {
     throw new Error('RPC does not implement getCode function');
+  }
+
+  public async getContractVersion(
+    contractAddress: string,
+    { blockIdentifier = this.blockIdentifier, compiler = true }: getContractVersionOptions
+  ) {
+    const contractClass = await this.getClassAt(contractAddress, blockIdentifier);
+    if (isSierra(contractClass)) {
+      if (compiler) {
+        const abiTest = getAbiContractVersion(contractClass.abi);
+        return { cairo: '1', compiler: abiTest.compiler };
+      }
+      return { cairo: '1', compiler: 'unknown' };
+    }
+    return { cairo: '0', compiler: '0' };
   }
 
   public async getEstimateFee(

@@ -230,6 +230,11 @@ export type getSimulateTransactionOptions = {
   skipFeeCharge?: boolean;
 };
 
+export type getContractVersionOptions = {
+  blockIdentifier?: BlockIdentifier;
+  compiler?: boolean;
+};
+
 export type getEstimateFeeBulkOptions = {
   blockIdentifier?: BlockIdentifier;
   skipValidate?: boolean;
@@ -240,5 +245,15 @@ export interface CallStruct {
   selector: string;
   calldata: string[];
 }
+
+/**
+ * Represent Contract version
+ * cairo: version of the cairo language
+ * compiler: version of the cairo compiler used to compile the contract
+ */
+export type ContractVersion = {
+  cairo: string | 'unknown';
+  compiler: string | 'unknown';
+};
 
 export * from './contract';

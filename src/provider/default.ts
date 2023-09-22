@@ -26,6 +26,7 @@ import {
   SimulateTransactionResponse,
   StateUpdateResponse,
   Storage,
+  getContractVersionOptions,
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
@@ -220,5 +221,9 @@ export class Provider implements ProviderInterface {
 
   public async getAddressFromStarkName(name: string, StarknetIdContract?: string): Promise<string> {
     return getAddressFromStarkName(this, name, StarknetIdContract);
+  }
+
+  public async getContractVersion(contractAddress: string, options?: getContractVersionOptions) {
+    return this.provider.getContractVersion(contractAddress, options);
   }
 }

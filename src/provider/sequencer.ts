@@ -34,11 +34,13 @@ import {
   TransactionExecutionStatus,
   TransactionFinalityStatus,
   TransactionType,
+  getContractVersionOptions,
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
 import { CallData } from '../utils/calldata';
+import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { isSierra } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
 import {
@@ -340,6 +342,24 @@ export class SequencerProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<CairoAssembly> {
     return this.fetchEndpoint('get_compiled_class_by_class_hash', { classHash, blockIdentifier });
+  }
+
+  public async getContractVersion(
+    contractAddress: string,
+    { blockIdentifier, compiler }: getContractVersionOptions = {
+      blockIdentifier: this.blockIdentifier,
+      compiler: true,
+    }
+  ) {
+    const contractClass = await this.getClassAt(contractAddress, blockIdentifier);
+    if (isSierra(contractClass)) {
+      if (compiler) {
+        const abiTest = getAbiContractVersion(contractClass.abi);
+        return { cairo: '1', compiler: abiTest.compiler };
+      }
+      return { cairo: '1', compiler: 'unknown' };
+    }
+    return { cairo: '0', compiler: '0' };
   }
 
   public async invokeFunction(

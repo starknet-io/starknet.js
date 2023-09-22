@@ -44,6 +44,11 @@ describe('defaultProvider', () => {
       expect(exampleTransactionHash).toBeTruthy();
     });
 
+    test('getContractVersion', async () => {
+      const version = await testProvider.getContractVersion(erc20ContractAddress);
+      expect(version).toEqual({ cairo: '0', compiler: '0' });
+    });
+
     describe('getBlock', () => {
       test('getBlock(blockIdentifier=latest)', async () => {
         expect(exampleBlock).not.toBeNull();
