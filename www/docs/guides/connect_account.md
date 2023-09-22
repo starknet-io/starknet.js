@@ -45,13 +45,11 @@ const account = new Account(provider, accountAddress, privateKey);
 
 Your account is now connected, and you can use it.
 
-> **IMPORTANT :** If this account is based on a Cairo v2 contract (for example OpenZeppelin account 0.7.0 or later), do not forget to add the parameter "1" after the privateKey parameter :
+> **IMPORTANT :** Starknet.js needs to know if this account is based on a Cairo 1 contract (for example OpenZeppelin account 0.7.0 or later) or a Legacy Cairo 0 contract. It will try to auto-recognize the Cairo version of the account. If for any reason you want to force the version of Cairo, add the parameter "0" or "1" after the privateKey parameter :
 
 ```typescript
 const account = new Account(provider, accountAddress, privateKey, "1");
 ```
-
-> Take care that this added parameter is a string, NOT a number.
 
 ## 👛 Connect to an existing account (in any network)
 

@@ -52,7 +52,7 @@ const OZcontractAddress = hash.calculateContractAddressFromHash(
 console.log('Precalculated account address=', OZcontractAddress);
 ```
 
-If you want a specific private key, replace `stark.randomAddress`()` with your choice.
+> If you want a specific private key, replace `stark.randomAddress`()` with your choice.
 
 Then you have to fund this address!
 
@@ -85,13 +85,11 @@ await provider.waitForTransaction(transaction_hash);
 console.log('✅ New OpenZeppelin account created.\n   address =', contract_address);
 ```
 
-> **IMPORTANT :** If this account is based on a Cairo v2 contract (for example OpenZeppelin account 0.7.0 or later), do not forget to add the parameter "1" after the privateKey parameter :
+> **IMPORTANT :** If this account is based on a Cairo 0 contract (for example OpenZeppelin account 0.7.0 or later), do not forget to add the parameter "1" after the privateKey parameter :
 
 ```typescript
 const OZaccount = new Account(provider, OZcontractAddress, privateKey, "1");
 ```
-
-> Take care that this added parameter is a string, NOT a number.
 
 ## Create an Argent account
 

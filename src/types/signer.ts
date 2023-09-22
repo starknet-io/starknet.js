@@ -9,7 +9,7 @@ import {
 export interface InvocationsSignerDetails extends Required<InvocationsDetails> {
   walletAddress: string;
   chainId: StarknetChainId;
-  cairoVersion: CairoVersion;
+  cairoVersion: CairoVersion | undefined;
 }
 
 export interface DeclareSignerDetails {

@@ -78,7 +78,7 @@ const account0 = new Account(provider, account0Address, starkKeyPair0);
 // v5
 const privateKey0 = accountTestnet4PrivateKey;
 const account0Address: string = accountTestnet4Address;
-const account0 = new Account(provider, account0Address, privateKey0);
+const account0 = new Account(provider, account0Address, privateKey0,"0");
 ```
 
 Derive partial public key (`starknetPubKey`):

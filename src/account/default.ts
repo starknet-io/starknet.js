@@ -66,13 +66,13 @@ export class Account extends Provider implements AccountInterface {
 
   public address: string;
 
-  public cairoVersion: CairoVersion;
+  public cairoVersion: CairoVersion | undefined;
 
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
     address: string,
     pkOrSigner: Uint8Array | string | SignerInterface,
-    cairoVersion: CairoVersion = '0'
+    cairoVersion?: CairoVersion
   ) {
     super(providerOrOptions);
     this.address = address.toLowerCase();
@@ -80,26 +80,9 @@ export class Account extends Provider implements AccountInterface {
       typeof pkOrSigner === 'string' || pkOrSigner instanceof Uint8Array
         ? new Signer(pkOrSigner)
         : pkOrSigner;
-
-    this.cairoVersion = cairoVersion.toString() as CairoVersion;
-  }
-
-  public static async new(
-    provider: Provider,
-    address: string,
-    pkOrSigner: Uint8Array | string | SignerInterface,
-    cairoVersion?: CairoVersion
-  ): Promise<Account> {
-    let cairoV: CairoVersion | undefined;
-    if (!cairoVersion) {
-      try {
-        const { abi } = await provider.getClassAt(address);
-        cairoV = isCairo1Abi(abi) ? '1' : '0';
-      } catch {
-        cairoV = DEFAULT_ACCOUNT_CAIRO_VERSION;
-      }
-    } else cairoV = cairoVersion;
-    return new Account(provider, address, pkOrSigner, cairoV);
+    if (typeof cairoVersion !== 'undefined') {
+      this.cairoVersion = cairoVersion.toString() as CairoVersion;
+    }
   }
 
   public async getNonce(blockIdentifier?: BlockIdentifier): Promise<Nonce> {
@@ -130,6 +113,7 @@ export class Account extends Provider implements AccountInterface {
     const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
     const version = toBigInt(feeTransactionVersion);
     const chainId = await this.getChainId();
+    await this.checkCairoVersion();
 
     const signerDetails: InvocationsSignerDetails = {
       walletAddress: this.address,
@@ -163,6 +147,7 @@ export class Account extends Provider implements AccountInterface {
     const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
     const version = !isSierra(contract) ? feeTransactionVersion : feeTransactionVersion_2;
     const chainId = await this.getChainId();
+    await this.checkCairoVersion();
 
     const declareContractTransaction = await this.buildDeclarePayload(
       { classHash: providedClassHash, contract, casm, compiledClassHash },
@@ -202,6 +187,7 @@ export class Account extends Provider implements AccountInterface {
     const version = toBigInt(feeTransactionVersion);
     const nonce = ZERO; // DEPLOY_ACCOUNT transaction will have a nonce zero as it is the first transaction in the account
     const chainId = await this.getChainId();
+    await this.checkCairoVersion();
 
     const payload = await this.buildAccountDeployPayload(
       { classHash, addressSalt, constructorCalldata, contractAddress: providedContractAddress },
@@ -265,6 +251,7 @@ export class Account extends Provider implements AccountInterface {
     call: Array<Call>,
     signerDetails: InvocationsSignerDetails
   ): Promise<Invocation> {
+    await this.checkCairoVersion();
     const calldata = getExecuteCalldata(call, this.cairoVersion);
     const signature = await this.signer.signTransaction(call, signerDetails);
 
@@ -291,6 +278,7 @@ export class Account extends Provider implements AccountInterface {
     const version = toBigInt(transactionVersion);
     const chainId = await this.getChainId();
 
+    await this.checkCairoVersion();
     const signerDetails: InvocationsSignerDetails = {
       walletAddress: this.address,
       nonce,
@@ -355,6 +343,7 @@ export class Account extends Provider implements AccountInterface {
       ));
     details.version = !isSierra(payload.contract) ? transactionVersion : transactionVersion_2;
     details.chainId = await this.getChainId();
+    await this.checkCairoVersion();
 
     const declareContractTransaction = await this.buildDeclarePayload(declareContractPayload, {
       ...details,
@@ -664,6 +653,7 @@ export class Account extends Provider implements AccountInterface {
     const version = versions[0];
     const safeNonce = await this.getNonceSafe(nonce);
     const chainId = await this.getChainId();
+    await this.checkCairoVersion();
 
     return Promise.all(
       ([] as Invocations).concat(invocations).map(async (transaction, index: number) => {
@@ -730,5 +720,16 @@ export class Account extends Provider implements AccountInterface {
     StarknetIdContract?: string
   ): Promise<string> {
     return super.getStarkName(address, StarknetIdContract);
+  }
+
+  private async checkCairoVersion() {
+    if (typeof this.cairoVersion === 'undefined') {
+      try {
+        const { abi } = await this.getClassAt(this.address);
+        this.cairoVersion = isCairo1Abi(abi) ? '1' : '0';
+      } catch {
+        this.cairoVersion = DEFAULT_ACCOUNT_CAIRO_VERSION;
+      }
+    }
   }
 }

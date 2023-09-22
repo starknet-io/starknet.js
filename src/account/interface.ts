@@ -35,7 +35,7 @@ export abstract class AccountInterface extends ProviderInterface {
 
   public abstract signer: SignerInterface;
 
-  public abstract cairoVersion: CairoVersion;
+  public abstract cairoVersion: CairoVersion | undefined;
 
   /**
    * Estimate Fee for executing an INVOKE transaction on starknet
