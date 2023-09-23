@@ -223,7 +223,11 @@ export class Provider implements ProviderInterface {
     return getAddressFromStarkName(this, name, StarknetIdContract);
   }
 
-  public async getContractVersion(contractAddress: string, options?: getContractVersionOptions) {
-    return this.provider.getContractVersion(contractAddress, options);
+  public async getContractVersion(
+    contractAddress?: string,
+    classHash?: string,
+    options?: getContractVersionOptions
+  ) {
+    return this.provider.getContractVersion(contractAddress, classHash, options);
   }
 }

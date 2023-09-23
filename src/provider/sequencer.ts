@@ -346,13 +346,22 @@ export class SequencerProvider implements ProviderInterface {
   }
 
   public async getContractVersion(
-    contractAddress: string,
+    contractAddress?: string,
+    classHash?: string,
     { blockIdentifier, compiler }: getContractVersionOptions = {
       blockIdentifier: this.blockIdentifier,
       compiler: true,
     }
   ): Promise<ContractVersion> {
-    const contractClass = await this.getClassAt(contractAddress, blockIdentifier);
+    let contractClass;
+    if (contractAddress) {
+      contractClass = await this.getClassAt(contractAddress, blockIdentifier);
+    } else if (classHash) {
+      contractClass = await this.getClassByHash(classHash, blockIdentifier);
+    } else {
+      throw Error('getContractVersion require contractAddress or classHash');
+    }
+
     if (isSierra(contractClass)) {
       if (compiler) {
         const abiTest = getAbiContractVersion(contractClass.abi);

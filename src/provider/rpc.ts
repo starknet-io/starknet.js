@@ -256,9 +256,18 @@ export class RpcProvider implements ProviderInterface {
 
   public async getContractVersion(
     contractAddress: string,
+    classHash: string,
     { blockIdentifier = this.blockIdentifier, compiler = true }: getContractVersionOptions
   ): Promise<ContractVersion> {
-    const contractClass = await this.getClassAt(contractAddress, blockIdentifier);
+    let contractClass;
+    if (contractAddress) {
+      contractClass = await this.getClassAt(contractAddress, blockIdentifier);
+    } else if (classHash) {
+      contractClass = await this.getClass(classHash, blockIdentifier);
+    } else {
+      throw Error('getContractVersion require contractAddress or classHash');
+    }
+
     if (isSierra(contractClass)) {
       if (compiler) {
         const abiTest = getAbiContractVersion(contractClass.abi);

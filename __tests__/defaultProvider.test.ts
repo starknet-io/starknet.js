@@ -45,8 +45,9 @@ describe('defaultProvider', () => {
     });
 
     test('getContractVersion', async () => {
-      const version = await testProvider.getContractVersion(erc20ContractAddress);
-      expect(version).toEqual({ cairo: '0', compiler: '0' });
+      const expected = { cairo: '0', compiler: '0' };
+      expect(await testProvider.getContractVersion(erc20ContractAddress)).toEqual(expected);
+      expect(await testProvider.getContractVersion(undefined, erc20ClassHash)).toEqual(expected);
     });
 
     describe('getBlock', () => {

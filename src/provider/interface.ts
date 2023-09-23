@@ -335,13 +335,15 @@ export abstract class ProviderInterface {
 
   /**
    * Gets the contract version from the provided address
-   * @param contractAddress string
+   * @param contractAddress required if no classHash
+   * @param classHash required if no contractAddress
    * @param options - getContractVersionOptions
    *   - (optional) compiler - (default true) extract compiler version using type tactic from abi
    *   - (optional) blockIdentifier - block identifier
    */
   public abstract getContractVersion(
-    contractAddress: string,
+    contractAddress?: string,
+    classHash?: string,
     options?: getContractVersionOptions
   ): Promise<ContractVersion>;
 }
