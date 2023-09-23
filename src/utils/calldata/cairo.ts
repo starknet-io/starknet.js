@@ -51,21 +51,11 @@ export const getArrayType = (type: string) => {
  * ```
  */
 export function isCairo1Abi(abi: Abi): boolean {
-  const firstFunction = abi.find((entry) => entry.type === 'function');
-  if (!firstFunction) {
-    if (abi.find((it) => it.type === 'interface')) {
-      // Expected in Cairo1 version 2
-      return true;
-    }
-    throw new Error(`Error in ABI. No function in ABI.`);
+  const { cairo } = getAbiContractVersion(abi);
+  if (cairo === undefined) {
+    throw Error('Unable to determine Cairo version');
   }
-  if (firstFunction.inputs.length) {
-    return isCairo1Type(firstFunction.inputs[0].type);
-  }
-  if (firstFunction.outputs.length) {
-    return isCairo1Type(firstFunction.outputs[0].type);
-  }
-  throw new Error(`Error in ABI. No input/output in function ${firstFunction.name}`);
+  return cairo === '1';
 }
 
 /**
