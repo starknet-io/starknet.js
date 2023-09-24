@@ -221,8 +221,8 @@ export const abstractionFns: AbstractionFunctions = {
 declare the class with abstraction (for declare) :
 
 ```typescript
-const signerAbstraction = new Signer(privateKeyAbstraction, abstractionFns);
-const accountAbstraction = new Account(provider, addressAbstraction, signerAbstraction, "1"); // "1" for a Cairo 1 account contract
+const signerAbstraction = new AbstractedSigner(privateKeyAbstraction, abstractionFns);
+const accountAbstraction = new Account(provider, addressAbstraction, signerAbstraction);
 const compiledSierra = json.parse(fs.readFileSync("./ccompiledContracts/cairo200/erc20/erc20.sierra.json").toString("ascii"));
 const compiledCasm = json.parse(fs.readFileSync("./compiledContracts/cairo200/erc20/erc20.casm.json").toString("ascii"));
 

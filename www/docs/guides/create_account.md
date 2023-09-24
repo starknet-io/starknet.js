@@ -85,14 +85,6 @@ await provider.waitForTransaction(transaction_hash);
 console.log('✅ New OpenZeppelin account created.\n   address =', contract_address);
 ```
 
-> **IMPORTANT :** If this account is based on a Cairo v2 contract (for example OpenZeppelin account 0.7.0 or later), do not forget to add the parameter "1" after the privateKey parameter :
-
-```typescript
-const OZaccount = new Account(provider, OZcontractAddress, privateKey, "1");
-```
-
-> Take care that this added parameter is a string, NOT a number.
-
 ## Create an Argent account
 
 > Level: medium.
@@ -156,8 +148,6 @@ const deployAccountPayload = {
 const { transaction_hash: AXdAth, contract_address: AXcontractFinalAdress } = await accountAX.deployAccount(deployAccountPayload);
 console.log('✅ ArgentX wallet deployed at:',AXcontractFinalAdress);
 ```
-
-> If you have activated the Argent Shield (2FA) for this account, the standard `Account` instance of Starknet.js is no more able to handle new transactions. In this case you need to use the account abstraction to define how are signed the transactions in this case (by creating a specific signer).
 
 ## Create a Braavos account
 
@@ -242,7 +232,7 @@ starknet-devnet --seed 0 --fork-network alpha-goerli
 Initialization:
 
 ```typescript
-import { Provider,  Account,  Calldata, Signer, BigNumberish, ec } from "starknet";
+import { Provider,  Account,  Calldata, AbstractedSigner, BigNumberish, ec } from "starknet";
 import { account3BraavosTestnetPrivateKey } from "../../privateStorage";
 import { calculateAddressBraavos, abstractionFnsBraavos, proxyConstructorBraavos, BraavosProxyClassHash } from "./braavosAbstraction";
 import axios from "axios";
@@ -263,7 +253,7 @@ const privateKeyBraavos = stark.randomAddress();
 const providerDevnet = new Provider({ sequencer: { baseUrl: "http://127.0.0.1:5050" } });
 // address
 const privateKeyBraavos = account3BraavosTestnetPrivateKey;
-    const signerBraavos = new Signer(privateKeyBraavos, abstractionFnsBraavos);
+    const signerBraavos = new AbstractedSigner(privateKeyBraavos, abstractionFnsBraavos);
     const starkKeyPubBraavos = ec.starkCurve.getStarkKey(privateKeyBraavos);
     const proxyAddressBraavos = calculateAddressBraavos(privateKeyBraavos);
     const accountClassHashBraavos = "0x0105c0cf7aadb6605c9538199797920884694b5ce84fc68f92c832b0c9f57ad9"; // 27/aug/2023, will probably change over time
@@ -271,7 +261,7 @@ const privateKeyBraavos = account3BraavosTestnetPrivateKey;
 console.log('Calculated account address=', accountBraavos.address);
 ```
 
-We have created a customized Signer, that uses the `abstractionFnsBraavos` list of functions. A new `Account` instance is created with this signer.
+We have created a customized signer, that uses the `abstractionFnsBraavos` list of functions. A new `Account` instance is created with this signer.
 
 ### Estimate fees
 
@@ -358,7 +348,6 @@ const provider = new Provider({ sequencer: { network: "http://127.0.0.1:5050" } 
 const privateKey0 = "0xe3e70682c2094cac629f6fbed82c07cd";
 const accountAddress0 = "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a";
 const account0 = new Account(provider, accountAddress0, privateKey0);
-// add ,"1" after privateKey0 if this account is not a Cairo 0 contract
 
 // new account abstraction
 // Generate public and private key pair.
@@ -393,7 +382,6 @@ console.log('Answer mint =', answer);
 
 // deploy account
 const AAaccount = new Account(provider, AAcontractAddress, AAprivateKey);
-// add ,"1" after AAprivateKey if this account is not a Cairo 0 contract
 const { transaction_hash, contract_address } = await AAaccount.deployAccount({
     classHash: AAaccountClassHash,
     constructorCalldata: AAaccountConstructorCallData,
@@ -511,13 +499,13 @@ export function signDeployAccount(standardInputData: DeployAccountSignerDetails,
 - Create a specific signer, using this list of functions.
 
 ```typescript
-const signerAbstraction = new Signer(privateKeyAbstraction, abstractionFns);
+const signerAbstraction = new AbstractedSigner(privateKeyAbstraction, abstractionFns);
 ```
 
 - Create an Account instance, using this signer.
 
 ```typescript
-const accountAbstraction = new Account(provider, addressAbstraction, signerAbstraction, "1"); // "1" for a Cairo 1 account contract
+const accountAbstraction = new Account(provider, addressAbstraction, signerAbstraction);
 ```
 
 - Interact with Starknet, with some additional sign parameters (if needed).

@@ -1,6 +1,7 @@
 import { SignatureType } from '@noble/curves/abstract/weierstrass';
 import { Signature as WeierstrassSignature } from '@scure/starknet';
 
+import { AbstractedSigner } from '../abstractedSigner';
 import { UDC, ZERO } from '../constants';
 import { ProviderInterface } from '../provider';
 import { Provider } from '../provider/default';
@@ -64,7 +65,7 @@ import { getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
 
 export class Account extends Provider implements AccountInterface {
-  public signer: SignerInterface;
+  public signer: SignerInterface | AbstractedSigner;
 
   public address: string;
 
@@ -267,12 +268,10 @@ export class Account extends Provider implements AccountInterface {
     ...addsAbstraction: string[]
   ): Promise<Invocation> {
     const calldata = getExecuteCalldata(call, this.cairoVersion);
-    const signature = await this.signer.signTransaction(
-      call,
-      signerDetails,
-      undefined,
-      ...addsAbstraction
-    );
+    const signature =
+      'abstractionFunctions' in this.signer
+        ? await this.signer.signTransaction(call, signerDetails, undefined, ...addsAbstraction)
+        : await this.signer.signTransaction(call, signerDetails, undefined);
 
     return {
       contractAddress: this.address,
@@ -309,7 +308,10 @@ export class Account extends Provider implements AccountInterface {
       cairoVersion: this.cairoVersion,
     };
 
-    const signature = await this.signer.signTransaction(transactions, signerDetails, abis, ...adds);
+    const signature =
+      'abstractionFunctions' in this.signer
+        ? await this.signer.signTransaction(transactions, signerDetails, abis, ...adds)
+        : await this.signer.signTransaction(transactions, signerDetails, abis);
 
     const calldata = getExecuteCalldata(transactions, this.cairoVersion);
 
@@ -544,7 +546,10 @@ export class Account extends Provider implements AccountInterface {
     myEIP712json: TypedData,
     ...addsAbstraction: BigNumberish[]
   ): Promise<string> {
-    if (!this.signer.abstractionFunctions?.abstractedMessageHash) {
+    if (
+      !('abstractionFunctions' in this.signer) ||
+      !this.signer.abstractionFunctions?.abstractedMessageHash
+    ) {
       return getMessageHash(myEIP712json, this.address);
     }
     const adds: string[] = addsAbstraction.map((param) => toHex(param));
@@ -638,18 +643,29 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<DeclareContractTransaction> {
     const { classHash, contract, compiledClassHash } = extractContractHashes(payload);
     const compressedCompiledContract = parseContract(contract);
-    const signature = await this.signer.signDeclareTransaction(
-      {
-        classHash,
-        compiledClassHash,
-        senderAddress: walletAddress,
-        chainId,
-        maxFee,
-        version,
-        nonce,
-      },
-      ...addsAbstraction
-    );
+    const signature =
+      'abstractionFunctions' in this.signer
+        ? await this.signer.signDeclareTransaction(
+            {
+              classHash,
+              compiledClassHash,
+              senderAddress: walletAddress,
+              chainId,
+              maxFee,
+              version,
+              nonce,
+            },
+            ...addsAbstraction
+          )
+        : await this.signer.signDeclareTransaction({
+            classHash,
+            compiledClassHash,
+            senderAddress: walletAddress,
+            chainId,
+            maxFee,
+            version,
+            nonce,
+          });
 
     return {
       senderAddress: walletAddress,
@@ -674,19 +690,31 @@ export class Account extends Provider implements AccountInterface {
       providedContractAddress ??
       calculateContractAddressFromHash(addressSalt, classHash, compiledCalldata, 0);
 
-    const signature = await this.signer.signDeployAccountTransaction(
-      {
-        classHash,
-        contractAddress,
-        chainId,
-        maxFee,
-        version,
-        nonce,
-        addressSalt,
-        constructorCalldata: compiledCalldata,
-      },
-      ...addsAbstraction
-    );
+    const signature =
+      'abstractionFunctions' in this.signer
+        ? await this.signer.signDeployAccountTransaction(
+            {
+              classHash,
+              contractAddress,
+              chainId,
+              maxFee,
+              version,
+              nonce,
+              addressSalt,
+              constructorCalldata: compiledCalldata,
+            },
+            ...addsAbstraction
+          )
+        : await this.signer.signDeployAccountTransaction({
+            classHash,
+            contractAddress,
+            chainId,
+            maxFee,
+            version,
+            nonce,
+            addressSalt,
+            constructorCalldata: compiledCalldata,
+          });
 
     return {
       classHash,

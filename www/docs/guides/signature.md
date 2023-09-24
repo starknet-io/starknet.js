@@ -274,8 +274,8 @@ export const abstractionFns: AbstractionFunctions = {
 ```
 
 ```typescript
-const signerAbstraction = new Signer(privateKeyAbstraction, abstractionFns);
-const accountAbstraction = new Account(provider, addressAbstraction, signerAbstraction, "1");
+const signerAbstraction = new AbstractedSigner(privateKeyAbstraction, abstractionFns);
+const accountAbstraction = new Account(provider, addressAbstraction, signerAbstraction);
 const signature = await accountAbstraction.signMessage(typedDataValidate, 10, 11, 12);
 const msgHash = await accountAbstraction.hashMessage(typedDataValidate, 10, 11, 12);
 ```

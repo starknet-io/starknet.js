@@ -1,5 +1,6 @@
 // tests of handling of accounts including account abstraction about hashes and signatures
 import {
+  AbstractedSigner,
   AbstractionFunctions,
   Account,
   ArraySignatureType,
@@ -13,7 +14,6 @@ import {
   Provider,
   RawCalldata,
   Signature,
-  Signer,
   TypedData,
   cairo,
   constants,
@@ -196,7 +196,7 @@ describe('Test account abstraction of Cairo 1 account', () => {
       casm: compiledAccountAbstractionCasm,
     });
     const classHashContract = declareResponse.class_hash;
-    const signerAbstraction = new Signer(privateKeyAbstraction, abstractionFns);
+    const signerAbstraction = new AbstractedSigner(privateKeyAbstraction, abstractionFns);
     const addressAbstraction = hash.calculateContractAddressFromHash(
       starkKeyPubAbstraction,
       classHashContract,
