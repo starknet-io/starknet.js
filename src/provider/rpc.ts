@@ -255,9 +255,9 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getContractVersion(
-    contractAddress: string,
-    classHash: string,
-    { blockIdentifier = this.blockIdentifier, compiler = true }: getContractVersionOptions
+    contractAddress?: string,
+    classHash?: string,
+    { blockIdentifier = this.blockIdentifier, compiler = true }: getContractVersionOptions = {}
   ): Promise<ContractVersion> {
     let contractClass;
     if (contractAddress) {
