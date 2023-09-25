@@ -31,12 +31,6 @@ export class AbstractedSigner extends Signer implements AbstractedSignerInterfac
     this.abstractionFunctions = abstractedFns;
   }
 
-  // public override transactionSign() {
-  //   // do something before
-  //   super.transactionSign(); // eventually use the existing method at some point
-  //   // do something after
-  // }
-
   public override async getPubKey(): Promise<string> {
     return starkCurve.getStarkKey(this.pk);
   }
@@ -72,7 +66,7 @@ export class AbstractedSigner extends Signer implements AbstractedSignerInterfac
     transactions: Call[],
     transactionsDetail: InvocationsSignerDetails,
     abis?: Abi[],
-    ...addsAbstraction: string[]
+    ...adds: string[]
   ): Promise<Signature> {
     if (abis && abis.length !== transactions.length) {
       throw new Error('ABI must be provided for each transaction or no transaction');
@@ -102,7 +96,7 @@ export class AbstractedSigner extends Signer implements AbstractedSignerInterfac
         nonce: transactionsDetail.nonce,
       },
       this.pk.toString(),
-      ...addsAbstraction
+      ...adds
     );
   }
 
@@ -117,7 +111,7 @@ export class AbstractedSigner extends Signer implements AbstractedSignerInterfac
       chainId,
       nonce,
     }: DeployAccountSignerDetails,
-    ...addsAbstraction: string[]
+    ...adds: string[]
   ): Promise<Signature> {
     if (!this.abstractionFunctions?.abstractedDeployAccountSign) {
       const msgHash = calculateDeployAccountTransactionHash(
@@ -144,7 +138,7 @@ export class AbstractedSigner extends Signer implements AbstractedSignerInterfac
         nonce,
       },
       this.pk.toString(),
-      ...addsAbstraction
+      ...adds
     );
   }
 
@@ -159,7 +153,7 @@ export class AbstractedSigner extends Signer implements AbstractedSignerInterfac
       nonce,
       compiledClassHash,
     }: DeclareSignerDetails,
-    ...addsAbstraction: string[]
+    ...adds: string[]
   ): Promise<Signature> {
     if (!this.abstractionFunctions?.abstractedDeclareSign) {
       const msgHash = calculateDeclareTransactionHash(
@@ -184,7 +178,7 @@ export class AbstractedSigner extends Signer implements AbstractedSignerInterfac
         compiledClassHash,
       },
       this.pk.toString(),
-      ...addsAbstraction
+      ...adds
     );
   }
 }
