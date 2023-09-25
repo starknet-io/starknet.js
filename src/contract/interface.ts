@@ -134,8 +134,7 @@ export abstract class ContractInterface {
   public abstract isCairo1(): boolean;
 
   /**
-   * Gets contract's version (cairo version & compiler version)
-   * @returns ContractVersion
+   * Retrieves the version of the contract (cairo version & compiler version)
    */
   public abstract getVersion(): Promise<ContractVersion>;
 
