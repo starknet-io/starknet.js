@@ -99,8 +99,8 @@ export class Account extends Provider implements AccountInterface {
   }
 
   /**
-   * Async Get cairo version (auto set it, if not set by user)
-   * @param classHash (optional) string - if provided detect cairoVersion from classHash
+   * Retrieves the Cairo version from the network and sets `cairoVersion` if not already set in the constructor
+   * @param classHash if provided detects Cairo version from classHash, otherwise from the account address
    */
   public async getCairoVersion(classHash?: string) {
     if (!this.cairoVersion) {
