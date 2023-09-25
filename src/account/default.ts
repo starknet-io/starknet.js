@@ -104,13 +104,10 @@ export class Account extends Provider implements AccountInterface {
    */
   public async getCairoVersion(classHash?: string) {
     if (!this.cairoVersion) {
-      if (classHash) {
-        const { cairo } = await super.getContractVersion(undefined, classHash);
-        this.cairoVersion = cairo;
-      } else {
-        const { cairo } = await super.getContractVersion(this.address);
-        this.cairoVersion = cairo;
-      }
+      const { cairo } = classHash
+        ? await super.getContractVersion(undefined, classHash)
+        : await super.getContractVersion(this.address);
+      this.cairoVersion = cairo;
     }
     return this.cairoVersion;
   }
