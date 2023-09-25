@@ -359,7 +359,7 @@ export class Account extends Provider implements AccountInterface {
     const declareContractTransaction = await this.buildDeclarePayload(declareContractPayload, {
       ...details,
       walletAddress: this.address,
-      cairoVersion: await this.getCairoVersion(), // unused parameter
+      cairoVersion: undefined, // unused parameter
     });
 
     return this.declareContract(declareContractTransaction, details);
@@ -664,25 +664,24 @@ export class Account extends Provider implements AccountInterface {
     const version = versions[0];
     const safeNonce = await this.getNonceSafe(nonce);
     const chainId = await this.getChainId();
-    let newAccClassHash: string;
+
+    // BULK ACTION FROM NEW ACCOUNT START WITH DEPLOY_ACCOUNT
+    const tx0Payload: any = 'payload' in invocations[0] ? invocations[0].payload : invocations[0];
+    const cairoVersion =
+      invocations[0].type === TransactionType.DEPLOY_ACCOUNT
+        ? await this.getCairoVersion(tx0Payload.classHash)
+        : await this.getCairoVersion();
 
     return Promise.all(
       ([] as Invocations).concat(invocations).map(async (transaction, index: number) => {
         const txPayload: any = 'payload' in transaction ? transaction.payload : transaction;
-        // BULK ACTION FROM NEW ACCOUNT START WITH DEPLOY_ACCOUNT
-        if (index === 0 && transaction.type === TransactionType.DEPLOY_ACCOUNT) {
-          newAccClassHash = txPayload.classHash;
-        }
-
         const signerDetails: InvocationsSignerDetails = {
           walletAddress: this.address,
           nonce: toBigInt(Number(safeNonce) + index),
           maxFee: ZERO,
           version,
           chainId,
-          cairoVersion: newAccClassHash
-            ? await this.getCairoVersion(newAccClassHash)
-            : await this.getCairoVersion(),
+          cairoVersion,
         };
         const common = {
           type: transaction.type,
