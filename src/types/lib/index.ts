@@ -249,11 +249,11 @@ export interface CallStruct {
 
 /**
  * Represent Contract version
- * cairo: version of the cairo language
- * compiler: version of the cairo compiler used to compile the contract
  */
 export type ContractVersion = {
+  /** version of the cairo language */
   cairo: CairoVersion;
+  /** version of the cairo compiler used to compile the contract */
   compiler: CompilerVersion;
 };
 
