@@ -21,11 +21,6 @@ import { getMessageHash } from '../utils/typedData';
 import { AbstractedSignerInterface } from './interface';
 
 export class AbstractedSigner extends Signer implements AbstractedSignerInterface {
-  // constructor() {
-  //   super();
-  // }
-  protected pk!: Uint8Array | string;
-
   readonly abstractionFunctions: AbstractionFunctions | undefined;
 
   constructor(

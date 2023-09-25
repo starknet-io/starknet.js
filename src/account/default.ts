@@ -1,7 +1,7 @@
 import { SignatureType } from '@noble/curves/abstract/weierstrass';
 import { Signature as WeierstrassSignature } from '@scure/starknet';
 
-import { AbstractedSigner } from '../abstractedSigner';
+import { AbstractedSignerInterface } from '../abstractedSigner';
 import { UDC, ZERO } from '../constants';
 import { ProviderInterface } from '../provider';
 import { Provider } from '../provider/default';
@@ -65,7 +65,7 @@ import { getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
 
 export class Account extends Provider implements AccountInterface {
-  public signer: SignerInterface | AbstractedSigner;
+  public signer: SignerInterface | AbstractedSignerInterface;
 
   public address: string;
 
