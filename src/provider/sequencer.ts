@@ -346,6 +346,17 @@ export class SequencerProvider implements ProviderInterface {
   }
 
   public async getContractVersion(
+    contractAddress: string,
+    classHash?: undefined,
+    options?: getContractVersionOptions
+  ): Promise<ContractVersion>;
+  public async getContractVersion(
+    contractAddress: undefined,
+    classHash: string,
+    options?: getContractVersionOptions
+  ): Promise<ContractVersion>;
+
+  public async getContractVersion(
     contractAddress?: string,
     classHash?: string,
     { blockIdentifier = this.blockIdentifier, compiler = true }: getContractVersionOptions = {}

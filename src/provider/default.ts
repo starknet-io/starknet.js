@@ -6,6 +6,7 @@ import {
   Call,
   CallContractResponse,
   ContractClassResponse,
+  ContractVersion,
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
@@ -224,10 +225,21 @@ export class Provider implements ProviderInterface {
   }
 
   public async getContractVersion(
+    contractAddress: string,
+    classHash?: undefined,
+    options?: getContractVersionOptions
+  ): Promise<ContractVersion>;
+  public async getContractVersion(
+    contractAddress: undefined,
+    classHash: string,
+    options?: getContractVersionOptions
+  ): Promise<ContractVersion>;
+
+  public async getContractVersion(
     contractAddress?: string,
     classHash?: string,
     options?: getContractVersionOptions
   ) {
-    return this.provider.getContractVersion(contractAddress, classHash, options);
+    return this.provider.getContractVersion(contractAddress as any, classHash as any, options);
   }
 }
