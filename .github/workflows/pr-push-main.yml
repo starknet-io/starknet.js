@@ -43,14 +43,12 @@ jobs:
         name: [sequencer-goerli, rpc-goerli]
         include:
           - name: sequencer-goerli
-            TEST_PROVIDER_BASE_URL: https://alpha4-2.starknet.io
           - name: rpc-goerli
-            ENABLE_TEST_RPC_URL: true
 
     uses: ./.github/workflows/_test.yml
     secrets:
-      TEST_PROVIDER_BASE_URL: ${{ matrix.TEST_PROVIDER_BASE_URL }}
-      TEST_RPC_URL: ${{ matrix.ENABLE_TEST_RPC_URL && secrets.TEST_RPC_URL }}
+      TEST_PROVIDER_BASE_URL: ${{ secrets.TEST_PROVIDER_BASE_URL }}
+      TEST_RPC_URL: ${{ secrets.TEST_RPC_URL }}
       TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
       TEST_ACCOUNT_ADDRESS: ${{ secrets.TEST_ACCOUNT_ADDRESS }}
 
