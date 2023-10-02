@@ -18,7 +18,7 @@ jobs:
 
     uses: ./.github/workflows/_test.yml
     secrets:
-      TEST_PROVIDER_BASE_URL: ${{ matrix.ENABLE_SEQUENCER && secrets.TEST_PROVIDER_BASE_URL }}
-      TEST_RPC_URL: ${{ matrix.ENABLE_RPC && secrets.TEST_RPC_URL }}
+      TEST_PROVIDER_BASE_URL: ${{ matrix.ENABLE_SEQUENCER && secrets.TEST_PROVIDER_BASE_URL  || ''}}
+      TEST_RPC_URL: ${{ matrix.ENABLE_RPC && secrets.TEST_RPC_URL || ''}}
       TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
       TEST_ACCOUNT_ADDRESS: ${{ secrets.TEST_ACCOUNT_ADDRESS }}
