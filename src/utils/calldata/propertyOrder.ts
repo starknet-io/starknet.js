@@ -63,7 +63,7 @@ export default function orderPropsByAbi(
       // eslint-disable-next-line @typescript-eslint/no-use-before-define
       return orderStruct(unorderedItem, abiOfStruct);
     }
-    // litterals
+    // literals
     return unorderedItem;
   };
 
