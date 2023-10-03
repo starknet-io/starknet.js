@@ -1,3 +1,16 @@
+# [5.21.0](https://github.com/0xs34n/starknet.js/compare/v5.20.0...v5.21.0) (2023-10-03)
+
+### Bug Fixes
+
+- cairo isCairo1Abi optimization ([da76508](https://github.com/0xs34n/starknet.js/commit/da76508d9a3d22b4325950cdd5b4d41e143fb59b))
+- parallel get version issue ([c58c894](https://github.com/0xs34n/starknet.js/commit/c58c8948b1996df3c357b3a0514b1509db903cb5))
+
+### Features
+
+- auto-detect account cairoVersion ([85bbe39](https://github.com/0xs34n/starknet.js/commit/85bbe39fea3a2bd825e972a8a7bfdcae6c21eeae))
+- getContractVersion and getCairoVersion by classHash, deploy_account and bulk action autodetect ([54ffca4](https://github.com/0xs34n/starknet.js/commit/54ffca4d2c4663e5362f4819201710762bc3f9a7))
+- provider getContractVersion, contract getVersion, cairo getAbiContractVersion ([71e634e](https://github.com/0xs34n/starknet.js/commit/71e634e5b0742d8ba10a742b8494b87bcb12a7dd))
+
 # [5.20.0](https://github.com/0xs34n/starknet.js/compare/v5.19.6...v5.20.0) (2023-09-21)
 
 ### Bug Fixes
