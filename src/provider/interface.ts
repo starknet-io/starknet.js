@@ -158,7 +158,7 @@ export abstract class ProviderInterface {
 
   /**
    * Invokes a function on starknet
-   * @deprecated This method wont be supported as soon as fees are mandatory. Should not be used outside of Account class
+   * @deprecated This method won't be supported as soon as fees are mandatory. Should not be used outside of Account class
    *
    * @param invocation the invocation object containing:
    * - contractAddress - the address of the contract

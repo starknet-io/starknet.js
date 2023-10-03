@@ -8,7 +8,7 @@ import {
   AbiStructs,
   BigNumberish,
   FunctionAbi,
-  Litteral,
+  Literal,
   Uint,
 } from '../../types';
 import assert from '../assert';
@@ -22,7 +22,7 @@ import {
   isTypeBool,
   isTypeEnum,
   isTypeFelt,
-  isTypeLitteral,
+  isTypeLiteral,
   isTypeOption,
   isTypeResult,
   isTypeStruct,
@@ -105,7 +105,7 @@ const validateUint = (parameter: any, input: AbiEntry) => {
       );
       break;
 
-    case Litteral.ClassHash:
+    case Literal.ClassHash:
       assert(
         // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1670
         param >= 0n && param <= 2n ** 252n - 1n,
@@ -113,7 +113,7 @@ const validateUint = (parameter: any, input: AbiEntry) => {
       );
       break;
 
-    case Litteral.ContractAddress:
+    case Literal.ContractAddress:
       assert(
         // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1245
         param >= 0n && param <= 2n ** 252n - 1n,
@@ -235,7 +235,7 @@ const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs, enu
     case isTypeEnum(baseType, enums):
       parameter.forEach((it: any) => validateEnum(it, { name: input.name, type: baseType }));
       break;
-    case isTypeUint(baseType) || isTypeLitteral(baseType):
+    case isTypeUint(baseType) || isTypeLiteral(baseType):
       parameter.forEach((param: BigNumberish) => validateUint(param, input));
       break;
     case isTypeBool(baseType):
@@ -263,7 +263,7 @@ export default function validateFields(
       case isTypeFelt(input.type):
         validateFelt(parameter, input);
         break;
-      case isTypeUint(input.type) || isTypeLitteral(input.type):
+      case isTypeUint(input.type) || isTypeLiteral(input.type):
         validateUint(parameter, input);
         break;
       case isTypeBool(input.type):

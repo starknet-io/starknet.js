@@ -461,7 +461,7 @@ The _transactionsDetail_ object may include any of:
 
 account.**signMessage**(typedData) => _Promise < Signature >_
 
-Sign an JSON object for off-chain usage with the starknet private key and return the signature. This adds a message prefix so it cant be interchanged with transactions.
+Sign an JSON object for off-chain usage with the starknet private key and return the signature. This adds a message prefix so it can't be interchanged with transactions.
 
 _typedData_ - JSON object to be signed
 
@@ -477,7 +477,7 @@ string[];
 
 account.**hashMessage**(typedData) => _Promise < string >_
 
-Hash a JSON object with pederson hash and return the hash. This adds a message prefix so it cant be interchanged with transactions.
+Hash a JSON object with Pedersen hash and return the hash. This adds a message prefix so it can't be interchanged with transactions.
 
 _typedData_ - JSON object to be signed
 
