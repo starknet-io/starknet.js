@@ -12,6 +12,7 @@ import {
   Call,
   CallContractResponse,
   ContractClassResponse,
+  ContractVersion,
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
@@ -28,6 +29,7 @@ import {
   RpcProviderOptions,
   SimulateTransactionResponse,
   TransactionType,
+  getContractVersionOptions,
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
@@ -38,6 +40,7 @@ import {
   TransactionFinalityStatus,
 } from '../types/api/rpc';
 import { CallData } from '../utils/calldata';
+import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { isSierra } from '../utils/contract';
 import { pascalToSnake } from '../utils/encode';
 import fetch from '../utils/fetchPonyfill';
@@ -249,6 +252,41 @@ export class RpcProvider implements ProviderInterface {
     _blockIdentifier?: BlockIdentifier
   ): Promise<GetCodeResponse> {
     throw new Error('RPC does not implement getCode function');
+  }
+
+  public async getContractVersion(
+    contractAddress: string,
+    classHash?: undefined,
+    options?: getContractVersionOptions
+  ): Promise<ContractVersion>;
+  public async getContractVersion(
+    contractAddress: undefined,
+    classHash: string,
+    options?: getContractVersionOptions
+  ): Promise<ContractVersion>;
+
+  public async getContractVersion(
+    contractAddress?: string,
+    classHash?: string,
+    { blockIdentifier = this.blockIdentifier, compiler = true }: getContractVersionOptions = {}
+  ): Promise<ContractVersion> {
+    let contractClass;
+    if (contractAddress) {
+      contractClass = await this.getClassAt(contractAddress, blockIdentifier);
+    } else if (classHash) {
+      contractClass = await this.getClass(classHash, blockIdentifier);
+    } else {
+      throw Error('getContractVersion require contractAddress or classHash');
+    }
+
+    if (isSierra(contractClass)) {
+      if (compiler) {
+        const abiTest = getAbiContractVersion(contractClass.abi);
+        return { cairo: '1', compiler: abiTest.compiler };
+      }
+      return { cairo: '1', compiler: undefined };
+    }
+    return { cairo: '0', compiler: '0' };
   }
 
   public async getEstimateFee(

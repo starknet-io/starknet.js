@@ -59,6 +59,11 @@ describe('contract module', () => {
         );
       });
 
+      test('getCairoVersion', async () => {
+        const version = await erc20Contract.getVersion();
+        expect(version).toEqual({ cairo: '0', compiler: '0' });
+      });
+
       test('isCairo1', async () => {
         const isContractCairo1: boolean = erc20Contract.isCairo1();
         expect(isContractCairo1).toBe(false);

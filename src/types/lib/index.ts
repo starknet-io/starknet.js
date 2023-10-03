@@ -105,7 +105,8 @@ export type Invocation = CallDetails & { signature?: Signature };
 
 export type Call = CallDetails & { entrypoint: string };
 
-export type CairoVersion = '0' | '1';
+export type CairoVersion = '0' | '1' | undefined;
+export type CompilerVersion = '0' | '1' | '2' | undefined;
 
 export type InvocationsDetails = {
   nonce?: BigNumberish;
@@ -230,6 +231,11 @@ export type getSimulateTransactionOptions = {
   skipFeeCharge?: boolean;
 };
 
+export type getContractVersionOptions = {
+  blockIdentifier?: BlockIdentifier;
+  compiler?: boolean;
+};
+
 export type getEstimateFeeBulkOptions = {
   blockIdentifier?: BlockIdentifier;
   skipValidate?: boolean;
@@ -240,5 +246,15 @@ export interface CallStruct {
   selector: string;
   calldata: string[];
 }
+
+/**
+ * Represent Contract version
+ */
+export type ContractVersion = {
+  /** version of the cairo language */
+  cairo: CairoVersion;
+  /** version of the cairo compiler used to compile the contract */
+  compiler: CompilerVersion;
+};
 
 export * from './contract';
