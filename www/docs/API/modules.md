@@ -1,6 +1,6 @@
 ---
 id: 'modules'
-title: 'Starknet.js API - v5.19.6'
+title: 'Starknet.js API - v5.20.0'
 sidebar_label: 'Exports'
 sidebar_position: 0.5
 custom_edit_url: null
@@ -398,6 +398,12 @@ Re-exports [CairoVersion](namespaces/types.md#cairoversion)
 
 ---
 
+### CompilerVersion
+
+Re-exports [CompilerVersion](namespaces/types.md#compilerversion)
+
+---
+
 ### InvocationsDetails
 
 Re-exports [InvocationsDetails](namespaces/types.md#invocationsdetails)
@@ -512,6 +518,12 @@ Re-exports [getSimulateTransactionOptions](namespaces/types.md#getsimulatetransa
 
 ---
 
+### getContractVersionOptions
+
+Re-exports [getContractVersionOptions](namespaces/types.md#getcontractversionoptions)
+
+---
+
 ### getEstimateFeeBulkOptions
 
 Re-exports [getEstimateFeeBulkOptions](namespaces/types.md#getestimatefeebulkoptions)
@@ -521,6 +533,12 @@ Re-exports [getEstimateFeeBulkOptions](namespaces/types.md#getestimatefeebulkopt
 ### CallStruct
 
 Re-exports [CallStruct](interfaces/types.CallStruct.md)
+
+---
+
+### ContractVersion
+
+Re-exports [ContractVersion](namespaces/types.md#contractversion)
 
 ---
 
@@ -986,7 +1004,7 @@ Re-exports [CairoEnum](namespaces/types.md#cairoenum)
 
 #### Defined in
 
-[src/contract/interface.ts:21](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L21)
+[src/contract/interface.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/interface.ts#L22)
 
 ---
 

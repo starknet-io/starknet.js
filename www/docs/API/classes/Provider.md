@@ -30,7 +30,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/default.ts:41](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L41)
+[src/provider/default.ts:43](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L43)
 
 ## Properties
 
@@ -40,7 +40,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/default.ts:39](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L39)
+[src/provider/default.ts:41](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L41)
 
 ## Methods
 
@@ -62,7 +62,7 @@ the chain Id
 
 #### Defined in
 
-[src/provider/default.ts:63](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L63)
+[src/provider/default.ts:65](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L65)
 
 ---
 
@@ -90,7 +90,7 @@ the block object
 
 #### Defined in
 
-[src/provider/default.ts:67](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L67)
+[src/provider/default.ts:69](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L69)
 
 ---
 
@@ -119,7 +119,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/default.ts:71](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L71)
+[src/provider/default.ts:73](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L73)
 
 ---
 
@@ -148,7 +148,7 @@ Class hash
 
 #### Defined in
 
-[src/provider/default.ts:78](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L78)
+[src/provider/default.ts:80](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L80)
 
 ---
 
@@ -176,7 +176,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/default.ts:85](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L85)
+[src/provider/default.ts:87](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L87)
 
 ---
 
@@ -210,7 +210,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:89](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L89)
+[src/provider/default.ts:91](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L91)
 
 ---
 
@@ -241,7 +241,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:97](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L97)
+[src/provider/default.ts:99](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L99)
 
 ---
 
@@ -270,7 +270,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:111](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L111)
+[src/provider/default.ts:113](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L113)
 
 ---
 
@@ -299,7 +299,7 @@ the hex nonce
 
 #### Defined in
 
-[src/provider/default.ts:118](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L118)
+[src/provider/default.ts:120](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L120)
 
 ---
 
@@ -329,7 +329,7 @@ the value of the storage variable
 
 #### Defined in
 
-[src/provider/default.ts:125](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L125)
+[src/provider/default.ts:127](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L127)
 
 ---
 
@@ -357,7 +357,7 @@ the transaction object { transaction_id, status, transaction, block_number?, blo
 
 #### Defined in
 
-[src/provider/default.ts:133](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L133)
+[src/provider/default.ts:135](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L135)
 
 ---
 
@@ -385,7 +385,7 @@ the transaction receipt object
 
 #### Defined in
 
-[src/provider/default.ts:137](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L137)
+[src/provider/default.ts:139](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L139)
 
 ---
 
@@ -414,7 +414,7 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[src/provider/default.ts:141](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L141)
+[src/provider/default.ts:143](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L143)
 
 ---
 
@@ -447,7 +447,7 @@ response from addTransaction
 
 #### Defined in
 
-[src/provider/default.ts:148](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L148)
+[src/provider/default.ts:150](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L150)
 
 ---
 
@@ -476,7 +476,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/default.ts:155](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L155)
+[src/provider/default.ts:157](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L157)
 
 ---
 
@@ -505,7 +505,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/default.ts:162](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L162)
+[src/provider/default.ts:164](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L164)
 
 ---
 
@@ -536,7 +536,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:169](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L169)
+[src/provider/default.ts:171](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L171)
 
 ---
 
@@ -567,7 +567,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:178](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L178)
+[src/provider/default.ts:180](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L180)
 
 ---
 
@@ -596,7 +596,7 @@ The method should not be used
 
 #### Defined in
 
-[src/provider/default.ts:192](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L192)
+[src/provider/default.ts:194](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L194)
 
 ---
 
@@ -625,7 +625,7 @@ GetTransactionReceiptResponse
 
 #### Defined in
 
-[src/provider/default.ts:199](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L199)
+[src/provider/default.ts:201](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L201)
 
 ---
 
@@ -654,7 +654,7 @@ an array of transaction trace and estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:206](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L206)
+[src/provider/default.ts:208](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L208)
 
 ---
 
@@ -682,7 +682,7 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/default.ts:213](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L213)
+[src/provider/default.ts:215](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L215)
 
 ---
 
@@ -703,7 +703,7 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/default.ts:217](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L217)
+[src/provider/default.ts:219](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L219)
 
 ---
 
@@ -724,4 +724,56 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/default.ts:221](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L221)
+[src/provider/default.ts:223](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L223)
+
+---
+
+### getContractVersion
+
+▸ **getContractVersion**(`contractAddress`, `classHash?`, `options?`): `Promise`<[`ContractVersion`](../namespaces/types.md#contractversion)\>
+
+Gets the contract version from the provided address
+
+#### Parameters
+
+| Name              | Type                                                                            | Description                                                                                                                                                          |
+| :---------------- | :------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `contractAddress` | `string`                                                                        | string                                                                                                                                                               |
+| `classHash?`      | `undefined`                                                                     | undefined                                                                                                                                                            |
+| `options?`        | [`getContractVersionOptions`](../namespaces/types.md#getcontractversionoptions) | getContractVersionOptions - (optional) compiler - (default true) extract compiler version using type tactic from abi - (optional) blockIdentifier - block identifier |
+
+#### Returns
+
+`Promise`<[`ContractVersion`](../namespaces/types.md#contractversion)\>
+
+#### Implementation of
+
+[ProviderInterface](ProviderInterface.md).[getContractVersion](ProviderInterface.md#getcontractversion)
+
+#### Defined in
+
+[src/provider/default.ts:227](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L227)
+
+▸ **getContractVersion**(`contractAddress`, `classHash`, `options?`): `Promise`<[`ContractVersion`](../namespaces/types.md#contractversion)\>
+
+Gets the contract version from the provided address
+
+#### Parameters
+
+| Name              | Type                                                                            | Description                                                                                                                                                          |
+| :---------------- | :------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `contractAddress` | `undefined`                                                                     | undefined                                                                                                                                                            |
+| `classHash`       | `string`                                                                        |                                                                                                                                                                      |
+| `options?`        | [`getContractVersionOptions`](../namespaces/types.md#getcontractversionoptions) | getContractVersionOptions - (optional) compiler - (default true) extract compiler version using type tactic from abi - (optional) blockIdentifier - block identifier |
+
+#### Returns
+
+`Promise`<[`ContractVersion`](../namespaces/types.md#contractversion)\>
+
+#### Implementation of
+
+[ProviderInterface](ProviderInterface.md).[getContractVersion](ProviderInterface.md#getcontractversion)
+
+#### Defined in
+
+[src/provider/default.ts:232](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/default.ts#L232)

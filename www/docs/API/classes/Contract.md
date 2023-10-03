@@ -448,6 +448,26 @@ TRUE if the contract comes from a Cairo1 contract
 
 ---
 
+### getVersion
+
+▸ **getVersion**(): `Promise`<[`ContractVersion`](../namespaces/types.md#contractversion)\>
+
+Retrieves the version of the contract (cairo version & compiler version)
+
+#### Returns
+
+`Promise`<[`ContractVersion`](../namespaces/types.md#contractversion)\>
+
+#### Implementation of
+
+[ContractInterface](ContractInterface.md).[getVersion](ContractInterface.md#getversion)
+
+#### Defined in
+
+[src/contract/default.ts:345](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L345)
+
+---
+
 ### typed
 
 ▸ **typed**<`TAbi`\>(`tAbi`): [`TypedContract`](../modules.md#typedcontract)<`TAbi`\>
@@ -474,4 +494,4 @@ TRUE if the contract comes from a Cairo1 contract
 
 #### Defined in
 
-[src/contract/default.ts:345](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L345)
+[src/contract/default.ts:349](https://github.com/0xs34n/starknet.js/blob/develop/src/contract/default.ts#L349)

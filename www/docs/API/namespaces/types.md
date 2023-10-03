@@ -757,11 +757,21 @@ Hexadecimal-string array
 
 ### CairoVersion
 
-Ƭ **CairoVersion**: `"0"` \| `"1"`
+Ƭ **CairoVersion**: `"0"` \| `"1"` \| `undefined`
 
 #### Defined in
 
 [src/types/lib/index.ts:108](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L108)
+
+---
+
+### CompilerVersion
+
+Ƭ **CompilerVersion**: `"0"` \| `"1"` \| `"2"` \| `undefined`
+
+#### Defined in
+
+[src/types/lib/index.ts:109](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L109)
 
 ---
 
@@ -779,7 +789,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:110](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L110)
+[src/types/lib/index.ts:111](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L111)
 
 ---
 
@@ -800,7 +810,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:119](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L119)
+[src/types/lib/index.ts:120](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L120)
 
 ---
 
@@ -810,7 +820,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:126](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L126)
+[src/types/lib/index.ts:127](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L127)
 
 ---
 
@@ -820,7 +830,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:175](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L175)
+[src/types/lib/index.ts:176](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L176)
 
 ---
 
@@ -834,7 +844,7 @@ null appends nothing to the request url
 
 #### Defined in
 
-[src/types/lib/index.ts:182](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L182)
+[src/types/lib/index.ts:183](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L183)
 
 ---
 
@@ -846,7 +856,7 @@ items used by AccountInvocations
 
 #### Defined in
 
-[src/types/lib/index.ts:187](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L187)
+[src/types/lib/index.ts:188](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L188)
 
 ---
 
@@ -858,7 +868,7 @@ Complete invocations array with account details (internal type from account -> p
 
 #### Defined in
 
-[src/types/lib/index.ts:197](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L197)
+[src/types/lib/index.ts:198](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L198)
 
 ---
 
@@ -870,7 +880,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:202](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L202)
+[src/types/lib/index.ts:203](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L203)
 
 ---
 
@@ -887,7 +897,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:211](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L211)
+[src/types/lib/index.ts:212](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L212)
 
 ---
 
@@ -901,7 +911,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:213](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L213)
+[src/types/lib/index.ts:214](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L214)
 
 ---
 
@@ -915,7 +925,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:216](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L216)
+[src/types/lib/index.ts:217](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L217)
 
 ---
 
@@ -933,7 +943,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:220](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L220)
+[src/types/lib/index.ts:221](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L221)
 
 ---
 
@@ -952,7 +962,24 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:226](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L226)
+[src/types/lib/index.ts:227](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L227)
+
+---
+
+### getContractVersionOptions
+
+Ƭ **getContractVersionOptions**: `Object`
+
+#### Type declaration
+
+| Name               | Type                                          |
+| :----------------- | :-------------------------------------------- |
+| `blockIdentifier?` | [`BlockIdentifier`](types.md#blockidentifier) |
+| `compiler?`        | `boolean`                                     |
+
+#### Defined in
+
+[src/types/lib/index.ts:234](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L234)
 
 ---
 
@@ -969,7 +996,26 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:233](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L233)
+[src/types/lib/index.ts:239](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L239)
+
+---
+
+### ContractVersion
+
+Ƭ **ContractVersion**: `Object`
+
+Represent Contract version
+
+#### Type declaration
+
+| Name       | Type                                          | Description                                                |
+| :--------- | :-------------------------------------------- | :--------------------------------------------------------- |
+| `cairo`    | [`CairoVersion`](types.md#cairoversion)       | version of the cairo language                              |
+| `compiler` | [`CompilerVersion`](types.md#compilerversion) | version of the cairo compiler used to compile the contract |
+
+#### Defined in
+
+[src/types/lib/index.ts:253](https://github.com/0xs34n/starknet.js/blob/develop/src/types/lib/index.ts#L253)
 
 ---
 

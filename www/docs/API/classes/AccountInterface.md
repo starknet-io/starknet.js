@@ -570,7 +570,7 @@ the chain Id
 
 #### Defined in
 
-[src/provider/interface.ts:38](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L38)
+[src/provider/interface.ts:40](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L40)
 
 ---
 
@@ -599,7 +599,7 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[src/provider/interface.ts:47](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L47)
+[src/provider/interface.ts:49](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L49)
 
 ---
 
@@ -627,7 +627,7 @@ the block object
 
 #### Defined in
 
-[src/provider/interface.ts:58](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L58)
+[src/provider/interface.ts:60](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L60)
 
 ---
 
@@ -656,7 +656,7 @@ The method should not be used
 
 #### Defined in
 
-[src/provider/interface.ts:63](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L63)
+[src/provider/interface.ts:65](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L65)
 
 ---
 
@@ -685,7 +685,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/interface.ts:75](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L75)
+[src/provider/interface.ts:77](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L77)
 
 ---
 
@@ -714,7 +714,7 @@ Class hash
 
 #### Defined in
 
-[src/provider/interface.ts:87](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L87)
+[src/provider/interface.ts:89](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L89)
 
 ---
 
@@ -742,7 +742,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/interface.ts:98](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L98)
+[src/provider/interface.ts:100](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L100)
 
 ---
 
@@ -771,7 +771,7 @@ the hex nonce
 
 #### Defined in
 
-[src/provider/interface.ts:106](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L106)
+[src/provider/interface.ts:108](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L108)
 
 ---
 
@@ -801,7 +801,7 @@ the value of the storage variable
 
 #### Defined in
 
-[src/provider/interface.ts:119](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L119)
+[src/provider/interface.ts:121](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L121)
 
 ---
 
@@ -829,7 +829,7 @@ the transaction object { transaction_id, status, transaction, block_number?, blo
 
 #### Defined in
 
-[src/provider/interface.ts:131](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L131)
+[src/provider/interface.ts:133](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L133)
 
 ---
 
@@ -857,7 +857,7 @@ the transaction receipt object
 
 #### Defined in
 
-[src/provider/interface.ts:139](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L139)
+[src/provider/interface.ts:141](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L141)
 
 ---
 
@@ -886,7 +886,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/interface.ts:152](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L152)
+[src/provider/interface.ts:154](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L154)
 
 ---
 
@@ -919,7 +919,7 @@ response from addTransaction
 
 #### Defined in
 
-[src/provider/interface.ts:172](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L172)
+[src/provider/interface.ts:174](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L174)
 
 ---
 
@@ -948,7 +948,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/interface.ts:189](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L189)
+[src/provider/interface.ts:191](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L191)
 
 ---
 
@@ -983,7 +983,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:210](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L210)
+[src/provider/interface.ts:212](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L212)
 
 ---
 
@@ -1014,7 +1014,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:232](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L232)
+[src/provider/interface.ts:234](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L234)
 
 ---
 
@@ -1045,7 +1045,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:254](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L254)
+[src/provider/interface.ts:256](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L256)
 
 ---
 
@@ -1076,7 +1076,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:277](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L277)
+[src/provider/interface.ts:279](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L279)
 
 ---
 
@@ -1105,7 +1105,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:293](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L293)
+[src/provider/interface.ts:295](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L295)
 
 ---
 
@@ -1134,7 +1134,7 @@ GetTransactionReceiptResponse
 
 #### Defined in
 
-[src/provider/interface.ts:306](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L306)
+[src/provider/interface.ts:308](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L308)
 
 ---
 
@@ -1163,7 +1163,7 @@ an array of transaction trace and estimated fee
 
 #### Defined in
 
-[src/provider/interface.ts:321](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L321)
+[src/provider/interface.ts:323](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L323)
 
 ---
 
@@ -1191,4 +1191,56 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/interface.ts:332](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L332)
+[src/provider/interface.ts:334](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L334)
+
+---
+
+### getContractVersion
+
+▸ `Abstract` **getContractVersion**(`contractAddress`, `classHash?`, `options?`): `Promise`<[`ContractVersion`](../namespaces/types.md#contractversion)\>
+
+Gets the contract version from the provided address
+
+#### Parameters
+
+| Name              | Type                                                                            | Description                                                                                                                                                          |
+| :---------------- | :------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `contractAddress` | `string`                                                                        | string                                                                                                                                                               |
+| `classHash?`      | `undefined`                                                                     | undefined                                                                                                                                                            |
+| `options?`        | [`getContractVersionOptions`](../namespaces/types.md#getcontractversionoptions) | getContractVersionOptions - (optional) compiler - (default true) extract compiler version using type tactic from abi - (optional) blockIdentifier - block identifier |
+
+#### Returns
+
+`Promise`<[`ContractVersion`](../namespaces/types.md#contractversion)\>
+
+#### Inherited from
+
+[ProviderInterface](ProviderInterface.md).[getContractVersion](ProviderInterface.md#getcontractversion)
+
+#### Defined in
+
+[src/provider/interface.ts:344](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L344)
+
+▸ `Abstract` **getContractVersion**(`contractAddress`, `classHash`, `options?`): `Promise`<[`ContractVersion`](../namespaces/types.md#contractversion)\>
+
+Gets the contract version from the provided address
+
+#### Parameters
+
+| Name              | Type                                                                            | Description                                                                                                                                                          |
+| :---------------- | :------------------------------------------------------------------------------ | :------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `contractAddress` | `undefined`                                                                     | undefined                                                                                                                                                            |
+| `classHash`       | `string`                                                                        |                                                                                                                                                                      |
+| `options?`        | [`getContractVersionOptions`](../namespaces/types.md#getcontractversionoptions) | getContractVersionOptions - (optional) compiler - (default true) extract compiler version using type tactic from abi - (optional) blockIdentifier - block identifier |
+
+#### Returns
+
+`Promise`<[`ContractVersion`](../namespaces/types.md#contractversion)\>
+
+#### Inherited from
+
+[ProviderInterface](ProviderInterface.md).[getContractVersion](ProviderInterface.md#getcontractversion)
+
+#### Defined in
+
+[src/provider/interface.ts:358](https://github.com/0xs34n/starknet.js/blob/develop/src/provider/interface.ts#L358)

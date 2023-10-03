@@ -34,7 +34,32 @@ TRUE if it is an ABI from a Cairo1 contract
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:44](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L44)
+[src/utils/calldata/cairo.ts:53](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L53)
+
+---
+
+### getAbiContractVersion
+
+▸ **getAbiContractVersion**(`abi`): [`ContractVersion`](types.md#contractversion)
+
+Return ContractVersion (Abi version) based on Abi
+or undefined for unknown version
+
+#### Parameters
+
+| Name  | Type                  |
+| :---- | :-------------------- |
+| `abi` | [`Abi`](types.md#abi) |
+
+#### Returns
+
+[`ContractVersion`](types.md#contractversion)
+
+string
+
+#### Defined in
+
+[src/utils/calldata/cairo.ts:67](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L67)
 
 ---
 
@@ -58,7 +83,7 @@ format: felt-string
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:101](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L101)
+[src/utils/calldata/cairo.ts:127](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L127)
 
 ---
 
@@ -78,7 +103,7 @@ format: felt-string
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:7](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L7)
+[src/utils/calldata/cairo.ts:16](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L16)
 
 ---
 
@@ -98,7 +123,7 @@ format: felt-string
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:8](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L8)
+[src/utils/calldata/cairo.ts:17](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L17)
 
 ---
 
@@ -118,7 +143,7 @@ format: felt-string
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:9](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L9)
+[src/utils/calldata/cairo.ts:18](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L18)
 
 ---
 
@@ -138,7 +163,7 @@ format: felt-string
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:13](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L13)
+[src/utils/calldata/cairo.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L22)
 
 ---
 
@@ -158,7 +183,7 @@ format: felt-string
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:14](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L14)
+[src/utils/calldata/cairo.ts:23](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L23)
 
 ---
 
@@ -179,7 +204,7 @@ format: felt-string
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:15](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L15)
+[src/utils/calldata/cairo.ts:24](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L24)
 
 ---
 
@@ -200,7 +225,7 @@ format: felt-string
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:16](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L16)
+[src/utils/calldata/cairo.ts:25](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L25)
 
 ---
 
@@ -220,7 +245,7 @@ format: felt-string
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:17](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L17)
+[src/utils/calldata/cairo.ts:26](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L26)
 
 ---
 
@@ -240,7 +265,7 @@ format: felt-string
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:18](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L18)
+[src/utils/calldata/cairo.ts:27](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L27)
 
 ---
 
@@ -260,7 +285,7 @@ format: felt-string
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:19](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L19)
+[src/utils/calldata/cairo.ts:28](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L28)
 
 ---
 
@@ -280,7 +305,7 @@ format: felt-string
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:20](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L20)
+[src/utils/calldata/cairo.ts:29](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L29)
 
 ---
 
@@ -300,7 +325,7 @@ format: felt-string
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:21](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L21)
+[src/utils/calldata/cairo.ts:30](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L30)
 
 ---
 
@@ -320,7 +345,7 @@ format: felt-string
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:22](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L22)
+[src/utils/calldata/cairo.ts:31](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L31)
 
 ---
 
@@ -340,7 +365,7 @@ format: felt-string
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:23](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L23)
+[src/utils/calldata/cairo.ts:32](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L32)
 
 ---
 
@@ -360,7 +385,7 @@ format: felt-string
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:25](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L25)
+[src/utils/calldata/cairo.ts:34](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L34)
 
 ---
 
@@ -380,7 +405,7 @@ format: felt-string
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:27](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L27)
+[src/utils/calldata/cairo.ts:36](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L36)
 
 ---
 
@@ -400,7 +425,7 @@ format: felt-string
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:28](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L28)
+[src/utils/calldata/cairo.ts:37](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L37)
 
 ---
 
@@ -428,7 +453,7 @@ uint256('892349863487563453485768723498');
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:75](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L75)
+[src/utils/calldata/cairo.ts:101](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L101)
 
 ---
 
@@ -456,4 +481,4 @@ tuple(1,'0x101',16);
 
 #### Defined in
 
-[src/utils/calldata/cairo.ts:93](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L93)
+[src/utils/calldata/cairo.ts:119](https://github.com/0xs34n/starknet.js/blob/develop/src/utils/calldata/cairo.ts#L119)
