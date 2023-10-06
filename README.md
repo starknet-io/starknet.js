@@ -5,8 +5,8 @@
 
 <!-- primary badges -->
 <p align="center">
-  <a href="https://github.com/seanjameshan/starknet.js/actions">
-    <img src="https://img.shields.io/github/workflow/status/seanjameshan/starknet.js/Release">
+  <a href="https://github.com/starknet-io/starknet.js/actions">
+    <img src="https://img.shields.io/github/workflow/status/starknet-io/starknet.js/Release">
   </a>
   <a href="https://www.npmjs.com/package/starknet">
     <img src='https://img.shields.io/npm/v/starknet' />
@@ -20,11 +20,11 @@
   <a href="https://www.npmjs.com/package/starknet">
     <img src='https://img.shields.io/npm/dt/starknet?color=blueviolet' />
   </a>
-  <a href="https://github.com/seanjameshan/starknet.js/blob/main/LICENSE/">
+  <a href="https://github.com/starknet-io/starknet.js/blob/main/LICENSE/">
     <img src="https://img.shields.io/badge/license-MIT-black">
   </a>
-  <a href="https://github.com/seanjameshan/starknet.js/stargazers">
-    <img src='https://img.shields.io/github/stars/seanjameshan/starknet.js?color=yellow' />
+  <a href="https://github.com/starknet-io/starknet.js/stargazers">
+    <img src='https://img.shields.io/github/stars/starknet-io/starknet.js?color=yellow' />
   </a>
   <a href="https://starkware.co/">
     <img src="https://img.shields.io/badge/powered_by-StarkWare-navy">
@@ -55,11 +55,11 @@ Guides can be found [here](https://www.starknetjs.com/docs/guides/intro) :book:
 
 ## ✏️ Contributing
 
-If you consider to contribute to this project please read [CONTRIBUTING.md](https://github.com/0xs34n/starknet.js/blob/main/CONTRIBUTING.md) first.
+If you consider to contribute to this project please read [CONTRIBUTING.md](https://github.com/starknet-io/starknet.js/blob/main/CONTRIBUTING.md) first.
 
 ## ❤️ Special Thanks
 
-Special thanks to all the [contributors](https://github.com/0xs34n/starknet.js/graphs/contributors), especially to:
+Special thanks to all the [contributors](https://github.com/starknet-io/starknet.js/graphs/contributors), especially to:
 
 - Janek ([@janek26](https://github.com/janek26)) and Dhruv ([@dhruvkelawala](https://github.com/dhruvkelawala)) from [Argent](https://github.com/argentlabs)
 
@@ -73,6 +73,6 @@ This library would not be possible without these rockstars.
 
 ## 📜 License
 
-Copyright (c) 2022 0xs34n
+Copyright (c) 2023 StarkWare
 
-Licensed under the [MIT license](https://github.com/0xs34n/starknet.js/blob/main/LICENSE).
+Licensed under the [MIT license](https://github.com/starknet-io/starknet.js/blob/main/LICENSE).

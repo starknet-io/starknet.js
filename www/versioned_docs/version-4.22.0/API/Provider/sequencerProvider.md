@@ -4,7 +4,7 @@ title: Sequencer Provider
 id: 'sequencerProvider'
 ---
 
-On top of methods found in the [Provider](/docs/API/provider) section, `SequencerProvider` has some additional ones you can use.
+On top of methods found in the [Provider](./) section, `SequencerProvider` has some additional ones you can use.
 
 ## Creating an instance
 

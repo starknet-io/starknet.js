@@ -24,7 +24,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/provider.ts:13](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/provider.ts#L13)
+[src/utils/provider.ts:13](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/provider.ts#L13)
 
 ---
 
@@ -44,7 +44,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/provider.ts:19](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/provider.ts#L19)
+[src/utils/provider.ts:19](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/provider.ts#L19)
 
 ---
 
@@ -64,4 +64,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/provider.ts:29](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/provider.ts#L29)
+[src/utils/provider.ts:29](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/provider.ts#L29)

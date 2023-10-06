@@ -15,7 +15,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/calldata.ts:17](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/calldata.ts#L17)
+[src/types/calldata.ts:17](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/calldata.ts#L17)
 
 ---
 
@@ -25,4 +25,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/calldata.ts:18](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/calldata.ts#L18)
+[src/types/calldata.ts:18](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/calldata.ts#L18)

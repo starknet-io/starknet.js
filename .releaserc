@@ -28,5 +28,5 @@
     ],
     "@semantic-release/github"
   ],
-  "repositoryUrl": "https://github.com/0xs34n/starknet.js"
+  "repositoryUrl": "https://github.com/starknet-io/starknet.js"
 }
