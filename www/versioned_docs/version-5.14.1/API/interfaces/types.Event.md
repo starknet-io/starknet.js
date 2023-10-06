@@ -15,7 +15,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider/response.ts:86](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/types/provider/response.ts#L86)
+[src/types/provider/response.ts:86](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/types/provider/response.ts#L86)
 
 ---
 
@@ -25,7 +25,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider/response.ts:87](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/types/provider/response.ts#L87)
+[src/types/provider/response.ts:87](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/types/provider/response.ts#L87)
 
 ---
 
@@ -35,4 +35,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider/response.ts:88](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/types/provider/response.ts#L88)
+[src/types/provider/response.ts:88](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/types/provider/response.ts#L88)

@@ -18,7 +18,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:30](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/hash.ts#L30)
+[src/utils/hash.ts:30](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/hash.ts#L30)
 
 ---
 
@@ -28,7 +28,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:31](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/hash.ts#L31)
+[src/utils/hash.ts:31](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/hash.ts#L31)
 
 ---
 
@@ -38,7 +38,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:33](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/hash.ts#L33)
+[src/utils/hash.ts:33](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/hash.ts#L33)
 
 ---
 
@@ -48,7 +48,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/hash.ts:34](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/hash.ts#L34)
+[src/utils/hash.ts:34](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/hash.ts#L34)
 
 ## Functions
 
@@ -77,7 +77,7 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:41](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/hash.ts#L41)
+[src/utils/hash.ts:41](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/hash.ts#L41)
 
 ---
 
@@ -97,7 +97,7 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:47](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/hash.ts#L47)
+[src/utils/hash.ts:47](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/hash.ts#L47)
 
 ---
 
@@ -124,7 +124,7 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:56](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/hash.ts#L56)
+[src/utils/hash.ts:56](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/hash.ts#L56)
 
 ---
 
@@ -148,7 +148,7 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:80](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/hash.ts#L80)
+[src/utils/hash.ts:80](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/hash.ts#L80)
 
 ---
 
@@ -174,7 +174,7 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:98](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/hash.ts#L98)
+[src/utils/hash.ts:98](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/hash.ts#L98)
 
 ---
 
@@ -201,7 +201,7 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:119](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/hash.ts#L119)
+[src/utils/hash.ts:119](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/hash.ts#L119)
 
 ---
 
@@ -226,7 +226,7 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:143](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/hash.ts#L143)
+[src/utils/hash.ts:143](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/hash.ts#L143)
 
 ---
 
@@ -249,7 +249,7 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:163](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/hash.ts#L163)
+[src/utils/hash.ts:163](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/hash.ts#L163)
 
 ---
 
@@ -269,7 +269,7 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:196](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/hash.ts#L196)
+[src/utils/hash.ts:196](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/hash.ts#L196)
 
 ---
 
@@ -289,7 +289,7 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:214](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/hash.ts#L214)
+[src/utils/hash.ts:214](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/hash.ts#L214)
 
 ---
 
@@ -309,7 +309,7 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:223](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/hash.ts#L223)
+[src/utils/hash.ts:223](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/hash.ts#L223)
 
 ---
 
@@ -329,7 +329,7 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:276](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/hash.ts#L276)
+[src/utils/hash.ts:276](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/hash.ts#L276)
 
 ---
 
@@ -349,7 +349,7 @@ versions { v1: bigint; v2: bigint; }
 
 #### Defined in
 
-[src/utils/hash.ts:317](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/hash.ts#L317)
+[src/utils/hash.ts:317](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/hash.ts#L317)
 
 ---
 
@@ -373,7 +373,7 @@ HexString ClassHash
 
 #### Defined in
 
-[src/utils/hash.ts:355](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/hash.ts#L355)
+[src/utils/hash.ts:355](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/hash.ts#L355)
 
 ---
 
@@ -397,7 +397,7 @@ string - hexadecimal string
 
 #### Defined in
 
-[src/utils/selector.ts:13](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/selector.ts#L13)
+[src/utils/selector.ts:13](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/selector.ts#L13)
 
 ---
 
@@ -423,7 +423,7 @@ starknet keccak hash as BigNumber
 
 #### Defined in
 
-[src/utils/selector.ts:35](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/selector.ts#L35)
+[src/utils/selector.ts:35](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/selector.ts#L35)
 
 ---
 
@@ -449,7 +449,7 @@ hex selector of given abi function name
 
 #### Defined in
 
-[src/utils/selector.ts:48](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/selector.ts#L48)
+[src/utils/selector.ts:48](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/selector.ts#L48)
 
 ---
 
@@ -473,4 +473,4 @@ Hex selector
 
 #### Defined in
 
-[src/utils/selector.ts:58](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/selector.ts#L58)
+[src/utils/selector.ts:58](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/selector.ts#L58)

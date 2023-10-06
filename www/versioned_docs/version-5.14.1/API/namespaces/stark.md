@@ -30,7 +30,7 @@ Compressed cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:21](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/stark.ts#L21)
+[src/utils/stark.ts:21](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/stark.ts#L21)
 
 ---
 
@@ -54,7 +54,7 @@ parsed decompressed compiled cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:33](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/stark.ts#L33)
+[src/utils/stark.ts:33](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/stark.ts#L33)
 
 ---
 
@@ -68,7 +68,7 @@ parsed decompressed compiled cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:39](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/stark.ts#L39)
+[src/utils/stark.ts:39](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/stark.ts#L39)
 
 ---
 
@@ -88,7 +88,7 @@ parsed decompressed compiled cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:44](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/stark.ts#L44)
+[src/utils/stark.ts:44](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/stark.ts#L44)
 
 ---
 
@@ -108,7 +108,7 @@ parsed decompressed compiled cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:48](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/stark.ts#L48)
+[src/utils/stark.ts:48](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/stark.ts#L48)
 
 ---
 
@@ -128,7 +128,7 @@ parsed decompressed compiled cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:61](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/stark.ts#L61)
+[src/utils/stark.ts:61](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/stark.ts#L61)
 
 ---
 
@@ -148,7 +148,7 @@ parsed decompressed compiled cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:65](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/stark.ts#L65)
+[src/utils/stark.ts:65](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/stark.ts#L65)
 
 ---
 
@@ -169,4 +169,4 @@ parsed decompressed compiled cairo program
 
 #### Defined in
 
-[src/utils/stark.ts:69](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/stark.ts#L69)
+[src/utils/stark.ts:69](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/stark.ts#L69)

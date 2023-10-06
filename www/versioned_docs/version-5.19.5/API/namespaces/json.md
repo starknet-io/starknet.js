@@ -24,7 +24,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/json.ts:12](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/json.ts#L12)
+[src/utils/json.ts:12](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/json.ts#L12)
 
 ---
 
@@ -44,7 +44,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/json.ts:13](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/json.ts#L13)
+[src/utils/json.ts:13](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/json.ts#L13)
 
 ---
 
@@ -67,7 +67,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/json.ts:18](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/json.ts#L18)
+[src/utils/json.ts:18](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/json.ts#L18)
 
 ---
 
@@ -94,4 +94,4 @@ equivalent to 'stringify', alias will be removed
 
 #### Defined in
 
-[src/utils/json.ts:18](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/json.ts#L18)
+[src/utils/json.ts:18](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/json.ts#L18)

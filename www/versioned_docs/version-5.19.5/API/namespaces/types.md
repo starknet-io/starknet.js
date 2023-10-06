@@ -70,7 +70,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:66](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L66)
+[src/types/api/sequencer.ts:66](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L66)
 
 ---
 
@@ -87,7 +87,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:73](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L73)
+[src/types/api/sequencer.ts:73](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L73)
 
 ---
 
@@ -111,7 +111,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:53](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L53)
+[src/types/api/sequencer.ts:53](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L53)
 
 ---
 
@@ -138,7 +138,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:38](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L38)
+[src/types/api/sequencer.ts:38](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L38)
 
 ---
 
@@ -155,7 +155,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:33](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L33)
+[src/types/api/sequencer.ts:33](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L33)
 
 ---
 
@@ -178,7 +178,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:21](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L21)
+[src/types/api/sequencer.ts:21](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L21)
 
 ---
 
@@ -188,7 +188,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:78](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L78)
+[src/types/api/sequencer.ts:78](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L78)
 
 ---
 
@@ -198,7 +198,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/account.ts:8](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/account.ts#L8)
+[src/types/account.ts:8](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/account.ts#L8)
 
 ---
 
@@ -216,7 +216,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/account.ts:10](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/account.ts#L10)
+[src/types/account.ts:10](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/account.ts#L10)
 
 ---
 
@@ -233,7 +233,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/account.ts:27](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/account.ts#L27)
+[src/types/account.ts:27](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/account.ts#L27)
 
 ---
 
@@ -257,7 +257,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/account.ts:32](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/account.ts#L32)
+[src/types/account.ts:32](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/account.ts#L32)
 
 ---
 
@@ -274,7 +274,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/account.ts:44](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/account.ts#L44)
+[src/types/account.ts:44](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/account.ts#L44)
 
 ---
 
@@ -293,7 +293,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/account.ts:51](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/account.ts#L51)
+[src/types/account.ts:51](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/account.ts#L51)
 
 ---
 
@@ -323,7 +323,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/contract.ts:11](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/contract.ts#L11)
+[src/types/contract.ts:11](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/contract.ts#L11)
 
 ---
 
@@ -347,7 +347,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/contract.ts:12](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/contract.ts#L12)
+[src/types/contract.ts:12](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/contract.ts#L12)
 
 ---
 
@@ -357,7 +357,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/contract.ts:14](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/contract.ts#L14)
+[src/types/contract.ts:14](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/contract.ts#L14)
 
 ---
 
@@ -367,7 +367,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/contract.ts:24](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/contract.ts#L24)
+[src/types/contract.ts:24](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/contract.ts#L24)
 
 ---
 
@@ -377,7 +377,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/contract.ts:25](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/contract.ts#L25)
+[src/types/contract.ts:25](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/contract.ts#L25)
 
 ---
 
@@ -400,7 +400,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/contract.ts:26](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/contract.ts#L26)
+[src/types/contract.ts:26](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/contract.ts#L26)
 
 ---
 
@@ -410,7 +410,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/contract.ts:37](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/contract.ts#L37)
+[src/types/contract.ts:37](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/contract.ts#L37)
 
 ---
 
@@ -420,7 +420,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/contract.ts:42](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/contract.ts#L42)
+[src/types/contract.ts:42](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/contract.ts#L42)
 
 ---
 
@@ -434,7 +434,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/contract.ts:47](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/contract.ts#L47)
+[src/types/contract.ts:47](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/contract.ts#L47)
 
 ---
 
@@ -444,7 +444,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/contract.ts:49](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/contract.ts#L49)
+[src/types/contract.ts:49](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/contract.ts#L49)
 
 ---
 
@@ -454,7 +454,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:6](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L6)
+[src/types/lib/index.ts:6](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L6)
 
 ---
 
@@ -464,7 +464,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:7](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L7)
+[src/types/lib/index.ts:7](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L7)
 
 ---
 
@@ -474,7 +474,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:8](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L8)
+[src/types/lib/index.ts:8](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L8)
 
 ---
 
@@ -484,7 +484,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/index.ts:10](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L10)
+[src/types/lib/index.ts:10](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L10)
 
 ---
 
@@ -497,7 +497,7 @@ decimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:16](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L16)
+[src/types/lib/index.ts:16](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L16)
 
 ---
 
@@ -510,7 +510,7 @@ use CallData.compile() to convert to Calldata
 
 #### Defined in
 
-[src/types/lib/index.ts:32](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L32)
+[src/types/lib/index.ts:32](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L32)
 
 ---
 
@@ -522,7 +522,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:37](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L37)
+[src/types/lib/index.ts:37](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L37)
 
 ---
 
@@ -538,7 +538,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:39](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L39)
+[src/types/lib/index.ts:39](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L39)
 
 ---
 
@@ -554,7 +554,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:41](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L41)
+[src/types/lib/index.ts:41](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L41)
 
 ---
 
@@ -564,7 +564,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:43](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L43)
+[src/types/lib/index.ts:43](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L43)
 
 ---
 
@@ -578,7 +578,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:45](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L45)
+[src/types/lib/index.ts:45](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L45)
 
 ---
 
@@ -588,7 +588,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:49](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L49)
+[src/types/lib/index.ts:49](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L49)
 
 ---
 
@@ -598,7 +598,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:51](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L51)
+[src/types/lib/index.ts:51](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L51)
 
 ---
 
@@ -617,7 +617,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:53](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L53)
+[src/types/lib/index.ts:53](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L53)
 
 ---
 
@@ -636,7 +636,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:60](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L60)
+[src/types/lib/index.ts:60](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L60)
 
 ---
 
@@ -646,7 +646,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:67](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L67)
+[src/types/lib/index.ts:67](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L67)
 
 ---
 
@@ -665,7 +665,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:74](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L74)
+[src/types/lib/index.ts:74](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L74)
 
 ---
 
@@ -684,7 +684,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:81](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L81)
+[src/types/lib/index.ts:81](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L81)
 
 ---
 
@@ -694,7 +694,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:88](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L88)
+[src/types/lib/index.ts:88](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L88)
 
 ---
 
@@ -713,7 +713,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:91](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L91)
+[src/types/lib/index.ts:91](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L91)
 
 ---
 
@@ -731,7 +731,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:98](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L98)
+[src/types/lib/index.ts:98](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L98)
 
 ---
 
@@ -741,7 +741,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:104](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L104)
+[src/types/lib/index.ts:104](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L104)
 
 ---
 
@@ -751,7 +751,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:106](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L106)
+[src/types/lib/index.ts:106](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L106)
 
 ---
 
@@ -761,7 +761,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:108](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L108)
+[src/types/lib/index.ts:108](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L108)
 
 ---
 
@@ -779,7 +779,7 @@ Hexadecimal-string array
 
 #### Defined in
 
-[src/types/lib/index.ts:110](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L110)
+[src/types/lib/index.ts:110](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L110)
 
 ---
 
@@ -800,7 +800,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:119](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L119)
+[src/types/lib/index.ts:119](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L119)
 
 ---
 
@@ -810,7 +810,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:126](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L126)
+[src/types/lib/index.ts:126](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L126)
 
 ---
 
@@ -820,7 +820,7 @@ Contain all additional details params
 
 #### Defined in
 
-[src/types/lib/index.ts:175](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L175)
+[src/types/lib/index.ts:175](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L175)
 
 ---
 
@@ -834,7 +834,7 @@ null appends nothing to the request url
 
 #### Defined in
 
-[src/types/lib/index.ts:182](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L182)
+[src/types/lib/index.ts:182](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L182)
 
 ---
 
@@ -846,7 +846,7 @@ items used by AccountInvocations
 
 #### Defined in
 
-[src/types/lib/index.ts:187](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L187)
+[src/types/lib/index.ts:187](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L187)
 
 ---
 
@@ -858,7 +858,7 @@ Complete invocations array with account details (internal type from account -> p
 
 #### Defined in
 
-[src/types/lib/index.ts:197](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L197)
+[src/types/lib/index.ts:197](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L197)
 
 ---
 
@@ -870,7 +870,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:202](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L202)
+[src/types/lib/index.ts:202](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L202)
 
 ---
 
@@ -887,7 +887,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:211](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L211)
+[src/types/lib/index.ts:211](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L211)
 
 ---
 
@@ -901,7 +901,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:213](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L213)
+[src/types/lib/index.ts:213](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L213)
 
 ---
 
@@ -915,7 +915,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:216](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L216)
+[src/types/lib/index.ts:216](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L216)
 
 ---
 
@@ -933,7 +933,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:220](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L220)
+[src/types/lib/index.ts:220](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L220)
 
 ---
 
@@ -952,7 +952,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:226](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L226)
+[src/types/lib/index.ts:226](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L226)
 
 ---
 
@@ -969,7 +969,7 @@ Invocations array user provide to bulk method (simulate)
 
 #### Defined in
 
-[src/types/lib/index.ts:233](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L233)
+[src/types/lib/index.ts:233](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L233)
 
 ---
 
@@ -982,7 +982,7 @@ CompressedCompiledContract
 
 #### Defined in
 
-[src/types/lib/contract/index.ts:9](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/index.ts#L9)
+[src/types/lib/contract/index.ts:9](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/index.ts#L9)
 
 ---
 
@@ -994,7 +994,7 @@ format produced after compile .cairo to .json
 
 #### Defined in
 
-[src/types/lib/contract/index.ts:14](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/index.ts#L14)
+[src/types/lib/contract/index.ts:14](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/index.ts#L14)
 
 ---
 
@@ -1006,7 +1006,7 @@ Compressed or decompressed Cairo0 or Cairo1 Contract
 
 #### Defined in
 
-[src/types/lib/contract/index.ts:19](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/index.ts#L19)
+[src/types/lib/contract/index.ts:19](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/index.ts#L19)
 
 ---
 
@@ -1018,7 +1018,7 @@ ABI
 
 #### Defined in
 
-[src/types/lib/contract/abi.ts:2](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L2)
+[src/types/lib/contract/abi.ts:2](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L2)
 
 ---
 
@@ -1035,7 +1035,7 @@ ABI
 
 #### Defined in
 
-[src/types/lib/contract/abi.ts:5](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L5)
+[src/types/lib/contract/abi.ts:5](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L5)
 
 ---
 
@@ -1053,7 +1053,7 @@ ABI
 
 #### Defined in
 
-[src/types/lib/contract/abi.ts:7](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L7)
+[src/types/lib/contract/abi.ts:7](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L7)
 
 ---
 
@@ -1074,7 +1074,7 @@ ABI
 
 #### Defined in
 
-[src/types/lib/contract/abi.ts:16](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L16)
+[src/types/lib/contract/abi.ts:16](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L16)
 
 ---
 
@@ -1088,7 +1088,7 @@ ABI
 
 #### Defined in
 
-[src/types/lib/contract/abi.ts:25](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L25)
+[src/types/lib/contract/abi.ts:25](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L25)
 
 ---
 
@@ -1107,7 +1107,7 @@ ABI
 
 #### Defined in
 
-[src/types/lib/contract/abi.ts:27](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L27)
+[src/types/lib/contract/abi.ts:27](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L27)
 
 ---
 
@@ -1121,7 +1121,7 @@ ABI
 
 #### Defined in
 
-[src/types/lib/contract/abi.ts:34](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L34)
+[src/types/lib/contract/abi.ts:34](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L34)
 
 ---
 
@@ -1140,7 +1140,7 @@ ABI
 
 #### Defined in
 
-[src/types/lib/contract/abi.ts:35](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L35)
+[src/types/lib/contract/abi.ts:35](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L35)
 
 ---
 
@@ -1154,7 +1154,7 @@ ABI
 
 #### Defined in
 
-[src/types/lib/contract/abi.ts:42](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L42)
+[src/types/lib/contract/abi.ts:42](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L42)
 
 ---
 
@@ -1164,7 +1164,7 @@ ABI
 
 #### Defined in
 
-[src/types/lib/contract/abi.ts:44](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L44)
+[src/types/lib/contract/abi.ts:44](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L44)
 
 ---
 
@@ -1183,7 +1183,7 @@ ABI
 
 #### Defined in
 
-[src/types/lib/contract/abi.ts:46](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L46)
+[src/types/lib/contract/abi.ts:46](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L46)
 
 ---
 
@@ -1202,7 +1202,7 @@ ABI
 
 #### Defined in
 
-[src/types/lib/contract/abi.ts:53](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L53)
+[src/types/lib/contract/abi.ts:53](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/abi.ts#L53)
 
 ---
 
@@ -1222,7 +1222,7 @@ format produced after compressing 'program' property
 
 #### Defined in
 
-[src/types/lib/contract/legacy.ts:7](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/legacy.ts#L7)
+[src/types/lib/contract/legacy.ts:7](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/legacy.ts#L7)
 
 ---
 
@@ -1234,7 +1234,7 @@ format produced after compile .cairo to .json
 
 #### Defined in
 
-[src/types/lib/contract/legacy.ts:16](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/legacy.ts#L16)
+[src/types/lib/contract/legacy.ts:16](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/legacy.ts#L16)
 
 ---
 
@@ -1246,7 +1246,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/legacy.ts:21](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/legacy.ts#L21)
+[src/types/lib/contract/legacy.ts:21](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/legacy.ts#L21)
 
 ---
 
@@ -1256,7 +1256,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/legacy.ts:22](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/legacy.ts#L22)
+[src/types/lib/contract/legacy.ts:22](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/legacy.ts#L22)
 
 ---
 
@@ -1274,7 +1274,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/legacy.ts:24](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/legacy.ts#L24)
+[src/types/lib/contract/legacy.ts:24](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/legacy.ts#L24)
 
 ---
 
@@ -1292,7 +1292,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/legacy.ts:30](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/legacy.ts#L30)
+[src/types/lib/contract/legacy.ts:30](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/legacy.ts#L30)
 
 ---
 
@@ -1315,7 +1315,7 @@ SYSTEM TYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:5](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/sierra.ts#L5)
+[src/types/lib/contract/sierra.ts:5](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/sierra.ts#L5)
 
 ---
 
@@ -1338,7 +1338,7 @@ sierra_program is hex array
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:19](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/sierra.ts#L19)
+[src/types/lib/contract/sierra.ts:19](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/sierra.ts#L19)
 
 ---
 
@@ -1351,7 +1351,7 @@ CompressedCompiledSierra
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:31](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/sierra.ts#L31)
+[src/types/lib/contract/sierra.ts:31](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/sierra.ts#L31)
 
 ---
 
@@ -1361,7 +1361,7 @@ CompressedCompiledSierra
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:35](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/sierra.ts#L35)
+[src/types/lib/contract/sierra.ts:35](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/sierra.ts#L35)
 
 ---
 
@@ -1373,7 +1373,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:38](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/sierra.ts#L38)
+[src/types/lib/contract/sierra.ts:38](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/sierra.ts#L38)
 
 ---
 
@@ -1383,7 +1383,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:39](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/sierra.ts#L39)
+[src/types/lib/contract/sierra.ts:39](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/sierra.ts#L39)
 
 ---
 
@@ -1401,7 +1401,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:41](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/sierra.ts#L41)
+[src/types/lib/contract/sierra.ts:41](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/sierra.ts#L41)
 
 ---
 
@@ -1419,7 +1419,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:47](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/sierra.ts#L47)
+[src/types/lib/contract/sierra.ts:47](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/sierra.ts#L47)
 
 ---
 
@@ -1436,7 +1436,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/lib/contract/sierra.ts:53](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/contract/sierra.ts#L53)
+[src/types/lib/contract/sierra.ts:53](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/contract/sierra.ts#L53)
 
 ---
 
@@ -1456,7 +1456,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/configuration.ts:9](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/provider/configuration.ts#L9)
+[src/types/provider/configuration.ts:9](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/provider/configuration.ts#L9)
 
 ---
 
@@ -1466,7 +1466,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/configuration.ts:17](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/provider/configuration.ts#L17)
+[src/types/provider/configuration.ts:17](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/provider/configuration.ts#L17)
 
 ---
 
@@ -1476,7 +1476,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/configuration.ts:19](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/provider/configuration.ts#L19)
+[src/types/provider/configuration.ts:19](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/provider/configuration.ts#L19)
 
 ---
 
@@ -1486,7 +1486,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:52](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L52)
+[src/types/provider/response.ts:52](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L52)
 
 ---
 
@@ -1505,7 +1505,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:93](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L93)
+[src/types/provider/response.ts:93](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L93)
 
 ---
 
@@ -1515,7 +1515,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:101](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L101)
+[src/types/provider/response.ts:101](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L101)
 
 ---
 
@@ -1525,7 +1525,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:106](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L106)
+[src/types/provider/response.ts:106](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L106)
 
 ---
 
@@ -1551,7 +1551,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:126](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L126)
+[src/types/provider/response.ts:126](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L126)
 
 ---
 
@@ -1561,7 +1561,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:140](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L140)
+[src/types/provider/response.ts:140](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L140)
 
 ---
 
@@ -1580,7 +1580,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:148](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L148)
+[src/types/provider/response.ts:148](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L148)
 
 ---
 
@@ -1607,7 +1607,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:156](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L156)
+[src/types/provider/response.ts:156](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L156)
 
 ---
 
@@ -1623,7 +1623,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:187](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L187)
+[src/types/provider/response.ts:187](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L187)
 
 ---
 
@@ -1633,7 +1633,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:191](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L191)
+[src/types/provider/response.ts:191](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L191)
 
 ---
 
@@ -1643,7 +1643,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:209](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L209)
+[src/types/provider/response.ts:209](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L209)
 
 ---
 
@@ -1653,7 +1653,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:211](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L211)
+[src/types/provider/response.ts:211](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L211)
 
 ---
 
@@ -1663,7 +1663,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:213](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L213)
+[src/types/provider/response.ts:213](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L213)
 
 ---
 
@@ -1673,7 +1673,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:215](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L215)
+[src/types/provider/response.ts:215](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L215)
 
 ---
 
@@ -1691,7 +1691,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:217](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L217)
+[src/types/provider/response.ts:217](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L217)
 
 ---
 
@@ -1701,7 +1701,7 @@ SUBTYPES
 
 #### Defined in
 
-[src/types/provider/response.ts:223](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L223)
+[src/types/provider/response.ts:223](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L223)
 
 ---
 
@@ -1716,7 +1716,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 #### Defined in
 
-[src/types/provider/response.ts:247](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L247)
+[src/types/provider/response.ts:247](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/provider/response.ts#L247)
 
 ---
 
@@ -1726,7 +1726,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 #### Defined in
 
-[src/types/signer.ts:25](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/signer.ts#L25)
+[src/types/signer.ts:25](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/signer.ts#L25)
 
 ---
 
@@ -1744,7 +1744,7 @@ CompiledSierra without '.sierra_program_debug_info'
 
 #### Defined in
 
-[src/types/typedData.ts:1](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/typedData.ts#L1)
+[src/types/typedData.ts:1](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/typedData.ts#L1)
 
 ---
 
@@ -1759,7 +1759,7 @@ standard.
 
 #### Defined in
 
-[src/types/typedData.ts:13](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/typedData.ts#L13)
+[src/types/typedData.ts:13](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/typedData.ts#L13)
 
 ---
 
@@ -1769,4 +1769,4 @@ standard.
 
 #### Defined in
 
-[src/types/cairoEnum.ts:3](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/cairoEnum.ts#L3)
+[src/types/cairoEnum.ts:3](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/cairoEnum.ts#L3)

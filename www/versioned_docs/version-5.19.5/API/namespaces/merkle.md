@@ -30,4 +30,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/merkle.ts:63](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/merkle.ts#L63)
+[src/utils/merkle.ts:63](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/merkle.ts#L63)

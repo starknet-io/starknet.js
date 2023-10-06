@@ -30,7 +30,7 @@ Re-exports [IS_BROWSER](constants.md#is_browser)
 
 #### Defined in
 
-[src/utils/encode.ts:6](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/encode.ts#L6)
+[src/utils/encode.ts:6](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/encode.ts#L6)
 
 ---
 
@@ -50,7 +50,7 @@ Re-exports [IS_BROWSER](constants.md#is_browser)
 
 #### Defined in
 
-[src/utils/encode.ts:10](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/encode.ts#L10)
+[src/utils/encode.ts:10](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/encode.ts#L10)
 
 ---
 
@@ -70,7 +70,7 @@ Re-exports [IS_BROWSER](constants.md#is_browser)
 
 #### Defined in
 
-[src/utils/encode.ts:14](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/encode.ts#L14)
+[src/utils/encode.ts:14](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/encode.ts#L14)
 
 ---
 
@@ -90,7 +90,7 @@ Re-exports [IS_BROWSER](constants.md#is_browser)
 
 #### Defined in
 
-[src/utils/encode.ts:18](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/encode.ts#L18)
+[src/utils/encode.ts:18](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/encode.ts#L18)
 
 ---
 
@@ -110,7 +110,7 @@ Re-exports [IS_BROWSER](constants.md#is_browser)
 
 #### Defined in
 
-[src/utils/encode.ts:22](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/encode.ts#L22)
+[src/utils/encode.ts:22](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/encode.ts#L22)
 
 ---
 
@@ -133,7 +133,7 @@ enc-utils is no dependency to avoid using `Buffer` which just works in node and 
 
 #### Defined in
 
-[src/utils/encode.ts:31](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/encode.ts#L31)
+[src/utils/encode.ts:31](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/encode.ts#L31)
 
 ---
 
@@ -153,7 +153,7 @@ enc-utils is no dependency to avoid using `Buffer` which just works in node and 
 
 #### Defined in
 
-[src/utils/encode.ts:35](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/encode.ts#L35)
+[src/utils/encode.ts:35](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/encode.ts#L35)
 
 ---
 
@@ -175,7 +175,7 @@ enc-utils is no dependency to avoid using `Buffer` which just works in node and 
 
 #### Defined in
 
-[src/utils/encode.ts:49](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/encode.ts#L49)
+[src/utils/encode.ts:49](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/encode.ts#L49)
 
 ---
 
@@ -196,7 +196,7 @@ enc-utils is no dependency to avoid using `Buffer` which just works in node and 
 
 #### Defined in
 
-[src/utils/encode.ts:53](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/encode.ts#L53)
+[src/utils/encode.ts:53](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/encode.ts#L53)
 
 ---
 
@@ -218,7 +218,7 @@ enc-utils is no dependency to avoid using `Buffer` which just works in node and 
 
 #### Defined in
 
-[src/utils/encode.ts:58](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/encode.ts#L58)
+[src/utils/encode.ts:58](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/encode.ts#L58)
 
 ---
 
@@ -238,7 +238,7 @@ enc-utils is no dependency to avoid using `Buffer` which just works in node and 
 
 #### Defined in
 
-[src/utils/encode.ts:62](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/encode.ts#L62)
+[src/utils/encode.ts:62](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/encode.ts#L62)
 
 ---
 
@@ -258,4 +258,4 @@ enc-utils is no dependency to avoid using `Buffer` which just works in node and 
 
 #### Defined in
 
-[src/utils/encode.ts:72](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/encode.ts#L72)
+[src/utils/encode.ts:72](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/encode.ts#L72)

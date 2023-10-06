@@ -20,7 +20,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/contractFactory.ts:46](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L46)
+[src/contract/contractFactory.ts:46](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L46)
 
 ## Properties
 
@@ -30,7 +30,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/contractFactory.ts:23](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L23)
+[src/contract/contractFactory.ts:23](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L23)
 
 ---
 
@@ -40,7 +40,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/contractFactory.ts:25](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L25)
+[src/contract/contractFactory.ts:25](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L25)
 
 ---
 
@@ -50,7 +50,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/contractFactory.ts:27](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L27)
+[src/contract/contractFactory.ts:27](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L27)
 
 ---
 
@@ -60,7 +60,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/contractFactory.ts:29](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L29)
+[src/contract/contractFactory.ts:29](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L29)
 
 ---
 
@@ -70,7 +70,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/contractFactory.ts:31](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L31)
+[src/contract/contractFactory.ts:31](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L31)
 
 ---
 
@@ -80,7 +80,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/contractFactory.ts:33](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L33)
+[src/contract/contractFactory.ts:33](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L33)
 
 ---
 
@@ -90,7 +90,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/contractFactory.ts:35](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L35)
+[src/contract/contractFactory.ts:35](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L35)
 
 ## Methods
 
@@ -115,7 +115,7 @@ deployed Contract
 
 #### Defined in
 
-[src/contract/contractFactory.ts:64](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L64)
+[src/contract/contractFactory.ts:64](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L64)
 
 ---
 
@@ -139,7 +139,7 @@ ContractFactory
 
 #### Defined in
 
-[src/contract/contractFactory.ts:105](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L105)
+[src/contract/contractFactory.ts:105](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L105)
 
 ---
 
@@ -163,4 +163,4 @@ Contract
 
 #### Defined in
 
-[src/contract/contractFactory.ts:116](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L116)
+[src/contract/contractFactory.ts:116](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L116)

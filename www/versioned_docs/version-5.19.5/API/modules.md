@@ -986,7 +986,7 @@ Re-exports [CairoEnum](namespaces/types.md#cairoenum)
 
 #### Defined in
 
-[src/contract/interface.ts:21](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/interface.ts#L21)
+[src/contract/interface.ts:21](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/interface.ts#L21)
 
 ---
 
@@ -1007,7 +1007,7 @@ Re-exports [CairoEnum](namespaces/types.md#cairoenum)
 
 #### Defined in
 
-[src/contract/contractFactory.ts:13](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L13)
+[src/contract/contractFactory.ts:13](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/contractFactory.ts#L13)
 
 ---
 
@@ -1021,7 +1021,7 @@ Re-exports [CairoEnum](namespaces/types.md#cairoenum)
 
 #### Defined in
 
-[src/utils/calldata/enum/CairoCustomEnum.ts:1](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoCustomEnum.ts#L1)
+[src/utils/calldata/enum/CairoCustomEnum.ts:1](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoCustomEnum.ts#L1)
 
 ## Variables
 
@@ -1035,7 +1035,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/index.ts:46](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/index.ts#L46)
+[src/index.ts:46](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/index.ts#L46)
 
 ---
 
@@ -1045,7 +1045,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/provider/index.ts:9](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/index.ts#L9)
+[src/provider/index.ts:9](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/index.ts#L9)
 
 ## Functions
 
@@ -1066,7 +1066,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/contract/default.ts:108](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/default.ts#L108)
+[src/contract/default.ts:108](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/default.ts#L108)
 
 ---
 
@@ -1086,7 +1086,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/contract/default.ts:35](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/default.ts#L35)
+[src/contract/default.ts:35](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/default.ts#L35)
 
 ---
 
@@ -1107,7 +1107,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/provider/errors.ts:2](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/errors.ts#L2)
+[src/provider/errors.ts:2](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/errors.ts#L2)
 
 ---
 
@@ -1128,7 +1128,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/provider/errors.ts:8](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/errors.ts#L8)
+[src/provider/errors.ts:8](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/errors.ts#L8)
 
 ---
 
@@ -1148,7 +1148,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/utils/address.ts:10](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/address.ts#L10)
+[src/utils/address.ts:10](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/address.ts#L10)
 
 ---
 
@@ -1168,7 +1168,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/utils/address.ts:14](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/address.ts#L14)
+[src/utils/address.ts:14](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/address.ts#L14)
 
 ---
 
@@ -1188,7 +1188,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/utils/address.ts:27](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/address.ts#L27)
+[src/utils/address.ts:27](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/address.ts#L27)
 
 ---
 
@@ -1208,7 +1208,7 @@ prefer the 'num' naming
 
 #### Defined in
 
-[src/utils/address.ts:44](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/address.ts#L44)
+[src/utils/address.ts:44](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/address.ts#L44)
 
 ---
 
@@ -1230,7 +1230,7 @@ Loosely validate a URL `string`.
 
 #### Defined in
 
-[src/utils/url.ts:22](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/url.ts#L22)
+[src/utils/url.ts:22](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/url.ts#L22)
 
 ---
 
@@ -1252,7 +1252,7 @@ Loosely validate a URL `string`.
 
 #### Defined in
 
-[src/utils/url.ts:51](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/url.ts#L51)
+[src/utils/url.ts:51](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/url.ts#L51)
 
 ---
 
@@ -1272,7 +1272,7 @@ contract is CompiledSierra \| SierraContractClass
 
 #### Defined in
 
-[src/utils/contract.ts:14](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/contract.ts#L14)
+[src/utils/contract.ts:14](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/contract.ts#L14)
 
 ---
 
@@ -1292,7 +1292,7 @@ contract is CompiledSierra \| SierraContractClass
 
 #### Defined in
 
-[src/utils/contract.ts:21](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/contract.ts#L21)
+[src/utils/contract.ts:21](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/contract.ts#L21)
 
 ---
 
@@ -1316,7 +1316,7 @@ LegacyCompiledContract
 
 #### Defined in
 
-[src/utils/contract.ts:48](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/contract.ts#L48)
+[src/utils/contract.ts:48](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/contract.ts#L48)
 
 ---
 
@@ -1353,4 +1353,4 @@ DeployContractResponse | UDC Event Response data
 
 #### Defined in
 
-[src/utils/events.ts:12](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/events.ts#L12)
+[src/utils/events.ts:12](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/events.ts#L12)

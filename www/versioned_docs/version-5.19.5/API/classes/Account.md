@@ -37,7 +37,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/account/default.ts:70](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L70)
+[src/account/default.ts:70](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L70)
 
 ## Properties
 
@@ -51,7 +51,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/account/default.ts:64](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L64)
+[src/account/default.ts:64](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L64)
 
 ---
 
@@ -65,7 +65,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/account/default.ts:66](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L66)
+[src/account/default.ts:66](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L66)
 
 ---
 
@@ -79,7 +79,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/account/default.ts:68](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L68)
+[src/account/default.ts:68](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L68)
 
 ---
 
@@ -104,7 +104,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/account/default.ts:423](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L423)
+[src/account/default.ts:423](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L423)
 
 ## Methods
 
@@ -132,7 +132,7 @@ nonce of the account
 
 #### Defined in
 
-[src/account/default.ts:86](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L86)
+[src/account/default.ts:86](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L86)
 
 ---
 
@@ -152,7 +152,7 @@ nonce of the account
 
 #### Defined in
 
-[src/account/default.ts:90](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L90)
+[src/account/default.ts:90](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L90)
 
 ---
 
@@ -173,7 +173,7 @@ nonce of the account
 
 #### Defined in
 
-[src/account/default.ts:99](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L99)
+[src/account/default.ts:99](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L99)
 
 ---
 
@@ -202,7 +202,7 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/default.ts:106](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L106)
+[src/account/default.ts:106](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L106)
 
 ---
 
@@ -231,7 +231,7 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/default.ts:140](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L140)
+[src/account/default.ts:140](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L140)
 
 ---
 
@@ -260,7 +260,7 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/default.ts:174](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L174)
+[src/account/default.ts:174](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L174)
 
 ---
 
@@ -288,7 +288,7 @@ This is different from the normal DEPLOY transaction as it goes through the Univ
 
 #### Defined in
 
-[src/account/default.ts:213](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L213)
+[src/account/default.ts:213](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L213)
 
 ---
 
@@ -318,7 +318,7 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/default.ts:221](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L221)
+[src/account/default.ts:221](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L221)
 
 ---
 
@@ -339,7 +339,7 @@ response from estimate_fee
 
 #### Defined in
 
-[src/account/default.ts:245](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L245)
+[src/account/default.ts:245](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L245)
 
 ---
 
@@ -369,7 +369,7 @@ response from addTransaction
 
 #### Defined in
 
-[src/account/default.ts:259](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L259)
+[src/account/default.ts:259](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L259)
 
 ---
 
@@ -396,7 +396,7 @@ DeclareContractResponse
 
 #### Defined in
 
-[src/account/default.ts:306](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L306)
+[src/account/default.ts:306](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L306)
 
 ---
 
@@ -425,7 +425,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/account/default.ts:322](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L322)
+[src/account/default.ts:322](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L322)
 
 ---
 
@@ -456,7 +456,7 @@ support multicall
 
 #### Defined in
 
-[src/account/default.ts:351](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L351)
+[src/account/default.ts:351](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L351)
 
 ---
 
@@ -494,7 +494,7 @@ Internal wait for L2 transaction, support multicall
 
 #### Defined in
 
-[src/account/default.ts:397](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L397)
+[src/account/default.ts:397](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L397)
 
 ---
 
@@ -536,7 +536,7 @@ Method will pass even if contract is already declared (internal using DeclareIfN
 
 #### Defined in
 
-[src/account/default.ts:406](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L406)
+[src/account/default.ts:406](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L406)
 
 ---
 
@@ -565,7 +565,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/account/default.ts:425](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L425)
+[src/account/default.ts:425](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L425)
 
 ---
 
@@ -598,7 +598,7 @@ the signature of the JSON object
 
 #### Defined in
 
-[src/account/default.ts:479](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L479)
+[src/account/default.ts:479](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L479)
 
 ---
 
@@ -631,7 +631,7 @@ the hash of the JSON object
 
 #### Defined in
 
-[src/account/default.ts:483](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L483)
+[src/account/default.ts:483](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L483)
 
 ---
 
@@ -668,7 +668,7 @@ true if the signature is valid, false otherwise
 
 #### Defined in
 
-[src/account/default.ts:487](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L487)
+[src/account/default.ts:487](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L487)
 
 ---
 
@@ -701,7 +701,7 @@ true if the signature is valid, false otherwise
 
 #### Defined in
 
-[src/account/default.ts:503](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L503)
+[src/account/default.ts:503](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L503)
 
 ---
 
@@ -730,7 +730,7 @@ suggestedMaxFee
 
 #### Defined in
 
-[src/account/default.ts:508](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L508)
+[src/account/default.ts:508](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L508)
 
 ---
 
@@ -753,7 +753,7 @@ will be renamed to buildDeclareContractTransaction
 
 #### Defined in
 
-[src/account/default.ts:542](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L542)
+[src/account/default.ts:542](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L542)
 
 ---
 
@@ -774,7 +774,7 @@ will be renamed to buildDeclareContractTransaction
 
 #### Defined in
 
-[src/account/default.ts:566](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L566)
+[src/account/default.ts:566](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L566)
 
 ---
 
@@ -794,7 +794,7 @@ will be renamed to buildDeclareContractTransaction
 
 #### Defined in
 
-[src/account/default.ts:599](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L599)
+[src/account/default.ts:599](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L599)
 
 ---
 
@@ -823,7 +823,7 @@ response from simulate_transaction
 
 #### Defined in
 
-[src/account/default.ts:626](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L626)
+[src/account/default.ts:626](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L626)
 
 ---
 
@@ -844,7 +844,7 @@ response from simulate_transaction
 
 #### Defined in
 
-[src/account/default.ts:643](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L643)
+[src/account/default.ts:643](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L643)
 
 ---
 
@@ -869,7 +869,7 @@ response from simulate_transaction
 
 #### Defined in
 
-[src/account/default.ts:711](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/account/default.ts#L711)
+[src/account/default.ts:711](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/account/default.ts#L711)
 
 ---
 
@@ -895,7 +895,7 @@ the chain Id
 
 #### Defined in
 
-[src/provider/default.ts:63](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L63)
+[src/provider/default.ts:63](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L63)
 
 ---
 
@@ -927,7 +927,7 @@ the block object
 
 #### Defined in
 
-[src/provider/default.ts:67](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L67)
+[src/provider/default.ts:67](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L67)
 
 ---
 
@@ -960,7 +960,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/default.ts:71](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L71)
+[src/provider/default.ts:71](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L71)
 
 ---
 
@@ -993,7 +993,7 @@ Class hash
 
 #### Defined in
 
-[src/provider/default.ts:78](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L78)
+[src/provider/default.ts:78](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L78)
 
 ---
 
@@ -1025,7 +1025,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/default.ts:85](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L85)
+[src/provider/default.ts:85](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L85)
 
 ---
 
@@ -1063,7 +1063,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:89](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L89)
+[src/provider/default.ts:89](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L89)
 
 ---
 
@@ -1098,7 +1098,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:97](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L97)
+[src/provider/default.ts:97](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L97)
 
 ---
 
@@ -1131,7 +1131,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:111](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L111)
+[src/provider/default.ts:111](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L111)
 
 ---
 
@@ -1164,7 +1164,7 @@ the hex nonce
 
 #### Defined in
 
-[src/provider/default.ts:118](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L118)
+[src/provider/default.ts:118](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L118)
 
 ---
 
@@ -1198,7 +1198,7 @@ the value of the storage variable
 
 #### Defined in
 
-[src/provider/default.ts:125](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L125)
+[src/provider/default.ts:125](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L125)
 
 ---
 
@@ -1230,7 +1230,7 @@ the transaction object { transaction_id, status, transaction, block_number?, blo
 
 #### Defined in
 
-[src/provider/default.ts:133](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L133)
+[src/provider/default.ts:133](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L133)
 
 ---
 
@@ -1262,7 +1262,7 @@ the transaction receipt object
 
 #### Defined in
 
-[src/provider/default.ts:137](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L137)
+[src/provider/default.ts:137](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L137)
 
 ---
 
@@ -1295,7 +1295,7 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[src/provider/default.ts:141](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L141)
+[src/provider/default.ts:141](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L141)
 
 ---
 
@@ -1332,7 +1332,7 @@ response from addTransaction
 
 #### Defined in
 
-[src/provider/default.ts:148](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L148)
+[src/provider/default.ts:148](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L148)
 
 ---
 
@@ -1365,7 +1365,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/default.ts:155](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L155)
+[src/provider/default.ts:155](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L155)
 
 ---
 
@@ -1398,7 +1398,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/default.ts:162](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L162)
+[src/provider/default.ts:162](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L162)
 
 ---
 
@@ -1433,7 +1433,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:169](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L169)
+[src/provider/default.ts:169](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L169)
 
 ---
 
@@ -1468,7 +1468,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:178](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L178)
+[src/provider/default.ts:178](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L178)
 
 ---
 
@@ -1501,7 +1501,7 @@ The method should not be used
 
 #### Defined in
 
-[src/provider/default.ts:192](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L192)
+[src/provider/default.ts:192](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L192)
 
 ---
 
@@ -1534,7 +1534,7 @@ GetTransactionReceiptResponse
 
 #### Defined in
 
-[src/provider/default.ts:199](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L199)
+[src/provider/default.ts:199](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L199)
 
 ---
 
@@ -1567,7 +1567,7 @@ an array of transaction trace and estimated fee
 
 #### Defined in
 
-[src/provider/default.ts:206](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L206)
+[src/provider/default.ts:206](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L206)
 
 ---
 
@@ -1599,7 +1599,7 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/default.ts:213](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L213)
+[src/provider/default.ts:213](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L213)
 
 ---
 
@@ -1624,4 +1624,4 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/default.ts:221](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/provider/default.ts#L221)
+[src/provider/default.ts:221](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/provider/default.ts#L221)

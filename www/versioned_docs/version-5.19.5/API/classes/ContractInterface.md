@@ -28,7 +28,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:24](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/interface.ts#L24)
+[src/contract/interface.ts:24](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/interface.ts#L24)
 
 ---
 
@@ -38,7 +38,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:26](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/interface.ts#L26)
+[src/contract/interface.ts:26](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/interface.ts#L26)
 
 ---
 
@@ -48,7 +48,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:28](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/interface.ts#L28)
+[src/contract/interface.ts:28](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/interface.ts#L28)
 
 ---
 
@@ -58,7 +58,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:30](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/interface.ts#L30)
+[src/contract/interface.ts:30](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/interface.ts#L30)
 
 ---
 
@@ -72,7 +72,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:32](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/interface.ts#L32)
+[src/contract/interface.ts:32](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/interface.ts#L32)
 
 ---
 
@@ -86,7 +86,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:34](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/interface.ts#L34)
+[src/contract/interface.ts:34](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/interface.ts#L34)
 
 ---
 
@@ -100,7 +100,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:36](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/interface.ts#L36)
+[src/contract/interface.ts:36](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/interface.ts#L36)
 
 ---
 
@@ -114,7 +114,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/contract/interface.ts:38](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/interface.ts#L38)
+[src/contract/interface.ts:38](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/interface.ts#L38)
 
 ## Methods
 
@@ -136,7 +136,7 @@ Saves the address of the contract deployed on network that will be used for inte
 
 #### Defined in
 
-[src/contract/interface.ts:47](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/interface.ts#L47)
+[src/contract/interface.ts:47](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/interface.ts#L47)
 
 ---
 
@@ -158,7 +158,7 @@ Attaches to new Provider or Account
 
 #### Defined in
 
-[src/contract/interface.ts:54](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/interface.ts#L54)
+[src/contract/interface.ts:54](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/interface.ts#L54)
 
 ---
 
@@ -180,7 +180,7 @@ Promise that resolves when contract is deployed on the network or when no deploy
 
 #### Defined in
 
-[src/contract/interface.ts:62](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/interface.ts#L62)
+[src/contract/interface.ts:62](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/interface.ts#L62)
 
 ---
 
@@ -206,7 +206,7 @@ Result of the call as an array with key value pars
 
 #### Defined in
 
-[src/contract/interface.ts:72](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/interface.ts#L72)
+[src/contract/interface.ts:72](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/interface.ts#L72)
 
 ---
 
@@ -232,7 +232,7 @@ Add Transaction Response
 
 #### Defined in
 
-[src/contract/interface.ts:86](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/interface.ts#L86)
+[src/contract/interface.ts:86](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/interface.ts#L86)
 
 ---
 
@@ -257,7 +257,7 @@ Estimates a method on a contract
 
 #### Defined in
 
-[src/contract/interface.ts:99](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/interface.ts#L99)
+[src/contract/interface.ts:99](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/interface.ts#L99)
 
 ---
 
@@ -282,7 +282,7 @@ Invocation object
 
 #### Defined in
 
-[src/contract/interface.ts:114](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/interface.ts#L114)
+[src/contract/interface.ts:114](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/interface.ts#L114)
 
 ---
 
@@ -306,7 +306,7 @@ Events parsed
 
 #### Defined in
 
-[src/contract/interface.ts:122](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/interface.ts#L122)
+[src/contract/interface.ts:122](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/interface.ts#L122)
 
 ---
 
@@ -330,7 +330,7 @@ TRUE if the contract comes from a Cairo1 contract
 
 #### Defined in
 
-[src/contract/interface.ts:133](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/interface.ts#L133)
+[src/contract/interface.ts:133](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/interface.ts#L133)
 
 ---
 
@@ -356,4 +356,4 @@ TRUE if the contract comes from a Cairo1 contract
 
 #### Defined in
 
-[src/contract/interface.ts:135](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/contract/interface.ts#L135)
+[src/contract/interface.ts:135](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/contract/interface.ts#L135)

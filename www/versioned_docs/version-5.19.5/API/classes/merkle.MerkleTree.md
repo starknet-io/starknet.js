@@ -21,7 +21,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/merkle.ts:11](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/merkle.ts#L11)
+[src/utils/merkle.ts:11](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/merkle.ts#L11)
 
 ## Properties
 
@@ -31,7 +31,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/merkle.ts:5](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/merkle.ts#L5)
+[src/utils/merkle.ts:5](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/merkle.ts#L5)
 
 ---
 
@@ -41,7 +41,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/merkle.ts:7](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/merkle.ts#L7)
+[src/utils/merkle.ts:7](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/merkle.ts#L7)
 
 ---
 
@@ -51,7 +51,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/merkle.ts:9](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/merkle.ts#L9)
+[src/utils/merkle.ts:9](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/merkle.ts#L9)
 
 ## Methods
 
@@ -72,7 +72,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/merkle.ts:34](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/merkle.ts#L34)
+[src/utils/merkle.ts:34](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/merkle.ts#L34)
 
 ---
 
@@ -92,7 +92,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/merkle.ts:16](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/merkle.ts#L16)
+[src/utils/merkle.ts:16](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/merkle.ts#L16)
 
 ---
 
@@ -114,4 +114,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/merkle.ts:39](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/merkle.ts#L39)
+[src/utils/merkle.ts:39](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/merkle.ts#L39)

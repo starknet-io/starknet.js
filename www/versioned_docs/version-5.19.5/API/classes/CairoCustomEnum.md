@@ -34,7 +34,7 @@ const myCairoEnum = new CairoCustomEnum( {Success: undefined, Warning: "0x7f32ea
 
 #### Defined in
 
-[src/utils/calldata/enum/CairoCustomEnum.ts:27](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoCustomEnum.ts#L27)
+[src/utils/calldata/enum/CairoCustomEnum.ts:27](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoCustomEnum.ts#L27)
 
 ## Properties
 
@@ -51,7 +51,7 @@ const successValue = myCairoEnum.variant.Success;
 
 #### Defined in
 
-[src/utils/calldata/enum/CairoCustomEnum.ts:22](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoCustomEnum.ts#L22)
+[src/utils/calldata/enum/CairoCustomEnum.ts:22](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoCustomEnum.ts#L22)
 
 ## Methods
 
@@ -67,7 +67,7 @@ the content of the valid variant of a Cairo custom Enum.
 
 #### Defined in
 
-[src/utils/calldata/enum/CairoCustomEnum.ts:45](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoCustomEnum.ts#L45)
+[src/utils/calldata/enum/CairoCustomEnum.ts:45](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoCustomEnum.ts#L45)
 
 ___
 
@@ -83,5 +83,5 @@ the name of the valid variant of a Cairo custom Enum.
 
 #### Defined in
 
-[src/utils/calldata/enum/CairoCustomEnum.ts:58](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoCustomEnum.ts#L58)
+[src/utils/calldata/enum/CairoCustomEnum.ts:58](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoCustomEnum.ts#L58)
 ```
