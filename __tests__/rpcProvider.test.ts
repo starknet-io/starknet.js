@@ -65,7 +65,7 @@ describeIfRpc('RPCProvider', () => {
   });
 
   test('getProtocolVersion - not implemented', async () => {
-    expect(rpcProvider.getProtocolVersion()).rejects.toThrow();
+    await expect(rpcProvider.getProtocolVersion()).rejects.toThrow();
   });
 
   test('getCode - not implemented', async () => {

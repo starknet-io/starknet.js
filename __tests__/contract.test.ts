@@ -79,7 +79,7 @@ describe('contract module', () => {
       });
 
       test('estimate gas fee for `mint` should fail when connected to the provider', async () => {
-        expect(erc20Contract.estimateFee.mint(wallet, ['10', '0'])).rejects.toThrow();
+        await expect(erc20Contract.estimateFee.mint(wallet, ['10', '0'])).rejects.toThrow();
       });
 
       test('read initial balance of that account', async () => {
@@ -286,7 +286,7 @@ describe('contract module', () => {
           recipient: wallet,
         })
       );
-      expect(contract.deployed()).resolves.not.toThrow();
+      await expect(contract.deployed()).resolves.not.toThrow();
     });
     test('attach new contract', async () => {
       const factory = new ContractFactory({ compiledContract: compiledErc20, classHash, account });
