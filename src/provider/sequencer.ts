@@ -12,6 +12,7 @@ import {
   CallContractResponse,
   CallL1Handler,
   ContractClassResponse,
+  ContractVersion,
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
@@ -34,11 +35,13 @@ import {
   TransactionExecutionStatus,
   TransactionFinalityStatus,
   TransactionType,
+  getContractVersionOptions,
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
 import { CallData } from '../utils/calldata';
+import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { isSierra } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
 import {
@@ -340,6 +343,41 @@ export class SequencerProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<CairoAssembly> {
     return this.fetchEndpoint('get_compiled_class_by_class_hash', { classHash, blockIdentifier });
+  }
+
+  public async getContractVersion(
+    contractAddress: string,
+    classHash?: undefined,
+    options?: getContractVersionOptions
+  ): Promise<ContractVersion>;
+  public async getContractVersion(
+    contractAddress: undefined,
+    classHash: string,
+    options?: getContractVersionOptions
+  ): Promise<ContractVersion>;
+
+  public async getContractVersion(
+    contractAddress?: string,
+    classHash?: string,
+    { blockIdentifier = this.blockIdentifier, compiler = true }: getContractVersionOptions = {}
+  ): Promise<ContractVersion> {
+    let contractClass;
+    if (contractAddress) {
+      contractClass = await this.getClassAt(contractAddress, blockIdentifier);
+    } else if (classHash) {
+      contractClass = await this.getClassByHash(classHash, blockIdentifier);
+    } else {
+      throw Error('getContractVersion require contractAddress or classHash');
+    }
+
+    if (isSierra(contractClass)) {
+      if (compiler) {
+        const abiTest = getAbiContractVersion(contractClass.abi);
+        return { cairo: '1', compiler: abiTest.compiler };
+      }
+      return { cairo: '1', compiler: undefined };
+    }
+    return { cairo: '0', compiler: '0' };
   }
 
   public async invokeFunction(

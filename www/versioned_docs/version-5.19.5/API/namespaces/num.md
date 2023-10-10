@@ -30,7 +30,7 @@ Re-exports [BigNumberish](types.md#bignumberish)
 
 #### Defined in
 
-[src/utils/num.ts:10](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/num.ts#L10)
+[src/utils/num.ts:10](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/num.ts#L10)
 
 ---
 
@@ -50,7 +50,7 @@ Re-exports [BigNumberish](types.md#bignumberish)
 
 #### Defined in
 
-[src/utils/num.ts:14](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/num.ts#L14)
+[src/utils/num.ts:14](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/num.ts#L14)
 
 ---
 
@@ -70,7 +70,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:18](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/num.ts#L18)
+[src/utils/num.ts:18](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/num.ts#L18)
 
 ---
 
@@ -90,7 +90,7 @@ value is bigint
 
 #### Defined in
 
-[src/utils/num.ts:22](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/num.ts#L22)
+[src/utils/num.ts:22](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/num.ts#L22)
 
 ---
 
@@ -115,7 +115,7 @@ A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
 
 #### Defined in
 
-[src/utils/num.ts:33](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/num.ts#L33)
+[src/utils/num.ts:33](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/num.ts#L33)
 
 ---
 
@@ -135,7 +135,7 @@ A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
 
 #### Defined in
 
-[src/utils/num.ts:38](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/num.ts#L38)
+[src/utils/num.ts:38](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/num.ts#L38)
 
 ---
 
@@ -158,7 +158,7 @@ A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
 
 #### Defined in
 
-[src/utils/num.ts:54](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/num.ts#L54)
+[src/utils/num.ts:54](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/num.ts#L54)
 
 ---
 
@@ -178,7 +178,7 @@ A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
 
 #### Defined in
 
-[src/utils/num.ts:71](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/num.ts#L71)
+[src/utils/num.ts:71](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/num.ts#L71)
 
 ---
 
@@ -198,7 +198,7 @@ A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
 
 #### Defined in
 
-[src/utils/num.ts:75](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/num.ts#L75)
+[src/utils/num.ts:75](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/num.ts#L75)
 
 ---
 
@@ -218,7 +218,7 @@ A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
 
 #### Defined in
 
-[src/utils/num.ts:82](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/num.ts#L82)
+[src/utils/num.ts:82](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/num.ts#L82)
 
 ---
 
@@ -238,7 +238,7 @@ A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
 
 #### Defined in
 
-[src/utils/num.ts:92](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/num.ts#L92)
+[src/utils/num.ts:92](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/num.ts#L92)
 
 ---
 
@@ -258,7 +258,7 @@ A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
 
 #### Defined in
 
-[src/utils/num.ts:102](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/num.ts#L102)
+[src/utils/num.ts:102](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/num.ts#L102)
 
 ---
 
@@ -282,7 +282,7 @@ an array of Bytes
 
 #### Defined in
 
-[src/utils/num.ts:113](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/num.ts#L113)
+[src/utils/num.ts:113](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/num.ts#L113)
 
 ---
 
@@ -304,7 +304,7 @@ Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
 
 #### Defined in
 
-[src/utils/num.ts:46](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/num.ts#L46)
+[src/utils/num.ts:46](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/num.ts#L46)
 
 ---
 
@@ -324,7 +324,7 @@ Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
 
 #### Defined in
 
-[src/utils/num.ts:79](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/num.ts#L79)
+[src/utils/num.ts:79](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/num.ts#L79)
 
 ---
 
@@ -344,7 +344,7 @@ Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
 
 #### Defined in
 
-[src/utils/num.ts:80](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/num.ts#L80)
+[src/utils/num.ts:80](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/num.ts#L80)
 
 ---
 
@@ -364,4 +364,4 @@ Remove hex string leading zero and lower case '0x01A'.. -> '0x1a..'
 
 #### Defined in
 
-[src/utils/num.ts:106](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/num.ts#L106)
+[src/utils/num.ts:106](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/num.ts#L106)

@@ -1,4 +1,13 @@
-import { Abi, AbiEnums, AbiStructs, BigNumberish, Litteral, Uint, Uint256 } from '../../types';
+import {
+  Abi,
+  AbiEnums,
+  AbiStructs,
+  BigNumberish,
+  ContractVersion,
+  Litteral,
+  Uint,
+  Uint256,
+} from '../../types';
 import { isBigInt, isHex, isStringWholeNumber } from '../num';
 import { encodeShortString, isShortString, isText } from '../shortString';
 import { UINT_128_MAX, isUint256 } from '../uint256';
@@ -42,21 +51,38 @@ export const getArrayType = (type: string) => {
  * ```
  */
 export function isCairo1Abi(abi: Abi): boolean {
-  const firstFunction = abi.find((entry) => entry.type === 'function');
-  if (!firstFunction) {
-    if (abi.find((it) => it.type === 'interface')) {
-      // Expected in Cairo1 version 2
-      return true;
-    }
-    throw new Error(`Error in ABI. No function in ABI.`);
+  const { cairo } = getAbiContractVersion(abi);
+  if (cairo === undefined) {
+    throw Error('Unable to determine Cairo version');
   }
-  if (firstFunction.inputs.length) {
-    return isCairo1Type(firstFunction.inputs[0].type);
+  return cairo === '1';
+}
+
+/**
+ * Return ContractVersion (Abi version) based on Abi
+ * or undefined for unknown version
+ * @param abi
+ * @returns string
+ */
+export function getAbiContractVersion(abi: Abi): ContractVersion {
+  // determine by interface for "Cairo 1.2"
+  if (abi.find((it) => it.type === 'interface')) {
+    return { cairo: '1', compiler: '2' };
   }
-  if (firstFunction.outputs.length) {
-    return isCairo1Type(firstFunction.outputs[0].type);
+
+  // determine by function io types "Cairo 1.1" or "Cairo 0.0"
+  // find first function with inputs or outputs
+  const testFunction = abi.find(
+    (it) => it.type === 'function' && (it.inputs.length || it.outputs.length)
+  );
+  if (!testFunction) {
+    return { cairo: undefined, compiler: undefined };
   }
-  throw new Error(`Error in ABI. No input/output in function ${firstFunction.name}`);
+  const io = testFunction.inputs.length ? testFunction.inputs : testFunction.outputs;
+  if (isCairo1Type(io[0].type)) {
+    return { cairo: '1', compiler: '1' };
+  }
+  return { cairo: '0', compiler: '0' };
 }
 
 /**

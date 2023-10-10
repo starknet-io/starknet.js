@@ -65,9 +65,9 @@ Additional helpful resources can also be found at <ins>[OpenZeppelin](https://do
 
 ## Full example with account & erc20 deployments
 
-Please take a look at our workshop using OpenZeppelin contracts <ins>[here](https://github.com/0xs34n/starknet.js-workshop)</ins>.
+Please take a look at our workshop using OpenZeppelin contracts <ins>[here](https://github.com/starknet-io/starknet.js-workshop)</ins>.
 
-Example with the Argent contract <ins>[here](https://github.com/0xs34n/starknet.js-account)</ins>.
+Example with the Argent contract <ins>[here](https://github.com/starknet-io/starknet.js-account)</ins>.
 
 ## Contracts used in the guides
 

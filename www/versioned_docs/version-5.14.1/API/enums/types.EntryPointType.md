@@ -15,7 +15,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/contract/index.ts:23](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/types/lib/contract/index.ts#L23)
+[src/types/lib/contract/index.ts:23](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/types/lib/contract/index.ts#L23)
 
 ---
 
@@ -25,7 +25,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/contract/index.ts:24](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/types/lib/contract/index.ts#L24)
+[src/types/lib/contract/index.ts:24](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/types/lib/contract/index.ts#L24)
 
 ---
 
@@ -35,4 +35,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/lib/contract/index.ts:25](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/types/lib/contract/index.ts#L25)
+[src/types/lib/contract/index.ts:25](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/types/lib/contract/index.ts#L25)

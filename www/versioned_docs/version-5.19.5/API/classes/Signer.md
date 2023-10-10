@@ -24,7 +24,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/signer/default.ts:26](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/signer/default.ts#L26)
+[src/signer/default.ts:26](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/signer/default.ts#L26)
 
 ## Properties
 
@@ -34,7 +34,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/signer/default.ts:24](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/signer/default.ts#L24)
+[src/signer/default.ts:24](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/signer/default.ts#L24)
 
 ## Methods
 
@@ -56,7 +56,7 @@ public key of signer as hex string with 0x prefix
 
 #### Defined in
 
-[src/signer/default.ts:30](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/signer/default.ts#L30)
+[src/signer/default.ts:30](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/signer/default.ts#L30)
 
 ---
 
@@ -90,7 +90,7 @@ the signature of the JSON object
 
 #### Defined in
 
-[src/signer/default.ts:34](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/signer/default.ts#L34)
+[src/signer/default.ts:34](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/signer/default.ts#L34)
 
 ---
 
@@ -120,7 +120,7 @@ signature
 
 #### Defined in
 
-[src/signer/default.ts:39](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/signer/default.ts#L39)
+[src/signer/default.ts:39](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/signer/default.ts#L39)
 
 ---
 
@@ -148,7 +148,7 @@ signature
 
 #### Defined in
 
-[src/signer/default.ts:63](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/signer/default.ts#L63)
+[src/signer/default.ts:63](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/signer/default.ts#L63)
 
 ---
 
@@ -176,4 +176,4 @@ signature
 
 #### Defined in
 
-[src/signer/default.ts:87](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/signer/default.ts#L87)
+[src/signer/default.ts:87](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/signer/default.ts#L87)

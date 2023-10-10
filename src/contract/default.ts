@@ -342,6 +342,10 @@ export class Contract implements ContractInterface {
     return cairo.isCairo1Abi(this.abi);
   }
 
+  public async getVersion() {
+    return this.providerOrAccount.getContractVersion(this.address);
+  }
+
   public typed<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContract<TAbi> {
     return this as TypedContract<typeof tAbi>;
   }

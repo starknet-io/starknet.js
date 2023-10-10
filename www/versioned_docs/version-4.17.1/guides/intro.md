@@ -58,6 +58,6 @@ Get the class hash of a contract: [starkli](https://github.com/xJonathanLEI/star
 
 ## Full example with account & erc20 deployments
 
-Please take a look at our workshop using OpenZeppelin contracts <ins>[here](https://github.com/0xs34n/starknet.js-workshop)</ins>.
+Please take a look at our workshop using OpenZeppelin contracts <ins>[here](https://github.com/starknet-io/starknet.js-workshop)</ins>.
 
-Example with Argent contract <ins>[here](https://github.com/0xs34n/starknet.js-account)</ins>.
+Example with Argent contract <ins>[here](https://github.com/starknet-io/starknet.js-account)</ins>.

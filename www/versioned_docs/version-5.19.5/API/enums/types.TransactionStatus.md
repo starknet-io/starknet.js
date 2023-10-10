@@ -18,7 +18,7 @@ to be #deprecated
 
 #### Defined in
 
-[src/types/lib/index.ts:142](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L142)
+[src/types/lib/index.ts:142](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L142)
 
 ---
 
@@ -28,7 +28,7 @@ to be #deprecated
 
 #### Defined in
 
-[src/types/lib/index.ts:143](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L143)
+[src/types/lib/index.ts:143](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L143)
 
 ---
 
@@ -38,7 +38,7 @@ to be #deprecated
 
 #### Defined in
 
-[src/types/lib/index.ts:144](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L144)
+[src/types/lib/index.ts:144](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L144)
 
 ---
 
@@ -48,7 +48,7 @@ to be #deprecated
 
 #### Defined in
 
-[src/types/lib/index.ts:145](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L145)
+[src/types/lib/index.ts:145](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L145)
 
 ---
 
@@ -58,7 +58,7 @@ to be #deprecated
 
 #### Defined in
 
-[src/types/lib/index.ts:146](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L146)
+[src/types/lib/index.ts:146](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L146)
 
 ---
 
@@ -68,4 +68,4 @@ to be #deprecated
 
 #### Defined in
 
-[src/types/lib/index.ts:147](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L147)
+[src/types/lib/index.ts:147](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/lib/index.ts#L147)

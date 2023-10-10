@@ -14,7 +14,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/calldata/enum/CairoOption.ts:2](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoOption.ts#L2)
+[src/utils/calldata/enum/CairoOption.ts:2](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoOption.ts#L2)
 
 ---
 
@@ -24,4 +24,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/calldata/enum/CairoOption.ts:3](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoOption.ts#L3)
+[src/utils/calldata/enum/CairoOption.ts:3](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoOption.ts#L3)

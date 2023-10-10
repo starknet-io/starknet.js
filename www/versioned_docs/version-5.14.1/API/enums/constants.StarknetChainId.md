@@ -15,7 +15,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/constants.ts:21](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/constants.ts#L21)
+[src/constants.ts:21](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/constants.ts#L21)
 
 ---
 
@@ -25,7 +25,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/constants.ts:22](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/constants.ts#L22)
+[src/constants.ts:22](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/constants.ts#L22)
 
 ---
 
@@ -35,4 +35,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/constants.ts:23](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/constants.ts#L23)
+[src/constants.ts:23](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/constants.ts#L23)
