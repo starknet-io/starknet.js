@@ -1,3 +1,9 @@
+## [5.21.1](https://github.com/starknet-io/starknet.js/compare/v5.21.0...v5.21.1) (2023-10-16)
+
+### Bug Fixes
+
+- naming for new rpc only devnet DEFAULT_TEST_PROVIDER_URL ([c844d41](https://github.com/starknet-io/starknet.js/commit/c844d41689759d6d2615602eddef2c7108380139))
+
 # [5.21.0](https://github.com/starknet-io/starknet.js/compare/v5.20.0...v5.21.0) (2023-10-03)
 
 ### Bug Fixes
