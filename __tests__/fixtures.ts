@@ -49,10 +49,10 @@ export const compiledC210 = readContractSierra('cairo/cairo210/cairo210.sierra')
 export const compiledC210Casm = readContractSierraCasm('cairo/cairo210/cairo210');
 
 /* Default test config based on run `starknet-devnet --seed 0` */
-const DEFAULT_TEST_PROVIDER_SEQUENCER_URL = 'http://127.0.0.1:5050/';
+const DEFAULT_TEST_PROVIDER_URL = 'http://127.0.0.1:5050/';
 
 /* User defined config or default one */
-const BASE_URL = process.env.TEST_PROVIDER_BASE_URL || DEFAULT_TEST_PROVIDER_SEQUENCER_URL;
+const BASE_URL = process.env.TEST_PROVIDER_BASE_URL || DEFAULT_TEST_PROVIDER_URL;
 const RPC_URL = process.env.TEST_RPC_URL;
 
 /* Detect user defined node or sequencer, if none default to sequencer if both default to node */
