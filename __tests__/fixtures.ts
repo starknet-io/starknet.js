@@ -49,18 +49,21 @@ export const compiledC210 = readContractSierra('cairo/cairo210/cairo210.sierra')
 export const compiledC210Casm = readContractSierraCasm('cairo/cairo210/cairo210');
 
 /* Default test config based on run `starknet-devnet --seed 0` */
-const DEFAULT_TEST_PROVIDER_SEQUENCER_URL = 'http://127.0.0.1:5050/';
+const DEFAULT_TEST_PROVIDER_URL = 'http://127.0.0.1:5050/';
 
 /* User defined config or default one */
-const BASE_URL = process.env.TEST_PROVIDER_BASE_URL || DEFAULT_TEST_PROVIDER_SEQUENCER_URL;
+const BASE_URL = process.env.TEST_PROVIDER_BASE_URL || DEFAULT_TEST_PROVIDER_URL;
 const RPC_URL = process.env.TEST_RPC_URL;
 
 /* Detect user defined node or sequencer, if none default to sequencer if both default to node */
 const PROVIDER_URL = RPC_URL || BASE_URL;
 
-/* Detect is localhost devnet */
+/** explicit is local devnet (undefined,'','1','true','TRUE') = true else false */
+const LOCAL_DEVNET = ['1', 'TRUE', ''].includes((process.env.LOCAL_DEVNET || '').toUpperCase());
+
+/* Detect is localhost devnet, it can be also localhost RPC node */
 export const IS_LOCALHOST_DEVNET =
-  PROVIDER_URL.includes('localhost') || PROVIDER_URL.includes('127.0.0.1');
+  LOCAL_DEVNET && (PROVIDER_URL.includes('localhost') || PROVIDER_URL.includes('127.0.0.1'));
 
 export const IS_DEVNET_RPC = IS_LOCALHOST_DEVNET && PROVIDER_URL.includes('rpc');
 export const IS_DEVNET_SEQUENCER = IS_LOCALHOST_DEVNET && !PROVIDER_URL.includes('rpc');
