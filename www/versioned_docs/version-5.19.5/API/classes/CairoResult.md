@@ -51,7 +51,7 @@ const myOption = new CairoResult<BigNumberish,CustomError>(CairoResultVariant.Ok
 
 #### Defined in
 
-[src/utils/calldata/enum/CairoResult.ts:20](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoResult.ts#L20)
+[src/utils/calldata/enum/CairoResult.ts:20](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoResult.ts#L20)
 
 ## Properties
 
@@ -61,7 +61,7 @@ const myOption = new CairoResult<BigNumberish,CustomError>(CairoResultVariant.Ok
 
 #### Defined in
 
-[src/utils/calldata/enum/CairoResult.ts:16](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoResult.ts#L16)
+[src/utils/calldata/enum/CairoResult.ts:16](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoResult.ts#L16)
 
 ---
 
@@ -71,7 +71,7 @@ const myOption = new CairoResult<BigNumberish,CustomError>(CairoResultVariant.Ok
 
 #### Defined in
 
-[src/utils/calldata/enum/CairoResult.ts:18](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoResult.ts#L18)
+[src/utils/calldata/enum/CairoResult.ts:18](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoResult.ts#L18)
 
 ## Methods
 
@@ -87,7 +87,7 @@ the content of the valid variant of a Cairo Result.
 
 #### Defined in
 
-[src/utils/calldata/enum/CairoResult.ts:37](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoResult.ts#L37)
+[src/utils/calldata/enum/CairoResult.ts:37](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoResult.ts#L37)
 
 ---
 
@@ -103,7 +103,7 @@ true if the valid variant is 'Ok'.
 
 #### Defined in
 
-[src/utils/calldata/enum/CairoResult.ts:51](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoResult.ts#L51)
+[src/utils/calldata/enum/CairoResult.ts:51](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoResult.ts#L51)
 
 ---
 
@@ -119,4 +119,4 @@ true if the valid variant is 'isErr'.
 
 #### Defined in
 
-[src/utils/calldata/enum/CairoResult.ts:59](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoResult.ts#L59)
+[src/utils/calldata/enum/CairoResult.ts:59](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/calldata/enum/CairoResult.ts#L59)

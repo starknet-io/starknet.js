@@ -71,7 +71,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:81](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L81)
+[src/types/api/sequencer.ts:81](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L81)
 
 ---
 
@@ -94,7 +94,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:89](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L89)
+[src/types/api/sequencer.ts:89](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L89)
 
 ---
 
@@ -114,7 +114,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:100](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L100)
+[src/types/api/sequencer.ts:100](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L100)
 
 ---
 
@@ -137,7 +137,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:108](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L108)
+[src/types/api/sequencer.ts:108](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L108)
 
 ---
 
@@ -160,7 +160,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:119](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L119)
+[src/types/api/sequencer.ts:119](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L119)
 
 ---
 
@@ -170,7 +170,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:130](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L130)
+[src/types/api/sequencer.ts:130](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L130)
 
 ---
 
@@ -189,7 +189,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:136](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L136)
+[src/types/api/sequencer.ts:136](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L136)
 
 ---
 
@@ -206,7 +206,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:143](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L143)
+[src/types/api/sequencer.ts:143](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L143)
 
 ---
 
@@ -216,7 +216,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:153](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L153)
+[src/types/api/sequencer.ts:153](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L153)
 
 ---
 
@@ -238,7 +238,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:158](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L158)
+[src/types/api/sequencer.ts:158](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L158)
 
 ---
 
@@ -261,7 +261,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:168](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L168)
+[src/types/api/sequencer.ts:168](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L168)
 
 ---
 
@@ -281,7 +281,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:179](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L179)
+[src/types/api/sequencer.ts:179](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L179)
 
 ---
 
@@ -291,7 +291,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:188](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L188)
+[src/types/api/sequencer.ts:188](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L188)
 
 ---
 
@@ -301,7 +301,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:193](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L193)
+[src/types/api/sequencer.ts:193](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L193)
 
 ---
 
@@ -327,7 +327,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:198](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L198)
+[src/types/api/sequencer.ts:198](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L198)
 
 ---
 
@@ -353,7 +353,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:212](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L212)
+[src/types/api/sequencer.ts:212](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L212)
 
 ---
 
@@ -377,7 +377,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:226](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L226)
+[src/types/api/sequencer.ts:226](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L226)
 
 ---
 
@@ -403,7 +403,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:239](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L239)
+[src/types/api/sequencer.ts:239](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L239)
 
 ---
 
@@ -413,7 +413,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:268](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L268)
+[src/types/api/sequencer.ts:268](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L268)
 
 ---
 
@@ -429,7 +429,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:284](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L284)
+[src/types/api/sequencer.ts:284](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L284)
 
 ---
 
@@ -439,7 +439,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:288](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L288)
+[src/types/api/sequencer.ts:288](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L288)
 
 ---
 
@@ -449,7 +449,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:289](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L289)
+[src/types/api/sequencer.ts:289](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L289)
 
 ---
 
@@ -459,7 +459,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:290](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L290)
+[src/types/api/sequencer.ts:290](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L290)
 
 ---
 
@@ -469,7 +469,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:291](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L291)
+[src/types/api/sequencer.ts:291](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L291)
 
 ---
 
@@ -486,7 +486,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:293](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L293)
+[src/types/api/sequencer.ts:293](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L293)
 
 ---
 
@@ -496,7 +496,7 @@ Re-exports [SequencerIdentifier](types.md#sequenceridentifier)
 
 #### Defined in
 
-[src/types/api/sequencer.ts:298](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L298)
+[src/types/api/sequencer.ts:298](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L298)
 
 ---
 
@@ -508,7 +508,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:307](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L307)
+[src/types/api/sequencer.ts:307](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L307)
 
 ---
 
@@ -518,7 +518,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:310](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L310)
+[src/types/api/sequencer.ts:310](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L310)
 
 ---
 
@@ -528,7 +528,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:322](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L322)
+[src/types/api/sequencer.ts:322](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L322)
 
 ---
 
@@ -544,7 +544,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:324](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L324)
+[src/types/api/sequencer.ts:324](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L324)
 
 ---
 
@@ -554,7 +554,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:328](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L328)
+[src/types/api/sequencer.ts:328](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L328)
 
 ---
 
@@ -579,7 +579,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:330](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L330)
+[src/types/api/sequencer.ts:330](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L330)
 
 ---
 
@@ -593,7 +593,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:344](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L344)
+[src/types/api/sequencer.ts:344](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L344)
 
 ---
 
@@ -610,7 +610,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:346](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L346)
+[src/types/api/sequencer.ts:346](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L346)
 
 ---
 
@@ -624,7 +624,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:348](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L348)
+[src/types/api/sequencer.ts:348](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L348)
 
 ---
 
@@ -634,7 +634,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:350](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L350)
+[src/types/api/sequencer.ts:350](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L350)
 
 ---
 
@@ -644,7 +644,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:352](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L352)
+[src/types/api/sequencer.ts:352](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L352)
 
 ---
 
@@ -654,7 +654,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:354](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L354)
+[src/types/api/sequencer.ts:354](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L354)
 
 ---
 
@@ -664,7 +664,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:356](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L356)
+[src/types/api/sequencer.ts:356](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L356)
 
 ---
 
@@ -681,7 +681,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:358](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L358)
+[src/types/api/sequencer.ts:358](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L358)
 
 ---
 
@@ -691,7 +691,7 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:360](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L360)
+[src/types/api/sequencer.ts:360](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L360)
 
 ---
 
@@ -821,4 +821,4 @@ Transaction filled with account data
 
 #### Defined in
 
-[src/types/api/sequencer.ts:362](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L362)
+[src/types/api/sequencer.ts:362](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L362)

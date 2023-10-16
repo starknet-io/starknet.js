@@ -1,4 +1,4 @@
-This API is based on the <ins>[Starknet.js V3](https://github.com/0xs34n/starknet.js/discussions/102)</ins> Interface write up by <ins>[Janek](https://twitter.com/0xjanek)</ins> of <ins>[Argent](https://www.argent.xyz/)</ins>
+This API is based on the <ins>[Starknet.js V3](https://github.com/starknet-io/starknet.js/discussions/102)</ins> Interface write up by <ins>[Janek](https://twitter.com/0xjanek)</ins> of <ins>[Argent](https://www.argent.xyz/)</ins>
 
 ## Provider
 
@@ -10,9 +10,9 @@ Guide is [**here**](../guides/connect_network.md).
 
 ## Account
 
-An Account extends <ins>[`Provider`](/docs/API/provider)</ins> and inherits all of its methods.
+An Account extends <ins>[`Provider`](./classes/Provider)</ins> and inherits all of its methods.
 
-It also introduces new methods that allow Accounts to create and verify signatures with a custom <ins>[`Signer`](/docs/API/signer)</ins>, declare and deploy Contract and deploy new Account
+It also introduces new methods that allow Accounts to create and verify signatures with a custom <ins>[`Signer`](./classes/Signer)</ins>, declare and deploy Contract and deploy new Account
 
 This [**API**](./classes/Account.md) is the primary way to interact with an account contract on Starknet.
 

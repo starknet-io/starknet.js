@@ -21,7 +21,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:149](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L149)
+[src/types/api/sequencer.ts:149](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L149)
 
 ---
 
@@ -31,7 +31,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/sequencer.ts:150](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L150)
+[src/types/api/sequencer.ts:150](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L150)
 
 ---
 
@@ -45,7 +45,7 @@ InvokeFunctionTransaction.type
 
 #### Defined in
 
-[src/types/api/sequencer.ts:120](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L120)
+[src/types/api/sequencer.ts:120](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L120)
 
 ---
 
@@ -59,7 +59,7 @@ InvokeFunctionTransaction.sender_address
 
 #### Defined in
 
-[src/types/api/sequencer.ts:121](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L121)
+[src/types/api/sequencer.ts:121](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L121)
 
 ---
 
@@ -73,7 +73,7 @@ InvokeFunctionTransaction.signature
 
 #### Defined in
 
-[src/types/api/sequencer.ts:122](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L122)
+[src/types/api/sequencer.ts:122](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L122)
 
 ---
 
@@ -87,7 +87,7 @@ InvokeFunctionTransaction.entry_point_type
 
 #### Defined in
 
-[src/types/api/sequencer.ts:123](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L123)
+[src/types/api/sequencer.ts:123](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L123)
 
 ---
 
@@ -101,7 +101,7 @@ InvokeFunctionTransaction.calldata
 
 #### Defined in
 
-[src/types/api/sequencer.ts:124](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L124)
+[src/types/api/sequencer.ts:124](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L124)
 
 ---
 
@@ -115,7 +115,7 @@ InvokeFunctionTransaction.nonce
 
 #### Defined in
 
-[src/types/api/sequencer.ts:125](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L125)
+[src/types/api/sequencer.ts:125](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L125)
 
 ---
 
@@ -129,7 +129,7 @@ InvokeFunctionTransaction.max_fee
 
 #### Defined in
 
-[src/types/api/sequencer.ts:126](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L126)
+[src/types/api/sequencer.ts:126](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L126)
 
 ---
 
@@ -143,4 +143,4 @@ InvokeFunctionTransaction.version
 
 #### Defined in
 
-[src/types/api/sequencer.ts:127](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L127)
+[src/types/api/sequencer.ts:127](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/types/api/sequencer.ts#L127)

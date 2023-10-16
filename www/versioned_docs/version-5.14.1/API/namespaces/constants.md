@@ -23,7 +23,7 @@ Utils
 
 #### Defined in
 
-[src/utils/encode.ts:2](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/encode.ts#L2)
+[src/utils/encode.ts:2](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/encode.ts#L2)
 
 ---
 
@@ -33,7 +33,7 @@ Utils
 
 #### Defined in
 
-[src/constants.ts:3](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/constants.ts#L3)
+[src/constants.ts:3](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/constants.ts#L3)
 
 ---
 
@@ -43,7 +43,7 @@ Utils
 
 #### Defined in
 
-[src/constants.ts:4](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/constants.ts#L4)
+[src/constants.ts:4](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/constants.ts#L4)
 
 ---
 
@@ -53,7 +53,7 @@ Utils
 
 #### Defined in
 
-[src/constants.ts:5](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/constants.ts#L5)
+[src/constants.ts:5](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/constants.ts#L5)
 
 ---
 
@@ -63,7 +63,7 @@ Utils
 
 #### Defined in
 
-[src/constants.ts:6](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/constants.ts#L6)
+[src/constants.ts:6](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/constants.ts#L6)
 
 ---
 
@@ -80,7 +80,7 @@ Utils
 
 #### Defined in
 
-[src/constants.ts:34](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/constants.ts#L34)
+[src/constants.ts:34](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/constants.ts#L34)
 
 ---
 
@@ -93,7 +93,7 @@ Please do not edit until the JSON changes.
 
 #### Defined in
 
-[src/constants.ts:43](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/constants.ts#L43)
+[src/constants.ts:43](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/constants.ts#L43)
 
 ---
 
@@ -103,7 +103,7 @@ Please do not edit until the JSON changes.
 
 #### Defined in
 
-[src/constants.ts:44](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/constants.ts#L44)
+[src/constants.ts:44](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/constants.ts#L44)
 
 ---
 
@@ -113,7 +113,7 @@ Please do not edit until the JSON changes.
 
 #### Defined in
 
-[src/constants.ts:45](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/constants.ts#L45)
+[src/constants.ts:45](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/constants.ts#L45)
 
 ---
 
@@ -123,7 +123,7 @@ Please do not edit until the JSON changes.
 
 #### Defined in
 
-[src/constants.ts:46](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/constants.ts#L46)
+[src/constants.ts:46](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/constants.ts#L46)
 
 ---
 
@@ -133,7 +133,7 @@ Please do not edit until the JSON changes.
 
 #### Defined in
 
-[src/constants.ts:47](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/constants.ts#L47)
+[src/constants.ts:47](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/constants.ts#L47)
 
 ---
 
@@ -143,7 +143,7 @@ Please do not edit until the JSON changes.
 
 #### Defined in
 
-[src/constants.ts:48](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/constants.ts#L48)
+[src/constants.ts:48](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/constants.ts#L48)
 
 ---
 
@@ -153,7 +153,7 @@ Please do not edit until the JSON changes.
 
 #### Defined in
 
-[src/constants.ts:49](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/constants.ts#L49)
+[src/constants.ts:49](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/constants.ts#L49)
 
 ---
 
@@ -163,4 +163,4 @@ Please do not edit until the JSON changes.
 
 #### Defined in
 
-[src/constants.ts:50](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/constants.ts#L50)
+[src/constants.ts:50](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/constants.ts#L50)

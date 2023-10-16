@@ -145,8 +145,8 @@ const deployAccountPayload = {
     contractAddress: AXcontractAddress,
     addressSalt: starkKeyPubAX };
 
-const { transaction_hash: AXdAth, contract_address: AXcontractFinalAdress } = await accountAX.deployAccount(deployAccountPayload);
-console.log('✅ ArgentX wallet deployed at :',AXcontractFinalAdress);
+const { transaction_hash: AXdAth, contract_address: AXcontractFinalAddress } = await accountAX.deployAccount(deployAccountPayload);
+console.log('✅ ArgentX wallet deployed at :',AXcontractFinalAddress);
 ```
 
 ## Create Braavos account

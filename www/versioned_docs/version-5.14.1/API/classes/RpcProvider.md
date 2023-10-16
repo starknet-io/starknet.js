@@ -24,7 +24,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/rpc.ts:74](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L74)
+[src/provider/rpc.ts:74](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L74)
 
 ## Properties
 
@@ -34,7 +34,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/rpc.ts:62](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L62)
+[src/provider/rpc.ts:62](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L62)
 
 ---
 
@@ -44,7 +44,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/rpc.ts:64](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L64)
+[src/provider/rpc.ts:64](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L64)
 
 ---
 
@@ -54,7 +54,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/rpc.ts:66](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L66)
+[src/provider/rpc.ts:66](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L66)
 
 ---
 
@@ -64,7 +64,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/rpc.ts:68](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L68)
+[src/provider/rpc.ts:68](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L68)
 
 ---
 
@@ -74,7 +74,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/rpc.ts:70](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L70)
+[src/provider/rpc.ts:70](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L70)
 
 ---
 
@@ -84,7 +84,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/rpc.ts:72](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L72)
+[src/provider/rpc.ts:72](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L72)
 
 ## Methods
 
@@ -105,7 +105,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/rpc.ts:84](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L84)
+[src/provider/rpc.ts:84](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L84)
 
 ---
 
@@ -125,7 +125,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/rpc.ts:93](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L93)
+[src/provider/rpc.ts:93](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L93)
 
 ---
 
@@ -152,7 +152,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/provider/rpc.ts:100](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L100)
+[src/provider/rpc.ts:100](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L100)
 
 ---
 
@@ -174,7 +174,7 @@ the chain Id
 
 #### Defined in
 
-[src/provider/rpc.ts:116](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L116)
+[src/provider/rpc.ts:116](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L116)
 
 ---
 
@@ -202,7 +202,7 @@ the block object
 
 #### Defined in
 
-[src/provider/rpc.ts:121](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L121)
+[src/provider/rpc.ts:121](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L121)
 
 ---
 
@@ -216,7 +216,7 @@ the block object
 
 #### Defined in
 
-[src/provider/rpc.ts:129](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L129)
+[src/provider/rpc.ts:129](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L129)
 
 ---
 
@@ -236,7 +236,7 @@ the block object
 
 #### Defined in
 
-[src/provider/rpc.ts:133](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L133)
+[src/provider/rpc.ts:133](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L133)
 
 ---
 
@@ -256,7 +256,7 @@ the block object
 
 #### Defined in
 
-[src/provider/rpc.ts:140](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L140)
+[src/provider/rpc.ts:140](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L140)
 
 ---
 
@@ -285,7 +285,7 @@ Class hash
 
 #### Defined in
 
-[src/provider/rpc.ts:147](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L147)
+[src/provider/rpc.ts:147](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L147)
 
 ---
 
@@ -314,7 +314,7 @@ the hex nonce
 
 #### Defined in
 
-[src/provider/rpc.ts:158](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L158)
+[src/provider/rpc.ts:158](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L158)
 
 ---
 
@@ -328,7 +328,7 @@ the hex nonce
 
 #### Defined in
 
-[src/provider/rpc.ts:169](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L169)
+[src/provider/rpc.ts:169](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L169)
 
 ---
 
@@ -342,7 +342,7 @@ the hex nonce
 
 #### Defined in
 
-[src/provider/rpc.ts:173](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L173)
+[src/provider/rpc.ts:173](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L173)
 
 ---
 
@@ -370,7 +370,7 @@ StateUpdateResponse
 
 #### Defined in
 
-[src/provider/rpc.ts:177](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L177)
+[src/provider/rpc.ts:177](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L177)
 
 ---
 
@@ -400,7 +400,7 @@ the value of the storage variable
 
 #### Defined in
 
-[src/provider/rpc.ts:184](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L184)
+[src/provider/rpc.ts:184](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L184)
 
 ---
 
@@ -428,7 +428,7 @@ the transaction object { transaction_id, status, transaction, block_number?, blo
 
 #### Defined in
 
-[src/provider/rpc.ts:199](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L199)
+[src/provider/rpc.ts:199](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L199)
 
 ---
 
@@ -448,7 +448,7 @@ the transaction object { transaction_id, status, transaction, block_number?, blo
 
 #### Defined in
 
-[src/provider/rpc.ts:203](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L203)
+[src/provider/rpc.ts:203](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L203)
 
 ---
 
@@ -469,7 +469,7 @@ the transaction object { transaction_id, status, transaction, block_number?, blo
 
 #### Defined in
 
-[src/provider/rpc.ts:207](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L207)
+[src/provider/rpc.ts:207](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L207)
 
 ---
 
@@ -497,7 +497,7 @@ the transaction receipt object
 
 #### Defined in
 
-[src/provider/rpc.ts:215](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L215)
+[src/provider/rpc.ts:215](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L215)
 
 ---
 
@@ -525,7 +525,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/rpc.ts:219](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L219)
+[src/provider/rpc.ts:219](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L219)
 
 ---
 
@@ -546,7 +546,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/rpc.ts:223](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L223)
+[src/provider/rpc.ts:223](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L223)
 
 ---
 
@@ -575,7 +575,7 @@ Contract class of compiled contract
 
 #### Defined in
 
-[src/provider/rpc.ts:234](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L234)
+[src/provider/rpc.ts:234](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L234)
 
 ---
 
@@ -604,7 +604,7 @@ The method should not be used
 
 #### Defined in
 
-[src/provider/rpc.ts:245](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L245)
+[src/provider/rpc.ts:245](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L245)
 
 ---
 
@@ -638,7 +638,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/rpc.ts:252](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L252)
+[src/provider/rpc.ts:252](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L252)
 
 ---
 
@@ -668,7 +668,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/rpc.ts:260](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L260)
+[src/provider/rpc.ts:260](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L260)
 
 ---
 
@@ -698,7 +698,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/rpc.ts:280](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L280)
+[src/provider/rpc.ts:280](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L280)
 
 ---
 
@@ -728,7 +728,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/rpc.ts:300](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L300)
+[src/provider/rpc.ts:300](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L300)
 
 ---
 
@@ -757,7 +757,7 @@ the estimated fee
 
 #### Defined in
 
-[src/provider/rpc.ts:320](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L320)
+[src/provider/rpc.ts:320](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L320)
 
 ---
 
@@ -786,7 +786,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/rpc.ts:335](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L335)
+[src/provider/rpc.ts:335](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L335)
 
 ---
 
@@ -815,7 +815,7 @@ a confirmation of sending a transaction on the starknet contract
 
 #### Defined in
 
-[src/provider/rpc.ts:375](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L375)
+[src/provider/rpc.ts:375](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L375)
 
 ---
 
@@ -848,7 +848,7 @@ response from addTransaction
 
 #### Defined in
 
-[src/provider/rpc.ts:393](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L393)
+[src/provider/rpc.ts:393](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L393)
 
 ---
 
@@ -877,7 +877,7 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[src/provider/rpc.ts:411](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L411)
+[src/provider/rpc.ts:411](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L411)
 
 ---
 
@@ -897,7 +897,7 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[src/provider/rpc.ts:428](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L428)
+[src/provider/rpc.ts:428](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L428)
 
 ---
 
@@ -917,7 +917,7 @@ the result of the function on the smart contract.
 
 #### Defined in
 
-[src/provider/rpc.ts:432](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L432)
+[src/provider/rpc.ts:432](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L432)
 
 ---
 
@@ -946,7 +946,7 @@ GetTransactionReceiptResponse
 
 #### Defined in
 
-[src/provider/rpc.ts:436](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L436)
+[src/provider/rpc.ts:436](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L436)
 
 ---
 
@@ -970,7 +970,7 @@ Number of transactions
 
 #### Defined in
 
-[src/provider/rpc.ts:493](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L493)
+[src/provider/rpc.ts:493](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L493)
 
 ---
 
@@ -988,7 +988,7 @@ Number of the latest block
 
 #### Defined in
 
-[src/provider/rpc.ts:506](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L506)
+[src/provider/rpc.ts:506](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L506)
 
 ---
 
@@ -1006,7 +1006,7 @@ Object with the stats data
 
 #### Defined in
 
-[src/provider/rpc.ts:516](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L516)
+[src/provider/rpc.ts:516](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L516)
 
 ---
 
@@ -1030,7 +1030,7 @@ events and the pagination of the events
 
 #### Defined in
 
-[src/provider/rpc.ts:526](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L526)
+[src/provider/rpc.ts:526](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L526)
 
 ---
 
@@ -1059,7 +1059,7 @@ an array of transaction trace and estimated fee
 
 #### Defined in
 
-[src/provider/rpc.ts:530](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L530)
+[src/provider/rpc.ts:530](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L530)
 
 ---
 
@@ -1080,7 +1080,7 @@ an array of transaction trace and estimated fee
 
 #### Defined in
 
-[src/provider/rpc.ts:551](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L551)
+[src/provider/rpc.ts:551](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L551)
 
 ---
 
@@ -1101,7 +1101,7 @@ an array of transaction trace and estimated fee
 
 #### Defined in
 
-[src/provider/rpc.ts:555](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L555)
+[src/provider/rpc.ts:555](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L555)
 
 ---
 
@@ -1122,4 +1122,4 @@ an array of transaction trace and estimated fee
 
 #### Defined in
 
-[src/provider/rpc.ts:559](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L559)
+[src/provider/rpc.ts:559](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/provider/rpc.ts#L559)

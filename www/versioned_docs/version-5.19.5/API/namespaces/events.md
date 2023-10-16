@@ -24,7 +24,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/events/index.ts:17](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/events/index.ts#L17)
+[src/utils/events/index.ts:17](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/events/index.ts#L17)
 
 ---
 
@@ -51,4 +51,4 @@ ParsedEvents - parsed events corresponding to the abi
 
 #### Defined in
 
-[src/utils/events/index.ts:38](https://github.com/0xs34n/starknet.js/blob/v5.19.5/src/utils/events/index.ts#L38)
+[src/utils/events/index.ts:38](https://github.com/starknet-io/starknet.js/blob/v5.19.5/src/utils/events/index.ts#L38)

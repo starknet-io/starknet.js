@@ -20,7 +20,7 @@ Re-exports [Uint256](../interfaces/types.Uint256.md)
 
 #### Defined in
 
-[src/utils/uint256.ts:14](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/uint256.ts#L14)
+[src/utils/uint256.ts:14](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/uint256.ts#L14)
 
 ---
 
@@ -30,7 +30,7 @@ Re-exports [Uint256](../interfaces/types.Uint256.md)
 
 #### Defined in
 
-[src/utils/uint256.ts:15](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/uint256.ts#L15)
+[src/utils/uint256.ts:15](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/uint256.ts#L15)
 
 ## Functions
 
@@ -50,7 +50,7 @@ Re-exports [Uint256](../interfaces/types.Uint256.md)
 
 #### Defined in
 
-[src/utils/uint256.ts:10](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/uint256.ts#L10)
+[src/utils/uint256.ts:10](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/uint256.ts#L10)
 
 ---
 
@@ -70,7 +70,7 @@ Re-exports [Uint256](../interfaces/types.Uint256.md)
 
 #### Defined in
 
-[src/utils/uint256.ts:17](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/uint256.ts#L17)
+[src/utils/uint256.ts:17](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/uint256.ts#L17)
 
 ---
 
@@ -90,4 +90,4 @@ Re-exports [Uint256](../interfaces/types.Uint256.md)
 
 #### Defined in
 
-[src/utils/uint256.ts:22](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/uint256.ts#L22)
+[src/utils/uint256.ts:22](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/uint256.ts#L22)

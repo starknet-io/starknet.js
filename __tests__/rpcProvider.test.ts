@@ -65,7 +65,7 @@ describeIfRpc('RPCProvider', () => {
   });
 
   test('getProtocolVersion - not implemented', async () => {
-    expect(rpcProvider.getProtocolVersion()).rejects.toThrow();
+    await expect(rpcProvider.getProtocolVersion()).rejects.toThrow();
   });
 
   test('getCode - not implemented', async () => {
@@ -99,15 +99,16 @@ describeIfRpc('RPCProvider', () => {
       expect(transaction).toHaveProperty('transaction_hash');
     });
 
+    test('getPendingTransactions', async () => {
+      const transactions = await rpcProvider.getPendingTransactions();
+      expect(Array.isArray(transactions)).toBe(true);
+    });
+
     xtest('traceBlockTransactions', async () => {
       await rpcProvider.traceBlockTransactions(latestBlock.block_hash);
     });
 
     describeIfDevnet('devnet only', () => {
-      test('getPendingTransactions - not implemented', async () => {
-        expect(rpcProvider.getPendingTransactions()).rejects.toThrow();
-      });
-
       test('getSyncingStats', async () => {
         const syncingStats = await rpcProvider.getSyncingStats();
         expect(syncingStats).toBe(false);
@@ -179,11 +180,6 @@ describeIfRpc('RPCProvider', () => {
     });
 
     describeIfNotDevnet('testnet only', () => {
-      test('getPendingTransactions', async () => {
-        const transactions = await rpcProvider.getPendingTransactions();
-        expect(Array.isArray(transactions)).toBe(true);
-      });
-
       test('getSyncingStats', async () => {
         const syncingStats = await rpcProvider.getSyncingStats();
         expect(syncingStats).toMatchSchemaRef('GetSyncingStatsResponse');

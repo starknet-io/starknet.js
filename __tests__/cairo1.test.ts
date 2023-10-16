@@ -60,6 +60,11 @@ describeIfDevnet('Cairo 1 Devnet', () => {
       expect(cairo1Contract).toBeInstanceOf(Contract);
     });
 
+    test('getCairoVersion', async () => {
+      const version1 = await cairo1Contract.getVersion();
+      expect(version1).toEqual({ cairo: '1', compiler: '1' });
+    });
+
     test('ContractFactory on Cairo1', async () => {
       const c1CFactory = new ContractFactory({
         compiledContract: compiledHelloSierra,

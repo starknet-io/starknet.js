@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 
 import { Account, ProviderInterface, RpcProvider, SequencerProvider, json } from '../src';
 import { BaseUrl } from '../src/constants';
@@ -50,9 +50,6 @@ export const compiledC210Casm = readContractSierraCasm('cairo/cairo210/cairo210'
 
 /* Default test config based on run `starknet-devnet --seed 0` */
 const DEFAULT_TEST_PROVIDER_SEQUENCER_URL = 'http://127.0.0.1:5050/';
-const DEFAULT_TEST_ACCOUNT_ADDRESS =
-  '0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a';
-const DEFAULT_TEST_ACCOUNT_PRIVATE_KEY = '0xe3e70682c2094cac629f6fbed82c07cd';
 
 /* User defined config or default one */
 const BASE_URL = process.env.TEST_PROVIDER_BASE_URL || DEFAULT_TEST_PROVIDER_SEQUENCER_URL;
@@ -107,9 +104,19 @@ export const getTestAccount = (provider: ProviderInterface) => {
     if (!testAccountAddress) {
       throw new Error('TEST_ACCOUNT_ADDRESS is not set');
     }
-  } else {
-    testAccountAddress = testAccountAddress || DEFAULT_TEST_ACCOUNT_ADDRESS;
-    testAccountPrivateKey = testAccountPrivateKey || DEFAULT_TEST_ACCOUNT_PRIVATE_KEY;
+  } else if (!testAccountAddress || !testAccountPrivateKey) {
+    // use defaults for devnet only if they are not set
+
+    // TODO: refactor to retrieve from devnet's /predeployed_accounts endpoint
+    [testAccountAddress, testAccountPrivateKey] = IS_RPC
+      ? [
+          '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691',
+          '0x71d7bb07b9a64f6f78ac4c816aff4da9',
+        ]
+      : [
+          '0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a',
+          '0xe3e70682c2094cac629f6fbed82c07cd',
+        ];
   }
   const cairoVersion = (process.env.ACCOUNT_CAIRO_VERSION as CairoVersion) || '0';
 
