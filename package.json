@@ -92,11 +92,11 @@
     "@noble/curves": "~1.2.0",
     "@scure/starknet": "~0.3.0",
     "abi-wan-kanabi": "^1.0.3",
-    "get-starknet-core": "^3.2.0",
     "isomorphic-fetch": "^3.0.0",
     "lossless-json": "^2.0.8",
     "pako": "^2.0.4",
-    "url-join": "^4.0.1"
+    "url-join": "^4.0.1",
+    "get-starknet-core": "~/Work/ShardLabs/get-starknet/packages/core"
   },
   "lint-staged": {
     "*.ts": "eslint --cache --fix",
