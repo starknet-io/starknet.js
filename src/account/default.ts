@@ -44,7 +44,6 @@ import {
 } from '../types';
 import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
-import { starkCurve } from '../utils/ec';
 import { parseUDCEvent } from '../utils/events';
 import {
   calculateContractAddressFromHash,
@@ -55,8 +54,8 @@ import {
 } from '../utils/hash';
 import { toBigInt, toCairoBool } from '../utils/num';
 import { parseContract } from '../utils/provider';
-import { estimatedFeeToMaxFee, formatSignature, randomAddress } from '../utils/stark';
-import { getExecuteCalldata } from '../utils/transaction';
+import { estimatedFeeToMaxFee, formatSignature } from '../utils/stark';
+import { buildUDCCall, getExecuteCalldata } from '../utils/transaction';
 import { getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
 
@@ -366,40 +365,7 @@ export class Account extends Provider implements AccountInterface {
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
     details?: InvocationsDetails | undefined
   ): Promise<MultiDeployContractResponse> {
-    const params = [].concat(payload as []).map((it) => {
-      const {
-        classHash,
-        salt,
-        unique = true,
-        constructorCalldata = [],
-      } = it as UniversalDeployerContractPayload;
-
-      const compiledConstructorCallData = CallData.compile(constructorCalldata);
-      const deploySalt = salt ?? randomAddress();
-
-      return {
-        call: {
-          contractAddress: UDC.ADDRESS,
-          entrypoint: UDC.ENTRYPOINT,
-          calldata: [
-            classHash,
-            deploySalt,
-            toCairoBool(unique),
-            compiledConstructorCallData.length,
-            ...compiledConstructorCallData,
-          ],
-        },
-        address: calculateContractAddressFromHash(
-          unique ? starkCurve.pedersen(this.address, deploySalt) : deploySalt,
-          classHash,
-          compiledConstructorCallData,
-          unique ? UDC.ADDRESS : 0
-        ),
-      };
-    });
-
-    const calls = params.map((it) => it.call);
-    const addresses = params.map((it) => it.address);
+    const { calls, addresses } = buildUDCCall(payload, this.address);
     const invokeResponse = await this.execute(calls, undefined, details);
 
     return {

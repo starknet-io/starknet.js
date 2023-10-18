@@ -11,6 +11,7 @@ import {
 } from 'get-starknet-core';
 
 import { StarknetChainId } from '../constants';
+import { buildUDCCall } from '../utils/transaction';
 // eslint-disable-next-line import/no-cycle
 import {
   AllowArray,
@@ -146,6 +147,11 @@ export class WalletAccount /* implements AccountInterface  */ {
       abi: json.stringify(pContract.abi),
     };
 
+    // Check FIx
+    if (!declareContractPayload.compiledClassHash) {
+      throw Error('compiledClassHash is required');
+    }
+
     const rpcCall: RpcCall = {
       type: 'starknet_addDeclareTransaction',
       params: {
@@ -159,16 +165,23 @@ export class WalletAccount /* implements AccountInterface  */ {
   public async deploy(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[]
   ): Promise<MultiDeployContractResponse> {
-    // TODO: Create UDC PRocedure using invoke()
-    return new Promise((e) => false);
+    const { calls, addresses } = buildUDCCall(payload, this.address);
+    const invokeResponse = await this.execute(calls);
+
+    return {
+      ...invokeResponse,
+      contract_address: addresses,
+    };
   }
 
   public async deployAccount(payload: DeployAccountContractPayload) {
     const rpcCall: RpcCall = {
       type: 'starknet_addDeployAccountTransaction',
       params: {
-        contract_address_salt: payload.addressSalt?.toString(),
-        constructor_calldata: CallData.compile(payload.constructorCalldata),
+        contract_address_salt: payload.addressSalt?.toString() || '0',
+        constructor_calldata: payload.constructorCalldata
+          ? CallData.compile(payload.constructorCalldata)
+          : [],
         class_hash: payload.classHash,
       },
     };

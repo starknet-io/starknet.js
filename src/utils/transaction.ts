@@ -1,7 +1,18 @@
-import { BigNumberish, CairoVersion, Call, CallStruct, Calldata, ParsedStruct } from '../types';
+import { UDC } from '../constants';
+import {
+  BigNumberish,
+  CairoVersion,
+  Call,
+  CallStruct,
+  Calldata,
+  ParsedStruct,
+  UniversalDeployerContractPayload,
+} from '../types';
 import { CallData } from './calldata';
-import { getSelectorFromName } from './hash';
-import { toBigInt } from './num';
+import { starkCurve } from './ec';
+import { calculateContractAddressFromHash, getSelectorFromName } from './hash';
+import { toBigInt, toCairoBool } from './num';
+import { randomAddress } from './stark';
 
 /**
  * Transforms a list of Calls, each with their own calldata, into
@@ -81,3 +92,45 @@ export const getExecuteCalldata = (calls: Call[], cairoVersion: CairoVersion = '
   }
   return fromCallsToExecuteCalldata(calls);
 };
+
+export function buildUDCCall(
+  payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
+  address: string
+) {
+  const params = [].concat(payload as []).map((it) => {
+    const {
+      classHash,
+      salt,
+      unique = true,
+      constructorCalldata = [],
+    } = it as UniversalDeployerContractPayload;
+
+    const compiledConstructorCallData = CallData.compile(constructorCalldata);
+    const deploySalt = salt ?? randomAddress();
+
+    return {
+      call: {
+        contractAddress: UDC.ADDRESS,
+        entrypoint: UDC.ENTRYPOINT,
+        calldata: [
+          classHash,
+          deploySalt,
+          toCairoBool(unique),
+          compiledConstructorCallData.length,
+          ...compiledConstructorCallData,
+        ],
+      },
+      address: calculateContractAddressFromHash(
+        unique ? starkCurve.pedersen(address, deploySalt) : deploySalt,
+        classHash,
+        compiledConstructorCallData,
+        unique ? UDC.ADDRESS : 0
+      ),
+    };
+  });
+
+  return {
+    calls: params.map((it) => it.call),
+    addresses: params.map((it) => it.address),
+  };
+}
