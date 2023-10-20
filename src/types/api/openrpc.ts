@@ -2,7 +2,7 @@
  * TypeScript Representation of 'starknet-specs' (OpenRpc protocol types)
  * https://github.com/starkware-libs/starknet-specs/tree/v0.4.0-rc3
  *
- * Starknet Node Read API  0.4.0 - rpc tag v0.4.0-rc3
+ * Starknet Node Read API  0.5.0 - rpc tag v0.5.0
  * Starknet Node Write API 0.4.0 - rpc tag v0.4.0-rc3
  * Starknet Node Trace API 0.4.0 - rpc tag v0.4.0-rc3
  */
@@ -433,7 +433,7 @@ export namespace OPENRPC {
   export type Storage = FELT;
   export type Transaction = TXN;
   export type TransactionWithHash = TXN_WITH_HASH;
-  export type TransactionReceipt = TXN_RECEIPT;
+  export type TransactionReceipt = TXN_RECEIPT | PENDING_TXN_RECEIPT;
   export type ContractClass = CONTRACT_CLASS;
   export type DeprecatedContractClass = DEPRECATED_CONTRACT_CLASS;
   export type CallResponse = Array<FELT>;
@@ -466,11 +466,13 @@ export namespace OPENRPC {
   };
   export type SimulatedTransactions = SimulatedTransaction[];
 
-  export type BaseTransaction = DECLARE_TXN | INVOKE_TXN | DEPLOY_ACCOUNT_TXN;
-
   // Final Methods
   export type Methods = {
     // Read API
+    starknet_specVersion: {
+      params: {};
+      result: string;
+    };
     starknet_getBlockWithTxHashes: {
       params: { block_id: BLOCK_ID };
       result: BlockWithTxHashes;
@@ -490,6 +492,11 @@ export namespace OPENRPC {
       params: { contract_address: ADDRESS; key: STORAGE_KEY; block_id: BLOCK_ID };
       result: Storage;
       errors: Errors.CONTRACT_NOT_FOUND | Errors.BLOCK_NOT_FOUND;
+    };
+    starknet_getTransactionStatus: {
+      params: { transaction_hash: TXN_HASH };
+      result: { finality_status: TXN_STATUS; execution_status?: TXN_EXECUTION_STATUS };
+      errors: Errors.TXN_HASH_NOT_FOUND;
     };
     starknet_getTransactionByHash: {
       params: { transaction_hash: TXN_HASH };
@@ -537,7 +544,7 @@ export namespace OPENRPC {
         | Errors.BLOCK_NOT_FOUND;
     };
     starknet_estimateFee: {
-      params: { request: Array<BaseTransaction>; block_id: BLOCK_ID };
+      params: { request: Array<BROADCASTED_TXN>; block_id: BLOCK_ID };
       result: Array<FEE_ESTIMATE>;
       errors: Errors.CONTRACT_NOT_FOUND | Errors.CONTRACT_ERROR | Errors.BLOCK_NOT_FOUND;
     };
@@ -563,10 +570,6 @@ export namespace OPENRPC {
     starknet_chainId: {
       params: {};
       result: CHAIN_ID;
-    };
-    starknet_pendingTransactions: {
-      params: {};
-      result: PendingTransactions;
     };
     starknet_syncing: {
       params: {};
@@ -663,7 +666,7 @@ export namespace OPENRPC {
     starknet_simulateTransactions: {
       params: {
         block_id: BLOCK_ID;
-        transactions: Array<BaseTransaction>;
+        transactions: Array<BROADCASTED_TXN>;
         simulation_flags: Array<SIMULATION_FLAG>;
       };
       result: SimulatedTransactions;
