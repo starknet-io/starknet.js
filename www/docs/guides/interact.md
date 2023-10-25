@@ -9,19 +9,16 @@ Once your provider, contract, and account are connected, you can interact with t
 - you can read the memory of the contract, without fees.
 - you can write to memory, but you have to pay fees.
   - On Mainnet, you have to pay fees with a bridged ETH token.
-  - On Testnet 1 & 2, you have to pay with a bridged Goerli ETH token.
+  - On Testnet, you have to pay with a bridged Goerli ETH token.
   - On devnet, you have to pay with a dummy ETH token.
 
 Your account should be funded enough to pay fees (0.01 ETH should be enough to start).
 
 ![](./pictures/Interact_contract.png)
 
-Here we will interact with a `test.cairo` contract (Cairo 0), already deployed in Testnet 1 and Tesnet 2, at addresses:
+Here we will interact with a `test.cairo` contract (Cairo 0) already deployed on Testnet at the address:
 
-- testnet1: [0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd](https://testnet.starkscan.co/contract/0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd#read-contract).
-- testnet2: [0x2367db6b0df07033d196dcd25961109d8fbc86227158343149742284c7582e](https://testnet-2.starkscan.co/contract/0x002367db6b0df07033d196dcd25961109d8fbc86227158343149742284c7582e#read-contract).
-
-We will use Testnet1, so you need a funded wallet in this network.
+- [0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd](https://testnet.starkscan.co/contract/0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd#read-contract)
 
 This contract contains a storage variable called `balance`.
 
@@ -40,7 +37,7 @@ You have to call Starknet, with the use of the meta-class method: `contract.func
 ```typescript
 //initialize Provider
 const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } });
-// Connect the deployed Test contract in Tesnet
+// Connect the deployed Test contract in Testnet
 const testAddress = "0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd";
 
 // read abi of Test contract
@@ -74,7 +71,7 @@ const account0Address = "0x123....789";
 const account0 = new Account(provider, account0Address, privateKey0);
 // add ,"1" after privateKey0 if this account is not a Cairo 0 contract
 
-// Connect the deployed Test contract in Tesnet
+// Connect the deployed Test contract in Testnet
 const testAddress = "0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd";
 
 // read abi of Test contract
