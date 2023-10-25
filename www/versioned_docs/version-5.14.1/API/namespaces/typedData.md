@@ -101,7 +101,7 @@ in the resulting array.
 
 ▸ **encodeType**(`types`, `type`): `string`
 
-Encode a type to a string. All dependant types are alphabetically sorted.
+Encode a type to a string. All dependent types are alphabetically sorted.
 
 #### Parameters
 
@@ -173,8 +173,8 @@ an array of ABI compatible types, and an array of corresponding values.
 
 ▸ **encodeData**<`T`\>(`types`, `type`, `data`): `string`[][]
 
-Encode the data to an ABI encoded Buffer. The data should be a key -> value object with all the required values. All
-dependant types are automatically encoded.
+Encode the data to an ABI encoded Buffer. The data should be a key -> value object with all the required values.
+All dependent types are automatically encoded.
 
 #### Type parameters
 
@@ -204,8 +204,8 @@ dependant types are automatically encoded.
 
 ▸ **getStructHash**<`T`\>(`types`, `type`, `data`): `string`
 
-Get encoded data as a hash. The data should be a key -> value object with all the required values. All dependant
-types are automatically encoded.
+Get encoded data as a hash. The data should be a key -> value object with all the required values.
+All dependent types are automatically encoded.
 
 #### Type parameters
 

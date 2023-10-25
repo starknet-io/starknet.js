@@ -16,7 +16,7 @@ Your account should be funded enough to pay fees (0.01 ETH should be enough to s
 
 ![](./pictures/Interact_contract.png)
 
-Here we will interact with a `test.cairo` contract, already deployed in Testnet 1 and Tesnet 2, at addresses :
+Here we will interact with a `test.cairo` contract, already deployed in Testnet 1 and Testnet 2, at addresses :
 
 - testnet1 : [0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd](https://testnet.starkscan.co/contract/0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd#read-contract).
 - testnet2 : [0x2367db6b0df07033d196dcd25961109d8fbc86227158343149742284c7582e](https://testnet-2.starkscan.co/contract/0x002367db6b0df07033d196dcd25961109d8fbc86227158343149742284c7582e#read-contract).
@@ -40,7 +40,7 @@ You have to use the call function : `contract.call("function_name",[params])` (h
 ```typescript
 //initialize Provider
 const provider = new Provider({ sequencer: { network: "goerli-alpha" } });
-// Connect the deployed Test contract in Tesnet
+// Connect the deployed Test contract in Testnet
 const testAddress = "0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd";
 
 // read abi of Test contract
@@ -72,7 +72,7 @@ const account0Address = "0x123....789";
 const starkKeyPair0 = ec.getKeyPair(privateKey0);
 const account0 = new Account(provider, account0Address, starkKeyPair0);
 
-// Connect the deployed Test contract in Tesnet
+// Connect the deployed Test contract in Testnet
 const testAddress = "0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd";
 
 // read abi of Test contract
@@ -112,7 +112,7 @@ const account0Address = "0x123....789";
 const starkKeyPair0 = ec.getKeyPair(privateKey0);
 const account0 = new Account(provider, account0Address, starkKeyPair0);
 
-// Connect the deployed Test contract in Tesnet
+// Connect the deployed Test contract in Testnet
 const testAddress = "0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd";
 
 // read abi of Test contract
