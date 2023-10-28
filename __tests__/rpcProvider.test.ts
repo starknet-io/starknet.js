@@ -60,12 +60,9 @@ describeIfRpc('RPCProvider', () => {
     expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
   });
 
-  xtest('getProtocolVersion - pathfinder not implemented', async () => {
-    await rpcProvider.getProtocolVersion();
-  });
-
-  test('getProtocolVersion - not implemented', async () => {
-    await expect(rpcProvider.getProtocolVersion()).rejects.toThrow();
+  test('getSpecVersion - pathfinder not implemented', async () => {
+    const spec = await rpcProvider.getSpecVersion();
+    console.log(spec);
   });
 
   test('getCode - not implemented', async () => {
