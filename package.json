@@ -67,6 +67,7 @@
     "@types/url-join": "^4.0.1",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
+    "abi-wan-kanabi": "^1.0.3",
     "ajv": "^8.12.0",
     "ajv-keywords": "^5.1.0",
     "eslint": "^8.17.0",
@@ -91,7 +92,6 @@
   "dependencies": {
     "@noble/curves": "~1.2.0",
     "@scure/starknet": "~0.3.0",
-    "abi-wan-kanabi": "^1.0.3",
     "isomorphic-fetch": "^3.0.0",
     "lossless-json": "^2.0.8",
     "pako": "^2.0.4",
