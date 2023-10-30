@@ -7,7 +7,7 @@ export type CairoAssembly = {
   compiler_version: string;
   bytecode: ByteCode;
   hints: any[];
-  pythonic_hints: PythonicHints;
+  pythonic_hints?: PythonicHints;
   entry_points_by_type: EntryPointsByType;
 };
 
