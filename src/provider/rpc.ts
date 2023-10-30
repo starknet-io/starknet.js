@@ -160,7 +160,7 @@ export class RpcProvider implements ProviderInterface {
   }
 
   /**
-   * Returns the version of the Starknet JSON-RPC specification being used
+   * NEW: Returns the version of the Starknet JSON-RPC specification being used
    */
   public async getSpecVersion() {
     return this.fetchEndpoint('starknet_specVersion');
@@ -444,6 +444,34 @@ export class RpcProvider implements ProviderInterface {
 
   public async traceTransaction(transactionHash: RPC.TransactionHash) {
     return this.fetchEndpoint('starknet_traceTransaction', { transaction_hash: transactionHash });
+  }
+
+  // TODO: implement in waitforTransaction, add tests
+  /**
+   * NEW: Get the status of a transaction
+   * @param transactionHash
+   */
+  public async getTransactionStatus(transactionHash: RPC.TransactionHash) {
+    return this.fetchEndpoint('starknet_getTransactionStatus', {
+      transaction_hash: transactionHash,
+    });
+  }
+
+  // TODO: add tests
+  /**
+   * NEW: Estimate the fee for a message from L1
+   * @param message Message From L1
+   * @param blockIdentifier
+   */
+  public async estimateMessageFee(
+    message: RPC.L1Message,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ) {
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint('starknet_estimateMessageFee', {
+      message,
+      block_id,
+    });
   }
 
   public async traceBlockTransactions(blockIdentifier: BlockIdentifier = this.blockIdentifier) {

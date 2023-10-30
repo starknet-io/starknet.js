@@ -9,6 +9,7 @@ import {
   EVENT_FILTER,
   FEE_ESTIMATE,
   FELT,
+  MSG_FROM_L1,
   PENDING_BLOCK_WITH_TX_HASHES,
   PENDING_TXN_RECEIPT,
   REPLACED_CLASS,
@@ -65,6 +66,7 @@ export type SimulateTransactionResponse = {
   transaction_trace: TRANSACTION_TRACE;
   fee_estimation: FEE_ESTIMATE;
 }[];
+export type L1Message = MSG_FROM_L1;
 
 export type TransactionType = TXN_TYPE;
 export type SimulationFlag = SIMULATION_FLAG;
