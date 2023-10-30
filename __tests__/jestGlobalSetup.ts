@@ -23,21 +23,21 @@ type ProviderType = {
 /* Default test config based on run `starknet-devnet --seed 0` */
 const GS_DEFAULT_TEST_PROVIDER_URL = 'http://127.0.0.1:5050/';
 
+const overrideOrSet = (envName: string, setValue: string) => {
+  process.env[envName] = process.env[envName] ?? setValue;
+};
+
 const localDevnetDetectionStrategy = async () => {
   const setup = (strategy: DevnetStrategy) => {
-    // Setup ENV
-    process.env.IS_LOCALHOST_DEVNET = 'false';
-    process.env.IS_RPC_DEVNET = 'false';
-    process.env.IS_SEQUENCER_DEVNET = 'false';
-
-    if (strategy.isDevnet) {
-      process.env.IS_LOCALHOST_DEVNET = 'true';
-      if (strategy.isRS) {
-        process.env.IS_RPC_DEVNET = 'true';
-      } else {
-        process.env.IS_SEQUENCER_DEVNET = 'true';
-      }
-    }
+    overrideOrSet('IS_LOCALHOST_DEVNET', strategy.isDevnet ? 'true' : 'false');
+    overrideOrSet(
+      'IS_RPC_DEVNET',
+      strategy.isDevnet && (strategy.isRS || process.env.TEST_RPC_URL) ? 'true' : 'false'
+    );
+    overrideOrSet(
+      'IS_SEQUENCER_DEVNET',
+      strategy.isDevnet && process.env.IS_RPC_DEVNET === 'false' ? 'true' : 'false'
+    );
     return strategy;
   };
 
@@ -75,15 +75,16 @@ const localDevnetDetectionStrategy = async () => {
 
 const sequencerOrRpc = async (devnetStrategy?: DevnetStrategy) => {
   const setup = (providerType: ProviderType) => {
-    process.env.IS_SEQUENCER = providerType.sequencer ? 'true' : 'false';
-    process.env.IS_RPC = providerType.rpc ? 'true' : 'false';
-    process.env.IS_SEQUENCER_GOERLI = (
-      process.env.TEST_PROVIDER_BASE_URL ||
-      process.env.TEST_RPC_URL ||
-      ''
-    ).includes(BaseUrl.SN_GOERLI)
-      ? 'true'
-      : 'false';
+    overrideOrSet('IS_SEQUENCER', providerType.sequencer ? 'true' : 'false');
+    overrideOrSet('IS_RPC', providerType.rpc ? 'true' : 'false');
+    overrideOrSet(
+      'IS_SEQUENCER_GOERLI',
+      (process.env.TEST_PROVIDER_BASE_URL || process.env.TEST_RPC_URL || '').includes(
+        BaseUrl.SN_GOERLI
+      )
+        ? 'true'
+        : 'false'
+    );
     return providerType;
   };
   let result: ProviderType = { sequencer: false, rpc: false };
@@ -142,25 +143,47 @@ const setAccount = async (devnetStrategy: DevnetStrategy) => {
   }
 
   throw new Error(
-    'Setting Account using all known strategies failed, please provide TEST_ACCOUNT_ADDRESS & TEST_ACCOUNT_PRIVATE_KEY'
+    'Setting Account using all known strategies failed, provide basic test parameters'
   );
 };
 
 const verifySetup = (final?: boolean) => {
+  const warnings: string[] = [];
   if (!process.env.TEST_ACCOUNT_ADDRESS) {
-    if (final) {
-      throw new Error('TEST_ACCOUNT_ADDRESS env is not set');
-    } else return false;
+    if (final) throw new Error('TEST_ACCOUNT_ADDRESS env is not provided');
+    else warnings.push('TEST_ACCOUNT_ADDRESS env is not provided!');
   }
   if (!process.env.TEST_ACCOUNT_PRIVATE_KEY) {
-    if (final) {
-      throw new Error('TEST_ACCOUNT_PRIVATE_KEY env is not set');
-    } else return false;
+    if (final) throw new Error('TEST_ACCOUNT_PRIVATE_KEY env is not provided');
+    else warnings.push('TEST_ACCOUNT_PRIVATE_KEY env is not provided!');
   }
   if (!process.env.TEST_PROVIDER_BASE_URL && !process.env.TEST_RPC_URL) {
-    if (final) {
-      throw new Error('One of TEST_PROVIDER_BASE_URL or TEST_RPC_URL env is not set');
-    } else return false;
+    if (final) throw new Error('One of TEST_PROVIDER_BASE_URL or TEST_RPC_URL env is not provided');
+    else warnings.push('TEST_PROVIDER_BASE_URL or TEST_RPC_URL env is not provided!');
+  }
+
+  if (warnings.length > 0) {
+    console.log('\x1b[33m', warnings.join('\n'), '\x1b[0m');
+    delete process.env.TEST_ACCOUNT_ADDRESS;
+    delete process.env.TEST_ACCOUNT_PRIVATE_KEY;
+    delete process.env.TEST_PROVIDER_BASE_URL;
+    return false;
+  }
+
+  if (!final) {
+    overrideOrSet('IS_LOCALHOST_DEVNET', 'false');
+    overrideOrSet('IS_RPC_DEVNET', 'false');
+    overrideOrSet('IS_SEQUENCER_DEVNET', 'false');
+    overrideOrSet('IS_RPC', process.env.TEST_RPC_URL ? 'true' : 'false');
+    overrideOrSet('IS_SEQUENCER', process.env.TEST_PROVIDER_BASE_URL ? 'true' : 'false');
+    overrideOrSet(
+      'IS_SEQUENCER_GOERLI',
+      (process.env.TEST_PROVIDER_BASE_URL || process.env.TEST_RPC_URL || '').includes(
+        BaseUrl.SN_GOERLI
+      )
+        ? 'true'
+        : 'false'
+    );
   }
 
   console.table({
@@ -186,6 +209,7 @@ const verifySetup = (final?: boolean) => {
 
 const executeStrategy = async () => {
   // 1. Assume setup is provided and ready;
+  console.log('Global Test Setup Started');
   let ready = verifySetup();
   if (ready) {
     console.log('Using Provided Test Setup');
@@ -193,7 +217,7 @@ const executeStrategy = async () => {
   }
 
   // 2. Try to detect setup
-  console.log('Global Test Environment Auto Setup Started');
+  console.log('Basic test parameters are missing, Auto Setup Started');
   const devnetStrategy = await localDevnetDetectionStrategy();
   if (devnetStrategy.isDevnet) {
     if (devnetStrategy.isRS) {
