@@ -17,6 +17,12 @@ export type LegacyCompiledContract = Omit<LegacyContractClass, 'program'> & {
   program: Program;
 };
 
+export enum KeyType {
+  ATTRIBUTES = 'attributes',
+  ACCESSIBLE_SCOPES = 'accessible_scopes',
+  DEBUG_INFO = 'debug_info',
+}
+
 /** SUBTYPES */
 export type Builtins = string[];
 export type CompressedProgram = string;

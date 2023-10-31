@@ -18,6 +18,7 @@ import {
   CompiledSierra,
   CompiledSierraCasm,
   ContractEntryPointFields,
+  KeyType,
   LegacyCompiledContract,
   RawArgs,
   RawCalldata,
@@ -214,12 +215,12 @@ export function calculateContractAddressFromHash(
   ]);
 }
 
-function nullSkipReplacer(key: string, value: any) {
-  if (key === 'attributes' || key === 'accessible_scopes') {
+function nullSkipReplacer(key: KeyType, value: any) {
+  if (key === KeyType.ATTRIBUTES || key === KeyType.ACCESSIBLE_SCOPES) {
     return Array.isArray(value) && value.length === 0 ? undefined : value;
   }
 
-  if (key === 'debug_info') {
+  if (key === KeyType.DEBUG_INFO) {
     return null;
   }
 
