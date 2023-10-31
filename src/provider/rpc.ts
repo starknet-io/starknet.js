@@ -446,14 +446,15 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_traceTransaction', { transaction_hash: transactionHash });
   }
 
-  // TODO: implement in waitforTransaction, add tests
+  // TODO: implement in waitforTransaction, add add tests, when RPC 0.5 become standard /
   /**
    * NEW: Get the status of a transaction
    * @param transactionHash
    */
-  public async getTransactionStatus(transactionHash: RPC.TransactionHash) {
+  public async getTransactionStatus(transactionHash: BigNumberish) {
+    const transaction_hash = toHex(transactionHash);
     return this.fetchEndpoint('starknet_getTransactionStatus', {
-      transaction_hash: transactionHash,
+      transaction_hash,
     });
   }
 
