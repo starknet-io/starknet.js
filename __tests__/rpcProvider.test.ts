@@ -240,6 +240,10 @@ describeIfRpc('RPCProvider', () => {
         expect(transaction).toMatchSchemaRef('GetTransactionResponse');
       });
 
+      test('getTransactionStatus()', async () => {
+        return expect(rpcProvider.getTransactionStatus(transaction_hash)).resolves.not.toThrow();
+      });
+
       test('getTransaction', async () => {
         const transaction = await rpcProvider.getTransaction(transaction_hash);
         expect(transaction).toMatchSchemaRef('GetTransactionResponse');
