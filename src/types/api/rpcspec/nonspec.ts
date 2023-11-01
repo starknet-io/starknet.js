@@ -29,8 +29,10 @@ import {
   SYNC_STATUS,
   TRANSACTION_TRACE,
   TXN,
+  TXN_EXECUTION_STATUS,
   TXN_HASH,
   TXN_RECEIPT,
+  TXN_STATUS,
 } from './components';
 
 // METHOD RESPONSES
@@ -46,18 +48,15 @@ export type FeeEstimate = FEE_ESTIMATE;
 // response starknet_getTransactionByHash, starknet_getTransactionByBlockIdAndIndex
 export type TransactionWithHash = TXN & { transaction_hash: TXN_HASH };
 // response starknet_blockHashAndNumber
-export type BlockHashAndNumber = {
-  block_hash: BLOCK_HASH;
-  block_number: BLOCK_NUMBER;
-};
+export type BlockHashAndNumber = { block_hash: BLOCK_HASH; block_number: BLOCK_NUMBER };
+// response starknet_getBlockWithTxs
+export type BlockWithTxs = BLOCK_WITH_TXS | PENDING_BLOCK_WITH_TXS;
 // response starknet_getBlockWithTxHashes
-export type GetBlockWithTxHashesResponse = BLOCK_WITH_TX_HASHES | PENDING_BLOCK_WITH_TX_HASHES;
+export type BlockWithTxHashes = BLOCK_WITH_TX_HASHES | PENDING_BLOCK_WITH_TX_HASHES;
 // response starknet_getStateUpdate
 export type StateUpdate = STATE_UPDATE | PENDING_STATE_UPDATE;
 // response starknet_traceBlockTransactions
-export type BlockTransactionsTraces = { transaction_hash: FELT; trace_root: TRANSACTION_TRACE };
-// response starknet_getBlockWithTxs
-export type GetBlockWithTxs = BLOCK_WITH_TXS | PENDING_BLOCK_WITH_TXS;
+export type BlockTransactionsTraces = { transaction_hash: FELT; trace_root: TRANSACTION_TRACE }[];
 // response starknet_syncing
 export type Syncing = boolean | SYNC_STATUS;
 // response starknet_getEvents
@@ -83,6 +82,10 @@ export type L1Message = MSG_FROM_L1;
 export type BaseTransaction = BROADCASTED_TXN;
 export type ChainId = CHAIN_ID;
 export type Transaction = TXN;
+export type TransactionStatus = {
+  finality_status: TXN_STATUS;
+  execution_status: TXN_EXECUTION_STATUS;
+};
 
 // Diff Than Seq
 export type StorageDiffs = Array<CONTRACT_STORAGE_DIFF_ITEM>;

@@ -13,9 +13,9 @@ import {
   SimulateTransactionResponse,
 } from '../../types';
 import {
+  BlockWithTxHashes,
   ContractClass,
   FeeEstimate,
-  GetBlockWithTxHashesResponse,
   SimulateTransactionResponse as RPCSimulateTransactionResponse,
   TransactionWithHash,
 } from '../../types/api/rpcspec';
@@ -33,7 +33,7 @@ export class RPCResponseParser
       | 'parseGetTransactionReceiptResponse'
     >
 {
-  public parseGetBlockResponse(res: GetBlockWithTxHashesResponse): GetBlockResponse {
+  public parseGetBlockResponse(res: BlockWithTxHashes): GetBlockResponse {
     return {
       timestamp: res.timestamp,
       block_hash: 'block_hash' in res ? res.block_hash : '',

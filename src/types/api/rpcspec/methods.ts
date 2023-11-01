@@ -2,7 +2,6 @@ import {
   ADDRESS,
   BLOCK_ID,
   BLOCK_NUMBER,
-  BLOCK_WITH_TXS,
   BROADCASTED_DECLARE_TXN,
   BROADCASTED_DEPLOY_ACCOUNT_TXN,
   BROADCASTED_INVOKE_TXN,
@@ -12,31 +11,31 @@ import {
   FELT,
   FUNCTION_CALL,
   MSG_FROM_L1,
-  PENDING_BLOCK_WITH_TXS,
   PENDING_STATE_UPDATE,
-  PENDING_TXN_RECEIPT,
   RESULT_PAGE_REQUEST,
   SIMULATION_FLAG,
   STATE_UPDATE,
   STORAGE_KEY,
-  TRANSACTION_TRACE,
-  TXN_EXECUTION_STATUS,
   TXN_HASH,
-  TXN_RECEIPT,
-  TXN_STATUS,
 } from './components';
 import { Errors } from './errors';
 import {
   BlockHashAndNumber,
+  BlockTransactionsTraces,
+  BlockWithTxHashes,
+  BlockWithTxs,
   ContractClass,
   DeclaredTransaction,
   DeployedAccountTransaction,
   Events,
   FeeEstimate,
-  GetBlockWithTxHashesResponse,
   InvokedTransaction,
+  Nonce,
   SimulateTransactionResponse,
   Syncing,
+  TransactionReceipt,
+  TransactionStatus,
+  TransactionTrace,
   TransactionWithHash,
 } from './nonspec';
 
@@ -54,7 +53,7 @@ type ReadMethods = {
     params: {
       block_id: BLOCK_ID;
     };
-    result: GetBlockWithTxHashesResponse;
+    result: BlockWithTxHashes;
     errors: Errors.BLOCK_NOT_FOUND;
   };
 
@@ -63,7 +62,7 @@ type ReadMethods = {
     params: {
       block_id: BLOCK_ID;
     };
-    result: BLOCK_WITH_TXS | PENDING_BLOCK_WITH_TXS;
+    result: BlockWithTxs;
     errors: Errors.BLOCK_NOT_FOUND;
   };
 
@@ -92,10 +91,7 @@ type ReadMethods = {
     params: {
       transaction_hash: TXN_HASH;
     };
-    result: {
-      finality_status: TXN_STATUS;
-      execution_status: TXN_EXECUTION_STATUS;
-    };
+    result: TransactionStatus;
     errors: Errors.TXN_HASH_NOT_FOUND;
   };
 
@@ -123,7 +119,7 @@ type ReadMethods = {
     params: {
       transaction_hash: TXN_HASH;
     };
-    result: TXN_RECEIPT | PENDING_TXN_RECEIPT;
+    result: TransactionReceipt;
     errors: Errors.TXN_HASH_NOT_FOUND;
   };
 
@@ -241,7 +237,7 @@ type ReadMethods = {
       block_id: BLOCK_ID;
       contract_address: ADDRESS;
     };
-    result: FELT;
+    result: Nonce;
     errors: Errors.BLOCK_NOT_FOUND | Errors.CONTRACT_NOT_FOUND;
   };
 };
@@ -309,14 +305,14 @@ type TraceMethods = {
   // For a given executed transaction, return the trace of its execution, including internal calls
   starknet_traceTransaction: {
     params: { transaction_hash: TXN_HASH };
-    result: TRANSACTION_TRACE;
+    result: TransactionTrace;
     errors: Errors.INVALID_TXN_HASH | Errors.NO_TRACE_AVAILABLE;
   };
 
   // Returns the execution traces of all transactions included in the given block
   starknet_traceBlockTransactions: {
     params: { block_id: BLOCK_ID };
-    result: { transaction_hash: FELT; trace_root: TRANSACTION_TRACE }[];
+    result: BlockTransactionsTraces;
     errors: Errors.BLOCK_NOT_FOUND;
   };
 

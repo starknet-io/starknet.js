@@ -80,7 +80,7 @@ export abstract class ProviderInterface {
   ): Promise<ContractClassResponse>;
 
   /**
-   * Returns the class hash deployed under the given address.
+   * Returns the contract class hash in the given block for the contract deployed at the given address
    *
    * @param contractAddress - contract address
    * @param blockIdentifier - block identifier
@@ -100,7 +100,7 @@ export abstract class ProviderInterface {
   public abstract getClassByHash(classHash: string): Promise<ContractClassResponse>;
 
   /**
-   * Gets the nonce of a contract with respect to a specific block
+   * Returns the nonce associated with the given address in the given block
    *
    * @param contractAddress - contract address
    * @returns the hex nonce
@@ -111,7 +111,7 @@ export abstract class ProviderInterface {
   ): Promise<Nonce>;
 
   /**
-   * Gets the contract's storage variable at a specific key.
+   * Get the value of the storage (contract's variable) at the given address and key
    *
    * @param contractAddress
    * @param key - from getStorageVarAddress('<STORAGE_VARIABLE_NAME>') (WIP)
@@ -326,7 +326,7 @@ export abstract class ProviderInterface {
   ): Promise<SimulateTransactionResponse>;
 
   /**
-   * Gets the state changes in a specific block
+   * Gets the state changes in a specific block (result of executing the requested block)
    *
    * @param blockIdentifier - block identifier
    * @returns StateUpdateResponse
