@@ -38,20 +38,10 @@ export type SIMULATION_FLAG = 'SKIP_VALIDATE' | 'SKIP_FEE_CHARGE';
 // Data availability mode
 export type DA_MODE = 'L1' | 'L2';
 export type TXN_TYPE = 'DECLARE' | 'DEPLOY' | 'DEPLOY_ACCOUNT' | 'INVOKE' | 'L1_HANDLER';
-
-export enum TXN_FINALITY_STATUS {
-  ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
-  ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
-}
-export enum TXN_EXECUTION_STATUS {
-  SUCCEEDED = 'SUCCEEDED',
-  REVERTED = 'REVERTED',
-}
+export type TXN_FINALITY_STATUS = 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1';
+export type TXN_EXECUTION_STATUS = 'SUCCEEDED' | 'REVERTED';
 export type BLOCK_STATUS = 'PENDING' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
-export enum BLOCK_TAG {
-  latest = 'latest',
-  pending = 'pending',
-}
+export type BLOCK_TAG = 'latest' | 'pending';
 
 /**
  * READ API
@@ -175,9 +165,10 @@ export type PENDING_BLOCK_HEADER = {
   starknet_version: string;
 };
 
-export type BLOCK_WITH_TX_HASHES = BLOCK_STATUS & BLOCK_HEADER & BLOCK_BODY_WITH_TX_HASHES;
+export type BLOCK_WITH_TX_HASHES = { status: BLOCK_STATUS } & BLOCK_HEADER &
+  BLOCK_BODY_WITH_TX_HASHES;
 
-export type BLOCK_WITH_TXS = BLOCK_STATUS & BLOCK_HEADER & BLOCK_BODY_WITH_TXS;
+export type BLOCK_WITH_TXS = { status: BLOCK_STATUS } & BLOCK_HEADER & BLOCK_BODY_WITH_TXS;
 
 export type PENDING_BLOCK_WITH_TX_HASHES = BLOCK_BODY_WITH_TX_HASHES & PENDING_BLOCK_HEADER;
 

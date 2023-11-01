@@ -215,8 +215,8 @@ export type Nonce = Sequencer.Nonce;
 export type SimulationFlags = RPC.SimulationFlags;
 
 export type SimulatedTransaction = {
-  transaction_trace: RPC.Trace | Sequencer.TransactionTraceResponse;
-  fee_estimation: RPC.EstimateFeeResponse | Sequencer.EstimateFeeResponse;
+  transaction_trace: RPC.TransactionTrace | Sequencer.TransactionTraceResponse;
+  fee_estimation: RPC.FeeEstimate | Sequencer.EstimateFeeResponse;
   suggestedMaxFee?: string | bigint;
 };
 
@@ -230,7 +230,7 @@ export interface StateUpdateResponse {
   state_diff: {
     storage_diffs: RPC.StorageDiffs; // API DIFF
     deployed_contracts: Sequencer.DeployedContracts;
-    nonces: RPC.Nonces; // API DIFF
+    nonces: RPC.NonceUpdates; // API DIFF
     old_declared_contracts?: Sequencer.OldDeclaredContracts; // Sequencer Only
     declared_classes?: Sequencer.DeclaredClasses;
     replaced_classes?: Sequencer.ReplacedClasses | RPC.ReplacedClasses;

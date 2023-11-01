@@ -486,11 +486,11 @@ export class RpcProvider implements ProviderInterface {
     let isErrorState = false;
     let txReceipt: any = {};
     const retryInterval = options?.retryInterval ?? 5000;
-    const errorStates: any = options?.errorStates ?? [RPC.TransactionExecutionStatus.REVERTED];
+    const errorStates: any = options?.errorStates ?? [RPC.ETransactionExecutionStatus.REVERTED];
     const successStates: any = options?.successStates ?? [
-      RPC.TransactionExecutionStatus.SUCCEEDED,
-      RPC.TransactionFinalityStatus.ACCEPTED_ON_L1,
-      RPC.TransactionFinalityStatus.ACCEPTED_ON_L2,
+      RPC.ETransactionExecutionStatus.SUCCEEDED,
+      RPC.ETransactionFinalityStatus.ACCEPTED_ON_L1,
+      RPC.ETransactionFinalityStatus.ACCEPTED_ON_L2,
     ];
 
     while (!onchain) {

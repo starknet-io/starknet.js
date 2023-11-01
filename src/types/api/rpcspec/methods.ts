@@ -3,29 +3,22 @@ import {
   BLOCK_ID,
   BLOCK_NUMBER,
   BLOCK_WITH_TXS,
-  BLOCK_WITH_TX_HASHES,
   BROADCASTED_DECLARE_TXN,
   BROADCASTED_DEPLOY_ACCOUNT_TXN,
   BROADCASTED_INVOKE_TXN,
   BROADCASTED_TXN,
   CHAIN_ID,
-  CONTRACT_CLASS,
-  DEPRECATED_CONTRACT_CLASS,
-  EVENTS_CHUNK,
   EVENT_FILTER,
-  FEE_ESTIMATE,
   FELT,
   FUNCTION_CALL,
   MSG_FROM_L1,
   PENDING_BLOCK_WITH_TXS,
-  PENDING_BLOCK_WITH_TX_HASHES,
   PENDING_STATE_UPDATE,
   PENDING_TXN_RECEIPT,
   RESULT_PAGE_REQUEST,
   SIMULATION_FLAG,
   STATE_UPDATE,
   STORAGE_KEY,
-  SYNC_STATUS,
   TRANSACTION_TRACE,
   TXN_EXECUTION_STATUS,
   TXN_HASH,
@@ -33,7 +26,19 @@ import {
   TXN_STATUS,
 } from './components';
 import { Errors } from './errors';
-import { BlockHashAndNumber, TransactionWithHash } from './nonspec';
+import {
+  BlockHashAndNumber,
+  ContractClass,
+  DeclaredTransaction,
+  DeployedAccountTransaction,
+  Events,
+  FeeEstimate,
+  GetBlockWithTxHashesResponse,
+  InvokedTransaction,
+  SimulateTransactionResponse,
+  Syncing,
+  TransactionWithHash,
+} from './nonspec';
 
 export type Methods = ReadMethods & WriteMethods & TraceMethods;
 
@@ -49,7 +54,7 @@ type ReadMethods = {
     params: {
       block_id: BLOCK_ID;
     };
-    result: BLOCK_WITH_TX_HASHES | PENDING_BLOCK_WITH_TX_HASHES;
+    result: GetBlockWithTxHashesResponse;
     errors: Errors.BLOCK_NOT_FOUND;
   };
 
@@ -128,7 +133,7 @@ type ReadMethods = {
       block_id: BLOCK_ID;
       class_hash: FELT;
     };
-    result: DEPRECATED_CONTRACT_CLASS | CONTRACT_CLASS;
+    result: ContractClass;
     errors: Errors.BLOCK_NOT_FOUND | Errors.CLASS_HASH_NOT_FOUND;
   };
 
@@ -148,7 +153,7 @@ type ReadMethods = {
       block_id: BLOCK_ID;
       contract_address: ADDRESS;
     };
-    result: DEPRECATED_CONTRACT_CLASS | CONTRACT_CLASS;
+    result: ContractClass;
     errors: Errors.BLOCK_NOT_FOUND | Errors.CONTRACT_NOT_FOUND;
   };
 
@@ -177,7 +182,7 @@ type ReadMethods = {
       request: BROADCASTED_TXN[];
       block_id: BLOCK_ID;
     };
-    result: FEE_ESTIMATE[];
+    result: FeeEstimate[];
     errors: Errors.CONTRACT_NOT_FOUND | Errors.CONTRACT_ERROR | Errors.BLOCK_NOT_FOUND;
   };
 
@@ -187,7 +192,7 @@ type ReadMethods = {
       message: MSG_FROM_L1;
       block_id: BLOCK_ID;
     };
-    result: FEE_ESTIMATE;
+    result: FeeEstimate;
     errors: Errors.CONTRACT_NOT_FOUND | Errors.CONTRACT_ERROR | Errors.BLOCK_NOT_FOUND;
   };
 
@@ -214,7 +219,7 @@ type ReadMethods = {
   // Returns an object about the sync status, or false if the node is not syncing
   starknet_syncing: {
     params: [];
-    result: boolean | SYNC_STATUS;
+    result: Syncing;
   };
 
   // Returns all events matching the given filter
@@ -222,7 +227,7 @@ type ReadMethods = {
     params: {
       filter: EVENT_FILTER & RESULT_PAGE_REQUEST;
     };
-    result: EVENTS_CHUNK;
+    result: Events;
     errors:
       | Errors.PAGE_SIZE_TOO_BIG
       | Errors.INVALID_CONTINUATION_TOKEN
@@ -247,7 +252,7 @@ type WriteMethods = {
     params: {
       invoke_transaction: BROADCASTED_INVOKE_TXN;
     };
-    result: { transaction_hash: TXN_HASH };
+    result: InvokedTransaction;
     errors:
       | Errors.INSUFFICIENT_ACCOUNT_BALANCE
       | Errors.INSUFFICIENT_MAX_FEE
@@ -264,7 +269,7 @@ type WriteMethods = {
     params: {
       declare_transaction: BROADCASTED_DECLARE_TXN;
     };
-    result: { transaction_hash: TXN_HASH; class_hash: FELT };
+    result: DeclaredTransaction;
     errors:
       | Errors.CLASS_ALREADY_DECLARED
       | Errors.COMPILATION_FAILED
@@ -286,10 +291,7 @@ type WriteMethods = {
     params: {
       deploy_account_transaction: BROADCASTED_DEPLOY_ACCOUNT_TXN;
     };
-    result: {
-      transaction_hash: TXN_HASH;
-      contract_address: FELT;
-    };
+    result: DeployedAccountTransaction;
     errors:
       | Errors.INSUFFICIENT_ACCOUNT_BALANCE
       | Errors.INSUFFICIENT_MAX_FEE
@@ -314,7 +316,7 @@ type TraceMethods = {
   // Returns the execution traces of all transactions included in the given block
   starknet_traceBlockTransactions: {
     params: { block_id: BLOCK_ID };
-    result: { transaction_hash: FELT; trace_root: TRANSACTION_TRACE };
+    result: { transaction_hash: FELT; trace_root: TRANSACTION_TRACE }[];
     errors: Errors.BLOCK_NOT_FOUND;
   };
 
@@ -325,7 +327,7 @@ type TraceMethods = {
       transactions: Array<BROADCASTED_TXN>;
       simulation_flags: Array<SIMULATION_FLAG>;
     };
-    result: { transaction_trace: TRANSACTION_TRACE; fee_estimation: FEE_ESTIMATE }[];
+    result: SimulateTransactionResponse;
     errors: Errors.CONTRACT_NOT_FOUND | Errors.CONTRACT_ERROR | Errors.BLOCK_NOT_FOUND;
   };
 };
