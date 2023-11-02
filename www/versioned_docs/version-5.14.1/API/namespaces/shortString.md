@@ -24,7 +24,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/shortString.ts:6](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/shortString.ts#L6)
+[src/utils/shortString.ts:6](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/shortString.ts#L6)
 
 ---
 
@@ -44,7 +44,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/shortString.ts:12](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/shortString.ts#L12)
+[src/utils/shortString.ts:12](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/shortString.ts#L12)
 
 ---
 
@@ -64,7 +64,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/shortString.ts:17](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/shortString.ts#L17)
+[src/utils/shortString.ts:17](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/shortString.ts#L17)
 
 ---
 
@@ -88,7 +88,7 @@ boolean
 
 #### Defined in
 
-[src/utils/shortString.ts:26](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/shortString.ts#L26)
+[src/utils/shortString.ts:26](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/shortString.ts#L26)
 
 ---
 
@@ -108,7 +108,7 @@ boolean
 
 #### Defined in
 
-[src/utils/shortString.ts:33](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/shortString.ts#L33)
+[src/utils/shortString.ts:33](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/shortString.ts#L33)
 
 ---
 
@@ -140,7 +140,7 @@ a string representing an Hex number 248 bits max.
 
 #### Defined in
 
-[src/utils/shortString.ts:49](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/shortString.ts#L49)
+[src/utils/shortString.ts:49](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/shortString.ts#L49)
 
 ---
 
@@ -172,7 +172,7 @@ a string with 31 characters max.
 
 #### Defined in
 
-[src/utils/shortString.ts:67](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/shortString.ts#L67)
+[src/utils/shortString.ts:67](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/shortString.ts#L67)
 
 ---
 
@@ -192,7 +192,7 @@ a string with 31 characters max.
 
 #### Defined in
 
-[src/utils/shortString.ts:30](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/shortString.ts#L30)
+[src/utils/shortString.ts:30](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/shortString.ts#L30)
 
 ---
 
@@ -212,4 +212,4 @@ a string with 31 characters max.
 
 #### Defined in
 
-[src/utils/shortString.ts:31](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/shortString.ts#L31)
+[src/utils/shortString.ts:31](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/shortString.ts#L31)

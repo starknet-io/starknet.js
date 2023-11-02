@@ -1,6 +1,6 @@
 {
   "name": "starknet",
-  "version": "5.17.0",
+  "version": "5.21.1",
   "description": "JavaScript library for Starknet",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -46,7 +46,7 @@
     "zk",
     "rollup"
   ],
-  "repository": "github:0xs34n/starknet.js",
+  "repository": "github:starknet-io/starknet.js",
   "author": "Sean Han",
   "license": "MIT",
   "devDependencies": {
@@ -67,6 +67,7 @@
     "@types/url-join": "^4.0.1",
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
+    "abi-wan-kanabi": "^1.0.3",
     "ajv": "^8.12.0",
     "ajv-keywords": "^5.1.0",
     "eslint": "^8.17.0",
@@ -89,10 +90,10 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@noble/curves": "~1.0.0",
+    "@noble/curves": "~1.2.0",
+    "@scure/starknet": "~0.3.0",
     "isomorphic-fetch": "^3.0.0",
     "lossless-json": "^2.0.8",
-    "micro-starknet": "~0.2.1",
     "pako": "^2.0.4",
     "url-join": "^4.0.1"
   },

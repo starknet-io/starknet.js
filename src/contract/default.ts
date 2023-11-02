@@ -1,7 +1,10 @@
+import type { Abi as AbiKanabi } from 'abi-wan-kanabi';
+
 import { AccountInterface } from '../account';
 import { ProviderInterface, defaultProvider } from '../provider';
 import {
   Abi,
+  AbiEvents,
   ArgsOrCalldata,
   ArgsOrCalldataWithOptions,
   AsyncContractFunction,
@@ -12,8 +15,11 @@ import {
   ContractOptions,
   EstimateFeeResponse,
   FunctionAbi,
+  GetTransactionReceiptResponse,
   InvokeFunctionResponse,
   InvokeOptions,
+  InvokeTransactionReceiptResponse,
+  ParsedEvents,
   RawArgs,
   Result,
   StructAbi,
@@ -22,7 +28,9 @@ import {
 import assert from '../utils/assert';
 import { CallData, cairo } from '../utils/calldata';
 import { createAbiParser } from '../utils/calldata/parser';
-import { ContractInterface } from './interface';
+import { getAbiEvents, parseEvents as parseRawEvents } from '../utils/events/index';
+import { cleanHex } from '../utils/num';
+import { ContractInterface, TypedContract } from './interface';
 
 export const splitArgsAndOptions = (args: ArgsOrCalldataWithOptions) => {
   const options = [
@@ -105,14 +113,6 @@ export function getCalldata(args: RawArgs, callback: Function): Calldata {
   return callback();
 }
 
-/**
- * Not used at the moment
- */
-/* const detectCairoVersion = (abi: Abi) => {
-  if (!abi) return '0';
-  return abi.find((it) => 'state_mutability' in it) ? '1' : '0';
-}; */
-
 export class Contract implements ContractInterface {
   abi: Abi;
 
@@ -123,6 +123,8 @@ export class Contract implements ContractInterface {
   deployTransactionHash?: string;
 
   protected readonly structs: { [name: string]: StructAbi };
+
+  protected readonly events: AbiEvents;
 
   readonly functions!: { [name: string]: AsyncContractFunction };
 
@@ -152,6 +154,7 @@ export class Contract implements ContractInterface {
     this.providerOrAccount = providerOrAccount;
     this.callData = new CallData(abi);
     this.structs = CallData.getAbiStruct(abi);
+    this.events = getAbiEvents(abi);
     const parser = createAbiParser(abi);
     this.abi = parser.getLegacyFormat();
 
@@ -323,7 +326,27 @@ export class Contract implements ContractInterface {
     };
   }
 
+  public parseEvents(receipt: GetTransactionReceiptResponse): ParsedEvents {
+    return parseRawEvents(
+      (receipt as InvokeTransactionReceiptResponse).events?.filter(
+        (event) => cleanHex(event.from_address) === cleanHex(this.address),
+        []
+      ) || [],
+      this.events,
+      this.structs,
+      CallData.getAbiEnum(this.abi)
+    );
+  }
+
   public isCairo1(): boolean {
     return cairo.isCairo1Abi(this.abi);
+  }
+
+  public async getVersion() {
+    return this.providerOrAccount.getContractVersion(this.address);
+  }
+
+  public typed<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContract<TAbi> {
+    return this as TypedContract<typeof tAbi>;
   }
 }

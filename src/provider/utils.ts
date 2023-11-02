@@ -12,11 +12,7 @@ import { isHex, toHex } from '../utils/num';
 export type { BlockIdentifier };
 
 /**
- *
  * [Reference](https://github.com/starkware-libs/cairo-lang/blob/fc97bdd8322a7df043c87c371634b26c15ed6cee/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L148-L153)
- *
- * @param hashValue
- * @param hashField
  */
 export function formatHash(hashValue: BigNumberish): string {
   if (typeof hashValue === 'string') return hashValue;
@@ -24,10 +20,7 @@ export function formatHash(hashValue: BigNumberish): string {
 }
 
 /**
- *
  * [Reference](https://github.com/starkware-libs/cairo-lang/blob/fc97bdd8322a7df043c87c371634b26c15ed6cee/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L156-L161)
- * @param txHash
- * @param txId
  */
 export function txIdentifier(txHash?: BigNumberish, txId?: BigNumberish): string {
   if (!txHash) {

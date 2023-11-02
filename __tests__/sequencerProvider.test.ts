@@ -49,22 +49,22 @@ describeIfSequencer('SequencerProvider', () => {
 
     test('fetch unexpected error', async () => {
       fetchSpy.mockResolvedValueOnce(generateMockResponse(false, 'null'));
-      expect(sequencerProvider.fetch('')).rejects.toThrow(/^Could not GET from endpoint/);
+      await expect(sequencerProvider.fetch('')).rejects.toThrow(/^Could not GET from endpoint/);
     });
 
     test('fetch http error', async () => {
       fetchSpy.mockResolvedValueOnce(generateMockResponse(false, 'wrong'));
-      expect(sequencerProvider.fetch('')).rejects.toThrow(HttpError);
+      await expect(sequencerProvider.fetch('')).rejects.toThrow(HttpError);
     });
 
     test('fetch gateway error', async () => {
       fetchSpy.mockResolvedValueOnce(generateMockResponse(false, stringify({})));
-      expect(sequencerProvider.fetch('')).rejects.toThrow(GatewayError);
+      await expect(sequencerProvider.fetch('')).rejects.toThrow(GatewayError);
     });
 
     test('fetch success', async () => {
       fetchSpy.mockResolvedValueOnce(generateMockResponse(true, stringify({ success: '' })));
-      expect(sequencerProvider.fetch('')).resolves.toHaveProperty('success');
+      await expect(sequencerProvider.fetch('')).resolves.toHaveProperty('success');
     });
   });
 

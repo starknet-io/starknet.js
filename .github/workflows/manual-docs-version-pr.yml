@@ -26,6 +26,7 @@ jobs:
           args=()
           [[ "${{ inputs.version-override }}" != "" ]] && args+=( '--version-override=${{ inputs.version-override }}' )
           [[ "${{ inputs.version-override }}" != "" ]] && args+=( '--git-revision-override=v${{ inputs.version-override }}' )
+          rm -rf www/docs/API/
           npm run docs:build:version "${args[@]}"
           npm run docs:version "${args[@]}"
           npm run format

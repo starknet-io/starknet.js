@@ -1,6 +1,7 @@
 /* eslint-disable no-plusplus */
 import {
   Abi,
+  AbiEnums,
   AbiStructs,
   Args,
   ArgsOrCalldata,
@@ -16,7 +17,14 @@ import assert from '../assert';
 import { isBigInt, toHex } from '../num';
 import { getSelectorFromName } from '../selector';
 import { isLongText, splitLongString } from '../shortString';
-import { felt, isLen } from './cairo';
+import { felt, isCairo1Type, isLen } from './cairo';
+import {
+  CairoCustomEnum,
+  CairoOption,
+  CairoOptionVariant,
+  CairoResult,
+  CairoResultVariant,
+} from './enum';
 import formatter from './formatter';
 import { createAbiParser, isNoConstructorValid } from './parser';
 import { AbiParserInterface } from './parser/interface';
@@ -34,8 +42,11 @@ export class CallData {
 
   protected readonly structs: AbiStructs;
 
+  protected readonly enums: AbiEnums;
+
   constructor(abi: Abi) {
     this.structs = CallData.getAbiStruct(abi);
+    this.enums = CallData.getAbiEnum(abi);
     this.parser = createAbiParser(abi);
     this.abi = this.parser.getLegacyFormat();
   }
@@ -82,7 +93,7 @@ export class CallData {
     }
 
     // validate parameters
-    validateFields(abiMethod, args, this.structs);
+    validateFields(abiMethod, args, this.structs, this.enums);
   }
 
   /**
@@ -100,7 +111,7 @@ export class CallData {
    * ```
    */
   public compile(method: string, argsCalldata: RawArgs): Calldata {
-    const abiMethod = this.abi.find((abi) => abi.name === method) as FunctionAbi;
+    const abiMethod = this.abi.find((abiFunction) => abiFunction.name === method) as FunctionAbi;
 
     if (isNoConstructorValid(method, argsCalldata, abiMethod)) {
       return [];
@@ -111,17 +122,25 @@ export class CallData {
       args = argsCalldata;
     } else {
       // order the object
-      const orderedObject = orderPropsByAbi(argsCalldata, abiMethod.inputs, this.structs);
+      const orderedObject = orderPropsByAbi(
+        argsCalldata,
+        abiMethod.inputs,
+        this.structs,
+        this.enums
+      );
+      // console.log('ordered =', orderedObject);
       args = Object.values(orderedObject);
       //   // validate array elements to abi
-      validateFields(abiMethod, args, this.structs);
+      validateFields(abiMethod, args, this.structs, this.enums);
     }
 
     const argsIterator = args[Symbol.iterator]();
 
     const callArray = abiMethod.inputs.reduce(
       (acc, input) =>
-        isLen(input.name) ? acc : acc.concat(parseCalldataField(argsIterator, input, this.structs)),
+        isLen(input.name) && !isCairo1Type(input.type)
+          ? acc
+          : acc.concat(parseCalldataField(argsIterator, input, this.structs, this.enums)),
       [] as Calldata
     );
 
@@ -141,7 +160,7 @@ export class CallData {
    */
   static compile(rawArgs: RawArgs): Calldata {
     const createTree = (obj: object) => {
-      const getEntries = (o: object, prefix = ''): any => {
+      const getEntries = (o: object, prefix = '.'): any => {
         const oe = Array.isArray(o) ? [o.length.toString(), ...o] : o;
         return Object.entries(oe).flatMap(([k, v]) => {
           let value = v;
@@ -149,12 +168,49 @@ export class CallData {
           if (k === 'entrypoint') value = getSelectorFromName(value);
           const kk = Array.isArray(oe) && k === '0' ? '$$len' : k;
           if (isBigInt(value)) return [[`${prefix}${kk}`, felt(value)]];
-          return Object(value) === value
-            ? getEntries(value, `${prefix}${kk}.`)
-            : [[`${prefix}${kk}`, felt(value)]];
+          if (Object(value) === value) {
+            const methodsKeys = Object.getOwnPropertyNames(Object.getPrototypeOf(value));
+            const keys = [...Object.getOwnPropertyNames(value), ...methodsKeys];
+            if (keys.includes('isSome') && keys.includes('isNone')) {
+              // Option
+              const myOption = value as CairoOption<any>;
+              const variantNb = myOption.isSome()
+                ? CairoOptionVariant.Some
+                : CairoOptionVariant.None;
+              if (myOption.isSome())
+                return getEntries({ 0: variantNb, 1: myOption.unwrap() }, `${prefix}${kk}.`);
+              return [[`${prefix}${kk}`, felt(variantNb)]];
+            }
+            if (keys.includes('isOk') && keys.includes('isErr')) {
+              // Result
+              const myResult = value as CairoResult<any, any>;
+              const variantNb = myResult.isOk() ? CairoResultVariant.Ok : CairoResultVariant.Err;
+              return getEntries({ 0: variantNb, 1: myResult.unwrap() }, `${prefix}${kk}.`);
+            }
+            if (keys.includes('variant') && keys.includes('activeVariant')) {
+              // CustomEnum
+              const myEnum = value as CairoCustomEnum;
+              const activeVariant: string = myEnum.activeVariant();
+              const listVariants = Object.keys(myEnum.variant);
+              const activeVariantNb = listVariants.findIndex(
+                (variant: any) => variant === activeVariant
+              );
+              if (
+                typeof myEnum.unwrap() === 'object' &&
+                Object.keys(myEnum.unwrap()).length === 0 // empty object : {}
+              ) {
+                return [[`${prefix}${kk}`, felt(activeVariantNb)]];
+              }
+              return getEntries({ 0: activeVariantNb, 1: myEnum.unwrap() }, `${prefix}${kk}.`);
+            }
+            // normal object
+            return getEntries(value, `${prefix}${kk}.`);
+          }
+          return [[`${prefix}${kk}`, felt(value)]];
         });
       };
-      return Object.fromEntries(getEntries(obj));
+      const result = Object.fromEntries(getEntries(obj));
+      return result;
     };
 
     let callTreeArray;
@@ -192,7 +248,7 @@ export class CallData {
 
     const parsed = outputs.flat().reduce((acc, output, idx) => {
       const propName = output.name ?? idx;
-      acc[propName] = responseParser(responseIterator, output, this.structs, acc);
+      acc[propName] = responseParser(responseIterator, output, this.structs, this.enums, acc);
       if (acc[propName] && acc[`${propName}_len`]) {
         delete acc[`${propName}_len`];
       }
@@ -230,6 +286,25 @@ export class CallData {
         }),
         {}
       );
+  }
+
+  /**
+   * Helper to extract enums from abi
+   * @param abi Abi
+   * @returns AbiEnums - enums from abi
+   */
+  static getAbiEnum(abi: Abi): AbiEnums {
+    const fullEnumList = abi
+      .filter((abiEntry) => abiEntry.type === 'enum')
+      .reduce(
+        (acc, abiEntry) => ({
+          ...acc,
+          [abiEntry.name]: abiEntry,
+        }),
+        {}
+      );
+    delete fullEnumList['core::bool'];
+    return fullEnumList;
   }
 
   /**

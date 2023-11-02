@@ -1,8 +1,10 @@
 /** ABI */
-export type Abi = Array<FunctionAbi | EventAbi | StructAbi>;
+export type Abi = Array<FunctionAbi | EventAbi | StructAbi | any>;
 
 // Basic elements
 export type AbiEntry = { name: string; type: 'felt' | 'felt*' | string };
+
+export type EventEntry = { name: string; type: 'felt' | 'felt*' | string; kind: 'key' | 'data' };
 
 enum FunctionAbiType {
   'function',
@@ -29,4 +31,28 @@ export type StructAbi = {
   type: 'struct';
 };
 
-type EventAbi = any;
+export type AbiEnums = { [name: string]: EnumAbi };
+export type EnumAbi = {
+  variants: (AbiEntry & { offset: number })[];
+  name: string;
+  size: number;
+  type: 'enum';
+};
+
+export type AbiEvents = { [hash: string]: EventAbi };
+
+export type EventAbi = Cairo1Event | LegacyEvent;
+
+export type Cairo1Event = {
+  name: string;
+  members: EventEntry[];
+  kind: 'struct';
+  type: 'event';
+};
+
+export type LegacyEvent = {
+  name: string;
+  type: 'event';
+  data: EventEntry[];
+  keys: EventEntry[];
+};

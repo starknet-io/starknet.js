@@ -1,5 +1,6 @@
 import { StarknetChainId } from '../../constants';
 import { weierstrass } from '../../utils/ec';
+import { CairoEnum } from '../cairoEnum';
 import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 
 export type WeierstrassSignatureType = weierstrass.SignatureType;
@@ -47,7 +48,7 @@ export type RawArgsObject = {
 
 export type RawArgsArray = Array<MultiType | MultiType[] | RawArgs>;
 
-export type MultiType = BigNumberish | Uint256 | object | boolean;
+export type MultiType = BigNumberish | Uint256 | object | boolean | CairoEnum;
 
 export type UniversalDeployerContractPayload = {
   classHash: BigNumberish;
@@ -104,7 +105,8 @@ export type Invocation = CallDetails & { signature?: Signature };
 
 export type Call = CallDetails & { entrypoint: string };
 
-export type CairoVersion = '0' | '1';
+export type CairoVersion = '0' | '1' | undefined;
+export type CompilerVersion = '0' | '1' | '2' | undefined;
 
 export type InvocationsDetails = {
   nonce?: BigNumberish;
@@ -133,12 +135,30 @@ export enum TransactionType {
   INVOKE = 'INVOKE_FUNCTION',
 }
 
+/**
+ * new statuses are defined by props: finality_status and execution_status
+ * to be #deprecated
+ */
 export enum TransactionStatus {
   NOT_RECEIVED = 'NOT_RECEIVED',
   RECEIVED = 'RECEIVED',
   ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
   ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
   REJECTED = 'REJECTED',
+  REVERTED = 'REVERTED',
+}
+
+export enum TransactionFinalityStatus {
+  NOT_RECEIVED = 'NOT_RECEIVED',
+  RECEIVED = 'RECEIVED',
+  ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
+  ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
+}
+
+export enum TransactionExecutionStatus {
+  REJECTED = 'REJECTED',
+  REVERTED = 'REVERTED',
+  SUCCEEDED = 'SUCCEEDED',
 }
 
 export enum BlockStatus {
@@ -195,18 +215,25 @@ export type Args = {
   [inputName: string]: BigNumberish | BigNumberish[] | ParsedStruct | ParsedStruct[];
 };
 export type ParsedStruct = {
-  [key: string]: BigNumberish | ParsedStruct;
+  [key: string]: BigNumberish | BigNumberish[] | ParsedStruct | Uint256;
 };
 
 export type waitForTransactionOptions = {
   retryInterval?: number;
-  successStates?: Array<TransactionStatus>;
+  successStates?: Array<TransactionFinalityStatus | TransactionExecutionStatus>;
+  errorStates?: Array<TransactionFinalityStatus | TransactionExecutionStatus>;
 };
 
 export type getSimulateTransactionOptions = {
   blockIdentifier?: BlockIdentifier;
   skipValidate?: boolean;
   skipExecute?: boolean;
+  skipFeeCharge?: boolean;
+};
+
+export type getContractVersionOptions = {
+  blockIdentifier?: BlockIdentifier;
+  compiler?: boolean;
 };
 
 export type getEstimateFeeBulkOptions = {
@@ -219,5 +246,15 @@ export interface CallStruct {
   selector: string;
   calldata: string[];
 }
+
+/**
+ * Represent Contract version
+ */
+export type ContractVersion = {
+  /** version of the cairo language */
+  cairo: CairoVersion;
+  /** version of the cairo compiler used to compile the contract */
+  compiler: CompilerVersion;
+};
 
 export * from './contract';

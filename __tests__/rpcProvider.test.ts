@@ -1,4 +1,4 @@
-import { getStarkKey, utils } from 'micro-starknet';
+import { getStarkKey, utils } from '@scure/starknet';
 
 import { Account, Contract, GetBlockResponse, RpcProvider, stark } from '../src';
 import { StarknetChainId } from '../src/constants';
@@ -65,7 +65,7 @@ describeIfRpc('RPCProvider', () => {
   });
 
   test('getProtocolVersion - not implemented', async () => {
-    expect(rpcProvider.getProtocolVersion()).rejects.toThrow();
+    await expect(rpcProvider.getProtocolVersion()).rejects.toThrow();
   });
 
   test('getCode - not implemented', async () => {
@@ -99,15 +99,16 @@ describeIfRpc('RPCProvider', () => {
       expect(transaction).toHaveProperty('transaction_hash');
     });
 
+    test('getPendingTransactions', async () => {
+      const transactions = await rpcProvider.getPendingTransactions();
+      expect(Array.isArray(transactions)).toBe(true);
+    });
+
     xtest('traceBlockTransactions', async () => {
       await rpcProvider.traceBlockTransactions(latestBlock.block_hash);
     });
 
     describeIfDevnet('devnet only', () => {
-      test('getPendingTransactions - not implemented', async () => {
-        expect(rpcProvider.getPendingTransactions()).rejects.toThrow();
-      });
-
       test('getSyncingStats', async () => {
         const syncingStats = await rpcProvider.getSyncingStats();
         expect(syncingStats).toBe(false);
@@ -151,8 +152,13 @@ describeIfRpc('RPCProvider', () => {
           chunk_size: 2,
         });
 
+        const result1 = await rpcProvider.getEvents({
+          chunk_size: 2, // all optional paramaters removed
+        });
+
         expect(result).toHaveProperty('continuation_token');
         expect(result).toHaveProperty('events');
+        expect(result1).toHaveProperty('events');
         expect(Array.isArray(result?.events)).toBe(true);
         expect(result?.events?.length).toBe(2);
         expect(result.events[0]).toMatchSchemaRef('StarknetEmittedEvent');
@@ -174,11 +180,6 @@ describeIfRpc('RPCProvider', () => {
     });
 
     describeIfNotDevnet('testnet only', () => {
-      test('getPendingTransactions', async () => {
-        const transactions = await rpcProvider.getPendingTransactions();
-        expect(Array.isArray(transactions)).toBe(true);
-      });
-
       test('getSyncingStats', async () => {
         const syncingStats = await rpcProvider.getSyncingStats();
         expect(syncingStats).toMatchSchemaRef('GetSyncingStatsResponse');

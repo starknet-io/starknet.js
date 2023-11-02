@@ -12,6 +12,7 @@ import {
   CallContractResponse,
   CallL1Handler,
   ContractClassResponse,
+  ContractVersion,
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
@@ -31,13 +32,16 @@ import {
   SequencerProviderOptions,
   SimulateTransactionResponse,
   StateUpdateResponse,
-  TransactionStatus,
+  TransactionExecutionStatus,
+  TransactionFinalityStatus,
   TransactionType,
+  getContractVersionOptions,
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
 import { CallData } from '../utils/calldata';
+import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { isSierra } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
 import {
@@ -68,7 +72,7 @@ function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
 }
 
 const defaultOptions = {
-  network: NetworkName.SN_GOERLI2,
+  network: NetworkName.SN_GOERLI,
   blockIdentifier: BlockTag.pending,
 };
 /**
@@ -112,12 +116,12 @@ export class SequencerProvider implements ProviderInterface {
 
   protected static getNetworkFromName(name: NetworkName | StarknetChainId) {
     switch (name) {
-      case NetworkName.SN_MAIN || StarknetChainId.SN_MAIN:
+      case NetworkName.SN_MAIN:
+      case StarknetChainId.SN_MAIN:
         return BaseUrl.SN_MAIN;
-      case NetworkName.SN_GOERLI || StarknetChainId.SN_GOERLI:
+      case NetworkName.SN_GOERLI:
+      case StarknetChainId.SN_GOERLI:
         return BaseUrl.SN_GOERLI;
-      case NetworkName.SN_GOERLI2 || StarknetChainId.SN_GOERLI2:
-        return BaseUrl.SN_GOERLI2;
       default:
         throw new Error('Could not detect base url from NetworkName');
     }
@@ -128,9 +132,6 @@ export class SequencerProvider implements ProviderInterface {
       const url = new URL(baseUrl);
       if (url.host.includes('mainnet.starknet.io')) {
         return StarknetChainId.SN_MAIN;
-      }
-      if (url.host.includes('alpha4-2.starknet.io')) {
-        return StarknetChainId.SN_GOERLI2;
       }
       return StarknetChainId.SN_GOERLI;
     } catch {
@@ -347,6 +348,41 @@ export class SequencerProvider implements ProviderInterface {
     return this.fetchEndpoint('get_compiled_class_by_class_hash', { classHash, blockIdentifier });
   }
 
+  public async getContractVersion(
+    contractAddress: string,
+    classHash?: undefined,
+    options?: getContractVersionOptions
+  ): Promise<ContractVersion>;
+  public async getContractVersion(
+    contractAddress: undefined,
+    classHash: string,
+    options?: getContractVersionOptions
+  ): Promise<ContractVersion>;
+
+  public async getContractVersion(
+    contractAddress?: string,
+    classHash?: string,
+    { blockIdentifier = this.blockIdentifier, compiler = true }: getContractVersionOptions = {}
+  ): Promise<ContractVersion> {
+    let contractClass;
+    if (contractAddress) {
+      contractClass = await this.getClassAt(contractAddress, blockIdentifier);
+    } else if (classHash) {
+      contractClass = await this.getClassByHash(classHash, blockIdentifier);
+    } else {
+      throw Error('getContractVersion require contractAddress or classHash');
+    }
+
+    if (isSierra(contractClass)) {
+      if (compiler) {
+        const abiTest = getAbiContractVersion(contractClass.abi);
+        return { cairo: '1', compiler: abiTest.compiler };
+      }
+      return { cairo: '1', compiler: undefined };
+    }
+    return { cairo: '0', compiler: '0' };
+  }
+
   public async invokeFunction(
     functionInvocation: Invocation,
     details: InvocationsDetailsWithNonce
@@ -492,27 +528,46 @@ export class SequencerProvider implements ProviderInterface {
   }
 
   public async waitForTransaction(txHash: BigNumberish, options?: waitForTransactionOptions) {
-    const errorStates = [TransactionStatus.REJECTED, TransactionStatus.NOT_RECEIVED];
-    let onchain = false;
     let res;
-    const retryInterval = options?.retryInterval ?? 8000;
+    let completed = false;
+    let retries = 0;
+    const retryInterval = options?.retryInterval ?? 5000;
+    const errorStates = options?.errorStates ?? [
+      TransactionExecutionStatus.REJECTED,
+      TransactionFinalityStatus.NOT_RECEIVED,
+      TransactionExecutionStatus.REVERTED,
+    ];
     const successStates = options?.successStates ?? [
-      TransactionStatus.ACCEPTED_ON_L1,
-      TransactionStatus.ACCEPTED_ON_L2,
+      TransactionExecutionStatus.SUCCEEDED,
+      TransactionFinalityStatus.ACCEPTED_ON_L1,
+      TransactionFinalityStatus.ACCEPTED_ON_L2,
     ];
 
-    while (!onchain) {
+    while (!completed) {
       // eslint-disable-next-line no-await-in-loop
       await wait(retryInterval);
       // eslint-disable-next-line no-await-in-loop
       res = await this.getTransactionStatus(txHash);
 
-      if (successStates.includes(res.tx_status)) {
-        onchain = true;
-      } else if (errorStates.includes(res.tx_status)) {
-        const message = res.tx_failure_reason
-          ? `${res.tx_status}: ${res.tx_failure_reason.code}\n${res.tx_failure_reason.error_message}`
-          : res.tx_status;
+      if (TransactionFinalityStatus.NOT_RECEIVED === res.finality_status && retries < 3) {
+        retries += 1;
+      } else if (
+        successStates.includes(res.finality_status) ||
+        successStates.includes(res.execution_status)
+      ) {
+        completed = true;
+      } else if (
+        errorStates.includes(res.finality_status) ||
+        errorStates.includes(res.execution_status)
+      ) {
+        let message;
+        if (res.tx_failure_reason) {
+          message = `${res.tx_status}: ${res.tx_failure_reason.code}\n${res.tx_failure_reason.error_message}`;
+        } else if (res.tx_revert_reason) {
+          message = `${res.tx_status}: ${res.tx_revert_reason}`;
+        } else {
+          message = res.tx_status;
+        }
         const error = new Error(message) as Error & { response: GetTransactionStatusResponse };
         error.response = res;
         throw error;

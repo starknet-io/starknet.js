@@ -116,7 +116,7 @@
         },
         "entry_point_type": {
           "type": "string",
-          "enum": ["EXTERNAL", "CONSTRUCTOR"]
+          "enum": ["EXTERNAL", "CONSTRUCTOR", "L1_HANDLER"]
         },
         "result": {
           "type": "array"

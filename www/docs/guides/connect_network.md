@@ -49,17 +49,55 @@ const provider = new Provider({
 
 ## Connect your DAPP to a Starknet node
 
+### Pathfinder
+
 For a local [Pathfinder](https://github.com/eqlabs/pathfinder) node:
 
 ```typescript
-const provider = new Provider({ rpc: { nodeUrl: '127.0.0.1:9545' } })
+const provider = new Provider({ rpc: { nodeUrl: '127.0.0.1:9545/rpc/v0.4' } })
 ```
 
 Your node can be located in your local network (example: pathfinder node running on a computer on your network, launched with this additional option: `--http-rpc 0.0.0.0:9545`).
 You can connect with:
 
 ```typescript
-const provider = new Provider({ rpc: { nodeUrl: '192.168.1.99:9545' } })
+const provider = new Provider({ rpc: { nodeUrl: '192.168.1.99:9545/rpc/v0.4' } })
+```
+
+### Juno
+
+Initialize the provider with :
+
+```typescript
+const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:6060' });
+```
+
+### Other node clients
+
+Other examples (some need a secret key) :
+
+**Mainnet :**
+
+```typescript
+// Infura node rpc for Mainnet :
+const providerInfuraMainnet = new RpcProvider({ nodeUrl: 'https://starknet-mainnet.infura.io/v3/' + infuraKey });
+// Blast node rpc for Mainnet :
+const providerBlastMainnet = new RpcProvider({ nodeUrl: 'https://starknet-mainnet.blastapi.io/' + blastKey + "/rpc/v0.4" });
+// Lava node rpc for Mainnet :
+const providerMainnetLava = new RpcProvider({ nodeUrl: "https://g.w.lavanet.xyz:443/gateway/strk/rpc-http/" + lavaMainnetKey });
+// Alchemy node rpc for Mainnet :
+const providerAlchemyMainnet = new RpcProvider({ nodeUrl: 'https://starknet-mainnet.g.alchemy.com/v2/' + alchemyKey });
+```
+
+**Testnet :**
+
+```typescript
+// Infura node rpc for Testnet :
+const providerInfuraTestnet = new RpcProvider({ nodeUrl: 'https://starknet-goerli.infura.io/v3/' + infuraKey });
+// Blast node rpc for Testnet :
+const providerBlastTestnet = new RpcProvider({ nodeUrl: 'https://starknet-testnet.blastapi.io/' + blastKey + "/rpc/v0.4" });
+// Alchemy node rpc for Testnet :
+const providerAlchemyTestnet = new RpcProvider({ nodeUrl: 'https://starknet-goerli.g.alchemy.com/v2/' + alchemyKey });
 ```
 
 ## Specific methods
@@ -78,18 +116,12 @@ const responseEstimateMessageFee = await provider.estimateMessageFee(.....)
 
 ### Specific RPC methods
 
-For example, if you want to read the events recorded in a range of blocks, you need to use a method available from an RPC node. The class `RpcProvider` is available for this case:
+For example, if you want to read the list of pending transactions, you need to use a method available from an RPC node. The class `RpcProvider` is available for this case:
 
 ```typescript
 import { RpcProvider } from "starknet";
-const providerRPC = new RpcProvider({ nodeUrl: "http://192.168.1.99:9545" }); // for a pathfinder node located in a PC in the local network
-const lastBlock = await providerRPC.getBlock('latest');
-let eventsList = await providerRPC.getEvents({
-    address: myContractAddress,
-    from_block: {block_number: lastBlock.block_number-2},
-    to_block: {block_number: lastBlock.block_number},
-    chunk_size: 400
-});
+const providerRPC = new RpcProvider({ nodeUrl: "http://192.168.1.99:9545/rpc/v0.4" }); // for a pathfinder node located in a PC in the local network
+const pendingTx = await providerRPC.getPendingTransactions();
 ```
 
 RPC providers are for example Infura, Alchemy, Chainstack... Or you can spin up your own Pathfinder node!

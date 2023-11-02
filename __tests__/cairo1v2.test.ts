@@ -1,6 +1,11 @@
 import {
   Account,
   BigNumberish,
+  CairoCustomEnum,
+  CairoOption,
+  CairoOptionVariant,
+  CairoResult,
+  CairoResultVariant,
   CallData,
   Calldata,
   CompiledSierra,
@@ -16,12 +21,15 @@ import {
   selector,
   shortString,
   stark,
+  types,
 } from '../src';
 import {
   compiledC1Account,
   compiledC1AccountCasm,
   compiledC1v2,
   compiledC1v2Casm,
+  compiledC210,
+  compiledC210Casm,
   compiledComplexSierra,
   describeIfDevnetSequencer,
   getTestAccount,
@@ -33,12 +41,14 @@ const { uint256, tuple, isCairo1Abi } = cairo;
 const { toHex } = num;
 const { starknetKeccak } = selector;
 
-describe('Cairo 1 Devnet', () => {
+describe('Cairo 1', () => {
+  const provider = getTestProvider();
+  const account = getTestAccount(provider);
   describe('API &  Contract interactions', () => {
-    const provider = getTestProvider();
-    const account = getTestAccount(provider);
     let dd: DeclareDeployUDCResponse;
     let cairo1Contract: Contract;
+    let dd2: DeclareDeployUDCResponse;
+    let cairo210Contract: Contract;
     initializeMatcher(expect);
 
     beforeAll(async () => {
@@ -46,14 +56,28 @@ describe('Cairo 1 Devnet', () => {
         contract: compiledC1v2,
         casm: compiledC1v2Casm,
       });
-
       cairo1Contract = new Contract(compiledC1v2.abi, dd.deploy.contract_address, account);
+
+      dd2 = await account.declareAndDeploy({
+        contract: compiledC210,
+        casm: compiledC210Casm,
+      });
+      cairo210Contract = new Contract(compiledC210.abi, dd2.deploy.contract_address, account);
     });
 
     test('Declare & deploy v2 - Hello Cairo 1 contract', async () => {
       expect(dd.declare).toMatchSchemaRef('DeclareContractResponse');
       expect(dd.deploy).toMatchSchemaRef('DeployContractUDCResponse');
       expect(cairo1Contract).toBeInstanceOf(Contract);
+      expect(cairo210Contract).toBeInstanceOf(Contract);
+    });
+
+    test('getCairoVersion', async () => {
+      const version1 = await cairo1Contract.getVersion();
+      expect(version1).toEqual({ cairo: '1', compiler: '2' });
+
+      const version210 = await cairo210Contract.getVersion();
+      expect(version210).toEqual({ cairo: '1', compiler: '2' });
     });
 
     xtest('validate TS for redeclare - skip testing', async () => {
@@ -117,7 +141,7 @@ describe('Cairo 1 Devnet', () => {
       expect(balance).toBe(200n);
     });
 
-    test('Cairo 1 Contract Interaction - uint 8, 16, 32, 64, 128', async () => {
+    test('Cairo 1 Contract Interaction - uint 8, 16, 32, 64, 128, litterals', async () => {
       const tx = await cairo1Contract.increase_balance_u8(255n);
       await account.waitForTransaction(tx.transaction_hash);
       const balance = await cairo1Contract.get_balance_u8();
@@ -147,7 +171,9 @@ describe('Cairo 1 Devnet', () => {
       const myCall0 = cairo1Contract.populate('test_u256', functionParameters);
       const res0 = await cairo1Contract.test_u256(myCall0.calldata);
       expect(res0).toBe(16n);
-
+      const myCall0a = cairo1Contract.populate('test_u256', { p1: 15 });
+      const res0a = await cairo1Contract.test_u256(myCall0a.calldata);
+      expect(res0a).toBe(16n);
       // using myCallData.compile result in meta-class
       const contractCallData: CallData = new CallData(cairo1Contract.abi);
       const myCalldata: Calldata = contractCallData.compile('test_u256', functionParameters);
@@ -183,12 +209,38 @@ describe('Cairo 1 Devnet', () => {
       expect(status).toBe(true);
     });
 
-    test('Cairo 1 Contract Interaction - ContractAddress', async () => {
+    test('Cairo 1 Contract Interaction - ContractAddress, ClassHash, EthAddress', async () => {
       const tx = await cairo1Contract.set_ca('123');
       await account.waitForTransaction(tx.transaction_hash);
       const status = await cairo1Contract.get_ca();
-
       expect(status).toBe(123n);
+
+      // new types Cairo v2.0.0
+      const compiled = cairo1Contract.populate('new_types', {
+        ch: 123456789n,
+        eth_addr: 987654321n,
+        contr_address: 657563474357n,
+      });
+      const result = await cairo1Contract.call('new_types', compiled.calldata as Calldata);
+      expect(result).toStrictEqual({ '0': 123456789n, '1': 987654321n, '2': 657563474357n });
+
+      const myCalldata = new CallData(compiledC1v2.abi); // test arrays
+      const compiled2 = myCalldata.compile('array_new_types', {
+        tup: cairo.tuple(256, '0x1234567890', '0xe3456'),
+        tupa: cairo.tuple(
+          ['0x1234567890', '0xe3456'], // ContractAddress
+          ['0x1234567891', '0xe3457'], // EthAddress
+          ['0x1234567892', '0xe3458'] // ClassHash
+        ),
+      });
+      const res1 = await cairo1Contract.call('array_new_types', compiled2);
+      expect(res1).toStrictEqual({
+        '0': [78187493520n, 930902n],
+        '1': [78187493521n, 930903n],
+        '2': [78187493522n, 930904n],
+      });
+      const res2 = await cairo1Contract.call('array_contract_addr', [['0x1234567892', '0xe3458']]);
+      expect(res2).toStrictEqual([78187493522n, 930904n]);
     });
 
     test('Cairo1 simple getStorageAt variables retrieval', async () => {
@@ -256,6 +308,11 @@ describe('Cairo 1 Devnet', () => {
 
       const status2 = await cairo1Contract.echo_array_bool([true, true, false, false]);
       expect(status2).toEqual([true, true, false, false]);
+
+      // Span type
+      const comp = cairo1Contract.populate('new_span', { my_span: [1, 2, 3] });
+      const resp = await cairo1Contract.call('new_span', comp.calldata as Calldata);
+      expect(resp).toEqual([1n, 2n, 3n]);
     });
 
     test('Cairo 1 Contract Interaction - echo flat un-nested Struct', async () => {
@@ -343,6 +400,134 @@ describe('Cairo 1 Devnet', () => {
         0: [1n, 2n, 3n],
         1: [4n, 5n, 6n],
       });
+    });
+
+    test('CairoEnums', async () => {
+      type Order = {
+        p1: BigNumberish;
+        p2: BigNumberish;
+      };
+      // return a Cairo Custom Enum
+      const myCairoEnum: CairoCustomEnum = await cairo1Contract.my_enum_output(50);
+      expect(myCairoEnum.unwrap()).toEqual(3n);
+      expect(myCairoEnum.activeVariant()).toEqual('Error');
+
+      const myCairoEnum2: CairoCustomEnum = await cairo1Contract.my_enum_output(100);
+      expect(myCairoEnum2.unwrap()).toEqual(BigInt(shortString.encodeShortString('attention:100')));
+      expect(myCairoEnum2.activeVariant()).toEqual('Warning');
+
+      const myCairoEnum3: CairoCustomEnum = await cairo1Contract.my_enum_output(150);
+      const res: Order = myCairoEnum3.unwrap();
+      expect(res).toEqual({ p1: 1n, p2: 150n });
+      expect(myCairoEnum3.activeVariant()).toEqual('Response');
+
+      // Send a Cairo Custom Enum
+      const res2 = (await cairo1Contract.call('my_enum_input', [
+        new CairoCustomEnum({ Error: 100 }),
+      ])) as bigint;
+      const myOrder: Order = { p1: 100, p2: 200 };
+      const res3 = (await cairo1Contract.my_enum_input(
+        new CairoCustomEnum({ Response: myOrder })
+      )) as bigint;
+      expect(res2).toEqual(100n);
+      expect(res3).toEqual(200n);
+
+      const comp2 = CallData.compile([
+        new CairoCustomEnum({
+          Response: undefined,
+          Warning: undefined,
+          Error: 100,
+        }),
+      ]);
+      const res2a = (await cairo1Contract.call('my_enum_input', comp2)) as bigint;
+      const comp3 = CallData.compile([
+        new CairoCustomEnum({
+          Response: myOrder,
+          Warning: undefined,
+          Error: undefined,
+        }),
+      ]);
+      const res3a = (await cairo1Contract.my_enum_input(comp3)) as bigint;
+      expect(res2a).toEqual(100n);
+      expect(res3a).toEqual(200n);
+
+      const comp2b = cairo1Contract.populate('my_enum_input', {
+        customEnum: new CairoCustomEnum({ Error: 100 }),
+      });
+      const res2b = (await cairo1Contract.call(
+        'my_enum_input',
+        comp2b.calldata as Calldata
+      )) as bigint;
+      const comp3b = cairo1Contract.populate('my_enum_input', {
+        customEnum: new CairoCustomEnum({ Response: myOrder }),
+      });
+      const res3b = (await cairo1Contract.my_enum_input(comp3b.calldata)) as bigint;
+      expect(res2b).toEqual(100n);
+      expect(res3b).toEqual(200n);
+
+      // return a Cairo Option
+      const myCairoOption: CairoOption<Order> = await cairo1Contract.option_order_output(50);
+      expect(myCairoOption.unwrap()).toEqual(undefined);
+      expect(myCairoOption.isNone()).toEqual(true);
+      expect(myCairoOption.isSome()).toEqual(false);
+
+      const myCairoOption2: CairoOption<Order> = await cairo1Contract.option_order_output(150);
+      expect(myCairoOption2.unwrap()).toEqual({ p1: 18n, p2: 150n });
+      expect(myCairoOption2.isNone()).toEqual(false);
+      expect(myCairoOption2.isSome()).toEqual(true);
+
+      // send a Cairo Option
+      const cairoOption1 = new CairoOption<Order>(CairoOptionVariant.None);
+      const res4 = (await cairo1Contract.call('option_order_input', [cairoOption1])) as bigint;
+      const comp4a = CallData.compile([cairoOption1]);
+      const res4a = (await cairo1Contract.call('option_order_input', comp4a)) as bigint;
+      const res5 = (await cairo1Contract.option_order_input(
+        new CairoOption<Order>(CairoOptionVariant.Some, myOrder)
+      )) as bigint;
+      const res5a = (await cairo1Contract.option_order_input(
+        CallData.compile([new CairoOption<Order>(CairoOptionVariant.Some, myOrder)])
+      )) as bigint;
+      expect(res4).toEqual(17n);
+      expect(res4a).toEqual(17n);
+      expect(res5).toEqual(200n);
+      expect(res5a).toEqual(200n);
+
+      // return a Cairo Result
+      const myCairoResult: CairoResult<Order, BigNumberish> =
+        await cairo1Contract.enum_result_output(50);
+      expect(myCairoResult.unwrap()).toEqual(14n);
+      expect(myCairoResult.isErr()).toEqual(true);
+      expect(myCairoResult.isOk()).toEqual(false);
+
+      const myCairoResult2: CairoResult<Order, BigNumberish> =
+        await cairo1Contract.enum_result_output(150);
+      expect(myCairoResult2.unwrap()).toEqual({ p1: 8n, p2: 150n });
+      expect(myCairoResult2.isErr()).toEqual(false);
+      expect(myCairoResult2.isOk()).toEqual(true);
+
+      // send a Cairo Result
+      const cairoResult1 = new CairoResult<Order, BigNumberish>(CairoResultVariant.Err, 18n);
+      const res6 = (await cairo1Contract.call('enum_result_input', [cairoResult1])) as bigint;
+      const comp6a = CallData.compile([cairoResult1]);
+      const res6a = (await cairo1Contract.call('enum_result_input', comp6a)) as bigint;
+      const res7 = (await cairo1Contract.enum_result_input(
+        new CairoResult<Order, BigNumberish>(CairoResultVariant.Ok, myOrder)
+      )) as bigint;
+      const res7a = (await cairo1Contract.enum_result_input(
+        CallData.compile([new CairoResult<Order, BigNumberish>(CairoResultVariant.Ok, myOrder)])
+      )) as bigint;
+      expect(res6).toEqual(18n);
+      expect(res6a).toEqual(18n);
+      expect(res7).toEqual(200n);
+      expect(res7a).toEqual(200n);
+    });
+
+    test('Cairo 2.1.0 simple contract', async () => {
+      const res = await cairo210Contract.test_felt(1, 100, 3);
+      expect(res).toEqual(101n);
+
+      const call1 = cairo210Contract.populate('test_len', { p1: 100, string_len: 200 });
+      expect(call1.calldata).toEqual(['100', '200']);
     });
 
     test('myCallData.compile for Cairo 1', async () => {
@@ -501,8 +686,6 @@ describe('Cairo 1 Devnet', () => {
   });
 
   describe('Cairo1 Account contract', () => {
-    const provider = getTestProvider();
-    const account = getTestAccount(provider);
     let accountC1: Account;
 
     beforeAll(async () => {
@@ -554,6 +737,170 @@ describe('Cairo 1 Devnet', () => {
 
     test('deploy Cairo1 Account from Cairo0 Account', () => {
       expect(accountC1).toBeInstanceOf(Account);
+    });
+  });
+
+  describe('Event Parsing', () => {
+    let eventContract: Contract;
+    const simpleKeyVariable = 0n;
+    const simpleKeyStruct = {
+      first: 1n,
+      second: 2n,
+    };
+    const simpleKeyArray = [3n, 4n, 5n];
+    const simpleDataVariable = 6n;
+    const simpleDataStruct = {
+      first: 7n,
+      second: 8n,
+    };
+    const simpleDataArray = [9n, 10n, 11n];
+    const nestedKeyStruct = {
+      simpleStruct: {
+        first: 0n,
+        second: 1n,
+      },
+      simpleArray: [2n, 3n, 4n, 5n],
+    };
+    const nestedDataStruct = {
+      simpleStruct: {
+        first: 6n,
+        second: 7n,
+      },
+      simpleArray: [8n, 9n, 10n, 11n],
+    };
+    beforeAll(async () => {
+      const { deploy } = await account.declareAndDeploy({
+        contract: compiledC1v2,
+        casm: compiledC1v2Casm,
+      });
+
+      eventContract = new Contract(compiledC1v2.abi, deploy.contract_address!, account);
+    });
+
+    test('parse event returning a regular struct', async () => {
+      const { transaction_hash } = await eventContract.emitEventRegular(
+        simpleKeyVariable,
+        simpleKeyStruct,
+        simpleKeyArray,
+        simpleDataVariable,
+        simpleDataStruct,
+        simpleDataArray
+      );
+      const shouldBe: types.ParsedEvents = [
+        {
+          EventRegular: {
+            simpleKeyVariable,
+            simpleKeyStruct,
+            simpleKeyArray,
+            simpleDataVariable,
+            simpleDataStruct,
+            simpleDataArray,
+          },
+        },
+      ];
+      const tx = await provider.waitForTransaction(transaction_hash);
+      const events = eventContract.parseEvents(tx);
+      return expect(events).toStrictEqual(shouldBe);
+    });
+
+    test('parse event returning a nested struct', async () => {
+      const { transaction_hash } = await eventContract.emitEventNested(
+        nestedKeyStruct,
+        nestedDataStruct
+      );
+      const shouldBe: types.ParsedEvents = [
+        {
+          EventNested: {
+            nestedKeyStruct,
+            nestedDataStruct,
+          },
+        },
+      ];
+      const tx = await provider.waitForTransaction(transaction_hash);
+      const events = eventContract.parseEvents(tx);
+      return expect(events).toStrictEqual(shouldBe);
+    });
+
+    test('parse tx returning multiple similar events', async () => {
+      const anotherKeyVariable = 100n;
+      const shouldBe: types.ParsedEvents = [
+        {
+          EventRegular: {
+            simpleKeyVariable,
+            simpleKeyStruct,
+            simpleKeyArray,
+            simpleDataVariable,
+            simpleDataStruct,
+            simpleDataArray,
+          },
+        },
+        {
+          EventRegular: {
+            simpleKeyVariable: anotherKeyVariable,
+            simpleKeyStruct,
+            simpleKeyArray,
+            simpleDataVariable,
+            simpleDataStruct,
+            simpleDataArray,
+          },
+        },
+      ];
+      const callData1 = eventContract.populate('emitEventRegular', [
+        simpleKeyVariable,
+        simpleKeyStruct,
+        simpleKeyArray,
+        simpleDataVariable,
+        simpleDataStruct,
+        simpleDataArray,
+      ]);
+      const callData2 = eventContract.populate('emitEventRegular', [
+        anotherKeyVariable,
+        simpleKeyStruct,
+        simpleKeyArray,
+        simpleDataVariable,
+        simpleDataStruct,
+        simpleDataArray,
+      ]);
+      const { transaction_hash } = await account.execute([callData1, callData2]);
+      const tx = await provider.waitForTransaction(transaction_hash);
+      const events = eventContract.parseEvents(tx);
+      return expect(events).toStrictEqual(shouldBe);
+    });
+    test('parse tx returning multiple different events', async () => {
+      const shouldBe: types.ParsedEvents = [
+        {
+          EventRegular: {
+            simpleKeyVariable,
+            simpleKeyStruct,
+            simpleKeyArray,
+            simpleDataVariable,
+            simpleDataStruct,
+            simpleDataArray,
+          },
+        },
+        {
+          EventNested: {
+            nestedKeyStruct,
+            nestedDataStruct,
+          },
+        },
+      ];
+      const callData1 = eventContract.populate('emitEventRegular', [
+        simpleKeyVariable,
+        simpleKeyStruct,
+        simpleKeyArray,
+        simpleDataVariable,
+        simpleDataStruct,
+        simpleDataArray,
+      ]);
+      const callData2 = eventContract.populate('emitEventNested', [
+        nestedKeyStruct,
+        nestedDataStruct,
+      ]);
+      const { transaction_hash } = await account.execute([callData1, callData2]);
+      const tx = await provider.waitForTransaction(transaction_hash);
+      const events = eventContract.parseEvents(tx);
+      return expect(events).toStrictEqual(shouldBe);
     });
   });
 });

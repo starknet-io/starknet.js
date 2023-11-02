@@ -21,6 +21,7 @@ import {
   DeployAccountContractTransaction,
   DeployContractResponse,
   DeployContractUDCResponse,
+  DeployTransactionReceiptResponse,
   Details,
   EstimateFee,
   EstimateFeeAction,
@@ -70,7 +71,7 @@ export class Account extends Provider implements AccountInterface {
     providerOrOptions: ProviderOptions | ProviderInterface,
     address: string,
     pkOrSigner: Uint8Array | string | SignerInterface,
-    cairoVersion: CairoVersion = '0'
+    cairoVersion?: CairoVersion
   ) {
     super(providerOrOptions);
     this.address = address.toLowerCase();
@@ -79,7 +80,9 @@ export class Account extends Provider implements AccountInterface {
         ? new Signer(pkOrSigner)
         : pkOrSigner;
 
-    this.cairoVersion = cairoVersion;
+    if (cairoVersion) {
+      this.cairoVersion = cairoVersion.toString() as CairoVersion;
+    }
   }
 
   public async getNonce(blockIdentifier?: BlockIdentifier): Promise<Nonce> {
@@ -93,6 +96,20 @@ export class Account extends Provider implements AccountInterface {
     } catch (error) {
       return 0n;
     }
+  }
+
+  /**
+   * Retrieves the Cairo version from the network and sets `cairoVersion` if not already set in the constructor
+   * @param classHash if provided detects Cairo version from classHash, otherwise from the account address
+   */
+  public async getCairoVersion(classHash?: string) {
+    if (!this.cairoVersion) {
+      const { cairo } = classHash
+        ? await super.getContractVersion(undefined, classHash)
+        : await super.getContractVersion(this.address);
+      this.cairoVersion = cairo;
+    }
+    return this.cairoVersion;
   }
 
   public async estimateFee(
@@ -117,7 +134,7 @@ export class Account extends Provider implements AccountInterface {
       maxFee: ZERO,
       version,
       chainId,
-      cairoVersion: this.cairoVersion,
+      cairoVersion: await this.getCairoVersion(),
     };
 
     const invocation = await this.buildInvocation(transactions, signerDetails);
@@ -152,7 +169,7 @@ export class Account extends Provider implements AccountInterface {
         version,
         walletAddress: this.address,
         maxFee: ZERO,
-        cairoVersion: this.cairoVersion,
+        cairoVersion: undefined, // unused parameter
       }
     );
 
@@ -189,9 +206,9 @@ export class Account extends Provider implements AccountInterface {
         nonce,
         chainId,
         version,
-        walletAddress: this.address,
+        walletAddress: this.address, // unused parameter
         maxFee: ZERO,
-        cairoVersion: this.cairoVersion,
+        cairoVersion: undefined, // unused parameter
       }
     );
 
@@ -245,7 +262,7 @@ export class Account extends Provider implements AccountInterface {
     call: Array<Call>,
     signerDetails: InvocationsSignerDetails
   ): Promise<Invocation> {
-    const calldata = getExecuteCalldata(call, this.cairoVersion);
+    const calldata = getExecuteCalldata(call, await this.getCairoVersion());
     const signature = await this.signer.signTransaction(call, signerDetails);
 
     return {
@@ -277,12 +294,12 @@ export class Account extends Provider implements AccountInterface {
       maxFee,
       version,
       chainId,
-      cairoVersion: this.cairoVersion,
+      cairoVersion: await this.getCairoVersion(),
     };
 
     const signature = await this.signer.signTransaction(transactions, signerDetails, abis);
 
-    const calldata = getExecuteCalldata(transactions, this.cairoVersion);
+    const calldata = getExecuteCalldata(transactions, await this.getCairoVersion());
 
     return this.invokeFunction(
       { contractAddress: this.address, calldata, signature },
@@ -298,9 +315,7 @@ export class Account extends Provider implements AccountInterface {
    * First check if contract is already declared, if not declare it
    * If contract already declared returned transaction_hash is ''.
    * Method will pass even if contract is already declared
-   * @param payload DeclareContractPayload
-   * @param transactionsDetail (optional) InvocationsDetails = \{\}
-   * @returns DeclareContractResponse
+   * @param transactionsDetail (optional)
    */
   public async declareIfNot(
     payload: DeclareContractPayload,
@@ -341,7 +356,7 @@ export class Account extends Provider implements AccountInterface {
     const declareContractTransaction = await this.buildDeclarePayload(declareContractPayload, {
       ...details,
       walletAddress: this.address,
-      cairoVersion: this.cairoVersion,
+      cairoVersion: undefined, // unused parameter
     });
 
     return this.declareContract(declareContractTransaction, details);
@@ -399,7 +414,7 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<DeployContractUDCResponse> {
     const deployTx = await this.deploy(payload, details);
     const txReceipt = await this.waitForTransaction(deployTx.transaction_hash);
-    return parseUDCEvent(txReceipt);
+    return parseUDCEvent(txReceipt as DeployTransactionReceiptResponse);
   }
 
   public async declareAndDeploy(
@@ -647,17 +662,24 @@ export class Account extends Provider implements AccountInterface {
     const safeNonce = await this.getNonceSafe(nonce);
     const chainId = await this.getChainId();
 
+    // BULK ACTION FROM NEW ACCOUNT START WITH DEPLOY_ACCOUNT
+    const tx0Payload: any = 'payload' in invocations[0] ? invocations[0].payload : invocations[0];
+    const cairoVersion =
+      invocations[0].type === TransactionType.DEPLOY_ACCOUNT
+        ? await this.getCairoVersion(tx0Payload.classHash)
+        : await this.getCairoVersion();
+
     return Promise.all(
       ([] as Invocations).concat(invocations).map(async (transaction, index: number) => {
+        const txPayload: any = 'payload' in transaction ? transaction.payload : transaction;
         const signerDetails: InvocationsSignerDetails = {
           walletAddress: this.address,
           nonce: toBigInt(Number(safeNonce) + index),
           maxFee: ZERO,
           version,
           chainId,
-          cairoVersion: this.cairoVersion,
+          cairoVersion,
         };
-        const txPayload: any = 'payload' in transaction ? transaction.payload : transaction;
         const common = {
           type: transaction.type,
           version,

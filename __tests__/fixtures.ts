@@ -1,5 +1,5 @@
-import fs from 'fs';
-import path from 'path';
+import fs from 'node:fs';
+import path from 'node:path';
 
 import { Account, ProviderInterface, RpcProvider, SequencerProvider, json } from '../src';
 import { BaseUrl } from '../src/constants';
@@ -45,23 +45,25 @@ export const compiledC1Account = readContractSierra('cairo/account/account');
 export const compiledC1AccountCasm = readContractSierraCasm('cairo/account/account');
 export const compiledC1v2 = readContractSierra('cairo/helloCairo2/compiled');
 export const compiledC1v2Casm = readContractSierraCasm('cairo/helloCairo2/compiled');
+export const compiledC210 = readContractSierra('cairo/cairo210/cairo210.sierra');
+export const compiledC210Casm = readContractSierraCasm('cairo/cairo210/cairo210');
 
 /* Default test config based on run `starknet-devnet --seed 0` */
-const DEFAULT_TEST_PROVIDER_SEQUENCER_URL = 'http://127.0.0.1:5050/';
-const DEFAULT_TEST_ACCOUNT_ADDRESS =
-  '0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a';
-const DEFAULT_TEST_ACCOUNT_PRIVATE_KEY = '0xe3e70682c2094cac629f6fbed82c07cd';
+const DEFAULT_TEST_PROVIDER_URL = 'http://127.0.0.1:5050/';
 
 /* User defined config or default one */
-const BASE_URL = process.env.TEST_PROVIDER_BASE_URL || DEFAULT_TEST_PROVIDER_SEQUENCER_URL;
+const BASE_URL = process.env.TEST_PROVIDER_BASE_URL || DEFAULT_TEST_PROVIDER_URL;
 const RPC_URL = process.env.TEST_RPC_URL;
 
 /* Detect user defined node or sequencer, if none default to sequencer if both default to node */
 const PROVIDER_URL = RPC_URL || BASE_URL;
 
-/* Detect is localhost devnet */
+/** explicit is local devnet (undefined,'','1','true','TRUE') = true else false */
+const LOCAL_DEVNET = ['1', 'TRUE', ''].includes((process.env.LOCAL_DEVNET || '').toUpperCase());
+
+/* Detect is localhost devnet, it can be also localhost RPC node */
 export const IS_LOCALHOST_DEVNET =
-  PROVIDER_URL.includes('localhost') || PROVIDER_URL.includes('127.0.0.1');
+  LOCAL_DEVNET && (PROVIDER_URL.includes('localhost') || PROVIDER_URL.includes('127.0.0.1'));
 
 export const IS_DEVNET_RPC = IS_LOCALHOST_DEVNET && PROVIDER_URL.includes('rpc');
 export const IS_DEVNET_SEQUENCER = IS_LOCALHOST_DEVNET && !PROVIDER_URL.includes('rpc');
@@ -69,7 +71,7 @@ export const IS_DEVNET_SEQUENCER = IS_LOCALHOST_DEVNET && !PROVIDER_URL.includes
 /* Definitions */
 export const IS_RPC = !!RPC_URL;
 export const IS_SEQUENCER = !RPC_URL;
-export const IS_SEQUENCER_TESTNET2 = PROVIDER_URL.includes(BaseUrl.SN_GOERLI2);
+export const IS_SEQUENCER_GOERLI = PROVIDER_URL.includes(BaseUrl.SN_GOERLI);
 
 export const getTestProvider = (): ProviderInterface => {
   const provider = RPC_URL
@@ -102,9 +104,19 @@ export const getTestAccount = (provider: ProviderInterface) => {
     if (!testAccountAddress) {
       throw new Error('TEST_ACCOUNT_ADDRESS is not set');
     }
-  } else {
-    testAccountAddress = DEFAULT_TEST_ACCOUNT_ADDRESS;
-    testAccountPrivateKey = DEFAULT_TEST_ACCOUNT_PRIVATE_KEY;
+  } else if (!testAccountAddress || !testAccountPrivateKey) {
+    // use defaults for devnet only if they are not set
+
+    // TODO: refactor to retrieve from devnet's /predeployed_accounts endpoint
+    [testAccountAddress, testAccountPrivateKey] = IS_RPC
+      ? [
+          '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691',
+          '0x71d7bb07b9a64f6f78ac4c816aff4da9',
+        ]
+      : [
+          '0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a',
+          '0xe3e70682c2094cac629f6fbed82c07cd',
+        ];
   }
   const cairoVersion = (process.env.ACCOUNT_CAIRO_VERSION as CairoVersion) || '0';
 
@@ -119,7 +131,7 @@ export const describeIfNotDevnet = describeIf(!IS_LOCALHOST_DEVNET);
 export const describeIfDevnet = describeIf(IS_LOCALHOST_DEVNET);
 export const describeIfDevnetRpc = describeIf(IS_DEVNET_RPC);
 export const describeIfDevnetSequencer = describeIf(IS_DEVNET_SEQUENCER);
-export const describeIfSequencerTestnet2 = describeIf(IS_SEQUENCER_TESTNET2);
+export const describeIfSequencerGoerli = describeIf(IS_SEQUENCER_GOERLI);
 
 export const erc20ClassHash = '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a';
 export const wrongClassHash = '0x000000000000000000000000000000000000000000000000000000000000000';
