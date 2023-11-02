@@ -23,18 +23,18 @@ type ProviderType = {
 /* Default test config based on run `starknet-devnet --seed 0` */
 const GS_DEFAULT_TEST_PROVIDER_URL = 'http://127.0.0.1:5050/';
 
-const overrideOrSet = (envName: string, setValue: string) => {
-  process.env[envName] = process.env[envName] ?? setValue;
+const setIfNullish = (envName: string, setValue?: string | boolean) => {
+  process.env[envName] ??= setValue?.toString();
 };
 
 const localDevnetDetectionStrategy = async () => {
   const setup = (strategy: DevnetStrategy) => {
-    overrideOrSet('IS_LOCALHOST_DEVNET', strategy.isDevnet ? 'true' : 'false');
-    overrideOrSet(
+    setIfNullish('IS_LOCALHOST_DEVNET', strategy.isDevnet ? 'true' : 'false');
+    setIfNullish(
       'IS_RPC_DEVNET',
       strategy.isDevnet && (strategy.isRS || process.env.TEST_RPC_URL) ? 'true' : 'false'
     );
-    overrideOrSet(
+    setIfNullish(
       'IS_SEQUENCER_DEVNET',
       strategy.isDevnet && process.env.IS_RPC_DEVNET === 'false' ? 'true' : 'false'
     );
@@ -45,18 +45,16 @@ const localDevnetDetectionStrategy = async () => {
     isDevnet: false,
     isRS: false,
   };
+
   // if is_alive work it is local devnet
-  try {
-    const response = await fetch(`${GS_DEFAULT_TEST_PROVIDER_URL}is_alive`);
-    const body = await response.text();
-    if (body === 'Alive!!!') {
-      strategy.isDevnet = true;
-    } else {
-      return setup(strategy);
-    }
-  } catch (error) {
+  const devnetResult = await fetch(`${GS_DEFAULT_TEST_PROVIDER_URL}is_alive`)
+    .then((res) => res.text())
+    .catch(() => '');
+  if (devnetResult !== 'Alive!!!') {
     return setup(strategy);
   }
+  strategy.isDevnet = true;
+
   // if on base url RPC endpoint work it is devnet-rs else it devnet-py
   try {
     const response = await fetch(`${GS_DEFAULT_TEST_PROVIDER_URL}`, {
@@ -75,9 +73,9 @@ const localDevnetDetectionStrategy = async () => {
 
 const sequencerOrRpc = async (devnetStrategy?: DevnetStrategy) => {
   const setup = (providerType: ProviderType) => {
-    overrideOrSet('IS_SEQUENCER', providerType.sequencer ? 'true' : 'false');
-    overrideOrSet('IS_RPC', providerType.rpc ? 'true' : 'false');
-    overrideOrSet(
+    setIfNullish('IS_SEQUENCER', providerType.sequencer ? 'true' : 'false');
+    setIfNullish('IS_RPC', providerType.rpc ? 'true' : 'false');
+    setIfNullish(
       'IS_SEQUENCER_GOERLI',
       (process.env.TEST_PROVIDER_BASE_URL || process.env.TEST_RPC_URL || '').includes(
         BaseUrl.SN_GOERLI
@@ -171,12 +169,12 @@ const verifySetup = (final?: boolean) => {
   }
 
   if (!final) {
-    overrideOrSet('IS_LOCALHOST_DEVNET', 'false');
-    overrideOrSet('IS_RPC_DEVNET', 'false');
-    overrideOrSet('IS_SEQUENCER_DEVNET', 'false');
-    overrideOrSet('IS_RPC', process.env.TEST_RPC_URL ? 'true' : 'false');
-    overrideOrSet('IS_SEQUENCER', process.env.TEST_PROVIDER_BASE_URL ? 'true' : 'false');
-    overrideOrSet(
+    setIfNullish('IS_LOCALHOST_DEVNET', 'false');
+    setIfNullish('IS_RPC_DEVNET', 'false');
+    setIfNullish('IS_SEQUENCER_DEVNET', 'false');
+    setIfNullish('IS_RPC', process.env.TEST_RPC_URL ? 'true' : 'false');
+    setIfNullish('IS_SEQUENCER', process.env.TEST_PROVIDER_BASE_URL ? 'true' : 'false');
+    setIfNullish(
       'IS_SEQUENCER_GOERLI',
       (process.env.TEST_PROVIDER_BASE_URL || process.env.TEST_RPC_URL || '').includes(
         BaseUrl.SN_GOERLI
@@ -210,8 +208,7 @@ const verifySetup = (final?: boolean) => {
 const executeStrategy = async () => {
   // 1. Assume setup is provided and ready;
   console.log('Global Test Setup Started');
-  let ready = verifySetup();
-  if (ready) {
+  if (verifySetup()) {
     console.log('Using Provided Test Setup');
     return true;
   }
@@ -239,12 +236,7 @@ const executeStrategy = async () => {
     console.log('Detected Account');
   }
 
-  ready = await verifySetup(true);
-  if (ready) {
-    return true;
-  }
-
-  return false;
+  return verifySetup(true);
 };
 
 export default async (_globalConfig: any, _projectConfig: any) => {
