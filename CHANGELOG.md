@@ -1,3 +1,9 @@
+# [5.22.0](https://github.com/starknet-io/starknet.js/compare/v5.21.1...v5.22.0) (2023-11-02)
+
+### Features
+
+- deprecating Sequencer provider ([94e02fa](https://github.com/starknet-io/starknet.js/commit/94e02fa083645602b8b96ab694b3ba3d2a3efbce))
+
 ## [5.21.1](https://github.com/starknet-io/starknet.js/compare/v5.21.0...v5.21.1) (2023-10-16)
 
 ### Bug Fixes
