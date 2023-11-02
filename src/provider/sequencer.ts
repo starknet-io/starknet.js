@@ -72,8 +72,8 @@ const defaultOptions = {
   blockIdentifier: BlockTag.pending,
 };
 /**
- * @deprecated Feeder gateway will be removed during October 2023, as Network is switching to P2P Nodes.
- * Use RPC Provider or Default provider (Default provider will be RPC Provider with public nodes and common interface/response)
+ * @deprecated Feeder gateway will be removed during November 2023, as Network is switching to P2P Nodes.
+ * Use RPC Provider or Default provider (Default provider will be RPC Provider with public nodes and legacy interface/response)
  */
 export class SequencerProvider implements ProviderInterface {
   public baseUrl: string;
