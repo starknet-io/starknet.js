@@ -6,9 +6,17 @@ import * as json from 'lossless-json';
  * Convert string to number or bigint based on size
  */
 const parseIntAsNumberOrBigInt = (x: string) => {
-  if (!json.isInteger(x)) return parseFloat(x);
+  if (!Number.isInteger(Number(x))) {
+    return parseFloat(x);
+  }
+
   const v = parseInt(x, 10);
-  return Number.isSafeInteger(v) ? v : BigInt(x);
+
+  if (Number.isSafeInteger(v)) {
+    return v;
+  }
+
+  return BigInt(x);
 };
 
 /**
