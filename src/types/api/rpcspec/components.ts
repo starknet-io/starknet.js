@@ -428,7 +428,7 @@ export type DEPRECATED_CONTRACT_CLASS = {
 };
 
 export type DEPRECATED_CAIRO_ENTRY_POINT = {
-  offset: NUM_AS_HEX;
+  offset: NUM_AS_HEX | number;
   selector: FELT;
 };
 
