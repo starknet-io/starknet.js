@@ -27,7 +27,6 @@ import {
 import { CallData } from '../utils/calldata';
 import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { isSierra } from '../utils/contract';
-import { pascalToSnake } from '../utils/encode';
 import fetch from '../utils/fetchPonyfill';
 import { getSelectorFromName, getVersionsByType } from '../utils/hash';
 import { stringify } from '../utils/json';
@@ -296,7 +295,6 @@ export class RpcProvider implements ProviderInterface {
     let { retries } = this;
     let onchain = false;
     let isErrorState = false;
-    let txReceipt: any = {};
     const retryInterval = options?.retryInterval ?? 5000;
     const errorStates: any = options?.errorStates ?? [RPC.ETransactionExecutionStatus.REVERTED];
     const successStates: any = options?.successStates ?? [
@@ -305,16 +303,20 @@ export class RpcProvider implements ProviderInterface {
       RPC.ETransactionFinalityStatus.ACCEPTED_ON_L2,
     ];
 
+    let txStatus: RPC.TransactionStatus;
+
     while (!onchain) {
       // eslint-disable-next-line no-await-in-loop
       await wait(retryInterval);
       try {
         // eslint-disable-next-line no-await-in-loop
-        txReceipt = await this.getTransactionReceipt(transactionHash);
+        // txReceipt = await this.getTransactionReceipt(transactionHash);
+        // eslint-disable-next-line no-await-in-loop
+        txStatus = await this.getTransactionStatus(transactionHash);
 
         // TODO: Hotfix until Pathfinder release fixed casing
-        const executionStatus = pascalToSnake(txReceipt.execution_status);
-        const finalityStatus = pascalToSnake(txReceipt.finality_status);
+        const executionStatus = txStatus.execution_status;
+        const finalityStatus = txStatus.finality_status;
 
         if (!executionStatus || !finalityStatus) {
           // Transaction is potentially REJECTED or NOT_RECEIVED but RPC doesn't have dose statuses
@@ -326,9 +328,9 @@ export class RpcProvider implements ProviderInterface {
         if (successStates.includes(executionStatus) || successStates.includes(finalityStatus)) {
           onchain = true;
         } else if (errorStates.includes(executionStatus) || errorStates.includes(finalityStatus)) {
-          const message = `${executionStatus}: ${finalityStatus}: ${txReceipt.revert_reason}`;
-          const error = new Error(message) as Error & { response: RPC.TransactionReceipt };
-          error.response = txReceipt;
+          const message = `${executionStatus}: ${finalityStatus}`;
+          const error = new Error(message) as Error & { response: RPC.TransactionStatus };
+          error.response = txStatus;
           isErrorState = true;
           throw error;
         }
@@ -346,7 +348,7 @@ export class RpcProvider implements ProviderInterface {
     }
 
     await wait(retryInterval);
-    return txReceipt;
+    return this.getTransactionReceipt(transactionHash);
   }
 
   public async getStorageAt(
