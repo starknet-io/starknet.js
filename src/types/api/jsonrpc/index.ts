@@ -1,5 +1,3 @@
-// TODO: Provjerit ovo i 'mergat' sa methods
-
 export namespace JRPC {
   export type RequestBody = {
     id: number | string;

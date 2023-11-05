@@ -237,8 +237,6 @@ describeIfRpc('RPCProvider', () => {
 
       test('getTransactionByHash', async () => {
         const transaction = await rpcProvider.getTransactionByHash(transaction_hash);
-
-        // const b: types.RPC. = 2;
         expect(transaction).toMatchSchemaRef('GetTransactionResponse');
       });
 
