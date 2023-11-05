@@ -52,7 +52,7 @@ Do not forget to include your methods documentation directly in your source code
 If you need to update some guides, modify the files in `/www/docs/guides` of your branch.
 The administrators of the project will handle your PR:
 
-### Without creation of a new realease of Starknet.js
+### Without creation of a new release of Starknet.js
 
 Your modified files will just be merged in `/www/docs/` by the Pull Request. If it was merged in `develop`, it will be visible in the official documentation in NEXT.
 

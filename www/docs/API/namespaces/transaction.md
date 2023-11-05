@@ -13,7 +13,7 @@ custom_edit_url: null
 ▸ **transformCallsToMulticallArrays**(`calls`): `Object`
 
 Transforms a list of Calls, each with their own calldata, into
-two arrays: one with the entrypoints, and one with the concatenated calldata.
+two arrays: one with the entry points, and one with the concatenated calldata.
 
 #### Parameters
 

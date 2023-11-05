@@ -342,7 +342,7 @@ TRUE if the contract comes from a Cairo1 contract
 
 | Name   | Type                                                                         |
 | :----- | :--------------------------------------------------------------------------- |
-| `TAbi` | extends readonly (`AbiFunction` \| `AbiEvent` \| `AbiStruct` \| `AbiEnum`)[] |
+| `TAbi` | extends read-only (`AbiFunction` \| `AbiEvent` \| `AbiStruct` \| `AbiEnum`)[] |
 
 #### Parameters
 

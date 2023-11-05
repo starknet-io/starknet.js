@@ -1163,7 +1163,7 @@ LegacyCompiledContract
 ▸ **parseUDCEvent**(`txReceipt`): `Object`
 
 Parse Transaction Receipt Event from UDC invoke transaction and
-create DeployContractResponse compatibile response with adition of UDC Event data
+create DeployContractResponse compatible response with addition of UDC Event data
 
 #### Parameters
 

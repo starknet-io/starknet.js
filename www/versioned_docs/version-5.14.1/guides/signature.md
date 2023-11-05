@@ -103,7 +103,7 @@ These items are designed to be able to be an interface with a wallet. At sign re
 - `message` will be displayed at the bottom of the wallet display, showing clearly (not in hex) the message to sign. Its structure has to be in accordance with the type listed in `primaryType`, defined in `types`.
 - `domain` will be shown above the message. Its structure has to be in accordance with `StarkNetDomain`.
 
-The prefefined types that you can use :
+The predefined types that you can use :
 
 - felt : for an integer on 251 bits.
 - felt\* : for an array of felt.

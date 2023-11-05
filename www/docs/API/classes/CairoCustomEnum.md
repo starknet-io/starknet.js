@@ -42,7 +42,7 @@ const myCairoEnum = new CairoCustomEnum( {Success: undefined, Warning: "0x7f32ea
 
 • `Readonly` **variant**: [`CairoEnumRaw`](../modules.md#cairoenumraw)
 
-direct readonly access to variants of the Cairo Custom Enum.
+direct read-only access to variants of the Cairo Custom Enum.
 
 **`Example`**
 

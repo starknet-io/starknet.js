@@ -35,7 +35,7 @@
 
 - add function definition to the contract interface + doc ([06498d5](https://github.com/0xs34n/starknet.js/commit/06498d539bc2b816982e0245ae3b6508665f03f7))
 - contract test status ([53cfaf9](https://github.com/0xs34n/starknet.js/commit/53cfaf935d1b053f5bcd17ffcb1ae48d9e8a4eef))
-- fix multiple same events + add cairo code + seperate tests, legacy and Cairo1 ([7c93157](https://github.com/0xs34n/starknet.js/commit/7c93157d60864989efec37a05521979a2548e4d8))
+- fix multiple same events + add cairo code + separate tests, legacy and Cairo1 ([7c93157](https://github.com/0xs34n/starknet.js/commit/7c93157d60864989efec37a05521979a2548e4d8))
 - modify parseEvents structure + add testcase for multiple different event in same tx ([b63b0d6](https://github.com/0xs34n/starknet.js/commit/b63b0d631d163e181c8a42a634f107d2761e35ca))
 - optional struct and enum in responseParser ([14d3cca](https://github.com/0xs34n/starknet.js/commit/14d3cca97a3cebedf07466f98dd46639999421c2))
 - patch merge, and add enums to event parser ([00f8073](https://github.com/0xs34n/starknet.js/commit/00f8073418eef1e2eebf105884357561b959fb7c))
@@ -95,7 +95,7 @@
 
 ### Bug Fixes
 
-- export utils provider,selector, contract, events. Simulate dev import on tests ([00b7bdf](https://github.com/0xs34n/starknet.js/commit/00b7bdf756c516a1905ce1ecc9036472800989af))
+- export utils provider, selector, contract, events. Simulate dev import on tests ([00b7bdf](https://github.com/0xs34n/starknet.js/commit/00b7bdf756c516a1905ce1ecc9036472800989af))
 - redeclare contract ([10da77e](https://github.com/0xs34n/starknet.js/commit/10da77efc6a5e1896af089508e4c403726e9cbf4))
 
 # [5.14.0](https://github.com/0xs34n/starknet.js/compare/v5.13.2...v5.14.0) (2023-06-21)
@@ -195,7 +195,7 @@
 
 - clean up Contract interfaces ([02c6b72](https://github.com/0xs34n/starknet.js/commit/02c6b72ec41016fdd75537044889e7cffd624b27))
 - clean up ContractFactory and Contract interfaces ([b25047e](https://github.com/0xs34n/starknet.js/commit/b25047ece2eed313eaa776b2a132b9a04c3fbc2f))
-- prevent missusage of cairoVersion on deploy ([d920dbe](https://github.com/0xs34n/starknet.js/commit/d920dbe6144006438c917727b153a043fec2531b))
+- prevent misusage of cairoVersion on deploy ([d920dbe](https://github.com/0xs34n/starknet.js/commit/d920dbe6144006438c917727b153a043fec2531b))
 - remove unused cairoVersion from Contract ([e4fcf24](https://github.com/0xs34n/starknet.js/commit/e4fcf244fa1dfd01301addfa7492bf90dac5a854))
 
 ### Features
@@ -457,7 +457,7 @@
 ### Bug Fixes
 
 - blockIdentifier null on call from constructed function ([c88fbf0](https://github.com/0xs34n/starknet.js/commit/c88fbf0cdfc57e1150275a34c15900d6c81802d3))
-- default pathfinder does't have pending block ([4619188](https://github.com/0xs34n/starknet.js/commit/4619188e21e5cc9a811c59bcf2923c4382661635))
+- default pathfinder nt have pending block ([4619188](https://github.com/0xs34n/starknet.js/commit/4619188e21e5cc9a811c59bcf2923c4382661635))
 - sequencer defaults, remove defaultProvider default blockIdentifier, spelling, class ([555a9a3](https://github.com/0xs34n/starknet.js/commit/555a9a3982bc1a742776119df5dee5d701209a0d))
 
 ### Features
@@ -502,15 +502,15 @@
 - remove deployMaxFee from deploy ([6d5fa24](https://github.com/0xs34n/starknet.js/commit/6d5fa2461def5caad3cdd71af8a4e6c61d88092e))
 - rpc tests ([cd913ee](https://github.com/0xs34n/starknet.js/commit/cd913ee93df433eb3730e6aae43dd22b0c8aed32))
 - split getNonce interface ([7b7acd9](https://github.com/0xs34n/starknet.js/commit/7b7acd9f5ebe0b2b97e389fb3a68249dd72224ce))
-- tiping issue ([78aa340](https://github.com/0xs34n/starknet.js/commit/78aa3402131f51e83287eada7499ea01de41efa0))
-- udc require L2 status for deployed contract to be awailable to use ([afba8d0](https://github.com/0xs34n/starknet.js/commit/afba8d068685c1c9b03126e5de13a5dfddb2925e))
+- tipping issue ([78aa340](https://github.com/0xs34n/starknet.js/commit/78aa3402131f51e83287eada7499ea01de41efa0))
+- udc require L2 status for deployed contract to be available to use ([afba8d0](https://github.com/0xs34n/starknet.js/commit/afba8d068685c1c9b03126e5de13a5dfddb2925e))
 
 ### Features
 
-- account deployContract ts overide base class ([dd4502d](https://github.com/0xs34n/starknet.js/commit/dd4502d76fb73f04e8e512336f6e5924c55b2f39))
+- account deployContract ts override base class ([dd4502d](https://github.com/0xs34n/starknet.js/commit/dd4502d76fb73f04e8e512336f6e5924c55b2f39))
 - extend acc interface, use deploy estimate fee ([da7392a](https://github.com/0xs34n/starknet.js/commit/da7392a65fa2b261cc1c6916739c1a59ecf9330f))
 - r p.deployCo. C tests, CF fixtures, cleanHex, DeclareDeploy, F Provider, seq.waitFor ret.txRec ([bb50f53](https://github.com/0xs34n/starknet.js/commit/bb50f5312f2b8618a26eaf13f1f851a645f5b670))
-- return from wait Transaction,Account deployContract and declareDeploy ([724975d](https://github.com/0xs34n/starknet.js/commit/724975dd92cc764208e1cf70c6f0d4089f0d363d))
+- return from wait Transaction, Account deployContract and declareDeploy ([724975d](https://github.com/0xs34n/starknet.js/commit/724975dd92cc764208e1cf70c6f0d4089f0d363d))
 
 ## [4.13.2](https://github.com/0xs34n/starknet.js/compare/v4.13.1...v4.13.2) (2022-11-25)
 
@@ -531,7 +531,7 @@
 
 - add estimateDeployFee ([3bc11be](https://github.com/0xs34n/starknet.js/commit/3bc11bef0d744303a1288eb997fbfca32c7523ab))
 - adjust fetch parameter types ([dfe876a](https://github.com/0xs34n/starknet.js/commit/dfe876ad9fd59a4351671df5fc0705b3f980ce75))
-- anotate deprecate all providers deployContract ([65eed1f](https://github.com/0xs34n/starknet.js/commit/65eed1f671b41393b3ae33ae1aaa7a9ae0fbc013))
+- annotate deprecate all providers deployContract ([65eed1f](https://github.com/0xs34n/starknet.js/commit/65eed1f671b41393b3ae33ae1aaa7a9ae0fbc013))
 - restore rpc node url to provided one ([2e1d87a](https://github.com/0xs34n/starknet.js/commit/2e1d87a6d9fc9a1fe9b493ffd8153eb2342ffdfc))
 - transaction v1 getInvokeEstimateFee ([cb4ede3](https://github.com/0xs34n/starknet.js/commit/cb4ede3b5b586ebf69768d4e4a8b36c739f6715f))
 
@@ -569,7 +569,7 @@
 - rpc 0.2.0 types spec ([25b2d29](https://github.com/0xs34n/starknet.js/commit/25b2d293a1a570b6fc68ea3877bfe6c3e898e3a6))
 - rpc 0.2.1 ([ed17f63](https://github.com/0xs34n/starknet.js/commit/ed17f6380d2b1ab1432d5426c7395ab18c6dc793))
 - rpc v0.2 endpoint, default identifiers, getClassHashAt flip parameters ([f0a0d6c](https://github.com/0xs34n/starknet.js/commit/f0a0d6c49e33442b603dcc9c9c119867c1ed32cc))
-- rpc0.2.1 definition migration comlete ([35c5a06](https://github.com/0xs34n/starknet.js/commit/35c5a0645dafe061080c2c2ced6a9a4a9882207c))
+- rpc0.2.1 definition migration complete ([35c5a06](https://github.com/0xs34n/starknet.js/commit/35c5a0645dafe061080c2c2ced6a9a4a9882207c))
 
 # [4.10.0](https://github.com/0xs34n/starknet.js/compare/v4.9.0...v4.10.0) (2022-11-10)
 
@@ -655,7 +655,7 @@
 - add getNonce method on account ([8e935eb](https://github.com/0xs34n/starknet.js/commit/8e935ebaa251279b83fab65397687ef0380358ac))
 - getNonce endpoint for sequencer ([add4900](https://github.com/0xs34n/starknet.js/commit/add4900ad86f40390b68f6f2158cfbb588fe21d6))
 - is_valid_signature -> isValidSignature ([f704f3e](https://github.com/0xs34n/starknet.js/commit/f704f3e9a3aec0744c155fc3bded079fac7284b5))
-- rpc options, methods, fetch with prop types, imp. types, clenup responseParser ([0ab5769](https://github.com/0xs34n/starknet.js/commit/0ab576957b3e193a68ae6f3ceb15d0b042d39b14))
+- rpc options, methods, fetch with prop types, imp. types, cleanup responseParser ([0ab5769](https://github.com/0xs34n/starknet.js/commit/0ab576957b3e193a68ae6f3ceb15d0b042d39b14))
 - rpc optionsOrProvider extend with retries ([46f9634](https://github.com/0xs34n/starknet.js/commit/46f96342be05252de306fba28da74e634e8b9c3f))
 - transaction v1 changes ([e928478](https://github.com/0xs34n/starknet.js/commit/e92847848166170c7d63394993cd74ae79c14a67))
 - update tests ([1af16f4](https://github.com/0xs34n/starknet.js/commit/1af16f475813a15c78d3b049b7453c19023fe53a))
@@ -667,11 +667,11 @@
 
 - add test getTransactionCount [skip ci] ([342755a](https://github.com/0xs34n/starknet.js/commit/342755aa99dda016d7aa394a0023b3f2e5d5e963))
 - estimateFee and call block id ([ef1645f](https://github.com/0xs34n/starknet.js/commit/ef1645f740e7c29edea6b091bec9949ec713953f))
-- rpc test update, comepleted rpc to openrpc mapping, rpc provider methods ([8b41e0f](https://github.com/0xs34n/starknet.js/commit/8b41e0fcf36b34b20dfaba356cfc0131f02d7d69))
+- rpc test update, completed rpc to openrpc mapping, rpc provider methods ([8b41e0f](https://github.com/0xs34n/starknet.js/commit/8b41e0fcf36b34b20dfaba356cfc0131f02d7d69))
 
 ### Features
 
-- new Block utility object, rpc fetch clenup, open rpc fetch api ([0d381c8](https://github.com/0xs34n/starknet.js/commit/0d381c89fe655b2628f02e67095ef03cb1721398))
+- new Block utility object, rpc fetch cleanup, open rpc fetch api ([0d381c8](https://github.com/0xs34n/starknet.js/commit/0d381c89fe655b2628f02e67095ef03cb1721398))
 - read, write and trace api ([d488ab2](https://github.com/0xs34n/starknet.js/commit/d488ab2513b88fdeb4e27b6ec2b7226ffd359445))
 - retry rpc wait for transaction 200 times instead of 100 ([3bc9118](https://github.com/0xs34n/starknet.js/commit/3bc9118cae86fba21e1c85667079079662ba0b7b))
 - updated rpc tests with new methods ([e369d95](https://github.com/0xs34n/starknet.js/commit/e369d95d72f3b39b3e8b8baa99867b94c1d5d1c1))
@@ -707,7 +707,7 @@
 
 - delete premature session account file ([ca3e70b](https://github.com/0xs34n/starknet.js/commit/ca3e70b06d21dba8b2074512251cf232ed8be46b))
 - session ([00269bf](https://github.com/0xs34n/starknet.js/commit/00269bfd23ed647270a1efd699af7c36978965c7))
-- session account prooving ([0b56833](https://github.com/0xs34n/starknet.js/commit/0b56833f6eb7557d55725a505a01185bbc9756db))
+- session account proving ([0b56833](https://github.com/0xs34n/starknet.js/commit/0b56833f6eb7557d55725a505a01185bbc9756db))
 - tests ([4586e93](https://github.com/0xs34n/starknet.js/commit/4586e93f10a2a43c375a23d851a9778bab412fcc))
 - typo ([1c60a4d](https://github.com/0xs34n/starknet.js/commit/1c60a4d4b306879422769a6c2afc4fd6c39c4c07))
 
@@ -803,7 +803,7 @@
 - rpc provider tests ([12db930](https://github.com/0xs34n/starknet.js/commit/12db930b1babf3e3de035426c8c449bfb448951c))
 - rpc provider waitForTransaction ([9e708ba](https://github.com/0xs34n/starknet.js/commit/9e708ba72ea350ae4866e5cff9519a89201b5b01))
 - run only devnet on pr ([613084b](https://github.com/0xs34n/starknet.js/commit/613084b32f93540e5f11938196d7b2c003f12bbf))
-- seperate types and fix fees ([577a836](https://github.com/0xs34n/starknet.js/commit/577a836b48a4567d63f0138163d016422256d221))
+- separate types and fix fees ([577a836](https://github.com/0xs34n/starknet.js/commit/577a836b48a4567d63f0138163d016422256d221))
 - set rpc url in pr workflow ([89ec3c1](https://github.com/0xs34n/starknet.js/commit/89ec3c1edfd6947404d009420305d7bb210c6cd3))
 - test account ([ac8210a](https://github.com/0xs34n/starknet.js/commit/ac8210a6bbb159a17ab548a12f7a20823e55814a))
 - tests should wait for build ([af8c5c7](https://github.com/0xs34n/starknet.js/commit/af8c5c779370e170de4785902e1e9ac282f2bfec))
@@ -1094,7 +1094,7 @@
 
 ### Bug Fixes
 
-- **account:** estimate fee transfered from provider to account class ([93e7dd9](https://github.com/seanjameshan/starknet.js/commit/93e7dd941b35bccb67cc426b9ae546801092964c))
+- **account:** estimate fee transferred from provider to account class ([93e7dd9](https://github.com/seanjameshan/starknet.js/commit/93e7dd941b35bccb67cc426b9ae546801092964c))
 - formatting ([248246f](https://github.com/seanjameshan/starknet.js/commit/248246f2fe75b9897700b955fa98e1779aec1744))
 - link ([494e000](https://github.com/seanjameshan/starknet.js/commit/494e0005c3b1cb86f5de0f25a10cbbe786a87b34))
 - **provider:** estimateFee entrypoint conversion fix ([e40204a](https://github.com/seanjameshan/starknet.js/commit/e40204a2eca5f475fe50a88349fd4890bbc36790))
@@ -1158,7 +1158,7 @@
 
 ### Bug Fixes
 
-- **test:** adding tests for type transferormation ([60d5eb6](https://github.com/seanjameshan/starknet.js/commit/60d5eb614721543be7fbaa842e8872a70564ebb2))
+- **test:** adding tests for type transformation ([60d5eb6](https://github.com/seanjameshan/starknet.js/commit/60d5eb614721543be7fbaa842e8872a70564ebb2))
 - **tests:** adding multicall contract ([138b29d](https://github.com/seanjameshan/starknet.js/commit/138b29d60cbc1eae6fa8f6f7dbf232bc11975e9a))
 
 ### Features
