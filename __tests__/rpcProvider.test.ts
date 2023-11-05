@@ -153,7 +153,7 @@ describeIfRpc('RPCProvider', () => {
         });
 
         const result1 = await rpcProvider.getEvents({
-          chunk_size: 2, // all optional paramaters removed
+          chunk_size: 2, // all optional parameters removed
         });
 
         expect(result).toHaveProperty('continuation_token');
