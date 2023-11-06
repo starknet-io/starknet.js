@@ -9,7 +9,7 @@ export enum CairoResultVariant {
  * @param resultContent value of type T or U.
  * @returns an instance representing a Cairo Result.
  * @example ```typescript
- * const myOption = new CairoResult<BigNumberish,CustomError>(CairoResultVariant.Ok, "0x54dda8");
+ * const myOption = new CairoResult<BigNumberish, CustomError>(CairoResultVariant.Ok, "0x54dda8");
  * ```
  */
 export class CairoResult<T, U> {

@@ -113,7 +113,7 @@ export const uint256 = (it: BigNumberish): Uint256 => {
  * Create unnamed tuple Cairo type (helper same as common struct type)
  * @example
  * ```typescript
- * tuple(1,'0x101',16);
+ * tuple(1, '0x101', 16);
  * ```
  */
 export const tuple = (

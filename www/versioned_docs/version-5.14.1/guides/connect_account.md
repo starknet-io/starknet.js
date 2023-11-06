@@ -6,7 +6,7 @@ sidebar_position: 4
 
 Once your provider is initialized, you can connect an existing account.
 
-You need 2 data :
+You need 2 data:
 
 - the address of the account
 - the private key of this account
@@ -21,9 +21,9 @@ When you launch starknet-devnet, 10 accounts are predeployed with 100 dummy ETH 
 
 Addresses and private keys are displayed on the console at initialization.
 
-> This data will change at each launch, so to freeze them, launch with : `starknet-devnet --seed 0`.
+> This data will change at each launch, so to freeze them, launch with: `starknet-devnet --seed 0`.
 
-The result for `account #0` :
+The result for `account #0`:
 
 ```bash
 Address: 0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a
@@ -31,7 +31,7 @@ Public key: 0x7e52885445756b313ea16849145363ccb73fb4ab0440dbac333cf9d13de82b9
 Private key: 0xe3e70682c2094cac629f6fbed82c07cd
 ```
 
-Then you can use this code :
+Then you can use this code:
 
 ```typescript
 // initialize provider
@@ -47,13 +47,13 @@ Your account is now connected, and you can use it.
 
 ## 👛 Connect an existing account (in any network)
 
-The code is exactly the same, you just have to :
+The code is exactly the same, you just have to:
 
 - connect to the appropriate network.
 - use the address of this account (public data).
-- use the private key of this account (very sensitive data : your code MUST not disclose it).
+- use the private key of this account (very sensitive data: your code MUST not disclose it).
 
-For example, to connect an existing account to testnet, with a private key stored in .env non archived file :
+For example, to connect an existing account to testnet, with a private key stored in .env non archived file:
 
 ```typescript
 import * as dotenv from "dotenv";

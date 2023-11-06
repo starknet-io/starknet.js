@@ -42,7 +42,7 @@ const responseEstimateMessageFee = await provider.estimateMessageFee({
     from_address: L1address,
     to_address: L2address,
     entry_point_selector: "handle_l1_mess",
-    payload: ["1234567890123456789","200"]
+    payload: ["1234567890123456789", "200"]
 })
 ```
 

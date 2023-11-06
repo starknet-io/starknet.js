@@ -16,7 +16,7 @@ The events are stored in a block on the blockchain.
 
 ## Events in the Cairo code
 
-You have to analyze the Cairo code of your smart contract, to recover the list of data emitted by the event. An example in Cairo 0 :
+You have to analyze the Cairo code of your smart contract, to recover the list of data emitted by the event. An example in Cairo 0:
 
 ```cairo
 @event
@@ -34,7 +34,7 @@ func my_func{syscall_ptr: felt*, pedersen_ptr: HashBuiltin*, range_check_ptr}() 
 
 Here, we can see that the event will store 3 felts.
 
-Once compiled, this code will generate an abi file containing :
+Once compiled, this code will generate an abi file containing:
 
 ```typescript
 {
@@ -58,10 +58,10 @@ import { InvokeTransactionReceiptResponse } from "starknet";
 
 const resu = await myTestContract.my_func();
 const txReceiptDeployTest: InvokeTransactionReceiptResponse = await provider.waitForTransaction(resu.transaction_hash);
-console.log("events =",txReceiptDeployTest.events);
+console.log("events =", txReceiptDeployTest.events);
 ```
 
-Now, you have all the events of the block. Here, we have 2 events - the last one contains our data :
+Now, you have all the events of the block. Here, we have 2 events - the last one contains our data:
 
 ```typescript
 [
@@ -89,7 +89,7 @@ Now, you have all the events of the block. Here, we have 2 events - the last one
 
 ```
 
-Use the contract deployment address `testContractAddress`, to filter the events and read the data from your smart contract :
+Use the contract deployment address `testContractAddress`, to filter the events and read the data from your smart contract:
 
 ```typescript
 const event = txReceiptDeployTest.events.find(
