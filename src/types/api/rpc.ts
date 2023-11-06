@@ -1,2 +1,2 @@
-export { JRPC } from './jsonrpc';
+export * as JRPC from './jsonrpc';
 export * from './rpcspec';

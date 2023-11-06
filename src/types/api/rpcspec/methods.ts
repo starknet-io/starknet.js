@@ -18,7 +18,7 @@ import {
   STORAGE_KEY,
   TXN_HASH,
 } from './components';
-import { Errors } from './errors';
+import * as Errors from './errors';
 import {
   BlockHashAndNumber,
   BlockTransactionsTraces,

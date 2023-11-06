@@ -185,8 +185,6 @@ export class RpcProvider implements ProviderInterface {
   /**
    * Returns the execution traces of all transactions included in the given block
    * @deprecated renamed to getBlockTransactionsTraces()
-   * @param blockIdentifier
-   * @returns
    */
   public traceBlockTransactions = this.getBlockTransactionsTraces;
 
@@ -198,7 +196,6 @@ export class RpcProvider implements ProviderInterface {
   /**
    * Get the number of transactions in a block given a block id
    * @deprecated renamed to getBlockTransactionCount()
-   * @param blockIdentifier BlockIdentifier
    * @returns Number of transactions
    */
   public getTransactionCount = this.getBlockTransactionCount;
@@ -244,15 +241,12 @@ export class RpcProvider implements ProviderInterface {
   /**
    * @deprecated renamed to getTransactionTrace();
    * For a given executed transaction, return the trace of its execution, including internal calls
-   * @param txHash BigNumberish
-   * @returns RPC.TransactionTrace
    */
   public traceTransaction = this.getTransactionTrace;
 
   // TODO: implement in waitforTransaction, add add tests, when RPC 0.5 become standard /
   /**
    * NEW: Get the status of a transaction
-   * @param transactionHash
    */
   public async getTransactionStatus(transactionHash: BigNumberish) {
     const transaction_hash = toHex(transactionHash);
@@ -266,10 +260,10 @@ export class RpcProvider implements ProviderInterface {
 
   /**
    * @param invocations AccountInvocations
-   * @param simulateTransactionOptions blockIdentifier and flags to skip validation and fee charge
-   * - blockIdentifier
-   * - skipValidate (default false)
-   * - skipFeeCharge (default true)
+   * @param simulateTransactionOptions blockIdentifier and flags to skip validation and fee charge<br/>
+   * - blockIdentifier<br/>
+   * - skipValidate (default false)<br/>
+   * - skipFeeCharge (default true)<br/>
    */
   public async simulateTransaction(
     invocations: AccountInvocations,
@@ -624,8 +618,6 @@ export class RpcProvider implements ProviderInterface {
   /**
    * NEW: Estimate the fee for a message from L1
    * @param message Message From L1
-   * @param blockIdentifier
-   * @returns RPC.FeeEstimate
    */
   public async estimateMessageFee(
     message: RPC.L1Message,
@@ -648,7 +640,7 @@ export class RpcProvider implements ProviderInterface {
 
   /**
    * Returns all events matching the given filter
-   * @returns RPC.Events - events and the pagination of the events
+   * @returns events and the pagination of the events
    */
   public async getEvents(eventFilter: RPC.EventFilter) {
     return this.fetchEndpoint('starknet_getEvents', { filter: eventFilter });
