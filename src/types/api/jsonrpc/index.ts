@@ -1,27 +1,25 @@
-export namespace JRPC {
-  export type RequestBody = {
-    id: number | string;
-    jsonrpc: '2.0';
-    method: string;
-    params?: {};
-  };
+export type RequestBody = {
+  id: number | string;
+  jsonrpc: '2.0';
+  method: string;
+  params?: {};
+};
 
-  export type ResponseBody = {
-    id: number | string;
-    jsonrpc: '2.0';
-  } & (SuccessResponseBody | ErrorResponseBody);
+export type ResponseBody = {
+  id: number | string;
+  jsonrpc: '2.0';
+} & (SuccessResponseBody | ErrorResponseBody);
 
-  export type SuccessResponseBody = {
-    result: unknown;
-  };
+export type SuccessResponseBody = {
+  result: unknown;
+};
 
-  export type ErrorResponseBody = {
-    error: Error;
-  };
+export type ErrorResponseBody = {
+  error: Error;
+};
 
-  export type Error = {
-    code: number;
-    message: string;
-    data?: unknown;
-  };
-}
+export type Error = {
+  code: number;
+  message: string;
+  data?: unknown;
+};
