@@ -44,3 +44,15 @@ export const UDC = {
   ADDRESS: '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
   ENTRYPOINT: 'deployContract',
 };
+
+export const RPC_GOERLI_NODES = [
+  'https://starknet-testnet.public.blastapi.io',
+  'https://rpc.starknet-testnet.lava.build',
+  'http://limited-rpc.nethermind.io/goerli-juno',
+];
+
+export const RPC_MAINNET_NODES = [
+  'https://starknet-mainnet.public.blastapi.io',
+  'https://rpc.starknet.lava.build',
+  'http://limited-rpc.nethermind.io/mainnet-juno/',
+];

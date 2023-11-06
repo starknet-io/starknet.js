@@ -1,6 +1,9 @@
 import {
   HEX_STR_TRANSACTION_VERSION_1,
   HEX_STR_TRANSACTION_VERSION_2,
+  NetworkName,
+  RPC_GOERLI_NODES,
+  RPC_MAINNET_NODES,
   StarknetChainId,
 } from '../constants';
 import {
@@ -40,6 +43,16 @@ import { ProviderInterface } from './interface';
 import { getAddressFromStarkName, getStarkName } from './starknetId';
 import { Block } from './utils';
 
+const getDefaultNodeUrl = (networkName?: NetworkName): string => {
+  // eslint-disable-next-line no-console
+  console.warn('Using default public node url, please provide nodeUrl in provider options!');
+  const randIdx = Math.floor(Math.random() * 3);
+  if (networkName && NetworkName.SN_MAIN === networkName) {
+    return RPC_MAINNET_NODES[randIdx];
+  }
+  return RPC_GOERLI_NODES[randIdx];
+};
+
 const defaultOptions = {
   headers: { 'Content-Type': 'application/json' },
   blockIdentifier: BlockTag.pending,
@@ -59,9 +72,18 @@ export class RpcProvider implements ProviderInterface {
 
   private chainId?: StarknetChainId;
 
-  constructor(optionsOrProvider: RpcProviderOptions) {
-    const { nodeUrl, retries, headers, blockIdentifier, chainId } = optionsOrProvider;
-    this.nodeUrl = nodeUrl;
+  constructor(optionsOrProvider?: RpcProviderOptions) {
+    const { nodeUrl, retries, headers, blockIdentifier, chainId } = optionsOrProvider || {};
+    if ((<any>Object).values(NetworkName).includes(nodeUrl)) {
+      // Network name provided for nodeUrl
+      this.nodeUrl = getDefaultNodeUrl(nodeUrl as NetworkName);
+    } else if (nodeUrl) {
+      // NodeUrl provided
+      this.nodeUrl = nodeUrl;
+    } else {
+      // non provided fallback to default testnet
+      this.nodeUrl = getDefaultNodeUrl();
+    }
     this.retries = retries || defaultOptions.retries;
     this.headers = { ...defaultOptions.headers, ...headers };
     this.blockIdentifier = blockIdentifier || defaultOptions.blockIdentifier;
