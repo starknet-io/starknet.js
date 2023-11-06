@@ -8,7 +8,7 @@ Based on what has been seen in the previous pages of this guide, we will use an 
 
 ## What's an ERC20
 
-As in Ethereum, a token has an ERC20 contract to manage it. This contract contains a table, that lists the quantity of tokens owned by each involved account :
+As in Ethereum, a token has an ERC20 contract to manage it. This contract contains a table, that lists the quantity of tokens owned by each involved account:
 ![](./pictures/ERC20.png)
 
 For example, the Account address 2 owns 100 token of this ERC20 contract.
@@ -27,7 +27,7 @@ This way, the ERC20 contract is absolutely sure that the caller of the transfer 
 
 ## ETH token is an ERC20 in Starknet
 
-In opposition with Ethereum, the ETH token is an ERC20 in Starknet, as all other tokens. In all networks, it's ERC20 contract address is :
+In opposition with Ethereum, the ETH token is an ERC20 in Starknet, as all other tokens. In all networks, it's ERC20 contract address is:
 
 ```typescript
 const addrETH = "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7";
@@ -39,7 +39,7 @@ Lets dive down the rabbit hole!
 
 This example works with an ERC20 mintable (everybody can mint new tokens), that we will deploy on the devnet (launched with `starknet-devnet --seed 0`).
 
-First, let's initialize an account :
+First, let's initialize an account:
 
 ```typescript
 // initialize provider
@@ -52,7 +52,7 @@ const accountAddress = "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd37
 const account0 = new Account(provider, accountAddress, starkKeyPair);
 ```
 
-Declaration and deployment of the ERC20 contract :
+Declaration and deployment of the ERC20 contract:
 
 ```typescript
 // Deploy an ERC20 contract
@@ -88,13 +88,13 @@ erc20.connect(account0);
 
 ## Interact with an ERC20
 
-Here we will read the balance, mint new tokens, and transfer tokens :
+Here we will read the balance, mint new tokens, and transfer tokens:
 
 ```typescript
 // Check balance - should be 100
 console.log(`Calling Starknet for account balance...`);
 const balanceInitial = await erc20.balanceOf(account0.address);
-console.log("account0 has a balance of :", uint256.uint256ToBN(balanceInitial.balance).toString());
+console.log("account0 has a balance of:", uint256.uint256ToBN(balanceInitial.balance).toString());
 
 // Mint 1000 tokens to account address
 const amountToMint = uint256.bnToUint256(1000);
@@ -112,7 +112,7 @@ await provider.waitForTransaction(mintTxHash);
 // Check balance - should be 1100
 console.log(`Calling Starknet for account balance...`);
 const balanceBeforeTransfer = await erc20.balanceOf(account0.address);
-console.log("account0 has a balance of :", uint256.uint256ToBN(balanceBeforeTransfer.balance).toString());
+console.log("account0 has a balance of:", uint256.uint256ToBN(balanceBeforeTransfer.balance).toString());
 
 // Execute tx transfer of 10 tokens
 console.log(`Invoke Tx - Transfer 10 tokens back to erc20 contract...`);
@@ -137,6 +137,6 @@ await provider.waitForTransaction(transferTxHash);
 // Check balance after transfer - should be 1090
 console.log(`Calling Starknet for account balance...`);
 const balanceAfterTransfer = await erc20.balanceOf(account0.address);
-console.log("account0 has a balance of :", uint256.uint256ToBN(balanceAfterTransfer.balance).toString());
+console.log("account0 has a balance of:", uint256.uint256ToBN(balanceAfterTransfer.balance).toString());
 console.log("✅ Script completed.");
 ```

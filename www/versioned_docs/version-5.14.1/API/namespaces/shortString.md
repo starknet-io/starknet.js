@@ -124,13 +124,13 @@ Convert an ASCII string to an hexadecimal string.
 const myEncodedString: string = encodeShortString("uri/pict/t38.jpg");
 ```
 
-returns : string : "0x7572692f706963742f7433382e6a7067"
+returns: string("0x7572692f706963742f7433382e6a7067")
 
 #### Parameters
 
-| Name  | Type     | Description                                              |
-| :---- | :------- | :------------------------------------------------------- |
-| `str` | `string` | ASCII string - 31 characters maxi. Ex : "uri/item23.jpg" |
+| Name  | Type     | Description                                             |
+| :---- | :------- | :------------------------------------------------------ |
+| `str` | `string` | ASCII string - 31 characters maxi. Ex: "uri/item23.jpg" |
 
 #### Returns
 
@@ -156,13 +156,13 @@ Convert an hexadecimal or decimal string to an ASCII string.
 const myDecodedString: string = decodeShortString("0x7572692f706963742f7433382e6a7067");
 ```
 
-return : string : "uri/pict/t38.jpg"
+return string ("uri/pict/t38.jpg")
 
 #### Parameters
 
-| Name  | Type     | Description                                                                                              |
-| :---- | :------- | :------------------------------------------------------------------------------------------------------- |
-| `str` | `string` | string - representing a 248 bits max number. Ex : hex : "0x1A4F64EA56" or decimal : "236942575435676423" |
+| Name  | Type     | Description                                                                                             |
+| :---- | :------- | :------------------------------------------------------------------------------------------------------ |
+| `str` | `string` | string - representing a 248 bits max number. Ex: hex ("0x1A4F64EA56") or decimal ("236942575435676423") |
 
 #### Returns
 
