@@ -7,7 +7,7 @@ export interface ProviderOptions {
 }
 
 export type RpcProviderOptions = {
-  nodeUrl: string | NetworkName;
+  nodeUrl?: string | NetworkName;
   retries?: number;
   headers?: object;
   blockIdentifier?: BlockIdentifier;

@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { Account, ProviderInterface, RpcProvider, SequencerProvider, json } from '../src';
+import { Account, ProviderInterface, RpcProvider, json } from '../src';
 import {
   CompiledSierra,
   CompiledSierraCasm,
@@ -47,10 +47,7 @@ export const compiledC210 = readContractSierra('cairo/cairo210/cairo210.sierra')
 export const compiledC210Casm = readContractSierraCasm('cairo/cairo210/cairo210');
 
 export const getTestProvider = (): ProviderInterface => {
-  const provider = process.env.TEST_RPC_URL
-    ? new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL })
-    : new SequencerProvider({ baseUrl: process.env.TEST_PROVIDER_BASE_URL || '' });
-
+  const provider = new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL });
   if (process.env.IS_LOCALHOST_DEVNET) {
     // accelerate the tests when running locally
     const originalWaitForTransaction = provider.waitForTransaction.bind(provider);

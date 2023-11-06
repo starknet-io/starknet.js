@@ -43,13 +43,14 @@ import { ProviderInterface } from './interface';
 import { getAddressFromStarkName, getStarkName } from './starknetId';
 import { Block } from './utils';
 
-const getDefaultNodeUrl = (networkName?: NetworkName): string => {
+export const getDefaultNodeUrl = (networkName?: NetworkName): string => {
   // eslint-disable-next-line no-console
   console.warn('Using default public node url, please provide nodeUrl in provider options!');
-  const randIdx = Math.floor(Math.random() * 3);
   if (networkName && NetworkName.SN_MAIN === networkName) {
+    const randIdx = Math.floor(Math.random() * RPC_MAINNET_NODES.length);
     return RPC_MAINNET_NODES[randIdx];
   }
+  const randIdx = Math.floor(Math.random() * RPC_GOERLI_NODES.length);
   return RPC_GOERLI_NODES[randIdx];
 };
 
