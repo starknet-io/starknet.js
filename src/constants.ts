@@ -52,7 +52,7 @@ export const RPC_GOERLI_NODES = [
 ];
 
 export const RPC_MAINNET_NODES = [
-  'https://starknet-mainnet.public.blastapi.io',
-  'https://rpc.starknet.lava.build',
+  'https://starknet-mainnet.public.blastapi.io/rpc/v0.5',
+  'https://rpc.starknet.lava.build/rpc/v0.5',
   'https://limited-rpc.nethermind.io/mainnet-juno/v0_5',
 ];
