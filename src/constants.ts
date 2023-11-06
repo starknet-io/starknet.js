@@ -48,11 +48,11 @@ export const UDC = {
 export const RPC_GOERLI_NODES = [
   'https://starknet-testnet.public.blastapi.io/rpc/v0.5',
   'https://rpc.starknet-testnet.lava.build/rpc/v0.5',
-  // 'http://limited-rpc.nethermind.io/goerli-juno/v0_5',
+  'https://limited-rpc.nethermind.io/goerli-juno/v0_5',
 ];
 
 export const RPC_MAINNET_NODES = [
   'https://starknet-mainnet.public.blastapi.io',
   'https://rpc.starknet.lava.build',
-  // 'http://limited-rpc.nethermind.io/mainnet-juno/v0_5',
+  'https://limited-rpc.nethermind.io/mainnet-juno/v0_5',
 ];
