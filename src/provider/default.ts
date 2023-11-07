@@ -43,13 +43,13 @@ export class Provider implements ProviderInterface {
       // providerOrOptions is Provider
       this.provider = providerOrOptions.provider;
     } else if (providerOrOptions instanceof RpcProvider) {
-      // providerOrOptions is SequencerProvider or RpcProvider
+      // providerOrOptions is RpcProvider
       this.provider = <ProviderInterface>providerOrOptions;
     } else if (providerOrOptions && 'rpc' in providerOrOptions) {
       // providerOrOptions is rpc option
       this.provider = new RpcProvider(<RpcProviderOptions>providerOrOptions.rpc);
     } else {
-      // providerOrOptions is none, create SequencerProvider as default
+      // providerOrOptions is none, create RpcProvider as default
       this.provider = new RpcProvider();
     }
   }
