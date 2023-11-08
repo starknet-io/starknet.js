@@ -29,8 +29,13 @@ jobs:
         image: ${{ inputs.use-rpc-devnet && 'shardlabs/starknet-devnet-rs:c7b5fde8fb46f8e7d498f63cc44beb0bd2ddd85e-seed0' || inputs.use-seq-devnet && 'shardlabs/starknet-devnet:0.6.3-seed0' || '' }}
         # image: ${{ (inputs.use-rpc-devnet || inputs.use-seq-devnet) && 'shardlabs/starknet-devnet:0.6.3-seed0' || '' }}
         # image: shardlabs/starknet-devnet-rs:c7b5fde8fb46f8e7d498f63cc44beb0bd2ddd85e-seed0
+        env:
+          # STARKNET_DEVNET_CAIRO_VM: rust
+          STARKNET_DEVNET_CAIRO_VM: ${{ (inputs.use-seq-devnet) && 'rust' || '' }}
         ports:
           - 5050:5050
+
+    if: ${{ (!inputs.use-rpc-devnet) }}
 
     env:
       TEST_PROVIDER_BASE_URL: ${{ secrets.TEST_PROVIDER_BASE_URL }}
