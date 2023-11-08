@@ -312,7 +312,6 @@ export class RpcProvider implements ProviderInterface {
         // eslint-disable-next-line no-await-in-loop
         txStatus = await this.getTransactionStatus(transactionHash);
 
-        // TODO: Hotfix until Pathfinder release fixed casing
         const executionStatus = txStatus.execution_status;
         const finalityStatus = txStatus.finality_status;
 
