@@ -23,6 +23,7 @@ import {
   Nonce,
   ProviderOptions,
   RpcProviderOptions,
+  SequencerProviderOptions,
   SimulateTransactionResponse,
   StateUpdateResponse,
   Storage,
@@ -33,8 +34,12 @@ import {
 } from '../types';
 import { ProviderInterface } from './interface';
 import { RpcProvider } from './rpc';
+import { SequencerProvider } from './sequencer';
 import { getAddressFromStarkName, getStarkName } from './starknetId';
 
+/**
+ * @deprecated Use RpcProvider instead. Common Provider will be removed with Sequencer provider.
+ */
 export class Provider implements ProviderInterface {
   private provider!: ProviderInterface;
 
@@ -42,14 +47,20 @@ export class Provider implements ProviderInterface {
     if (providerOrOptions instanceof Provider) {
       // providerOrOptions is Provider
       this.provider = providerOrOptions.provider;
-    } else if (providerOrOptions instanceof RpcProvider) {
-      // providerOrOptions is RpcProvider
+    } else if (
+      providerOrOptions instanceof RpcProvider ||
+      providerOrOptions instanceof SequencerProvider
+    ) {
+      // providerOrOptions is SequencerProvider or RpcProvider
       this.provider = <ProviderInterface>providerOrOptions;
     } else if (providerOrOptions && 'rpc' in providerOrOptions) {
       // providerOrOptions is rpc option
       this.provider = new RpcProvider(<RpcProviderOptions>providerOrOptions.rpc);
+    } else if (providerOrOptions && 'sequencer' in providerOrOptions) {
+      // providerOrOptions is sequencer option
+      this.provider = new SequencerProvider(<SequencerProviderOptions>providerOrOptions.sequencer);
     } else {
-      // providerOrOptions is none, create RpcProvider as default
+      // providerOrOptions is none, create SequencerProvider as default
       this.provider = new RpcProvider();
     }
   }

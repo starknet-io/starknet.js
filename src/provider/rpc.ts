@@ -46,12 +46,9 @@ import { Block } from './utils';
 export const getDefaultNodeUrl = (networkName?: NetworkName): string => {
   // eslint-disable-next-line no-console
   console.warn('Using default public node url, please provide nodeUrl in provider options!');
-  if (networkName && NetworkName.SN_MAIN === networkName) {
-    const randIdx = Math.floor(Math.random() * RPC_MAINNET_NODES.length);
-    return RPC_MAINNET_NODES[randIdx];
-  }
-  const randIdx = Math.floor(Math.random() * RPC_GOERLI_NODES.length);
-  return RPC_GOERLI_NODES[randIdx];
+  const nodes = networkName === NetworkName.SN_MAIN ? RPC_MAINNET_NODES : RPC_GOERLI_NODES;
+  const randIdx = Math.floor(Math.random() * nodes.length);
+  return nodes[randIdx];
 };
 
 const defaultOptions = {
@@ -75,14 +72,14 @@ export class RpcProvider implements ProviderInterface {
 
   constructor(optionsOrProvider?: RpcProviderOptions) {
     const { nodeUrl, retries, headers, blockIdentifier, chainId } = optionsOrProvider || {};
-    if ((<any>Object).values(NetworkName).includes(nodeUrl)) {
+    if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
       // Network name provided for nodeUrl
       this.nodeUrl = getDefaultNodeUrl(nodeUrl as NetworkName);
     } else if (nodeUrl) {
       // NodeUrl provided
       this.nodeUrl = nodeUrl;
     } else {
-      // non provided fallback to default testnet
+      // none provided fallback to default testnet
       this.nodeUrl = getDefaultNodeUrl();
     }
     this.retries = retries || defaultOptions.retries;
