@@ -316,7 +316,7 @@ export class RpcProvider implements ProviderInterface {
         const finalityStatus = txStatus.finality_status;
 
         if (!executionStatus || !finalityStatus) {
-          // Transaction is potentially REJECTED or NOT_RECEIVED but RPC doesn't have dose statuses
+          // Transaction is potentially REJECTED or NOT_RECEIVED but RPC doesn't have those statuses
           // so we will retry '{ retries }' times
           const error = new Error('waiting for transaction status');
           throw error;
