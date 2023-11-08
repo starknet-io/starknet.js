@@ -310,8 +310,6 @@ export class RpcProvider implements ProviderInterface {
       await wait(retryInterval);
       try {
         // eslint-disable-next-line no-await-in-loop
-        // txReceipt = await this.getTransactionReceipt(transactionHash);
-        // eslint-disable-next-line no-await-in-loop
         txStatus = await this.getTransactionStatus(transactionHash);
 
         // TODO: Hotfix until Pathfinder release fixed casing
