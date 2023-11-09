@@ -7,6 +7,7 @@ import { felt, uint256 } from '../src/utils/calldata/cairo';
 import { toHexString } from '../src/utils/num';
 import {
   compiledErc20Echo,
+  compiledL1L2,
   compiledOpenZeppelinAccount,
   describeIfDevnet,
   describeIfNotDevnet,
@@ -60,18 +61,44 @@ describeIfRpc('RPCProvider', () => {
     expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
   });
 
-  xtest('getProtocolVersion - pathfinder not implemented', async () => {
-    await rpcProvider.getProtocolVersion();
-  });
-
-  test('getProtocolVersion - not implemented', async () => {
-    await expect(rpcProvider.getProtocolVersion()).rejects.toThrow();
+  test('getSpecVersion', async () => {
+    const spec = await rpcProvider.getSpecVersion();
+    expect(typeof spec).toBe('string');
   });
 
   test('getCode - not implemented', async () => {
     expect(
       rpcProvider.getCode('0x058d97f7d76e78f44905cc30cb65b91ea49a4b908a76703c54197bca90f81773')
     ).rejects.toThrow();
+  });
+
+  describe('Test Estimate message fee', () => {
+    const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165A0';
+    let l1l2ContractAddress: string;
+
+    beforeAll(async () => {
+      const { deploy } = await account.declareAndDeploy({
+        contract: compiledL1L2,
+      });
+      l1l2ContractAddress = deploy.contract_address;
+    });
+
+    test('estimate message fee', async () => {
+      const estimation = await rpcProvider.estimateMessageFee({
+        from_address: L1_ADDRESS,
+        to_address: l1l2ContractAddress,
+        entry_point_selector: 'deposit',
+        payload: ['556', '123'],
+      });
+      expect(estimation).toEqual(
+        expect.objectContaining({
+          overall_fee: expect.anything(),
+          gas_price: expect.anything(),
+          gas_usage: expect.anything(),
+          unit: 'wei',
+        })
+      );
+    });
   });
 
   describe('RPC methods', () => {
@@ -211,6 +238,10 @@ describeIfRpc('RPCProvider', () => {
       test('getTransactionByHash', async () => {
         const transaction = await rpcProvider.getTransactionByHash(transaction_hash);
         expect(transaction).toMatchSchemaRef('GetTransactionResponse');
+      });
+
+      test('getTransactionStatus()', async () => {
+        return expect(rpcProvider.getTransactionStatus(transaction_hash)).resolves.not.toThrow();
       });
 
       test('getTransaction', async () => {
