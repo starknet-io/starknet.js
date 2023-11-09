@@ -37,6 +37,9 @@ import { RpcProvider } from './rpc';
 import { SequencerProvider } from './sequencer';
 import { getAddressFromStarkName, getStarkName } from './starknetId';
 
+/**
+ * @deprecated Use RpcProvider instead. Common Provider will be removed with Sequencer provider.
+ */
 export class Provider implements ProviderInterface {
   private provider!: ProviderInterface;
 
@@ -58,7 +61,7 @@ export class Provider implements ProviderInterface {
       this.provider = new SequencerProvider(<SequencerProviderOptions>providerOrOptions.sequencer);
     } else {
       // providerOrOptions is none, create SequencerProvider as default
-      this.provider = new SequencerProvider();
+      this.provider = new RpcProvider();
     }
   }
 

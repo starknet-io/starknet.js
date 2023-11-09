@@ -29,7 +29,7 @@ export type EntryPointsByType = {
 
 export type ContractEntryPointFields = {
   selector: string;
-  offset: string;
+  offset: string | number;
   builtins?: Builtins;
 };
 

@@ -2,9 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { Account, ProviderInterface, RpcProvider, SequencerProvider, json } from '../src';
-import { BaseUrl } from '../src/constants';
 import {
-  CairoVersion,
   CompiledSierra,
   CompiledSierraCasm,
   LegacyCompiledContract,
@@ -48,37 +46,12 @@ export const compiledC1v2Casm = readContractSierraCasm('cairo/helloCairo2/compil
 export const compiledC210 = readContractSierra('cairo/cairo210/cairo210.sierra');
 export const compiledC210Casm = readContractSierraCasm('cairo/cairo210/cairo210');
 
-/* Default test config based on run `starknet-devnet --seed 0` */
-const DEFAULT_TEST_PROVIDER_URL = 'http://127.0.0.1:5050/';
-
-/* User defined config or default one */
-const BASE_URL = process.env.TEST_PROVIDER_BASE_URL || DEFAULT_TEST_PROVIDER_URL;
-const RPC_URL = process.env.TEST_RPC_URL;
-
-/* Detect user defined node or sequencer, if none default to sequencer if both default to node */
-const PROVIDER_URL = RPC_URL || BASE_URL;
-
-/** explicit is local devnet (undefined,'','1','true','TRUE') = true else false */
-const LOCAL_DEVNET = ['1', 'TRUE', ''].includes((process.env.LOCAL_DEVNET || '').toUpperCase());
-
-/* Detect is localhost devnet, it can be also localhost RPC node */
-export const IS_LOCALHOST_DEVNET =
-  LOCAL_DEVNET && (PROVIDER_URL.includes('localhost') || PROVIDER_URL.includes('127.0.0.1'));
-
-export const IS_DEVNET_RPC = IS_LOCALHOST_DEVNET && PROVIDER_URL.includes('rpc');
-export const IS_DEVNET_SEQUENCER = IS_LOCALHOST_DEVNET && !PROVIDER_URL.includes('rpc');
-
-/* Definitions */
-export const IS_RPC = !!RPC_URL;
-export const IS_SEQUENCER = !RPC_URL;
-export const IS_SEQUENCER_GOERLI = PROVIDER_URL.includes(BaseUrl.SN_GOERLI);
-
 export const getTestProvider = (): ProviderInterface => {
-  const provider = RPC_URL
-    ? new RpcProvider({ nodeUrl: RPC_URL })
-    : new SequencerProvider({ baseUrl: BASE_URL });
+  const provider = process.env.TEST_RPC_URL
+    ? new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL })
+    : new SequencerProvider({ baseUrl: process.env.TEST_PROVIDER_BASE_URL || '' });
 
-  if (IS_LOCALHOST_DEVNET) {
+  if (process.env.IS_LOCALHOST_DEVNET) {
     // accelerate the tests when running locally
     const originalWaitForTransaction = provider.waitForTransaction.bind(provider);
     provider.waitForTransaction = (
@@ -92,46 +65,22 @@ export const getTestProvider = (): ProviderInterface => {
   return provider;
 };
 
-// test account with fee token balance
 export const getTestAccount = (provider: ProviderInterface) => {
-  let testAccountAddress = process.env.TEST_ACCOUNT_ADDRESS;
-  let testAccountPrivateKey = process.env.TEST_ACCOUNT_PRIVATE_KEY;
-
-  if (!IS_LOCALHOST_DEVNET) {
-    if (!testAccountPrivateKey) {
-      throw new Error('TEST_ACCOUNT_PRIVATE_KEY is not set');
-    }
-    if (!testAccountAddress) {
-      throw new Error('TEST_ACCOUNT_ADDRESS is not set');
-    }
-  } else if (!testAccountAddress || !testAccountPrivateKey) {
-    // use defaults for devnet only if they are not set
-
-    // TODO: refactor to retrieve from devnet's /predeployed_accounts endpoint
-    [testAccountAddress, testAccountPrivateKey] = IS_RPC
-      ? [
-          '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691',
-          '0x71d7bb07b9a64f6f78ac4c816aff4da9',
-        ]
-      : [
-          '0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a',
-          '0xe3e70682c2094cac629f6fbed82c07cd',
-        ];
-  }
-  const cairoVersion = (process.env.ACCOUNT_CAIRO_VERSION as CairoVersion) || '0';
-
-  return new Account(provider, toHex(testAccountAddress), testAccountPrivateKey, cairoVersion);
+  return new Account(
+    provider,
+    toHex(process.env.TEST_ACCOUNT_ADDRESS || ''),
+    process.env.TEST_ACCOUNT_PRIVATE_KEY || ''
+  );
 };
 
 const describeIf = (condition: boolean) => (condition ? describe : describe.skip);
-export const describeIfSequencer = describeIf(IS_SEQUENCER);
-export const describeIfRpc = describeIf(IS_RPC);
-export const describeIfNotRpc = describeIf(!IS_RPC);
-export const describeIfNotDevnet = describeIf(!IS_LOCALHOST_DEVNET);
-export const describeIfDevnet = describeIf(IS_LOCALHOST_DEVNET);
-export const describeIfDevnetRpc = describeIf(IS_DEVNET_RPC);
-export const describeIfDevnetSequencer = describeIf(IS_DEVNET_SEQUENCER);
-export const describeIfSequencerGoerli = describeIf(IS_SEQUENCER_GOERLI);
+export const describeIfSequencer = describeIf(process.env.IS_SEQUENCER === 'true');
+export const describeIfRpc = describeIf(process.env.IS_RPC === 'true');
+export const describeIfNotDevnet = describeIf(process.env.IS_LOCALHOST_DEVNET === 'false');
+export const describeIfDevnet = describeIf(process.env.IS_LOCALHOST_DEVNET === 'true');
+export const describeIfDevnetRpc = describeIf(process.env.IS_RPC_DEVNET === 'true');
+export const describeIfDevnetSequencer = describeIf(process.env.IS_SEQUENCER_DEVNET === 'true');
+export const describeIfSequencerGoerli = describeIf(process.env.IS_SEQUENCER_GOERLI === 'true');
 
 export const erc20ClassHash = '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a';
 export const wrongClassHash = '0x000000000000000000000000000000000000000000000000000000000000000';

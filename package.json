@@ -113,6 +113,7 @@
     "setupFilesAfterEnv": [
       "./__tests__/jest.setup.ts"
     ],
+    "globalSetup": "./__tests__/jestGlobalSetup.ts",
     "sandboxInjectedGlobals": [
       "Math"
     ]
