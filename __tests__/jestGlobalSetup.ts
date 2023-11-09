@@ -5,6 +5,7 @@
  * ref: order of execution jestGlobalSetup.ts -> jest.setup.ts -> fixtures.ts
  */
 
+import { getDefaultNodeUrl } from '../src';
 import { BaseUrl } from '../src/constants';
 
 type DevnetStrategy = {
@@ -155,16 +156,15 @@ const verifySetup = (final?: boolean) => {
     if (final) throw new Error('TEST_ACCOUNT_PRIVATE_KEY env is not provided');
     else warnings.push('TEST_ACCOUNT_PRIVATE_KEY env is not provided!');
   }
-  if (!process.env.TEST_PROVIDER_BASE_URL && !process.env.TEST_RPC_URL) {
-    if (final) throw new Error('One of TEST_PROVIDER_BASE_URL or TEST_RPC_URL env is not provided');
-    else warnings.push('TEST_PROVIDER_BASE_URL or TEST_RPC_URL env is not provided!');
+  if (!process.env.TEST_RPC_URL) {
+    process.env.TEST_RPC_URL = getDefaultNodeUrl();
+    console.warn('TEST_RPC_URL env is not provided');
   }
 
   if (warnings.length > 0) {
     console.log('\x1b[33m', warnings.join('\n'), '\x1b[0m');
     delete process.env.TEST_ACCOUNT_ADDRESS;
     delete process.env.TEST_ACCOUNT_PRIVATE_KEY;
-    delete process.env.TEST_PROVIDER_BASE_URL;
     return false;
   }
 
@@ -213,7 +213,7 @@ const executeStrategy = async () => {
     return true;
   }
 
-  // 2. Try to detect setup
+  // 2. Try to detect devnet setup
   console.log('Basic test parameters are missing, Auto Setup Started');
   const devnetStrategy = await localDevnetDetectionStrategy();
   if (devnetStrategy.isDevnet) {
@@ -242,6 +242,4 @@ const executeStrategy = async () => {
 export default async (_globalConfig: any, _projectConfig: any) => {
   const isSet = await executeStrategy();
   if (!isSet) console.error('Test Setup Environment is NOT Ready');
-  // SET GLOBALS
-  process.env.GS_DEFAULT_TEST_PROVIDER_URL = GS_DEFAULT_TEST_PROVIDER_URL;
 };
