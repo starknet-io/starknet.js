@@ -18,14 +18,13 @@ import {Provider} from 'starknet';
 const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_MAIN } })
 ```
 
-## Connect your DAPP to Starknet testnet 1 & 2
+## Connect your DAPP to Starknet testnet
 
 ```typescript
-const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } }) // for testnet 1
-const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI2 } })  // for testnet 2
+const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } }) // for testnet
 ```
 
-## Connect your DAPP to Starknet-devnet
+## Connect your DAPP to Starknet devnet
 
 ```typescript
 const provider = new Provider({ sequencer: { baseUrl:"http://127.0.0.1:5050"} });
@@ -110,7 +109,7 @@ For example, if you want to estimate the fee of an L1 ➡️ L2 message, you nee
 
 ```typescript
 import { SequencerProvider, constants } from "starknet";
-const provider = new SequencerProvider({ baseUrl: constants.BaseUrl.SN_GOERLI2 }); // for testnet 2
+const provider = new SequencerProvider({ baseUrl: constants.BaseUrl.SN_GOERLI }); // for testnet
 const responseEstimateMessageFee = await provider.estimateMessageFee(.....)
 ```
 

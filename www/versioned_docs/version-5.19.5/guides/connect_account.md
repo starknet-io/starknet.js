@@ -68,7 +68,7 @@ import * as dotenv from "dotenv";
 dotenv.config();
 
 // initialize provider
-const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI2  } });
+const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI  } });
 // initialize existing account
 const privateKey = process.env.OZ_NEW_ACCOUNT_PRIVKEY;
 const accountAddress = "0x051158d244c7636dde39ec822873b29e6c9a758c6a9812d005b6287564908667";
