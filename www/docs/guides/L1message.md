@@ -7,7 +7,7 @@ sidebar_position: 13
 You can exchange messages between L1 & L2 networks:
 
 - L2 Starknet mainnet ↔️ L1 Ethereum.
-- L2 Starknet testnet 1 & 2 ↔️ L1 Goerli ETH testnet.
+- L2 Starknet testnet ↔️ L1 Goerli ETH testnet.
 - L2 local Starknet devnet ↔️ L1 local ETH testnet (Ganache, ...).
 
 You can find an explanation of the global mechanism [here](https://docs.starknet.io/documentation/architecture_and_concepts/L1-L2_Communication/messaging-mechanism/).
@@ -36,7 +36,7 @@ You have to pay in the L1 an extra fee when invoking `sendMessageToL2` (of cours
 
 ```typescript
 import { SequencerProvider } from "starknet";
-const provider = new SequencerProvider({ baseUrl: constants.BaseUrl.SN_GOERLI }); // for testnet 1
+const provider = new SequencerProvider({ baseUrl: constants.BaseUrl.SN_GOERLI }); // for testnet
 
 const responseEstimateMessageFee = await provider.estimateMessageFee({
     from_address: L1address,

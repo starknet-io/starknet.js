@@ -138,7 +138,7 @@ const typedDataValidate: TypedData = {
         domain: {
             name: "myDapp", // put the name of your dapp to ensure that the signatures will not be used by other DAPP
             version: "1",
-            chainId: shortString.encodeShortString("SN_GOERLI"), // shortString of 'SN_GOERLI' (or 'SN_MAIN' or 'SN_GOERLI2'), to be sure that signature can't be used by other network.
+            chainId: shortString.encodeShortString("SN_GOERLI"), // shortString of 'SN_GOERLI' (or 'SN_MAIN'), to be sure that signature can't be used by other network.
         },
         message: {
             id: "0x0000004f000f",

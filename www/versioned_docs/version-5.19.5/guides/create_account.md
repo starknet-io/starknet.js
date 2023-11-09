@@ -20,7 +20,7 @@ Creating an account is a bit tricky; you have several steps:
 
 > Level: easy.
 
-Here, we will create a wallet with the Open Zeppelin smart contract v0.5.1. The contract class is already implemented in both Testnet 1 & 2.  
+Here, we will create a wallet with the Open Zeppelin smart contract v0.5.1. The contract class is already implemented in Testnet.  
 This contract is coded in Cairo 0, so it will not survive the upcoming re-genesis of Starknet.
 
 ```typescript
@@ -97,7 +97,7 @@ const OZaccount = new Account(provider, OZcontractAddress, privateKey, "1");
 
 > Level: medium.
 
-Here, we will create a wallet with the Argent smart contract v0.2.3. This case is more complicated because we will have the account behind a proxy contract (this way, the wallet contract can be updated). The contract classes of both contracts are already implemented in both Testnet 1 & 2.
+Here, we will create a wallet with the Argent smart contract v0.2.3. This case is more complicated because we will have the account behind a proxy contract (this way, the wallet contract can be updated). The contract classes of both contracts are already implemented in Testnet.
 
 > If necessary OZ contracts can also be created with a proxy.
 
