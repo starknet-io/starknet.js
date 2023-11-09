@@ -1,3 +1,5 @@
+import { base64 } from '@scure/base';
+
 /* eslint-disable no-param-reassign */
 export const IS_BROWSER = typeof window !== 'undefined';
 
@@ -39,14 +41,14 @@ export function stringToArrayBuffer(str: string): Uint8Array {
  * Convert string to array buffer (browser and node compatible)
  */
 export function atobUniversal(a: string): Uint8Array {
-  return IS_BROWSER ? utf8ToArray(atob(a)) : Buffer.from(a, 'base64');
+  return base64.decode(a);
 }
 
 /**
  * Convert array buffer to string (browser and node compatible)
  */
 export function btoaUniversal(b: ArrayBuffer): string {
-  return IS_BROWSER ? btoa(arrayBufferToString(b)) : Buffer.from(b).toString('base64');
+  return base64.encode(new Uint8Array(b));
 }
 
 /**
