@@ -1,3 +1,25 @@
+# [5.23.0](https://github.com/starknet-io/starknet.js/compare/v5.22.0...v5.23.0) (2023-11-10)
+
+### Bug Fixes
+
+- correction of CairoAssembly type ([340392f](https://github.com/starknet-io/starknet.js/commit/340392fe2db4585ea7905176ede5f78f21cf5bad))
+- nethermind public node work's on https ([12c1582](https://github.com/starknet-io/starknet.js/commit/12c15829a7f2c7f46dcd4dd92b75d9ced5e62781))
+- offset type in DEPRECATED_CAIRO_ENTRY_POINT ([452df9e](https://github.com/starknet-io/starknet.js/commit/452df9e133e2c4a5df1956ca01d7af19fd01f1d9))
+- remove buffer ([f8f1caa](https://github.com/starknet-io/starknet.js/commit/f8f1caa0d1ba41abdb4e3c0cb26bdec2e5dd2f65))
+
+### Features
+
+- export types and respose type in nonspec ([e42f9f9](https://github.com/starknet-io/starknet.js/commit/e42f9f991982d93a5733069fa5655f6b787cf8a2))
+- refactored tests setup ([a6be207](https://github.com/starknet-io/starknet.js/commit/a6be207bf9f05c90f29e9620fdebea160fbfac79))
+- rpc 0.5.0, spec refactored and rebuilt, wip testing setup refactor ([ecfbe19](https://github.com/starknet-io/starknet.js/commit/ecfbe193cf28a16404f6e1e7cdf3fc9f00b5012c))
+- rpc default provider and public nodes ([12402e3](https://github.com/starknet-io/starknet.js/commit/12402e31e0f22de85351843baa2bae8be440918f))
+- rpc Provider cleanup & refactor, RPC Spec types update ([c373ca4](https://github.com/starknet-io/starknet.js/commit/c373ca44e8fcffc4afc164712b13838b9f34e7b9))
+- set default provider to random rpc provider, update rpc provider, update test setup ([321311e](https://github.com/starknet-io/starknet.js/commit/321311e7722064516ec705aa932660f4b36073bd))
+- test general parameters overide ([c888d23](https://github.com/starknet-io/starknet.js/commit/c888d2381c4a2a461a6aebf066dbbed3563c7df2))
+- use txStatus in waitForTransaction ([dd80eb5](https://github.com/starknet-io/starknet.js/commit/dd80eb5fec8a1eede7301684e6a6fb2bb970b2b5))
+- waitForTransaction tx hash readiness, test errors & logging update, rpc ([39b3fa7](https://github.com/starknet-io/starknet.js/commit/39b3fa73f319ed9119850e1b41f7a49f832fa0ba))
+- wip ([98aa89c](https://github.com/starknet-io/starknet.js/commit/98aa89cb8595cbf589fb1389cda2db45a932e2e9))
+
 # [5.22.0](https://github.com/starknet-io/starknet.js/compare/v5.21.1...v5.22.0) (2023-11-02)
 
 ### Features
