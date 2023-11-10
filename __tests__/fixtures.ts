@@ -51,7 +51,7 @@ export const getTestProvider = (): ProviderInterface => {
     ? new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL })
     : new SequencerProvider({ baseUrl: process.env.TEST_PROVIDER_BASE_URL || '' });
 
-  if (process.env.IS_LOCALHOST_DEVNET) {
+  if (process.env.IS_LOCALHOST_DEVNET === 'true') {
     // accelerate the tests when running locally
     const originalWaitForTransaction = provider.waitForTransaction.bind(provider);
     provider.waitForTransaction = (

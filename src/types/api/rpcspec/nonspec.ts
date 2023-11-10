@@ -84,7 +84,7 @@ export type ChainId = CHAIN_ID;
 export type Transaction = TXN;
 export type TransactionStatus = {
   finality_status: TXN_STATUS;
-  execution_status: TXN_EXECUTION_STATUS;
+  execution_status?: TXN_EXECUTION_STATUS;
 };
 
 // Diff Than Seq
@@ -105,6 +105,13 @@ export enum ETransactionType {
 export enum ESimulationFlag {
   SKIP_VALIDATE = 'SKIP_VALIDATE',
   SKIP_FEE_CHARGE = 'SKIP_FEE_CHARGE',
+}
+
+export enum ETransactionStatus {
+  RECEIVED = 'RECEIVED',
+  REJECTED = 'REJECTED',
+  ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
+  ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
 }
 
 export enum ETransactionFinalityStatus {

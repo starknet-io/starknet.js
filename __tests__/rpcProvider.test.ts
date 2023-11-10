@@ -21,9 +21,9 @@ describeIfRpc('RPCProvider', () => {
   const rpcProvider = getTestProvider() as RpcProvider;
   const account = getTestAccount(rpcProvider);
   let accountPublicKey: string;
+  initializeMatcher(expect);
 
   beforeAll(async () => {
-    initializeMatcher(expect);
     expect(account).toBeInstanceOf(Account);
     const accountKeyPair = utils.randomPrivateKey();
     accountPublicKey = getStarkKey(accountKeyPair);
@@ -92,10 +92,9 @@ describeIfRpc('RPCProvider', () => {
       });
       expect(estimation).toEqual(
         expect.objectContaining({
-          overall_fee: expect.anything(),
+          gas_consumed: expect.anything(),
           gas_price: expect.anything(),
-          gas_usage: expect.anything(),
-          unit: 'wei',
+          overall_fee: expect.anything(),
         })
       );
     });
@@ -206,13 +205,6 @@ describeIfRpc('RPCProvider', () => {
       });
     });
 
-    describeIfNotDevnet('testnet only', () => {
-      test('getSyncingStats', async () => {
-        const syncingStats = await rpcProvider.getSyncingStats();
-        expect(syncingStats).toMatchSchemaRef('GetSyncingStatsResponse');
-      });
-    });
-
     describe('deploy contract related tests', () => {
       let contract_address: string;
       let transaction_hash: string;
@@ -267,6 +259,13 @@ describeIfRpc('RPCProvider', () => {
         const contractClass = await rpcProvider.getClass(ozClassHash);
         expect(contractClass).toMatchSchemaRef('LegacyContractClass');
       });
+    });
+  });
+
+  describeIfNotDevnet('global rpc only', () => {
+    test('getSyncingStats', async () => {
+      const syncingStats = await rpcProvider.getSyncingStats();
+      expect(syncingStats).toMatchSchemaRef('GetSyncingStatsResponse');
     });
   });
 });
