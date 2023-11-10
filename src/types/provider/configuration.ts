@@ -12,6 +12,7 @@ export type RpcProviderOptions = {
   headers?: object;
   blockIdentifier?: BlockIdentifier;
   chainId?: StarknetChainId;
+  default?: boolean;
 };
 
 export type SequencerHttpMethod = 'POST' | 'GET';

@@ -31,9 +31,9 @@ import { CallData } from '../utils/calldata';
 import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { isSierra } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
-import { getSelectorFromName, getVersionsByType } from '../utils/hash';
+import { getSelector, getSelectorFromName, getVersionsByType } from '../utils/hash';
 import { stringify } from '../utils/json';
-import { toHex, toStorageKey } from '../utils/num';
+import { getHexStringArray, toHex, toStorageKey } from '../utils/num';
 import { wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { decompressProgram, signatureToHexArray } from '../utils/stark';
@@ -42,9 +42,10 @@ import { ProviderInterface } from './interface';
 import { getAddressFromStarkName, getStarkName } from './starknetId';
 import { Block } from './utils';
 
-export const getDefaultNodeUrl = (networkName?: NetworkName): string => {
-  // eslint-disable-next-line no-console
-  console.warn('Using default public node url, please provide nodeUrl in provider options!');
+export const getDefaultNodeUrl = (networkName?: NetworkName, mute: boolean = false): string => {
+  if (!mute)
+    // eslint-disable-next-line no-console
+    console.warn('Using default public node url, please provide nodeUrl in provider options!');
   const nodes = networkName === NetworkName.SN_MAIN ? RPC_MAINNET_NODES : RPC_GOERLI_NODES;
   const randIdx = Math.floor(Math.random() * nodes.length);
   return nodes[randIdx];
@@ -73,13 +74,13 @@ export class RpcProvider implements ProviderInterface {
     const { nodeUrl, retries, headers, blockIdentifier, chainId } = optionsOrProvider || {};
     if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
       // Network name provided for nodeUrl
-      this.nodeUrl = getDefaultNodeUrl(nodeUrl as NetworkName);
+      this.nodeUrl = getDefaultNodeUrl(nodeUrl as NetworkName, optionsOrProvider?.default);
     } else if (nodeUrl) {
       // NodeUrl provided
       this.nodeUrl = nodeUrl;
     } else {
       // none provided fallback to default testnet
-      this.nodeUrl = getDefaultNodeUrl();
+      this.nodeUrl = getDefaultNodeUrl(undefined, optionsOrProvider?.default);
     }
     this.retries = retries || defaultOptions.retries;
     this.headers = { ...defaultOptions.headers, ...headers };
@@ -89,7 +90,12 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public fetch(method: string, params?: object, id: string | number = 0) {
-    const rpcRequestBody: RPC.JRPC.RequestBody = { id, jsonrpc: '2.0', method, params };
+    const rpcRequestBody: RPC.JRPC.RequestBody = {
+      id,
+      jsonrpc: '2.0',
+      method,
+      ...(params && { params }),
+    };
     return fetch(this.nodeUrl, {
       method: 'POST',
       body: stringify(rpcRequestBody),
@@ -97,10 +103,15 @@ export class RpcProvider implements ProviderInterface {
     });
   }
 
-  protected errorHandler(rpcError?: RPC.JRPC.Error, otherError?: any) {
+  protected errorHandler(method: string, params: any, rpcError?: RPC.JRPC.Error, otherError?: any) {
     if (rpcError) {
       const { code, message, data } = rpcError;
-      throw new LibraryError(`${code}: ${message}: ${data}`);
+      throw new LibraryError(
+        `RPC: ${method} with params ${JSON.stringify(params)}\n ${code}: ${message}: ${data}`
+      );
+    }
+    if (otherError instanceof LibraryError) {
+      throw otherError;
     }
     if (otherError) {
       throw Error(otherError.message);
@@ -114,10 +125,10 @@ export class RpcProvider implements ProviderInterface {
     try {
       const rawResult = await this.fetch(method, params);
       const { error, result } = await rawResult.json();
-      this.errorHandler(error);
+      this.errorHandler(method, params, error);
       return result as RPC.Methods[T]['result'];
     } catch (error: any) {
-      this.errorHandler(error?.response?.data, error);
+      this.errorHandler(method, params, error?.response?.data, error);
       throw error;
     }
   }
@@ -310,15 +321,17 @@ export class RpcProvider implements ProviderInterface {
     let onchain = false;
     let isErrorState = false;
     const retryInterval = options?.retryInterval ?? 5000;
-    const errorStates: any = options?.errorStates ?? [RPC.ETransactionExecutionStatus.REVERTED];
+    const errorStates: any = options?.errorStates ?? [
+      RPC.ETransactionStatus.REJECTED,
+      RPC.ETransactionExecutionStatus.REVERTED,
+    ];
     const successStates: any = options?.successStates ?? [
       RPC.ETransactionExecutionStatus.SUCCEEDED,
-      RPC.ETransactionFinalityStatus.ACCEPTED_ON_L1,
-      RPC.ETransactionFinalityStatus.ACCEPTED_ON_L2,
+      RPC.ETransactionStatus.ACCEPTED_ON_L2,
+      RPC.ETransactionStatus.ACCEPTED_ON_L1,
     ];
 
     let txStatus: RPC.TransactionStatus;
-
     while (!onchain) {
       // eslint-disable-next-line no-await-in-loop
       await wait(retryInterval);
@@ -329,8 +342,8 @@ export class RpcProvider implements ProviderInterface {
         const executionStatus = txStatus.execution_status;
         const finalityStatus = txStatus.finality_status;
 
-        if (!executionStatus || !finalityStatus) {
-          // Transaction is potentially REJECTED or NOT_RECEIVED but RPC doesn't have those statuses
+        if (!finalityStatus) {
+          // Transaction is potentially NOT_RECEIVED or RPC not Synced yet
           // so we will retry '{ retries }' times
           const error = new Error('waiting for transaction status');
           throw error;
@@ -350,7 +363,7 @@ export class RpcProvider implements ProviderInterface {
           throw error;
         }
 
-        if (retries === 0) {
+        if (retries <= 0) {
           throw new Error(`waitForTransaction timed-out with retries ${this.retries}`);
         }
       }
@@ -358,8 +371,25 @@ export class RpcProvider implements ProviderInterface {
       retries -= 1;
     }
 
-    await wait(retryInterval);
-    return this.getTransactionReceipt(transactionHash);
+    /**
+     * Nodes even doe transaction is executionStatus SUCCEEDED finalityStatus ACCEPTED_ON_L2, getTransactionReceipt return Transaction hash not found
+     * Retry until rpc is actually ready to work with txHash
+     */
+    let txReceipt = null;
+    while (txReceipt === null) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        txReceipt = await this.getTransactionReceipt(transactionHash);
+      } catch (error) {
+        if (retries <= 0) {
+          throw new Error(`waitForTransaction timed-out with retries ${this.retries}`);
+        }
+      }
+      retries -= 1;
+      // eslint-disable-next-line no-await-in-loop
+      await wait(retryInterval);
+    }
+    return txReceipt as RPC.TransactionReceipt;
   }
 
   public async getStorageAt(
@@ -642,9 +672,17 @@ export class RpcProvider implements ProviderInterface {
     message: RPC.L1Message,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ) {
+    const { from_address, to_address, entry_point_selector, payload } = message;
+    const formattedMessage = {
+      from_address: toHex(from_address),
+      to_address: toHex(to_address),
+      entry_point_selector: getSelector(entry_point_selector),
+      payload: getHexStringArray(payload),
+    };
+
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_estimateMessageFee', {
-      message,
+      message: formattedMessage,
       block_id,
     });
   }
