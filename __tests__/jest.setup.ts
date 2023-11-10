@@ -1,3 +1,9 @@
+/**
+ * Test Setup
+ * Run before each test
+ * ref: order of execution jestGlobalSetup.ts -> jest.setup.ts -> fixtures.ts
+ */
+
 import 'isomorphic-fetch';
 
 /* eslint-disable no-console */

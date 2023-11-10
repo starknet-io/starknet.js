@@ -7,6 +7,7 @@ import { felt, uint256 } from '../src/utils/calldata/cairo';
 import { toHexString } from '../src/utils/num';
 import {
   compiledErc20Echo,
+  compiledL1L2,
   compiledOpenZeppelinAccount,
   describeIfDevnet,
   describeIfNotDevnet,
@@ -20,9 +21,9 @@ describeIfRpc('RPCProvider', () => {
   const rpcProvider = getTestProvider() as RpcProvider;
   const account = getTestAccount(rpcProvider);
   let accountPublicKey: string;
+  initializeMatcher(expect);
 
   beforeAll(async () => {
-    initializeMatcher(expect);
     expect(account).toBeInstanceOf(Account);
     const accountKeyPair = utils.randomPrivateKey();
     accountPublicKey = getStarkKey(accountKeyPair);
@@ -60,18 +61,43 @@ describeIfRpc('RPCProvider', () => {
     expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
   });
 
-  xtest('getProtocolVersion - pathfinder not implemented', async () => {
-    await rpcProvider.getProtocolVersion();
-  });
-
-  test('getProtocolVersion - not implemented', async () => {
-    await expect(rpcProvider.getProtocolVersion()).rejects.toThrow();
+  test('getSpecVersion', async () => {
+    const spec = await rpcProvider.getSpecVersion();
+    expect(typeof spec).toBe('string');
   });
 
   test('getCode - not implemented', async () => {
     expect(
       rpcProvider.getCode('0x058d97f7d76e78f44905cc30cb65b91ea49a4b908a76703c54197bca90f81773')
     ).rejects.toThrow();
+  });
+
+  describe('Test Estimate message fee', () => {
+    const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165A0';
+    let l1l2ContractAddress: string;
+
+    beforeAll(async () => {
+      const { deploy } = await account.declareAndDeploy({
+        contract: compiledL1L2,
+      });
+      l1l2ContractAddress = deploy.contract_address;
+    });
+
+    test('estimate message fee', async () => {
+      const estimation = await rpcProvider.estimateMessageFee({
+        from_address: L1_ADDRESS,
+        to_address: l1l2ContractAddress,
+        entry_point_selector: 'deposit',
+        payload: ['556', '123'],
+      });
+      expect(estimation).toEqual(
+        expect.objectContaining({
+          gas_consumed: expect.anything(),
+          gas_price: expect.anything(),
+          overall_fee: expect.anything(),
+        })
+      );
+    });
   });
 
   describe('RPC methods', () => {
@@ -179,13 +205,6 @@ describeIfRpc('RPCProvider', () => {
       });
     });
 
-    describeIfNotDevnet('testnet only', () => {
-      test('getSyncingStats', async () => {
-        const syncingStats = await rpcProvider.getSyncingStats();
-        expect(syncingStats).toMatchSchemaRef('GetSyncingStatsResponse');
-      });
-    });
-
     describe('deploy contract related tests', () => {
       let contract_address: string;
       let transaction_hash: string;
@@ -213,6 +232,10 @@ describeIfRpc('RPCProvider', () => {
         expect(transaction).toMatchSchemaRef('GetTransactionResponse');
       });
 
+      test('getTransactionStatus()', async () => {
+        return expect(rpcProvider.getTransactionStatus(transaction_hash)).resolves.not.toThrow();
+      });
+
       test('getTransaction', async () => {
         const transaction = await rpcProvider.getTransaction(transaction_hash);
         expect(transaction).toMatchSchemaRef('GetTransactionResponse');
@@ -236,6 +259,13 @@ describeIfRpc('RPCProvider', () => {
         const contractClass = await rpcProvider.getClass(ozClassHash);
         expect(contractClass).toMatchSchemaRef('LegacyContractClass');
       });
+    });
+  });
+
+  describeIfNotDevnet('global rpc only', () => {
+    test('getSyncingStats', async () => {
+      const syncingStats = await rpcProvider.getSyncingStats();
+      expect(syncingStats).toMatchSchemaRef('GetSyncingStatsResponse');
     });
   });
 });
