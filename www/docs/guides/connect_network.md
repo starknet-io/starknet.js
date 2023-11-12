@@ -9,7 +9,7 @@ The first thing to do is to define with which network you want to interact.
 With the Provider object, you define which network to use.
 
 ```typescript
-import {Provider} from 'starknet';
+import { Provider } from 'starknet';
 ```
 
 ## Connect your DAPP to Starknet mainnet
