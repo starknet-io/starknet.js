@@ -1,3 +1,13 @@
+# [5.24.0](https://github.com/starknet-io/starknet.js/compare/v5.23.0...v5.24.0) (2023-11-13)
+
+### Bug Fixes
+
+- skip chainId eager load for RpcProvider initialization ([3bccc4d](https://github.com/starknet-io/starknet.js/commit/3bccc4d9f0e07d42a3855891cb5b4efce3692001))
+
+### Features
+
+- rpc 0.5.1 ([0306b90](https://github.com/starknet-io/starknet.js/commit/0306b90f0cec30a3db99925a83f05d6c66f4100c))
+
 # [5.23.0](https://github.com/starknet-io/starknet.js/compare/v5.22.0...v5.23.0) (2023-11-10)
 
 ### Bug Fixes
