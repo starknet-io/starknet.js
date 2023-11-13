@@ -85,8 +85,7 @@ export class RpcProvider implements ProviderInterface {
     this.retries = retries || defaultOptions.retries;
     this.headers = { ...defaultOptions.headers, ...headers };
     this.blockIdentifier = blockIdentifier || defaultOptions.blockIdentifier;
-    this.chainId = chainId;
-    this.getChainId(); // internally skipped if chainId has value
+    this.chainId = chainId; // setting to a non-null value skips making a request in getChainId()
   }
 
   public fetch(method: string, params?: object, id: string | number = 0) {
@@ -372,7 +371,7 @@ export class RpcProvider implements ProviderInterface {
     }
 
     /**
-     * Nodes even doe transaction is executionStatus SUCCEEDED finalityStatus ACCEPTED_ON_L2, getTransactionReceipt return Transaction hash not found
+     * For some nodes even though the transaction has executionStatus SUCCEEDED finalityStatus ACCEPTED_ON_L2, getTransactionReceipt returns "Transaction hash not found"
      * Retry until rpc is actually ready to work with txHash
      */
     let txReceipt = null;
