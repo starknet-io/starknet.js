@@ -106,7 +106,7 @@ export class RpcProvider implements ProviderInterface {
     if (rpcError) {
       const { code, message, data } = rpcError;
       throw new LibraryError(
-        `RPC: ${method} with params ${JSON.stringify(params)}\n ${code}: ${message}: ${data}`
+        `RPC: ${method} with params ${stringify(params)}\n ${code}: ${message}: ${stringify(data)}`
       );
     }
     if (otherError instanceof LibraryError) {
