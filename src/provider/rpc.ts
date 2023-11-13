@@ -371,7 +371,7 @@ export class RpcProvider implements ProviderInterface {
     }
 
     /**
-     * Nodes even doe transaction is executionStatus SUCCEEDED finalityStatus ACCEPTED_ON_L2, getTransactionReceipt return Transaction hash not found
+     * For some nodes even though the transaction has executionStatus SUCCEEDED finalityStatus ACCEPTED_ON_L2, getTransactionReceipt returns "Transaction hash not found"
      * Retry until rpc is actually ready to work with txHash
      */
     let txReceipt = null;
