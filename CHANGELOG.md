@@ -9,13 +9,13 @@
 
 ### Features
 
-- export types and respose type in nonspec ([e42f9f9](https://github.com/starknet-io/starknet.js/commit/e42f9f991982d93a5733069fa5655f6b787cf8a2))
+- export types and response type in nonspec ([e42f9f9](https://github.com/starknet-io/starknet.js/commit/e42f9f991982d93a5733069fa5655f6b787cf8a2))
 - refactored tests setup ([a6be207](https://github.com/starknet-io/starknet.js/commit/a6be207bf9f05c90f29e9620fdebea160fbfac79))
 - rpc 0.5.0, spec refactored and rebuilt, wip testing setup refactor ([ecfbe19](https://github.com/starknet-io/starknet.js/commit/ecfbe193cf28a16404f6e1e7cdf3fc9f00b5012c))
 - rpc default provider and public nodes ([12402e3](https://github.com/starknet-io/starknet.js/commit/12402e31e0f22de85351843baa2bae8be440918f))
 - rpc Provider cleanup & refactor, RPC Spec types update ([c373ca4](https://github.com/starknet-io/starknet.js/commit/c373ca44e8fcffc4afc164712b13838b9f34e7b9))
 - set default provider to random rpc provider, update rpc provider, update test setup ([321311e](https://github.com/starknet-io/starknet.js/commit/321311e7722064516ec705aa932660f4b36073bd))
-- test general parameters overide ([c888d23](https://github.com/starknet-io/starknet.js/commit/c888d2381c4a2a461a6aebf066dbbed3563c7df2))
+- test general parameters override ([c888d23](https://github.com/starknet-io/starknet.js/commit/c888d2381c4a2a461a6aebf066dbbed3563c7df2))
 - use txStatus in waitForTransaction ([dd80eb5](https://github.com/starknet-io/starknet.js/commit/dd80eb5fec8a1eede7301684e6a6fb2bb970b2b5))
 - waitForTransaction tx hash readiness, test errors & logging update, rpc ([39b3fa7](https://github.com/starknet-io/starknet.js/commit/39b3fa73f319ed9119850e1b41f7a49f832fa0ba))
 - wip ([98aa89c](https://github.com/starknet-io/starknet.js/commit/98aa89cb8595cbf589fb1389cda2db45a932e2e9))
@@ -112,7 +112,7 @@
 
 - add function definition to the contract interface + doc ([06498d5](https://github.com/starknet-io/starknet.js/commit/06498d539bc2b816982e0245ae3b6508665f03f7))
 - contract test status ([53cfaf9](https://github.com/starknet-io/starknet.js/commit/53cfaf935d1b053f5bcd17ffcb1ae48d9e8a4eef))
-- fix multiple same events + add cairo code + seperate tests, legacy and Cairo1 ([7c93157](https://github.com/starknet-io/starknet.js/commit/7c93157d60864989efec37a05521979a2548e4d8))
+- fix multiple same events + add cairo code + separate tests, legacy and Cairo1 ([7c93157](https://github.com/starknet-io/starknet.js/commit/7c93157d60864989efec37a05521979a2548e4d8))
 - modify parseEvents structure + add testcase for multiple different event in same tx ([b63b0d6](https://github.com/starknet-io/starknet.js/commit/b63b0d631d163e181c8a42a634f107d2761e35ca))
 - optional struct and enum in responseParser ([14d3cca](https://github.com/starknet-io/starknet.js/commit/14d3cca97a3cebedf07466f98dd46639999421c2))
 - patch merge, and add enums to event parser ([00f8073](https://github.com/starknet-io/starknet.js/commit/00f8073418eef1e2eebf105884357561b959fb7c))
@@ -534,7 +534,7 @@
 ### Bug Fixes
 
 - blockIdentifier null on call from constructed function ([c88fbf0](https://github.com/starknet-io/starknet.js/commit/c88fbf0cdfc57e1150275a34c15900d6c81802d3))
-- default pathfinder does't have pending block ([4619188](https://github.com/starknet-io/starknet.js/commit/4619188e21e5cc9a811c59bcf2923c4382661635))
+- default pathfinder doesn't have pending block ([4619188](https://github.com/starknet-io/starknet.js/commit/4619188e21e5cc9a811c59bcf2923c4382661635))
 - sequencer defaults, remove defaultProvider default blockIdentifier, spelling, class ([555a9a3](https://github.com/starknet-io/starknet.js/commit/555a9a3982bc1a742776119df5dee5d701209a0d))
 
 ### Features
@@ -579,12 +579,12 @@
 - remove deployMaxFee from deploy ([6d5fa24](https://github.com/starknet-io/starknet.js/commit/6d5fa2461def5caad3cdd71af8a4e6c61d88092e))
 - rpc tests ([cd913ee](https://github.com/starknet-io/starknet.js/commit/cd913ee93df433eb3730e6aae43dd22b0c8aed32))
 - split getNonce interface ([7b7acd9](https://github.com/starknet-io/starknet.js/commit/7b7acd9f5ebe0b2b97e389fb3a68249dd72224ce))
-- tiping issue ([78aa340](https://github.com/starknet-io/starknet.js/commit/78aa3402131f51e83287eada7499ea01de41efa0))
-- udc require L2 status for deployed contract to be awailable to use ([afba8d0](https://github.com/starknet-io/starknet.js/commit/afba8d068685c1c9b03126e5de13a5dfddb2925e))
+- tipping issue ([78aa340](https://github.com/starknet-io/starknet.js/commit/78aa3402131f51e83287eada7499ea01de41efa0))
+- udc require L2 status for deployed contract to be available to use ([afba8d0](https://github.com/starknet-io/starknet.js/commit/afba8d068685c1c9b03126e5de13a5dfddb2925e))
 
 ### Features
 
-- account deployContract ts overide base class ([dd4502d](https://github.com/starknet-io/starknet.js/commit/dd4502d76fb73f04e8e512336f6e5924c55b2f39))
+- account deployContract ts override base class ([dd4502d](https://github.com/starknet-io/starknet.js/commit/dd4502d76fb73f04e8e512336f6e5924c55b2f39))
 - extend acc interface, use deploy estimate fee ([da7392a](https://github.com/starknet-io/starknet.js/commit/da7392a65fa2b261cc1c6916739c1a59ecf9330f))
 - r p.deployCo. C tests, CF fixtures, cleanHex, DeclareDeploy, F Provider, seq.waitFor ret.txRec ([bb50f53](https://github.com/starknet-io/starknet.js/commit/bb50f5312f2b8618a26eaf13f1f851a645f5b670))
 - return from wait Transaction,Account deployContract and declareDeploy ([724975d](https://github.com/starknet-io/starknet.js/commit/724975dd92cc764208e1cf70c6f0d4089f0d363d))
@@ -1248,11 +1248,11 @@
 
 ### Bug Fixes
 
-- **account:** dont allow additional signatures in execute ([ac02d46](https://github.com/starknet-io/starknet.js/commit/ac02d46c5759904886f56a7b9e7e2686dbf52d4c))
+- **account:** don't allow additional signatures in execute ([ac02d46](https://github.com/starknet-io/starknet.js/commit/ac02d46c5759904886f56a7b9e7e2686dbf52d4c))
 - comments ([f261120](https://github.com/starknet-io/starknet.js/commit/f261120e1971710cde8f95bd17a5869860db8160))
 - review comments ([ee93bd6](https://github.com/starknet-io/starknet.js/commit/ee93bd6e51eabcf3507a77d21c5bdc6fe93d5d1c))
 - **test:** remove only for getTransactionReceipt test ([eb11d3b](https://github.com/starknet-io/starknet.js/commit/eb11d3b60f434f81390f4d13c0462ad8c7ed7321))
-- **types:** change type of `block_number` from `number` to `BlockNumber` in TransactionReceipt ([7a48ff8](https://github.com/starknet-io/starknet.js/commit/7a48ff8e15a93a778fec62fdff10f92b1a073dec))
+- **types:** change the type of `block_number` from `number` to `BlockNumber` in TransactionReceipt ([7a48ff8](https://github.com/starknet-io/starknet.js/commit/7a48ff8e15a93a778fec62fdff10f92b1a073dec))
 - **types:** update TransactionReceipt type ([9f9f6a2](https://github.com/starknet-io/starknet.js/commit/9f9f6a2f4cf3b8bfb438edda06ec38bd1471c03d))
 
 ### Features
