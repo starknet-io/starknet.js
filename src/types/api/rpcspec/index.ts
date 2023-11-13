@@ -1,3 +1,7 @@
+/**
+ * version 0.5.1
+ */
+
 export { Methods } from './methods';
 export { ABI } from './contract';
 export * as Errors from './errors';
