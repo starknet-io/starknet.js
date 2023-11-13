@@ -30,7 +30,7 @@ export type FUNCTION_ABI_TYPE = 'function' | 'l1_handler' | 'constructor';
 // Represents the type of an entry point.
 export type ENTRY_POINT_TYPE = 'EXTERNAL' | 'L1_HANDLER' | 'CONSTRUCTOR';
 // Represents the type of a function call.
-export type CALL_TYPE = 'LIBRARY_CALL' | 'CALL';
+export type CALL_TYPE = 'DELEGATE' | 'LIBRARY_CALL' | 'CALL';
 // Represents the status of the transaction
 export type TXN_STATUS = 'RECEIVED' | 'REJECTED' | 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1';
 // Flags that indicate how to simulate a given transaction. By default, the sequencer behavior is replicated locally (enough funds are expected to be in the account, and the fee will be deducted from the balance before the simulation of the next transaction). To skip the fee charge, use the SKIP_FEE_CHARGE flag.
@@ -520,34 +520,35 @@ export type TRANSACTION_TRACE = {
 
 // Represents a transaction trace for an invoke transaction.
 export type INVOKE_TXN_TRACE = {
-  validate_invocation: FUNCTION_INVOCATION;
-  execute_invocation: FUNCTION_INVOCATION | { revert_reason: string };
-  fee_transfer_invocation: FUNCTION_INVOCATION;
-  state_diff: STATE_DIFF;
   type: 'INVOKE';
+  execute_invocation: FUNCTION_INVOCATION | { revert_reason: string };
+  validate_invocation?: FUNCTION_INVOCATION;
+  fee_transfer_invocation?: FUNCTION_INVOCATION;
+  state_diff?: STATE_DIFF;
 };
 
 // Represents a transaction trace for a declare transaction.
 export type DECLARE_TXN_TRACE = {
-  validate_invocation: FUNCTION_INVOCATION;
-  fee_transfer_invocation: FUNCTION_INVOCATION;
-  state_diff: STATE_DIFF;
   type: 'DECLARE';
+  validate_invocation?: FUNCTION_INVOCATION;
+  fee_transfer_invocation?: FUNCTION_INVOCATION;
+  state_diff?: STATE_DIFF;
 };
 
 // Represents a transaction trace for a deploy account transaction.
 export type DEPLOY_ACCOUNT_TXN_TRACE = {
-  validate_invocation: FUNCTION_INVOCATION;
-  constructor_invocation: FUNCTION_INVOCATION;
-  fee_transfer_invocation: FUNCTION_INVOCATION;
-  state_diff: STATE_DIFF;
   type: 'DEPLOY_ACCOUNT';
+  constructor_invocation: FUNCTION_INVOCATION;
+  validate_invocation?: FUNCTION_INVOCATION;
+  fee_transfer_invocation?: FUNCTION_INVOCATION;
+  state_diff?: STATE_DIFF;
 };
 
 // Represents a transaction trace for an L1 handler transaction.
 export type L1_HANDLER_TXN_TRACE = {
-  function_invocation: FUNCTION_INVOCATION;
   type: 'L1_HANDLER';
+  function_invocation: FUNCTION_INVOCATION;
+  state_diff?: STATE_DIFF;
 };
 
 // Represents a nested function call.
