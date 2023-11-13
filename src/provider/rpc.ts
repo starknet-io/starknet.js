@@ -85,8 +85,7 @@ export class RpcProvider implements ProviderInterface {
     this.retries = retries || defaultOptions.retries;
     this.headers = { ...defaultOptions.headers, ...headers };
     this.blockIdentifier = blockIdentifier || defaultOptions.blockIdentifier;
-    this.chainId = chainId;
-    this.getChainId(); // internally skipped if chainId has value
+    this.chainId = chainId; // setting to a non-null value skips making a request in getChainId()
   }
 
   public fetch(method: string, params?: object, id: string | number = 0) {
