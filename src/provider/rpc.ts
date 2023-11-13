@@ -274,7 +274,6 @@ export class RpcProvider implements ProviderInterface {
    */
   public traceTransaction = this.getTransactionTrace;
 
-  // TODO: implement in waitforTransaction, add add tests, when RPC 0.5 become standard /
   /**
    * NEW: Get the status of a transaction
    */
