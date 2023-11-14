@@ -15,4 +15,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/provider/response.ts:113](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/types/provider/response.ts#L113)
+[src/types/provider/response.ts:113](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/types/provider/response.ts#L113)

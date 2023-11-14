@@ -1,4 +1,4 @@
-import { Abi as AbiKanabi } from 'abi-wan-kanabi';
+import type { Abi as AbiKanabi } from 'abi-wan-kanabi';
 
 import { AccountInterface } from '../account';
 import { ProviderInterface, defaultProvider } from '../provider';
@@ -112,14 +112,6 @@ export function getCalldata(args: RawArgs, callback: Function): Calldata {
     return args[0] as Calldata;
   return callback();
 }
-
-/**
- * Not used at the moment
- */
-/* const detectCairoVersion = (abi: Abi) => {
-  if (!abi) return '0';
-  return abi.find((it) => 'state_mutability' in it) ? '1' : '0';
-}; */
 
 export class Contract implements ContractInterface {
   abi: Abi;
@@ -348,6 +340,10 @@ export class Contract implements ContractInterface {
 
   public isCairo1(): boolean {
     return cairo.isCairo1Abi(this.abi);
+  }
+
+  public async getVersion() {
+    return this.providerOrAccount.getContractVersion(this.address);
   }
 
   public typed<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContract<TAbi> {

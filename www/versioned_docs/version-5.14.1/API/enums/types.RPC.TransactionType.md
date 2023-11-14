@@ -15,7 +15,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:51](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/types/api/rpc.ts#L51)
+[src/types/api/rpc.ts:51](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/types/api/rpc.ts#L51)
 
 ---
 
@@ -25,7 +25,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:52](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/types/api/rpc.ts#L52)
+[src/types/api/rpc.ts:52](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/types/api/rpc.ts#L52)
 
 ---
 
@@ -35,7 +35,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:53](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/types/api/rpc.ts#L53)
+[src/types/api/rpc.ts:53](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/types/api/rpc.ts#L53)
 
 ---
 
@@ -45,7 +45,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:54](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/types/api/rpc.ts#L54)
+[src/types/api/rpc.ts:54](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/types/api/rpc.ts#L54)
 
 ---
 
@@ -55,4 +55,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/types/api/rpc.ts:55](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/types/api/rpc.ts#L55)
+[src/types/api/rpc.ts:55](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/types/api/rpc.ts#L55)

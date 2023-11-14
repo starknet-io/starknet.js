@@ -6,6 +6,7 @@ import type {
   Call,
   CallContractResponse,
   ContractClassResponse,
+  ContractVersion,
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractPayload,
@@ -24,6 +25,7 @@ import type {
   SimulateTransactionResponse,
   StateUpdateResponse,
   Storage,
+  getContractVersionOptions,
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
@@ -78,7 +80,7 @@ export abstract class ProviderInterface {
   ): Promise<ContractClassResponse>;
 
   /**
-   * Returns the class hash deployed under the given address.
+   * Returns the contract class hash in the given block for the contract deployed at the given address
    *
    * @param contractAddress - contract address
    * @param blockIdentifier - block identifier
@@ -98,7 +100,7 @@ export abstract class ProviderInterface {
   public abstract getClassByHash(classHash: string): Promise<ContractClassResponse>;
 
   /**
-   * Gets the nonce of a contract with respect to a specific block
+   * Returns the nonce associated with the given address in the given block
    *
    * @param contractAddress - contract address
    * @returns the hex nonce
@@ -109,7 +111,7 @@ export abstract class ProviderInterface {
   ): Promise<Nonce>;
 
   /**
-   * Gets the contract's storage variable at a specific key.
+   * Get the value of the storage (contract's variable) at the given address and key
    *
    * @param contractAddress
    * @param key - from getStorageVarAddress('<STORAGE_VARIABLE_NAME>') (WIP)
@@ -324,10 +326,38 @@ export abstract class ProviderInterface {
   ): Promise<SimulateTransactionResponse>;
 
   /**
-   * Gets the state changes in a specific block
+   * Gets the state changes in a specific block (result of executing the requested block)
    *
    * @param blockIdentifier - block identifier
    * @returns StateUpdateResponse
    */
   public abstract getStateUpdate(blockIdentifier?: BlockIdentifier): Promise<StateUpdateResponse>;
+
+  /**
+   * Gets the contract version from the provided address
+   * @param contractAddress string
+   * @param classHash undefined
+   * @param options - getContractVersionOptions
+   *   - (optional) compiler - (default true) extract compiler version using type tactic from abi
+   *   - (optional) blockIdentifier - block identifier
+   */
+  public abstract getContractVersion(
+    contractAddress: string,
+    classHash?: undefined,
+    options?: getContractVersionOptions
+  ): Promise<ContractVersion>;
+
+  /**
+   * Gets the contract version from the provided address
+   * @param contractAddress undefined
+   * @param classHash
+   * @param options - getContractVersionOptions
+   *   - (optional) compiler - (default true) extract compiler version using type tactic from abi
+   *   - (optional) blockIdentifier - block identifier
+   */
+  public abstract getContractVersion(
+    contractAddress: undefined,
+    classHash: string,
+    options?: getContractVersionOptions
+  ): Promise<ContractVersion>;
 }

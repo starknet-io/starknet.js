@@ -41,7 +41,7 @@ const { uint256, tuple, isCairo1Abi } = cairo;
 const { toHex } = num;
 const { starknetKeccak } = selector;
 
-describe('Cairo 1 Devnet', () => {
+describe('Cairo 1', () => {
   const provider = getTestProvider();
   const account = getTestAccount(provider);
   describe('API &  Contract interactions', () => {
@@ -70,6 +70,14 @@ describe('Cairo 1 Devnet', () => {
       expect(dd.deploy).toMatchSchemaRef('DeployContractUDCResponse');
       expect(cairo1Contract).toBeInstanceOf(Contract);
       expect(cairo210Contract).toBeInstanceOf(Contract);
+    });
+
+    test('getCairoVersion', async () => {
+      const version1 = await cairo1Contract.getVersion();
+      expect(version1).toEqual({ cairo: '1', compiler: '2' });
+
+      const version210 = await cairo210Contract.getVersion();
+      expect(version210).toEqual({ cairo: '1', compiler: '2' });
     });
 
     xtest('validate TS for redeclare - skip testing', async () => {
@@ -517,6 +525,9 @@ describe('Cairo 1 Devnet', () => {
     test('Cairo 2.1.0 simple contract', async () => {
       const res = await cairo210Contract.test_felt(1, 100, 3);
       expect(res).toEqual(101n);
+
+      const call1 = cairo210Contract.populate('test_len', { p1: 100, string_len: 200 });
+      expect(call1.calldata).toEqual(['100', '200']);
     });
 
     test('myCallData.compile for Cairo 1', async () => {

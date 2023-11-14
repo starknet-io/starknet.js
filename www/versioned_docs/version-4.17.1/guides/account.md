@@ -13,7 +13,7 @@ Unlike in Ethereum where a wallet is created with a public and private key pair,
 High level explanations from StarkWare can be found in this Notion [page](https://starkware.notion.site/Deploy-a-contract-and-an-account-on-StarkNet-ed2fd13301d2414e8223bb72bb90e386), but in short, the process is:
 
 1. Decide on your account type (OpenZeppelin, Argent, ...)
-2. Compute the address of our would-be account off-chain (adressess on Starknet are deterministic)
+2. Compute the address of our would-be account off-chain (addresses on Starknet are deterministic)
 3. Send funds to this pre-computed address. The funds will be used to pay for the account contract deployment
 4. Actual deployment of the Account
 

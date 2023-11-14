@@ -15,7 +15,7 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/starknetId.ts:104](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/starknetId.ts#L104)
+[src/utils/starknetId.ts:104](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/starknetId.ts#L104)
 
 ---
 
@@ -25,4 +25,4 @@ custom_edit_url: null
 
 #### Defined in
 
-[src/utils/starknetId.ts:105](https://github.com/0xs34n/starknet.js/blob/v5.14.1/src/utils/starknetId.ts#L105)
+[src/utils/starknetId.ts:105](https://github.com/starknet-io/starknet.js/blob/v5.14.1/src/utils/starknetId.ts#L105)

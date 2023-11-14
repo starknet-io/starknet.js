@@ -1,4 +1,4 @@
-import { Abi as AbiKanabi, TypedContract as AbiWanTypedContract } from 'abi-wan-kanabi';
+import type { Abi as AbiKanabi, TypedContract as AbiWanTypedContract } from 'abi-wan-kanabi';
 
 import { AccountInterface } from '../account';
 import { ProviderInterface } from '../provider';
@@ -9,6 +9,7 @@ import {
   BlockIdentifier,
   CallOptions,
   ContractFunction,
+  ContractVersion,
   EstimateFeeResponse,
   GetTransactionReceiptResponse,
   Invocation,
@@ -131,6 +132,11 @@ export abstract class ContractInterface {
    * ```
    */
   public abstract isCairo1(): boolean;
+
+  /**
+   * Retrieves the version of the contract (cairo version & compiler version)
+   */
+  public abstract getVersion(): Promise<ContractVersion>;
 
   public abstract typed<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContract<TAbi>;
 }

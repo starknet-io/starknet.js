@@ -12,6 +12,7 @@ import {
   CallContractResponse,
   CallL1Handler,
   ContractClassResponse,
+  ContractVersion,
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
@@ -34,11 +35,13 @@ import {
   TransactionExecutionStatus,
   TransactionFinalityStatus,
   TransactionType,
+  getContractVersionOptions,
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
 import { CallData } from '../utils/calldata';
+import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { isSierra } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
 import {
@@ -69,10 +72,13 @@ function isEmptyQueryObject(obj?: Record<any, any>): obj is undefined {
 }
 
 const defaultOptions = {
-  network: NetworkName.SN_GOERLI2,
+  network: NetworkName.SN_GOERLI,
   blockIdentifier: BlockTag.pending,
 };
-
+/**
+ * @deprecated Feeder gateway will be removed during November 2023, as Network is switching to P2P Nodes.
+ * Use RPC Provider or Default provider (Default provider will be RPC Provider with public nodes and legacy interface/response)
+ */
 export class SequencerProvider implements ProviderInterface {
   public baseUrl: string;
 
@@ -116,9 +122,6 @@ export class SequencerProvider implements ProviderInterface {
       case NetworkName.SN_GOERLI:
       case StarknetChainId.SN_GOERLI:
         return BaseUrl.SN_GOERLI;
-      case NetworkName.SN_GOERLI2:
-      case StarknetChainId.SN_GOERLI2:
-        return BaseUrl.SN_GOERLI2;
       default:
         throw new Error('Could not detect base url from NetworkName');
     }
@@ -129,9 +132,6 @@ export class SequencerProvider implements ProviderInterface {
       const url = new URL(baseUrl);
       if (url.host.includes('mainnet.starknet.io')) {
         return StarknetChainId.SN_MAIN;
-      }
-      if (url.host.includes('alpha4-2.starknet.io')) {
-        return StarknetChainId.SN_GOERLI2;
       }
       return StarknetChainId.SN_GOERLI;
     } catch {
@@ -346,6 +346,41 @@ export class SequencerProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier = this.blockIdentifier
   ): Promise<CairoAssembly> {
     return this.fetchEndpoint('get_compiled_class_by_class_hash', { classHash, blockIdentifier });
+  }
+
+  public async getContractVersion(
+    contractAddress: string,
+    classHash?: undefined,
+    options?: getContractVersionOptions
+  ): Promise<ContractVersion>;
+  public async getContractVersion(
+    contractAddress: undefined,
+    classHash: string,
+    options?: getContractVersionOptions
+  ): Promise<ContractVersion>;
+
+  public async getContractVersion(
+    contractAddress?: string,
+    classHash?: string,
+    { blockIdentifier = this.blockIdentifier, compiler = true }: getContractVersionOptions = {}
+  ): Promise<ContractVersion> {
+    let contractClass;
+    if (contractAddress) {
+      contractClass = await this.getClassAt(contractAddress, blockIdentifier);
+    } else if (classHash) {
+      contractClass = await this.getClassByHash(classHash, blockIdentifier);
+    } else {
+      throw Error('getContractVersion require contractAddress or classHash');
+    }
+
+    if (isSierra(contractClass)) {
+      if (compiler) {
+        const abiTest = getAbiContractVersion(contractClass.abi);
+        return { cairo: '1', compiler: abiTest.compiler };
+      }
+      return { cairo: '1', compiler: undefined };
+    }
+    return { cairo: '0', compiler: '0' };
   }
 
   public async invokeFunction(

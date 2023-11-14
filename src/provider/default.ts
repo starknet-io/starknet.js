@@ -6,6 +6,7 @@ import {
   Call,
   CallContractResponse,
   ContractClassResponse,
+  ContractVersion,
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
@@ -26,6 +27,7 @@ import {
   SimulateTransactionResponse,
   StateUpdateResponse,
   Storage,
+  getContractVersionOptions,
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
@@ -35,6 +37,9 @@ import { RpcProvider } from './rpc';
 import { SequencerProvider } from './sequencer';
 import { getAddressFromStarkName, getStarkName } from './starknetId';
 
+/**
+ * @deprecated Use RpcProvider instead. Common Provider will be removed with Sequencer provider.
+ */
 export class Provider implements ProviderInterface {
   private provider!: ProviderInterface;
 
@@ -56,7 +61,7 @@ export class Provider implements ProviderInterface {
       this.provider = new SequencerProvider(<SequencerProviderOptions>providerOrOptions.sequencer);
     } else {
       // providerOrOptions is none, create SequencerProvider as default
-      this.provider = new SequencerProvider();
+      this.provider = new RpcProvider();
     }
   }
 
@@ -220,5 +225,24 @@ export class Provider implements ProviderInterface {
 
   public async getAddressFromStarkName(name: string, StarknetIdContract?: string): Promise<string> {
     return getAddressFromStarkName(this, name, StarknetIdContract);
+  }
+
+  public async getContractVersion(
+    contractAddress: string,
+    classHash?: undefined,
+    options?: getContractVersionOptions
+  ): Promise<ContractVersion>;
+  public async getContractVersion(
+    contractAddress: undefined,
+    classHash: string,
+    options?: getContractVersionOptions
+  ): Promise<ContractVersion>;
+
+  public async getContractVersion(
+    contractAddress?: string,
+    classHash?: string,
+    options?: getContractVersionOptions
+  ) {
+    return this.provider.getContractVersion(contractAddress as any, classHash as any, options);
   }
 }

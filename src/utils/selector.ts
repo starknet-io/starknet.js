@@ -6,9 +6,10 @@ import { addHexPrefix, removeHexPrefix, utf8ToArray } from './encode';
 import { hexToBytes, isHex, isStringWholeNumber, toHex, toHexString } from './num';
 
 /**
- * Keccak hash BigNumberish value
- * @param value BigNumberish
- * @returns string - hexadecimal string
+ * Calculate hex-string keccak hash for a given BigNumberish
+ *
+ * BigNumberish -> hex-string keccak hash
+ * @returns format: hex-string
  */
 export function keccakBn(value: BigNumberish): string {
   const hexWithoutPrefix = removeHexPrefix(toHex(BigInt(value)));
@@ -17,33 +18,38 @@ export function keccakBn(value: BigNumberish): string {
 }
 
 /**
- * Keccak hash string value
- * @param value string
- * @returns string - hexadecimal string
+ * Calculate hex-string keccak hash for a given string
+ *
+ * String -> hex-string keccak hash
+ * @returns format: hex-string
  */
-function keccakHex(value: string): string {
-  return addHexPrefix(keccak(utf8ToArray(value)).toString(16));
+function keccakHex(str: string): string {
+  return addHexPrefix(keccak(utf8ToArray(str)).toString(16));
 }
 
 /**
- * Function to get the starknet keccak hash from a string
+ * Calculate bigint keccak hash for a given string
+ *
+ * String -> bigint keccak hash
  *
  * [Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/public/abi.py#L17-L22)
- * @param value - string you want to get the starknetKeccak hash from
- * @returns starknet keccak hash as BigNumber
+ * @param str the value you want to get the keccak hash from
+ * @returns starknet keccak hash as BigInt
  */
-export function starknetKeccak(value: string): bigint {
-  const hash = BigInt(keccakHex(value));
+export function starknetKeccak(str: string): bigint {
+  const hash = BigInt(keccakHex(str));
   // eslint-disable-next-line no-bitwise
   return hash & MASK_250;
 }
 
 /**
- * Function to get the hex selector from a given function name
+ * Calculate hex-string selector for a given abi-function-name
+ *
+ * Abi-function-name -> hex-string selector
  *
  * [Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/public/abi.py#L25-L26)
- * @param funcName - selectors abi function name
- * @returns hex selector of given abi function name
+ * @param funcName ascii-string of 'abi function name'
+ * @returns format: hex-string; selector for 'abi function name'
  */
 export function getSelectorFromName(funcName: string) {
   // sometimes BigInteger pads the hex string with zeros, which is not allowed in the starknet api
@@ -51,9 +57,12 @@ export function getSelectorFromName(funcName: string) {
 }
 
 /**
- * Function to get hex selector from function name, decimal string or hex string
- * @param value hex string | decimal string | string
- * @returns Hex selector
+ * Calculate hex-string selector from abi-function-name, decimal string or hex string
+ *
+ * ('abi-function-name' or dec-string or hex-string) -> hex-string selector
+ *
+ * @param value hex-string | dec-string | ascii-string
+ * @returns format: hex-string
  */
 export function getSelector(value: string) {
   if (isHex(value)) {
