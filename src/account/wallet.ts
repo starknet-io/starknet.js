@@ -14,14 +14,18 @@ import { StarknetChainId } from '../constants';
 import { buildUDCCall } from '../utils/transaction';
 // eslint-disable-next-line import/no-cycle
 import {
+  Account,
   AllowArray,
   ArraySignatureType,
+  CairoVersion,
   Call,
   CallData,
   CompiledSierra,
   DeclareContractPayload,
   DeployAccountContractPayload,
   MultiDeployContractResponse,
+  ProviderInterface,
+  ProviderOptions,
   TypedData,
   UniversalDeployerContractPayload,
   extractContractHashes,
@@ -36,18 +40,25 @@ type RpcCall = Omit<RpcMessage, 'result'>;
 interface StarknetWalletProvider extends ConnectedStarknetWindowObject {}
 
 // Represent 'Selected Active' Account inside Connected Wallet
-export class WalletAccount /* implements AccountInterface  */ {
+export class WalletAccount extends Account {
   public address: string;
 
-  public provider: StarknetWalletProvider;
+  public walletProvider: StarknetWalletProvider;
 
-  constructor(provider: StarknetWalletProvider) {
-    if (!provider.isConnected) throw Error('StarknetWalletProvider should be connected');
-    this.provider = provider;
-    this.address = provider.selectedAddress;
+  constructor(
+    providerOrOptions: ProviderOptions | ProviderInterface,
+    walletProvider: StarknetWalletProvider,
+    cairoVersion?: CairoVersion
+  ) {
+    if (!walletProvider.isConnected) throw Error('StarknetWalletProvider should be connected');
+    const address = walletProvider.selectedAddress;
+    super(providerOrOptions, address, '', cairoVersion);
+    this.walletProvider = walletProvider;
+    this.address = address.toLowerCase();
 
-    this.provider.on('accountsChanged', () => {
-      this.address = provider.selectedAddress;
+    // Event Listeners
+    this.walletProvider.on('accountsChanged', () => {
+      this.address = walletProvider.selectedAddress;
     });
   }
 
@@ -55,11 +66,11 @@ export class WalletAccount /* implements AccountInterface  */ {
    * WALLET EVENTS
    */
   public onAccountChange(callback: AccountChangeEventHandler) {
-    this.provider.on('accountsChanged', callback);
+    this.walletProvider.on('accountsChanged', callback);
   }
 
   public onNetworkChanged(callback: NetworkChangeEventHandler) {
-    this.provider.on('networkChanged', callback);
+    this.walletProvider.on('networkChanged', callback);
   }
 
   /**
@@ -78,7 +89,7 @@ export class WalletAccount /* implements AccountInterface  */ {
         silentMode,
       },
     };
-    return this.provider.request(rpcCall) as Promise<string[]>;
+    return this.walletProvider.request(rpcCall) as Promise<string[]>;
   }
 
   /**
@@ -93,7 +104,7 @@ export class WalletAccount /* implements AccountInterface  */ {
         chainId,
       },
     };
-    return this.provider.request(rpcCall) as Promise<boolean>;
+    return this.walletProvider.request(rpcCall) as Promise<boolean>;
   }
 
   /**
@@ -106,7 +117,7 @@ export class WalletAccount /* implements AccountInterface  */ {
       type: 'wallet_watchAsset',
       params: asset,
     };
-    return this.provider.request(rpcCall) as Promise<boolean>;
+    return this.walletProvider.request(rpcCall) as Promise<boolean>;
   }
 
   /**
@@ -120,24 +131,23 @@ export class WalletAccount /* implements AccountInterface  */ {
       type: 'wallet_addStarknetChain',
       params: chain,
     };
-    return this.provider.request(rpcCall) as Promise<boolean>;
+    return this.walletProvider.request(rpcCall) as Promise<boolean>;
   }
 
   /**
    * ACCOUNT METHODS
    */
-
-  public async execute(calls: AllowArray<Call>) {
+  override execute(calls: AllowArray<Call>) {
     const rpcCall: RpcCall = {
       type: 'starknet_addInvokeTransaction',
       params: {
         calls: [].concat(calls as any),
       },
     };
-    return this.provider.request(rpcCall) as Promise<AddInvokeTransactionResult>;
+    return this.walletProvider.request(rpcCall) as Promise<AddInvokeTransactionResult>;
   }
 
-  public async declare(payload: DeclareContractPayload) {
+  override declare(payload: DeclareContractPayload) {
     const declareContractPayload = extractContractHashes(payload);
 
     // DISCUSS: HOTFIX: Adapt Abi format
@@ -159,10 +169,10 @@ export class WalletAccount /* implements AccountInterface  */ {
         contract_class: cairo1Contract,
       },
     };
-    return this.provider.request(rpcCall) as Promise<AddDeclareTransactionResult>;
+    return this.walletProvider.request(rpcCall) as Promise<AddDeclareTransactionResult>;
   }
 
-  public async deploy(
+  override async deploy(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[]
   ): Promise<MultiDeployContractResponse> {
     const { calls, addresses } = buildUDCCall(payload, this.address);
@@ -174,7 +184,7 @@ export class WalletAccount /* implements AccountInterface  */ {
     };
   }
 
-  public async deployAccount(payload: DeployAccountContractPayload) {
+  override deployAccount(payload: DeployAccountContractPayload) {
     const rpcCall: RpcCall = {
       type: 'starknet_addDeployAccountTransaction',
       params: {
@@ -185,15 +195,15 @@ export class WalletAccount /* implements AccountInterface  */ {
         class_hash: payload.classHash,
       },
     };
-    return this.provider.request(rpcCall) as Promise<AddDeployAccountTransactionResult>;
+    return this.walletProvider.request(rpcCall) as Promise<AddDeployAccountTransactionResult>;
   }
 
-  public async signMessage(typedData: TypedData) {
+  override signMessage(typedData: TypedData) {
     const rpcCall: RpcCall = {
       type: 'starknet_signTypedData',
       params: typedData,
     };
-    return this.provider.request(rpcCall) as Promise<ArraySignatureType>;
+    return this.walletProvider.request(rpcCall) as Promise<ArraySignatureType>;
   }
 
   // MISSING ESTIMATES
