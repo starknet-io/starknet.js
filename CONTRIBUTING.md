@@ -34,6 +34,15 @@ Or run tests in watch mode:
 npm test --watch
 ```
 
+By default the tests are executed in your local Devnet. If you want to use a specific rpc node, you have to set some global variables before executing the tests :
+
+```bash
+export TEST_RPC_URL=http://192.168.1.44:9545/rpc/v0.5 # example of a Pathfinder node located in your local network
+export TEST_RPC_URL=https://starknet-testnet.public.blastapi.io/rpc/v0.5 # example of a public testnet node
+export TEST_ACCOUNT_ADDRESS=0x065A822f0000000000000000000000000c26641
+export TEST_ACCOUNT_PRIVATE_KEY=0x02a80000000000000000000000001754438a
+```
+
 **Don’t forget to add tests and [update documentation](./www/README.md) for your changes.**
 Documentation can be archived by using JSDoc.
 
