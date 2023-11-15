@@ -1,4 +1,12 @@
-import { BigNumberish, CairoVersion, Call, CallStruct, Calldata, ParsedStruct } from '../types';
+import {
+  BigNumberish,
+  CairoVersion,
+  Call,
+  CallStruct,
+  Calldata,
+  ParsedStruct,
+  RawArgs,
+} from '../types';
 import { CallData } from './calldata';
 import { getSelectorFromName } from './hash';
 import { toBigInt } from './num';
@@ -66,7 +74,10 @@ export const fromCallsToExecuteCalldata_cairo1 = (calls: Call[]) => {
   const orderCalls = calls.map((call) => ({
     contractAddress: call.contractAddress,
     entrypoint: call.entrypoint,
-    calldata: call.calldata,
+    calldata:
+      Array.isArray(call.calldata) && '__compiled' in call.calldata
+        ? call.calldata // Calldata type
+        : CallData.compile(call.calldata as RawArgs), // RawArgsObject | RawArgsArray type
   }));
 
   return CallData.compile({ orderCalls });
