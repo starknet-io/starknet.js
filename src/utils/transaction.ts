@@ -75,7 +75,7 @@ export const fromCallsToExecuteCalldata_cairo1 = (calls: Call[]) => {
     contractAddress: call.contractAddress,
     entrypoint: call.entrypoint,
     calldata:
-      Array.isArray(call.calldata) && '__compiled' in call.calldata
+      Array.isArray(call.calldata) && '__compiled__' in call.calldata
         ? call.calldata // Calldata type
         : CallData.compile(call.calldata as RawArgs), // RawArgsObject | RawArgsArray type
   }));
