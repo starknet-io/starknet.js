@@ -538,7 +538,7 @@ describeIfDevnet('Cairo 1 Devnet', () => {
         entrypoint: 'transfer',
         calldata: {
           recipient: toBeAccountAddress,
-          amount: uint256(1_000_000_000_000_000),
+          amount: uint256(5 * 10 ** 15),
         },
       });
       await account.waitForTransaction(transaction_hash);
