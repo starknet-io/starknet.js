@@ -86,7 +86,7 @@ myTestContract.connect(account0);
 const bal1 = await myTestContract.get_balance();
 console.log("Initial balance =", bal1.res.toString()); // Cairo 0 contract
 // increase_balance needs 2 felts, to add them to the balance.
-const myCall = myTestContract.populate("increase_balance", [10,30]);
+const myCall = myTestContract.populate("increase_balance", [10, 30]);
 const res = await myTestContract.increase_balance(myCall.calldata);
 await provider.waitForTransaction(res.transaction_hash);
 
@@ -147,7 +147,7 @@ Some other useful methods to interact with Starknet:
 If you want to call a function with its name contained in a variable:
 
 ```typescript
-const listFn = ["calc-sum","calc-hash","calc-proof"];
+const listFn = ["calc-sum", "calc-hash", "calc-proof"];
 // fnChoice is a number defined during execution
 const res = await myTestContract[listFn[fnChoice]](200, 234567897n, 865423);
 ```

@@ -6,7 +6,7 @@ sidebar_position: 9
 
 This guide is the most important of all this documentation. Take your time, and read it carefully...
 
-Cairo contracts and Javascript/Typescript languages do not have the same types of data. To exchange data with Starknet, the data have to be transformed and formatted in a list of numbers.
+Cairo contracts and JavaScript/TypeScript languages do not have the same types of data. To exchange data with Starknet, the data have to be transformed and formatted in a list of numbers.
 
 So, it's necessary to prepare the data before sending them to a contract.
 On the other side, when a contract sends data to your DAPP (the result of a call), you also have to transform them before using them in your code.
@@ -30,7 +30,7 @@ Starknet.js is compatible with both versions.
 
 Starknet is waiting for a list of felts, and answers with the same format.
 
-### Javascript / Typescript
+### JavaScript / TypeScript
 
 These types do not exist in JS/TS - you have Number, bigInt, string, array, objects... and types defined in libraries.
 
@@ -55,7 +55,7 @@ Starknet is waiting for a felt.
 You can send to Starknet.js methods: bigNumberish.
 
 ```typescript
-await myContract.my_function(12,"13","0xe",15n);
+await myContract.my_function(12, "13", "0xe", 15n);
 ```
 
 > `EthAddress` is limited to 160 bits.
@@ -67,7 +67,7 @@ Starknet is waiting for a felt, containing 0 or 1.
 You can send to Starknet.js methods: boolean, bigNumberish.
 
 ```typescript
-await myContract.my_function(true,1);
+await myContract.my_function(true, 1);
 ```
 
 ### u256
@@ -86,7 +86,7 @@ In specific cases that we will see hereunder, you can use an object, with the fo
 ```typescript
 const a1: Uint256 = cairo.uint256("0x05f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd")
 const a2: Uint256 = {low: "0xeb5337d9a885be319366b5205a414fdd", high: "0x05f7cd1fd465baff2ba9d2d1501ad0a2"};
-const a3: Uint256 = {low: a1.low,high: a1.high};
+const a3: Uint256 = {low: a1.low, high: a1.high};
 ```
 
 ### string
@@ -95,7 +95,7 @@ Starknet is waiting for a felt, including 31 ASCII characters max.
 You can send to Starknet.js methods: string, bigNumberish.
 
 ```typescript
-await myContract.my_function("Token","0x0x534e5f4d41494e")
+await myContract.my_function("Token", "0x0x534e5f4d41494e")
 ```
 
 To encode yourself a string:
@@ -172,7 +172,7 @@ const namedTup = {min: "0x4e65ac6", max: 296735486n};
 await myContract.my_function(namedTup);
 ```
 
-> It's not mandatory to create an object conform to the Cairo 0 named tuple ; you can just use the `cairo.tuple()` function.
+> It's not mandatory to create an object conform to the Cairo 0 named tuple, you can just use the `cairo.tuple()` function.
 
 ### struct
 
@@ -190,7 +190,7 @@ Starknet is waiting for an array of felts: array_len, array1, array2, ...
 You can send it to Starknet.js methods: bigNumberish[].
 
 ```typescript
-Const myArray = [10,"0xaa",567n];
+Const myArray = [10, "0xaa", 567n];
 await myContract.my_function(myArray);
 ```
 
@@ -215,7 +215,7 @@ const myOrder2: Order2 = {
         p2: [234, 467456745457n, '0x56ec'],
     };
 const param1 = cairo.tuple(cairo.tuple(34, '0x5e'), 234n);
-const param2 = [[200, 201],[202, 203],[204, 205]];
+const param2 = [[200, 201], [202, 203], [204, 205]];
 const param3 = [myOrder2, myOrder2];
 const param4 = [cairo.tuple(251, 40000n), cairo.tuple(252, 40001n)];
 await myContract.my_function(param1, param2, param3, param4);
@@ -287,31 +287,31 @@ This type is available for: `CallData.compile(), hash.calculateContractAddressFr
 This is the recommended type of input to use, especially for complex ABI.
 
 ```typescript
-const myFalseUint256 = { high: 1, low: 23456 }; // wrong order ; should be low first
+const myFalseUint256 = { high: 1, low: 23456 }; // wrong order; should be low first
 type Order2 = {
     p1: BigNumberish,
     p2: BigNumberish[]
 }
-const myOrder2bis: Order2 = {// wrong order ; p1 should be first
+const myOrder2bis: Order2 = {// wrong order; p1 should be first
     p2: [234, 467456745457n, "0x56ec"],
     p1: "17"
 }
-const functionParameters: RawArgsObject = {//wrong order ; all properties are mixed
+const functionParameters: RawArgsObject = {//wrong order; all properties are mixed
     active: true,
     symbol: "NIT",
     initial_supply: myFalseUint256,
     recipient: account0.address,
     decimals: 18,
-    tupOfTup: cairo.tuple(cairo.tuple(34,"0x5e") ,myFalseUint256),
+    tupOfTup: cairo.tuple(cairo.tuple(34, "0x5e") ,myFalseUint256),
     card: myOrder2bis,
     longText: "Zorg is back, for ever, here and everywhere",
     array1: [100, 101, 102],
     array2: [[200, 201], [202, 203], [204, 205]],
     array3: [myOrder2bis, myOrder2bis],
-    array4: [myFalseUint256,myFalseUint256],
-    tuple1: cairo.tuple(40000n, myOrder2bis, [54,55n,"0xae"], "texte"),
+    array4: [myFalseUint256, myFalseUint256],
+    tuple1: cairo.tuple(40000n, myOrder2bis, [54, 55n, "0xae"], "texte"),
     name: "niceToken",
-    array5: [cairo.tuple(251,40000n),cairo.tuple(252,40001n)],
+    array5: [cairo.tuple(251, 40000n), cairo.tuple(252, 40001n)],
 }
 const contractCallData: CallData = new CallData(compiledContractSierra.abi);
 const myCalldata: Calldata = contractCallData.compile("constructor", functionParameters);
@@ -393,11 +393,11 @@ To use with `parseRequest: false` (see hereunder).
 
 ### summary table for arguments
 
-These types of arguments can't be used at your convenience everywhere. Here is a table showing which types can be used in which function :
+These types of arguments can't be used at your convenience everywhere. Here is a table showing which types can be used in which function:
 
 |                                                    Function | array of parameters | ordered object  | non ordered object |       Call & MultiCall       | list of parameters | array of strings (\*) | array of strings (\*\*) |
 | ----------------------------------------------------------: | :-----------------: | :-------------: | :----------------: | :--------------------------: | :----------------: | :-------------------: | :---------------------: |
-|                                         **Typescript type** |         N/A         | {} RawArgsArray |  {} RawArgsObject  |        Call & Call[]         |       ...[]        |       string[]        |        string[]         |
+|                                         **TypeScript type** |         N/A         | {} RawArgsArray |  {} RawArgsObject  |        Call & Call[]         |       ...[]        |       string[]        |        string[]         |
 |                 contract.metaClass() contract\[metaclass]() |                     |                 |                    |                              |         ✔️         |          ✔️           |           ✔️            |
 |                             contract.call / contract.invoke |         ✔️          |                 |                    |                              |                    |          ✔️           |           ✔️            |
 | account.execute <br /><br />(with 3 params, incl. calldata) |   <br /><br /> ✔️   | <br /><br /> ✔️ |                    | ✔️ <br /><br /><br /> <br /> |                    |                       |     <br /><br /> ✔️     |
@@ -472,7 +472,7 @@ const txH = await myContract.send_tk([
 If for any reason, you want to receive a low-level answer from Starknet, you can use the parseResponse option.
 
 ```typescript
-const result = await myContract.call("get_bals",100n, {parseResponse: false});
+const result = await myContract.call("get_bals", 100n, {parseResponse: false});
 ```
 
 The answer is an array of strings (representing numbers).

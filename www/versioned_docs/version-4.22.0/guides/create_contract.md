@@ -6,7 +6,7 @@ sidebar_position: 7
 
 When you have compiled your new Cairo contract, you can deploy it in the network.
 
-In Starknet, a new contract has to be added in two phases :
+In Starknet, a new contract has to be added in two phases:
 
 1. Create the contract class.
 2. Deploy an instance of the contract.
@@ -24,7 +24,7 @@ You will have only one Class Hash for the contract code, but you can have as man
 
 Other users of the network can use your declared contract. It means that if somebody has already declared a contract class (and paid this declaration), and if you would like to have your own instance of this contract, you have only to deploy (and pay) a new instance.
 
-Example : if you want an ERC20 contract, and somebody has already declared an ERC20 contract that conforms to your needs, you have just to deploy a new instance of this contract class.
+Example: if you want an ERC20 contract, and somebody has already declared an ERC20 contract that conforms to your needs, you have just to deploy a new instance of this contract class.
 
 ```typescript
 import { Provider, Account, Contract, ec, json, stark, uint256, shortString } from "starknet";
@@ -32,7 +32,7 @@ import { Provider, Account, Contract, ec, json, stark, uint256, shortString } fr
 
 ## Class Hash 😕
 
-TLDR : Starknet.js is not (yet) able to calculate a Class Hash 😮.
+TLDR: Starknet.js is not (yet) able to calculate a Class Hash 😮.
 
 The Class Hash should be a result of the compilation, but today, it's not recorded in the compiled file. It could be calculated during the declaration activity, but it's actually too long to process.
 
@@ -42,14 +42,14 @@ So you need to calculate yourself the Class hash, and add it as constant in your
 
 ## `declareDeploy()` your new contract
 
-Starknet.js proposes a function to perform both operations in one step : `declareDeploy()`.
+Starknet.js proposes a function to perform both operations in one step: `declareDeploy()`.
 
-Here, to declare & deploy a `Test.cairo` smartcontract, in Testnet 1 :
+Here, to declare & deploy a `Test.cairo` smartcontract, in Testnet 1:
 
 ```typescript
 // connect provider
 const provider = new Provider({ sequencer: { network: "goerli-alpha" } });
-// connect your account. To adapt to your own account :
+// connect your account. To adapt to your own account:
 const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
 const account0Address: string = "0x123....789";
 
@@ -62,7 +62,7 @@ const testClassHash = "0xff0378becffa6ad51c67ac968948dbbd110b8a8550397cf17866afe
 const compiledTest = json.parse(fs.readFileSync("./compiled_contracts/test.json").toString("ascii"));
 const deployResponse = await account0.declareDeploy({ contract: compiledTest, classHash: testClassHash });
 
-// Connect the new contract instance :
+// Connect the new contract instance:
 const myTestContract = new Contract(compiledTest.abi, deployResponse.deploy.contract_address, provider);
 console.log('✅ Test Contract connected at =', myTestContract.address);
 ```
@@ -74,7 +74,7 @@ If the contract class is already deployed, it's faster and cheaper to use `deplo
 ```typescript
 // connect provider
 const provider = new Provider({ sequencer: { network: "goerli-alpha" } });
-// connect your account. To adapt to your own account :
+// connect your account. To adapt to your own account:
 const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
 const account0Address: string = "0x123....789";
 
@@ -90,7 +90,7 @@ const deployResponse = await account0.deployContract({ classHash: testClassHash 
 const { abi: testAbi } = await provider.getClassAt(deployResponse.contract_address);
 if (testAbi === undefined) { throw new Error("no abi.") };
 
-// Connect the new contract instance :
+// Connect the new contract instance:
 const myTestContract = new Contract(testAbi, deployResponse.contract_address, provider);
 console.log('✅ Test Contract connected at =', myTestContract.address);
 ```
@@ -102,7 +102,7 @@ If you want only declare a new Contract Class, use `declare()`.
 ```typescript
 // connect provider
 const provider = new Provider({ sequencer: { network: "goerli-alpha" } });
-// connect your account. To adapt to your own account :
+// connect your account. To adapt to your own account:
 const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
 const account0Address: string = "0x123....789";
 

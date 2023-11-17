@@ -129,7 +129,7 @@ Estimate Fee for executing a list of transactions on starknet.
 
 The _transaction_ object structure:
 
-- transaction.**type** - the type of transaction : 'DECLARE' | 'DEPLOY' | 'INVOKE_FUNCTION' | 'DEPLOY_ACCOUNT'
+- transaction.**type** - the type of transaction: 'DECLARE' | 'DEPLOY' | 'INVOKE_FUNCTION' | 'DEPLOY_ACCOUNT'
 - transaction payload - the payload for the transaction
 
 The _estimateFeeDetails_ object may include any of:

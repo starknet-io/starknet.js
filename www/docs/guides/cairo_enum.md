@@ -6,9 +6,9 @@ sidebar_position: 16
 
 ## Cairo Enums usage
 
-Cairo-lang v0.12.0 (includes Cairo v2.0.0) introduces a new type of data that can be exchanged with Starknet : the Enums. Not related to the Typescript Enums, the Cairo Enums are identical to Rust Enums.  
+Cairo-lang v0.12.0 (includes Cairo v2.0.0) introduces a new type of data that can be exchanged with Starknet: the Enums. Not related to the TypeScript Enums, the Cairo Enums are identical to Rust Enums.  
 More information in the Starknet book [here](https://book.starknet.io/chapter_2/enums.html).  
-In the following paragraphers, you will see how to send and receive Enums with the Starknet network.
+In the following paragraphs, you will see how to send and receive Enums with the Starknet network.
 
 ## Cairo Option
 
@@ -16,7 +16,7 @@ The `Option` Enum is a core enum, and has 2 variants (`Some` and `None`). Only t
 
 ### Receive Cairo Option
 
-An example of Cairo code that returns an Option enum :
+An example of Cairo code that returns an Option enum:
 
 ```rust
 fn test(self: @ContractState, val1: u16) -> Option<Order> {
@@ -27,7 +27,7 @@ fn test(self: @ContractState, val1: u16) -> Option<Order> {
 }
 ```
 
-In your code, the Starknet.js response will be an instance of the CairoOption class :
+In your code, the Starknet.js response will be an instance of the CairoOption class:
 
 ```typescript
 import { CairoOption } from "starknet";
@@ -40,7 +40,7 @@ const res2: CairoOption<Order> = await myTestContract.test(150);
 ```
 
 In `CairoOption<T>`, T is the type of the data related to the `Some` variant.  
-The `CairoOption` class has "Cairo like" methods :
+The `CairoOption` class has "Cairo like" methods:
 
 ```typescript
 const a = res.isSome(); // false
@@ -53,7 +53,7 @@ const c2: Order = res2.unwrap(); // { p1: 18n, p2: 150n }
 
 ### Send Cairo Option
 
-An example of Cairo code that use an Option enum as input :
+An example of Cairo code that use an Option enum as input:
 
 ```rust
 fn test5(self: @ContractState, inp: Option<Order>) -> u16 {
@@ -68,7 +68,7 @@ fn test5(self: @ContractState, inp: Option<Order>) -> u16 {
 }
 ```
 
-In your code, the Starknet.js request is an instance of the CairoOption class :
+In your code, the Starknet.js request is an instance of the CairoOption class:
 
 ```typescript
 import { CairoOption, CairoOptionVariant } from "starknet";
@@ -76,18 +76,18 @@ type Order = {
     p1: BigNumberish,
     p2: BigNumberish,
 }
-const res = await myTestContract.call("test5", [new CairoOption<Order>(CairoOptionVariant.Some,{p1:20,p2:40})]) as bigint;
+const res = await myTestContract.call("test5", [new CairoOption<Order>(CairoOptionVariant.Some, {p1:20, p2:40})]) as bigint;
 const res2 = await myTestContract.call("test5", [new CairoOption<Order>(CairoOptionVariant.None)]) as bigint;
 ```
 
 ## Cairo Result
 
-Cairo v2.1.0 introduces an other core Enum : `Result`.  
+Cairo v2.1.0 introduces an other core Enum: `Result`.  
 This Enum has 2 variants (`Ok` and `Err`) and both variants can contain data.
 
 ### Receive Cairo Result
 
-An example of Cairo code that returns a Result enum :
+An example of Cairo code that returns a Result enum:
 
 ```rust
 fn test(self: @ContractState, val1: u16) -> Result<u16, u16> {
@@ -98,17 +98,17 @@ fn test(self: @ContractState, val1: u16) -> Result<u16, u16> {
 }
 ```
 
-In your code, the Starknet.js response will be an instance of the CairoResult class :
+In your code, the Starknet.js response will be an instance of the CairoResult class:
 
 ```typescript
 import { CairoResult } from "starknet";
 
 const res:CairoResult<bigint, bigint> = await myTestContract.test(90);
-const res2 = (await myTestContract.call("test",[110])) as CairoResult<bigint, bigint>;
+const res2 = (await myTestContract.call("test", [110])) as CairoResult<bigint, bigint>;
 ```
 
 In `CairoResult<T, U>`, T is the type of the data related to the `Ok` variant, and U is the type of the data related to the `Err` variant.  
-The `CairoResult` class has "Cairo like" methods :
+The `CairoResult` class has "Cairo like" methods:
 
 ```typescript
 const a = res.isOk(); // false
@@ -121,7 +121,7 @@ const c2 = res2.unwrap(); // 110n
 
 ### Send Cairo Result
 
-An example of Cairo code that uses a Result enum :
+An example of Cairo code that uses a Result enum:
 
 ```rust
 fn test8(self: @ContractState, inp: Result<Order, u16>) -> u16 {
@@ -136,13 +136,13 @@ fn test8(self: @ContractState, inp: Result<Order, u16>) -> u16 {
 }
 ```
 
-In your code, the Starknet.js request is an instance of the CairoResult class :
+In your code, the Starknet.js request is an instance of the CairoResult class:
 
 ```typescript
 import { CairoResult, CairoResultVariant } from "starknet";
 
-const res = await myTestContract.call("test8", [new CairoResult<Order,BigNumberish>(CairoResultVariant.Ok,{p1:50,p2:60})]) as bigint;
-const res2 = await myTestContract.call("test8", [new CairoResult<Order,BigNumberish>(CairoResultVariant.Err,50)])as bigint;
+const res = await myTestContract.call("test8", [new CairoResult<Order, BigNumberish>(CairoResultVariant.Ok, {p1:50, p2:60})]) as bigint;
+const res2 = await myTestContract.call("test8", [new CairoResult<Order, BigNumberish>(CairoResultVariant.Err, 50)])as bigint;
 ```
 
 ## Cairo custom Enum
@@ -151,7 +151,7 @@ In Cairo v2.0.0, you can also create your own customized Enum.
 
 ### Receive Cairo custom Enum
 
-An example of Cairo code that returns the Result enum :
+An example of Cairo code that returns the Result enum:
 
 ```rust
 #[derive(Drop, Serde, Append)]
@@ -184,7 +184,7 @@ fn test(self: @ContractState, val1: u16) -> MyEnum {
 
 This example Enum has 5 variants (`Response`, `Warning`, `Error`, `Critical` and `Empty`) and both variants can contain data.
 
-In your code, the Starknet.js response will be an instance of the CairoCustomEnum class :
+In your code, the Starknet.js response will be an instance of the CairoCustomEnum class:
 
 ```typescript
 import { CairoCustomEnum } from "starknet";
@@ -196,7 +196,7 @@ const res4: CairoCustomEnum = await myTestContract.test(190);
 const res5: CairoCustomEnum = await myTestContract.test(220);
 ```
 
-The `CairoCustomEnum` class has "Cairo like" methods :
+The `CairoCustomEnum` class has "Cairo like" methods:
 
 ```typescript
 const a = res.activeVariant(); // "Error"
@@ -211,7 +211,7 @@ const c4: Order = res4.unwrap(); // { p1: 1n, p2: 190n }
 const c5: Object = res5.unwrap(); // {}
 ```
 
-> In a `CairoCustomEnum` instance, you can also have a direct access to the content of a variant :
+> In a `CairoCustomEnum` instance, you can also have a direct access to the content of a variant:
 
 ```typescript
 const d: Order = res4.variant.Response // { p1: 1n, p2: 190n }
@@ -220,7 +220,7 @@ const e = res4.variant["Critical"] // undefined
 
 ### Send Cairo custom Enum
 
-An example of Cairo code that uses the Result enum :
+An example of Cairo code that uses the Result enum:
 
 ```rust
 #[derive(Drop, Serde, Append)]
@@ -242,7 +242,7 @@ fn test2a(self: @ContractState, customEnum:MyEnum ) -> u16{
 }
 ```
 
-In your code, the Starknet.js request is an instance of the CairoCustomEnum class :
+In your code, the Starknet.js request is an instance of the CairoCustomEnum class:
 
 ```typescript
 import { CairoCustomEnum } from "starknet";
@@ -255,7 +255,7 @@ const res14d = await myTestContract.call("test2a", [new CairoCustomEnum({ Critic
 const res14e = await myTestContract.call("test2a", [new CairoCustomEnum({ Empty: {} })]) as bigint;
 ```
 
-Take care that if you call a method that do not use the abi (as `CallData.compile`), you have to list all the variants of the enum, like this :
+Take care that if you call a method that do not use the abi (as `CallData.compile`), you have to list all the variants of the enum, like this:
 
 ```typescript
 const orderToSend: Order = { p1: 8, p2: 10 };

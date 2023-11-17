@@ -45,7 +45,7 @@ const account = new Account(provider, accountAddress, privateKey);
 
 Your account is now connected, and you can use it.
 
-> **IMPORTANT :** If this account is based on a Cairo v2 contract (for example OpenZeppelin account 0.7.0 or later), do not forget to add the parameter "1" after the privateKey parameter :
+> **IMPORTANT:** If this account is based on a Cairo v2 contract (for example OpenZeppelin account 0.7.0 or later), do not forget to add the parameter "1" after the privateKey parameter:
 
 ```typescript
 const account = new Account(provider, accountAddress, privateKey, "1");

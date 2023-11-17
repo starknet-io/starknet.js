@@ -104,10 +104,10 @@ export class CallData {
    * @return Calldata - parsed arguments in format that contract is expecting
    * @example
    * ```typescript
-   * const calldata = myCallData.compile("constructor",["0x34a",[1,3n]]);
+   * const calldata = myCallData.compile("constructor", ["0x34a", [1, 3n]]);
    * ```
    * ```typescript
-   * const calldata2 = myCallData.compile("constructor",{list:[1,3n],balance:"0x34"}); // wrong order is valid
+   * const calldata2 = myCallData.compile("constructor", {list:[1, 3n], balance:"0x34"}); // wrong order is valid
    * ```
    */
   public compile(method: string, argsCalldata: RawArgs): Calldata {

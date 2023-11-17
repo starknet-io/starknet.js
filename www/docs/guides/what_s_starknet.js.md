@@ -4,7 +4,7 @@ sidebar_position: 2
 
 # What is Starknet.js ?
 
-Starknet.js is a library that helps to connect your website or your Decentralized Application (DAPP) to the blockchain-based Starknet network, using Javascript / Typescript language.
+Starknet.js is a library that helps to connect your website or your Decentralized Application (DAPP) to the blockchain-based Starknet network, using JavaScript / TypeScript language.
 
 ## Overview
 

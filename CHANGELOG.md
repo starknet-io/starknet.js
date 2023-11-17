@@ -1,3 +1,9 @@
+## [5.24.2](https://github.com/starknet-io/starknet.js/compare/v5.24.1...v5.24.2) (2023-11-17)
+
+### Bug Fixes
+
+- errors when testing in Testnet with a Cairo 1 account ([243074e](https://github.com/starknet-io/starknet.js/commit/243074ebd8324da2a33f13b5d8542949d7e92991))
+
 ## [5.24.1](https://github.com/starknet-io/starknet.js/compare/v5.24.0...v5.24.1) (2023-11-13)
 
 ### Bug Fixes

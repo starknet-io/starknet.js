@@ -14,7 +14,7 @@ The keys can be used for indexing the events, while the data may contain any inf
 
 The events are recorded in the blocks of the blockchain.
 
-Example of Cairo code for an event :
+Example of Cairo code for an event:
 
 ```rust
 #[derive(Drop, starknet::Event)]
@@ -31,7 +31,7 @@ Here we have an event called `EventPanic`, with an u8 stored in keys, and a felt
 
 Events are a useful tool for logging and notifying external entities about specific occurrences within a contract, with a timestamp (the block number). They emit data that can be accessed by everybody.
 
-Some cases :
+Some cases:
 
 - When a specific value is reached in a contract, an event can be created to store the fact that this value has been reached at a specific block number.
 - When the L1 network has triggered the execution of a L2 contract, you can store in the event some results and when it occurs.
@@ -40,15 +40,15 @@ An event can be useful also when you invoke a contract. When you invoke a Cairo 
 
 ## With the Transaction hash
 
-If you use Starknet.js to invoke a Cairo function that will trigger a new event, you will have as response the transaction hash. Keep it preciously ; it will be easy to read the event with it.
+If you use Starknet.js to invoke a Cairo function that will trigger a new event, you will receive the transaction hash as a response. Preserve it so it can be used to easily retrieve the event data.
 
-Example of invocation :
+Example of invocation:
 
 ```typescript
 const transactionHash = myContract.invoke("emitEventPanic", [8, "Mega Panic."])
 ```
 
-Then get the transaction receipt :
+Then get the transaction receipt:
 
 ```typescript
 const txReceipt = await provider.waitForTransaction(transactionHash);
@@ -56,7 +56,7 @@ const txReceipt = await provider.waitForTransaction(transactionHash);
 
 ### Raw response
 
-You can recover all the events related to this transaction hash :
+You can recover all the events related to this transaction hash:
 
 ```typescript
 const listEvents = txReceipt.events;
@@ -77,7 +77,7 @@ The result is an array of events (here only one event):
 ]
 ```
 
-The first parameter in the `keys` array is a hash of the name of the event, calculated this way :
+The first parameter in the `keys` array is a hash of the name of the event, calculated this way:
 
 ```typescript
 const nameHash = num.toHex( hash.starknetKeccak("EventPanic"));
@@ -87,7 +87,7 @@ The second parameter is the `errorType` variable content (stored in keys array b
 
 The `data` array contains the `errorDescription` variable content (`'0x4d6567612050616e69632e'` corresponds to the encoded value of "Mega Panic.")
 
-You can decode it with :
+You can decode it with:
 
 ```typescript
 const ErrorMessage =  shortString.decodeShortString("0x4d6567612050616e69632e")
@@ -96,7 +96,7 @@ const ErrorMessage =  shortString.decodeShortString("0x4d6567612050616e69632e")
 ### Parsed response
 
 Once you have the transaction receipt, you can parse the events to have something easier to process.  
-We will perform parsing this way :
+We will perform parsing this way:
 
 ```typescript
 const events = myTestContract.parseEvents(txReceipt);
@@ -136,9 +136,9 @@ const eventsList = await providerRPC.getEvents({
 
 > `address, from_block, to_block, keys` are all optional parameters.
 
-> If you don't want to filter by key, you can either remove the `keys` parameter, or affect it this way : `[[]]` .
+> If you don't want to filter by key, you can either remove the `keys` parameter, or affect it this way: `[[]]` .
 
-Here we have only one event. You can easily read this event :
+Here we have only one event. You can easily read this event:
 
 ```typescript
 const event = eventsList.events[0];
@@ -147,7 +147,7 @@ console.log("\nkeys =", event.keys, "data =", event.data);
 ```
 
 To limit the workload of the node, the parameter `chunk_size` defines a size of chunk to read. If the request needs an additional chunk, the response includes a key `continuation_token` containing a string to use in the next request.  
-Hereunder a code to read all the chunks of a request :
+Hereunder a code to read all the chunks of a request:
 
 ```typescript
 const keyFilter = [num.toHex(hash.starknetKeccak("EventPanic")), "0x8"]
@@ -171,8 +171,8 @@ while (continuationToken) {
     });
     const nbEvents = eventsRes.events.length;
     continuationToken=eventsRes.continuation_token;
-    console.log("chunk nb =",chunkNum,".",nbEvents, "events recovered.");
-    console.log("continuation_token =",continuationToken );
+    console.log("chunk nb =", chunkNum, ".", nbEvents, "events recovered.");
+    console.log("continuation_token =", continuationToken );
     for (let i = 0; i < nbEvents; i++) {
         const event = eventsRes.events[i];
         console.log("event #", i, "data length =", event.data.length, "key length =", event.keys.length, ":");

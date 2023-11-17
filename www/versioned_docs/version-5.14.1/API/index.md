@@ -40,7 +40,7 @@ The Signer [**API**](./classes/Signer.md) allows you to sign transactions and me
 
 ## Utils
 
-Util functions are provided so you can use various low level functions in your application :
+Util functions are provided so you can use various low level functions in your application:
 
 ### [elliptic curve](./namespaces/ec.md)
 

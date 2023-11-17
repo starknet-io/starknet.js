@@ -85,7 +85,7 @@ await provider.waitForTransaction(transaction_hash);
 console.log('✅ New OpenZeppelin account created.\n   address =', contract_address);
 ```
 
-> **IMPORTANT :** If this account is based on a Cairo v2 contract (for example OpenZeppelin account 0.7.0 or later), do not forget to add the parameter "1" after the privateKey parameter :
+> **IMPORTANT:** If this account is based on a Cairo v2 contract (for example OpenZeppelin account 0.7.0 or later), do not forget to add the parameter "1" after the privateKey parameter:
 
 ```typescript
 const OZaccount = new Account(provider, OZcontractAddress, privateKey, "1");
@@ -154,7 +154,7 @@ const deployAccountPayload = {
     addressSalt: starkKeyPubAX };
 
 const { transaction_hash: AXdAth, contract_address: AXcontractFinalAddress } = await accountAX.deployAccount(deployAccountPayload);
-console.log('✅ ArgentX wallet deployed at:',AXcontractFinalAddress);
+console.log('✅ ArgentX wallet deployed at:', AXcontractFinalAddress);
 ```
 
 ## Create a Braavos account
@@ -223,7 +223,7 @@ console.log('Answer mint =', answer); // 10 ETH
 
 // deploy Braavos account
 const { transaction_hash, contract_address: BraavosAccountFinalAddress } =
-    await deployBraavosAccount(privateKeyBraavos, providerDevnet,estimatedFee);
+    await deployBraavosAccount(privateKeyBraavos, providerDevnet, estimatedFee);
     // estimatedFee is optional
 console.log('Transaction hash =', transaction_hash);
 await providerDevnet.waitForTransaction(transaction_hash);
