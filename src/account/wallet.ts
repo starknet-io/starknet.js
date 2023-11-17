@@ -1,3 +1,5 @@
+import { StarknetChainId } from '../constants';
+import { buildUDCCall } from '../utils/transaction';
 import {
   AccountChangeEventHandler,
   AddDeclareTransactionResult,
@@ -8,10 +10,7 @@ import {
   NetworkChangeEventHandler,
   RpcMessage,
   WatchAssetParameters,
-} from 'get-starknet-core';
-
-import { StarknetChainId } from '../constants';
-import { buildUDCCall } from '../utils/transaction';
+} from './getst/main';
 // eslint-disable-next-line import/no-cycle
 import {
   Account,
@@ -138,10 +137,19 @@ export class WalletAccount extends Account {
    * ACCOUNT METHODS
    */
   override execute(calls: AllowArray<Call>) {
+    const txCalls = [].concat(calls as any).map((it) => {
+      const { contractAddress, entrypoint, calldata } = it;
+      return {
+        contract_address: contractAddress,
+        entrypoint,
+        calldata,
+      };
+    });
+
     const rpcCall: RpcCall = {
       type: 'starknet_addInvokeTransaction',
       params: {
-        calls: [].concat(calls as any),
+        calls: txCalls,
       },
     };
     return this.walletProvider.request(rpcCall) as Promise<AddInvokeTransactionResult>;
