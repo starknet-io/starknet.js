@@ -1,3 +1,9 @@
+## [5.24.3](https://github.com/starknet-io/starknet.js/compare/v5.24.2...v5.24.3) (2023-11-20)
+
+### Bug Fixes
+
+- correct syncing type ([41f9d8a](https://github.com/starknet-io/starknet.js/commit/41f9d8a0d1b69c569e7a3aa55cec09f105c32356))
+
 ## [5.24.2](https://github.com/starknet-io/starknet.js/compare/v5.24.1...v5.24.2) (2023-11-17)
 
 ### Bug Fixes
