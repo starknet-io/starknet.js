@@ -28,7 +28,11 @@ The result is in `estimatedFee1`, of type BigInt.
 To estimate the cost to deploy a contract in the network:
 
 ```typescript
-const { suggestedMaxFee: estimatedFee1 } = await account0.estimateDeployFee({ classHash: testClassHash });
+const { suggestedMaxFee: estimatedFee1 } = await account0.estimateDeployFee({
+	classHash: testClassHash,
+	// constructorCalldata is not necessary if the contract to deploy has no constructor
+	constructorCalldata: callData
+});
 ```
 
 The result is in `estimatedFee1`, of type BigInt.

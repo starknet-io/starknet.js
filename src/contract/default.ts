@@ -1,4 +1,4 @@
-import { Abi as AbiKanabi } from 'abi-wan-kanabi';
+import type { Abi as AbiKanabi } from 'abi-wan-kanabi';
 
 import { AccountInterface } from '../account';
 import { ProviderInterface, defaultProvider } from '../provider';

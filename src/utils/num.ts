@@ -112,7 +112,7 @@ export function bigNumberishArrayToHexadecimalStringArray(rawCalldata: BigNumber
 }
 
 /**
- * Test if string is whole number (0,1,2,3...)
+ * Test if string is whole number (0, 1, 2, 3...)
  */
 export const isStringWholeNumber = (value: string) => /^\d+$/.test(value);
 

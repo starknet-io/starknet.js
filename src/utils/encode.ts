@@ -1,3 +1,5 @@
+import { base64 } from '@scure/base';
+
 /* eslint-disable no-param-reassign */
 export const IS_BROWSER = typeof window !== 'undefined';
 
@@ -18,26 +20,35 @@ export function arrayBufferToString(array: ArrayBuffer): string {
 }
 
 /**
- * Convert string to array buffer
+ * Convert utf8-string to Uint8Array
  *
  * *[internal usage]*
  */
-export function stringToArrayBuffer(s: string): Uint8Array {
-  return Uint8Array.from(s, (c) => c.charCodeAt(0));
+export function utf8ToArray(str: string): Uint8Array {
+  return new TextEncoder().encode(str);
+}
+
+/**
+ * Convert utf8-string to Uint8Array
+ *
+ * @deprecated equivalent to 'utf8ToArray', alias will be removed
+ */
+export function stringToArrayBuffer(str: string): Uint8Array {
+  return utf8ToArray(str);
 }
 
 /**
  * Convert string to array buffer (browser and node compatible)
  */
 export function atobUniversal(a: string): Uint8Array {
-  return IS_BROWSER ? stringToArrayBuffer(atob(a)) : Buffer.from(a, 'base64');
+  return base64.decode(a);
 }
 
 /**
  * Convert array buffer to string (browser and node compatible)
  */
 export function btoaUniversal(b: ArrayBuffer): string {
-  return IS_BROWSER ? btoa(arrayBufferToString(b)) : Buffer.from(b).toString('base64');
+  return base64.encode(new Uint8Array(b));
 }
 
 /**
@@ -45,7 +56,7 @@ export function btoaUniversal(b: ArrayBuffer): string {
  * @returns format: hex-string
  */
 export function buf2hex(buffer: Uint8Array) {
-  return [...buffer].map((x) => x.toString(16).padStart(2, '0')).join('');
+  return buffer.reduce((r, x) => r + x.toString(16).padStart(2, '0'), '');
 }
 
 /**
@@ -122,16 +133,6 @@ export function sanitizeHex(hex: string): string {
     hex = addHexPrefix(hex);
   }
   return hex;
-}
-
-/**
- * Convert utf8-string to Uint8Array
- *
- * Implemented using TextEncoder to make it isomorphic
- * @param str utf8-string
- */
-export function utf8ToArray(str: string): Uint8Array {
-  return new TextEncoder().encode(str);
 }
 
 /**

@@ -24,6 +24,7 @@ import {
   compiledOpenZeppelinAccount,
   compiledStarknetId,
   compiledTestDapp,
+  describeIfDevnet,
   describeIfDevnetSequencer,
   erc20ClassHash,
   getTestAccount,
@@ -130,7 +131,7 @@ describe('deploy and test Wallet', () => {
         entrypoint: 'transfer',
         calldata: {
           recipient: tobeAccountAddress,
-          amount: uint256(1_000_000_000_000_000),
+          amount: uint256(5 * 10 ** 15),
         },
       });
       await account.waitForTransaction(transaction_hash);
@@ -228,15 +229,19 @@ describe('deploy and test Wallet', () => {
       ]);
       expect(res).toMatchSchemaRef('SimulateTransactionResponse');
     });
-    test('simulate DECLARE - Cairo 0 Contract', async () => {
-      const res = await account.simulateTransaction([
-        {
-          type: TransactionType.DECLARE,
-          contract: compiledErc20,
-        },
-      ]);
-      expect(res).toMatchSchemaRef('SimulateTransactionResponse');
+
+    describeIfDevnet('declare tests only on devnet', () => {
+      test('simulate DECLARE - Cairo 0 Contract', async () => {
+        const res = await account.simulateTransaction([
+          {
+            type: TransactionType.DECLARE,
+            contract: compiledErc20,
+          },
+        ]);
+        expect(res).toMatchSchemaRef('SimulateTransactionResponse');
+      });
     });
+
     test('simulate DECLARE - Cairo 1 Contract - test if not already declared', async () => {
       const declareContractPayload = extractContractHashes({
         contract: compiledHelloSierra,
@@ -297,11 +302,13 @@ describe('deploy and test Wallet', () => {
       expect(res).toMatchSchemaRef('SimulateTransactionResponse');
     });
     test('simulate DEPLOY_ACCOUNT - Cairo 0 Account', async () => {
-      const declareAccount = await account.declare({
+      const declareAccount = await account.declareIfNot({
         contract: compiledOpenZeppelinAccount,
       });
       const accountClassHash = declareAccount.class_hash;
-      await provider.waitForTransaction(declareAccount.transaction_hash);
+      if (declareAccount.transaction_hash) {
+        await provider.waitForTransaction(declareAccount.transaction_hash);
+      }
       const privateKey = stark.randomAddress();
       const starkKeyPub = ec.starkCurve.getStarkKey(privateKey);
       const precalculatedAddress = hash.calculateContractAddressFromHash(
@@ -427,11 +434,13 @@ describe('deploy and test Wallet', () => {
     });
 
     test('Declare ERC20 contract', async () => {
-      const declareTx = await account.declare({
+      const declareTx = await account.declareIfNot({
         contract: compiledErc20,
         classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
       });
-      await provider.waitForTransaction(declareTx.transaction_hash);
+      if (declareTx.transaction_hash) {
+        await provider.waitForTransaction(declareTx.transaction_hash);
+      }
       expect(declareTx).toMatchSchemaRef('DeclareContractResponse');
     });
 
@@ -510,11 +519,13 @@ describe('deploy and test Wallet', () => {
 
   describe('Declare and UDC Deploy Flow', () => {
     test('ERC20 Declare', async () => {
-      const declareTx = await account.declare({
+      const declareTx = await account.declareIfNot({
         contract: compiledErc20,
       });
 
-      await provider.waitForTransaction(declareTx.transaction_hash);
+      if (declareTx.transaction_hash) {
+        await provider.waitForTransaction(declareTx.transaction_hash);
+      }
       expect(declareTx).toMatchSchemaRef('DeclareContractResponse');
       expect(hexToDecimalString(declareTx.class_hash)).toEqual(hexToDecimalString(erc20ClassHash));
     });
@@ -600,12 +611,13 @@ describe('deploy and test Wallet', () => {
     let newAccount: Account;
 
     beforeAll(async () => {
-      const declareAccount = await account.declare({
+      const declareAccount = await account.declareIfNot({
         contract: compiledOpenZeppelinAccount,
       });
       accountClassHash = declareAccount.class_hash;
-      await provider.waitForTransaction(declareAccount.transaction_hash);
-
+      if (declareAccount.transaction_hash) {
+        await provider.waitForTransaction(declareAccount.transaction_hash);
+      }
       const privateKey = stark.randomAddress();
       starkKeyPub = ec.starkCurve.getStarkKey(privateKey);
       precalculatedAddress = hash.calculateContractAddressFromHash(
@@ -705,51 +717,53 @@ describe('deploy and test Wallet', () => {
       });
     });
 
-    test('declare, deploy & multi invoke functions', async () => {
-      const res = await account.estimateFeeBulk([
-        /*         {
-          // Cairo 1.1.0, if declared estimate error with can't redeclare same contract
-          type: TransactionType.DECLARE,
-          contract: compiledHelloSierra,
-          casm: compiledHelloSierraCasm,
-        }, */
-        {
-          // Cairo 0
-          type: TransactionType.DECLARE,
-          payload: {
-            contract: compiledErc20,
-            classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+    describeIfDevnet('declare tests only on devnet', () => {
+      test('declare, deploy & multi invoke functions', async () => {
+        const res = await account.estimateFeeBulk([
+          /*         {
+            // Cairo 1.1.0, if declared estimate error with can't redeclare same contract
+            type: TransactionType.DECLARE,
+            contract: compiledHelloSierra,
+            casm: compiledHelloSierraCasm,
+          }, */
+          {
+            // Cairo 0
+            type: TransactionType.DECLARE,
+            payload: {
+              contract: compiledErc20,
+              classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+            },
           },
-        },
-        {
-          type: TransactionType.DEPLOY,
-          payload: {
-            classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
-            constructorCalldata: ['Token', 'ERC20', account.address],
+          {
+            type: TransactionType.DEPLOY,
+            payload: {
+              classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
+              constructorCalldata: ['Token', 'ERC20', account.address],
+            },
           },
-        },
-        {
-          type: TransactionType.INVOKE,
-          payload: [
-            {
-              contractAddress: erc20Address,
-              entrypoint: 'approve',
-              calldata: {
-                address: erc20Address,
-                amount: uint256(10),
+          {
+            type: TransactionType.INVOKE,
+            payload: [
+              {
+                contractAddress: erc20Address,
+                entrypoint: 'approve',
+                calldata: {
+                  address: erc20Address,
+                  amount: uint256(10),
+                },
               },
-            },
-            {
-              contractAddress: erc20Address,
-              entrypoint: 'transfer',
-              calldata: [erc20.address, '10', '0'],
-            },
-          ],
-        },
-      ]);
-      expect(res).toHaveLength(3);
-      res.forEach((value) => {
-        expect(value).toMatchSchemaRef('EstimateFee');
+              {
+                contractAddress: erc20Address,
+                entrypoint: 'transfer',
+                calldata: [erc20.address, '10', '0'],
+              },
+            ],
+          },
+        ]);
+        expect(res).toHaveLength(3);
+        res.forEach((value) => {
+          expect(value).toMatchSchemaRef('EstimateFee');
+        });
       });
     });
 

@@ -63,12 +63,12 @@ Please check the Starknet documentation <ins>[here](https://www.cairo-lang.org/d
 
 Additional helpful resources can also be found at <ins>[OpenZeppelin](https://docs.openzeppelin.com/contracts-cairo/0.6.1/)</ins> documentation site.
 
-## Full example with account & erc20 deployments
+## Interacting with contracts and accounts
 
-Please take a look at our workshop using OpenZeppelin contracts <ins>[here](https://github.com/starknet-io/starknet.js-workshop)</ins>.
+For a basic overview on how to interact with contracts and accounts continue following this guide.
 
-Example with Argent contract <ins>[here](https://github.com/starknet-io/starknet.js-account)</ins>.
+For some more extensive examples visit PhilippeR26's <ins>[workshop](https://github.com/PhilippeR26/starknet.js-workshop-typescript)</ins>.
 
 ## Contracts used in the guides
 
-You can find the compiled contracts used in these guides in `compiled_contracts` directory.
+You can find the compiled contracts used in these guides in the <ins>[compiled_contracts](https://github.com/starknet-io/starknet.js/tree/develop/www/docs/guides/compiled_contracts)</ins> directory.

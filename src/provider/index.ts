@@ -6,4 +6,4 @@ export * from './sequencer';
 export * from './interface';
 export * from './rpc';
 
-export const defaultProvider = new Provider();
+export const defaultProvider = new Provider({ rpc: { default: true } });

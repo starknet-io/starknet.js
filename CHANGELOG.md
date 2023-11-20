@@ -1,3 +1,59 @@
+## [5.24.2](https://github.com/starknet-io/starknet.js/compare/v5.24.1...v5.24.2) (2023-11-17)
+
+### Bug Fixes
+
+- errors when testing in Testnet with a Cairo 1 account ([243074e](https://github.com/starknet-io/starknet.js/commit/243074ebd8324da2a33f13b5d8542949d7e92991))
+
+## [5.24.1](https://github.com/starknet-io/starknet.js/compare/v5.24.0...v5.24.1) (2023-11-13)
+
+### Bug Fixes
+
+- stringify error handler data ([1eab2d3](https://github.com/starknet-io/starknet.js/commit/1eab2d3acd67e8a14d6e10ea24d27aa1e108cdcc))
+
+# [5.24.0](https://github.com/starknet-io/starknet.js/compare/v5.23.0...v5.24.0) (2023-11-13)
+
+### Bug Fixes
+
+- skip chainId eager load for RpcProvider initialization ([3bccc4d](https://github.com/starknet-io/starknet.js/commit/3bccc4d9f0e07d42a3855891cb5b4efce3692001))
+
+### Features
+
+- rpc 0.5.1 ([0306b90](https://github.com/starknet-io/starknet.js/commit/0306b90f0cec30a3db99925a83f05d6c66f4100c))
+
+# [5.23.0](https://github.com/starknet-io/starknet.js/compare/v5.22.0...v5.23.0) (2023-11-10)
+
+### Bug Fixes
+
+- correction of CairoAssembly type ([340392f](https://github.com/starknet-io/starknet.js/commit/340392fe2db4585ea7905176ede5f78f21cf5bad))
+- nethermind public node work's on https ([12c1582](https://github.com/starknet-io/starknet.js/commit/12c15829a7f2c7f46dcd4dd92b75d9ced5e62781))
+- offset type in DEPRECATED_CAIRO_ENTRY_POINT ([452df9e](https://github.com/starknet-io/starknet.js/commit/452df9e133e2c4a5df1956ca01d7af19fd01f1d9))
+- remove buffer ([f8f1caa](https://github.com/starknet-io/starknet.js/commit/f8f1caa0d1ba41abdb4e3c0cb26bdec2e5dd2f65))
+
+### Features
+
+- export types and respose type in nonspec ([e42f9f9](https://github.com/starknet-io/starknet.js/commit/e42f9f991982d93a5733069fa5655f6b787cf8a2))
+- refactored tests setup ([a6be207](https://github.com/starknet-io/starknet.js/commit/a6be207bf9f05c90f29e9620fdebea160fbfac79))
+- rpc 0.5.0, spec refactored and rebuilt, wip testing setup refactor ([ecfbe19](https://github.com/starknet-io/starknet.js/commit/ecfbe193cf28a16404f6e1e7cdf3fc9f00b5012c))
+- rpc default provider and public nodes ([12402e3](https://github.com/starknet-io/starknet.js/commit/12402e31e0f22de85351843baa2bae8be440918f))
+- rpc Provider cleanup & refactor, RPC Spec types update ([c373ca4](https://github.com/starknet-io/starknet.js/commit/c373ca44e8fcffc4afc164712b13838b9f34e7b9))
+- set default provider to random rpc provider, update rpc provider, update test setup ([321311e](https://github.com/starknet-io/starknet.js/commit/321311e7722064516ec705aa932660f4b36073bd))
+- test general parameters overide ([c888d23](https://github.com/starknet-io/starknet.js/commit/c888d2381c4a2a461a6aebf066dbbed3563c7df2))
+- use txStatus in waitForTransaction ([dd80eb5](https://github.com/starknet-io/starknet.js/commit/dd80eb5fec8a1eede7301684e6a6fb2bb970b2b5))
+- waitForTransaction tx hash readiness, test errors & logging update, rpc ([39b3fa7](https://github.com/starknet-io/starknet.js/commit/39b3fa73f319ed9119850e1b41f7a49f832fa0ba))
+- wip ([98aa89c](https://github.com/starknet-io/starknet.js/commit/98aa89cb8595cbf589fb1389cda2db45a932e2e9))
+
+# [5.22.0](https://github.com/starknet-io/starknet.js/compare/v5.21.1...v5.22.0) (2023-11-02)
+
+### Features
+
+- deprecating Sequencer provider ([94e02fa](https://github.com/starknet-io/starknet.js/commit/94e02fa083645602b8b96ab694b3ba3d2a3efbce))
+
+## [5.21.1](https://github.com/starknet-io/starknet.js/compare/v5.21.0...v5.21.1) (2023-10-16)
+
+### Bug Fixes
+
+- naming for new rpc only devnet DEFAULT_TEST_PROVIDER_URL ([c844d41](https://github.com/starknet-io/starknet.js/commit/c844d41689759d6d2615602eddef2c7108380139))
+
 # [5.21.0](https://github.com/starknet-io/starknet.js/compare/v5.20.0...v5.21.0) (2023-10-03)
 
 ### Bug Fixes

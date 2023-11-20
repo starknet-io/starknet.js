@@ -171,8 +171,8 @@ while (continuationToken) {
     });
     const nbEvents = eventsRes.events.length;
     continuationToken=eventsRes.continuation_token;
-    console.log("chunk nb =",chunkNum,".",nbEvents, "events recovered.");
-    console.log("continuation_token =",continuationToken );
+    console.log("chunk nb =", chunkNum, ".", nbEvents, "events recovered.");
+    console.log("continuation_token =", continuationToken );
     for (let i = 0; i < nbEvents; i++) {
         const event = eventsRes.events[i];
         console.log("event #", i, "data length =", event.data.length, "key length =", event.keys.length, ":");

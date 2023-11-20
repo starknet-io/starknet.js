@@ -6,6 +6,7 @@ import {
   CallStruct,
   Calldata,
   ParsedStruct,
+  RawArgs,
   UniversalDeployerContractPayload,
 } from '../types';
 import { CallData } from './calldata';
@@ -16,7 +17,7 @@ import { randomAddress } from './stark';
 
 /**
  * Transforms a list of Calls, each with their own calldata, into
- * two arrays: one with the entrypoints, and one with the concatenated calldata.
+ * two arrays: one with the entry points, and one with the concatenated calldata
  */
 export const transformCallsToMulticallArrays = (calls: Call[]) => {
   const callArray: ParsedStruct[] = [];
@@ -77,7 +78,10 @@ export const fromCallsToExecuteCalldata_cairo1 = (calls: Call[]) => {
   const orderCalls = calls.map((call) => ({
     contractAddress: call.contractAddress,
     entrypoint: call.entrypoint,
-    calldata: call.calldata,
+    calldata:
+      Array.isArray(call.calldata) && '__compiled__' in call.calldata
+        ? call.calldata // Calldata type
+        : CallData.compile(call.calldata as RawArgs), // RawArgsObject | RawArgsArray type
   }));
 
   return CallData.compile({ orderCalls });

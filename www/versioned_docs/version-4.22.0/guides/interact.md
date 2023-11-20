@@ -4,7 +4,7 @@ sidebar_position: 6
 
 # Interact with your contract
 
-Once your provider, contract and account are connected, you can interact with the contract :
+Once your provider, contract and account are connected, you can interact with the contract:
 
 - you can read the memory of the contract, without fees.
 - you can write to memory, but you have to pay fees.
@@ -16,17 +16,17 @@ Your account should be funded enough to pay fees (0.01 ETH should be enough to s
 
 ![](./pictures/Interact_contract.png)
 
-Here we will interact with a `test.cairo` contract, already deployed in Testnet 1 and Tesnet 2, at addresses :
+Here we will interact with a `test.cairo` contract, already deployed in Testnet 1 and Testnet 2, at addresses:
 
-- testnet1 : [0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd](https://testnet.starkscan.co/contract/0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd#read-contract).
-- testnet2 : [0x2367db6b0df07033d196dcd25961109d8fbc86227158343149742284c7582e](https://testnet-2.starkscan.co/contract/0x002367db6b0df07033d196dcd25961109d8fbc86227158343149742284c7582e#read-contract).
+- testnet1: [0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd](https://testnet.starkscan.co/contract/0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd#read-contract).
+- testnet2: [0x2367db6b0df07033d196dcd25961109d8fbc86227158343149742284c7582e](https://testnet-2.starkscan.co/contract/0x002367db6b0df07033d196dcd25961109d8fbc86227158343149742284c7582e#read-contract).
 
 We will use Testnet1, so you need a funded wallet in this network.
 
 This contract contains a storage memory called `balance`.
 
-- It can be read with the `@view function : get_balance()`
-- Balance can be modified with the `@external function : increase_balance(amount1: felt, amount2: felt)`
+- It can be read with the `@view function: get_balance()`
+- Balance can be modified with the `@external function: increase_balance(amount1: felt, amount2: felt)`
 
 ```typescript
 import { Provider, Contract, Account, ec, json } from "starknet";
@@ -35,12 +35,12 @@ import { Provider, Contract, Account, ec, json } from "starknet";
 ## 🔍 Read contract memory, with call
 
 To read the balance, you need only to connect a Provider and a Contract.  
-You have to use the call function : `contract.call("function_name",[params])` (here `params` is not necessary, because there are no parameters for the `get_balance` function).
+You have to use the call function: `contract.call("function_name", [params])` (here `params` is not necessary, because there are no parameters for the `get_balance` function).
 
 ```typescript
 //initialize Provider
 const provider = new Provider({ sequencer: { network: "goerli-alpha" } });
-// Connect the deployed Test contract in Tesnet
+// Connect the deployed Test contract in Testnet
 const testAddress = "0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd";
 
 // read abi of Test contract
@@ -57,22 +57,22 @@ console.log("Initial balance =", bal1.res.toString()); // .res because the  retu
 
 To increase the balance, you need in addition a connected and funded Account.
 
-You have to use the invoke function : `contract.invoke("function_name",[params])`
+You have to use the invoke function: `contract.invoke("function_name", [params])`
 After the invoke function, you have to wait the incorporation of the modification of Balance in the network, with `await provider.waitForTransaction(transaction_hash)`
 
-Here is an example to increase and check the balance :
+Here is an example to increase and check the balance:
 
 ```typescript
 //initialize Provider
 const provider = new Provider({ sequencer: { network: "goerli-alpha" } });
-// connect your account. To adapt to your own account :
+// connect your account. To adapt to your own account:
 const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
 const account0Address = "0x123....789";
 
 const starkKeyPair0 = ec.getKeyPair(privateKey0);
 const account0 = new Account(provider, account0Address, starkKeyPair0);
 
-// Connect the deployed Test contract in Tesnet
+// Connect the deployed Test contract in Testnet
 const testAddress = "0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd";
 
 // read abi of Test contract
@@ -95,24 +95,24 @@ console.log("Initial balance =", bal2.res.toString());
 
 ## Use meta-class of Contract
 
-You have another way to interact with a contract - the meta-class : each `Contract` object as specific functions to interact. For example here, we have 2 additional functions for the Test contract object:
+You have another way to interact with a contract - the meta-class: each `Contract` object as specific functions to interact. For example here, we have 2 additional functions for the Test contract object:
 
 - `Contract.get_balance()`
 - `Contract.increase_balance()`
 
-The code can be modified this way :
+The code can be modified this way:
 
 ```typescript
 //initialize Provider
 const provider = new Provider({ sequencer: { network: "goerli-alpha" } });
-// connect your account. To adapt to your own account :
+// connect your account. To adapt to your own account:
 const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
 const account0Address = "0x123....789";
 
 const starkKeyPair0 = ec.getKeyPair(privateKey0);
 const account0 = new Account(provider, account0Address, starkKeyPair0);
 
-// Connect the deployed Test contract in Tesnet
+// Connect the deployed Test contract in Testnet
 const testAddress = "0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd";
 
 // read abi of Test contract

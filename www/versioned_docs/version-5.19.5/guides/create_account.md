@@ -20,7 +20,7 @@ Creating an account is a bit tricky; you have several steps:
 
 > Level: easy.
 
-Here, we will create a wallet with the Open Zeppelin smart contract v0.5.1. The contract class is already implemented in both Testnet 1 & 2.  
+Here, we will create a wallet with the Open Zeppelin smart contract v0.5.1. The contract class is already implemented in Testnet.  
 This contract is coded in Cairo 0, so it will not survive the upcoming re-genesis of Starknet.
 
 ```typescript
@@ -85,7 +85,7 @@ await provider.waitForTransaction(transaction_hash);
 console.log('✅ New OpenZeppelin account created.\n   address =', contract_address);
 ```
 
-> **IMPORTANT :** If this account is based on a Cairo v2 contract (for example OpenZeppelin account 0.7.0 or later), do not forget to add the parameter "1" after the privateKey parameter :
+> **IMPORTANT:** If this account is based on a Cairo v2 contract (for example OpenZeppelin account 0.7.0 or later), do not forget to add the parameter "1" after the privateKey parameter:
 
 ```typescript
 const OZaccount = new Account(provider, OZcontractAddress, privateKey, "1");
@@ -97,7 +97,7 @@ const OZaccount = new Account(provider, OZcontractAddress, privateKey, "1");
 
 > Level: medium.
 
-Here, we will create a wallet with the Argent smart contract v0.2.3. This case is more complicated because we will have the account behind a proxy contract (this way, the wallet contract can be updated). The contract classes of both contracts are already implemented in both Testnet 1 & 2.
+Here, we will create a wallet with the Argent smart contract v0.2.3. This case is more complicated because we will have the account behind a proxy contract (this way, the wallet contract can be updated). The contract classes of both contracts are already implemented in Testnet.
 
 > If necessary OZ contracts can also be created with a proxy.
 
@@ -154,7 +154,7 @@ const deployAccountPayload = {
     addressSalt: starkKeyPubAX };
 
 const { transaction_hash: AXdAth, contract_address: AXcontractFinalAddress } = await accountAX.deployAccount(deployAccountPayload);
-console.log('✅ ArgentX wallet deployed at:',AXcontractFinalAddress);
+console.log('✅ ArgentX wallet deployed at:', AXcontractFinalAddress);
 ```
 
 ## Create a Braavos account
@@ -223,7 +223,7 @@ console.log('Answer mint =', answer); // 10 ETH
 
 // deploy Braavos account
 const { transaction_hash, contract_address: BraavosAccountFinalAddress } =
-    await deployBraavosAccount(privateKeyBraavos, providerDevnet,estimatedFee);
+    await deployBraavosAccount(privateKeyBraavos, providerDevnet, estimatedFee);
     // estimatedFee is optional
 console.log('Transaction hash =', transaction_hash);
 await providerDevnet.waitForTransaction(transaction_hash);

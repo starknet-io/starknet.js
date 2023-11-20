@@ -20,13 +20,14 @@ npm install starknet@next
 
 ### With Devnet
 
-The example devnet version is `0.5.3`.
+- Sequencer Devnet [docs](https://0xspaceshard.github.io/starknet-devnet/docs/intro)
+- RPC Devnet [repo](https://github.com/0xSpaceShard/starknet-devnet-rs)
 
-Get devnet with docker:
+Get the Sequencer Devnet with Docker:
 
 ```bash
-docker pull shardlabs/starknet-devnet:0.5.3
-docker run -p 5050:5050 shardlabs/starknet-devnet:0.5.3 --seed 0
+docker pull shardlabs/starknet-devnet:latest
+docker run -p 5050:5050 shardlabs/starknet-devnet:latest --seed 0
 ```
 
 Open a new console tab, go to your starknet.js directory, and run:
@@ -59,16 +60,16 @@ npm run start # fires up a local documentation site
 
 ## Compiling Starknet Contracts
 
-Please check the Starknet documentation <ins>[here](https://www.cairo-lang.org/docs/hello_starknet/intro.html)</ins> to compile Starknet contracts.
+Please check the Starknet documentation <ins>[here](https://docs.starknet.io/documentation/quick_start/declare_a_smart_contract/#compiling_a_smart_contract)</ins> to compile Starknet contracts.
 
 Additional helpful resources can also be found at <ins>[OpenZeppelin](https://docs.openzeppelin.com/contracts-cairo/0.6.1/)</ins> documentation site.
 
-## Full example with account & erc20 deployments
+## Interacting with contracts and accounts
 
-Please take a look at our workshop using OpenZeppelin contracts <ins>[here](https://github.com/starknet-io/starknet.js-workshop)</ins>.
+For a basic overview on how to interact with contracts and accounts continue following this guide.
 
-Example with the Argent contract <ins>[here](https://github.com/starknet-io/starknet.js-account)</ins>.
+For some more extensive examples visit PhilippeR26's <ins>[workshop](https://github.com/PhilippeR26/starknet.js-workshop-typescript)</ins>.
 
 ## Contracts used in the guides
 
-You can find the compiled contracts used in these guides in `compiled_contracts` directory.
+You can find the compiled contracts used in these guides in the <ins>[compiled_contracts](https://github.com/starknet-io/starknet.js/tree/develop/www/docs/guides/compiled_contracts)</ins> directory.

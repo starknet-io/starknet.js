@@ -10,7 +10,7 @@ import { cleanHex } from './num';
  */
 export function parseUDCEvent(txReceipt: InvokeTransactionReceiptResponse) {
   if (!txReceipt.events) {
-    throw new Error('UDC emited event is empty');
+    throw new Error('UDC emitted event is empty');
   }
   const event = txReceipt.events.find(
     (it) => cleanHex(it.from_address) === cleanHex(UDC.ADDRESS)

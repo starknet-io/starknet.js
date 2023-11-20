@@ -22,7 +22,7 @@ const fullPublicKey = encode.addHexPrefix( encode.buf2hex( ec.starkCurve.getPubl
 const message: BigNumberish[] = [1, 128, 18, 14];
 
 const msgHash = hash.computeHashOnElements(message);
-const signature: WeierstrassSignatureType = ec.starkCurve.sign(msgHash,privateKey);
+const signature: WeierstrassSignatureType = ec.starkCurve.sign(msgHash, privateKey);
 ```
 
 Then you can send, by any means, to the recipient of the message:
@@ -87,7 +87,7 @@ const msgHash2 = hash.computeHashOnElements(message);
 // The call of isValidSignature will generate an error if not valid
     let result2: boolean;
     try {
-        await contractAccount.isValidSignature(msgHash2, [signature.r,signature.s]);
+        await contractAccount.isValidSignature(msgHash2, [signature.r, signature.s]);
         result2 = true;
     } catch {
         result2 = false;
@@ -103,7 +103,7 @@ These items are designed to be able to be an interface with a wallet. At sign re
 - the `message` will be displayed at the bottom of the wallet display, showing clearly (not in hex) the message to sign. Its structure has to be in accordance with the type listed in `primaryType`, defined in `types`.
 - the `domain` will be shown above the message. Its structure has to be in accordance with `StarkNetDomain`.
 
-The predefined types that you can use :
+The predefined types that you can use:
 
 - felt: for an integer on 251 bits.
 - felt\*: for an array of felt.
@@ -138,7 +138,7 @@ const typedDataValidate: TypedData = {
         domain: {
             name: "myDapp", // put the name of your dapp to ensure that the signatures will not be used by other DAPP
             version: "1",
-            chainId: shortString.encodeShortString("SN_GOERLI"), // shortString of 'SN_GOERLI' (or 'SN_MAIN' or 'SN_GOERLI2'), to be sure that signature can't be used by other network.
+            chainId: shortString.encodeShortString("SN_GOERLI"), // shortString of 'SN_GOERLI' (or 'SN_MAIN'), to be sure that signature can't be used by other network.
         },
         message: {
             id: "0x0000004f000f",

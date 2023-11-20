@@ -20,7 +20,7 @@ const starkKeyPair = ec.getKeyPair(privateKey);
 const starknetPublicKey = ec.getStarkKey(starkKeyPair);
 const fullPublicKey=encode.addHexPrefix(starkKeyPair.getPublic("hex"));
 
-const message : BigNumberish[] = [1, 128, 18, 14];
+const message: BigNumberish[] = [1, 128, 18, 14];
 
 const msgHash = hash.computeHashOnElements(message);
 const signature = ec.sign(starkKeyPair, msgHash);
@@ -57,12 +57,12 @@ console.log("Result (boolean) =", result1);
 
 > The sender can also provide their account address. Then you can check that this full public key is linked to this account. The pubKey that you can read in the account contract is part (part X) of the full pubKey (parts X & Y):
 
-Read the pubKey of the account :
+Read the pubKey of the account:
 
 ```typescript
 const provider = new Provider({ sequencer: { baseUrl: "http://127.0.0.1:5050" } }); //devnet
 const compiledAccount = json.parse(fs.readFileSync("./compiled_contracts/Account_0_5_1.json").toString("ascii"));
-const accountAddress ="0x...."; // account of sender
+const accountAddress = "0x...."; // account of sender
 const contractAccount = new Contract(compiledAccount.abi, accountAddress, provider);
 const pubKey3 = await contractAccount.call("getPublicKey");
 ```
@@ -106,13 +106,13 @@ These items are designed to be able to be an interface with a wallet. At sign re
 - `message` will be displayed at the bottom of the wallet display, showing clearly (not in hex) the message to sign. Its structure has to be in accordance with the type listed in `primaryType`, defined in `types`.
 - `domain` will be shown above the message. Its structure has to be in accordance with `StarkNetDomain`.
 
-The prefefined types that you can use :
+The predefined types that you can use:
 
-- felt : for an integer on 251 bits.
-- felt\* : for an array of felt.
-- string : for a shortString of 31 ASCII characters max.
-- selector : for a name of a smartcontract function.
-- merkletree : for a Root of a Merkle tree. root is calculated with the provided data.
+- felt: for an integer on 251 bits.
+- felt\*: for an array of felt.
+- string: for a shortString of 31 ASCII characters max.
+- selector: for a name of a smartcontract function.
+- merkletree: for a Root of a Merkle tree. root is calculated with the provided data.
 
 ```typescript
 import { Account, typedData } from "starknet";

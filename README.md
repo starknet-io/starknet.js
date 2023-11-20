@@ -6,7 +6,7 @@
 <!-- primary badges -->
 <p align="center">
   <a href="https://github.com/starknet-io/starknet.js/actions">
-    <img src="https://img.shields.io/github/workflow/status/starknet-io/starknet.js/Release">
+    <img src="https://github.com/starknet-io/starknet.js/actions/workflows/manual-release.yml/badge.svg">
   </a>
   <a href="https://www.npmjs.com/package/starknet">
     <img src='https://img.shields.io/npm/v/starknet' />
@@ -28,6 +28,9 @@
   </a>
   <a href="https://starkware.co/">
     <img src="https://img.shields.io/badge/powered_by-StarkWare-navy">
+  </a>
+  <a href="https://twitter.com/starknetjs">
+    <img src="https://img.shields.io/badge/follow_us-Twitter-blue">
   </a>
 </p>
 

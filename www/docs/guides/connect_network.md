@@ -18,14 +18,13 @@ import {Provider} from 'starknet';
 const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_MAIN } })
 ```
 
-## Connect your DAPP to Starknet testnet 1 & 2
+## Connect your DAPP to Starknet testnet
 
 ```typescript
-const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } }) // for testnet 1
-const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI2 } })  // for testnet 2
+const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } }) // for testnet
 ```
 
-## Connect your DAPP to Starknet-devnet
+## Connect your DAPP to Starknet devnet
 
 ```typescript
 const provider = new Provider({ sequencer: { baseUrl:"http://127.0.0.1:5050"} });
@@ -66,7 +65,7 @@ const provider = new Provider({ rpc: { nodeUrl: '192.168.1.99:9545/rpc/v0.4' } }
 
 ### Juno
 
-Initialize the provider with :
+Initialize the provider with:
 
 ```typescript
 const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:6060' });
@@ -74,29 +73,29 @@ const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:6060' });
 
 ### Other node clients
 
-Other examples (some need a secret key) :
+Other examples (some need a secret key):
 
-**Mainnet :**
+**Mainnet:**
 
 ```typescript
-// Infura node rpc for Mainnet :
+// Infura node rpc for Mainnet:
 const providerInfuraMainnet = new RpcProvider({ nodeUrl: 'https://starknet-mainnet.infura.io/v3/' + infuraKey });
-// Blast node rpc for Mainnet :
+// Blast node rpc for Mainnet:
 const providerBlastMainnet = new RpcProvider({ nodeUrl: 'https://starknet-mainnet.blastapi.io/' + blastKey + "/rpc/v0.4" });
-// Lava node rpc for Mainnet :
+// Lava node rpc for Mainnet:
 const providerMainnetLava = new RpcProvider({ nodeUrl: "https://g.w.lavanet.xyz:443/gateway/strk/rpc-http/" + lavaMainnetKey });
-// Alchemy node rpc for Mainnet :
+// Alchemy node rpc for Mainnet:
 const providerAlchemyMainnet = new RpcProvider({ nodeUrl: 'https://starknet-mainnet.g.alchemy.com/v2/' + alchemyKey });
 ```
 
-**Testnet :**
+**Testnet:**
 
 ```typescript
-// Infura node rpc for Testnet :
+// Infura node rpc for Testnet:
 const providerInfuraTestnet = new RpcProvider({ nodeUrl: 'https://starknet-goerli.infura.io/v3/' + infuraKey });
-// Blast node rpc for Testnet :
+// Blast node rpc for Testnet:
 const providerBlastTestnet = new RpcProvider({ nodeUrl: 'https://starknet-testnet.blastapi.io/' + blastKey + "/rpc/v0.4" });
-// Alchemy node rpc for Testnet :
+// Alchemy node rpc for Testnet:
 const providerAlchemyTestnet = new RpcProvider({ nodeUrl: 'https://starknet-goerli.g.alchemy.com/v2/' + alchemyKey });
 ```
 
@@ -110,7 +109,7 @@ For example, if you want to estimate the fee of an L1 ➡️ L2 message, you nee
 
 ```typescript
 import { SequencerProvider, constants } from "starknet";
-const provider = new SequencerProvider({ baseUrl: constants.BaseUrl.SN_GOERLI2 }); // for testnet 2
+const provider = new SequencerProvider({ baseUrl: constants.BaseUrl.SN_GOERLI }); // for testnet
 const responseEstimateMessageFee = await provider.estimateMessageFee(.....)
 ```
 
