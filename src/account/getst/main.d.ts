@@ -55,5 +55,6 @@ interface GetStarknetResult {
   disconnect: (options?: DisconnectOptions) => Promise<void>;
 }
 export declare function getStarknet(options?: Partial<GetStarknetOptions>): GetStarknetResult;
+// eslint-disable-next-line no-underscore-dangle
 declare const _default: GetStarknetResult;
 export default _default;
