@@ -86,7 +86,7 @@ export function signatureToHexArray(sig?: Signature): ArraySignatureType {
  * Convert estimated fee to max fee with overhead
  */
 export function estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: number = 0.5): bigint {
-  // BN can only handle Integers, so we need to do all calulations with integers
+  // BN can only handle Integers, so we need to do all calculations with integers
   const overHeadPercent = Math.round((1 + overhead) * 100);
   return (toBigInt(estimatedFee) * toBigInt(overHeadPercent)) / 100n;
 }

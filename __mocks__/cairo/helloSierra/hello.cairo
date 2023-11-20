@@ -302,7 +302,7 @@ mod HelloStarknet {
         data
     }
 
-    // unamed Tuple
+    // unnamed Tuple
     #[view]
     fn echo_un_tuple(a:(felt252, u16)) -> (felt252, u16) {
         a
