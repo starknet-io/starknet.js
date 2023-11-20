@@ -58,7 +58,7 @@ export type StateUpdate = STATE_UPDATE | PENDING_STATE_UPDATE;
 // response starknet_traceBlockTransactions
 export type BlockTransactionsTraces = { transaction_hash: FELT; trace_root: TRANSACTION_TRACE }[];
 // response starknet_syncing
-export type Syncing = 'false' | SYNC_STATUS;
+export type Syncing = false | SYNC_STATUS;
 // response starknet_getEvents
 export type Events = EVENTS_CHUNK;
 // response starknet_addInvokeTransaction
