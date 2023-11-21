@@ -29,8 +29,8 @@ import {
   erc20ClassHash,
   getTestAccount,
   getTestProvider,
-} from './fixtures';
-import { initializeMatcher } from './schema';
+} from './config/fixtures';
+import { initializeMatcher } from './config/schema';
 
 const { cleanHex, hexToDecimalString, toBigInt, toHex } = num;
 const { encodeShortString } = shortString;

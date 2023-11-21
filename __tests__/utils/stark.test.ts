@@ -1,6 +1,6 @@
 import { CallData, RawArgs, json, stark } from '../../src';
 import { toBigInt, toHex } from '../../src/utils/num';
-import { compiledOpenZeppelinAccount } from '../fixtures';
+import { compiledOpenZeppelinAccount } from '../config/fixtures';
 
 const compiledAccount = compiledOpenZeppelinAccount;
 

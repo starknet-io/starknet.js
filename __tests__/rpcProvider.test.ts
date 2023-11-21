@@ -1,6 +1,6 @@
 import { getStarkKey, utils } from '@scure/starknet';
 
-import { Account, Contract, GetBlockResponse, RpcProvider, stark } from '../src';
+import { Account, Contract, GetBlockResponse, stark } from '../src';
 import { StarknetChainId } from '../src/constants';
 import { CallData } from '../src/utils/calldata';
 import { felt, uint256 } from '../src/utils/calldata/cairo';
@@ -14,12 +14,13 @@ import {
   describeIfRpc,
   getTestAccount,
   getTestProvider,
-} from './fixtures';
-import { initializeMatcher } from './schema';
+} from './config/fixtures';
+import { initializeMatcher } from './config/schema';
 
 describeIfRpc('RPCProvider', () => {
-  const rpcProvider = getTestProvider() as RpcProvider;
-  const account = getTestAccount(rpcProvider);
+  const rpcProvider = getTestProvider(false);
+  const provider = getTestProvider();
+  const account = getTestAccount(provider);
   let accountPublicKey: string;
   initializeMatcher(expect);
 
@@ -41,12 +42,12 @@ describeIfRpc('RPCProvider', () => {
   });
 
   test('getTransactionCount', async () => {
-    const count = await rpcProvider.getTransactionCount('latest');
+    const count = await rpcProvider.getBlockTransactionCount('latest');
     expect(typeof count).toBe('number');
   });
 
   test('getBlockHashAndNumber', async () => {
-    const blockHashAndNumber = await rpcProvider.getBlockHashAndNumber();
+    const blockHashAndNumber = await rpcProvider.getBlockLatestAccepted();
     expect(blockHashAndNumber).toHaveProperty('block_hash');
     expect(blockHashAndNumber).toHaveProperty('block_number');
   });
@@ -57,7 +58,7 @@ describeIfRpc('RPCProvider', () => {
   });
 
   test('getStateUpdate', async () => {
-    const stateUpdate = await rpcProvider.getStateUpdate('latest');
+    const stateUpdate = await rpcProvider.getBlockStateUpdate('latest');
     expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
   });
 
@@ -104,7 +105,7 @@ describeIfRpc('RPCProvider', () => {
     let latestBlock: GetBlockResponse;
 
     beforeAll(async () => {
-      latestBlock = await rpcProvider.getBlock('latest');
+      latestBlock = await provider.getBlock('latest');
     });
 
     test('getBlockWithTxHashes', async () => {
@@ -131,7 +132,7 @@ describeIfRpc('RPCProvider', () => {
     });
 
     xtest('traceBlockTransactions', async () => {
-      await rpcProvider.traceBlockTransactions(latestBlock.block_hash);
+      await rpcProvider.getBlockTransactionsTraces(latestBlock.block_hash);
     });
 
     describeIfDevnet('devnet only', () => {
@@ -237,7 +238,8 @@ describeIfRpc('RPCProvider', () => {
       });
 
       test('getTransaction', async () => {
-        const transaction = await rpcProvider.getTransaction(transaction_hash);
+        // todo - schema for rpc need to be created and expected response here updated
+        const transaction = await rpcProvider.getTransactionByHash(transaction_hash);
         expect(transaction).toMatchSchemaRef('GetTransactionResponse');
       });
 
@@ -247,7 +249,7 @@ describeIfRpc('RPCProvider', () => {
       });
 
       xtest('traceTransaction', async () => {
-        await rpcProvider.traceTransaction(transaction_hash);
+        await rpcProvider.getTransactionTrace(transaction_hash);
       });
 
       test('getClassAt', async () => {

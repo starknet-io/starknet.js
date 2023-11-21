@@ -7,8 +7,8 @@ import {
   getTestAccount,
   getTestProvider,
   wrongClassHash,
-} from './fixtures';
-import { initializeMatcher } from './schema';
+} from './config/fixtures';
+import { initializeMatcher } from './config/schema';
 
 const testProvider = new Provider(getTestProvider());
 

@@ -16,7 +16,6 @@ export type AccountInvocationsFactoryDetails = {
 export interface EstimateFeeDetails {
   nonce?: BigNumberish;
   blockIdentifier?: BlockIdentifier;
-  skipValidate?: boolean;
 }
 
 export interface DeployContractResponse {

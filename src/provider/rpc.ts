@@ -2,8 +2,6 @@ import {
   HEX_STR_TRANSACTION_VERSION_1,
   HEX_STR_TRANSACTION_VERSION_2,
   NetworkName,
-  RPC_GOERLI_NODES,
-  RPC_MAINNET_NODES,
   StarknetChainId,
 } from '../constants';
 import {
@@ -34,20 +32,10 @@ import fetch from '../utils/fetchPonyfill';
 import { getSelector, getSelectorFromName, getVersionsByType } from '../utils/hash';
 import { stringify } from '../utils/json';
 import { getHexStringArray, toHex, toStorageKey } from '../utils/num';
-import { wait } from '../utils/provider';
+import { Block, getDefaultNodeUrl, wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { decompressProgram, signatureToHexArray } from '../utils/stark';
 import { LibraryError } from './errors';
-import { Block } from './utils';
-
-export const getDefaultNodeUrl = (networkName?: NetworkName, mute: boolean = false): string => {
-  if (!mute)
-    // eslint-disable-next-line no-console
-    console.warn('Using default public node url, please provide nodeUrl in provider options!');
-  const nodes = networkName === NetworkName.SN_MAIN ? RPC_MAINNET_NODES : RPC_GOERLI_NODES;
-  const randIdx = Math.floor(Math.random() * nodes.length);
-  return nodes[randIdx];
-};
 
 const defaultOptions = {
   headers: { 'Content-Type': 'application/json' },
@@ -190,6 +178,18 @@ export class RpcProvider {
   public async getBlockTransactionCount(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getBlockTransactionCount', { block_id });
+  }
+
+  /**
+   * Return transactions from pending block
+   * @deprecated Instead use getBlock(BlockTag.pending); (will be removed in next minor version)
+   * Utility method, same result can be achieved using getBlockWithTxHashes(BlockTag.pending);
+   */
+  public async getPendingTransactions() {
+    const { transactions } = await this.getBlockWithTxHashes(BlockTag.pending).then(
+      this.responseParser.parseGetBlockResponse
+    );
+    return Promise.all(transactions.map((it: any) => this.getTransactionByHash(it)));
   }
 
   public async getTransactionByHash(txHash: BigNumberish) {

@@ -11,7 +11,7 @@ import {
   compiledOpenZeppelinAccount,
   compiledTestDapp,
   erc20ClassHash,
-} from '../fixtures';
+} from '../config/fixtures';
 
 describe('Hash Tester', () => {
   test('Test getSelectorFromName', () => {

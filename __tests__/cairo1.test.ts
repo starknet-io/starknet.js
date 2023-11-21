@@ -10,7 +10,6 @@ import {
   DeclareDeployUDCResponse,
   RawArgsArray,
   RawArgsObject,
-  SequencerProvider,
   cairo,
   ec,
   hash,
@@ -26,12 +25,11 @@ import {
   compiledHelloSierra,
   compiledHelloSierraCasm,
   describeIfDevnet,
-  describeIfDevnetSequencer,
   describeIfSequencerGoerli,
   getTestAccount,
   getTestProvider,
-} from './fixtures';
-import { initializeMatcher } from './schema';
+} from './config/fixtures';
+import { initializeMatcher } from './config/schema';
 
 const { uint256, tuple, isCairo1Abi } = cairo;
 const { toHex } = num;
@@ -491,15 +489,6 @@ describeIfDevnet('Cairo 1 Devnet', () => {
       expect(callDataFromObject).toStrictEqual(expectedResult);
       expect(callDataFromArray).toStrictEqual(expectedResult);
     });
-
-    describeIfDevnetSequencer('Sequencer only', () => {
-      test('getCompiledClassByClassHash', async () => {
-        const compiledClass = await (provider as SequencerProvider).getCompiledClassByClassHash(
-          dd.deploy.classHash
-        );
-        expect(compiledClass).toMatchSchemaRef('CompiledClass');
-      });
-    });
   });
 
   describe('Cairo1 Account contract', () => {
@@ -562,7 +551,7 @@ describeIfDevnet('Cairo 1 Devnet', () => {
 
 describeIfSequencerGoerli('Cairo1 Testnet', () => {
   describe('Sequencer API - C1 Testnet C:0x00305e...', () => {
-    const provider = getTestProvider() as SequencerProvider;
+    const provider = getTestProvider();
     const account = getTestAccount(provider);
     const classHash: any = '0x022332bb9c1e22ae13ae7fd9f3101eced4644533c6bfe51a25cf8dea028e5045';
     const contractAddress: any =
@@ -574,11 +563,6 @@ describeIfSequencerGoerli('Cairo1 Testnet', () => {
       const cairoClass = await provider.getClassByHash(classHash);
       // TODO: Fix typing and responses for abi
       cairo1Contract = new Contract(cairoClass.abi as Abi, contractAddress, account);
-    });
-
-    test('getCompiledClassByClassHash', async () => {
-      const compiledClass = await provider.getCompiledClassByClassHash(classHash);
-      expect(compiledClass).toMatchSchemaRef('CompiledClass');
     });
 
     test('GetClassByHash', async () => {

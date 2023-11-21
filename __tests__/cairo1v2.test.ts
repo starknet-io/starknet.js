@@ -13,7 +13,6 @@ import {
   DeclareDeployUDCResponse,
   RawArgsArray,
   RawArgsObject,
-  SequencerProvider,
   cairo,
   ec,
   hash,
@@ -31,11 +30,10 @@ import {
   compiledC210,
   compiledC210Casm,
   compiledComplexSierra,
-  describeIfDevnetSequencer,
   getTestAccount,
   getTestProvider,
-} from './fixtures';
-import { initializeMatcher } from './schema';
+} from './config/fixtures';
+import { initializeMatcher } from './config/schema';
 
 const { uint256, tuple, isCairo1Abi } = cairo;
 const { toHex } = num;
@@ -673,15 +671,6 @@ describe('Cairo 1', () => {
       ];
       expect(callDataFromObject).toStrictEqual(expectedResult);
       expect(callDataFromArray).toStrictEqual(expectedResult);
-    });
-
-    describeIfDevnetSequencer('Sequencer only', () => {
-      test('getCompiledClassByClassHash', async () => {
-        const compiledClass = await (provider as SequencerProvider).getCompiledClassByClassHash(
-          dd.deploy.classHash
-        );
-        expect(compiledClass).toMatchSchemaRef('CompiledClass');
-      });
     });
   });
 

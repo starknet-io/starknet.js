@@ -2,7 +2,7 @@ import { NetworkName, StarknetChainId } from '../../constants';
 import { BlockIdentifier } from '../lib';
 
 export interface ProviderOptions extends RpcProviderOptions {
-  rpc: RpcProviderOptions; // backward-compatibility
+  rpc?: RpcProviderOptions; // backward-compatibility
 }
 
 export type RpcProviderOptions = {

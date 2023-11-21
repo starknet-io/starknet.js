@@ -4,7 +4,6 @@ import { BaseUrl, NetworkName, StarknetChainId } from '../constants';
 import { GatewayError, HttpError, LibraryError } from '../provider/errors';
 import { StarknetId } from '../provider/extensions/starknetId';
 import { ProviderInterface } from '../provider/interface';
-import { Block } from '../provider/utils';
 import {
   AccountInvocationItem,
   AccountInvocations,
@@ -57,7 +56,7 @@ import {
 } from '../utils/hash';
 import { parse, parseAlwaysAsBig, stringify } from '../utils/json';
 import { getDecimalString, getHexString, getHexStringArray, toBigInt, toHex } from '../utils/num';
-import { wait } from '../utils/provider';
+import { Block, wait } from '../utils/provider';
 import { SequencerAPIResponseParser } from '../utils/responseParser/sequencer';
 import { randomAddress, signatureToDecimalArray } from '../utils/stark';
 import { buildUrl } from '../utils/url';
