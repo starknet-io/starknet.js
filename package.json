@@ -96,6 +96,7 @@
     "isomorphic-fetch": "^3.0.0",
     "lossless-json": "^2.0.8",
     "pako": "^2.0.4",
+    "ts-mixer": "^6.0.3",
     "url-join": "^4.0.1"
   },
   "lint-staged": {

@@ -23,7 +23,6 @@ import {
   Nonce,
   ProviderOptions,
   RpcProviderOptions,
-  SequencerProviderOptions,
   SimulateTransactionResponse,
   StateUpdateResponse,
   Storage,
@@ -32,35 +31,32 @@ import {
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
+import { RPCResponseParser } from '../utils/responseParser/rpc';
+import { StarknetId } from './extensions/starknetId';
 import { ProviderInterface } from './interface';
 import { RpcProvider } from './rpc';
-import { SequencerProvider } from './sequencer';
-import { getAddressFromStarkName, getStarkName } from './starknetId';
 
 /**
- * @deprecated Use RpcProvider instead. Common Provider will be removed with Sequencer provider.
+ * Represent old common ProviderInterface interface used in RPCProvider
+ * Backward compatible to old provider now using only rpc provider
  */
 export class Provider implements ProviderInterface {
-  private provider!: ProviderInterface;
+  private provider!: RpcProvider;
+
+  private responseParser = new RPCResponseParser();
 
   constructor(providerOrOptions?: ProviderOptions | ProviderInterface) {
     if (providerOrOptions instanceof Provider) {
       // providerOrOptions is Provider
       this.provider = providerOrOptions.provider;
-    } else if (
-      providerOrOptions instanceof RpcProvider ||
-      providerOrOptions instanceof SequencerProvider
-    ) {
-      // providerOrOptions is SequencerProvider or RpcProvider
-      this.provider = <ProviderInterface>providerOrOptions;
+    } else if (providerOrOptions instanceof RpcProvider) {
+      // providerOrOptions is RpcProvider
+      this.provider = <RpcProvider>providerOrOptions;
     } else if (providerOrOptions && 'rpc' in providerOrOptions) {
       // providerOrOptions is rpc option
       this.provider = new RpcProvider(<RpcProviderOptions>providerOrOptions.rpc);
-    } else if (providerOrOptions && 'sequencer' in providerOrOptions) {
-      // providerOrOptions is sequencer option
-      this.provider = new SequencerProvider(<SequencerProviderOptions>providerOrOptions.sequencer);
     } else {
-      // providerOrOptions is none, create SequencerProvider as default
+      // providerOrOptions is none, create RpcProvider as default
       this.provider = new RpcProvider();
     }
   }
@@ -70,7 +66,13 @@ export class Provider implements ProviderInterface {
   }
 
   public async getBlock(blockIdentifier: BlockIdentifier): Promise<GetBlockResponse> {
-    return this.provider.getBlock(blockIdentifier);
+    return this.provider
+      .getBlockWithTxHashes(blockIdentifier)
+      .then(this.responseParser.parseGetBlockResponse);
+  }
+
+  public async getClass(classHash: BigNumberish, blockIdentifier?: BlockIdentifier) {
+    return this.provider.getClass(classHash, blockIdentifier);
   }
 
   public async getClassAt(
@@ -96,28 +98,26 @@ export class Provider implements ProviderInterface {
     invocationDetails: InvocationsDetailsWithNonce,
     blockIdentifier: BlockIdentifier
   ): Promise<EstimateFeeResponse> {
-    return this.provider.getEstimateFee(invocationWithTxType, invocationDetails, blockIdentifier);
+    return this.getInvokeEstimateFee(invocationWithTxType, invocationDetails, blockIdentifier);
   }
 
   public async getInvokeEstimateFee(
     invocationWithTxType: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier,
-    skipValidate?: boolean
+    blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponse> {
-    return this.provider.getInvokeEstimateFee(
-      invocationWithTxType,
-      invocationDetails,
-      blockIdentifier,
-      skipValidate
-    );
+    return this.provider
+      .getInvokeEstimateFee(invocationWithTxType, invocationDetails, blockIdentifier)
+      .then(this.responseParser.parseFeeEstimateResponse);
   }
 
   public async getEstimateFeeBulk(
     invocations: AccountInvocations,
     options: getEstimateFeeBulkOptions
   ): Promise<EstimateFeeResponseBulk> {
-    return this.provider.getEstimateFeeBulk(invocations, options);
+    return this.provider
+      .getEstimateFeeBulk(invocations, options)
+      .then(this.responseParser.parseFeeEstimateBulkResponse);
   }
 
   public async getNonceForAddress(
@@ -136,7 +136,9 @@ export class Provider implements ProviderInterface {
   }
 
   public async getTransaction(txHash: BigNumberish): Promise<GetTransactionResponse> {
-    return this.provider.getTransaction(txHash);
+    return this.provider
+      .getTransactionByHash(txHash)
+      .then(this.responseParser.parseGetTransactionResponse);
   }
 
   public async getTransactionReceipt(txHash: BigNumberish): Promise<GetTransactionReceiptResponse> {
@@ -147,7 +149,9 @@ export class Provider implements ProviderInterface {
     request: Call,
     blockIdentifier?: BlockIdentifier
   ): Promise<CallContractResponse> {
-    return this.provider.callContract(request, blockIdentifier);
+    return this.provider
+      .callContract(request, blockIdentifier)
+      .then(this.responseParser.parseCallContractResponse);
   }
 
   public async invokeFunction(
@@ -174,24 +178,21 @@ export class Provider implements ProviderInterface {
   public async getDeclareEstimateFee(
     transaction: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier,
-    skipValidate?: boolean
+    blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponse> {
-    return this.provider.getDeclareEstimateFee(transaction, details, blockIdentifier, skipValidate);
+    return this.provider
+      .getDeclareEstimateFee(transaction, details, blockIdentifier)
+      .then(this.responseParser.parseFeeEstimateResponse);
   }
 
   public getDeployAccountEstimateFee(
     transaction: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier,
-    skipValidate?: boolean
+    blockIdentifier?: BlockIdentifier
   ): Promise<EstimateFeeResponse> {
-    return this.provider.getDeployAccountEstimateFee(
-      transaction,
-      details,
-      blockIdentifier,
-      skipValidate
-    );
+    return this.provider
+      .getDeployAccountEstimateFee(transaction, details, blockIdentifier)
+      .then(this.responseParser.parseFeeEstimateResponse);
   }
 
   public async getCode(
@@ -212,19 +213,21 @@ export class Provider implements ProviderInterface {
     invocations: AccountInvocations,
     options?: getSimulateTransactionOptions
   ): Promise<SimulateTransactionResponse> {
-    return this.provider.getSimulateTransaction(invocations, options);
+    return this.provider
+      .simulateTransaction(invocations, options)
+      .then(this.responseParser.parseSimulateTransactionResponse);
   }
 
   public async getStateUpdate(blockIdentifier?: BlockIdentifier): Promise<StateUpdateResponse> {
-    return this.provider.getStateUpdate(blockIdentifier);
+    return this.provider.getBlockStateUpdate(blockIdentifier);
   }
 
   public async getStarkName(address: BigNumberish, StarknetIdContract?: string): Promise<string> {
-    return getStarkName(this, address, StarknetIdContract);
+    return StarknetId.getStarkName(this, address, StarknetIdContract);
   }
 
   public async getAddressFromStarkName(name: string, StarknetIdContract?: string): Promise<string> {
-    return getAddressFromStarkName(this, name, StarknetIdContract);
+    return StarknetId.getAddressFromStarkName(this, name, StarknetIdContract);
   }
 
   public async getContractVersion(

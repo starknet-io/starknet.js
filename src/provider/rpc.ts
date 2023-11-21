@@ -38,8 +38,6 @@ import { wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { decompressProgram, signatureToHexArray } from '../utils/stark';
 import { LibraryError } from './errors';
-import { ProviderInterface } from './interface';
-import { getAddressFromStarkName, getStarkName } from './starknetId';
 import { Block } from './utils';
 
 export const getDefaultNodeUrl = (networkName?: NetworkName, mute: boolean = false): string => {
@@ -57,7 +55,7 @@ const defaultOptions = {
   retries: 200,
 };
 
-export class RpcProvider implements ProviderInterface {
+export class RpcProvider {
   public nodeUrl: string;
 
   public headers: object;
@@ -137,9 +135,6 @@ export class RpcProvider implements ProviderInterface {
     return this.chainId;
   }
 
-  /**
-   * NEW: Returns the version of the Starknet JSON-RPC specification being used
-   */
   public async getSpecVersion() {
     return this.fetchEndpoint('starknet_specVersion');
   }
@@ -155,20 +150,6 @@ export class RpcProvider implements ProviderInterface {
       block_id,
     });
   }
-
-  /**
-   * @deprecated use getBlockWithTxHashes or getBlockWithTxs (will be removed on sequencer deprecation)
-   */
-  public async getBlock(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
-    return this.getBlockWithTxHashes(blockIdentifier).then(
-      this.responseParser.parseGetBlockResponse
-    );
-  }
-
-  /**
-   * @deprecated renamed to getBlockLatestAccepted(); (will be removed in next minor version)
-   */
-  public getBlockHashAndNumber = this.getBlockLatestAccepted;
 
   /**
    * Get the most recent accepted block hash and number
@@ -201,48 +182,14 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_getStateUpdate', { block_id });
   }
 
-  /**
-   * @deprecated renamed to getBlockStateUpdate();
-   */
-  public getStateUpdate = this.getBlockStateUpdate;
-
   public async getBlockTransactionsTraces(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_traceBlockTransactions', { block_id });
   }
 
-  /**
-   * Returns the execution traces of all transactions included in the given block
-   * @deprecated renamed to getBlockTransactionsTraces()
-   */
-  public traceBlockTransactions = this.getBlockTransactionsTraces;
-
   public async getBlockTransactionCount(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getBlockTransactionCount', { block_id });
-  }
-
-  /**
-   * Get the number of transactions in a block given a block id
-   * @deprecated renamed to getBlockTransactionCount()
-   * @returns Number of transactions
-   */
-  public getTransactionCount = this.getBlockTransactionCount;
-
-  /**
-   * Return transactions from pending block
-   * @deprecated Instead use getBlock(BlockTag.pending); (will be removed in next minor version)
-   */
-  public async getPendingTransactions() {
-    const { transactions } = await this.getBlock(BlockTag.pending);
-    return Promise.all(transactions.map((it) => this.getTransactionByHash(it)));
-  }
-
-  /**
-   * @deprecated use getTransactionByHash or getTransactionByBlockIdAndIndex (will be removed on sequencer deprecation)
-   */
-  public async getTransaction(txHash: BigNumberish) {
-    return this.getTransactionByHash(txHash).then(this.responseParser.parseGetTransactionResponse);
   }
 
   public async getTransactionByHash(txHash: BigNumberish) {
@@ -268,13 +215,7 @@ export class RpcProvider implements ProviderInterface {
   }
 
   /**
-   * @deprecated renamed to getTransactionTrace();
-   * For a given executed transaction, return the trace of its execution, including internal calls
-   */
-  public traceTransaction = this.getTransactionTrace;
-
-  /**
-   * NEW: Get the status of a transaction
+   * Get the status of a transaction
    */
   public async getTransactionStatus(transactionHash: BigNumberish) {
     const transaction_hash = toHex(transactionHash);
@@ -299,7 +240,7 @@ export class RpcProvider implements ProviderInterface {
       blockIdentifier = this.blockIdentifier,
       skipValidate = false,
       skipFeeCharge = true,
-    }: getSimulateTransactionOptions
+    }: getSimulateTransactionOptions = {}
   ) {
     const block_id = new Block(blockIdentifier).identifier;
     const simulationFlags = [];
@@ -310,7 +251,7 @@ export class RpcProvider implements ProviderInterface {
       block_id,
       transactions: invocations.map((it) => this.buildTransaction(it)),
       simulation_flags: simulationFlags,
-    }).then(this.responseParser.parseSimulateTransactionResponse);
+    });
   }
 
   public async waitForTransaction(txHash: BigNumberish, options?: waitForTransactionOptions) {
@@ -515,7 +456,7 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_estimateFee', {
       request: [transaction],
       block_id,
-    }).then(this.responseParser.parseFeeEstimateResponse);
+    });
   }
 
   public async getDeclareEstimateFee(
@@ -535,7 +476,7 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_estimateFee', {
       request: [transaction],
       block_id,
-    }).then(this.responseParser.parseFeeEstimateResponse);
+    });
   }
 
   public async getDeployAccountEstimateFee(
@@ -555,7 +496,7 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_estimateFee', {
       request: [transaction],
       block_id,
-    }).then(this.responseParser.parseFeeEstimateResponse);
+    });
   }
 
   public async getEstimateFeeBulk(
@@ -570,7 +511,7 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_estimateFee', {
       request: invocations.map((it) => this.buildTransaction(it, 'fee')),
       block_id,
-    }).then(this.responseParser.parseFeeEstimateBulkResponse);
+    });
   }
 
   public async invokeFunction(
@@ -650,7 +591,7 @@ export class RpcProvider implements ProviderInterface {
 
   public async callContract(call: Call, blockIdentifier: BlockIdentifier = this.blockIdentifier) {
     const block_id = new Block(blockIdentifier).identifier;
-    const result = await this.fetchEndpoint('starknet_call', {
+    return this.fetchEndpoint('starknet_call', {
       request: {
         contract_address: call.contractAddress,
         entry_point_selector: getSelectorFromName(call.entrypoint),
@@ -658,8 +599,6 @@ export class RpcProvider implements ProviderInterface {
       },
       block_id,
     });
-
-    return this.responseParser.parseCallContractResponse(result);
   }
 
   /**
@@ -699,20 +638,6 @@ export class RpcProvider implements ProviderInterface {
    */
   public async getEvents(eventFilter: RPC.EventFilter) {
     return this.fetchEndpoint('starknet_getEvents', { filter: eventFilter });
-  }
-
-  /**
-   * StarknetId Endpoint (get name from address)
-   */
-  public async getStarkName(address: BigNumberish, StarknetIdContract?: string) {
-    return getStarkName(this, address, StarknetIdContract);
-  }
-
-  /**
-   * StarknetId Endpoint (get address from name)
-   */
-  public async getAddressFromStarkName(name: string, StarknetIdContract?: string) {
-    return getAddressFromStarkName(this, name, StarknetIdContract);
   }
 
   public buildTransaction(
