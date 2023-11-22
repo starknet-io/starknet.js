@@ -170,3 +170,29 @@ const getResponse = await myAccount.call(
 ```
 
 You provide the low-level numbers expected by Starknet, without any parsing or checking. See more details [here](define_call_message.md#parse-configuration).
+
+## Transaction response
+
+You can interpret the transaction response to check if it succeeded or not.
+
+```typescript
+const result = await account.execute(myCall);
+const txReceipt = await provider.waitForTransaction(result.transaction_hash);
+const txR = transactionResponse(txReceipt);
+console.log(txR.match({
+    Success: () => "success!",
+    _: () => "unsuccess"
+}));
+
+console.log(txR.content);
+console.log(txR.status);
+console.log(txR.isSuccess());
+console.log(txR.isRejected());
+
+txR.match({
+    Success: (txR: SuccessfulTransactionReceiptResponse) => { console.log("Success =", txR) },
+    Rejected: (txR: RejectedTransactionReceiptResponse) => { console.log("Rejected =", txR) },
+    Reverted: (txR: RevertedTransactionReceiptResponse) => { console.log("Reverted =", txR) },
+    Error: (err: Error) => { console.log("An error occured =", err) },
+});
+```

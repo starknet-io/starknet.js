@@ -45,6 +45,8 @@ export const compiledC1v2 = readContractSierra('cairo/helloCairo2/compiled');
 export const compiledC1v2Casm = readContractSierraCasm('cairo/helloCairo2/compiled');
 export const compiledC210 = readContractSierra('cairo/cairo210/cairo210.sierra');
 export const compiledC210Casm = readContractSierraCasm('cairo/cairo210/cairo210');
+export const compiledTestRejectSierra = readContractSierra('cairo/testReject/test_reject.sierra');
+export const compiledTestRejectCasm = readContractSierraCasm('cairo/testReject/test_reject');
 
 export const getTestProvider = (): ProviderInterface => {
   const provider = process.env.TEST_RPC_URL
