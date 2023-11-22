@@ -5,7 +5,6 @@
  * ref: order of execution jestGlobalSetup.ts -> jest.setup.ts -> fixtures.ts
  */
 
-import { getDefaultNodeUrl } from '../src';
 import { BaseUrl } from '../src/constants';
 
 type DevnetStrategy = {
@@ -156,10 +155,11 @@ const verifySetup = (final?: boolean) => {
     if (final) throw new Error('TEST_ACCOUNT_PRIVATE_KEY env is not provided');
     else warnings.push('TEST_ACCOUNT_PRIVATE_KEY env is not provided!');
   }
-  if (!process.env.TEST_RPC_URL) {
-    process.env.TEST_RPC_URL = getDefaultNodeUrl();
-    console.warn('TEST_RPC_URL env is not provided');
-  }
+  // TODO: revise after Sequencer removal
+  // if (!process.env.TEST_RPC_URL) {
+  //   process.env.TEST_RPC_URL = getDefaultNodeUrl();
+  //   console.warn('TEST_RPC_URL env is not provided');
+  // }
 
   if (warnings.length > 0) {
     console.log('\x1b[33m', warnings.join('\n'), '\x1b[0m');
