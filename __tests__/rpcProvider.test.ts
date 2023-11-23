@@ -31,7 +31,7 @@ describeIfRpc('RPCProvider', () => {
   });
 
   test('getChainId', async () => {
-    const fetchSpy = jest.spyOn(rpcProvider as any, 'fetchEndpoint');
+    const fetchSpy = jest.spyOn(rpcProvider.channel as any, 'fetchEndpoint');
     (rpcProvider as any).chainId = undefined as unknown as StarknetChainId;
     const chainId1 = await rpcProvider.getChainId();
     const chainId2 = await rpcProvider.getChainId();

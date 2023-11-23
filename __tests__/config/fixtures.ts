@@ -12,17 +12,17 @@ import { toHex } from '../../src/utils/num';
 
 const readContract = (name: string): LegacyCompiledContract =>
   json.parse(
-    fs.readFileSync(path.resolve(__dirname, `../__mocks__/${name}.json`)).toString('ascii')
+    fs.readFileSync(path.resolve(__dirname, `../../__mocks__/${name}.json`)).toString('ascii')
   );
 
 const readContractSierraCasm = (name: string): CompiledSierraCasm =>
   json.parse(
-    fs.readFileSync(path.resolve(__dirname, `../__mocks__/${name}.casm`)).toString('ascii')
+    fs.readFileSync(path.resolve(__dirname, `../../__mocks__/${name}.casm`)).toString('ascii')
   );
 
 const readContractSierra = (name: string): CompiledSierra =>
   json.parse(
-    fs.readFileSync(path.resolve(__dirname, `../__mocks__/${name}.json`)).toString('ascii')
+    fs.readFileSync(path.resolve(__dirname, `../../__mocks__/${name}.json`)).toString('ascii')
   );
 
 export const compiledOpenZeppelinAccount = readContract('Account');

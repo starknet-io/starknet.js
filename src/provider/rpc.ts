@@ -29,8 +29,8 @@ export class RpcProvider implements ProviderInterface {
 
   public channel: RpcChannel;
 
-  constructor(optionsOrProvider?: RpcProviderOptions | ProviderInterface) {
-    if (optionsOrProvider instanceof ProviderInterface) {
+  constructor(optionsOrProvider?: RpcProviderOptions | ProviderInterface | RpcProvider) {
+    if (optionsOrProvider && 'channel' in optionsOrProvider) {
       this.channel = optionsOrProvider.channel;
     } else {
       this.channel = new RpcChannel({ ...optionsOrProvider, waitMode: false });
