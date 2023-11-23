@@ -238,7 +238,6 @@ export type getContractVersionOptions = {
 
 export type getEstimateFeeBulkOptions = {
   blockIdentifier?: BlockIdentifier;
-  skipValidate?: boolean;
 };
 
 export interface CallStruct {

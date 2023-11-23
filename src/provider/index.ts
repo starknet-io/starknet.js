@@ -1,8 +1,8 @@
-import { Provider } from './default';
+import { RpcProvider } from './rpc';
 
-export * from './default';
+export { RpcProvider as Provider } from './extensions/default'; // backward-compatibility
 export * from './errors';
 export * from './interface';
 export * from './extensions/default';
 
-export const defaultProvider = new Provider({ rpc: { default: true } });
+export const defaultProvider = new RpcProvider({ default: true });

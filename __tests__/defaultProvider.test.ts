@@ -1,4 +1,12 @@
-import { BlockNumber, CallData, GetBlockResponse, LibraryError, Provider, stark } from '../src';
+import {
+  BlockNumber,
+  CallData,
+  GetBlockResponse,
+  LibraryError,
+  Provider,
+  provider,
+  stark,
+} from '../src';
 import { toBigInt } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import {
@@ -73,14 +81,32 @@ describe('defaultProvider', () => {
 
       test(`getStateUpdate(blockHash=${exampleBlockHash}, blockNumber=undefined)`, async () => {
         const stateUpdate = await testProvider.getStateUpdate(exampleBlockHash);
-        expect(stateUpdate.block_hash).toBe(exampleBlockHash);
-        expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
+        provider.defStateUpdate(
+          stateUpdate,
+          (state) => {
+            expect(state.block_hash).toBe(exampleBlockHash);
+            expect(state).toMatchSchemaRef('StateUpdateResponse');
+          },
+          (pending) => {
+            fail('exampleBlockHash is latest block, should not be pending');
+            expect(pending).toMatchSchemaRef('PendingStateUpdateResponse');
+          }
+        );
       });
 
       test(`getStateUpdate(blockHash=undefined, blockNumber=${exampleBlockNumber})`, async () => {
         const stateUpdate = await testProvider.getStateUpdate(exampleBlockNumber);
-        expect(stateUpdate.block_hash).toBe(exampleBlockHash);
-        expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
+        provider.defStateUpdate(
+          stateUpdate,
+          (state) => {
+            expect(state.block_hash).toBe(exampleBlockHash);
+            expect(state).toMatchSchemaRef('StateUpdateResponse');
+          },
+          (pending) => {
+            fail('exampleBlockHash is latest block, should not be pending');
+            expect(pending).toMatchSchemaRef('PendingStateUpdateResponse');
+          }
+        );
       });
     });
 

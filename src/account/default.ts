@@ -1,6 +1,5 @@
 import { UDC, ZERO } from '../constants';
-import { ProviderInterface } from '../provider';
-import { Provider } from '../provider/default';
+import { Provider, ProviderInterface } from '../provider';
 import { Signer, SignerInterface } from '../signer';
 import {
   Abi,
@@ -725,7 +724,7 @@ export class Account extends Provider implements AccountInterface {
     ) as Promise<AccountInvocations>;
   }
 
-  public override async getStarkName(
+  public async getStarkName(
     address: BigNumberish = this.address, // default to the wallet address
     StarknetIdContract?: string
   ): Promise<string> {

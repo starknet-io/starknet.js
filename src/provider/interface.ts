@@ -1,3 +1,4 @@
+import { RpcChannel } from '../channel/rpc';
 import { StarknetChainId } from '../constants';
 import type {
   AccountInvocations,
@@ -32,6 +33,8 @@ import type {
 } from '../types';
 
 export abstract class ProviderInterface {
+  public abstract channel: RpcChannel;
+
   /**
    * Gets the Starknet chain Id
    *
@@ -212,8 +215,7 @@ export abstract class ProviderInterface {
   public abstract getEstimateFee(
     invocation: Invocation,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier,
-    skipValidate?: boolean
+    blockIdentifier: BlockIdentifier
   ): Promise<EstimateFeeResponse>;
 
   /**
@@ -289,7 +291,6 @@ export abstract class ProviderInterface {
    * @param invocations AccountInvocations - Complete invocations array with account details
    * @param options getEstimateFeeBulkOptions
    * - (optional) blockIdentifier - BlockIdentifier
-   * - (optional) skipValidate - boolean (default false)
    * @returns the estimated fee
    */
   public abstract getEstimateFeeBulk(

@@ -4,6 +4,24 @@ import { getStarknetIdContract, useDecoded, useEncoded } from '../../utils/stark
 import type { ProviderInterface } from '..';
 
 export class StarknetId {
+  async getStarkName(address: BigNumberish, StarknetIdContract?: string) {
+    return StarknetId.getStarkName(
+      // After Mixin, this is ProviderInterface
+      (<unknown>this) as ProviderInterface,
+      address,
+      StarknetIdContract
+    );
+  }
+
+  public async getAddressFromStarkName(name: string, StarknetIdContract?: string): Promise<string> {
+    return StarknetId.getAddressFromStarkName(
+      // After Mixin, this is ProviderInterface
+      (<unknown>this) as ProviderInterface,
+      name,
+      StarknetIdContract
+    );
+  }
+
   static async getStarkName(
     provider: ProviderInterface,
     address: BigNumberish,

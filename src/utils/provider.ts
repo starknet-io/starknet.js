@@ -8,6 +8,7 @@ import {
   CompiledSierra,
   ContractClass,
   LegacyContractClass,
+  RPC,
   SequencerIdentifier,
   SierraContractClass,
 } from '../types';
@@ -164,4 +165,15 @@ export class Block {
       ? { blockHash: this.hash as string }
       : { blockNumber: (this.number ?? this.tag) as BlockNumber };
   }
+}
+
+export function defStateUpdate(
+  state: RPC.SPEC.STATE_UPDATE | RPC.SPEC.PENDING_STATE_UPDATE,
+  accepted: (state: RPC.SPEC.STATE_UPDATE) => unknown,
+  pending: (state: RPC.SPEC.PENDING_STATE_UPDATE) => unknown
+) {
+  if ('block_hash' in state) {
+    return accepted(state);
+  }
+  return pending(state);
 }
