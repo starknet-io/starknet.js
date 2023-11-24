@@ -2,8 +2,7 @@ import {
   HEX_STR_TRANSACTION_VERSION_1,
   HEX_STR_TRANSACTION_VERSION_2,
   NetworkName,
-  RPC_GOERLI_NODES,
-  RPC_MAINNET_NODES,
+  RPC_NODES,
   StarknetChainId,
 } from '../constants';
 import {
@@ -46,7 +45,7 @@ export const getDefaultNodeUrl = (networkName?: NetworkName, mute: boolean = fal
   if (!mute)
     // eslint-disable-next-line no-console
     console.warn('Using default public node url, please provide nodeUrl in provider options!');
-  const nodes = networkName === NetworkName.SN_MAIN ? RPC_MAINNET_NODES : RPC_GOERLI_NODES;
+  const nodes = networkName ? RPC_NODES[networkName] : RPC_NODES[NetworkName.SN_GOERLI];
   const randIdx = Math.floor(Math.random() * nodes.length);
   return nodes[randIdx];
 };
