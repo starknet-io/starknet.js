@@ -1,2 +1,2 @@
 export * as JRPC from './jsonrpc';
-export * from './rpcspec';
+export * from './rpcspec_0_5';

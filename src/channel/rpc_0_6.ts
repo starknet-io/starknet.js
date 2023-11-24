@@ -51,6 +51,8 @@ export class RpcChannel {
 
   readonly waitMode: Boolean; // behave like web2 rpc and return when tx is processed
 
+  readonly rpcSpec = '0_6';
+
   constructor(optionsOrProvider?: RpcProviderOptions) {
     const { nodeUrl, retries, headers, blockIdentifier, chainId, waitMode } =
       optionsOrProvider || {};

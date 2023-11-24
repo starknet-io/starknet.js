@@ -1,4 +1,4 @@
-import { RpcChannel } from '../channel/rpc';
+import { RpcChannel } from '../channel/rpc_0_5';
 import {
   AccountInvocations,
   BigNumberish,
