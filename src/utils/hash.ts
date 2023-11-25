@@ -6,8 +6,10 @@ import {
   API_VERSION,
   BN_FEE_TRANSACTION_VERSION_1,
   BN_FEE_TRANSACTION_VERSION_2,
+  BN_FEE_TRANSACTION_VERSION_3,
   BN_TRANSACTION_VERSION_1,
   BN_TRANSACTION_VERSION_2,
+  BN_TRANSACTION_VERSION_3,
   StarknetChainId,
   TransactionHashPrefix,
 } from '../constants';
@@ -37,16 +39,18 @@ export * from './selector'; // Preserve legacy export structure
 
 export const transactionVersion = BN_TRANSACTION_VERSION_1;
 export const transactionVersion_2 = BN_TRANSACTION_VERSION_2;
+export const transactionVersion_3 = BN_TRANSACTION_VERSION_3;
 export const feeTransactionVersion = BN_FEE_TRANSACTION_VERSION_1;
 export const feeTransactionVersion_2 = BN_FEE_TRANSACTION_VERSION_2;
+export const feeTransactionVersion_3 = BN_FEE_TRANSACTION_VERSION_3;
 
 /**
  * Return transaction versions based on version type, default version type is 'transaction'
  */
 export function getVersionsByType(versionType?: 'fee' | 'transaction') {
   return versionType === 'fee'
-    ? { v1: feeTransactionVersion, v2: feeTransactionVersion_2 }
-    : { v1: transactionVersion, v2: transactionVersion_2 };
+    ? { v1: feeTransactionVersion, v2: feeTransactionVersion_2, v3: feeTransactionVersion_3 }
+    : { v1: transactionVersion, v2: transactionVersion_2, v3: transactionVersion_3 };
 }
 
 /**

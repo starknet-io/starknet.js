@@ -320,7 +320,6 @@ export type DEPLOY_ACCOUNT_TXN_V1 = {
 
 export type DEPLOY_ACCOUNT_TXN_V3 = {
   type: 'DEPLOY_ACCOUNT';
-  max_fee: FELT;
   version: '0x3' | '0x100000000000000000000000000000003';
   signature: SIGNATURE;
   nonce: FELT;

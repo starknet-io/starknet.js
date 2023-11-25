@@ -5,6 +5,7 @@ export * from './account';
 export * from './contract';
 export * from './provider';
 export * from './signer';
+export * from './channel';
 
 // TODO: decide on final export style
 export * from './types';

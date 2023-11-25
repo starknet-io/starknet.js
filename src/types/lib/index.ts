@@ -1,5 +1,6 @@
 import { StarknetChainId } from '../../constants';
 import { weierstrass } from '../../utils/ec';
+import { V0_6 } from '../api/rpc';
 import { CairoEnum } from '../cairoEnum';
 import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 
@@ -114,6 +115,17 @@ export type InvocationsDetails = {
   version?: BigNumberish;
 };
 
+export type V3InvocationDetails = {
+  nonce: BigNumberish;
+  version: BigNumberish;
+  resourceBounds: V0_6.SPEC.RESOURCE_BOUNDS_MAPPING;
+  tip: BigNumberish;
+  paymasterData: BigNumberish[];
+  accountDeploymentData: BigNumberish[];
+  nonceDataAvailabilityMode: V0_6.SPEC.DA_MODE;
+  feeDataAvailabilityMode: V0_6.SPEC.DA_MODE;
+};
+
 /**
  * Contain all additional details params
  */
@@ -124,9 +136,11 @@ export type Details = {
   chainId: StarknetChainId;
 };
 
-export type InvocationsDetailsWithNonce = InvocationsDetails & {
-  nonce: BigNumberish;
-};
+export type InvocationsDetailsWithNonce =
+  | (InvocationsDetails & {
+      nonce: BigNumberish;
+    })
+  | V3InvocationDetails;
 
 export enum TransactionType {
   DECLARE = 'DECLARE',

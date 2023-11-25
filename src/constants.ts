@@ -7,10 +7,13 @@ export const TEXT_TO_FELT_MAX_LEN = 31;
 
 export const HEX_STR_TRANSACTION_VERSION_1 = '0x1';
 export const HEX_STR_TRANSACTION_VERSION_2 = '0x2';
+export const HEX_STR_TRANSACTION_VERSION_3 = '0x3';
 export const BN_TRANSACTION_VERSION_1 = 1n;
 export const BN_TRANSACTION_VERSION_2 = 2n;
+export const BN_TRANSACTION_VERSION_3 = 3n;
 export const BN_FEE_TRANSACTION_VERSION_1 = 2n ** 128n + BN_TRANSACTION_VERSION_1;
 export const BN_FEE_TRANSACTION_VERSION_2 = 2n ** 128n + BN_TRANSACTION_VERSION_2;
+export const BN_FEE_TRANSACTION_VERSION_3 = 2n ** 128n + BN_TRANSACTION_VERSION_3;
 
 export const ZERO = 0n;
 export const MASK_250 = 2n ** 250n - 1n; // 2 ** 250 - 1

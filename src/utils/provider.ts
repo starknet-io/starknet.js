@@ -7,10 +7,12 @@ import {
   CompiledContract,
   CompiledSierra,
   ContractClass,
+  InvocationsDetailsWithNonce,
   LegacyContractClass,
   RPC,
   SequencerIdentifier,
   SierraContractClass,
+  V3InvocationDetails,
 } from '../types';
 import { isSierra } from './contract';
 import { formatSpaces } from './hash';
@@ -176,4 +178,9 @@ export function defStateUpdate(
     return accepted(state);
   }
   return pending(state);
+}
+
+export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3InvocationDetails {
+  const version = details.version ? toHex(details.version) : '0x3';
+  return version === '0x3' || version === '0x100000000000000000000000000000003';
 }
