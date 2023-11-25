@@ -487,9 +487,9 @@ export class RpcChannel {
     { classHash, constructorCalldata, addressSalt, signature }: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce
   ) {
-    const version = details.version ? toHex(details.version) : '0x3';
     let promise;
     if (!isV3Tx(details)) {
+      // v1
       promise = this.fetchEndpoint('starknet_addDeployAccountTransaction', {
         deploy_account_transaction: {
           constructor_calldata: CallData.toHex(constructorCalldata || []),
@@ -497,16 +497,17 @@ export class RpcChannel {
           contract_address_salt: toHex(addressSalt || 0),
           type: RPC.V0_6.ETransactionType.DEPLOY_ACCOUNT,
           max_fee: toHex(details.maxFee || 0),
-          version: version as RPC.V0_6.SPEC.DEPLOY_ACCOUNT_TXN_V1['version'], // todo: rethink
+          version: HEX_STR_TRANSACTION_VERSION_1,
           signature: signatureToHexArray(signature),
           nonce: toHex(details.nonce),
         },
       });
     } else {
+      // v3
       promise = this.fetchEndpoint('starknet_addDeployAccountTransaction', {
         deploy_account_transaction: {
           type: RPC.V0_6.ETransactionType.DEPLOY_ACCOUNT,
-          version: version as RPC.V0_6.SPEC.DEPLOY_ACCOUNT_TXN_V3['version'], // todo: rethink
+          version: HEX_STR_TRANSACTION_VERSION_3,
           signature: signatureToHexArray(signature),
           nonce: toHex(details.nonce),
           contract_address_salt: toHex(addressSalt || 0),
