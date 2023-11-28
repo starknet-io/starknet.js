@@ -554,15 +554,19 @@ export type TYPED_PARAMETER = {
   type: string;
 };
 
+export type SIMULATION_FLAG_FOR_ESTIMATE_FEE = 'SKIP_VALIDATE';
+export type PRICE_UNIT = 'WEI' | 'FRI';
+
 export type FEE_ESTIMATE = {
   gas_consumed: FELT;
   gas_price: FELT;
   overall_fee: FELT;
+  unit: PRICE_UNIT;
 };
 
 export type FEE_PAYMENT = {
   amount: FELT;
-  unit: 'WEI' | 'STRK';
+  unit: PRICE_UNIT;
 };
 
 export type RESOURCE_BOUNDS_MAPPING = {
@@ -576,7 +580,7 @@ export type RESOURCE_BOUNDS = {
 };
 
 export type RESOURCE_PRICE = {
-  price_in_strk?: FELT;
+  price_in_fri: FELT;
   price_in_wei: FELT;
 };
 

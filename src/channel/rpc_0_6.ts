@@ -33,6 +33,22 @@ import { getHexStringArray, toHex, toStorageKey } from '../utils/num';
 import { Block, getDefaultNodeUrl, isV3Tx, wait } from '../utils/provider';
 import { decompressProgram, signatureToHexArray } from '../utils/stark';
 
+/* function detailsToV3DefaultDetails(details: InvocationsDetailsWithNonce) {
+  if (!isV3Tx(details)) throw Error('detailsToV3Details: Transaction is not V3');
+
+  return {
+    ...details,
+    resource_bounds: details.resourceBounds,
+    tip: toHex(details.tip || 0),
+    paymaster_data: details.paymasterData ? details.paymasterData.map((it) => toHex(it)) : [],
+    account_deployment_data: details.accountDeploymentData
+      ? details.accountDeploymentData.map((it) => toHex(it))
+      : [],
+    nonce_data_availability_mode: details.nonceDataAvailabilityMode || 'L1',
+    fee_data_availability_mode: details.feeDataAvailabilityMode || 'L1',
+  };
+} */
+
 const defaultOptions = {
   headers: { 'Content-Type': 'application/json' },
   blockIdentifier: BlockTag.pending,
@@ -364,12 +380,13 @@ export class RpcChannel {
 
   public getEstimateFee(
     invocations: AccountInvocations,
-    { blockIdentifier = this.blockIdentifier }: getEstimateFeeBulkOptions
+    { blockIdentifier = this.blockIdentifier, skipValidate = false }: getEstimateFeeBulkOptions
   ) {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_estimateFee', {
       request: invocations.map((it) => this.buildTransaction(it, 'fee')),
       block_id,
+      ...(skipValidate && { simulation_flags: [RPC.V0_6.ESimulationFlag.SKIP_VALIDATE] }),
     });
   }
 

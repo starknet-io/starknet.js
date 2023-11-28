@@ -115,7 +115,7 @@ export type InvocationsDetails = {
   version?: BigNumberish;
 };
 
-export type V3InvocationDetails = {
+export type V3TransactionDetails = {
   nonce: BigNumberish;
   version: BigNumberish;
   resourceBounds: V0_6.SPEC.RESOURCE_BOUNDS_MAPPING;
@@ -140,7 +140,7 @@ export type InvocationsDetailsWithNonce =
   | (InvocationsDetails & {
       nonce: BigNumberish;
     })
-  | V3InvocationDetails;
+  | V3TransactionDetails;
 
 export enum TransactionType {
   DECLARE = 'DECLARE',
@@ -252,6 +252,7 @@ export type getContractVersionOptions = {
 
 export type getEstimateFeeBulkOptions = {
   blockIdentifier?: BlockIdentifier;
+  skipValidate?: boolean;
 };
 
 export interface CallStruct {

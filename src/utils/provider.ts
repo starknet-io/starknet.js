@@ -1,4 +1,10 @@
-import { NetworkName, RPC_GOERLI_NODES, RPC_MAINNET_NODES } from '../constants';
+import {
+  BN_FEE_TRANSACTION_VERSION_3,
+  HEX_STR_TRANSACTION_VERSION_3,
+  NetworkName,
+  RPC_GOERLI_NODES,
+  RPC_MAINNET_NODES,
+} from '../constants';
 import {
   BigNumberish,
   BlockIdentifier,
@@ -12,7 +18,7 @@ import {
   RPC,
   SequencerIdentifier,
   SierraContractClass,
-  V3InvocationDetails,
+  V3TransactionDetails,
 } from '../types';
 import { isSierra } from './contract';
 import { formatSpaces } from './hash';
@@ -180,7 +186,9 @@ export function defStateUpdate(
   return pending(state);
 }
 
-export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3InvocationDetails {
-  const version = details.version ? toHex(details.version) : '0x3';
-  return version === '0x3' || version === '0x100000000000000000000000000000003';
+export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3TransactionDetails {
+  const version = details.version ? toHex(details.version) : HEX_STR_TRANSACTION_VERSION_3;
+  return (
+    version === HEX_STR_TRANSACTION_VERSION_3 || version === toHex(BN_FEE_TRANSACTION_VERSION_3)
+  );
 }

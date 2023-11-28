@@ -215,7 +215,8 @@ export abstract class ProviderInterface {
   public abstract getEstimateFee(
     invocation: Invocation,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ): Promise<EstimateFeeResponse>;
 
   /**
