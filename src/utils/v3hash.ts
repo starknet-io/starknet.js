@@ -64,7 +64,7 @@ export function calculateTransactionHashCommon(
 }
 
 /**
- * Calculate deploy_account transaction hash
+ * Calculate v3 deploy_account transaction hash
  * @returns format: hex-string
  */
 export function calculateDeployAccountTransactionHash(
@@ -75,7 +75,7 @@ export function calculateDeployAccountTransactionHash(
   version: BigNumberish,
   chainId: StarknetChainId,
   nonce: BigNumberish,
-  nonceDataAvailabilityMode: EDAMode, // need to be 0 or 1
+  nonceDataAvailabilityMode: EDAMode,
   feeDataAvailabilityMode: EDAMode,
   resourceBounds: ResourceBounds,
   tip: BigNumberish,
@@ -97,9 +97,7 @@ export function calculateDeployAccountTransactionHash(
 }
 
 /**
- * Calculate declare transaction hash
- * @param classHash hex-string
- * @param compiledClassHash hex-string
+ * Calculate v3 declare transaction hash
  * @returns format: hex-string
  */
 export function calculateDeclareTransactionHash(
@@ -110,7 +108,7 @@ export function calculateDeclareTransactionHash(
   chainId: StarknetChainId,
   nonce: BigNumberish,
   accountDeploymentData: BigNumberish[],
-  nonceDataAvailabilityMode: EDAMode, // need to be 0 or 1
+  nonceDataAvailabilityMode: EDAMode,
   feeDataAvailabilityMode: EDAMode,
   resourceBounds: ResourceBounds,
   tip: BigNumberish,
@@ -132,7 +130,7 @@ export function calculateDeclareTransactionHash(
 }
 
 /**
- * Calculate invoke transaction hash
+ * Calculate v3 invoke transaction hash
  * @returns format: hex-string
  */
 export function calculateInvokeTransactionHash(
@@ -142,7 +140,7 @@ export function calculateInvokeTransactionHash(
   chainId: StarknetChainId,
   nonce: BigNumberish,
   accountDeploymentData: BigNumberish[],
-  nonceDataAvailabilityMode: EDAMode, // need to be 0 or 1
+  nonceDataAvailabilityMode: EDAMode,
   feeDataAvailabilityMode: EDAMode,
   resourceBounds: ResourceBounds,
   tip: BigNumberish,
