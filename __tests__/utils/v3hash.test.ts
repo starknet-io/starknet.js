@@ -1,6 +1,7 @@
 import { types, v3hash } from '../../src';
 import { StarknetChainId } from '../../src/constants';
 import { ResourceBounds } from '../../src/types/api/rpcspec_0_6';
+import { encodeShortString } from '../../src/utils/shortString';
 
 describe('TxV3 Hash Test', () => {
   test('DaMode', () => {
@@ -34,12 +35,12 @@ describe('TxV3 Hash Test', () => {
     );
   });
 
-  xtest('calculateInvokeTransactionHash Demo', () => {
+  test('calculateInvokeTransactionHash Demo', () => {
     const result = v3hash.calculateInvokeTransactionHash(
       '0x12fd538',
       '0x3',
-      ['0x21b', '0x151'],
-      '0x1' as StarknetChainId,
+      ['0x11', '0x26'],
+      encodeShortString('1') as StarknetChainId,
       '0x9',
       [],
       types.RPC.EDAMode.L1,
@@ -93,14 +94,14 @@ describe('TxV3 Hash Test', () => {
     expect(result).toBe('0x41906f1c314cca5f43170ea75d3b1904196a10101190d2b12a41cc61cfd17c');
   });
 
-  xtest('calculateDeployAccountTransactionHash Demo', () => {
+  test('calculateDeployAccountTransactionHash Demo', () => {
     const result = v3hash.calculateDeployAccountTransactionHash(
       '0x219bea54dc352c0d6853de34019644758620fa6298c4608829228c3f5f8db33',
       '0x65bcf29c898ff912fa2bdd4c6cd94b9142da0399127601ef35dfc9babc7a691',
       ['0x21b', '0x151'],
       '0x12fd537',
       '0x3',
-      '0x2' as StarknetChainId,
+      encodeShortString('2') as StarknetChainId,
       '0x0',
       types.RPC.EDAMode.L1,
       types.RPC.EDAMode.L1,
@@ -137,13 +138,13 @@ describe('TxV3 Hash Test', () => {
     expect(result).toBe('0x29fd7881f14380842414cdfdd8d6c0b1f2174f8916edcfeb1ede1eb26ac3ef0');
   });
 
-  xtest('calculateDeclareTransactionHash Demo', () => {
+  test('calculateDeclareTransactionHash Demo', () => {
     const result = v3hash.calculateDeclareTransactionHash(
       '0x7d6b55b53dc0b621bb7e2b501340e4a88f7c448b513c9882d1be7ffac42ba3',
       '0x7b',
       '0x12fd538',
       '0x3',
-      '0x3' as StarknetChainId,
+      encodeShortString('3') as StarknetChainId,
       '0x0',
       ['0x0'],
       types.RPC.EDAMode.L1,
