@@ -17,6 +17,7 @@ export * as types from './types';
 export * as constants from './constants';
 export * as encode from './utils/encode';
 export * as hash from './utils/hash';
+export * as v3hash from './utils/v3hash';
 export * as json from './utils/json';
 export * as num from './utils/num';
 export * as transaction from './utils/transaction';

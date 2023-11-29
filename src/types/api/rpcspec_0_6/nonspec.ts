@@ -23,6 +23,7 @@ import {
   PENDING_STATE_UPDATE,
   PENDING_TXN_RECEIPT,
   REPLACED_CLASS,
+  RESOURCE_BOUNDS_MAPPING,
   RESULT_PAGE_REQUEST,
   SIMULATION_FLAG,
   STATE_UPDATE,
@@ -86,6 +87,7 @@ export type TransactionStatus = {
   finality_status: TXN_STATUS;
   execution_status?: TXN_EXECUTION_STATUS;
 };
+export type ResourceBounds = RESOURCE_BOUNDS_MAPPING;
 
 // Diff Than Seq
 export type StorageDiffs = Array<CONTRACT_STORAGE_DIFF_ITEM>;
@@ -131,4 +133,9 @@ export enum EBlockTag {
 export enum EDataAvailabilityMode {
   L1 = 'L1',
   L2 = 'L2',
+}
+
+export enum EDAMode {
+  L1,
+  L2,
 }
