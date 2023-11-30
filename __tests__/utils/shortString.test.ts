@@ -1,5 +1,5 @@
 import { removeHexPrefix } from '../../src/utils/encode';
-import { decodeShortString, encodeShortString } from '../../src/utils/shortString';
+import { decodeShortString, encodeShortString, splitLongString } from '../../src/utils/shortString';
 
 describe('shortString', () => {
   test('should convert string to number', () => {
@@ -43,5 +43,18 @@ describe('shortString', () => {
   test('explicitly test removeHexPrefix', () => {
     expect(removeHexPrefix('0x01')).toBe('01');
     expect(removeHexPrefix('0X01')).toBe('01');
+  });
+});
+
+describe('splitLongString', () => {
+  it('should split a long string into an array of substrings', () => {
+    const string = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
+    const result = splitLongString(string);
+    expect(result).toEqual(['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'a']);
+  });
+
+  it('should return an empty array for an empty string', () => {
+    const result = splitLongString('');
+    expect(result).toEqual([]);
   });
 });
