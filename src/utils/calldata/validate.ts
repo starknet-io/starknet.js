@@ -142,7 +142,7 @@ const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) =>
   if (input.type === 'core::starknet::eth_address::EthAddress') {
     assert(
       typeof parameter !== 'object',
-      `EthAdress type is waiting a BigNumberish. Got ${parameter}`
+      `EthAddress type is waiting a BigNumberish. Got ${parameter}`
     );
     const param = BigInt(parameter.toString(10));
     assert(
