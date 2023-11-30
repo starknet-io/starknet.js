@@ -48,12 +48,14 @@ export const UDC = {
   ENTRYPOINT: 'deployContract',
 };
 
+export const RPC_DEFAULT_VERSION = 'v0_5';
+
 export const RPC_GOERLI_NODES = [
-  'https://starknet-testnet.public.blastapi.io/rpc/v0.5',
-  'https://limited-rpc.nethermind.io/goerli-juno/v0_5',
+  `https://starknet-testnet.public.blastapi.io/rpc/${RPC_DEFAULT_VERSION}`,
+  `https://free-rpc.nethermind.io/goerli-juno/${RPC_DEFAULT_VERSION}`,
 ];
 
 export const RPC_MAINNET_NODES = [
-  'https://starknet-mainnet.public.blastapi.io/rpc/v0.5',
-  'https://limited-rpc.nethermind.io/mainnet-juno/v0_5',
+  `https://starknet-mainnet.public.blastapi.io/rpc/${RPC_DEFAULT_VERSION}`,
+  `https://free-rpc.nethermind.io/mainnet-juno/${RPC_DEFAULT_VERSION}`,
 ];
