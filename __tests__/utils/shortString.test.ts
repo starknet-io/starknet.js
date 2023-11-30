@@ -1,5 +1,6 @@
 import { removeHexPrefix } from '../../src/utils/encode';
 import { decodeShortString, encodeShortString, splitLongString } from '../../src/utils/shortString';
+import { TEXT_TO_FELT_MAX_LEN } from '../../src/constants';
 
 describe('shortString', () => {
   test('should convert string to number', () => {
@@ -51,6 +52,17 @@ describe('splitLongString', () => {
     const string = 'aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa';
     const result = splitLongString(string);
     expect(result).toEqual(['aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa', 'a']);
+  });
+
+  it('should split a long string into an array of substrings with max length', () => {
+    const longStr = 'This is a long string that needs to be split into smaller parts.';
+    const result = splitLongString(longStr);
+    expect(result).toEqual([
+      'This is a long string that need',
+      's to be split into smaller part',
+      's.',
+    ]);
+    expect(result[0].length).toBe(TEXT_TO_FELT_MAX_LEN);
   });
 
   it('should return an empty array for an empty string', () => {
