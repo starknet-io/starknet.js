@@ -58,7 +58,7 @@ console.log("Result (boolean) =", result1);
 Read the Public Key of the account:
 
 ```typescript
-const provider = new Provider({ sequencer: { baseUrl: "http://127.0.0.1:5050" } }); //devnet
+const provider = new RpcProvider({ nodeUrl: "http://127.0.0.1:5050/rpc" }); //devnet
 const compiledAccount = json.parse(fs.readFileSync("./compiled_contracts/Account_0_5_1.json").toString("ascii"));
 const accountAddress ="0x...."; // account of sender
 const contractAccount = new Contract(compiledAccount.abi, accountAddress, provider);
@@ -78,7 +78,7 @@ console.log("Result (boolean)=", isFullPubKeyRelatedToAccount);
 The sender can provide an account address, despite a full public key.
 
 ```typescript
-const provider = new Provider({ sequencer: { baseUrl: "http://127.0.0.1:5050" } }); //devnet
+const provider = new RpcProvider({ nodeUrl: "http://127.0.0.1:5050/rpc" }); //devnet
 const compiledAccount = json.parse(fs.readFileSync("./compiled_contracts/Account_0_5_1.json").toString("ascii"));
 
 const accountAddress ="0x..."; // account of sender

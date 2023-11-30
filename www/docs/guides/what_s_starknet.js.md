@@ -25,7 +25,7 @@ Some important topics that have to be understood:
 
 > Understand what is Starknet and how it works is necessary. Then, you can learn how to interact with it using Starknet.js. So, at this stage, you should be aware of the content of the [Starknet official doc](https://docs.starknet.io/documentation/) and [the Starknet Book](https://book.starknet.io/).
 
-- Only the `Provider` object is talking directly to the network - your DAPP will talk mainly to `Account` and `Contract` objects. You will define with the `Provider` with which network you want to work. You can ask the Provider for some low-level data of the network (block, timestamp, ...).
+- Only the `RpcProvider` object is talking directly to the network - your DAPP will talk mainly to `Account` and `Contract` objects. You will define with the `RpcProvider` with which network you want to work. You can ask the provider for some low-level data of the network (block, timestamp, ...).
 - `Signer` and `Utils` objects contain many useful functions for interaction with Starknet.js.
 - The `Contract` object is mainly used to read the memory of a blockchain contract.
 - The `Account` object is the most useful:

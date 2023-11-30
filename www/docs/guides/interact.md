@@ -26,17 +26,17 @@ This contract contains a storage variable called `balance`.
 - Balance can be modified with the `@external function: increase_balance(amount1: felt, amount2: felt)`
 
 ```typescript
-import { Provider, Contract, Account, ec, json } from "starknet";
+import { RpcProvider, Contract, Account, ec, json } from "starknet";
 ```
 
 ## 🔍 Read from contract memory, with meta-class
 
-To read the balance, you need to connect a Provider and a Contract.  
+To read the balance, you need to connect a RpcProvider and a Contract.  
 You have to call Starknet, with the use of the meta-class method: `contract.function_name(params)` (here `params` is not necessary, because there are no parameters for the `get_balance` function).
 
 ```typescript
-//initialize Provider
-const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } });
+//initialize provider
+const provider = new RpcProvider({ nodeUrl: "https://limited-rpc.nethermind.io/goerli-juno" });
 // Connect the deployed Test contract in Testnet
 const testAddress = "0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd";
 
@@ -62,8 +62,8 @@ You have to invoke Starknet, with the use of the meta-class method: `contract.fu
 Here is an example of how to increase and check the balance:
 
 ```typescript
-//initialize Provider
-const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } });
+//initialize provider
+const provider = new RpcProvider({ nodeUrl: "https://starknet-testnet.public.blastapi.io/rpc/v0.5" });
 // connect your account. To adapt to your own account:
 const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
 const account0Address = "0x123....789";

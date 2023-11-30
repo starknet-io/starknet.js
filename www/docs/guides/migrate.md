@@ -149,17 +149,17 @@ Returned values from a Cairo 0 contract are identical, but returned values from 
 
 ## Provider
 
-Constants for `Provider` initialization have been updated:
+Constants for `Provider` initialization have been updated. Only `RpcProvider` is now authorized:
 
 ```typescript
 // v4
 const providerTestnet = new Provider({ sequencer: { network: "goerli-alpha" } });
 
 // v5
- const providerTestnet = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } }); // or SN_MAIN
+ const providerTestnet = new RpcProvider({ nodeUrl: "https://limited-rpc.nethermind.io/goerli-juno" });
 ```
 
-`Provider.chainId()` has been removed, `Provider.getChainId()` should be used.
+`Provider.chainId()` has been removed, `RpcProvider.getChainId()` should be used.
 
 ```typescript
 // v4

@@ -24,14 +24,14 @@ Here, we will create a wallet with the Open Zeppelin smart contract v0.5.1. The 
 This contract is coded in Cairo 0, so it will not survive the upcoming re-genesis of Starknet.
 
 ```typescript
-import { Account, constants, ec, json, stark, Provider, hash, CallData } from "starknet";
+import { Account, constants, ec, json, stark, RpcProvider, hash, CallData } from "starknet";
 ```
 
 ### compute address
 
 ```typescript
 // connect provider
-const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } });
+const provider = new RpcProvider({ nodeUrl: "https://limited-rpc.nethermind.io/goerli-juno" });
 
 // new Open Zeppelin account v0.5.1
 // Generate public and private key pair.
@@ -85,14 +85,6 @@ await provider.waitForTransaction(transaction_hash);
 console.log('✅ New OpenZeppelin account created.\n   address =', contract_address);
 ```
 
-> **IMPORTANT:** If this account is based on a Cairo v2 contract (for example OpenZeppelin account 0.7.0 or later), do not forget to add the parameter "1" after the privateKey parameter:
-
-```typescript
-const OZaccount = new Account(provider, OZcontractAddress, privateKey, "1");
-```
-
-> Take care that this added parameter is a string, NOT a number.
-
 ## Create an Argent account
 
 > Level: medium.
@@ -102,14 +94,14 @@ Here, we will create a wallet with the Argent smart contract v0.2.3. This case i
 > If necessary OZ contracts can also be created with a proxy.
 
 ```typescript
-import { Account, ec, json, stark, Provider, hash, CallData } from "starknet";
+import { Account, ec, json, stark, RpcProvider, hash, CallData } from "starknet";
 ```
 
 ### compute address
 
 ```typescript
 // connect provider
-const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } });
+const provider = new RpcProvider({ nodeUrl: "https://json-rpc.starknet-testnet.public.lavanet.xyz" });
 
 //new Argent X account v0.2.3
 const argentXproxyClassHash = "0x25ec026985a3bf9d0cc1fe17326b245dfdc3ff89b8fde106542a3ea56c5a918";
@@ -172,7 +164,7 @@ starknet-devnet --seed 0 --fork-network alpha-goerli
 Initialization:
 
 ```typescript
-import { Provider, Account, num, stark } from "starknet";
+import { RpcProvider, Account, num, stark } from "starknet";
 import { calculateAddressBraavos,
     deployBraavosAccount,
     estimateBraavosAccountDeployFee
@@ -195,8 +187,8 @@ const privateKeyBraavos = "0x02e8....e12";
 ### Compute address
 
 ```typescript
-// initialize Provider
-const providerDevnet = new Provider({ sequencer: { baseUrl: "http://127.0.0.1:5050" } });
+// initialize provider
+const providerDevnet = new RpcProvider({ baseUrl: "http://127.0.0.1:5050/rpc" });
 // address
 const BraavosProxyAddress = calculateAddressBraavos(privateKeyBraavos);
 console.log('Calculated account address=', BraavosProxyAddress);
@@ -259,14 +251,14 @@ Here is an example of a customized wallet, including super administrator managem
 > launch `starknet-devnet --seed 0` before using this script
 
 ```typescript
-import { Account, ec, json, stark, Provider, hash, CallData } from "starknet";
+import { Account, ec, json, stark, RpcProvider, hash, CallData } from "starknet";
 import fs from "fs";
 import axios from "axios";
 ```
 
 ```typescript
 // connect provider
-const provider = new Provider({ sequencer: { network: "http://127.0.0.1:5050" } });
+const provider = new RpcProvider({ network: "http://127.0.0.1:5050/rpc" });
 
 // initialize existing predeployed account 0 of Devnet
 const privateKey0 = "0xe3e70682c2094cac629f6fbed82c07cd";
