@@ -232,21 +232,11 @@ function nullSkipReplacer(key: string, value: any) {
  * @returns format: json-string
  */
 export function formatSpaces(json: string) {
-  let insideQuotes = false;
-  const newString = [];
-  // eslint-disable-next-line no-restricted-syntax
-  for (const char of json) {
-    if (char === '"' && (newString.length > 0 && newString.slice(-1)[0] === '\\') === false) {
-      insideQuotes = !insideQuotes;
-    }
-    if (insideQuotes) {
-      newString.push(char);
-    } else {
-      // eslint-disable-next-line no-nested-ternary
-      newString.push(char === ':' ? ': ' : char === ',' ? ', ' : char);
-    }
-  }
-  return newString.join('');
+  return json.replace(/(["{[\]},])/g, match => {
+    if (match === ':') return ': ';
+    if (match === ',') return ', ';
+    return match;
+  });
 }
 
 /**
