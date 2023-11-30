@@ -26,9 +26,9 @@ jobs:
     # TODO - periodically check if conditional services are supported; https://github.com/actions/runner/issues/822
     services:
       devnet:
-        image: ${{ inputs.use-rpc-devnet && 'shardlabs/starknet-devnet-rs:638a11adc96d443d03b04fc0d5c13c8a1e3bfc5b-amd-seed0' || inputs.use-seq-devnet && 'shardlabs/starknet-devnet:0.6.3-seed0' || '' }}
+        image: ${{ inputs.use-rpc-devnet && 'shardlabs/starknet-devnet-rs:d04cbd73800793bcaf09e708a937a5df08987d98-amd-seed0' || inputs.use-seq-devnet && 'shardlabs/starknet-devnet:0.6.3-seed0' || '' }}
         # image: ${{ (inputs.use-rpc-devnet || inputs.use-seq-devnet) && 'shardlabs/starknet-devnet:0.6.3-seed0' || '' }}
-        # image: shardlabs/starknet-devnet-rs:638a11adc96d443d03b04fc0d5c13c8a1e3bfc5b-amd-seed0
+        # image: shardlabs/starknet-devnet-rs:d04cbd73800793bcaf09e708a937a5df08987d98-amd-seed0
         ports:
           - 5050:5050
 
