@@ -1,4 +1,4 @@
-import { atobUniversal, btoaUniversal } from '../../src/utils/encode';
+import { atobUniversal, btoaUniversal, sanitizeHex } from '../../src/utils/encode';
 
 describe('atobUniversal and btoaUniversal functions', () => {
   test('atobUniversal should decode base64 string to Uint8Array', () => {
@@ -30,5 +30,19 @@ describe('atobUniversal and btoaUniversal functions', () => {
     expect(encoded).toBe('');
     const decoded = atobUniversal(encoded);
     expect(decoded).toEqual(new Uint8Array([]));
+  });
+});
+
+describe('sanitizeHex', () => {
+  it('should return hex string without hex prefix', () => {
+    const hexString = '1111';
+    const result = sanitizeHex(hexString);
+    expect(result).toBe('0x1111');
+  });
+
+  it('should handle empty hex-string', () => {
+    const hexString = '';
+    const result = sanitizeHex(hexString);
+    expect(result).toBe('');
   });
 });
