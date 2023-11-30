@@ -45,4 +45,10 @@ describe('sanitizeHex', () => {
     const result = sanitizeHex(hexString);
     expect(result).toBe('');
   });
+
+  it('should handle hex-string with insufficient bytes', () => {
+    const hexString = '1';
+    const result = sanitizeHex(hexString);
+    expect(result).toBe('0x01');
+  });
 });
