@@ -40,15 +40,21 @@ describe('sanitizeHex', () => {
     expect(result).toBe('0x1111');
   });
 
-  it('should handle empty hex-string', () => {
-    const hexString = '';
+  it('should handle hex-string hex-string with hex prefix', () => {
+    const hexString = '0x11';
     const result = sanitizeHex(hexString);
-    expect(result).toBe('');
+    expect(result).toBe('0x11');
   });
 
   it('should handle hex-string with insufficient bytes', () => {
     const hexString = '1';
     const result = sanitizeHex(hexString);
     expect(result).toBe('0x01');
+  });
+
+  it('should handle empty hex-string', () => {
+    const hexString = '';
+    const result = sanitizeHex(hexString);
+    expect(result).toBe('');
   });
 });
