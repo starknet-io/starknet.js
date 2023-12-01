@@ -122,7 +122,7 @@ In this example, if you want to read the events recorded in the last 10 blocks, 
 
 ```typescript
 import { RpcProvider } from "starknet";
-const provider = new RpcProvider({ nodeUrl: 'https://starknet-goerli.infura.io/v3/' + infuraKey }); // for an Infura node on Testnet
+const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 const lastBlock = await provider.getBlock('latest');
 const keyFilter = [num.toHex(hash.starknetKeccak("EventPanic")), "0x8"]
 const eventsList = await provider.getEvents({

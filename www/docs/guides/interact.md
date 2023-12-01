@@ -36,7 +36,7 @@ You have to call Starknet, with the use of the meta-class method: `contract.func
 
 ```typescript
 //initialize provider
-const provider = new RpcProvider({ nodeUrl: "https://limited-rpc.nethermind.io/goerli-juno" });
+const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 // Connect the deployed Test contract in Testnet
 const testAddress = "0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd";
 
@@ -63,7 +63,7 @@ Here is an example of how to increase and check the balance:
 
 ```typescript
 //initialize provider
-const provider = new RpcProvider({ nodeUrl: "https://starknet-testnet.public.blastapi.io/rpc/v0.5" });
+const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 // connect your account. To adapt to your own account:
 const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
 const account0Address = "0x123....789";

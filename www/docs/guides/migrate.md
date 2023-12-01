@@ -156,7 +156,7 @@ Constants for `Provider` initialization have been updated. Only `RpcProvider` is
 const providerTestnet = new Provider({ sequencer: { network: "goerli-alpha" } });
 
 // v5
- const providerTestnet = new RpcProvider({ nodeUrl: "https://limited-rpc.nethermind.io/goerli-juno" });
+ const providerTestnet = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 ```
 
 `Provider.chainId()` has been removed, `RpcProvider.getChainId()` should be used.

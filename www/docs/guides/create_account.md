@@ -31,7 +31,7 @@ import { Account, constants, ec, json, stark, RpcProvider, hash, CallData } from
 
 ```typescript
 // connect provider
-const provider = new RpcProvider({ nodeUrl: "https://limited-rpc.nethermind.io/goerli-juno" });
+const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 
 // new Open Zeppelin account v0.5.1
 // Generate public and private key pair.
@@ -101,7 +101,7 @@ import { Account, ec, json, stark, RpcProvider, hash, CallData } from "starknet"
 
 ```typescript
 // connect provider
-const provider = new RpcProvider({ nodeUrl: "https://json-rpc.starknet-testnet.public.lavanet.xyz" });
+const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 
 //new Argent X account v0.2.3
 const argentXproxyClassHash = "0x25ec026985a3bf9d0cc1fe17326b245dfdc3ff89b8fde106542a3ea56c5a918";
@@ -188,7 +188,7 @@ const privateKeyBraavos = "0x02e8....e12";
 
 ```typescript
 // initialize provider
-const providerDevnet = new RpcProvider({ baseUrl: "http://127.0.0.1:5050/rpc" });
+const providerDevnet = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 // address
 const BraavosProxyAddress = calculateAddressBraavos(privateKeyBraavos);
 console.log('Calculated account address=', BraavosProxyAddress);

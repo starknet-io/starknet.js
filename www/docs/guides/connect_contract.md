@@ -40,7 +40,7 @@ const compiledContract = json.parse(fs.readFileSync("./compiledContracts/test.js
 
 ```typescript
 // initialize provider
-const provider = new RpcProvider({ nodeUrl: "https://limited-rpc.nethermind.io/goerli-juno" });
+const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 
 // initialize deployed contract
 const testAddress = "0x7667469b8e93faa642573078b6bf8c790d3a6184b2a1bb39c5c923a732862e1";
