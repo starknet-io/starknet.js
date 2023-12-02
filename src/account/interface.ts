@@ -261,7 +261,7 @@ export abstract class AccountInterface extends ProviderInterface {
   ): Promise<DeployContractResponse>;
 
   /**
-   * Sign an JSON object for off-chain usage with the starknet private key and return the signature
+   * Signs a JSON object for off-chain usage with the Starknet private key and returns the signature
    * This adds a message prefix so it can't be interchanged with transactions
    *
    * @param json - JSON object to be signed
@@ -322,7 +322,7 @@ export abstract class AccountInterface extends ProviderInterface {
   ): Promise<bigint>;
 
   /**
-   * Simulates an array of transaction and returns an array of transaction trace and estimated fee.
+   * Simulates an array of transactions and returns an array of transaction trace and estimated fee.
    *
    * @param invocations Invocations containing:
    * - type - transaction type: DECLARE, (multi)DEPLOY, DEPLOY_ACCOUNT, (multi)INVOKE_FUNCTION

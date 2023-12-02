@@ -370,7 +370,7 @@ export class SequencerProvider implements ProviderInterface {
     } else if (classHash) {
       contractClass = await this.getClassByHash(classHash, blockIdentifier);
     } else {
-      throw Error('getContractVersion require contractAddress or classHash');
+      throw Error('getContractVersion requires contractAddress or classHash');
     }
 
     if (isSierra(contractClass)) {
