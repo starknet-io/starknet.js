@@ -29,7 +29,7 @@ export class CairoCustomEnum {
   constructor(enumContent: CairoEnumRaw) {
     const variantsList = Object.values(enumContent);
     if (variantsList.length === 0) {
-      throw new Error('This Enum must have a least 1 variant');
+      throw new Error('This Enum must have at least 1 variant');
     }
     const nbActiveVariants = variantsList.filter(
       (content) => typeof content !== 'undefined'
