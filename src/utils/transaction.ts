@@ -1,4 +1,12 @@
 import {
+  BN_FEE_TRANSACTION_VERSION_1,
+  BN_FEE_TRANSACTION_VERSION_2,
+  BN_FEE_TRANSACTION_VERSION_3,
+  BN_TRANSACTION_VERSION_1,
+  BN_TRANSACTION_VERSION_2,
+  BN_TRANSACTION_VERSION_3,
+} from '../constants';
+import {
   BigNumberish,
   CairoVersion,
   Call,
@@ -92,3 +100,16 @@ export const getExecuteCalldata = (calls: Call[], cairoVersion: CairoVersion = '
   }
   return fromCallsToExecuteCalldata(calls);
 };
+
+/**
+ * Return transaction versions based on version type, default version type is 'transaction'
+ */
+export function getVersionsByType(versionType?: 'fee' | 'transaction') {
+  return versionType === 'fee'
+    ? {
+        v1: BN_FEE_TRANSACTION_VERSION_1,
+        v2: BN_FEE_TRANSACTION_VERSION_2,
+        v3: BN_FEE_TRANSACTION_VERSION_3,
+      }
+    : { v1: BN_TRANSACTION_VERSION_1, v2: BN_TRANSACTION_VERSION_2, v3: BN_TRANSACTION_VERSION_3 };
+}

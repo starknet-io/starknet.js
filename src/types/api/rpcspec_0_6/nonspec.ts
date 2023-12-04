@@ -130,12 +130,39 @@ export enum EBlockTag {
   PENDING = 'pending',
 }
 
+// 'L1' | 'L2'
 export enum EDataAvailabilityMode {
   L1 = 'L1',
   L2 = 'L2',
 }
 
+// 0 | 1
 export enum EDAMode {
   L1,
   L2,
+}
+
+export enum ETransactionVersion {
+  V0 = '0x0',
+  V1 = '0x1',
+  V2 = '0x2',
+  V3 = '0x3',
+  F0 = '0x100000000000000000000000000000000',
+  F1 = '0x100000000000000000000000000000001',
+  F2 = '0x100000000000000000000000000000002',
+  F3 = '0x100000000000000000000000000000003',
+}
+
+export enum ETransactionVersion2 {
+  V0 = '0x0',
+  V1 = '0x1',
+  V2 = '0x2',
+  F0 = '0x100000000000000000000000000000000',
+  F1 = '0x100000000000000000000000000000001',
+  F2 = '0x100000000000000000000000000000002',
+}
+
+export enum ETransactionVersion3 {
+  V3 = '0x3',
+  F3 = '0x100000000000000000000000000000003',
 }

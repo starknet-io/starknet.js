@@ -1,6 +1,6 @@
 import { StarknetChainId } from '../../constants';
 import { weierstrass } from '../../utils/ec';
-import { V0_6 } from '../api/rpc';
+import { EDataAvailabilityMode, ResourceBounds } from '../api/rpc';
 import { CairoEnum } from '../cairoEnum';
 import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 
@@ -14,7 +14,7 @@ export type BigNumberish = string | number | bigint;
  * Compiled calldata ready to be sent
  * decimal-string array
  */
-export type Calldata = string[] & { readonly __compiled__?: boolean };
+export type Calldata = string[] & { readonly __compiled__?: true };
 
 /**
  * Represents an integer in the range [0, 2^256)
@@ -118,12 +118,12 @@ export type InvocationsDetails = {
 export type V3TransactionDetails = {
   nonce: BigNumberish;
   version: BigNumberish;
-  resourceBounds: V0_6.SPEC.RESOURCE_BOUNDS_MAPPING;
+  resourceBounds: ResourceBounds;
   tip: BigNumberish;
   paymasterData: BigNumberish[];
   accountDeploymentData: BigNumberish[];
-  nonceDataAvailabilityMode: V0_6.SPEC.DA_MODE;
-  feeDataAvailabilityMode: V0_6.SPEC.DA_MODE;
+  nonceDataAvailabilityMode: EDataAvailabilityMode;
+  feeDataAvailabilityMode: EDataAvailabilityMode;
 };
 
 /**

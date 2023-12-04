@@ -1,18 +1,10 @@
-/* eslint-disable no-param-reassign */
-/* eslint-disable import/extensions */
+/**
+ * Class Hash
+ */
+
 import { poseidonHashMany } from '@scure/starknet';
 
-import {
-  API_VERSION,
-  BN_FEE_TRANSACTION_VERSION_1,
-  BN_FEE_TRANSACTION_VERSION_2,
-  BN_FEE_TRANSACTION_VERSION_3,
-  BN_TRANSACTION_VERSION_1,
-  BN_TRANSACTION_VERSION_2,
-  BN_TRANSACTION_VERSION_3,
-  StarknetChainId,
-  TransactionHashPrefix,
-} from '../constants';
+import { API_VERSION } from '../../constants';
 import {
   BigNumberish,
   Builtins,
@@ -22,36 +14,15 @@ import {
   ContractEntryPointFields,
   LegacyCompiledContract,
   RawArgs,
-  RawCalldata,
   SierraContractEntryPointFields,
-} from '../types';
-import { CallData } from './calldata';
-import { felt } from './calldata/cairo';
-import { starkCurve } from './ec';
-import { addHexPrefix, utf8ToArray } from './encode';
-import { parse, stringify } from './json';
-import { toBigInt, toHex } from './num';
-import { getSelectorFromName } from './selector';
-import { encodeShortString } from './shortString';
-
-export * as poseidon from '@noble/curves/abstract/poseidon';
-export * from './selector'; // Preserve legacy export structure
-
-export const transactionVersion = BN_TRANSACTION_VERSION_1;
-export const transactionVersion_2 = BN_TRANSACTION_VERSION_2;
-export const transactionVersion_3 = BN_TRANSACTION_VERSION_3;
-export const feeTransactionVersion = BN_FEE_TRANSACTION_VERSION_1;
-export const feeTransactionVersion_2 = BN_FEE_TRANSACTION_VERSION_2;
-export const feeTransactionVersion_3 = BN_FEE_TRANSACTION_VERSION_3;
-
-/**
- * Return transaction versions based on version type, default version type is 'transaction'
- */
-export function getVersionsByType(versionType?: 'fee' | 'transaction') {
-  return versionType === 'fee'
-    ? { v1: feeTransactionVersion, v2: feeTransactionVersion_2, v3: feeTransactionVersion_3 }
-    : { v1: transactionVersion, v2: transactionVersion_2, v3: transactionVersion_3 };
-}
+} from '../../types';
+import { CallData } from '../calldata';
+import { felt } from '../calldata/cairo';
+import { starkCurve } from '../ec';
+import { addHexPrefix, utf8ToArray } from '../encode';
+import { parse, stringify } from '../json';
+import { toBigInt, toHex } from '../num';
+import { encodeShortString } from '../shortString';
 
 /**
  * Compute pedersen hash from data
@@ -61,137 +32,6 @@ export function computeHashOnElements(data: BigNumberish[]): string {
   return [...data, data.length]
     .reduce((x: BigNumberish, y: BigNumberish) => starkCurve.pedersen(toBigInt(x), toBigInt(y)), 0)
     .toString();
-}
-
-/**
- * Calculate transaction pedersen hash for common properties
- *
- * Following implementation is based on this python [implementation #](https://github.com/starkware-libs/cairo-lang/blob/b614d1867c64f3fb2cf4a4879348cfcf87c3a5a7/src/starkware/starknet/core/os/transaction_hash/transaction_hash.py)
- * @returns format: hex-string
- */
-export function calculateTransactionHashCommon(
-  txHashPrefix: TransactionHashPrefix,
-  version: BigNumberish,
-  contractAddress: BigNumberish,
-  entryPointSelector: BigNumberish,
-  calldata: RawCalldata,
-  maxFee: BigNumberish,
-  chainId: StarknetChainId,
-  additionalData: BigNumberish[] = []
-): string {
-  const calldataHash = computeHashOnElements(calldata);
-  const dataToHash = [
-    txHashPrefix,
-    version,
-    contractAddress,
-    entryPointSelector,
-    calldataHash,
-    maxFee,
-    chainId,
-    ...additionalData,
-  ];
-  return computeHashOnElements(dataToHash);
-}
-
-/**
- * Calculate deploy transaction hash
- * @returns format: hex-string
- */
-export function calculateDeployTransactionHash(
-  contractAddress: BigNumberish,
-  constructorCalldata: RawCalldata,
-  version: BigNumberish,
-  chainId: StarknetChainId,
-  constructorName: string = 'constructor'
-): string {
-  return calculateTransactionHashCommon(
-    TransactionHashPrefix.DEPLOY,
-    version,
-    contractAddress,
-    getSelectorFromName(constructorName),
-    constructorCalldata,
-    0,
-    chainId
-  );
-}
-
-/**
- * Calculate declare transaction hash
- * @param classHash hex-string
- * @param compiledClassHash hex-string
- * @returns format: hex-string
- */
-export function calculateDeclareTransactionHash(
-  classHash: string,
-  senderAddress: BigNumberish,
-  version: BigNumberish,
-  maxFee: BigNumberish,
-  chainId: StarknetChainId,
-  nonce: BigNumberish,
-  compiledClassHash?: string
-): string {
-  return calculateTransactionHashCommon(
-    TransactionHashPrefix.DECLARE,
-    version,
-    senderAddress,
-    0,
-    [classHash],
-    maxFee,
-    chainId,
-    [nonce, ...(compiledClassHash ? [compiledClassHash] : [])]
-  );
-}
-
-/**
- * Calculate deploy_account transaction hash
- * @returns format: hex-string
- */
-export function calculateDeployAccountTransactionHash(
-  contractAddress: BigNumberish,
-  classHash: BigNumberish,
-  constructorCalldata: RawCalldata,
-  salt: BigNumberish,
-  version: BigNumberish,
-  maxFee: BigNumberish,
-  chainId: StarknetChainId,
-  nonce: BigNumberish
-) {
-  const calldata = [classHash, salt, ...constructorCalldata];
-
-  return calculateTransactionHashCommon(
-    TransactionHashPrefix.DEPLOY_ACCOUNT,
-    version,
-    contractAddress,
-    0,
-    calldata,
-    maxFee,
-    chainId,
-    [nonce]
-  );
-}
-
-/**
- * Calculate invoke transaction hash
- * @returns format: hex-string
- */
-export function calculateTransactionHash(
-  contractAddress: BigNumberish,
-  version: BigNumberish,
-  calldata: RawCalldata,
-  maxFee: BigNumberish,
-  chainId: StarknetChainId,
-  nonce: BigNumberish
-): string {
-  return calculateTransactionHashCommon(
-    TransactionHashPrefix.INVOKE,
-    version,
-    contractAddress,
-    0,
-    calldata,
-    maxFee,
-    chainId,
-    [nonce]
-  );
 }
 
 /**
@@ -306,7 +146,7 @@ export function computeLegacyContractClassHash(contract: LegacyCompiledContract 
   ]);
 }
 
-// Cairo 1 code
+// Cairo 1 Contract Hashes
 
 function hashBuiltins(builtins: Builtins) {
   return poseidonHashMany(

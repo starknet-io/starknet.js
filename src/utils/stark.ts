@@ -1,13 +1,21 @@
 import { getStarkKey, utils } from '@scure/starknet';
 import { gzip, ungzip } from 'pako';
 
-import { ArraySignatureType, BigNumberish, CompressedProgram, Program, Signature } from '../types';
+import {
+  ArraySignatureType,
+  BigNumberish,
+  CompressedProgram,
+  EstimateFeeResponse,
+  Program,
+  Signature,
+} from '../types';
+import { EDAMode, EDataAvailabilityMode, ResourceBounds } from '../types/api/rpc';
 import { addHexPrefix, arrayBufferToString, atobUniversal, btoaUniversal } from './encode';
 import { parse, stringify } from './json';
 import {
+  addPercent,
   bigNumberishArrayToDecimalStringArray,
   bigNumberishArrayToHexadecimalStringArray,
-  toBigInt,
   toHex,
 } from './num';
 
@@ -86,7 +94,34 @@ export function signatureToHexArray(sig?: Signature): ArraySignatureType {
  * Convert estimated fee to max fee with overhead
  */
 export function estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: number = 0.5): bigint {
-  // BN can only handle Integers, so we need to do all calculations with integers
-  const overHeadPercent = Math.round((1 + overhead) * 100);
-  return (toBigInt(estimatedFee) * toBigInt(overHeadPercent)) / 100n;
+  return addPercent(estimatedFee, overhead * 100);
+}
+
+export function estimateFeeToBounds(
+  estimate: EstimateFeeResponse | 0n,
+  amountOverhead: number = 10,
+  priceOverhead = 50
+): ResourceBounds {
+  if (typeof estimate === 'bigint') {
+    return {
+      l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
+      l1_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
+    };
+  }
+
+  if (typeof estimate.gas_consumed === 'undefined' || typeof estimate.gas_price === 'undefined') {
+    throw Error('estimateFeeToBounds: estimate is undefined');
+  }
+  const maxUnits = toHex(addPercent(estimate.gas_consumed, amountOverhead));
+  const maxUnitPrice = toHex(addPercent(estimate.gas_price, priceOverhead));
+  return {
+    l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
+    l1_gas: { max_amount: maxUnits, max_price_per_unit: maxUnitPrice },
+  };
+}
+
+export function intDAM(dam: EDataAvailabilityMode) {
+  if (dam === EDataAvailabilityMode.L1) return EDAMode.L1;
+  if (dam === EDataAvailabilityMode.L2) return EDAMode.L2;
+  throw Error('EDAM conversion');
 }

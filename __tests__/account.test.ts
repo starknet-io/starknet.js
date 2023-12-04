@@ -6,6 +6,7 @@ import {
   Provider,
   TransactionType,
   cairo,
+  constants,
   contractClassResponseToLegacyCompiledContract,
   ec,
   extractContractHashes,
@@ -94,7 +95,9 @@ describe('deploy and test Wallet', () => {
     });
 
     expect(result).toMatchSchemaRef('EstimateFee');
-    expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(hash.feeTransactionVersion);
+    expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(
+      constants.BN_FEE_TRANSACTION_VERSION_1
+    );
     innerInvokeEstFeeSpy.mockClear();
   });
 

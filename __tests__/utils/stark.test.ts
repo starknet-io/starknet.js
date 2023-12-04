@@ -1,4 +1,4 @@
-import { CallData, RawArgs, json, stark } from '../../src';
+import { CallData, EstimateFeeResponse, RawArgs, json, stark } from '../../src';
 import { toBigInt, toHex } from '../../src/utils/num';
 import { compiledOpenZeppelinAccount } from '../config/fixtures';
 
@@ -63,6 +63,22 @@ describe('stark', () => {
       const compiled = CallData.compile(calldata);
 
       expect(compiled).toEqual(['1', '2', '3', '10000000000', '4', '1', '2', '3', '4']);
+    });
+  });
+
+  test('estimatedFeeToMaxFee', () => {
+    expect(stark.estimatedFeeToMaxFee(100)).toBe(150n);
+  });
+
+  test('estimateFeeToBounds', () => {
+    const estimateFeeResponse: EstimateFeeResponse = {
+      gas_consumed: 100n,
+      gas_price: 10n,
+      overall_fee: 1000n,
+    };
+    expect(stark.estimateFeeToBounds(estimateFeeResponse)).toStrictEqual({
+      l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
+      l1_gas: { max_amount: '0x6e', max_price_per_unit: '0xf' },
     });
   });
 });

@@ -27,11 +27,12 @@ import {
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
-import { getSelector, getSelectorFromName, getVersionsByType } from '../utils/hash';
+import { getSelector, getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
 import { getHexStringArray, toHex, toStorageKey } from '../utils/num';
 import { Block, getDefaultNodeUrl, isV3Tx, wait } from '../utils/provider';
 import { decompressProgram, signatureToHexArray } from '../utils/stark';
+import { getVersionsByType } from '../utils/transaction';
 
 /* function detailsToV3DefaultDetails(details: InvocationsDetailsWithNonce) {
   if (!isV3Tx(details)) throw Error('detailsToV3Details: Transaction is not V3');

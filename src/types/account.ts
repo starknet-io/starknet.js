@@ -1,4 +1,5 @@
-import { BigNumberish, BlockIdentifier } from './lib';
+import { ETransactionVersion } from './api/rpc';
+import { BigNumberish, BlockIdentifier, V3TransactionDetails } from './lib';
 import { DeclareTransactionReceiptResponse, EstimateFeeResponse } from './provider';
 
 export interface EstimateFee extends EstimateFeeResponse {
@@ -7,11 +8,12 @@ export interface EstimateFee extends EstimateFeeResponse {
 
 export type EstimateFeeBulk = Array<EstimateFee>;
 
+// TODO: This is too wide generic with optional params
 export type AccountInvocationsFactoryDetails = {
-  versions: bigint[];
+  versions: Array<`${ETransactionVersion}`>;
   nonce?: BigNumberish;
   blockIdentifier?: BlockIdentifier;
-};
+} & Partial<V3TransactionDetails>;
 
 export interface EstimateFeeDetails {
   nonce?: BigNumberish;

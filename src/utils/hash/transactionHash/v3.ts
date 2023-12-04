@@ -1,10 +1,14 @@
+/**
+ * Calculate Hashes for v3 transactions
+ */
+
 import { poseidonHashMany } from '@scure/starknet';
 
-import { StarknetChainId, TransactionHashPrefix } from '../constants';
-import { BigNumberish, Calldata } from '../types';
-import { EDAMode, ResourceBounds } from '../types/api/rpc';
-import { toHex } from './num';
-import { encodeShortString } from './shortString';
+import { StarknetChainId, TransactionHashPrefix } from '../../../constants';
+import { BigNumberish, Calldata } from '../../../types';
+import { EDAMode, ResourceBounds } from '../../../types/api/rpc';
+import { toHex } from '../../num';
+import { encodeShortString } from '../../shortString';
 
 const AToBI = (array: BigNumberish[]) => array.map((it: BigNumberish) => BigInt(it));
 
@@ -144,7 +148,7 @@ export function calculateInvokeTransactionHash(
   feeDataAvailabilityMode: EDAMode,
   resourceBounds: ResourceBounds,
   tip: BigNumberish,
-  paymasterData: []
+  paymasterData: BigNumberish[]
 ): string {
   return calculateTransactionHashCommon(
     TransactionHashPrefix.INVOKE,
