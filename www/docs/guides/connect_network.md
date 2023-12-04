@@ -38,7 +38,7 @@ const myProvider = new RpcProvider(); // Goerli
 
 Using a specific nodeUrl is the better approach, as such a node will have less limitations and will be less crowded.
 
-Some example of RpcProvider instantiation to connect to RPC node providers:
+Some examples of RpcProvider instantiation to connect to RPC node providers:
 
 ### Mainnet
 
