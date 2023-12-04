@@ -36,7 +36,7 @@ const myProvider = new RpcProvider(); // Goerli
 
 > when using this syntax, a random public node will be selected.
 
-Using a specific nodeUrl is the better approach, as a such node will have less limitations and will be less crowded.
+Using a specific nodeUrl is the better approach, as such a node will have less limitations and will be less crowded.
 
 Some example of RpcProvider instantiation to connect to RPC node providers:
 
