@@ -1,8 +1,17 @@
 import { getStarkKey, utils } from '@scure/starknet';
 
-import { Account, Contract, GetBlockResponse, RpcProvider, stark } from '../src';
+import {
+  Account,
+  CallData,
+  Contract,
+  GetBlockResponse,
+  RPC,
+  RpcProvider,
+  TransactionExecutionStatus,
+  stark,
+  waitForTransactionOptions,
+} from '../src';
 import { StarknetChainId } from '../src/constants';
-import { CallData } from '../src/utils/calldata';
 import { felt, uint256 } from '../src/utils/calldata/cairo';
 import { toHexString } from '../src/utils/num';
 import {
@@ -99,6 +108,66 @@ describeIfRpc('RPCProvider', () => {
           overall_fee: expect.anything(),
         })
       );
+    });
+  });
+
+  describe('waitForTransaction', () => {
+    const receipt = {};
+    const transactionStatusSpy = jest.spyOn(rpcProvider as any, 'getTransactionStatus');
+    const transactionReceiptSpy = jest.spyOn(rpcProvider as any, 'getTransactionReceipt');
+
+    const generateOptions = (o: waitForTransactionOptions) => ({ retryInterval: 10, ...o });
+    const generateTransactionStatus = (
+      finality_status: RPC.SPEC.TXN_STATUS,
+      execution_status?: RPC.SPEC.TXN_EXECUTION_STATUS
+    ): RPC.TransactionStatus => ({
+      finality_status,
+      execution_status,
+    });
+    const response = {
+      successful: generateTransactionStatus('ACCEPTED_ON_L1', 'SUCCEEDED'),
+      reverted: generateTransactionStatus('ACCEPTED_ON_L2', 'REVERTED'),
+      rejected: generateTransactionStatus('REJECTED'),
+    };
+
+    beforeAll(() => {
+      transactionStatusSpy.mockResolvedValue(null);
+      transactionReceiptSpy.mockResolvedValue(receipt);
+    });
+
+    afterAll(() => {
+      transactionStatusSpy.mockRestore();
+      transactionReceiptSpy.mockRestore();
+    });
+
+    test('successful - default', async () => {
+      transactionStatusSpy.mockResolvedValueOnce(response.successful);
+      await expect(rpcProvider.waitForTransaction(0)).resolves.toBe(receipt);
+    });
+
+    test('reverted - default', async () => {
+      transactionStatusSpy.mockResolvedValueOnce(response.reverted);
+      await expect(rpcProvider.waitForTransaction(0)).resolves.toBe(receipt);
+    });
+
+    test('rejected - default', async () => {
+      transactionStatusSpy.mockResolvedValueOnce(response.rejected);
+      await expect(rpcProvider.waitForTransaction(0)).rejects.toThrow(
+        `${undefined}: ${RPC.ETransactionStatus.REJECTED}`
+      );
+    });
+
+    test('reverted - as error state', async () => {
+      transactionStatusSpy.mockResolvedValueOnce(response.reverted);
+      const options = generateOptions({ errorStates: [TransactionExecutionStatus.REVERTED] });
+      await expect(rpcProvider.waitForTransaction(0, options)).rejects.toThrow(
+        `${RPC.ETransactionExecutionStatus.REVERTED}: ${RPC.ETransactionStatus.ACCEPTED_ON_L2}`
+      );
+    });
+
+    test('no error state; timed-out', async () => {
+      const options = generateOptions({ errorStates: [] });
+      await expect(rpcProvider.waitForTransaction(0, options)).rejects.toThrow(/timed-out/);
     });
   });
 

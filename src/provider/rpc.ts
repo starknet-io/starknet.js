@@ -321,7 +321,9 @@ export class RpcProvider implements ProviderInterface {
     const retryInterval = options?.retryInterval ?? 5000;
     const errorStates: any = options?.errorStates ?? [
       RPC.ETransactionStatus.REJECTED,
-      RPC.ETransactionExecutionStatus.REVERTED,
+      // TODO: commented out to preserve the long-standing behavior of "reverted" not being treated as an error by default
+      // should decide which behavior to keep in the future
+      // RPC.ETransactionExecutionStatus.REVERTED,
     ];
     const successStates: any = options?.successStates ?? [
       RPC.ETransactionExecutionStatus.SUCCEEDED,
@@ -347,14 +349,17 @@ export class RpcProvider implements ProviderInterface {
           throw error;
         }
 
-        if (successStates.includes(executionStatus) || successStates.includes(finalityStatus)) {
-          onchain = true;
-        } else if (errorStates.includes(executionStatus) || errorStates.includes(finalityStatus)) {
+        if (errorStates.includes(executionStatus) || errorStates.includes(finalityStatus)) {
           const message = `${executionStatus}: ${finalityStatus}`;
           const error = new Error(message) as Error & { response: RPC.TransactionStatus };
           error.response = txStatus;
           isErrorState = true;
           throw error;
+        } else if (
+          successStates.includes(executionStatus) ||
+          successStates.includes(finalityStatus)
+        ) {
+          onchain = true;
         }
       } catch (error) {
         if (error instanceof Error && isErrorState) {
