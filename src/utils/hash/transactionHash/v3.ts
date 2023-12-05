@@ -6,7 +6,7 @@ import { poseidonHashMany } from '@scure/starknet';
 
 import { StarknetChainId, TransactionHashPrefix } from '../../../constants';
 import { BigNumberish, Calldata } from '../../../types';
-import { EDAMode, ResourceBounds } from '../../../types/api/rpc';
+import { EDAMode, ResourceBounds } from '../../../types/api';
 import { toHex } from '../../num';
 import { encodeShortString } from '../../shortString';
 

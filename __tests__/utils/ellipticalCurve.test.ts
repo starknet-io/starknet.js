@@ -50,7 +50,7 @@ test('hashMessage()', () => {
 
   const hashMsg = calculateTransactionHash(
     account,
-    constants.BN_TRANSACTION_VERSION_1,
+    BigInt(constants.TRANSACTION_VERSION.V1),
     calldata,
     maxFee,
     StarknetChainId.SN_GOERLI,

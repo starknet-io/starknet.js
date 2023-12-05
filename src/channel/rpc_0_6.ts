@@ -1,10 +1,4 @@
-import {
-  HEX_STR_TRANSACTION_VERSION_1,
-  HEX_STR_TRANSACTION_VERSION_2,
-  HEX_STR_TRANSACTION_VERSION_3,
-  NetworkName,
-  StarknetChainId,
-} from '../constants';
+import { NetworkName, StarknetChainId } from '../constants';
 import { LibraryError } from '../provider/errors';
 import {
   AccountInvocationItem,
@@ -24,6 +18,7 @@ import {
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
+import { ETransactionVersion } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
@@ -401,7 +396,7 @@ export class RpcChannel {
           calldata: CallData.toHex(functionInvocation.calldata),
           type: RPC.ETransactionType.INVOKE,
           max_fee: toHex(details.maxFee || 0),
-          version: HEX_STR_TRANSACTION_VERSION_1,
+          version: ETransactionVersion.V1,
           signature: signatureToHexArray(functionInvocation.signature),
           nonce: toHex(details.nonce),
         },
@@ -413,7 +408,7 @@ export class RpcChannel {
           type: RPC.ETransactionType.INVOKE,
           sender_address: functionInvocation.contractAddress,
           calldata: CallData.toHex(functionInvocation.calldata),
-          version: HEX_STR_TRANSACTION_VERSION_3,
+          version: ETransactionVersion.V3,
           signature: signatureToHexArray(functionInvocation.signature),
           nonce: toHex(details.nonce),
           resource_bounds: details.resourceBounds,
@@ -444,7 +439,7 @@ export class RpcChannel {
             entry_points_by_type: contract.entry_points_by_type,
             abi: contract.abi,
           },
-          version: HEX_STR_TRANSACTION_VERSION_1,
+          version: ETransactionVersion.V1,
           max_fee: toHex(details.maxFee || 0),
           signature: signatureToHexArray(signature),
           sender_address: senderAddress,
@@ -463,7 +458,7 @@ export class RpcChannel {
             abi: contract.abi,
           },
           compiled_class_hash: compiledClassHash || '',
-          version: HEX_STR_TRANSACTION_VERSION_2,
+          version: ETransactionVersion.V2,
           max_fee: toHex(details.maxFee || 0),
           signature: signatureToHexArray(signature),
           sender_address: senderAddress,
@@ -477,7 +472,7 @@ export class RpcChannel {
           type: RPC.ETransactionType.DECLARE,
           sender_address: senderAddress,
           compiled_class_hash: compiledClassHash || '',
-          version: HEX_STR_TRANSACTION_VERSION_3,
+          version: ETransactionVersion.V3,
           signature: signatureToHexArray(signature),
           nonce: toHex(details.nonce),
           contract_class: {
@@ -515,7 +510,7 @@ export class RpcChannel {
           contract_address_salt: toHex(addressSalt || 0),
           type: RPC.ETransactionType.DEPLOY_ACCOUNT,
           max_fee: toHex(details.maxFee || 0),
-          version: HEX_STR_TRANSACTION_VERSION_1,
+          version: ETransactionVersion.V1,
           signature: signatureToHexArray(signature),
           nonce: toHex(details.nonce),
         },
@@ -525,7 +520,7 @@ export class RpcChannel {
       promise = this.fetchEndpoint('starknet_addDeployAccountTransaction', {
         deploy_account_transaction: {
           type: RPC.ETransactionType.DEPLOY_ACCOUNT,
-          version: HEX_STR_TRANSACTION_VERSION_3,
+          version: ETransactionVersion.V3,
           signature: signatureToHexArray(signature),
           nonce: toHex(details.nonce),
           contract_address_salt: toHex(addressSalt || 0),

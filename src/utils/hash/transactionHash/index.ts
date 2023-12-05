@@ -10,7 +10,7 @@ import {
   ETransactionVersion2,
   ETransactionVersion3,
   ResourceBounds,
-} from '../../../types/api/rpc';
+} from '../../../types/api';
 import {
   calculateDeclareTransactionHash as v2calculateDeclareTransactionHash,
   calculateDeployAccountTransactionHash as v2calculateDeployAccountTransactionHash,

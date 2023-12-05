@@ -45,7 +45,7 @@ import {
   ETransactionVersion,
   ETransactionVersion2,
   ETransactionVersion3,
-} from '../types/api/rpc';
+} from '../types/api';
 import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { starkCurve } from '../utils/ec';

@@ -1,10 +1,4 @@
-import {
-  BN_FEE_TRANSACTION_VERSION_3,
-  HEX_STR_TRANSACTION_VERSION_3,
-  NetworkName,
-  RPC_GOERLI_NODES,
-  RPC_MAINNET_NODES,
-} from '../constants';
+import { NetworkName, RPC_GOERLI_NODES, RPC_MAINNET_NODES } from '../constants';
 import {
   BigNumberish,
   BlockIdentifier,
@@ -20,6 +14,7 @@ import {
   SierraContractClass,
   V3TransactionDetails,
 } from '../types';
+import { ETransactionVersion } from '../types/api';
 import { isSierra } from './contract';
 import { formatSpaces } from './hash';
 import { parse, stringify } from './json';
@@ -187,8 +182,6 @@ export function defStateUpdate(
 }
 
 export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3TransactionDetails {
-  const version = details.version ? toHex(details.version) : HEX_STR_TRANSACTION_VERSION_3;
-  return (
-    version === HEX_STR_TRANSACTION_VERSION_3 || version === toHex(BN_FEE_TRANSACTION_VERSION_3)
-  );
+  const version = details.version ? toHex(details.version) : ETransactionVersion.V3;
+  return version === ETransactionVersion.V3 || version === ETransactionVersion.F3;
 }

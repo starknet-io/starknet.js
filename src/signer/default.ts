@@ -12,7 +12,7 @@ import {
   V3DeployAccountSignerDetails,
   V3InvocationsSignerDetails,
 } from '../types';
-import { ETransactionVersion2, ETransactionVersion3 } from '../types/api/rpc';
+import { ETransactionVersion2, ETransactionVersion3 } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { starkCurve } from '../utils/ec';
 import { buf2hex } from '../utils/encode';

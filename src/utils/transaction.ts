@@ -1,12 +1,4 @@
 import {
-  BN_FEE_TRANSACTION_VERSION_1,
-  BN_FEE_TRANSACTION_VERSION_2,
-  BN_FEE_TRANSACTION_VERSION_3,
-  BN_TRANSACTION_VERSION_1,
-  BN_TRANSACTION_VERSION_2,
-  BN_TRANSACTION_VERSION_3,
-} from '../constants';
-import {
   BigNumberish,
   CairoVersion,
   Call,
@@ -15,6 +7,7 @@ import {
   ParsedStruct,
   RawArgs,
 } from '../types';
+import { ETransactionVersion } from '../types/api';
 import { CallData } from './calldata';
 import { getSelectorFromName } from './hash';
 import { toBigInt } from './num';
@@ -107,9 +100,9 @@ export const getExecuteCalldata = (calls: Call[], cairoVersion: CairoVersion = '
 export function getVersionsByType(versionType?: 'fee' | 'transaction') {
   return versionType === 'fee'
     ? {
-        v1: BN_FEE_TRANSACTION_VERSION_1,
-        v2: BN_FEE_TRANSACTION_VERSION_2,
-        v3: BN_FEE_TRANSACTION_VERSION_3,
+        v1: ETransactionVersion.F1,
+        v2: ETransactionVersion.F2,
+        v3: ETransactionVersion.F3,
       }
-    : { v1: BN_TRANSACTION_VERSION_1, v2: BN_TRANSACTION_VERSION_2, v3: BN_TRANSACTION_VERSION_3 };
+    : { v1: ETransactionVersion.V1, v2: ETransactionVersion.V2, v3: ETransactionVersion.V3 };
 }

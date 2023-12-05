@@ -9,7 +9,7 @@ import {
   Program,
   Signature,
 } from '../types';
-import { EDAMode, EDataAvailabilityMode, ResourceBounds } from '../types/api/rpc';
+import { EDAMode, EDataAvailabilityMode, ResourceBounds } from '../types/api';
 import { addHexPrefix, arrayBufferToString, atobUniversal, btoaUniversal } from './encode';
 import { parse, stringify } from './json';
 import {

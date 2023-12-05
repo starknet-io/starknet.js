@@ -1,4 +1,4 @@
-import { ETransactionVersion } from './api/rpc';
+import { ETransactionVersion } from './api';
 import { BigNumberish, BlockIdentifier, V3TransactionDetails } from './lib';
 import { DeclareTransactionReceiptResponse, EstimateFeeResponse } from './provider';
 

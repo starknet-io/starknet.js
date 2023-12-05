@@ -1,5 +1,5 @@
 import { StarknetChainId } from '../constants';
-import { ETransactionVersion, ETransactionVersion2, ETransactionVersion3 } from './api/rpc';
+import { ETransactionVersion, ETransactionVersion2, ETransactionVersion3 } from './api';
 import {
   BigNumberish,
   CairoVersion,

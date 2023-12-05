@@ -142,6 +142,10 @@ export enum EDAMode {
   L2,
 }
 
+/**
+ * V_ Transaction versions HexString
+ * F_ Fee Transaction Versions HexString (2 ** 128 + TRANSACTION_VERSION)
+ */
 export enum ETransactionVersion {
   V0 = '0x0',
   V1 = '0x1',
@@ -153,6 +157,9 @@ export enum ETransactionVersion {
   F3 = '0x100000000000000000000000000000003',
 }
 
+/**
+ * Old Transaction Versions
+ */
 export enum ETransactionVersion2 {
   V0 = '0x0',
   V1 = '0x1',
@@ -162,6 +169,9 @@ export enum ETransactionVersion2 {
   F2 = '0x100000000000000000000000000000002',
 }
 
+/**
+ * V3 Transaction Versions
+ */
 export enum ETransactionVersion3 {
   V3 = '0x3',
   F3 = '0x100000000000000000000000000000003',

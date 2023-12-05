@@ -1,6 +1,6 @@
 import { StarknetChainId } from '../../constants';
 import { weierstrass } from '../../utils/ec';
-import { EDataAvailabilityMode, ResourceBounds } from '../api/rpc';
+import { EDataAvailabilityMode, ResourceBounds } from '../api';
 import { CairoEnum } from '../cairoEnum';
 import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 

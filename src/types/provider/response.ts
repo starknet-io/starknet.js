@@ -3,7 +3,7 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 
-import * as RPC from '../api/rpc';
+import * as RPC from '../api';
 import * as Sequencer from '../api/sequencer';
 import {
   AllowArray,
