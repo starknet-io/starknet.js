@@ -118,7 +118,7 @@ Easier to read and process, isn't it?
 
 If you don't have the transaction Hash of the contract execution that created the event, it will be necessary to search inside the blocks of the Starknet blockchain.
 
-In this example, if you want to read the events recorded in the last 10 blocks, you need to use a method available from a RPC node. The class `RpcProvider` is available for this case:
+In this example, if you want to read the events recorded in the last 10 blocks, you need to use a method available from an RPC node. The class `RpcProvider` is available for this case:
 
 ```typescript
 import { RpcProvider } from "starknet";

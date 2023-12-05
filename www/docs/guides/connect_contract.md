@@ -11,7 +11,7 @@ You need 2 pieces of data:
 - the address of the contract
 - the ABI file of the contract (or the compiled/compressed contract file, that includes the abi)
 
-> If you don't have the abi file, the `provider.getClassAt()` and `provider.getClassByHash()` commands will recover the compressed contract file. As these methods generate a significant workload to the sequencer/node, it's recommended to store the result in your computer, to be able to reuse it later without using the provider each time:
+> If you don't have the abi file, the `provider.getClassAt()` and `provider.getClassByHash()` commands will recover the compressed contract file. As these methods generate a significant workload for the sequencer/node, it's recommended to store the result on your computer to be able to reuse it later without using the provider each time:
 
 ```typescript
 import fs from "fs";
