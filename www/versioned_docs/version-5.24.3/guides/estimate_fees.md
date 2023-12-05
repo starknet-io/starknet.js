@@ -43,7 +43,7 @@ To estimate the cost to deploy an account in the network:
 
 ```typescript
 const { suggestedMaxFee: estimatedFee1 } = await account0.estimateAccountDeployFee({
-	classHash: OZaccountClashHass,
+	classHash: OZaccountClashHash,
 	constructorCalldata: OZaccountConstructorCallData,
 	contractAddress: OZcontractAddress
 });
