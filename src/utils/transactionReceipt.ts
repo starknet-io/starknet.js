@@ -35,22 +35,6 @@ export class TransactionReceiptUtility implements TransactionReceiptUtilityInter
 
   public readonly value: TransactionReceiptValue;
 
-  get isSuccess() {
-    return this.status === 'success';
-  }
-
-  get isReverted() {
-    return this.status === 'reverted';
-  }
-
-  get isRejected() {
-    return this.status === 'rejected';
-  }
-
-  get isError() {
-    return this.status === 'error';
-  }
-
   constructor(receipt: GetTransactionReceiptResponse) {
     [this.status, this.value] = TransactionReceiptUtility.isSuccess(receipt)
       ? ['success', receipt]
@@ -66,6 +50,22 @@ export class TransactionReceiptUtility implements TransactionReceiptUtilityInter
       return callbacks[this.status]!(this.value as any);
     }
     return (callbacks as TransactionReceiptCallbacksDefault)._();
+  }
+
+  isSuccess() {
+    return this.status === 'success';
+  }
+
+  isReverted() {
+    return this.status === 'reverted';
+  }
+
+  isRejected() {
+    return this.status === 'rejected';
+  }
+
+  isError() {
+    return this.status === 'error';
   }
 
   static isSuccess(

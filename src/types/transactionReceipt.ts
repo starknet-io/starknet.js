@@ -28,5 +28,5 @@ export type TransactionReceiptUtilityInterface = {
   readonly value: TransactionReceiptValue;
   match(callbacks: TransactionReceiptCallbacks): void;
 } & {
-  [key in `is${Capitalize<TransactionReceiptStatus>}`]: boolean;
+  [key in `is${Capitalize<TransactionReceiptStatus>}`]: () => boolean;
 };

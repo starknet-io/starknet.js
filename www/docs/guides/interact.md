@@ -181,7 +181,7 @@ const txReceipt = await provider.waitForTransaction(result.transaction_hash);
 const txR = evaluateTransactionReceipt(txReceipt);
 
 console.log(txR.status, txR.value);
-console.log(txR.isSuccess, txR.isRejected, txR.isReverted, txR.isError);
+console.log(txR.isSuccess(), txR.isRejected(), txR.isReverted(), txR.isError());
 console.log(TransactionReceiptUtility.isSuccess(txReceipt))
 console.log(TransactionReceiptUtility.isRejected(txReceipt))
 console.log(TransactionReceiptUtility.isReverted(txReceipt))

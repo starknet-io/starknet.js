@@ -38,10 +38,10 @@ describe('Transaction receipt utility', () => {
     const txR = evaluateTransactionReceipt(txReceipt);
     expect(txR.value).toHaveProperty('execution_status', TransactionExecutionStatus.SUCCEEDED);
     expect(txR.status).toBe('success');
-    expect(txR.isSuccess).toBe(true);
-    expect(txR.isRejected).toBe(false);
-    expect(txR.isReverted).toBe(false);
-    expect(txR.isError).toBe(false);
+    expect(txR.isSuccess()).toBe(true);
+    expect(txR.isRejected()).toBe(false);
+    expect(txR.isReverted()).toBe(false);
+    expect(txR.isError()).toBe(false);
     let isSuccess: boolean = false;
     txR.match({
       success: () => {
@@ -61,10 +61,10 @@ describe('Transaction receipt utility', () => {
     const txR = evaluateTransactionReceipt(txReceipt);
     expect(txR.value).toHaveProperty('execution_status', TransactionExecutionStatus.REVERTED);
     expect(txR.status).toBe('reverted');
-    expect(txR.isSuccess).toBe(false);
-    expect(txR.isRejected).toBe(false);
-    expect(txR.isReverted).toBe(true);
-    expect(txR.isError).toBe(false);
+    expect(txR.isSuccess()).toBe(false);
+    expect(txR.isRejected()).toBe(false);
+    expect(txR.isReverted()).toBe(true);
+    expect(txR.isError()).toBe(false);
     let isReverted: boolean = false;
     txR.match({
       reverted: (_resp: RevertedTransactionReceiptResponse) => {
@@ -86,10 +86,10 @@ describe('Transaction receipt utility', () => {
     const txR = evaluateTransactionReceipt(txReceipt);
     expect(txR.value).toHaveProperty('execution_status', TransactionExecutionStatus.SUCCEEDED);
     expect(txR.status).toBe('success');
-    expect(txR.isSuccess).toBe(true);
-    expect(txR.isRejected).toBe(false);
-    expect(txR.isReverted).toBe(false);
-    expect(txR.isError).toBe(false);
+    expect(txR.isSuccess()).toBe(true);
+    expect(txR.isRejected()).toBe(false);
+    expect(txR.isReverted()).toBe(false);
+    expect(txR.isError()).toBe(false);
     let isSuccess: boolean = false;
     txR.match({
       success: (_resp: SuccessfulTransactionReceiptResponse) => {
