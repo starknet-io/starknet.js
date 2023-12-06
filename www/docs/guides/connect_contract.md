@@ -11,10 +11,11 @@ You need 2 pieces of data:
 - the address of the contract
 - the ABI file of the contract (or the compiled/compressed contract file, that includes the abi)
 
-> If you don't have the abi file, the `provider.getClassAt()` and `provider.getClassByHash()` commands will recover the compressed contract file. As these methods generate a significant workload to the sequencer/node, it's recommended to store the result in your computer, to be able to reuse it later without using the provider:
+> If you don't have the abi file, the `provider.getClassAt()` and `provider.getClassByHash()` commands will recover the compressed contract file. As these methods generate a significant workload for the sequencer/node, it's recommended to store the result on your computer to be able to reuse it later without using the provider each time:
 
 ```typescript
 import fs from "fs";
+
 const compressedContract = await provider.getClassAt(addrContract);
 fs.writeFileSync('./myAbi.json', json.stringify( compressedContract.abi, undefined, 2));
 ```
@@ -24,7 +25,7 @@ fs.writeFileSync('./myAbi.json', json.stringify( compressedContract.abi, undefin
 ## Get the abi from a compiled/compressed file
 
 ```typescript
-import { Provider, Contract, json } from "starknet";
+import { RpcProvider, Contract, json } from "starknet";
 ```
 
 If you have the compiled/compressed file of the contract, use this code to recover all data, including the ABI:
@@ -39,7 +40,7 @@ const compiledContract = json.parse(fs.readFileSync("./compiledContracts/test.js
 
 ```typescript
 // initialize provider
-const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } });
+const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 
 // initialize deployed contract
 const testAddress = "0x7667469b8e93faa642573078b6bf8c790d3a6184b2a1bb39c5c923a732862e1";

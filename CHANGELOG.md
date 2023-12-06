@@ -1,3 +1,9 @@
+## [5.24.4](https://github.com/starknet-io/starknet.js/compare/v5.24.3...v5.24.4) (2023-12-06)
+
+### Bug Fixes
+
+- typos ([#862](https://github.com/starknet-io/starknet.js/issues/862)) ([b2431d3](https://github.com/starknet-io/starknet.js/commit/b2431d36d636821b32403ef0aa4def2312b10254))
+
 ## [5.24.3](https://github.com/starknet-io/starknet.js/compare/v5.24.2...v5.24.3) (2023-11-20)
 
 ### Bug Fixes

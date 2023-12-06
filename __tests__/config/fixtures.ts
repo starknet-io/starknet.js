@@ -40,8 +40,8 @@ export const compiledHashSierraCasm = readContractSierraCasm('cairo/hash/hash');
 export const compiledHelloSierra = readContractSierra('cairo/helloSierra/hello');
 export const compiledHelloSierraCasm = readContractSierraCasm('cairo/helloSierra/hello');
 export const compiledComplexSierra = readContractSierra('cairo/complexInput/complexInput');
-export const compiledC1Account = readContractSierra('cairo/account/account');
-export const compiledC1AccountCasm = readContractSierraCasm('cairo/account/account');
+export const compiledC1Account = readContractSierra('cairo/account/accountOZ080');
+export const compiledC1AccountCasm = readContractSierraCasm('cairo/account/accountOZ080');
 export const compiledC1v2 = readContractSierra('cairo/helloCairo2/compiled');
 export const compiledC1v2Casm = readContractSierraCasm('cairo/helloCairo2/compiled');
 export const compiledC210 = readContractSierra('cairo/cairo210/cairo210.sierra');
@@ -76,6 +76,11 @@ export const getTestAccount = (provider: ProviderInterface) => {
     undefined,
     process.env.TX_VERSION === 'v3' ? ETransactionVersion.V3 : undefined // TODO: enable setup to test diff TX versions
   );
+};
+
+export const createBlockForDevnet = async (): Promise<void> => {
+  if (!(process.env.IS_RPC_DEVNET === 'true')) return;
+  await fetch(new URL('/create_block', process.env.TEST_RPC_URL), { method: 'POST' });
 };
 
 const describeIf = (condition: boolean) => (condition ? describe : describe.skip);

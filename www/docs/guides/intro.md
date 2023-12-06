@@ -20,32 +20,15 @@ npm install starknet@next
 
 ### With Devnet
 
-- Sequencer Devnet [docs](https://0xspaceshard.github.io/starknet-devnet/docs/intro)
 - RPC Devnet [repo](https://github.com/0xSpaceShard/starknet-devnet-rs)
 
-Get the Sequencer Devnet with Docker:
-
-```bash
-docker pull shardlabs/starknet-devnet:latest
-docker run -p 5050:5050 shardlabs/starknet-devnet:latest --seed 0
-```
+Launch the development net.
 
 Open a new console tab, go to your starknet.js directory, and run:
 
 ```bash
 npm run test # all tests
 npm run test ./__tests__/contract.test.ts # just one test suite
-```
-
-By default, `defaultProvider` tests will be run through the `Sequencer`.
-
-If you want to run `defaultProvider` through the `RPC` run:
-
-```bash
-export TEST_RPC_URL = "http://127.0.0.1:5050/rpc"
-
-# only RPC related tests:
-npm run test ./__tests__/rpcProvider.test.ts
 ```
 
 ## Running docs locally

@@ -27,7 +27,7 @@ Other users of the network can use your declared contract. It means that if some
 Example: if you want an ERC20 contract, and somebody has already declared an ERC20 contract that conforms to your needs, you have just to deploy a new instance of this contract class.
 
 ```typescript
-import { Provider, Account, Contract, json, stark, uint256, shortString } from "starknet";
+import { RpcProvider, Account, Contract, json, stark, uint256, shortString } from "starknet";
 ```
 
 ## `declareAndDeploy()` your new contract
@@ -38,7 +38,7 @@ Here, to declare & deploy a `Test.cairo` smart contract, in devnet:
 
 ```typescript
 // connect provider
-const provider = new Provider({ sequencer: { baseUrl: "http://127.0.0.1:5050" } });
+const provider = new RpcProvider({ baseUrl: "http://127.0.0.1:5050/rpc" });
 // connect your account. To adapt to your own account:
 const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
 const account0Address: string = "0x123....789";
@@ -62,7 +62,7 @@ If the contract class is already declared, it's faster and cheaper: just use `de
 
 ```typescript
 // connect provider
-const provider = new Provider({ sequencer: { baseUrl: "http://127.0.0.1:5050" } });
+const provider = new RpcProvider({ baseUrl: "http://127.0.0.1:5050/rpc" });
 // connect your account. To adapt to your own account:
 const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
 const account0Address: string = "0x123....789";
@@ -162,7 +162,7 @@ If you want only declare a new Contract Class, use `declare()`.
 
 ```typescript
 // connect provider
-const provider = new Provider({ sequencer: { baseUrl: "http://127.0.0.1:5050" } });
+const provider = new RpcProvider({ baseUrl: "http://127.0.0.1:5050/rpc" });
 // connect your account. To adapt to your own account:
 const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
 const account0Address: string = "0x123....789";
