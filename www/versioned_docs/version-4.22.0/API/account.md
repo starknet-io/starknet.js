@@ -4,9 +4,9 @@ sidebar_position: 2
 
 # Account
 
-An Account extends <ins>[`Provider`](/docs/API/provider)</ins> and inherits all of its methods.
+An Account extends <ins>[`Provider`](./Provider)</ins> and inherits all of its methods.
 
-It also introduces new methods that allow Accounts to create and verify signatures with a custom <ins>[`Signer`](/docs/API/signer)</ins>, declare and deploy Contract and deploy new Account
+It also introduces new methods that allow Accounts to create and verify signatures with a custom <ins>[`Signer`](./Signer)</ins>, declare and deploy Contract and deploy new Account
 
 This API is the primary way to interact with an account contract on Starknet.
 
@@ -129,7 +129,7 @@ Estimate Fee for executing a list of transactions on starknet.
 
 The _transaction_ object structure:
 
-- transaction.**type** - the type of transaction : 'DECLARE' | 'DEPLOY' | 'INVOKE_FUNCTION' | 'DEPLOY_ACCOUNT'
+- transaction.**type** - the type of transaction: 'DECLARE' | 'DEPLOY' | 'INVOKE_FUNCTION' | 'DEPLOY_ACCOUNT'
 - transaction payload - the payload for the transaction
 
 The _estimateFeeDetails_ object may include any of:

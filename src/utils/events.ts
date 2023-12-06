@@ -4,14 +4,13 @@ import { cleanHex } from './num';
 
 /**
  * Parse Transaction Receipt Event from UDC invoke transaction and
- * create DeployContractResponse compatibile response with adition of UDC Event data
+ * create DeployContractResponse compatible response with addition of the UDC Event data
  *
- * @param txReceipt
  * @returns DeployContractResponse | UDC Event Response data
  */
 export function parseUDCEvent(txReceipt: InvokeTransactionReceiptResponse) {
   if (!txReceipt.events) {
-    throw new Error('UDC emited event is empty');
+    throw new Error('UDC emitted event is empty');
   }
   const event = txReceipt.events.find(
     (it) => cleanHex(it.from_address) === cleanHex(UDC.ADDRESS)

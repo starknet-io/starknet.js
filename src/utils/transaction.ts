@@ -1,13 +1,20 @@
-import { CairoVersion, Call, CallStruct, Calldata, ParsedStruct } from '../types';
+import {
+  BigNumberish,
+  CairoVersion,
+  Call,
+  CallStruct,
+  Calldata,
+  ParsedStruct,
+  RawArgs,
+} from '../types';
+import { ETransactionVersion } from '../types/api';
 import { CallData } from './calldata';
 import { getSelectorFromName } from './hash';
-import { BigNumberish, toBigInt } from './num';
+import { toBigInt } from './num';
 
 /**
  * Transforms a list of Calls, each with their own calldata, into
- * two arrays: one with the entrypoints, and one with the concatenated calldata.
- * @param calls
- * @returns
+ * two arrays: one with the entry points, and one with the concatenated calldata
  */
 export const transformCallsToMulticallArrays = (calls: Call[]) => {
   const callArray: ParsedStruct[] = [];
@@ -29,10 +36,7 @@ export const transformCallsToMulticallArrays = (calls: Call[]) => {
 };
 
 /**
- * Transforms a list of calls in the full flattened calldata expected
- * by the __execute__ protocol.
- * @param calls
- * @returns
+ * Transforms a list of calls into the Cairo 0 `__execute__` calldata.
  */
 export const fromCallsToExecuteCalldata = (calls: Call[]) => {
   const { callArray, calldata } = transformCallsToMulticallArrays(calls);
@@ -40,15 +44,19 @@ export const fromCallsToExecuteCalldata = (calls: Call[]) => {
   return [...compiledCalls, ...calldata] as Calldata;
 };
 
+/**
+ * Transforms a list of calls into the Cairo 0 `__execute__` calldata including nonce.
+ *
+ * @deprecated
+ */
 export const fromCallsToExecuteCalldataWithNonce = (calls: Call[], nonce: BigNumberish) => {
   return [...fromCallsToExecuteCalldata(calls), toBigInt(nonce).toString()] as Calldata;
 };
 
-// TT: Can be removed ?
 /**
  * Format Data inside Calls
- * @param calls Call[]
- * @returns CallStruct
+ *
+ * @deprecated Not required for getting execute Calldata
  */
 export const transformCallsToMulticallArrays_cairo1 = (calls: Call[]) => {
   const callArray = calls.map<CallStruct>((call) => ({
@@ -60,27 +68,24 @@ export const transformCallsToMulticallArrays_cairo1 = (calls: Call[]) => {
 };
 
 /**
- * Transforms a list of calls in the full flattened calldata expected
- * by the __execute__ protocol.
- * @param calls
- * @returns Calldata
+ * Transforms a list of calls into the Cairo 1 `__execute__` calldata.
  */
 export const fromCallsToExecuteCalldata_cairo1 = (calls: Call[]) => {
   // ensure property order
   const orderCalls = calls.map((call) => ({
     contractAddress: call.contractAddress,
     entrypoint: call.entrypoint,
-    calldata: call.calldata,
+    calldata:
+      Array.isArray(call.calldata) && '__compiled__' in call.calldata
+        ? call.calldata // Calldata type
+        : CallData.compile(call.calldata as RawArgs), // RawArgsObject | RawArgsArray type
   }));
 
   return CallData.compile({ orderCalls });
 };
 
 /**
- *
- * @param calls Call array
- * @param cairoVersion Defaults to 0
- * @returns string[] of calldata
+ * Create `__execute__` Calldata from Calls based on Cairo versions
  */
 export const getExecuteCalldata = (calls: Call[], cairoVersion: CairoVersion = '0') => {
   if (cairoVersion === '1') {
@@ -88,3 +93,16 @@ export const getExecuteCalldata = (calls: Call[], cairoVersion: CairoVersion = '
   }
   return fromCallsToExecuteCalldata(calls);
 };
+
+/**
+ * Return transaction versions based on version type, default version type is 'transaction'
+ */
+export function getVersionsByType(versionType?: 'fee' | 'transaction') {
+  return versionType === 'fee'
+    ? {
+        v1: ETransactionVersion.F1,
+        v2: ETransactionVersion.F2,
+        v3: ETransactionVersion.F3,
+      }
+    : { v1: ETransactionVersion.V1, v2: ETransactionVersion.V2, v3: ETransactionVersion.V3 };
+}

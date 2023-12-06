@@ -2,9 +2,10 @@
 import { hexToBytes } from '@noble/curves/abstract/utils';
 
 import { MASK_251, ZERO } from '../constants';
+import { BigNumberish } from '../types';
 import { addHexPrefix, removeHexPrefix } from './encode';
 import { keccakBn } from './hash';
-import { BigNumberish, assertInRange, toHex } from './num';
+import { assertInRange, toHex } from './num';
 
 export function addAddressPadding(address: BigNumberish): string {
   return addHexPrefix(removeHexPrefix(toHex(address)).padStart(64, '0'));

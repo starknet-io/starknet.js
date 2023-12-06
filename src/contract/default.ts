@@ -1,7 +1,10 @@
+import type { Abi as AbiKanabi } from 'abi-wan-kanabi';
+
 import { AccountInterface } from '../account';
 import { ProviderInterface, defaultProvider } from '../provider';
 import {
   Abi,
+  AbiEvents,
   ArgsOrCalldata,
   ArgsOrCalldataWithOptions,
   AsyncContractFunction,
@@ -12,14 +15,22 @@ import {
   ContractOptions,
   EstimateFeeResponse,
   FunctionAbi,
+  GetTransactionReceiptResponse,
   InvokeFunctionResponse,
   InvokeOptions,
+  InvokeTransactionReceiptResponse,
+  ParsedEvents,
+  RawArgs,
   Result,
   StructAbi,
+  ValidateType,
 } from '../types';
 import assert from '../utils/assert';
-import { CallData } from '../utils/calldata';
-import { ContractInterface } from './interface';
+import { CallData, cairo } from '../utils/calldata';
+import { createAbiParser } from '../utils/calldata/parser';
+import { getAbiEvents, parseEvents as parseRawEvents } from '../utils/events/index';
+import { cleanHex } from '../utils/num';
+import { ContractInterface, TypedContract } from './interface';
 
 export const splitArgsAndOptions = (args: ArgsOrCalldataWithOptions) => {
   const options = [
@@ -94,20 +105,13 @@ function buildEstimate(contract: Contract, functionAbi: FunctionAbi): ContractFu
   };
 }
 
-export function getCalldata(args: ArgsOrCalldata, callback: Function): Calldata {
+export function getCalldata(args: RawArgs, callback: Function): Calldata {
   // Check if Calldata in args or args[0] else compile
-  if ('__compiled__' in args) return args as Calldata;
-  if (Array.isArray(args[0]) && '__compiled__' in args[0]) return args[0] as Calldata;
+  if (Array.isArray(args) && '__compiled__' in args) return args as Calldata;
+  if (Array.isArray(args) && Array.isArray(args[0]) && '__compiled__' in args[0])
+    return args[0] as Calldata;
   return callback();
 }
-
-/**
- * Not used at the moment
- */
-/* const detectCairoVersion = (abi: Abi) => {
-  if (!abi) return '0';
-  return abi.find((it) => 'state_mutability' in it) ? '1' : '0';
-}; */
 
 export class Contract implements ContractInterface {
   abi: Abi;
@@ -119,6 +123,8 @@ export class Contract implements ContractInterface {
   deployTransactionHash?: string;
 
   protected readonly structs: { [name: string]: StructAbi };
+
+  protected readonly events: AbiEvents;
 
   readonly functions!: { [name: string]: AsyncContractFunction };
 
@@ -148,7 +154,9 @@ export class Contract implements ContractInterface {
     this.providerOrAccount = providerOrAccount;
     this.callData = new CallData(abi);
     this.structs = CallData.getAbiStruct(abi);
-    this.abi = abi;
+    this.events = getAbiEvents(abi);
+    const parser = createAbiParser(abi);
+    this.abi = parser.getLegacyFormat();
 
     const options = { enumerable: true, value: {}, writable: false };
     Object.defineProperties(this, {
@@ -223,7 +231,7 @@ export class Contract implements ContractInterface {
 
     const calldata = getCalldata(args, () => {
       if (parseRequest) {
-        this.callData.validate('CALL', method, args);
+        this.callData.validate(ValidateType.CALL, method, args);
         return this.callData.compile(method, args);
       }
       // eslint-disable-next-line no-console
@@ -260,7 +268,7 @@ export class Contract implements ContractInterface {
 
     const calldata = getCalldata(args, () => {
       if (parseRequest) {
-        this.callData.validate('INVOKE', method, args);
+        this.callData.validate(ValidateType.INVOKE, method, args);
         return this.callData.compile(method, args);
       }
       // eslint-disable-next-line no-console
@@ -299,7 +307,7 @@ export class Contract implements ContractInterface {
     assert(this.address !== null, 'contract is not connected to an address');
 
     if (!getCalldata(args, () => false)) {
-      this.callData.validate('INVOKE', method, args);
+      this.callData.validate(ValidateType.INVOKE, method, args);
     }
 
     const invocation = this.populate(method, args);
@@ -309,13 +317,36 @@ export class Contract implements ContractInterface {
     throw Error('Contract must be connected to the account contract to estimate');
   }
 
-  public populate(method: string, args: ArgsOrCalldata = []): Call {
-    const calldata = getCalldata(args, () => this.callData.compile(method, args));
-
+  public populate(method: string, args: RawArgs = []): Call {
+    const calldata: Calldata = getCalldata(args, () => this.callData.compile(method, args));
     return {
       contractAddress: this.address,
       entrypoint: method,
       calldata,
     };
+  }
+
+  public parseEvents(receipt: GetTransactionReceiptResponse): ParsedEvents {
+    return parseRawEvents(
+      (receipt as InvokeTransactionReceiptResponse).events?.filter(
+        (event) => cleanHex(event.from_address) === cleanHex(this.address),
+        []
+      ) || [],
+      this.events,
+      this.structs,
+      CallData.getAbiEnum(this.abi)
+    );
+  }
+
+  public isCairo1(): boolean {
+    return cairo.isCairo1Abi(this.abi);
+  }
+
+  public async getVersion() {
+    return this.providerOrAccount.getContractVersion(this.address);
+  }
+
+  public typed<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContract<TAbi> {
+    return this as TypedContract<typeof tAbi>;
   }
 }

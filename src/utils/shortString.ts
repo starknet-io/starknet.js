@@ -1,50 +1,63 @@
+import { TEXT_TO_FELT_MAX_LEN } from '../constants';
 import { addHexPrefix, removeHexPrefix } from './encode';
 import { isHex, isStringWholeNumber } from './num';
 
-const TEXT_TO_FELT_MAX_LEN = 31;
-
+/**
+ * Test if string contains only ASCII characters (string can be ascii text)
+ */
 export function isASCII(str: string) {
   // eslint-disable-next-line no-control-regex
   return /^[\x00-\x7F]*$/.test(str);
 }
 
-// function to check if string has less or equal 31 characters
+/**
+ * Test if string is a Cairo short string (string has less or equal 31 characters)
+ */
 export function isShortString(str: string) {
   return str.length <= TEXT_TO_FELT_MAX_LEN;
 }
 
-// function to check if string is a decimal
-export function isDecimalString(decim: string): boolean {
-  return /^[0-9]*$/i.test(decim);
+/**
+ * Test if string contains only numbers (string can be converted to decimal number)
+ */
+export function isDecimalString(str: string): boolean {
+  return /^[0-9]*$/i.test(str);
 }
 
 /**
- * check if value is string text, and not string-hex, string-number
- * @param val any
- * @returns boolean
+ * Test if value is a free-from string text, and not a hex string or number string
  */
 export function isText(val: any) {
   return typeof val === 'string' && !isHex(val) && !isStringWholeNumber(val);
 }
 
+/**
+ * Test if value is short text
+ */
 export const isShortText = (val: any) => isText(val) && isShortString(val);
+
+/**
+ * Test if value is long text
+ */
 export const isLongText = (val: any) => isText(val) && !isShortString(val);
 
+/**
+ * Split long text into short strings
+ */
 export function splitLongString(longStr: string): string[] {
   const regex = RegExp(`[^]{1,${TEXT_TO_FELT_MAX_LEN}}`, 'g');
   return longStr.match(regex) || [];
 }
 
 /**
- * Convert an ASCII string to an hexadecimal string.
- * @param str - ASCII string -
- * 31 characters maxi. Ex : "uri/item23.jpg"
- * @returns a string representing an Hex number 248 bits max.
- * @Example
+ * Convert an ASCII string to a hexadecimal string.
+ * @param str short string (ASCII string, 31 characters max)
+ * @returns format: hex-string; 248 bits max
+ * @example
  * ```typescript
  * const myEncodedString: string = encodeShortString("uri/pict/t38.jpg");
+ * // return hex string (ex."0x7572692f706963742f7433382e6a7067")
  * ```
- * returns : string : "0x7572692f706963742f7433382e6a7067"
  */
 export function encodeShortString(str: string): string {
   if (!isASCII(str)) throw new Error(`${str} is not an ASCII string`);
@@ -53,16 +66,14 @@ export function encodeShortString(str: string): string {
 }
 
 /**
- * Convert an hexadecimal or decimal string to an ASCII string.
- * @param str - string - representing a 248 bits max number.
- *
- * Ex : hex : "0x1A4F64EA56" or decimal : "236942575435676423"
- * @returns a string with 31 characters max.
- * @Example
+ * Convert a hexadecimal or decimal string to an ASCII string.
+ * @param str representing a 248 bit max number (ex. "0x1A4F64EA56" or "236942575435676423")
+ * @returns format: short string; 31 characters max
+ * @example
  * ```typescript
  * const myDecodedString: string = decodeShortString("0x7572692f706963742f7433382e6a7067");
+ * // return string (ex."uri/pict/t38.jpg")
  * ```
- * return : string : "uri/pict/t38.jpg"
  */
 export function decodeShortString(str: string): string {
   if (!isASCII(str)) throw new Error(`${str} is not an ASCII string`);

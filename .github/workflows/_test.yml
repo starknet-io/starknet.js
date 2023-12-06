@@ -1,6 +1,13 @@
 name: _ Run Tests
 on:
   workflow_call:
+    inputs:
+      use-rpc-devnet:
+        type: boolean
+        default: false
+      use-seq-devnet:
+        type: boolean
+        default: false
     secrets:
       TEST_PROVIDER_BASE_URL:
         required: false
@@ -19,15 +26,9 @@ jobs:
     # TODO - periodically check if conditional services are supported; https://github.com/actions/runner/issues/822
     services:
       devnet:
-        # TODO - The image utilized is a temporary workaround to allow for the RPC request validation
-        # deactivation argument to be set since the service configuration lacks a corresponding
-        # functionality; https://github.com/actions/runner/issues/2276.
-        # It was generated from the following Dockerfile:
-        #   FROM shardlabs/starknet-devnet:0.5.1-seed0
-        #   CMD ["--disable-rpc-request-validation", "--timeout", "600"]
-        # Switch back to the standard Devnet image once a full release is available.
-        image: penovicp/devnet-test:0.5.1
-        # image: shardlabs/starknet-devnet:0.5.1-seed0
+        image: ${{ inputs.use-rpc-devnet && 'shardlabs/starknet-devnet-rs:0c82d023f35bb77c4b5f4afd885ab14e44b73130-amd-seed0' || inputs.use-seq-devnet && 'shardlabs/starknet-devnet:0.6.3-seed0' || '' }}
+        # image: ${{ (inputs.use-rpc-devnet || inputs.use-seq-devnet) && 'shardlabs/starknet-devnet:0.6.3-seed0' || '' }}
+        # image: shardlabs/starknet-devnet-rs:0c82d023f35bb77c4b5f4afd885ab14e44b73130-amd-seed0
         ports:
           - 5050:5050
 

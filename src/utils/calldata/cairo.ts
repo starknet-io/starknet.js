@@ -1,31 +1,39 @@
-import { AbiStructs } from '../../types';
-import { BigNumberish, isBigInt, isHex, isStringWholeNumber } from '../num';
+import {
+  Abi,
+  AbiEnums,
+  AbiStructs,
+  BigNumberish,
+  ContractVersion,
+  Litteral,
+  Uint,
+  Uint256,
+} from '../../types';
+import { isBigInt, isHex, isStringWholeNumber } from '../num';
 import { encodeShortString, isShortString, isText } from '../shortString';
-import { UINT_128_MAX, Uint256, isUint256 } from '../uint256';
+import { UINT_128_MAX, isUint256 } from '../uint256';
 
-export enum Uint {
-  u8 = 'core::integer::u8',
-  u16 = 'core::integer::u16',
-  u32 = 'core::integer::u32',
-  u64 = 'core::integer::u64',
-  u128 = 'core::integer::u128',
-  u256 = 'core::integer::u256', // This one is struct
-}
-
+// Intended for internal usage, maybe should be exported somewhere else and not exported to utils
 export const isLen = (name: string) => /_len$/.test(name);
 export const isTypeFelt = (type: string) => type === 'felt' || type === 'core::felt252';
 export const isTypeArray = (type: string) =>
-  /\*/.test(type) || type.startsWith('core::array::Array::');
+  /\*/.test(type) ||
+  type.startsWith('core::array::Array::') ||
+  type.startsWith('core::array::Span::');
 export const isTypeTuple = (type: string) => /^\(.*\)$/i.test(type);
 export const isTypeNamedTuple = (type: string) => /\(.*\)/i.test(type) && type.includes(':');
 export const isTypeStruct = (type: string, structs: AbiStructs) => type in structs;
+export const isTypeEnum = (type: string, enums: AbiEnums) => type in enums;
+export const isTypeOption = (type: string) => type.startsWith('core::option::Option::');
+export const isTypeResult = (type: string) => type.startsWith('core::result::Result::');
 export const isTypeUint = (type: string) => Object.values(Uint).includes(type as Uint);
+export const isTypeLitteral = (type: string) => Object.values(Litteral).includes(type as Litteral);
 export const isTypeUint256 = (type: string) => type === 'core::integer::u256';
 export const isTypeBool = (type: string) => type === 'core::bool';
 export const isTypeContractAddress = (type: string) =>
   type === 'core::starknet::contract_address::ContractAddress';
-export const isCairo1Type = (type: string) => type.includes('core::');
-
+export const isTypeEthAddress = (type: string) =>
+  type === 'core::starknet::eth_address::EthAddress';
+export const isCairo1Type = (type: string) => type.includes('::');
 export const getArrayType = (type: string) => {
   if (isCairo1Type(type)) {
     return type.substring(type.indexOf('<') + 1, type.lastIndexOf('>'));
@@ -34,13 +42,61 @@ export const getArrayType = (type: string) => {
 };
 
 /**
- * named tuple are described as js object {}
- * struct types are described as js object {}
- * array types are described as js array []
+ * Test if an ABI comes from a Cairo 1 contract
+ * @param abi representing the interface of a Cairo contract
+ * @returns TRUE if it is an ABI from a Cairo1 contract
+ * @example
+ * ```typescript
+ * const isCairo1: boolean = isCairo1Abi(myAbi: Abi);
+ * ```
+ */
+export function isCairo1Abi(abi: Abi): boolean {
+  const { cairo } = getAbiContractVersion(abi);
+  if (cairo === undefined) {
+    throw Error('Unable to determine Cairo version');
+  }
+  return cairo === '1';
+}
+
+/**
+ * Return ContractVersion (Abi version) based on Abi
+ * or undefined for unknown version
+ * @param abi
+ * @returns string
+ */
+export function getAbiContractVersion(abi: Abi): ContractVersion {
+  // determine by interface for "Cairo 1.2"
+  if (abi.find((it) => it.type === 'interface')) {
+    return { cairo: '1', compiler: '2' };
+  }
+
+  // determine by function io types "Cairo 1.1" or "Cairo 0.0"
+  // find first function with inputs or outputs
+  const testFunction = abi.find(
+    (it) => it.type === 'function' && (it.inputs.length || it.outputs.length)
+  );
+  if (!testFunction) {
+    return { cairo: undefined, compiler: undefined };
+  }
+  const io = testFunction.inputs.length ? testFunction.inputs : testFunction.outputs;
+  if (isCairo1Type(io[0].type)) {
+    return { cairo: '1', compiler: '1' };
+  }
+  return { cairo: '0', compiler: '0' };
+}
+
+/**
+ * named tuple cairo type is described as js object {}
+ * struct cairo type are described as js object {}
+ * array cairo type are described as js array []
  */
 
 /**
- * Uint256 cairo type (helper for common struct type)
+ * Create Uint256 Cairo type (helper for common struct type)
+ * @example
+ * ```typescript
+ * uint256('892349863487563453485768723498');
+ * ```
  */
 export const uint256 = (it: BigNumberish): Uint256 => {
   const bn = BigInt(it);
@@ -54,14 +110,19 @@ export const uint256 = (it: BigNumberish): Uint256 => {
 };
 
 /**
- * unnamed tuple cairo type (helper same as common struct type)
+ * Create unnamed tuple Cairo type (helper same as common struct type)
+ * @example
+ * ```typescript
+ * tuple(1, '0x101', 16);
+ * ```
  */
 export const tuple = (
   ...args: (BigNumberish | object | boolean)[]
 ): Record<number, BigNumberish | object | boolean> => ({ ...args });
 
 /**
- * felt cairo type
+ * Create felt Cairo type (cairo type helper)
+ * @returns format: felt-string
  */
 export function felt(it: BigNumberish): string {
   // BN or number

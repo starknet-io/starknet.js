@@ -1,8 +1,13 @@
+import { RpcChannel } from '../channel/rpc_0_6';
 import { StarknetChainId } from '../constants';
 import type {
+  AccountInvocations,
+  BigNumberish,
+  BlockIdentifier,
   Call,
   CallContractResponse,
-  ContractClass,
+  ContractClassResponse,
+  ContractVersion,
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractPayload,
@@ -15,20 +20,21 @@ import type {
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
-  InvocationBulk,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Nonce,
-  RPC,
+  SimulateTransactionResponse,
   StateUpdateResponse,
   Storage,
-  TransactionSimulationResponse,
+  getContractVersionOptions,
+  getEstimateFeeBulkOptions,
+  getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
-import type { BigNumberish } from '../utils/num';
-import { BlockIdentifier } from './utils';
 
 export abstract class ProviderInterface {
+  public abstract channel: RpcChannel;
+
   /**
    * Gets the Starknet chain Id
    *
@@ -74,10 +80,10 @@ export abstract class ProviderInterface {
   public abstract getClassAt(
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
-  ): Promise<ContractClass | RPC.ContractClass>;
+  ): Promise<ContractClassResponse>;
 
   /**
-   * Returns the class hash deployed under the given address.
+   * Returns the contract class hash in the given block for the contract deployed at the given address
    *
    * @param contractAddress - contract address
    * @param blockIdentifier - block identifier
@@ -94,10 +100,10 @@ export abstract class ProviderInterface {
    * @param classHash - class hash
    * @returns Contract class of compiled contract
    */
-  public abstract getClassByHash(classHash: string): Promise<ContractClass | RPC.ContractClass>;
+  public abstract getClassByHash(classHash: string): Promise<ContractClassResponse>;
 
   /**
-   * Gets the nonce of a contract with respect to a specific block
+   * Returns the nonce associated with the given address in the given block
    *
    * @param contractAddress - contract address
    * @returns the hex nonce
@@ -108,7 +114,7 @@ export abstract class ProviderInterface {
   ): Promise<Nonce>;
 
   /**
-   * Gets the contract's storage variable at a specific key.
+   * Get the value of the storage (contract's variable) at the given address and key
    *
    * @param contractAddress
    * @param key - from getStorageVarAddress('<STORAGE_VARIABLE_NAME>') (WIP)
@@ -209,7 +215,7 @@ export abstract class ProviderInterface {
   public abstract getEstimateFee(
     invocation: Invocation,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier,
+    blockIdentifier?: BlockIdentifier,
     skipValidate?: boolean
   ): Promise<EstimateFeeResponse>;
 
@@ -283,24 +289,20 @@ export abstract class ProviderInterface {
   /**
    * Estimates the fee for a list of INVOKE transaction
    *
-   * @param invocations the array of invocation and invocation details object containing:
-   * - contractAddress - the address of the account
-   * - calldata - (defaults to []) the calldata
-   * - signature - (defaults to []) the signature
-   * - nonce - optional nonce
-   * - version - optional version
-   * @param blockIdentifier - block identifier
+   * @param invocations AccountInvocations - Complete invocations array with account details
+   * @param options getEstimateFeeBulkOptions
+   * - (optional) blockIdentifier - BlockIdentifier
    * @returns the estimated fee
    */
   public abstract getEstimateFeeBulk(
-    invocations: InvocationBulk,
-    blockIdentifier?: BlockIdentifier
+    invocations: AccountInvocations,
+    options?: getEstimateFeeBulkOptions
   ): Promise<EstimateFeeResponseBulk>;
 
   /**
    * Wait for the transaction to be accepted
    * @param txHash - transaction hash
-   * @param options
+   * @param options waitForTransactionOptions
    * - (optional) retryInterval: number | undefined;
    * - (optional) successStates: TransactionStatus[] | undefined;
    * @return GetTransactionReceiptResponse
@@ -313,30 +315,51 @@ export abstract class ProviderInterface {
   /**
    * Simulates the transaction and returns the transaction trace and estimated fee.
    *
-   * @param invocation the invocation object containing:
-   * - contractAddress - the address of the contract
-   * - entrypoint - the entrypoint of the contract
-   * - calldata - (defaults to []) the calldata
-   * - signature - (defaults to []) the signature
-   * @param details - optional details containing:
-   * - nonce - optional nonce
-   * - version - optional version
-   * @param blockIdentifier - (optional) block identifier
-   * @param skipValidate - (optional) skip cairo __validate__ method
-   * @returns the transaction trace and estimated fee
+   * @param invocations AccountInvocations - Complete invocations array with account details
+   * @param options - getSimulateTransactionOptions
+   *  - (optional) blockIdentifier - block identifier
+   *  - (optional) skipValidate - skip cairo __validate__ method
+   *  - (optional) skipExecute - skip cairo __execute__ method
+   * @returns an array of transaction trace and estimated fee
    */
   public abstract getSimulateTransaction(
-    invocation: Invocation,
-    invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier,
-    skipValidate?: boolean
-  ): Promise<TransactionSimulationResponse>;
+    invocations: AccountInvocations,
+    options?: getSimulateTransactionOptions
+  ): Promise<SimulateTransactionResponse>;
 
   /**
-   * Gets the state changes in a specific block
+   * Gets the state changes in a specific block (result of executing the requested block)
    *
    * @param blockIdentifier - block identifier
    * @returns StateUpdateResponse
    */
   public abstract getStateUpdate(blockIdentifier?: BlockIdentifier): Promise<StateUpdateResponse>;
+
+  /**
+   * Gets the contract version from the provided address
+   * @param contractAddress string
+   * @param classHash undefined
+   * @param options - getContractVersionOptions
+   *   - (optional) compiler - (default true) extract compiler version using type tactic from abi
+   *   - (optional) blockIdentifier - block identifier
+   */
+  public abstract getContractVersion(
+    contractAddress: string,
+    classHash?: undefined,
+    options?: getContractVersionOptions
+  ): Promise<ContractVersion>;
+
+  /**
+   * Gets the contract version from the provided address
+   * @param contractAddress undefined
+   * @param classHash
+   * @param options - getContractVersionOptions
+   *   - (optional) compiler - (default true) extract compiler version using type tactic from abi
+   *   - (optional) blockIdentifier - block identifier
+   */
+  public abstract getContractVersion(
+    contractAddress: undefined,
+    classHash: string,
+    options?: getContractVersionOptions
+  ): Promise<ContractVersion>;
 }

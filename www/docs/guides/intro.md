@@ -20,31 +20,15 @@ npm install starknet@next
 
 ### With Devnet
 
-Example devnet version is `0.7.1`.
+- RPC Devnet [repo](https://github.com/0xSpaceShard/starknet-devnet-rs)
 
-Get devnet with docker:
+Launch the development net.
 
-```bash
-docker pull shardlabs/starknet-devnet:0.7.1
-docker run -p 5050:5050 shardlabs/starknet-devnet:0.7.1 --seed 0
-```
-
-Open new console tab, go to your starknet.js directory and run:
+Open a new console tab, go to your starknet.js directory, and run:
 
 ```bash
 npm run test # all tests
 npm run test ./__tests__/contract.test.ts # just one test suite
-```
-
-By default `defaultProvider` tests will be ran through the `Sequencer`.
-
-If you want to run `defaultProvider` through the `RPC` run:
-
-```bash
-export TEST_RPC_URL = "http://127.0.0.1:5050/rpc"
-
-# only RPC related tests:
-npm run test ./__tests__/rpcProvider.test.ts
 ```
 
 ## Running docs locally
@@ -59,14 +43,16 @@ npm run start # fires up a local documentation site
 
 ## Compiling Starknet Contracts
 
-Please check the Starknet documentation <ins>[here](https://www.cairo-lang.org/docs/hello_starknet/intro.html)</ins> to compile Starknet contracts.
+Please check the Starknet documentation <ins>[here](https://docs.starknet.io/documentation/quick_start/declare_a_smart_contract/#compiling_a_smart_contract)</ins> to compile Starknet contracts.
 
-Additional helpful resources can also be found at <ins>[OpenZeppelin](https://docs.openzeppelin.com/contracts-cairo/0.5.0/)</ins> documentation site.
+Additional helpful resources can also be found at <ins>[OpenZeppelin](https://docs.openzeppelin.com/contracts-cairo/0.6.1/)</ins> documentation site.
 
-Get the class hash of a contract: [starkli](https://github.com/xJonathanLEI/starkli).
+## Interacting with contracts and accounts
 
-## Full example with account & erc20 deployments
+For a basic overview on how to interact with contracts and accounts continue following this guide.
 
-Please take a look at our workshop using OpenZeppelin contracts <ins>[here](https://github.com/0xs34n/starknet.js-workshop)</ins>.
+For some more extensive examples visit PhilippeR26's <ins>[workshop](https://github.com/PhilippeR26/starknet.js-workshop-typescript)</ins>.
 
-Example with Argent contract <ins>[here](https://github.com/0xs34n/starknet.js-account)</ins>.
+## Contracts used in the guides
+
+You can find the compiled contracts used in these guides in the <ins>[compiled_contracts](https://github.com/starknet-io/starknet.js/tree/develop/www/docs/guides/compiled_contracts)</ins> directory.

@@ -1,10 +1,7 @@
-import { ec } from '../../src';
+import { constants, ec } from '../../src';
 import { StarknetChainId } from '../../src/constants';
-import {
-  calculateTransactionHash,
-  computeHashOnElements,
-  transactionVersion,
-} from '../../src/utils/hash';
+import { computeHashOnElements } from '../../src/utils/hash';
+import { calculateTransactionHash } from '../../src/utils/hash/transactionHash/v2';
 import { fromCallsToExecuteCalldataWithNonce } from '../../src/utils/transaction';
 
 test('getKeyPair()', () => {
@@ -53,7 +50,7 @@ test('hashMessage()', () => {
 
   const hashMsg = calculateTransactionHash(
     account,
-    transactionVersion,
+    BigInt(constants.TRANSACTION_VERSION.V1),
     calldata,
     maxFee,
     StarknetChainId.SN_GOERLI,

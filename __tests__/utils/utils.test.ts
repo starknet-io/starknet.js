@@ -1,5 +1,5 @@
 import { constants, ec, hash, num, stark } from '../../src';
-import { Block } from '../../src/provider/utils';
+import { Block } from '../../src/utils/provider';
 
 const { IS_BROWSER } = constants;
 

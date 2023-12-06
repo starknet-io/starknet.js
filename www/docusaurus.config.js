@@ -5,7 +5,12 @@ const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
 const generateSourceLinkTemplate = (gitRevision) =>
-  `https://github.com/0xs34n/starknet.js/blob/${gitRevision || '{gitRevision}'}/{path}#L{line}`;
+  `https://github.com/starknet-io/starknet.js/blob/${
+    gitRevision || '{gitRevision}'
+  }/{path}#L{line}`;
+
+// TODO: remove the /next/ fragment after the v5 official release
+const migrationGuideLink = '/docs/next/guides/migrate';
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
@@ -13,10 +18,10 @@ const config = {
   tagline: 'JavaScript library for Starknet',
   url: 'https://starknetjs.com',
   baseUrl: '/',
-  onBrokenLinks: 'throw',
+  onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
-  organizationName: '0xs34n', // Usually your GitHub org/user name.
+  organizationName: 'starknet-io', // Usually your GitHub org/user name.
   projectName: 'starknet.js', // Usually your repo name.
 
   presets: [
@@ -34,6 +39,10 @@ const config = {
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
     ({
+      announcementBar: {
+        content: `<a href="${migrationGuideLink}">Migrate from v4</a>`,
+        backgroundColor: 'rgb(230 231 232)',
+      },
       navbar: {
         title: 'Home',
         logo: {
@@ -60,7 +69,7 @@ const config = {
           },
           {
             label: 'GitHub',
-            href: 'https://github.com/0xs34n/starknet.js',
+            href: 'https://github.com/starknet-io/starknet.js',
             position: 'right',
           },
         ],
@@ -79,6 +88,10 @@ const config = {
                 label: 'Guides',
                 to: '/docs/guides/intro',
               },
+              {
+                label: 'Migrate from v4',
+                to: migrationGuideLink,
+              },
             ],
           },
           {
@@ -95,12 +108,12 @@ const config = {
             items: [
               {
                 label: 'GitHub',
-                href: 'https://github.com/0xs34n/starknet.js',
+                href: 'https://github.com/starknet-io/starknet.js',
               },
             ],
           },
         ],
-        copyright: `Copyright © ${new Date().getFullYear()} 0xs34n`,
+        copyright: `Copyright © ${new Date().getFullYear()} StarkWare`,
       },
       prism: {
         theme: lightCodeTheme,

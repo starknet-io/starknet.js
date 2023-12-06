@@ -4,7 +4,6 @@ import {
   validateAndParseAddress,
   validateChecksumAddress,
 } from '../../src/utils/address';
-// import { addHexPrefix, removeHexPrefix } from '../../src/utils/encode';
 
 describe('validateAndParseAddress', () => {
   test('should pass when correct starknet address is passed', () => {

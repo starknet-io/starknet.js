@@ -1,4 +1,12 @@
-import { BlockNumber, CallData, GetBlockResponse, LibraryError, Provider, stark } from '../src';
+import {
+  BlockNumber,
+  CallData,
+  GetBlockResponse,
+  LibraryError,
+  Provider,
+  provider,
+  stark,
+} from '../src';
 import { toBigInt } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import {
@@ -7,8 +15,8 @@ import {
   getTestAccount,
   getTestProvider,
   wrongClassHash,
-} from './fixtures';
-import { initializeMatcher } from './schema';
+} from './config/fixtures';
+import { initializeMatcher } from './config/schema';
 
 const testProvider = new Provider(getTestProvider());
 
@@ -44,6 +52,12 @@ describe('defaultProvider', () => {
       expect(exampleTransactionHash).toBeTruthy();
     });
 
+    test('getContractVersion', async () => {
+      const expected = { cairo: '0', compiler: '0' };
+      expect(await testProvider.getContractVersion(erc20ContractAddress)).toEqual(expected);
+      expect(await testProvider.getContractVersion(undefined, erc20ClassHash)).toEqual(expected);
+    });
+
     describe('getBlock', () => {
       test('getBlock(blockIdentifier=latest)', async () => {
         expect(exampleBlock).not.toBeNull();
@@ -67,14 +81,32 @@ describe('defaultProvider', () => {
 
       test(`getStateUpdate(blockHash=${exampleBlockHash}, blockNumber=undefined)`, async () => {
         const stateUpdate = await testProvider.getStateUpdate(exampleBlockHash);
-        expect(stateUpdate.block_hash).toBe(exampleBlockHash);
-        expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
+        provider.defStateUpdate(
+          stateUpdate,
+          (state) => {
+            expect(state.block_hash).toBe(exampleBlockHash);
+            expect(state).toMatchSchemaRef('StateUpdateResponse');
+          },
+          (pending) => {
+            fail('exampleBlockHash is latest block, should not be pending');
+            expect(pending).toMatchSchemaRef('PendingStateUpdateResponse');
+          }
+        );
       });
 
       test(`getStateUpdate(blockHash=undefined, blockNumber=${exampleBlockNumber})`, async () => {
         const stateUpdate = await testProvider.getStateUpdate(exampleBlockNumber);
-        expect(stateUpdate.block_hash).toBe(exampleBlockHash);
-        expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
+        provider.defStateUpdate(
+          stateUpdate,
+          (state) => {
+            expect(state.block_hash).toBe(exampleBlockHash);
+            expect(state).toMatchSchemaRef('StateUpdateResponse');
+          },
+          (pending) => {
+            fail('exampleBlockHash is latest block, should not be pending');
+            expect(pending).toMatchSchemaRef('PendingStateUpdateResponse');
+          }
+        );
       });
     });
 

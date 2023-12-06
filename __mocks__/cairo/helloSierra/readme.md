@@ -1,7 +1,8 @@
-# 1.
+Compiled with SW cairo repo tag Cairo v1.1.0
 
-Download cairo repo
-Switch to target tag version alpha6
+# 1.Download cairo repo
+
+Switch to target tag version
 `cargo test`
 
 # 1.1. Compile to Starknet Sierra json

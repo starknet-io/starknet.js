@@ -1,46 +1,69 @@
 import { AccountInterface } from '../account';
-import { Abi, ArgsOrCalldataWithOptions, CompiledContract } from '../types';
+import {
+  Abi,
+  ArgsOrCalldataWithOptions,
+  CairoAssembly,
+  CompiledContract,
+  ValidateType,
+} from '../types';
 import assert from '../utils/assert';
 import { CallData } from '../utils/calldata';
 import { Contract, getCalldata, splitArgsAndOptions } from './default';
 
-export class ContractFactory {
-  abi: Abi;
-
+export type ContractFactoryParams = {
   compiledContract: CompiledContract;
+  account: any;
+  casm?: CairoAssembly;
+  classHash?: string;
+  compiledClassHash?: string;
+  abi?: Abi;
+};
 
-  classHash: string;
+export class ContractFactory {
+  compiledContract: CompiledContract;
 
   account: AccountInterface;
 
+  abi: Abi;
+
+  classHash?: string;
+
+  casm?: CairoAssembly;
+
+  compiledClassHash?: string;
+
   private CallData: CallData;
 
-  constructor(
-    compiledContract: CompiledContract,
-    classHash: string,
-    account: AccountInterface,
-    abi: Abi = compiledContract.abi // abi can be different from the deployed contract ie for proxy contracts
-  ) {
-    this.abi = abi;
-    this.compiledContract = compiledContract;
-    this.account = account;
-    this.classHash = classHash;
-    this.CallData = new CallData(abi);
+  /**
+   * @param params CFParams
+   *  - compiledContract: CompiledContract;
+   *  - account: AccountInterface;
+   *  - casm?: CairoAssembly;
+   *  - classHash?: string;
+   *  - compiledClassHash?: string;
+   *  - abi?: Abi;
+   */
+  constructor(params: ContractFactoryParams) {
+    this.compiledContract = params.compiledContract;
+    this.account = params.account;
+    this.casm = params.casm;
+    this.abi = params.abi ?? params.compiledContract.abi;
+    this.classHash = params.classHash;
+    this.compiledClassHash = params.compiledClassHash;
+    this.CallData = new CallData(this.abi);
   }
 
   /**
    * Deploys contract and returns new instance of the Contract
    *
-   * @param args - Array of the constructor arguments for deployment
-   * @param options (optional) Object - parseRequest, parseResponse, addressSalt
-   * @returns deployed Contract
+   * If contract is not declared it will first declare it, and then deploy
    */
   public async deploy(...args: ArgsOrCalldataWithOptions): Promise<Contract> {
     const { args: param, options = { parseRequest: true } } = splitArgsAndOptions(args);
 
     const constructorCalldata = getCalldata(param, () => {
       if (options.parseRequest) {
-        this.CallData.validate('DEPLOY', 'constructor', param);
+        this.CallData.validate(ValidateType.DEPLOY, 'constructor', param);
         return this.CallData.compile('constructor', param);
       }
       // eslint-disable-next-line no-console
@@ -52,6 +75,9 @@ export class ContractFactory {
       deploy: { contract_address, transaction_hash },
     } = await this.account.declareAndDeploy({
       contract: this.compiledContract,
+      casm: this.casm,
+      classHash: this.classHash,
+      compiledClassHash: this.compiledClassHash,
       constructorCalldata,
       salt: options.addressSalt,
     });
@@ -70,8 +96,7 @@ export class ContractFactory {
   /**
    * Attaches to new Account
    *
-   * @param account - new Provider or Account to attach to
-   * @returns ContractFactory
+   * @param account - new Account to attach to
    */
   connect(account: AccountInterface): ContractFactory {
     this.account = account;
@@ -80,9 +105,6 @@ export class ContractFactory {
 
   /**
    * Attaches current abi and account to the new address
-   *
-   * @param address - Contract address
-   * @returns Contract
    */
   attach(address: string): Contract {
     return new Contract(this.abi, address, this.account);

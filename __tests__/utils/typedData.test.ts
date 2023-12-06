@@ -1,12 +1,10 @@
 import typedDataExample from '../../__mocks__/typedDataExample.json';
 import typedDataSessionExample from '../../__mocks__/typedDataSessionExample.json';
 import typedDataStructArrayExample from '../../__mocks__/typedDataStructArrayExample.json';
-import { num } from '../../src';
+import { BigNumberish, StarkNetDomain, num } from '../../src';
 import { getSelectorFromName } from '../../src/utils/hash';
 import { MerkleTree } from '../../src/utils/merkle';
-import { BigNumberish } from '../../src/utils/num';
 import {
-  StarkNetDomain,
   encodeType,
   encodeValue,
   getMessageHash,

@@ -1,20 +1,30 @@
-import { AbiEntry, AbiStructs, FunctionAbi } from '../../types';
 /**
  * Validate cairo contract method arguments
  * Flow: Determine type from abi and than validate against parameter
  */
+import {
+  AbiEntry,
+  AbiEnums,
+  AbiStructs,
+  BigNumberish,
+  FunctionAbi,
+  Litteral,
+  Uint,
+} from '../../types';
 import assert from '../assert';
-import { BigNumberish, toBigInt } from '../num';
+import { isHex, toBigInt } from '../num';
 import { isLongText } from '../shortString';
 import { uint256ToBN } from '../uint256';
 import {
-  Uint,
   getArrayType,
   isLen,
   isTypeArray,
   isTypeBool,
-  isTypeContractAddress,
+  isTypeEnum,
   isTypeFelt,
+  isTypeLitteral,
+  isTypeOption,
+  isTypeResult,
   isTypeStruct,
   isTypeTuple,
   isTypeUint,
@@ -24,6 +34,13 @@ const validateFelt = (parameter: any, input: AbiEntry) => {
   assert(
     typeof parameter === 'string' || typeof parameter === 'number' || typeof parameter === 'bigint',
     `Validate: arg ${input.name} should be a felt typed as (String, Number or BigInt)`
+  );
+  if (typeof parameter === 'string' && !isHex(parameter)) return; // shortstring
+  const param = BigInt(parameter.toString(10));
+  assert(
+    // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1266
+    param >= 0n && param <= 2n ** 252n - 1n,
+    `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^252-1]`
   );
 };
 
@@ -39,7 +56,9 @@ const validateUint = (parameter: any, input: AbiEntry) => {
       typeof parameter === 'number' ||
       typeof parameter === 'bigint' ||
       (typeof parameter === 'object' && 'low' in parameter && 'high' in parameter),
-    `Validate: arg ${input.name} of cairo ZORG type ${input.type} should be type (String, Number or BigInt)`
+    `Validate: arg ${input.name} of cairo type ${
+      input.type
+    } should be type (String, Number or BigInt), but is ${typeof parameter} ${parameter}.`
   );
   const param = typeof parameter === 'object' ? uint256ToBN(parameter) : toBigInt(parameter);
 
@@ -86,6 +105,21 @@ const validateUint = (parameter: any, input: AbiEntry) => {
       );
       break;
 
+    case Litteral.ClassHash:
+      assert(
+        // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1670
+        param >= 0n && param <= 2n ** 252n - 1n,
+        `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^252-1]`
+      );
+      break;
+
+    case Litteral.ContractAddress:
+      assert(
+        // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1245
+        param >= 0n && param <= 2n ** 252n - 1n,
+        `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^252-1]`
+      );
+      break;
     default:
       break;
   }
@@ -99,6 +133,26 @@ const validateBool = (parameter: any, input: AbiEntry) => {
 };
 
 const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) => {
+  // c1v2 uint256 in struct
+  if (input.type === Uint.u256) {
+    validateUint(parameter, input);
+    return;
+  }
+
+  if (input.type === 'core::starknet::eth_address::EthAddress') {
+    assert(
+      typeof parameter !== 'object',
+      `EthAddress type is waiting a BigNumberish. Got ${parameter}`
+    );
+    const param = BigInt(parameter.toString(10));
+    assert(
+      // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1259
+      param >= 0n && param <= 2n ** 160n - 1n,
+      `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^160-1]`
+    );
+    return;
+  }
+
   assert(
     typeof parameter === 'object' && !Array.isArray(parameter),
     `Validate: arg ${input.name} is cairo type struct (${input.type}), and should be defined as js object (not array)`
@@ -113,6 +167,27 @@ const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) =>
   });
 };
 
+const validateEnum = (parameter: any, input: AbiEntry) => {
+  assert(
+    typeof parameter === 'object' && !Array.isArray(parameter),
+    `Validate: arg ${input.name} is cairo type Enum (${input.type}), and should be defined as js object (not array)`
+  );
+  const methodsKeys = Object.getOwnPropertyNames(Object.getPrototypeOf(parameter));
+  const keys = [...Object.getOwnPropertyNames(parameter), ...methodsKeys];
+  if (isTypeOption(input.type) && keys.includes('isSome') && keys.includes('isNone')) {
+    return; // Option Enum
+  }
+  if (isTypeResult(input.type) && keys.includes('isOk') && keys.includes('isErr')) {
+    return; // Result Enum
+  }
+  if (keys.includes('variant') && keys.includes('activeVariant')) {
+    return; // Custom Enum
+  }
+  throw new Error(
+    `Validate Enum: argument ${input.name}, type ${input.type}, value received ${parameter}, is not an Enum.`
+  );
+};
+
 const validateTuple = (parameter: any, input: AbiEntry) => {
   assert(
     typeof parameter === 'object' && !Array.isArray(parameter),
@@ -121,11 +196,21 @@ const validateTuple = (parameter: any, input: AbiEntry) => {
   // todo: skip tuple structural validation for now
 };
 
-const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs) => {
+const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs, enums: AbiEnums) => {
   const baseType = getArrayType(input.type);
 
   // Long text (special case when parameter is not an array but long text)
-  if (isTypeFelt(baseType) && isLongText(parameter)) return;
+  // console.log(
+  //   'validate array = ',
+  //   isTypeFelt(baseType),
+  //   isLongText(parameter),
+  //   baseType,
+  //   parameter
+  // );
+  if (isTypeFelt(baseType) && isLongText(parameter)) {
+    // console.log('long text.');
+    return;
+  }
 
   assert(Array.isArray(parameter), `Validate: arg ${input.name} should be an Array`);
 
@@ -136,21 +221,25 @@ const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs) => 
     case isTypeTuple(baseType):
       parameter.forEach((it: any) => validateTuple(it, { name: input.name, type: baseType }));
       break;
+
+    case isTypeArray(baseType):
+      parameter.forEach((param: BigNumberish) =>
+        validateArray(param, { name: '', type: baseType }, structs, enums)
+      );
+      break;
     case isTypeStruct(baseType, structs):
       parameter.forEach((it: any) =>
         validateStruct(it, { name: input.name, type: baseType }, structs)
       );
       break;
-    case isTypeUint(baseType):
+    case isTypeEnum(baseType, enums):
+      parameter.forEach((it: any) => validateEnum(it, { name: input.name, type: baseType }));
+      break;
+    case isTypeUint(baseType) || isTypeLitteral(baseType):
       parameter.forEach((param: BigNumberish) => validateUint(param, input));
       break;
     case isTypeBool(baseType):
       parameter.forEach((param: BigNumberish) => validateBool(param, input));
-      break;
-    case isTypeArray(baseType):
-      parameter.forEach((param: BigNumberish) =>
-        validateArray(param, { name: '', type: baseType }, structs)
-      );
       break;
     default:
       throw new Error(
@@ -162,7 +251,8 @@ const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs) => 
 export default function validateFields(
   abiMethod: FunctionAbi,
   args: Array<any>,
-  structs: AbiStructs
+  structs: AbiStructs,
+  enums: AbiEnums
 ) {
   abiMethod.inputs.reduce((acc, input) => {
     const parameter = args[acc];
@@ -173,23 +263,23 @@ export default function validateFields(
       case isTypeFelt(input.type):
         validateFelt(parameter, input);
         break;
-      case isTypeUint(input.type):
+      case isTypeUint(input.type) || isTypeLitteral(input.type):
         validateUint(parameter, input);
         break;
       case isTypeBool(input.type):
         validateBool(parameter, input);
         break;
-      case isTypeContractAddress(input.type):
-        // TODO: ??
+      case isTypeArray(input.type):
+        validateArray(parameter, input, structs, enums);
         break;
       case isTypeStruct(input.type, structs):
         validateStruct(parameter, input, structs);
         break;
+      case isTypeEnum(input.type, enums):
+        validateEnum(parameter, input);
+        break;
       case isTypeTuple(input.type):
         validateTuple(parameter, input);
-        break;
-      case isTypeArray(input.type):
-        validateArray(parameter, input, structs);
         break;
       default:
         throw new Error(

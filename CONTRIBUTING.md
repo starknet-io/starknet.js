@@ -2,7 +2,7 @@
 
 We love pull requests. And following these guidelines will make your pull request easier to merge.
 
-If you want to contribute but don’t know what to do, take a look at these two labels: [help wanted](https://github.com/seanjameshan/starknet.js/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) and [good first issue](https://github.com/seanjameshan/starknet.js/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
+If you want to contribute but don’t know what to do, take a look at these two labels: [help wanted](https://github.com/starknet-io/starknet.js/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22) and [good first issue](https://github.com/starknet-io/starknet.js/issues?q=is%3Aissue+is%3Aopen+label%3A%22good+first+issue%22).
 
 _[Use GitHub interface](https://blog.sapegin.me/all/open-source-for-everyone/) for simple documentation changes, otherwise follow the steps below._
 
@@ -34,12 +34,45 @@ Or run tests in watch mode:
 npm test --watch
 ```
 
+By default the tests are executed in your local Devnet. If you want to use a specific rpc node, you have to set some global variables before executing the tests :
+
+```bash
+export TEST_RPC_URL=http://192.168.1.44:9545/rpc/v0.5 # example of a Pathfinder node located in your local network
+export TEST_RPC_URL=https://starknet-testnet.public.blastapi.io/rpc/v0.5 # example of a public testnet node
+export TEST_ACCOUNT_ADDRESS=0x065A822f0000000000000000000000000c26641
+export TEST_ACCOUNT_PRIVATE_KEY=0x02a80000000000000000000000001754438a
+```
+
 **Don’t forget to add tests and [update documentation](./www/README.md) for your changes.**
 Documentation can be archived by using JSDoc.
 
 **Please update the npm lock file (`package-lock.json`) if you add or update dependencies.**
 
+### Commit messages
+
 **For commit messages use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/), like so: `feat(scope): topic`**
+
+Note that the `feat` and `fix` commit messages are used for compiling the changelog. They should be relative to the current state of the target branch they should be merged into and not the feature branch where they are initially committed.
+
+Example of **_incorrect_** commit messages:
+
+```
+fix: repair some bug
+fix: rectify failing test
+fix: adjust formatting
+fix: add comments
+fix: repair some other bug
+```
+
+Example of **_correct_** commit messages:
+
+```
+fix: repair some bug
+test: rectify failing test
+chore: adjust formatting
+chore: add comments
+fix: repair some other bug
+```
 
 ### Pull request targets
 

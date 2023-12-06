@@ -1,16 +1,30 @@
-import { Abi, Call, DeclareSignerDetails, InvocationsSignerDetails, Signature } from '../types';
-import { DeployAccountSignerDetails } from '../types/signer';
+import {
+  Call,
+  DeclareSignerDetails,
+  DeployAccountSignerDetails,
+  InvocationsSignerDetails,
+  Signature,
+  TypedData,
+  V2DeclareSignerDetails,
+  V2DeployAccountSignerDetails,
+  V2InvocationsSignerDetails,
+  V3DeclareSignerDetails,
+  V3DeployAccountSignerDetails,
+  V3InvocationsSignerDetails,
+} from '../types';
+import { ETransactionVersion2, ETransactionVersion3 } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { starkCurve } from '../utils/ec';
 import { buf2hex } from '../utils/encode';
 import {
   calculateDeclareTransactionHash,
   calculateDeployAccountTransactionHash,
-  calculateTransactionHash,
+  calculateInvokeTransactionHash,
 } from '../utils/hash';
 import { toHex } from '../utils/num';
+import { intDAM } from '../utils/stark';
 import { getExecuteCalldata } from '../utils/transaction';
-import { TypedData, getMessageHash } from '../utils/typedData';
+import { getMessageHash } from '../utils/typedData';
 import { SignerInterface } from './interface';
 
 export class Signer implements SignerInterface {
@@ -31,74 +45,93 @@ export class Signer implements SignerInterface {
 
   public async signTransaction(
     transactions: Call[],
-    transactionsDetail: InvocationsSignerDetails,
-    abis?: Abi[]
+    details: InvocationsSignerDetails
   ): Promise<Signature> {
-    if (abis && abis.length !== transactions.length) {
-      throw new Error('ABI must be provided for each transaction or no transaction');
+    const compiledCalldata = getExecuteCalldata(transactions, details.cairoVersion);
+    let msgHash;
+
+    // TODO: How to do generic union discriminator for all like this
+    if (Object.values(ETransactionVersion2).includes(details.version as any)) {
+      const det = details as V2InvocationsSignerDetails;
+      msgHash = calculateInvokeTransactionHash({
+        ...det,
+        senderAddress: det.walletAddress,
+        compiledCalldata,
+        version: det.version,
+      });
+    } else if (Object.values(ETransactionVersion3).includes(details.version as any)) {
+      const det = details as V3InvocationsSignerDetails;
+      msgHash = calculateInvokeTransactionHash({
+        ...det,
+        senderAddress: det.walletAddress,
+        compiledCalldata,
+        version: det.version,
+        nonceDataAvailabilityMode: intDAM(det.nonceDataAvailabilityMode),
+        feeDataAvailabilityMode: intDAM(det.feeDataAvailabilityMode),
+      });
+    } else {
+      throw Error('unsupported signTransaction version');
     }
-    // now use abi to display decoded data somewhere, but as this signer is headless, we can't do that
 
-    const calldata = getExecuteCalldata(transactions, transactionsDetail.cairoVersion);
-
-    const msgHash = calculateTransactionHash(
-      transactionsDetail.walletAddress,
-      transactionsDetail.version,
-      calldata,
-      transactionsDetail.maxFee,
-      transactionsDetail.chainId,
-      transactionsDetail.nonce
-    );
-
-    return starkCurve.sign(msgHash, this.pk);
+    return starkCurve.sign(msgHash as string, this.pk);
   }
 
-  public async signDeployAccountTransaction({
-    classHash,
-    contractAddress,
-    constructorCalldata,
-    addressSalt,
-    maxFee,
-    version,
-    chainId,
-    nonce,
-  }: DeployAccountSignerDetails): Promise<Signature> {
-    const msgHash = calculateDeployAccountTransactionHash(
-      contractAddress,
-      classHash,
-      CallData.compile(constructorCalldata),
-      addressSalt,
-      version,
-      maxFee,
-      chainId,
-      nonce
-    );
+  public async signDeployAccountTransaction(
+    details: DeployAccountSignerDetails
+  ): Promise<Signature> {
+    const compiledConstructorCalldata = CallData.compile(details.constructorCalldata);
+    /*     const version = BigInt(details.version).toString(); */
+    let msgHash;
 
-    return starkCurve.sign(msgHash, this.pk);
+    if (Object.values(ETransactionVersion2).includes(details.version as any)) {
+      const det = details as V2DeployAccountSignerDetails;
+      msgHash = calculateDeployAccountTransactionHash({
+        ...det,
+        salt: det.addressSalt,
+        constructorCalldata: compiledConstructorCalldata,
+        version: det.version,
+      });
+    } else if (Object.values(ETransactionVersion3).includes(details.version as any)) {
+      const det = details as V3DeployAccountSignerDetails;
+      msgHash = calculateDeployAccountTransactionHash({
+        ...det,
+        salt: det.addressSalt,
+        compiledConstructorCalldata,
+        version: det.version,
+        nonceDataAvailabilityMode: intDAM(det.nonceDataAvailabilityMode),
+        feeDataAvailabilityMode: intDAM(det.feeDataAvailabilityMode),
+      });
+    } else {
+      throw Error('unsupported signDeployAccountTransaction version');
+    }
+
+    return starkCurve.sign(msgHash as string, this.pk);
   }
 
   public async signDeclareTransaction(
     // contractClass: ContractClass,  // Should be used once class hash is present in ContractClass
-    {
-      classHash,
-      senderAddress,
-      chainId,
-      maxFee,
-      version,
-      nonce,
-      compiledClassHash,
-    }: DeclareSignerDetails
+    details: DeclareSignerDetails
   ): Promise<Signature> {
-    const msgHash = calculateDeclareTransactionHash(
-      classHash,
-      senderAddress,
-      version,
-      maxFee,
-      chainId,
-      nonce,
-      compiledClassHash
-    );
+    let msgHash;
 
-    return starkCurve.sign(msgHash, this.pk);
+    if (Object.values(ETransactionVersion2).includes(details.version as any)) {
+      const det = details as V2DeclareSignerDetails;
+      msgHash = calculateDeclareTransactionHash({
+        ...det,
+        version: det.version,
+      });
+    } else if (Object.values(ETransactionVersion3).includes(details.version as any)) {
+      const det = details as V3DeclareSignerDetails;
+      msgHash = calculateDeclareTransactionHash({
+        ...det,
+        version: det.version,
+        nonceDataAvailabilityMode: intDAM(det.nonceDataAvailabilityMode),
+        feeDataAvailabilityMode: intDAM(det.feeDataAvailabilityMode),
+      });
+    } else {
+      throw Error('unsupported signDeclareTransaction version');
+    }
+
+    return starkCurve.sign(msgHash as string, this.pk);
   }
 }

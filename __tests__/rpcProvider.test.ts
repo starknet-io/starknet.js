@@ -1,35 +1,39 @@
-import { getStarkKey, utils } from 'micro-starknet';
+import { getStarkKey, utils } from '@scure/starknet';
 
-import { Account, Contract, GetBlockResponse, RpcProvider, stark } from '../src';
+import { Account, Contract, GetBlockResponse, stark } from '../src';
 import { StarknetChainId } from '../src/constants';
 import { CallData } from '../src/utils/calldata';
 import { felt, uint256 } from '../src/utils/calldata/cairo';
-// import { toBigInt } from '../src/utils/num';
+import { toHexString } from '../src/utils/num';
 import {
   compiledErc20Echo,
+  compiledL1L2,
   compiledOpenZeppelinAccount,
+  createBlockForDevnet,
   describeIfDevnet,
   describeIfNotDevnet,
   describeIfRpc,
   getTestAccount,
   getTestProvider,
-} from './fixtures';
-import { initializeMatcher } from './schema';
+} from './config/fixtures';
+import { initializeMatcher } from './config/schema';
 
 describeIfRpc('RPCProvider', () => {
-  const rpcProvider = getTestProvider() as RpcProvider;
-  const account = getTestAccount(rpcProvider);
+  const rpcProvider = getTestProvider(false);
+  const provider = getTestProvider();
+  const account = getTestAccount(provider);
   let accountPublicKey: string;
+  initializeMatcher(expect);
 
   beforeAll(async () => {
-    initializeMatcher(expect);
     expect(account).toBeInstanceOf(Account);
     const accountKeyPair = utils.randomPrivateKey();
     accountPublicKey = getStarkKey(accountKeyPair);
+    await createBlockForDevnet();
   });
 
   test('getChainId', async () => {
-    const fetchSpy = jest.spyOn(rpcProvider as any, 'fetchEndpoint');
+    const fetchSpy = jest.spyOn(rpcProvider.channel as any, 'fetchEndpoint');
     (rpcProvider as any).chainId = undefined as unknown as StarknetChainId;
     const chainId1 = await rpcProvider.getChainId();
     const chainId2 = await rpcProvider.getChainId();
@@ -40,12 +44,12 @@ describeIfRpc('RPCProvider', () => {
   });
 
   test('getTransactionCount', async () => {
-    const count = await rpcProvider.getTransactionCount('latest');
+    const count = await rpcProvider.getBlockTransactionCount('latest');
     expect(typeof count).toBe('number');
   });
 
   test('getBlockHashAndNumber', async () => {
-    const blockHashAndNumber = await rpcProvider.getBlockHashAndNumber();
+    const blockHashAndNumber = await rpcProvider.getBlockLatestAccepted();
     expect(blockHashAndNumber).toHaveProperty('block_hash');
     expect(blockHashAndNumber).toHaveProperty('block_number');
   });
@@ -56,16 +60,13 @@ describeIfRpc('RPCProvider', () => {
   });
 
   test('getStateUpdate', async () => {
-    const stateUpdate = await rpcProvider.getStateUpdate('latest');
+    const stateUpdate = await rpcProvider.getBlockStateUpdate('latest');
     expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
   });
 
-  xtest('getProtocolVersion - pathfinder not implemented', async () => {
-    await rpcProvider.getProtocolVersion();
-  });
-
-  test('getProtocolVersion - not implemented', async () => {
-    expect(rpcProvider.getProtocolVersion()).rejects.toThrow();
+  test('getSpecVersion', async () => {
+    const spec = await rpcProvider.getSpecVersion();
+    expect(typeof spec).toBe('string');
   });
 
   test('getCode - not implemented', async () => {
@@ -74,11 +75,39 @@ describeIfRpc('RPCProvider', () => {
     ).rejects.toThrow();
   });
 
+  describe('Test Estimate message fee', () => {
+    const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165A0';
+    let l1l2ContractAddress: string;
+
+    beforeAll(async () => {
+      const { deploy } = await account.declareAndDeploy({
+        contract: compiledL1L2,
+      });
+      l1l2ContractAddress = deploy.contract_address;
+    });
+
+    test('estimate message fee', async () => {
+      const estimation = await rpcProvider.estimateMessageFee({
+        from_address: L1_ADDRESS,
+        to_address: l1l2ContractAddress,
+        entry_point_selector: 'deposit',
+        payload: ['556', '123'],
+      });
+      expect(estimation).toEqual(
+        expect.objectContaining({
+          gas_consumed: expect.anything(),
+          gas_price: expect.anything(),
+          overall_fee: expect.anything(),
+        })
+      );
+    });
+  });
+
   describe('RPC methods', () => {
     let latestBlock: GetBlockResponse;
 
     beforeAll(async () => {
-      latestBlock = await rpcProvider.getBlock('latest');
+      latestBlock = await provider.getBlock('latest');
     });
 
     test('getBlockWithTxHashes', async () => {
@@ -99,15 +128,16 @@ describeIfRpc('RPCProvider', () => {
       expect(transaction).toHaveProperty('transaction_hash');
     });
 
+    test('getPendingTransactions', async () => {
+      const transactions = await rpcProvider.getPendingTransactions();
+      expect(Array.isArray(transactions)).toBe(true);
+    });
+
     xtest('traceBlockTransactions', async () => {
-      await rpcProvider.traceBlockTransactions(latestBlock.block_hash);
+      await rpcProvider.getBlockTransactionsTraces(latestBlock.block_hash);
     });
 
     describeIfDevnet('devnet only', () => {
-      test('getPendingTransactions - not implemented', async () => {
-        expect(rpcProvider.getPendingTransactions()).rejects.toThrow();
-      });
-
       test('getSyncingStats', async () => {
         const syncingStats = await rpcProvider.getSyncingStats();
         expect(syncingStats).toBe(false);
@@ -116,8 +146,9 @@ describeIfRpc('RPCProvider', () => {
       test('getEvents ', async () => {
         const randomWallet = stark.randomAddress();
         const classHash = '0x011ab8626b891bcb29f7cc36907af7670d6fb8a0528c7944330729d8f01e9ea3';
-        const transferSelector =
-          '271746229759260285552388728919865295615886751538523744128730118297934206697';
+        const transferSelector = toHexString(
+          '271746229759260285552388728919865295615886751538523744128730118297934206697'
+        );
 
         const { deploy } = await account.declareAndDeploy({
           contract: compiledErc20Echo,
@@ -146,12 +177,17 @@ describeIfRpc('RPCProvider', () => {
           from_block: { block_number: 0 },
           to_block: { block_number: blockNumber },
           address: deploy.contract_address,
-          keys: [transferSelector],
+          keys: [[transferSelector]],
           chunk_size: 2,
+        });
+
+        const result1 = await rpcProvider.getEvents({
+          chunk_size: 2, // all optional parameters removed
         });
 
         expect(result).toHaveProperty('continuation_token');
         expect(result).toHaveProperty('events');
+        expect(result1).toHaveProperty('events');
         expect(Array.isArray(result?.events)).toBe(true);
         expect(result?.events?.length).toBe(2);
         expect(result.events[0]).toMatchSchemaRef('StarknetEmittedEvent');
@@ -160,7 +196,7 @@ describeIfRpc('RPCProvider', () => {
           from_block: { block_number: 0 },
           to_block: { block_number: blockNumber },
           address: deploy.contract_address,
-          keys: [transferSelector],
+          keys: [[transferSelector]],
           chunk_size: 2,
           continuation_token: result.continuation_token,
         });
@@ -169,18 +205,6 @@ describeIfRpc('RPCProvider', () => {
         expect(result2).toHaveProperty('events');
         expect(Array.isArray(result2?.events)).toBe(true);
         expect(result2?.events?.length).toBe(1);
-      });
-    });
-
-    describeIfNotDevnet('testnet only', () => {
-      test('getPendingTransactions', async () => {
-        const transactions = await rpcProvider.getPendingTransactions();
-        expect(Array.isArray(transactions)).toBe(true);
-      });
-
-      test('getSyncingStats', async () => {
-        const syncingStats = await rpcProvider.getSyncingStats();
-        expect(syncingStats).toMatchSchemaRef('GetSyncingStatsResponse');
       });
     });
 
@@ -211,8 +235,13 @@ describeIfRpc('RPCProvider', () => {
         expect(transaction).toMatchSchemaRef('GetTransactionResponse');
       });
 
+      test('getTransactionStatus()', async () => {
+        return expect(rpcProvider.getTransactionStatus(transaction_hash)).resolves.not.toThrow();
+      });
+
       test('getTransaction', async () => {
-        const transaction = await rpcProvider.getTransaction(transaction_hash);
+        // todo - schema for rpc need to be created and expected response here updated
+        const transaction = await rpcProvider.getTransactionByHash(transaction_hash);
         expect(transaction).toMatchSchemaRef('GetTransactionResponse');
       });
 
@@ -222,7 +251,7 @@ describeIfRpc('RPCProvider', () => {
       });
 
       xtest('traceTransaction', async () => {
-        await rpcProvider.traceTransaction(transaction_hash);
+        await rpcProvider.getTransactionTrace(transaction_hash);
       });
 
       test('getClassAt', async () => {
@@ -234,6 +263,13 @@ describeIfRpc('RPCProvider', () => {
         const contractClass = await rpcProvider.getClass(ozClassHash);
         expect(contractClass).toMatchSchemaRef('LegacyContractClass');
       });
+    });
+  });
+
+  describeIfNotDevnet('global rpc only', () => {
+    test('getSyncingStats', async () => {
+      const syncingStats = await rpcProvider.getSyncingStats();
+      expect(syncingStats).toMatchSchemaRef('GetSyncingStatsResponse');
     });
   });
 });

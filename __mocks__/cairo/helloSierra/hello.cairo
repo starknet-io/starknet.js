@@ -21,20 +21,9 @@ use starknet::storage_access::StorageAddressSerde;
 use box::BoxTrait;
 // end bet part
 
-#[derive(Drop)]
+#[derive(Drop, Serde)]
 struct Foo {
     val: felt252
-}
-
-impl FooSerde of Serde::<Foo> {
-    fn serialize(ref serialized: Array<felt252>, input: Foo) {
-        Serde::<felt252>::serialize(ref serialized, input.val);
-    }
-
-    fn deserialize(ref serialized: Span<felt252>) -> Option<Foo> {
-        let val: felt252 = *serialized.pop_front()?;
-        Option::Some(Foo { val } )
-    }
 }
 
 // Complex Structs
@@ -85,21 +74,6 @@ impl UserDataStorageAccess of StorageAccess::<UserData> {
                 1
             } else {
                 0
-            }
-        )
-    }
-}
-
-impl UserDataSerde of serde::Serde::<UserData> {
-    fn serialize(ref serialized: Array::<felt252>, input: UserData) {
-        serde::Serde::serialize(ref serialized, input.address);
-        serde::Serde::serialize(ref serialized, input.is_claimed);
-    }
-    fn deserialize(ref serialized: Span::<felt252>) -> Option::<UserData> {
-        Option::Some(
-            UserData {
-                address: Serde::deserialize(ref serialized)?,
-                is_claimed: Serde::deserialize(ref serialized)?
             }
         )
     }
@@ -218,57 +192,6 @@ impl BetStorageAccess of StorageAccess::<Bet> {
     }
 }
 
-impl BetSerde of serde::Serde::<Bet> {
-    fn serialize(ref serialized: Array::<felt252>, input: Bet) {
-        serde::Serde::serialize(ref serialized, input.name);
-        serde::Serde::serialize(ref serialized, input.description);
-        serde::Serde::serialize(ref serialized, input.expire_date);
-        serde::Serde::serialize(ref serialized, input.creation_time);
-        serde::Serde::serialize(ref serialized, input.creator);
-        serde::Serde::serialize(ref serialized, input.is_cancelled);
-        serde::Serde::serialize(ref serialized, input.is_voted);
-        serde::Serde::serialize(ref serialized, input.bettor.address);
-        serde::Serde::serialize(ref serialized, input.bettor.is_claimed);
-        serde::Serde::serialize(ref serialized, input.counter_bettor.address);
-        serde::Serde::serialize(ref serialized, input.counter_bettor.is_claimed);
-        serde::Serde::serialize(ref serialized, input.winner);
-        serde::Serde::serialize(ref serialized, input.pool.low);
-        serde::Serde::serialize(ref serialized, input.pool.high);
-        serde::Serde::serialize(ref serialized, input.amount.low);
-        serde::Serde::serialize(ref serialized, input.amount.high);
-    }
-    fn deserialize(ref serialized: Span::<felt252>) -> Option::<Bet> {
-        Option::Some(
-            Bet {
-                name: Serde::deserialize(ref serialized)?, 
-                description: Serde::deserialize(ref serialized)?,  
-                expire_date: Serde::deserialize(ref serialized)?, 
-                creation_time: Serde::deserialize(ref serialized)?, 
-                creator: Serde::deserialize(ref serialized)?, 
-                is_cancelled: Serde::deserialize(ref serialized)?, 
-                is_voted: Serde::deserialize(ref serialized)?, 
-                bettor: UserData {
-                    address: Serde::deserialize(ref serialized)?,
-                    is_claimed: Serde::deserialize(ref serialized)?,
-                },
-                counter_bettor: UserData {
-                    address: Serde::deserialize(ref serialized)?,
-                    is_claimed: Serde::deserialize(ref serialized)?,
-                },
-                winner: Serde::deserialize(ref serialized)?,
-                pool: u256 {
-                    low: Serde::deserialize(ref serialized)?,
-                    high: Serde::deserialize(ref serialized)?,
-                },
-                amount: u256 {
-                    low: Serde::deserialize(ref serialized)?,
-                    high: Serde::deserialize(ref serialized)?,
-                }
-            }
-        )
-    }
-}
-
 // MAIN APP
 #[contract]
 mod HelloStarknet {
@@ -290,6 +213,7 @@ mod HelloStarknet {
         ca: ContractAddress,
         testbet: Bet,
         user: UserData,
+        user1: UserData,
     }
 
     // Felt252 test.
@@ -378,7 +302,7 @@ mod HelloStarknet {
         data
     }
 
-    // unamed Tuple
+    // unnamed Tuple
     #[view]
     fn echo_un_tuple(a:(felt252, u16)) -> (felt252, u16) {
         a
@@ -405,6 +329,16 @@ mod HelloStarknet {
         testbet::read()
     }
 
+    #[external]
+    fn set_user1(user: UserData) {
+        user1::write(user);
+    }
+
+    #[view]
+    fn get_user1() -> UserData {
+        user1::read()
+    }
+
     // this method is required so that ABI have UserData definition in structs
     #[view]
     fn get_user() -> UserData {
@@ -427,46 +361,23 @@ mod HelloStarknet {
         return *(test.at(0_u32)).at(0_u32);
     }
 
-    //mix request
+    // req tuple(array) ret tuple(array)
     #[view]
-    fn mix_req(mut a:core::array::Array::<felt252>, b:bool) -> core::array::Array::<felt252> {
-        a.append(1);
-        a.append(2);
+    fn tuple_echo(a: (core::array::Array::<felt252>, core::array::Array::<felt252>)) -> (core::array::Array::<felt252>, core::array::Array::<felt252>) {
         a
     }
 
-    // tuple req array,bool
-    //#[view]
-    //fn tuple_mix_req(a: (core::array::Array::<felt252>, core::array::Array::<felt252>)) -> (core::array::Array::<felt252>, core::array::Array::<felt252>) {
-    //    {t:a r:123}
-    //}
+    // mix req (array,bool) ret tuple(array,bool)
+    #[view]
+    fn array_bool_tuple(mut a:core::array::Array::<felt252>, b:bool) -> (core::array::Array::<felt252>, bool) {
+        a.append(1);
+        a.append(2);
+        (a, b)
+    }
 
-    //#[view]
-    //fn b() -> (core::array::Array::<felt252>, core::array::Array::<felt252>) {
-    //    let x = ArrayTrait::new();
-    //    let y = ArrayTrait::new();
-    //    (x, y)
-    //}  
-
-    //#[view]
-    //fn tuple_mix_req(a: (core::array::Array::<felt252>, core::array::Array::<felt252>)) -> (core::array::Array::<felt252>, core::array::Array::<felt252>) {
-    //    a
-    //}
-
-    //mix Tuple array,bool
-    //#[view]
-    //fn tuple_mix_req(mut a:core::array::Array::<felt252>, b:bool) -> core::array::Array::<felt252> {
-    //    a.append(1);
-    //    a.append(2);
-    //    a
-    //}
-
-    //#[external]
-    //fn tuple_mix_ex() -> (core::array::Array::<felt252>, bool) {
-    //    let mut ret = ArrayTrait::new();
-    //   ret.append(1);
-    //    ret.append(2);
-    //    (ret, true)
-    //}
-
+    // used for changes to redeclare contract
+    #[view]
+    fn array2ddd_felt(testdd: Array<Array<felt252>>) -> felt252 {
+        return *(testdd.at(0_u32)).at(0_u32);
+    }
 }

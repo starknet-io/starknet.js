@@ -1,8 +1,17 @@
-import { Contract, ContractFactory, RawArgs, json, stark } from '../src';
+import {
+  BigNumberish,
+  Contract,
+  ContractFactory,
+  ParsedEvents,
+  RawArgs,
+  SuccessfulTransactionReceiptResponse,
+  json,
+  stark,
+} from '../src';
 import { CallData } from '../src/utils/calldata';
-import { felt, tuple, uint256 } from '../src/utils/calldata/cairo';
+import { felt, isCairo1Abi, tuple, uint256 } from '../src/utils/calldata/cairo';
 import { getSelectorFromName } from '../src/utils/hash';
-import { BigNumberish, hexToDecimalString, toBigInt } from '../src/utils/num';
+import { hexToDecimalString, toBigInt } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import { uint256ToBN } from '../src/utils/uint256';
 import {
@@ -13,8 +22,8 @@ import {
   describeIfDevnet,
   getTestAccount,
   getTestProvider,
-} from './fixtures';
-import { initializeMatcher } from './schema';
+} from './config/fixtures';
+import { initializeMatcher } from './config/schema';
 
 describe('contract module', () => {
   let erc20Address: string;
@@ -50,6 +59,18 @@ describe('contract module', () => {
         );
       });
 
+      test('getCairoVersion', async () => {
+        const version = await erc20Contract.getVersion();
+        expect(version).toEqual({ cairo: '0', compiler: '0' });
+      });
+
+      test('isCairo1', async () => {
+        const isContractCairo1: boolean = erc20Contract.isCairo1();
+        expect(isContractCairo1).toBe(false);
+        const isAbiCairo1: boolean = isCairo1Abi(erc20Contract.abi);
+        expect(isAbiCairo1).toBe(false);
+      });
+
       test('populate transaction for initial balance of that account', async () => {
         const res = await erc20Contract.populateTransaction.balanceOf(wallet);
         expect(res).toHaveProperty('contractAddress');
@@ -58,7 +79,7 @@ describe('contract module', () => {
       });
 
       test('estimate gas fee for `mint` should fail when connected to the provider', async () => {
-        expect(erc20Contract.estimateFee.mint(wallet, ['10', '0'])).rejects.toThrow();
+        await expect(erc20Contract.estimateFee.mint(wallet, ['10', '0'])).rejects.toThrow();
       });
 
       test('read initial balance of that account', async () => {
@@ -86,6 +107,51 @@ describe('contract module', () => {
         expect(BigInt(block_number));
         expect(Array.isArray(result));
         (result as BigNumberish[]).forEach((el) => expect(BigInt(el)));
+      });
+    });
+
+    describe('Event Parsing', () => {
+      let erc20Echo20Contract: Contract;
+      const factoryClassHash =
+        '0x011ab8626b891bcb29f7cc36907af7670d6fb8a0528c7944330729d8f01e9ea3'!;
+      let factory: ContractFactory;
+      beforeAll(async () => {
+        factory = new ContractFactory({
+          compiledContract: compiledErc20Echo,
+          classHash: factoryClassHash,
+          account,
+        });
+
+        erc20Echo20Contract = await factory.deploy(
+          'Token',
+          'ERC20',
+          18,
+          uint256('1000000000'),
+          account.address,
+          ['0x823d5a0c0eefdc9a6a1cb0e064079a6284f3b26566b677a32c71bbe7bf9f8c'],
+          22
+        );
+      });
+
+      test('parse legacy event structure', async () => {
+        const to = stark.randomAddress();
+        const amount = uint256(1);
+        const { transaction_hash } = await erc20Echo20Contract.transfer(to, amount);
+        const tx = await provider.waitForTransaction(transaction_hash);
+        const events: ParsedEvents = erc20Echo20Contract.parseEvents(tx);
+        const shouldBe: ParsedEvents = [
+          {
+            Transfer: {
+              from_: BigInt(account.address),
+              to: BigInt(to),
+              value: {
+                low: BigInt(amount.low),
+                high: BigInt(amount.high),
+              },
+            },
+          },
+        ];
+        return expect(events).toStrictEqual(shouldBe);
       });
     });
 
@@ -207,12 +273,12 @@ describe('contract module', () => {
       });
     });
     test('deployment of new contract', async () => {
-      const factory = new ContractFactory(compiledErc20, classHash, account);
+      const factory = new ContractFactory({ compiledContract: compiledErc20, classHash, account });
       const erc20 = await factory.deploy('Token', 'ERC20', wallet);
       expect(erc20).toBeInstanceOf(Contract);
     });
     test('wait for deployment transaction', async () => {
-      const factory = new ContractFactory(compiledErc20, classHash, account);
+      const factory = new ContractFactory({ compiledContract: compiledErc20, classHash, account });
       const contract = await factory.deploy(
         CallData.compile({
           name: encodeShortString('Token'),
@@ -220,10 +286,10 @@ describe('contract module', () => {
           recipient: wallet,
         })
       );
-      expect(contract.deployed()).resolves.not.toThrow();
+      await expect(contract.deployed()).resolves.not.toThrow();
     });
     test('attach new contract', async () => {
-      const factory = new ContractFactory(compiledErc20, classHash, account);
+      const factory = new ContractFactory({ compiledContract: compiledErc20, classHash, account });
       const erc20 = factory.attach(erc20Address);
       expect(erc20).toBeInstanceOf(Contract);
     });
@@ -238,7 +304,7 @@ describe('Complex interaction', () => {
   let factory: ContractFactory;
 
   beforeAll(async () => {
-    factory = new ContractFactory(compiledErc20Echo, classHash, account);
+    factory = new ContractFactory({ compiledContract: compiledErc20Echo, classHash, account });
     erc20Echo20Contract = await factory.deploy(
       'Token',
       'ERC20',
@@ -376,6 +442,21 @@ describe('Complex interaction', () => {
     )}","10","20","48","40","1","2","10","20","22","33","1","2","3","4","22","33","1","33","1415934836","123333333","0","1","2","3","1","321","322","33","0","2","123","291","3","1","2","10","20","100","200","2","111","112","121","122","211","212","221","222"]`;
     expect(json.stringify(compiled)).toBe(reference);
     expect(json.stringify(doubleCompiled)).toBe(reference);
+
+    // mix of complex and litteral
+    const mySetArgs = {
+      validators: [234, 235],
+      powers: { a1: 562, a2: 567 },
+      valsetNonce: uint256(49),
+    };
+    const compiledArr = CallData.compile([mySetArgs, 456789]);
+    const compiledObj = CallData.compile({
+      currentValset: mySetArgs,
+      relayerRouterAddress: 456789,
+    });
+    const expectedResult = ['2', '234', '235', '562', '567', '49', '0', '456789'];
+    expect(compiledArr).toStrictEqual(expectedResult);
+    expect(compiledObj).toStrictEqual(expectedResult);
   });
 
   describe('Composed and nested data types (felt, array, struct, tuples), formatter', () => {
@@ -639,8 +720,7 @@ describe('Complex interaction', () => {
     test('invoke compiled data', async () => {
       const result = await erc20Echo20Contract.iecho(CallData.compile(request));
       const transaction = await provider.waitForTransaction(result.transaction_hash);
-
-      expect(transaction.status).toBeDefined();
+      expect((transaction as SuccessfulTransactionReceiptResponse).execution_status).toBeDefined();
     });
 
     // skip on live for performance
@@ -650,19 +730,19 @@ describe('Complex interaction', () => {
 
       const result = await erc20Echo20Contract.iecho(calldata);
       const transaction = await provider.waitForTransaction(result.transaction_hash);
-      expect(transaction.status).toBeDefined();
+      expect((transaction as SuccessfulTransactionReceiptResponse).execution_status).toBeDefined();
 
       const result1 = await erc20Echo20Contract.iecho(...args);
       const transaction1 = await provider.waitForTransaction(result1.transaction_hash);
-      expect(transaction1.status).toBeDefined();
+      expect((transaction1 as SuccessfulTransactionReceiptResponse).execution_status).toBeDefined();
 
       const result2 = await erc20Echo20Contract.invoke('iecho', calldata);
       const transaction2 = await provider.waitForTransaction(result2.transaction_hash);
-      expect(transaction2.status).toBeDefined();
+      expect((transaction2 as SuccessfulTransactionReceiptResponse).execution_status).toBeDefined();
 
       const result3 = await erc20Echo20Contract.invoke('iecho', args);
       const transaction3 = await provider.waitForTransaction(result3.transaction_hash);
-      expect(transaction3.status).toBeDefined();
+      expect((transaction3 as SuccessfulTransactionReceiptResponse).execution_status).toBeDefined();
     });
 
     describe('speedup live tests', () => {
@@ -715,7 +795,9 @@ describe('Complex interaction', () => {
           { formatResponse }
         );
         const transaction = await provider.waitForTransaction(result.transaction_hash);
-        expect(transaction.status).toBeDefined();
+        expect(
+          (transaction as SuccessfulTransactionReceiptResponse).execution_status
+        ).toBeDefined();
       });
     });
 
@@ -731,6 +813,7 @@ describe('Complex interaction', () => {
       const calldata = CallData.compile(request);
       const populated4 = erc20Echo20Contract.populateTransaction.echo(calldata);
       const populated5 = erc20Echo20Contract.populate('echo', calldata);
+      const populated6 = erc20Echo20Contract.populate('echo', request);
       const expected =
         '["474107654995566025798705","123","8","135049554883004558383340439742929429255072943744440858662311072577337126766","203887170123222058415354283980421533276985178030994883159827760142323294308","196343614134218459150194337625778954700414868493373034945803514629145850912","191491606203201332235940470946533476219373216944002683254566549675726417440","150983476482645969577707455338206408996455974968365254240526141964709732462","196916864427988120570407658938236398782031728400132565646592333804118761826","196909666192589839125749789377187946419246316474617716408635151520594095469","2259304674248048077001042434290734","1","1","2","3","4","5","6","1","2","3","4","5","6","7","8","9","10","11","5000","0","1","2","1","2","200","1","2","6","1","2","3","4","5","6","4","1000","0","2000","0","3000","0","4000","0","2","10","11","20","22","2","1","2","3","4","1","2","3","4","3","1","2","3","4","1","2","3","4","1","2","3","4"]';
       expect(expected).toBe(json.stringify(populated1.calldata));
@@ -738,6 +821,7 @@ describe('Complex interaction', () => {
       expect(expected).toBe(json.stringify(populated3.calldata));
       expect(expected).toBe(json.stringify(populated4.calldata));
       expect(expected).toBe(json.stringify(populated5.calldata));
+      expect(expected).toBe(json.stringify(populated6.calldata));
 
       // mark data as compiled (it can be also done manually check defineProperty compiled in CallData.compile)
       const compiledCallData = CallData.compile(populated4.calldata);
