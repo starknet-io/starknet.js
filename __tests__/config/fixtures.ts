@@ -8,6 +8,7 @@ import {
   LegacyCompiledContract,
   waitForTransactionOptions,
 } from '../../src/types';
+import { ETransactionVersion } from '../../src/types/api';
 import { toHex } from '../../src/utils/num';
 
 const readContract = (name: string): LegacyCompiledContract =>
@@ -71,7 +72,9 @@ export const getTestAccount = (provider: ProviderInterface) => {
   return new Account(
     provider,
     toHex(process.env.TEST_ACCOUNT_ADDRESS || ''),
-    process.env.TEST_ACCOUNT_PRIVATE_KEY || ''
+    process.env.TEST_ACCOUNT_PRIVATE_KEY || '',
+    undefined,
+    process.env.TX_VERSION === 'v3' ? ETransactionVersion.V3 : undefined // TODO: enable setup to test diff TX versions
   );
 };
 

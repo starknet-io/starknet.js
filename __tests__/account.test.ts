@@ -3,10 +3,10 @@ import {
   Account,
   Contract,
   DeclareDeployUDCResponse,
-  DeployTransactionReceiptResponse,
   Provider,
   TransactionType,
   cairo,
+  constants,
   contractClassResponseToLegacyCompiledContract,
   ec,
   extractContractHashes,
@@ -95,7 +95,7 @@ describe('deploy and test Wallet', () => {
     });
 
     expect(result).toMatchSchemaRef('EstimateFee');
-    expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(hash.feeTransactionVersion);
+    expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(constants.TRANSACTION_VERSION.F1);
     innerInvokeEstFeeSpy.mockClear();
   });
 
@@ -559,7 +559,7 @@ describe('deploy and test Wallet', () => {
 
       // check pre-calculated address
       const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
-      const udcEvent = parseUDCEvent(txReceipt as DeployTransactionReceiptResponse);
+      const udcEvent = parseUDCEvent(txReceipt as any); // todo: when time fix types
       expect(cleanHex(deployment.contract_address[0])).toBe(cleanHex(udcEvent.contract_address));
     });
 
@@ -580,7 +580,7 @@ describe('deploy and test Wallet', () => {
 
       // check pre-calculated address
       const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
-      const udcEvent = parseUDCEvent(txReceipt as DeployTransactionReceiptResponse);
+      const udcEvent = parseUDCEvent(txReceipt as any); // todo: when time fix types
       expect(cleanHex(deployment.contract_address[0])).toBe(cleanHex(udcEvent.contract_address));
     });
 

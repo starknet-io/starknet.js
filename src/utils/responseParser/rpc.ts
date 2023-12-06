@@ -18,7 +18,7 @@ import {
   FeeEstimate,
   SimulateTransactionResponse as RPCSimulateTransactionResponse,
   TransactionWithHash,
-} from '../../types/api/rpcspec';
+} from '../../types/api/rpcspec_0_6';
 import { toBigInt } from '../num';
 import { estimatedFeeToMaxFee } from '../stark';
 import { ResponseParser } from '.';

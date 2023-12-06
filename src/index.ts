@@ -5,6 +5,7 @@ export * from './account';
 export * from './contract';
 export * from './provider';
 export * from './signer';
+export * from './channel';
 
 // TODO: decide on final export style
 export * from './types';
@@ -16,6 +17,8 @@ export * as types from './types';
 export * as constants from './constants';
 export * as encode from './utils/encode';
 export * as hash from './utils/hash';
+export * as v3hash from './utils/hash/transactionHash/v3';
+export * as v2hash from './utils/hash/transactionHash/v2';
 export * as json from './utils/json';
 export * as num from './utils/num';
 export * as transaction from './utils/transaction';

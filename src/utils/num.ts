@@ -170,3 +170,14 @@ export function hexToBytes(value: string): Uint8Array {
   }
   return hexToBytesNoble(adaptedValue);
 }
+
+/**
+ *
+ * @param number value to be increased
+ * @param percent integer as percent ex. 50 for 50%
+ * @returns increased value
+ */
+export function addPercent(number: BigNumberish, percent: number) {
+  const bigIntNum = BigInt(number);
+  return bigIntNum + (bigIntNum * BigInt(percent)) / 100n;
+}

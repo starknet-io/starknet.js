@@ -7,7 +7,7 @@ export * from './signer';
 export * from './typedData';
 export * from './cairoEnum';
 
-export * as RPC from './api/rpc';
+export * as RPC from './api';
 export {
   CallL1Handler,
   DeployedContractItem,

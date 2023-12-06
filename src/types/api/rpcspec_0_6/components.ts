@@ -19,6 +19,16 @@ export type ETH_ADDRESS = string;
 export type STORAGE_KEY = string;
 export type ADDRESS = FELT;
 export type NUM_AS_HEX = string;
+/**
+ * 64 bit integers, represented by hex string of length at most 16
+ * "pattern": "^0x(0|[a-fA-F1-9]{1}[a-fA-F0-9]{0,15})$"
+ */
+export type u64 = string;
+/**
+ * 64 bit integers, represented by hex string of length at most 32
+ * "pattern": "^0x(0|[a-fA-F1-9]{1}[a-fA-F0-9]{0,31})$"
+ */
+export type u128 = string;
 export type SIGNATURE = Array<FELT>;
 export type BLOCK_NUMBER = number;
 export type BLOCK_HASH = FELT;
@@ -62,8 +72,6 @@ export type RESULT_PAGE_REQUEST = {
 };
 
 export type EMITTED_EVENT = EVENT & {
-  block_hash: BLOCK_HASH;
-  block_number: BLOCK_NUMBER;
   transaction_hash: TXN_HASH;
 };
 
@@ -195,13 +203,13 @@ export type StorageDiffItem = {
 
 export type TXN = INVOKE_TXN | L1_HANDLER_TXN | DECLARE_TXN | DEPLOY_TXN | DEPLOY_ACCOUNT_TXN;
 
-export type DECLARE_TXN = DECLARE_TXN_V0 | DECLARE_TXN_V1 | DECLARE_TXN_V2;
+export type DECLARE_TXN = DECLARE_TXN_V0 | DECLARE_TXN_V1 | DECLARE_TXN_V2 | DECLARE_TXN_V3;
 
 export type DECLARE_TXN_V0 = {
   type: 'DECLARE';
   sender_address: ADDRESS;
   max_fee: FELT;
-  version: '0x0';
+  version: '0x0' | '0x100000000000000000000000000000000';
   signature: SIGNATURE;
   class_hash: FELT;
 };
@@ -210,7 +218,7 @@ export type DECLARE_TXN_V1 = {
   type: 'DECLARE';
   sender_address: ADDRESS;
   max_fee: FELT;
-  version: '0x1';
+  version: '0x1' | '0x100000000000000000000000000000001';
   signature: SIGNATURE;
   nonce: FELT;
   class_hash: FELT;
@@ -221,10 +229,27 @@ export type DECLARE_TXN_V2 = {
   sender_address: ADDRESS;
   compiled_class_hash: FELT;
   max_fee: FELT;
-  version: '0x2';
+  version: '0x2' | '0x100000000000000000000000000000002';
   signature: SIGNATURE;
   nonce: FELT;
   class_hash: FELT;
+};
+
+export type DECLARE_TXN_V3 = {
+  type: 'DECLARE';
+  sender_address: ADDRESS;
+  compiled_class_hash: FELT;
+  version: '0x3' | '0x100000000000000000000000000000003';
+  signature: SIGNATURE;
+  nonce: FELT;
+  class_hash: FELT;
+  // new...
+  resource_bounds: RESOURCE_BOUNDS_MAPPING;
+  tip: u64;
+  paymaster_data: FELT[];
+  account_deployment_data: FELT[];
+  nonce_data_availability_mode: DA_MODE;
+  fee_data_availability_mode: DA_MODE;
 };
 
 export type BROADCASTED_TXN =
@@ -232,17 +257,21 @@ export type BROADCASTED_TXN =
   | BROADCASTED_DECLARE_TXN
   | BROADCASTED_DEPLOY_ACCOUNT_TXN;
 
-export type BROADCASTED_INVOKE_TXN = INVOKE_TXN_V0 | INVOKE_TXN_V1;
+export type BROADCASTED_INVOKE_TXN = INVOKE_TXN;
 
 export type BROADCASTED_DEPLOY_ACCOUNT_TXN = DEPLOY_ACCOUNT_TXN;
 
-export type BROADCASTED_DECLARE_TXN = BROADCASTED_DECLARE_TXN_V1 | BROADCASTED_DECLARE_TXN_V2;
+export type BROADCASTED_DECLARE_TXN =
+  | BROADCASTED_DECLARE_TXN_V1
+  | BROADCASTED_DECLARE_TXN_V2
+  | BROADCASTED_DECLARE_TXN_V3;
 
 export type BROADCASTED_DECLARE_TXN_V1 = {
   type: 'DECLARE';
   sender_address: ADDRESS;
   max_fee: FELT;
-  version: NUM_AS_HEX;
+  // todo: check if working, prev i fixed it with NUM_AS_HEX
+  version: '0x1' | '0x100000000000000000000000000000001';
   signature: SIGNATURE;
   nonce: FELT;
   contract_class: DEPRECATED_CONTRACT_CLASS;
@@ -253,18 +282,35 @@ export type BROADCASTED_DECLARE_TXN_V2 = {
   sender_address: ADDRESS;
   compiled_class_hash: FELT;
   max_fee: FELT;
-  version: NUM_AS_HEX;
+  version: '0x2' | '0x100000000000000000000000000000002';
   signature: SIGNATURE;
   nonce: FELT;
   contract_class: CONTRACT_CLASS;
 };
 
-export type DEPLOY_ACCOUNT_TXN = DEPLOY_ACCOUNT_TXN_V1;
+export type BROADCASTED_DECLARE_TXN_V3 = {
+  type: 'DECLARE';
+  sender_address: ADDRESS;
+  compiled_class_hash: FELT;
+  version: '0x3' | '0x100000000000000000000000000000003';
+  signature: SIGNATURE;
+  nonce: FELT;
+  contract_class: CONTRACT_CLASS;
+  // new...
+  resource_bounds: RESOURCE_BOUNDS_MAPPING;
+  tip: u64;
+  paymaster_data: FELT[];
+  account_deployment_data: FELT[];
+  nonce_data_availability_mode: DA_MODE;
+  fee_data_availability_mode: DA_MODE;
+};
+
+export type DEPLOY_ACCOUNT_TXN = DEPLOY_ACCOUNT_TXN_V1 | DEPLOY_ACCOUNT_TXN_V3;
 
 export type DEPLOY_ACCOUNT_TXN_V1 = {
   type: 'DEPLOY_ACCOUNT';
   max_fee: FELT;
-  version: NUM_AS_HEX;
+  version: '0x1' | '0x100000000000000000000000000000001';
   signature: SIGNATURE;
   nonce: FELT;
   contract_address_salt: FELT;
@@ -272,20 +318,36 @@ export type DEPLOY_ACCOUNT_TXN_V1 = {
   class_hash: FELT;
 };
 
+export type DEPLOY_ACCOUNT_TXN_V3 = {
+  type: 'DEPLOY_ACCOUNT';
+  version: '0x3' | '0x100000000000000000000000000000003';
+  signature: SIGNATURE;
+  nonce: FELT;
+  contract_address_salt: FELT;
+  constructor_calldata: FELT[];
+  class_hash: FELT;
+  resource_bounds: RESOURCE_BOUNDS_MAPPING;
+  tip: u64;
+  paymaster_data: FELT[];
+  account_deployment_data: FELT[];
+  nonce_data_availability_mode: DA_MODE;
+  fee_data_availability_mode: DA_MODE;
+};
+
 export type DEPLOY_TXN = {
   type: 'DEPLOY';
-  version: NUM_AS_HEX;
+  version: FELT;
   contract_address_salt: FELT;
   constructor_calldata: FELT[];
   class_hash: FELT;
 };
 
-export type INVOKE_TXN = INVOKE_TXN_V0 | INVOKE_TXN_V1;
+export type INVOKE_TXN = INVOKE_TXN_V0 | INVOKE_TXN_V1 | INVOKE_TXN_V3;
 
 export type INVOKE_TXN_V0 = {
   type: 'INVOKE';
   max_fee: FELT;
-  version: '0x0';
+  version: '0x0' | '0x100000000000000000000000000000000';
   signature: SIGNATURE;
   contract_address: ADDRESS;
   entry_point_selector: FELT;
@@ -297,37 +359,51 @@ export type INVOKE_TXN_V1 = {
   sender_address: ADDRESS;
   calldata: FELT[];
   max_fee: FELT;
-  version: NUM_AS_HEX;
+  version: '0x1' | '0x100000000000000000000000000000001';
   signature: SIGNATURE;
   nonce: FELT;
 };
 
+export type INVOKE_TXN_V3 = {
+  type: 'INVOKE';
+  sender_address: ADDRESS;
+  calldata: FELT[];
+  version: '0x3' | '0x100000000000000000000000000000003';
+  signature: SIGNATURE;
+  nonce: FELT;
+  resource_bounds: RESOURCE_BOUNDS_MAPPING;
+  tip: u64;
+  paymaster_data: FELT[];
+  account_deployment_data: FELT[];
+  nonce_data_availability_mode: DA_MODE;
+  fee_data_availability_mode: DA_MODE;
+};
+
 export type L1_HANDLER_TXN = {
-  version: NUM_AS_HEX;
+  version: FELT;
   type: 'L1_HANDLER';
   nonce: NUM_AS_HEX;
 } & FUNCTION_CALL;
 
 export type COMMON_RECEIPT_PROPERTIES = {
   transaction_hash: TXN_HASH;
-  actual_fee: FELT;
+  actual_fee: FEE_PAYMENT;
   execution_status: TXN_EXECUTION_STATUS;
   finality_status: TXN_FINALITY_STATUS;
   block_hash: BLOCK_HASH;
   block_number: BLOCK_NUMBER;
   messages_sent: MSG_TO_L1[];
-  revert_reason: string;
+  revert_reason?: string;
   events: EVENT[];
   execution_resources: EXECUTION_RESOURCES;
 };
 
 export type PENDING_COMMON_RECEIPT_PROPERTIES = {
   transaction_hash: TXN_HASH;
-  actual_fee: FELT;
-  type: TXN_TYPE;
+  actual_fee: FEE_PAYMENT;
   messages_sent: MSG_TO_L1[];
   events: EVENT[];
-  revert_reason: string;
+  revert_reason?: string;
   finality_status: 'ACCEPTED_ON_L2';
   execution_status: TXN_EXECUTION_STATUS;
   execution_resources: EXECUTION_RESOURCES;
@@ -478,32 +554,47 @@ export type TYPED_PARAMETER = {
   type: string;
 };
 
+export type SIMULATION_FLAG_FOR_ESTIMATE_FEE = 'SKIP_VALIDATE';
+export type PRICE_UNIT = 'WEI' | 'FRI';
+
 export type FEE_ESTIMATE = {
-  gas_consumed: NUM_AS_HEX;
-  gas_price: NUM_AS_HEX;
-  overall_fee: NUM_AS_HEX;
+  gas_consumed: FELT;
+  gas_price: FELT;
+  overall_fee: FELT;
+  unit: PRICE_UNIT;
 };
 
-export type RESOURCE_LIMITS = {
-  max_amount: NUM_AS_HEX;
-  max_price_per_unit: NUM_AS_HEX;
+export type FEE_PAYMENT = {
+  amount: FELT;
+  unit: PRICE_UNIT;
+};
+
+export type RESOURCE_BOUNDS_MAPPING = {
+  l1_gas: RESOURCE_BOUNDS;
+  l2_gas: RESOURCE_BOUNDS;
+};
+
+export type RESOURCE_BOUNDS = {
+  max_amount: u64;
+  max_price_per_unit: u128;
 };
 
 export type RESOURCE_PRICE = {
-  price_in_strk?: NUM_AS_HEX;
-  price_in_wei: NUM_AS_HEX;
+  price_in_fri: FELT;
+  price_in_wei: FELT;
 };
 
 export type EXECUTION_RESOURCES = {
-  steps: NUM_AS_HEX;
-  memory_holes: NUM_AS_HEX;
-  range_check_builtin_applications: NUM_AS_HEX;
-  pedersen_builtin_applications: NUM_AS_HEX;
-  poseidon_builtin_applications: NUM_AS_HEX;
-  ec_op_builtin_applications: NUM_AS_HEX;
-  ecdsa_builtin_applications: NUM_AS_HEX;
-  bitwise_builtin_applications: NUM_AS_HEX;
-  keccak_builtin_applications: NUM_AS_HEX;
+  steps: number;
+  memory_holes?: number;
+  range_check_builtin_applications?: number;
+  pedersen_builtin_applications?: number;
+  poseidon_builtin_applications?: number;
+  ec_op_builtin_applications?: number;
+  ecdsa_builtin_applications?: number;
+  bitwise_builtin_applications?: number;
+  keccak_builtin_applications?: number;
+  segment_arena_builtin?: number;
 };
 
 /**
@@ -565,6 +656,7 @@ export type FUNCTION_INVOCATION = {
   calls: NESTED_CALL[];
   events: ORDERED_EVENT[];
   messages: ORDERED_MESSAGE[];
+  execution_resources: EXECUTION_RESOURCES;
 };
 
 // Represents an ordered event alongside its order within the transaction.

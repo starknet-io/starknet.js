@@ -1,4 +1,4 @@
-import { RpcChannel } from '../channel/rpc';
+import { RpcChannel } from '../channel/rpc_0_6';
 import {
   AccountInvocations,
   BigNumberish,
@@ -239,15 +239,17 @@ export class RpcProvider implements ProviderInterface {
   public async getEstimateFee(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ) {
-    return this.getInvokeEstimateFee(invocation, invocationDetails, blockIdentifier);
+    return this.getInvokeEstimateFee(invocation, invocationDetails, blockIdentifier, skipValidate);
   }
 
   public async getInvokeEstimateFee(
     invocation: Invocation,
     invocationDetails: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ) {
     return this.channel
       .getEstimateFee(
@@ -258,7 +260,7 @@ export class RpcProvider implements ProviderInterface {
             ...invocationDetails,
           },
         ],
-        { blockIdentifier }
+        { blockIdentifier, skipValidate }
       )
       .then(this.responseParser.parseFeeEstimateResponse);
   }
@@ -266,7 +268,8 @@ export class RpcProvider implements ProviderInterface {
   public async getDeclareEstimateFee(
     invocation: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ) {
     return this.channel
       .getEstimateFee(
@@ -277,7 +280,7 @@ export class RpcProvider implements ProviderInterface {
             ...details,
           },
         ],
-        { blockIdentifier }
+        { blockIdentifier, skipValidate }
       )
       .then(this.responseParser.parseFeeEstimateResponse);
   }
@@ -285,7 +288,8 @@ export class RpcProvider implements ProviderInterface {
   public async getDeployAccountEstimateFee(
     invocation: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
   ) {
     return this.channel
       .getEstimateFee(
@@ -296,7 +300,7 @@ export class RpcProvider implements ProviderInterface {
             ...details,
           },
         ],
-        { blockIdentifier }
+        { blockIdentifier, skipValidate }
       )
       .then(this.responseParser.parseFeeEstimateResponse);
   }

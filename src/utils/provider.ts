@@ -7,11 +7,14 @@ import {
   CompiledContract,
   CompiledSierra,
   ContractClass,
+  InvocationsDetailsWithNonce,
   LegacyContractClass,
   RPC,
   SequencerIdentifier,
   SierraContractClass,
+  V3TransactionDetails,
 } from '../types';
+import { ETransactionVersion } from '../types/api';
 import { isSierra } from './contract';
 import { formatSpaces } from './hash';
 import { parse, stringify } from './json';
@@ -176,4 +179,16 @@ export function defStateUpdate(
     return accepted(state);
   }
   return pending(state);
+}
+
+export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3TransactionDetails {
+  const version = details.version ? toHex(details.version) : ETransactionVersion.V3;
+  return version === ETransactionVersion.V3 || version === ETransactionVersion.F3;
+}
+
+export function isVersion(version: '0.5' | '0.6', response: string) {
+  const [majorS, minorS] = version.split('.');
+  const [majorR, minorR] = response.split('.');
+
+  return majorS === majorR && minorS === minorR;
 }
