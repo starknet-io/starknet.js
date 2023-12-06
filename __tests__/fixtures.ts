@@ -73,6 +73,11 @@ export const getTestAccount = (provider: ProviderInterface) => {
   );
 };
 
+export const createBlockForDevnet = async (): Promise<void> => {
+  if (!(process.env.IS_RPC_DEVNET === 'true')) return;
+  await fetch(new URL('/create_block', process.env.TEST_RPC_URL), { method: 'POST' });
+};
+
 const describeIf = (condition: boolean) => (condition ? describe : describe.skip);
 export const describeIfSequencer = describeIf(process.env.IS_SEQUENCER === 'true');
 export const describeIfRpc = describeIf(process.env.IS_RPC === 'true');

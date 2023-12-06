@@ -9,6 +9,7 @@ import {
   compiledErc20Echo,
   compiledL1L2,
   compiledOpenZeppelinAccount,
+  createBlockForDevnet,
   describeIfDevnet,
   describeIfNotDevnet,
   describeIfRpc,
@@ -27,6 +28,7 @@ describeIfRpc('RPCProvider', () => {
     expect(account).toBeInstanceOf(Account);
     const accountKeyPair = utils.randomPrivateKey();
     accountPublicKey = getStarkKey(accountKeyPair);
+    await createBlockForDevnet();
   });
 
   test('getChainId', async () => {
