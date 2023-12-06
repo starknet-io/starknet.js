@@ -74,7 +74,7 @@ export const getTestAccount = (provider: ProviderInterface) => {
     toHex(process.env.TEST_ACCOUNT_ADDRESS || ''),
     process.env.TEST_ACCOUNT_PRIVATE_KEY || '',
     undefined,
-    process.env.TX_VERSION === 'v3' ? ETransactionVersion.V3 : undefined // TODO: enable setup to test diff TX versions
+    process.env.TX_VERSION === 'v3' ? ETransactionVersion.V3 : undefined // TODO: enable setup to test diff TX versions, add this to print table
   );
 };
 
