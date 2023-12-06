@@ -1,15 +1,17 @@
 import { getStarkKey, utils } from '@scure/starknet';
 import { gzip, ungzip } from 'pako';
 
+import { ZERO } from '../constants';
 import {
   ArraySignatureType,
   BigNumberish,
   CompressedProgram,
+  EstimateFeeDetails,
   EstimateFeeResponse,
   Program,
   Signature,
 } from '../types';
-import { EDAMode, EDataAvailabilityMode, ResourceBounds } from '../types/api';
+import { EDAMode, EDataAvailabilityMode, ETransactionVersion, ResourceBounds } from '../types/api';
 import { addHexPrefix, arrayBufferToString, atobUniversal, btoaUniversal } from './encode';
 import { parse, stringify } from './json';
 import {
@@ -124,4 +126,35 @@ export function intDAM(dam: EDataAvailabilityMode) {
   if (dam === EDataAvailabilityMode.L1) return EDAMode.L1;
   if (dam === EDataAvailabilityMode.L2) return EDAMode.L2;
   throw Error('EDAM conversion');
+}
+
+/**
+ * Convert to ETransactionVersion or throw an error
+ * @param defaultVersion ETransactionVersion
+ * @param providedVersion BigNumberish
+ * @returns ETransactionVersion
+ */
+export function toTransactionVersion(
+  defaultVersion: ETransactionVersion,
+  providedVersion?: BigNumberish
+) {
+  if (!Object.values(ETransactionVersion).includes(providedVersion as any)) {
+    throw Error(`${providedVersion} is not supported`);
+  }
+  return (providedVersion ? toHex(providedVersion) : defaultVersion) as ETransactionVersion;
+}
+
+/**
+ * Rerturn provided or default v3 tx details
+ * @param details EstimateFeeDetails
+ */
+export function v3Details(details: EstimateFeeDetails) {
+  return {
+    tip: details.tip || 0,
+    paymasterData: details.paymasterData || [],
+    accountDeploymentData: details.accountDeploymentData || [],
+    nonceDataAvailabilityMode: details.nonceDataAvailabilityMode || EDataAvailabilityMode.L1,
+    feeDataAvailabilityMode: details.feeDataAvailabilityMode || EDataAvailabilityMode.L1,
+    resourceBounds: estimateFeeToBounds(ZERO),
+  };
 }

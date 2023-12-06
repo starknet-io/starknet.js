@@ -25,9 +25,9 @@ import {
   EstimateFeeAction,
   EstimateFeeBulk,
   EstimateFeeDetails,
+  EstimateFeeResponse,
   Invocation,
   Invocations,
-  InvocationsDetails,
   InvocationsSignerDetails,
   InvokeFunctionResponse,
   MultiDeployContractResponse,
@@ -40,12 +40,7 @@ import {
   TypedData,
   UniversalDeployerContractPayload,
 } from '../types';
-import {
-  EDataAvailabilityMode,
-  ETransactionVersion,
-  ETransactionVersion2,
-  ETransactionVersion3,
-} from '../types/api';
+import { ETransactionVersion, ETransactionVersion3 } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { starkCurve } from '../utils/ec';
@@ -58,6 +53,8 @@ import {
   estimatedFeeToMaxFee,
   formatSignature,
   randomAddress,
+  toTransactionVersion,
+  v3Details,
 } from '../utils/stark';
 import { getExecuteCalldata } from '../utils/transaction';
 import { getMessageHash } from '../utils/typedData';
@@ -70,11 +67,14 @@ export class Account extends Provider implements AccountInterface {
 
   public cairoVersion: CairoVersion;
 
+  readonly transactionVersion: ETransactionVersion.V2 | ETransactionVersion.V3;
+
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
     address: string,
     pkOrSigner: Uint8Array | string | SignerInterface,
-    cairoVersion?: CairoVersion
+    cairoVersion?: CairoVersion,
+    transactionVersion: ETransactionVersion.V2 | ETransactionVersion.V3 = ETransactionVersion.V2 // TODO: Discuss this, set to v2 for backward compatibility
   ) {
     super(providerOrOptions);
     this.address = address.toLowerCase();
@@ -86,6 +86,15 @@ export class Account extends Provider implements AccountInterface {
     if (cairoVersion) {
       this.cairoVersion = cairoVersion.toString() as CairoVersion;
     }
+    this.transactionVersion = transactionVersion;
+  }
+
+  // provided version or contract based preferred transactionVersion
+  private getPreferredVersion(type2: ETransactionVersion, type3: ETransactionVersion) {
+    if (this.transactionVersion === ETransactionVersion.V3) return type3;
+    if (this.transactionVersion === ETransactionVersion.V2) return type2;
+
+    return ETransactionVersion.V3;
   }
 
   public async getNonce(blockIdentifier?: BlockIdentifier): Promise<Nonce> {
@@ -117,18 +126,23 @@ export class Account extends Provider implements AccountInterface {
 
   public async estimateFee(
     calls: AllowArray<Call>,
-    estimateFeeDetails?: EstimateFeeDetails | undefined
+    estimateFeeDetails: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
     return this.estimateInvokeFee(calls, estimateFeeDetails);
   }
 
   public async estimateInvokeFee(
     calls: AllowArray<Call>,
-    { nonce: providedNonce, blockIdentifier }: EstimateFeeDetails = {}
+    details: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
+    const { nonce: providedNonce, blockIdentifier, version: providedVersion } = details;
+
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
-    const version = ETransactionVersion.F1;
+    const version = toTransactionVersion(
+      this.getPreferredVersion(ETransactionVersion.F1, ETransactionVersion.F3),
+      providedVersion
+    );
     const chainId = await this.getChainId();
 
     const signerDetails: InvocationsSignerDetails = {
@@ -138,29 +152,35 @@ export class Account extends Provider implements AccountInterface {
       version,
       chainId,
       cairoVersion: await this.getCairoVersion(),
+      ...v3Details(details),
     };
 
     const invocation = await this.buildInvocation(transactions, signerDetails);
-    const response = await super.getInvokeEstimateFee(
+    const estimateFeeResponse = await super.getInvokeEstimateFee(
       { ...invocation },
-      { version, nonce },
+      { version, nonce, ...v3Details(details) },
       blockIdentifier
     );
 
-    const suggestedMaxFee = estimatedFeeToMaxFee(response.overall_fee);
-
     return {
-      ...response,
-      suggestedMaxFee,
+      ...estimateFeeResponse,
+      suggestedMaxFee: estimatedFeeToMaxFee(estimateFeeResponse.overall_fee),
+      resourceBounds: estimateFeeToBounds(estimateFeeResponse),
     };
   }
 
   public async estimateDeclareFee(
     { contract, classHash: providedClassHash, casm, compiledClassHash }: DeclareContractPayload,
-    { blockIdentifier, nonce: providedNonce }: EstimateFeeDetails = {}
+    details: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
+    const { blockIdentifier, nonce: providedNonce, version: providedVersion } = details;
     const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
-    const version = !isSierra(contract) ? ETransactionVersion.F1 : ETransactionVersion.F2;
+    const version = toTransactionVersion(
+      !isSierra(contract)
+        ? ETransactionVersion.F1
+        : this.getPreferredVersion(ETransactionVersion.F2, ETransactionVersion.F3),
+      providedVersion
+    );
     const chainId = await this.getChainId();
 
     const declareContractTransaction = await this.buildDeclarePayload(
@@ -172,19 +192,20 @@ export class Account extends Provider implements AccountInterface {
         walletAddress: this.address,
         maxFee: ZERO,
         cairoVersion: undefined, // unused parameter
+        ...v3Details(details),
       }
     );
 
-    const response = await super.getDeclareEstimateFee(
+    const estimateFeeResponse = await super.getDeclareEstimateFee(
       declareContractTransaction,
-      { version, nonce },
+      { version, nonce, ...v3Details(details) },
       blockIdentifier
     );
-    const suggestedMaxFee = estimatedFeeToMaxFee(response.overall_fee);
 
     return {
-      ...response,
-      suggestedMaxFee,
+      ...estimateFeeResponse,
+      suggestedMaxFee: estimatedFeeToMaxFee(estimateFeeResponse.overall_fee),
+      resourceBounds: estimateFeeToBounds(estimateFeeResponse),
     };
   }
 
@@ -195,9 +216,13 @@ export class Account extends Provider implements AccountInterface {
       constructorCalldata = [],
       contractAddress: providedContractAddress,
     }: DeployAccountContractPayload,
-    { blockIdentifier }: EstimateFeeDetails = {}
+    details: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
-    const version = ETransactionVersion.F1;
+    const { blockIdentifier, version: providedVersion } = details;
+    const version = toTransactionVersion(
+      this.getPreferredVersion(ETransactionVersion.F1, ETransactionVersion.F3),
+      providedVersion
+    ); // TODO: Can Cairo0 be deployed with F3 ?
     const nonce = ZERO; // DEPLOY_ACCOUNT transaction will have a nonce zero as it is the first transaction in the account
     const chainId = await this.getChainId();
 
@@ -210,25 +235,26 @@ export class Account extends Provider implements AccountInterface {
         walletAddress: this.address, // unused parameter
         maxFee: ZERO,
         cairoVersion: undefined, // unused parameter,
+        ...v3Details(details),
       }
     );
 
-    const response = await super.getDeployAccountEstimateFee(
+    const estimateFeeResponse = await super.getDeployAccountEstimateFee(
       { ...payload },
-      { version, nonce },
+      { version, nonce, ...v3Details(details) },
       blockIdentifier
     );
-    const suggestedMaxFee = estimatedFeeToMaxFee(response.overall_fee);
 
     return {
-      ...response,
-      suggestedMaxFee,
+      ...estimateFeeResponse,
+      suggestedMaxFee: estimatedFeeToMaxFee(estimateFeeResponse.overall_fee),
+      resourceBounds: estimateFeeToBounds(estimateFeeResponse),
     };
   }
 
   public async estimateDeployFee(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
-    transactionsDetail?: InvocationsDetails | undefined
+    transactionsDetail: EstimateFeeDetails = {}
   ): Promise<EstimateFee> {
     const calls = this.buildUDCContractPayload(payload);
     return this.estimateInvokeFee(calls, transactionsDetail);
@@ -236,55 +262,68 @@ export class Account extends Provider implements AccountInterface {
 
   public async estimateFeeBulk(
     invocations: Invocations,
-    { nonce, blockIdentifier }: EstimateFeeDetails = {}
+    details: EstimateFeeDetails = {}
   ): Promise<EstimateFeeBulk> {
+    const { nonce, blockIdentifier } = details;
     const accountInvocations = await this.accountInvocationsFactory(invocations, {
-      versions: [ETransactionVersion.F1, ETransactionVersion.F2],
+      versions: [
+        ETransactionVersion.F1, // non-sierra
+        this.getPreferredVersion(ETransactionVersion.F2, ETransactionVersion.F3), // sierra
+      ],
       nonce,
       blockIdentifier,
+      ...v3Details(details),
     });
 
-    const response = await super.getEstimateFeeBulk(accountInvocations, {
+    const EstimateFeeResponseBulk = await super.getEstimateFeeBulk(accountInvocations, {
       blockIdentifier,
     });
 
-    return [].concat(response as []).map((elem: any) => {
-      const suggestedMaxFee = estimatedFeeToMaxFee(elem.overall_fee);
+    return [].concat(EstimateFeeResponseBulk as []).map((elem: EstimateFeeResponse) => {
       return {
         ...elem,
-        suggestedMaxFee,
+        suggestedMaxFee: estimatedFeeToMaxFee(elem.overall_fee),
+        resourceBounds: estimateFeeToBounds(elem),
       };
     });
   }
 
   public async buildInvocation(
     call: Array<Call>,
-    signerDetails: InvocationsSignerDetails
+    details: InvocationsSignerDetails
   ): Promise<Invocation> {
     const calldata = getExecuteCalldata(call, await this.getCairoVersion());
-    const signature = await this.signer.signTransaction(call, signerDetails);
+    const signature = await this.signer.signTransaction(call, details);
 
     return {
       contractAddress: this.address,
       calldata,
       signature,
+      ...v3Details(details),
     };
   }
 
   public async execute(
     calls: AllowArray<Call>,
     abis: Abi[] | undefined = undefined,
-    transactionsDetail: InvocationsDetails = {}
+    details: EstimateFeeDetails = {}
   ): Promise<InvokeFunctionResponse> {
     const transactions = Array.isArray(calls) ? calls : [calls];
-    const nonce = toBigInt(transactionsDetail.nonce ?? (await this.getNonce()));
+    const nonce = toBigInt(details.nonce ?? (await this.getNonce()));
+    const version = toTransactionVersion(
+      this.getPreferredVersion(ETransactionVersion.V1, ETransactionVersion.V3), // TODO: does this depend on cairo version ?
+      details.version
+    );
     const maxFee =
-      transactionsDetail.maxFee ??
+      details.maxFee ??
       (await this.getSuggestedMaxFee(
         { type: TransactionType.INVOKE, payload: calls },
-        transactionsDetail
+        {
+          ...details,
+          version,
+        }
       ));
-    const version = ETransactionVersion.V1;
+
     const chainId = await this.getChainId();
 
     const signerDetails: InvocationsSignerDetails = {
@@ -294,6 +333,7 @@ export class Account extends Provider implements AccountInterface {
       version,
       chainId,
       cairoVersion: await this.getCairoVersion(),
+      ...v3Details(details),
     };
 
     const signature = await this.signer.signTransaction(transactions, signerDetails, abis);
@@ -306,6 +346,7 @@ export class Account extends Provider implements AccountInterface {
         nonce,
         maxFee,
         version,
+        ...v3Details(details),
       }
     );
   }
@@ -318,7 +359,7 @@ export class Account extends Provider implements AccountInterface {
    */
   public async declareIfNot(
     payload: DeclareContractPayload,
-    transactionsDetail: InvocationsDetails = {}
+    transactionsDetail: EstimateFeeDetails = {}
   ): Promise<DeclareContractResponse> {
     const declareContractPayload = extractContractHashes(payload);
     try {
@@ -334,25 +375,36 @@ export class Account extends Provider implements AccountInterface {
 
   public async declare(
     payload: DeclareContractPayload,
-    transactionsDetail: InvocationsDetails = {}
+    details: EstimateFeeDetails = {}
   ): Promise<DeclareContractResponse> {
     const declareContractPayload = extractContractHashes(payload);
+    const { maxFee, nonce, version: providedVersion } = details;
+    const version = toTransactionVersion(
+      !isSierra(payload.contract)
+        ? ETransactionVersion.V1
+        : this.getPreferredVersion(ETransactionVersion.V2, ETransactionVersion.V3),
+      providedVersion
+    );
 
     const declareDetails: InvocationsSignerDetails = {
-      nonce: toBigInt(transactionsDetail.nonce ?? (await this.getNonce())),
+      nonce: toBigInt(nonce ?? (await this.getNonce())),
       maxFee:
-        transactionsDetail.maxFee ??
+        maxFee ??
         (await this.getSuggestedMaxFee(
           {
             type: TransactionType.DECLARE,
             payload: declareContractPayload,
           },
-          transactionsDetail
+          {
+            ...details,
+            version,
+          }
         )),
-      version: !isSierra(payload.contract) ? ETransactionVersion.V1 : ETransactionVersion.V2,
+      version,
       chainId: await this.getChainId(),
       walletAddress: this.address,
       cairoVersion: undefined,
+      ...v3Details(details),
     };
 
     const declareContractTransaction = await this.buildDeclarePayload(
@@ -365,7 +417,7 @@ export class Account extends Provider implements AccountInterface {
 
   public async deploy(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
-    details?: InvocationsDetails | undefined
+    details: EstimateFeeDetails = {}
   ): Promise<MultiDeployContractResponse> {
     const params = [].concat(payload as []).map((it) => {
       const {
@@ -411,7 +463,7 @@ export class Account extends Provider implements AccountInterface {
 
   public async deployContract(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
-    details?: InvocationsDetails | undefined
+    details: EstimateFeeDetails = {}
   ): Promise<DeployContractUDCResponse> {
     const deployTx = await this.deploy(payload, details);
     const txReceipt = await this.waitForTransaction(deployTx.transaction_hash);
@@ -420,7 +472,7 @@ export class Account extends Provider implements AccountInterface {
 
   public async declareAndDeploy(
     payload: DeclareAndDeployContractPayload,
-    details?: InvocationsDetails | undefined
+    details: EstimateFeeDetails = {}
   ): Promise<DeclareDeployUDCResponse> {
     const { constructorCalldata, salt, unique } = payload;
     let declare = await this.declareIfNot(payload, details);
@@ -444,9 +496,12 @@ export class Account extends Provider implements AccountInterface {
       addressSalt = 0,
       contractAddress: providedContractAddress,
     }: DeployAccountContractPayload,
-    transactionsDetail: InvocationsDetails = {}
+    details: EstimateFeeDetails = {}
   ): Promise<DeployContractResponse> {
-    const version = ETransactionVersion.V1;
+    const version = toTransactionVersion(
+      this.getPreferredVersion(ETransactionVersion.V1, ETransactionVersion.V3),
+      details.version
+    );
     const nonce = ZERO; // DEPLOY_ACCOUNT transaction will have a nonce zero as it is the first transaction in the account
     const chainId = await this.getChainId();
 
@@ -456,7 +511,7 @@ export class Account extends Provider implements AccountInterface {
       calculateContractAddressFromHash(addressSalt, classHash, compiledCalldata, 0);
 
     const maxFee =
-      transactionsDetail.maxFee ??
+      details.maxFee ??
       (await this.getSuggestedMaxFee(
         {
           type: TransactionType.DEPLOY_ACCOUNT,
@@ -467,7 +522,7 @@ export class Account extends Provider implements AccountInterface {
             contractAddress,
           },
         },
-        transactionsDetail
+        details
       ));
 
     const signature = await this.signer.signDeployAccountTransaction({
@@ -479,6 +534,7 @@ export class Account extends Provider implements AccountInterface {
       maxFee,
       version,
       nonce,
+      ...v3Details(details),
     });
 
     return this.deployAccountContract(
@@ -487,6 +543,7 @@ export class Account extends Provider implements AccountInterface {
         nonce,
         maxFee,
         version,
+        ...v3Details(details),
       }
     );
   }
@@ -544,7 +601,11 @@ export class Account extends Provider implements AccountInterface {
         break;
 
       default:
-        feeEstimate = { suggestedMaxFee: ZERO, overall_fee: ZERO };
+        feeEstimate = {
+          suggestedMaxFee: ZERO,
+          overall_fee: ZERO,
+          resourceBounds: estimateFeeToBounds(ZERO),
+        };
         break;
     }
 
@@ -573,6 +634,7 @@ export class Account extends Provider implements AccountInterface {
       classHash,
       compiledClassHash: compiledClassHash as string, // TODO: TS Nekuzi da v2 nemora imat a v3 mora i da je throvano ako nije definiran
       senderAddress: details.walletAddress,
+      ...v3Details(details),
     });
 
     return {
@@ -603,6 +665,7 @@ export class Account extends Provider implements AccountInterface {
       contractAddress,
       addressSalt,
       constructorCalldata: compiledCalldata,
+      ...v3Details(details),
     });
 
     return {
@@ -642,12 +705,20 @@ export class Account extends Provider implements AccountInterface {
 
   public async simulateTransaction(
     invocations: Invocations,
-    { nonce, blockIdentifier, skipValidate, skipExecute }: SimulateTransactionDetails = {}
+    details: SimulateTransactionDetails = {}
   ): Promise<SimulateTransactionResponse> {
+    const { nonce, blockIdentifier, skipValidate, skipExecute, version } = details;
     const accountInvocations = await this.accountInvocationsFactory(invocations, {
-      versions: [ETransactionVersion.V1, ETransactionVersion.V2],
+      versions: [
+        toTransactionVersion(ETransactionVersion.V1), // non-sierra
+        toTransactionVersion(
+          this.getPreferredVersion(ETransactionVersion.V2, ETransactionVersion.V3),
+          version
+        ),
+      ],
       nonce,
       blockIdentifier,
+      ...v3Details(details),
     });
 
     return super.getSimulateTransaction(accountInvocations, {
@@ -659,9 +730,10 @@ export class Account extends Provider implements AccountInterface {
 
   public async accountInvocationsFactory(
     invocations: Invocations,
-    { versions, nonce, blockIdentifier }: AccountInvocationsFactoryDetails
+    details: AccountInvocationsFactoryDetails
   ) {
-    const version = versions[0];
+    const { versions, nonce, blockIdentifier } = details;
+    const version = versions[1]; // TODO: ovdje je bilo 0 prije a tribalo bi bit 1 LOL
     const safeNonce = await this.getNonceSafe(nonce);
     const chainId = await this.getChainId();
 
@@ -675,32 +747,15 @@ export class Account extends Provider implements AccountInterface {
     return Promise.all(
       ([] as Invocations).concat(invocations).map(async (transaction, index: number) => {
         const txPayload: any = 'payload' in transaction ? transaction.payload : transaction;
-        let signerDetails: InvocationsSignerDetails;
-        if (Object.values(ETransactionVersion2).includes(version as any)) {
-          signerDetails = {
-            walletAddress: this.address,
-            nonce: toBigInt(Number(safeNonce) + index),
-            maxFee: ZERO,
-            version: version as ETransactionVersion2,
-            chainId,
-            cairoVersion,
-          };
-        } else if (Object.values(ETransactionVersion3).includes(version as any)) {
-          signerDetails = {
-            walletAddress: this.address,
-            nonce: toBigInt(Number(safeNonce) + index),
-            version: version as ETransactionVersion3,
-            chainId,
-            cairoVersion,
-            resourceBounds: estimateFeeToBounds(ZERO),
-            // TODO: this is defaults also inherit data from params
-            tip: 0,
-            paymasterData: [],
-            accountDeploymentData: [],
-            nonceDataAvailabilityMode: EDataAvailabilityMode.L1,
-            feeDataAvailabilityMode: EDataAvailabilityMode.L1,
-          };
-        } else throw Error('un-supported version');
+        const signerDetails: InvocationsSignerDetails = {
+          walletAddress: this.address,
+          nonce: toBigInt(Number(safeNonce) + index),
+          maxFee: ZERO,
+          version,
+          chainId,
+          cairoVersion,
+          ...v3Details(details),
+        };
         const common = {
           type: transaction.type,
           version,

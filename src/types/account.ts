@@ -1,9 +1,10 @@
-import { ETransactionVersion } from './api';
+import { EDataAvailabilityMode, ETransactionVersion, ResourceBounds } from './api';
 import { BigNumberish, BlockIdentifier, V3TransactionDetails } from './lib';
 import { DeclareTransactionReceiptResponse, EstimateFeeResponse } from './provider';
 
 export interface EstimateFee extends EstimateFeeResponse {
   suggestedMaxFee: bigint;
+  resourceBounds: ResourceBounds;
 }
 
 export type EstimateFeeBulk = Array<EstimateFee>;
@@ -18,6 +19,13 @@ export type AccountInvocationsFactoryDetails = {
 export interface EstimateFeeDetails {
   nonce?: BigNumberish;
   blockIdentifier?: BlockIdentifier;
+  maxFee?: BigNumberish; // TODO: max_fee is added to match InvocationsDetails
+  tip?: BigNumberish;
+  paymasterData?: BigNumberish[];
+  accountDeploymentData?: BigNumberish[];
+  nonceDataAvailabilityMode?: EDataAvailabilityMode;
+  feeDataAvailabilityMode?: EDataAvailabilityMode;
+  version?: BigNumberish; // TODO: this is BigNumberish for interoperability with InvocationsDetails
 }
 
 export interface DeployContractResponse {
@@ -54,7 +62,7 @@ export type SimulateTransactionDetails = {
   blockIdentifier?: BlockIdentifier;
   skipValidate?: boolean;
   skipExecute?: boolean;
-};
+} & Partial<V3TransactionDetails>;
 
 export enum SIMULATION_FLAG {
   SKIP_VALIDATE = 'SKIP_VALIDATE',
