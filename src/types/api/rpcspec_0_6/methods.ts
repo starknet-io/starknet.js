@@ -177,7 +177,7 @@ type ReadMethods = {
   starknet_estimateFee: {
     params: {
       request: BROADCASTED_TXN[];
-      simulation_flags?: [SIMULATION_FLAG_FOR_ESTIMATE_FEE];
+      simulation_flags?: [SIMULATION_FLAG_FOR_ESTIMATE_FEE] | []; // TODO: Check this is like this is spec (0.5 can't be, 0.6 must be)
       block_id: BLOCK_ID;
     };
     result: FeeEstimate[];

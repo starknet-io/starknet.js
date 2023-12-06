@@ -53,6 +53,8 @@ import {
   estimatedFeeToMaxFee,
   formatSignature,
   randomAddress,
+  reduceV2,
+  toFeeVersion,
   toTransactionVersion,
   v3Details,
 } from '../utils/stark';
@@ -90,9 +92,9 @@ export class Account extends Provider implements AccountInterface {
   }
 
   // provided version or contract based preferred transactionVersion
-  private getPreferredVersion(type2: ETransactionVersion, type3: ETransactionVersion) {
+  private getPreferredVersion(type12: ETransactionVersion, type3: ETransactionVersion) {
     if (this.transactionVersion === ETransactionVersion.V3) return type3;
-    if (this.transactionVersion === ETransactionVersion.V2) return type2;
+    if (this.transactionVersion === ETransactionVersion.V2) return type12;
 
     return ETransactionVersion.V3;
   }
@@ -141,24 +143,24 @@ export class Account extends Provider implements AccountInterface {
     const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
     const version = toTransactionVersion(
       this.getPreferredVersion(ETransactionVersion.F1, ETransactionVersion.F3),
-      providedVersion
+      toFeeVersion(providedVersion)
     );
     const chainId = await this.getChainId();
 
     const signerDetails: InvocationsSignerDetails = {
+      ...v3Details(details),
       walletAddress: this.address,
       nonce,
       maxFee: ZERO,
       version,
       chainId,
       cairoVersion: await this.getCairoVersion(),
-      ...v3Details(details),
     };
 
     const invocation = await this.buildInvocation(transactions, signerDetails);
     const estimateFeeResponse = await super.getInvokeEstimateFee(
       { ...invocation },
-      { version, nonce, ...v3Details(details) },
+      { ...v3Details(details), version, nonce },
       blockIdentifier
     );
 
@@ -179,26 +181,26 @@ export class Account extends Provider implements AccountInterface {
       !isSierra(contract)
         ? ETransactionVersion.F1
         : this.getPreferredVersion(ETransactionVersion.F2, ETransactionVersion.F3),
-      providedVersion
+      toFeeVersion(providedVersion)
     );
     const chainId = await this.getChainId();
 
     const declareContractTransaction = await this.buildDeclarePayload(
       { classHash: providedClassHash, contract, casm, compiledClassHash },
       {
+        ...v3Details(details),
         nonce,
         chainId,
         version,
         walletAddress: this.address,
         maxFee: ZERO,
         cairoVersion: undefined, // unused parameter
-        ...v3Details(details),
       }
     );
 
     const estimateFeeResponse = await super.getDeclareEstimateFee(
       declareContractTransaction,
-      { version, nonce, ...v3Details(details) },
+      { ...v3Details(details), version, nonce },
       blockIdentifier
     );
 
@@ -221,7 +223,7 @@ export class Account extends Provider implements AccountInterface {
     const { blockIdentifier, version: providedVersion } = details;
     const version = toTransactionVersion(
       this.getPreferredVersion(ETransactionVersion.F1, ETransactionVersion.F3),
-      providedVersion
+      toFeeVersion(providedVersion)
     ); // TODO: Can Cairo0 be deployed with F3 ?
     const nonce = ZERO; // DEPLOY_ACCOUNT transaction will have a nonce zero as it is the first transaction in the account
     const chainId = await this.getChainId();
@@ -229,19 +231,19 @@ export class Account extends Provider implements AccountInterface {
     const payload = await this.buildAccountDeployPayload(
       { classHash, addressSalt, constructorCalldata, contractAddress: providedContractAddress },
       {
+        ...v3Details(details),
         nonce,
         chainId,
         version,
         walletAddress: this.address, // unused parameter
         maxFee: ZERO,
         cairoVersion: undefined, // unused parameter,
-        ...v3Details(details),
       }
     );
 
     const estimateFeeResponse = await super.getDeployAccountEstimateFee(
       { ...payload },
-      { version, nonce, ...v3Details(details) },
+      { ...v3Details(details), version, nonce },
       blockIdentifier
     );
 
@@ -266,13 +268,13 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<EstimateFeeBulk> {
     const { nonce, blockIdentifier } = details;
     const accountInvocations = await this.accountInvocationsFactory(invocations, {
+      ...v3Details(details),
       versions: [
         ETransactionVersion.F1, // non-sierra
         this.getPreferredVersion(ETransactionVersion.F2, ETransactionVersion.F3), // sierra
       ],
       nonce,
       blockIdentifier,
-      ...v3Details(details),
     });
 
     const EstimateFeeResponseBulk = await super.getEstimateFeeBulk(accountInvocations, {
@@ -296,10 +298,10 @@ export class Account extends Provider implements AccountInterface {
     const signature = await this.signer.signTransaction(call, details);
 
     return {
+      ...v3Details(details),
       contractAddress: this.address,
       calldata,
       signature,
-      ...v3Details(details),
     };
   }
 
@@ -327,13 +329,13 @@ export class Account extends Provider implements AccountInterface {
     const chainId = await this.getChainId();
 
     const signerDetails: InvocationsSignerDetails = {
+      ...v3Details(details),
       walletAddress: this.address,
       nonce,
       maxFee,
       version,
       chainId,
       cairoVersion: await this.getCairoVersion(),
-      ...v3Details(details),
     };
 
     const signature = await this.signer.signTransaction(transactions, signerDetails, abis);
@@ -343,10 +345,10 @@ export class Account extends Provider implements AccountInterface {
     return this.invokeFunction(
       { contractAddress: this.address, calldata, signature },
       {
+        ...v3Details(details),
         nonce,
         maxFee,
         version,
-        ...v3Details(details),
       }
     );
   }
@@ -387,6 +389,7 @@ export class Account extends Provider implements AccountInterface {
     );
 
     const declareDetails: InvocationsSignerDetails = {
+      ...v3Details(details),
       nonce: toBigInt(nonce ?? (await this.getNonce())),
       maxFee:
         maxFee ??
@@ -404,7 +407,6 @@ export class Account extends Provider implements AccountInterface {
       chainId: await this.getChainId(),
       walletAddress: this.address,
       cairoVersion: undefined,
-      ...v3Details(details),
     };
 
     const declareContractTransaction = await this.buildDeclarePayload(
@@ -526,6 +528,7 @@ export class Account extends Provider implements AccountInterface {
       ));
 
     const signature = await this.signer.signDeployAccountTransaction({
+      ...v3Details(details),
       classHash,
       constructorCalldata: compiledCalldata,
       contractAddress,
@@ -534,16 +537,15 @@ export class Account extends Provider implements AccountInterface {
       maxFee,
       version,
       nonce,
-      ...v3Details(details),
     });
 
     return this.deployAccountContract(
       { classHash, addressSalt, constructorCalldata, signature },
       {
+        ...v3Details(details),
         nonce,
         maxFee,
         version,
-        ...v3Details(details),
       }
     );
   }
@@ -631,10 +633,10 @@ export class Account extends Provider implements AccountInterface {
 
     const signature = await this.signer.signDeclareTransaction({
       ...details,
+      ...v3Details(details),
       classHash,
       compiledClassHash: compiledClassHash as string, // TODO: TS Nekuzi da v2 nemora imat a v3 mora i da je throvano ako nije definiran
       senderAddress: details.walletAddress,
-      ...v3Details(details),
     });
 
     return {
@@ -661,11 +663,11 @@ export class Account extends Provider implements AccountInterface {
 
     const signature = await this.signer.signDeployAccountTransaction({
       ...details,
+      ...v3Details(details),
       classHash,
       contractAddress,
       addressSalt,
       constructorCalldata: compiledCalldata,
-      ...v3Details(details),
     });
 
     return {
@@ -709,6 +711,7 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<SimulateTransactionResponse> {
     const { nonce, blockIdentifier, skipValidate, skipExecute, version } = details;
     const accountInvocations = await this.accountInvocationsFactory(invocations, {
+      ...v3Details(details),
       versions: [
         toTransactionVersion(ETransactionVersion.V1), // non-sierra
         toTransactionVersion(
@@ -718,7 +721,6 @@ export class Account extends Provider implements AccountInterface {
       ],
       nonce,
       blockIdentifier,
-      ...v3Details(details),
     });
 
     return super.getSimulateTransaction(accountInvocations, {
@@ -733,7 +735,7 @@ export class Account extends Provider implements AccountInterface {
     details: AccountInvocationsFactoryDetails
   ) {
     const { versions, nonce, blockIdentifier } = details;
-    const version = versions[1]; // TODO: ovdje je bilo 0 prije a tribalo bi bit 1 LOL
+    // const version = versions[1]; // TODO: ovdje je bilo 0 prije a tribalo bi bit 1 LOL
     const safeNonce = await this.getNonceSafe(nonce);
     const chainId = await this.getChainId();
 
@@ -748,32 +750,52 @@ export class Account extends Provider implements AccountInterface {
       ([] as Invocations).concat(invocations).map(async (transaction, index: number) => {
         const txPayload: any = 'payload' in transaction ? transaction.payload : transaction;
         const signerDetails: InvocationsSignerDetails = {
+          ...v3Details(details),
           walletAddress: this.address,
           nonce: toBigInt(Number(safeNonce) + index),
           maxFee: ZERO,
-          version,
+          version: versions[1],
           chainId,
           cairoVersion,
-          ...v3Details(details),
         };
         const common = {
           type: transaction.type,
-          version,
+          version: versions[1],
           nonce: toBigInt(Number(safeNonce) + index),
           blockIdentifier,
         };
 
         if (transaction.type === TransactionType.INVOKE) {
+          // todo: moze bit 1 ili 3
+          const versionX = reduceV2(versions[1] as ETransactionVersion);
           const payload = await this.buildInvocation(
             ([] as Call[]).concat(txPayload),
-            signerDetails
+            {
+              ...signerDetails,
+              version: versionX,
+            } as InvocationsSignerDetails // TODO: Fix force
           );
           return {
-            ...common,
+            ...{ ...common, version: versionX },
             ...payload,
           } as AccountInvocationItem;
         }
+        if (transaction.type === TransactionType.DEPLOY) {
+          // todo: moze bit 1 ili 3
+          const versionX = reduceV2(versions[1] as ETransactionVersion);
+          const calls = this.buildUDCContractPayload(txPayload);
+          const payload = await this.buildInvocation(calls, {
+            ...signerDetails,
+            version: versionX,
+          } as InvocationsSignerDetails); // TODO: Fix force
+          return {
+            ...{ ...common, version: versionX },
+            ...payload,
+            type: TransactionType.INVOKE,
+          } as AccountInvocationItem;
+        }
         if (transaction.type === TransactionType.DECLARE) {
+          // todo: moze bit 1 ili 2,3 OK
           signerDetails.version = !isSierra(txPayload.contract) ? versions[0] : versions[1];
           const payload = await this.buildDeclarePayload(txPayload, signerDetails);
           return {
@@ -783,19 +805,15 @@ export class Account extends Provider implements AccountInterface {
           } as AccountInvocationItem;
         }
         if (transaction.type === TransactionType.DEPLOY_ACCOUNT) {
-          const payload = await this.buildAccountDeployPayload(txPayload, signerDetails);
+          // todo: moze bit 1 ili 3
+          const versionX = reduceV2(versions[1] as ETransactionVersion);
+          const payload = await this.buildAccountDeployPayload(txPayload, {
+            ...signerDetails,
+            version: versionX,
+          } as InvocationsSignerDetails); // TODO: Fix force
           return {
-            ...common,
+            ...{ ...common, version: versionX },
             ...payload,
-          } as AccountInvocationItem;
-        }
-        if (transaction.type === TransactionType.DEPLOY) {
-          const calls = this.buildUDCContractPayload(txPayload);
-          const payload = await this.buildInvocation(calls, signerDetails);
-          return {
-            ...common,
-            ...payload,
-            type: TransactionType.INVOKE,
           } as AccountInvocationItem;
         }
         throw Error(`accountInvocationsFactory: unsupported transaction type: ${transaction}`);

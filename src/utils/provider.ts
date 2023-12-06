@@ -185,3 +185,10 @@ export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3Trans
   const version = details.version ? toHex(details.version) : ETransactionVersion.V3;
   return version === ETransactionVersion.V3 || version === ETransactionVersion.F3;
 }
+
+export function isVersion(version: '0.5' | '0.6', response: string) {
+  const [majorS, minorS] = version.split('.');
+  const [majorR, minorR] = response.split('.');
+
+  return majorS === majorR && minorS === minorR;
+}

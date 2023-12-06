@@ -25,7 +25,7 @@ import fetch from '../utils/fetchPonyfill';
 import { getSelector, getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
 import { getHexStringArray, toHex, toStorageKey } from '../utils/num';
-import { Block, getDefaultNodeUrl, isV3Tx, wait } from '../utils/provider';
+import { Block, getDefaultNodeUrl, isV3Tx, isVersion, wait } from '../utils/provider';
 import { decompressProgram, signatureToHexArray } from '../utils/stark';
 import { getVersionsByType } from '../utils/transaction';
 
@@ -46,9 +46,9 @@ export class RpcChannel {
 
   private chainId?: StarknetChainId;
 
-  readonly waitMode: Boolean; // behave like web2 rpc and return when tx is processed
+  private speckVersion?: string;
 
-  readonly version = 'v0_6';
+  readonly waitMode: Boolean; // behave like web2 rpc and return when tx is processed
 
   constructor(optionsOrProvider?: RpcProviderOptions) {
     const { nodeUrl, retries, headers, blockIdentifier, chainId, waitMode } =
@@ -117,8 +117,9 @@ export class RpcChannel {
     return this.chainId;
   }
 
-  public getSpecVersion() {
-    return this.fetchEndpoint('starknet_specVersion');
+  public async getSpecVersion() {
+    this.speckVersion ??= (await this.fetchEndpoint('starknet_specVersion')) as StarknetChainId;
+    return this.speckVersion;
   }
 
   public getNonceForAddress(
@@ -359,15 +360,22 @@ export class RpcChannel {
     });
   }
 
-  public getEstimateFee(
+  public async getEstimateFee(
     invocations: AccountInvocations,
     { blockIdentifier = this.blockIdentifier, skipValidate = false }: getEstimateFeeBulkOptions
   ) {
     const block_id = new Block(blockIdentifier).identifier;
+    let flags = {};
+    if (isVersion('0.6', await this.getSpecVersion())) {
+      flags = {
+        simulation_flags: skipValidate ? [RPC.ESimulationFlag.SKIP_VALIDATE] : [],
+      };
+    } // else v(0.5) no flags
+
     return this.fetchEndpoint('starknet_estimateFee', {
       request: invocations.map((it) => this.buildTransaction(it, 'fee')),
       block_id,
-      ...(skipValidate && { simulation_flags: [RPC.ESimulationFlag.SKIP_VALIDATE] }),
+      ...flags,
     });
   }
 

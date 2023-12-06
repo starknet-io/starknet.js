@@ -131,17 +131,33 @@ export function intDAM(dam: EDataAvailabilityMode) {
 /**
  * Convert to ETransactionVersion or throw an error
  * @param defaultVersion ETransactionVersion
- * @param providedVersion BigNumberish
+ * @param providedVersion BigNumberish | undefined
  * @returns ETransactionVersion
  */
 export function toTransactionVersion(
   defaultVersion: ETransactionVersion,
   providedVersion?: BigNumberish
 ) {
-  if (!Object.values(ETransactionVersion).includes(providedVersion as any)) {
-    throw Error(`${providedVersion} is not supported`);
+  if (providedVersion && !Object.values(ETransactionVersion).includes(providedVersion as any)) {
+    throw Error(`toTransactionVersion: ${providedVersion} is not supported`);
   }
   return (providedVersion ? toHex(providedVersion) : defaultVersion) as ETransactionVersion;
+}
+
+/**
+ * Convert Transaction version to Fee version or throw an error
+ * @param providedVersion BigNumberish | undefined
+ */
+export function toFeeVersion(providedVersion?: BigNumberish) {
+  if (!providedVersion) return undefined;
+  const version = toHex(providedVersion);
+
+  if (version === ETransactionVersion.V0) return ETransactionVersion.F0;
+  if (version === ETransactionVersion.V1) return ETransactionVersion.F1;
+  if (version === ETransactionVersion.V2) return ETransactionVersion.F2;
+  if (version === ETransactionVersion.V3) return ETransactionVersion.F3;
+
+  throw Error(`toFeeVersion: ${version} is not supported`);
 }
 
 /**
@@ -157,4 +173,17 @@ export function v3Details(details: EstimateFeeDetails) {
     feeDataAvailabilityMode: details.feeDataAvailabilityMode || EDataAvailabilityMode.L1,
     resourceBounds: estimateFeeToBounds(ZERO),
   };
+}
+
+/**
+ * It will reduce V2 to V1, else (V3) stay the same
+ * F2 -> F1
+ * V2 -> V1
+ * F3 -> F3
+ * V3 -> V3
+ */
+export function reduceV2(providedVersion: ETransactionVersion) {
+  if (providedVersion === ETransactionVersion.F2) return ETransactionVersion.F1;
+  if (providedVersion === ETransactionVersion.V2) return ETransactionVersion.V1;
+  return providedVersion;
 }
