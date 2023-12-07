@@ -1,3 +1,5 @@
+import * as starkCurve from '@scure/starknet';
+
 import { constants, ec, hash, num, stark } from '../../src';
 import { Block } from '../../src/provider/utils';
 
@@ -78,18 +80,15 @@ describe('estimatedFeeToMaxFee()', () => {
 });
 
 describe('calculateContractAddressFromHash()', () => {
-  // This test just show how to use calculateContractAddressFromHash for new devs
+  const ethAddress = '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7';
+  const daiAddress = '0x03e85bfbb8e2a42b7bead9e88e9a1b19dbccf661471061807292120462396ec9';
+  const factoryAddress = '0x249827618A01858A72B7D04339C47195A324D20D6037033DFE2829F98AFF4FC';
+  const classHash = '0x55187E68C60664A947048E0C9E5322F9BF55F7D435ECDCF17ED75724E77368F';
+  // Any type of salt can be used. It depends on the dApp what kind of salt it wants to use.
+  const salt = ec.starkCurve.pedersen(ethAddress, daiAddress);
 
+  // This test just shows how to use calculateContractAddressFromHash for new devs
   test('calculated contract address should match the snapshot', () => {
-    const ethAddress = '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7';
-
-    const daiAddress = '0x03e85bfbb8e2a42b7bead9e88e9a1b19dbccf661471061807292120462396ec9';
-    const factoryAddress = '0x249827618A01858A72B7D04339C47195A324D20D6037033DFE2829F98AFF4FC';
-    const classHash = '0x55187E68C60664A947048E0C9E5322F9BF55F7D435ECDCF17ED75724E77368F';
-
-    // Any type of salt can be used. It depends on the dApp what kind of salt it wants to use.
-    const salt = ec.starkCurve.pedersen(ethAddress, daiAddress);
-
     const res = hash.calculateContractAddressFromHash(
       salt,
       classHash,
@@ -100,6 +99,20 @@ describe('calculateContractAddressFromHash()', () => {
     expect(res).toMatchInlineSnapshot(
       `"0x36dc8dcb3440596472ddde11facacc45d0cd250df764ae7c3d1a360c853c324"`
     );
+  });
+
+  test('output should be bound', () => {
+    const starkCurveSpy = jest.spyOn(starkCurve, 'pedersen');
+    starkCurveSpy.mockReturnValue(num.toHex(constants.ADDR_BOUND + 1n));
+    const res = hash.calculateContractAddressFromHash(
+      salt,
+      classHash,
+      [ethAddress, daiAddress, factoryAddress],
+      factoryAddress
+    );
+    expect(starkCurveSpy).toHaveBeenCalled();
+    expect(BigInt(res)).toBeLessThan(constants.ADDR_BOUND);
+    starkCurveSpy.mockRestore();
   });
 });
 

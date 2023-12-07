@@ -14,8 +14,11 @@ export const BN_FEE_TRANSACTION_VERSION_2 = 2n ** 128n + BN_TRANSACTION_VERSION_
 
 export const ZERO = 0n;
 export const MASK_250 = 2n ** 250n - 1n; // 2 ** 250 - 1
-export const MASK_251 = 2n ** 251n;
 export const API_VERSION = ZERO;
+
+// based on: https://github.com/starkware-libs/cairo-lang/blob/v0.12.3/src/starkware/starknet/common/storage.cairo#L3
+export const MAX_STORAGE_ITEM_SIZE = 256n;
+export const ADDR_BOUND = 2n ** 251n - MAX_STORAGE_ITEM_SIZE;
 
 export enum BaseUrl {
   SN_MAIN = 'https://alpha-mainnet.starknet.io',
