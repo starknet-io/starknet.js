@@ -522,7 +522,6 @@ export class RpcChannel {
           resource_bounds: details.resourceBounds,
           tip: toHex(details.tip),
           paymaster_data: details.paymasterData.map((it) => toHex(it)),
-          account_deployment_data: details.accountDeploymentData.map((it) => toHex(it)),
           nonce_data_availability_mode: details.nonceDataAvailabilityMode,
           fee_data_availability_mode: details.feeDataAvailabilityMode,
         },
@@ -607,13 +606,7 @@ export class RpcChannel {
         paymaster_data: invocation.paymasterData.map((it) => toHex(it)),
         nonce_data_availability_mode: invocation.nonceDataAvailabilityMode,
         fee_data_availability_mode: invocation.feeDataAvailabilityMode,
-
-        // dont add account_deployment_data if invocation.type === TransactionType.DEPLOY_ACCOUNT
-        ...(invocation.type === TransactionType.DEPLOY_ACCOUNT
-          ? {}
-          : {
-              account_deployment_data: invocation.accountDeploymentData.map((it) => toHex(it)),
-            }),
+        account_deployment_data: invocation.accountDeploymentData.map((it) => toHex(it)),
       };
     }
 
@@ -652,6 +645,8 @@ export class RpcChannel {
       } as RPC.SPEC.BROADCASTED_DECLARE_TXN;
     }
     if (invocation.type === TransactionType.DEPLOY_ACCOUNT) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { account_deployment_data, ...restDetails } = details;
       // v1 v3
       return {
         type: invocation.type,
@@ -659,7 +654,7 @@ export class RpcChannel {
         class_hash: toHex(invocation.classHash),
         contract_address_salt: toHex(invocation.addressSalt || 0),
         version: toHex(invocation.version || defaultVersions.v3) as RPC.SPEC.INVOKE_TXN['version'],
-        ...details,
+        ...restDetails,
       } as RPC.SPEC.BROADCASTED_DEPLOY_ACCOUNT_TXN;
     }
     throw Error('RPC buildTransaction received unknown TransactionType');
