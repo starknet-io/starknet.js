@@ -329,7 +329,6 @@ export type DEPLOY_ACCOUNT_TXN_V3 = {
   resource_bounds: RESOURCE_BOUNDS_MAPPING;
   tip: u64;
   paymaster_data: FELT[];
-  account_deployment_data: FELT[];
   nonce_data_availability_mode: DA_MODE;
   fee_data_availability_mode: DA_MODE;
 };
