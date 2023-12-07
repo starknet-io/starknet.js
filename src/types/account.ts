@@ -26,6 +26,8 @@ export interface EstimateFeeDetails {
   nonceDataAvailabilityMode?: EDataAvailabilityMode;
   feeDataAvailabilityMode?: EDataAvailabilityMode;
   version?: BigNumberish; // TODO: this is BigNumberish for interoperability with InvocationsDetails
+  resourceBounds?: ResourceBounds; // TODO: required for non estimate and for estimate is 00
+  skipValidate?: boolean; // TODO: Specific only to estimatFee methods
 }
 
 export interface DeployContractResponse {
