@@ -3,6 +3,7 @@
 import { poseidonHashMany } from '@scure/starknet';
 
 import {
+  ADDR_BOUND,
   API_VERSION,
   BN_FEE_TRANSACTION_VERSION_1,
   BN_FEE_TRANSACTION_VERSION_2,
@@ -205,13 +206,14 @@ export function calculateContractAddressFromHash(
 
   const CONTRACT_ADDRESS_PREFIX = felt('0x535441524b4e45545f434f4e54524143545f41444452455353'); // Equivalent to 'STARKNET_CONTRACT_ADDRESS'
 
-  return computeHashOnElements([
+  const hash = computeHashOnElements([
     CONTRACT_ADDRESS_PREFIX,
     deployerAddress,
     salt,
     classHash,
     constructorCalldataHash,
   ]);
+  return toHex(BigInt(hash) % ADDR_BOUND);
 }
 
 function nullSkipReplacer(key: string, value: any) {
