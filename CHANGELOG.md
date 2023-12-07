@@ -1,3 +1,9 @@
+# [6.0.0-beta.2](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.1...v6.0.0-beta.2) (2023-12-07)
+
+### Features
+
+- v3 wip with est ([b95c462](https://github.com/starknet-io/starknet.js/commit/b95c462df0bd59293b7b42b5474311a3bbbfab1d))
+
 # [6.0.0-beta.1](https://github.com/starknet-io/starknet.js/compare/v5.24.4...v6.0.0-beta.1) (2023-12-06)
 
 ### Features
