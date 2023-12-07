@@ -1,3 +1,9 @@
+# [6.0.0-beta.3](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.2...v6.0.0-beta.3) (2023-12-07)
+
+### Bug Fixes
+
+- **beta:** deploy account ([#880](https://github.com/starknet-io/starknet.js/issues/880)) ([00c58e3](https://github.com/starknet-io/starknet.js/commit/00c58e3c6d03b716b68c1b96b5a4adc1cff87dd0))
+
 # [6.0.0-beta.2](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.1...v6.0.0-beta.2) (2023-12-07)
 
 ### Features
