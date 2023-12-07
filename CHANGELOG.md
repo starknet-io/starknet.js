@@ -1,3 +1,37 @@
+# [6.0.0-beta.3](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.2...v6.0.0-beta.3) (2023-12-07)
+
+### Bug Fixes
+
+- **beta:** deploy account ([#880](https://github.com/starknet-io/starknet.js/issues/880)) ([00c58e3](https://github.com/starknet-io/starknet.js/commit/00c58e3c6d03b716b68c1b96b5a4adc1cff87dd0))
+
+# [6.0.0-beta.2](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.1...v6.0.0-beta.2) (2023-12-07)
+
+### Features
+
+- v3 wip with est ([b95c462](https://github.com/starknet-io/starknet.js/commit/b95c462df0bd59293b7b42b5474311a3bbbfab1d))
+
+# [6.0.0-beta.1](https://github.com/starknet-io/starknet.js/compare/v5.24.4...v6.0.0-beta.1) (2023-12-06)
+
+### Features
+
+- account preferred transaction version, setup v3 ([5652eb2](https://github.com/starknet-io/starknet.js/commit/5652eb211e1accaefbb2f24bcb756ccf9170c07a))
+- dual specification with 0.6 implementation, not yet integrated ([ac8c763](https://github.com/starknet-io/starknet.js/commit/ac8c76383bb3f566164bc4f38c477e3e3dc45f31))
+- hashes, signer, vip account, types, versions as string enum ([6ceb9e3](https://github.com/starknet-io/starknet.js/commit/6ceb9e31e51d51a6ce374144fd3ddb82a6ea01b3))
+- pretty print rpc LibraryError params, make env.DEBUG usefull ([cca723f](https://github.com/starknet-io/starknet.js/commit/cca723f13009ce7048c7be6b8a6f466aca0d5e19))
+- remove old version constants, default types api rpc ([ed9cb08](https://github.com/starknet-io/starknet.js/commit/ed9cb089460640af96a73eca66e9971ca5832041))
+- rpc 0.6 implementation as superset of 0.5 tx ([5b2b299](https://github.com/starknet-io/starknet.js/commit/5b2b2997ee7e54144864315ed20175017e4218b4))
+- rpc 0.6.0-rc3 implementation ([c2607ed](https://github.com/starknet-io/starknet.js/commit/c2607ed64f26d18ea66f2184acf34d3ca9ee4766))
+- rpc provider ([0d9c2e5](https://github.com/starknet-io/starknet.js/commit/0d9c2e5ba0298af7b608ccbd9dd2eff3dc0bb69a))
+- rpcChannel ([181eea3](https://github.com/starknet-io/starknet.js/commit/181eea3e4eabc52cdf46b796f0861e2641d59668))
+- update default rpc nodes and version ([9b9fe0e](https://github.com/starknet-io/starknet.js/commit/9b9fe0e4c5d8d54323bb82ab7ceed3a78d6fc1bc))
+- update verson ([5dfe445](https://github.com/starknet-io/starknet.js/commit/5dfe445a5ed09dd531d91156633321fdae4b70cd))
+- v3 transaction hashes ([4fe40a1](https://github.com/starknet-io/starknet.js/commit/4fe40a1419031cd6328509e2439744d0ff98c8e7))
+- v3 tx hashes calculation ([f0e760d](https://github.com/starknet-io/starknet.js/commit/f0e760d109e488b70b16eed24e94b889d708d257))
+
+### BREAKING CHANGES
+
+- v3 transactions
+
 ## [5.24.4](https://github.com/starknet-io/starknet.js/compare/v5.24.3...v5.24.4) (2023-12-06)
 
 ### Bug Fixes

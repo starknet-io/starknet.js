@@ -605,9 +605,15 @@ export class RpcChannel {
         resource_bounds: invocation.resourceBounds,
         tip: toHex(invocation.tip),
         paymaster_data: invocation.paymasterData.map((it) => toHex(it)),
-        account_deployment_data: invocation.accountDeploymentData.map((it) => toHex(it)),
         nonce_data_availability_mode: invocation.nonceDataAvailabilityMode,
         fee_data_availability_mode: invocation.feeDataAvailabilityMode,
+
+        // dont add account_deployment_data if invocation.type === TransactionType.DEPLOY_ACCOUNT
+        ...(invocation.type === TransactionType.DEPLOY_ACCOUNT
+          ? {}
+          : {
+              account_deployment_data: invocation.accountDeploymentData.map((it) => toHex(it)),
+            }),
       };
     }
 
