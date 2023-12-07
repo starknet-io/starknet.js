@@ -14,6 +14,7 @@ import {
   DeployAccountContractPayload,
   DeployContractResponse,
   DeployContractUDCResponse,
+  EstimateFee,
   EstimateFeeAction,
   EstimateFeeDetails,
   EstimateFeeResponse,
@@ -166,7 +167,7 @@ export abstract class AccountInterface extends ProviderInterface {
    * @param details -
    * - [nonce=getNonce]
    * - [version=transactionVersion]
-   * - [maxFee=getSuggestedMaxFee]
+   * - [maxFee=getSuggestedFee]
    * @returns
    * - contract_address[]
    * - transaction_hash
@@ -188,7 +189,7 @@ export abstract class AccountInterface extends ProviderInterface {
    * @param details -
    * - [nonce=getNonce]
    * - [version=transactionVersion]
-   * - [maxFee=getSuggestedMaxFee]
+   * - [maxFee=getSuggestedFee]
    * @returns
    *  - contract_address
    *  - transaction_hash
@@ -221,7 +222,7 @@ export abstract class AccountInterface extends ProviderInterface {
    * @param details
    * - [nonce=getNonce]
    * - [version=transactionVersion]
-   * - [maxFee=getSuggestedMaxFee]
+   * - [maxFee=getSuggestedFee]
    * @returns
    * - declare
    *    - transaction_hash
@@ -316,10 +317,10 @@ export abstract class AccountInterface extends ProviderInterface {
    * @param  {EstimateFeeDetails} details
    * @returns suggestedMaxFee
    */
-  public abstract getSuggestedMaxFee(
+  public abstract getSuggestedFee(
     estimateFeeAction: EstimateFeeAction,
     details: EstimateFeeDetails
-  ): Promise<bigint>;
+  ): Promise<EstimateFee>;
 
   /**
    * Simulates an array of transaction and returns an array of transaction trace and estimated fee.
