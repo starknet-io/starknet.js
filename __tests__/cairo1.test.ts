@@ -19,6 +19,7 @@ import {
   stark,
 } from '../src';
 import {
+  TEST_TX_VERSION,
   compiledC1Account,
   compiledC1AccountCasm,
   compiledComplexSierra,
@@ -533,7 +534,7 @@ describeIfDevnet('Cairo 1 Devnet', () => {
       await account.waitForTransaction(transaction_hash);
 
       // deploy account
-      accountC1 = new Account(provider, toBeAccountAddress, priKey, '1');
+      accountC1 = new Account(provider, toBeAccountAddress, priKey, '1', TEST_TX_VERSION);
       const deployed = await accountC1.deploySelf({
         classHash: accountClassHash,
         constructorCalldata: calldata,

@@ -68,13 +68,15 @@ export function getTestProvider(isProvider: boolean = true): ProviderInterface |
   return provider;
 }
 
+export const TEST_TX_VERSION = process.env.TX_VERSION === 'v3' ? ETransactionVersion.V3 : undefined;
+
 export const getTestAccount = (provider: ProviderInterface) => {
   return new Account(
     provider,
     toHex(process.env.TEST_ACCOUNT_ADDRESS || ''),
     process.env.TEST_ACCOUNT_PRIVATE_KEY || '',
     undefined,
-    process.env.TX_VERSION === 'v3' ? ETransactionVersion.V3 : undefined // TODO: enable setup to test diff TX versions, add this to print table
+    TEST_TX_VERSION
   );
 };
 

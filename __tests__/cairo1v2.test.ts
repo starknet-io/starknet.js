@@ -23,6 +23,7 @@ import {
   types,
 } from '../src';
 import {
+  TEST_TX_VERSION,
   compiledC1Account,
   compiledC1AccountCasm,
   compiledC1v2,
@@ -714,7 +715,7 @@ describe('Cairo 1', () => {
       await account.waitForTransaction(transaction_hash);
 
       // deploy account
-      accountC1 = new Account(provider, toBeAccountAddress, priKey, '1');
+      accountC1 = new Account(provider, toBeAccountAddress, priKey, '1', TEST_TX_VERSION);
       const deployed = await accountC1.deploySelf({
         classHash: accountClassHash,
         constructorCalldata: calldata,
