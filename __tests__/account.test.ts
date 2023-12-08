@@ -17,6 +17,7 @@ import {
   stark,
 } from '../src';
 import {
+  TEST_TX_VERSION,
   compiledErc20,
   compiledHelloSierra,
   compiledHelloSierraCasm,
@@ -137,7 +138,13 @@ describe('deploy and test Wallet', () => {
       await account.waitForTransaction(transaction_hash);
 
       // deploy account
-      const accountOZ = new Account(provider, tobeAccountAddress, priKey);
+      const accountOZ = new Account(
+        provider,
+        tobeAccountAddress,
+        priKey,
+        undefined,
+        TEST_TX_VERSION
+      );
       const deployed = await accountOZ.deploySelf({
         classHash: accountClassHash,
         constructorCalldata: calldata,
