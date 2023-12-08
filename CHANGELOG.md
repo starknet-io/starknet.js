@@ -1,3 +1,13 @@
+# [6.0.0-beta.4](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.3...v6.0.0-beta.4) (2023-12-08)
+
+### Bug Fixes
+
+- remove account_deployment_data from deploy Account ([ede83bf](https://github.com/starknet-io/starknet.js/commit/ede83bfda3c6fcfa9dd397c92bd709293c8dda9b))
+
+### Features
+
+- simulate skip validate by default, spec deploy acc fix ([1b3e7ae](https://github.com/starknet-io/starknet.js/commit/1b3e7aeadaba5b7d59377e249b535f6a8cb8862e))
+
 # [6.0.0-beta.3](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.2...v6.0.0-beta.3) (2023-12-07)
 
 ### Bug Fixes
