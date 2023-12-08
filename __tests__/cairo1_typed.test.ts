@@ -119,7 +119,7 @@ describe('TS validation for API &  Contract interactions - tests skipped', () =>
     expect(balance).toBe(255n);
 
     let result = await cairo1Contract.test_u16(255n);
-    expect(result);
+    expect(result).toBe(256n);
     result = await cairo1Contract.test_u32(255n);
     expect(result).toBe(256n);
     result = await cairo1Contract.test_u64(255n);
