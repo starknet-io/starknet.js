@@ -221,7 +221,7 @@ export class RpcChannel {
     }: getSimulateTransactionOptions = {}
   ) {
     const block_id = new Block(blockIdentifier).identifier;
-    const simulationFlags: any = [];
+    const simulationFlags: RPC.ESimulationFlag[] = [];
     if (skipValidate) simulationFlags.push(RPC.ESimulationFlag.SKIP_VALIDATE);
     if (skipFeeCharge) simulationFlags.push(RPC.ESimulationFlag.SKIP_FEE_CHARGE);
 
