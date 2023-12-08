@@ -11,7 +11,7 @@ import {
   ContractFunction,
   ContractVersion,
   EstimateFeeResponse,
-  GetTransactionReceiptResponse,
+  GetTransactionReceiptResponseWoHelper,
   Invocation,
   InvokeFunctionResponse,
   InvokeOptions,
@@ -120,7 +120,7 @@ export abstract class ContractInterface {
    * @param receipt transaction receipt
    * @returns Events parsed
    */
-  public abstract parseEvents(receipt: GetTransactionReceiptResponse): ParsedEvents;
+  public abstract parseEvents(receipt: GetTransactionReceiptResponseWoHelper): ParsedEvents;
 
   /**
    * tells if the contract comes from a Cairo 1 contract

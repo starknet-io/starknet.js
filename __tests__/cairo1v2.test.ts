@@ -11,6 +11,7 @@ import {
   CompiledSierra,
   Contract,
   DeclareDeployUDCResponse,
+  GetTransactionReceiptResponseWoHelper,
   RawArgsArray,
   RawArgsObject,
   SequencerProvider,
@@ -23,6 +24,7 @@ import {
   stark,
   types,
 } from '../src';
+import { SuccessfulTransactionReceiptResponse } from '../src/types/api/sequencer';
 import {
   compiledC1Account,
   compiledC1AccountCasm,
@@ -817,7 +819,16 @@ describe('Cairo 1', () => {
         },
       ];
       const tx = await provider.waitForTransaction(transaction_hash);
-      const events = eventContract.parseEvents(tx);
+      tx.match({
+        success: (txR: SuccessfulTransactionReceiptResponse) => {
+          const events = eventContract.parseEvents(txR);
+          return expect(events).toStrictEqual(shouldBe);
+        },
+        _: () => {
+          throw new Error('Transaction not succeed.');
+        },
+      });
+      const events = eventContract.parseEvents(tx.value);
       return expect(events).toStrictEqual(shouldBe);
     });
 
@@ -863,8 +874,15 @@ describe('Cairo 1', () => {
       ]);
       const { transaction_hash } = await account.execute([callData1, callData2]);
       const tx = await provider.waitForTransaction(transaction_hash);
-      const events = eventContract.parseEvents(tx);
-      return expect(events).toStrictEqual(shouldBe);
+      tx.match({
+        success: (txR) => {
+          const events = eventContract.parseEvents(txR as GetTransactionReceiptResponseWoHelper);
+          return expect(events).toStrictEqual(shouldBe);
+        },
+        _: () => {
+          throw new Error('Transaction not succeed.');
+        },
+      });
     });
     test('parse tx returning multiple different events', async () => {
       const shouldBe: types.ParsedEvents = [

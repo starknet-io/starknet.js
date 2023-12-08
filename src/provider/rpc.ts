@@ -37,6 +37,7 @@ import { getHexStringArray, toHex, toStorageKey } from '../utils/num';
 import { wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { decompressProgram, signatureToHexArray } from '../utils/stark';
+import { GetTransactionReceiptResponse } from '../utils/transactionReceipt';
 import { LibraryError } from './errors';
 import { ProviderInterface } from './interface';
 import { getAddressFromStarkName, getStarkName } from './starknetId';
@@ -257,9 +258,12 @@ export class RpcProvider implements ProviderInterface {
     return this.fetchEndpoint('starknet_getTransactionByBlockIdAndIndex', { block_id, index });
   }
 
-  public async getTransactionReceipt(txHash: BigNumberish) {
+  public async getTransactionReceipt(txHash: BigNumberish): Promise<GetTransactionReceiptResponse> {
     const transaction_hash = toHex(txHash);
-    return this.fetchEndpoint('starknet_getTransactionReceipt', { transaction_hash });
+    const txReceiptWoHelper = await this.fetchEndpoint('starknet_getTransactionReceipt', {
+      transaction_hash,
+    });
+    return new GetTransactionReceiptResponse(txReceiptWoHelper);
   }
 
   public async getTransactionTrace(txHash: BigNumberish) {
@@ -313,7 +317,10 @@ export class RpcProvider implements ProviderInterface {
     }).then(this.responseParser.parseSimulateTransactionResponse);
   }
 
-  public async waitForTransaction(txHash: BigNumberish, options?: waitForTransactionOptions) {
+  public async waitForTransaction(
+    txHash: BigNumberish,
+    options?: waitForTransactionOptions
+  ): Promise<GetTransactionReceiptResponse> {
     const transactionHash = toHex(txHash);
     let { retries } = this;
     let onchain = false;
@@ -387,7 +394,7 @@ export class RpcProvider implements ProviderInterface {
       // eslint-disable-next-line no-await-in-loop
       await wait(retryInterval);
     }
-    return txReceipt as RPC.TransactionReceipt;
+    return txReceipt;
   }
 
   public async getStorageAt(

@@ -16,7 +16,6 @@ import type {
   EstimateFeeResponseBulk,
   GetBlockResponse,
   GetCodeResponse,
-  GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
   InvocationsDetailsWithNonce,
@@ -30,6 +29,7 @@ import type {
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
+import { GetTransactionReceiptResponse } from '../utils/transactionReceipt';
 
 export abstract class ProviderInterface {
   /**

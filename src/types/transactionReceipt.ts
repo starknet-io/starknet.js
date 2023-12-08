@@ -1,4 +1,5 @@
 import {
+  GetTransactionReceiptResponseWoHelper,
   RejectedTransactionReceiptResponse,
   RevertedTransactionReceiptResponse,
   SuccessfulTransactionReceiptResponse,
@@ -24,9 +25,11 @@ export type TransactionReceiptCallbacks =
   | TransactionReceiptCallbacksDefault;
 
 export type TransactionReceiptUtilityInterface = {
-  readonly status: TransactionReceiptStatus;
+  readonly statusReceipt: TransactionReceiptStatus;
   readonly value: TransactionReceiptValue;
   match(callbacks: TransactionReceiptCallbacks): void;
 } & {
   [key in `is${Capitalize<TransactionReceiptStatus>}`]: () => boolean;
 };
+
+export type Receipt = GetTransactionReceiptResponseWoHelper & TransactionReceiptUtilityInterface;

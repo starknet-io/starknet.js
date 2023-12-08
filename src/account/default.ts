@@ -414,7 +414,7 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<DeployContractUDCResponse> {
     const deployTx = await this.deploy(payload, details);
     const txReceipt = await this.waitForTransaction(deployTx.transaction_hash);
-    return parseUDCEvent(txReceipt as DeployTransactionReceiptResponse);
+    return parseUDCEvent(txReceipt.value as DeployTransactionReceiptResponse);
   }
 
   public async declareAndDeploy(

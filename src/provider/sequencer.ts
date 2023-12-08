@@ -21,7 +21,6 @@ import {
   EstimateFeeResponseBulk,
   GetBlockResponse,
   GetContractAddressesResponse,
-  GetTransactionReceiptResponse,
   GetTransactionResponse,
   GetTransactionStatusResponse,
   Invocation,
@@ -56,6 +55,7 @@ import { getDecimalString, getHexString, getHexStringArray, toBigInt, toHex } fr
 import { wait } from '../utils/provider';
 import { SequencerAPIResponseParser } from '../utils/responseParser/sequencer';
 import { randomAddress, signatureToDecimalArray } from '../utils/stark';
+import { GetTransactionReceiptResponse } from '../utils/transactionReceipt';
 import { buildUrl } from '../utils/url';
 import { GatewayError, HttpError, LibraryError } from './errors';
 import { ProviderInterface } from './interface';
@@ -311,9 +311,10 @@ export class SequencerProvider implements ProviderInterface {
 
   public async getTransactionReceipt(txHash: BigNumberish): Promise<GetTransactionReceiptResponse> {
     const txHashHex = toHex(txHash);
-    return this.fetchEndpoint('get_transaction_receipt', { transactionHash: txHashHex }).then(
-      this.responseParser.parseGetTransactionReceiptResponse
-    );
+    const txReceiptWoHelper = await this.fetchEndpoint('get_transaction_receipt', {
+      transactionHash: txHashHex,
+    }).then(this.responseParser.parseGetTransactionReceiptResponse);
+    return new GetTransactionReceiptResponse(txReceiptWoHelper);
   }
 
   public async getClassAt(
@@ -574,6 +575,7 @@ export class SequencerProvider implements ProviderInterface {
       }
     }
     const txReceipt = await this.getTransactionReceipt(txHash);
+
     return txReceipt;
   }
 

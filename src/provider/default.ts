@@ -15,7 +15,6 @@ import {
   EstimateFeeResponseBulk,
   GetBlockResponse,
   GetCodeResponse,
-  GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
   InvocationsDetailsWithNonce,
@@ -32,6 +31,7 @@ import {
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
+import { GetTransactionReceiptResponse } from '../utils/transactionReceipt';
 import { ProviderInterface } from './interface';
 import { RpcProvider } from './rpc';
 import { SequencerProvider } from './sequencer';

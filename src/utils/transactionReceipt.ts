@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
-import { LibraryError } from '../provider';
+// import { LibraryError } from '../provider';
 import {
-  GetTransactionReceiptResponse,
+  GetTransactionReceiptResponseWoHelper,
   RejectedTransactionReceiptResponse,
   RevertedTransactionReceiptResponse,
   SuccessfulTransactionReceiptResponse,
@@ -30,46 +30,54 @@ import {
  * }
  * ```
  */
-export class TransactionReceiptUtility implements TransactionReceiptUtilityInterface {
-  public readonly status: TransactionReceiptStatus;
+export class GetTransactionReceiptResponse implements TransactionReceiptUtilityInterface {
+  public readonly statusReceipt: TransactionReceiptStatus;
 
   public readonly value: TransactionReceiptValue;
 
-  constructor(receipt: GetTransactionReceiptResponse) {
-    [this.status, this.value] = TransactionReceiptUtility.isSuccess(receipt)
+  constructor(receipt: GetTransactionReceiptResponseWoHelper) {
+    [this.statusReceipt, this.value] = GetTransactionReceiptResponse.isSuccess(receipt)
       ? ['success', receipt]
-      : TransactionReceiptUtility.isReverted(receipt)
+      : GetTransactionReceiptResponse.isReverted(receipt)
       ? ['reverted', receipt]
-      : TransactionReceiptUtility.isRejected(receipt)
+      : GetTransactionReceiptResponse.isRejected(receipt)
       ? ['rejected', receipt]
-      : ['error', new LibraryError('Unknown response type')];
+      : ['error', new Error('Unknown response type')];
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [key, value] of Object.entries(receipt)) {
+      Object.defineProperty(this, key, {
+        enumerable: true,
+        writable: false,
+        value,
+      });
+    }
   }
 
   match(callbacks: TransactionReceiptCallbacks) {
-    if (this.status in callbacks) {
-      return callbacks[this.status]!(this.value as any);
+    if (this.statusReceipt in callbacks) {
+      return callbacks[this.statusReceipt]!(this.value as any);
     }
     return (callbacks as TransactionReceiptCallbacksDefault)._();
   }
 
   isSuccess() {
-    return this.status === 'success';
+    return this.statusReceipt === 'success';
   }
 
   isReverted() {
-    return this.status === 'reverted';
+    return this.statusReceipt === 'reverted';
   }
 
   isRejected() {
-    return this.status === 'rejected';
+    return this.statusReceipt === 'rejected';
   }
 
   isError() {
-    return this.status === 'error';
+    return this.statusReceipt === 'error';
   }
 
   static isSuccess(
-    transactionReceipt: GetTransactionReceiptResponse
+    transactionReceipt: GetTransactionReceiptResponseWoHelper
   ): transactionReceipt is SuccessfulTransactionReceiptResponse {
     return (
       (transactionReceipt as SuccessfulTransactionReceiptResponse).execution_status ===
@@ -78,7 +86,7 @@ export class TransactionReceiptUtility implements TransactionReceiptUtilityInter
   }
 
   static isReverted(
-    transactionReceipt: GetTransactionReceiptResponse
+    transactionReceipt: GetTransactionReceiptResponseWoHelper
   ): transactionReceipt is RevertedTransactionReceiptResponse {
     return (
       (transactionReceipt as RevertedTransactionReceiptResponse).execution_status ===
@@ -87,7 +95,7 @@ export class TransactionReceiptUtility implements TransactionReceiptUtilityInter
   }
 
   static isRejected(
-    transactionReceipt: GetTransactionReceiptResponse
+    transactionReceipt: GetTransactionReceiptResponseWoHelper
   ): transactionReceipt is RejectedTransactionReceiptResponse {
     return (
       (transactionReceipt as RejectedTransactionReceiptResponse).status ===
@@ -114,7 +122,7 @@ export class TransactionReceiptUtility implements TransactionReceiptUtilityInter
  * ```
  */
 export function evaluateTransactionReceipt(
-  transactionResponse: GetTransactionReceiptResponse
-): TransactionReceiptUtility {
-  return new TransactionReceiptUtility(transactionResponse);
+  transactionResponse: GetTransactionReceiptResponseWoHelper
+): GetTransactionReceiptResponse {
+  return new GetTransactionReceiptResponse(transactionResponse);
 }
