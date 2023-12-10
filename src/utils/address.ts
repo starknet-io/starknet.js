@@ -1,7 +1,7 @@
 /* eslint-disable no-bitwise */
 import { hexToBytes } from '@noble/curves/abstract/utils';
 
-import { MASK_251, ZERO } from '../constants';
+import { ADDR_BOUND, ZERO } from '../constants';
 import { BigNumberish } from '../types';
 import { addHexPrefix, removeHexPrefix } from './encode';
 import { keccakBn } from './hash';
@@ -12,7 +12,7 @@ export function addAddressPadding(address: BigNumberish): string {
 }
 
 export function validateAndParseAddress(address: BigNumberish): string {
-  assertInRange(address, ZERO, MASK_251, 'Starknet Address');
+  assertInRange(address, ZERO, ADDR_BOUND - 1n, 'Starknet Address');
 
   const result = addAddressPadding(address);
 
