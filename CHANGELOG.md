@@ -1,3 +1,11 @@
+# [6.0.0-beta.5](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.4...v6.0.0-beta.5) (2023-12-10)
+
+### Bug Fixes
+
+- apply bound for contract address from hash calculation ([6d8c291](https://github.com/starknet-io/starknet.js/commit/6d8c291bce130d7b00ae6d81aff071c4986f04af))
+- **Calldata.compile:** do not split long `entrypoint` names before calling `getSelectorFromName` ([89715da](https://github.com/starknet-io/starknet.js/commit/89715da3fdb4b497cc5771eb83a88460007740b6))
+- prioritize error states in waitForTransaction evaluation ([ac54404](https://github.com/starknet-io/starknet.js/commit/ac544045e2079b68042d850a09b203fc5536c0d0))
+
 ## [5.24.5](https://github.com/starknet-io/starknet.js/compare/v5.24.4...v5.24.5) (2023-12-10)
 
 ### Bug Fixes
