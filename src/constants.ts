@@ -25,16 +25,19 @@ export const ADDR_BOUND = 2n ** 251n - MAX_STORAGE_ITEM_SIZE;
 export enum BaseUrl {
   SN_MAIN = 'https://alpha-mainnet.starknet.io',
   SN_GOERLI = 'https://alpha4.starknet.io',
+  SN_SEPOLIA = 'https://alpha-sepolia.starknet.io',
 }
 
 export enum NetworkName {
   SN_MAIN = 'SN_MAIN',
   SN_GOERLI = 'SN_GOERLI',
+  SN_SEPOLIA = 'SN_SEPOLIA',
 }
 
 export enum StarknetChainId {
   SN_MAIN = '0x534e5f4d41494e', // encodeShortString('SN_MAIN'),
   SN_GOERLI = '0x534e5f474f45524c49', // encodeShortString('SN_GOERLI')
+  SN_SEPOLIA = '0x534e5f5345504f4c4941', // encodeShortString('SN_SEPOLIA')
 }
 
 export enum TransactionHashPrefix {
@@ -50,14 +53,19 @@ export const UDC = {
   ENTRYPOINT: 'deployContract',
 };
 
-export const RPC_DEFAULT_VERSION = 'v0_5';
+export const RPC_DEFAULT_VERSION = 'v0_6';
 
-export const RPC_GOERLI_NODES = [
-  `https://starknet-testnet.public.blastapi.io/rpc/${RPC_DEFAULT_VERSION}`,
-  `https://free-rpc.nethermind.io/goerli-juno/${RPC_DEFAULT_VERSION}`,
-];
-
-export const RPC_MAINNET_NODES = [
-  `https://starknet-mainnet.public.blastapi.io/rpc/${RPC_DEFAULT_VERSION}`,
-  `https://free-rpc.nethermind.io/mainnet-juno/${RPC_DEFAULT_VERSION}`,
-];
+export const RPC_NODES = {
+  SN_GOERLI: [
+    `https://starknet-testnet.public.blastapi.io/rpc/${RPC_DEFAULT_VERSION}`,
+    `https://free-rpc.nethermind.io/goerli-juno/${RPC_DEFAULT_VERSION}`,
+  ],
+  SN_MAIN: [
+    `https://starknet-mainnet.public.blastapi.io/rpc/${RPC_DEFAULT_VERSION}`,
+    `https://free-rpc.nethermind.io/mainnet-juno/${RPC_DEFAULT_VERSION}`,
+  ],
+  SN_SEPOLIA: [
+    `https://starknet-sepolia.public.blastapi.io/rpc/${RPC_DEFAULT_VERSION}`,
+    `https://free-rpc.nethermind.io/sepolia-juno/${RPC_DEFAULT_VERSION}`,
+  ],
+};
