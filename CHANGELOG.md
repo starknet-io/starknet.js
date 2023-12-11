@@ -1,3 +1,11 @@
+# [6.0.0-beta.6](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.5...v6.0.0-beta.6) (2023-12-11)
+
+### Features
+
+- def rpc 0_6, sepolia nodes ([4f59a8f](https://github.com/starknet-io/starknet.js/commit/4f59a8f01439662ae7eb785cafcf781c68b2cb04))
+- default account UniversalDetails, rpc spec update, update interface ([8dc9b8a](https://github.com/starknet-io/starknet.js/commit/8dc9b8ab28a82a9a0eaa47e0271c12b79e8cff39))
+- sepolia constants, rpc open change ([6de46b5](https://github.com/starknet-io/starknet.js/commit/6de46b59d22bfda959c083b3ac5570cb8d4c6d0a))
+
 # [6.0.0-beta.5](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.4...v6.0.0-beta.5) (2023-12-10)
 
 ### Bug Fixes
