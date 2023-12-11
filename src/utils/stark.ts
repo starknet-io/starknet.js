@@ -129,19 +129,24 @@ export function intDAM(dam: EDataAvailabilityMode) {
 }
 
 /**
- * Convert to ETransactionVersion or throw an error
- * @param defaultVersion ETransactionVersion
+ * Convert to ETransactionVersion or throw an error.
+ * Return providedVersion is specified else return defaultVersion
+ * @param defaultVersion BigNumberish
  * @param providedVersion BigNumberish | undefined
  * @returns ETransactionVersion
  */
-export function toTransactionVersion(
-  defaultVersion: ETransactionVersion,
-  providedVersion?: BigNumberish
-) {
-  if (providedVersion && !Object.values(ETransactionVersion).includes(providedVersion as any)) {
-    throw Error(`toTransactionVersion: ${providedVersion} is not supported`);
+export function toTransactionVersion(defaultVersion: BigNumberish, providedVersion?: BigNumberish) {
+  const providedVersion0xs = providedVersion ? toHex(providedVersion) : undefined;
+  const defaultVersion0xs = toHex(defaultVersion);
+
+  if (providedVersion && !Object.values(ETransactionVersion).includes(providedVersion0xs as any)) {
+    throw Error(`providedVersion ${providedVersion} is not ETransactionVersion`);
   }
-  return (providedVersion ? toHex(providedVersion) : defaultVersion) as ETransactionVersion;
+  if (!Object.values(ETransactionVersion).includes(defaultVersion0xs as any)) {
+    throw Error(`defaultVersion ${defaultVersion} is not ETransactionVersion`);
+  }
+
+  return (providedVersion ? providedVersion0xs : defaultVersion0xs) as ETransactionVersion;
 }
 
 /**
@@ -186,12 +191,4 @@ export function reduceV2(providedVersion: ETransactionVersion) {
   if (providedVersion === ETransactionVersion.F2) return ETransactionVersion.F1;
   if (providedVersion === ETransactionVersion.V2) return ETransactionVersion.V1;
   return providedVersion;
-}
-
-export function toETransactionVersions(version: string) {
-  if (!Object.values(ETransactionVersion).includes(version as any)) {
-    throw Error(`Provided ${version} is not ETransactionVersion`);
-  }
-
-  return version as ETransactionVersion;
 }
