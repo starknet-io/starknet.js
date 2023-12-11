@@ -6,10 +6,10 @@ import {
   ArraySignatureType,
   BigNumberish,
   CompressedProgram,
-  EstimateFeeDetails,
   EstimateFeeResponse,
   Program,
   Signature,
+  UniversalDetails,
 } from '../types';
 import { EDAMode, EDataAvailabilityMode, ETransactionVersion, ResourceBounds } from '../types/api';
 import { addHexPrefix, arrayBufferToString, atobUniversal, btoaUniversal } from './encode';
@@ -169,7 +169,7 @@ export function toFeeVersion(providedVersion?: BigNumberish) {
  * Rerturn provided or default v3 tx details
  * @param details EstimateFeeDetails
  */
-export function v3Details(details: EstimateFeeDetails) {
+export function v3Details(details: UniversalDetails) {
   return {
     tip: details.tip || 0,
     paymasterData: details.paymasterData || [],

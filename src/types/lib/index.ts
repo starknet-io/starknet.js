@@ -99,7 +99,7 @@ export type DeclareContractTransaction = {
 export type CallDetails = {
   contractAddress: string;
   calldata?: RawArgs | Calldata;
-  entrypoint?: string; // TODO: check if required
+  entrypoint?: string;
 };
 
 export type Invocation = CallDetails & { signature?: Signature };
@@ -113,7 +113,7 @@ export type InvocationsDetails = {
   nonce?: BigNumberish;
   maxFee?: BigNumberish;
   version?: BigNumberish;
-};
+} & Partial<V3TransactionDetails>;
 
 export type V3TransactionDetails = {
   nonce: BigNumberish;
