@@ -111,6 +111,7 @@ export interface INSUFFICIENT_ACCOUNT_BALANCE {
 export interface VALIDATION_FAILURE {
   code: 55;
   message: 'Account validation failed';
+  data: string;
 }
 
 export interface COMPILATION_FAILED {

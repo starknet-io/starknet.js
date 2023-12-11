@@ -16,19 +16,21 @@ export type AccountInvocationsFactoryDetails = {
   blockIdentifier?: BlockIdentifier;
 } & Partial<V3TransactionDetails>;
 
-export interface EstimateFeeDetails {
+export interface UniversalDetails {
   nonce?: BigNumberish;
   blockIdentifier?: BlockIdentifier;
-  maxFee?: BigNumberish; // TODO: max_fee is added to match InvocationsDetails
+  maxFee?: BigNumberish; // ignored on estimate
   tip?: BigNumberish;
   paymasterData?: BigNumberish[];
   accountDeploymentData?: BigNumberish[];
   nonceDataAvailabilityMode?: EDataAvailabilityMode;
   feeDataAvailabilityMode?: EDataAvailabilityMode;
-  version?: BigNumberish; // TODO: this is BigNumberish for interoperability with InvocationsDetails
-  resourceBounds?: ResourceBounds; // TODO: required for non estimate and for estimate is 00
-  skipValidate?: boolean; // TODO: Specific only to estimatFee methods
+  version?: BigNumberish;
+  resourceBounds?: ResourceBounds; // ignored on estimate
+  skipValidate?: boolean; // ignored on non-estimate
 }
+
+export interface EstimateFeeDetails extends UniversalDetails {}
 
 export interface DeployContractResponse {
   contract_address: string;

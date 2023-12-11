@@ -177,7 +177,7 @@ type ReadMethods = {
   starknet_estimateFee: {
     params: {
       request: BROADCASTED_TXN[];
-      simulation_flags?: [SIMULATION_FLAG_FOR_ESTIMATE_FEE] | []; // TODO: Check this is like this is spec (0.5 can't be, 0.6 must be)
+      simulation_flags?: [SIMULATION_FLAG_FOR_ESTIMATE_FEE] | []; // Diverged from spec (0.5 can't be, 0.6 must be)
       block_id: BLOCK_ID;
     };
     result: FeeEstimate[];
@@ -191,7 +191,7 @@ type ReadMethods = {
       block_id: BLOCK_ID;
     };
     result: FeeEstimate;
-    errors: Errors.CONTRACT_NOT_FOUND | Errors.CONTRACT_ERROR | Errors.BLOCK_NOT_FOUND;
+    errors: Errors.CONTRACT_ERROR | Errors.BLOCK_NOT_FOUND;
   };
 
   // Get the most recent accepted block number

@@ -6,10 +6,10 @@ import {
   ArraySignatureType,
   BigNumberish,
   CompressedProgram,
-  EstimateFeeDetails,
   EstimateFeeResponse,
   Program,
   Signature,
+  UniversalDetails,
 } from '../types';
 import { EDAMode, EDataAvailabilityMode, ETransactionVersion, ResourceBounds } from '../types/api';
 import { addHexPrefix, arrayBufferToString, atobUniversal, btoaUniversal } from './encode';
@@ -129,19 +129,24 @@ export function intDAM(dam: EDataAvailabilityMode) {
 }
 
 /**
- * Convert to ETransactionVersion or throw an error
- * @param defaultVersion ETransactionVersion
+ * Convert to ETransactionVersion or throw an error.
+ * Return providedVersion is specified else return defaultVersion
+ * @param defaultVersion BigNumberish
  * @param providedVersion BigNumberish | undefined
  * @returns ETransactionVersion
  */
-export function toTransactionVersion(
-  defaultVersion: ETransactionVersion,
-  providedVersion?: BigNumberish
-) {
-  if (providedVersion && !Object.values(ETransactionVersion).includes(providedVersion as any)) {
-    throw Error(`toTransactionVersion: ${providedVersion} is not supported`);
+export function toTransactionVersion(defaultVersion: BigNumberish, providedVersion?: BigNumberish) {
+  const providedVersion0xs = providedVersion ? toHex(providedVersion) : undefined;
+  const defaultVersion0xs = toHex(defaultVersion);
+
+  if (providedVersion && !Object.values(ETransactionVersion).includes(providedVersion0xs as any)) {
+    throw Error(`providedVersion ${providedVersion} is not ETransactionVersion`);
   }
-  return (providedVersion ? toHex(providedVersion) : defaultVersion) as ETransactionVersion;
+  if (!Object.values(ETransactionVersion).includes(defaultVersion0xs as any)) {
+    throw Error(`defaultVersion ${defaultVersion} is not ETransactionVersion`);
+  }
+
+  return (providedVersion ? providedVersion0xs : defaultVersion0xs) as ETransactionVersion;
 }
 
 /**
@@ -164,7 +169,7 @@ export function toFeeVersion(providedVersion?: BigNumberish) {
  * Rerturn provided or default v3 tx details
  * @param details EstimateFeeDetails
  */
-export function v3Details(details: EstimateFeeDetails) {
+export function v3Details(details: UniversalDetails) {
   return {
     tip: details.tip || 0,
     paymasterData: details.paymasterData || [],
