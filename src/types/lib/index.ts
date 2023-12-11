@@ -1,5 +1,6 @@
 import { StarknetChainId } from '../../constants';
 import { weierstrass } from '../../utils/ec';
+import { EDataAvailabilityMode, ResourceBounds } from '../api';
 import { CairoEnum } from '../cairoEnum';
 import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 
@@ -13,7 +14,7 @@ export type BigNumberish = string | number | bigint;
  * Compiled calldata ready to be sent
  * decimal-string array
  */
-export type Calldata = string[] & { readonly __compiled__?: boolean };
+export type Calldata = string[] & { readonly __compiled__?: true };
 
 /**
  * Represents an integer in the range [0, 2^256)
@@ -114,6 +115,17 @@ export type InvocationsDetails = {
   version?: BigNumberish;
 };
 
+export type V3TransactionDetails = {
+  nonce: BigNumberish;
+  version: BigNumberish;
+  resourceBounds: ResourceBounds;
+  tip: BigNumberish;
+  paymasterData: BigNumberish[];
+  accountDeploymentData: BigNumberish[];
+  nonceDataAvailabilityMode: EDataAvailabilityMode;
+  feeDataAvailabilityMode: EDataAvailabilityMode;
+};
+
 /**
  * Contain all additional details params
  */
@@ -124,9 +136,11 @@ export type Details = {
   chainId: StarknetChainId;
 };
 
-export type InvocationsDetailsWithNonce = InvocationsDetails & {
-  nonce: BigNumberish;
-};
+export type InvocationsDetailsWithNonce =
+  | (InvocationsDetails & {
+      nonce: BigNumberish;
+    })
+  | V3TransactionDetails;
 
 export enum TransactionType {
   DECLARE = 'DECLARE',

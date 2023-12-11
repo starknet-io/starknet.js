@@ -13,7 +13,6 @@ import {
   DeclareDeployUDCResponse,
   RawArgsArray,
   RawArgsObject,
-  SequencerProvider,
   cairo,
   ec,
   hash,
@@ -24,6 +23,7 @@ import {
   types,
 } from '../src';
 import {
+  TEST_TX_VERSION,
   compiledC1Account,
   compiledC1AccountCasm,
   compiledC1v2,
@@ -31,11 +31,10 @@ import {
   compiledC210,
   compiledC210Casm,
   compiledComplexSierra,
-  describeIfDevnetSequencer,
   getTestAccount,
   getTestProvider,
-} from './fixtures';
-import { initializeMatcher } from './schema';
+} from './config/fixtures';
+import { initializeMatcher } from './config/schema';
 
 const { uint256, tuple, isCairo1Abi } = cairo;
 const { toHex } = num;
@@ -674,15 +673,6 @@ describe('Cairo 1', () => {
       expect(callDataFromObject).toStrictEqual(expectedResult);
       expect(callDataFromArray).toStrictEqual(expectedResult);
     });
-
-    describeIfDevnetSequencer('Sequencer only', () => {
-      test('getCompiledClassByClassHash', async () => {
-        const compiledClass = await (provider as SequencerProvider).getCompiledClassByClassHash(
-          dd.deploy.classHash
-        );
-        expect(compiledClass).toMatchSchemaRef('CompiledClass');
-      });
-    });
   });
 
   describe('Cairo1 Account contract', () => {
@@ -725,7 +715,7 @@ describe('Cairo 1', () => {
       await account.waitForTransaction(transaction_hash);
 
       // deploy account
-      accountC1 = new Account(provider, toBeAccountAddress, priKey, '1');
+      accountC1 = new Account(provider, toBeAccountAddress, priKey, '1', TEST_TX_VERSION);
       const deployed = await accountC1.deploySelf({
         classHash: accountClassHash,
         constructorCalldata: calldata,

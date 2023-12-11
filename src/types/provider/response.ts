@@ -3,8 +3,7 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 
-import * as RPC from '../api/rpc';
-import { BlockHash } from '../api/rpc';
+import * as RPC from '../api';
 import * as Sequencer from '../api/sequencer';
 import {
   AllowArray,
@@ -113,8 +112,8 @@ export interface InvokeTransactionReceiptResponse {
   execution_status: TransactionExecutionStatus;
   finality_status: TransactionFinalityStatus;
   status?: `${TransactionStatus}`; // SEQ only
-  actual_fee: string;
-  block_hash: BlockHash;
+  actual_fee: string | RPC.SPEC.FEE_ESTIMATE;
+  block_hash: RPC.BlockHash;
   block_number: BlockNumber;
   transaction_hash: string;
   transaction_index?: number; // SEQ only
@@ -129,7 +128,7 @@ export type DeclareTransactionReceiptResponse = {
   finality_status: TransactionFinalityStatus;
   status?: `${TransactionStatus}`; // SEQ only
   actual_fee: string;
-  block_hash: BlockHash;
+  block_hash: RPC.BlockHash;
   block_number: BlockNumber;
   transaction_hash: string;
   transaction_index?: number; // SEQ only
@@ -158,7 +157,7 @@ export type RevertedTransactionReceiptResponse = {
   execution_status: TransactionExecutionStatus.REVERTED | any; // any due to RPC Spec issue
   finality_status: TransactionFinalityStatus | any;
   status?: TransactionStatus; // SEQ only
-  actual_fee: string;
+  actual_fee: string | RPC.SPEC.FEE_PAYMENT;
   block_hash?: string; // ?~ optional due to RPC spec issue
   block_number?: BlockNumber; // ?~ optional due to RCP spec issue
   transaction_hash: string;

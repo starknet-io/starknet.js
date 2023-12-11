@@ -1,10 +1,7 @@
 import { NetworkName, StarknetChainId } from '../../constants';
 import { BlockIdentifier } from '../lib';
 
-export interface ProviderOptions {
-  sequencer?: SequencerProviderOptions;
-  rpc?: RpcProviderOptions;
-}
+export interface ProviderOptions extends RpcProviderOptions {}
 
 export type RpcProviderOptions = {
   nodeUrl?: string | NetworkName;
@@ -13,6 +10,7 @@ export type RpcProviderOptions = {
   blockIdentifier?: BlockIdentifier;
   chainId?: StarknetChainId;
   default?: boolean;
+  waitMode?: boolean;
 };
 
 export type SequencerHttpMethod = 'POST' | 'GET';

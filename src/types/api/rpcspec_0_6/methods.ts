@@ -14,6 +14,7 @@ import {
   PENDING_STATE_UPDATE,
   RESULT_PAGE_REQUEST,
   SIMULATION_FLAG,
+  SIMULATION_FLAG_FOR_ESTIMATE_FEE,
   STATE_UPDATE,
   STORAGE_KEY,
   TXN_HASH,
@@ -176,10 +177,11 @@ type ReadMethods = {
   starknet_estimateFee: {
     params: {
       request: BROADCASTED_TXN[];
+      simulation_flags?: [SIMULATION_FLAG_FOR_ESTIMATE_FEE] | []; // TODO: Check this is like this is spec (0.5 can't be, 0.6 must be)
       block_id: BLOCK_ID;
     };
     result: FeeEstimate[];
-    errors: Errors.CONTRACT_NOT_FOUND | Errors.CONTRACT_ERROR | Errors.BLOCK_NOT_FOUND;
+    errors: Errors.TRANSACTION_EXECUTION_ERROR | Errors.BLOCK_NOT_FOUND;
   };
 
   // Estimate the L2 fee of a message sent on L1
@@ -306,7 +308,7 @@ type TraceMethods = {
   starknet_traceTransaction: {
     params: { transaction_hash: TXN_HASH };
     result: TransactionTrace;
-    errors: Errors.INVALID_TXN_HASH | Errors.NO_TRACE_AVAILABLE;
+    errors: Errors.TXN_HASH_NOT_FOUND | Errors.NO_TRACE_AVAILABLE;
   };
 
   // Returns the execution traces of all transactions included in the given block
@@ -324,6 +326,6 @@ type TraceMethods = {
       simulation_flags: Array<SIMULATION_FLAG>;
     };
     result: SimulateTransactionResponse;
-    errors: Errors.CONTRACT_NOT_FOUND | Errors.CONTRACT_ERROR | Errors.BLOCK_NOT_FOUND;
+    errors: Errors.BLOCK_NOT_FOUND | Errors.TRANSACTION_EXECUTION_ERROR;
   };
 };

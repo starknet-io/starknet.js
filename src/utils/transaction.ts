@@ -7,6 +7,7 @@ import {
   ParsedStruct,
   RawArgs,
 } from '../types';
+import { ETransactionVersion } from '../types/api';
 import { CallData } from './calldata';
 import { getSelectorFromName } from './hash';
 import { toBigInt } from './num';
@@ -92,3 +93,16 @@ export const getExecuteCalldata = (calls: Call[], cairoVersion: CairoVersion = '
   }
   return fromCallsToExecuteCalldata(calls);
 };
+
+/**
+ * Return transaction versions based on version type, default version type is 'transaction'
+ */
+export function getVersionsByType(versionType?: 'fee' | 'transaction') {
+  return versionType === 'fee'
+    ? {
+        v1: ETransactionVersion.F1,
+        v2: ETransactionVersion.F2,
+        v3: ETransactionVersion.F3,
+      }
+    : { v1: ETransactionVersion.V1, v2: ETransactionVersion.V2, v3: ETransactionVersion.V3 };
+}

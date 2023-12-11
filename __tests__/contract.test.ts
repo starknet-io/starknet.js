@@ -22,8 +22,8 @@ import {
   describeIfDevnet,
   getTestAccount,
   getTestProvider,
-} from './fixtures';
-import { initializeMatcher } from './schema';
+} from './config/fixtures';
+import { initializeMatcher } from './config/schema';
 
 describe('contract module', () => {
   let erc20Address: string;

@@ -9,7 +9,6 @@ import {
   DeclareDeployUDCResponse,
   RawArgsArray,
   RawArgsObject,
-  SequencerProvider,
   TypedContract,
   cairo,
   num,
@@ -22,8 +21,8 @@ import {
   compiledHelloSierraCasm,
   getTestAccount,
   getTestProvider,
-} from './fixtures';
-import { initializeMatcher } from './schema';
+} from './config/fixtures';
+import { initializeMatcher } from './config/schema';
 
 const { uint256, tuple, isCairo1Abi } = cairo;
 const { toHex } = num;
@@ -476,23 +475,22 @@ describe('TS validation for API &  Contract interactions - tests skipped', () =>
   });
 
   xtest('getCompiledClassByClassHash', async () => {
-    const compiledClass = await (provider as SequencerProvider).getCompiledClassByClassHash(
-      dd.deploy.classHash
-    );
-    expect(compiledClass).toMatchSchemaRef('CompiledClass');
+    // Seqeuncer provider removed
+    // const compiledClass = await provider.getCompiledClassByClassHash(dd.deploy.classHash);
+    // expect(compiledClass).toMatchSchemaRef('CompiledClass');
   });
 });
 
 describe('TS validation for Sequencer API - C1 T2 C:0x771bbe2ba64f... - tests skipped', () => {
-  const provider = getTestProvider() as SequencerProvider;
+  const provider = getTestProvider();
   const classHash: any = '0x028b6f2ee9ae00d55a32072d939a55a6eb522974a283880f3c73a64c2f9fd6d6';
   const contractAddress: any = '0x771bbe2ba64fa5ab52f0c142b4296fc67460a3a2372b4cdce752c620e3e8194';
   let cairo1Contract: TypedContract<typeof tAbi>;
   initializeMatcher(expect);
 
   xtest('getCompiledClassByClassHash', async () => {
-    const compiledClass = await provider.getCompiledClassByClassHash(classHash);
-    expect(compiledClass).toMatchSchemaRef('CompiledClass');
+    // const compiledClass = await provider.getCompiledClassByClassHash(classHash);
+    // expect(compiledClass).toMatchSchemaRef('CompiledClass');
   });
 
   xtest('GetClassByHash', async () => {
