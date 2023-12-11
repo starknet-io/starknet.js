@@ -3,16 +3,19 @@ import {
   AbiEnums,
   AbiStructs,
   BigNumberish,
+  ByteArray,
   CairoEnum,
   ParsedStruct,
   Tupled,
   Uint256,
 } from '../../types';
-import { isText, splitLongString } from '../shortString';
+import { encodeShortString, isText, splitLongString } from '../shortString';
+import { byteArrayFromString } from './byteArray';
 import {
   felt,
   getArrayType,
   isTypeArray,
+  isTypeBytes31,
   isTypeEnum,
   isTypeOption,
   isTypeResult,
@@ -42,6 +45,8 @@ function parseBaseTypes(type: string, val: BigNumberish) {
       // eslint-disable-next-line no-case-declarations
       const el_uint256 = uint256(val);
       return [felt(el_uint256.low), felt(el_uint256.high)];
+    case isTypeBytes31(type):
+      return encodeShortString(val.toString());
     default:
       return felt(val);
   }
@@ -80,6 +85,16 @@ function parseUint256(element: object | BigNumberish) {
   }
   const el_uint256 = uint256(element);
   return [felt(el_uint256.low), felt(el_uint256.high)];
+}
+
+function parseByteArray(element: string): string[] {
+  const myByteArray: ByteArray = byteArrayFromString(element);
+  return [
+    myByteArray.data.length.toString(),
+    ...myByteArray.data.map((bn) => bn.toString()),
+    myByteArray.pending_word.toString(),
+    myByteArray.pending_word_len.toString(),
+  ];
 }
 
 /**
@@ -126,6 +141,8 @@ function parseCalldataValue(
 
     if (type === 'core::starknet::eth_address::EthAddress')
       return parseBaseTypes(type, element as BigNumberish);
+
+    if (type === 'core::byte_array::ByteArray') return parseByteArray(element as string);
 
     const { members } = structs[type];
     const subElement = element as any;

@@ -10,6 +10,12 @@ export type Signature = ArraySignatureType | WeierstrassSignatureType;
 
 export type BigNumberish = string | number | bigint;
 
+export type ByteArray = {
+  data: BigNumberish[];
+  pending_word: BigNumberish;
+  pending_word_len: BigNumberish;
+};
+
 /**
  * Compiled calldata ready to be sent
  * decimal-string array

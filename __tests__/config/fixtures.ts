@@ -46,6 +46,8 @@ export const compiledC1v2 = readContractSierra('cairo/helloCairo2/compiled');
 export const compiledC1v2Casm = readContractSierraCasm('cairo/helloCairo2/compiled');
 export const compiledC210 = readContractSierra('cairo/cairo210/cairo210.sierra');
 export const compiledC210Casm = readContractSierraCasm('cairo/cairo210/cairo210');
+export const compiledC240 = readContractSierra('cairo/cairo240/string.sierra');
+export const compiledC240Casm = readContractSierraCasm('cairo/cairo240/string');
 
 export function getTestProvider(isProvider?: true): ProviderInterface;
 export function getTestProvider(isProvider?: false): RpcProvider;
