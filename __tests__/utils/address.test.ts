@@ -1,3 +1,4 @@
+import { constants, num } from '../../src';
 import {
   addAddressPadding,
   getChecksumAddress,
@@ -16,6 +17,11 @@ describe('validateAndParseAddress', () => {
     const addr = '0x6eff1d71068df8e6677f59a556151c56ed13e14ad431a9bef6fcb3fc5e6fa7';
 
     return expect(validateAndParseAddress(addr)).toEqual(`${addAddressPadding(addr)}`);
+  });
+
+  test('should fail for out of bound address', () => {
+    const addr = num.toHex(constants.ADDR_BOUND + 1n);
+    expect(() => validateAndParseAddress(addr)).toThrow(/^Message not signable/);
   });
 });
 
