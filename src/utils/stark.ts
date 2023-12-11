@@ -187,3 +187,11 @@ export function reduceV2(providedVersion: ETransactionVersion) {
   if (providedVersion === ETransactionVersion.V2) return ETransactionVersion.V1;
   return providedVersion;
 }
+
+export function toETransactionVersions(version: string) {
+  if (!Object.values(ETransactionVersion).includes(version as any)) {
+    throw Error(`Provided ${version} is not ETransactionVersion`);
+  }
+
+  return version as ETransactionVersion;
+}

@@ -3,7 +3,6 @@ import { Provider, ProviderInterface } from '../provider';
 import { Signer, SignerInterface } from '../signer';
 import {
   Abi,
-  AccountInvocationItem,
   AccountInvocations,
   AccountInvocationsFactoryDetails,
   AllowArray,
@@ -54,6 +53,7 @@ import {
   formatSignature,
   randomAddress,
   reduceV2,
+  toETransactionVersions,
   toFeeVersion,
   toTransactionVersion,
   v3Details,
@@ -805,10 +805,10 @@ export class Account extends Provider implements AccountInterface {
     invocations: Invocations,
     details: AccountInvocationsFactoryDetails
   ) {
-    const { versions, nonce, blockIdentifier } = details;
-    // const version = versions[1]; // TODO: ovdje je bilo 0 prije a tribalo bi bit 1 LOL
+    const { nonce, blockIdentifier } = details;
     const safeNonce = await this.getNonceSafe(nonce);
     const chainId = await this.getChainId();
+    const versions = details.versions.map((it) => toETransactionVersions(it));
 
     // BULK ACTION FROM NEW ACCOUNT START WITH DEPLOY_ACCOUNT
     const tx0Payload: any = 'payload' in invocations[0] ? invocations[0].payload : invocations[0];
@@ -820,72 +820,74 @@ export class Account extends Provider implements AccountInterface {
     return Promise.all(
       ([] as Invocations).concat(invocations).map(async (transaction, index: number) => {
         const txPayload: any = 'payload' in transaction ? transaction.payload : transaction;
-        const signerDetails: InvocationsSignerDetails = {
+        const signerDetails = {
           ...v3Details(details),
           walletAddress: this.address,
           nonce: toBigInt(Number(safeNonce) + index),
           maxFee: ZERO,
-          version: versions[1],
           chainId,
           cairoVersion,
+          version: '' as ETransactionVersion,
         };
         const common = {
           type: transaction.type,
-          version: versions[1],
           nonce: toBigInt(Number(safeNonce) + index),
           blockIdentifier,
+          version: '' as ETransactionVersion,
         };
 
         if (transaction.type === TransactionType.INVOKE) {
-          // todo: moze bit 1 ili 3
-          const versionX = reduceV2(versions[1] as ETransactionVersion);
+          // 1 or 3
+          const versionX = reduceV2(versions[1]);
+          signerDetails.version = versionX;
+          common.version = versionX;
+
           const payload = await this.buildInvocation(
             ([] as Call[]).concat(txPayload),
-            {
-              ...signerDetails,
-              version: versionX,
-            } as InvocationsSignerDetails // TODO: Fix force
+            signerDetails
           );
           return {
-            ...{ ...common, version: versionX },
+            ...common,
             ...payload,
-          } as AccountInvocationItem;
+          };
         }
         if (transaction.type === TransactionType.DEPLOY) {
-          // todo: moze bit 1 ili 3
-          const versionX = reduceV2(versions[1] as ETransactionVersion);
+          // 1 or 3
+          const versionX = reduceV2(versions[1]);
+          signerDetails.version = versionX;
+          common.version = versionX;
+
           const calls = this.buildUDCContractPayload(txPayload);
-          const payload = await this.buildInvocation(calls, {
-            ...signerDetails,
-            version: versionX,
-          } as InvocationsSignerDetails); // TODO: Fix force
+          const payload = await this.buildInvocation(calls, signerDetails);
           return {
-            ...{ ...common, version: versionX },
+            ...common,
             ...payload,
             type: TransactionType.INVOKE,
-          } as AccountInvocationItem;
+          };
         }
         if (transaction.type === TransactionType.DECLARE) {
-          // todo: moze bit 1 ili 2,3 OK
-          signerDetails.version = !isSierra(txPayload.contract) ? versions[0] : versions[1];
+          // 1 (Cairo0) or 2 or 3
+          const versionX = !isSierra(txPayload.contract) ? versions[0] : versions[1];
+          signerDetails.version = versionX;
+          common.version = versionX;
+
           const payload = await this.buildDeclarePayload(txPayload, signerDetails);
           return {
             ...common,
             ...payload,
-            version: signerDetails.version,
-          } as AccountInvocationItem;
+          };
         }
         if (transaction.type === TransactionType.DEPLOY_ACCOUNT) {
-          // todo: moze bit 1 ili 3
-          const versionX = reduceV2(versions[1] as ETransactionVersion);
-          const payload = await this.buildAccountDeployPayload(txPayload, {
-            ...signerDetails,
-            version: versionX,
-          } as InvocationsSignerDetails); // TODO: Fix force
+          // 1 or 3
+          const versionX = reduceV2(versions[1]);
+          signerDetails.version = versionX;
+          common.version = versionX;
+
+          const payload = await this.buildAccountDeployPayload(txPayload, signerDetails);
           return {
-            ...{ ...common, version: versionX },
+            ...common,
             ...payload,
-          } as AccountInvocationItem;
+          };
         }
         throw Error(`accountInvocationsFactory: unsupported transaction type: ${transaction}`);
       })

@@ -1,5 +1,5 @@
 /**
- * version 0.6.0-rc2
+ * version 0.6.0
  */
 
 export { Methods } from './methods';
