@@ -1,4 +1,4 @@
-import { NetworkName, RPC_GOERLI_NODES, RPC_MAINNET_NODES } from '../constants';
+import { NetworkName, RPC_NODES } from '../constants';
 import {
   BigNumberish,
   BlockIdentifier,
@@ -73,7 +73,7 @@ export const getDefaultNodeUrl = (networkName?: NetworkName, mute: boolean = fal
   if (!mute)
     // eslint-disable-next-line no-console
     console.warn('Using default public node url, please provide nodeUrl in provider options!');
-  const nodes = networkName === NetworkName.SN_MAIN ? RPC_MAINNET_NODES : RPC_GOERLI_NODES;
+  const nodes = RPC_NODES[networkName ?? NetworkName.SN_GOERLI]; // TODO: when goerli deprecated switch default to sepolia
   const randIdx = Math.floor(Math.random() * nodes.length);
   return nodes[randIdx];
 };

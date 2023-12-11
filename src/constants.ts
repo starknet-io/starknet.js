@@ -53,7 +53,7 @@ export const UDC = {
   ENTRYPOINT: 'deployContract',
 };
 
-export const RPC_DEFAULT_VERSION = 'v0_5';
+export const RPC_DEFAULT_VERSION = 'v0_6';
 
 export const RPC_NODES = {
   SN_GOERLI: [
