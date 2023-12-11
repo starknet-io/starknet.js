@@ -13,6 +13,7 @@ import {
   DeclareDeployUDCResponse,
   RawArgsArray,
   RawArgsObject,
+  byteArray,
   cairo,
   ec,
   hash,
@@ -22,6 +23,8 @@ import {
   stark,
   types,
 } from '../src';
+import { hexToDecimalString } from '../src/utils/num';
+import { encodeShortString } from '../src/utils/shortString';
 import {
   TEST_TX_VERSION,
   compiledC1Account,
@@ -30,6 +33,8 @@ import {
   compiledC1v2Casm,
   compiledC210,
   compiledC210Casm,
+  compiledC240,
+  compiledC240Casm,
   compiledComplexSierra,
   getTestAccount,
   getTestProvider,
@@ -891,6 +896,71 @@ describe('Cairo 1', () => {
       const tx = await provider.waitForTransaction(transaction_hash);
       const events = eventContract.parseEvents(tx);
       return expect(events).toStrictEqual(shouldBe);
+    });
+  });
+
+  describe('cairo v2.4.0 new types', () => {
+    let stringContract: Contract;
+
+    beforeAll(async () => {
+      const { deploy } = await account.declareAndDeploy({
+        contract: compiledC240,
+        casm: compiledC240Casm,
+      });
+
+      stringContract = new Contract(compiledC240.abi, deploy.contract_address, account);
+    });
+
+    test('bytes31', async () => {
+      const resp = await stringContract.call('proceed_bytes31', ['AZERTY']);
+      expect(resp).toBe('AZERTY');
+      const str = 'TokenName';
+      const callD1 = CallData.compile([str]);
+      expect(callD1).toEqual([hexToDecimalString(encodeShortString(str))]);
+      const callD2 = CallData.compile({ str });
+      expect(callD2).toEqual([hexToDecimalString(encodeShortString(str))]);
+      const myCallData = new CallData(compiledC240.abi);
+      const myCalldata1 = myCallData.compile('proceed_bytes31', [str]);
+      expect(myCalldata1).toEqual([encodeShortString(str)]);
+      const myCalldata2 = myCallData.compile('proceed_bytes31', { str });
+      expect(myCalldata2).toEqual([encodeShortString(str)]);
+      const myCall1 = stringContract.populate('proceed_bytes31', [str]);
+      expect(myCall1.calldata).toEqual([encodeShortString(str)]);
+      const myCall2 = stringContract.populate('proceed_bytes31', { str });
+      expect(myCall2.calldata).toEqual([encodeShortString(str)]);
+    });
+
+    test('bytes31 too long', async () => {
+      await expect(stringContract.call('proceed_bytes31', ['ABCDEFGHIJKLMNOPQRSTUVWXYZ12345A'])) // more than 31 characters
+        .rejects.toThrow();
+    });
+
+    test('ByteArray', async () => {
+      const message = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ12345AAADEFGHIJKLMNOPQRSTUVWXYZ12345A';
+      const callD = CallData.compile([message]);
+      const expectedResult = [
+        '2',
+        hexToDecimalString('0x4142434445464748494a4b4c4d4e4f505152535455565758595a3132333435'),
+        hexToDecimalString('0x4141414445464748494a4b4c4d4e4f505152535455565758595a3132333435'),
+        hexToDecimalString('0x41'),
+        '1',
+      ];
+      expect(callD).toEqual(expectedResult);
+      const callD2 = CallData.compile({ mess: message });
+      expect(callD2).toEqual(expectedResult);
+      const callD3 = CallData.compile({ mess: byteArray.byteArrayFromString('Take care.') });
+      expect(callD3).toEqual(['1', '0', '398475857363345939260718', '10']);
+      const str1 = await stringContract.get_string();
+      expect(str1).toBe('azertzertrty dfghfghj dfgh dfghazert sdfgsdf ');
+      const myCallData = new CallData(stringContract.abi);
+      const expectedString = 'Take care. Zorg is back';
+      const resp3 = await stringContract.proceed_string('Take care.');
+      expect(resp3).toBe(expectedString);
+      const resp4 = await stringContract.call('proceed_string', ['Take care.']);
+      expect(resp4).toBe(expectedString);
+      const calldata1 = myCallData.compile('proceed_string', ['Take care.']);
+      const resp5 = await stringContract.call('proceed_string', calldata1);
+      expect(resp5).toBe(expectedString);
     });
   });
 });

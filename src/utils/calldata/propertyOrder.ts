@@ -4,6 +4,7 @@ import {
   isCairo1Type,
   isLen,
   isTypeArray,
+  isTypeByteArray,
   isTypeEnum,
   isTypeEthAddress,
   isTypeOption,
@@ -45,6 +46,9 @@ export default function orderPropsByAbi(
       return orderTuple(unorderedItem, abiType);
     }
     if (isTypeEthAddress(abiType)) {
+      return unorderedItem;
+    }
+    if (isTypeByteArray(abiType)) {
       return unorderedItem;
     }
     if (isTypeUint256(abiType)) {

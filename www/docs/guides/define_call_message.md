@@ -89,13 +89,16 @@ const a2: Uint256 = {low: "0xeb5337d9a885be319366b5205a414fdd", high: "0x05f7cd1
 const a3: Uint256 = {low: a1.low, high: a1.high};
 ```
 
-### string
+### shortString or bytes31
 
-Starknet is waiting for a felt, including 31 ASCII characters max.
+For a shortString, Starknet is waiting for a felt, including 31 ASCII characters max.  
 You can send to Starknet.js methods: string, bigNumberish.
 
+bytes31 is similar to shortString.  
+You can send to Starknet.js methods: string.
+
 ```typescript
-await myContract.my_function("Token", "0x0x534e5f4d41494e")
+await myContract.my_function("Token", "0x0x534e5f4d41494e") // send 2 shortStrings
 ```
 
 To encode yourself a string:
@@ -112,14 +115,24 @@ const decStr: string = shortString.decodeShortString("0x7572692f706963742f743338
 
 The result is: "uri/pict/t38.jpg"
 
-### longString
+### longString or ByteArray
 
-longString is a string that may contain more than 31 characters.
+longString is a string that may contain more than 31 characters.  
 Starknet is waiting for an array of felt: string_len, string1, string2, ...  
 You can send to Starknet.js methods: string, bigNumberish[].
 
+ByteArray is similar to longString.  
+Starknet is waiting for a specific struct.  
+You can send to Starknet.js methods: string.
+
 ```typescript
 await myContract.my_function("http://addressOfMyERC721pictures/image1.jpg")
+```
+
+To force to send a shortString as a ByteArray with `CallData.compile()` :
+
+```typescript
+const myCalldata = Calldata.compile([ byteArray.byteArrayFromString("Take care.") ]);
 ```
 
 If you want to split yourself your longString in 31 chars substrings:
@@ -437,8 +450,10 @@ const amount = myContract.call(...);
 | u8, u16, u32, usize                                       | `func get_v() -> u16`              | number (53 bits max)                          | `const res=myContract.call(...`<br /> `const total: number = Number(res)`                                                                                            |
 | u256 (255 bits max)                                       | `func get_v() -> u256`             | bigint                                        | `const res: bigint = myContract.call(...`                                                                                                                            |
 | array of u8, u16, u32, usize, u64, u128, felt252, address | `func get_v() -> Array<u64>`       | bigint[]                                      | `const res: bigint[] = myContract.call(...`                                                                                                                          |
-| shortString (31 ASCII characters max)                     | `func get_v() -> felt252`          | string                                        | `const res=myContract.call(...`<br /> `const title:string = shortString.decodeShortstring(res)`                                                                      |
+| bytes31 (31 ASCII characters max)                         | `func get_v() -> bytes31`          | string                                        | `const res: string = myContract.call(...`                                                                                                                            |
+| felt252 (31 ASCII characters max)                         | `func get_v() -> felt252`          | string                                        | `const res = myContract.call(...`<br /> `const title:string = shortString.decodeShortstring(res);`                                                                   |
 | longString                                                | `func get_v() -> Array<felt252>`   | string                                        | `const res=myContract.call(...`<br /> `const longString = res.map( (shortStr: bigint) => { return shortString.decodeShortString( num.toHex( shortStr)) }).join("");` |
+| ByteArray                                                 | `func get_v() -> ByteArray`        | string                                        | `const res: string = myContract.call(...`                                                                                                                            |
 | Tuple                                                     | `func get_v() -> (felt252, u8)`    | Object {"0": bigint, "1": bigint}             | `const res = myContract.call(...` <br /> `const res0: bigint = res["0"];` <br /> `const results: bigint[] = Object.values(res)`                                      |
 | Struct                                                    | ` func get_v() -> MyStruct`        | MyStruct = { account: bigint, amount: bigint} | `const res: MyStruct = myContract.call(...`                                                                                                                          |
 | complex array                                             | `func get_v() -> Array<fMyStruct>` | MyStruct[]                                    | `const res: MyStruct[] = myContract.call(...`                                                                                                                        |
