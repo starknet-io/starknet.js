@@ -113,8 +113,8 @@ describeIfRpc('RPCProvider', () => {
 
   describe('waitForTransaction', () => {
     const receipt = {};
-    const transactionStatusSpy = jest.spyOn(rpcProvider as any, 'getTransactionStatus');
-    const transactionReceiptSpy = jest.spyOn(rpcProvider as any, 'getTransactionReceipt');
+    const transactionStatusSpy = jest.spyOn(rpcProvider.channel as any, 'getTransactionStatus');
+    const transactionReceiptSpy = jest.spyOn(rpcProvider.channel as any, 'getTransactionReceipt');
 
     const generateOptions = (o: waitForTransactionOptions) => ({ retryInterval: 10, ...o });
     const generateTransactionStatus = (
