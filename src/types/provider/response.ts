@@ -167,11 +167,14 @@ export type RevertedTransactionReceiptResponse = {
   revert_reason?: string; // SEQ Casted revert_error // ?~ optional due to RCP spec issue
 };
 
+// OK 12.12.2023
 export interface EstimateFeeResponse {
+  gas_consumed: bigint;
   overall_fee: bigint;
-  gas_consumed?: bigint;
-  gas_price?: bigint;
-  suggestedMaxFee?: bigint;
+  gas_price: bigint;
+  unit: RPC.PriceUnit;
+  suggestedMaxFee: bigint;
+  resourceBounds: RPC.ResourceBounds;
 }
 
 export interface InvokeFunctionResponse {

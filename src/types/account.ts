@@ -2,10 +2,7 @@ import { EDataAvailabilityMode, ETransactionVersion, ResourceBounds } from './ap
 import { BigNumberish, BlockIdentifier, V3TransactionDetails } from './lib';
 import { DeclareTransactionReceiptResponse, EstimateFeeResponse } from './provider';
 
-export interface EstimateFee extends EstimateFeeResponse {
-  suggestedMaxFee: bigint;
-  resourceBounds: ResourceBounds;
-}
+export interface EstimateFee extends EstimateFeeResponse {}
 
 export type EstimateFeeBulk = Array<EstimateFee>;
 

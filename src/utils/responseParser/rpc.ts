@@ -22,7 +22,7 @@ import {
   TransactionWithHash,
 } from '../../types/api/rpcspec_0_6';
 import { toBigInt } from '../num';
-import { estimatedFeeToMaxFee } from '../stark';
+import { estimateFeeToBounds, estimatedFeeToMaxFee } from '../stark';
 import { ResponseParser } from '.';
 
 export class RPCResponseParser
@@ -76,10 +76,14 @@ export class RPCResponseParser
   }
 
   public parseFeeEstimateResponse(res: FeeEstimate[]): EstimateFeeResponse {
+    const val = res[0];
     return {
-      overall_fee: toBigInt(res[0].overall_fee),
-      gas_consumed: toBigInt(res[0].gas_consumed),
-      gas_price: toBigInt(res[0].gas_price),
+      overall_fee: toBigInt(val.overall_fee),
+      gas_consumed: toBigInt(val.gas_consumed),
+      gas_price: toBigInt(val.gas_price),
+      unit: val.unit,
+      suggestedMaxFee: estimatedFeeToMaxFee(val.overall_fee),
+      resourceBounds: estimateFeeToBounds(val),
     };
   }
 
@@ -88,6 +92,9 @@ export class RPCResponseParser
       overall_fee: toBigInt(val.overall_fee),
       gas_consumed: toBigInt(val.gas_consumed),
       gas_price: toBigInt(val.gas_price),
+      unit: val.unit,
+      suggestedMaxFee: estimatedFeeToMaxFee(val.overall_fee),
+      resourceBounds: estimateFeeToBounds(val),
     }));
   }
 

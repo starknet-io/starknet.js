@@ -1,4 +1,5 @@
-import { CallData, EstimateFeeResponse, RawArgs, json, stark } from '../../src';
+import { CallData, RawArgs, json, stark } from '../../src';
+import { FeeEstimate } from '../../src/types/api';
 import { toBigInt, toHex } from '../../src/utils/num';
 import { compiledOpenZeppelinAccount } from '../config/fixtures';
 
@@ -71,10 +72,11 @@ describe('stark', () => {
   });
 
   test('estimateFeeToBounds', () => {
-    const estimateFeeResponse: EstimateFeeResponse = {
-      gas_consumed: 100n,
-      gas_price: 10n,
-      overall_fee: 1000n,
+    const estimateFeeResponse: FeeEstimate = {
+      gas_consumed: '100',
+      gas_price: '10',
+      overall_fee: '1000',
+      unit: 'FRI',
     };
     expect(stark.estimateFeeToBounds(estimateFeeResponse)).toStrictEqual({
       l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
