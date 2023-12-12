@@ -3,7 +3,6 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 import {
-  BlockStatus,
   CallContractResponse,
   ContractClassResponse,
   EstimateFeeResponse,
@@ -36,15 +35,7 @@ export class RPCResponseParser
     >
 {
   public parseGetBlockResponse(res: BlockWithTxHashes): GetBlockResponse {
-    return {
-      timestamp: res.timestamp,
-      block_hash: 'block_hash' in res ? res.block_hash : '',
-      block_number: 'block_number' in res ? res.block_number : -1,
-      new_root: 'new_root' in res ? res.new_root : '',
-      parent_hash: res.parent_hash,
-      status: 'status' in res ? (res.status as BlockStatus) : BlockStatus.PENDING,
-      transactions: res.transactions,
-    };
+    return 'status' in res ? res : { ...res, status: 'PENDING' };
   }
 
   public parseTransactionReceipt(res: RPC.TransactionReceipt): GetTransactionReceiptResponse {

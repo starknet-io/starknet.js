@@ -2,9 +2,9 @@ import { getStarkKey, utils } from '@scure/starknet';
 
 import {
   Account,
+  Block,
   CallData,
   Contract,
-  GetBlockResponse,
   RPC,
   TransactionExecutionStatus,
   stark,
@@ -75,12 +75,6 @@ describeIfRpc('RPCProvider', () => {
   test('getSpecVersion', async () => {
     const spec = await rpcProvider.getSpecVersion();
     expect(typeof spec).toBe('string');
-  });
-
-  test('getCode - not implemented', async () => {
-    expect(
-      rpcProvider.getCode('0x058d97f7d76e78f44905cc30cb65b91ea49a4b908a76703c54197bca90f81773')
-    ).rejects.toThrow();
   });
 
   describe('Test Estimate message fee', () => {
@@ -172,7 +166,7 @@ describeIfRpc('RPCProvider', () => {
   });
 
   describe('RPC methods', () => {
-    let latestBlock: GetBlockResponse;
+    let latestBlock: Block;
 
     beforeAll(async () => {
       latestBlock = await provider.getBlock('latest');

@@ -2,15 +2,17 @@ import { RpcChannel } from '../channel/rpc_0_6';
 import {
   AccountInvocations,
   BigNumberish,
+  Block,
   BlockIdentifier,
   BlockTag,
   Call,
   ContractVersion,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
-  GetCodeResponse,
+  GetBlockResponse,
   Invocation,
   InvocationsDetailsWithNonce,
+  PendingBlock,
   RPC,
   RpcProviderOptions,
   TransactionType,
@@ -56,6 +58,10 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getNonceForAddress(contractAddress, blockIdentifier);
   }
 
+  public async getBlock(): Promise<PendingBlock>;
+  public async getBlock(blockIdentifier: 'pending'): Promise<PendingBlock>;
+  public async getBlock(blockIdentifier: 'latest'): Promise<Block>;
+  public async getBlock(blockIdentifier?: BlockIdentifier): Promise<GetBlockResponse>;
   public async getBlock(blockIdentifier?: BlockIdentifier) {
     return this.channel
       .getBlockWithTxHashes(blockIdentifier)
@@ -188,13 +194,6 @@ export class RpcProvider implements ProviderInterface {
     return this.channel
       .getClassAt(contractAddress, blockIdentifier)
       .then(this.responseParser.parseContractClassResponse);
-  }
-
-  public async getCode(
-    _contractAddress: string,
-    _blockIdentifier?: BlockIdentifier
-  ): Promise<GetCodeResponse> {
-    throw new Error('RPC does not implement getCode function');
   }
 
   public async getContractVersion(

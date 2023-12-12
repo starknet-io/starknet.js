@@ -8,8 +8,6 @@ import * as Sequencer from '../api/sequencer';
 import {
   AllowArray,
   BlockNumber,
-  BlockStatus,
-  ByteCode,
   Call,
   CompiledSierra,
   DeclareContractPayload,
@@ -24,29 +22,31 @@ import {
   UniversalDeployerContractPayload,
 } from '../lib';
 
-export interface GetBlockResponse {
+// OK
+export type GetBlockResponse = PendingBlock | Block;
+
+export type PendingBlock = {
+  status: 'PENDING';
+  parent_hash: RPC.SPEC.BLOCK_HASH;
   timestamp: number;
-  block_hash: string;
-  block_number: number;
-  new_root: string;
-  parent_hash: string;
-  status: BlockStatus;
-  transactions: Array<string>;
-  gas_price?: string;
-  sequencer_address?: string;
-  starknet_version?: string;
-  transaction_receipts?: any;
-}
+  sequencer_address: RPC.Felt;
+  l1_gas_price: RPC.SPEC.RESOURCE_PRICE;
+  starknet_version: string;
+  transactions: RPC.SPEC.TXN_HASH[];
+};
 
-export interface GetCodeResponse {
-  bytecode: ByteCode;
-  // abi: string; // is not consistent between rpc and sequencer (is it?), therefore not included in the provider interface
-}
-
-export interface ContractEntryPoint {
-  offset: string;
-  selector: string;
-}
+export type Block = {
+  status: 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
+  block_hash: RPC.SPEC.BLOCK_HASH;
+  parent_hash: RPC.SPEC.BLOCK_HASH;
+  block_number: RPC.SPEC.BLOCK_NUMBER;
+  new_root: RPC.SPEC.FELT;
+  timestamp: number;
+  sequencer_address: RPC.SPEC.FELT;
+  l1_gas_price: RPC.SPEC.RESOURCE_PRICE;
+  starknet_version: string;
+  transactions: RPC.SPEC.TXN_HASH[];
+};
 
 export type GetTransactionResponse =
   | InvokeTransactionResponse
