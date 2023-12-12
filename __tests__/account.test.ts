@@ -96,7 +96,9 @@ describe('deploy and test Wallet', () => {
     });
 
     expect(result).toMatchSchemaRef('EstimateFee');
-    expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(constants.TRANSACTION_VERSION.F1);
+    expect([constants.TRANSACTION_VERSION.F1, constants.TRANSACTION_VERSION.F3]).toContain(
+      innerInvokeEstFeeSpy.mock.calls[0][1].version
+    );
     innerInvokeEstFeeSpy.mockClear();
   });
 

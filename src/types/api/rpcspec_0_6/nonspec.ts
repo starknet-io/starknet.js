@@ -15,6 +15,7 @@ import {
   EVENTS_CHUNK,
   EVENT_FILTER,
   FEE_ESTIMATE,
+  FEE_PAYMENT,
   FELT,
   MSG_FROM_L1,
   NONCE_UPDATE,
@@ -22,6 +23,7 @@ import {
   PENDING_BLOCK_WITH_TX_HASHES,
   PENDING_STATE_UPDATE,
   PENDING_TXN_RECEIPT,
+  PRICE_UNIT,
   REPLACED_CLASS,
   RESOURCE_BOUNDS_MAPPING,
   RESULT_PAGE_REQUEST,
@@ -88,6 +90,8 @@ export type TransactionStatus = {
   execution_status?: TXN_EXECUTION_STATUS;
 };
 export type ResourceBounds = RESOURCE_BOUNDS_MAPPING;
+export type FeePayment = FEE_PAYMENT;
+export type PriceUnit = PRICE_UNIT;
 
 // Diff Than Seq
 export type StorageDiffs = Array<CONTRACT_STORAGE_DIFF_ITEM>;

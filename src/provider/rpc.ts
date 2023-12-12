@@ -127,7 +127,9 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getTransactionReceipt(txHash: BigNumberish) {
-    return this.channel.getTransactionReceipt(txHash);
+    return this.channel
+      .getTransactionReceipt(txHash)
+      .then(this.responseParser.parseTransactionReceipt);
   }
 
   public async getTransactionTrace(txHash: BigNumberish) {

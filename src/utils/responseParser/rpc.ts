@@ -9,7 +9,9 @@ import {
   EstimateFeeResponse,
   EstimateFeeResponseBulk,
   GetBlockResponse,
+  GetTransactionReceiptResponse,
   GetTransactionResponse,
+  RPC,
   SimulateTransactionResponse,
 } from '../../types';
 import {
@@ -43,6 +45,21 @@ export class RPCResponseParser
       status: 'status' in res ? (res.status as BlockStatus) : BlockStatus.PENDING,
       transactions: res.transactions,
     };
+  }
+
+  public parseTransactionReceipt(res: RPC.TransactionReceipt): GetTransactionReceiptResponse {
+    if (typeof res.actual_fee === 'string') {
+      // This case is RPC 0.5. It can be only v2 thx with FRI units
+      return {
+        ...res,
+        actual_fee: {
+          amount: res.actual_fee,
+          unit: 'FRI' as RPC.PriceUnit,
+        },
+      };
+    }
+
+    return res;
   }
 
   public parseGetTransactionResponse(res: TransactionWithHash): GetTransactionResponse {
