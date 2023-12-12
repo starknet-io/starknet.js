@@ -203,7 +203,15 @@
           ]
         },
         "actual_fee": {
-          "type": "string"
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "string"
+            },
+            "unit": {
+              "type": "string"
+            }
+          }
         },
         "status_data": {
           "type": "string"
