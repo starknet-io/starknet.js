@@ -13,7 +13,7 @@ import {
   EstimateFeeResponse,
   EstimateFeeResponseBulk,
   GetBlockResponse,
-  GetTransactionReceiptResponse,
+  GetTransactionReceiptResponseWoHelper,
   GetTransactionResponse,
   HexCalldata,
   InvokeFunctionResponse,
@@ -75,7 +75,7 @@ export class SequencerAPIResponseParser extends ResponseParser {
 
   public parseGetTransactionReceiptResponse(
     res: Sequencer.TransactionReceiptResponse
-  ): GetTransactionReceiptResponse {
+  ): GetTransactionReceiptResponseWoHelper {
     return {
       ...res,
       messages_sent: res.l2_to_l1_messages as any,

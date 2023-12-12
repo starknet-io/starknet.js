@@ -15,7 +15,7 @@ import {
   ContractOptions,
   EstimateFeeResponse,
   FunctionAbi,
-  GetTransactionReceiptResponse,
+  GetTransactionReceiptResponseWoHelper,
   InvokeFunctionResponse,
   InvokeOptions,
   InvokeTransactionReceiptResponse,
@@ -326,7 +326,7 @@ export class Contract implements ContractInterface {
     };
   }
 
-  public parseEvents(receipt: GetTransactionReceiptResponse): ParsedEvents {
+  public parseEvents(receipt: GetTransactionReceiptResponseWoHelper): ParsedEvents {
     return parseRawEvents(
       (receipt as InvokeTransactionReceiptResponse).events?.filter(
         (event) => cleanHex(event.from_address) === cleanHex(this.address),

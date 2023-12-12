@@ -24,7 +24,7 @@ export type TransactionReceiptCallbacks =
   | TransactionReceiptCallbacksDefault;
 
 export type TransactionReceiptUtilityInterface = {
-  readonly status: TransactionReceiptStatus;
+  readonly statusReceipt: TransactionReceiptStatus;
   readonly value: TransactionReceiptValue;
   match(callbacks: TransactionReceiptCallbacks): void;
 } & {

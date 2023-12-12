@@ -4,7 +4,7 @@ import {
   DeployContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
-  GetTransactionReceiptResponse,
+  GetTransactionReceiptResponseWoHelper,
   GetTransactionResponse,
   InvokeFunctionResponse,
   SimulateTransactionResponse,
@@ -15,7 +15,7 @@ export abstract class ResponseParser {
 
   abstract parseGetTransactionResponse(res: any): GetTransactionResponse;
 
-  abstract parseGetTransactionReceiptResponse(res: any): GetTransactionReceiptResponse;
+  abstract parseGetTransactionReceiptResponse(res: any): GetTransactionReceiptResponseWoHelper;
 
   abstract parseFeeEstimateResponse(res: any): EstimateFeeResponse;
 
