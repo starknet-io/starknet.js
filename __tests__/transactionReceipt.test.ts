@@ -5,14 +5,13 @@ import {
   RevertedTransactionReceiptResponse,
   SuccessfulTransactionReceiptResponse,
   TransactionExecutionStatus,
-  evaluateTransactionReceipt,
-} from '../../src';
+} from '../src';
 import {
   compiledTestRejectCasm,
   compiledTestRejectSierra,
   getTestAccount,
   getTestProvider,
-} from '../fixtures';
+} from './fixtures';
 
 describe('Transaction receipt utility', () => {
   const provider = getTestProvider();
@@ -34,10 +33,9 @@ describe('Transaction receipt utility', () => {
   test('test for Success variant', async () => {
     const myCall: Call = contract.populate('test_fail', { p1: 100 });
     const res = await account.execute(myCall, undefined, { maxFee: 1 * 10 ** 15 }); // maxFee needed to not throw error in getEstimateFee
-    const txReceipt = await provider.waitForTransaction(res.transaction_hash);
-    const txR = evaluateTransactionReceipt(txReceipt);
+    const txR = await provider.waitForTransaction(res.transaction_hash);
     expect(txR.value).toHaveProperty('execution_status', TransactionExecutionStatus.SUCCEEDED);
-    expect(txR.status).toBe('success');
+    expect(txR.statusReceipt).toBe('success');
     expect(txR.isSuccess()).toBe(true);
     expect(txR.isRejected()).toBe(false);
     expect(txR.isReverted()).toBe(false);
@@ -57,10 +55,9 @@ describe('Transaction receipt utility', () => {
   test('test for Reverted variant', async () => {
     const myCall: Call = contract.populate('test_fail', { p1: 10 }); // reverted if not 100
     const res = await account.execute(myCall, undefined, { maxFee: 1 * 10 ** 15 }); // maxFee needed to not throw error in getEstimateFee
-    const txReceipt = await provider.waitForTransaction(res.transaction_hash);
-    const txR = evaluateTransactionReceipt(txReceipt);
+    const txR = await provider.waitForTransaction(res.transaction_hash);
     expect(txR.value).toHaveProperty('execution_status', TransactionExecutionStatus.REVERTED);
-    expect(txR.status).toBe('reverted');
+    expect(txR.statusReceipt).toBe('reverted');
     expect(txR.isSuccess()).toBe(false);
     expect(txR.isRejected()).toBe(false);
     expect(txR.isReverted()).toBe(true);
@@ -82,10 +79,9 @@ describe('Transaction receipt utility', () => {
       { classHash: dd.declare.class_hash },
       { maxFee: 1 * 10 ** 15 }
     ); // maxFee needed to not throw error in getEstimateFee
-    const txReceipt = await provider.waitForTransaction(res.transaction_hash);
-    const txR = evaluateTransactionReceipt(txReceipt);
+    const txR = await provider.waitForTransaction(res.transaction_hash);
     expect(txR.value).toHaveProperty('execution_status', TransactionExecutionStatus.SUCCEEDED);
-    expect(txR.status).toBe('success');
+    expect(txR.statusReceipt).toBe('success');
     expect(txR.isSuccess()).toBe(true);
     expect(txR.isRejected()).toBe(false);
     expect(txR.isReverted()).toBe(false);
@@ -103,6 +99,6 @@ describe('Transaction receipt utility', () => {
   });
 
   // NOTE:
-  // no rejected test, impossible to trigger 'rejected' from a node/devnet
+  // no rejected test, impossible to trigger 'rejected' from a node/devnet.
   // no declare test due to slow process (result is very similar to Invoke)
 });

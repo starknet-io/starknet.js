@@ -177,14 +177,10 @@ You can interpret the transaction receipt response to check whether it succeeded
 
 ```typescript
 const result = await account.execute(myCall);
-const txReceipt = await provider.waitForTransaction(result.transaction_hash);
-const txR = evaluateTransactionReceipt(txReceipt);
+const txR = await provider.waitForTransaction(result.transaction_hash);
 
-console.log(txR.status, txR.value);
+console.log(txR.statusReceipt, txR.value);
 console.log(txR.isSuccess(), txR.isRejected(), txR.isReverted(), txR.isError());
-console.log(TransactionReceiptUtility.isSuccess(txReceipt))
-console.log(TransactionReceiptUtility.isRejected(txReceipt))
-console.log(TransactionReceiptUtility.isReverted(txReceipt))
 
 txR.match({
   success: () => { console.log('Success') },

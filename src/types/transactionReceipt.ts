@@ -1,5 +1,4 @@
 import {
-  GetTransactionReceiptResponseWoHelper,
   RejectedTransactionReceiptResponse,
   RevertedTransactionReceiptResponse,
   SuccessfulTransactionReceiptResponse,
@@ -31,5 +30,3 @@ export type TransactionReceiptUtilityInterface = {
 } & {
   [key in `is${Capitalize<TransactionReceiptStatus>}`]: () => boolean;
 };
-
-export type Receipt = GetTransactionReceiptResponseWoHelper & TransactionReceiptUtilityInterface;

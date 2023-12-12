@@ -30,19 +30,25 @@ import {
  * }
  * ```
  */
-export class GetTransactionReceiptResponse implements TransactionReceiptUtilityInterface {
+export class Receipt implements TransactionReceiptUtilityInterface {
   public readonly statusReceipt: TransactionReceiptStatus;
 
   public readonly value: TransactionReceiptValue;
 
   constructor(receipt: GetTransactionReceiptResponseWoHelper) {
-    [this.statusReceipt, this.value] = GetTransactionReceiptResponse.isSuccess(receipt)
+    [this.statusReceipt, this.value] = Receipt.isSuccess(receipt)
       ? ['success', receipt]
-      : GetTransactionReceiptResponse.isReverted(receipt)
+      : Receipt.isReverted(receipt)
       ? ['reverted', receipt]
-      : GetTransactionReceiptResponse.isRejected(receipt)
+      : Receipt.isRejected(receipt)
       ? ['rejected', receipt]
       : ['error', new Error('Unknown response type')];
+    // eslint-disable-next-line no-restricted-syntax
+    for (const [key] of Object.entries(this)) {
+      Object.defineProperty(this, key, {
+        enumerable: false,
+      });
+    }
     // eslint-disable-next-line no-restricted-syntax
     for (const [key, value] of Object.entries(receipt)) {
       Object.defineProperty(this, key, {
@@ -104,25 +110,4 @@ export class GetTransactionReceiptResponse implements TransactionReceiptUtilityI
   }
 }
 
-/**
- * Analyses a transaction receipt response and provides helpers to process it
- * @example
- * ```typescript
- * const responseTx = evaluateTransactionReceipt(receipt);
- * responseTx.match({
- *   success: (txR: SuccessfulTransactionReceiptResponse) => { },
- *   rejected: (txR: RejectedTransactionReceiptResponse) => { },
- *   reverted: (txR: RevertedTransactionReceiptResponse) => { },
- *   error: (err: Error) => { },
- * });
- * responseTx.match({
- *   success: (txR: SuccessfulTransactionReceiptResponse) => { },
- *   _: () => { },
- * }
- * ```
- */
-export function evaluateTransactionReceipt(
-  transactionResponse: GetTransactionReceiptResponseWoHelper
-): GetTransactionReceiptResponse {
-  return new GetTransactionReceiptResponse(transactionResponse);
-}
+export type GetTransactionReceiptResponse = GetTransactionReceiptResponseWoHelper & Receipt;

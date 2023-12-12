@@ -37,7 +37,7 @@ import { getHexStringArray, toHex, toStorageKey } from '../utils/num';
 import { wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { decompressProgram, signatureToHexArray } from '../utils/stark';
-import { GetTransactionReceiptResponse } from '../utils/transactionReceipt';
+import { GetTransactionReceiptResponse, Receipt } from '../utils/transactionReceipt';
 import { LibraryError } from './errors';
 import { ProviderInterface } from './interface';
 import { getAddressFromStarkName, getStarkName } from './starknetId';
@@ -263,7 +263,7 @@ export class RpcProvider implements ProviderInterface {
     const txReceiptWoHelper = await this.fetchEndpoint('starknet_getTransactionReceipt', {
       transaction_hash,
     });
-    return new GetTransactionReceiptResponse(txReceiptWoHelper);
+    return new Receipt(txReceiptWoHelper) as GetTransactionReceiptResponse;
   }
 
   public async getTransactionTrace(txHash: BigNumberish) {
