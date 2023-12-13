@@ -4,6 +4,7 @@ import {
   Contract,
   DeclareDeployUDCResponse,
   Provider,
+  SignatureVerifResult,
   TransactionType,
   cairo,
   constants,
@@ -397,7 +398,7 @@ describe('deploy and test Wallet', () => {
     expect(toBigInt(response.number as string).toString()).toStrictEqual('57');
   });
 
-  test('sign and verify offchain message fail', async () => {
+  test('sign and verify EIP712 message fail', async () => {
     const signature = await account.signMessage(typedDataExample);
     const [r, s] = stark.formatSignature(signature);
 
@@ -408,12 +409,32 @@ describe('deploy and test Wallet', () => {
 
     if (!signature2) return;
 
-    expect(await account.verifyMessage(typedDataExample, signature2)).toBe(false);
+    const verifMessageResponse: SignatureVerifResult = await account.verifyMessage(
+      typedDataExample,
+      signature2
+    );
+    expect(verifMessageResponse.isVerificationProcessed).toBe(true);
+    expect(verifMessageResponse.isSignatureValid).toBe(false);
+
+    const wrongAccount = new Account(provider, '0x037891', '0x026789', undefined, TEST_TX_VERSION); // non existing account
+    const verifMessageResponse2: SignatureVerifResult = await wrongAccount.verifyMessage(
+      typedDataExample,
+      signature2
+    );
+    expect(verifMessageResponse2.isVerificationProcessed).toBe(false);
+    expect(verifMessageResponse2.error?.message).toContain(
+      'Signature verification request is rejected by the network.'
+    );
   });
 
-  test('sign and verify offchain message', async () => {
+  test('sign and verify message', async () => {
     const signature = await account.signMessage(typedDataExample);
-    expect(await account.verifyMessage(typedDataExample, signature)).toBe(true);
+    const verifMessageResponse: SignatureVerifResult = await account.verifyMessage(
+      typedDataExample,
+      signature
+    );
+    expect(verifMessageResponse.isVerificationProcessed).toBe(true);
+    expect(verifMessageResponse.isSignatureValid).toBe(true);
   });
 
   describe('Contract interaction with Account', () => {

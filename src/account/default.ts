@@ -32,6 +32,7 @@ import {
   Nonce,
   ProviderOptions,
   Signature,
+  SignatureVerifResult,
   SimulateTransactionDetails,
   SimulateTransactionResponse,
   TransactionType,
@@ -573,9 +574,12 @@ export class Account extends Provider implements AccountInterface {
     return getMessageHash(typedData, this.address);
   }
 
-  public async verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean> {
+  public async verifyMessageHash(
+    hash: BigNumberish,
+    signature: Signature
+  ): Promise<SignatureVerifResult> {
     try {
-      await this.callContract({
+      const resp = await this.callContract({
         contractAddress: this.address,
         entrypoint: 'isValidSignature',
         calldata: CallData.compile({
@@ -583,13 +587,46 @@ export class Account extends Provider implements AccountInterface {
           signature: formatSignature(signature),
         }),
       });
-      return true;
-    } catch {
-      return false;
+      // console.log('verifySign=', resp);
+      if (BigInt(resp.result[0]) === 0n) {
+        // OpenZeppelin 0.8.0 invalid signature
+        return {
+          isVerificationProcessed: true,
+          isSignatureValid: false,
+        } as SignatureVerifResult;
+      }
+      // OpenZeppelin 0.8.0, ArgentX 0.3.0 & Braavos Cairo 0 valid signature
+      return {
+        isVerificationProcessed: true,
+        isSignatureValid: true,
+      } as SignatureVerifResult;
+    } catch (err) {
+      // console.log('verifySign error=', err);
+      if ((err as Error).message.includes('argent/invalid-signature')) {
+        // ArgentX 0.3.0 invalid signature
+        return {
+          isVerificationProcessed: true,
+          isSignatureValid: false,
+        } as SignatureVerifResult;
+      }
+      if ((err as Error).message.includes('is invalid, with respect to the public key')) {
+        // Braavos Cairo 0 invalid signature
+        return {
+          isVerificationProcessed: true,
+          isSignatureValid: false,
+        } as SignatureVerifResult;
+      }
+      return {
+        isVerificationProcessed: false,
+        error: new Error('Signature verification request is rejected by the network.'),
+      } as SignatureVerifResult;
     }
   }
 
-  public async verifyMessage(typedData: TypedData, signature: Signature): Promise<boolean> {
+  public async verifyMessage(
+    typedData: TypedData,
+    signature: Signature
+  ): Promise<SignatureVerifResult> {
     const hash = await this.hashMessage(typedData);
     return this.verifyMessageHash(hash, signature);
   }
