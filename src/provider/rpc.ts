@@ -13,8 +13,11 @@ import {
   Invocation,
   InvocationsDetailsWithNonce,
   PendingBlock,
+  PendingStateUpdate,
   RPC,
   RpcProviderOptions,
+  StateUpdate,
+  StateUpdateResponse,
   TransactionType,
   getContractVersionOptions,
   getEstimateFeeBulkOptions,
@@ -94,6 +97,10 @@ export class RpcProvider implements ProviderInterface {
 
   public getStateUpdate = this.getBlockStateUpdate;
 
+  public async getBlockStateUpdate(): Promise<PendingStateUpdate>;
+  public async getBlockStateUpdate(blockIdentifier: 'pending'): Promise<PendingStateUpdate>;
+  public async getBlockStateUpdate(blockIdentifier: 'latest'): Promise<StateUpdate>;
+  public async getBlockStateUpdate(blockIdentifier?: BlockIdentifier): Promise<StateUpdateResponse>;
   public async getBlockStateUpdate(blockIdentifier?: BlockIdentifier) {
     return this.channel.getBlockStateUpdate(blockIdentifier);
   }

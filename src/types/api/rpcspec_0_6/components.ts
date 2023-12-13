@@ -134,6 +134,7 @@ export type STATE_DIFF = {
 export type PENDING_STATE_UPDATE = {
   old_root: FELT;
   state_diff: STATE_DIFF;
+  block_hash: never; // diverge: this make it distinct
 };
 
 export type STATE_UPDATE = {

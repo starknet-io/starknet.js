@@ -6,10 +6,15 @@ import {
   CompiledContract,
   CompiledSierra,
   ContractClass,
+  GetBlockResponse,
+  GetTransactionReceiptResponse,
   InvocationsDetailsWithNonce,
   LegacyContractClass,
+  PendingBlock,
+  PendingStateUpdate,
   RPC,
   SierraContractClass,
+  StateUpdateResponse,
   V3TransactionDetails,
 } from '../types';
 import { ETransactionVersion } from '../types/api';
@@ -168,17 +173,6 @@ export class Block {
   } */
 }
 
-export function defStateUpdate(
-  state: RPC.SPEC.STATE_UPDATE | RPC.SPEC.PENDING_STATE_UPDATE,
-  accepted: (state: RPC.SPEC.STATE_UPDATE) => unknown,
-  pending: (state: RPC.SPEC.PENDING_STATE_UPDATE) => unknown
-) {
-  if ('block_hash' in state) {
-    return accepted(state);
-  }
-  return pending(state);
-}
-
 export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3TransactionDetails {
   const version = details.version ? toHex(details.version) : ETransactionVersion.V3;
   return version === ETransactionVersion.V3 || version === ETransactionVersion.F3;
@@ -189,4 +183,30 @@ export function isVersion(version: '0.5' | '0.6', response: string) {
   const [majorR, minorR] = response.split('.');
 
   return majorS === majorR && minorS === minorR;
+}
+
+/**
+ * Guard Pending Block
+ */
+export function isPendingBlock(response: GetBlockResponse): response is PendingBlock {
+  return response.status === 'PENDING';
+}
+
+/**
+ * Guard Pending Transaction
+ */
+export function isPendingTransaction(
+  response: GetTransactionReceiptResponse
+): response is RPC.PendingReceipt {
+  return !('block_hash' in response);
+}
+
+/**
+ * Guard Pending State Update
+ * ex. if(isPendingStateUpdate(stateUpdate)) throe Error('Update must be final')
+ */
+export function isPendingStateUpdate(
+  response: StateUpdateResponse
+): response is PendingStateUpdate {
+  return !('block_hash' in response);
 }

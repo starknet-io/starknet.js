@@ -33,7 +33,6 @@ export type Block = {
 
 export type GetTransactionResponse = RPC.TransactionWithHash;
 
-// TODO Check if can be pending discriminated
 export type GetTransactionReceiptResponse = RPC.Receipt | RPC.PendingReceipt;
 // Spread individual types for usage convenience
 export type InvokeTransactionReceiptResponse =
@@ -80,7 +79,6 @@ export type SimulatedTransaction = RPC.SimulateTransaction & {
 
 export type SimulateTransactionResponse = SimulatedTransaction[];
 
-// TODO: Make discriminator key
 export type StateUpdateResponse = StateUpdate | PendingStateUpdate;
 export type StateUpdate = RPC.SPEC.STATE_UPDATE;
 export type PendingStateUpdate = RPC.SPEC.PENDING_STATE_UPDATE;
