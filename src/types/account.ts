@@ -1,5 +1,15 @@
 import { EDataAvailabilityMode, ETransactionVersion, ResourceBounds } from './api';
-import { BigNumberish, BlockIdentifier, V3TransactionDetails } from './lib';
+import {
+  AllowArray,
+  BigNumberish,
+  BlockIdentifier,
+  Call,
+  DeclareContractPayload,
+  DeployAccountContractPayload,
+  TransactionType,
+  UniversalDeployerContractPayload,
+  V3TransactionDetails,
+} from './lib';
 import { DeclareTransactionReceiptResponse, EstimateFeeResponse } from './provider';
 
 export interface EstimateFee extends EstimateFeeResponse {}
@@ -69,3 +79,21 @@ export enum SIMULATION_FLAG {
   SKIP_VALIDATE = 'SKIP_VALIDATE',
   SKIP_EXECUTE = 'SKIP_EXECUTE',
 }
+
+export type EstimateFeeAction =
+  | {
+      type: TransactionType.INVOKE;
+      payload: AllowArray<Call>;
+    }
+  | {
+      type: TransactionType.DECLARE;
+      payload: DeclareContractPayload;
+    }
+  | {
+      type: TransactionType.DEPLOY_ACCOUNT;
+      payload: DeployAccountContractPayload;
+    }
+  | {
+      type: TransactionType.DEPLOY;
+      payload: UniversalDeployerContractPayload;
+    };

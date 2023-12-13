@@ -2,7 +2,6 @@ import { NetworkName, RPC_NODES } from '../constants';
 import {
   BigNumberish,
   BlockIdentifier,
-  BlockNumber,
   BlockTag,
   CompiledContract,
   CompiledSierra,
@@ -10,7 +9,6 @@ import {
   InvocationsDetailsWithNonce,
   LegacyContractClass,
   RPC,
-  SequencerIdentifier,
   SierraContractClass,
   V3TransactionDetails,
 } from '../types';
@@ -163,11 +161,11 @@ export class Block {
 
   toString = () => this.hash;
 
-  get sequencerIdentifier(): SequencerIdentifier {
+  /*   get sequencerIdentifier(): SequencerIdentifier {
     return this.hash !== null
       ? { blockHash: this.hash as string }
       : { blockNumber: (this.number ?? this.tag) as BlockNumber };
-  }
+  } */
 }
 
 export function defStateUpdate(

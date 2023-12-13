@@ -181,7 +181,7 @@ describe('defaultProvider', () => {
               }),
             })
             .then((res) => {
-              expect(Array.isArray(res.result)).toBe(true);
+              expect(Array.isArray(res)).toBe(true);
             })
         ).resolves.not.toThrow();
       });

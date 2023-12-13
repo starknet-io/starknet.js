@@ -119,9 +119,7 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getTransaction(txHash: BigNumberish) {
-    return this.channel
-      .getTransactionByHash(txHash)
-      .then(this.responseParser.parseGetTransactionResponse);
+    return this.channel.getTransactionByHash(txHash);
   }
 
   public async getTransactionByHash(txHash: BigNumberish) {
@@ -161,7 +159,9 @@ export class RpcProvider implements ProviderInterface {
     options?: getSimulateTransactionOptions
   ) {
     // can't be named simulateTransaction because of argument conflict with account
-    return this.channel.simulateTransaction(invocations, options);
+    return this.channel
+      .simulateTransaction(invocations, options)
+      .then(this.responseParser.parseSimulateTransactionResponse);
   }
 
   public async waitForTransaction(txHash: BigNumberish, options?: waitForTransactionOptions) {
@@ -340,9 +340,8 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async callContract(call: Call, blockIdentifier?: BlockIdentifier) {
-    return this.channel
-      .callContract(call, blockIdentifier)
-      .then(this.responseParser.parseCallContractResponse);
+    return this.channel.callContract(call, blockIdentifier);
+    // .then(this.responseParser.parseCallContractResponse);
   }
 
   /**

@@ -42,10 +42,11 @@ import {
 // response starknet_getClass
 export type ContractClass = CONTRACT_CLASS | DEPRECATED_CONTRACT_CLASS;
 // response starknet_simulateTransactions
-export type SimulateTransactionResponse = {
+export type SimulateTransaction = {
   transaction_trace: TRANSACTION_TRACE;
   fee_estimation: FEE_ESTIMATE;
-}[];
+};
+export type SimulateTransactionResponse = SimulateTransaction[];
 // response starknet_estimateFee
 export type FeeEstimate = FEE_ESTIMATE;
 // response starknet_getTransactionByHash, starknet_getTransactionByBlockIdAndIndex
@@ -79,6 +80,8 @@ export type TransactionHash = TXN_HASH;
 export type TransactionTrace = TRANSACTION_TRACE;
 export type BlockHash = BLOCK_HASH;
 export type TransactionReceipt = TXN_RECEIPT | PENDING_TXN_RECEIPT;
+export type Receipt = TXN_RECEIPT;
+export type PendingReceipt = PENDING_TXN_RECEIPT;
 export type EventFilter = EVENT_FILTER & RESULT_PAGE_REQUEST;
 export type SimulationFlags = Array<SIMULATION_FLAG>;
 export type L1Message = MSG_FROM_L1;
