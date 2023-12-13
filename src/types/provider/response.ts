@@ -33,13 +33,6 @@ export type Block = {
 
 export type GetTransactionResponse = RPC.TransactionWithHash;
 
-// TODO: solve this one
-export interface Event {
-  from_address: string;
-  keys: Array<string>;
-  data: Array<string>;
-}
-
 // TODO Check if can be pending discriminated
 export type GetTransactionReceiptResponse = RPC.Receipt | RPC.PendingReceipt;
 // Spread individual types for usage convenience

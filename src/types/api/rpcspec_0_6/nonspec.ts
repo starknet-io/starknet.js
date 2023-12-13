@@ -12,6 +12,8 @@ import {
   CONTRACT_CLASS,
   CONTRACT_STORAGE_DIFF_ITEM,
   DEPRECATED_CONTRACT_CLASS,
+  EMITTED_EVENT,
+  EVENT,
   EVENTS_CHUNK,
   EVENT_FILTER,
   FEE_ESTIMATE,
@@ -65,6 +67,8 @@ export type BlockTransactionsTraces = { transaction_hash: FELT; trace_root: TRAN
 export type Syncing = false | SYNC_STATUS;
 // response starknet_getEvents
 export type Events = EVENTS_CHUNK;
+export type EmittedEvent = EMITTED_EVENT;
+export type Event = EVENT;
 // response starknet_addInvokeTransaction
 export type InvokedTransaction = { transaction_hash: TXN_HASH };
 // response starknet_addDeclareTransaction
