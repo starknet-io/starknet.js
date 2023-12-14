@@ -1,3 +1,15 @@
+# [6.0.0-beta.7](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.6...v6.0.0-beta.7) (2023-12-14)
+
+### Bug Fixes
+
+- provider rpc 0.5-0.6 getTransactionReceipt response standardization ([76b6ab4](https://github.com/starknet-io/starknet.js/commit/76b6ab49f6721d1f76c3f30d3d88d6dbc8b80bda))
+
+### Features
+
+- curves ([405de46](https://github.com/starknet-io/starknet.js/commit/405de462032579ef0e8e434c62976dcb84ee1af8))
+- **provider:** fix and clean provider response and response parser, removed seqeuncer api ([7ecb069](https://github.com/starknet-io/starknet.js/commit/7ecb069e3d2c37653cedc44dfbb635c5bc8eec7f))
+- **provider:** pending response discrimination, pending type guards ([013a22b](https://github.com/starknet-io/starknet.js/commit/013a22bf4dd8cb6df817ccf6ff2d82837fe91693))
+
 # [6.0.0-beta.6](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.5...v6.0.0-beta.6) (2023-12-11)
 
 ### Features
