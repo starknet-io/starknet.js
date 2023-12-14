@@ -203,7 +203,7 @@ export function isPendingTransaction(
 
 /**
  * Guard Pending State Update
- * ex. if(isPendingStateUpdate(stateUpdate)) throe Error('Update must be final')
+ * ex. if(isPendingStateUpdate(stateUpdate)) throw Error('Update must be final')
  */
 export function isPendingStateUpdate(
   response: StateUpdateResponse

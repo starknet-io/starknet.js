@@ -348,7 +348,6 @@ export class RpcProvider implements ProviderInterface {
 
   public async callContract(call: Call, blockIdentifier?: BlockIdentifier) {
     return this.channel.callContract(call, blockIdentifier);
-    // .then(this.responseParser.parseCallContractResponse);
   }
 
   /**
