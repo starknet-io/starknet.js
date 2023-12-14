@@ -38,21 +38,13 @@ jobs:
     needs: [skip_check]
     if: needs.skip_check.outputs.should_skip != 'true'
     strategy:
-      max-parallel: 1 # needed until we get a seperate account for the rpc provider, until then running them in parallel would result in a nonce issue
+      max-parallel: 1
       matrix:
-        name: [sequencer-goerli, rpc-goerli]
-        include:
-          - name: sequencer-goerli
-            ENABLE_SEQUENCER: true
-            ENABLE_RPC: false
-          - name: rpc-goerli
-            ENABLE_SEQUENCER: false
-            ENABLE_RPC: true
+        name: [rpc-goerli]
 
     uses: ./.github/workflows/_test.yml
     secrets:
-      TEST_PROVIDER_BASE_URL: ${{ matrix.ENABLE_SEQUENCER && secrets.TEST_PROVIDER_BASE_URL || ''}}
-      TEST_RPC_URL: ${{ matrix.ENABLE_RPC && secrets.TEST_RPC_URL || ''}}
+      TEST_RPC_URL: ${{ secrets.TEST_RPC_URL }}
       TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
       TEST_ACCOUNT_ADDRESS: ${{ secrets.TEST_ACCOUNT_ADDRESS }}
 
