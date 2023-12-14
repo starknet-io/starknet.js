@@ -3,24 +3,16 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 import {
-  BlockStatus,
-  CallContractResponse,
   ContractClassResponse,
   EstimateFeeResponse,
   EstimateFeeResponseBulk,
   GetBlockResponse,
-  GetTransactionResponse,
+  GetTransactionReceiptResponse,
+  RPC,
   SimulateTransactionResponse,
 } from '../../types';
-import {
-  BlockWithTxHashes,
-  ContractClass,
-  FeeEstimate,
-  SimulateTransactionResponse as RPCSimulateTransactionResponse,
-  TransactionWithHash,
-} from '../../types/api/rpcspec_0_6';
 import { toBigInt } from '../num';
-import { estimatedFeeToMaxFee } from '../stark';
+import { estimateFeeToBounds, estimatedFeeToMaxFee } from '../stark';
 import { ResponseParser } from '.';
 
 export class RPCResponseParser
@@ -31,67 +23,66 @@ export class RPCResponseParser
       | 'parseDeployContractResponse'
       | 'parseInvokeFunctionResponse'
       | 'parseGetTransactionReceiptResponse'
+      | 'parseGetTransactionResponse'
+      | 'parseCallContractResponse'
     >
 {
-  public parseGetBlockResponse(res: BlockWithTxHashes): GetBlockResponse {
+  public parseGetBlockResponse(res: RPC.BlockWithTxHashes): GetBlockResponse {
+    return { status: 'PENDING', ...res };
+  }
+
+  public parseTransactionReceipt(res: RPC.TransactionReceipt): GetTransactionReceiptResponse {
+    // HOTFIX RPC 0.5 to align with RPC 0.6
+    // This case is RPC 0.5. It can be only v2 thx with FRI units
+    if ('actual_fee' in res && typeof res.actual_fee === 'string') {
+      return {
+        ...res,
+        actual_fee: {
+          amount: res.actual_fee,
+          unit: 'FRI' as RPC.PriceUnit,
+        },
+      };
+    }
+
+    return res;
+  }
+
+  public parseFeeEstimateResponse(res: RPC.FeeEstimate[]): EstimateFeeResponse {
+    const val = res[0];
     return {
-      timestamp: res.timestamp,
-      block_hash: 'block_hash' in res ? res.block_hash : '',
-      block_number: 'block_number' in res ? res.block_number : -1,
-      new_root: 'new_root' in res ? res.new_root : '',
-      parent_hash: res.parent_hash,
-      status: 'status' in res ? (res.status as BlockStatus) : BlockStatus.PENDING,
-      transactions: res.transactions,
+      overall_fee: toBigInt(val.overall_fee),
+      gas_consumed: toBigInt(val.gas_consumed),
+      gas_price: toBigInt(val.gas_price),
+      unit: val.unit,
+      suggestedMaxFee: estimatedFeeToMaxFee(val.overall_fee),
+      resourceBounds: estimateFeeToBounds(val),
     };
   }
 
-  public parseGetTransactionResponse(res: TransactionWithHash): GetTransactionResponse {
-    return {
-      calldata: 'calldata' in res ? res.calldata : [],
-      contract_address: 'contract_address' in res ? res.contract_address : '',
-      sender_address: 'sender_address' in res ? res.sender_address : '',
-      max_fee: 'max_fee' in res ? res.max_fee : '',
-      nonce: 'nonce' in res ? res.nonce : '',
-      signature: 'signature' in res ? res.signature : [],
-      transaction_hash: res.transaction_hash,
-      version: res.version,
-    };
-  }
-
-  public parseFeeEstimateResponse(res: FeeEstimate[]): EstimateFeeResponse {
-    return {
-      overall_fee: toBigInt(res[0].overall_fee),
-      gas_consumed: toBigInt(res[0].gas_consumed),
-      gas_price: toBigInt(res[0].gas_price),
-    };
-  }
-
-  public parseFeeEstimateBulkResponse(res: FeeEstimate[]): EstimateFeeResponseBulk {
+  public parseFeeEstimateBulkResponse(res: RPC.FeeEstimate[]): EstimateFeeResponseBulk {
     return res.map((val) => ({
       overall_fee: toBigInt(val.overall_fee),
       gas_consumed: toBigInt(val.gas_consumed),
       gas_price: toBigInt(val.gas_price),
+      unit: val.unit,
+      suggestedMaxFee: estimatedFeeToMaxFee(val.overall_fee),
+      resourceBounds: estimateFeeToBounds(val),
     }));
   }
 
-  public parseCallContractResponse(res: string[]): CallContractResponse {
-    return {
-      result: res,
-    };
-  }
-
   public parseSimulateTransactionResponse(
-    res: RPCSimulateTransactionResponse
+    res: RPC.SimulateTransactionResponse
   ): SimulateTransactionResponse {
     return res.map((it) => {
       return {
         ...it,
         suggestedMaxFee: estimatedFeeToMaxFee(BigInt(it.fee_estimation.overall_fee)),
+        resourceBounds: estimateFeeToBounds(it.fee_estimation),
       };
     });
   }
 
-  public parseContractClassResponse(res: ContractClass): ContractClassResponse {
+  public parseContractClassResponse(res: RPC.ContractClass): ContractClassResponse {
     return {
       ...res,
       abi: typeof res.abi === 'string' ? JSON.parse(res.abi) : res.abi,

@@ -2,17 +2,22 @@ import { RpcChannel } from '../channel/rpc_0_6';
 import {
   AccountInvocations,
   BigNumberish,
+  Block,
   BlockIdentifier,
   BlockTag,
   Call,
   ContractVersion,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
-  GetCodeResponse,
+  GetBlockResponse,
   Invocation,
   InvocationsDetailsWithNonce,
+  PendingBlock,
+  PendingStateUpdate,
   RPC,
   RpcProviderOptions,
+  StateUpdate,
+  StateUpdateResponse,
   TransactionType,
   getContractVersionOptions,
   getEstimateFeeBulkOptions,
@@ -56,6 +61,10 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getNonceForAddress(contractAddress, blockIdentifier);
   }
 
+  public async getBlock(): Promise<PendingBlock>;
+  public async getBlock(blockIdentifier: 'pending'): Promise<PendingBlock>;
+  public async getBlock(blockIdentifier: 'latest'): Promise<Block>;
+  public async getBlock(blockIdentifier?: BlockIdentifier): Promise<GetBlockResponse>;
   public async getBlock(blockIdentifier?: BlockIdentifier) {
     return this.channel
       .getBlockWithTxHashes(blockIdentifier)
@@ -88,6 +97,10 @@ export class RpcProvider implements ProviderInterface {
 
   public getStateUpdate = this.getBlockStateUpdate;
 
+  public async getBlockStateUpdate(): Promise<PendingStateUpdate>;
+  public async getBlockStateUpdate(blockIdentifier: 'pending'): Promise<PendingStateUpdate>;
+  public async getBlockStateUpdate(blockIdentifier: 'latest'): Promise<StateUpdate>;
+  public async getBlockStateUpdate(blockIdentifier?: BlockIdentifier): Promise<StateUpdateResponse>;
   public async getBlockStateUpdate(blockIdentifier?: BlockIdentifier) {
     return this.channel.getBlockStateUpdate(blockIdentifier);
   }
@@ -113,9 +126,7 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getTransaction(txHash: BigNumberish) {
-    return this.channel
-      .getTransactionByHash(txHash)
-      .then(this.responseParser.parseGetTransactionResponse);
+    return this.channel.getTransactionByHash(txHash);
   }
 
   public async getTransactionByHash(txHash: BigNumberish) {
@@ -127,7 +138,9 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getTransactionReceipt(txHash: BigNumberish) {
-    return this.channel.getTransactionReceipt(txHash);
+    return this.channel
+      .getTransactionReceipt(txHash)
+      .then(this.responseParser.parseTransactionReceipt);
   }
 
   public async getTransactionTrace(txHash: BigNumberish) {
@@ -153,7 +166,9 @@ export class RpcProvider implements ProviderInterface {
     options?: getSimulateTransactionOptions
   ) {
     // can't be named simulateTransaction because of argument conflict with account
-    return this.channel.simulateTransaction(invocations, options);
+    return this.channel
+      .simulateTransaction(invocations, options)
+      .then(this.responseParser.parseSimulateTransactionResponse);
   }
 
   public async waitForTransaction(txHash: BigNumberish, options?: waitForTransactionOptions) {
@@ -186,13 +201,6 @@ export class RpcProvider implements ProviderInterface {
     return this.channel
       .getClassAt(contractAddress, blockIdentifier)
       .then(this.responseParser.parseContractClassResponse);
-  }
-
-  public async getCode(
-    _contractAddress: string,
-    _blockIdentifier?: BlockIdentifier
-  ): Promise<GetCodeResponse> {
-    throw new Error('RPC does not implement getCode function');
   }
 
   public async getContractVersion(
@@ -339,9 +347,7 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async callContract(call: Call, blockIdentifier?: BlockIdentifier) {
-    return this.channel
-      .callContract(call, blockIdentifier)
-      .then(this.responseParser.parseCallContractResponse);
+    return this.channel.callContract(call, blockIdentifier);
   }
 
   /**

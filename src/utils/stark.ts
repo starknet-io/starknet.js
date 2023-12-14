@@ -6,12 +6,17 @@ import {
   ArraySignatureType,
   BigNumberish,
   CompressedProgram,
-  EstimateFeeResponse,
   Program,
   Signature,
   UniversalDetails,
 } from '../types';
-import { EDAMode, EDataAvailabilityMode, ETransactionVersion, ResourceBounds } from '../types/api';
+import {
+  EDAMode,
+  EDataAvailabilityMode,
+  ETransactionVersion,
+  FeeEstimate,
+  ResourceBounds,
+} from '../types/api';
 import { addHexPrefix, arrayBufferToString, atobUniversal, btoaUniversal } from './encode';
 import { parse, stringify } from './json';
 import {
@@ -100,7 +105,7 @@ export function estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: numbe
 }
 
 export function estimateFeeToBounds(
-  estimate: EstimateFeeResponse | 0n,
+  estimate: FeeEstimate | 0n,
   amountOverhead: number = 10,
   priceOverhead = 50
 ): ResourceBounds {

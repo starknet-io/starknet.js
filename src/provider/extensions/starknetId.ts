@@ -38,7 +38,7 @@ export class StarknetId {
           address,
         }),
       });
-      const decimalDomain = hexDomain.result.map((element) => BigInt(element)).slice(1);
+      const decimalDomain = hexDomain.map((element) => BigInt(element)).slice(1);
 
       const stringDomain = useDecoded(decimalDomain);
 
@@ -72,7 +72,7 @@ export class StarknetId {
         }),
       });
 
-      return addressData.result[0];
+      return addressData[0];
     } catch {
       throw Error('Could not get address from stark name');
     }

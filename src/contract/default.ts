@@ -248,14 +248,14 @@ export class Contract implements ContractInterface {
         },
         blockIdentifier
       )
-      .then((x) => {
+      .then((it) => {
         if (!parseResponse) {
-          return x.result;
+          return it;
         }
         if (formatResponse) {
-          return this.callData.format(method, x.result, formatResponse);
+          return this.callData.format(method, it, formatResponse);
         }
-        return this.callData.parse(method, x.result);
+        return this.callData.parse(method, it);
       });
   }
 

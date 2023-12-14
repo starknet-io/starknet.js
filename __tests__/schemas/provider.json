@@ -209,7 +209,8 @@
               "type": "string"
             },
             "unit": {
-              "type": "string"
+              "type": "string",
+              "enum": ["WEI", "FRI"]
             }
           }
         },

@@ -2,16 +2,19 @@ import { NetworkName, RPC_NODES } from '../constants';
 import {
   BigNumberish,
   BlockIdentifier,
-  BlockNumber,
   BlockTag,
   CompiledContract,
   CompiledSierra,
   ContractClass,
+  GetBlockResponse,
+  GetTransactionReceiptResponse,
   InvocationsDetailsWithNonce,
   LegacyContractClass,
+  PendingBlock,
+  PendingStateUpdate,
   RPC,
-  SequencerIdentifier,
   SierraContractClass,
+  StateUpdateResponse,
   V3TransactionDetails,
 } from '../types';
 import { ETransactionVersion } from '../types/api';
@@ -163,22 +166,11 @@ export class Block {
 
   toString = () => this.hash;
 
-  get sequencerIdentifier(): SequencerIdentifier {
+  /*   get sequencerIdentifier(): SequencerIdentifier {
     return this.hash !== null
       ? { blockHash: this.hash as string }
       : { blockNumber: (this.number ?? this.tag) as BlockNumber };
-  }
-}
-
-export function defStateUpdate(
-  state: RPC.SPEC.STATE_UPDATE | RPC.SPEC.PENDING_STATE_UPDATE,
-  accepted: (state: RPC.SPEC.STATE_UPDATE) => unknown,
-  pending: (state: RPC.SPEC.PENDING_STATE_UPDATE) => unknown
-) {
-  if ('block_hash' in state) {
-    return accepted(state);
-  }
-  return pending(state);
+  } */
 }
 
 export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3TransactionDetails {
@@ -191,4 +183,30 @@ export function isVersion(version: '0.5' | '0.6', response: string) {
   const [majorR, minorR] = response.split('.');
 
   return majorS === majorR && minorS === minorR;
+}
+
+/**
+ * Guard Pending Block
+ */
+export function isPendingBlock(response: GetBlockResponse): response is PendingBlock {
+  return response.status === 'PENDING';
+}
+
+/**
+ * Guard Pending Transaction
+ */
+export function isPendingTransaction(
+  response: GetTransactionReceiptResponse
+): response is RPC.PendingReceipt {
+  return !('block_hash' in response);
+}
+
+/**
+ * Guard Pending State Update
+ * ex. if(isPendingStateUpdate(stateUpdate)) throw Error('Update must be final')
+ */
+export function isPendingStateUpdate(
+  response: StateUpdateResponse
+): response is PendingStateUpdate {
+  return !('block_hash' in response);
 }
