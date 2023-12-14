@@ -28,7 +28,7 @@ export class RPCResponseParser
     >
 {
   public parseGetBlockResponse(res: RPC.BlockWithTxHashes): GetBlockResponse {
-    return 'status' in res ? res : { ...res, status: 'PENDING' };
+    return { status: 'PENDING', ...res };
   }
 
   public parseTransactionReceipt(res: RPC.TransactionReceipt): GetTransactionReceiptResponse {
