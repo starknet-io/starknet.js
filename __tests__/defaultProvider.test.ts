@@ -83,7 +83,7 @@ describe('defaultProvider', () => {
 
       test(`getStateUpdate(blockHash=${exampleBlockHash}, blockNumber=undefined)`, async () => {
         const stateUpdate = await testProvider.getStateUpdate(exampleBlockHash);
-        if (!isPendingStateUpdate(stateUpdate)) {
+        if (isPendingStateUpdate(stateUpdate)) {
           fail('exampleBlockHash is latest block, should not be pending');
         }
         expect(stateUpdate.block_hash).toBe(exampleBlockHash);
