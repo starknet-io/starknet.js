@@ -1,10 +1,16 @@
-import typedDataExample from '../../__mocks__/typedDataExample.json';
-import typedDataSessionExample from '../../__mocks__/typedDataSessionExample.json';
-import typedDataStructArrayExample from '../../__mocks__/typedDataStructArrayExample.json';
+import * as starkCurve from '@scure/starknet';
+
+import typedDataExample from '../../__mocks__/typedData/baseExample.json';
+import exampleBaseTypes from '../../__mocks__/typedData/example_baseTypes.json';
+import exampleEnum from '../../__mocks__/typedData/example_enum.json';
+import examplePresetTypes from '../../__mocks__/typedData/example_presetTypes.json';
+import typedDataStructArrayExample from '../../__mocks__/typedData/mail_StructArray.json';
+import typedDataSessionExample from '../../__mocks__/typedData/session_MerkleTree.json';
 import { BigNumberish, StarkNetDomain, num } from '../../src';
 import { getSelectorFromName } from '../../src/utils/hash';
 import { MerkleTree } from '../../src/utils/merkle';
 import {
+  TypedDataRevision,
   encodeType,
   encodeValue,
   getMessageHash,
@@ -12,42 +18,80 @@ import {
   getTypeHash,
 } from '../../src/utils/typedData';
 
+const exampleAddress = '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826';
+
 describe('typedData', () => {
   test('should get right type encoding', () => {
-    const typeEncoding = encodeType(typedDataExample.types, 'Mail');
-    expect(typeEncoding).toMatchInlineSnapshot(
+    let encoded: string;
+    encoded = encodeType(typedDataExample.types, 'Mail');
+    expect(encoded).toMatchInlineSnapshot(
       `"Mail(from:Person,to:Person,contents:felt)Person(name:felt,wallet:felt)"`
     );
-    const typeEncodingStructArr = encodeType(typedDataStructArrayExample.types, 'Mail');
-    expect(typeEncodingStructArr).toMatchInlineSnapshot(
+    encoded = encodeType(typedDataStructArrayExample.types, 'Mail');
+    expect(encoded).toMatchInlineSnapshot(
       `"Mail(from:Person,to:Person,posts_len:felt,posts:Post*)Person(name:felt,wallet:felt)Post(title:felt,content:felt)"`
+    );
+    encoded = encodeType(typedDataExample.types, 'Mail', TypedDataRevision.Active);
+    expect(encoded).toMatchInlineSnapshot(
+      JSON.stringify(
+        '"Mail"("from":"Person","to":"Person","contents":"felt")"Person"("name":"felt","wallet":"felt")'
+      )
+    );
+    encoded = encodeType(typedDataStructArrayExample.types, 'Mail', TypedDataRevision.Active);
+    expect(encoded).toMatchInlineSnapshot(
+      `"\\"Mail\\"(\\"from\\":\\"Person\\",\\"to\\":\\"Person\\",\\"posts_len\\":\\"felt\\",\\"posts\\":\\"Post*\\")\\"Person\\"(\\"name\\":\\"felt\\",\\"wallet\\":\\"felt\\")\\"Post\\"(\\"title\\":\\"felt\\",\\"content\\":\\"felt\\")"`
+    );
+    encoded = encodeType(exampleBaseTypes.types, 'Example', TypedDataRevision.Active);
+    expect(encoded).toMatchInlineSnapshot(
+      `"\\"Example\\"(\\"n0\\":\\"felt\\",\\"n1\\":\\"bool\\",\\"n2\\":\\"string\\",\\"n3\\":\\"selector\\",\\"n4\\":\\"u128\\",\\"n5\\":\\"ContractAddress\\",\\"n6\\":\\"ClassHash\\",\\"n7\\":\\"timestamp\\",\\"n8\\":\\"shortstring\\")"`
+    );
+    encoded = encodeType(examplePresetTypes.types, 'Example', TypedDataRevision.Active);
+    expect(encoded).toMatchInlineSnapshot(
+      `"\\"Example\\"(\\"n0\\":\\"TokenAmount\\",\\"n1\\":\\"NftId\\")"`
+    );
+    encoded = encodeType(exampleEnum.types, 'Example', TypedDataRevision.Active);
+    expect(encoded).toMatchInlineSnapshot(
+      `"\\"Example\\"(\\"someEnum\\":\\"MyEnum\\")\\"MyEnum\\"(\\"Variant 1\\":(),\\"Variant 2\\":(\\"u128\\",\\"u128*\\"),\\"Variant 3\\":(\\"u128\\"))"`
     );
   });
 
   test('should get right type hash', () => {
-    const typeHashDomain = getTypeHash(typedDataExample.types, 'StarkNetDomain');
-    expect(typeHashDomain).toMatchInlineSnapshot(
+    let typeHash: string;
+    typeHash = getTypeHash(typedDataExample.types, 'StarkNetDomain');
+    expect(typeHash).toMatchInlineSnapshot(
       `"0x1bfc207425a47a5dfa1a50a4f5241203f50624ca5fdf5e18755765416b8e288"`
     );
-    const typeHashPerson = getTypeHash(typedDataExample.types, 'Person');
-    expect(typeHashPerson).toMatchInlineSnapshot(
+    typeHash = getTypeHash(typedDataExample.types, 'Person');
+    expect(typeHash).toMatchInlineSnapshot(
       `"0x2896dbe4b96a67110f454c01e5336edc5bbc3635537efd690f122f4809cc855"`
     );
-    const typeHashMail = getTypeHash(typedDataExample.types, 'Mail');
-    expect(typeHashMail).toMatchInlineSnapshot(
+    typeHash = getTypeHash(typedDataExample.types, 'Mail');
+    expect(typeHash).toMatchInlineSnapshot(
       `"0x13d89452df9512bf750f539ba3001b945576243288137ddb6c788457d4b2f79"`
     );
-    const typeHashPost = getTypeHash(typedDataStructArrayExample.types, 'Post');
-    expect(typeHashPost).toMatchInlineSnapshot(
+    typeHash = getTypeHash(typedDataStructArrayExample.types, 'Post');
+    expect(typeHash).toMatchInlineSnapshot(
       `"0x1d71e69bf476486b43cdcfaf5a85c00bb2d954c042b281040e513080388356d"`
     );
-    const typeHashMailWithStructArray = getTypeHash(typedDataStructArrayExample.types, 'Mail');
-    expect(typeHashMailWithStructArray).toMatchInlineSnapshot(
+    typeHash = getTypeHash(typedDataStructArrayExample.types, 'Mail');
+    expect(typeHash).toMatchInlineSnapshot(
       `"0x873b878e35e258fc99e3085d5aaad3a81a0c821f189c08b30def2cde55ff27"`
     );
-    const selectorTypeHash = getTypeHash({}, 'selector');
-    expect(selectorTypeHash).toMatchInlineSnapshot(
+    typeHash = getTypeHash({}, 'selector');
+    expect(typeHash).toMatchInlineSnapshot(
       `"0x1d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"`
+    );
+    typeHash = getTypeHash(exampleBaseTypes.types, 'Example', TypedDataRevision.Active);
+    expect(typeHash).toMatchInlineSnapshot(
+      `"0x2e5b7e12ca4388c49b4ceb305d853b8f7bf5f36525fea5e4255346b80153249"`
+    );
+    typeHash = getTypeHash(examplePresetTypes.types, 'Example', TypedDataRevision.Active);
+    expect(typeHash).toMatchInlineSnapshot(
+      `"0x155de33c6a0cc7f2b8926afc7a71fc2ac31ffc26726aee5da0570c5d517a763"`
+    );
+    typeHash = getTypeHash(exampleEnum.types, 'Example', TypedDataRevision.Active);
+    expect(typeHash).toMatchInlineSnapshot(
+      `"0x380a54d417fb58913b904675d94a8a62e2abc3467f4b5439de0fd65fafdd1a8"`
     );
   });
 
@@ -132,16 +176,25 @@ describe('typedData', () => {
     );
   });
 
+  test('should get right hash for StarknetDomain', () => {
+    const hash = getStructHash(
+      exampleBaseTypes.types,
+      'StarknetDomain',
+      exampleBaseTypes.domain as StarkNetDomain,
+      TypedDataRevision.Active
+    );
+    expect(hash).toMatchInlineSnapshot(
+      `"0x555f72e550b308e50c1a4f8611483a174026c982a9893a05c185eeb85399657"`
+    );
+  });
+
   test('should get right hash for entire message', () => {
-    const hash = getMessageHash(typedDataExample, '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826');
+    const hash = getMessageHash(typedDataExample, exampleAddress);
     expect(hash).toMatchInlineSnapshot(
       `"0x6fcff244f63e38b9d88b9e3378d44757710d1b244282b435cb472053c8d78d0"`
     );
 
-    const hashStructArr = getMessageHash(
-      typedDataStructArrayExample,
-      '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826'
-    );
+    const hashStructArr = getMessageHash(typedDataStructArrayExample, exampleAddress);
     expect(hashStructArr).toMatchInlineSnapshot(
       `"0x5914ed2764eca2e6a41eb037feefd3d2e33d9af6225a9e7fe31ac943ff712c"`
     );
@@ -187,7 +240,7 @@ describe('typedData', () => {
     message: {
       from: {
         name: 'Cow',
-        wallet: '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826',
+        wallet: exampleAddress,
       },
       to: {
         name: 'Bob',
@@ -200,22 +253,43 @@ describe('typedData', () => {
   };
 
   test('should transform strings correctly', () => {
-    const hash = getMessageHash(
-      typedDataStringExample,
-      '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826'
-    );
+    const hash = getMessageHash(typedDataStringExample, exampleAddress);
     expect(hash).toMatchInlineSnapshot(
       `"0x70338fb11b8f70b68b261de8a322bcb004bd85e88ac47d9147982c7f5ac66fd"`
     );
   });
 
   test('should transform session message correctly', () => {
-    const hash = getMessageHash(
-      typedDataSessionExample,
-      '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826'
-    );
+    const hash = getMessageHash(typedDataSessionExample, exampleAddress);
     expect(hash).toMatchInlineSnapshot(
       `"0x751fb7d98545f7649d0d0eadc80d770fcd88d8cfaa55590b284f4e1b701ef0a"`
     );
+  });
+
+  test('should hash messages with revision 1 types', () => {
+    // necessary to mock dependecy since function mocks (hash.computePedersenHash; hash.computePoseidonHash) won't work
+    const spyPedersen = jest.spyOn(starkCurve, 'pedersen');
+    const spyPoseidon = jest.spyOn(starkCurve, 'poseidonHashMany');
+
+    let messageHash: string;
+    messageHash = getMessageHash(exampleBaseTypes, exampleAddress);
+    expect(messageHash).toMatchInlineSnapshot(
+      `"0x458a6a7cd8b781412b0bdf25d77cc7012821156f250c14b9fedb418ee2b200a"`
+    );
+
+    messageHash = getMessageHash(examplePresetTypes, exampleAddress);
+    expect(messageHash).toMatchInlineSnapshot(
+      `"0x26e7b8cedfa63cdbed14e7e51b60ee53ac82bdf26724eb1e3f0710cb8987522"`
+    );
+
+    messageHash = getMessageHash(exampleEnum, exampleAddress);
+    expect(messageHash).toMatchInlineSnapshot(
+      `"0x3df10475ad5a8f49db4345a04a5b09164d2e24b09f6e1e236bc1ccd87627cc"`
+    );
+
+    expect(spyPedersen).not.toHaveBeenCalled();
+    expect(spyPoseidon).toHaveBeenCalled();
+    spyPedersen.mockRestore();
+    spyPoseidon.mockRestore();
   });
 });

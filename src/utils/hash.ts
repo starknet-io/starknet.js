@@ -60,6 +60,12 @@ export function computeHashOnElements(data: BigNumberish[]): string {
     .toString();
 }
 
+export const computePedersenHash = computeHashOnElements;
+
+export function computePoseidonHash(data: BigNumberish[]) {
+  return toHex(poseidonHashMany(data.map((x) => BigInt(x))));
+}
+
 /**
  * Calculate transaction pedersen hash for common properties
  *

@@ -1,3 +1,16 @@
+// TODO: adjust starknet casing in v6
+
+export enum TypedDataRevision {
+  Active = '1',
+  Legacy = '0',
+}
+
+export type StarkNetEnumType = {
+  name: string;
+  type: 'enum';
+  contains: string;
+};
+
 export type StarkNetMerkleType = {
   name: string;
   type: 'merkletree';
@@ -15,6 +28,7 @@ export type StarkNetType =
       name: string;
       type: string;
     }
+  | StarkNetEnumType
   | StarkNetMerkleType;
 
 /**
@@ -24,6 +38,7 @@ export interface StarkNetDomain extends Record<string, unknown> {
   name?: string;
   version?: string;
   chainId?: string | number;
+  revision?: string | number;
 }
 
 /**
