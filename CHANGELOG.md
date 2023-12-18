@@ -1,3 +1,9 @@
+# [5.25.0](https://github.com/starknet-io/starknet.js/compare/v5.24.5...v5.25.0) (2023-12-18)
+
+### Features
+
+- sepolia ([26d7044](https://github.com/starknet-io/starknet.js/commit/26d70446edd7c098b7f257d9242cc9d9d220b11e))
+
 ## [5.24.5](https://github.com/starknet-io/starknet.js/compare/v5.24.4...v5.24.5) (2023-12-10)
 
 ### Bug Fixes
