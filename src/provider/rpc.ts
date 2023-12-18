@@ -2,8 +2,8 @@ import {
   HEX_STR_TRANSACTION_VERSION_1,
   HEX_STR_TRANSACTION_VERSION_2,
   NetworkName,
-  RPC_GOERLI_NODES,
-  RPC_MAINNET_NODES,
+  RPC_DEFAULT_VERSION,
+  RPC_NODES,
   StarknetChainId,
 } from '../constants';
 import {
@@ -42,13 +42,23 @@ import { ProviderInterface } from './interface';
 import { getAddressFromStarkName, getStarkName } from './starknetId';
 import { Block } from './utils';
 
-export const getDefaultNodeUrl = (networkName?: NetworkName, mute: boolean = false): string => {
+/**
+ * Return randomly select available public node
+ * @param networkName NetworkName
+ * @param mute mute public node warning
+ * @returns default node url
+ */
+export const getDefaultNodeUrl = (
+  networkName?: NetworkName,
+  mute: boolean = false,
+  version: 'v0_5' | 'v0_6' = RPC_DEFAULT_VERSION
+): string => {
   if (!mute)
     // eslint-disable-next-line no-console
     console.warn('Using default public node url, please provide nodeUrl in provider options!');
-  const nodes = networkName === NetworkName.SN_MAIN ? RPC_MAINNET_NODES : RPC_GOERLI_NODES;
+  const nodes = RPC_NODES[networkName ?? NetworkName.SN_GOERLI];
   const randIdx = Math.floor(Math.random() * nodes.length);
-  return nodes[randIdx];
+  return `${nodes[randIdx]}${version}`;
 };
 
 const defaultOptions = {
@@ -71,16 +81,21 @@ export class RpcProvider implements ProviderInterface {
   private chainId?: StarknetChainId;
 
   constructor(optionsOrProvider?: RpcProviderOptions) {
-    const { nodeUrl, retries, headers, blockIdentifier, chainId } = optionsOrProvider || {};
+    const { nodeUrl, retries, headers, blockIdentifier, chainId, rpcVersion } =
+      optionsOrProvider || {};
     if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
       // Network name provided for nodeUrl
-      this.nodeUrl = getDefaultNodeUrl(nodeUrl as NetworkName, optionsOrProvider?.default);
+      this.nodeUrl = getDefaultNodeUrl(
+        nodeUrl as NetworkName,
+        optionsOrProvider?.default,
+        rpcVersion
+      );
     } else if (nodeUrl) {
       // NodeUrl provided
       this.nodeUrl = nodeUrl;
     } else {
       // none provided fallback to default testnet
-      this.nodeUrl = getDefaultNodeUrl(undefined, optionsOrProvider?.default);
+      this.nodeUrl = getDefaultNodeUrl(undefined, optionsOrProvider?.default, rpcVersion);
     }
     this.retries = retries || defaultOptions.retries;
     this.headers = { ...defaultOptions.headers, ...headers };
