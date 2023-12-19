@@ -1,3 +1,9 @@
+# [6.0.0-beta.8](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.7...v6.0.0-beta.8) (2023-12-19)
+
+### Bug Fixes
+
+- estimateFeeBulk provided version ([da717be](https://github.com/starknet-io/starknet.js/commit/da717be8e656087eaba21c865a6dd0b648664491))
+
 # [6.0.0-beta.7](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.6...v6.0.0-beta.7) (2023-12-14)
 
 ### Bug Fixes
