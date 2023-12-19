@@ -700,6 +700,7 @@ export class Account extends Provider implements AccountInterface {
     });
 
     return {
+      ...v3Details(details),
       classHash,
       addressSalt,
       constructorCalldata: compiledCalldata,
