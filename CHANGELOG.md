@@ -1,3 +1,9 @@
+# [6.0.0-beta.9](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.8...v6.0.0-beta.9) (2023-12-19)
+
+### Bug Fixes
+
+- acc deploy_acc ([732cd94](https://github.com/starknet-io/starknet.js/commit/732cd946f26c2b0fe893067f25c1fe712d72d49b))
+
 # [6.0.0-beta.8](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.7...v6.0.0-beta.8) (2023-12-19)
 
 ### Bug Fixes
