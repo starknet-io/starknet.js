@@ -42,6 +42,8 @@ export class RpcChannel {
 
   readonly retries: number;
 
+  private requestId: number;
+
   readonly blockIdentifier: BlockIdentifier;
 
   private chainId?: StarknetChainId;
@@ -65,6 +67,7 @@ export class RpcChannel {
     this.blockIdentifier = blockIdentifier || defaultOptions.blockIdentifier;
     this.chainId = chainId;
     this.waitMode = waitMode || false;
+    this.requestId = 0;
   }
 
   public fetch(method: string, params?: object, id: string | number = 0) {
@@ -102,7 +105,7 @@ export class RpcChannel {
     params?: RPC.Methods[T]['params']
   ): Promise<RPC.Methods[T]['result']> {
     try {
-      const rawResult = await this.fetch(method, params);
+      const rawResult = await this.fetch(method, params, (this.requestId += 1));
       const { error, result } = await rawResult.json();
       this.errorHandler(method, params, error);
       return result as RPC.Methods[T]['result'];
