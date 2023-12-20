@@ -1,3 +1,9 @@
+# [6.0.0-beta.10](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.9...v6.0.0-beta.10) (2023-12-20)
+
+### Features
+
+- req id counter ([cedd1ea](https://github.com/starknet-io/starknet.js/commit/cedd1ea32cd58107c504d357a3dd5e9a40010a80))
+
 # [6.0.0-beta.9](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.8...v6.0.0-beta.9) (2023-12-19)
 
 ### Bug Fixes
