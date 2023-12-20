@@ -42,7 +42,7 @@ export class RpcChannel {
 
   readonly retries: number;
 
-  private requestId: number;
+  public requestId: number;
 
   readonly blockIdentifier: BlockIdentifier;
 
