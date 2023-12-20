@@ -80,8 +80,10 @@ export class RpcProvider implements ProviderInterface {
 
   private chainId?: StarknetChainId;
 
+  public fallbackNodeUrls?: string[];
+
   constructor(optionsOrProvider?: RpcProviderOptions) {
-    const { nodeUrl, retries, headers, blockIdentifier, chainId, rpcVersion } =
+    const { nodeUrl, retries, headers, blockIdentifier, chainId, rpcVersion, fallbackNodeUrls } =
       optionsOrProvider || {};
     if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
       // Network name provided for nodeUrl
@@ -101,16 +103,17 @@ export class RpcProvider implements ProviderInterface {
     this.headers = { ...defaultOptions.headers, ...headers };
     this.blockIdentifier = blockIdentifier || defaultOptions.blockIdentifier;
     this.chainId = chainId; // setting to a non-null value skips making a request in getChainId()
+    this.fallbackNodeUrls = fallbackNodeUrls;
   }
 
-  public fetch(method: string, params?: object, id: string | number = 0) {
+  public fetch(url: string, method: string, params?: object, id: string | number = 0) {
     const rpcRequestBody: RPC.JRPC.RequestBody = {
       id,
       jsonrpc: '2.0',
       method,
       ...(params && { params }),
     };
-    return fetch(this.nodeUrl, {
+    return fetch(url, {
       method: 'POST',
       body: stringify(rpcRequestBody),
       headers: this.headers as Record<string, string>,
@@ -137,11 +140,36 @@ export class RpcProvider implements ProviderInterface {
     params?: RPC.Methods[T]['params']
   ): Promise<RPC.Methods[T]['result']> {
     try {
-      const rawResult = await this.fetch(method, params);
+      const rawResult = await this.fetch(this.nodeUrl, method, params);
       const { error, result } = await rawResult.json();
       this.errorHandler(method, params, error);
       return result as RPC.Methods[T]['result'];
     } catch (error: any) {
+      if (this.fallbackNodeUrls) {
+        for (let i = 0; i < this.fallbackNodeUrls.length; i += 1) {
+          try {
+            // eslint-disable-next-line no-await-in-loop
+            const fallbackResult = await this.fetch(this.fallbackNodeUrls[i], method, params);
+            // eslint-disable-next-line no-await-in-loop
+            const { error: fallbackError, result } = await fallbackResult.json();
+            this.errorHandler(method, params, fallbackError);
+
+            // If a fallback node succeeds, update the primary and fallback URLs
+            const oldPrimaryUrl = this.nodeUrl;
+            this.nodeUrl = this.fallbackNodeUrls[i];
+            this.fallbackNodeUrls.splice(i, 1); // Remove the new primary from the fallback list
+            this.fallbackNodeUrls.push(oldPrimaryUrl); // Add the old primary to the end of the fallback list
+
+            return result as RPC.Methods[T]['result'];
+          } catch (fallbackError: any) {
+            if (i === this.fallbackNodeUrls.length - 1) {
+              this.errorHandler(method, params, fallbackError?.response?.data, fallbackError);
+              throw fallbackError;
+            }
+          }
+        }
+      }
+
       this.errorHandler(method, params, error?.response?.data, error);
       throw error;
     }

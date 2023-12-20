@@ -13,6 +13,7 @@ export type RpcProviderOptions = {
   blockIdentifier?: BlockIdentifier;
   chainId?: StarknetChainId;
   default?: boolean;
+  fallbackNodeUrls?: string[];
   rpcVersion?: 'v0_5' | 'v0_6';
 };
 
