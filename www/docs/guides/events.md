@@ -167,7 +167,7 @@ while (continuationToken) {
         address: myContractAddress,
         keys: [keyFilter],
         chunk_size: 5,
-        continuation_token: continuationToken
+        continuation_token: continuationToken === "0" ? undefined : continuationToken
     });
     const nbEvents = eventsRes.events.length;
     continuationToken=eventsRes.continuation_token;
