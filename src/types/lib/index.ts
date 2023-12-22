@@ -1,6 +1,12 @@
 import { StarknetChainId } from '../../constants';
 import { weierstrass } from '../../utils/ec';
-import { EDataAvailabilityMode, ResourceBounds } from '../api';
+import {
+  EBlockTag,
+  EDataAvailabilityMode,
+  ETransactionExecutionStatus,
+  ETransactionFinalityStatus,
+  ResourceBounds,
+} from '../api';
 import { CairoEnum } from '../cairoEnum';
 import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 
@@ -149,52 +155,54 @@ export enum TransactionType {
   INVOKE = 'INVOKE_FUNCTION',
 }
 
+// TODO: All this should be removed
+
 /**
  * new statuses are defined by props: finality_status and execution_status
  * to be #deprecated
  */
-export enum TransactionStatus {
+/* export enum TransactionStatus {
   NOT_RECEIVED = 'NOT_RECEIVED',
   RECEIVED = 'RECEIVED',
   ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
   ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
   REJECTED = 'REJECTED',
   REVERTED = 'REVERTED',
-}
+} */
 
-export enum TransactionFinalityStatus {
+/* export enum TransactionFinalityStatus {
   NOT_RECEIVED = 'NOT_RECEIVED',
   RECEIVED = 'RECEIVED',
   ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
   ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
-}
+} */
 
-export enum TransactionExecutionStatus {
+/* export enum TransactionExecutionStatus {
   REJECTED = 'REJECTED',
   REVERTED = 'REVERTED',
   SUCCEEDED = 'SUCCEEDED',
-}
+} */
 
-export enum BlockStatus {
+/* export enum BlockStatus {
   PENDING = 'PENDING',
   ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
   ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
   REJECTED = 'REJECTED',
-}
+} */
 
-export enum BlockTag {
+/* export enum BlockTag {
   pending = 'pending',
   latest = 'latest',
-}
+} */
 
-export type BlockNumber = BlockTag | null | number;
+export type BlockNumber = number;
 
 /**
  * hex string and BN are detected as block hashes
  * decimal string and number are detected as block numbers
  * null appends nothing to the request url
  */
-export type BlockIdentifier = BlockNumber | BigNumberish;
+export type BlockIdentifier = BlockNumber | BigNumberish | EBlockTag | null;
 
 /**
  * items used by AccountInvocations
@@ -234,8 +242,8 @@ export type ParsedStruct = {
 
 export type waitForTransactionOptions = {
   retryInterval?: number;
-  successStates?: Array<TransactionFinalityStatus | TransactionExecutionStatus>;
-  errorStates?: Array<TransactionFinalityStatus | TransactionExecutionStatus>;
+  successStates?: Array<ETransactionFinalityStatus | ETransactionExecutionStatus>;
+  errorStates?: Array<ETransactionFinalityStatus | ETransactionExecutionStatus>;
 };
 
 export type getSimulateTransactionOptions = {

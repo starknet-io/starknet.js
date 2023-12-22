@@ -5,10 +5,10 @@ import {
   AccountInvocations,
   BigNumberish,
   BlockIdentifier,
-  BlockTag,
   Call,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
+  EBlockTag,
   Invocation,
   InvocationsDetailsWithNonce,
   RPC,
@@ -18,7 +18,7 @@ import {
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
-import { ETransactionVersion } from '../types/api';
+import { ERPCVersion, ETransactionVersion } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
@@ -31,7 +31,7 @@ import { getVersionsByType } from '../utils/transaction';
 
 const defaultOptions = {
   headers: { 'Content-Type': 'application/json' },
-  blockIdentifier: BlockTag.pending,
+  blockIdentifier: EBlockTag.PENDING,
   retries: 200,
 };
 
@@ -54,11 +54,19 @@ export class RpcChannel {
     const { nodeUrl, retries, headers, blockIdentifier, chainId, waitMode } =
       optionsOrProvider || {};
     if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
-      this.nodeUrl = getDefaultNodeUrl(nodeUrl as NetworkName, optionsOrProvider?.default);
+      this.nodeUrl = getDefaultNodeUrl(
+        nodeUrl as NetworkName,
+        optionsOrProvider?.rpcVersion,
+        optionsOrProvider?.default
+      );
     } else if (nodeUrl) {
       this.nodeUrl = nodeUrl;
     } else {
-      this.nodeUrl = getDefaultNodeUrl(undefined, optionsOrProvider?.default);
+      this.nodeUrl = getDefaultNodeUrl(
+        undefined,
+        optionsOrProvider?.rpcVersion,
+        optionsOrProvider?.default
+      );
     }
     this.retries = retries || defaultOptions.retries;
     this.headers = { ...defaultOptions.headers, ...headers };
@@ -118,7 +126,7 @@ export class RpcChannel {
   }
 
   public async getSpecVersion() {
-    this.speckVersion ??= (await this.fetchEndpoint('starknet_specVersion')) as StarknetChainId;
+    this.speckVersion ??= await this.fetchEndpoint('starknet_specVersion');
     return this.speckVersion;
   }
 
@@ -371,7 +379,7 @@ export class RpcChannel {
   ) {
     const block_id = new Block(blockIdentifier).identifier;
     let flags = {};
-    if (isVersion('0.6', await this.getSpecVersion())) {
+    if (isVersion(ERPCVersion.V0_6, await this.getSpecVersion())) {
       flags = {
         simulation_flags: skipValidate ? [RPC.ESimulationFlag.SKIP_VALIDATE] : [],
       };

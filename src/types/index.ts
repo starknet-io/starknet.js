@@ -6,5 +6,7 @@ export * from './provider';
 export * from './signer';
 export * from './typedData';
 export * from './cairoEnum';
+export * from './api/forward';
 
 export * as RPC from './api';
+// export * from './api';

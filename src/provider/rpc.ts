@@ -4,11 +4,11 @@ import {
   BigNumberish,
   Block,
   BlockIdentifier,
-  BlockTag,
   Call,
   ContractVersion,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
+  EBlockTag,
   GetBlockResponse,
   Invocation,
   InvocationsDetailsWithNonce,
@@ -119,7 +119,7 @@ export class RpcProvider implements ProviderInterface {
    * Utility method, same result can be achieved using getBlockWithTxHashes(BlockTag.pending);
    */
   public async getPendingTransactions() {
-    const { transactions } = await this.getBlockWithTxHashes(BlockTag.pending).then(
+    const { transactions } = await this.getBlockWithTxHashes(EBlockTag.PENDING).then(
       this.responseParser.parseGetBlockResponse
     );
     return Promise.all(transactions.map((it: any) => this.getTransactionByHash(it)));
