@@ -4,6 +4,10 @@ sidebar_position: 1
 
 # Getting Started
 
+## Prerequisites
+
+This project requires <ins>[Node.js](https://nodejs.org/en)</ins>.
+
 ## Installation
 
 ```bash
@@ -20,7 +24,7 @@ npm install starknet@next
 
 ### With Devnet
 
-- RPC Devnet [repo](https://github.com/0xSpaceShard/starknet-devnet-rs)
+- RPC Devnet <ins>[repo](https://github.com/0xSpaceShard/starknet-devnet-rs)</ins>
 
 Launch the development net.
 
