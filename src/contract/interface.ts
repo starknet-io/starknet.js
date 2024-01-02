@@ -44,8 +44,6 @@ declare module 'abi-wan-kanabi-v2' {
   }
 }
 
-// export type X = ResolvedConfig['InvokeOptions'];
-
 export type TypedContract<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & ContractInterface;
 type TypedContractV2<TAbi extends AbiKanabiV2> = AbiWanTypedContractV2<TAbi> & ContractInterface;
 

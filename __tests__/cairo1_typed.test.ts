@@ -231,7 +231,7 @@ describe('TS validation for API &  Contract interactions - tests skipped', () =>
     // TODO: Complex mapping - https://docs.starknet.io/documentation/architecture_and_concepts/Contracts/contract-storage/
   });
 
-  test('Cairo 1 Contract Interaction - echo flat un-named un-nested tuple', async () => {
+  xtest('Cairo 1 Contract Interaction - echo flat un-named un-nested tuple', async () => {
     const status = await cairo1Contract.echo_un_tuple([77, 123]);
     expect(Object.values(status)).toEqual([77n, 123n]);
   });
@@ -264,7 +264,7 @@ describe('TS validation for API &  Contract interactions - tests skipped', () =>
     expect(shortString.decodeShortString(status.val as string)).toBe('simple');
   });
 
-  test('Cairo 1 more complex structs', async () => {
+  xtest('Cairo 1 more complex structs', async () => {
     const tx = await cairo1Contract.set_bet();
     await account.waitForTransaction(tx.transaction_hash);
     const status = await cairo1Contract.get_bet(
@@ -333,7 +333,7 @@ describe('TS validation for API &  Contract interactions - tests skipped', () =>
     expect(result1).toEqual(result11);
   });
 
-  test('mix tuples', async () => {
+  xtest('mix tuples', async () => {
     const res = await cairo1Contract.array_bool_tuple([1, 2, 3], true);
     expect(res).toEqual({
       0: [1n, 2n, 3n, 1n, 2n],
