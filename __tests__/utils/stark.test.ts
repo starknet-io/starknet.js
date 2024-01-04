@@ -1,5 +1,5 @@
-import { CallData, RawArgs, json, stark } from '../../src';
-import { FeeEstimate } from '../../src/types/api';
+import { CallData, RawArgs, UniversalDetails, json, stark } from '../../src';
+import { EDataAvailabilityMode, FeeEstimate } from '../../src/types/api';
 import { toBigInt, toHex } from '../../src/utils/num';
 import { compiledOpenZeppelinAccount } from '../config/fixtures';
 
@@ -82,5 +82,26 @@ describe('stark', () => {
       l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
       l1_gas: { max_amount: '0x6e', max_price_per_unit: '0xf' },
     });
+  });
+
+  test('v3Details', () => {
+    const setValues = (o: {}, v: any) => Object.fromEntries(Object.keys(o).map((k) => [k, v]));
+
+    const details: UniversalDetails = {
+      tip: 99n,
+      paymasterData: [99n, 99n],
+      accountDeploymentData: [99n, 99n],
+      nonceDataAvailabilityMode: EDataAvailabilityMode.L2,
+      feeDataAvailabilityMode: EDataAvailabilityMode.L2,
+      resourceBounds: {
+        l1_gas: { max_amount: '0x99', max_price_per_unit: '0x99' },
+        l2_gas: { max_amount: '0x99', max_price_per_unit: '0x99' },
+      },
+    };
+    const detailsUndefined = setValues(details, undefined);
+    const detailsAnything = setValues(details, expect.anything());
+
+    expect(stark.v3Details(details)).toMatchObject(details);
+    expect(stark.v3Details(detailsUndefined)).toEqual(expect.objectContaining(detailsAnything));
   });
 });
