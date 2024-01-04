@@ -1,3 +1,9 @@
+# [6.0.0-beta.11](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.10...v6.0.0-beta.11) (2024-01-04)
+
+### Bug Fixes
+
+- utilize provided resourceBounds value ([65bea53](https://github.com/starknet-io/starknet.js/commit/65bea53ab03a04fdd4c122ba2fecbb1010100e18))
+
 # [6.0.0-beta.10](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.9...v6.0.0-beta.10) (2023-12-20)
 
 ### Features
