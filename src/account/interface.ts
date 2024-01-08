@@ -1,3 +1,4 @@
+import { StarknetChainId } from '../constants';
 import { ProviderInterface } from '../provider';
 import { SignerInterface } from '../signer';
 import {
@@ -334,4 +335,22 @@ export abstract class AccountInterface extends ProviderInterface {
     invocations: Invocations,
     details?: SimulateTransactionDetails
   ): Promise<SimulateTransactionResponse>;
+}
+
+/**
+ * @typedef {Object} ProcessTransactionParams
+ * @property {BigNumberish} version - The version of the transaction, related to the protocol or software version.
+ * @property {BigNumberish} safeNonce - A nonce value that has been validated or adjusted for safety. Nonce is used to prevent double-spending and replay attacks.
+ * @property {StarknetChainId} chainId - The identifier for the blockchain network where the transaction will be processed. This specifies the particular blockchain for the transaction.
+ * @property {CairoVersion} cairoVersion - The version of the Cairo language or platform, specific to the type of transaction being processed. Cairo is used for writing provably-secure programs on some blockchains.
+ * @property {BlockIdentifier | undefined} blockIdentifier - An identifier for the block in the blockchain in which this transaction is included, used for tracking or verification purposes.
+ * @property {BigNumberish[]} versions - An array of versions, indicating different supported versions for various transaction types.
+ */
+export interface ProcessTransactionParams {
+  version: BigNumberish;
+  safeNonce: BigNumberish;
+  chainId: StarknetChainId;
+  cairoVersion: CairoVersion;
+  blockIdentifier: BlockIdentifier | undefined;
+  versions: BigNumberish[];
 }

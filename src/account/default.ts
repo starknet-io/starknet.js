@@ -5,7 +5,6 @@ import { Signer, SignerInterface } from '../signer';
 import {
   Abi,
   AccountInvocationItem,
-  AccountInvocations,
   AccountInvocationsFactoryDetails,
   AllowArray,
   BigNumberish,
@@ -58,7 +57,7 @@ import { parseContract } from '../utils/provider';
 import { estimatedFeeToMaxFee, formatSignature, randomAddress } from '../utils/stark';
 import { getExecuteCalldata } from '../utils/transaction';
 import { getMessageHash } from '../utils/typedData';
-import { AccountInterface } from './interface';
+import { AccountInterface, ProcessTransactionParams } from './interface';
 
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
@@ -654,79 +653,100 @@ export class Account extends Provider implements AccountInterface {
     });
   }
 
+  private extractPayload(transaction: Invocations[0]): any {
+    return 'payload' in transaction ? transaction.payload : transaction;
+  }
+
+  private async processTransaction(
+    transaction: Invocations[0],
+    index: number,
+    {
+      version,
+      safeNonce,
+      chainId,
+      cairoVersion,
+      blockIdentifier,
+      versions: [firstVersion, secondVersion],
+    }: ProcessTransactionParams
+  ): Promise<AccountInvocationItem> {
+    const payload = this.extractPayload(transaction);
+    const nonceBigInt = toBigInt(Number(safeNonce) + index);
+    const signerDetails: InvocationsSignerDetails = {
+      walletAddress: this.address,
+      nonce: nonceBigInt,
+      maxFee: ZERO,
+      version,
+      chainId,
+      cairoVersion,
+    };
+
+    const commonDetails = {
+      type: transaction.type,
+      version,
+      nonce: nonceBigInt,
+      blockIdentifier,
+    };
+
+    switch (transaction.type) {
+      case TransactionType.INVOKE:
+        return {
+          ...commonDetails,
+          ...(await this.buildInvocation([].concat(payload), signerDetails)),
+        } as AccountInvocationItem;
+      case TransactionType.DECLARE:
+        signerDetails.version = toBigInt(
+          !isSierra(payload.contract) ? firstVersion : secondVersion
+        );
+        return {
+          ...commonDetails,
+          ...(await this.buildDeclarePayload(payload, signerDetails)),
+          version: signerDetails.version,
+        } as AccountInvocationItem;
+      case TransactionType.DEPLOY_ACCOUNT:
+        return {
+          ...commonDetails,
+          ...(await this.buildAccountDeployPayload(payload, signerDetails)),
+        } as AccountInvocationItem;
+
+      case TransactionType.DEPLOY:
+        return {
+          ...commonDetails,
+          ...(await this.buildInvocation(this.buildUDCContractPayload(payload), signerDetails)),
+          type: TransactionType.INVOKE,
+        };
+      default:
+        throw new Error(`Unsupported transaction type: ${(transaction as Invocations[0]).type}`);
+    }
+  }
+
   public async accountInvocationsFactory(
     invocations: Invocations,
     { versions, nonce, blockIdentifier }: AccountInvocationsFactoryDetails
   ) {
-    const version = versions[0];
+    const [version] = versions;
     const safeNonce = await this.getNonceSafe(nonce);
     const chainId = await this.getChainId();
+    const [invocation] = invocations;
 
     // BULK ACTION FROM NEW ACCOUNT START WITH DEPLOY_ACCOUNT
-    const tx0Payload: any = 'payload' in invocations[0] ? invocations[0].payload : invocations[0];
+    const firstInvocationPayload = this.extractPayload(invocation);
     const cairoVersion =
-      invocations[0].type === TransactionType.DEPLOY_ACCOUNT
-        ? await this.getCairoVersion(tx0Payload.classHash)
+      invocation.type === TransactionType.DEPLOY_ACCOUNT
+        ? await this.getCairoVersion(firstInvocationPayload.classHash)
         : await this.getCairoVersion();
 
     return Promise.all(
-      ([] as Invocations).concat(invocations).map(async (transaction, index: number) => {
-        const txPayload: any = 'payload' in transaction ? transaction.payload : transaction;
-        const signerDetails: InvocationsSignerDetails = {
-          walletAddress: this.address,
-          nonce: toBigInt(Number(safeNonce) + index),
-          maxFee: ZERO,
+      invocations.map((transaction, index) =>
+        this.processTransaction(transaction, index, {
           version,
+          safeNonce,
           chainId,
           cairoVersion,
-        };
-        const common = {
-          type: transaction.type,
-          version,
-          nonce: toBigInt(Number(safeNonce) + index),
           blockIdentifier,
-        };
-
-        if (transaction.type === TransactionType.INVOKE) {
-          const payload = await this.buildInvocation(
-            ([] as Call[]).concat(txPayload),
-            signerDetails
-          );
-          return {
-            ...common,
-            ...payload,
-          } as AccountInvocationItem;
-        }
-        if (transaction.type === TransactionType.DECLARE) {
-          signerDetails.version = !isSierra(txPayload.contract)
-            ? toBigInt(versions[0])
-            : toBigInt(versions[1]);
-          const payload = await this.buildDeclarePayload(txPayload, signerDetails);
-          return {
-            ...common,
-            ...payload,
-            version: signerDetails.version,
-          } as AccountInvocationItem;
-        }
-        if (transaction.type === TransactionType.DEPLOY_ACCOUNT) {
-          const payload = await this.buildAccountDeployPayload(txPayload, signerDetails);
-          return {
-            ...common,
-            ...payload,
-          } as AccountInvocationItem;
-        }
-        if (transaction.type === TransactionType.DEPLOY) {
-          const calls = this.buildUDCContractPayload(txPayload);
-          const payload = await this.buildInvocation(calls, signerDetails);
-          return {
-            ...common,
-            ...payload,
-            type: TransactionType.INVOKE,
-          } as AccountInvocationItem;
-        }
-        throw Error(`accountInvocationsFactory: unsupported transaction type: ${transaction}`);
-      })
-    ) as Promise<AccountInvocations>;
+          versions,
+        })
+      )
+    );
   }
 
   public override async getStarkName(
