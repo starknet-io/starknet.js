@@ -21,9 +21,13 @@ import {
   compiledErc20,
   compiledHelloSierra,
   compiledHelloSierraCasm,
-  compiledNamingContract,
+  compiledNaming,
+  compiledNamingCasm,
   compiledOpenZeppelinAccount,
+  compiledPricing,
+  compiledPricingCasm,
   compiledStarknetId,
+  compiledStarknetIdCasm,
   compiledTestDapp,
   describeIfDevnet,
   describeIfDevnetSequencer,
@@ -459,75 +463,83 @@ describe('deploy and test Wallet', () => {
     });
 
     test('Get the stark name of the account and account from stark name (using starknet.id)', async () => {
-      // Deploy naming contract
-      const namingResponse = await account.declareAndDeploy({
-        contract: compiledNamingContract,
-      });
-      const namingAddress = namingResponse.deploy.contract_address;
-
+      const devnetERC20Address =
+        '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
       // Deploy Starknet id contract
-      const idResponse = await account.declareAndDeploy({
-        contract: compiledStarknetId,
-      });
+      const idResponse = await account.declareAndDeploy(
+        {
+          contract: compiledStarknetId,
+          casm: compiledStarknetIdCasm,
+          constructorCalldata: [account.address, 0],
+        },
+        { maxFee: 1e18 }
+      );
       const idAddress = idResponse.deploy.contract_address;
 
-      // Create signature from private key
-      const whitelistingPublicKey =
-        '1893860513534673656759973582609638731665558071107553163765293299136715951024';
-      const whitelistingPrivateKey =
-        '301579081698031303837612923223391524790804435085778862878979120159194507372';
-      const hashed = ec.starkCurve.pedersen(
-        ec.starkCurve.pedersen(toBigInt('18925'), toBigInt('1922775124')),
-        toBigInt(account.address)
+      // Deploy pricing contract
+      const pricingResponse = await account.declareAndDeploy(
+        {
+          contract: compiledPricing,
+          casm: compiledPricingCasm,
+          constructorCalldata: [devnetERC20Address],
+        },
+        { maxFee: 1e18 }
       );
-      const signed = ec.starkCurve.sign(hashed, toHex(whitelistingPrivateKey));
+      const pricingAddress = pricingResponse.deploy.contract_address;
 
-      const { transaction_hash } = await account.execute([
+      // Deploy naming contract
+      const namingResponse = await account.declareAndDeploy(
         {
-          contractAddress: namingAddress,
-          entrypoint: 'initializer',
-          calldata: [
-            idAddress, // starknetid_contract_addr
-            '0', // pricing_contract_addr
-            account.address, // admin
-            whitelistingPublicKey, // whitelisting_key
-            '0', // l1_contract
-          ],
+          contract: compiledNaming,
+          casm: compiledNamingCasm,
+          constructorCalldata: [idAddress, pricingAddress, 0, account.address],
         },
-        {
-          contractAddress: idAddress,
-          entrypoint: 'mint',
-          calldata: ['1'], // TokenId
-        },
-        {
-          contractAddress: namingAddress,
-          entrypoint: 'whitelisted_mint',
-          calldata: [
-            '18925', // Domain encoded "ben"
-            '1922775124', // Expiry
-            '1', // Starknet id linked
-            account.address, // receiver_address
-            signed.r, // sig 0 for whitelist
-            signed.s, // sig 1 for whitelist
-          ],
-        },
-        {
-          contractAddress: namingAddress,
-          entrypoint: 'set_address_to_domain',
-          calldata: [
-            '1', // length
-            '18925', // Domain encoded "ben"
-          ],
-        },
-      ]);
+        { maxFee: 1e18 }
+      );
+      const namingAddress = namingResponse.deploy.contract_address;
+
+      const { transaction_hash } = await account.execute(
+        [
+          {
+            contractAddress: devnetERC20Address,
+            entrypoint: 'approve',
+            calldata: [namingAddress, 0, 1], // Price of domain
+          },
+          {
+            contractAddress: idAddress,
+            entrypoint: 'mint',
+            calldata: ['1'], // TokenId
+          },
+          {
+            contractAddress: namingAddress,
+            entrypoint: 'buy',
+            calldata: [
+              '1', // Starknet id linked
+              '1499554868251', // Domain encoded "fricoben"
+              '62', // days
+              '0', // resolver
+              0, // sponsor
+              0,
+              0,
+            ],
+          },
+          {
+            contractAddress: idAddress,
+            entrypoint: 'set_main_id',
+            calldata: ['1'],
+          },
+        ],
+        undefined,
+        { maxFee: 1e18 }
+      );
 
       await provider.waitForTransaction(transaction_hash);
 
-      const address = await account.getAddressFromStarkName('ben.stark', namingAddress);
+      const address = await account.getAddressFromStarkName('fricoben.stark', namingAddress);
       expect(hexToDecimalString(address as string)).toEqual(hexToDecimalString(account.address));
 
       const name = await account.getStarkName(undefined, namingAddress);
-      expect(name).toEqual('ben.stark');
+      expect(name).toEqual('fricoben.stark');
     });
   });
 

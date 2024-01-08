@@ -69,6 +69,7 @@ export class StarknetId {
         entrypoint: 'domain_to_address',
         calldata: CallData.compile({
           domain: [useEncoded(name.replace('.stark', '')).toString(10)],
+          hint: [],
         }),
       });
 
