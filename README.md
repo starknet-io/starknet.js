@@ -64,7 +64,7 @@ If you consider to contribute to this project please read [CONTRIBUTING.md](http
 
 Special thanks to all the [contributors](https://github.com/starknet-io/starknet.js/graphs/contributors), especially to:
 
-- Sean ([@0xs34n](https://github.com/0xs34n)), the original creator of Straknet.js!
+- Sean ([@0xs34n](https://github.com/0xs34n)), the original creator of Starknet.js!
 
 - Janek ([@janek26](https://github.com/janek26)) and Dhruv ([@dhruvkelawala](https://github.com/dhruvkelawala)) from [Argent](https://github.com/argentlabs)
 
