@@ -247,12 +247,15 @@ export class Account extends Provider implements AccountInterface {
     invocations: Invocations,
     details: UniversalDetails = {}
   ): Promise<EstimateFeeBulk> {
-    const { nonce, blockIdentifier } = details;
+    const { nonce, blockIdentifier, version } = details;
     const accountInvocations = await this.accountInvocationsFactory(invocations, {
       ...v3Details(details),
       versions: [
         ETransactionVersion.F1, // non-sierra
-        this.getPreferredVersion(ETransactionVersion.F2, ETransactionVersion.F3), // sierra
+        toTransactionVersion(
+          this.getPreferredVersion(ETransactionVersion.F2, ETransactionVersion.F3),
+          version
+        ), // sierra
       ],
       nonce,
       blockIdentifier,
@@ -699,6 +702,7 @@ export class Account extends Provider implements AccountInterface {
     });
 
     return {
+      ...v3Details(details),
       classHash,
       addressSalt,
       constructorCalldata: compiledCalldata,

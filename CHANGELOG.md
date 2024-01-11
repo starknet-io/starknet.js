@@ -1,3 +1,27 @@
+# [6.0.0-beta.11](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.10...v6.0.0-beta.11) (2024-01-04)
+
+### Bug Fixes
+
+- utilize provided resourceBounds value ([65bea53](https://github.com/starknet-io/starknet.js/commit/65bea53ab03a04fdd4c122ba2fecbb1010100e18))
+
+# [6.0.0-beta.10](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.9...v6.0.0-beta.10) (2023-12-20)
+
+### Features
+
+- req id counter ([cedd1ea](https://github.com/starknet-io/starknet.js/commit/cedd1ea32cd58107c504d357a3dd5e9a40010a80))
+
+# [6.0.0-beta.9](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.8...v6.0.0-beta.9) (2023-12-19)
+
+### Bug Fixes
+
+- acc deploy_acc ([732cd94](https://github.com/starknet-io/starknet.js/commit/732cd946f26c2b0fe893067f25c1fe712d72d49b))
+
+# [6.0.0-beta.8](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.7...v6.0.0-beta.8) (2023-12-19)
+
+### Bug Fixes
+
+- estimateFeeBulk provided version ([da717be](https://github.com/starknet-io/starknet.js/commit/da717be8e656087eaba21c865a6dd0b648664491))
+
 # [6.0.0-beta.7](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.6...v6.0.0-beta.7) (2023-12-14)
 
 ### Bug Fixes
