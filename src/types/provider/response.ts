@@ -1,6 +1,7 @@
 /**
- * Common interface response
- * Intersection (sequencer response ∩ (∪ rpc responses))
+ * Provider interface responses
+ * DEV NOTE: For stability ensure this types do not change with minor versions
+ * aka. when rpc spec change update parser so this types can stay the same
  */
 
 import * as RPC from '../api';
@@ -92,3 +93,12 @@ export type PendingStateUpdate = RPC.SPEC.PENDING_STATE_UPDATE;
 export type ContractClassResponse =
   | LegacyContractClass
   | Omit<CompiledSierra, 'sierra_program_debug_info'>;
+
+/* RE-Export from RPC */
+
+export type BlockHashAndNumber = {
+  block_hash: string;
+  block_number: number;
+};
+
+export type BlockWithTxHashes = RPC.BlockWithTxHashes;

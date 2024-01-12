@@ -3,6 +3,7 @@ import {
   AccountInvocations,
   BigNumberish,
   Block,
+  BlockHashAndNumber,
   BlockIdentifier,
   Call,
   ContractVersion,
@@ -74,7 +75,7 @@ export class RpcProvider implements ProviderInterface {
   /**
    * Get the most recent accepted block hash and number
    */
-  public async getBlockLatestAccepted() {
+  public async getBlockLatestAccepted(): Promise<BlockHashAndNumber> {
     return this.channel.getBlockLatestAccepted();
   }
 
