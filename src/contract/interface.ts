@@ -27,8 +27,6 @@ import { CairoCustomEnum } from '../utils/calldata/enum/CairoCustomEnum';
 import { CairoOption } from '../utils/calldata/enum/CairoOption';
 import { CairoResult } from '../utils/calldata/enum/CairoResult';
 
-// import { ResolvedConfig } from 'abi-wan-kanabi-v2/config';
-
 declare module 'abi-wan-kanabi-v2' {
   export interface Config<OptionT = any, ResultT = any, ErrorT = any> {
     FeltType: BigNumberish;
