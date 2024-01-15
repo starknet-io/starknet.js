@@ -1,3 +1,9 @@
+# [5.26.0](https://github.com/starknet-io/starknet.js/compare/v5.25.0...v5.26.0) (2024-01-15)
+
+### Features
+
+- abi-wan trigger ([c10150a](https://github.com/starknet-io/starknet.js/commit/c10150a328051054a7bba1260296c0c92fdd2051))
+
 # [5.25.0](https://github.com/starknet-io/starknet.js/compare/v5.24.5...v5.25.0) (2023-12-18)
 
 ### Features
