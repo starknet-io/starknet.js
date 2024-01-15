@@ -68,6 +68,7 @@
     "@typescript-eslint/eslint-plugin": "^5.28.0",
     "@typescript-eslint/parser": "^5.28.0",
     "abi-wan-kanabi": "^1.0.3",
+    "abi-wan-kanabi-v2": "npm:abi-wan-kanabi@^2.1.0",
     "ajv": "^8.12.0",
     "ajv-keywords": "^5.1.0",
     "eslint": "^8.17.0",
