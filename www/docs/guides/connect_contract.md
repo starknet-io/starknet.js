@@ -42,6 +42,7 @@ const compiledContract = json.parse(fs.readFileSync("./compiledContracts/test.js
 // initialize provider
 const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 
+
 // initialize deployed contract
 const testAddress = "0x7667469b8e93faa642573078b6bf8c790d3a6184b2a1bb39c5c923a732862e1";
 const compiledTest = json.parse(fs.readFileSync("./compiledContracts/test.json").toString("ascii"));
@@ -49,3 +50,7 @@ const compiledTest = json.parse(fs.readFileSync("./compiledContracts/test.json")
 // connect the contract
 const myTestContract = new Contract(compiledTest.abi, testAddress, provider);
 ```
+
+## Typechecking and autocompletion
+
+If you want to have typechecking and autocompletion for your contract' functions calls and catch typing errors early, you can use Abiwan, see [this guide](./automatic_cairo_ABI_parsing.md) for more details.
