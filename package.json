@@ -1,6 +1,6 @@
 {
   "name": "starknet",
-  "version": "6.0.0-beta.6",
+  "version": "6.0.0-beta.11",
   "description": "JavaScript library for Starknet",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -90,9 +90,9 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "@noble/curves": "~1.2.0",
-    "@scure/base": "^1.1.3",
-    "@scure/starknet": "~0.3.0",
+    "@noble/curves": "~1.3.0",
+    "@scure/base": "~1.1.3",
+    "@scure/starknet": "~1.0.0",
     "isomorphic-fetch": "^3.0.0",
     "lossless-json": "^2.0.8",
     "pako": "^2.0.4",

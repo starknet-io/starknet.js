@@ -12,20 +12,3 @@ export type RpcProviderOptions = {
   default?: boolean;
   waitMode?: boolean;
 };
-
-export type SequencerHttpMethod = 'POST' | 'GET';
-
-export type SequencerProviderOptions = {
-  headers?: Record<string, string>;
-  blockIdentifier?: BlockIdentifier;
-  chainId?: StarknetChainId;
-} & (
-  | {
-      network: NetworkName | StarknetChainId;
-    }
-  | {
-      baseUrl: string;
-      feederGatewayUrl?: string;
-      gatewayUrl?: string;
-    }
-);

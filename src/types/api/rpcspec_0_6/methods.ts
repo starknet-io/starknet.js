@@ -11,11 +11,9 @@ import {
   FELT,
   FUNCTION_CALL,
   MSG_FROM_L1,
-  PENDING_STATE_UPDATE,
   RESULT_PAGE_REQUEST,
   SIMULATION_FLAG,
   SIMULATION_FLAG_FOR_ESTIMATE_FEE,
-  STATE_UPDATE,
   STORAGE_KEY,
   TXN_HASH,
 } from './components';
@@ -33,6 +31,7 @@ import {
   InvokedTransaction,
   Nonce,
   SimulateTransactionResponse,
+  StateUpdate,
   Syncing,
   TransactionReceipt,
   TransactionStatus,
@@ -72,7 +71,7 @@ type ReadMethods = {
     params: {
       block_id: BLOCK_ID;
     };
-    result: STATE_UPDATE | PENDING_STATE_UPDATE;
+    result: StateUpdate;
     errors: Errors.BLOCK_NOT_FOUND;
   };
 

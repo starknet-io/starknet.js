@@ -12,9 +12,12 @@ import {
   CONTRACT_CLASS,
   CONTRACT_STORAGE_DIFF_ITEM,
   DEPRECATED_CONTRACT_CLASS,
+  EMITTED_EVENT,
+  EVENT,
   EVENTS_CHUNK,
   EVENT_FILTER,
   FEE_ESTIMATE,
+  FEE_PAYMENT,
   FELT,
   MSG_FROM_L1,
   NONCE_UPDATE,
@@ -22,6 +25,7 @@ import {
   PENDING_BLOCK_WITH_TX_HASHES,
   PENDING_STATE_UPDATE,
   PENDING_TXN_RECEIPT,
+  PRICE_UNIT,
   REPLACED_CLASS,
   RESOURCE_BOUNDS_MAPPING,
   RESULT_PAGE_REQUEST,
@@ -40,10 +44,11 @@ import {
 // response starknet_getClass
 export type ContractClass = CONTRACT_CLASS | DEPRECATED_CONTRACT_CLASS;
 // response starknet_simulateTransactions
-export type SimulateTransactionResponse = {
+export type SimulateTransaction = {
   transaction_trace: TRANSACTION_TRACE;
   fee_estimation: FEE_ESTIMATE;
-}[];
+};
+export type SimulateTransactionResponse = SimulateTransaction[];
 // response starknet_estimateFee
 export type FeeEstimate = FEE_ESTIMATE;
 // response starknet_getTransactionByHash, starknet_getTransactionByBlockIdAndIndex
@@ -62,6 +67,8 @@ export type BlockTransactionsTraces = { transaction_hash: FELT; trace_root: TRAN
 export type Syncing = false | SYNC_STATUS;
 // response starknet_getEvents
 export type Events = EVENTS_CHUNK;
+export type EmittedEvent = EMITTED_EVENT;
+export type Event = EVENT;
 // response starknet_addInvokeTransaction
 export type InvokedTransaction = { transaction_hash: TXN_HASH };
 // response starknet_addDeclareTransaction
@@ -77,6 +84,8 @@ export type TransactionHash = TXN_HASH;
 export type TransactionTrace = TRANSACTION_TRACE;
 export type BlockHash = BLOCK_HASH;
 export type TransactionReceipt = TXN_RECEIPT | PENDING_TXN_RECEIPT;
+export type Receipt = TXN_RECEIPT;
+export type PendingReceipt = PENDING_TXN_RECEIPT;
 export type EventFilter = EVENT_FILTER & RESULT_PAGE_REQUEST;
 export type SimulationFlags = Array<SIMULATION_FLAG>;
 export type L1Message = MSG_FROM_L1;
@@ -88,6 +97,8 @@ export type TransactionStatus = {
   execution_status?: TXN_EXECUTION_STATUS;
 };
 export type ResourceBounds = RESOURCE_BOUNDS_MAPPING;
+export type FeePayment = FEE_PAYMENT;
+export type PriceUnit = PRICE_UNIT;
 
 // Diff Than Seq
 export type StorageDiffs = Array<CONTRACT_STORAGE_DIFF_ITEM>;

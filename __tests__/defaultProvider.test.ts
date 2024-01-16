@@ -18,6 +18,8 @@ import {
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
+const { isPendingStateUpdate } = provider;
+
 const testProvider = new Provider(getTestProvider());
 
 describe('defaultProvider', () => {
@@ -81,32 +83,20 @@ describe('defaultProvider', () => {
 
       test(`getStateUpdate(blockHash=${exampleBlockHash}, blockNumber=undefined)`, async () => {
         const stateUpdate = await testProvider.getStateUpdate(exampleBlockHash);
-        provider.defStateUpdate(
-          stateUpdate,
-          (state) => {
-            expect(state.block_hash).toBe(exampleBlockHash);
-            expect(state).toMatchSchemaRef('StateUpdateResponse');
-          },
-          (pending) => {
-            fail('exampleBlockHash is latest block, should not be pending');
-            expect(pending).toMatchSchemaRef('PendingStateUpdateResponse');
-          }
-        );
+        if (isPendingStateUpdate(stateUpdate)) {
+          fail('exampleBlockHash is latest block, should not be pending');
+        }
+        expect(stateUpdate.block_hash).toBe(exampleBlockHash);
+        expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
       });
 
       test(`getStateUpdate(blockHash=undefined, blockNumber=${exampleBlockNumber})`, async () => {
         const stateUpdate = await testProvider.getStateUpdate(exampleBlockNumber);
-        provider.defStateUpdate(
-          stateUpdate,
-          (state) => {
-            expect(state.block_hash).toBe(exampleBlockHash);
-            expect(state).toMatchSchemaRef('StateUpdateResponse');
-          },
-          (pending) => {
-            fail('exampleBlockHash is latest block, should not be pending');
-            expect(pending).toMatchSchemaRef('PendingStateUpdateResponse');
-          }
-        );
+        if (isPendingStateUpdate(stateUpdate)) {
+          fail('exampleBlockHash is latest block, should not be pending');
+        }
+        expect(stateUpdate.block_hash).toBe(exampleBlockHash);
+        expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
       });
     });
 
@@ -181,7 +171,7 @@ describe('defaultProvider', () => {
               }),
             })
             .then((res) => {
-              expect(Array.isArray(res.result)).toBe(true);
+              expect(Array.isArray(res)).toBe(true);
             })
         ).resolves.not.toThrow();
       });

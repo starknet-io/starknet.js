@@ -6,12 +6,17 @@ import {
   ArraySignatureType,
   BigNumberish,
   CompressedProgram,
-  EstimateFeeResponse,
   Program,
   Signature,
   UniversalDetails,
 } from '../types';
-import { EDAMode, EDataAvailabilityMode, ETransactionVersion, ResourceBounds } from '../types/api';
+import {
+  EDAMode,
+  EDataAvailabilityMode,
+  ETransactionVersion,
+  FeeEstimate,
+  ResourceBounds,
+} from '../types/api';
 import { addHexPrefix, arrayBufferToString, atobUniversal, btoaUniversal } from './encode';
 import { parse, stringify } from './json';
 import {
@@ -100,7 +105,7 @@ export function estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: numbe
 }
 
 export function estimateFeeToBounds(
-  estimate: EstimateFeeResponse | 0n,
+  estimate: FeeEstimate | 0n,
   amountOverhead: number = 10,
   priceOverhead = 50
 ): ResourceBounds {
@@ -166,8 +171,7 @@ export function toFeeVersion(providedVersion?: BigNumberish) {
 }
 
 /**
- * Rerturn provided or default v3 tx details
- * @param details EstimateFeeDetails
+ * Return provided or default v3 tx details
  */
 export function v3Details(details: UniversalDetails) {
   return {
@@ -176,7 +180,7 @@ export function v3Details(details: UniversalDetails) {
     accountDeploymentData: details.accountDeploymentData || [],
     nonceDataAvailabilityMode: details.nonceDataAvailabilityMode || EDataAvailabilityMode.L1,
     feeDataAvailabilityMode: details.feeDataAvailabilityMode || EDataAvailabilityMode.L1,
-    resourceBounds: estimateFeeToBounds(ZERO),
+    resourceBounds: details.resourceBounds ?? estimateFeeToBounds(ZERO),
   };
 }
 

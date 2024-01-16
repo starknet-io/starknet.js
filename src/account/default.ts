@@ -23,7 +23,6 @@ import {
   EstimateFee,
   EstimateFeeAction,
   EstimateFeeBulk,
-  EstimateFeeResponse,
   Invocation,
   Invocations,
   InvocationsSignerDetails,
@@ -50,7 +49,6 @@ import { toBigInt, toCairoBool } from '../utils/num';
 import { parseContract } from '../utils/provider';
 import {
   estimateFeeToBounds,
-  estimatedFeeToMaxFee,
   formatSignature,
   randomAddress,
   reduceV2,
@@ -158,18 +156,12 @@ export class Account extends Provider implements AccountInterface {
     };
 
     const invocation = await this.buildInvocation(transactions, signerDetails);
-    const estimateFeeResponse = await super.getInvokeEstimateFee(
+    return super.getInvokeEstimateFee(
       { ...invocation },
       { ...v3Details(details), version, nonce },
       blockIdentifier,
       details.skipValidate
     );
-
-    return {
-      ...estimateFeeResponse,
-      suggestedMaxFee: estimatedFeeToMaxFee(estimateFeeResponse.overall_fee),
-      resourceBounds: estimateFeeToBounds(estimateFeeResponse),
-    };
   }
 
   public async estimateDeclareFee(
@@ -196,18 +188,12 @@ export class Account extends Provider implements AccountInterface {
       cairoVersion: undefined, // unused parameter
     });
 
-    const estimateFeeResponse = await super.getDeclareEstimateFee(
+    return super.getDeclareEstimateFee(
       declareContractTransaction,
       { ...v3Details(details), version, nonce },
       blockIdentifier,
       details.skipValidate
     );
-
-    return {
-      ...estimateFeeResponse,
-      suggestedMaxFee: estimatedFeeToMaxFee(estimateFeeResponse.overall_fee),
-      resourceBounds: estimateFeeToBounds(estimateFeeResponse),
-    };
   }
 
   public async estimateAccountDeployFee(
@@ -240,18 +226,12 @@ export class Account extends Provider implements AccountInterface {
       }
     );
 
-    const estimateFeeResponse = await super.getDeployAccountEstimateFee(
+    return super.getDeployAccountEstimateFee(
       { ...payload },
       { ...v3Details(details), version, nonce },
       blockIdentifier,
       details.skipValidate
     );
-
-    return {
-      ...estimateFeeResponse,
-      suggestedMaxFee: estimatedFeeToMaxFee(estimateFeeResponse.overall_fee),
-      resourceBounds: estimateFeeToBounds(estimateFeeResponse),
-    };
   }
 
   public async estimateDeployFee(
@@ -266,28 +246,23 @@ export class Account extends Provider implements AccountInterface {
     invocations: Invocations,
     details: UniversalDetails = {}
   ): Promise<EstimateFeeBulk> {
-    const { nonce, blockIdentifier } = details;
+    const { nonce, blockIdentifier, version } = details;
     const accountInvocations = await this.accountInvocationsFactory(invocations, {
       ...v3Details(details),
       versions: [
         ETransactionVersion.F1, // non-sierra
-        this.getPreferredVersion(ETransactionVersion.F2, ETransactionVersion.F3), // sierra
+        toTransactionVersion(
+          this.getPreferredVersion(ETransactionVersion.F2, ETransactionVersion.F3),
+          version
+        ), // sierra
       ],
       nonce,
       blockIdentifier,
     });
 
-    const EstimateFeeResponseBulk = await super.getEstimateFeeBulk(accountInvocations, {
+    return super.getEstimateFeeBulk(accountInvocations, {
       blockIdentifier,
       skipValidate: details.skipValidate,
-    });
-
-    return [].concat(EstimateFeeResponseBulk as []).map((elem: EstimateFeeResponse) => {
-      return {
-        ...elem,
-        suggestedMaxFee: estimatedFeeToMaxFee(elem.overall_fee),
-        resourceBounds: estimateFeeToBounds(elem),
-      };
     });
   }
 
@@ -680,8 +655,11 @@ export class Account extends Provider implements AccountInterface {
 
       default:
         feeEstimate = {
-          suggestedMaxFee: ZERO,
+          gas_consumed: 0n,
+          gas_price: 0n,
           overall_fee: ZERO,
+          unit: 'FRI',
+          suggestedMaxFee: ZERO,
           resourceBounds: estimateFeeToBounds(ZERO),
         };
         break;
@@ -759,6 +737,7 @@ export class Account extends Provider implements AccountInterface {
     });
 
     return {
+      ...v3Details(details),
       classHash,
       addressSalt,
       constructorCalldata: compiledCalldata,
