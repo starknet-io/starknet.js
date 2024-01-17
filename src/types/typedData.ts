@@ -38,7 +38,7 @@ export interface StarkNetDomain extends Record<string, unknown> {
   name?: string;
   version?: string;
   chainId?: string | number;
-  revision?: string | number;
+  revision?: string;
 }
 
 /**

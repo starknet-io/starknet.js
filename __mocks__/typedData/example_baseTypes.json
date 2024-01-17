@@ -22,8 +22,8 @@
   "domain": {
     "name": "StarkNet Mail",
     "version": "1",
-    "chainId": 1,
-    "revision": 1
+    "chainId": "1",
+    "revision": "1"
   },
   "message": {
     "n0": "0x3e8",

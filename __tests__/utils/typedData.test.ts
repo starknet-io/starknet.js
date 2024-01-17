@@ -267,14 +267,14 @@ describe('typedData', () => {
   });
 
   test('should hash messages with revision 1 types', () => {
-    // necessary to mock dependecy since function mocks (hash.computePedersenHash; hash.computePoseidonHash) won't work
+    // necessary to spy dependecy since function spies (hash.computePedersenHash; hash.computePoseidonHash) won't work
     const spyPedersen = jest.spyOn(starkCurve, 'pedersen');
     const spyPoseidon = jest.spyOn(starkCurve, 'poseidonHashMany');
 
     let messageHash: string;
     messageHash = getMessageHash(exampleBaseTypes, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
-      `"0x458a6a7cd8b781412b0bdf25d77cc7012821156f250c14b9fedb418ee2b200a"`
+      `"0x790d9fa99cf9ad91c515aaff9465fcb1c87784d9cfb27271ed193675cd06f9c"`
     );
 
     messageHash = getMessageHash(examplePresetTypes, exampleAddress);
