@@ -175,10 +175,10 @@ On the receiver side, you receive the JSON, the signature, and the account addre
 
 ```typescript
 const myAccount = new Account(provider, accountAddress, "0x0123"); // fake private key
-const result = await myAccount.verifyMessage(typedMessage, signature);
-if (result.isVerificationProcessed) {
-    console.log("Result (boolean) =", result.isSignatureValid);
-} else {
+try {
+    const result = await myAccount.verifyMessage(typedMessage, signature);
+    console.log("Result (boolean) =", result);
+} catch {
     console.log("verification failed :", result.error);
 }
 ```

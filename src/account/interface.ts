@@ -25,7 +25,6 @@ import {
   MultiDeployContractResponse,
   Nonce,
   Signature,
-  SignatureVerifResult,
   SimulateTransactionDetails,
   SimulateTransactionResponse,
   TypedData,
@@ -357,10 +356,7 @@ export abstract class AccountInterface extends ProviderInterface {
    * @returns true if the signature is valid, false otherwise
    * @throws {Error} if the JSON object is not a valid JSON or the signature is not a valid signature
    */
-  public abstract verifyMessage(
-    typedData: TypedData,
-    signature: Signature
-  ): Promise<SignatureVerifResult>;
+  public abstract verifyMessage(typedData: TypedData, signature: Signature): Promise<boolean>;
 
   /**
    * Verify a signature of a given hash
@@ -371,10 +367,7 @@ export abstract class AccountInterface extends ProviderInterface {
    * @returns true if the signature is valid, false otherwise
    * @throws {Error} if the signature is not a valid signature
    */
-  public abstract verifyMessageHash(
-    hash: BigNumberish,
-    signature: Signature
-  ): Promise<SignatureVerifResult>;
+  public abstract verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean>;
 
   /**
    * Gets the nonce of the account with respect to a specific block

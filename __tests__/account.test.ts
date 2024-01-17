@@ -4,7 +4,6 @@ import {
   Contract,
   DeclareDeployUDCResponse,
   Provider,
-  SignatureVerifResult,
   TransactionType,
   cairo,
   constants,
@@ -411,32 +410,17 @@ describe('deploy and test Wallet', () => {
 
     if (!signature2) return;
 
-    const verifMessageResponse: SignatureVerifResult = await account.verifyMessage(
-      typedDataExample,
-      signature2
-    );
-    expect(verifMessageResponse.isVerificationProcessed).toBe(true);
-    expect(verifMessageResponse.isSignatureValid).toBe(false);
+    const verifMessageResponse: boolean = await account.verifyMessage(typedDataExample, signature2);
+    expect(verifMessageResponse).toBe(false);
 
     const wrongAccount = new Account(provider, '0x037891', '0x026789', undefined, TEST_TX_VERSION); // non existing account
-    const verifMessageResponse2: SignatureVerifResult = await wrongAccount.verifyMessage(
-      typedDataExample,
-      signature2
-    );
-    expect(verifMessageResponse2.isVerificationProcessed).toBe(false);
-    expect(verifMessageResponse2.error?.message).toContain(
-      'Signature verification request is rejected by the network.'
-    );
+    await expect(wrongAccount.verifyMessage(typedDataExample, signature2)).rejects.toThrow();
   });
 
   test('sign and verify message', async () => {
     const signature = await account.signMessage(typedDataExample);
-    const verifMessageResponse: SignatureVerifResult = await account.verifyMessage(
-      typedDataExample,
-      signature
-    );
-    expect(verifMessageResponse.isVerificationProcessed).toBe(true);
-    expect(verifMessageResponse.isSignatureValid).toBe(true);
+    const verifMessageResponse: boolean = await account.verifyMessage(typedDataExample, signature);
+    expect(verifMessageResponse).toBe(true);
   });
 
   describe('Contract interaction with Account', () => {

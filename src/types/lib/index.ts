@@ -7,11 +7,6 @@ import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract'
 export type WeierstrassSignatureType = weierstrass.SignatureType;
 export type ArraySignatureType = string[];
 export type Signature = ArraySignatureType | WeierstrassSignatureType;
-export type SignatureVerifResult = {
-  isVerificationProcessed: boolean;
-  isSignatureValid?: boolean;
-  error?: Error;
-};
 
 export type BigNumberish = string | number | bigint;
 
