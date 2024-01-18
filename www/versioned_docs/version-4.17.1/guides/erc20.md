@@ -16,7 +16,7 @@ High level explanations from StarkWare can be found in this Notion [page](https:
 ERC20 implementations:
 
 1. Argent ERC20 contract can be found [here](https://github.com/argentlabs/argent-contracts-starknet/blob/develop/contracts/lib/ERC20.cairo).
-2. OpenZeppelin ERC20 can be found [here](https://github.com/OpenZeppelin/cairo-contracts/tree/main/src/openzeppelin/token/erc20).
+2. OpenZeppelin ERC20 can be found [here](https://github.com/OpenZeppelin/cairo-contracts/tree/main/src/token/erc20).
 
 ## Setup
 
