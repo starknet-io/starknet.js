@@ -1,3 +1,9 @@
+## [5.26.1](https://github.com/starknet-io/starknet.js/compare/v5.26.0...v5.26.1) (2024-01-18)
+
+### Bug Fixes
+
+- move abiwan from dev dependencies to regular dependencies ([#925](https://github.com/starknet-io/starknet.js/issues/925)) ([6b7ee49](https://github.com/starknet-io/starknet.js/commit/6b7ee49918d704f8143f51ab7a0360446ea4cf5e))
+
 # [5.26.0](https://github.com/starknet-io/starknet.js/compare/v5.25.0...v5.26.0) (2024-01-15)
 
 ### Features
