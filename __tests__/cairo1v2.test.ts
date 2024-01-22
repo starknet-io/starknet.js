@@ -31,6 +31,7 @@ import {
   compiledC210,
   compiledC210Casm,
   compiledComplexSierra,
+  compiledHelloSierra,
   getTestAccount,
   getTestProvider,
 } from './config/fixtures';
@@ -672,6 +673,83 @@ describe('Cairo 1', () => {
       ];
       expect(callDataFromObject).toStrictEqual(expectedResult);
       expect(callDataFromArray).toStrictEqual(expectedResult);
+    });
+
+    test('myCallData.decodeParameters for Cairo 1', async () => {
+      const Cairo1HelloAbi = compiledHelloSierra;
+      const Cairo1Abi = compiledC1v2;
+      const helloCallData = new CallData(Cairo1HelloAbi.abi);
+      const c1v2CallData = new CallData(Cairo1Abi.abi);
+
+      const res2 = helloCallData.decodeParameters('hello::hello::UserData', ['0x123456', '0x1']);
+      expect(res2).toEqual({ address: 1193046n, is_claimed: true });
+      const res3 = helloCallData.decodeParameters(
+        ['hello::hello::UserData', 'hello::hello::UserData'],
+        ['0x123456', '0x1', '0x98765', '0x0']
+      );
+      expect(res3).toEqual([
+        { address: 1193046n, is_claimed: true },
+        { address: 624485n, is_claimed: false },
+      ]);
+      const res4 = helloCallData.decodeParameters('core::integer::u8', ['0x123456']);
+      expect(res4).toBe(1193046n);
+      const res5 = helloCallData.decodeParameters('core::bool', ['0x1']);
+      expect(res5).toBe(true);
+      const res6 = helloCallData.decodeParameters('core::felt252', ['0x123456']);
+      expect(res6).toBe(1193046n);
+      const res7 = helloCallData.decodeParameters('core::integer::u256', ['0x123456', '0x789']);
+      expect(num.toHex(res7.toString())).toBe('0x78900000000000000000000000000123456');
+      const res8 = helloCallData.decodeParameters('core::array::Array::<core::integer::u16>', [
+        '2',
+        '0x123456',
+        '0x789',
+      ]);
+      expect(res8).toEqual([1193046n, 1929n]);
+      const res9 = helloCallData.decodeParameters('core::array::Span::<core::integer::u16>', [
+        '2',
+        '0x123456',
+        '0x789',
+      ]);
+      expect(res9).toEqual([1193046n, 1929n]);
+      const res10 = helloCallData.decodeParameters('(core::felt252, core::integer::u16)', [
+        '0x123456',
+        '0x789',
+      ]);
+      expect(res10).toEqual({ '0': 1193046n, '1': 1929n });
+      const res11 = helloCallData.decodeParameters('core::starknet::eth_address::EthAddress', [
+        '0x123456',
+      ]);
+      expect(res11).toBe(1193046n);
+      const res12 = helloCallData.decodeParameters(
+        'core::starknet::contract_address::ContractAddress',
+        ['0x123456']
+      );
+      expect(res12).toBe(1193046n);
+      const res13 = helloCallData.decodeParameters('core::starknet::class_hash::ClassHash', [
+        '0x123456',
+      ]);
+      expect(res13).toBe(1193046n);
+      const res14 = c1v2CallData.decodeParameters('core::option::Option::<core::integer::u8>', [
+        '0',
+        '0x12',
+      ]);
+      expect(res14).toEqual({ Some: 18n, None: undefined });
+      const res15 = c1v2CallData.decodeParameters(
+        'core::result::Result::<hello_res_events_newTypes::hello_res_events_newTypes::Order, core::integer::u16>',
+        ['0', '0x12', '0x345']
+      );
+      expect(res15).toEqual({ Ok: { p1: 18n, p2: 837n }, Err: undefined });
+      const res16 = c1v2CallData.decodeParameters(
+        'hello_res_events_newTypes::hello_res_events_newTypes::MyEnum',
+        ['0', '0x12', '0x5678']
+      );
+      expect(res16).toEqual({
+        variant: {
+          Response: { p1: 18n, p2: 22136n },
+          Warning: undefined,
+          Error: undefined,
+        },
+      });
     });
   });
 
