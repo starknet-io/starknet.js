@@ -951,7 +951,9 @@ describe('Cairo 1', () => {
       const callD3 = CallData.compile({ mess: byteArray.byteArrayFromString('Take care.') });
       expect(callD3).toEqual(['1', '0', '398475857363345939260718', '10']);
       const str1 = await stringContract.get_string();
-      expect(str1).toBe('azertzertrty dfghfghj dfgh dfghazert sdfgsdf ');
+      expect(str1).toBe(
+        "Cairo has become the most popular language for developers + charizards !@#$%^&*_+|:'<>?~`"
+      );
       const myCallData = new CallData(stringContract.abi);
       const expectedString = 'Take care. Zorg is back';
       const resp3 = await stringContract.proceed_string('Take care.');
