@@ -717,6 +717,75 @@ describe('Complex interaction', () => {
       expect(callDataFromArray).toStrictEqual(expectedResult);
     });
 
+    test('myCallData.decodeParameters for Cairo 0', async () => {
+      const myCallData = new CallData(erc20Echo20Contract.abi);
+
+      const res0 = myCallData.decodeParameters('felt', ['474107654995566025798705']);
+      expect(res0).toBe(474107654995566025798705n);
+      const res1 = myCallData.decodeParameters('StructY', [
+        '474107654995566025798705',
+        '3534634645645',
+      ]);
+      expect(res1).toEqual({ y1: 474107654995566025798705n, y2: 3534634645645n });
+
+      const res2 = myCallData.decodeParameters('Uint256', ['47410765', '35346645']);
+      expect(res2).toEqual({ low: 47410765n, high: 35346645n });
+      const res3 = myCallData.decodeParameters('Struct32', ['47410765', '35346645', '1', '2', '3']);
+      expect(res3).toEqual({ b: 47410765n, c: { '0': 35346645n, '1': 1n, '2': 2n, '3': 3n } });
+
+      const res4 = myCallData.decodeParameters('(felt, felt, felt, felt)', [
+        '47410765',
+        '35346645',
+        '1',
+        '2',
+      ]);
+      expect(res4).toEqual({ '0': 47410765n, '1': 35346645n, '2': 1n, '3': 2n });
+
+      const res5 = myCallData.decodeParameters('Struct2', ['47410765', '35346645', '1', '2', '3']);
+      expect(res5).toEqual({
+        info: { discount_fix_bps: 47410765n, discount_transfer_bps: 35346645n },
+        data: 1n,
+        data2: { min: 2n, max: 3n },
+      });
+      const res6 = myCallData.decodeParameters('Struct3', [
+        '47410765',
+        '35346645',
+        '1',
+        '2',
+        '3',
+        '4',
+      ]);
+      expect(res6).toEqual({
+        a: 47410765n,
+        b: { b: 35346645n, c: { '0': 1n, '1': 2n, '2': 3n, '3': 4n } },
+      });
+      const res7 = myCallData.decodeParameters('(t1: felt, t2: StructX, t3: felt)', [
+        '47410765',
+        '35346645',
+        '1',
+        '2',
+        '3',
+        '4',
+        '5',
+        '6',
+        '7',
+        '8',
+        '9',
+      ]);
+      expect(res7).toEqual({
+        t1: 47410765n,
+        t2: {
+          x1: 35346645n,
+          x2: { y1: 1n, y2: 2n },
+          x3: {
+            tx1: { '0': 3n, '1': 4n },
+            tx2: { tx21: { tx211: 5n, tx212: 6n }, tx22: { '0': 7n, '1': 8n } },
+          },
+        },
+        t3: 9n,
+      });
+    });
+
     test('invoke compiled data', async () => {
       const result = await erc20Echo20Contract.iecho(CallData.compile(request));
       const transaction = await provider.waitForTransaction(result.transaction_hash);
