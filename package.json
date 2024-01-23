@@ -1,6 +1,6 @@
 {
   "name": "starknet",
-  "version": "5.25.0",
+  "version": "6.0.0-beta.12",
   "description": "JavaScript library for Starknet",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -97,6 +97,7 @@
     "isomorphic-fetch": "^3.0.0",
     "lossless-json": "^2.0.8",
     "pako": "^2.0.4",
+    "ts-mixer": "^6.0.3",
     "url-join": "^4.0.1"
   },
   "lint-staged": {
@@ -112,9 +113,9 @@
       "**/__tests__/**/(*.)+(spec|test).[jt]s?(x)"
     ],
     "setupFilesAfterEnv": [
-      "./__tests__/jest.setup.ts"
+      "./__tests__/config/jest.setup.ts"
     ],
-    "globalSetup": "./__tests__/jestGlobalSetup.ts",
+    "globalSetup": "./__tests__/config/jestGlobalSetup.ts",
     "sandboxInjectedGlobals": [
       "Math"
     ]

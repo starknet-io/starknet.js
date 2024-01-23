@@ -1,3 +1,5 @@
+import { secp256k1 } from '@noble/curves/secp256k1';
+
 import {
   Call,
   DeclareSignerDetails,
@@ -14,8 +16,8 @@ import {
 } from '../types';
 import { ETransactionVersion2, ETransactionVersion3 } from '../types/api';
 import { CallData } from '../utils/calldata';
-import { starkCurve } from '../utils/ec';
-import { buf2hex } from '../utils/encode';
+import { addHexPrefix, buf2hex, removeHexPrefix, sanitizeHex } from '../utils/encode';
+import { ethRandomPrivateKey } from '../utils/eth';
 import {
   calculateDeclareTransactionHash,
   calculateDeployAccountTransactionHash,
@@ -27,20 +29,26 @@ import { getExecuteCalldata } from '../utils/transaction';
 import { getMessageHash } from '../utils/typedData';
 import { SignerInterface } from './interface';
 
-export class Signer implements SignerInterface {
-  protected pk: Uint8Array | string;
+/**
+ * Signer for accounts using Ethereum signature
+ */
+export class EthSigner implements SignerInterface {
+  protected pk: string; // hex string without 0x and odd number of characters
 
-  constructor(pk: Uint8Array | string = starkCurve.utils.randomPrivateKey()) {
-    this.pk = pk instanceof Uint8Array ? buf2hex(pk) : toHex(pk);
+  constructor(pk: Uint8Array | string = ethRandomPrivateKey()) {
+    this.pk =
+      pk instanceof Uint8Array
+        ? removeHexPrefix(sanitizeHex(buf2hex(pk)))
+        : removeHexPrefix(sanitizeHex(toHex(pk)));
   }
 
   public async getPubKey(): Promise<string> {
-    return starkCurve.getStarkKey(this.pk);
+    return addHexPrefix(buf2hex(secp256k1.getPublicKey(this.pk)));
   }
 
   public async signMessage(typedData: TypedData, accountAddress: string): Promise<Signature> {
     const msgHash = getMessageHash(typedData, accountAddress);
-    return starkCurve.sign(msgHash, this.pk);
+    return secp256k1.sign(removeHexPrefix(sanitizeHex(msgHash)), this.pk);
   }
 
   public async signTransaction(
@@ -73,7 +81,7 @@ export class Signer implements SignerInterface {
       throw Error('unsupported signTransaction version');
     }
 
-    return starkCurve.sign(msgHash as string, this.pk);
+    return secp256k1.sign(removeHexPrefix(sanitizeHex(msgHash)), this.pk);
   }
 
   public async signDeployAccountTransaction(
@@ -105,7 +113,7 @@ export class Signer implements SignerInterface {
       throw Error('unsupported signDeployAccountTransaction version');
     }
 
-    return starkCurve.sign(msgHash as string, this.pk);
+    return secp256k1.sign(removeHexPrefix(sanitizeHex(msgHash)), this.pk);
   }
 
   public async signDeclareTransaction(
@@ -132,6 +140,6 @@ export class Signer implements SignerInterface {
       throw Error('unsupported signDeclareTransaction version');
     }
 
-    return starkCurve.sign(msgHash as string, this.pk);
+    return secp256k1.sign(removeHexPrefix(sanitizeHex(msgHash)), this.pk);
   }
 }

@@ -4,6 +4,66 @@
 
 - sepolia ([26d7044](https://github.com/starknet-io/starknet.js/commit/26d70446edd7c098b7f257d9242cc9d9d220b11e))
 
+# [6.0.0-beta.12](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.11...v6.0.0-beta.12) (2024-01-23)
+
+### Features
+
+- add provider.decodeParameters ([be6eec9](https://github.com/starknet-io/starknet.js/commit/be6eec94c8ae5d92df631502c9a1d61663d80101))
+- ethereum signer ([8473adb](https://github.com/starknet-io/starknet.js/commit/8473adbcfa5ef642297b8a7f448a0d789703037f))
+- ethereum-signer ([f37bfb2](https://github.com/starknet-io/starknet.js/commit/f37bfb2788b7c6befc10efca8b102ee2a975ee55))
+
+# [6.0.0-beta.11](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.10...v6.0.0-beta.11) (2024-01-04)
+
+### Bug Fixes
+
+- utilize provided resourceBounds value ([65bea53](https://github.com/starknet-io/starknet.js/commit/65bea53ab03a04fdd4c122ba2fecbb1010100e18))
+
+# [6.0.0-beta.10](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.9...v6.0.0-beta.10) (2023-12-20)
+
+### Features
+
+- req id counter ([cedd1ea](https://github.com/starknet-io/starknet.js/commit/cedd1ea32cd58107c504d357a3dd5e9a40010a80))
+
+# [6.0.0-beta.9](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.8...v6.0.0-beta.9) (2023-12-19)
+
+### Bug Fixes
+
+- acc deploy_acc ([732cd94](https://github.com/starknet-io/starknet.js/commit/732cd946f26c2b0fe893067f25c1fe712d72d49b))
+
+# [6.0.0-beta.8](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.7...v6.0.0-beta.8) (2023-12-19)
+
+### Bug Fixes
+
+- estimateFeeBulk provided version ([da717be](https://github.com/starknet-io/starknet.js/commit/da717be8e656087eaba21c865a6dd0b648664491))
+
+# [6.0.0-beta.7](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.6...v6.0.0-beta.7) (2023-12-14)
+
+### Bug Fixes
+
+- provider rpc 0.5-0.6 getTransactionReceipt response standardization ([76b6ab4](https://github.com/starknet-io/starknet.js/commit/76b6ab49f6721d1f76c3f30d3d88d6dbc8b80bda))
+
+### Features
+
+- curves ([405de46](https://github.com/starknet-io/starknet.js/commit/405de462032579ef0e8e434c62976dcb84ee1af8))
+- **provider:** fix and clean provider response and response parser, removed seqeuncer api ([7ecb069](https://github.com/starknet-io/starknet.js/commit/7ecb069e3d2c37653cedc44dfbb635c5bc8eec7f))
+- **provider:** pending response discrimination, pending type guards ([013a22b](https://github.com/starknet-io/starknet.js/commit/013a22bf4dd8cb6df817ccf6ff2d82837fe91693))
+
+# [6.0.0-beta.6](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.5...v6.0.0-beta.6) (2023-12-11)
+
+### Features
+
+- def rpc 0_6, sepolia nodes ([4f59a8f](https://github.com/starknet-io/starknet.js/commit/4f59a8f01439662ae7eb785cafcf781c68b2cb04))
+- default account UniversalDetails, rpc spec update, update interface ([8dc9b8a](https://github.com/starknet-io/starknet.js/commit/8dc9b8ab28a82a9a0eaa47e0271c12b79e8cff39))
+- sepolia constants, rpc open change ([6de46b5](https://github.com/starknet-io/starknet.js/commit/6de46b59d22bfda959c083b3ac5570cb8d4c6d0a))
+
+# [6.0.0-beta.5](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.4...v6.0.0-beta.5) (2023-12-10)
+
+### Bug Fixes
+
+- apply bound for contract address from hash calculation ([6d8c291](https://github.com/starknet-io/starknet.js/commit/6d8c291bce130d7b00ae6d81aff071c4986f04af))
+- **Calldata.compile:** do not split long `entrypoint` names before calling `getSelectorFromName` ([89715da](https://github.com/starknet-io/starknet.js/commit/89715da3fdb4b497cc5771eb83a88460007740b6))
+- prioritize error states in waitForTransaction evaluation ([ac54404](https://github.com/starknet-io/starknet.js/commit/ac544045e2079b68042d850a09b203fc5536c0d0))
+
 ## [5.24.5](https://github.com/starknet-io/starknet.js/compare/v5.24.4...v5.24.5) (2023-12-10)
 
 ### Bug Fixes
@@ -11,6 +71,50 @@
 - apply bound for contract address from hash calculation ([6d8c291](https://github.com/starknet-io/starknet.js/commit/6d8c291bce130d7b00ae6d81aff071c4986f04af))
 - **Calldata.compile:** do not split long `entrypoint` names before calling `getSelectorFromName` ([89715da](https://github.com/starknet-io/starknet.js/commit/89715da3fdb4b497cc5771eb83a88460007740b6))
 - prioritize error states in waitForTransaction evaluation ([ac54404](https://github.com/starknet-io/starknet.js/commit/ac544045e2079b68042d850a09b203fc5536c0d0))
+
+# [6.0.0-beta.4](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.3...v6.0.0-beta.4) (2023-12-08)
+
+### Bug Fixes
+
+- remove account_deployment_data from deploy Account ([ede83bf](https://github.com/starknet-io/starknet.js/commit/ede83bfda3c6fcfa9dd397c92bd709293c8dda9b))
+
+### Features
+
+- simulate skip validate by default, spec deploy acc fix ([1b3e7ae](https://github.com/starknet-io/starknet.js/commit/1b3e7aeadaba5b7d59377e249b535f6a8cb8862e))
+
+# [6.0.0-beta.3](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.2...v6.0.0-beta.3) (2023-12-07)
+
+### Bug Fixes
+
+- **beta:** deploy account ([#880](https://github.com/starknet-io/starknet.js/issues/880)) ([00c58e3](https://github.com/starknet-io/starknet.js/commit/00c58e3c6d03b716b68c1b96b5a4adc1cff87dd0))
+
+# [6.0.0-beta.2](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.1...v6.0.0-beta.2) (2023-12-07)
+
+### Features
+
+- v3 wip with est ([b95c462](https://github.com/starknet-io/starknet.js/commit/b95c462df0bd59293b7b42b5474311a3bbbfab1d))
+
+# [6.0.0-beta.1](https://github.com/starknet-io/starknet.js/compare/v5.24.4...v6.0.0-beta.1) (2023-12-06)
+
+### Features
+
+- account preferred transaction version, setup v3 ([5652eb2](https://github.com/starknet-io/starknet.js/commit/5652eb211e1accaefbb2f24bcb756ccf9170c07a))
+- dual specification with 0.6 implementation, not yet integrated ([ac8c763](https://github.com/starknet-io/starknet.js/commit/ac8c76383bb3f566164bc4f38c477e3e3dc45f31))
+- hashes, signer, vip account, types, versions as string enum ([6ceb9e3](https://github.com/starknet-io/starknet.js/commit/6ceb9e31e51d51a6ce374144fd3ddb82a6ea01b3))
+- pretty print rpc LibraryError params, make env.DEBUG usefull ([cca723f](https://github.com/starknet-io/starknet.js/commit/cca723f13009ce7048c7be6b8a6f466aca0d5e19))
+- remove old version constants, default types api rpc ([ed9cb08](https://github.com/starknet-io/starknet.js/commit/ed9cb089460640af96a73eca66e9971ca5832041))
+- rpc 0.6 implementation as superset of 0.5 tx ([5b2b299](https://github.com/starknet-io/starknet.js/commit/5b2b2997ee7e54144864315ed20175017e4218b4))
+- rpc 0.6.0-rc3 implementation ([c2607ed](https://github.com/starknet-io/starknet.js/commit/c2607ed64f26d18ea66f2184acf34d3ca9ee4766))
+- rpc provider ([0d9c2e5](https://github.com/starknet-io/starknet.js/commit/0d9c2e5ba0298af7b608ccbd9dd2eff3dc0bb69a))
+- rpcChannel ([181eea3](https://github.com/starknet-io/starknet.js/commit/181eea3e4eabc52cdf46b796f0861e2641d59668))
+- update default rpc nodes and version ([9b9fe0e](https://github.com/starknet-io/starknet.js/commit/9b9fe0e4c5d8d54323bb82ab7ceed3a78d6fc1bc))
+- update verson ([5dfe445](https://github.com/starknet-io/starknet.js/commit/5dfe445a5ed09dd531d91156633321fdae4b70cd))
+- v3 transaction hashes ([4fe40a1](https://github.com/starknet-io/starknet.js/commit/4fe40a1419031cd6328509e2439744d0ff98c8e7))
+- v3 tx hashes calculation ([f0e760d](https://github.com/starknet-io/starknet.js/commit/f0e760d109e488b70b16eed24e94b889d708d257))
+
+### BREAKING CHANGES
+
+- v3 transactions
 
 ## [5.24.4](https://github.com/starknet-io/starknet.js/compare/v5.24.3...v5.24.4) (2023-12-06)
 
