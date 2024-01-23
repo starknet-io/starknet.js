@@ -1,3 +1,17 @@
+# [6.0.0-beta.13](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.12...v6.0.0-beta.13) (2024-01-23)
+
+### Bug Fixes
+
+- solve wrong response for account.verifyMessage ([05f4095](https://github.com/starknet-io/starknet.js/commit/05f4095599f89dd508fac9316e1c24fc0dceaa8a))
+
+### Features
+
+- abiwan v2 intergation ([87d15d3](https://github.com/starknet-io/starknet.js/commit/87d15d3d4ada1138ed5b66620a4de56189195f4c))
+- add string types of cairo v2.4.0 ([a8a73c1](https://github.com/starknet-io/starknet.js/commit/a8a73c1f5b0bc72bc42460f3735eeec6f95edcbe))
+- make Abi and CONTRACT_ABI types compatible with abiwan ([9007816](https://github.com/starknet-io/starknet.js/commit/9007816689528a79bd8bb4267e0098be2e6d71d2))
+- replace in verifyMessage : response by Error ([1abf91f](https://github.com/starknet-io/starknet.js/commit/1abf91f170c46d4f4cf5f493dc3d6717c6d3c1e7))
+- sepolia ([26d7044](https://github.com/starknet-io/starknet.js/commit/26d70446edd7c098b7f257d9242cc9d9d220b11e))
+
 # [5.25.0](https://github.com/starknet-io/starknet.js/compare/v5.24.5...v5.25.0) (2023-12-18)
 
 ### Features
