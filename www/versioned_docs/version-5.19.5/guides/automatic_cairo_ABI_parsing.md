@@ -63,7 +63,7 @@ import { tAbi } from '../__mocks__/hello';
 
 let cairo1Contract = new Contract(compiledHelloSierra.abi, dd.deploy.contract_address, account);
 
-let cairo1ContractTyped = cairo1Contract.typed(tAbi);
+let cairo1ContractTyped = cairo1Contract.typedv1(tAbi); // or typedv2(tAbi) if you're using Cairo Compiler v2
 
 cairo1ContractTyped.test_bool();
 ```

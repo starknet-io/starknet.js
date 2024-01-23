@@ -96,7 +96,7 @@
     "lossless-json": "^2.0.8",
     "pako": "^2.0.4",
     "url-join": "^4.0.1",
-    "abi-wan-kanabi": "^1.0.3",
+    "abi-wan-kanabi-v1": "npm:abi-wan-kanabi@^1.0.3",
     "abi-wan-kanabi-v2": "npm:abi-wan-kanabi@^2.1.1"
   },
   "lint-staged": {
