@@ -38,7 +38,35 @@ const config = {
 
   themeConfig:
     /** @type {import('@docusaurus/preset-classic').ThemeConfig} */
-    ({
+    {
+      algolia: {
+        // The application ID provided by Algolia
+        appId: '86VVNRI64B',
+
+        // Public API key: it is safe to commit it
+        apiKey: '6f4db54e4ee0ae77619b41dbe862af7f',
+
+        indexName: 'starknetjs',
+
+        // Optional: see doc section below
+        contextualSearch: true,
+
+        // Optional: Specify domains where the navigation should occur through window.location instead on history.push. Useful when our Algolia config crawls multiple documentation sites and we want to navigate with window.location.href to them.
+        //externalUrlRegex: 'external\\.com|domain\\.com',
+
+        // Optional: Replace parts of the item URLs from Algolia. Useful when using the same search index for multiple deployments using a different baseUrl. You can use regexp or string in the `from` param. For example: localhost:3000 vs myCompany.com/docs
+        //replaceSearchResultPathname: {
+        // from: '/docs/', // or as RegExp: /\/docs\//
+        // to: '/',
+
+        // Optional: Algolia search parameters
+        //searchParameters: {},
+
+        // Optional: path for search page that enabled by default (`false` to disable it)
+        //searchPagePath: 'search',
+
+        //... other Algolia param
+      },
       announcementBar: {
         content: `<a href="${migrationGuideLink}">Migrate from v4</a>`,
         backgroundColor: 'rgb(230 231 232)',
@@ -67,6 +95,7 @@ const config = {
             dropdownActiveClassDisabled: true,
             position: 'left',
           },
+
           {
             label: 'GitHub',
             href: 'https://github.com/starknet-io/starknet.js',
@@ -119,7 +148,7 @@ const config = {
         theme: lightCodeTheme,
         darkTheme: darkCodeTheme,
       },
-    }),
+    },
 
   plugins: [
     [
@@ -155,7 +184,6 @@ const config = {
           'Function',
           'Accessor',
           'Method',
-          'ObjectLiteral',
           'Parameter',
           'TypeParameter',
           'TypeLiteral',
