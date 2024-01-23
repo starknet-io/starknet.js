@@ -8,7 +8,8 @@ export enum CairoOptionVariant {
  * @param variant CairoOptionVariant.Some or CairoOptionVariant.None
  * @param someContent value of type T.
  * @returns an instance representing a Cairo Option.
- * @example ```typescript
+ * @example
+ * ```typescript
  * const myOption = new CairoOption<BigNumberish>(CairoOptionVariant.Some, "0x54dda8");
  * ```
  */
