@@ -6,6 +6,7 @@ import {
   ParsedEvents,
   RawArgs,
   json,
+  shortString,
   stark,
 } from '../src';
 import { CallData } from '../src/utils/calldata';
@@ -463,7 +464,9 @@ describe('Complex interaction', () => {
     const request = {
       t1: 'demo text1',
       n1: 123,
-      tl2: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      tl2: shortString.splitLongString(
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
+      ),
       k1: [{ a: 1, b: { b: 2, c: tuple(3, 4, 5, 6) } }],
       k2: {
         // named tuple
@@ -573,6 +576,7 @@ describe('Complex interaction', () => {
         ...request,
         u1: uint256ToBN(request.u1),
         au1: request.au1.map((it) => uint256ToBN(it)),
+        tl2: request.tl2.join(''),
       };
       expect(json.stringify(compareRequest)).toBe(json.stringify(result));
       expect(json.stringify(compareRequest)).toBe(json.stringify(result2));
@@ -585,7 +589,9 @@ describe('Complex interaction', () => {
         t1: 'demo text1',
         n1: 123,
         k1: [{ a: 1, b: { b: 2, c: tuple(3, 4, 5, 6) } }], // not ordered
-        tl2: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        tl2: shortString.splitLongString(
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
+        ),
         k2: {
           // named tuple
           t1: 1,
@@ -842,6 +848,7 @@ describe('Complex interaction', () => {
           ...request,
           u1: uint256ToBN(request.u1),
           au1: request.au1.map((it) => uint256ToBN(it)),
+          tl2: request.tl2.join(''),
         };
         expect(json.stringify(result)).toBe(json.stringify(compareRequest));
       });
@@ -899,6 +906,7 @@ describe('Complex interaction', () => {
         ...request,
         u1: uint256ToBN(request.u1),
         au1: request.au1.map((it) => uint256ToBN(it)),
+        tl2: request.tl2.join(''),
       };
       expect(json.stringify(compareRequest)).toBe(json.stringify(result));
     });

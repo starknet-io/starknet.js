@@ -17,7 +17,8 @@ import {
 import assert from '../assert';
 import { isBigInt, toHex } from '../num';
 import { getSelectorFromName } from '../selector';
-import { isLongText, splitLongString } from '../shortString';
+import { isLongText } from '../shortString';
+import { byteArrayFromString } from './byteArray';
 import { felt, isCairo1Type, isLen } from './cairo';
 import {
   CairoCustomEnum,
@@ -35,6 +36,7 @@ import responseParser from './responseParser';
 import validateFields from './validate';
 
 export * as cairo from './cairo';
+export * as byteArray from './byteArray';
 
 export class CallData {
   abi: Abi;
@@ -165,8 +167,8 @@ export class CallData {
         const oe = Array.isArray(o) ? [o.length.toString(), ...o] : o;
         return Object.entries(oe).flatMap(([k, v]) => {
           let value = v;
+          if (isLongText(value)) value = byteArrayFromString(value);
           if (k === 'entrypoint') value = getSelectorFromName(value);
-          else if (isLongText(value)) value = splitLongString(value);
           const kk = Array.isArray(oe) && k === '0' ? '$$len' : k;
           if (isBigInt(value)) return [[`${prefix}${kk}`, felt(value)]];
           if (Object(value) === value) {
