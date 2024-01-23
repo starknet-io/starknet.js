@@ -1,6 +1,6 @@
 /**
  * Test Setup
- * Run before each test
+ * Run before each test run
  * ref: order of execution jestGlobalSetup.ts -> jest.setup.ts -> fixtures.ts
  */
 
