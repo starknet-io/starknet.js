@@ -1,3 +1,11 @@
+# [6.0.0-beta.12](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.11...v6.0.0-beta.12) (2024-01-23)
+
+### Features
+
+- add provider.decodeParameters ([be6eec9](https://github.com/starknet-io/starknet.js/commit/be6eec94c8ae5d92df631502c9a1d61663d80101))
+- ethereum signer ([8473adb](https://github.com/starknet-io/starknet.js/commit/8473adbcfa5ef642297b8a7f448a0d789703037f))
+- ethereum-signer ([f37bfb2](https://github.com/starknet-io/starknet.js/commit/f37bfb2788b7c6befc10efca8b102ee2a975ee55))
+
 # [6.0.0-beta.11](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.10...v6.0.0-beta.11) (2024-01-04)
 
 ### Bug Fixes
