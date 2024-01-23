@@ -1,3 +1,9 @@
+# [5.27.0](https://github.com/starknet-io/starknet.js/compare/v5.26.1...v5.27.0) (2024-01-23)
+
+### Features
+
+- trigger release ([fbf983f](https://github.com/starknet-io/starknet.js/commit/fbf983f7820768f919cddb2c5806178a20e38bdd))
+
 ## [5.26.1](https://github.com/starknet-io/starknet.js/compare/v5.26.0...v5.26.1) (2024-01-18)
 
 ### Bug Fixes
