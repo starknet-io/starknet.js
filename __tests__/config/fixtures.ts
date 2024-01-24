@@ -55,6 +55,8 @@ export const compiledNaming = readContractSierra('starknetId/naming/naming.sierr
 export const compiledNamingCasm = readContractSierraCasm('starknetId/naming/naming');
 export const compiledPricing = readContractSierra('starknetId/pricing/pricing.sierra');
 export const compiledPricingCasm = readContractSierraCasm('starknetId/pricing/pricing');
+export const compiledSidMulticall = readContractSierra('starknetId/multicall/multicall.sierra');
+export const compiledSidMulticallCasm = readContractSierraCasm('starknetId/multicall/multicall');
 
 export function getTestProvider(isProvider?: true): ProviderInterface;
 export function getTestProvider(isProvider?: false): RpcProvider;

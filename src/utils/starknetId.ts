@@ -1,5 +1,8 @@
-/* eslint-disable no-param-reassign */
 import { StarknetChainId, ZERO } from '../constants';
+import { BigNumberish } from '../types';
+import { tuple } from './calldata/cairo';
+import { CairoCustomEnum } from './calldata/enum/CairoCustomEnum';
+/* eslint-disable no-param-reassign */
 
 const basicAlphabet = 'abcdefghijklmnopqrstuvwxyz0123456789-';
 const basicSizePlusOne = BigInt(basicAlphabet.length + 1);
@@ -120,4 +123,150 @@ export function getStarknetIdContract(chainId: StarknetChainId): string {
     default:
       throw new Error('Starknet.id is not yet deployed on this network');
   }
+}
+
+export const enum StarknetIdIdentityContract {
+  MAINNET = '0x05dbdedc203e92749e2e746e2d40a768d966bd243df04a6b712e222bc040a9af',
+  TESTNET = '0x783a9097b26eae0586373b2ce0ed3529ddc44069d1e0fbc4f66d42b69d6850d',
+  TESTNET_SEPOLIA = '0x718d9172f6e36183abeeff1a0db76a1851cef4ed9b9c13896da79ef4bfcb4d0',
+}
+
+export function getStarknetIdIdentityContract(chainId: StarknetChainId): string {
+  switch (chainId) {
+    case StarknetChainId.SN_MAIN:
+      return StarknetIdIdentityContract.MAINNET;
+
+    case StarknetChainId.SN_GOERLI:
+      return StarknetIdIdentityContract.TESTNET;
+
+    case StarknetChainId.SN_SEPOLIA:
+      return StarknetIdIdentityContract.TESTNET_SEPOLIA;
+
+    default:
+      throw new Error('Starknet.id verifier contract is not yet deployed on this network');
+  }
+}
+
+export const StarknetIdMulticallContract =
+  '0x034ffb8f4452df7a613a0210824d6414dbadcddce6c6e19bf4ddc9e22ce5f970';
+
+export function getStarknetIdMulticallContract(chainId: StarknetChainId): string {
+  switch (chainId) {
+    case StarknetChainId.SN_MAIN:
+      return StarknetIdMulticallContract;
+
+    case StarknetChainId.SN_GOERLI:
+      return StarknetIdMulticallContract;
+
+    case StarknetChainId.SN_SEPOLIA:
+      return StarknetIdMulticallContract;
+
+    default:
+      throw new Error('Starknet.id multicall contract is not yet deployed on this network');
+  }
+}
+
+export const enum StarknetIdVerifierContract {
+  MAINNET = '0x07d14dfd8ee95b41fce179170d88ba1f0d5a512e13aeb232f19cfeec0a88f8bf',
+  TESTNET = '0x057c942544063c3aea6ea6c37009cc9d1beacd750cb6801549a129c7265f0f11',
+  TESTNET_SEPOLIA = '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
+}
+
+export function getStarknetIdVerifierContract(chainId: StarknetChainId): string {
+  switch (chainId) {
+    case StarknetChainId.SN_MAIN:
+      return StarknetIdVerifierContract.MAINNET;
+
+    case StarknetChainId.SN_GOERLI:
+      return StarknetIdVerifierContract.TESTNET;
+
+    case StarknetChainId.SN_SEPOLIA:
+      return StarknetIdVerifierContract.TESTNET_SEPOLIA;
+
+    default:
+      throw new Error('Starknet.id verifier contract is not yet deployed on this network');
+  }
+}
+
+export const enum StarknetIdPfpContract {
+  MAINNET = '0x070aaa20ec4a46da57c932d9fd89ca5e6bb9ca3188d3df361a32306aff7d59c7',
+  TESTNET = '0x03cac3228b434259734ee0e4ff445f642206ea11adace7e4f45edd2596748698',
+  TESTNET_SEPOLIA = '0x070c035557d6fed57eed2ed7fa861616b487f8a95439347b805639ca076f29f0',
+}
+
+export function getStarknetIdPfpContract(chainId: StarknetChainId): string {
+  switch (chainId) {
+    case StarknetChainId.SN_MAIN:
+      return StarknetIdPfpContract.MAINNET;
+
+    case StarknetChainId.SN_GOERLI:
+      return StarknetIdPfpContract.TESTNET;
+
+    case StarknetChainId.SN_SEPOLIA:
+      return StarknetIdPfpContract.TESTNET_SEPOLIA;
+
+    default:
+      throw new Error(
+        'Starknet.id profile picture verifier contract is not yet deployed on this network'
+      );
+  }
+}
+
+export const enum StarknetIdPopContract {
+  MAINNET = '0x0293eb2ba9862f762bd3036586d5755a782bd22e6f5028320f1d0405fd47bff4',
+  TESTNET = '0x03528caf090179e337931ee669a5b0214041e1bae30d460ff07d2cea2c7a9106',
+  TESTNET_SEPOLIA = '0x00f80f68443becd0e0a4a08ff5734e36dd8028507333e4a0ec034dcfdf1b793e',
+}
+
+export function getStarknetIdPopContract(chainId: StarknetChainId): string {
+  switch (chainId) {
+    case StarknetChainId.SN_MAIN:
+      return StarknetIdPopContract.MAINNET;
+
+    case StarknetChainId.SN_GOERLI:
+      return StarknetIdPopContract.TESTNET;
+
+    case StarknetChainId.SN_SEPOLIA:
+      return StarknetIdPopContract.TESTNET_SEPOLIA;
+
+    default:
+      throw new Error(
+        'Starknet.id proof of personhood verifier contract is not yet deployed on this network'
+      );
+  }
+}
+
+// Functions to build CairoCustomEnum for multicall contracts
+export function execution(
+  staticEx: {} | undefined,
+  ifEqual: number[] | undefined = undefined,
+  ifNotEqual: number[] | undefined = undefined
+): CairoCustomEnum {
+  return new CairoCustomEnum({
+    Static: staticEx,
+    IfEqual: ifEqual ? tuple(ifEqual[0], ifEqual[1], ifEqual[2]) : undefined,
+    IfNotEqual: ifNotEqual ? tuple(ifNotEqual[0], ifNotEqual[1], ifNotEqual[2]) : undefined,
+  });
+}
+
+export function dynamicFelt(
+  hardcoded: BigNumberish | undefined,
+  reference: number[] | undefined = undefined
+): CairoCustomEnum {
+  return new CairoCustomEnum({
+    Hardcoded: hardcoded,
+    Reference: reference ? tuple(reference[0], reference[1]) : undefined,
+  });
+}
+
+export function dynamicCallData(
+  hardcoded: BigNumberish | undefined,
+  reference: BigNumberish[] | undefined = undefined,
+  arrayReference: BigNumberish[] | undefined = undefined
+): CairoCustomEnum {
+  return new CairoCustomEnum({
+    Hardcoded: hardcoded,
+    Reference: reference ? tuple(reference[0], reference[1]) : undefined,
+    ArrayReference: arrayReference ? tuple(arrayReference[0], arrayReference[1]) : undefined,
+  });
 }
