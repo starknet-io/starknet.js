@@ -11,4 +11,5 @@ export type RpcProviderOptions = {
   chainId?: StarknetChainId;
   default?: boolean;
   waitMode?: boolean;
+  fallbackNodeUrls?: string[];
 };

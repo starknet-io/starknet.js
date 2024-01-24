@@ -43,7 +43,7 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public fetch(method: string, params?: object, id: string | number = 0) {
-    return this.channel.fetch(method, params, id);
+    return this.channel.fetch(this.channel.nodeUrl, method, params, id);
   }
 
   public async getChainId() {
