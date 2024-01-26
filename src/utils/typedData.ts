@@ -7,7 +7,13 @@ import {
   StarkNetType,
   TypedData,
 } from '../types';
-import { computePedersenHash, computePoseidonHash, getSelectorFromName } from './hash';
+import {
+  computePedersenHash,
+  computePedersenHashOnElements,
+  computePoseidonHash,
+  computePoseidonHashOnElements,
+  getSelectorFromName,
+} from './hash';
 import { MerkleTree } from './merkle';
 import { isHex, toHex } from './num';
 import { encodeShortString, splitLongString } from './shortString';
@@ -23,6 +29,7 @@ interface Context {
 interface Configuration {
   domain: string;
   hashMethod: (data: BigNumberish[]) => string;
+  hashMerkleMethod: (a: BigNumberish, b: BigNumberish) => string;
   escapeTypeString: (s: string) => string;
   presetTypes: TypedData['types'];
 }
@@ -40,13 +47,15 @@ const presetTypes: TypedData['types'] = {
 const revisionConfiguration: Record<Revision, Configuration> = {
   [Revision.Active]: {
     domain: 'StarknetDomain',
-    hashMethod: computePoseidonHash,
+    hashMethod: computePoseidonHashOnElements,
+    hashMerkleMethod: computePoseidonHash,
     escapeTypeString: (s) => `"${s}"`,
     presetTypes,
   },
   [Revision.Legacy]: {
     domain: 'StarkNetDomain',
-    hashMethod: computePedersenHash,
+    hashMethod: computePedersenHashOnElements,
+    hashMerkleMethod: computePedersenHash,
     escapeTypeString: (s) => s,
     presetTypes: {},
   },
@@ -287,7 +296,10 @@ export function encodeValue(
       const structHashes: string[] = (data as Array<TypedData['message']>).map((struct) => {
         return encodeValue(types, merkleTreeType, struct, undefined, revision)[1];
       });
-      const { root } = new MerkleTree(structHashes as string[]);
+      const { root } = new MerkleTree(
+        structHashes as string[],
+        revisionConfiguration[revision].hashMerkleMethod
+      );
       return ['felt', root];
     }
     case 'selector': {
