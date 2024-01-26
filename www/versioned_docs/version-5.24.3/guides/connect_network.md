@@ -68,7 +68,7 @@ const provider = new Provider({ rpc: { nodeUrl: '192.168.1.99:9545/rpc/v0.4' } }
 Initialize the provider with:
 
 ```typescript
-const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:6060' });
+const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:6060/v0_5' });
 ```
 
 ### Other node clients

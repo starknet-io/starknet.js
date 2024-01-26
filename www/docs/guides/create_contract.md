@@ -139,9 +139,10 @@ For very simple constructors, you can use `CallData.compile`:
 const myArray1: RawCalldata = ["0x0a", 24, 36n];
 const contractConstructor: Calldata = CallData.compile({
         text: 'niceToken',
-        longText: "http://addressOfMyERC721pictures/image1.jpg",
+        longText: "http://addressOfMyERC721pictures/image1.jpg", // for Cairo v2.4.0 onwards
         array1: myArray1
     });
+    // with older Cairo, use:   longText: shortString.splitLongString("http://addressOfMyERC721pictures/image1.jpg"),
 const deployResponse = await account0.deployContract({
     classHash: contractClassHash,
     constructorCalldata: contractConstructor
@@ -153,7 +154,7 @@ Properties have to be ordered in conformity with the abi.
 Even easier:
 
 ```typescript
-const contractConstructor: Calldata = CallData.compile(['niceToken', "http://addressOfMyERC721pictures/image1.jpg", myArray1]);
+const contractConstructor: Calldata = CallData.compile(['niceToken', "http://addressOfMyERC721pictures/image1.jpg", myArray1]); // // for Cairo v2.4.0 onwards
 ```
 
 ## `declare()` for a new class

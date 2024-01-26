@@ -550,7 +550,7 @@ export class Account extends Provider implements AccountInterface {
 
   public async verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean> {
     try {
-      await this.callContract({
+      const resp = await this.callContract({
         contractAddress: this.address,
         entrypoint: 'isValidSignature',
         calldata: CallData.compile({
@@ -558,9 +558,22 @@ export class Account extends Provider implements AccountInterface {
           signature: formatSignature(signature),
         }),
       });
+      if (BigInt(resp[0]) === 0n) {
+        // OpenZeppelin 0.8.0 invalid signature
+        return false;
+      }
+      // OpenZeppelin 0.8.0, ArgentX 0.3.0 & Braavos Cairo 0 valid signature
       return true;
-    } catch {
-      return false;
+    } catch (err) {
+      if (
+        ['argent/invalid-signature', 'is invalid, with respect to the public key'].some(
+          (errMessage) => (err as Error).message.includes(errMessage)
+        )
+      ) {
+        // ArgentX 0.3.0 invalid signature, Braavos Cairo 0 invalid signature
+        return false;
+      }
+      throw Error(`Signature verification request is rejected by the network: ${err}`);
     }
   }
 

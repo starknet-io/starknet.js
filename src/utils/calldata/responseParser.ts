@@ -5,17 +5,22 @@ import {
   AbiStructs,
   Args,
   BigNumberish,
+  ByteArray,
   CairoEnum,
   EventEntry,
   ParsedStruct,
 } from '../../types';
+import { toHex } from '../num';
+import { decodeShortString } from '../shortString';
 import { uint256ToBN } from '../uint256';
+import { stringFromByteArray } from './byteArray';
 import {
   getArrayType,
   isCairo1Type,
   isLen,
   isTypeArray,
   isTypeBool,
+  isTypeByteArray,
   isTypeEnum,
   isTypeTuple,
   isTypeUint256,
@@ -49,6 +54,9 @@ function parseBaseTypes(type: string, it: Iterator<string>) {
     case type === 'core::starknet::eth_address::EthAddress':
       temp = it.next().value;
       return BigInt(temp);
+    case type === 'core::bytes_31::bytes31':
+      temp = it.next().value;
+      return decodeShortString(temp);
     default:
       temp = it.next().value;
       return BigInt(temp);
@@ -77,6 +85,23 @@ function parseResponseValue(
     const low = responseIterator.next().value;
     const high = responseIterator.next().value;
     return uint256ToBN({ low, high });
+  }
+
+  // type C1 ByteArray struct, representing a LongString
+  if (isTypeByteArray(element.type)) {
+    const parsedBytes31Arr: BigNumberish[] = [];
+    const bytes31ArrLen = BigInt(responseIterator.next().value);
+    while (parsedBytes31Arr.length < bytes31ArrLen) {
+      parsedBytes31Arr.push(toHex(responseIterator.next().value));
+    }
+    const pending_word = toHex(responseIterator.next().value);
+    const pending_word_len = BigInt(responseIterator.next().value);
+    const myByteArray: ByteArray = {
+      data: parsedBytes31Arr,
+      pending_word,
+      pending_word_len,
+    };
+    return stringFromByteArray(myByteArray);
   }
 
   // type c1 array

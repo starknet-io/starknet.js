@@ -1,4 +1,5 @@
 import type { Abi as AbiKanabi } from 'abi-wan-kanabi';
+import type { Abi as AbiKanabiV2, TypedContract as AbiWanTypedContractV2 } from 'abi-wan-kanabi-v2';
 
 import { AccountInterface } from '../account';
 import { ProviderInterface, defaultProvider } from '../provider';
@@ -31,6 +32,8 @@ import { createAbiParser } from '../utils/calldata/parser';
 import { getAbiEvents, parseEvents as parseRawEvents } from '../utils/events/index';
 import { cleanHex } from '../utils/num';
 import { ContractInterface, TypedContract } from './interface';
+
+export type TypedContractV2<TAbi extends AbiKanabiV2> = AbiWanTypedContractV2<TAbi> & Contract;
 
 export const splitArgsAndOptions = (args: ArgsOrCalldataWithOptions) => {
   const options = [
@@ -348,5 +351,9 @@ export class Contract implements ContractInterface {
 
   public typed<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContract<TAbi> {
     return this as TypedContract<typeof tAbi>;
+  }
+
+  public typedv2<TAbi extends AbiKanabiV2>(tAbi: TAbi): TypedContractV2<TAbi> {
+    return this as unknown as TypedContractV2<typeof tAbi>;
   }
 }
