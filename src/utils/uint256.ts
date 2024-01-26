@@ -27,7 +27,8 @@ export function isUint256(bn: BigNumberish): boolean {
  * Convert BigNumberish (string | number | bigint) to Uint256 (hex)
  */
 export function bnToUint256(bn: BigNumberish): Uint256 {
-  const bi = toBigInt(bn);
+  const bi = BigInt(bn);
+  if (bi < 0) throw Error('uint256 must be positive number');
   if (!isUint256(bi)) throw new Error('Number is too large');
   return {
     low: addHexPrefix((bi & UINT_128_MAX).toString(16)),

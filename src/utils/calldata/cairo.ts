@@ -100,6 +100,7 @@ export function getAbiContractVersion(abi: Abi): ContractVersion {
  */
 export const uint256 = (it: BigNumberish): Uint256 => {
   const bn = BigInt(it);
+  if (bn < 0) throw Error('uint256 must be positive number');
   if (!isUint256(bn)) throw new Error('Number is too large');
   return {
     // eslint-disable-next-line no-bitwise
