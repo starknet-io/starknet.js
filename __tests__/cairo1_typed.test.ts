@@ -9,7 +9,7 @@ import {
   DeclareDeployUDCResponse,
   RawArgsArray,
   RawArgsObject,
-  TypedContract,
+  TypedContractV1,
   cairo,
   num,
   selector,
@@ -35,7 +35,7 @@ describeIfDevnet('Cairo 1 Devnet', () => {
     const provider = getTestProvider();
     const account = getTestAccount(provider);
     let dd: DeclareDeployUDCResponse;
-    let cairo1Contract: TypedContract<typeof tAbi>;
+    let cairo1Contract: TypedContractV1<typeof tAbi>;
     initializeMatcher(expect);
 
     beforeAll(async () => {
@@ -48,7 +48,7 @@ describeIfDevnet('Cairo 1 Devnet', () => {
         compiledHelloSierra.abi,
         dd.deploy.contract_address,
         account
-      ).typed(tAbi);
+      ).typedv1(tAbi);
     });
 
     test('Declare & deploy v2 - Hello Cairo 1 contract', async () => {
@@ -503,7 +503,7 @@ describeIfSequencerGoerli('Cairo1 Testnet', () => {
     const classHash: any = '0x028b6f2ee9ae00d55a32072d939a55a6eb522974a283880f3c73a64c2f9fd6d6';
     const contractAddress: any =
       '0x771bbe2ba64fa5ab52f0c142b4296fc67460a3a2372b4cdce752c620e3e8194';
-    let cairo1Contract: TypedContract<typeof tAbi>;
+    let cairo1Contract: TypedContractV1<typeof tAbi>;
     initializeMatcher(expect);
 
     test('GetClassByHash', async () => {
