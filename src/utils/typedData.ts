@@ -205,7 +205,7 @@ export function encodeType(
           ? `(${targetType
               .slice(1, -1)
               .split(',')
-              .map((e) => (e ? esc(e.trim()) : e))
+              .map((e) => (e ? esc(e) : e))
               .join(',')})`
           : esc(targetType);
         return `${esc(t.name)}:${typeString}`;
@@ -254,15 +254,9 @@ export function encodeValue(
   }
 
   if (type.endsWith('*')) {
-    const isStructArray = Object.keys(types)
-      .map((x) => `${x}*`)
-      .includes(type);
-
-    const mappingMethod: (entry: Record<string, unknown>) => string = isStructArray
-      ? (entry) => getStructHash(types, type.slice(0, -1), entry, revision)
-      : (entry) => encodeValue(types, type.slice(0, -1), entry, undefined, revision)[1];
-
-    const hashes: string[] = (data as Array<TypedData['message']>).map(mappingMethod);
+    const hashes: string[] = (data as Array<TypedData['message']>).map(
+      (entry) => encodeValue(types, type.slice(0, -1), entry, undefined, revision)[1]
+    );
     return [type, revisionConfiguration[revision].hashMethod(hashes)];
   }
 
@@ -282,7 +276,7 @@ export function encodeValue(
           .map((subtype, index) => {
             if (!subtype) return subtype;
             const subtypeData = (variantData as unknown[])[index];
-            return encodeValue(types, subtype.trim(), subtypeData, undefined, revision)[1];
+            return encodeValue(types, subtype, subtypeData, undefined, revision)[1];
           });
         return [
           type,

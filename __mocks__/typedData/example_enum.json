@@ -9,7 +9,7 @@
     "Example": [{ "name": "someEnum", "type": "enum", "contains": "MyEnum" }],
     "MyEnum": [
       { "name": "Variant 1", "type": "()" },
-      { "name": "Variant 2", "type": "(u128, u128*)" },
+      { "name": "Variant 2", "type": "(u128,u128*)" },
       { "name": "Variant 3", "type": "(u128)" }
     ]
   },
