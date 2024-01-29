@@ -27,6 +27,7 @@ import {
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
+import assert from '../utils/assert';
 import { CallData } from '../utils/calldata';
 import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { isSierra } from '../utils/contract';
@@ -68,8 +69,6 @@ const defaultOptions = {
 };
 
 export class RpcProvider implements ProviderInterface {
-  public nodeUrl: string;
-
   public headers: object;
 
   private responseParser = new RPCResponseParser();
@@ -80,30 +79,39 @@ export class RpcProvider implements ProviderInterface {
 
   private chainId?: StarknetChainId;
 
-  public fallbackNodeUrls?: string[];
+  public nodeUrls: string[];
 
   constructor(optionsOrProvider?: RpcProviderOptions) {
     const { nodeUrl, retries, headers, blockIdentifier, chainId, rpcVersion, fallbackNodeUrls } =
       optionsOrProvider || {};
+    let primaryNode;
     if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
       // Network name provided for nodeUrl
-      this.nodeUrl = getDefaultNodeUrl(
+      primaryNode = getDefaultNodeUrl(
         nodeUrl as NetworkName,
         optionsOrProvider?.default,
         rpcVersion
       );
     } else if (nodeUrl) {
       // NodeUrl provided
-      this.nodeUrl = nodeUrl;
+      primaryNode = nodeUrl;
     } else {
       // none provided fallback to default testnet
-      this.nodeUrl = getDefaultNodeUrl(undefined, optionsOrProvider?.default, rpcVersion);
+      primaryNode = getDefaultNodeUrl(undefined, optionsOrProvider?.default, rpcVersion);
     }
     this.retries = retries || defaultOptions.retries;
     this.headers = { ...defaultOptions.headers, ...headers };
     this.blockIdentifier = blockIdentifier || defaultOptions.blockIdentifier;
     this.chainId = chainId; // setting to a non-null value skips making a request in getChainId()
-    this.fallbackNodeUrls = fallbackNodeUrls;
+    this.nodeUrls = [primaryNode, ...(fallbackNodeUrls || [])];
+  }
+
+  get nodeUrl() {
+    return this.nodeUrls[0];
+  }
+
+  set nodeUrl(url) {
+    this.nodeUrls[0] = url;
   }
 
   public fetch(url: string, method: string, params?: object, id: string | number = 0) {
@@ -135,41 +143,55 @@ export class RpcProvider implements ProviderInterface {
     }
   }
 
+  protected async setPrimaryNode(node: string, index: number) {
+    // eslint-disable-next-line prefer-destructuring
+    this.nodeUrls[index] = this.nodeUrls[0];
+    this.nodeUrls[0] = node;
+  }
+
+  protected async fetchResponse(method: string, params?: object) {
+    const nodes = [...this.nodeUrls];
+    const lastNode = nodes.pop();
+    assert(lastNode !== undefined);
+    let response;
+    for (let i = 0; i < nodes.length - 1; i += 1) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        response = await this.fetch(nodes[i], method, params);
+
+        if (response.ok) {
+          this.setPrimaryNode(nodes[i], i);
+          return response;
+        }
+      } catch (error: any) {
+        /* empty */
+      }
+    }
+
+    // If all nodes fail return anything the last one returned
+    try {
+      response = await this.fetch(lastNode, method, params);
+      if (response.ok) {
+        this.setPrimaryNode(lastNode, this.nodeUrls.length - 1);
+      }
+      return response;
+    } catch (error: any) {
+      this.errorHandler(method, params, error?.response?.data, error);
+      throw error;
+    }
+  }
+
   protected async fetchEndpoint<T extends keyof RPC.Methods>(
     method: T,
     params?: RPC.Methods[T]['params']
   ): Promise<RPC.Methods[T]['result']> {
+    const response = await this.fetchResponse(method, params);
+
     try {
-      const rawResult = await this.fetch(this.nodeUrl, method, params);
-      const { error, result } = await rawResult.json();
+      const { error, result } = await response.json();
       this.errorHandler(method, params, error);
       return result as RPC.Methods[T]['result'];
     } catch (error: any) {
-      if (this.fallbackNodeUrls) {
-        for (let i = 0; i < this.fallbackNodeUrls.length; i += 1) {
-          try {
-            // eslint-disable-next-line no-await-in-loop
-            const fallbackResult = await this.fetch(this.fallbackNodeUrls[i], method, params);
-            // eslint-disable-next-line no-await-in-loop
-            const { error: fallbackError, result } = await fallbackResult.json();
-            this.errorHandler(method, params, fallbackError);
-
-            // If a fallback node succeeds, update the primary and fallback URLs
-            const oldPrimaryUrl = this.nodeUrl;
-            this.nodeUrl = this.fallbackNodeUrls[i];
-            this.fallbackNodeUrls.splice(i, 1); // Remove the new primary from the fallback list
-            this.fallbackNodeUrls.push(oldPrimaryUrl); // Add the old primary to the end of the fallback list
-
-            return result as RPC.Methods[T]['result'];
-          } catch (fallbackError: any) {
-            if (i === this.fallbackNodeUrls.length - 1) {
-              this.errorHandler(method, params, fallbackError?.response?.data, fallbackError);
-              throw fallbackError;
-            }
-          }
-        }
-      }
-
       this.errorHandler(method, params, error?.response?.data, error);
       throw error;
     }
