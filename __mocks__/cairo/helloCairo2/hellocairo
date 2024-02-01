@@ -478,7 +478,7 @@ mod HelloStarknet {
             }
         }
 
-        // return Option<litteral>
+        // return Option<literal>
         fn option_u8_output(self: @ContractState, val1: u8) -> Option<u8> {
             if val1 < 100 {
                 return Option::None(());

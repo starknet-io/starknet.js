@@ -196,7 +196,7 @@ export class SequencerProvider implements ProviderInterface {
         : [undefined, Sequencer.Endpoints[T]['REQUEST']]
       : Sequencer.Endpoints[T]['REQUEST'] extends never
       ? [Sequencer.Endpoints[T]['QUERY']] // when no request is needed, we can omit the request parameter
-      : [Sequencer.Endpoints[T]['QUERY'], Sequencer.Endpoints[T]['REQUEST']] // when both query and request are needed, we cant omit anything
+      : [Sequencer.Endpoints[T]['QUERY'], Sequencer.Endpoints[T]['REQUEST']] // when both query and request are needed, we can't omit anything
   ): Promise<Sequencer.Endpoints[T]['RESPONSE']> {
     const baseUrl = this.getFetchUrl(endpoint);
     const method = this.getFetchMethod(endpoint);
@@ -370,7 +370,7 @@ export class SequencerProvider implements ProviderInterface {
     } else if (classHash) {
       contractClass = await this.getClassByHash(classHash, blockIdentifier);
     } else {
-      throw Error('getContractVersion require contractAddress or classHash');
+      throw Error('getContractVersion requires contractAddress or classHash');
     }
 
     if (isSierra(contractClass)) {

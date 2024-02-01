@@ -53,6 +53,6 @@ const myTestContract = new Contract(compiledTest.abi, testAddress, provider);
 
 ## Typechecking and autocompletion
 
-If you want to have typechecking and autocompletion for your contracts functions calls and catch typing errors early, you can use Abiwan! 
+If you want to have typechecking and autocompletion for your contracts functions calls and catch typing errors early, you can use Abiwan!
 
 See [this guide](./automatic_cairo_ABI_parsing.md) for more details.

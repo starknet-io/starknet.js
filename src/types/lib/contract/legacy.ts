@@ -11,7 +11,7 @@ export type LegacyContractClass = {
 };
 
 /**
- * format produced after compile .cairo to .json
+ * format produced after compiling .cairo to .json
  */
 export type LegacyCompiledContract = Omit<LegacyContractClass, 'program'> & {
   program: Program;
