@@ -1,3 +1,9 @@
+# [5.28.0](https://github.com/starknet-io/starknet.js/compare/v5.27.0...v5.28.0) (2024-02-01)
+
+### Features
+
+- expand structured data hashing in line with SNIP-12 ([#920](https://github.com/starknet-io/starknet.js/issues/920)) ([cb20590](https://github.com/starknet-io/starknet.js/commit/cb2059039e3b42501cdfefec7802da83eb73645b))
+
 # [5.27.0](https://github.com/starknet-io/starknet.js/compare/v5.26.1...v5.27.0) (2024-01-23)
 
 ### Features
