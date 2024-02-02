@@ -7,7 +7,6 @@ import {
   CairoEnum,
   ParsedStruct,
   Tupled,
-  Uint256,
 } from '../../types';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { encodeShortString, isText, splitLongString } from '../shortString';
@@ -75,10 +74,6 @@ function parseTuple(element: object, typeStr: string): Tupled[] {
   });
 }
 
-function parseUint256(element: object | BigNumberish) {
-  return new CairoUint256(element as Uint256).toApiRequest();
-}
-
 function parseByteArray(element: string): string[] {
   const myByteArray: ByteArray = byteArrayFromString(element);
   return [
@@ -128,7 +123,7 @@ function parseCalldataValue(
   // checking if the passed element is struct
   if (structs[type] && structs[type].members.length) {
     if (CairoUint256.isAbiType(type)) {
-      return parseUint256(element);
+      return new CairoUint256(element as any).toApiRequest();
     }
 
     if (type === 'core::starknet::eth_address::EthAddress')
@@ -154,7 +149,7 @@ function parseCalldataValue(
   }
   // check if u256 C1v0
   if (CairoUint256.isAbiType(type)) {
-    return parseUint256(element);
+    return new CairoUint256(element as any).toApiRequest();
   }
   // check if Enum
   if (isTypeEnum(type, enums)) {

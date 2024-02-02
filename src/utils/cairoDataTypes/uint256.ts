@@ -64,6 +64,9 @@ export class CairoUint256 {
     return bigInt;
   }
 
+  /**
+   * Validate if low and high can be represented as Unit256
+   */
   static validateProps(low: BigNumberish, high: BigNumberish) {
     const bigIntLow = BigInt(low);
     const bigIntHigh = BigInt(high);
