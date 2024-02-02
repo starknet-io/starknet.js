@@ -93,6 +93,7 @@
     "@noble/curves": "~1.3.0",
     "@scure/base": "~1.1.3",
     "@scure/starknet": "~1.0.0",
+    "fetch-cookie": "github:NethermindEth/fetch-cookie#export-cookieimpl",
     "isomorphic-fetch": "^3.0.0",
     "lossless-json": "^2.0.8",
     "pako": "^2.0.4",
