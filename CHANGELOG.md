@@ -1,3 +1,9 @@
+# [5.29.0](https://github.com/starknet-io/starknet.js/compare/v5.28.0...v5.29.0) (2024-02-02)
+
+### Features
+
+- add provider.decodeParameters ([39595f3](https://github.com/starknet-io/starknet.js/commit/39595f3303204b273fadd53764c59767ce6c5b36))
+
 # [5.28.0](https://github.com/starknet-io/starknet.js/compare/v5.27.0...v5.28.0) (2024-02-01)
 
 ### Features
