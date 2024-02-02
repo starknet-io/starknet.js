@@ -9,6 +9,7 @@ import {
   Tupled,
   Uint256,
 } from '../../types';
+import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { encodeShortString, isText, splitLongString } from '../shortString';
 import { byteArrayFromString } from './byteArray';
 import {
@@ -21,8 +22,6 @@ import {
   isTypeResult,
   isTypeStruct,
   isTypeTuple,
-  isTypeUint256,
-  uint256,
 } from './cairo';
 import {
   CairoCustomEnum,
@@ -41,10 +40,8 @@ import extractTupleMemberTypes from './tuple';
  */
 function parseBaseTypes(type: string, val: BigNumberish) {
   switch (true) {
-    case isTypeUint256(type):
-      // eslint-disable-next-line no-case-declarations
-      const el_uint256 = uint256(val);
-      return [felt(el_uint256.low), felt(el_uint256.high)];
+    case CairoUint256.isAbiType(type):
+      return new CairoUint256(val).toApiRequest();
     case isTypeBytes31(type):
       return encodeShortString(val.toString());
     default:
@@ -79,12 +76,7 @@ function parseTuple(element: object, typeStr: string): Tupled[] {
 }
 
 function parseUint256(element: object | BigNumberish) {
-  if (typeof element === 'object') {
-    const { low, high } = element as Uint256;
-    return [felt(low as BigNumberish), felt(high as BigNumberish)];
-  }
-  const el_uint256 = uint256(element);
-  return [felt(el_uint256.low), felt(el_uint256.high)];
+  return new CairoUint256(element as Uint256).toApiRequest();
 }
 
 function parseByteArray(element: string): string[] {
@@ -135,7 +127,7 @@ function parseCalldataValue(
 
   // checking if the passed element is struct
   if (structs[type] && structs[type].members.length) {
-    if (isTypeUint256(type)) {
+    if (CairoUint256.isAbiType(type)) {
       return parseUint256(element);
     }
 
@@ -161,7 +153,7 @@ function parseCalldataValue(
     }, [] as string[]);
   }
   // check if u256 C1v0
-  if (isTypeUint256(type)) {
+  if (CairoUint256.isAbiType(type)) {
     return parseUint256(element);
   }
   // check if Enum
@@ -288,7 +280,7 @@ export function parseCalldataField(
     case type === 'core::starknet::eth_address::EthAddress':
       return parseBaseTypes(type, value);
     // Struct or Tuple
-    case isTypeStruct(type, structs) || isTypeTuple(type) || isTypeUint256(type):
+    case isTypeStruct(type, structs) || isTypeTuple(type) || CairoUint256.isAbiType(type):
       return parseCalldataValue(value as ParsedStruct | BigNumberish[], type, structs, enums);
 
     // Enums

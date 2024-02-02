@@ -10,9 +10,9 @@ import {
   EventEntry,
   ParsedStruct,
 } from '../../types';
+import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { toHex } from '../num';
 import { decodeShortString } from '../shortString';
-import { uint256ToBN } from '../uint256';
 import { stringFromByteArray } from './byteArray';
 import {
   getArrayType,
@@ -23,7 +23,6 @@ import {
   isTypeByteArray,
   isTypeEnum,
   isTypeTuple,
-  isTypeUint256,
 } from './cairo';
 import {
   CairoCustomEnum,
@@ -47,10 +46,10 @@ function parseBaseTypes(type: string, it: Iterator<string>) {
     case isTypeBool(type):
       temp = it.next().value;
       return Boolean(BigInt(temp));
-    case isTypeUint256(type):
+    case CairoUint256.isAbiType(type):
       const low = it.next().value;
       const high = it.next().value;
-      return uint256ToBN({ low, high });
+      return new CairoUint256(low, high).toBigInt();
     case type === 'core::starknet::eth_address::EthAddress':
       temp = it.next().value;
       return BigInt(temp);
@@ -81,10 +80,10 @@ function parseResponseValue(
     return {};
   }
   // type uint256 struct (c1v2)
-  if (isTypeUint256(element.type)) {
+  if (CairoUint256.isAbiType(element.type)) {
     const low = responseIterator.next().value;
     const high = responseIterator.next().value;
-    return uint256ToBN({ low, high });
+    return new CairoUint256(low, high).toBigInt();
   }
 
   // type C1 ByteArray struct, representing a LongString
