@@ -1,4 +1,4 @@
-import type { Abi as AbiKanabi } from 'abi-wan-kanabi';
+import type { Abi as AbiKanabiV1 } from 'abi-wan-kanabi-v1';
 import type { Abi as AbiKanabiV2, TypedContract as AbiWanTypedContractV2 } from 'abi-wan-kanabi-v2';
 
 import { AccountInterface } from '../account';
@@ -349,7 +349,7 @@ export class Contract implements ContractInterface {
     return this.providerOrAccount.getContractVersion(this.address);
   }
 
-  public typedv1<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContractV1<TAbi> {
+  public typedv1<TAbi extends AbiKanabiV1>(tAbi: TAbi): TypedContractV1<TAbi> {
     return this as TypedContractV1<typeof tAbi>;
   }
 

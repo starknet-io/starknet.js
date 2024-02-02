@@ -1,4 +1,4 @@
-import typedDataExample from '../../__mocks__/typedDataExample.json';
+import typedDataExample from '../../__mocks__/typedData/baseExample.json';
 import {
   Call,
   DeclareSignerDetails,
