@@ -1,3 +1,16 @@
+# [6.0.0-beta.14](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.13...v6.0.0-beta.14) (2024-02-02)
+
+### Bug Fixes
+
+- move abiwan from dev dependencies to regular dependencies ([#925](https://github.com/starknet-io/starknet.js/issues/925)) ([6b7ee49](https://github.com/starknet-io/starknet.js/commit/6b7ee49918d704f8143f51ab7a0360446ea4cf5e))
+
+### Features
+
+- abi-wan trigger ([c10150a](https://github.com/starknet-io/starknet.js/commit/c10150a328051054a7bba1260296c0c92fdd2051))
+- add provider.decodeParameters ([39595f3](https://github.com/starknet-io/starknet.js/commit/39595f3303204b273fadd53764c59767ce6c5b36))
+- expand structured data hashing in line with SNIP-12 ([#920](https://github.com/starknet-io/starknet.js/issues/920)) ([cb20590](https://github.com/starknet-io/starknet.js/commit/cb2059039e3b42501cdfefec7802da83eb73645b))
+- trigger release ([fbf983f](https://github.com/starknet-io/starknet.js/commit/fbf983f7820768f919cddb2c5806178a20e38bdd))
+
 # [5.29.0](https://github.com/starknet-io/starknet.js/compare/v5.28.0...v5.29.0) (2024-02-02)
 
 ### Features
