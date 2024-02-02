@@ -339,4 +339,25 @@ describeIfRpc('RPCProvider', () => {
       expect(syncingStats).toMatchSchemaRef('GetSyncingStatsResponse');
     });
   });
+
+  describeIfRpc('Fallback node', () => {
+    beforeAll(() => {});
+    test('Ensure fallback node is used when base node fails', async () => {
+      const provider: RpcProvider = new RpcProvider({
+        nodeUrl: 'http://[1080:0:0:0:8:800:200C:417A]',
+        fallbackNodeUrls: [process.env.TEST_RPC_URL!],
+      });
+      const blockNumber = await provider.getBlockNumber();
+      expect(typeof blockNumber).toBe('number');
+    });
+  });
+
+  test('Ensure fallback nodes are run until any of them succeeds', async () => {
+    const provider: RpcProvider = new RpcProvider({
+      nodeUrl: 'Incorrect URL',
+      fallbackNodeUrls: ['Another incorrect URL', process.env.TEST_RPC_URL!],
+    });
+    const blockNumber = await provider.getBlockNumber();
+    expect(typeof blockNumber).toBe('number');
+  });
 });
