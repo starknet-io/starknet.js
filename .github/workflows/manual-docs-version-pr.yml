@@ -11,8 +11,8 @@ jobs:
     name: Documentation build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: lts/*
           cache: 'npm'
@@ -33,7 +33,7 @@ jobs:
           git add www/versioned_docs www/versioned_sidebars www/versions.json
           git checkout .
       - name: Create pull request
-        uses: peter-evans/create-pull-request@v5
+        uses: peter-evans/create-pull-request@v6
         with:
           branch: ci/docs-version
           committer: CI <noreply@github.com>

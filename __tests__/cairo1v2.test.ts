@@ -146,7 +146,7 @@ describe('Cairo 1', () => {
       expect(balance).toBe(200n);
     });
 
-    test('Cairo 1 Contract Interaction - uint 8, 16, 32, 64, 128, litterals', async () => {
+    test('Cairo 1 Contract Interaction - uint 8, 16, 32, 64, 128, literals', async () => {
       const tx = await cairo1Contract.increase_balance_u8(255n);
       await account.waitForTransaction(tx.transaction_hash);
       const balance = await cairo1Contract.get_balance_u8();

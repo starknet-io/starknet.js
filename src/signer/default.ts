@@ -40,7 +40,7 @@ export class Signer implements SignerInterface {
 
   public async signMessage(typedData: TypedData, accountAddress: string): Promise<Signature> {
     const msgHash = getMessageHash(typedData, accountAddress);
-    return starkCurve.sign(msgHash, this.pk);
+    return this.signRaw(msgHash);
   }
 
   public async signTransaction(
@@ -73,7 +73,7 @@ export class Signer implements SignerInterface {
       throw Error('unsupported signTransaction version');
     }
 
-    return starkCurve.sign(msgHash as string, this.pk);
+    return this.signRaw(msgHash as string);
   }
 
   public async signDeployAccountTransaction(
@@ -105,7 +105,7 @@ export class Signer implements SignerInterface {
       throw Error('unsupported signDeployAccountTransaction version');
     }
 
-    return starkCurve.sign(msgHash as string, this.pk);
+    return this.signRaw(msgHash as string);
   }
 
   public async signDeclareTransaction(
@@ -132,6 +132,10 @@ export class Signer implements SignerInterface {
       throw Error('unsupported signDeclareTransaction version');
     }
 
-    return starkCurve.sign(msgHash as string, this.pk);
+    return this.signRaw(msgHash as string);
+  }
+
+  protected async signRaw(msgHash: string): Promise<Signature> {
+    return starkCurve.sign(msgHash, this.pk);
   }
 }

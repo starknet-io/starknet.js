@@ -430,7 +430,7 @@ Invokes a function on starknet
 
 **`Deprecated`**
 
-This method wont be supported as soon as fees are mandatory. Should not be used outside of Account class
+This method won't be supported as soon as fees are mandatory. Should not be used outside of Account class
 
 #### Parameters
 

@@ -444,7 +444,7 @@ describe('Complex interaction', () => {
     expect(json.stringify(compiled)).toBe(reference);
     expect(json.stringify(doubleCompiled)).toBe(reference);
 
-    // mix of complex and litteral
+    // mix of complex and literal
     const mySetArgs = {
       validators: [234, 235],
       powers: { a1: 562, a2: 567 },

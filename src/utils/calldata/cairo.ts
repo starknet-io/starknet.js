@@ -4,7 +4,7 @@ import {
   AbiStructs,
   BigNumberish,
   ContractVersion,
-  Litteral,
+  Literal,
   Uint,
   Uint256,
 } from '../../types';
@@ -25,9 +25,9 @@ export const isTypeEnum = (type: string, enums: AbiEnums) => type in enums;
 export const isTypeOption = (type: string) => type.startsWith('core::option::Option::');
 export const isTypeResult = (type: string) => type.startsWith('core::result::Result::');
 export const isTypeUint = (type: string) => Object.values(Uint).includes(type as Uint);
-export const isTypeLitteral = (type: string) => Object.values(Litteral).includes(type as Litteral);
 // Legacy Export
 export const isTypeUint256 = (type: string) => CairoUint256.isAbiType(type);
+export const isTypeLiteral = (type: string) => Object.values(Literal).includes(type as Literal);
 export const isTypeBool = (type: string) => type === 'core::bool';
 export const isTypeContractAddress = (type: string) =>
   type === 'core::starknet::contract_address::ContractAddress';
