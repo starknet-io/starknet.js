@@ -19,7 +19,7 @@ First, you need to wrap your ABI in a array and export it as a `const`.
 Example:
 
 ```js
-export const tAbi = [
+export const ABI = [
   {
     type: 'function',
     name: 'increase_balance',
@@ -35,35 +35,48 @@ export const tAbi = [
 ] as const;
 ```
 
-Later on, to use it in our code, we have 2 options.
-
-### Option 1
+Later on, to use it in our code:
 
 ```js
-import { tAbi } from '../__mocks__/hello';
-import { TypedContract } from '../src';
+import { Contract, RpcProvider, constants } from 'starknet';
 
-let cairo1Contract: TypedContract<typeof tAbi>; // tAbi is your Cairo contract ABI
+const address = "YOUR_ADDRESS_HERE";
+const provider = new RpcProvider({ nodeUrl: `${yourNodeUrl}` });
+const contract = new Contract(ABI, address, provider).typedv2(ABI);
+
+// Notice the autocompletion and typechecking in your editor
+const result = await contract.increase_balance(100);
 ```
 
-After that, you can use `cairo1Contract` in your code as you would before, but with autocomplete and type checking!
+After that, you can use `contract` in your code as you would before, but with autocompletion and typechecking!
 
-For example:
+### Generate `abi.ts` from the contract class
 
-```js
-const tx = await cairo1Contract.increase_balance(100);
+If you have your contract class in a Json file, you can use the abiwan CLI to generate the `abi.ts` typescript file
+
+```bash
+npx abi-wan-kanabi --input /path/to/contract_class.json --output /path/to/abi.ts
 ```
 
-### Option 2
+### Usage for deployed contracts
 
-```js
-import { tAbi } from '../__mocks__/hello';
+Let's say you want to interact with the [Ekubo: Core](https://starkscan.co/contract/0x00000005dd3d2f4429af886cd1a3b08289dbcea99a294197e9eb43b0e0325b4b) contract
 
-// ...
+You need to first get the **ABI** of the contract and export it in a typescript file, you can do so using one command combining both [`starkli`](https://github.com/xJonathanLEI/starkli) (tested with version 0.2.3) and `npx abi-wan-kanabi`:
 
-let cairo1Contract = new Contract(compiledHelloSierra.abi, dd.deploy.contract_address, account);
+```bash
+starkli class-at "0x00000005dd3d2f4429af886cd1a3b08289dbcea99a294197e9eb43b0e0325b4b" --network mainnet | npx abi-wan-kanabi --input /dev/stdin --output abi.ts
+```
 
-let cairo1ContractTyped = cairo1Contract.typed(tAbi);
+```typescript
+import { Contract, RpcProvider, constants } from "starknet";
+import { ABI } from "./abi";
 
-cairo1ContractTyped.test_bool();
+const address = "0x00000005dd3d2f4429af886cd1a3b08289dbcea99a294197e9eb43b0e0325b4b";
+const provider = new RpcProvider({ nodeUrl: constants.NetworkName.SN_MAIN });
+const contract = new Contract(ABI, address, provider).typedv2(ABI);
+
+// Notice the types inferred for the parameter and the returned value
+const primary_inteface_id = contract.get_primary_interface_id()
+const protocol_fees_collected = contract.get_protocol_fees_collected('0x1')
 ```
