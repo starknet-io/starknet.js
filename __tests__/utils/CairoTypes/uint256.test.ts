@@ -1,4 +1,5 @@
 /* eslint-disable no-new */
+import { Uint256 } from '../../../src';
 import {
   CairoUint256,
   UINT_256_HIGH_MAX,
@@ -98,6 +99,32 @@ describe('CairoUint256 class test', () => {
     expect(case1).toEqual(case2);
     expect(case3).toEqual(case4);
     expect(case1).toEqual(case4);
+  });
+
+  test('constructor 2 should support Uint256 {low, high}', () => {
+    const cases: Uint256[] = [];
+    cases[cases.length] = new CairoUint256({ low: 0, high: 0 });
+    cases[cases.length] = new CairoUint256({ low: '0', high: '0' });
+    cases[cases.length] = new CairoUint256({ low: 0n, high: 0n });
+    cases[cases.length] = new CairoUint256({ low: '0x0', high: '0x0' });
+
+    const cases2: Uint256[] = [];
+    cases2[cases2.length] = new CairoUint256({ low: 10000, high: 10000 });
+    cases2[cases2.length] = new CairoUint256({ low: '10000', high: '10000' });
+    cases2[cases2.length] = new CairoUint256({ low: 10000n, high: 10000n });
+    cases2[cases2.length] = new CairoUint256({ low: '0x2710', high: '0x2710' });
+
+    expect(
+      cases.every((it) => {
+        return it.low === 0n && it.high === 0n;
+      })
+    ).toEqual(true);
+
+    expect(
+      cases2.every((it) => {
+        return it.low === 10000n && it.high === 10000n;
+      })
+    ).toEqual(true);
   });
 
   test('should convert UINT_256_MAX to Uint256 dec struct', () => {

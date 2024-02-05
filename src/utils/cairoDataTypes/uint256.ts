@@ -37,7 +37,7 @@ export class CairoUint256 {
   public constructor(uint256: Uint256);
 
   public constructor(...arr: any[]) {
-    if (typeof arr === 'object' && arr.length === 1 && arr[0].low && arr[0].high) {
+    if (typeof arr[0] === 'object' && arr.length === 1 && 'low' in arr[0] && 'high' in arr[0]) {
       const props = CairoUint256.validateProps(arr[0].low, arr[0].high);
       this.low = props.low;
       this.high = props.high;
