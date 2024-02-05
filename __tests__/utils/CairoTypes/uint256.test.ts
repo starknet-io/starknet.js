@@ -30,25 +30,25 @@ describe('CairoUint256 class test', () => {
   test('constructor 2 should throw out of bounds', () => {
     expect(() => {
       new CairoUint256(UINT_256_LOW_MIN - 1n, 1000);
-    }).toThrow('low is our of range UINT_256_LOW_MIN - UINT_256_LOW_MAX');
+    }).toThrow('low is out of range UINT_256_LOW_MIN - UINT_256_LOW_MAX');
   });
 
   test('constructor 2 should throw out of bounds', () => {
     expect(() => {
       new CairoUint256(UINT_256_LOW_MAX + 1n, 1000);
-    }).toThrow('low is our of range UINT_256_LOW_MIN - UINT_256_LOW_MAX');
+    }).toThrow('low is out of range UINT_256_LOW_MIN - UINT_256_LOW_MAX');
   });
 
   test('constructor 2 should throw out of bounds', () => {
     expect(() => {
       new CairoUint256(1000, UINT_256_HIGH_MIN - 1n);
-    }).toThrow('high is our of range UINT_256_HIGH_MIN - UINT_256_HIGH_MAX');
+    }).toThrow('high is out of range UINT_256_HIGH_MIN - UINT_256_HIGH_MAX');
   });
 
   test('constructor 2 should throw out of bounds', () => {
     expect(() => {
       new CairoUint256(1000, UINT_256_HIGH_MAX + 1n);
-    }).toThrow('high is our of range UINT_256_HIGH_MIN - UINT_256_HIGH_MAX');
+    }).toThrow('high is out of range UINT_256_HIGH_MIN - UINT_256_HIGH_MAX');
   });
 
   test('constructor 3 ({low, high})', () => {
@@ -59,7 +59,7 @@ describe('CairoUint256 class test', () => {
   test('constructor 3 should throw out of bounds', () => {
     expect(() => {
       new CairoUint256({ low: 1000, high: UINT_256_HIGH_MAX + 1n });
-    }).toThrow('high is our of range UINT_256_HIGH_MIN - UINT_256_HIGH_MAX');
+    }).toThrow('high is out of range UINT_256_HIGH_MIN - UINT_256_HIGH_MAX');
   });
 
   test('validate should throw on < UINT_256_MIN', () => {

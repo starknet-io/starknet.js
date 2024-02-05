@@ -74,7 +74,7 @@ export class CairoUint256 {
       throw new Error('low is out of range UINT_256_LOW_MIN - UINT_256_LOW_MAX');
     }
     if (bigIntHigh < UINT_256_HIGH_MIN || bigIntHigh > UINT_256_HIGH_MAX) {
-      throw new Error('high is our of range UINT_256_HIGH_MIN - UINT_256_HIGH_MAX');
+      throw new Error('high is out of range UINT_256_HIGH_MIN - UINT_256_HIGH_MAX');
     }
     return { low: bigIntLow, high: bigIntHigh };
   }
