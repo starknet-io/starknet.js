@@ -9,21 +9,21 @@ Once your provider, contract, and account are connected, you can interact with t
 - you can read the memory of the contract, without fees.
 - you can write to memory, but you have to pay fees.
   - On Mainnet, you have to pay fees with a bridged ETH token.
-  - On Testnet, you have to pay with a bridged Goerli ETH token.
+  - On Testnets, you have to pay with a bridged Goerli or Sepolia ETH token.
   - On devnet, you have to pay with a dummy ETH token.
 
 Your account should be funded enough to pay fees (0.01 ETH should be enough to start).
 
 ![](./pictures/Interact_contract.png)
 
-Here we will interact with a `test.cairo` contract (Cairo 0) already deployed on Testnet at the address:
+Here we will interact with a `test.cairo` contract (Cairo 1) already deployed in Sepolia Testnet at the address:
 
-- [0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd](https://testnet.starkscan.co/contract/0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd#read-contract)
+- [0x02d2a4804f83c34227314dba41d5c2f8a546a500d34e30bb5078fd36b5af2d77](https://sepolia.starkscan.co/contract/0x02d2a4804f83c34227314dba41d5c2f8a546a500d34e30bb5078fd36b5af2d77)
 
 This contract contains a storage variable called `balance`.
 
-- It can be read with the `@view function: get_balance()`
-- Balance can be modified with the `@external function: increase_balance(amount1: felt, amount2: felt)`
+- It can be read with the `fn get_balance(self: @TContractState) -> felt252;`
+- Balance can be modified with `fn increase_balance(ref self: TContractState, amount: felt252);`
 
 ```typescript
 import { RpcProvider, Contract, Account, ec, json } from "starknet";
@@ -35,10 +35,10 @@ To read the balance, you need to connect an RpcProvider and a Contract.
 You have to call Starknet, with the use of the meta-class method: `contract.function_name(params)` (here `params` is not necessary, because there are no parameters for the `get_balance` function).
 
 ```typescript
-//initialize provider
+//initialize provider with a Sepolia Testnet node
 const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
-// Connect the deployed Test contract in Testnet
-const testAddress = "0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd";
+// Connect the deployed Test contract in Sepolia Testnet
+const testAddress = "0x02d2a4804f83c34227314dba41d5c2f8a546a500d34e30bb5078fd36b5af2d77";
 
 // read abi of Test contract
 const { abi: testAbi } = await provider.getClassAt(testAddress);
@@ -47,8 +47,9 @@ const myTestContract = new Contract(testAbi, testAddress, provider);
 
 // Interaction with the contract with call
 const bal1 = await myTestContract.get_balance();
-console.log("Initial balance =", bal1.res.toString()); // .res because the return value is called 'res' in the Cairo 0 contract.
-// With Cairo 1 contract, the result value is in bal1, as bigint.
+console.log("Initial balance =", bal1); // Cairo 1 contract
+// With Cairo 0 contract, `bal1.res.toString()` because the return value is called 'res' in the Cairo 0 contract.
+// With Cairo 1 contract, the result value is in `bal1`, as bigint.
 ```
 
 ## ✍️ Write to contract memory, with meta-class
@@ -62,17 +63,16 @@ You have to invoke Starknet, with the use of the meta-class method: `contract.fu
 Here is an example of how to increase and check the balance:
 
 ```typescript
-//initialize provider
+//initialize provider with a Sepolia Testnet node
 const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 // connect your account. To adapt to your own account:
 const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
 const account0Address = "0x123....789";
 
 const account0 = new Account(provider, account0Address, privateKey0);
-// add ,"1" after privateKey0 if this account is not a Cairo 0 contract
 
 // Connect the deployed Test contract in Testnet
-const testAddress = "0x5f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd";
+const testAddress = "0x02d2a4804f83c34227314dba41d5c2f8a546a500d34e30bb5078fd36b5af2d77";
 
 // read abi of Test contract
 const { abi: testAbi } = await provider.getClassAt(testAddress);
@@ -84,17 +84,88 @@ myTestContract.connect(account0);
 
 // Interactions with the contract with meta-class
 const bal1 = await myTestContract.get_balance();
-console.log("Initial balance =", bal1.res.toString()); // Cairo 0 contract
-// increase_balance needs 2 felts, to add them to the balance.
-const myCall = myTestContract.populate("increase_balance", [10, 30]);
+console.log("Initial balance =", bal1); // Cairo 1 contract
+const myCall = myTestContract.populate("increase_balance", [10]);
 const res = await myTestContract.increase_balance(myCall.calldata);
 await provider.waitForTransaction(res.transaction_hash);
 
 const bal2 = await myTestContract.get_balance();
-console.log("Final balance =", bal2.res.toString());
+console.log("Final balance =", bal2);
 ```
 
 `Contract.populate()` is the recommended method to define the parameters to call/invoke the Cairo functions.
+
+## ✍️ Send a V3 transaction, paying fees with STRK
+
+We have seen in the previous chapter how to send a "legacy" transaction, with fees paid in ETH.  
+You can also send transactions and pay the fees with the STRK token. It is called a V3 transaction.  
+To perform a such transaction, you needs :
+
+- an account compatible with V3 transactions.
+- Some STRK tokens in this account.
+- a node with a rpc spec 0.6.0.
+- Starknet.js v6.
+
+You have to initialize the account this way :
+
+```typescript
+const account0 = new Account(provider, accountAddress0, privateKey0, undefined, constants.TRANSACTION_VERSION.V3);
+```
+
+By this way, all the transactions sent by this account are by default performed in V3 (paid with STRK). If the transactionVersion parameter is omitted, "legacy" transactions will be performed.
+
+One example of V3 transaction, using account.execute :
+
+```typescript
+const myCall = myTestContract.populate("test_fail", [100]);
+const maxQtyGasAuthorized = 1800n; // max quantity of gas authorized
+const maxPriceAuthorizeForOneGas = 12n * 10n ** 9n; // max FRI authorized to pay 1 gas (1 FRI=10**-18 STRK)
+console.log("max authorized cost =", maxQtyGasAuthorized * maxPriceAuthorizeForOneGas, "FRI");
+const { transaction_hash: txH } = await account0.execute(myCall,
+    undefined, {
+    version: 3,
+    maxFee: 10 ** 15,
+    feeDataAvailabilityMode: RPC.EDataAvailabilityMode.L1,
+    tip: 10 ** 13,
+    paymasterData: [],
+    resourceBounds: {
+        l1_gas: {
+            max_amount: num.toHex(maxQtyGasAuthorized),
+            max_price_per_unit: num.toHex(maxPriceAuthorizeForOneGas)
+        },
+        l2_gas: {
+            max_amount: num.toHex(0),
+            max_price_per_unit: num.toHex(0)
+        }
+    }
+}
+);
+const txR = await provider.waitForTransaction(txH);
+console.log("Paid fee =", txR.actual_fee);
+```
+
+Yes, it's much more complicated. Let's see in detail.  
+In fact, Starknet v0.13.0 is using few of these parameters :  
+`feeDataAvailabilityMode: RPC.EDataAvailabilityMode.L2` is not yet accepted.  
+`feeDataAvailabilityMode: RPC.EDataAvailabilityMode.L1` is accepted.  
+`maxFee : 10**15` : value not taken into account in V3  
+`tip: 10**13` : value not yet taken into account  
+`paymasterData: []` : only empty value currently authorized
+
+```typescript
+l1_gas: {
+      max_amount: num.toHex(2000n),  // max quantity of gas authorized
+    max_price_per_unit: num.toHex(12n * 10n ** 9n) // max FRI authorized to pay 1 gas (here 12 G FRI)
+},
+l2_gas: {
+    max_amount: num.toHex(0), // currently set to 0
+    max_price_per_unit: num.toHex(0) // currently set to 0
+}
+```
+
+Take care that these gas values have to be `string` type.  
+In future versions, Starknet will uses all these parameters.  
+The `version` parameter is optional (account settings by default), and overtakes the `transactionVersion` parameter of the Account instantiation. Here, it's not really necessary to use this parameter, as the same transaction version has been already initialized in the account instantiation.
 
 ## Sending sequential transactions
 

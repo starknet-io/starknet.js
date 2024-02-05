@@ -43,7 +43,6 @@ const provider = new RpcProvider({ baseUrl: "http://127.0.0.1:5050/rpc" });
 const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
 const account0Address: string = "0x123....789";
 const account0 = new Account(provider, account0Address, privateKey0);
-// add ,"1" after privateKey0 if this account is not a Cairo 0 contract
 
 // Declare & deploy Test contract in devnet
 const compiledTestSierra = json.parse(fs.readFileSync( "./compiledContracts/test.sierra").toString( "ascii"));
@@ -68,7 +67,6 @@ const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
 const account0Address: string = "0x123....789";
 
 const account0 = new Account(provider, account0Address, privateKey0);
-// add ,"1" after privateKey0 if this account is not a Cairo 0 contract
 
 // Deploy Test contract in devnet
 // ClassHash of the already declared contract
@@ -154,7 +152,7 @@ Properties have to be ordered in conformity with the abi.
 Even easier:
 
 ```typescript
-const contractConstructor: Calldata = CallData.compile(['niceToken', "http://addressOfMyERC721pictures/image1.jpg", myArray1]); // // for Cairo v2.4.0 onwards
+const contractConstructor: Calldata = CallData.compile(['niceToken', "http://addressOfMyERC721pictures/image1.jpg", myArray1]); // for Cairo v2.4.0 onwards
 ```
 
 ## `declare()` for a new class
@@ -169,7 +167,6 @@ const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
 const account0Address: string = "0x123....789";
 
 const account0 = new Account(provider, account0Address, privateKey0);
-// add ,"1" after privateKey0 if this account is not a Cairo 0 contract
 
 // Declare Test contract in devnet
 const compiledTestSierra = json.parse(fs.readFileSync( "./compiledContracts/test.sierra").toString("ascii"));
@@ -179,3 +176,5 @@ console.log('Test Contract declared with classHash =', declareResponse.class_has
 await provider.waitForTransaction(declareResponse.transaction_hash);
 console.log("✅ Test Completed.");
 ```
+
+> If the class is already declared, `declare()` will fail. You can also use `declareIfNot()` to not fail in this case.

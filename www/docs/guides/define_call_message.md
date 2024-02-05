@@ -21,8 +21,8 @@ Cairo has 2 versions, involving 2 types of data:
 
 - **Cairo 0**: here, everything is felt, an integer on 251 bits.  
   Available: array, struct, tuple, named tuple, or a mix of these elements.
-- **Cairo 1**: with plethora of literal types: u8, u16, u32, usize, u64, u128, felt252, u256, bool, address.  
-  Available: array, struct, tuple, or a mix of these elements.
+- **Cairo 1**: with plethora of literal types: u8, u16, u32, usize, u64, u128, felt252, u256, bool, address, eth address, classHash.  
+  Available: array, struct, tuple, bytes31, byteArray, enums or a mix of these elements.
 
 Starknet.js is compatible with both versions.
 
