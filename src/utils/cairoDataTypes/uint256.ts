@@ -71,7 +71,7 @@ export class CairoUint256 {
     const bigIntLow = BigInt(low);
     const bigIntHigh = BigInt(high);
     if (bigIntLow < UINT_256_LOW_MIN || bigIntLow > UINT_256_LOW_MAX) {
-      throw new Error('low is our of range UINT_256_LOW_MIN - UINT_256_LOW_MAX');
+      throw new Error('low is out of range UINT_256_LOW_MIN - UINT_256_LOW_MAX');
     }
     if (bigIntHigh < UINT_256_HIGH_MIN || bigIntHigh > UINT_256_HIGH_MAX) {
       throw new Error('high is our of range UINT_256_HIGH_MIN - UINT_256_HIGH_MAX');
