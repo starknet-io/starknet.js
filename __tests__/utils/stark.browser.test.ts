@@ -26,7 +26,7 @@ describe('compressProgram()', () => {
   const { stark } = require('../../src'); // eslint-disable-line global-require
 
   // eslint-disable-next-line global-require
-  const fixtures = require('../fixtures');
+  const fixtures = require('../config/fixtures');
   const compiledAccount = fixtures.compiledOpenZeppelinAccount;
 
   test('compresses a contract program', () => {

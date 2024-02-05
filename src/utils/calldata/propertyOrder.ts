@@ -1,16 +1,17 @@
 import { AbiEntry, AbiEnums, AbiStructs, CairoEnum, RawArgsObject } from '../../types';
+import { CairoUint256 } from '../cairoDataTypes/uint256';
 import {
   getArrayType,
   isCairo1Type,
   isLen,
   isTypeArray,
+  isTypeByteArray,
   isTypeEnum,
   isTypeEthAddress,
   isTypeOption,
   isTypeResult,
   isTypeStruct,
   isTypeTuple,
-  isTypeUint256,
 } from './cairo';
 import {
   CairoCustomEnum,
@@ -47,7 +48,10 @@ export default function orderPropsByAbi(
     if (isTypeEthAddress(abiType)) {
       return unorderedItem;
     }
-    if (isTypeUint256(abiType)) {
+    if (isTypeByteArray(abiType)) {
+      return unorderedItem;
+    }
+    if (CairoUint256.isAbiType(abiType)) {
       const u256 = unorderedItem;
       if (typeof u256 !== 'object') {
         // BigNumberish --> just copy

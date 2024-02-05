@@ -2,10 +2,11 @@ import {
   BigNumberish,
   Contract,
   ContractFactory,
+  GetTransactionReceiptResponse,
   ParsedEvents,
   RawArgs,
-  SuccessfulTransactionReceiptResponse,
   json,
+  shortString,
   stark,
 } from '../src';
 import { CallData } from '../src/utils/calldata';
@@ -22,8 +23,8 @@ import {
   describeIfDevnet,
   getTestAccount,
   getTestProvider,
-} from './fixtures';
-import { initializeMatcher } from './schema';
+} from './config/fixtures';
+import { initializeMatcher } from './config/schema';
 
 describe('contract module', () => {
   let erc20Address: string;
@@ -463,7 +464,9 @@ describe('Complex interaction', () => {
     const request = {
       t1: 'demo text1',
       n1: 123,
-      tl2: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+      tl2: shortString.splitLongString(
+        'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
+      ),
       k1: [{ a: 1, b: { b: 2, c: tuple(3, 4, 5, 6) } }],
       k2: {
         // named tuple
@@ -573,6 +576,7 @@ describe('Complex interaction', () => {
         ...request,
         u1: uint256ToBN(request.u1),
         au1: request.au1.map((it) => uint256ToBN(it)),
+        tl2: request.tl2.join(''),
       };
       expect(json.stringify(compareRequest)).toBe(json.stringify(result));
       expect(json.stringify(compareRequest)).toBe(json.stringify(result2));
@@ -585,7 +589,9 @@ describe('Complex interaction', () => {
         t1: 'demo text1',
         n1: 123,
         k1: [{ a: 1, b: { b: 2, c: tuple(3, 4, 5, 6) } }], // not ordered
-        tl2: 'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.',
+        tl2: shortString.splitLongString(
+          'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.'
+        ),
         k2: {
           // named tuple
           t1: 1,
@@ -789,7 +795,7 @@ describe('Complex interaction', () => {
     test('invoke compiled data', async () => {
       const result = await erc20Echo20Contract.iecho(CallData.compile(request));
       const transaction = await provider.waitForTransaction(result.transaction_hash);
-      expect((transaction as SuccessfulTransactionReceiptResponse).execution_status).toBeDefined();
+      expect((transaction as GetTransactionReceiptResponse).execution_status).toBeDefined();
     });
 
     // skip on live for performance
@@ -799,19 +805,19 @@ describe('Complex interaction', () => {
 
       const result = await erc20Echo20Contract.iecho(calldata);
       const transaction = await provider.waitForTransaction(result.transaction_hash);
-      expect((transaction as SuccessfulTransactionReceiptResponse).execution_status).toBeDefined();
+      expect((transaction as GetTransactionReceiptResponse).execution_status).toBeDefined();
 
       const result1 = await erc20Echo20Contract.iecho(...args);
       const transaction1 = await provider.waitForTransaction(result1.transaction_hash);
-      expect((transaction1 as SuccessfulTransactionReceiptResponse).execution_status).toBeDefined();
+      expect((transaction1 as GetTransactionReceiptResponse).execution_status).toBeDefined();
 
       const result2 = await erc20Echo20Contract.invoke('iecho', calldata);
       const transaction2 = await provider.waitForTransaction(result2.transaction_hash);
-      expect((transaction2 as SuccessfulTransactionReceiptResponse).execution_status).toBeDefined();
+      expect((transaction2 as GetTransactionReceiptResponse).execution_status).toBeDefined();
 
       const result3 = await erc20Echo20Contract.invoke('iecho', args);
       const transaction3 = await provider.waitForTransaction(result3.transaction_hash);
-      expect((transaction3 as SuccessfulTransactionReceiptResponse).execution_status).toBeDefined();
+      expect((transaction3 as GetTransactionReceiptResponse).execution_status).toBeDefined();
     });
 
     describe('speedup live tests', () => {
@@ -842,6 +848,7 @@ describe('Complex interaction', () => {
           ...request,
           u1: uint256ToBN(request.u1),
           au1: request.au1.map((it) => uint256ToBN(it)),
+          tl2: request.tl2.join(''),
         };
         expect(json.stringify(result)).toBe(json.stringify(compareRequest));
       });
@@ -864,9 +871,7 @@ describe('Complex interaction', () => {
           { formatResponse }
         );
         const transaction = await provider.waitForTransaction(result.transaction_hash);
-        expect(
-          (transaction as SuccessfulTransactionReceiptResponse).execution_status
-        ).toBeDefined();
+        expect((transaction as GetTransactionReceiptResponse).execution_status).toBeDefined();
       });
     });
 
@@ -901,6 +906,7 @@ describe('Complex interaction', () => {
         ...request,
         u1: uint256ToBN(request.u1),
         au1: request.au1.map((it) => uint256ToBN(it)),
+        tl2: request.tl2.join(''),
       };
       expect(json.stringify(compareRequest)).toBe(json.stringify(result));
     });

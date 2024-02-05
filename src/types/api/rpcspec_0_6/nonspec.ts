@@ -12,9 +12,12 @@ import {
   CONTRACT_CLASS,
   CONTRACT_STORAGE_DIFF_ITEM,
   DEPRECATED_CONTRACT_CLASS,
+  EMITTED_EVENT,
+  EVENT,
   EVENTS_CHUNK,
   EVENT_FILTER,
   FEE_ESTIMATE,
+  FEE_PAYMENT,
   FELT,
   MSG_FROM_L1,
   NONCE_UPDATE,
@@ -22,7 +25,9 @@ import {
   PENDING_BLOCK_WITH_TX_HASHES,
   PENDING_STATE_UPDATE,
   PENDING_TXN_RECEIPT,
+  PRICE_UNIT,
   REPLACED_CLASS,
+  RESOURCE_BOUNDS_MAPPING,
   RESULT_PAGE_REQUEST,
   SIMULATION_FLAG,
   STATE_UPDATE,
@@ -39,10 +44,11 @@ import {
 // response starknet_getClass
 export type ContractClass = CONTRACT_CLASS | DEPRECATED_CONTRACT_CLASS;
 // response starknet_simulateTransactions
-export type SimulateTransactionResponse = {
+export type SimulateTransaction = {
   transaction_trace: TRANSACTION_TRACE;
   fee_estimation: FEE_ESTIMATE;
-}[];
+};
+export type SimulateTransactionResponse = SimulateTransaction[];
 // response starknet_estimateFee
 export type FeeEstimate = FEE_ESTIMATE;
 // response starknet_getTransactionByHash, starknet_getTransactionByBlockIdAndIndex
@@ -61,6 +67,8 @@ export type BlockTransactionsTraces = { transaction_hash: FELT; trace_root: TRAN
 export type Syncing = false | SYNC_STATUS;
 // response starknet_getEvents
 export type Events = EVENTS_CHUNK;
+export type EmittedEvent = EMITTED_EVENT;
+export type Event = EVENT;
 // response starknet_addInvokeTransaction
 export type InvokedTransaction = { transaction_hash: TXN_HASH };
 // response starknet_addDeclareTransaction
@@ -76,6 +84,8 @@ export type TransactionHash = TXN_HASH;
 export type TransactionTrace = TRANSACTION_TRACE;
 export type BlockHash = BLOCK_HASH;
 export type TransactionReceipt = TXN_RECEIPT | PENDING_TXN_RECEIPT;
+export type Receipt = TXN_RECEIPT;
+export type PendingReceipt = PENDING_TXN_RECEIPT;
 export type EventFilter = EVENT_FILTER & RESULT_PAGE_REQUEST;
 export type SimulationFlags = Array<SIMULATION_FLAG>;
 export type L1Message = MSG_FROM_L1;
@@ -86,6 +96,9 @@ export type TransactionStatus = {
   finality_status: TXN_STATUS;
   execution_status?: TXN_EXECUTION_STATUS;
 };
+export type ResourceBounds = RESOURCE_BOUNDS_MAPPING;
+export type FeePayment = FEE_PAYMENT;
+export type PriceUnit = PRICE_UNIT;
 
 // Diff Than Seq
 export type StorageDiffs = Array<CONTRACT_STORAGE_DIFF_ITEM>;
@@ -128,7 +141,49 @@ export enum EBlockTag {
   PENDING = 'pending',
 }
 
+// 'L1' | 'L2'
 export enum EDataAvailabilityMode {
   L1 = 'L1',
   L2 = 'L2',
+}
+
+// 0 | 1
+export enum EDAMode {
+  L1,
+  L2,
+}
+
+/**
+ * V_ Transaction versions HexString
+ * F_ Fee Transaction Versions HexString (2 ** 128 + TRANSACTION_VERSION)
+ */
+export enum ETransactionVersion {
+  V0 = '0x0',
+  V1 = '0x1',
+  V2 = '0x2',
+  V3 = '0x3',
+  F0 = '0x100000000000000000000000000000000',
+  F1 = '0x100000000000000000000000000000001',
+  F2 = '0x100000000000000000000000000000002',
+  F3 = '0x100000000000000000000000000000003',
+}
+
+/**
+ * Old Transaction Versions
+ */
+export enum ETransactionVersion2 {
+  V0 = '0x0',
+  V1 = '0x1',
+  V2 = '0x2',
+  F0 = '0x100000000000000000000000000000000',
+  F1 = '0x100000000000000000000000000000001',
+  F2 = '0x100000000000000000000000000000002',
+}
+
+/**
+ * V3 Transaction Versions
+ */
+export enum ETransactionVersion3 {
+  V3 = '0x3',
+  F3 = '0x100000000000000000000000000000003',
 }

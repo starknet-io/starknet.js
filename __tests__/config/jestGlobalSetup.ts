@@ -5,7 +5,7 @@
  * ref: order of execution jestGlobalSetup.ts -> jest.setup.ts -> fixtures.ts
  */
 
-import { BaseUrl } from '../src/constants';
+import { BaseUrl } from '../../src/constants';
 
 type DevnetStrategy = {
   isDevnet: boolean;
@@ -190,6 +190,7 @@ const verifySetup = (final?: boolean) => {
     INITIAL_BALANCE: process.env.INITIAL_BALANCE,
     TEST_PROVIDER_BASE_URL: process.env.TEST_PROVIDER_BASE_URL,
     TEST_RPC_URL: process.env.TEST_RPC_URL,
+    TX_VERSION: process.env.TX_VERSION === 'v3' ? 'v3' : 'v2',
   });
 
   console.table({

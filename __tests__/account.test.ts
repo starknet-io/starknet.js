@@ -3,10 +3,10 @@ import {
   Account,
   Contract,
   DeclareDeployUDCResponse,
-  DeployTransactionReceiptResponse,
   Provider,
   TransactionType,
   cairo,
+  constants,
   contractClassResponseToLegacyCompiledContract,
   ec,
   extractContractHashes,
@@ -17,6 +17,7 @@ import {
   stark,
 } from '../src';
 import {
+  TEST_TX_VERSION,
   compiledErc20,
   compiledHelloSierra,
   compiledHelloSierraCasm,
@@ -29,8 +30,8 @@ import {
   erc20ClassHash,
   getTestAccount,
   getTestProvider,
-} from './fixtures';
-import { initializeMatcher } from './schema';
+} from './config/fixtures';
+import { initializeMatcher } from './config/schema';
 
 const { cleanHex, hexToDecimalString, toBigInt, toHex } = num;
 const { encodeShortString } = shortString;
@@ -95,7 +96,9 @@ describe('deploy and test Wallet', () => {
     });
 
     expect(result).toMatchSchemaRef('EstimateFee');
-    expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(hash.feeTransactionVersion);
+    expect([constants.TRANSACTION_VERSION.F1, constants.TRANSACTION_VERSION.F3]).toContain(
+      innerInvokeEstFeeSpy.mock.calls[0][1].version
+    );
     innerInvokeEstFeeSpy.mockClear();
   });
 
@@ -137,7 +140,13 @@ describe('deploy and test Wallet', () => {
       await account.waitForTransaction(transaction_hash);
 
       // deploy account
-      const accountOZ = new Account(provider, tobeAccountAddress, priKey);
+      const accountOZ = new Account(
+        provider,
+        tobeAccountAddress,
+        priKey,
+        undefined,
+        TEST_TX_VERSION
+      );
       const deployed = await accountOZ.deploySelf({
         classHash: accountClassHash,
         constructorCalldata: calldata,
@@ -390,7 +399,7 @@ describe('deploy and test Wallet', () => {
     expect(toBigInt(response.number as string).toString()).toStrictEqual('57');
   });
 
-  test('sign and verify offchain message fail', async () => {
+  test('sign and verify EIP712 message fail', async () => {
     const signature = await account.signMessage(typedDataExample);
     const [r, s] = stark.formatSignature(signature);
 
@@ -401,12 +410,17 @@ describe('deploy and test Wallet', () => {
 
     if (!signature2) return;
 
-    expect(await account.verifyMessage(typedDataExample, signature2)).toBe(false);
+    const verifMessageResponse: boolean = await account.verifyMessage(typedDataExample, signature2);
+    expect(verifMessageResponse).toBe(false);
+
+    const wrongAccount = new Account(provider, '0x037891', '0x026789', undefined, TEST_TX_VERSION); // non existing account
+    await expect(wrongAccount.verifyMessage(typedDataExample, signature2)).rejects.toThrow();
   });
 
-  test('sign and verify offchain message', async () => {
+  test('sign and verify message', async () => {
     const signature = await account.signMessage(typedDataExample);
-    expect(await account.verifyMessage(typedDataExample, signature)).toBe(true);
+    const verifMessageResponse: boolean = await account.verifyMessage(typedDataExample, signature);
+    expect(verifMessageResponse).toBe(true);
   });
 
   describe('Contract interaction with Account', () => {
@@ -559,7 +573,7 @@ describe('deploy and test Wallet', () => {
 
       // check pre-calculated address
       const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
-      const udcEvent = parseUDCEvent(txReceipt as DeployTransactionReceiptResponse);
+      const udcEvent = parseUDCEvent(txReceipt as any); // todo: when time fix types
       expect(cleanHex(deployment.contract_address[0])).toBe(cleanHex(udcEvent.contract_address));
     });
 
@@ -580,7 +594,7 @@ describe('deploy and test Wallet', () => {
 
       // check pre-calculated address
       const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
-      const udcEvent = parseUDCEvent(txReceipt as DeployTransactionReceiptResponse);
+      const udcEvent = parseUDCEvent(txReceipt as any); // todo: when time fix types
       expect(cleanHex(deployment.contract_address[0])).toBe(cleanHex(udcEvent.contract_address));
     });
 

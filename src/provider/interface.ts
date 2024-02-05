@@ -1,7 +1,9 @@
+import { RpcChannel } from '../channel/rpc_0_6';
 import { StarknetChainId } from '../constants';
 import type {
   AccountInvocations,
   BigNumberish,
+  Block,
   BlockIdentifier,
   Call,
   CallContractResponse,
@@ -15,13 +17,13 @@ import type {
   EstimateFeeResponse,
   EstimateFeeResponseBulk,
   GetBlockResponse,
-  GetCodeResponse,
   GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
   InvocationsDetailsWithNonce,
   InvokeFunctionResponse,
   Nonce,
+  PendingBlock,
   SimulateTransactionResponse,
   StateUpdateResponse,
   Storage,
@@ -32,6 +34,8 @@ import type {
 } from '../types';
 
 export abstract class ProviderInterface {
+  public abstract channel: RpcChannel;
+
   /**
    * Gets the Starknet chain Id
    *
@@ -57,15 +61,10 @@ export abstract class ProviderInterface {
    * @param blockIdentifier block identifier
    * @returns the block object
    */
+  public abstract getBlock(): Promise<PendingBlock>;
+  public abstract getBlock(blockIdentifier: 'pending'): Promise<PendingBlock>;
+  public abstract getBlock(blockIdentifier: 'latest'): Promise<Block>;
   public abstract getBlock(blockIdentifier: BlockIdentifier): Promise<GetBlockResponse>;
-
-  /**
-   * @deprecated The method should not be used
-   */
-  public abstract getCode(
-    contractAddress: string,
-    blockIdentifier?: BlockIdentifier
-  ): Promise<GetCodeResponse>;
 
   /**
    * Gets the contract class of the deployed contract.
@@ -212,7 +211,7 @@ export abstract class ProviderInterface {
   public abstract getEstimateFee(
     invocation: Invocation,
     details: InvocationsDetailsWithNonce,
-    blockIdentifier: BlockIdentifier,
+    blockIdentifier?: BlockIdentifier,
     skipValidate?: boolean
   ): Promise<EstimateFeeResponse>;
 
@@ -289,7 +288,6 @@ export abstract class ProviderInterface {
    * @param invocations AccountInvocations - Complete invocations array with account details
    * @param options getEstimateFeeBulkOptions
    * - (optional) blockIdentifier - BlockIdentifier
-   * - (optional) skipValidate - boolean (default false)
    * @returns the estimated fee
    */
   public abstract getEstimateFeeBulk(

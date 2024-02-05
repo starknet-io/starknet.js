@@ -31,11 +31,6 @@ export interface BLOCK_NOT_FOUND {
   message: 'Block not found';
 }
 
-export interface INVALID_TXN_HASH {
-  code: 25;
-  message: 'Invalid transaction hash';
-}
-
 export interface INVALID_BLOCK_HASH {
   code: 26;
   message: 'Invalid block hash';
@@ -84,6 +79,15 @@ export interface CONTRACT_ERROR {
   };
 }
 
+export interface TRANSACTION_EXECUTION_ERROR {
+  code: 41;
+  message: 'Transaction execution error';
+  data: {
+    transaction_index: number;
+    execution_error: string;
+  };
+}
+
 export interface CLASS_ALREADY_DECLARED {
   code: 51;
   message: 'Class already declared';
@@ -107,6 +111,7 @@ export interface INSUFFICIENT_ACCOUNT_BALANCE {
 export interface VALIDATION_FAILURE {
   code: 55;
   message: 'Account validation failed';
+  data: string;
 }
 
 export interface COMPILATION_FAILED {

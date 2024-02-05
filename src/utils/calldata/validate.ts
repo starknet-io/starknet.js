@@ -12,14 +12,16 @@ import {
   Uint,
 } from '../../types';
 import assert from '../assert';
+import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { isHex, toBigInt } from '../num';
 import { isLongText } from '../shortString';
-import { uint256ToBN } from '../uint256';
 import {
   getArrayType,
   isLen,
   isTypeArray,
   isTypeBool,
+  isTypeByteArray,
+  isTypeBytes31,
   isTypeEnum,
   isTypeFelt,
   isTypeLiteral,
@@ -44,6 +46,18 @@ const validateFelt = (parameter: any, input: AbiEntry) => {
   );
 };
 
+const validateBytes31 = (parameter: any, input: AbiEntry) => {
+  assert(typeof parameter === 'string', `Validate: arg ${input.name} should be a string.`);
+  assert(
+    parameter.length < 32,
+    `Validate: arg ${input.name} cairo typed ${input.type} should be a string of less than 32 characters.`
+  );
+};
+
+const validateByteArray = (parameter: any, input: AbiEntry) => {
+  assert(typeof parameter === 'string', `Validate: arg ${input.name} should be a string.`);
+};
+
 const validateUint = (parameter: any, input: AbiEntry) => {
   if (typeof parameter === 'number') {
     assert(
@@ -60,7 +74,8 @@ const validateUint = (parameter: any, input: AbiEntry) => {
       input.type
     } should be type (String, Number or BigInt), but is ${typeof parameter} ${parameter}.`
   );
-  const param = typeof parameter === 'object' ? uint256ToBN(parameter) : toBigInt(parameter);
+  const param =
+    typeof parameter === 'object' ? new CairoUint256(parameter).toBigInt() : toBigInt(parameter);
 
   switch (input.type) {
     case Uint.u8:
@@ -263,11 +278,17 @@ export default function validateFields(
       case isTypeFelt(input.type):
         validateFelt(parameter, input);
         break;
+      case isTypeBytes31(input.type):
+        validateBytes31(parameter, input);
+        break;
       case isTypeUint(input.type) || isTypeLiteral(input.type):
         validateUint(parameter, input);
         break;
       case isTypeBool(input.type):
         validateBool(parameter, input);
+        break;
+      case isTypeByteArray(input.type):
+        validateByteArray(parameter, input);
         break;
       case isTypeArray(input.type):
         validateArray(parameter, input, structs, enums);

@@ -1,11 +1,11 @@
 import ajvKeywords from 'ajv-keywords';
 import { matchersWithOptions } from 'jest-json-schema';
 
-import accountSchemas from './schemas/account.json';
-import libSchemas from './schemas/lib.json';
-import providerSchemas from './schemas/provider.json';
-import rpcSchemas from './schemas/rpc.json';
-import sequencerSchemas from './schemas/sequencer.json';
+import accountSchemas from '../schemas/account.json';
+import libSchemas from '../schemas/lib.json';
+import providerSchemas from '../schemas/provider.json';
+import rpcSchemas from '../schemas/rpc.json';
+import sequencerSchemas from '../schemas/sequencer.json';
 
 const schemas = [accountSchemas, sequencerSchemas, providerSchemas, libSchemas, rpcSchemas];
 const jestJsonMatchers = matchersWithOptions({ schemas }, (ajv: any) => {

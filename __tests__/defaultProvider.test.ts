@@ -1,4 +1,12 @@
-import { BlockNumber, CallData, GetBlockResponse, LibraryError, Provider, stark } from '../src';
+import {
+  BlockNumber,
+  CallData,
+  GetBlockResponse,
+  LibraryError,
+  Provider,
+  provider,
+  stark,
+} from '../src';
 import { toBigInt } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import {
@@ -7,8 +15,10 @@ import {
   getTestAccount,
   getTestProvider,
   wrongClassHash,
-} from './fixtures';
-import { initializeMatcher } from './schema';
+} from './config/fixtures';
+import { initializeMatcher } from './config/schema';
+
+const { isPendingStateUpdate } = provider;
 
 const testProvider = new Provider(getTestProvider());
 
@@ -73,12 +83,18 @@ describe('defaultProvider', () => {
 
       test(`getStateUpdate(blockHash=${exampleBlockHash}, blockNumber=undefined)`, async () => {
         const stateUpdate = await testProvider.getStateUpdate(exampleBlockHash);
+        if (isPendingStateUpdate(stateUpdate)) {
+          fail('exampleBlockHash is latest block, should not be pending');
+        }
         expect(stateUpdate.block_hash).toBe(exampleBlockHash);
         expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
       });
 
       test(`getStateUpdate(blockHash=undefined, blockNumber=${exampleBlockNumber})`, async () => {
         const stateUpdate = await testProvider.getStateUpdate(exampleBlockNumber);
+        if (isPendingStateUpdate(stateUpdate)) {
+          fail('exampleBlockHash is latest block, should not be pending');
+        }
         expect(stateUpdate.block_hash).toBe(exampleBlockHash);
         expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
       });
@@ -155,7 +171,7 @@ describe('defaultProvider', () => {
               }),
             })
             .then((res) => {
-              expect(Array.isArray(res.result)).toBe(true);
+              expect(Array.isArray(res)).toBe(true);
             })
         ).resolves.not.toThrow();
       });

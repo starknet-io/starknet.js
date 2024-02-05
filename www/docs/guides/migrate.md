@@ -2,6 +2,84 @@
 sidebar_position: 18
 ---
 
+# Migrate from v5 to v6
+
+This document only covers the features present in v5 which have changed in some significant way in v6.  
+If you encounter any missing changes, please let us know and we will update this guide.
+
+## Transaction response
+
+When you send a transaction, the response type has changed.  
+Previously, the response was just the transaction hash value. Now, the response is an object including many other data.  
+This has an impact on `provider.waitForTransaction()` :
+
+```typescript
+const response = await ethContract.approve(swapContractAddress, cairo.uint256(100000));
+// v5
+const transactionReceipt = await provider.waitForTransaction(response);
+
+// v6
+const transactionReceipt = await provider.waitForTransaction(response.transaction_hash);
+```
+
+## Long strings
+
+Starknet.js v6 is compatible with Cairo v2.4.0. It means that the long strings (>31 characters) are automatically handled and converted to the Cairo `ByteArray` type.
+So, the command to convert a long string to an array of felts (for Cairo 0 contracts for example) has changed :
+
+```typescript
+// v5
+const param: BigNumberish[] = CallData.compile("http://addressOfMyERC721pictures/storage/image1.jpg");
+// v6
+const param: BigNumberish[] = CallData.compile(shortString.splitLongString("http://addressOfMyERC721pictures/storage/image1.jpg"));
+```
+
+## Fees
+
+All functions related to gas price and estimation of fees have changed their output types.
+For example, if you read the content of a block, the ETH gasPrice was straightforward to read. With v6, it's now more nested :
+
+```typescript
+const resp: GetBlockResponse = await myProvider.getBlock("latest");
+// v5
+const gasPrice = resp.gas_price;
+// v6
+const gasPrice = resp.l1_gas_price.price_in_wei;
+```
+
+Other example for `estimateDeclareFee()`, where the object response has changed :
+
+```typescript
+const fee = await account0.estimateDeclareFee({ contract: compiledContract });
+// v5 response
+fee = {
+  overall_fee: 247700000000000n,
+  gas_consumed: 2477n,
+  gas_price: 100000000000n,
+  suggestedMaxFee: 371550000000000n
+}
+// v6 response
+fee = {
+  overall_fee: 247700000000000n,
+  gas_consumed: 2477n,
+  gas_price: 100000000000n,
+  unit: undefined,
+  suggestedMaxFee: 371550000000000n,
+  resourceBounds: {
+    l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
+    l1_gas: { max_amount: '0xaa4', max_price_per_unit: '0x22ecb25c00' }
+  }
+}
+```
+
+So you have to adapt your code to all these new entries. Globally, pay attention of all the result types of methods that returns a response from the node.
+
+<br />
+<br />
+<br />
+<hr>
+<hr>
+
 # Migrate from v4 to v5
 
 This document only covers the features present in v4 which have changed in some significant way in v5.

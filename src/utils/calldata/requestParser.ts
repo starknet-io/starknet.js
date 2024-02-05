@@ -3,23 +3,24 @@ import {
   AbiEnums,
   AbiStructs,
   BigNumberish,
+  ByteArray,
   CairoEnum,
   ParsedStruct,
   Tupled,
-  Uint256,
 } from '../../types';
-import { isText, splitLongString } from '../shortString';
+import { CairoUint256 } from '../cairoDataTypes/uint256';
+import { encodeShortString, isText, splitLongString } from '../shortString';
+import { byteArrayFromString } from './byteArray';
 import {
   felt,
   getArrayType,
   isTypeArray,
+  isTypeBytes31,
   isTypeEnum,
   isTypeOption,
   isTypeResult,
   isTypeStruct,
   isTypeTuple,
-  isTypeUint256,
-  uint256,
 } from './cairo';
 import {
   CairoCustomEnum,
@@ -38,10 +39,10 @@ import extractTupleMemberTypes from './tuple';
  */
 function parseBaseTypes(type: string, val: BigNumberish) {
   switch (true) {
-    case isTypeUint256(type):
-      // eslint-disable-next-line no-case-declarations
-      const el_uint256 = uint256(val);
-      return [felt(el_uint256.low), felt(el_uint256.high)];
+    case CairoUint256.isAbiType(type):
+      return new CairoUint256(val).toApiRequest();
+    case isTypeBytes31(type):
+      return encodeShortString(val.toString());
     default:
       return felt(val);
   }
@@ -73,13 +74,14 @@ function parseTuple(element: object, typeStr: string): Tupled[] {
   });
 }
 
-function parseUint256(element: object | BigNumberish) {
-  if (typeof element === 'object') {
-    const { low, high } = element as Uint256;
-    return [felt(low as BigNumberish), felt(high as BigNumberish)];
-  }
-  const el_uint256 = uint256(element);
-  return [felt(el_uint256.low), felt(el_uint256.high)];
+function parseByteArray(element: string): string[] {
+  const myByteArray: ByteArray = byteArrayFromString(element);
+  return [
+    myByteArray.data.length.toString(),
+    ...myByteArray.data.map((bn) => bn.toString()),
+    myByteArray.pending_word.toString(),
+    myByteArray.pending_word_len.toString(),
+  ];
 }
 
 /**
@@ -120,12 +122,14 @@ function parseCalldataValue(
 
   // checking if the passed element is struct
   if (structs[type] && structs[type].members.length) {
-    if (isTypeUint256(type)) {
-      return parseUint256(element);
+    if (CairoUint256.isAbiType(type)) {
+      return new CairoUint256(element as any).toApiRequest();
     }
 
     if (type === 'core::starknet::eth_address::EthAddress')
       return parseBaseTypes(type, element as BigNumberish);
+
+    if (type === 'core::byte_array::ByteArray') return parseByteArray(element as string);
 
     const { members } = structs[type];
     const subElement = element as any;
@@ -144,8 +148,8 @@ function parseCalldataValue(
     }, [] as string[]);
   }
   // check if u256 C1v0
-  if (isTypeUint256(type)) {
-    return parseUint256(element);
+  if (CairoUint256.isAbiType(type)) {
+    return new CairoUint256(element as any).toApiRequest();
   }
   // check if Enum
   if (isTypeEnum(type, enums)) {
@@ -271,7 +275,7 @@ export function parseCalldataField(
     case type === 'core::starknet::eth_address::EthAddress':
       return parseBaseTypes(type, value);
     // Struct or Tuple
-    case isTypeStruct(type, structs) || isTypeTuple(type) || isTypeUint256(type):
+    case isTypeStruct(type, structs) || isTypeTuple(type) || CairoUint256.isAbiType(type):
       return parseCalldataValue(value as ParsedStruct | BigNumberish[], type, structs, enums);
 
     // Enums

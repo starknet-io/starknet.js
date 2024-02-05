@@ -1,28 +1,29 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { Account, ProviderInterface, RpcProvider, SequencerProvider, json } from '../src';
+import { Account, Provider, ProviderInterface, RpcProvider, json } from '../../src';
 import {
   CompiledSierra,
   CompiledSierraCasm,
   LegacyCompiledContract,
   waitForTransactionOptions,
-} from '../src/types';
-import { toHex } from '../src/utils/num';
+} from '../../src/types';
+import { ETransactionVersion } from '../../src/types/api';
+import { toHex } from '../../src/utils/num';
 
 const readContract = (name: string): LegacyCompiledContract =>
   json.parse(
-    fs.readFileSync(path.resolve(__dirname, `../__mocks__/${name}.json`)).toString('ascii')
+    fs.readFileSync(path.resolve(__dirname, `../../__mocks__/${name}.json`)).toString('ascii')
   );
 
 const readContractSierraCasm = (name: string): CompiledSierraCasm =>
   json.parse(
-    fs.readFileSync(path.resolve(__dirname, `../__mocks__/${name}.casm`)).toString('ascii')
+    fs.readFileSync(path.resolve(__dirname, `../../__mocks__/${name}.casm`)).toString('ascii')
   );
 
 const readContractSierra = (name: string): CompiledSierra =>
   json.parse(
-    fs.readFileSync(path.resolve(__dirname, `../__mocks__/${name}.json`)).toString('ascii')
+    fs.readFileSync(path.resolve(__dirname, `../../__mocks__/${name}.json`)).toString('ascii')
   );
 
 export const compiledOpenZeppelinAccount = readContract('Account');
@@ -45,11 +46,15 @@ export const compiledC1v2 = readContractSierra('cairo/helloCairo2/compiled');
 export const compiledC1v2Casm = readContractSierraCasm('cairo/helloCairo2/compiled');
 export const compiledC210 = readContractSierra('cairo/cairo210/cairo210.sierra');
 export const compiledC210Casm = readContractSierraCasm('cairo/cairo210/cairo210');
+export const compiledC240 = readContractSierra('cairo/cairo240/string.sierra');
+export const compiledC240Casm = readContractSierraCasm('cairo/cairo240/string');
 
-export const getTestProvider = (): ProviderInterface => {
-  const provider = process.env.TEST_RPC_URL
-    ? new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL })
-    : new SequencerProvider({ baseUrl: process.env.TEST_PROVIDER_BASE_URL || '' });
+export function getTestProvider(isProvider?: true): ProviderInterface;
+export function getTestProvider(isProvider?: false): RpcProvider;
+export function getTestProvider(isProvider: boolean = true): ProviderInterface | RpcProvider {
+  const provider = isProvider
+    ? new Provider({ nodeUrl: process.env.TEST_RPC_URL })
+    : new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL });
 
   if (process.env.IS_LOCALHOST_DEVNET === 'true') {
     // accelerate the tests when running locally
@@ -60,13 +65,17 @@ export const getTestProvider = (): ProviderInterface => {
   }
 
   return provider;
-};
+}
+
+export const TEST_TX_VERSION = process.env.TX_VERSION === 'v3' ? ETransactionVersion.V3 : undefined;
 
 export const getTestAccount = (provider: ProviderInterface) => {
   return new Account(
     provider,
     toHex(process.env.TEST_ACCOUNT_ADDRESS || ''),
-    process.env.TEST_ACCOUNT_PRIVATE_KEY || ''
+    process.env.TEST_ACCOUNT_PRIVATE_KEY || '',
+    undefined,
+    TEST_TX_VERSION
   );
 };
 

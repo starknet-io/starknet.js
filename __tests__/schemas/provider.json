@@ -203,7 +203,16 @@
           ]
         },
         "actual_fee": {
-          "type": "string"
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "string"
+            },
+            "unit": {
+              "type": "string",
+              "enum": ["WEI", "FRI"]
+            }
+          }
         },
         "status_data": {
           "type": "string"
