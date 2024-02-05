@@ -12,9 +12,9 @@ import {
   Uint,
 } from '../../types';
 import assert from '../assert';
+import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { isHex, toBigInt } from '../num';
 import { isLongText } from '../shortString';
-import { uint256ToBN } from '../uint256';
 import {
   getArrayType,
   isLen,
@@ -74,7 +74,8 @@ const validateUint = (parameter: any, input: AbiEntry) => {
       input.type
     } should be type (String, Number or BigInt), but is ${typeof parameter} ${parameter}.`
   );
-  const param = typeof parameter === 'object' ? uint256ToBN(parameter) : toBigInt(parameter);
+  const param =
+    typeof parameter === 'object' ? new CairoUint256(parameter).toBigInt() : toBigInt(parameter);
 
   switch (input.type) {
     case Uint.u8:

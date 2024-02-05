@@ -8,9 +8,8 @@ import {
   Uint,
   Uint256,
 } from '../../types';
-import { isBigInt, isHex, isStringWholeNumber } from '../num';
-import { encodeShortString, isShortString, isText } from '../shortString';
-import { UINT_128_MAX, isUint256 } from '../uint256';
+import { CairoFelt } from '../cairoDataTypes/felt';
+import { CairoUint256 } from '../cairoDataTypes/uint256';
 
 // Intended for internal usage, maybe should be exported somewhere else and not exported to utils
 export const isLen = (name: string) => /_len$/.test(name);
@@ -26,8 +25,9 @@ export const isTypeEnum = (type: string, enums: AbiEnums) => type in enums;
 export const isTypeOption = (type: string) => type.startsWith('core::option::Option::');
 export const isTypeResult = (type: string) => type.startsWith('core::result::Result::');
 export const isTypeUint = (type: string) => Object.values(Uint).includes(type as Uint);
+// Legacy Export
+export const isTypeUint256 = (type: string) => CairoUint256.isAbiType(type);
 export const isTypeLiteral = (type: string) => Object.values(Literal).includes(type as Literal);
-export const isTypeUint256 = (type: string) => type === 'core::integer::u256';
 export const isTypeBool = (type: string) => type === 'core::bool';
 export const isTypeContractAddress = (type: string) =>
   type === 'core::starknet::contract_address::ContractAddress';
@@ -101,14 +101,7 @@ export function getAbiContractVersion(abi: Abi): ContractVersion {
  * ```
  */
 export const uint256 = (it: BigNumberish): Uint256 => {
-  const bn = BigInt(it);
-  if (!isUint256(bn)) throw new Error('Number is too large');
-  return {
-    // eslint-disable-next-line no-bitwise
-    low: (bn & UINT_128_MAX).toString(10),
-    // eslint-disable-next-line no-bitwise
-    high: (bn >> 128n).toString(10),
-  };
+  return new CairoUint256(it).toUint256DecimalString();
 };
 
 /**
@@ -127,32 +120,5 @@ export const tuple = (
  * @returns format: felt-string
  */
 export function felt(it: BigNumberish): string {
-  // BN or number
-  if (isBigInt(it) || (typeof it === 'number' && Number.isInteger(it))) {
-    return it.toString();
-  }
-  // string text
-  if (isText(it)) {
-    if (!isShortString(it as string))
-      throw new Error(
-        `${it} is a long string > 31 chars, felt can store short strings, split it to array of short strings`
-      );
-    const encoded = encodeShortString(it as string);
-    return BigInt(encoded).toString();
-  }
-  // hex string
-  if (typeof it === 'string' && isHex(it)) {
-    // toBN().toString
-    return BigInt(it).toString();
-  }
-  // string number (already converted), or unhandled type
-  if (typeof it === 'string' && isStringWholeNumber(it)) {
-    return it;
-  }
-  // bool to felt
-  if (typeof it === 'boolean') {
-    return `${+it}`;
-  }
-
-  throw new Error(`${it} can't be computed by felt()`);
+  return CairoFelt(it);
 }
