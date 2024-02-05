@@ -1,3 +1,13 @@
+# [6.0.0-beta.15](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.14...v6.0.0-beta.15) (2024-02-05)
+
+### Bug Fixes
+
+- throw on negative param cairo.uint256 and bnToUint256 ([e1ead14](https://github.com/starknet-io/starknet.js/commit/e1ead1466984f26ff91d7fe6174fc87be8c3aede))
+
+### Features
+
+- new CairoUint256 cairo datatype model ([b64abcc](https://github.com/starknet-io/starknet.js/commit/b64abccf3888eba49460124a4d7aabbdca1592d1))
+
 # [6.0.0-beta.14](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.13...v6.0.0-beta.14) (2024-02-02)
 
 ### Bug Fixes
