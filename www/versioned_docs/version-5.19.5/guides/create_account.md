@@ -118,7 +118,7 @@ const argentXaccountClassHash = "0x033434ad846cdd5f23eb73ff09fe6fddd568284a0fb7d
 // Generate public and private key pair.
 const privateKeyAX = stark.randomAddress();
 console.log('AX_ACCOUNT_PRIVATE_KEY=', privateKeyAX);
-const starkKeyPubAX = ec.starkCurve.getStarkKey(privateKey);
+const starkKeyPubAX = ec.starkCurve.getStarkKey(privateKeyAX);
 console.log('AX_ACCOUNT_PUBLIC_KEY=', starkKeyPubAX);
 
 // Calculate future address of the ArgentX account

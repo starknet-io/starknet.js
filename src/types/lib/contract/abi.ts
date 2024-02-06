@@ -1,5 +1,5 @@
 /** ABI */
-export type Abi = Array<FunctionAbi | EventAbi | StructAbi | any>;
+export type Abi = ReadonlyArray<FunctionAbi | EventAbi | StructAbi | any>;
 
 // Basic elements
 export type AbiEntry = { name: string; type: 'felt' | 'felt*' | string };

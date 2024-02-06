@@ -513,7 +513,7 @@ export type SIERRA_ENTRY_POINT = {
   function_idx: number;
 };
 
-export type CONTRACT_ABI = CONTRACT_ABI_ENTRY[];
+export type CONTRACT_ABI = readonly CONTRACT_ABI_ENTRY[];
 
 export type CONTRACT_ABI_ENTRY = {
   selector: FELT;

@@ -77,3 +77,21 @@ const account = new Account(provider, accountAddress, privateKey);
 // add ,"1" after privateKey if this account is not a Cairo 0 contract
 
 ```
+
+## Connect to an account that uses Ethereum signature
+
+As a consequence of account abstraction, you can find accounts that uses Ethereum signature logical.  
+To connect to this type of account:
+
+```typescript
+const myEthPrivateKey = "0x525bc68475c0955fae83869beec0996114d4bb27b28b781ed2a20ef23121b8de";
+const myEthAccountAddress = "0x65a822fbee1ae79e898688b5a4282dc79e0042cbed12f6169937fddb4c26641";
+const myEthSigner = new EthSigner(myEthPrivateKey);
+const myEthAccount = new Account(provider, myEthAccountAddress, myEthSigner)
+```
+
+And if you need a randon Ethereum private key:
+
+```typescript
+const myPrivateKey = eth.ethRandomPrivateKey();
+```

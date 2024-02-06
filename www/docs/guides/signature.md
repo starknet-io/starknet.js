@@ -174,17 +174,11 @@ const signature2 = await account.signMessage(typedDataValidate) as WeierstrassSi
 On the receiver side, you receive the JSON, the signature, and the account address. To verify the message:
 
 ```typescript
-const compiledAccount = json.parse(fs.readFileSync("./compiledContracts/Account_0_5_1.json").toString("ascii"));
-const contractAccount = new Contract(compiledAccount.abi, accountAddress, provider);
-
-const msgHash5 = typedData.getMessageHash(typedDataValidate, accountAddress);
-// The call of isValidSignature will generate an error if not valid
-let result5: boolean;
+const myAccount = new Account(provider, accountAddress, "0x0123"); // fake private key
 try {
-    await contractAccount.isValidSignature(msgHash5, [signature2.r, signature2.s]);
-    result5 = true;
+    const result = await myAccount.verifyMessage(typedMessage, signature);
+    console.log("Result (boolean) =", result);
 } catch {
-    result5 = false;
+    console.log("verification failed :", result.error);
 }
-console.log("Result5 (boolean) =", result5);
 ```

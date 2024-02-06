@@ -23,6 +23,7 @@ export * as json from './utils/json';
 export * as num from './utils/num';
 export * as transaction from './utils/transaction';
 export * as stark from './utils/stark';
+export * as eth from './utils/eth';
 export * as merkle from './utils/merkle';
 export * as uint256 from './utils/uint256';
 export * as shortString from './utils/shortString';

@@ -13,6 +13,7 @@ import {
   DeclareDeployUDCResponse,
   RawArgsArray,
   RawArgsObject,
+  byteArray,
   cairo,
   ec,
   hash,
@@ -22,6 +23,8 @@ import {
   stark,
   types,
 } from '../src';
+import { hexToDecimalString } from '../src/utils/num';
+import { encodeShortString } from '../src/utils/shortString';
 import {
   TEST_TX_VERSION,
   compiledC1Account,
@@ -30,7 +33,10 @@ import {
   compiledC1v2Casm,
   compiledC210,
   compiledC210Casm,
+  compiledC240,
+  compiledC240Casm,
   compiledComplexSierra,
+  compiledHelloSierra,
   getTestAccount,
   getTestProvider,
 } from './config/fixtures';
@@ -140,7 +146,7 @@ describe('Cairo 1', () => {
       expect(balance).toBe(200n);
     });
 
-    test('Cairo 1 Contract Interaction - uint 8, 16, 32, 64, 128, litterals', async () => {
+    test('Cairo 1 Contract Interaction - uint 8, 16, 32, 64, 128, literals', async () => {
       const tx = await cairo1Contract.increase_balance_u8(255n);
       await account.waitForTransaction(tx.transaction_hash);
       const balance = await cairo1Contract.get_balance_u8();
@@ -673,6 +679,83 @@ describe('Cairo 1', () => {
       expect(callDataFromObject).toStrictEqual(expectedResult);
       expect(callDataFromArray).toStrictEqual(expectedResult);
     });
+
+    test('myCallData.decodeParameters for Cairo 1', async () => {
+      const Cairo1HelloAbi = compiledHelloSierra;
+      const Cairo1Abi = compiledC1v2;
+      const helloCallData = new CallData(Cairo1HelloAbi.abi);
+      const c1v2CallData = new CallData(Cairo1Abi.abi);
+
+      const res2 = helloCallData.decodeParameters('hello::hello::UserData', ['0x123456', '0x1']);
+      expect(res2).toEqual({ address: 1193046n, is_claimed: true });
+      const res3 = helloCallData.decodeParameters(
+        ['hello::hello::UserData', 'hello::hello::UserData'],
+        ['0x123456', '0x1', '0x98765', '0x0']
+      );
+      expect(res3).toEqual([
+        { address: 1193046n, is_claimed: true },
+        { address: 624485n, is_claimed: false },
+      ]);
+      const res4 = helloCallData.decodeParameters('core::integer::u8', ['0x123456']);
+      expect(res4).toBe(1193046n);
+      const res5 = helloCallData.decodeParameters('core::bool', ['0x1']);
+      expect(res5).toBe(true);
+      const res6 = helloCallData.decodeParameters('core::felt252', ['0x123456']);
+      expect(res6).toBe(1193046n);
+      const res7 = helloCallData.decodeParameters('core::integer::u256', ['0x123456', '0x789']);
+      expect(num.toHex(res7.toString())).toBe('0x78900000000000000000000000000123456');
+      const res8 = helloCallData.decodeParameters('core::array::Array::<core::integer::u16>', [
+        '2',
+        '0x123456',
+        '0x789',
+      ]);
+      expect(res8).toEqual([1193046n, 1929n]);
+      const res9 = helloCallData.decodeParameters('core::array::Span::<core::integer::u16>', [
+        '2',
+        '0x123456',
+        '0x789',
+      ]);
+      expect(res9).toEqual([1193046n, 1929n]);
+      const res10 = helloCallData.decodeParameters('(core::felt252, core::integer::u16)', [
+        '0x123456',
+        '0x789',
+      ]);
+      expect(res10).toEqual({ '0': 1193046n, '1': 1929n });
+      const res11 = helloCallData.decodeParameters('core::starknet::eth_address::EthAddress', [
+        '0x123456',
+      ]);
+      expect(res11).toBe(1193046n);
+      const res12 = helloCallData.decodeParameters(
+        'core::starknet::contract_address::ContractAddress',
+        ['0x123456']
+      );
+      expect(res12).toBe(1193046n);
+      const res13 = helloCallData.decodeParameters('core::starknet::class_hash::ClassHash', [
+        '0x123456',
+      ]);
+      expect(res13).toBe(1193046n);
+      const res14 = c1v2CallData.decodeParameters('core::option::Option::<core::integer::u8>', [
+        '0',
+        '0x12',
+      ]);
+      expect(res14).toEqual({ Some: 18n, None: undefined });
+      const res15 = c1v2CallData.decodeParameters(
+        'core::result::Result::<hello_res_events_newTypes::hello_res_events_newTypes::Order, core::integer::u16>',
+        ['0', '0x12', '0x345']
+      );
+      expect(res15).toEqual({ Ok: { p1: 18n, p2: 837n }, Err: undefined });
+      const res16 = c1v2CallData.decodeParameters(
+        'hello_res_events_newTypes::hello_res_events_newTypes::MyEnum',
+        ['0', '0x12', '0x5678']
+      );
+      expect(res16).toEqual({
+        variant: {
+          Response: { p1: 18n, p2: 22136n },
+          Warning: undefined,
+          Error: undefined,
+        },
+      });
+    });
   });
 
   describe('Cairo1 Account contract', () => {
@@ -891,6 +974,73 @@ describe('Cairo 1', () => {
       const tx = await provider.waitForTransaction(transaction_hash);
       const events = eventContract.parseEvents(tx);
       return expect(events).toStrictEqual(shouldBe);
+    });
+  });
+
+  describe('cairo v2.4.0 new types', () => {
+    let stringContract: Contract;
+
+    beforeAll(async () => {
+      const { deploy } = await account.declareAndDeploy({
+        contract: compiledC240,
+        casm: compiledC240Casm,
+      });
+
+      stringContract = new Contract(compiledC240.abi, deploy.contract_address, account);
+    });
+
+    test('bytes31', async () => {
+      const resp = await stringContract.call('proceed_bytes31', ['AZERTY']);
+      expect(resp).toBe('AZERTY');
+      const str = 'TokenName';
+      const callD1 = CallData.compile([str]);
+      expect(callD1).toEqual([hexToDecimalString(encodeShortString(str))]);
+      const callD2 = CallData.compile({ str });
+      expect(callD2).toEqual([hexToDecimalString(encodeShortString(str))]);
+      const myCallData = new CallData(compiledC240.abi);
+      const myCalldata1 = myCallData.compile('proceed_bytes31', [str]);
+      expect(myCalldata1).toEqual([encodeShortString(str)]);
+      const myCalldata2 = myCallData.compile('proceed_bytes31', { str });
+      expect(myCalldata2).toEqual([encodeShortString(str)]);
+      const myCall1 = stringContract.populate('proceed_bytes31', [str]);
+      expect(myCall1.calldata).toEqual([encodeShortString(str)]);
+      const myCall2 = stringContract.populate('proceed_bytes31', { str });
+      expect(myCall2.calldata).toEqual([encodeShortString(str)]);
+    });
+
+    test('bytes31 too long', async () => {
+      await expect(stringContract.call('proceed_bytes31', ['ABCDEFGHIJKLMNOPQRSTUVWXYZ12345A'])) // more than 31 characters
+        .rejects.toThrow();
+    });
+
+    test('ByteArray', async () => {
+      const message = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ12345AAADEFGHIJKLMNOPQRSTUVWXYZ12345A';
+      const callD = CallData.compile([message]);
+      const expectedResult = [
+        '2',
+        hexToDecimalString('0x4142434445464748494a4b4c4d4e4f505152535455565758595a3132333435'),
+        hexToDecimalString('0x4141414445464748494a4b4c4d4e4f505152535455565758595a3132333435'),
+        hexToDecimalString('0x41'),
+        '1',
+      ];
+      expect(callD).toEqual(expectedResult);
+      const callD2 = CallData.compile({ mess: message });
+      expect(callD2).toEqual(expectedResult);
+      const callD3 = CallData.compile({ mess: byteArray.byteArrayFromString('Take care.') });
+      expect(callD3).toEqual(['1', '0', '398475857363345939260718', '10']);
+      const str1 = await stringContract.get_string();
+      expect(str1).toBe(
+        "Cairo has become the most popular language for developers + charizards !@#$%^&*_+|:'<>?~`"
+      );
+      const myCallData = new CallData(stringContract.abi);
+      const expectedString = 'Take care. Zorg is back';
+      const resp3 = await stringContract.proceed_string('Take care.');
+      expect(resp3).toBe(expectedString);
+      const resp4 = await stringContract.call('proceed_string', ['Take care.']);
+      expect(resp4).toBe(expectedString);
+      const calldata1 = myCallData.compile('proceed_string', ['Take care.']);
+      const resp5 = await stringContract.call('proceed_string', calldata1);
+      expect(resp5).toBe(expectedString);
     });
   });
 });

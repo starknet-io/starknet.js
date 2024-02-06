@@ -1,4 +1,5 @@
-import type { Abi as AbiKanabi, TypedContract as AbiWanTypedContract } from 'abi-wan-kanabi';
+import type { Abi as AbiKanabiV1, TypedContract as AbiWanTypedContractV1 } from 'abi-wan-kanabi-v1';
+import type { Abi as AbiKanabiV2, TypedContract as AbiWanTypedContractV2 } from 'abi-wan-kanabi-v2';
 
 import { AccountInterface } from '../account';
 import { ProviderInterface } from '../provider';
@@ -6,8 +7,10 @@ import {
   Abi,
   ArgsOrCalldata,
   AsyncContractFunction,
+  BigNumberish,
   BlockIdentifier,
   CallOptions,
+  Calldata,
   ContractFunction,
   ContractVersion,
   EstimateFeeResponse,
@@ -16,10 +19,32 @@ import {
   InvokeFunctionResponse,
   InvokeOptions,
   ParsedEvents,
+  RawArgs,
   Result,
+  Uint256,
 } from '../types';
+import { CairoCustomEnum } from '../utils/calldata/enum/CairoCustomEnum';
+import { CairoOption } from '../utils/calldata/enum/CairoOption';
+import { CairoResult } from '../utils/calldata/enum/CairoResult';
 
-export type TypedContract<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & ContractInterface;
+declare module 'abi-wan-kanabi-v2' {
+  export interface Config<OptionT = any, ResultT = any, ErrorT = any> {
+    FeltType: BigNumberish;
+    U256Type: number | bigint | Uint256;
+    Option: CairoOption<OptionT>;
+    Tuple: Record<number, BigNumberish | object | boolean>;
+    Result: CairoResult<ResultT, ErrorT>;
+    Enum: CairoCustomEnum;
+    Calldata: RawArgs | Calldata;
+    CallOptions: CallOptions;
+    InvokeOptions: InvokeOptions;
+    InvokeFunctionResponse: InvokeFunctionResponse;
+  }
+}
+
+export type TypedContractV1<TAbi extends AbiKanabiV1> = AbiWanTypedContractV1<TAbi> &
+  ContractInterface;
+type TypedContractV2<TAbi extends AbiKanabiV2> = AbiWanTypedContractV2<TAbi> & ContractInterface;
 
 export abstract class ContractInterface {
   public abstract abi: Abi;
@@ -138,5 +163,6 @@ export abstract class ContractInterface {
    */
   public abstract getVersion(): Promise<ContractVersion>;
 
-  public abstract typed<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContract<TAbi>;
+  public abstract typedv1<TAbi extends AbiKanabiV1>(tAbi: TAbi): TypedContractV1<TAbi>;
+  public abstract typedv2<TAbi extends AbiKanabiV2>(tAbi: TAbi): TypedContractV2<TAbi>;
 }
