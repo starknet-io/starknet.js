@@ -6,6 +6,7 @@ import {
   CallData,
   Contract,
   RPC,
+  RpcProvider,
   TransactionExecutionStatus,
   stark,
   waitForTransactionOptions,
@@ -333,5 +334,26 @@ describeIfRpc('RPCProvider', () => {
       const syncingStats = await rpcProvider.getSyncingStats();
       expect(syncingStats).toMatchSchemaRef('GetSyncingStatsResponse');
     });
+  });
+
+  describeIfRpc('Fallback node', () => {
+    beforeAll(() => {});
+    test('Ensure fallback node is used when base node fails', async () => {
+      const fallbackProvider: RpcProvider = new RpcProvider({
+        nodeUrl: 'Incorrect URL',
+        fallbackNodeUrls: [process.env.TEST_RPC_URL!],
+      });
+      const blockNumber = await fallbackProvider.getBlockNumber();
+      expect(typeof blockNumber).toBe('number');
+    });
+  });
+
+  test('Ensure fallback nodes are run until any of them succeeds', async () => {
+    const fallbackProvider: RpcProvider = new RpcProvider({
+      nodeUrl: 'Incorrect URL',
+      fallbackNodeUrls: ['Another incorrect URL', process.env.TEST_RPC_URL!],
+    });
+    const blockNumber = await fallbackProvider.getBlockNumber();
+    expect(typeof blockNumber).toBe('number');
   });
 });
