@@ -1,4 +1,4 @@
-import typedDataExample from '../__mocks__/typedDataExample.json';
+import typedDataExample from '../__mocks__/typedData/baseExample.json';
 import {
   Account,
   Contract,
@@ -399,7 +399,7 @@ describe('deploy and test Wallet', () => {
     expect(toBigInt(response.number as string).toString()).toStrictEqual('57');
   });
 
-  test('sign and verify offchain message fail', async () => {
+  test('sign and verify EIP712 message fail', async () => {
     const signature = await account.signMessage(typedDataExample);
     const [r, s] = stark.formatSignature(signature);
 
@@ -410,12 +410,17 @@ describe('deploy and test Wallet', () => {
 
     if (!signature2) return;
 
-    expect(await account.verifyMessage(typedDataExample, signature2)).toBe(false);
+    const verifMessageResponse: boolean = await account.verifyMessage(typedDataExample, signature2);
+    expect(verifMessageResponse).toBe(false);
+
+    const wrongAccount = new Account(provider, '0x037891', '0x026789', undefined, TEST_TX_VERSION); // non existing account
+    await expect(wrongAccount.verifyMessage(typedDataExample, signature2)).rejects.toThrow();
   });
 
-  test('sign and verify offchain message', async () => {
+  test('sign and verify message', async () => {
     const signature = await account.signMessage(typedDataExample);
-    expect(await account.verifyMessage(typedDataExample, signature)).toBe(true);
+    const verifMessageResponse: boolean = await account.verifyMessage(typedDataExample, signature);
+    expect(verifMessageResponse).toBe(true);
   });
 
   describe('Contract interaction with Account', () => {

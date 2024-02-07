@@ -1,5 +1,5 @@
-import { starkCurve } from './ec';
-import { toBigInt } from './num';
+import { BigNumberish } from '../types';
+import { computePedersenHash } from './hash';
 
 export class MerkleTree {
   public leaves: string[];
@@ -8,7 +8,13 @@ export class MerkleTree {
 
   public root: string;
 
-  constructor(leafHashes: string[]) {
+  public hashMethod: (a: BigNumberish, b: BigNumberish) => string;
+
+  constructor(
+    leafHashes: string[],
+    hashMethod: (a: BigNumberish, b: BigNumberish) => string = computePedersenHash
+  ) {
+    this.hashMethod = hashMethod;
     this.leaves = leafHashes;
     this.root = this.build(leafHashes);
   }
@@ -28,21 +34,25 @@ export class MerkleTree {
     const newLeaves: string[] = [];
     for (let i = 0; i < leaves.length; i += 2) {
       if (i + 1 === leaves.length) {
-        newLeaves.push(MerkleTree.hash(leaves[i], '0x0'));
+        newLeaves.push(MerkleTree.hash(leaves[i], '0x0', this.hashMethod));
       } else {
-        newLeaves.push(MerkleTree.hash(leaves[i], leaves[i + 1]));
+        newLeaves.push(MerkleTree.hash(leaves[i], leaves[i + 1], this.hashMethod));
       }
     }
     return this.build(newLeaves);
   }
 
   /**
-   * Create pedersen hash from a and b
+   * Create hash from ordered a and b, Pedersen hash default
    * @returns format: hex-string
    */
-  static hash(a: string, b: string) {
-    const [aSorted, bSorted] = [toBigInt(a), toBigInt(b)].sort((x, y) => (x >= y ? 1 : -1));
-    return starkCurve.pedersen(aSorted, bSorted);
+  static hash(
+    a: BigNumberish,
+    b: BigNumberish,
+    hashMethod: (a: BigNumberish, b: BigNumberish) => string = computePedersenHash
+  ) {
+    const [aSorted, bSorted] = [BigInt(a), BigInt(b)].sort((x, y) => (x >= y ? 1 : -1));
+    return hashMethod(aSorted, bSorted);
   }
 
   /**
@@ -69,7 +79,7 @@ export class MerkleTree {
         : this.branches.findIndex((b) => b.length === branch.length);
     const nextBranch = this.branches[currentBranchLevelIndex + 1] ?? [this.root];
     return this.getProof(
-      MerkleTree.hash(isLeft ? leaf : neededBranch, isLeft ? neededBranch : leaf),
+      MerkleTree.hash(isLeft ? leaf : neededBranch, isLeft ? neededBranch : leaf, this.hashMethod),
       nextBranch,
       newHashPath
     );
@@ -81,11 +91,17 @@ export class MerkleTree {
  * @param root hex-string
  * @param leaf hex-string
  * @param path hex-string array
+ * @param hashMethod hash method override, Pedersen default
  */
-export function proofMerklePath(root: string, leaf: string, path: string[]): boolean {
+export function proofMerklePath(
+  root: string,
+  leaf: string,
+  path: string[],
+  hashMethod: (a: BigNumberish, b: BigNumberish) => string = computePedersenHash
+): boolean {
   if (path.length === 0) {
     return root === leaf;
   }
   const [next, ...rest] = path;
-  return proofMerklePath(root, MerkleTree.hash(leaf, next), rest);
+  return proofMerklePath(root, MerkleTree.hash(leaf, next, hashMethod), rest, hashMethod);
 }

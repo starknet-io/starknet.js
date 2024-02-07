@@ -1,3 +1,84 @@
+# [6.0.0-beta.15](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.14...v6.0.0-beta.15) (2024-02-05)
+
+### Bug Fixes
+
+- throw on negative param cairo.uint256 and bnToUint256 ([e1ead14](https://github.com/starknet-io/starknet.js/commit/e1ead1466984f26ff91d7fe6174fc87be8c3aede))
+
+### Features
+
+- new CairoUint256 cairo datatype model ([b64abcc](https://github.com/starknet-io/starknet.js/commit/b64abccf3888eba49460124a4d7aabbdca1592d1))
+
+# [6.0.0-beta.14](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.13...v6.0.0-beta.14) (2024-02-02)
+
+### Bug Fixes
+
+- move abiwan from dev dependencies to regular dependencies ([#925](https://github.com/starknet-io/starknet.js/issues/925)) ([6b7ee49](https://github.com/starknet-io/starknet.js/commit/6b7ee49918d704f8143f51ab7a0360446ea4cf5e))
+
+### Features
+
+- abi-wan trigger ([c10150a](https://github.com/starknet-io/starknet.js/commit/c10150a328051054a7bba1260296c0c92fdd2051))
+- add provider.decodeParameters ([39595f3](https://github.com/starknet-io/starknet.js/commit/39595f3303204b273fadd53764c59767ce6c5b36))
+- expand structured data hashing in line with SNIP-12 ([#920](https://github.com/starknet-io/starknet.js/issues/920)) ([cb20590](https://github.com/starknet-io/starknet.js/commit/cb2059039e3b42501cdfefec7802da83eb73645b))
+- trigger release ([fbf983f](https://github.com/starknet-io/starknet.js/commit/fbf983f7820768f919cddb2c5806178a20e38bdd))
+
+# [5.29.0](https://github.com/starknet-io/starknet.js/compare/v5.28.0...v5.29.0) (2024-02-02)
+
+### Features
+
+- add provider.decodeParameters ([39595f3](https://github.com/starknet-io/starknet.js/commit/39595f3303204b273fadd53764c59767ce6c5b36))
+
+# [5.28.0](https://github.com/starknet-io/starknet.js/compare/v5.27.0...v5.28.0) (2024-02-01)
+
+### Features
+
+- expand structured data hashing in line with SNIP-12 ([#920](https://github.com/starknet-io/starknet.js/issues/920)) ([cb20590](https://github.com/starknet-io/starknet.js/commit/cb2059039e3b42501cdfefec7802da83eb73645b))
+
+# [5.27.0](https://github.com/starknet-io/starknet.js/compare/v5.26.1...v5.27.0) (2024-01-23)
+
+### Features
+
+- trigger release ([fbf983f](https://github.com/starknet-io/starknet.js/commit/fbf983f7820768f919cddb2c5806178a20e38bdd))
+
+## [5.26.1](https://github.com/starknet-io/starknet.js/compare/v5.26.0...v5.26.1) (2024-01-18)
+
+### Bug Fixes
+
+- move abiwan from dev dependencies to regular dependencies ([#925](https://github.com/starknet-io/starknet.js/issues/925)) ([6b7ee49](https://github.com/starknet-io/starknet.js/commit/6b7ee49918d704f8143f51ab7a0360446ea4cf5e))
+
+# [5.26.0](https://github.com/starknet-io/starknet.js/compare/v5.25.0...v5.26.0) (2024-01-15)
+
+### Features
+
+- abi-wan trigger ([c10150a](https://github.com/starknet-io/starknet.js/commit/c10150a328051054a7bba1260296c0c92fdd2051))
+
+# [6.0.0-beta.13](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.12...v6.0.0-beta.13) (2024-01-23)
+
+### Bug Fixes
+
+- solve wrong response for account.verifyMessage ([05f4095](https://github.com/starknet-io/starknet.js/commit/05f4095599f89dd508fac9316e1c24fc0dceaa8a))
+
+### Features
+
+- abiwan v2 intergation ([87d15d3](https://github.com/starknet-io/starknet.js/commit/87d15d3d4ada1138ed5b66620a4de56189195f4c))
+- add string types of cairo v2.4.0 ([a8a73c1](https://github.com/starknet-io/starknet.js/commit/a8a73c1f5b0bc72bc42460f3735eeec6f95edcbe))
+- make Abi and CONTRACT_ABI types compatible with abiwan ([9007816](https://github.com/starknet-io/starknet.js/commit/9007816689528a79bd8bb4267e0098be2e6d71d2))
+- replace in verifyMessage : response by Error ([1abf91f](https://github.com/starknet-io/starknet.js/commit/1abf91f170c46d4f4cf5f493dc3d6717c6d3c1e7))
+- sepolia ([26d7044](https://github.com/starknet-io/starknet.js/commit/26d70446edd7c098b7f257d9242cc9d9d220b11e))
+
+# [5.25.0](https://github.com/starknet-io/starknet.js/compare/v5.24.5...v5.25.0) (2023-12-18)
+
+### Features
+
+- sepolia ([26d7044](https://github.com/starknet-io/starknet.js/commit/26d70446edd7c098b7f257d9242cc9d9d220b11e))
+
+# [6.0.0-beta.12](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.11...v6.0.0-beta.12) (2024-01-23)
+
+### Features
+
+- add provider.decodeParameters ([be6eec9](https://github.com/starknet-io/starknet.js/commit/be6eec94c8ae5d92df631502c9a1d61663d80101))
+- ethereum signer ([8473adb](https://github.com/starknet-io/starknet.js/commit/8473adbcfa5ef642297b8a7f448a0d789703037f))
+- ethereum-signer ([f37bfb2](https://github.com/starknet-io/starknet.js/commit/f37bfb2788b7c6befc10efca8b102ee2a975ee55))
+
 # [6.0.0-beta.11](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.10...v6.0.0-beta.11) (2024-01-04)
 
 ### Bug Fixes

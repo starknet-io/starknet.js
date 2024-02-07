@@ -598,7 +598,7 @@ a confirmation of sending a transaction on the starknet contract
 ▸ **signMessage**(`typedData`): `Promise`<[`Signature`](../namespaces/types.md#signature)\>
 
 Sign an JSON object for off-chain usage with the starknet private key and return the signature
-This adds a message prefix so it cant be interchanged with transactions
+This adds a message prefix so it can't be interchanged with transactions
 
 **`Throws`**
 
@@ -630,8 +630,8 @@ the signature of the JSON object
 
 ▸ **hashMessage**(`typedData`): `Promise`<`string`\>
 
-Hash a JSON object with pederson hash and return the hash
-This adds a message prefix so it cant be interchanged with transactions
+Hash a JSON object with Pedersen hash and return the hash
+This adds a message prefix so it can't be interchanged with transactions
 
 **`Throws`**
 
@@ -1331,7 +1331,7 @@ Invokes a function on starknet
 
 **`Deprecated`**
 
-This method wont be supported as soon as fees are mandatory. Should not be used outside of Account class
+This method won't be supported as soon as fees are mandatory. Should not be used outside of Account class
 
 #### Parameters
 

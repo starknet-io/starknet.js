@@ -329,8 +329,8 @@ export abstract class AccountInterface extends ProviderInterface {
   ): Promise<DeployContractResponse>;
 
   /**
-   * Sign an JSON object for off-chain usage with the starknet private key and return the signature
-   * This adds a message prefix so it cant be interchanged with transactions
+   * Signs a JSON object for off-chain usage with the Starknet private key and returns the signature
+   * This adds a message prefix so it can't be interchanged with transactions
    *
    * @param json - JSON object to be signed
    * @returns the signature of the JSON object
@@ -339,8 +339,8 @@ export abstract class AccountInterface extends ProviderInterface {
   public abstract signMessage(typedData: TypedData): Promise<Signature>;
 
   /**
-   * Hash a JSON object with pederson hash and return the hash
-   * This adds a message prefix so it cant be interchanged with transactions
+   * Hash a JSON object with Pedersen hash and return the hash
+   * This adds a message prefix so it can't be interchanged with transactions
    *
    * @param json - JSON object to be hashed
    * @returns the hash of the JSON object

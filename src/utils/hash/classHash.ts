@@ -21,8 +21,16 @@ import { felt } from '../calldata/cairo';
 import { starkCurve } from '../ec';
 import { addHexPrefix, utf8ToArray } from '../encode';
 import { parse, stringify } from '../json';
-import { toBigInt, toHex } from '../num';
+import { toHex } from '../num';
 import { encodeShortString } from '../shortString';
+
+export function computePedersenHash(a: BigNumberish, b: BigNumberish): string {
+  return starkCurve.pedersen(BigInt(a), BigInt(b));
+}
+
+export function computePoseidonHash(a: BigNumberish, b: BigNumberish): string {
+  return toHex(starkCurve.poseidonHash(BigInt(a), BigInt(b)));
+}
 
 /**
  * Compute pedersen hash from data
@@ -30,8 +38,14 @@ import { encodeShortString } from '../shortString';
  */
 export function computeHashOnElements(data: BigNumberish[]): string {
   return [...data, data.length]
-    .reduce((x: BigNumberish, y: BigNumberish) => starkCurve.pedersen(toBigInt(x), toBigInt(y)), 0)
+    .reduce((x: BigNumberish, y: BigNumberish) => starkCurve.pedersen(BigInt(x), BigInt(y)), 0)
     .toString();
+}
+
+export const computePedersenHashOnElements = computeHashOnElements;
+
+export function computePoseidonHashOnElements(data: BigNumberish[]) {
+  return toHex(poseidonHashMany(data.map((x) => BigInt(x))));
 }
 
 /**
