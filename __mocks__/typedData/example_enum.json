@@ -1,0 +1,28 @@
+{
+  "types": {
+    "StarknetDomain": [
+      { "name": "name", "type": "shortstring" },
+      { "name": "version", "type": "shortstring" },
+      { "name": "chainId", "type": "shortstring" },
+      { "name": "revision", "type": "shortstring" }
+    ],
+    "Example": [{ "name": "someEnum", "type": "enum", "contains": "MyEnum" }],
+    "MyEnum": [
+      { "name": "Variant 1", "type": "()" },
+      { "name": "Variant 2", "type": "(u128,u128*)" },
+      { "name": "Variant 3", "type": "(u128)" }
+    ]
+  },
+  "primaryType": "Example",
+  "domain": {
+    "name": "StarkNet Mail",
+    "version": "1",
+    "chainId": "1",
+    "revision": "1"
+  },
+  "message": {
+    "someEnum": {
+      "Variant 2": [2, [0, 1]]
+    }
+  }
+}

@@ -8,21 +8,23 @@ import {
   AbiStructs,
   BigNumberish,
   FunctionAbi,
-  Litteral,
+  Literal,
   Uint,
 } from '../../types';
 import assert from '../assert';
+import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { isHex, toBigInt } from '../num';
 import { isLongText } from '../shortString';
-import { uint256ToBN } from '../uint256';
 import {
   getArrayType,
   isLen,
   isTypeArray,
   isTypeBool,
+  isTypeByteArray,
+  isTypeBytes31,
   isTypeEnum,
   isTypeFelt,
-  isTypeLitteral,
+  isTypeLiteral,
   isTypeOption,
   isTypeResult,
   isTypeStruct,
@@ -44,6 +46,18 @@ const validateFelt = (parameter: any, input: AbiEntry) => {
   );
 };
 
+const validateBytes31 = (parameter: any, input: AbiEntry) => {
+  assert(typeof parameter === 'string', `Validate: arg ${input.name} should be a string.`);
+  assert(
+    parameter.length < 32,
+    `Validate: arg ${input.name} cairo typed ${input.type} should be a string of less than 32 characters.`
+  );
+};
+
+const validateByteArray = (parameter: any, input: AbiEntry) => {
+  assert(typeof parameter === 'string', `Validate: arg ${input.name} should be a string.`);
+};
+
 const validateUint = (parameter: any, input: AbiEntry) => {
   if (typeof parameter === 'number') {
     assert(
@@ -60,7 +74,8 @@ const validateUint = (parameter: any, input: AbiEntry) => {
       input.type
     } should be type (String, Number or BigInt), but is ${typeof parameter} ${parameter}.`
   );
-  const param = typeof parameter === 'object' ? uint256ToBN(parameter) : toBigInt(parameter);
+  const param =
+    typeof parameter === 'object' ? new CairoUint256(parameter).toBigInt() : toBigInt(parameter);
 
   switch (input.type) {
     case Uint.u8:
@@ -105,7 +120,7 @@ const validateUint = (parameter: any, input: AbiEntry) => {
       );
       break;
 
-    case Litteral.ClassHash:
+    case Literal.ClassHash:
       assert(
         // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1670
         param >= 0n && param <= 2n ** 252n - 1n,
@@ -113,7 +128,7 @@ const validateUint = (parameter: any, input: AbiEntry) => {
       );
       break;
 
-    case Litteral.ContractAddress:
+    case Literal.ContractAddress:
       assert(
         // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1245
         param >= 0n && param <= 2n ** 252n - 1n,
@@ -235,7 +250,7 @@ const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs, enu
     case isTypeEnum(baseType, enums):
       parameter.forEach((it: any) => validateEnum(it, { name: input.name, type: baseType }));
       break;
-    case isTypeUint(baseType) || isTypeLitteral(baseType):
+    case isTypeUint(baseType) || isTypeLiteral(baseType):
       parameter.forEach((param: BigNumberish) => validateUint(param, input));
       break;
     case isTypeBool(baseType):
@@ -263,11 +278,17 @@ export default function validateFields(
       case isTypeFelt(input.type):
         validateFelt(parameter, input);
         break;
-      case isTypeUint(input.type) || isTypeLitteral(input.type):
+      case isTypeBytes31(input.type):
+        validateBytes31(parameter, input);
+        break;
+      case isTypeUint(input.type) || isTypeLiteral(input.type):
         validateUint(parameter, input);
         break;
       case isTypeBool(input.type):
         validateBool(parameter, input);
+        break;
+      case isTypeByteArray(input.type):
+        validateByteArray(parameter, input);
         break;
       case isTypeArray(input.type):
         validateArray(parameter, input, structs, enums);
