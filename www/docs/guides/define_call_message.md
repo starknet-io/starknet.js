@@ -129,7 +129,7 @@ You can send to Starknet.js methods: string.
 await myContract.my_function("http://addressOfMyERC721pictures/image1.jpg")
 ```
 
-To force to send a shortString as a ByteArray with `CallData.compile()` :
+To force to send a shortString as a ByteArray with `CallData.compile()`:
 
 ```typescript
 const myCalldata = Calldata.compile([ byteArray.byteArrayFromString("Take care.") ]);

@@ -179,6 +179,6 @@ try {
     const result = await myAccount.verifyMessage(typedMessage, signature);
     console.log("Result (boolean) =", result);
 } catch {
-    console.log("verification failed :", result.error);
+    console.log("verification failed:", result.error);
 }
 ```
