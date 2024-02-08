@@ -45,3 +45,7 @@ html.plugin-id-default.plugin-pages div[class*="announcementBar"],
 html[class*="docs-version-4"] div[class*="announcementBar"] {
   display: none;
 }
+
+.hidden {
+  display: none;
+}
