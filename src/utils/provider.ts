@@ -165,12 +165,6 @@ export class Block {
   valueOf = () => this.number;
 
   toString = () => this.hash;
-
-  /*   get sequencerIdentifier(): SequencerIdentifier {
-    return this.hash !== null
-      ? { blockHash: this.hash as string }
-      : { blockNumber: (this.number ?? this.tag) as BlockNumber };
-  } */
 }
 
 export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3TransactionDetails {
