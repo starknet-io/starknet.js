@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 /**
  * Asynchronous Global Test Setup
  * Run only once
@@ -128,6 +127,7 @@ const setAccount = async (devnetStrategy: DevnetStrategy) => {
       await fetchAccount(GS_DEFAULT_TEST_PROVIDER_URL);
       return true;
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Fetching account from devnet failed');
     }
   } else if (providedURL) {
@@ -136,6 +136,7 @@ const setAccount = async (devnetStrategy: DevnetStrategy) => {
       await fetchAccount(providedURL);
       return true;
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error(`Fetching account from provided url ${providedURL} failed`);
     }
   }
@@ -162,6 +163,7 @@ const verifySetup = (final?: boolean) => {
   // }
 
   if (warnings.length > 0) {
+    // eslint-disable-next-line no-console
     console.log('\x1b[33m', warnings.join('\n'), '\x1b[0m');
     delete process.env.TEST_ACCOUNT_ADDRESS;
     delete process.env.TEST_ACCOUNT_PRIVATE_KEY;
@@ -184,6 +186,7 @@ const verifySetup = (final?: boolean) => {
     );
   }
 
+  // eslint-disable-next-line no-console
   console.table({
     TEST_ACCOUNT_ADDRESS: process.env.TEST_ACCOUNT_ADDRESS,
     TEST_ACCOUNT_PRIVATE_KEY: '****',
@@ -193,6 +196,7 @@ const verifySetup = (final?: boolean) => {
     TX_VERSION: process.env.TX_VERSION === 'v3' ? 'v3' : 'v2',
   });
 
+  // eslint-disable-next-line no-console
   console.table({
     IS_LOCALHOST_DEVNET: process.env.IS_LOCALHOST_DEVNET,
     IS_RPC_DEVNET: process.env.IS_RPC_DEVNET,
@@ -202,45 +206,52 @@ const verifySetup = (final?: boolean) => {
     IS_SEQUENCER_GOERLI: process.env.IS_SEQUENCER_GOERLI,
   });
 
+  // eslint-disable-next-line no-console
   console.log('Global Test Environment is Ready');
   return true;
 };
 
 const executeStrategy = async () => {
   // 1. Assume setup is provided and ready;
+  // eslint-disable-next-line no-console
   console.log('Global Test Setup Started');
   if (verifySetup()) {
+    // eslint-disable-next-line no-console
     console.log('Using Provided Test Setup');
     return true;
   }
 
   // 2. Try to detect devnet setup
+  // eslint-disable-next-line no-console
   console.log('Basic test parameters are missing, Auto Setup Started');
   const devnetStrategy = await localDevnetDetectionStrategy();
   if (devnetStrategy.isDevnet) {
     if (devnetStrategy.isRS) {
+      // eslint-disable-next-line no-console
       console.log('Detected Devnet-RS');
     } else {
+      // eslint-disable-next-line no-console
       console.log('Detected Devnet-PY');
     }
   }
 
   const providerType = await sequencerOrRpc(devnetStrategy);
   if (providerType.sequencer) {
+    // eslint-disable-next-line no-console
     console.log('Detected Sequencer');
   } else if (providerType.rpc) {
+    // eslint-disable-next-line no-console
     console.log('Detected RPC');
   }
 
   const isAccountSet = await setAccount(devnetStrategy);
-  if (isAccountSet) {
-    console.log('Detected Account');
-  }
-
+  // eslint-disable-next-line no-console
+  if (isAccountSet) console.log('Detected Account');
   return verifySetup(true);
 };
 
 export default async (_globalConfig: any, _projectConfig: any) => {
   const isSet = await executeStrategy();
+  // eslint-disable-next-line no-console
   if (!isSet) console.error('Test Setup Environment is NOT Ready');
 };
