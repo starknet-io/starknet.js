@@ -91,7 +91,7 @@ export const describeIfNotDevnet = describeIf(process.env.IS_LOCALHOST_DEVNET ==
 export const describeIfDevnet = describeIf(process.env.IS_LOCALHOST_DEVNET === 'true');
 export const describeIfDevnetRpc = describeIf(process.env.IS_RPC_DEVNET === 'true');
 export const describeIfRPCGoerli = describeIf(process.env.IS_RPC_GOERLI === 'true');
-export const describeIfSequencerGoerli = describeIf(process.env.IS_SEQUENCER_GOERLI === 'true');
+export const describeIfCairo1Tesnet = describeIf(process.env.IS_CAIRO1_TESTNET === 'true');
 
 export const erc20ClassHash = '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a';
 export const wrongClassHash = '0x000000000000000000000000000000000000000000000000000000000000000';

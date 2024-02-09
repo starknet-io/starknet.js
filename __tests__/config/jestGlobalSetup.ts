@@ -75,7 +75,7 @@ const sequencerOrRpc = async (devnetStrategy?: DevnetStrategy) => {
     setIfNullish('IS_SEQUENCER', providerType.sequencer ? 'true' : 'false');
     setIfNullish('IS_RPC', providerType.rpc ? 'true' : 'false');
     setIfNullish(
-      'IS_SEQUENCER_GOERLI',
+      'IS_CAIRO1_TESTNET',
       (process.env.TEST_PROVIDER_BASE_URL || process.env.TEST_RPC_URL || '').includes(
         BaseUrl.SN_GOERLI
       )
@@ -177,7 +177,7 @@ const verifySetup = (final?: boolean) => {
     setIfNullish('IS_RPC', process.env.TEST_RPC_URL ? 'true' : 'false');
     setIfNullish('IS_SEQUENCER', process.env.TEST_PROVIDER_BASE_URL ? 'true' : 'false');
     setIfNullish(
-      'IS_SEQUENCER_GOERLI',
+      'IS_CAIRO1_TESTNET',
       (process.env.TEST_PROVIDER_BASE_URL || process.env.TEST_RPC_URL || '').includes(
         BaseUrl.SN_GOERLI
       )
@@ -203,7 +203,7 @@ const verifySetup = (final?: boolean) => {
     IS_RPC_GOERLI: process.env.IS_RPC_GOERLI,
     IS_RPC: process.env.IS_RPC,
     IS_SEQUENCER: process.env.IS_SEQUENCER,
-    IS_SEQUENCER_GOERLI: process.env.IS_SEQUENCER_GOERLI,
+    IS_CAIRO1_TESTNET: process.env.IS_CAIRO1_TESTNET,
   });
 
   // eslint-disable-next-line no-console

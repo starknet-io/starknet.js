@@ -19,8 +19,8 @@ import {
   compiledComplexSierra,
   compiledHelloSierra,
   compiledHelloSierraCasm,
+  describeIfCairo1Tesnet,
   describeIfDevnet,
-  describeIfSequencerGoerli,
   getTestAccount,
   getTestProvider,
 } from './config/fixtures';
@@ -497,8 +497,8 @@ describeIfDevnet('Cairo 1 Devnet', () => {
   });
 });
 
-describeIfSequencerGoerli('Cairo1 Testnet', () => {
-  describe('TS validation for Sequencer API - C1 T2 C:0x771bbe2ba64f... - tests skipped', () => {
+describeIfCairo1Tesnet('Cairo1 Testnet', () => {
+  describe('TS validation for Goerli', () => {
     const provider = getTestProvider();
     const classHash: any = '0x028b6f2ee9ae00d55a32072d939a55a6eb522974a283880f3c73a64c2f9fd6d6';
     const contractAddress: any =
