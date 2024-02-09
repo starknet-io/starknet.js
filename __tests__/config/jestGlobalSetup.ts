@@ -34,7 +34,7 @@ const localDevnetDetectionStrategy = async () => {
       strategy.isDevnet && (strategy.isRS || process.env.TEST_RPC_URL) ? 'true' : 'false'
     );
     setIfNullish(
-      'IS_SEQUENCER_DEVNET',
+      'IS_RPC_GOERLI',
       strategy.isDevnet && process.env.IS_RPC_DEVNET === 'false' ? 'true' : 'false'
     );
     return strategy;
@@ -173,7 +173,7 @@ const verifySetup = (final?: boolean) => {
   if (!final) {
     setIfNullish('IS_LOCALHOST_DEVNET', 'false');
     setIfNullish('IS_RPC_DEVNET', 'false');
-    setIfNullish('IS_SEQUENCER_DEVNET', 'false');
+    setIfNullish('IS_RPC_GOERLI', 'false');
     setIfNullish('IS_RPC', process.env.TEST_RPC_URL ? 'true' : 'false');
     setIfNullish('IS_SEQUENCER', process.env.TEST_PROVIDER_BASE_URL ? 'true' : 'false');
     setIfNullish(
@@ -200,7 +200,7 @@ const verifySetup = (final?: boolean) => {
   console.table({
     IS_LOCALHOST_DEVNET: process.env.IS_LOCALHOST_DEVNET,
     IS_RPC_DEVNET: process.env.IS_RPC_DEVNET,
-    IS_SEQUENCER_DEVNET: process.env.IS_SEQUENCER_DEVNET,
+    IS_RPC_GOERLI: process.env.IS_RPC_GOERLI,
     IS_RPC: process.env.IS_RPC,
     IS_SEQUENCER: process.env.IS_SEQUENCER,
     IS_SEQUENCER_GOERLI: process.env.IS_SEQUENCER_GOERLI,
