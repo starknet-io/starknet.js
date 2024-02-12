@@ -157,7 +157,7 @@ const verifySetup = (final?: boolean) => {
     else warnings.push('TEST_ACCOUNT_PRIVATE_KEY env is not provided!');
   }
 
-  if (!process.env.TEST_RPC_URL) {
+  if (!process.env.TEST_RPC_URL && final) {
     process.env.TEST_RPC_URL = getDefaultNodeUrl();
   }
 

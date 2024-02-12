@@ -12,7 +12,7 @@ import {
   Invocation,
   InvocationsDetailsWithNonce,
   RPC,
-  RpcProviderOptions,
+  RpcChannelOptions,
   TransactionType,
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
@@ -52,8 +52,8 @@ export class RpcChannel {
 
   readonly waitMode: Boolean; // behave like web2 rpc and return when tx is processed
 
-  constructor(optionsOrProvider?: RpcProviderOptions) {
-    const { nodeUrl, retries, headers, blockIdentifier, chainId, waitMode } =
+  constructor(optionsOrProvider?: RpcChannelOptions) {
+    const { nodeUrl, retries, headers, blockIdentifier, chainId, waitMode, speckVersion } =
       optionsOrProvider || {};
     if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
       this.nodeUrl = getDefaultNodeUrl(
@@ -76,6 +76,7 @@ export class RpcChannel {
     this.chainId = chainId;
     this.waitMode = waitMode || false;
     this.requestId = 0;
+    this.speckVersion = speckVersion;
   }
 
   public fetch(method: string, params?: object, id: string | number = 0) {
