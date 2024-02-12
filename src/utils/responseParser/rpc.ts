@@ -1,6 +1,6 @@
 /**
  * Map RPC Response to common interface response
- * Intersection (sequencer response ∩ (∪ rpc responses))
+ * Intersection (rpc responses))
  */
 import {
   ContractClassResponse,

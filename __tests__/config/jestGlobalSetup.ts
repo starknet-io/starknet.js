@@ -11,7 +11,6 @@ type DevnetStrategy = {
   isRS: boolean;
 };
 type ProviderType = {
-  sequencer: boolean;
   rpc: boolean;
 };
 
@@ -70,9 +69,8 @@ const localDevnetDetectionStrategy = async () => {
   return setup(strategy);
 };
 
-const sequencerOrRpc = async (devnetStrategy?: DevnetStrategy) => {
+const rpc = async (devnetStrategy?: DevnetStrategy) => {
   const setup = (providerType: ProviderType) => {
-    setIfNullish('IS_SEQUENCER', providerType.sequencer ? 'true' : 'false');
     setIfNullish('IS_RPC', providerType.rpc ? 'true' : 'false');
     setIfNullish(
       'IS_CAIRO1_TESTNET',
@@ -84,21 +82,14 @@ const sequencerOrRpc = async (devnetStrategy?: DevnetStrategy) => {
     );
     return providerType;
   };
-  let result: ProviderType = { sequencer: false, rpc: false };
-  if (process.env.TEST_PROVIDER_BASE_URL) {
-    return setup({ ...result, sequencer: true });
-  }
+  let result: ProviderType = { rpc: false };
   if (process.env.TEST_RPC_URL) {
     return setup({ ...result, rpc: true });
   }
-  // nor sequencer nor rpc provided, try with local devnet strategy
+  // nor rpc provided, try with local devnet strategy
   if (devnetStrategy && devnetStrategy.isDevnet) {
-    result = { sequencer: !devnetStrategy.isRS, rpc: devnetStrategy.isRS };
-    if (result.sequencer) {
-      process.env.TEST_PROVIDER_BASE_URL = GS_DEFAULT_TEST_PROVIDER_URL;
-    } else if (result.rpc) {
-      process.env.TEST_RPC_URL = GS_DEFAULT_TEST_PROVIDER_URL;
-    }
+    result = { rpc: devnetStrategy.isRS };
+    if (result.rpc) process.env.TEST_RPC_URL = GS_DEFAULT_TEST_PROVIDER_URL;
   }
   return setup(result);
 };
@@ -175,7 +166,6 @@ const verifySetup = (final?: boolean) => {
     setIfNullish('IS_RPC_DEVNET', 'false');
     setIfNullish('IS_RPC_GOERLI', 'false');
     setIfNullish('IS_RPC', process.env.TEST_RPC_URL ? 'true' : 'false');
-    setIfNullish('IS_SEQUENCER', process.env.TEST_PROVIDER_BASE_URL ? 'true' : 'false');
     setIfNullish(
       'IS_CAIRO1_TESTNET',
       (process.env.TEST_PROVIDER_BASE_URL || process.env.TEST_RPC_URL || '').includes(
@@ -202,7 +192,6 @@ const verifySetup = (final?: boolean) => {
     IS_RPC_DEVNET: process.env.IS_RPC_DEVNET,
     IS_RPC_GOERLI: process.env.IS_RPC_GOERLI,
     IS_RPC: process.env.IS_RPC,
-    IS_SEQUENCER: process.env.IS_SEQUENCER,
     IS_CAIRO1_TESTNET: process.env.IS_CAIRO1_TESTNET,
   });
 
@@ -235,11 +224,8 @@ const executeStrategy = async () => {
     }
   }
 
-  const providerType = await sequencerOrRpc(devnetStrategy);
-  if (providerType.sequencer) {
-    // eslint-disable-next-line no-console
-    console.log('Detected Sequencer');
-  } else if (providerType.rpc) {
+  const providerType = await rpc(devnetStrategy);
+  if (providerType.rpc) {
     // eslint-disable-next-line no-console
     console.log('Detected RPC');
   }

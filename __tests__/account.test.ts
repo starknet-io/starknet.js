@@ -804,7 +804,7 @@ describe('deploy and test Wallet', () => {
 });
 
 describe('unit', () => {
-  describeIfRPCGoerli('devnet sequencer', () => {
+  describeIfRPCGoerli('devnet Goerli', () => {
     initializeMatcher(expect);
     const provider = getTestProvider();
     const account = getTestAccount(provider);

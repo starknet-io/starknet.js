@@ -85,7 +85,6 @@ export const createBlockForDevnet = async (): Promise<void> => {
 };
 
 const describeIf = (condition: boolean) => (condition ? describe : describe.skip);
-export const describeIfSequencer = describeIf(process.env.IS_SEQUENCER === 'true');
 export const describeIfRpc = describeIf(process.env.IS_RPC === 'true');
 export const describeIfNotDevnet = describeIf(process.env.IS_LOCALHOST_DEVNET === 'false');
 export const describeIfDevnet = describeIf(process.env.IS_LOCALHOST_DEVNET === 'true');

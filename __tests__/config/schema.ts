@@ -5,9 +5,8 @@ import accountSchemas from '../schemas/account.json';
 import libSchemas from '../schemas/lib.json';
 import providerSchemas from '../schemas/provider.json';
 import rpcSchemas from '../schemas/rpc.json';
-import sequencerSchemas from '../schemas/sequencer.json';
 
-const schemas = [accountSchemas, sequencerSchemas, providerSchemas, libSchemas, rpcSchemas];
+const schemas = [accountSchemas, providerSchemas, libSchemas, rpcSchemas];
 const jestJsonMatchers = matchersWithOptions({ schemas }, (ajv: any) => {
   // @ts-ignore
   ajv.addKeyword({
@@ -32,7 +31,6 @@ export const initializeMatcher = (expect: jest.Expect) => {
     },
   });
   expect(accountSchemas).toBeValidSchema();
-  expect(sequencerSchemas).toBeValidSchema();
   expect(providerSchemas).toBeValidSchema();
   expect(libSchemas).toBeValidSchema();
   expect(rpcSchemas).toBeValidSchema();
