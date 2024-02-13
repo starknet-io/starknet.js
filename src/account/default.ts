@@ -75,9 +75,10 @@ export class Account extends Provider implements AccountInterface {
     cairoVersion?: CairoVersion,
     transactionVersion:
       | ETransactionVersion.V2
-      | ETransactionVersion.V3 = DEFAULT_TRANSACTION_VERSION
+      | ETransactionVersion.V3 = DEFAULT_TRANSACTION_VERSION,
+    instance?: boolean
   ) {
-    super(providerOrOptions);
+    super(providerOrOptions, instance);
     this.address = address.toLowerCase();
     this.signer =
       typeof pkOrSigner === 'string' || pkOrSigner instanceof Uint8Array

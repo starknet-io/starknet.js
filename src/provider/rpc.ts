@@ -35,8 +35,11 @@ export class RpcProvider implements ProviderInterface {
 
   public channel: RpcChannel;
 
-  constructor(optionsOrProvider?: RpcProviderOptions | ProviderInterface | RpcProvider) {
-    if (optionsOrProvider && 'onInstance' in optionsOrProvider && optionsOrProvider.onInstance) {
+  constructor(
+    optionsOrProvider?: RpcProviderOptions | ProviderInterface | RpcProvider,
+    instance?: boolean
+  ) {
+    if (optionsOrProvider && instance) {
       // stop ts complains
       // @ts-expect-error
       this.channel = null;
