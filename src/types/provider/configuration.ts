@@ -13,4 +13,5 @@ export type RpcProviderOptions = {
   default?: boolean;
   waitMode?: boolean;
   rpcVersion?: ERPCVersion;
+  speckVersion?: string;
 };
