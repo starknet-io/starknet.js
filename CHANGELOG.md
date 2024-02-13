@@ -1,3 +1,9 @@
+# [6.1.0](https://github.com/starknet-io/starknet.js/compare/v6.0.0...v6.1.0) (2024-02-13)
+
+### Features
+
+- use fetch-cookie package for cookie based sticky sessions ([5a56485](https://github.com/starknet-io/starknet.js/commit/5a56485052e773c8b0a3f9dbdc2f4ba3626362fb))
+
 # [6.0.0](https://github.com/starknet-io/starknet.js/compare/v5.29.0...v6.0.0) (2024-02-05)
 
 ### Bug Fixes
