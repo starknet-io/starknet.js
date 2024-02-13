@@ -59,7 +59,7 @@ Read the Public Key of the account:
 
 ```typescript
 const provider = new RpcProvider({ nodeUrl: "http://127.0.0.1:5050/rpc" }); //devnet
-const compiledAccount = json.parse(fs.readFileSync("./compiled_contracts/Account_0_5_1.json").toString("ascii"));
+const compiledAccount = json.parse(fs.readFileSync("./__mocks__/cairo/account/accountOZ080.json").toString("ascii"));
 const accountAddress ="0x...."; // account of sender
 const contractAccount = new Contract(compiledAccount.abi, accountAddress, provider);
 const pubKey3 = await contractAccount.call("getPublicKey");
@@ -79,7 +79,7 @@ The sender can provide an account address, despite a full public key.
 
 ```typescript
 const provider = new RpcProvider({ nodeUrl: "http://127.0.0.1:5050/rpc" }); //devnet
-const compiledAccount = json.parse(fs.readFileSync("./compiled_contracts/Account_0_5_1.json").toString("ascii"));
+const compiledAccount = json.parse(fs.readFileSync("./__mocks__/cairo/account/accountOZ080.json").toString("ascii"));
 
 const accountAddress ="0x..."; // account of sender
 const contractAccount = new Contract(compiledAccount.abi, accountAddress, provider);

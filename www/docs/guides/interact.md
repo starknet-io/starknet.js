@@ -99,7 +99,7 @@ console.log("Final balance =", bal2);
 
 We have seen in the previous chapter how to send a "legacy" transaction, with fees paid in ETH.  
 You can also send transactions and pay the fees with the STRK token. It is called a V3 transaction.  
-To perform a such transaction, you needs :
+To perform a such transaction, you need:
 
 - an account compatible with V3 transactions.
 - Some STRK tokens in this account.

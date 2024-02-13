@@ -56,8 +56,8 @@ Declaration and deployment of the ERC20 contract:
 ```typescript
 // Deploy an ERC20 contract
 console.log("Deployment Tx - ERC20 Contract to Starknet...");
-const compiledSierra = json.parse(fs.readFileSync("./compiled_contracts/erc20OZ081.sierra.json").toString("ascii"));
-    const compiledCasm = json.parse(fs.readFileSync("./compiled_contracts/erc20OZ081.casm.json").toString("ascii"));
+const compiledSierra = json.parse(fs.readFileSync("./__mocks__/cairo/ERC20-241/ERC20OZ081.sierra.json").toString("ascii"));
+    const compiledCasm = json.parse(fs.readFileSync("./__mocks__/cairo/ERC20-241/ERC20OZ081.casm.json").toString("ascii"));
     const initialTk: Uint256 = cairo.uint256(20n*10n**18n); // 20 NIT
     const erc20CallData: CallData = new CallData(compiledSierra.abi);
     const ERC20ConstructorCallData: Calldata = erc20CallData.compile("constructor", {

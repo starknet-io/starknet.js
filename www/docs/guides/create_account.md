@@ -143,7 +143,7 @@ console.log('✅ ArgentX wallet deployed at:', AXcontractFinalAddress);
 
 ## Create a Braavos account
 
-More complicated, a Braavos account needs a proxy and a specific signature. Starknet.js is handling only Starknet standard signatures; so we need extra code to handle this specific signature for account creation. These nearly 200 lines of code are not displayed here but are available in a module [here](./compiled_contracts/deployBraavos.ts).
+More complicated, a Braavos account needs a proxy and a specific signature. Starknet.js is handling only Starknet standard signatures; so we need extra code to handle this specific signature for account creation. These nearly 200 lines of code are not displayed here but are available in a module [here](./doc_scripts/deployBraavos.ts).
 
 We will deploy hereunder a Braavos account in devnet. So launch starknet-devnet with these parameters:
 
@@ -263,7 +263,7 @@ const AAstarkKeyPub = ec.starkCurve.getStarkKey(AAprivateKey);
 console.log('publicKey=', AAstarkKeyPub);
 
 // declare the contract
-const compiledAAaccount = json.parse(fs.readFileSync("./compiled_contracts/myAccountAbstraction.json").toString("ascii"));
+const compiledAAaccount = json.parse(fs.readFileSync("./__mocks__/cairo/myAccountAbstraction/myAccountAbstraction.json").toString("ascii"));
 const { transaction_hash: declTH, class_hash: decCH } =
     await account0.declare({contract: compiledAAaccount});
 console.log('Customized account class hash =', decCH);

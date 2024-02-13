@@ -37,7 +37,7 @@ On Starknet.js side, you have to select the proper version, to be in accordance 
 |v0.5.1 | Starknet.js v5.29.0 & v6.0.0|
 |v0.6.0 | Starknet.js v6.0.0|
 
-Starknet.js v6.0.0 will recognize automatically if you are connect to a v0.5.1 or a v0.6.0 rpc spec version.
+Starknet.js v6.x.x will recognize automatically if you are connected to a v0.5.1 or a v0.6.0 rpc spec version.
 
 With the `RpcProvider` class, you define the Starknet Rpc node to use.
 
