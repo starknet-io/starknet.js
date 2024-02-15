@@ -8,7 +8,8 @@ export type CairoEnumRaw = {
  *  {Success: 234, Warning: undefined, Error: undefined}.
  *  Only one variant with a value, object, array.
  * @returns an instance representing a Cairo custom Enum.
- * @example ```typescript
+ * @example
+ * ```typescript
  * const myCairoEnum = new CairoCustomEnum( {Success: undefined, Warning: "0x7f32ea", Error: undefined})
  * ```
  */
@@ -16,7 +17,8 @@ export class CairoCustomEnum {
   /**
    * direct readonly access to variants of the Cairo Custom Enum.
    * @returns a value of type any
-   * @example ```typescript
+   * @example
+   * ```typescript
    * const successValue = myCairoEnum.variant.Success;
    */
   readonly variant: CairoEnumRaw;
@@ -27,7 +29,7 @@ export class CairoCustomEnum {
   constructor(enumContent: CairoEnumRaw) {
     const variantsList = Object.values(enumContent);
     if (variantsList.length === 0) {
-      throw new Error('This Enum must have a least 1 variant');
+      throw new Error('This Enum must have at least 1 variant');
     }
     const nbActiveVariants = variantsList.filter(
       (content) => typeof content !== 'undefined'

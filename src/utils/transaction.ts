@@ -9,6 +9,7 @@ import {
   RawArgs,
   UniversalDeployerContractPayload,
 } from '../types';
+import { ETransactionVersion } from '../types/api';
 import { CallData } from './calldata';
 import { starkCurve } from './ec';
 import { calculateContractAddressFromHash, getSelectorFromName } from './hash';
@@ -137,4 +138,17 @@ export function buildUDCCall(
     calls: params.map((it) => it.call),
     addresses: params.map((it) => it.address),
   };
+}
+
+/**
+ * Return transaction versions based on version type, default version type is 'transaction'
+ */
+export function getVersionsByType(versionType?: 'fee' | 'transaction') {
+  return versionType === 'fee'
+    ? {
+        v1: ETransactionVersion.F1,
+        v2: ETransactionVersion.F2,
+        v3: ETransactionVersion.F3,
+      }
+    : { v1: ETransactionVersion.V1, v2: ETransactionVersion.V2, v3: ETransactionVersion.V3 };
 }
