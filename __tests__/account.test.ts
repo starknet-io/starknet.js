@@ -803,6 +803,51 @@ describe('deploy and test Wallet', () => {
       // innerInvokeEstFeeSpy.mockClear();
     });
   });
+
+  describe('EstimateFeeBulk with Cario1 Acc', () => {
+    test('estimateInvokeFee Cairo 1', async () => {
+      const ddc1: DeclareDeployUDCResponse = await account.declareAndDeploy({
+        contract: compiledHelloSierra,
+        casm: compiledHelloSierraCasm,
+      });
+
+      const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
+      const result = await account.estimateInvokeFee({
+        contractAddress: ddc1.deploy.address,
+        entrypoint: 'increase_balance',
+        calldata: [100],
+      });
+
+      expect(result).toMatchSchemaRef('EstimateFee');
+      expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBeDefined();
+      innerInvokeEstFeeSpy.mockClear();
+    });
+
+    test('estimateFeeBulk Cairo 1', async () => {
+      const ddc1: DeclareDeployUDCResponse = await account.declareAndDeploy({
+        contract: compiledHelloSierra,
+        casm: compiledHelloSierraCasm,
+      });
+
+      const innerEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
+      const result = await account.estimateFeeBulk([
+        {
+          type: TransactionType.INVOKE,
+          payload: {
+            contractAddress: ddc1.deploy.address,
+            entrypoint: 'increase_balance',
+            calldata: [100],
+          },
+        },
+      ]);
+
+      result.forEach((value) => {
+        expect(value).toMatchSchemaRef('EstimateFee');
+      });
+      expect(innerEstFeeSpy.mock.calls[0][1].version).toBeDefined();
+      innerEstFeeSpy.mockClear();
+    });
+  });
 });
 
 describe('unit', () => {
