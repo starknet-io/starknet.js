@@ -7,6 +7,8 @@ export * from './provider';
 export * from './signer';
 export * from './channel';
 
+export * from './account/wallet';
+
 // TODO: decide on final export style
 export * from './types';
 export * as types from './types';
