@@ -6,7 +6,6 @@
 
 import 'isomorphic-fetch';
 
-/* eslint-disable no-console */
 import { register } from 'fetch-intercept';
 
 const util = require('util');
@@ -32,6 +31,7 @@ if (process.env.DEBUG === 'true') {
     requestError(error) {
       const match: any = combiner.find((it: any) => typeof it.result === 'undefined');
       match.result = error;
+      // eslint-disable-next-line no-console
       console.log('[fetch.requestError]', match);
       return Promise.reject(error);
     },
@@ -43,8 +43,10 @@ if (process.env.DEBUG === 'true') {
         const match: any = combiner.find((it: any) => it.request.body.id === res.id);
         if (match && 'request' in match) {
           match.result = result;
+          // eslint-disable-next-line no-console
           console.log(util.inspect(match, false, null, true /* enable colors */));
         } else {
+          // eslint-disable-next-line no-console
           console.log(result);
         }
       });
@@ -54,6 +56,7 @@ if (process.env.DEBUG === 'true') {
     responseError(error) {
       const match: any = combiner.find((it: any) => typeof it.result === 'undefined');
       match.result = error;
+      // eslint-disable-next-line no-console
       console.log('[fetch.responseError]', match);
       return Promise.reject(error);
     },
