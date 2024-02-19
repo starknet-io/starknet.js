@@ -10,6 +10,52 @@ Nevertheless, you might want to inform the DAPP user of the cost of the incoming
 
 Starknet.js proposes several functions to estimate the fees:
 
+## estimateInvokeFee
+
+To estimate the cost to invoke a contract in the network:
+
+```typescript
+const { suggestedMaxFee: estimatedFee1 } = await account0.estimateInvokeFee({
+	contractAddress: testAddress,
+	entrypoint: "increase_balance",
+	calldata: ["10", "30"]
+});
+```
+
+The result is in `estimatedFee1`, of type BigInt. Unit is WEI for "legacy" transactions, and FRI for V3 transactions.
+
+The complete answer for a "legacy" transaction :
+
+```typescript
+{
+  overall_fee: 2499000034986n,
+  gas_consumed: 2499n,
+  gas_price: 1000000014n,
+  unit: 'WEI',
+  suggestedMaxFee: 3748500052479n,
+  resourceBounds: {
+    l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
+    l1_gas: { max_amount: '0xabc', max_price_per_unit: '0x59682f15' }
+  }
+}
+```
+
+The complete answer for a V3 transaction :
+
+```typescript
+{
+  overall_fee: 46098414083169n,
+  gas_consumed: 2499n,
+  gas_price: 18446744331n,
+  unit: 'FRI',
+  suggestedMaxFee: 69147621124753n,
+  resourceBounds: {
+    l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
+    l1_gas: { max_amount: '0xabc', max_price_per_unit: '0x671447890' }
+  }
+}
+```
+
 ## estimateDeclareFee
 
 To estimate the cost to declare a contract in the network:
@@ -51,20 +97,6 @@ const { suggestedMaxFee: estimatedFee1 } = await account0.estimateAccountDeployF
 
 The result is in `estimatedFee1`, of type BigInt.
 
-## estimateInvokeFee
-
-To estimate the cost to invoke a contract in the network:
-
-```typescript
-const { suggestedMaxFee: estimatedFee1 } = await account0.estimateInvokeFee({
-	contractAddress: testAddress,
-	entrypoint: "increase_balance",
-	calldata: ["10", "30"]
-});
-```
-
-The result is in `estimatedFee1`, of type BigInt.
-
 ## Fee limitation
 
 In all non-free functions, you can add an optional parameter limiting the fee consumption.  
@@ -89,4 +121,13 @@ const { suggestedMaxFee: estimatedFee1 } = await account0.estimateDeclareFee({ c
 const declareResponse = await account0.declare({ contract: compiledTest},
   { maxFee: estimatedFee1 * 11n / 10n}
 );
+```
+
+## Real fee paid
+
+After the processing of the transaction, you can read the fee that has really been paid :
+
+```typescript
+const txR = await provider.waitForTransaction(txH);
+console.log("Fee paid =", txR.actual_fee);
 ```

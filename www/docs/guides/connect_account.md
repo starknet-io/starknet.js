@@ -45,10 +45,8 @@ const account = new Account(provider, accountAddress, privateKey);
 
 Your account is now connected, and you can use it.
 
-> **IMPORTANT:** If this account is based on a Cairo v2 contract (for example OpenZeppelin account 0.7.0 or later), do not forget to add the parameter "1" after the privateKey parameter:
-
 ```typescript
-const account = new Account(provider, accountAddress, privateKey, "1");
+const account = new Account(provider, accountAddress, privateKey);
 ```
 
 > Take care that this added parameter is a string, NOT a number.
@@ -74,8 +72,6 @@ const privateKey = process.env.OZ_NEW_ACCOUNT_PRIVKEY;
 const accountAddress = "0x051158d244c7636dde39ec822873b29e6c9a758c6a9812d005b6287564908667";
 
 const account = new Account(provider, accountAddress, privateKey);
-// add ,"1" after privateKey if this account is not a Cairo 0 contract
-
 ```
 
 ## Connect to an account that uses Ethereum signature
@@ -90,7 +86,7 @@ const myEthSigner = new EthSigner(myEthPrivateKey);
 const myEthAccount = new Account(provider, myEthAccountAddress, myEthSigner)
 ```
 
-And if you need a randon Ethereum private key:
+And if you need a random Ethereum private key:
 
 ```typescript
 const myPrivateKey = eth.ethRandomPrivateKey();

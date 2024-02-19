@@ -37,16 +37,16 @@ const addrETH = "0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004
 
 Let's dive down the rabbit hole!
 
-This example works with an ERC20 mintable (everybody can mint new tokens), that we will deploy on the devnet (launched with `starknet-devnet --seed 0`).
+This example works with an ERC20, that we will deploy on the devnet-rs (launched with `cargo run --release -- --seed 0`).
 
-First, let's initialize an account:
+First, let's initialize an existing account:
 
 ```typescript
 // initialize provider
 const provider = new RpcProvider({ nodeUrl: "http://127.0.0.1:5050/rpc" });
-// initialize existing pre-deployed account 0 of Devnet
-const privateKey = "0xe3e70682c2094cac629f6fbed82c07cd";
-const accountAddress = "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a";
+// initialize existing pre-deployed account 0 of Devnet-rs
+const privateKey = "0x71d7bb07b9a64f6f78ac4c816aff4da9";
+const accountAddress = "0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691";
 
 const account0 = new Account(provider, accountAddress, privateKey);
 ```
@@ -56,21 +56,21 @@ Declaration and deployment of the ERC20 contract:
 ```typescript
 // Deploy an ERC20 contract
 console.log("Deployment Tx - ERC20 Contract to Starknet...");
-const compiledErc20mintable = json.parse(fs.readFileSync("compiled_contracts/ERC20MintableOZ051.json").toString("ascii"));
-    const initialTk: Uint256 = cairo.uint256(100);
-    const erc20CallData: CallData = new CallData(compiledErc20mintable.abi);
+const compiledSierra = json.parse(fs.readFileSync("./__mocks__/cairo/ERC20-241/ERC20OZ081.sierra.json").toString("ascii"));
+    const compiledCasm = json.parse(fs.readFileSync("./__mocks__/cairo/ERC20-241/ERC20OZ081.casm.json").toString("ascii"));
+    const initialTk: Uint256 = cairo.uint256(20n*10n**18n); // 20 NIT
+    const erc20CallData: CallData = new CallData(compiledSierra.abi);
     const ERC20ConstructorCallData: Calldata = erc20CallData.compile("constructor", {
         name: "niceToken",
         symbol: "NIT",
-        decimals: 18,
-        initial_supply: initialTk,
-        recipient: account0.address,
-        owner: account0.address
+        fixed_supply: initialTk,
+        recipient: account0.address
     });
 
     console.log("constructor=", ERC20ConstructorCallData);
     const deployERC20Response = await account0.declareAndDeploy({
-        contract: compiledErc20mintable,
+        contract: compiledSierra,
+        casm: compiledCasm,
         constructorCalldata: ERC20ConstructorCallData
     });
     console.log("ERC20 declared hash: ", deployERC20Response.declare.class_hash);
@@ -79,54 +79,35 @@ const compiledErc20mintable = json.parse(fs.readFileSync("compiled_contracts/ERC
 // Get the erc20 contract address
 const erc20Address = deployERC20Response.deploy.contract_address;
 // Create a new erc20 contract object
-const erc20 = new Contract(compiledErc20mintable.abi, erc20Address, provider);
+const erc20 = new Contract(compiledSierra.abi, erc20Address, provider);
 erc20.connect(account0);
 ```
 
 ## Interact with an ERC20
 
-Here we will read the balance, mint new tokens, and transfer tokens:
+Here we will read the balance and transfer tokens:
 
 ```typescript
-// Check balance - should be 100
+// Check balance - should be 20 NIT
 console.log(`Calling Starknet for account balance...`);
 const balanceInitial = await erc20.balanceOf(account0.address);
-console.log("account0 has a balance of:", uint256.uint256ToBN(balanceInitial.balance).toString()); // Cairo 0 response
+console.log("account0 has a balance of:", balanceInitial);
 
-// Mint 1000 tokens to account address
-const amountToMint = cairo.uint256(1000);
-console.log("Invoke Tx - Minting 1000 tokens to account0...");
-const { transaction_hash: mintTxHash } = await erc20.mint(
-	account0.address,
-	amountToMint,
-	{ maxFee: 900_000_000_000_000 }
-);
-
-// Wait for the invoke transaction to be accepted on Starknet
-console.log(`Waiting for Tx to be Accepted on Starknet - Minting...`);
-await provider.waitForTransaction(mintTxHash);
-
-// Check balance - should be 1100
-console.log(`Calling Starknet for account balance...`);
-const balanceBeforeTransfer = await erc20.balanceOf(account0.address);
-console.log("account0 has a balance of:", uint256.uint256ToBN(balanceBeforeTransfer.balance).toString()); // Cairo 0 response
-
-// Execute tx transfer of 10 tokens
-console.log(`Invoke Tx - Transfer 10 tokens back to erc20 contract...`);
-const toTransferTk: Uint256 = cairo.uint256(10);
-const transferCallData: Call = erc20.populate("transfer", {
-    recipient: erc20Address,
-    amount: toTransferTk // with Cairo 1 contract, 'toTransferTk' can be replaced by '10n'
+// Execute tx transfer of 1 tokens to account 1
+console.log(`Invoke Tx - Transfer 1 tokens to erc20 contract...`);
+const toTransferTk: Uint256 = cairo.uint256(1*10**18);
+const transferCall: Call = erc20.populate("transfer", {
+    recipient: "0x78662e7352d062084b0010068b99288486c2d8b914f6e2a55ce945f8792c8b1",
+    amount: 1n*10n**18n
 });
-    const { transaction_hash: transferTxHash } = await erc20.transfer( transferCallData.calldata);
-
+const { transaction_hash: transferTxHash } = await account0.execute( transferCall);
 // Wait for the invoke transaction to be accepted on Starknet
 console.log(`Waiting for Tx to be Accepted on Starknet - Transfer...`);
 await provider.waitForTransaction(transferTxHash);
 
-// Check balance after transfer - should be 1090
+// Check balance after transfer - should be 19 NIT
 console.log(`Calling Starknet for account balance...`);
 const balanceAfterTransfer = await erc20.balanceOf(account0.address);
-console.log("account0 has a balance of:", uint256.uint256ToBN(balanceAfterTransfer.balance).toString()); // Cairo 0 response
+console.log("account0 has a balance of:", balanceAfterTransfer);
 console.log("✅ Script completed.");
 ```
