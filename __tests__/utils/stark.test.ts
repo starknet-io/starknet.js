@@ -1,5 +1,6 @@
 import { CallData, RawArgs, UniversalDetails, json, stark } from '../../src';
-import { EDataAvailabilityMode, FeeEstimate } from '../../src/types/api';
+import { EDataAvailabilityMode } from '../../src/types/api';
+import { FeeEstimate } from '../../src/types/provider';
 import { toBigInt, toHex } from '../../src/utils/num';
 import { compiledOpenZeppelinAccount } from '../config/fixtures';
 

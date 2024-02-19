@@ -10,13 +10,8 @@ import {
   Signature,
   UniversalDetails,
 } from '../types';
-import {
-  EDAMode,
-  EDataAvailabilityMode,
-  ETransactionVersion,
-  FeeEstimate,
-  ResourceBounds,
-} from '../types/api';
+import { EDAMode, EDataAvailabilityMode, ETransactionVersion, ResourceBounds } from '../types/api';
+import { FeeEstimate } from '../types/provider';
 import { addHexPrefix, arrayBufferToString, atobUniversal, btoaUniversal } from './encode';
 import { parse, stringify } from './json';
 import {
