@@ -1,3 +1,9 @@
+## [6.1.1](https://github.com/starknet-io/starknet.js/compare/v6.1.0...v6.1.1) (2024-02-19)
+
+### Bug Fixes
+
+- rpc event ([ae3e265](https://github.com/starknet-io/starknet.js/commit/ae3e265f6617bd79c8435483916b0f24be036fa6))
+
 # [6.1.0](https://github.com/starknet-io/starknet.js/compare/v6.0.0...v6.1.0) (2024-02-13)
 
 ### Features
