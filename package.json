@@ -94,7 +94,7 @@
     "@scure/starknet": "~1.0.0",
     "fetch-cookie": "github:NethermindEth/fetch-cookie#export-cookieimpl",
     "abi-wan-kanabi-v1": "npm:abi-wan-kanabi@^1.0.3",
-    "abi-wan-kanabi-v2": "npm:abi-wan-kanabi@^2.1.1",
+    "abi-wan-kanabi-v2": "npm:abi-wan-kanabi@^2.2.1",
     "isomorphic-fetch": "^3.0.0",
     "lossless-json": "^2.0.8",
     "pako": "^2.0.4",
