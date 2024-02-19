@@ -1,4 +1,4 @@
-import { RpcChannel } from '../channel/rpc_0_6';
+import { RpcChannel, RPC06, RPC07 } from '../channel';
 import {
   AccountInvocations,
   BigNumberish,
@@ -32,7 +32,7 @@ import { ProviderInterface } from './interface';
 export class RpcProvider implements ProviderInterface {
   private responseParser = new RPCResponseParser();
 
-  public channel: RpcChannel;
+  public channel: RPC07.RpcChannel | RPC06.RpcChannel;
 
   constructor(optionsOrProvider?: RpcProviderOptions | ProviderInterface | RpcProvider) {
     if (optionsOrProvider && 'channel' in optionsOrProvider) {

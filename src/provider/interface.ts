@@ -1,4 +1,4 @@
-import { RpcChannel } from '../channel/rpc_0_6';
+import { RPC06, RPC07 } from '../channel';
 import { StarknetChainId } from '../constants';
 import type {
   AccountInvocations,
@@ -34,7 +34,7 @@ import type {
 } from '../types';
 
 export abstract class ProviderInterface {
-  public abstract channel: RpcChannel;
+  public abstract channel: RPC07.RpcChannel | RPC06.RpcChannel;
 
   /**
    * Gets the Starknet chain Id
