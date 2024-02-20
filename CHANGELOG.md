@@ -1,3 +1,9 @@
+## [6.1.2](https://github.com/starknet-io/starknet.js/compare/v6.1.1...v6.1.2) (2024-02-20)
+
+### Bug Fixes
+
+- drop abi-wan-kanabi-v1 support ([30a4681](https://github.com/starknet-io/starknet.js/commit/30a46815fa9fb88bbcb98df2f4a8dafc5a32b4ab))
+
 ## [6.1.1](https://github.com/starknet-io/starknet.js/compare/v6.1.0...v6.1.1) (2024-02-19)
 
 ### Bug Fixes
