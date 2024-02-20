@@ -35,7 +35,7 @@ export const parseAlwaysAsBig = (x: string): any =>
  * @returns JSON string
  */
 export const stringify = (
-  value: json.JavaScriptValue,
+  value: unknown,
   replacer?: any,
   space?: string | number | undefined,
   numberStringifiers?: json.NumberStringifier[] | undefined

@@ -1,4 +1,4 @@
-import type { Abi as AbiKanabiV2, TypedContract as AbiWanTypedContractV2 } from 'abi-wan-kanabi-v2';
+import type { Abi as AbiKanabi, TypedContract as AbiWanTypedContract } from 'abi-wan-kanabi';
 
 import { AccountInterface } from '../account';
 import { ProviderInterface } from '../provider';
@@ -26,7 +26,7 @@ import { CairoCustomEnum } from '../utils/calldata/enum/CairoCustomEnum';
 import { CairoOption } from '../utils/calldata/enum/CairoOption';
 import { CairoResult } from '../utils/calldata/enum/CairoResult';
 
-declare module 'abi-wan-kanabi-v2' {
+declare module 'abi-wan-kanabi' {
   export interface Config<OptionT = any, ResultT = any, ErrorT = any> {
     FeltType: BigNumberish;
     U256Type: number | bigint | Uint256;
@@ -41,7 +41,7 @@ declare module 'abi-wan-kanabi-v2' {
   }
 }
 
-type TypedContractV2<TAbi extends AbiKanabiV2> = AbiWanTypedContractV2<TAbi> & ContractInterface;
+type TypedContractV2<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & ContractInterface;
 
 export abstract class ContractInterface {
   public abstract abi: Abi;
@@ -160,5 +160,5 @@ export abstract class ContractInterface {
    */
   public abstract getVersion(): Promise<ContractVersion>;
 
-  public abstract typedv2<TAbi extends AbiKanabiV2>(tAbi: TAbi): TypedContractV2<TAbi>;
+  public abstract typedv2<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContractV2<TAbi>;
 }

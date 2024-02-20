@@ -12,7 +12,7 @@ You need 2 data:
 - the private key of this account
 
 ```typescript
-import { Account, Provider } from "starknet";
+import { Account, Provider } from 'starknet';
 ```
 
 ## Connect a predeployed account in Starknet-devnet
@@ -35,10 +35,10 @@ Then you can use this code:
 
 ```typescript
 // initialize provider
-const provider = new Provider({ sequencer: { baseUrl:"http://127.0.0.1:5050"  } });
+const provider = new Provider({ sequencer: { baseUrl: 'http://127.0.0.1:5050' } });
 // initialize existing pre-deployed account 0 of Devnet
-const privateKey = "0xe3e70682c2094cac629f6fbed82c07cd";
-const accountAddress = "0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a";
+const privateKey = '0xe3e70682c2094cac629f6fbed82c07cd';
+const accountAddress = '0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd372f75a551a';
 
 const account = new Account(provider, accountAddress, privateKey);
 ```
@@ -56,14 +56,14 @@ The code is exactly the same, you just have to:
 For example, to connect an existing account to testnet, with a private key stored in .env non archived file:
 
 ```typescript
-import * as dotenv from "dotenv";
+import * as dotenv from 'dotenv';
 dotenv.config();
 
 // initialize provider
-const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI2  } });
+const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI2 } });
 // initialize existing account
 const privateKey = process.env.OZ_NEW_ACCOUNT_PRIVKEY;
-const accountAddress = "0x051158d244c7636dde39ec822873b29e6c9a758c6a9812d005b6287564908667";
+const accountAddress = '0x051158d244c7636dde39ec822873b29e6c9a758c6a9812d005b6287564908667';
 
 const account = new Account(provider, accountAddress, privateKey);
 ```

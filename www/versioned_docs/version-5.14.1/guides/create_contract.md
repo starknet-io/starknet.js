@@ -27,7 +27,7 @@ Other users of the network can use your declared contract. It means that if some
 Example: if you want an ERC20 contract, and somebody has already declared an ERC20 contract that conforms to your needs, you have just to deploy a new instance of this contract class.
 
 ```typescript
-import { Provider, Account, Contract, json, stark, uint256, shortString } from "starknet";
+import { Provider, Account, Contract, json, stark, uint256, shortString } from 'starknet';
 ```
 
 ## `declareAndDeploy()` your new contract
@@ -38,20 +38,31 @@ Here, to declare & deploy a `Test.cairo` smartcontract, in devnet:
 
 ```typescript
 // connect provider
-const provider = new Provider({ sequencer: { baseUrl: "http://127.0.0.1:5050" } });
+const provider = new Provider({ sequencer: { baseUrl: 'http://127.0.0.1:5050' } });
 // connect your account. To adapt to your own account:
 const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
-const account0Address: string = "0x123....789";
+const account0Address: string = '0x123....789';
 const account0 = new Account(provider, account0Address, privateKey0);
 
 // Declare & deploy Test contract in devnet
-const compiledTestSierra = json.parse(fs.readFileSync( "./compiledContracts/test.sierra").toString( "ascii"));
-const compiledTestCasm = json.parse(fs.readFileSync( "./compiledContracts/test.casm").toString( "ascii"));
-const deployResponse = await account0.declareAndDeploy({ contract: compiledTestSierra, casm: compiledTestCasm });
+const compiledTestSierra = json.parse(
+  fs.readFileSync('./compiledContracts/test.sierra').toString('ascii')
+);
+const compiledTestCasm = json.parse(
+  fs.readFileSync('./compiledContracts/test.casm').toString('ascii')
+);
+const deployResponse = await account0.declareAndDeploy({
+  contract: compiledTestSierra,
+  casm: compiledTestCasm,
+});
 
 // Connect the new contract instance:
-const myTestContract = new Contract(compiledTest.abi, deployResponse.deploy.contract_address, provider);
-console.log("Test Contract Class Hash =", deployResponse.declare.class_hash);
+const myTestContract = new Contract(
+  compiledTest.abi,
+  deployResponse.deploy.contract_address,
+  provider
+);
+console.log('Test Contract Class Hash =', deployResponse.declare.class_hash);
 console.log('✅ Test Contract connected at =', myTestContract.address);
 ```
 
@@ -61,23 +72,25 @@ If the contract class is already declared, it's faster and cheaper: just use `de
 
 ```typescript
 // connect provider
-const provider = new Provider({ sequencer: { baseUrl: "http://127.0.0.1:5050" } });
+const provider = new Provider({ sequencer: { baseUrl: 'http://127.0.0.1:5050' } });
 // connect your account. To adapt to your own account:
 const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
-const account0Address: string = "0x123....789";
+const account0Address: string = '0x123....789';
 
 const account0 = new Account(provider, account0Address, privateKey0);
 
 // Deploy Test contract in devnet
 // ClassHash of the already declared contract
-const testClassHash = "0xff0378becffa6ad51c67ac968948dbbd110b8a8550397cf17866afebc6c17d";
+const testClassHash = '0xff0378becffa6ad51c67ac968948dbbd110b8a8550397cf17866afebc6c17d';
 
 const deployResponse = await account0.deployContract({ classHash: testClassHash });
-await provider.waitForTransaction( deployResponse.transaction_hash);
+await provider.waitForTransaction(deployResponse.transaction_hash);
 
 // read abi of Test contract
-const { abi: testAbi } = await provider.getClassByHash( testClassHash);
-if (testAbi === undefined) { throw new Error("no abi.") };
+const { abi: testAbi } = await provider.getClassByHash(testClassHash);
+if (testAbi === undefined) {
+  throw new Error('no abi.');
+}
 
 // Connect the new contract instance:
 const myTestContract = new Contract(testAbi, deployResponse.contract_address, provider);
@@ -114,16 +127,16 @@ You have several ways to define these inputs:
 This is the recommended way to proceed:
 
 ```typescript
-const myArray1: RawCalldata = ["0x0a", 24, 36n];
+const myArray1: RawCalldata = ['0x0a', 24, 36n];
 const contractCallData: CallData = new CallData(compiledContractSierra.abi);
-const contractConstructor: Calldata = contractCallData.compile("constructor", {
-        text: 'niceToken',
-        longText: "http://addressOfMyERC721pictures/image1.jpg",
-        array1: myArray1
-    });
+const contractConstructor: Calldata = contractCallData.compile('constructor', {
+  text: 'niceToken',
+  longText: 'http://addressOfMyERC721pictures/image1.jpg',
+  array1: myArray1,
+});
 const deployResponse = await account0.deployContract({
-    classHash: contractClassHash,
-    constructorCalldata: contractConstructor
+  classHash: contractClassHash,
+  constructorCalldata: contractConstructor,
 });
 ```
 
@@ -134,15 +147,15 @@ Starknet.js will perform a full verification of conformity with the abi. Propert
 For very simple constructors, you can use `CallData.compile`:
 
 ```typescript
-const myArray1: RawCalldata = ["0x0a", 24, 36n];
+const myArray1: RawCalldata = ['0x0a', 24, 36n];
 const contractConstructor: Calldata = CallData.compile({
-        text: 'niceToken',
-        longText: "http://addressOfMyERC721pictures/image1.jpg",
-        array1: myArray1
-    });
+  text: 'niceToken',
+  longText: 'http://addressOfMyERC721pictures/image1.jpg',
+  array1: myArray1,
+});
 const deployResponse = await account0.deployContract({
-    classHash: contractClassHash,
-    constructorCalldata: contractConstructor
+  classHash: contractClassHash,
+  constructorCalldata: contractConstructor,
 });
 ```
 
@@ -151,7 +164,11 @@ Properties have to be ordered in conformity with the abi.
 Even easier:
 
 ```typescript
-const contractConstructor: Calldata = CallData.compile(['niceToken', "http://addressOfMyERC721pictures/image1.jpg", myArray1]);
+const contractConstructor: Calldata = CallData.compile([
+  'niceToken',
+  'http://addressOfMyERC721pictures/image1.jpg',
+  myArray1,
+]);
 ```
 
 ## `declare()` for a new class
@@ -160,18 +177,25 @@ If you want only declare a new Contract Class, use `declare()`.
 
 ```typescript
 // connect provider
-const provider = new Provider({ sequencer: { baseUrl: "http://127.0.0.1:5050" } });
+const provider = new Provider({ sequencer: { baseUrl: 'http://127.0.0.1:5050' } });
 // connect your account. To adapt to your own account:
 const privateKey0 = process.env.OZ_ACCOUNT_PRIVATE_KEY;
-const account0Address: string = "0x123....789";
+const account0Address: string = '0x123....789';
 
 const account0 = new Account(provider, account0Address, starkKeyPair0);
 
 // Declare Test contract in devnet
-const compiledTestSierra = json.parse(fs.readFileSync( "./compiledContracts/test.sierra").toString("ascii"));
-const compiledtestCasm = json.parse(fs.readFileSync( "./compiledContracts/test.casm").toString("ascii"));
-const declareResponse = await account0.declare({ contract: compiledTestSierra, casm: compiledTestCasm });
+const compiledTestSierra = json.parse(
+  fs.readFileSync('./compiledContracts/test.sierra').toString('ascii')
+);
+const compiledtestCasm = json.parse(
+  fs.readFileSync('./compiledContracts/test.casm').toString('ascii')
+);
+const declareResponse = await account0.declare({
+  contract: compiledTestSierra,
+  casm: compiledTestCasm,
+});
 console.log('Test Contract declared with classHash =', declareResponse.class_hash);
 await provider.waitForTransaction(declareResponse.transaction_hash);
-console.log("✅ Test Completed.");
+console.log('✅ Test Completed.');
 ```

@@ -40,7 +40,7 @@ Later on, to use it in our code:
 ```js
 import { Contract, RpcProvider, constants } from 'starknet';
 
-const address = "YOUR_ADDRESS_HERE";
+const address = 'YOUR_ADDRESS_HERE';
 const provider = new RpcProvider({ nodeUrl: `${yourNodeUrl}` });
 const contract = new Contract(ABI, address, provider).typedv2(ABI);
 
@@ -69,14 +69,14 @@ starkli class-at "0x00000005dd3d2f4429af886cd1a3b08289dbcea99a294197e9eb43b0e032
 ```
 
 ```typescript
-import { Contract, RpcProvider, constants } from "starknet";
-import { ABI } from "./abi";
+import { Contract, RpcProvider, constants } from 'starknet';
+import { ABI } from './abi';
 
-const address = "0x00000005dd3d2f4429af886cd1a3b08289dbcea99a294197e9eb43b0e0325b4b";
+const address = '0x00000005dd3d2f4429af886cd1a3b08289dbcea99a294197e9eb43b0e0325b4b';
 const provider = new RpcProvider({ nodeUrl: constants.NetworkName.SN_MAIN });
 const contract = new Contract(ABI, address, provider).typedv2(ABI);
 
 // Notice the types inferred for the parameter and the returned value
-const primary_inteface_id = contract.get_primary_interface_id()
-const protocol_fees_collected = contract.get_protocol_fees_collected('0x1')
+const primary_inteface_id = contract.get_primary_interface_id();
+const protocol_fees_collected = contract.get_protocol_fees_collected('0x1');
 ```
