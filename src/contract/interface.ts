@@ -1,4 +1,3 @@
-import type { Abi as AbiKanabiV1, TypedContract as AbiWanTypedContractV1 } from 'abi-wan-kanabi-v1';
 import type { Abi as AbiKanabiV2, TypedContract as AbiWanTypedContractV2 } from 'abi-wan-kanabi-v2';
 
 import { AccountInterface } from '../account';
@@ -42,8 +41,6 @@ declare module 'abi-wan-kanabi-v2' {
   }
 }
 
-export type TypedContractV1<TAbi extends AbiKanabiV1> = AbiWanTypedContractV1<TAbi> &
-  ContractInterface;
 type TypedContractV2<TAbi extends AbiKanabiV2> = AbiWanTypedContractV2<TAbi> & ContractInterface;
 
 export abstract class ContractInterface {
@@ -163,6 +160,5 @@ export abstract class ContractInterface {
    */
   public abstract getVersion(): Promise<ContractVersion>;
 
-  public abstract typedv1<TAbi extends AbiKanabiV1>(tAbi: TAbi): TypedContractV1<TAbi>;
   public abstract typedv2<TAbi extends AbiKanabiV2>(tAbi: TAbi): TypedContractV2<TAbi>;
 }
