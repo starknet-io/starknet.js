@@ -17,7 +17,11 @@ Only one variant with a value, object, array.
 **`Example`**
 
 ```typescript
-const myCairoEnum = new CairoCustomEnum( {Success: undefined, Warning: "0x7f32ea", Error: undefined})
+const myCairoEnum = new CairoCustomEnum({
+  Success: undefined,
+  Warning: '0x7f32ea',
+  Error: undefined,
+});
 ```
 
 ## Constructors

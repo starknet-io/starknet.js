@@ -176,18 +176,16 @@ Example:
 // When there is only one call
 const call = await account.execute(
   {
-    contractAddress: '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',  // ETH contract address
+    contractAddress: '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7', // ETH contract address
     entrypoint: 'approve',
-    calldata: starknet.CallData.compile(
-      {
-        spender: "0x15e90f807a00a01df845460324fbcd33986f2df3cc9d981e9e8b5005b7f595e",
-        amount: {
-          type: 'struct',
-          low: '1',   // 1 wei
-          high: '0',
-        }
-      }
-    ),
+    calldata: starknet.CallData.compile({
+      spender: '0x15e90f807a00a01df845460324fbcd33986f2df3cc9d981e9e8b5005b7f595e',
+      amount: {
+        type: 'struct',
+        low: '1', // 1 wei
+        high: '0',
+      },
+    }),
   },
   undefined,
   {
@@ -199,24 +197,22 @@ const call = await account.execute(
 const multiCall = await account.execute(
   [
     {
-      contractAddress: '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',  // ETH contract address
+      contractAddress: '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7', // ETH contract address
       entrypoint: 'approve',
-      calldata: starknet.CallData.compile(
-        {
-          spender: "0x15e90f807a00a01df845460324fbcd33986f2df3cc9d981e9e8b5005b7f595e",
-          amount: {
-            type: 'struct',
-            low: '1',   // 1 wei
-            high: '0',
-          }
-        }
-      ),
+      calldata: starknet.CallData.compile({
+        spender: '0x15e90f807a00a01df845460324fbcd33986f2df3cc9d981e9e8b5005b7f595e',
+        amount: {
+          type: 'struct',
+          low: '1', // 1 wei
+          high: '0',
+        },
+      }),
     },
     {
       contractAddress: '0x15e90f807a00a01df845460324fbcd33986f2df3cc9d981e9e8b5005b7f595e',
       entrypoint: 'transfer_ether',
-      calldata: ['1', '0'],  // 1 wei
-    }
+      calldata: ['1', '0'], // 1 wei
+    },
   ],
   undefined,
   {
@@ -230,7 +226,7 @@ const multiCall = await account.execute(
 ```typescript
 {
   transaction_hash: string;
-};
+}
 ```
 
 ---
@@ -270,7 +266,7 @@ const declareTx = await account.declare({
 {
   transaction_hash: string;
   class_hash: string;
-};
+}
 ```
 
 ---
@@ -299,18 +295,14 @@ account.**deploy**(deployContractPayload [ , transactionsDetail ]) => _Promise <
 Example:
 
 ```typescript
-  const deployment = await account.deploy({
-    classHash: erc20ClassHash,
-    constructorCalldata: [
-      encodeShortString('Token'),
-      encodeShortString('ERC20'),
-      account.address,
-    ],
-    salt: randomAddress(),
-    unique: true, // Using true here so as not to clash with normal erc20 deploy in account and provider test
-  });
+const deployment = await account.deploy({
+  classHash: erc20ClassHash,
+  constructorCalldata: [encodeShortString('Token'), encodeShortString('ERC20'), account.address],
+  salt: randomAddress(),
+  unique: true, // Using true here so as not to clash with normal erc20 deploy in account and provider test
+});
 
-  await provider.waitForTransaction(deployment.transaction_hash);
+await provider.waitForTransaction(deployment.transaction_hash);
 ```
 
 Example multi-call:
@@ -356,14 +348,10 @@ account.**deployContract**(payload [ , details ]) => _Promise < DeployContractUD
 Example:
 
 ```typescript
-  const deployResponse = await account.deployContract({
-    classHash: erc20ClassHash,
-    constructorCalldata: [
-      encodeShortString('Token'),
-      encodeShortString('ERC20'),
-      account.address,
-    ],
-  });
+const deployResponse = await account.deployContract({
+  classHash: erc20ClassHash,
+  constructorCalldata: [encodeShortString('Token'), encodeShortString('ERC20'), account.address],
+});
 ```
 
 ---
@@ -409,17 +397,13 @@ account.**declareAndDeploy**(payload [ , details ]) => _Promise < DeclareDeployU
 Example:
 
 ```typescript
-  const declareDeploy = await account.declareDeploy({
-    contract: compiledErc20,
-    constructorCalldata: [
-      encodeShortString('Token'),
-      encodeShortString('ERC20'),
-      account.address,
-    ],
-  });
+const declareDeploy = await account.declareDeploy({
+  contract: compiledErc20,
+  constructorCalldata: [encodeShortString('Token'), encodeShortString('ERC20'), account.address],
+});
 
-  const declareTransactionHash = declareDeploy.declare.transaction_hash
-  const erc20Address = declareDeploy.deploy.contract_address;
+const declareTransactionHash = declareDeploy.declare.transaction_hash;
+const erc20Address = declareDeploy.deploy.contract_address;
 ```
 
 ---
@@ -451,7 +435,7 @@ The _transactionsDetail_ object may include any of:
 {
   contract_address: string;
   transaction_hash: string;
-};
+}
 ```
 
 ---

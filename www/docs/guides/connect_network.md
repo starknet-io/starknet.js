@@ -24,8 +24,8 @@ For example, this node is compatible with v0.5.1 & v0.6.0, using the following e
 From rpc spec v0.5.0, you can request the rpc spec version that uses a node address :
 
 ```typescript
-const resp=await myProvider.getSpecVersion();
-console.log("rpc version =",resp);
+const resp = await myProvider.getSpecVersion();
+console.log('rpc version =', resp);
 // result : rpc version = 0.6.0
 ```
 
@@ -43,7 +43,7 @@ Starknet.js v6.x.x will recognize automatically if you are connected to a v0.5.1
 With the `RpcProvider` class, you define the Starknet Rpc node to use.
 
 ```typescript
-import {RpcProvider} from 'starknet';
+import { RpcProvider } from 'starknet';
 ```
 
 ## Connect your DAPP to an RPC node provider
@@ -69,24 +69,45 @@ Some examples of RpcProvider instantiation to connect to RPC node providers:
 
 ```typescript
 // Infura node rpc 0.5.1 for Mainnet:
-const providerInfuraMainnet = new RpcProvider({ nodeUrl: 'https://starknet-mainnet.infura.io/v3/' + infuraKey });
+const providerInfuraMainnet = new RpcProvider({
+  nodeUrl: 'https://starknet-mainnet.infura.io/v3/' + infuraKey,
+});
 // Blast node rpc 0.5.1 & 0.6.0 for Mainnet:
-const providerBlastMainnet = new RpcProvider({ nodeUrl: 'https://starknet-mainnet.blastapi.io/' + blastKey + "/rpc/v0.5" });
-const providerBlastMainnet = new RpcProvider({ nodeUrl: 'https://starknet-mainnet.blastapi.io/' + blastKey + "/rpc/v0_6" });
+const providerBlastMainnet = new RpcProvider({
+  nodeUrl: 'https://starknet-mainnet.blastapi.io/' + blastKey + '/rpc/v0.5',
+});
+const providerBlastMainnet = new RpcProvider({
+  nodeUrl: 'https://starknet-mainnet.blastapi.io/' + blastKey + '/rpc/v0_6',
+});
 // Lava node rpc 0.4.0 for Mainnet:
-const providerMainnetLava = new RpcProvider({ nodeUrl: "https://g.w.lavanet.xyz:443/gateway/strk/rpc-http/" + lavaMainnetKey });
+const providerMainnetLava = new RpcProvider({
+  nodeUrl: 'https://g.w.lavanet.xyz:443/gateway/strk/rpc-http/' + lavaMainnetKey,
+});
 // Alchemy node rpc 0.5.1 for Mainnet:
-const providerAlchemyMainnet = new RpcProvider({ nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0.5/' + alchemyKey });
+const providerAlchemyMainnet = new RpcProvider({
+  nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0.5/' + alchemyKey,
+});
 // Public Nethermind node rpc 0.5.1 & 0.6.0 for Mainnet:
-const providerMainnetNethermindPublic = new RpcProvider({ nodeUrl: "https://free-rpc.nethermind.io/mainnet-juno/v0_5" });
-const providerMainnetNethermindPublic = new RpcProvider({ nodeUrl: "https://free-rpc.nethermind.io/mainnet-juno/v0_6" });
+const providerMainnetNethermindPublic = new RpcProvider({
+  nodeUrl: 'https://free-rpc.nethermind.io/mainnet-juno/v0_5',
+});
+const providerMainnetNethermindPublic = new RpcProvider({
+  nodeUrl: 'https://free-rpc.nethermind.io/mainnet-juno/v0_6',
+});
 // Public Blast node rpc 0.4.0, 0.5.1 & 0.6.0 for Mainnet:
-const providerBlastMainnet = new RpcProvider({ nodeUrl: "https://starknet-mainnet.public.blastapi.io/rpc/v0.4"});
-const providerBlastMainnet = new RpcProvider({ nodeUrl: "https://starknet-mainnet.public.blastapi.io/rpc/v0.5"});
-const providerBlastMainnet = new RpcProvider({ nodeUrl: "https://starknet-mainnet.public.blastapi.io/rpc/v0_6"});
+const providerBlastMainnet = new RpcProvider({
+  nodeUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0.4',
+});
+const providerBlastMainnet = new RpcProvider({
+  nodeUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0.5',
+});
+const providerBlastMainnet = new RpcProvider({
+  nodeUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0_6',
+});
 // Public Lava node rpc 0.4.0 for Mainnet:
-const providerLavaMainnet = new RpcProvider({ nodeUrl: "https://json-rpc.starknet-mainnet.public.lavanet.xyz"});
-
+const providerLavaMainnet = new RpcProvider({
+  nodeUrl: 'https://json-rpc.starknet-mainnet.public.lavanet.xyz',
+});
 ```
 
 > Take care to safely manage your API key. It's a confidential item!
@@ -95,26 +116,46 @@ const providerLavaMainnet = new RpcProvider({ nodeUrl: "https://json-rpc.starkne
 
 ```typescript
 // Infura node rpc 0.5.1 for Goerli Testnet:
-const providerInfuraTestnet = new RpcProvider({ nodeUrl: 'https://starknet-goerli.infura.io/v3/' + infuraKey });
+const providerInfuraTestnet = new RpcProvider({
+  nodeUrl: 'https://starknet-goerli.infura.io/v3/' + infuraKey,
+});
 // Blast node rpc 0.5.1 & 0.6.0 for Goerli Testnet:
-const providerBlastTestnet = new RpcProvider({ nodeUrl: 'https://starknet-testnet.blastapi.io/' + blastKey + "/rpc/v0.5" });
-const providerBlastTestnet = new RpcProvider({ nodeUrl: 'https://starknet-testnet.blastapi.io/' + blastKey + "/rpc/v0_6" });
+const providerBlastTestnet = new RpcProvider({
+  nodeUrl: 'https://starknet-testnet.blastapi.io/' + blastKey + '/rpc/v0.5',
+});
+const providerBlastTestnet = new RpcProvider({
+  nodeUrl: 'https://starknet-testnet.blastapi.io/' + blastKey + '/rpc/v0_6',
+});
 // Alchemy node rpc 0.5.1 for Goerli Testnet:
-const providerAlchemyTestnet = new RpcProvider({ nodeUrl: 'https://starknet-goerli.g.alchemy.com/starknet/version/rpc/v0.5/' + alchemyKey });
+const providerAlchemyTestnet = new RpcProvider({
+  nodeUrl: 'https://starknet-goerli.g.alchemy.com/starknet/version/rpc/v0.5/' + alchemyKey,
+});
 // Public Nethermind node rpc 0.5.1 & 0.6.0 for Goerli Testnet:
-const providerTestnetNethermindPublic = new RpcProvider({ nodeUrl: "https://free-rpc.nethermind.io/goerli-juno/v0_5" });
-const providerTestnetNethermindPublic = new RpcProvider({ nodeUrl: "https://free-rpc.nethermind.io/goerli-juno/v0_6" });
+const providerTestnetNethermindPublic = new RpcProvider({
+  nodeUrl: 'https://free-rpc.nethermind.io/goerli-juno/v0_5',
+});
+const providerTestnetNethermindPublic = new RpcProvider({
+  nodeUrl: 'https://free-rpc.nethermind.io/goerli-juno/v0_6',
+});
 ```
 
 ### Sepolia Testnet
 
 ```typescript
 // Blast node rpc 0.5.1 & 0.60 for Sepolia Testnet:
-const providerBlastTestnet = new RpcProvider({ nodeUrl: 'https://starknet-testnet.blastapi.io/' + blastKey + "/rpc/v0.5" });
-const providerBlastTestnet = new RpcProvider({ nodeUrl: 'https://starknet-testnet.blastapi.io/' + blastKey + "/rpc/v0_6" });
+const providerBlastTestnet = new RpcProvider({
+  nodeUrl: 'https://starknet-testnet.blastapi.io/' + blastKey + '/rpc/v0.5',
+});
+const providerBlastTestnet = new RpcProvider({
+  nodeUrl: 'https://starknet-testnet.blastapi.io/' + blastKey + '/rpc/v0_6',
+});
 // Alchemy node rpc for Sepolia Testnet:
-const providerSepoliaNethermindPublic = new RpcProvider({ nodeUrl: "https://free-rpc.nethermind.io/sepolia-juno/v0_5" });
-const providerSepoliaNethermindPublic = new RpcProvider({ nodeUrl: "https://free-rpc.nethermind.io/sepolia-juno/v0_6" });
+const providerSepoliaNethermindPublic = new RpcProvider({
+  nodeUrl: 'https://free-rpc.nethermind.io/sepolia-juno/v0_5',
+});
+const providerSepoliaNethermindPublic = new RpcProvider({
+  nodeUrl: 'https://free-rpc.nethermind.io/sepolia-juno/v0_6',
+});
 ```
 
 ## Connect to your own node
@@ -131,7 +172,7 @@ Your node can be located in your local network (example: Pathfinder node running
 You can connect with:
 
 ```typescript
-const provider = new RpcProvider({ nodeUrl: '192.168.1.99:9545/rpc/v0_6' })
+const provider = new RpcProvider({ nodeUrl: '192.168.1.99:9545/rpc/v0_6' });
 ```
 
 ### Juno
@@ -149,7 +190,7 @@ const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:6060/v0_6' });
 Example of a connection to a local development node (rpc 0.6.0), with Starknet-devnet-rs:
 
 ```typescript
-const provider = new RpcProvider({ nodeUrl: "http://127.0.0.1:5050/rpc" });
+const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
 ```
 
 > If you have customized host and port during starknet-devnet initialization, adapt in accordance to your script.

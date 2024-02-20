@@ -32,10 +32,14 @@ This means that the approach to convert a long string to an array of felts (for 
 
 ```typescript
 // v5
-const feltArray: BigNumberish[] = CallData.compile("http://addressOfMyERC721pictures/storage/image1.jpg");
+const feltArray: BigNumberish[] = CallData.compile(
+  'http://addressOfMyERC721pictures/storage/image1.jpg'
+);
 
 // v6
-const feltArray: BigNumberish[] = CallData.compile(shortString.splitLongString("http://addressOfMyERC721pictures/storage/image1.jpg"));
+const feltArray: BigNumberish[] = CallData.compile(
+  shortString.splitLongString('http://addressOfMyERC721pictures/storage/image1.jpg')
+);
 ```
 
 ## Fees
@@ -45,7 +49,7 @@ All functions related to gas price and fee estimation have changed output types.
 For example, if you read the content of a block with v5 the ETH gas price was a top level property, with v6 the same information is nested a level deeper:
 
 ```typescript
-const resp: GetBlockResponse = await myProvider.getBlock("latest");
+const resp: GetBlockResponse = await myProvider.getBlock('latest');
 
 // v5
 const gasPrice = resp.gas_price;
@@ -64,8 +68,8 @@ fee = {
   overall_fee: 247700000000000n,
   gas_consumed: 2477n,
   gas_price: 100000000000n,
-  suggestedMaxFee: 371550000000000n
-}
+  suggestedMaxFee: 371550000000000n,
+};
 
 // v6 response
 fee = {
@@ -76,9 +80,9 @@ fee = {
   suggestedMaxFee: 371550000000000n,
   resourceBounds: {
     l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-    l1_gas: { max_amount: '0xaa4', max_price_per_unit: '0x22ecb25c00' }
-  }
-}
+    l1_gas: { max_amount: '0xaa4', max_price_per_unit: '0x22ecb25c00' },
+  },
+};
 ```
 
 You have to adapt your code to all these new entries.
