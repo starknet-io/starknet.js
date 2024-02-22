@@ -1,5 +1,3 @@
-// the ts-ignore suppresses an esm to cjs import error that is resolved with bundling
-// @ts-ignore
 import * as json from 'lossless-json';
 
 /**
