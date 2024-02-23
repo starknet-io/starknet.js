@@ -1,3 +1,9 @@
+## [6.1.3](https://github.com/starknet-io/starknet.js/compare/v6.1.2...v6.1.3) (2024-02-23)
+
+### Bug Fixes
+
+- update fetch-cookie dependency ([518330c](https://github.com/starknet-io/starknet.js/commit/518330c4ee00e671e716b018220f767e8118c431))
+
 ## [6.1.2](https://github.com/starknet-io/starknet.js/compare/v6.1.1...v6.1.2) (2024-02-20)
 
 ### Bug Fixes
