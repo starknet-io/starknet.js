@@ -42,11 +42,13 @@ export class RpcChannel {
 
   public headers: object;
 
-  readonly retries: number;
-
   public requestId: number;
 
   readonly blockIdentifier: BlockIdentifier;
+
+  readonly retries: number;
+
+  readonly waitMode: boolean; // behave like web2 rpc and return when tx is processed
 
   private chainId?: StarknetChainId;
 
@@ -54,21 +56,22 @@ export class RpcChannel {
 
   private transactionRetryIntervalFallback?: number;
 
-  readonly waitMode: Boolean; // behave like web2 rpc and return when tx is processed
-
   private batchClient?: BatchClient;
+
+  private baseFetch: NonNullable<RpcProviderOptions['baseFetch']>;
 
   constructor(optionsOrProvider?: RpcProviderOptions) {
     const {
-      nodeUrl,
-      retries,
-      headers,
+      baseFetch,
+      batch,
       blockIdentifier,
       chainId,
+      headers,
+      nodeUrl,
+      retries,
       specVersion,
-      waitMode,
       transactionRetryIntervalFallback,
-      batch,
+      waitMode,
     } = optionsOrProvider || {};
     if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
       this.nodeUrl = getDefaultNodeUrl(nodeUrl as NetworkName, optionsOrProvider?.default);
@@ -77,20 +80,23 @@ export class RpcChannel {
     } else {
       this.nodeUrl = getDefaultNodeUrl(undefined, optionsOrProvider?.default);
     }
-    this.retries = retries || defaultOptions.retries;
-    this.headers = { ...defaultOptions.headers, ...headers };
-    this.blockIdentifier = blockIdentifier || defaultOptions.blockIdentifier;
+    this.baseFetch = baseFetch ?? fetch;
+    this.blockIdentifier = blockIdentifier ?? defaultOptions.blockIdentifier;
     this.chainId = chainId;
+    this.headers = { ...defaultOptions.headers, ...headers };
+    this.retries = retries ?? defaultOptions.retries;
     this.specVersion = specVersion;
-    this.waitMode = waitMode || false;
-    this.requestId = 0;
     this.transactionRetryIntervalFallback = transactionRetryIntervalFallback;
+    this.waitMode = waitMode ?? false;
+
+    this.requestId = 0;
 
     if (typeof batch === 'number') {
       this.batchClient = new BatchClient({
         nodeUrl: this.nodeUrl,
         headers: this.headers,
         interval: batch,
+        baseFetch: this.baseFetch,
       });
     }
   }
@@ -110,7 +116,7 @@ export class RpcChannel {
       method,
       ...(params && { params }),
     };
-    return fetch(this.nodeUrl, {
+    return this.baseFetch(this.nodeUrl, {
       method: 'POST',
       body: stringify(rpcRequestBody),
       headers: this.headers as Record<string, string>,

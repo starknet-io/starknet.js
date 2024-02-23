@@ -1,3 +1,4 @@
+import fetch from '../../src/utils/fetchPonyfill';
 import { BatchClient } from '../../src/utils/batch';
 import { createBlockForDevnet, getTestProvider } from '../config/fixtures';
 import { initializeMatcher } from '../config/schema';
@@ -9,6 +10,7 @@ describe('Batch Client', () => {
     nodeUrl: provider.channel.nodeUrl,
     headers: provider.channel.headers,
     interval: 0,
+    baseFetch: fetch,
   });
 
   initializeMatcher(expect);
