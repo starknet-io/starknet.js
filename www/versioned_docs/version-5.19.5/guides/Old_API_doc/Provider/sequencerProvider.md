@@ -29,7 +29,7 @@ const provider = new starknet.SequencerProvider({
   baseUrl: BaseUrl.SN_GOERLI,
   feederGatewayUrl: 'feeder_gateway',
   gatewayUrl: 'gateway',
-})
+});
 ```
 
 ## Methods

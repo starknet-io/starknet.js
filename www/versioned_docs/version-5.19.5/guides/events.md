@@ -45,7 +45,7 @@ If you use Starknet.js to invoke a Cairo function that will trigger a new event,
 Example of invocation :
 
 ```typescript
-const transactionHash = myContract.invoke("emitEventPanic", [8, "Mega Panic."])
+const transactionHash = myContract.invoke('emitEventPanic', [8, 'Mega Panic.']);
 ```
 
 Then get the transaction receipt :
@@ -66,21 +66,18 @@ The result is an array of events (here only one event):
 
 ```typescript
 [
-    {
-        from_address: '0x47cb13bf174043adde61f7bea49ab2d9ebc575b0431f85bcbfa113a6f93fc4',
-        keys: [
-        '0x3ba972537cb2f8e811809bba7623a2119f4f1133ac9e955a53d5a605af72bf2',
-        '0x8'
-        ],
-        data: [ '0x4d6567612050616e69632e' ]
-    }
-]
+  {
+    from_address: '0x47cb13bf174043adde61f7bea49ab2d9ebc575b0431f85bcbfa113a6f93fc4',
+    keys: ['0x3ba972537cb2f8e811809bba7623a2119f4f1133ac9e955a53d5a605af72bf2', '0x8'],
+    data: ['0x4d6567612050616e69632e'],
+  },
+];
 ```
 
 The first parameter in the `keys` array is a hash of the name of the event, calculated this way :
 
 ```typescript
-const nameHash = num.toHex( hash.starknetKeccak("EventPanic"));
+const nameHash = num.toHex(hash.starknetKeccak('EventPanic'));
 ```
 
 The second parameter is the `errorType` variable content (stored in keys array because of the `#[key]` flag in the Cairo code).
@@ -90,7 +87,7 @@ The `data` array contains the `errorDescription` variable content (`'0x4d6567612
 You can decode it with :
 
 ```typescript
-const ErrorMessage =  shortString.decodeShortString("0x4d6567612050616e69632e")
+const ErrorMessage = shortString.decodeShortString('0x4d6567612050616e69632e');
 ```
 
 ### Parsed response
@@ -107,9 +104,9 @@ The result is an array of parsed events (here only one event):
 ```typescript
 events = [
   {
-    EventPanic: { errorType: 8n, errorDescription: 93566154138418073030976302n }
+    EventPanic: { errorType: 8n, errorDescription: 93566154138418073030976302n },
   },
-]
+];
 ```
 
 Easier to read and process, isn't it?
@@ -121,16 +118,18 @@ If you don't have the transaction Hash of the contract execution that created th
 In this example, if you want to read the events recorded in the last 10 blocks, you need to use a method available only from an RPC node. The class `RpcProvider` is available for this case:
 
 ```typescript
-import { RpcProvider } from "starknet";
-const providerRPC = new RpcProvider({ nodeUrl: "{ nodeUrl: 'https://starknet-goerli.infura.io/v3/' + infuraKey }" }); // for an Infura node on Testnet
+import { RpcProvider } from 'starknet';
+const providerRPC = new RpcProvider({
+  nodeUrl: "{ nodeUrl: 'https://starknet-goerli.infura.io/v3/' + infuraKey }",
+}); // for an Infura node on Testnet
 const lastBlock = await providerRPC.getBlock('latest');
-const keyFilter = [num.toHex(hash.starknetKeccak("EventPanic")), "0x8"]
+const keyFilter = [num.toHex(hash.starknetKeccak('EventPanic')), '0x8'];
 const eventsList = await providerRPC.getEvents({
-    address: myContractAddress,
-    from_block: {block_number: lastBlock.block_number-9},
-    to_block: {block_number: lastBlock.block_number},
-    keys:[keyFilter],
-    chunk_size: 10
+  address: myContractAddress,
+  from_block: { block_number: lastBlock.block_number - 9 },
+  to_block: { block_number: lastBlock.block_number },
+  keys: [keyFilter],
+  chunk_size: 10,
 });
 ```
 
@@ -142,42 +141,50 @@ Here we have only one event. You can easily read this event :
 
 ```typescript
 const event = eventsList.events[0];
-console.log("data length =", event.data.length, "key length =", event.keys.length, ":");
-console.log("\nkeys =", event.keys, "data =", event.data);
+console.log('data length =', event.data.length, 'key length =', event.keys.length, ':');
+console.log('\nkeys =', event.keys, 'data =', event.data);
 ```
 
 To limit the workload of the node, the parameter `chunk_size` defines a size of chunk to read. If the request needs an additional chunk, the response includes a key `continuation_token` containing a string to use in the next request.  
 Hereunder a code to read all the chunks of a request :
 
 ```typescript
-const keyFilter = [num.toHex(hash.starknetKeccak("EventPanic")), "0x8"]
+const keyFilter = [num.toHex(hash.starknetKeccak('EventPanic')), '0x8'];
 let block = await provider.getBlock('latest');
-console.log("bloc #", block.block_number);
+console.log('bloc #', block.block_number);
 
-let continuationToken: string | undefined = "0";
+let continuationToken: string | undefined = '0';
 let chunkNum: number = 1;
 while (continuationToken) {
-    const eventsRes = await providerRPC.getEvents({
-        from_block: {
-            block_number: block.block_number - 30
-        },
-        to_block: {
-            block_number: block.block_number
-        },
-        address: myContractAddress,
-        keys: [keyFilter],
-        chunk_size: 5,
-        continuation_token: continuationToken
-    });
-    const nbEvents = eventsRes.events.length;
-    continuationToken=eventsRes.continuation_token;
-    console.log("chunk nb =", chunkNum, ".", nbEvents, "events recovered.");
-    console.log("continuation_token =", continuationToken );
-    for (let i = 0; i < nbEvents; i++) {
-        const event = eventsRes.events[i];
-        console.log("event #", i, "data length =", event.data.length, "key length =", event.keys.length, ":");
-        console.log("\nkeys =", event.keys, "data =", event.data)
-    }
-    chunkNum++;
+  const eventsRes = await providerRPC.getEvents({
+    from_block: {
+      block_number: block.block_number - 30,
+    },
+    to_block: {
+      block_number: block.block_number,
+    },
+    address: myContractAddress,
+    keys: [keyFilter],
+    chunk_size: 5,
+    continuation_token: continuationToken,
+  });
+  const nbEvents = eventsRes.events.length;
+  continuationToken = eventsRes.continuation_token;
+  console.log('chunk nb =', chunkNum, '.', nbEvents, 'events recovered.');
+  console.log('continuation_token =', continuationToken);
+  for (let i = 0; i < nbEvents; i++) {
+    const event = eventsRes.events[i];
+    console.log(
+      'event #',
+      i,
+      'data length =',
+      event.data.length,
+      'key length =',
+      event.keys.length,
+      ':'
+    );
+    console.log('\nkeys =', event.keys, 'data =', event.data);
+  }
+  chunkNum++;
 }
 ```

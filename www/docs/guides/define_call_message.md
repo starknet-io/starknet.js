@@ -21,8 +21,8 @@ Cairo has 2 versions, involving 2 types of data:
 
 - **Cairo 0**: here, everything is felt, an integer on 251 bits.  
   Available: array, struct, tuple, named tuple, or a mix of these elements.
-- **Cairo 1**: with plethora of literal types: u8, u16, u32, usize, u64, u128, felt252, u256, bool, address.  
-  Available: array, struct, tuple, or a mix of these elements.
+- **Cairo 1**: with plethora of literal types: u8, u16, u32, usize, u64, u128, felt252, u256, bool, address, eth address, classHash.  
+  Available: array, struct, tuple, bytes31, byteArray, enums or a mix of these elements.
 
 Starknet.js is compatible with both versions.
 
@@ -41,7 +41,7 @@ In Starknet.js, it's a bit ... complicated: you have the BigNumberish type and i
 - BigInt (max 255 bits): 12345612345n
 
 ```typescript
-import { BigNumberish } from "starknet";
+import { BigNumberish } from 'starknet';
 const decimals: BigNumberish = 18;
 ```
 
@@ -55,7 +55,7 @@ Starknet is waiting for a felt.
 You can send to Starknet.js methods: bigNumberish.
 
 ```typescript
-await myContract.my_function(12, "13", "0xe", 15n);
+await myContract.my_function(12, '13', '0xe', 15n);
 ```
 
 > `EthAddress` is limited to 160 bits.
@@ -76,17 +76,22 @@ Starknet is waiting for 2 felts, the first including the lowest 128 bits, the se
 You can send to Starknet.js methods: bigNumberish (Cairo 1 only), Uint256 object (both Cairo 0 & 1).
 
 ```typescript
-await myContract0.my_function({low: 100, high: 0}) // Cairo 0 & 1 contract
-await myContract1.my_function(cairo.uint256(100)) // Cairo 0 & 1 contract
-await myContract2.my_function(12345678, "13456789765", "0xe23a40b543f", 1534566734334n) // Cairo 1 contract
+await myContract0.my_function({ low: 100, high: 0 }); // Cairo 0 & 1 contract
+await myContract1.my_function(cairo.uint256(100)); // Cairo 0 & 1 contract
+await myContract2.my_function(12345678, '13456789765', '0xe23a40b543f', 1534566734334n); // Cairo 1 contract
 ```
 
 In specific cases that we will see hereunder, you can use an object, with the following format:
 
 ```typescript
-const a1: Uint256 = cairo.uint256("0x05f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd")
-const a2: Uint256 = {low: "0xeb5337d9a885be319366b5205a414fdd", high: "0x05f7cd1fd465baff2ba9d2d1501ad0a2"};
-const a3: Uint256 = {low: a1.low, high: a1.high};
+const a1: Uint256 = cairo.uint256(
+  '0x05f7cd1fd465baff2ba9d2d1501ad0a2eb5337d9a885be319366b5205a414fdd'
+);
+const a2: Uint256 = {
+  low: '0xeb5337d9a885be319366b5205a414fdd',
+  high: '0x05f7cd1fd465baff2ba9d2d1501ad0a2',
+};
+const a3: Uint256 = { low: a1.low, high: a1.high };
 ```
 
 ### shortString or bytes31
@@ -98,19 +103,19 @@ bytes31 is similar to shortString.
 You can send to Starknet.js methods: string.
 
 ```typescript
-await myContract.my_function("Token", "0x0x534e5f4d41494e") // send 2 shortStrings
+await myContract.my_function('Token', '0x0x534e5f4d41494e'); // send 2 shortStrings
 ```
 
 To encode yourself a string:
 
 ```typescript
-const encStr: string = shortString.encodeShortString("Stark");
+const encStr: string = shortString.encodeShortString('Stark');
 ```
 
 To decode yourself a string:
 
 ```typescript
-const decStr: string = shortString.decodeShortString("0x7572692f706963742f7433382e6a7067");
+const decStr: string = shortString.decodeShortString('0x7572692f706963742f7433382e6a7067');
 ```
 
 The result is: "uri/pict/t38.jpg"
@@ -126,25 +131,29 @@ Starknet is waiting for a specific struct.
 You can send to Starknet.js methods: string.
 
 ```typescript
-await myContract.my_function("http://addressOfMyERC721pictures/image1.jpg")
+await myContract.my_function('http://addressOfMyERC721pictures/image1.jpg');
 ```
 
-To force to send a shortString as a ByteArray with `CallData.compile()` :
+To force to send a shortString as a ByteArray with `CallData.compile()`:
 
 ```typescript
-const myCalldata = Calldata.compile([ byteArray.byteArrayFromString("Take care.") ]);
+const myCalldata = Calldata.compile([byteArray.byteArrayFromString('Take care.')]);
 ```
 
 If you want to split yourself your longString in 31 chars substrings:
 
 ```typescript
-const splitted: string[] = shortString.splitLongString("http://addressOfMyERC721pictures/image1.jpg")
+const splitted: string[] = shortString.splitLongString(
+  'http://addressOfMyERC721pictures/image1.jpg'
+);
 ```
 
 If you want to split your longString in an array of felts:
 
 ```typescript
-const longString: string[] = shortString.splitLongString("http://addressOfMyERC721pictures/image1.jpg" ).map( str => shortString.encodeShortString( str))
+const longString: string[] = shortString
+  .splitLongString('http://addressOfMyERC721pictures/image1.jpg')
+  .map((str) => shortString.encodeShortString(str));
 ```
 
 ### tuple
@@ -153,14 +162,14 @@ Starknet is waiting for a list of felts.
 You can send it to Starknet.js methods: `cairo.tuple()`, object.
 
 ```typescript
-const myTpl = cairo.tuple("0x0a", 200);
+const myTpl = cairo.tuple('0x0a', 200);
 await myContract.my_function(myTpl);
 ```
 
 To construct your tuple:
 
 ```typescript
-const myTpl = {"0": "0x0a", "1": 200};
+const myTpl = { '0': '0x0a', '1': 200 };
 ```
 
 ### named tuple
@@ -181,7 +190,7 @@ From this ABI:
 You can create this code:
 
 ```typescript
-const namedTup = {min: "0x4e65ac6", max: 296735486n};
+const namedTup = { min: '0x4e65ac6', max: 296735486n };
 await myContract.my_function(namedTup);
 ```
 
@@ -193,7 +202,7 @@ Starknet is waiting for a list of felts.
 You can send to Starknet.js methods: an object.
 
 ```typescript
-const myStruct = {type: "TR1POST", tries: 8, isBridged: true};
+const myStruct = { type: 'TR1POST', tries: 8, isBridged: true };
 await myContract.my_function(myStruct);
 ```
 
@@ -220,15 +229,19 @@ All these examples are valid:
 
 ```typescript
 type Order2 = {
-        p1: BigNumberish;
-        p2: BigNumberish[];
-    }; // struct
+  p1: BigNumberish;
+  p2: BigNumberish[];
+}; // struct
 const myOrder2: Order2 = {
-        p1: 17,
-        p2: [234, 467456745457n, '0x56ec'],
-    };
+  p1: 17,
+  p2: [234, 467456745457n, '0x56ec'],
+};
 const param1 = cairo.tuple(cairo.tuple(34, '0x5e'), 234n);
-const param2 = [[200, 201], [202, 203], [204, 205]];
+const param2 = [
+  [200, 201],
+  [202, 203],
+  [204, 205],
+];
 const param3 = [myOrder2, myOrder2];
 const param4 = [cairo.tuple(251, 40000n), cairo.tuple(252, 40001n)];
 await myContract.my_function(param1, param2, param3, param4);
@@ -244,10 +257,10 @@ Only meta-class methods are using a list of parameters (as illustrated in the pr
 A Meta-Class is a Class that has any of its properties determined at run-time. The Contract object uses a Contract's ABI to determine what methods are available.
 
 ```typescript
-await myContract.my_function("TOKEN", "13", [10, 11, 12], 135438734812n);
+await myContract.my_function('TOKEN', '13', [10, 11, 12], 135438734812n);
 // or
-const functionName="my_function";
-await myContract[functionName]("TOKEN", "13", [10, 11, 12], 135438734812n);
+const functionName = 'my_function';
+await myContract[functionName]('TOKEN', '13', [10, 11, 12], 135438734812n);
 ```
 
 ### Array of parameters
@@ -255,23 +268,21 @@ await myContract[functionName]("TOKEN", "13", [10, 11, 12], 135438734812n);
 An array of parameters can be used as input:
 
 ```typescript
-const myParams = [  {x: 100, y: 200},
-                    13,
-                    [10, 11, 12],
-                    cairo.uint256("0x295fa652e32b")];
+const myParams = [{ x: 100, y: 200 }, 13, [10, 11, 12], cairo.uint256('0x295fa652e32b')];
 const txResp = await account0.execute({
-    contractAddress:testAddress,
-    entrypoint: "change_activity",
-    calldata: myParams});
+  contractAddress: testAddress,
+  entrypoint: 'change_activity',
+  calldata: myParams,
+});
 ```
 
 All Starknet.js methods accept this type of input, except meta-class, which needs 3 dots prefix:
 
 ```typescript
-const myParams = ["TOKEN", "13", [10, 11, 12], 135438734812n];
+const myParams = ['TOKEN', '13', [10, 11, 12], 135438734812n];
 await myContract.my_function(...myParams);
 // or
-const functionName="my_function";
+const functionName = 'my_function';
 await myContract[functionName](...myParams);
 ```
 
@@ -283,12 +294,14 @@ The use of objects allows a clear representation of the list of parameters:
 
 ```typescript
 const myParams = {
-    name: "TOKEN",
-    decimals: "13",
-    amount: 135438734812n};
+  name: 'TOKEN',
+  decimals: '13',
+  amount: 135438734812n,
+};
 const deployResponse = await myAccount.deployContract({
-    classHash: contractClassHash,
-    constructorCalldata: myParams });
+  classHash: contractClassHash,
+  constructorCalldata: myParams,
+});
 ```
 
 This type is available for: `CallData.compile(), hash.calculateContractAddressFromHash, account.deployContract, account.deployAccount, account.execute`
@@ -302,40 +315,47 @@ This is the recommended type of input to use, especially for complex ABI.
 ```typescript
 const myFalseUint256 = { high: 1, low: 23456 }; // wrong order; should be low first
 type Order2 = {
-    p1: BigNumberish,
-    p2: BigNumberish[]
-}
-const myOrder2bis: Order2 = {// wrong order; p1 should be first
-    p2: [234, 467456745457n, "0x56ec"],
-    p1: "17"
-}
-const functionParameters: RawArgsObject = {//wrong order; all properties are mixed
-    active: true,
-    symbol: "NIT",
-    initial_supply: myFalseUint256,
-    recipient: account0.address,
-    decimals: 18,
-    tupOfTup: cairo.tuple(cairo.tuple(34, "0x5e") ,myFalseUint256),
-    card: myOrder2bis,
-    longText: "Zorg is back, for ever, here and everywhere",
-    array1: [100, 101, 102],
-    array2: [[200, 201], [202, 203], [204, 205]],
-    array3: [myOrder2bis, myOrder2bis],
-    array4: [myFalseUint256, myFalseUint256],
-    tuple1: cairo.tuple(40000n, myOrder2bis, [54, 55n, "0xae"], "texte"),
-    name: "niceToken",
-    array5: [cairo.tuple(251, 40000n), cairo.tuple(252, 40001n)],
-}
+  p1: BigNumberish;
+  p2: BigNumberish[];
+};
+const myOrder2bis: Order2 = {
+  // wrong order; p1 should be first
+  p2: [234, 467456745457n, '0x56ec'],
+  p1: '17',
+};
+const functionParameters: RawArgsObject = {
+  //wrong order; all properties are mixed
+  active: true,
+  symbol: 'NIT',
+  initial_supply: myFalseUint256,
+  recipient: account0.address,
+  decimals: 18,
+  tupOfTup: cairo.tuple(cairo.tuple(34, '0x5e'), myFalseUint256),
+  card: myOrder2bis,
+  longText: 'Zorg is back, for ever, here and everywhere',
+  array1: [100, 101, 102],
+  array2: [
+    [200, 201],
+    [202, 203],
+    [204, 205],
+  ],
+  array3: [myOrder2bis, myOrder2bis],
+  array4: [myFalseUint256, myFalseUint256],
+  tuple1: cairo.tuple(40000n, myOrder2bis, [54, 55n, '0xae'], 'texte'),
+  name: 'niceToken',
+  array5: [cairo.tuple(251, 40000n), cairo.tuple(252, 40001n)],
+};
 const contractCallData: CallData = new CallData(compiledContractSierra.abi);
-const myCalldata: Calldata = contractCallData.compile("constructor", functionParameters);
+const myCalldata: Calldata = contractCallData.compile('constructor', functionParameters);
 const deployResponse = await account0.deployContract({
-    classHash: contractClassHash,
-    constructorCalldata: myCalldata });
+  classHash: contractClassHash,
+  constructorCalldata: myCalldata,
+});
 // or
-const myCall: Call = myContract.populate("setup_elements", functionParameters);
+const myCall: Call = myContract.populate('setup_elements', functionParameters);
 const tx = await account0.execute(myCall);
 // or
-const myCall: Call = myContract.populate("get_elements", functionParameters);
+const myCall: Call = myContract.populate('get_elements', functionParameters);
 const res = await myContract.get_elements(myCall.calldata);
 ```
 
@@ -351,22 +371,22 @@ A Call is an object with this format:
 
 ```typescript
 type Call = {
-    contractAddress: string,
-    entrypoint: string,
-    calldata?: RawArgs,
-}
+  contractAddress: string;
+  entrypoint: string;
+  calldata?: RawArgs;
+};
 ```
 
 ...and is only authorized with `Account.execute `. It can be generated manually or by `Contract.populate()`:
 
 ```typescript
-const myCall: Call = myContract.populate("get_component", [100, recipient]);
+const myCall: Call = myContract.populate('get_component', [100, recipient]);
 // or
 const myCall: Call = {
-    contractAddress: tokenContract.address,
-    entrypoint: "get_component",
-    calldata: CallData.compile( [100, recipient]),
-    }
+  contractAddress: tokenContract.address,
+  entrypoint: 'get_component',
+  calldata: CallData.compile([100, recipient]),
+};
 
 const tx = await account0.execute(myCall);
 ```
@@ -374,9 +394,9 @@ const tx = await account0.execute(myCall);
 It's particularly interesting when you want to invoke a function several times in the same transaction:
 
 ```typescript
-const myCall1: Call = myContract.populate("mint", {type: 7, qty: 10});
-const myCall2: Call = myContract.populate("mint", {type: 21, qty: 3});
-const myCall3: Call = myContract.populate("mint", {type: 2, qty: 1});
+const myCall1: Call = myContract.populate('mint', { type: 7, qty: 10 });
+const myCall2: Call = myContract.populate('mint', { type: 21, qty: 3 });
+const myCall3: Call = myContract.populate('mint', { type: 2, qty: 1 });
 const tx = await account0.execute([myCall1, myCall2, myCall3]);
 ```
 
@@ -388,18 +408,18 @@ You provide to starknet.js the low-level data expected by Starknet:
 
 ```typescript
 const specialParameters: Calldata = [
-    '2036735872918048433518',
-    '5130580',
-    '18',
-    '23456',
-    '1',
-    '17',
-    '3',
-    '234',
-    '467456745457',
-    '22252'];
-const getResponse = await myAccount.get_bal(specialParameters,
-    {parseRequest: false});
+  '2036735872918048433518',
+  '5130580',
+  '18',
+  '23456',
+  '1',
+  '17',
+  '3',
+  '234',
+  '467456745457',
+  '22252',
+];
+const getResponse = await myAccount.get_bal(specialParameters, { parseRequest: false });
 ```
 
 To use with `parseRequest: false` (see hereunder).
@@ -461,7 +481,7 @@ const amount = myContract.call(...);
 If you don't know if your Contract object is interacting with a Cairo 0 or a Cairo 1 contract, you have these methods:
 
 ```typescript
-import { cairo } from "starknet";
+import { cairo } from 'starknet';
 const isCairo1: boolean = myContract.isCairo1();
 const isAbiCairo1: boolean = cairo.isCairo1Abi(myAbi);
 ```
@@ -474,12 +494,9 @@ If for any reason (mainly for speed of processing), you want to define yourself 
 Parameters are an array of strings (representing numbers).
 
 ```typescript
-const txH = await myContract.send_tk([
-    '2036735872918048433518',
-    '5130580',
-    '18'],
-    {parseRequest: false}
-);
+const txH = await myContract.send_tk(['2036735872918048433518', '5130580', '18'], {
+  parseRequest: false,
+});
 ```
 
 ### parseResponse
@@ -487,7 +504,7 @@ const txH = await myContract.send_tk([
 If for any reason, you want to receive a low-level answer from Starknet, you can use the parseResponse option.
 
 ```typescript
-const result = await myContract.call("get_bals", 100n, {parseResponse: false});
+const result = await myContract.call('get_bals', 100n, { parseResponse: false });
 ```
 
 The answer is an array of strings (representing numbers).
@@ -506,11 +523,11 @@ For example, if a contract returns a struct containing a shortString and a longS
 You can automate the string parsing with:
 
 ```typescript
-const formatAnswer = { name: 'string', description: 'string' }
+const formatAnswer = { name: 'string', description: 'string' };
 const result = await myContract.get_text(calldata, {
-    parseRequest: true,
-    parseResponse: true,
-    formatResponse: formatAnswer,
+  parseRequest: true,
+  parseResponse: true,
+  formatResponse: formatAnswer,
 });
 ```
 

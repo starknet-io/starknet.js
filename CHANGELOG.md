@@ -1,3 +1,27 @@
+## [6.1.3](https://github.com/starknet-io/starknet.js/compare/v6.1.2...v6.1.3) (2024-02-23)
+
+### Bug Fixes
+
+- update fetch-cookie dependency ([518330c](https://github.com/starknet-io/starknet.js/commit/518330c4ee00e671e716b018220f767e8118c431))
+
+## [6.1.2](https://github.com/starknet-io/starknet.js/compare/v6.1.1...v6.1.2) (2024-02-20)
+
+### Bug Fixes
+
+- drop abi-wan-kanabi-v1 support ([30a4681](https://github.com/starknet-io/starknet.js/commit/30a46815fa9fb88bbcb98df2f4a8dafc5a32b4ab))
+
+## [6.1.1](https://github.com/starknet-io/starknet.js/compare/v6.1.0...v6.1.1) (2024-02-19)
+
+### Bug Fixes
+
+- rpc event ([ae3e265](https://github.com/starknet-io/starknet.js/commit/ae3e265f6617bd79c8435483916b0f24be036fa6))
+
+# [6.1.0](https://github.com/starknet-io/starknet.js/compare/v6.0.0...v6.1.0) (2024-02-13)
+
+### Features
+
+- use fetch-cookie package for cookie based sticky sessions ([5a56485](https://github.com/starknet-io/starknet.js/commit/5a56485052e773c8b0a3f9dbdc2f4ba3626362fb))
+
 # [6.0.0](https://github.com/starknet-io/starknet.js/compare/v5.29.0...v6.0.0) (2024-02-05)
 
 ### Bug Fixes
