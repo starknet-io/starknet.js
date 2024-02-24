@@ -6,9 +6,9 @@ import {
   AddDeployAccountTransactionResult,
   AddInvokeTransactionResult,
   AddStarknetChainParameters,
-  ConnectedStarknetWindowObject,
   NetworkChangeEventHandler,
   RpcMessage,
+  StarknetWindowObject,
   WatchAssetParameters,
 } from './getst/main';
 // eslint-disable-next-line import/no-cycle
@@ -36,7 +36,7 @@ type RpcCall = Omit<RpcMessage, 'result'>;
 
 // -- TT Better naming
 // This is provider object expected by WalletAccount to communicate with wallet
-interface StarknetWalletProvider extends ConnectedStarknetWindowObject {}
+interface StarknetWalletProvider extends StarknetWindowObject {}
 
 // Represent 'Selected Active' Account inside Connected Wallet
 export class WalletAccount extends Account {
@@ -49,15 +49,16 @@ export class WalletAccount extends Account {
     walletProvider: StarknetWalletProvider,
     cairoVersion?: CairoVersion
   ) {
-    if (!walletProvider.isConnected) throw Error('StarknetWalletProvider should be connected');
-    const address = walletProvider.selectedAddress;
+    // if (!walletProvider.isConnected) throw Error('StarknetWalletProvider should be connected');
+    const address = '0x0'; // walletProvider.selectedAddress;
     super(providerOrOptions, address, '', cairoVersion);
     this.walletProvider = walletProvider;
     this.address = address.toLowerCase();
 
     // Event Listeners
-    this.walletProvider.on('accountsChanged', () => {
-      this.address = walletProvider.selectedAddress;
+    this.walletProvider.on('accountsChanged', (data) => {
+      console.log('data', data);
+      // this.address = walletProvider.selectedAddress;
     });
   }
 

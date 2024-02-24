@@ -1,60 +1,40 @@
-import { WalletProvider } from './discovery';
-import { IStorageWrapper } from './localStorageStore';
-import type {
-  ConnectedStarknetWindowObject,
-  RequestAccountsParameters,
-  StarknetWindowObject,
-} from './StarknetWindowObject';
-import { FilterList } from './wallet/filter';
-import { Sort } from './wallet/sort';
+import type { GetStarknetOptions, GetStarknetResult } from './types';
 
+export type { StarknetWindowObject } from './StarknetWindowObject';
 export type {
-  AccountChangeEventHandler,
-  AddStarknetChainParameters,
-  ConnectedStarknetWindowObject,
-  NetworkChangeEventHandler,
-  RpcMessage,
-  StarknetWindowObject,
-  SwitchStarknetChainParameters,
-  WalletEvents,
-  WatchAssetParameters,
-  DisconnectedStarknetWindowObject,
-  IStarknetWindowObject,
-  RequestAccountsParameters,
   AddDeclareTransactionParameters,
   AddDeclareTransactionResult,
   AddDeployAccountTransactionParameters,
   AddDeployAccountTransactionResult,
   AddInvokeTransactionParameters,
   AddInvokeTransactionResult,
+  AddStarknetChainParameters,
+  RequestAccountsParameters,
+  StarknetChainId,
+  SwitchStarknetChainParameters,
+  GetDeploymentDataResult,
+  WatchAssetParameters,
   TypedData,
-} from './StarknetWindowObject';
-export type { WalletProvider } from './discovery';
-export interface GetStarknetOptions {
-  windowObject: Record<string, any>;
-  isWalletObject: (wallet: any) => boolean;
-  storageFactoryImplementation: (name: string) => IStorageWrapper;
-}
-export interface GetWalletOptions {
-  sort?: Sort;
-  include?: FilterList;
-  exclude?: FilterList;
-}
-export interface DisconnectOptions {
-  clearLastWallet?: boolean;
-}
-interface GetStarknetResult {
-  getAvailableWallets: (options?: GetWalletOptions) => Promise<StarknetWindowObject[]>;
-  getPreAuthorizedWallets: (options?: GetWalletOptions) => Promise<StarknetWindowObject[]>;
-  getDiscoveryWallets: (options?: GetWalletOptions) => Promise<WalletProvider[]>;
-  getLastConnectedWallet: () => Promise<StarknetWindowObject | null | undefined>;
-  enable: (
-    wallet: StarknetWindowObject,
-    options?: RequestAccountsParameters
-  ) => Promise<ConnectedStarknetWindowObject>;
-  disconnect: (options?: DisconnectOptions) => Promise<void>;
-}
+  RequestFn,
+  RpcMessage,
+  IsParamsOptional,
+  RpcTypeToMessageMap,
+  RequestFnCall,
+} from './rpcMessage';
+export type {
+  WalletEvents,
+  AccountChangeEventHandler,
+  NetworkChangeEventHandler,
+  WalletEventHandlers,
+} from './walletEvents';
+export { Permission } from './rpcMessage';
+export type {
+  DisconnectOptions,
+  GetStarknetOptions,
+  GetStarknetResult,
+  GetWalletOptions,
+  WalletProvider,
+} from './types';
 export declare function getStarknet(options?: Partial<GetStarknetOptions>): GetStarknetResult;
-// eslint-disable-next-line no-underscore-dangle
-declare const _default: GetStarknetResult;
-export default _default;
+declare const ddefault: GetStarknetResult;
+export default ddefault;

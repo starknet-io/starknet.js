@@ -4,5 +4,5 @@
 export declare const generateUID: () => string;
 export declare const shuffle: <T extends any[]>(arr: T) => T;
 declare type AllowPromise<T> = Promise<T> | T;
-export declare function pipe<T>(...fns: Array<(arg: T) => AllowPromise<T>>): (arg: T) => Promise<T>;
+export declare const pipe: <T>(...fns: ((arg: T) => AllowPromise<T>)[]) => (arg: T) => Promise<T>;
 export {};

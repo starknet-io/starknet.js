@@ -1,4 +1,4 @@
-import { WalletProvider } from '../discovery';
+import type { WalletProvider } from '../discovery';
 import { StarknetWindowObject } from '../StarknetWindowObject';
 
 export declare type FilterList = string[];
@@ -14,7 +14,7 @@ export declare function filterBy<T extends StarknetWindowObject | WalletProvider
  * filters given wallets array, return only preAuthorized instances
  * @param wallets
  */
-export declare const filterByPreAuthorized: (
+export declare const filterByAuthorized: (
   wallets: StarknetWindowObject[]
 ) => Promise<StarknetWindowObject[]>;
 export {};
