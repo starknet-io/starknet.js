@@ -1,3 +1,9 @@
+## [6.1.4](https://github.com/starknet-io/starknet.js/compare/v6.1.3...v6.1.4) (2024-02-26)
+
+### Bug Fixes
+
+- **Calldata.compile:** do not split long `entrypoint` names before calling `getSelectorFromName` ([9434bcd](https://github.com/starknet-io/starknet.js/commit/9434bcddf74069c7e5bdecbac94017ae23cd2a45))
+
 ## [6.1.3](https://github.com/starknet-io/starknet.js/compare/v6.1.2...v6.1.3) (2024-02-23)
 
 ### Bug Fixes
