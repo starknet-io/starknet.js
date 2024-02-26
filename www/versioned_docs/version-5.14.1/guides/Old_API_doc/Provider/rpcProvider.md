@@ -18,7 +18,7 @@ Example:
 ```typescript
 const provider = new starknet.RpcProvider({
   nodeUrl: 'URL_TO_STARKNET_RPC_NODE',
-})
+});
 ```
 
 ## Methods
@@ -67,7 +67,7 @@ provider.**getBlockWithTxHashes**(blockIdentifier) => _Promise < GetBlockWithTxH
 ###### _GetBlockWithTxHashesResponse_
 
 ```typescript
-OPENRPC.BlockWithTxHashes
+OPENRPC.BlockWithTxHashes;
 ```
 
 ---
@@ -79,7 +79,7 @@ provider.**getBlockWithTxs**(blockIdentifier) => _Promise < GetBlockWithTxs >_
 ###### _GetBlockWithTxs_
 
 ```typescript
-OPENRPC.BlockWithTxs
+OPENRPC.BlockWithTxs;
 ```
 
 ---
@@ -231,8 +231,8 @@ provider.**declareContract**(DeclareContractTransaction, details) => _Promise < 
 ###### _DeclareContractResponse_
 
 ```typescript
-  transaction_hash: string;
-  class_hash: string;
+transaction_hash: string;
+class_hash: string;
 ```
 
 ---

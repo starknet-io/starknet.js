@@ -2,15 +2,10 @@ name: _ Run Tests
 on:
   workflow_call:
     inputs:
-      use-rpc-devnet:
-        type: boolean
-        default: false
-      use-seq-devnet:
+      use-devnet:
         type: boolean
         default: false
     secrets:
-      TEST_PROVIDER_BASE_URL:
-        required: false
       TEST_RPC_URL:
         required: false
       TEST_ACCOUNT_PRIVATE_KEY:
@@ -26,23 +21,19 @@ jobs:
     # TODO - periodically check if conditional services are supported; https://github.com/actions/runner/issues/822
     services:
       devnet:
-        image: ${{ inputs.use-rpc-devnet && 'shardlabs/starknet-devnet-rs:c7b5fde8fb46f8e7d498f63cc44beb0bd2ddd85e-seed0' || inputs.use-seq-devnet && 'shardlabs/starknet-devnet:0.6.3-seed0' || '' }}
-        # image: ${{ (inputs.use-rpc-devnet || inputs.use-seq-devnet) && 'shardlabs/starknet-devnet:0.6.3-seed0' || '' }}
-        # image: shardlabs/starknet-devnet-rs:c7b5fde8fb46f8e7d498f63cc44beb0bd2ddd85e-seed0
+        image: ${{ (inputs.use-devnet) && 'shardlabs/starknet-devnet-rs:b41e566a3f17aa0e51871f02d5165959e50ce358-amd-seed0' || '' }}
         ports:
           - 5050:5050
 
     env:
-      TEST_PROVIDER_BASE_URL: ${{ secrets.TEST_PROVIDER_BASE_URL }}
       TEST_RPC_URL: ${{ secrets.TEST_RPC_URL }}
       TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}
       TEST_ACCOUNT_ADDRESS: ${{ secrets.TEST_ACCOUNT_ADDRESS }}
 
     steps:
-      - run: echo ${{ secrets.TEST_PROVIDER_BASE_URL }}
       - run: echo ${{ secrets.TEST_RPC_URL }}
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: lts/*
           cache: 'npm'

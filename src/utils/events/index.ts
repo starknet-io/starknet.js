@@ -8,8 +8,8 @@ import {
   LegacyEvent,
   ParsedEvent,
   ParsedEvents,
+  RPC,
 } from '../../types';
-import { Event as ProviderEvent } from '../../types/provider/response';
 import responseParser from '../calldata/responseParser';
 import { starkCurve } from '../ec';
 import { addHexPrefix, utf8ToArray } from '../encode';
@@ -36,7 +36,7 @@ export function getAbiEvents(abi: Abi): AbiEvents {
  * @return ParsedEvents - parsed events corresponding to the abi
  */
 export function parseEvents(
-  providerReceivedEvents: Array<ProviderEvent>,
+  providerReceivedEvents: RPC.Event[],
   abiEvents: AbiEvents,
   abiStructs: AbiStructs,
   abiEnums: AbiEnums

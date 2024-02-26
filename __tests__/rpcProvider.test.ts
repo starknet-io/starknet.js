@@ -1,25 +1,35 @@
 import { getStarkKey, utils } from '@scure/starknet';
 
-import { Account, Contract, GetBlockResponse, RpcProvider, stark } from '../src';
+import {
+  Account,
+  Block,
+  CallData,
+  Contract,
+  RPC,
+  TransactionExecutionStatus,
+  stark,
+  waitForTransactionOptions,
+} from '../src';
 import { StarknetChainId } from '../src/constants';
-import { CallData } from '../src/utils/calldata';
 import { felt, uint256 } from '../src/utils/calldata/cairo';
 import { toHexString } from '../src/utils/num';
 import {
   compiledErc20Echo,
   compiledL1L2,
   compiledOpenZeppelinAccount,
+  createBlockForDevnet,
   describeIfDevnet,
   describeIfNotDevnet,
   describeIfRpc,
   getTestAccount,
   getTestProvider,
-} from './fixtures';
-import { initializeMatcher } from './schema';
+} from './config/fixtures';
+import { initializeMatcher } from './config/schema';
 
 describeIfRpc('RPCProvider', () => {
-  const rpcProvider = getTestProvider() as RpcProvider;
-  const account = getTestAccount(rpcProvider);
+  const rpcProvider = getTestProvider(false);
+  const provider = getTestProvider();
+  const account = getTestAccount(provider);
   let accountPublicKey: string;
   initializeMatcher(expect);
 
@@ -27,10 +37,11 @@ describeIfRpc('RPCProvider', () => {
     expect(account).toBeInstanceOf(Account);
     const accountKeyPair = utils.randomPrivateKey();
     accountPublicKey = getStarkKey(accountKeyPair);
+    await createBlockForDevnet();
   });
 
   test('getChainId', async () => {
-    const fetchSpy = jest.spyOn(rpcProvider as any, 'fetchEndpoint');
+    const fetchSpy = jest.spyOn(rpcProvider.channel as any, 'fetchEndpoint');
     (rpcProvider as any).chainId = undefined as unknown as StarknetChainId;
     const chainId1 = await rpcProvider.getChainId();
     const chainId2 = await rpcProvider.getChainId();
@@ -41,12 +52,12 @@ describeIfRpc('RPCProvider', () => {
   });
 
   test('getTransactionCount', async () => {
-    const count = await rpcProvider.getTransactionCount('latest');
+    const count = await rpcProvider.getBlockTransactionCount('latest');
     expect(typeof count).toBe('number');
   });
 
   test('getBlockHashAndNumber', async () => {
-    const blockHashAndNumber = await rpcProvider.getBlockHashAndNumber();
+    const blockHashAndNumber = await rpcProvider.getBlockLatestAccepted();
     expect(blockHashAndNumber).toHaveProperty('block_hash');
     expect(blockHashAndNumber).toHaveProperty('block_number');
   });
@@ -57,19 +68,13 @@ describeIfRpc('RPCProvider', () => {
   });
 
   test('getStateUpdate', async () => {
-    const stateUpdate = await rpcProvider.getStateUpdate('latest');
+    const stateUpdate = await rpcProvider.getBlockStateUpdate('latest');
     expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
   });
 
   test('getSpecVersion', async () => {
     const spec = await rpcProvider.getSpecVersion();
     expect(typeof spec).toBe('string');
-  });
-
-  test('getCode - not implemented', async () => {
-    expect(
-      rpcProvider.getCode('0x058d97f7d76e78f44905cc30cb65b91ea49a4b908a76703c54197bca90f81773')
-    ).rejects.toThrow();
   });
 
   describe('Test Estimate message fee', () => {
@@ -100,11 +105,71 @@ describeIfRpc('RPCProvider', () => {
     });
   });
 
+  describe('waitForTransaction', () => {
+    const receipt = {};
+    const transactionStatusSpy = jest.spyOn(rpcProvider.channel as any, 'getTransactionStatus');
+    const transactionReceiptSpy = jest.spyOn(rpcProvider.channel as any, 'getTransactionReceipt');
+
+    const generateOptions = (o: waitForTransactionOptions) => ({ retryInterval: 10, ...o });
+    const generateTransactionStatus = (
+      finality_status: RPC.SPEC.TXN_STATUS,
+      execution_status?: RPC.SPEC.TXN_EXECUTION_STATUS
+    ): RPC.TransactionStatus => ({
+      finality_status,
+      execution_status,
+    });
+    const response = {
+      successful: generateTransactionStatus('ACCEPTED_ON_L1', 'SUCCEEDED'),
+      reverted: generateTransactionStatus('ACCEPTED_ON_L2', 'REVERTED'),
+      rejected: generateTransactionStatus('REJECTED'),
+    };
+
+    beforeAll(() => {
+      transactionStatusSpy.mockResolvedValue(null);
+      transactionReceiptSpy.mockResolvedValue(receipt);
+    });
+
+    afterAll(() => {
+      transactionStatusSpy.mockRestore();
+      transactionReceiptSpy.mockRestore();
+    });
+
+    test('successful - default', async () => {
+      transactionStatusSpy.mockResolvedValueOnce(response.successful);
+      await expect(rpcProvider.waitForTransaction(0)).resolves.toBe(receipt);
+    });
+
+    test('reverted - default', async () => {
+      transactionStatusSpy.mockResolvedValueOnce(response.reverted);
+      await expect(rpcProvider.waitForTransaction(0)).resolves.toBe(receipt);
+    });
+
+    test('rejected - default', async () => {
+      transactionStatusSpy.mockResolvedValueOnce(response.rejected);
+      await expect(rpcProvider.waitForTransaction(0)).rejects.toThrow(
+        `${undefined}: ${RPC.ETransactionStatus.REJECTED}`
+      );
+    });
+
+    test('reverted - as error state', async () => {
+      transactionStatusSpy.mockResolvedValueOnce(response.reverted);
+      const options = generateOptions({ errorStates: [TransactionExecutionStatus.REVERTED] });
+      await expect(rpcProvider.waitForTransaction(0, options)).rejects.toThrow(
+        `${RPC.ETransactionExecutionStatus.REVERTED}: ${RPC.ETransactionStatus.ACCEPTED_ON_L2}`
+      );
+    });
+
+    test('no error state; timed-out', async () => {
+      const options = generateOptions({ errorStates: [] });
+      await expect(rpcProvider.waitForTransaction(0, options)).rejects.toThrow(/timed-out/);
+    });
+  });
+
   describe('RPC methods', () => {
-    let latestBlock: GetBlockResponse;
+    let latestBlock: Block;
 
     beforeAll(async () => {
-      latestBlock = await rpcProvider.getBlock('latest');
+      latestBlock = await provider.getBlock('latest');
     });
 
     test('getBlockWithTxHashes', async () => {
@@ -131,7 +196,7 @@ describeIfRpc('RPCProvider', () => {
     });
 
     xtest('traceBlockTransactions', async () => {
-      await rpcProvider.traceBlockTransactions(latestBlock.block_hash);
+      await rpcProvider.getBlockTransactionsTraces(latestBlock.block_hash);
     });
 
     describeIfDevnet('devnet only', () => {
@@ -237,7 +302,8 @@ describeIfRpc('RPCProvider', () => {
       });
 
       test('getTransaction', async () => {
-        const transaction = await rpcProvider.getTransaction(transaction_hash);
+        // todo - schema for rpc need to be created and expected response here updated
+        const transaction = await rpcProvider.getTransactionByHash(transaction_hash);
         expect(transaction).toMatchSchemaRef('GetTransactionResponse');
       });
 
@@ -247,7 +313,7 @@ describeIfRpc('RPCProvider', () => {
       });
 
       xtest('traceTransaction', async () => {
-        await rpcProvider.traceTransaction(transaction_hash);
+        await rpcProvider.getTransactionTrace(transaction_hash);
       });
 
       test('getClassAt', async () => {
