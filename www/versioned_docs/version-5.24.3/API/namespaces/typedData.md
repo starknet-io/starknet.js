@@ -147,7 +147,7 @@ Get a type string as hash.
 
 ▸ **encodeValue**(`types`, `type`, `data`, `ctx?`): [`string`, `string`]
 
-Encodes a single value to an ABI serialisable string, number or Buffer. Returns the data as tuple, which consists of
+Encodes a single value to an ABI serializable string, number or Buffer. Returns the data as tuple, which consists of
 an array of ABI compatible types, and an array of corresponding values.
 
 #### Parameters
