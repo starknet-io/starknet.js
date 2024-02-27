@@ -22,6 +22,7 @@ import {
   BlockHashAndNumber,
   BlockTransactionsTraces,
   BlockWithTxHashes,
+  BlockWithTxReceipts,
   BlockWithTxs,
   ContractClass,
   DeclaredTransaction,
@@ -63,6 +64,15 @@ type ReadMethods = {
       block_id: BLOCK_ID;
     };
     result: BlockWithTxs;
+    errors: Errors.BLOCK_NOT_FOUND;
+  };
+
+  // Get block information with full transactions and receipts given the block id
+  starknet_getBlockWithReceipts: {
+    params: {
+      block_id: BLOCK_ID;
+    };
+    result: BlockWithTxReceipts;
     errors: Errors.BLOCK_NOT_FOUND;
   };
 

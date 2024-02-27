@@ -152,8 +152,15 @@ export type BLOCK_BODY_WITH_TX_HASHES = {
 
 export type BLOCK_BODY_WITH_TXS = {
   transactions: {
-    transaction: TXN;
+    transaction: TXN; // TODO: double check if intersection
     transaction_hash: TXN_HASH;
+  }[];
+};
+
+export type BLOCK_BODY_WITH_RECEIPTS = {
+  transactions: {
+    transaction: TXN;
+    receipt: TXN_RECEIPT_IN_BLOCK;
   }[];
 };
 
@@ -165,6 +172,8 @@ export type BLOCK_HEADER = {
   timestamp: number;
   sequencer_address: FELT;
   l1_gas_price: RESOURCE_PRICE;
+  l1_data_gas_price: RESOURCE_PRICE;
+  l1_da_mode: 'BLOB' | 'CALLDATA';
   starknet_version: string;
 };
 
@@ -181,9 +190,16 @@ export type BLOCK_WITH_TX_HASHES = { status: BLOCK_STATUS } & BLOCK_HEADER &
 
 export type BLOCK_WITH_TXS = { status: BLOCK_STATUS } & BLOCK_HEADER & BLOCK_BODY_WITH_TXS;
 
+export type BLOCK_WITH_RECEIPTS = {
+  status: BLOCK_STATUS;
+} & BLOCK_HEADER &
+  BLOCK_BODY_WITH_RECEIPTS;
+
 export type PENDING_BLOCK_WITH_TX_HASHES = BLOCK_BODY_WITH_TX_HASHES & PENDING_BLOCK_HEADER;
 
 export type PENDING_BLOCK_WITH_TXS = BLOCK_BODY_WITH_TXS & PENDING_BLOCK_HEADER;
+
+export type PENDING_BLOCK_WITH_RECEIPTS = BLOCK_BODY_WITH_RECEIPTS & PENDING_BLOCK_HEADER;
 
 export type DEPLOYED_CONTRACT_ITEM = {
   address: FELT;
@@ -382,7 +398,7 @@ export type INVOKE_TXN_V3 = {
 };
 
 export type L1_HANDLER_TXN = {
-  version: FELT;
+  version: '0x0';
   type: 'L1_HANDLER';
   nonce: NUM_AS_HEX;
 } & FUNCTION_CALL;
@@ -400,13 +416,15 @@ export type COMMON_RECEIPT_PROPERTIES = {
   execution_resources: EXECUTION_RESOURCES;
 };
 
+export type TXN_RECEIPT_IN_BLOCK = PENDING_TXN_RECEIPT;
+
 export type PENDING_COMMON_RECEIPT_PROPERTIES = {
   transaction_hash: TXN_HASH;
   actual_fee: FEE_PAYMENT;
   messages_sent: MSG_TO_L1[];
   events: EVENT[];
   revert_reason?: string;
-  finality_status: 'ACCEPTED_ON_L2';
+  finality_status: TXN_FINALITY_STATUS;
   execution_status: TXN_EXECUTION_STATUS;
   execution_resources: EXECUTION_RESOURCES;
 };
@@ -562,6 +580,8 @@ export type PRICE_UNIT = 'WEI' | 'FRI';
 export type FEE_ESTIMATE = {
   gas_consumed: FELT;
   gas_price: FELT;
+  data_gas_consumed: FELT;
+  data_gas_price: FELT;
   overall_fee: FELT;
   unit: PRICE_UNIT;
 };
@@ -586,7 +606,7 @@ export type RESOURCE_PRICE = {
   price_in_wei: FELT;
 };
 
-export type EXECUTION_RESOURCES = {
+export type COMPUTATION_RESOURCES = {
   steps: number;
   memory_holes?: number;
   range_check_builtin_applications?: number;
@@ -597,6 +617,13 @@ export type EXECUTION_RESOURCES = {
   bitwise_builtin_applications?: number;
   keccak_builtin_applications?: number;
   segment_arena_builtin?: number;
+};
+
+export type EXECUTION_RESOURCES = COMPUTATION_RESOURCES & {
+  data_availability: {
+    l1_gas: number;
+    l1_data_gas: number;
+  };
 };
 
 /**
@@ -618,6 +645,7 @@ export type INVOKE_TXN_TRACE = {
   validate_invocation?: FUNCTION_INVOCATION;
   fee_transfer_invocation?: FUNCTION_INVOCATION;
   state_diff?: STATE_DIFF;
+  execution_resources: EXECUTION_RESOURCES;
 };
 
 // Represents a transaction trace for a declare transaction.
@@ -626,6 +654,7 @@ export type DECLARE_TXN_TRACE = {
   validate_invocation?: FUNCTION_INVOCATION;
   fee_transfer_invocation?: FUNCTION_INVOCATION;
   state_diff?: STATE_DIFF;
+  execution_resources: EXECUTION_RESOURCES;
 };
 
 // Represents a transaction trace for a deploy account transaction.
@@ -635,6 +664,7 @@ export type DEPLOY_ACCOUNT_TXN_TRACE = {
   validate_invocation?: FUNCTION_INVOCATION;
   fee_transfer_invocation?: FUNCTION_INVOCATION;
   state_diff?: STATE_DIFF;
+  execution_resources: EXECUTION_RESOURCES;
 };
 
 // Represents a transaction trace for an L1 handler transaction.
@@ -649,7 +679,7 @@ export type NESTED_CALL = FUNCTION_INVOCATION;
 
 // Represents a function invocation along with its execution details.
 export type FUNCTION_INVOCATION = {
-  function_call: FUNCTION_CALL;
+  function_call: FUNCTION_CALL; // TODO: double check if this should be an intersection
   caller_address: string;
   class_hash: string;
   entry_point_type: ENTRY_POINT_TYPE;
@@ -658,7 +688,7 @@ export type FUNCTION_INVOCATION = {
   calls: NESTED_CALL[];
   events: ORDERED_EVENT[];
   messages: ORDERED_MESSAGE[];
-  execution_resources: EXECUTION_RESOURCES;
+  execution_resources: COMPUTATION_RESOURCES;
 };
 
 // Represents an ordered event alongside its order within the transaction.

@@ -162,6 +162,11 @@ export class RpcChannel {
     return this.fetchEndpoint('starknet_getBlockWithTxs', { block_id });
   }
 
+  public getBlockWithReceipts(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint('starknet_getBlockWithReceipts', { block_id });
+  }
+
   public getBlockStateUpdate(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getStateUpdate', { block_id });
