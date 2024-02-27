@@ -36,7 +36,7 @@ export function stringFromByteArray(myByteArray: ByteArray): string {
  * @returns Cairo representation of a LongString
  * @example
  * ```typescript
- * const myByteArray: ByteArray = byteArrayFromStr("ABCDEFGHI");
+ * const myByteArray: ByteArray = byteArrayFromStr("IHGFEDCBA");
  * ```
  * Result is :
  * {
