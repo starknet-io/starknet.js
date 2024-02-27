@@ -131,7 +131,6 @@ export class CallData {
         this.structs,
         this.enums
       );
-      // console.log('ordered =', orderedObject);
       args = Object.values(orderedObject);
       //   // validate array elements to abi
       validateFields(abiMethod, args, this.structs, this.enums);

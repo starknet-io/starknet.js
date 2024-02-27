@@ -10,6 +10,7 @@ import {
   isTypeEthAddress,
   isTypeOption,
   isTypeResult,
+  isTypeSecp256k1Point,
   isTypeStruct,
   isTypeTuple,
 } from './cairo';
@@ -49,6 +50,9 @@ export default function orderPropsByAbi(
       return unorderedItem;
     }
     if (isTypeByteArray(abiType)) {
+      return unorderedItem;
+    }
+    if (isTypeSecp256k1Point(abiType)) {
       return unorderedItem;
     }
     if (CairoUint256.isAbiType(abiType)) {

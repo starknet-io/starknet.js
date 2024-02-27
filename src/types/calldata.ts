@@ -16,4 +16,5 @@ export enum Uint {
 export enum Literal {
   ClassHash = 'core::starknet::class_hash::ClassHash',
   ContractAddress = 'core::starknet::contract_address::ContractAddress',
+  Secp256k1Point = 'core::starknet::secp256k1::Secp256k1Point',
 }

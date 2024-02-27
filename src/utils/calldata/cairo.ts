@@ -35,6 +35,8 @@ export const isTypeEthAddress = (type: string) =>
   type === 'core::starknet::eth_address::EthAddress';
 export const isTypeBytes31 = (type: string) => type === 'core::bytes_31::bytes31';
 export const isTypeByteArray = (type: string) => type === 'core::byte_array::ByteArray';
+export const isTypeSecp256k1Point = (type: string) =>
+  type === 'core::starknet::secp256k1::Secp256k1Point';
 export const isCairo1Type = (type: string) => type.includes('::');
 export const getArrayType = (type: string) => {
   if (isCairo1Type(type)) {
