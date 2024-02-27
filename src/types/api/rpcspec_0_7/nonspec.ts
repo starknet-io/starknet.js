@@ -5,6 +5,7 @@ import {
   ADDRESS,
   BLOCK_HASH,
   BLOCK_NUMBER,
+  BLOCK_WITH_RECEIPTS,
   BLOCK_WITH_TXS,
   BLOCK_WITH_TX_HASHES,
   BROADCASTED_TXN,
@@ -21,6 +22,7 @@ import {
   FELT,
   MSG_FROM_L1,
   NONCE_UPDATE,
+  PENDING_BLOCK_WITH_RECEIPTS,
   PENDING_BLOCK_WITH_TXS,
   PENDING_BLOCK_WITH_TX_HASHES,
   PENDING_STATE_UPDATE,
@@ -59,6 +61,8 @@ export type BlockHashAndNumber = { block_hash: BLOCK_HASH; block_number: BLOCK_N
 export type BlockWithTxs = BLOCK_WITH_TXS | PENDING_BLOCK_WITH_TXS;
 // response starknet_getBlockWithTxHashes
 export type BlockWithTxHashes = BLOCK_WITH_TX_HASHES | PENDING_BLOCK_WITH_TX_HASHES;
+// response starknet_getBlockWithReceipts
+export type BlockWithTxReceipts = BLOCK_WITH_RECEIPTS | PENDING_BLOCK_WITH_RECEIPTS;
 // response starknet_getStateUpdate
 export type StateUpdate = STATE_UPDATE | PENDING_STATE_UPDATE;
 // response starknet_traceBlockTransactions

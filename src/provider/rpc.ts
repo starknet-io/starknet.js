@@ -1,3 +1,5 @@
+import { ProviderInterface } from './interface';
+import { LibraryError } from './errors';
 import { RpcChannel, RPC06, RPC07 } from '../channel';
 import {
   AccountInvocations,
@@ -27,7 +29,6 @@ import {
 import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { isSierra } from '../utils/contract';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
-import { ProviderInterface } from './interface';
 
 export class RpcProvider implements ProviderInterface {
   private responseParser = new RPCResponseParser();
@@ -93,6 +94,13 @@ export class RpcProvider implements ProviderInterface {
 
   public async getBlockWithTxs(blockIdentifier?: BlockIdentifier) {
     return this.channel.getBlockWithTxs(blockIdentifier);
+  }
+
+  public async getBlockWithReceipts(blockIdentifier?: BlockIdentifier) {
+    if (this.channel instanceof RPC06.RpcChannel)
+      throw new LibraryError('Unsupported method for RPC version');
+
+    return this.channel.getBlockWithReceipts(blockIdentifier);
   }
 
   public getStateUpdate = this.getBlockStateUpdate;
