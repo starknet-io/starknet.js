@@ -9,25 +9,25 @@ The first thing to do is to define with which network you want to interact.
 With the Provider object, you define which network to use.
 
 ```typescript
-import {Provider} from 'starknet';
+import { Provider } from 'starknet';
 ```
 
 ## Connect your DAPP to Starknet mainnet
 
 ```typescript
-const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_MAIN } })
+const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_MAIN } });
 ```
 
 ## Connect your DAPP to Starknet testnet
 
 ```typescript
-const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } }) // for testnet
+const provider = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI } }); // for testnet
 ```
 
 ## Connect your DAPP to Starknet devnet
 
 ```typescript
-const provider = new Provider({ sequencer: { baseUrl:"http://127.0.0.1:5050"} });
+const provider = new Provider({ sequencer: { baseUrl: 'http://127.0.0.1:5050' } });
 ```
 
 > If you have customized host and port during starknet-devnet initialization, adapt in accordance to your script.
@@ -42,8 +42,8 @@ const provider = new Provider({
     baseUrl: 'https://mynetwork.mycompany.io',
     feederGatewayUrl: 'feeder_gateway',
     gatewayUrl: 'gateway',
-  }
-})
+  },
+});
 ```
 
 ## Connect your DAPP to a Starknet node
@@ -53,14 +53,14 @@ const provider = new Provider({
 For a local [Pathfinder](https://github.com/eqlabs/pathfinder) node:
 
 ```typescript
-const provider = new Provider({ rpc: { nodeUrl: '127.0.0.1:9545/rpc/v0.4' } })
+const provider = new Provider({ rpc: { nodeUrl: '127.0.0.1:9545/rpc/v0.4' } });
 ```
 
 Your node can be located in your local network (example: pathfinder node running on a computer on your network, launched with this additional option: `--http-rpc 0.0.0.0:9545`).
 You can connect with:
 
 ```typescript
-const provider = new Provider({ rpc: { nodeUrl: '192.168.1.99:9545/rpc/v0.4' } })
+const provider = new Provider({ rpc: { nodeUrl: '192.168.1.99:9545/rpc/v0.4' } });
 ```
 
 ### Juno
@@ -79,24 +79,38 @@ Other examples (some need a secret key):
 
 ```typescript
 // Infura node rpc for Mainnet:
-const providerInfuraMainnet = new RpcProvider({ nodeUrl: 'https://starknet-mainnet.infura.io/v3/' + infuraKey });
+const providerInfuraMainnet = new RpcProvider({
+  nodeUrl: 'https://starknet-mainnet.infura.io/v3/' + infuraKey,
+});
 // Blast node rpc for Mainnet:
-const providerBlastMainnet = new RpcProvider({ nodeUrl: 'https://starknet-mainnet.blastapi.io/' + blastKey + "/rpc/v0.4" });
+const providerBlastMainnet = new RpcProvider({
+  nodeUrl: 'https://starknet-mainnet.blastapi.io/' + blastKey + '/rpc/v0.4',
+});
 // Lava node rpc for Mainnet:
-const providerMainnetLava = new RpcProvider({ nodeUrl: "https://g.w.lavanet.xyz:443/gateway/strk/rpc-http/" + lavaMainnetKey });
+const providerMainnetLava = new RpcProvider({
+  nodeUrl: 'https://g.w.lavanet.xyz:443/gateway/strk/rpc-http/' + lavaMainnetKey,
+});
 // Alchemy node rpc for Mainnet:
-const providerAlchemyMainnet = new RpcProvider({ nodeUrl: 'https://starknet-mainnet.g.alchemy.com/v2/' + alchemyKey });
+const providerAlchemyMainnet = new RpcProvider({
+  nodeUrl: 'https://starknet-mainnet.g.alchemy.com/v2/' + alchemyKey,
+});
 ```
 
 **Testnet:**
 
 ```typescript
 // Infura node rpc for Testnet:
-const providerInfuraTestnet = new RpcProvider({ nodeUrl: 'https://starknet-goerli.infura.io/v3/' + infuraKey });
+const providerInfuraTestnet = new RpcProvider({
+  nodeUrl: 'https://starknet-goerli.infura.io/v3/' + infuraKey,
+});
 // Blast node rpc for Testnet:
-const providerBlastTestnet = new RpcProvider({ nodeUrl: 'https://starknet-testnet.blastapi.io/' + blastKey + "/rpc/v0.4" });
+const providerBlastTestnet = new RpcProvider({
+  nodeUrl: 'https://starknet-testnet.blastapi.io/' + blastKey + '/rpc/v0.4',
+});
 // Alchemy node rpc for Testnet:
-const providerAlchemyTestnet = new RpcProvider({ nodeUrl: 'https://starknet-goerli.g.alchemy.com/v2/' + alchemyKey });
+const providerAlchemyTestnet = new RpcProvider({
+  nodeUrl: 'https://starknet-goerli.g.alchemy.com/v2/' + alchemyKey,
+});
 ```
 
 ## Specific methods
@@ -118,8 +132,8 @@ const responseEstimateMessageFee = await provider.estimateMessageFee(.....)
 For example, if you want to read the list of pending transactions, you need to use a method available from an RPC node. The class `RpcProvider` is available for this case:
 
 ```typescript
-import { RpcProvider } from "starknet";
-const providerRPC = new RpcProvider({ nodeUrl: "http://192.168.1.99:9545/rpc/v0.4" }); // for a pathfinder node located in a PC in the local network
+import { RpcProvider } from 'starknet';
+const providerRPC = new RpcProvider({ nodeUrl: 'http://192.168.1.99:9545/rpc/v0.4' }); // for a pathfinder node located in a PC in the local network
 const pendingTx = await providerRPC.getPendingTransactions();
 ```
 
@@ -128,5 +142,7 @@ RPC providers are for example Infura, Alchemy, Chainstack... Or you can spin up 
 For example, to connect to Alchemy with your personal API key:
 
 ```typescript
-const providerRPC = new RpcProvider({ nodeUrl: 'https://starknet-mainnet.g.alchemy.com/v2/' + alchemyKey});
+const providerRPC = new RpcProvider({
+  nodeUrl: 'https://starknet-mainnet.g.alchemy.com/v2/' + alchemyKey,
+});
 ```

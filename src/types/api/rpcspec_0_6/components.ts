@@ -72,6 +72,8 @@ export type RESULT_PAGE_REQUEST = {
 };
 
 export type EMITTED_EVENT = EVENT & {
+  block_hash: BLOCK_HASH;
+  block_number: BLOCK_NUMBER;
   transaction_hash: TXN_HASH;
 };
 

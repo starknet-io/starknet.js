@@ -54,11 +54,13 @@ Once compiled, this code will generate an abi file containing:
 Once the `my_func` is invoked, the event is stored in the blockchain and you get in return the transaction hash.
 
 ```typescript
-import { InvokeTransactionReceiptResponse } from "starknet";
+import { InvokeTransactionReceiptResponse } from 'starknet';
 
 const resu = await myTestContract.my_func();
-const txReceiptDeployTest: InvokeTransactionReceiptResponse = await provider.waitForTransaction(resu.transaction_hash);
-console.log("events =", txReceiptDeployTest.events);
+const txReceiptDeployTest: InvokeTransactionReceiptResponse = await provider.waitForTransaction(
+  resu.transaction_hash
+);
+console.log('events =', txReceiptDeployTest.events);
 ```
 
 Now, you have all the events of the block. Here, we have 2 events - the last one contains our data:
@@ -94,7 +96,7 @@ Use the contract deployment address `testContractAddress`, to filter the events 
 ```typescript
 const event = txReceiptDeployTest.events.find(
   (it) => num.cleanHex(it.from_address) === num.cleanHex(testContractAddress)
-) || {data: []};
+) || { data: [] };
 
 const eventD1 = event.data[0];
 const eventD2 = event.data[1];

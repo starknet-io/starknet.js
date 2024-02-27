@@ -1,5 +1,3 @@
-// the ts-ignore suppresses an esm to cjs import error that is resolved with bundling
-// @ts-ignore
 import * as json from 'lossless-json';
 
 /**
@@ -35,7 +33,7 @@ export const parseAlwaysAsBig = (x: string): any =>
  * @returns JSON string
  */
 export const stringify = (
-  value: json.JavaScriptValue,
+  value: unknown,
   replacer?: any,
   space?: string | number | undefined,
   numberStringifiers?: json.NumberStringifier[] | undefined

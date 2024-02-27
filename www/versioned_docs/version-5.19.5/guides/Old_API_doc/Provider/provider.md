@@ -20,7 +20,7 @@ The options for the provider depend on the network. The structure of the options
 The easiest way to get started is:
 
 ```typescript
-const provider = new starknet.Provider()
+const provider = new starknet.Provider();
 ```
 
 The above snippet creates a Starknet Provider instance with testnet `SN_GOERLI2` network.
@@ -30,9 +30,9 @@ However, if you want to use mainnet `SN_MAIN` or explicitly declare the network,
 ```typescript
 const provider = new starknet.Provider({
   sequencer: {
-    network: NetworkName.SN_MAIN // or NetworkName.SN_GOERLI2
-  }
-})
+    network: NetworkName.SN_MAIN, // or NetworkName.SN_GOERLI2
+  },
+});
 ```
 
 If you want more control:
@@ -43,8 +43,8 @@ const provider = new starknet.Provider({
     baseUrl: BaseUrl.SN_GOERLI,
     feederGatewayUrl: 'feeder_gateway',
     gatewayUrl: 'gateway',
-  }
-})
+  },
+});
 ```
 
 These are also the default options for the Provider constructor with `network: 'SN_GOERLI2'`.
@@ -222,7 +222,7 @@ Declare a contract on Starknet.
 {
   transaction_hash: string;
   class_hash: string;
-};
+}
 ```
 
 ---
@@ -295,6 +295,6 @@ Gets the state changes in a specific block
     declared_contract_hashes: Array<string>;
     deployed_contracts: Array<DeployedContractItem>;
     nonces: Array<Nonces>;
-  };
-};
+  }
+}
 ```

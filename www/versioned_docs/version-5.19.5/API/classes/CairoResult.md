@@ -19,7 +19,7 @@ value of type T or U.
 **`Example`**
 
 ```typescript
-const myOption = new CairoResult<BigNumberish, CustomError>(CairoResultVariant.Ok, "0x54dda8");
+const myOption = new CairoResult<BigNumberish, CustomError>(CairoResultVariant.Ok, '0x54dda8');
 ```
 
 ## Type parameters
