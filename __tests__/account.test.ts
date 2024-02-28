@@ -592,7 +592,6 @@ describe('deploy and test Wallet', () => {
           account.address,
           multicallAddress
         );
-        console.log('starkProfile', profile);
         const expectedProfile = {
           name: 'fricoben.stark',
           twitter: undefined,

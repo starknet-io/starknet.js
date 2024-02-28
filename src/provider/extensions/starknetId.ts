@@ -1,4 +1,5 @@
-import { BigNumberish, StarkProfile } from '../../types';
+import { StarknetChainId } from '../../constants';
+import { BigNumberish, RawArgs, StarkProfile } from '../../types';
 import { CallData } from '../../utils/calldata';
 import { getSelectorFromName } from '../../utils/hash';
 import { decodeShortString, encodeShortString } from '../../utils/shortString';
@@ -100,13 +101,19 @@ export class StarknetId {
     const contract = StarknetIdContract ?? getStarknetIdContract(chainId);
 
     try {
+      const encodedDomain = name
+        .replace('.stark', '')
+        .split('.')
+        .map((part) => useEncoded(part).toString(10));
+      const calldata: RawArgs =
+        chainId === StarknetChainId.SN_MAIN
+          ? { domain: encodedDomain }
+          : { domain: encodedDomain, hint: [] };
+
       const addressData = await provider.callContract({
         contractAddress: contract,
         entrypoint: 'domain_to_address',
-        calldata: CallData.compile({
-          domain: [useEncoded(name.replace('.stark', '')).toString(10)],
-          hint: [],
-        }),
+        calldata: CallData.compile(calldata),
       });
 
       return addressData[0];
@@ -148,7 +155,11 @@ export class StarknetId {
             {
               execution: execution({}),
               to: dynamicFelt(contract),
-              selector: dynamicFelt(getSelectorFromName('domain_to_id')),
+              selector: dynamicFelt(
+                getSelectorFromName(
+                  chainId === StarknetChainId.SN_MAIN ? 'domain_to_token_id' : 'domain_to_id'
+                )
+              ),
               calldata: [dynamicCallData(undefined, undefined, [0, 0])],
             },
             {
@@ -232,7 +243,7 @@ export class StarknetId {
       if (Array.isArray(data)) {
         // Format data
         const size = parseInt(data[0], 16);
-        const finalArray = [];
+        const finalArray: string[][] = [];
         let index = 1;
         for (let i = 0; i < size; i += 1) {
           if (index < data.length) {
