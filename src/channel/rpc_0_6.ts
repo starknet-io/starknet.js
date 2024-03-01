@@ -21,7 +21,7 @@ import {
 import { ETransactionVersion } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
-import fetch from '../utils/fetchPonyfill';
+import fetch from '../utils/fetch';
 import { getSelector, getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
 import { getHexStringArray, toHex, toStorageKey } from '../utils/num';
@@ -40,20 +40,22 @@ export class RpcChannel {
 
   public headers: object;
 
-  readonly retries: number;
-
   public requestId: number;
 
   readonly blockIdentifier: BlockIdentifier;
 
+  readonly retries: number;
+
+  readonly waitMode: boolean; // behave like web2 rpc and return when tx is processed
+
   private chainId?: StarknetChainId;
 
-  private speckVersion?: string;
+  private specVersion?: string;
 
-  readonly waitMode: Boolean; // behave like web2 rpc and return when tx is processed
+  private baseFetch: NonNullable<RpcProviderOptions['baseFetch']>;
 
   constructor(optionsOrProvider?: RpcProviderOptions) {
-    const { nodeUrl, retries, headers, blockIdentifier, chainId, waitMode } =
+    const { nodeUrl, retries, headers, blockIdentifier, chainId, waitMode, baseFetch } =
       optionsOrProvider || {};
     if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
       this.nodeUrl = getDefaultNodeUrl(nodeUrl as NetworkName, optionsOrProvider?.default);
@@ -68,6 +70,7 @@ export class RpcChannel {
     this.chainId = chainId;
     this.waitMode = waitMode || false;
     this.requestId = 0;
+    this.baseFetch = baseFetch ?? fetch;
   }
 
   public fetch(method: string, params?: object, id: string | number = 0) {
@@ -77,7 +80,7 @@ export class RpcChannel {
       method,
       ...(params && { params }),
     };
-    return fetch(this.nodeUrl, {
+    return this.baseFetch(this.nodeUrl, {
       method: 'POST',
       body: stringify(rpcRequestBody),
       headers: this.headers as Record<string, string>,
@@ -121,8 +124,8 @@ export class RpcChannel {
   }
 
   public async getSpecVersion() {
-    this.speckVersion ??= (await this.fetchEndpoint('starknet_specVersion')) as StarknetChainId;
-    return this.speckVersion;
+    this.specVersion ??= (await this.fetchEndpoint('starknet_specVersion')) as StarknetChainId;
+    return this.specVersion;
   }
 
   public getNonceForAddress(

@@ -6,6 +6,7 @@ import {
   CallData,
   Contract,
   RPC,
+  RpcProvider,
   TransactionExecutionStatus,
   stark,
   waitForTransactionOptions,
@@ -38,6 +39,14 @@ describeIfRpc('RPCProvider', () => {
     const accountKeyPair = utils.randomPrivateKey();
     accountPublicKey = getStarkKey(accountKeyPair);
     await createBlockForDevnet();
+  });
+
+  test('baseFetch override', async () => {
+    const { nodeUrl } = rpcProvider.channel;
+    const baseFetch = jest.fn();
+    const fetchProvider = new RpcProvider({ nodeUrl, baseFetch });
+    (fetchProvider.fetch as any)();
+    expect(baseFetch.mock.calls.length).toBe(1);
   });
 
   test('getChainId', async () => {
