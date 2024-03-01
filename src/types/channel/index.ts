@@ -11,5 +11,5 @@ export type RpcChannelOptions = {
   default?: boolean;
   waitMode?: boolean;
   rpcVersion?: ERPCVersion;
-  speckVersion?: string;
+  specVersion?: string;
 };

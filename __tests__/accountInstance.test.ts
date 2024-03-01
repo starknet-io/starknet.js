@@ -1,4 +1,4 @@
-import { Account, AccountInstance, BigNumberish, LibraryError, RpcProvider } from '../src';
+import { Account, AccountInstance, LibraryError, RpcProvider } from '../src';
 
 describe('Account instantiated from provider instance', () => {
   const rpc = new RpcProvider();

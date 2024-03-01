@@ -10,4 +10,3 @@ export * from './cairoEnum';
 export * from './api/forward';
 
 export * as RPC from './api';
-// export * from './api';

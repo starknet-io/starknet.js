@@ -161,46 +161,6 @@ export enum TransactionType {
   INVOKE = 'INVOKE_FUNCTION',
 }
 
-// TODO: All this should be removed
-
-/**
- * new statuses are defined by props: finality_status and execution_status
- * to be #deprecated
- */
-/* export enum TransactionStatus {
-  NOT_RECEIVED = 'NOT_RECEIVED',
-  RECEIVED = 'RECEIVED',
-  ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
-  ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
-  REJECTED = 'REJECTED',
-  REVERTED = 'REVERTED',
-} */
-
-/* export enum TransactionFinalityStatus {
-  NOT_RECEIVED = 'NOT_RECEIVED',
-  RECEIVED = 'RECEIVED',
-  ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
-  ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
-} */
-
-/* export enum TransactionExecutionStatus {
-  REJECTED = 'REJECTED',
-  REVERTED = 'REVERTED',
-  SUCCEEDED = 'SUCCEEDED',
-} */
-
-/* export enum BlockStatus {
-  PENDING = 'PENDING',
-  ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
-  ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
-  REJECTED = 'REJECTED',
-} */
-
-/* export enum BlockTag {
-  pending = 'pending',
-  latest = 'latest',
-} */
-
 export type BlockNumber = number;
 
 /**

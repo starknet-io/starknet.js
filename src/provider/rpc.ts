@@ -41,8 +41,7 @@ export class RpcProvider implements ProviderInterface {
   ) {
     if (optionsOrProvider && instance) {
       // stop ts complains
-      // @ts-expect-error
-      this.channel = null;
+      this.channel = null as any;
       // use provided instance
       Object.setPrototypeOf(this, Object.getPrototypeOf(optionsOrProvider));
       Object.assign(this, optionsOrProvider);

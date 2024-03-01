@@ -34,7 +34,7 @@ import type {
 } from '../types';
 
 export abstract class ProviderInterface {
-  public abstract channel: RpcChannel | undefined;
+  public abstract channel: RpcChannel;
 
   /**
    * Gets the Starknet chain Id

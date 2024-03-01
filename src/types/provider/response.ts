@@ -71,8 +71,6 @@ export type Storage = RPC.Felt;
 
 export type Nonce = string;
 
-// export type SimulationFlags = RPC.SimulationFlags;
-
 export type SimulatedTransaction = RPC.SimulateTransaction & {
   suggestedMaxFee: bigint;
   resourceBounds: RPC.ResourceBounds;

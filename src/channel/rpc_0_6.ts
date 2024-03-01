@@ -48,12 +48,12 @@ export class RpcChannel {
 
   private chainId?: StarknetChainId;
 
-  private speckVersion?: string;
+  private specVersion?: string;
 
   readonly waitMode: Boolean; // behave like web2 rpc and return when tx is processed
 
   constructor(optionsOrProvider?: RpcChannelOptions) {
-    const { nodeUrl, retries, headers, blockIdentifier, chainId, waitMode, speckVersion } =
+    const { nodeUrl, retries, headers, blockIdentifier, chainId, waitMode, specVersion } =
       optionsOrProvider || {};
     if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
       this.nodeUrl = getDefaultNodeUrl(
@@ -76,7 +76,7 @@ export class RpcChannel {
     this.chainId = chainId;
     this.waitMode = waitMode || false;
     this.requestId = 0;
-    this.speckVersion = speckVersion;
+    this.specVersion = specVersion;
   }
 
   public fetch(method: string, params?: object, id: string | number = 0) {
@@ -130,8 +130,8 @@ export class RpcChannel {
   }
 
   public async getSpecVersion() {
-    this.speckVersion ??= await this.fetchEndpoint('starknet_specVersion');
-    return this.speckVersion;
+    this.specVersion ??= await this.fetchEndpoint('starknet_specVersion');
+    return this.specVersion;
   }
 
   public getNonceForAddress(
