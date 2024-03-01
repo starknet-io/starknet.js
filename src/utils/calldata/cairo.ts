@@ -3,7 +3,7 @@ import {
   AbiEnums,
   AbiStructs,
   BigNumberish,
-  ContractVersion,
+  ContractSpecificities,
   Literal,
   Uint,
   Uint256,
@@ -66,10 +66,10 @@ export function isCairo1Abi(abi: Abi): boolean {
  * @param abi
  * @returns string
  */
-export function getAbiContractVersion(abi: Abi): ContractVersion {
+export function getAbiContractVersion(abi: Abi): ContractSpecificities {
   // determine by interface for "Cairo 1.2"
   if (abi.find((it) => it.type === 'interface')) {
-    return { cairo: '1', compiler: '2' };
+    return { cairo: '1', compiler: '2', messageVerifFunctionName: undefined };
   }
 
   // determine by function io types "Cairo 1.1" or "Cairo 0.0"
@@ -78,13 +78,13 @@ export function getAbiContractVersion(abi: Abi): ContractVersion {
     (it) => it.type === 'function' && (it.inputs.length || it.outputs.length)
   );
   if (!testFunction) {
-    return { cairo: undefined, compiler: undefined };
+    return { cairo: undefined, compiler: undefined, messageVerifFunctionName: undefined };
   }
   const io = testFunction.inputs.length ? testFunction.inputs : testFunction.outputs;
   if (isCairo1Type(io[0].type)) {
-    return { cairo: '1', compiler: '1' };
+    return { cairo: '1', compiler: '1', messageVerifFunctionName: undefined };
   }
-  return { cairo: '0', compiler: '0' };
+  return { cairo: '0', compiler: '0', messageVerifFunctionName: undefined };
 }
 
 /**

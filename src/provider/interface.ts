@@ -8,7 +8,7 @@ import type {
   Call,
   CallContractResponse,
   ContractClassResponse,
-  ContractVersion,
+  ContractSpecificities,
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractPayload,
@@ -339,11 +339,11 @@ export abstract class ProviderInterface {
    *   - (optional) compiler - (default true) extract compiler version using type tactic from abi
    *   - (optional) blockIdentifier - block identifier
    */
-  public abstract getContractVersion(
+  public abstract getContractSpecificities(
     contractAddress: string,
     classHash?: undefined,
     options?: getContractVersionOptions
-  ): Promise<ContractVersion>;
+  ): Promise<ContractSpecificities>;
 
   /**
    * Gets the contract version from the provided address
@@ -353,9 +353,9 @@ export abstract class ProviderInterface {
    *   - (optional) compiler - (default true) extract compiler version using type tactic from abi
    *   - (optional) blockIdentifier - block identifier
    */
-  public abstract getContractVersion(
+  public abstract getContractSpecificities(
     contractAddress: undefined,
     classHash: string,
     options?: getContractVersionOptions
-  ): Promise<ContractVersion>;
+  ): Promise<ContractSpecificities>;
 }

@@ -421,6 +421,10 @@ describe('deploy and test Wallet', () => {
     const signature = await account.signMessage(typedDataExample);
     const verifMessageResponse: boolean = await account.verifyMessage(typedDataExample, signature);
     expect(verifMessageResponse).toBe(true);
+    const messageVerificationFunctionName = account.signatureVerifFunctionName;
+    expect(
+      ['isValidSignature', 'is_valid_signature'].includes(messageVerificationFunctionName!)
+    ).toBe(true);
   });
 
   describe('Contract interaction with Account', () => {

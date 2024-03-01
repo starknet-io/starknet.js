@@ -11,7 +11,7 @@ import {
   CallOptions,
   Calldata,
   ContractFunction,
-  ContractVersion,
+  ContractSpecificities,
   EstimateFeeResponse,
   GetTransactionReceiptResponse,
   Invocation,
@@ -156,9 +156,9 @@ export abstract class ContractInterface {
   public abstract isCairo1(): boolean;
 
   /**
-   * Retrieves the version of the contract (cairo version & compiler version)
+   * Retrieves the version of the contract (cairo version & compiler version & account verify message function name)
    */
-  public abstract getVersion(): Promise<ContractVersion>;
+  public abstract getVersion(): Promise<ContractSpecificities>;
 
   public abstract typedv2<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContractV2<TAbi>;
 }

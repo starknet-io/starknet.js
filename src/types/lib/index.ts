@@ -268,13 +268,15 @@ export interface CallStruct {
 }
 
 /**
- * Represent Contract version
+ * Represent Contract version & account verification message function name
  */
-export type ContractVersion = {
+export type ContractSpecificities = {
   /** version of the cairo language */
   cairo: CairoVersion;
   /** version of the cairo compiler used to compile the contract */
   compiler: CompilerVersion;
+  /** If the contract is an account, the name of the function that verify a message signature. Otherwise returns '' */
+  messageVerifFunctionName: string | undefined;
 };
 
 export * from './contract';

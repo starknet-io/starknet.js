@@ -40,6 +40,7 @@ import {
 } from '../types';
 import { ETransactionVersion, ETransactionVersion3, ResourceBounds } from '../types/api';
 import { CallData } from '../utils/calldata';
+import { createAbiParser } from '../utils/calldata/parser';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { starkCurve } from '../utils/ec';
 import { parseUDCEvent } from '../utils/events';
@@ -66,6 +67,8 @@ export class Account extends Provider implements AccountInterface {
 
   public cairoVersion: CairoVersion;
 
+  public signatureVerifFunctionName: string | undefined;
+
   readonly transactionVersion: ETransactionVersion.V2 | ETransactionVersion.V3;
 
   constructor(
@@ -86,6 +89,7 @@ export class Account extends Provider implements AccountInterface {
       this.cairoVersion = cairoVersion.toString() as CairoVersion;
     }
     this.transactionVersion = transactionVersion;
+    this.signatureVerifFunctionName = undefined;
   }
 
   // provided version or contract based preferred transactionVersion
@@ -110,15 +114,17 @@ export class Account extends Provider implements AccountInterface {
   }
 
   /**
-   * Retrieves the Cairo version from the network and sets `cairoVersion` if not already set in the constructor
+   * Retrieves the Cairo version from the network and sets `cairoVersion` if not already set in the constructor.
+   * Retrieves also the name of the function that verify a message signature.
    * @param classHash if provided detects Cairo version from classHash, otherwise from the account address
    */
   public async getCairoVersion(classHash?: string) {
     if (!this.cairoVersion) {
-      const { cairo } = classHash
-        ? await super.getContractVersion(undefined, classHash)
-        : await super.getContractVersion(this.address);
+      const { cairo, messageVerifFunctionName } = classHash
+        ? await super.getContractSpecificities(undefined, classHash)
+        : await super.getContractSpecificities(this.address);
       this.cairoVersion = cairo;
+      this.signatureVerifFunctionName = messageVerifFunctionName;
     }
     return this.cairoVersion;
   }
@@ -549,28 +555,58 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean> {
-    try {
+    // Accounts should be conform to SNIP-6 ( https://github.com/starknet-io/SNIPs/blob/f6998f779ee2157d5e1dea36042b08062093b3c5/SNIPS/snip-6.md?plain=1#L61 ), but they are not always conform, and SNIP do not standardize the response if the signature isn't valid.
+    if (typeof this.signatureVerifFunctionName === 'undefined') {
+      await this.getCairoVersion();
+    }
+    // if proxy
+    if (this.signatureVerifFunctionName === '') {
       const resp = await this.callContract({
         contractAddress: this.address,
-        entrypoint: 'isValidSignature',
+        entrypoint: 'get_implementation',
+        calldata: [],
+      });
+      const implementationHash = resp[0];
+      const implementationClass = await super.getClassByHash(implementationHash);
+      const parser = createAbiParser(implementationClass.abi);
+      const parsedAbi = parser.getLegacyFormat();
+      const functionsList = parsedAbi.filter((abiElement) => abiElement.type === 'function');
+      if (functionsList) {
+        const validFunction = functionsList.find((abiElement) =>
+          ['isValidSignature', 'is_valid_signature'].includes(abiElement.name)
+        );
+        if (validFunction) {
+          this.signatureVerifFunctionName = validFunction.name;
+        }
+      }
+    }
+
+    try {
+      if (!this.signatureVerifFunctionName) {
+        throw Error('This account contract has no message verification function identified.');
+      }
+      const resp = await this.callContract({
+        contractAddress: this.address,
+        entrypoint: this.signatureVerifFunctionName,
         calldata: CallData.compile({
           hash: toBigInt(hash).toString(),
           signature: formatSignature(signature),
         }),
       });
       if (BigInt(resp[0]) === 0n) {
-        // OpenZeppelin 0.8.0 invalid signature
+        // OpenZeppelin 0.7.0 to 0.9.0 invalid signature
         return false;
       }
-      // OpenZeppelin 0.8.0, ArgentX 0.3.0 & Braavos Cairo 0 valid signature
+      // OpenZeppelin 0.7.0 to 0.9.0, ArgentX 0.3.0 to 0.3.1 & Braavos Cairo 0.0.11 to 1.0.0 valid signature
       return true;
     } catch (err) {
       if (
-        ['argent/invalid-signature', 'is invalid, with respect to the public key'].some(
-          (errMessage) => (err as Error).message.includes(errMessage)
-        )
+        [
+          'argent/invalid-signature', // ArgentX 0.3.0 to 0.3.1
+          'is invalid, with respect to the public key', // OpenZeppelin until 0.6.1, Braavos 0.0.11
+          'INVALID_SIG', // Braavos 1.0.0
+        ].some((errMessage) => (err as Error).message.includes(errMessage))
       ) {
-        // ArgentX 0.3.0 invalid signature, Braavos Cairo 0 invalid signature
         return false;
       }
       throw Error(`Signature verification request is rejected by the network: ${err}`);
