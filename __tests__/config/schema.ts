@@ -2,12 +2,14 @@ import ajvKeywords from 'ajv-keywords';
 import { matchersWithOptions } from 'jest-json-schema';
 
 import accountSchemas from '../schemas/account.json';
+import componentSchemas from '../schemas/component.json';
 import libSchemas from '../schemas/lib.json';
 import providerSchemas from '../schemas/provider.json';
 import rpcSchemas from '../schemas/rpc.json';
 import sequencerSchemas from '../schemas/sequencer.json';
 
-const schemas = [accountSchemas, sequencerSchemas, providerSchemas, libSchemas, rpcSchemas];
+const matcherSchemas = [accountSchemas, libSchemas, providerSchemas, rpcSchemas, sequencerSchemas];
+const schemas = [...matcherSchemas, componentSchemas];
 const jestJsonMatchers = matchersWithOptions({ schemas }, (ajv: any) => {
   // @ts-ignore
   ajv.addKeyword({
@@ -26,16 +28,17 @@ export const initializeMatcher = (expect: jest.Expect) => {
   expect.extend(jestJsonMatchers);
   expect.extend({
     toMatchSchemaRef(received: object, name: string) {
-      const schema = schemas.find((s) => Object.keys(s.definitions).includes(name));
+      const schema = matcherSchemas.find((s) => Object.keys(s.definitions).includes(name));
       const $ref = `${schema?.$id}#/definitions/${name}`;
       return jestJsonMatchers.toMatchSchema.call(this, received, { $ref });
     },
   });
   expect(accountSchemas).toBeValidSchema();
-  expect(sequencerSchemas).toBeValidSchema();
-  expect(providerSchemas).toBeValidSchema();
+  expect(componentSchemas).toBeValidSchema();
   expect(libSchemas).toBeValidSchema();
+  expect(providerSchemas).toBeValidSchema();
   expect(rpcSchemas).toBeValidSchema();
+  expect(sequencerSchemas).toBeValidSchema();
 };
 
 declare global {

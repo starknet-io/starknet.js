@@ -228,6 +228,19 @@
         }
       },
       "required": ["transaction_hash"]
+    },
+    "getTransactionTrace": {
+      "$ref": "componentSchemas#/components/schemas/TRANSACTION_TRACE"
+    },
+    "BlockWithTxReceipts": {
+      "oneOf": [
+        {
+          "$ref": "componentSchemas#/components/schemas/BLOCK_WITH_RECEIPTS"
+        },
+        {
+          "$ref": "componentSchemas#/components/schemas/PENDING_BLOCK_WITH_RECEIPTS"
+        }
+      ]
     }
   }
 }
