@@ -1,3 +1,9 @@
+## [6.1.5](https://github.com/starknet-io/starknet.js/compare/v6.1.4...v6.1.5) (2024-03-02)
+
+### Bug Fixes
+
+- **RpcChannel:** allow client to provide `specVersion` ([ae8cf8e](https://github.com/starknet-io/starknet.js/commit/ae8cf8e19d8ba73c52376d83d2e084da008daba1))
+
 ## [6.1.4](https://github.com/starknet-io/starknet.js/compare/v6.1.3...v6.1.4) (2024-02-26)
 
 ### Bug Fixes
