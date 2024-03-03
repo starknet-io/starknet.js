@@ -151,10 +151,9 @@ export type BLOCK_BODY_WITH_TX_HASHES = {
 };
 
 export type BLOCK_BODY_WITH_TXS = {
-  transactions: {
-    transaction: TXN; // TODO: double check if intersection
+  transactions: (TXN & {
     transaction_hash: TXN_HASH;
-  }[];
+  })[];
 };
 
 export type BLOCK_BODY_WITH_RECEIPTS = {
@@ -678,8 +677,7 @@ export type L1_HANDLER_TXN_TRACE = {
 export type NESTED_CALL = FUNCTION_INVOCATION;
 
 // Represents a function invocation along with its execution details.
-export type FUNCTION_INVOCATION = {
-  function_call: FUNCTION_CALL; // TODO: double check if this should be an intersection
+export type FUNCTION_INVOCATION = FUNCTION_CALL & {
   caller_address: string;
   class_hash: string;
   entry_point_type: ENTRY_POINT_TYPE;
