@@ -159,7 +159,7 @@ export type BLOCK_BODY_WITH_TXS = {
 export type BLOCK_BODY_WITH_RECEIPTS = {
   transactions: {
     transaction: TXN;
-    receipt: TXN_RECEIPT_IN_BLOCK;
+    receipt: TXN_RECEIPT;
   }[];
 };
 
@@ -181,6 +181,8 @@ export type PENDING_BLOCK_HEADER = {
   timestamp: number;
   sequencer_address: FELT;
   l1_gas_price: RESOURCE_PRICE;
+  l1_data_gas_price: RESOURCE_PRICE;
+  l1_da_mode: 'BLOB' | 'CALLDATA';
   starknet_version: string;
 };
 
@@ -407,24 +409,9 @@ export type COMMON_RECEIPT_PROPERTIES = {
   actual_fee: FEE_PAYMENT;
   execution_status: TXN_EXECUTION_STATUS;
   finality_status: TXN_FINALITY_STATUS;
-  block_hash: BLOCK_HASH;
-  block_number: BLOCK_NUMBER;
   messages_sent: MSG_TO_L1[];
   revert_reason?: string;
   events: EVENT[];
-  execution_resources: EXECUTION_RESOURCES;
-};
-
-export type TXN_RECEIPT_IN_BLOCK = PENDING_TXN_RECEIPT;
-
-export type PENDING_COMMON_RECEIPT_PROPERTIES = {
-  transaction_hash: TXN_HASH;
-  actual_fee: FEE_PAYMENT;
-  messages_sent: MSG_TO_L1[];
-  events: EVENT[];
-  revert_reason?: string;
-  finality_status: TXN_FINALITY_STATUS;
-  execution_status: TXN_EXECUTION_STATUS;
   execution_resources: EXECUTION_RESOURCES;
 };
 
@@ -432,27 +419,14 @@ export type INVOKE_TXN_RECEIPT = {
   type: 'INVOKE';
 } & COMMON_RECEIPT_PROPERTIES;
 
-export type PENDING_INVOKE_TXN_RECEIPT = {
-  type: 'INVOKE';
-} & PENDING_COMMON_RECEIPT_PROPERTIES;
-
 export type DECLARE_TXN_RECEIPT = {
   type: 'DECLARE';
 } & COMMON_RECEIPT_PROPERTIES;
-
-export type PENDING_DECLARE_TXN_RECEIPT = {
-  type: 'DECLARE';
-} & PENDING_COMMON_RECEIPT_PROPERTIES;
 
 export type DEPLOY_ACCOUNT_TXN_RECEIPT = {
   type: 'DEPLOY_ACCOUNT';
   contract_address: FELT;
 } & COMMON_RECEIPT_PROPERTIES;
-
-export type PENDING_DEPLOY_ACCOUNT_TXN_RECEIPT = {
-  type: 'DEPLOY_ACCOUNT';
-  contract_address: FELT;
-} & PENDING_COMMON_RECEIPT_PROPERTIES;
 
 export type DEPLOY_TXN_RECEIPT = {
   type: 'DEPLOY';
@@ -464,11 +438,6 @@ export type L1_HANDLER_TXN_RECEIPT = {
   message_hash: NUM_AS_HEX;
 } & COMMON_RECEIPT_PROPERTIES;
 
-export type PENDING_L1_HANDLER_TXN_RECEIPT = {
-  type: 'L1_HANDLER';
-  message_hash: NUM_AS_HEX;
-} & PENDING_COMMON_RECEIPT_PROPERTIES;
-
 export type TXN_RECEIPT =
   | INVOKE_TXN_RECEIPT
   | L1_HANDLER_TXN_RECEIPT
@@ -476,11 +445,10 @@ export type TXN_RECEIPT =
   | DEPLOY_TXN_RECEIPT
   | DEPLOY_ACCOUNT_TXN_RECEIPT;
 
-export type PENDING_TXN_RECEIPT =
-  | PENDING_INVOKE_TXN_RECEIPT
-  | PENDING_L1_HANDLER_TXN_RECEIPT
-  | PENDING_DECLARE_TXN_RECEIPT
-  | PENDING_DEPLOY_ACCOUNT_TXN_RECEIPT;
+export type TXN_RECEIPT_WITH_BLOCK_INFO = TXN_RECEIPT & {
+  block_hash?: BLOCK_HASH;
+  block_number?: BLOCK_NUMBER;
+};
 
 export type MSG_TO_L1 = {
   from_address: FELT;
