@@ -26,7 +26,6 @@ import {
   PENDING_BLOCK_WITH_TXS,
   PENDING_BLOCK_WITH_TX_HASHES,
   PENDING_STATE_UPDATE,
-  PENDING_TXN_RECEIPT,
   PRICE_UNIT,
   REPLACED_CLASS,
   RESOURCE_BOUNDS_MAPPING,
@@ -39,6 +38,7 @@ import {
   TXN_EXECUTION_STATUS,
   TXN_HASH,
   TXN_RECEIPT,
+  TXN_RECEIPT_WITH_BLOCK_INFO,
   TXN_STATUS,
 } from './components';
 
@@ -87,9 +87,9 @@ export type Nonce = FELT;
 export type TransactionHash = TXN_HASH;
 export type TransactionTrace = TRANSACTION_TRACE;
 export type BlockHash = BLOCK_HASH;
-export type TransactionReceipt = TXN_RECEIPT | PENDING_TXN_RECEIPT;
-export type Receipt = TXN_RECEIPT;
-export type PendingReceipt = PENDING_TXN_RECEIPT;
+export type TransactionReceipt = TXN_RECEIPT_WITH_BLOCK_INFO;
+export type Receipt = TXN_RECEIPT_WITH_BLOCK_INFO & BlockHashAndNumber;
+export type PendingReceipt = TXN_RECEIPT;
 export type EventFilter = EVENT_FILTER & RESULT_PAGE_REQUEST;
 export type SimulationFlags = Array<SIMULATION_FLAG>;
 export type L1Message = MSG_FROM_L1;
