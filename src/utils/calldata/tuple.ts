@@ -58,14 +58,72 @@ function extractCairo0Tuple(type: string) {
   return recomposed;
 }
 
-function extractCairo1Tuple(type: string) {
+function posClosure(input: string, open: string, close: string): number {
+  let posEnd: number = 0;
+  let i = 0;
+  while (i < input.length) {
+    if (input[i] === open) {
+      let counter = 1;
+      i++;
+      while (counter) {
+        if (input[i] === close) counter--;
+        if (input[i] === open) counter++;
+        i++;
+      }
+      posEnd = i;
+      break;
+    }
+    i++;
+  }
+  return posEnd;
+}
+
+function extractCairo1Tuple(type: string): string[] {
   // un-named tuples support
-  const cleanType = type.replace(/\s/g, '').slice(1, -1); // remove first lvl () and spaces
-  const { subTuple, result } = parseSubTuple(cleanType);
-  const recomposed = result.split(',').map((it) => {
-    return subTuple.length ? it.replace(' ', subTuple.shift() as string) : it;
-  });
-  return recomposed;
+  const input = type.slice(1, -1); // remove first lvl ()
+  const result: string[] = [];
+  let posStart: number = 0;
+  while (posStart < input.length) {
+    switch (true) {
+      case input[posStart] === '(': {
+        // Tuple
+        const posEnd = posClosure(input.slice(posStart), '(', ')');
+        result.push(input.slice(posStart, posStart + posEnd));
+        posStart = posStart + posEnd + 2; // +2 to skip ', '
+        break;
+      }
+      case input.slice(posStart).startsWith('core::result::Result::<'): {
+        const posEnd = posClosure(input.slice(posStart), '<', '>');
+        result.push(input.slice(posStart, posStart + posEnd));
+        posStart = posStart + posEnd + 2;
+        break;
+      }
+      case input.slice(posStart).startsWith('core::array::Array::<'): {
+        const posEnd = posClosure(input.slice(posStart), '<', '>');
+        result.push(input.slice(posStart, posStart + posEnd));
+        posStart = posStart + posEnd + 2;
+        break;
+      }
+      case input.slice(posStart).startsWith('core::option::Option::<'): {
+        const posEnd = posClosure(input.slice(posStart), '<', '>');
+        result.push(input.slice(posStart, posStart + posEnd));
+        posStart = posStart + posEnd + 2;
+        break;
+      }
+      default: {
+        const posEnd = input.slice(posStart).indexOf(',');
+        if (posEnd === -1) {
+          result.push(input.slice(posStart));
+          posStart = input.length;
+        } else {
+          result.push(input.slice(posStart, posStart + posEnd));
+          posStart = posStart + posEnd + 2;
+          break;
+        }
+      }
+    }
+  }
+  return result;
 }
 
 /**
