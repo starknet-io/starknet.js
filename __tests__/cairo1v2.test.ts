@@ -1046,7 +1046,7 @@ describe('Cairo 1', () => {
     });
   });
 
-  describe.only('cairo v2.5.3 complex tuples', () => {
+  describe('cairo v2.5.3 complex tuples', () => {
     let tupleContract: Contract;
     let myCallData: CallData;
 
