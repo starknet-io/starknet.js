@@ -28,8 +28,8 @@ trait ITupleStarknet<TContractState> {
     fn get_tuple9(
         self: @TContractState, l0: ((u256, (u16, Order2)), u8)
     ) -> ((u256, (u16, Order2)), u8);
-    fn get_tuple10(self: @TContractState) -> Array<Result<u256, u8>>;
-    fn get_tuple11(self: @TContractState) -> Option<Result<u16, felt252>>;
+    fn get_tuple10(self: @TContractState) -> (u256,Array<Result<u256, u8>>);
+    fn get_tuple11(self: @TContractState) -> (u16,Option<Result<u16, felt252>>);
     fn get_tuple12(self: @TContractState) -> (Direction, u8);
 }
 
@@ -113,17 +113,19 @@ mod HelloStarknet {
             a
         }
 
-        fn get_tuple10(self: @ContractState) -> Array<Result<u256, u8>> {
+        fn get_tuple10(self: @ContractState) -> (u256,Array<Result<u256, u8>>) {
             let r1: Result<u256, u8> = Result::Ok(6000_u256);
             let r2: Result<u256, u8> = Result::Ok(7000_u256);
             let arr = array![r1, r2];
-            arr
+            let a: (u256,Array<Result<u256, u8>>) = (8000_u256,arr);
+            a
         }
 
-        fn get_tuple11(self: @ContractState) -> Option<Result<u16, felt252>> {
+        fn get_tuple11(self: @ContractState) -> (u16,Option<Result<u16, felt252>>) {
             let r: Result<u16, felt252> = Result::Ok(2000_u16);
             let o: Option<Result<u16, felt252>> = Option::Some(r);
-            o
+            let a: (u16,Option<Result<u16, felt252>>) = (400_u16,o);
+            a
         }
 
         fn get_tuple12(self: @ContractState) -> (Direction, u8) {

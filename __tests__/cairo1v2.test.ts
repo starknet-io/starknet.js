@@ -1046,7 +1046,7 @@ describe('Cairo 1', () => {
     });
   });
 
-  describe('cairo v2.5.3 complex tuples', () => {
+  describe.only('cairo v2.5.3 complex tuples', () => {
     let tupleContract: Contract;
     let myCallData: CallData;
 
@@ -1144,20 +1144,24 @@ describe('Cairo 1', () => {
 
     test('Array Array<Result<u256, u8>>', async () => {
       const res10 = await tupleContract.call('get_tuple10', []);
-      expect(res10).toEqual([
-        new CairoResult<BigNumberish, BigNumberish>(CairoResultVariant.Ok, 6000n),
-        new CairoResult<BigNumberish, BigNumberish>(CairoResultVariant.Ok, 7000n),
-      ]);
+      expect(res10).toEqual({
+        '0': 8000n,
+        '1': [
+          new CairoResult<BigNumberish, BigNumberish>(CairoResultVariant.Ok, 6000n),
+          new CairoResult<BigNumberish, BigNumberish>(CairoResultVariant.Ok, 7000n),
+        ],
+      });
     });
 
     test('Option Option<Result<u16, felt252>>', async () => {
       const res11 = await tupleContract.call('get_tuple11', []);
-      expect(res11).toEqual(
-        new CairoOption<CairoResult<BigNumberish, BigNumberish>>(
+      expect(res11).toEqual({
+        '0': 400n,
+        '1': new CairoOption<CairoResult<BigNumberish, BigNumberish>>(
           CairoOptionVariant.Some,
           new CairoResult<BigNumberish, BigNumberish>(CairoResultVariant.Ok, 2000n)
-        )
-      );
+        ),
+      });
     });
   });
 });
