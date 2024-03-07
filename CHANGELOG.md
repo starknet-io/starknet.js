@@ -1,3 +1,9 @@
+# [6.2.0](https://github.com/starknet-io/starknet.js/compare/v6.1.5...v6.2.0) (2024-03-07)
+
+### Features
+
+- implement RPC v0.7.0-rc2 specification ([de32936](https://github.com/starknet-io/starknet.js/commit/de329361d838157b4fbe2b37bb043c3235b97a14))
+
 ## [6.1.5](https://github.com/starknet-io/starknet.js/compare/v6.1.4...v6.1.5) (2024-03-02)
 
 ### Bug Fixes
