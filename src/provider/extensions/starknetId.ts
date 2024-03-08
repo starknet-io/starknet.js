@@ -1,5 +1,4 @@
-import { StarknetChainId } from '../../constants';
-import { BigNumberish, RawArgs, StarkProfile } from '../../types';
+import { BigNumberish, StarkProfile } from '../../types';
 import { CallData } from '../../utils/calldata';
 import { getSelectorFromName } from '../../utils/hash';
 import { decodeShortString, encodeShortString } from '../../utils/shortString';
@@ -105,15 +104,11 @@ export class StarknetId {
         .replace('.stark', '')
         .split('.')
         .map((part) => useEncoded(part).toString(10));
-      const calldata: RawArgs =
-        chainId === StarknetChainId.SN_MAIN
-          ? { domain: encodedDomain }
-          : { domain: encodedDomain, hint: [] };
 
       const addressData = await provider.callContract({
         contractAddress: contract,
         entrypoint: 'domain_to_address',
-        calldata: CallData.compile(calldata),
+        calldata: CallData.compile({ domain: encodedDomain, hint: [] }),
       });
 
       return addressData[0];
@@ -155,11 +150,7 @@ export class StarknetId {
             {
               execution: execution({}),
               to: dynamicFelt(contract),
-              selector: dynamicFelt(
-                getSelectorFromName(
-                  chainId === StarknetChainId.SN_MAIN ? 'domain_to_token_id' : 'domain_to_id'
-                )
-              ),
+              selector: dynamicFelt(getSelectorFromName('domain_to_id')),
               calldata: [dynamicCallData(undefined, undefined, [0, 0])],
             },
             {
