@@ -35,6 +35,8 @@ import {
   compiledC210Casm,
   compiledC240,
   compiledC240Casm,
+  compiledC260,
+  compiledC260Casm,
   compiledComplexSierra,
   compiledHelloSierra,
   getTestAccount,
@@ -1041,6 +1043,18 @@ describe('Cairo 1', () => {
       const calldata1 = myCallData.compile('proceed_string', ['Take care.']);
       const resp5 = await stringContract.call('proceed_string', calldata1);
       expect(resp5).toBe(expectedString);
+    });
+  });
+
+  describe('Cairo2.6.0 Sierra1.5.0', () => {
+    test('declare Sierra 1.5.0', async () => {
+      const declare260Response = await account.declare({
+        contract: compiledC260,
+        casm: compiledC260Casm,
+      });
+      expect(declare260Response.class_hash).toBe(
+        '0x6184f1a71cad4bd123ff8bb3b97dc9ec876ced6489d9479cfdaada81a2f06d6'
+      );
     });
   });
 });

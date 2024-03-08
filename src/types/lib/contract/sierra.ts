@@ -8,6 +8,7 @@ export type CairoAssembly = {
   bytecode: ByteCode;
   hints: any[];
   pythonic_hints?: PythonicHints;
+  bytecode_segment_lengths?: number[]; // if Sierra >= v1.5.0
   entry_points_by_type: EntryPointsByType;
 };
 
@@ -33,6 +34,10 @@ export type SierraContractClass = Omit<CompiledSierra, 'abi' | 'sierra_program_d
   abi: string;
 };
 export type CompiledSierraCasm = CairoAssembly;
+export type BytecodeSegment = {
+  len: number;
+  segment: bigint[];
+};
 
 /** SUBTYPES */
 export type ByteCode = string[];
