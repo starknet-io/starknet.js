@@ -58,14 +58,49 @@ function extractCairo0Tuple(type: string) {
   return recomposed;
 }
 
-function extractCairo1Tuple(type: string) {
+function getClosureOffset(input: string, open: string, close: string): number {
+  for (let i = 0, counter = 0; i < input.length; i++) {
+    if (input[i] === open) {
+      counter++;
+    } else if (input[i] === close && --counter === 0) {
+      return i;
+    }
+  }
+  return Number.POSITIVE_INFINITY;
+}
+
+function extractCairo1Tuple(type: string): string[] {
   // un-named tuples support
-  const cleanType = type.replace(/\s/g, '').slice(1, -1); // remove first lvl () and spaces
-  const { subTuple, result } = parseSubTuple(cleanType);
-  const recomposed = result.split(',').map((it) => {
-    return subTuple.length ? it.replace(' ', subTuple.shift() as string) : it;
-  });
-  return recomposed;
+  const input = type.slice(1, -1); // remove first lvl ()
+  const result: string[] = [];
+
+  let currentIndex: number = 0;
+  let limitIndex: number;
+
+  while (currentIndex < input.length) {
+    switch (true) {
+      // Tuple
+      case input[currentIndex] === '(': {
+        limitIndex = currentIndex + getClosureOffset(input.slice(currentIndex), '(', ')') + 1;
+        break;
+      }
+      case input.startsWith('core::result::Result::<', currentIndex) ||
+        input.startsWith('core::array::Array::<', currentIndex) ||
+        input.startsWith('core::option::Option::<', currentIndex): {
+        limitIndex = currentIndex + getClosureOffset(input.slice(currentIndex), '<', '>') + 1;
+        break;
+      }
+      default: {
+        const commaIndex = input.indexOf(',', currentIndex);
+        limitIndex = commaIndex !== -1 ? commaIndex : Number.POSITIVE_INFINITY;
+      }
+    }
+
+    result.push(input.slice(currentIndex, limitIndex));
+    currentIndex = limitIndex + 2; // +2 to skip ', '
+  }
+
+  return result;
 }
 
 /**
