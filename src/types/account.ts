@@ -97,3 +97,12 @@ export type EstimateFeeAction =
       type: TransactionType.DEPLOY;
       payload: UniversalDeployerContractPayload;
     };
+
+export type StarkProfile = {
+  name?: string;
+  profilePicture?: string;
+  discord?: string;
+  twitter?: string;
+  github?: string;
+  proofOfPersonhood?: boolean;
+};
