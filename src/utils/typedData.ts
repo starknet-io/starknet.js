@@ -188,14 +188,24 @@ export function encodeType(
   type: string,
   revision: Revision = Revision.Legacy
 ): string {
-  const [primary, ...dependencies] = getDependencies(types, type, undefined, undefined, revision);
+  const allTypes =
+    revision === Revision.Active
+      ? { ...types, ...revisionConfiguration[revision].presetTypes }
+      : types;
+  const [primary, ...dependencies] = getDependencies(
+    allTypes,
+    type,
+    undefined,
+    undefined,
+    revision
+  );
   const newTypes = !primary ? [] : [primary, ...dependencies.sort()];
 
   const esc = revisionConfiguration[revision].escapeTypeString;
 
   return newTypes
     .map((dependency) => {
-      const dependencyElements = types[dependency].map((t) => {
+      const dependencyElements = allTypes[dependency].map((t) => {
         const targetType =
           t.type === 'enum' && revision === Revision.Active
             ? (t as StarkNetEnumType).contains
