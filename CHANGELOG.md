@@ -1,3 +1,9 @@
+## [6.2.1](https://github.com/starknet-io/starknet.js/compare/v6.2.0...v6.2.1) (2024-03-11)
+
+### Bug Fixes
+
+- repair Cairo 1 nested and enum tuple handling ([ce2e541](https://github.com/starknet-io/starknet.js/commit/ce2e5417e6c42af17418408dc1ca6aab4c570473))
+
 # [6.2.0](https://github.com/starknet-io/starknet.js/compare/v6.1.5...v6.2.0) (2024-03-07)
 
 ### Features
