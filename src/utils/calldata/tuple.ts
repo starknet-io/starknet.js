@@ -58,71 +58,48 @@ function extractCairo0Tuple(type: string) {
   return recomposed;
 }
 
-function posClosure(input: string, open: string, close: string): number {
-  let posEnd: number = 0;
-  let i = 0;
-  while (i < input.length) {
+function getClosureOffset(input: string, open: string, close: string): number {
+  for (let i = 0, counter = 0; i < input.length; i++) {
     if (input[i] === open) {
-      let counter = 1;
-      i++;
-      while (counter) {
-        if (input[i] === close) counter--;
-        if (input[i] === open) counter++;
-        i++;
-      }
-      posEnd = i;
-      break;
+      counter++;
+    } else if (input[i] === close && --counter === 0) {
+      return i;
     }
-    i++;
   }
-  return posEnd;
+  return Number.POSITIVE_INFINITY;
 }
 
 function extractCairo1Tuple(type: string): string[] {
   // un-named tuples support
   const input = type.slice(1, -1); // remove first lvl ()
   const result: string[] = [];
-  let posStart: number = 0;
-  while (posStart < input.length) {
+
+  let currentIndex: number = 0;
+  let limitIndex: number;
+
+  while (currentIndex < input.length) {
     switch (true) {
-      case input[posStart] === '(': {
-        // Tuple
-        const posEnd = posClosure(input.slice(posStart), '(', ')');
-        result.push(input.slice(posStart, posStart + posEnd));
-        posStart = posStart + posEnd + 2; // +2 to skip ', '
+      // Tuple
+      case input[currentIndex] === '(': {
+        limitIndex = currentIndex + getClosureOffset(input.slice(currentIndex), '(', ')') + 1;
         break;
       }
-      case input.slice(posStart).startsWith('core::result::Result::<'): {
-        const posEnd = posClosure(input.slice(posStart), '<', '>');
-        result.push(input.slice(posStart, posStart + posEnd));
-        posStart = posStart + posEnd + 2;
-        break;
-      }
-      case input.slice(posStart).startsWith('core::array::Array::<'): {
-        const posEnd = posClosure(input.slice(posStart), '<', '>');
-        result.push(input.slice(posStart, posStart + posEnd));
-        posStart = posStart + posEnd + 2;
-        break;
-      }
-      case input.slice(posStart).startsWith('core::option::Option::<'): {
-        const posEnd = posClosure(input.slice(posStart), '<', '>');
-        result.push(input.slice(posStart, posStart + posEnd));
-        posStart = posStart + posEnd + 2;
+      case input.startsWith('core::result::Result::<', currentIndex) ||
+        input.startsWith('core::array::Array::<', currentIndex) ||
+        input.startsWith('core::option::Option::<', currentIndex): {
+        limitIndex = currentIndex + getClosureOffset(input.slice(currentIndex), '<', '>') + 1;
         break;
       }
       default: {
-        const posEnd = input.slice(posStart).indexOf(',');
-        if (posEnd === -1) {
-          result.push(input.slice(posStart));
-          posStart = input.length;
-        } else {
-          result.push(input.slice(posStart, posStart + posEnd));
-          posStart = posStart + posEnd + 2;
-          break;
-        }
+        const commaIndex = input.indexOf(',', currentIndex);
+        limitIndex = commaIndex !== -1 ? commaIndex : Number.POSITIVE_INFINITY;
       }
     }
+
+    result.push(input.slice(currentIndex, limitIndex));
+    currentIndex = limitIndex + 2; // +2 to skip ', '
   }
+
   return result;
 }
 
