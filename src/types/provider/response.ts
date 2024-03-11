@@ -3,85 +3,108 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 
-import * as RPC from '../api';
 import { CompiledSierra, LegacyContractClass } from '../lib';
+import {
+  BLOCK_HASH,
+  BLOCK_NUMBER,
+  DECLARE_TXN_RECEIPT,
+  DEPLOY_ACCOUNT_TXN_RECEIPT,
+  FELT,
+  INVOKE_TXN_RECEIPT,
+  L1_HANDLER_TXN_RECEIPT,
+  PENDING_DECLARE_TXN_RECEIPT,
+  PENDING_DEPLOY_ACCOUNT_TXN_RECEIPT,
+  PENDING_INVOKE_TXN_RECEIPT,
+  PENDING_L1_HANDLER_TXN_RECEIPT,
+  PENDING_STATE_UPDATE,
+  PRICE_UNIT,
+  RESOURCE_PRICE,
+  SIMULATION_FLAG,
+  STATE_UPDATE,
+  TXN_HASH,
+  DeclaredTransaction,
+  InvokedTransaction,
+  PendingReceipt,
+  Receipt,
+  ResourceBounds,
+  SimulateTransaction,
+  TransactionWithHash,
+} from './spec';
+
+export { BlockWithTxHashes, ContractClassPayload, FeeEstimate, TransactionReceipt } from './spec';
 
 export type GetBlockResponse = PendingBlock | Block;
 
 export type PendingBlock = {
   status: 'PENDING';
-  parent_hash: RPC.SPEC.BLOCK_HASH;
+  parent_hash: BLOCK_HASH;
   timestamp: number;
-  sequencer_address: RPC.Felt;
-  l1_gas_price: RPC.SPEC.RESOURCE_PRICE;
+  sequencer_address: FELT;
+  l1_gas_price: RESOURCE_PRICE;
   starknet_version: string;
-  transactions: RPC.SPEC.TXN_HASH[];
+  transactions: TXN_HASH[];
 };
 
 export type Block = {
   status: 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
-  block_hash: RPC.SPEC.BLOCK_HASH;
-  parent_hash: RPC.SPEC.BLOCK_HASH;
-  block_number: RPC.SPEC.BLOCK_NUMBER;
-  new_root: RPC.SPEC.FELT;
+  block_hash: BLOCK_HASH;
+  parent_hash: BLOCK_HASH;
+  block_number: BLOCK_NUMBER;
+  new_root: FELT;
   timestamp: number;
-  sequencer_address: RPC.SPEC.FELT;
-  l1_gas_price: RPC.SPEC.RESOURCE_PRICE;
+  sequencer_address: FELT;
+  l1_gas_price: RESOURCE_PRICE;
   starknet_version: string;
-  transactions: RPC.SPEC.TXN_HASH[];
+  transactions: TXN_HASH[];
 };
 
-export type GetTransactionResponse = RPC.TransactionWithHash;
+export type GetTransactionResponse = TransactionWithHash;
 
-export type GetTransactionReceiptResponse = RPC.Receipt | RPC.PendingReceipt;
+export type GetTransactionReceiptResponse = Receipt | PendingReceipt;
 // Spread individual types for usage convenience
-export type InvokeTransactionReceiptResponse =
-  | RPC.SPEC.INVOKE_TXN_RECEIPT
-  | RPC.SPEC.PENDING_INVOKE_TXN_RECEIPT;
-export type DeclareTransactionReceiptResponse =
-  | RPC.SPEC.DECLARE_TXN_RECEIPT
-  | RPC.SPEC.PENDING_DECLARE_TXN_RECEIPT;
+export type InvokeTransactionReceiptResponse = INVOKE_TXN_RECEIPT | PENDING_INVOKE_TXN_RECEIPT;
+export type DeclareTransactionReceiptResponse = DECLARE_TXN_RECEIPT | PENDING_DECLARE_TXN_RECEIPT;
 export type DeployTransactionReceiptResponse = InvokeTransactionReceiptResponse;
 export type DeployAccountTransactionReceiptResponse =
-  | RPC.SPEC.DEPLOY_ACCOUNT_TXN_RECEIPT
-  | RPC.SPEC.PENDING_DEPLOY_ACCOUNT_TXN_RECEIPT;
+  | DEPLOY_ACCOUNT_TXN_RECEIPT
+  | PENDING_DEPLOY_ACCOUNT_TXN_RECEIPT;
 export type L1HandlerTransactionReceiptResponse =
-  | RPC.SPEC.L1_HANDLER_TXN_RECEIPT
-  | RPC.SPEC.PENDING_L1_HANDLER_TXN_RECEIPT;
+  | L1_HANDLER_TXN_RECEIPT
+  | PENDING_L1_HANDLER_TXN_RECEIPT;
 
 export interface EstimateFeeResponse {
   gas_consumed: bigint;
   overall_fee: bigint;
   gas_price: bigint;
-  unit: RPC.PriceUnit;
+  unit: PRICE_UNIT;
   suggestedMaxFee: bigint;
-  resourceBounds: RPC.ResourceBounds;
+  resourceBounds: ResourceBounds;
 }
 
 export type EstimateFeeResponseBulk = Array<EstimateFeeResponse>;
 
-export type InvokeFunctionResponse = RPC.InvokedTransaction;
+export type InvokeFunctionResponse = InvokedTransaction;
 
-export type DeclareContractResponse = RPC.DeclaredTransaction;
+export type DeclareContractResponse = DeclaredTransaction;
 
 export type CallContractResponse = string[];
 
-export type Storage = RPC.Felt;
+export type Storage = FELT;
 
 export type Nonce = string;
 
-export type SimulationFlags = RPC.SimulationFlags;
+export type SimulationFlags = Array<SIMULATION_FLAG>;
 
-export type SimulatedTransaction = RPC.SimulateTransaction & {
+export type SimulatedTransaction = SimulateTransaction & {
   suggestedMaxFee: bigint;
-  resourceBounds: RPC.ResourceBounds;
+  resourceBounds: ResourceBounds;
 };
 
 export type SimulateTransactionResponse = SimulatedTransaction[];
 
 export type StateUpdateResponse = StateUpdate | PendingStateUpdate;
-export type StateUpdate = RPC.SPEC.STATE_UPDATE;
-export type PendingStateUpdate = RPC.SPEC.PENDING_STATE_UPDATE;
+export type StateUpdate = STATE_UPDATE;
+export type PendingStateUpdate = PENDING_STATE_UPDATE;
 
 /**
  * Standardized type

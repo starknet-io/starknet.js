@@ -156,6 +156,13 @@ export type BLOCK_BODY_WITH_TXS = {
   })[];
 };
 
+export type BLOCK_BODY_WITH_RECEIPTS = {
+  transactions: {
+    transaction: TXN;
+    receipt: TXN_RECEIPT;
+  }[];
+};
+
 export type BLOCK_HEADER = {
   block_hash: BLOCK_HASH;
   parent_hash: BLOCK_HASH;
@@ -164,6 +171,8 @@ export type BLOCK_HEADER = {
   timestamp: number;
   sequencer_address: FELT;
   l1_gas_price: RESOURCE_PRICE;
+  l1_data_gas_price: RESOURCE_PRICE;
+  l1_da_mode: 'BLOB' | 'CALLDATA';
   starknet_version: string;
 };
 
@@ -172,6 +181,8 @@ export type PENDING_BLOCK_HEADER = {
   timestamp: number;
   sequencer_address: FELT;
   l1_gas_price: RESOURCE_PRICE;
+  l1_data_gas_price: RESOURCE_PRICE;
+  l1_da_mode: 'BLOB' | 'CALLDATA';
   starknet_version: string;
 };
 
@@ -180,9 +191,16 @@ export type BLOCK_WITH_TX_HASHES = { status: BLOCK_STATUS } & BLOCK_HEADER &
 
 export type BLOCK_WITH_TXS = { status: BLOCK_STATUS } & BLOCK_HEADER & BLOCK_BODY_WITH_TXS;
 
+export type BLOCK_WITH_RECEIPTS = {
+  status: BLOCK_STATUS;
+} & BLOCK_HEADER &
+  BLOCK_BODY_WITH_RECEIPTS;
+
 export type PENDING_BLOCK_WITH_TX_HASHES = BLOCK_BODY_WITH_TX_HASHES & PENDING_BLOCK_HEADER;
 
 export type PENDING_BLOCK_WITH_TXS = BLOCK_BODY_WITH_TXS & PENDING_BLOCK_HEADER;
+
+export type PENDING_BLOCK_WITH_RECEIPTS = BLOCK_BODY_WITH_RECEIPTS & PENDING_BLOCK_HEADER;
 
 export type DEPLOYED_CONTRACT_ITEM = {
   address: FELT;
@@ -381,7 +399,7 @@ export type INVOKE_TXN_V3 = {
 };
 
 export type L1_HANDLER_TXN = {
-  version: FELT;
+  version: '0x0';
   type: 'L1_HANDLER';
   nonce: NUM_AS_HEX;
 } & FUNCTION_CALL;
@@ -391,22 +409,9 @@ export type COMMON_RECEIPT_PROPERTIES = {
   actual_fee: FEE_PAYMENT;
   execution_status: TXN_EXECUTION_STATUS;
   finality_status: TXN_FINALITY_STATUS;
-  block_hash: BLOCK_HASH;
-  block_number: BLOCK_NUMBER;
   messages_sent: MSG_TO_L1[];
   revert_reason?: string;
   events: EVENT[];
-  execution_resources: EXECUTION_RESOURCES;
-};
-
-export type PENDING_COMMON_RECEIPT_PROPERTIES = {
-  transaction_hash: TXN_HASH;
-  actual_fee: FEE_PAYMENT;
-  messages_sent: MSG_TO_L1[];
-  events: EVENT[];
-  revert_reason?: string;
-  finality_status: 'ACCEPTED_ON_L2';
-  execution_status: TXN_EXECUTION_STATUS;
   execution_resources: EXECUTION_RESOURCES;
 };
 
@@ -414,27 +419,14 @@ export type INVOKE_TXN_RECEIPT = {
   type: 'INVOKE';
 } & COMMON_RECEIPT_PROPERTIES;
 
-export type PENDING_INVOKE_TXN_RECEIPT = {
-  type: 'INVOKE';
-} & PENDING_COMMON_RECEIPT_PROPERTIES;
-
 export type DECLARE_TXN_RECEIPT = {
   type: 'DECLARE';
 } & COMMON_RECEIPT_PROPERTIES;
-
-export type PENDING_DECLARE_TXN_RECEIPT = {
-  type: 'DECLARE';
-} & PENDING_COMMON_RECEIPT_PROPERTIES;
 
 export type DEPLOY_ACCOUNT_TXN_RECEIPT = {
   type: 'DEPLOY_ACCOUNT';
   contract_address: FELT;
 } & COMMON_RECEIPT_PROPERTIES;
-
-export type PENDING_DEPLOY_ACCOUNT_TXN_RECEIPT = {
-  type: 'DEPLOY_ACCOUNT';
-  contract_address: FELT;
-} & PENDING_COMMON_RECEIPT_PROPERTIES;
 
 export type DEPLOY_TXN_RECEIPT = {
   type: 'DEPLOY';
@@ -446,11 +438,6 @@ export type L1_HANDLER_TXN_RECEIPT = {
   message_hash: NUM_AS_HEX;
 } & COMMON_RECEIPT_PROPERTIES;
 
-export type PENDING_L1_HANDLER_TXN_RECEIPT = {
-  type: 'L1_HANDLER';
-  message_hash: NUM_AS_HEX;
-} & PENDING_COMMON_RECEIPT_PROPERTIES;
-
 export type TXN_RECEIPT =
   | INVOKE_TXN_RECEIPT
   | L1_HANDLER_TXN_RECEIPT
@@ -458,11 +445,10 @@ export type TXN_RECEIPT =
   | DEPLOY_TXN_RECEIPT
   | DEPLOY_ACCOUNT_TXN_RECEIPT;
 
-export type PENDING_TXN_RECEIPT =
-  | PENDING_INVOKE_TXN_RECEIPT
-  | PENDING_L1_HANDLER_TXN_RECEIPT
-  | PENDING_DECLARE_TXN_RECEIPT
-  | PENDING_DEPLOY_ACCOUNT_TXN_RECEIPT;
+export type TXN_RECEIPT_WITH_BLOCK_INFO = TXN_RECEIPT & {
+  block_hash?: BLOCK_HASH;
+  block_number?: BLOCK_NUMBER;
+};
 
 export type MSG_TO_L1 = {
   from_address: FELT;
@@ -561,6 +547,8 @@ export type PRICE_UNIT = 'WEI' | 'FRI';
 export type FEE_ESTIMATE = {
   gas_consumed: FELT;
   gas_price: FELT;
+  data_gas_consumed: FELT;
+  data_gas_price: FELT;
   overall_fee: FELT;
   unit: PRICE_UNIT;
 };
@@ -585,7 +573,7 @@ export type RESOURCE_PRICE = {
   price_in_wei: FELT;
 };
 
-export type EXECUTION_RESOURCES = {
+export type COMPUTATION_RESOURCES = {
   steps: number;
   memory_holes?: number;
   range_check_builtin_applications?: number;
@@ -596,6 +584,13 @@ export type EXECUTION_RESOURCES = {
   bitwise_builtin_applications?: number;
   keccak_builtin_applications?: number;
   segment_arena_builtin?: number;
+};
+
+export type EXECUTION_RESOURCES = COMPUTATION_RESOURCES & {
+  data_availability: {
+    l1_gas: number;
+    l1_data_gas: number;
+  };
 };
 
 /**
@@ -617,6 +612,7 @@ export type INVOKE_TXN_TRACE = {
   validate_invocation?: FUNCTION_INVOCATION;
   fee_transfer_invocation?: FUNCTION_INVOCATION;
   state_diff?: STATE_DIFF;
+  execution_resources: EXECUTION_RESOURCES;
 };
 
 // Represents a transaction trace for a declare transaction.
@@ -625,6 +621,7 @@ export type DECLARE_TXN_TRACE = {
   validate_invocation?: FUNCTION_INVOCATION;
   fee_transfer_invocation?: FUNCTION_INVOCATION;
   state_diff?: STATE_DIFF;
+  execution_resources: EXECUTION_RESOURCES;
 };
 
 // Represents a transaction trace for a deploy account transaction.
@@ -634,6 +631,7 @@ export type DEPLOY_ACCOUNT_TXN_TRACE = {
   validate_invocation?: FUNCTION_INVOCATION;
   fee_transfer_invocation?: FUNCTION_INVOCATION;
   state_diff?: STATE_DIFF;
+  execution_resources: EXECUTION_RESOURCES;
 };
 
 // Represents a transaction trace for an L1 handler transaction.
@@ -656,7 +654,7 @@ export type FUNCTION_INVOCATION = FUNCTION_CALL & {
   calls: NESTED_CALL[];
   events: ORDERED_EVENT[];
   messages: ORDERED_MESSAGE[];
-  execution_resources: EXECUTION_RESOURCES;
+  execution_resources: COMPUTATION_RESOURCES;
 };
 
 // Represents an ordered event alongside its order within the transaction.

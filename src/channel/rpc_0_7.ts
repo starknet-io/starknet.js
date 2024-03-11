@@ -17,7 +17,7 @@ import {
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
-import { JRPC, RPCSPEC06 as RPC } from '../types/api';
+import { JRPC, RPCSPEC07 as RPC } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
@@ -47,12 +47,12 @@ export class RpcChannel {
 
   private chainId?: StarknetChainId;
 
-  private specVersion?: string;
+  private speckVersion?: string;
 
   readonly waitMode: Boolean; // behave like web2 rpc and return when tx is processed
 
   constructor(optionsOrProvider?: RpcProviderOptions) {
-    const { nodeUrl, retries, headers, blockIdentifier, chainId, specVersion, waitMode } =
+    const { nodeUrl, retries, headers, blockIdentifier, chainId, waitMode } =
       optionsOrProvider || {};
     if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
       this.nodeUrl = getDefaultNodeUrl(nodeUrl as NetworkName, optionsOrProvider?.default);
@@ -65,7 +65,6 @@ export class RpcChannel {
     this.headers = { ...defaultOptions.headers, ...headers };
     this.blockIdentifier = blockIdentifier || defaultOptions.blockIdentifier;
     this.chainId = chainId;
-    this.specVersion = specVersion;
     this.waitMode = waitMode || false;
     this.requestId = 0;
   }
@@ -121,8 +120,8 @@ export class RpcChannel {
   }
 
   public async getSpecVersion() {
-    this.specVersion ??= (await this.fetchEndpoint('starknet_specVersion')) as StarknetChainId;
-    return this.specVersion;
+    this.speckVersion ??= (await this.fetchEndpoint('starknet_specVersion')) as StarknetChainId;
+    return this.speckVersion;
   }
 
   public getNonceForAddress(
@@ -161,6 +160,11 @@ export class RpcChannel {
   public getBlockWithTxs(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getBlockWithTxs', { block_id });
+  }
+
+  public getBlockWithReceipts(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint('starknet_getBlockWithReceipts', { block_id });
   }
 
   public getBlockStateUpdate(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
