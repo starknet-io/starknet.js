@@ -127,7 +127,7 @@ Convert an ASCII string to a hexadecimal string.
 **`Example`**
 
 ```typescript
-const myEncodedString: string = encodeShortString("uri/pict/t38.jpg");
+const myEncodedString: string = encodeShortString('uri/pict/t38.jpg');
 // return hex string (ex."0x7572692f706963742f7433382e6a7067")
 ```
 
@@ -158,7 +158,7 @@ Convert a hexadecimal or decimal string to an ASCII string.
 **`Example`**
 
 ```typescript
-const myDecodedString: string = decodeShortString("0x7572692f706963742f7433382e6a7067");
+const myDecodedString: string = decodeShortString('0x7572692f706963742f7433382e6a7067');
 // return string (ex."uri/pict/t38.jpg")
 ```
 

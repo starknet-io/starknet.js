@@ -1,3 +1,51 @@
+# [6.3.0](https://github.com/starknet-io/starknet.js/compare/v6.2.1...v6.3.0) (2024-03-11)
+
+### Features
+
+- update starknetId class and add getStarkProfile function ([ae71c97](https://github.com/starknet-io/starknet.js/commit/ae71c97b38974d4d7b3392532388957e1ea499bb))
+
+## [6.2.1](https://github.com/starknet-io/starknet.js/compare/v6.2.0...v6.2.1) (2024-03-11)
+
+### Bug Fixes
+
+- repair Cairo 1 nested and enum tuple handling ([ce2e541](https://github.com/starknet-io/starknet.js/commit/ce2e5417e6c42af17418408dc1ca6aab4c570473))
+
+# [6.2.0](https://github.com/starknet-io/starknet.js/compare/v6.1.5...v6.2.0) (2024-03-07)
+
+### Features
+
+- implement RPC v0.7.0-rc2 specification ([de32936](https://github.com/starknet-io/starknet.js/commit/de329361d838157b4fbe2b37bb043c3235b97a14))
+
+## [6.1.5](https://github.com/starknet-io/starknet.js/compare/v6.1.4...v6.1.5) (2024-03-02)
+
+### Bug Fixes
+
+- **RpcChannel:** allow client to provide `specVersion` ([ae8cf8e](https://github.com/starknet-io/starknet.js/commit/ae8cf8e19d8ba73c52376d83d2e084da008daba1))
+
+## [6.1.4](https://github.com/starknet-io/starknet.js/compare/v6.1.3...v6.1.4) (2024-02-26)
+
+### Bug Fixes
+
+- **Calldata.compile:** do not split long `entrypoint` names before calling `getSelectorFromName` ([9434bcd](https://github.com/starknet-io/starknet.js/commit/9434bcddf74069c7e5bdecbac94017ae23cd2a45))
+
+## [6.1.3](https://github.com/starknet-io/starknet.js/compare/v6.1.2...v6.1.3) (2024-02-23)
+
+### Bug Fixes
+
+- update fetch-cookie dependency ([518330c](https://github.com/starknet-io/starknet.js/commit/518330c4ee00e671e716b018220f767e8118c431))
+
+## [6.1.2](https://github.com/starknet-io/starknet.js/compare/v6.1.1...v6.1.2) (2024-02-20)
+
+### Bug Fixes
+
+- drop abi-wan-kanabi-v1 support ([30a4681](https://github.com/starknet-io/starknet.js/commit/30a46815fa9fb88bbcb98df2f4a8dafc5a32b4ab))
+
+## [6.1.1](https://github.com/starknet-io/starknet.js/compare/v6.1.0...v6.1.1) (2024-02-19)
+
+### Bug Fixes
+
+- rpc event ([ae3e265](https://github.com/starknet-io/starknet.js/commit/ae3e265f6617bd79c8435483916b0f24be036fa6))
+
 # [6.1.0](https://github.com/starknet-io/starknet.js/compare/v6.0.0...v6.1.0) (2024-02-13)
 
 ### Features

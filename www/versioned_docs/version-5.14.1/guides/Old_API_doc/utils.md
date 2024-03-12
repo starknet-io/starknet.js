@@ -85,12 +85,12 @@ Function that creates calldata that gets sent to the contract.
 
 ```js
 await this.callContract({
-    contractAddress: this.address,
-    entrypoint: 'is_valid_signature',
-    calldata: CallData.compile({
-        hash: toBigInt(hash).toString(),
-        signature: signature.map((x) => toBigInt(x).toString()),
-    }),
+  contractAddress: this.address,
+  entrypoint: 'is_valid_signature',
+  calldata: CallData.compile({
+    hash: toBigInt(hash).toString(),
+    signature: signature.map((x) => toBigInt(x).toString()),
+  }),
 });
 ```
 

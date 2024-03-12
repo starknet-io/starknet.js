@@ -1,3 +1,5 @@
+// the ts-ignore suppresses an esm to cjs import error that is resolved with entry point resolution
+// @ts-ignore
 import makeFetchCookie from 'fetch-cookie';
 import isomorphicFetch from 'isomorphic-fetch';
 

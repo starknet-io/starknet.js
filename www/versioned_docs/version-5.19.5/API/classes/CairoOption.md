@@ -19,7 +19,7 @@ value of type T.
 **`Example`**
 
 ```typescript
-const myOption = new CairoOption<BigNumberish>(CairoOptionVariant.Some, "0x54dda8");
+const myOption = new CairoOption<BigNumberish>(CairoOptionVariant.Some, '0x54dda8');
 ```
 
 ## Type parameters

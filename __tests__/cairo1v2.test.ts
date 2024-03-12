@@ -37,6 +37,8 @@ import {
   compiledC240Casm,
   compiledComplexSierra,
   compiledHelloSierra,
+  compiledTuple,
+  compiledTupleCasm,
   getTestAccount,
   getTestProvider,
 } from './config/fixtures';
@@ -1041,6 +1043,125 @@ describe('Cairo 1', () => {
       const calldata1 = myCallData.compile('proceed_string', ['Take care.']);
       const resp5 = await stringContract.call('proceed_string', calldata1);
       expect(resp5).toBe(expectedString);
+    });
+  });
+
+  describe('cairo v2.5.3 complex tuples', () => {
+    let tupleContract: Contract;
+    let myCallData: CallData;
+
+    beforeAll(async () => {
+      const { deploy } = await account.declareAndDeploy({
+        contract: compiledTuple,
+        casm: compiledTupleCasm,
+      });
+
+      tupleContract = new Contract(compiledTuple.abi, deploy.contract_address, account);
+      myCallData = new CallData(tupleContract.abi);
+    });
+
+    test('Tuple (u8, Array<u16>, bool)', async () => {
+      const res1 = await tupleContract.call('get_tuple1', []);
+      expect(res1).toEqual({ '0': 100n, '1': [5000n, 6000n], '2': true });
+    });
+
+    test('Tuple (bytes31, ByteArray)', async () => {
+      const res2 = await tupleContract.call('get_tuple2', []);
+      expect(res2).toEqual({
+        '0': 'Input',
+        '1': 'Zorg is very verbose and creates only long sentences.',
+      });
+    });
+
+    test('Tuple (u256, Order2)', async () => {
+      const res3 = await tupleContract.call('get_tuple3', []);
+      expect(res3).toEqual({ '0': 123456n, '1': { p1: 10n, p2: [1n, 2n, 3n] } });
+    });
+
+    test('Tuple (EthAddress, u256)', async () => {
+      const res4 = await tupleContract.call('get_tuple4', []);
+      expect(res4).toEqual({ '0': 123n, '1': 500n });
+    });
+
+    test('Tuple (Result<u64, u8>, u8)', async () => {
+      const res5 = await tupleContract.call('get_tuple5', []);
+      expect(res5).toEqual({
+        '0': new CairoResult<BigNumberish, BigNumberish>(CairoResultVariant.Ok, 18n),
+        '1': 4n,
+      });
+    });
+
+    test('Tuple (Option<u64>, u8)', async () => {
+      const res6 = await tupleContract.call('get_tuple6', []);
+      expect(res6).toEqual({
+        '0': new CairoOption<BigNumberish>(CairoOptionVariant.Some, 18n),
+        '1': 4n,
+      });
+    });
+
+    test('Tuple (Cairo enum.North, u8)', async () => {
+      const res7 = await tupleContract.call('get_tuple7', []);
+      expect(res7).toEqual({
+        '0': new CairoCustomEnum({ North: {}, East: undefined }),
+        '1': 4n,
+      });
+    });
+
+    test('Tuple (Cairo enum.East, u8)', async () => {
+      const res12 = await tupleContract.call('get_tuple12', []);
+      expect(res12).toEqual({
+        '0': new CairoCustomEnum({
+          North: undefined,
+          East: new CairoResult<BigNumberish, BigNumberish>(CairoResultVariant.Ok, 2000n),
+        }),
+        '1': 4n,
+      });
+    });
+
+    test('Tuple ((u256, Array<u16>), u8)', async () => {
+      const res8 = await tupleContract.call('get_tuple8', []);
+      expect(res8).toEqual({ '0': { '0': 600n, '1': [1n, 2n, 3n] }, '1': 8n });
+    });
+
+    test('Tuple ((u256,(u16,Order2)), u8)', async () => {
+      type Order2 = {
+        p1: num.BigNumberish;
+        p2: num.BigNumberish[];
+      };
+      const myOrder2: Order2 = { p1: 100, p2: [5, 6, 7] };
+      const calldata9 = myCallData.compile('get_tuple9', {
+        l0: cairo.tuple(cairo.tuple(cairo.uint256(5000n), cairo.tuple(250, myOrder2)), 240),
+      });
+      const res9 = await tupleContract.call('get_tuple9', calldata9);
+      expect(res9).toEqual({
+        '0': {
+          '0': 5000n,
+          '1': { '0': 250n, '1': { p1: 100n, p2: [5n, 6n, 7n] } },
+        },
+        '1': 240n,
+      });
+    });
+
+    test('Array Array<Result<u256, u8>>', async () => {
+      const res10 = await tupleContract.call('get_tuple10', []);
+      expect(res10).toEqual({
+        '0': 8000n,
+        '1': [
+          new CairoResult<BigNumberish, BigNumberish>(CairoResultVariant.Ok, 6000n),
+          new CairoResult<BigNumberish, BigNumberish>(CairoResultVariant.Ok, 7000n),
+        ],
+      });
+    });
+
+    test('Option Option<Result<u16, felt252>>', async () => {
+      const res11 = await tupleContract.call('get_tuple11', []);
+      expect(res11).toEqual({
+        '0': 400n,
+        '1': new CairoOption<CairoResult<BigNumberish, BigNumberish>>(
+          CairoOptionVariant.Some,
+          new CairoResult<BigNumberish, BigNumberish>(CairoResultVariant.Ok, 2000n)
+        ),
+      });
     });
   });
 });

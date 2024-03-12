@@ -28,10 +28,10 @@ The `bn.js` library has been removed in favor of using the native JavaScript `Bi
 
 ```typescript
 // v4
-const qty = new BN("0x4a8bc");
+const qty = new BN('0x4a8bc');
 
 // v5
-const qty1 = BigInt("0x4a8bc");
+const qty1 = BigInt('0x4a8bc');
 const qty2 = 32786324915918425n;
 ```
 
@@ -95,10 +95,12 @@ Derive full public key (`fullPubKey`):
 
 ```typescript
 // v4
-const fullPubKey = encode.addHexPrefix(keyPair.getPublic("hex"));
+const fullPubKey = encode.addHexPrefix(keyPair.getPublic('hex'));
 
 // v5
-const fullPubKey = encode.addHexPrefix(encode.buf2hex(ec.starkCurve.getPublicKey(privateKey, false))); // full key
+const fullPubKey = encode.addHexPrefix(
+  encode.buf2hex(ec.starkCurve.getPublicKey(privateKey, false))
+); // full key
 ```
 
 `ec.sign` and `ec.verify`:
@@ -132,7 +134,10 @@ The `account.declareDeploy()` method has been renamed to `declareAndDeploy()`:
 const response = await account0.declareDeploy({ contract: compiledTest, classHash: testClassHash });
 
 // v5
-const response = await account0.declareAndDeploy({ contract: compiledHelloSierra, casm: compiledHelloCasm });
+const response = await account0.declareAndDeploy({
+  contract: compiledHelloSierra,
+  casm: compiledHelloCasm,
+});
 ```
 
 > Note: `declare` and `declareAndDeploy` no longer require `classHash`! The new ec library is now able to calculate it quickly
@@ -153,10 +158,10 @@ Constants for `Provider` initialization have been updated:
 
 ```typescript
 // v4
-const providerTestnet2 = new Provider({ sequencer: { network: "goerli-alpha-2" } });
+const providerTestnet2 = new Provider({ sequencer: { network: 'goerli-alpha-2' } });
 
 // v5
- const providerTestnet2 = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI2 } }); // or SN_GOERLI or SN_MAIN
+const providerTestnet2 = new Provider({ sequencer: { network: constants.NetworkName.SN_GOERLI2 } }); // or SN_GOERLI or SN_MAIN
 ```
 
 `Provider.chainId()` has been removed, `Provider.getChainId()` should be used.

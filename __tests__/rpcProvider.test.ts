@@ -6,6 +6,8 @@ import {
   CallData,
   Contract,
   RPC,
+  RPC06,
+  RpcProvider,
   TransactionExecutionStatus,
   stark,
   waitForTransactionOptions,
@@ -182,6 +184,17 @@ describeIfRpc('RPCProvider', () => {
       expect(blockResponse).toHaveProperty('transactions');
     });
 
+    test('getBlockWithReceipts - 0.6 RpcChannel', async () => {
+      const channel = new RPC06.RpcChannel({ nodeUrl: rpcProvider.channel.nodeUrl });
+      const p = new RpcProvider({ channel } as any);
+      await expect(p.getBlockWithReceipts(latestBlock.block_number)).rejects.toThrow(/Unsupported/);
+    });
+
+    test('getBlockWithReceipts - 0.7 RpcChannel', async () => {
+      const blockResponse = await rpcProvider.getBlockWithReceipts(latestBlock.block_number);
+      expect(blockResponse).toMatchSchemaRef('BlockWithTxReceipts');
+    });
+
     test('getTransactionByBlockIdAndIndex', async () => {
       const transaction = await rpcProvider.getTransactionByBlockIdAndIndex(
         latestBlock.block_number,
@@ -312,8 +325,9 @@ describeIfRpc('RPCProvider', () => {
         expect(typeof classHash).toBe('string');
       });
 
-      xtest('traceTransaction', async () => {
-        await rpcProvider.getTransactionTrace(transaction_hash);
+      test('traceTransaction', async () => {
+        const trace = await rpcProvider.getTransactionTrace(transaction_hash);
+        expect(trace).toMatchSchemaRef('getTransactionTrace');
       });
 
       test('getClassAt', async () => {

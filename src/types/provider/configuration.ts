@@ -9,6 +9,7 @@ export type RpcProviderOptions = {
   headers?: object;
   blockIdentifier?: BlockIdentifier;
   chainId?: StarknetChainId;
+  specVersion?: string;
   default?: boolean;
   waitMode?: boolean;
 };

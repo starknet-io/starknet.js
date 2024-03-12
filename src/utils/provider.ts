@@ -178,7 +178,7 @@ export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3Trans
   return version === ETransactionVersion.V3 || version === ETransactionVersion.F3;
 }
 
-export function isVersion(version: '0.5' | '0.6', response: string) {
+export function isVersion(version: '0.5' | '0.6' | '0.7', response: string) {
   const [majorS, minorS] = version.split('.');
   const [majorR, minorR] = response.split('.');
 
