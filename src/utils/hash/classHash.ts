@@ -188,25 +188,15 @@ function hashEntryPoint(data: ContractEntryPointFields[]) {
  */
 export function hashByteCodeSegments(casm: CompiledSierraCasm): bigint {
   const byteCode: bigint[] = casm.bytecode.map((n) => BigInt(n));
-  const bytecode_segment_lengths: number[] = casm.bytecode_segment_lengths
-    ? casm.bytecode_segment_lengths
-    : [];
+  const bytecodeSegmentLengths: number[] = casm.bytecode_segment_lengths ?? [];
 
-  const byteCodeIterator = byteCode[Symbol.iterator]();
-  const leafs: BytecodeSegment[] = bytecode_segment_lengths.map((len: number) => {
-    const segment: bigint[] = [];
-    for (let i = 0; i < len; i += 1) {
-      segment.push(byteCodeIterator.next().value);
-    }
-    const res: BytecodeSegment = { len, segment };
-    return res;
+  let segmentStart = 0;
+  const hashLeaves = bytecodeSegmentLengths.flatMap((len) => {
+    const segment = byteCode.slice(segmentStart, (segmentStart += len));
+
+    return [BigInt(len), poseidonHashMany(segment)];
   });
-  const hashLeafs: bigint[] = leafs.flatMap((leaf) => [
-    BigInt(leaf.len),
-    poseidonHashMany(leaf.segment),
-  ]);
-  const a = 1n + poseidonHashMany(hashLeafs);
-  return a;
+  return 1n + poseidonHashMany(hashLeaves);
 }
 
 /**
