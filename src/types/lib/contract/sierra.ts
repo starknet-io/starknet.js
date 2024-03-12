@@ -34,10 +34,6 @@ export type SierraContractClass = Omit<CompiledSierra, 'abi' | 'sierra_program_d
   abi: string;
 };
 export type CompiledSierraCasm = CairoAssembly;
-export type BytecodeSegment = {
-  len: number;
-  segment: bigint[];
-};
 
 /** SUBTYPES */
 export type ByteCode = string[];

@@ -15,7 +15,6 @@ import {
   LegacyCompiledContract,
   RawArgs,
   SierraContractEntryPointFields,
-  BytecodeSegment,
 } from '../../types';
 import { CallData } from '../calldata';
 import { felt } from '../calldata/cairo';

@@ -692,7 +692,7 @@ export class Account extends Provider implements AccountInterface {
           ...details,
           ...v3Details(details),
           classHash,
-          compiledClassHash: compiledClassHash as string, // TODO: TS Nekuzi da v2 nemora imat a v3 mora i da je throvano ako nije definiran
+          compiledClassHash: compiledClassHash as string, // TODO: TS, cast because optional for v2 and required for v3, thrown if not present
           senderAddress: details.walletAddress,
         })
       : [];
