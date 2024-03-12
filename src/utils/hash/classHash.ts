@@ -15,6 +15,7 @@ import {
   LegacyCompiledContract,
   RawArgs,
   SierraContractEntryPointFields,
+  BytecodeSegment,
 } from '../../types';
 import { CallData } from '../calldata';
 import { felt } from '../calldata/cairo';
@@ -179,6 +180,26 @@ function hashEntryPoint(data: ContractEntryPointFields[]) {
 }
 
 /**
+ * Compute hash of the bytecode for Sierra v1.5.0 onwards (Cairo 2.6.0)
+ * Each segment is Poseidon hashed.
+ * The global hash is : 1 + PoseidonHash(len0, h0, len1, h1, ...)
+ * @param casm compiled Sierra CASM file content.
+ * @returns the bytecode hash as bigint.
+ */
+export function hashByteCodeSegments(casm: CompiledSierraCasm): bigint {
+  const byteCode: bigint[] = casm.bytecode.map((n) => BigInt(n));
+  const bytecodeSegmentLengths: number[] = casm.bytecode_segment_lengths ?? [];
+
+  let segmentStart = 0;
+  const hashLeaves = bytecodeSegmentLengths.flatMap((len) => {
+    const segment = byteCode.slice(segmentStart, (segmentStart += len));
+
+    return [BigInt(len), poseidonHashMany(segment)];
+  });
+  return 1n + poseidonHashMany(hashLeaves);
+}
+
+/**
  * Compute compiled class hash for contract (Cairo 1)
  * @returns format: hex-string
  */
@@ -198,7 +219,9 @@ export function computeCompiledClassHash(casm: CompiledSierraCasm) {
   const constructor = hashEntryPoint(casm.entry_points_by_type.CONSTRUCTOR);
 
   // Hash bytecode.
-  const bytecode = poseidonHashMany(casm.bytecode.map((it: string) => BigInt(it)));
+  const bytecode = casm.bytecode_segment_lengths
+    ? hashByteCodeSegments(casm)
+    : poseidonHashMany(casm.bytecode.map((it: string) => BigInt(it)));
 
   return toHex(
     poseidonHashMany([
