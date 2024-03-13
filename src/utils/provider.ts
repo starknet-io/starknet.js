@@ -21,7 +21,7 @@ import { ETransactionVersion } from '../types/api';
 import { isSierra } from './contract';
 import { formatSpaces } from './hash';
 import { parse, stringify } from './json';
-import { isHex, toHex } from './num';
+import { isBigInt, isHex, isNumber, isString, toHex } from './num';
 import { compressProgram } from './stark';
 
 /**
@@ -111,19 +111,17 @@ export class Block {
   tag: BlockIdentifier = null;
 
   private setIdentifier(__identifier: BlockIdentifier) {
-    if (typeof __identifier === 'string' && isHex(__identifier)) {
-      this.hash = __identifier;
-    } else if (typeof __identifier === 'bigint') {
+    if (isString(__identifier)) {
+      if (isHex(__identifier)) {
+        this.hash = __identifier;
+      } else if (validBlockTags.includes(__identifier as BlockTag)) {
+        this.tag = __identifier;
+      }
+    } else if (isBigInt(__identifier)) {
       this.hash = toHex(__identifier);
-    } else if (typeof __identifier === 'number') {
+    } else if (isNumber(__identifier)) {
       this.number = __identifier;
-    } else if (
-      typeof __identifier === 'string' &&
-      validBlockTags.includes(__identifier as BlockTag)
-    ) {
-      this.tag = __identifier;
     } else {
-      // default
       this.tag = BlockTag.pending;
     }
   }
