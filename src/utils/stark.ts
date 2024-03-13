@@ -114,7 +114,11 @@ export function estimateFeeToBounds(
   if (typeof estimate.gas_consumed === 'undefined' || typeof estimate.gas_price === 'undefined') {
     throw Error('estimateFeeToBounds: estimate is undefined');
   }
-  const maxUnits = toHex(addPercent(estimate.gas_consumed, amountOverhead));
+
+  const maxUnits =
+    estimate.data_gas_consumed !== undefined && estimate.data_gas_price !== undefined // RPC v0.7
+      ? toHex(addPercent(BigInt(estimate.overall_fee) / BigInt(estimate.gas_price), amountOverhead))
+      : toHex(addPercent(estimate.gas_consumed, amountOverhead));
   const maxUnitPrice = toHex(addPercent(estimate.gas_price, priceOverhead));
   return {
     l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
