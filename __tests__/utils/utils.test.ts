@@ -70,11 +70,11 @@ describe('computeHashOnElements()', () => {
 });
 describe('estimatedFeeToMaxFee()', () => {
   test('should return maxFee for 0', () => {
-    const res = stark.estimatedFeeToMaxFee(0, 0.15);
+    const res = stark.estimatedFeeToMaxFee(0, 15);
     expect(res).toBe(0n);
   });
   test('should return maxFee for 10_000', () => {
-    const res = stark.estimatedFeeToMaxFee(10_000, 0.15);
+    const res = stark.estimatedFeeToMaxFee(10_000, 15);
     expect(res).toBe(11500n);
   });
 });
