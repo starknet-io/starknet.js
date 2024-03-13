@@ -35,7 +35,7 @@ npm test --watch
 ```
 
 By default the tests are executed in your local Devnet. If you want to use a specific
-rpc node, you have to set some global variables before executing the tests:
+RPC node, you have to set some global variables before executing the tests:
 
 ```bash
 export TEST_RPC_URL=http://192.168.1.44:9545/rpc/v0.5 # example of a Pathfinder node located in your local network
@@ -45,11 +45,11 @@ export TEST_ACCOUNT_PRIVATE_KEY=0x02a80000000000000000000000001754438a
 ```
 
 The global variables above will only be valid for some of the tests.
-The recommended and more straightforward approach is to go with the docker approach.
+The recommended and more straightforward approach is to go with the docker.
 You just need to do the following steps:
 
-- Install the [docker](https://docs.docker.com/desktop/install/mac-install/)
-- Run the `docker` on your machine.
+- Install the [docker](https://docs.docker.com/desktop/install/mac-install/) (You can install it via `brew` or some other package manager)
+- Run the `docker` on your machine (Open the application).
 - Go to the [starknet-devnet-rs](https://hub.docker.com/r/shardlabs/starknet-devnet-rs/tags) and copy the `docker pull` command from the desired tag
 - Run tests locally with `npm run test`
 
