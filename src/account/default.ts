@@ -58,6 +58,7 @@ import {
 import { getExecuteCalldata } from '../utils/transaction';
 import { getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
+import { isString } from '../utils/shortString';
 
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
@@ -78,7 +79,7 @@ export class Account extends Provider implements AccountInterface {
     super(providerOrOptions);
     this.address = address.toLowerCase();
     this.signer =
-      typeof pkOrSigner === 'string' || pkOrSigner instanceof Uint8Array
+      isString(pkOrSigner) || pkOrSigner instanceof Uint8Array
         ? new Signer(pkOrSigner)
         : pkOrSigner;
 

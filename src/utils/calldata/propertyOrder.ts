@@ -22,6 +22,8 @@ import {
 } from './enum';
 import extractTupleMemberTypes from './tuple';
 
+import { isString } from '../shortString';
+
 function errorU256(key: string) {
   return Error(
     `Your object includes the property : ${key}, containing an Uint256 object without the 'low' and 'high' keys.`
@@ -92,7 +94,7 @@ export default function orderPropsByAbi(
 
   function orderArray(myArray: Array<any> | string, abiParam: string): Array<any> | string {
     const typeInArray = getArrayType(abiParam);
-    if (typeof myArray === 'string') {
+    if (isString(myArray)) {
       return myArray; // longstring
     }
     return myArray.map((myElem) => orderInput(myElem, typeInArray));

@@ -27,7 +27,7 @@ import {
   types,
 } from '../src';
 import { hexToDecimalString } from '../src/utils/num';
-import { encodeShortString } from '../src/utils/shortString';
+import { encodeShortString, isString } from '../src/utils/shortString';
 import {
   TEST_TX_VERSION,
   compiledC1Account,
@@ -337,7 +337,7 @@ describe('Cairo 1', () => {
       const status = await cairo1Contract.echo_struct({
         val: 'simple',
       });
-      if (typeof status.val === 'string') {
+      if (isString(status.val)) {
         expect(shortString.decodeShortString(status.val)).toBe('simple');
       }
     });

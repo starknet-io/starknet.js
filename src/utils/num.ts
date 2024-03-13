@@ -193,11 +193,11 @@ export function isNumber(value: unknown): value is number {
 }
 
 /**
- * Checks if a given value is a string.
+ * Checks if a given value is of boolean type.
  *
- * @param {unknown} value - The value to be checked.
- * @return {boolean} - Returns true if the value is a string, false otherwise.
+ * @param {unknown} value - The value to check.
+ * @return {boolean} - True if the value is of boolean type, false otherwise.
  */
-export function isString(value: unknown): value is string {
-  return typeof value === 'string';
+export function isBoolean(value: unknown): value is boolean {
+  return typeof value === 'boolean';
 }

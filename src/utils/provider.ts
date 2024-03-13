@@ -21,8 +21,9 @@ import { ETransactionVersion } from '../types/api';
 import { isSierra } from './contract';
 import { formatSpaces } from './hash';
 import { parse, stringify } from './json';
-import { isBigInt, isHex, isNumber, isString, toHex } from './num';
+import { isBigInt, isHex, isNumber, toHex } from './num';
 import { compressProgram } from './stark';
+import { isString } from './shortString';
 
 /**
  * Helper - Async Sleep for 'delay' time
@@ -53,8 +54,7 @@ export function createSierraContractClass(contract: CompiledSierra): SierraContr
  * (CompiledContract or string) -> ContractClass
  */
 export function parseContract(contract: CompiledContract | string): ContractClass {
-  const parsedContract =
-    typeof contract === 'string' ? (parse(contract) as CompiledContract) : contract;
+  const parsedContract = isString(contract) ? (parse(contract) as CompiledContract) : contract;
 
   if (!isSierra(contract)) {
     return {
@@ -85,7 +85,7 @@ export const getDefaultNodeUrl = (networkName?: NetworkName, mute: boolean = fal
  * [Reference](https://github.com/starkware-libs/cairo-lang/blob/fc97bdd8322a7df043c87c371634b26c15ed6cee/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L148-L153)
  */
 export function formatHash(hashValue: BigNumberish): string {
-  if (typeof hashValue === 'string') return hashValue;
+  if (isString(hashValue)) return hashValue;
   return toHex(hashValue);
 }
 
