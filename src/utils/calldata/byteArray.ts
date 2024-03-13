@@ -9,7 +9,7 @@ import { decodeShortString, encodeShortString, splitLongString } from '../shortS
  * @example
  * ```typescript
  * const myByteArray = {
- *    data: [ '0x00' ],
+ *    data: [],
  *    pending_word: '0x414243444546474849',
  *    pending_word_len: 9
  * }
@@ -40,7 +40,7 @@ export function stringFromByteArray(myByteArray: ByteArray): string {
  * ```
  * Result is :
  * {
- *    data: [ '0x00' ],
+ *    data: [],
  *    pending_word: '0x414243444546474849',
  *    pending_word_len: 9
  * }
@@ -48,7 +48,7 @@ export function stringFromByteArray(myByteArray: ByteArray): string {
 export function byteArrayFromString(myString: string): ByteArray {
   if (myString.length === 0) {
     return {
-      data: ['0x00'],
+      data: [],
       pending_word: '0x00',
       pending_word_len: 0,
     } as ByteArray;
@@ -67,7 +67,7 @@ export function byteArrayFromString(myString: string): ByteArray {
   }
   const pendingEncodedWord: BigNumberish = myShortStringsEncoded.pop()!;
   return {
-    data: myShortStringsEncoded.length === 0 ? ['0x00'] : myShortStringsEncoded,
+    data: myShortStringsEncoded.length === 0 ? [] : myShortStringsEncoded,
     pending_word: pendingEncodedWord,
     pending_word_len: remains.length,
   } as ByteArray;
