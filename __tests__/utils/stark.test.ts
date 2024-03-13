@@ -87,11 +87,11 @@ describe('stark', () => {
     };
     expect(stark.estimateFeeToBounds(estimateFeeResponse)).toStrictEqual({
       l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-      l1_gas: { max_amount: '0x6e', max_price_per_unit: '0xf' },
+      l1_gas: { max_amount: '0x96', max_price_per_unit: '0xf' },
     });
     expect(stark.estimateFeeToBounds(estimateFeeResponse07)).toStrictEqual({
       l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-      l1_gas: { max_amount: '0xdc', max_price_per_unit: '0xf' },
+      l1_gas: { max_amount: '0x12c', max_price_per_unit: '0xf' },
     });
   });
 

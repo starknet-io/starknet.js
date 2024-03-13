@@ -48,6 +48,12 @@ export enum TransactionHashPrefix {
   L1_HANDLER = '0x6c315f68616e646c6572', // encodeShortString('l1_handler'),
 }
 
+export const enum feeMarginPercentage {
+  L1_BOUND_MAX_AMOUNT = 50,
+  L1_BOUND_MAX_PRICE_PER_UNIT = 50,
+  MAX_FEE = 50,
+}
+
 export const UDC = {
   ADDRESS: '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
   ENTRYPOINT: 'deployContract',
