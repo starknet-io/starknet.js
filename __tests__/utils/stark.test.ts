@@ -79,9 +79,19 @@ describe('stark', () => {
       overall_fee: '1000',
       unit: 'FRI',
     };
+    const estimateFeeResponse07: FeeEstimate = {
+      ...estimateFeeResponse,
+      data_gas_consumed: '100',
+      data_gas_price: '10',
+      overall_fee: '2000',
+    };
     expect(stark.estimateFeeToBounds(estimateFeeResponse)).toStrictEqual({
       l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
       l1_gas: { max_amount: '0x6e', max_price_per_unit: '0xf' },
+    });
+    expect(stark.estimateFeeToBounds(estimateFeeResponse07)).toStrictEqual({
+      l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
+      l1_gas: { max_amount: '0xdc', max_price_per_unit: '0xf' },
     });
   });
 
