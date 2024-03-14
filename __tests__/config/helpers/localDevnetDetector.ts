@@ -54,7 +54,8 @@ class LocalDevnetDetector {
 
     if (!this.strategy.isDevnet) {
       console.log('\x1b[36m%s\x1b[0m', LOCAL_DEVNET_NOT_RUNNING_MESSAGE);
-      return this.setup();
+      this.setup();
+      throw new Error('Local devnet is not Running. Please follow the devnet setup instructions.');
     }
 
     // if on base url RPC endpoint work it is devnet-rs else it devnet-py
