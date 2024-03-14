@@ -1,3 +1,13 @@
+# [6.5.0](https://github.com/starknet-io/starknet.js/compare/v6.4.2...v6.5.0) (2024-03-14)
+
+### Bug Fixes
+
+- adjust max amount bound calculation for RPC v0.7.0 ([dd34cdb](https://github.com/starknet-io/starknet.js/commit/dd34cdb8b9817a55a16a97d960b1544d75c0059a))
+
+### Features
+
+- make fee margins configurable ([cedd984](https://github.com/starknet-io/starknet.js/commit/cedd984e1106db5b73d17630e282eb956d344a97))
+
 ## [6.4.2](https://github.com/starknet-io/starknet.js/compare/v6.4.1...v6.4.2) (2024-03-14)
 
 ### Bug Fixes
