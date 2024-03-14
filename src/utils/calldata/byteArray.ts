@@ -9,7 +9,7 @@ import { decodeShortString, encodeShortString, splitLongString } from '../shortS
  * @example
  * ```typescript
  * const myByteArray = {
- *    data: [ '0x00' ],
+ *    data: [],
  *    pending_word: '0x414243444546474849',
  *    pending_word_len: 9
  * }
@@ -36,39 +36,28 @@ export function stringFromByteArray(myByteArray: ByteArray): string {
  * @returns Cairo representation of a LongString
  * @example
  * ```typescript
- * const myByteArray: ByteArray = byteArrayFromStr("ABCDEFGHI");
+ * const myByteArray: ByteArray = byteArrayFromString("ABCDEFGHI");
  * ```
  * Result is :
  * {
- *    data: [ '0x00' ],
+ *    data: [],
  *    pending_word: '0x414243444546474849',
  *    pending_word_len: 9
  * }
  */
-export function byteArrayFromString(myString: string): ByteArray {
-  if (myString.length === 0) {
-    return {
-      data: ['0x00'],
-      pending_word: '0x00',
-      pending_word_len: 0,
-    } as ByteArray;
-  }
-  const myShortStrings: string[] = splitLongString(myString);
-  const remains: string = myShortStrings[myShortStrings.length - 1];
-  const myShortStringsEncoded: BigNumberish[] = myShortStrings.map((shortStr) =>
-    encodeShortString(shortStr)
-  );
-  if (remains.length === 31) {
-    return {
-      data: myShortStringsEncoded,
-      pending_word: '0x00',
-      pending_word_len: 0,
-    } as ByteArray;
-  }
-  const pendingEncodedWord: BigNumberish = myShortStringsEncoded.pop()!;
+export function byteArrayFromString(targetString: string): ByteArray {
+  const shortStrings: string[] = splitLongString(targetString);
+  const remainder: string = shortStrings[shortStrings.length - 1];
+  const shortStringsEncoded: BigNumberish[] = shortStrings.map(encodeShortString);
+
+  const [pendingWord, pendingWordLength] =
+    remainder === undefined || remainder.length === 31
+      ? ['0x00', 0]
+      : [shortStringsEncoded.pop()!, remainder.length];
+
   return {
-    data: myShortStringsEncoded.length === 0 ? ['0x00'] : myShortStringsEncoded,
-    pending_word: pendingEncodedWord,
-    pending_word_len: remains.length,
-  } as ByteArray;
+    data: shortStringsEncoded.length === 0 ? [] : shortStringsEncoded,
+    pending_word: pendingWord,
+    pending_word_len: pendingWordLength,
+  };
 }
