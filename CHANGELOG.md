@@ -1,3 +1,9 @@
+## [6.4.1](https://github.com/starknet-io/starknet.js/compare/v6.4.0...v6.4.1) (2024-03-14)
+
+### Bug Fixes
+
+- byteArray encoding for less than 31 chars ([#1011](https://github.com/starknet-io/starknet.js/issues/1011)) ([653acc4](https://github.com/starknet-io/starknet.js/commit/653acc44c841540214dd6f6b8956b354d7c27644))
+
 # [6.4.0](https://github.com/starknet-io/starknet.js/compare/v6.3.0...v6.4.0) (2024-03-12)
 
 ### Bug Fixes
