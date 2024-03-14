@@ -47,7 +47,7 @@ describe('typedData', () => {
     );
     encoded = encodeType(examplePresetTypes.types, 'Example', TypedDataRevision.Active);
     expect(encoded).toMatchInlineSnapshot(
-      `"\\"Example\\"(\\"n0\\":\\"TokenAmount\\",\\"n1\\":\\"NftId\\")"`
+      `"\\"Example\\"(\\"n0\\":\\"TokenAmount\\",\\"n1\\":\\"NftId\\")\\"NftId\\"(\\"collection_address\\":\\"ContractAddress\\",\\"token_id\\":\\"u256\\")\\"TokenAmount\\"(\\"token_address\\":\\"ContractAddress\\",\\"amount\\":\\"u256\\")\\"u256\\"(\\"low\\":\\"u128\\",\\"high\\":\\"u128\\")"`
     );
     encoded = encodeType(exampleEnum.types, 'Example', TypedDataRevision.Active);
     expect(encoded).toMatchInlineSnapshot(
@@ -87,7 +87,7 @@ describe('typedData', () => {
     );
     typeHash = getTypeHash(examplePresetTypes.types, 'Example', TypedDataRevision.Active);
     expect(typeHash).toMatchInlineSnapshot(
-      `"0x155de33c6a0cc7f2b8926afc7a71fc2ac31ffc26726aee5da0570c5d517a763"`
+      `"0x1a25a8bb84b761090b1fadaebe762c4b679b0d8883d2bedda695ea340839a55"`
     );
     typeHash = getTypeHash(exampleEnum.types, 'Example', TypedDataRevision.Active);
     expect(typeHash).toMatchInlineSnapshot(
@@ -279,7 +279,7 @@ describe('typedData', () => {
 
     messageHash = getMessageHash(examplePresetTypes, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
-      `"0x26e7b8cedfa63cdbed14e7e51b60ee53ac82bdf26724eb1e3f0710cb8987522"`
+      `"0x185b339d5c566a883561a88fb36da301051e2c0225deb325c91bb7aa2f3473a"`
     );
 
     messageHash = getMessageHash(exampleEnum, exampleAddress);

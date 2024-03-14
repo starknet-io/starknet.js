@@ -106,7 +106,7 @@ export function useEncoded(decoded: string): bigint {
 export const enum StarknetIdContract {
   MAINNET = '0x6ac597f8116f886fa1c97a23fa4e08299975ecaf6b598873ca6792b9bbfb678',
   TESTNET = '0x3bab268e932d2cecd1946f100ae67ce3dff9fd234119ea2f6da57d16d29fce',
-  TESTNET_SEPOLIA = '0x5847d20f9757de24395a7b3b47303684003753858737bf288716855dfb0aaf2',
+  TESTNET_SEPOLIA = '0x0707f09bc576bd7cfee59694846291047e965f4184fe13dac62c56759b3b6fa7',
 }
 
 export function getStarknetIdContract(chainId: StarknetChainId): string {
@@ -128,7 +128,7 @@ export function getStarknetIdContract(chainId: StarknetChainId): string {
 export const enum StarknetIdIdentityContract {
   MAINNET = '0x05dbdedc203e92749e2e746e2d40a768d966bd243df04a6b712e222bc040a9af',
   TESTNET = '0x783a9097b26eae0586373b2ce0ed3529ddc44069d1e0fbc4f66d42b69d6850d',
-  TESTNET_SEPOLIA = '0x718d9172f6e36183abeeff1a0db76a1851cef4ed9b9c13896da79ef4bfcb4d0',
+  TESTNET_SEPOLIA = '0x070DF8B4F5cb2879f8592849fA8f3134da39d25326B8558cc9C8FE8D47EA3A90',
 }
 
 export function getStarknetIdIdentityContract(chainId: StarknetChainId): string {
@@ -169,7 +169,7 @@ export function getStarknetIdMulticallContract(chainId: StarknetChainId): string
 export const enum StarknetIdVerifierContract {
   MAINNET = '0x07d14dfd8ee95b41fce179170d88ba1f0d5a512e13aeb232f19cfeec0a88f8bf',
   TESTNET = '0x057c942544063c3aea6ea6c37009cc9d1beacd750cb6801549a129c7265f0f11',
-  TESTNET_SEPOLIA = '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
+  TESTNET_SEPOLIA = '0x0182EcE8173C216A395f4828e1523541b7e3600bf190CB252E1a1A0cE219d184',
 }
 
 export function getStarknetIdVerifierContract(chainId: StarknetChainId): string {
@@ -191,7 +191,7 @@ export function getStarknetIdVerifierContract(chainId: StarknetChainId): string 
 export const enum StarknetIdPfpContract {
   MAINNET = '0x070aaa20ec4a46da57c932d9fd89ca5e6bb9ca3188d3df361a32306aff7d59c7',
   TESTNET = '0x03cac3228b434259734ee0e4ff445f642206ea11adace7e4f45edd2596748698',
-  TESTNET_SEPOLIA = '0x070c035557d6fed57eed2ed7fa861616b487f8a95439347b805639ca076f29f0',
+  TESTNET_SEPOLIA = '0x058061bb6bdc501eE215172c9f87d557C1E0f466dC498cA81b18f998Bf1362b2',
 }
 
 export function getStarknetIdPfpContract(chainId: StarknetChainId): string {
@@ -215,7 +215,7 @@ export function getStarknetIdPfpContract(chainId: StarknetChainId): string {
 export const enum StarknetIdPopContract {
   MAINNET = '0x0293eb2ba9862f762bd3036586d5755a782bd22e6f5028320f1d0405fd47bff4',
   TESTNET = '0x03528caf090179e337931ee669a5b0214041e1bae30d460ff07d2cea2c7a9106',
-  TESTNET_SEPOLIA = '0x00f80f68443becd0e0a4a08ff5734e36dd8028507333e4a0ec034dcfdf1b793e',
+  TESTNET_SEPOLIA = '0x0023FE3b845ed5665a9eb3792bbB17347B490EE4090f855C1298d03BB5F49B49',
 }
 
 export function getStarknetIdPopContract(chainId: StarknetChainId): string {
