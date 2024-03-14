@@ -1,13 +1,12 @@
 /**
  * Main
  */
+export * from './wallet';
 export * from './account';
 export * from './contract';
 export * from './provider';
 export * from './signer';
 export * from './channel';
-
-export * from './account/wallet';
 
 // TODO: decide on final export style
 export * from './types';

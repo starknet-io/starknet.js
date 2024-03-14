@@ -1,5 +1,4 @@
-import { StarknetChainId } from '../constants';
-import { buildUDCCall } from '../utils/transaction';
+import { Account, AccountInterface } from '../account';
 import {
   AccountChangeEventHandler,
   AddDeclareTransactionResult,
@@ -7,29 +6,30 @@ import {
   AddInvokeTransactionResult,
   AddStarknetChainParameters,
   NetworkChangeEventHandler,
+  Permission,
   RpcMessage,
   StarknetWindowObject,
   WatchAssetParameters,
-} from './getst/main';
-// eslint-disable-next-line import/no-cycle
+} from '../account/getst/main';
+import { StarknetChainId } from '../constants';
+import { ProviderInterface } from '../provider';
 import {
-  Account,
   AllowArray,
   ArraySignatureType,
   CairoVersion,
   Call,
-  CallData,
   CompiledSierra,
   DeclareContractPayload,
   DeployAccountContractPayload,
   MultiDeployContractResponse,
-  ProviderInterface,
   ProviderOptions,
   TypedData,
   UniversalDeployerContractPayload,
-  extractContractHashes,
-  json,
-} from '..';
+} from '../types';
+import { CallData } from '../utils/calldata';
+import { extractContractHashes } from '../utils/contract';
+import { stringify } from '../utils/json';
+import { buildUDCCall } from '../utils/transaction';
 
 // ---- TT Request Handler
 type RpcCall = Omit<RpcMessage, 'result'>;
@@ -39,8 +39,8 @@ type RpcCall = Omit<RpcMessage, 'result'>;
 interface StarknetWalletProvider extends StarknetWindowObject {}
 
 // Represent 'Selected Active' Account inside Connected Wallet
-export class WalletAccount extends Account {
-  public address: string;
+export class WalletAccount extends Account implements AccountInterface {
+  public address: string = '';
 
   public walletProvider: StarknetWalletProvider;
 
@@ -49,17 +49,34 @@ export class WalletAccount extends Account {
     walletProvider: StarknetWalletProvider,
     cairoVersion?: CairoVersion
   ) {
-    // if (!walletProvider.isConnected) throw Error('StarknetWalletProvider should be connected');
-    const address = '0x0'; // walletProvider.selectedAddress;
-    super(providerOrOptions, address, '', cairoVersion);
+    super(providerOrOptions, '', '', cairoVersion); // At this point unknown address
     this.walletProvider = walletProvider;
-    this.address = address.toLowerCase();
 
-    // Event Listeners
-    this.walletProvider.on('accountsChanged', (data) => {
-      console.log('data', data);
-      // this.address = walletProvider.selectedAddress;
+    // Address change Event Listeners
+    this.walletProvider.on('accountsChanged', (res) => {
+      if (!res) return;
+      this.address = res[0].toLowerCase();
+      console.log('Setting new address', res[0].toLowerCase());
     });
+
+    // Network change Event Listeners
+    this.walletProvider.on('networkChanged', (res) => {
+      if (!res) return;
+      console.log('Setting new network', res.toLowerCase());
+      throw Error('WalletAccount doest support switching chains');
+    });
+
+    // Get and Set Address !!! Post constructor initial it is ''
+    walletProvider
+      .request({
+        type: 'wallet_requestAccounts',
+        params: {
+          silentMode: false,
+        },
+      })
+      .then((res) => {
+        this.address = res[0].toLowerCase();
+      });
   }
 
   /**
@@ -90,6 +107,17 @@ export class WalletAccount extends Account {
       },
     };
     return this.walletProvider.request(rpcCall) as Promise<string[]>;
+  }
+
+  /**
+   * Request Permission for wallet account
+   * @returns allowed accounts addresses
+   */
+  public getPermissions() {
+    const rpcCall: RpcCall = {
+      type: 'wallet_getPermissions',
+    };
+    return this.walletProvider.request(rpcCall) as Promise<Permission[]>;
   }
 
   /**
@@ -163,7 +191,7 @@ export class WalletAccount extends Account {
     const pContract = payload.contract as CompiledSierra;
     const cairo1Contract = {
       ...pContract,
-      abi: json.stringify(pContract.abi),
+      abi: stringify(pContract.abi),
     };
 
     // Check FIx
