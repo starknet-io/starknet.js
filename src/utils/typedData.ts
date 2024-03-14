@@ -7,6 +7,7 @@ import {
   StarkNetType,
   TypedData,
 } from '../types';
+import { byteArrayFromString } from './calldata/byteArray';
 import {
   computePedersenHash,
   computePedersenHashOnElements,
@@ -16,7 +17,7 @@ import {
 } from './hash';
 import { MerkleTree } from './merkle';
 import { isHex, toHex } from './num';
-import { encodeShortString, splitLongString } from './shortString';
+import { encodeShortString } from './shortString';
 
 /** @deprecated prefer importing from 'types' over 'typedData' */
 export * from '../types/typedData';
@@ -60,24 +61,6 @@ const revisionConfiguration: Record<Revision, Configuration> = {
     presetTypes: {},
   },
 };
-
-// TODO: replace with utils byteArrayFromString from PR#891 once it is available
-export function byteArrayFromString(targetString: string) {
-  const shortStrings: string[] = splitLongString(targetString);
-  const remainder: string = shortStrings[shortStrings.length - 1];
-  const shortStringsEncoded: BigNumberish[] = shortStrings.map(encodeShortString);
-
-  const [pendingWord, pendingWordLength] =
-    remainder === undefined || remainder.length === 31
-      ? ['0x00', 0]
-      : [shortStringsEncoded.pop()!, remainder.length];
-
-  return {
-    data: shortStringsEncoded.length === 0 ? ['0x00'] : shortStringsEncoded,
-    pending_word: pendingWord,
-    pending_word_len: pendingWordLength,
-  };
-}
 
 function identifyRevision({ types, domain }: TypedData) {
   if (revisionConfiguration[Revision.Active].domain in types && domain.revision === Revision.Active)
