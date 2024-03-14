@@ -1,3 +1,9 @@
+## [6.4.2](https://github.com/starknet-io/starknet.js/compare/v6.4.1...v6.4.2) (2024-03-14)
+
+### Bug Fixes
+
+- update starknetid sepolia contract addresses ([#1016](https://github.com/starknet-io/starknet.js/issues/1016)) ([b50a3bd](https://github.com/starknet-io/starknet.js/commit/b50a3bdada4345a9d601734762bc7a600766ec25))
+
 ## [6.4.1](https://github.com/starknet-io/starknet.js/compare/v6.4.0...v6.4.1) (2024-03-14)
 
 ### Bug Fixes
