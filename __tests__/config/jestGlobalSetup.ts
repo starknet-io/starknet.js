@@ -158,9 +158,6 @@ const executeStrategy = async () => {
   // 2. Try to detect devnet setup
   console.log('Basic test parameters are missing, Auto Setup Started');
   const devnetStrategy = await localDevnetDetector.execute();
-  if (devnetStrategy.isDevnet) {
-    console.log(devnetStrategy.isRS ? 'Detected Devnet-RS' : 'Detected Devnet-PY');
-  }
 
   const providerType = await sequencerOrRpc(devnetStrategy);
   if (providerType.sequencer) {

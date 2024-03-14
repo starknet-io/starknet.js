@@ -61,6 +61,7 @@ class LocalDevnetDetector {
     // if on base url RPC endpoint work it is devnet-rs else it devnet-py
     try {
       this.strategy.isRS = await this.isRsDevnet();
+      if (this.isRS) console.log('Detected Devnet-RS');
     } catch (error) {
       return this.setup();
     }
