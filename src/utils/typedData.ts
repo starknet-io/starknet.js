@@ -3,9 +3,9 @@ import { PRIME, RANGE_FELT, RANGE_I128, RANGE_U128 } from '../constants';
 import {
   BigNumberish,
   TypedDataRevision as Revision,
-  StarkNetEnumType,
-  StarkNetMerkleType,
-  StarkNetType,
+  StarknetEnumType,
+  StarknetMerkleType,
+  StarknetType,
   TypedData,
 } from '../types';
 import assert from './assert';
@@ -107,7 +107,7 @@ export function prepareSelector(selector: string): string {
   return isHex(selector) ? selector : getSelectorFromName(selector);
 }
 
-export function isMerkleTreeType(type: StarkNetType): type is StarkNetMerkleType {
+export function isMerkleTreeType(type: StarknetType): type is StarknetMerkleType {
   return type.type === 'merkletree';
 }
 
@@ -142,7 +142,7 @@ export function getDependencies(
 
   return [
     type,
-    ...(types[type] as StarkNetEnumType[]).reduce<string[]>(
+    ...(types[type] as StarknetEnumType[]).reduce<string[]>(
       (previous, t) => [
         ...previous,
         ...getDependencies(types, t.type, previous, t.contains, revision).filter(
@@ -198,7 +198,7 @@ export function encodeType(
       const dependencyElements = allTypes[dependency].map((t) => {
         const targetType =
           t.type === 'enum' && revision === Revision.Active
-            ? (t as StarkNetEnumType).contains
+            ? (t as StarknetEnumType).contains
             : t.type;
         // parentheses handling for enum variant types
         const typeString = targetType.match(/^\(.*\)$/)
@@ -265,9 +265,9 @@ export function encodeValue(
       if (revision === Revision.Active) {
         const [variantKey, variantData] = Object.entries(data as TypedData['message'])[0];
 
-        const parentType = types[ctx.parent as string][0] as StarkNetEnumType;
+        const parentType = types[ctx.parent as string][0] as StarknetEnumType;
         const enumType = types[parentType.contains];
-        const variantType = enumType.find((t) => t.name === variantKey) as StarkNetType;
+        const variantType = enumType.find((t) => t.name === variantKey) as StarknetType;
         const variantIndex = enumType.indexOf(variantType);
 
         const encodedSubtypes = variantType.type

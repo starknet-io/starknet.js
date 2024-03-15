@@ -6,7 +6,7 @@ import exampleEnum from '../../__mocks__/typedData/example_enum.json';
 import examplePresetTypes from '../../__mocks__/typedData/example_presetTypes.json';
 import typedDataStructArrayExample from '../../__mocks__/typedData/mail_StructArray.json';
 import typedDataSessionExample from '../../__mocks__/typedData/session_MerkleTree.json';
-import { BigNumberish, StarkNetDomain, num } from '../../src';
+import { BigNumberish, StarknetDomain, num } from '../../src';
 import { PRIME } from '../../src/constants';
 import { getSelectorFromName } from '../../src/utils/hash';
 import { MerkleTree } from '../../src/utils/merkle';
@@ -170,7 +170,7 @@ describe('typedData', () => {
     const hash = getStructHash(
       typedDataExample.types,
       'StarkNetDomain',
-      typedDataExample.domain as StarkNetDomain
+      typedDataExample.domain as StarknetDomain
     );
     expect(hash).toMatchInlineSnapshot(
       `"0x54833b121883a3e3aebff48ec08a962f5742e5f7b973469c1f8f4f55d470b07"`
@@ -181,7 +181,7 @@ describe('typedData', () => {
     const hash = getStructHash(
       exampleBaseTypes.types,
       'StarknetDomain',
-      exampleBaseTypes.domain as StarkNetDomain,
+      exampleBaseTypes.domain as StarknetDomain,
       TypedDataRevision.Active
     );
     expect(hash).toMatchInlineSnapshot(
