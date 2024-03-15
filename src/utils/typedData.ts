@@ -1,4 +1,5 @@
 /* eslint-disable no-param-reassign */
+import { PRIME, RANGE_FELT, RANGE_I128, RANGE_U128 } from '../constants';
 import {
   BigNumberish,
   TypedDataRevision as Revision,
@@ -7,6 +8,7 @@ import {
   StarkNetType,
   TypedData,
 } from '../types';
+import assert from './assert';
 import { byteArrayFromString } from './calldata/byteArray';
 import {
   computePedersenHash,
@@ -61,6 +63,11 @@ const revisionConfiguration: Record<Revision, Configuration> = {
     presetTypes: {},
   },
 };
+
+function assertRange(data: unknown, type: string, { min, max }: { min: bigint; max: bigint }) {
+  const value = BigInt(data as string);
+  assert(value >= min && value <= max, `${value} (${type}) is out of bounds [${min}, ${max}]`);
+}
 
 function identifyRevision({ types, domain }: TypedData) {
   if (revisionConfiguration[Revision.Active].domain in types && domain.revision === Revision.Active)
@@ -305,15 +312,42 @@ export function encodeValue(
       } // else fall through to default
       return [type, getHex(data as string)];
     }
-    case 'felt':
-    case 'bool':
-    case 'u128':
-    case 'i128':
-    case 'ContractAddress':
-    case 'ClassHash':
-    case 'timestamp':
-    case 'shortstring':
+    case 'i128': {
+      if (revision === Revision.Active) {
+        const value = BigInt(data as string);
+        assertRange(value, type, RANGE_I128);
+        return [type, getHex(value < 0n ? PRIME + value : value)];
+      } // else fall through to default
       return [type, getHex(data as string)];
+    }
+    case 'timestamp':
+    case 'u128': {
+      if (revision === Revision.Active) {
+        assertRange(data, type, RANGE_U128);
+      } // else fall through to default
+      return [type, getHex(data as string)];
+    }
+    case 'felt':
+    case 'shortstring': {
+      // TODO: should 'shortstring' diverge into directly using encodeShortString()?
+      if (revision === Revision.Active) {
+        assertRange(getHex(data as string), type, RANGE_FELT);
+      } // else fall through to default
+      return [type, getHex(data as string)];
+    }
+    case 'ClassHash':
+    case 'ContractAddress': {
+      if (revision === Revision.Active) {
+        assertRange(data, type, RANGE_FELT);
+      } // else fall through to default
+      return [type, getHex(data as string)];
+    }
+    case 'bool': {
+      if (revision === Revision.Active) {
+        assert(typeof data === 'boolean', `Type mismatch for ${type} ${data}`);
+      } // else fall through to default
+      return [type, getHex(data as string)];
+    }
     default: {
       if (revision === Revision.Active) {
         throw new Error(`Unsupported type: ${type}`);
