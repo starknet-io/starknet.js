@@ -17,10 +17,16 @@ export { ETransactionVersion as TRANSACTION_VERSION };
 export const ZERO = 0n;
 export const MASK_250 = 2n ** 250n - 1n; // 2 ** 250 - 1
 export const API_VERSION = ZERO;
+export const PRIME = 2n ** 251n + 17n * 2n ** 192n + 1n;
 
 // based on: https://github.com/starkware-libs/cairo-lang/blob/v0.12.3/src/starkware/starknet/common/storage.cairo#L3
 export const MAX_STORAGE_ITEM_SIZE = 256n;
 export const ADDR_BOUND = 2n ** 251n - MAX_STORAGE_ITEM_SIZE;
+
+const range = (min: bigint, max: bigint) => ({ min, max }) as const;
+export const RANGE_FELT = range(ZERO, PRIME - 1n);
+export const RANGE_I128 = range(-(2n ** 127n), 2n ** 127n - 1n);
+export const RANGE_U128 = range(ZERO, 2n ** 128n - 1n);
 
 export enum BaseUrl {
   SN_MAIN = 'https://alpha-mainnet.starknet.io',
