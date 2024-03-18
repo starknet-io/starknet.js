@@ -6,82 +6,25 @@
  */
 
 import { BaseUrl } from '../../src/constants';
+import localDevnetDetector, { type DevnetStrategy } from './helpers/localDevnetDetector';
+import { GS_DEFAULT_TEST_PROVIDER_URL } from './constants';
+import { setIfNullish } from './helpers/env';
 
-type DevnetStrategy = {
-  isDevnet: boolean;
-  isRS: boolean;
-};
-type ProviderType = {
-  sequencer: boolean;
-  rpc: boolean;
-};
+type ProviderType = Record<'sequencer' | 'rpc', boolean>;
 
 /**
  * Global Setup Fixtures
  */
 
-/* Default test config based on run `starknet-devnet --seed 0` */
-const GS_DEFAULT_TEST_PROVIDER_URL = 'http://127.0.0.1:5050/';
-
-const setIfNullish = (envName: string, setValue?: string | boolean) => {
-  process.env[envName] ??= setValue?.toString();
-};
-
-const localDevnetDetectionStrategy = async () => {
-  const setup = (strategy: DevnetStrategy) => {
-    setIfNullish('IS_LOCALHOST_DEVNET', strategy.isDevnet ? 'true' : 'false');
-    setIfNullish(
-      'IS_RPC_DEVNET',
-      strategy.isDevnet && (strategy.isRS || process.env.TEST_RPC_URL) ? 'true' : 'false'
-    );
-    setIfNullish(
-      'IS_SEQUENCER_DEVNET',
-      strategy.isDevnet && process.env.IS_RPC_DEVNET === 'false' ? 'true' : 'false'
-    );
-    return strategy;
-  };
-
-  const strategy: DevnetStrategy = {
-    isDevnet: false,
-    isRS: false,
-  };
-
-  // if is_alive work it is local devnet
-  const devnetResult = await fetch(`${GS_DEFAULT_TEST_PROVIDER_URL}is_alive`)
-    .then((res) => res.text())
-    .catch(() => '');
-  if (devnetResult !== 'Alive!!!') {
-    return setup(strategy);
-  }
-  strategy.isDevnet = true;
-
-  // if on base url RPC endpoint work it is devnet-rs else it devnet-py
-  try {
-    const response = await fetch(`${GS_DEFAULT_TEST_PROVIDER_URL}`, {
-      method: 'POST',
-      headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
-      body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'starknet_syncing' }),
-    });
-    const json = await response.json();
-    strategy.isRS = json.jsonrpc === '2.0';
-  } catch (error) {
-    return setup(strategy);
-  }
-
-  return setup(strategy);
-};
-
 const sequencerOrRpc = async (devnetStrategy?: DevnetStrategy) => {
   const setup = (providerType: ProviderType) => {
-    setIfNullish('IS_SEQUENCER', providerType.sequencer ? 'true' : 'false');
-    setIfNullish('IS_RPC', providerType.rpc ? 'true' : 'false');
+    setIfNullish('IS_SEQUENCER', providerType.sequencer);
+    setIfNullish('IS_RPC', providerType.rpc);
     setIfNullish(
       'IS_SEQUENCER_GOERLI',
       (process.env.TEST_PROVIDER_BASE_URL || process.env.TEST_RPC_URL || '').includes(
         BaseUrl.SN_GOERLI
       )
-        ? 'true'
-        : 'false'
     );
     return providerType;
   };
@@ -169,18 +112,16 @@ const verifySetup = (final?: boolean) => {
   }
 
   if (!final) {
-    setIfNullish('IS_LOCALHOST_DEVNET', 'false');
-    setIfNullish('IS_RPC_DEVNET', 'false');
-    setIfNullish('IS_SEQUENCER_DEVNET', 'false');
-    setIfNullish('IS_RPC', process.env.TEST_RPC_URL ? 'true' : 'false');
-    setIfNullish('IS_SEQUENCER', process.env.TEST_PROVIDER_BASE_URL ? 'true' : 'false');
+    setIfNullish('IS_LOCALHOST_DEVNET', false);
+    setIfNullish('IS_RPC_DEVNET', false);
+    setIfNullish('IS_SEQUENCER_DEVNET', false);
+    setIfNullish('IS_RPC', !!process.env.TEST_RPC_URL);
+    setIfNullish('IS_SEQUENCER', !!process.env.TEST_PROVIDER_BASE_URL);
     setIfNullish(
       'IS_SEQUENCER_GOERLI',
       (process.env.TEST_PROVIDER_BASE_URL || process.env.TEST_RPC_URL || '').includes(
         BaseUrl.SN_GOERLI
       )
-        ? 'true'
-        : 'false'
     );
   }
 
@@ -216,14 +157,7 @@ const executeStrategy = async () => {
 
   // 2. Try to detect devnet setup
   console.log('Basic test parameters are missing, Auto Setup Started');
-  const devnetStrategy = await localDevnetDetectionStrategy();
-  if (devnetStrategy.isDevnet) {
-    if (devnetStrategy.isRS) {
-      console.log('Detected Devnet-RS');
-    } else {
-      console.log('Detected Devnet-PY');
-    }
-  }
+  const devnetStrategy = await localDevnetDetector.execute();
 
   const providerType = await sequencerOrRpc(devnetStrategy);
   if (providerType.sequencer) {
