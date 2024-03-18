@@ -58,10 +58,12 @@ export class WalletAccount extends Account implements AccountInterface {
       this.address = res[0].toLowerCase();
     });
 
-    // Throw Error on Network change
+    // Update Channel chainId on Network change
     this.walletProvider.on('networkChanged', (res) => {
       if (!res) return;
-      throw Error('WalletAccount doest support switching chains');
+      // Determine is it better to set chainId or replace channel with new one
+      // At the moment channel is stateless but it could change
+      this.channel.setChainId(res as StarknetChainId);
     });
 
     // Get and Set Address !!! Post constructor initial empty string
