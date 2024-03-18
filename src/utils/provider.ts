@@ -7,12 +7,10 @@ import {
   CompiledSierra,
   ContractClass,
   GetBlockResponse,
-  GetTransactionReceiptResponse,
   InvocationsDetailsWithNonce,
   LegacyContractClass,
   PendingBlock,
   PendingStateUpdate,
-  RPC,
   SierraContractClass,
   StateUpdateResponse,
   V3TransactionDetails,
@@ -23,6 +21,7 @@ import { formatSpaces } from './hash';
 import { parse, stringify } from './json';
 import { isHex, toHex } from './num';
 import { compressProgram } from './stark';
+import type { GetTransactionReceiptResponse } from './transactionReceipt';
 
 /**
  * Helper - Async Sleep for 'delay' time
@@ -195,9 +194,7 @@ export function isPendingBlock(response: GetBlockResponse): response is PendingB
 /**
  * Guard Pending Transaction
  */
-export function isPendingTransaction(
-  response: GetTransactionReceiptResponse
-): response is RPC.PendingReceipt {
+export function isPendingTransaction(response: GetTransactionReceiptResponse): boolean {
   return !('block_hash' in response);
 }
 

@@ -39,6 +39,7 @@ export * from './utils/calldata';
 export * from './utils/calldata/enum';
 export * from './utils/contract';
 export * from './utils/events';
+export * from './utils/transactionReceipt';
 
 /**
  * Deprecated

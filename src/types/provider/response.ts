@@ -3,7 +3,15 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 
-import { CompiledSierra, LegacyContractClass } from '../lib';
+import {
+  CompiledSierra,
+  LegacyContractClass,
+  TransactionExecutionStatus,
+  TransactionFinalityStatus,
+  TransactionType,
+  TransactionStatus,
+  BlockNumber,
+} from '../lib';
 import {
   BLOCK_HASH,
   BLOCK_NUMBER,
@@ -24,8 +32,6 @@ import {
   TXN_HASH,
   DeclaredTransaction,
   InvokedTransaction,
-  PendingReceipt,
-  Receipt,
   ResourceBounds,
   SimulateTransaction,
   TransactionWithHash,
@@ -58,9 +64,45 @@ export type Block = {
   transactions: TXN_HASH[];
 };
 
-export type GetTransactionResponse = TransactionWithHash;
+export interface MessageToL1 {
+  to_address: string;
+  payload: Array<string>;
+}
 
-export type GetTransactionReceiptResponse = Receipt | PendingReceipt;
+export type RevertedTransactionReceiptResponse = {
+  type?: TransactionType | any; // RPC only // any due to RPC Spec issue
+  execution_status: TransactionExecutionStatus.REVERTED | any; // any due to RPC Spec issue
+  finality_status: TransactionFinalityStatus | any;
+  status?: TransactionStatus; // SEQ only
+  actual_fee: string;
+  block_hash?: string; // ?~ optional due to RPC spec issue
+  block_number?: BlockNumber; // ?~ optional due to RCP spec issue
+  transaction_hash: string;
+  transaction_index?: number; // SEQ only
+  messages_sent: Array<MessageToL1>; // SEQ Casted l2_to_l1_messages
+  events: any[];
+  revert_reason?: string; // SEQ Casted revert_error // ?~ optional due to RCP spec issue
+};
+
+export type RejectedTransactionReceiptResponse = {
+  status: `${TransactionStatus.REJECTED}`;
+  transaction_failure_reason: {
+    code: string;
+    error_message: string;
+  };
+};
+
+export type GetTransactionReceiptResponseWoHelper =
+  | SuccessfulTransactionReceiptResponse
+  | RevertedTransactionReceiptResponse
+  | RejectedTransactionReceiptResponse;
+
+export type SuccessfulTransactionReceiptResponse =
+  | InvokeTransactionReceiptResponse
+  | DeployTransactionReceiptResponse
+  | DeclareTransactionReceiptResponse;
+
+export type GetTransactionResponse = TransactionWithHash;
 // Spread individual types for usage convenience
 export type InvokeTransactionReceiptResponse = INVOKE_TXN_RECEIPT | PENDING_INVOKE_TXN_RECEIPT;
 export type DeclareTransactionReceiptResponse = DECLARE_TXN_RECEIPT | PENDING_DECLARE_TXN_RECEIPT;

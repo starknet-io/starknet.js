@@ -10,11 +10,11 @@ import {
   EstimateFeeResponse,
   EstimateFeeResponseBulk,
   GetBlockResponse,
-  GetTransactionReceiptResponse,
   FeeEstimate,
   SimulateTransactionResponse,
   SimulatedTransaction,
   RpcProviderOptions,
+  GetTransactionReceiptResponseWoHelper,
 } from '../../types/provider';
 import { toBigInt } from '../num';
 import { estimateFeeToBounds, estimatedFeeToMaxFee } from '../stark';
@@ -54,20 +54,20 @@ export class RPCResponseParser
     return { status: 'PENDING', ...res } as GetBlockResponse;
   }
 
-  public parseTransactionReceipt(res: TransactionReceipt): GetTransactionReceiptResponse {
+  public parseTransactionReceipt(res: TransactionReceipt): GetTransactionReceiptResponseWoHelper {
     // HOTFIX RPC 0.5 to align with RPC 0.6
     // This case is RPC 0.5. It can be only v2 thx with FRI units
     if ('actual_fee' in res && typeof res.actual_fee === 'string') {
       return {
-        ...(res as GetTransactionReceiptResponse),
+        ...(res as GetTransactionReceiptResponseWoHelper),
         actual_fee: {
           amount: res.actual_fee,
           unit: 'FRI',
         },
-      };
+      } as GetTransactionReceiptResponseWoHelper;
     }
 
-    return res as GetTransactionReceiptResponse;
+    return res as GetTransactionReceiptResponseWoHelper;
   }
 
   public parseFeeEstimateResponse(res: FeeEstimate[]): EstimateFeeResponse {

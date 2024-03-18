@@ -8,6 +8,7 @@ import {
   FeeEstimate,
   RPC,
   RPC06,
+  ReceiptTx,
   RpcProvider,
   TransactionExecutionStatus,
   stark,
@@ -166,12 +167,12 @@ describeIfRpc('RPCProvider', () => {
 
     test('successful - default', async () => {
       transactionStatusSpy.mockResolvedValueOnce(response.successful);
-      await expect(rpcProvider.waitForTransaction(0)).resolves.toBe(receipt);
+      await expect(rpcProvider.waitForTransaction(0)).resolves.toBeInstanceOf(ReceiptTx);
     });
 
     test('reverted - default', async () => {
       transactionStatusSpy.mockResolvedValueOnce(response.reverted);
-      await expect(rpcProvider.waitForTransaction(0)).resolves.toBe(receipt);
+      await expect(rpcProvider.waitForTransaction(0)).resolves.toBeInstanceOf(ReceiptTx);
     });
 
     test('rejected - default', async () => {
