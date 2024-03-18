@@ -12,4 +12,9 @@ export type RpcProviderOptions = {
   specVersion?: string;
   default?: boolean;
   waitMode?: boolean;
+  feeMarginPercentage?: {
+    l1BoundMaxAmount: number;
+    l1BoundMaxPricePerUnit: number;
+    maxFee: number;
+  };
 };

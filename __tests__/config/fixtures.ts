@@ -56,6 +56,8 @@ export const compiledDummy2Eth = readContractSierra('cairo/ethSigner/dummy2ForEt
 export const compiledDummy2EthCasm = readContractSierraCasm('cairo/ethSigner/dummy2ForEth');
 export const compiledEthPubk = readContractSierra('cairo/ethSigner/testEthPubKey.sierra');
 export const compiledEthPubkCasm = readContractSierraCasm('cairo/ethSigner/testEthPubKey');
+export const compiledC260 = readContractSierra('cairo/cairo260/hello260.sierra');
+export const compiledC260Casm = readContractSierraCasm('cairo/cairo260/hello260');
 export const compiledTuple = readContractSierra('cairo/cairo253/tupleResponse.sierra');
 export const compiledTupleCasm = readContractSierraCasm('cairo/cairo253/tupleResponse');
 // StarknetId

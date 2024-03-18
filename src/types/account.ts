@@ -21,6 +21,7 @@ export type AccountInvocationsFactoryDetails = {
   versions: Array<`${ETransactionVersion}`>;
   nonce?: BigNumberish;
   blockIdentifier?: BlockIdentifier;
+  skipValidate?: boolean;
 } & Partial<V3TransactionDetails>;
 
 export interface UniversalDetails {

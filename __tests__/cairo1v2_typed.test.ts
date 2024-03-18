@@ -973,7 +973,7 @@ describe('Cairo 1', () => {
       const callD2 = CallData.compile({ mess: message });
       expect(callD2).toEqual(expectedResult);
       const callD3 = CallData.compile({ mess: byteArray.byteArrayFromString('Take care.') });
-      expect(callD3).toEqual(['1', '0', '398475857363345939260718', '10']);
+      expect(callD3).toEqual(['0', '398475857363345939260718', '10']);
       const str1 = await stringContract.get_string();
       expect(str1).toBe(
         "Cairo has become the most popular language for developers + charizards !@#$%^&*_+|:'<>?~`"
