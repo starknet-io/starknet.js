@@ -8,8 +8,8 @@ const LOCAL_DEVNET_NOT_RUNNING_MESSAGE = `
 Local devnet is not running. In order to properly run it you need to do the following: \n
   - Go to the: https://hub.docker.com/r/shardlabs/starknet-devnet-rs/tags
   - Find the latest tag and copy the "docker pull" command
-  - Run the docker on your machine
-  - Run the: "docker pull shardlabs/starknet-devnet-rs:latest"
+  - Run Docker on your machine
+  - Run the command: "docker pull shardlabs/starknet-devnet-rs:latest"
 `;
 
 class LocalDevnetDetector {

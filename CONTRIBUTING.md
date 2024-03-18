@@ -48,8 +48,8 @@ The global variables above will only be valid for some of the tests.
 The recommended and more straightforward approach is to go with the docker.
 You just need to do the following steps:
 
-- Install the [docker](https://docs.docker.com/desktop/install/mac-install/) (You can install it via `brew` or some other package manager)
-- Run the `docker` on your machine (Open the application).
+- Install [Docker](https://docs.docker.com/engine/install/) (it can also be installed via a package manager, e.g. `brew` for Mac)
+- Run `Docker` on your machine (open the application).
 - Go to the [starknet-devnet-rs](https://hub.docker.com/r/shardlabs/starknet-devnet-rs/tags) and copy the `docker pull` command from the latest tag
 - Run `docker pull shardlabs/starknet-devnet-rs:latest` in your terminal
 - Run tests locally with `npm run test`
