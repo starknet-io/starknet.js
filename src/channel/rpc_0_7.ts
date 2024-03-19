@@ -69,6 +69,10 @@ export class RpcChannel {
     this.requestId = 0;
   }
 
+  public setChainId(chainId: StarknetChainId) {
+    this.chainId = chainId;
+  }
+
   public fetch(method: string, params?: object, id: string | number = 0) {
     const rpcRequestBody: JRPC.RequestBody = {
       id,
