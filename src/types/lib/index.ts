@@ -270,7 +270,7 @@ export interface CallStruct {
 /**
  * Represent Contract version & account verification message function name
  */
-export type ContractSpecificities = {
+export type ContractVersion = {
   /** version of the cairo language */
   cairo: CairoVersion;
   /** version of the cairo compiler used to compile the contract */

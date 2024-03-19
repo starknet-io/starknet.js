@@ -3,7 +3,7 @@ import {
   AbiEnums,
   AbiStructs,
   BigNumberish,
-  ContractSpecificities,
+  ContractVersion,
   Literal,
   Uint,
   Uint256,
@@ -66,7 +66,7 @@ export function isCairo1Abi(abi: Abi): boolean {
  * @param abi
  * @returns string
  */
-export function getAbiContractVersion(abi: Abi): ContractSpecificities {
+export function getAbiContractVersion(abi: Abi): ContractVersion {
   // determine by interface for "Cairo 1.2"
   if (abi.find((it) => it.type === 'interface')) {
     return { cairo: '1', compiler: '2', messageVerifFunctionName: undefined };

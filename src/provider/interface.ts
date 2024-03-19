@@ -8,7 +8,7 @@ import type {
   Call,
   CallContractResponse,
   ContractClassResponse,
-  ContractSpecificities,
+  ContractVersion,
   DeclareContractResponse,
   DeclareContractTransaction,
   DeployAccountContractPayload,
@@ -343,7 +343,7 @@ export abstract class ProviderInterface {
     contractAddress: string,
     classHash?: undefined,
     options?: getContractVersionOptions
-  ): Promise<ContractSpecificities>;
+  ): Promise<ContractVersion>;
 
   /**
    * Gets the contract version from the provided address
@@ -357,5 +357,5 @@ export abstract class ProviderInterface {
     contractAddress: undefined,
     classHash: string,
     options?: getContractVersionOptions
-  ): Promise<ContractSpecificities>;
+  ): Promise<ContractVersion>;
 }

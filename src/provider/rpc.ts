@@ -6,7 +6,7 @@ import {
   BlockIdentifier,
   BlockTag,
   Call,
-  ContractSpecificities,
+  ContractVersion,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
   GetBlockResponse,
@@ -208,12 +208,12 @@ export class RpcProvider implements ProviderInterface {
     contractAddress: BigNumberish,
     classHash?: undefined,
     options?: getContractVersionOptions
-  ): Promise<ContractSpecificities>;
+  ): Promise<ContractVersion>;
   public async getContractSpecificities(
     contractAddress: undefined,
     classHash: BigNumberish,
     options?: getContractVersionOptions
-  ): Promise<ContractSpecificities>;
+  ): Promise<ContractVersion>;
 
   public async getContractSpecificities(
     contractAddress?: BigNumberish,
@@ -222,7 +222,7 @@ export class RpcProvider implements ProviderInterface {
       blockIdentifier = this.channel.blockIdentifier,
       compiler = true,
     }: getContractVersionOptions = {}
-  ): Promise<ContractSpecificities> {
+  ): Promise<ContractVersion> {
     let contractClass;
     if (contractAddress) {
       contractClass = await this.getClassAt(contractAddress, blockIdentifier);
