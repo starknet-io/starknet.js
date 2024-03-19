@@ -12,7 +12,7 @@ import {
 } from './getst/main';
 
 /**
- * Request Permission for wallet account, return addresses that's allowed by user
+ * Request Permission for wallet account, return addresses that are allowed by user
  * @param silentMode false: request user interaction allowance. true: return only pre-allowed
  * @returns allowed accounts addresses
  */
@@ -51,7 +51,7 @@ export function watchAsset(swo: StarknetWindowObject, asset: WatchAssetParameter
  * @returns boolean
  */
 export function addStarknetChain(swo: StarknetWindowObject, chain: AddStarknetChainParameters) {
-  // Can this set custom RPC endpoint ?
+  // TODO: This should set custom RPC endpoint ?
   return swo.request({
     type: 'wallet_addStarknetChain',
     params: chain,
