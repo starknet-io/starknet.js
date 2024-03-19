@@ -31,15 +31,17 @@ import { isSierra } from '../utils/contract';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 
 export class RpcProvider implements ProviderInterface {
-  private responseParser = new RPCResponseParser();
+  private responseParser: RPCResponseParser;
 
   public channel: RPC07.RpcChannel | RPC06.RpcChannel;
 
   constructor(optionsOrProvider?: RpcProviderOptions | ProviderInterface | RpcProvider) {
     if (optionsOrProvider && 'channel' in optionsOrProvider) {
       this.channel = optionsOrProvider.channel;
+      this.responseParser = (optionsOrProvider as any).responseParser;
     } else {
       this.channel = new RpcChannel({ ...optionsOrProvider, waitMode: false });
+      this.responseParser = new RPCResponseParser(optionsOrProvider?.feeMarginPercentage);
     }
   }
 
@@ -176,7 +178,7 @@ export class RpcProvider implements ProviderInterface {
     // can't be named simulateTransaction because of argument conflict with account
     return this.channel
       .simulateTransaction(invocations, options)
-      .then(this.responseParser.parseSimulateTransactionResponse);
+      .then((r) => this.responseParser.parseSimulateTransactionResponse(r));
   }
 
   public async waitForTransaction(txHash: BigNumberish, options?: waitForTransactionOptions) {
@@ -278,7 +280,7 @@ export class RpcProvider implements ProviderInterface {
         ],
         { blockIdentifier, skipValidate }
       )
-      .then(this.responseParser.parseFeeEstimateResponse);
+      .then((r) => this.responseParser.parseFeeEstimateResponse(r));
   }
 
   public async getDeclareEstimateFee(
@@ -298,7 +300,7 @@ export class RpcProvider implements ProviderInterface {
         ],
         { blockIdentifier, skipValidate }
       )
-      .then(this.responseParser.parseFeeEstimateResponse);
+      .then((r) => this.responseParser.parseFeeEstimateResponse(r));
   }
 
   public async getDeployAccountEstimateFee(
@@ -318,7 +320,7 @@ export class RpcProvider implements ProviderInterface {
         ],
         { blockIdentifier, skipValidate }
       )
-      .then(this.responseParser.parseFeeEstimateResponse);
+      .then((r) => this.responseParser.parseFeeEstimateResponse(r));
   }
 
   public async getEstimateFeeBulk(
@@ -327,7 +329,7 @@ export class RpcProvider implements ProviderInterface {
   ) {
     return this.channel
       .getEstimateFee(invocations, options)
-      .then(this.responseParser.parseFeeEstimateBulkResponse);
+      .then((r) => this.responseParser.parseFeeEstimateBulkResponse(r));
   }
 
   public async invokeFunction(

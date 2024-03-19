@@ -5,6 +5,7 @@ import {
   Block,
   CallData,
   Contract,
+  FeeEstimate,
   RPC,
   RPC06,
   RpcProvider,
@@ -77,6 +78,33 @@ describeIfRpc('RPCProvider', () => {
   test('getSpecVersion', async () => {
     const spec = await rpcProvider.getSpecVersion();
     expect(typeof spec).toBe('string');
+  });
+
+  test('configurable margin', async () => {
+    const p = new RpcProvider({
+      nodeUrl: provider.channel.nodeUrl,
+      feeMarginPercentage: {
+        l1BoundMaxAmount: 0,
+        l1BoundMaxPricePerUnit: 0,
+        maxFee: 0,
+      },
+    });
+    const estimateSpy = jest.spyOn(p.channel as any, 'getEstimateFee');
+    const mockFeeEstimate: FeeEstimate = {
+      gas_consumed: '0x2',
+      gas_price: '0x1',
+      data_gas_consumed: '0x2',
+      data_gas_price: '0x1',
+      overall_fee: '0x4',
+      unit: 'WEI',
+    };
+    estimateSpy.mockResolvedValue([mockFeeEstimate]);
+    const result = (await p.getEstimateFeeBulk([{} as any], {}))[0];
+    expect(estimateSpy).toHaveBeenCalledTimes(1);
+    expect(result.suggestedMaxFee).toBe(4n);
+    expect(result.resourceBounds.l1_gas.max_amount).toBe('0x4');
+    expect(result.resourceBounds.l1_gas.max_price_per_unit).toBe('0x1');
+    estimateSpy.mockRestore();
   });
 
   describe('Test Estimate message fee', () => {

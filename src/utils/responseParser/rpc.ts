@@ -14,6 +14,7 @@ import {
   FeeEstimate,
   SimulateTransactionResponse,
   SimulatedTransaction,
+  RpcProviderOptions,
 } from '../../types/provider';
 import { toBigInt } from '../num';
 import { estimateFeeToBounds, estimatedFeeToMaxFee } from '../stark';
@@ -31,6 +32,24 @@ export class RPCResponseParser
       | 'parseCallContractResponse'
     >
 {
+  private margin: RpcProviderOptions['feeMarginPercentage'];
+
+  constructor(margin?: RpcProviderOptions['feeMarginPercentage']) {
+    this.margin = margin;
+  }
+
+  private estimatedFeeToMaxFee(estimatedFee: Parameters<typeof estimatedFeeToMaxFee>[0]) {
+    return estimatedFeeToMaxFee(estimatedFee, this.margin?.maxFee);
+  }
+
+  private estimateFeeToBounds(estimate: Parameters<typeof estimateFeeToBounds>[0]) {
+    return estimateFeeToBounds(
+      estimate,
+      this.margin?.l1BoundMaxAmount,
+      this.margin?.l1BoundMaxPricePerUnit
+    );
+  }
+
   public parseGetBlockResponse(res: BlockWithTxHashes): GetBlockResponse {
     return { status: 'PENDING', ...res } as GetBlockResponse;
   }
@@ -58,8 +77,8 @@ export class RPCResponseParser
       gas_consumed: toBigInt(val.gas_consumed),
       gas_price: toBigInt(val.gas_price),
       unit: val.unit,
-      suggestedMaxFee: estimatedFeeToMaxFee(val.overall_fee),
-      resourceBounds: estimateFeeToBounds(val),
+      suggestedMaxFee: this.estimatedFeeToMaxFee(val.overall_fee),
+      resourceBounds: this.estimateFeeToBounds(val),
     };
   }
 
@@ -69,8 +88,8 @@ export class RPCResponseParser
       gas_consumed: toBigInt(val.gas_consumed),
       gas_price: toBigInt(val.gas_price),
       unit: val.unit,
-      suggestedMaxFee: estimatedFeeToMaxFee(val.overall_fee),
-      resourceBounds: estimateFeeToBounds(val),
+      suggestedMaxFee: this.estimatedFeeToMaxFee(val.overall_fee),
+      resourceBounds: this.estimateFeeToBounds(val),
     }));
   }
 
@@ -85,8 +104,8 @@ export class RPCResponseParser
     return res.map((it: SimulatedTransaction) => {
       return {
         ...it,
-        suggestedMaxFee: estimatedFeeToMaxFee(BigInt(it.fee_estimation.overall_fee)),
-        resourceBounds: estimateFeeToBounds(it.fee_estimation),
+        suggestedMaxFee: this.estimatedFeeToMaxFee(it.fee_estimation.overall_fee),
+        resourceBounds: this.estimateFeeToBounds(it.fee_estimation),
       };
     });
   }

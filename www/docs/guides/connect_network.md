@@ -16,17 +16,17 @@ Then you need to select a node. A node is a safe way to connect with the Starkne
   > Main development devnets are Starknet-devnet-rs, Madara, ...
 
 Each node is communicating with Starknet.js using a rpc specification. Most of the nodes are able to use 2 rpc spec versions.  
-For example, this node is compatible with v0.5.1 & v0.6.0, using the following entry points :
+For example, this node is compatible with v0.6.0 & v0.7.0, using the following entry points :
 
-- "https://free-rpc.nethermind.io/goerli-juno/v0_5"
 - "https://free-rpc.nethermind.io/goerli-juno/v0_6"
+- "https://free-rpc.nethermind.io/goerli-juno/v0_7"
 
 From rpc spec v0.5.0, you can request the rpc spec version that uses a node address :
 
 ```typescript
 const resp = await myProvider.getSpecVersion();
 console.log('rpc version =', resp);
-// result : rpc version = 0.6.0
+// result : rpc version = 0.7.0
 ```
 
 On Starknet.js side, you have to select the proper version, to be in accordance with the node you want to use :
@@ -35,9 +35,9 @@ On Starknet.js side, you have to select the proper version, to be in accordance 
 | :---------------------------: | ---------------------------- |
 |            v0.4.0             | Starknet.js v5.21.1          |
 |            v0.5.0             | Starknet.js v5.23.0          |
-|            v0.5.1             | Starknet.js v5.29.0 & v6.3.0 |
-|            v0.6.0             | Starknet.js v6.3.0           |
-|            v0.7.0             | Starknet.js v6.3.0           |
+|            v0.5.1             | Starknet.js v5.29.0 & v6.1.0 |
+|            v0.6.0             | Starknet.js v6.4.3           |
+|            v0.7.0             | Starknet.js v6.4.3           |
 
 [!NOTE] Each Starknet.js version 6.x.x is compatible with 3 rpc spec versions, and recognize automatically the spec version if not provided.
 
@@ -51,7 +51,7 @@ import { RpcProvider } from 'starknet';
 
 ### Default Rpc node
 
-If you don't want to use a specific node, or to handle an API key, you can use by default:
+If you don't want to use a specific node, or to handle an API key, you can use by default (using Rpc spec 0.7.0):
 
 ```typescript
 const myProvider = new RpcProvider({ nodeUrl: constants.NetworkName.SN_GOERLI });
@@ -62,7 +62,7 @@ const myProvider = new RpcProvider(); // Goerli
 
 > when using this syntax, a random public node will be selected.
 
-Using a specific nodeUrl is the better approach, as such a node will have fewer limitations and will be less crowded.
+Using a specific nodeUrl is the better approach, as such a node will have fewer limitations, the last version of software and will be less crowded.
 
 Some examples of RpcProvider instantiation to connect to RPC node providers:
 
@@ -73,39 +73,27 @@ Some examples of RpcProvider instantiation to connect to RPC node providers:
 const providerInfuraMainnet = new RpcProvider({
   nodeUrl: 'https://starknet-mainnet.infura.io/v3/' + infuraKey,
 });
-// Blast node rpc 0.5.1 & 0.6.0 for Mainnet:
+// Blast node rpc 0.7.0 for Mainnet (0.4, 0.5 & 0_6 also available):
 const providerBlastMainnet = new RpcProvider({
-  nodeUrl: 'https://starknet-mainnet.blastapi.io/' + blastKey + '/rpc/v0.5',
+  nodeUrl: 'https://starknet-mainnet.blastapi.io/' + blastKey + '/rpc/v0_7',
 });
-const providerBlastMainnet = new RpcProvider({
-  nodeUrl: 'https://starknet-mainnet.blastapi.io/' + blastKey + '/rpc/v0_6',
-});
-// Lava node rpc 0.4.0 for Mainnet:
+// Lava node rpc 0.6.0 for Mainnet:
 const providerMainnetLava = new RpcProvider({
   nodeUrl: 'https://g.w.lavanet.xyz:443/gateway/strk/rpc-http/' + lavaMainnetKey,
 });
-// Alchemy node rpc 0.5.1 for Mainnet:
+// Alchemy node rpc 0.6.0 for Mainnet:
 const providerAlchemyMainnet = new RpcProvider({
-  nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0.5/' + alchemyKey,
+  nodeUrl: 'https://starknet-mainnet.g.alchemy.com/starknet/version/rpc/v0_6/' + alchemyKey,
 });
-// Public Nethermind node rpc 0.5.1 & 0.6.0 for Mainnet:
+// Public Nethermind node rpc 0.7.0 for Mainnet (0_6 also available):
 const providerMainnetNethermindPublic = new RpcProvider({
-  nodeUrl: 'https://free-rpc.nethermind.io/mainnet-juno/v0_5',
+  nodeUrl: 'https://free-rpc.nethermind.io/mainnet-juno/v0_7',
 });
-const providerMainnetNethermindPublic = new RpcProvider({
-  nodeUrl: 'https://free-rpc.nethermind.io/mainnet-juno/v0_6',
-});
-// Public Blast node rpc 0.4.0, 0.5.1 & 0.6.0 for Mainnet:
+// Public Blast node rpc 0.7.0 for Mainnet (0.4, 0.5 & 0_6 also available) :
 const providerBlastMainnet = new RpcProvider({
-  nodeUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0.4',
+  nodeUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0_7',
 });
-const providerBlastMainnet = new RpcProvider({
-  nodeUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0.5',
-});
-const providerBlastMainnet = new RpcProvider({
-  nodeUrl: 'https://starknet-mainnet.public.blastapi.io/rpc/v0_6',
-});
-// Public Lava node rpc 0.4.0 for Mainnet:
+// Public Lava node rpc 0.6.0 for Mainnet:
 const providerLavaMainnet = new RpcProvider({
   nodeUrl: 'https://json-rpc.starknet-mainnet.public.lavanet.xyz',
 });
@@ -120,42 +108,38 @@ const providerLavaMainnet = new RpcProvider({
 const providerInfuraTestnet = new RpcProvider({
   nodeUrl: 'https://starknet-goerli.infura.io/v3/' + infuraKey,
 });
-// Blast node rpc 0.5.1 & 0.6.0 for Goerli Testnet:
+// Blast node rpc 0.7.0 for Goerli Testnet (0.4, 0.5 & 0_6 also available) :
 const providerBlastTestnet = new RpcProvider({
-  nodeUrl: 'https://starknet-testnet.blastapi.io/' + blastKey + '/rpc/v0.5',
+  nodeUrl: 'https://starknet-testnet.blastapi.io/' + blastKey + '/rpc/v0_7',
 });
-const providerBlastTestnet = new RpcProvider({
-  nodeUrl: 'https://starknet-testnet.blastapi.io/' + blastKey + '/rpc/v0_6',
-});
-// Alchemy node rpc 0.5.1 for Goerli Testnet:
+// Alchemy node rpc 0.6.0 for Goerli Testnet:
 const providerAlchemyTestnet = new RpcProvider({
-  nodeUrl: 'https://starknet-goerli.g.alchemy.com/starknet/version/rpc/v0.5/' + alchemyKey,
+  nodeUrl: 'https://starknet-goerli.g.alchemy.com/starknet/version/rpc/v0_6/' + alchemyKey,
 });
-// Public Nethermind node rpc 0.5.1 & 0.6.0 for Goerli Testnet:
+// Public Nethermind node rpc 0.7.0 for Goerli Testnet (0_6 also available) :
 const providerTestnetNethermindPublic = new RpcProvider({
-  nodeUrl: 'https://free-rpc.nethermind.io/goerli-juno/v0_5',
+  nodeUrl: 'https://free-rpc.nethermind.io/goerli-juno/v0_7',
 });
-const providerTestnetNethermindPublic = new RpcProvider({
-  nodeUrl: 'https://free-rpc.nethermind.io/goerli-juno/v0_6',
+// Public Blast node rpc 0.7.0 for Goerli Testnet (0.4, 0.5 & 0_6 also available) :
+const providerTestnetBlastPublic = new RpcProvider({
+  nodeUrl: 'https://starknet-testnet.public.blastapi.io/rpc/v0_7',
 });
 ```
 
 ### Sepolia Testnet
 
 ```typescript
-// Blast node rpc 0.5.1 & 0.60 for Sepolia Testnet:
-const providerBlastTestnet = new RpcProvider({
-  nodeUrl: 'https://starknet-testnet.blastapi.io/' + blastKey + '/rpc/v0.5',
+// Infura node rpc 0.5.1 for Sepolia Testnet :
+const providerInfuraSepoliaTestnet = new RpcProvider({
+  nodeUrl: 'https://starknet-sepolia.infura.io/v3/' + infuraKey,
 });
-const providerBlastTestnet = new RpcProvider({
-  nodeUrl: 'https://starknet-testnet.blastapi.io/' + blastKey + '/rpc/v0_6',
+// Public Nethermind node rpc 0.7.0 for Sepolia Testnet (0_6 also available) :
+const providerSepoliaTestnetNethermindPublic = new RpcProvider({
+  nodeUrl: 'https://free-rpc.nethermind.io/sepolia-juno/v0_7',
 });
-// Alchemy node rpc for Sepolia Testnet:
-const providerSepoliaNethermindPublic = new RpcProvider({
-  nodeUrl: 'https://free-rpc.nethermind.io/sepolia-juno/v0_5',
-});
-const providerSepoliaNethermindPublic = new RpcProvider({
-  nodeUrl: 'https://free-rpc.nethermind.io/sepolia-juno/v0_6',
+// Public Blast node rpc 0.7.0 for Sepolia Testnet (0_6 also available) :
+const providerSepoliaTestnetBlastPublic = new RpcProvider({
+  nodeUrl: 'https://starknet-sepolia.public.blastapi.io/rpc/v0_7',
 });
 ```
 
@@ -166,14 +150,14 @@ const providerSepoliaNethermindPublic = new RpcProvider({
 For a local [Pathfinder](https://github.com/eqlabs/pathfinder) node:
 
 ```typescript
-const provider = new RpcProvider({ nodeUrl: '127.0.0.1:9545/rpc/v0_6' });
+const provider = new RpcProvider({ nodeUrl: '127.0.0.1:9545/rpc/v0_7' });
 ```
 
 Your node can be located in your local network (example: Pathfinder node running on a computer in your network, launched with this additional option: `--http-rpc 0.0.0.0:9545`).
 You can connect with:
 
 ```typescript
-const provider = new RpcProvider({ nodeUrl: '192.168.1.99:9545/rpc/v0_6' });
+const provider = new RpcProvider({ nodeUrl: '192.168.1.99:9545/rpc/v0_7' });
 ```
 
 ### Juno
@@ -181,7 +165,7 @@ const provider = new RpcProvider({ nodeUrl: '192.168.1.99:9545/rpc/v0_6' });
 For a local [Juno](https://github.com/NethermindEth/juno) node initialize the provider with:
 
 ```typescript
-const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:6060/v0_6' });
+const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:6060/v0_7' });
 ```
 
 > If Juno is running on a separate computer in your local network, don't forget to add the option `--http-host 0.0.0.0` when launching Juno.

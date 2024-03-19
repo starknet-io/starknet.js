@@ -87,7 +87,7 @@ export class Account extends Provider implements AccountInterface {
   }
 
   // provided version or contract based preferred transactionVersion
-  private getPreferredVersion(type12: ETransactionVersion, type3: ETransactionVersion) {
+  protected getPreferredVersion(type12: ETransactionVersion, type3: ETransactionVersion) {
     if (this.transactionVersion === ETransactionVersion.V3) return type3;
     if (this.transactionVersion === ETransactionVersion.V2) return type12;
 
@@ -98,7 +98,7 @@ export class Account extends Provider implements AccountInterface {
     return super.getNonceForAddress(this.address, blockIdentifier);
   }
 
-  private async getNonceSafe(nonce?: BigNumberish) {
+  protected async getNonceSafe(nonce?: BigNumberish) {
     // Patch DEPLOY_ACCOUNT: RPC getNonce for non-existing address will result in error, on Sequencer it is '0x0'
     try {
       return toBigInt(nonce ?? (await this.getNonce()));
@@ -565,7 +565,7 @@ export class Account extends Provider implements AccountInterface {
    * Support methods
    */
 
-  private async getUniversalSuggestedFee(
+  protected async getUniversalSuggestedFee(
     version: ETransactionVersion,
     { type, payload }: EstimateFeeAction,
     details: UniversalDetails
