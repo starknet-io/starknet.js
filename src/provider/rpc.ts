@@ -25,7 +25,7 @@ import {
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
-  GetTransactionReceiptResponseWoHelper,
+  GetTxReceiptResponseWithoutHelper,
 } from '../types';
 import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { isSierra } from '../utils/contract';
@@ -151,7 +151,7 @@ export class RpcProvider implements ProviderInterface {
 
   public async getTransactionReceipt(txHash: BigNumberish): Promise<GetTransactionReceiptResponse> {
     const txReceiptWoHelper = await this.channel.getTransactionReceipt(txHash);
-    const txReceiptWoHelperModified: GetTransactionReceiptResponseWoHelper =
+    const txReceiptWoHelperModified: GetTxReceiptResponseWithoutHelper =
       this.responseParser.parseTransactionReceipt(txReceiptWoHelper);
     return new ReceiptTx(txReceiptWoHelperModified) as GetTransactionReceiptResponse;
   }
@@ -191,7 +191,7 @@ export class RpcProvider implements ProviderInterface {
     const receiptWoHelper = (await this.channel.waitForTransaction(
       txHash,
       options
-    )) as GetTransactionReceiptResponseWoHelper;
+    )) as GetTxReceiptResponseWithoutHelper;
     return new ReceiptTx(receiptWoHelper) as GetTransactionReceiptResponse;
   }
 

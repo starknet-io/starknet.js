@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import {
-  GetTransactionReceiptResponseWoHelper,
+  GetTxReceiptResponseWithoutHelper,
   RejectedTransactionReceiptResponse,
   RevertedTransactionReceiptResponse,
   SuccessfulTransactionReceiptResponse,
@@ -36,7 +36,7 @@ export class ReceiptTx implements TransactionReceiptUtilityInterface {
 
   public readonly value: TransactionReceiptValue;
 
-  constructor(receipt: GetTransactionReceiptResponseWoHelper) {
+  constructor(receipt: GetTxReceiptResponseWithoutHelper) {
     [this.statusReceipt, this.value] = ReceiptTx.isSuccess(receipt)
       ? ['success', receipt]
       : ReceiptTx.isReverted(receipt)
@@ -84,7 +84,7 @@ export class ReceiptTx implements TransactionReceiptUtilityInterface {
   }
 
   static isSuccess(
-    transactionReceipt: GetTransactionReceiptResponseWoHelper
+    transactionReceipt: GetTxReceiptResponseWithoutHelper
   ): transactionReceipt is SuccessfulTransactionReceiptResponse {
     return (
       (transactionReceipt as SuccessfulTransactionReceiptResponse).execution_status ===
@@ -93,7 +93,7 @@ export class ReceiptTx implements TransactionReceiptUtilityInterface {
   }
 
   static isReverted(
-    transactionReceipt: GetTransactionReceiptResponseWoHelper
+    transactionReceipt: GetTxReceiptResponseWithoutHelper
   ): transactionReceipt is RevertedTransactionReceiptResponse {
     return (
       (transactionReceipt as RevertedTransactionReceiptResponse).execution_status ===
@@ -102,7 +102,7 @@ export class ReceiptTx implements TransactionReceiptUtilityInterface {
   }
 
   static isRejected(
-    transactionReceipt: GetTransactionReceiptResponseWoHelper
+    transactionReceipt: GetTxReceiptResponseWithoutHelper
   ): transactionReceipt is RejectedTransactionReceiptResponse {
     return (
       (transactionReceipt as RejectedTransactionReceiptResponse).status ===
@@ -111,4 +111,4 @@ export class ReceiptTx implements TransactionReceiptUtilityInterface {
   }
 }
 
-export type GetTransactionReceiptResponse = GetTransactionReceiptResponseWoHelper & ReceiptTx;
+export type GetTransactionReceiptResponse = GetTxReceiptResponseWithoutHelper & ReceiptTx;

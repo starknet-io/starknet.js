@@ -92,7 +92,7 @@ export type RejectedTransactionReceiptResponse = {
   };
 };
 
-export type GetTransactionReceiptResponseWoHelper =
+export type GetTxReceiptResponseWithoutHelper =
   | SuccessfulTransactionReceiptResponse
   | RevertedTransactionReceiptResponse
   | RejectedTransactionReceiptResponse;
