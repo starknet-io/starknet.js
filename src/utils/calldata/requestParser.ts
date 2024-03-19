@@ -9,6 +9,7 @@ import {
   Tupled,
 } from '../../types';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
+import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { encodeShortString, isText, splitLongString } from '../shortString';
 import { byteArrayFromString } from './byteArray';
 import {
@@ -41,6 +42,8 @@ function parseBaseTypes(type: string, val: BigNumberish) {
   switch (true) {
     case CairoUint256.isAbiType(type):
       return new CairoUint256(val).toApiRequest();
+    case CairoUint512.isAbiType(type):
+      return new CairoUint512(val).toApiRequest();
     case isTypeBytes31(type):
       return encodeShortString(val.toString());
     default:
@@ -125,7 +128,9 @@ function parseCalldataValue(
     if (CairoUint256.isAbiType(type)) {
       return new CairoUint256(element as any).toApiRequest();
     }
-
+    if (CairoUint512.isAbiType(type)) {
+      return new CairoUint512(element as any).toApiRequest();
+    }
     if (type === 'core::starknet::eth_address::EthAddress')
       return parseBaseTypes(type, element as BigNumberish);
 
@@ -150,6 +155,10 @@ function parseCalldataValue(
   // check if u256 C1v0
   if (CairoUint256.isAbiType(type)) {
     return new CairoUint256(element as any).toApiRequest();
+  }
+  // check if u512
+  if (CairoUint512.isAbiType(type)) {
+    return new CairoUint512(element as any).toApiRequest();
   }
   // check if Enum
   if (isTypeEnum(type, enums)) {
@@ -275,7 +284,10 @@ export function parseCalldataField(
     case type === 'core::starknet::eth_address::EthAddress':
       return parseBaseTypes(type, value);
     // Struct or Tuple
-    case isTypeStruct(type, structs) || isTypeTuple(type) || CairoUint256.isAbiType(type):
+    case isTypeStruct(type, structs) ||
+      isTypeTuple(type) ||
+      CairoUint256.isAbiType(type) ||
+      CairoUint256.isAbiType(type):
       return parseCalldataValue(value as ParsedStruct | BigNumberish[], type, structs, enums);
 
     // Enums

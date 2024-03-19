@@ -13,6 +13,7 @@ import {
 } from '../../types';
 import assert from '../assert';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
+import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { isHex, toBigInt } from '../num';
 import { isLongText } from '../shortString';
 import {
@@ -69,14 +70,24 @@ const validateUint = (parameter: any, input: AbiEntry) => {
     typeof parameter === 'string' ||
       typeof parameter === 'number' ||
       typeof parameter === 'bigint' ||
-      (typeof parameter === 'object' && 'low' in parameter && 'high' in parameter),
+      (typeof parameter === 'object' && 'low' in parameter && 'high' in parameter) ||
+      (typeof parameter === 'object' &&
+        ['limb0', 'limb1', 'limb2', 'limb3'].every((key) => key in parameter)),
     `Validate: arg ${input.name} of cairo type ${
       input.type
     } should be type (String, Number or BigInt), but is ${typeof parameter} ${parameter}.`
   );
-  const param =
-    typeof parameter === 'object' ? new CairoUint256(parameter).toBigInt() : toBigInt(parameter);
-
+  let param: bigint;
+  switch (input.type) {
+    case Uint.u256:
+      param = new CairoUint256(parameter).toBigInt();
+      break;
+    case Uint.u512:
+      param = new CairoUint512(parameter).toBigInt();
+      break;
+    default:
+      param = toBigInt(parameter);
+  }
   switch (input.type) {
     case Uint.u8:
       assert(
@@ -120,6 +131,10 @@ const validateUint = (parameter: any, input: AbiEntry) => {
       );
       break;
 
+    case Uint.u512:
+      assert(CairoUint512.is(param), `Validate: arg ${input.name} is ${input.type} 0 - 2^512-1`);
+      break;
+
     case Literal.ClassHash:
       assert(
         // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1670
@@ -148,8 +163,8 @@ const validateBool = (parameter: any, input: AbiEntry) => {
 };
 
 const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) => {
-  // c1v2 uint256 in struct
-  if (input.type === Uint.u256) {
+  // c1v2 uint256 or u512 in struct
+  if (input.type === Uint.u256 || input.type === Uint.u512) {
     validateUint(parameter, input);
     return;
   }
@@ -251,7 +266,7 @@ const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs, enu
       parameter.forEach((it: any) => validateEnum(it, { name: input.name, type: baseType }));
       break;
     case isTypeUint(baseType) || isTypeLiteral(baseType):
-      parameter.forEach((param: BigNumberish) => validateUint(param, input));
+      parameter.forEach((param: BigNumberish) => validateUint(param, { name: '', type: baseType }));
       break;
     case isTypeBool(baseType):
       parameter.forEach((param: BigNumberish) => validateBool(param, input));
