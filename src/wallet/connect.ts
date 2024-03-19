@@ -51,7 +51,7 @@ export function watchAsset(swo: StarknetWindowObject, asset: WatchAssetParameter
  * @returns boolean
  */
 export function addStarknetChain(swo: StarknetWindowObject, chain: AddStarknetChainParameters) {
-  // Can this set custom RPC endpoint ?
+  // TODO: This should set custom RPC endpoint ?
   return swo.request({
     type: 'wallet_addStarknetChain',
     params: chain,
