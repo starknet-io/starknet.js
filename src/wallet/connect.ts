@@ -12,7 +12,7 @@ import {
 } from './getst/main';
 
 /**
- * Request Permission for wallet account, return addresses that's allowed by user
+ * Request Permission for wallet account, return addresses that are allowed by user
  * @param silentMode false: request user interaction allowance. true: return only pre-allowed
  * @returns allowed accounts addresses
  */
