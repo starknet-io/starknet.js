@@ -184,5 +184,5 @@ export class WalletAccount extends Account implements AccountInterface {
     return signMessage(this.walletProvider, typedData);
   }
 
-  // MISSING ESTIMATES
+  // TODO: MISSING ESTIMATES
 }
