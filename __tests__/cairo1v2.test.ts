@@ -35,6 +35,8 @@ import {
   compiledC210Casm,
   compiledC240,
   compiledC240Casm,
+  compiledC260,
+  compiledC260Casm,
   compiledComplexSierra,
   compiledHelloSierra,
   compiledTuple,
@@ -1029,7 +1031,7 @@ describe('Cairo 1', () => {
       const callD2 = CallData.compile({ mess: message });
       expect(callD2).toEqual(expectedResult);
       const callD3 = CallData.compile({ mess: byteArray.byteArrayFromString('Take care.') });
-      expect(callD3).toEqual(['1', '0', '398475857363345939260718', '10']);
+      expect(callD3).toEqual(['0', '398475857363345939260718', '10']);
       const str1 = await stringContract.get_string();
       expect(str1).toBe(
         "Cairo has become the most popular language for developers + charizards !@#$%^&*_+|:'<>?~`"
@@ -1162,6 +1164,18 @@ describe('Cairo 1', () => {
           new CairoResult<BigNumberish, BigNumberish>(CairoResultVariant.Ok, 2000n)
         ),
       });
+    });
+  });
+
+  describe('Cairo2.6.0 Sierra1.5.0', () => {
+    test('declare Sierra 1.5.0', async () => {
+      const declare260Response = await account.declare({
+        contract: compiledC260,
+        casm: compiledC260Casm,
+      });
+      expect(declare260Response.class_hash).toBe(
+        '0x6184f1a71cad4bd123ff8bb3b97dc9ec876ced6489d9479cfdaada81a2f06d6'
+      );
     });
   });
 });

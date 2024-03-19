@@ -46,6 +46,8 @@ export const compiledC210 = readContractSierra('cairo/cairo210/cairo210.sierra')
 export const compiledC210Casm = readContractSierraCasm('cairo/cairo210/cairo210');
 export const compiledC240 = readContractSierra('cairo/cairo240/string.sierra');
 export const compiledC240Casm = readContractSierraCasm('cairo/cairo240/string');
+export const compiledC260 = readContractSierra('cairo/cairo260/hello260.sierra');
+export const compiledC260Casm = readContractSierraCasm('cairo/cairo260/hello260');
 export const compiledTuple = readContractSierra('cairo/cairo253/tupleResponse.sierra');
 export const compiledTupleCasm = readContractSierraCasm('cairo/cairo253/tupleResponse');
 // StarknetId

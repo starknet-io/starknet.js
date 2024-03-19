@@ -1,6 +1,8 @@
 import typedDataExample from '../__mocks__/typedData/baseExample.json';
 import {
   Account,
+  AllowArray,
+  Call,
   Contract,
   DeclareDeployUDCResponse,
   Provider,
@@ -87,17 +89,24 @@ describe('deploy and test Wallet', () => {
 
   test('estimateInvokeFee Cairo 0', async () => {
     const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
-    const result = await account.estimateInvokeFee({
+
+    const calls: AllowArray<Call> = {
       contractAddress: erc20Address,
       entrypoint: 'transfer',
       calldata: [erc20.address, '10', '0'],
-    });
+    };
 
+    let result = await account.estimateInvokeFee(calls, { skipValidate: true });
+    expect(result).toMatchSchemaRef('EstimateFee');
+    expect(innerInvokeEstFeeSpy).not.toHaveBeenCalled();
+    innerInvokeEstFeeSpy.mockClear();
+
+    result = await account.estimateInvokeFee(calls, { skipValidate: false });
     expect(result).toMatchSchemaRef('EstimateFee');
     expect([constants.TRANSACTION_VERSION.F1, constants.TRANSACTION_VERSION.F3]).toContain(
       innerInvokeEstFeeSpy.mock.calls[0][1].version
     );
-    innerInvokeEstFeeSpy.mockClear();
+    innerInvokeEstFeeSpy.mockRestore();
   });
 
   xtest('estimateDeclareFee Cairo 0 &  Cairo 1', async () => {

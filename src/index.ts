@@ -1,6 +1,7 @@
 /**
  * Main
  */
+export * from './wallet';
 export * from './account';
 export * from './contract';
 export * from './provider';
