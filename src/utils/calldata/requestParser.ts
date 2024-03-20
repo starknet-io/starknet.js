@@ -10,7 +10,7 @@ import {
 } from '../../types';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
-import { encodeShortString, isText, splitLongString } from '../shortString';
+import { encodeShortString, isString, isText, splitLongString } from '../shortString';
 import { byteArrayFromString } from './byteArray';
 import {
   felt,
@@ -275,7 +275,7 @@ export function parseCalldataField(
       if (!Array.isArray(value) && !isText(value)) {
         throw Error(`ABI expected parameter ${name} to be array or long string, got ${value}`);
       }
-      if (typeof value === 'string') {
+      if (isString(value)) {
         // long string match cairo felt*
         value = splitLongString(value);
       }

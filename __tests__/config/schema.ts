@@ -7,6 +7,7 @@ import libSchemas from '../schemas/lib.json';
 import providerSchemas from '../schemas/provider.json';
 import rpcSchemas from '../schemas/rpc.json';
 import sequencerSchemas from '../schemas/sequencer.json';
+import { isBigInt } from '../../src/utils/num';
 
 const matcherSchemas = [accountSchemas, libSchemas, providerSchemas, rpcSchemas, sequencerSchemas];
 const schemas = [...matcherSchemas, componentSchemas];
@@ -16,7 +17,7 @@ const jestJsonMatchers = matchersWithOptions({ schemas }, (ajv: any) => {
     keyword: 'isBigInt',
     type: 'object',
     validate: (_schema: any, data: any) => {
-      return typeof data === 'bigint' && data < 2n ** 64n && data >= 0n;
+      return isBigInt(data) && data < 2n ** 64n && data >= 0n;
     },
     errors: true,
   });

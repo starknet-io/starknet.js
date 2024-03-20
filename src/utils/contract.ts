@@ -11,10 +11,12 @@ import { computeCompiledClassHash, computeContractClassHash } from './hash';
 import { parse } from './json';
 import { decompressProgram } from './stark';
 
+import { isString } from './shortString';
+
 export function isSierra(
   contract: CairoContract | string
 ): contract is SierraContractClass | CompiledSierra {
-  const compiledContract = typeof contract === 'string' ? parse(contract) : contract;
+  const compiledContract = isString(contract) ? parse(contract) : contract;
   return 'sierra_program' in compiledContract;
 }
 

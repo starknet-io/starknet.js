@@ -22,7 +22,7 @@ import { starkCurve } from '../ec';
 import { addHexPrefix, utf8ToArray } from '../encode';
 import { parse, stringify } from '../json';
 import { toHex } from '../num';
-import { encodeShortString } from '../shortString';
+import { encodeShortString, isString } from '../shortString';
 
 export function computePedersenHash(a: BigNumberish, b: BigNumberish): string {
   return starkCurve.pedersen(BigInt(a), BigInt(b));
@@ -125,8 +125,9 @@ export default function computeHintedClassHash(compiledContract: LegacyCompiledC
  * @returns format: hex-string
  */
 export function computeLegacyContractClassHash(contract: LegacyCompiledContract | string) {
-  const compiledContract =
-    typeof contract === 'string' ? (parse(contract) as LegacyCompiledContract) : contract;
+  const compiledContract = isString(contract)
+    ? (parse(contract) as LegacyCompiledContract)
+    : contract;
 
   const apiVersion = toHex(API_VERSION);
 
@@ -287,7 +288,7 @@ export function computeSierraContractClassHash(sierra: CompiledSierra) {
  * @returns format: hex-string
  */
 export function computeContractClassHash(contract: CompiledContract | string) {
-  const compiledContract = typeof contract === 'string' ? parse(contract) : contract;
+  const compiledContract = isString(contract) ? parse(contract) : contract;
 
   if ('sierra_program' in compiledContract) {
     return computeSierraContractClassHash(compiledContract as CompiledSierra);
