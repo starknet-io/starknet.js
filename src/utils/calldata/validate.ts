@@ -13,8 +13,8 @@ import {
 } from '../../types';
 import assert from '../assert';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
-import { isHex, toBigInt } from '../num';
-import { isLongText } from '../shortString';
+import { isBigInt, isBoolean, isHex, isNumber, toBigInt } from '../num';
+import { isLongText, isString } from '../shortString';
 import {
   getArrayType,
   isLen,
@@ -34,10 +34,10 @@ import {
 
 const validateFelt = (parameter: any, input: AbiEntry) => {
   assert(
-    typeof parameter === 'string' || typeof parameter === 'number' || typeof parameter === 'bigint',
+    isString(parameter) || isNumber(parameter) || isBigInt(parameter),
     `Validate: arg ${input.name} should be a felt typed as (String, Number or BigInt)`
   );
-  if (typeof parameter === 'string' && !isHex(parameter)) return; // shortstring
+  if (isString(parameter) && !isHex(parameter)) return; // shortstring
   const param = BigInt(parameter.toString(10));
   assert(
     // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1266
@@ -47,7 +47,7 @@ const validateFelt = (parameter: any, input: AbiEntry) => {
 };
 
 const validateBytes31 = (parameter: any, input: AbiEntry) => {
-  assert(typeof parameter === 'string', `Validate: arg ${input.name} should be a string.`);
+  assert(isString(parameter), `Validate: arg ${input.name} should be a string.`);
   assert(
     parameter.length < 32,
     `Validate: arg ${input.name} cairo typed ${input.type} should be a string of less than 32 characters.`
@@ -55,20 +55,20 @@ const validateBytes31 = (parameter: any, input: AbiEntry) => {
 };
 
 const validateByteArray = (parameter: any, input: AbiEntry) => {
-  assert(typeof parameter === 'string', `Validate: arg ${input.name} should be a string.`);
+  assert(isString(parameter), `Validate: arg ${input.name} should be a string.`);
 };
 
 const validateUint = (parameter: any, input: AbiEntry) => {
-  if (typeof parameter === 'number') {
+  if (isNumber(parameter)) {
     assert(
       parameter <= Number.MAX_SAFE_INTEGER,
       `Validation: Parameter is to large to be typed as Number use (BigInt or String)`
     );
   }
   assert(
-    typeof parameter === 'string' ||
-      typeof parameter === 'number' ||
-      typeof parameter === 'bigint' ||
+    isString(parameter) ||
+      isNumber(parameter) ||
+      isBigInt(parameter) ||
       (typeof parameter === 'object' && 'low' in parameter && 'high' in parameter),
     `Validate: arg ${input.name} of cairo type ${
       input.type
@@ -142,7 +142,7 @@ const validateUint = (parameter: any, input: AbiEntry) => {
 
 const validateBool = (parameter: any, input: AbiEntry) => {
   assert(
-    typeof parameter === 'boolean',
+    isBoolean(parameter),
     `Validate: arg ${input.name} of cairo type ${input.type} should be type (Boolean)`
   );
 };
