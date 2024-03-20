@@ -25,10 +25,20 @@ export function isDecimalString(str: string): boolean {
 }
 
 /**
+ * Checks if a given value is a string.
+ *
+ * @param {unknown} value - The value to be checked.
+ * @return {boolean} - Returns true if the value is a string, false otherwise.
+ */
+export function isString(value: unknown): value is string {
+  return typeof value === 'string';
+}
+
+/**
  * Test if value is a free-from string text, and not a hex string or number string
  */
 export function isText(val: any) {
-  return typeof val === 'string' && !isHex(val) && !isStringWholeNumber(val);
+  return isString(val) && !isHex(val) && !isStringWholeNumber(val);
 }
 
 /**

@@ -17,7 +17,7 @@ import {
 } from './hash';
 import { MerkleTree } from './merkle';
 import { isHex, toHex } from './num';
-import { encodeShortString } from './shortString';
+import { encodeShortString, isString } from './shortString';
 
 /** @deprecated prefer importing from 'types' over 'typedData' */
 export * from '../types/typedData';
@@ -79,7 +79,7 @@ function getHex(value: BigNumberish): string {
   try {
     return toHex(value);
   } catch (e) {
-    if (typeof value === 'string') {
+    if (isString(value)) {
       return toHex(encodeShortString(value));
     }
     throw new Error(`Invalid BigNumberish: ${value}`);

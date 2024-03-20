@@ -18,8 +18,10 @@ import {
   addPercent,
   bigNumberishArrayToDecimalStringArray,
   bigNumberishArrayToHexadecimalStringArray,
+  isBigInt,
   toHex,
 } from './num';
+import { isString } from './shortString';
 
 /**
  * Compress compiled Cairo program
@@ -28,7 +30,7 @@ import {
  * @param jsonProgram Representing the compiled cairo program
  */
 export function compressProgram(jsonProgram: Program | string): CompressedProgram {
-  const stringified = typeof jsonProgram === 'string' ? jsonProgram : stringify(jsonProgram);
+  const stringified = isString(jsonProgram) ? jsonProgram : stringify(jsonProgram);
   const compressedProgram = gzip(stringified);
   return btoaUniversal(compressedProgram);
 }
@@ -107,7 +109,7 @@ export function estimateFeeToBounds(
   amountOverhead: number = feeMarginPercentage.L1_BOUND_MAX_AMOUNT,
   priceOverhead: number = feeMarginPercentage.L1_BOUND_MAX_PRICE_PER_UNIT
 ): ResourceBounds {
-  if (typeof estimate === 'bigint') {
+  if (isBigInt(estimate)) {
     return {
       l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
       l1_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
