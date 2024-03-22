@@ -96,7 +96,7 @@ const a3: Uint256 = { low: a1.low, high: a1.high };
 
 ### u512
 
-Starknet is waiting for 4 u128, the first one has the lowest wight.  
+Starknet is waiting for 4 u128, the first one has the lowest weight.  
 You can send to Starknet.js methods: bigNumberish or Uint512 object.
 
 ```typescript
