@@ -1,5 +1,6 @@
 import { AbiEntry, AbiEnums, AbiStructs, CairoEnum, RawArgsObject } from '../../types';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
+import { CairoUint512 } from '../cairoDataTypes/uint512';
 import {
   getArrayType,
   isCairo1Type,
@@ -29,6 +30,13 @@ function errorU256(key: string) {
     `Your object includes the property : ${key}, containing an Uint256 object without the 'low' and 'high' keys.`
   );
 }
+
+function errorU512(key: string) {
+  return Error(
+    `Your object includes the property : ${key}, containing an Uint512 object without the 'limb0' to 'limb3' keys.`
+  );
+}
+
 export default function orderPropsByAbi(
   unorderedObject: RawArgsObject,
   abiOfObject: AbiEntry[],
@@ -63,6 +71,17 @@ export default function orderPropsByAbi(
         throw errorU256(abiType);
       }
       return { low: u256.low, high: u256.high };
+    }
+    if (CairoUint512.isAbiType(abiType)) {
+      const u512 = unorderedItem;
+      if (typeof u512 !== 'object') {
+        // BigNumberish --> just copy
+        return u512;
+      }
+      if (!['limb0', 'limb1', 'limb2', 'limb3'].every((key) => key in u512)) {
+        throw errorU512(abiType);
+      }
+      return { limb0: u512.limb0, limb1: u512.limb1, limb2: u512.limb2, limb3: u512.limb3 };
     }
     if (isTypeStruct(abiType, structs)) {
       const abiOfStruct = structs[abiType].members;

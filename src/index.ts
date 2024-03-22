@@ -34,6 +34,8 @@ export * as starknetId from './utils/starknetId';
 export * as provider from './utils/provider';
 export * as selector from './utils/selector';
 export * as events from './utils/events/index';
+export * from './utils/cairoDataTypes/uint256';
+export * from './utils/cairoDataTypes/uint512';
 export * from './utils/address';
 export * from './utils/url';
 export * from './utils/calldata';
