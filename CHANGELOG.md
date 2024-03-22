@@ -1,3 +1,19 @@
+# [6.6.0](https://github.com/starknet-io/starknet.js/compare/v6.5.0...v6.6.0) (2024-03-19)
+
+### Bug Fixes
+
+- second option bump semantic release to 0.5 ([c90f9b2](https://github.com/starknet-io/starknet.js/commit/c90f9b285afb455d2404bff67137d5e6ae44cd5f))
+- test ci fix ([3a6c924](https://github.com/starknet-io/starknet.js/commit/3a6c9247717cb979842d9b37905ae423267959a5))
+- update to latest get-starknet dev ([017702f](https://github.com/starknet-io/starknet.js/commit/017702fd8c579ab62c98bc78fd6e8dd3022ef9ec))
+- wallet circular dependency fix ([621ae2d](https://github.com/starknet-io/starknet.js/commit/621ae2d4a015f3bb3b2e63ddbaeb5fa843509a88))
+
+### Features
+
+- get-starknet-core repacked for mjs, and initial implementation ([ab7fa19](https://github.com/starknet-io/starknet.js/commit/ab7fa19f44ad1fc27292313589247b74943fe3d0))
+- the WalletAccount handle changed channel ([73603e1](https://github.com/starknet-io/starknet.js/commit/73603e175bcc7925aa896be81fb666ffb225890d))
+- wallet deploy contract and patches ([dbf53b6](https://github.com/starknet-io/starknet.js/commit/dbf53b6e57948e433186cae6209998dece04fe4a))
+- walletAccount extract methods and update new ones ([0dfb5db](https://github.com/starknet-io/starknet.js/commit/0dfb5db1032dd7c946ee514647e8abb3eda87996))
+
 # [6.5.0](https://github.com/starknet-io/starknet.js/compare/v6.4.2...v6.5.0) (2024-03-14)
 
 ### Bug Fixes

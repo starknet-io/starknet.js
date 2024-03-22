@@ -19,6 +19,7 @@ import {
 import { toBigInt } from '../num';
 import { estimateFeeToBounds, estimatedFeeToMaxFee } from '../stark';
 import { ResponseParser } from '.';
+import { isString } from '../shortString';
 
 export class RPCResponseParser
   implements
@@ -57,7 +58,7 @@ export class RPCResponseParser
   public parseTransactionReceipt(res: TransactionReceipt): GetTransactionReceiptResponse {
     // HOTFIX RPC 0.5 to align with RPC 0.6
     // This case is RPC 0.5. It can be only v2 thx with FRI units
-    if ('actual_fee' in res && typeof res.actual_fee === 'string') {
+    if ('actual_fee' in res && isString(res.actual_fee)) {
       return {
         ...(res as GetTransactionReceiptResponse),
         actual_fee: {
@@ -113,7 +114,7 @@ export class RPCResponseParser
   public parseContractClassResponse(res: ContractClassPayload): ContractClassResponse {
     return {
       ...(res as ContractClassResponse),
-      abi: typeof res.abi === 'string' ? JSON.parse(res.abi) : res.abi,
+      abi: isString(res.abi) ? JSON.parse(res.abi) : res.abi,
     };
   }
 }
