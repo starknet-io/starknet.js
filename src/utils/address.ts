@@ -41,6 +41,14 @@ export function getChecksumAddress(address: BigNumberish): string {
   return addHexPrefix(chars.join(''));
 }
 
+/**
+ * If the casing of an address is mixed, it is a Checksum Address, which uses a specific pattern of uppercase and lowercase letters within
+ * a given address to reduce the risk of errors introduced from typing an address or cut and paste issues.
+ *
+ * @param address string
+ *
+ * @returns true if the ChecksumAddress is valid
+ */
 export function validateChecksumAddress(address: string): boolean {
   return getChecksumAddress(address) === address;
 }
