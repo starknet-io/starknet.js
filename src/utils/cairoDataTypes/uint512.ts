@@ -25,7 +25,7 @@ export class CairoUint512 {
 
   /**
    * Default constructor (Lib usage)
-   * @param bigNumberish BigNumberish value representing uin256
+   * @param bigNumberish BigNumberish value representing u512
    */
   public constructor(bigNumberish: BigNumberish);
   /**
