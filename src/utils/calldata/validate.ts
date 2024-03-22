@@ -70,7 +70,7 @@ const validateUint = (parameter: any, input: AbiEntry) => {
     isString(parameter) ||
       isNumber(parameter) ||
       isBigInt(parameter) ||
-      (typeof parameter === 'object' && 'low' in parameter && 'high' in parameter), ||
+      (typeof parameter === 'object' && 'low' in parameter && 'high' in parameter) ||
       (typeof parameter === 'object' &&
         ['limb0', 'limb1', 'limb2', 'limb3'].every((key) => key in parameter)),
     `Validate: arg ${input.name} of cairo type ${
