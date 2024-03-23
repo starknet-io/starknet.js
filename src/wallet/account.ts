@@ -115,7 +115,10 @@ export class WalletAccount extends Account implements AccountInterface {
   }
 
   /**
-   * ACCOUNT METHODS
+   * Executes a batch of calls on a smart contract.
+   *
+   * @param {AllowArray<Call>} calls - The array of calls to execute on the smart contract.
+   * @returns - A promise that resolves with the result of the execution.
    */
   override execute(calls: AllowArray<Call>) {
     const txCalls = [].concat(calls as any).map((it) => {
@@ -134,6 +137,13 @@ export class WalletAccount extends Account implements AccountInterface {
     return addInvokeTransaction(this.walletProvider, params);
   }
 
+  /**
+   * Overrides the declare method.
+   *
+   * @param {DeclareContractPayload} payload - The payload for declaring a contract.
+   * @return {Promise<Transaction>} - A promise that resolves with the transaction object.
+   * @throws {Error} - Throws an error if compiledClassHash is missing.
+   */
   override declare(payload: DeclareContractPayload) {
     const declareContractPayload = extractContractHashes(payload);
 
@@ -157,6 +167,12 @@ export class WalletAccount extends Account implements AccountInterface {
     return addDeclareTransaction(this.walletProvider, params);
   }
 
+  /**
+   * Deploys a contract or multiple contracts using the UniversalDeployer.
+   *
+   * @param {UniversalDeployerContractPayload | UniversalDeployerContractPayload[]} payload - The contract payload(s) to be deployed.
+   * @return {Promise<MultiDeployContractResponse>} - The response object containing the result of the deployment.
+   */
   override async deploy(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[]
   ): Promise<MultiDeployContractResponse> {
@@ -169,6 +185,16 @@ export class WalletAccount extends Account implements AccountInterface {
     };
   }
 
+  /**
+   * Deploys an account for a contract.
+   *
+   * @param {DeployAccountContractPayload} payload - The payload containing the necessary data for deployment.
+   * @param {string} payload.addressSalt - Optional. The address salt for the contract. Defaults to '0'.
+   * @param {string} payload.constructorCalldata - The constructor calldata for the contract.
+   * @param {string} payload.classHash - The class hash of the contract.
+   *
+   * @return - A promise that resolves when the account deployment is complete.
+   */
   override deployAccount(payload: DeployAccountContractPayload) {
     const params = {
       contract_address_salt: payload.addressSalt?.toString() || '0',
@@ -181,6 +207,12 @@ export class WalletAccount extends Account implements AccountInterface {
     return addDeployAccountTransaction(this.walletProvider, params);
   }
 
+  /**
+   * Signs the given message using the wallet provider.
+   *
+   * @param {TypedData} typedData - The typed data to be signed.
+   * @return - A promise that resolves with the signed message.
+   */
   override signMessage(typedData: TypedData) {
     return signMessage(this.walletProvider, typedData);
   }

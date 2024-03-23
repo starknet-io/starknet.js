@@ -18,6 +18,13 @@ import {
 import type { ProviderInterface } from '..';
 
 export class StarknetId {
+  /**
+   * Retrieves the Stark name associated with a specific address.
+   *
+   * @param {BigNumberish} address - The address to query the Stark name for.
+   * @param {string} [StarknetIdContract] - The Starknet ID contract address. Optional.
+   * @returns {Promise<string>} - A Promise that resolves to the Stark name associated with the address.
+   */
   async getStarkName(address: BigNumberish, StarknetIdContract?: string) {
     return StarknetId.getStarkName(
       // After Mixin, this is ProviderInterface
@@ -27,6 +34,14 @@ export class StarknetId {
     );
   }
 
+  /**
+   * Retrieves the address associated with a given Stark name.
+   *
+   * @param {string} name - The Stark name.
+   * @param {string} [StarknetIdContract] - The contract address of the StarknetId smart contract.
+   *
+   * @returns {Promise<string>} - The address associated with the Stark name.
+   */
   public async getAddressFromStarkName(name: string, StarknetIdContract?: string): Promise<string> {
     return StarknetId.getAddressFromStarkName(
       // After Mixin, this is ProviderInterface
@@ -36,6 +51,18 @@ export class StarknetId {
     );
   }
 
+  /**
+   * Retrieves the Stark profile for a given address.
+   *
+   * @param {BigNumberish} address - The address for which to retrieve the Stark profile.
+   * @param {string} [StarknetIdContract] - The address of the StarknetId contract.
+   * @param {string} [StarknetIdIdentityContract] - The address of the StarknetIdIdentity contract.
+   * @param {string} [StarknetIdVerifierContract] - The address of the StarknetIdVerifier contract.
+   * @param {string} [StarknetIdPfpContract] - The address of the StarknetIdPfp contract.
+   * @param {string} [StarknetIdPopContract] - The address of the StarknetIdPop contract.
+   * @param {string} [StarknetIdMulticallContract] - The address of the StarknetIdMulticall contract.
+   * @returns {Promise<StarkProfile>} A Promise that resolves to the Stark profile.
+   */
   async getStarkProfile(
     address: BigNumberish,
     StarknetIdContract?: string,
@@ -58,6 +85,15 @@ export class StarknetId {
     );
   }
 
+  /**
+   * Retrieves the Starkname associated with a given Ethereum address.
+   *
+   * @param {ProviderInterface} provider - The provider interface.
+   * @param {BigNumberish} address - The Ethereum address.
+   * @param {string} [StarknetIdContract] - The address of the Starknet Id contract. If not provided, it will be derived based on the chainId.
+   * @returns {Promise<string>} - The Starkname associated with the given Ethereum address.
+   * @throws {Error} - If the Starkname is not found or if an error occurred while retrieving the Starkname.
+   */
   static async getStarkName(
     provider: ProviderInterface,
     address: BigNumberish,
@@ -91,6 +127,15 @@ export class StarknetId {
     }
   }
 
+  /**
+   * Retrieves the address associated with a Stark name.
+   *
+   * @param {ProviderInterface} provider - The provider to use for interacting with the blockchain.
+   * @param {string} name - The Stark name to retrieve the address for.
+   * @param {string} [StarknetIdContract] - The address of the StarknetId contract. If not provided, it will be retrieved based on the chain Id.
+   * @returns {Promise<string>} - The address associated with the Stark name.
+   * @throws {Error} - If the address cannot be retrieved.
+   */
   static async getAddressFromStarkName(
     provider: ProviderInterface,
     name: string,
@@ -117,6 +162,20 @@ export class StarknetId {
     }
   }
 
+  /**
+   * Retrieves the Stark Profile of a user using their Ethereum address.
+   *
+   * @param {ProviderInterface} provider - The provider interface used to communicate with the blockchain.
+   * @param {BigNumberish} address - The Ethereum address of the user.
+   * @param {string} [StarknetIdContract] - The contract address of the Starknet ID contract.
+   * @param {string} [StarknetIdIdentityContract] - The contract address of the Starknet ID Identity contract.
+   * @param {string} [StarknetIdVerifierContract] - The contract address of the Starknet ID Verifier contract.
+   * @param {string} [StarknetIdPfpContract] - The contract address of the Starknet ID Pfp contract.
+   * @param {string} [StarknetIdPopContract] - The contract address of the Starknet ID Proof-of-Personhood contract.
+   * @param {string} [StarknetIdMulticallContract] - The contract address of the Starknet ID Multicall contract.
+   * @returns {Promise<StarkProfile>} - The Stark Profile of the user, including their name, social media accounts, proof-of-personhood status, and profile picture.
+   * @throws {Error} - If there was an error while retrieving the Stark Profile.
+   */
   static async getStarkProfile(
     provider: ProviderInterface,
     address: BigNumberish,

@@ -26,6 +26,11 @@ import extractTupleMemberTypes from './tuple';
 
 import { isString } from '../shortString';
 
+/**
+ * Creates a new Error object indicating that the provided key in the object includes an Uint256 object without the 'low' and 'high' keys.
+ * @param {string} key - The key indicating the property in the object.
+ * @return - The Error object indicating the missing 'low' and 'high' keys.
+ */
 function errorU256(key: string) {
   return Error(
     `Your object includes the property : ${key}, containing an Uint256 object without the 'low' and 'high' keys.`
@@ -44,6 +49,13 @@ export default function orderPropsByAbi(
   structs: AbiStructs,
   enums: AbiEnums
 ): object {
+  /**
+   * Orders an input item based on its ABI type.
+   *
+   * @param {any} unorderedItem - The unordered item to be ordered.
+   * @param {string} abiType - The ABI type of the item.
+   * @returns - The ordered item.
+   */
   const orderInput = (unorderedItem: any, abiType: string): any => {
     if (isTypeArray(abiType)) {
       return orderArray(unorderedItem, abiType);
@@ -96,6 +108,14 @@ export default function orderPropsByAbi(
     return unorderedItem;
   };
 
+  /**
+   * Orders the properties of the input object based on the given ABI entries.
+   *
+   * @param {object} unorderedObject2 - The input object whose properties need to be ordered.
+   * @param {Array<object>} abiObject - An array of ABI entries representing the desired order of properties.
+   * @returns - The ordered object with properties based on the given ABI entries.
+   * @throws {Error} If the input object is missing a required property or if a property has an invalid value.
+   */
   const orderStruct = (unorderedObject2: RawArgsObject, abiObject: AbiEntry[]): object => {
     const orderedObject2 = abiObject.reduce((orderedObject, abiParam) => {
       const setProperty = (value?: any) =>
@@ -115,6 +135,14 @@ export default function orderPropsByAbi(
     return orderedObject2;
   };
 
+  /**
+   * Orders the elements in the array according to the given ABI parameter.
+   *
+   * @param {Array<any> | string} myArray - The array to be ordered. Can be either an array of any type or a string.
+   * @param {string} abiParam - The ABI parameter used to determine the order of the elements.
+   *
+   * @return - The ordered array or the input string if it is not an array.
+   */
   function orderArray(myArray: Array<any> | string, abiParam: string): Array<any> | string {
     const typeInArray = getArrayType(abiParam);
     if (isString(myArray)) {
@@ -123,6 +151,13 @@ export default function orderPropsByAbi(
     return myArray.map((myElem) => orderInput(myElem, typeInArray));
   }
 
+  /**
+   * Orders the properties of the input object based on the provided ABI parameter.
+   *
+   * @param {object} unorderedObject2 - The input object with unordered properties.
+   * @param {string} abiParam - The ABI parameter for ordering the properties.
+   * @return - The ordered object with properties arranged according to ABI parameter.
+   */
   function orderTuple(unorderedObject2: RawArgsObject, abiParam: string): object {
     const typeList = extractTupleMemberTypes(abiParam);
     const orderedObject2 = typeList.reduce((orderedObject: object, abiTypeCairoX: any, index) => {
@@ -139,6 +174,12 @@ export default function orderPropsByAbi(
     return orderedObject2;
   }
 
+  /**
+   * Applies a specific order to the given unordered object based on the provided ABI entry.
+   * @param {CairoEnum} unorderedObject2 - The unordered object.
+   * @param {AbiEntry} abiObject - The ABI entry.
+   * @returns {CairoEnum} The ordered object.
+   */
   const orderEnum = (unorderedObject2: CairoEnum, abiObject: AbiEntry): CairoEnum => {
     if (isTypeResult(abiObject.name)) {
       const unorderedResult = unorderedObject2 as CairoResult<any, any>;

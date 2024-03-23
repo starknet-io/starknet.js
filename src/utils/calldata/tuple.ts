@@ -1,12 +1,26 @@
 /* eslint-disable no-plusplus */
 import { isCairo1Type, isTypeNamedTuple } from './cairo';
 
+/**
+ * Parses a named tuple.
+ *
+ * @param {string} namedTuple - The named tuple to parse in the format "name:type".
+ * @returns - The parsed named tuple as an object with properties "name" and "type".
+ */
 function parseNamedTuple(namedTuple: string): any {
   const name = namedTuple.substring(0, namedTuple.indexOf(':'));
   const type = namedTuple.substring(name.length + ':'.length);
   return { name, type };
 }
 
+/**
+ * Parses and extracts sub-tuples from a given string.
+ *
+ * @param {string} s - The input string to parse.
+ * @return - An object containing the sub-tuples and the remaining string.
+ *   - subTuple: {Array} - An array of strings representing the extracted sub-tuples.
+ *   - result: {string} - The remaining string after extracting the sub-tuples.
+ */
 function parseSubTuple(s: string) {
   if (!s.includes('(')) return { subTuple: [], result: s };
   const subTuple: string[] = [];
@@ -37,6 +51,12 @@ function parseSubTuple(s: string) {
   };
 }
 
+/**
+ * Extracts tuples from a given type.
+ *
+ * @param {string} type - The type containing tuples.
+ * @returns {string[]} - An array of extracted tuples.
+ */
 function extractCairo0Tuple(type: string) {
   const cleanType = type.replace(/\s/g, '').slice(1, -1); // remove first lvl () and spaces
 
@@ -58,6 +78,14 @@ function extractCairo0Tuple(type: string) {
   return recomposed;
 }
 
+/**
+ * Finds the offset at which a closure ends in a given input string.
+ *
+ * @param {string} input - The input string.
+ * @param {string} open - The opening closure character.
+ * @param {string} close - The closing closure character.
+ * @return {number} - The offset at which the closure ends, or Number.POSITIVE_INFINITY if no closure is found.
+ */
 function getClosureOffset(input: string, open: string, close: string): number {
   for (let i = 0, counter = 0; i < input.length; i++) {
     if (input[i] === open) {
@@ -69,6 +97,12 @@ function getClosureOffset(input: string, open: string, close: string): number {
   return Number.POSITIVE_INFINITY;
 }
 
+/**
+ * Extracts individual elements from a tuple string.
+ *
+ * @param {string} type - The tuple string to extract elements from.
+ * @returns {string[]} - An array containing the individual elements of the tuple string.
+ */
 function extractCairo1Tuple(type: string): string[] {
   // un-named tuples support
   const input = type.slice(1, -1); // remove first lvl ()

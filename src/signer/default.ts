@@ -135,6 +135,12 @@ export class Signer implements SignerInterface {
     return this.signRaw(msgHash as string);
   }
 
+  /**
+   * Signs a raw message hash using the `starkCurve` and the provided private key.
+   *
+   * @param {string} msgHash - The raw message hash to sign.
+   * @returns {Promise<Signature>} - A Promise that resolves to the generated signature.
+   */
   protected async signRaw(msgHash: string): Promise<Signature> {
     return starkCurve.sign(msgHash, this.pk);
   }
