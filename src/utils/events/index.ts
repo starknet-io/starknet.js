@@ -14,6 +14,12 @@ import responseParser from '../calldata/responseParser';
 import { starkCurve } from '../ec';
 import { addHexPrefix, utf8ToArray } from '../encode';
 
+/**
+ * Retrieves the events from the given ABI.
+ *
+ * @param {Abi} abi - The ABI to extract events from.
+ * @return {AbiEvents} - An object containing the extracted events.
+ */
 export function getAbiEvents(abi: Abi): AbiEvents {
   return abi
     .filter((abiEntry) => abiEntry.type === 'event' && (abiEntry.size || abiEntry.kind !== 'enum'))
@@ -33,6 +39,7 @@ export function getAbiEvents(abi: Abi): AbiEvents {
  * @param providerReceivedEvents ProviderEvent[] - Array of raw events
  * @param abiEvents AbiEvents - Events defined in the abi
  * @param abiStructs AbiStructs - Structs defined in the abi
+ * @param abiEnums
  * @return ParsedEvents - parsed events corresponding to the abi
  */
 export function parseEvents(

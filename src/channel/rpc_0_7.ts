@@ -69,10 +69,26 @@ export class RpcChannel {
     this.requestId = 0;
   }
 
-  public setChainId(chainId: StarknetChainId) {
+  /**
+   * Sets the chain ID for the Starknet.
+   *
+   * @param {StarknetChainId} chainId - The chain ID to be set.
+   *
+   * @return {void}
+   */
+  public setChainId(chainId: StarknetChainId): void {
     this.chainId = chainId;
   }
 
+  /**
+   * Sends a JSON-RPC request to the specified method with optional parameters and ID.
+   *
+   * @param {string} method - The name of the method to call.
+   * @param {object} [params] - Optional parameters to pass to the method.
+   * @param {string|number} [id=0] - Optional ID to associate with the request.
+   *
+   * @returns - A promise that resolves to the response from the server.
+   */
   public fetch(method: string, params?: object, id: string | number = 0) {
     const rpcRequestBody: JRPC.RequestBody = {
       id,
@@ -87,6 +103,18 @@ export class RpcChannel {
     });
   }
 
+  /**
+   * Handles errors in library methods execution.
+   *
+   * @param {string} method - The name of the method that caused the error.
+   * @param {any} params - The parameters passed to the method.
+   * @param {JRPC.Error} [rpcError] - The JSON-RPC error object, if applicable.
+   * @param {any} [otherError] - Any other error object encountered.
+   *
+   * @throws {LibraryError} - If an RPC error occurs.
+   * @throws {LibraryError} - If the "otherError" parameter is an instance of LibraryError.
+   * @throws {Error} - If any other error occurs.
+   */
   protected errorHandler(method: string, params: any, rpcError?: JRPC.Error, otherError?: any) {
     if (rpcError) {
       const { code, message, data } = rpcError;
@@ -103,6 +131,14 @@ export class RpcChannel {
     }
   }
 
+  /**
+   * Fetches an endpoint using the specified method and parameters.
+   *
+   * @param {string} method - The name of the method to be called.
+   * @param {object} [params] - The parameters to be passed to the method.
+   * @returns {Promise} - A promise that resolves to the result of the method call.
+   * @throws {Error} - If an error occurs during the method call.
+   */
   protected async fetchEndpoint<T extends keyof RPC.Methods>(
     method: T,
     params?: RPC.Methods[T]['params']
@@ -118,16 +154,34 @@ export class RpcChannel {
     }
   }
 
-  public async getChainId() {
+  /**
+   * Fetches the chainId from the Starknet API endpoint if not already fetched,
+   * and returns the fetched chainId.
+   *
+   * @returns - The fetched chainId from the Starknet API.
+   */
+  public async ΩgetChainId(): Promise<StarknetChainId> {
     this.chainId ??= (await this.fetchEndpoint('starknet_chainId')) as StarknetChainId;
     return this.chainId;
   }
 
+  /**
+   * Retrieves the specification version of the Starknet chain.
+   *
+   * @returns  - The speck version of the Starknet chain.
+   */
   public async getSpecVersion() {
     this.speckVersion ??= (await this.fetchEndpoint('starknet_specVersion')) as StarknetChainId;
     return this.speckVersion;
   }
 
+  /**
+   * Retrieves the nonce for a given contract address.
+   *
+   * @param {BigNumberish} contractAddress - The address of the contract.
+   * @param {BlockIdentifier} [blockIdentifier=this.blockIdentifier] - The block identifier (default: current block).
+   * @returns - A Promise that resolves with the nonce of the contract.
+   */
   public getNonceForAddress(
     contractAddress: BigNumberish,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
@@ -156,36 +210,81 @@ export class RpcChannel {
     return this.fetchEndpoint('starknet_blockNumber');
   }
 
+  /**
+   * Retrieves a block with transaction hashes from the StarkNet blockchain.
+   *
+   * @param {BlockIdentifier} [blockIdentifier=this.blockIdentifier] - The identifier of the block to retrieve.
+   * @returns - A Promise that resolves with the block object containing transaction hashes.
+   */
   public getBlockWithTxHashes(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getBlockWithTxHashes', { block_id });
   }
 
+  /**
+   * Retrieves the block with transactions identified by the given block identifier.
+   *
+   * @param {BlockIdentifier} [blockIdentifier=this.blockIdentifier] - The identifier of the block to retrieve.
+   * @return - A Promise that resolves to the block with transactions.
+   */
   public getBlockWithTxs(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getBlockWithTxs', { block_id });
   }
 
+  /**
+   * Fetches the block with receipts for the given block identifier.
+   *
+   * @param {BlockIdentifier} blockIdentifier - The identifier of the block. Defaults to this.blockIdentifier.
+   *
+   * @return - A promise that resolves with the block along with its receipts.
+   */
   public getBlockWithReceipts(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getBlockWithReceipts', { block_id });
   }
 
+  /**
+   * Retrieves the state update for a given block.
+   *
+   * @param {BlockIdentifier} [blockIdentifier=this.blockIdentifier] - The identifier of the block. Defaults to the
+   *                                                                 previously set block identifier.
+   * @returns - A Promise that resolves with the state update object.
+   */
   public getBlockStateUpdate(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getStateUpdate', { block_id });
   }
 
+  /**
+   * Retrieves the transaction traces for the given block identifier.
+   *
+   * @param {BlockIdentifier} [blockIdentifier=this.blockIdentifier] - The identifier of the block. Defaults to the current block identifier.
+   *
+   * @return - A promise that resolves to an array of transaction traces for the block.
+   */
   public getBlockTransactionsTraces(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_traceBlockTransactions', { block_id });
   }
 
+  /**
+   * Retrieves the number of transactions in a block.
+   *
+   * @param {BlockIdentifier} [blockIdentifier=this.blockIdentifier] - The identifier of the block.
+   * @return - A promise that resolves to the number of transactions in the block.
+   */
   public getBlockTransactionCount(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getBlockTransactionCount', { block_id });
   }
 
+  /**
+   * Retrieves transaction information by hash.
+   *
+   * @param {BigNumberish} txHash - The hash of the transaction to retrieve.
+   * @return - A promise that resolves to the transaction details.
+   */
   public getTransactionByHash(txHash: BigNumberish) {
     const transaction_hash = toHex(txHash);
     return this.fetchEndpoint('starknet_getTransactionByHash', {
@@ -193,16 +292,35 @@ export class RpcChannel {
     });
   }
 
+  /**
+   * Returns the transaction at a specific index in a block identified by its ID.
+   *
+   * @param {BlockIdentifier} blockIdentifier - The identifier of the block.
+   * @param {number} index - The index of the transaction in the block.
+   * @return - A promise that resolves with the transaction data.
+   */
   public getTransactionByBlockIdAndIndex(blockIdentifier: BlockIdentifier, index: number) {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getTransactionByBlockIdAndIndex', { block_id, index });
   }
 
+  /**
+   * Retrieves the transaction receipt for a given transaction hash.
+   *
+   * @param {BigNumberish} txHash - The transaction hash to retrieve the receipt for.
+   * @return - A promise that resolves to the transaction receipt object.
+   */
   public getTransactionReceipt(txHash: BigNumberish) {
     const transaction_hash = toHex(txHash);
     return this.fetchEndpoint('starknet_getTransactionReceipt', { transaction_hash });
   }
 
+  /**
+   * Retrieves the transaction trace for a given transaction hash.
+   *
+   * @param {BigNumberish} txHash - The transaction hash to retrieve the trace for.
+   * @return - A promise that resolves with the transaction trace object.
+   */
   public getTransactionTrace(txHash: BigNumberish) {
     const transaction_hash = toHex(txHash);
     return this.fetchEndpoint('starknet_traceTransaction', { transaction_hash });
@@ -243,6 +361,19 @@ export class RpcChannel {
     });
   }
 
+  /**
+   * Waits for a transaction to be confirmed on the blockchain.
+   *
+   * @param {BigNumberish} txHash - The transaction hash.
+   * @param {waitForTransactionOptions} [options] - Optional parameters.
+   * @param {number} [options.retryInterval=5000] - The interval in milliseconds between each retry.
+   * @param {Array<RPC.TransactionStatus>} [options.errorStates] - The list of error states to consider.
+   * @param {Array<RPC.TransactionStatus>} [options.successStates] - The list of success states to consider.
+   *
+   * @throws {Error} - Throws an error if the transaction status cannot be obtained or if it reaches the maximum number of retries.
+   *
+   * @returns - The transaction receipt.
+   */
   public async waitForTransaction(txHash: BigNumberish, options?: waitForTransactionOptions) {
     const transactionHash = toHex(txHash);
     let { retries } = this;
@@ -325,6 +456,14 @@ export class RpcChannel {
     return txReceipt as RPC.SPEC.TXN_RECEIPT;
   }
 
+  /**
+   * Retrieves the storage value at a specific key in a smart contract.
+   *
+   * @param {BigNumberish} contractAddress - The address of the smart contract.
+   * @param {BigNumberish} key - The key for the desired storage value.
+   * @param {BlockIdentifier} [blockIdentifier=this.blockIdentifier] - The block identifier to retrieve storage from (optional, defaults to this.blockIdentifier).
+   * @return - A promise that resolves with the storage value at the specified key.
+   */
   public getStorageAt(
     contractAddress: BigNumberish,
     key: BigNumberish,
@@ -340,6 +479,14 @@ export class RpcChannel {
     });
   }
 
+  /**
+   * Retrieves the class hash of a contract at a specific block.
+   *
+   * @param {BigNumberish} contractAddress - The address of the contract.
+   * @param {BlockIdentifier} [blockIdentifier=this.blockIdentifier] - The block identifier.
+   *
+   * @return - A promise that resolves to the class hash of the contract.
+   */
   public getClassHashAt(
     contractAddress: BigNumberish,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
@@ -352,6 +499,14 @@ export class RpcChannel {
     });
   }
 
+  /**
+   * Retrieves the class information for a given class hash and block identifier.
+   *
+   * @param {BigNumberish} classHash - The hash of the class to retrieve.
+   * @param {BlockIdentifier} [blockIdentifier=this.blockIdentifier] - The block identifier
+   * associated with the class.
+   * @return - The class information.
+   */
   public getClass(
     classHash: BigNumberish,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
@@ -364,6 +519,13 @@ export class RpcChannel {
     });
   }
 
+  /**
+   * Returns the class at the specified contract address and block identifier.
+   *
+   * @param {BigNumberish} contractAddress - The address of the contract.
+   * @param {BlockIdentifier} [blockIdentifier=this.blockIdentifier] - The block identifier.
+   * @return - A promise that resolves to the class at the specified contract address and block identifier.
+   */
   public getClassAt(
     contractAddress: BigNumberish,
     blockIdentifier: BlockIdentifier = this.blockIdentifier
@@ -376,6 +538,16 @@ export class RpcChannel {
     });
   }
 
+  /**
+   * Get an estimate of the fee for executing multiple invocations on the StarkNet network.
+   *
+   * @async
+   * @param {AccountInvocations} invocations - The list of invocations to estimate the fee for.
+   * @param {getEstimateFeeBulkOptions} options - Additional options for the estimation process.
+   * @param {string} [options.blockIdentifier=this.blockIdentifier] - The identifier of the block to estimate the fee for. Defaults to the current block identifier.
+   * @param {boolean} [options.skipValidate=true] - Indicates whether validation should be skipped during the fee estimation. Defaults to true.
+   * @returns - A Promise that resolves to the estimated fee for executing the invocations.
+   */
   public async getEstimateFee(
     invocations: AccountInvocations,
     { blockIdentifier = this.blockIdentifier, skipValidate = true }: getEstimateFeeBulkOptions
@@ -395,6 +567,14 @@ export class RpcChannel {
     });
   }
 
+  /**
+   * Invokes a function on a contract.
+   *
+   * @param {Invocation} functionInvocation - The details of the function invocation.
+   * @param {InvocationsDetailsWithNonce} details - The additional details of the invocation with nonce.
+   *
+   * @returns - A promise that resolves to the transaction hash or the transaction details if wait mode is enabled.
+   */
   public async invoke(functionInvocation: Invocation, details: InvocationsDetailsWithNonce) {
     let promise;
     if (!isV3Tx(details)) {
@@ -433,6 +613,14 @@ export class RpcChannel {
     return this.waitMode ? this.waitForTransaction((await promise).transaction_hash) : promise;
   }
 
+  /**
+   * Sends a declare transaction to the StarkNet network.
+   *
+   * @param {DeclareContractTransaction} transaction - The transaction object containing contract, signature, senderAddress, and compiledClassHash.
+   * @param {InvocationsDetailsWithNonce} details - The invocation details with nonce.
+   * @returns - A promise that resolves with the transaction result.
+   * @throws {Error} - If the parameters are invalid.
+   */
   public async declare(
     { contract, signature, senderAddress, compiledClassHash }: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce
@@ -505,6 +693,14 @@ export class RpcChannel {
     return this.waitMode ? this.waitForTransaction((await promise).transaction_hash) : promise;
   }
 
+  /**
+   * Deploys an account contract transaction.
+   *
+   * @param {DeployAccountContractTransaction} transaction - The transaction details.
+   * @param {InvocationsDetailsWithNonce} details - The invocation details with nonce.
+   *
+   * @return - A promise that resolves with the result of the deployment transaction.
+   */
   public async deployAccount(
     { classHash, constructorCalldata, addressSalt, signature }: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce
@@ -547,6 +743,13 @@ export class RpcChannel {
     return this.waitMode ? this.waitForTransaction((await promise).transaction_hash) : promise;
   }
 
+  /**
+   * Calls a contract on the StarkNet blockchain.
+   *
+   * @param {Call} call - The contract call details.
+   * @param {BlockIdentifier} [blockIdentifier=this.blockIdentifier] - The identifier of the block to call the contract in. Defaults to the current block.
+   * @returns - A promise that resolves to the response of the contract call.
+   */
   public callContract(call: Call, blockIdentifier: BlockIdentifier = this.blockIdentifier) {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_call', {
@@ -562,6 +765,7 @@ export class RpcChannel {
   /**
    * NEW: Estimate the fee for a message from L1
    * @param message Message From L1
+   * @param blockIdentifier
    */
   public estimateMessageFee(
     message: RPC.L1Message,
@@ -598,6 +802,14 @@ export class RpcChannel {
     return this.fetchEndpoint('starknet_getEvents', { filter: eventFilter });
   }
 
+  /**
+   * Builds a transaction object based on the provided invocation and version type.
+   *
+   * @param {AccountInvocationItem} invocation - The invocation object.
+   * @param {('fee' | 'transaction')} [versionType] - The version type ('fee' or 'transaction').
+   *
+   * @return {RPC.BaseTransaction} - The built transaction object.
+   */
   public buildTransaction(
     invocation: AccountInvocationItem,
     versionType?: 'fee' | 'transaction'

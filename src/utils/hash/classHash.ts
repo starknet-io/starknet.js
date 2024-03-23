@@ -241,7 +241,13 @@ function hashEntryPointSierra(data: SierraContractEntryPointFields[]) {
   return poseidonHashMany(base);
 }
 
-function hashAbi(sierra: CompiledSierra) {
+/**
+ * Computes the ABI hash of a compiled `sierra` object.
+ *
+ * @param {CompiledSierra} sierra - The compiled Sierra object.
+ * @return {bigint} - The ABI hash as a BigInt.
+ */
+function hashAbi(sierra: CompiledSierra): bigint {
   const indentString = formatSpaces(stringify(sierra.abi, null));
   return BigInt(addHexPrefix(starkCurve.keccak(utf8ToArray(indentString)).toString(16)));
 }

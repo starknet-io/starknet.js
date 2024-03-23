@@ -99,6 +99,16 @@ export class Account extends Provider implements AccountInterface {
     return super.getNonceForAddress(this.address, blockIdentifier);
   }
 
+  /**
+   * Retrieves the safe nonce value to use when executing a transaction.
+   * If a nonce value is provided as an argument, that value will be used.
+   * Otherwise, the method will attempt to retrieve the next available nonce from the blockchain.
+   * In case of any error, the method will return 0 as the nonce value.
+   *
+   * @param {BigNumberish} [nonce] - The nonce value to use for the transaction.
+   *
+   * @returns - The safe nonce value to use for the transaction or 0 in case of any error.
+   */
   protected async getNonceSafe(nonce?: BigNumberish) {
     // Patch DEPLOY_ACCOUNT: RPC getNonce for non-existing address will result in error, on Sequencer it is '0x0'
     try {
@@ -122,6 +132,13 @@ export class Account extends Provider implements AccountInterface {
     return this.cairoVersion;
   }
 
+  /**
+   * Calculates the estimated fee for executing a series of function calls.
+   *
+   * @param {AllowArray<Call>} calls - The list of function calls to estimate the fee for.
+   * @param {UniversalDetails} [estimateFeeDetails = {}] - Additional details for fee estimation. Default is an empty object.
+   * @returns {Promise<EstimateFee>} - A promise that resolves to the estimated fee.
+   */
   public async estimateFee(
     calls: AllowArray<Call>,
     estimateFeeDetails: UniversalDetails = {}
@@ -358,6 +375,7 @@ export class Account extends Provider implements AccountInterface {
    * First check if contract is already declared, if not declare it
    * If contract already declared returned transaction_hash is ''.
    * Method will pass even if contract is already declared
+   * @param payload
    * @param transactionsDetail (optional)
    */
   public async declareIfNot(
@@ -567,6 +585,14 @@ export class Account extends Provider implements AccountInterface {
    * Support methods
    */
 
+  /**
+   * Get the universal suggested fee based on the provided version, action, and details.
+   *
+   * @param {ETransactionVersion} version - The transaction version.
+   * @param {EstimateFeeAction} action - The action containing type and payload.
+   * @param {UniversalDetails} details - The details object.
+   * @returns {Object} - The maximum fee and resource bounds.
+   */
   protected async getUniversalSuggestedFee(
     version: ETransactionVersion,
     { type, payload }: EstimateFeeAction,
@@ -625,6 +651,12 @@ export class Account extends Provider implements AccountInterface {
     return feeEstimate;
   }
 
+  /**
+   * Builds an Invocation object based on the given Call array and InvocationsSignerDetails.
+   * @param {Array<Call>} call - The array of Call objects.
+   * @param {InvocationsSignerDetails} details - The InvocationsSignerDetails object.
+   * @return {Promise<Invocation>} - The Promise that resolves with the built Invocation object.
+   */
   public async buildInvocation(
     call: Array<Call>,
     details: InvocationsSignerDetails
@@ -640,6 +672,14 @@ export class Account extends Provider implements AccountInterface {
     };
   }
 
+  /**
+   * Builds the payload for declaring a contract.
+   *
+   * @param {DeclareContractPayload} payload - The payload for declaring a contract.
+   * @param {InvocationsSignerDetails} details - The details for signing the transaction.
+   * @returns {Promise<DeclareContractTransaction>} - A promise that resolves to the built declare contract transaction.
+   * @throws {Error} - Throws an error if version is F3 or V3 and compiledClassHash is undefined.
+   */
   public async buildDeclarePayload(
     payload: DeclareContractPayload,
     details: InvocationsSignerDetails
@@ -672,6 +712,12 @@ export class Account extends Provider implements AccountInterface {
     };
   }
 
+  /**
+   * Builds the payload for deploying an account contract.
+   * @param {DeployAccountContractPayload} options - The options for deploying the account contract.
+   * @param {InvocationsSignerDetails} details - The details of the invocations signer.
+   * @return {Promise<DeployAccountContractTransaction>} - A promise that resolves to the deploy account contract transaction.
+   */
   public async buildAccountDeployPayload(
     {
       classHash,
@@ -706,6 +752,12 @@ export class Account extends Provider implements AccountInterface {
     };
   }
 
+  /**
+   * Builds the payload for UDC contract invocation.
+   *
+   * @param {UniversalDeployerContractPayload|UniversalDeployerContractPayload[]} payload - The payload for UDC contract invocation.
+   * @return {Call[]} - The array of calls.
+   */
   public buildUDCContractPayload(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[]
   ): Call[] {
@@ -733,6 +785,13 @@ export class Account extends Provider implements AccountInterface {
     return calls;
   }
 
+  /**
+   * Creates invocations for a given account.
+   *
+   * @param {Invocations} invocations - The list of invocations to be created.
+   * @param {AccountInvocationsFactoryDetails} details - Additional details for creating the invocations.
+   * @returns {Promise<AccountInvocations>} - The created invocations for the account.
+   */
   public async accountInvocationsFactory(
     invocations: Invocations,
     details: AccountInvocationsFactoryDetails
@@ -827,6 +886,13 @@ export class Account extends Provider implements AccountInterface {
     ) as Promise<AccountInvocations>;
   }
 
+  /**
+   * Retrieves the StarkNet name associated with a given address.
+   *
+   * @param {BigNumberish} address - The Ethereum address for which to retrieve the StarkNet name. Defaults to the wallet address.
+   * @param {string} StarknetIdContract - The contract address of the Starknet identifier contract. Optional parameter.
+   * @return {Promise<string>} The StarkNet name associated with the given address.
+   */
   public async getStarkName(
     address: BigNumberish = this.address, // default to the wallet address
     StarknetIdContract?: string

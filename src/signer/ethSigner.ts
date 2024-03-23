@@ -56,6 +56,12 @@ export class EthSigner implements SignerInterface {
     );
   }
 
+  /**
+   * Signs the provided message with the given account address.
+   * @param {TypedData} typedData - The message data to be signed.
+   * @param {string} accountAddress - The address of the signing account.
+   * @return {Promise<Signature>} - The signature of the message.
+   */
   public async signMessage(typedData: TypedData, accountAddress: string): Promise<Signature> {
     const msgHash = getMessageHash(typedData, accountAddress);
     const signature: RecoveredSignatureType = secp256k1.sign(
@@ -65,6 +71,14 @@ export class EthSigner implements SignerInterface {
     return this.formatEthSignature(signature);
   }
 
+  /**
+   * Signs a transaction using the provided transactions and details.
+   *
+   * @param {Call[]} transactions - The transactions to be signed.
+   * @param {InvocationsSignerDetails} details - The details needed for signing.
+   * @return {Promise<Signature>} - The signed transaction.
+   * @throws {Error} - Throws an error if the signTransaction version is unsupported.
+   */
   public async signTransaction(
     transactions: Call[],
     details: InvocationsSignerDetails
@@ -101,6 +115,12 @@ export class EthSigner implements SignerInterface {
     return this.formatEthSignature(signature);
   }
 
+  /**
+   * Signs a deploy account transaction.
+   * @param {DeployAccountSignerDetails} details - The details of the deploy account transaction.
+   * @return {Promise<Signature>} - The signature of the signed transaction.
+   * @throws {Error} - If the version of the deploy account transaction is not supported.
+   */
   public async signDeployAccountTransaction(
     details: DeployAccountSignerDetails
   ): Promise<Signature> {
@@ -136,6 +156,13 @@ export class EthSigner implements SignerInterface {
     return this.formatEthSignature(signature);
   }
 
+  /**
+   * Signs a declare transaction.
+   *
+   * @param {DeclareSignerDetails} details - The details of the declare transaction.
+   * @returns {Promise<Signature>} - The signature of the declare transaction.
+   * @throws {Error} - If the version of the declare transaction is unsupported.
+   */
   public async signDeclareTransaction(
     // contractClass: ContractClass,  // Should be used once class hash is present in ContractClass
     details: DeclareSignerDetails
