@@ -45,6 +45,7 @@ import { parseUDCEvent } from '../utils/events';
 import { calculateContractAddressFromHash } from '../utils/hash';
 import { toBigInt, toCairoBool } from '../utils/num';
 import { parseContract } from '../utils/provider';
+import { isString } from '../utils/shortString';
 import {
   estimateFeeToBounds,
   formatSignature,
@@ -56,7 +57,6 @@ import {
 import { buildUDCCall, getExecuteCalldata } from '../utils/transaction';
 import { getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
-import { isString } from '../utils/shortString';
 
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
@@ -257,7 +257,7 @@ export class Account extends Provider implements AccountInterface {
     invocations: Invocations,
     details: UniversalDetails = {}
   ): Promise<EstimateFeeBulk> {
-    const { nonce, blockIdentifier, version } = details;
+    const { nonce, blockIdentifier, version, skipValidate } = details;
     const accountInvocations = await this.accountInvocationsFactory(invocations, {
       ...v3Details(details),
       versions: [
@@ -269,11 +269,12 @@ export class Account extends Provider implements AccountInterface {
       ],
       nonce,
       blockIdentifier,
+      skipValidate,
     });
 
     return super.getEstimateFeeBulk(accountInvocations, {
       blockIdentifier,
-      skipValidate: details.skipValidate,
+      skipValidate,
     });
   }
 
