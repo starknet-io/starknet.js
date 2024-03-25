@@ -20,6 +20,7 @@ import {
 import { JRPC, RPCSPEC07 as RPC } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
+import { validateAndParseEthAddress } from '../utils/eth';
 import fetch from '../utils/fetchPonyfill';
 import { getSelector, getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
@@ -569,7 +570,7 @@ export class RpcChannel {
   ) {
     const { from_address, to_address, entry_point_selector, payload } = message;
     const formattedMessage = {
-      from_address: toHex(from_address),
+      from_address: validateAndParseEthAddress(from_address),
       to_address: toHex(to_address),
       entry_point_selector: getSelector(entry_point_selector),
       payload: getHexStringArray(payload),

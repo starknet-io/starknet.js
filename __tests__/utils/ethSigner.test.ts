@@ -11,6 +11,7 @@ import {
   num,
   stark,
 } from '../../src';
+import { validateAndParseEthAddress } from '../../src/utils/eth';
 
 describe('Ethereum signatures', () => {
   describe('privk, pubK', () => {
@@ -122,6 +123,20 @@ describe('Ethereum signatures', () => {
         s: 420191492562045858770062885997406552542950984883779606809355688615026963844n,
         recovery: 1,
       });
+    });
+  });
+  describe('Ethereum address', () => {
+    test('Eth address format', async () => {
+      const ethAddr = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165';
+      expect(validateAndParseEthAddress(ethAddr)).toBe(
+        '0x008359e4b0152ed5a731162d3c7b0d8d56edb165'
+      );
+      expect(validateAndParseEthAddress(BigInt(ethAddr))).toBe(
+        '0x008359e4b0152ed5a731162d3c7b0d8d56edb165'
+      );
+      expect(validateAndParseEthAddress(BigInt(ethAddr).toString(10))).toBe(
+        '0x008359e4b0152ed5a731162d3c7b0d8d56edb165'
+      );
     });
   });
 });

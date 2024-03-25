@@ -17,6 +17,8 @@ import { StarknetChainId } from '../src/constants';
 import { felt, uint256 } from '../src/utils/calldata/cairo';
 import { toHexString } from '../src/utils/num';
 import {
+  compiledC1v2,
+  compiledC1v2Casm,
   compiledErc20Echo,
   compiledL1L2,
   compiledOpenZeppelinAccount,
@@ -108,24 +110,47 @@ describeIfRpc('RPCProvider', () => {
   });
 
   describe('Test Estimate message fee', () => {
-    const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165A0';
-    let l1l2ContractAddress: string;
+    let l1l2ContractCairo0Address: string;
+    let l1l2ContractCairo1Address: string;
 
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
         contract: compiledL1L2,
       });
-      l1l2ContractAddress = deploy.contract_address;
+      l1l2ContractCairo0Address = deploy.contract_address;
+      const { deploy: deploy2 } = await account.declareAndDeploy({
+        contract: compiledC1v2,
+        casm: compiledC1v2Casm,
+      });
+      l1l2ContractCairo1Address = deploy2.contract_address;
     });
 
-    test('estimate message fee', async () => {
-      const estimation = await rpcProvider.estimateMessageFee({
+    test('estimate message fee Cairo 0', async () => {
+      const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165A0';
+      const estimationCairo0 = await rpcProvider.estimateMessageFee({
         from_address: L1_ADDRESS,
-        to_address: l1l2ContractAddress,
+        to_address: l1l2ContractCairo0Address,
         entry_point_selector: 'deposit',
         payload: ['556', '123'],
       });
-      expect(estimation).toEqual(
+      expect(estimationCairo0).toEqual(
+        expect.objectContaining({
+          gas_consumed: expect.anything(),
+          gas_price: expect.anything(),
+          overall_fee: expect.anything(),
+        })
+      );
+    });
+
+    test('estimate message fee Cairo 1', async () => {
+      const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165'; // not coded in 20 bytes
+      const estimationCairo1 = await rpcProvider.estimateMessageFee({
+        from_address: L1_ADDRESS,
+        to_address: l1l2ContractCairo1Address,
+        entry_point_selector: 'increase_bal',
+        payload: ['100'],
+      });
+      expect(estimationCairo1).toEqual(
         expect.objectContaining({
           gas_consumed: expect.anything(),
           gas_price: expect.anything(),
