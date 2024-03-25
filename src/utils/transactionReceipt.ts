@@ -67,15 +67,15 @@ export class ReceiptTx implements TransactionReceiptUtilityInterface {
     return (callbacks as TransactionReceiptCallbacksDefault)._();
   }
 
-  isSuccess() {
+  isSuccess(): this is SuccessfulTransactionReceiptResponse {
     return this.statusReceipt === 'success';
   }
 
-  isReverted() {
+  isReverted(): this is RevertedTransactionReceiptResponse {
     return this.statusReceipt === 'reverted';
   }
 
-  isRejected() {
+  isRejected(): this is RejectedTransactionReceiptResponse {
     return this.statusReceipt === 'rejected';
   }
 

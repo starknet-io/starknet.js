@@ -159,7 +159,12 @@ describe('Ethereum signer', () => {
         { maxFee: 1 * 10 ** 16 }
       );
       const txR = await provider.waitForTransaction(respTransfer.transaction_hash);
-      expect(txR.execution_status).toBe('SUCCEEDED');
+
+      if (txR.isSuccess()) {
+        expect(txR.execution_status).toBe('SUCCEEDED');
+      } else {
+        fail('txR not success');
+      }
     });
 
     test('ETH account declaration V2', async () => {
@@ -279,7 +284,11 @@ describe('Ethereum signer', () => {
       });
 
       const txR = await provider.waitForTransaction(respTransfer.transaction_hash);
-      expect(txR.execution_status).toBe('SUCCEEDED');
+      if (txR.isSuccess()) {
+        expect(txR.execution_status).toBe('SUCCEEDED');
+      } else {
+        fail('txR not success');
+      }
     });
 
     test('ETH account declaration V3', async () => {
