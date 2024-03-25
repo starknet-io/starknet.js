@@ -12,6 +12,7 @@ import {
 } from '../../types';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
+import { addHexPrefix, removeHexPrefix } from '../encode';
 import { toHex } from '../num';
 import { decodeShortString } from '../shortString';
 import { stringFromByteArray } from './byteArray';
@@ -23,6 +24,7 @@ import {
   isTypeBool,
   isTypeByteArray,
   isTypeEnum,
+  isTypeSecp256k1Point,
   isTypeTuple,
 } from './cairo';
 import {
@@ -63,6 +65,13 @@ function parseBaseTypes(type: string, it: Iterator<string>) {
     case type === 'core::bytes_31::bytes31':
       temp = it.next().value;
       return decodeShortString(temp);
+    case isTypeSecp256k1Point(type):
+      const xLow = removeHexPrefix(it.next().value).padStart(32, '0');
+      const xHigh = removeHexPrefix(it.next().value).padStart(32, '0');
+      const yLow = removeHexPrefix(it.next().value).padStart(32, '0');
+      const yHigh = removeHexPrefix(it.next().value).padStart(32, '0');
+      const pubK = BigInt(addHexPrefix(xHigh + xLow + yHigh + yLow));
+      return pubK;
     default:
       temp = it.next().value;
       return BigInt(temp);

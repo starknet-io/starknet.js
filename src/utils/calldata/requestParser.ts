@@ -2,6 +2,7 @@ import {
   AbiEntry,
   AbiEnums,
   AbiStructs,
+  AllowArray,
   BigNumberish,
   ByteArray,
   CairoEnum,
@@ -10,6 +11,8 @@ import {
 } from '../../types';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
+import { addHexPrefix, removeHexPrefix } from '../encode';
+import { toHex } from '../num';
 import { encodeShortString, isString, isText, splitLongString } from '../shortString';
 import { byteArrayFromString } from './byteArray';
 import {
@@ -20,8 +23,10 @@ import {
   isTypeEnum,
   isTypeOption,
   isTypeResult,
+  isTypeSecp256k1Point,
   isTypeStruct,
   isTypeTuple,
+  uint256,
 } from './cairo';
 import {
   CairoCustomEnum,
@@ -38,7 +43,7 @@ import extractTupleMemberTypes from './tuple';
  * @param val value provided
  * @returns string | string[]
  */
-function parseBaseTypes(type: string, val: BigNumberish) {
+function parseBaseTypes(type: string, val: BigNumberish): AllowArray<string> {
   switch (true) {
     case CairoUint256.isAbiType(type):
       return new CairoUint256(val).toApiRequest();
@@ -46,6 +51,17 @@ function parseBaseTypes(type: string, val: BigNumberish) {
       return new CairoUint512(val).toApiRequest();
     case isTypeBytes31(type):
       return encodeShortString(val.toString());
+    case isTypeSecp256k1Point(type): {
+      const pubKeyETH = removeHexPrefix(toHex(val)).padStart(128, '0');
+      const pubKeyETHy = uint256(addHexPrefix(pubKeyETH.slice(-64)));
+      const pubKeyETHx = uint256(addHexPrefix(pubKeyETH.slice(0, -64)));
+      return [
+        felt(pubKeyETHx.low),
+        felt(pubKeyETHx.high),
+        felt(pubKeyETHy.low),
+        felt(pubKeyETHy.high),
+      ];
+    }
     default:
       return felt(val);
   }

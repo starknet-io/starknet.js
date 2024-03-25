@@ -150,6 +150,14 @@ const validateUint = (parameter: any, input: AbiEntry) => {
         `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^252-1]`
       );
       break;
+    case Literal.Secp256k1Point: {
+      assert(
+        param >= 0n && param <= 2n ** 512n - 1n,
+        `Validate: arg ${input.name} must be ${input.type} : a 512 bits number.`
+      );
+      break;
+    }
+
     default:
       break;
   }
@@ -228,17 +236,8 @@ const validateTuple = (parameter: any, input: AbiEntry) => {
 
 const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs, enums: AbiEnums) => {
   const baseType = getArrayType(input.type);
-
   // Long text (special case when parameter is not an array but long text)
-  // console.log(
-  //   'validate array = ',
-  //   isTypeFelt(baseType),
-  //   isLongText(parameter),
-  //   baseType,
-  //   parameter
-  // );
   if (isTypeFelt(baseType) && isLongText(parameter)) {
-    // console.log('long text.');
     return;
   }
 
