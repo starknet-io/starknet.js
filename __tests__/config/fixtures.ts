@@ -46,10 +46,22 @@ export const compiledC210 = readContractSierra('cairo/cairo210/cairo210.sierra')
 export const compiledC210Casm = readContractSierraCasm('cairo/cairo210/cairo210');
 export const compiledC240 = readContractSierra('cairo/cairo240/string.sierra');
 export const compiledC240Casm = readContractSierraCasm('cairo/cairo240/string');
+export const compiledEthAccount = readContractSierra(
+  'cairo/ethSigner/openzeppelin_EthAccount090.sierra'
+);
+export const compiledEthCasm = readContractSierraCasm('cairo/ethSigner/openzeppelin_EthAccount090');
+export const compiledDummy1Eth = readContractSierra('cairo/ethSigner/dummy1ForEth.sierra');
+export const compiledDummy1EthCasm = readContractSierraCasm('cairo/ethSigner/dummy1ForEth');
+export const compiledDummy2Eth = readContractSierra('cairo/ethSigner/dummy2ForEth.sierra');
+export const compiledDummy2EthCasm = readContractSierraCasm('cairo/ethSigner/dummy2ForEth');
+export const compiledEthPubk = readContractSierra('cairo/ethSigner/testEthPubKey.sierra');
+export const compiledEthPubkCasm = readContractSierraCasm('cairo/ethSigner/testEthPubKey');
 export const compiledC260 = readContractSierra('cairo/cairo260/hello260.sierra');
 export const compiledC260Casm = readContractSierraCasm('cairo/cairo260/hello260');
 export const compiledTuple = readContractSierra('cairo/cairo253/tupleResponse.sierra');
 export const compiledTupleCasm = readContractSierraCasm('cairo/cairo253/tupleResponse');
+export const compiledU512 = readContractSierra('cairo/cairo260/u512.sierra');
+export const compiledU512Casm = readContractSierraCasm('cairo/cairo260/u512');
 // StarknetId
 export const compiledStarknetId = readContractSierra('starknetId/identity/identity.sierra');
 export const compiledStarknetIdCasm = readContractSierraCasm('starknetId/identity/identity');
@@ -57,9 +69,10 @@ export const compiledNaming = readContractSierra('starknetId/naming/naming.sierr
 export const compiledNamingCasm = readContractSierraCasm('starknetId/naming/naming');
 export const compiledPricing = readContractSierra('starknetId/pricing/pricing.sierra');
 export const compiledPricingCasm = readContractSierraCasm('starknetId/pricing/pricing');
+export const compiledTestRejectSierra = readContractSierra('cairo/testReject/test_reject.sierra');
+export const compiledTestRejectCasm = readContractSierraCasm('cairo/testReject/test_reject');
 export const compiledSidMulticall = readContractSierra('starknetId/multicall/multicall.sierra');
 export const compiledSidMulticallCasm = readContractSierraCasm('starknetId/multicall/multicall');
-
 export function getTestProvider(isProvider?: true): ProviderInterface;
 export function getTestProvider(isProvider?: false): RpcProvider;
 export function getTestProvider(isProvider: boolean = true): ProviderInterface | RpcProvider {

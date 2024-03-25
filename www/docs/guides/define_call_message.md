@@ -94,6 +94,32 @@ const a2: Uint256 = {
 const a3: Uint256 = { low: a1.low, high: a1.high };
 ```
 
+### u512
+
+Starknet is waiting for 4 u128, the first one has the lowest weight.  
+You can send to Starknet.js methods: bigNumberish or Uint512 object.
+
+```typescript
+await myContract0.my_function(553844998243714947043252949842317834769n);
+await myContract1.my_function(
+  cairo.uint512(
+    '0xa9d2d1501ad0a2eb5337a9d2d1501ad0a2eb5337a9d2d1501ad0a2eb5337a9d2d1501ad0a2eb5337a9d2d1501ad0a2eb5337'
+  )
+);
+await myContract2.my_function(12345678, '13456789765', '0xe23a40b543f', 1534566734334n);
+```
+
+In specific cases, you can use an object, with the following format:
+
+```typescript
+const a2: Uint512 = {
+  limb0: '0xeb5337d9a885be310x9365205a414fdd',
+  limb1: '0x1fd465baff2ba9d2d1501ad0a2eb5337',
+  limb2: '0x05f7cd1fd465baff2ba9d2d1501ad0a2',
+  limb3: '0x2eb5337d9a885be319366b5205a414fd',
+};
+```
+
 ### shortString or bytes31
 
 For a shortString, Starknet is waiting for a felt, including 31 ASCII characters max.  
@@ -174,7 +200,7 @@ const myTpl = { '0': '0x0a', '1': 200 };
 
 ### named tuple
 
-> Only for Cairo 0.
+> [!IMPORTANT] Only for Cairo 0.
 
 Starknet is waiting for a list of felts.  
 You can send to Starknet.js methods: an object, `cairo.tuple()`, list of bigNumberish.  
@@ -194,7 +220,51 @@ const namedTup = { min: '0x4e65ac6', max: 296735486n };
 await myContract.my_function(namedTup);
 ```
 
-> It's not mandatory to create an object conform to the Cairo 0 named tuple, you can just use the `cairo.tuple()` function.
+> [!TIP] It's not mandatory to create an object conform to the Cairo 0 named tuple, you can just use the `cairo.tuple()` function.
+
+### Ethereum public key
+
+If your abi is requesting this type : `core::starknet::secp256k1::Secp256k1Point`, it means that you have probably to send an Ethereum full public key. Example :
+
+```json
+{
+  "type": "constructor",
+  "name": "constructor",
+  "inputs": [
+    {
+      "name": "public_key",
+      "type": "core::starknet::secp256k1::Secp256k1Point"
+    }
+  ]
+}
+```
+
+- If you are using a calldata construction method using the Abi, you have just to use a 512 bits number (so, without parity) :
+
+```typescript
+const privateKeyETH = "0x45397ee6ca34cb49060f1c303c6cb7ee2d6123e617601ef3e31ccf7bf5bef1f9";
+const ethSigner = new EthSigner(privateKeyETH);
+const ethFullPublicKey = await ethSigner.getPubKey(); // 512 bits number
+const myCallData = new CallData(ethAccountAbi);
+const accountETHconstructorCalldata = myCallData.compile(
+    "constructor",
+    {
+        public_key: ethFullPublicKey
+    }
+);
+```
+
+- If you are using a calldata construction method without the Abi, you have to send a tuple of 2 u256 :
+
+```typescript
+const ethFullPublicKey = "0x0178bb97615b49070eefad71cb2f159392274404e41db748d9397147cb25cf597ebfcf2f399e635b72b99b8f76e9080763c65a42c842869815039d912150ddfe"; // 512 bits number
+const pubKeyETH = encode.addHexPrefix(encode.removeHexPrefix(ethFullPublicKey).padStart(128, "0"));
+const pubKeyETHx = cairo.uint256(addAddressPadding(encode.addHexPrefix(pubKeyETH.slice(2, -64))));
+const pubKeyETHy = cairo.uint256(addAddressPadding(encode.addHexPrefix(pubKeyETH.slice(-64))));
+const accountETHconstructorCalldata = CallData.compile([
+    cairo.tuple(pubKeyETHx, pubKeyETHy)
+]);
+```
 
 ### struct
 
@@ -206,7 +276,7 @@ const myStruct = { type: 'TR1POST', tries: 8, isBridged: true };
 await myContract.my_function(myStruct);
 ```
 
-### array
+### array, span
 
 Starknet is waiting for an array of felts: array_len, array1, array2, ...  
 You can send it to Starknet.js methods: bigNumberish[].
@@ -216,7 +286,7 @@ Const myArray = [10, "0xaa", 567n];
 await myContract.my_function(myArray);
 ```
 
-> Do not add the `array_len` parameter before your array. Starknet.js will manage this element automatically.
+> [!CAUTION] Do not add the `array_len` parameter before your array. Starknet.js will manage this element automatically.
 
 > It's also applicable for Cairo `Span` type.
 
@@ -286,7 +356,7 @@ const functionName = 'my_function';
 await myContract[functionName](...myParams);
 ```
 
-> Objects properties have to be ordered in accordance with the ABI.
+> [!WARNING] Objects properties have to be ordered in accordance with the ABI.
 
 ### Object (without ABI conformity check)
 
@@ -306,7 +376,7 @@ const deployResponse = await myAccount.deployContract({
 
 This type is available for: `CallData.compile(), hash.calculateContractAddressFromHash, account.deployContract, account.deployAccount, account.execute`
 
-> Objects properties have to be ordered in accordance with the ABI.
+> [!WARNING] Objects properties have to be ordered in accordance with the ABI.
 
 ### Object (with ABI conformity check)
 
@@ -469,6 +539,7 @@ const amount = myContract.call(...);
 |                                                           |                                    | string representing an hex number             | `const res=myContract.call(...`<br /> `const address: string = num.toHex(res);`                                                                                      |
 | u8, u16, u32, usize                                       | `func get_v() -> u16`              | number (53 bits max)                          | `const res=myContract.call(...`<br /> `const total: number = Number(res)`                                                                                            |
 | u256 (255 bits max)                                       | `func get_v() -> u256`             | bigint                                        | `const res: bigint = myContract.call(...`                                                                                                                            |
+| u512 (512 bits max)                                       | `func get_v() -> u512`             | bigint                                        | `const res: bigint = myContract.call(...`                                                                                                                            |
 | array of u8, u16, u32, usize, u64, u128, felt252, address | `func get_v() -> Array<u64>`       | bigint[]                                      | `const res: bigint[] = myContract.call(...`                                                                                                                          |
 | bytes31 (31 ASCII characters max)                         | `func get_v() -> bytes31`          | string                                        | `const res: string = myContract.call(...`                                                                                                                            |
 | felt252 (31 ASCII characters max)                         | `func get_v() -> felt252`          | string                                        | `const res = myContract.call(...`<br /> `const title:string = shortString.decodeShortstring(res);`                                                                   |
