@@ -60,6 +60,8 @@ export const compiledC260 = readContractSierra('cairo/cairo260/hello260.sierra')
 export const compiledC260Casm = readContractSierraCasm('cairo/cairo260/hello260');
 export const compiledTuple = readContractSierra('cairo/cairo253/tupleResponse.sierra');
 export const compiledTupleCasm = readContractSierraCasm('cairo/cairo253/tupleResponse');
+export const compiledU512 = readContractSierra('cairo/cairo260/u512.sierra');
+export const compiledU512Casm = readContractSierraCasm('cairo/cairo260/u512');
 // StarknetId
 export const compiledStarknetId = readContractSierra('starknetId/identity/identity.sierra');
 export const compiledStarknetIdCasm = readContractSierraCasm('starknetId/identity/identity');

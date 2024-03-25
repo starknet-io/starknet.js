@@ -7,9 +7,11 @@ import {
   Literal,
   Uint,
   Uint256,
+  Uint512,
 } from '../../types';
 import { CairoFelt } from '../cairoDataTypes/felt';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
+import { CairoUint512 } from '../cairoDataTypes/uint512';
 
 // Intended for internal usage, maybe should be exported somewhere else and not exported to utils
 export const isLen = (name: string) => /_len$/.test(name);
@@ -104,6 +106,19 @@ export function getAbiContractVersion(abi: Abi): ContractVersion {
  */
 export const uint256 = (it: BigNumberish): Uint256 => {
   return new CairoUint256(it).toUint256DecimalString();
+};
+
+/**
+ * Create Uint512 Cairo type (helper for common struct type)
+ * @param it BigNumberish representation of a 512 bits unsigned number
+ * @returns Uint512 struct
+ * @example
+ * ```typescript
+ * uint512('345745685892349863487563453485768723498');
+ * ```
+ */
+export const uint512 = (it: BigNumberish): Uint512 => {
+  return new CairoUint512(it).toUint512DecimalString();
 };
 
 /**

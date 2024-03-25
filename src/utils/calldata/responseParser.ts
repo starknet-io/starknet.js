@@ -11,6 +11,7 @@ import {
   ParsedStruct,
 } from '../../types';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
+import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { addHexPrefix, removeHexPrefix } from '../encode';
 import { toHex } from '../num';
 import { decodeShortString } from '../shortString';
@@ -52,6 +53,12 @@ function parseBaseTypes(type: string, it: Iterator<string>) {
       const low = it.next().value;
       const high = it.next().value;
       return new CairoUint256(low, high).toBigInt();
+    case CairoUint512.isAbiType(type):
+      const limb0 = it.next().value;
+      const limb1 = it.next().value;
+      const limb2 = it.next().value;
+      const limb3 = it.next().value;
+      return new CairoUint512(limb0, limb1, limb2, limb3).toBigInt();
     case type === 'core::starknet::eth_address::EthAddress':
       temp = it.next().value;
       return BigInt(temp);
@@ -94,7 +101,14 @@ function parseResponseValue(
     const high = responseIterator.next().value;
     return new CairoUint256(low, high).toBigInt();
   }
-
+  // type uint512 struct
+  if (CairoUint512.isAbiType(element.type)) {
+    const limb0 = responseIterator.next().value;
+    const limb1 = responseIterator.next().value;
+    const limb2 = responseIterator.next().value;
+    const limb3 = responseIterator.next().value;
+    return new CairoUint512(limb0, limb1, limb2, limb3).toBigInt();
+  }
   // type C1 ByteArray struct, representing a LongString
   if (isTypeByteArray(element.type)) {
     const parsedBytes31Arr: BigNumberish[] = [];

@@ -94,6 +94,32 @@ const a2: Uint256 = {
 const a3: Uint256 = { low: a1.low, high: a1.high };
 ```
 
+### u512
+
+Starknet is waiting for 4 u128, the first one has the lowest weight.  
+You can send to Starknet.js methods: bigNumberish or Uint512 object.
+
+```typescript
+await myContract0.my_function(553844998243714947043252949842317834769n);
+await myContract1.my_function(
+  cairo.uint512(
+    '0xa9d2d1501ad0a2eb5337a9d2d1501ad0a2eb5337a9d2d1501ad0a2eb5337a9d2d1501ad0a2eb5337a9d2d1501ad0a2eb5337'
+  )
+);
+await myContract2.my_function(12345678, '13456789765', '0xe23a40b543f', 1534566734334n);
+```
+
+In specific cases, you can use an object, with the following format:
+
+```typescript
+const a2: Uint512 = {
+  limb0: '0xeb5337d9a885be310x9365205a414fdd',
+  limb1: '0x1fd465baff2ba9d2d1501ad0a2eb5337',
+  limb2: '0x05f7cd1fd465baff2ba9d2d1501ad0a2',
+  limb3: '0x2eb5337d9a885be319366b5205a414fd',
+};
+```
+
 ### shortString or bytes31
 
 For a shortString, Starknet is waiting for a felt, including 31 ASCII characters max.  
@@ -513,6 +539,7 @@ const amount = myContract.call(...);
 |                                                           |                                    | string representing an hex number             | `const res=myContract.call(...`<br /> `const address: string = num.toHex(res);`                                                                                      |
 | u8, u16, u32, usize                                       | `func get_v() -> u16`              | number (53 bits max)                          | `const res=myContract.call(...`<br /> `const total: number = Number(res)`                                                                                            |
 | u256 (255 bits max)                                       | `func get_v() -> u256`             | bigint                                        | `const res: bigint = myContract.call(...`                                                                                                                            |
+| u512 (512 bits max)                                       | `func get_v() -> u512`             | bigint                                        | `const res: bigint = myContract.call(...`                                                                                                                            |
 | array of u8, u16, u32, usize, u64, u128, felt252, address | `func get_v() -> Array<u64>`       | bigint[]                                      | `const res: bigint[] = myContract.call(...`                                                                                                                          |
 | bytes31 (31 ASCII characters max)                         | `func get_v() -> bytes31`          | string                                        | `const res: string = myContract.call(...`                                                                                                                            |
 | felt252 (31 ASCII characters max)                         | `func get_v() -> felt252`          | string                                        | `const res = myContract.call(...`<br /> `const title:string = shortString.decodeShortstring(res);`                                                                   |
