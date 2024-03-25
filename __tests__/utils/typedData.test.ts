@@ -6,7 +6,8 @@ import exampleEnum from '../../__mocks__/typedData/example_enum.json';
 import examplePresetTypes from '../../__mocks__/typedData/example_presetTypes.json';
 import typedDataStructArrayExample from '../../__mocks__/typedData/mail_StructArray.json';
 import typedDataSessionExample from '../../__mocks__/typedData/session_MerkleTree.json';
-import { BigNumberish, StarkNetDomain, num } from '../../src';
+import { BigNumberish, StarknetDomain, num } from '../../src';
+import { PRIME } from '../../src/constants';
 import { getSelectorFromName } from '../../src/utils/hash';
 import { MerkleTree } from '../../src/utils/merkle';
 import {
@@ -43,7 +44,7 @@ describe('typedData', () => {
     );
     encoded = encodeType(exampleBaseTypes.types, 'Example', TypedDataRevision.Active);
     expect(encoded).toMatchInlineSnapshot(
-      `"\\"Example\\"(\\"n0\\":\\"felt\\",\\"n1\\":\\"bool\\",\\"n2\\":\\"string\\",\\"n3\\":\\"selector\\",\\"n4\\":\\"u128\\",\\"n5\\":\\"ContractAddress\\",\\"n6\\":\\"ClassHash\\",\\"n7\\":\\"timestamp\\",\\"n8\\":\\"shortstring\\")"`
+      `"\\"Example\\"(\\"n0\\":\\"felt\\",\\"n1\\":\\"bool\\",\\"n2\\":\\"string\\",\\"n3\\":\\"selector\\",\\"n4\\":\\"u128\\",\\"n5\\":\\"i128\\",\\"n6\\":\\"ContractAddress\\",\\"n7\\":\\"ClassHash\\",\\"n8\\":\\"timestamp\\",\\"n9\\":\\"shortstring\\")"`
     );
     encoded = encodeType(examplePresetTypes.types, 'Example', TypedDataRevision.Active);
     expect(encoded).toMatchInlineSnapshot(
@@ -83,7 +84,7 @@ describe('typedData', () => {
     );
     typeHash = getTypeHash(exampleBaseTypes.types, 'Example', TypedDataRevision.Active);
     expect(typeHash).toMatchInlineSnapshot(
-      `"0x2e5b7e12ca4388c49b4ceb305d853b8f7bf5f36525fea5e4255346b80153249"`
+      `"0x1f94cd0be8b4097a41486170fdf09a4cd23aefbc74bb2344718562994c2c111"`
     );
     typeHash = getTypeHash(examplePresetTypes.types, 'Example', TypedDataRevision.Active);
     expect(typeHash).toMatchInlineSnapshot(
@@ -169,7 +170,7 @@ describe('typedData', () => {
     const hash = getStructHash(
       typedDataExample.types,
       'StarkNetDomain',
-      typedDataExample.domain as StarkNetDomain
+      typedDataExample.domain as StarknetDomain
     );
     expect(hash).toMatchInlineSnapshot(
       `"0x54833b121883a3e3aebff48ec08a962f5742e5f7b973469c1f8f4f55d470b07"`
@@ -180,7 +181,7 @@ describe('typedData', () => {
     const hash = getStructHash(
       exampleBaseTypes.types,
       'StarknetDomain',
-      exampleBaseTypes.domain as StarkNetDomain,
+      exampleBaseTypes.domain as StarknetDomain,
       TypedDataRevision.Active
     );
     expect(hash).toMatchInlineSnapshot(
@@ -274,7 +275,7 @@ describe('typedData', () => {
     let messageHash: string;
     messageHash = getMessageHash(exampleBaseTypes, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
-      `"0x790d9fa99cf9ad91c515aaff9465fcb1c87784d9cfb27271ed193675cd06f9c"`
+      `"0xdb7829db8909c0c5496f5952bcfc4fc894341ce01842537fc4f448743480b6"`
     );
 
     messageHash = getMessageHash(examplePresetTypes, exampleAddress);
@@ -291,5 +292,27 @@ describe('typedData', () => {
     expect(spyPoseidon).toHaveBeenCalled();
     spyPedersen.mockRestore();
     spyPoseidon.mockRestore();
+  });
+
+  describe('should fail validation', () => {
+    const baseTypes = (type: string, value: any = PRIME) => {
+      const copy = JSON.parse(JSON.stringify(exampleBaseTypes)) as typeof exampleBaseTypes;
+      const property = copy.types.Example.find((e) => e.type === type)!.name;
+      (copy.message as any)[property] = value;
+      return copy;
+    };
+
+    test.each([
+      { type: 'felt' },
+      { type: 'bool' },
+      { type: 'u128' },
+      { type: 'i128' },
+      { type: 'ContractAddress' },
+      { type: 'ClassHash' },
+      { type: 'timestamp' },
+      { type: 'shortstring' },
+    ])('out of bounds - $type', ({ type }) => {
+      expect(() => getMessageHash(baseTypes(type), exampleAddress)).toThrow(RegExp(type));
+    });
   });
 });

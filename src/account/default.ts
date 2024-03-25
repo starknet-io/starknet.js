@@ -45,6 +45,7 @@ import { parseUDCEvent } from '../utils/events';
 import { calculateContractAddressFromHash } from '../utils/hash';
 import { toBigInt, toCairoBool } from '../utils/num';
 import { parseContract } from '../utils/provider';
+import { isString } from '../utils/shortString';
 import {
   estimateFeeToBounds,
   formatSignature,
@@ -56,7 +57,6 @@ import {
 import { buildUDCCall, getExecuteCalldata } from '../utils/transaction';
 import { getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
-import { isString } from '../utils/shortString';
 
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
@@ -88,7 +88,7 @@ export class Account extends Provider implements AccountInterface {
   }
 
   // provided version or contract based preferred transactionVersion
-  private getPreferredVersion(type12: ETransactionVersion, type3: ETransactionVersion) {
+  protected getPreferredVersion(type12: ETransactionVersion, type3: ETransactionVersion) {
     if (this.transactionVersion === ETransactionVersion.V3) return type3;
     if (this.transactionVersion === ETransactionVersion.V2) return type12;
 
@@ -99,7 +99,7 @@ export class Account extends Provider implements AccountInterface {
     return super.getNonceForAddress(this.address, blockIdentifier);
   }
 
-  private async getNonceSafe(nonce?: BigNumberish) {
+  protected async getNonceSafe(nonce?: BigNumberish) {
     // Patch DEPLOY_ACCOUNT: RPC getNonce for non-existing address will result in error, on Sequencer it is '0x0'
     try {
       return toBigInt(nonce ?? (await this.getNonce()));
@@ -257,7 +257,7 @@ export class Account extends Provider implements AccountInterface {
     invocations: Invocations,
     details: UniversalDetails = {}
   ): Promise<EstimateFeeBulk> {
-    const { nonce, blockIdentifier, version } = details;
+    const { nonce, blockIdentifier, version, skipValidate } = details;
     const accountInvocations = await this.accountInvocationsFactory(invocations, {
       ...v3Details(details),
       versions: [
@@ -269,11 +269,12 @@ export class Account extends Provider implements AccountInterface {
       ],
       nonce,
       blockIdentifier,
+      skipValidate,
     });
 
     return super.getEstimateFeeBulk(accountInvocations, {
       blockIdentifier,
-      skipValidate: details.skipValidate,
+      skipValidate,
     });
   }
 
@@ -566,7 +567,7 @@ export class Account extends Provider implements AccountInterface {
    * Support methods
    */
 
-  private async getUniversalSuggestedFee(
+  protected async getUniversalSuggestedFee(
     version: ETransactionVersion,
     { type, payload }: EstimateFeeAction,
     details: UniversalDetails

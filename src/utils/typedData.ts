@@ -1,12 +1,14 @@
 /* eslint-disable no-param-reassign */
+import { PRIME, RANGE_FELT, RANGE_I128, RANGE_U128 } from '../constants';
 import {
   BigNumberish,
   TypedDataRevision as Revision,
-  StarkNetEnumType,
-  StarkNetMerkleType,
-  StarkNetType,
+  StarknetEnumType,
+  StarknetMerkleType,
+  StarknetType,
   TypedData,
 } from '../types';
+import assert from './assert';
 import { byteArrayFromString } from './calldata/byteArray';
 import {
   computePedersenHash,
@@ -62,6 +64,11 @@ const revisionConfiguration: Record<Revision, Configuration> = {
   },
 };
 
+function assertRange(data: unknown, type: string, { min, max }: { min: bigint; max: bigint }) {
+  const value = BigInt(data as string);
+  assert(value >= min && value <= max, `${value} (${type}) is out of bounds [${min}, ${max}]`);
+}
+
 function identifyRevision({ types, domain }: TypedData) {
   if (revisionConfiguration[Revision.Active].domain in types && domain.revision === Revision.Active)
     return Revision.Active;
@@ -100,7 +107,7 @@ export function prepareSelector(selector: string): string {
   return isHex(selector) ? selector : getSelectorFromName(selector);
 }
 
-export function isMerkleTreeType(type: StarkNetType): type is StarkNetMerkleType {
+export function isMerkleTreeType(type: StarknetType): type is StarknetMerkleType {
   return type.type === 'merkletree';
 }
 
@@ -135,7 +142,7 @@ export function getDependencies(
 
   return [
     type,
-    ...(types[type] as StarkNetEnumType[]).reduce<string[]>(
+    ...(types[type] as StarknetEnumType[]).reduce<string[]>(
       (previous, t) => [
         ...previous,
         ...getDependencies(types, t.type, previous, t.contains, revision).filter(
@@ -191,7 +198,7 @@ export function encodeType(
       const dependencyElements = allTypes[dependency].map((t) => {
         const targetType =
           t.type === 'enum' && revision === Revision.Active
-            ? (t as StarkNetEnumType).contains
+            ? (t as StarknetEnumType).contains
             : t.type;
         // parentheses handling for enum variant types
         const typeString = targetType.match(/^\(.*\)$/)
@@ -258,9 +265,9 @@ export function encodeValue(
       if (revision === Revision.Active) {
         const [variantKey, variantData] = Object.entries(data as TypedData['message'])[0];
 
-        const parentType = types[ctx.parent as string][0] as StarkNetEnumType;
+        const parentType = types[ctx.parent as string][0] as StarknetEnumType;
         const enumType = types[parentType.contains];
-        const variantType = enumType.find((t) => t.name === variantKey) as StarkNetType;
+        const variantType = enumType.find((t) => t.name === variantKey) as StarknetType;
         const variantIndex = enumType.indexOf(variantType);
 
         const encodedSubtypes = variantType.type
@@ -305,15 +312,42 @@ export function encodeValue(
       } // else fall through to default
       return [type, getHex(data as string)];
     }
-    case 'felt':
-    case 'bool':
-    case 'u128':
-    case 'i128':
-    case 'ContractAddress':
-    case 'ClassHash':
-    case 'timestamp':
-    case 'shortstring':
+    case 'i128': {
+      if (revision === Revision.Active) {
+        const value = BigInt(data as string);
+        assertRange(value, type, RANGE_I128);
+        return [type, getHex(value < 0n ? PRIME + value : value)];
+      } // else fall through to default
       return [type, getHex(data as string)];
+    }
+    case 'timestamp':
+    case 'u128': {
+      if (revision === Revision.Active) {
+        assertRange(data, type, RANGE_U128);
+      } // else fall through to default
+      return [type, getHex(data as string)];
+    }
+    case 'felt':
+    case 'shortstring': {
+      // TODO: should 'shortstring' diverge into directly using encodeShortString()?
+      if (revision === Revision.Active) {
+        assertRange(getHex(data as string), type, RANGE_FELT);
+      } // else fall through to default
+      return [type, getHex(data as string)];
+    }
+    case 'ClassHash':
+    case 'ContractAddress': {
+      if (revision === Revision.Active) {
+        assertRange(data, type, RANGE_FELT);
+      } // else fall through to default
+      return [type, getHex(data as string)];
+    }
+    case 'bool': {
+      if (revision === Revision.Active) {
+        assert(typeof data === 'boolean', `Type mismatch for ${type} ${data}`);
+      } // else fall through to default
+      return [type, getHex(data as string)];
+    }
     default: {
       if (revision === Revision.Active) {
         throw new Error(`Unsupported type: ${type}`);
