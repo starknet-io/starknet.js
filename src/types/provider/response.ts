@@ -32,7 +32,7 @@ import {
   TransactionWithHash,
 } from './spec';
 
-export { ContractClassPayload, FeeEstimate, TransactionReceipt } from './spec';
+export { BlockWithTxHashes, ContractClassPayload, FeeEstimate, TransactionReceipt } from './spec';
 
 export type GetBlockResponse = PendingBlock | Block;
 

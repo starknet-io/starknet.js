@@ -73,7 +73,6 @@ export class RpcChannel {
     this.headers = { ...defaultOptions.headers, ...headers };
     this.blockIdentifier = blockIdentifier || defaultOptions.blockIdentifier;
     this.chainId = chainId;
-    this.specVersion = specVersion;
     this.waitMode = waitMode || false;
     this.requestId = 0;
     this.specVersion = specVersion;

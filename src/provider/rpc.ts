@@ -1,6 +1,4 @@
-import { ProviderInterface } from './interface';
-import { LibraryError } from './errors';
-import { RpcChannel, RPC06, RPC07 } from '../channel';
+import { RPC06, RPC07, RpcChannel } from '../channel';
 import {
   AccountInvocations,
   BigNumberish,
@@ -30,9 +28,11 @@ import {
 import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { isSierra } from '../utils/contract';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
+import { LibraryError } from './errors';
+import { ProviderInterface } from './interface';
 
 export class RpcProvider implements ProviderInterface {
-  private responseParser: RPCResponseParser;
+  private responseParser = new RPCResponseParser();
 
   public channel: RPC07.RpcChannel | RPC06.RpcChannel;
 
@@ -55,7 +55,8 @@ export class RpcProvider implements ProviderInterface {
       this.responseParser = (optionsOrProvider as any).responseParser;
     } else {
       this.channel = new RpcChannel({ ...optionsOrProvider, waitMode: false });
-      this.responseParser = new RPCResponseParser(optionsOrProvider?.feeMarginPercentage);
+      // TODO: check this hotfix (optionsOrProvider as any)? why required ?
+      this.responseParser = new RPCResponseParser((optionsOrProvider as any)?.feeMarginPercentage);
     }
   }
 
