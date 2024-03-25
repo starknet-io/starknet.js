@@ -1,0 +1,443 @@
+{
+  "$id": "componentSchemas",
+  "components": {
+    "schemas": {
+      "BLOCK_BODY_WITH_RECEIPTS": {
+        "type": "object",
+        "properties": {
+          "transactions": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          }
+        },
+        "required": ["transactions"]
+      },
+      "BLOCK_HEADER": {
+        "type": "object",
+        "properties": {
+          "block_hash": { "type": "string" },
+          "parent_hash": { "type": "string" },
+          "block_number": { "type": "string" },
+          "new_root": { "type": "string" },
+          "timestamp": {
+            "type": "integer"
+          },
+          "sequencer_address": { "type": "string" },
+          "l1_gas_price": {
+            "$ref": "#/components/schemas/RESOURCE_PRICE"
+          },
+          "l1_data_gas_price": {
+            "$ref": "#/components/schemas/RESOURCE_PRICE"
+          },
+          "l1_da_mode": {
+            "type": "string",
+            "enum": ["BLOB", "CALLDATA"]
+          },
+          "starknet_version": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "block_hash",
+          "parent_hash",
+          "block_number",
+          "new_root",
+          "timestamp",
+          "sequencer_address",
+          "l1_gas_price",
+          "l1_data_gas_price",
+          "l1_da_mode",
+          "starknet_version"
+        ]
+      },
+      "BLOCK_WITH_RECEIPTS": {
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "status": {
+                "type": "string"
+              }
+            },
+            "required": ["status"]
+          },
+          {
+            "$ref": "#/components/schemas/BLOCK_HEADER"
+          },
+          {
+            "$ref": "#/components/schemas/BLOCK_BODY_WITH_RECEIPTS"
+          }
+        ]
+      },
+      "COMPUTATION_RESOURCES": {
+        "type": "object",
+        "properties": {
+          "steps": {
+            "type": "integer"
+          },
+          "memory_holes": {
+            "type": "integer"
+          },
+          "range_check_builtin_applications": {
+            "type": "integer"
+          },
+          "pedersen_builtin_applications": {
+            "type": "integer"
+          },
+          "poseidon_builtin_applications": {
+            "type": "integer"
+          },
+          "ec_op_builtin_applications": {
+            "type": "integer"
+          },
+          "ecdsa_builtin_applications": {
+            "type": "integer"
+          },
+          "bitwise_builtin_applications": {
+            "type": "integer"
+          },
+          "keccak_builtin_applications": {
+            "type": "integer"
+          },
+          "segment_arena_builtin": {
+            "type": "integer"
+          }
+        },
+        "required": ["steps"]
+      },
+      "EXECUTION_RESOURCES": {
+        "type": "object",
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/COMPUTATION_RESOURCES"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "data_availability": {
+                "type": "object",
+                "properties": {
+                  "l1_gas": {
+                    "type": "integer"
+                  },
+                  "l1_data_gas": {
+                    "type": "integer"
+                  }
+                },
+                "required": ["l1_gas", "l1_data_gas"]
+              }
+            },
+            "required": ["data_availability"]
+          }
+        ]
+      },
+      "FUNCTION_CALL": {
+        "type": "object",
+        "properties": {
+          "contract_address": {
+            "type": "string"
+          },
+          "entry_point_selector": {
+            "type": "string"
+          },
+          "calldata": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "required": ["contract_address", "entry_point_selector", "calldata"]
+      },
+      "FUNCTION_INVOCATION": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/FUNCTION_CALL"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "caller_address": {
+                "type": "string"
+              },
+              "class_hash": {
+                "type": "string"
+              },
+              "entry_point_type": {
+                "type": "string"
+              },
+              "call_type": {
+                "type": "string"
+              },
+              "result": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "calls": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "events": {
+                "type": "array",
+                "items": { "type": "object" }
+              },
+              "messages": {
+                "type": "array",
+                "items": { "type": "object" }
+              },
+              "execution_resources": {
+                "$ref": "#/components/schemas/COMPUTATION_RESOURCES"
+              }
+            },
+            "required": [
+              "call_type",
+              "caller_address",
+              "calls",
+              "class_hash",
+              "entry_point_type",
+              "events",
+              "execution_resources",
+              "messages",
+              "result"
+            ]
+          }
+        ]
+      },
+      "PENDING_BLOCK_HEADER": {
+        "type": "object",
+        "properties": {
+          "parent_hash": { "type": "string" },
+          "timestamp": {
+            "type": "integer"
+          },
+          "sequencer_address": { "type": "string" },
+          "l1_gas_price": {
+            "$ref": "#/components/schemas/RESOURCE_PRICE"
+          },
+          "l1_data_gas_price": {
+            "$ref": "#/components/schemas/RESOURCE_PRICE"
+          },
+          "l1_da_mode": {
+            "type": "string",
+            "enum": ["BLOB", "CALLDATA"]
+          },
+          "starknet_version": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "parent_hash",
+          "timestamp",
+          "sequencer_address",
+          "l1_gas_price",
+          "l1_data_gas_price",
+          "l1_da_mode",
+          "starknet_version"
+        ]
+      },
+      "PENDING_BLOCK_WITH_RECEIPTS": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/BLOCK_BODY_WITH_RECEIPTS"
+          },
+          {
+            "$ref": "#/components/schemas/PENDING_BLOCK_HEADER"
+          }
+        ]
+      },
+      "RESOURCE_PRICE": {
+        "type": "object",
+        "properties": {
+          "price_in_fri": {
+            "type": "string"
+          },
+          "price_in_wei": {
+            "type": "string"
+          }
+        },
+        "required": ["price_in_wei", "price_in_fri"]
+      },
+      "STATE_DIFF": {
+        "type": "object",
+        "properties": {
+          "storage_diffs": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "deprecated_declared_classes": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "declared_classes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "class_hash": {
+                  "type": "string"
+                },
+                "compiled_class_hash": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "deployed_contracts": {
+            "type": "array",
+            "items": {
+              "type": "object"
+            }
+          },
+          "replaced_classes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "contract_address": {
+                  "type": "string"
+                },
+                "class_hash": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "nonces": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "contract_address": {
+                  "type": "string"
+                },
+                "nonce": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "required": [
+          "storage_diffs",
+          "deprecated_declared_classes",
+          "declared_classes",
+          "replaced_classes",
+          "deployed_contracts",
+          "nonces"
+        ]
+      },
+      "TRANSACTION_TRACE": {
+        "oneOf": [
+          {
+            "name": "INVOKE_TXN_TRACE",
+            "type": "object",
+            "properties": {
+              "validate_invocation": {
+                "$ref": "#/components/schemas/FUNCTION_INVOCATION"
+              },
+              "execute_invocation": {
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/FUNCTION_INVOCATION"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "revert_reason": { "type": "string" }
+                    }
+                  }
+                ]
+              },
+              "fee_transfer_invocation": {
+                "$ref": "#/components/schemas/FUNCTION_INVOCATION"
+              },
+              "state_diff": {
+                "$ref": "#/components/schemas/STATE_DIFF"
+              },
+              "execution_resources": {
+                "$ref": "#/components/schemas/EXECUTION_RESOURCES"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["INVOKE"]
+              }
+            },
+            "required": ["type", "execute_invocation", "execution_resources"]
+          },
+          {
+            "name": "DECLARE_TXN_TRACE",
+            "type": "object",
+            "properties": {
+              "validate_invocation": {
+                "$ref": "#/components/schemas/FUNCTION_INVOCATION"
+              },
+              "fee_transfer_invocation": {
+                "$ref": "#/components/schemas/FUNCTION_INVOCATION"
+              },
+              "state_diff": {
+                "$ref": "#/components/schemas/STATE_DIFF"
+              },
+              "execution_resources": {
+                "$ref": "#/components/schemas/EXECUTION_RESOURCES"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["DECLARE"]
+              }
+            },
+            "required": ["type", "execution_resources"]
+          },
+          {
+            "name": "DEPLOY_ACCOUNT_TXN_TRACE",
+            "type": "object",
+            "properties": {
+              "validate_invocation": {
+                "$ref": "#/components/schemas/FUNCTION_INVOCATION"
+              },
+              "constructor_invocation": {
+                "$ref": "#/components/schemas/FUNCTION_INVOCATION"
+              },
+              "fee_transfer_invocation": {
+                "$ref": "#/components/schemas/FUNCTION_INVOCATION"
+              },
+              "state_diff": {
+                "$ref": "#/components/schemas/STATE_DIFF"
+              },
+              "execution_resources": {
+                "$ref": "#/components/schemas/EXECUTION_RESOURCES"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["DEPLOY_ACCOUNT"]
+              }
+            },
+            "required": ["type", "execution_resources", "constructor_invocation"]
+          },
+          {
+            "name": "L1_HANDLER_TXN_TRACE",
+            "type": "object",
+            "properties": {
+              "function_invocation": {
+                "$ref": "#/components/schemas/FUNCTION_INVOCATION"
+              },
+              "state_diff": {
+                "$ref": "#/components/schemas/STATE_DIFF"
+              },
+              "type": {
+                "type": "string",
+                "enum": ["L1_HANDLER"]
+              }
+            },
+            "required": ["type", "function_invocation"]
+          }
+        ]
+      }
+    }
+  }
+}

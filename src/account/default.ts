@@ -41,7 +41,6 @@ import {
 import { ETransactionVersion, ETransactionVersion3, ResourceBounds } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
-import { starkCurve } from '../utils/ec';
 import { parseUDCEvent } from '../utils/events';
 import { calculateContractAddressFromHash } from '../utils/hash';
 import { toBigInt, toCairoBool } from '../utils/num';
@@ -49,15 +48,15 @@ import { parseContract } from '../utils/provider';
 import {
   estimateFeeToBounds,
   formatSignature,
-  randomAddress,
   reduceV2,
   toFeeVersion,
   toTransactionVersion,
   v3Details,
 } from '../utils/stark';
-import { getExecuteCalldata } from '../utils/transaction';
+import { buildUDCCall, getExecuteCalldata } from '../utils/transaction';
 import { getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
+import { isString } from '../utils/shortString';
 
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
@@ -81,7 +80,7 @@ export class Account extends Provider implements AccountInterface {
     super(providerOrOptions, instance);
     this.address = address.toLowerCase();
     this.signer =
-      typeof pkOrSigner === 'string' || pkOrSigner instanceof Uint8Array
+      isString(pkOrSigner) || pkOrSigner instanceof Uint8Array
         ? new Signer(pkOrSigner)
         : pkOrSigner;
 
@@ -137,7 +136,12 @@ export class Account extends Provider implements AccountInterface {
     calls: AllowArray<Call>,
     details: UniversalDetails = {}
   ): Promise<EstimateFee> {
-    const { nonce: providedNonce, blockIdentifier, version: providedVersion } = details;
+    const {
+      nonce: providedNonce,
+      blockIdentifier,
+      version: providedVersion,
+      skipValidate = true,
+    } = details;
 
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
@@ -155,6 +159,7 @@ export class Account extends Provider implements AccountInterface {
       version,
       chainId,
       cairoVersion: await this.getCairoVersion(),
+      skipValidate,
     };
 
     const invocation = await this.buildInvocation(transactions, signerDetails);
@@ -170,7 +175,12 @@ export class Account extends Provider implements AccountInterface {
     payload: DeclareContractPayload,
     details: UniversalDetails = {}
   ): Promise<EstimateFee> {
-    const { blockIdentifier, nonce: providedNonce, version: providedVersion } = details;
+    const {
+      blockIdentifier,
+      nonce: providedNonce,
+      version: providedVersion,
+      skipValidate = true,
+    } = details;
     const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
     const version = toTransactionVersion(
       !isSierra(payload.contract)
@@ -188,6 +198,7 @@ export class Account extends Provider implements AccountInterface {
       walletAddress: this.address,
       maxFee: ZERO,
       cairoVersion: undefined, // unused parameter
+      skipValidate,
     });
 
     return super.getDeclareEstimateFee(
@@ -207,7 +218,7 @@ export class Account extends Provider implements AccountInterface {
     }: DeployAccountContractPayload,
     details: UniversalDetails = {}
   ): Promise<EstimateFee> {
-    const { blockIdentifier, version: providedVersion } = details;
+    const { blockIdentifier, version: providedVersion, skipValidate = true } = details;
     const version = toTransactionVersion(
       this.getPreferredVersion(ETransactionVersion.F1, ETransactionVersion.F3),
       toFeeVersion(providedVersion)
@@ -225,6 +236,7 @@ export class Account extends Provider implements AccountInterface {
         walletAddress: this.address, // unused parameter
         maxFee: ZERO,
         cairoVersion: undefined, // unused parameter,
+        skipValidate,
       }
     );
 
@@ -272,7 +284,7 @@ export class Account extends Provider implements AccountInterface {
     invocations: Invocations,
     details: SimulateTransactionDetails = {}
   ): Promise<SimulateTransactionResponse> {
-    const { nonce, blockIdentifier, skipValidate, skipExecute, version } = details;
+    const { nonce, blockIdentifier, skipValidate = true, skipExecute, version } = details;
     const accountInvocations = await this.accountInvocationsFactory(invocations, {
       ...v3Details(details),
       versions: [
@@ -284,6 +296,7 @@ export class Account extends Provider implements AccountInterface {
       ],
       nonce,
       blockIdentifier,
+      skipValidate,
     });
 
     return super.getSimulateTransaction(accountInvocations, {
@@ -413,40 +426,7 @@ export class Account extends Provider implements AccountInterface {
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
     details: UniversalDetails = {}
   ): Promise<MultiDeployContractResponse> {
-    const params = [].concat(payload as []).map((it) => {
-      const {
-        classHash,
-        salt,
-        unique = true,
-        constructorCalldata = [],
-      } = it as UniversalDeployerContractPayload;
-
-      const compiledConstructorCallData = CallData.compile(constructorCalldata);
-      const deploySalt = salt ?? randomAddress();
-
-      return {
-        call: {
-          contractAddress: UDC.ADDRESS,
-          entrypoint: UDC.ENTRYPOINT,
-          calldata: [
-            classHash,
-            deploySalt,
-            toCairoBool(unique),
-            compiledConstructorCallData.length,
-            ...compiledConstructorCallData,
-          ],
-        },
-        address: calculateContractAddressFromHash(
-          unique ? starkCurve.pedersen(this.address, deploySalt) : deploySalt,
-          classHash,
-          compiledConstructorCallData,
-          unique ? UDC.ADDRESS : 0
-        ),
-      };
-    });
-
-    const calls = params.map((it) => it.call);
-    const addresses = params.map((it) => it.address);
+    const { calls, addresses } = buildUDCCall(payload, this.address);
     const invokeResponse = await this.execute(calls, undefined, details);
 
     return {
@@ -652,7 +632,7 @@ export class Account extends Provider implements AccountInterface {
     details: InvocationsSignerDetails
   ): Promise<Invocation> {
     const calldata = getExecuteCalldata(call, await this.getCairoVersion());
-    const signature = await this.signer.signTransaction(call, details);
+    const signature = !details.skipValidate ? await this.signer.signTransaction(call, details) : [];
 
     return {
       ...v3Details(details),
@@ -676,13 +656,15 @@ export class Account extends Provider implements AccountInterface {
       throw Error('V3 Transaction work with Cairo1 Contracts and require compiledClassHash');
     }
 
-    const signature = await this.signer.signDeclareTransaction({
-      ...details,
-      ...v3Details(details),
-      classHash,
-      compiledClassHash: compiledClassHash as string, // TODO: TS Nekuzi da v2 nemora imat a v3 mora i da je throvano ako nije definiran
-      senderAddress: details.walletAddress,
-    });
+    const signature = !details.skipValidate
+      ? await this.signer.signDeclareTransaction({
+          ...details,
+          ...v3Details(details),
+          classHash,
+          compiledClassHash: compiledClassHash as string, // TODO: TS, cast because optional for v2 and required for v3, thrown if not present
+          senderAddress: details.walletAddress,
+        })
+      : [];
 
     return {
       senderAddress: details.walletAddress,
@@ -706,14 +688,16 @@ export class Account extends Provider implements AccountInterface {
       providedContractAddress ??
       calculateContractAddressFromHash(addressSalt, classHash, compiledCalldata, 0);
 
-    const signature = await this.signer.signDeployAccountTransaction({
-      ...details,
-      ...v3Details(details),
-      classHash,
-      contractAddress,
-      addressSalt,
-      constructorCalldata: compiledCalldata,
-    });
+    const signature = !details.skipValidate
+      ? await this.signer.signDeployAccountTransaction({
+          ...details,
+          ...v3Details(details),
+          classHash,
+          contractAddress,
+          addressSalt,
+          constructorCalldata: compiledCalldata,
+        })
+      : [];
 
     return {
       ...v3Details(details),
@@ -755,7 +739,7 @@ export class Account extends Provider implements AccountInterface {
     invocations: Invocations,
     details: AccountInvocationsFactoryDetails
   ) {
-    const { nonce, blockIdentifier } = details;
+    const { nonce, blockIdentifier, skipValidate = true } = details;
     const safeNonce = await this.getNonceSafe(nonce);
     const chainId = await this.getChainId();
     const versions = details.versions.map((it) => toTransactionVersion(it));
@@ -778,6 +762,7 @@ export class Account extends Provider implements AccountInterface {
           chainId,
           cairoVersion,
           version: '' as ETransactionVersion,
+          skipValidate,
         };
         const common = {
           type: transaction.type,

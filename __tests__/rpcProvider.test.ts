@@ -7,7 +7,10 @@ import {
   Contract,
   ETransactionExecutionStatus,
   ETransactionStatus,
+  FeeEstimate,
   RPC,
+  RPC06,
+  RpcProvider,
   stark,
   waitForTransactionOptions,
 } from '../src';
@@ -76,6 +79,33 @@ describeIfRpc('RPCProvider', () => {
   test('getSpecVersion', async () => {
     const spec = await rpcProvider.getSpecVersion();
     expect(typeof spec).toBe('string');
+  });
+
+  test('configurable margin', async () => {
+    const p = new RpcProvider({
+      nodeUrl: provider.channel.nodeUrl,
+      feeMarginPercentage: {
+        l1BoundMaxAmount: 0,
+        l1BoundMaxPricePerUnit: 0,
+        maxFee: 0,
+      },
+    });
+    const estimateSpy = jest.spyOn(p.channel as any, 'getEstimateFee');
+    const mockFeeEstimate: FeeEstimate = {
+      gas_consumed: '0x2',
+      gas_price: '0x1',
+      data_gas_consumed: '0x2',
+      data_gas_price: '0x1',
+      overall_fee: '0x4',
+      unit: 'WEI',
+    };
+    estimateSpy.mockResolvedValue([mockFeeEstimate]);
+    const result = (await p.getEstimateFeeBulk([{} as any], {}))[0];
+    expect(estimateSpy).toHaveBeenCalledTimes(1);
+    expect(result.suggestedMaxFee).toBe(4n);
+    expect(result.resourceBounds.l1_gas.max_amount).toBe('0x4');
+    expect(result.resourceBounds.l1_gas.max_price_per_unit).toBe('0x1');
+    estimateSpy.mockRestore();
   });
 
   describe('Test Estimate message fee', () => {
@@ -181,6 +211,17 @@ describeIfRpc('RPCProvider', () => {
     test('getBlockWithTxs', async () => {
       const blockResponse = await rpcProvider.getBlockWithTxs(latestBlock.block_number);
       expect(blockResponse).toHaveProperty('transactions');
+    });
+
+    test('getBlockWithReceipts - 0.6 RpcChannel', async () => {
+      const channel = new RPC06.RpcChannel({ nodeUrl: rpcProvider.channel.nodeUrl });
+      const p = new RpcProvider({ channel } as any);
+      await expect(p.getBlockWithReceipts(latestBlock.block_number)).rejects.toThrow(/Unsupported/);
+    });
+
+    test('getBlockWithReceipts - 0.7 RpcChannel', async () => {
+      const blockResponse = await rpcProvider.getBlockWithReceipts(latestBlock.block_number);
+      expect(blockResponse).toMatchSchemaRef('BlockWithTxReceipts');
     });
 
     test('getTransactionByBlockIdAndIndex', async () => {
@@ -313,8 +354,9 @@ describeIfRpc('RPCProvider', () => {
         expect(typeof classHash).toBe('string');
       });
 
-      xtest('traceTransaction', async () => {
-        await rpcProvider.getTransactionTrace(transaction_hash);
+      test('traceTransaction', async () => {
+        const trace = await rpcProvider.getTransactionTrace(transaction_hash);
+        expect(trace).toMatchSchemaRef('getTransactionTrace');
       });
 
       test('getClassAt', async () => {

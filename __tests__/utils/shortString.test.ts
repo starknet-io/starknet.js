@@ -65,12 +65,12 @@ describe('shortString', () => {
       pending_word_len: 0,
     });
     expect(byteArray.byteArrayFromString('ABCDEFGHIJKLMNOPQRSTUVWXYZ1234')).toEqual({
-      data: ['0x00'],
+      data: [],
       pending_word: '0x4142434445464748494a4b4c4d4e4f505152535455565758595a31323334',
       pending_word_len: 30,
     });
     expect(byteArray.byteArrayFromString('')).toEqual({
-      data: ['0x00'],
+      data: [],
       pending_word: '0x00',
       pending_word_len: 0,
     });
@@ -90,14 +90,14 @@ describe('shortString', () => {
   });
   expect(
     byteArray.stringFromByteArray({
-      data: ['0x00'],
+      data: [],
       pending_word: '0x4142434445464748494a4b4c4d4e4f505152535455565758595a31323334',
       pending_word_len: 30,
     })
   ).toBe('ABCDEFGHIJKLMNOPQRSTUVWXYZ1234');
   expect(
     byteArray.stringFromByteArray({
-      data: ['0x00'],
+      data: [],
       pending_word: '0x00',
       pending_word_len: 0,
     })

@@ -7,6 +7,7 @@ import {
   StarkNetType,
   TypedData,
 } from '../types';
+import { byteArrayFromString } from './calldata/byteArray';
 import {
   computePedersenHash,
   computePedersenHashOnElements,
@@ -16,7 +17,7 @@ import {
 } from './hash';
 import { MerkleTree } from './merkle';
 import { isHex, toHex } from './num';
-import { encodeShortString, splitLongString } from './shortString';
+import { encodeShortString, isString } from './shortString';
 
 /** @deprecated prefer importing from 'types' over 'typedData' */
 export * from '../types/typedData';
@@ -61,24 +62,6 @@ const revisionConfiguration: Record<Revision, Configuration> = {
   },
 };
 
-// TODO: replace with utils byteArrayFromString from PR#891 once it is available
-export function byteArrayFromString(targetString: string) {
-  const shortStrings: string[] = splitLongString(targetString);
-  const remainder: string = shortStrings[shortStrings.length - 1];
-  const shortStringsEncoded: BigNumberish[] = shortStrings.map(encodeShortString);
-
-  const [pendingWord, pendingWordLength] =
-    remainder === undefined || remainder.length === 31
-      ? ['0x00', 0]
-      : [shortStringsEncoded.pop()!, remainder.length];
-
-  return {
-    data: shortStringsEncoded.length === 0 ? ['0x00'] : shortStringsEncoded,
-    pending_word: pendingWord,
-    pending_word_len: pendingWordLength,
-  };
-}
-
 function identifyRevision({ types, domain }: TypedData) {
   if (revisionConfiguration[Revision.Active].domain in types && domain.revision === Revision.Active)
     return Revision.Active;
@@ -96,7 +79,7 @@ function getHex(value: BigNumberish): string {
   try {
     return toHex(value);
   } catch (e) {
-    if (typeof value === 'string') {
+    if (isString(value)) {
       return toHex(encodeShortString(value));
     }
     throw new Error(`Invalid BigNumberish: ${value}`);
@@ -188,14 +171,24 @@ export function encodeType(
   type: string,
   revision: Revision = Revision.Legacy
 ): string {
-  const [primary, ...dependencies] = getDependencies(types, type, undefined, undefined, revision);
+  const allTypes =
+    revision === Revision.Active
+      ? { ...types, ...revisionConfiguration[revision].presetTypes }
+      : types;
+  const [primary, ...dependencies] = getDependencies(
+    allTypes,
+    type,
+    undefined,
+    undefined,
+    revision
+  );
   const newTypes = !primary ? [] : [primary, ...dependencies.sort()];
 
   const esc = revisionConfiguration[revision].escapeTypeString;
 
   return newTypes
     .map((dependency) => {
-      const dependencyElements = types[dependency].map((t) => {
+      const dependencyElements = allTypes[dependency].map((t) => {
         const targetType =
           t.type === 'enum' && revision === Revision.Active
             ? (t as StarkNetEnumType).contains

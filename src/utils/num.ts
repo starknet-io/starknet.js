@@ -181,3 +181,23 @@ export function addPercent(number: BigNumberish, percent: number) {
   const bigIntNum = BigInt(number);
   return bigIntNum + (bigIntNum * BigInt(percent)) / 100n;
 }
+
+/**
+ * Check if a value is a number.
+ *
+ * @param {unknown} value - The value to check.
+ * @return {boolean} Returns true if the value is a number, otherwise returns false.
+ */
+export function isNumber(value: unknown): value is number {
+  return typeof value === 'number';
+}
+
+/**
+ * Checks if a given value is of boolean type.
+ *
+ * @param {unknown} value - The value to check.
+ * @return {boolean} - True if the value is of boolean type, false otherwise.
+ */
+export function isBoolean(value: unknown): value is boolean {
+  return typeof value === 'boolean';
+}

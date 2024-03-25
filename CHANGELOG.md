@@ -1,3 +1,82 @@
+# [6.6.0](https://github.com/starknet-io/starknet.js/compare/v6.5.0...v6.6.0) (2024-03-19)
+
+### Bug Fixes
+
+- second option bump semantic release to 0.5 ([c90f9b2](https://github.com/starknet-io/starknet.js/commit/c90f9b285afb455d2404bff67137d5e6ae44cd5f))
+- test ci fix ([3a6c924](https://github.com/starknet-io/starknet.js/commit/3a6c9247717cb979842d9b37905ae423267959a5))
+- update to latest get-starknet dev ([017702f](https://github.com/starknet-io/starknet.js/commit/017702fd8c579ab62c98bc78fd6e8dd3022ef9ec))
+- wallet circular dependency fix ([621ae2d](https://github.com/starknet-io/starknet.js/commit/621ae2d4a015f3bb3b2e63ddbaeb5fa843509a88))
+
+### Features
+
+- get-starknet-core repacked for mjs, and initial implementation ([ab7fa19](https://github.com/starknet-io/starknet.js/commit/ab7fa19f44ad1fc27292313589247b74943fe3d0))
+- the WalletAccount handle changed channel ([73603e1](https://github.com/starknet-io/starknet.js/commit/73603e175bcc7925aa896be81fb666ffb225890d))
+- wallet deploy contract and patches ([dbf53b6](https://github.com/starknet-io/starknet.js/commit/dbf53b6e57948e433186cae6209998dece04fe4a))
+- walletAccount extract methods and update new ones ([0dfb5db](https://github.com/starknet-io/starknet.js/commit/0dfb5db1032dd7c946ee514647e8abb3eda87996))
+
+# [6.5.0](https://github.com/starknet-io/starknet.js/compare/v6.4.2...v6.5.0) (2024-03-14)
+
+### Bug Fixes
+
+- adjust max amount bound calculation for RPC v0.7.0 ([dd34cdb](https://github.com/starknet-io/starknet.js/commit/dd34cdb8b9817a55a16a97d960b1544d75c0059a))
+
+### Features
+
+- make fee margins configurable ([cedd984](https://github.com/starknet-io/starknet.js/commit/cedd984e1106db5b73d17630e282eb956d344a97))
+
+## [6.4.2](https://github.com/starknet-io/starknet.js/compare/v6.4.1...v6.4.2) (2024-03-14)
+
+### Bug Fixes
+
+- update starknetid sepolia contract addresses ([#1016](https://github.com/starknet-io/starknet.js/issues/1016)) ([b50a3bd](https://github.com/starknet-io/starknet.js/commit/b50a3bdada4345a9d601734762bc7a600766ec25))
+
+## [6.4.1](https://github.com/starknet-io/starknet.js/compare/v6.4.0...v6.4.1) (2024-03-14)
+
+### Bug Fixes
+
+- byteArray encoding for less than 31 chars ([#1011](https://github.com/starknet-io/starknet.js/issues/1011)) ([653acc4](https://github.com/starknet-io/starknet.js/commit/653acc44c841540214dd6f6b8956b354d7c27644))
+
+# [6.4.0](https://github.com/starknet-io/starknet.js/compare/v6.3.0...v6.4.0) (2024-03-12)
+
+### Bug Fixes
+
+- expand encoding type for preset types ([b992446](https://github.com/starknet-io/starknet.js/commit/b9924465a1f01ac4273638f3fa258b36192d2101))
+
+### Features
+
+- enable cairo 2.6.0 contract declaration ([0104c59](https://github.com/starknet-io/starknet.js/commit/0104c59739a9dbe70091e14372a73ca84550f639))
+- skip signatures when skipValidate is true ([6f784ea](https://github.com/starknet-io/starknet.js/commit/6f784ea4e4edd298f1950dac956fd1c81b953497))
+
+# [6.3.0](https://github.com/starknet-io/starknet.js/compare/v6.2.1...v6.3.0) (2024-03-11)
+
+### Features
+
+- update starknetId class and add getStarkProfile function ([ae71c97](https://github.com/starknet-io/starknet.js/commit/ae71c97b38974d4d7b3392532388957e1ea499bb))
+
+## [6.2.1](https://github.com/starknet-io/starknet.js/compare/v6.2.0...v6.2.1) (2024-03-11)
+
+### Bug Fixes
+
+- repair Cairo 1 nested and enum tuple handling ([ce2e541](https://github.com/starknet-io/starknet.js/commit/ce2e5417e6c42af17418408dc1ca6aab4c570473))
+
+# [6.2.0](https://github.com/starknet-io/starknet.js/compare/v6.1.5...v6.2.0) (2024-03-07)
+
+### Features
+
+- implement RPC v0.7.0-rc2 specification ([de32936](https://github.com/starknet-io/starknet.js/commit/de329361d838157b4fbe2b37bb043c3235b97a14))
+
+## [6.1.5](https://github.com/starknet-io/starknet.js/compare/v6.1.4...v6.1.5) (2024-03-02)
+
+### Bug Fixes
+
+- **RpcChannel:** allow client to provide `specVersion` ([ae8cf8e](https://github.com/starknet-io/starknet.js/commit/ae8cf8e19d8ba73c52376d83d2e084da008daba1))
+
+## [6.1.4](https://github.com/starknet-io/starknet.js/compare/v6.1.3...v6.1.4) (2024-02-26)
+
+### Bug Fixes
+
+- **Calldata.compile:** do not split long `entrypoint` names before calling `getSelectorFromName` ([9434bcd](https://github.com/starknet-io/starknet.js/commit/9434bcddf74069c7e5bdecbac94017ae23cd2a45))
+
 ## [6.1.3](https://github.com/starknet-io/starknet.js/compare/v6.1.2...v6.1.3) (2024-02-23)
 
 ### Bug Fixes

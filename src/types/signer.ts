@@ -10,6 +10,7 @@ import {
 
 export type InvocationsSignerDetails = (V2InvocationsSignerDetails | V3InvocationsSignerDetails) & {
   version: `${ETransactionVersion}`;
+  skipValidate?: boolean;
 };
 
 export type V2InvocationsSignerDetails = {

@@ -167,8 +167,8 @@ export class CallData {
         const oe = Array.isArray(o) ? [o.length.toString(), ...o] : o;
         return Object.entries(oe).flatMap(([k, v]) => {
           let value = v;
-          if (isLongText(value)) value = byteArrayFromString(value);
           if (k === 'entrypoint') value = getSelectorFromName(value);
+          else if (isLongText(value)) value = byteArrayFromString(value);
           const kk = Array.isArray(oe) && k === '0' ? '$$len' : k;
           if (isBigInt(value)) return [[`${prefix}${kk}`, felt(value)]];
           if (Object(value) === value) {
