@@ -229,15 +229,21 @@ OpenZeppelin has released an account contract for a such Ethereum account. Here 
 ### Compute address
 
 ```typescript
-const privateKeyETH = "0x45397ee6ca34cb49060f1c303c6cb7ee2d6123e617601ef3e31ccf7bf5bef1f9";
+const privateKeyETH = '0x45397ee6ca34cb49060f1c303c6cb7ee2d6123e617601ef3e31ccf7bf5bef1f9';
 const ethSigner = new EthSigner(privateKeyETH);
 const ethFullPublicKey = await ethSigner.getPubKey();
-const accountEthClassHash = "0x23e416842ca96b1f7067693892ed00881d97a4b0d9a4c793b75cb887944d98d";
+const accountEthClassHash = '0x23e416842ca96b1f7067693892ed00881d97a4b0d9a4c793b75cb887944d98d';
 const myCallData = new CallData(ethAccountAbi);
-const accountETHconstructorCalldata = myCallData.compile("constructor",
-    { public_key: ethFullPublicKey });
-const salt = "0x12345" // or lower felt of public key X part
-const contractETHaddress = hash.calculateContractAddressFromHash(salt, decClassHash, accountETHconstructorCalldata, 0);
+const accountETHconstructorCalldata = myCallData.compile('constructor', {
+  public_key: ethFullPublicKey,
+});
+const salt = '0x12345'; // or lower felt of public key X part
+const contractETHaddress = hash.calculateContractAddressFromHash(
+  salt,
+  accountEthClassHash,
+  accountETHconstructorCalldata,
+  0
+);
 console.log('Pre-calculated ETH account address =', contractETHaddress);
 ```
 
@@ -249,11 +255,17 @@ If you have sent enough funds to this new address, you can go forward to the fin
 
 ```typescript
 const ethAccount = new Account(provider, contractETHaddress, ethSigner);
-const { transaction_hash, contract_address } = await ethAccount.deployAccount({
-    classHash: accountEthClassHash,
-    constructorCalldata: accountETHconstructorCalldata,
-    addressSalt: salt
-    });
+const deployPayload = {
+  classHash: accountEthClassHash,
+  constructorCalldata: accountETHconstructorCalldata,
+  addressSalt: salt,
+};
+const { suggestedMaxFee: feeDeploy } = await ethAccount.estimateAccountDeployFee(deployPayload);
+const { transaction_hash, contract_address } = await ethAccount.deployAccount(
+  deployPayload,
+  { maxFee: stark.estimatedFeeToMaxFee(feeDeploy, 100) }
+  // Extra fee to fund the validation of the transaction
+);
 await provider.waitForTransaction(transaction_hash);
 console.log('✅ New Ethereum account final address =', contract_address);
 ```

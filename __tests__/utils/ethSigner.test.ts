@@ -11,6 +11,7 @@ import {
   eth,
   hash,
   num,
+  stark,
 } from '../../src';
 import { ETransactionVersion } from '../../src/types/api';
 import {
@@ -135,11 +136,17 @@ describe('Ethereum signer', () => {
       await account.waitForTransaction(transaction_hash);
 
       ethAccount = new Account(provider, contractETHAccountAddress, ethSigner);
-      const { transaction_hash: txH2, contract_address } = await ethAccount.deployAccount({
+      const deployPayload = {
         classHash: decClassHash,
         constructorCalldata: accountETHconstructorCalldata,
         addressSalt: salt,
-      });
+      };
+      const { suggestedMaxFee: feeDeploy } =
+        await ethAccount.estimateAccountDeployFee(deployPayload);
+      const { transaction_hash: txH2, contract_address } = await ethAccount.deployAccount(
+        deployPayload,
+        { maxFee: stark.estimatedFeeToMaxFee(feeDeploy, 100) }
+      );
       await provider.waitForTransaction(txH2);
       expect(contract_address).toBe(contractETHAccountAddress);
     });
@@ -261,9 +268,11 @@ describe('Ethereum signer', () => {
         resourceBounds: {
           l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
           l1_gas: {
-            max_amount: num.toHex(BigInt(feeTransfer.resourceBounds.l1_gas.max_amount) * 2n),
+            max_amount: num.toHex(
+              stark.estimatedFeeToMaxFee(feeTransfer.resourceBounds.l1_gas.max_amount, 150)
+            ),
             max_price_per_unit: num.toHex(
-              BigInt(feeTransfer.resourceBounds.l1_gas.max_price_per_unit) * 2n
+              stark.estimatedFeeToMaxFee(feeTransfer.resourceBounds.l1_gas.max_price_per_unit, 150)
             ),
           },
         },
