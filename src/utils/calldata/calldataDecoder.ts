@@ -38,7 +38,7 @@ import assert from '../assert';
  * @returns The decoded value.
  * @throws An error if the type is not recognized.
  */
-function decodeBaseType(type: string, calldata: string | string[]): BigNumberish | CairoUint256 {
+function decodeBaseTypes(type: string, calldata: string | string[]): BigNumberish | CairoUint256 {
   switch (true) {
     case CairoUint256.isAbiType(type):
       assert(
@@ -116,7 +116,7 @@ function decodeTuple(
         break;
       }
       default: {
-        const result = decodeBaseType(type, calldata[calldataIndex]);
+        const result = decodeBaseTypes(type, calldata[calldataIndex]);
         decodedElements.push(result);
         calldataIndex += 1;
       }
@@ -170,7 +170,7 @@ function decodeCalldataValue(
 ): any {
   // Felt type decoding
   if (isTypeFelt(type)) {
-    return decodeBaseType(type, Array.isArray(calldata) ? calldata[0] : calldata);
+    return decodeBaseTypes(type, Array.isArray(calldata) ? calldata[0] : calldata);
   }
 
   // Bytes31 decoding
@@ -180,7 +180,7 @@ function decodeCalldataValue(
 
   // CairoUint256
   if (CairoUint256.isAbiType(type)) {
-    return decodeBaseType(type, Array.isArray(calldata) ? calldata[0] : calldata);
+    return decodeBaseTypes(type, Array.isArray(calldata) ? calldata[0] : calldata);
   }
 
   // Struct decoding
@@ -485,7 +485,7 @@ export function decodeCalldataField(
     }
 
     default: {
-      return decodeBaseType(calldata[0], type);
+      return decodeBaseTypes(calldata[0], type);
     }
   }
 }
