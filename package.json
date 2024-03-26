@@ -99,7 +99,8 @@
     "lossless-json": "^4.0.1",
     "pako": "^2.0.4",
     "ts-mixer": "^6.0.3",
-    "url-join": "^4.0.1"
+    "url-join": "^4.0.1",
+    "get-starknet-core": "file:~/Work/get-starknet-fork/packages/core"
   },
   "lint-staged": {
     "*.ts": "eslint --cache --fix",

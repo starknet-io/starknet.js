@@ -1,15 +1,15 @@
 import {
-  AccountChangeEventHandler,
-  AddDeclareTransactionParameters,
-  AddDeployAccountTransactionParameters,
-  AddInvokeTransactionParameters,
-  AddStarknetChainParameters,
-  NetworkChangeEventHandler,
-  StarknetChainId,
-  StarknetWindowObject,
-  TypedData,
-  WatchAssetParameters,
-} from './getst/main';
+  type WatchAssetParameters,
+  type AccountChangeEventHandler,
+  type AddDeclareTransactionParameters,
+  type AddDeployAccountTransactionParameters,
+  type AddInvokeTransactionParameters,
+  type AddStarknetChainParameters,
+  type NetworkChangeEventHandler,
+  type StarknetChainId,
+  type StarknetWindowObject,
+  type TypedData,
+} from 'get-starknet-core';
 
 /**
  * Request Permission for wallet account, return addresses that are allowed by user

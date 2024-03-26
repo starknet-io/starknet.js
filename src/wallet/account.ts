@@ -29,7 +29,7 @@ import {
   signMessage,
   switchStarknetChain,
   watchAsset,
-} from './connect';
+} from './connect.js';
 import {
   AccountChangeEventHandler,
   AddStarknetChainParameters,
