@@ -9,7 +9,6 @@ import {
   StructAbi,
 } from '../../types';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
-import { byteArrayFromString } from './byteArray';
 import {
   isTypeFelt,
   getArrayType,
@@ -30,7 +29,7 @@ import {
 } from './enum';
 import extractTupleMemberTypes from './tuple';
 import { decodeShortString } from '../shortString';
-import { hexToBytes } from '../num';
+import assert from '../assert';
 
 /**
  * Decode a base type from calldata.
@@ -42,18 +41,14 @@ import { hexToBytes } from '../num';
 function decodeBaseType(type: string, calldata: string | string[]): BigNumberish | CairoUint256 {
   switch (true) {
     case CairoUint256.isAbiType(type):
-      if (!Array.isArray(calldata) || calldata.length !== 2) {
-        throw new Error('Expected calldata for CairoUint256 as an array of two strings.');
-      }
+      assert(Array.isArray(calldata) && calldata.length === 2, 'Expected calldata for CairoUint256 as an array of two strings.')
       return CairoUint256.fromCalldata([calldata[0], calldata[1]]);
 
     case isTypeBytes31(type):
       return decodeShortString(calldata as string);
 
     case isTypeFelt(type):
-      if (typeof calldata !== 'string') {
-        throw new Error('Expected string calldata for base type decoding.');
-      }
+      assert(typeof calldata === 'string', 'Expected string calldata for base type decoding.')
       return BigInt(calldata);
 
     default:
@@ -198,10 +193,9 @@ function decodeCalldataValue(
   // CairoOption decoding
   if (isTypeOption(type)) {
     const match = type.match(/Option<(.*)>/);
-    if (!match) {
-      throw new Error(`Type "${type}" is not a valid Option type.`);
-    }
-    const innerType = match[1];
+    assert(match !== null, `Type "${type}" is not a valid Option type.`);
+
+    const innerType = match![1];
     return decodeCairoOption(
       Array.isArray(calldata) ? calldata : [calldata],
       innerType,
@@ -213,9 +207,7 @@ function decodeCalldataValue(
   // CairoResult decoding
   if (isTypeResult(type)) {
     const matches = type.match(/Result<(.+),\s*(.+)>/);
-    if (!matches || matches.length < 3) {
-      throw new Error(`Type "${type}" is not a valid Option type.`);
-    }
+    assert(matches !== null && matches.length > 2, `Type "${type}" is not a valid Option type.`)
 
     const okType = matches[1];
     const errType = matches[2];
@@ -273,9 +265,7 @@ function decodeStruct(
   enums: AbiEnums
 ): ParsedStruct {
   const structAbi: StructAbi = structs[structName];
-  if (!structAbi) {
-    throw new Error(`Struct with name ${structName} not found.`);
-  }
+  assert(structAbi !== null, `Struct with name ${structName} not found.`);
 
   let index = 0;
   const result: ParsedStruct = {};
@@ -300,14 +290,10 @@ function decodeStruct(
  */
 function decodeEnum(calldataValues: string[], enumName: string, enums: AbiEnums): CairoEnum {
   const enumDefinition = enums[enumName];
-  if (!enumDefinition) {
-    throw new Error(`Enum with name ${enumName} not found.`);
-  }
+  assert(enumDefinition !== null, `Enum with name ${enumName} not found.`);
 
   const variantIndex = parseInt(calldataValues[0], 10);
-  if (variantIndex < 0 || variantIndex >= enumDefinition.variants.length) {
-    throw new Error(`Variant index ${variantIndex} out of range for enum ${enumName}.`);
-  }
+  assert(variantIndex >=0 && variantIndex < enumDefinition.variants.length, `Variant index ${variantIndex} out of range for enum ${enumName}.`);
 
   const variant = enumDefinition.variants[variantIndex];
 
@@ -405,7 +391,7 @@ function getExpectedCalldataLengthForEnum(
   enums: AbiEnums
 ): number {
   const enumDefinition = enums[enumName];
-  if (!enumDefinition) throw new Error(`Enum with name ${enumName} not found.`);
+  assert(enumDefinition, `Enum with name ${enumName} not found.`);
 
   const variantIndex = parseInt(variantIndexCalldata, 10);
   const variant = enumDefinition.variants[variantIndex];
