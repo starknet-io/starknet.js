@@ -41,14 +41,17 @@ import assert from '../assert';
 function decodeBaseType(type: string, calldata: string | string[]): BigNumberish | CairoUint256 {
   switch (true) {
     case CairoUint256.isAbiType(type):
-      assert(Array.isArray(calldata) && calldata.length === 2, 'Expected calldata for CairoUint256 as an array of two strings.')
+      assert(
+        Array.isArray(calldata) && calldata.length === 2,
+        'Expected calldata for CairoUint256 as an array of two strings.'
+      );
       return CairoUint256.fromCalldata([calldata[0], calldata[1]]);
 
     case isTypeBytes31(type):
       return decodeShortString(calldata as string);
 
     case isTypeFelt(type):
-      assert(typeof calldata === 'string', 'Expected string calldata for base type decoding.')
+      assert(typeof calldata === 'string', 'Expected string calldata for base type decoding.');
       return BigInt(calldata);
 
     default:
@@ -64,19 +67,24 @@ function decodeBaseType(type: string, calldata: string | string[]): BigNumberish
  * @param enums The ABI enums.
  * @returns An array of decoded tuple elements.
  */
-function decodeTuple(calldata: string[], typeStr: string, structs: AbiStructs, enums: AbiEnums) {
+function decodeTuple(
+  calldata: string[],
+  typeStr: string,
+  structs: AbiStructs,
+  enums: AbiEnums
+): any[] {
   // Parse typeStr to understand the tuple structure, e.g., "('felt', 'struct', 'enum')"
   const types: string[] = extractTupleMemberTypes(typeStr).map((type: string | object) =>
     String(type)
   );
 
   // Assuming we now have an array of types, ['felt', 'YourStructName', 'YourEnumName'], etc.
-  const decodedElements = [];
+  const decodedElements: any = [];
   let calldataIndex = 0;
 
-  for (const type of types) {
+  types.forEach((type) => {
     switch (true) {
-      case isTypeStruct(type, structs):
+      case isTypeStruct(type, structs): {
         const structRes = decodeStruct(
           calldata.slice(calldataIndex, calldataIndex + structs[type].size),
           type,
@@ -86,7 +94,8 @@ function decodeTuple(calldata: string[], typeStr: string, structs: AbiStructs, e
         decodedElements.push(structRes);
         calldataIndex += structs[type].size; // Assuming size is defined for structs.
         break;
-      case isTypeEnum(type, enums):
+      }
+      case isTypeEnum(type, enums): {
         // Determine the expected calldata consumption for the current enum. (e.g., 1 or 2 elements for CairoOption, 2 elements for CairoResult, etc.)
         const expectedCalldataLength = getExpectedCalldataLengthForEnum(
           calldata[calldataIndex],
@@ -98,18 +107,21 @@ function decodeTuple(calldata: string[], typeStr: string, structs: AbiStructs, e
         decodedElements.push(enumRes);
         calldataIndex += expectedCalldataLength; // Move past the consumed calldata.
         break;
-      case isTypeArray(type):
+      }
+      case isTypeArray(type): {
         const arrayType = getArrayType(type);
         const arrayRes = decodeCalldataValue([calldata[calldataIndex]], arrayType, structs, enums);
         decodedElements.push(arrayRes);
         calldataIndex += 1;
         break;
-      default:
+      }
+      default: {
         const result = decodeBaseType(type, calldata[calldataIndex]);
         decodedElements.push(result);
         calldataIndex += 1;
+      }
     }
-  }
+  });
 
   return decodedElements;
 }
@@ -119,19 +131,20 @@ function decodeTuple(calldata: string[], typeStr: string, structs: AbiStructs, e
  * @param calldata The calldata array.
  * @returns The decoded byte array.
  */
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 function decodeByteArray(calldata: string[]): ByteArray {
   // Extract the length of the data array from the first element.
   const dataLength = parseInt(calldata[0], 10);
-  
+
   // Extract the data array elements based on the extracted length.
   const data = calldata.slice(1, 1 + dataLength).map((str) => parseInt(str, 10));
-  
+
   // The pending_word is the second-to-last element in the original array.
   const pending_word = parseInt(calldata[1 + dataLength], 10);
-  
+
   // The pending_word_len is the last element in the original array.
   const pending_word_len = parseInt(calldata[2 + dataLength], 10);
-  
+
   // Construct and return the ByteArray object.
   return {
     data,
@@ -207,7 +220,7 @@ function decodeCalldataValue(
   // CairoResult decoding
   if (isTypeResult(type)) {
     const matches = type.match(/Result<(.+),\s*(.+)>/);
-    assert(matches !== null && matches.length > 2, `Type "${type}" is not a valid Option type.`)
+    assert(matches !== null && matches.length > 2, `Type "${type}" is not a valid Option type.`);
 
     const okType = matches[1];
     const errType = matches[2];
@@ -242,7 +255,7 @@ function decodeArray(
   const elementType = getArrayType(arrayType);
   const elements = [];
 
-  for (let i = 0; i < calldata.length; i++) {
+  for (let i = 0; i < calldata.length; i += 1) {
     elements.push(decodeCalldataValue([calldata[i]], elementType, structs, enums));
   }
 
@@ -270,12 +283,12 @@ function decodeStruct(
   let index = 0;
   const result: ParsedStruct = {};
 
-  for (const field of structAbi.members) {
+  structAbi.members.forEach((field) => {
     const fieldType = field.type;
     const fieldCalldata = calldataSegment.slice(index, index + 1);
     result[field.name] = decodeCalldataValue(fieldCalldata[0], fieldType, structs, enums);
     index += 1;
-  }
+  });
 
   return result;
 }
@@ -293,7 +306,10 @@ function decodeEnum(calldataValues: string[], enumName: string, enums: AbiEnums)
   assert(enumDefinition !== null, `Enum with name ${enumName} not found.`);
 
   const variantIndex = parseInt(calldataValues[0], 10);
-  assert(variantIndex >=0 && variantIndex < enumDefinition.variants.length, `Variant index ${variantIndex} out of range for enum ${enumName}.`);
+  assert(
+    variantIndex >= 0 && variantIndex < enumDefinition.variants.length,
+    `Variant index ${variantIndex} out of range for enum ${enumName}.`
+  );
 
   const variant = enumDefinition.variants[variantIndex];
 
@@ -301,14 +317,17 @@ function decodeEnum(calldataValues: string[], enumName: string, enums: AbiEnums)
   switch (enumName) {
     case 'CairoOption':
       switch (variant.name) {
-        case 'None':
+        case 'None': {
           return new CairoOption(CairoOptionVariant.None);
-        default: // "Some"
+        }
+        default: {
+          // "Some"
           // const someValue = calldataValues[1]; // Placeholder logic.
           const someValue = decodeCalldataValue(calldataValues.slice(1), variant.type, {}, enums);
           return new CairoOption(CairoOptionVariant.Some, someValue);
+        }
       }
-    case 'CairoResult':
+    case 'CairoResult': {
       // const resultValue = calldataValues[1]; // Placeholder logic.
       const resultValue = decodeCalldataValue(calldataValues.slice(1), variant.type, {}, enums);
 
@@ -318,9 +337,11 @@ function decodeEnum(calldataValues: string[], enumName: string, enums: AbiEnums)
         default: // "Err"
           return new CairoResult(CairoResultVariant.Err, resultValue);
       }
-
-    default: // Handling CairoCustomEnum or simple enum types without associated data.
+    }
+    default: {
+      // Handling CairoCustomEnum or simple enum types without associated data.
       return new CairoCustomEnum({ activeVariant: variant.name, variant: variant.name });
+    }
   }
 }
 
@@ -341,12 +362,15 @@ function decodeCairoOption(
   const optionIndicator = parseInt(calldata[0], 10);
 
   switch (optionIndicator) {
-    case 0: // None
-      return CairoOptionVariant.None ;
-    default:
-    // Assuming the value is directly after the indicator
-    const valueCalldata = calldata.slice(1);
-    return decodeCalldataValue(valueCalldata, innerType, structs, enums);
+    case 0: {
+      // None
+      return CairoOptionVariant.None;
+    }
+    default: {
+      // Assuming the value is directly after the indicator
+      const valueCalldata = calldata.slice(1);
+      return decodeCalldataValue(valueCalldata, innerType, structs, enums);
+    }
   }
 }
 
@@ -369,12 +393,16 @@ function decodeCairoResult(
   const resultIndicator = parseInt(calldata[0], 10);
 
   switch (resultIndicator) {
-    case 0: // Code 0 indicates "Ok"
+    case 0: {
+      // Code 0 indicates "Ok"
       const okValueCalldata = calldata.slice(1);
-      return { ok: decodeCalldataValue(okValueCalldata, okType, structs, enums) };  
-    default: // Non-zero code indicates "Err"
+      return { ok: decodeCalldataValue(okValueCalldata, okType, structs, enums) };
+    }
+    default: {
+      // Non-zero code indicates "Err"
       const errValueCalldata = calldata.slice(1);
       return { err: decodeCalldataValue(errValueCalldata, errType, structs, enums) };
+    }
   }
 }
 
@@ -420,14 +448,15 @@ export function decodeCalldataField(
   structs: AbiStructs,
   enums: AbiEnums
 ): any {
-  const { name, type } = input;
+  const { type } = input;
 
   switch (true) {
-    
     // Handling Array types
     case isTypeArray(type): {
       const elementType = getArrayType(type);
-      return calldata.map(elementCalldata => decodeCalldataValue([elementCalldata], elementType, structs, enums));
+      return calldata.map((elementCalldata) =>
+        decodeCalldataValue([elementCalldata], elementType, structs, enums)
+      );
     }
 
     // Handling StarkNet addresses
