@@ -1,3 +1,9 @@
+import {
+  type AccountChangeEventHandler,
+  type AddStarknetChainParameters,
+  type NetworkChangeEventHandler,
+  type WatchAssetParameters,
+} from 'get-starknet-core';
 import { Account, AccountInterface } from '../account';
 import { StarknetChainId } from '../constants';
 import { ProviderInterface } from '../provider';
@@ -29,13 +35,7 @@ import {
   signMessage,
   switchStarknetChain,
   watchAsset,
-} from './connect.js';
-import {
-  AccountChangeEventHandler,
-  AddStarknetChainParameters,
-  NetworkChangeEventHandler,
-  WatchAssetParameters,
-} from './getst/main';
+} from './connect';
 import { StarknetWalletProvider } from './types';
 
 // Represent 'Selected Active' Account inside Connected Wallet
