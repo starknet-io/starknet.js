@@ -1,3 +1,9 @@
+## [6.6.6](https://github.com/starknet-io/starknet.js/compare/v6.6.5...v6.6.6) (2024-03-25)
+
+### Bug Fixes
+
+- next version ([#1024](https://github.com/starknet-io/starknet.js/issues/1024)) ([07d4a26](https://github.com/starknet-io/starknet.js/commit/07d4a26c8b93413fcf1b8b54549e11555df86ca9))
+
 # [6.6.0](https://github.com/starknet-io/starknet.js/compare/v6.5.0...v6.6.0) (2024-03-19)
 
 ### Bug Fixes
