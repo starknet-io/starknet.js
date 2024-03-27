@@ -28,6 +28,7 @@ import {
   GetTxReceiptResponseWithoutHelper,
 } from '../types';
 import { getAbiContractVersion } from '../utils/calldata/cairo';
+import { createAbiParser } from '../utils/calldata/parser';
 import { isSierra } from '../utils/contract';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { ReceiptTx, GetTransactionReceiptResponse } from '../utils/transactionReceipt';
@@ -251,14 +252,37 @@ export class RpcProvider implements ProviderInterface {
       throw Error('getContractVersion require contractAddress or classHash');
     }
 
+    // Take the opportunity of class reading, to get the name of the message signature verification name
+    // or an empty string in case of proxy.
+    let messageVerifFunctionName: string | undefined;
+    if ('signatureVerifFunctionName' in this) {
+      const parser = createAbiParser(contractClass.abi);
+      const parsedAbi = parser.getLegacyFormat();
+      const functionsList = parsedAbi.filter((abiElement) => abiElement.type === 'function');
+      if (functionsList) {
+        const isProxy: boolean = functionsList.some(
+          (abiElement) => abiElement.name === '__default__'
+        );
+        if (isProxy) {
+          messageVerifFunctionName = '';
+        } else {
+          const validFunction = functionsList.find((abiElement) =>
+            ['isValidSignature', 'is_valid_signature'].includes(abiElement.name)
+          );
+          if (validFunction) {
+            messageVerifFunctionName = validFunction.name;
+          }
+        }
+      }
+    }
     if (isSierra(contractClass)) {
       if (compiler) {
         const abiTest = getAbiContractVersion(contractClass.abi);
-        return { cairo: '1', compiler: abiTest.compiler };
+        return { cairo: '1', compiler: abiTest.compiler, messageVerifFunctionName };
       }
-      return { cairo: '1', compiler: undefined };
+      return { cairo: '1', compiler: undefined, messageVerifFunctionName };
     }
-    return { cairo: '0', compiler: '0' };
+    return { cairo: '0', compiler: '0', messageVerifFunctionName };
   }
 
   /**
