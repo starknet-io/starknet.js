@@ -103,10 +103,23 @@ function validateTypedData(data: unknown): data is TypedData {
   );
 }
 
+/**
+ * Prepares the selector for use.
+ *
+ * @param {string} selector - The selector to be prepared.
+ * @returns {string} The prepared selector.
+ */
 export function prepareSelector(selector: string): string {
   return isHex(selector) ? selector : getSelectorFromName(selector);
 }
 
+/**
+ * Checks if the given StarkNet type is a Merkle tree type.
+ *
+ * @param {StarkNetType} type - The StarkNet type to check.
+ *
+ * @returns {boolean} - True if the type is a Merkle tree type, false otherwise.
+ */
 export function isMerkleTreeType(type: StarknetType): type is StarknetMerkleType {
   return type.type === 'merkletree';
 }
@@ -154,6 +167,15 @@ export function getDependencies(
   ];
 }
 
+/**
+ * Retrieves the merkle tree type for a given key in the context.
+ *
+ * @param {TypedData['types']} types - The types object containing the data types.
+ * @param {Context} ctx - The context object containing the parent and key information.
+ * @throws {Error} If the key is not a merkle tree.
+ * @throws {Error} If the merkle tree's contain property is an array.
+ * @returns {string} The merkle tree's contain property value.
+ */
 function getMerkleTreeType(types: TypedData['types'], ctx: Context) {
   if (ctx.parent && ctx.key) {
     const parentType = types[ctx.parent];

@@ -104,6 +104,21 @@ export function estimatedFeeToMaxFee(
   return addPercent(estimatedFee, overhead);
 }
 
+/**
+ * Calculates the maximum resource bounds for fee estimation.
+ *
+ * @param {FeeEstimate|0n} estimate - The estimate for the fee. If a BigInt is provided,
+ *                                    the returned bounds will be set to '0x0'.
+ * @param {number} [amountOverhead=feeMarginPercentage.L1_BOUND_MAX_AMOUNT] - The percentage
+ *                                                                             overhead added to
+ *                                                                             the gas consumed or
+ *                                                                             overall fee amount.
+ * @param {number} [priceOverhead=feeMarginPercentage.L1_BOUND_MAX_PRICE_PER_UNIT] - The percentage
+ *                                                                                  overhead added to
+ *                                                                                  the gas price per unit.
+ * @throws {Error} If the estimate object is undefined or does not have the required properties.
+ * @returns {ResourceBounds} The maximum resource bounds for fee estimation.
+ */
 export function estimateFeeToBounds(
   estimate: FeeEstimate | 0n,
   amountOverhead: number = feeMarginPercentage.L1_BOUND_MAX_AMOUNT,
@@ -131,6 +146,13 @@ export function estimateFeeToBounds(
   };
 }
 
+/**
+ * Converts the data availability mode from EDataAvailabilityMode to EDAMode.
+ *
+ * @param {EDataAvailabilityMode} dam - The data availability mode to be converted.
+ * @return {EDAMode} The converted data availability mode.
+ * @throws {Error} If the data availability mode is not a valid value.
+ */
 export function intDAM(dam: EDataAvailabilityMode) {
   if (dam === EDataAvailabilityMode.L1) return EDAMode.L1;
   if (dam === EDataAvailabilityMode.L2) return EDAMode.L2;
