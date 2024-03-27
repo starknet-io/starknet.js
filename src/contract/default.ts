@@ -345,7 +345,7 @@ export class Contract implements ContractInterface {
   }
 
   public async getVersion() {
-    return this.providerOrAccount.getContractSpecificities(this.address);
+    return this.providerOrAccount.getContractVersion(this.address);
   }
 
   public typedv2<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContractV2<TAbi> {

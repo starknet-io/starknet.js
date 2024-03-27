@@ -204,18 +204,18 @@ export class RpcProvider implements ProviderInterface {
       .then(this.responseParser.parseContractClassResponse);
   }
 
-  public async getContractSpecificities(
+  public async getContractVersion(
     contractAddress: BigNumberish,
     classHash?: undefined,
     options?: getContractVersionOptions
   ): Promise<ContractVersion>;
-  public async getContractSpecificities(
+  public async getContractVersion(
     contractAddress: undefined,
     classHash: BigNumberish,
     options?: getContractVersionOptions
   ): Promise<ContractVersion>;
 
-  public async getContractSpecificities(
+  public async getContractVersion(
     contractAddress?: BigNumberish,
     classHash?: BigNumberish,
     {

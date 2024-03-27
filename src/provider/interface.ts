@@ -339,7 +339,7 @@ export abstract class ProviderInterface {
    *   - (optional) compiler - (default true) extract compiler version using type tactic from abi
    *   - (optional) blockIdentifier - block identifier
    */
-  public abstract getContractSpecificities(
+  public abstract getContractVersion(
     contractAddress: string,
     classHash?: undefined,
     options?: getContractVersionOptions
@@ -353,7 +353,7 @@ export abstract class ProviderInterface {
    *   - (optional) compiler - (default true) extract compiler version using type tactic from abi
    *   - (optional) blockIdentifier - block identifier
    */
-  public abstract getContractSpecificities(
+  public abstract getContractVersion(
     contractAddress: undefined,
     classHash: string,
     options?: getContractVersionOptions

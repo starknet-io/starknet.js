@@ -121,8 +121,8 @@ export class Account extends Provider implements AccountInterface {
   public async getCairoVersion(classHash?: string) {
     if (!this.cairoVersion) {
       const { cairo, messageVerifFunctionName } = classHash
-        ? await super.getContractSpecificities(undefined, classHash)
-        : await super.getContractSpecificities(this.address);
+        ? await super.getContractVersion(undefined, classHash)
+        : await super.getContractVersion(this.address);
       this.cairoVersion = cairo;
       this.signatureVerifFunctionName = messageVerifFunctionName;
     }
