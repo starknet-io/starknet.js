@@ -4,11 +4,11 @@ import {
   DeployContractResponse,
   EstimateFeeResponse,
   GetBlockResponse,
-  GetTransactionReceiptResponse,
   GetTransactionResponse,
   InvokeFunctionResponse,
   SimulateTransactionResponse,
 } from '../../types';
+import type { GetTransactionReceiptResponse } from '../transactionReceipt';
 
 export abstract class ResponseParser {
   abstract parseGetBlockResponse(res: any): GetBlockResponse;

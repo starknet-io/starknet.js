@@ -6,6 +6,8 @@ import {
   CairoOptionVariant,
   CairoResult,
   CairoResultVariant,
+  CairoUint256,
+  CairoUint512,
   CallData,
   Calldata,
   CompiledSierra,
@@ -22,6 +24,7 @@ import {
   shortString,
   stark,
   types,
+  type Uint512,
 } from '../src';
 import { hexToDecimalString } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
@@ -41,6 +44,8 @@ import {
   compiledHelloSierra,
   compiledTuple,
   compiledTupleCasm,
+  compiledU512,
+  compiledU512Casm,
   getTestAccount,
   getTestProvider,
 } from './config/fixtures';
@@ -1176,6 +1181,82 @@ describe('Cairo 1', () => {
       expect(declare260Response.class_hash).toBe(
         '0x6184f1a71cad4bd123ff8bb3b97dc9ec876ced6489d9479cfdaada81a2f06d6'
       );
+    });
+  });
+
+  describe('cairo u512 type', () => {
+    let u512Contract: Contract;
+    const myU512 =
+      '0x33333333333333333333333333333333222222222222222222222222222222221111111111111111111111111111111100000000000000000000000000000000';
+    const serializedU512 = new CairoUint512({
+      limb0: '0x00000000000000000000000000000000',
+      limb1: '0x11111111111111111111111111111111',
+      limb2: '0x22222222222222222222222222222222',
+      limb3: '0x33333333333333333333333333333333',
+    });
+    const myUint256 = new CairoUint256('0x55544444433233223222222122112111111011001');
+
+    beforeAll(async () => {
+      const { deploy } = await account.declareAndDeploy({
+        contract: compiledU512,
+        casm: compiledU512Casm,
+      });
+
+      u512Contract = new Contract(compiledU512.abi, deploy.contract_address, account);
+    });
+
+    test('u512 compile', async () => {
+      const u512_1: Uint512 = cairo.uint512(myU512);
+      expect(u512_1).toEqual({
+        limb0: '0',
+        limb1: '22685491128062564230891640495451214097',
+        limb2: '45370982256125128461783280990902428194',
+        limb3: '68056473384187692692674921486353642291',
+      });
+
+      const myCalldata1 = CallData.compile([u512_1]);
+      const myCalldata2 = CallData.compile({ my_u512: u512_1 });
+      const expected1 = [
+        '0',
+        '22685491128062564230891640495451214097',
+        '45370982256125128461783280990902428194',
+        '68056473384187692692674921486353642291',
+      ];
+      expect(myCalldata1).toEqual(expected1);
+      expect(myCalldata2).toEqual(expected1);
+
+      const myCallData = new CallData(u512Contract.abi);
+      const myCalldata3 = myCallData.compile('div_u512', {
+        my_u512: serializedU512,
+        divisor: myUint256,
+      });
+      const myCalldata4 = myCallData.compile('div_u512', [serializedU512, myUint256]);
+      const expected2 = [
+        '0',
+        '22685491128062564230891640495451214097',
+        '45370982256125128461783280990902428194',
+        '68056473384187692692674921486353642291',
+        '67973375079109053774543167123544412161',
+        '22905373764',
+      ];
+      expect(myCalldata3).toEqual(expected2);
+      expect(myCalldata4).toEqual(expected2);
+
+      const myCall1 = u512Contract.populate('return_u512', { my_u512: serializedU512 });
+      const myCall2 = u512Contract.populate('return_u512', [serializedU512]);
+      expect(myCall1.calldata).toEqual(expected1);
+      expect(myCall2.calldata).toEqual(expected1);
+    });
+
+    test('u512 call', async () => {
+      const resp1 = await u512Contract.div_u512(myU512, myUint256);
+      const expected = {
+        '0': 344041591305341143461698062540412331701024044049418150896694357470676311354588133518143452261258807949095n,
+        '1': 3408778323931873632420467616107826476746211809497n,
+      };
+      expect(resp1).toEqual(expected);
+      const resp2 = await u512Contract.call('div_u512', [serializedU512, myUint256]);
+      expect(resp2).toEqual(expected);
     });
   });
 });

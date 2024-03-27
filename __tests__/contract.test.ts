@@ -2,12 +2,12 @@ import {
   BigNumberish,
   Contract,
   ContractFactory,
-  GetTransactionReceiptResponse,
   ParsedEvents,
   RawArgs,
   json,
   shortString,
   stark,
+  SuccessfulTransactionReceiptResponse,
 } from '../src';
 import { CallData } from '../src/utils/calldata';
 import { felt, isCairo1Abi, tuple, uint256 } from '../src/utils/calldata/cairo';
@@ -795,7 +795,7 @@ describe('Complex interaction', () => {
     test('invoke compiled data', async () => {
       const result = await erc20Echo20Contract.iecho(CallData.compile(request));
       const transaction = await provider.waitForTransaction(result.transaction_hash);
-      expect((transaction as GetTransactionReceiptResponse).execution_status).toBeDefined();
+      expect((transaction as SuccessfulTransactionReceiptResponse).execution_status).toBeDefined();
     });
 
     // skip on live for performance
@@ -805,19 +805,19 @@ describe('Complex interaction', () => {
 
       const result = await erc20Echo20Contract.iecho(calldata);
       const transaction = await provider.waitForTransaction(result.transaction_hash);
-      expect((transaction as GetTransactionReceiptResponse).execution_status).toBeDefined();
+      expect((transaction as SuccessfulTransactionReceiptResponse).execution_status).toBeDefined();
 
       const result1 = await erc20Echo20Contract.iecho(...args);
       const transaction1 = await provider.waitForTransaction(result1.transaction_hash);
-      expect((transaction1 as GetTransactionReceiptResponse).execution_status).toBeDefined();
+      expect((transaction1 as SuccessfulTransactionReceiptResponse).execution_status).toBeDefined();
 
       const result2 = await erc20Echo20Contract.invoke('iecho', calldata);
       const transaction2 = await provider.waitForTransaction(result2.transaction_hash);
-      expect((transaction2 as GetTransactionReceiptResponse).execution_status).toBeDefined();
+      expect((transaction2 as SuccessfulTransactionReceiptResponse).execution_status).toBeDefined();
 
       const result3 = await erc20Echo20Contract.invoke('iecho', args);
       const transaction3 = await provider.waitForTransaction(result3.transaction_hash);
-      expect((transaction3 as GetTransactionReceiptResponse).execution_status).toBeDefined();
+      expect((transaction3 as SuccessfulTransactionReceiptResponse).execution_status).toBeDefined();
     });
 
     describe('speedup live tests', () => {
@@ -871,7 +871,9 @@ describe('Complex interaction', () => {
           { formatResponse }
         );
         const transaction = await provider.waitForTransaction(result.transaction_hash);
-        expect((transaction as GetTransactionReceiptResponse).execution_status).toBeDefined();
+        expect(
+          (transaction as SuccessfulTransactionReceiptResponse).execution_status
+        ).toBeDefined();
       });
     });
 

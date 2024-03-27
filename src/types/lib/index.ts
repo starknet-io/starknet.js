@@ -33,6 +33,18 @@ export interface Uint256 {
 }
 
 /**
+ * Represents an integer in the range [0, 2^256)
+ */
+export interface Uint512 {
+  // The lowest 128 bits of the value
+  limb0: BigNumberish;
+  limb1: BigNumberish;
+  limb2: BigNumberish;
+  // The higher 128 bits of the value
+  limb3: BigNumberish;
+}
+
+/**
  * BigNumberish array
  * use CallData.compile() to convert to Calldata
  */

@@ -1,17 +1,15 @@
-// TODO: adjust starknet casing in v6
-
 export enum TypedDataRevision {
   Active = '1',
   Legacy = '0',
 }
 
-export type StarkNetEnumType = {
+export type StarknetEnumType = {
   name: string;
   type: 'enum';
   contains: string;
 };
 
-export type StarkNetMerkleType = {
+export type StarknetMerkleType = {
   name: string;
   type: 'merkletree';
   contains: string;
@@ -23,18 +21,18 @@ export type StarkNetMerkleType = {
  * Note that the `uint` and `int` aliases like in Solidity, and fixed point numbers are not supported by the EIP-712
  * standard.
  */
-export type StarkNetType =
+export type StarknetType =
   | {
       name: string;
       type: string;
     }
-  | StarkNetEnumType
-  | StarkNetMerkleType;
+  | StarknetEnumType
+  | StarknetMerkleType;
 
 /**
  * The EIP712 domain struct. Any of these fields are optional, but it must contain at least one field.
  */
-export interface StarkNetDomain extends Record<string, unknown> {
+export interface StarknetDomain extends Record<string, unknown> {
   name?: string;
   version?: string;
   chainId?: string | number;
@@ -45,8 +43,8 @@ export interface StarkNetDomain extends Record<string, unknown> {
  * The complete typed data, with all the structs, domain data, primary type of the message, and the message itself.
  */
 export interface TypedData {
-  types: Record<string, StarkNetType[]>;
+  types: Record<string, StarknetType[]>;
   primaryType: string;
-  domain: StarkNetDomain;
+  domain: StarknetDomain;
   message: Record<string, unknown>;
 }
