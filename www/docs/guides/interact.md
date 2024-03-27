@@ -131,7 +131,7 @@ const myCall = myTestContract.populate('test_fail', [100]);
 const maxQtyGasAuthorized = 1800n; // max quantity of gas authorized
 const maxPriceAuthorizeForOneGas = 12n * 10n ** 9n; // max FRI authorized to pay 1 gas (1 FRI=10**-18 STRK)
 console.log('max authorized cost =', maxQtyGasAuthorized * maxPriceAuthorizeForOneGas, 'FRI');
-const { transaction_hash: txH } = await account0.execute(myCall, undefined, {
+const { transaction_hash: txH } = await account0.execute(myCall, {
   version: 3,
   maxFee: 10 ** 15,
   feeDataAvailabilityMode: RPC.EDataAvailabilityMode.L1,

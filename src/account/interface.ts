@@ -203,9 +203,24 @@ export abstract class AccountInterface extends ProviderInterface {
    * - entrypoint - the entrypoint of the contract
    * - calldata - (defaults to []) the calldata
    * - signature - (defaults to []) the signature
-   * @param abi (optional) the abi of the contract for better displaying
+   * @param {InvocationsDetails} transactionsDetail Additional optional parameters for the transaction
    *
    * @returns response from addTransaction
+   */
+  public abstract execute(
+    transactions: AllowArray<Call>,
+    transactionsDetail?: InvocationsDetails
+  ): Promise<InvokeFunctionResponse>;
+  /**
+   * @deprecated
+   * @param transactions the invocation object or an array of them, containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   * @param abis (optional) the abi of the contract for better displaying
+   * @param {InvocationsDetails} transactionsDetail Additional optional parameters for the transaction
+   * * @returns response from addTransaction
    */
   public abstract execute(
     transactions: AllowArray<Call>,

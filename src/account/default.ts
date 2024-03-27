@@ -305,11 +305,34 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async execute(
-    calls: AllowArray<Call>,
-    abis: Abi[] | undefined = undefined,
-    details: UniversalDetails = {}
+    transactions: AllowArray<Call>,
+    transactionsDetail?: UniversalDetails
+  ): Promise<InvokeFunctionResponse>;
+  public async execute(
+    transactions: AllowArray<Call>,
+    abis?: Abi[],
+    transactionsDetail?: UniversalDetails
+  ): Promise<InvokeFunctionResponse>;
+  public async execute(
+    transactions: AllowArray<Call>,
+    arg2: Abi[] | UniversalDetails | undefined = undefined,
+    transactionsDetail: UniversalDetails = {}
   ): Promise<InvokeFunctionResponse> {
-    const transactions = Array.isArray(calls) ? calls : [calls];
+    let details: UniversalDetails;
+    switch (true) {
+      case Array.isArray(arg2):
+        details = transactionsDetail;
+        break;
+      case typeof arg2 === 'object':
+        details = arg2;
+        break;
+      case typeof arg2 === 'undefined':
+        details = transactionsDetail;
+        break;
+      default:
+        throw Error(`wrong input parameters: ${arg2}, ${transactionsDetail}`);
+    }
+    const calls = Array.isArray(transactions) ? transactions : [transactions];
     const nonce = toBigInt(details.nonce ?? (await this.getNonce()));
     const version = toTransactionVersion(
       this.getPreferredVersion(ETransactionVersion.V1, ETransactionVersion.V3), // TODO: does this depend on cairo version ?
@@ -318,7 +341,7 @@ export class Account extends Provider implements AccountInterface {
 
     const estimate = await this.getUniversalSuggestedFee(
       version,
-      { type: TransactionType.INVOKE, payload: calls },
+      { type: TransactionType.INVOKE, payload: transactions },
       {
         ...details,
         version,
@@ -338,9 +361,9 @@ export class Account extends Provider implements AccountInterface {
       cairoVersion: await this.getCairoVersion(),
     };
 
-    const signature = await this.signer.signTransaction(transactions, signerDetails, abis);
+    const signature = await this.signer.signTransaction(calls, signerDetails);
 
-    const calldata = getExecuteCalldata(transactions, await this.getCairoVersion());
+    const calldata = getExecuteCalldata(calls, await this.getCairoVersion());
 
     return this.invokeFunction(
       { contractAddress: this.address, calldata, signature },

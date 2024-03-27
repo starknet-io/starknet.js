@@ -370,6 +370,19 @@ describe('deploy and test Wallet', () => {
     expect(balance.low).toStrictEqual(toBigInt(990));
   });
 
+  test('execute with syntax without abi parameter', async () => {
+    const { transaction_hash } = await account.execute(
+      {
+        contractAddress: erc20Address,
+        entrypoint: 'transfer',
+        calldata: [erc20.address, '10', '0'],
+      },
+      { maxFee: 6n * 10n ** 15n }
+    );
+
+    await provider.waitForTransaction(transaction_hash);
+  });
+
   test('execute with custom nonce', async () => {
     const result = await account.getNonce();
     const nonce = toBigInt(result);
