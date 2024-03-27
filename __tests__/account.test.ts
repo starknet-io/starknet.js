@@ -112,9 +112,88 @@ describe('deploy and test Wallet', () => {
     // this is tested indirectly true declareAndDeploy while declaring
   });
 
+  describeIfRpcDevnet('Test on RPC Devnet', () => {
+    test('deployAccount with rawArgs - test on devnet', async () => {
+      const priKey = stark.randomAddress();
+      const pubKey = ec.starkCurve.getStarkKey(priKey);
+
+      const calldata = { publicKey: pubKey };
+
+      // declare account
+      const declareAccount = await account.declare({
+        contract: compiledOpenZeppelinAccount,
+      });
+      const accountClassHash = declareAccount.class_hash;
+      await account.waitForTransaction(declareAccount.transaction_hash);
+
+      // fund new account
+      const tobeAccountAddress = hash.calculateContractAddressFromHash(
+        pubKey,
+        accountClassHash,
+        calldata,
+        0
+      );
+      const devnetERC20Address =
+        '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
+      const { transaction_hash } = await account.execute({
+        contractAddress: devnetERC20Address,
+        entrypoint: 'transfer',
+        calldata: {
+          recipient: tobeAccountAddress,
+          amount: uint256(5 * 10 ** 15),
+        },
+      });
+      await account.waitForTransaction(transaction_hash);
+
+      // deploy account
+      const accountOZ = new Account(
+        provider,
+        tobeAccountAddress,
+        priKey,
+        undefined,
+        TEST_TX_VERSION
+      );
+      const deployed = await accountOZ.deploySelf({
+        classHash: accountClassHash,
+        constructorCalldata: calldata,
+        addressSalt: pubKey,
+      });
+      const receipt = await account.waitForTransaction(deployed.transaction_hash);
+      expect(receipt).toMatchSchemaRef('GetTransactionReceiptResponse');
+    });
+
+    test('deploy with rawArgs', async () => {
+      const deployment = await account.deploy({
+        classHash: erc20ClassHash,
+        constructorCalldata: {
+          name: 'Token',
+          symbol: 'ERC20',
+          recipient: account.address,
+        },
+      });
+      expect(deployment).toMatchSchemaRef('MultiDeployContractResponse');
+    });
+
+    test('multideploy with rawArgs', async () => {
+      const deployments = await account.deploy([
+        {
+          classHash: '0x04367b26fbb92235e8d1137d19c080e6e650a6889ded726d00658411cc1046f5',
+        },
+        {
+          classHash: erc20ClassHash,
+          constructorCalldata: {
+            name: 'Token',
+            symbol: 'ERC20',
+            recipient: account.address,
+          },
+        },
+      ]);
+      expect(deployments).toMatchSchemaRef('MultiDeployContractResponse');
+    });
+  });
+
   describe('simulate transaction - single transaction S0.11.2', () => {
     test('simulate INVOKE Cairo 0', async () => {
-      // INFO: Sequencer S0.11.2 support only one transaction per simulate request
       const res = await account.simulateTransaction([
         {
           type: TransactionType.INVOKE,
@@ -125,7 +204,6 @@ describe('deploy and test Wallet', () => {
             amount: uint256(10),
           },
         },
-        // This transaction will be skipped on sequencer
         {
           type: TransactionType.INVOKE,
           contractAddress: erc20Address,
@@ -655,6 +733,35 @@ describe('deploy and test Wallet', () => {
       expect(result).toMatchSchemaRef('EstimateFee');
       // expect(innerInvokeEstFeeSpy.mock.calls[0][1].version).toBe(feeTransactionVersion);
       // innerInvokeEstFeeSpy.mockClear();
+    });
+  });
+});
+
+describe('unit', () => {
+  describeIfRpcDevnet('RPC devnet', () => {
+    initializeMatcher(expect);
+    const provider = getTestProvider();
+    const account = getTestAccount(provider);
+
+    test('declareIfNot', async () => {
+      const declare = await account.declareIfNot({
+        contract: compiledHelloSierra,
+        casm: compiledHelloSierraCasm,
+      });
+      expect(declare).toMatchSchemaRef('DeclareContractResponse');
+
+      await expect(
+        account.declare({
+          contract: compiledHelloSierra,
+          casm: compiledHelloSierraCasm,
+        })
+      ).rejects.toThrow();
+
+      const redeclare = await account.declareIfNot({
+        contract: compiledHelloSierra,
+        casm: compiledHelloSierraCasm,
+      });
+      expect(redeclare.class_hash).toBe(declare.class_hash);
     });
   });
 });

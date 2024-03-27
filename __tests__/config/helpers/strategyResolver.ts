@@ -4,6 +4,7 @@ import setupVerifier from './setupVerifier';
 
 import { GS_DEFAULT_TEST_PROVIDER_URL } from '../constants';
 import { setIfNullish } from './env';
+import { BaseUrl } from '../../../src/constants';
 
 const LOCAL_DEVNET_NOT_RUNNING_MESSAGE = `
 Local devnet is not running. In order to properly run it you need to do the following: \n
@@ -20,6 +21,11 @@ class StrategyResolver {
 
   get isRpcDevnet() {
     return this.isRsDevnet || !!process.env.TEST_RPC_URL;
+  }
+
+  get isCairo1Testnet() {
+    const url = process.env.TEST_PROVIDER_BASE_URL || process.env.TEST_RPC_URL;
+    return url?.includes(BaseUrl.SN_GOERLI);
   }
 
   private async isRS(): Promise<boolean> {
@@ -52,6 +58,7 @@ class StrategyResolver {
 
     this.isRpc = hasRpcUrl || this.isRsDevnet;
     setIfNullish('IS_RPC', this.isRpc);
+    setIfNullish('IS_CAIRO1_TESTNET', this.isCairo1Testnet);
 
     if (hasRpcUrl) {
       console.log('Detected RPC');

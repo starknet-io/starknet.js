@@ -1,14 +1,15 @@
+import type { Abi } from 'abi-wan-kanabi';
 import {
+  type BigNumberish,
+  type Calldata,
+  type CompiledSierra,
+  type DeclareDeployUDCResponse,
+  type RawArgsArray,
+  type RawArgsObject,
   Account,
-  BigNumberish,
   CallData,
-  Calldata,
-  CompiledSierra,
   Contract,
   ContractFactory,
-  DeclareDeployUDCResponse,
-  RawArgsArray,
-  RawArgsObject,
   cairo,
   ec,
   hash,
@@ -25,6 +26,7 @@ import {
   compiledHelloSierra,
   compiledHelloSierraCasm,
   describeIfRpcDevnet,
+  describeIfCairo1Testnet,
   getTestAccount,
   getTestProvider,
 } from './config/fixtures';
@@ -544,6 +546,68 @@ describeIfRpcDevnet('Cairo 1 Devnet', () => {
 
     test('deploy Cairo1 Account from Cairo0 Account', () => {
       expect(accountC1).toBeInstanceOf(Account);
+    });
+  });
+});
+
+describeIfCairo1Testnet('Cairo1 Testnet', () => {
+  describe('TS validation for Goerli', () => {
+    const provider = getTestProvider();
+    const account = getTestAccount(provider);
+    const classHash: any = '0x022332bb9c1e22ae13ae7fd9f3101eced4644533c6bfe51a25cf8dea028e5045';
+    const contractAddress: any =
+      '0x00305ef61e86F4566b8726d8867EF252d4f37F4B6418Cad4288052738ee22A5d';
+    let cairo1Contract: Contract;
+    initializeMatcher(expect);
+
+    beforeAll(async () => {
+      const cairoClass = await provider.getClassByHash(classHash);
+      // TODO: Fix typing and responses for abi
+      cairo1Contract = new Contract(cairoClass.abi as Abi, contractAddress, account);
+    });
+
+    test('GetClassByHash', async () => {
+      const classResponse = await provider.getClassByHash(classHash);
+      expect(classResponse).toMatchSchemaRef('SierraContractClass');
+    });
+
+    test('GetClassAt', async () => {
+      const classResponse = await provider.getClassAt(contractAddress);
+      expect(classResponse).toMatchSchemaRef('SierraContractClass');
+    });
+
+    test('Cairo 1 Contract Interaction - felt252', async () => {
+      const result = await cairo1Contract.test_felt252(100);
+      expect(result).toBe(101n);
+    });
+
+    test('Cairo 1 Contract Interaction - uint 8, 16, 32, 64, 128', async () => {
+      let result = await cairo1Contract.test_u8(100n);
+      expect(result).toBe(107n);
+      result = await cairo1Contract.test_u16(100n);
+      expect(result).toBe(106n);
+      result = await cairo1Contract.test_u32(100n);
+      expect(result).toBe(104n);
+      result = await cairo1Contract.test_u64(255n);
+      expect(result).toBe(258n);
+      result = await cairo1Contract.test_u128(255n);
+      expect(result).toBe(257n);
+    });
+
+    test('Cairo 1 - uint256 struct', async () => {
+      const myUint256 = uint256(2n ** 256n - 2n);
+      const result = await cairo1Contract.test_u256(myUint256);
+      expect(result).toBe(2n ** 256n - 1n);
+    });
+
+    test('Cairo 1 - uint256 by a bignumber', async () => {
+      const result = await cairo1Contract.test_u256(2n ** 256n - 2n);
+      expect(result).toBe(2n ** 256n - 1n);
+    });
+
+    test('Cairo 1 Contract Interaction - bool', async () => {
+      const tx = await cairo1Contract.test_bool(true);
+      expect(tx).toBe(true);
     });
   });
 });
