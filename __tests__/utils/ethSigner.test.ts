@@ -127,7 +127,7 @@ describe('Ethereum signatures', () => {
   });
   describe('Ethereum address', () => {
     test('Eth address format', async () => {
-      const ethAddr = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165';
+      const ethAddr = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165'; // not a valid 20 bytes ETh address
       expect(validateAndParseEthAddress(ethAddr)).toBe(
         '0x008359e4b0152ed5a731162d3c7b0d8d56edb165'
       );

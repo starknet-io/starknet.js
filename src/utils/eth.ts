@@ -4,6 +4,7 @@ import { addHexPrefix, buf2hex, removeHexPrefix, sanitizeHex } from './encode';
 import type { BigNumberish } from '../types';
 import { assertInRange, toHex } from './num';
 import { ZERO } from '../constants';
+import assert from './assert';
 
 /**
  * Get random Ethereum private Key.
@@ -31,8 +32,6 @@ export function ethRandomPrivateKey(): string {
 export function validateAndParseEthAddress(address: BigNumberish): string {
   assertInRange(address, ZERO, 2n ** 160n - 1n, 'Ethereum Address ');
   const result = addHexPrefix(removeHexPrefix(toHex(address)).padStart(40, '0'));
-  if (!result.match(/^(0x)?[0-9a-f]{40}$/)) {
-    throw new Error('Invalid Ethereum Address Format');
-  }
+  assert(result.match(/^(0x)?[0-9a-f]{40}$/), 'Invalid Ethereum Address Format');
   return result;
 }
