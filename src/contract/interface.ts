@@ -30,6 +30,8 @@ declare module 'abi-wan-kanabi' {
   export interface Config<OptionT = any, ResultT = any, ErrorT = any> {
     FeltType: BigNumberish;
     U256Type: number | bigint | Uint256;
+    U512Type: BigNumberish;
+    Secp256k1PointType: BigNumberish;
     Option: CairoOption<OptionT>;
     Tuple: Record<number, BigNumberish | object | boolean>;
     Result: CairoResult<ResultT, ErrorT>;
