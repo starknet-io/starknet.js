@@ -35,7 +35,7 @@ import {
   signMessage,
   switchStarknetChain,
   watchAsset,
-} from './connect';
+} from './wallet';
 import { StarknetWalletProvider } from './types';
 
 // Represent 'Selected Active' Account inside Connected Wallet
