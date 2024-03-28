@@ -25,7 +25,7 @@ This contract is coded in Cairo 1.
 import { Account, constants, ec, json, stark, RpcProvider, hash, CallData } from 'starknet';
 ```
 
-### compute address
+### Compute address
 
 ```typescript
 // connect provider (Mainnet or Sepolia)
@@ -66,7 +66,7 @@ curl -X POST http://127.0.0.1:5050/mint -d '{"address":"0x04a093c37ab61065d00155
 // {"new_balance":50000000000000000000,"tx_hash":null,"unit":"wei"}
 ```
 
-### deployment of the new account
+### Deployment of the new account
 
 If you have sent enough funds to this new address, you can go forward to the final step:
 
@@ -91,7 +91,7 @@ Here, we will create a wallet with the Argent smart contract v0.3.0. The contrac
 import { Account, ec, json, stark, RpcProvider, hash, CallData } from 'starknet';
 ```
 
-### compute address
+### Compute address
 
 ```typescript
 // connect provider
@@ -124,7 +124,7 @@ If you want a specific private key, replace `stark.randomAddress`()` with your c
 
 Then you have to fund this address.
 
-### deployment of the new account
+### Deployment of the new account
 
 If you have sent enough funds to this new address, you can go forward to the final step:
 
@@ -223,8 +223,10 @@ The computed address has been funded automatically by minting a new dummy ETH in
 
 ## Create an Ethereum account
 
-Thanks to account abstraction, you can create in Starknet an account that old the cryptographic logic of an Ethereum account. By this way, you can use Ethereum private and public keys.  
-OpenZeppelin has released an account contract for a such Ethereum account. Here an example of account creation in Sepolia Testnet.
+Thanks to account abstraction, you can create an account in Starknet that holds the cryptographic logic of an Ethereum account. This way, you can use Ethereum private and public keys!  
+OpenZeppelin has released an account contract for such an Ethereum account.
+
+Below is an example of account creation in Sepolia Testnet.
 
 ### Compute address
 
@@ -249,7 +251,7 @@ console.log('Pre-calculated ETH account address =', contractETHaddress);
 
 Then you have to fund this address.
 
-### deployment of the new account
+### Deployment of the new account
 
 If you have sent enough funds to this new address, you can go forward to the final step:
 
@@ -274,7 +276,7 @@ console.log('✅ New Ethereum account final address =', contract_address);
 
 You are not limited to these 3 contracts. You can create your own contract for the wallet. It's the concept of Account Abstraction.
 
-You can customize entirely the wallet - for example:
+You can entirely customize the wallet - for example:
 
 - use a different concept of keys.
 

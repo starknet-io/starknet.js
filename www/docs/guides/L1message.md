@@ -42,11 +42,11 @@ const responseEstimateMessageFee = await provider.estimateMessageFee({
   from_address: L1address,
   to_address: L2address,
   entry_point_selector: 'handle_l1_mess',
-  payload: ['1234567890123456789', '200'],
+  payload: ['1234567890123456789', '200'], // without from_address
 });
 ```
 
-If the fee is paid in L1, the Cairo contract at `to_Address` is automatically executed, function `entry_point_selector` (the function shall have a decorator `@l1_handler` in the Cairo code), with parameters `payload`.
+If the fee is paid in L1, the Cairo contract at `to_Address` is automatically executed, function `entry_point_selector` (the function shall have a decorator `#[l1_handler]` in the Cairo code, with a first parameter called `from_address: felt252`). The payload shall not include the `from_address` parameter.
 
 ## L2 ➡️ L1 messages
 
