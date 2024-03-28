@@ -315,23 +315,10 @@ export class Account extends Provider implements AccountInterface {
   ): Promise<InvokeFunctionResponse>;
   public async execute(
     transactions: AllowArray<Call>,
-    arg2: Abi[] | UniversalDetails | undefined = undefined,
+    arg2?: Abi[] | UniversalDetails,
     transactionsDetail: UniversalDetails = {}
   ): Promise<InvokeFunctionResponse> {
-    let details: UniversalDetails;
-    switch (true) {
-      case Array.isArray(arg2):
-        details = transactionsDetail;
-        break;
-      case typeof arg2 === 'object':
-        details = arg2;
-        break;
-      case typeof arg2 === 'undefined':
-        details = transactionsDetail;
-        break;
-      default:
-        throw Error(`wrong input parameters: ${arg2}, ${transactionsDetail}`);
-    }
+    const details = arg2 === undefined || Array.isArray(arg2) ? transactionsDetail : arg2;
     const calls = Array.isArray(transactions) ? transactions : [transactions];
     const nonce = toBigInt(details.nonce ?? (await this.getNonce()));
     const version = toTransactionVersion(
