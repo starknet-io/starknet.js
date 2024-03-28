@@ -198,7 +198,7 @@ To construct your tuple:
 const myTpl = { '0': '0x0a', '1': 200 };
 ```
 
-### named tuple
+### Named tuple
 
 > [!IMPORTANT] Only for Cairo 0.
 
@@ -242,28 +242,24 @@ If your abi is requesting this type : `core::starknet::secp256k1::Secp256k1Point
 - If you are using a calldata construction method using the Abi, you have just to use a 512 bits number (so, without parity) :
 
 ```typescript
-const privateKeyETH = "0x45397ee6ca34cb49060f1c303c6cb7ee2d6123e617601ef3e31ccf7bf5bef1f9";
+const privateKeyETH = '0x45397ee6ca34cb49060f1c303c6cb7ee2d6123e617601ef3e31ccf7bf5bef1f9';
 const ethSigner = new EthSigner(privateKeyETH);
 const ethFullPublicKey = await ethSigner.getPubKey(); // 512 bits number
 const myCallData = new CallData(ethAccountAbi);
-const accountETHconstructorCalldata = myCallData.compile(
-    "constructor",
-    {
-        public_key: ethFullPublicKey
-    }
-);
+const accountETHconstructorCalldata = myCallData.compile('constructor', {
+  public_key: ethFullPublicKey,
+});
 ```
 
 - If you are using a calldata construction method without the Abi, you have to send a tuple of 2 u256 :
 
 ```typescript
-const ethFullPublicKey = "0x0178bb97615b49070eefad71cb2f159392274404e41db748d9397147cb25cf597ebfcf2f399e635b72b99b8f76e9080763c65a42c842869815039d912150ddfe"; // 512 bits number
-const pubKeyETH = encode.addHexPrefix(encode.removeHexPrefix(ethFullPublicKey).padStart(128, "0"));
+const ethFullPublicKey =
+  '0x0178bb97615b49070eefad71cb2f159392274404e41db748d9397147cb25cf597ebfcf2f399e635b72b99b8f76e9080763c65a42c842869815039d912150ddfe'; // 512 bits number
+const pubKeyETH = encode.addHexPrefix(encode.removeHexPrefix(ethFullPublicKey).padStart(128, '0'));
 const pubKeyETHx = cairo.uint256(addAddressPadding(encode.addHexPrefix(pubKeyETH.slice(2, -64))));
 const pubKeyETHy = cairo.uint256(addAddressPadding(encode.addHexPrefix(pubKeyETH.slice(-64))));
-const accountETHconstructorCalldata = CallData.compile([
-    cairo.tuple(pubKeyETHx, pubKeyETHy)
-]);
+const accountETHconstructorCalldata = CallData.compile([cairo.tuple(pubKeyETHx, pubKeyETHy)]);
 ```
 
 ### struct
@@ -290,7 +286,7 @@ await myContract.my_function(myArray);
 
 > It's also applicable for Cairo `Span` type.
 
-### complex types
+### Complex types
 
 You can mix and nest literals, arrays, structs, and tuples.
 
@@ -321,7 +317,7 @@ await myContract.my_function(param1, param2, param3, param4);
 
 There are 12 methods using contract parameters. Some types are authorized for each method:
 
-### list of parameters
+### List of parameters
 
 Only meta-class methods are using a list of parameters (as illustrated in the previous chapter).  
 A Meta-Class is a Class that has any of its properties determined at run-time. The Contract object uses a Contract's ABI to determine what methods are available.
@@ -494,7 +490,7 @@ const getResponse = await myAccount.get_bal(specialParameters, { parseRequest: f
 
 To use with `parseRequest: false` (see hereunder).
 
-### summary table for arguments
+### Summary table for arguments
 
 These types of arguments can't be used at your convenience everywhere. Here is a table showing which types can be used in which function:
 
