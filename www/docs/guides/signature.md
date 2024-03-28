@@ -196,10 +196,11 @@ try {
 All the previous examples are using the standard Starknet signature process, but you can also use the Ethereum one.
 
 ```typescript
-const myEthPrivateKey = "0x525bc68475c0955fae83869beec0996114d4bb27b28b781ed2a20ef23121b8de";
-const myEthAccountAddressInStarknet = "0x65a822fbee1ae79e898688b5a4282dc79e0042cbed12f6169937fddb4c26641";
+const myEthPrivateKey = '0x525bc68475c0955fae83869beec0996114d4bb27b28b781ed2a20ef23121b8de';
+const myEthAccountAddressInStarknet =
+  '0x65a822fbee1ae79e898688b5a4282dc79e0042cbed12f6169937fddb4c26641';
 const myEthSigner = new EthSigner(myEthPrivateKey);
-console.log("Complete public key =", await myEthSigner.getPubKey());
+console.log('Complete public key =', await myEthSigner.getPubKey());
 const sig0 = await myEthSigner.signMessage(message, myEthAccountAddressInStarknet);
-console.log("signature message =", sig0);
+console.log('signature message =', sig0);
 ```

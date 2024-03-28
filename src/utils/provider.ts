@@ -72,12 +72,13 @@ export function parseContract(contract: CompiledContract | string): ContractClas
  * @returns default node url
  */
 export const getDefaultNodeUrl = (networkName?: NetworkName, mute: boolean = false): string => {
-  if (!mute)
+  if (!mute) {
     // eslint-disable-next-line no-console
     console.warn('Using default public node url, please provide nodeUrl in provider options!');
+  }
   const nodes = RPC_NODES[networkName ?? NetworkName.SN_GOERLI]; // TODO: when goerli deprecated switch default to sepolia
-  const randIdx = Math.floor(Math.random() * nodes.length);
-  return nodes[randIdx];
+  const randomIndex = Math.floor(Math.random() * nodes.length);
+  return nodes[randomIndex];
 };
 
 /**
@@ -162,12 +163,6 @@ export class Block {
   valueOf = () => this.number;
 
   toString = () => this.hash;
-
-  /*   get sequencerIdentifier(): SequencerIdentifier {
-    return this.hash !== null
-      ? { blockHash: this.hash as string }
-      : { blockNumber: (this.number ?? this.tag) as BlockNumber };
-  } */
 }
 
 export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3TransactionDetails {

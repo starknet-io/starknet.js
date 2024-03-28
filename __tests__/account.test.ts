@@ -25,8 +25,7 @@ import {
   compiledHelloSierraCasm,
   compiledOpenZeppelinAccount,
   compiledTestDapp,
-  describeIfDevnet,
-  describeIfDevnetSequencer,
+  describeIfRpcDevnet,
   erc20ClassHash,
   getTestAccount,
   getTestProvider,
@@ -113,7 +112,7 @@ describe('deploy and test Wallet', () => {
     // this is tested indirectly true declareAndDeploy while declaring
   });
 
-  describeIfDevnetSequencer('Test on Devnet Sequencer', () => {
+  describeIfRpcDevnet('Test on RPC Devnet', () => {
     test('deployAccount with rawArgs - test on devnet', async () => {
       const priKey = stark.randomAddress();
       const pubKey = ec.starkCurve.getStarkKey(priKey);
@@ -195,7 +194,6 @@ describe('deploy and test Wallet', () => {
 
   describe('simulate transaction - single transaction S0.11.2', () => {
     test('simulate INVOKE Cairo 0', async () => {
-      // INFO: Sequencer S0.11.2 support only one transaction per simulate request
       const res = await account.simulateTransaction([
         {
           type: TransactionType.INVOKE,
@@ -206,7 +204,6 @@ describe('deploy and test Wallet', () => {
             amount: uint256(10),
           },
         },
-        // This transaction will be skipped on sequencer
         {
           type: TransactionType.INVOKE,
           contractAddress: erc20Address,
@@ -246,7 +243,7 @@ describe('deploy and test Wallet', () => {
       expect(res).toMatchSchemaRef('SimulateTransactionResponse');
     });
 
-    describeIfDevnet('declare tests only on devnet', () => {
+    describeIfRpcDevnet('declare tests only on devnet', () => {
       test('simulate DECLARE - Cairo 0 Contract', async () => {
         const res = await account.simulateTransaction([
           {
@@ -666,7 +663,7 @@ describe('deploy and test Wallet', () => {
       });
     });
 
-    describeIfDevnet('declare tests only on devnet', () => {
+    describeIfRpcDevnet('declare tests only on devnet', () => {
       test('declare, deploy & multi invoke functions', async () => {
         const res = await account.estimateFeeBulk([
           /*         {
@@ -741,7 +738,7 @@ describe('deploy and test Wallet', () => {
 });
 
 describe('unit', () => {
-  describeIfDevnetSequencer('devnet sequencer', () => {
+  describeIfRpcDevnet('RPC devnet', () => {
     initializeMatcher(expect);
     const provider = getTestProvider();
     const account = getTestAccount(provider);

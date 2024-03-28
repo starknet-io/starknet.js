@@ -100,7 +100,7 @@ export class Account extends Provider implements AccountInterface {
   }
 
   protected async getNonceSafe(nonce?: BigNumberish) {
-    // Patch DEPLOY_ACCOUNT: RPC getNonce for non-existing address will result in error, on Sequencer it is '0x0'
+    // Patch DEPLOY_ACCOUNT: RPC getNonce for non-existing address will result in error
     try {
       return toBigInt(nonce ?? (await this.getNonce()));
     } catch (error) {

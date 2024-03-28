@@ -74,6 +74,7 @@ export class LocalStorageWrapper implements IStorageWrapper {
         }
       }
     } catch (err) {
+      // eslint-disable-next-line no-console
       console.warn(err);
     }
     return this.#initialized;

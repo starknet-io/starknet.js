@@ -22,9 +22,9 @@ import {
   compiledL1L2,
   compiledOpenZeppelinAccount,
   createBlockForDevnet,
-  describeIfDevnet,
-  describeIfNotDevnet,
   describeIfRpc,
+  describeIfNotRpcDevnet,
+  describeIfRpcDevnet,
   getTestAccount,
   getTestProvider,
 } from './config/fixtures';
@@ -241,7 +241,7 @@ describeIfRpc('RPCProvider', () => {
       await rpcProvider.getBlockTransactionsTraces(latestBlock.block_hash);
     });
 
-    describeIfDevnet('devnet only', () => {
+    describeIfRpcDevnet('devnet only', () => {
       test('getSyncingStats', async () => {
         const syncingStats = await rpcProvider.getSyncingStats();
         expect(syncingStats).toBe(false);
@@ -371,7 +371,7 @@ describeIfRpc('RPCProvider', () => {
     });
   });
 
-  describeIfNotDevnet('global rpc only', () => {
+  describeIfNotRpcDevnet('global rpc only', () => {
     test('getSyncingStats', async () => {
       const syncingStats = await rpcProvider.getSyncingStats();
       expect(syncingStats).toMatchSchemaRef('GetSyncingStatsResponse');
