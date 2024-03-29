@@ -54,12 +54,10 @@ describe('defaultProvider', () => {
       expect(exampleTransactionHash).toBeTruthy();
     });
 
-    test('getContractSpecificities', async () => {
+    test('getContractVersion', async () => {
       const expected = { cairo: '0', compiler: '0', messageVerifFunctionName: undefined };
-      expect(await testProvider.getContractSpecificities(erc20ContractAddress)).toEqual(expected);
-      expect(await testProvider.getContractSpecificities(undefined, erc20ClassHash)).toEqual(
-        expected
-      );
+      expect(await testProvider.getContractVersion(erc20ContractAddress)).toEqual(expected);
+      expect(await testProvider.getContractVersion(undefined, erc20ClassHash)).toEqual(expected);
     });
 
     describe('getBlock', () => {
