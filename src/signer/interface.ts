@@ -1,5 +1,4 @@
 import {
-  Abi,
   Call,
   DeclareSignerDetails,
   DeployAccountSignerDetails,
@@ -39,12 +38,10 @@ export abstract class SignerInterface {
    *  - maxFee<br/>
    *  - version<br/>
    *  - nonce<br/>
-   * @param abis - (optional) An array of Abi objects for displaying decoded data
    */
   public abstract signTransaction(
     transactions: Call[],
-    transactionsDetail: InvocationsSignerDetails,
-    abis?: Abi[]
+    transactionsDetail: InvocationsSignerDetails
   ): Promise<Signature>;
 
   /**
