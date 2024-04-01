@@ -9,7 +9,7 @@ import {
   type StarknetChainId,
   type StarknetWindowObject,
   type TypedData,
-} from 'get-starknet-core';
+} from 'starknet-types';
 
 /**
  * Request Permission for wallet account, return addresses that are allowed by user

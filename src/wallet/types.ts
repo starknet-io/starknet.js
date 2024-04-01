@@ -1,4 +1,4 @@
-import { type RpcMessage, type StarknetWindowObject } from 'get-starknet-core';
+import { type RpcMessage, type StarknetWindowObject } from 'starknet-types';
 
 // ---- TT Request Handler
 export type RpcCall = Omit<RpcMessage, 'result'>;
