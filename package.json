@@ -98,7 +98,7 @@
     "isomorphic-fetch": "^3.0.0",
     "lossless-json": "^4.0.1",
     "pako": "^2.0.4",
-    "starknet-types": "^0.0.1",
+    "starknet-types": "^0.0.4",
     "ts-mixer": "^6.0.3",
     "url-join": "^4.0.1"
   },
