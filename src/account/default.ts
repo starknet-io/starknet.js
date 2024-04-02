@@ -618,6 +618,8 @@ export class Account extends Provider implements AccountInterface {
           unit: 'FRI',
           suggestedMaxFee: ZERO,
           resourceBounds: estimateFeeToBounds(ZERO),
+          data_gas_consumed: 0n,
+          data_gas_price: 0n,
         };
         break;
     }
