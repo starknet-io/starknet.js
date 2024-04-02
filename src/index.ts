@@ -43,7 +43,7 @@ export * from './utils/calldata/enum';
 export * from './utils/contract';
 export * from './utils/events';
 export * from './utils/transactionReceipt';
-export * as wallet from './wallet/wallet';
+export * as wallet from './wallet/connect';
 
 /**
  * Deprecated
