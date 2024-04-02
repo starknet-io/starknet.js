@@ -18,6 +18,7 @@ import {
 import { toBigInt } from '../num';
 import { estimateFeeToBounds, estimatedFeeToMaxFee } from '../stark';
 import { ResponseParser } from '.';
+import { BlockWithTxs } from '../../types/api/rpcspec_0_6/nonspec';
 
 export class RPCResponseParser
   implements
@@ -96,5 +97,9 @@ export class RPCResponseParser
       ...(res as ContractClassResponse),
       abi: typeof res.abi === 'string' ? JSON.parse(res.abi) : res.abi,
     };
+  }
+
+  public parseGasPriceResponse(res: BlockWithTxs): string {
+    return res.l1_gas_price.price_in_wei;
   }
 }
