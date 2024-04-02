@@ -1,6 +1,8 @@
 import typedDataExample from '../__mocks__/typedData/baseExample.json';
 import {
   Account,
+  AllowArray,
+  Call,
   Contract,
   DeclareDeployUDCResponse,
   Provider,
@@ -21,9 +23,7 @@ import {
   compiledErc20,
   compiledHelloSierra,
   compiledHelloSierraCasm,
-  compiledNamingContract,
   compiledOpenZeppelinAccount,
-  compiledStarknetId,
   compiledTestDapp,
   describeIfDevnet,
   describeIfDevnetSequencer,
@@ -89,17 +89,24 @@ describe('deploy and test Wallet', () => {
 
   test('estimateInvokeFee Cairo 0', async () => {
     const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
-    const result = await account.estimateInvokeFee({
+
+    const calls: AllowArray<Call> = {
       contractAddress: erc20Address,
       entrypoint: 'transfer',
       calldata: [erc20.address, '10', '0'],
-    });
+    };
 
+    let result = await account.estimateInvokeFee(calls, { skipValidate: true });
+    expect(result).toMatchSchemaRef('EstimateFee');
+    expect(innerInvokeEstFeeSpy).not.toHaveBeenCalled();
+    innerInvokeEstFeeSpy.mockClear();
+
+    result = await account.estimateInvokeFee(calls, { skipValidate: false });
     expect(result).toMatchSchemaRef('EstimateFee');
     expect([constants.TRANSACTION_VERSION.F1, constants.TRANSACTION_VERSION.F3]).toContain(
       innerInvokeEstFeeSpy.mock.calls[0][1].version
     );
-    innerInvokeEstFeeSpy.mockClear();
+    innerInvokeEstFeeSpy.mockRestore();
   });
 
   xtest('estimateDeclareFee Cairo 0 &  Cairo 1', async () => {
@@ -456,78 +463,6 @@ describe('deploy and test Wallet', () => {
         await provider.waitForTransaction(declareTx.transaction_hash);
       }
       expect(declareTx).toMatchSchemaRef('DeclareContractResponse');
-    });
-
-    test('Get the stark name of the account and account from stark name (using starknet.id)', async () => {
-      // Deploy naming contract
-      const namingResponse = await account.declareAndDeploy({
-        contract: compiledNamingContract,
-      });
-      const namingAddress = namingResponse.deploy.contract_address;
-
-      // Deploy Starknet id contract
-      const idResponse = await account.declareAndDeploy({
-        contract: compiledStarknetId,
-      });
-      const idAddress = idResponse.deploy.contract_address;
-
-      // Create signature from private key
-      const whitelistingPublicKey =
-        '1893860513534673656759973582609638731665558071107553163765293299136715951024';
-      const whitelistingPrivateKey =
-        '301579081698031303837612923223391524790804435085778862878979120159194507372';
-      const hashed = ec.starkCurve.pedersen(
-        ec.starkCurve.pedersen(toBigInt('18925'), toBigInt('1922775124')),
-        toBigInt(account.address)
-      );
-      const signed = ec.starkCurve.sign(hashed, toHex(whitelistingPrivateKey));
-
-      const { transaction_hash } = await account.execute([
-        {
-          contractAddress: namingAddress,
-          entrypoint: 'initializer',
-          calldata: [
-            idAddress, // starknetid_contract_addr
-            '0', // pricing_contract_addr
-            account.address, // admin
-            whitelistingPublicKey, // whitelisting_key
-            '0', // l1_contract
-          ],
-        },
-        {
-          contractAddress: idAddress,
-          entrypoint: 'mint',
-          calldata: ['1'], // TokenId
-        },
-        {
-          contractAddress: namingAddress,
-          entrypoint: 'whitelisted_mint',
-          calldata: [
-            '18925', // Domain encoded "ben"
-            '1922775124', // Expiry
-            '1', // Starknet id linked
-            account.address, // receiver_address
-            signed.r, // sig 0 for whitelist
-            signed.s, // sig 1 for whitelist
-          ],
-        },
-        {
-          contractAddress: namingAddress,
-          entrypoint: 'set_address_to_domain',
-          calldata: [
-            '1', // length
-            '18925', // Domain encoded "ben"
-          ],
-        },
-      ]);
-
-      await provider.waitForTransaction(transaction_hash);
-
-      const address = await account.getAddressFromStarkName('ben.stark', namingAddress);
-      expect(hexToDecimalString(address as string)).toEqual(hexToDecimalString(account.address));
-
-      const name = await account.getStarkName(undefined, namingAddress);
-      expect(name).toEqual('ben.stark');
     });
   });
 

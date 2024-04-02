@@ -221,6 +221,55 @@ console.log('✅ Braavos wallet deployed at', BraavosAccountFinalAddress);
 
 The computed address has been funded automatically by minting a new dummy ETH in Starknet devnet!
 
+## Create an Ethereum account
+
+Thanks to account abstraction, you can create in Starknet an account that old the cryptographic logic of an Ethereum account. By this way, you can use Ethereum private and public keys.  
+OpenZeppelin has released an account contract for a such Ethereum account. Here an example of account creation in Sepolia Testnet.
+
+### Compute address
+
+```typescript
+const privateKeyETH = '0x45397ee6ca34cb49060f1c303c6cb7ee2d6123e617601ef3e31ccf7bf5bef1f9';
+const ethSigner = new EthSigner(privateKeyETH);
+const ethFullPublicKey = await ethSigner.getPubKey();
+const accountEthClassHash = '0x23e416842ca96b1f7067693892ed00881d97a4b0d9a4c793b75cb887944d98d';
+const myCallData = new CallData(ethAccountAbi);
+const accountETHconstructorCalldata = myCallData.compile('constructor', {
+  public_key: ethFullPublicKey,
+});
+const salt = '0x12345'; // or lower felt of public key X part
+const contractETHaddress = hash.calculateContractAddressFromHash(
+  salt,
+  accountEthClassHash,
+  accountETHconstructorCalldata,
+  0
+);
+console.log('Pre-calculated ETH account address =', contractETHaddress);
+```
+
+Then you have to fund this address.
+
+### deployment of the new account
+
+If you have sent enough funds to this new address, you can go forward to the final step:
+
+```typescript
+const ethAccount = new Account(provider, contractETHaddress, ethSigner);
+const deployPayload = {
+  classHash: accountEthClassHash,
+  constructorCalldata: accountETHconstructorCalldata,
+  addressSalt: salt,
+};
+const { suggestedMaxFee: feeDeploy } = await ethAccount.estimateAccountDeployFee(deployPayload);
+const { transaction_hash, contract_address } = await ethAccount.deployAccount(
+  deployPayload,
+  { maxFee: stark.estimatedFeeToMaxFee(feeDeploy, 100) }
+  // Extra fee to fund the validation of the transaction
+);
+await provider.waitForTransaction(transaction_hash);
+console.log('✅ New Ethereum account final address =', contract_address);
+```
+
 ## Create your account abstraction
 
 You are not limited to these 3 contracts. You can create your own contract for the wallet. It's the concept of Account Abstraction.

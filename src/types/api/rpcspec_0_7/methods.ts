@@ -172,7 +172,7 @@ type ReadMethods = {
     errors: Errors.BLOCK_NOT_FOUND;
   };
 
-  // Call a StarkNet function without creating a StarkNet transaction
+  // Call a Starknet function without creating a Starknet transaction
   starknet_call: {
     params: {
       request: FUNCTION_CALL;
@@ -182,7 +182,7 @@ type ReadMethods = {
     errors: Errors.CONTRACT_NOT_FOUND | Errors.CONTRACT_ERROR | Errors.BLOCK_NOT_FOUND;
   };
 
-  // Estimate the fee for StarkNet transactions
+  // Estimate the fee for Starknet transactions
   starknet_estimateFee: {
     params: {
       request: BROADCASTED_TXN[];
@@ -217,7 +217,7 @@ type ReadMethods = {
     errors: Errors.NO_BLOCKS;
   };
 
-  // Return the currently configured StarkNet chain id
+  // Return the currently configured Starknet chain id
   starknet_chainId: {
     params: [];
     result: CHAIN_ID;

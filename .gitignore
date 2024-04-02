@@ -4,6 +4,7 @@
 .env
 .eslintcache
 .vscode
+.idea
 coverage
 dist
 node_modules

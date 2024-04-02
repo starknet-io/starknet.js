@@ -33,7 +33,7 @@ type MergeProperties<T1 extends Record<any, any>, T2 extends Record<any, any>> =
 // type c = Merge<a, b>; // { w: (bigint | number)[] x: bigint | number; y?: string; z?: string; }
 //
 // NOTE: handling for ambiguous overlaps, such as a shared property being an array or object,
-// is simplified to resolve to only one type since there shouldn't be such occurences in the
+// is simplified to resolve to only one type since there shouldn't be such occurrences in the
 // currently supported RPC specifications
 type Merge<T1, T2> = Simplify<
   T1 extends Array<any>

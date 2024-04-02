@@ -5,8 +5,10 @@ import {
   Block,
   CallData,
   Contract,
+  FeeEstimate,
   RPC,
   RPC06,
+  ReceiptTx,
   RpcProvider,
   TransactionExecutionStatus,
   stark,
@@ -84,6 +86,33 @@ describeIfRpc('RPCProvider', () => {
     expect(typeof spec).toBe('string');
   });
 
+  test('configurable margin', async () => {
+    const p = new RpcProvider({
+      nodeUrl: provider.channel.nodeUrl,
+      feeMarginPercentage: {
+        l1BoundMaxAmount: 0,
+        l1BoundMaxPricePerUnit: 0,
+        maxFee: 0,
+      },
+    });
+    const estimateSpy = jest.spyOn(p.channel as any, 'getEstimateFee');
+    const mockFeeEstimate: FeeEstimate = {
+      gas_consumed: '0x2',
+      gas_price: '0x1',
+      data_gas_consumed: '0x2',
+      data_gas_price: '0x1',
+      overall_fee: '0x4',
+      unit: 'WEI',
+    };
+    estimateSpy.mockResolvedValue([mockFeeEstimate]);
+    const result = (await p.getEstimateFeeBulk([{} as any], {}))[0];
+    expect(estimateSpy).toHaveBeenCalledTimes(1);
+    expect(result.suggestedMaxFee).toBe(4n);
+    expect(result.resourceBounds.l1_gas.max_amount).toBe('0x4');
+    expect(result.resourceBounds.l1_gas.max_price_per_unit).toBe('0x1');
+    estimateSpy.mockRestore();
+  });
+
   describe('Test Estimate message fee', () => {
     const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165A0';
     let l1l2ContractAddress: string;
@@ -143,12 +172,12 @@ describeIfRpc('RPCProvider', () => {
 
     test('successful - default', async () => {
       transactionStatusSpy.mockResolvedValueOnce(response.successful);
-      await expect(rpcProvider.waitForTransaction(0)).resolves.toBe(receipt);
+      await expect(rpcProvider.waitForTransaction(0)).resolves.toBeInstanceOf(ReceiptTx);
     });
 
     test('reverted - default', async () => {
       transactionStatusSpy.mockResolvedValueOnce(response.reverted);
-      await expect(rpcProvider.waitForTransaction(0)).resolves.toBe(receipt);
+      await expect(rpcProvider.waitForTransaction(0)).resolves.toBeInstanceOf(ReceiptTx);
     });
 
     test('rejected - default', async () => {

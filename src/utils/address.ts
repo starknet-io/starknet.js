@@ -7,10 +7,20 @@ import { addHexPrefix, removeHexPrefix } from './encode';
 import { keccakBn } from './hash';
 import { assertInRange, toHex } from './num';
 
+/**
+ * Format a hex number to '0x' and 64 characters, adding leading zeros if necessary.
+ * @param {BigNumberish} address
+ * @returns {string} Hex string : 0x followed by 64 characters. No upper case characters in the response.
+ */
 export function addAddressPadding(address: BigNumberish): string {
   return addHexPrefix(removeHexPrefix(toHex(address)).padStart(64, '0'));
 }
 
+/**
+ * Check the validity of a Starknet address, and format it as a hex number : '0x' and 64 characters, adding leading zeros if necessary.
+ * @param {BigNumberish} address
+ * @returns {string} Hex string : 0x followed by 64 characters. No upper case characters in the response.
+ */
 export function validateAndParseAddress(address: BigNumberish): string {
   assertInRange(address, ZERO, ADDR_BOUND - 1n, 'Starknet Address');
 
@@ -41,6 +51,14 @@ export function getChecksumAddress(address: BigNumberish): string {
   return addHexPrefix(chars.join(''));
 }
 
+/**
+ * If the casing of an address is mixed, it is a Checksum Address, which uses a specific pattern of uppercase and lowercase letters within
+ * a given address to reduce the risk of errors introduced from typing an address or cut and paste issues.
+ *
+ * @param address string
+ *
+ * @returns true if the ChecksumAddress is valid
+ */
 export function validateChecksumAddress(address: string): boolean {
   return getChecksumAddress(address) === address;
 }

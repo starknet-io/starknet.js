@@ -1,7 +1,7 @@
 import { getStarkKey, utils } from '@scure/starknet';
 import { gzip, ungzip } from 'pako';
 
-import { ZERO } from '../constants';
+import { ZERO, feeMarginPercentage } from '../constants';
 import {
   ArraySignatureType,
   BigNumberish,
@@ -18,8 +18,10 @@ import {
   addPercent,
   bigNumberishArrayToDecimalStringArray,
   bigNumberishArrayToHexadecimalStringArray,
+  isBigInt,
   toHex,
 } from './num';
+import { isString } from './shortString';
 
 /**
  * Compress compiled Cairo program
@@ -28,7 +30,7 @@ import {
  * @param jsonProgram Representing the compiled cairo program
  */
 export function compressProgram(jsonProgram: Program | string): CompressedProgram {
-  const stringified = typeof jsonProgram === 'string' ? jsonProgram : stringify(jsonProgram);
+  const stringified = isString(jsonProgram) ? jsonProgram : stringify(jsonProgram);
   const compressedProgram = gzip(stringified);
   return btoaUniversal(compressedProgram);
 }
@@ -95,16 +97,19 @@ export function signatureToHexArray(sig?: Signature): ArraySignatureType {
 /**
  * Convert estimated fee to max fee with overhead
  */
-export function estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: number = 0.5): bigint {
-  return addPercent(estimatedFee, overhead * 100);
+export function estimatedFeeToMaxFee(
+  estimatedFee: BigNumberish,
+  overhead: number = feeMarginPercentage.MAX_FEE
+): bigint {
+  return addPercent(estimatedFee, overhead);
 }
 
 export function estimateFeeToBounds(
   estimate: FeeEstimate | 0n,
-  amountOverhead: number = 10,
-  priceOverhead = 50
+  amountOverhead: number = feeMarginPercentage.L1_BOUND_MAX_AMOUNT,
+  priceOverhead: number = feeMarginPercentage.L1_BOUND_MAX_PRICE_PER_UNIT
 ): ResourceBounds {
-  if (typeof estimate === 'bigint') {
+  if (isBigInt(estimate)) {
     return {
       l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
       l1_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
@@ -114,7 +119,11 @@ export function estimateFeeToBounds(
   if (typeof estimate.gas_consumed === 'undefined' || typeof estimate.gas_price === 'undefined') {
     throw Error('estimateFeeToBounds: estimate is undefined');
   }
-  const maxUnits = toHex(addPercent(estimate.gas_consumed, amountOverhead));
+
+  const maxUnits =
+    estimate.data_gas_consumed !== undefined && estimate.data_gas_price !== undefined // RPC v0.7
+      ? toHex(addPercent(BigInt(estimate.overall_fee) / BigInt(estimate.gas_price), amountOverhead))
+      : toHex(addPercent(estimate.gas_consumed, amountOverhead));
   const maxUnitPrice = toHex(addPercent(estimate.gas_price, priceOverhead));
   return {
     l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },

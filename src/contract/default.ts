@@ -15,7 +15,6 @@ import {
   ContractOptions,
   EstimateFeeResponse,
   FunctionAbi,
-  GetTransactionReceiptResponse,
   InvokeFunctionResponse,
   InvokeOptions,
   InvokeTransactionReceiptResponse,
@@ -31,6 +30,7 @@ import { createAbiParser } from '../utils/calldata/parser';
 import { getAbiEvents, parseEvents as parseRawEvents } from '../utils/events/index';
 import { cleanHex } from '../utils/num';
 import { ContractInterface } from './interface';
+import type { GetTransactionReceiptResponse } from '../utils/transactionReceipt';
 
 export type TypedContractV2<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & Contract;
 

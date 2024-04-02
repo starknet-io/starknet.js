@@ -7,12 +7,10 @@ import {
   CompiledSierra,
   ContractClass,
   GetBlockResponse,
-  GetTransactionReceiptResponse,
   InvocationsDetailsWithNonce,
   LegacyContractClass,
   PendingBlock,
   PendingStateUpdate,
-  RPC,
   SierraContractClass,
   StateUpdateResponse,
   V3TransactionDetails,
@@ -21,8 +19,10 @@ import { ETransactionVersion } from '../types/api';
 import { isSierra } from './contract';
 import { formatSpaces } from './hash';
 import { parse, stringify } from './json';
-import { isHex, toHex } from './num';
+import { isBigInt, isHex, isNumber, toHex } from './num';
 import { compressProgram } from './stark';
+import type { GetTransactionReceiptResponse } from './transactionReceipt';
+import { isString } from './shortString';
 
 /**
  * Helper - Async Sleep for 'delay' time
@@ -53,8 +53,7 @@ export function createSierraContractClass(contract: CompiledSierra): SierraContr
  * (CompiledContract or string) -> ContractClass
  */
 export function parseContract(contract: CompiledContract | string): ContractClass {
-  const parsedContract =
-    typeof contract === 'string' ? (parse(contract) as CompiledContract) : contract;
+  const parsedContract = isString(contract) ? (parse(contract) as CompiledContract) : contract;
 
   if (!isSierra(contract)) {
     return {
@@ -85,7 +84,7 @@ export const getDefaultNodeUrl = (networkName?: NetworkName, mute: boolean = fal
  * [Reference](https://github.com/starkware-libs/cairo-lang/blob/fc97bdd8322a7df043c87c371634b26c15ed6cee/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L148-L153)
  */
 export function formatHash(hashValue: BigNumberish): string {
-  if (typeof hashValue === 'string') return hashValue;
+  if (isString(hashValue)) return hashValue;
   return toHex(hashValue);
 }
 
@@ -111,19 +110,17 @@ export class Block {
   tag: BlockIdentifier = null;
 
   private setIdentifier(__identifier: BlockIdentifier) {
-    if (typeof __identifier === 'string' && isHex(__identifier)) {
-      this.hash = __identifier;
-    } else if (typeof __identifier === 'bigint') {
+    if (isString(__identifier)) {
+      if (isHex(__identifier)) {
+        this.hash = __identifier;
+      } else if (validBlockTags.includes(__identifier as BlockTag)) {
+        this.tag = __identifier;
+      }
+    } else if (isBigInt(__identifier)) {
       this.hash = toHex(__identifier);
-    } else if (typeof __identifier === 'number') {
+    } else if (isNumber(__identifier)) {
       this.number = __identifier;
-    } else if (
-      typeof __identifier === 'string' &&
-      validBlockTags.includes(__identifier as BlockTag)
-    ) {
-      this.tag = __identifier;
     } else {
-      // default
       this.tag = BlockTag.pending;
     }
   }
@@ -195,9 +192,7 @@ export function isPendingBlock(response: GetBlockResponse): response is PendingB
 /**
  * Guard Pending Transaction
  */
-export function isPendingTransaction(
-  response: GetTransactionReceiptResponse
-): response is RPC.PendingReceipt {
+export function isPendingTransaction(response: GetTransactionReceiptResponse): boolean {
   return !('block_hash' in response);
 }
 

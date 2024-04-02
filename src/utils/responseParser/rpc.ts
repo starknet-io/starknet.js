@@ -10,15 +10,17 @@ import {
   EstimateFeeResponse,
   EstimateFeeResponseBulk,
   GetBlockResponse,
-  GetTransactionReceiptResponse,
   FeeEstimate,
   SimulateTransactionResponse,
   SimulatedTransaction,
+  RpcProviderOptions,
+  GetTxReceiptResponseWithoutHelper,
 } from '../../types/provider';
 import { toBigInt } from '../num';
 import { estimateFeeToBounds, estimatedFeeToMaxFee } from '../stark';
 import { ResponseParser } from '.';
 import { BlockWithTxs } from '../../types/api/rpcspec_0_6/nonspec';
+import { isString } from '../shortString';
 
 export class RPCResponseParser
   implements
@@ -32,24 +34,42 @@ export class RPCResponseParser
       | 'parseCallContractResponse'
     >
 {
+  private margin: RpcProviderOptions['feeMarginPercentage'];
+
+  constructor(margin?: RpcProviderOptions['feeMarginPercentage']) {
+    this.margin = margin;
+  }
+
+  private estimatedFeeToMaxFee(estimatedFee: Parameters<typeof estimatedFeeToMaxFee>[0]) {
+    return estimatedFeeToMaxFee(estimatedFee, this.margin?.maxFee);
+  }
+
+  private estimateFeeToBounds(estimate: Parameters<typeof estimateFeeToBounds>[0]) {
+    return estimateFeeToBounds(
+      estimate,
+      this.margin?.l1BoundMaxAmount,
+      this.margin?.l1BoundMaxPricePerUnit
+    );
+  }
+
   public parseGetBlockResponse(res: BlockWithTxHashes): GetBlockResponse {
     return { status: 'PENDING', ...res } as GetBlockResponse;
   }
 
-  public parseTransactionReceipt(res: TransactionReceipt): GetTransactionReceiptResponse {
+  public parseTransactionReceipt(res: TransactionReceipt): GetTxReceiptResponseWithoutHelper {
     // HOTFIX RPC 0.5 to align with RPC 0.6
     // This case is RPC 0.5. It can be only v2 thx with FRI units
-    if ('actual_fee' in res && typeof res.actual_fee === 'string') {
+    if ('actual_fee' in res && isString(res.actual_fee)) {
       return {
-        ...(res as GetTransactionReceiptResponse),
+        ...(res as GetTxReceiptResponseWithoutHelper),
         actual_fee: {
           amount: res.actual_fee,
           unit: 'FRI',
         },
-      };
+      } as GetTxReceiptResponseWithoutHelper;
     }
 
-    return res as GetTransactionReceiptResponse;
+    return res as GetTxReceiptResponseWithoutHelper;
   }
 
   public parseFeeEstimateResponse(res: FeeEstimate[]): EstimateFeeResponse {
@@ -59,8 +79,8 @@ export class RPCResponseParser
       gas_consumed: toBigInt(val.gas_consumed),
       gas_price: toBigInt(val.gas_price),
       unit: val.unit,
-      suggestedMaxFee: estimatedFeeToMaxFee(val.overall_fee),
-      resourceBounds: estimateFeeToBounds(val),
+      suggestedMaxFee: this.estimatedFeeToMaxFee(val.overall_fee),
+      resourceBounds: this.estimateFeeToBounds(val),
     };
   }
 
@@ -70,8 +90,8 @@ export class RPCResponseParser
       gas_consumed: toBigInt(val.gas_consumed),
       gas_price: toBigInt(val.gas_price),
       unit: val.unit,
-      suggestedMaxFee: estimatedFeeToMaxFee(val.overall_fee),
-      resourceBounds: estimateFeeToBounds(val),
+      suggestedMaxFee: this.estimatedFeeToMaxFee(val.overall_fee),
+      resourceBounds: this.estimateFeeToBounds(val),
     }));
   }
 
@@ -86,8 +106,8 @@ export class RPCResponseParser
     return res.map((it: SimulatedTransaction) => {
       return {
         ...it,
-        suggestedMaxFee: estimatedFeeToMaxFee(BigInt(it.fee_estimation.overall_fee)),
-        resourceBounds: estimateFeeToBounds(it.fee_estimation),
+        suggestedMaxFee: this.estimatedFeeToMaxFee(it.fee_estimation.overall_fee),
+        resourceBounds: this.estimateFeeToBounds(it.fee_estimation),
       };
     });
   }
@@ -95,7 +115,7 @@ export class RPCResponseParser
   public parseContractClassResponse(res: ContractClassPayload): ContractClassResponse {
     return {
       ...(res as ContractClassResponse),
-      abi: typeof res.abi === 'string' ? JSON.parse(res.abi) : res.abi,
+      abi: isString(res.abi) ? JSON.parse(res.abi) : res.abi,
     };
   }
 

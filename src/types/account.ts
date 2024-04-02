@@ -21,6 +21,7 @@ export type AccountInvocationsFactoryDetails = {
   versions: Array<`${ETransactionVersion}`>;
   nonce?: BigNumberish;
   blockIdentifier?: BlockIdentifier;
+  skipValidate?: boolean;
 } & Partial<V3TransactionDetails>;
 
 export interface UniversalDetails {
@@ -97,3 +98,12 @@ export type EstimateFeeAction =
       type: TransactionType.DEPLOY;
       payload: UniversalDeployerContractPayload;
     };
+
+export type StarkProfile = {
+  name?: string;
+  profilePicture?: string;
+  discord?: string;
+  twitter?: string;
+  github?: string;
+  proofOfPersonhood?: boolean;
+};

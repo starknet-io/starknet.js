@@ -25,21 +25,25 @@ import {
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
+  GetTxReceiptResponseWithoutHelper,
 } from '../types';
 import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { isSierra } from '../utils/contract';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
+import { ReceiptTx, GetTransactionReceiptResponse } from '../utils/transactionReceipt';
 
 export class RpcProvider implements ProviderInterface {
-  private responseParser = new RPCResponseParser();
+  private responseParser: RPCResponseParser;
 
   public channel: RPC07.RpcChannel | RPC06.RpcChannel;
 
   constructor(optionsOrProvider?: RpcProviderOptions | ProviderInterface | RpcProvider) {
     if (optionsOrProvider && 'channel' in optionsOrProvider) {
       this.channel = optionsOrProvider.channel;
+      this.responseParser = (optionsOrProvider as any).responseParser;
     } else {
       this.channel = new RpcChannel({ ...optionsOrProvider, waitMode: false });
+      this.responseParser = new RPCResponseParser(optionsOrProvider?.feeMarginPercentage);
     }
   }
 
@@ -151,10 +155,11 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getTransactionByBlockIdAndIndex(blockIdentifier, index);
   }
 
-  public async getTransactionReceipt(txHash: BigNumberish) {
-    return this.channel
-      .getTransactionReceipt(txHash)
-      .then(this.responseParser.parseTransactionReceipt);
+  public async getTransactionReceipt(txHash: BigNumberish): Promise<GetTransactionReceiptResponse> {
+    const txReceiptWoHelper = await this.channel.getTransactionReceipt(txHash);
+    const txReceiptWoHelperModified: GetTxReceiptResponseWithoutHelper =
+      this.responseParser.parseTransactionReceipt(txReceiptWoHelper);
+    return new ReceiptTx(txReceiptWoHelperModified) as GetTransactionReceiptResponse;
   }
 
   public async getTransactionTrace(txHash: BigNumberish) {
@@ -182,11 +187,18 @@ export class RpcProvider implements ProviderInterface {
     // can't be named simulateTransaction because of argument conflict with account
     return this.channel
       .simulateTransaction(invocations, options)
-      .then(this.responseParser.parseSimulateTransactionResponse);
+      .then((r) => this.responseParser.parseSimulateTransactionResponse(r));
   }
 
-  public async waitForTransaction(txHash: BigNumberish, options?: waitForTransactionOptions) {
-    return this.channel.waitForTransaction(txHash, options);
+  public async waitForTransaction(
+    txHash: BigNumberish,
+    options?: waitForTransactionOptions
+  ): Promise<GetTransactionReceiptResponse> {
+    const receiptWoHelper = (await this.channel.waitForTransaction(
+      txHash,
+      options
+    )) as GetTxReceiptResponseWithoutHelper;
+    return new ReceiptTx(receiptWoHelper) as GetTransactionReceiptResponse;
   }
 
   public async getStorageAt(
@@ -284,7 +296,7 @@ export class RpcProvider implements ProviderInterface {
         ],
         { blockIdentifier, skipValidate }
       )
-      .then(this.responseParser.parseFeeEstimateResponse);
+      .then((r) => this.responseParser.parseFeeEstimateResponse(r));
   }
 
   public async getDeclareEstimateFee(
@@ -304,7 +316,7 @@ export class RpcProvider implements ProviderInterface {
         ],
         { blockIdentifier, skipValidate }
       )
-      .then(this.responseParser.parseFeeEstimateResponse);
+      .then((r) => this.responseParser.parseFeeEstimateResponse(r));
   }
 
   public async getDeployAccountEstimateFee(
@@ -324,7 +336,7 @@ export class RpcProvider implements ProviderInterface {
         ],
         { blockIdentifier, skipValidate }
       )
-      .then(this.responseParser.parseFeeEstimateResponse);
+      .then((r) => this.responseParser.parseFeeEstimateResponse(r));
   }
 
   public async getEstimateFeeBulk(
@@ -333,7 +345,7 @@ export class RpcProvider implements ProviderInterface {
   ) {
     return this.channel
       .getEstimateFee(invocations, options)
-      .then(this.responseParser.parseFeeEstimateBulkResponse);
+      .then((r) => this.responseParser.parseFeeEstimateBulkResponse(r));
   }
 
   public async invokeFunction(

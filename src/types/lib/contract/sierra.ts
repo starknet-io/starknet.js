@@ -8,6 +8,7 @@ export type CairoAssembly = {
   bytecode: ByteCode;
   hints: any[];
   pythonic_hints?: PythonicHints;
+  bytecode_segment_lengths?: number[]; // if Sierra >= v1.5.0
   entry_points_by_type: EntryPointsByType;
 };
 

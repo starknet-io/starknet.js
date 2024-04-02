@@ -80,10 +80,10 @@ As a consequence of account abstraction, you can find accounts that uses Ethereu
 To connect to this type of account:
 
 ```typescript
-const myEthPrivateKey = '0x525bc68475c0955fae83869beec0996114d4bb27b28b781ed2a20ef23121b8de';
-const myEthAccountAddress = '0x65a822fbee1ae79e898688b5a4282dc79e0042cbed12f6169937fddb4c26641';
+const myEthPrivateKey = "0x525bc68475c0955fae83869beec0996114d4bb27b28b781ed2a20ef23121b8de";
+const myEthAccountAddressInStarknet = "0x65a822fbee1ae79e898688b5a4282dc79e0042cbed12f6169937fddb4c26641";
 const myEthSigner = new EthSigner(myEthPrivateKey);
-const myEthAccount = new Account(provider, myEthAccountAddress, myEthSigner);
+const myEthAccount = new Account(provider, myEthAccountAddressInStarknet, myEthSigner)
 ```
 
 And if you need a random Ethereum private key:
