@@ -1,3 +1,4 @@
+import Web3Utils from 'web3-utils';
 import { NetworkName, StarknetChainId } from '../constants';
 import { LibraryError } from '../provider/errors';
 import {
@@ -18,7 +19,6 @@ import {
   waitForTransactionOptions,
 } from '../types';
 import { JRPC, RPCSPEC07 as RPC } from '../types/api';
-import { getChecksumAddress } from '../utils/address';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
 import fetch from '../utils/fetchPonyfill';
@@ -570,7 +570,7 @@ export class RpcChannel {
   ) {
     const { from_address, to_address, entry_point_selector, payload } = message;
     const formattedMessage = {
-      from_address: getChecksumAddress(from_address),
+      from_address: Web3Utils.toChecksumAddress(from_address),
       to_address: toHex(to_address),
       entry_point_selector: getSelector(entry_point_selector),
       payload: getHexStringArray(payload),

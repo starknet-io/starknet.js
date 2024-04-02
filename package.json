@@ -99,7 +99,8 @@
     "lossless-json": "^4.0.1",
     "pako": "^2.0.4",
     "ts-mixer": "^6.0.3",
-    "url-join": "^4.0.1"
+    "url-join": "^4.0.1",
+    "web3-utils": "^4.2.2"
   },
   "lint-staged": {
     "*.ts": "eslint --cache --fix",
