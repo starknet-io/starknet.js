@@ -112,7 +112,7 @@ const describeIf = (condition: boolean) => (condition ? describe : describe.skip
 export const describeIfRpc = describeIf(process.env.IS_RPC === 'true');
 export const describeIfNotRpcDevnet = describeIf(process.env.IS_RPC_DEVNET === 'false');
 export const describeIfRpcDevnet = describeIf(process.env.IS_RPC_DEVNET === 'true');
-export const describeIfCairo1Testnet = describeIf(process.env.IS_CAIRO1_TESTNET === 'true');
+export const describeIfTestnet = describeIf(process.env.IS_TESTNET === 'true');
 
 export const erc20ClassHash = '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a';
 export const wrongClassHash = '0x000000000000000000000000000000000000000000000000000000000000000';

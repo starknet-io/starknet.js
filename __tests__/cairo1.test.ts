@@ -26,7 +26,7 @@ import {
   compiledHelloSierra,
   compiledHelloSierraCasm,
   describeIfRpcDevnet,
-  describeIfCairo1Testnet,
+  describeIfTestnet,
   getTestAccount,
   getTestProvider,
 } from './config/fixtures';
@@ -550,8 +550,8 @@ describeIfRpcDevnet('Cairo 1 Devnet', () => {
   });
 });
 
-describeIfCairo1Testnet('Cairo1 Testnet', () => {
-  describe('TS validation for Goerli', () => {
+describeIfTestnet('Testnet', () => {
+  describe('TS validation for testnet', () => {
     const provider = getTestProvider();
     const account = getTestAccount(provider);
     const classHash: any = '0x022332bb9c1e22ae13ae7fd9f3101eced4644533c6bfe51a25cf8dea028e5045';

@@ -5,15 +5,15 @@ import { setIfNullish } from './env';
 import { BaseUrl } from '../../../src/constants';
 
 class StrategyResolver {
-  private isRsDevnet = false;
+  private isDevnet = false;
 
-  private isRpc = false;
+  private isRpcNode = false;
 
   get isRpcDevnet() {
-    return this.isRsDevnet || !!process.env.TEST_RPC_URL;
+    return this.isDevnet || !!process.env.TEST_RPC_URL;
   }
 
-  get isCairo1Testnet() {
+  get isTestnet() {
     const url = process.env.TEST_PROVIDER_BASE_URL || process.env.TEST_RPC_URL;
     return url?.includes(BaseUrl.SN_GOERLI);
   }
@@ -23,7 +23,7 @@ class StrategyResolver {
     return !!(TEST_ACCOUNT_PRIVATE_KEY && TEST_ACCOUNT_ADDRESS);
   }
 
-  private async isRS(): Promise<boolean> {
+  private async isRsDevnet(): Promise<boolean> {
     const response = await fetch(GS_DEFAULT_TEST_PROVIDER_URL, {
       method: 'POST',
       headers: { Accept: 'application/json', 'Content-Type': 'application/json' },
@@ -36,8 +36,8 @@ class StrategyResolver {
   async detectDevnet(): Promise<void> {
     // if on base url RPC endpoint work it is devnet-rs else it devnet-py
     try {
-      this.isRsDevnet = await this.isRS();
-      if (this.isRsDevnet) console.log('Detected Devnet-RS');
+      this.isDevnet = await this.isRsDevnet();
+      if (this.isDevnet) console.log('Detected Devnet-RS');
     } catch (error) {
       console.log('\x1b[36m%s\x1b[0m', LOCAL_DEVNET_NOT_RUNNING_MESSAGE);
       throw new Error(
@@ -51,9 +51,9 @@ class StrategyResolver {
   resolveRpc(): void {
     const hasRpcUrl = !!process.env.TEST_RPC_URL;
 
-    this.isRpc = hasRpcUrl || this.isRsDevnet;
-    setIfNullish('IS_RPC', this.isRpc);
-    setIfNullish('IS_CAIRO1_TESTNET', this.isCairo1Testnet);
+    this.isRpcNode = hasRpcUrl || this.isDevnet;
+    setIfNullish('IS_RPC', this.isRpcNode);
+    setIfNullish('IS_TESTNET', this.isTestnet);
 
     if (hasRpcUrl) {
       console.log('Detected RPC');
@@ -61,7 +61,7 @@ class StrategyResolver {
       return;
     }
 
-    if (this.isRsDevnet) {
+    if (this.isDevnet) {
       process.env.TEST_RPC_URL = GS_DEFAULT_TEST_PROVIDER_URL;
     } else {
       process.env.TEST_PROVIDER_BASE_URL = GS_DEFAULT_TEST_PROVIDER_URL;
@@ -106,7 +106,7 @@ class StrategyResolver {
   private useProvidedSetup(): void {
     setIfNullish('IS_RPC_DEVNET', false);
     setIfNullish('IS_RPC', !!process.env.TEST_RPC_URL);
-    setIfNullish('IS_CAIRO1_TESTNET', this.isCairo1Testnet);
+    setIfNullish('IS_TESTNET', this.isTestnet);
 
     this.logConfigInfo();
 
@@ -128,7 +128,7 @@ class StrategyResolver {
 
     await this.detectDevnet();
     this.resolveRpc();
-    await accountResolver.execute(this.isRsDevnet);
+    await accountResolver.execute(this.isDevnet);
 
     this.verifyAccountData(true);
     if (!this.hasAllAccountEnvs) console.error('Test Setup Environment is NOT Ready');

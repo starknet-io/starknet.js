@@ -23,7 +23,7 @@ class AccountResolver {
     process.env.INITIAL_BALANCE = initial_balance;
   }
 
-  private async isAccountSet(isRsDevnet: boolean): Promise<boolean> {
+  private async isAccountSet(isDevnet: boolean): Promise<boolean> {
     if (this.hasAllAccountEnvs) {
       return true;
     }
@@ -32,7 +32,7 @@ class AccountResolver {
         'If you are providing one of you need to provide both: TEST_ACCOUNT_ADDRESS & TEST_ACCOUNT_PRIVATE_KEY'
       );
     }
-    if (isRsDevnet) {
+    if (isDevnet) {
       // get account from devnet
       try {
         await this.fetchAccount(GS_DEFAULT_TEST_PROVIDER_URL);
@@ -55,8 +55,8 @@ class AccountResolver {
     );
   }
 
-  async execute(isRsDevnet: boolean): Promise<void> {
-    const isAccountSet = await this.isAccountSet(isRsDevnet);
+  async execute(isDevnet: boolean): Promise<void> {
+    const isAccountSet = await this.isAccountSet(isDevnet);
     if (isAccountSet) console.log('Detected Account');
   }
 }
