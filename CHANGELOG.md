@@ -1,3 +1,9 @@
+# [6.7.0](https://github.com/starknet-io/starknet.js/compare/v6.6.6...v6.7.0) (2024-04-03)
+
+### Features
+
+- readme & trigger release ([5341c42](https://github.com/starknet-io/starknet.js/commit/5341c42da8bf5d2f82e4446a60b5e4fdc9c4e2fe))
+
 ## [6.6.6](https://github.com/starknet-io/starknet.js/compare/v6.6.5...v6.6.6) (2024-03-25)
 
 ### Bug Fixes
