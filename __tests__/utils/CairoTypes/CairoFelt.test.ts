@@ -142,7 +142,7 @@ describe('CairoFelt function', () => {
     const expectedAddressFelt = BigInt(contractAddress).toString();
     expect(CairoFelt(contractAddress)).toBe(expectedAddressFelt);
 
-    const tokenAmount = BigInt('5000000000000000000'); // 5 tokens in wei
+    const tokenAmount = BigInt('5000000000000000000'); // 5 tokens
     expect(CairoFelt(tokenAmount)).toBe('5000000000000000000');
 
     const isActive = true; // Boolean flag
