@@ -3,9 +3,9 @@ import {
   type AddStarknetChainParameters,
   type NetworkChangeEventHandler,
   type WatchAssetParameters,
-} from 'get-starknet-core';
+} from 'starknet-types';
+
 import { Account, AccountInterface } from '../account';
-import { StarknetChainId } from '../constants';
 import { ProviderInterface } from '../provider';
 import {
   AllowArray,
@@ -37,6 +37,7 @@ import {
   watchAsset,
 } from './connect';
 import { StarknetWalletProvider } from './types';
+import { StarknetChainId } from '../constants';
 
 // Represent 'Selected Active' Account inside Connected Wallet
 export class WalletAccount extends Account implements AccountInterface {
