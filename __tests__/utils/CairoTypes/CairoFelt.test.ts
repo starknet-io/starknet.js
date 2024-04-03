@@ -166,7 +166,7 @@ describe('CairoFelt function', () => {
     expect(() => CairoFelt(invalidTxHash)).not.toThrow(); // CHANGED
 
     const malformedAddress = '0x12345'; // Malformed address
-    // CairoFelt does not currently validate Ethereum addresses, so no error would be thrown for a malformed address.
+    // CairoFelt does not currently validate addresses, so no error would be thrown for a malformed address.
     expect(() => CairoFelt(malformedAddress)).not.toThrow(); // CHANGED
 
     const overflowNumber = BigInt(
