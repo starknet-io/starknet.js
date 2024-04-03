@@ -83,7 +83,7 @@ class StrategyResolver {
     console.table({
       IS_RPC_DEVNET: process.env.IS_RPC_DEVNET,
       IS_RPC: process.env.IS_RPC,
-      IS_CAIRO1_TESTNET: process.env.IS_CAIRO1_TESTNET,
+      IS_TESTNET: process.env.IS_TESTNET,
     });
 
     console.log('Global Test Environment is Ready');
