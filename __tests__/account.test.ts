@@ -367,6 +367,18 @@ describe('deploy and test Wallet', () => {
     expect(balance.low).toStrictEqual(toBigInt(990));
   });
 
+  test('execute with and without deprecated abis parameter', async () => {
+    const transaction = {
+      contractAddress: erc20Address,
+      entrypoint: 'transfer',
+      calldata: [erc20.address, '10', '0'],
+    };
+    const details = { maxFee: 0n };
+
+    await expect(account.execute(transaction, details)).rejects.toThrow(/zero/);
+    await expect(account.execute(transaction, undefined, details)).rejects.toThrow(/zero/);
+  });
+
   test('execute with custom nonce', async () => {
     const result = await account.getNonce();
     const nonce = toBigInt(result);

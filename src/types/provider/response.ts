@@ -121,6 +121,8 @@ export interface EstimateFeeResponse {
   unit: PRICE_UNIT;
   suggestedMaxFee: bigint;
   resourceBounds: ResourceBounds;
+  data_gas_consumed: bigint;
+  data_gas_price: bigint;
 }
 
 export type EstimateFeeResponseBulk = Array<EstimateFeeResponse>;

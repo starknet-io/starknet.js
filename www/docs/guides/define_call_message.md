@@ -198,7 +198,7 @@ To construct your tuple:
 const myTpl = { '0': '0x0a', '1': 200 };
 ```
 
-### named tuple
+### Named tuple
 
 > [!IMPORTANT] Only for Cairo 0.
 
@@ -286,7 +286,7 @@ await myContract.my_function(myArray);
 
 > It's also applicable for Cairo `Span` type.
 
-### complex types
+### Complex types
 
 You can mix and nest literals, arrays, structs, and tuples.
 
@@ -317,7 +317,7 @@ await myContract.my_function(param1, param2, param3, param4);
 
 There are 12 methods using contract parameters. Some types are authorized for each method:
 
-### list of parameters
+### List of parameters
 
 Only meta-class methods are using a list of parameters (as illustrated in the previous chapter).  
 A Meta-Class is a Class that has any of its properties determined at run-time. The Contract object uses a Contract's ABI to determine what methods are available.
@@ -490,7 +490,7 @@ const getResponse = await myAccount.get_bal(specialParameters, { parseRequest: f
 
 To use with `parseRequest: false` (see hereunder).
 
-### summary table for arguments
+### Summary table for arguments
 
 These types of arguments can't be used at your convenience everywhere. Here is a table showing which types can be used in which function:
 
