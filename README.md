@@ -42,8 +42,11 @@ Install starknet with `npm`
 # latest official release (main branch)
 $ npm install starknet
 
-# or for latest pre-release version (develop branch):
+# or for latest pre-release version (develop branch)
 $ npm install starknet@next
+
+# or for latest beta release version (beta branch)
+$ npm install starknet@beta
 ```
 
 Import `starknet` and use the [API](https://www.starknetjs.com/docs/API/).
