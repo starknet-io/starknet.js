@@ -15,7 +15,7 @@ class StrategyResolver {
 
   get isTestnet() {
     const url = process.env.TEST_PROVIDER_BASE_URL || process.env.TEST_RPC_URL;
-    return url?.includes(BaseUrl.SN_GOERLI);
+    return url?.includes(BaseUrl.SN_SEPOLIA);
   }
 
   get hasAllAccountEnvs() {
