@@ -15,8 +15,8 @@ Some important topics that have to be understood:
 - You can connect your DAPP to several networks:
 
   - [Starknet mainnet](https://starkscan.co) (Layer 2 of [Ethereum network](https://etherscan.io/) ).
-  - [Starknet testnet](https://testnet.starkscan.co/) (Layer 2 of [Goerli network](https://goerli.etherscan.io/) (testnet of Ethereum)).
-  - [Starknet-devnet](https://shard-labs.github.io/starknet-devnet/docs/intro) (your local Starknet network, for developers).
+  - [Starknet testnet](https://sepolia.starkscan.co/) (Layer 2 of [Sepolia network](https://sepolia.etherscan.io/) (testnet of Ethereum)).
+  - [Starknet-devnet](https://github.com/0xSpaceShard/starknet-devnet-rs) (your local Starknet network, for developers).
 
   and also to some more specific solutions:
 
