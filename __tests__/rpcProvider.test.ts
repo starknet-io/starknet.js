@@ -73,7 +73,7 @@ describeIfRpc('RPCProvider', () => {
     expect(typeof blockNumber).toBe('number');
   });
 
-  test('getGasprice', async () => {
+  test('getL1GasPrice', async () => {
     const gasPrice = await rpcProvider.getL1GasPrice('latest');
     expect(typeof gasPrice).toBe('string');
   });
