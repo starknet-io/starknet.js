@@ -45,7 +45,7 @@ class StrategyResolver {
       );
     }
 
-    setIfNullish('IS_RPC_DEVNET', this.isRpcDevnet);
+    setIfNullish('IS_DEVNET', this.isRpcDevnet);
   }
 
   resolveRpc(): void {
@@ -81,7 +81,7 @@ class StrategyResolver {
     });
 
     console.table({
-      IS_RPC_DEVNET: process.env.IS_RPC_DEVNET,
+      IS_DEVNET: process.env.IS_DEVNET,
       IS_RPC: process.env.IS_RPC,
       IS_TESTNET: process.env.IS_TESTNET,
     });
@@ -104,7 +104,7 @@ class StrategyResolver {
   }
 
   private useProvidedSetup(): void {
-    setIfNullish('IS_RPC_DEVNET', false);
+    setIfNullish('IS_DEVNET', false);
     setIfNullish('IS_RPC', !!process.env.TEST_RPC_URL);
     setIfNullish('IS_TESTNET', this.isTestnet);
 

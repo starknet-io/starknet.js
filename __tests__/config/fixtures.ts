@@ -80,7 +80,7 @@ export function getTestProvider(isProvider: boolean = true): ProviderInterface |
     ? new Provider({ nodeUrl: process.env.TEST_RPC_URL })
     : new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL });
 
-  if (process.env.IS_RPC_DEVNET === 'true') {
+  if (process.env.IS_DEVNET === 'true') {
     // accelerate the tests when running locally
     const originalWaitForTransaction = provider.waitForTransaction.bind(provider);
     provider.waitForTransaction = (txHash: string, options: waitForTransactionOptions = {}) => {
@@ -104,14 +104,14 @@ export const getTestAccount = (provider: ProviderInterface) => {
 };
 
 export const createBlockForDevnet = async (): Promise<void> => {
-  if (!(process.env.IS_RPC_DEVNET === 'true')) return;
+  if (!(process.env.IS_DEVNET === 'true')) return;
   await fetch(new URL('/create_block', process.env.TEST_RPC_URL), { method: 'POST' });
 };
 
 const describeIf = (condition: boolean) => (condition ? describe : describe.skip);
 export const describeIfRpc = describeIf(process.env.IS_RPC === 'true');
-export const describeIfNotRpcDevnet = describeIf(process.env.IS_RPC_DEVNET === 'false');
-export const describeIfRpcDevnet = describeIf(process.env.IS_RPC_DEVNET === 'true');
+export const describeIfNotDevnet = describeIf(process.env.IS_DEVNET === 'false');
+export const describeIfDevnet = describeIf(process.env.IS_DEVNET === 'true');
 export const describeIfTestnet = describeIf(process.env.IS_TESTNET === 'true');
 
 export const erc20ClassHash = '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a';

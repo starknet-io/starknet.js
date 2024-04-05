@@ -25,7 +25,7 @@ import {
   compiledHelloSierraCasm,
   compiledOpenZeppelinAccount,
   compiledTestDapp,
-  describeIfRpcDevnet,
+  describeIfDevnet,
   erc20ClassHash,
   getTestAccount,
   getTestProvider,
@@ -112,7 +112,7 @@ describe('deploy and test Wallet', () => {
     // this is tested indirectly true declareAndDeploy while declaring
   });
 
-  describeIfRpcDevnet('Test on RPC Devnet', () => {
+  describeIfDevnet('Test on Devnet', () => {
     test('deployAccount with rawArgs - test on devnet', async () => {
       const priKey = stark.randomAddress();
       const pubKey = ec.starkCurve.getStarkKey(priKey);
@@ -243,7 +243,7 @@ describe('deploy and test Wallet', () => {
       expect(res).toMatchSchemaRef('SimulateTransactionResponse');
     });
 
-    describeIfRpcDevnet('declare tests only on devnet', () => {
+    describeIfDevnet('declare tests only on devnet', () => {
       test('simulate DECLARE - Cairo 0 Contract', async () => {
         const res = await account.simulateTransaction([
           {
@@ -675,7 +675,7 @@ describe('deploy and test Wallet', () => {
       });
     });
 
-    describeIfRpcDevnet('declare tests only on devnet', () => {
+    describeIfDevnet('declare tests only on devnet', () => {
       test('declare, deploy & multi invoke functions', async () => {
         const res = await account.estimateFeeBulk([
           /*         {
@@ -750,7 +750,7 @@ describe('deploy and test Wallet', () => {
 });
 
 describe('unit', () => {
-  describeIfRpcDevnet('RPC devnet', () => {
+  describeIfDevnet('Devnet', () => {
     initializeMatcher(expect);
     const provider = getTestProvider();
     const account = getTestAccount(provider);

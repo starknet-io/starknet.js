@@ -20,7 +20,7 @@ import {
   compiledErc20Echo,
   compiledMulticall,
   compiledTypeTransformation,
-  describeIfRpcDevnet,
+  describeIfDevnet,
   getTestAccount,
   getTestProvider,
 } from './config/fixtures';
@@ -322,7 +322,7 @@ describe('Complex interaction', () => {
     expect(erc20Echo20Contract).toBeInstanceOf(Contract);
   });
 
-  describeIfRpcDevnet('speedup live tests', () => {
+  describeIfDevnet('speedup live tests', () => {
     test('declareDeploy with callData - all types using felt,uint256,tuple helpers', async () => {
       const { deploy } = await account.declareAndDeploy({
         contract: compiledErc20Echo,

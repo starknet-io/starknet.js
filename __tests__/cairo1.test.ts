@@ -25,7 +25,7 @@ import {
   compiledComplexSierra,
   compiledHelloSierra,
   compiledHelloSierraCasm,
-  describeIfRpcDevnet,
+  describeIfDevnet,
   describeIfTestnet,
   getTestAccount,
   getTestProvider,
@@ -36,7 +36,7 @@ const { uint256, tuple, isCairo1Abi } = cairo;
 const { toHex } = num;
 const { starknetKeccak } = selector;
 
-describeIfRpcDevnet('Cairo 1 Devnet', () => {
+describeIfDevnet('Cairo 1 Devnet', () => {
   describe('API &  Contract interactions', () => {
     const provider = getTestProvider();
     const account = getTestAccount(provider);
