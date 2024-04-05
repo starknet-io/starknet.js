@@ -20,6 +20,7 @@ import {
 import { JRPC, RPCSPEC07 as RPC } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
+import { validateAndParseEthAddress } from '../utils/eth';
 import fetch from '../utils/fetchPonyfill';
 import { getSelector, getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
@@ -47,12 +48,12 @@ export class RpcChannel {
 
   private chainId?: StarknetChainId;
 
-  private speckVersion?: string;
+  private specVersion?: string;
 
   readonly waitMode: Boolean; // behave like web2 rpc and return when tx is processed
 
   constructor(optionsOrProvider?: RpcProviderOptions) {
-    const { nodeUrl, retries, headers, blockIdentifier, chainId, waitMode } =
+    const { nodeUrl, retries, headers, blockIdentifier, chainId, specVersion, waitMode } =
       optionsOrProvider || {};
     if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
       this.nodeUrl = getDefaultNodeUrl(nodeUrl as NetworkName, optionsOrProvider?.default);
@@ -65,6 +66,7 @@ export class RpcChannel {
     this.headers = { ...defaultOptions.headers, ...headers };
     this.blockIdentifier = blockIdentifier || defaultOptions.blockIdentifier;
     this.chainId = chainId;
+    this.specVersion = specVersion;
     this.waitMode = waitMode || false;
     this.requestId = 0;
   }
@@ -124,8 +126,8 @@ export class RpcChannel {
   }
 
   public async getSpecVersion() {
-    this.speckVersion ??= (await this.fetchEndpoint('starknet_specVersion')) as StarknetChainId;
-    return this.speckVersion;
+    this.specVersion ??= (await this.fetchEndpoint('starknet_specVersion')) as StarknetChainId;
+    return this.specVersion;
   }
 
   public getNonceForAddress(
@@ -569,7 +571,7 @@ export class RpcChannel {
   ) {
     const { from_address, to_address, entry_point_selector, payload } = message;
     const formattedMessage = {
-      from_address: toHex(from_address),
+      from_address: validateAndParseEthAddress(from_address),
       to_address: toHex(to_address),
       entry_point_selector: getSelector(entry_point_selector),
       payload: getHexStringArray(payload),

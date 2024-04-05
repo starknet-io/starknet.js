@@ -6,21 +6,23 @@ import {
   BlockWithTxHashes,
   ContractClassPayload,
   ContractClassResponse,
-  TransactionReceipt,
   EstimateFeeResponse,
   EstimateFeeResponseBulk,
-  GetBlockResponse,
   FeeEstimate,
+  GetBlockResponse,
+  GetTxReceiptResponseWithoutHelper,
+  RpcProviderOptions,
   SimulateTransactionResponse,
   SimulatedTransaction,
-  RpcProviderOptions,
-  GetTxReceiptResponseWithoutHelper,
+  TransactionReceipt,
 } from '../../types/provider';
 import { toBigInt } from '../num';
+import { isString } from '../shortString';
 import { estimateFeeToBounds, estimatedFeeToMaxFee } from '../stark';
 import { ResponseParser } from '.';
 import { BlockWithTxs } from '../../types/api/rpcspec_0_6/nonspec';
 import { isString } from '../shortString';
+
 
 export class RPCResponseParser
   implements
@@ -81,6 +83,8 @@ export class RPCResponseParser
       unit: val.unit,
       suggestedMaxFee: this.estimatedFeeToMaxFee(val.overall_fee),
       resourceBounds: this.estimateFeeToBounds(val),
+      data_gas_consumed: val.data_gas_consumed ? toBigInt(val.data_gas_consumed) : 0n,
+      data_gas_price: val.data_gas_price ? toBigInt(val.data_gas_price) : 0n,
     };
   }
 
@@ -92,6 +96,8 @@ export class RPCResponseParser
       unit: val.unit,
       suggestedMaxFee: this.estimatedFeeToMaxFee(val.overall_fee),
       resourceBounds: this.estimateFeeToBounds(val),
+      data_gas_consumed: val.data_gas_consumed ? toBigInt(val.data_gas_consumed) : 0n,
+      data_gas_price: val.data_gas_price ? toBigInt(val.data_gas_price) : 0n,
     }));
   }
 

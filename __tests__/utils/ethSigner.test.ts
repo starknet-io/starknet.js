@@ -13,6 +13,7 @@ import {
   num,
   stark,
 } from '../../src';
+import { validateAndParseEthAddress } from '../../src/utils/eth';
 import { ETransactionVersion } from '../../src/types/api';
 import {
   compiledDummy1Eth,
@@ -318,6 +319,20 @@ describe('Ethereum signer', () => {
       }
       expect(decClassHash2).toBe(
         '0x5d574bd1467f1ca5178c118be7cdb3e74718c37bae90ab686a9b8536ca24436'
+      );
+    });
+  });
+  describe('Ethereum address', () => {
+    test('Eth address format', async () => {
+      const ethAddr = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165'; // not a valid 20 bytes ETh address
+      expect(validateAndParseEthAddress(ethAddr)).toBe(
+        '0x008359e4b0152ed5a731162d3c7b0d8d56edb165'
+      );
+      expect(validateAndParseEthAddress(BigInt(ethAddr))).toBe(
+        '0x008359e4b0152ed5a731162d3c7b0d8d56edb165'
+      );
+      expect(validateAndParseEthAddress(BigInt(ethAddr).toString(10))).toBe(
+        '0x008359e4b0152ed5a731162d3c7b0d8d56edb165'
       );
     });
   });
