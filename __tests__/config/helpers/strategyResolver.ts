@@ -14,8 +14,7 @@ class StrategyResolver {
   }
 
   get isTestnet() {
-    const url = process.env.TEST_PROVIDER_BASE_URL || process.env.TEST_RPC_URL;
-    return url?.includes(BaseUrl.SN_SEPOLIA);
+    return process.env.TEST_RPC_URL?.includes(BaseUrl.SN_SEPOLIA);
   }
 
   get hasAllAccountEnvs() {
@@ -52,20 +51,13 @@ class StrategyResolver {
     const hasRpcUrl = !!process.env.TEST_RPC_URL;
 
     this.isRpcNode = hasRpcUrl || this.isDevnet;
+
+    if (!hasRpcUrl && this.isDevnet) {
+      process.env.TEST_RPC_URL = GS_DEFAULT_TEST_PROVIDER_URL;
+    }
+
     setIfNullish('IS_RPC', this.isRpcNode);
     setIfNullish('IS_TESTNET', this.isTestnet);
-
-    if (hasRpcUrl) {
-      console.log('Detected RPC');
-
-      return;
-    }
-
-    if (this.isDevnet) {
-      process.env.TEST_RPC_URL = GS_DEFAULT_TEST_PROVIDER_URL;
-    } else {
-      process.env.TEST_PROVIDER_BASE_URL = GS_DEFAULT_TEST_PROVIDER_URL;
-    }
 
     console.log('Detected RPC');
   }
@@ -75,7 +67,6 @@ class StrategyResolver {
       TEST_ACCOUNT_ADDRESS: process.env.TEST_ACCOUNT_ADDRESS,
       TEST_ACCOUNT_PRIVATE_KEY: '****',
       INITIAL_BALANCE: process.env.INITIAL_BALANCE,
-      TEST_PROVIDER_BASE_URL: process.env.TEST_PROVIDER_BASE_URL,
       TEST_RPC_URL: process.env.TEST_RPC_URL,
       TX_VERSION: process.env.TX_VERSION === 'v3' ? 'v3' : 'v2',
     });

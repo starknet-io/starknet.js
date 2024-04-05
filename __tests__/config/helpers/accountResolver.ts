@@ -3,7 +3,7 @@ import { GS_DEFAULT_TEST_PROVIDER_URL } from '../constants';
 
 class AccountResolver {
   get providedUrl() {
-    return process.env.TEST_PROVIDER_BASE_URL || process.env.TEST_RPC_URL;
+    return process.env.TEST_RPC_URL;
   }
 
   get hasAllAccountEnvs() {
