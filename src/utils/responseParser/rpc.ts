@@ -20,7 +20,6 @@ import { toBigInt } from '../num';
 import { isString } from '../shortString';
 import { estimateFeeToBounds, estimatedFeeToMaxFee } from '../stark';
 import { ResponseParser } from '.';
-import { BlockWithTxs } from '../../types/api/rpcspec_0_6/nonspec';
 import { isString } from '../shortString';
 
 
@@ -125,7 +124,7 @@ export class RPCResponseParser
     };
   }
 
-  public parseL1GasPriceResponse(res: BlockWithTxs): string {
+  public parseL1GasPriceResponse(res: BlockWithTxHashes): string {
     return res.l1_gas_price.price_in_wei;
   }
 }

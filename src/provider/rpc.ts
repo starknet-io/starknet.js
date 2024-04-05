@@ -102,7 +102,7 @@ export class RpcProvider implements ProviderInterface {
 
   public async getL1GasPrice(blockIdentifier?: BlockIdentifier) {
     return this.channel
-      .getBlockWithTxs(blockIdentifier)
+      .getBlockWithTxHashes(blockIdentifier)
       .then(this.responseParser.parseL1GasPriceResponse);
   }
 
