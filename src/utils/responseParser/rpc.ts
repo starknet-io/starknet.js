@@ -119,7 +119,7 @@ export class RPCResponseParser
     };
   }
 
-  public parseGasPriceResponse(res: BlockWithTxs): string {
+  public parseL1GasPriceResponse(res: BlockWithTxs): string {
     return res.l1_gas_price.price_in_wei;
   }
 }

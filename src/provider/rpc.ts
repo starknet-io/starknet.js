@@ -100,10 +100,10 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getBlockWithTxs(blockIdentifier);
   }
 
-  public async getGasPrice(blockIdentifier?: BlockIdentifier) {
+  public async getL1GasPrice(blockIdentifier?: BlockIdentifier) {
     return this.channel
       .getBlockWithTxs(blockIdentifier)
-      .then(this.responseParser.parseGasPriceResponse);
+      .then(this.responseParser.parseL1GasPriceResponse);
   }
 
   public async getBlockWithReceipts(blockIdentifier?: BlockIdentifier) {
