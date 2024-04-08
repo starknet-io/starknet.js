@@ -79,6 +79,14 @@ export abstract class ProviderInterface {
   ): Promise<ContractClassResponse>;
 
   /**
+   * Gets the price of l1 gas in the block
+   *
+   * @param blockIdentifier block identifier
+   * @returns gas price of the block
+   */
+  public abstract getL1GasPrice(blockIdentifier: BlockIdentifier): Promise<string>;
+
+  /**
    * Returns the contract class hash in the given block for the contract deployed at the given address
    *
    * @param contractAddress - contract address

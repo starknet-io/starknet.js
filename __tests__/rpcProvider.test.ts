@@ -73,6 +73,11 @@ describeIfRpc('RPCProvider', () => {
     expect(typeof blockNumber).toBe('number');
   });
 
+  test('getL1GasPrice', async () => {
+    const gasPrice = await rpcProvider.getL1GasPrice('latest');
+    expect(typeof gasPrice).toBe('string');
+  });
+
   test('getStateUpdate', async () => {
     const stateUpdate = await rpcProvider.getBlockStateUpdate('latest');
     expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
