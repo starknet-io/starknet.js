@@ -58,12 +58,14 @@ How to proceed is out of the scope of this guide, but you can for example:
 
 - Transfer ETH from another wallet.
 - Bridge ETH to this Starknet address.
-- Use a faucet. (https://faucet.goerli.starknet.io/)
+- Use a faucet. (https://starknet-faucet.vercel.app/)
 - Mint ETH on starknet-devnet-rs, like so:
 
 ```bash
-curl -X POST http://127.0.0.1:5050/mint -d '{"address":"0x04a093c37ab61065d001550089b1089922212c60b34e662bb14f2f91faee2979","amount":50000000000000000000,"lite":true}' -H "Content-Type:application/json"
-// {"new_balance":50000000000000000000,"tx_hash":null,"unit":"wei"}
+// ETH
+curl -X POST http://127.0.0.1:5050/mint -d '{"address":"0x04a093c37ab61065d001550089b1089922212c60b34e662bb14f2f91faee2979","amount":50000000000000000000}' -H "Content-Type:application/json"
+// STRK
+curl -X POST http://127.0.0.1:5050/mint -d '{"address":"0x04a093c37ab61065d001550089b1089922212c60b34e662bb14f2f91faee2979","amount":50000000000000000000,"unit":"FRI"}' -H "Content-Type:application/json"
 ```
 
 ### Deployment of the new account
@@ -150,7 +152,7 @@ More complicated, a Braavos account needs a proxy and a specific signature. Star
 We will deploy hereunder a Braavos account in devnet. So launch starknet-devnet with these parameters:
 
 ```bash
-starknet-devnet --seed 0 --fork-network alpha-goerli
+starknet-devnet --seed 0 --fork-network 'https://free-rpc.nethermind.io/sepolia-juno/v0_7'
 ```
 
 Initialization:
@@ -204,7 +206,6 @@ const { data: answer } = await axios.post(
   {
     address: BraavosProxyAddress,
     amount: 10_000_000_000_000_000_000,
-    lite: true,
   },
   { headers: { 'Content-Type': 'application/json' } }
 );

@@ -20,6 +20,8 @@ import { toBigInt } from '../num';
 import { isString } from '../shortString';
 import { estimateFeeToBounds, estimatedFeeToMaxFee } from '../stark';
 import { ResponseParser } from '.';
+import { isString } from '../shortString';
+
 
 export class RPCResponseParser
   implements
@@ -120,5 +122,9 @@ export class RPCResponseParser
       ...(res as ContractClassResponse),
       abi: isString(res.abi) ? JSON.parse(res.abi) : res.abi,
     };
+  }
+
+  public parseL1GasPriceResponse(res: BlockWithTxHashes): string {
+    return res.l1_gas_price.price_in_wei;
   }
 }
