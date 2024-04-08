@@ -24,9 +24,9 @@ import {
   compiledL1L2,
   compiledOpenZeppelinAccount,
   createBlockForDevnet,
-  describeIfDevnet,
-  describeIfNotDevnet,
   describeIfRpc,
+  describeIfNotDevnet,
+  describeIfDevnet,
   getTestAccount,
   getTestProvider,
 } from './config/fixtures';
