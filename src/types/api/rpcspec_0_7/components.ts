@@ -14,7 +14,7 @@ export type FELT = string;
 export type ETH_ADDRESS = string;
 /**
  * A storage key. Represented as up to 62 hex digits, 3 bits, and 5 leading zeroes.
- * @pattern ^0x0[0-7]{1}[a-fA-F0-9]{0,62}$
+ * @pattern ^0x(0|[0-7]{1}[a-fA-F0-9]{0,62}$)
  */
 export type STORAGE_KEY = string;
 export type ADDRESS = FELT;
@@ -407,12 +407,19 @@ export type L1_HANDLER_TXN = {
 export type COMMON_RECEIPT_PROPERTIES = {
   transaction_hash: TXN_HASH;
   actual_fee: FEE_PAYMENT;
-  execution_status: TXN_EXECUTION_STATUS;
   finality_status: TXN_FINALITY_STATUS;
   messages_sent: MSG_TO_L1[];
-  revert_reason?: string;
   events: EVENT[];
   execution_resources: EXECUTION_RESOURCES;
+} & (SUCCESSFUL_COMMON_RECEIPT_PROPERTIES | REVERTED_COMMON_RECEIPT_PROPERTIES);
+
+type SUCCESSFUL_COMMON_RECEIPT_PROPERTIES = {
+  execution_status: 'SUCCEEDED';
+};
+
+type REVERTED_COMMON_RECEIPT_PROPERTIES = {
+  execution_status: 'REVERTED';
+  revert_reason: string;
 };
 
 export type INVOKE_TXN_RECEIPT = {
@@ -639,6 +646,7 @@ export type L1_HANDLER_TXN_TRACE = {
   type: 'L1_HANDLER';
   function_invocation: FUNCTION_INVOCATION;
   state_diff?: STATE_DIFF;
+  execution_resources: EXECUTION_RESOURCES;
 };
 
 // Represents a nested function call.
