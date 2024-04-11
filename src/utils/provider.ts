@@ -102,6 +102,15 @@ export function txIdentifier(txHash?: BigNumberish, txId?: BigNumberish): string
 
 export const validBlockTags = Object.values(BlockTag);
 
+/**
+ * hex string and BigInt are detected as block hashes. identifier return { block_hash: hash }
+ *
+ * decimal string and number are detected as block numbers. identifier return { block_number: number }
+ *
+ * text string are detected as block tag. identifier return tag
+ *
+ * null is detected as 'pending' block tag. identifier return 'pending'
+ */
 export class Block {
   hash: BlockIdentifier = null;
 
