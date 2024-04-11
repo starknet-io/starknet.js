@@ -18,6 +18,7 @@ export type ByteArray = {
 
 /**
  * Compiled calldata ready to be sent
+ *
  * decimal-string array
  */
 export type Calldata = string[] & { readonly __compiled__?: true };
@@ -46,6 +47,7 @@ export interface Uint512 {
 
 /**
  * BigNumberish array
+ *
  * use CallData.compile() to convert to Calldata
  */
 export type RawCalldata = BigNumberish[];

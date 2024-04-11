@@ -24,9 +24,9 @@ import {
   compiledL1L2,
   compiledOpenZeppelinAccount,
   createBlockForDevnet,
-  describeIfDevnet,
-  describeIfNotDevnet,
   describeIfRpc,
+  describeIfNotDevnet,
+  describeIfDevnet,
   getTestAccount,
   getTestProvider,
 } from './config/fixtures';
@@ -71,6 +71,11 @@ describeIfRpc('RPCProvider', () => {
   test('getBlockNumber', async () => {
     const blockNumber = await rpcProvider.getBlockNumber();
     expect(typeof blockNumber).toBe('number');
+  });
+
+  test('getL1GasPrice', async () => {
+    const gasPrice = await rpcProvider.getL1GasPrice('latest');
+    expect(typeof gasPrice).toBe('string');
   });
 
   test('getStateUpdate', async () => {

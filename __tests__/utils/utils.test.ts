@@ -1,6 +1,7 @@
 import * as starkCurve from '@scure/starknet';
 
 import { constants, ec, hash, num, stark } from '../../src';
+import { isBigInt, isHex } from '../../src/utils/num';
 
 const { IS_BROWSER } = constants;
 
@@ -112,5 +113,40 @@ describe('calculateContractAddressFromHash()', () => {
     expect(starkCurveSpy).toHaveBeenCalled();
     expect(BigInt(res)).toBeLessThan(constants.ADDR_BOUND);
     starkCurveSpy.mockRestore();
+  });
+});
+
+describe('Num utility functions', () => {
+  describe('isBigInt', () => {
+    test('should return true for big integers', () => {
+      expect(isBigInt(BigInt(10))).toBe(true);
+      expect(isBigInt(BigInt('9007199254740991'))).toBe(true);
+    });
+
+    test('should return false for non-big integers', () => {
+      expect(isBigInt(10)).toBe(false);
+      expect(isBigInt('10')).toBe(false);
+      expect(isBigInt(undefined)).toBe(false);
+      expect(isBigInt(null)).toBe(false);
+      expect(isBigInt({})).toBe(false);
+      expect(isBigInt([])).toBe(false);
+      expect(isBigInt(true)).toBe(false);
+    });
+  });
+
+  describe('isHex', () => {
+    test('should return true for valid hex strings', () => {
+      expect(isHex('0xab')).toBe(true);
+      expect(isHex('0xAB')).toBe(true);
+      expect(isHex('0x0')).toBe(true);
+      expect(isHex('0x12345')).toBe(true);
+    });
+
+    test('should return false for non-hex strings', () => {
+      expect(isHex('0xG')).toBe(false);
+      expect(isHex('ab')).toBe(false);
+      expect(isHex('123')).toBe(false);
+      expect(isHex('')).toBe(false);
+    });
   });
 });
