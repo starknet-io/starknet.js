@@ -37,7 +37,7 @@ import validateFields from './validate';
 
 export * as cairo from './cairo';
 export * as byteArray from './byteArray';
-export * as calldata from './requestParser';
+export { parseCalldataField } from './requestParser';
 
 export class CallData {
   abi: Abi;
