@@ -208,9 +208,13 @@ export enum BlockTag {
 export type BlockNumber = BlockTag | null | number;
 
 /**
- * hex string and BN are detected as block hashes
+ * hex string and BigInt are detected as block hashes
+ *
  * decimal string and number are detected as block numbers
- * null appends nothing to the request url
+ *
+ * text string are detected as block tag
+ *
+ * null return 'pending' block tag
  */
 export type BlockIdentifier = BlockNumber | BigNumberish;
 

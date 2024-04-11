@@ -1,7 +1,6 @@
 import * as starkCurve from '@scure/starknet';
 
 import { constants, ec, hash, num, stark } from '../../src';
-import { Block } from '../../src/utils/provider';
 
 const { IS_BROWSER } = constants;
 
@@ -113,21 +112,5 @@ describe('calculateContractAddressFromHash()', () => {
     expect(starkCurveSpy).toHaveBeenCalled();
     expect(BigInt(res)).toBeLessThan(constants.ADDR_BOUND);
     starkCurveSpy.mockRestore();
-  });
-});
-
-describe('new Block()', () => {
-  test('Block identifier and queryIdentifier', () => {
-    const blockA = new Block(0);
-    expect(blockA.identifier).toMatchObject({ block_number: 0 });
-    expect(blockA.queryIdentifier).toBe('blockNumber=0');
-
-    const blockB = new Block('latest');
-    expect(blockB.identifier).toBe('latest');
-    expect(blockB.queryIdentifier).toBe('blockNumber=latest');
-
-    const blockC = new Block('0x01');
-    expect(blockC.identifier).toMatchObject({ block_hash: '0x01' });
-    expect(blockC.queryIdentifier).toBe('blockHash=0x01');
   });
 });

@@ -20,9 +20,9 @@ import { isSierra } from './contract';
 import { formatSpaces } from './hash';
 import { parse, stringify } from './json';
 import { isBigInt, isHex, isNumber, toHex } from './num';
+import { isDecimalString, isString } from './shortString';
 import { compressProgram } from './stark';
 import type { GetTransactionReceiptResponse } from './transactionReceipt';
-import { isString } from './shortString';
 
 /**
  * Helper - Async Sleep for 'delay' time
@@ -111,10 +111,14 @@ export class Block {
 
   private setIdentifier(__identifier: BlockIdentifier) {
     if (isString(__identifier)) {
-      if (isHex(__identifier)) {
+      if (isDecimalString(__identifier)) {
+        this.number = parseInt(__identifier, 10);
+      } else if (isHex(__identifier)) {
         this.hash = __identifier;
       } else if (validBlockTags.includes(__identifier as BlockTag)) {
         this.tag = __identifier;
+      } else {
+        throw TypeError(`Block identifier unmanaged: ${__identifier}`);
       }
     } else if (isBigInt(__identifier)) {
       this.hash = toHex(__identifier);
@@ -122,6 +126,10 @@ export class Block {
       this.number = __identifier;
     } else {
       this.tag = BlockTag.pending;
+    }
+
+    if (isNumber(this.number) && this.number < 0) {
+      throw TypeError(`Block number (${this.number}) can't be negative`);
     }
   }
 
@@ -162,12 +170,6 @@ export class Block {
   valueOf = () => this.number;
 
   toString = () => this.hash;
-
-  /*   get sequencerIdentifier(): SequencerIdentifier {
-    return this.hash !== null
-      ? { blockHash: this.hash as string }
-      : { blockNumber: (this.number ?? this.tag) as BlockNumber };
-  } */
 }
 
 export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3TransactionDetails {
