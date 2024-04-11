@@ -20,9 +20,9 @@ import { isSierra } from './contract';
 import { formatSpaces } from './hash';
 import { parse, stringify } from './json';
 import { isBigInt, isHex, isNumber, toHex } from './num';
+import { isDecimalString, isString } from './shortString';
 import { compressProgram } from './stark';
 import type { GetTransactionReceiptResponse } from './transactionReceipt';
-import { isString } from './shortString';
 
 /**
  * Helper - Async Sleep for 'delay' time
@@ -103,6 +103,15 @@ export function txIdentifier(txHash?: BigNumberish, txId?: BigNumberish): string
 
 export const validBlockTags = Object.values(BlockTag);
 
+/**
+ * hex string and BigInt are detected as block hashes. identifier return { block_hash: hash }
+ *
+ * decimal string and number are detected as block numbers. identifier return { block_number: number }
+ *
+ * text string are detected as block tag. identifier return tag
+ *
+ * null is detected as 'pending' block tag. identifier return 'pending'
+ */
 export class Block {
   hash: BlockIdentifier = null;
 
@@ -112,10 +121,14 @@ export class Block {
 
   private setIdentifier(__identifier: BlockIdentifier) {
     if (isString(__identifier)) {
-      if (isHex(__identifier)) {
+      if (isDecimalString(__identifier)) {
+        this.number = parseInt(__identifier, 10);
+      } else if (isHex(__identifier)) {
         this.hash = __identifier;
       } else if (validBlockTags.includes(__identifier as BlockTag)) {
         this.tag = __identifier;
+      } else {
+        throw TypeError(`Block identifier unmanaged: ${__identifier}`);
       }
     } else if (isBigInt(__identifier)) {
       this.hash = toHex(__identifier);
@@ -123,6 +136,10 @@ export class Block {
       this.number = __identifier;
     } else {
       this.tag = BlockTag.pending;
+    }
+
+    if (isNumber(this.number) && this.number < 0) {
+      throw TypeError(`Block number (${this.number}) can't be negative`);
     }
   }
 
