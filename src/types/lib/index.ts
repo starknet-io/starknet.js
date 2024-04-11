@@ -211,9 +211,7 @@ export type BlockNumber = BlockTag | null | number;
 
 /**
  * hex string and BN are detected as block hashes
- *
  * decimal string and number are detected as block numbers
- *
  * null appends nothing to the request url
  */
 export type BlockIdentifier = BlockNumber | BigNumberish;
