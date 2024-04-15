@@ -89,7 +89,6 @@ export class Account extends Provider implements AccountInterface {
       this.cairoVersion = cairoVersion.toString() as CairoVersion;
     }
     this.transactionVersion = transactionVersion;
-    this.signatureVerifFunctionName = undefined;
   }
 
   // provided version or contract based preferred transactionVersion
@@ -117,6 +116,8 @@ export class Account extends Provider implements AccountInterface {
    * Retrieves the Cairo version from the network and sets `cairoVersion` if not already set in the constructor.
    * Retrieves also the name of the function that verify a message signature.
    * @param classHash if provided detects Cairo version from classHash, otherwise from the account address
+
+   * Retrieves also the name of the function that verifies a message signature.
    */
   public async getCairoVersion(classHash?: string) {
     if (!this.cairoVersion) {
@@ -555,7 +556,7 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean> {
-    // Accounts should be conform to SNIP-6 ( https://github.com/starknet-io/SNIPs/blob/f6998f779ee2157d5e1dea36042b08062093b3c5/SNIPS/snip-6.md?plain=1#L61 ), but they are not always conform, and SNIP do not standardize the response if the signature isn't valid.
+    // Accounts should conform to SNIP-6 (https://github.com/starknet-io/SNIPs/blob/f6998f779ee2157d5e1dea36042b08062093b3c5/SNIPS/snip-6.md?plain=1#L61), but they don't always conform. Also, the SNIP doesn't standardize the response if the signature isn't valid.
     if (typeof this.signatureVerifFunctionName === 'undefined') {
       await this.getCairoVersion();
     }

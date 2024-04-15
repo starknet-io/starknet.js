@@ -275,7 +275,7 @@ export type ContractVersion = {
   cairo: CairoVersion;
   /** version of the cairo compiler used to compile the contract */
   compiler: CompilerVersion;
-  /** If the contract is an account, the name of the function that verify a message signature. Otherwise returns '' */
+  /** If the contract is an account, the name of the function that verifies a message signature. Otherwise returns '' */
   messageVerifFunctionName: string | undefined;
 };
 
