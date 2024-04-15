@@ -270,7 +270,7 @@ function parseCalldataValue(
 /**
  * Parse one field of the calldata by using input field from the abi for that method
  *
- * @param argsIterator - Iterator<any> for value of the field
+ * @param argsIterator - Iterator for value of the field
  * @param input  - input(field) information from the abi that will be used to parse the data
  * @param structs - structs from abi
  * @param enums - enums from abi
