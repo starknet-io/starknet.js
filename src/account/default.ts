@@ -120,7 +120,7 @@ export class Account extends Provider implements AccountInterface {
    * Retrieves also the name of the function that verifies a message signature.
    */
   public async getCairoVersion(classHash?: string) {
-    if (!this.cairoVersion) {
+    if (!this.cairoVersion || !this.signatureVerifFunctionName) {
       const { cairo, messageVerifFunctionName } = classHash
         ? await super.getContractVersion(undefined, classHash)
         : await super.getContractVersion(this.address);
