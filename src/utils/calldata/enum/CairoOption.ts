@@ -1,7 +1,10 @@
-export enum CairoOptionVariant {
-  Some = 0,
-  None = 1,
-}
+export const CairoOptionVariant = {
+  Some: 0,
+  None: 1,
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type CairoOptionVariant = (typeof CairoOptionVariant)[keyof typeof CairoOptionVariant];
 
 /**
  * Class to handle Cairo Option
@@ -18,8 +21,8 @@ export class CairoOption<T> {
 
   readonly None?: boolean;
 
-  constructor(variant: CairoOptionVariant, someContent?: T) {
-    if (!(variant in CairoOptionVariant)) {
+  constructor(variant: CairoOptionVariant | number, someContent?: T) {
+    if (!(variant in Object.values(CairoOptionVariant))) {
       throw new Error('Wrong variant : should be CairoOptionVariant.Some or .None.');
     }
     if (variant === CairoOptionVariant.Some) {

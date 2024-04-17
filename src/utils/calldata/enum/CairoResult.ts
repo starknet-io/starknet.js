@@ -1,7 +1,10 @@
-export enum CairoResultVariant {
-  Ok = 0,
-  Err = 1,
-}
+export const CairoResultVariant = {
+  Ok: 0,
+  Err: 1,
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type CairoResultVariant = (typeof CairoResultVariant)[keyof typeof CairoResultVariant];
 
 /**
  * Class to handle Cairo Result
@@ -18,8 +21,8 @@ export class CairoResult<T, U> {
 
   readonly Err?: U;
 
-  constructor(variant: CairoResultVariant, resultContent: T | U) {
-    if (!(variant in CairoResultVariant)) {
+  constructor(variant: CairoResultVariant | number, resultContent: T | U) {
+    if (!(variant in Object.values(CairoResultVariant))) {
       throw new Error('Wrong variant : should be CairoResultVariant.Ok or .Err.');
     }
     if (variant === CairoResultVariant.Ok) {
