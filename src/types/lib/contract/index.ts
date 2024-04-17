@@ -19,11 +19,14 @@ export type CompiledContract = LegacyCompiledContract | CompiledSierra;
 export type CairoContract = ContractClass | CompiledContract;
 
 // Basic elements
-export enum EntryPointType {
-  EXTERNAL = 'EXTERNAL',
-  L1_HANDLER = 'L1_HANDLER',
-  CONSTRUCTOR = 'CONSTRUCTOR',
-}
+export const EntryPointType = {
+  EXTERNAL: 'EXTERNAL',
+  L1_HANDLER: 'L1_HANDLER',
+  CONSTRUCTOR: 'CONSTRUCTOR',
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type EntryPointType = (typeof EntryPointType)[keyof typeof EntryPointType];
 
 export * from './abi';
 export * from './legacy';

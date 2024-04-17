@@ -76,26 +76,29 @@ export type SimulateTransactionDetails = {
   skipExecute?: boolean;
 } & Partial<V3TransactionDetails>;
 
-export enum SIMULATION_FLAG {
-  SKIP_VALIDATE = 'SKIP_VALIDATE',
-  SKIP_EXECUTE = 'SKIP_EXECUTE',
-}
+export const SimulationFlag = {
+  SKIP_VALIDATE: 'SKIP_VALIDATE',
+  SKIP_EXECUTE: 'SKIP_EXECUTE',
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type SimulationFlag = (typeof SimulationFlag)[keyof typeof SimulationFlag];
 
 export type EstimateFeeAction =
   | {
-      type: TransactionType.INVOKE;
+      type: typeof TransactionType.INVOKE;
       payload: AllowArray<Call>;
     }
   | {
-      type: TransactionType.DECLARE;
+      type: typeof TransactionType.DECLARE;
       payload: DeclareContractPayload;
     }
   | {
-      type: TransactionType.DEPLOY_ACCOUNT;
+      type: typeof TransactionType.DEPLOY_ACCOUNT;
       payload: DeployAccountContractPayload;
     }
   | {
-      type: TransactionType.DEPLOY;
+      type: typeof TransactionType.DEPLOY;
       payload: UniversalDeployerContractPayload;
     };
 

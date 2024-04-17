@@ -1,14 +1,14 @@
-import {
-  type WatchAssetParameters,
-  type AccountChangeEventHandler,
-  type AddDeclareTransactionParameters,
-  type AddDeployAccountTransactionParameters,
-  type AddInvokeTransactionParameters,
-  type AddStarknetChainParameters,
-  type NetworkChangeEventHandler,
-  type StarknetChainId,
-  type StarknetWindowObject,
-  type TypedData,
+import type {
+  WatchAssetParameters,
+  AccountChangeEventHandler,
+  AddDeclareTransactionParameters,
+  AddDeployAccountTransactionParameters,
+  AddInvokeTransactionParameters,
+  AddStarknetChainParameters,
+  NetworkChangeEventHandler,
+  StarknetChainId,
+  StarknetWindowObject,
+  TypedData,
 } from 'starknet-types';
 
 /**

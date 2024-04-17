@@ -31,7 +31,7 @@ import { getVersionsByType } from '../utils/transaction';
 
 const defaultOptions = {
   headers: { 'Content-Type': 'application/json' },
-  blockIdentifier: BlockTag.pending,
+  blockIdentifier: BlockTag.PENDING,
   retries: 200,
 };
 
@@ -93,7 +93,7 @@ export class RpcChannel {
     if (rpcError) {
       const { code, message, data } = rpcError;
       throw new LibraryError(
-        `RPC: ${method} with params ${stringify(params, null, 2)}\n 
+        `RPC: ${method} with params ${stringify(params, null, 2)}\n
         ${code}: ${message}: ${stringify(data)}`
       );
     }

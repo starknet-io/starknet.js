@@ -106,7 +106,7 @@ describe('deploy and test Wallet', () => {
 
   test('Get the stark name of the account (using starknet.id)', async () => {
     const address = await account.getAddressFromStarkName('fricoben.stark', namingAddress);
-    expect(hexToDecimalString(address as string)).toEqual(hexToDecimalString(account.address));
+    expect(hexToDecimalString(address)).toEqual(hexToDecimalString(account.address));
   });
 
   test('Get the account from a stark name of the account (using starknet.id)', async () => {

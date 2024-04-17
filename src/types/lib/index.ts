@@ -155,55 +155,73 @@ export type Details = {
 };
 
 export type InvocationsDetailsWithNonce =
-  | (InvocationsDetails & {
-      nonce: BigNumberish;
-    })
+  | (InvocationsDetails & { nonce: BigNumberish })
   | V3TransactionDetails;
 
-export enum TransactionType {
-  DECLARE = 'DECLARE',
-  DEPLOY = 'DEPLOY',
-  DEPLOY_ACCOUNT = 'DEPLOY_ACCOUNT',
-  INVOKE = 'INVOKE_FUNCTION',
-}
+export const TransactionType = {
+  DECLARE: 'DECLARE',
+  DEPLOY: 'DEPLOY',
+  DEPLOY_ACCOUNT: 'DEPLOY_ACCOUNT',
+  INVOKE: 'INVOKE_FUNCTION',
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type TransactionType = (typeof TransactionType)[keyof typeof TransactionType];
 
 /**
  * new statuses are defined by props: finality_status and execution_status
  * to be #deprecated
  */
-export enum TransactionStatus {
-  NOT_RECEIVED = 'NOT_RECEIVED',
-  RECEIVED = 'RECEIVED',
-  ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
-  ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
-  REJECTED = 'REJECTED',
-  REVERTED = 'REVERTED',
-}
+export const TransactionStatus = {
+  NOT_RECEIVED: 'NOT_RECEIVED',
+  RECEIVED: 'RECEIVED',
+  ACCEPTED_ON_L2: 'ACCEPTED_ON_L2',
+  ACCEPTED_ON_L1: 'ACCEPTED_ON_L1',
+  REJECTED: 'REJECTED',
+  REVERTED: 'REVERTED',
+} as const;
 
-export enum TransactionFinalityStatus {
-  NOT_RECEIVED = 'NOT_RECEIVED',
-  RECEIVED = 'RECEIVED',
-  ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
-  ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
-}
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type TransactionStatus = (typeof TransactionStatus)[keyof typeof TransactionStatus];
 
-export enum TransactionExecutionStatus {
-  REJECTED = 'REJECTED',
-  REVERTED = 'REVERTED',
-  SUCCEEDED = 'SUCCEEDED',
-}
+export const TransactionFinalityStatus = {
+  NOT_RECEIVED: 'NOT_RECEIVED',
+  RECEIVED: 'RECEIVED',
+  ACCEPTED_ON_L2: 'ACCEPTED_ON_L2',
+  ACCEPTED_ON_L1: 'ACCEPTED_ON_L1',
+} as const;
 
-export enum BlockStatus {
-  PENDING = 'PENDING',
-  ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
-  ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
-  REJECTED = 'REJECTED',
-}
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type TransactionFinalityStatus =
+  (typeof TransactionFinalityStatus)[keyof typeof TransactionFinalityStatus];
 
-export enum BlockTag {
-  pending = 'pending',
-  latest = 'latest',
-}
+export const TransactionExecutionStatus = {
+  REJECTED: 'REJECTED',
+  REVERTED: 'REVERTED',
+  SUCCEEDED: 'SUCCEEDED',
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type TransactionExecutionStatus =
+  (typeof TransactionExecutionStatus)[keyof typeof TransactionExecutionStatus];
+
+export const BlockStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED_ON_L1: 'ACCEPTED_ON_L1',
+  ACCEPTED_ON_L2: 'ACCEPTED_ON_L2',
+  REJECTED: 'REJECTED',
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type BlockStatus = (typeof BlockStatus)[keyof typeof BlockStatus];
+
+export const BlockTag = {
+  PENDING: 'pending',
+  LATEST: 'latest',
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type BlockTag = (typeof BlockTag)[keyof typeof BlockTag];
 
 export type BlockNumber = BlockTag | null | number;
 
@@ -218,9 +236,9 @@ export type BlockIdentifier = BlockNumber | BigNumberish;
  * items used by AccountInvocations
  */
 export type AccountInvocationItem = (
-  | ({ type: TransactionType.DECLARE } & DeclareContractTransaction)
-  | ({ type: TransactionType.DEPLOY_ACCOUNT } & DeployAccountContractTransaction)
-  | ({ type: TransactionType.INVOKE } & Invocation)
+  | ({ type: typeof TransactionType.DECLARE } & DeclareContractTransaction)
+  | ({ type: typeof TransactionType.DEPLOY_ACCOUNT } & DeployAccountContractTransaction)
+  | ({ type: typeof TransactionType.INVOKE } & Invocation)
 ) &
   InvocationsDetailsWithNonce;
 
@@ -233,12 +251,14 @@ export type AccountInvocations = AccountInvocationItem[];
  * Invocations array user provide to bulk method (simulate)
  */
 export type Invocations = Array<
-  | ({ type: TransactionType.DECLARE } & OptionalPayload<DeclareContractPayload>)
-  | ({ type: TransactionType.DEPLOY } & OptionalPayload<
+  | ({ type: typeof TransactionType.DECLARE } & OptionalPayload<DeclareContractPayload>)
+  | ({ type: typeof TransactionType.DEPLOY } & OptionalPayload<
       AllowArray<UniversalDeployerContractPayload>
     >)
-  | ({ type: TransactionType.DEPLOY_ACCOUNT } & OptionalPayload<DeployAccountContractPayload>)
-  | ({ type: TransactionType.INVOKE } & OptionalPayload<AllowArray<Call>>)
+  | ({
+      type: typeof TransactionType.DEPLOY_ACCOUNT;
+    } & OptionalPayload<DeployAccountContractPayload>)
+  | ({ type: typeof TransactionType.INVOKE } & OptionalPayload<AllowArray<Call>>)
 >;
 
 export type Tupled = { element: any; type: string };

@@ -111,83 +111,120 @@ export type NonceUpdates = NONCE_UPDATE[];
 export type ReplacedClasses = REPLACED_CLASS[];
 
 // Enums Derived From Spec Types (require manual check for changes)
-export enum ETransactionType {
-  DECLARE = 'DECLARE',
-  DEPLOY = 'DEPLOY',
-  DEPLOY_ACCOUNT = 'DEPLOY_ACCOUNT',
-  INVOKE = 'INVOKE',
-  L1_HANDLER = 'L1_HANDLER',
-}
+export const ETransactionType = {
+  DECLARE: 'DECLARE',
+  DEPLOY: 'DEPLOY',
+  DEPLOY_ACCOUNT: 'DEPLOY_ACCOUNT',
+  INVOKE: 'INVOKE',
+  L1_HANDLER: 'L1_HANDLER',
+} as const;
 
-export enum ESimulationFlag {
-  SKIP_VALIDATE = 'SKIP_VALIDATE',
-  SKIP_FEE_CHARGE = 'SKIP_FEE_CHARGE',
-}
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type ETransactionType = (typeof ETransactionType)[keyof typeof ETransactionType];
 
-export enum ETransactionStatus {
-  RECEIVED = 'RECEIVED',
-  REJECTED = 'REJECTED',
-  ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
-  ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
-}
+export const ESimulationFlag = {
+  SKIP_VALIDATE: 'SKIP_VALIDATE',
+  SKIP_FEE_CHARGE: 'SKIP_FEE_CHARGE',
+} as const;
 
-export enum ETransactionFinalityStatus {
-  ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
-  ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
-}
-export enum ETransactionExecutionStatus {
-  SUCCEEDED = 'SUCCEEDED',
-  REVERTED = 'REVERTED',
-}
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type ESimulationFlag = (typeof ESimulationFlag)[keyof typeof ESimulationFlag];
 
-export enum EBlockTag {
-  LATEST = 'latest',
-  PENDING = 'pending',
-}
+export const ETransactionStatus = {
+  RECEIVED: 'RECEIVED',
+  REJECTED: 'REJECTED',
+  ACCEPTED_ON_L2: 'ACCEPTED_ON_L2',
+  ACCEPTED_ON_L1: 'ACCEPTED_ON_L1',
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type ETransactionStatus = (typeof ETransactionStatus)[keyof typeof ETransactionStatus];
+
+export const ETransactionFinalityStatus = {
+  ACCEPTED_ON_L2: 'ACCEPTED_ON_L2',
+  ACCEPTED_ON_L1: 'ACCEPTED_ON_L1',
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type ETransactionFinalityStatus =
+  (typeof ETransactionFinalityStatus)[keyof typeof ETransactionFinalityStatus];
+
+export const ETransactionExecutionStatus = {
+  SUCCEEDED: 'SUCCEEDED',
+  REVERTED: 'REVERTED',
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type ETransactionExecutionStatus =
+  (typeof ETransactionExecutionStatus)[keyof typeof ETransactionExecutionStatus];
+
+export const EBlockTag = {
+  PENDING: 'pending',
+  LATEST: 'latest',
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type EBlockTag = (typeof EBlockTag)[keyof typeof EBlockTag];
 
 // 'L1' | 'L2'
-export enum EDataAvailabilityMode {
-  L1 = 'L1',
-  L2 = 'L2',
-}
+export const EDataAvailabilityMode = {
+  L1: 'L1',
+  L2: 'L2',
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type EDataAvailabilityMode =
+  (typeof EDataAvailabilityMode)[keyof typeof EDataAvailabilityMode];
 
 // 0 | 1
-export enum EDAMode {
-  L1,
-  L2,
-}
+export const EDAMode = {
+  L1: 0,
+  L2: 1,
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type EDAMode = (typeof EDAMode)[keyof typeof EDAMode];
 
 /**
  * V_ Transaction versions HexString
  * F_ Fee Transaction Versions HexString (2 ** 128 + TRANSACTION_VERSION)
  */
-export enum ETransactionVersion {
-  V0 = '0x0',
-  V1 = '0x1',
-  V2 = '0x2',
-  V3 = '0x3',
-  F0 = '0x100000000000000000000000000000000',
-  F1 = '0x100000000000000000000000000000001',
-  F2 = '0x100000000000000000000000000000002',
-  F3 = '0x100000000000000000000000000000003',
-}
+export const ETransactionVersion = {
+  V0: '0x0',
+  V1: '0x1',
+  V2: '0x2',
+  V3: '0x3',
+  F0: '0x100000000000000000000000000000000',
+  F1: '0x100000000000000000000000000000001',
+  F2: '0x100000000000000000000000000000002',
+  F3: '0x100000000000000000000000000000003',
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type ETransactionVersion = (typeof ETransactionVersion)[keyof typeof ETransactionVersion];
 
 /**
  * Old Transaction Versions
  */
-export enum ETransactionVersion2 {
-  V0 = '0x0',
-  V1 = '0x1',
-  V2 = '0x2',
-  F0 = '0x100000000000000000000000000000000',
-  F1 = '0x100000000000000000000000000000001',
-  F2 = '0x100000000000000000000000000000002',
-}
+export const ETransactionVersion2 = {
+  V0: '0x0',
+  V1: '0x1',
+  V2: '0x2',
+  F0: '0x100000000000000000000000000000000',
+  F1: '0x100000000000000000000000000000001',
+  F2: '0x100000000000000000000000000000002',
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type ETransactionVersion2 = (typeof ETransactionVersion2)[keyof typeof ETransactionVersion2];
 
 /**
  * V3 Transaction Versions
  */
-export enum ETransactionVersion3 {
-  V3 = '0x3',
-  F3 = '0x100000000000000000000000000000003',
-}
+export const ETransactionVersion3 = {
+  V3: '0x3',
+  F3: '0x100000000000000000000000000000003',
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type ETransactionVersion3 = (typeof ETransactionVersion3)[keyof typeof ETransactionVersion3];

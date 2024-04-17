@@ -24,46 +24,66 @@ export const MAX_STORAGE_ITEM_SIZE = 256n;
 export const ADDR_BOUND = 2n ** 251n - MAX_STORAGE_ITEM_SIZE;
 
 const range = (min: bigint, max: bigint) => ({ min, max }) as const;
+
 export const RANGE_FELT = range(ZERO, PRIME - 1n);
 export const RANGE_I128 = range(-(2n ** 127n), 2n ** 127n - 1n);
 export const RANGE_U128 = range(ZERO, 2n ** 128n - 1n);
 
-export enum BaseUrl {
-  SN_MAIN = 'https://alpha-mainnet.starknet.io',
-  SN_GOERLI = 'https://alpha4.starknet.io',
-  SN_SEPOLIA = 'https://alpha-sepolia.starknet.io',
-}
+export const BaseUrl = {
+  SN_MAIN: 'https://alpha-mainnet.starknet.io',
+  SN_GOERLI: 'https://alpha4.starknet.io',
+  SN_SEPOLIA: 'https://alpha-sepolia.starknet.io',
+} as const;
 
-export enum NetworkName {
-  SN_MAIN = 'SN_MAIN',
-  SN_GOERLI = 'SN_GOERLI',
-  SN_SEPOLIA = 'SN_SEPOLIA',
-}
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type BaseUrl = (typeof BaseUrl)[keyof typeof BaseUrl];
 
-export enum StarknetChainId {
-  SN_MAIN = '0x534e5f4d41494e', // encodeShortString('SN_MAIN'),
-  SN_GOERLI = '0x534e5f474f45524c49', // encodeShortString('SN_GOERLI')
-  SN_SEPOLIA = '0x534e5f5345504f4c4941', // encodeShortString('SN_SEPOLIA')
-}
+export const NetworkName = {
+  SN_MAIN: 'SN_MAIN',
+  SN_GOERLI: 'SN_GOERLI',
+  SN_SEPOLIA: 'SN_SEPOLIA',
+} as const;
 
-export enum TransactionHashPrefix {
-  DECLARE = '0x6465636c617265', // encodeShortString('declare'),
-  DEPLOY = '0x6465706c6f79', // encodeShortString('deploy'),
-  DEPLOY_ACCOUNT = '0x6465706c6f795f6163636f756e74', // encodeShortString('deploy_account'),
-  INVOKE = '0x696e766f6b65', // encodeShortString('invoke'),
-  L1_HANDLER = '0x6c315f68616e646c6572', // encodeShortString('l1_handler'),
-}
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type NetworkName = (typeof NetworkName)[keyof typeof NetworkName];
 
-export const enum feeMarginPercentage {
-  L1_BOUND_MAX_AMOUNT = 50,
-  L1_BOUND_MAX_PRICE_PER_UNIT = 50,
-  MAX_FEE = 50,
-}
+export const StarknetChainId = {
+  SN_MAIN: '0x534e5f4d41494e', // encodeShortString('SN_MAIN'),
+  SN_GOERLI: '0x534e5f474f45524c49', // encodeShortString('SN_GOERLI')
+  SN_SEPOLIA: '0x534e5f5345504f4c4941', // encodeShortString('SN_SEPOLIA')
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type StarknetChainId = (typeof StarknetChainId)[keyof typeof StarknetChainId];
+
+export const TransactionHashPrefix = {
+  DECLARE: '0x6465636c617265', // encodeShortString('declare'),
+  DEPLOY: '0x6465706c6f79', // encodeShortString('deploy'),
+  DEPLOY_ACCOUNT: '0x6465706c6f795f6163636f756e74', // encodeShortString('deploy_account'),
+  INVOKE: '0x696e766f6b65', // encodeShortString('invoke'),
+  L1_HANDLER: '0x6c315f68616e646c6572', // encodeShortString('l1_handler'),
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type TransactionHashPrefix =
+  (typeof TransactionHashPrefix)[keyof typeof TransactionHashPrefix];
+
+export const FeeMarginPercentage = {
+  L1_BOUND_MAX_AMOUNT: 50,
+  L1_BOUND_MAX_PRICE_PER_UNIT: 50,
+  MAX_FEE: 50,
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type FeeMarginPercentage = (typeof FeeMarginPercentage)[keyof typeof FeeMarginPercentage];
 
 export const UDC = {
   ADDRESS: '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
   ENTRYPOINT: 'deployContract',
-};
+} as const;
+
+// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
+export type UDC = (typeof UDC)[keyof typeof UDC];
 
 export const RPC_DEFAULT_VERSION = 'v0_7';
 
@@ -80,4 +100,4 @@ export const RPC_NODES = {
     `https://starknet-sepolia.public.blastapi.io/rpc/${RPC_DEFAULT_VERSION}`,
     `https://free-rpc.nethermind.io/sepolia-juno/${RPC_DEFAULT_VERSION}`,
   ],
-};
+} as const;

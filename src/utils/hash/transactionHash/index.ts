@@ -26,15 +26,15 @@ import {
  * INVOKE TX HASH
  */
 
+type Version = typeof ETransactionVersion.V3 | typeof ETransactionVersion.F3;
+
 function isV3InvokeTx(args: CalcInvokeTxHashArgs): args is CalcV3InvokeTxHashArgs {
-  return [ETransactionVersion.V3, ETransactionVersion.F3].includes(
-    args.version as ETransactionVersion
-  );
+  return [ETransactionVersion.V3, ETransactionVersion.F3].includes(args.version as Version);
 }
 
 type CalcV2InvokeTxHashArgs = {
   senderAddress: BigNumberish;
-  version: `${ETransactionVersion2}`;
+  version: ETransactionVersion2;
   compiledCalldata: Calldata;
   maxFee: BigNumberish;
   chainId: StarknetChainId;
@@ -43,7 +43,7 @@ type CalcV2InvokeTxHashArgs = {
 
 type CalcV3InvokeTxHashArgs = {
   senderAddress: BigNumberish;
-  version: `${ETransactionVersion3}`;
+  version: ETransactionVersion3;
   compiledCalldata: Calldata;
   chainId: StarknetChainId;
   nonce: BigNumberish;
@@ -87,9 +87,7 @@ export function calculateInvokeTransactionHash(args: CalcInvokeTxHashArgs) {
  * DECLARE TX HASH
  */
 function isV3DeclareTx(args: CalcDeclareTxHashArgs): args is CalcV3DeclareTxHashArgs {
-  return [ETransactionVersion.V3, ETransactionVersion.F3].includes(
-    args.version as ETransactionVersion
-  );
+  return [ETransactionVersion.V3, ETransactionVersion.F3].includes(args.version as Version);
 }
 
 type CalcV2DeclareTxHashArgs = {
@@ -155,9 +153,7 @@ export function calculateDeclareTransactionHash(args: CalcDeclareTxHashArgs) {
 function isV3DeployAccountTx(
   args: CalcDeployAccountTxHashArgs
 ): args is CalcV3DeployAccountTxHashArgs {
-  return [ETransactionVersion.V3, ETransactionVersion.F3].includes(
-    args.version as ETransactionVersion
-  );
+  return [ETransactionVersion.V3, ETransactionVersion.F3].includes(args.version as Version);
 }
 
 type CalcV2DeployAccountTxHashArgs = {

@@ -1,8 +1,9 @@
-import {
-  type AccountChangeEventHandler,
-  type AddStarknetChainParameters,
-  type NetworkChangeEventHandler,
-  type WatchAssetParameters,
+import type {
+  AccountChangeEventHandler,
+  AddStarknetChainParameters,
+  NetworkChangeEventHandler,
+  WatchAssetParameters,
+  StarknetChainId as StarknetChaindIdEnum,
 } from 'starknet-types';
 
 import { Account, AccountInterface } from '../account';
@@ -103,7 +104,8 @@ export class WalletAccount extends Account implements AccountInterface {
   }
 
   public switchStarknetChain(chainId: StarknetChainId) {
-    return switchStarknetChain(this.walletProvider, chainId);
+    // TODO: Remove `as` assertion after `StarknetChaindId` from `starknet-types` gets converted to companion pattern
+    return switchStarknetChain(this.walletProvider, chainId as StarknetChaindIdEnum);
   }
 
   public watchAsset(asset: WatchAssetParameters) {

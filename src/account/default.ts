@@ -65,14 +65,16 @@ export class Account extends Provider implements AccountInterface {
 
   public cairoVersion: CairoVersion;
 
-  readonly transactionVersion: ETransactionVersion.V2 | ETransactionVersion.V3;
+  readonly transactionVersion: typeof ETransactionVersion.V2 | typeof ETransactionVersion.V3;
 
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
     address: string,
     pkOrSigner: Uint8Array | string | SignerInterface,
     cairoVersion?: CairoVersion,
-    transactionVersion: ETransactionVersion.V2 | ETransactionVersion.V3 = ETransactionVersion.V2 // TODO: Discuss this, set to v2 for backward compatibility
+    transactionVersion:
+      | typeof ETransactionVersion.V2
+      | typeof ETransactionVersion.V3 = ETransactionVersion.V2 // TODO: Discuss this, set to v2 for backward compatibility
   ) {
     super(providerOrOptions);
     this.address = address.toLowerCase();
