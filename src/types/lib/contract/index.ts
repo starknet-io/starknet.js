@@ -1,3 +1,4 @@
+import { ValuesType } from '../../helpers/valuesType';
 import { LegacyCompiledContract, LegacyContractClass } from './legacy';
 import { CompiledSierra, SierraContractClass } from './sierra';
 
@@ -26,7 +27,7 @@ export const EntryPointType = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type EntryPointType = (typeof EntryPointType)[keyof typeof EntryPointType];
+export type EntryPointType = ValuesType<typeof EntryPointType>;
 
 export * from './abi';
 export * from './legacy';

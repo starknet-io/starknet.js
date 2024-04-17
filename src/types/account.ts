@@ -1,4 +1,5 @@
 import { EDataAvailabilityMode, ETransactionVersion, ResourceBounds } from './api';
+import { ValuesType } from './helpers/valuesType';
 import {
   AllowArray,
   BigNumberish,
@@ -82,7 +83,7 @@ export const SimulationFlag = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type SimulationFlag = (typeof SimulationFlag)[keyof typeof SimulationFlag];
+export type SimulationFlag = ValuesType<typeof SimulationFlag>;
 
 export type EstimateFeeAction =
   | {

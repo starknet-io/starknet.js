@@ -1,3 +1,4 @@
+import { ValuesType } from '../helpers/valuesType';
 import { StarknetChainId } from '../../constants';
 import { weierstrass } from '../../utils/ec';
 import { EDataAvailabilityMode, ResourceBounds } from '../api';
@@ -166,7 +167,7 @@ export const TransactionType = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type TransactionType = (typeof TransactionType)[keyof typeof TransactionType];
+export type TransactionType = ValuesType<typeof TransactionType>;
 
 /**
  * new statuses are defined by props: finality_status and execution_status
@@ -182,7 +183,7 @@ export const TransactionStatus = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type TransactionStatus = (typeof TransactionStatus)[keyof typeof TransactionStatus];
+export type TransactionStatus = ValuesType<typeof TransactionStatus>;
 
 export const TransactionFinalityStatus = {
   NOT_RECEIVED: 'NOT_RECEIVED',
@@ -192,8 +193,7 @@ export const TransactionFinalityStatus = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type TransactionFinalityStatus =
-  (typeof TransactionFinalityStatus)[keyof typeof TransactionFinalityStatus];
+export type TransactionFinalityStatus = ValuesType<typeof TransactionFinalityStatus>;
 
 export const TransactionExecutionStatus = {
   REJECTED: 'REJECTED',
@@ -202,8 +202,7 @@ export const TransactionExecutionStatus = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type TransactionExecutionStatus =
-  (typeof TransactionExecutionStatus)[keyof typeof TransactionExecutionStatus];
+export type TransactionExecutionStatus = ValuesType<typeof TransactionExecutionStatus>;
 
 export const BlockStatus = {
   PENDING: 'PENDING',
@@ -213,7 +212,7 @@ export const BlockStatus = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type BlockStatus = (typeof BlockStatus)[keyof typeof BlockStatus];
+export type BlockStatus = ValuesType<typeof BlockStatus>;
 
 export const BlockTag = {
   PENDING: 'pending',
@@ -221,7 +220,7 @@ export const BlockTag = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type BlockTag = (typeof BlockTag)[keyof typeof BlockTag];
+export type BlockTag = ValuesType<typeof BlockTag>;
 
 export type BlockNumber = BlockTag | null | number;
 

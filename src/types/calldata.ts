@@ -1,3 +1,5 @@
+import { ValuesType } from './helpers/valuesType';
+
 export const ValidateType = {
   DEPLOY: 'DEPLOY',
   CALL: 'CALL',
@@ -5,7 +7,7 @@ export const ValidateType = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type ValidateType = (typeof ValidateType)[keyof typeof ValidateType];
+export type ValidateType = ValuesType<typeof ValidateType>;
 
 export const Uint = {
   u8: 'core::integer::u8',
@@ -18,7 +20,7 @@ export const Uint = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type Uint = (typeof Uint)[keyof typeof Uint];
+export type Uint = ValuesType<typeof Uint>;
 
 export const Literal = {
   ClassHash: 'core::starknet::class_hash::ClassHash',
@@ -27,4 +29,4 @@ export const Literal = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type Literal = (typeof Literal)[keyof typeof Literal];
+export type Literal = ValuesType<typeof Literal>;

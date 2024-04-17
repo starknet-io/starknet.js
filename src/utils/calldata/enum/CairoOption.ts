@@ -1,10 +1,12 @@
+import { ValuesType } from '../../../types/helpers/valuesType';
+
 export const CairoOptionVariant = {
   Some: 0,
   None: 1,
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type CairoOptionVariant = (typeof CairoOptionVariant)[keyof typeof CairoOptionVariant];
+export type CairoOptionVariant = ValuesType<typeof CairoOptionVariant>;
 
 /**
  * Class to handle Cairo Option

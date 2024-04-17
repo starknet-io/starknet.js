@@ -1,10 +1,12 @@
+import { ValuesType } from '../../../types/helpers/valuesType';
+
 export const CairoResultVariant = {
   Ok: 0,
   Err: 1,
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type CairoResultVariant = (typeof CairoResultVariant)[keyof typeof CairoResultVariant];
+export type CairoResultVariant = ValuesType<typeof CairoResultVariant>;
 
 /**
  * Class to handle Cairo Result

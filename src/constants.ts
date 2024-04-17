@@ -1,4 +1,5 @@
 import { ETransactionVersion } from './types/api';
+import { ValuesType } from './types/helpers/valuesType';
 
 export { IS_BROWSER } from './utils/encode';
 
@@ -36,7 +37,7 @@ export const BaseUrl = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type BaseUrl = (typeof BaseUrl)[keyof typeof BaseUrl];
+export type BaseUrl = ValuesType<typeof BaseUrl>;
 
 export const NetworkName = {
   SN_MAIN: 'SN_MAIN',
@@ -45,7 +46,7 @@ export const NetworkName = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type NetworkName = (typeof NetworkName)[keyof typeof NetworkName];
+export type NetworkName = ValuesType<typeof NetworkName>;
 
 export const StarknetChainId = {
   SN_MAIN: '0x534e5f4d41494e', // encodeShortString('SN_MAIN'),
@@ -54,7 +55,7 @@ export const StarknetChainId = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type StarknetChainId = (typeof StarknetChainId)[keyof typeof StarknetChainId];
+export type StarknetChainId = ValuesType<typeof StarknetChainId>;
 
 export const TransactionHashPrefix = {
   DECLARE: '0x6465636c617265', // encodeShortString('declare'),
@@ -65,8 +66,7 @@ export const TransactionHashPrefix = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type TransactionHashPrefix =
-  (typeof TransactionHashPrefix)[keyof typeof TransactionHashPrefix];
+export type TransactionHashPrefix = ValuesType<typeof TransactionHashPrefix>;
 
 export const FeeMarginPercentage = {
   L1_BOUND_MAX_AMOUNT: 50,
@@ -75,7 +75,7 @@ export const FeeMarginPercentage = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type FeeMarginPercentage = (typeof FeeMarginPercentage)[keyof typeof FeeMarginPercentage];
+export type FeeMarginPercentage = ValuesType<typeof FeeMarginPercentage>;
 
 export const UDC = {
   ADDRESS: '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
@@ -83,7 +83,7 @@ export const UDC = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type UDC = (typeof UDC)[keyof typeof UDC];
+export type UDC = ValuesType<typeof UDC>;
 
 export const RPC_DEFAULT_VERSION = 'v0_7';
 

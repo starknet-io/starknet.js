@@ -41,6 +41,7 @@ import {
   TXN_RECEIPT_WITH_BLOCK_INFO,
   TXN_STATUS,
 } from './components';
+import { ValuesType } from '../../helpers/valuesType';
 
 // METHOD RESPONSES
 // response starknet_getClass
@@ -120,7 +121,7 @@ export const ETransactionType = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type ETransactionType = (typeof ETransactionType)[keyof typeof ETransactionType];
+export type ETransactionType = ValuesType<typeof ETransactionType>;
 
 export const ESimulationFlag = {
   SKIP_VALIDATE: 'SKIP_VALIDATE',
@@ -128,7 +129,7 @@ export const ESimulationFlag = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type ESimulationFlag = (typeof ESimulationFlag)[keyof typeof ESimulationFlag];
+export type ESimulationFlag = ValuesType<typeof ESimulationFlag>;
 
 export const ETransactionStatus = {
   RECEIVED: 'RECEIVED',
@@ -138,7 +139,7 @@ export const ETransactionStatus = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type ETransactionStatus = (typeof ETransactionStatus)[keyof typeof ETransactionStatus];
+export type ETransactionStatus = ValuesType<typeof ETransactionStatus>;
 
 export const ETransactionFinalityStatus = {
   ACCEPTED_ON_L2: 'ACCEPTED_ON_L2',
@@ -146,8 +147,7 @@ export const ETransactionFinalityStatus = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type ETransactionFinalityStatus =
-  (typeof ETransactionFinalityStatus)[keyof typeof ETransactionFinalityStatus];
+export type ETransactionFinalityStatus = ValuesType<typeof ETransactionFinalityStatus>;
 
 export const ETransactionExecutionStatus = {
   SUCCEEDED: 'SUCCEEDED',
@@ -155,8 +155,7 @@ export const ETransactionExecutionStatus = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type ETransactionExecutionStatus =
-  (typeof ETransactionExecutionStatus)[keyof typeof ETransactionExecutionStatus];
+export type ETransactionExecutionStatus = ValuesType<typeof ETransactionExecutionStatus>;
 
 export const EBlockTag = {
   PENDING: 'pending',
@@ -164,7 +163,7 @@ export const EBlockTag = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type EBlockTag = (typeof EBlockTag)[keyof typeof EBlockTag];
+export type EBlockTag = ValuesType<typeof EBlockTag>;
 
 // 'L1' | 'L2'
 export const EDataAvailabilityMode = {
@@ -173,8 +172,7 @@ export const EDataAvailabilityMode = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type EDataAvailabilityMode =
-  (typeof EDataAvailabilityMode)[keyof typeof EDataAvailabilityMode];
+export type EDataAvailabilityMode = ValuesType<typeof EDataAvailabilityMode>;
 
 // 0 | 1
 export const EDAMode = {
@@ -183,7 +181,7 @@ export const EDAMode = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type EDAMode = (typeof EDAMode)[keyof typeof EDAMode];
+export type EDAMode = ValuesType<typeof EDAMode>;
 
 /**
  * V_ Transaction versions HexString
@@ -201,7 +199,7 @@ export const ETransactionVersion = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type ETransactionVersion = (typeof ETransactionVersion)[keyof typeof ETransactionVersion];
+export type ETransactionVersion = ValuesType<typeof ETransactionVersion>;
 
 /**
  * Old Transaction Versions
@@ -216,7 +214,7 @@ export const ETransactionVersion2 = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type ETransactionVersion2 = (typeof ETransactionVersion2)[keyof typeof ETransactionVersion2];
+export type ETransactionVersion2 = ValuesType<typeof ETransactionVersion2>;
 
 /**
  * V3 Transaction Versions
@@ -227,4 +225,4 @@ export const ETransactionVersion3 = {
 } as const;
 
 // eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type ETransactionVersion3 = (typeof ETransactionVersion3)[keyof typeof ETransactionVersion3];
+export type ETransactionVersion3 = ValuesType<typeof ETransactionVersion3>;
