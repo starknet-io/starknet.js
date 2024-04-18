@@ -11,11 +11,6 @@ const basicAlphabetSize = BigInt(basicAlphabet.length);
 const bigAlphabetSize = BigInt(bigAlphabet.length);
 const bigAlphabetSizePlusOne = BigInt(bigAlphabet.length + 1);
 
-/**
- * Extracts stars from a given string and returns the modified string and the number of stars extracted.
- * @param {string} str - The input string from which to extract stars.
- * @returns {[string, number]} - An array containing the modified string and the number of stars extracted.
- */
 function extractStars(str: string): [string, number] {
   let k = 0;
   while (str.endsWith(bigAlphabet[bigAlphabet.length - 1])) {
