@@ -39,22 +39,10 @@ export class RPCResponseParser
     this.margin = margin;
   }
 
-  /**
-   * Converts the estimated fee to the maximum fee.
-   *
-   * @param {number} estimatedFee - The estimated fee value.
-   * @return {number} - The maximum fee value.
-   */
   private estimatedFeeToMaxFee(estimatedFee: Parameters<typeof estimatedFeeToMaxFee>[0]) {
     return estimatedFeeToMaxFee(estimatedFee, this.margin?.maxFee);
   }
 
-  /**
-   * Estimate the fee within the specified bounds.
-   *
-   * @param {object} estimate - The estimate object containing the necessary parameters.
-   * @returns {object} - The estimated fee within the specified bounds.
-   */
   private estimateFeeToBounds(estimate: Parameters<typeof estimateFeeToBounds>[0]) {
     return estimateFeeToBounds(
       estimate,
@@ -63,22 +51,10 @@ export class RPCResponseParser
     );
   }
 
-  /**
-   * Parses the response from a "getBlock" request.
-   *
-   * @param {BlockWithTxHashes} res - The response object with block information and transaction hashes.
-   * @return {GetBlockResponse} - The parsed result with the status set to 'PENDING'.
-   */
   public parseGetBlockResponse(res: BlockWithTxHashes): GetBlockResponse {
     return { status: 'PENDING', ...res } as GetBlockResponse;
   }
 
-  /**
-   * Parses a transaction receipt and returns a processed response.
-   *
-   * @param {TransactionReceipt} res - The transaction receipt to parse.
-   * @return {GetTransactionReceiptResponse} - The parsed transaction receipt.
-   */
   public parseTransactionReceipt(res: TransactionReceipt): GetTxReceiptResponseWithoutHelper {
     // HOTFIX RPC 0.5 to align with RPC 0.6
     // This case is RPC 0.5. It can be only v2 thx with FRI units
@@ -95,12 +71,6 @@ export class RPCResponseParser
     return res as GetTxReceiptResponseWithoutHelper;
   }
 
-  /**
-   * Parses the response of a fee estimate request.
-   *
-   * @param {FeeEstimate[]} res - The response array of fee estimates.
-   * @return {EstimateFeeResponse} The parsed fee estimate response.
-   */
   public parseFeeEstimateResponse(res: FeeEstimate[]): EstimateFeeResponse {
     const val = res[0];
     return {
@@ -115,12 +85,6 @@ export class RPCResponseParser
     };
   }
 
-  /**
-   * Parses a bulk fee estimate response.
-   *
-   * @param {FeeEstimate[]} res - The array of fee estimates to parse.
-   * @return {EstimateFeeResponseBulk} - The parsed bulk fee estimate response.
-   */
   public parseFeeEstimateBulkResponse(res: FeeEstimate[]): EstimateFeeResponseBulk {
     return res.map((val) => ({
       overall_fee: toBigInt(val.overall_fee),
@@ -134,12 +98,6 @@ export class RPCResponseParser
     }));
   }
 
-  /**
-   * Parses the simulate transaction response.
-   *
-   * @param {any} res - The simulate transaction response.
-   * @returns {SimulateTransactionResponse} - The parsed simulate transaction response.
-   */
   public parseSimulateTransactionResponse(
     // TODO: revisit
     // set as 'any' to avoid a mapped type circular recursion error stemming from
@@ -157,12 +115,6 @@ export class RPCResponseParser
     });
   }
 
-  /**
-   * Parses the contract class response.
-   *
-   * @param {ContractClassPayload} res - The response payload to parse.
-   * @return {ContractClassResponse} - The parsed contract class response.
-   */
   public parseContractClassResponse(res: ContractClassPayload): ContractClassResponse {
     return {
       ...(res as ContractClassResponse),

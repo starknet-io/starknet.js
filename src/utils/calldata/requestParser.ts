@@ -93,12 +93,6 @@ function parseTuple(element: object, typeStr: string): Tupled[] {
   });
 }
 
-/**
- * Parses a string representation of a byte array and returns an array of strings.
- *
- * @param {string} element - The string representation of the byte array.
- * @return {string[]} An array of strings representing the byte array.
- */
 function parseByteArray(element: string): string[] {
   const myByteArray: ByteArray = byteArrayFromString(element);
   return [

@@ -109,13 +109,6 @@ export class Block {
 
   tag: BlockIdentifier = null;
 
-  /**
-   * Sets the identifier of the block.
-   *
-   * @param {BlockIdentifier} __identifier - The identifier of the block.
-   *
-   * @returns {void}
-   */
   private setIdentifier(__identifier: BlockIdentifier): void {
     if (isString(__identifier)) {
       if (isHex(__identifier)) {

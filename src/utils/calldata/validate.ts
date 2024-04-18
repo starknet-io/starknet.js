@@ -33,15 +33,6 @@ import {
   isTypeUint,
 } from './cairo';
 
-/**
- * Validates a felt parameter.
- *
- * @param {any} parameter - The parameter to validate.
- * @param {AbiEntry} input - The input AbiEntry containing the name and type of the parameter.
- * @throws {Error} Throws an error if the parameter is not a string, number, or bigint.
- * @throws {Error} Throws an error if the parameter is a string but not a valid hexadecimal string.
- * @throws {Error} Throws an error if the parameter is outside the range [0, 2^252 - 1].
- */
 const validateFelt = (parameter: any, input: AbiEntry) => {
   assert(
     isString(parameter) || isNumber(parameter) || isBigInt(parameter),
@@ -56,14 +47,6 @@ const validateFelt = (parameter: any, input: AbiEntry) => {
   );
 };
 
-/**
- * Validates a parameter and checks if it is a string of less than 32 characters.
- *
- * @param {any} parameter - The parameter to be validated.
- * @param {AbiEntry} input - The ABI entry object related to the parameter.
- * @returns {void}
- * @throws {Error} - If the parameter is not a string or has a length greater than or equal to 32.
- */
 const validateBytes31 = (parameter: any, input: AbiEntry) => {
   assert(isString(parameter), `Validate: arg ${input.name} should be a string.`);
   assert(
@@ -72,25 +55,10 @@ const validateBytes31 = (parameter: any, input: AbiEntry) => {
   );
 };
 
-/**
- * Validate a byte array parameter against a specific ABI entry.
- *
- * @param {any} parameter - The parameter to be validated.
- * @param {AbiEntry} input - The ABI entry to validate against.
- * @throws {TypeError} - If the parameter is not a string.
- */
 const validateByteArray = (parameter: any, input: AbiEntry) => {
   assert(isString(parameter), `Validate: arg ${input.name} should be a string.`);
 };
 
-/**
- * Validates a given parameter against the specified Cairo type.
- *
- * @param {any} parameter - The parameter to be validated.
- * @param {AbiEntry} input - The AbiEntry object that represents the Cairo type.
- * @returns {void}
- * @throws {Error} If the parameter is not of the expected type or exceeds the specified range.
- */
 const validateUint = (parameter: any, input: AbiEntry) => {
   if (isNumber(parameter)) {
     assert(
@@ -195,13 +163,6 @@ const validateUint = (parameter: any, input: AbiEntry) => {
   }
 };
 
-/**
- * Validates a boolean parameter against a given ABI entry.
- *
- * @param {any} parameter - The parameter to be validated.
- * @param {AbiEntry} input - The ABI entry against which the parameter should be validated.
- * @throws {AssertionError} - If the parameter is not a boolean.
- */
 const validateBool = (parameter: any, input: AbiEntry) => {
   assert(
     isBoolean(parameter),
@@ -209,13 +170,6 @@ const validateBool = (parameter: any, input: AbiEntry) => {
   );
 };
 
-/**
- * Validates a struct parameter based on the input type and structure definition.
- *
- * @param {any} parameter - The parameter to be validated.
- * @param {AbiEntry} input - The AbiEntry object that represents the struct input.
- * @param {AbiStructs} structs - The AbiStructs object that contains the structure definitions.
- */
 const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) => {
   // c1v2 uint256 or u512 in struct
   if (input.type === Uint.u256 || input.type === Uint.u512) {
@@ -251,13 +205,6 @@ const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) =>
   });
 };
 
-/**
- * Validates if the given parameter is a valid Enum based on the input definition.
- *
- * @param {any} parameter - The parameter to be validated as an Enum.
- * @param {AbiEntry} input - The input definition for the Enum.
- * @throws {Error} If the parameter is not a valid Enum.
- */
 const validateEnum = (parameter: any, input: AbiEntry) => {
   assert(
     typeof parameter === 'object' && !Array.isArray(parameter),
@@ -279,17 +226,6 @@ const validateEnum = (parameter: any, input: AbiEntry) => {
   );
 };
 
-/**
- * Validates that the given parameter is a tuple (defined as an object).
- *
- * @param {any} parameter - The parameter to validate.
- * @param {AbiEntry} input - The input for which the validation is performed.
- * @throws {AssertionError} - If the parameter is not a tuple.
- * @returns
- *
- * @example
- * validateTuple({ prop1: 'value1', prop2: 'value2' }, { name: 'param' });
- */
 const validateTuple = (parameter: any, input: AbiEntry) => {
   assert(
     typeof parameter === 'object' && !Array.isArray(parameter),
@@ -341,15 +277,6 @@ const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs, enu
   }
 };
 
-/**
- * Validates the fields of the given ABI method.
- *
- * @param {FunctionAbi} abiMethod - The ABI method to validate.
- * @param {Array<any>} args - The arguments passed to the method.
- * @param {AbiStructs} structs - The ABI structs used for validation.
- * @param {AbiEnums} enums - The ABI enums used for validation.
- * @throws {Error} If the validation fails.
- */
 export default function validateFields(
   abiMethod: FunctionAbi,
   args: Array<any>,
