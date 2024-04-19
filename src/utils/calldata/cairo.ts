@@ -53,7 +53,7 @@ export const isTypeTuple = (type: string) => /^\(.*\)$/i.test(type);
  */
 export const isTypeNamedTuple = (type: string) => /\(.*\)/i.test(type) && type.includes(':');
 /**
- * Checks if a given type exists in a collection of structs.
+ * Checks if a given type is a struct.
  *
  * @param {string} type - The type to check for existence.
  * @param {AbiStructs} structs - The collection of structs to search in.
