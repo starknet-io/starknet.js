@@ -34,7 +34,7 @@ export function validateAndParseAddress(address: BigNumberish): string {
 }
 
 /**
- * Computes the checksum address for the given Ethereum address.
+ * Computes the checksum address for the given Starknet address.
  *
  * From https://github.com/ethers-io/ethers.js/blob/fc1e006575d59792fa97b4efb9ea2f8cca1944cf/packages/address/src.ts/index.ts#L12
  * @param {BigNumberish} address - The address to compute the checksum for.
