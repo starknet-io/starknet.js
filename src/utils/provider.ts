@@ -119,7 +119,7 @@ export class Block {
 
   tag: BlockIdentifier = null;
 
-  private setIdentifier(__identifier: BlockIdentifier) {
+  private setIdentifier(__identifier: BlockIdentifier): void {
     if (isString(__identifier)) {
       if (isDecimalString(__identifier)) {
         this.number = parseInt(__identifier, 10);
@@ -182,11 +182,24 @@ export class Block {
   toString = () => this.hash;
 }
 
+/**
+ * Check if the given transaction details is a V3 transaction.
+ *
+ * @param {InvocationsDetailsWithNonce} details - The transaction details to be checked.
+ * @return {boolean} - Returns true if the transaction is a V3 transaction, otherwise false.
+ */
 export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3TransactionDetails {
   const version = details.version ? toHex(details.version) : ETransactionVersion.V3;
   return version === ETransactionVersion.V3 || version === ETransactionVersion.F3;
 }
 
+/**
+ * Determines if the given response matches the specified version.
+ *
+ * @param {('0.5' | '0.6' | '0.7')} version - The version to compare against the response.
+ * @param {string} response - The response to check against the version.
+ * @returns {boolean} - True if the response matches the version, false otherwise.
+ */
 export function isVersion(version: '0.5' | '0.6' | '0.7', response: string) {
   const [majorS, minorS] = version.split('.');
   const [majorR, minorR] = response.split('.');

@@ -153,10 +153,32 @@ export function supportedSpecs(swo: StarknetWindowObject) {
   return swo.request({ type: 'starknet_supportedSpecs' });
 }
 
-export function onAccountChange(swo: StarknetWindowObject, callback: AccountChangeEventHandler) {
+/**
+ * Attaches an event handler function to the "accountsChanged" event of a StarknetWindowObject.
+ * When the accounts are changed, the specified callback function will be called.
+ *
+ * @param {StarknetWindowObject} swo - The StarknetWindowObject to attach the event handler to.
+ * @param {AccountChangeEventHandler} callback - The function to be called when the accounts are changed.
+ *                                              It will receive the changed accounts as a parameter.
+ * @returns {void}
+ */
+export function onAccountChange(
+  swo: StarknetWindowObject,
+  callback: AccountChangeEventHandler
+): void {
   swo.on('accountsChanged', callback);
 }
 
-export function onNetworkChanged(swo: StarknetWindowObject, callback: NetworkChangeEventHandler) {
+/**
+ * Register a callback function to be called when the network is changed.
+ *
+ * @param {StarknetWindowObject} swo - The StarknetWindowObject instance.
+ * @param {NetworkChangeEventHandler} callback - The callback function to be called when the network is changed.
+ * @return {void}
+ */
+export function onNetworkChanged(
+  swo: StarknetWindowObject,
+  callback: NetworkChangeEventHandler
+): void {
   swo.on('networkChanged', callback);
 }

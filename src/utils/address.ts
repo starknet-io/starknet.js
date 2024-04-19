@@ -33,7 +33,14 @@ export function validateAndParseAddress(address: BigNumberish): string {
   return result;
 }
 
-// from https://github.com/ethers-io/ethers.js/blob/fc1e006575d59792fa97b4efb9ea2f8cca1944cf/packages/address/src.ts/index.ts#L12
+/**
+ * Computes the checksum address for the given Starknet address.
+ *
+ * From https://github.com/ethers-io/ethers.js/blob/fc1e006575d59792fa97b4efb9ea2f8cca1944cf/packages/address/src.ts/index.ts#L12
+ * @param {BigNumberish} address - The address to compute the checksum for.
+ *
+ * @returns {string} The checksum address.
+ */
 export function getChecksumAddress(address: BigNumberish): string {
   const chars = removeHexPrefix(validateAndParseAddress(address)).toLowerCase().split('');
   const hex = removeHexPrefix(keccakBn(address));

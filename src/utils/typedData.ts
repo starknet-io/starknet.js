@@ -103,10 +103,23 @@ function validateTypedData(data: unknown): data is TypedData {
   );
 }
 
+/**
+ * Prepares the selector for use.
+ *
+ * @param {string} selector - The selector to be prepared.
+ * @returns {string} The prepared selector.
+ */
 export function prepareSelector(selector: string): string {
   return isHex(selector) ? selector : getSelectorFromName(selector);
 }
 
+/**
+ * Checks if the given Starknet type is a Merkle tree type.
+ *
+ * @param {StarknetType} type - The StarkNet type to check.
+ *
+ * @returns {boolean} - True if the type is a Merkle tree type, false otherwise.
+ */
 export function isMerkleTreeType(type: StarknetType): type is StarknetMerkleType {
   return type.type === 'merkletree';
 }
