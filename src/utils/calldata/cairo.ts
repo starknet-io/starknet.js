@@ -61,7 +61,7 @@ export const isTypeNamedTuple = (type: string) => /\(.*\)/i.test(type) && type.i
  */
 export const isTypeStruct = (type: string, structs: AbiStructs) => type in structs;
 /**
- * Checks if a given type exists in the provided enumeration.
+ * Checks if a given type is an enum.
  *
  * @param {string} type - The type to check.
  * @param {AbiEnums} enums - The enumeration to search in.
