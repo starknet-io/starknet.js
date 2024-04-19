@@ -370,11 +370,14 @@ export function encodeData<T extends TypedData>(
   const targetType = types[type] ?? revisionConfiguration[revision].presetTypes[type];
   const [returnTypes, values] = targetType.reduce<[string[], string[]]>(
     ([ts, vs], field) => {
-      if (data[field.name] === undefined || (data[field.name] === null && field.type !== 'enum')) {
+      if (
+        data[field.name as keyof T['message']] === undefined ||
+        (data[field.name as keyof T['message']] === null && field.type !== 'enum')
+      ) {
         throw new Error(`Cannot encode data: missing data for '${field.name}'`);
       }
 
-      const value = data[field.name];
+      const value = data[field.name as keyof T['message']];
       const ctx = { parent: type, key: field.name };
       const [t, encodedValue] = encodeValue(types, field.type, value, ctx, revision);
 
