@@ -4,14 +4,17 @@
  * ref: order of execution jestGlobalSetup.ts -> jest.setup.ts -> fixtures.ts
  */
 
+
+
 import 'isomorphic-fetch';
+import jest 
 
 /* eslint-disable no-console */
 import { register } from 'fetch-intercept';
 
 const util = require('util');
 
-jest.setTimeout(50 * 60 * 1000);
+// jest.setTimeout(50 * 60 * 1000);
 
 const combiner: object[] = [];
 

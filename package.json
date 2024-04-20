@@ -50,7 +50,7 @@
   "author": "Sean Han",
   "license": "MIT",
   "devDependencies": {
-    "@babel/plugin-transform-modules-commonjs": "^7.18.2",
+    
     "@babel/preset-env": "^7.18.2",
     "@babel/preset-typescript": "^7.17.12",
     "@commitlint/cli": "^19.0.0",
