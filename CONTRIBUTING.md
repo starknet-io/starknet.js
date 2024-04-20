@@ -102,4 +102,4 @@ For major changes that markedly transform the existing API or significantly alte
 
 If you want to contribute but have any questions, concerns or doubts, feel free to ping maintainers. Ideally create a pull request with `WIP` (Work in progress) in its title and ask questions in the pull request description.
 
-You can also ask your query in the [Discord channel](https://discord.com/channels/793094838509764618/927918707613786162)
+You can also join our [Discord Server](https://discord.com/invite/YgsdxEx3)

@@ -63,7 +63,7 @@ Guides can be found [here](https://www.starknetjs.com/docs/guides/intro) :book:
 
 If you consider to contribute to this project please read [CONTRIBUTING.md](https://github.com/starknet-io/starknet.js/blob/main/CONTRIBUTING.md) first.
 
-You can also ask your query in the [Discord channel](https://discord.com/channels/793094838509764618/927918707613786162)
+You can also ask your query in our [Discord Server](https://discord.com/invite/YgsdxEx3)
 
 ## ❤️ Special Thanks
 
