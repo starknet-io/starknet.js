@@ -32,7 +32,7 @@ export function stringFromByteArray(myByteArray: ByteArray): string {
 
 /**
  * convert a JS string to a Cairo ByteArray
- * @param myString a JS string
+ * @param targetString a JS string
  * @returns Cairo representation of a LongString
  * @example
  * ```typescript

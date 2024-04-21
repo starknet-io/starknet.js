@@ -39,6 +39,7 @@ import {
 import { StarknetWalletProvider } from './types';
 import { StarknetChainId } from '../constants';
 
+export { StarknetWalletProvider };
 // Represent 'Selected Active' Account inside Connected Wallet
 export class WalletAccount extends Account implements AccountInterface {
   public address: string = '';

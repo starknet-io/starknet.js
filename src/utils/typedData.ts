@@ -24,7 +24,7 @@ import { encodeShortString, isString } from './shortString';
 /** @deprecated prefer importing from 'types' over 'typedData' */
 export * from '../types/typedData';
 
-interface Context {
+export interface Context {
   parent?: string;
   key?: string;
 }

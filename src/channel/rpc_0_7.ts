@@ -227,12 +227,13 @@ export class RpcChannel {
    */
   public simulateTransaction(
     invocations: AccountInvocations,
-    {
+    simulateTransactionOptions: getSimulateTransactionOptions = {}
+  ) {
+    const {
       blockIdentifier = this.blockIdentifier,
       skipValidate = true,
       skipFeeCharge = true,
-    }: getSimulateTransactionOptions = {}
-  ) {
+    } = simulateTransactionOptions;
     const block_id = new Block(blockIdentifier).identifier;
     const simulationFlags: RPC.ESimulationFlag[] = [];
     if (skipValidate) simulationFlags.push(RPC.ESimulationFlag.SKIP_VALIDATE);

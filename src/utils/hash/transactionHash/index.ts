@@ -32,7 +32,7 @@ function isV3InvokeTx(args: CalcInvokeTxHashArgs): args is CalcV3InvokeTxHashArg
   );
 }
 
-type CalcV2InvokeTxHashArgs = {
+export type CalcV2InvokeTxHashArgs = {
   senderAddress: BigNumberish;
   version: `${ETransactionVersion2}`;
   compiledCalldata: Calldata;
@@ -41,7 +41,7 @@ type CalcV2InvokeTxHashArgs = {
   nonce: BigNumberish;
 };
 
-type CalcV3InvokeTxHashArgs = {
+export type CalcV3InvokeTxHashArgs = {
   senderAddress: BigNumberish;
   version: `${ETransactionVersion3}`;
   compiledCalldata: Calldata;
@@ -55,7 +55,7 @@ type CalcV3InvokeTxHashArgs = {
   paymasterData: BigNumberish[];
 };
 
-type CalcInvokeTxHashArgs = CalcV2InvokeTxHashArgs | CalcV3InvokeTxHashArgs;
+export type CalcInvokeTxHashArgs = CalcV2InvokeTxHashArgs | CalcV3InvokeTxHashArgs;
 
 export function calculateInvokeTransactionHash(args: CalcInvokeTxHashArgs) {
   if (isV3InvokeTx(args)) {
@@ -92,7 +92,7 @@ function isV3DeclareTx(args: CalcDeclareTxHashArgs): args is CalcV3DeclareTxHash
   );
 }
 
-type CalcV2DeclareTxHashArgs = {
+export type CalcV2DeclareTxHashArgs = {
   classHash: string;
   senderAddress: BigNumberish;
   version: `${ETransactionVersion2}`;
@@ -102,7 +102,7 @@ type CalcV2DeclareTxHashArgs = {
   compiledClassHash?: string;
 };
 
-type CalcV3DeclareTxHashArgs = {
+export type CalcV3DeclareTxHashArgs = {
   classHash: string;
   compiledClassHash: string;
   senderAddress: BigNumberish;
@@ -117,7 +117,7 @@ type CalcV3DeclareTxHashArgs = {
   paymasterData: BigNumberish[];
 };
 
-type CalcDeclareTxHashArgs = CalcV2DeclareTxHashArgs | CalcV3DeclareTxHashArgs;
+export type CalcDeclareTxHashArgs = CalcV2DeclareTxHashArgs | CalcV3DeclareTxHashArgs;
 
 export function calculateDeclareTransactionHash(args: CalcDeclareTxHashArgs) {
   if (isV3DeclareTx(args)) {
@@ -160,7 +160,7 @@ function isV3DeployAccountTx(
   );
 }
 
-type CalcV2DeployAccountTxHashArgs = {
+export type CalcV2DeployAccountTxHashArgs = {
   contractAddress: BigNumberish;
   classHash: BigNumberish;
   constructorCalldata: Calldata;
@@ -171,7 +171,7 @@ type CalcV2DeployAccountTxHashArgs = {
   nonce: BigNumberish;
 };
 
-type CalcV3DeployAccountTxHashArgs = {
+export type CalcV3DeployAccountTxHashArgs = {
   contractAddress: BigNumberish;
   classHash: BigNumberish;
   compiledConstructorCalldata: Calldata;
@@ -186,7 +186,9 @@ type CalcV3DeployAccountTxHashArgs = {
   paymasterData: BigNumberish[];
 };
 
-type CalcDeployAccountTxHashArgs = CalcV2DeployAccountTxHashArgs | CalcV3DeployAccountTxHashArgs;
+export type CalcDeployAccountTxHashArgs =
+  | CalcV2DeployAccountTxHashArgs
+  | CalcV3DeployAccountTxHashArgs;
 
 export function calculateDeployAccountTransactionHash(args: CalcDeployAccountTxHashArgs) {
   if (isV3DeployAccountTx(args)) {

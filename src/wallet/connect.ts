@@ -135,7 +135,8 @@ export function addDeployAccountTransaction(
 
 /**
  * Sign typed data using the wallet.
- * @param params The typed data to sign.
+ * @param swo the starknet (wallet) window object to request the signature.
+ * @param typedData The typed data to sign.
  * @returns An array of signatures as strings.
  */
 export function signMessage(swo: StarknetWindowObject, typedData: TypedData) {

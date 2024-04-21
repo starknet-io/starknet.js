@@ -41,7 +41,7 @@ import {
 
 export type Methods = ReadMethods & WriteMethods & TraceMethods;
 
-type ReadMethods = {
+export type ReadMethods = {
   // Returns the version of the Starknet JSON-RPC specification being used
   starknet_specVersion: {
     params: [];
@@ -243,7 +243,7 @@ type ReadMethods = {
   };
 };
 
-type WriteMethods = {
+export type WriteMethods = {
   // Submit a new transaction to be added to the chain
   starknet_addInvokeTransaction: {
     params: {
@@ -302,7 +302,7 @@ type WriteMethods = {
   };
 };
 
-type TraceMethods = {
+export type TraceMethods = {
   // For a given executed transaction, return the trace of its execution, including internal calls
   starknet_traceTransaction: {
     params: { transaction_hash: TXN_HASH };

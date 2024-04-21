@@ -6,7 +6,7 @@ export type AbiEntry = { name: string; type: 'felt' | 'felt*' | string };
 
 export type EventEntry = { name: string; type: 'felt' | 'felt*' | string; kind: 'key' | 'data' };
 
-enum FunctionAbiType {
+export enum FunctionAbiType {
   'function',
   'l1_handler',
   'constructor',

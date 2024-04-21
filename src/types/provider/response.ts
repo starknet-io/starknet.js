@@ -37,6 +37,8 @@ import {
   TransactionWithHash,
 } from './spec';
 
+export type { BLOCK_HASH, BLOCK_NUMBER, RESOURCE_PRICE, TXN_HASH };
+
 export { BlockWithTxHashes, ContractClassPayload, FeeEstimate, TransactionReceipt } from './spec';
 
 export type GetBlockResponse = PendingBlock | Block;
@@ -102,18 +104,24 @@ export type SuccessfulTransactionReceiptResponse =
   | DeployTransactionReceiptResponse
   | DeclareTransactionReceiptResponse;
 
+export type { TransactionWithHash };
 export type GetTransactionResponse = TransactionWithHash;
 // Spread individual types for usage convenience
+export type { INVOKE_TXN_RECEIPT, PENDING_INVOKE_TXN_RECEIPT };
 export type InvokeTransactionReceiptResponse = INVOKE_TXN_RECEIPT | PENDING_INVOKE_TXN_RECEIPT;
+export type { DECLARE_TXN_RECEIPT, PENDING_DECLARE_TXN_RECEIPT };
 export type DeclareTransactionReceiptResponse = DECLARE_TXN_RECEIPT | PENDING_DECLARE_TXN_RECEIPT;
 export type DeployTransactionReceiptResponse = InvokeTransactionReceiptResponse;
+export type { DEPLOY_ACCOUNT_TXN_RECEIPT, PENDING_DEPLOY_ACCOUNT_TXN_RECEIPT };
 export type DeployAccountTransactionReceiptResponse =
   | DEPLOY_ACCOUNT_TXN_RECEIPT
   | PENDING_DEPLOY_ACCOUNT_TXN_RECEIPT;
+export type { L1_HANDLER_TXN_RECEIPT, PENDING_L1_HANDLER_TXN_RECEIPT };
 export type L1HandlerTransactionReceiptResponse =
   | L1_HANDLER_TXN_RECEIPT
   | PENDING_L1_HANDLER_TXN_RECEIPT;
 
+export type { PRICE_UNIT };
 export interface EstimateFeeResponse {
   gas_consumed: bigint;
   overall_fee: bigint;
@@ -127,18 +135,23 @@ export interface EstimateFeeResponse {
 
 export type EstimateFeeResponseBulk = Array<EstimateFeeResponse>;
 
+export type { InvokedTransaction };
 export type InvokeFunctionResponse = InvokedTransaction;
 
+export type { DeclaredTransaction };
 export type DeclareContractResponse = DeclaredTransaction;
 
 export type CallContractResponse = string[];
 
+export type { FELT };
 export type Storage = FELT;
 
 export type Nonce = string;
 
+export type { SIMULATION_FLAG };
 export type SimulationFlags = Array<SIMULATION_FLAG>;
 
+export type { SimulateTransaction, ResourceBounds };
 export type SimulatedTransaction = SimulateTransaction & {
   suggestedMaxFee: bigint;
   resourceBounds: ResourceBounds;
@@ -147,7 +160,9 @@ export type SimulatedTransaction = SimulateTransaction & {
 export type SimulateTransactionResponse = SimulatedTransaction[];
 
 export type StateUpdateResponse = StateUpdate | PendingStateUpdate;
+export type { STATE_UPDATE };
 export type StateUpdate = STATE_UPDATE;
+export type { PENDING_STATE_UPDATE };
 export type PendingStateUpdate = PENDING_STATE_UPDATE;
 
 /**
