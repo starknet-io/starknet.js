@@ -35,5 +35,12 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Setting global variables
+        run: |
+          export TEST_RPC_URL=http://192.168.1.44:9545/rpc/v0.5
+          export TEST_RPC_URL=https://starknet-testnet.public.blastapi.io/rpc/v0.5
+          export TEST_ACCOUNT_ADDRESS=0x065A822f0000000000000000000000000c26641
+          export TEST_ACCOUNT_PRIVATE_KEY=0x02a80000000000000000000000001754438a
+
       - name: Run the tests
         run: npm test -- --coverage
