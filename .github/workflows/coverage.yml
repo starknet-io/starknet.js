@@ -23,7 +23,7 @@ jobs:
         run: npm cache clean --force
 
       - name: delete node_modules clear dependency error
-        run: rm -rf node_modules && rm -r package-lock. json
+        run: rm -rf node_modules && rm -r package-lock.json
 
       - name: Setting global variables
         run: |
