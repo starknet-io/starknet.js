@@ -98,9 +98,9 @@
     "isomorphic-fetch": "^3.0.0",
     "lossless-json": "^4.0.1",
     "pako": "^2.0.4",
-    "starknet-types": "^0.0.5",
     "ts-mixer": "^6.0.3",
-    "url-join": "^4.0.1"
+    "url-join": "^4.0.1",
+    "starknet-types-07": "npm:starknet-types@^0.7.2"
   },
   "lint-staged": {
     "*.ts": "eslint --cache --fix",
