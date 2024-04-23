@@ -1,7 +1,7 @@
 /* eslint-disable no-new */
-import { CallData } from '../../../src/utils/calldata';
-import { bigNumberishArrayToDecimalStringArray, toHex } from '../../../src/utils/num';
-import { compiledEthAccount, compiledEthPubk } from '../../config/fixtures';
+import { CallData } from '../../src/utils/calldata';
+import { bigNumberishArrayToDecimalStringArray, toHex } from '../../src/utils/num';
+import { compiledEthAccount, compiledEthPubk } from '../config/fixtures';
 
 describe('secp256k1Point cairo type test', () => {
   const myCallDataAccount = new CallData(compiledEthAccount.abi);

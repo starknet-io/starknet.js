@@ -13,7 +13,7 @@ export function parseUDCEvent(txReceipt: InvokeTransactionReceiptResponse) {
     throw new Error('UDC emitted event is empty');
   }
   const event = txReceipt.events.find(
-    (it) => cleanHex(it.from_address) === cleanHex(UDC.ADDRESS)
+    (it: any) => cleanHex(it.from_address) === cleanHex(UDC.ADDRESS)
   ) || {
     data: [],
   };

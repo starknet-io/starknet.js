@@ -6,10 +6,9 @@ import componentSchemas from '../schemas/component.json';
 import libSchemas from '../schemas/lib.json';
 import providerSchemas from '../schemas/provider.json';
 import rpcSchemas from '../schemas/rpc.json';
-import sequencerSchemas from '../schemas/sequencer.json';
 import { isBigInt } from '../../src/utils/num';
 
-const matcherSchemas = [accountSchemas, libSchemas, providerSchemas, rpcSchemas, sequencerSchemas];
+const matcherSchemas = [accountSchemas, libSchemas, providerSchemas, rpcSchemas];
 const schemas = [...matcherSchemas, componentSchemas];
 const jestJsonMatchers = matchersWithOptions({ schemas }, (ajv: any) => {
   // @ts-ignore
@@ -39,7 +38,6 @@ export const initializeMatcher = (expect: jest.Expect) => {
   expect(libSchemas).toBeValidSchema();
   expect(providerSchemas).toBeValidSchema();
   expect(rpcSchemas).toBeValidSchema();
-  expect(sequencerSchemas).toBeValidSchema();
 };
 
 declare global {

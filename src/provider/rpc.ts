@@ -100,6 +100,12 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getBlockWithTxs(blockIdentifier);
   }
 
+  public async getL1GasPrice(blockIdentifier?: BlockIdentifier) {
+    return this.channel
+      .getBlockWithTxHashes(blockIdentifier)
+      .then(this.responseParser.parseL1GasPriceResponse);
+  }
+
   public async getBlockWithReceipts(blockIdentifier?: BlockIdentifier) {
     if (this.channel instanceof RPC06.RpcChannel)
       throw new LibraryError('Unsupported method for RPC version');
