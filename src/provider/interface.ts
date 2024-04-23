@@ -134,7 +134,7 @@ export abstract class ProviderInterface {
   /**
    * Gets the transaction information from a tx id.
    *
-   * @param txHash
+   * @param transactionHash
    * @returns the transaction object \{ transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? \}
    */
   public abstract getTransaction(transactionHash: BigNumberish): Promise<GetTransactionResponse>;
@@ -142,7 +142,7 @@ export abstract class ProviderInterface {
   /**
    * Gets the transaction receipt from a tx hash.
    *
-   * @param txHash
+   * @param transactionHash
    * @returns the transaction receipt object
    */
   public abstract getTransactionReceipt(
