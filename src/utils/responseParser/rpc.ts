@@ -121,4 +121,8 @@ export class RPCResponseParser
       abi: isString(res.abi) ? JSON.parse(res.abi) : res.abi,
     };
   }
+
+  public parseL1GasPriceResponse(res: BlockWithTxHashes): string {
+    return res.l1_gas_price.price_in_wei;
+  }
 }

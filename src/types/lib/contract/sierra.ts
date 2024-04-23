@@ -15,6 +15,7 @@ export type CairoAssembly = {
 /** COMPILED CONTRACT */
 /**
  * format produced after starknet-compile .cairo to .json
+ *
  * sierra_program is hex array
  */
 export type CompiledSierra = {
@@ -27,6 +28,7 @@ export type CompiledSierra = {
 
 /**
  * format produced after compressing 'sierra_program', stringifies 'abi' property and omit sierra_program_debug_info
+ *
  * CompressedCompiledSierra
  */
 export type SierraContractClass = Omit<CompiledSierra, 'abi' | 'sierra_program_debug_info'> & {

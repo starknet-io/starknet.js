@@ -1,15 +1,15 @@
+import type { Abi } from 'abi-wan-kanabi';
 import {
-  Abi,
+  type BigNumberish,
+  type Calldata,
+  type CompiledSierra,
+  type DeclareDeployUDCResponse,
+  type RawArgsArray,
+  type RawArgsObject,
   Account,
-  BigNumberish,
   CallData,
-  Calldata,
-  CompiledSierra,
   Contract,
   ContractFactory,
-  DeclareDeployUDCResponse,
-  RawArgsArray,
-  RawArgsObject,
   cairo,
   ec,
   hash,
@@ -26,7 +26,7 @@ import {
   compiledHelloSierra,
   compiledHelloSierraCasm,
   describeIfDevnet,
-  describeIfSequencerGoerli,
+  describeIfTestnet,
   getTestAccount,
   getTestProvider,
 } from './config/fixtures';
@@ -550,8 +550,8 @@ describeIfDevnet('Cairo 1 Devnet', () => {
   });
 });
 
-describeIfSequencerGoerli('Cairo1 Testnet', () => {
-  describe('Sequencer API - C1 Testnet C:0x00305e...', () => {
+describeIfTestnet('Testnet', () => {
+  describe('TS validation for testnet', () => {
     const provider = getTestProvider();
     const account = getTestAccount(provider);
     const classHash: any = '0x022332bb9c1e22ae13ae7fd9f3101eced4644533c6bfe51a25cf8dea028e5045';

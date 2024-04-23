@@ -46,6 +46,14 @@ export function isUrl(s?: string): boolean {
   return false;
 }
 
+/**
+ * Builds a URL using the provided base URL, default path, and optional URL or path.
+ *
+ * @param {string} baseUrl - The base URL of the URL being built.
+ * @param {string} defaultPath - The default path to use if no URL or path is provided.
+ * @param {string} [urlOrPath] - The optional URL or path to append to the base URL.
+ * @return {string} The built URL.
+ */
 export function buildUrl(baseUrl: string, defaultPath: string, urlOrPath?: string) {
   return isUrl(urlOrPath) ? urlOrPath! : urljoin(baseUrl, urlOrPath ?? defaultPath);
 }

@@ -110,10 +110,23 @@ function validateTypedData(data: unknown): data is TypedData {
   );
 }
 
+/**
+ * Prepares the selector for use.
+ *
+ * @param {string} selector - The selector to be prepared.
+ * @returns {string} The prepared selector.
+ */
 export function prepareSelector(selector: string): string {
   return isHex(selector) ? selector : getSelectorFromName(selector);
 }
 
+/**
+ * Checks if the given Starknet type is a Merkle tree type.
+ *
+ * @param {StarknetType} type - The StarkNet type to check.
+ *
+ * @returns {boolean} - True if the type is a Merkle tree type, false otherwise.
+ */
 export function isMerkleTreeType(type: StarknetType): type is StarknetMerkleType {
   return type.type === 'merkletree';
 }
@@ -377,11 +390,14 @@ export function encodeData<T extends TypedData>(
   const targetType = types[type] ?? revisionConfiguration[revision].presetTypes[type];
   const [returnTypes, values] = targetType.reduce<[string[], string[]]>(
     ([ts, vs], field) => {
-      if (data[field.name] === undefined || (data[field.name] === null && field.type !== 'enum')) {
+      if (
+        data[field.name as keyof T['message']] === undefined ||
+        (data[field.name as keyof T['message']] === null && field.type !== 'enum')
+      ) {
         throw new Error(`Cannot encode data: missing data for '${field.name}'`);
       }
 
-      const value = data[field.name];
+      const value = data[field.name as keyof T['message']];
       const ctx = { parent: type, key: field.name };
       const [t, encodedValue] = encodeValue(types, field.type, value, ctx, revision);
 

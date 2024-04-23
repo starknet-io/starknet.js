@@ -2,25 +2,24 @@ import {
   type WatchAssetParameters,
   type AccountChangeEventHandler,
   type AddDeclareTransactionParameters,
-  type AddDeployAccountTransactionParameters,
   type AddInvokeTransactionParameters,
   type AddStarknetChainParameters,
   type NetworkChangeEventHandler,
-  type StarknetChainId,
+  type ChainId,
   type StarknetWindowObject,
   type TypedData,
-} from 'starknet-types';
+} from 'starknet-types-07';
 
 /**
  * Request Permission for wallet account, return addresses that are allowed by user
  * @param silentMode false: request user interaction allowance. true: return only pre-allowed
  * @returns allowed accounts addresses
  */
-export function requestAccounts(swo: StarknetWindowObject, silentMode = false) {
+export function requestAccounts(swo: StarknetWindowObject, silent_mode = false) {
   return swo.request({
     type: 'wallet_requestAccounts',
     params: {
-      silentMode,
+      silent_mode,
     },
   });
 }
@@ -63,7 +62,7 @@ export function addStarknetChain(swo: StarknetWindowObject, chain: AddStarknetCh
  * @param chainId StarknetChainId
  * @returns boolean
  */
-export function switchStarknetChain(swo: StarknetWindowObject, chainId: StarknetChainId) {
+export function switchStarknetChain(swo: StarknetWindowObject, chainId: ChainId) {
   return swo.request({
     type: 'wallet_switchStarknetChain',
     params: {
@@ -98,7 +97,7 @@ export function addInvokeTransaction(
   params: AddInvokeTransactionParameters
 ) {
   return swo.request({
-    type: 'starknet_addInvokeTransaction',
+    type: 'wallet_addInvokeTransaction',
     params,
   });
 }
@@ -113,22 +112,7 @@ export function addDeclareTransaction(
   params: AddDeclareTransactionParameters
 ) {
   return swo.request({
-    type: 'starknet_addDeclareTransaction',
-    params,
-  });
-}
-
-/**
- * Add a deploy account transaction to the wallet.
- * @param params The parameters required for the deploy account transaction.
- * @returns The result of adding the deploy account transaction.
- */
-export function addDeployAccountTransaction(
-  swo: StarknetWindowObject,
-  params: AddDeployAccountTransactionParameters
-) {
-  return swo.request({
-    type: 'starknet_addDeployAccountTransaction',
+    type: 'wallet_addDeclareTransaction',
     params,
   });
 }
@@ -140,7 +124,7 @@ export function addDeployAccountTransaction(
  */
 export function signMessage(swo: StarknetWindowObject, typedData: TypedData) {
   return swo.request({
-    type: 'starknet_signTypedData',
+    type: 'wallet_signTypedData',
     params: typedData,
   });
 }
@@ -150,13 +134,35 @@ export function signMessage(swo: StarknetWindowObject, typedData: TypedData) {
  * @returns An array of supported specification strings.
  */
 export function supportedSpecs(swo: StarknetWindowObject) {
-  return swo.request({ type: 'starknet_supportedSpecs' });
+  return swo.request({ type: 'wallet_supportedSpecs' });
 }
 
-export function onAccountChange(swo: StarknetWindowObject, callback: AccountChangeEventHandler) {
+/**
+ * Attaches an event handler function to the "accountsChanged" event of a StarknetWindowObject.
+ * When the accounts are changed, the specified callback function will be called.
+ *
+ * @param {StarknetWindowObject} swo - The StarknetWindowObject to attach the event handler to.
+ * @param {AccountChangeEventHandler} callback - The function to be called when the accounts are changed.
+ *                                              It will receive the changed accounts as a parameter.
+ * @returns {void}
+ */
+export function onAccountChange(
+  swo: StarknetWindowObject,
+  callback: AccountChangeEventHandler
+): void {
   swo.on('accountsChanged', callback);
 }
 
-export function onNetworkChanged(swo: StarknetWindowObject, callback: NetworkChangeEventHandler) {
+/**
+ * Register a callback function to be called when the network is changed.
+ *
+ * @param {StarknetWindowObject} swo - The StarknetWindowObject instance.
+ * @param {NetworkChangeEventHandler} callback - The callback function to be called when the network is changed.
+ * @return {void}
+ */
+export function onNetworkChanged(
+  swo: StarknetWindowObject,
+  callback: NetworkChangeEventHandler
+): void {
   swo.on('networkChanged', callback);
 }
