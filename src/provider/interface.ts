@@ -61,8 +61,7 @@ export abstract class ProviderInterface {
    * @param blockIdentifier block identifier
    * @returns the block object
    */
-  public abstract getBlock(): Promise<PendingBlock>;
-  public abstract getBlock(blockIdentifier: 'pending'): Promise<PendingBlock>;
+  public abstract getBlock(blockIdentifier?: 'pending'): Promise<PendingBlock>;
   public abstract getBlock(blockIdentifier: 'latest'): Promise<Block>;
   public abstract getBlock(blockIdentifier: BlockIdentifier): Promise<GetBlockResponse>;
 
