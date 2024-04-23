@@ -11,6 +11,12 @@ import { assertInRange, toHex } from './num';
  * Format a hex number to '0x' and 64 characters, adding leading zeros if necessary.
  * @param {BigNumberish} address
  * @returns {string} Hex string : 0x followed by 64 characters. No upper case characters in the response.
+ * @example
+ * ```typescript
+ * const address = 0x7ee790591d9fa3efc87067d95a643f8455e0b8190eb8cb7bfd39e4fb7571fdf;
+ * const result = addAddressPadding(address);
+ * // result = "0x07ee790591d9fa3efc87067d95a643f8455e0b8190eb8cb7bfd39e4fb7571fdf"
+ * ```
  */
 export function addAddressPadding(address: BigNumberish): string {
   return addHexPrefix(removeHexPrefix(toHex(address)).padStart(64, '0'));
@@ -20,6 +26,12 @@ export function addAddressPadding(address: BigNumberish): string {
  * Check the validity of a Starknet address, and format it as a hex number : '0x' and 64 characters, adding leading zeros if necessary.
  * @param {BigNumberish} address
  * @returns {string} Hex string : 0x followed by 64 characters. No upper case characters in the response.
+ * @example
+ * ```typescript
+ * const address = 0x7ee790591d9fa3efc87067d95a643f8455e0b8190eb8cb7bfd39e4fb7571fdf;
+ * const result = addAddressPadding(address);
+ * // result = "0x07ee790591d9fa3efc87067d95a643f8455e0b8190eb8cb7bfd39e4fb7571fdf"
+ * ```
  */
 export function validateAndParseAddress(address: BigNumberish): string {
   assertInRange(address, ZERO, ADDR_BOUND - 1n, 'Starknet Address');
@@ -33,6 +45,18 @@ export function validateAndParseAddress(address: BigNumberish): string {
   return result;
 }
 
+/**
+ * Convert an address to her checksum representation which uses a specific pattern of uppercase and lowercase letters within
+ * a given address to reduce the risk of errors introduced from typing an address or cut and paste issues.
+ * @param {BigNumberish} address
+ * @returns {string} Hex string : 0x followed by 64 characters. Mix of uppercase and lowercase
+ * @example
+ * ```typescript
+ * const address = 0x2fd23d9182193775423497fc0c472e156c57c69e4089a1967fb288a2d84e914;
+ * const result = getChecksumAddress(address);
+ * // result = "0x02Fd23d9182193775423497fc0c472E156C57C69E4089A1967fb288A2d84e914"
+ * ```
+ */
 // from https://github.com/ethers-io/ethers.js/blob/fc1e006575d59792fa97b4efb9ea2f8cca1944cf/packages/address/src.ts/index.ts#L12
 export function getChecksumAddress(address: BigNumberish): string {
   const chars = removeHexPrefix(validateAndParseAddress(address)).toLowerCase().split('');
@@ -58,6 +82,12 @@ export function getChecksumAddress(address: BigNumberish): string {
  * @param address string
  *
  * @returns true if the ChecksumAddress is valid
+ * @example
+ * ```typescript
+ * const address = 0x02Fd23d9182193775423497fc0c472E156C57C69E4089A1967fb288A2d84e914;
+ * const result = validateChecksumAddress(address);
+ * // result = "true"
+ * ```
  */
 export function validateChecksumAddress(address: string): boolean {
   return getChecksumAddress(address) === address;
