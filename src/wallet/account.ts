@@ -3,8 +3,7 @@ import type {
   AddStarknetChainParameters,
   NetworkChangeEventHandler,
   WatchAssetParameters,
-  StarknetChainId as StarknetChaindIdEnum,
-} from 'starknet-types';
+} from 'starknet-types-07';
 
 import { Account, AccountInterface } from '../account';
 import { ProviderInterface } from '../provider';
@@ -14,19 +13,16 @@ import {
   Call,
   CompiledSierra,
   DeclareContractPayload,
-  DeployAccountContractPayload,
   MultiDeployContractResponse,
   ProviderOptions,
   TypedData,
   UniversalDeployerContractPayload,
 } from '../types';
-import { CallData } from '../utils/calldata';
 import { extractContractHashes } from '../utils/contract';
 import { stringify } from '../utils/json';
 import { buildUDCCall } from '../utils/transaction';
 import {
   addDeclareTransaction,
-  addDeployAccountTransaction,
   addInvokeTransaction,
   addStarknetChain,
   getPermissions,
@@ -73,7 +69,7 @@ export class WalletAccount extends Account implements AccountInterface {
       .request({
         type: 'wallet_requestAccounts',
         params: {
-          silentMode: false,
+          silent_mode: false,
         },
       })
       .then((res) => {
@@ -104,8 +100,7 @@ export class WalletAccount extends Account implements AccountInterface {
   }
 
   public switchStarknetChain(chainId: StarknetChainId) {
-    // TODO: Remove `as` assertion after `StarknetChaindId` from `starknet-types` gets converted to companion pattern
-    return switchStarknetChain(this.walletProvider, chainId as StarknetChaindIdEnum);
+    return switchStarknetChain(this.walletProvider, chainId);
   }
 
   public watchAsset(asset: WatchAssetParameters) {
@@ -124,7 +119,7 @@ export class WalletAccount extends Account implements AccountInterface {
       const { contractAddress, entrypoint, calldata } = it;
       return {
         contract_address: contractAddress,
-        entrypoint,
+        entry_point: entrypoint,
         calldata,
       };
     });
@@ -169,18 +164,6 @@ export class WalletAccount extends Account implements AccountInterface {
       ...invokeResponse,
       contract_address: addresses,
     };
-  }
-
-  override deployAccount(payload: DeployAccountContractPayload) {
-    const params = {
-      contract_address_salt: payload.addressSalt?.toString() || '0',
-      constructor_calldata: payload.constructorCalldata
-        ? CallData.compile(payload.constructorCalldata)
-        : [],
-      class_hash: payload.classHash,
-    };
-
-    return addDeployAccountTransaction(this.walletProvider, params);
   }
 
   override signMessage(typedData: TypedData) {

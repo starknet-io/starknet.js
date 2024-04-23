@@ -15,6 +15,14 @@ const guard = {
   },
 };
 
+/**
+ * Formats the given data based on the provided type definition.
+ *
+ * @param {any} data - The data to be formatted.
+ * @param {any} type - The type definition for the data.
+ * @param {any} [sameType] - The same type definition to be used (optional).
+ * @returns - The formatted data.
+ */
 export default function formatter(data: any, type: any, sameType?: any) {
   // match data element with type element
   return Object.entries(data).reduce((acc, [key, value]: [any, any]) => {

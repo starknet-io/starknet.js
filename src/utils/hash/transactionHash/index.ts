@@ -34,7 +34,7 @@ function isV3InvokeTx(args: CalcInvokeTxHashArgs): args is CalcV3InvokeTxHashArg
 
 type CalcV2InvokeTxHashArgs = {
   senderAddress: BigNumberish;
-  version: ETransactionVersion2;
+  version: `${ETransactionVersion2}`;
   compiledCalldata: Calldata;
   maxFee: BigNumberish;
   chainId: StarknetChainId;
@@ -43,7 +43,7 @@ type CalcV2InvokeTxHashArgs = {
 
 type CalcV3InvokeTxHashArgs = {
   senderAddress: BigNumberish;
-  version: ETransactionVersion3;
+  version: `${ETransactionVersion3}`;
   compiledCalldata: Calldata;
   chainId: StarknetChainId;
   nonce: BigNumberish;

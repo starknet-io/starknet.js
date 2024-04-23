@@ -19,6 +19,7 @@ export type ByteArray = {
 
 /**
  * Compiled calldata ready to be sent
+ *
  * decimal-string array
  */
 export type Calldata = string[] & { readonly __compiled__?: true };
@@ -47,6 +48,7 @@ export interface Uint512 {
 
 /**
  * BigNumberish array
+ *
  * use CallData.compile() to convert to Calldata
  */
 export type RawCalldata = BigNumberish[];
@@ -225,9 +227,13 @@ export type BlockTag = ValuesType<typeof BlockTag>;
 export type BlockNumber = BlockTag | null | number;
 
 /**
- * hex string and BN are detected as block hashes
+ * hex string and BigInt are detected as block hashes
+ *
  * decimal string and number are detected as block numbers
- * null appends nothing to the request url
+ *
+ * text string are detected as block tag
+ *
+ * null return 'pending' block tag
  */
 export type BlockIdentifier = BlockNumber | BigNumberish;
 

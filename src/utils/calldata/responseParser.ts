@@ -84,6 +84,7 @@ function parseBaseTypes(type: string, it: Iterator<string>) {
  * @param responseIterator - iterator of the response
  * @param element - element of the field {name: string, type: string}
  * @param structs - structs from abi
+ * @param enums
  * @return {any} - parsed arguments in format that contract is expecting
  */
 function parseResponseValue(
