@@ -18,7 +18,7 @@ import {
   getSelectorFromName,
 } from './hash';
 import { MerkleTree } from './merkle';
-import { isHex, toHex } from './num';
+import { isHex } from './num';
 import { encodeShortString, isString } from './shortString';
 
 /** @deprecated prefer importing from 'types' over 'typedData' */
@@ -82,12 +82,19 @@ function identifyRevision({ types, domain }: TypedData) {
   return undefined;
 }
 
+function formatBigIntAsHex(bigIntValue: bigint): string {
+  if (bigIntValue < 0n) {
+    bigIntValue += BigInt(2) ** BigInt(128);
+  }
+  return `0x${bigIntValue.toString(16).padStart(32, '0')}`;
+}
+
 function getHex(value: BigNumberish): string {
   try {
-    return toHex(value);
+    return formatBigIntAsHex(BigInt(value));
   } catch (e) {
     if (isString(value)) {
-      return toHex(encodeShortString(value));
+      return formatBigIntAsHex(BigInt(encodeShortString(value)));
     }
     throw new Error(`Invalid BigNumberish: ${value}`);
   }
