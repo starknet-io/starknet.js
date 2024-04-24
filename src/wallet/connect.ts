@@ -8,6 +8,8 @@ import {
   type ChainId,
   type StarknetWindowObject,
   type TypedData,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  type SPEC,
 } from 'starknet-types-07';
 
 /**
