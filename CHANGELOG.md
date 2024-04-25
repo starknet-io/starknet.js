@@ -1,3 +1,17 @@
+# [6.8.0](https://github.com/starknet-io/starknet.js/compare/v6.7.0...v6.8.0) (2024-04-23)
+
+### Bug Fixes
+
+- starknet types 0.7 ([#1087](https://github.com/starknet-io/starknet.js/issues/1087)) ([b038c76](https://github.com/starknet-io/starknet.js/commit/b038c76fe204746f1d1023c2ad3b46c022f6edbd))
+- tslib ([#1068](https://github.com/starknet-io/starknet.js/issues/1068)) ([dd7dc10](https://github.com/starknet-io/starknet.js/commit/dd7dc10c57fc3cc35298c0d584a178666e9cfed1))
+- **utils:** fix block identifier ([#1076](https://github.com/starknet-io/starknet.js/issues/1076)) ([0a3499d](https://github.com/starknet-io/starknet.js/commit/0a3499d49751061ceae1a4d6023b34f402376efc))
+
+### Features
+
+- add getGasPrice rpc provider method ([#1056](https://github.com/starknet-io/starknet.js/issues/1056)) ([d396275](https://github.com/starknet-io/starknet.js/commit/d396275348aff9c932d2bb7466b2a55f96214e4e))
+- Export function parseCalldataField() ([4d59658](https://github.com/starknet-io/starknet.js/commit/4d596582023f24522c25a1a515ee0246d2eca90a))
+- rpc 0.7.1 ([#1071](https://github.com/starknet-io/starknet.js/issues/1071)) ([11dc600](https://github.com/starknet-io/starknet.js/commit/11dc6003c74b6b6d0408b3f5894b5b6739d4bfba))
+
 # [6.7.0](https://github.com/starknet-io/starknet.js/compare/v6.6.6...v6.7.0) (2024-04-03)
 
 ### Features
