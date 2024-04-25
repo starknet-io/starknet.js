@@ -1,0 +1,698 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>rpc_0_7.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">src/channel/rpc_0_7.ts</td><td class="">94.36%</td><td class="">80%</td><td class="">1258</td><td class="">1187</td><td class="">71</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">import { NetworkName, StarknetChainId } from &#x27;../constants&#x27;;
+import { LibraryError } from &#x27;../provider/errors&#x27;;
+import {
+  AccountInvocationItem,
+  AccountInvocations,
+  BigNumberish,
+  BlockIdentifier,
+  BlockTag,
+  Call,
+  DeclareContractTransaction,
+  DeployAccountContractTransaction,
+  Invocation,
+  InvocationsDetailsWithNonce,
+  RpcProviderOptions,
+  TransactionType,
+  getEstimateFeeBulkOptions,
+  getSimulateTransactionOptions,
+  waitForTransactionOptions,
+} from &#x27;../types&#x27;;
+import { JRPC, RPCSPEC07 as RPC } from &#x27;../types/api&#x27;;
+import { CallData } from &#x27;../utils/calldata&#x27;;
+import { isSierra } from &#x27;../utils/contract&#x27;;
+import { validateAndParseEthAddress } from &#x27;../utils/eth&#x27;;
+import fetch from &#x27;../utils/fetchPonyfill&#x27;;
+import { getSelector, getSelectorFromName } from &#x27;../utils/hash&#x27;;
+import { stringify } from &#x27;../utils/json&#x27;;
+import { getHexStringArray, toHex, toStorageKey } from &#x27;../utils/num&#x27;;
+import { Block, getDefaultNodeUrl, isV3Tx, isVersion, wait } from &#x27;../utils/provider&#x27;;
+import { decompressProgram, signatureToHexArray } from &#x27;../utils/stark&#x27;;
+import { getVersionsByType } from &#x27;../utils/transaction&#x27;;
+
+const defaultOptions = {
+  headers: { &#x27;Content-Type&#x27;: &#x27;application/json&#x27; },
+  blockIdentifier: BlockTag.pending,
+  retries: 200,
+};
+
+export class RpcChannel {
+  public nodeUrl: string;
+
+  public headers: object;
+
+  readonly retries: number;
+
+  public requestId: number;
+
+  readonly blockIdentifier: BlockIdentifier;
+
+  private chainId?: StarknetChainId;
+
+  private specVersion?: string;
+
+  readonly waitMode: Boolean; // behave like web2 rpc and return when tx is processed
+
+  constructor(optionsOrProvider?: RpcProviderOptions) {
+    const { nodeUrl, retries, headers, blockIdentifier, chainId, specVersion, waitMode } =
+      optionsOrProvider || {};
+    if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
+      this.nodeUrl = getDefaultNodeUrl(nodeUrl as NetworkName, optionsOrProvider?.default);
+    } else if (nodeUrl) {
+      this.nodeUrl = nodeUrl;
+    } else {
+      this.nodeUrl = getDefaultNodeUrl(undefined, optionsOrProvider?.default);
+    }
+    this.retries = retries || defaultOptions.retries;
+    this.headers = { ...defaultOptions.headers, ...headers };
+    this.blockIdentifier = blockIdentifier || defaultOptions.blockIdentifier;
+    this.chainId = chainId;
+    this.specVersion = specVersion;
+    this.waitMode = waitMode || false;
+    this.requestId = 0;
+  }
+
+  public setChainId(chainId: StarknetChainId) {
+    this.chainId = chainId;
+  }
+
+  public fetch(method: string, params?: object, id: string | number = 0) {
+    const rpcRequestBody: JRPC.RequestBody = {
+      id,
+      jsonrpc: &#x27;2.0&#x27;,
+      method,
+      ...(params &amp;&amp; { params }),
+    };
+    return fetch(this.nodeUrl, {
+      method: &#x27;POST&#x27;,
+      body: stringify(rpcRequestBody),
+      headers: this.headers as Record&lt;string, string&gt;,
+    });
+  }
+
+  protected errorHandler(method: string, params: any, rpcError?: JRPC.Error, otherError?: any) {
+    if (rpcError) {
+      const { code, message, data } = rpcError;
+      throw new LibraryError(
+        `RPC: ${method} with params ${stringify(params, null, 2)}\n 
+        ${code}: ${message}: ${stringify(data)}`
+      );
+    }
+    if (otherError instanceof LibraryError) {
+      throw otherError;
+    }
+    if (otherError) {
+      throw Error(otherError.message);
+    }
+  }
+
+  protected async fetchEndpoint&lt;T extends keyof RPC.Methods&gt;(
+    method: T,
+    params?: RPC.Methods[T][&#x27;params&#x27;]
+  ): Promise&lt;RPC.Methods[T][&#x27;result&#x27;]&gt; {
+    try {
+      const rawResult = await this.fetch(method, params, (this.requestId += 1));
+      const { error, result } = await rawResult.json();
+      this.errorHandler(method, params, error);
+      return result as RPC.Methods[T][&#x27;result&#x27;];
+    } catch (error: any) {
+      this.errorHandler(method, params, error?.response?.data, error);
+      throw error;
+    }
+  }
+
+  public async getChainId() {
+    this.chainId ??= (await this.fetchEndpoint(&#x27;starknet_chainId&#x27;)) as StarknetChainId;
+    return this.chainId;
+  }
+
+  public async getSpecVersion() {
+    this.specVersion ??= (await this.fetchEndpoint(&#x27;starknet_specVersion&#x27;)) as StarknetChainId;
+    return this.specVersion;
+  }
+
+  public getNonceForAddress(
+    contractAddress: BigNumberish,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ) {
+    const contract_address = toHex(contractAddress);
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint(&#x27;starknet_getNonce&#x27;, {
+      contract_address,
+      block_id,
+    });
+  }
+
+  /**
+   * Get the most recent accepted block hash and number
+   */
+  public getBlockLatestAccepted() {
+    return this.fetchEndpoint(&#x27;starknet_blockHashAndNumber&#x27;);
+  }
+
+  /**
+   * Get the most recent accepted block number
+   * redundant use getBlockLatestAccepted();
+   * @returns Number of the latest block
+   */
+  public getBlockNumber() {
+    return this.fetchEndpoint(&#x27;starknet_blockNumber&#x27;);
+  }
+
+  public getBlockWithTxHashes(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint(&#x27;starknet_getBlockWithTxHashes&#x27;, { block_id });
+  }
+
+  public getBlockWithTxs(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint(&#x27;starknet_getBlockWithTxs&#x27;, { block_id });
+  }
+
+  public getBlockWithReceipts(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint(&#x27;starknet_getBlockWithReceipts&#x27;, { block_id });
+  }
+
+  public getBlockStateUpdate(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint(&#x27;starknet_getStateUpdate&#x27;, { block_id });
+  }
+
+  public getBlockTransactionsTraces(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint(&#x27;starknet_traceBlockTransactions&#x27;, { block_id });
+  }
+
+  public getBlockTransactionCount(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint(&#x27;starknet_getBlockTransactionCount&#x27;, { block_id });
+  }
+
+  public getTransactionByHash(txHash: BigNumberish) {
+    const transaction_hash = toHex(txHash);
+    return this.fetchEndpoint(&#x27;starknet_getTransactionByHash&#x27;, {
+      transaction_hash,
+    });
+  }
+
+  public getTransactionByBlockIdAndIndex(blockIdentifier: BlockIdentifier, index: number) {
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint(&#x27;starknet_getTransactionByBlockIdAndIndex&#x27;, { block_id, index });
+  }
+
+  public getTransactionReceipt(txHash: BigNumberish) {
+    const transaction_hash = toHex(txHash);
+    return this.fetchEndpoint(&#x27;starknet_getTransactionReceipt&#x27;, { transaction_hash });
+  }
+
+  public getTransactionTrace(txHash: BigNumberish) {
+    const transaction_hash = toHex(txHash);
+    return this.fetchEndpoint(&#x27;starknet_traceTransaction&#x27;, { transaction_hash });
+  }
+
+  /**
+   * Get the status of a transaction
+   */
+  public getTransactionStatus(transactionHash: BigNumberish) {
+    const transaction_hash = toHex(transactionHash);
+    return this.fetchEndpoint(&#x27;starknet_getTransactionStatus&#x27;, { transaction_hash });
+  }
+
+  /**
+   * @param invocations AccountInvocations
+   * @param simulateTransactionOptions blockIdentifier and flags to skip validation and fee charge&lt;br/&gt;
+   * - blockIdentifier&lt;br/&gt;
+   * - skipValidate (default false)&lt;br/&gt;
+   * - skipFeeCharge (default true)&lt;br/&gt;
+   */
+  public simulateTransaction(
+    invocations: AccountInvocations,
+    {
+      blockIdentifier = this.blockIdentifier,
+      skipValidate = true,
+      skipFeeCharge = true,
+    }: getSimulateTransactionOptions = {}
+  ) {
+    const block_id = new Block(blockIdentifier).identifier;
+    const simulationFlags: RPC.ESimulationFlag[] = [];
+    if (skipValidate) simulationFlags.push(RPC.ESimulationFlag.SKIP_VALIDATE);
+    if (skipFeeCharge) simulationFlags.push(RPC.ESimulationFlag.SKIP_FEE_CHARGE);
+
+    return this.fetchEndpoint(&#x27;starknet_simulateTransactions&#x27;, {
+      block_id,
+      transactions: invocations.map((it) =&gt; this.buildTransaction(it)),
+      simulation_flags: simulationFlags,
+    });
+  }
+
+  public async waitForTransaction(txHash: BigNumberish, options?: waitForTransactionOptions) {
+    const transactionHash = toHex(txHash);
+    let { retries } = this;
+    let onchain = false;
+    let isErrorState = false;
+    const retryInterval = options?.retryInterval ?? 5000;
+    const errorStates: any = options?.errorStates ?? [
+      RPC.ETransactionStatus.REJECTED,
+      // TODO: commented out to preserve the long-standing behavior of &quot;reverted&quot; not being treated as an error by default
+      // should decide which behavior to keep in the future
+      // RPC.ETransactionExecutionStatus.REVERTED,
+    ];
+    const successStates: any = options?.successStates ?? [
+      RPC.ETransactionExecutionStatus.SUCCEEDED,
+      RPC.ETransactionStatus.ACCEPTED_ON_L2,
+      RPC.ETransactionStatus.ACCEPTED_ON_L1,
+    ];
+
+    let txStatus: RPC.TransactionStatus;
+    while (!onchain) {
+      // eslint-disable-next-line no-await-in-loop
+      await wait(retryInterval);
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        txStatus = await this.getTransactionStatus(transactionHash);
+
+        const executionStatus = txStatus.execution_status;
+        const finalityStatus = txStatus.finality_status;
+
+        if (!finalityStatus) {
+          // Transaction is potentially NOT_RECEIVED or RPC not Synced yet
+          // so we will retry &#x27;{ retries }&#x27; times
+          const error = new Error(&#x27;waiting for transaction status&#x27;);
+          throw error;
+        }
+
+        if (errorStates.includes(executionStatus) || errorStates.includes(finalityStatus)) {
+          const message = `${executionStatus}: ${finalityStatus}`;
+          const error = new Error(message) as Error &amp; { response: RPC.TransactionStatus };
+          error.response = txStatus;
+          isErrorState = true;
+          throw error;
+        } else if (
+          successStates.includes(executionStatus) ||
+          successStates.includes(finalityStatus)
+        ) {
+          onchain = true;
+        }
+      } catch (error) {
+        if (error instanceof Error &amp;&amp; isErrorState) {
+          throw error;
+        }
+
+        if (retries &lt;= 0) {
+          throw new Error(`waitForTransaction timed-out with retries ${this.retries}`);
+        }
+      }
+
+      retries -= 1;
+    }
+
+    /**
+     * For some nodes even though the transaction has executionStatus SUCCEEDED finalityStatus ACCEPTED_ON_L2, getTransactionReceipt returns &quot;Transaction hash not found&quot;
+     * Retry until rpc is actually ready to work with txHash
+     */
+    let txReceipt = null;
+    while (txReceipt === null) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        txReceipt = await this.getTransactionReceipt(transactionHash);
+      } catch (error) {
+        if (retries &lt;= 0) {
+          throw new Error(`waitForTransaction timed-out with retries ${this.retries}`);
+        }
+      }
+      retries -= 1;
+      // eslint-disable-next-line no-await-in-loop
+      await wait(retryInterval);
+    }
+    return txReceipt as RPC.SPEC.TXN_RECEIPT;
+  }
+
+  public getStorageAt(
+    contractAddress: BigNumberish,
+    key: BigNumberish,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ) {
+    const contract_address = toHex(contractAddress);
+    const parsedKey = toStorageKey(key);
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint(&#x27;starknet_getStorageAt&#x27;, {
+      contract_address,
+      key: parsedKey,
+      block_id,
+    });
+  }
+
+  public getClassHashAt(
+    contractAddress: BigNumberish,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ) {
+    const contract_address = toHex(contractAddress);
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint(&#x27;starknet_getClassHashAt&#x27;, {
+      block_id,
+      contract_address,
+    });
+  }
+
+  public getClass(
+    classHash: BigNumberish,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ) {
+    const class_hash = toHex(classHash);
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint(&#x27;starknet_getClass&#x27;, {
+      class_hash,
+      block_id,
+    });
+  }
+
+  public getClassAt(
+    contractAddress: BigNumberish,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ) {
+    const contract_address = toHex(contractAddress);
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint(&#x27;starknet_getClassAt&#x27;, {
+      block_id,
+      contract_address,
+    });
+  }
+
+  public async getEstimateFee(
+    invocations: AccountInvocations,
+    { blockIdentifier = this.blockIdentifier, skipValidate = true }: getEstimateFeeBulkOptions
+  ) {
+    const block_id = new Block(blockIdentifier).identifier;
+    let flags = {};
+    if (!isVersion(&#x27;0.5&#x27;, await this.getSpecVersion())) {
+      flags = {
+        simulation_flags: skipValidate ? [RPC.ESimulationFlag.SKIP_VALIDATE] : [],
+      };
+    } // else v(0.5) no flags
+
+    return this.fetchEndpoint(&#x27;starknet_estimateFee&#x27;, {
+      request: invocations.map((it) =&gt; this.buildTransaction(it, &#x27;fee&#x27;)),
+      block_id,
+      ...flags,
+    });
+  }
+
+  public async invoke(functionInvocation: Invocation, details: InvocationsDetailsWithNonce) {
+    let promise;
+    if (!isV3Tx(details)) {
+      // V1
+      promise = this.fetchEndpoint(&#x27;starknet_addInvokeTransaction&#x27;, {
+        invoke_transaction: {
+          sender_address: functionInvocation.contractAddress,
+          calldata: CallData.toHex(functionInvocation.calldata),
+          type: RPC.ETransactionType.INVOKE,
+          max_fee: toHex(details.maxFee || 0),
+          version: RPC.ETransactionVersion.V1,
+          signature: signatureToHexArray(functionInvocation.signature),
+          nonce: toHex(details.nonce),
+        },
+      });
+    } else {
+      // V3
+      promise = this.fetchEndpoint(&#x27;starknet_addInvokeTransaction&#x27;, {
+        invoke_transaction: {
+          type: RPC.ETransactionType.INVOKE,
+          sender_address: functionInvocation.contractAddress,
+          calldata: CallData.toHex(functionInvocation.calldata),
+          version: RPC.ETransactionVersion.V3,
+          signature: signatureToHexArray(functionInvocation.signature),
+          nonce: toHex(details.nonce),
+          resource_bounds: details.resourceBounds,
+          tip: toHex(details.tip),
+          paymaster_data: details.paymasterData.map((it) =&gt; toHex(it)),
+          account_deployment_data: details.accountDeploymentData.map((it) =&gt; toHex(it)),
+          nonce_data_availability_mode: details.nonceDataAvailabilityMode,
+          fee_data_availability_mode: details.feeDataAvailabilityMode,
+        },
+      });
+    }
+
+    return this.waitMode ? this.waitForTransaction((await promise).transaction_hash) : promise;
+  }
+
+  public async declare(
+    { contract, signature, senderAddress, compiledClassHash }: DeclareContractTransaction,
+    details: InvocationsDetailsWithNonce
+  ) {
+    let promise;
+    if (!isSierra(contract) &amp;&amp; !isV3Tx(details)) {
+      // V1 Cairo 0
+      promise = this.fetchEndpoint(&#x27;starknet_addDeclareTransaction&#x27;, {
+        declare_transaction: {
+          type: RPC.ETransactionType.DECLARE,
+          contract_class: {
+            program: contract.program,
+            entry_points_by_type: contract.entry_points_by_type,
+            abi: contract.abi,
+          },
+          version: RPC.ETransactionVersion.V1,
+          max_fee: toHex(details.maxFee || 0),
+          signature: signatureToHexArray(signature),
+          sender_address: senderAddress,
+          nonce: toHex(details.nonce),
+        },
+      });
+    } else if (isSierra(contract) &amp;&amp; !isV3Tx(details)) {
+      // V2 Cairo1
+      promise = this.fetchEndpoint(&#x27;starknet_addDeclareTransaction&#x27;, {
+        declare_transaction: {
+          type: RPC.ETransactionType.DECLARE,
+          contract_class: {
+            sierra_program: decompressProgram(contract.sierra_program),
+            contract_class_version: contract.contract_class_version,
+            entry_points_by_type: contract.entry_points_by_type,
+            abi: contract.abi,
+          },
+          compiled_class_hash: compiledClassHash || &#x27;&#x27;,
+          version: RPC.ETransactionVersion.V2,
+          max_fee: toHex(details.maxFee || 0),
+          signature: signatureToHexArray(signature),
+          sender_address: senderAddress,
+          nonce: toHex(details.nonce),
+        },
+      });
+    } else if (isSierra(contract) &amp;&amp; isV3Tx(details)) {
+      // V3 Cairo1
+      promise = this.fetchEndpoint(&#x27;starknet_addDeclareTransaction&#x27;, {
+        declare_transaction: {
+          type: RPC.ETransactionType.DECLARE,
+          sender_address: senderAddress,
+          compiled_class_hash: compiledClassHash || &#x27;&#x27;,
+          version: RPC.ETransactionVersion.V3,
+          signature: signatureToHexArray(signature),
+          nonce: toHex(details.nonce),
+          contract_class: {
+            sierra_program: decompressProgram(contract.sierra_program),
+            contract_class_version: contract.contract_class_version,
+            entry_points_by_type: contract.entry_points_by_type,
+            abi: contract.abi,
+          },
+          resource_bounds: details.resourceBounds,
+          tip: toHex(details.tip),
+          paymaster_data: details.paymasterData.map((it) =&gt; toHex(it)),
+          account_deployment_data: details.accountDeploymentData.map((it) =&gt; toHex(it)),
+          nonce_data_availability_mode: details.nonceDataAvailabilityMode,
+          fee_data_availability_mode: details.feeDataAvailabilityMode,
+        },
+      });
+    } else {
+      throw Error(&#x27;declare unspotted parameters&#x27;);
+    }
+
+    return this.waitMode ? this.waitForTransaction((await promise).transaction_hash) : promise;
+  }
+
+  public async deployAccount(
+    { classHash, constructorCalldata, addressSalt, signature }: DeployAccountContractTransaction,
+    details: InvocationsDetailsWithNonce
+  ) {
+    let promise;
+    if (!isV3Tx(details)) {
+      // v1
+      promise = this.fetchEndpoint(&#x27;starknet_addDeployAccountTransaction&#x27;, {
+        deploy_account_transaction: {
+          constructor_calldata: CallData.toHex(constructorCalldata || []),
+          class_hash: toHex(classHash),
+          contract_address_salt: toHex(addressSalt || 0),
+          type: RPC.ETransactionType.DEPLOY_ACCOUNT,
+          max_fee: toHex(details.maxFee || 0),
+          version: RPC.ETransactionVersion.V1,
+          signature: signatureToHexArray(signature),
+          nonce: toHex(details.nonce),
+        },
+      });
+    } else {
+      // v3
+      promise = this.fetchEndpoint(&#x27;starknet_addDeployAccountTransaction&#x27;, {
+        deploy_account_transaction: {
+          type: RPC.ETransactionType.DEPLOY_ACCOUNT,
+          version: RPC.ETransactionVersion.V3,
+          signature: signatureToHexArray(signature),
+          nonce: toHex(details.nonce),
+          contract_address_salt: toHex(addressSalt || 0),
+          constructor_calldata: CallData.toHex(constructorCalldata || []),
+          class_hash: toHex(classHash),
+          resource_bounds: details.resourceBounds,
+          tip: toHex(details.tip),
+          paymaster_data: details.paymasterData.map((it) =&gt; toHex(it)),
+          nonce_data_availability_mode: details.nonceDataAvailabilityMode,
+          fee_data_availability_mode: details.feeDataAvailabilityMode,
+        },
+      });
+    }
+
+    return this.waitMode ? this.waitForTransaction((await promise).transaction_hash) : promise;
+  }
+
+  public callContract(call: Call, blockIdentifier: BlockIdentifier = this.blockIdentifier) {
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint(&#x27;starknet_call&#x27;, {
+      request: {
+        contract_address: call.contractAddress,
+        entry_point_selector: getSelectorFromName(call.entrypoint),
+        calldata: CallData.toHex(call.calldata),
+      },
+      block_id,
+    });
+  }
+
+  /**
+   * NEW: Estimate the fee for a message from L1
+   * @param message Message From L1
+   */
+  public estimateMessageFee(
+    message: RPC.L1Message,
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
+  ) {
+    const { from_address, to_address, entry_point_selector, payload } = message;
+    const formattedMessage = {
+      from_address: validateAndParseEthAddress(from_address),
+      to_address: toHex(to_address),
+      entry_point_selector: getSelector(entry_point_selector),
+      payload: getHexStringArray(payload),
+    };
+
+    const block_id = new Block(blockIdentifier).identifier;
+    return this.fetchEndpoint(&#x27;starknet_estimateMessageFee&#x27;, {
+      message: formattedMessage,
+      block_id,
+    });
+  }
+
+  /**
+   * Returns an object about the sync status, or false if the node is not synching
+   * @returns Object with the stats data
+   */
+  public getSyncingStats() {
+    return this.fetchEndpoint(&#x27;starknet_syncing&#x27;);
+  }
+
+  /**
+   * Returns all events matching the given filter
+   * @returns events and the pagination of the events
+   */
+  public getEvents(eventFilter: RPC.EventFilter) {
+    return this.fetchEndpoint(&#x27;starknet_getEvents&#x27;, { filter: eventFilter });
+  }
+
+  public buildTransaction(
+    invocation: AccountInvocationItem,
+    versionType?: &#x27;fee&#x27; | &#x27;transaction&#x27;
+  ): RPC.BaseTransaction {
+    const defaultVersions = getVersionsByType(versionType);
+    let details;
+
+    if (!isV3Tx(invocation)) {
+      // V0,V1,V2
+      details = {
+        signature: signatureToHexArray(invocation.signature),
+        nonce: toHex(invocation.nonce),
+        max_fee: toHex(invocation.maxFee || 0),
+      };
+    } else {
+      // V3
+      details = {
+        signature: signatureToHexArray(invocation.signature),
+        nonce: toHex(invocation.nonce),
+        resource_bounds: invocation.resourceBounds,
+        tip: toHex(invocation.tip),
+        paymaster_data: invocation.paymasterData.map((it) =&gt; toHex(it)),
+        nonce_data_availability_mode: invocation.nonceDataAvailabilityMode,
+        fee_data_availability_mode: invocation.feeDataAvailabilityMode,
+        account_deployment_data: invocation.accountDeploymentData.map((it) =&gt; toHex(it)),
+      };
+    }
+
+    if (invocation.type === TransactionType.INVOKE) {
+      return {
+        // v0 v1 v3
+        type: RPC.ETransactionType.INVOKE,
+        sender_address: invocation.contractAddress,
+        calldata: CallData.toHex(invocation.calldata),
+        version: toHex(invocation.version || defaultVersions.v3),
+        ...details,
+      } as RPC.SPEC.BROADCASTED_INVOKE_TXN;
+    }
+    if (invocation.type === TransactionType.DECLARE) {
+      if (!isSierra(invocation.contract)) {
+        // Cairo 0 - v1
+        return {
+          type: invocation.type,
+          contract_class: invocation.contract,
+          sender_address: invocation.senderAddress,
+          version: toHex(invocation.version || defaultVersions.v1),
+          ...details,
+        } as RPC.SPEC.BROADCASTED_DECLARE_TXN_V1;
+      }
+      return {
+        // Cairo 1 - v2 v3
+        type: invocation.type,
+        contract_class: {
+          ...invocation.contract,
+          sierra_program: decompressProgram(invocation.contract.sierra_program),
+        },
+        compiled_class_hash: invocation.compiledClassHash || &#x27;&#x27;,
+        sender_address: invocation.senderAddress,
+        version: toHex(invocation.version || defaultVersions.v3),
+        ...details,
+      } as RPC.SPEC.BROADCASTED_DECLARE_TXN;
+    }
+    if (invocation.type === TransactionType.DEPLOY_ACCOUNT) {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { account_deployment_data, ...restDetails } = details;
+      // v1 v3
+      return {
+        type: invocation.type,
+        constructor_calldata: CallData.toHex(invocation.constructorCalldata || []),
+        class_hash: toHex(invocation.classHash),
+        contract_address_salt: toHex(invocation.addressSalt || 0),
+        version: toHex(invocation.version || defaultVersions.v3) as RPC.SPEC.INVOKE_TXN[&#x27;version&#x27;],
+        ...restDetails,
+      } as RPC.SPEC.BROADCASTED_DEPLOY_ACCOUNT_TXN;
+    }
+    throw Error(&#x27;RPC buildTransaction received unknown TransactionType&#x27;);
+  }
+}
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:41,&quot;text&quot;:&quot;params&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:91,&quot;character&quot;:77,&quot;text&quot;:&quot;otherError&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:99,&quot;character&quot;:8,&quot;text&quot;:&quot;otherError&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:102,&quot;character&quot;:8,&quot;text&quot;:&quot;otherError&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:103,&quot;character&quot;:18,&quot;text&quot;:&quot;otherError&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:103,&quot;character&quot;:29,&quot;text&quot;:&quot;message&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:14,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:113,&quot;character&quot;:21,&quot;text&quot;:&quot;result&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:40,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:47,&quot;text&quot;:&quot;response&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:57,&quot;text&quot;:&quot;data&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:117,&quot;character&quot;:63,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:118,&quot;character&quot;:12,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:116,&quot;character&quot;:13,&quot;text&quot;:&quot;error&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:137,&quot;character&quot;:10,&quot;text&quot;:&quot;block_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:137,&quot;character&quot;:48,&quot;text&quot;:&quot;identifier&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:10,&quot;text&quot;:&quot;block_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:161,&quot;character&quot;:48,&quot;text&quot;:&quot;identifier&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:10,&quot;text&quot;:&quot;block_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:48,&quot;text&quot;:&quot;identifier&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:10,&quot;text&quot;:&quot;block_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:171,&quot;character&quot;:48,&quot;text&quot;:&quot;identifier&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:10,&quot;text&quot;:&quot;block_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:48,&quot;text&quot;:&quot;identifier&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:10,&quot;text&quot;:&quot;block_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:48,&quot;text&quot;:&quot;identifier&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:186,&quot;character&quot;:10,&quot;text&quot;:&quot;block_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:186,&quot;character&quot;:48,&quot;text&quot;:&quot;identifier&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:198,&quot;character&quot;:10,&quot;text&quot;:&quot;block_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:198,&quot;character&quot;:48,&quot;text&quot;:&quot;identifier&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:235,&quot;character&quot;:10,&quot;text&quot;:&quot;block_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:235,&quot;character&quot;:48,&quot;text&quot;:&quot;identifier&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:253,&quot;character&quot;:10,&quot;text&quot;:&quot;errorStates&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:10,&quot;text&quot;:&quot;successStates&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:283,&quot;character&quot;:12,&quot;text&quot;:&quot;errorStates&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:283,&quot;character&quot;:24,&quot;text&quot;:&quot;includes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:283,&quot;character&quot;:53,&quot;text&quot;:&quot;errorStates&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:283,&quot;character&quot;:65,&quot;text&quot;:&quot;includes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:290,&quot;character&quot;:10,&quot;text&quot;:&quot;successStates&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:290,&quot;character&quot;:24,&quot;text&quot;:&quot;includes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:291,&quot;character&quot;:10,&quot;text&quot;:&quot;successStates&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:291,&quot;character&quot;:24,&quot;text&quot;:&quot;includes&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:312,&quot;character&quot;:8,&quot;text&quot;:&quot;txReceipt&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:316,&quot;character&quot;:8,&quot;text&quot;:&quot;txReceipt&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:336,&quot;character&quot;:10,&quot;text&quot;:&quot;block_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:336,&quot;character&quot;:48,&quot;text&quot;:&quot;identifier&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:349,&quot;character&quot;:10,&quot;text&quot;:&quot;block_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:349,&quot;character&quot;:48,&quot;text&quot;:&quot;identifier&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:361,&quot;character&quot;:10,&quot;text&quot;:&quot;block_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:361,&quot;character&quot;:48,&quot;text&quot;:&quot;identifier&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:373,&quot;character&quot;:10,&quot;text&quot;:&quot;block_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:373,&quot;character&quot;:48,&quot;text&quot;:&quot;identifier&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:384,&quot;character&quot;:10,&quot;text&quot;:&quot;block_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:384,&quot;character&quot;:48,&quot;text&quot;:&quot;identifier&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:400,&quot;character&quot;:8,&quot;text&quot;:&quot;promise&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:403,&quot;character&quot;:6,&quot;text&quot;:&quot;promise&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:416,&quot;character&quot;:6,&quot;text&quot;:&quot;promise&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:441,&quot;character&quot;:8,&quot;text&quot;:&quot;promise&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:444,&quot;character&quot;:6,&quot;text&quot;:&quot;promise&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:461,&quot;character&quot;:6,&quot;text&quot;:&quot;promise&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:480,&quot;character&quot;:6,&quot;text&quot;:&quot;promise&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:513,&quot;character&quot;:8,&quot;text&quot;:&quot;promise&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:516,&quot;character&quot;:6,&quot;text&quot;:&quot;promise&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:530,&quot;character&quot;:6,&quot;text&quot;:&quot;promise&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:552,&quot;character&quot;:10,&quot;text&quot;:&quot;block_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:552,&quot;character&quot;:48,&quot;text&quot;:&quot;identifier&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:579,&quot;character&quot;:10,&quot;text&quot;:&quot;block_id&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:579,&quot;character&quot;:48,&quot;text&quot;:&quot;identifier&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:607,&quot;character&quot;:8,&quot;text&quot;:&quot;details&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:611,&quot;character&quot;:6,&quot;text&quot;:&quot;details&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/channel/rpc_0_7.ts&quot;,&quot;line&quot;:618,&quot;character&quot;:6,&quot;text&quot;:&quot;details&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 25 Apr 2024 15:57:37 GMT</p>
+    </body>
+  </html>
+  

@@ -32,6 +32,6 @@ export function ethRandomPrivateKey(): string {
 export function validateAndParseEthAddress(address: BigNumberish): string {
   assertInRange(address, ZERO, 2n ** 160n - 1n, 'Ethereum Address ');
   const result = addHexPrefix(removeHexPrefix(toHex(address)).padStart(40, '0'));
-  assert(result.match(/^(0x)?[0-9a-f]{40}$/), 'Invalid Ethereum Address Format');
+  assert(Boolean(result.match(/^(0x)?[0-9a-f]{40}$/)), 'Invalid Ethereum Address Format');
   return result;
 }

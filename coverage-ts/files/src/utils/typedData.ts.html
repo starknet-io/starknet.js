@@ -1,0 +1,458 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>typedData.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">src/utils/typedData.ts</td><td class="">99.86%</td><td class="">80%</td><td class="">702</td><td class="">701</td><td class="">1</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">/* eslint-disable no-param-reassign */
+import { PRIME, RANGE_FELT, RANGE_I128, RANGE_U128 } from &#x27;../constants&#x27;;
+import {
+  BigNumberish,
+  TypedDataRevision as Revision,
+  StarknetEnumType,
+  StarknetMerkleType,
+  StarknetType,
+  TypedData,
+} from &#x27;../types&#x27;;
+import assert from &#x27;./assert&#x27;;
+import { byteArrayFromString } from &#x27;./calldata/byteArray&#x27;;
+import {
+  computePedersenHash,
+  computePedersenHashOnElements,
+  computePoseidonHash,
+  computePoseidonHashOnElements,
+  getSelectorFromName,
+} from &#x27;./hash&#x27;;
+import { MerkleTree } from &#x27;./merkle&#x27;;
+import { isHex, toHex } from &#x27;./num&#x27;;
+import { encodeShortString, isString } from &#x27;./shortString&#x27;;
+
+/** @deprecated prefer importing from &#x27;types&#x27; over &#x27;typedData&#x27; */
+export * from &#x27;../types/typedData&#x27;;
+
+interface Context {
+  parent?: string;
+  key?: string;
+}
+
+interface Configuration {
+  domain: string;
+  hashMethod: (data: BigNumberish[]) =&gt; string;
+  hashMerkleMethod: (a: BigNumberish, b: BigNumberish) =&gt; string;
+  escapeTypeString: (s: string) =&gt; string;
+  presetTypes: TypedData[&#x27;types&#x27;];
+}
+
+const presetTypes: TypedData[&#x27;types&#x27;] = {
+  u256: JSON.parse(&#x27;[{ &quot;name&quot;: &quot;low&quot;, &quot;type&quot;: &quot;u128&quot; }, { &quot;name&quot;: &quot;high&quot;, &quot;type&quot;: &quot;u128&quot; }]&#x27;),
+  TokenAmount: JSON.parse(
+    &#x27;[{ &quot;name&quot;: &quot;token_address&quot;, &quot;type&quot;: &quot;ContractAddress&quot; }, { &quot;name&quot;: &quot;amount&quot;, &quot;type&quot;: &quot;u256&quot; }]&#x27;
+  ),
+  NftId: JSON.parse(
+    &#x27;[{ &quot;name&quot;: &quot;collection_address&quot;, &quot;type&quot;: &quot;ContractAddress&quot; }, { &quot;name&quot;: &quot;token_id&quot;, &quot;type&quot;: &quot;u256&quot; }]&#x27;
+  ),
+};
+
+const revisionConfiguration: Record&lt;Revision, Configuration&gt; = {
+  [Revision.Active]: {
+    domain: &#x27;StarknetDomain&#x27;,
+    hashMethod: computePoseidonHashOnElements,
+    hashMerkleMethod: computePoseidonHash,
+    escapeTypeString: (s) =&gt; `&quot;${s}&quot;`,
+    presetTypes,
+  },
+  [Revision.Legacy]: {
+    domain: &#x27;StarkNetDomain&#x27;,
+    hashMethod: computePedersenHashOnElements,
+    hashMerkleMethod: computePedersenHash,
+    escapeTypeString: (s) =&gt; s,
+    presetTypes: {},
+  },
+};
+
+function assertRange(data: unknown, type: string, { min, max }: { min: bigint; max: bigint }) {
+  const value = BigInt(data as string);
+  assert(value &gt;= min &amp;&amp; value &lt;= max, `${value} (${type}) is out of bounds [${min}, ${max}]`);
+}
+
+function identifyRevision({ types, domain }: TypedData) {
+  if (revisionConfiguration[Revision.Active].domain in types &amp;&amp; domain.revision === Revision.Active)
+    return Revision.Active;
+
+  if (
+    revisionConfiguration[Revision.Legacy].domain in types &amp;&amp;
+    (domain.revision ?? Revision.Legacy) === Revision.Legacy
+  )
+    return Revision.Legacy;
+
+  return undefined;
+}
+
+function getHex(value: BigNumberish): string {
+  try {
+    return toHex(value);
+  } catch (e) {
+    if (isString(value)) {
+      return toHex(encodeShortString(value));
+    }
+    throw new Error(`Invalid BigNumberish: ${value}`);
+  }
+}
+
+/**
+ * Validates that `data` matches the EIP-712 JSON schema.
+ */
+function validateTypedData(data: unknown): data is TypedData {
+  const typedData = data as TypedData;
+  return Boolean(
+    typedData.message &amp;&amp; typedData.primaryType &amp;&amp; typedData.types &amp;&amp; identifyRevision(typedData)
+  );
+}
+
+/**
+ * Prepares the selector for use.
+ *
+ * @param {string} selector - The selector to be prepared.
+ * @returns {string} The prepared selector.
+ */
+export function prepareSelector(selector: string): string {
+  return isHex(selector) ? selector : getSelectorFromName(selector);
+}
+
+/**
+ * Checks if the given Starknet type is a Merkle tree type.
+ *
+ * @param {StarknetType} type - The StarkNet type to check.
+ *
+ * @returns {boolean} - True if the type is a Merkle tree type, false otherwise.
+ */
+export function isMerkleTreeType(type: StarknetType): type is StarknetMerkleType {
+  return type.type === &#x27;merkletree&#x27;;
+}
+
+/**
+ * Get the dependencies of a struct type. If a struct has the same dependency multiple times, it&#x27;s only included once
+ * in the resulting array.
+ */
+export function getDependencies(
+  types: TypedData[&#x27;types&#x27;],
+  type: string,
+  dependencies: string[] = [],
+  contains: string = &#x27;&#x27;,
+  revision: Revision = Revision.Legacy
+): string[] {
+  // Include pointers (struct arrays)
+  if (type[type.length - 1] === &#x27;*&#x27;) {
+    type = type.slice(0, -1);
+  } else if (revision === Revision.Active) {
+    // enum base
+    if (type === &#x27;enum&#x27;) {
+      type = contains;
+    }
+    // enum element types
+    else if (type.match(/^\(.*\)$/)) {
+      type = type.slice(1, -1);
+    }
+  }
+
+  if (dependencies.includes(type) || !types[type]) {
+    return dependencies;
+  }
+
+  return [
+    type,
+    ...(types[type] as StarknetEnumType[]).reduce&lt;string[]&gt;(
+      (previous, t) =&gt; [
+        ...previous,
+        ...getDependencies(types, t.type, previous, t.contains, revision).filter(
+          (dependency) =&gt; !previous.includes(dependency)
+        ),
+      ],
+      []
+    ),
+  ];
+}
+
+function getMerkleTreeType(types: TypedData[&#x27;types&#x27;], ctx: Context) {
+  if (ctx.parent &amp;&amp; ctx.key) {
+    const parentType = types[ctx.parent];
+    const merkleType = parentType.find((t) =&gt; t.name === ctx.key)!;
+    const isMerkleTree = isMerkleTreeType(merkleType);
+    if (!isMerkleTree) {
+      throw new Error(`${ctx.key} is not a merkle tree`);
+    }
+    if (merkleType.contains.endsWith(&#x27;*&#x27;)) {
+      throw new Error(`Merkle tree contain property must not be an array but was given ${ctx.key}`);
+    }
+    return merkleType.contains;
+  }
+  return &#x27;raw&#x27;;
+}
+
+/**
+ * Encode a type to a string. All dependent types are alphabetically sorted.
+ */
+export function encodeType(
+  types: TypedData[&#x27;types&#x27;],
+  type: string,
+  revision: Revision = Revision.Legacy
+): string {
+  const allTypes =
+    revision === Revision.Active
+      ? { ...types, ...revisionConfiguration[revision].presetTypes }
+      : types;
+  const [primary, ...dependencies] = getDependencies(
+    allTypes,
+    type,
+    undefined,
+    undefined,
+    revision
+  );
+  const newTypes = !primary ? [] : [primary, ...dependencies.sort()];
+
+  const esc = revisionConfiguration[revision].escapeTypeString;
+
+  return newTypes
+    .map((dependency) =&gt; {
+      const dependencyElements = allTypes[dependency].map((t) =&gt; {
+        const targetType =
+          t.type === &#x27;enum&#x27; &amp;&amp; revision === Revision.Active
+            ? (t as StarknetEnumType).contains
+            : t.type;
+        // parentheses handling for enum variant types
+        const typeString = targetType.match(/^\(.*\)$/)
+          ? `(${targetType
+              .slice(1, -1)
+              .split(&#x27;,&#x27;)
+              .map((e) =&gt; (e ? esc(e) : e))
+              .join(&#x27;,&#x27;)})`
+          : esc(targetType);
+        return `${esc(t.name)}:${typeString}`;
+      });
+      return `${esc(dependency)}(${dependencyElements})`;
+    })
+    .join(&#x27;&#x27;);
+}
+
+/**
+ * Get a type string as hash.
+ */
+export function getTypeHash(
+  types: TypedData[&#x27;types&#x27;],
+  type: string,
+  revision: Revision = Revision.Legacy
+): string {
+  return getSelectorFromName(encodeType(types, type, revision));
+}
+
+/**
+ * Encodes a single value to an ABI serialisable string, number or Buffer. Returns the data as tuple, which consists of
+ * an array of ABI compatible types, and an array of corresponding values.
+ */
+export function encodeValue(
+  types: TypedData[&#x27;types&#x27;],
+  type: string,
+  data: unknown,
+  ctx: Context = {},
+  revision: Revision = Revision.Legacy
+): [string, string] {
+  if (types[type]) {
+    return [type, getStructHash(types, type, data as TypedData[&#x27;message&#x27;], revision)];
+  }
+
+  if (revisionConfiguration[revision].presetTypes[type]) {
+    return [
+      type,
+      getStructHash(
+        revisionConfiguration[revision].presetTypes,
+        type,
+        data as TypedData[&#x27;message&#x27;],
+        revision
+      ),
+    ];
+  }
+
+  if (type.endsWith(&#x27;*&#x27;)) {
+    const hashes: string[] = (data as Array&lt;TypedData[&#x27;message&#x27;]&gt;).map(
+      (entry) =&gt; encodeValue(types, type.slice(0, -1), entry, undefined, revision)[1]
+    );
+    return [type, revisionConfiguration[revision].hashMethod(hashes)];
+  }
+
+  switch (type) {
+    case &#x27;enum&#x27;: {
+      if (revision === Revision.Active) {
+        const [variantKey, variantData] = Object.entries(data as TypedData[&#x27;message&#x27;])[0];
+
+        const parentType = types[ctx.parent as string][0] as StarknetEnumType;
+        const enumType = types[parentType.contains];
+        const variantType = enumType.find((t) =&gt; t.name === variantKey) as StarknetType;
+        const variantIndex = enumType.indexOf(variantType);
+
+        const encodedSubtypes = variantType.type
+          .slice(1, -1)
+          .split(&#x27;,&#x27;)
+          .map((subtype, index) =&gt; {
+            if (!subtype) return subtype;
+            const subtypeData = (variantData as unknown[])[index];
+            return encodeValue(types, subtype, subtypeData, undefined, revision)[1];
+          });
+        return [
+          type,
+          revisionConfiguration[revision].hashMethod([variantIndex, ...encodedSubtypes]),
+        ];
+      } // else fall through to default
+      return [type, getHex(data as string)];
+    }
+    case &#x27;merkletree&#x27;: {
+      const merkleTreeType = getMerkleTreeType(types, ctx);
+      const structHashes: string[] = (data as Array&lt;TypedData[&#x27;message&#x27;]&gt;).map((struct) =&gt; {
+        return encodeValue(types, merkleTreeType, struct, undefined, revision)[1];
+      });
+      const { root } = new MerkleTree(
+        structHashes as string[],
+        revisionConfiguration[revision].hashMerkleMethod
+      );
+      return [&#x27;felt&#x27;, root];
+    }
+    case &#x27;selector&#x27;: {
+      return [&#x27;felt&#x27;, prepareSelector(data as string)];
+    }
+    case &#x27;string&#x27;: {
+      if (revision === Revision.Active) {
+        const byteArray = byteArrayFromString(data as string);
+        const elements = [
+          byteArray.data.length,
+          ...byteArray.data,
+          byteArray.pending_word,
+          byteArray.pending_word_len,
+        ];
+        return [type, revisionConfiguration[revision].hashMethod(elements)];
+      } // else fall through to default
+      return [type, getHex(data as string)];
+    }
+    case &#x27;i128&#x27;: {
+      if (revision === Revision.Active) {
+        const value = BigInt(data as string);
+        assertRange(value, type, RANGE_I128);
+        return [type, getHex(value &lt; 0n ? PRIME + value : value)];
+      } // else fall through to default
+      return [type, getHex(data as string)];
+    }
+    case &#x27;timestamp&#x27;:
+    case &#x27;u128&#x27;: {
+      if (revision === Revision.Active) {
+        assertRange(data, type, RANGE_U128);
+      } // else fall through to default
+      return [type, getHex(data as string)];
+    }
+    case &#x27;felt&#x27;:
+    case &#x27;shortstring&#x27;: {
+      // TODO: should &#x27;shortstring&#x27; diverge into directly using encodeShortString()?
+      if (revision === Revision.Active) {
+        assertRange(getHex(data as string), type, RANGE_FELT);
+      } // else fall through to default
+      return [type, getHex(data as string)];
+    }
+    case &#x27;ClassHash&#x27;:
+    case &#x27;ContractAddress&#x27;: {
+      if (revision === Revision.Active) {
+        assertRange(data, type, RANGE_FELT);
+      } // else fall through to default
+      return [type, getHex(data as string)];
+    }
+    case &#x27;bool&#x27;: {
+      if (revision === Revision.Active) {
+        assert(typeof data === &#x27;boolean&#x27;, `Type mismatch for ${type} ${data}`);
+      } // else fall through to default
+      return [type, getHex(data as string)];
+    }
+    default: {
+      if (revision === Revision.Active) {
+        throw new Error(`Unsupported type: ${type}`);
+      }
+      return [type, getHex(data as string)];
+    }
+  }
+}
+
+/**
+ * Encode the data to an ABI encoded Buffer. The data should be a key -&gt; value object with all the required values.
+ * All dependent types are automatically encoded.
+ */
+export function encodeData&lt;T extends TypedData&gt;(
+  types: T[&#x27;types&#x27;],
+  type: string,
+  data: T[&#x27;message&#x27;],
+  revision: Revision = Revision.Legacy
+) {
+  const targetType = types[type] ?? revisionConfiguration[revision].presetTypes[type];
+  const [returnTypes, values] = targetType.reduce&lt;[string[], string[]]&gt;(
+    ([ts, vs], field) =&gt; {
+      if (
+        data[field.name as keyof T[&#x27;message&#x27;]] === undefined ||
+        (data[field.name as keyof T[&#x27;message&#x27;]] === null &amp;&amp; field.type !== &#x27;enum&#x27;)
+      ) {
+        throw new Error(`Cannot encode data: missing data for &#x27;${field.name}&#x27;`);
+      }
+
+      const value = data[field.name as keyof T[&#x27;message&#x27;]];
+      const ctx = { parent: type, key: field.name };
+      const [t, encodedValue] = encodeValue(types, field.type, value, ctx, revision);
+
+      return [
+        [...ts, t],
+        [...vs, encodedValue],
+      ];
+    },
+    [[&#x27;felt&#x27;], [getTypeHash(types, type, revision)]]
+  );
+
+  return [returnTypes, values];
+}
+
+/**
+ * Get encoded data as a hash. The data should be a key -&gt; value object with all the required values.
+ * All dependent types are automatically encoded.
+ */
+export function getStructHash&lt;T extends TypedData&gt;(
+  types: T[&#x27;types&#x27;],
+  type: string,
+  data: T[&#x27;message&#x27;],
+  revision: Revision = Revision.Legacy
+) {
+  return revisionConfiguration[revision].hashMethod(encodeData(types, type, data, revision)[1]);
+}
+
+/**
+ * Get the SNIP-12 encoded message to sign, from the typedData object.
+ */
+export function getMessageHash(typedData: TypedData, account: BigNumberish): string {
+  if (!validateTypedData(typedData)) {
+    throw new Error(&#x27;Typed data does not match JSON schema&#x27;);
+  }
+
+  const revision = identifyRevision(typedData) as Revision;
+  const { domain, hashMethod } = revisionConfiguration[revision];
+
+  const message = [
+    encodeShortString(&#x27;StarkNet Message&#x27;),
+    getStructHash(typedData.types, domain, typedData.domain, revision),
+    account,
+    getStructHash(typedData.types, typedData.primaryType, typedData.message, revision),
+  ];
+
+  return hashMethod(message);
+}
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;src/utils/typedData.ts&quot;,&quot;line&quot;:278,&quot;character&quot;:27,&quot;text&quot;:&quot;variantData&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 25 Apr 2024 15:57:37 GMT</p>
+    </body>
+  </html>
+  

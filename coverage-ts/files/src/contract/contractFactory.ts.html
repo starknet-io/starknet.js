@@ -1,0 +1,132 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>contractFactory.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">src/contract/contractFactory.ts</td><td class="">98.68%</td><td class="">80%</td><td class="">151</td><td class="">149</td><td class="">2</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">import { AccountInterface } from &#x27;../account&#x27;;
+import {
+  Abi,
+  ArgsOrCalldataWithOptions,
+  CairoAssembly,
+  CompiledContract,
+  ValidateType,
+} from &#x27;../types&#x27;;
+import assert from &#x27;../utils/assert&#x27;;
+import { CallData } from &#x27;../utils/calldata&#x27;;
+import { Contract, getCalldata, splitArgsAndOptions } from &#x27;./default&#x27;;
+
+export type ContractFactoryParams = {
+  compiledContract: CompiledContract;
+  account: any;
+  casm?: CairoAssembly;
+  classHash?: string;
+  compiledClassHash?: string;
+  abi?: Abi;
+};
+
+export class ContractFactory {
+  compiledContract: CompiledContract;
+
+  account: AccountInterface;
+
+  abi: Abi;
+
+  classHash?: string;
+
+  casm?: CairoAssembly;
+
+  compiledClassHash?: string;
+
+  private CallData: CallData;
+
+  /**
+   * @param params CFParams
+   *  - compiledContract: CompiledContract;
+   *  - account: AccountInterface;
+   *  - casm?: CairoAssembly;
+   *  - classHash?: string;
+   *  - compiledClassHash?: string;
+   *  - abi?: Abi;
+   */
+  constructor(params: ContractFactoryParams) {
+    this.compiledContract = params.compiledContract;
+    this.account = params.account;
+    this.casm = params.casm;
+    this.abi = params.abi ?? params.compiledContract.abi;
+    this.classHash = params.classHash;
+    this.compiledClassHash = params.compiledClassHash;
+    this.CallData = new CallData(this.abi);
+  }
+
+  /**
+   * Deploys contract and returns new instance of the Contract
+   *
+   * If contract is not declared it will first declare it, and then deploy
+   */
+  public async deploy(...args: ArgsOrCalldataWithOptions): Promise&lt;Contract&gt; {
+    const { args: param, options = { parseRequest: true } } = splitArgsAndOptions(args);
+
+    const constructorCalldata = getCalldata(param, () =&gt; {
+      if (options.parseRequest) {
+        this.CallData.validate(ValidateType.DEPLOY, &#x27;constructor&#x27;, param);
+        return this.CallData.compile(&#x27;constructor&#x27;, param);
+      }
+      // eslint-disable-next-line no-console
+      console.warn(&#x27;Call skipped parsing but provided rawArgs, possible malfunction request&#x27;);
+      return param;
+    });
+
+    const {
+      deploy: { contract_address, transaction_hash },
+    } = await this.account.declareAndDeploy({
+      contract: this.compiledContract,
+      casm: this.casm,
+      classHash: this.classHash,
+      compiledClassHash: this.compiledClassHash,
+      constructorCalldata,
+      salt: options.addressSalt,
+    });
+    assert(Boolean(contract_address), &#x27;Deployment of the contract failed&#x27;);
+
+    const contractInstance = new Contract(
+      this.compiledContract.abi,
+      contract_address!,
+      this.account
+    );
+    contractInstance.deployTransactionHash = transaction_hash;
+
+    return contractInstance;
+  }
+
+  /**
+   * Attaches to new Account
+   *
+   * @param account - new Account to attach to
+   */
+  connect(account: AccountInterface): ContractFactory {
+    this.account = account;
+    return this;
+  }
+
+  /**
+   * Attaches current abi and account to the new address
+   */
+  attach(address: string): Contract {
+    return new Contract(this.abi, address, this.account);
+  }
+
+  // ethers.js&#x27; getDeployTransaction can&#x27;t be supported as it requires the account or signer to return a signed transaction which is not possible with the current implementation
+}
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;src/contract/contractFactory.ts&quot;,&quot;line&quot;:14,&quot;character&quot;:2,&quot;text&quot;:&quot;account&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/contract/contractFactory.ts&quot;,&quot;line&quot;:47,&quot;character&quot;:26,&quot;text&quot;:&quot;account&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 25 Apr 2024 15:57:38 GMT</p>
+    </body>
+  </html>
+  

@@ -1,0 +1,316 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>classHash.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">src/utils/hash/classHash.ts</td><td class="">95.19%</td><td class="">80%</td><td class="">416</td><td class="">396</td><td class="">20</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">/**
+ * Class Hash
+ */
+
+import { poseidonHashMany } from &#x27;@scure/starknet&#x27;;
+
+import { ADDR_BOUND, API_VERSION } from &#x27;../../constants&#x27;;
+import {
+  BigNumberish,
+  Builtins,
+  CompiledContract,
+  CompiledSierra,
+  CompiledSierraCasm,
+  ContractEntryPointFields,
+  LegacyCompiledContract,
+  RawArgs,
+  SierraContractEntryPointFields,
+} from &#x27;../../types&#x27;;
+import { CallData } from &#x27;../calldata&#x27;;
+import { felt } from &#x27;../calldata/cairo&#x27;;
+import { starkCurve } from &#x27;../ec&#x27;;
+import { addHexPrefix, utf8ToArray } from &#x27;../encode&#x27;;
+import { parse, stringify } from &#x27;../json&#x27;;
+import { toHex } from &#x27;../num&#x27;;
+import { encodeShortString, isString } from &#x27;../shortString&#x27;;
+
+export function computePedersenHash(a: BigNumberish, b: BigNumberish): string {
+  return starkCurve.pedersen(BigInt(a), BigInt(b));
+}
+
+export function computePoseidonHash(a: BigNumberish, b: BigNumberish): string {
+  return toHex(starkCurve.poseidonHash(BigInt(a), BigInt(b)));
+}
+
+/**
+ * Compute pedersen hash from data
+ * @returns format: hex-string - pedersen hash
+ */
+export function computeHashOnElements(data: BigNumberish[]): string {
+  return [...data, data.length]
+    .reduce((x: BigNumberish, y: BigNumberish) =&gt; starkCurve.pedersen(BigInt(x), BigInt(y)), 0)
+    .toString();
+}
+
+export const computePedersenHashOnElements = computeHashOnElements;
+
+export function computePoseidonHashOnElements(data: BigNumberish[]) {
+  return toHex(poseidonHashMany(data.map((x) =&gt; BigInt(x))));
+}
+
+/**
+ * Calculate contract address from class hash
+ * @returns format: hex-string
+ */
+export function calculateContractAddressFromHash(
+  salt: BigNumberish,
+  classHash: BigNumberish,
+  constructorCalldata: RawArgs,
+  deployerAddress: BigNumberish
+) {
+  const compiledCalldata = CallData.compile(constructorCalldata);
+  const constructorCalldataHash = computeHashOnElements(compiledCalldata);
+
+  const CONTRACT_ADDRESS_PREFIX = felt(&#x27;0x535441524b4e45545f434f4e54524143545f41444452455353&#x27;); // Equivalent to &#x27;STARKNET_CONTRACT_ADDRESS&#x27;
+
+  const hash = computeHashOnElements([
+    CONTRACT_ADDRESS_PREFIX,
+    deployerAddress,
+    salt,
+    classHash,
+    constructorCalldataHash,
+  ]);
+  return toHex(BigInt(hash) % ADDR_BOUND);
+}
+
+function nullSkipReplacer(key: string, value: any) {
+  if (key === &#x27;attributes&#x27; || key === &#x27;accessible_scopes&#x27;) {
+    return Array.isArray(value) &amp;&amp; value.length === 0 ? undefined : value;
+  }
+
+  if (key === &#x27;debug_info&#x27;) {
+    return null;
+  }
+
+  return value === null ? undefined : value;
+}
+
+/**
+ * Format json-string to conform starknet json-string
+ * @param json json-string
+ * @returns format: json-string
+ */
+export function formatSpaces(json: string) {
+  let insideQuotes = false;
+  const newString = [];
+  // eslint-disable-next-line no-restricted-syntax
+  for (const char of json) {
+    if (char === &#x27;&quot;&#x27; &amp;&amp; (newString.length &gt; 0 &amp;&amp; newString.slice(-1)[0] === &#x27;\\&#x27;) === false) {
+      insideQuotes = !insideQuotes;
+    }
+    if (insideQuotes) {
+      newString.push(char);
+    } else {
+      // eslint-disable-next-line no-nested-ternary
+      newString.push(char === &#x27;:&#x27; ? &#x27;: &#x27; : char === &#x27;,&#x27; ? &#x27;, &#x27; : char);
+    }
+  }
+  return newString.join(&#x27;&#x27;);
+}
+
+/**
+ * Compute hinted class hash for legacy compiled contract (Cairo 0)
+ * @returns format: hex-string
+ */
+export default function computeHintedClassHash(compiledContract: LegacyCompiledContract) {
+  const { abi, program } = compiledContract;
+  const contractClass = { abi, program };
+  const serializedJson = formatSpaces(stringify(contractClass, nullSkipReplacer));
+
+  return addHexPrefix(starkCurve.keccak(utf8ToArray(serializedJson)).toString(16));
+}
+
+/**
+ * Computes the class hash for legacy compiled contract (Cairo 0)
+ * @returns format: hex-string
+ */
+export function computeLegacyContractClassHash(contract: LegacyCompiledContract | string) {
+  const compiledContract = isString(contract)
+    ? (parse(contract) as LegacyCompiledContract)
+    : contract;
+
+  const apiVersion = toHex(API_VERSION);
+
+  const externalEntryPointsHash = computeHashOnElements(
+    compiledContract.entry_points_by_type.EXTERNAL.flatMap((e) =&gt; [e.selector, e.offset])
+  );
+
+  const l1HandlerEntryPointsHash = computeHashOnElements(
+    compiledContract.entry_points_by_type.L1_HANDLER.flatMap((e) =&gt; [e.selector, e.offset])
+  );
+
+  const constructorEntryPointHash = computeHashOnElements(
+    compiledContract.entry_points_by_type.CONSTRUCTOR.flatMap((e) =&gt; [e.selector, e.offset])
+  );
+
+  const builtinsHash = computeHashOnElements(
+    compiledContract.program.builtins.map((s) =&gt; encodeShortString(s))
+  );
+
+  const hintedClassHash = computeHintedClassHash(compiledContract);
+
+  const dataHash = computeHashOnElements(compiledContract.program.data);
+
+  return computeHashOnElements([
+    apiVersion,
+    externalEntryPointsHash,
+    l1HandlerEntryPointsHash,
+    constructorEntryPointHash,
+    builtinsHash,
+    hintedClassHash,
+    dataHash,
+  ]);
+}
+
+// Cairo 1 Contract Hashes
+
+function hashBuiltins(builtins: Builtins) {
+  return poseidonHashMany(
+    builtins.flatMap((it: any) =&gt; {
+      return BigInt(encodeShortString(it));
+    })
+  );
+}
+
+function hashEntryPoint(data: ContractEntryPointFields[]) {
+  const base = data.flatMap((it: any) =&gt; {
+    return [BigInt(it.selector), BigInt(it.offset), hashBuiltins(it.builtins)];
+  });
+  return poseidonHashMany(base);
+}
+
+/**
+ * Compute hash of the bytecode for Sierra v1.5.0 onwards (Cairo 2.6.0)
+ * Each segment is Poseidon hashed.
+ * The global hash is : 1 + PoseidonHash(len0, h0, len1, h1, ...)
+ * @param casm compiled Sierra CASM file content.
+ * @returns the bytecode hash as bigint.
+ */
+export function hashByteCodeSegments(casm: CompiledSierraCasm): bigint {
+  const byteCode: bigint[] = casm.bytecode.map((n) =&gt; BigInt(n));
+  const bytecodeSegmentLengths: number[] = casm.bytecode_segment_lengths ?? [];
+
+  let segmentStart = 0;
+  const hashLeaves = bytecodeSegmentLengths.flatMap((len) =&gt; {
+    const segment = byteCode.slice(segmentStart, (segmentStart += len));
+
+    return [BigInt(len), poseidonHashMany(segment)];
+  });
+  return 1n + poseidonHashMany(hashLeaves);
+}
+
+/**
+ * Compute compiled class hash for contract (Cairo 1)
+ * @returns format: hex-string
+ */
+export function computeCompiledClassHash(casm: CompiledSierraCasm) {
+  const COMPILED_CLASS_VERSION = &#x27;COMPILED_CLASS_V1&#x27;;
+
+  // Hash compiled class version
+  const compiledClassVersion = BigInt(encodeShortString(COMPILED_CLASS_VERSION));
+
+  // Hash external entry points.
+  const externalEntryPointsHash = hashEntryPoint(casm.entry_points_by_type.EXTERNAL);
+
+  // Hash L1 handler entry points.
+  const l1Handlers = hashEntryPoint(casm.entry_points_by_type.L1_HANDLER);
+
+  // Hash constructor entry points.
+  const constructor = hashEntryPoint(casm.entry_points_by_type.CONSTRUCTOR);
+
+  // Hash bytecode.
+  const bytecode = casm.bytecode_segment_lengths
+    ? hashByteCodeSegments(casm)
+    : poseidonHashMany(casm.bytecode.map((it: string) =&gt; BigInt(it)));
+
+  return toHex(
+    poseidonHashMany([
+      compiledClassVersion,
+      externalEntryPointsHash,
+      l1Handlers,
+      constructor,
+      bytecode,
+    ])
+  );
+}
+
+function hashEntryPointSierra(data: SierraContractEntryPointFields[]) {
+  const base = data.flatMap((it: any) =&gt; {
+    return [BigInt(it.selector), BigInt(it.function_idx)];
+  });
+  return poseidonHashMany(base);
+}
+
+function hashAbi(sierra: CompiledSierra) {
+  const indentString = formatSpaces(stringify(sierra.abi, null));
+  return BigInt(addHexPrefix(starkCurve.keccak(utf8ToArray(indentString)).toString(16)));
+}
+
+/**
+ * Compute sierra contract class hash (Cairo 1)
+ * @returns format: hex-string
+ */
+export function computeSierraContractClassHash(sierra: CompiledSierra) {
+  const CONTRACT_CLASS_VERSION = &#x27;CONTRACT_CLASS_V0.1.0&#x27;;
+
+  // Hash class version
+  const compiledClassVersion = BigInt(encodeShortString(CONTRACT_CLASS_VERSION));
+
+  // Hash external entry points.
+  const externalEntryPointsHash = hashEntryPointSierra(sierra.entry_points_by_type.EXTERNAL);
+
+  // Hash L1 handler entry points.
+  const l1Handlers = hashEntryPointSierra(sierra.entry_points_by_type.L1_HANDLER);
+
+  // Hash constructor entry points.
+  const constructor = hashEntryPointSierra(sierra.entry_points_by_type.CONSTRUCTOR);
+
+  // Hash abi_hash.
+  const abiHash = hashAbi(sierra);
+
+  // Hash Sierra program.
+  const sierraProgram = poseidonHashMany(sierra.sierra_program.map((it: string) =&gt; BigInt(it)));
+
+  return toHex(
+    poseidonHashMany([
+      compiledClassVersion,
+      externalEntryPointsHash,
+      l1Handlers,
+      constructor,
+      abiHash,
+      sierraProgram,
+    ])
+  );
+}
+
+/**
+ * Compute ClassHash (sierra or legacy) based on provided contract
+ * @returns format: hex-string
+ */
+export function computeContractClassHash(contract: CompiledContract | string) {
+  const compiledContract = isString(contract) ? parse(contract) : contract;
+
+  if (&#x27;sierra_program&#x27; in compiledContract) {
+    return computeSierraContractClassHash(compiledContract as CompiledSierra);
+  }
+
+  return computeLegacyContractClassHash(compiledContract as LegacyCompiledContract);
+}
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;src/utils/hash/classHash.ts&quot;,&quot;line&quot;:75,&quot;character&quot;:39,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/hash/classHash.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:25,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/hash/classHash.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:68,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/hash/classHash.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:9,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/hash/classHash.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:38,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/hash/classHash.ts&quot;,&quot;line&quot;:168,&quot;character&quot;:22,&quot;text&quot;:&quot;it&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/hash/classHash.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:29,&quot;text&quot;:&quot;it&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/hash/classHash.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:19,&quot;text&quot;:&quot;it&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/hash/classHash.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:22,&quot;text&quot;:&quot;selector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/hash/classHash.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:40,&quot;text&quot;:&quot;it&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/hash/classHash.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:43,&quot;text&quot;:&quot;offset&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/hash/classHash.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:65,&quot;text&quot;:&quot;it&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/hash/classHash.ts&quot;,&quot;line&quot;:176,&quot;character&quot;:68,&quot;text&quot;:&quot;builtins&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/hash/classHash.ts&quot;,&quot;line&quot;:237,&quot;character&quot;:29,&quot;text&quot;:&quot;it&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/hash/classHash.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:19,&quot;text&quot;:&quot;it&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/hash/classHash.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:22,&quot;text&quot;:&quot;selector&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/hash/classHash.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:40,&quot;text&quot;:&quot;it&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/hash/classHash.ts&quot;,&quot;line&quot;:238,&quot;character&quot;:43,&quot;text&quot;:&quot;function_idx&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/hash/classHash.ts&quot;,&quot;line&quot;:290,&quot;character&quot;:8,&quot;text&quot;:&quot;compiledContract&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/hash/classHash.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:26,&quot;text&quot;:&quot;compiledContract&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 25 Apr 2024 15:57:37 GMT</p>
+    </body>
+  </html>
+  

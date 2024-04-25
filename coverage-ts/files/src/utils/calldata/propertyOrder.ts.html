@@ -1,0 +1,230 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>propertyOrder.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">src/utils/calldata/propertyOrder.ts</td><td class="">86.83%</td><td class="">80%</td><td class="">372</td><td class="">323</td><td class="">49</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">import { AbiEntry, AbiEnums, AbiStructs, CairoEnum, RawArgsObject } from &#x27;../../types&#x27;;
+import { CairoUint256 } from &#x27;../cairoDataTypes/uint256&#x27;;
+import { CairoUint512 } from &#x27;../cairoDataTypes/uint512&#x27;;
+import {
+  getArrayType,
+  isCairo1Type,
+  isLen,
+  isTypeArray,
+  isTypeByteArray,
+  isTypeEnum,
+  isTypeEthAddress,
+  isTypeOption,
+  isTypeResult,
+  isTypeSecp256k1Point,
+  isTypeStruct,
+  isTypeTuple,
+} from &#x27;./cairo&#x27;;
+import {
+  CairoCustomEnum,
+  CairoOption,
+  CairoOptionVariant,
+  CairoResult,
+  CairoResultVariant,
+} from &#x27;./enum&#x27;;
+import extractTupleMemberTypes from &#x27;./tuple&#x27;;
+
+import { isString } from &#x27;../shortString&#x27;;
+
+function errorU256(key: string) {
+  return Error(
+    `Your object includes the property : ${key}, containing an Uint256 object without the &#x27;low&#x27; and &#x27;high&#x27; keys.`
+  );
+}
+
+function errorU512(key: string) {
+  return Error(
+    `Your object includes the property : ${key}, containing an Uint512 object without the &#x27;limb0&#x27; to &#x27;limb3&#x27; keys.`
+  );
+}
+
+export default function orderPropsByAbi(
+  unorderedObject: RawArgsObject,
+  abiOfObject: AbiEntry[],
+  structs: AbiStructs,
+  enums: AbiEnums
+): object {
+  const orderInput = (unorderedItem: any, abiType: string): any =&gt; {
+    if (isTypeArray(abiType)) {
+      return orderArray(unorderedItem, abiType);
+    }
+    if (isTypeEnum(abiType, enums)) {
+      const abiObj = enums[abiType];
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      return orderEnum(unorderedItem, abiObj);
+    }
+    if (isTypeTuple(abiType)) {
+      return orderTuple(unorderedItem, abiType);
+    }
+    if (isTypeEthAddress(abiType)) {
+      return unorderedItem;
+    }
+    if (isTypeByteArray(abiType)) {
+      return unorderedItem;
+    }
+    if (isTypeSecp256k1Point(abiType)) {
+      return unorderedItem;
+    }
+    if (CairoUint256.isAbiType(abiType)) {
+      const u256 = unorderedItem;
+      if (typeof u256 !== &#x27;object&#x27;) {
+        // BigNumberish --&gt; just copy
+        return u256;
+      }
+      if (!(&#x27;low&#x27; in u256 &amp;&amp; &#x27;high&#x27; in u256)) {
+        throw errorU256(abiType);
+      }
+      return { low: u256.low, high: u256.high };
+    }
+    if (CairoUint512.isAbiType(abiType)) {
+      const u512 = unorderedItem;
+      if (typeof u512 !== &#x27;object&#x27;) {
+        // BigNumberish --&gt; just copy
+        return u512;
+      }
+      if (![&#x27;limb0&#x27;, &#x27;limb1&#x27;, &#x27;limb2&#x27;, &#x27;limb3&#x27;].every((key) =&gt; key in u512)) {
+        throw errorU512(abiType);
+      }
+      return { limb0: u512.limb0, limb1: u512.limb1, limb2: u512.limb2, limb3: u512.limb3 };
+    }
+    if (isTypeStruct(abiType, structs)) {
+      const abiOfStruct = structs[abiType].members;
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
+      return orderStruct(unorderedItem, abiOfStruct);
+    }
+    // literals
+    return unorderedItem;
+  };
+
+  const orderStruct = (unorderedObject2: RawArgsObject, abiObject: AbiEntry[]): object =&gt; {
+    const orderedObject2 = abiObject.reduce((orderedObject, abiParam) =&gt; {
+      const setProperty = (value?: any) =&gt;
+        Object.defineProperty(orderedObject, abiParam.name, {
+          enumerable: true,
+          value: value ?? unorderedObject2[abiParam.name],
+        });
+
+      if (unorderedObject2[abiParam.name] === &#x27;undefined&#x27;) {
+        if (isCairo1Type(abiParam.type) || !isLen(abiParam.name)) {
+          throw Error(`Your object needs a property with key : ${abiParam.name} .`);
+        }
+      }
+      setProperty(orderInput(unorderedObject2[abiParam.name], abiParam.type));
+      return orderedObject;
+    }, {});
+    return orderedObject2;
+  };
+
+  function orderArray(myArray: Array&lt;any&gt; | string, abiParam: string): Array&lt;any&gt; | string {
+    const typeInArray = getArrayType(abiParam);
+    if (isString(myArray)) {
+      return myArray; // longstring
+    }
+    return myArray.map((myElem) =&gt; orderInput(myElem, typeInArray));
+  }
+
+  function orderTuple(unorderedObject2: RawArgsObject, abiParam: string): object {
+    const typeList = extractTupleMemberTypes(abiParam);
+    const orderedObject2 = typeList.reduce((orderedObject: object, abiTypeCairoX: any, index) =&gt; {
+      const myObjKeys: string[] = Object.keys(unorderedObject2);
+      const setProperty = (value?: any) =&gt;
+        Object.defineProperty(orderedObject, index.toString(), {
+          enumerable: true,
+          value: value ?? unorderedObject2[myObjKeys[index]],
+        });
+      const abiType: string = abiTypeCairoX?.type ? abiTypeCairoX.type : abiTypeCairoX; // Named tuple, or tuple
+      setProperty(orderInput(unorderedObject2[myObjKeys[index]], abiType));
+      return orderedObject;
+    }, {});
+    return orderedObject2;
+  }
+
+  const orderEnum = (unorderedObject2: CairoEnum, abiObject: AbiEntry): CairoEnum =&gt; {
+    if (isTypeResult(abiObject.name)) {
+      const unorderedResult = unorderedObject2 as CairoResult&lt;any, any&gt;;
+      const resultOkType: string = abiObject.name.substring(
+        abiObject.name.indexOf(&#x27;&lt;&#x27;) + 1,
+        abiObject.name.lastIndexOf(&#x27;,&#x27;)
+      );
+      const resultErrType: string = abiObject.name.substring(
+        abiObject.name.indexOf(&#x27;,&#x27;) + 1,
+        abiObject.name.lastIndexOf(&#x27;&gt;&#x27;)
+      );
+      if (unorderedResult.isOk()) {
+        return new CairoResult&lt;any, any&gt;(
+          CairoResultVariant.Ok,
+          orderInput(unorderedObject2.unwrap(), resultOkType)
+        );
+      }
+      return new CairoResult&lt;any, any&gt;(
+        CairoResultVariant.Err,
+        orderInput(unorderedObject2.unwrap(), resultErrType)
+      );
+    }
+    if (isTypeOption(abiObject.name)) {
+      const unorderedOption = unorderedObject2 as CairoOption&lt;any&gt;;
+      const resultSomeType: string = abiObject.name.substring(
+        abiObject.name.indexOf(&#x27;&lt;&#x27;) + 1,
+        abiObject.name.lastIndexOf(&#x27;&gt;&#x27;)
+      );
+      if (unorderedOption.isSome()) {
+        return new CairoOption&lt;any&gt;(
+          CairoOptionVariant.Some,
+          orderInput(unorderedOption.unwrap(), resultSomeType)
+        );
+      }
+      // none(())
+      return new CairoOption&lt;any&gt;(CairoOptionVariant.None, {});
+    }
+    // custom Enum
+    const unorderedCustomEnum = unorderedObject2 as CairoCustomEnum;
+    const variants = Object.entries(unorderedCustomEnum.variant);
+    const newEntries = variants.map((variant) =&gt; {
+      if (typeof variant[1] === &#x27;undefined&#x27;) {
+        return variant;
+      }
+      const variantType: string = abiObject.type.substring(
+        abiObject.type.lastIndexOf(&#x27;&lt;&#x27;) + 1,
+        abiObject.type.lastIndexOf(&#x27;&gt;&#x27;)
+      );
+      if (variantType === &#x27;()&#x27;) {
+        return variant;
+      }
+      return [variant[0], orderInput(unorderedCustomEnum.unwrap(), variantType)];
+    });
+    return new CairoCustomEnum(Object.fromEntries(newEntries));
+  };
+
+  // Order Call Parameters
+  const finalOrderedObject = abiOfObject.reduce((orderedObject, abiParam) =&gt; {
+    const setProperty = (value: any) =&gt;
+      Object.defineProperty(orderedObject, abiParam.name, {
+        enumerable: true,
+        value,
+      });
+    if (isLen(abiParam.name) &amp;&amp; !isCairo1Type(abiParam.type)) {
+      return orderedObject;
+    }
+    setProperty(orderInput(unorderedObject[abiParam.name], abiParam.type));
+    return orderedObject;
+  }, {});
+  return finalOrderedObject;
+}
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:22,&quot;text&quot;:&quot;unorderedItem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:59,&quot;character&quot;:13,&quot;text&quot;:&quot;unorderedItem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:62,&quot;character&quot;:13,&quot;text&quot;:&quot;unorderedItem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:65,&quot;character&quot;:13,&quot;text&quot;:&quot;unorderedItem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:12,&quot;text&quot;:&quot;u256&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:68,&quot;character&quot;:19,&quot;text&quot;:&quot;unorderedItem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:17,&quot;text&quot;:&quot;u256&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:15,&quot;text&quot;:&quot;u256&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:21,&quot;text&quot;:&quot;u256&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:39,&quot;text&quot;:&quot;u256&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:15,&quot;text&quot;:&quot;low&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:20,&quot;text&quot;:&quot;u256&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:25,&quot;text&quot;:&quot;low&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:30,&quot;text&quot;:&quot;high&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:36,&quot;text&quot;:&quot;u256&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:76,&quot;character&quot;:41,&quot;text&quot;:&quot;high&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:12,&quot;text&quot;:&quot;u512&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:79,&quot;character&quot;:19,&quot;text&quot;:&quot;unorderedItem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:80,&quot;character&quot;:17,&quot;text&quot;:&quot;u512&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:82,&quot;character&quot;:15,&quot;text&quot;:&quot;u512&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:84,&quot;character&quot;:70,&quot;text&quot;:&quot;u512&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:15,&quot;text&quot;:&quot;limb0&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:22,&quot;text&quot;:&quot;u512&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:27,&quot;text&quot;:&quot;limb0&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:34,&quot;text&quot;:&quot;limb1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:41,&quot;text&quot;:&quot;u512&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:46,&quot;text&quot;:&quot;limb1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:53,&quot;text&quot;:&quot;limb2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:60,&quot;text&quot;:&quot;u512&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:65,&quot;text&quot;:&quot;limb2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:72,&quot;text&quot;:&quot;limb3&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:79,&quot;text&quot;:&quot;u512&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:84,&quot;text&quot;:&quot;limb3&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:95,&quot;character&quot;:11,&quot;text&quot;:&quot;unorderedItem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:100,&quot;character&quot;:27,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:103,&quot;character&quot;:10,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:103,&quot;character&quot;:17,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:24,&quot;text&quot;:&quot;myElem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:122,&quot;character&quot;:46,&quot;text&quot;:&quot;myElem&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:127,&quot;character&quot;:67,&quot;text&quot;:&quot;abiTypeCairoX&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:129,&quot;character&quot;:27,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:10,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:132,&quot;character&quot;:17,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:30,&quot;text&quot;:&quot;abiTypeCairoX&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:45,&quot;text&quot;:&quot;type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:52,&quot;text&quot;:&quot;abiTypeCairoX&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:134,&quot;character&quot;:66,&quot;text&quot;:&quot;type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:199,&quot;character&quot;:25,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/propertyOrder.ts&quot;,&quot;line&quot;:202,&quot;character&quot;:8,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 25 Apr 2024 15:57:37 GMT</p>
+    </body>
+  </html>
+  
