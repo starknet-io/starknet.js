@@ -1,0 +1,174 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>errors.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">src/types/api/rpcspec_0_6/errors.ts</td><td class="">100.00%</td><td class="">80%</td><td class="">96</td><td class="">96</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">export interface FAILED_TO_RECEIVE_TXN {
+  code: 1;
+  message: &#x27;Failed to write transaction&#x27;;
+}
+
+export interface NO_TRACE_AVAILABLE {
+  code: 10;
+  message: &#x27;No trace available for transaction&#x27;;
+  data: {
+    status: &#x27;RECEIVED&#x27; | &#x27;REJECTED&#x27;;
+  };
+}
+
+export interface CONTRACT_NOT_FOUND {
+  code: 20;
+  message: &#x27;Contract not found&#x27;;
+}
+
+export interface INVALID_MESSAGE_SELECTOR {
+  code: 21;
+  message: &#x27;Invalid message selector&#x27;;
+}
+
+export interface INVALID_CALL_DATA {
+  code: 22;
+  message: &#x27;Invalid call data&#x27;;
+}
+
+export interface BLOCK_NOT_FOUND {
+  code: 24;
+  message: &#x27;Block not found&#x27;;
+}
+
+export interface INVALID_BLOCK_HASH {
+  code: 26;
+  message: &#x27;Invalid block hash&#x27;;
+}
+
+export interface INVALID_TXN_INDEX {
+  code: 27;
+  message: &#x27;Invalid transaction index in a block&#x27;;
+}
+
+export interface CLASS_HASH_NOT_FOUND {
+  code: 28;
+  message: &#x27;Class hash not found&#x27;;
+}
+
+export interface TXN_HASH_NOT_FOUND {
+  code: 29;
+  message: &#x27;Transaction hash not found&#x27;;
+}
+
+export interface PAGE_SIZE_TOO_BIG {
+  code: 31;
+  message: &#x27;Requested page size is too big&#x27;;
+}
+
+export interface NO_BLOCKS {
+  code: 32;
+  message: &#x27;There are no blocks&#x27;;
+}
+
+export interface INVALID_CONTINUATION_TOKEN {
+  code: 33;
+  message: &#x27;The supplied continuation token is invalid or unknown&#x27;;
+}
+
+export interface TOO_MANY_KEYS_IN_FILTER {
+  code: 34;
+  message: &#x27;Too many keys provided in a filter&#x27;;
+}
+
+export interface CONTRACT_ERROR {
+  code: 40;
+  message: &#x27;Contract error&#x27;;
+  data: {
+    revert_error: string;
+  };
+}
+
+export interface TRANSACTION_EXECUTION_ERROR {
+  code: 41;
+  message: &#x27;Transaction execution error&#x27;;
+  data: {
+    transaction_index: number;
+    execution_error: string;
+  };
+}
+
+export interface CLASS_ALREADY_DECLARED {
+  code: 51;
+  message: &#x27;Class already declared&#x27;;
+}
+
+export interface INVALID_TRANSACTION_NONCE {
+  code: 52;
+  message: &#x27;Invalid transaction nonce&#x27;;
+}
+
+export interface INSUFFICIENT_MAX_FEE {
+  code: 53;
+  message: &#x27;Max fee is smaller than the minimal transaction cost (validation plus fee transfer)&#x27;;
+}
+
+export interface INSUFFICIENT_ACCOUNT_BALANCE {
+  code: 54;
+  message: &quot;Account balance is smaller than the transaction&#x27;s max_fee&quot;;
+}
+
+export interface VALIDATION_FAILURE {
+  code: 55;
+  message: &#x27;Account validation failed&#x27;;
+  data: string;
+}
+
+export interface COMPILATION_FAILED {
+  code: 56;
+  message: &#x27;Compilation failed&#x27;;
+}
+
+export interface CONTRACT_CLASS_SIZE_IS_TOO_LARGE {
+  code: 57;
+  message: &#x27;Contract class size it too large&#x27;;
+}
+
+export interface NON_ACCOUNT {
+  code: 58;
+  message: &#x27;Sender address in not an account contract&#x27;;
+}
+
+export interface DUPLICATE_TX {
+  code: 59;
+  message: &#x27;A transaction with the same hash already exists in the mempool&#x27;;
+}
+
+export interface COMPILED_CLASS_HASH_MISMATCH {
+  code: 60;
+  message: &#x27;the compiled class hash did not match the one supplied in the transaction&#x27;;
+}
+
+export interface UNSUPPORTED_TX_VERSION {
+  code: 61;
+  message: &#x27;the transaction version is not supported&#x27;;
+}
+
+export interface UNSUPPORTED_CONTRACT_CLASS_VERSION {
+  code: 62;
+  message: &#x27;the contract class version is not supported&#x27;;
+}
+
+export interface UNEXPECTED_ERROR {
+  code: 63;
+  message: &#x27;An unexpected error occurred&#x27;;
+  data: string;
+}
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 25 Apr 2024 15:57:37 GMT</p>
+    </body>
+  </html>
+  

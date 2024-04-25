@@ -1,0 +1,345 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>validate.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">src/utils/calldata/validate.ts</td><td class="">90.94%</td><td class="">80%</td><td class="">552</td><td class="">502</td><td class="">50</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">/**
+ * Validate cairo contract method arguments
+ * Flow: Determine type from abi and than validate against parameter
+ */
+import {
+  AbiEntry,
+  AbiEnums,
+  AbiStructs,
+  BigNumberish,
+  FunctionAbi,
+  Literal,
+  Uint,
+} from &#x27;../../types&#x27;;
+import assert from &#x27;../assert&#x27;;
+import { CairoUint256 } from &#x27;../cairoDataTypes/uint256&#x27;;
+import { CairoUint512 } from &#x27;../cairoDataTypes/uint512&#x27;;
+import { isBigInt, isBoolean, isHex, isNumber, toBigInt } from &#x27;../num&#x27;;
+import { isLongText, isString } from &#x27;../shortString&#x27;;
+import {
+  getArrayType,
+  isLen,
+  isTypeArray,
+  isTypeBool,
+  isTypeByteArray,
+  isTypeBytes31,
+  isTypeEnum,
+  isTypeFelt,
+  isTypeLiteral,
+  isTypeOption,
+  isTypeResult,
+  isTypeStruct,
+  isTypeTuple,
+  isTypeUint,
+} from &#x27;./cairo&#x27;;
+
+const validateFelt = (parameter: any, input: AbiEntry) =&gt; {
+  assert(
+    isString(parameter) || isNumber(parameter) || isBigInt(parameter),
+    `Validate: arg ${input.name} should be a felt typed as (String, Number or BigInt)`
+  );
+  if (isString(parameter) &amp;&amp; !isHex(parameter)) return; // shortstring
+  const param = BigInt(parameter.toString(10));
+  assert(
+    // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1266
+    param &gt;= 0n &amp;&amp; param &lt;= 2n ** 252n - 1n,
+    `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^252-1]`
+  );
+};
+
+const validateBytes31 = (parameter: any, input: AbiEntry) =&gt; {
+  assert(isString(parameter), `Validate: arg ${input.name} should be a string.`);
+  assert(
+    parameter.length &lt; 32,
+    `Validate: arg ${input.name} cairo typed ${input.type} should be a string of less than 32 characters.`
+  );
+};
+
+const validateByteArray = (parameter: any, input: AbiEntry) =&gt; {
+  assert(isString(parameter), `Validate: arg ${input.name} should be a string.`);
+};
+
+const validateUint = (parameter: any, input: AbiEntry) =&gt; {
+  if (isNumber(parameter)) {
+    assert(
+      parameter &lt;= Number.MAX_SAFE_INTEGER,
+      `Validation: Parameter is to large to be typed as Number use (BigInt or String)`
+    );
+  }
+  assert(
+    isString(parameter) ||
+      isNumber(parameter) ||
+      isBigInt(parameter) ||
+      (typeof parameter === &#x27;object&#x27; &amp;&amp; &#x27;low&#x27; in parameter &amp;&amp; &#x27;high&#x27; in parameter) ||
+      (typeof parameter === &#x27;object&#x27; &amp;&amp;
+        [&#x27;limb0&#x27;, &#x27;limb1&#x27;, &#x27;limb2&#x27;, &#x27;limb3&#x27;].every((key) =&gt; key in parameter)),
+    `Validate: arg ${input.name} of cairo type ${
+      input.type
+    } should be type (String, Number or BigInt), but is ${typeof parameter} ${parameter}.`
+  );
+  let param: bigint;
+  switch (input.type) {
+    case Uint.u256:
+      param = new CairoUint256(parameter).toBigInt();
+      break;
+    case Uint.u512:
+      param = new CairoUint512(parameter).toBigInt();
+      break;
+    default:
+      param = toBigInt(parameter);
+  }
+  switch (input.type) {
+    case Uint.u8:
+      assert(
+        param &gt;= 0n &amp;&amp; param &lt;= 255n,
+        `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0 - 255]`
+      );
+      break;
+
+    case Uint.u16:
+      assert(
+        param &gt;= 0n &amp;&amp; param &lt;= 65535n,
+        `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 65535]`
+      );
+      break;
+
+    case Uint.u32:
+      assert(
+        param &gt;= 0n &amp;&amp; param &lt;= 4294967295n,
+        `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 4294967295]`
+      );
+      break;
+
+    case Uint.u64:
+      assert(
+        param &gt;= 0n &amp;&amp; param &lt;= 2n ** 64n - 1n,
+        `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^64-1]`
+      );
+      break;
+
+    case Uint.u128:
+      assert(
+        param &gt;= 0n &amp;&amp; param &lt;= 2n ** 128n - 1n,
+        `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^128-1]`
+      );
+      break;
+
+    case Uint.u256:
+      assert(
+        param &gt;= 0n &amp;&amp; param &lt;= 2n ** 256n - 1n,
+        `Validate: arg ${input.name} is ${input.type} 0 - 2^256-1`
+      );
+      break;
+
+    case Uint.u512:
+      assert(CairoUint512.is(param), `Validate: arg ${input.name} is ${input.type} 0 - 2^512-1`);
+      break;
+
+    case Literal.ClassHash:
+      assert(
+        // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1670
+        param &gt;= 0n &amp;&amp; param &lt;= 2n ** 252n - 1n,
+        `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^252-1]`
+      );
+      break;
+
+    case Literal.ContractAddress:
+      assert(
+        // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1245
+        param &gt;= 0n &amp;&amp; param &lt;= 2n ** 252n - 1n,
+        `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^252-1]`
+      );
+      break;
+    case Literal.Secp256k1Point: {
+      assert(
+        param &gt;= 0n &amp;&amp; param &lt;= 2n ** 512n - 1n,
+        `Validate: arg ${input.name} must be ${input.type} : a 512 bits number.`
+      );
+      break;
+    }
+
+    default:
+      break;
+  }
+};
+
+const validateBool = (parameter: any, input: AbiEntry) =&gt; {
+  assert(
+    isBoolean(parameter),
+    `Validate: arg ${input.name} of cairo type ${input.type} should be type (Boolean)`
+  );
+};
+
+const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) =&gt; {
+  // c1v2 uint256 or u512 in struct
+  if (input.type === Uint.u256 || input.type === Uint.u512) {
+    validateUint(parameter, input);
+    return;
+  }
+
+  if (input.type === &#x27;core::starknet::eth_address::EthAddress&#x27;) {
+    assert(
+      typeof parameter !== &#x27;object&#x27;,
+      `EthAddress type is waiting a BigNumberish. Got ${parameter}`
+    );
+    const param = BigInt(parameter.toString(10));
+    assert(
+      // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1259
+      param &gt;= 0n &amp;&amp; param &lt;= 2n ** 160n - 1n,
+      `Validate: arg ${input.name} cairo typed ${input.type} should be in range [0, 2^160-1]`
+    );
+    return;
+  }
+
+  assert(
+    typeof parameter === &#x27;object&#x27; &amp;&amp; !Array.isArray(parameter),
+    `Validate: arg ${input.name} is cairo type struct (${input.type}), and should be defined as js object (not array)`
+  );
+
+  // shallow struct validation, only first depth level
+  structs[input.type].members.forEach(({ name }) =&gt; {
+    assert(
+      Object.keys(parameter).includes(name),
+      `Validate: arg ${input.name} should have a property ${name}`
+    );
+  });
+};
+
+const validateEnum = (parameter: any, input: AbiEntry) =&gt; {
+  assert(
+    typeof parameter === &#x27;object&#x27; &amp;&amp; !Array.isArray(parameter),
+    `Validate: arg ${input.name} is cairo type Enum (${input.type}), and should be defined as js object (not array)`
+  );
+  const methodsKeys = Object.getOwnPropertyNames(Object.getPrototypeOf(parameter));
+  const keys = [...Object.getOwnPropertyNames(parameter), ...methodsKeys];
+  if (isTypeOption(input.type) &amp;&amp; keys.includes(&#x27;isSome&#x27;) &amp;&amp; keys.includes(&#x27;isNone&#x27;)) {
+    return; // Option Enum
+  }
+  if (isTypeResult(input.type) &amp;&amp; keys.includes(&#x27;isOk&#x27;) &amp;&amp; keys.includes(&#x27;isErr&#x27;)) {
+    return; // Result Enum
+  }
+  if (keys.includes(&#x27;variant&#x27;) &amp;&amp; keys.includes(&#x27;activeVariant&#x27;)) {
+    return; // Custom Enum
+  }
+  throw new Error(
+    `Validate Enum: argument ${input.name}, type ${input.type}, value received ${parameter}, is not an Enum.`
+  );
+};
+
+const validateTuple = (parameter: any, input: AbiEntry) =&gt; {
+  assert(
+    typeof parameter === &#x27;object&#x27; &amp;&amp; !Array.isArray(parameter),
+    `Validate: arg ${input.name} should be a tuple (defined as object)`
+  );
+  // todo: skip tuple structural validation for now
+};
+
+const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs, enums: AbiEnums) =&gt; {
+  const baseType = getArrayType(input.type);
+  // Long text (special case when parameter is not an array but long text)
+  if (isTypeFelt(baseType) &amp;&amp; isLongText(parameter)) {
+    return;
+  }
+
+  assert(Array.isArray(parameter), `Validate: arg ${input.name} should be an Array`);
+
+  switch (true) {
+    case isTypeFelt(baseType):
+      parameter.forEach((param: BigNumberish) =&gt; validateFelt(param, input));
+      break;
+    case isTypeTuple(baseType):
+      parameter.forEach((it: any) =&gt; validateTuple(it, { name: input.name, type: baseType }));
+      break;
+
+    case isTypeArray(baseType):
+      parameter.forEach((param: BigNumberish) =&gt;
+        validateArray(param, { name: &#x27;&#x27;, type: baseType }, structs, enums)
+      );
+      break;
+    case isTypeStruct(baseType, structs):
+      parameter.forEach((it: any) =&gt;
+        validateStruct(it, { name: input.name, type: baseType }, structs)
+      );
+      break;
+    case isTypeEnum(baseType, enums):
+      parameter.forEach((it: any) =&gt; validateEnum(it, { name: input.name, type: baseType }));
+      break;
+    case isTypeUint(baseType) || isTypeLiteral(baseType):
+      parameter.forEach((param: BigNumberish) =&gt; validateUint(param, { name: &#x27;&#x27;, type: baseType }));
+      break;
+    case isTypeBool(baseType):
+      parameter.forEach((param: BigNumberish) =&gt; validateBool(param, input));
+      break;
+    default:
+      throw new Error(
+        `Validate Unhandled: argument ${input.name}, type ${input.type}, value ${parameter}`
+      );
+  }
+};
+
+export default function validateFields(
+  abiMethod: FunctionAbi,
+  args: Array&lt;any&gt;,
+  structs: AbiStructs,
+  enums: AbiEnums
+) {
+  abiMethod.inputs.reduce((acc, input) =&gt; {
+    const parameter = args[acc];
+
+    switch (true) {
+      case isLen(input.name):
+        return acc;
+      case isTypeFelt(input.type):
+        validateFelt(parameter, input);
+        break;
+      case isTypeBytes31(input.type):
+        validateBytes31(parameter, input);
+        break;
+      case isTypeUint(input.type) || isTypeLiteral(input.type):
+        validateUint(parameter, input);
+        break;
+      case isTypeBool(input.type):
+        validateBool(parameter, input);
+        break;
+      case isTypeByteArray(input.type):
+        validateByteArray(parameter, input);
+        break;
+      case isTypeArray(input.type):
+        validateArray(parameter, input, structs, enums);
+        break;
+      case isTypeStruct(input.type, structs):
+        validateStruct(parameter, input, structs);
+        break;
+      case isTypeEnum(input.type, enums):
+        validateEnum(parameter, input);
+        break;
+      case isTypeTuple(input.type):
+        validateTuple(parameter, input);
+        break;
+      default:
+        throw new Error(
+          `Validate Unhandled: argument ${input.name}, type ${input.type}, value ${parameter}`
+        );
+    }
+
+    return acc + 1;
+  }, 0);
+}
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:22,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:59,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:49,&quot;character&quot;:25,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:27,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:61,&quot;character&quot;:22,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:71,&quot;character&quot;:15,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:14,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:49,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:72,&quot;character&quot;:72,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:73,&quot;character&quot;:14,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:74,&quot;character&quot;:67,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:65,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:77,&quot;character&quot;:78,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:165,&quot;character&quot;:22,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:172,&quot;character&quot;:24,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:175,&quot;character&quot;:17,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:181,&quot;character&quot;:13,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:182,&quot;character&quot;:56,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:184,&quot;character&quot;:25,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:194,&quot;character&quot;:11,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:194,&quot;character&quot;:52,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:207,&quot;character&quot;:22,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:11,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:209,&quot;character&quot;:52,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:212,&quot;character&quot;:71,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:213,&quot;character&quot;:46,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:224,&quot;character&quot;:81,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:228,&quot;character&quot;:23,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:230,&quot;character&quot;:11,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:230,&quot;character&quot;:52,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:236,&quot;character&quot;:23,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:239,&quot;character&quot;:41,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:243,&quot;character&quot;:23,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:250,&quot;character&quot;:25,&quot;text&quot;:&quot;it&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:250,&quot;character&quot;:51,&quot;text&quot;:&quot;it&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:259,&quot;character&quot;:25,&quot;text&quot;:&quot;it&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:260,&quot;character&quot;:23,&quot;text&quot;:&quot;it&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:264,&quot;character&quot;:25,&quot;text&quot;:&quot;it&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:264,&quot;character&quot;:50,&quot;text&quot;:&quot;it&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:286,&quot;character&quot;:10,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:292,&quot;character&quot;:21,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:295,&quot;character&quot;:24,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:298,&quot;character&quot;:21,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:301,&quot;character&quot;:21,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:304,&quot;character&quot;:26,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:307,&quot;character&quot;:22,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:310,&quot;character&quot;:23,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:313,&quot;character&quot;:21,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:316,&quot;character&quot;:22,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/validate.ts&quot;,&quot;line&quot;:320,&quot;character&quot;:83,&quot;text&quot;:&quot;parameter&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 25 Apr 2024 15:57:37 GMT</p>
+    </body>
+  </html>
+  

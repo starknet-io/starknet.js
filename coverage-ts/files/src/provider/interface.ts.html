@@ -1,0 +1,387 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>interface.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">src/provider/interface.ts</td><td class="">100.00%</td><td class="">80%</td><td class="">209</td><td class="">209</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">import { RPC06, RPC07 } from &#x27;../channel&#x27;;
+import { StarknetChainId } from &#x27;../constants&#x27;;
+import type {
+  AccountInvocations,
+  BigNumberish,
+  Block,
+  BlockIdentifier,
+  Call,
+  CallContractResponse,
+  ContractClassResponse,
+  ContractVersion,
+  DeclareContractResponse,
+  DeclareContractTransaction,
+  DeployAccountContractPayload,
+  DeployAccountContractTransaction,
+  DeployContractResponse,
+  EstimateFeeResponse,
+  EstimateFeeResponseBulk,
+  GetBlockResponse,
+  GetTransactionResponse,
+  Invocation,
+  InvocationsDetailsWithNonce,
+  InvokeFunctionResponse,
+  Nonce,
+  PendingBlock,
+  SimulateTransactionResponse,
+  StateUpdateResponse,
+  Storage,
+  getContractVersionOptions,
+  getEstimateFeeBulkOptions,
+  getSimulateTransactionOptions,
+  waitForTransactionOptions,
+} from &#x27;../types&#x27;;
+import type { GetTransactionReceiptResponse } from &#x27;../utils/transactionReceipt&#x27;;
+
+export abstract class ProviderInterface {
+  public abstract channel: RPC07.RpcChannel | RPC06.RpcChannel;
+
+  /**
+   * Gets the Starknet chain Id
+   *
+   * @returns the chain Id
+   */
+  public abstract getChainId(): Promise&lt;StarknetChainId&gt;;
+
+  /**
+   * Calls a function on the Starknet contract.
+   *
+   * @param call transaction to be called
+   * @param blockIdentifier block identifier
+   * @returns the result of the function on the smart contract.
+   */
+  public abstract callContract(
+    call: Call,
+    blockIdentifier?: BlockIdentifier
+  ): Promise&lt;CallContractResponse&gt;;
+
+  /**
+   * Gets the block information
+   *
+   * @param blockIdentifier block identifier
+   * @returns the block object
+   */
+  public abstract getBlock(): Promise&lt;PendingBlock&gt;;
+  public abstract getBlock(blockIdentifier: &#x27;pending&#x27;): Promise&lt;PendingBlock&gt;;
+  public abstract getBlock(blockIdentifier: &#x27;latest&#x27;): Promise&lt;Block&gt;;
+  public abstract getBlock(blockIdentifier: BlockIdentifier): Promise&lt;GetBlockResponse&gt;;
+
+  /**
+   * Gets the contract class of the deployed contract.
+   *
+   * @param contractAddress - contract address
+   * @param blockIdentifier - block identifier
+   * @returns Contract class of compiled contract
+   */
+  public abstract getClassAt(
+    contractAddress: string,
+    blockIdentifier?: BlockIdentifier
+  ): Promise&lt;ContractClassResponse&gt;;
+
+  /**
+   * Gets the price of l1 gas in the block
+   *
+   * @param blockIdentifier block identifier
+   * @returns gas price of the block
+   */
+  public abstract getL1GasPrice(blockIdentifier: BlockIdentifier): Promise&lt;string&gt;;
+
+  /**
+   * Returns the contract class hash in the given block for the contract deployed at the given address
+   *
+   * @param contractAddress - contract address
+   * @param blockIdentifier - block identifier
+   * @returns Class hash
+   */
+  public abstract getClassHashAt(
+    contractAddress: string,
+    blockIdentifier?: BlockIdentifier
+  ): Promise&lt;string&gt;;
+
+  /**
+   * Returns the contract class deployed under the given class hash.
+   *
+   * @param classHash - class hash
+   * @returns Contract class of compiled contract
+   */
+  public abstract getClassByHash(classHash: string): Promise&lt;ContractClassResponse&gt;;
+
+  /**
+   * Returns the nonce associated with the given address in the given block
+   *
+   * @param contractAddress - contract address
+   * @returns the hex nonce
+   */
+  public abstract getNonceForAddress(
+    contractAddress: string,
+    blockIdentifier?: BlockIdentifier
+  ): Promise&lt;Nonce&gt;;
+
+  /**
+   * Get the value of the storage (contract&#x27;s variable) at the given address and key
+   *
+   * @param contractAddress
+   * @param key - from getStorageVarAddress(&#x27;&lt;STORAGE_VARIABLE_NAME&gt;&#x27;) (WIP)
+   * @param blockIdentifier - block identifier
+   * @returns the value of the storage variable
+   */
+  public abstract getStorageAt(
+    contractAddress: string,
+    key: BigNumberish,
+    blockIdentifier?: BlockIdentifier
+  ): Promise&lt;Storage&gt;;
+
+  /**
+   * Gets the transaction information from a tx id.
+   *
+   * @param txHash
+   * @returns the transaction object \{ transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? \}
+   */
+  public abstract getTransaction(transactionHash: BigNumberish): Promise&lt;GetTransactionResponse&gt;;
+
+  /**
+   * Gets the transaction receipt from a tx hash.
+   *
+   * @param txHash
+   * @returns the transaction receipt object
+   */
+  public abstract getTransactionReceipt(
+    transactionHash: BigNumberish
+  ): Promise&lt;GetTransactionReceiptResponse&gt;;
+
+  /**
+   * Deploys a given compiled Account contract (json) to starknet
+   *
+   * @param payload payload to be deployed containing:
+   * - compiled contract code
+   * - constructor calldata
+   * - address salt
+   * @returns a confirmation of sending a transaction on the starknet contract
+   */
+  public abstract deployAccountContract(
+    payload: DeployAccountContractPayload,
+    details: InvocationsDetailsWithNonce
+  ): Promise&lt;DeployContractResponse&gt;;
+
+  /**
+   * Invokes a function on starknet
+   * @deprecated This method won&#x27;t be supported as soon as fees are mandatory. Should not be used outside of Account class
+   *
+   * @param invocation the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   * @param details - optional details containing:
+   * - nonce - optional nonce
+   * - version - optional version
+   * - maxFee - optional maxFee
+   * @returns response from addTransaction
+   */
+  public abstract invokeFunction(
+    invocation: Invocation,
+    details: InvocationsDetailsWithNonce
+  ): Promise&lt;InvokeFunctionResponse&gt;;
+
+  /**
+   * Declares a given compiled contract (json) to starknet
+   * @param transaction transaction payload to be deployed containing:
+   * - compiled contract code
+   * - sender address
+   * - signature
+   * @param details Invocation Details containing:
+   * - nonce
+   * - optional version
+   * - optional maxFee
+   * @returns a confirmation of sending a transaction on the starknet contract
+   */
+  public abstract declareContract(
+    transaction: DeclareContractTransaction,
+    details: InvocationsDetailsWithNonce
+  ): Promise&lt;DeclareContractResponse&gt;;
+
+  /**
+   * Estimates the fee for a given INVOKE transaction
+   * @deprecated Please use getInvokeEstimateFee or getDeclareEstimateFee instead. Should not be used outside of Account class
+   *
+   * @param invocation the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   * @param details - optional details containing:
+   * - nonce - optional nonce
+   * - version - optional version
+   * @param blockIdentifier - (optional) block identifier
+   * @param skipValidate - (optional) skip cairo __validate__ method
+   * @returns the estimated fee
+   */
+  public abstract getEstimateFee(
+    invocation: Invocation,
+    details: InvocationsDetailsWithNonce,
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
+  ): Promise&lt;EstimateFeeResponse&gt;;
+
+  /**
+   * Estimates the fee for a given INVOKE transaction
+   *
+   * @param invocation the invocation object containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   * @param details - optional details containing:
+   * - nonce - optional nonce
+   * - version - optional version
+   * @param blockIdentifier - (optional) block identifier
+   * @param skipValidate - (optional) skip cairo __validate__ method
+   * @returns the estimated fee
+   */
+  public abstract getInvokeEstimateFee(
+    invocation: Invocation,
+    details: InvocationsDetailsWithNonce,
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
+  ): Promise&lt;EstimateFeeResponse&gt;;
+
+  /**
+   * Estimates the fee for a given DECLARE transaction
+   *
+   * @param transaction transaction payload to be declared containing:
+   * - compiled contract code
+   * - sender address
+   * - signature - (defaults to []) the signature
+   * @param details - optional details containing:
+   * - nonce
+   * - version - optional version
+   * - optional maxFee
+   * @param blockIdentifier - (optional) block identifier
+   * @param skipValidate - (optional) skip cairo __validate__ method
+   * @returns the estimated fee
+   */
+  public abstract getDeclareEstimateFee(
+    transaction: DeclareContractTransaction,
+    details: InvocationsDetailsWithNonce,
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
+  ): Promise&lt;EstimateFeeResponse&gt;;
+
+  /**
+   * Estimates the fee for a given DEPLOY_ACCOUNT transaction
+   *
+   * @param transaction transaction payload to be deployed containing:
+   * - classHash
+   * - constructorCalldata
+   * - addressSalt
+   * - signature - (defaults to []) the signature
+   * @param details - optional details containing:
+   * - nonce
+   * - version - optional version
+   * - optional maxFee
+   * @param blockIdentifier - (optional) block identifier
+   * @param skipValidate - (optional) skip cairo __validate__ method
+   * @returns the estimated fee
+   */
+  public abstract getDeployAccountEstimateFee(
+    transaction: DeployAccountContractTransaction,
+    details: InvocationsDetailsWithNonce,
+    blockIdentifier?: BlockIdentifier,
+    skipValidate?: boolean
+  ): Promise&lt;EstimateFeeResponse&gt;;
+
+  /**
+   * Estimates the fee for a list of INVOKE transaction
+   *
+   * @param invocations AccountInvocations - Complete invocations array with account details
+   * @param options getEstimateFeeBulkOptions
+   * - (optional) blockIdentifier - BlockIdentifier
+   * @returns the estimated fee
+   */
+  public abstract getEstimateFeeBulk(
+    invocations: AccountInvocations,
+    options?: getEstimateFeeBulkOptions
+  ): Promise&lt;EstimateFeeResponseBulk&gt;;
+
+  /**
+   * Wait for the transaction to be accepted
+   * @param txHash - transaction hash
+   * @param options waitForTransactionOptions
+   * - (optional) retryInterval: number | undefined;
+   * - (optional) successStates: TransactionStatus[] | undefined;
+   * @return GetTransactionReceiptResponse
+   */
+  public abstract waitForTransaction(
+    txHash: BigNumberish,
+    options?: waitForTransactionOptions
+  ): Promise&lt;GetTransactionReceiptResponse&gt;;
+
+  /**
+   * Simulates the transaction and returns the transaction trace and estimated fee.
+   *
+   * @param invocations AccountInvocations - Complete invocations array with account details
+   * @param options - getSimulateTransactionOptions
+   *  - (optional) blockIdentifier - block identifier
+   *  - (optional) skipValidate - skip cairo __validate__ method
+   *  - (optional) skipExecute - skip cairo __execute__ method
+   * @returns an array of transaction trace and estimated fee
+   */
+  public abstract getSimulateTransaction(
+    invocations: AccountInvocations,
+    options?: getSimulateTransactionOptions
+  ): Promise&lt;SimulateTransactionResponse&gt;;
+
+  /**
+   * Gets the state changes in a specific block (result of executing the requested block)
+   *
+   * @param blockIdentifier - block identifier
+   * @returns StateUpdateResponse
+   */
+  public abstract getStateUpdate(blockIdentifier?: BlockIdentifier): Promise&lt;StateUpdateResponse&gt;;
+
+  /**
+   * Gets the contract version from the provided address
+   * @param contractAddress string
+   * @param classHash undefined
+   * @param options - getContractVersionOptions
+   *   - (optional) compiler - (default true) extract compiler version using type tactic from abi
+   *   - (optional) blockIdentifier - block identifier
+   */
+  public abstract getContractVersion(
+    contractAddress: string,
+    classHash?: undefined,
+    options?: getContractVersionOptions
+  ): Promise&lt;ContractVersion&gt;;
+
+  /**
+   * Gets the contract version from the provided address
+   * @param contractAddress undefined
+   * @param classHash
+   * @param options - getContractVersionOptions
+   *   - (optional) compiler - (default true) extract compiler version using type tactic from abi
+   *   - (optional) blockIdentifier - block identifier
+   */
+  public abstract getContractVersion(
+    contractAddress: undefined,
+    classHash: string,
+    options?: getContractVersionOptions
+  ): Promise&lt;ContractVersion&gt;;
+}
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 25 Apr 2024 15:57:37 GMT</p>
+    </body>
+  </html>
+  

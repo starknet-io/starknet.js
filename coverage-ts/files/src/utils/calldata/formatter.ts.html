@@ -1,0 +1,98 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>formatter.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">src/utils/calldata/formatter.ts</td><td class="">87.50%</td><td class="">80%</td><td class="">136</td><td class="">119</td><td class="">17</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">import { isBigInt } from &#x27;../num&#x27;;
+import { decodeShortString } from &#x27;../shortString&#x27;;
+
+const guard = {
+  isBN: (data: Record&lt;string, any&gt;, type: Record&lt;string, any&gt;, key: string) =&gt; {
+    if (!isBigInt(data[key]))
+      throw new Error(
+        `Data and formatter mismatch on ${key}:${type[key]}, expected response data ${key}:${
+          data[key]
+        } to be BN instead it is ${typeof data[key]}`
+      );
+  },
+  unknown: (data: Record&lt;string, any&gt;, type: Record&lt;string, any&gt;, key: string) =&gt; {
+    throw new Error(`Unhandled formatter type on ${key}:${type[key]} for data ${key}:${data[key]}`);
+  },
+};
+
+/**
+ * Formats the given data based on the provided type definition.
+ *
+ * @param {any} data - The data to be formatted.
+ * @param {any} type - The type definition for the data.
+ * @param {any} [sameType] - The same type definition to be used (optional).
+ * @returns - The formatted data.
+ */
+export default function formatter(
+  data: Record&lt;string, any&gt;,
+  type: Record&lt;string, any&gt;,
+  sameType?: any
+) {
+  // match data element with type element
+  return Object.entries(data).reduce(
+    (acc, [key, value]: [string, any]) =&gt; {
+      const elType = sameType ?? type[key];
+
+      if (!(key in type) &amp;&amp; !sameType) {
+        // no type definition for element return original element
+        acc[key] = value;
+        return acc;
+      }
+
+      if (elType === &#x27;string&#x27;) {
+        if (Array.isArray(data[key])) {
+          // long string (felt*)
+          const arrayStr = formatter(
+            data[key],
+            data[key].map((_: any) =&gt; elType)
+          );
+          acc[key] = Object.values(arrayStr).join(&#x27;&#x27;);
+          return acc;
+        }
+        guard.isBN(data, type, key);
+        acc[key] = decodeShortString(value);
+        return acc;
+      }
+      if (elType === &#x27;number&#x27;) {
+        guard.isBN(data, type, key);
+        acc[key] = Number(value);
+        return acc;
+      }
+      if (typeof elType === &#x27;function&#x27;) {
+        acc[key] = elType(value);
+        return acc;
+      }
+      if (Array.isArray(elType)) {
+        const arrayObj = formatter(data[key], elType, elType[0]);
+        acc[key] = Object.values(arrayObj);
+        return acc;
+      }
+      if (typeof elType === &#x27;object&#x27;) {
+        acc[key] = formatter(data[key], elType);
+        return acc;
+      }
+
+      guard.unknown(data, type, key);
+      return acc;
+    },
+    {} as Record&lt;string, any&gt;
+  );
+}
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;src/utils/calldata/formatter.ts&quot;,&quot;line&quot;:28,&quot;character&quot;:2,&quot;text&quot;:&quot;sameType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/formatter.ts&quot;,&quot;line&quot;:32,&quot;character&quot;:16,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/formatter.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:12,&quot;text&quot;:&quot;elType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/formatter.ts&quot;,&quot;line&quot;:33,&quot;character&quot;:21,&quot;text&quot;:&quot;sameType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/formatter.ts&quot;,&quot;line&quot;:35,&quot;character&quot;:29,&quot;text&quot;:&quot;sameType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/formatter.ts&quot;,&quot;line&quot;:37,&quot;character&quot;:19,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/formatter.ts&quot;,&quot;line&quot;:41,&quot;character&quot;:10,&quot;text&quot;:&quot;elType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/formatter.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:22,&quot;text&quot;:&quot;map&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/formatter.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:27,&quot;text&quot;:&quot;_&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/formatter.ts&quot;,&quot;line&quot;:46,&quot;character&quot;:38,&quot;text&quot;:&quot;elType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/formatter.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:10,&quot;text&quot;:&quot;elType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/formatter.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:26,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/formatter.ts&quot;,&quot;line&quot;:60,&quot;character&quot;:17,&quot;text&quot;:&quot;elType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/formatter.ts&quot;,&quot;line&quot;:61,&quot;character&quot;:19,&quot;text&quot;:&quot;elType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/formatter.ts&quot;,&quot;line&quot;:61,&quot;character&quot;:26,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/formatter.ts&quot;,&quot;line&quot;:64,&quot;character&quot;:24,&quot;text&quot;:&quot;elType&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/formatter.ts&quot;,&quot;line&quot;:69,&quot;character&quot;:17,&quot;text&quot;:&quot;elType&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 25 Apr 2024 15:57:37 GMT</p>
+    </body>
+  </html>
+  

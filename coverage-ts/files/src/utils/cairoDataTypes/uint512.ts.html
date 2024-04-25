@@ -1,0 +1,194 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>uint512.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">src/utils/cairoDataTypes/uint512.ts</td><td class="">98.27%</td><td class="">80%</td><td class="">231</td><td class="">227</td><td class="">4</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">/* eslint-disable no-bitwise */
+/**
+ * Singular class handling cairo u512 data type
+ */
+
+import { BigNumberish, type Uint512 } from &#x27;../../types&#x27;;
+import { addHexPrefix } from &#x27;../encode&#x27;;
+import { CairoFelt } from &#x27;./felt&#x27;;
+import { UINT_128_MAX } from &#x27;./uint256&#x27;;
+
+export const UINT_512_MAX = (1n &lt;&lt; 512n) - 1n;
+export const UINT_512_MIN = 0n;
+export const UINT_128_MIN = 0n;
+
+export class CairoUint512 {
+  public limb0: bigint;
+
+  public limb1: bigint;
+
+  public limb2: bigint;
+
+  public limb3: bigint;
+
+  static abiSelector = &#x27;core::integer::u512&#x27;;
+
+  /**
+   * Default constructor (Lib usage)
+   * @param bigNumberish BigNumberish value representing u512
+   */
+  public constructor(bigNumberish: BigNumberish);
+  /**
+   * Direct props initialization (Api response)
+   */
+  public constructor(
+    limb0: BigNumberish,
+    limb1: BigNumberish,
+    limb2: BigNumberish,
+    limb3: BigNumberish
+  );
+  /**
+   * Initialization from Uint512 object
+   */
+  public constructor(uint512: Uint512);
+
+  public constructor(...arr: any[]) {
+    if (
+      typeof arr[0] === &#x27;object&#x27; &amp;&amp;
+      arr.length === 1 &amp;&amp;
+      &#x27;limb0&#x27; in arr[0] &amp;&amp;
+      &#x27;limb1&#x27; in arr[0] &amp;&amp;
+      &#x27;limb2&#x27; in arr[0] &amp;&amp;
+      &#x27;limb3&#x27; in arr[0]
+    ) {
+      const props = CairoUint512.validateProps(
+        arr[0].limb0,
+        arr[0].limb1,
+        arr[0].limb2,
+        arr[0].limb3
+      );
+      this.limb0 = props.limb0;
+      this.limb1 = props.limb1;
+      this.limb2 = props.limb2;
+      this.limb3 = props.limb3;
+    } else if (arr.length === 1) {
+      const bigInt = CairoUint512.validate(arr[0]);
+      this.limb0 = bigInt &amp; UINT_128_MAX;
+      this.limb1 = (bigInt &amp; (UINT_128_MAX &lt;&lt; 128n)) &gt;&gt; 128n;
+      this.limb2 = (bigInt &amp; (UINT_128_MAX &lt;&lt; 256n)) &gt;&gt; 256n;
+      this.limb3 = bigInt &gt;&gt; 384n;
+    } else if (arr.length === 4) {
+      const props = CairoUint512.validateProps(arr[0], arr[1], arr[2], arr[3]);
+      this.limb0 = props.limb0;
+      this.limb1 = props.limb1;
+      this.limb2 = props.limb2;
+      this.limb3 = props.limb3;
+    } else {
+      throw Error(&#x27;Incorrect Uint512 constructor parameters&#x27;);
+    }
+  }
+
+  /**
+   * Validate if BigNumberish can be represented as Uint512
+   */
+  static validate(bigNumberish: BigNumberish): bigint {
+    const bigInt = BigInt(bigNumberish);
+    if (bigInt &lt; UINT_512_MIN) throw Error(&#x27;bigNumberish is smaller than UINT_512_MIN.&#x27;);
+    if (bigInt &gt; UINT_512_MAX) throw Error(&#x27;bigNumberish is bigger than UINT_512_MAX.&#x27;);
+    return bigInt;
+  }
+
+  /**
+   * Validate if limbs can be represented as Uint512
+   */
+  static validateProps(
+    limb0: BigNumberish,
+    limb1: BigNumberish,
+    limb2: BigNumberish,
+    limb3: BigNumberish
+  ): { limb0: bigint; limb1: bigint; limb2: bigint; limb3: bigint } {
+    const l0 = BigInt(limb0);
+    const l1 = BigInt(limb1);
+    const l2 = BigInt(limb2);
+    const l3 = BigInt(limb3);
+    [l0, l1, l2, l3].forEach((value: bigint, index) =&gt; {
+      if (value &lt; UINT_128_MIN || value &gt; UINT_128_MAX) {
+        throw Error(`limb${index} is not in the range of a u128 number`);
+      }
+    });
+    return { limb0: l0, limb1: l1, limb2: l2, limb3: l3 };
+  }
+
+  /**
+   * Check if BigNumberish can be represented as Uint512
+   */
+  static is(bigNumberish: BigNumberish): boolean {
+    try {
+      CairoUint512.validate(bigNumberish);
+    } catch (error) {
+      return false;
+    }
+    return true;
+  }
+
+  /**
+   * Check if provided abi type is this data type
+   */
+  static isAbiType(abiType: string): boolean {
+    return abiType === CairoUint512.abiSelector;
+  }
+
+  /**
+   * Return bigint representation
+   */
+  toBigInt(): bigint {
+    return (this.limb3 &lt;&lt; 384n) + (this.limb2 &lt;&lt; 256n) + (this.limb1 &lt;&lt; 128n) + this.limb0;
+  }
+
+  /**
+   * Return Uint512 structure with HexString props
+   * limbx: HexString
+   */
+  toUint512HexString() {
+    return {
+      limb0: addHexPrefix(this.limb0.toString(16)),
+      limb1: addHexPrefix(this.limb1.toString(16)),
+      limb2: addHexPrefix(this.limb2.toString(16)),
+      limb3: addHexPrefix(this.limb3.toString(16)),
+    };
+  }
+
+  /**
+   * Return Uint512 structure with DecimalString props
+   * limbx DecString
+   */
+  toUint512DecimalString() {
+    return {
+      limb0: this.limb0.toString(10),
+      limb1: this.limb1.toString(10),
+      limb2: this.limb2.toString(10),
+      limb3: this.limb3.toString(10),
+    };
+  }
+
+  /**
+   * Return api requests representation witch is felt array
+   */
+  toApiRequest(): string[] {
+    // lower limb first : https://github.com/starkware-libs/cairo/blob/07484c52791b76abcc18fd86265756904557d0d2/corelib/src/test/integer_test.cairo#L767
+    return [
+      CairoFelt(this.limb0),
+      CairoFelt(this.limb1),
+      CairoFelt(this.limb2),
+      CairoFelt(this.limb3),
+    ];
+  }
+}
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;src/utils/cairoDataTypes/uint512.ts&quot;,&quot;line&quot;:54,&quot;character&quot;:15,&quot;text&quot;:&quot;limb0&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/cairoDataTypes/uint512.ts&quot;,&quot;line&quot;:55,&quot;character&quot;:15,&quot;text&quot;:&quot;limb1&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/cairoDataTypes/uint512.ts&quot;,&quot;line&quot;:56,&quot;character&quot;:15,&quot;text&quot;:&quot;limb2&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/cairoDataTypes/uint512.ts&quot;,&quot;line&quot;:57,&quot;character&quot;:15,&quot;text&quot;:&quot;limb3&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 25 Apr 2024 15:57:37 GMT</p>
+    </body>
+  </html>
+  

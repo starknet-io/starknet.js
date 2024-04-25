@@ -1,0 +1,340 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>requestParser.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">src/utils/calldata/requestParser.ts</td><td class="">97.14%</td><td class="">80%</td><td class="">489</td><td class="">475</td><td class="">14</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">import {
+  AbiEntry,
+  AbiEnums,
+  AbiStructs,
+  AllowArray,
+  BigNumberish,
+  ByteArray,
+  CairoEnum,
+  ParsedStruct,
+  Tupled,
+} from &#x27;../../types&#x27;;
+import { CairoUint256 } from &#x27;../cairoDataTypes/uint256&#x27;;
+import { CairoUint512 } from &#x27;../cairoDataTypes/uint512&#x27;;
+import { addHexPrefix, removeHexPrefix } from &#x27;../encode&#x27;;
+import { toHex } from &#x27;../num&#x27;;
+import { encodeShortString, isString, isText, splitLongString } from &#x27;../shortString&#x27;;
+import { byteArrayFromString } from &#x27;./byteArray&#x27;;
+import {
+  felt,
+  getArrayType,
+  isTypeArray,
+  isTypeBytes31,
+  isTypeEnum,
+  isTypeOption,
+  isTypeResult,
+  isTypeSecp256k1Point,
+  isTypeStruct,
+  isTypeTuple,
+  uint256,
+} from &#x27;./cairo&#x27;;
+import {
+  CairoCustomEnum,
+  CairoOption,
+  CairoOptionVariant,
+  CairoResult,
+  CairoResultVariant,
+} from &#x27;./enum&#x27;;
+import extractTupleMemberTypes from &#x27;./tuple&#x27;;
+
+/**
+ * parse base types
+ * @param type type from abi
+ * @param val value provided
+ * @returns string | string[]
+ */
+function parseBaseTypes(type: string, val: BigNumberish): AllowArray&lt;string&gt; {
+  switch (true) {
+    case CairoUint256.isAbiType(type):
+      return new CairoUint256(val).toApiRequest();
+    case CairoUint512.isAbiType(type):
+      return new CairoUint512(val).toApiRequest();
+    case isTypeBytes31(type):
+      return encodeShortString(val.toString());
+    case isTypeSecp256k1Point(type): {
+      const pubKeyETH = removeHexPrefix(toHex(val)).padStart(128, &#x27;0&#x27;);
+      const pubKeyETHy = uint256(addHexPrefix(pubKeyETH.slice(-64)));
+      const pubKeyETHx = uint256(addHexPrefix(pubKeyETH.slice(0, -64)));
+      return [
+        felt(pubKeyETHx.low),
+        felt(pubKeyETHx.high),
+        felt(pubKeyETHy.low),
+        felt(pubKeyETHy.high),
+      ];
+    }
+    default:
+      return felt(val);
+  }
+}
+
+/**
+ * Parse tuple type string to array of known objects
+ * @param element request element
+ * @param typeStr tuple type string
+ * @returns Tupled[]
+ */
+function parseTuple(element: object, typeStr: string): Tupled[] {
+  const memberTypes = extractTupleMemberTypes(typeStr);
+  const elements = Object.values(element);
+
+  if (elements.length !== memberTypes.length) {
+    throw Error(
+      `ParseTuple: provided and expected abi tuple size do not match.
+      provided: ${elements} 
+      expected: ${memberTypes}`
+    );
+  }
+
+  return memberTypes.map((it: any, dx: number) =&gt; {
+    return {
+      element: elements[dx],
+      type: it.type ?? it,
+    };
+  });
+}
+
+function parseByteArray(element: string): string[] {
+  const myByteArray: ByteArray = byteArrayFromString(element);
+  return [
+    myByteArray.data.length.toString(),
+    ...myByteArray.data.map((bn) =&gt; bn.toString()),
+    myByteArray.pending_word.toString(),
+    myByteArray.pending_word_len.toString(),
+  ];
+}
+
+/**
+ * Deep parse of the object that has been passed to the method
+ *
+ * @param element - element that needs to be parsed
+ * @param type  - name of the method
+ * @param structs - structs from abi
+ * @param enums - enums from abi
+ * @return {string | string[]} - parsed arguments in format that contract is expecting
+ */
+function parseCalldataValue(
+  element:
+    | ParsedStruct
+    | BigNumberish
+    | BigNumberish[]
+    | CairoOption&lt;any&gt;
+    | CairoResult&lt;any, any&gt;
+    | CairoEnum,
+  type: string,
+  structs: AbiStructs,
+  enums: AbiEnums
+): string | string[] {
+  if (element === undefined) {
+    throw Error(`Missing parameter for type ${type}`);
+  }
+
+  // value is Array
+  if (Array.isArray(element)) {
+    const result: string[] = [];
+    result.push(felt(element.length)); // Add length to array
+    const arrayType = getArrayType(type);
+
+    return element.reduce((acc, it) =&gt; {
+      return acc.concat(parseCalldataValue(it, arrayType, structs, enums));
+    }, result);
+  }
+
+  // checking if the passed element is struct
+  if (structs[type] &amp;&amp; structs[type].members.length) {
+    if (CairoUint256.isAbiType(type)) {
+      return new CairoUint256(element as any).toApiRequest();
+    }
+    if (CairoUint512.isAbiType(type)) {
+      return new CairoUint512(element as any).toApiRequest();
+    }
+    if (type === &#x27;core::starknet::eth_address::EthAddress&#x27;)
+      return parseBaseTypes(type, element as BigNumberish);
+
+    if (type === &#x27;core::byte_array::ByteArray&#x27;) return parseByteArray(element as string);
+
+    const { members } = structs[type];
+    const subElement = element as any;
+
+    return members.reduce((acc, it: AbiEntry) =&gt; {
+      return acc.concat(parseCalldataValue(subElement[it.name], it.type, structs, enums));
+    }, [] as string[]);
+  }
+  // check if abi element is tuple
+  if (isTypeTuple(type)) {
+    const tupled = parseTuple(element as object, type);
+
+    return tupled.reduce((acc, it: Tupled) =&gt; {
+      const parsedData = parseCalldataValue(it.element, it.type, structs, enums);
+      return acc.concat(parsedData);
+    }, [] as string[]);
+  }
+  // check if u256 C1v0
+  if (CairoUint256.isAbiType(type)) {
+    return new CairoUint256(element as any).toApiRequest();
+  }
+  // check if u512
+  if (CairoUint512.isAbiType(type)) {
+    return new CairoUint512(element as any).toApiRequest();
+  }
+  // check if Enum
+  if (isTypeEnum(type, enums)) {
+    const { variants } = enums[type];
+    // Option Enum
+    if (isTypeOption(type)) {
+      const myOption = element as CairoOption&lt;any&gt;;
+      if (myOption.isSome()) {
+        const listTypeVariant = variants.find((variant) =&gt; variant.name === &#x27;Some&#x27;);
+        if (typeof listTypeVariant === &#x27;undefined&#x27;) {
+          throw Error(`Error in abi : Option has no &#x27;Some&#x27; variant.`);
+        }
+        const typeVariantSome = listTypeVariant.type;
+        if (typeVariantSome === &#x27;()&#x27;) {
+          return CairoOptionVariant.Some.toString();
+        }
+        const parsedParameter = parseCalldataValue(
+          myOption.unwrap(),
+          typeVariantSome,
+          structs,
+          enums
+        );
+        if (Array.isArray(parsedParameter)) {
+          return [CairoOptionVariant.Some.toString(), ...parsedParameter];
+        }
+        return [CairoOptionVariant.Some.toString(), parsedParameter];
+      }
+      return CairoOptionVariant.None.toString();
+    }
+    // Result Enum
+    if (isTypeResult(type)) {
+      const myResult = element as CairoResult&lt;any, any&gt;;
+      if (myResult.isOk()) {
+        const listTypeVariant = variants.find((variant) =&gt; variant.name === &#x27;Ok&#x27;);
+        if (typeof listTypeVariant === &#x27;undefined&#x27;) {
+          throw Error(`Error in abi : Result has no &#x27;Ok&#x27; variant.`);
+        }
+        const typeVariantOk = listTypeVariant.type;
+        if (typeVariantOk === &#x27;()&#x27;) {
+          return CairoResultVariant.Ok.toString();
+        }
+        const parsedParameter = parseCalldataValue(
+          myResult.unwrap(),
+          typeVariantOk,
+          structs,
+          enums
+        );
+        if (Array.isArray(parsedParameter)) {
+          return [CairoResultVariant.Ok.toString(), ...parsedParameter];
+        }
+        return [CairoResultVariant.Ok.toString(), parsedParameter];
+      }
+      // is Result::Err
+      const listTypeVariant = variants.find((variant) =&gt; variant.name === &#x27;Err&#x27;);
+      if (typeof listTypeVariant === &#x27;undefined&#x27;) {
+        throw Error(`Error in abi : Result has no &#x27;Err&#x27; variant.`);
+      }
+      const typeVariantErr = listTypeVariant.type;
+      if (typeVariantErr === &#x27;()&#x27;) {
+        return CairoResultVariant.Err.toString();
+      }
+      const parsedParameter = parseCalldataValue(myResult.unwrap(), typeVariantErr, structs, enums);
+      if (Array.isArray(parsedParameter)) {
+        return [CairoResultVariant.Err.toString(), ...parsedParameter];
+      }
+      return [CairoResultVariant.Err.toString(), parsedParameter];
+    }
+    // Custom Enum
+    const myEnum = element as CairoCustomEnum;
+    const activeVariant: string = myEnum.activeVariant();
+    const listTypeVariant = variants.find((variant) =&gt; variant.name === activeVariant);
+    if (typeof listTypeVariant === &#x27;undefined&#x27;) {
+      throw Error(`Not find in abi : Enum has no &#x27;${activeVariant}&#x27; variant.`);
+    }
+    const typeActiveVariant = listTypeVariant.type;
+    const numActiveVariant = variants.findIndex((variant) =&gt; variant.name === activeVariant); // can not fail due to check of listTypeVariant
+    if (typeActiveVariant === &#x27;()&#x27;) {
+      return numActiveVariant.toString();
+    }
+    const parsedParameter = parseCalldataValue(myEnum.unwrap(), typeActiveVariant, structs, enums);
+    if (Array.isArray(parsedParameter)) {
+      return [numActiveVariant.toString(), ...parsedParameter];
+    }
+    return [numActiveVariant.toString(), parsedParameter];
+  }
+
+  if (typeof element === &#x27;object&#x27;) {
+    throw Error(`Parameter ${element} do not align with abi parameter ${type}`);
+  }
+  return parseBaseTypes(type, element);
+}
+
+/**
+ * Parse one field of the calldata by using input field from the abi for that method
+ *
+ * @param argsIterator - Iterator for value of the field
+ * @param input  - input(field) information from the abi that will be used to parse the data
+ * @param structs - structs from abi
+ * @param enums - enums from abi
+ * @return {string | string[]} - parsed arguments in format that contract is expecting
+ */
+export function parseCalldataField(
+  argsIterator: Iterator&lt;any&gt;,
+  input: AbiEntry,
+  structs: AbiStructs,
+  enums: AbiEnums
+): string | string[] {
+  const { name, type } = input;
+  let { value } = argsIterator.next();
+
+  switch (true) {
+    // Array
+    case isTypeArray(type):
+      if (!Array.isArray(value) &amp;&amp; !isText(value)) {
+        throw Error(`ABI expected parameter ${name} to be array or long string, got ${value}`);
+      }
+      if (isString(value)) {
+        // long string match cairo felt*
+        value = splitLongString(value);
+      }
+      return parseCalldataValue(value, input.type, structs, enums);
+
+    case type === &#x27;core::starknet::eth_address::EthAddress&#x27;:
+      return parseBaseTypes(type, value);
+    // Struct or Tuple
+    case isTypeStruct(type, structs) ||
+      isTypeTuple(type) ||
+      CairoUint256.isAbiType(type) ||
+      CairoUint256.isAbiType(type):
+      return parseCalldataValue(value as ParsedStruct | BigNumberish[], type, structs, enums);
+
+    // Enums
+    case isTypeEnum(type, enums):
+      return parseCalldataValue(
+        value as CairoOption&lt;any&gt; | CairoResult&lt;any, any&gt; | CairoEnum,
+        type,
+        structs,
+        enums
+      );
+
+    // Felt or unhandled
+    default:
+      return parseBaseTypes(type, value);
+  }
+}
+</textarea><pre id="annotations" style="display:none">[{&quot;file&quot;:&quot;src/utils/calldata/requestParser.ts&quot;,&quot;line&quot;:87,&quot;character&quot;:26,&quot;text&quot;:&quot;it&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/requestParser.ts&quot;,&quot;line&quot;:89,&quot;character&quot;:6,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/requestParser.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:6,&quot;text&quot;:&quot;type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/requestParser.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:12,&quot;text&quot;:&quot;it&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/requestParser.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:15,&quot;text&quot;:&quot;type&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/requestParser.ts&quot;,&quot;line&quot;:90,&quot;character&quot;:23,&quot;text&quot;:&quot;it&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/requestParser.ts&quot;,&quot;line&quot;:155,&quot;character&quot;:10,&quot;text&quot;:&quot;subElement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/requestParser.ts&quot;,&quot;line&quot;:158,&quot;character&quot;:43,&quot;text&quot;:&quot;subElement&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/requestParser.ts&quot;,&quot;line&quot;:166,&quot;character&quot;:47,&quot;text&quot;:&quot;element&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/requestParser.ts&quot;,&quot;line&quot;:285,&quot;character&quot;:8,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/requestParser.ts&quot;,&quot;line&quot;:290,&quot;character&quot;:25,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/requestParser.ts&quot;,&quot;line&quot;:290,&quot;character&quot;:43,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/requestParser.ts&quot;,&quot;line&quot;:291,&quot;character&quot;:86,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1},{&quot;file&quot;:&quot;src/utils/calldata/requestParser.ts&quot;,&quot;line&quot;:295,&quot;character&quot;:8,&quot;text&quot;:&quot;value&quot;,&quot;kind&quot;:1}]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 25 Apr 2024 15:57:37 GMT</p>
+    </body>
+  </html>
+  

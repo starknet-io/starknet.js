@@ -1,0 +1,167 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>encode.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">src/utils/encode.ts</td><td class="">100.00%</td><td class="">80%</td><td class="">139</td><td class="">139</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">import { base64 } from &#x27;@scure/base&#x27;;
+
+/* eslint-disable no-param-reassign */
+export const IS_BROWSER = typeof window !== &#x27;undefined&#x27;;
+
+const STRING_ZERO = &#x27;0&#x27;;
+
+/**
+ * Some functions recreated from https://github.com/pedrouid/enc-utils/blob/master/src/index.ts
+ * enc-utils is not a dependency to avoid using `Buffer` which only works in node and not browsers
+ */
+
+/**
+ * Convert array buffer to string
+ *
+ * *[internal usage]*
+ */
+export function arrayBufferToString(array: ArrayBuffer): string {
+  return new Uint8Array(array).reduce((data, byte) =&gt; data + String.fromCharCode(byte), &#x27;&#x27;);
+}
+
+/**
+ * Convert utf8-string to Uint8Array
+ *
+ * *[internal usage]*
+ */
+export function utf8ToArray(str: string): Uint8Array {
+  return new TextEncoder().encode(str);
+}
+
+/**
+ * Convert utf8-string to Uint8Array
+ *
+ * @deprecated equivalent to &#x27;utf8ToArray&#x27;, alias will be removed
+ */
+export function stringToArrayBuffer(str: string): Uint8Array {
+  return utf8ToArray(str);
+}
+
+/**
+ * Convert string to array buffer (browser and node compatible)
+ */
+export function atobUniversal(a: string): Uint8Array {
+  return base64.decode(a);
+}
+
+/**
+ * Convert array buffer to string (browser and node compatible)
+ */
+export function btoaUniversal(b: ArrayBuffer): string {
+  return base64.encode(new Uint8Array(b));
+}
+
+/**
+ * Convert array buffer to hex-string
+ * @returns format: hex-string
+ */
+export function buf2hex(buffer: Uint8Array) {
+  return buffer.reduce((r, x) =&gt; r + x.toString(16).padStart(2, &#x27;0&#x27;), &#x27;&#x27;);
+}
+
+/**
+ * Remove hex prefix &#x27;0x&#x27; from hex-string
+ * @param hex hex-string
+ * @returns format: base16-string
+ */
+export function removeHexPrefix(hex: string): string {
+  return hex.replace(/^0x/i, &#x27;&#x27;);
+}
+
+/**
+ * Add hex prefix &#x27;0x&#x27; to base16-string
+ * @param hex base16-string
+ * @returns format: hex-string
+ */
+export function addHexPrefix(hex: string): string {
+  return `0x${removeHexPrefix(hex)}`;
+}
+
+/**
+ * Prepend or append to string
+ *
+ * *[internal usage]*
+ */
+function padString(str: string, length: number, left: boolean, padding = STRING_ZERO): string {
+  const diff = length - str.length;
+  let result = str;
+  if (diff &gt; 0) {
+    const pad = padding.repeat(diff);
+    result = left ? pad + str : str + pad;
+  }
+  return result;
+}
+
+/**
+ * Prepend string (default with &#x27;0&#x27;)
+ */
+export function padLeft(str: string, length: number, padding = STRING_ZERO): string {
+  return padString(str, length, true, padding);
+}
+
+/**
+ * Calculate byte length of string
+ *
+ * *[no internal usage]*
+ */
+export function calcByteLength(str: string, byteSize = 8): number {
+  const { length } = str;
+  const remainder = length % byteSize;
+  return remainder ? ((length - remainder) / byteSize) * byteSize + byteSize : length;
+}
+
+/**
+ * Prepend &#x27;0&#x27; to string bytes
+ *
+ * *[no internal usage]*
+ */
+export function sanitizeBytes(str: string, byteSize = 8, padding = STRING_ZERO): string {
+  return padLeft(str, calcByteLength(str, byteSize), padding);
+}
+
+/**
+ * Prepend &#x27;0&#x27; to hex-string bytes
+ *
+ * *[no internal usage]*
+ * @param hex hex-string
+ * @returns format: hex-string
+ */
+export function sanitizeHex(hex: string): string {
+  hex = removeHexPrefix(hex);
+  hex = sanitizeBytes(hex, 2);
+  if (hex) {
+    hex = addHexPrefix(hex);
+  }
+  return hex;
+}
+
+/**
+ * String transformation util
+ *
+ * Pascal case to screaming snake case
+ */
+export const pascalToSnake = (text: string) =&gt;
+  /[a-z]/.test(text)
+    ? text
+        .split(/(?=[A-Z])/)
+        .join(&#x27;_&#x27;)
+        .toUpperCase()
+    : text;
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 25 Apr 2024 15:57:37 GMT</p>
+    </body>
+  </html>
+  

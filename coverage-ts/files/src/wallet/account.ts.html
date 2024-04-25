@@ -1,0 +1,192 @@
+
+  <!DOCTYPE html>
+  <html>
+    <head>
+      <title>account.ts</title>
+      <link href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css" type="text/css" rel="stylesheet">
+      <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.js" type="text/javascript" charset="utf-8"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/mode/javascript/javascript.min.js" type="text/javascript" charset="utf-8"></script>
+<link href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.58.2/codemirror.min.css" type="text/css" rel="stylesheet">
+<script src="../../../assets/source-file.js" type="text/javascript" charset="utf-8"></script>
+<link href="../../../assets/source-file.css" type="text/css" rel="stylesheet">
+    </head>
+    <body>
+    <div style="margin-top:3em" class="ui container"><h1 class="ui header"><a href="../../../index.html">TypeScript coverage report</a></h1><table style="margin-top:2em" class="ui celled table"><thead class=""><tr class=""><th class="">Filename</th><th class="">Percent</th><th class="">Threshold</th><th class="">Total</th><th class="">Covered</th><th class="">Uncovered</th></tr></thead><tbody class=""><tr class="positive"><td class="">src/wallet/account.ts</td><td class="">100.00%</td><td class="">80%</td><td class="">204</td><td class="">204</td><td class="">0</td></tr></tbody></table><textarea id="editor" readonly="" style="margin-top:3em">import {
+  type AccountChangeEventHandler,
+  type AddStarknetChainParameters,
+  type NetworkChangeEventHandler,
+  type WatchAssetParameters,
+} from &#x27;starknet-types-07&#x27;;
+
+import { Account, AccountInterface } from &#x27;../account&#x27;;
+import { ProviderInterface } from &#x27;../provider&#x27;;
+import {
+  AllowArray,
+  CairoVersion,
+  Call,
+  CompiledSierra,
+  DeclareContractPayload,
+  MultiDeployContractResponse,
+  ProviderOptions,
+  TypedData,
+  UniversalDeployerContractPayload,
+} from &#x27;../types&#x27;;
+import { extractContractHashes } from &#x27;../utils/contract&#x27;;
+import { stringify } from &#x27;../utils/json&#x27;;
+import { buildUDCCall } from &#x27;../utils/transaction&#x27;;
+import {
+  addDeclareTransaction,
+  addInvokeTransaction,
+  addStarknetChain,
+  getPermissions,
+  onAccountChange,
+  onNetworkChanged,
+  requestAccounts,
+  signMessage,
+  switchStarknetChain,
+  watchAsset,
+} from &#x27;./connect&#x27;;
+import { StarknetWalletProvider } from &#x27;./types&#x27;;
+import { StarknetChainId } from &#x27;../constants&#x27;;
+
+// Represent &#x27;Selected Active&#x27; Account inside Connected Wallet
+export class WalletAccount extends Account implements AccountInterface {
+  public address: string = &#x27;&#x27;;
+
+  public walletProvider: StarknetWalletProvider;
+
+  constructor(
+    providerOrOptions: ProviderOptions | ProviderInterface,
+    walletProvider: StarknetWalletProvider,
+    cairoVersion?: CairoVersion
+  ) {
+    super(providerOrOptions, &#x27;&#x27;, &#x27;&#x27;, cairoVersion); // At this point unknown address
+    this.walletProvider = walletProvider;
+
+    // Update Address on change
+    this.walletProvider.on(&#x27;accountsChanged&#x27;, (res) =&gt; {
+      if (!res) return;
+      this.address = res[0].toLowerCase();
+    });
+
+    // Update Channel chainId on Network change
+    this.walletProvider.on(&#x27;networkChanged&#x27;, (res) =&gt; {
+      if (!res) return;
+      // Determine is it better to set chainId or replace channel with new one
+      // At the moment channel is stateless but it could change
+      this.channel.setChainId(res as StarknetChainId);
+    });
+
+    // Get and Set Address !!! Post constructor initial empty string
+    walletProvider
+      .request({
+        type: &#x27;wallet_requestAccounts&#x27;,
+        params: {
+          silent_mode: false,
+        },
+      })
+      .then((res) =&gt; {
+        this.address = res[0].toLowerCase();
+      });
+  }
+
+  /**
+   * WALLET EVENTS
+   */
+  public onAccountChange(callback: AccountChangeEventHandler) {
+    onAccountChange(this.walletProvider, callback);
+  }
+
+  public onNetworkChanged(callback: NetworkChangeEventHandler) {
+    onNetworkChanged(this.walletProvider, callback);
+  }
+
+  /**
+   * WALLET SPECIFIC METHODS
+   */
+  public requestAccounts(silentMode = false) {
+    return requestAccounts(this.walletProvider, silentMode);
+  }
+
+  public getPermissions() {
+    return getPermissions(this.walletProvider);
+  }
+
+  public switchStarknetChain(chainId: StarknetChainId) {
+    return switchStarknetChain(this.walletProvider, chainId);
+  }
+
+  public watchAsset(asset: WatchAssetParameters) {
+    return watchAsset(this.walletProvider, asset);
+  }
+
+  public addStarknetChain(chain: AddStarknetChainParameters) {
+    return addStarknetChain(this.walletProvider, chain);
+  }
+
+  /**
+   * ACCOUNT METHODS
+   */
+  override execute(calls: AllowArray&lt;Call&gt;) {
+    const txCalls = [].concat(calls as any).map((it) =&gt; {
+      const { contractAddress, entrypoint, calldata } = it;
+      return {
+        contract_address: contractAddress,
+        entry_point: entrypoint,
+        calldata,
+      };
+    });
+
+    const params = {
+      calls: txCalls,
+    };
+
+    return addInvokeTransaction(this.walletProvider, params);
+  }
+
+  override declare(payload: DeclareContractPayload) {
+    const declareContractPayload = extractContractHashes(payload);
+
+    // DISCUSS: HOTFIX: Adapt Abi format
+    const pContract = payload.contract as CompiledSierra;
+    const cairo1Contract = {
+      ...pContract,
+      abi: stringify(pContract.abi),
+    };
+
+    // Check FIx
+    if (!declareContractPayload.compiledClassHash) {
+      throw Error(&#x27;compiledClassHash is required&#x27;);
+    }
+
+    const params = {
+      compiled_class_hash: declareContractPayload.compiledClassHash,
+      contract_class: cairo1Contract,
+    };
+
+    return addDeclareTransaction(this.walletProvider, params);
+  }
+
+  override async deploy(
+    payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[]
+  ): Promise&lt;MultiDeployContractResponse&gt; {
+    const { calls, addresses } = buildUDCCall(payload, this.address);
+    const invokeResponse = await this.execute(calls);
+
+    return {
+      ...invokeResponse,
+      contract_address: addresses,
+    };
+  }
+
+  override signMessage(typedData: TypedData) {
+    return signMessage(this.walletProvider, typedData);
+  }
+
+  // TODO: MISSING ESTIMATES
+}
+</textarea><pre id="annotations" style="display:none">[]</pre></div>
+    <p class="footer-text">TypeScript Coverage Report generated by <a href="https://github.com/plantain-00/type-coverage">type-coverage</a> and <a href="https://github.com/alexcanessa/typescript-coverage-report">typescript-coverage-report</a> at Thu, 25 Apr 2024 15:57:38 GMT</p>
+    </body>
+  </html>
+  
