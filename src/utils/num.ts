@@ -72,7 +72,8 @@ export function toHex(number: BigNumberish): string {
 }
 
 /**
- * Alias of ToHex
+ * Alias of toHex
+ * @returns format: hex-string
  * @example
  * ```typescript
  * const result = toHexString(123);
@@ -123,22 +124,22 @@ export function hexToDecimalString(hex: string): string {
  * @returns format: hex-string
  * @example
  * ```typescript
- * const hexString = '0x01A...'
+ * const hexString = '0x01A2F3'
  * const result = cleanHex(hexString);
- * //result = '0x1a..'
+ * // result = '0x1a2f3'
  * ```
  */
 export const cleanHex = (hex: string) => hex.toLowerCase().replace(/^(0x)0+/, '$1');
 
 /**
- * Asserts input is equal to or greater then lowerBound and lower then upperBound.
+ * Asserts input is equal to or greater than lowerBound and lower than upperBound.
  *
  * The `inputName` parameter is used in the assertion message.
  * @param input Value to check
  * @param lowerBound Lower bound value
  * @param upperBound Upper bound value
  * @param inputName Name of the input for error message
- * @throws Error if input is out of range
+ * @Throws Error if input is out of range
  * @example
  * ```typescript
  * const input1:BigNumberish = 10;
@@ -146,7 +147,7 @@ export const cleanHex = (hex: string) => hex.toLowerCase().replace(/^(0x)0+/, '$
  * 
  * const input2: BigNumberish = 25;
  * assertInRange(input2, 5, 20, 'value');
- * //Throws Error: Message not signable, invalid value length.
+ * // Throws Error: Message not signable, invalid value length.
  * ```
  */
 export function assertInRange(
@@ -198,6 +199,8 @@ export function bigNumberishArrayToHexadecimalStringArray(rawCalldata: BigNumber
 
 /**
  * Test if string is whole number (0, 1, 2, 3...)
+ * @param value The string to be tested.
+ * @return {boolean} Returns true if the value is a number, otherwise returns false.
  * @example
  * ```typescript
  * const result = isStringWholeNumber("123");
@@ -208,6 +211,7 @@ export const isStringWholeNumber = (value: string) => /^\d+$/.test(value);
 
 /**
  * Convert string to decimal string
+ * @param value The string to be converted.
  * @returns format: decimal string
  * @example
  * ```typescript
@@ -215,7 +219,7 @@ export const isStringWholeNumber = (value: string) => /^\d+$/.test(value);
  * // result = "26"
  * 
  * const result2 = getDecimalString("Hello");
- * // result2 = "Hello need to be hex-string or whole-number-string"
+ * // Throws Error: "Hello need to be hex-string or whole-number-string"
  * ```
  */
 export function getDecimalString(value: string) {
@@ -230,6 +234,7 @@ export function getDecimalString(value: string) {
 
 /**
  * Convert string to hexadecimal string
+ * @param value The string to be converted.
  * @returns format: hex-string
  * @example
  * ```typescript
@@ -237,7 +242,7 @@ export function getDecimalString(value: string) {
  * // result = "0x7b"
  * 
  * const result2 = getHexString("Hello");
- * // result2 = Hello need to be hex-string or whole-number-s
+ * // Throws Error: Hello need to be hex-string or whole-number-string
  * ```
  */
 export function getHexString(value: string) {
@@ -252,6 +257,7 @@ export function getHexString(value: string) {
 
 /**
  * Convert string array to hex-string array
+ * @param value The string array to be converted.
  * @returns format: hex-string array
  * @example
  * ```typescript
@@ -266,20 +272,23 @@ export function getHexStringArray(value: Array<string>) {
 
 /**
  * Convert boolean to "0" or "1"
+ * @param value The boolean value to be converted.
+ * @return {boolean} Returns true if the value is a number, otherwise returns false.
  * @example
  * ```typescript
  * const result = toCairoBool(true);
  * // result ="1"
  * 
  * const result2 = toCairoBool(false);
- * // result = "0"
+ * // result2 = "0"
  * ```
  */
 export const toCairoBool = (value: boolean): string => (+value).toString();
 
 /**
  * Convert hex-string to an array of Bytes (Uint8Array)
- * @param value hex-string
+ * @param value The hex-string to be converted.
+ * @return The array of bytes (Uint8Array) corresponding to the hex-string.
  * @example
  * ```typescript
  * const result = hexToBytes("0x123456");
@@ -297,10 +306,10 @@ export function hexToBytes(value: string): Uint8Array {
 }
 
 /**
- *
- * @param number value to be increased
+ * Increase a give number by specified percentage
+ * @param number The value to be increased (BigInt or number).
  * @param percent integer as percent ex. 50 for 50%
- * @returns increased value
+ * @returns The increased value as a BigInt.
  * @example
  * ```typescript
  * const result = addPercent(100, 50);
@@ -323,7 +332,8 @@ export function addPercent(number: BigNumberish, percent: number) {
  * // result = true
  * 
  * const result2 = isNumber("123");
- * // result = true
+ * // result2 = false
+ * ```
  */
 export function isNumber(value: unknown): value is number {
   return typeof value === 'number';
