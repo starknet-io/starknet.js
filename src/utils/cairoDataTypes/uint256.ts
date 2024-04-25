@@ -133,4 +133,24 @@ export class CairoUint256 {
   toApiRequest() {
     return [CairoFelt(this.low), CairoFelt(this.high)];
   }
+
+  /**
+   * Construct CairoUint256 from calldata
+   * @param calldata Array of two strings representing the low and high parts of a uint256.
+   */
+  static fromCalldata(calldata: [string, string]): CairoUint256 {
+    if (calldata.length !== 2) {
+      throw new Error(
+        'Calldata must contain exactly two elements for low and high parts of uint256.'
+      );
+    }
+
+    // Validate each part to ensure they are within the acceptable range.
+    const [low, high] = calldata;
+    const validatedLow = CairoUint256.validateProps(low, UINT_256_LOW_MIN.toString());
+    const validatedHigh = CairoUint256.validateProps(high, UINT_256_HIGH_MIN.toString());
+
+    // Construct a new instance based on the validated low and high parts.
+    return new CairoUint256(validatedLow.low, validatedHigh.high);
+  }
 }
