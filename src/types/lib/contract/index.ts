@@ -4,6 +4,7 @@ import { CompiledSierra, SierraContractClass } from './sierra';
 // Final types
 /**
  * format produced after compressing compiled contract
+ *
  * CompressedCompiledContract
  */
 export type ContractClass = LegacyContractClass | SierraContractClass;

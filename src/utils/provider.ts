@@ -20,9 +20,9 @@ import { isSierra } from './contract';
 import { formatSpaces } from './hash';
 import { parse, stringify } from './json';
 import { isBigInt, isHex, isNumber, toHex } from './num';
+import { isDecimalString, isString } from './shortString';
 import { compressProgram } from './stark';
 import type { GetTransactionReceiptResponse } from './transactionReceipt';
-import { isString } from './shortString';
 
 /**
  * Helper - Async Sleep for 'delay' time
@@ -72,10 +72,11 @@ export function parseContract(contract: CompiledContract | string): ContractClas
  * @returns default node url
  */
 export const getDefaultNodeUrl = (networkName?: NetworkName, mute: boolean = false): string => {
-  if (!mute)
+  if (!mute) {
     // eslint-disable-next-line no-console
     console.warn('Using default public node url, please provide nodeUrl in provider options!');
-  const nodes = RPC_NODES[networkName ?? NetworkName.SN_GOERLI]; // TODO: when goerli deprecated switch default to sepolia
+  }
+  const nodes = RPC_NODES[networkName ?? NetworkName.SN_SEPOLIA];
   const randIdx = Math.floor(Math.random() * nodes.length);
   return nodes[randIdx];
 };
@@ -102,6 +103,15 @@ export function txIdentifier(txHash?: BigNumberish, txId?: BigNumberish): string
 
 export const validBlockTags = Object.values(BlockTag);
 
+/**
+ * hex string and BigInt are detected as block hashes. identifier return { block_hash: hash }
+ *
+ * decimal string and number are detected as block numbers. identifier return { block_number: number }
+ *
+ * text string are detected as block tag. identifier return tag
+ *
+ * null is detected as 'pending' block tag. identifier return 'pending'
+ */
 export class Block {
   hash: BlockIdentifier = null;
 
@@ -109,12 +119,16 @@ export class Block {
 
   tag: BlockIdentifier = null;
 
-  private setIdentifier(__identifier: BlockIdentifier) {
+  private setIdentifier(__identifier: BlockIdentifier): void {
     if (isString(__identifier)) {
-      if (isHex(__identifier)) {
+      if (isDecimalString(__identifier)) {
+        this.number = parseInt(__identifier, 10);
+      } else if (isHex(__identifier)) {
         this.hash = __identifier;
       } else if (validBlockTags.includes(__identifier as BlockTag)) {
         this.tag = __identifier;
+      } else {
+        throw TypeError(`Block identifier unmanaged: ${__identifier}`);
       }
     } else if (isBigInt(__identifier)) {
       this.hash = toHex(__identifier);
@@ -122,6 +136,10 @@ export class Block {
       this.number = __identifier;
     } else {
       this.tag = BlockTag.pending;
+    }
+
+    if (isNumber(this.number) && this.number < 0) {
+      throw TypeError(`Block number (${this.number}) can't be negative`);
     }
   }
 
@@ -162,19 +180,26 @@ export class Block {
   valueOf = () => this.number;
 
   toString = () => this.hash;
-
-  /*   get sequencerIdentifier(): SequencerIdentifier {
-    return this.hash !== null
-      ? { blockHash: this.hash as string }
-      : { blockNumber: (this.number ?? this.tag) as BlockNumber };
-  } */
 }
 
+/**
+ * Check if the given transaction details is a V3 transaction.
+ *
+ * @param {InvocationsDetailsWithNonce} details - The transaction details to be checked.
+ * @return {boolean} - Returns true if the transaction is a V3 transaction, otherwise false.
+ */
 export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3TransactionDetails {
   const version = details.version ? toHex(details.version) : ETransactionVersion.V3;
   return version === ETransactionVersion.V3 || version === ETransactionVersion.F3;
 }
 
+/**
+ * Determines if the given response matches the specified version.
+ *
+ * @param {('0.5' | '0.6' | '0.7')} version - The version to compare against the response.
+ * @param {string} response - The response to check against the version.
+ * @returns {boolean} - True if the response matches the version, false otherwise.
+ */
 export function isVersion(version: '0.5' | '0.6' | '0.7', response: string) {
   const [majorS, minorS] = version.split('.');
   const [majorR, minorR] = response.split('.');

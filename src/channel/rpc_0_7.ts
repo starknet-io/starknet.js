@@ -631,7 +631,7 @@ export class RpcChannel {
     if (invocation.type === TransactionType.INVOKE) {
       return {
         // v0 v1 v3
-        type: RPC.ETransactionType.INVOKE, // TODO: Diff between sequencer and rpc invoke type
+        type: RPC.ETransactionType.INVOKE,
         sender_address: invocation.contractAddress,
         calldata: CallData.toHex(invocation.calldata),
         version: toHex(invocation.version || defaultVersions.v3),

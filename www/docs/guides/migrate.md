@@ -8,22 +8,33 @@ This document only covers the features present in v5 which have changed in some 
 
 If you encounter any missing changes, please let us know and we will update this guide.
 
-## Transaction response
+## Transaction receipt
 
-When sending a transaction, the response type has changed.
-
-Previously, the response was just the transaction hash value. Now, the response is an object including many other data.
-This has an impact on `provider.waitForTransaction()`:
+When sending a transaction, the receipt type has changed.
+In V5, it's an object that can have varied definitions, depending of the status and the type of transaction.
+In V6, this object is in `TxR.value`, and several helpers are available (`.statusReceipt`, `isSuccess()`, `isRejected()`, `isReverted()`, `.isError()`, `match`, ...)
 
 ```typescript
 const response = await ethContract.approve(swapContractAddress, cairo.uint256(100000));
-
-// v5
-const transactionReceipt = await provider.waitForTransaction(response);
-
-// v6
 const transactionReceipt = await provider.waitForTransaction(response.transaction_hash);
+
+// v5 : transactionReceipt is just an object
+{
+type: 'INVOKE',
+  transaction_hash: '0x5286217518c621581ac85505a99ffe182ce1114abaa8fce8b418d2b27c3c04c',
+  actual_fee: { unit: 'WEI', amount: '0x1c1902fe99800' },
+  messages_sent: [],
+  execution_status: 'SUCCEEDED',
+  finality_status: 'ACCEPTED_ON_L2',
+  // ...
+}
+// v6 : transactionReceipt is an object + helpers
+const receipt = transactionReceipt.value;
+const status: boolean = transactionReceipt.isSuccess();
+
 ```
+
+> See this [guide](./interact.md#transaction-receipt-response)
 
 ## Long strings
 

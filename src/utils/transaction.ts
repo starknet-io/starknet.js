@@ -98,6 +98,14 @@ export const getExecuteCalldata = (calls: Call[], cairoVersion: CairoVersion = '
   return fromCallsToExecuteCalldata(calls);
 };
 
+/**
+ * Builds a UDCCall object.
+ *
+ * @param {UniversalDeployerContractPayload | UniversalDeployerContractPayload[]} payload - The payload data for the UDCCall. Can be a single payload object or an array of payload objects
+ *.
+ * @param {string} address - The address to be used in the UDCCall.
+ * @returns {{ calls: Array, addresses: Array }} - The UDCCall object containing an array of calls and an array of addresses.
+ */
 export function buildUDCCall(
   payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
   address: string

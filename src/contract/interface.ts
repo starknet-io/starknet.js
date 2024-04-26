@@ -162,5 +162,11 @@ export abstract class ContractInterface {
    */
   public abstract getVersion(): Promise<ContractVersion>;
 
+  /**
+   * Returns a typed instance of ContractV2 based on the supplied ABI.
+   *
+   * @param {TAbi} tAbi - The ABI (Abstract Binary Interface) of the ContractV2.
+   * @return {TypedContractV2<TAbi>} - A typed instance of ContractV2.
+   */
   public abstract typedv2<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContractV2<TAbi>;
 }
