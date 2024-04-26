@@ -10,7 +10,7 @@ export type { BigNumberish };
 /**
  * Test if string is hex-string
  * @param hex hex-string
- * @returns{boolean} True if the input string is a hexadecimal string, false otherwise
+ * @returns {boolean} True if the input string is a hexadecimal string, false otherwise
  * @example
  * ```typescript
  * const hexString1 = "0x2fd23d9182193775423497fc0c472e156c57c69e4089a1967fb288a2d84e914";
@@ -200,7 +200,7 @@ export function bigNumberishArrayToHexadecimalStringArray(rawCalldata: BigNumber
 /**
  * Test if string is whole number (0, 1, 2, 3...)
  * @param value The string to be tested.
- * @return {boolean} Returns true if the value is a number, otherwise returns false.
+ * @returns {boolean} Returns true if the value is a number, otherwise returns false.
  * @example
  * ```typescript
  * const result = isStringWholeNumber("123");
@@ -273,7 +273,7 @@ export function getHexStringArray(value: Array<string>) {
 /**
  * Convert boolean to "0" or "1"
  * @param value The boolean value to be converted.
- * @return {boolean} Returns true if the value is a number, otherwise returns false.
+ * @returns {boolean} Returns true if the value is a number, otherwise returns false.
  * @example
  * ```typescript
  * const result = toCairoBool(true);
@@ -288,7 +288,7 @@ export const toCairoBool = (value: boolean): string => (+value).toString();
 /**
  * Convert hex-string to an array of Bytes (Uint8Array)
  * @param value The hex-string to be converted.
- * @return The array of bytes (Uint8Array) corresponding to the hex-string.
+ * @returns The array of bytes (Uint8Array) corresponding to the hex-string.
  * @example
  * ```typescript
  * const result = hexToBytes("0x123456");
@@ -325,7 +325,7 @@ export function addPercent(number: BigNumberish, percent: number) {
  * Check if a value is a number.
  *
  * @param {unknown} value - The value to check.
- * @return {boolean} Returns true if the value is a number, otherwise returns false.
+ * @returns {boolean} Returns true if the value is a number, otherwise returns false.
  * @example
  * ```typescript
  * const result = isNumber(123);
@@ -343,7 +343,7 @@ export function isNumber(value: unknown): value is number {
  * Checks if a given value is of boolean type.
  *
  * @param {unknown} value - The value to check.
- * @return {boolean} - True if the value is of boolean type, false otherwise.
+ * @returns {boolean} - True if the value is of boolean type, false otherwise.
  * @example
  * ```typescript
  * const result = isBoolean(true);
