@@ -32,7 +32,7 @@ import { createAbiParser, isNoConstructorValid } from './parser';
 import { AbiParserInterface } from './parser/interface';
 import orderPropsByAbi from './propertyOrder';
 import { parseCalldataField } from './requestParser';
-import { decodeCalldataField } from './calldataDecoder';
+import decodeCalldataField from './calldataDecoder';
 import responseParser from './responseParser';
 import validateFields from './validate';
 
