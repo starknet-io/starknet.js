@@ -32,6 +32,7 @@ import { createAbiParser, isNoConstructorValid } from './parser';
 import { AbiParserInterface } from './parser/interface';
 import orderPropsByAbi from './propertyOrder';
 import { parseCalldataField } from './requestParser';
+import { decodeCalldataField } from './calldataDecoder';
 import responseParser from './responseParser';
 import validateFields from './validate';
 
@@ -154,6 +155,27 @@ export class CallData {
       value: true,
     });
     return callArray;
+  }
+
+  /**
+   * Decompile calldata into JavaScript-compatible types based on ABI definitions.
+   * @param method The method name as defined in the ABI.
+   * @param calldata Array of strings representing the encoded calldata.
+   * @returns A structured object representing the decoded calldata.
+   */
+  public decompile(method: string, calldata: string[]): RawArgs {
+    const abiMethod = this.abi.find(entry => entry.name === method && entry.type === 'function') as FunctionAbi;
+    if (!abiMethod) {
+        throw new Error(`Method ${method} not found in ABI`);
+    }
+  
+    const calldataIterator = calldata[Symbol.iterator]();
+    const decodedArgs: RawArgs = {};
+    abiMethod.inputs.forEach(input => {
+        decodedArgs[input.name] = decodeCalldataField(calldataIterator, input, this.structs, this.enums);
+    });
+  
+    return decodedArgs;
   }
 
   /**

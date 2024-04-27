@@ -5,7 +5,10 @@ import {
   BigNumberish,
   ByteArray,
   CairoEnum,
+  Calldata,
   ParsedStruct,
+  RawArgs,
+  RawArgsArray,
   StructAbi,
 } from '../../types';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
@@ -153,90 +156,90 @@ function decodeByteArray(calldata: string[]): ByteArray {
   };
 }
 
-/**
- * Decode calldata for a given type.
- * @param calldata The calldata array.
- * @param type The type string.
- * @param structs The ABI structs.
- * @param enums The ABI enums.
- * @returns The decoded value.
- * @throws An error if the type is not recognized.
- */
-function decodeCalldataValue(
-  calldata: string | string[],
-  type: string,
-  structs: AbiStructs,
-  enums: AbiEnums
-): any {
-  // Felt type decoding
-  if (isTypeFelt(type)) {
-    return decodeBaseTypes(type, Array.isArray(calldata) ? calldata[0] : calldata);
-  }
+// /**
+//  * Decode calldata for a given type.
+//  * @param calldata The calldata array.
+//  * @param type The type string.
+//  * @param structs The ABI structs.
+//  * @param enums The ABI enums.
+//  * @returns The decoded value.
+//  * @throws An error if the type is not recognized.
+//  */
+// function decodeCalldataValue(
+//   calldata: string | string[],
+//   type: string,
+//   structs: AbiStructs,
+//   enums: AbiEnums
+// ): any {
+//   // Felt type decoding
+//   if (isTypeFelt(type)) {
+//     return decodeBaseTypes(type, Array.isArray(calldata) ? calldata[0] : calldata);
+//   }
 
-  // Bytes31 decoding
-  if (isTypeBytes31(type)) {
-    return decodeShortString(calldata as string);
-  }
+//   // Bytes31 decoding
+//   if (isTypeBytes31(type)) {
+//     return decodeShortString(calldata as string);
+//   }
 
-  // CairoUint256
-  if (CairoUint256.isAbiType(type)) {
-    return decodeBaseTypes(type, Array.isArray(calldata) ? calldata[0] : calldata);
-  }
+//   // CairoUint256
+//   if (CairoUint256.isAbiType(type)) {
+//     return decodeBaseTypes(type, Array.isArray(calldata) ? calldata[0] : calldata);
+//   }
 
-  // Struct decoding
-  if (isTypeStruct(type, structs)) {
-    return decodeStruct(Array.isArray(calldata) ? calldata : [calldata], type, structs, enums);
-  }
+//   // Struct decoding
+//   if (isTypeStruct(type, structs)) {
+//     return decodeStruct(Array.isArray(calldata) ? calldata : [calldata], type, structs, enums);
+//   }
 
-  // Enum decoding
-  if (isTypeEnum(type, enums)) {
-    return decodeEnum(Array.isArray(calldata) ? calldata : [calldata], type, enums);
-  }
+//   // Enum decoding
+//   if (isTypeEnum(type, enums)) {
+//     return decodeEnum(Array.isArray(calldata) ? calldata : [calldata], type, enums);
+//   }
 
-  // Array decoding
-  if (isTypeArray(type)) {
-    return decodeArray(Array.isArray(calldata) ? calldata : [calldata], type, structs, enums);
-  }
+//   // Array decoding
+//   if (isTypeArray(type)) {
+//     return decodeArray(Array.isArray(calldata) ? calldata : [calldata], type, structs, enums);
+//   }
 
-  // Tuple decoding
-  if (isTypeTuple(type)) {
-    return decodeTuple(Array.isArray(calldata) ? calldata : [calldata], type, structs, enums);
-  }
+//   // Tuple decoding
+//   if (isTypeTuple(type)) {
+//     return decodeTuple(Array.isArray(calldata) ? calldata : [calldata], type, structs, enums);
+//   }
 
-  // CairoOption decoding
-  if (isTypeOption(type)) {
-    const match = type.match(/Option<(.*)>/);
-    assert(match !== null, `Type "${type}" is not a valid Option type.`);
+//   // CairoOption decoding
+//   if (isTypeOption(type)) {
+//     const match = type.match(/Option<(.*)>/);
+//     assert(match !== null, `Type "${type}" is not a valid Option type.`);
 
-    const innerType = match![1];
-    return decodeCairoOption(
-      Array.isArray(calldata) ? calldata : [calldata],
-      innerType,
-      structs,
-      enums
-    );
-  }
+//     const innerType = match![1];
+//     return decodeCairoOption(
+//       Array.isArray(calldata) ? calldata : [calldata],
+//       innerType,
+//       structs,
+//       enums
+//     );
+//   }
 
-  // CairoResult decoding
-  if (isTypeResult(type)) {
-    const matches = type.match(/Result<(.+),\s*(.+)>/);
-    assert(matches !== null && matches.length > 2, `Type "${type}" is not a valid Option type.`);
+//   // CairoResult decoding
+//   if (isTypeResult(type)) {
+//     const matches = type.match(/Result<(.+),\s*(.+)>/);
+//     assert(matches !== null && matches.length > 2, `Type "${type}" is not a valid Option type.`);
 
-    const okType = matches[1];
-    const errType = matches[2];
+//     const okType = matches[1];
+//     const errType = matches[2];
 
-    return decodeCairoResult(
-      Array.isArray(calldata) ? calldata : [calldata],
-      okType,
-      errType,
-      structs,
-      enums
-    );
-  }
+//     return decodeCairoResult(
+//       Array.isArray(calldata) ? calldata : [calldata],
+//       okType,
+//       errType,
+//       structs,
+//       enums
+//     );
+//   }
 
-  // Fallback for unrecognized types
-  throw new Error(`Unrecognized type ${type} for calldata decoding.`);
-}
+//   // Fallback for unrecognized types
+//   throw new Error(`Unrecognized type ${type} for calldata decoding.`);
+// }
 
 /**
  * Decode an array from calldata.
@@ -435,57 +438,191 @@ function getExpectedCalldataLengthForEnum(
 }
 
 /**
- * Decode a calldata field.
- * @param calldata The calldata array.
- * @param input The ABI entry for the field.
- * @param structs The ABI structs.
- * @param enums The ABI enums.
- * @returns The decoded field value.
+ * Decode calldata fields using provided ABI details.
+ * @param calldataIterator Iterator over the string array representing encoded calldata.
+ * @param input ABI entry for the field to decode.
+ * @param structs Struct definitions from ABI, if applicable.
+ * @param enums Enum definitions from ABI, if applicable.
+ * @returns Decoded field value.
  */
-export function decodeCalldataField(
-  calldata: string[],
+export default function decodeCalldataField(
+  calldataIterator: Iterator<string>,
   input: AbiEntry,
   structs: AbiStructs,
   enums: AbiEnums
 ): any {
   const { type } = input;
+  let temp;
 
+  // Handling different types based on the ABI definition
   switch (true) {
-    // Handling Array types
     case isTypeArray(type): {
       const elementType = getArrayType(type);
-      return calldata.map((elementCalldata) =>
-        decodeCalldataValue([elementCalldata], elementType, structs, enums)
-      );
+      const elements: any[] = [];
+      let elementResult = calldataIterator.next();
+      while (!elementResult.done) {
+        elements.push(decodeCalldataValue([elementResult.value], elementType, structs, enums));
+        elementResult = calldataIterator.next();
+      }
+      return elements;
     }
 
-    // Handling StarkNet addresses
-    case type === 'core::starknet::eth_address::EthAddress': {
-      // Directly returning the value, assuming it's already in the desired format
-      return calldata[0];
-    }
+    case isTypeStruct(type, structs):
+    case isTypeTuple(type):
+      const structOrTupleResult: RawArgs = {};
+      const memberTypes = structs[type]?.members || extractTupleMemberTypes(type);
+      memberTypes.forEach(member => {
+        structOrTupleResult[member.name] = decodeCalldataValue([calldataIterator.next().value], member.type, structs, enums);
+      });
+      return structOrTupleResult;
 
-    // Handling Struct or Tuple types
-    case isTypeStruct(type, structs): {
-      return decodeStruct(calldata, type, structs, enums);
-    }
+    case isTypeFelt(type):
+    case CairoUint256.isAbiType(type):
+    case isTypeEnum(type, enums):
+    case isTypeBytes31(type):
+      temp = calldataIterator.next().value;
+      return decodeCalldataValue(temp, type, structs, enums);
 
-    case isTypeTuple(type): {
-      return decodeTuple(calldata, type, structs, enums);
-    }
-
-    // Handling CairoUint256 types
-    case CairoUint256.isAbiType(type): {
-      return CairoUint256.fromCalldata([calldata[0], calldata[1]]);
-    }
-
-    // Handling Enums
-    case isTypeEnum(type, enums): {
-      return decodeEnum(calldata, type, enums);
-    }
-
-    default: {
-      return decodeBaseTypes(calldata[0], type);
-    }
+    default:
+      throw new Error(`Unsupported or unrecognized type: ${type}`);
   }
 }
+
+/**
+ * Decodes a calldata segment based on the specified type.
+ * This function is versatile enough to handle all types directly from the calldata.
+ * @param calldata The calldata array segment or a single calldata value.
+ * @param type The type string as defined in the ABI.
+ * @param structs ABI struct definitions, if applicable.
+ * @param enums ABI enum definitions, if applicable.
+ * @returns The decoded JavaScript-compatible type.
+ */
+function decodeCalldataValue(
+  calldata: string | string[],
+  type: string,
+  structs: AbiStructs,
+  enums: AbiEnums
+): any {
+  let singleValue = Array.isArray(calldata) && calldata.length === 1 ? calldata[0] : calldata;
+
+  switch (true) {
+    case CairoUint256.isAbiType(type):
+      assert(
+        Array.isArray(calldata) && calldata.length === 2,
+        'Expected calldata for CairoUint256 as an array of two strings.'
+      );
+      return new CairoUint256(calldata[0], calldata[1]).toBigInt();
+
+    case isTypeFelt(type):
+      assert(
+        typeof singleValue === 'string',
+        'Expected single string calldata for type `felt`.'
+      );
+      return BigInt(singleValue);
+
+    case isTypeBytes31(type):
+      assert(
+        typeof singleValue === 'string',
+        'Expected single string calldata for type `bytes31`.'
+      );
+      return decodeShortString(singleValue);
+
+    case isTypeEnum(type, enums):
+      return decodeEnum(calldata as string[], type, enums);
+
+    case isTypeStruct(type, structs):
+      return decodeStruct(calldata as string[], type, structs, enums);
+
+    case isTypeArray(type):
+      const elementType = getArrayType(type);
+      return (calldata as string[]).map(element => decodeCalldataValue(element, elementType, structs, enums));
+
+    case isTypeTuple(type):
+      return decodeTuple(calldata as string[], type, structs, enums);
+
+    case isTypeOption(type) || isTypeResult(type):
+      return decodeComplexType(calldata as string[], type, structs, enums);
+
+    default:
+      throw new Error(`Unrecognized type ${type} for calldata decoding.`);
+  }
+}
+
+function decodeComplexType(
+  calldata: Calldata,
+  type: string,
+  structs: AbiStructs,
+  enums: AbiEnums
+): CairoOption<any> | CairoResult<any, any> | CairoCustomEnum {
+  const matches = type.match(/(Option|Result)<(.+)>/);
+  assert(matches, `Type "${type}" is not a valid complex type.`);
+  const containerType = matches[1];
+  const innerType = matches[2];
+
+  switch (containerType) {
+    case 'Option':
+      const optionValue = decodeCalldataValue(calldata, innerType, structs, enums);
+      return new CairoOption(optionValue ? CairoOptionVariant.Some : CairoOptionVariant.None, optionValue);
+    case 'Result':
+      const resultValue = decodeCalldataValue(calldata, innerType, structs, enums);
+      return new CairoResult(resultValue ? CairoResultVariant.Ok : CairoResultVariant.Err, resultValue);
+    default:
+      throw new Error(`Unsupported container type: ${containerType}`);
+  }
+}
+
+// /**
+//  * Decode a calldata field.
+//  * @param calldata The calldata array.
+//  * @param input The ABI entry for the field.
+//  * @param structs The ABI structs.
+//  * @param enums The ABI enums.
+//  * @returns The decoded field value.
+//  */
+// function _decodeCalldataField(
+//   calldata: Calldata,
+//   element: { name: string; type: string },
+//   structs: AbiStructs,
+//   enums: AbiEnums
+// ): any {
+//   const { name, type } = element;
+
+//   switch (true) {
+//     // Handling Array types
+//     case isTypeArray(type): {
+//       const elementType = getArrayType(type);
+//       return calldata.map((elementCalldata) =>
+//         decodeCalldataValue([elementCalldata], elementType, structs, enums)
+//       );
+//     }
+
+//     // Handling StarkNet addresses
+//     case type === 'core::starknet::eth_address::EthAddress': {
+//       // Directly returning the value, assuming it's already in the desired format
+//       return calldata[0];
+//     }
+
+//     // Handling Struct or Tuple types
+//     case isTypeStruct(type, structs): {
+//       return decodeStruct(calldata, type, structs, enums);
+//     }
+
+//     case isTypeTuple(type): {
+//       return decodeTuple(calldata, type, structs, enums);
+//     }
+
+//     // Handling CairoUint256 types
+//     case CairoUint256.isAbiType(type): {
+//       return CairoUint256.fromCalldata([calldata[0], calldata[1]]);
+//     }
+
+//     // Handling Enums
+//     case isTypeEnum(type, enums): {
+//       return decodeEnum(calldata, type, enums);
+//     }
+
+//     default: {
+//       return decodeBaseTypes(calldata[0], type);
+//     }
+//   }
+// }
