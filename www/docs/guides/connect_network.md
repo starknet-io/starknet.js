@@ -18,8 +18,8 @@ Then you need to select a node. A node is a safe way to connect with the Starkne
 Each node is communicating with Starknet.js using a rpc specification. Most of the nodes are able to use 2 rpc spec versions.  
 For example, this node is compatible with v0.6.0 & v0.7.0, using the following entry points :
 
-- "https://free-rpc.nethermind.io/goerli-juno/v0_6"
-- "https://free-rpc.nethermind.io/goerli-juno/v0_7"
+- "https://free-rpc.nethermind.io/sepolia-juno/v0_6"
+- "https://free-rpc.nethermind.io/sepolia-juno/v0_7"
 
 From rpc spec v0.5.0, you can request the rpc spec version that uses a node address :
 
@@ -36,8 +36,8 @@ On Starknet.js side, you have to select the proper version, to be in accordance 
 |            v0.4.0             | Starknet.js v5.21.1          |
 |            v0.5.0             | Starknet.js v5.23.0          |
 |            v0.5.1             | Starknet.js v5.29.0 & v6.1.0 |
-|            v0.6.0             | Starknet.js v6.4.3           |
-|            v0.7.0             | Starknet.js v6.4.3           |
+|            v0.6.0             | Starknet.js v6.6.6           |
+|            v0.7.0             | Starknet.js v6.6.6           |
 
 [!NOTE] Each Starknet.js version 6.x.x is compatible with 3 rpc spec versions, and recognize automatically the spec version if not provided.
 
@@ -54,10 +54,10 @@ import { RpcProvider } from 'starknet';
 If you don't want to use a specific node, or to handle an API key, you can use by default (using Rpc spec 0.7.0):
 
 ```typescript
-const myProvider = new RpcProvider({ nodeUrl: constants.NetworkName.SN_GOERLI });
+const myProvider = new RpcProvider({ nodeUrl: constants.NetworkName.SN_SEPOLIA });
 const myProvider = new RpcProvider({ nodeUrl: constants.NetworkName.SN_MAIN });
 // or
-const myProvider = new RpcProvider(); // Goerli
+const myProvider = new RpcProvider(); // Sepolia
 ```
 
 > when using this syntax, a random public node will be selected.
@@ -103,28 +103,9 @@ const providerLavaMainnet = new RpcProvider({
 
 ### Goerli Testnet
 
-```typescript
-// Infura node rpc 0.5.1 for Goerli Testnet:
-const providerInfuraTestnet = new RpcProvider({
-  nodeUrl: 'https://starknet-goerli.infura.io/v3/' + infuraKey,
-});
-// Blast node rpc 0.7.0 for Goerli Testnet (0.4, 0.5 & 0_6 also available) :
-const providerBlastTestnet = new RpcProvider({
-  nodeUrl: 'https://starknet-testnet.blastapi.io/' + blastKey + '/rpc/v0_7',
-});
-// Alchemy node rpc 0.6.0 for Goerli Testnet:
-const providerAlchemyTestnet = new RpcProvider({
-  nodeUrl: 'https://starknet-goerli.g.alchemy.com/starknet/version/rpc/v0_6/' + alchemyKey,
-});
-// Public Nethermind node rpc 0.7.0 for Goerli Testnet (0_6 also available) :
-const providerTestnetNethermindPublic = new RpcProvider({
-  nodeUrl: 'https://free-rpc.nethermind.io/goerli-juno/v0_7',
-});
-// Public Blast node rpc 0.7.0 for Goerli Testnet (0.4, 0.5 & 0_6 also available) :
-const providerTestnetBlastPublic = new RpcProvider({
-  nodeUrl: 'https://starknet-testnet.public.blastapi.io/rpc/v0_7',
-});
-```
+[!IMPORTANT]
+
+> The Goerli testnet is no more in service.
 
 ### Sepolia Testnet
 

@@ -152,8 +152,11 @@ export type PendingStateUpdate = PENDING_STATE_UPDATE;
 
 /**
  * Standardized type
+ *
  * Cairo0 program compressed and Cairo1 sierra_program decompressed
+ *
  * abi Abi
+ *
  * CompiledSierra without '.sierra_program_debug_info'
  */
 export type ContractClassResponse =

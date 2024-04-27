@@ -1,6 +1,12 @@
 import { byteArray } from '../../src';
 import { removeHexPrefix } from '../../src/utils/encode';
-import { decodeShortString, encodeShortString } from '../../src/utils/shortString';
+import {
+  decodeShortString,
+  encodeShortString,
+  isDecimalString,
+  isShortString,
+  isString,
+} from '../../src/utils/shortString';
 
 describe('shortString', () => {
   test('should convert string to number', () => {
@@ -102,4 +108,44 @@ describe('shortString', () => {
       pending_word_len: 0,
     })
   ).toBe('');
+});
+
+describe('isString', () => {
+  test('should return true for strings', () => {
+    expect(isString('test')).toBe(true);
+    expect(isString('')).toBe(true);
+  });
+
+  test('should return false for non-string values', () => {
+    expect(isString(10)).toBe(false);
+    expect(isString({})).toBe(false);
+    expect(isString(null)).toBe(false);
+    expect(isString(undefined)).toBe(false);
+    expect(isString([])).toBe(false);
+    expect(isString(true)).toBe(false);
+  });
+});
+
+describe('isShortString', () => {
+  test('should return true for short strings', () => {
+    const shortStr = '1234567890123456789012345678901';
+    expect(isShortString(shortStr)).toBe(true);
+  });
+
+  test('should return false for long strings', () => {
+    const longStr = '12345678901234567890123456789012';
+    expect(isShortString(longStr)).toBe(false);
+  });
+});
+
+describe('isDecimalString', () => {
+  test('should return true for decimal strings', () => {
+    expect(isDecimalString('1234567890')).toBe(true);
+  });
+
+  test('should return false for non-decimal strings', () => {
+    expect(isDecimalString('123A')).toBe(false);
+    expect(isDecimalString('ABCDE')).toBe(false);
+    expect(isDecimalString('123.456')).toBe(false);
+  });
 });

@@ -9,7 +9,7 @@ Once your provider, contract, and account are connected, you can interact with t
 - you can read the memory of the contract, without fees.
 - you can write to memory, but you have to pay fees.
   - On Mainnet, you have to pay fees with a bridged ETH token.
-  - On Testnets, you have to pay with a bridged Goerli or Sepolia ETH token.
+  - On Testnet, you have to pay with a bridged Sepolia ETH token.
   - On devnet, you have to pay with a dummy ETH token.
 
 Your account should be funded enough to pay fees (0.01 ETH should be enough to start).
