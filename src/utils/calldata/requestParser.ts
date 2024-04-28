@@ -22,11 +22,13 @@ import {
   isTypeBytes31,
   isTypeEnum,
   isTypeOption,
+  isTypeEthAddress,
   isTypeResult,
   isTypeSecp256k1Point,
   isTypeStruct,
   isTypeTuple,
   uint256,
+  isTypeByteArray,
 } from './cairo';
 import {
   CairoCustomEnum,
@@ -147,10 +149,10 @@ function parseCalldataValue(
     if (CairoUint512.isAbiType(type)) {
       return new CairoUint512(element as any).toApiRequest();
     }
-    if (type === 'core::starknet::eth_address::EthAddress')
+    if (isTypeEthAddress(type))
       return parseBaseTypes(type, element as BigNumberish);
 
-    if (type === 'core::byte_array::ByteArray') return parseByteArray(element as string);
+    if (isTypeByteArray(type)) return parseByteArray(element as string);
 
     const { members } = structs[type];
     const subElement = element as any;
@@ -297,7 +299,7 @@ export function parseCalldataField(
       }
       return parseCalldataValue(value, input.type, structs, enums);
 
-    case type === 'core::starknet::eth_address::EthAddress':
+    case isTypeEthAddress(type):
       return parseBaseTypes(type, value);
     // Struct or Tuple
     case isTypeStruct(type, structs) ||

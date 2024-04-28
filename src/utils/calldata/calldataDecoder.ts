@@ -5,12 +5,7 @@ import {
   BigNumberish,
   ByteArray,
   CairoEnum,
-  Calldata,
-  MultiType,
   ParsedStruct,
-  RawArgs,
-  RawArgsArray,
-  StructAbi,
 } from '../../types';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
@@ -19,22 +14,23 @@ import { decodeShortString } from '../shortString';
 import { stringFromByteArray } from './byteArray';
 import { addHexPrefix, removeHexPrefix } from '../encode';
 import {
-  isTypeFelt,
   getArrayType,
   isTypeArray,
   isTypeBytes31,
   isTypeEnum,
   isTypeBool,
   isLen,
+  isCairo1Type,
   isTypeByteArray,
   isTypeSecp256k1Point,
   isTypeOption,
   isTypeResult,
-  isTypeStruct,
+  isTypeEthAddress,
   isTypeTuple,
 } from './cairo';
 import {
   CairoCustomEnum,
+  CairoEnumRaw,
   CairoOption,
   CairoOptionVariant,
   CairoResult,
@@ -42,7 +38,6 @@ import {
 } from './enum';
 import extractTupleMemberTypes from './tuple';
 import assert from '../assert';
-import { call } from 'abi-wan-kanabi';
 
 /**
  * Decode base types from calldata
@@ -79,11 +74,11 @@ function decodeBaseTypes(type: string, it: Iterator<string>):
 
       return new CairoUint512(limb0, limb1, limb2, limb3).toBigInt();
 
-      case type === 'core::starknet::eth_address::EthAddress':
+      case isTypeEthAddress(type):
       temp = it.next().value;
       return BigInt(temp);
 
-      case type === 'core::bytes_31::bytes31':
+      case isTypeBytes31(type):
       temp = it.next().value;
       return decodeShortString(temp);
 
@@ -103,34 +98,6 @@ function decodeBaseTypes(type: string, it: Iterator<string>):
 }
 
 /**
- * Get the expected calldata length for a given enum variant.
- * @param variantIndexCalldata The calldata for the variant index.
- * @param enumName The name of the enum.
- * @param enums The ABI enums.
- * @returns The expected calldata length.
- */
-function getExpectedCalldataLengthForEnum(
-  variantIndexCalldata: string,
-  enumName: string,
-  enums: AbiEnums
-): number {
-  const enumDefinition = enums[enumName];
-  assert(enumDefinition, `Enum with name ${enumName} not found.`);
-
-  const variantIndex = parseInt(variantIndexCalldata, 10);
-  const variant = enumDefinition.variants[variantIndex];
-
-  switch (enumName) {
-    case 'CairoOption':
-      return variant.name === 'None' ? 1 : 2; // "None" requires only the index, "Some" requires additional data.
-    case 'CairoResult':
-      return 2; // Both "Ok" and "Err" require additional data.
-    default:
-      return 1; // Assuming other enums don't have associated data by default.
-  }
-}
-
-/**
  * Decodes calldata based on the provided type, using an iterator over the calldata.
  * @param calldataIterator Iterator over the encoded calldata strings.
  * @param type The type string as defined in the ABI.
@@ -144,10 +111,11 @@ function decodeCalldataValue(
   structs: AbiStructs,
   enums: AbiEnums
 ): 
-  | Boolean
+ | Boolean
   | ParsedStruct
   | BigNumberish
   | BigNumberish[]
+  | any[]
   | CairoOption<any>
   | CairoResult<any, any>
   | CairoEnum
@@ -163,6 +131,7 @@ function decodeCalldataValue(
     const high = calldataIterator.next().value;
     return new CairoUint256(low, high).toBigInt();
   }
+
   // type uint512 struct
   if (CairoUint512.isAbiType(element.type)) {
     const limb0 = calldataIterator.next().value;
@@ -171,6 +140,7 @@ function decodeCalldataValue(
     const limb3 = calldataIterator.next().value;
     return new CairoUint512(limb0, limb1, limb2, limb3).toBigInt();
   }
+
   // type C1 ByteArray struct, representing a LongString
   if (isTypeByteArray(element.type)) {
     const parsedBytes31Arr: BigNumberish[] = [];
@@ -188,9 +158,75 @@ function decodeCalldataValue(
     return stringFromByteArray(myByteArray);
   }
 
-  // type Bytes31 string
-  if (isTypeBytes31(element.type)) {
-    return decodeShortString(calldataIterator.next().value);
+  // type struct
+  if (structs && element.type in structs && structs[element.type]) {
+    if (isTypeEthAddress(element.type)) {
+      return decodeBaseTypes(element.type, calldataIterator);
+    }
+    return structs[element.type].members.reduce((acc, el) => {
+      acc[el.name] = decodeCalldataValue(calldataIterator, el, structs, enums);
+      return acc;
+    }, {} as any);
+  }
+
+  // type Enum (only CustomEnum)
+  if (enums && element.type in enums && enums[element.type]) {
+    const variantNum: number = Number(calldataIterator.next().value); // get variant number
+    const rawEnum = enums[element.type].variants.reduce((acc, variant, num) => {
+      if (num === variantNum) {
+        acc[variant.name] = decodeCalldataValue(
+          calldataIterator,
+          { name: '', type: variant.type },
+          structs,
+          enums
+        );
+        return acc;
+      }
+      acc[variant.name] = undefined;
+      return acc;
+    }, {} as CairoEnumRaw);
+    // Option
+    if (isTypeOption(element.type)) {
+      const content = variantNum === CairoOptionVariant.Some ? rawEnum.Some : undefined;
+      return new CairoOption<Object>(variantNum, content);
+    }
+    // Result
+    if (isTypeResult(element.type)) {
+      let content: Object;
+      if (variantNum === CairoResultVariant.Ok) {
+        content = rawEnum.Ok;
+      } else {
+        content = rawEnum.Err;
+      }
+      return new CairoResult<Object, Object>(variantNum, content);
+    }
+    // Cairo custom Enum
+    const customEnum = new CairoCustomEnum(rawEnum);
+    return customEnum;
+  }
+
+  // type tuple
+  if (isTypeTuple(element.type)) {
+    const memberTypes = extractTupleMemberTypes(element.type);
+    return memberTypes.reduce((acc, it: any, idx) => {
+      const name = it?.name ? it.name : idx;
+      const type = it?.type ? it.type : it;
+      const el = { name, type };
+      acc[name] = decodeCalldataValue(calldataIterator, el, structs, enums);
+      return acc;
+    }, {} as any);
+  }
+
+  // type c1 array
+  if (isTypeArray(element.type)) {
+    // eslint-disable-next-line no-case-declarations
+    const parsedDataArr = [];
+    const el: AbiEntry = { name: '', type: getArrayType(element.type) };
+    const len = BigInt(calldataIterator.next().value); // get length
+    while (parsedDataArr.length < len) {
+      parsedDataArr.push(decodeCalldataValue(calldataIterator, el, structs, enums));
+    }
+    return parsedDataArr;
   }
 
   // base type
@@ -218,33 +254,19 @@ export default function decodeCalldataField(
       let temp = calldataIterator.next().value;
       return BigInt(temp);
 
-    case isTypeArray(type): {
-      const elementType = getArrayType(type);
-      const elements: any[] = [];
-      let elementResult = calldataIterator.next();
-      while (!elementResult.done) {
-        elements.push(decodeCalldataValue(elementResult.value, elementType, structs, enums));
-        elementResult = calldataIterator.next();
+    case (structs && type in structs) || isTypeTuple(type):
+      return decodeCalldataValue(calldataIterator, input, structs, enums);
+
+    case enums && isTypeEnum(type, enums):
+      return decodeCalldataValue(calldataIterator, input, structs, enums);
+
+    case isTypeArray(type):
+      // C1 Array
+      if (isCairo1Type(type)) {
+        return decodeCalldataValue(calldataIterator, input, structs, enums);
       }
-      return elements;
-    }
-
-    case isTypeStruct(type, structs):
-    case isTypeTuple(type):
-      const structOrTupleResult: RawArgs = {};
-      const memberTypes = structs[type]?.members || extractTupleMemberTypes(type);
-      memberTypes.forEach(member => {
-        structOrTupleResult[member.name] = decodeCalldataValue(calldataIterator.next().value, member.type, structs, enums);
-      });
-      return structOrTupleResult;
-
-    case isTypeFelt(type):
-    case CairoUint256.isAbiType(type):
-    case isTypeEnum(type, enums):
-    case isTypeBytes31(type):
-      return decodeCalldataValue(calldataIterator.next().value, type, structs, enums);
 
     default:
-      throw new Error(`Unsupported or unrecognized type: ${type}`);
+      return decodeBaseTypes(type, calldataIterator);
   }
 }
