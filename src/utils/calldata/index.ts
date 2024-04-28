@@ -11,6 +11,7 @@ import {
   HexCalldata,
   RawArgs,
   RawArgsArray,
+  RawArgsObject,
   Result,
   ValidateType,
 } from '../../types';
@@ -168,13 +169,13 @@ export class CallData {
     if (!abiMethod) {
         throw new Error(`Method ${method} not found in ABI`);
     }
-  
-    const calldataIterator = calldata[Symbol.iterator]();
-    const decodedArgs: RawArgs = {};
-    abiMethod.inputs.forEach(input => {
-        decodedArgs[input.name] = decodeCalldataField(calldataIterator, input, this.structs, this.enums);
-    });
-  
+
+    const calldataIterator = calldata.flat()[Symbol.iterator]();
+    const decodedArgs = abiMethod.inputs.reduce((acc, input) => {
+      acc[input.name] = decodeCalldataField(calldataIterator, input, this.structs, this.enums);
+      return acc;
+  }, {} as RawArgsObject);
+    
     return decodedArgs;
   }
 

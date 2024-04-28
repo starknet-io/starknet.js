@@ -231,11 +231,10 @@ export default function responseParser(
   parsedResult?: Args | ParsedStruct
 ): any {
   const { name, type } = output;
-  let temp;
 
   switch (true) {
     case isLen(name):
-      temp = responseIterator.next().value;
+      let temp = responseIterator.next().value;
       return BigInt(temp);
 
     case (structs && type in structs) || isTypeTuple(type):
