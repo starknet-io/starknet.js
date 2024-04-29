@@ -603,3 +603,13 @@ The result will be an object, with 2 strings:
 ```typescript
 { name: "Organic", description: "The best way to read a long string!!!" }
 ```
+
+## Tool to learn how to encode/decode
+
+A DAPP has been created to learn how to encode/decode with Starknet.js : **Startnet-encode-decode**.  
+It's also a convenient tool for the exploration of any contract ABI.
+![](./pictures/encodeFn2.png)
+
+Follow these links :  
+DAPP : https://starknet-encode-decode.vercel.app/  
+Tuto : https://github.com/PhilippeR26/starknet-encode-decode/blob/main/tuto.md
