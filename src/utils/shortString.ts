@@ -10,6 +10,9 @@ import { isHex, isStringWholeNumber } from './num';
  * ```typescript
  * const isAscii: boolean = isASCII("Hello, world!");
  * // isAscii = true
+ * 
+ * const isAsciiFalse: boolean = isASCII("Hello, 世界!");
+ * // isAsciiFalse = false
  * ```
  */
 export function isASCII(str: string) {
@@ -43,8 +46,14 @@ export function isShortString(str: string) {
  * const isDecimalTrue: boolean = isDecimalString("12345");
  * // isDecimalTrue = true
  * 
+ * const isDecimalFloat: boolean = isDecimalString("0.123");
+ * // isDecimalFloat = true
+ * 
  * const isDecimalFalse: boolean = isDecimalString("12a45");
  * // isDecimalFalse = false
+ * 
+ * const isDecimalNegativeNumber: boolean = isDecimalString("-12345");
+ * // isDecimalNegativeNumber = false 
  * ```
  */
 export function isDecimalString(str: string): boolean {
@@ -56,21 +65,13 @@ export function isDecimalString(str: string): boolean {
  *
  * @param {unknown} value - The value to be checked.
  * @return {boolean} - Returns true if the value is a string, false otherwise.
- * @example
- * ```typescript
- * const isStringTrue: boolean = isString("Hello, world!");
- * // isStringTrue = true
- * 
- * const isStringFalse: boolean = isString(123);
- * // isStringFalse = false
- * ```
  */
 export function isString(value: unknown): value is string {
   return typeof value === 'string';
 }
 
 /**
- * Test if value is a free-from string text, and not a hex string or number string
+ * Test if value is a pure string text, and not a hex string or number string
  * @param val - The value to test.
  * @returns Returns true if the value is a free-form string text, otherwise false.
  * @example
@@ -89,7 +90,7 @@ export function isText(val: any) {
 /**
  * Test if value is short text
  * @param val - The value to test.
- * @returns Returns true if the value is a short text, otherwise false.
+ * @returns Returns true if the value is a short text(string has less or equal 31 characters), otherwise false.
  * @example
  * ```typescript
  * const isShortTextTrue: boolean = isShortText("Hello, world!");
@@ -104,7 +105,7 @@ export const isShortText = (val: any) => isText(val) && isShortString(val);
 /**
  * Test if value is long text
  * @param val - The value to test.
- * @returns Returns true if the value is a long text, otherwise false.
+ * @returns Returns true if the value is a long text(string has greater than 31 characters), otherwise false.
  * @example
  * ```typescript
  * const isLongTextTrue = isLongText("Hello, world! this is some random long string to enable you test isLongText function.")
@@ -117,9 +118,9 @@ export const isShortText = (val: any) => isText(val) && isShortString(val);
 export const isLongText = (val: any) => isText(val) && !isShortString(val);
 
 /**
- * Split long text into short strings
- * @param longStr - The long text to split.
- * @returns An array of short strings.
+ * Split long text (string greater than 31 characters) into short strings (string lesser or equal 31 characters)
+ * @param longStr - The long text (string greater than 31 characters) to split.
+ * @returns An array of short strings (string lesser or equal 31 characters).
  * @example
  * ```typescript
  * const shortStrings: string[] = splitLongString("Hello, world! we just testing splitLongString function.")
