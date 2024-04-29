@@ -20,8 +20,15 @@ const STRING_ZERO = '0';
  *
  * @example
  * ```typescript
- * const string = arrayBufferToString({0: 72, 1: 105});
- * console.log(string); // Outputs: 'Hi'
+ * const buffer = new ArrayBuffer(5);
+ * const view = new Uint8Array(buffer);
+ * view[0] = 72;  // ASCII code for 'H'
+ * view[1] = 101; // ASCII code for 'e'
+ * view[2] = 108; // ASCII code for 'l'
+ * view[3] = 108; // ASCII code for 'l'
+ * view[4] = 111; // ASCII code for 'o'
+ * const result = encode.arrayBufferToString(buffer);
+ * // result = "Hello"
  * ```
  */
 export function arrayBufferToString(array: ArrayBuffer): string {
@@ -39,8 +46,8 @@ export function arrayBufferToString(array: ArrayBuffer): string {
  * @example
  * ```typescript
  * const myString = 'Hi';
- * const byteArray = utf8ToArray(myString);
- * console.log(byteArray); // Outputs: Uint8Array {0: 72, 1: 105}
+ * const result = encode.utf8ToArray(myString);
+ * // result = Uint8Array(2) [ 72, 105 ]
  * ```
  */
 export function utf8ToArray(str: string): Uint8Array {
@@ -65,8 +72,8 @@ export function stringToArrayBuffer(str: string): Uint8Array {
  * @example
  * ```typescript
  * const base64String = 'SGVsbG8='; // 'Hello' in Base64
- * const byteArray = atobUniversal(base64String);
- * console.log(byteArray); // Outputs: Uint8Array {0: 72, 1: 105, 2: 108, 3: 108, 4: 111}
+ * const result = encode.atobUniversal(base64String);
+ * // result = Uint8Array(5) [ 72, 101, 108, 108, 111 ]
  * ```
  */
 export function atobUniversal(a: string): Uint8Array {
@@ -76,14 +83,14 @@ export function atobUniversal(a: string): Uint8Array {
 /**
  * Convert array buffer to string (browser and node compatible)
  *
- * @param {Uint8Array} b The decoded Uint8Array.
+ * @param {ArrayBuffer} b The Array buffer.
  * @returns {string} The Base64 encoded string.
  *
  * @example
  * ```typescript
  * const buffer = new Uint8Array([72, 101, 108, 108, 111]); // Array with ASCII values for 'Hello'
- * const string = btoaUniversal(buffer);
- * console.log(string); // Outputs: SGVsbG8=
+ * const result = encode.btoaUniversal(buffer);
+ * // result = "SGVsbG8="
  * ```
  */
 export function btoaUniversal(b: ArrayBuffer): string {
@@ -92,13 +99,15 @@ export function btoaUniversal(b: ArrayBuffer): string {
 
 /**
  * Convert array buffer to hex-string
- * @returns format: hex-string
+ *
+ * @param {Uint8Array} buffer The encoded Uint8Array.
+ * @returns {string} The hex-string
  *
  * @example
  * ```typescript
  * const buffer = new Uint8Array([72, 101, 108, 108, 111]); // Array with ASCII values for 'Hello'
- * const hexString = buf2hex(buffer);
- * console.log(hexString); // Outputs: 48656c6c6f
+ * const result = encode.buf2hex(buffer);
+ * // result = "48656c6c6f"
  * ```
  */
 export function buf2hex(buffer: Uint8Array) {
@@ -108,13 +117,13 @@ export function buf2hex(buffer: Uint8Array) {
 /**
  * Remove hex prefix '0x' from hex-string
  * @param hex hex-string
- * @returns format: base16-string
+ * @returns {string} The hex-string
  *
  * @example
  * ```typescript
  * const hexStringWithPrefix = '0x48656c6c6f';
- * const cleanedHexString = removeHexPrefix(hexStringWithPrefix);
- * console.log(cleanedHexString); // Outputs: 48656c6c6f
+ * const result = encode.removeHexPrefix(hexStringWithPrefix);
+ * // result: "48656c6c6f"
  * ```
  */
 export function removeHexPrefix(hex: string): string {
@@ -124,13 +133,13 @@ export function removeHexPrefix(hex: string): string {
 /**
  * Add hex prefix '0x' to base16-string
  * @param hex base16-string
- * @returns format: hex-string
+ * @returns {string} The hex-string
  *
  * @example
  * ```typescript
  * const plainHexString = '48656c6c6f';
- * const hexStringWithPrefix = addHexPrefix(plainHexString);
- * console.log(hexStringWithPrefix); // Outputs: 0x48656c6c6f
+ * const result = encode.addHexPrefix(plainHexString);
+ * // result: "0x48656c6c6f"
  * ```
  */
 export function addHexPrefix(hex: string): string {
@@ -154,15 +163,8 @@ export function addHexPrefix(hex: string): string {
  * @example
  * ```typescript
  * const myString = 'hello';
- * const paddedLeft = padString(myString, 10, true);
- * console.log(paddedLeft); // Outputs: '00000hello'
- *
- * const paddedRight = padString(myString, 10, false);
- * console.log(paddedRight); // Outputs: 'hello00000'
- *
- * // Using a different padding character
- * const paddedCustom = padString(myString, 10, true, '1');
- * console.log(paddedCustom); // Outputs: '11111hello'
+ * const result = padString(myString, 10, true);
+ * // result = '00000hello'
  * ```
  */
 function padString(str: string, length: number, left: boolean, padding = STRING_ZERO): string {
@@ -188,9 +190,9 @@ function padString(str: string, length: number, left: boolean, padding = STRING_
  *
  * @example
  * ```typescript
- * const myString = 'hello';
- * const paddedLeft = padString(myString, 10);
- * console.log(paddedLeft); // Outputs: '00000hello'
+ * const myString = '1A3F';
+ * const result = encode.padLeft(myString, 10);
+ * // result: '0000001A3F'
  * ```
  */
 export function padLeft(str: string, length: number, padding = STRING_ZERO): string {
@@ -206,20 +208,15 @@ export function padLeft(str: string, length: number, padding = STRING_ZERO): str
  * The function rounds up the byte count to the nearest multiple of the specified byte size.
  *
  * @param {string} str The string whose byte length is to be calculated.
- * @param {number} byteSize The size of the byte block to round up to. Defaults to 8.
+ * @param {number} [byteSize='8'] The size of the byte block to round up to. Defaults to 8.
  * @returns {number} The calculated byte length, rounded to the nearest multiple of byteSize.
  *
  * @example
  * ```typescript
  * const myString = 'Hello';
- * const byteLengthDefault = calcByteLength(myString);
- * console.log(byteLengthDefault); // Outputs: 8 (rounded up to the nearest multiple of 8)
+ * const result = encode.calcByteLength(myString, 4);
+ * // result = 8 (rounded up to the nearest multiple of 4)
  *
- * const byteLength4 = calcByteLength(myString, 4);
- * console.log(byteLength4); // Outputs: 8 (rounded up to the nearest multiple of 4)
- *
- * const byteLength10 = calcByteLength(myString, 10);
- * console.log(byteLength10); // Outputs: 10 (rounded up to the nearest multiple of 10)
  * ```
  */
 export function calcByteLength(str: string, byteSize = 8): number {
@@ -238,15 +235,15 @@ export function calcByteLength(str: string, byteSize = 8): number {
  * The function uses a specified padding character and rounds up the string length to the nearest multiple of `byteSize`.
  *
  * @param {string} str The string to be padded.
- * @param {number} byteSize The byte block size to which the string length should be rounded up. Defaults to 8.
- * @param {string} padding The character to use for padding. Defaults to '0'.
+ * @param {number} [byteSize='8'] The byte block size to which the string length should be rounded up. Defaults to 8.
+ * @param {string} [padding='0'] The character to use for padding. Defaults to '0'.
  * @returns {string} The padded string.
  *
  * @example
  * ```typescript
  * const myString = '123';
- * const sanitizedString = sanitizeBytes(myString);
- * console.log(sanitizedString); // Outputs: '00000123' (padded to 8 characters)
+ * const result = encode.sanitizeBytes(myString);
+ * // result: '00000123' (padded to 8 characters)
  * ```
  */
 export function sanitizeBytes(str: string, byteSize = 8, padding = STRING_ZERO): string {
@@ -254,7 +251,8 @@ export function sanitizeBytes(str: string, byteSize = 8, padding = STRING_ZERO):
 }
 
 /**
- * Prepend '0' to hex-string bytes
+ * Sanitizes a hex-string by removing any existing '0x' prefix, padding the string with '0' to ensure it has even length,
+ * and then re-adding the '0x' prefix.
  *
  * *[no internal usage]*
  * @param hex hex-string
@@ -263,8 +261,8 @@ export function sanitizeBytes(str: string, byteSize = 8, padding = STRING_ZERO):
  * @example
  * ```typescript
  * const unevenHex = '0x23abc';
- * const formattedHex = sanitizeHex(unevenHex);
- * console.log(formattedHex); // Outputs: '0x023abc' (padded to ensure even length)
+ * const result = encode.sanitizeHex(unevenHex);
+ * // result = '0x023abc' (padded to ensure even length)
  * ```
  */
 export function sanitizeHex(hex: string): string {
@@ -287,12 +285,8 @@ export function sanitizeHex(hex: string): string {
  * @example
  * ```typescript
  * const pascalString = 'PascalCaseExample';
- * const snakeString = pascalToSnake(pascalString);
- * console.log(snakeString); // Outputs: 'PASCAL_CASE_EXAMPLE'
- *
- * const nonPascalString = 'Already_snake_or_lowercase';
- * const unchangedString = pascalToSnake(nonPascalString);
- * console.log(unchangedString); // Outputs: 'ALREADY_SNAKE_OR_LOWERCASE'
+ * const result = encode.pascalToSnake(pascalString);
+ * // result: 'PASCAL_CASE_EXAMPLE'
  * ```
  */
 export const pascalToSnake = (text: string) =>

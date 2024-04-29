@@ -86,7 +86,7 @@ export function getChecksumAddress(address: BigNumberish): string {
  * ```typescript
  * const address = "0x0000090591D9fA3EfC87067d95a643f8455E0b8190eb8Cb7bFd39e4fb7571fDF";
  * const result = validateChecksumAddress(address);
- * // result = "true"
+ * // result = true
  * ```
  */
 export function validateChecksumAddress(address: string): boolean {
