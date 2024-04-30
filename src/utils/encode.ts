@@ -22,11 +22,7 @@ const STRING_ZERO = '0';
  * ```typescript
  * const buffer = new ArrayBuffer(5);
  * const view = new Uint8Array(buffer);
- * view[0] = 72;  // ASCII code for 'H'
- * view[1] = 101; // ASCII code for 'e'
- * view[2] = 108; // ASCII code for 'l'
- * view[3] = 108; // ASCII code for 'l'
- * view[4] = 111; // ASCII code for 'o'
+ * [72, 101, 108, 108, 111].forEach((x, idx) => view[idx] = x);
  * const result = encode.arrayBufferToString(buffer);
  * // result = "Hello"
  * ```
