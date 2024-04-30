@@ -14,9 +14,9 @@ export { UINT_128_MAX, UINT_256_MAX };
  * @returns {bigint} BigInt representation of the input Uint25
  * @example
  * ```typescript
- * const uint256Value: Uint256 = "0x2fd23d9182193775423497fc0c472e156c57c69e4089a1967fb288a2d84e914";
+ * const uint256Value: Uint256 = { low: 1234567890, high: 1 };
  * const result = uint256ToBN(uint256Value);
- * // result = 28139218908760698114965631183142736658067655190345294133754686837148899816404n
+ * // result = 519229685234822890n
  * ```
  */
 export function uint256ToBN(uint256: Uint256) {
@@ -24,15 +24,19 @@ export function uint256ToBN(uint256: Uint256) {
 }
 
 /**
- * Test BigNumberish is smaller or equal 2**256-1
+ * Test BigNumberish is in the range[0, 2**256-1]
  * Legacy support Export
  * @param bn BigNumberish value to test
- * @returns {boolean} True if the input value is smaller or equal to 2**256-1, false otherwise
+ * @returns {boolean} True if the input value is in the range[0, 2**256-1], false otherwise
  * @example
  * ```typescript
- * const bnValue: BigNumberish = 28139218908760698114965631183142736658067655190345294133754686837148899816404n;
+ * const bnValue: BigNumberish = 12345n;
  * const result = isUint256(bnValue);
  * // result = true
+ * 
+ * const bnValue1: BigNumberish = -1n;
+ * const result1 = isUint256(bnValue1);
+ * // result = false
  * ```
  */
 export function isUint256(bn: BigNumberish): boolean {
@@ -46,9 +50,15 @@ export function isUint256(bn: BigNumberish): boolean {
  * @returns {Uint256} Uint256 (hex) representation of the input BigNumberish value
  * @example
  * ```typescript
- * const bnValue: BigNumberish = 28139218908760698114965631183142736658067655190345294133754686837148899816404n;
- * const result = bnToUint256(bnValue);
- * // result = "0x2fd23d9182193775423497fc0c472e156c57c69e4089a1967fb288a2d84e914"
+ * import { uint256 } from "path/to/file";
+ * 
+ * const bnValue: BigNumberish = -1n;
+ * const result = uint256.bnToUint256(bnValue);
+ * // Throws Error: bigNumberish is smaller than UINT_256_MIN
+ * 
+ * const bnValue: BigNumberish = 1000000000n;
+ * const result1 = uint256.bnToUint256(bnValue);
+ * // result1 = { "high": "0x0", "low": "0x3b9aca00" }
  * ```
  */
 export function bnToUint256(bn: BigNumberish): Uint256 {
