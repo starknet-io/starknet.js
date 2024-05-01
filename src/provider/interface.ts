@@ -87,6 +87,13 @@ export abstract class ProviderInterface {
   public abstract getL1GasPrice(blockIdentifier: BlockIdentifier): Promise<string>;
 
   /**
+   * Get L1 message hash from L2 transaction hash
+   * @param txHash L2 transaction hash
+   * @returns L1 message hash
+   */
+  public abstract getL1MessageHash(txHash: string): Promise<any>;
+
+  /**
    * Returns the contract class hash in the given block for the contract deployed at the given address
    *
    * @param contractAddress - contract address

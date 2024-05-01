@@ -22,7 +22,7 @@ import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
 import { validateAndParseEthAddress } from '../utils/eth';
 import fetch from '../utils/fetchPonyfill';
-import { getSelector, getSelectorFromName } from '../utils/hash';
+import { computeHashOnElements, getSelector, getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
 import { getHexStringArray, toHex, toStorageKey } from '../utils/num';
 import { Block, getDefaultNodeUrl, isV3Tx, isVersion, wait } from '../utils/provider';
@@ -166,6 +166,22 @@ export class RpcChannel {
   public getBlockWithTxs(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
     const block_id = new Block(blockIdentifier).identifier;
     return this.fetchEndpoint('starknet_getBlockWithTxs', { block_id });
+  }
+
+  public async getL1MessageHash(txHash: BigNumberish) {
+    const txData = (await this.getTransactionByHash(txHash)) as any;
+    const { calldata, contract_address, entry_point_selector, nonce, version /* type */ } = txData;
+    const hashedCallData = computeHashOnElements(calldata);
+
+    return computeHashOnElements([
+      // type,
+      version,
+      contract_address,
+      entry_point_selector,
+      hashedCallData,
+      '0x0',
+      nonce,
+    ]);
   }
 
   public getBlockStateUpdate(blockIdentifier: BlockIdentifier = this.blockIdentifier) {
