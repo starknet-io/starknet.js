@@ -97,7 +97,7 @@ For major changes that markedly transform the existing API or significantly alte
 - We’re using [Prettier](https://github.com/prettier/prettier) to format code, so don’t worry much about code formatting.
 - Don’t commit generated files, like minified JavaScript.
 - Don’t change the version number or changelog.
-- Use `npm run ts:coverage` to check the global type coverage rate and `npm run ts:coverage:report` to generate a complete report and find files having low coverage.
+- Use `npm run ts:coverage` to check the global type coverage rate and `npm run ts:coverage:report` to generate a complete report (summary displayed in the console, full HTML report available in the `coverage-ts` folder) and find files having low coverage.
 
 ## Need help?
 
