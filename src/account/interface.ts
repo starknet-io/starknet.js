@@ -30,6 +30,7 @@ import {
   TypedData,
   UniversalDeployerContractPayload,
 } from '../types';
+import { EOutsideExecutionVersion, OutsideExecution } from '../types/outsideExecution';
 
 export abstract class AccountInterface extends ProviderInterface {
   public abstract address: string;
@@ -383,6 +384,28 @@ export abstract class AccountInterface extends ProviderInterface {
    * @throws {Error} if the signature is not a valid signature
    */
   public abstract verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean>;
+
+  /**
+   * Get the supported version of the outside execution for the account
+   * @returns the supported version of the outside execution
+   */
+  public abstract getSnip9Version(): Promise<EOutsideExecutionVersion | undefined>;
+
+  /**
+   * Execute an outside execution on the account
+   * @param outsideExecution - the outside execution object
+   * @param signature - the signature for the outside execution
+   * @param targetAddress - the address of an account on which the outside execution will be executed
+   * @param version - the version of the outside execution standard
+   */
+  public abstract executeFromOutside(
+    outsideExecution: OutsideExecution,
+    signature: Signature,
+    targetAddress: string,
+    version?: EOutsideExecutionVersion
+  ): Promise<InvokeFunctionResponse>;
+
+  public abstract isValidSnip9Nonce(nonce: BigNumberish): Promise<boolean>;
 
   /**
    * Gets the nonce of the account with respect to a specific block
