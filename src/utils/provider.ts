@@ -26,6 +26,11 @@ import type { GetTransactionReceiptResponse } from './transactionReceipt';
 
 /**
  * Helper - Async Sleep for 'delay' time
+ *
+ * @example
+ * ```typescript
+ * wait(1000) // 1000 milliseconds == 1 second
+ * ```
  */
 export function wait(delay: number) {
   return new Promise((res) => {
@@ -37,6 +42,25 @@ export function wait(delay: number) {
  * Create Sierra Contract Class from a given Compiled Sierra
  *
  * CompiledSierra -> SierraContractClass
+ * 
+ * @example
+ * ```typescript
+ * const sierraContractClass = createSierraContractClass({
+    "sierra_program": [
+        "0x1",
+        "0x4",
+        "0x0",
+        "0x2",
+        "0x4",
+        "0x1",
+        "0x3b4",
+        "0x4c",
+        "0x65",
+        "0x52616e6765436865636b",...})
+  
+        
+  sierraContractClass = {sierra_program: 'H4sIAAAAAAAAA6x9WZbsrI7uVGqd53qgb8ZynwzYY7jDv5JAAmxHZuQ+96yq/L0jIzEINZ8axP/5j/q/+j//+z/wH9f/o/p/zPbh+Iot49+u9v8G3//rTdDhDDF4Z0MKPthQ+m+S2v6n1S//638VvdXW2PQ6RvxuDG+jiybCXKJ7Hef6ZRi9E+Q89WmKLilfqbrsL6PUCf8...}
+ * ```
  */
 export function createSierraContractClass(contract: CompiledSierra): SierraContractClass {
   const result = { ...contract } as any;
@@ -51,6 +75,25 @@ export function createSierraContractClass(contract: CompiledSierra): SierraContr
  * Create Contract Class from a given CompiledContract or string
  *
  * (CompiledContract or string) -> ContractClass
+ * 
+ * @example
+ * ```typescript
+ * const sierraContractClass = parseContract({
+    "sierra_program": [
+        "0x1",
+        "0x4",
+        "0x0",
+        "0x2",
+        "0x4",
+        "0x1",
+        "0x3b4",
+        "0x4c",
+        "0x65",
+        "0x52616e6765436865636b",...})
+  
+        
+  sierraContractClass = {sierra_program: 'H4sIAAAAAAAAA6x9WZbsrI7uVGqd53qgb8ZynwzYY7jDv5JAAmxHZuQ+96yq/L0jIzEINZ8axP/5j/q/+j//+z/wH9f/o/p/zPbh+Iot49+u9v8G3//rTdDhDDF4Z0MKPthQ+m+S2v6n1S//638VvdXW2PQ6RvxuDG+jiybCXKJ7Hef6ZRi9E+Q89WmKLilfqbrsL6PUCf8...}
+ * ```
  */
 export function parseContract(contract: CompiledContract | string): ContractClass {
   const parsedContract = isString(contract) ? (parse(contract) as CompiledContract) : contract;
