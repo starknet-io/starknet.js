@@ -24,6 +24,12 @@ function extractStars(str: string): [string, number] {
  * Decodes an array of BigInts into a string using the given algorithm.
  * @param {bigint[]} encoded - The encoded array of BigInts.
  * @return {string} The decoded string.
+ * @example
+ * ```typescript
+ * const result =  useDecoded([3015206943634620n])
+ *
+ * assert(result === "starknetjs.stark")
+ * ```
  */
 export function useDecoded(encoded: bigint[]): string {
   let decoded = '';
@@ -71,6 +77,12 @@ export function useDecoded(encoded: bigint[]): string {
  *
  * @param {string} decoded - The string to be encoded.
  * @returns {bigint} - The encoded bigint value.
+ * @example
+ * ```typescript
+ * const result = useEncoded("starknet.js")
+ *
+ * assert(result === 3015206943634620n)
+ * ```
  */
 export function useEncoded(decoded: string): bigint {
   let encoded = BigInt(0);
