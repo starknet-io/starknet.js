@@ -37,7 +37,8 @@
     "format": "prettier --log-level log --write \"**/*.{ts,js,md,yml,json}\"",
     "lint": "eslint . --cache --fix --ext .ts",
     "ts:check": "tsc --noEmit --resolveJsonModule --project tsconfig.eslint.json",
-    "ts:coverage": "type-coverage --at-least 95"
+    "ts:coverage": "type-coverage --at-least 95",
+    "ts:coverage:report": "typescript-coverage-report"
   },
   "keywords": [
     "starknet",
@@ -89,7 +90,8 @@
     "tsup": "^8.0.2",
     "type-coverage": "^2.28.1",
     "typedoc": "^0.25.7",
-    "typescript": "~5.4.0"
+    "typescript": "~5.4.0",
+    "typescript-coverage-report": "^1.0.0"
   },
   "dependencies": {
     "@noble/curves": "~1.4.0",
