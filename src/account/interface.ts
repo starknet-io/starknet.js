@@ -405,8 +405,6 @@ export abstract class AccountInterface extends ProviderInterface {
     version?: EOutsideExecutionVersion
   ): Promise<InvokeFunctionResponse>;
 
-  public abstract isValidSnip9Nonce(nonce: BigNumberish): Promise<boolean>;
-
   /**
    * Gets the nonce of the account with respect to a specific block
    *

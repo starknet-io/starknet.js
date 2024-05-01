@@ -50,13 +50,14 @@ import { extractContractHashes, isSierra } from '../utils/contract';
 import { parseUDCEvent } from '../utils/events';
 import { calculateContractAddressFromHash } from '../utils/hash';
 import { toBigInt, toCairoBool } from '../utils/num';
-import { buildExecuteFromOutsideCallData } from '../utils/outsideExecution';
 import { parseContract } from '../utils/provider';
 import { isString } from '../utils/shortString';
+import { buildExecuteFromOutsideCallData } from '../utils/snip9';
 import { supportsInterface } from '../utils/src5';
 import {
   estimateFeeToBounds,
   formatSignature,
+  randomAddress,
   reduceV2,
   toFeeVersion,
   toTransactionVersion,
@@ -652,6 +653,20 @@ export class Account extends Provider implements AccountInterface {
     };
     // execute the call
     return this.execute(call, opts);
+  }
+
+  public async getSnip9Nonce(account: Account): Promise<string> {
+    // create random nonce (in felt range)
+    const nonce = randomAddress();
+    // check if nonce is already used
+    const isValidNonce = await account.isValidSnip9Nonce(nonce);
+    if (!isValidNonce) {
+      // if it is, try again
+      return this.getSnip9Nonce(account);
+    }
+    // if not, return it
+    return nonce;
+    // TODO process errors
   }
 
   /*
