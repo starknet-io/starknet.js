@@ -23,6 +23,17 @@ export class MerkleTree {
    * Create Merkle tree
    * @param leaves hex-string array
    * @returns format: hex-string; Merkle tree root
+   * @example
+   * ```typescript
+   * const leaves: string[] = [
+   * "0x2fd23d9182193775423497fc0c472e156c57c69e4089a1967fb288a2d84e914",
+   * "0x1234567890123456789012345678901234567890123456789012345678901234",
+   * "0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef"
+   * ];
+   * const merkleTree = new MerkleTree();
+   * const root = merkleTree.build(leaves);
+   * // root = "0x71d6f4b2f7a5aa46daa76f2e01ab44b0e7581a82b40cb1289b89b2353fc1b9e0"
+   * ```
    */
   private build(leaves: string[]): string {
     if (leaves.length === 1) {
@@ -44,7 +55,18 @@ export class MerkleTree {
 
   /**
    * Create hash from ordered a and b, Pedersen hash default
+   * @param a BigNumberish value to be hashed
+   * @param b BigNumberish value to be hashed
+   * @param hashMethod Function to compute hash, default is Pedersen hash
    * @returns format: hex-string
+   * @example
+   * ```typescript
+   * const hash = MerkleTree.hash(
+   * "0x2fd23d9182193775423497fc0c472e156c57c69e4089a1967fb288a2d84e914",
+   * "0x1234567890123456789012345678901234567890123456789012345678901234",
+   * );
+   * // hash = "0x71d6f4b2f7a5aa46daa76f2e01ab44b0e7581a82b40cb1289b89b2353fc1b9e0"
+   * ```
    */
   static hash(
     a: BigNumberish,
@@ -57,10 +79,19 @@ export class MerkleTree {
 
   /**
    * Return path to leaf
-   * @param leaf hex-string
-   * @param branch hex-string array
-   * @param hashPath hex-string array
-   * @returns format: hex-string array
+   * @param leaf hex-string representing the leaf
+   * @param branch hex-string array representing the branch
+   * @param hashPath hex-string array representing the hash path
+   * @returns format: hex-string array representing the path to the leaf
+   * @example
+   * ```typescript
+   * const merkleTree = new MerkleTree();
+   * const proof = merkleTree.getProof("0x2fd23d9182193775423497fc0c472e156c57c69e4089a1967fb288a2d84e914");
+   * // proof = [
+   * // "0x1234567890123456789012345678901234567890123456789012345678901234",
+   * // "0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef"
+   * // ]
+   * ```
    */
   public getProof(leaf: string, branch = this.leaves, hashPath: string[] = []): string[] {
     const index = branch.indexOf(leaf);
@@ -92,6 +123,18 @@ export class MerkleTree {
  * @param leaf hex-string
  * @param path hex-string array
  * @param hashMethod hash method override, Pedersen default
+ * @returns {boolean} True if the Merkle tree path is valid, false otherwise
+ * @example
+ * ```typescript
+ * const root = "0x71d6f4b2f7a5aa46daa76f2e01ab44b0e7581a82b40cb1289b89b2353fc1b9e0";
+ * const leaf = "0x2fd23d9182193775423497fc0c472e156c57c69e4089a1967fb288a2d84e914";
+ * const path = [
+ * 	"0x1234567890123456789012345678901234567890123456789012345678901234",
+ * 	"0xabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdefabcdef"
+ * ];
+ * const isValid = proofMerklePath(root, leaf, path);
+ * // isValid = true
+ * ```
  */
 export function proofMerklePath(
   root: string,
