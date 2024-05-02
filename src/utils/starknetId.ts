@@ -26,7 +26,7 @@ function extractStars(str: string): [string, number] {
  * @return {string} The decoded string.
  * @example
  * ```typescript
- * const result =  useDecoded([3015206943634620n])
+ * const result = useDecoded([3015206943634620n])
  *
  * assert(result === "starknetjs.stark")
  * ```
