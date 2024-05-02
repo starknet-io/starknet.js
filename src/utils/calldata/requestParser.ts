@@ -23,6 +23,7 @@ import {
   isTypeEnum,
   isTypeOption,
   isTypeEthAddress,
+  isTypeContractAddress,
   isTypeResult,
   isTypeSecp256k1Point,
   isTypeStruct,
@@ -149,8 +150,9 @@ function parseCalldataValue(
     if (CairoUint512.isAbiType(type)) {
       return new CairoUint512(element as any).toApiRequest();
     }
-    if (isTypeEthAddress(type))
-      return parseBaseTypes(type, element as BigNumberish);
+    if (isTypeEthAddress(type)) return parseBaseTypes(type, element as BigNumberish);
+
+    if (isTypeContractAddress(type)) return parseBaseTypes(type, element as BigNumberish);
 
     if (isTypeByteArray(type)) return parseByteArray(element as string);
 
@@ -301,6 +303,9 @@ export function parseCalldataField(
 
     case isTypeEthAddress(type):
       return parseBaseTypes(type, value);
+    case isTypeContractAddress(type):
+      return parseBaseTypes(type, value);
+
     // Struct or Tuple
     case isTypeStruct(type, structs) ||
       isTypeTuple(type) ||

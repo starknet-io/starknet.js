@@ -7,6 +7,7 @@ import {
   Args,
   ArgsOrCalldata,
   Calldata,
+  DecodeConfig,
   FunctionAbi,
   HexCalldata,
   RawArgs,
@@ -159,27 +160,6 @@ export class CallData {
   }
 
   /**
-   * Decompile calldata into JavaScript-compatible types based on ABI definitions.
-   * @param method The method name as defined in the ABI.
-   * @param calldata Array of strings representing the encoded calldata.
-   * @returns A structured object representing the decoded calldata.
-   */
-  public decompile(method: string, calldata: string[]): RawArgs {
-    const abiMethod = this.abi.find(entry => entry.name === method && entry.type === 'function') as FunctionAbi;
-    if (!abiMethod) {
-        throw new Error(`Method ${method} not found in ABI`);
-    }
-
-    const calldataIterator = calldata.flat()[Symbol.iterator]();
-    const decodedArgs = abiMethod.inputs.reduce((acc, input) => {
-      acc[input.name] = decodeCalldataField(calldataIterator, input, this.structs, this.enums);
-      return acc;
-  }, {} as RawArgsObject);
-    
-    return decodedArgs;
-  }
-
-  /**
    * Compile contract callData without abi
    * @param rawArgs RawArgs representing cairo method arguments or string array of compiled data
    * @returns Calldata
@@ -260,6 +240,48 @@ export class CallData {
       value: true,
     });
     return callTreeArray;
+  }
+
+  /**
+   * Decompile calldata into JavaScript-compatible types based on ABI definitions.
+   * @param method The method name as defined in the ABI.
+   * @param calldata Array of strings representing the encoded calldata.
+   * @returns A structured object representing the decoded calldata.
+   */
+  public decompile(
+    method: string,
+    calldata: string[],
+    config?: DecodeConfig,
+    returnArray?: boolean
+  ): RawArgs {
+    const abiMethod = this.abi.find(
+      (entry) => entry.name === method && entry.type === 'function'
+    ) as FunctionAbi;
+    if (!abiMethod) {
+      throw new Error(`Method ${method} not found in ABI`);
+    }
+
+    const calldataIterator = calldata.flat()[Symbol.iterator]();
+    const decodedArgs = abiMethod.inputs.reduce((acc, input) => {
+      acc[input.name] = decodeCalldataField(
+        calldataIterator,
+        input,
+        this.structs,
+        this.enums,
+        config
+      );
+      return acc;
+    }, {} as RawArgsObject);
+
+    if (returnArray === true) {
+      const decodedArgsArray: RawArgsArray = [];
+      abiMethod.inputs.forEach((input) => {
+        const value = decodedArgs[input.name];
+        decodedArgsArray.push(value);
+      });
+    }
+
+    return decodedArgs;
   }
 
   /**

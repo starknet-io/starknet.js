@@ -4,8 +4,11 @@ import {
   AbiStructs,
   BigNumberish,
   ByteArray,
+  DecodeConfig,
   CairoEnum,
   ParsedStruct,
+  Uint256,
+  Uint,
 } from '../../types';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
@@ -21,10 +24,14 @@ import {
   isTypeBool,
   isLen,
   isCairo1Type,
+  isTypeFelt,
+  isTypeUint,
+  getUintType,
   isTypeByteArray,
   isTypeSecp256k1Point,
   isTypeOption,
   isTypeResult,
+  isTypeContractAddress,
   isTypeEthAddress,
   isTypeTuple,
 } from './cairo';
@@ -37,7 +44,6 @@ import {
   CairoResultVariant,
 } from './enum';
 import extractTupleMemberTypes from './tuple';
-import assert from '../assert';
 
 /**
  * Decode base types from calldata
@@ -45,44 +51,79 @@ import assert from '../assert';
  * @param it iterator
  * @returns CairoUint256 | CairoUint512 | Boolean | string | BigNumberish
  */
-function decodeBaseTypes(type: string, it: Iterator<string>): 
+function decodeBaseTypes(
+  type: string,
+  it: Iterator<string>,
+  config?: DecodeConfig
+):
   | Boolean
   | ParsedStruct
   | BigNumberish
+  | Uint256
   | BigNumberish[]
   | CairoOption<any>
   | CairoResult<any, any>
-  | CairoEnum 
-{
+  | CairoEnum {
   let temp;
   switch (true) {
     case isTypeBool(type):
       temp = it.next().value;
       return Boolean(BigInt(temp));
 
-    case CairoUint256.isAbiType(type):
-      const low = it.next().value;
-      const high = it.next().value;
+    case isTypeUint(type):
+      switch (true) {
+        case CairoUint256.isAbiType(type):
+          console.log('got 256 uint value');
+          const low = it.next().value;
+          const high = it.next().value;
 
-      return new CairoUint256(low, high).toBigInt();
+          const ret = new CairoUint256(low, high);
+          let configConstructor = config?.['core::integer::u256'];
+          if (configConstructor) {
+            return configConstructor(ret);
+          }
+          return ret;
 
-      case CairoUint512.isAbiType(type):
-      const limb0 = it.next().value;
-      const limb1 = it.next().value;
-      const limb2 = it.next().value;
-      const limb3 = it.next().value;
+        case CairoUint512.isAbiType(type):
+          const limb0 = it.next().value;
+          const limb1 = it.next().value;
+          const limb2 = it.next().value;
+          const limb3 = it.next().value;
 
-      return new CairoUint512(limb0, limb1, limb2, limb3).toBigInt();
+          return new CairoUint512(limb0, limb1, limb2, limb3).toBigInt();
 
-      case isTypeEthAddress(type):
+        default:
+          temp = it.next().value;
+          const configType = getUintType(type);
+          if (configType) {
+            const UintConstructor = config?.[configType];
+            if (UintConstructor) {
+              return UintConstructor(temp);
+            } else {
+              return BigInt(temp);
+            }
+          }
+      }
+
+    case isTypeEthAddress(type):
       temp = it.next().value;
       return BigInt(temp);
 
-      case isTypeBytes31(type):
+    case isTypeContractAddress(type):
+      temp = it.next().value;
+      temp = toHex(temp);
+      const configConstructor = config?.[type];
+      if (configConstructor) {
+        return configConstructor(temp);
+      } else {
+        return BigInt(temp);
+      }
+
+    case isTypeBytes31(type):
       temp = it.next().value;
       return decodeShortString(temp);
 
-      case isTypeSecp256k1Point(type):
+    case isTypeSecp256k1Point(type):
       const xLow = removeHexPrefix(it.next().value).padStart(32, '0');
       const xHigh = removeHexPrefix(it.next().value).padStart(32, '0');
       const yLow = removeHexPrefix(it.next().value).padStart(32, '0');
@@ -91,7 +132,20 @@ function decodeBaseTypes(type: string, it: Iterator<string>):
 
       return pubK;
 
-      default:
+    case isTypeFelt(type):
+      temp = String(it.next().value);
+      console.log('Original temp = ', temp);
+      const configFeltConstructor = config?.['core::felt252'];
+      if (configFeltConstructor) {
+        if (configFeltConstructor === String) return decodeShortString(temp);
+        else return configFeltConstructor(temp);
+      }
+
+      // Default
+      return BigInt(temp);
+
+    default:
+      console.log('went to default block for ');
       temp = it.next().value;
       return BigInt(temp);
   }
@@ -109,18 +163,18 @@ function decodeCalldataValue(
   calldataIterator: Iterator<string>,
   element: { name: string; type: string },
   structs: AbiStructs,
-  enums: AbiEnums
-): 
- | Boolean
+  enums: AbiEnums,
+  config?: DecodeConfig
+):
+  | Boolean
   | ParsedStruct
+  | Uint256
   | BigNumberish
   | BigNumberish[]
   | any[]
   | CairoOption<any>
   | CairoResult<any, any>
-  | CairoEnum
-{
-
+  | CairoEnum {
   if (element.type === '()') {
     return {};
   }
@@ -129,7 +183,7 @@ function decodeCalldataValue(
   if (CairoUint256.isAbiType(element.type)) {
     const low = calldataIterator.next().value;
     const high = calldataIterator.next().value;
-    return new CairoUint256(low, high).toBigInt();
+    return new CairoUint256(low, high);
   }
 
   // type uint512 struct
@@ -161,10 +215,14 @@ function decodeCalldataValue(
   // type struct
   if (structs && element.type in structs && structs[element.type]) {
     if (isTypeEthAddress(element.type)) {
-      return decodeBaseTypes(element.type, calldataIterator);
+      return decodeBaseTypes(element.type, calldataIterator, config);
     }
+    if (isTypeContractAddress(element.type)) {
+      return decodeBaseTypes(element.type, calldataIterator, config);
+    }
+
     return structs[element.type].members.reduce((acc, el) => {
-      acc[el.name] = decodeCalldataValue(calldataIterator, el, structs, enums);
+      acc[el.name] = decodeCalldataValue(calldataIterator, el, structs, enums, config);
       return acc;
     }, {} as any);
   }
@@ -178,7 +236,8 @@ function decodeCalldataValue(
           calldataIterator,
           { name: '', type: variant.type },
           structs,
-          enums
+          enums,
+          config
         );
         return acc;
       }
@@ -212,7 +271,7 @@ function decodeCalldataValue(
       const name = it?.name ? it.name : idx;
       const type = it?.type ? it.type : it;
       const el = { name, type };
-      acc[name] = decodeCalldataValue(calldataIterator, el, structs, enums);
+      acc[name] = decodeCalldataValue(calldataIterator, el, structs, enums, config);
       return acc;
     }, {} as any);
   }
@@ -224,13 +283,29 @@ function decodeCalldataValue(
     const el: AbiEntry = { name: '', type: getArrayType(element.type) };
     const len = BigInt(calldataIterator.next().value); // get length
     while (parsedDataArr.length < len) {
-      parsedDataArr.push(decodeCalldataValue(calldataIterator, el, structs, enums));
+      const val = decodeCalldataValue(calldataIterator, el, structs, enums, config);
+      if (
+        el.type === 'core::integer::u128' ||
+        el.type === 'core::integer::u8' ||
+        el.type === 'core::integer::u16'
+      ) {
+        parsedDataArr.push(Number(val));
+      } else {
+        parsedDataArr.push(val);
+      }
     }
-    return parsedDataArr;
+    console.log('Returning array: ', parsedDataArr);
+    const configConstructor = config?.[element.name];
+    if (configConstructor) {
+      const concatenatedString = parsedDataArr.join('');
+      return concatenatedString;
+    } else {
+      return parsedDataArr;
+    }
   }
 
   // base type
-  return decodeBaseTypes(element.type, calldataIterator);
+  return decodeBaseTypes(element.type, calldataIterator, config);
 }
 
 /**
@@ -245,28 +320,29 @@ export default function decodeCalldataField(
   calldataIterator: Iterator<string>,
   input: AbiEntry,
   structs: AbiStructs,
-  enums: AbiEnums
+  enums: AbiEnums,
+  config?: DecodeConfig
 ): any {
   const { name, type } = input;
 
   switch (true) {
     case isLen(name):
-      let temp = calldataIterator.next().value;
+      const temp = calldataIterator.next().value;
       return BigInt(temp);
 
     case (structs && type in structs) || isTypeTuple(type):
-      return decodeCalldataValue(calldataIterator, input, structs, enums);
+      return decodeCalldataValue(calldataIterator, input, structs, enums, config);
 
     case enums && isTypeEnum(type, enums):
-      return decodeCalldataValue(calldataIterator, input, structs, enums);
+      return decodeCalldataValue(calldataIterator, input, structs, enums, config);
 
     case isTypeArray(type):
       // C1 Array
       if (isCairo1Type(type)) {
-        return decodeCalldataValue(calldataIterator, input, structs, enums);
+        return decodeCalldataValue(calldataIterator, input, structs, enums, config);
       }
 
     default:
-      return decodeBaseTypes(type, calldataIterator);
+      return decodeBaseTypes(type, calldataIterator, config);
   }
 }

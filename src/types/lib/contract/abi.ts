@@ -1,3 +1,5 @@
+import { Uint256 } from '..';
+
 /** ABI */
 export type Abi = ReadonlyArray<FunctionAbi | EventAbi | StructAbi | any>;
 
@@ -55,4 +57,9 @@ export type LegacyEvent = {
   type: 'event';
   data: EventEntry[];
   keys: EventEntry[];
+};
+
+type JSCDataType = StringConstructor | NumberConstructor | BigIntConstructor | BooleanConstructor;
+export type DecodeConfig = {
+  [typeName: string]: JSCDataType;
 };

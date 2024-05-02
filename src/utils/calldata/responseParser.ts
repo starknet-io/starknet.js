@@ -238,7 +238,7 @@ export default function responseParser(
 
   switch (true) {
     case isLen(name):
-      let temp = responseIterator.next().value;
+      const temp = responseIterator.next().value;
       return BigInt(temp);
 
     case (structs && type in structs) || isTypeTuple(type):

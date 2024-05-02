@@ -89,6 +89,21 @@ export const isTypeResult = (type: string) => type.startsWith('core::result::Res
  * @returns - Returns true if the value is a valid Uint type, otherwise false.
  */
 export const isTypeUint = (type: string) => Object.values(Uint).includes(type as Uint);
+/**
+ * Retrieves the Uint enum type for the given type string.
+ *
+ * @param {string} type - The type string to check against Uint types.
+ * @returns {(Uint | null)} - The corresponding Uint enum value or null if not found.
+ */
+export const getUintType = (type: string): string | undefined => {
+  for (const value of Object.values(Uint)) {
+    if (value === type) {
+      return value;
+    }
+  }
+
+  return undefined;
+};
 // Legacy Export
 /**
  * Checks if the given type is `uint256`.
