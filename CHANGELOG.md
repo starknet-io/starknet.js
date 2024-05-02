@@ -2,7 +2,6 @@
 
 ### Bug Fixes
 
-
 - starknet types 0.7 ([#1087](https://github.com/starknet-io/starknet.js/issues/1087)) ([b038c76](https://github.com/starknet-io/starknet.js/commit/b038c76fe204746f1d1023c2ad3b46c022f6edbd))
 
 - tslib ([#1068](https://github.com/starknet-io/starknet.js/issues/1068)) ([dd7dc10](https://github.com/starknet-io/starknet.js/commit/dd7dc10c57fc3cc35298c0d584a178666e9cfed1))
