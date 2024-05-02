@@ -27,6 +27,7 @@ import { stringify } from '../utils/json';
 import { getHexStringArray, toHex, toStorageKey } from '../utils/num';
 import { Block, getDefaultNodeUrl, isV3Tx, isVersion, wait } from '../utils/provider';
 import { decompressProgram, signatureToHexArray } from '../utils/stark';
+import { useEncoded } from '../utils/starknetId';
 import { getVersionsByType } from '../utils/transaction';
 
 const defaultOptions = {
@@ -170,11 +171,11 @@ export class RpcChannel {
 
   public async getL1MessageHash(txHash: BigNumberish) {
     const txData = (await this.getTransactionByHash(txHash)) as any;
-    const { calldata, contract_address, entry_point_selector, nonce, version /* type */ } = txData;
+    const { calldata, contract_address, entry_point_selector, nonce, version, type } = txData;
     const hashedCallData = computeHashOnElements(calldata);
 
     return computeHashOnElements([
-      // type,
+      useEncoded(type),
       version,
       contract_address,
       entry_point_selector,

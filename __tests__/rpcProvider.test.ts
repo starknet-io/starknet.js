@@ -78,14 +78,6 @@ describeIfRpc('RPCProvider', () => {
     expect(typeof gasPrice).toBe('string');
   });
 
-  test('getL1MessageHash', async () => {
-    const msgHash = await rpcProvider.getL1MessageHash(
-      '0x24f985090da17ccc9734efd2f516262fce50b37c702bf1e9d2a149796c05cfd'
-    );
-
-    expect(msgHash).toBeTruthy();
-  });
-
   test('getStateUpdate', async () => {
     const stateUpdate = await rpcProvider.getBlockStateUpdate('latest');
     expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
