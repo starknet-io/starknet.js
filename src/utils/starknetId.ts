@@ -138,6 +138,11 @@ export const enum StarknetIdContract {
  * @param {StarknetChainId} chainId - The chain ID of the Starknet network.
  * @return {string} The Starknet ID contract address.
  * @throws {Error} Throws an error if the Starknet ID contract is not deployed on the network.
+ * @example
+ * ```typescript
+ * const result = getStarknetIdContract(StarknetChainId.SN_SEPOLIA)
+ * assert(result === "0x0707f09bc576bd7cfee59694846291047e965f4184fe13dac62c56759b3b6fa7")
+ * ```
  */
 export function getStarknetIdContract(chainId: StarknetChainId): string {
   switch (chainId) {

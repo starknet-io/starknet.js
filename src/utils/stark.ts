@@ -28,6 +28,11 @@ import { isString } from './shortString';
  *
  * [Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/services/api/gateway/transaction.py#L54-L58)
  * @param jsonProgram Representing the compiled cairo program
+ * @example
+ * ```typescript
+ * const result = compressProgram("{compiled_cairo_program}")
+ * assert(result === "H4sIAAAAAAAAA7NJzs8tyMxJTYlPTswsyo8vKMpPL0rMtQMAWnh2rRgAAAA=")
+ * ```
  */
 export function compressProgram(jsonProgram: Program | string): CompressedProgram {
   const stringified = isString(jsonProgram) ? jsonProgram : stringify(jsonProgram);
@@ -48,6 +53,11 @@ export function decompressProgram(base64: CompressedProgram) {
 
 /**
  * Random Address based on random keyPair
+ * @example
+ * ```typescript
+ * const result = randomAddress()
+ * assert(result === "0x51fc8126a13cd5ddb29a71ca399cb1e814f086f5af1b502d7151c14929554f")
+ * ```
  */
 export function randomAddress(): string {
   const randomKeyPair = utils.randomPrivateKey();
@@ -58,6 +68,11 @@ export function randomAddress(): string {
  * Lowercase and hex prefix string
  *
  * @deprecated Not used internally, naming is confusing based on functionality
+ * @example
+ * ```typescript
+ * const result = makeAddress("51fc8126a13cd5ddb29a71ca399cb1e814f086f5af1b502d7151c14929554f")
+ * assert(result === "0x51fc8126a13cd5ddb29a71ca399cb1e814f086f5af1b502d7151c14929554f")
+ * ```
  */
 export function makeAddress(input: string): string {
   return addHexPrefix(input).toLowerCase();
@@ -96,6 +111,11 @@ export function signatureToHexArray(sig?: Signature): ArraySignatureType {
 
 /**
  * Convert estimated fee to max fee with overhead
+ * @example
+ * ```typescript
+ * const result = estimatedFeeToMaxFee("8982300000000")
+ * assert(result === "13473450000000n")
+ * ```
  */
 export function estimatedFeeToMaxFee(
   estimatedFee: BigNumberish,
