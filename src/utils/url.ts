@@ -15,9 +15,6 @@ const localhostDomainRE = /^localhost[:?\d]*(?:[^:?\d]\S*)?$/;
 const nonLocalhostDomainRE = /^[^\s.]+\.\S{2,}$/;
 
 /**
- */
-
-/**
  * Loosely validate a URL `string`.
  *
  * @param {string} s - The URL to check for
