@@ -1,46 +1,18 @@
 import { DecodeConfig } from '../../src/types';
 
 import {
-  // Account,
   BigNumberish,
   CairoUint256,
-  // CairoCustomEnum,
-  // CairoOption,
-  // CairoOptionVariant,
-  // CairoResult,
-  // CairoResultVariant,
-  // CairoUint256,
-  // CairoUint512,
   CallData,
   Calldata,
-  // CompiledSierra,
-  // Contract,
-  // DeclareDeployUDCResponse,
   RawArgsArray,
   RawArgsObject,
-  // byteArray,
   cairo,
-  // ec,
-  // hash,
-  // num,
-  // selector,
-  // shortString,
-  // stark,
-  // types,
-  // type Uint512,
 } from '../../src';
 
-import {
-  // compiledC1v2,
-  // compiledHelloSierra,
-  compiledComplexSierra,
-} from '../config/fixtures';
+import { compiledComplexSierra } from '../config/fixtures';
 
-const {
-  // uint256,
-  tuple,
-  //  isCairo1Abi
-} = cairo;
+const { tuple } = cairo;
 
 describe('Cairo 1', () => {
   test('should correctly compile and decompile complex data structures', async () => {
@@ -131,14 +103,9 @@ describe('Cairo 1', () => {
     const compiledDataFromObject: Calldata = cd.compile('constructor', myRawArgsObject);
     const compiledDataFromArray: Calldata = cd.compile('constructor', myRawArgsArray);
     const decompiledDataFromObject = cd.decompile('constructor', compiledDataFromObject, config);
-    const decompiledDataFromArray = cd.decompile(
-      'constructor',
-      compiledDataFromArray,
-      config,
-      true
-    );
+    const decompiledDataFromArray = cd.decompile('constructor', compiledDataFromArray, config);
 
     expect(decompiledDataFromObject).toEqual(myRawArgsObject);
-    expect(decompiledDataFromArray).toEqual(myRawArgsArray);
+    expect(decompiledDataFromArray).toEqual(myRawArgsObject);
   });
 });

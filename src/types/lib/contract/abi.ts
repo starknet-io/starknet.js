@@ -1,5 +1,3 @@
-import { Uint256 } from '..';
-
 /** ABI */
 export type Abi = ReadonlyArray<FunctionAbi | EventAbi | StructAbi | any>;
 

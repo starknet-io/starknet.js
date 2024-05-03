@@ -248,12 +248,7 @@ export class CallData {
    * @param calldata Array of strings representing the encoded calldata.
    * @returns A structured object representing the decoded calldata.
    */
-  public decompile(
-    method: string,
-    calldata: string[],
-    config?: DecodeConfig,
-    returnArray?: boolean
-  ): RawArgs {
+  public decompile(method: string, calldata: string[], config?: DecodeConfig): RawArgs {
     const abiMethod = this.abi.find(
       (entry) => entry.name === method && entry.type === 'function'
     ) as FunctionAbi;
@@ -272,14 +267,6 @@ export class CallData {
       );
       return acc;
     }, {} as RawArgsObject);
-
-    if (returnArray === true) {
-      const decodedArgsArray: RawArgsArray = [];
-      abiMethod.inputs.forEach((input) => {
-        const value = decodedArgs[input.name];
-        decodedArgsArray.push(value);
-      });
-    }
 
     return decodedArgs;
   }

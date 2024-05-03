@@ -96,10 +96,15 @@ export const isTypeUint = (type: string) => Object.values(Uint).includes(type as
  * @returns {(Uint | null)} - The corresponding Uint enum value or null if not found.
  */
 export const getUintType = (type: string): string | undefined => {
-  for (const value of Object.values(Uint)) {
+  const uintValues = Object.values(Uint);
+  const iterator = uintValues[Symbol.iterator]();
+  let next = iterator.next();
+  while (!next.done) {
+    const { value } = next;
     if (value === type) {
       return value;
     }
+    next = iterator.next();
   }
 
   return undefined;
