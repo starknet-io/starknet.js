@@ -29,6 +29,7 @@ import {
   describeIfDevnet,
   getTestAccount,
   getTestProvider,
+  describeIfTestnet,
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
@@ -339,6 +340,16 @@ describeIfRpc('RPCProvider', () => {
         expect(result2).toHaveProperty('events');
         expect(Array.isArray(result2?.events)).toBe(true);
         expect(result2?.events?.length).toBe(1);
+      });
+    });
+
+    describeIfTestnet('testnet only', () => {
+      test('getL1MessageHash', async () => {
+        const msgHash = await rpcProvider.getL1MessageHash(
+          '0x24f985090da17ccc9734efd2f516262fce50b37c702bf1e9d2a149796c05cfd'
+        );
+
+        expect(msgHash).toBe('0x42a4cbbcc2a14a30d3ecd3c50b1613bb2bf003738cbde61eea6a37b4622fa28');
       });
     });
 

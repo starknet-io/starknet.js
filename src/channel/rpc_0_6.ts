@@ -26,8 +26,8 @@ import { computeHashOnElements, getSelector, getSelectorFromName } from '../util
 import { stringify } from '../utils/json';
 import { getHexStringArray, toHex, toStorageKey } from '../utils/num';
 import { Block, getDefaultNodeUrl, isV3Tx, isVersion, wait } from '../utils/provider';
+import { encodeShortString } from '../utils/shortString';
 import { decompressProgram, signatureToHexArray } from '../utils/stark';
-import { useEncoded } from '../utils/starknetId';
 import { getVersionsByType } from '../utils/transaction';
 
 const defaultOptions = {
@@ -172,15 +172,20 @@ export class RpcChannel {
   public async getL1MessageHash(txHash: BigNumberish) {
     const txData = (await this.getTransactionByHash(txHash)) as any;
     const { calldata, contract_address, entry_point_selector, nonce, version, type } = txData;
+
+    if (type !== 'L1_HANDLER') {
+      throw new Error('This transaction is not a L1 message.');
+    }
     const hashedCallData = computeHashOnElements(calldata);
+    const chainId = await this.getChainId();
 
     return computeHashOnElements([
-      useEncoded(type),
+      encodeShortString(type),
       version,
       contract_address,
       entry_point_selector,
       hashedCallData,
-      '0x0',
+      chainId,
       nonce,
     ]);
   }

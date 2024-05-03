@@ -107,7 +107,7 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getL1MessageHash(txHash: string) {
-    return this.channel.getL1MessageHash(txHash).then((msgHash) => msgHash);
+    return this.channel.getL1MessageHash(txHash).then((msgHash: string) => msgHash);
   }
 
   public async getBlockWithReceipts(blockIdentifier?: BlockIdentifier) {
