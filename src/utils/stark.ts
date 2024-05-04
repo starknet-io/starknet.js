@@ -28,6 +28,7 @@ import { isString } from './shortString';
  *
  * [Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/services/api/gateway/transaction.py#L54-L58)
  * @param jsonProgram Representing the compiled cairo program
+ * @return {CompressedProgram} Compressed cairo program
  * @example
  * ```typescript
  * const result = compressProgram("{compiled_cairo_program}")
@@ -53,6 +54,7 @@ export function decompressProgram(base64: CompressedProgram) {
 
 /**
  * Random Address based on random keyPair
+ * @returns  {string} Randomly generated address
  * @example
  * ```typescript
  * const result = randomAddress()
@@ -68,11 +70,6 @@ export function randomAddress(): string {
  * Lowercase and hex prefix string
  *
  * @deprecated Not used internally, naming is confusing based on functionality
- * @example
- * ```typescript
- * const result = makeAddress("51fc8126a13cd5ddb29a71ca399cb1e814f086f5af1b502d7151c14929554f")
- * assert(result === "0x51fc8126a13cd5ddb29a71ca399cb1e814f086f5af1b502d7151c14929554f")
- * ```
  */
 export function makeAddress(input: string): string {
   return addHexPrefix(input).toLowerCase();
@@ -111,7 +108,9 @@ export function signatureToHexArray(sig?: Signature): ArraySignatureType {
 
 /**
  * Convert estimated fee to max fee with overhead
- * @example
+ * @param {BigNumberish} estimatedFee - The estimated fee
+ * @param {number} [overhead = feeMarginPercentage.MAX_FEE] - The overhead added to the gas
+ * @returns {bigint} The maximum fee with overhead
  * ```typescript
  * const result = estimatedFeeToMaxFee("8982300000000")
  * assert(result === "13473450000000n")
