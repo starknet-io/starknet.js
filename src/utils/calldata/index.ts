@@ -271,7 +271,7 @@ export class CallData {
    */
   public format(method: string, response: string[], format: object): Result {
     const parsed = this.parse(method, response);
-    return formatter(parsed, format);
+    return formatter(parsed as Record<string, any>, format);
   }
 
   /**
