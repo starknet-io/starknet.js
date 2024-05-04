@@ -198,6 +198,7 @@ export class RpcProvider implements ProviderInterface {
       txHash,
       options
     )) as GetTxReceiptResponseWithoutHelper;
+
     return new ReceiptTx(receiptWoHelper) as GetTransactionReceiptResponse;
   }
 
