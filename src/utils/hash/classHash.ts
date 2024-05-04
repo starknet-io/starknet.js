@@ -34,6 +34,8 @@ export function computePoseidonHash(a: BigNumberish, b: BigNumberish): string {
 
 /**
  * Compute pedersen hash from data
+ *
+ * @param {BigNumberish[]} data - Data to compute hash on
  * @returns format: hex-string - pedersen hash
  *
  * @example
@@ -57,6 +59,11 @@ export function computePoseidonHashOnElements(data: BigNumberish[]) {
 
 /**
  * Calculate contract address from class hash
+ *
+ * @param {BigNumberish} salt - Salt to be used for hashing
+ * @param {BigNumberish} classHash - Class hash of contract to generate address for
+ * @param {RawArgs} constructorCalldata - Call data for contract constructor
+ * @param {BigNumberish} deployerAddress - Address of contract deployer
  * @returns format: hex-string
  * @example
  * ```typescript

@@ -27,6 +27,7 @@ import type { GetTransactionReceiptResponse } from './transactionReceipt';
 /**
  * Helper - Async Sleep for 'delay' time
  *
+ * @param {number} delay - Number of milliseconds to delay.
  * @example
  * ```typescript
  * wait(1000) // 1000 milliseconds == 1 second
@@ -42,6 +43,8 @@ export function wait(delay: number) {
  * Create Sierra Contract Class from a given Compiled Sierra
  *
  * CompiledSierra -> SierraContractClass
+ * 
+ * @param {CompiledSierra} contract - Compiled sierra code
  * 
  * @example
  * ```typescript
@@ -75,6 +78,8 @@ export function createSierraContractClass(contract: CompiledSierra): SierraContr
  * Create Contract Class from a given CompiledContract or string
  *
  * (CompiledContract or string) -> ContractClass
+ * 
+ * @param {CompiledContract | string} contract - Compiled contract or string
  * 
  * @example
  * ```typescript
