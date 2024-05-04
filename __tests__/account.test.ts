@@ -351,7 +351,7 @@ describe('deploy and test Wallet', () => {
     expect(BigInt(balance.low).toString()).toStrictEqual(BigInt(1000).toString());
   });
 
-  test.only('execute by wallet owner', async () => {
+  test('execute by wallet owner', async () => {
     const { transaction_hash } = await account.execute({
       contractAddress: erc20Address,
       entrypoint: 'transfer',
