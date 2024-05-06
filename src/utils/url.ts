@@ -67,7 +67,7 @@ export function isUrl(s?: string): boolean {
  * const defaultPath = "/";
  * const urlOrPath = "/docs";
  * const result = buildUrl(baseUrl, defaultPath, urlOrPath);
- * 
+ *
  * result = "https://starknetjs.com/docs"
  */
 export function buildUrl(baseUrl: string, defaultPath: string, urlOrPath?: string) {
