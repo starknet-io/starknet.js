@@ -2,12 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { Account, Provider, ProviderInterface, RpcProvider, json } from '../../src';
-import {
-  CompiledSierra,
-  CompiledSierraCasm,
-  LegacyCompiledContract,
-  waitForTransactionOptions,
-} from '../../src/types';
+import { CompiledSierra, CompiledSierraCasm, LegacyCompiledContract } from '../../src/types';
 import { ETransactionVersion } from '../../src/types/api';
 import { toHex } from '../../src/utils/num';
 
@@ -73,22 +68,18 @@ export const compiledTestRejectSierra = readContractSierra('cairo/testReject/tes
 export const compiledTestRejectCasm = readContractSierraCasm('cairo/testReject/test_reject');
 export const compiledSidMulticall = readContractSierra('starknetId/multicall/multicall.sierra');
 export const compiledSidMulticallCasm = readContractSierraCasm('starknetId/multicall/multicall');
+
 export function getTestProvider(isProvider?: true): ProviderInterface;
 export function getTestProvider(isProvider?: false): RpcProvider;
 export function getTestProvider(isProvider: boolean = true): ProviderInterface | RpcProvider {
-  const provider = isProvider
-    ? new Provider({ nodeUrl: process.env.TEST_RPC_URL })
-    : new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL });
+  const isDevnet = process.env.IS_DEVNET === 'true';
 
-  if (process.env.IS_DEVNET === 'true') {
+  const providerOptions = {
+    nodeUrl: process.env.TEST_RPC_URL,
     // accelerate the tests when running locally
-    const originalWaitForTransaction = provider.waitForTransaction.bind(provider);
-    provider.waitForTransaction = (txHash: string, options: waitForTransactionOptions = {}) => {
-      return originalWaitForTransaction(txHash, { retryInterval: 1000, ...options });
-    };
-  }
-
-  return provider;
+    ...(isDevnet && { transactionRetryIntervalFallback: 1000 }),
+  };
+  return isProvider ? new Provider(providerOptions) : new RpcProvider(providerOptions);
 }
 
 export const TEST_TX_VERSION = process.env.TX_VERSION === 'v3' ? ETransactionVersion.V3 : undefined;
