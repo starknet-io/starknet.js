@@ -6,10 +6,15 @@ If you want to contribute but don’t know what to do, take a look at these two 
 
 _[Use GitHub interface](https://blog.sapegin.me/all/open-source-for-everyone/) for simple documentation changes, otherwise follow the steps below._
 
+> :warning: IMPORTANT NOTE :warning:
+>
+> All contributions are expected to be of the highest possible quality! That means the PR is thoroughly tested and documented, and without blindly generated ChatGPT code and documentation! We will not consider nor merge PR-s that do not comply to these rules!
+
 ## Prerequisites
 
 - If it’s your first pull request, watch [this amazing course](http://makeapullrequest.com/) by [Kent C. Dodds](https://twitter.com/kentcdodds).
 - Fork the repository and clone your fork.
+- Checkout to the `develop` branch.
 - Install dependencies: `npm install`.
 
 ## Development workflow
@@ -34,8 +39,9 @@ Or run tests in watch mode:
 npm test --watch
 ```
 
-By default the tests are executed in your local Devnet. If you want to use a specific
-RPC node, you have to set some global variables before executing the tests:
+By default the tests are executed in your local Devnet and everything should run automatically.
+
+If you want to use a specific RPC node, you have to set some global variables before executing the tests:
 
 ```bash
 export TEST_RPC_URL=http://192.168.1.44:9545/rpc/v0.5 # example of a Pathfinder node located in your local network
