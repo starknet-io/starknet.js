@@ -85,10 +85,10 @@ export function getSelectorFromName(funcName: string) {
  * ```typescript
  * const selector: string = getSelector("myFunction");
  * // selector = "0x7e44bafo"
- * 
+ *
  * const selector1: string = getSelector("0x123abc");
  * // selector1 = "0x123abc"
- * 
+ *
  * const selector2: string = getSelector("123456");
  * // selector2 = "0x1e240"
  * ```

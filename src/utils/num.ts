@@ -16,7 +16,7 @@ export type { BigNumberish };
  * const hexString1 = "0x2fd23d9182193775423497fc0c472e156c57c69e4089a1967fb288a2d84e914";
  * const result1 = isHex(hexString1);
  * // result1 = true
- * 
+ *
  * const hexString2 = "2fd23d9182193775423497fc0c472e156c57c69e4089a1967fb288a2d84e914";
  * const result2 = isHex(hexString2);
  * // result2 = false
@@ -144,7 +144,7 @@ export const cleanHex = (hex: string) => hex.toLowerCase().replace(/^(0x)0+/, '$
  * ```typescript
  * const input1:BigNumberish = 10;
  * assertInRange(input1, 5, 20, 'value')
- * 
+ *
  * const input2: BigNumberish = 25;
  * assertInRange(input2, 5, 20, 'value');
  * // Throws Error: Message not signable, invalid value length.
@@ -217,7 +217,7 @@ export const isStringWholeNumber = (value: string) => /^\d+$/.test(value);
  * ```typescript
  * const result = getDecimalString("0x1a");
  * // result = "26"
- * 
+ *
  * const result2 = getDecimalString("Hello");
  * // Throws Error: "Hello need to be hex-string or whole-number-string"
  * ```
@@ -240,7 +240,7 @@ export function getDecimalString(value: string) {
  * ```typescript
  * const result = getHexString("123");
  * // result = "0x7b"
- * 
+ *
  * const result2 = getHexString("Hello");
  * // Throws Error: Hello need to be hex-string or whole-number-string
  * ```
@@ -278,7 +278,7 @@ export function getHexStringArray(value: Array<string>) {
  * ```typescript
  * const result = toCairoBool(true);
  * // result ="1"
- * 
+ *
  * const result2 = toCairoBool(false);
  * // result2 = "0"
  * ```
@@ -330,7 +330,7 @@ export function addPercent(number: BigNumberish, percent: number) {
  * ```typescript
  * const result = isNumber(123);
  * // result = true
- * 
+ *
  * const result2 = isNumber("123");
  * // result2 = false
  * ```
@@ -348,7 +348,7 @@ export function isNumber(value: unknown): value is number {
  * ```typescript
  * const result = isBoolean(true);
  * // result = true
- * 
+ *
  * const result2 = isBoolean(false);
  * // result2 = false
  * ```

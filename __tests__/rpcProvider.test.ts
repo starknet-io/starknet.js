@@ -11,6 +11,7 @@ import {
   ReceiptTx,
   RpcProvider,
   TransactionExecutionStatus,
+  cairo,
   stark,
   waitForTransactionOptions,
 } from '../src';
@@ -29,6 +30,8 @@ import {
   describeIfDevnet,
   getTestAccount,
   getTestProvider,
+  waitNextBlock,
+  devnetETHtokenAddress,
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
@@ -115,20 +118,15 @@ describeIfRpc('RPCProvider', () => {
     estimateSpy.mockRestore();
   });
 
-  describe('Test Estimate message fee', () => {
+  describeIfDevnet('Test Estimate message fee Cairo 0', () => {
+    // declaration of Cairo 0 contract is no more authorized in Sepolia Testnet
     let l1l2ContractCairo0Address: string;
-    let l1l2ContractCairo1Address: string;
 
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
         contract: compiledL1L2,
       });
       l1l2ContractCairo0Address = deploy.contract_address;
-      const { deploy: deploy2 } = await account.declareAndDeploy({
-        contract: compiledC1v2,
-        casm: compiledC1v2Casm,
-      });
-      l1l2ContractCairo1Address = deploy2.contract_address;
     });
 
     test('estimate message fee Cairo 0', async () => {
@@ -146,6 +144,19 @@ describeIfRpc('RPCProvider', () => {
           overall_fee: expect.anything(),
         })
       );
+    });
+  });
+
+  describe('Test Estimate message fee Cairo 1', () => {
+    let l1l2ContractCairo1Address: string;
+
+    beforeAll(async () => {
+      const { deploy: deploy2 } = await account.declareAndDeploy({
+        contract: compiledC1v2,
+        casm: compiledC1v2Casm,
+      });
+      l1l2ContractCairo1Address = deploy2.contract_address;
+      await waitNextBlock(provider as RpcProvider, 5000); // in Sepolia Testnet, needs pending block validation before interacting
     });
 
     test('estimate message fee Cairo 1', async () => {
@@ -230,6 +241,16 @@ describeIfRpc('RPCProvider', () => {
     let latestBlock: Block;
 
     beforeAll(async () => {
+      // add a Tx to be sure to have at least one Tx in the last block
+      const { transaction_hash } = await account.execute({
+        contractAddress: devnetETHtokenAddress,
+        entrypoint: 'transfer',
+        calldata: {
+          recipient: account.address,
+          amount: cairo.uint256(1n * 10n ** 4n),
+        },
+      });
+      await account.waitForTransaction(transaction_hash);
       latestBlock = await provider.getBlock('latest');
     });
 
