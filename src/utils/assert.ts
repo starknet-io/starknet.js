@@ -4,7 +4,7 @@
  * @param {string} [message] - The optional message to include in the error.
  * @throws {Error} Throws an error if the condition is false.
  */
-export default function assert(condition: any, message?: string): asserts condition {
+export default function assert(condition: boolean, message?: string): asserts condition {
   if (!condition) {
     throw new Error(message || 'Assertion failure');
   }
