@@ -1,3 +1,6 @@
+import type { SPEC } from 'starknet-types-07';
+import { bytesToHex } from '@noble/curves/abstract/utils';
+import { keccak_256 } from '@noble/hashes/sha3';
 import { ProviderInterface } from './interface';
 import { LibraryError } from './errors';
 import { RpcChannel, RPC06, RPC07 } from '../channel';
@@ -31,6 +34,10 @@ import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { isSierra } from '../utils/contract';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { ReceiptTx, GetTransactionReceiptResponse } from '../utils/transactionReceipt';
+import type { TransactionWithHash } from '../types/provider/spec';
+import assert from '../utils/assert';
+import { hexToBytes, toHex } from '../utils/num';
+import { addHexPrefix, removeHexPrefix } from '../utils/encode';
 
 export class RpcProvider implements ProviderInterface {
   private responseParser: RPCResponseParser;
@@ -104,6 +111,28 @@ export class RpcProvider implements ProviderInterface {
     return this.channel
       .getBlockWithTxHashes(blockIdentifier)
       .then(this.responseParser.parseL1GasPriceResponse);
+  }
+
+  public async getL1MessageHash(l2TxHash: BigNumberish) {
+    const transaction = (await this.channel.getTransactionByHash(l2TxHash)) as TransactionWithHash;
+    assert(transaction.type === 'L1_HANDLER', 'This L2 transaction is not a L1 message.');
+    const { calldata, contract_address, entry_point_selector, nonce } =
+      transaction as SPEC.L1_HANDLER_TXN;
+    const params = [
+      calldata[0],
+      contract_address,
+      nonce,
+      entry_point_selector,
+      calldata.length - 1,
+      ...calldata.slice(1),
+    ];
+    const myEncode = addHexPrefix(
+      params.reduce(
+        (res: string, par: BigNumberish) => res + removeHexPrefix(toHex(par)).padStart(64, '0'),
+        ''
+      )
+    );
+    return addHexPrefix(bytesToHex(keccak_256(hexToBytes(myEncode))));
   }
 
   public async getBlockWithReceipts(blockIdentifier?: BlockIdentifier) {
