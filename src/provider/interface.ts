@@ -90,6 +90,12 @@ export abstract class ProviderInterface {
    * Get L1 message hash from L2 transaction hash
    * @param {BigNumberish} l2TxHash L2 transaction hash
    * @returns {string} Hex string of L1 message hash
+   * @example
+   * In Sepolia Testnet :
+   * ```typescript
+   * const result = provider.getL1MessageHash('0x28dfc05eb4f261b37ddad451ff22f1d08d4e3c24dc646af0ec69fa20e096819');
+   * // result = '0x55b3f8b6e607fffd9b4d843dfe8f9b5c05822cd94fcad8797deb01d77805532a'
+   * ```
    */
   public abstract getL1MessageHash(l2TxHash: BigNumberish): Promise<string>;
 
