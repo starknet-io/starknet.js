@@ -133,7 +133,7 @@
           "properties": {
             "transaction_trace": {
               "title": "the transaction's trace",
-              "$ref": "sequencerSchemas#/definitions/TransactionTraceResponse"
+              "$ref": "starknet_trace_api_openrpc#/components/schemas/TRANSACTION_TRACE"
             },
             "fee_estimation": {
               "title": "the transaction's resources and fee",

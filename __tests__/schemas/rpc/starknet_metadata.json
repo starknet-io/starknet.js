@@ -1,0 +1,430 @@
+{
+  "openrpc": "1.0.0",
+  "info": {
+    "version": "0.1.0",
+    "title": "Starknet ABI specs"
+  },
+  "methods": [],
+  "$id": "starknet_metadata",
+  "components": {
+    "contentDescriptors": {
+      "ABI": {
+        "name": "abi",
+        "required": true,
+        "description": "A Cairo v>=2 contract ABI",
+        "schema": {
+          "$ref": "#/components/schemas/ABI"
+        }
+      }
+    },
+    "schemas": {
+      "ABI": {
+        "type": "array",
+        "items": {
+          "oneOf": [
+            {
+              "title": "function",
+              "$ref": "#/components/schemas/FUNCTION"
+            },
+            {
+              "title": "constructor",
+              "$ref": "#/components/schemas/CONSTRUCTOR"
+            },
+            {
+              "title": "l1_handler",
+              "$ref": "#/components/schemas/L1_HANDLER"
+            },
+            {
+              "title": "event",
+              "$ref": "#/components/schemas/EVENT"
+            },
+            {
+              "title": "struct",
+              "$ref": "#/components/schemas/STRUCT"
+            },
+            {
+              "title": "enum",
+              "$ref": "#/components/schemas/ENUM"
+            },
+            {
+              "title": "interface",
+              "$ref": "#/components/schemas/INTERFACE"
+            },
+            {
+              "title": "impl",
+              "$ref": "#/components/schemas/IMPL"
+            }
+          ]
+        }
+      },
+      "FUNCTION": {
+        "type": "object",
+        "title": "function",
+        "properties": {
+          "type": {
+            "title": "abi_entry_type",
+            "type": "string",
+            "enum": ["function"]
+          },
+          "name": {
+            "title": "name",
+            "description": "the function's name",
+            "type": "string"
+          },
+          "inputs": {
+            "type": "array",
+            "description": "the function's inputs",
+            "title": "inputs",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "title": "name",
+                  "description": "the argument name",
+                  "type": "string"
+                },
+                "type": {
+                  "title": "type",
+                  "description": "the argument type",
+                  "type": "string"
+                }
+              },
+              "required": ["name", "type"]
+            }
+          },
+          "outputs": {
+            "type": "array",
+            "title": "outputs",
+            "description": "the function's outputs",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "title": "type",
+                  "description": "the output type",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "state_mutability": {
+            "title": "state mutability",
+            "type": "string",
+            "enum": ["view", "external"]
+          }
+        },
+        "required": ["type", "name", "inputs", "outputs", "state_mutability"]
+      },
+      "CONSTRUCTOR": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "title": "abi_entry_type",
+            "type": "string",
+            "enum": ["constructor"]
+          },
+          "name": {
+            "title": "name",
+            "type": "string",
+            "description": "the constructor name, currently forced to be `contructor`",
+            "enum": ["constructor"]
+          },
+          "inputs": {
+            "type": "array",
+            "title": "inputs",
+            "description": "the constructor's inputs",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "title": "name",
+                  "description": "the argument name",
+                  "type": "string"
+                },
+                "type": {
+                  "title": "type",
+                  "description": "the argument type",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        },
+        "required": ["type", "name", "inputs"]
+      },
+      "L1_HANDLER": {
+        "type": "object",
+        "title": "function",
+        "properties": {
+          "type": {
+            "title": "abi_entry_type",
+            "type": "string",
+            "enum": ["l1_handler"]
+          },
+          "name": {
+            "title": "name",
+            "description": "the l1_handler name",
+            "type": "string"
+          },
+          "inputs": {
+            "type": "array",
+            "description": "the l1_handler inputs",
+            "title": "inputs",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "title": "name",
+                  "description": "the argument name",
+                  "type": "string"
+                },
+                "type": {
+                  "title": "type",
+                  "description": "the argument type",
+                  "type": "string"
+                }
+              },
+              "required": ["name", "type"]
+            }
+          },
+          "outputs": {
+            "type": "array",
+            "title": "outputs",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "title": "type",
+                  "description": "the output type",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "state_mutability": {
+            "title": "state mutability",
+            "type": "string",
+            "enum": ["view", "external"]
+          }
+        },
+        "required": ["type", "name", "inputs", "outputs", "state_mutability"]
+      },
+      "EVENT": {
+        "title": "event",
+        "allOf": [
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "title": "abi_entry_type",
+                "type": "string",
+                "enum": ["event"]
+              },
+              "name": {
+                "title": "name",
+                "description": "the name of the (Cairo) type associated with the event",
+                "type": "string"
+              }
+            },
+            "required": ["type", "name"]
+          },
+          {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ENUM_EVENT"
+              },
+              {
+                "$ref": "#/components/schemas/STRUCT_EVENT"
+              }
+            ]
+          }
+        ]
+      },
+      "STRUCT_EVENT": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "title": "kind",
+            "description": "determines the serialization of the corresponding type",
+            "type": "string",
+            "enum": ["struct"]
+          },
+          "members": {
+            "type": "array",
+            "description": "struct members",
+            "title": "members",
+            "items": {
+              "$ref": "#/components/schemas/EVENT_FIELD"
+            }
+          }
+        },
+        "required": ["kind", "members"]
+      },
+      "ENUM_EVENT": {
+        "type": "object",
+        "properties": {
+          "kind": {
+            "title": "kind",
+            "description": "determines the serialization of the corresponding type",
+            "type": "string",
+            "enum": ["enum"]
+          },
+          "variants": {
+            "type": "array",
+            "title": "variants",
+            "description": "enum variants",
+            "items": {
+              "$ref": "#/components/schemas/EVENT_FIELD"
+            }
+          }
+        },
+        "required": ["kind", "variants"]
+      },
+      "STRUCT": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "title": "abi_entry_type",
+            "type": "string",
+            "enum": ["struct"]
+          },
+          "name": {
+            "title": "name",
+            "description": "the (Cairo) struct name, including namespacing",
+            "type": "string"
+          },
+          "members": {
+            "type": "array",
+            "title": "members",
+            "description": "the struct members",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "title": "name",
+                  "description": "name of the struct member",
+                  "type": "string"
+                },
+                "type": {
+                  "title": "type",
+                  "description": "the member type, including namespacing",
+                  "type": "string"
+                }
+              },
+              "required": ["name", "type"]
+            }
+          }
+        },
+        "required": ["type", "name", "members"]
+      },
+      "ENUM": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "title": "abi_entry_type",
+            "type": "string",
+            "enum": ["enum"]
+          },
+          "name": {
+            "title": "name",
+            "description": "the (Cairo) enum name, including namespacing",
+            "type": "string"
+          },
+          "variants": {
+            "type": "array",
+            "title": "variants",
+            "items": {
+              "type": "object",
+              "properties": {
+                "name": {
+                  "title": "name",
+                  "description": "name of the enum variant",
+                  "type": "string"
+                },
+                "type": {
+                  "title": "type",
+                  "description": " the variant type, including namespacing",
+                  "type": "string"
+                }
+              },
+              "required": ["name", "type"]
+            }
+          }
+        },
+        "required": ["type", "name", "variants"]
+      },
+      "INTERFACE": {
+        "type": "object",
+        "title": "interface",
+        "properties": {
+          "type": {
+            "title": "abi_entry_type",
+            "type": "string",
+            "enum": ["interface"]
+          },
+          "name": {
+            "title": "name",
+            "description": "the name of the trait which defines the contract interface",
+            "type": "string"
+          },
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FUNCTION"
+            }
+          }
+        },
+        "required": ["type", "name", "items"]
+      },
+      "IMPL": {
+        "type": "object",
+        "title": "impl",
+        "properties": {
+          "type": {
+            "title": "abi_entry_type",
+            "type": "string",
+            "enum": ["impl"]
+          },
+          "name": {
+            "title": "name",
+            "description": "the name of an impl containing contract entry points",
+            "type": "string"
+          },
+          "interface_name": {
+            "description": "the name of the trait corresponding to this impl",
+            "title": "interface name",
+            "type": "string"
+          }
+        },
+        "required": ["type", "name", "interface_name"]
+      },
+      "EVENT_KIND": {
+        "type": "string",
+        "enum": ["struct", "enum"]
+      },
+      "EVENT_FIELD": {
+        "title": "member",
+        "type": "object",
+        "properties": {
+          "name": {
+            "title": "name",
+            "description": "the name of the struct member or enum variant",
+            "type": "string"
+          },
+          "type": {
+            "description": "the Cairo type of the member or variant, including namespacing",
+            "title": "type",
+            "type": "string"
+          },
+          "kind": {
+            "title": "kind",
+            "description": "specifies how the field should be serialized, via the starknet::Event trait or the serde::Serde trait",
+            "type": "string",
+            "enum": ["key", "data", "nested"]
+          }
+        },
+        "required": ["name", "type", "kind"]
+      }
+    }
+  }
+}
