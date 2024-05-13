@@ -32,7 +32,7 @@ import { isString } from './shortString';
  * @example
  * ```typescript
  * const result = compressProgram("{compiled_cairo_program}")
- * assert(result === "H4sIAAAAAAAAA7NJzs8tyMxJTYlPTswsyo8vKMpPL0rMtQMAWnh2rRgAAAA=")
+ * // result = "H4sIAAAAAAAAA7NJzs8tyMxJTYlPTswsyo8vKMpPL0rMtQMAWnh2rRgAAAA="
  * ```
  */
 export function compressProgram(jsonProgram: Program | string): CompressedProgram {
@@ -58,7 +58,7 @@ export function decompressProgram(base64: CompressedProgram) {
  * @example
  * ```typescript
  * const result = randomAddress()
- * assert(result === "0x51fc8126a13cd5ddb29a71ca399cb1e814f086f5af1b502d7151c14929554f")
+ * // result = "0x51fc8126a13cd5ddb29a71ca399cb1e814f086f5af1b502d7151c14929554f"
  * ```
  */
 export function randomAddress(): string {
@@ -113,7 +113,7 @@ export function signatureToHexArray(sig?: Signature): ArraySignatureType {
  * @returns {bigint} The maximum fee with overhead
  * ```typescript
  * const result = estimatedFeeToMaxFee("8982300000000")
- * assert(result === "13473450000000n")
+ * // result = "13473450000000n"
  * ```
  */
 export function estimatedFeeToMaxFee(
