@@ -429,3 +429,37 @@ describeIfRpc('RPCProvider', () => {
     });
   });
 });
+
+describeIfNotDevnet('waitForBlock', () => {
+  // As Devnet-rs isn't generating automatically blocks at a periodic time, it's excluded of this test.
+  const providerStandard = new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL });
+  const providerFastTimeOut = new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL, retries: 1 });
+  let block: number;
+  beforeEach(async () => {
+    block = await providerStandard.getBlockNumber();
+  });
+
+  test('waitForBlock timeOut', async () => {
+    await expect(providerFastTimeOut.waitForBlock(10 ** 20, 1)).rejects.toThrow(/timed-out/);
+  });
+
+  test('waitForBlock in the past', async () => {
+    const start = new Date().getTime();
+    await providerStandard.waitForBlock(block);
+    const end = new Date().getTime();
+    expect(end - start).toBeLessThan(1000); // quick answer expected
+  });
+
+  test('waitForBlock latest', async () => {
+    const start = new Date().getTime();
+    await providerStandard.waitForBlock('latest');
+    const end = new Date().getTime();
+    expect(end - start).toBeLessThan(100); // nearly immediate answer expected
+  });
+
+  // NOTA : this test can have a duration up to block interval.
+  test('waitForBlock pending', async () => {
+    await providerStandard.waitForBlock('pending');
+    expect(true).toBe(true); // answer without timeout Error (blocks have to be spaced with 16 minutes maximum : 200 retries * 5000ms)
+  });
+});
