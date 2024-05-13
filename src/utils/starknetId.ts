@@ -27,8 +27,7 @@ function extractStars(str: string): [string, number] {
  * @example
  * ```typescript
  * const result = useDecoded([3015206943634620n])
- *
- * assert(result === "starknetjs.stark")
+ * // result = "starknetjs.stark"
  * ```
  */
 export function useDecoded(encoded: bigint[]): string {
@@ -80,8 +79,7 @@ export function useDecoded(encoded: bigint[]): string {
  * @example
  * ```typescript
  * const result = useEncoded("starknet.js")
- *
- * assert(result === 3015206943634620n)
+ * // result = 3015206943634620n
  * ```
  */
 export function useEncoded(decoded: string): bigint {
@@ -141,7 +139,7 @@ export const enum StarknetIdContract {
  * @example
  * ```typescript
  * const result = getStarknetIdContract(StarknetChainId.SN_SEPOLIA)
- * assert(result === "0x0707f09bc576bd7cfee59694846291047e965f4184fe13dac62c56759b3b6fa7")
+ * // result = "0x0707f09bc576bd7cfee59694846291047e965f4184fe13dac62c56759b3b6fa7"
  * ```
  */
 export function getStarknetIdContract(chainId: StarknetChainId): string {
