@@ -40,9 +40,8 @@ export function computePoseidonHash(a: BigNumberish, b: BigNumberish): string {
  *
  * @example
  * ```typescript
- * const hash = computeHashOnElements(['0xabc', '0x123', '0xabc123'])
- *
- * hash = 0x148141e8f7db29d005a0187669a56f0790d7e8c2c5b2d780e4d8b9e436a5521
+ * const result = computeHashOnElements(['0xabc', '0x123', '0xabc123'])
+ * // result = 0x148141e8f7db29d005a0187669a56f0790d7e8c2c5b2d780e4d8b9e436a5521
  * ```
  */
 export function computeHashOnElements(data: BigNumberish[]): string {
@@ -67,8 +66,8 @@ export function computePoseidonHashOnElements(data: BigNumberish[]) {
  * @returns format: hex-string
  * @example
  * ```typescript
- * const contractAddress = calculateContractAddressFromHash(1234, 0x1cf4fe5d37868d25524cdacb89518d88bf217a9240a1e6fde71cc22c429e0e3, [1234, true, false], 0x052fb1a9ab0db3c4f81d70fea6a2f6e55f57c709a46089b25eeec0e959db3695)
- * contractAddress = 0x5fb03d3a88d8e474976932f927ff6a9e332e06ed36642ea3e8c7e38bf010f76
+ * const result = calculateContractAddressFromHash(1234, 0x1cf4fe5d37868d25524cdacb89518d88bf217a9240a1e6fde71cc22c429e0e3, [1234, true, false], 0x052fb1a9ab0db3c4f81d70fea6a2f6e55f57c709a46089b25eeec0e959db3695)
+ * // result = 0x5fb03d3a88d8e474976932f927ff6a9e332e06ed36642ea3e8c7e38bf010f76
  * ```
  */
 export function calculateContractAddressFromHash(
@@ -110,8 +109,8 @@ function nullSkipReplacer(key: string, value: any) {
  * @returns format: json-string
  * @example
  * ```typescript
- * const formattedSpaces = formatSpaces("{'onchain': true, 'isStarknet': true}")
- * formattedSpaces = {'onchain':  true,  'isStarknet':  true}
+ * const result = formatSpaces("{'onchain': true, 'isStarknet': true}")
+ * // result = {'onchain':  true,  'isStarknet':  true}
  * ```
  */
 export function formatSpaces(json: string) {

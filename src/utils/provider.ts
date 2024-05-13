@@ -48,7 +48,7 @@ export function wait(delay: number) {
  * 
  * @example
  * ```typescript
- * const sierraContractClass = createSierraContractClass({
+ * const result = createSierraContractClass({
     "sierra_program": [
         "0x1",
         "0x4",
@@ -60,9 +60,7 @@ export function wait(delay: number) {
         "0x4c",
         "0x65",
         "0x52616e6765436865636b",...})
-  
-        
-  sierraContractClass = {sierra_program: 'H4sIAAAAAAAAA6x9WZbsrI7uVGqd53qgb8ZynwzYY7jDv5JAAmxHZuQ+96yq/L0jIzEINZ8axP/5j/q/+j//+z/wH9f/o/p/zPbh+Iot49+u9v8G3//rTdDhDDF4Z0MKPthQ+m+S2v6n1S//638VvdXW2PQ6RvxuDG+jiybCXKJ7Hef6ZRi9E+Q89WmKLilfqbrsL6PUCf8...}
+ * // result = {sierra_program: 'H4sIAAAAAAAAA6x9WZbsrI7uVGqd53qgb8ZynwzYY7jDv5JAAmxHZuQ+96yq/L0jIzEINZ8axP/5j/q/+j//+z/wH9f/o/p/zPbh+Iot49+u9v8G3//rTdDhDDF4Z0MKPthQ+m+S2v6n1S//638VvdXW2PQ6RvxuDG+jiybCXKJ7Hef6ZRi9E+Q89WmKLilfqbrsL6PUCf8...}
  * ```
  */
 export function createSierraContractClass(contract: CompiledSierra): SierraContractClass {
@@ -83,7 +81,7 @@ export function createSierraContractClass(contract: CompiledSierra): SierraContr
  * 
  * @example
  * ```typescript
- * const sierraContractClass = parseContract({
+ * const result = parseContract({
     "sierra_program": [
         "0x1",
         "0x4",
@@ -95,9 +93,7 @@ export function createSierraContractClass(contract: CompiledSierra): SierraContr
         "0x4c",
         "0x65",
         "0x52616e6765436865636b",...})
-  
-        
-  sierraContractClass = {sierra_program: 'H4sIAAAAAAAAA6x9WZbsrI7uVGqd53qgb8ZynwzYY7jDv5JAAmxHZuQ+96yq/L0jIzEINZ8axP/5j/q/+j//+z/wH9f/o/p/zPbh+Iot49+u9v8G3//rTdDhDDF4Z0MKPthQ+m+S2v6n1S//638VvdXW2PQ6RvxuDG+jiybCXKJ7Hef6ZRi9E+Q89WmKLilfqbrsL6PUCf8...}
+ * // result = {sierra_program: 'H4sIAAAAAAAAA6x9WZbsrI7uVGqd53qgb8ZynwzYY7jDv5JAAmxHZuQ+96yq/L0jIzEINZ8axP/5j/q/+j//+z/wH9f/o/p/zPbh+Iot49+u9v8G3//rTdDhDDF4Z0MKPthQ+m+S2v6n1S//638VvdXW2PQ6RvxuDG+jiybCXKJ7Hef6ZRi9E+Q89WmKLilfqbrsL6PUCf8...}
  * ```
  */
 export function parseContract(contract: CompiledContract | string): ContractClass {
