@@ -1,10 +1,9 @@
 import { BatchClientOptions } from './interface';
-import { DelayedAction } from './delayedAction';
 import { stringify } from '../utils/json';
 import { RPC } from '../types';
 import { JRPC } from '../types/api';
 
-export class BatchClient extends DelayedAction {
+export class BatchClient {
   public nodeUrl: string;
 
   public headers: object;
@@ -15,14 +14,44 @@ export class BatchClient extends DelayedAction {
 
   private pendingRequests: Record<string | number, JRPC.RequestBody> = {};
 
-  private batchPromise?: Promise<any>;
+  private batchPromises: Record<string | number, Promise<JRPC.ResponseBody[]>> = {};
+
+  private delayTimer?: NodeJS.Timeout;
+
+  private delayPromise?: Promise<void>;
+
+  private delayPromiseResolve?: () => void;
 
   constructor(options: BatchClientOptions) {
-    super(options.interval);
-
     this.nodeUrl = options.nodeUrl;
     this.headers = options.headers;
     this.interval = options.interval;
+  }
+
+  private async wait(): Promise<void> {
+    // If the promise is not set, create a new one and store the resolve function
+    if (!this.delayPromise || !this.delayPromiseResolve) {
+      this.delayPromise = new Promise((resolve) => {
+        this.delayPromiseResolve = resolve;
+      });
+    }
+
+    if (this.delayTimer) {
+      clearTimeout(this.delayTimer);
+      this.delayTimer = undefined;
+    }
+
+    this.delayTimer = setTimeout(() => {
+      if (this.delayPromiseResolve) {
+        this.delayPromiseResolve();
+
+        // Reset the promise and resolve function so that a new promise is created next time
+        this.delayPromise = undefined;
+        this.delayPromiseResolve = undefined;
+      }
+    }, this.interval);
+
+    return this.delayPromise;
   }
 
   private addPendingRequest<T extends keyof RPC.Methods>(
@@ -59,17 +88,25 @@ export class BatchClient extends DelayedAction {
   ) {
     const requestId = this.addPendingRequest(method, params, id);
 
+    // Wait for the interval to pass before sending the batch
     await this.wait();
 
+    // Get the pending requests and clear the object
     const requests = this.pendingRequests;
     this.pendingRequests = {};
 
-    if (!this.batchPromise) {
-      this.batchPromise = this.sendBatch(Object.values(requests));
+    // If there is no promise for this batch, create one and send the batch
+    if (!this.batchPromises[requestId]) {
+      const promise = this.sendBatch(Object.values(requests));
+      Object.keys(requests).forEach((key) => {
+        this.batchPromises[key] = promise;
+      });
     }
-    const results = await this.batchPromise;
-    this.batchPromise = undefined;
 
+    const results = await this.batchPromises[requestId];
+    delete this.batchPromises[requestId];
+
+    // Find this request in the results and return it
     return results.find((result: any) => result.id === requestId);
   }
 }
