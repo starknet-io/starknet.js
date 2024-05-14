@@ -1,9 +1,9 @@
-import { BatchClientOptions } from './interface';
+import { BatchClientInterface, BatchClientOptions } from './interface';
 import { stringify } from '../utils/json';
 import { RPC } from '../types';
 import { JRPC } from '../types/api';
 
-export class BatchClient {
+export class BatchClient implements BatchClientInterface {
   public nodeUrl: string;
 
   public headers: object;
@@ -81,11 +81,13 @@ export class BatchClient {
     return raw.json();
   }
 
-  public async fetch<T extends keyof RPC.Methods>(
-    method: T,
-    params?: RPC.Methods[T]['params'],
-    id?: string | number
-  ) {
+  public async fetch<
+    T extends keyof RPC.Methods,
+    TResponse extends JRPC.ResponseBody & {
+      result?: RPC.Methods[T]['result'];
+      error?: JRPC.Error;
+    },
+  >(method: T, params?: RPC.Methods[T]['params'], id?: string | number): Promise<TResponse> {
     const requestId = this.addPendingRequest(method, params, id);
 
     // Wait for the interval to pass before sending the batch
@@ -107,6 +109,9 @@ export class BatchClient {
     delete this.batchPromises[requestId];
 
     // Find this request in the results and return it
-    return results.find((result: any) => result.id === requestId);
+    const result = results.find((res: any) => res.id === requestId);
+    if (!result) throw new Error(`Couldn't find the result for the request. Method: ${method}`);
+
+    return result as TResponse;
   }
 }

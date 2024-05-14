@@ -19,14 +19,9 @@ export abstract class BatchClientInterface {
     params?: RPC.Methods[T]['params'],
     id?: string | number
   ): Promise<
-    JRPC.ResponseBody &
-      (
-        | {
-            result?: RPC.Methods[T]['result'];
-          }
-        | {
-            error?: RPC.Methods[T] extends { error: infer E } ? E : never;
-          }
-      )
+    JRPC.ResponseBody & {
+      result?: RPC.Methods[T]['result'];
+      error?: JRPC.Error;
+    }
   >;
 }
