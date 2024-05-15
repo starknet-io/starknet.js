@@ -11,13 +11,30 @@ import { computeCompiledClassHash, computeContractClassHash } from './hash';
 import { parse } from './json';
 import { decompressProgram } from './stark';
 
+import { isString } from './shortString';
+
+/**
+ * Checks if a given contract is in Sierra (Safe Intermediate Representation) format.
+ *
+ * @param {CairoContract | string} contract - The contract to check. Can be either a CairoContract object or a string representation of the contract.
+ * @return {boolean} - Returns true if the contract is a Sierra contract, otherwise false.
+ */
 export function isSierra(
   contract: CairoContract | string
 ): contract is SierraContractClass | CompiledSierra {
-  const compiledContract = typeof contract === 'string' ? parse(contract) : contract;
+  const compiledContract = isString(contract) ? parse(contract) : contract;
   return 'sierra_program' in compiledContract;
 }
 
+/**
+ * Extracts contract hashes from `DeclareContractPayload`.
+ *
+ * @param {DeclareContractPayload} payload - The payload containing contract information.
+ *
+ * @return {CompleteDeclareContractPayload} - The `CompleteDeclareContractPayload` with extracted contract hashes.
+ *
+ * @throws {Error} - If extraction of compiledClassHash or classHash fails.
+ */
 export function extractContractHashes(
   payload: DeclareContractPayload
 ): CompleteDeclareContractPayload {

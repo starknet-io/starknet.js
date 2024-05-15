@@ -5,7 +5,11 @@ import {
   Block,
   CallData,
   Contract,
+  FeeEstimate,
   RPC,
+  RPC06,
+  ReceiptTx,
+  RpcProvider,
   TransactionExecutionStatus,
   stark,
   waitForTransactionOptions,
@@ -14,13 +18,15 @@ import { StarknetChainId } from '../src/constants';
 import { felt, uint256 } from '../src/utils/calldata/cairo';
 import { toHexString } from '../src/utils/num';
 import {
+  compiledC1v2,
+  compiledC1v2Casm,
   compiledErc20Echo,
   compiledL1L2,
   compiledOpenZeppelinAccount,
   createBlockForDevnet,
-  describeIfDevnet,
-  describeIfNotDevnet,
   describeIfRpc,
+  describeIfNotDevnet,
+  describeIfDevnet,
   getTestAccount,
   getTestProvider,
 } from './config/fixtures';
@@ -67,6 +73,11 @@ describeIfRpc('RPCProvider', () => {
     expect(typeof blockNumber).toBe('number');
   });
 
+  test('getL1GasPrice', async () => {
+    const gasPrice = await rpcProvider.getL1GasPrice('latest');
+    expect(typeof gasPrice).toBe('string');
+  });
+
   test('getStateUpdate', async () => {
     const stateUpdate = await rpcProvider.getBlockStateUpdate('latest');
     expect(stateUpdate).toMatchSchemaRef('StateUpdateResponse');
@@ -77,25 +88,75 @@ describeIfRpc('RPCProvider', () => {
     expect(typeof spec).toBe('string');
   });
 
+  test('configurable margin', async () => {
+    const p = new RpcProvider({
+      nodeUrl: provider.channel.nodeUrl,
+      feeMarginPercentage: {
+        l1BoundMaxAmount: 0,
+        l1BoundMaxPricePerUnit: 0,
+        maxFee: 0,
+      },
+    });
+    const estimateSpy = jest.spyOn(p.channel as any, 'getEstimateFee');
+    const mockFeeEstimate: FeeEstimate = {
+      gas_consumed: '0x2',
+      gas_price: '0x1',
+      data_gas_consumed: '0x2',
+      data_gas_price: '0x1',
+      overall_fee: '0x4',
+      unit: 'WEI',
+    };
+    estimateSpy.mockResolvedValue([mockFeeEstimate]);
+    const result = (await p.getEstimateFeeBulk([{} as any], {}))[0];
+    expect(estimateSpy).toHaveBeenCalledTimes(1);
+    expect(result.suggestedMaxFee).toBe(4n);
+    expect(result.resourceBounds.l1_gas.max_amount).toBe('0x4');
+    expect(result.resourceBounds.l1_gas.max_price_per_unit).toBe('0x1');
+    estimateSpy.mockRestore();
+  });
+
   describe('Test Estimate message fee', () => {
-    const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165A0';
-    let l1l2ContractAddress: string;
+    let l1l2ContractCairo0Address: string;
+    let l1l2ContractCairo1Address: string;
 
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
         contract: compiledL1L2,
       });
-      l1l2ContractAddress = deploy.contract_address;
+      l1l2ContractCairo0Address = deploy.contract_address;
+      const { deploy: deploy2 } = await account.declareAndDeploy({
+        contract: compiledC1v2,
+        casm: compiledC1v2Casm,
+      });
+      l1l2ContractCairo1Address = deploy2.contract_address;
     });
 
-    test('estimate message fee', async () => {
-      const estimation = await rpcProvider.estimateMessageFee({
+    test('estimate message fee Cairo 0', async () => {
+      const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165A0';
+      const estimationCairo0 = await rpcProvider.estimateMessageFee({
         from_address: L1_ADDRESS,
-        to_address: l1l2ContractAddress,
+        to_address: l1l2ContractCairo0Address,
         entry_point_selector: 'deposit',
         payload: ['556', '123'],
       });
-      expect(estimation).toEqual(
+      expect(estimationCairo0).toEqual(
+        expect.objectContaining({
+          gas_consumed: expect.anything(),
+          gas_price: expect.anything(),
+          overall_fee: expect.anything(),
+        })
+      );
+    });
+
+    test('estimate message fee Cairo 1', async () => {
+      const L1_ADDRESS = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165'; // not coded in 20 bytes
+      const estimationCairo1 = await rpcProvider.estimateMessageFee({
+        from_address: L1_ADDRESS,
+        to_address: l1l2ContractCairo1Address,
+        entry_point_selector: 'increase_bal',
+        payload: ['100'],
+      });
+      expect(estimationCairo1).toEqual(
         expect.objectContaining({
           gas_consumed: expect.anything(),
           gas_price: expect.anything(),
@@ -136,12 +197,12 @@ describeIfRpc('RPCProvider', () => {
 
     test('successful - default', async () => {
       transactionStatusSpy.mockResolvedValueOnce(response.successful);
-      await expect(rpcProvider.waitForTransaction(0)).resolves.toBe(receipt);
+      await expect(rpcProvider.waitForTransaction(0)).resolves.toBeInstanceOf(ReceiptTx);
     });
 
     test('reverted - default', async () => {
       transactionStatusSpy.mockResolvedValueOnce(response.reverted);
-      await expect(rpcProvider.waitForTransaction(0)).resolves.toBe(receipt);
+      await expect(rpcProvider.waitForTransaction(0)).resolves.toBeInstanceOf(ReceiptTx);
     });
 
     test('rejected - default', async () => {
@@ -180,6 +241,17 @@ describeIfRpc('RPCProvider', () => {
     test('getBlockWithTxs', async () => {
       const blockResponse = await rpcProvider.getBlockWithTxs(latestBlock.block_number);
       expect(blockResponse).toHaveProperty('transactions');
+    });
+
+    test('getBlockWithReceipts - 0.6 RpcChannel', async () => {
+      const channel = new RPC06.RpcChannel({ nodeUrl: rpcProvider.channel.nodeUrl });
+      const p = new RpcProvider({ channel } as any);
+      await expect(p.getBlockWithReceipts(latestBlock.block_number)).rejects.toThrow(/Unsupported/);
+    });
+
+    test('getBlockWithReceipts - 0.7 RpcChannel', async () => {
+      const blockResponse = await rpcProvider.getBlockWithReceipts(latestBlock.block_number);
+      expect(blockResponse).toMatchSchemaRef('BlockWithTxReceipts');
     });
 
     test('getTransactionByBlockIdAndIndex', async () => {
@@ -312,8 +384,9 @@ describeIfRpc('RPCProvider', () => {
         expect(typeof classHash).toBe('string');
       });
 
-      xtest('traceTransaction', async () => {
-        await rpcProvider.getTransactionTrace(transaction_hash);
+      test('traceTransaction', async () => {
+        const trace = await rpcProvider.getTransactionTrace(transaction_hash);
+        expect(trace).toMatchSchemaRef('getTransactionTrace');
       });
 
       test('getClassAt', async () => {

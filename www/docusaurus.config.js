@@ -130,6 +130,10 @@ const config = {
                 label: 'Twitter',
                 href: 'https://twitter.com/starknetjs',
               },
+              {
+                label: 'Discord',
+                href: 'https://discord.com/invite/YgsdxEx3',
+              },
             ],
           },
           {

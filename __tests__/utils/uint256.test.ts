@@ -25,6 +25,24 @@ describe('cairo uint256', () => {
     `);
   });
 
+  test('uint512 should not convert -1 to uint512 dec struct', () => {
+    expect(() => {
+      cairo.uint512(-1n);
+    }).toThrow('bigNumberish is smaller than UINT_512_MIN');
+  });
+
+  test('uint512 should convert to uint512 dec struct', () => {
+    const uint512 = cairo.uint512(
+      '0x33333333333333333333333333333333222222222222222222222222222222221111111111111111111111111111111100000000000000000000000000000000'
+    );
+    expect(uint512).toEqual({
+      limb0: '0',
+      limb1: '22685491128062564230891640495451214097',
+      limb2: '45370982256125128461783280990902428194',
+      limb3: '68056473384187692692674921486353642291',
+    });
+  });
+
   test('should convert 0 from BN to uint256 struct', () => {
     const uint256 = bnToUint256(0n);
     expect(uint256).toMatchInlineSnapshot(`

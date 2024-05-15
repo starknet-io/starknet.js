@@ -11,16 +11,16 @@ import {
   DeployAccountContractTransaction,
   Invocation,
   InvocationsDetailsWithNonce,
-  RPC,
   RpcProviderOptions,
   TransactionType,
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
-import { ETransactionVersion } from '../types/api';
+import { JRPC, RPCSPEC06 as RPC } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
+import { validateAndParseEthAddress } from '../utils/eth';
 import fetch from '../utils/fetchPonyfill';
 import { getSelector, getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
@@ -48,12 +48,12 @@ export class RpcChannel {
 
   private chainId?: StarknetChainId;
 
-  private speckVersion?: string;
+  private specVersion?: string;
 
   readonly waitMode: Boolean; // behave like web2 rpc and return when tx is processed
 
   constructor(optionsOrProvider?: RpcProviderOptions) {
-    const { nodeUrl, retries, headers, blockIdentifier, chainId, waitMode } =
+    const { nodeUrl, retries, headers, blockIdentifier, chainId, specVersion, waitMode } =
       optionsOrProvider || {};
     if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
       this.nodeUrl = getDefaultNodeUrl(nodeUrl as NetworkName, optionsOrProvider?.default);
@@ -66,12 +66,17 @@ export class RpcChannel {
     this.headers = { ...defaultOptions.headers, ...headers };
     this.blockIdentifier = blockIdentifier || defaultOptions.blockIdentifier;
     this.chainId = chainId;
+    this.specVersion = specVersion;
     this.waitMode = waitMode || false;
     this.requestId = 0;
   }
 
+  public setChainId(chainId: StarknetChainId) {
+    this.chainId = chainId;
+  }
+
   public fetch(method: string, params?: object, id: string | number = 0) {
-    const rpcRequestBody: RPC.JRPC.RequestBody = {
+    const rpcRequestBody: JRPC.RequestBody = {
       id,
       jsonrpc: '2.0',
       method,
@@ -84,7 +89,7 @@ export class RpcChannel {
     });
   }
 
-  protected errorHandler(method: string, params: any, rpcError?: RPC.JRPC.Error, otherError?: any) {
+  protected errorHandler(method: string, params: any, rpcError?: JRPC.Error, otherError?: any) {
     if (rpcError) {
       const { code, message, data } = rpcError;
       throw new LibraryError(
@@ -121,8 +126,8 @@ export class RpcChannel {
   }
 
   public async getSpecVersion() {
-    this.speckVersion ??= (await this.fetchEndpoint('starknet_specVersion')) as StarknetChainId;
-    return this.speckVersion;
+    this.specVersion ??= (await this.fetchEndpoint('starknet_specVersion')) as StarknetChainId;
+    return this.specVersion;
   }
 
   public getNonceForAddress(
@@ -374,7 +379,7 @@ export class RpcChannel {
   ) {
     const block_id = new Block(blockIdentifier).identifier;
     let flags = {};
-    if (isVersion('0.6', await this.getSpecVersion())) {
+    if (!isVersion('0.5', await this.getSpecVersion())) {
       flags = {
         simulation_flags: skipValidate ? [RPC.ESimulationFlag.SKIP_VALIDATE] : [],
       };
@@ -397,7 +402,7 @@ export class RpcChannel {
           calldata: CallData.toHex(functionInvocation.calldata),
           type: RPC.ETransactionType.INVOKE,
           max_fee: toHex(details.maxFee || 0),
-          version: ETransactionVersion.V1,
+          version: RPC.ETransactionVersion.V1,
           signature: signatureToHexArray(functionInvocation.signature),
           nonce: toHex(details.nonce),
         },
@@ -409,7 +414,7 @@ export class RpcChannel {
           type: RPC.ETransactionType.INVOKE,
           sender_address: functionInvocation.contractAddress,
           calldata: CallData.toHex(functionInvocation.calldata),
-          version: ETransactionVersion.V3,
+          version: RPC.ETransactionVersion.V3,
           signature: signatureToHexArray(functionInvocation.signature),
           nonce: toHex(details.nonce),
           resource_bounds: details.resourceBounds,
@@ -440,7 +445,7 @@ export class RpcChannel {
             entry_points_by_type: contract.entry_points_by_type,
             abi: contract.abi,
           },
-          version: ETransactionVersion.V1,
+          version: RPC.ETransactionVersion.V1,
           max_fee: toHex(details.maxFee || 0),
           signature: signatureToHexArray(signature),
           sender_address: senderAddress,
@@ -459,7 +464,7 @@ export class RpcChannel {
             abi: contract.abi,
           },
           compiled_class_hash: compiledClassHash || '',
-          version: ETransactionVersion.V2,
+          version: RPC.ETransactionVersion.V2,
           max_fee: toHex(details.maxFee || 0),
           signature: signatureToHexArray(signature),
           sender_address: senderAddress,
@@ -473,7 +478,7 @@ export class RpcChannel {
           type: RPC.ETransactionType.DECLARE,
           sender_address: senderAddress,
           compiled_class_hash: compiledClassHash || '',
-          version: ETransactionVersion.V3,
+          version: RPC.ETransactionVersion.V3,
           signature: signatureToHexArray(signature),
           nonce: toHex(details.nonce),
           contract_class: {
@@ -511,7 +516,7 @@ export class RpcChannel {
           contract_address_salt: toHex(addressSalt || 0),
           type: RPC.ETransactionType.DEPLOY_ACCOUNT,
           max_fee: toHex(details.maxFee || 0),
-          version: ETransactionVersion.V1,
+          version: RPC.ETransactionVersion.V1,
           signature: signatureToHexArray(signature),
           nonce: toHex(details.nonce),
         },
@@ -521,7 +526,7 @@ export class RpcChannel {
       promise = this.fetchEndpoint('starknet_addDeployAccountTransaction', {
         deploy_account_transaction: {
           type: RPC.ETransactionType.DEPLOY_ACCOUNT,
-          version: ETransactionVersion.V3,
+          version: RPC.ETransactionVersion.V3,
           signature: signatureToHexArray(signature),
           nonce: toHex(details.nonce),
           contract_address_salt: toHex(addressSalt || 0),
@@ -561,7 +566,7 @@ export class RpcChannel {
   ) {
     const { from_address, to_address, entry_point_selector, payload } = message;
     const formattedMessage = {
-      from_address: toHex(from_address),
+      from_address: validateAndParseEthAddress(from_address),
       to_address: toHex(to_address),
       entry_point_selector: getSelector(entry_point_selector),
       payload: getHexStringArray(payload),
@@ -621,7 +626,7 @@ export class RpcChannel {
     if (invocation.type === TransactionType.INVOKE) {
       return {
         // v0 v1 v3
-        type: RPC.ETransactionType.INVOKE, // TODO: Diff between sequencer and rpc invoke type
+        type: RPC.ETransactionType.INVOKE,
         sender_address: invocation.contractAddress,
         calldata: CallData.toHex(invocation.calldata),
         version: toHex(invocation.version || defaultVersions.v3),

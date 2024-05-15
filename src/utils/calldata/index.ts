@@ -37,6 +37,7 @@ import validateFields from './validate';
 
 export * as cairo from './cairo';
 export * as byteArray from './byteArray';
+export { parseCalldataField } from './requestParser';
 
 export class CallData {
   abi: Abi;
@@ -131,7 +132,6 @@ export class CallData {
         this.structs,
         this.enums
       );
-      // console.log('ordered =', orderedObject);
       args = Object.values(orderedObject);
       //   // validate array elements to abi
       validateFields(abiMethod, args, this.structs, this.enums);
@@ -271,7 +271,7 @@ export class CallData {
    */
   public format(method: string, response: string[], format: object): Result {
     const parsed = this.parse(method, response);
-    return formatter(parsed, format);
+    return formatter(parsed as Record<string, any>, format);
   }
 
   /**

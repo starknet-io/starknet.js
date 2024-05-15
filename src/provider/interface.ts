@@ -1,4 +1,4 @@
-import { RpcChannel } from '../channel/rpc_0_6';
+import { RPC06, RPC07 } from '../channel';
 import { StarknetChainId } from '../constants';
 import type {
   AccountInvocations,
@@ -17,7 +17,6 @@ import type {
   EstimateFeeResponse,
   EstimateFeeResponseBulk,
   GetBlockResponse,
-  GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
   InvocationsDetailsWithNonce,
@@ -32,9 +31,10 @@ import type {
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
+import type { GetTransactionReceiptResponse } from '../utils/transactionReceipt';
 
 export abstract class ProviderInterface {
-  public abstract channel: RpcChannel;
+  public abstract channel: RPC07.RpcChannel | RPC06.RpcChannel;
 
   /**
    * Gets the Starknet chain Id
@@ -77,6 +77,14 @@ export abstract class ProviderInterface {
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
   ): Promise<ContractClassResponse>;
+
+  /**
+   * Gets the price of l1 gas in the block
+   *
+   * @param blockIdentifier block identifier
+   * @returns gas price of the block
+   */
+  public abstract getL1GasPrice(blockIdentifier: BlockIdentifier): Promise<string>;
 
   /**
    * Returns the contract class hash in the given block for the contract deployed at the given address

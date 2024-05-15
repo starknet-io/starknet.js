@@ -1,7 +1,7 @@
 import { getStarkKey, utils } from '@scure/starknet';
 import { gzip, ungzip } from 'pako';
 
-import { ZERO } from '../constants';
+import { ZERO, feeMarginPercentage } from '../constants';
 import {
   ArraySignatureType,
   BigNumberish,
@@ -10,21 +10,18 @@ import {
   Signature,
   UniversalDetails,
 } from '../types';
-import {
-  EDAMode,
-  EDataAvailabilityMode,
-  ETransactionVersion,
-  FeeEstimate,
-  ResourceBounds,
-} from '../types/api';
+import { EDAMode, EDataAvailabilityMode, ETransactionVersion, ResourceBounds } from '../types/api';
+import { FeeEstimate } from '../types/provider';
 import { addHexPrefix, arrayBufferToString, atobUniversal, btoaUniversal } from './encode';
 import { parse, stringify } from './json';
 import {
   addPercent,
   bigNumberishArrayToDecimalStringArray,
   bigNumberishArrayToHexadecimalStringArray,
+  isBigInt,
   toHex,
 } from './num';
+import { isString } from './shortString';
 
 /**
  * Compress compiled Cairo program
@@ -33,7 +30,7 @@ import {
  * @param jsonProgram Representing the compiled cairo program
  */
 export function compressProgram(jsonProgram: Program | string): CompressedProgram {
-  const stringified = typeof jsonProgram === 'string' ? jsonProgram : stringify(jsonProgram);
+  const stringified = isString(jsonProgram) ? jsonProgram : stringify(jsonProgram);
   const compressedProgram = gzip(stringified);
   return btoaUniversal(compressedProgram);
 }
@@ -100,16 +97,34 @@ export function signatureToHexArray(sig?: Signature): ArraySignatureType {
 /**
  * Convert estimated fee to max fee with overhead
  */
-export function estimatedFeeToMaxFee(estimatedFee: BigNumberish, overhead: number = 0.5): bigint {
-  return addPercent(estimatedFee, overhead * 100);
+export function estimatedFeeToMaxFee(
+  estimatedFee: BigNumberish,
+  overhead: number = feeMarginPercentage.MAX_FEE
+): bigint {
+  return addPercent(estimatedFee, overhead);
 }
 
+/**
+ * Calculates the maximum resource bounds for fee estimation.
+ *
+ * @param {FeeEstimate|0n} estimate - The estimate for the fee. If a BigInt is provided,
+ *                                    the returned bounds will be set to '0x0'.
+ * @param {number} [amountOverhead=feeMarginPercentage.L1_BOUND_MAX_AMOUNT] - The percentage
+ *                                                                             overhead added to
+ *                                                                             the gas consumed or
+ *                                                                             overall fee amount.
+ * @param {number} [priceOverhead=feeMarginPercentage.L1_BOUND_MAX_PRICE_PER_UNIT] - The percentage
+ *                                                                                  overhead added to
+ *                                                                                  the gas price per unit.
+ * @throws {Error} If the estimate object is undefined or does not have the required properties.
+ * @returns {ResourceBounds} The maximum resource bounds for fee estimation.
+ */
 export function estimateFeeToBounds(
   estimate: FeeEstimate | 0n,
-  amountOverhead: number = 10,
-  priceOverhead = 50
+  amountOverhead: number = feeMarginPercentage.L1_BOUND_MAX_AMOUNT,
+  priceOverhead: number = feeMarginPercentage.L1_BOUND_MAX_PRICE_PER_UNIT
 ): ResourceBounds {
-  if (typeof estimate === 'bigint') {
+  if (isBigInt(estimate)) {
     return {
       l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
       l1_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
@@ -119,7 +134,11 @@ export function estimateFeeToBounds(
   if (typeof estimate.gas_consumed === 'undefined' || typeof estimate.gas_price === 'undefined') {
     throw Error('estimateFeeToBounds: estimate is undefined');
   }
-  const maxUnits = toHex(addPercent(estimate.gas_consumed, amountOverhead));
+
+  const maxUnits =
+    estimate.data_gas_consumed !== undefined && estimate.data_gas_price !== undefined // RPC v0.7
+      ? toHex(addPercent(BigInt(estimate.overall_fee) / BigInt(estimate.gas_price), amountOverhead))
+      : toHex(addPercent(estimate.gas_consumed, amountOverhead));
   const maxUnitPrice = toHex(addPercent(estimate.gas_price, priceOverhead));
   return {
     l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
@@ -127,6 +146,13 @@ export function estimateFeeToBounds(
   };
 }
 
+/**
+ * Converts the data availability mode from EDataAvailabilityMode to EDAMode.
+ *
+ * @param {EDataAvailabilityMode} dam - The data availability mode to be converted.
+ * @return {EDAMode} The converted data availability mode.
+ * @throws {Error} If the data availability mode is not a valid value.
+ */
 export function intDAM(dam: EDataAvailabilityMode) {
   if (dam === EDataAvailabilityMode.L1) return EDAMode.L1;
   if (dam === EDataAvailabilityMode.L2) return EDAMode.L2;

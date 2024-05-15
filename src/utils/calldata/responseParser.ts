@@ -11,6 +11,8 @@ import {
   ParsedStruct,
 } from '../../types';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
+import { CairoUint512 } from '../cairoDataTypes/uint512';
+import { addHexPrefix, removeHexPrefix } from '../encode';
 import { toHex } from '../num';
 import { decodeShortString } from '../shortString';
 import { stringFromByteArray } from './byteArray';
@@ -22,6 +24,7 @@ import {
   isTypeBool,
   isTypeByteArray,
   isTypeEnum,
+  isTypeSecp256k1Point,
   isTypeTuple,
 } from './cairo';
 import {
@@ -50,12 +53,25 @@ function parseBaseTypes(type: string, it: Iterator<string>) {
       const low = it.next().value;
       const high = it.next().value;
       return new CairoUint256(low, high).toBigInt();
+    case CairoUint512.isAbiType(type):
+      const limb0 = it.next().value;
+      const limb1 = it.next().value;
+      const limb2 = it.next().value;
+      const limb3 = it.next().value;
+      return new CairoUint512(limb0, limb1, limb2, limb3).toBigInt();
     case type === 'core::starknet::eth_address::EthAddress':
       temp = it.next().value;
       return BigInt(temp);
     case type === 'core::bytes_31::bytes31':
       temp = it.next().value;
       return decodeShortString(temp);
+    case isTypeSecp256k1Point(type):
+      const xLow = removeHexPrefix(it.next().value).padStart(32, '0');
+      const xHigh = removeHexPrefix(it.next().value).padStart(32, '0');
+      const yLow = removeHexPrefix(it.next().value).padStart(32, '0');
+      const yHigh = removeHexPrefix(it.next().value).padStart(32, '0');
+      const pubK = BigInt(addHexPrefix(xHigh + xLow + yHigh + yLow));
+      return pubK;
     default:
       temp = it.next().value;
       return BigInt(temp);
@@ -68,6 +84,7 @@ function parseBaseTypes(type: string, it: Iterator<string>) {
  * @param responseIterator - iterator of the response
  * @param element - element of the field {name: string, type: string}
  * @param structs - structs from abi
+ * @param enums
  * @return {any} - parsed arguments in format that contract is expecting
  */
 function parseResponseValue(
@@ -85,7 +102,14 @@ function parseResponseValue(
     const high = responseIterator.next().value;
     return new CairoUint256(low, high).toBigInt();
   }
-
+  // type uint512 struct
+  if (CairoUint512.isAbiType(element.type)) {
+    const limb0 = responseIterator.next().value;
+    const limb1 = responseIterator.next().value;
+    const limb2 = responseIterator.next().value;
+    const limb3 = responseIterator.next().value;
+    return new CairoUint512(limb0, limb1, limb2, limb3).toBigInt();
+  }
   // type C1 ByteArray struct, representing a LongString
   if (isTypeByteArray(element.type)) {
     const parsedBytes31Arr: BigNumberish[] = [];

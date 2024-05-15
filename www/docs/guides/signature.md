@@ -144,7 +144,7 @@ const typedDataValidate: TypedData = {
   domain: {
     name: 'myDapp', // put the name of your dapp to ensure that the signatures will not be used by other DAPP
     version: '1',
-    chainId: shortString.encodeShortString('SN_GOERLI'), // shortString of 'SN_GOERLI' (or 'SN_MAIN'), to be sure that signature can't be used by other network.
+    chainId: shortString.encodeShortString('SN_SEPOLIA'), // shortString of 'SN_SEPOLIA' (or 'SN_MAIN'), to be sure that signature can't be used by other network.
   },
   message: {
     id: '0x0000004f000f',
@@ -189,4 +189,18 @@ try {
 } catch {
   console.log('verification failed:', result.error);
 }
+```
+
+### Signing with an Ethereum signer
+
+All the previous examples are using the standard Starknet signature process, but you can also use the Ethereum one.
+
+```typescript
+const myEthPrivateKey = '0x525bc68475c0955fae83869beec0996114d4bb27b28b781ed2a20ef23121b8de';
+const myEthAccountAddressInStarknet =
+  '0x65a822fbee1ae79e898688b5a4282dc79e0042cbed12f6169937fddb4c26641';
+const myEthSigner = new EthSigner(myEthPrivateKey);
+console.log('Complete public key =', await myEthSigner.getPubKey());
+const sig0 = await myEthSigner.signMessage(message, myEthAccountAddressInStarknet);
+console.log('signature message =', sig0);
 ```

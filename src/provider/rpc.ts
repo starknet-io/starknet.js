@@ -1,4 +1,6 @@
-import { RpcChannel } from '../channel/rpc_0_6';
+import { ProviderInterface } from './interface';
+import { LibraryError } from './errors';
+import { RpcChannel, RPC06, RPC07 } from '../channel';
 import {
   AccountInvocations,
   BigNumberish,
@@ -23,23 +25,26 @@ import {
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
+  GetTxReceiptResponseWithoutHelper,
 } from '../types';
 import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { createAbiParser } from '../utils/calldata/parser';
 import { isSierra } from '../utils/contract';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
-import { ProviderInterface } from './interface';
+import { ReceiptTx, GetTransactionReceiptResponse } from '../utils/transactionReceipt';
 
 export class RpcProvider implements ProviderInterface {
-  private responseParser = new RPCResponseParser();
+  private responseParser: RPCResponseParser;
 
-  public channel: RpcChannel;
+  public channel: RPC07.RpcChannel | RPC06.RpcChannel;
 
   constructor(optionsOrProvider?: RpcProviderOptions | ProviderInterface | RpcProvider) {
     if (optionsOrProvider && 'channel' in optionsOrProvider) {
       this.channel = optionsOrProvider.channel;
+      this.responseParser = (optionsOrProvider as any).responseParser;
     } else {
       this.channel = new RpcChannel({ ...optionsOrProvider, waitMode: false });
+      this.responseParser = new RPCResponseParser(optionsOrProvider?.feeMarginPercentage);
     }
   }
 
@@ -96,6 +101,19 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getBlockWithTxs(blockIdentifier);
   }
 
+  public async getL1GasPrice(blockIdentifier?: BlockIdentifier) {
+    return this.channel
+      .getBlockWithTxHashes(blockIdentifier)
+      .then(this.responseParser.parseL1GasPriceResponse);
+  }
+
+  public async getBlockWithReceipts(blockIdentifier?: BlockIdentifier) {
+    if (this.channel instanceof RPC06.RpcChannel)
+      throw new LibraryError('Unsupported method for RPC version');
+
+    return this.channel.getBlockWithReceipts(blockIdentifier);
+  }
+
   public getStateUpdate = this.getBlockStateUpdate;
 
   public async getBlockStateUpdate(): Promise<PendingStateUpdate>;
@@ -138,10 +156,11 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getTransactionByBlockIdAndIndex(blockIdentifier, index);
   }
 
-  public async getTransactionReceipt(txHash: BigNumberish) {
-    return this.channel
-      .getTransactionReceipt(txHash)
-      .then(this.responseParser.parseTransactionReceipt);
+  public async getTransactionReceipt(txHash: BigNumberish): Promise<GetTransactionReceiptResponse> {
+    const txReceiptWoHelper = await this.channel.getTransactionReceipt(txHash);
+    const txReceiptWoHelperModified: GetTxReceiptResponseWithoutHelper =
+      this.responseParser.parseTransactionReceipt(txReceiptWoHelper);
+    return new ReceiptTx(txReceiptWoHelperModified) as GetTransactionReceiptResponse;
   }
 
   public async getTransactionTrace(txHash: BigNumberish) {
@@ -169,11 +188,18 @@ export class RpcProvider implements ProviderInterface {
     // can't be named simulateTransaction because of argument conflict with account
     return this.channel
       .simulateTransaction(invocations, options)
-      .then(this.responseParser.parseSimulateTransactionResponse);
+      .then((r) => this.responseParser.parseSimulateTransactionResponse(r));
   }
 
-  public async waitForTransaction(txHash: BigNumberish, options?: waitForTransactionOptions) {
-    return this.channel.waitForTransaction(txHash, options);
+  public async waitForTransaction(
+    txHash: BigNumberish,
+    options?: waitForTransactionOptions
+  ): Promise<GetTransactionReceiptResponse> {
+    const receiptWoHelper = (await this.channel.waitForTransaction(
+      txHash,
+      options
+    )) as GetTxReceiptResponseWithoutHelper;
+    return new ReceiptTx(receiptWoHelper) as GetTransactionReceiptResponse;
   }
 
   public async getStorageAt(
@@ -294,7 +320,7 @@ export class RpcProvider implements ProviderInterface {
         ],
         { blockIdentifier, skipValidate }
       )
-      .then(this.responseParser.parseFeeEstimateResponse);
+      .then((r) => this.responseParser.parseFeeEstimateResponse(r));
   }
 
   public async getDeclareEstimateFee(
@@ -314,7 +340,7 @@ export class RpcProvider implements ProviderInterface {
         ],
         { blockIdentifier, skipValidate }
       )
-      .then(this.responseParser.parseFeeEstimateResponse);
+      .then((r) => this.responseParser.parseFeeEstimateResponse(r));
   }
 
   public async getDeployAccountEstimateFee(
@@ -334,7 +360,7 @@ export class RpcProvider implements ProviderInterface {
         ],
         { blockIdentifier, skipValidate }
       )
-      .then(this.responseParser.parseFeeEstimateResponse);
+      .then((r) => this.responseParser.parseFeeEstimateResponse(r));
   }
 
   public async getEstimateFeeBulk(
@@ -343,7 +369,7 @@ export class RpcProvider implements ProviderInterface {
   ) {
     return this.channel
       .getEstimateFee(invocations, options)
-      .then(this.responseParser.parseFeeEstimateBulkResponse);
+      .then((r) => this.responseParser.parseFeeEstimateBulkResponse(r));
   }
 
   public async invokeFunction(

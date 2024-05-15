@@ -1,5 +1,5 @@
 import { constants, hash, shortString, types, v2hash, v3hash } from '../../src';
-import { ResourceBounds } from '../../src/types/api/rpcspec_0_6';
+import { ResourceBounds } from '../../src/types/api';
 
 describe('TxV2 Hash Tests', () => {
   describe('calculateTransactionHashCommon()', () => {

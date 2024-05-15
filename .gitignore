@@ -4,7 +4,9 @@
 .env
 .eslintcache
 .vscode
+.idea
 coverage
+coverage-ts
 dist
 node_modules
 npm-debug.log

@@ -9,6 +9,12 @@ export type RpcProviderOptions = {
   headers?: object;
   blockIdentifier?: BlockIdentifier;
   chainId?: StarknetChainId;
+  specVersion?: string;
   default?: boolean;
   waitMode?: boolean;
+  feeMarginPercentage?: {
+    l1BoundMaxAmount: number;
+    l1BoundMaxPricePerUnit: number;
+    maxFee: number;
+  };
 };

@@ -9,7 +9,7 @@ Once your provider, contract, and account are connected, you can interact with t
 - you can read the memory of the contract, without fees.
 - you can write to memory, but you have to pay fees.
   - On Mainnet, you have to pay fees with a bridged ETH token.
-  - On Testnets, you have to pay with a bridged Goerli or Sepolia ETH token.
+  - On Testnet, you have to pay with a bridged Sepolia ETH token.
   - On devnet, you have to pay with a dummy ETH token.
 
 Your account should be funded enough to pay fees (0.01 ETH should be enough to start).
@@ -131,7 +131,7 @@ const myCall = myTestContract.populate('test_fail', [100]);
 const maxQtyGasAuthorized = 1800n; // max quantity of gas authorized
 const maxPriceAuthorizeForOneGas = 12n * 10n ** 9n; // max FRI authorized to pay 1 gas (1 FRI=10**-18 STRK)
 console.log('max authorized cost =', maxQtyGasAuthorized * maxPriceAuthorizeForOneGas, 'FRI');
-const { transaction_hash: txH } = await account0.execute(myCall, undefined, {
+const { transaction_hash: txH } = await account0.execute(myCall, {
   version: 3,
   maxFee: 10 ** 15,
   feeDataAvailabilityMode: RPC.EDataAvailabilityMode.L1,
@@ -239,3 +239,39 @@ const getResponse = await myAccount.call('get_bal', specialParameters, { parseRe
 ```
 
 You provide the low-level numbers expected by Starknet, without any parsing or checking. See more details [here](define_call_message.md#parse-configuration).
+
+## Transaction receipt response
+
+You can interpret the transaction receipt response to check whether it succeeded or not.
+
+```typescript
+const result = await account.execute(myCall);
+const txR = await provider.waitForTransaction(result.transaction_hash);
+
+console.log(txR.statusReceipt, txR.value);
+console.log(txR.isSuccess(), txR.isRejected(), txR.isReverted(), txR.isError());
+
+txR.match({
+  success: () => {
+    console.log('Success');
+  },
+  _: () => {
+    console.log('Unsuccess');
+  },
+});
+
+txR.match({
+  success: (txR: SuccessfulTransactionReceiptResponse) => {
+    console.log('Success =', txR);
+  },
+  rejected: (txR: RejectedTransactionReceiptResponse) => {
+    console.log('Rejected =', txR);
+  },
+  reverted: (txR: RevertedTransactionReceiptResponse) => {
+    console.log('Reverted =', txR);
+  },
+  error: (err: Error) => {
+    console.log('An error occured =', err);
+  },
+});
+```

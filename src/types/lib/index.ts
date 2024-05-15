@@ -18,6 +18,7 @@ export type ByteArray = {
 
 /**
  * Compiled calldata ready to be sent
+ *
  * decimal-string array
  */
 export type Calldata = string[] & { readonly __compiled__?: true };
@@ -33,7 +34,20 @@ export interface Uint256 {
 }
 
 /**
+ * Represents an integer in the range [0, 2^256)
+ */
+export interface Uint512 {
+  // The lowest 128 bits of the value
+  limb0: BigNumberish;
+  limb1: BigNumberish;
+  limb2: BigNumberish;
+  // The higher 128 bits of the value
+  limb3: BigNumberish;
+}
+
+/**
  * BigNumberish array
+ *
  * use CallData.compile() to convert to Calldata
  */
 export type RawCalldata = BigNumberish[];
@@ -196,9 +210,13 @@ export enum BlockTag {
 export type BlockNumber = BlockTag | null | number;
 
 /**
- * hex string and BN are detected as block hashes
+ * hex string and BigInt are detected as block hashes
+ *
  * decimal string and number are detected as block numbers
- * null appends nothing to the request url
+ *
+ * text string are detected as block tag
+ *
+ * null return 'pending' block tag
  */
 export type BlockIdentifier = BlockNumber | BigNumberish;
 

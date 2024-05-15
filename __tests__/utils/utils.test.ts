@@ -1,7 +1,7 @@
 import * as starkCurve from '@scure/starknet';
 
 import { constants, ec, hash, num, stark } from '../../src';
-import { Block } from '../../src/utils/provider';
+import { isBigInt, isHex } from '../../src/utils/num';
 
 const { IS_BROWSER } = constants;
 
@@ -70,11 +70,11 @@ describe('computeHashOnElements()', () => {
 });
 describe('estimatedFeeToMaxFee()', () => {
   test('should return maxFee for 0', () => {
-    const res = stark.estimatedFeeToMaxFee(0, 0.15);
+    const res = stark.estimatedFeeToMaxFee(0, 15);
     expect(res).toBe(0n);
   });
   test('should return maxFee for 10_000', () => {
-    const res = stark.estimatedFeeToMaxFee(10_000, 0.15);
+    const res = stark.estimatedFeeToMaxFee(10_000, 15);
     expect(res).toBe(11500n);
   });
 });
@@ -116,18 +116,37 @@ describe('calculateContractAddressFromHash()', () => {
   });
 });
 
-describe('new Block()', () => {
-  test('Block identifier and queryIdentifier', () => {
-    const blockA = new Block(0);
-    expect(blockA.identifier).toMatchObject({ block_number: 0 });
-    expect(blockA.queryIdentifier).toBe('blockNumber=0');
+describe('Num utility functions', () => {
+  describe('isBigInt', () => {
+    test('should return true for big integers', () => {
+      expect(isBigInt(BigInt(10))).toBe(true);
+      expect(isBigInt(BigInt('9007199254740991'))).toBe(true);
+    });
 
-    const blockB = new Block('latest');
-    expect(blockB.identifier).toBe('latest');
-    expect(blockB.queryIdentifier).toBe('blockNumber=latest');
+    test('should return false for non-big integers', () => {
+      expect(isBigInt(10)).toBe(false);
+      expect(isBigInt('10')).toBe(false);
+      expect(isBigInt(undefined)).toBe(false);
+      expect(isBigInt(null)).toBe(false);
+      expect(isBigInt({})).toBe(false);
+      expect(isBigInt([])).toBe(false);
+      expect(isBigInt(true)).toBe(false);
+    });
+  });
 
-    const blockC = new Block('0x01');
-    expect(blockC.identifier).toMatchObject({ block_hash: '0x01' });
-    expect(blockC.queryIdentifier).toBe('blockHash=0x01');
+  describe('isHex', () => {
+    test('should return true for valid hex strings', () => {
+      expect(isHex('0xab')).toBe(true);
+      expect(isHex('0xAB')).toBe(true);
+      expect(isHex('0x0')).toBe(true);
+      expect(isHex('0x12345')).toBe(true);
+    });
+
+    test('should return false for non-hex strings', () => {
+      expect(isHex('0xG')).toBe(false);
+      expect(isHex('ab')).toBe(false);
+      expect(isHex('123')).toBe(false);
+      expect(isHex('')).toBe(false);
+    });
   });
 });

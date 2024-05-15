@@ -25,7 +25,7 @@ This contract is coded in Cairo 1.
 import { Account, constants, ec, json, stark, RpcProvider, hash, CallData } from 'starknet';
 ```
 
-### compute address
+### Compute address
 
 ```typescript
 // connect provider (Mainnet or Sepolia)
@@ -58,15 +58,17 @@ How to proceed is out of the scope of this guide, but you can for example:
 
 - Transfer ETH from another wallet.
 - Bridge ETH to this Starknet address.
-- Use a faucet. (https://faucet.goerli.starknet.io/)
+- Use a faucet. (https://starknet-faucet.vercel.app/)
 - Mint ETH on starknet-devnet-rs, like so:
 
 ```bash
-curl -X POST http://127.0.0.1:5050/mint -d '{"address":"0x04a093c37ab61065d001550089b1089922212c60b34e662bb14f2f91faee2979","amount":50000000000000000000,"lite":true}' -H "Content-Type:application/json"
-// {"new_balance":50000000000000000000,"tx_hash":null,"unit":"wei"}
+// ETH
+curl -X POST http://127.0.0.1:5050/mint -d '{"address":"0x04a093c37ab61065d001550089b1089922212c60b34e662bb14f2f91faee2979","amount":50000000000000000000}' -H "Content-Type:application/json"
+// STRK
+curl -X POST http://127.0.0.1:5050/mint -d '{"address":"0x04a093c37ab61065d001550089b1089922212c60b34e662bb14f2f91faee2979","amount":50000000000000000000,"unit":"FRI"}' -H "Content-Type:application/json"
 ```
 
-### deployment of the new account
+### Deployment of the new account
 
 If you have sent enough funds to this new address, you can go forward to the final step:
 
@@ -91,7 +93,7 @@ Here, we will create a wallet with the Argent smart contract v0.3.0. The contrac
 import { Account, ec, json, stark, RpcProvider, hash, CallData } from 'starknet';
 ```
 
-### compute address
+### Compute address
 
 ```typescript
 // connect provider
@@ -124,7 +126,7 @@ If you want a specific private key, replace `stark.randomAddress`()` with your c
 
 Then you have to fund this address.
 
-### deployment of the new account
+### Deployment of the new account
 
 If you have sent enough funds to this new address, you can go forward to the final step:
 
@@ -150,7 +152,7 @@ More complicated, a Braavos account needs a proxy and a specific signature. Star
 We will deploy hereunder a Braavos account in devnet. So launch starknet-devnet with these parameters:
 
 ```bash
-starknet-devnet --seed 0 --fork-network alpha-goerli
+starknet-devnet --seed 0 --fork-network 'https://free-rpc.nethermind.io/sepolia-juno/v0_7'
 ```
 
 Initialization:
@@ -204,7 +206,6 @@ const { data: answer } = await axios.post(
   {
     address: BraavosProxyAddress,
     amount: 10_000_000_000_000_000_000,
-    lite: true,
   },
   { headers: { 'Content-Type': 'application/json' } }
 );
@@ -221,11 +222,62 @@ console.log('✅ Braavos wallet deployed at', BraavosAccountFinalAddress);
 
 The computed address has been funded automatically by minting a new dummy ETH in Starknet devnet!
 
+## Create an Ethereum account
+
+Thanks to account abstraction, you can create an account in Starknet that holds the cryptographic logic of an Ethereum account. This way, you can use Ethereum private and public keys!  
+OpenZeppelin has released an account contract for such an Ethereum account.
+
+Below is an example of account creation in Sepolia Testnet.
+
+### Compute address
+
+```typescript
+const privateKeyETH = '0x45397ee6ca34cb49060f1c303c6cb7ee2d6123e617601ef3e31ccf7bf5bef1f9';
+const ethSigner = new EthSigner(privateKeyETH);
+const ethFullPublicKey = await ethSigner.getPubKey();
+const accountEthClassHash = '0x23e416842ca96b1f7067693892ed00881d97a4b0d9a4c793b75cb887944d98d';
+const myCallData = new CallData(ethAccountAbi);
+const accountETHconstructorCalldata = myCallData.compile('constructor', {
+  public_key: ethFullPublicKey,
+});
+const salt = '0x12345'; // or lower felt of public key X part
+const contractETHaddress = hash.calculateContractAddressFromHash(
+  salt,
+  accountEthClassHash,
+  accountETHconstructorCalldata,
+  0
+);
+console.log('Pre-calculated ETH account address =', contractETHaddress);
+```
+
+Then you have to fund this address.
+
+### Deployment of the new account
+
+If you have sent enough funds to this new address, you can go forward to the final step:
+
+```typescript
+const ethAccount = new Account(provider, contractETHaddress, ethSigner);
+const deployPayload = {
+  classHash: accountEthClassHash,
+  constructorCalldata: accountETHconstructorCalldata,
+  addressSalt: salt,
+};
+const { suggestedMaxFee: feeDeploy } = await ethAccount.estimateAccountDeployFee(deployPayload);
+const { transaction_hash, contract_address } = await ethAccount.deployAccount(
+  deployPayload,
+  { maxFee: stark.estimatedFeeToMaxFee(feeDeploy, 100) }
+  // Extra fee to fund the validation of the transaction
+);
+await provider.waitForTransaction(transaction_hash);
+console.log('✅ New Ethereum account final address =', contract_address);
+```
+
 ## Create your account abstraction
 
 You are not limited to these 3 contracts. You can create your own contract for the wallet. It's the concept of Account Abstraction.
 
-You can customize entirely the wallet - for example:
+You can entirely customize the wallet - for example:
 
 - use a different concept of keys.
 
