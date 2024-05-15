@@ -592,7 +592,7 @@ export class Account extends Provider implements AccountInterface {
         ) {
           return true;
         }
-        return false;
+        throw Error('signatureVerificationResponse Error: response is not part of known responses');
       } catch (err) {
         // Known NOK Errors
         if (

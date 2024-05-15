@@ -6,6 +6,7 @@ import {
   BlockIdentifier,
   BlockTag,
   Call,
+  ContractClassResponse,
   ContractVersion,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
@@ -248,7 +249,7 @@ export class RpcProvider implements ProviderInterface {
       compiler = true,
     }: getContractVersionOptions = {}
   ): Promise<ContractVersion> {
-    let contractClass;
+    let contractClass: ContractClassResponse;
     if (contractAddress) {
       contractClass = await this.getClassAt(contractAddress, blockIdentifier);
     } else if (classHash) {
