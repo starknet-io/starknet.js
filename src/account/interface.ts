@@ -368,6 +368,8 @@ export abstract class AccountInterface extends ProviderInterface {
    *
    * @param typedData - JSON object to be verified
    * @param signature - signature of the JSON object
+   * @param signatureVerificationFunctionName - optional account contract verification function name override
+   * @param signatureVerificationResponse - optional response override { okResponse: string[]; nokResponse: string[]; error: string[] }
    * @returns true if the signature is valid, false otherwise
    * @throws {Error} if the JSON object is not a valid JSON or the signature is not a valid signature
    */
@@ -379,6 +381,8 @@ export abstract class AccountInterface extends ProviderInterface {
    *
    * @param hash - hash to be verified
    * @param signature - signature of the hash
+   * @param signatureVerificationFunctionName - optional account contract verification function name override
+   * @param signatureVerificationResponse - optional response override { okResponse: string[]; nokResponse: string[]; error: string[] }
    * @returns true if the signature is valid, false otherwise
    * @throws {Error} if the signature is not a valid signature
    */

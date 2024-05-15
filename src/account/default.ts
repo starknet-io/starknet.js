@@ -40,7 +40,6 @@ import {
 } from '../types';
 import { ETransactionVersion, ETransactionVersion3, ResourceBounds } from '../types/api';
 import { CallData } from '../utils/calldata';
-import { createAbiParser } from '../utils/calldata/parser';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { parseUDCEvent } from '../utils/events';
 import { calculateContractAddressFromHash } from '../utils/hash';
@@ -65,8 +64,6 @@ export class Account extends Provider implements AccountInterface {
   public address: string;
 
   public cairoVersion: CairoVersion;
-
-  public signatureVerifFunctionName: string | undefined;
 
   readonly transactionVersion: ETransactionVersion.V2 | ETransactionVersion.V3;
 
@@ -119,12 +116,11 @@ export class Account extends Provider implements AccountInterface {
    * Retrieves also the name of the function that verifies a message signature.
    */
   public async getCairoVersion(classHash?: string) {
-    if (!this.cairoVersion || !this.signatureVerifFunctionName) {
-      const { cairo, messageVerifFunctionName } = classHash
+    if (!this.cairoVersion) {
+      const { cairo } = classHash
         ? await super.getContractVersion(undefined, classHash)
         : await super.getContractVersion(this.address);
       this.cairoVersion = cairo;
-      this.signatureVerifFunctionName = messageVerifFunctionName;
     }
     return this.cairoVersion;
   }
@@ -546,68 +542,90 @@ export class Account extends Provider implements AccountInterface {
     return getMessageHash(typedData, this.address);
   }
 
-  public async verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean> {
-    // Accounts should conform to SNIP-6 (https://github.com/starknet-io/SNIPs/blob/f6998f779ee2157d5e1dea36042b08062093b3c5/SNIPS/snip-6.md?plain=1#L61), but they don't always conform. Also, the SNIP doesn't standardize the response if the signature isn't valid.
-    if (typeof this.signatureVerifFunctionName === 'undefined') {
-      await this.getCairoVersion();
-    }
-    // if proxy
-    if (this.signatureVerifFunctionName === '') {
-      const resp = await this.callContract({
-        contractAddress: this.address,
-        entrypoint: 'get_implementation',
-        calldata: [],
-      });
-      const implementationHash = resp[0];
-      const implementationClass = await super.getClassByHash(implementationHash);
-      const parser = createAbiParser(implementationClass.abi);
-      const parsedAbi = parser.getLegacyFormat();
-      const functionsList = parsedAbi.filter((abiElement) => abiElement.type === 'function');
-      if (functionsList) {
-        const validFunction = functionsList.find((abiElement) =>
-          ['isValidSignature', 'is_valid_signature'].includes(abiElement.name)
-        );
-        if (validFunction) {
-          this.signatureVerifFunctionName = validFunction.name;
+  public async verifyMessageHash(
+    hash: BigNumberish,
+    signature: Signature,
+    signatureVerificationFunctionName?: string,
+    signatureVerificationResponse?: { okResponse: string[]; nokResponse: string[]; error: string[] }
+  ): Promise<boolean> {
+    // HOTFIX: Accounts should conform to SNIP-6
+    // (https://github.com/starknet-io/SNIPs/blob/f6998f779ee2157d5e1dea36042b08062093b3c5/SNIPS/snip-6.md?plain=1#L61),
+    // but they don't always conform. Also, the SNIP doesn't standardize the response if the signature isn't valid.
+    const knownSigVerificationFName = signatureVerificationFunctionName
+      ? [signatureVerificationFunctionName]
+      : ['isValidSignature', 'is_valid_signature'];
+    const knownSignatureResponse = signatureVerificationResponse || {
+      okResponse: [
+        // any non-nok response is true
+      ],
+      nokResponse: [
+        '0x0', // Devnet
+        '0x00', // OpenZeppelin 0.7.0 to 0.9.0 invalid signature
+      ],
+      error: [
+        'argent/invalid-signature', // ArgentX 0.3.0 to 0.3.1
+        'is invalid, with respect to the public key', // OpenZeppelin until 0.6.1, Braavos 0.0.11
+        'INVALID_SIG', // Braavos 1.0.0
+      ],
+    };
+    let error: any;
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const SigVerificationFName of knownSigVerificationFName) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        const resp = await this.callContract({
+          contractAddress: this.address,
+          entrypoint: SigVerificationFName,
+          calldata: CallData.compile({
+            hash: toBigInt(hash).toString(),
+            signature: formatSignature(signature),
+          }),
+        });
+        // Response NOK Signature
+        if (knownSignatureResponse.nokResponse.includes(resp[0].toString())) {
+          return false;
         }
+        // Response OK Signature
+        // Empty okResponse assume all non-nok responses are valid signatures
+        // OpenZeppelin 0.7.0 to 0.9.0, ArgentX 0.3.0 to 0.3.1 & Braavos Cairo 0.0.11 to 1.0.0 valid signature
+        if (
+          knownSignatureResponse.okResponse.length === 0 ||
+          knownSignatureResponse.okResponse.includes(resp[0].toString())
+        ) {
+          return true;
+        }
+        return false;
+      } catch (err) {
+        // Known NOK Errors
+        if (
+          knownSignatureResponse.error.some((errMessage) =>
+            (err as Error).message.includes(errMessage)
+          )
+        ) {
+          return false;
+        }
+        // Unknown Error
+        error = err;
       }
     }
 
-    try {
-      if (!this.signatureVerifFunctionName) {
-        throw Error('This account contract has no message verification function identified.');
-      }
-      const resp = await this.callContract({
-        contractAddress: this.address,
-        entrypoint: this.signatureVerifFunctionName,
-        calldata: CallData.compile({
-          hash: toBigInt(hash).toString(),
-          signature: formatSignature(signature),
-        }),
-      });
-      if (BigInt(resp[0]) === 0n) {
-        // OpenZeppelin 0.7.0 to 0.9.0 invalid signature
-        return false;
-      }
-      // OpenZeppelin 0.7.0 to 0.9.0, ArgentX 0.3.0 to 0.3.1 & Braavos Cairo 0.0.11 to 1.0.0 valid signature
-      return true;
-    } catch (err) {
-      if (
-        [
-          'argent/invalid-signature', // ArgentX 0.3.0 to 0.3.1
-          'is invalid, with respect to the public key', // OpenZeppelin until 0.6.1, Braavos 0.0.11
-          'INVALID_SIG', // Braavos 1.0.0
-        ].some((errMessage) => (err as Error).message.includes(errMessage))
-      ) {
-        return false;
-      }
-      throw Error(`Signature verification request is rejected by the network: ${err}`);
-    }
+    throw Error(`Signature verification Error: ${error}`);
   }
 
-  public async verifyMessage(typedData: TypedData, signature: Signature): Promise<boolean> {
+  public async verifyMessage(
+    typedData: TypedData,
+    signature: Signature,
+    signatureVerificationFunctionName?: string,
+    signatureVerificationResponse?: { okResponse: string[]; nokResponse: string[]; error: string[] }
+  ): Promise<boolean> {
     const hash = await this.hashMessage(typedData);
-    return this.verifyMessageHash(hash, signature);
+    return this.verifyMessageHash(
+      hash,
+      signature,
+      signatureVerificationFunctionName,
+      signatureVerificationResponse
+    );
   }
 
   /*

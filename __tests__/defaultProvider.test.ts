@@ -55,7 +55,7 @@ describe('defaultProvider', () => {
     });
 
     test('getContractVersion', async () => {
-      const expected = { cairo: '0', compiler: '0', messageVerifFunctionName: undefined };
+      const expected = { cairo: '0', compiler: '0' };
       expect(await testProvider.getContractVersion(erc20ContractAddress)).toEqual(expected);
       expect(await testProvider.getContractVersion(undefined, erc20ClassHash)).toEqual(expected);
     });

@@ -1,6 +1,4 @@
-import { ProviderInterface } from './interface';
-import { LibraryError } from './errors';
-import { RpcChannel, RPC06, RPC07 } from '../channel';
+import { RPC06, RPC07, RpcChannel } from '../channel';
 import {
   AccountInvocations,
   BigNumberish,
@@ -12,6 +10,7 @@ import {
   DeclareContractTransaction,
   DeployAccountContractTransaction,
   GetBlockResponse,
+  GetTxReceiptResponseWithoutHelper,
   Invocation,
   InvocationsDetailsWithNonce,
   PendingBlock,
@@ -25,13 +24,13 @@ import {
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
-  GetTxReceiptResponseWithoutHelper,
 } from '../types';
 import { getAbiContractVersion } from '../utils/calldata/cairo';
-import { createAbiParser } from '../utils/calldata/parser';
 import { isSierra } from '../utils/contract';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
-import { ReceiptTx, GetTransactionReceiptResponse } from '../utils/transactionReceipt';
+import { GetTransactionReceiptResponse, ReceiptTx } from '../utils/transactionReceipt';
+import { LibraryError } from './errors';
+import { ProviderInterface } from './interface';
 
 export class RpcProvider implements ProviderInterface {
   private responseParser: RPCResponseParser;
@@ -260,7 +259,7 @@ export class RpcProvider implements ProviderInterface {
 
     // Take the opportunity of class reading, to get the name of the message signature verification name
     // or an empty string in case of proxy.
-    let messageVerifFunctionName: string | undefined;
+    /*     let messageVerifFunctionName: string | undefined;
     if ('signatureVerifFunctionName' in this) {
       const parser = createAbiParser(contractClass.abi);
       const parsedAbi = parser.getLegacyFormat();
@@ -280,15 +279,15 @@ export class RpcProvider implements ProviderInterface {
           }
         }
       }
-    }
+    } */
     if (isSierra(contractClass)) {
       if (compiler) {
         const abiTest = getAbiContractVersion(contractClass.abi);
-        return { cairo: '1', compiler: abiTest.compiler, messageVerifFunctionName };
+        return { cairo: '1', compiler: abiTest.compiler };
       }
-      return { cairo: '1', compiler: undefined, messageVerifFunctionName };
+      return { cairo: '1', compiler: undefined };
     }
-    return { cairo: '0', compiler: '0', messageVerifFunctionName };
+    return { cairo: '0', compiler: '0' };
   }
 
   /**
