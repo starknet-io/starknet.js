@@ -64,11 +64,41 @@ const revisionConfiguration: Record<Revision, Configuration> = {
   },
 };
 
+/**
+ * Asserts that the given data is within the specified range.
+ *
+ * @param {unknown} data - The data to check.
+ * @param {string} type - The type of the data.
+ * @param {Object} range - The range object containing min and max values.
+ * @param {bigint} range.min - The minimum value of the range.
+ * @param {bigint} range.max - The maximum value of the range.
+ * @throws Will throw an error if the data is out of the specified range.
+ * 
+ * @example
+ * ```typescript
+ * assertRange('10', 'felt', { min: BigInt(0), max: BigInt(100) }); // No error
+ * assertRange('200', 'felt', { min: BigInt(0), max: BigInt(100) }); // Error: 200 (felt) is out of bounds [0, 100]
+ * ```
+ */
 function assertRange(data: unknown, type: string, { min, max }: { min: bigint; max: bigint }) {
   const value = BigInt(data as string);
   assert(value >= min && value <= max, `${value} (${type}) is out of bounds [${min}, ${max}]`);
 }
 
+/**
+ * Identifies the revision of the given TypedData.
+ *
+ * @param {TypedData} data - The TypedData object.
+ * @returns {Revision | undefined} The identified revision, or undefined if not found.
+ * 
+ * @example
+ * ```typescript
+ * const revision = identifyRevision(typedData);
+ * if (revision === Revision.Active) {
+ *   console.log('Active revision identified');
+ * }
+ * ```
+ */
 function identifyRevision({ types, domain }: TypedData) {
   if (revisionConfiguration[Revision.Active].domain in types && domain.revision === Revision.Active)
     return Revision.Active;
@@ -82,6 +112,19 @@ function identifyRevision({ types, domain }: TypedData) {
   return undefined;
 }
 
+/**
+ * Converts a BigNumberish value to a hexadecimal string.
+ *
+ * @param {BigNumberish} value - The value to convert.
+ * @returns {string} The hexadecimal representation of the value.
+ * @throws Will throw an error if the value is not a valid BigNumberish.
+ * 
+ * @example
+ * ```typescript
+ * const hexValue = getHex(123); // "0x7b"
+ * const hexString = getHex("0x1a"); // "0x1a"
+ * ```
+ */
 function getHex(value: BigNumberish): string {
   try {
     return toHex(value);
@@ -94,7 +137,18 @@ function getHex(value: BigNumberish): string {
 }
 
 /**
- * Validates that `data` matches the EIP-712 JSON schema.
+ * Validates that the given data matches the EIP-712 JSON schema.
+ *
+ * @param {unknown} data - The data to validate.
+ * @returns {boolean} True if the data matches the schema, false otherwise.
+ * 
+ * @example
+ * ```typescript
+ * const isValid = validateTypedData(typedData);
+ * if (isValid) {
+ *   console.log('Typed data is valid');
+ * }
+ * ```
  */
 function validateTypedData(data: unknown): data is TypedData {
   const typedData = data as TypedData;
@@ -108,6 +162,12 @@ function validateTypedData(data: unknown): data is TypedData {
  *
  * @param {string} selector - The selector to be prepared.
  * @returns {string} The prepared selector.
+ * 
+ * @example
+ * ```typescript
+ * const preparedSelector = prepareSelector('0x1');
+ * console.log(preparedSelector); // '0x1'
+ * ```
  */
 export function prepareSelector(selector: string): string {
   return isHex(selector) ? selector : getSelectorFromName(selector);
@@ -117,16 +177,33 @@ export function prepareSelector(selector: string): string {
  * Checks if the given Starknet type is a Merkle tree type.
  *
  * @param {StarknetType} type - The StarkNet type to check.
- *
- * @returns {boolean} - True if the type is a Merkle tree type, false otherwise.
+ * @returns {boolean} True if the type is a Merkle tree type, false otherwise.
+ * 
+ * @example
+ * ```typescript
+ * const isMerkle = isMerkleTreeType(someType);
+ * console.log(isMerkle); // true or false
+ * ```
  */
 export function isMerkleTreeType(type: StarknetType): type is StarknetMerkleType {
   return type.type === 'merkletree';
 }
 
 /**
- * Get the dependencies of a struct type. If a struct has the same dependency multiple times, it's only included once
- * in the resulting array.
+ * Get the dependencies of a struct type. If a struct has the same dependency multiple times, it's only included once in the resulting array.
+ *
+ * @param {TypedData['types']} types - The types object containing all defined types.
+ * @param {string} type - The name of the type to get dependencies for.
+ * @param {string[]} [dependencies=[]] - The array to store dependencies.
+ * @param {string} [contains=''] - The type contained within the struct.
+ * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
+ * @returns {string[]} The array of dependencies.
+ * 
+ * @example
+ * ```typescript
+ * const deps = getDependencies(typedData.types, 'MyStruct');
+ * console.log(deps); // ['MyStruct', 'AnotherStruct']
+ * ```
  */
 export function getDependencies(
   types: TypedData['types'],
@@ -167,6 +244,20 @@ export function getDependencies(
   ];
 }
 
+/**
+ * Gets the Merkle tree type for the given context.
+ *
+ * @param {TypedData['types']} types - The types object containing all defined types.
+ * @param {Context} ctx - The context containing parent and key information.
+ * @returns {string} The Merkle tree type.
+ * @throws Will throw an error if the context is not a Merkle tree or if the Merkle tree contains property is an array.
+ * 
+ * @example
+ * ```typescript
+ * const merkleTreeType = getMerkleTreeType(typedData.types, { parent: 'MyStruct', key: 'merkleField' });
+ * console.log(merkleTreeType); // 'MerkleType'
+ * ```
+ */
 function getMerkleTreeType(types: TypedData['types'], ctx: Context) {
   if (ctx.parent && ctx.key) {
     const parentType = types[ctx.parent];
@@ -185,6 +276,17 @@ function getMerkleTreeType(types: TypedData['types'], ctx: Context) {
 
 /**
  * Encode a type to a string. All dependent types are alphabetically sorted.
+ *
+ * @param {TypedData['types']} types - The types object containing all defined types.
+ * @param {string} type - The name of the type to encode.
+ * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
+ * @returns {string} The encoded type string.
+ * 
+ * @example
+ * ```typescript
+ * const encodedType = encodeType(typedData.types, 'MyStruct');
+ * console.log(encodedType); // 'MyStruct(anotherStruct:u256)'
+ * ```
  */
 export function encodeType(
   types: TypedData['types'],
@@ -227,9 +329,19 @@ export function encodeType(
     })
     .join('');
 }
-
 /**
  * Get a type string as hash.
+ *
+ * @param {TypedData['types']} types - The types object containing all defined types.
+ * @param {string} type - The name of the type to hash.
+ * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
+ * @returns {string} The hash of the type string.
+ * 
+ * @example
+ * ```typescript
+ * const typeHash = getTypeHash(typedData.types, 'MyStruct');
+ * console.log(typeHash); // '0xabc123...'
+ * ```
  */
 export function getTypeHash(
   types: TypedData['types'],
@@ -242,6 +354,19 @@ export function getTypeHash(
 /**
  * Encodes a single value to an ABI serialisable string, number or Buffer. Returns the data as tuple, which consists of
  * an array of ABI compatible types, and an array of corresponding values.
+ *
+ * @param {TypedData['types']} types - The types object containing all defined types.
+ * @param {string} type - The name of the type to encode.
+ * @param {unknown} data - The data to encode.
+ * @param {Context} [ctx={}] - The context of the encoding process.
+ * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
+ * @returns {[string, string]} The ABI compatible type and corresponding value.
+ * 
+ * @example
+ * ```typescript
+ * const encodedValue = encodeValue(typedData.types, 'u256', '12345');
+ * console.log(encodedValue); // ['u256', '0x3039']
+ * ```
  */
 export function encodeValue(
   types: TypedData['types'],
@@ -373,6 +498,18 @@ export function encodeValue(
 /**
  * Encode the data to an ABI encoded Buffer. The data should be a key -> value object with all the required values.
  * All dependent types are automatically encoded.
+ *
+ * @param {TypedData['types']} types - The types object containing all defined types.
+ * @param {string} type - The name of the type to encode.
+ * @param {TypedData['message']} data - The data to encode.
+ * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
+ * @returns {[string[], string[]]} The ABI compatible types and corresponding values.
+ * 
+ * @example
+ * ```typescript
+ * const encodedData = encodeData(typedData.types, 'MyStruct', typedData.message);
+ * console.log(encodedData); // [['felt'], ['0xabc123...']]
+ * ```
  */
 export function encodeData<T extends TypedData>(
   types: T['types'],
@@ -408,6 +545,18 @@ export function encodeData<T extends TypedData>(
 /**
  * Get encoded data as a hash. The data should be a key -> value object with all the required values.
  * All dependent types are automatically encoded.
+ *
+ * @param {TypedData['types']} types - The types object containing all defined types.
+ * @param {string} type - The name of the type to hash.
+ * @param {TypedData['message']} data - The data to hash.
+ * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
+ * @returns {string} The hash of the encoded data.
+ * 
+ * @example
+ * ```typescript
+ * const structHash = getStructHash(typedData.types, 'MyStruct', typedData.message);
+ * console.log(structHash); // '0xabc123...'
+ * ```
  */
 export function getStructHash<T extends TypedData>(
   types: T['types'],
@@ -420,6 +569,17 @@ export function getStructHash<T extends TypedData>(
 
 /**
  * Get the SNIP-12 encoded message to sign, from the typedData object.
+ *
+ * @param {TypedData} typedData - The TypedData object.
+ * @param {BigNumberish} account - The account to sign the message.
+ * @returns {string} The hash of the message to sign.
+ * @throws Will throw an error if the typedData does not match the JSON schema.
+ * 
+ * @example
+ * ```typescript
+ * const messageHash = getMessageHash(typedData, '0x123');
+ * console.log(messageHash); // '0xabc123...'
+ * ```
  */
 export function getMessageHash(typedData: TypedData, account: BigNumberish): string {
   if (!validateTypedData(typedData)) {
