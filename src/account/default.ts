@@ -110,10 +110,7 @@ export class Account extends Provider implements AccountInterface {
 
   /**
    * Retrieves the Cairo version from the network and sets `cairoVersion` if not already set in the constructor.
-   * Retrieves also the name of the function that verify a message signature.
    * @param classHash if provided detects Cairo version from classHash, otherwise from the account address
-
-   * Retrieves also the name of the function that verifies a message signature.
    */
   public async getCairoVersion(classHash?: string) {
     if (!this.cairoVersion) {

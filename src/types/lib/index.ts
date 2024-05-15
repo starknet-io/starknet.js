@@ -286,7 +286,7 @@ export interface CallStruct {
 }
 
 /**
- * Represent Contract version & account verification message function name
+ * Represent Contract version
  */
 export type ContractVersion = {
   /** version of the cairo language */

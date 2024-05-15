@@ -257,29 +257,6 @@ export class RpcProvider implements ProviderInterface {
       throw Error('getContractVersion require contractAddress or classHash');
     }
 
-    // Take the opportunity of class reading, to get the name of the message signature verification name
-    // or an empty string in case of proxy.
-    /*     let messageVerifFunctionName: string | undefined;
-    if ('signatureVerifFunctionName' in this) {
-      const parser = createAbiParser(contractClass.abi);
-      const parsedAbi = parser.getLegacyFormat();
-      const functionsList = parsedAbi.filter((abiElement) => abiElement.type === 'function');
-      if (functionsList) {
-        const isProxy: boolean = functionsList.some(
-          (abiElement) => abiElement.name === '__default__'
-        );
-        if (isProxy) {
-          messageVerifFunctionName = '';
-        } else {
-          const validFunction = functionsList.find((abiElement) =>
-            ['isValidSignature', 'is_valid_signature'].includes(abiElement.name)
-          );
-          if (validFunction) {
-            messageVerifFunctionName = validFunction.name;
-          }
-        }
-      }
-    } */
     if (isSierra(contractClass)) {
       if (compiler) {
         const abiTest = getAbiContractVersion(contractClass.abi);
