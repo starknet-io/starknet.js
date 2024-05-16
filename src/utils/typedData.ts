@@ -401,8 +401,22 @@ function getMerkleTreeType(types: TypedData['types'], ctx: Context) {
  * 
  * @example
  * ```typescript
+ * const typedData = {
+ *   types: {
+ *     MyStruct: [
+ *       { name: 'field1', type: 'felt' },
+ *       { name: 'field2', type: 'AnotherStruct' }
+ *     ],
+ *     AnotherStruct: [
+ *       { name: 'fieldA', type: 'felt' }
+ *     ]
+ *   }
+ * };
+ * 
+ * let result;
  * const encodedType = encodeType(typedData.types, 'MyStruct');
- * console.log(encodedType); // 'MyStruct(anotherStruct:u256)'
+ * result = encodedType;
+ * // result = 'MyStruct(field1:felt,field2:AnotherStruct)'
  * ```
  */
 export function encodeType(
@@ -446,6 +460,7 @@ export function encodeType(
     })
     .join('');
 }
+
 /**
  * Get a type string as hash.
  *
@@ -456,8 +471,22 @@ export function encodeType(
  * 
  * @example
  * ```typescript
+ * const typedData = {
+ *   types: {
+ *     MyStruct: [
+ *       { name: 'field1', type: 'felt' },
+ *       { name: 'field2', type: 'AnotherStruct' }
+ *     ],
+ *     AnotherStruct: [
+ *       { name: 'fieldA', type: 'felt' }
+ *     ]
+ *   }
+ * };
+ * 
+ * let result;
  * const typeHash = getTypeHash(typedData.types, 'MyStruct');
- * console.log(typeHash); // '0xabc123...'
+ * result = typeHash;
+ * // result = '0x5f3cfe24eb9cba5f0e80bcacb8b2d8cdccb1c71f9ff71ec7e02a77c0cbe32e61'
  * ```
  */
 export function getTypeHash(
@@ -469,7 +498,7 @@ export function getTypeHash(
 }
 
 /**
- * Encodes a single value to an ABI serialisable string, number or Buffer. Returns the data as tuple, which consists of
+ * Encodes a single value to an ABI serialisable string, number or Buffer. Returns the data as a tuple, which consists of
  * an array of ABI compatible types, and an array of corresponding values.
  *
  * @param {TypedData['types']} types - The types object containing all defined types.
@@ -481,8 +510,22 @@ export function getTypeHash(
  * 
  * @example
  * ```typescript
+ * const typedData = {
+ *   types: {
+ *     MyStruct: [
+ *       { name: 'field1', type: 'felt' },
+ *       { name: 'field2', type: 'AnotherStruct' }
+ *     ],
+ *     AnotherStruct: [
+ *       { name: 'fieldA', type: 'felt' }
+ *     ]
+ *   }
+ * };
+ * 
+ * let result;
  * const encodedValue = encodeValue(typedData.types, 'u256', '12345');
- * console.log(encodedValue); // ['u256', '0x3039']
+ * result = encodedValue;
+ * // result = ['u256', '0x3039']
  * ```
  */
 export function encodeValue(
@@ -624,10 +667,29 @@ export function encodeValue(
  * 
  * @example
  * ```typescript
+ * const typedData = {
+ *   types: {
+ *     MyStruct: [
+ *       { name: 'field1', type: 'felt' },
+ *       { name: 'field2', type: 'AnotherStruct' }
+ *     ],
+ *     AnotherStruct: [
+ *       { name: 'fieldA', type: 'felt' }
+ *     ]
+ *   },
+ *   message: {
+ *     field1: '0x123',
+ *     field2: { fieldA: '0x456' }
+ *   }
+ * };
+ * 
+ * let result;
  * const encodedData = encodeData(typedData.types, 'MyStruct', typedData.message);
- * console.log(encodedData); // [['felt'], ['0xabc123...']]
+ * result = encodedData;
+ * // result = [['felt', 'AnotherStruct'], ['0x123', '0x456']]
  * ```
  */
+
 export function encodeData<T extends TypedData>(
   types: T['types'],
   type: string,
@@ -658,6 +720,9 @@ export function encodeData<T extends TypedData>(
 
   return [returnTypes, values];
 }
+
+
+//TO: I stopped here
 
 /**
  * Get encoded data as a hash. The data should be a key -> value object with all the required values.
