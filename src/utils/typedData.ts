@@ -76,10 +76,26 @@ const revisionConfiguration: Record<Revision, Configuration> = {
  * 
  * @example
  * ```typescript
- * assertRange('10', 'felt', { min: BigInt(0), max: BigInt(100) }); // No error
- * assertRange('200', 'felt', { min: BigInt(0), max: BigInt(100) }); // Error: 200 (felt) is out of bounds [0, 100]
+ * let result1;
+ * try {
+ *     assertRange('10', 'felt', { min: BigInt(0), max: BigInt(100) });
+ *     result1 = 'No error'; 
+ * } catch (error) {
+ *     result1 = error.message;
+ * }
+ * // result1 = 'No error'
+ * 
+ * let result2;
+ * try {
+ *     assertRange('200', 'felt', { min: BigInt(0), max: BigInt(100) });
+ *     result2 = 'No error';
+ * } catch (error) {
+ *     result2 = error.message;
+ * }
+ * // result2 = '200 (felt) is out of bounds [0, 100]'
  * ```
  */
+
 function assertRange(data: unknown, type: string, { min, max }: { min: bigint; max: bigint }) {
   const value = BigInt(data as string);
   assert(value >= min && value <= max, `${value} (${type}) is out of bounds [${min}, ${max}]`);
@@ -93,12 +109,26 @@ function assertRange(data: unknown, type: string, { min, max }: { min: bigint; m
  * 
  * @example
  * ```typescript
- * const revision = identifyRevision(typedData);
- * if (revision === Revision.Active) {
- *   console.log('Active revision identified');
- * }
+ * const typedData = {
+ *   revision: 'Active'
+ * };
+ * 
+ * let result1;
+ * const revision1 = identifyRevision(typedData);
+ * result1 = revision1 === Revision.Active ? 'Active revision identified' : 'Revision not identified or not active';
+ * // result1 = 'Active revision identified'
+ * 
+ * const invalidTypedData = {
+ *   revision: 'Inactive'
+ * };
+ * 
+ * let result2;
+ * const revision2 = identifyRevision(invalidTypedData);
+ * result2 = revision2 === Revision.Active ? 'Active revision identified' : 'Revision not identified or not active';
+ * // result2 = 'Revision not identified or not active'
  * ```
  */
+
 function identifyRevision({ types, domain }: TypedData) {
   if (revisionConfiguration[Revision.Active].domain in types && domain.revision === Revision.Active)
     return Revision.Active;
@@ -121,10 +151,25 @@ function identifyRevision({ types, domain }: TypedData) {
  * 
  * @example
  * ```typescript
- * const hexValue = getHex(123); // "0x7b"
- * const hexString = getHex("0x1a"); // "0x1a"
+ * let result;
+ * try {
+ *     const hexValue = getHex(123);
+ *     result = hexValue; 
+ * } catch (error) {
+ *     result = error.message;
+ * }
+ * // result: "0x7b"
+ * 
+ * try {
+ *     const hexString = getHex("0x1a");
+ *     result = hexString; 
+ * } catch (error) {
+ *     result = error.message;
+ * }
+ * // result: "0x1a"
  * ```
  */
+
 function getHex(value: BigNumberish): string {
   try {
     return toHex(value);
@@ -144,12 +189,32 @@ function getHex(value: BigNumberish): string {
  * 
  * @example
  * ```typescript
- * const isValid = validateTypedData(typedData);
- * if (isValid) {
- *   console.log('Typed data is valid');
- * }
+ * const validTypedData = {
+ *   types: { EIP712Domain: [{ name: 'name', type: 'string' }] },
+ *   primaryType: 'EIP712Domain',
+ *   domain: { name: 'MyDapp' },
+ *   message: { name: 'Alice' }
+ * };
+ * 
+ * const invalidTypedData = {
+ *   types: {},
+ *   primaryType: 'EIP712Domain',
+ *   domain: {},
+ *   message: {}
+ * };
+ * 
+ * let result1;
+ * const isValid1 = validateTypedData(validTypedData);
+ * result1 = isValid1 ? 'Typed data is valid' : 'Typed data is invalid';
+ * // result1 = 'Typed data is valid'
+ * 
+ * let result2;
+ * const isValid2 = validateTypedData(invalidTypedData);
+ * result2 = isValid2 ? 'Typed data is valid' : 'Typed data is invalid';
+ * // result2 = 'Typed data is invalid'
  * ```
  */
+
 function validateTypedData(data: unknown): data is TypedData {
   const typedData = data as TypedData;
   return Boolean(
@@ -158,6 +223,7 @@ function validateTypedData(data: unknown): data is TypedData {
 }
 
 /**
+/**
  * Prepares the selector for use.
  *
  * @param {string} selector - The selector to be prepared.
@@ -165,8 +231,10 @@ function validateTypedData(data: unknown): data is TypedData {
  * 
  * @example
  * ```typescript
+ * let result;
  * const preparedSelector = prepareSelector('0x1');
- * console.log(preparedSelector); // '0x1'
+ * result = preparedSelector;
+ * // result: '0x1'
  * ```
  */
 export function prepareSelector(selector: string): string {
@@ -181,8 +249,29 @@ export function prepareSelector(selector: string): string {
  * 
  * @example
  * ```typescript
- * const isMerkle = isMerkleTreeType(someType);
- * console.log(isMerkle); // true or false
+ * let result1;
+ * const merkleType = {
+ *   name: 'MerkleTree',
+ *   fields: [
+ *     { name: 'root', type: 'felt' },
+ *     { name: 'leaves', type: 'felt[]' }
+ *   ]
+ * };
+ * const isMerkle1 = isMerkleTreeType(merkleType);
+ * result1 = isMerkle1;
+ * // result1 = true
+ * 
+ * let result2;
+ * const nonMerkleType = {
+ *   name: 'RegularStruct',
+ *   fields: [
+ *     { name: 'id', type: 'felt' },
+ *     { name: 'value', type: 'felt' }
+ *   ]
+ * };
+ * const isMerkle2 = isMerkleTreeType(nonMerkleType);
+ * result2 = isMerkle2;
+ * // result2 = false
  * ```
  */
 export function isMerkleTreeType(type: StarknetType): type is StarknetMerkleType {
@@ -201,8 +290,20 @@ export function isMerkleTreeType(type: StarknetType): type is StarknetMerkleType
  * 
  * @example
  * ```typescript
- * const deps = getDependencies(typedData.types, 'MyStruct');
- * console.log(deps); // ['MyStruct', 'AnotherStruct']
+ * const types = {
+ *   MyStruct: [
+ *     { name: 'field1', type: 'felt' },
+ *     { name: 'field2', type: 'AnotherStruct' }
+ *   ],
+ *   AnotherStruct: [
+ *     { name: 'fieldA', type: 'felt' }
+ *   ]
+ * };
+ * 
+ * let result;
+ * const deps = getDependencies(types, 'MyStruct');
+ * result = deps;
+ * // result = ['MyStruct', 'AnotherStruct']
  * ```
  */
 export function getDependencies(
@@ -254,10 +355,26 @@ export function getDependencies(
  * 
  * @example
  * ```typescript
- * const merkleTreeType = getMerkleTreeType(typedData.types, { parent: 'MyStruct', key: 'merkleField' });
- * console.log(merkleTreeType); // 'MerkleType'
+ * let result1;
+ * try {
+ *     const merkleTreeType = getMerkleTreeType(typedData.types, { parent: 'MyStruct', key: 'merkleField' });
+ *     result1 = merkleTreeType;
+ * } catch (error) {
+ *     result1 = error.message;
+ * }
+ * // result1 = 'MerkleType'
+ * 
+ * let result2;
+ * try {
+ *     const invalidMerkleTreeType = getMerkleTreeType(typedData.types, { parent: 'InvalidStruct', key: 'invalidField' });
+ *     result2 = invalidMerkleTreeType;
+ * } catch (error) {
+ *     result2 = error.message;
+ * }
+ * // result2 = 'Error message describing why the context is not a Merkle tree or why it contains an array property'
  * ```
  */
+
 function getMerkleTreeType(types: TypedData['types'], ctx: Context) {
   if (ctx.parent && ctx.key) {
     const parentType = types[ctx.parent];
