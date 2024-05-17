@@ -1,4 +1,4 @@
-import { RpcChannel, RPC06, RPC07 } from '../channel';
+import { RPC06, RPC07, RpcChannel } from '../channel';
 import {
   AccountInvocations,
   BigNumberish,
@@ -6,10 +6,12 @@ import {
   BlockIdentifier,
   BlockTag,
   Call,
+  ContractClassResponse,
   ContractVersion,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
   GetBlockResponse,
+  GetTxReceiptResponseWithoutHelper,
   Invocation,
   InvocationsDetailsWithNonce,
   PendingBlock,
@@ -23,7 +25,6 @@ import {
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
-  GetTxReceiptResponseWithoutHelper,
 } from '../types';
 import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { isSierra } from '../utils/contract';
@@ -291,7 +292,7 @@ export class RpcProvider implements ProviderInterface {
       compiler = true,
     }: getContractVersionOptions = {}
   ): Promise<ContractVersion> {
-    let contractClass;
+    let contractClass: ContractClassResponse;
     if (contractAddress) {
       contractClass = await this.getClassAt(contractAddress, blockIdentifier);
     } else if (classHash) {
