@@ -30,6 +30,7 @@ import {
   describeIfDevnet,
   getTestAccount,
   getTestProvider,
+  describeIfTestnet,
   waitNextBlock,
   devnetETHtokenAddress,
 } from './config/fixtures';
@@ -430,6 +431,21 @@ describeIfRpc('RPCProvider', () => {
   });
 });
 
+describeIfTestnet('RPCProvider', () => {
+  const provider = getTestProvider();
+
+  test('getL1MessageHash', async () => {
+    const l2TransactionHash = '0x28dfc05eb4f261b37ddad451ff22f1d08d4e3c24dc646af0ec69fa20e096819';
+    const l1MessageHash = await provider.getL1MessageHash(l2TransactionHash);
+    expect(l1MessageHash).toBe(
+      '0x55b3f8b6e607fffd9b4d843dfe8f9b5c05822cd94fcad8797deb01d77805532a'
+    );
+    await expect(
+      provider.getL1MessageHash('0x283882a666a418cf88df04cc5f8fc2262af510bba0b637e61b2820a6ab15318')
+    ).rejects.toThrow(/This L2 transaction is not a L1 message./);
+    await expect(provider.getL1MessageHash('0x123')).rejects.toThrow(/Transaction hash not found/);
+  });
+});
 describeIfNotDevnet('waitForBlock', () => {
   // As Devnet-rs isn't generating automatically blocks at a periodic time, it's excluded of this test.
   const providerStandard = new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL });
