@@ -11,6 +11,7 @@ import {
   ReceiptTx,
   RpcProvider,
   TransactionExecutionStatus,
+  cairo,
   stark,
   waitForTransactionOptions,
 } from '../src';
@@ -29,6 +30,8 @@ import {
   describeIfDevnet,
   getTestAccount,
   getTestProvider,
+  waitNextBlock,
+  devnetETHtokenAddress,
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
@@ -115,20 +118,15 @@ describeIfRpc('RPCProvider', () => {
     estimateSpy.mockRestore();
   });
 
-  describe('Test Estimate message fee', () => {
+  describeIfDevnet('Test Estimate message fee Cairo 0', () => {
+    // declaration of Cairo 0 contract is no more authorized in Sepolia Testnet
     let l1l2ContractCairo0Address: string;
-    let l1l2ContractCairo1Address: string;
 
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
         contract: compiledL1L2,
       });
       l1l2ContractCairo0Address = deploy.contract_address;
-      const { deploy: deploy2 } = await account.declareAndDeploy({
-        contract: compiledC1v2,
-        casm: compiledC1v2Casm,
-      });
-      l1l2ContractCairo1Address = deploy2.contract_address;
     });
 
     test('estimate message fee Cairo 0', async () => {
@@ -146,6 +144,19 @@ describeIfRpc('RPCProvider', () => {
           overall_fee: expect.anything(),
         })
       );
+    });
+  });
+
+  describe('Test Estimate message fee Cairo 1', () => {
+    let l1l2ContractCairo1Address: string;
+
+    beforeAll(async () => {
+      const { deploy: deploy2 } = await account.declareAndDeploy({
+        contract: compiledC1v2,
+        casm: compiledC1v2Casm,
+      });
+      l1l2ContractCairo1Address = deploy2.contract_address;
+      await waitNextBlock(provider as RpcProvider, 5000); // in Sepolia Testnet, needs pending block validation before interacting
     });
 
     test('estimate message fee Cairo 1', async () => {
@@ -230,6 +241,16 @@ describeIfRpc('RPCProvider', () => {
     let latestBlock: Block;
 
     beforeAll(async () => {
+      // add a Tx to be sure to have at least one Tx in the last block
+      const { transaction_hash } = await account.execute({
+        contractAddress: devnetETHtokenAddress,
+        entrypoint: 'transfer',
+        calldata: {
+          recipient: account.address,
+          amount: cairo.uint256(1n * 10n ** 4n),
+        },
+      });
+      await account.waitForTransaction(transaction_hash);
       latestBlock = await provider.getBlock('latest');
     });
 
@@ -406,5 +427,39 @@ describeIfRpc('RPCProvider', () => {
       const syncingStats = await rpcProvider.getSyncingStats();
       expect(syncingStats).toMatchSchemaRef('GetSyncingStatsResponse');
     });
+  });
+});
+
+describeIfNotDevnet('waitForBlock', () => {
+  // As Devnet-rs isn't generating automatically blocks at a periodic time, it's excluded of this test.
+  const providerStandard = new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL });
+  const providerFastTimeOut = new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL, retries: 1 });
+  let block: number;
+  beforeEach(async () => {
+    block = await providerStandard.getBlockNumber();
+  });
+
+  test('waitForBlock timeOut', async () => {
+    await expect(providerFastTimeOut.waitForBlock(10 ** 20, 1)).rejects.toThrow(/timed-out/);
+  });
+
+  test('waitForBlock in the past', async () => {
+    const start = new Date().getTime();
+    await providerStandard.waitForBlock(block);
+    const end = new Date().getTime();
+    expect(end - start).toBeLessThan(1000); // quick answer expected
+  });
+
+  test('waitForBlock latest', async () => {
+    const start = new Date().getTime();
+    await providerStandard.waitForBlock('latest');
+    const end = new Date().getTime();
+    expect(end - start).toBeLessThan(100); // nearly immediate answer expected
+  });
+
+  // NOTA : this test can have a duration up to block interval.
+  test('waitForBlock pending', async () => {
+    await providerStandard.waitForBlock('pending');
+    expect(true).toBe(true); // answer without timeout Error (blocks have to be spaced with 16 minutes maximum : 200 retries * 5000ms)
   });
 });

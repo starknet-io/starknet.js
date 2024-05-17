@@ -30,6 +30,8 @@ import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { isSierra } from '../utils/contract';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { GetTransactionReceiptResponse, ReceiptTx } from '../utils/transactionReceipt';
+import { wait } from '../utils/provider';
+import { toHex } from '../utils/num';
 import { LibraryError } from './errors';
 import { ProviderInterface } from './interface';
 
@@ -99,6 +101,47 @@ export class RpcProvider implements ProviderInterface {
 
   public async getBlockWithTxs(blockIdentifier?: BlockIdentifier) {
     return this.channel.getBlockWithTxs(blockIdentifier);
+  }
+
+  /**
+   * Pause the execution of the script until a specified block is created.
+   * @param {BlockIdentifier} blockIdentifier bloc number (BigNumberisk) or 'pending' or 'latest'.
+   * Use of 'latest" or of a block already created will generate no pause.
+   * @param {number} [retryInterval] number of milliseconds between 2 requests to the node
+   * @example
+   * ```typescript
+   * await myProvider.waitForBlock();
+   * // wait the creation of the pending block
+   * ```
+   */
+  public async waitForBlock(
+    blockIdentifier: BlockIdentifier = 'pending',
+    retryInterval: number = 5000
+  ) {
+    if (blockIdentifier === BlockTag.latest) return;
+    const currentBlock = await this.getBlockNumber();
+    const targetBlock =
+      blockIdentifier === BlockTag.pending
+        ? currentBlock + 1
+        : Number(toHex(blockIdentifier as BigNumberish));
+    if (targetBlock <= currentBlock) return;
+    const { retries } = this.channel;
+    let retriesCount = retries;
+    let isTargetBlock: boolean = false;
+    while (!isTargetBlock) {
+      // eslint-disable-next-line no-await-in-loop
+      const currBlock = await this.getBlockNumber();
+      if (currBlock === targetBlock) {
+        isTargetBlock = true;
+      } else {
+        // eslint-disable-next-line no-await-in-loop
+        await wait(retryInterval);
+      }
+      retriesCount -= 1;
+      if (retriesCount <= 0) {
+        throw new Error(`waitForBlock() timed-out after ${retries} tries.`);
+      }
+    }
   }
 
   public async getL1GasPrice(blockIdentifier?: BlockIdentifier) {

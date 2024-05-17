@@ -10,6 +10,17 @@ export type { BigNumberish };
 /**
  * Test if string is hex-string
  * @param hex hex-string
+ * @returns {boolean} True if the input string is a hexadecimal string, false otherwise
+ * @example
+ * ```typescript
+ * const hexString1 = "0x2fd23d9182193775423497fc0c472e156c57c69e4089a1967fb288a2d84e914";
+ * const result1 = isHex(hexString1);
+ * // result1 = true
+ *
+ * const hexString2 = "2fd23d9182193775423497fc0c472e156c57c69e4089a1967fb288a2d84e914";
+ * const result2 = isHex(hexString2);
+ * // result2 = false
+ * ```
  */
 export function isHex(hex: string): boolean {
   return /^0x[0-9a-f]*$/i.test(hex);
@@ -77,6 +88,20 @@ export const cleanHex = (hex: string) => hex.toLowerCase().replace(/^(0x)0+/, '$
  * Asserts input is equal to or greater then lowerBound and lower then upperBound.
  *
  * The `inputName` parameter is used in the assertion message.
+ * @param input Value to check
+ * @param lowerBound Lower bound value
+ * @param upperBound Upper bound value
+ * @param inputName Name of the input for error message
+ * @Throws Error if input is out of range
+ * @example
+ * ```typescript
+ * const input1:BigNumberish = 10;
+ * assertInRange(input1, 5, 20, 'value')
+ *
+ * const input2: BigNumberish = 25;
+ * assertInRange(input2, 5, 20, 'value');
+ * // Throws Error: Message not signable, invalid value length.
+ * ```
  */
 export function assertInRange(
   input: BigNumberish,
@@ -119,6 +144,14 @@ export const isStringWholeNumber = (value: string) => /^\d+$/.test(value);
 /**
  * Convert string to decimal string
  * @returns format: decimal string
+ * @example
+ * ```typescript
+ * const result = getDecimalString("0x1a");
+ * // result = "26"
+ *
+ * const result2 = getDecimalString("Hello");
+ * // Throws Error: "Hello need to be hex-string or whole-number-string"
+ * ```
  */
 export function getDecimalString(value: string) {
   if (isHex(value)) {
@@ -133,6 +166,14 @@ export function getDecimalString(value: string) {
 /**
  * Convert string to hexadecimal string
  * @returns format: hex-string
+ * @example
+ * ```typescript
+ * const result = getHexString("123");
+ * // result = "0x7b"
+ *
+ * const result2 = getHexString("Hello");
+ * // Throws Error: Hello need to be hex-string or whole-number-string
+ * ```
  */
 export function getHexString(value: string) {
   if (isHex(value)) {
@@ -154,6 +195,16 @@ export function getHexStringArray(value: Array<string>) {
 
 /**
  * Convert boolean to "0" or "1"
+ * @param value The boolean value to be converted.
+ * @returns {boolean} Returns true if the value is a number, otherwise returns false.
+ * @example
+ * ```typescript
+ * const result = toCairoBool(true);
+ * // result ="1"
+ *
+ * const result2 = toCairoBool(false);
+ * // result2 = "0"
+ * ```
  */
 export const toCairoBool = (value: boolean): string => (+value).toString();
 
@@ -186,6 +237,15 @@ export function addPercent(number: BigNumberish, percent: number) {
  * Check if a value is a number.
  *
  * @param {unknown} value - The value to check.
+ * @returns {boolean} Returns true if the value is a number, otherwise returns false.
+ * @example
+ * ```typescript
+ * const result = isNumber(123);
+ * // result = true
+ *
+ * const result2 = isNumber("123");
+ * // result2 = false
+ * ```
  * @return {boolean} Returns true if the value is a number, otherwise returns false.
  */
 export function isNumber(value: unknown): value is number {
@@ -196,6 +256,15 @@ export function isNumber(value: unknown): value is number {
  * Checks if a given value is of boolean type.
  *
  * @param {unknown} value - The value to check.
+ * @returns {boolean} - True if the value is of boolean type, false otherwise.
+ * @example
+ * ```typescript
+ * const result = isBoolean(true);
+ * // result = true
+ *
+ * const result2 = isBoolean(false);
+ * // result2 = false
+ * ```
  * @return {boolean} - True if the value is of boolean type, false otherwise.
  */
 export function isBoolean(value: unknown): value is boolean {

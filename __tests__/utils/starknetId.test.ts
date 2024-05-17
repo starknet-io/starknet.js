@@ -40,8 +40,8 @@ describe('Should tets StarknetId utils', () => {
   });
 
   test('Should test getStarknetIdContract', () => {
-    expect(getStarknetIdContract(StarknetChainId.SN_GOERLI)).toBe(
-      '0x3bab268e932d2cecd1946f100ae67ce3dff9fd234119ea2f6da57d16d29fce'
+    expect(getStarknetIdContract(StarknetChainId.SN_SEPOLIA)).toBe(
+      '0x0707f09bc576bd7cfee59694846291047e965f4184fe13dac62c56759b3b6fa7'
     );
 
     expect(getStarknetIdContract(StarknetChainId.SN_MAIN)).toBe(
