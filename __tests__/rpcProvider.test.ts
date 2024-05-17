@@ -444,6 +444,8 @@ describeIfTestnet('RPCProvider', () => {
       provider.getL1MessageHash('0x283882a666a418cf88df04cc5f8fc2262af510bba0b637e61b2820a6ab15318')
     ).rejects.toThrow(/This L2 transaction is not a L1 message./);
     await expect(provider.getL1MessageHash('0x123')).rejects.toThrow(/Transaction hash not found/);
+  });
+});
 describeIfNotDevnet('waitForBlock', () => {
   // As Devnet-rs isn't generating automatically blocks at a periodic time, it's excluded of this test.
   const providerStandard = new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL });

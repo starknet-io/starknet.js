@@ -1,8 +1,6 @@
 import type { SPEC } from 'starknet-types-07';
 import { bytesToHex } from '@noble/curves/abstract/utils';
 import { keccak_256 } from '@noble/hashes/sha3';
-import { ProviderInterface } from './interface';
-import { LibraryError } from './errors';
 import { RPC06, RPC07, RpcChannel } from '../channel';
 import {
   AccountInvocations,
