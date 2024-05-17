@@ -247,7 +247,7 @@ export class RpcProvider implements ProviderInterface {
 
   /**
    * @param invocations AccountInvocations
-   * @param simulateTransactionOptions blockIdentifier and flags to skip validation and fee charge<br/>
+   * @param options blockIdentifier and flags to skip validation and fee charge<br/>
    * - blockIdentifier<br/>
    * - skipValidate (default false)<br/>
    * - skipFeeCharge (default true)<br/>
@@ -270,6 +270,7 @@ export class RpcProvider implements ProviderInterface {
       txHash,
       options
     )) as GetTxReceiptResponseWithoutHelper;
+
     return new ReceiptTx(receiptWoHelper) as GetTransactionReceiptResponse;
   }
 
