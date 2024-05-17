@@ -14,7 +14,15 @@ const parseIntAsNumberOrBigInt = (x: string) => {
  *
  * NOTE: the String() wrapping is used so the behavior conforms to JSON.parse()
  * which can accept simple data types but is not represented in the default typing
+ *
  * @param x JSON string
+ * @return {object} Parsed json object
+ * @example
+ * ```typescript
+ * const str = '[123, 12.3, 11223344556677889900]';
+ * const result = parse(str);
+ * // result = [123, 12.3, 11223344556677890048n]
+ * ```
  */
 export const parse = (x: string): any => json.parse(String(x), undefined, parseIntAsNumberOrBigInt);
 
