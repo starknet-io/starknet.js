@@ -1,6 +1,4 @@
-import { ProviderInterface } from './interface';
-import { LibraryError } from './errors';
-import { RpcChannel, RPC06, RPC07 } from '../channel';
+import { RPC06, RPC07, RpcChannel } from '../channel';
 import {
   AccountInvocations,
   BigNumberish,
@@ -8,10 +6,12 @@ import {
   BlockIdentifier,
   BlockTag,
   Call,
+  ContractClassResponse,
   ContractVersion,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
   GetBlockResponse,
+  GetTxReceiptResponseWithoutHelper,
   Invocation,
   InvocationsDetailsWithNonce,
   PendingBlock,
@@ -25,12 +25,13 @@ import {
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
-  GetTxReceiptResponseWithoutHelper,
 } from '../types';
 import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { isSierra } from '../utils/contract';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
-import { ReceiptTx, GetTransactionReceiptResponse } from '../utils/transactionReceipt';
+import { GetTransactionReceiptResponse, ReceiptTx } from '../utils/transactionReceipt';
+import { LibraryError } from './errors';
+import { ProviderInterface } from './interface';
 
 export class RpcProvider implements ProviderInterface {
   private responseParser: RPCResponseParser;
@@ -248,7 +249,7 @@ export class RpcProvider implements ProviderInterface {
       compiler = true,
     }: getContractVersionOptions = {}
   ): Promise<ContractVersion> {
-    let contractClass;
+    let contractClass: ContractClassResponse;
     if (contractAddress) {
       contractClass = await this.getClassAt(contractAddress, blockIdentifier);
     } else if (classHash) {
