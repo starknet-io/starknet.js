@@ -63,6 +63,17 @@ export function getSelectorFromName(funcName: string) {
  *
  * @param value hex-string | dec-string | ascii-string
  * @returns format: hex-string
+ * @example
+ * ```typescript
+ * const selector: string = getSelector("myFunction");
+ * // selector = "0x7e44bafo"
+ *
+ * const selector1: string = getSelector("0x123abc");
+ * // selector1 = "0x123abc"
+ *
+ * const selector2: string = getSelector("123456");
+ * // selector2 = "0x1e240"
+ * ```
  */
 export function getSelector(value: string) {
   if (isHex(value)) {
