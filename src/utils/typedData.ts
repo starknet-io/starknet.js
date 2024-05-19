@@ -73,18 +73,18 @@ const revisionConfiguration: Record<Revision, Configuration> = {
  * @param {bigint} range.min - The minimum value of the range.
  * @param {bigint} range.max - The maximum value of the range.
  * @throws Will throw an error if the data is out of the specified range.
- * 
+ *
  * @example
  * ```typescript
  * let result1;
  * try {
  *     assertRange('10', 'felt', { min: BigInt(0), max: BigInt(100) });
- *     result1 = 'No error'; 
+ *     result1 = 'No error';
  * } catch (error) {
  *     result1 = error.message;
  * }
  * // result1 = 'No error'
- * 
+ *
  * let result2;
  * try {
  *     assertRange('200', 'felt', { min: BigInt(0), max: BigInt(100) });
@@ -106,22 +106,22 @@ function assertRange(data: unknown, type: string, { min, max }: { min: bigint; m
  *
  * @param {TypedData} data - The TypedData object.
  * @returns {Revision | undefined} The identified revision, or undefined if not found.
- * 
+ *
  * @example
  * ```typescript
  * const typedData = {
  *   revision: 'Active'
  * };
- * 
+ *
  * let result1;
  * const revision1 = identifyRevision(typedData);
  * result1 = revision1 === Revision.Active ? 'Active revision identified' : 'Revision not identified or not active';
  * // result1 = 'Active revision identified'
- * 
+ *
  * const invalidTypedData = {
  *   revision: 'Inactive'
  * };
- * 
+ *
  * let result2;
  * const revision2 = identifyRevision(invalidTypedData);
  * result2 = revision2 === Revision.Active ? 'Active revision identified' : 'Revision not identified or not active';
@@ -148,25 +148,26 @@ function identifyRevision({ types, domain }: TypedData) {
  * @param {BigNumberish} value - The value to convert.
  * @returns {string} The hexadecimal representation of the value.
  * @throws Will throw an error if the value is not a valid BigNumberish.
- * 
+ *
  * @example
  * ```typescript
- * let result;
+ * let result1;
  * try {
  *     const hexValue = getHex(123);
- *     result = hexValue; 
+ *     result1 = hexValue;
  * } catch (error) {
- *     result = error.message;
+ *     result1 = error.message;
  * }
- * // result: "0x7b"
- * 
+ * // result1 = "0x7b"
+ *
+ * let result2;
  * try {
  *     const hexString = getHex("0x1a");
- *     result = hexString; 
+ *     result2 = hexString;
  * } catch (error) {
- *     result = error.message;
+ *     result2 = error.message;
  * }
- * // result: "0x1a"
+ * // result2 = "0x1a"
  * ```
  */
 
@@ -186,7 +187,7 @@ function getHex(value: BigNumberish): string {
  *
  * @param {unknown} data - The data to validate.
  * @returns {boolean} True if the data matches the schema, false otherwise.
- * 
+ *
  * @example
  * ```typescript
  * const validTypedData = {
@@ -195,19 +196,19 @@ function getHex(value: BigNumberish): string {
  *   domain: { name: 'MyDapp' },
  *   message: { name: 'Alice' }
  * };
- * 
+ *
  * const invalidTypedData = {
  *   types: {},
  *   primaryType: 'EIP712Domain',
  *   domain: {},
  *   message: {}
  * };
- * 
+ *
  * let result1;
  * const isValid1 = validateTypedData(validTypedData);
  * result1 = isValid1 ? 'Typed data is valid' : 'Typed data is invalid';
  * // result1 = 'Typed data is valid'
- * 
+ *
  * let result2;
  * const isValid2 = validateTypedData(invalidTypedData);
  * result2 = isValid2 ? 'Typed data is valid' : 'Typed data is invalid';
@@ -223,18 +224,22 @@ function validateTypedData(data: unknown): data is TypedData {
 }
 
 /**
-/**
  * Prepares the selector for use.
  *
  * @param {string} selector - The selector to be prepared.
  * @returns {string} The prepared selector.
- * 
+ *
  * @example
  * ```typescript
- * let result;
- * const preparedSelector = prepareSelector('0x1');
- * result = preparedSelector;
- * // result: '0x1'
+ * let result1;
+ * const preparedSelector1 = prepareSelector('0x1');
+ * result1 = preparedSelector1;
+ * // result1 = '0x1'
+ *
+ * let result2;
+ * const preparedSelector2 = prepareSelector('someFunction');
+ * result2 = preparedSelector2;
+ * // result2 = '0xsomecomputedvalue' (actual output will vary)
  * ```
  */
 export function prepareSelector(selector: string): string {
@@ -246,7 +251,7 @@ export function prepareSelector(selector: string): string {
  *
  * @param {StarknetType} type - The StarkNet type to check.
  * @returns {boolean} True if the type is a Merkle tree type, false otherwise.
- * 
+ *
  * @example
  * ```typescript
  * let result1;
@@ -260,7 +265,7 @@ export function prepareSelector(selector: string): string {
  * const isMerkle1 = isMerkleTreeType(merkleType);
  * result1 = isMerkle1;
  * // result1 = true
- * 
+ *
  * let result2;
  * const nonMerkleType = {
  *   name: 'RegularStruct',
@@ -287,7 +292,7 @@ export function isMerkleTreeType(type: StarknetType): type is StarknetMerkleType
  * @param {string} [contains=''] - The type contained within the struct.
  * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
  * @returns {string[]} The array of dependencies.
- * 
+ *
  * @example
  * ```typescript
  * const types = {
@@ -299,7 +304,7 @@ export function isMerkleTreeType(type: StarknetType): type is StarknetMerkleType
  *     { name: 'fieldA', type: 'felt' }
  *   ]
  * };
- * 
+ *
  * let result;
  * const deps = getDependencies(types, 'MyStruct');
  * result = deps;
@@ -352,7 +357,7 @@ export function getDependencies(
  * @param {Context} ctx - The context containing parent and key information.
  * @returns {string} The Merkle tree type.
  * @throws Will throw an error if the context is not a Merkle tree or if the Merkle tree contains property is an array.
- * 
+ *
  * @example
  * ```typescript
  * let result1;
@@ -363,7 +368,7 @@ export function getDependencies(
  *     result1 = error.message;
  * }
  * // result1 = 'MerkleType'
- * 
+ *
  * let result2;
  * try {
  *     const invalidMerkleTreeType = getMerkleTreeType(typedData.types, { parent: 'InvalidStruct', key: 'invalidField' });
@@ -398,7 +403,7 @@ function getMerkleTreeType(types: TypedData['types'], ctx: Context) {
  * @param {string} type - The name of the type to encode.
  * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
  * @returns {string} The encoded type string.
- * 
+ *
  * @example
  * ```typescript
  * const typedData = {
@@ -412,7 +417,7 @@ function getMerkleTreeType(types: TypedData['types'], ctx: Context) {
  *     ]
  *   }
  * };
- * 
+ *
  * let result;
  * const encodedType = encodeType(typedData.types, 'MyStruct');
  * result = encodedType;
@@ -468,7 +473,7 @@ export function encodeType(
  * @param {string} type - The name of the type to hash.
  * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
  * @returns {string} The hash of the type string.
- * 
+ *
  * @example
  * ```typescript
  * const typedData = {
@@ -482,7 +487,7 @@ export function encodeType(
  *     ]
  *   }
  * };
- * 
+ *
  * let result;
  * const typeHash = getTypeHash(typedData.types, 'MyStruct');
  * result = typeHash;
@@ -507,7 +512,7 @@ export function getTypeHash(
  * @param {Context} [ctx={}] - The context of the encoding process.
  * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
  * @returns {[string, string]} The ABI compatible type and corresponding value.
- * 
+ *
  * @example
  * ```typescript
  * const typedData = {
@@ -521,11 +526,16 @@ export function getTypeHash(
  *     ]
  *   }
  * };
- * 
- * let result;
- * const encodedValue = encodeValue(typedData.types, 'u256', '12345');
- * result = encodedValue;
- * // result = ['u256', '0x3039']
+ *
+ * let result1;
+ * const encodedValue1 = encodeValue(typedData.types, 'u256', '12345');
+ * result1 = encodedValue1;
+ * // result1 = ['u256', '0x3039']
+ *
+ * let result2;
+ * const encodedValue2 = encodeValue(typedData.types, 'string', 'Hello');
+ * result2 = encodedValue2;
+ * // result2 = ['string', '0x48656c6c6f']
  * ```
  */
 export function encodeValue(
@@ -664,7 +674,7 @@ export function encodeValue(
  * @param {TypedData['message']} data - The data to encode.
  * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
  * @returns {[string[], string[]]} The ABI compatible types and corresponding values.
- * 
+ *
  * @example
  * ```typescript
  * const typedData = {
@@ -682,11 +692,16 @@ export function encodeValue(
  *     field2: { fieldA: '0x456' }
  *   }
  * };
- * 
- * let result;
- * const encodedData = encodeData(typedData.types, 'MyStruct', typedData.message);
- * result = encodedData;
- * // result = [['felt', 'AnotherStruct'], ['0x123', '0x456']]
+ *
+ * let result1;
+ * const encodedData1 = encodeData(typedData.types, 'MyStruct', typedData.message);
+ * result1 = encodedData1;
+ * // result1 = [['felt', 'AnotherStruct'], ['0x123', '0x456']]
+ *
+ * let result2;
+ * const encodedData2 = encodeData(typedData.types, 'AnotherStruct', { fieldA: '0x789' });
+ * result2 = encodedData2;
+ * // result2 = [['felt'], ['0x789']]
  * ```
  */
 
@@ -721,9 +736,6 @@ export function encodeData<T extends TypedData>(
   return [returnTypes, values];
 }
 
-
-//TO: I stopped here
-
 /**
  * Get encoded data as a hash. The data should be a key -> value object with all the required values.
  * All dependent types are automatically encoded.
@@ -733,11 +745,13 @@ export function encodeData<T extends TypedData>(
  * @param {TypedData['message']} data - The data to hash.
  * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
  * @returns {string} The hash of the encoded data.
- * 
+ *
  * @example
  * ```typescript
  * const structHash = getStructHash(typedData.types, 'MyStruct', typedData.message);
- * console.log(structHash); // '0xabc123...'
+ * let result;
+ * result = structHash;
+ * // result = '0xabc123...'
  * ```
  */
 export function getStructHash<T extends TypedData>(
@@ -756,11 +770,26 @@ export function getStructHash<T extends TypedData>(
  * @param {BigNumberish} account - The account to sign the message.
  * @returns {string} The hash of the message to sign.
  * @throws Will throw an error if the typedData does not match the JSON schema.
- * 
+ *
  * @example
  * ```typescript
- * const messageHash = getMessageHash(typedData, '0x123');
- * console.log(messageHash); // '0xabc123...'
+ * let result1;
+ * try {
+ *     const messageHash1 = getMessageHash(typedData, '0x123');
+ *     result1 = messageHash1;
+ * } catch (error) {
+ *     result1 = error.message;
+ * }
+ * // result1 = '0xabc123...'
+ *
+ * let result2;
+ * try {
+ *     const messageHash2 = getMessageHash(invalidTypedData, '0x123');
+ *     result2 = messageHash2;
+ * } catch (error) {
+ *     result2 = error.message;
+ * }
+ * // result2 = 'Typed data does not match JSON schema'
  * ```
  */
 export function getMessageHash(typedData: TypedData, account: BigNumberish): string {
