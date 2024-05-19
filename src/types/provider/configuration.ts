@@ -6,6 +6,7 @@ export interface ProviderOptions extends RpcProviderOptions {}
 export type RpcProviderOptions = {
   nodeUrl?: string | NetworkName;
   retries?: number;
+  transactionRetryIntervalFallback?: number;
   headers?: object;
   blockIdentifier?: BlockIdentifier;
   chainId?: StarknetChainId;

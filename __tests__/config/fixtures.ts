@@ -2,14 +2,10 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { Account, Provider, ProviderInterface, RpcProvider, json } from '../../src';
-import {
-  CompiledSierra,
-  CompiledSierraCasm,
-  LegacyCompiledContract,
-  waitForTransactionOptions,
-} from '../../src/types';
+import { CompiledSierra, CompiledSierraCasm, LegacyCompiledContract } from '../../src/types';
 import { ETransactionVersion } from '../../src/types/api';
 import { toHex } from '../../src/utils/num';
+import { wait } from '../../src/utils/provider';
 
 const readContract = (name: string): LegacyCompiledContract =>
   json.parse(
@@ -73,22 +69,18 @@ export const compiledTestRejectSierra = readContractSierra('cairo/testReject/tes
 export const compiledTestRejectCasm = readContractSierraCasm('cairo/testReject/test_reject');
 export const compiledSidMulticall = readContractSierra('starknetId/multicall/multicall.sierra');
 export const compiledSidMulticallCasm = readContractSierraCasm('starknetId/multicall/multicall');
+
 export function getTestProvider(isProvider?: true): ProviderInterface;
 export function getTestProvider(isProvider?: false): RpcProvider;
 export function getTestProvider(isProvider: boolean = true): ProviderInterface | RpcProvider {
-  const provider = isProvider
-    ? new Provider({ nodeUrl: process.env.TEST_RPC_URL })
-    : new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL });
+  const isDevnet = process.env.IS_DEVNET === 'true';
 
-  if (process.env.IS_DEVNET === 'true') {
+  const providerOptions = {
+    nodeUrl: process.env.TEST_RPC_URL,
     // accelerate the tests when running locally
-    const originalWaitForTransaction = provider.waitForTransaction.bind(provider);
-    provider.waitForTransaction = (txHash: string, options: waitForTransactionOptions = {}) => {
-      return originalWaitForTransaction(txHash, { retryInterval: 1000, ...options });
-    };
-  }
-
-  return provider;
+    ...(isDevnet && { transactionRetryIntervalFallback: 1000 }),
+  };
+  return isProvider ? new Provider(providerOptions) : new RpcProvider(providerOptions);
 }
 
 export const TEST_TX_VERSION = process.env.TX_VERSION === 'v3' ? ETransactionVersion.V3 : undefined;
@@ -108,11 +100,28 @@ export const createBlockForDevnet = async (): Promise<void> => {
   await fetch(new URL('/create_block', process.env.TEST_RPC_URL), { method: 'POST' });
 };
 
+export async function waitNextBlock(provider: RpcProvider, delay: number) {
+  const initBlock = await provider.getBlockNumber();
+  createBlockForDevnet();
+  let isNewBlock: boolean = false;
+  while (!isNewBlock) {
+    // eslint-disable-next-line no-await-in-loop
+    const currentBlock = await provider.getBlockNumber();
+    if (currentBlock !== initBlock) {
+      isNewBlock = true;
+    } else {
+      // eslint-disable-next-line no-await-in-loop
+      await wait(delay);
+    }
+  }
+}
+
 const describeIf = (condition: boolean) => (condition ? describe : describe.skip);
 export const describeIfRpc = describeIf(process.env.IS_RPC === 'true');
 export const describeIfNotDevnet = describeIf(process.env.IS_DEVNET === 'false');
 export const describeIfDevnet = describeIf(process.env.IS_DEVNET === 'true');
 export const describeIfTestnet = describeIf(process.env.IS_TESTNET === 'true');
-
 export const erc20ClassHash = '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a';
 export const wrongClassHash = '0x000000000000000000000000000000000000000000000000000000000000000';
+export const devnetETHtokenAddress =
+  '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';

@@ -375,8 +375,12 @@ describe('deploy and test Wallet', () => {
     };
     const details = { maxFee: 0n };
 
-    await expect(account.execute(transaction, details)).rejects.toThrow(/zero/);
-    await expect(account.execute(transaction, undefined, details)).rejects.toThrow(/zero/);
+    await expect(account.execute(transaction, details)).rejects.toThrow(
+      /zero|Transaction must commit to pay a positive amount on fee./
+    );
+    await expect(account.execute(transaction, undefined, details)).rejects.toThrow(
+      /zero|Transaction must commit to pay a positive amount on fee./
+    );
   });
 
   test('execute with custom nonce', async () => {
@@ -415,28 +419,44 @@ describe('deploy and test Wallet', () => {
     expect(toBigInt(response.number as string).toString()).toStrictEqual('57');
   });
 
-  test('sign and verify EIP712 message fail', async () => {
-    const signature = await account.signMessage(typedDataExample);
-    const [r, s] = stark.formatSignature(signature);
+  describeIfDevnet('EIP712 verification', () => {
+    // currently only in Devnet-rs, because can fail in Sepolia.
+    // to test in all cases once PR#989 implemented.
+    test('sign and verify EIP712 message fail', async () => {
+      const signature = await account.signMessage(typedDataExample);
+      const [r, s] = stark.formatSignature(signature);
 
-    // change the signature to make it invalid
-    const r2 = toBigInt(r) + 123n;
+      // change the signature to make it invalid
+      const r2 = toBigInt(r) + 123n;
 
-    const signature2 = new Signature(toBigInt(r2.toString()), toBigInt(s));
+      const signature2 = new Signature(toBigInt(r2.toString()), toBigInt(s));
 
-    if (!signature2) return;
+      if (!signature2) return;
 
-    const verifMessageResponse: boolean = await account.verifyMessage(typedDataExample, signature2);
-    expect(verifMessageResponse).toBe(false);
+      const verifMessageResponse: boolean = await account.verifyMessage(
+        typedDataExample,
+        signature2
+      );
+      expect(verifMessageResponse).toBe(false);
 
-    const wrongAccount = new Account(provider, '0x037891', '0x026789', undefined, TEST_TX_VERSION); // non existing account
-    await expect(wrongAccount.verifyMessage(typedDataExample, signature2)).rejects.toThrow();
-  });
+      const wrongAccount = new Account(
+        provider,
+        '0x037891',
+        '0x026789',
+        undefined,
+        TEST_TX_VERSION
+      ); // non existing account
+      await expect(wrongAccount.verifyMessage(typedDataExample, signature2)).rejects.toThrow();
+    });
 
-  test('sign and verify message', async () => {
-    const signature = await account.signMessage(typedDataExample);
-    const verifMessageResponse: boolean = await account.verifyMessage(typedDataExample, signature);
-    expect(verifMessageResponse).toBe(true);
+    test('sign and verify message', async () => {
+      const signature = await account.signMessage(typedDataExample);
+      const verifMessageResponse: boolean = await account.verifyMessage(
+        typedDataExample,
+        signature
+      );
+      expect(verifMessageResponse).toBe(true);
+    });
   });
 
   describe('Contract interaction with Account', () => {

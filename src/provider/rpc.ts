@@ -1,6 +1,7 @@
-import { ProviderInterface } from './interface';
-import { LibraryError } from './errors';
-import { RpcChannel, RPC06, RPC07 } from '../channel';
+import type { SPEC } from 'starknet-types-07';
+import { bytesToHex } from '@noble/curves/abstract/utils';
+import { keccak_256 } from '@noble/hashes/sha3';
+import { RPC06, RPC07, RpcChannel } from '../channel';
 import {
   AccountInvocations,
   BigNumberish,
@@ -8,10 +9,12 @@ import {
   BlockIdentifier,
   BlockTag,
   Call,
+  ContractClassResponse,
   ContractVersion,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
   GetBlockResponse,
+  GetTxReceiptResponseWithoutHelper,
   Invocation,
   InvocationsDetailsWithNonce,
   PendingBlock,
@@ -25,12 +28,18 @@ import {
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
   waitForTransactionOptions,
-  GetTxReceiptResponseWithoutHelper,
 } from '../types';
 import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { isSierra } from '../utils/contract';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
-import { ReceiptTx, GetTransactionReceiptResponse } from '../utils/transactionReceipt';
+import { GetTransactionReceiptResponse, ReceiptTx } from '../utils/transactionReceipt';
+import type { TransactionWithHash } from '../types/provider/spec';
+import assert from '../utils/assert';
+import { hexToBytes, toHex } from '../utils/num';
+import { addHexPrefix, removeHexPrefix } from '../utils/encode';
+import { wait } from '../utils/provider';
+import { LibraryError } from './errors';
+import { ProviderInterface } from './interface';
 
 export class RpcProvider implements ProviderInterface {
   private responseParser: RPCResponseParser;
@@ -100,10 +109,73 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getBlockWithTxs(blockIdentifier);
   }
 
+  /**
+   * Pause the execution of the script until a specified block is created.
+   * @param {BlockIdentifier} blockIdentifier bloc number (BigNumberisk) or 'pending' or 'latest'.
+   * Use of 'latest" or of a block already created will generate no pause.
+   * @param {number} [retryInterval] number of milliseconds between 2 requests to the node
+   * @example
+   * ```typescript
+   * await myProvider.waitForBlock();
+   * // wait the creation of the pending block
+   * ```
+   */
+  public async waitForBlock(
+    blockIdentifier: BlockIdentifier = 'pending',
+    retryInterval: number = 5000
+  ) {
+    if (blockIdentifier === BlockTag.latest) return;
+    const currentBlock = await this.getBlockNumber();
+    const targetBlock =
+      blockIdentifier === BlockTag.pending
+        ? currentBlock + 1
+        : Number(toHex(blockIdentifier as BigNumberish));
+    if (targetBlock <= currentBlock) return;
+    const { retries } = this.channel;
+    let retriesCount = retries;
+    let isTargetBlock: boolean = false;
+    while (!isTargetBlock) {
+      // eslint-disable-next-line no-await-in-loop
+      const currBlock = await this.getBlockNumber();
+      if (currBlock === targetBlock) {
+        isTargetBlock = true;
+      } else {
+        // eslint-disable-next-line no-await-in-loop
+        await wait(retryInterval);
+      }
+      retriesCount -= 1;
+      if (retriesCount <= 0) {
+        throw new Error(`waitForBlock() timed-out after ${retries} tries.`);
+      }
+    }
+  }
+
   public async getL1GasPrice(blockIdentifier?: BlockIdentifier) {
     return this.channel
       .getBlockWithTxHashes(blockIdentifier)
       .then(this.responseParser.parseL1GasPriceResponse);
+  }
+
+  public async getL1MessageHash(l2TxHash: BigNumberish) {
+    const transaction = (await this.channel.getTransactionByHash(l2TxHash)) as TransactionWithHash;
+    assert(transaction.type === 'L1_HANDLER', 'This L2 transaction is not a L1 message.');
+    const { calldata, contract_address, entry_point_selector, nonce } =
+      transaction as SPEC.L1_HANDLER_TXN;
+    const params = [
+      calldata[0],
+      contract_address,
+      nonce,
+      entry_point_selector,
+      calldata.length - 1,
+      ...calldata.slice(1),
+    ];
+    const myEncode = addHexPrefix(
+      params.reduce(
+        (res: string, par: BigNumberish) => res + removeHexPrefix(toHex(par)).padStart(64, '0'),
+        ''
+      )
+    );
+    return addHexPrefix(bytesToHex(keccak_256(hexToBytes(myEncode))));
   }
 
   public async getBlockWithReceipts(blockIdentifier?: BlockIdentifier) {
@@ -175,7 +247,7 @@ export class RpcProvider implements ProviderInterface {
 
   /**
    * @param invocations AccountInvocations
-   * @param simulateTransactionOptions blockIdentifier and flags to skip validation and fee charge<br/>
+   * @param options blockIdentifier and flags to skip validation and fee charge<br/>
    * - blockIdentifier<br/>
    * - skipValidate (default false)<br/>
    * - skipFeeCharge (default true)<br/>
@@ -198,6 +270,7 @@ export class RpcProvider implements ProviderInterface {
       txHash,
       options
     )) as GetTxReceiptResponseWithoutHelper;
+
     return new ReceiptTx(receiptWoHelper) as GetTransactionReceiptResponse;
   }
 
@@ -248,7 +321,7 @@ export class RpcProvider implements ProviderInterface {
       compiler = true,
     }: getContractVersionOptions = {}
   ): Promise<ContractVersion> {
-    let contractClass;
+    let contractClass: ContractClassResponse;
     if (contractAddress) {
       contractClass = await this.getClassAt(contractAddress, blockIdentifier);
     } else if (classHash) {
