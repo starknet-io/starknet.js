@@ -76,7 +76,7 @@ const revisionConfiguration: Record<Revision, Configuration> = {
  *
  * @example
  * ```typescript
- * let result1;
+ * const result1;
  * try {
  *     assertRange('10', 'felt', { min: BigInt(0), max: BigInt(100) });
  *     result1 = 'No error';
@@ -85,7 +85,7 @@ const revisionConfiguration: Record<Revision, Configuration> = {
  * }
  * // result1 = 'No error'
  *
- * let result2;
+ * const result2;
  * try {
  *     assertRange('200', 'felt', { min: BigInt(0), max: BigInt(100) });
  *     result2 = 'No error';
@@ -113,7 +113,7 @@ function assertRange(data: unknown, type: string, { min, max }: { min: bigint; m
  *   revision: 'Active'
  * };
  *
- * let result1;
+ * const result1;
  * const revision1 = identifyRevision(typedData);
  * result1 = revision1 === Revision.Active ? 'Active revision identified' : 'Revision not identified or not active';
  * // result1 = 'Active revision identified'
@@ -122,7 +122,7 @@ function assertRange(data: unknown, type: string, { min, max }: { min: bigint; m
  *   revision: 'Inactive'
  * };
  *
- * let result2;
+ * const result2;
  * const revision2 = identifyRevision(invalidTypedData);
  * result2 = revision2 === Revision.Active ? 'Active revision identified' : 'Revision not identified or not active';
  * // result2 = 'Revision not identified or not active'
@@ -151,7 +151,7 @@ function identifyRevision({ types, domain }: TypedData) {
  *
  * @example
  * ```typescript
- * let result1;
+ * const result1;
  * try {
  *     const hexValue = getHex(123);
  *     result1 = hexValue;
@@ -160,7 +160,7 @@ function identifyRevision({ types, domain }: TypedData) {
  * }
  * // result1 = "0x7b"
  *
- * let result2;
+ * const result2;
  * try {
  *     const hexString = getHex("0x1a");
  *     result2 = hexString;
@@ -204,12 +204,12 @@ function getHex(value: BigNumberish): string {
  *   message: {}
  * };
  *
- * let result1;
+ * const result1;
  * const isValid1 = validateTypedData(validTypedData);
  * result1 = isValid1 ? 'Typed data is valid' : 'Typed data is invalid';
  * // result1 = 'Typed data is valid'
  *
- * let result2;
+ * const result2;
  * const isValid2 = validateTypedData(invalidTypedData);
  * result2 = isValid2 ? 'Typed data is valid' : 'Typed data is invalid';
  * // result2 = 'Typed data is invalid'
@@ -231,12 +231,12 @@ function validateTypedData(data: unknown): data is TypedData {
  *
  * @example
  * ```typescript
- * let result1;
+ * const result1;
  * const preparedSelector1 = prepareSelector('0x1');
  * result1 = preparedSelector1;
  * // result1 = '0x1'
  *
- * let result2;
+ * const result2;
  * const preparedSelector2 = prepareSelector('someFunction');
  * result2 = preparedSelector2;
  * // result2 = '0xsomecomputedvalue' (actual output will vary)
@@ -254,7 +254,7 @@ export function prepareSelector(selector: string): string {
  *
  * @example
  * ```typescript
- * let result1;
+ * const result1;
  * const merkleType = {
  *   name: 'MerkleTree',
  *   fields: [
@@ -266,7 +266,7 @@ export function prepareSelector(selector: string): string {
  * result1 = isMerkle1;
  * // result1 = true
  *
- * let result2;
+ * const result2;
  * const nonMerkleType = {
  *   name: 'RegularStruct',
  *   fields: [
@@ -305,7 +305,7 @@ export function isMerkleTreeType(type: StarknetType): type is StarknetMerkleType
  *   ]
  * };
  *
- * let result;
+ * const result;
  * const deps = getDependencies(types, 'MyStruct');
  * result = deps;
  * // result = ['MyStruct', 'AnotherStruct']
@@ -360,7 +360,7 @@ export function getDependencies(
  *
  * @example
  * ```typescript
- * let result1;
+ * const result1;
  * try {
  *     const merkleTreeType = getMerkleTreeType(typedData.types, { parent: 'MyStruct', key: 'merkleField' });
  *     result1 = merkleTreeType;
@@ -369,7 +369,7 @@ export function getDependencies(
  * }
  * // result1 = 'MerkleType'
  *
- * let result2;
+ * const result2;
  * try {
  *     const invalidMerkleTreeType = getMerkleTreeType(typedData.types, { parent: 'InvalidStruct', key: 'invalidField' });
  *     result2 = invalidMerkleTreeType;
@@ -418,7 +418,7 @@ function getMerkleTreeType(types: TypedData['types'], ctx: Context) {
  *   }
  * };
  *
- * let result;
+ * const result;
  * const encodedType = encodeType(typedData.types, 'MyStruct');
  * result = encodedType;
  * // result = 'MyStruct(field1:felt,field2:AnotherStruct)'
@@ -488,7 +488,7 @@ export function encodeType(
  *   }
  * };
  *
- * let result;
+ * const result;
  * const typeHash = getTypeHash(typedData.types, 'MyStruct');
  * result = typeHash;
  * // result = '0x5f3cfe24eb9cba5f0e80bcacb8b2d8cdccb1c71f9ff71ec7e02a77c0cbe32e61'
@@ -527,12 +527,12 @@ export function getTypeHash(
  *   }
  * };
  *
- * let result1;
+ * const result1;
  * const encodedValue1 = encodeValue(typedData.types, 'u256', '12345');
  * result1 = encodedValue1;
  * // result1 = ['u256', '0x3039']
  *
- * let result2;
+ * const result2;
  * const encodedValue2 = encodeValue(typedData.types, 'string', 'Hello');
  * result2 = encodedValue2;
  * // result2 = ['string', '0x48656c6c6f']
@@ -693,12 +693,12 @@ export function encodeValue(
  *   }
  * };
  *
- * let result1;
+ * const result1;
  * const encodedData1 = encodeData(typedData.types, 'MyStruct', typedData.message);
  * result1 = encodedData1;
  * // result1 = [['felt', 'AnotherStruct'], ['0x123', '0x456']]
  *
- * let result2;
+ * const result2;
  * const encodedData2 = encodeData(typedData.types, 'AnotherStruct', { fieldA: '0x789' });
  * result2 = encodedData2;
  * // result2 = [['felt'], ['0x789']]
@@ -749,7 +749,7 @@ export function encodeData<T extends TypedData>(
  * @example
  * ```typescript
  * const structHash = getStructHash(typedData.types, 'MyStruct', typedData.message);
- * let result;
+ * const result;
  * result = structHash;
  * // result = '0xabc123...'
  * ```
@@ -773,7 +773,7 @@ export function getStructHash<T extends TypedData>(
  *
  * @example
  * ```typescript
- * let result1;
+ * const result1;
  * try {
  *     const messageHash1 = getMessageHash(typedData, '0x123');
  *     result1 = messageHash1;
@@ -782,7 +782,7 @@ export function getStructHash<T extends TypedData>(
  * }
  * // result1 = '0xabc123...'
  *
- * let result2;
+ * const result2;
  * try {
  *     const messageHash2 = getMessageHash(invalidTypedData, '0x123');
  *     result2 = messageHash2;
