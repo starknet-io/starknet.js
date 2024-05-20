@@ -114,9 +114,9 @@ function validateTypedData(data: unknown): data is TypedData {
  * // result1 = '0x1'
  *
  * const result2;
- * const preparedSelector2 = prepareSelector('someFunction');
+ * const preparedSelector2 = prepareSelector('myFunction');
  * result2 = preparedSelector2;
- * // result2 = '0xsomecomputedvalue' (actual output will vary)
+ * // result2 = '0x8bb83e7e'
  * ```
  */
 export function prepareSelector(selector: string): string {
