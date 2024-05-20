@@ -64,70 +64,10 @@ const revisionConfiguration: Record<Revision, Configuration> = {
   },
 };
 
-/**
- * Asserts that the given data is within the specified range.
- *
- * @param {unknown} data - The data to check.
- * @param {string} type - The type of the data.
- * @param {Object} range - The range object containing min and max values.
- * @param {bigint} range.min - The minimum value of the range.
- * @param {bigint} range.max - The maximum value of the range.
- * @throws Will throw an error if the data is out of the specified range.
- *
- * @example
- * ```typescript
- * const result1;
- * try {
- *     assertRange('10', 'felt', { min: BigInt(0), max: BigInt(100) });
- *     result1 = 'No error';
- * } catch (error) {
- *     result1 = error.message;
- * }
- * // result1 = 'No error'
- *
- * const result2;
- * try {
- *     assertRange('200', 'felt', { min: BigInt(0), max: BigInt(100) });
- *     result2 = 'No error';
- * } catch (error) {
- *     result2 = error.message;
- * }
- * // result2 = '200 (felt) is out of bounds [0, 100]'
- * ```
- */
-
 function assertRange(data: unknown, type: string, { min, max }: { min: bigint; max: bigint }) {
   const value = BigInt(data as string);
   assert(value >= min && value <= max, `${value} (${type}) is out of bounds [${min}, ${max}]`);
 }
-
-/**
- * Identifies the revision of the given TypedData.
- *
- * @param {TypedData} data - The TypedData object.
- * @returns {Revision | undefined} The identified revision, or undefined if not found.
- *
- * @example
- * ```typescript
- * const typedData = {
- *   revision: 'Active'
- * };
- *
- * const result1;
- * const revision1 = identifyRevision(typedData);
- * result1 = revision1 === Revision.Active ? 'Active revision identified' : 'Revision not identified or not active';
- * // result1 = 'Active revision identified'
- *
- * const invalidTypedData = {
- *   revision: 'Inactive'
- * };
- *
- * const result2;
- * const revision2 = identifyRevision(invalidTypedData);
- * result2 = revision2 === Revision.Active ? 'Active revision identified' : 'Revision not identified or not active';
- * // result2 = 'Revision not identified or not active'
- * ```
- */
 
 function identifyRevision({ types, domain }: TypedData) {
   if (revisionConfiguration[Revision.Active].domain in types && domain.revision === Revision.Active)
@@ -142,35 +82,6 @@ function identifyRevision({ types, domain }: TypedData) {
   return undefined;
 }
 
-/**
- * Converts a BigNumberish value to a hexadecimal string.
- *
- * @param {BigNumberish} value - The value to convert.
- * @returns {string} The hexadecimal representation of the value.
- * @throws Will throw an error if the value is not a valid BigNumberish.
- *
- * @example
- * ```typescript
- * const result1;
- * try {
- *     const hexValue = getHex(123);
- *     result1 = hexValue;
- * } catch (error) {
- *     result1 = error.message;
- * }
- * // result1 = "0x7b"
- *
- * const result2;
- * try {
- *     const hexString = getHex("0x1a");
- *     result2 = hexString;
- * } catch (error) {
- *     result2 = error.message;
- * }
- * // result2 = "0x1a"
- * ```
- */
-
 function getHex(value: BigNumberish): string {
   try {
     return toHex(value);
@@ -181,40 +92,6 @@ function getHex(value: BigNumberish): string {
     throw new Error(`Invalid BigNumberish: ${value}`);
   }
 }
-
-/**
- * Validates that the given data matches the EIP-712 JSON schema.
- *
- * @param {unknown} data - The data to validate.
- * @returns {boolean} True if the data matches the schema, false otherwise.
- *
- * @example
- * ```typescript
- * const validTypedData = {
- *   types: { EIP712Domain: [{ name: 'name', type: 'string' }] },
- *   primaryType: 'EIP712Domain',
- *   domain: { name: 'MyDapp' },
- *   message: { name: 'Alice' }
- * };
- *
- * const invalidTypedData = {
- *   types: {},
- *   primaryType: 'EIP712Domain',
- *   domain: {},
- *   message: {}
- * };
- *
- * const result1;
- * const isValid1 = validateTypedData(validTypedData);
- * result1 = isValid1 ? 'Typed data is valid' : 'Typed data is invalid';
- * // result1 = 'Typed data is valid'
- *
- * const result2;
- * const isValid2 = validateTypedData(invalidTypedData);
- * result2 = isValid2 ? 'Typed data is valid' : 'Typed data is invalid';
- * // result2 = 'Typed data is invalid'
- * ```
- */
 
 function validateTypedData(data: unknown): data is TypedData {
   const typedData = data as TypedData;
@@ -349,36 +226,6 @@ export function getDependencies(
     ),
   ];
 }
-
-/**
- * Gets the Merkle tree type for the given context.
- *
- * @param {TypedData['types']} types - The types object containing all defined types.
- * @param {Context} ctx - The context containing parent and key information.
- * @returns {string} The Merkle tree type.
- * @throws Will throw an error if the context is not a Merkle tree or if the Merkle tree contains property is an array.
- *
- * @example
- * ```typescript
- * const result1;
- * try {
- *     const merkleTreeType = getMerkleTreeType(typedData.types, { parent: 'MyStruct', key: 'merkleField' });
- *     result1 = merkleTreeType;
- * } catch (error) {
- *     result1 = error.message;
- * }
- * // result1 = 'MerkleType'
- *
- * const result2;
- * try {
- *     const invalidMerkleTreeType = getMerkleTreeType(typedData.types, { parent: 'InvalidStruct', key: 'invalidField' });
- *     result2 = invalidMerkleTreeType;
- * } catch (error) {
- *     result2 = error.message;
- * }
- * // result2 = 'Error message describing why the context is not a Merkle tree or why it contains an array property'
- * ```
- */
 
 function getMerkleTreeType(types: TypedData['types'], ctx: Context) {
   if (ctx.parent && ctx.key) {
