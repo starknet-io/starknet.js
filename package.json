@@ -36,7 +36,9 @@
     "info:version": "npm pkg get version | xargs",
     "format": "prettier --log-level log --write \"**/*.{ts,js,md,yml,json}\"",
     "lint": "eslint . --cache --fix --ext .ts",
-    "ts:check": "tsc --noEmit --resolveJsonModule --project tsconfig.eslint.json"
+    "ts:check": "tsc --noEmit --resolveJsonModule --project tsconfig.eslint.json",
+    "ts:coverage": "type-coverage --at-least 95",
+    "ts:coverage:report": "typescript-coverage-report"
   },
   "keywords": [
     "starknet",
@@ -86,21 +88,25 @@
     "prettier-plugin-import-sort": "^0.0.7",
     "semantic-release": "^23.0.5",
     "tsup": "^8.0.2",
+    "type-coverage": "^2.28.2",
     "typedoc": "^0.25.7",
-    "typescript": "~5.4.0"
+    "typescript": "~5.4.0",
+    "typescript-coverage-report": "^1.0.0"
   },
   "dependencies": {
     "@noble/curves": "~1.4.0",
+    "@noble/hashes": "^1.4.0",
     "@scure/base": "~1.1.3",
     "@scure/starknet": "~1.0.0",
     "abi-wan-kanabi": "^2.2.2",
     "fetch-cookie": "^3.0.0",
+    "get-starknet-core": "^4.0.0-next.3",
     "isomorphic-fetch": "^3.0.0",
     "lossless-json": "^4.0.1",
     "pako": "^2.0.4",
+    "starknet-types-07": "npm:starknet-types@^0.7.2",
     "ts-mixer": "^6.0.3",
-    "url-join": "^4.0.1",
-    "starknet-types-07": "npm:starknet-types@^0.7.2"
+    "url-join": "^4.0.1"
   },
   "lint-staged": {
     "*.ts": "eslint --cache --fix",

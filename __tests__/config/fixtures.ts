@@ -5,6 +5,7 @@ import { Account, Provider, ProviderInterface, RpcProvider, json } from '../../s
 import { CompiledSierra, CompiledSierraCasm, LegacyCompiledContract } from '../../src/types';
 import { ETransactionVersion } from '../../src/types/api';
 import { toHex } from '../../src/utils/num';
+import { wait } from '../../src/utils/provider';
 
 const readContract = (name: string): LegacyCompiledContract =>
   json.parse(
@@ -99,11 +100,28 @@ export const createBlockForDevnet = async (): Promise<void> => {
   await fetch(new URL('/create_block', process.env.TEST_RPC_URL), { method: 'POST' });
 };
 
+export async function waitNextBlock(provider: RpcProvider, delay: number) {
+  const initBlock = await provider.getBlockNumber();
+  createBlockForDevnet();
+  let isNewBlock: boolean = false;
+  while (!isNewBlock) {
+    // eslint-disable-next-line no-await-in-loop
+    const currentBlock = await provider.getBlockNumber();
+    if (currentBlock !== initBlock) {
+      isNewBlock = true;
+    } else {
+      // eslint-disable-next-line no-await-in-loop
+      await wait(delay);
+    }
+  }
+}
+
 const describeIf = (condition: boolean) => (condition ? describe : describe.skip);
 export const describeIfRpc = describeIf(process.env.IS_RPC === 'true');
 export const describeIfNotDevnet = describeIf(process.env.IS_DEVNET === 'false');
 export const describeIfDevnet = describeIf(process.env.IS_DEVNET === 'true');
 export const describeIfTestnet = describeIf(process.env.IS_TESTNET === 'true');
-
 export const erc20ClassHash = '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a';
 export const wrongClassHash = '0x000000000000000000000000000000000000000000000000000000000000000';
+export const devnetETHtokenAddress =
+  '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
