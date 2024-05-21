@@ -7,7 +7,7 @@ import { cleanHex } from './num';
  * create DeployContractResponse compatible response with addition of the UDC Event data
  *
  * @param {InvokeTransactionReceiptResponse} txReceipt
- * @return {ReturnType<typeof parseUDCEvent>} Object including DeployContractResponse and UDC Event data
+ * @return {object} Object including DeployContractResponse and UDC Event data
  * @example
  * ```typescript
  * const deployment = await account.deploy({
