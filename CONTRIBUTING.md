@@ -104,7 +104,7 @@ For major changes that markedly transform the existing API or significantly alte
 - Don’t commit generated files, like minified JavaScript.
 - Don’t change the version number or changelog.
 - Use `npm run test:coverage` for a complete project test coverage.
-- Use for example `npx jest -i __tests__/utils/uint256.test.ts  --coverage` for a single file coverage.
+- Use for example `npm run test:coverage __tests__/utils/uint256.test.ts` for a single file coverage.
 - Use `npm run ts:coverage` to check the global type coverage rate and `npm run ts:coverage:report` to generate a complete report (summary displayed in the console, full HTML report available in the `coverage-ts` folder by launching `./coverage-ts/index.html` in your browser) and find files having low coverage.
 
 ## Need help?
