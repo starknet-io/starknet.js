@@ -21,6 +21,7 @@ import { isString } from './shortString';
  * @example
  * ```typescript
  * const result = isSierra(contract);
+ * // result = true | false
  * ```
  */
 export function isSierra(
@@ -39,6 +40,12 @@ export function isSierra(
  * @example
  * ```typescript
  * const result = extractContractHashes(contract);
+ * // result = {
+ * //   contract: ...,
+ * //   classHash: ...,
+ * //   casm: ...,
+ * //   compiledClassHash: ...,
+ * // }
  * ```
  */
 export function extractContractHashes(

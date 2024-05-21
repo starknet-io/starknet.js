@@ -22,6 +22,17 @@ import { cleanHex } from './num';
  * });
  * const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
  * const udcEvent = parseUDCEvent(txReceipt as any);
+ * // udcEvent = {
+ * //   transaction_hash: ...,
+ * //   contract_address: ...,
+ * //   address: ...,
+ * //   deployer: ...,
+ * //   unique: ...,
+ * //   classHash: ...,
+ * //   calldata_len: ...,
+ * //   calldata: ...,
+ * //   salt: ...,
+ * // }
  * ```
  */
 export function parseUDCEvent(txReceipt: InvokeTransactionReceiptResponse) {
