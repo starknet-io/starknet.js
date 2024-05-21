@@ -1,3 +1,19 @@
+# [6.9.0](https://github.com/starknet-io/starknet.js/compare/v6.8.0...v6.9.0) (2024-05-21)
+
+### Bug Fixes
+
+- cannot infer ts2742 types from starknet-types@0.7 ([#1098](https://github.com/starknet-io/starknet.js/issues/1098)) ([f1c3b8e](https://github.com/starknet-io/starknet.js/commit/f1c3b8e3aeb96f6efb7e512ac3ba689253004c9d))
+- remove [warning] from typedoc for external usage ([#1095](https://github.com/starknet-io/starknet.js/issues/1095)) ([195186f](https://github.com/starknet-io/starknet.js/commit/195186fc2974ab0d164b1a48c68f7bf026329df5)), closes [#1121](https://github.com/starknet-io/starknet.js/issues/1121) [#1126](https://github.com/starknet-io/starknet.js/issues/1126)
+
+### Features
+
+- add type coverage ([#1120](https://github.com/starknet-io/starknet.js/issues/1120)) ([eceda5d](https://github.com/starknet-io/starknet.js/commit/eceda5dc1c39e472e1105e07797e76aaac3c1531))
+- provider.getL1MessageHash ([#1123](https://github.com/starknet-io/starknet.js/issues/1123)) ([1489cf2](https://github.com/starknet-io/starknet.js/commit/1489cf25e7e8598ab161cecc62c82495f64daa33))
+
+### Reverts
+
+- Revert "chore: add examples to JsDoc for transaction.ts file (#1105)" (#1108) ([59eb01e](https://github.com/starknet-io/starknet.js/commit/59eb01e451cf64dfdacd6d34b2a709e0a1029f15)), closes [#1105](https://github.com/starknet-io/starknet.js/issues/1105) [#1108](https://github.com/starknet-io/starknet.js/issues/1108)
+
 # [6.8.0](https://github.com/starknet-io/starknet.js/compare/v6.7.0...v6.8.0) (2024-04-23)
 
 ### Bug Fixes
