@@ -1,14 +1,7 @@
 import * as json from 'lossless-json';
 
 /**
- * Convert string to number or bigint based on size
- * @param str string to parse
- * @return {number | BigInt} parsed number
- * @example
- * ```typescript
- * parseIntAsNumberOrBigInt('1.2'); // 1.2
- * parseIntAsNumberOrBigInt('11223344556677889900'); // 11223344556677890048n
- * ```
+ * Helper to convert string to number or bigint based on size
  */
 const parseIntAsNumberOrBigInt = (str: string) => {
   if (!json.isInteger(str)) return parseFloat(str);
