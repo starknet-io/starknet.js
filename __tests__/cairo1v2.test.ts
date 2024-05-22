@@ -1174,7 +1174,7 @@ describe('Cairo 1', () => {
 
   describe('Cairo2.6.0 Sierra1.5.0', () => {
     test('declare Sierra 1.5.0', async () => {
-      const declare260Response = await account.declare({
+      const declare260Response = await account.declareIfNot({
         contract: compiledC260,
         casm: compiledC260Casm,
       });

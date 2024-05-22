@@ -2,7 +2,7 @@
 import accountResolver from './accountResolver';
 import { GS_DEFAULT_TEST_PROVIDER_URL, LOCAL_DEVNET_NOT_RUNNING_MESSAGE } from '../constants';
 import { setIfNullish } from './env';
-import { BaseUrl } from '../../../src/constants';
+import { RpcProvider } from '../../../src';
 
 class StrategyResolver {
   private isDevnet = false;
@@ -14,7 +14,12 @@ class StrategyResolver {
   }
 
   get isTestnet() {
-    return process.env.TEST_RPC_URL?.includes(BaseUrl.SN_SEPOLIA);
+    const provider = new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL });
+    const isTestnetSepolia = provider
+      .getTransactionByHash('0x28dfc05eb4f261b37ddad451ff22f1d08d4e3c24dc646af0ec69fa20e096819') // one random existing Sepolia transaction hash
+      .then(() => true)
+      .catch(() => false);
+    return isTestnetSepolia;
   }
 
   get hasAllAccountEnvs() {
@@ -47,7 +52,7 @@ class StrategyResolver {
     setIfNullish('IS_DEVNET', this.isRpcDevnet);
   }
 
-  resolveRpc(): void {
+  async resolveRpc(): Promise<void> {
     const hasRpcUrl = !!process.env.TEST_RPC_URL;
 
     this.isRpcNode = hasRpcUrl || this.isDevnet;
@@ -57,7 +62,7 @@ class StrategyResolver {
     }
 
     setIfNullish('IS_RPC', this.isRpcNode);
-    setIfNullish('IS_TESTNET', this.isTestnet);
+    setIfNullish('IS_TESTNET', await this.isTestnet);
 
     console.log('Detected RPC');
   }
@@ -94,10 +99,10 @@ class StrategyResolver {
     }
   }
 
-  private useProvidedSetup(): void {
+  private async useProvidedSetup(): Promise<void> {
     setIfNullish('IS_DEVNET', false);
     setIfNullish('IS_RPC', !!process.env.TEST_RPC_URL);
-    setIfNullish('IS_TESTNET', this.isTestnet);
+    setIfNullish('IS_TESTNET', await this.isTestnet);
 
     this.logConfigInfo();
 
@@ -110,7 +115,7 @@ class StrategyResolver {
     this.verifyAccountData();
 
     if (this.hasAllAccountEnvs) {
-      this.useProvidedSetup();
+      await this.useProvidedSetup();
       return;
     }
 
@@ -118,7 +123,7 @@ class StrategyResolver {
     console.log('Basic test parameters are missing, Auto Setup Started');
 
     await this.detectDevnet();
-    this.resolveRpc();
+    await this.resolveRpc();
     await accountResolver.execute(this.isDevnet);
 
     this.verifyAccountData(true);

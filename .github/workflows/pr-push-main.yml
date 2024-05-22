@@ -40,7 +40,7 @@ jobs:
     strategy:
       max-parallel: 1
       matrix:
-        name: [rpc-goerli]
+        name: [rpc-sepolia]
 
     uses: ./.github/workflows/_test.yml
     secrets:
