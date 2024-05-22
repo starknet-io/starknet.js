@@ -12,6 +12,6 @@ export const supportsInterface = async (
     calldata: [interfaceId],
   };
   // call the contract
-  const result = await provider.callContract(call);
-  return result.length !== 0 && result[0] === '0x01';
+  const resp = await provider.callContract(call);
+  return BigInt(resp[0]) !== 0n;
 };

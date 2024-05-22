@@ -29,6 +29,7 @@ import {
   SimulateTransactionResponse,
   TypedData,
   UniversalDeployerContractPayload,
+  UniversalDetails,
 } from '../types';
 import { EOutsideExecutionVersion, OutsideExecution } from '../types/outsideExecution';
 
@@ -402,6 +403,7 @@ export abstract class AccountInterface extends ProviderInterface {
     outsideExecution: OutsideExecution,
     signature: Signature,
     targetAddress: string,
+    opts: UniversalDetails,
     version?: EOutsideExecutionVersion
   ): Promise<InvokeFunctionResponse>;
 

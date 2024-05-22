@@ -610,11 +610,10 @@ export class Account extends Provider implements AccountInterface {
         calldata: CallData.compile({ nonce }),
       };
 
-      const result = await this.callContract(call);
+      const resp = await this.callContract(call);
 
       // Transforming the result into a boolean value
-      const isValid = result[0] === '0x1';
-      return isValid;
+      return BigInt(resp[0]) !== 0n;
     } catch (error) {
       throw new Error(`Failed to check if nonce is valid: ${error}`);
     }
@@ -624,6 +623,7 @@ export class Account extends Provider implements AccountInterface {
     outsideExecution: OutsideExecution,
     signature: Signature,
     targetAddress: string,
+    opts: UniversalDetails,
     version?: EOutsideExecutionVersion | undefined
   ): Promise<{ transaction_hash: string }> {
     // if the version is not specified, try to determine the latest supported version
@@ -647,9 +647,6 @@ export class Account extends Provider implements AccountInterface {
       contractAddress: targetAddress,
       entrypoint,
       calldata: buildExecuteFromOutsideCallData(outsideExecution, signature),
-    };
-    const opts = {
-      maxFee: 7000000000000, // 0.000007 ETH
     };
     // execute the call
     return this.execute(call, opts);

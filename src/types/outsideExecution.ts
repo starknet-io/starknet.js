@@ -1,3 +1,4 @@
+import { CallData } from '../utils/calldata';
 import { getSelectorFromName } from '../utils/selector';
 import { encodeShortString } from '../utils/shortString';
 import { BigNumberish, Call, RawArgs } from './lib';
@@ -64,7 +65,7 @@ export const OutsideExecutionTypesV2 = {
   ],
 };
 
-export declare enum EOutsideExecutionVersion {
+export enum EOutsideExecutionVersion {
   V1 = '1',
   V2 = '2',
 }
@@ -135,10 +136,12 @@ function getDomain(chainId: string, version: EOutsideExecutionVersion) {
 // converts a Call object to an OutsideCall object that can be used in the OutsideExecution object
 // TODO maybe just use the Call object directly?
 function getOutsideCall(call: Call): OutsideCall {
+  const callData = call.calldata ?? [];
+  const callDataCompiled = Array.isArray(callData) ? callData : CallData.compile(callData);
   return {
     to: call.contractAddress,
     selector: getSelectorFromName(call.entrypoint),
-    calldata: call.calldata ?? [],
+    calldata: callDataCompiled,
   };
 }
 
