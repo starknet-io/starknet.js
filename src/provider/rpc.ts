@@ -124,10 +124,10 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier = 'pending',
     retryInterval: number = 5000
   ) {
-    if (blockIdentifier === BlockTag.latest) return;
+    if (blockIdentifier === BlockTag.LATEST) return;
     const currentBlock = await this.getBlockNumber();
     const targetBlock =
-      blockIdentifier === BlockTag.pending
+      blockIdentifier === BlockTag.PENDING
         ? currentBlock + 1
         : Number(toHex(blockIdentifier as BigNumberish));
     if (targetBlock <= currentBlock) return;
