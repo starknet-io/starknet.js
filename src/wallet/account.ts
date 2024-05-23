@@ -1,8 +1,10 @@
-import type {
-  AccountChangeEventHandler,
-  AddStarknetChainParameters,
-  NetworkChangeEventHandler,
-  WatchAssetParameters,
+import {
+  type AccountChangeEventHandler,
+  type AddStarknetChainParameters,
+  type NetworkChangeEventHandler,
+  type WatchAssetParameters,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  type SPEC,
 } from 'starknet-types-07';
 
 import { Account, AccountInterface } from '../account';

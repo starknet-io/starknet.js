@@ -116,7 +116,6 @@ export function useEncoded(decoded: string): bigint {
 
 export const StarknetIdContract = {
   MAINNET: '0x6ac597f8116f886fa1c97a23fa4e08299975ecaf6b598873ca6792b9bbfb678',
-  TESTNET: '0x3bab268e932d2cecd1946f100ae67ce3dff9fd234119ea2f6da57d16d29fce',
   TESTNET_SEPOLIA: '0x0707f09bc576bd7cfee59694846291047e965f4184fe13dac62c56759b3b6fa7',
 } as const;
 
@@ -132,9 +131,6 @@ export function getStarknetIdContract(chainId: StarknetChainId): string {
     case StarknetChainId.SN_MAIN:
       return StarknetIdContract.MAINNET;
 
-    case StarknetChainId.SN_GOERLI:
-      return StarknetIdContract.TESTNET;
-
     case StarknetChainId.SN_SEPOLIA:
       return StarknetIdContract.TESTNET_SEPOLIA;
 
@@ -145,7 +141,6 @@ export function getStarknetIdContract(chainId: StarknetChainId): string {
 
 export const StarknetIdIdentityContract = {
   MAINNET: '0x05dbdedc203e92749e2e746e2d40a768d966bd243df04a6b712e222bc040a9af',
-  TESTNET: '0x783a9097b26eae0586373b2ce0ed3529ddc44069d1e0fbc4f66d42b69d6850d',
   TESTNET_SEPOLIA: '0x070DF8B4F5cb2879f8592849fA8f3134da39d25326B8558cc9C8FE8D47EA3A90',
 } as const;
 
@@ -162,9 +157,6 @@ export function getStarknetIdIdentityContract(chainId: StarknetChainId): string 
   switch (chainId) {
     case StarknetChainId.SN_MAIN:
       return StarknetIdIdentityContract.MAINNET;
-
-    case StarknetChainId.SN_GOERLI:
-      return StarknetIdIdentityContract.TESTNET;
 
     case StarknetChainId.SN_SEPOLIA:
       return StarknetIdIdentityContract.TESTNET_SEPOLIA;
@@ -189,9 +181,6 @@ export function getStarknetIdMulticallContract(chainId: StarknetChainId): string
     case StarknetChainId.SN_MAIN:
       return StarknetIdMulticallContract;
 
-    case StarknetChainId.SN_GOERLI:
-      return StarknetIdMulticallContract;
-
     case StarknetChainId.SN_SEPOLIA:
       return StarknetIdMulticallContract;
 
@@ -202,7 +191,6 @@ export function getStarknetIdMulticallContract(chainId: StarknetChainId): string
 
 export const StarknetIdVerifierContract = {
   MAINNET: '0x07d14dfd8ee95b41fce179170d88ba1f0d5a512e13aeb232f19cfeec0a88f8bf',
-  TESTNET: '0x057c942544063c3aea6ea6c37009cc9d1beacd750cb6801549a129c7265f0f11',
   TESTNET_SEPOLIA: '0x0182EcE8173C216A395f4828e1523541b7e3600bf190CB252E1a1A0cE219d184',
 } as const;
 
@@ -218,9 +206,6 @@ export function getStarknetIdVerifierContract(chainId: StarknetChainId): string 
     case StarknetChainId.SN_MAIN:
       return StarknetIdVerifierContract.MAINNET;
 
-    case StarknetChainId.SN_GOERLI:
-      return StarknetIdVerifierContract.TESTNET;
-
     case StarknetChainId.SN_SEPOLIA:
       return StarknetIdVerifierContract.TESTNET_SEPOLIA;
 
@@ -231,7 +216,6 @@ export function getStarknetIdVerifierContract(chainId: StarknetChainId): string 
 
 export const StarknetIdPfpContract = {
   MAINNET: '0x070aaa20ec4a46da57c932d9fd89ca5e6bb9ca3188d3df361a32306aff7d59c7',
-  TESTNET: '0x03cac3228b434259734ee0e4ff445f642206ea11adace7e4f45edd2596748698',
   TESTNET_SEPOLIA: '0x058061bb6bdc501eE215172c9f87d557C1E0f466dC498cA81b18f998Bf1362b2',
 } as const;
 
@@ -247,9 +231,6 @@ export function getStarknetIdPfpContract(chainId: StarknetChainId): string {
     case StarknetChainId.SN_MAIN:
       return StarknetIdPfpContract.MAINNET;
 
-    case StarknetChainId.SN_GOERLI:
-      return StarknetIdPfpContract.TESTNET;
-
     case StarknetChainId.SN_SEPOLIA:
       return StarknetIdPfpContract.TESTNET_SEPOLIA;
 
@@ -262,7 +243,6 @@ export function getStarknetIdPfpContract(chainId: StarknetChainId): string {
 
 export const StarknetIdPopContract = {
   MAINNET: '0x0293eb2ba9862f762bd3036586d5755a782bd22e6f5028320f1d0405fd47bff4',
-  TESTNET: '0x03528caf090179e337931ee669a5b0214041e1bae30d460ff07d2cea2c7a9106',
   TESTNET_SEPOLIA: '0x0023FE3b845ed5665a9eb3792bbB17347B490EE4090f855C1298d03BB5F49B49',
 } as const;
 
@@ -277,9 +257,6 @@ export function getStarknetIdPopContract(chainId: StarknetChainId): string {
   switch (chainId) {
     case StarknetChainId.SN_MAIN:
       return StarknetIdPopContract.MAINNET;
-
-    case StarknetChainId.SN_GOERLI:
-      return StarknetIdPopContract.TESTNET;
 
     case StarknetChainId.SN_SEPOLIA:
       return StarknetIdPopContract.TESTNET_SEPOLIA;

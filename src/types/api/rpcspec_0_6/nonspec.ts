@@ -116,7 +116,6 @@ export const ETransactionType = {
   L1_HANDLER: 'L1_HANDLER',
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
 export type ETransactionType = ValuesType<typeof ETransactionType>;
 
 export const ESimulationFlag = {
@@ -124,7 +123,6 @@ export const ESimulationFlag = {
   SKIP_FEE_CHARGE: 'SKIP_FEE_CHARGE',
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
 export type ESimulationFlag = ValuesType<typeof ESimulationFlag>;
 
 export const ETransactionStatus = {
@@ -134,7 +132,6 @@ export const ETransactionStatus = {
   ACCEPTED_ON_L1: 'ACCEPTED_ON_L1',
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
 export type ETransactionStatus = ValuesType<typeof ETransactionStatus>;
 
 export const ETransactionFinalityStatus = {
@@ -142,7 +139,6 @@ export const ETransactionFinalityStatus = {
   ACCEPTED_ON_L1: 'ACCEPTED_ON_L1',
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
 export type ETransactionFinalityStatus = ValuesType<typeof ETransactionFinalityStatus>;
 
 export const ETransactionExecutionStatus = {
@@ -150,7 +146,6 @@ export const ETransactionExecutionStatus = {
   REVERTED: 'REVERTED',
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
 export type ETransactionExecutionStatus = ValuesType<typeof ETransactionExecutionStatus>;
 
 export const EBlockTag = {
@@ -158,7 +153,6 @@ export const EBlockTag = {
   LATEST: 'latest',
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
 export type EBlockTag = ValuesType<typeof EBlockTag>;
 
 // 'L1' | 'L2'
@@ -167,7 +161,6 @@ export const EDataAvailabilityMode = {
   L2: 'L2',
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
 export type EDataAvailabilityMode = ValuesType<typeof EDataAvailabilityMode>;
 
 // 0 | 1
@@ -176,7 +169,6 @@ export const EDAMode = {
   L2: 1,
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
 export type EDAMode = ValuesType<typeof EDAMode>;
 
 /**
@@ -194,7 +186,6 @@ export const ETransactionVersion = {
   F3: '0x100000000000000000000000000000003',
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
 export type ETransactionVersion = ValuesType<typeof ETransactionVersion>;
 
 /**
@@ -209,7 +200,6 @@ export const ETransactionVersion2 = {
   F2: '0x100000000000000000000000000000002',
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
 export type ETransactionVersion2 = ValuesType<typeof ETransactionVersion2>;
 
 /**
@@ -220,5 +210,4 @@ export const ETransactionVersion3 = {
   F3: '0x100000000000000000000000000000003',
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
 export type ETransactionVersion3 = ValuesType<typeof ETransactionVersion3>;

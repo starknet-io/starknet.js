@@ -6,7 +6,6 @@ export const ValidateType = {
   INVOKE: 'INVOKE',
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
 export type ValidateType = ValuesType<typeof ValidateType>;
 
 export const Uint = {
@@ -19,7 +18,6 @@ export const Uint = {
   u512: 'core::integer::u512', // This one is struct
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
 export type Uint = ValuesType<typeof Uint>;
 
 export const Literal = {
@@ -28,5 +26,4 @@ export const Literal = {
   Secp256k1Point: 'core::starknet::secp256k1::Secp256k1Point',
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
 export type Literal = ValuesType<typeof Literal>;

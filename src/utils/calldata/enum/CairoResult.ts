@@ -5,7 +5,6 @@ export const CairoResultVariant = {
   Err: 1,
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
 export type CairoResultVariant = ValuesType<typeof CairoResultVariant>;
 
 /**

@@ -47,7 +47,7 @@ export abstract class SignerInterface {
   /**
    * Signs a DEPLOY_ACCOUNT transaction with the Starknet private key and returns the signature
    *
-   * @param transaction<br/>
+   * @param transaction <br/>
    * - contractAddress<br/>
    * - chainId<br/>
    * - classHash<br/>
@@ -64,7 +64,7 @@ export abstract class SignerInterface {
   /**
    * Signs a DECLARE transaction with the Starknet private key and returns the signature
    *
-   * @param transaction<br/>
+   * @param transaction <br/>
    * - classHash<br/>
    * - compiledClassHash? - used for Cairo1<br/>
    * - senderAddress<br/>

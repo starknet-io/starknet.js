@@ -137,6 +137,7 @@ export type Storage = FELT;
 
 export type Nonce = string;
 
+export type { SIMULATION_FLAG };
 export type SimulationFlags = Array<SIMULATION_FLAG>;
 
 export type SimulatedTransaction = SimulateTransaction & {

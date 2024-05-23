@@ -1,5 +1,4 @@
 import { EDataAvailabilityMode, ETransactionVersion, ResourceBounds } from './api';
-import { ValuesType } from './helpers/valuesType';
 import {
   AllowArray,
   BigNumberish,
@@ -76,14 +75,6 @@ export type SimulateTransactionDetails = {
   skipValidate?: boolean;
   skipExecute?: boolean;
 } & Partial<V3TransactionDetails>;
-
-export const SimulationFlag = {
-  SKIP_VALIDATE: 'SKIP_VALIDATE',
-  SKIP_EXECUTE: 'SKIP_EXECUTE',
-} as const;
-
-// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
-export type SimulationFlag = ValuesType<typeof SimulationFlag>;
 
 export type EstimateFeeAction =
   | {

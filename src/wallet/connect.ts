@@ -1,13 +1,15 @@
-import type {
-  WatchAssetParameters,
-  AccountChangeEventHandler,
-  AddDeclareTransactionParameters,
-  AddInvokeTransactionParameters,
-  AddStarknetChainParameters,
-  NetworkChangeEventHandler,
-  ChainId,
-  StarknetWindowObject,
-  TypedData,
+import {
+  type WatchAssetParameters,
+  type AccountChangeEventHandler,
+  type AddDeclareTransactionParameters,
+  type AddInvokeTransactionParameters,
+  type AddStarknetChainParameters,
+  type NetworkChangeEventHandler,
+  type ChainId,
+  type StarknetWindowObject,
+  type TypedData,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  type SPEC,
 } from 'starknet-types-07';
 
 /**
@@ -119,7 +121,8 @@ export function addDeclareTransaction(
 
 /**
  * Sign typed data using the wallet.
- * @param params The typed data to sign.
+ * @param swo the starknet (wallet) window object to request the signature.
+ * @param typedData The typed data to sign.
  * @returns An array of signatures as strings.
  */
 export function signMessage(swo: StarknetWindowObject, typedData: TypedData) {

@@ -168,7 +168,6 @@ export const TransactionType = {
   INVOKE: 'INVOKE_FUNCTION',
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
 export type TransactionType = ValuesType<typeof TransactionType>;
 
 /**
@@ -184,7 +183,6 @@ export const TransactionStatus = {
   REVERTED: 'REVERTED',
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
 export type TransactionStatus = ValuesType<typeof TransactionStatus>;
 
 export const TransactionFinalityStatus = {
@@ -194,7 +192,6 @@ export const TransactionFinalityStatus = {
   ACCEPTED_ON_L1: 'ACCEPTED_ON_L1',
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
 export type TransactionFinalityStatus = ValuesType<typeof TransactionFinalityStatus>;
 
 export const TransactionExecutionStatus = {
@@ -203,7 +200,6 @@ export const TransactionExecutionStatus = {
   SUCCEEDED: 'SUCCEEDED',
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
 export type TransactionExecutionStatus = ValuesType<typeof TransactionExecutionStatus>;
 
 export const BlockStatus = {
@@ -213,7 +209,6 @@ export const BlockStatus = {
   REJECTED: 'REJECTED',
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
 export type BlockStatus = ValuesType<typeof BlockStatus>;
 
 export const BlockTag = {
@@ -221,7 +216,6 @@ export const BlockTag = {
   LATEST: 'latest',
 } as const;
 
-// eslint-disable-next-line @typescript-eslint/no-redeclare -- intentionally naming the variable the same as the type
 export type BlockTag = ValuesType<typeof BlockTag>;
 
 export type BlockNumber = BlockTag | null | number;

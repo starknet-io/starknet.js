@@ -1,4 +1,4 @@
-import { BigNumberish, StarkProfile } from '../../types';
+import { BigNumberish, RawArgsArray, StarkProfile } from '../../types';
 import { CallData } from '../../utils/calldata';
 import { getSelectorFromName } from '../../utils/hash';
 import { decodeShortString, encodeShortString } from '../../utils/shortString';
@@ -67,13 +67,7 @@ export class StarknetId {
     const contract = StarknetIdContract ?? getStarknetIdContract(chainId);
 
     try {
-      const hexDomain = await provider.callContract({
-        contractAddress: contract,
-        entrypoint: 'address_to_domain',
-        calldata: CallData.compile({
-          address,
-        }),
-      });
+      const hexDomain = await this.executeStarkName(provider, address as string, contract);
       const decimalDomain = hexDomain.map((element) => BigInt(element)).slice(1);
 
       const stringDomain = useDecoded(decimalDomain);
@@ -88,6 +82,29 @@ export class StarknetId {
         throw e;
       }
       throw Error('Could not get stark name');
+    }
+  }
+
+  static async executeStarkName(provider: ProviderInterface, address: string, contract: string) {
+    try {
+      // Attempt the initial call with the hint parameter
+      return await provider.callContract({
+        contractAddress: contract as string,
+        entrypoint: 'address_to_domain',
+        calldata: CallData.compile({
+          address,
+          hint: [],
+        }),
+      });
+    } catch (initialError) {
+      // If the initial call fails, try with the fallback calldata without the hint parameter
+      return await provider.callContract({
+        contractAddress: contract as string,
+        entrypoint: 'address_to_domain',
+        calldata: CallData.compile({
+          address,
+        }),
+      });
     }
   }
 
@@ -136,100 +153,115 @@ export class StarknetId {
     const multicallAddress = StarknetIdMulticallContract ?? getStarknetIdMulticallContract(chainId);
 
     try {
-      const data = await provider.callContract({
-        contractAddress: multicallAddress,
-        entrypoint: 'aggregate',
-        calldata: CallData.compile({
-          calls: [
-            {
-              execution: execution({}),
-              to: dynamicFelt(contract),
-              selector: dynamicFelt(getSelectorFromName('address_to_domain')),
-              calldata: [dynamicCallData(address)],
-            },
-            {
-              execution: execution({}),
-              to: dynamicFelt(contract),
-              selector: dynamicFelt(getSelectorFromName('domain_to_id')),
-              calldata: [dynamicCallData(undefined, undefined, [0, 0])],
-            },
-            {
-              execution: execution({}),
-              to: dynamicFelt(identityContract),
-              selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
-              calldata: [
-                dynamicCallData(undefined, [1, 0]),
-                dynamicCallData(encodeShortString('twitter')),
-                dynamicCallData(verifierContract),
-                dynamicCallData('0'),
-              ],
-            },
-            {
-              execution: execution({}),
-              to: dynamicFelt(identityContract),
-              selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
-              calldata: [
-                dynamicCallData(undefined, [1, 0]),
-                dynamicCallData(encodeShortString('github')),
-                dynamicCallData(verifierContract),
-                dynamicCallData('0'),
-              ],
-            },
-            {
-              execution: execution({}),
-              to: dynamicFelt(identityContract),
-              selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
-              calldata: [
-                dynamicCallData(undefined, [1, 0]),
-                dynamicCallData(encodeShortString('discord')),
-                dynamicCallData(verifierContract),
-                dynamicCallData('0'),
-              ],
-            },
-            {
-              execution: execution({}),
-              to: dynamicFelt(identityContract),
-              selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
-              calldata: [
-                dynamicCallData(undefined, [1, 0]),
-                dynamicCallData(encodeShortString('proof_of_personhood')),
-                dynamicCallData(popContract),
-                dynamicCallData('0'),
-              ],
-            },
-            // PFP
-            {
-              execution: execution({}),
-              to: dynamicFelt(identityContract),
-              selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
-              calldata: [
-                dynamicCallData(undefined, [1, 0]),
-                dynamicCallData(encodeShortString('nft_pp_contract')),
-                dynamicCallData(pfpContract),
-                dynamicCallData('0'),
-              ],
-            },
-            {
-              execution: execution({}),
-              to: dynamicFelt(identityContract),
-              selector: dynamicFelt(getSelectorFromName('get_extended_verifier_data')),
-              calldata: [
-                dynamicCallData(undefined, [1, 0]),
-                dynamicCallData(encodeShortString('nft_pp_id')),
-                dynamicCallData('2'),
-                dynamicCallData(pfpContract),
-                dynamicCallData('0'),
-              ],
-            },
-            {
-              execution: execution(undefined, undefined, [6, 0, 0]),
-              to: dynamicFelt(undefined, [6, 0]),
-              selector: dynamicFelt(getSelectorFromName('tokenURI')),
-              calldata: [dynamicCallData(undefined, [7, 1]), dynamicCallData(undefined, [7, 2])],
-            },
-          ],
-        }),
+      const initialCalldata: RawArgsArray = [];
+      const fallbackCalldata: RawArgsArray = [];
+
+      initialCalldata.push({
+        execution: execution({}),
+        to: dynamicCallData(contract),
+        selector: dynamicCallData(getSelectorFromName('address_to_domain')),
+        calldata: [dynamicCallData(address), dynamicCallData('0')],
       });
+      fallbackCalldata.push({
+        execution: execution({}),
+        to: dynamicCallData(contract),
+        selector: dynamicFelt(getSelectorFromName('address_to_domain')),
+        calldata: [dynamicCallData(address)],
+      });
+
+      const calls = [
+        {
+          execution: execution({}),
+          to: dynamicFelt(contract),
+          selector: dynamicFelt(getSelectorFromName('domain_to_id')),
+          calldata: [dynamicCallData(undefined, undefined, [0, 0])],
+        },
+        {
+          execution: execution({}),
+          to: dynamicFelt(identityContract),
+          selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
+          calldata: [
+            dynamicCallData(undefined, [1, 0]),
+            dynamicCallData(encodeShortString('twitter')),
+            dynamicCallData(verifierContract),
+            dynamicCallData('0'),
+          ],
+        },
+        {
+          execution: execution({}),
+          to: dynamicFelt(identityContract),
+          selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
+          calldata: [
+            dynamicCallData(undefined, [1, 0]),
+            dynamicCallData(encodeShortString('github')),
+            dynamicCallData(verifierContract),
+            dynamicCallData('0'),
+          ],
+        },
+        {
+          execution: execution({}),
+          to: dynamicFelt(identityContract),
+          selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
+          calldata: [
+            dynamicCallData(undefined, [1, 0]),
+            dynamicCallData(encodeShortString('discord')),
+            dynamicCallData(verifierContract),
+            dynamicCallData('0'),
+          ],
+        },
+        {
+          execution: execution({}),
+          to: dynamicFelt(identityContract),
+          selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
+          calldata: [
+            dynamicCallData(undefined, [1, 0]),
+            dynamicCallData(encodeShortString('proof_of_personhood')),
+            dynamicCallData(popContract),
+            dynamicCallData('0'),
+          ],
+        },
+        // PFP
+        {
+          execution: execution({}),
+          to: dynamicFelt(identityContract),
+          selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
+          calldata: [
+            dynamicCallData(undefined, [1, 0]),
+            dynamicCallData(encodeShortString('nft_pp_contract')),
+            dynamicCallData(pfpContract),
+            dynamicCallData('0'),
+          ],
+        },
+        {
+          execution: execution({}),
+          to: dynamicFelt(identityContract),
+          selector: dynamicFelt(getSelectorFromName('get_extended_verifier_data')),
+          calldata: [
+            dynamicCallData(undefined, [1, 0]),
+            dynamicCallData(encodeShortString('nft_pp_id')),
+            dynamicCallData('2'),
+            dynamicCallData(pfpContract),
+            dynamicCallData('0'),
+          ],
+        },
+        {
+          execution: execution(undefined, undefined, [6, 0, 0]),
+          to: dynamicFelt(undefined, [6, 0]),
+          selector: dynamicFelt(getSelectorFromName('tokenURI')),
+          calldata: [dynamicCallData(undefined, [7, 1]), dynamicCallData(undefined, [7, 2])],
+        },
+      ];
+
+      initialCalldata.push(...calls);
+      fallbackCalldata.push(...calls);
+
+      const data = await this.executeStarkProfile(
+        provider,
+        multicallAddress,
+        'aggregate',
+        initialCalldata,
+        fallbackCalldata
+      );
 
       if (Array.isArray(data)) {
         // Format data
@@ -286,6 +318,34 @@ export class StarknetId {
         throw e;
       }
       throw Error('Could not get user stark profile data from address');
+    }
+  }
+
+  static async executeStarkProfile(
+    provider: ProviderInterface,
+    contract: string,
+    functionName: string,
+    initialCalldata: RawArgsArray,
+    fallbackCalldata: RawArgsArray
+  ) {
+    try {
+      // Attempt the initial call with the hint parameter
+      return await provider.callContract({
+        contractAddress: contract as string,
+        entrypoint: functionName,
+        calldata: CallData.compile({
+          calls: initialCalldata,
+        }),
+      });
+    } catch (initialError) {
+      // If the initial call fails, try with the fallback calldata without the hint parameter
+      return await provider.callContract({
+        contractAddress: contract as string,
+        entrypoint: functionName,
+        calldata: CallData.compile({
+          calls: fallbackCalldata,
+        }),
+      });
     }
   }
 }
