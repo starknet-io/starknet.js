@@ -9,8 +9,9 @@ export type { BigNumberish };
 
 /**
  * Test if string is hex-string
+ *
  * @param hex hex-string
- * @returns {boolean} True if the input string is a hexadecimal string, false otherwise
+ * @returns {boolean} true if the input string is a hexadecimal string, false otherwise
  * @example
  * ```typescript
  * const hexString1 = "0x2fd23d9182193775423497fc0c472e156c57c69e4089a1967fb288a2d84e914";
@@ -28,6 +29,15 @@ export function isHex(hex: string): boolean {
 
 /**
  * Convert BigNumberish to bigint
+ *
+ * @param {BigNumberish} value hex-string
+ * @returns {BigInt} converted value
+ * @example
+ * ```typescript
+ * const str = '123';
+ * const result = toBigInt(str);
+ * // result = 123n
+ * ```
  */
 export function toBigInt(value: BigNumberish): bigint {
   return BigInt(value);
@@ -35,6 +45,17 @@ export function toBigInt(value: BigNumberish): bigint {
 
 /**
  * Test if value is bigint
+ *
+ * @param value value to test
+ * @returns {boolean} true if value is bigint, false otherwise
+ * @example
+ * ```typescript
+ * isBigInt(BigInt(10)); // true
+ * isBigInt(BigInt('10')); // true
+ * isBigInt(10); // false
+ * isBigInt('10'); // false
+ * isBigInt(null); // false
+ * ```
  */
 export function isBigInt(value: any): value is bigint {
   return typeof value === 'bigint';
@@ -42,7 +63,14 @@ export function isBigInt(value: any): value is bigint {
 
 /**
  * Convert BigNumberish to hex-string
- * @returns format: hex-string
+ *
+ * @param {BigNumberish} number number to convert
+ * @returns {string} converted number in hex-string format
+ * @example
+ * ```typescript
+ * toHex(100); // '0x64'
+ * toHex('200'); // '0xc8'
+ * ```
  */
 export function toHex(number: BigNumberish): string {
   return addHexPrefix(toBigInt(number).toString(16));
@@ -63,26 +91,37 @@ export const toHexString = toHex;
  * @returns format: storage-key-string
  */
 export function toStorageKey(number: BigNumberish): string {
-  const res = addHexPrefix(toBigInt(number).toString(16).padStart(64, '0'));
-  return res;
+  return addHexPrefix(toBigInt(number).toString(16).padStart(64, '0'));
 }
 
 /**
  * Convert hexadecimal string to decimal string
- * @param hex hex-string
- * @returns format: decimal string
+ *
+ * @param {string} hex hex-string to convert
+ * @returns {string} converted number in decimal string format
+ * @example
+ * ```typescript
+ * hexToDecimalString('64'); // '100'
+ * hexToDecimalString('c8'); // '200'
+ * ```
  */
 export function hexToDecimalString(hex: string): string {
   return BigInt(addHexPrefix(hex)).toString(10);
 }
 
 /**
- * Remove hex string leading zero and lowercase it
- * @example '0x01A...' -> '0x1a..'
- * @param hex hex-string
- * @returns format: hex-string
+ * Remove hex-string leading zeroes and lowercase it
+ *
+ * @param {string} hex hex-string
+ * @returns {string} updated string in hex-string format
+ * @example
+ * ```typescript
+ * cleanHex('0x00023AB'); // '0x23ab'
+ * ```
  */
-export const cleanHex = (hex: string) => hex.toLowerCase().replace(/^(0x)0+/, '$1');
+export function cleanHex(hex: string): string {
+  return hex.toLowerCase().replace(/^(0x)0+/, '$1');
+}
 
 /**
  * Asserts input is equal to or greater then lowerBound and lower then upperBound.
@@ -92,7 +131,7 @@ export const cleanHex = (hex: string) => hex.toLowerCase().replace(/^(0x)0+/, '$
  * @param lowerBound Lower bound value
  * @param upperBound Upper bound value
  * @param inputName Name of the input for error message
- * @Throws Error if input is out of range
+ * @throws Error if input is out of range
  * @example
  * ```typescript
  * const input1:BigNumberish = 10;
@@ -100,7 +139,7 @@ export const cleanHex = (hex: string) => hex.toLowerCase().replace(/^(0x)0+/, '$
  *
  * const input2: BigNumberish = 25;
  * assertInRange(input2, 5, 20, 'value');
- * // Throws Error: Message not signable, invalid value length.
+ * // throws Error: Message not signable, invalid value length.
  * ```
  */
 export function assertInRange(
@@ -122,79 +161,121 @@ export function assertInRange(
 
 /**
  * Convert BigNumberish array to decimal string array
- * @returns format: decimal string array
+ *
+ * @param {BigNumberish[]} data array of big-numberish elements
+ * @returns {string[]} array of decimal strings
+ * @example
+ * ```typescript
+ * const data = [100, BigInt(200)];
+ * const result = bigNumberishArrayToDecimalStringArray(data);
+ * // result = ['100', '200']
+ * ```
  */
-export function bigNumberishArrayToDecimalStringArray(rawCalldata: BigNumberish[]): string[] {
-  return rawCalldata.map((x) => toBigInt(x).toString(10));
+export function bigNumberishArrayToDecimalStringArray(data: BigNumberish[]): string[] {
+  return data.map((x) => toBigInt(x).toString(10));
 }
 
 /**
  * Convert BigNumberish array to hexadecimal string array
- * @returns format: hex-string array
+ *
+ * @param {BigNumberish[]} data array of big-numberish elements
+ * @returns array of hex-strings
+ * @example
+ * ```typescript
+ * const data = [100, BigInt(200)];
+ * const result = bigNumberishArrayToHexadecimalStringArray(data);
+ * // result = ['0x64', '0xc8']
+ * ```
  */
-export function bigNumberishArrayToHexadecimalStringArray(rawCalldata: BigNumberish[]): string[] {
-  return rawCalldata.map((x) => toHex(x));
+export function bigNumberishArrayToHexadecimalStringArray(data: BigNumberish[]): string[] {
+  return data.map((x) => toHex(x));
 }
 
 /**
- * Test if string is whole number (0, 1, 2, 3...)
+ * Test if string is a whole number (0, 1, 2, 3...)
+ *
+ * @param {string} str string to test
+ * @returns {boolean}: true if string is a whole number, false otherwise
+ * @example
+ * ```typescript
+ * isStringWholeNumber('100'); // true
+ * isStringWholeNumber('10.0'); // false
+ * isStringWholeNumber('test'); // false
+ * ```
  */
-export const isStringWholeNumber = (value: string) => /^\d+$/.test(value);
+export function isStringWholeNumber(str: string): boolean {
+  return /^\d+$/.test(str);
+}
 
 /**
  * Convert string to decimal string
- * @returns format: decimal string
+ *
+ * @param {string} str string to convert
+ * @returns converted string in decimal format
+ * @throws str needs to be a number string in hex or whole number format
  * @example
  * ```typescript
  * const result = getDecimalString("0x1a");
  * // result = "26"
  *
  * const result2 = getDecimalString("Hello");
- * // Throws Error: "Hello need to be hex-string or whole-number-string"
+ * // throws Error: "Hello needs to be a hex-string or whole-number-string"
  * ```
  */
-export function getDecimalString(value: string) {
-  if (isHex(value)) {
-    return hexToDecimalString(value);
+export function getDecimalString(str: string) {
+  if (isHex(str)) {
+    return hexToDecimalString(str);
   }
-  if (isStringWholeNumber(value)) {
-    return value;
+  if (isStringWholeNumber(str)) {
+    return str;
   }
-  throw new Error(`${value} need to be hex-string or whole-number-string`);
+  throw new Error(`${str} needs to be a hex-string or whole-number-string`);
 }
 
 /**
  * Convert string to hexadecimal string
- * @returns format: hex-string
+ *
+ * @param {string} str string to convert
+ * @returns converted hex-string
+ * @throws str needs to be a number string in hex or whole number format
  * @example
  * ```typescript
  * const result = getHexString("123");
  * // result = "0x7b"
  *
  * const result2 = getHexString("Hello");
- * // Throws Error: Hello need to be hex-string or whole-number-string
+ * // throws Error: Hello need to be hex-string or whole-number-string
  * ```
  */
-export function getHexString(value: string) {
-  if (isHex(value)) {
-    return value;
+export function getHexString(str: string) {
+  if (isHex(str)) {
+    return str;
   }
-  if (isStringWholeNumber(value)) {
-    return toHexString(value);
+  if (isStringWholeNumber(str)) {
+    return toHexString(str);
   }
-  throw new Error(`${value} need to be hex-string or whole-number-string`);
+  throw new Error(`${str} needs to be a hex-string or whole-number-string`);
 }
 
 /**
  * Convert string array to hex-string array
- * @returns format: hex-string array
+ *
+ * @param {Array<string>} data array of string elements
+ * @returns array of converted elements in hex-string format
+ * @example
+ * ```typescript
+ * const data = ['100', '200', '0xaa'];
+ * const result = getHexStringArray(data);
+ * // result = ['0x64', '0xc8', '0xaa']
+ * ```
  */
-export function getHexStringArray(value: Array<string>) {
-  return value.map((el) => getHexString(el));
+export function getHexStringArray(data: Array<string>) {
+  return data.map((el) => getHexString(el));
 }
 
 /**
  * Convert boolean to "0" or "1"
+ *
  * @param value The boolean value to be converted.
  * @returns {boolean} Returns true if the value is a number, otherwise returns false.
  * @example
@@ -206,16 +287,31 @@ export function getHexStringArray(value: Array<string>) {
  * // result2 = "0"
  * ```
  */
-export const toCairoBool = (value: boolean): string => (+value).toString();
+export function toCairoBool(value: boolean): string {
+  return (+value).toString();
+}
 
 /**
  * Convert hex-string to an array of Bytes (Uint8Array)
- * @param value hex-string
+ *
+ * @param {string} str hex-string
+ * @returns {Uint8Array} array containing the converted elements
+ * @throws str must be a hex-string
+ * @example
+ * ```typescript
+ * let result;
+ *
+ * result = hexToBytes('0x64');
+ * // result = [100]
+ *
+ * result = hexToBytes('test');
+ * // throws Error: test needs to be a hex-string
+ * ```
  */
-export function hexToBytes(value: string): Uint8Array {
-  if (!isHex(value)) throw new Error(`${value} need to be a hex-string`);
+export function hexToBytes(str: string): Uint8Array {
+  if (!isHex(str)) throw new Error(`${str} needs to be a hex-string`);
 
-  let adaptedValue: string = removeHexPrefix(value);
+  let adaptedValue: string = removeHexPrefix(str);
   if (adaptedValue.length % 2 !== 0) {
     adaptedValue = `0${adaptedValue}`;
   }
@@ -223,10 +319,20 @@ export function hexToBytes(value: string): Uint8Array {
 }
 
 /**
+ * Adds a percentage amount to the value
  *
- * @param number value to be increased
+ * @param number value to be modified
  * @param percent integer as percent ex. 50 for 50%
- * @returns increased value
+ * @returns {BigInt} modified value
+ * @example
+ * ```typescript
+ * addPercent(100, 50); // 150n
+ * addPercent(100, 100); // 200n
+ * addPercent(200, 50); // 300n
+ * addPercent(200, -50); // 100n
+ * addPercent(200, -100); // 0n
+ * addPercent(200, -150); // -100n
+ * ```
  */
 export function addPercent(number: BigNumberish, percent: number) {
   const bigIntNum = BigInt(number);
