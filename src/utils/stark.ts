@@ -237,7 +237,8 @@ export function estimateFeeToBounds(
  * @throws {Error} If the data availability mode is not a valid value.
  * @example
  * ```typescript
- * TODO : add example when EDataAvailabilityMode can be imported by users
+ * const result = stark.intDAM(RPC.EDataAvailabilityMode.L1);
+ * // result = 0
  * ```
  */
 export function intDAM(dam: EDataAvailabilityMode): EDAMode {
