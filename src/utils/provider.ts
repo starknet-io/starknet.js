@@ -237,7 +237,7 @@ export class Block {
 
   // TODO: fix any
   /**
-   * Return the identifier as a string
+   * @returns {any} the identifier as a string
    * @example
    * ```typescript
    * const result = new provider.Block(123456n).queryIdentifier;
@@ -258,7 +258,7 @@ export class Block {
 
   // TODO: fix any
   /**
-   * Return the identifier as an object
+   * @returns {any} the identifier as an object
    * @example
    * ```typescript
    * const result = new provider.Block(56789).identifier;
