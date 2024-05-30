@@ -984,6 +984,10 @@ describe('Cairo 1', () => {
       const events = eventContract.parseEvents(tx);
       return expect(events).toStrictEqual(shouldBe);
     });
+
+    // test ('parsing '
+
+    // )
   });
 
   describe('cairo v2.4.0 new types', () => {

@@ -48,13 +48,21 @@ export type EnumAbi = {
 
 export type AbiEvents = { [hash: string]: EventAbi };
 
-export type EventAbi = Cairo1Event | LegacyEvent;
+export type EventAbi = Cairo1Events | LegacyEvent;
+
+export type Cairo1Events = Cairo1Event | AbiEvents;
 
 export type Cairo1Event = {
   name: string;
   members: EventEntry[];
   kind: 'struct';
   type: 'event';
+};
+
+export type Cairo1EventVariant = {
+  kind: 'nested';
+  name: string;
+  type: string;
 };
 
 export type LegacyEvent = {
