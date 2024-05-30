@@ -67,7 +67,13 @@ export class StarknetId {
     const contract = StarknetIdContract ?? getStarknetIdContract(chainId);
 
     try {
-      const hexDomain = await this.executeStarkName(provider, address as string, contract);
+      const hexDomain = await provider.callContract({
+        contractAddress: contract,
+        entrypoint: 'address_to_domain',
+        calldata: CallData.compile({
+          address,
+        }),
+      });
       const decimalDomain = hexDomain.map((element) => BigInt(element)).slice(1);
 
       const stringDomain = useDecoded(decimalDomain);
@@ -82,29 +88,6 @@ export class StarknetId {
         throw e;
       }
       throw Error('Could not get stark name');
-    }
-  }
-
-  static async executeStarkName(provider: ProviderInterface, address: string, contract: string) {
-    try {
-      // Attempt the initial call with the hint parameter
-      return await provider.callContract({
-        contractAddress: contract as string,
-        entrypoint: 'address_to_domain',
-        calldata: CallData.compile({
-          address,
-          hint: [],
-        }),
-      });
-    } catch (initialError) {
-      // If the initial call fails, try with the fallback calldata without the hint parameter
-      return await provider.callContract({
-        contractAddress: contract as string,
-        entrypoint: 'address_to_domain',
-        calldata: CallData.compile({
-          address,
-        }),
-      });
     }
   }
 
@@ -153,23 +136,13 @@ export class StarknetId {
     const multicallAddress = StarknetIdMulticallContract ?? getStarknetIdMulticallContract(chainId);
 
     try {
-      const initialCalldata: RawArgsArray = [];
-      const fallbackCalldata: RawArgsArray = [];
-
-      initialCalldata.push({
-        execution: execution({}),
-        to: dynamicCallData(contract),
-        selector: dynamicCallData(getSelectorFromName('address_to_domain')),
-        calldata: [dynamicCallData(address), dynamicCallData('0')],
-      });
-      fallbackCalldata.push({
-        execution: execution({}),
-        to: dynamicCallData(contract),
-        selector: dynamicFelt(getSelectorFromName('address_to_domain')),
-        calldata: [dynamicCallData(address)],
-      });
-
-      const calls = [
+      const calls: RawArgsArray = [
+        {
+          execution: execution({}),
+          to: dynamicCallData(contract),
+          selector: dynamicCallData(getSelectorFromName('address_to_domain')),
+          calldata: [dynamicCallData(address), dynamicCallData('0')],
+        },
         {
           execution: execution({}),
           to: dynamicFelt(contract),
@@ -252,16 +225,13 @@ export class StarknetId {
         },
       ];
 
-      initialCalldata.push(...calls);
-      fallbackCalldata.push(...calls);
-
-      const data = await this.executeStarkProfile(
-        provider,
-        multicallAddress,
-        'aggregate',
-        initialCalldata,
-        fallbackCalldata
-      );
+      const data = await provider.callContract({
+        contractAddress: multicallAddress,
+        entrypoint: 'aggregate',
+        calldata: CallData.compile({
+          calls,
+        }),
+      });
 
       if (Array.isArray(data)) {
         // Format data
@@ -318,34 +288,6 @@ export class StarknetId {
         throw e;
       }
       throw Error('Could not get user stark profile data from address');
-    }
-  }
-
-  static async executeStarkProfile(
-    provider: ProviderInterface,
-    contract: string,
-    functionName: string,
-    initialCalldata: RawArgsArray,
-    fallbackCalldata: RawArgsArray
-  ) {
-    try {
-      // Attempt the initial call with the hint parameter
-      return await provider.callContract({
-        contractAddress: contract as string,
-        entrypoint: functionName,
-        calldata: CallData.compile({
-          calls: initialCalldata,
-        }),
-      });
-    } catch (initialError) {
-      // If the initial call fails, try with the fallback calldata without the hint parameter
-      return await provider.callContract({
-        contractAddress: contract as string,
-        entrypoint: functionName,
-        calldata: CallData.compile({
-          calls: fallbackCalldata,
-        }),
-      });
     }
   }
 }
