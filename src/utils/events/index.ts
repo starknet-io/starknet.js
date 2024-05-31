@@ -24,6 +24,22 @@ import { addHexPrefix, utf8ToArray } from '../encode';
  * Is able to handle Cairo 1 events nested in Cairo components.
  * @param {Abi} abi - The ABI to extract events from.
  * @return {AbiEvents} - An object containing the extracted events.
+ * @example
+ * ```typescript
+ * const result = events.getAbiEvents(abi);
+ * // result = {
+ * //   '0x22ea134d4126804c60797e633195f8c9aa5fd6d1567e299f4961d0e96f373ee': 
+ * //    { '0x34e55c1cd55f1338241b50d352f0e91c7e4ffad0e4271d64eb347589ebdfd16': {
+ * //     kind: 'struct', type: 'event',
+ * //     name: 'ka::ExComponent::ex_logic_component::Mint',
+      
+ * //     members: [{
+ * //      name: 'spender',
+ * //      type: 'core::starknet::contract_address::ContractAddress',
+ * //      kind: 'key'},
+ * //      { name: 'value', type: 'core::integer::u256', kind: 'data' }]},
+ * // ...
+ * ```
  */
 export function getAbiEvents(abi: Abi): AbiEvents {
   let finalResult: AbiEvents;
@@ -43,48 +59,40 @@ export function getAbiEvents(abi: Abi): AbiEvents {
   } else {
     // Cairo 1 abi
     const abiEventsStructs = abi.filter((obj) => obj.type === 'event' && obj.kind === 'struct');
-
-    console.log(abiEventsStructs.length);
-
     const abiEventsEnums = abi.filter((obj) => obj.type === 'event' && obj.kind === 'enum');
-    console.log(abiEventsEnums.length);
-
     const abiEventsData: AbiEvents = abiEventsStructs.reduce(
       (acc: Cairo1Events, event: Cairo1Events) => {
-        const nameList: string[] = [];
+        let nameList: string[] = [];
         let { name } = event;
-        console.log('initial name =', name);
+        let flat: boolean = false;
         const findName = (variant: Cairo1EventVariant) => variant.type === name;
         // eslint-disable-next-line no-constant-condition
         while (true) {
           const eventEnum = abiEventsEnums.find((eventE) => eventE.variants.some(findName));
           if (typeof eventEnum === 'undefined') break;
           const variant: Cairo1EventVariant = eventEnum.variants.find(findName);
-          // console.log("eventEnum =", eventEnum);
           nameList.unshift(variant.name);
+          if (variant.kind === 'flat') flat = true;
           name = eventEnum.name;
         }
-        console.log('names of this event =', nameList);
         if (nameList.length === 0) {
           throw new Error('inconsistancy in ABI events definition.');
         }
+        if (flat) nameList = [nameList[nameList.length - 1]];
         const final = nameList.pop();
         let result: AbiEvents = {
           [addHexPrefix(starkCurve.keccak(utf8ToArray(final!)).toString(16))]: event,
         };
-
         while (nameList.length > 0) {
           result = {
             [addHexPrefix(starkCurve.keccak(utf8ToArray(nameList.pop()!)).toString(16))]: result,
           };
         }
         result = { ...result };
-        // console.log("result =", result);
         return mergeAbiEvents(acc, result);
       },
       {}
     );
-    console.log('abiEventsData =', abiEventsData);
     finalResult = abiEventsData;
   }
   return finalResult;
@@ -135,7 +143,7 @@ function mergeAbiEvents(target: any, source: any): Object {
  * const abiStructs =  CallData.getAbiStruct(sierra.abi);
  * const abiEnums = CallData.getAbiEnum(sierra.abi);
  * const result = events.parseEvents(myEvents, abiEvents, abiStructs, abiEnums);
- * // result = [{Trade: {
+ * // result = [{test::ExCh::ex_ch::Trade: {
       maker: 7548613724711489396448209137n,
       taker: 6435850562375218974960297344n,
       router_maker: 0n,
@@ -148,9 +156,7 @@ export function parseEvents(
   abiStructs: AbiStructs,
   abiEnums: AbiEnums
 ): ParsedEvents {
-  // const abiEventsEntries = Object.keys(abiEvents);
   const ret = providerReceivedEvents.flat().reduce((acc, recEvent: RPC.Event) => {
-    // const keyPosition = recEvent.keys.findIndex((key) => abiEventsEntries.includes(key));
     let abiEvent: EventAbi | AbiEvents = abiEvents[recEvent.keys.shift() ?? 0];
     if (!abiEvent) {
       return acc;
@@ -164,8 +170,6 @@ export function parseEvents(
     const parsedEvent: ParsedEvent = {};
     parsedEvent[abiEvent.name as string] = {};
     // Remove the event's name hashed from the keys array
-    // recEvent.keys.shift();
-
     const keysIter = recEvent.keys[Symbol.iterator]();
     const dataIter = recEvent.data[Symbol.iterator]();
 

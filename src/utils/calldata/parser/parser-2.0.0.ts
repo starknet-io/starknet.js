@@ -1,4 +1,11 @@
-import { Abi, FunctionAbi, EventAbi, StructAbi, InterfaceAbi } from '../../../types';
+import {
+  Abi,
+  FunctionAbi,
+  EventAbi,
+  StructAbi,
+  InterfaceAbi,
+  type LegacyEvent,
+} from '../../../types';
 import { AbiParserInterface } from './interface';
 
 export class AbiParser2 implements AbiParserInterface {
@@ -34,7 +41,7 @@ export class AbiParser2 implements AbiParserInterface {
    * @returns Abi
    */
   public getLegacyFormat(): Abi {
-    return this.abi.flatMap((e: FunctionAbi | EventAbi | StructAbi | InterfaceAbi) => {
+    return this.abi.flatMap((e: FunctionAbi | LegacyEvent | StructAbi | InterfaceAbi) => {
       if (e.type === 'interface') {
         return e.items;
       }

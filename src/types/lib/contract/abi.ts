@@ -60,7 +60,7 @@ export type Cairo1Event = {
 };
 
 export type Cairo1EventVariant = {
-  kind: 'nested';
+  kind: 'nested' | 'flat';
   name: string;
   type: string;
 };

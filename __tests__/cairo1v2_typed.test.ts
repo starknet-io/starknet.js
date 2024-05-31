@@ -802,7 +802,7 @@ describe('Cairo 1', () => {
       );
       const shouldBe: types.ParsedEvents = [
         {
-          EventRegular: {
+          'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable,
             simpleKeyStruct,
             simpleKeyArray,
@@ -824,7 +824,7 @@ describe('Cairo 1', () => {
       );
       const shouldBe: types.ParsedEvents = [
         {
-          EventNested: {
+          'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventNested': {
             nestedKeyStruct,
             nestedDataStruct,
           },
@@ -840,7 +840,7 @@ describe('Cairo 1', () => {
       const anotherKeyVariable = 100n;
       const shouldBe: types.ParsedEvents = [
         {
-          EventRegular: {
+          'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable,
             simpleKeyStruct,
             simpleKeyArray,
@@ -850,7 +850,7 @@ describe('Cairo 1', () => {
           },
         },
         {
-          EventRegular: {
+          'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable: anotherKeyVariable,
             simpleKeyStruct,
             simpleKeyArray,
@@ -884,7 +884,7 @@ describe('Cairo 1', () => {
     test('parse tx returning multiple different events', async () => {
       const shouldBe: types.ParsedEvents = [
         {
-          EventRegular: {
+          'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable,
             simpleKeyStruct,
             simpleKeyArray,
@@ -894,7 +894,7 @@ describe('Cairo 1', () => {
           },
         },
         {
-          EventNested: {
+          'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventNested': {
             nestedKeyStruct,
             nestedDataStruct,
           },
