@@ -124,10 +124,10 @@ export function useEncoded(decoded: string): bigint {
   return encoded;
 }
 
-export const enum StarknetIdContract {
-  MAINNET = '0x6ac597f8116f886fa1c97a23fa4e08299975ecaf6b598873ca6792b9bbfb678',
-  TESTNET_SEPOLIA = '0x0707f09bc576bd7cfee59694846291047e965f4184fe13dac62c56759b3b6fa7',
-}
+export const StarknetIdContract = {
+  MAINNET: '0x6ac597f8116f886fa1c97a23fa4e08299975ecaf6b598873ca6792b9bbfb678',
+  TESTNET_SEPOLIA: '0x0707f09bc576bd7cfee59694846291047e965f4184fe13dac62c56759b3b6fa7',
+} as const;
 
 /**
  * Returns the Starknet ID contract address based on the provided chain ID.
@@ -154,10 +154,10 @@ export function getStarknetIdContract(chainId: StarknetChainId): string {
   }
 }
 
-export const enum StarknetIdIdentityContract {
-  MAINNET = '0x05dbdedc203e92749e2e746e2d40a768d966bd243df04a6b712e222bc040a9af',
-  TESTNET_SEPOLIA = '0x070DF8B4F5cb2879f8592849fA8f3134da39d25326B8558cc9C8FE8D47EA3A90',
-}
+export const StarknetIdIdentityContract = {
+  MAINNET: '0x05dbdedc203e92749e2e746e2d40a768d966bd243df04a6b712e222bc040a9af',
+  TESTNET_SEPOLIA: '0x070DF8B4F5cb2879f8592849fA8f3134da39d25326B8558cc9C8FE8D47EA3A90',
+} as const;
 
 /**
  * Returns the Starknet ID identity contract address for the given chain ID.
@@ -214,10 +214,10 @@ export function getStarknetIdMulticallContract(chainId: StarknetChainId): string
   }
 }
 
-export const enum StarknetIdVerifierContract {
-  MAINNET = '0x07d14dfd8ee95b41fce179170d88ba1f0d5a512e13aeb232f19cfeec0a88f8bf',
-  TESTNET_SEPOLIA = '0x0182EcE8173C216A395f4828e1523541b7e3600bf190CB252E1a1A0cE219d184',
-}
+export const StarknetIdVerifierContract = {
+  MAINNET: '0x07d14dfd8ee95b41fce179170d88ba1f0d5a512e13aeb232f19cfeec0a88f8bf',
+  TESTNET_SEPOLIA: '0x0182EcE8173C216A395f4828e1523541b7e3600bf190CB252E1a1A0cE219d184',
+} as const;
 
 /**
  * Returns the address of the Starknet ID Verifier contract based on the specified chain ID.
@@ -244,10 +244,10 @@ export function getStarknetIdVerifierContract(chainId: StarknetChainId): string 
   }
 }
 
-export const enum StarknetIdPfpContract {
-  MAINNET = '0x070aaa20ec4a46da57c932d9fd89ca5e6bb9ca3188d3df361a32306aff7d59c7',
-  TESTNET_SEPOLIA = '0x058061bb6bdc501eE215172c9f87d557C1E0f466dC498cA81b18f998Bf1362b2',
-}
+export const StarknetIdPfpContract = {
+  MAINNET: '0x070aaa20ec4a46da57c932d9fd89ca5e6bb9ca3188d3df361a32306aff7d59c7',
+  TESTNET_SEPOLIA: '0x058061bb6bdc501eE215172c9f87d557C1E0f466dC498cA81b18f998Bf1362b2',
+} as const;
 
 /**
  * Retrieves the contract address of the Starknet.id profile picture verifier contract based on the given chain ID.
@@ -276,10 +276,10 @@ export function getStarknetIdPfpContract(chainId: StarknetChainId): string {
   }
 }
 
-export const enum StarknetIdPopContract {
-  MAINNET = '0x0293eb2ba9862f762bd3036586d5755a782bd22e6f5028320f1d0405fd47bff4',
-  TESTNET_SEPOLIA = '0x0023FE3b845ed5665a9eb3792bbB17347B490EE4090f855C1298d03BB5F49B49',
-}
+export const StarknetIdPopContract = {
+  MAINNET: '0x0293eb2ba9862f762bd3036586d5755a782bd22e6f5028320f1d0405fd47bff4',
+  TESTNET_SEPOLIA: '0x0023FE3b845ed5665a9eb3792bbB17347B490EE4090f855C1298d03BB5F49B49',
+} as const;
 
 /**
  * Retrieves the Starknet ID Proof of Personhood (IdPop) verifier contract address for the given chain ID.
