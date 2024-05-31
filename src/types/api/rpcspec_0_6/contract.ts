@@ -91,9 +91,6 @@ type IMPL = {
   interface_name: string;
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-type EVENT_KIND = 'struct' | 'enum';
-
 type EVENT_FIELD = {
   name: string;
   type: string;

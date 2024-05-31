@@ -18,11 +18,12 @@ function generateString(length: number, seed: number): string {
   return result;
 }
 
-describe('Should tets StarknetId utils', () => {
+describe('Should test StarknetId utils', () => {
   test('Should test useEncoded and useDecoded hook with a random string', () => {
     for (let index = 0; index < 2500; index += 1) {
       const randomString = generateString(10, index);
-      expect(useDecoded([useEncoded(randomString)])).toBe(randomString.concat('.stark'));
+      const decoded = useDecoded([useEncoded(randomString)]);
+      expect(decoded).toBe(randomString.concat('.stark'));
     }
   });
 
