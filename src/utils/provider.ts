@@ -1,6 +1,5 @@
 import { NetworkName, RPC_NODES } from '../constants';
 import {
-  BigNumberish,
   BlockIdentifier,
   BlockTag,
   CompiledContract,
@@ -128,43 +127,6 @@ export const getDefaultNodeUrl = (networkName?: NetworkName, mute: boolean = fal
   const randIdx = Math.floor(Math.random() * nodes.length);
   return nodes[randIdx];
 };
-
-/**
- * Return the hash formatted as a string
- * @see https://github.com/starkware-libs/cairo-lang/blob/fc97bdd8322a7df043c87c371634b26c15ed6cee/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L148-L153
- * @param {BigNumberish} hashValue NetworkName
- * @returns {string} hash as a string
- * @example
- * ```typescript
- * const result= provider.formatHash(123n);
- * // result = "0x7b"
- * ```
- */
-export function formatHash(hashValue: BigNumberish): string {
-  if (isString(hashValue)) return hashValue;
-  return toHex(hashValue);
-}
-
-/**
- * Return the ID of a transaction
- * @see https://github.com/starkware-libs/cairo-lang/blob/fc97bdd8322a7df043c87c371634b26c15ed6cee/src/starkware/starknet/services/api/feeder_gateway/feeder_gateway_client.py#L156-L161
- * @param {BigNumberish} [txHash] Transaction hash
- * @param {BigNumberish} [txId] Transaction ID (one of the 2 params is required)
- * @returns {string} transaction identifier
- * @example
- * ```typescript
- * const result = provider.txIdentifier(undefined, 123n);
- * // result = "transactionId=0x7b"
- * ```
- */
-export function txIdentifier(txHash?: BigNumberish, txId?: BigNumberish): string {
-  if (!txHash) {
-    return `transactionId=${JSON.stringify(txId)}`;
-  }
-  const hashString = formatHash(txHash);
-
-  return `transactionHash=${hashString}`;
-}
 
 export const validBlockTags = Object.values(BlockTag);
 
