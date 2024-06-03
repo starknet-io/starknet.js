@@ -1,22 +1,25 @@
+import { UDC } from '../../constants';
 import {
   Abi,
   AbiEnums,
   AbiEvents,
   AbiStructs,
-  Cairo1Events,
-  EventAbi,
+  CairoEvent,
+  AbiEvent,
   LegacyEvent,
   ParsedEvent,
   ParsedEvents,
   RPC,
-  type Cairo1Event,
-  type Cairo1EventVariant,
+  type CairoEventDefinition,
+  type CairoEventVariant,
+  type InvokeTransactionReceiptResponse,
 } from '../../types';
 import assert from '../assert';
 import { isCairo1Abi } from '../calldata/cairo';
 import responseParser from '../calldata/responseParser';
 import { starkCurve } from '../ec';
 import { addHexPrefix, utf8ToArray } from '../encode';
+import { cleanHex } from '../num';
 
 /**
  * Retrieves the events from the given ABI.
@@ -61,16 +64,16 @@ export function getAbiEvents(abi: Abi): AbiEvents {
     const abiEventsStructs = abi.filter((obj) => obj.type === 'event' && obj.kind === 'struct');
     const abiEventsEnums = abi.filter((obj) => obj.type === 'event' && obj.kind === 'enum');
     const abiEventsData: AbiEvents = abiEventsStructs.reduce(
-      (acc: Cairo1Events, event: Cairo1Events) => {
+      (acc: CairoEvent, event: CairoEvent) => {
         let nameList: string[] = [];
         let { name } = event;
         let flat: boolean = false;
-        const findName = (variant: Cairo1EventVariant) => variant.type === name;
+        const findName = (variant: CairoEventVariant) => variant.type === name;
         // eslint-disable-next-line no-constant-condition
         while (true) {
           const eventEnum = abiEventsEnums.find((eventE) => eventE.variants.some(findName));
           if (typeof eventEnum === 'undefined') break;
-          const variant: Cairo1EventVariant = eventEnum.variants.find(findName);
+          const variant: CairoEventVariant = eventEnum.variants.find(findName);
           nameList.unshift(variant.name);
           if (variant.kind === 'flat') flat = true;
           name = eventEnum.name;
@@ -157,7 +160,7 @@ export function parseEvents(
   abiEnums: AbiEnums
 ): ParsedEvents {
   const ret = providerReceivedEvents.flat().reduce((acc, recEvent: RPC.Event) => {
-    let abiEvent: EventAbi | AbiEvents = abiEvents[recEvent.keys.shift() ?? 0];
+    let abiEvent: AbiEvent | AbiEvents = abiEvents[recEvent.keys.shift() ?? 0];
     if (!abiEvent) {
       return acc;
     }
@@ -174,10 +177,10 @@ export function parseEvents(
     const dataIter = recEvent.data[Symbol.iterator]();
 
     const abiEventKeys =
-      (abiEvent as Cairo1Event).members?.filter((it) => it.kind === 'key') ||
+      (abiEvent as CairoEventDefinition).members?.filter((it) => it.kind === 'key') ||
       (abiEvent as LegacyEvent).keys;
     const abiEventData =
-      (abiEvent as Cairo1Event).members?.filter((it) => it.kind === 'data') ||
+      (abiEvent as CairoEventDefinition).members?.filter((it) => it.kind === 'data') ||
       (abiEvent as LegacyEvent).data;
 
     abiEventKeys.forEach((key) => {
@@ -203,4 +206,32 @@ export function parseEvents(
     return acc;
   }, [] as ParsedEvents);
   return ret;
+}
+
+/**
+ * Parse Transaction Receipt Event from UDC invoke transaction and
+ * create DeployContractResponse compatible response with addition of the UDC Event data
+ *
+ * @returns DeployContractResponse | UDC Event Response data
+ */
+export function parseUDCEvent(txReceipt: InvokeTransactionReceiptResponse) {
+  if (!txReceipt.events) {
+    throw new Error('UDC emitted event is empty');
+  }
+  const event = txReceipt.events.find(
+    (it: any) => cleanHex(it.from_address) === cleanHex(UDC.ADDRESS)
+  ) || {
+    data: [],
+  };
+  return {
+    transaction_hash: txReceipt.transaction_hash,
+    contract_address: event.data[0],
+    address: event.data[0],
+    deployer: event.data[1],
+    unique: event.data[2],
+    classHash: event.data[3],
+    calldata_len: event.data[4],
+    calldata: event.data.slice(5, 5 + parseInt(event.data[4], 16)),
+    salt: event.data[event.data.length - 1],
+  };
 }

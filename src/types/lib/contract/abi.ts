@@ -1,5 +1,5 @@
 /** ABI */
-export type Abi = ReadonlyArray<FunctionAbi | EventAbi | StructAbi | InterfaceAbi | any>;
+export type Abi = ReadonlyArray<FunctionAbi | AbiEvent | AbiStruct | InterfaceAbi | any>;
 
 // Basic elements
 export type AbiEntry = { name: string; type: 'felt' | 'felt*' | string };
@@ -22,9 +22,9 @@ export type FunctionAbi = {
   type: FunctionAbiType;
 };
 
-export type AbiStructs = { [name: string]: StructAbi };
+export type AbiStructs = { [name: string]: AbiStruct };
 
-export type StructAbi = {
+export type AbiStruct = {
   members: (AbiEntry & { offset: number })[];
   name: string;
   size: number;
@@ -38,28 +38,37 @@ export type InterfaceAbi = {
   type: 'interface';
 };
 
-export type AbiEnums = { [name: string]: EnumAbi };
-export type EnumAbi = {
+export type AbiEnums = { [name: string]: AbiEnum };
+export type AbiEnum = {
   variants: (AbiEntry & { offset: number })[];
   name: string;
   size: number;
   type: 'enum';
 };
 
-export type AbiEvents = { [hash: string]: EventAbi };
+// AbiEvents type is an arborescence :
+// - Nodes are hashes of Cairo 1 components names, or of Cairo 0 or 1 event names,
+// - With Cairo 1 abi, the nodes are linked in accordance with the components arborescence ; the tree can have several levels.
+// - With Cairo 0 abi : the tree has only one level (no component concept)
+// - leaves are the description of each event (not the same for Cairo 0 and Cairo 1)
+// -  if the #[flat] flag is used in the Cairo 1 code to describe an event, or if the event is in the main code, the branch for this event has only one level.
+export type AbiEvents = { [hash: string]: AbiEvent };
 
-export type EventAbi = Cairo1Events | LegacyEvent;
+// if Cairo 1 then definition of an event, or new level
+// if Cairo 0 then definition of an event
+export type AbiEvent = CairoEvent | LegacyEvent;
 
-export type Cairo1Events = Cairo1Event | AbiEvents;
+// CairoEvent is CairoEventDefinition type if we have a leaf (end of the arborescence for an event), otherwise a new branch is created. Only for Cairo 1
+export type CairoEvent = CairoEventDefinition | AbiEvents;
 
-export type Cairo1Event = {
+export type CairoEventDefinition = {
   name: string;
   members: EventEntry[];
   kind: 'struct';
   type: 'event';
 };
 
-export type Cairo1EventVariant = {
+export type CairoEventVariant = {
   kind: 'nested' | 'flat';
   name: string;
   type: string;

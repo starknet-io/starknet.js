@@ -33,7 +33,7 @@ export * as ec from './utils/ec';
 export * as starknetId from './utils/starknetId';
 export * as provider from './utils/provider';
 export * as selector from './utils/selector';
-export * as events from './utils/events/index';
+export * as events from './utils/events';
 export * from './utils/cairoDataTypes/uint256';
 export * from './utils/cairoDataTypes/uint512';
 export * from './utils/address';
@@ -41,7 +41,6 @@ export * from './utils/url';
 export * from './utils/calldata';
 export * from './utils/calldata/enum';
 export * from './utils/contract';
-export * from './utils/events';
 export * from './utils/transactionReceipt';
 export * as wallet from './wallet/connect';
 
