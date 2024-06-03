@@ -126,7 +126,7 @@ export function useEncoded(decoded: string): bigint {
 
 export const StarknetIdContract = {
   MAINNET: '0x6ac597f8116f886fa1c97a23fa4e08299975ecaf6b598873ca6792b9bbfb678',
-  TESTNET_SEPOLIA: '0x0707f09bc576bd7cfee59694846291047e965f4184fe13dac62c56759b3b6fa7',
+  TESTNET_SEPOLIA: '0x154bc2e1af9260b9e66af0e9c46fc757ff893b3ff6a85718a810baf1474',
 } as const;
 
 /**
@@ -138,7 +138,7 @@ export const StarknetIdContract = {
  * @example
  * ```typescript
  * const result = starknetId.getStarknetIdContract(constants.StarknetChainId.SN_SEPOLIA);
- * // result = "0x0707f09bc576bd7cfee59694846291047e965f4184fe13dac62c56759b3b6fa7"
+ * // result = "0x154bc2e1af9260b9e66af0e9c46fc757ff893b3ff6a85718a810baf1474"
  * ```
  */
 export function getStarknetIdContract(chainId: StarknetChainId): string {
@@ -156,7 +156,7 @@ export function getStarknetIdContract(chainId: StarknetChainId): string {
 
 export const StarknetIdIdentityContract = {
   MAINNET: '0x05dbdedc203e92749e2e746e2d40a768d966bd243df04a6b712e222bc040a9af',
-  TESTNET_SEPOLIA: '0x070DF8B4F5cb2879f8592849fA8f3134da39d25326B8558cc9C8FE8D47EA3A90',
+  TESTNET_SEPOLIA: '0x3697660a0981d734780731949ecb2b4a38d6a58fc41629ed611e8defda',
 } as const;
 
 /**
@@ -170,7 +170,7 @@ export const StarknetIdIdentityContract = {
  * @example
  * ```typescript
  * const result = starknetId.getStarknetIdIdentityContract(constants.StarknetChainId.SN_SEPOLIA);
- * // result = "0x070DF8B4F5cb2879f8592849fA8f3134da39d25326B8558cc9C8FE8D47EA3A90"
+ * // result = "0x3697660a0981d734780731949ecb2b4a38d6a58fc41629ed611e8defda"
  * ```
  */
 export function getStarknetIdIdentityContract(chainId: StarknetChainId): string {
@@ -216,7 +216,7 @@ export function getStarknetIdMulticallContract(chainId: StarknetChainId): string
 
 export const StarknetIdVerifierContract = {
   MAINNET: '0x07d14dfd8ee95b41fce179170d88ba1f0d5a512e13aeb232f19cfeec0a88f8bf',
-  TESTNET_SEPOLIA: '0x0182EcE8173C216A395f4828e1523541b7e3600bf190CB252E1a1A0cE219d184',
+  TESTNET_SEPOLIA: '0x60B94fEDe525f815AE5E8377A463e121C787cCCf3a36358Aa9B18c12c4D566',
 } as const;
 
 /**
@@ -228,7 +228,7 @@ export const StarknetIdVerifierContract = {
  * @example
  * ```typescript
  * const result = starknetId.getStarknetIdVerifierContract(constants.StarknetChainId.SN_SEPOLIA);
- * // result = "0x0182EcE8173C216A395f4828e1523541b7e3600bf190CB252E1a1A0cE219d184"
+ * // result = "0x60B94fEDe525f815AE5E8377A463e121C787cCCf3a36358Aa9B18c12c4D566"
  * ```
  */
 export function getStarknetIdVerifierContract(chainId: StarknetChainId): string {
@@ -246,7 +246,7 @@ export function getStarknetIdVerifierContract(chainId: StarknetChainId): string 
 
 export const StarknetIdPfpContract = {
   MAINNET: '0x070aaa20ec4a46da57c932d9fd89ca5e6bb9ca3188d3df361a32306aff7d59c7',
-  TESTNET_SEPOLIA: '0x058061bb6bdc501eE215172c9f87d557C1E0f466dC498cA81b18f998Bf1362b2',
+  TESTNET_SEPOLIA: '0x9e7bdb8dabd02ea8cfc23b1d1c5278e46490f193f87516ed5ff2dfec02',
 } as const;
 
 /**
@@ -258,7 +258,7 @@ export const StarknetIdPfpContract = {
  * @example
  * ```typescript
  * const result = starknetId.getStarknetIdPfpContract(constants.StarknetChainId.SN_SEPOLIA);
- * // result = "0x058061bb6bdc501eE215172c9f87d557C1E0f466dC498cA81b18f998Bf1362b2"
+ * // result = "0x9e7bdb8dabd02ea8cfc23b1d1c5278e46490f193f87516ed5ff2dfec02"
  * ```
  */
 export function getStarknetIdPfpContract(chainId: StarknetChainId): string {
@@ -278,7 +278,7 @@ export function getStarknetIdPfpContract(chainId: StarknetChainId): string {
 
 export const StarknetIdPopContract = {
   MAINNET: '0x0293eb2ba9862f762bd3036586d5755a782bd22e6f5028320f1d0405fd47bff4',
-  TESTNET_SEPOLIA: '0x0023FE3b845ed5665a9eb3792bbB17347B490EE4090f855C1298d03BB5F49B49',
+  TESTNET_SEPOLIA: '0x15ae88ae054caa74090b89025c1595683f12edf7a4ed2ad0274de3e1d4a',
 } as const;
 
 /**
@@ -290,7 +290,7 @@ export const StarknetIdPopContract = {
  * @example
  * ```typescript
  * const result = starknetId.getStarknetIdPopContract(constants.StarknetChainId.SN_SEPOLIA);
- * // result = "0x0023FE3b845ed5665a9eb3792bbB17347B490EE4090f855C1298d03BB5F49B49"
+ * // result = "0x15ae88ae054caa74090b89025c1595683f12edf7a4ed2ad0274de3e1d4a"
  * ```
  */
 export function getStarknetIdPopContract(chainId: StarknetChainId): string {
