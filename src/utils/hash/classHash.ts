@@ -135,13 +135,16 @@ export function formatSpaces(json: string): string {
  * Compute hinted class hash for legacy compiled contract (Cairo 0)
  * @param {LegacyCompiledContract} compiledContract
  * @returns {string} hex-string
- * No example, as this function is not exported to user
- */
-export default function computeHintedClassHash(compiledContract: LegacyCompiledContract) {
+ * @example
+ * ```typescript
+ * const compiledCairo0 = json.parse(fs.readFileSync("./cairo0contract.json").toString("ascii"));
+ * const result=hash.computeHintedClassHash(compiledCairo0);
+ * // result = "0x293eabb06955c0a1e55557014675aa4e7a1fd69896147382b29b2b6b166a2ac"
+ * ``` */
+export function computeHintedClassHash(compiledContract: LegacyCompiledContract): string {
   const { abi, program } = compiledContract;
   const contractClass = { abi, program };
   const serializedJson = formatSpaces(stringify(contractClass, nullSkipReplacer));
-
   return addHexPrefix(starkCurve.keccak(utf8ToArray(serializedJson)).toString(16));
 }
 
