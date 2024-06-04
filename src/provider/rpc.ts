@@ -124,10 +124,10 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier = 'pending',
     retryInterval: number = 5000
   ) {
-    if (blockIdentifier === BlockTag.latest) return;
+    if (blockIdentifier === BlockTag.LATEST) return;
     const currentBlock = await this.getBlockNumber();
     const targetBlock =
-      blockIdentifier === BlockTag.pending
+      blockIdentifier === BlockTag.PENDING
         ? currentBlock + 1
         : Number(toHex(blockIdentifier as BigNumberish));
     if (targetBlock <= currentBlock) return;
@@ -205,11 +205,11 @@ export class RpcProvider implements ProviderInterface {
 
   /**
    * Return transactions from pending block
-   * @deprecated Instead use getBlock(BlockTag.pending); (will be removed in next minor version)
+   * @deprecated Instead use getBlock(BlockTag.PENDING); (will be removed in next minor version)
    * Utility method, same result can be achieved using getBlockWithTxHashes(BlockTag.pending);
    */
   public async getPendingTransactions() {
-    const { transactions } = await this.getBlockWithTxHashes(BlockTag.pending).then(
+    const { transactions } = await this.getBlockWithTxHashes(BlockTag.PENDING).then(
       this.responseParser.parseGetBlockResponse
     );
     return Promise.all(transactions.map((it: any) => this.getTransactionByHash(it)));
