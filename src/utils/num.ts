@@ -30,7 +30,7 @@ export function isHex(hex: string): boolean {
 /**
  * Convert BigNumberish to bigint
  *
- * @param {BigNumberish} value hex-string
+ * @param {BigNumberish} value value to convert
  * @returns {BigInt} converted value
  * @example
  * ```typescript
@@ -50,7 +50,7 @@ export function toBigInt(value: BigNumberish): bigint {
  * @returns {boolean} true if value is bigint, false otherwise
  * @example
  * ```typescript
- * isBigInt(BigInt(10)); // true
+ * isBigInt(10n); // true
  * isBigInt(BigInt('10')); // true
  * isBigInt(10); // false
  * isBigInt('10'); // false
@@ -64,7 +64,7 @@ export function isBigInt(value: any): value is bigint {
 /**
  * Convert BigNumberish to hex-string
  *
- * @param {BigNumberish} number number to convert
+ * @param {BigNumberish} value value to convert
  * @returns {string} converted number in hex-string format
  * @example
  * ```typescript
@@ -72,8 +72,8 @@ export function isBigInt(value: any): value is bigint {
  * toHex('200'); // '0xc8'
  * ```
  */
-export function toHex(number: BigNumberish): string {
-  return addHexPrefix(toBigInt(number).toString(16));
+export function toHex(value: BigNumberish): string {
+  return addHexPrefix(toBigInt(value).toString(16));
 }
 
 /**
@@ -166,7 +166,7 @@ export function assertInRange(
  * @returns {string[]} array of decimal strings
  * @example
  * ```typescript
- * const data = [100, BigInt(200)];
+ * const data = [100, 200n];
  * const result = bigNumberishArrayToDecimalStringArray(data);
  * // result = ['100', '200']
  * ```
@@ -182,7 +182,7 @@ export function bigNumberishArrayToDecimalStringArray(data: BigNumberish[]): str
  * @returns array of hex-strings
  * @example
  * ```typescript
- * const data = [100, BigInt(200)];
+ * const data = [100, 200n];
  * const result = bigNumberishArrayToHexadecimalStringArray(data);
  * // result = ['0x64', '0xc8']
  * ```
@@ -260,7 +260,7 @@ export function getHexString(str: string) {
 /**
  * Convert string array to hex-string array
  *
- * @param {Array<string>} data array of string elements
+ * @param {Array<string>} array array of string elements
  * @returns array of converted elements in hex-string format
  * @example
  * ```typescript
@@ -269,8 +269,8 @@ export function getHexString(str: string) {
  * // result = ['0x64', '0xc8', '0xaa']
  * ```
  */
-export function getHexStringArray(data: Array<string>) {
-  return data.map((el) => getHexString(el));
+export function getHexStringArray(array: Array<string>) {
+  return array.map(getHexString);
 }
 
 /**
