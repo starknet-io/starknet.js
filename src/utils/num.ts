@@ -244,7 +244,7 @@ export function getDecimalString(str: string) {
  * // result = "0x7b"
  *
  * const result2 = getHexString("Hello");
- * // throws Error: Hello need to be hex-string or whole-number-string
+ * // throws Error: Hello needs to be a hex-string or whole-number-string
  * ```
  */
 export function getHexString(str: string) {
