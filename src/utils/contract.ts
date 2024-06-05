@@ -18,6 +18,11 @@ import { isString } from './shortString';
  *
  * @param {CairoContract | string} contract - The contract to check. Can be either a CairoContract object or a string representation of the contract.
  * @return {boolean} - Returns true if the contract is a Sierra contract, otherwise false.
+ * @example
+ * ```typescript
+ * const result = isSierra(contract);
+ * // result = true | false
+ * ```
  */
 export function isSierra(
   contract: CairoContract | string
@@ -30,10 +35,18 @@ export function isSierra(
  * Extracts contract hashes from `DeclareContractPayload`.
  *
  * @param {DeclareContractPayload} payload - The payload containing contract information.
- *
  * @return {CompleteDeclareContractPayload} - The `CompleteDeclareContractPayload` with extracted contract hashes.
- *
  * @throws {Error} - If extraction of compiledClassHash or classHash fails.
+ * @example
+ * ```typescript
+ * const result = extractContractHashes(contract);
+ * // result = {
+ * //   contract: ...,
+ * //   classHash: ...,
+ * //   casm: ...,
+ * //   compiledClassHash: ...,
+ * // }
+ * ```
  */
 export function extractContractHashes(
   payload: DeclareContractPayload

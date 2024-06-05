@@ -1,6 +1,6 @@
 {
   "name": "starknet",
-  "version": "6.8.0",
+  "version": "6.9.0",
   "description": "JavaScript library for Starknet",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -27,6 +27,7 @@
     "build:dts": "tsup --clean false --dts-only",
     "pretest": "npm run lint && npm run ts:check",
     "test": "jest -i",
+    "test:coverage": "jest -i --coverage",
     "posttest": "npm run format -- --log-level warn",
     "test:watch": "jest --watch",
     "docs": "cd www && npm run start",

@@ -71,7 +71,7 @@ export interface MessageToL1 {
 
 export type RevertedTransactionReceiptResponse = {
   type?: TransactionType | any; // RPC only // any due to RPC Spec issue
-  execution_status: TransactionExecutionStatus.REVERTED | any; // any due to RPC Spec issue
+  execution_status: typeof TransactionExecutionStatus.REVERTED | any; // any due to RPC Spec issue
   finality_status: TransactionFinalityStatus | any;
   status?: TransactionStatus; // SEQ only
   actual_fee: string;
@@ -85,7 +85,7 @@ export type RevertedTransactionReceiptResponse = {
 };
 
 export type RejectedTransactionReceiptResponse = {
-  status: `${TransactionStatus.REJECTED}`;
+  status: typeof TransactionStatus.REJECTED;
   transaction_failure_reason: {
     code: string;
     error_message: string;
