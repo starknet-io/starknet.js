@@ -1,5 +1,4 @@
 /* eslint-disable max-classes-per-file */
-// TODO Convert to CairoFelt base on CairoUint256 and implement it in the codebase in the backward compatible manner
 
 import { BigNumberish, isBigInt, isBoolean, isHex, isStringWholeNumber } from '../num';
 import { encodeShortString, isLongText, isShortText, isString } from '../shortString';
