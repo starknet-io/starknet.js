@@ -11,7 +11,7 @@ export type ABI = Array<
   FUNCTION | CONSTRUCTOR | L1_HANDLER | EVENT | STRUCT | ENUM | INTERFACE | IMPL
 >;
 
-type FUNCTION = {
+export type FUNCTION = {
   type: 'function';
   name: string;
   inputs: Array<{
@@ -24,7 +24,7 @@ type FUNCTION = {
   state_mutability: 'view' | 'external';
 };
 
-type CONSTRUCTOR = {
+export type CONSTRUCTOR = {
   type: 'constructor';
   name: 'constructor';
   inputs: Array<{
@@ -33,7 +33,7 @@ type CONSTRUCTOR = {
   }>;
 };
 
-type L1_HANDLER = {
+export type L1_HANDLER = {
   type: 'l1_handler';
   name: string;
   inputs: Array<{
@@ -46,22 +46,22 @@ type L1_HANDLER = {
   state_mutability: 'view' | 'external';
 };
 
-type EVENT = {
+export type EVENT = {
   type: 'event';
   name: string;
 } & (ENUM_EVENT | STRUCT_EVENT);
 
-type STRUCT_EVENT = {
+export type STRUCT_EVENT = {
   kind: 'struct';
   members: Array<EVENT_FIELD>;
 };
 
-type ENUM_EVENT = {
+export type ENUM_EVENT = {
   kind: 'enum';
   variants: Array<EVENT_FIELD>;
 };
 
-type STRUCT = {
+export type STRUCT = {
   type: 'struct';
   name: string;
   members: Array<{
@@ -70,7 +70,7 @@ type STRUCT = {
   }>;
 };
 
-type ENUM = {
+export type ENUM = {
   type: 'enum';
   name: string;
   variants: Array<{
@@ -79,22 +79,22 @@ type ENUM = {
   }>;
 };
 
-type INTERFACE = {
+export type INTERFACE = {
   type: 'interface';
   name: string;
   items: Array<FUNCTION>;
 };
 
-type IMPL = {
+export type IMPL = {
   type: 'impl';
   name: string;
   interface_name: string;
 };
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-type EVENT_KIND = 'struct' | 'enum';
+export type EVENT_KIND = 'struct' | 'enum';
 
-type EVENT_FIELD = {
+export type EVENT_FIELD = {
   name: string;
   type: string;
   kind: 'key' | 'data' | 'nested';
