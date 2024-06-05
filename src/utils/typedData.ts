@@ -92,7 +92,9 @@ function getHex(value: BigNumberish): string {
     throw new Error(`Invalid BigNumberish: ${value}`);
   }
 }
-
+/**
+ * Validates that `data` matches the EIP-712 JSON schema.
+ */
 function validateTypedData(data: unknown): data is TypedData {
   const typedData = data as TypedData;
   return Boolean(
