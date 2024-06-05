@@ -33,9 +33,9 @@ export const parse = (str: string): any =>
  * @return {object} Parsed json object
  * @example
  * ```typescript
- * const str = '[123, 12.3, 11223344556677889900]';
+ * const str = '[123, 12.3, 1234567890]';
  * const result = parseAlwaysAsBig(str);
- * // result = [123n, 12.3, 11223344556677890048n]
+ * // result = [123n, 12.3, 1234567890n]
  * ```
  */
 export const parseAlwaysAsBig = (str: string): any =>
@@ -54,9 +54,9 @@ export const parseAlwaysAsBig = (str: string): any =>
  * @return {string} JSON string
  * @example
  * ```typescript
- * const str = '[123, 12.3, 11223344556677889900]';
- * const result = stringify(str);
- * // result = [123, 12.3, 11223344556677890048n]
+ * const value = [123, 12.3, 1234567890];
+ * const result = stringify(value);
+ * // result = '[123,12.3,1234567890]'
  * ```
  */
 export const stringify = (
