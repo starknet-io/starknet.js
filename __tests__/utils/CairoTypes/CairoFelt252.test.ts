@@ -1,20 +1,20 @@
 import { CairoFelt252 } from '../../../src/utils/cairoDataTypes/felt252';
 import { encodeShortString } from '../../../src/utils/shortString';
 
-describe('new CairoFelt252 function', () => {
-  test('should throw error for non-integer input', () => {
+describe('CairoFelt252 constructor', () => {
+  test('should throw an error for non-integer input', () => {
     expect(() => new CairoFelt252({} as any)).toThrow();
     expect(() => new CairoFelt252([] as any)).toThrow();
     expect(() => new CairoFelt252(null as any)).toThrow();
     expect(() => new CairoFelt252(undefined as any)).toThrow();
   });
 
-  test('it should not throw an error for long string input', () => {
+  test('should not throw an error for long string input', () => {
     const longStr = '1234567890123456789012345678901234567890'; // length more than 31
     expect(() => new CairoFelt252(longStr as any)).not.toThrow();
   });
 
-  test('should throw error for non-ascii string input', () => {
+  test('should throw an error for non-ascii string input', () => {
     const nonAsciiStr = 'hello\uD83D\uDE00'; // hello with emoji
     expect(() => new CairoFelt252(nonAsciiStr as any)).toThrow();
   });
@@ -56,12 +56,12 @@ describe('new CairoFelt252 function', () => {
     expect(new CairoFelt252('0x10A').value).toBe('266');
   });
 
-  test('should throw error for non-standard ASCII string literals', () => {
+  test('should throw an error for non-standard ASCII string literals', () => {
     // It appears new CairoFelt252 correctly handles only ASCII string literals and throws for spaces and non-ASCII characters
     expect(() => new CairoFelt252('Δ')).toThrow(); // Non-ASCII
   });
 
-  test('should not throw error for standard ASCII string literals', () => {
+  test('should not throw an error for standard ASCII string literals', () => {
     // Cairo uses standard ASCII for string literals.
     // Letters, numbers and some special characters are allowed.
     expect(new CairoFelt252('abc').value).toBe('6382179'); // Cairo equivalents
@@ -70,9 +70,9 @@ describe('new CairoFelt252 function', () => {
     expect(new CairoFelt252('!').value).toBe('33'); // Cairo equivalents.
   });
 
-  test('should throw error for number beyond JavaScript limit', () => {
+  test('should not throw an error for number beyond JavaScript limit', () => {
     const beyondJsLimit = '9007199254740992'; // beyond Number.MAX_SAFE_INTEGER
-    expect(() => new CairoFelt252(beyondJsLimit as any)).not.toThrow(); //
+    expect(() => new CairoFelt252(beyondJsLimit)).not.toThrow(); //
   });
 
   test('should properly handle decimal string values', () => {
@@ -162,29 +162,29 @@ describe('new CairoFelt252 function', () => {
 
   test('should reject invalid blockchain data formats', () => {
     const invalidTxHash = '0xGHIJKLMNOPQRSTUVWXYZ123456'; // Invalid transaction hash
-    // new CairoFelt252 does not currently throw on invalid hex.
+    // CairoFelt252 does not currently throw on invalid hex.
     expect(() => new CairoFelt252(invalidTxHash)).not.toThrow(); // CHANGED
 
     const malformedAddress = '0x12345'; // Malformed address
-    // new CairoFelt252 does not currently validate addresses, so no error would be thrown for a malformed address.
+    // CairoFelt252 does not currently validate addresses, so no error would be thrown for a malformed address.
     expect(() => new CairoFelt252(malformedAddress)).not.toThrow(); // CHANGED
 
     const overflowNumber = BigInt(
       '115792089237316195423570985008687907853269984665640564039457584007913129639936'
     );
-    // new CairoFelt252 does not currently check for uint256 overflow.
+    // CairoFelt252 does not currently check for uint256 overflow.
     expect(() => new CairoFelt252(overflowNumber)).not.toThrow(); // CHANGED
   });
 
   test('should reject non-hexadecimal strings and invalid hex formats', () => {
-    expect(() => new CairoFelt252('0xGHIJK')).not.toThrow(); // new CairoFelt252 does not currently throw on invalid hex.
+    expect(() => new CairoFelt252('0xGHIJK')).not.toThrow(); // CairoFelt252 does not currently throw on invalid hex.
 
-    expect(() => new CairoFelt252('0x123G')).not.toThrow(); // new CairoFelt252 does not currently throw on invalid hex.
+    expect(() => new CairoFelt252('0x123G')).not.toThrow(); // CairoFelt252 does not currently throw on invalid hex.
 
-    expect(() => new CairoFelt252('123x0')).not.toThrow(); // new CairoFelt252 does not currently throw on invalid hex.
+    expect(() => new CairoFelt252('123x0')).not.toThrow(); // CairoFelt252 does not currently throw on invalid hex.
   });
 
-  test('should throw error for strings not representing ASCII text or whole numbers', () => {
+  test('should throw an error for strings not representing ASCII text or whole numbers', () => {
     expect(() => new CairoFelt252('hello world')).not.toThrow(); // new CairoFelt252 currently does not perform ASCII text validation.
 
     expect(() => new CairoFelt252('123.456')).not.toThrow(); // new CairoFelt252 currently does not perform decimal number validation.
@@ -244,12 +244,12 @@ describe('new CairoFelt252 function', () => {
     );
   });
 
-  test('should throw error for object input', () => {
+  test('should throw an error for object input', () => {
     const obj = {};
     expect(() => new CairoFelt252(obj as any)).toThrow(`${obj} can't be converted to felt252`);
   });
 
-  test('should throw error for array input', () => {
+  test('should throw an error for array input', () => {
     const arr = [1, 2, 3];
     expect(() => new CairoFelt252(arr as any)).toThrow(`${arr} can't be converted to felt252`);
   });

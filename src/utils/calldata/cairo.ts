@@ -9,7 +9,7 @@ import {
   Uint256,
   Uint512,
 } from '../../types';
-import { CairoFelt } from '../cairoDataTypes/felt';
+import { CairoFelt252 } from '../cairoDataTypes/felt252';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 
@@ -262,5 +262,5 @@ export const tuple = (
  * @returns format: felt-string
  */
 export function felt(it: BigNumberish): string {
-  return CairoFelt(it);
+  return new CairoFelt252(it).value;
 }

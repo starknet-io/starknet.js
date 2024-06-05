@@ -4,11 +4,11 @@
 import { BigNumberish, isBigInt, isBoolean, isHex, isStringWholeNumber } from '../num';
 import { encodeShortString, isLongText, isShortText, isString } from '../shortString';
 
-type ParseableTypes = BigNumberish | Boolean;
-type Numberish = BigInt | number;
+type ParsableTypes = BigNumberish | Boolean;
+type Numberish = bigint | number;
 
 export class FeltParseError extends Error {
-  constructor(val: ParseableTypes, msg?: string) {
+  constructor(val: ParsableTypes, msg?: string) {
     const message = msg ?? `${val} can't be converted to felt252`;
     super(message);
   }
@@ -17,7 +17,7 @@ export class FeltParseError extends Error {
 export class CairoFelt252 {
   private felt: string;
 
-  constructor(val: ParseableTypes) {
+  constructor(val: ParsableTypes) {
     if (isBigInt(val) || Number.isInteger(val)) {
       this.felt = this.parseNumberish(val as Numberish);
     } else if (isString(val)) {
@@ -27,6 +27,14 @@ export class CairoFelt252 {
     } else {
       throw new FeltParseError(val);
     }
+  }
+
+  get value() {
+    return this.felt;
+  }
+
+  public static toFeltArray(...vals: ParsableTypes[]) {
+    return vals.map((it) => new CairoFelt252(it).value);
   }
 
   private parseNumberish(val: Numberish) {
@@ -53,9 +61,5 @@ export class CairoFelt252 {
 
   private parseBoolean(val: boolean) {
     return `${+val}`;
-  }
-
-  get value() {
-    return this.felt;
   }
 }
