@@ -6,7 +6,34 @@ import { cleanHex } from './num';
  * Parse Transaction Receipt Event from UDC invoke transaction and
  * create DeployContractResponse compatible response with addition of the UDC Event data
  *
- * @returns DeployContractResponse | UDC Event Response data
+ * @param {InvokeTransactionReceiptResponse} txReceipt
+ * @return {object} Object including DeployContractResponse and UDC Event data
+ * @example
+ * ```typescript
+ * const deployment = await account.deploy({
+ *   classHash,
+ *   constructorCalldata: [
+ *     encodeShortString('Token'),
+ *     encodeShortString('ERC20'),
+ *     account.address,
+ *   ],
+ *   salt,
+ *   unique: true,
+ * });
+ * const txReceipt = await provider.waitForTransaction(deployment.transaction_hash);
+ * const udcEvent = parseUDCEvent(txReceipt as any);
+ * // udcEvent = {
+ * //   transaction_hash: ...,
+ * //   contract_address: ...,
+ * //   address: ...,
+ * //   deployer: ...,
+ * //   unique: ...,
+ * //   classHash: ...,
+ * //   calldata_len: ...,
+ * //   calldata: ...,
+ * //   salt: ...,
+ * // }
+ * ```
  */
 export function parseUDCEvent(txReceipt: InvokeTransactionReceiptResponse) {
   if (!txReceipt.events) {
