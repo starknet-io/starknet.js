@@ -47,14 +47,14 @@ export type AbiEnum = {
 };
 
 // AbiEvents type is an arborescence :
-// - Nodes are hashes of Cairo 1 components names, or of Cairo 0 or 1 event names,
-// - With Cairo 1 abi, the nodes are linked in accordance with the components arborescence ; the tree can have several levels.
-// - With Cairo 0 abi : the tree has only one level (no component concept)
-// - leaves are the description of each event (not the same for Cairo 0 and Cairo 1)
-// -  if the #[flat] flag is used in the Cairo 1 code to describe an event, or if the event is in the main code, the branch for this event has only one level.
+// - Nodes are hashes of either Cairo 1 components names, or of Cairo 0 or 1 event names,
+// - With Cairo 1 abi, the nodes are linked in accordance with the components arborescence ; the tree can have several levels of nodes.
+// - With Cairo 0 abi : the tree has only one level of nodes (no component concept)
+// - leaves are at the end of each branch ; they describes each event (not the same for Cairo 0 and Cairo 1)
+// -  if the #[flat] flag is used in the Cairo 1 code to describe an event, or if the event is in the main code, the branch for this event has only one level of nodes (see example class 0x46ded64ae2dead6448e247234bab192a9c483644395b66f2155f2614e5804b0 in Sepolia)
 export type AbiEvents = { [hash: string]: AbiEvent };
 
-// if Cairo 1 then definition of an event, or new level
+// if Cairo 1 then either definition of an event, or new level of nodes
 // if Cairo 0 then definition of an event
 export type AbiEvent = CairoEvent | LegacyEvent;
 

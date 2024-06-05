@@ -1,3 +1,4 @@
+// import { API } from '@starknet-io/types-js';
 import { UDC } from '../../constants';
 import {
   Abi,
@@ -13,6 +14,7 @@ import {
   type CairoEventDefinition,
   type CairoEventVariant,
   type InvokeTransactionReceiptResponse,
+  type AbiEntry,
 } from '../../types';
 import assert from '../assert';
 import { isCairo1Abi } from '../calldata/cairo';
@@ -22,11 +24,113 @@ import { addHexPrefix, utf8ToArray } from '../encode';
 import { cleanHex } from '../num';
 
 /**
- * Retrieves the events from the given ABI.
+ * Check if an ABI entry is related to events.
+ * @param {AbiEntry} object an Abi entry
+ * @returns {boolean} true if this Abi Entry is related to an event
+ * @example
+ * ```typescript
+ * // use of a transaction receipt
+ * ```
+ */
+export function isAbiEvent(object: AbiEntry): boolean {
+  return object.type === 'event';
+}
+
+/**
+ * Retrieves the events from the given Cairo 0 ABI.
+ * @param {Abi} abi - The Cairo 0 ABI to extract events from.
+ * @return {AbiEvents} - An object containing the hashes and the definition of the events.
+ * @example
+ * ```typescript
+ * const result = events.getCairo0AbiEvents(abi0);
+ * // result = {
+  '0x35ea10b06d74221d24a134672e9f776a3088ba6b9829e53b9a10abd8817a211': {
+    data: [{ name: 'admin_requester', type: 'felt' }, { name: 'new_requester', type: 'felt' }],
+    keys: [],
+    name: 'AddAdmin',
+    type: 'event'
+  }
+ * ```
+ */
+function getCairo0AbiEvents(abi: Abi) {
+  return abi
+    .filter((abiEntry) => abiEntry.type === 'event')
+    .reduce((acc, abiEntry) => {
+      const entryName = abiEntry.name;
+      const abiEntryMod = { ...abiEntry };
+      abiEntryMod.name = entryName;
+      return {
+        ...acc,
+        [addHexPrefix(starkCurve.keccak(utf8ToArray(entryName)).toString(16))]: abiEntryMod,
+      };
+    }, {});
+}
+
+/**
+ * Retrieves the events from the given Cairo 1 ABI.
+ *
+ * Is able to handle events nested in Cairo components.
+ * @param {Abi} abi - The Cairo 1 ABI to extract events from.
+ * @return {AbiEvents} - An object containing the hashes and the definition of the events.
+ * @example
+ * ```typescript
+ * const result = events.getCairo1AbiEvents(abi1);
+ * // result = {
+ * //   '0x22ea134d4126804c60797e633195f8c9aa5fd6d1567e299f4961d0e96f373ee': 
+ * //    { '0x34e55c1cd55f1338241b50d352f0e91c7e4ffad0e4271d64eb347589ebdfd16': {
+ * //     kind: 'struct', type: 'event',
+ * //     name: 'ka::ExComponent::ex_logic_component::Mint',
+      
+ * //     members: [{
+ * //      name: 'spender',
+ * //      type: 'core::starknet::contract_address::ContractAddress',
+ * //      kind: 'key'},
+ * //      { name: 'value', type: 'core::integer::u256', kind: 'data' }]},
+ * // ...
+ * ```
+ */
+function getCairo1AbiEvents(abi: Abi) {
+  const abiEventsStructs = abi.filter((obj) => isAbiEvent(obj) && obj.kind === 'struct');
+  const abiEventsEnums = abi.filter((obj) => isAbiEvent(obj) && obj.kind === 'enum');
+  const abiEventsData: AbiEvents = abiEventsStructs.reduce((acc: CairoEvent, event: CairoEvent) => {
+    let nameList: string[] = [];
+    let { name } = event;
+    let flat: boolean = false;
+    const findName = (variant: CairoEventVariant) => variant.type === name;
+    // eslint-disable-next-line no-constant-condition
+    while (true) {
+      const eventEnum = abiEventsEnums.find((eventE) => eventE.variants.some(findName));
+      if (typeof eventEnum === 'undefined') break;
+      const variant: CairoEventVariant = eventEnum.variants.find(findName);
+      nameList.unshift(variant.name);
+      if (variant.kind === 'flat') flat = true;
+      name = eventEnum.name;
+    }
+    if (nameList.length === 0) {
+      throw new Error('inconsistency in ABI events definition.');
+    }
+    if (flat) nameList = [nameList[nameList.length - 1]];
+    const final = nameList.pop();
+    let result: AbiEvents = {
+      [addHexPrefix(starkCurve.keccak(utf8ToArray(final!)).toString(16))]: event,
+    };
+    while (nameList.length > 0) {
+      result = {
+        [addHexPrefix(starkCurve.keccak(utf8ToArray(nameList.pop()!)).toString(16))]: result,
+      };
+    }
+    result = { ...result };
+    return mergeAbiEvents(acc, result);
+  }, {});
+  return abiEventsData;
+}
+
+/**
+ * Retrieves the events from the given ABI (from Cairo 0 or Cairo 1 contract).
  *
  * Is able to handle Cairo 1 events nested in Cairo components.
  * @param {Abi} abi - The ABI to extract events from.
- * @return {AbiEvents} - An object containing the extracted events.
+ * @return {AbiEvents} - An object containing the hashes and the definition of the events.
  * @example
  * ```typescript
  * const result = events.getAbiEvents(abi);
@@ -45,60 +149,7 @@ import { cleanHex } from '../num';
  * ```
  */
 export function getAbiEvents(abi: Abi): AbiEvents {
-  let finalResult: AbiEvents;
-  if (!isCairo1Abi(abi)) {
-    // Cairo 0 abi
-    finalResult = abi
-      .filter((abiEntry) => abiEntry.type === 'event')
-      .reduce((acc, abiEntry) => {
-        const entryName = abiEntry.name;
-        const abiEntryMod = { ...abiEntry };
-        abiEntryMod.name = entryName;
-        return {
-          ...acc,
-          [addHexPrefix(starkCurve.keccak(utf8ToArray(entryName)).toString(16))]: abiEntryMod,
-        };
-      }, {});
-  } else {
-    // Cairo 1 abi
-    const abiEventsStructs = abi.filter((obj) => obj.type === 'event' && obj.kind === 'struct');
-    const abiEventsEnums = abi.filter((obj) => obj.type === 'event' && obj.kind === 'enum');
-    const abiEventsData: AbiEvents = abiEventsStructs.reduce(
-      (acc: CairoEvent, event: CairoEvent) => {
-        let nameList: string[] = [];
-        let { name } = event;
-        let flat: boolean = false;
-        const findName = (variant: CairoEventVariant) => variant.type === name;
-        // eslint-disable-next-line no-constant-condition
-        while (true) {
-          const eventEnum = abiEventsEnums.find((eventE) => eventE.variants.some(findName));
-          if (typeof eventEnum === 'undefined') break;
-          const variant: CairoEventVariant = eventEnum.variants.find(findName);
-          nameList.unshift(variant.name);
-          if (variant.kind === 'flat') flat = true;
-          name = eventEnum.name;
-        }
-        if (nameList.length === 0) {
-          throw new Error('inconsistancy in ABI events definition.');
-        }
-        if (flat) nameList = [nameList[nameList.length - 1]];
-        const final = nameList.pop();
-        let result: AbiEvents = {
-          [addHexPrefix(starkCurve.keccak(utf8ToArray(final!)).toString(16))]: event,
-        };
-        while (nameList.length > 0) {
-          result = {
-            [addHexPrefix(starkCurve.keccak(utf8ToArray(nameList.pop()!)).toString(16))]: result,
-          };
-        }
-        result = { ...result };
-        return mergeAbiEvents(acc, result);
-      },
-      {}
-    );
-    finalResult = abiEventsData;
-  }
-  return finalResult;
+  return isCairo1Abi(abi) ? getCairo1AbiEvents(abi) : getCairo0AbiEvents(abi);
 }
 
 /**
