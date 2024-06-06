@@ -86,3 +86,9 @@ const myEthAccountAddressInStarknet =
 const myEthSigner = new EthSigner(myEthPrivateKey);
 const myEthAccount = new Account(provider, myEthAccountAddressInStarknet, myEthSigner);
 ```
+
+And if you need a random Ethereum private key:
+
+```typescript
+const myPrivateKey = eth.ethRandomPrivateKey();
+```

@@ -31,7 +31,6 @@ import {
   getTestAccount,
   getTestProvider,
   describeIfTestnet,
-  waitNextBlock,
   devnetETHtokenAddress,
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
@@ -119,15 +118,20 @@ describeIfRpc('RPCProvider', () => {
     estimateSpy.mockRestore();
   });
 
-  describeIfDevnet('Test Estimate message fee Cairo 0', () => {
-    // declaration of Cairo 0 contract is no more authorized in Sepolia Testnet
+  describe('Test Estimate message fee', () => {
     let l1l2ContractCairo0Address: string;
+    let l1l2ContractCairo1Address: string;
 
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
         contract: compiledL1L2,
       });
       l1l2ContractCairo0Address = deploy.contract_address;
+      const { deploy: deploy2 } = await account.declareAndDeploy({
+        contract: compiledC1v2,
+        casm: compiledC1v2Casm,
+      });
+      l1l2ContractCairo1Address = deploy2.contract_address;
     });
 
     test('estimate message fee Cairo 0', async () => {
@@ -145,19 +149,6 @@ describeIfRpc('RPCProvider', () => {
           overall_fee: expect.anything(),
         })
       );
-    });
-  });
-
-  describe('Test Estimate message fee Cairo 1', () => {
-    let l1l2ContractCairo1Address: string;
-
-    beforeAll(async () => {
-      const { deploy: deploy2 } = await account.declareAndDeploy({
-        contract: compiledC1v2,
-        casm: compiledC1v2Casm,
-      });
-      l1l2ContractCairo1Address = deploy2.contract_address;
-      await waitNextBlock(provider as RpcProvider, 5000); // in Sepolia Testnet, needs pending block validation before interacting
     });
 
     test('estimate message fee Cairo 1', async () => {
