@@ -1,4 +1,3 @@
-// import { API } from '@starknet-io/types-js';
 import { UDC } from '../../constants';
 import {
   Abi,
