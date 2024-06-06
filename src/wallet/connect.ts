@@ -14,7 +14,7 @@ import {
 
 /**
  * Request Permission for wallet account, return addresses that are allowed by user
- * @param {boolean} [silent_mode=false] false: request user interaction allowance. true: return only pre-allowed
+ * @param silentMode false: request user interaction allowance. true: return only pre-allowed
  * @returns allowed accounts addresses
  */
 export function requestAccounts(swo: StarknetWindowObject, silent_mode = false) {
