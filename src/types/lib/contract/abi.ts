@@ -1,3 +1,5 @@
+import type { ENUM_EVENT, EVENT_FIELD, STRUCT_EVENT } from '../../api/rpcspec_0_6/contract';
+
 /** ABI */
 export type Abi = ReadonlyArray<FunctionAbi | AbiEvent | AbiStruct | InterfaceAbi | any>;
 
@@ -58,18 +60,15 @@ export type AbiEvents = { [hash: string]: AbiEvent };
 // if Cairo 0 then definition of an event
 export type AbiEvent = CairoEvent | LegacyEvent;
 
-// CairoEvent is CairoEventDefinition type if we have a leaf (end of the arborescence for an event), otherwise a new branch is created. Only for Cairo 1
+// CairoEvent is CairoEventDefinition type if we have a leaf (end of the arborescence for an event), otherwise a new node level is created. Only for Cairo 1
 export type CairoEvent = CairoEventDefinition | AbiEvents;
 
-export type CairoEventDefinition = {
+export type CairoEventDefinition = STRUCT_EVENT & {
   name: string;
-  members: EventEntry[];
-  kind: 'struct';
   type: 'event';
 };
 
-export type CairoEventVariant = {
-  kind: 'nested' | 'flat';
+export type CairoEventVariant = ENUM_EVENT & {
   name: string;
   type: string;
 };
@@ -77,6 +76,6 @@ export type CairoEventVariant = {
 export type LegacyEvent = {
   name: string;
   type: 'event';
-  data: EventEntry[];
-  keys: EventEntry[];
+  data: EVENT_FIELD[];
+  keys: EVENT_FIELD[];
 };

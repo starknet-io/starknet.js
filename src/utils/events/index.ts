@@ -101,7 +101,7 @@ function getCairo1AbiEvents(abi: Abi) {
     while (true) {
       const eventEnum = abiEventsEnums.find((eventE) => eventE.variants.some(findName));
       if (typeof eventEnum === 'undefined') break;
-      const variant: CairoEventVariant = eventEnum.variants.find(findName);
+      const variant = eventEnum.variants.find(findName);
       nameList.unshift(variant.name);
       if (variant.kind === 'flat') flat = true;
       name = eventEnum.name;
