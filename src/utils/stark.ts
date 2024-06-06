@@ -3,7 +3,7 @@ import type { SPEC } from 'starknet-types-07';
 import { getStarkKey, utils } from '@scure/starknet';
 import { gzip, ungzip } from 'pako';
 
-import { ZERO, feeMarginPercentage } from '../constants';
+import { ZERO, FeeMarginPercentage } from '../constants';
 import {
   ArraySignatureType,
   BigNumberish,
@@ -26,10 +26,17 @@ import {
 import { isString } from './shortString';
 
 /**
- * Compress compiled Cairo program
+ * Compress compiled Cairo 0 program
  *
  * [Reference](https://github.com/starkware-libs/cairo-lang/blob/master/src/starkware/starknet/services/api/gateway/transaction.py#L54-L58)
- * @param jsonProgram Representing the compiled cairo program
+ * @param {Program | string} jsonProgram Representing the compiled Cairo 0 program
+ * @return {CompressedProgram} Compressed Cairo 0 program
+ * @example
+ * ```typescript
+ * const contractCairo0 = json.parse(fs.readFileSync("./cairo0contract.json").toString("ascii"));
+ * const result = stark.compressProgram(contractCairo0);
+ * // result = "H4sIAAAAAAAAA+1dC4/bOJL+K4aBu01me7r5EEUyixzQk/TuB..."
+ * ```
  */
 export function compressProgram(jsonProgram: Program | string): CompressedProgram {
   const stringified = isString(jsonProgram) ? jsonProgram : stringify(jsonProgram);
@@ -38,9 +45,32 @@ export function compressProgram(jsonProgram: Program | string): CompressedProgra
 }
 
 /**
- * Decompress compressed compiled Cairo program
- * @param base64 Compressed program
- * @returns Parsed decompressed compiled Cairo program
+ * Decompress compressed compiled Cairo 0 program
+ * @param {CompressedProgram} base64 Compressed Cairo 0 program
+ * @returns {Object | CompressedProgram} Parsed decompressed compiled Cairo 0 program
+ * @example
+ * ```typescript
+ * const contractCairo0 = json.parse(fs.readFileSync("./cairo0contract.json").toString("ascii"));
+ * const compressedCairo0 = stark.compressProgram(contractCairo0);
+ * const result = stark.decompressProgram(compressedCairo0);
+ * // result = {
+ * //   abi: [
+ * //     {
+ * //       inputs: [Array],
+ * //       name: 'increase_balance',
+ * //       outputs: [],
+ * //       type: 'function'
+ * //     }
+ * //   ],
+ * //   entry_points_by_type: { CONSTRUCTOR: [], EXTERNAL: [ [Object], [Object] ], L1_HANDLER: [] },
+ * //   program: {
+ * //     attributes: [],
+ * //     builtins: [ 'pedersen', 'range_check' ],
+ * //     compiler_version: '0.10.2',
+ * //     data: [
+ * //       '0x480680017fff8000',
+ * // ...
+ * ```
  */
 export function decompressProgram(base64: CompressedProgram) {
   if (Array.isArray(base64)) return base64;
@@ -50,6 +80,12 @@ export function decompressProgram(base64: CompressedProgram) {
 
 /**
  * Random Address based on random keyPair
+ * @returns {string} an hex string of a random Starknet address
+ * @example
+ * ```typescript
+ * const result = stark.randomAddress();
+ * // result = "0x51fc8126a13cd5ddb29a71ca399cb1e814f086f5af1b502d7151c14929554f"
+ * ```
  */
 export function randomAddress(): string {
   const randomKeyPair = utils.randomPrivateKey();
@@ -67,7 +103,16 @@ export function makeAddress(input: string): string {
 
 /**
  * Format Signature to standard type (hex array)
- * @returns Custom hex array or weierstrass.SignatureType hex array
+ * @param {Signature} [sig]
+ * @returns {ArraySignatureType} Custom hex string array
+ * @throws {Error} if sig not defined, or wrong format
+ * @example
+ * ```typescript
+ * const signature = ec.starkCurve.sign("0x12de34", "0x3487123eac");
+ * const result = stark.formatSignature(signature);
+ * // result = ['0xba8eecee2d69c417e8c6a20cf331c821f716b58ba9e47166c7476afdb38997',
+ * //  '0x69ef7438c94104839a6e2aa2385482a77399d2f46e894ae4f50ab6d69239d1c']
+ * ```
  */
 export function formatSignature(sig?: Signature): ArraySignatureType {
   if (!sig) throw Error('formatSignature: provided signature is undefined');
@@ -84,6 +129,16 @@ export function formatSignature(sig?: Signature): ArraySignatureType {
 
 /**
  * Format Signature to decimal string array
+ * @param {Signature} [sig]
+ * @returns {ArraySignatureType} Custom hex string array
+ * @throws {Error} if sig not defined, or wrong format
+ * @example
+ * ```typescript
+ * const signature = ec.starkCurve.sign("0x12de34", "0x3487123eac");
+ * const result = stark.signatureToDecimalArray(signature);
+ * // result = ['329619989660444495690615805546674399714973829707166906185976654753023887767',
+ * //  '2994745480203297689255012826403147585778741462125743754529207781488706428188']
+ * ```
  */
 export function signatureToDecimalArray(sig?: Signature): ArraySignatureType {
   return bigNumberishArrayToDecimalStringArray(formatSignature(sig));
@@ -91,17 +146,35 @@ export function signatureToDecimalArray(sig?: Signature): ArraySignatureType {
 
 /**
  * Format Signature to hex string array
+ * @param {Signature} [sig]
+ * @returns {ArraySignatureType} Custom hex string array
+ * @throws {Error} if sig not defined, or wrong format
+ * @example
+ * ```typescript
+ * const signature = ec.starkCurve.sign("0x12de34", "0x3487123eac");
+ * const result = stark.signatureToHexArray(signature);
+ * // result = ['0xba8eecee2d69c417e8c6a20cf331c821f716b58ba9e47166c7476afdb38997',
+ * //  '0x69ef7438c94104839a6e2aa2385482a77399d2f46e894ae4f50ab6d69239d1c']
+ * ```
  */
 export function signatureToHexArray(sig?: Signature): ArraySignatureType {
   return bigNumberishArrayToHexadecimalStringArray(formatSignature(sig));
 }
 
 /**
- * Convert estimated fee to max fee with overhead
+ * Convert estimated fee to max fee including a margin
+ * @param {BigNumberish} estimatedFee - The estimated fee
+ * @param {number} [overhead = feeMarginPercentage.MAX_FEE] - The overhead added to the gas
+ * @returns {bigint} The maximum fee with the margin
+ * @example
+ * ```typescript
+ * const result = stark.estimatedFeeToMaxFee("8982300000000", 50);
+ * // result = "13473450000000n"
+ * ```
  */
 export function estimatedFeeToMaxFee(
   estimatedFee: BigNumberish,
-  overhead: number = feeMarginPercentage.MAX_FEE
+  overhead: number = FeeMarginPercentage.MAX_FEE
 ): bigint {
   return addPercent(estimatedFee, overhead);
 }
@@ -109,22 +182,30 @@ export function estimatedFeeToMaxFee(
 /**
  * Calculates the maximum resource bounds for fee estimation.
  *
- * @param {FeeEstimate|0n} estimate - The estimate for the fee. If a BigInt is provided,
- *                                    the returned bounds will be set to '0x0'.
- * @param {number} [amountOverhead=feeMarginPercentage.L1_BOUND_MAX_AMOUNT] - The percentage
- *                                                                             overhead added to
- *                                                                             the gas consumed or
- *                                                                             overall fee amount.
- * @param {number} [priceOverhead=feeMarginPercentage.L1_BOUND_MAX_PRICE_PER_UNIT] - The percentage
- *                                                                                  overhead added to
- *                                                                                  the gas price per unit.
- * @throws {Error} If the estimate object is undefined or does not have the required properties.
+ * @param {FeeEstimate | 0n} estimate The estimate for the fee. If a BigInt is provided, the returned bounds will be set to '0x0'.
+ * @param {number} [amountOverhead = feeMarginPercentage.L1_BOUND_MAX_AMOUNT] - The percentage overhead added to the gas consumed or overall fee amount.
+ * @param {number} [priceOverhead = feeMarginPercentage.L1_BOUND_MAX_PRICE_PER_UNIT] The percentage overhead added to the gas price per unit.
  * @returns {ResourceBounds} The maximum resource bounds for fee estimation.
+ * @throws {Error} If the estimate object is undefined or does not have the required properties.
+ * @example
+ * ```typescript
+ * const feeEstimated: FeeEstimate = {
+  gas_consumed: "0x3456a",
+  gas_price: "0xa45567567567ae4",
+  overall_fee: "0x2198F463A77A899A5668",
+  unit: "WEI"
+};
+const result = stark.estimateFeeToBounds(feeEstimated, 70, 50);
+ * // result = {
+ * //   l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
+ * //   l1_gas: { max_amount: '0x58f9a', max_price_per_unit: '0xf6801b01b01b856' }
+ * // }
+ * ```
  */
 export function estimateFeeToBounds(
   estimate: FeeEstimate | 0n,
-  amountOverhead: number = feeMarginPercentage.L1_BOUND_MAX_AMOUNT,
-  priceOverhead: number = feeMarginPercentage.L1_BOUND_MAX_PRICE_PER_UNIT
+  amountOverhead: number = FeeMarginPercentage.L1_BOUND_MAX_AMOUNT,
+  priceOverhead: number = FeeMarginPercentage.L1_BOUND_MAX_PRICE_PER_UNIT
 ): ResourceBounds {
   if (isBigInt(estimate)) {
     return {
@@ -151,11 +232,16 @@ export function estimateFeeToBounds(
 /**
  * Converts the data availability mode from EDataAvailabilityMode to EDAMode.
  *
- * @param {EDataAvailabilityMode} dam - The data availability mode to be converted.
+ * @param {EDataAvailabilityMode} dam The data availability mode to be converted.
  * @return {EDAMode} The converted data availability mode.
  * @throws {Error} If the data availability mode is not a valid value.
+ * @example
+ * ```typescript
+ * const result = stark.intDAM(RPC.EDataAvailabilityMode.L1);
+ * // result = 0
+ * ```
  */
-export function intDAM(dam: EDataAvailabilityMode) {
+export function intDAM(dam: EDataAvailabilityMode): EDAMode {
   if (dam === EDataAvailabilityMode.L1) return EDAMode.L1;
   if (dam === EDataAvailabilityMode.L2) return EDAMode.L2;
   throw Error('EDAM conversion');
@@ -164,11 +250,20 @@ export function intDAM(dam: EDataAvailabilityMode) {
 /**
  * Convert to ETransactionVersion or throw an error.
  * Return providedVersion is specified else return defaultVersion
- * @param defaultVersion BigNumberish
- * @param providedVersion BigNumberish | undefined
- * @returns ETransactionVersion
+ * @param {BigNumberish} defaultVersion default estimate transaction version
+ * @param {BigNumberish} [providedVersion] estimate transaction version
+ * @returns {ETransactionVersion} if providedVersion is not provided, returns the default estimate version, else return the provided version
+ * @throws {Error} if estimate transaction version or default estimate transaction version is unknown
+ * @example
+ * ```typescript
+ * const result = stark.toTransactionVersion("0x100000000000000000000000000000003", stark.toFeeVersion(2));
+ * // result = "0x100000000000000000000000000000002"
+ * ```
  */
-export function toTransactionVersion(defaultVersion: BigNumberish, providedVersion?: BigNumberish) {
+export function toTransactionVersion(
+  defaultVersion: BigNumberish,
+  providedVersion?: BigNumberish
+): ETransactionVersion {
   const providedVersion0xs = providedVersion ? toHex(providedVersion) : undefined;
   const defaultVersion0xs = toHex(defaultVersion);
 
@@ -184,7 +279,14 @@ export function toTransactionVersion(defaultVersion: BigNumberish, providedVersi
 
 /**
  * Convert Transaction version to Fee version or throw an error
- * @param providedVersion BigNumberish | undefined
+ * @param {BigNumberish} [providedVersion] 0..3 number representing the transaction version
+ * @returns {ETransactionVersion} the fee estimation version corresponding to the transaction version provided
+ * @throws {Error} if the transaction version is unknown
+ * @example
+ * ```typescript
+ * const result = stark.toFeeVersion(2);
+ * // result = "0x100000000000000000000000000000002"
+ * ```
  */
 export function toFeeVersion(providedVersion?: BigNumberish) {
   if (!providedVersion) return undefined;
@@ -200,6 +302,24 @@ export function toFeeVersion(providedVersion?: BigNumberish) {
 
 /**
  * Return provided or default v3 tx details
+ * @param {UniversalDetails} details details of the transaction
+ * @return {} an object including the V3 transaction details.
+ * @example
+ * ```typescript
+ * const detail: UniversalDetails = { tip: 3456n };
+ * const result = stark.v3Details(detail);
+ * // result = {
+ * //   tip: 3456n,
+ * //   paymasterData: [],
+ * //   accountDeploymentData: [],
+ * //   nonceDataAvailabilityMode: 'L1',
+ * //   feeDataAvailabilityMode: 'L1',
+ * //   resourceBounds: {
+ * //     l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
+ * //     l1_gas: { max_amount: '0x0', max_price_per_unit: '0x0' }
+ * //   }
+ * // }
+ * ```
  */
 export function v3Details(details: UniversalDetails) {
   return {
@@ -218,8 +338,15 @@ export function v3Details(details: UniversalDetails) {
  * V2 -> V1
  * F3 -> F3
  * V3 -> V3
+ * @param {ETransactionVersion} providedVersion
+ * @returns {ETransactionVersion} if v2 then returns v1. if v3 then return v3
+ * @example
+ * ```typescript
+ * const result = stark.reduceV2(constants.TRANSACTION_VERSION.V2);
+ * // result = "0x1"
+ * ```
  */
-export function reduceV2(providedVersion: ETransactionVersion) {
+export function reduceV2(providedVersion: ETransactionVersion): ETransactionVersion {
   if (providedVersion === ETransactionVersion.F2) return ETransactionVersion.F1;
   if (providedVersion === ETransactionVersion.V2) return ETransactionVersion.V1;
   return providedVersion;
