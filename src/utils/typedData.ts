@@ -48,14 +48,14 @@ const presetTypes: TypedData['types'] = {
 };
 
 const revisionConfiguration: Record<Revision, Configuration> = {
-  [Revision.Active]: {
+  [Revision.ACTIVE]: {
     domain: 'StarknetDomain',
     hashMethod: computePoseidonHashOnElements,
     hashMerkleMethod: computePoseidonHash,
     escapeTypeString: (s) => `"${s}"`,
     presetTypes,
   },
-  [Revision.Legacy]: {
+  [Revision.LEGACY]: {
     domain: 'StarkNetDomain',
     hashMethod: computePedersenHashOnElements,
     hashMerkleMethod: computePedersenHash,
@@ -70,14 +70,14 @@ function assertRange(data: unknown, type: string, { min, max }: { min: bigint; m
 }
 
 function identifyRevision({ types, domain }: TypedData) {
-  if (revisionConfiguration[Revision.Active].domain in types && domain.revision === Revision.Active)
-    return Revision.Active;
+  if (revisionConfiguration[Revision.ACTIVE].domain in types && domain.revision === Revision.LEGACY)
+    return Revision.ACTIVE;
 
   if (
-    revisionConfiguration[Revision.Legacy].domain in types &&
-    (domain.revision ?? Revision.Legacy) === Revision.Legacy
+    revisionConfiguration[Revision.LEGACY].domain in types &&
+    (domain.revision ?? Revision.LEGACY) === Revision.LEGACY
   )
-    return Revision.Legacy;
+    return Revision.LEGACY;
 
   return undefined;
 }
@@ -133,12 +133,12 @@ export function getDependencies(
   type: string,
   dependencies: string[] = [],
   contains: string = '',
-  revision: Revision = Revision.Legacy
+  revision: Revision = Revision.LEGACY
 ): string[] {
   // Include pointers (struct arrays)
   if (type[type.length - 1] === '*') {
     type = type.slice(0, -1);
-  } else if (revision === Revision.Active) {
+  } else if (revision === Revision.ACTIVE) {
     // enum base
     if (type === 'enum') {
       type = contains;
@@ -189,10 +189,10 @@ function getMerkleTreeType(types: TypedData['types'], ctx: Context) {
 export function encodeType(
   types: TypedData['types'],
   type: string,
-  revision: Revision = Revision.Legacy
+  revision: Revision = Revision.LEGACY
 ): string {
   const allTypes =
-    revision === Revision.Active
+    revision === Revision.ACTIVE
       ? { ...types, ...revisionConfiguration[revision].presetTypes }
       : types;
   const [primary, ...dependencies] = getDependencies(
@@ -210,7 +210,7 @@ export function encodeType(
     .map((dependency) => {
       const dependencyElements = allTypes[dependency].map((t) => {
         const targetType =
-          t.type === 'enum' && revision === Revision.Active
+          t.type === 'enum' && revision === Revision.ACTIVE
             ? (t as StarknetEnumType).contains
             : t.type;
         // parentheses handling for enum variant types
@@ -234,7 +234,7 @@ export function encodeType(
 export function getTypeHash(
   types: TypedData['types'],
   type: string,
-  revision: Revision = Revision.Legacy
+  revision: Revision = Revision.LEGACY
 ): string {
   return getSelectorFromName(encodeType(types, type, revision));
 }
@@ -248,7 +248,7 @@ export function encodeValue(
   type: string,
   data: unknown,
   ctx: Context = {},
-  revision: Revision = Revision.Legacy
+  revision: Revision = Revision.LEGACY
 ): [string, string] {
   if (types[type]) {
     return [type, getStructHash(types, type, data as TypedData['message'], revision)];
@@ -275,7 +275,7 @@ export function encodeValue(
 
   switch (type) {
     case 'enum': {
-      if (revision === Revision.Active) {
+      if (revision === Revision.ACTIVE) {
         const [variantKey, variantData] = Object.entries(data as TypedData['message'])[0];
 
         const parentType = types[ctx.parent as string][0] as StarknetEnumType;
@@ -313,7 +313,7 @@ export function encodeValue(
       return ['felt', prepareSelector(data as string)];
     }
     case 'string': {
-      if (revision === Revision.Active) {
+      if (revision === Revision.ACTIVE) {
         const byteArray = byteArrayFromString(data as string);
         const elements = [
           byteArray.data.length,
@@ -326,7 +326,7 @@ export function encodeValue(
       return [type, getHex(data as string)];
     }
     case 'i128': {
-      if (revision === Revision.Active) {
+      if (revision === Revision.ACTIVE) {
         const value = BigInt(data as string);
         assertRange(value, type, RANGE_I128);
         return [type, getHex(value < 0n ? PRIME + value : value)];
@@ -335,7 +335,7 @@ export function encodeValue(
     }
     case 'timestamp':
     case 'u128': {
-      if (revision === Revision.Active) {
+      if (revision === Revision.ACTIVE) {
         assertRange(data, type, RANGE_U128);
       } // else fall through to default
       return [type, getHex(data as string)];
@@ -343,26 +343,26 @@ export function encodeValue(
     case 'felt':
     case 'shortstring': {
       // TODO: should 'shortstring' diverge into directly using encodeShortString()?
-      if (revision === Revision.Active) {
+      if (revision === Revision.ACTIVE) {
         assertRange(getHex(data as string), type, RANGE_FELT);
       } // else fall through to default
       return [type, getHex(data as string)];
     }
     case 'ClassHash':
     case 'ContractAddress': {
-      if (revision === Revision.Active) {
+      if (revision === Revision.ACTIVE) {
         assertRange(data, type, RANGE_FELT);
       } // else fall through to default
       return [type, getHex(data as string)];
     }
     case 'bool': {
-      if (revision === Revision.Active) {
+      if (revision === Revision.ACTIVE) {
         assert(typeof data === 'boolean', `Type mismatch for ${type} ${data}`);
       } // else fall through to default
       return [type, getHex(data as string)];
     }
     default: {
-      if (revision === Revision.Active) {
+      if (revision === Revision.ACTIVE) {
         throw new Error(`Unsupported type: ${type}`);
       }
       return [type, getHex(data as string)];
@@ -378,7 +378,7 @@ export function encodeData<T extends TypedData>(
   types: T['types'],
   type: string,
   data: T['message'],
-  revision: Revision = Revision.Legacy
+  revision: Revision = Revision.LEGACY
 ) {
   const targetType = types[type] ?? revisionConfiguration[revision].presetTypes[type];
   const [returnTypes, values] = targetType.reduce<[string[], string[]]>(
@@ -413,7 +413,7 @@ export function getStructHash<T extends TypedData>(
   types: T['types'],
   type: string,
   data: T['message'],
-  revision: Revision = Revision.Legacy
+  revision: Revision = Revision.LEGACY
 ) {
   return revisionConfiguration[revision].hashMethod(encodeData(types, type, data, revision)[1]);
 }
