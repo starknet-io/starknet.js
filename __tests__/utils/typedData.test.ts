@@ -32,25 +32,25 @@ describe('typedData', () => {
     expect(encoded).toMatchInlineSnapshot(
       `"Mail(from:Person,to:Person,posts_len:felt,posts:Post*)Person(name:felt,wallet:felt)Post(title:felt,content:felt)"`
     );
-    encoded = encodeType(typedDataExample.types, 'Mail', TypedDataRevision.Active);
+    encoded = encodeType(typedDataExample.types, 'Mail', TypedDataRevision.ACTIVE);
     expect(encoded).toMatchInlineSnapshot(
       JSON.stringify(
         '"Mail"("from":"Person","to":"Person","contents":"felt")"Person"("name":"felt","wallet":"felt")'
       )
     );
-    encoded = encodeType(typedDataStructArrayExample.types, 'Mail', TypedDataRevision.Active);
+    encoded = encodeType(typedDataStructArrayExample.types, 'Mail', TypedDataRevision.ACTIVE);
     expect(encoded).toMatchInlineSnapshot(
       `"\\"Mail\\"(\\"from\\":\\"Person\\",\\"to\\":\\"Person\\",\\"posts_len\\":\\"felt\\",\\"posts\\":\\"Post*\\")\\"Person\\"(\\"name\\":\\"felt\\",\\"wallet\\":\\"felt\\")\\"Post\\"(\\"title\\":\\"felt\\",\\"content\\":\\"felt\\")"`
     );
-    encoded = encodeType(exampleBaseTypes.types, 'Example', TypedDataRevision.Active);
+    encoded = encodeType(exampleBaseTypes.types, 'Example', TypedDataRevision.ACTIVE);
     expect(encoded).toMatchInlineSnapshot(
       `"\\"Example\\"(\\"n0\\":\\"felt\\",\\"n1\\":\\"bool\\",\\"n2\\":\\"string\\",\\"n3\\":\\"selector\\",\\"n4\\":\\"u128\\",\\"n5\\":\\"i128\\",\\"n6\\":\\"ContractAddress\\",\\"n7\\":\\"ClassHash\\",\\"n8\\":\\"timestamp\\",\\"n9\\":\\"shortstring\\")"`
     );
-    encoded = encodeType(examplePresetTypes.types, 'Example', TypedDataRevision.Active);
+    encoded = encodeType(examplePresetTypes.types, 'Example', TypedDataRevision.ACTIVE);
     expect(encoded).toMatchInlineSnapshot(
       `"\\"Example\\"(\\"n0\\":\\"TokenAmount\\",\\"n1\\":\\"NftId\\")\\"NftId\\"(\\"collection_address\\":\\"ContractAddress\\",\\"token_id\\":\\"u256\\")\\"TokenAmount\\"(\\"token_address\\":\\"ContractAddress\\",\\"amount\\":\\"u256\\")\\"u256\\"(\\"low\\":\\"u128\\",\\"high\\":\\"u128\\")"`
     );
-    encoded = encodeType(exampleEnum.types, 'Example', TypedDataRevision.Active);
+    encoded = encodeType(exampleEnum.types, 'Example', TypedDataRevision.ACTIVE);
     expect(encoded).toMatchInlineSnapshot(
       `"\\"Example\\"(\\"someEnum\\":\\"MyEnum\\")\\"MyEnum\\"(\\"Variant 1\\":(),\\"Variant 2\\":(\\"u128\\",\\"u128*\\"),\\"Variant 3\\":(\\"u128\\"))"`
     );
@@ -82,15 +82,15 @@ describe('typedData', () => {
     expect(typeHash).toMatchInlineSnapshot(
       `"0x1d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"`
     );
-    typeHash = getTypeHash(exampleBaseTypes.types, 'Example', TypedDataRevision.Active);
+    typeHash = getTypeHash(exampleBaseTypes.types, 'Example', TypedDataRevision.ACTIVE);
     expect(typeHash).toMatchInlineSnapshot(
       `"0x1f94cd0be8b4097a41486170fdf09a4cd23aefbc74bb2344718562994c2c111"`
     );
-    typeHash = getTypeHash(examplePresetTypes.types, 'Example', TypedDataRevision.Active);
+    typeHash = getTypeHash(examplePresetTypes.types, 'Example', TypedDataRevision.ACTIVE);
     expect(typeHash).toMatchInlineSnapshot(
       `"0x1a25a8bb84b761090b1fadaebe762c4b679b0d8883d2bedda695ea340839a55"`
     );
-    typeHash = getTypeHash(exampleEnum.types, 'Example', TypedDataRevision.Active);
+    typeHash = getTypeHash(exampleEnum.types, 'Example', TypedDataRevision.ACTIVE);
     expect(typeHash).toMatchInlineSnapshot(
       `"0x380a54d417fb58913b904675d94a8a62e2abc3467f4b5439de0fd65fafdd1a8"`
     );
@@ -182,7 +182,7 @@ describe('typedData', () => {
       exampleBaseTypes.types,
       'StarknetDomain',
       exampleBaseTypes.domain as StarknetDomain,
-      TypedDataRevision.Active
+      TypedDataRevision.ACTIVE
     );
     expect(hash).toMatchInlineSnapshot(
       `"0x555f72e550b308e50c1a4f8611483a174026c982a9893a05c185eeb85399657"`
