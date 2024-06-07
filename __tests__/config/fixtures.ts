@@ -69,6 +69,8 @@ export const compiledTestRejectSierra = readContractSierra('cairo/testReject/tes
 export const compiledTestRejectCasm = readContractSierraCasm('cairo/testReject/test_reject');
 export const compiledSidMulticall = readContractSierra('starknetId/multicall/multicall.sierra');
 export const compiledSidMulticallCasm = readContractSierraCasm('starknetId/multicall/multicall');
+export const compiledNonZero = readContractSierra('cairo/cairo263/zeroable.sierra');
+export const compiledNonZeroCasm = readContractSierraCasm('cairo/cairo263/zeroable');
 
 export function getTestProvider(isProvider?: true): ProviderInterface;
 export function getTestProvider(isProvider?: false): RpcProvider;
