@@ -2,7 +2,7 @@ import { defaultProvider, stark } from 'starknet';
 const { getSelectorFromName } = stark;
 
 /**
- * !! IMPORTANT NOTE !! When fees are introduced all function invocations will go through the account account contract and this example will be deprecated.
+ * !! IMPORTANT NOTE !! When fees are introduced all function invocations will go through the account contract and this example will be deprecated.
  **/
 
 const CONTRACT_ADDRESS = '0x03e19baa6cb2078631bcdb34844f3f7879449a544c9ce722681a54af08cff4b9';
