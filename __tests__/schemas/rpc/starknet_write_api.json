@@ -1,0 +1,292 @@
+{
+  "openrpc": "1.0.0-rc1",
+  "info": {
+    "version": "0.7.1",
+    "title": "StarkNet Node Write API",
+    "license": {}
+  },
+  "servers": [],
+  "methods": [
+    {
+      "name": "starknet_addInvokeTransaction",
+      "summary": "Submit a new transaction to be added to the chain",
+      "params": [
+        {
+          "name": "invoke_transaction",
+          "description": "The information needed to invoke the function (or account, for version 1 transactions)",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/BROADCASTED_INVOKE_TXN"
+          }
+        }
+      ],
+      "result": {
+        "name": "result",
+        "description": "The result of the transaction submission",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "transaction_hash": {
+              "title": "The hash of the invoke transaction",
+              "$ref": "#/components/schemas/TXN_HASH"
+            }
+          },
+          "required": ["transaction_hash"]
+        }
+      },
+      "errors": [
+        {
+          "$ref": "#/components/errors/INSUFFICIENT_ACCOUNT_BALANCE"
+        },
+        {
+          "$ref": "#/components/errors/INSUFFICIENT_MAX_FEE"
+        },
+        {
+          "$ref": "#/components/errors/INVALID_TRANSACTION_NONCE"
+        },
+        {
+          "$ref": "#/components/errors/VALIDATION_FAILURE"
+        },
+        {
+          "$ref": "#/components/errors/NON_ACCOUNT"
+        },
+        {
+          "$ref": "#/components/errors/DUPLICATE_TX"
+        },
+        {
+          "$ref": "#/components/errors/UNSUPPORTED_TX_VERSION"
+        },
+        {
+          "$ref": "#/components/errors/UNEXPECTED_ERROR"
+        }
+      ]
+    },
+    {
+      "name": "starknet_addDeclareTransaction",
+      "summary": "Submit a new class declaration transaction",
+      "params": [
+        {
+          "name": "declare_transaction",
+          "description": "Declare transaction required to declare a new class on Starknet",
+          "required": true,
+          "schema": {
+            "title": "Declare transaction",
+            "$ref": "#/components/schemas/BROADCASTED_DECLARE_TXN"
+          }
+        }
+      ],
+      "result": {
+        "name": "result",
+        "description": "The result of the transaction submission",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "transaction_hash": {
+              "title": "The hash of the declare transaction",
+              "$ref": "#/components/schemas/TXN_HASH"
+            },
+            "class_hash": {
+              "title": "The hash of the declared class",
+              "$ref": "#/components/schemas/FELT"
+            }
+          },
+          "required": ["transaction_hash", "class_hash"]
+        }
+      },
+      "errors": [
+        {
+          "$ref": "#/components/errors/CLASS_ALREADY_DECLARED"
+        },
+        {
+          "$ref": "#/components/errors/COMPILATION_FAILED"
+        },
+        {
+          "$ref": "#/components/errors/COMPILED_CLASS_HASH_MISMATCH"
+        },
+        {
+          "$ref": "#/components/errors/INSUFFICIENT_ACCOUNT_BALANCE"
+        },
+        {
+          "$ref": "#/components/errors/INSUFFICIENT_MAX_FEE"
+        },
+        {
+          "$ref": "#/components/errors/INVALID_TRANSACTION_NONCE"
+        },
+        {
+          "$ref": "#/components/errors/VALIDATION_FAILURE"
+        },
+        {
+          "$ref": "#/components/errors/NON_ACCOUNT"
+        },
+        {
+          "$ref": "#/components/errors/DUPLICATE_TX"
+        },
+        {
+          "$ref": "#/components/errors/CONTRACT_CLASS_SIZE_IS_TOO_LARGE"
+        },
+        {
+          "$ref": "#/components/errors/UNSUPPORTED_TX_VERSION"
+        },
+        {
+          "$ref": "#/components/errors/UNSUPPORTED_CONTRACT_CLASS_VERSION"
+        },
+        {
+          "$ref": "#/components/errors/UNEXPECTED_ERROR"
+        }
+      ]
+    },
+    {
+      "name": "starknet_addDeployAccountTransaction",
+      "summary": "Submit a new deploy account transaction",
+      "params": [
+        {
+          "name": "deploy_account_transaction",
+          "description": "The deploy account transaction",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/BROADCASTED_DEPLOY_ACCOUNT_TXN"
+          }
+        }
+      ],
+      "result": {
+        "name": "result",
+        "description": "The result of the transaction submission",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "transaction_hash": {
+              "title": "The hash of the deploy transaction",
+              "$ref": "#/components/schemas/TXN_HASH"
+            },
+            "contract_address": {
+              "title": "The address of the new contract",
+              "$ref": "#/components/schemas/FELT"
+            }
+          },
+          "required": ["transaction_hash", "contract_address"]
+        }
+      },
+      "errors": [
+        {
+          "$ref": "#/components/errors/INSUFFICIENT_ACCOUNT_BALANCE"
+        },
+        {
+          "$ref": "#/components/errors/INSUFFICIENT_MAX_FEE"
+        },
+        {
+          "$ref": "#/components/errors/INVALID_TRANSACTION_NONCE"
+        },
+        {
+          "$ref": "#/components/errors/VALIDATION_FAILURE"
+        },
+        {
+          "$ref": "#/components/errors/NON_ACCOUNT"
+        },
+        {
+          "$ref": "#/components/errors/CLASS_HASH_NOT_FOUND"
+        },
+        {
+          "$ref": "#/components/errors/DUPLICATE_TX"
+        },
+        {
+          "$ref": "#/components/errors/UNSUPPORTED_TX_VERSION"
+        },
+        {
+          "$ref": "#/components/errors/UNEXPECTED_ERROR"
+        }
+      ]
+    }
+  ],
+  "$id": "starknet_write_api",
+  "components": {
+    "contentDescriptors": {},
+    "schemas": {
+      "NUM_AS_HEX": {
+        "title": "An integer number in hex format (0x...)",
+        "type": "string",
+        "pattern": "^0x[a-fA-F0-9]+$"
+      },
+      "SIGNATURE": {
+        "$ref": "starknet_api_openrpc.json#/components/schemas/SIGNATURE"
+      },
+      "FELT": {
+        "$ref": "starknet_api_openrpc.json#/components/schemas/FELT"
+      },
+      "TXN_HASH": {
+        "$ref": "starknet_api_openrpc.json#/components/schemas/TXN_HASH"
+      },
+      "BROADCASTED_INVOKE_TXN": {
+        "$ref": "starknet_api_openrpc.json#/components/schemas/BROADCASTED_INVOKE_TXN"
+      },
+      "BROADCASTED_DECLARE_TXN": {
+        "$ref": "starknet_api_openrpc.json#/components/schemas/BROADCASTED_DECLARE_TXN"
+      },
+      "BROADCASTED_DEPLOY_ACCOUNT_TXN": {
+        "$ref": "starknet_api_openrpc.json#/components/schemas/BROADCASTED_DEPLOY_ACCOUNT_TXN"
+      },
+      "FUNCTION_CALL": {
+        "$ref": "starknet_api_openrpc.json#/components/schemas/FUNCTION_CALL"
+      }
+    },
+    "errors": {
+      "CLASS_HASH_NOT_FOUND": {
+        "code": 28,
+        "message": "Class hash not found"
+      },
+      "CLASS_ALREADY_DECLARED": {
+        "code": 51,
+        "message": "Class already declared"
+      },
+      "INVALID_TRANSACTION_NONCE": {
+        "code": 52,
+        "message": "Invalid transaction nonce"
+      },
+      "INSUFFICIENT_MAX_FEE": {
+        "code": 53,
+        "message": "Max fee is smaller than the minimal transaction cost (validation plus fee transfer)"
+      },
+      "INSUFFICIENT_ACCOUNT_BALANCE": {
+        "code": 54,
+        "message": "Account balance is smaller than the transaction's max_fee"
+      },
+      "VALIDATION_FAILURE": {
+        "code": 55,
+        "message": "Account validation failed",
+        "data": "string"
+      },
+      "COMPILATION_FAILED": {
+        "code": 56,
+        "message": "Compilation failed"
+      },
+      "CONTRACT_CLASS_SIZE_IS_TOO_LARGE": {
+        "code": 57,
+        "message": "Contract class size it too large"
+      },
+      "NON_ACCOUNT": {
+        "code": 58,
+        "message": "Sender address in not an account contract"
+      },
+      "DUPLICATE_TX": {
+        "code": 59,
+        "message": "A transaction with the same hash already exists in the mempool"
+      },
+      "COMPILED_CLASS_HASH_MISMATCH": {
+        "code": 60,
+        "message": "the compiled class hash did not match the one supplied in the transaction"
+      },
+      "UNSUPPORTED_TX_VERSION": {
+        "code": 61,
+        "message": "the transaction version is not supported"
+      },
+      "UNSUPPORTED_CONTRACT_CLASS_VERSION": {
+        "code": 62,
+        "message": "the contract class version is not supported"
+      },
+      "UNEXPECTED_ERROR": {
+        "code": 63,
+        "message": "An unexpected error occurred",
+        "data": "string"
+      }
+    }
+  }
+}
