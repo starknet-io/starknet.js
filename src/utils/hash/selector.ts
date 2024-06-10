@@ -57,6 +57,7 @@ export function starknetKeccak(str: string): bigint {
  *
  * @param funcName abi function name
  * @returns hex-string selector
+ * @example
  * ```typescript
  * const result = getSelectorFromName('myFunction');
  * // result = '0xc14cfe23f3fa7ce7b1f8db7d7682305b1692293f71a61cc06637f0d8d8b6c8'
