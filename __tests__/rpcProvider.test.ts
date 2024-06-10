@@ -25,14 +25,14 @@ import {
   compiledL1L2,
   compiledOpenZeppelinAccount,
   createBlockForDevnet,
-  describeIfRpc,
-  describeIfNotDevnet,
   describeIfDevnet,
+  describeIfNotDevnet,
+  describeIfRpc,
+  describeIfTestnet,
+  devnetETHtokenAddress,
   getTestAccount,
   getTestProvider,
-  describeIfTestnet,
   waitNextBlock,
-  devnetETHtokenAddress,
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
@@ -48,6 +48,17 @@ describeIfRpc('RPCProvider', () => {
     const accountKeyPair = utils.randomPrivateKey();
     accountPublicKey = getStarkKey(accountKeyPair);
     await createBlockForDevnet();
+  });
+
+  test('instantiate from rpcProvider', () => {
+    // instantiate rpc provider template
+    const newInsRPCProvider = new RpcProvider();
+    // like* change channel and parser
+    newInsRPCProvider.channel = rpcProvider.channel;
+    newInsRPCProvider.responseParser = rpcProvider.responseParser;
+    // instantiate from modified instance
+    const FinalInsRPCProvider = new RpcProvider(newInsRPCProvider);
+    expect(FinalInsRPCProvider).toBeInstanceOf(RpcProvider);
   });
 
   test('getChainId', async () => {
