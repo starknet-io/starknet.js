@@ -105,7 +105,7 @@
     "isomorphic-fetch": "^3.0.0",
     "lossless-json": "^4.0.1",
     "pako": "^2.0.4",
-    "starknet-types-07": "npm:starknet-types@^0.7.2",
+    "starknet-types-07": "npm:@starknet-io/types-js@^0.7.7",
     "ts-mixer": "^6.0.3",
     "url-join": "^4.0.1"
   },
