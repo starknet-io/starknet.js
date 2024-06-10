@@ -80,6 +80,10 @@ The first parameter in the `keys` array is a hash of the name of the event, calc
 const nameHash = num.toHex(hash.starknetKeccak('EventPanic'));
 ```
 
+:::info
+In some cases (when an event is coded in a Cairo component, without the `#[flat]` flag), this hash is handled in several numbers.
+:::
+
 The second parameter is the `errorType` variable content (stored in keys array because of the `#[key]` flag in the Cairo code).
 
 The `data` array contains the `errorDescription` variable content (`'0x4d6567612050616e69632e'` corresponds to the encoded value of "Mega Panic.")

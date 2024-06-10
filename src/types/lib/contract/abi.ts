@@ -1,4 +1,4 @@
-import type { ENUM_EVENT, EVENT_FIELD, STRUCT_EVENT } from '../../api/rpcspec_0_6/contract';
+import type { ENUM_EVENT, EVENT_FIELD, STRUCT_EVENT } from 'starknet-types-07';
 
 /** ABI */
 export type Abi = ReadonlyArray<FunctionAbi | AbiEvent | AbiStruct | InterfaceAbi | any>;
