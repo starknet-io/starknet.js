@@ -16,7 +16,7 @@ import {
 } from '../../types';
 import assert from '../assert';
 import { isBigInt, toHex } from '../num';
-import { getSelectorFromName } from '../selector';
+import { getSelectorFromName } from '../hash/selector';
 import { isLongText } from '../shortString';
 import { byteArrayFromString } from './byteArray';
 import { felt, isCairo1Type, isLen } from './cairo';
