@@ -51,14 +51,16 @@ describeIfRpc('RPCProvider', () => {
   });
 
   test('instantiate from rpcProvider', () => {
-    // instantiate rpc provider template
     const newInsRPCProvider = new RpcProvider();
-    // like* change channel and parser
-    newInsRPCProvider.channel = rpcProvider.channel;
-    newInsRPCProvider.responseParser = rpcProvider.responseParser;
-    // instantiate from modified instance
-    const FinalInsRPCProvider = new RpcProvider(newInsRPCProvider);
-    expect(FinalInsRPCProvider).toBeInstanceOf(RpcProvider);
+    
+    let FinalInsRPCProvider = new RpcProvider(newInsRPCProvider);
+    expect(FinalInsRPCProvider.channel).toBe(newInsRPCProvider.channel);
+    expect(FinalInsRPCProvider.responseParser).toBe(newInsRPCProvider.responseParser);
+    
+    delete (newInsRPCProvider as any).responseParser;
+    FinalInsRPCProvider = new RpcProvider(newInsRPCProvider);
+    expect(FinalInsRPCProvider.channel).toBe(newInsRPCProvider.channel);
+    expect(FinalInsRPCProvider.responseParser).toBeInstanceOf(RPCResponseParser);
   });
 
   test('getChainId', async () => {
