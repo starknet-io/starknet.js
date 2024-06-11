@@ -8,6 +8,7 @@ import {
   FeeEstimate,
   RPC,
   RPC06,
+  RPCResponseParser,
   ReceiptTx,
   RpcProvider,
   TransactionExecutionStatus,
@@ -52,11 +53,11 @@ describeIfRpc('RPCProvider', () => {
 
   test('instantiate from rpcProvider', () => {
     const newInsRPCProvider = new RpcProvider();
-    
+
     let FinalInsRPCProvider = new RpcProvider(newInsRPCProvider);
     expect(FinalInsRPCProvider.channel).toBe(newInsRPCProvider.channel);
     expect(FinalInsRPCProvider.responseParser).toBe(newInsRPCProvider.responseParser);
-    
+
     delete (newInsRPCProvider as any).responseParser;
     FinalInsRPCProvider = new RpcProvider(newInsRPCProvider);
     expect(FinalInsRPCProvider.channel).toBe(newInsRPCProvider.channel);
