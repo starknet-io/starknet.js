@@ -1,26 +1,29 @@
 import ajvKeywords from 'ajv-keywords';
 import { matchersWithOptions } from 'jest-json-schema';
 
+import starknet_api_openrpc from 'starknet_specs/api/starknet_api_openrpc.json';
+import starknet_metadata from 'starknet_specs/api/starknet_metadata.json';
+import starknet_trace_api_openrpc from 'starknet_specs/api/starknet_trace_api_openrpc.json';
+import starknet_write_api from 'starknet_specs/api/starknet_write_api.json';
+
 import accountSchemas from '../schemas/account.json';
-import componentSchemas from '../schemas/rpc/component.json';
-import starknet_api_openrpc from '../schemas/rpc/starknet_api_openrpc.json';
-import starknet_metadata from '../schemas/rpc/starknet_metadata.json';
-import starknet_trace_api_openrpc from '../schemas/rpc/starknet_trace_api_openrpc.json';
-import starknet_write_api from '../schemas/rpc/starknet_write_api.json';
+import componentSchemas from '../schemas/component.json';
 import libSchemas from '../schemas/lib.json';
 import providerSchemas from '../schemas/provider.json';
 import rpcSchemas from '../schemas/rpc.json';
 import { isBigInt } from '../../src/utils/num';
 
 const matcherSchemas = [accountSchemas, libSchemas, providerSchemas, rpcSchemas];
-const schemas = [
-  ...matcherSchemas,
-  componentSchemas,
-  starknet_api_openrpc,
-  starknet_metadata,
-  starknet_trace_api_openrpc,
-  starknet_write_api,
+const starknetSchemas = [
+  { $id: 'starknet_api_openrpc', ...starknet_api_openrpc },
+  { $id: 'starknet_metadata', ...starknet_metadata },
+  { $id: 'starknet_trace_api_openrpc', ...starknet_trace_api_openrpc },
+  { $id: 'starknet_write_api', ...starknet_write_api },
+  // schema aliases to rectify faulty references from the spec
+  { $id: 'starknet_api_openrpc.json', ...starknet_api_openrpc },
+  { $id: 'api/starknet_api_openrpc.json', ...starknet_api_openrpc },
 ];
+const schemas = [...matcherSchemas, ...starknetSchemas, componentSchemas];
 const jestJsonMatchers = matchersWithOptions({ schemas }, (ajv: any) => {
   // @ts-ignore
   ajv.addKeyword({
