@@ -87,6 +87,7 @@
     "prettier": "^3.2.5",
     "prettier-plugin-import-sort": "^0.0.7",
     "semantic-release": "^23.0.5",
+    "starknet_specs": "github:starkware-libs/starknet-specs#v0.7.1",
     "tsup": "^8.0.2",
     "type-coverage": "^2.28.2",
     "typedoc": "^0.25.7",
