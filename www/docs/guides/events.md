@@ -1,5 +1,5 @@
 ---
-sidebar_position: 12
+sidebar_position: 13
 ---
 
 # Events
@@ -59,7 +59,9 @@ const txReceipt = await provider.waitForTransaction(transactionHash);
 You can recover all the events related to this transaction hash:
 
 ```typescript
-const listEvents = txReceipt.events;
+if (txReceipt.isSuccess()) {
+  const listEvents = txReceipt.events;
+}
 ```
 
 The result is an array of events (here only one event):
