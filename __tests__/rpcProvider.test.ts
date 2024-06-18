@@ -8,6 +8,7 @@ import {
   FeeEstimate,
   RPC,
   RPC06,
+  RPCResponseParser,
   ReceiptTx,
   RpcProvider,
   TransactionExecutionStatus,
@@ -25,14 +26,14 @@ import {
   compiledL1L2,
   compiledOpenZeppelinAccount,
   createBlockForDevnet,
-  describeIfRpc,
-  describeIfNotDevnet,
   describeIfDevnet,
+  describeIfNotDevnet,
+  describeIfRpc,
+  describeIfTestnet,
+  devnetETHtokenAddress,
   getTestAccount,
   getTestProvider,
-  describeIfTestnet,
   waitNextBlock,
-  devnetETHtokenAddress,
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
@@ -48,6 +49,19 @@ describeIfRpc('RPCProvider', () => {
     const accountKeyPair = utils.randomPrivateKey();
     accountPublicKey = getStarkKey(accountKeyPair);
     await createBlockForDevnet();
+  });
+
+  test('instantiate from rpcProvider', () => {
+    const newInsRPCProvider = new RpcProvider();
+
+    let FinalInsRPCProvider = new RpcProvider(newInsRPCProvider);
+    expect(FinalInsRPCProvider.channel).toBe(newInsRPCProvider.channel);
+    expect(FinalInsRPCProvider.responseParser).toBe(newInsRPCProvider.responseParser);
+
+    delete (newInsRPCProvider as any).responseParser;
+    FinalInsRPCProvider = new RpcProvider(newInsRPCProvider);
+    expect(FinalInsRPCProvider.channel).toBe(newInsRPCProvider.channel);
+    expect(FinalInsRPCProvider.responseParser).toBeInstanceOf(RPCResponseParser);
   });
 
   test('getChainId', async () => {

@@ -1,5 +1,5 @@
 ---
-sidebar_position: 9
+sidebar_position: 10
 ---
 
 # Data transformation
@@ -200,7 +200,8 @@ const myTpl = { '0': '0x0a', '1': 200 };
 
 ### Named tuple
 
-> [!IMPORTANT] Only for Cairo 0.
+:::warning Only for Cairo 0
+:::
 
 Starknet is waiting for a list of felts.  
 You can send to Starknet.js methods: an object, `cairo.tuple()`, list of bigNumberish.  
@@ -220,7 +221,9 @@ const namedTup = { min: '0x4e65ac6', max: 296735486n };
 await myContract.my_function(namedTup);
 ```
 
-> [!TIP] It's not mandatory to create an object conform to the Cairo 0 named tuple, you can just use the `cairo.tuple()` function.
+:::tip
+It's not mandatory to create manually an object conform to the Cairo 0 named tuple ; you can just use the `cairo.tuple()` function.
+:::
 
 ### Ethereum public key
 
@@ -282,7 +285,9 @@ Const myArray = [10, "0xaa", 567n];
 await myContract.my_function(myArray);
 ```
 
-> [!CAUTION] Do not add the `array_len` parameter before your array. Starknet.js will manage this element automatically.
+:::danger important
+Do not add the `array_len` parameter before your array. Starknet.js will manage this element automatically.
+:::
 
 > It's also applicable for Cairo `Span` type.
 
@@ -352,7 +357,9 @@ const functionName = 'my_function';
 await myContract[functionName](...myParams);
 ```
 
-> [!WARNING] Objects properties have to be ordered in accordance with the ABI.
+:::warning important
+Objects properties have to be ordered in accordance with the ABI.
+:::
 
 ### Object (without ABI conformity check)
 
@@ -372,7 +379,9 @@ const deployResponse = await myAccount.deployContract({
 
 This type is available for: `CallData.compile(), hash.calculateContractAddressFromHash, account.deployContract, account.deployAccount, account.execute`
 
-> [!WARNING] Objects properties have to be ordered in accordance with the ABI.
+:::warning important
+Objects properties have to be ordered in accordance with the ABI.
+:::
 
 ### Object (with ABI conformity check)
 

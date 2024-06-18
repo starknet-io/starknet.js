@@ -1,5 +1,5 @@
 ---
-sidebar_position: 12
+sidebar_position: 13
 ---
 
 # Events
@@ -59,7 +59,9 @@ const txReceipt = await provider.waitForTransaction(transactionHash);
 You can recover all the events related to this transaction hash:
 
 ```typescript
-const listEvents = txReceipt.events;
+if (txReceipt.isSuccess()) {
+  const listEvents = txReceipt.events;
+}
 ```
 
 The result is an array of events (here only one event):
@@ -79,6 +81,10 @@ The first parameter in the `keys` array is a hash of the name of the event, calc
 ```typescript
 const nameHash = num.toHex(hash.starknetKeccak('EventPanic'));
 ```
+
+:::info
+In some cases (when an event is coded in a Cairo component, without the `#[flat]` flag), this hash is handled in several numbers.
+:::
 
 The second parameter is the `errorType` variable content (stored in keys array because of the `#[key]` flag in the Cairo code).
 
@@ -121,19 +127,32 @@ In this example, if you want to read the events recorded in the last 10 blocks, 
 import { RpcProvider } from 'starknet';
 const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 const lastBlock = await provider.getBlock('latest');
-const keyFilter = [num.toHex(hash.starknetKeccak('EventPanic')), '0x8'];
+const keyFilter = [[num.toHex(hash.starknetKeccak('EventPanic')), '0x8']];
 const eventsList = await provider.getEvents({
   address: myContractAddress,
   from_block: { block_number: lastBlock.block_number - 9 },
   to_block: { block_number: lastBlock.block_number },
-  keys: [keyFilter],
+  keys: keyFilter,
   chunk_size: 10,
 });
 ```
 
-> `address, from_block, to_block, keys` are all optional parameters.
+:::info
+`address, from_block, to_block, keys` are all optional parameters.
+:::
 
-> If you don't want to filter by key, you can either remove the `keys` parameter, or affect it this way: `[[]]` .
+:::tip
+If you don't want to filter by key, you can either remove the `keys` parameter, or affect it this way: `[[]]` .
+:::
+
+:::warning CAUTION
+An event can be nested in a Cairo component (See the Cairo code of the contract to verify). In this case, the array of keys will start with additional hashes, and you will have to adapt your code in consequence ; in this example, we have to skip one hash :
+
+```typescript
+const keyFilter = [[], [num.toHex(hash.starknetKeccak('EventPanic'))]];
+```
+
+:::
 
 Here we have only one event. You can easily read this event:
 
@@ -185,4 +204,14 @@ while (continuationToken) {
   }
   chunkNum++;
 }
+```
+
+If you want to parse an array of events of the same contract (abi of the contract available) :
+
+```typescript
+const abiEvents = events.getAbiEvents(abi);
+const abiStructs = CallData.getAbiStruct(abi);
+const abiEnums = CallData.getAbiEnum(abi);
+const parsed = events.parseEvents(eventsRes.events, abiEvents, abiStructs, abiEnums);
+console.log('parsed events=', parsed);
 ```

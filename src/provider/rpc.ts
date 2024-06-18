@@ -1,6 +1,7 @@
-import type { SPEC } from 'starknet-types-07';
 import { bytesToHex } from '@noble/curves/abstract/utils';
 import { keccak_256 } from '@noble/hashes/sha3';
+import type { SPEC } from 'starknet-types-07';
+
 import { RPC06, RPC07, RpcChannel } from '../channel';
 import {
   AccountInvocations,
@@ -29,27 +30,30 @@ import {
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
-import { getAbiContractVersion } from '../utils/calldata/cairo';
-import { isSierra } from '../utils/contract';
-import { RPCResponseParser } from '../utils/responseParser/rpc';
-import { GetTransactionReceiptResponse, ReceiptTx } from '../utils/transactionReceipt';
 import type { TransactionWithHash } from '../types/provider/spec';
 import assert from '../utils/assert';
-import { hexToBytes, toHex } from '../utils/num';
+import { getAbiContractVersion } from '../utils/calldata/cairo';
+import { isSierra } from '../utils/contract';
 import { addHexPrefix, removeHexPrefix } from '../utils/encode';
+import { hexToBytes, toHex } from '../utils/num';
 import { wait } from '../utils/provider';
+import { RPCResponseParser } from '../utils/responseParser/rpc';
+import { GetTransactionReceiptResponse, ReceiptTx } from '../utils/transactionReceipt';
 import { LibraryError } from './errors';
 import { ProviderInterface } from './interface';
 
 export class RpcProvider implements ProviderInterface {
-  private responseParser: RPCResponseParser;
+  public responseParser: RPCResponseParser;
 
   public channel: RPC07.RpcChannel | RPC06.RpcChannel;
 
   constructor(optionsOrProvider?: RpcProviderOptions | ProviderInterface | RpcProvider) {
     if (optionsOrProvider && 'channel' in optionsOrProvider) {
       this.channel = optionsOrProvider.channel;
-      this.responseParser = (optionsOrProvider as any).responseParser;
+      this.responseParser =
+        'responseParser' in optionsOrProvider
+          ? optionsOrProvider.responseParser
+          : new RPCResponseParser();
     } else {
       this.channel = new RpcChannel({ ...optionsOrProvider, waitMode: false });
       this.responseParser = new RPCResponseParser(optionsOrProvider?.feeMarginPercentage);
@@ -124,10 +128,10 @@ export class RpcProvider implements ProviderInterface {
     blockIdentifier: BlockIdentifier = 'pending',
     retryInterval: number = 5000
   ) {
-    if (blockIdentifier === BlockTag.latest) return;
+    if (blockIdentifier === BlockTag.LATEST) return;
     const currentBlock = await this.getBlockNumber();
     const targetBlock =
-      blockIdentifier === BlockTag.pending
+      blockIdentifier === BlockTag.PENDING
         ? currentBlock + 1
         : Number(toHex(blockIdentifier as BigNumberish));
     if (targetBlock <= currentBlock) return;
@@ -205,11 +209,11 @@ export class RpcProvider implements ProviderInterface {
 
   /**
    * Return transactions from pending block
-   * @deprecated Instead use getBlock(BlockTag.pending); (will be removed in next minor version)
+   * @deprecated Instead use getBlock(BlockTag.PENDING); (will be removed in next minor version)
    * Utility method, same result can be achieved using getBlockWithTxHashes(BlockTag.pending);
    */
   public async getPendingTransactions() {
-    const { transactions } = await this.getBlockWithTxHashes(BlockTag.pending).then(
+    const { transactions } = await this.getBlockWithTxHashes(BlockTag.PENDING).then(
       this.responseParser.parseGetBlockResponse
     );
     return Promise.all(transactions.map((it: any) => this.getTransactionByHash(it)));

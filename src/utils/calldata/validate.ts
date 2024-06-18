@@ -26,6 +26,7 @@ import {
   isTypeEnum,
   isTypeFelt,
   isTypeLiteral,
+  isTypeNonZero,
   isTypeOption,
   isTypeResult,
   isTypeStruct,
@@ -277,6 +278,52 @@ const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs, enu
   }
 };
 
+const validateNonZero = (parameter: any, input: AbiEntry) => {
+  // Telegram : https://t.me/sncorestars/11902/45433
+  // Author : Ori Ziv (08/apr/2024)
+  // "NonZero is only supported for purely numeric types (u*, i* and felt252) and EcPoint."
+  //
+  // As EcPoint do not includes trait Serde, it can't be seen in an ABI.
+  // u512 is not compatible.
+  // i* are not currently handled by Starknet.js (and core::zeroable::NonZero::<i*> seems not to work in Cairo 2.6.3).
+  // so, are authorized here : u8, u16, u32, u64, u128, u256 and felt252.
+
+  const baseType = getArrayType(input.type);
+  assert(
+    (isTypeUint(baseType) && baseType !== CairoUint512.abiSelector) || isTypeFelt(baseType),
+    `Validate: ${input.name} type is not authorized for NonZero type.`
+  );
+  switch (true) {
+    case isTypeFelt(baseType):
+      validateFelt(parameter, input);
+      assert(
+        BigInt(parameter.toString(10)) > 0,
+        'Validate: value 0 is not authorized in NonZero felt252 type.'
+      );
+      break;
+    case isTypeUint(baseType):
+      validateUint(parameter, { name: '', type: baseType });
+      switch (input.type) {
+        case Uint.u256:
+          assert(
+            new CairoUint256(parameter).toBigInt() > 0,
+            'Validate: value 0 is not authorized in NonZero uint256 type.'
+          );
+          break;
+        default:
+          assert(
+            toBigInt(parameter) > 0,
+            'Validate: value 0 is not authorized in NonZero uint type.'
+          );
+      }
+      break;
+    default:
+      throw new Error(
+        `Validate Unhandled: argument ${input.name}, type ${input.type}, value ${parameter}`
+      );
+  }
+};
+
 export default function validateFields(
   abiMethod: FunctionAbi,
   args: Array<any>,
@@ -315,6 +362,9 @@ export default function validateFields(
         break;
       case isTypeTuple(input.type):
         validateTuple(parameter, input);
+        break;
+      case isTypeNonZero(input.type):
+        validateNonZero(parameter, input);
         break;
       default:
         throw new Error(

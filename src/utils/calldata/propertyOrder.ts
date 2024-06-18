@@ -9,6 +9,7 @@ import {
   isTypeByteArray,
   isTypeEnum,
   isTypeEthAddress,
+  isTypeNonZero,
   isTypeOption,
   isTypeResult,
   isTypeSecp256k1Point,
@@ -57,6 +58,9 @@ export default function orderPropsByAbi(
       return orderTuple(unorderedItem, abiType);
     }
     if (isTypeEthAddress(abiType)) {
+      return unorderedItem;
+    }
+    if (isTypeNonZero(abiType)) {
       return unorderedItem;
     }
     if (isTypeByteArray(abiType)) {

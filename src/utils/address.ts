@@ -9,6 +9,7 @@ import { assertInRange, toHex } from './num';
 
 /**
  * Format a hex number to '0x' and 64 characters, adding leading zeros if necessary.
+ *
  * @param {BigNumberish} address
  * @returns {string} Hex string : 0x followed by 64 characters. No upper case characters in the response.
  * @example
@@ -19,13 +20,17 @@ import { assertInRange, toHex } from './num';
  * ```
  */
 export function addAddressPadding(address: BigNumberish): string {
-  return addHexPrefix(removeHexPrefix(toHex(address)).padStart(64, '0'));
+  const hex = toHex(addHexPrefix(address.toString()));
+  const padded = removeHexPrefix(hex).padStart(64, '0');
+  return addHexPrefix(padded);
 }
 
 /**
  * Check the validity of a Starknet address, and format it as a hex number : '0x' and 64 characters, adding leading zeros if necessary.
+ *
  * @param {BigNumberish} address
  * @returns {string} Hex string : 0x followed by 64 characters. No upper case characters in the response.
+ * @throws address argument must be a valid address inside the address range bound
  * @example
  * ```typescript
  * const address = "0x90591d9fa3efc87067d95a643f8455e0b8190eb8cb7bfd39e4fb7571fdf";
@@ -34,13 +39,13 @@ export function addAddressPadding(address: BigNumberish): string {
  * ```
  */
 export function validateAndParseAddress(address: BigNumberish): string {
-  assertInRange(address, ZERO, ADDR_BOUND - 1n, 'Starknet Address');
-
   const result = addAddressPadding(address);
 
   if (!result.match(/^(0x)?[0-9a-fA-F]{64}$/)) {
     throw new Error('Invalid Address Format');
   }
+
+  assertInRange(result, ZERO, ADDR_BOUND - 1n, 'Starknet Address');
 
   return result;
 }
@@ -80,7 +85,6 @@ export function getChecksumAddress(address: BigNumberish): string {
  * a given address to reduce the risk of errors introduced from typing an address or cut and paste issues.
  *
  * @param address string
- *
  * @returns true if the ChecksumAddress is valid
  * @example
  * ```typescript

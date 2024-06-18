@@ -36,8 +36,8 @@ On Starknet.js side, you have to select the proper version, to be in accordance 
 |            v0.4.0             | Starknet.js v5.21.1          |
 |            v0.5.0             | Starknet.js v5.23.0          |
 |            v0.5.1             | Starknet.js v5.29.0 & v6.1.0 |
-|            v0.6.0             | Starknet.js v6.6.6           |
-|            v0.7.0             | Starknet.js v6.6.6           |
+|            v0.6.0             | Starknet.js v6.9.0           |
+|            v0.7.0             | Starknet.js v6.9.0           |
 
 [!NOTE] Each Starknet.js version 6.x.x is compatible with 3 rpc spec versions, and recognize automatically the spec version if not provided.
 
@@ -153,10 +153,10 @@ const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:6060/v0_7' });
 
 ## Devnet
 
-Example of a connection to a local development node (rpc 0.6.0), with Starknet-devnet-rs:
+Example of a connection to a local development node (rpc 0.7.0), with Starknet-devnet-rs v0.0.6:
 
 ```typescript
 const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
 ```
 
-> If you have customized host and port during starknet-devnet initialization, adapt in accordance to your script.
+> If you have customized host and port during starknet-devnet initialization, adapt in accordance your script.

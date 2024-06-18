@@ -149,7 +149,9 @@ const { transaction_hash: txH } = await account0.execute(myCall, {
   },
 });
 const txR = await provider.waitForTransaction(txH);
-console.log('Paid fee =', txR.actual_fee);
+if (txR.isSuccess()) {
+  console.log('Paid fee =', txR.actual_fee);
+}
 ```
 
 Yes, it's much more complicated. Let's see in detail.  

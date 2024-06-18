@@ -146,6 +146,7 @@ export const isCairo1Type = (type: string) => type.includes('::');
 /**
  * Retrieves the array type from the given type string.
  *
+ * Works also for core::zeroable::NonZero type.
  * @param {string} type - The type string.
  * @returns - The array type.
  */
@@ -171,6 +172,21 @@ export function isCairo1Abi(abi: Abi): boolean {
     throw Error('Unable to determine Cairo version');
   }
   return cairo === '1';
+}
+
+/**
+ * Checks if the given type is a NonZero type.
+ *
+ * @param {string} type The type to check.
+ * @returns `true` if the type is NonZero type, `false` otherwise.
+ * @example
+ * ```typescript
+ * const result = cairo.isTypeNonZero("core::zeroable::NonZero::<u8>");
+ * //result = true
+ * ```
+ */
+export function isTypeNonZero(type: string): boolean {
+  return type.startsWith('core::zeroable::NonZero::');
 }
 
 /**

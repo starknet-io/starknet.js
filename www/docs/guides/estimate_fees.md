@@ -1,5 +1,5 @@
 ---
-sidebar_position: 10
+sidebar_position: 11
 ---
 
 # Estimate fees
@@ -132,5 +132,7 @@ After the processing of the transaction, you can read the fee that has really be
 
 ```typescript
 const txR = await provider.waitForTransaction(txH);
-console.log('Fee paid =', txR.actual_fee);
+if (txR.isSuccess()) {
+  console.log('Fee paid =', txR.actual_fee);
+}
 ```
