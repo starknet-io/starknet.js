@@ -50,7 +50,6 @@
     "rollup"
   ],
   "repository": "github:starknet-io/starknet.js",
-  "author": "Sean Han",
   "license": "MIT",
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.18.2",
