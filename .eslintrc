@@ -12,7 +12,7 @@
     "plugin:prettier/recommended"
   ],
   "ignorePatterns": [
-    "tsup.config.ts"
+    "build.config.ts"
   ],
   "globals": {
     "Atomics": "readonly",
