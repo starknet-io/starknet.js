@@ -41,10 +41,10 @@ import {
 import { ETransactionVersion, ETransactionVersion3, ResourceBounds } from '../types/api';
 import {
   EOutsideExecutionVersion,
-  OutsideExecution,
   SNIP9_V1_INTERFACE_ID,
   SNIP9_V2_INTERFACE_ID,
 } from '../types/outsideExecution';
+import { OutsideExecution, buildExecuteFromOutsideCallData } from '../utils/outsideExecution';
 import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { parseUDCEvent } from '../utils/events';
@@ -52,7 +52,6 @@ import { calculateContractAddressFromHash } from '../utils/hash';
 import { toBigInt, toCairoBool } from '../utils/num';
 import { parseContract } from '../utils/provider';
 import { isString } from '../utils/shortString';
-import { buildExecuteFromOutsideCallData } from '../utils/outsideExecution';
 import { supportsInterface } from '../utils/src5';
 import {
   estimateFeeToBounds,

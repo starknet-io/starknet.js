@@ -1,7 +1,8 @@
 // import { Provider, Account, Contract, num, typedData } from '../src';
 import { getStarkKey, utils } from '@scure/starknet';
 import { Provider, Account, cairo } from '../src';
-import { OutsideExecution, SNIP9_V1_INTERFACE_ID } from '../src/types/outsideExecution';
+import { SNIP9_V1_INTERFACE_ID } from '../src/types/outsideExecution';
+import { OutsideExecution } from '../src/utils/outsideExecution';
 import { randomAddress } from '../src/utils/stark';
 import {
   compiledArgentAccount,

@@ -1,11 +1,11 @@
 // outsideExecution.test.ts
 
 import {
-  OutsideExecution,
   EOutsideExecutionVersion,
   OutsideExecutionTypesV1,
   OutsideExecutionTypesV2,
 } from '../src/types/outsideExecution';
+import { OutsideExecution } from '../src/utils/outsideExecution';
 import { Call } from '../src/types';
 import { encodeShortString } from '../src/utils/shortString';
 

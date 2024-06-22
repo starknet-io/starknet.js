@@ -11,7 +11,7 @@ import {
   EOutsideExecutionVersion,
   OutsideExecutionTypesV1,
   OutsideExecutionTypesV2,
-} from '../types/outsideExecutionTypes';
+} from '../types/outsideExecution';
 
 export const OutsideExecutionCallerAny = encodeShortString('ANY_CALLER');
 

@@ -31,7 +31,8 @@ import {
   UniversalDeployerContractPayload,
   UniversalDetails,
 } from '../types';
-import { EOutsideExecutionVersion, OutsideExecution } from '../types/outsideExecution';
+import { EOutsideExecutionVersion } from '../types/outsideExecution';
+import { OutsideExecution } from '../utils/outsideExecution';
 
 export abstract class AccountInterface extends ProviderInterface {
   public abstract address: string;
