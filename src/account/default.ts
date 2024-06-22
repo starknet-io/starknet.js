@@ -52,7 +52,7 @@ import { calculateContractAddressFromHash } from '../utils/hash';
 import { toBigInt, toCairoBool } from '../utils/num';
 import { parseContract } from '../utils/provider';
 import { isString } from '../utils/shortString';
-import { buildExecuteFromOutsideCallData } from '../utils/snip9';
+import { buildExecuteFromOutsideCallData } from '../utils/outsideExecution';
 import { supportsInterface } from '../utils/src5';
 import {
   estimateFeeToBounds,
