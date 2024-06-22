@@ -1,5 +1,5 @@
 import { Calldata, Signature } from '../types';
-import { OutsideExecution } from '../types/outsideExecution';
+import { OutsideExecution } from './outsideExecution';
 import { CallData } from './calldata';
 import { formatSignature } from './stark';
 
