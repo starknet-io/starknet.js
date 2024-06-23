@@ -16,7 +16,6 @@ export default defineBuildConfig({
       input: './src/',
       outDir: './dist',
       format: 'esm',
-      // https://github.com/sindresorhus/globby
       pattern: ['**', '!**/*.test.ts'],
       esbuild: {
         define: {
