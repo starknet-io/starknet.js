@@ -256,8 +256,6 @@ console.log('Pre-calculated ETH account address =', contractETHaddress);
 > const myPrivateKey = eth.ethRandomPrivateKey();
 > ```
 
-````
-
 Then you have to fund this address.
 
 ### Deployment of the new account
@@ -279,7 +277,7 @@ const { transaction_hash, contract_address } = await ethAccount.deployAccount(
 );
 await provider.waitForTransaction(transaction_hash);
 console.log('✅ New Ethereum account final address =', contract_address);
-````
+```
 
 ## Create your account abstraction
 
