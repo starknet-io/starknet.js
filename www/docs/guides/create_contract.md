@@ -58,7 +58,7 @@ const deployResponse = await account0.declareAndDeploy({
 
 // Connect the new contract instance:
 const myTestContract = new Contract(
-  compiledTest.abi,
+  compiledTestSierra.abi,
   deployResponse.deploy.contract_address,
   provider
 );
