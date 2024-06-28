@@ -1,3 +1,9 @@
+## [6.10.1](https://github.com/starknet-io/starknet.js/compare/v6.10.0...v6.10.1) (2024-06-28)
+
+### Bug Fixes
+
+- change build cjs and mjs to unbuild ([#1163](https://github.com/starknet-io/starknet.js/issues/1163)) ([bb4a93d](https://github.com/starknet-io/starknet.js/commit/bb4a93d6639cf90298e0b1003fb31a79f11691f0))
+
 # [6.10.0](https://github.com/starknet-io/starknet.js/compare/v6.9.0...v6.10.0) (2024-06-18)
 
 ### Features
