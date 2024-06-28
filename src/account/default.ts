@@ -628,9 +628,6 @@ export class Account extends Provider implements AccountInterface {
     // if the version is not specified, try to determine the latest supported version
     const supportedVersion =
       version ?? (await new Account(this, targetAddress, this.signer).getSnip9Version());
-    if (version === undefined) {
-      throw new Error('Account does not support OutsideExecution interface');
-    }
     // choose the correct entrypoint
     let entrypoint: string;
     if (supportedVersion === EOutsideExecutionVersion.V1) {

@@ -1,4 +1,3 @@
-// import { Provider, Account, Contract, num, typedData } from '../src';
 import { getStarkKey, utils } from '@scure/starknet';
 import { Provider, Account, cairo } from '../src';
 import { SNIP9_V1_INTERFACE_ID } from '../src/types/outsideExecution';
@@ -115,7 +114,6 @@ describe('Account and OutsideExecution', () => {
         user: recipient,
       },
     });
-    // TODO Check balance correctly
     expect(balanceRes[0]).toBe('0x64'); // 100 tokens
   });
 });

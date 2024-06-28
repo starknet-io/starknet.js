@@ -75,7 +75,6 @@ function getDomain(chainId: string, version: EOutsideExecutionVersion) {
 }
 
 // converts a Call object to an OutsideCall object that can be used in the OutsideExecution object
-// TODO maybe just use the Call object directly?
 function getOutsideCall(call: Call): OutsideCall {
   const callData = call.calldata ?? [];
   const callDataCompiled = Array.isArray(callData) ? callData : CallData.compile(callData);
@@ -111,7 +110,7 @@ export function buildExecuteFromOutsideCallData(
   const abiData = outsideExecution.getABIData();
   const formattedSignature = formatSignature(signature);
   return CallData.compile({
-    outside_execution: abiData, // TODO we should encode it field by field most likely
+    outside_execution: abiData,
     signature: formattedSignature,
   });
 }
