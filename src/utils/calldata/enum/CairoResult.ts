@@ -1,11 +1,7 @@
-import { ValuesType } from '../../../types/helpers/valuesType';
-
-export const CairoResultVariant = {
-  Ok: 0,
-  Err: 1,
-} as const;
-
-export type CairoResultVariant = ValuesType<typeof CairoResultVariant>;
+export enum CairoResultVariant {
+  Ok = 0,
+  Err = 1,
+}
 
 /**
  * Class to handle Cairo Result
@@ -22,8 +18,8 @@ export class CairoResult<T, U> {
 
   readonly Err?: U;
 
-  constructor(variant: CairoResultVariant | number, resultContent: T | U) {
-    if (!(variant in Object.values(CairoResultVariant))) {
+  constructor(variant: CairoResultVariant, resultContent: T | U) {
+    if (!(variant in CairoResultVariant)) {
       throw new Error('Wrong variant : should be CairoResultVariant.Ok or .Err.');
     }
     if (variant === CairoResultVariant.Ok) {
