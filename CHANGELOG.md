@@ -1,3 +1,9 @@
+## [6.10.2](https://github.com/starknet-io/starknet.js/compare/v6.10.1...v6.10.2) (2024-07-02)
+
+### Bug Fixes
+
+- revert enums partially & tsup build ([#1165](https://github.com/starknet-io/starknet.js/issues/1165)) ([57b2c72](https://github.com/starknet-io/starknet.js/commit/57b2c7210147f3ff33ebffa844351b50bee6534e))
+
 ## [6.10.1](https://github.com/starknet-io/starknet.js/compare/v6.10.0...v6.10.1) (2024-06-28)
 
 ### Bug Fixes
