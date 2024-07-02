@@ -1,0 +1,41 @@
+{
+  "types": {
+    "StarknetDomain": [
+      { "name": "name", "type": "shortstring" },
+      { "name": "version", "type": "shortstring" },
+      { "name": "chainId", "type": "shortstring" },
+      { "name": "revision", "type": "shortstring" }
+    ],
+    "Example": [
+      { "name": "n0", "type": "felt" },
+      { "name": "n1", "type": "bool" },
+      { "name": "n2", "type": "string" },
+      { "name": "n3", "type": "selector" },
+      { "name": "n4", "type": "u128" },
+      { "name": "n5", "type": "i128" },
+      { "name": "n6", "type": "ContractAddress" },
+      { "name": "n7", "type": "ClassHash" },
+      { "name": "n8", "type": "timestamp" },
+      { "name": "n9", "type": "shortstring" }
+    ]
+  },
+  "primaryType": "Example",
+  "domain": {
+    "name": "StarkNet Mail",
+    "version": "1",
+    "chainId": "1",
+    "revision": "1"
+  },
+  "message": {
+    "n0": "0x3e8",
+    "n1": true,
+    "n2": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+    "n3": "transfer",
+    "n4": 10,
+    "n5": -10,
+    "n6": "0x3e8",
+    "n7": "0x3e8",
+    "n8": 1000,
+    "n9": "transfer"
+  }
+}

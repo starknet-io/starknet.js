@@ -1,6 +1,8 @@
-import { CallData, RawArgs, json, stark } from '../../src';
+import { CallData, RawArgs, UniversalDetails, json, stark } from '../../src';
+import { EDataAvailabilityMode } from '../../src/types/api';
+import { FeeEstimate } from '../../src/types/provider';
 import { toBigInt, toHex } from '../../src/utils/num';
-import { compiledOpenZeppelinAccount } from '../fixtures';
+import { compiledOpenZeppelinAccount } from '../config/fixtures';
 
 const compiledAccount = compiledOpenZeppelinAccount;
 
@@ -64,5 +66,53 @@ describe('stark', () => {
 
       expect(compiled).toEqual(['1', '2', '3', '10000000000', '4', '1', '2', '3', '4']);
     });
+  });
+
+  test('estimatedFeeToMaxFee', () => {
+    expect(stark.estimatedFeeToMaxFee(100)).toBe(150n);
+  });
+
+  test('estimateFeeToBounds', () => {
+    const estimateFeeResponse: FeeEstimate = {
+      gas_consumed: '100',
+      gas_price: '10',
+      overall_fee: '1000',
+      unit: 'FRI',
+    };
+    const estimateFeeResponse07: FeeEstimate = {
+      ...estimateFeeResponse,
+      data_gas_consumed: '100',
+      data_gas_price: '10',
+      overall_fee: '2000',
+    };
+    expect(stark.estimateFeeToBounds(estimateFeeResponse)).toStrictEqual({
+      l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
+      l1_gas: { max_amount: '0x96', max_price_per_unit: '0xf' },
+    });
+    expect(stark.estimateFeeToBounds(estimateFeeResponse07)).toStrictEqual({
+      l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
+      l1_gas: { max_amount: '0x12c', max_price_per_unit: '0xf' },
+    });
+  });
+
+  test('v3Details', () => {
+    const setValues = (o: {}, v: any) => Object.fromEntries(Object.keys(o).map((k) => [k, v]));
+
+    const details: UniversalDetails = {
+      tip: 99n,
+      paymasterData: [99n, 99n],
+      accountDeploymentData: [99n, 99n],
+      nonceDataAvailabilityMode: EDataAvailabilityMode.L2,
+      feeDataAvailabilityMode: EDataAvailabilityMode.L2,
+      resourceBounds: {
+        l1_gas: { max_amount: '0x99', max_price_per_unit: '0x99' },
+        l2_gas: { max_amount: '0x99', max_price_per_unit: '0x99' },
+      },
+    };
+    const detailsUndefined = setValues(details, undefined);
+    const detailsAnything = setValues(details, expect.anything());
+
+    expect(stark.v3Details(details)).toMatchObject(details);
+    expect(stark.v3Details(detailsUndefined)).toEqual(expect.objectContaining(detailsAnything));
   });
 });

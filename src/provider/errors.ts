@@ -37,13 +37,19 @@ export class CustomError extends Error {
 export class LibraryError extends CustomError {}
 
 export class GatewayError extends LibraryError {
-  constructor(message: string, public errorCode: string) {
+  constructor(
+    message: string,
+    public errorCode: string
+  ) {
     super(message);
   }
 }
 
 export class HttpError extends LibraryError {
-  constructor(message: string, public errorCode: number) {
+  constructor(
+    message: string,
+    public errorCode: number
+  ) {
     super(message);
   }
 }

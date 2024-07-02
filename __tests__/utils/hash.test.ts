@@ -1,64 +1,41 @@
-import {
-  computeCompiledClassHash,
-  computeContractClassHash,
-  computeSierraContractClassHash,
-  getSelectorFromName,
-} from '../../src/utils/hash';
-import {
-  compiledErc20,
-  compiledHashSierra,
-  compiledHashSierraCasm,
-  compiledOpenZeppelinAccount,
-  compiledTestDapp,
-  erc20ClassHash,
-} from '../fixtures';
+import { keccakBn, starknetKeccak, getSelectorFromName, getSelector } from '../../src/utils/hash';
 
-describe('Hash Tester', () => {
-  test('Test getSelectorFromName', () => {
-    const hash = getSelectorFromName('__validate__');
-    expect(hash).toEqual('0x162da33a4585851fe8d3af3c2a9c60b557814e221e0d4f30ff0b2189d9c7775');
+describe('keccakBn', () => {
+  test('should properly calculate the Keccak hash', () => {
+    expect(keccakBn('0xabc')).toBe(
+      '0x11cf08aac85935e32397f410e48217a127b6855d41b1e3877eb4179c0904b77'
+    );
+  });
+});
+
+describe('starknetKeccak', () => {
+  test('should properly calculate the starknet BigInt Keccak hash', () => {
+    expect(starknetKeccak('test').toString()).toBe(
+      '61835310290161785288773114225739080147441215596947647498723774891619563096'
+    );
+  });
+});
+
+describe('getSelectorFromName', () => {
+  test('should properly calculate the selector', () => {
+    expect(getSelectorFromName('myFunction')).toBe(
+      '0xc14cfe23f3fa7ce7b1f8db7d7682305b1692293f71a61cc06637f0d8d8b6c8'
+    );
+  });
+});
+
+describe('getSelector', () => {
+  test('should return the proper selector when provided a function name', () => {
+    expect(getSelector('myFunction')).toBe(
+      '0xc14cfe23f3fa7ce7b1f8db7d7682305b1692293f71a61cc06637f0d8d8b6c8'
+    );
   });
 
-  describe('Compute ClassHash of various contracts Cairo0', () => {
-    test('ERC20 Contract ClassHash', () => {
-      const classHash = computeContractClassHash(compiledErc20);
-
-      expect(classHash).toEqual(erc20ClassHash);
-      expect(classHash).toMatchInlineSnapshot(
-        `"0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a"`
-      );
-    });
-
-    test('OZ ERC20 Contract ClassHash', () => {
-      const classHash = computeContractClassHash(compiledOpenZeppelinAccount);
-
-      expect(classHash).toMatchInlineSnapshot(
-        `"0x36c7e49a16f8fc760a6fbdf71dde543d98be1fee2eda5daff59a0eeae066ed9"`
-      );
-    });
-
-    test('Test DApp Contract ClassHash', () => {
-      const classHash = computeContractClassHash(compiledTestDapp);
-
-      expect(classHash).toMatchInlineSnapshot(
-        `"0x4367b26fbb92235e8d1137d19c080e6e650a6889ded726d00658411cc1046f5"`
-      );
-    });
+  test('should return the proper selector when provided a hex-string', () => {
+    expect(getSelector('0x123abc')).toBe('0x123abc');
   });
 
-  describe('Compute CompiledClassHash & ClassHash Cairo1', () => {
-    test('Hello - CompiledClassHash', () => {
-      const compiledClassHash = computeCompiledClassHash(compiledHashSierraCasm);
-      expect(compiledClassHash).toEqual(
-        '0x5c82c98f2ab111bd50293ba64bb18cf49037374783ad2486c712709c4ba0d89'
-      );
-    });
-
-    test('Hello - ClassHash', () => {
-      const classHash = computeSierraContractClassHash(compiledHashSierra);
-      expect(classHash).toEqual(
-        '0x345df0a9b35ce05d03772ba7938acad66921c5c39c1a5af74aee72aa25c363e'
-      );
-    });
+  test('should return the proper selector when provided a decimal string', () => {
+    expect(getSelector('123456')).toBe('0x1e240');
   });
 });

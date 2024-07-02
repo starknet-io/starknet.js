@@ -6,10 +6,15 @@ If you want to contribute but don’t know what to do, take a look at these two 
 
 _[Use GitHub interface](https://blog.sapegin.me/all/open-source-for-everyone/) for simple documentation changes, otherwise follow the steps below._
 
+> :warning: IMPORTANT NOTE :warning:
+>
+> All contributions are expected to be of the highest possible quality! That means the PR is thoroughly tested and documented, and without blindly generated ChatGPT code and documentation! We will not consider nor merge PR-s that do not comply to these rules!
+
 ## Prerequisites
 
 - If it’s your first pull request, watch [this amazing course](http://makeapullrequest.com/) by [Kent C. Dodds](https://twitter.com/kentcdodds).
 - Fork the repository and clone your fork.
+- Checkout to the `develop` branch.
 - Install dependencies: `npm install`.
 
 ## Development workflow
@@ -34,14 +39,26 @@ Or run tests in watch mode:
 npm test --watch
 ```
 
-By default the tests are executed in your local Devnet. If you want to use a specific rpc node, you have to set some global variables before executing the tests :
+By default the tests are executed in your local Devnet and everything should run automatically.
+
+If you want to use a specific RPC node, you have to set some global variables before executing the tests:
 
 ```bash
-export TEST_RPC_URL=http://192.168.1.44:9545/rpc/v0.5 # example of a Pathfinder node located in your local network
-export TEST_RPC_URL=https://starknet-testnet.public.blastapi.io/rpc/v0.5 # example of a public testnet node
+export TEST_RPC_URL=http://192.168.1.44:9545/rpc/v0_7 # example of a Pathfinder node located in your local network
+export TEST_RPC_URL=https://starknet-sepolia.public.blastapi.io/rpc/v0_7 # example of a public Sepolia testnet node
 export TEST_ACCOUNT_ADDRESS=0x065A822f0000000000000000000000000c26641
 export TEST_ACCOUNT_PRIVATE_KEY=0x02a80000000000000000000000001754438a
 ```
+
+The global variables above will only be valid for some of the tests.
+The recommended and more straightforward approach is to go with the docker.
+You just need to do the following steps:
+
+- Install [Docker](https://docs.docker.com/engine/install/) (it can also be installed via a package manager, e.g. `brew` for Mac)
+- Run `Docker` on your machine (open the application).
+- Go to the [starknet-devnet-rs](https://hub.docker.com/r/shardlabs/starknet-devnet-rs/tags) and copy the `docker pull` command from the latest tag
+- Run `docker pull shardlabs/starknet-devnet-rs:latest` in your terminal
+- Run tests locally with `npm run test`
 
 **Don’t forget to add tests and [update documentation](./www/README.md) for your changes.**
 Documentation can be archived by using JSDoc.
@@ -86,7 +103,12 @@ For major changes that markedly transform the existing API or significantly alte
 - We’re using [Prettier](https://github.com/prettier/prettier) to format code, so don’t worry much about code formatting.
 - Don’t commit generated files, like minified JavaScript.
 - Don’t change the version number or changelog.
+- Use `npm run test:coverage` for a complete project test coverage.
+- Use for example `npm run test:coverage __tests__/utils/uint256.test.ts` for a single file coverage.
+- Use `npm run ts:coverage` to check the global type coverage rate and `npm run ts:coverage:report` to generate a complete report (summary displayed in the console, full HTML report available in the `coverage-ts` folder by launching `./coverage-ts/index.html` in your browser) and find files having low coverage.
 
 ## Need help?
 
 If you want to contribute but have any questions, concerns or doubts, feel free to ping maintainers. Ideally create a pull request with `WIP` (Work in progress) in its title and ask questions in the pull request description.
+
+You can also ask your query on our dedicated channel for [Starknet.js](https://discord.com/channels/793094838509764618/927918707613786162) on the [Starknet Discord](https://discord.com/invite/YgsdxEx3)

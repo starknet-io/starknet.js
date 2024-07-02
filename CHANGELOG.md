@@ -1,3 +1,407 @@
+## [6.10.2](https://github.com/starknet-io/starknet.js/compare/v6.10.1...v6.10.2) (2024-07-02)
+
+### Bug Fixes
+
+- revert enums partially & tsup build ([#1165](https://github.com/starknet-io/starknet.js/issues/1165)) ([57b2c72](https://github.com/starknet-io/starknet.js/commit/57b2c7210147f3ff33ebffa844351b50bee6534e))
+
+## [6.10.1](https://github.com/starknet-io/starknet.js/compare/v6.10.0...v6.10.1) (2024-06-28)
+
+### Bug Fixes
+
+- change build cjs and mjs to unbuild ([#1163](https://github.com/starknet-io/starknet.js/issues/1163)) ([bb4a93d](https://github.com/starknet-io/starknet.js/commit/bb4a93d6639cf90298e0b1003fb31a79f11691f0))
+
+# [6.10.0](https://github.com/starknet-io/starknet.js/compare/v6.9.0...v6.10.0) (2024-06-18)
+
+### Features
+
+- next-version ([1687dd2](https://github.com/starknet-io/starknet.js/commit/1687dd28f3390e770f66ac5dad52860a1dd92289))
+
+# [6.9.0](https://github.com/starknet-io/starknet.js/compare/v6.8.0...v6.9.0) (2024-05-21)
+
+### Bug Fixes
+
+- cannot infer ts2742 types from starknet-types@0.7 ([#1098](https://github.com/starknet-io/starknet.js/issues/1098)) ([f1c3b8e](https://github.com/starknet-io/starknet.js/commit/f1c3b8e3aeb96f6efb7e512ac3ba689253004c9d))
+- remove [warning] from typedoc for external usage ([#1095](https://github.com/starknet-io/starknet.js/issues/1095)) ([195186f](https://github.com/starknet-io/starknet.js/commit/195186fc2974ab0d164b1a48c68f7bf026329df5)), closes [#1121](https://github.com/starknet-io/starknet.js/issues/1121) [#1126](https://github.com/starknet-io/starknet.js/issues/1126)
+
+### Features
+
+- add type coverage ([#1120](https://github.com/starknet-io/starknet.js/issues/1120)) ([eceda5d](https://github.com/starknet-io/starknet.js/commit/eceda5dc1c39e472e1105e07797e76aaac3c1531))
+- provider.getL1MessageHash ([#1123](https://github.com/starknet-io/starknet.js/issues/1123)) ([1489cf2](https://github.com/starknet-io/starknet.js/commit/1489cf25e7e8598ab161cecc62c82495f64daa33))
+
+### Reverts
+
+- Revert "chore: add examples to JsDoc for transaction.ts file (#1105)" (#1108) ([59eb01e](https://github.com/starknet-io/starknet.js/commit/59eb01e451cf64dfdacd6d34b2a709e0a1029f15)), closes [#1105](https://github.com/starknet-io/starknet.js/issues/1105) [#1108](https://github.com/starknet-io/starknet.js/issues/1108)
+
+# [6.8.0](https://github.com/starknet-io/starknet.js/compare/v6.7.0...v6.8.0) (2024-04-23)
+
+### Bug Fixes
+
+- starknet types 0.7 ([#1087](https://github.com/starknet-io/starknet.js/issues/1087)) ([b038c76](https://github.com/starknet-io/starknet.js/commit/b038c76fe204746f1d1023c2ad3b46c022f6edbd))
+- tslib ([#1068](https://github.com/starknet-io/starknet.js/issues/1068)) ([dd7dc10](https://github.com/starknet-io/starknet.js/commit/dd7dc10c57fc3cc35298c0d584a178666e9cfed1))
+- **utils:** fix block identifier ([#1076](https://github.com/starknet-io/starknet.js/issues/1076)) ([0a3499d](https://github.com/starknet-io/starknet.js/commit/0a3499d49751061ceae1a4d6023b34f402376efc))
+
+### Features
+
+- add getGasPrice rpc provider method ([#1056](https://github.com/starknet-io/starknet.js/issues/1056)) ([d396275](https://github.com/starknet-io/starknet.js/commit/d396275348aff9c932d2bb7466b2a55f96214e4e))
+- Export function parseCalldataField() ([4d59658](https://github.com/starknet-io/starknet.js/commit/4d596582023f24522c25a1a515ee0246d2eca90a))
+- rpc 0.7.1 ([#1071](https://github.com/starknet-io/starknet.js/issues/1071)) ([11dc600](https://github.com/starknet-io/starknet.js/commit/11dc6003c74b6b6d0408b3f5894b5b6739d4bfba))
+
+# [6.7.0](https://github.com/starknet-io/starknet.js/compare/v6.6.6...v6.7.0) (2024-04-03)
+
+### Features
+
+- readme & trigger release ([5341c42](https://github.com/starknet-io/starknet.js/commit/5341c42da8bf5d2f82e4446a60b5e4fdc9c4e2fe))
+
+## [6.6.6](https://github.com/starknet-io/starknet.js/compare/v6.6.5...v6.6.6) (2024-03-25)
+
+### Bug Fixes
+
+- next version ([#1024](https://github.com/starknet-io/starknet.js/issues/1024)) ([07d4a26](https://github.com/starknet-io/starknet.js/commit/07d4a26c8b93413fcf1b8b54549e11555df86ca9))
+
+# [6.6.0](https://github.com/starknet-io/starknet.js/compare/v6.5.0...v6.6.0) (2024-03-19)
+
+### Bug Fixes
+
+- second option bump semantic release to 0.5 ([c90f9b2](https://github.com/starknet-io/starknet.js/commit/c90f9b285afb455d2404bff67137d5e6ae44cd5f))
+- test ci fix ([3a6c924](https://github.com/starknet-io/starknet.js/commit/3a6c9247717cb979842d9b37905ae423267959a5))
+- update to latest get-starknet dev ([017702f](https://github.com/starknet-io/starknet.js/commit/017702fd8c579ab62c98bc78fd6e8dd3022ef9ec))
+- wallet circular dependency fix ([621ae2d](https://github.com/starknet-io/starknet.js/commit/621ae2d4a015f3bb3b2e63ddbaeb5fa843509a88))
+
+### Features
+
+- get-starknet-core repacked for mjs, and initial implementation ([ab7fa19](https://github.com/starknet-io/starknet.js/commit/ab7fa19f44ad1fc27292313589247b74943fe3d0))
+- the WalletAccount handle changed channel ([73603e1](https://github.com/starknet-io/starknet.js/commit/73603e175bcc7925aa896be81fb666ffb225890d))
+- wallet deploy contract and patches ([dbf53b6](https://github.com/starknet-io/starknet.js/commit/dbf53b6e57948e433186cae6209998dece04fe4a))
+- walletAccount extract methods and update new ones ([0dfb5db](https://github.com/starknet-io/starknet.js/commit/0dfb5db1032dd7c946ee514647e8abb3eda87996))
+
+# [6.5.0](https://github.com/starknet-io/starknet.js/compare/v6.4.2...v6.5.0) (2024-03-14)
+
+### Bug Fixes
+
+- adjust max amount bound calculation for RPC v0.7.0 ([dd34cdb](https://github.com/starknet-io/starknet.js/commit/dd34cdb8b9817a55a16a97d960b1544d75c0059a))
+
+### Features
+
+- make fee margins configurable ([cedd984](https://github.com/starknet-io/starknet.js/commit/cedd984e1106db5b73d17630e282eb956d344a97))
+
+## [6.4.2](https://github.com/starknet-io/starknet.js/compare/v6.4.1...v6.4.2) (2024-03-14)
+
+### Bug Fixes
+
+- update starknetid sepolia contract addresses ([#1016](https://github.com/starknet-io/starknet.js/issues/1016)) ([b50a3bd](https://github.com/starknet-io/starknet.js/commit/b50a3bdada4345a9d601734762bc7a600766ec25))
+
+## [6.4.1](https://github.com/starknet-io/starknet.js/compare/v6.4.0...v6.4.1) (2024-03-14)
+
+### Bug Fixes
+
+- byteArray encoding for less than 31 chars ([#1011](https://github.com/starknet-io/starknet.js/issues/1011)) ([653acc4](https://github.com/starknet-io/starknet.js/commit/653acc44c841540214dd6f6b8956b354d7c27644))
+
+# [6.4.0](https://github.com/starknet-io/starknet.js/compare/v6.3.0...v6.4.0) (2024-03-12)
+
+### Bug Fixes
+
+- expand encoding type for preset types ([b992446](https://github.com/starknet-io/starknet.js/commit/b9924465a1f01ac4273638f3fa258b36192d2101))
+
+### Features
+
+- enable cairo 2.6.0 contract declaration ([0104c59](https://github.com/starknet-io/starknet.js/commit/0104c59739a9dbe70091e14372a73ca84550f639))
+- skip signatures when skipValidate is true ([6f784ea](https://github.com/starknet-io/starknet.js/commit/6f784ea4e4edd298f1950dac956fd1c81b953497))
+
+# [6.3.0](https://github.com/starknet-io/starknet.js/compare/v6.2.1...v6.3.0) (2024-03-11)
+
+### Features
+
+- update starknetId class and add getStarkProfile function ([ae71c97](https://github.com/starknet-io/starknet.js/commit/ae71c97b38974d4d7b3392532388957e1ea499bb))
+
+## [6.2.1](https://github.com/starknet-io/starknet.js/compare/v6.2.0...v6.2.1) (2024-03-11)
+
+### Bug Fixes
+
+- repair Cairo 1 nested and enum tuple handling ([ce2e541](https://github.com/starknet-io/starknet.js/commit/ce2e5417e6c42af17418408dc1ca6aab4c570473))
+
+# [6.2.0](https://github.com/starknet-io/starknet.js/compare/v6.1.5...v6.2.0) (2024-03-07)
+
+### Features
+
+- implement RPC v0.7.0-rc2 specification ([de32936](https://github.com/starknet-io/starknet.js/commit/de329361d838157b4fbe2b37bb043c3235b97a14))
+
+## [6.1.5](https://github.com/starknet-io/starknet.js/compare/v6.1.4...v6.1.5) (2024-03-02)
+
+### Bug Fixes
+
+- **RpcChannel:** allow client to provide `specVersion` ([ae8cf8e](https://github.com/starknet-io/starknet.js/commit/ae8cf8e19d8ba73c52376d83d2e084da008daba1))
+
+## [6.1.4](https://github.com/starknet-io/starknet.js/compare/v6.1.3...v6.1.4) (2024-02-26)
+
+### Bug Fixes
+
+- **Calldata.compile:** do not split long `entrypoint` names before calling `getSelectorFromName` ([9434bcd](https://github.com/starknet-io/starknet.js/commit/9434bcddf74069c7e5bdecbac94017ae23cd2a45))
+
+## [6.1.3](https://github.com/starknet-io/starknet.js/compare/v6.1.2...v6.1.3) (2024-02-23)
+
+### Bug Fixes
+
+- update fetch-cookie dependency ([518330c](https://github.com/starknet-io/starknet.js/commit/518330c4ee00e671e716b018220f767e8118c431))
+
+## [6.1.2](https://github.com/starknet-io/starknet.js/compare/v6.1.1...v6.1.2) (2024-02-20)
+
+### Bug Fixes
+
+- drop abi-wan-kanabi-v1 support ([30a4681](https://github.com/starknet-io/starknet.js/commit/30a46815fa9fb88bbcb98df2f4a8dafc5a32b4ab))
+
+## [6.1.1](https://github.com/starknet-io/starknet.js/compare/v6.1.0...v6.1.1) (2024-02-19)
+
+### Bug Fixes
+
+- rpc event ([ae3e265](https://github.com/starknet-io/starknet.js/commit/ae3e265f6617bd79c8435483916b0f24be036fa6))
+
+# [6.1.0](https://github.com/starknet-io/starknet.js/compare/v6.0.0...v6.1.0) (2024-02-13)
+
+### Features
+
+- use fetch-cookie package for cookie based sticky sessions ([5a56485](https://github.com/starknet-io/starknet.js/commit/5a56485052e773c8b0a3f9dbdc2f4ba3626362fb))
+
+# [6.0.0](https://github.com/starknet-io/starknet.js/compare/v5.29.0...v6.0.0) (2024-02-05)
+
+### Bug Fixes
+
+- acc deploy_acc ([732cd94](https://github.com/starknet-io/starknet.js/commit/732cd946f26c2b0fe893067f25c1fe712d72d49b))
+- **beta:** deploy account ([#880](https://github.com/starknet-io/starknet.js/issues/880)) ([00c58e3](https://github.com/starknet-io/starknet.js/commit/00c58e3c6d03b716b68c1b96b5a4adc1cff87dd0))
+- estimateFeeBulk provided version ([da717be](https://github.com/starknet-io/starknet.js/commit/da717be8e656087eaba21c865a6dd0b648664491))
+- provider rpc 0.5-0.6 getTransactionReceipt response standardization ([76b6ab4](https://github.com/starknet-io/starknet.js/commit/76b6ab49f6721d1f76c3f30d3d88d6dbc8b80bda))
+- remove account_deployment_data from deploy Account ([ede83bf](https://github.com/starknet-io/starknet.js/commit/ede83bfda3c6fcfa9dd397c92bd709293c8dda9b))
+- solve wrong response for account.verifyMessage ([05f4095](https://github.com/starknet-io/starknet.js/commit/05f4095599f89dd508fac9316e1c24fc0dceaa8a))
+- throw on negative param cairo.uint256 and bnToUint256 ([e1ead14](https://github.com/starknet-io/starknet.js/commit/e1ead1466984f26ff91d7fe6174fc87be8c3aede))
+- utilize provided resourceBounds value ([65bea53](https://github.com/starknet-io/starknet.js/commit/65bea53ab03a04fdd4c122ba2fecbb1010100e18))
+
+### Features
+
+- abiwan v2 intergation ([87d15d3](https://github.com/starknet-io/starknet.js/commit/87d15d3d4ada1138ed5b66620a4de56189195f4c))
+- account preferred transaction version, setup v3 ([5652eb2](https://github.com/starknet-io/starknet.js/commit/5652eb211e1accaefbb2f24bcb756ccf9170c07a))
+- add provider.decodeParameters ([be6eec9](https://github.com/starknet-io/starknet.js/commit/be6eec94c8ae5d92df631502c9a1d61663d80101))
+- add string types of cairo v2.4.0 ([a8a73c1](https://github.com/starknet-io/starknet.js/commit/a8a73c1f5b0bc72bc42460f3735eeec6f95edcbe))
+- curves ([405de46](https://github.com/starknet-io/starknet.js/commit/405de462032579ef0e8e434c62976dcb84ee1af8))
+- def rpc 0_6, sepolia nodes ([4f59a8f](https://github.com/starknet-io/starknet.js/commit/4f59a8f01439662ae7eb785cafcf781c68b2cb04))
+- default account UniversalDetails, rpc spec update, update interface ([8dc9b8a](https://github.com/starknet-io/starknet.js/commit/8dc9b8ab28a82a9a0eaa47e0271c12b79e8cff39))
+- dual specification with 0.6 implementation, not yet integrated ([ac8c763](https://github.com/starknet-io/starknet.js/commit/ac8c76383bb3f566164bc4f38c477e3e3dc45f31))
+- ethereum signer ([8473adb](https://github.com/starknet-io/starknet.js/commit/8473adbcfa5ef642297b8a7f448a0d789703037f))
+- ethereum-signer ([f37bfb2](https://github.com/starknet-io/starknet.js/commit/f37bfb2788b7c6befc10efca8b102ee2a975ee55))
+- hashes, signer, vip account, types, versions as string enum ([6ceb9e3](https://github.com/starknet-io/starknet.js/commit/6ceb9e31e51d51a6ce374144fd3ddb82a6ea01b3))
+- make Abi and CONTRACT_ABI types compatible with abiwan ([9007816](https://github.com/starknet-io/starknet.js/commit/9007816689528a79bd8bb4267e0098be2e6d71d2))
+- new CairoUint256 cairo datatype model ([b64abcc](https://github.com/starknet-io/starknet.js/commit/b64abccf3888eba49460124a4d7aabbdca1592d1))
+- pretty print rpc LibraryError params, make env.DEBUG usefull ([cca723f](https://github.com/starknet-io/starknet.js/commit/cca723f13009ce7048c7be6b8a6f466aca0d5e19))
+- **provider:** fix and clean provider response and response parser, removed seqeuncer api ([7ecb069](https://github.com/starknet-io/starknet.js/commit/7ecb069e3d2c37653cedc44dfbb635c5bc8eec7f))
+- **provider:** pending response discrimination, pending type guards ([013a22b](https://github.com/starknet-io/starknet.js/commit/013a22bf4dd8cb6df817ccf6ff2d82837fe91693))
+- remove old version constants, default types api rpc ([ed9cb08](https://github.com/starknet-io/starknet.js/commit/ed9cb089460640af96a73eca66e9971ca5832041))
+- replace in verifyMessage : response by Error ([1abf91f](https://github.com/starknet-io/starknet.js/commit/1abf91f170c46d4f4cf5f493dc3d6717c6d3c1e7))
+- req id counter ([cedd1ea](https://github.com/starknet-io/starknet.js/commit/cedd1ea32cd58107c504d357a3dd5e9a40010a80))
+- rpc 0.6 implementation as superset of 0.5 tx ([5b2b299](https://github.com/starknet-io/starknet.js/commit/5b2b2997ee7e54144864315ed20175017e4218b4))
+- rpc 0.6.0-rc3 implementation ([c2607ed](https://github.com/starknet-io/starknet.js/commit/c2607ed64f26d18ea66f2184acf34d3ca9ee4766))
+- rpc provider ([0d9c2e5](https://github.com/starknet-io/starknet.js/commit/0d9c2e5ba0298af7b608ccbd9dd2eff3dc0bb69a))
+- rpcChannel ([181eea3](https://github.com/starknet-io/starknet.js/commit/181eea3e4eabc52cdf46b796f0861e2641d59668))
+- sepolia constants, rpc open change ([6de46b5](https://github.com/starknet-io/starknet.js/commit/6de46b59d22bfda959c083b3ac5570cb8d4c6d0a))
+- simulate skip validate by default, spec deploy acc fix ([1b3e7ae](https://github.com/starknet-io/starknet.js/commit/1b3e7aeadaba5b7d59377e249b535f6a8cb8862e))
+- update default rpc nodes and version ([9b9fe0e](https://github.com/starknet-io/starknet.js/commit/9b9fe0e4c5d8d54323bb82ab7ceed3a78d6fc1bc))
+- update verson ([5dfe445](https://github.com/starknet-io/starknet.js/commit/5dfe445a5ed09dd531d91156633321fdae4b70cd))
+- v3 transaction hashes ([4fe40a1](https://github.com/starknet-io/starknet.js/commit/4fe40a1419031cd6328509e2439744d0ff98c8e7))
+- v3 tx hashes calculation ([f0e760d](https://github.com/starknet-io/starknet.js/commit/f0e760d109e488b70b16eed24e94b889d708d257))
+- v3 wip with est ([b95c462](https://github.com/starknet-io/starknet.js/commit/b95c462df0bd59293b7b42b5474311a3bbbfab1d))
+
+### BREAKING CHANGES
+
+- v3 transactions
+
+# [6.0.0-beta.15](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.14...v6.0.0-beta.15) (2024-02-05)
+
+### Bug Fixes
+
+- throw on negative param cairo.uint256 and bnToUint256 ([e1ead14](https://github.com/starknet-io/starknet.js/commit/e1ead1466984f26ff91d7fe6174fc87be8c3aede))
+
+### Features
+
+- new CairoUint256 cairo datatype model ([b64abcc](https://github.com/starknet-io/starknet.js/commit/b64abccf3888eba49460124a4d7aabbdca1592d1))
+
+# [6.0.0-beta.14](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.13...v6.0.0-beta.14) (2024-02-02)
+
+### Bug Fixes
+
+- move abiwan from dev dependencies to regular dependencies ([#925](https://github.com/starknet-io/starknet.js/issues/925)) ([6b7ee49](https://github.com/starknet-io/starknet.js/commit/6b7ee49918d704f8143f51ab7a0360446ea4cf5e))
+
+### Features
+
+- abi-wan trigger ([c10150a](https://github.com/starknet-io/starknet.js/commit/c10150a328051054a7bba1260296c0c92fdd2051))
+- add provider.decodeParameters ([39595f3](https://github.com/starknet-io/starknet.js/commit/39595f3303204b273fadd53764c59767ce6c5b36))
+- expand structured data hashing in line with SNIP-12 ([#920](https://github.com/starknet-io/starknet.js/issues/920)) ([cb20590](https://github.com/starknet-io/starknet.js/commit/cb2059039e3b42501cdfefec7802da83eb73645b))
+- trigger release ([fbf983f](https://github.com/starknet-io/starknet.js/commit/fbf983f7820768f919cddb2c5806178a20e38bdd))
+
+# [5.29.0](https://github.com/starknet-io/starknet.js/compare/v5.28.0...v5.29.0) (2024-02-02)
+
+### Features
+
+- add provider.decodeParameters ([39595f3](https://github.com/starknet-io/starknet.js/commit/39595f3303204b273fadd53764c59767ce6c5b36))
+
+# [5.28.0](https://github.com/starknet-io/starknet.js/compare/v5.27.0...v5.28.0) (2024-02-01)
+
+### Features
+
+- expand structured data hashing in line with SNIP-12 ([#920](https://github.com/starknet-io/starknet.js/issues/920)) ([cb20590](https://github.com/starknet-io/starknet.js/commit/cb2059039e3b42501cdfefec7802da83eb73645b))
+
+# [5.27.0](https://github.com/starknet-io/starknet.js/compare/v5.26.1...v5.27.0) (2024-01-23)
+
+### Features
+
+- trigger release ([fbf983f](https://github.com/starknet-io/starknet.js/commit/fbf983f7820768f919cddb2c5806178a20e38bdd))
+
+## [5.26.1](https://github.com/starknet-io/starknet.js/compare/v5.26.0...v5.26.1) (2024-01-18)
+
+### Bug Fixes
+
+- move abiwan from dev dependencies to regular dependencies ([#925](https://github.com/starknet-io/starknet.js/issues/925)) ([6b7ee49](https://github.com/starknet-io/starknet.js/commit/6b7ee49918d704f8143f51ab7a0360446ea4cf5e))
+
+# [5.26.0](https://github.com/starknet-io/starknet.js/compare/v5.25.0...v5.26.0) (2024-01-15)
+
+### Features
+
+- abi-wan trigger ([c10150a](https://github.com/starknet-io/starknet.js/commit/c10150a328051054a7bba1260296c0c92fdd2051))
+
+# [6.0.0-beta.13](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.12...v6.0.0-beta.13) (2024-01-23)
+
+### Bug Fixes
+
+- solve wrong response for account.verifyMessage ([05f4095](https://github.com/starknet-io/starknet.js/commit/05f4095599f89dd508fac9316e1c24fc0dceaa8a))
+
+### Features
+
+- abiwan v2 intergation ([87d15d3](https://github.com/starknet-io/starknet.js/commit/87d15d3d4ada1138ed5b66620a4de56189195f4c))
+- add string types of cairo v2.4.0 ([a8a73c1](https://github.com/starknet-io/starknet.js/commit/a8a73c1f5b0bc72bc42460f3735eeec6f95edcbe))
+- make Abi and CONTRACT_ABI types compatible with abiwan ([9007816](https://github.com/starknet-io/starknet.js/commit/9007816689528a79bd8bb4267e0098be2e6d71d2))
+- replace in verifyMessage : response by Error ([1abf91f](https://github.com/starknet-io/starknet.js/commit/1abf91f170c46d4f4cf5f493dc3d6717c6d3c1e7))
+- sepolia ([26d7044](https://github.com/starknet-io/starknet.js/commit/26d70446edd7c098b7f257d9242cc9d9d220b11e))
+
+# [5.25.0](https://github.com/starknet-io/starknet.js/compare/v5.24.5...v5.25.0) (2023-12-18)
+
+### Features
+
+- sepolia ([26d7044](https://github.com/starknet-io/starknet.js/commit/26d70446edd7c098b7f257d9242cc9d9d220b11e))
+
+# [6.0.0-beta.12](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.11...v6.0.0-beta.12) (2024-01-23)
+
+### Features
+
+- add provider.decodeParameters ([be6eec9](https://github.com/starknet-io/starknet.js/commit/be6eec94c8ae5d92df631502c9a1d61663d80101))
+- ethereum signer ([8473adb](https://github.com/starknet-io/starknet.js/commit/8473adbcfa5ef642297b8a7f448a0d789703037f))
+- ethereum-signer ([f37bfb2](https://github.com/starknet-io/starknet.js/commit/f37bfb2788b7c6befc10efca8b102ee2a975ee55))
+
+# [6.0.0-beta.11](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.10...v6.0.0-beta.11) (2024-01-04)
+
+### Bug Fixes
+
+- utilize provided resourceBounds value ([65bea53](https://github.com/starknet-io/starknet.js/commit/65bea53ab03a04fdd4c122ba2fecbb1010100e18))
+
+# [6.0.0-beta.10](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.9...v6.0.0-beta.10) (2023-12-20)
+
+### Features
+
+- req id counter ([cedd1ea](https://github.com/starknet-io/starknet.js/commit/cedd1ea32cd58107c504d357a3dd5e9a40010a80))
+
+# [6.0.0-beta.9](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.8...v6.0.0-beta.9) (2023-12-19)
+
+### Bug Fixes
+
+- acc deploy_acc ([732cd94](https://github.com/starknet-io/starknet.js/commit/732cd946f26c2b0fe893067f25c1fe712d72d49b))
+
+# [6.0.0-beta.8](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.7...v6.0.0-beta.8) (2023-12-19)
+
+### Bug Fixes
+
+- estimateFeeBulk provided version ([da717be](https://github.com/starknet-io/starknet.js/commit/da717be8e656087eaba21c865a6dd0b648664491))
+
+# [6.0.0-beta.7](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.6...v6.0.0-beta.7) (2023-12-14)
+
+### Bug Fixes
+
+- provider rpc 0.5-0.6 getTransactionReceipt response standardization ([76b6ab4](https://github.com/starknet-io/starknet.js/commit/76b6ab49f6721d1f76c3f30d3d88d6dbc8b80bda))
+
+### Features
+
+- curves ([405de46](https://github.com/starknet-io/starknet.js/commit/405de462032579ef0e8e434c62976dcb84ee1af8))
+- **provider:** fix and clean provider response and response parser, removed seqeuncer api ([7ecb069](https://github.com/starknet-io/starknet.js/commit/7ecb069e3d2c37653cedc44dfbb635c5bc8eec7f))
+- **provider:** pending response discrimination, pending type guards ([013a22b](https://github.com/starknet-io/starknet.js/commit/013a22bf4dd8cb6df817ccf6ff2d82837fe91693))
+
+# [6.0.0-beta.6](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.5...v6.0.0-beta.6) (2023-12-11)
+
+### Features
+
+- def rpc 0_6, sepolia nodes ([4f59a8f](https://github.com/starknet-io/starknet.js/commit/4f59a8f01439662ae7eb785cafcf781c68b2cb04))
+- default account UniversalDetails, rpc spec update, update interface ([8dc9b8a](https://github.com/starknet-io/starknet.js/commit/8dc9b8ab28a82a9a0eaa47e0271c12b79e8cff39))
+- sepolia constants, rpc open change ([6de46b5](https://github.com/starknet-io/starknet.js/commit/6de46b59d22bfda959c083b3ac5570cb8d4c6d0a))
+
+# [6.0.0-beta.5](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.4...v6.0.0-beta.5) (2023-12-10)
+
+### Bug Fixes
+
+- apply bound for contract address from hash calculation ([6d8c291](https://github.com/starknet-io/starknet.js/commit/6d8c291bce130d7b00ae6d81aff071c4986f04af))
+- **Calldata.compile:** do not split long `entrypoint` names before calling `getSelectorFromName` ([89715da](https://github.com/starknet-io/starknet.js/commit/89715da3fdb4b497cc5771eb83a88460007740b6))
+- prioritize error states in waitForTransaction evaluation ([ac54404](https://github.com/starknet-io/starknet.js/commit/ac544045e2079b68042d850a09b203fc5536c0d0))
+
+## [5.24.5](https://github.com/starknet-io/starknet.js/compare/v5.24.4...v5.24.5) (2023-12-10)
+
+### Bug Fixes
+
+- apply bound for contract address from hash calculation ([6d8c291](https://github.com/starknet-io/starknet.js/commit/6d8c291bce130d7b00ae6d81aff071c4986f04af))
+- **Calldata.compile:** do not split long `entrypoint` names before calling `getSelectorFromName` ([89715da](https://github.com/starknet-io/starknet.js/commit/89715da3fdb4b497cc5771eb83a88460007740b6))
+- prioritize error states in waitForTransaction evaluation ([ac54404](https://github.com/starknet-io/starknet.js/commit/ac544045e2079b68042d850a09b203fc5536c0d0))
+
+# [6.0.0-beta.4](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.3...v6.0.0-beta.4) (2023-12-08)
+
+### Bug Fixes
+
+- remove account_deployment_data from deploy Account ([ede83bf](https://github.com/starknet-io/starknet.js/commit/ede83bfda3c6fcfa9dd397c92bd709293c8dda9b))
+
+### Features
+
+- simulate skip validate by default, spec deploy acc fix ([1b3e7ae](https://github.com/starknet-io/starknet.js/commit/1b3e7aeadaba5b7d59377e249b535f6a8cb8862e))
+
+# [6.0.0-beta.3](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.2...v6.0.0-beta.3) (2023-12-07)
+
+### Bug Fixes
+
+- **beta:** deploy account ([#880](https://github.com/starknet-io/starknet.js/issues/880)) ([00c58e3](https://github.com/starknet-io/starknet.js/commit/00c58e3c6d03b716b68c1b96b5a4adc1cff87dd0))
+
+# [6.0.0-beta.2](https://github.com/starknet-io/starknet.js/compare/v6.0.0-beta.1...v6.0.0-beta.2) (2023-12-07)
+
+### Features
+
+- v3 wip with est ([b95c462](https://github.com/starknet-io/starknet.js/commit/b95c462df0bd59293b7b42b5474311a3bbbfab1d))
+
+# [6.0.0-beta.1](https://github.com/starknet-io/starknet.js/compare/v5.24.4...v6.0.0-beta.1) (2023-12-06)
+
+### Features
+
+- account preferred transaction version, setup v3 ([5652eb2](https://github.com/starknet-io/starknet.js/commit/5652eb211e1accaefbb2f24bcb756ccf9170c07a))
+- dual specification with 0.6 implementation, not yet integrated ([ac8c763](https://github.com/starknet-io/starknet.js/commit/ac8c76383bb3f566164bc4f38c477e3e3dc45f31))
+- hashes, signer, vip account, types, versions as string enum ([6ceb9e3](https://github.com/starknet-io/starknet.js/commit/6ceb9e31e51d51a6ce374144fd3ddb82a6ea01b3))
+- pretty print rpc LibraryError params, make env.DEBUG usefull ([cca723f](https://github.com/starknet-io/starknet.js/commit/cca723f13009ce7048c7be6b8a6f466aca0d5e19))
+- remove old version constants, default types api rpc ([ed9cb08](https://github.com/starknet-io/starknet.js/commit/ed9cb089460640af96a73eca66e9971ca5832041))
+- rpc 0.6 implementation as superset of 0.5 tx ([5b2b299](https://github.com/starknet-io/starknet.js/commit/5b2b2997ee7e54144864315ed20175017e4218b4))
+- rpc 0.6.0-rc3 implementation ([c2607ed](https://github.com/starknet-io/starknet.js/commit/c2607ed64f26d18ea66f2184acf34d3ca9ee4766))
+- rpc provider ([0d9c2e5](https://github.com/starknet-io/starknet.js/commit/0d9c2e5ba0298af7b608ccbd9dd2eff3dc0bb69a))
+- rpcChannel ([181eea3](https://github.com/starknet-io/starknet.js/commit/181eea3e4eabc52cdf46b796f0861e2641d59668))
+- update default rpc nodes and version ([9b9fe0e](https://github.com/starknet-io/starknet.js/commit/9b9fe0e4c5d8d54323bb82ab7ceed3a78d6fc1bc))
+- update verson ([5dfe445](https://github.com/starknet-io/starknet.js/commit/5dfe445a5ed09dd531d91156633321fdae4b70cd))
+- v3 transaction hashes ([4fe40a1](https://github.com/starknet-io/starknet.js/commit/4fe40a1419031cd6328509e2439744d0ff98c8e7))
+- v3 tx hashes calculation ([f0e760d](https://github.com/starknet-io/starknet.js/commit/f0e760d109e488b70b16eed24e94b889d708d257))
+
+### BREAKING CHANGES
+
+- v3 transactions
+
+## [5.24.4](https://github.com/starknet-io/starknet.js/compare/v5.24.3...v5.24.4) (2023-12-06)
+
+### Bug Fixes
+
+- typos ([#862](https://github.com/starknet-io/starknet.js/issues/862)) ([b2431d3](https://github.com/starknet-io/starknet.js/commit/b2431d36d636821b32403ef0aa4def2312b10254))
+
 ## [5.24.3](https://github.com/starknet-io/starknet.js/compare/v5.24.2...v5.24.3) (2023-11-20)
 
 ### Bug Fixes

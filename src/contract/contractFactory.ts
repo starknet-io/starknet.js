@@ -110,5 +110,5 @@ export class ContractFactory {
     return new Contract(this.abi, address, this.account);
   }
 
-  // ethers.js' getDeployTransaction cant be supported as it requires the account or signer to return a signed transaction which is not possible with the current implementation
+  // ethers.js' getDeployTransaction can't be supported as it requires the account or signer to return a signed transaction which is not possible with the current implementation
 }

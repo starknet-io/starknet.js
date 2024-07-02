@@ -1,10 +1,7 @@
-import { ec } from '../../src';
+import { constants, ec } from '../../src';
 import { StarknetChainId } from '../../src/constants';
-import {
-  calculateTransactionHash,
-  computeHashOnElements,
-  transactionVersion,
-} from '../../src/utils/hash';
+import { computeHashOnElements } from '../../src/utils/hash';
+import { calculateTransactionHash } from '../../src/utils/hash/transactionHash/v2';
 import { fromCallsToExecuteCalldataWithNonce } from '../../src/utils/transaction';
 
 test('getKeyPair()', () => {
@@ -53,24 +50,24 @@ test('hashMessage()', () => {
 
   const hashMsg = calculateTransactionHash(
     account,
-    transactionVersion,
+    BigInt(constants.TRANSACTION_VERSION.V1),
     calldata,
     maxFee,
-    StarknetChainId.SN_GOERLI,
+    StarknetChainId.SN_SEPOLIA,
     nonce
   );
 
   expect(hashMsg).toMatchInlineSnapshot(
-    `"0x6d1706bd3d1ba7c517be2a2a335996f63d4738e2f182144d078a1dd9997062e"`
+    `"0xa006ce6da518722c1af8bdb1d8a42cee638102c670bb1a55f063bff10506d4"`
   );
 
   const { r, s } = ec.starkCurve.sign(hashMsg, privateKey);
 
   expect(r.toString()).toMatchInlineSnapshot(
-    `"1427981024487605678086498726488552139932400435436186597196374630267616399345"`
+    `"384207128292005766686294801921397180350977625816434242436096267488258549139"`
   );
   expect(s.toString()).toMatchInlineSnapshot(
-    `"1853664302719670721837677288395394946745467311923401353018029119631574115563"`
+    `"2521602681140573534692734854765316415611209530542226558354401890884906162365"`
   );
 });
 

@@ -18,11 +18,12 @@ function generateString(length: number, seed: number): string {
   return result;
 }
 
-describe('Should tets StarknetId utils', () => {
+describe('Should test StarknetId utils', () => {
   test('Should test useEncoded and useDecoded hook with a random string', () => {
     for (let index = 0; index < 2500; index += 1) {
       const randomString = generateString(10, index);
-      expect(useDecoded([useEncoded(randomString)])).toBe(randomString.concat('.stark'));
+      const decoded = useDecoded([useEncoded(randomString)]);
+      expect(decoded).toBe(randomString.concat('.stark'));
     }
   });
 
@@ -40,8 +41,8 @@ describe('Should tets StarknetId utils', () => {
   });
 
   test('Should test getStarknetIdContract', () => {
-    expect(getStarknetIdContract(StarknetChainId.SN_GOERLI)).toBe(
-      '0x3bab268e932d2cecd1946f100ae67ce3dff9fd234119ea2f6da57d16d29fce'
+    expect(getStarknetIdContract(StarknetChainId.SN_SEPOLIA)).toBe(
+      '0x154bc2e1af9260b9e66af0e9c46fc757ff893b3ff6a85718a810baf1474'
     );
 
     expect(getStarknetIdContract(StarknetChainId.SN_MAIN)).toBe(

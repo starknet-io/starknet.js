@@ -34,35 +34,38 @@
   </a>
 </p>
 
-## 🕹️ Usage
-
-Install starknet with `npm`
+## Installation
 
 ```bash
 # latest official release (main branch)
 $ npm install starknet
 
-# or for latest pre-release version (develop branch):
+# or for latest pre-release version (develop branch)
 $ npm install starknet@next
+
+# or for latest beta release version (beta branch)
+$ npm install starknet@beta
 ```
 
 Import `starknet` and use the [API](https://www.starknetjs.com/docs/API/).
 
-## 🌐 API
+## 🌐 Documentation
 
-[Click Here](https://www.starknetjs.com/docs/API/)
+How to [Guides](https://www.starknetjs.com/docs/guides/intro) :book: & [API](https://www.starknetjs.com/docs/API/) 💻
 
-Please refer to the following code examples [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript)! :video_game:
-
-Guides can be found [here](https://www.starknetjs.com/docs/guides/intro) :book:
+Play with [Code Examples](https://github.com/PhilippeR26/starknet.js-workshop-typescript) :video_game:
 
 ## ✏️ Contributing
 
 If you consider to contribute to this project please read [CONTRIBUTING.md](https://github.com/starknet-io/starknet.js/blob/main/CONTRIBUTING.md) first.
 
+You can also join our dedicated channel for [Starknet.js](https://discord.com/channels/793094838509764618/927918707613786162) on the [Starknet Discord](https://discord.com/invite/YgsdxEx3)
+
 ## ❤️ Special Thanks
 
 Special thanks to all the [contributors](https://github.com/starknet-io/starknet.js/graphs/contributors), especially to:
+
+- Sean ([@0xs34n](https://github.com/0xs34n)), the original creator of Starknet.js!
 
 - Janek ([@janek26](https://github.com/janek26)) and Dhruv ([@dhruvkelawala](https://github.com/dhruvkelawala)) from [Argent](https://github.com/argentlabs)
 
@@ -76,6 +79,6 @@ This library would not be possible without these rockstars.
 
 ## 📜 License
 
-Copyright (c) 2023 StarkWare
+Copyright (c) 2024 StarkWare
 
 Licensed under the [MIT license](https://github.com/starknet-io/starknet.js/blob/main/LICENSE).

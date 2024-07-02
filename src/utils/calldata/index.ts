@@ -3,6 +3,7 @@ import {
   Abi,
   AbiEnums,
   AbiStructs,
+  AllowArray,
   Args,
   ArgsOrCalldata,
   Calldata,
@@ -15,8 +16,9 @@ import {
 } from '../../types';
 import assert from '../assert';
 import { isBigInt, toHex } from '../num';
-import { getSelectorFromName } from '../selector';
-import { isLongText, splitLongString } from '../shortString';
+import { getSelectorFromName } from '../hash/selector';
+import { isLongText } from '../shortString';
+import { byteArrayFromString } from './byteArray';
 import { felt, isCairo1Type, isLen } from './cairo';
 import {
   CairoCustomEnum,
@@ -34,6 +36,8 @@ import responseParser from './responseParser';
 import validateFields from './validate';
 
 export * as cairo from './cairo';
+export * as byteArray from './byteArray';
+export { parseCalldataField } from './requestParser';
 
 export class CallData {
   abi: Abi;
@@ -100,7 +104,7 @@ export class CallData {
    * Compile contract callData with abi
    * Parse the calldata by using input fields from the abi for that method
    * @param method string - method name
-   * @param args RawArgs - arguments passed to the method. Can be an array of arguments (in the order of abi definition), or an object constructed in conformity with abi (in this case, the parameter can be in a wrong order).
+   * @param argsCalldata RawArgs - arguments passed to the method. Can be an array of arguments (in the order of abi definition), or an object constructed in conformity with abi (in this case, the parameter can be in a wrong order).
    * @return Calldata - parsed arguments in format that contract is expecting
    * @example
    * ```typescript
@@ -128,7 +132,6 @@ export class CallData {
         this.structs,
         this.enums
       );
-      // console.log('ordered =', orderedObject);
       args = Object.values(orderedObject);
       //   // validate array elements to abi
       validateFields(abiMethod, args, this.structs, this.enums);
@@ -164,8 +167,8 @@ export class CallData {
         const oe = Array.isArray(o) ? [o.length.toString(), ...o] : o;
         return Object.entries(oe).flatMap(([k, v]) => {
           let value = v;
-          if (isLongText(value)) value = splitLongString(value);
           if (k === 'entrypoint') value = getSelectorFromName(value);
+          else if (isLongText(value)) value = byteArrayFromString(value);
           const kk = Array.isArray(oe) && k === '0' ? '$$len' : k;
           if (isBigInt(value)) return [[`${prefix}${kk}`, felt(value)]];
           if (Object(value) === value) {
@@ -268,7 +271,7 @@ export class CallData {
    */
   public format(method: string, response: string[], format: object): Result {
     const parsed = this.parse(method, response);
-    return formatter(parsed, format);
+    return formatter(parsed as Record<string, any>, format);
   }
 
   /**
@@ -324,5 +327,30 @@ export class CallData {
   static toHex(raw: RawArgs = []): HexCalldata {
     const calldata = CallData.compile(raw);
     return calldata.map((it) => toHex(it));
+  }
+
+  /**
+   * Parse the elements of a contract response and structure them into one or several Result.
+   * In Cairo 0, arrays are not supported.
+   * @param typeCairo string or string[] - Cairo type name, ex : "hello::hello::UserData"
+   * @param response string[] - serialized data corresponding to typeCairo.
+   * @return Result or Result[] - parsed response corresponding to typeData.
+   * @example
+   * const res2=helloCallData.decodeParameters("hello::hello::UserData",["0x123456","0x1"]);
+   * result = { address: 1193046n, is_claimed: true }
+   */
+  public decodeParameters(typeCairo: AllowArray<string>, response: string[]): AllowArray<Result> {
+    const typeCairoArray = Array.isArray(typeCairo) ? typeCairo : [typeCairo];
+    const responseIterator = response.flat()[Symbol.iterator]();
+    const decodedArray = typeCairoArray.map(
+      (typeParam) =>
+        responseParser(
+          responseIterator,
+          { name: '', type: typeParam },
+          this.structs,
+          this.enums
+        ) as Result
+    );
+    return decodedArray.length === 1 ? decodedArray[0] : decodedArray;
   }
 }

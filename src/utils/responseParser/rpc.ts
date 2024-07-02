@@ -2,26 +2,24 @@
  * Map RPC Response to common interface response
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
-import {
-  BlockStatus,
-  CallContractResponse,
+import type {
+  BlockWithTxHashes,
+  ContractClassPayload,
   ContractClassResponse,
   EstimateFeeResponse,
   EstimateFeeResponseBulk,
-  GetBlockResponse,
-  GetTransactionResponse,
-  SimulateTransactionResponse,
-} from '../../types';
-import {
-  BlockWithTxHashes,
-  ContractClass,
   FeeEstimate,
-  SimulateTransactionResponse as RPCSimulateTransactionResponse,
-  TransactionWithHash,
-} from '../../types/api/rpcspec';
+  GetBlockResponse,
+  GetTxReceiptResponseWithoutHelper,
+  RpcProviderOptions,
+  SimulateTransactionResponse,
+  SimulatedTransaction,
+  TransactionReceipt,
+} from '../../types/provider';
 import { toBigInt } from '../num';
-import { estimatedFeeToMaxFee } from '../stark';
-import { ResponseParser } from '.';
+import { isString } from '../shortString';
+import { estimateFeeToBounds, estimatedFeeToMaxFee } from '../stark';
+import { ResponseParser } from './interface';
 
 export class RPCResponseParser
   implements
@@ -31,38 +29,59 @@ export class RPCResponseParser
       | 'parseDeployContractResponse'
       | 'parseInvokeFunctionResponse'
       | 'parseGetTransactionReceiptResponse'
+      | 'parseGetTransactionResponse'
+      | 'parseCallContractResponse'
     >
 {
-  public parseGetBlockResponse(res: BlockWithTxHashes): GetBlockResponse {
-    return {
-      timestamp: res.timestamp,
-      block_hash: 'block_hash' in res ? res.block_hash : '',
-      block_number: 'block_number' in res ? res.block_number : -1,
-      new_root: 'new_root' in res ? res.new_root : '',
-      parent_hash: res.parent_hash,
-      status: 'status' in res ? (res.status as BlockStatus) : BlockStatus.PENDING,
-      transactions: res.transactions,
-    };
+  private margin: RpcProviderOptions['feeMarginPercentage'];
+
+  constructor(margin?: RpcProviderOptions['feeMarginPercentage']) {
+    this.margin = margin;
   }
 
-  public parseGetTransactionResponse(res: TransactionWithHash): GetTransactionResponse {
-    return {
-      calldata: 'calldata' in res ? res.calldata : [],
-      contract_address: 'contract_address' in res ? res.contract_address : '',
-      sender_address: 'sender_address' in res ? res.sender_address : '',
-      max_fee: 'max_fee' in res ? res.max_fee : '',
-      nonce: 'nonce' in res ? res.nonce : '',
-      signature: 'signature' in res ? res.signature : [],
-      transaction_hash: res.transaction_hash,
-      version: res.version,
-    };
+  private estimatedFeeToMaxFee(estimatedFee: Parameters<typeof estimatedFeeToMaxFee>[0]) {
+    return estimatedFeeToMaxFee(estimatedFee, this.margin?.maxFee);
+  }
+
+  private estimateFeeToBounds(estimate: Parameters<typeof estimateFeeToBounds>[0]) {
+    return estimateFeeToBounds(
+      estimate,
+      this.margin?.l1BoundMaxAmount,
+      this.margin?.l1BoundMaxPricePerUnit
+    );
+  }
+
+  public parseGetBlockResponse(res: BlockWithTxHashes): GetBlockResponse {
+    return { status: 'PENDING', ...res } as GetBlockResponse;
+  }
+
+  public parseTransactionReceipt(res: TransactionReceipt): GetTxReceiptResponseWithoutHelper {
+    // HOTFIX RPC 0.5 to align with RPC 0.6
+    // This case is RPC 0.5. It can be only v2 thx with FRI units
+    if ('actual_fee' in res && isString(res.actual_fee)) {
+      return {
+        ...(res as GetTxReceiptResponseWithoutHelper),
+        actual_fee: {
+          amount: res.actual_fee,
+          unit: 'FRI',
+        },
+      } as GetTxReceiptResponseWithoutHelper;
+    }
+
+    return res as GetTxReceiptResponseWithoutHelper;
   }
 
   public parseFeeEstimateResponse(res: FeeEstimate[]): EstimateFeeResponse {
+    const val = res[0];
     return {
-      overall_fee: toBigInt(res[0].overall_fee),
-      gas_consumed: toBigInt(res[0].gas_consumed),
-      gas_price: toBigInt(res[0].gas_price),
+      overall_fee: toBigInt(val.overall_fee),
+      gas_consumed: toBigInt(val.gas_consumed),
+      gas_price: toBigInt(val.gas_price),
+      unit: val.unit,
+      suggestedMaxFee: this.estimatedFeeToMaxFee(val.overall_fee),
+      resourceBounds: this.estimateFeeToBounds(val),
+      data_gas_consumed: val.data_gas_consumed ? toBigInt(val.data_gas_consumed) : 0n,
+      data_gas_price: val.data_gas_price ? toBigInt(val.data_gas_price) : 0n,
     };
   }
 
@@ -71,30 +90,39 @@ export class RPCResponseParser
       overall_fee: toBigInt(val.overall_fee),
       gas_consumed: toBigInt(val.gas_consumed),
       gas_price: toBigInt(val.gas_price),
+      unit: val.unit,
+      suggestedMaxFee: this.estimatedFeeToMaxFee(val.overall_fee),
+      resourceBounds: this.estimateFeeToBounds(val),
+      data_gas_consumed: val.data_gas_consumed ? toBigInt(val.data_gas_consumed) : 0n,
+      data_gas_price: val.data_gas_price ? toBigInt(val.data_gas_price) : 0n,
     }));
   }
 
-  public parseCallContractResponse(res: string[]): CallContractResponse {
-    return {
-      result: res,
-    };
-  }
-
   public parseSimulateTransactionResponse(
-    res: RPCSimulateTransactionResponse
+    // TODO: revisit
+    // set as 'any' to avoid a mapped type circular recursion error stemming from
+    // merging src/types/api/rpcspec*/components/FUNCTION_INVOCATION.calls
+    //
+    // res: SimulateTransactionResponse
+    res: any
   ): SimulateTransactionResponse {
-    return res.map((it) => {
+    return res.map((it: SimulatedTransaction) => {
       return {
         ...it,
-        suggestedMaxFee: estimatedFeeToMaxFee(BigInt(it.fee_estimation.overall_fee)),
+        suggestedMaxFee: this.estimatedFeeToMaxFee(it.fee_estimation.overall_fee),
+        resourceBounds: this.estimateFeeToBounds(it.fee_estimation),
       };
     });
   }
 
-  public parseContractClassResponse(res: ContractClass): ContractClassResponse {
+  public parseContractClassResponse(res: ContractClassPayload): ContractClassResponse {
     return {
-      ...res,
-      abi: typeof res.abi === 'string' ? JSON.parse(res.abi) : res.abi,
+      ...(res as ContractClassResponse),
+      abi: isString(res.abi) ? JSON.parse(res.abi) : res.abi,
     };
+  }
+
+  public parseL1GasPriceResponse(res: BlockWithTxHashes): string {
+    return res.l1_gas_price.price_in_wei;
   }
 }

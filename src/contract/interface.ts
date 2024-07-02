@@ -6,20 +6,44 @@ import {
   Abi,
   ArgsOrCalldata,
   AsyncContractFunction,
+  BigNumberish,
   BlockIdentifier,
   CallOptions,
+  Calldata,
   ContractFunction,
   ContractVersion,
   EstimateFeeResponse,
-  GetTransactionReceiptResponse,
   Invocation,
   InvokeFunctionResponse,
   InvokeOptions,
   ParsedEvents,
+  RawArgs,
   Result,
+  Uint256,
 } from '../types';
+import { CairoCustomEnum } from '../utils/calldata/enum/CairoCustomEnum';
+import { CairoOption } from '../utils/calldata/enum/CairoOption';
+import { CairoResult } from '../utils/calldata/enum/CairoResult';
+import type { GetTransactionReceiptResponse } from '../utils/transactionReceipt';
 
-export type TypedContract<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & ContractInterface;
+declare module 'abi-wan-kanabi' {
+  export interface Config<OptionT = any, ResultT = any, ErrorT = any> {
+    FeltType: BigNumberish;
+    U256Type: number | bigint | Uint256;
+    U512Type: BigNumberish;
+    Secp256k1PointType: BigNumberish;
+    Option: CairoOption<OptionT>;
+    Tuple: Record<number, BigNumberish | object | boolean>;
+    Result: CairoResult<ResultT, ErrorT>;
+    Enum: CairoCustomEnum;
+    Calldata: RawArgs | Calldata;
+    CallOptions: CallOptions;
+    InvokeOptions: InvokeOptions;
+    InvokeFunctionResponse: InvokeFunctionResponse;
+  }
+}
+
+type TypedContractV2<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & ContractInterface;
 
 export abstract class ContractInterface {
   public abstract abi: Abi;
@@ -138,5 +162,11 @@ export abstract class ContractInterface {
    */
   public abstract getVersion(): Promise<ContractVersion>;
 
-  public abstract typed<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContract<TAbi>;
+  /**
+   * Returns a typed instance of ContractV2 based on the supplied ABI.
+   *
+   * @param {TAbi} tAbi - The ABI (Abstract Binary Interface) of the ContractV2.
+   * @return {TypedContractV2<TAbi>} - A typed instance of ContractV2.
+   */
+  public abstract typedv2<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContractV2<TAbi>;
 }

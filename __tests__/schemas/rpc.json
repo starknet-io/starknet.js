@@ -2,72 +2,10 @@
   "$id": "rpcSchemas",
   "definitions": {
     "GetSyncingStatsResponse": {
-      "oneOf": [
-        {
-          "type": "object",
-          "properties": {
-            "current_block_hash": {
-              "type": "string"
-            },
-            "current_block_num": {
-              "type": "number"
-            },
-            "highest_block_hash": {
-              "type": "string"
-            },
-            "highest_block_num": {
-              "type": "number"
-            },
-            "starting_block_hash": {
-              "type": "string"
-            },
-            "starting_block_num": {
-              "type": "number"
-            }
-          },
-          "required": [
-            "current_block_hash",
-            "current_block_num",
-            "highest_block_hash",
-            "highest_block_num",
-            "starting_block_hash",
-            "starting_block_num"
-          ]
-        },
-        {
-          "type": "boolean"
-        }
-      ]
+      "$ref": "starknet_api_openrpc#/components/schemas/SYNC_STATUS"
     },
     "StarknetEmittedEvent": {
-      "type": "object",
-      "properties": {
-        "from_address": {
-          "type": "string"
-        },
-        "keys": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "data": {
-          "type": "array",
-          "items": {
-            "type": "string"
-          }
-        },
-        "block_hash": {
-          "type": "string"
-        },
-        "block_number": {
-          "type": "number"
-        },
-        "transaction_hash": {
-          "type": "string"
-        }
-      },
-      "required": ["from_address", "keys", "data", "block_hash", "block_number", "transaction_hash"]
+      "$ref": "starknet_api_openrpc#/components/schemas/EMITTED_EVENT"
     }
   }
 }

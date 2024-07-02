@@ -198,11 +198,11 @@ Parse the calldata by using input fields from the abi for that method
 **`Example`**
 
 ```typescript
-const calldata = myCallData.compile("constructor", ["0x34a", [1, 3n]]);
+const calldata = myCallData.compile('constructor', ['0x34a', [1, 3n]]);
 ```
 
 ```typescript
-const calldata2 = myCallData.compile("constructor", {list:[1, 3n], balance:"0x34"}); // wrong order is valid
+const calldata2 = myCallData.compile('constructor', { list: [1, 3n], balance: '0x34' }); // wrong order is valid
 ```
 
 #### Parameters

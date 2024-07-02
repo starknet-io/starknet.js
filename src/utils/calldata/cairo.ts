@@ -4,36 +4,152 @@ import {
   AbiStructs,
   BigNumberish,
   ContractVersion,
-  Litteral,
+  Literal,
   Uint,
   Uint256,
+  Uint512,
 } from '../../types';
-import { isBigInt, isHex, isStringWholeNumber } from '../num';
-import { encodeShortString, isShortString, isText } from '../shortString';
-import { UINT_128_MAX, isUint256 } from '../uint256';
+import { CairoFelt } from '../cairoDataTypes/felt';
+import { CairoUint256 } from '../cairoDataTypes/uint256';
+import { CairoUint512 } from '../cairoDataTypes/uint512';
 
 // Intended for internal usage, maybe should be exported somewhere else and not exported to utils
+/**
+ * Checks if the given name ends with "_len".
+ *
+ * @param {string} name - The name to be checked.
+ * @returns - True if the name ends with "_len", false otherwise.
+ */
 export const isLen = (name: string) => /_len$/.test(name);
+/**
+ * Checks if a given type is felt.
+ *
+ * @param {string} type - The type to check.
+ * @returns - True if the type is felt, false otherwise.
+ */
 export const isTypeFelt = (type: string) => type === 'felt' || type === 'core::felt252';
+/**
+ * Checks if the given type is an array type.
+ *
+ * @param {string} type - The type to check.
+ * @returns - `true` if the type is an array type, `false` otherwise.
+ */
 export const isTypeArray = (type: string) =>
   /\*/.test(type) ||
   type.startsWith('core::array::Array::') ||
   type.startsWith('core::array::Span::');
+/**
+ * Checks if the given type is a tuple type.
+ *
+ * @param {string} type - The type to be checked.
+ * @returns - `true` if the type is a tuple type, otherwise `false`.
+ */
 export const isTypeTuple = (type: string) => /^\(.*\)$/i.test(type);
+/**
+ * Checks whether a given type is a named tuple.
+ *
+ * @param {string} type - The type to be checked.
+ * @returns - True if the type is a named tuple, false otherwise.
+ */
 export const isTypeNamedTuple = (type: string) => /\(.*\)/i.test(type) && type.includes(':');
+/**
+ * Checks if a given type is a struct.
+ *
+ * @param {string} type - The type to check for existence.
+ * @param {AbiStructs} structs - The collection of structs to search in.
+ * @returns - True if the type exists in the structs, false otherwise.
+ */
 export const isTypeStruct = (type: string, structs: AbiStructs) => type in structs;
+/**
+ * Checks if a given type is an enum.
+ *
+ * @param {string} type - The type to check.
+ * @param {AbiEnums} enums - The enumeration to search in.
+ * @returns - True if the type exists in the enumeration, otherwise false.
+ */
 export const isTypeEnum = (type: string, enums: AbiEnums) => type in enums;
+/**
+ * Determines if the given type is an Option type.
+ *
+ * @param {string} type - The type to check.
+ * @returns - True if the type is an Option type, false otherwise.
+ */
 export const isTypeOption = (type: string) => type.startsWith('core::option::Option::');
+/**
+ * Checks whether a given type starts with 'core::result::Result::'.
+ *
+ * @param {string} type - The type to check.
+ * @returns - True if the type starts with 'core::result::Result::', false otherwise.
+ */
 export const isTypeResult = (type: string) => type.startsWith('core::result::Result::');
+/**
+ * Checks if the given value is a valid Uint type.
+ *
+ * @param {string} type - The value to check.
+ * @returns - Returns true if the value is a valid Uint type, otherwise false.
+ */
 export const isTypeUint = (type: string) => Object.values(Uint).includes(type as Uint);
-export const isTypeLitteral = (type: string) => Object.values(Litteral).includes(type as Litteral);
-export const isTypeUint256 = (type: string) => type === 'core::integer::u256';
+// Legacy Export
+/**
+ * Checks if the given type is `uint256`.
+ *
+ * @param {string} type - The type to be checked.
+ * @returns - Returns true if the type is `uint256`, otherwise false.
+ */
+export const isTypeUint256 = (type: string) => CairoUint256.isAbiType(type);
+/**
+ * Checks if the given type is a literal type.
+ *
+ * @param {string} type - The type to check.
+ * @returns - True if the type is a literal type, false otherwise.
+ */
+export const isTypeLiteral = (type: string) => Object.values(Literal).includes(type as Literal);
+/**
+ * Checks if the given type is a boolean type.
+ *
+ * @param {string} type - The type to be checked.
+ * @returns - Returns true if the type is a boolean type, otherwise false.
+ */
 export const isTypeBool = (type: string) => type === 'core::bool';
+/**
+ * Checks if the provided type is equal to 'core::starknet::contract_address::ContractAddress'.
+ * @param {string} type - The type to be checked.
+ * @returns - true if the type matches 'core::starknet::contract_address::ContractAddress', false otherwise.
+ */
 export const isTypeContractAddress = (type: string) =>
   type === 'core::starknet::contract_address::ContractAddress';
+/**
+ * Determines if the given type is an Ethereum address type.
+ *
+ * @param {string} type - The type to check.
+ * @returns - Returns true if the given type is 'core::starknet::eth_address::EthAddress', otherwise false.
+ */
 export const isTypeEthAddress = (type: string) =>
   type === 'core::starknet::eth_address::EthAddress';
+/**
+ * Checks if the given type is 'core::bytes_31::bytes31'.
+ *
+ * @param {string} type - The type to check.
+ * @returns - True if the type is 'core::bytes_31::bytes31', false otherwise.
+ */
+export const isTypeBytes31 = (type: string) => type === 'core::bytes_31::bytes31';
+/**
+ * Checks if the given type is equal to the 'core::byte_array::ByteArray'.
+ *
+ * @param {string} type - The type to check.
+ * @returns - True if the given type is equal to 'core::byte_array::ByteArray', false otherwise.
+ */
+export const isTypeByteArray = (type: string) => type === 'core::byte_array::ByteArray';
+export const isTypeSecp256k1Point = (type: string) =>
+  type === 'core::starknet::secp256k1::Secp256k1Point';
 export const isCairo1Type = (type: string) => type.includes('::');
+/**
+ * Retrieves the array type from the given type string.
+ *
+ * Works also for core::zeroable::NonZero type.
+ * @param {string} type - The type string.
+ * @returns - The array type.
+ */
 export const getArrayType = (type: string) => {
   if (isCairo1Type(type)) {
     return type.substring(type.indexOf('<') + 1, type.lastIndexOf('>'));
@@ -56,6 +172,21 @@ export function isCairo1Abi(abi: Abi): boolean {
     throw Error('Unable to determine Cairo version');
   }
   return cairo === '1';
+}
+
+/**
+ * Checks if the given type is a NonZero type.
+ *
+ * @param {string} type The type to check.
+ * @returns `true` if the type is NonZero type, `false` otherwise.
+ * @example
+ * ```typescript
+ * const result = cairo.isTypeNonZero("core::zeroable::NonZero::<u8>");
+ * //result = true
+ * ```
+ */
+export function isTypeNonZero(type: string): boolean {
+  return type.startsWith('core::zeroable::NonZero::');
 }
 
 /**
@@ -99,14 +230,20 @@ export function getAbiContractVersion(abi: Abi): ContractVersion {
  * ```
  */
 export const uint256 = (it: BigNumberish): Uint256 => {
-  const bn = BigInt(it);
-  if (!isUint256(bn)) throw new Error('Number is too large');
-  return {
-    // eslint-disable-next-line no-bitwise
-    low: (bn & UINT_128_MAX).toString(10),
-    // eslint-disable-next-line no-bitwise
-    high: (bn >> 128n).toString(10),
-  };
+  return new CairoUint256(it).toUint256DecimalString();
+};
+
+/**
+ * Create Uint512 Cairo type (helper for common struct type)
+ * @param it BigNumberish representation of a 512 bits unsigned number
+ * @returns Uint512 struct
+ * @example
+ * ```typescript
+ * uint512('345745685892349863487563453485768723498');
+ * ```
+ */
+export const uint512 = (it: BigNumberish): Uint512 => {
+  return new CairoUint512(it).toUint512DecimalString();
 };
 
 /**
@@ -125,32 +262,5 @@ export const tuple = (
  * @returns format: felt-string
  */
 export function felt(it: BigNumberish): string {
-  // BN or number
-  if (isBigInt(it) || (typeof it === 'number' && Number.isInteger(it))) {
-    return it.toString();
-  }
-  // string text
-  if (isText(it)) {
-    if (!isShortString(it as string))
-      throw new Error(
-        `${it} is a long string > 31 chars, felt can store short strings, split it to array of short strings`
-      );
-    const encoded = encodeShortString(it as string);
-    return BigInt(encoded).toString();
-  }
-  // hex string
-  if (typeof it === 'string' && isHex(it)) {
-    // toBN().toString
-    return BigInt(it).toString();
-  }
-  // string number (already converted), or unhandled type
-  if (typeof it === 'string' && isStringWholeNumber(it)) {
-    return it;
-  }
-  // bool to felt
-  if (typeof it === 'boolean') {
-    return `${+it}`;
-  }
-
-  throw new Error(`${it} can't be computed by felt()`);
+  return CairoFelt(it);
 }

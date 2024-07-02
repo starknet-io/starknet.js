@@ -203,7 +203,16 @@
           ]
         },
         "actual_fee": {
-          "type": "string"
+          "type": "object",
+          "properties": {
+            "amount": {
+              "type": "string"
+            },
+            "unit": {
+              "type": "string",
+              "enum": ["WEI", "FRI"]
+            }
+          }
         },
         "status_data": {
           "type": "string"
@@ -219,6 +228,19 @@
         }
       },
       "required": ["transaction_hash"]
+    },
+    "getTransactionTrace": {
+      "$ref": "starknet_trace_api_openrpc#/components/schemas/TRANSACTION_TRACE"
+    },
+    "BlockWithTxReceipts": {
+      "oneOf": [
+        {
+          "$ref": "starknet_api_openrpc#/components/schemas/BLOCK_WITH_RECEIPTS"
+        },
+        {
+          "$ref": "starknet_api_openrpc#/components/schemas/PENDING_BLOCK_WITH_RECEIPTS"
+        }
+      ]
     }
   }
 }
