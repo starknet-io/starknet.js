@@ -19,7 +19,7 @@ _[Use GitHub interface](https://blog.sapegin.me/all/open-source-for-everyone/) f
 
 ## Development workflow
 
-Start from the `develop` branch (or `next-version` if it is latest).
+Start from the `develop` branch (or `next-version` if latest).
 
 To build your changes, run:
 
