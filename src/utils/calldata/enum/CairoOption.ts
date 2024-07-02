@@ -1,11 +1,7 @@
-import { ValuesType } from '../../../types/helpers/valuesType';
-
-export const CairoOptionVariant = {
-  Some: 0,
-  None: 1,
-} as const;
-
-export type CairoOptionVariant = ValuesType<typeof CairoOptionVariant>;
+export enum CairoOptionVariant {
+  Some = 0,
+  None = 1,
+}
 
 /**
  * Class to handle Cairo Option
@@ -22,8 +18,8 @@ export class CairoOption<T> {
 
   readonly None?: boolean;
 
-  constructor(variant: CairoOptionVariant | number, someContent?: T) {
-    if (!(variant in Object.values(CairoOptionVariant))) {
+  constructor(variant: CairoOptionVariant, someContent?: T) {
+    if (!(variant in CairoOptionVariant)) {
       throw new Error('Wrong variant : should be CairoOptionVariant.Some or .None.');
     }
     if (variant === CairoOptionVariant.Some) {

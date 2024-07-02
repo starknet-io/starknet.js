@@ -78,19 +78,19 @@ export type SimulateTransactionDetails = {
 
 export type EstimateFeeAction =
   | {
-      type: typeof TransactionType.INVOKE;
+      type: TransactionType.INVOKE;
       payload: AllowArray<Call>;
     }
   | {
-      type: typeof TransactionType.DECLARE;
+      type: TransactionType.DECLARE;
       payload: DeclareContractPayload;
     }
   | {
-      type: typeof TransactionType.DEPLOY_ACCOUNT;
+      type: TransactionType.DEPLOY_ACCOUNT;
       payload: DeployAccountContractPayload;
     }
   | {
-      type: typeof TransactionType.DEPLOY;
+      type: TransactionType.DEPLOY;
       payload: UniversalDeployerContractPayload;
     };
 

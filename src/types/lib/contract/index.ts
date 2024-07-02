@@ -1,4 +1,3 @@
-import { ValuesType } from '../../helpers/valuesType';
 import { LegacyCompiledContract, LegacyContractClass } from './legacy';
 import { CompiledSierra, SierraContractClass } from './sierra';
 
@@ -21,13 +20,11 @@ export type CompiledContract = LegacyCompiledContract | CompiledSierra;
 export type CairoContract = ContractClass | CompiledContract;
 
 // Basic elements
-export const EntryPointType = {
-  EXTERNAL: 'EXTERNAL',
-  L1_HANDLER: 'L1_HANDLER',
-  CONSTRUCTOR: 'CONSTRUCTOR',
-} as const;
-
-export type EntryPointType = ValuesType<typeof EntryPointType>;
+export enum EntryPointType {
+  EXTERNAL = 'EXTERNAL',
+  L1_HANDLER = 'L1_HANDLER',
+  CONSTRUCTOR = 'CONSTRUCTOR',
+}
 
 export * from './abi';
 export * from './legacy';
