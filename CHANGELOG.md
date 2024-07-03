@@ -1,3 +1,10 @@
+# [6.11.0](https://github.com/starknet-io/starknet.js/compare/v6.10.3...v6.11.0) (2024-07-02)
+
+### Features
+
+- dummy change ([70cd028](https://github.com/starknet-io/starknet.js/commit/70cd02886432591825af2e7cad31f356898e0d1e))
+- v6 version release CI retry ([04c67df](https://github.com/starknet-io/starknet.js/commit/04c67dfec044f36292bcc4171e1d242885c6e11b))
+
 ## [6.10.2](https://github.com/starknet-io/starknet.js/compare/v6.10.1...v6.10.2) (2024-07-02)
 
 ### Bug Fixes
