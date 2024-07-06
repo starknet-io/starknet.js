@@ -1,9 +1,14 @@
-import { BatchClientInterface, BatchClientOptions } from './interface';
-import { stringify } from '../utils/json';
-import { RPC } from '../types';
-import { JRPC } from '../types/api';
+import { stringify } from '../json';
+import { RPC } from '../../types';
+import { JRPC } from '../../types/api';
 
-export class BatchClient implements BatchClientInterface {
+export type BatchClientOptions = {
+  nodeUrl: string;
+  headers: object;
+  interval: number;
+};
+
+export class BatchClient {
   public nodeUrl: string;
 
   public headers: object;

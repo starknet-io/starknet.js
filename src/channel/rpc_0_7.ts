@@ -1,4 +1,3 @@
-import { BatchClient } from '../batch';
 import { NetworkName, StarknetChainId } from '../constants';
 import { LibraryError } from '../provider/errors';
 import {
@@ -19,6 +18,7 @@ import {
   waitForTransactionOptions,
 } from '../types';
 import { JRPC, RPCSPEC07 as RPC } from '../types/api';
+import { BatchClient } from '../utils/batch';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
 import { validateAndParseEthAddress } from '../utils/eth';
