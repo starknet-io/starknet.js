@@ -86,6 +86,13 @@ export class BatchClient {
     return raw.json();
   }
 
+  /**
+   * Automatically batches and fetches JSON-RPC calls in a single request.
+   * @param method Method to call
+   * @param params Method parameters
+   * @param id JSON-RPC Request ID
+   * @returns JSON-RPC Response
+   */
   public async fetch<
     T extends keyof RPC.Methods,
     TResponse extends JRPC.ResponseBody & {
