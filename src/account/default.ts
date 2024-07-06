@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { SPEC } from 'starknet-types-07';
 import { UDC, ZERO } from '../constants';
 import { Provider, ProviderInterface } from '../provider';
 import { Signer, SignerInterface } from '../signer';
@@ -65,14 +67,16 @@ export class Account extends Provider implements AccountInterface {
 
   public cairoVersion: CairoVersion;
 
-  readonly transactionVersion: ETransactionVersion.V2 | ETransactionVersion.V3;
+  readonly transactionVersion: typeof ETransactionVersion.V2 | typeof ETransactionVersion.V3;
 
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
     address: string,
     pkOrSigner: Uint8Array | string | SignerInterface,
     cairoVersion?: CairoVersion,
-    transactionVersion: ETransactionVersion.V2 | ETransactionVersion.V3 = ETransactionVersion.V2 // TODO: Discuss this, set to v2 for backward compatibility
+    transactionVersion:
+      | typeof ETransactionVersion.V2
+      | typeof ETransactionVersion.V3 = ETransactionVersion.V2 // TODO: Discuss this, set to v2 for backward compatibility
   ) {
     super(providerOrOptions);
     this.address = address.toLowerCase();
@@ -109,7 +113,7 @@ export class Account extends Provider implements AccountInterface {
   }
 
   /**
-   * Retrieves the Cairo version from the network and sets `cairoVersion` if not already set in the constructor
+   * Retrieves the Cairo version from the network and sets `cairoVersion` if not already set in the constructor.
    * @param classHash if provided detects Cairo version from classHash, otherwise from the account address
    */
   public async getCairoVersion(classHash?: string) {
@@ -539,38 +543,90 @@ export class Account extends Provider implements AccountInterface {
     return getMessageHash(typedData, this.address);
   }
 
-  public async verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean> {
-    try {
-      const resp = await this.callContract({
-        contractAddress: this.address,
-        entrypoint: 'isValidSignature',
-        calldata: CallData.compile({
-          hash: toBigInt(hash).toString(),
-          signature: formatSignature(signature),
-        }),
-      });
-      if (BigInt(resp[0]) === 0n) {
-        // OpenZeppelin 0.8.0 invalid signature
-        return false;
+  public async verifyMessageHash(
+    hash: BigNumberish,
+    signature: Signature,
+    signatureVerificationFunctionName?: string,
+    signatureVerificationResponse?: { okResponse: string[]; nokResponse: string[]; error: string[] }
+  ): Promise<boolean> {
+    // HOTFIX: Accounts should conform to SNIP-6
+    // (https://github.com/starknet-io/SNIPs/blob/f6998f779ee2157d5e1dea36042b08062093b3c5/SNIPS/snip-6.md?plain=1#L61),
+    // but they don't always conform. Also, the SNIP doesn't standardize the response if the signature isn't valid.
+    const knownSigVerificationFName = signatureVerificationFunctionName
+      ? [signatureVerificationFunctionName]
+      : ['isValidSignature', 'is_valid_signature'];
+    const knownSignatureResponse = signatureVerificationResponse || {
+      okResponse: [
+        // any non-nok response is true
+      ],
+      nokResponse: [
+        '0x0', // Devnet
+        '0x00', // OpenZeppelin 0.7.0 to 0.9.0 invalid signature
+      ],
+      error: [
+        'argent/invalid-signature', // ArgentX 0.3.0 to 0.3.1
+        'is invalid, with respect to the public key', // OpenZeppelin until 0.6.1, Braavos 0.0.11
+        'INVALID_SIG', // Braavos 1.0.0
+      ],
+    };
+    let error: any;
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const SigVerificationFName of knownSigVerificationFName) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        const resp = await this.callContract({
+          contractAddress: this.address,
+          entrypoint: SigVerificationFName,
+          calldata: CallData.compile({
+            hash: toBigInt(hash).toString(),
+            signature: formatSignature(signature),
+          }),
+        });
+        // Response NOK Signature
+        if (knownSignatureResponse.nokResponse.includes(resp[0].toString())) {
+          return false;
+        }
+        // Response OK Signature
+        // Empty okResponse assume all non-nok responses are valid signatures
+        // OpenZeppelin 0.7.0 to 0.9.0, ArgentX 0.3.0 to 0.3.1 & Braavos Cairo 0.0.11 to 1.0.0 valid signature
+        if (
+          knownSignatureResponse.okResponse.length === 0 ||
+          knownSignatureResponse.okResponse.includes(resp[0].toString())
+        ) {
+          return true;
+        }
+        throw Error('signatureVerificationResponse Error: response is not part of known responses');
+      } catch (err) {
+        // Known NOK Errors
+        if (
+          knownSignatureResponse.error.some((errMessage) =>
+            (err as Error).message.includes(errMessage)
+          )
+        ) {
+          return false;
+        }
+        // Unknown Error
+        error = err;
       }
-      // OpenZeppelin 0.8.0, ArgentX 0.3.0 & Braavos Cairo 0 valid signature
-      return true;
-    } catch (err) {
-      if (
-        ['argent/invalid-signature', 'is invalid, with respect to the public key'].some(
-          (errMessage) => (err as Error).message.includes(errMessage)
-        )
-      ) {
-        // ArgentX 0.3.0 invalid signature, Braavos Cairo 0 invalid signature
-        return false;
-      }
-      throw Error(`Signature verification request is rejected by the network: ${err}`);
     }
+
+    throw Error(`Signature verification Error: ${error}`);
   }
 
-  public async verifyMessage(typedData: TypedData, signature: Signature): Promise<boolean> {
+  public async verifyMessage(
+    typedData: TypedData,
+    signature: Signature,
+    signatureVerificationFunctionName?: string,
+    signatureVerificationResponse?: { okResponse: string[]; nokResponse: string[]; error: string[] }
+  ): Promise<boolean> {
     const hash = await this.hashMessage(typedData);
-    return this.verifyMessageHash(hash, signature);
+    return this.verifyMessageHash(
+      hash,
+      signature,
+      signatureVerificationFunctionName,
+      signatureVerificationResponse
+    );
   }
 
   /*

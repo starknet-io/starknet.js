@@ -2,7 +2,7 @@
  * Map RPC Response to common interface response
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
-import {
+import type {
   BlockWithTxHashes,
   ContractClassPayload,
   ContractClassResponse,
@@ -19,7 +19,7 @@ import {
 import { toBigInt } from '../num';
 import { isString } from '../shortString';
 import { estimateFeeToBounds, estimatedFeeToMaxFee } from '../stark';
-import { ResponseParser } from '.';
+import { ResponseParser } from './interface';
 
 export class RPCResponseParser
   implements

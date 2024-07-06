@@ -6,6 +6,22 @@ import {
   validateChecksumAddress,
 } from '../../src/utils/address';
 
+describe('addAddressPadding', () => {
+  test('should correctly add padding', () => {
+    const addr = '0x6eff1d71';
+    const padded = '0x000000000000000000000000000000000000000000000000000000006eff1d71';
+
+    return expect(addAddressPadding(addr)).toBe(padded);
+  });
+
+  test('should add hex prefix', () => {
+    const addr = 'a7ee790591d9fa3efc87067d95a643f8455e0b8190eb8cb7bfd39e4fb7571fdf';
+    const padded = '0xa7ee790591d9fa3efc87067d95a643f8455e0b8190eb8cb7bfd39e4fb7571fdf';
+
+    return expect(addAddressPadding(addr)).toBe(padded);
+  });
+});
+
 describe('validateAndParseAddress', () => {
   test('should pass when correct starknet address is passed', () => {
     const addr = '0x7ee790591d9fa3efc87067d95a643f8455e0b8190eb8cb7bfd39e4fb7571fdf';
@@ -14,9 +30,14 @@ describe('validateAndParseAddress', () => {
   });
 
   test('should add 0x prefix if not provided', () => {
-    const addr = '0x6eff1d71068df8e6677f59a556151c56ed13e14ad431a9bef6fcb3fc5e6fa7';
+    const addr = '6eff1d71068df8e6677f59a556151c56ed13e14ad431a9bef6fcb3fc5e6fa7';
 
     return expect(validateAndParseAddress(addr)).toEqual(`${addAddressPadding(addr)}`);
+  });
+
+  test('should fail for invalid address', () => {
+    const addr = 'test';
+    expect(() => validateAndParseAddress(addr)).toThrow('Cannot convert 0xtest to a BigInt');
   });
 
   test('should fail for out of bound address', () => {

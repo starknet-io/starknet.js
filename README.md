@@ -34,9 +34,7 @@
   </a>
 </p>
 
-## 🕹️ Usage
-
-Install starknet with `npm`
+## Installation
 
 ```bash
 # latest official release (main branch)
@@ -51,13 +49,11 @@ $ npm install starknet@beta
 
 Import `starknet` and use the [API](https://www.starknetjs.com/docs/API/).
 
-## 🌐 API
+## 🌐 Documentation
 
-[Click Here](https://www.starknetjs.com/docs/API/)
+How to [Guides](https://www.starknetjs.com/docs/guides/intro) :book: & [API](https://www.starknetjs.com/docs/API/) 💻
 
-Please refer to the following code examples [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript)! :video_game:
-
-Guides can be found [here](https://www.starknetjs.com/docs/guides/intro) :book:
+Play with [Code Examples](https://github.com/PhilippeR26/starknet.js-workshop-typescript) :video_game:
 
 ## ✏️ Contributing
 
@@ -83,6 +79,6 @@ This library would not be possible without these rockstars.
 
 ## 📜 License
 
-Copyright (c) 2023 StarkWare
+Copyright (c) 2024 StarkWare
 
 Licensed under the [MIT license](https://github.com/starknet-io/starknet.js/blob/main/LICENSE).

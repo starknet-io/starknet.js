@@ -10,7 +10,6 @@ _[Use GitHub interface](https://blog.sapegin.me/all/open-source-for-everyone/) f
 >
 > All contributions are expected to be of the highest possible quality! That means the PR is thoroughly tested and documented, and without blindly generated ChatGPT code and documentation! We will not consider nor merge PR-s that do not comply to these rules!
 
-
 ## Prerequisites
 
 - If it’s your first pull request, watch [this amazing course](http://makeapullrequest.com/) by [Kent C. Dodds](https://twitter.com/kentcdodds).
@@ -20,7 +19,7 @@ _[Use GitHub interface](https://blog.sapegin.me/all/open-source-for-everyone/) f
 
 ## Development workflow
 
-Start from the `develop` branch.
+Start from the `develop` branch (or `next-version` if latest).
 
 To build your changes, run:
 
@@ -40,13 +39,13 @@ Or run tests in watch mode:
 npm test --watch
 ```
 
-By default the tests are executed in your local Devnet and everything should run automatically. 
+By default the tests are executed in your local Devnet and everything should run automatically.
 
 If you want to use a specific RPC node, you have to set some global variables before executing the tests:
 
 ```bash
-export TEST_RPC_URL=http://192.168.1.44:9545/rpc/v0.5 # example of a Pathfinder node located in your local network
-export TEST_RPC_URL=https://starknet-testnet.public.blastapi.io/rpc/v0.5 # example of a public testnet node
+export TEST_RPC_URL=http://192.168.1.44:9545/rpc/v0_7 # example of a Pathfinder node located in your local network
+export TEST_RPC_URL=https://starknet-sepolia.public.blastapi.io/rpc/v0_7 # example of a public Sepolia testnet node
 export TEST_ACCOUNT_ADDRESS=0x065A822f0000000000000000000000000c26641
 export TEST_ACCOUNT_PRIVATE_KEY=0x02a80000000000000000000000001754438a
 ```
@@ -104,6 +103,9 @@ For major changes that markedly transform the existing API or significantly alte
 - We’re using [Prettier](https://github.com/prettier/prettier) to format code, so don’t worry much about code formatting.
 - Don’t commit generated files, like minified JavaScript.
 - Don’t change the version number or changelog.
+- Use `npm run test:coverage` for a complete project test coverage.
+- Use for example `npm run test:coverage __tests__/utils/uint256.test.ts` for a single file coverage.
+- Use `npm run ts:coverage` to check the global type coverage rate and `npm run ts:coverage:report` to generate a complete report (summary displayed in the console, full HTML report available in the `coverage-ts` folder by launching `./coverage-ts/index.html` in your browser) and find files having low coverage.
 
 ## Need help?
 

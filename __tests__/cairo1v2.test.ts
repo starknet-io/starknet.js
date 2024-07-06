@@ -1,3 +1,5 @@
+import fs from 'node:fs';
+import path from 'node:path';
 import {
   Account,
   BigNumberish,
@@ -6,8 +8,6 @@ import {
   CairoOptionVariant,
   CairoResult,
   CairoResultVariant,
-  CairoUint256,
-  CairoUint512,
   CallData,
   Calldata,
   CompiledSierra,
@@ -15,19 +15,17 @@ import {
   DeclareDeployUDCResponse,
   RawArgsArray,
   RawArgsObject,
-  byteArray,
   cairo,
   ec,
+  events,
   hash,
+  json,
   num,
   selector,
   shortString,
   stark,
   types,
-  type Uint512,
 } from '../src';
-import { hexToDecimalString } from '../src/utils/num';
-import { encodeShortString } from '../src/utils/shortString';
 import {
   TEST_TX_VERSION,
   compiledC1Account,
@@ -36,16 +34,8 @@ import {
   compiledC1v2Casm,
   compiledC210,
   compiledC210Casm,
-  compiledC240,
-  compiledC240Casm,
-  compiledC260,
-  compiledC260Casm,
   compiledComplexSierra,
   compiledHelloSierra,
-  compiledTuple,
-  compiledTupleCasm,
-  compiledU512,
-  compiledU512Casm,
   getTestAccount,
   getTestProvider,
 } from './config/fixtures';
@@ -870,7 +860,7 @@ describe('Cairo 1', () => {
       );
       const shouldBe: types.ParsedEvents = [
         {
-          EventRegular: {
+          'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable,
             simpleKeyStruct,
             simpleKeyArray,
@@ -881,8 +871,8 @@ describe('Cairo 1', () => {
         },
       ];
       const tx = await provider.waitForTransaction(transaction_hash);
-      const events = eventContract.parseEvents(tx);
-      return expect(events).toStrictEqual(shouldBe);
+      const myEvents = eventContract.parseEvents(tx);
+      return expect(myEvents).toStrictEqual(shouldBe);
     });
 
     test('parse event returning a nested struct', async () => {
@@ -892,22 +882,22 @@ describe('Cairo 1', () => {
       );
       const shouldBe: types.ParsedEvents = [
         {
-          EventNested: {
+          'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventNested': {
             nestedKeyStruct,
             nestedDataStruct,
           },
         },
       ];
       const tx = await provider.waitForTransaction(transaction_hash);
-      const events = eventContract.parseEvents(tx);
-      return expect(events).toStrictEqual(shouldBe);
+      const myEvents = eventContract.parseEvents(tx);
+      return expect(myEvents).toStrictEqual(shouldBe);
     });
 
     test('parse tx returning multiple similar events', async () => {
       const anotherKeyVariable = 100n;
       const shouldBe: types.ParsedEvents = [
         {
-          EventRegular: {
+          'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable,
             simpleKeyStruct,
             simpleKeyArray,
@@ -917,7 +907,7 @@ describe('Cairo 1', () => {
           },
         },
         {
-          EventRegular: {
+          'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable: anotherKeyVariable,
             simpleKeyStruct,
             simpleKeyArray,
@@ -945,13 +935,13 @@ describe('Cairo 1', () => {
       ]);
       const { transaction_hash } = await account.execute([callData1, callData2]);
       const tx = await provider.waitForTransaction(transaction_hash);
-      const events = eventContract.parseEvents(tx);
-      return expect(events).toStrictEqual(shouldBe);
+      const myEvents = eventContract.parseEvents(tx);
+      return expect(myEvents).toStrictEqual(shouldBe);
     });
     test('parse tx returning multiple different events', async () => {
       const shouldBe: types.ParsedEvents = [
         {
-          EventRegular: {
+          'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable,
             simpleKeyStruct,
             simpleKeyArray,
@@ -961,7 +951,7 @@ describe('Cairo 1', () => {
           },
         },
         {
-          EventNested: {
+          'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventNested': {
             nestedKeyStruct,
             nestedDataStruct,
           },
@@ -981,282 +971,170 @@ describe('Cairo 1', () => {
       ]);
       const { transaction_hash } = await account.execute([callData1, callData2]);
       const tx = await provider.waitForTransaction(transaction_hash);
-      const events = eventContract.parseEvents(tx);
-      return expect(events).toStrictEqual(shouldBe);
-    });
-  });
-
-  describe('cairo v2.4.0 new types', () => {
-    let stringContract: Contract;
-
-    beforeAll(async () => {
-      const { deploy } = await account.declareAndDeploy({
-        contract: compiledC240,
-        casm: compiledC240Casm,
-      });
-
-      stringContract = new Contract(compiledC240.abi, deploy.contract_address, account);
+      const myEvents = eventContract.parseEvents(tx);
+      return expect(myEvents).toStrictEqual(shouldBe);
     });
 
-    test('bytes31', async () => {
-      const resp = await stringContract.call('proceed_bytes31', ['AZERTY']);
-      expect(resp).toBe('AZERTY');
-      const str = 'TokenName';
-      const callD1 = CallData.compile([str]);
-      expect(callD1).toEqual([hexToDecimalString(encodeShortString(str))]);
-      const callD2 = CallData.compile({ str });
-      expect(callD2).toEqual([hexToDecimalString(encodeShortString(str))]);
-      const myCallData = new CallData(compiledC240.abi);
-      const myCalldata1 = myCallData.compile('proceed_bytes31', [str]);
-      expect(myCalldata1).toEqual([encodeShortString(str)]);
-      const myCalldata2 = myCallData.compile('proceed_bytes31', { str });
-      expect(myCalldata2).toEqual([encodeShortString(str)]);
-      const myCall1 = stringContract.populate('proceed_bytes31', [str]);
-      expect(myCall1.calldata).toEqual([encodeShortString(str)]);
-      const myCall2 = stringContract.populate('proceed_bytes31', { str });
-      expect(myCall2.calldata).toEqual([encodeShortString(str)]);
-    });
-
-    test('bytes31 too long', async () => {
-      await expect(stringContract.call('proceed_bytes31', ['ABCDEFGHIJKLMNOPQRSTUVWXYZ12345A'])) // more than 31 characters
-        .rejects.toThrow();
-    });
-
-    test('ByteArray', async () => {
-      const message = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ12345AAADEFGHIJKLMNOPQRSTUVWXYZ12345A';
-      const callD = CallData.compile([message]);
-      const expectedResult = [
-        '2',
-        hexToDecimalString('0x4142434445464748494a4b4c4d4e4f505152535455565758595a3132333435'),
-        hexToDecimalString('0x4141414445464748494a4b4c4d4e4f505152535455565758595a3132333435'),
-        hexToDecimalString('0x41'),
-        '1',
-      ];
-      expect(callD).toEqual(expectedResult);
-      const callD2 = CallData.compile({ mess: message });
-      expect(callD2).toEqual(expectedResult);
-      const callD3 = CallData.compile({ mess: byteArray.byteArrayFromString('Take care.') });
-      expect(callD3).toEqual(['0', '398475857363345939260718', '10']);
-      const str1 = await stringContract.get_string();
-      expect(str1).toBe(
-        "Cairo has become the most popular language for developers + charizards !@#$%^&*_+|:'<>?~`"
+    test('parsing nested events from Cairo components', () => {
+      // this abi is from Sepolia contract 0x07981ea76ca241100a3e1cd4083a15a73a068b6d6a946d36042cbfc9b531baa2
+      // with the end from OpenZeppelin ERC20 contract (for `flat` event test)
+      const { abi } = json.parse(
+        fs
+          .readFileSync(
+            path.resolve(__dirname, `../__mocks__/cairo/cairo260/nestedEvents.abi.json`)
+          )
+          .toString('ascii')
       );
-      const myCallData = new CallData(stringContract.abi);
-      const expectedString = 'Take care. Zorg is back';
-      const resp3 = await stringContract.proceed_string('Take care.');
-      expect(resp3).toBe(expectedString);
-      const resp4 = await stringContract.call('proceed_string', ['Take care.']);
-      expect(resp4).toBe(expectedString);
-      const calldata1 = myCallData.compile('proceed_string', ['Take care.']);
-      const resp5 = await stringContract.call('proceed_string', calldata1);
-      expect(resp5).toBe(expectedString);
-    });
-  });
-
-  describe('cairo v2.5.3 complex tuples', () => {
-    let tupleContract: Contract;
-    let myCallData: CallData;
-
-    beforeAll(async () => {
-      const { deploy } = await account.declareAndDeploy({
-        contract: compiledTuple,
-        casm: compiledTupleCasm,
-      });
-
-      tupleContract = new Contract(compiledTuple.abi, deploy.contract_address, account);
-      myCallData = new CallData(tupleContract.abi);
-    });
-
-    test('Tuple (u8, Array<u16>, bool)', async () => {
-      const res1 = await tupleContract.call('get_tuple1', []);
-      expect(res1).toEqual({ '0': 100n, '1': [5000n, 6000n], '2': true });
-    });
-
-    test('Tuple (bytes31, ByteArray)', async () => {
-      const res2 = await tupleContract.call('get_tuple2', []);
-      expect(res2).toEqual({
-        '0': 'Input',
-        '1': 'Zorg is very verbose and creates only long sentences.',
-      });
-    });
-
-    test('Tuple (u256, Order2)', async () => {
-      const res3 = await tupleContract.call('get_tuple3', []);
-      expect(res3).toEqual({ '0': 123456n, '1': { p1: 10n, p2: [1n, 2n, 3n] } });
-    });
-
-    test('Tuple (EthAddress, u256)', async () => {
-      const res4 = await tupleContract.call('get_tuple4', []);
-      expect(res4).toEqual({ '0': 123n, '1': 500n });
-    });
-
-    test('Tuple (Result<u64, u8>, u8)', async () => {
-      const res5 = await tupleContract.call('get_tuple5', []);
-      expect(res5).toEqual({
-        '0': new CairoResult<BigNumberish, BigNumberish>(CairoResultVariant.Ok, 18n),
-        '1': 4n,
-      });
-    });
-
-    test('Tuple (Option<u64>, u8)', async () => {
-      const res6 = await tupleContract.call('get_tuple6', []);
-      expect(res6).toEqual({
-        '0': new CairoOption<BigNumberish>(CairoOptionVariant.Some, 18n),
-        '1': 4n,
-      });
-    });
-
-    test('Tuple (Cairo enum.North, u8)', async () => {
-      const res7 = await tupleContract.call('get_tuple7', []);
-      expect(res7).toEqual({
-        '0': new CairoCustomEnum({ North: {}, East: undefined }),
-        '1': 4n,
-      });
-    });
-
-    test('Tuple (Cairo enum.East, u8)', async () => {
-      const res12 = await tupleContract.call('get_tuple12', []);
-      expect(res12).toEqual({
-        '0': new CairoCustomEnum({
-          North: undefined,
-          East: new CairoResult<BigNumberish, BigNumberish>(CairoResultVariant.Ok, 2000n),
-        }),
-        '1': 4n,
-      });
-    });
-
-    test('Tuple ((u256, Array<u16>), u8)', async () => {
-      const res8 = await tupleContract.call('get_tuple8', []);
-      expect(res8).toEqual({ '0': { '0': 600n, '1': [1n, 2n, 3n] }, '1': 8n });
-    });
-
-    test('Tuple ((u256,(u16,Order2)), u8)', async () => {
-      type Order2 = {
-        p1: num.BigNumberish;
-        p2: num.BigNumberish[];
-      };
-      const myOrder2: Order2 = { p1: 100, p2: [5, 6, 7] };
-      const calldata9 = myCallData.compile('get_tuple9', {
-        l0: cairo.tuple(cairo.tuple(cairo.uint256(5000n), cairo.tuple(250, myOrder2)), 240),
-      });
-      const res9 = await tupleContract.call('get_tuple9', calldata9);
-      expect(res9).toEqual({
-        '0': {
-          '0': 5000n,
-          '1': { '0': 250n, '1': { p1: 100n, p2: [5n, 6n, 7n] } },
-        },
-        '1': 240n,
-      });
-    });
-
-    test('Array Array<Result<u256, u8>>', async () => {
-      const res10 = await tupleContract.call('get_tuple10', []);
-      expect(res10).toEqual({
-        '0': 8000n,
-        '1': [
-          new CairoResult<BigNumberish, BigNumberish>(CairoResultVariant.Ok, 6000n),
-          new CairoResult<BigNumberish, BigNumberish>(CairoResultVariant.Ok, 7000n),
+      const abiEvents = events.getAbiEvents(abi);
+      const abiStructs = CallData.getAbiStruct(abi);
+      const abiEnums = CallData.getAbiEnum(abi);
+      const rawEventNested = {
+        block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
+        block_number: 69198,
+        data: [
+          '0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
+          '0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
+          '0x0',
+          '0x0',
+          '0x8bb2c97000',
+          '0x0',
+          '0x425615c73f000',
+          '0x0',
+          '0x0',
+          '0x0',
+          '0x0',
+          '0x2bfc41e4bcfdbe82d0bafe3f935dadb18b6e90be3d22ccccea1f5b10986ed53',
+          '0x7aab02decaf82af6fa798fe8d23de042695846ab9dae9f18331fffc518d3d36',
+          '0x616b697261',
+          '0x616b697261',
         ],
-      });
-    });
-
-    test('Option Option<Result<u16, felt252>>', async () => {
-      const res11 = await tupleContract.call('get_tuple11', []);
-      expect(res11).toEqual({
-        '0': 400n,
-        '1': new CairoOption<CairoResult<BigNumberish, BigNumberish>>(
-          CairoOptionVariant.Some,
-          new CairoResult<BigNumberish, BigNumberish>(CairoResultVariant.Ok, 2000n)
-        ),
-      });
-    });
-  });
-
-  describe('Cairo2.6.0 Sierra1.5.0', () => {
-    test('declare Sierra 1.5.0', async () => {
-      const declare260Response = await account.declare({
-        contract: compiledC260,
-        casm: compiledC260Casm,
-      });
-      expect(declare260Response.class_hash).toBe(
-        '0x6184f1a71cad4bd123ff8bb3b97dc9ec876ced6489d9479cfdaada81a2f06d6'
-      );
-    });
-  });
-
-  describe('cairo u512 type', () => {
-    let u512Contract: Contract;
-    const myU512 =
-      '0x33333333333333333333333333333333222222222222222222222222222222221111111111111111111111111111111100000000000000000000000000000000';
-    const serializedU512 = new CairoUint512({
-      limb0: '0x00000000000000000000000000000000',
-      limb1: '0x11111111111111111111111111111111',
-      limb2: '0x22222222222222222222222222222222',
-      limb3: '0x33333333333333333333333333333333',
-    });
-    const myUint256 = new CairoUint256('0x55544444433233223222222122112111111011001');
-
-    beforeAll(async () => {
-      const { deploy } = await account.declareAndDeploy({
-        contract: compiledU512,
-        casm: compiledU512Casm,
-      });
-
-      u512Contract = new Contract(compiledU512.abi, deploy.contract_address, account);
-    });
-
-    test('u512 compile', async () => {
-      const u512_1: Uint512 = cairo.uint512(myU512);
-      expect(u512_1).toEqual({
-        limb0: '0',
-        limb1: '22685491128062564230891640495451214097',
-        limb2: '45370982256125128461783280990902428194',
-        limb3: '68056473384187692692674921486353642291',
-      });
-
-      const myCalldata1 = CallData.compile([u512_1]);
-      const myCalldata2 = CallData.compile({ my_u512: u512_1 });
-      const expected1 = [
-        '0',
-        '22685491128062564230891640495451214097',
-        '45370982256125128461783280990902428194',
-        '68056473384187692692674921486353642291',
-      ];
-      expect(myCalldata1).toEqual(expected1);
-      expect(myCalldata2).toEqual(expected1);
-
-      const myCallData = new CallData(u512Contract.abi);
-      const myCalldata3 = myCallData.compile('div_u512', {
-        my_u512: serializedU512,
-        divisor: myUint256,
-      });
-      const myCalldata4 = myCallData.compile('div_u512', [serializedU512, myUint256]);
-      const expected2 = [
-        '0',
-        '22685491128062564230891640495451214097',
-        '45370982256125128461783280990902428194',
-        '68056473384187692692674921486353642291',
-        '67973375079109053774543167123544412161',
-        '22905373764',
-      ];
-      expect(myCalldata3).toEqual(expected2);
-      expect(myCalldata4).toEqual(expected2);
-
-      const myCall1 = u512Contract.populate('return_u512', { my_u512: serializedU512 });
-      const myCall2 = u512Contract.populate('return_u512', [serializedU512]);
-      expect(myCall1.calldata).toEqual(expected1);
-      expect(myCall2.calldata).toEqual(expected1);
-    });
-
-    test('u512 call', async () => {
-      const resp1 = await u512Contract.div_u512(myU512, myUint256);
-      const expected = {
-        '0': 344041591305341143461698062540412331701024044049418150896694357470676311354588133518143452261258807949095n,
-        '1': 3408778323931873632420467616107826476746211809497n,
+        from_address: '0x7981ea76ca241100a3e1cd4083a15a73a068b6d6a946d36042cbfc9b531baa2',
+        keys: [
+          '0x22ea134d4126804c60797e633195f8c9aa5fd6d1567e299f4961d0e96f373ee',
+          '0x2e0a012a863e6b614014d113e7285b06e30d2999e42e6e03ba2ef6158b0a8f1',
+          '0x33e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
+          '0x33e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
+        ],
+        transaction_hash: '0x4e38fcce79c115b6fe2c486e3514efc1bd4da386b91c104e97230177d0bf181',
       };
-      expect(resp1).toEqual(expected);
-      const resp2 = await u512Contract.call('div_u512', [serializedU512, myUint256]);
-      expect(resp2).toEqual(expected);
+      const parsedEvent = events.parseEvents([rawEventNested], abiEvents, abiStructs, abiEnums);
+      expect(parsedEvent).toEqual([
+        {
+          'kurosawa_akira::ExchangeBalanceComponent::exchange_balance_logic_component::Trade': {
+            maker: 1466771120193999006693452314154095230636738457276435850562375218974960297344n,
+            taker: 1466771120193999006693452314154095230636738457276435850562375218974960297344n,
+            ticker: {
+              '0': 2087021424722619777119509474943472645767659996348769578120564519014510906823n,
+              '1': 2009894490435840142178314390393166646092438090257831307886760648929397478285n,
+            },
+            router_maker: 0n,
+            router_taker: 0n,
+            amount_base: 600000000000n,
+            amount_quote: 1167000000000000n,
+            is_sell_side: false,
+            is_failed: false,
+            is_ecosystem_book: false,
+            maker_hash:
+              1243447045605505261525562127352132336915826038411731622093247599150671261011n,
+            taker_hash:
+              3467769886575726876986429904727435956490031836678599158998056330580017888566n,
+            maker_source: 418413900385n,
+            taker_source: 418413900385n,
+          },
+        },
+      ]);
+      // From component `DepositComponent`, event `Deposit` (same event name than next)
+      const rawEventNestedDeposit1 = {
+        block_hash: '0x31afd649a5042cb1855ce820708a555eab62fe6ea07a2a538fa9100cdc80383',
+        block_number: 69198,
+        data: [
+          '0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
+          '0x33e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
+          '0x119b74ab81c000',
+          '0x0',
+        ],
+        from_address: '0x7981ea76ca241100a3e1cd4083a15a73a068b6d6a946d36042cbfc9b531baa2',
+        keys: [
+          '0xa1db419bdf20c7726cf74c30394c4300e5645db4e3cacaf897da05faabae03',
+          '0x9149d2123147c5f43d258257fef0b7b969db78269369ebcf5ebb9eef8592f2',
+          '0x033e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
+        ],
+        transaction_hash: '0x7768860d79bfb4c8463d215abea3c267899e373407c6882077f7447051c50de',
+      };
+      // From component `RouterComponent`, event `Deposit` (same event name than previous)
+      const rawEventNestedDeposit2 = {
+        block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
+        block_number: 69198,
+        data: [
+          '0x33e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
+          '0x119b74ab81c000',
+          '0x0',
+        ],
+        from_address: '0x7981ea76ca241100a3e1cd4083a15a73a068b6d6a946d36042cbfc9b531baa2',
+        keys: [
+          '0x1352a17d221f274db15a49e35cc827e5106495ba85330b210632597411d5a46',
+          '0x9149d2123147c5f43d258257fef0b7b969db78269369ebcf5ebb9eef8592f2',
+          '0x33e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
+          '0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
+        ],
+        transaction_hash: '0x2d5210e5334a83306abe6f7f5e7e65cd1feed72ad3b8e359a2f4614fa948e1d',
+      };
+      const parsedEventNestedDeposit1 = events.parseEvents(
+        [rawEventNestedDeposit1],
+        abiEvents,
+        abiStructs,
+        abiEnums
+      );
+      expect(parsedEventNestedDeposit1).toEqual([
+        {
+          'kurosawa_akira::DepositComponent::deposit_component::Deposit': {
+            receiver: 1466771120193999006693452314154095230636738457276435850562375218974960297344n,
+            token: 2087021424722619777119509474943472645767659996348769578120564519014510906823n,
+            funder: 1466771120193999006693452314154095230636738457276435850562375218974960297344n,
+            amount: 4956000000000000n,
+          },
+        },
+      ]);
+      const parsedEventNestedDeposit2 = events.parseEvents(
+        [rawEventNestedDeposit2],
+        abiEvents,
+        abiStructs,
+        abiEnums
+      );
+      expect(parsedEventNestedDeposit2).toEqual([
+        {
+          'kurosawa_akira::RouterComponent::router_component::Deposit': {
+            router: 1466771120193999006693452314154095230636738457276435850562375218974960297344n,
+            token: 2087021424722619777119509474943472645767659996348769578120564519014510906823n,
+            funder: 1466771120193999006693452314154095230636738457276435850562375218974960297344n,
+            amount: 4956000000000000n,
+          },
+        },
+      ]);
+
+      // parsing nested event with #[flat] attribute, from a Cairo component
+      const rawEventFlat = {
+        block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
+        block_number: 69198,
+        data: ['0x119b74ab81c000', '0x0'],
+        from_address: '0x7981ea76ca241100a3e1cd4083a15a73a068b6d6a946d36042cbfc9b531baa2',
+        keys: [
+          '0x99cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9',
+          '0x33e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
+          '0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
+        ],
+        transaction_hash: '0x2da31a929a9848e9630906275a75a531e1718d4830501e10b0bccacd55f6fe0',
+      };
+      const parsedEventFlat = events.parseEvents([rawEventFlat], abiEvents, abiStructs, abiEnums);
+      expect(parsedEventFlat).toEqual([
+        {
+          'openzeppelin::token::erc20::erc20::ERC20Component::Transfer': {
+            from: 1466771120193999006693452314154095230636738457276435850562375218974960297344n,
+            to: 2087021424722619777119509474943472645767659996348769578120564519014510906823n,
+            value: 4956000000000000n,
+          },
+        },
+      ]);
     });
   });
 });

@@ -24,46 +24,34 @@ describe('deploy and test Wallet', () => {
 
   beforeAll(async () => {
     // Deploy Starknet id contract
-    const idResponse = await account.declareAndDeploy(
-      {
-        contract: compiledStarknetId,
-        casm: compiledStarknetIdCasm,
-        constructorCalldata: [account.address, 0],
-      },
-      { maxFee: 1e18 }
-    );
+    const idResponse = await account.declareAndDeploy({
+      contract: compiledStarknetId,
+      casm: compiledStarknetIdCasm,
+      constructorCalldata: [account.address, 0],
+    });
     identityAddress = idResponse.deploy.contract_address;
 
     // Deploy pricing contract
-    const pricingResponse = await account.declareAndDeploy(
-      {
-        contract: compiledPricing,
-        casm: compiledPricingCasm,
-        constructorCalldata: [devnetERC20Address],
-      },
-      { maxFee: 1e18 }
-    );
+    const pricingResponse = await account.declareAndDeploy({
+      contract: compiledPricing,
+      casm: compiledPricingCasm,
+      constructorCalldata: [devnetERC20Address],
+    });
     const pricingAddress = pricingResponse.deploy.contract_address;
 
     // Deploy naming contract
-    const namingResponse = await account.declareAndDeploy(
-      {
-        contract: compiledNaming,
-        casm: compiledNamingCasm,
-        constructorCalldata: [identityAddress, pricingAddress, 0, account.address],
-      },
-      { maxFee: 1e18 }
-    );
+    const namingResponse = await account.declareAndDeploy({
+      contract: compiledNaming,
+      casm: compiledNamingCasm,
+      constructorCalldata: [identityAddress, pricingAddress, 0, account.address],
+    });
     namingAddress = namingResponse.deploy.contract_address;
 
     // Deploy multicall contract
-    const multicallResponse = await account.declareAndDeploy(
-      {
-        contract: compiledSidMulticall,
-        casm: compiledSidMulticallCasm,
-      },
-      { maxFee: 1e18 }
-    );
+    const multicallResponse = await account.declareAndDeploy({
+      contract: compiledSidMulticall,
+      casm: compiledSidMulticallCasm,
+    });
     multicallAddress = multicallResponse.deploy.contract_address;
 
     const { transaction_hash } = await account.execute(
@@ -97,8 +85,7 @@ describe('deploy and test Wallet', () => {
           calldata: ['1'],
         },
       ],
-      undefined,
-      { maxFee: 1e18 }
+      undefined
     );
 
     await provider.waitForTransaction(transaction_hash);
@@ -106,7 +93,7 @@ describe('deploy and test Wallet', () => {
 
   test('Get the stark name of the account (using starknet.id)', async () => {
     const address = await account.getAddressFromStarkName('fricoben.stark', namingAddress);
-    expect(hexToDecimalString(address as string)).toEqual(hexToDecimalString(account.address));
+    expect(hexToDecimalString(address)).toEqual(hexToDecimalString(account.address));
   });
 
   test('Get the account from a stark name of the account (using starknet.id)', async () => {
@@ -130,8 +117,7 @@ describe('deploy and test Wallet', () => {
             ],
           },
         ],
-        undefined,
-        { maxFee: 1e18 }
+        undefined
       );
       await provider.waitForTransaction(transaction_hash_verifier);
     });

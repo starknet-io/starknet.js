@@ -131,14 +131,15 @@ export enum ETransactionFinalityStatus {
   ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
   ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
 }
+
 export enum ETransactionExecutionStatus {
   SUCCEEDED = 'SUCCEEDED',
   REVERTED = 'REVERTED',
 }
 
 export enum EBlockTag {
-  LATEST = 'latest',
   PENDING = 'pending',
+  LATEST = 'latest',
 }
 
 // 'L1' | 'L2'

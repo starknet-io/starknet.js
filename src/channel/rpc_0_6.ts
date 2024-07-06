@@ -32,7 +32,7 @@ import { getVersionsByType } from '../utils/transaction';
 
 const defaultOptions = {
   headers: { 'Content-Type': 'application/json' },
-  blockIdentifier: BlockTag.pending,
+  blockIdentifier: BlockTag.PENDING,
   retries: 200,
 };
 
@@ -104,7 +104,7 @@ export class RpcChannel {
     if (rpcError) {
       const { code, message, data } = rpcError;
       throw new LibraryError(
-        `RPC: ${method} with params ${stringify(params, null, 2)}\n 
+        `RPC: ${method} with params ${stringify(params, null, 2)}\n
         ${code}: ${message}: ${stringify(data)}`
       );
     }
@@ -243,12 +243,13 @@ export class RpcChannel {
    */
   public simulateTransaction(
     invocations: AccountInvocations,
-    {
+    simulateTransactionOptions: getSimulateTransactionOptions = {}
+  ) {
+    const {
       blockIdentifier = this.blockIdentifier,
       skipValidate = true,
       skipFeeCharge = true,
-    }: getSimulateTransactionOptions = {}
-  ) {
+    } = simulateTransactionOptions;
     const block_id = new Block(blockIdentifier).identifier;
     const simulationFlags: RPC.ESimulationFlag[] = [];
     if (skipValidate) simulationFlags.push(RPC.ESimulationFlag.SKIP_VALIDATE);

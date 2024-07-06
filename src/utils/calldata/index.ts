@@ -16,7 +16,7 @@ import {
 } from '../../types';
 import assert from '../assert';
 import { isBigInt, toHex } from '../num';
-import { getSelectorFromName } from '../selector';
+import { getSelectorFromName } from '../hash/selector';
 import { isLongText } from '../shortString';
 import { byteArrayFromString } from './byteArray';
 import { felt, isCairo1Type, isLen } from './cairo';
@@ -104,7 +104,7 @@ export class CallData {
    * Compile contract callData with abi
    * Parse the calldata by using input fields from the abi for that method
    * @param method string - method name
-   * @param args RawArgs - arguments passed to the method. Can be an array of arguments (in the order of abi definition), or an object constructed in conformity with abi (in this case, the parameter can be in a wrong order).
+   * @param argsCalldata RawArgs - arguments passed to the method. Can be an array of arguments (in the order of abi definition), or an object constructed in conformity with abi (in this case, the parameter can be in a wrong order).
    * @return Calldata - parsed arguments in format that contract is expecting
    * @example
    * ```typescript
@@ -271,7 +271,7 @@ export class CallData {
    */
   public format(method: string, response: string[], format: object): Result {
     const parsed = this.parse(method, response);
-    return formatter(parsed, format);
+    return formatter(parsed as Record<string, any>, format);
   }
 
   /**

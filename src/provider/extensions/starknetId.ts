@@ -1,4 +1,4 @@
-import { BigNumberish, StarkProfile } from '../../types';
+import { BigNumberish, RawArgsArray, StarkProfile } from '../../types';
 import { CallData } from '../../utils/calldata';
 import { getSelectorFromName } from '../../utils/hash';
 import { decodeShortString, encodeShortString } from '../../utils/shortString';
@@ -72,6 +72,7 @@ export class StarknetId {
         entrypoint: 'address_to_domain',
         calldata: CallData.compile({
           address,
+          hint: [],
         }),
       });
       const decimalDomain = hexDomain.map((element) => BigInt(element)).slice(1);
@@ -136,98 +137,100 @@ export class StarknetId {
     const multicallAddress = StarknetIdMulticallContract ?? getStarknetIdMulticallContract(chainId);
 
     try {
+      const calls: RawArgsArray = [
+        {
+          execution: execution({}),
+          to: dynamicCallData(contract),
+          selector: dynamicCallData(getSelectorFromName('address_to_domain')),
+          calldata: [dynamicCallData(address), dynamicCallData('0')],
+        },
+        {
+          execution: execution({}),
+          to: dynamicFelt(contract),
+          selector: dynamicFelt(getSelectorFromName('domain_to_id')),
+          calldata: [dynamicCallData(undefined, undefined, [0, 0])],
+        },
+        {
+          execution: execution({}),
+          to: dynamicFelt(identityContract),
+          selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
+          calldata: [
+            dynamicCallData(undefined, [1, 0]),
+            dynamicCallData(encodeShortString('twitter')),
+            dynamicCallData(verifierContract),
+            dynamicCallData('0'),
+          ],
+        },
+        {
+          execution: execution({}),
+          to: dynamicFelt(identityContract),
+          selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
+          calldata: [
+            dynamicCallData(undefined, [1, 0]),
+            dynamicCallData(encodeShortString('github')),
+            dynamicCallData(verifierContract),
+            dynamicCallData('0'),
+          ],
+        },
+        {
+          execution: execution({}),
+          to: dynamicFelt(identityContract),
+          selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
+          calldata: [
+            dynamicCallData(undefined, [1, 0]),
+            dynamicCallData(encodeShortString('discord')),
+            dynamicCallData(verifierContract),
+            dynamicCallData('0'),
+          ],
+        },
+        {
+          execution: execution({}),
+          to: dynamicFelt(identityContract),
+          selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
+          calldata: [
+            dynamicCallData(undefined, [1, 0]),
+            dynamicCallData(encodeShortString('proof_of_personhood')),
+            dynamicCallData(popContract),
+            dynamicCallData('0'),
+          ],
+        },
+        // PFP
+        {
+          execution: execution({}),
+          to: dynamicFelt(identityContract),
+          selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
+          calldata: [
+            dynamicCallData(undefined, [1, 0]),
+            dynamicCallData(encodeShortString('nft_pp_contract')),
+            dynamicCallData(pfpContract),
+            dynamicCallData('0'),
+          ],
+        },
+        {
+          execution: execution({}),
+          to: dynamicFelt(identityContract),
+          selector: dynamicFelt(getSelectorFromName('get_extended_verifier_data')),
+          calldata: [
+            dynamicCallData(undefined, [1, 0]),
+            dynamicCallData(encodeShortString('nft_pp_id')),
+            dynamicCallData('2'),
+            dynamicCallData(pfpContract),
+            dynamicCallData('0'),
+          ],
+        },
+        {
+          execution: execution(undefined, undefined, [6, 0, 0]),
+          to: dynamicFelt(undefined, [6, 0]),
+          selector: dynamicFelt(getSelectorFromName('tokenURI')),
+          calldata: [dynamicCallData(undefined, [7, 1]), dynamicCallData(undefined, [7, 2])],
+        },
+      ];
+
       const data = await provider.callContract({
         contractAddress: multicallAddress,
         entrypoint: 'aggregate',
         calldata: CallData.compile({
-          calls: [
-            {
-              execution: execution({}),
-              to: dynamicFelt(contract),
-              selector: dynamicFelt(getSelectorFromName('address_to_domain')),
-              calldata: [dynamicCallData(address)],
-            },
-            {
-              execution: execution({}),
-              to: dynamicFelt(contract),
-              selector: dynamicFelt(getSelectorFromName('domain_to_id')),
-              calldata: [dynamicCallData(undefined, undefined, [0, 0])],
-            },
-            {
-              execution: execution({}),
-              to: dynamicFelt(identityContract),
-              selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
-              calldata: [
-                dynamicCallData(undefined, [1, 0]),
-                dynamicCallData(encodeShortString('twitter')),
-                dynamicCallData(verifierContract),
-                dynamicCallData('0'),
-              ],
-            },
-            {
-              execution: execution({}),
-              to: dynamicFelt(identityContract),
-              selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
-              calldata: [
-                dynamicCallData(undefined, [1, 0]),
-                dynamicCallData(encodeShortString('github')),
-                dynamicCallData(verifierContract),
-                dynamicCallData('0'),
-              ],
-            },
-            {
-              execution: execution({}),
-              to: dynamicFelt(identityContract),
-              selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
-              calldata: [
-                dynamicCallData(undefined, [1, 0]),
-                dynamicCallData(encodeShortString('discord')),
-                dynamicCallData(verifierContract),
-                dynamicCallData('0'),
-              ],
-            },
-            {
-              execution: execution({}),
-              to: dynamicFelt(identityContract),
-              selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
-              calldata: [
-                dynamicCallData(undefined, [1, 0]),
-                dynamicCallData(encodeShortString('proof_of_personhood')),
-                dynamicCallData(popContract),
-                dynamicCallData('0'),
-              ],
-            },
-            // PFP
-            {
-              execution: execution({}),
-              to: dynamicFelt(identityContract),
-              selector: dynamicFelt(getSelectorFromName('get_verifier_data')),
-              calldata: [
-                dynamicCallData(undefined, [1, 0]),
-                dynamicCallData(encodeShortString('nft_pp_contract')),
-                dynamicCallData(pfpContract),
-                dynamicCallData('0'),
-              ],
-            },
-            {
-              execution: execution({}),
-              to: dynamicFelt(identityContract),
-              selector: dynamicFelt(getSelectorFromName('get_extended_verifier_data')),
-              calldata: [
-                dynamicCallData(undefined, [1, 0]),
-                dynamicCallData(encodeShortString('nft_pp_id')),
-                dynamicCallData('2'),
-                dynamicCallData(pfpContract),
-                dynamicCallData('0'),
-              ],
-            },
-            {
-              execution: execution(undefined, undefined, [6, 0, 0]),
-              to: dynamicFelt(undefined, [6, 0]),
-              selector: dynamicFelt(getSelectorFromName('tokenURI')),
-              calldata: [dynamicCallData(undefined, [7, 1]), dynamicCallData(undefined, [7, 2])],
-            },
-          ],
+          calls,
         }),
       });
 
