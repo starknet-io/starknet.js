@@ -3,7 +3,7 @@
 import { BigNumberish, isBigInt, isBoolean, isHex, isStringWholeNumber } from '../num';
 import { encodeShortString, isLongText, isShortText, isString } from '../shortString';
 
-type ParsableTypes = BigNumberish | Boolean;
+type ParsableTypes = BigNumberish | boolean;
 type Numberish = bigint | number;
 
 export class FeltParseError extends Error {
