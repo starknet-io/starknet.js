@@ -29,7 +29,7 @@ describe('Account and OutsideExecution', () => {
       {
         contract: compiledArgentAccount,
         casm: compiledArgentAccountCasm,
-        constructorCalldata: [targetOwner, 0],
+        constructorCalldata: [0, targetOwner, 1], // signer = targetOwner, guardian = None
       },
       { maxFee: 1e18 }
     );
