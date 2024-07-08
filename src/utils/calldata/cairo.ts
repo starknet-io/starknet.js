@@ -27,7 +27,7 @@ export const isLen = (name: string) => /_len$/.test(name);
  * @param {string} type - The type to check.
  * @returns - True if the type is felt, false otherwise.
  */
-export const isTypeFelt = (type: string) => type === 'felt' || type === 'core::felt252';
+export const isTypeFelt = (type: string) => CairoFelt252.isAbiType(type);
 /**
  * Checks if the given type is an array type.
  *

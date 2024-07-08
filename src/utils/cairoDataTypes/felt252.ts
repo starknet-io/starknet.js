@@ -16,6 +16,8 @@ export class FeltParseError extends Error {
 export class CairoFelt252 {
   private felt: string;
 
+  static abiSelector = 'core::felt252';
+
   constructor(val: ParsableTypes) {
     if (isBigInt(val) || Number.isInteger(val)) {
       this.felt = this.parseNumberish(val as Numberish);
@@ -30,6 +32,13 @@ export class CairoFelt252 {
 
   get value() {
     return this.felt;
+  }
+
+  /**
+   * Check if provided abi type is this data type
+   */
+  static isAbiType(abiType: string) {
+    return abiType === 'felt' || abiType === CairoFelt252.abiSelector;
   }
 
   public static toFeltArray(...vals: ParsableTypes[]) {
