@@ -63,6 +63,7 @@ export const OutsideExecutionTypesV2 = {
 };
 
 export enum EOutsideExecutionVersion {
+  UNSUPPORTED = '0',
   V1 = '1',
   V2 = '2',
 }

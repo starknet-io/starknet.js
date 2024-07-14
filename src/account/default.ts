@@ -581,7 +581,7 @@ export class Account extends Provider implements AccountInterface {
     return this.verifyMessageHash(hash, signature);
   }
 
-  public async getSnip9Version(): Promise<EOutsideExecutionVersion | undefined> {
+  public async getSnip9Version(): Promise<EOutsideExecutionVersion> {
     // Check for support of the SNIP-9 version 2 interface
 
     const supportsSnip9V2 = await supportsInterface(this, this.address, SNIP9_V2_INTERFACE_ID);
@@ -598,7 +598,7 @@ export class Account extends Provider implements AccountInterface {
     }
 
     // Account does not support either version 2 or version 1
-    return undefined;
+    return EOutsideExecutionVersion.UNSUPPORTED;
   }
 
   public async isValidSnip9Nonce(nonce: BigNumberish): Promise<boolean> {

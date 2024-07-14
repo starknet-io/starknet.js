@@ -23,7 +23,7 @@ Before using Outside Execution, check if the account supports it:
 const account = new Account(provider, address, privateKey);
 const version = await account.getSnip9Version();
 
-if (version) {
+if (version != 'UNSUPPORTED') {
   console.log(`Account supports SNIP-9 version ${version}`);
 } else {
   console.log('Account does not support SNIP-9');
@@ -35,7 +35,10 @@ if (version) {
 To create an OutsideExecution object, you need to prepare the calls and options:
 
 ```typescript
-import { OutsideExecution, OutsideExecutionOptions } from 'starknet';
+import { outsideExecution, OutsideExecutionOptions, cairo } from 'starknet';
+const { OutsideExecution } = outsideExecution;
+
+// ... account initialization skipped ...
 
 const calls = [
   {
