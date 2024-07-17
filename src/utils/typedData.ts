@@ -104,10 +104,20 @@ function validateTypedData(data: unknown): data is TypedData {
 }
 
 /**
- * Prepares the selector for use.
+ * Prepares the selector for later use, if it's not already in correct format.
+ * The selector in correct format is the starknet_keccak hash of the function name, encoded in ASCII.
  *
  * @param {string} selector - The selector to be prepared.
  * @returns {string} The prepared selector.
+ *
+ * @example
+ * ```typescript
+ * const result1 = prepareSelector('0xc14cfe23f3fa7ce7b1f8db7d7682305b1692293f71a61cc06637f0d8d8b6c8');
+ * // result1 = '0xc14cfe23f3fa7ce7b1f8db7d7682305b1692293f71a61cc06637f0d8d8b6c8'
+ *
+ * const result2 =  prepareSelector('myFunction');
+ * // result2 = '0xc14cfe23f3fa7ce7b1f8db7d7682305b1692293f71a61cc06637f0d8d8b6c8'
+ * ```
  */
 export function prepareSelector(selector: string): string {
   return isHex(selector) ? selector : getSelectorFromName(selector);
@@ -119,6 +129,17 @@ export function prepareSelector(selector: string): string {
  * @param {StarknetType} type - The StarkNet type to check.
  *
  * @returns {boolean} - True if the type is a Merkle tree type, false otherwise.
+ *
+ * @example
+ * ```typescript
+ * const type = { name: 'test', type: 'merkletree',};
+ * const result1 = isMerkleTreeType(type);
+ * // result1 = true
+ *
+ * const type2 = {name: 'test', type: 'non-merkletree',};
+ * const result2 =  isMerkleTreeType(type2);
+ * // result2 = false
+ * ```
  */
 export function isMerkleTreeType(type: StarknetType): type is StarknetMerkleType {
   return type.type === 'merkletree';
@@ -127,6 +148,14 @@ export function isMerkleTreeType(type: StarknetType): type is StarknetMerkleType
 /**
  * Get the dependencies of a struct type. If a struct has the same dependency multiple times, it's only included once
  * in the resulting array.
+ *
+ * @param {TypedData['types']} types - The types object containing all defined types.
+ * @param {string} type - The name of the type to get dependencies for.
+ * @param {string[]} [dependencies=[]] - The array to store dependencies.
+ * @param {string} [contains=''] - The type contained within the struct.
+ * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
+ *
+ * @returns {string[]} The array of dependencies.
  */
 export function getDependencies(
   types: TypedData['types'],
@@ -185,6 +214,20 @@ function getMerkleTreeType(types: TypedData['types'], ctx: Context) {
 
 /**
  * Encode a type to a string. All dependent types are alphabetically sorted.
+ *
+ * @param {TypedData['types']} types - The types object containing all defined types.
+ * @param {string} type - The name of the type to encode.
+ * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
+ *
+ * @returns {string} The encoded string.
+ *
+ * @example
+ * ```typescript
+ * import typedDataExample from '../../__mocks__/typedData/baseExample.json';
+ *
+ * const result = encodeType(typedDataExample.types, 'Mail');
+ * // result = "Mail(from:Person,to:Person,contents:felt)Person(name:felt,wallet:felt)";
+ * ```
  */
 export function encodeType(
   types: TypedData['types'],
@@ -230,6 +273,20 @@ export function encodeType(
 
 /**
  * Get a type string as hash.
+ *
+ * @param {TypedData['types']} types - The types object containing all defined types.
+ * @param {string} type - The name of the type to hash.
+ * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
+ *
+ * @returns {string} The hash.
+ *
+ * @example
+ * ```typescript
+ * import typedDataExample from '../../__mocks__/typedData/baseExample.json';
+ *
+ * const result = getTypeHash(typedDataExample.types, 'StarkNetDomain');
+ * // result = "0x1bfc207425a47a5dfa1a50a4f5241203f50624ca5fdf5e18755765416b8e288";
+ * ```
  */
 export function getTypeHash(
   types: TypedData['types'],
@@ -240,8 +297,27 @@ export function getTypeHash(
 }
 
 /**
- * Encodes a single value to an ABI serialisable string, number or Buffer. Returns the data as tuple, which consists of
+ * Encodes a single value to an ABI serialisable string, number or Buffer. Returns the data as a tuple, which consists of
  * an array of ABI compatible types, and an array of corresponding values.
+ *
+ * @param {TypedData['types']} types - The types object containing all defined types.
+ * @param {string} type - The name of the type to encode.
+ * @param {unknown} data - The data to encode.
+ * @param {Context} [ctx={}] - The context of the encoding process.
+ * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
+ *
+ * @returns {[string, string]} The ABI compatible type and corresponding value.
+ *
+ * @example
+ * ```typescript
+ * import { getSelectorFromName } from '../../src/utils/hash';
+ *
+ * const selector = 'transfer';
+ * const selectorHash = getSelectorFromName(selector);
+ * const result1 = encodeValue({}, 'felt', selectorHash);
+ *
+ * // result1 = ['felt', '0x83afd3f4caedc6eebf44246fe54e38c95e3179a5ec9ea81740eca5b482d12e']
+ * ```
  */
 export function encodeValue(
   types: TypedData['types'],
@@ -373,6 +449,13 @@ export function encodeValue(
 /**
  * Encode the data to an ABI encoded Buffer. The data should be a key -> value object with all the required values.
  * All dependent types are automatically encoded.
+ *
+ * @param {TypedData['types']} types - The types object containing all defined types.
+ * @param {string} type - The name of the type to encode.
+ * @param {TypedData['message']} data - The data to encode.
+ * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
+ *
+ * @returns {[string[], string[]]} The ABI compatible types and corresponding values.
  */
 export function encodeData<T extends TypedData>(
   types: T['types'],
@@ -408,6 +491,26 @@ export function encodeData<T extends TypedData>(
 /**
  * Get encoded data as a hash. The data should be a key -> value object with all the required values.
  * All dependent types are automatically encoded.
+ *
+ * @param {TypedData['types']} types - The types object containing all defined types.
+ * @param {string} type - The name of the type to hash.
+ * @param {TypedData['message']} data - The data to hash.
+ * @param {Revision} [revision=Revision.Legacy] - The revision of the TypedData.
+ *
+ * @returns {string} The hash of the encoded data.
+ *
+ * @example
+ * ```typescript
+ * import exampleBaseTypes from '../../__mocks__/typedData/example_baseTypes.json';
+ *
+ * const result = getStructHash(
+ *    exampleBaseTypes.types,
+ *    'StarknetDomain',
+ *    exampleBaseTypes.domain as StarknetDomain,
+ *    TypedDataRevision.ACTIVE
+ *  );
+ *  // result = "0x555f72e550b308e50c1a4f8611483a174026c982a9893a05c185eeb85399657";
+ * ```
  */
 export function getStructHash<T extends TypedData>(
   types: T['types'],
@@ -420,6 +523,61 @@ export function getStructHash<T extends TypedData>(
 
 /**
  * Get the SNIP-12 encoded message to sign, from the typedData object.
+ *
+ * @param {TypedData} typedData - The TypedData object.
+ * @param {BigNumberish} account - The account to sign the message.
+ *
+ * @returns {string} The hash of the message to sign.
+ * @throws Will throw an error if the typedData does not match the JSON schema.
+ *
+ * @example
+ * ```typescript
+ * const exampleAddress = "0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826";
+ * const typedDataStringExample = {
+ *  types: {
+ *    StarkNetDomain: [
+ *      { name: 'name', type: 'felt' },
+ *      { name: 'version', type: 'felt' },
+ *      { name: 'chainId', type: 'felt' },
+ *    ],
+ *    Person: [
+ *      { name: 'name', type: 'felt' },
+ *      { name: 'wallet', type: 'felt' },
+ *    ],
+ *    String: [
+ *      { name: 'len', type: 'felt' },
+ *      { name: 'data', type: 'felt*' },
+ *    ],
+ *    Mail: [
+ *      { name: 'from', type: 'Person' },
+ *      { name: 'to', type: 'Person' },
+ *      { name: 'contents', type: 'String' },
+ *    ],
+ *  },
+ *  primaryType: 'Mail',
+ *  domain: {
+ *    name: 'StarkNet Mail',
+ *    version: '1',
+ *    chainId: 1,
+ *  },
+ *  message: {
+ *    from: {
+ *      name: 'Cow',
+ *      wallet: exampleAddress,
+ *    },
+ *    to: {
+ *      name: 'Bob',
+ *      wallet: '0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB',
+ *    },
+ *    contents: stringToStringStruct(
+ *      'this is way longer than just 32 characters, to test if that is possible within a typedData struct.'
+ *    ),
+ *  },
+ * };
+ *
+ * const result = getMessageHash(typedDataStringExample, exampleAddress);
+ * // result = "0x70338fb11b8f70b68b261de8a322bcb004bd85e88ac47d9147982c7f5ac66fd"
+ * ```
  */
 export function getMessageHash(typedData: TypedData, account: BigNumberish): string {
   if (!validateTypedData(typedData)) {
