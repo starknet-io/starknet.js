@@ -29,4 +29,21 @@ describe('Batch Client', () => {
     expect(fetchSpy).toHaveBeenCalledTimes(1);
     fetchSpy.mockRestore();
   });
+
+  test('batch request using Provider', async () => {
+    const myBatchProvider = getTestProvider(false, {
+      batch: 0,
+    });
+
+    // eslint-disable-next-line @typescript-eslint/dot-notation
+    const sendBatchSpy = jest.spyOn(myBatchProvider.channel['batchClient'] as any, 'sendBatch');
+
+    await Promise.all([
+      myBatchProvider.getBlock(),
+      myBatchProvider.getBlockLatestAccepted(),
+      myBatchProvider.getBlockTransactionCount('latest'),
+    ]);
+
+    expect(sendBatchSpy).toHaveBeenCalledTimes(1);
+  });
 });
