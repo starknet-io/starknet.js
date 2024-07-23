@@ -17,6 +17,8 @@ import {
   getMessageHash,
   getStructHash,
   getTypeHash,
+  prepareSelector,
+  isMerkleTreeType,
 } from '../../src/utils/typedData';
 
 const exampleAddress = '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826';
@@ -110,6 +112,21 @@ describe('typedData', () => {
     `);
   });
 
+  test('should prepare selector', () => {
+    const res1 = prepareSelector('myFunction');
+    expect(res1).toEqual('0xc14cfe23f3fa7ce7b1f8db7d7682305b1692293f71a61cc06637f0d8d8b6c8');
+
+    const res2 = prepareSelector(
+      '0xc14cfe23f3fa7ce7b1f8db7d7682305b1692293f71a61cc06637f0d8d8b6c8'
+    );
+    expect(res2).toEqual('0xc14cfe23f3fa7ce7b1f8db7d7682305b1692293f71a61cc06637f0d8d8b6c8');
+
+    const res3 = prepareSelector(
+      '0xc14cfe23f3fa7ce7b1f8db7d7682305b1692293f71a61cc06637f0d8d8b6c8'
+    );
+    expect(res3).not.toEqual('0xc14cfe23f3fa7ce7b1f8db7d76');
+  });
+
   test('should transform merkle tree', () => {
     const tree = new MerkleTree(['0x1', '0x2', '0x3']);
     const [, merkleTreeHash] = encodeValue({}, 'merkletree', tree.leaves);
@@ -117,6 +134,20 @@ describe('typedData', () => {
     expect(merkleTreeHash).toMatchInlineSnapshot(
       `"0x15ac9e457789ef0c56e5d559809e7336a909c14ee2511503fa7af69be1ba639"`
     );
+  });
+
+  test('should check merkle tree type', () => {
+    const type = {
+      name: 'test',
+      type: 'merkletree',
+    };
+    expect(isMerkleTreeType(type)).toBe(true);
+
+    const type2 = {
+      name: 'test',
+      type: 'non-merkletree',
+    };
+    expect(isMerkleTreeType(type2)).toBe(false);
   });
 
   test('should transform merkle tree with custom types', () => {
