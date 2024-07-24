@@ -10,6 +10,7 @@ import {
   encode,
   eth,
   extractContractHashes,
+  getLedgerPathBuffer,
   hash,
   num,
   stark,
@@ -351,5 +352,18 @@ describe('Ethereum signer', () => {
         '0x008359e4b0152ed5a731162d3c7b0d8d56edb165'
       );
     });
+  });
+});
+
+describe('Ledger Signer', () => {
+  // signature of Ledger can't be tested automatically.
+  // So, just the test of the path encoding.
+  test('getLedgerPathBuffer', () => {
+    const path = getLedgerPathBuffer(3, 'AstroAPP');
+    expect(path).toEqual(
+      new Uint8Array([
+        128, 0, 10, 85, 71, 65, 233, 201, 95, 192, 123, 107, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0,
+      ])
+    );
   });
 });
