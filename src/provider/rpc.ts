@@ -1,7 +1,4 @@
-import { bytesToHex } from '@noble/curves/abstract/utils';
-import { keccak_256 } from '@noble/hashes/sha3';
 import type { SPEC } from 'starknet-types-07';
-
 import { RPC06, RPC07, RpcChannel } from '../channel';
 import {
   AccountInvocations,
@@ -34,13 +31,13 @@ import type { TransactionWithHash } from '../types/provider/spec';
 import assert from '../utils/assert';
 import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { isSierra } from '../utils/contract';
-import { addHexPrefix, removeHexPrefix } from '../utils/encode';
-import { hexToBytes, toHex } from '../utils/num';
+import { toHex } from '../utils/num';
 import { wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { GetTransactionReceiptResponse, ReceiptTx } from '../utils/transactionReceipt';
 import { LibraryError } from './errors';
 import { ProviderInterface } from './interface';
+import { solidityUint256PackedKeccak256 } from '../utils/hash';
 
 export class RpcProvider implements ProviderInterface {
   public responseParser: RPCResponseParser;
@@ -115,7 +112,7 @@ export class RpcProvider implements ProviderInterface {
 
   /**
    * Pause the execution of the script until a specified block is created.
-   * @param {BlockIdentifier} blockIdentifier bloc number (BigNumberisk) or 'pending' or 'latest'.
+   * @param {BlockIdentifier} blockIdentifier bloc number (BigNumberish) or 'pending' or 'latest'.
    * Use of 'latest" or of a block already created will generate no pause.
    * @param {number} [retryInterval] number of milliseconds between 2 requests to the node
    * @example
@@ -160,7 +157,7 @@ export class RpcProvider implements ProviderInterface {
       .then(this.responseParser.parseL1GasPriceResponse);
   }
 
-  public async getL1MessageHash(l2TxHash: BigNumberish) {
+  public async getL1MessageHash(l2TxHash: BigNumberish): Promise<string> {
     const transaction = (await this.channel.getTransactionByHash(l2TxHash)) as TransactionWithHash;
     assert(transaction.type === 'L1_HANDLER', 'This L2 transaction is not a L1 message.');
     const { calldata, contract_address, entry_point_selector, nonce } =
@@ -173,13 +170,7 @@ export class RpcProvider implements ProviderInterface {
       calldata.length - 1,
       ...calldata.slice(1),
     ];
-    const myEncode = addHexPrefix(
-      params.reduce(
-        (res: string, par: BigNumberish) => res + removeHexPrefix(toHex(par)).padStart(64, '0'),
-        ''
-      )
-    );
-    return addHexPrefix(bytesToHex(keccak_256(hexToBytes(myEncode))));
+    return solidityUint256PackedKeccak256(params);
   }
 
   public async getBlockWithReceipts(blockIdentifier?: BlockIdentifier) {
