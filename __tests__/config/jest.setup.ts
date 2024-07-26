@@ -18,31 +18,46 @@ const combiner: object[] = [];
 if (process.env.DEBUG === 'true') {
   register({
     request(url, config) {
-      const body = JSON.parse(config.body);
-      combiner.push({
-        request: {
-          url,
-          method: config.method,
-          body,
-        },
-      });
+      const randId = crypto.randomUUID();
+      if (config.body) {
+        const body = JSON.parse(config.body);
+        combiner.push({
+          request: {
+            matchId: randId,
+            url,
+            method: config.method,
+            body,
+          },
+        });
+
+        // match request and response when DEBUG, lib override headers instead of add
+        const headers = {
+          'Content-Type': 'application/json',
+          Accept: 'application/json',
+          'x-match-id': randId,
+        };
+        // eslint-disable-next-line no-param-reassign
+        config.headers = headers;
+      }
       return [url, config];
     },
 
     requestError(error) {
-      const match: any = combiner.find((it: any) => typeof it.result === 'undefined');
-      match.result = error;
-      console.log('[fetch.requestError]', match);
+      // unknown original request
+      console.log('[fetch.requestError]', error);
       return Promise.reject(error);
     },
 
     response(response) {
+      const requestId = response.request.headers.get('x-match-id');
       const cloned = response.clone();
       cloned.json().then((res) => {
         const { result } = res;
-        const match: any = combiner.find((it: any) => it.request.body.id === res.id);
+        const match: any = combiner.find((it: any) => it.request.matchId === requestId);
         if (match && 'request' in match) {
-          match.result = result;
+          if (result) match.result = result;
+          else match.response = res;
+
           console.log(util.inspect(match, false, null, true /* enable colors */));
         } else {
           console.log(result);
@@ -52,9 +67,8 @@ if (process.env.DEBUG === 'true') {
     },
 
     responseError(error) {
-      const match: any = combiner.find((it: any) => typeof it.result === 'undefined');
-      match.result = error;
-      console.log('[fetch.responseError]', match);
+      // unknown original request
+      console.log('[fetch.responseError]', error);
       return Promise.reject(error);
     },
   });
