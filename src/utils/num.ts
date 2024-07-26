@@ -1,8 +1,9 @@
 import { hexToBytes as hexToBytesNoble } from '@noble/curves/abstract/utils';
-
+import { sha256 } from '@noble/hashes/sha256';
 import { BigNumberish } from '../types';
 import assert from './assert';
-import { addHexPrefix, removeHexPrefix } from './encode';
+import { addHexPrefix, buf2hex, removeHexPrefix } from './encode';
+import { MASK_31 } from '../constants';
 
 /** @deprecated prefer importing from 'types' over 'num' */
 export type { BigNumberish };
@@ -375,4 +376,24 @@ export function isNumber(value: unknown): value is number {
  */
 export function isBoolean(value: unknown): value is boolean {
   return typeof value === 'boolean';
+}
+
+/**
+ * Calculate the sha256 hash of an utf8 string, then encode the
+ * result in an uint8Array of 4 elements.
+ * Useful in wallet path calculation.
+ * @param {string} str utf8 string (hex string not handled).
+ * @returns a uint8Array of 4 bytes.
+ * @example
+ * ```typescript
+ * const ledgerPathApplicationName = 'LedgerW';
+ * const path2Buffer = num.stringToSha256ToArrayBuff4(ledgerPathApplicationName);
+ * // path2Buffer = Uint8Array(4) [43, 206, 231, 219]
+ * ```
+ */
+export function stringToSha256ToArrayBuff4(str: string): Uint8Array {
+  // eslint-disable-next-line no-bitwise
+  const int31 = (n: bigint) => Number(n & MASK_31);
+  const result: number = int31(BigInt(addHexPrefix(buf2hex(sha256(str)))));
+  return hexToBytes(toHex(result));
 }

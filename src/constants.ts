@@ -16,6 +16,7 @@ export { ETransactionVersion as TRANSACTION_VERSION };
 
 export const ZERO = 0n;
 export const MASK_250 = 2n ** 250n - 1n; // 2 ** 250 - 1
+export const MASK_31 = 2n ** 31n - 1n; // 2 ** 31 - 1
 export const API_VERSION = ZERO;
 export const PRIME = 2n ** 251n + 17n * 2n ** 192n + 1n;
 

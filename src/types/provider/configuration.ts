@@ -18,4 +18,5 @@ export type RpcProviderOptions = {
     l1BoundMaxPricePerUnit: number;
     maxFee: number;
   };
+  batch?: false | number;
 };

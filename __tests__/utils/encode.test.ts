@@ -1,3 +1,4 @@
+import { encode } from '../../src';
 import { atobUniversal, btoaUniversal } from '../../src/utils/encode';
 
 describe('atobUniversal and btoaUniversal functions', () => {
@@ -30,5 +31,14 @@ describe('atobUniversal and btoaUniversal functions', () => {
     expect(encoded).toBe('');
     const decoded = atobUniversal(encoded);
     expect(decoded).toEqual(new Uint8Array([]));
+  });
+});
+
+describe('concatenateArrayBuffer', () => {
+  test('should concatenate uint8Arrays', () => {
+    const path0buff = new Uint8Array([128, 0, 10, 85]);
+    const path1buff = new Uint8Array([71, 65, 233, 201]);
+    const result = encode.concatenateArrayBuffer([path0buff, path1buff]);
+    expect(result).toEqual(new Uint8Array([128, 0, 10, 85, 71, 65, 233, 201]));
   });
 });
