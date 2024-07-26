@@ -292,3 +292,27 @@ export const pascalToSnake = (text: string) =>
         .join('_')
         .toUpperCase()
     : text;
+
+/**
+ * Combine multiple Uint8Arrays into one.
+ * Useful for wallet path creation.
+ * @param {Uint8Array[]} uint8arrays An array of Uint8Array.
+ * @returns {Uint8Array} all the Uint8Arrays joined.
+ * @example
+ * ```typescript
+ * const path0buff = new Uint8Array([128, 0, 10, 85]);
+ * const path1buff = new Uint8Array([71, 65, 233, 201]);
+ * const result = encode.concatenateArrayBuffer([path0buff, path1buff]);
+ * // result = Uint8Array(8) [128, 0, 10, 85, 71, 65, 233, 201]
+ * ```
+ */
+export function concatenateArrayBuffer(uint8arrays: Uint8Array[]): Uint8Array {
+  const totalLength = uint8arrays.reduce((total, uint8array) => total + uint8array.byteLength, 0);
+  const result = new Uint8Array(totalLength);
+  let offset = 0;
+  uint8arrays.forEach((uint8array) => {
+    result.set(uint8array, offset);
+    offset += uint8array.byteLength;
+  });
+  return result;
+}

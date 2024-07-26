@@ -18,6 +18,7 @@ import {
   isNumber,
   isBoolean,
 } from '../../src/utils/num';
+import { num } from '../../src';
 
 describe('isHex', () => {
   test('should return true for valid hex strings', () => {
@@ -206,5 +207,12 @@ describe('isBoolean', () => {
     expect(isBoolean(null)).toBe(false);
     expect(isBoolean([])).toBe(false);
     expect(isBoolean({})).toBe(false);
+  });
+});
+
+describe('stringToSha256ToArrayBuff4', () => {
+  test('should correctly hash&encode an utf8 string', () => {
+    const buff = num.stringToSha256ToArrayBuff4('LedgerW');
+    expect(buff).toEqual(new Uint8Array([43, 206, 231, 219]));
   });
 });
