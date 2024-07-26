@@ -2,7 +2,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 import { Account, Provider, ProviderInterface, RpcProvider, json } from '../../src';
-import { CompiledSierra, CompiledSierraCasm, LegacyCompiledContract } from '../../src/types';
+import {
+  CompiledSierra,
+  CompiledSierraCasm,
+  LegacyCompiledContract,
+  RpcProviderOptions,
+} from '../../src/types';
 import { ETransactionVersion } from '../../src/types/api';
 import { toHex } from '../../src/utils/num';
 import { wait } from '../../src/utils/provider';
@@ -72,12 +77,22 @@ export const compiledSidMulticallCasm = readContractSierraCasm('starknetId/multi
 export const compiledNonZero = readContractSierra('cairo/cairo263/zeroable.sierra');
 export const compiledNonZeroCasm = readContractSierraCasm('cairo/cairo263/zeroable');
 
-export function getTestProvider(isProvider?: true): ProviderInterface;
-export function getTestProvider(isProvider?: false): RpcProvider;
-export function getTestProvider(isProvider: boolean = true): ProviderInterface | RpcProvider {
+export function getTestProvider(
+  isProvider?: true,
+  setProviderOptions?: RpcProviderOptions
+): ProviderInterface;
+export function getTestProvider(
+  isProvider?: false,
+  setProviderOptions?: RpcProviderOptions
+): RpcProvider;
+export function getTestProvider(
+  isProvider: boolean = true,
+  setProviderOptions?: RpcProviderOptions
+): ProviderInterface | RpcProvider {
   const isDevnet = process.env.IS_DEVNET === 'true';
 
-  const providerOptions = {
+  const providerOptions: RpcProviderOptions = {
+    ...setProviderOptions,
     nodeUrl: process.env.TEST_RPC_URL,
     // accelerate the tests when running locally
     ...(isDevnet && { transactionRetryIntervalFallback: 1000 }),

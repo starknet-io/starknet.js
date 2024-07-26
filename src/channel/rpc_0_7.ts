@@ -18,6 +18,7 @@ import {
   waitForTransactionOptions,
 } from '../types';
 import { JRPC, RPCSPEC07 as RPC } from '../types/api';
+import { BatchClient } from '../utils/batch';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
 import { validateAndParseEthAddress } from '../utils/eth';
@@ -54,6 +55,8 @@ export class RpcChannel {
 
   readonly waitMode: Boolean; // behave like web2 rpc and return when tx is processed
 
+  private batchClient?: BatchClient;
+
   constructor(optionsOrProvider?: RpcProviderOptions) {
     const {
       nodeUrl,
@@ -64,6 +67,7 @@ export class RpcChannel {
       specVersion,
       waitMode,
       transactionRetryIntervalFallback,
+      batch,
     } = optionsOrProvider || {};
     if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
       this.nodeUrl = getDefaultNodeUrl(nodeUrl as NetworkName, optionsOrProvider?.default);
@@ -80,6 +84,14 @@ export class RpcChannel {
     this.waitMode = waitMode || false;
     this.requestId = 0;
     this.transactionRetryIntervalFallback = transactionRetryIntervalFallback;
+
+    if (typeof batch === 'number') {
+      this.batchClient = new BatchClient({
+        nodeUrl: this.nodeUrl,
+        headers: this.headers,
+        interval: batch,
+      });
+    }
   }
 
   private get transactionRetryIntervalDefault() {
@@ -125,6 +137,16 @@ export class RpcChannel {
     params?: RPC.Methods[T]['params']
   ): Promise<RPC.Methods[T]['result']> {
     try {
+      if (this.batchClient) {
+        const { error, result } = await this.batchClient.fetch(
+          method,
+          params,
+          (this.requestId += 1)
+        );
+        this.errorHandler(method, params, error);
+        return result as RPC.Methods[T]['result'];
+      }
+
       const rawResult = await this.fetch(method, params, (this.requestId += 1));
       const { error, result } = await rawResult.json();
       this.errorHandler(method, params, error);
