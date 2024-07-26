@@ -1,3 +1,18 @@
+# [6.12.0](https://github.com/starknet-io/starknet.js/compare/v6.11.1...v6.12.0) (2024-07-26)
+
+### Bug Fixes
+
+- jest debut fix api requests match using uid ([b1d10a1](https://github.com/starknet-io/starknet.js/commit/b1d10a13fd2308c927a072cd0c87115b294c26ae))
+- move BatchClient to utils ([f494902](https://github.com/starknet-io/starknet.js/commit/f49490206eaf396813b9662adefbce36ec219a12))
+- rpc batch type errors ([04ad50d](https://github.com/starknet-io/starknet.js/commit/04ad50d4a03a74595790cff235d4af26de5d4969))
+
+### Features
+
+- add L1->L2 hashes ([f8c1dac](https://github.com/starknet-io/starknet.js/commit/f8c1dacc164d487eeac014f932a395ca064e9545))
+- ledger Signer ([078c37d](https://github.com/starknet-io/starknet.js/commit/078c37df5687c2ee84ba9a8dfbc5d01153aeb066))
+- rpc batch remove delayedAction class ([01f48ef](https://github.com/starknet-io/starknet.js/commit/01f48ef2a85597afc53f3406ecd9a505b12da5b0))
+- rpc batch requests ([ce48afc](https://github.com/starknet-io/starknet.js/commit/ce48afc41396d39a89724bbdf2a005822d538725))
+
 # [7.0.0](https://github.com/starknet-io/starknet.js/compare/v6.11.0...v7.0.0) (2024-07-03)
 
 ### Bug Fixes
