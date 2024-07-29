@@ -1,4 +1,4 @@
-import Transport from '@ledgerhq/hw-transport';
+/* eslint no-underscore-dangle: ["error", { "allowAfterThis": true }] */
 import type {
   InvocationsSignerDetails,
   V2InvocationsSignerDetails,
@@ -31,11 +31,20 @@ import { hexToBytes, stringToSha256ToArrayBuff4, toHex } from '../utils/num';
 import { starkCurve } from '../utils/ec';
 import { ETransactionVersion3 } from '../types/api';
 
+// import type _Transport from '@ledgerhq/hw-transport';
+// NOTE: the preceding line was substituted because of the '@ledgerhq/hw-transport' module bug listed in
+// the following issue https://github.com/LedgerHQ/ledger-live/issues/7448
+// if required for development, the line can be uncommented and '@ledgerhq/hw-transport' temporarily added as a dev dependency
+type _Transport = any;
+
 /**
  * Signer for accounts using a Ledger Nano S+/X signature
  */
-export class LedgerSigner implements SignerInterface {
+export class LedgerSigner<Transport extends Record<any, any>> implements SignerInterface {
   readonly transporter: Transport;
+
+  // this is a hack to allow the '@ledgerhq/hw-transport' type to be used as a dev dependency but not exposed in the production build
+  private _transporter: _Transport;
 
   readonly accountID: number;
 
@@ -68,6 +77,7 @@ export class LedgerSigner implements SignerInterface {
     assert(accountID <= MASK_31, 'Ledger account ID shall be < 2**31.');
     assert(!!eip2645application, 'Ledger application name shall not be empty.');
     this.transporter = transport;
+    this._transporter = this.transporter as any;
     this.accountID = accountID;
     this.pubKey = '';
     this.fullPubKey = '';
@@ -105,7 +115,7 @@ export class LedgerSigner implements SignerInterface {
    */
   public async getAppVersion(): Promise<string> {
     if (!this.appVersion) {
-      const resp = await this.transporter.send(Number('0x5a'), 0, 0, 0);
+      const resp = await this._transporter.send(Number('0x5a'), 0, 0, 0);
       this.appVersion = `${resp[0]}.${resp[1]}.${resp[2]}`;
     }
     return this.appVersion;
@@ -210,13 +220,13 @@ export class LedgerSigner implements SignerInterface {
 
   private async signRaw(msgHash: string): Promise<Signature> {
     addHexPrefix(
-      buf2hex(await this.transporter.send(Number('0x5a'), 2, 0, 0, Buffer.from(this.pathBuffer)))
+      buf2hex(await this._transporter.send(Number('0x5a'), 2, 0, 0, Buffer.from(this.pathBuffer)))
     );
     // eslint-disable-next-line no-bitwise
     const shiftedHash = toHex(BigInt(msgHash) << 4n);
     const buff2 = hexToBytes(shiftedHash);
     const respSign2 = Uint8Array.from(
-      await this.transporter.send(Number('0x5a'), 2, 1, 0, Buffer.from(buff2))
+      await this._transporter.send(Number('0x5a'), 2, 1, 0, Buffer.from(buff2))
     );
     const r = BigInt(addHexPrefix(buf2hex(respSign2.subarray(1, 33))));
     const s = BigInt(addHexPrefix(buf2hex(respSign2.subarray(33, 65))));
@@ -229,7 +239,7 @@ export class LedgerSigner implements SignerInterface {
   private async getPublicKeys() {
     const pathBuff = this.pathBuffer;
     const respGetPublic = Uint8Array.from(
-      await this.transporter.send(Number('0x5a'), 1, 0, 0, Buffer.from(pathBuff))
+      await this._transporter.send(Number('0x5a'), 1, 0, 0, Buffer.from(pathBuff))
     );
     this.pubKey = addHexPrefix(buf2hex(respGetPublic.subarray(1, 33)));
     this.fullPubKey = addHexPrefix(buf2hex(respGetPublic.subarray(0, 65)));
