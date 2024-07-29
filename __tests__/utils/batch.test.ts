@@ -31,12 +31,9 @@ describe('Batch Client', () => {
   });
 
   test('batch request using Provider', async () => {
-    const myBatchProvider = getTestProvider(false, {
-      batch: 0,
-    });
+    const myBatchProvider = getTestProvider(false, { batch: 0 });
 
-    // eslint-disable-next-line @typescript-eslint/dot-notation
-    const sendBatchSpy = jest.spyOn(myBatchProvider.channel['batchClient'] as any, 'sendBatch');
+    const sendBatchSpy = jest.spyOn((myBatchProvider.channel as any).batchClient, 'sendBatch');
 
     await Promise.all([
       myBatchProvider.getBlock(),
