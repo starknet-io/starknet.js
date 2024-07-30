@@ -17,6 +17,7 @@ import {
   addPercent,
   isNumber,
   isBoolean,
+  toStorageKey,
 } from '../../src/utils/num';
 import { num } from '../../src';
 
@@ -214,5 +215,33 @@ describe('stringToSha256ToArrayBuff4', () => {
   test('should correctly hash&encode an utf8 string', () => {
     const buff = num.stringToSha256ToArrayBuff4('LedgerW');
     expect(buff).toEqual(new Uint8Array([43, 206, 231, 219]));
+  });
+});
+
+describe('toStorageKey', () => {
+  test('should convert number to 64-character hex string with prefix', () => {
+    expect(toStorageKey(12345)).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000003039'
+    );
+  });
+
+  test('should handle zero value', () => {
+    expect(toStorageKey(0)).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000000000'
+    );
+  });
+
+  test('should handle large numbers', () => {
+    expect(toStorageKey(1152921504606846976)).toBe(
+      '0x0000000000000000000000000000000000000000000000000000000000010000'
+    );
+  });
+
+  test('should handle edge case with a large negative number', () => {
+    expect(() => toStorageKey(-12345)).toThrow();
+  });
+
+  test('should handle non-numeric input gracefully', () => {
+    expect(() => toStorageKey('string')).toThrow();
   });
 });
