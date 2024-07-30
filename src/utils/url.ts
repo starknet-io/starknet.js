@@ -15,6 +15,8 @@ const localhostDomainRE = /^localhost[:?\d]*(?:[^:?\d]\S*)?$/;
 const nonLocalhostDomainRE = /^[^\s.]+\.\S{2,}$/;
 
 /**
+ * @deprecated
+ *
  * Loosely validate a URL `string`.
  *
  * @param {string} s - The URL to check for
@@ -55,6 +57,8 @@ export function isUrl(s?: string): boolean {
 }
 
 /**
+ * @deprecated
+ *
  * Builds a URL using the provided base URL, default path, and optional URL or path.
  *
  * @param {string} baseUrl - The base URL of the URL being built.
