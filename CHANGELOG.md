@@ -1,3 +1,10 @@
+## [6.12.1](https://github.com/starknet-io/starknet.js/compare/v6.12.0...v6.12.1) (2024-07-30)
+
+### Bug Fixes
+
+- deprecate url utility methods ([bbbf3d8](https://github.com/starknet-io/starknet.js/commit/bbbf3d8add56021b9609395ffff3d93ac084acb1))
+- remove ledger transport dependency ([91493bb](https://github.com/starknet-io/starknet.js/commit/91493bb73762f0eb2c4605352c73d35645194593))
+
 # [6.12.0](https://github.com/starknet-io/starknet.js/compare/v6.11.1...v6.12.0) (2024-07-26)
 
 ### Bug Fixes
