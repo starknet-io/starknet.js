@@ -2,7 +2,7 @@
   "name": "starknet",
   "version": "6.12.1",
   "description": "JavaScript library for Starknet",
-  "main": "dist/index.js",
+  "main": "dist/index.cjs",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
   "jsdelivr": "dist/index.global.js",
@@ -10,7 +10,7 @@
   "exports": {
     ".": {
       "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
+      "require": "./dist/index.cjs",
       "types": "./dist/index.d.ts",
       "browser": "./dist/index.global.js"
     }
@@ -21,10 +21,8 @@
   ],
   "scripts": {
     "prepare": "npm run build && husky",
-    "build": "tsup && npm run build:esm && npm run build:iife && npm run build:dts",
-    "build:esm": "tsup --clean false --format esm --platform node",
-    "build:iife": "tsup --clean false --format iife --platform browser",
-    "build:dts": "tsup --clean false --dts-only",
+    "build": "unbuild && npm run build:iife",
+    "build:iife": "tsup --format iife --platform browser",
     "pretest": "npm run lint && npm run ts:check",
     "test": "jest -i",
     "test:coverage": "jest -i --coverage",
@@ -92,7 +90,8 @@
     "type-coverage": "^2.28.2",
     "typedoc": "~0.26.0",
     "typescript": "~5.4.0",
-    "typescript-coverage-report": "npm:@penovicp/typescript-coverage-report@^1.0.0-beta.2"
+    "typescript-coverage-report": "npm:@penovicp/typescript-coverage-report@^1.0.0-beta.2",
+    "unbuild": "2.0.0"
   },
   "dependencies": {
     "@noble/curves": "~1.4.0",
