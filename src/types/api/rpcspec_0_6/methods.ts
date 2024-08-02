@@ -39,8 +39,6 @@ import {
   TransactionWithHash,
 } from './nonspec';
 
-export type Methods = ReadMethods & WriteMethods & TraceMethods;
-
 type ReadMethods = {
   // Returns the version of the Starknet JSON-RPC specification being used
   starknet_specVersion: {
@@ -328,3 +326,5 @@ type TraceMethods = {
     errors: Errors.BLOCK_NOT_FOUND | Errors.TRANSACTION_EXECUTION_ERROR;
   };
 };
+
+export type Methods = ReadMethods & WriteMethods & TraceMethods;
