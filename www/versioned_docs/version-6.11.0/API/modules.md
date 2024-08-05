@@ -1126,7 +1126,7 @@ Re-exports [UINT_256_MAX](namespaces/uint256.md#uint_256_max)
 
 ### TypedContractV2
 
-Ƭ **TypedContractV2**<`TAbi`\>: `AbiWanTypedContract`<`TAbi`\> & [`Contract`](classes/Contract.md)
+Ƭ **TypedContractV2**\<`TAbi`\>: `AbiWanTypedContract`\<`TAbi`\> & [`Contract`](classes/Contract.md)
 
 #### Type parameters
 
@@ -1388,7 +1388,7 @@ Format a hex number to '0x' and 64 characters, adding leading zeros if necessary
 
 `string`
 
-Hex string : 0x followed by 64 characters. No upper case characters in the response.
+Hex string: 0x followed by 64 characters. No upper case characters in the response.
 
 **`Example`**
 
@@ -1408,7 +1408,7 @@ const result = addAddressPadding(address);
 
 ▸ **validateAndParseAddress**(`address`): `string`
 
-Check the validity of a Starknet address, and format it as a hex number : '0x' and 64 characters, adding leading zeros if necessary.
+Check the validity of a Starknet address, and format it as a hex number: '0x' and 64 characters, adding leading zeros if necessary.
 
 #### Parameters
 
@@ -1420,7 +1420,7 @@ Check the validity of a Starknet address, and format it as a hex number : '0x' a
 
 `string`
 
-Hex string : 0x followed by 64 characters. No upper case characters in the response.
+Hex string: 0x followed by 64 characters. No upper case characters in the response.
 
 **`Throws`**
 
@@ -1457,7 +1457,7 @@ a given address to reduce the risk of errors introduced from typing an address o
 
 `string`
 
-Hex string : 0x followed by 64 characters. Mix of uppercase and lowercase
+Hex string: 0x followed by 64 characters. Mix of uppercase and lowercase
 
 **`Example`**
 
@@ -1583,7 +1583,7 @@ Parse one field of the calldata by using input field from the abi for that metho
 
 | Name | Type | Description |
 | :------ | :------ | :------ |
-| `argsIterator` | `Iterator`<`any`, `any`, `undefined`\> | Iterator for value of the field |
+| `argsIterator` | `Iterator`\<`any`, `any`, `undefined`\> | Iterator for value of the field |
 | `input` | [`AbiEntry`](namespaces/types.md#abientry) | input(field) information from the abi that will be used to parse the data |
 | `structs` | [`AbiStructs`](namespaces/types.md#abistructs) | structs from abi |
 | `enums` | [`AbiEnums`](namespaces/types.md#abienums) | enums from abi |

@@ -40,10 +40,9 @@ export function encodeResourceBoundsL1(bounds: ResourceBoundsBN): bigint {
 
 /**
  * Encode the L2 bound of a V3 transaction
- * @param {ResourceBounds} bounds 
- * {l1_gas: {max_amount: u64, max_price_per_unit: u128},
- *  l2_gas: {max_amount: u64, max_price_per_unit: u128}}
-}
+ * @param {ResourceBounds} bounds
+ * `{l1_gas: {max_amount: u64, max_price_per_unit: u128},
+ *   l2_gas: {max_amount: u64, max_price_per_unit: u128}}`
  * @returns {bigint} encoded data
  */
 export function encodeResourceBoundsL2(bounds: ResourceBoundsBN): bigint {

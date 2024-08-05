@@ -61,7 +61,7 @@ const call1: Call = {
 };
 ```
 
-Then, you have to initialize some parameters :
+Then, you have to initialize some parameters:
 
 - The `caller` is the address of the account that will execute the outside transaction.
 - The transaction can be executed in a time frame that is defined in `execute_after` and `execute_before`, using Unix timestamp.
@@ -122,7 +122,7 @@ const outsideTransaction1: OutsideTransaction = await signerAccount.getOutsideTr
 
 ### Process the Outside Execution
 
-Finally, if you are in the time frame, you can perform the Outside Execution, using the executor Account :
+Finally, if you are in the time frame, you can perform the Outside Execution, using the executor Account:
 
 ```typescript
 const executorAccount = new Account(provider, executorAddress, executorPrivateKey);
@@ -240,7 +240,7 @@ const res0 = await executorAccount.executeFromOutside(outsideTransaction2);
 await myProvider.waitForTransaction(res0.transaction_hash);
 ```
 
-The balances are now :
+The balances are now:
 
 |                 account | ETH balance |
 | ----------------------: | ----------- |
@@ -257,7 +257,7 @@ const res1 = await executorAccount.executeFromOutside([outsideTransaction1, outs
 await myProvider.waitForTransaction(res1.transaction_hash);
 ```
 
-The balances are finally :
+The balances are finally:
 
 |                 account | ETH balance |
 | ----------------------: | ----------- |

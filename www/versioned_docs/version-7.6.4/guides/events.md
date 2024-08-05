@@ -168,7 +168,7 @@ Hereunder a code to read all the chunks of a request:
 ```typescript
 const keyFilter = [num.toHex(hash.starknetKeccak('EventPanic')), '0x8'];
 let block = await provider.getBlock('latest');
-console.log('bloc #', block.block_number);
+console.log('block #', block.block_number);
 
 let continuationToken: string | undefined = '0';
 let chunkNum: number = 1;

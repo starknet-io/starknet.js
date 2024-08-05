@@ -143,11 +143,11 @@ RpcProviderOptions.waitMode
 
 ### baseFetch
 
-• `Optional` **baseFetch**: (`input`: `RequestInfo` \| `URL`, `init?`: `RequestInit`) => `Promise`<`Response`\>
+• `Optional` **baseFetch**: (`input`: `RequestInfo` \| `URL`, `init?`: `RequestInit`) => `Promise`\<`Response`\>
 
 #### Type declaration
 
-▸ (`input`, `init?`): `Promise`<`Response`\>
+▸ (`input`, `init?`): `Promise`\<`Response`\>
 
 ##### Parameters
 
@@ -158,7 +158,7 @@ RpcProviderOptions.waitMode
 
 ##### Returns
 
-`Promise`<`Response`\>
+`Promise`\<`Response`\>
 
 #### Inherited from
 

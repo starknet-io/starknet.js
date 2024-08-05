@@ -55,7 +55,7 @@ export class CairoUint256 {
   }
 
   /**
-   * Validate if BigNumberish can be represented as Unit256
+   * Validate if BigNumberish can be represented as Uint256
    */
   static validate(bigNumberish: BigNumberish | unknown) {
     assert(bigNumberish !== null, 'null value is not allowed for u256');
@@ -72,7 +72,7 @@ export class CairoUint256 {
   }
 
   /**
-   * Validate if low and high can be represented as Unit256
+   * Validate if low and high can be represented as Uint256
    */
   static validateProps(low: BigNumberish, high: BigNumberish) {
     const bigIntLow = BigInt(low);
@@ -89,7 +89,7 @@ export class CairoUint256 {
   }
 
   /**
-   * Check if BigNumberish can be represented as Unit256
+   * Check if BigNumberish can be represented as Uint256
    */
   static is(bigNumberish: BigNumberish | unknown) {
     try {
@@ -122,7 +122,7 @@ export class CairoUint256 {
 
   /**
    * Return Uint256 structure with HexString props
-   * {low: HexString, high: HexString}
+   * `{low: HexString, high: HexString}`
    */
   toUint256HexString() {
     return {
@@ -133,7 +133,7 @@ export class CairoUint256 {
 
   /**
    * Return Uint256 structure with DecimalString props
-   * {low: DecString, high: DecString}
+   * `{low: DecString, high: DecString}`
    */
   toUint256DecimalString() {
     return {

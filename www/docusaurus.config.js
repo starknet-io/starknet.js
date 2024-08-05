@@ -1,8 +1,8 @@
 // @ts-check
 // Note: type annotations allow type checking and IDEs autocompletion
 
-const lightCodeTheme = require('prism-react-renderer/themes/github');
-const darkCodeTheme = require('prism-react-renderer/themes/dracula');
+const lightCodeTheme = require('prism-react-renderer').themes.github;
+const darkCodeTheme = require('prism-react-renderer').themes.dracula;
 
 const generateBaseUrl = (baseUrl = '') => `/${baseUrl.trim()}/`.replace(/\/+/g, '/');
 
@@ -15,6 +15,56 @@ const generateSourceLinkTemplate = (gitRevision) =>
 // const migrationGuideLink = `${generateBaseUrl(process.env.DOCS_BASE_URL)}docs/guides/migrate`;
 const migrationGuideLink = `${generateBaseUrl(process.env.DOCS_BASE_URL)}docs/next/guides/migrate`;
 
+/**
+ * overrides the auto-generated left sidebar content to more closely align with the previous version
+ *
+ * @param {import('@docusaurus/plugin-content-docs/src/sidebars/types.js').SidebarItemsGeneratorArgs} args
+ * @param {import('@docusaurus/plugin-content-docs/src/sidebars/types.js').NormalizedSidebar} items
+ */
+function injectTypeDocSidebar(args, items) {
+  if (args.version.versionName !== 'current') return items;
+
+  return items.toReversed().map((item) => {
+    if (
+      item.type === 'category' && //
+      item.link?.type === 'doc' &&
+      item.link?.id === 'API/index'
+    ) {
+      item.label = 'API';
+
+      const groupedItems = item.items.reduce((grouped, entry) => {
+        if (entry.type === 'doc') {
+          entry.label = 'exports';
+          grouped['globals'] = entry;
+        } else if (entry.type === 'category') {
+          // collapse 'starknet.namespaces' into 'namespaces'
+          // TODO: investigate if this can be avoided through configuration
+          if (entry.label === 'starknet') {
+            // grouped['namespaces'] = entry.items[0];
+            grouped['namespaces'] = entry;
+          } else {
+            grouped[entry.label] = entry;
+          }
+        } else {
+          throw Error('Expected sidebar data structure has changed');
+        }
+        return grouped;
+      }, {});
+      const order = [
+        'globals', //
+        'namespaces',
+        // 'enumerations',
+        'classes',
+        'interfaces',
+      ];
+      if (order.length !== item.items.length)
+        throw Error('Expected sidebar data structure has changed');
+      item.items = order.map((x) => groupedItems[x]);
+    }
+    return item;
+  });
+}
+
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Starknet.js',
@@ -26,6 +76,10 @@ const config = {
   favicon: 'img/favicon.ico',
   organizationName: 'starknet-io', // Usually your GitHub org/user name.
   projectName: 'starknet.js', // Usually your repo name.
+  markdown: {
+    format: 'detect',
+  },
+
   presets: [
     [
       'classic',
@@ -33,6 +87,11 @@ const config = {
       ({
         theme: {
           customCss: require.resolve('./src/css/custom.css'),
+        },
+        docs: {
+          async sidebarItemsGenerator({ defaultSidebarItemsGenerator, ...args }) {
+            return injectTypeDocSidebar(args, await defaultSidebarItemsGenerator(args));
+          },
         },
       }),
     ],
@@ -164,13 +223,13 @@ const config = {
   plugins: [
     [
       'docusaurus-plugin-typedoc',
-      {
+      /** @type {Partial<import('typedoc', { with: { 'resolution-mode': 'import' } }).TypeDocOptions & import('docusaurus-plugin-typedoc',  { with: { 'resolution-mode': 'import' } }).PluginOptions>} */
+      ({
         entryPoints: ['../src/index.ts'],
         tsconfig: '../tsconfig.json',
-        out: 'API',
-        name: 'Starknet.js API',
+        out: 'docs/API',
+        cleanOutputDir: false,
         includeVersion: true,
-        includeExtension: true,
         sourceLinkTemplate: generateSourceLinkTemplate(
           process.env.GIT_REVISION_OVERRIDE || 'develop'
         ),
@@ -179,33 +238,17 @@ const config = {
           private: false,
         },
         sort: ['kind'],
-        kindSortOrder: [
-          'Reference',
-          'Project',
-          'Module',
-          'Class',
-          'Namespace',
-          'Enum',
-          'EnumMember',
-          'Interface',
-          'TypeAlias',
-          'Constructor',
-          'Property',
-          'Variable',
-          'Function',
-          'Accessor',
-          'Method',
-          'Parameter',
-          'TypeParameter',
-          'TypeLiteral',
-          'CallSignature',
-          'ConstructorSignature',
-          'IndexSignature',
-          'GetSignature',
-          'SetSignature',
-        ],
+        sidebar: {
+          autoConfiguration: true,
+          pretty: true,
+        },
         readme: './ApiTitle.md',
-      },
+        parametersFormat: 'table',
+        interfacePropertiesFormat: 'table',
+        enumMembersFormat: 'table',
+        typeDeclarationFormat: 'table',
+        membersWithOwnFile: ['Class', 'Enum', 'Interface'],
+      }),
     ],
   ],
 };

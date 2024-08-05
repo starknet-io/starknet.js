@@ -1,5 +1,5 @@
 ---
-sidebar_position: 13
+sidebar_position: 12
 ---
 
 # Events
@@ -82,10 +82,6 @@ The first parameter in the `keys` array is a hash of the name of the event, calc
 const nameHash = num.toHex(hash.starknetKeccak('EventPanic'));
 ```
 
-:::info
-In some cases (when an event is coded in a Cairo component, without the `#[flat]` flag), this hash is handled in several numbers.
-:::
-
 The second parameter is the `errorType` variable content (stored in keys array because of the `#[key]` flag in the Cairo code).
 
 The `data` array contains the `errorDescription` variable content (`'0x4d6567612050616e69632e'` corresponds to the encoded value of "Mega Panic.")
@@ -121,7 +117,7 @@ Easier to read and process, isn't it?
 
 If you don't have the transaction Hash of the contract execution that created the event, it will be necessary to search inside the blocks of the Starknet blockchain.
 
-In this example, if you want to read the events recorded in the last 10 blocks, you need to use a method available from an RPC node. The class `RpcProvider` is available for this case:
+In this example, if you want to read the events recorded in the last 10 blocks, you need to use a method available only from an RPC node. The class `RpcProvider` is available for this case:
 
 ```typescript
 import { RpcProvider } from 'starknet';
@@ -132,17 +128,19 @@ const eventsList = await myProvider.getEvents({
   address: myContractAddress,
   from_block: { block_number: lastBlock.block_number - 9 },
   to_block: { block_number: lastBlock.block_number },
-  keys: keyFilter,
+  keys: [keyFilter],
   chunk_size: 10,
 });
 ```
 
 :::info
 `address, from_block, to_block, keys` are all optional parameters.
+
 :::
 
 :::tip
 If you don't want to filter by key, you can either remove the `keys` parameter, or affect it this way: `[[]]` .
+
 :::
 
 :::warning CAUTION
@@ -168,7 +166,7 @@ Hereunder a code to read all the chunks of a request:
 ```typescript
 const keyFilter = [num.toHex(hash.starknetKeccak('EventPanic')), '0x8'];
 let block = await myProvider.getBlock('latest');
-console.log('bloc #', block.block_number);
+console.log('block #', block.block_number);
 
 let continuationToken: string | undefined = '0';
 let chunkNum: number = 1;
@@ -183,7 +181,7 @@ while (continuationToken) {
     address: myContractAddress,
     keys: [keyFilter],
     chunk_size: 5,
-    continuation_token: continuationToken === '0' ? undefined : continuationToken,
+    continuation_token: continuationToken,
   });
   const nbEvents = eventsRes.events.length;
   continuationToken = eventsRes.continuation_token;
@@ -206,7 +204,7 @@ while (continuationToken) {
 }
 ```
 
-If you want to parse an array of events of the same contract (abi of the contract available):
+If you want to parse an array of events of the same contract (with the ABI of the contract available):
 
 ```typescript
 const abiEvents = events.getAbiEvents(abi);

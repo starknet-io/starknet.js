@@ -227,7 +227,7 @@ It's not mandatory to create manually an object conform to the Cairo 0 named tup
 
 ### Ethereum public key
 
-If your ABI is requesting this type: `core::starknet::secp256k1::Secp256k1Point`, it means that you have probably to send an Ethereum full public key. Example:
+If your ABI is requesting this type: `core::starknet::secp256k1::Secp256k1Point`, it probably means that you have to send an Ethereum full public key. Example:
 
 ```json
 {
@@ -293,7 +293,7 @@ Do not add the `array_len` parameter before your array. Starknet.js will manage 
 
 ### Fixed array
 
-Starknet type `[type_array; n]` is waiting for an array of `n` items of type `type_array`, without initial length parameter : item1, item2, ...  
+Starknet type `[type_array; n]` is waiting for an array of `n` items of type `type_array`, without initial length parameter: item1, item2, ...  
 You can send it to Starknet.js the same way than arrays & spans: bigNumberish[].
 
 ```typescript
@@ -560,22 +560,22 @@ const amount = res.amount;
 const amount = myContract.call(...);
 ```
 
-| Type in Cairo 1                                                | Cairo 1 code                              | Type expected in JS/TS                        | JS/TS function to recover data                                                                                                                                       |
-| -------------------------------------------------------------- | ----------------------------------------- | --------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| u8, u16, u32, usize, u64, u96, u128, felt252, address          | `func get_v()->u128`                      | bigint                                        | `const res: bigint = myContract.call(...`                                                                                                                            |
-|                                                                |                                           | string representing an hex number             | `const res=myContract.call(...`<br /> `const address: string = num.toHex(res);`                                                                                      |
-| u8, u16, u32, usize                                            | `func get_v() -> u16`                     | number (53 bits max)                          | `const res=myContract.call(...`<br /> `const total: number = Number(res)`                                                                                            |
-| u256 (255 bits max)                                            | `func get_v() -> u256`                    | bigint                                        | `const res: bigint = myContract.call(...`                                                                                                                            |
-| u512 (512 bits max)                                            | `func get_v() -> u512`                    | bigint                                        | `const res: bigint = myContract.call(...`                                                                                                                            |
-| array of u8, u16, u32, usize, u64, u96, u128, felt252, address | `func get_v() -> Array<u64>`              | bigint[]                                      | `const res: bigint[] = myContract.call(...`                                                                                                                          |
-| fixed array of single type items                               | `func get_v() -> [core::integer::u32; 8]` | bigint[]                                      | `const res = (await myContract.call(...)) as bigint[]`                                                                                                               |
-| bytes31 (31 ASCII characters max)                              | `func get_v() -> bytes31`                 | string                                        | `const res: string = myContract.call(...`                                                                                                                            |
-| felt252 (31 ASCII characters max)                              | `func get_v() -> felt252`                 | string                                        | `const res = myContract.call(...`<br /> `const title:string = shortString.decodeShortstring(res);`                                                                   |
-| longString                                                     | `func get_v() -> Array<felt252>`          | string                                        | `const res=myContract.call(...`<br /> `const longString = res.map( (shortStr: bigint) => { return shortString.decodeShortString( num.toHex( shortStr)) }).join("");` |
-| ByteArray                                                      | `func get_v() -> ByteArray`               | string                                        | `const res: string = myContract.call(...`                                                                                                                            |
-| Tuple                                                          | `func get_v() -> (felt252, u8)`           | Object {"0": bigint, "1": bigint}             | `const res = myContract.call(...` <br /> `const res0: bigint = res["0"];` <br /> `const results: bigint[] = Object.values(res)`                                      |
-| Struct                                                         | ` func get_v() -> MyStruct`               | MyStruct = { account: bigint, amount: bigint} | `const res: MyStruct = myContract.call(...`                                                                                                                          |
-| complex array                                                  | `func get_v() -> Array<fMyStruct>`        | MyStruct[]                                    | `const res: MyStruct[] = myContract.call(...`                                                                                                                        |
+| Type in Cairo 1                                                | Cairo 1 code                              | Type expected in JS/TS                          | JS/TS function to recover data                                                                                                                                       |
+| -------------------------------------------------------------- | ----------------------------------------- | ----------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| u8, u16, u32, usize, u64, u96, u128, felt252, address          | `func get_v()->u128`                      | `bigint`                                        | `const res: bigint = myContract.call(...`                                                                                                                            |
+|                                                                |                                           | `string representing a hex number`              | `const res=myContract.call(...`<br /> `const address: string = num.toHex(res);`                                                                                      |
+| u8, u16, u32, usize                                            | `func get_v() -> u16`                     | `number (53 bits max)`                          | `const res=myContract.call(...`<br /> `const total: number = Number(res)`                                                                                            |
+| u256 (255 bits max)                                            | `func get_v() -> u256`                    | `bigint`                                        | `const res: bigint = myContract.call(...`                                                                                                                            |
+| u512 (512 bits max)                                            | `func get_v() -> u512`                    | `bigint`                                        | `const res: bigint = myContract.call(...`                                                                                                                            |
+| array of u8, u16, u32, usize, u64, u96, u128, felt252, address | `func get_v() -> Array<u64>`              | `bigint[]`                                      | `const res: bigint[] = myContract.call(...`                                                                                                                          |
+| fixed array of single type items                               | `func get_v() -> [core::integer::u32; 8]` | `bigint[]`                                      | `const res = (await myContract.call(...)) as bigint[]`                                                                                                               |
+| bytes31 (31 ASCII characters max)                              | `func get_v() -> bytes31`                 | `string`                                        | `const res: string = myContract.call(...`                                                                                                                            |
+| felt252 (31 ASCII characters max)                              | `func get_v() -> felt252`                 | `string`                                        | `const res = myContract.call(...`<br /> `const title:string = shortString.decodeShortstring(res);`                                                                   |
+| longString                                                     | `func get_v() -> Array<felt252>`          | `string`                                        | `const res=myContract.call(...`<br /> `const longString = res.map( (shortStr: bigint) => { return shortString.decodeShortString( num.toHex( shortStr)) }).join("");` |
+| ByteArray                                                      | `func get_v() -> ByteArray`               | `string`                                        | `const res: string = myContract.call(...`                                                                                                                            |
+| Tuple                                                          | `func get_v() -> (felt252, u8)`           | `Object {"0": bigint, "1": bigint}`             | `const res = myContract.call(...` <br /> `const res0: bigint = res["0"];` <br /> `const results: bigint[] = Object.values(res)`                                      |
+| Struct                                                         | `func get_v() -> MyStruct`                | `MyStruct = { account: bigint, amount: bigint}` | `const res: MyStruct = myContract.call(...`                                                                                                                          |
+| complex array                                                  | `func get_v() -> Array<fMyStruct>`        | `MyStruct[]`                                    | `const res: MyStruct[] = myContract.call(...`                                                                                                                        |
 
 If you don't know if your Contract object is interacting with a Cairo 0 or a Cairo 1 contract, you have these methods:
 
@@ -638,10 +638,10 @@ The result will be an object, with 2 strings:
 
 ## Tool to learn how to encode/decode
 
-A DAPP has been created to learn how to encode/decode with Starknet.js : **Startnet-encode-decode**.  
+A DAPP has been created to learn how to encode/decode with Starknet.js: **Startnet-encode-decode**.  
 It's also a convenient tool for the exploration of any contract ABI.
 ![](./pictures/encodeFn2.png)
 
-Follow these links :  
-DAPP : https://starknet-encode-decode.vercel.app/  
-Tuto : https://github.com/PhilippeR26/starknet-encode-decode/blob/main/tuto.md
+Follow these links:  
+DAPP: https://starknet-encode-decode.vercel.app/  
+Tuto: https://github.com/PhilippeR26/starknet-encode-decode/blob/main/tuto.md

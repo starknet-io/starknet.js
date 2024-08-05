@@ -56,7 +56,7 @@ export class LedgerSigner221<Transport extends Record<any, any> = any>
    * @param {LedgerPathCalculation} [pathFunction=getLedgerPathBuffer221]
    * defines the function that will calculate the path. By default `getLedgerPathBuffer221` is selected.
    *
-   * If you are using APP v2.2.1 with an account created with the v1.1.1, you need to use :
+   * If you are using APP v2.2.1 with an account created with the v1.1.1, you need to use:
    * ```typescript
    * const myLedgerSigner = new LedgerSigner211(myNodeTransport, 0, undefined, getLedgerPathBuffer111);
    * ```

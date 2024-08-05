@@ -51,7 +51,7 @@ const msgHash1 = hash.computeHashOnElements(message);
 const isValid1 = typedData.verifyMessage(msgHash1, signature, fullPublicKey);
 console.log('Result (boolean) =', isValid1);
 
-// with a low level function (take care of Types limitations) :
+// with a low level function (take care of Types limitations):
 const isValid2 = ec.starkCurve.verify(signature1, msgHash, fullPublicKey);
 ```
 
@@ -167,7 +167,7 @@ A verification is also possible if you have the message hash, the signature and 
 ```typescript
 const isValid2 = typedData.verifyMessage(msgHash, signature, fullPublicKey);
 
-// with a low level function (take care of Types limitations) :
+// with a low level function (take care of Types limitations):
 const isValid3 = ec.starkCurve.verify(signature, msgHash, fullPublicKey);
 ```
 
@@ -211,10 +211,10 @@ console.log('signature message =', sig0);
 Starknet.js has a support for Ledger Nano S+ or X, to sign your Starknet transactions.
 You have to use a transporter to interact with the Ledger Nano. Depending if you use an USB or a Bluetooth connection, depending on your framework (Node, Web, Mobile), you have to use the appropriate library to create your transporter.
 
-The Ledger documentation lists all the available cases :
+The Ledger documentation lists all the available cases:
 ![](./pictures/LedgerConnectivity.png)
 
-The libs available are :
+The libs available are:
 
 ```typescript
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid';
