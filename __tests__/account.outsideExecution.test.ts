@@ -334,7 +334,7 @@ describe('Account and OutsideExecution', () => {
         calldata: [getDecimalString(recipientAccount.address), '300', '0'],
       },
     ]);
-    // get outside transaction of a multiCall :
+    // get outside transaction of a multiCall:
     const outsideTransaction2: OutsideTransaction = await signerAccount.getOutsideTransaction(
       callOptions,
       [call1, call2]

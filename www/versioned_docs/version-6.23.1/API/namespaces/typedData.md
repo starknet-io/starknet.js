@@ -146,13 +146,13 @@ in the resulting array.
 
 #### Parameters
 
-| Name            | Type                                                                                    | Default value     | Description                                    |
-| :-------------- | :-------------------------------------------------------------------------------------- | :---------------- | :--------------------------------------------- |
-| `types`         | `Record`<`string`, [`StarknetType`](types.RPC.RPCSPEC07.WALLET_API.md#starknettype)[]\> | `undefined`       | The types object containing all defined types. |
-| `type`          | `string`                                                                                | `undefined`       | The name of the type to get dependencies for.  |
-| `dependencies?` | `string`[]                                                                              | `[]`              | The array to store dependencies.               |
-| `contains?`     | `string`                                                                                | `''`              | The type contained within the struct.          |
-| `revision?`     | [`TypedDataRevision`](types.RPC.RPCSPEC07.WALLET_API.md#typeddatarevision-1)            | `Revision.LEGACY` | The revision of the TypedData.                 |
+| Name            | Type                                                                                     | Default value     | Description                                    |
+| :-------------- | :--------------------------------------------------------------------------------------- | :---------------- | :--------------------------------------------- |
+| `types`         | `Record`\<`string`, [`StarknetType`](types.RPC.RPCSPEC07.WALLET_API.md#starknettype)[]\> | `undefined`       | The types object containing all defined types. |
+| `type`          | `string`                                                                                 | `undefined`       | The name of the type to get dependencies for.  |
+| `dependencies?` | `string`[]                                                                               | `[]`              | The array to store dependencies.               |
+| `contains?`     | `string`                                                                                 | `''`              | The type contained within the struct.          |
+| `revision?`     | [`TypedDataRevision`](types.RPC.RPCSPEC07.WALLET_API.md#typeddatarevision-1)             | `Revision.LEGACY` | The revision of the TypedData.                 |
 
 #### Returns
 
@@ -174,11 +174,11 @@ Encode a type to a string. All dependent types are alphabetically sorted.
 
 #### Parameters
 
-| Name        | Type                                                                                    | Default value     | Description                                    |
-| :---------- | :-------------------------------------------------------------------------------------- | :---------------- | :--------------------------------------------- |
-| `types`     | `Record`<`string`, [`StarknetType`](types.RPC.RPCSPEC07.WALLET_API.md#starknettype)[]\> | `undefined`       | The types object containing all defined types. |
-| `type`      | `string`                                                                                | `undefined`       | The name of the type to encode.                |
-| `revision?` | [`TypedDataRevision`](types.RPC.RPCSPEC07.WALLET_API.md#typeddatarevision-1)            | `Revision.LEGACY` | The revision of the TypedData.                 |
+| Name        | Type                                                                                     | Default value     | Description                                    |
+| :---------- | :--------------------------------------------------------------------------------------- | :---------------- | :--------------------------------------------- |
+| `types`     | `Record`\<`string`, [`StarknetType`](types.RPC.RPCSPEC07.WALLET_API.md#starknettype)[]\> | `undefined`       | The types object containing all defined types. |
+| `type`      | `string`                                                                                 | `undefined`       | The name of the type to encode.                |
+| `revision?` | [`TypedDataRevision`](types.RPC.RPCSPEC07.WALLET_API.md#typeddatarevision-1)             | `Revision.LEGACY` | The revision of the TypedData.                 |
 
 #### Returns
 
@@ -209,11 +209,11 @@ Get a type string as hash.
 
 #### Parameters
 
-| Name        | Type                                                                                    | Default value     | Description                                    |
-| :---------- | :-------------------------------------------------------------------------------------- | :---------------- | :--------------------------------------------- |
-| `types`     | `Record`<`string`, [`StarknetType`](types.RPC.RPCSPEC07.WALLET_API.md#starknettype)[]\> | `undefined`       | The types object containing all defined types. |
-| `type`      | `string`                                                                                | `undefined`       | The name of the type to hash.                  |
-| `revision?` | [`TypedDataRevision`](types.RPC.RPCSPEC07.WALLET_API.md#typeddatarevision-1)            | `Revision.LEGACY` | The revision of the TypedData.                 |
+| Name        | Type                                                                                     | Default value     | Description                                    |
+| :---------- | :--------------------------------------------------------------------------------------- | :---------------- | :--------------------------------------------- |
+| `types`     | `Record`\<`string`, [`StarknetType`](types.RPC.RPCSPEC07.WALLET_API.md#starknettype)[]\> | `undefined`       | The types object containing all defined types. |
+| `type`      | `string`                                                                                 | `undefined`       | The name of the type to hash.                  |
+| `revision?` | [`TypedDataRevision`](types.RPC.RPCSPEC07.WALLET_API.md#typeddatarevision-1)             | `Revision.LEGACY` | The revision of the TypedData.                 |
 
 #### Returns
 
@@ -245,13 +245,13 @@ an array of ABI compatible types, and an array of corresponding values.
 
 #### Parameters
 
-| Name        | Type                                                                                    | Default value     | Description                                    |
-| :---------- | :-------------------------------------------------------------------------------------- | :---------------- | :--------------------------------------------- |
-| `types`     | `Record`<`string`, [`StarknetType`](types.RPC.RPCSPEC07.WALLET_API.md#starknettype)[]\> | `undefined`       | The types object containing all defined types. |
-| `type`      | `string`                                                                                | `undefined`       | The name of the type to encode.                |
-| `data`      | `unknown`                                                                               | `undefined`       | The data to encode.                            |
-| `ctx?`      | `Context`                                                                               | `{}`              | The context of the encoding process.           |
-| `revision?` | [`TypedDataRevision`](types.RPC.RPCSPEC07.WALLET_API.md#typeddatarevision-1)            | `Revision.LEGACY` | The revision of the TypedData.                 |
+| Name        | Type                                                                                     | Default value     | Description                                    |
+| :---------- | :--------------------------------------------------------------------------------------- | :---------------- | :--------------------------------------------- |
+| `types`     | `Record`\<`string`, [`StarknetType`](types.RPC.RPCSPEC07.WALLET_API.md#starknettype)[]\> | `undefined`       | The types object containing all defined types. |
+| `type`      | `string`                                                                                 | `undefined`       | The name of the type to encode.                |
+| `data`      | `unknown`                                                                                | `undefined`       | The data to encode.                            |
+| `ctx?`      | `Context`                                                                                | `{}`              | The context of the encoding process.           |
+| `revision?` | [`TypedDataRevision`](types.RPC.RPCSPEC07.WALLET_API.md#typeddatarevision-1)             | `Revision.LEGACY` | The revision of the TypedData.                 |
 
 #### Returns
 
@@ -279,7 +279,7 @@ const result1 = encodeValue({}, 'felt', selectorHash);
 
 ### encodeData
 
-▸ **encodeData**<`T`\>(`types`, `type`, `data`, `revision?`): [`string`[], `string`[]]
+▸ **encodeData**\<`T`\>(`types`, `type`, `data`, `revision?`): [`string`[], `string`[]]
 
 Encode the data to an ABI encoded Buffer. The data should be a key -> value object with all the required values.
 All dependent types are automatically encoded.
@@ -313,7 +313,7 @@ The ABI compatible types and corresponding values.
 
 ### getStructHash
 
-▸ **getStructHash**<`T`\>(`types`, `type`, `data`, `revision?`): `string`
+▸ **getStructHash**\<`T`\>(`types`, `type`, `data`, `revision?`): `string`
 
 Get encoded data as a hash. The data should be a key -> value object with all the required values.
 All dependent types are automatically encoded.

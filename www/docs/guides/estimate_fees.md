@@ -24,7 +24,7 @@ const { suggestedMaxFee: estimatedFee1 } = await account0.estimateInvokeFee({
 
 The result is in `estimatedFee1`, of type BigInt. Unit is WEI for "legacy" transactions, and FRI for V3 transactions.
 
-The complete answer for a "legacy" transaction :
+The complete answer for a "legacy" transaction:
 
 ```typescript
 {
@@ -40,7 +40,7 @@ The complete answer for a "legacy" transaction :
 }
 ```
 
-The complete answer for a V3 transaction :
+The complete answer for a V3 transaction:
 
 ```typescript
 {
@@ -128,7 +128,7 @@ const declareResponse = await account0.declare(
 
 ## Real fee paid
 
-After the processing of the transaction, you can read the fee that has really been paid :
+After the processing of the transaction, you can read the fee that has really been paid:
 
 ```typescript
 const txR = await provider.waitForTransaction(txH);

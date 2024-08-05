@@ -61,9 +61,9 @@ Encode the L2 bound of a V3 transaction
 
 #### Parameters
 
-| Name     | Type                                                                                 | Description                                                                                                  |
-| :------- | :----------------------------------------------------------------------------------- | :----------------------------------------------------------------------------------------------------------- |
-| `bounds` | [`RESOURCE_BOUNDS_MAPPING`](types.RPC.RPCSPEC07.API.SPEC.md#resource_bounds_mapping) | {l1_gas: {max_amount: u64, max_price_per_unit: u128}, l2_gas: {max_amount: u64, max_price_per_unit: u128}} } |
+| Name     | Type                                                                                 | Description                                                                                                    |
+| :------- | :----------------------------------------------------------------------------------- | :------------------------------------------------------------------------------------------------------------- |
+| `bounds` | [`RESOURCE_BOUNDS_MAPPING`](types.RPC.RPCSPEC07.API.SPEC.md#resource_bounds_mapping) | `{l1_gas: {max_amount: u64, max_price_per_unit: u128}, l2_gas: {max_amount: u64, max_price_per_unit: u128}} }` |
 
 #### Returns
 

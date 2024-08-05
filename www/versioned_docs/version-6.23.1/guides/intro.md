@@ -51,4 +51,4 @@ For some more extensive examples visit PhilippeR26's <ins>[workshop](https://git
 
 ## Contracts used in the guides
 
-You can find the compiled contracts used in these guides in the <ins>[\_\_mocks\_\_](https://github.com/starknet-io/starknet.js/tree/develop/__mocks__/cairo/myAccountAbstraction/)</ins> directory.
+You can find the compiled contracts used in these guides in the <ins>[\_\_mocks\_\_](https://github.com/starknet-io/starknet.js/tree/v6.23.1/__mocks__/cairo/myAccountAbstraction)</ins> directory.

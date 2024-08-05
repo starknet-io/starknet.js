@@ -437,7 +437,7 @@ const result = hash.computeLegacyContractClassHash(compiledCairo0);
 
 Compute hash of the bytecode for Sierra v1.5.0 onwards (Cairo 2.6.0)
 Each segment is Poseidon hashed.
-The global hash is : 1 + PoseidonHash(len0, h0, len1, h1, ...)
+The global hash is: 1 + PoseidonHash(len0, h0, len1, h1, ...)
 
 #### Parameters
 

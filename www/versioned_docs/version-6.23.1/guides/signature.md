@@ -51,7 +51,7 @@ const msgHash1 = hash.computeHashOnElements(message);
 const isValid1 = typedData.verifyMessage(msgHash1, signature, fullPublicKey);
 console.log('Result (boolean) =', isValid1);
 
-// with a low level function (take care of Types limitations) :
+// with a low level function (take care of Types limitations):
 const isValid2 = ec.starkCurve.verify(signature1, msgHash, fullPublicKey);
 ```
 
@@ -98,7 +98,7 @@ These items are designed to be able to be an interface with a browser wallet. At
 - the `message` at the bottom of the wallet window, showing clearly (not in hex) the message to sign. Its structure has to be in accordance with the type listed in `primaryType`, defined in `types`.
 - the `domain` above the message. Its structure has to be in accordance with `StarknetDomain`.
 
-The types than can be used are defined in [SNIP-12](https://github.com/starknet-io/SNIPs/blob/main/SNIPS/snip-12.md). An example of simple message :
+The types than can be used are defined in [SNIP-12](https://github.com/starknet-io/SNIPs/blob/main/SNIPS/snip-12.md). An example of simple message:
 
 ```typescript
 const myTypedData: TypedData = {
@@ -167,7 +167,7 @@ A verification is also possible if you have the message hash, the signature and 
 ```typescript
 const isValid2 = typedData.verifyMessage(msgHash, signature, fullPublicKey);
 
-// with a low level function (take care of Types limitations) :
+// with a low level function (take care of Types limitations):
 const isValid3 = ec.starkCurve.verify(signature, msgHash, fullPublicKey);
 ```
 
@@ -211,10 +211,10 @@ console.log('signature message =', sig0);
 Starknet.js has a support for Ledger Nano S+ or X, to sign your Starknet transactions.
 You have to use a transporter to interact with the Ledger Nano. Depending if you use an USB or a Bluetooth connection, depending on your framework (Node, Web, Mobile), you have to use the appropriate library to create your transporter.
 
-The Ledger documentation lists all the available cases :
+The Ledger documentation lists all the available cases:
 ![](./pictures/LedgerConnectivity.png)
 
-The libs available are :
+The libs available are:
 
 ```typescript
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid';
@@ -231,7 +231,7 @@ In a Web DAPP, take care that some browsers are not compatible (FireFox, ...), a
 The last version of the Ledger Starknet APP (v2.2.1) supports explained V1 (ETH) & V3 (STRK) transactions & deploy accounts. For a class declaration or a message, you will have to blind sign a hash ; sign only hashes from a code that you trust. Do not forget to Enable `Blind signing` in the APP settings.
 :::
 
-For example, for a Node script :
+For example, for a Node script:
 
 ```typescript
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid';
@@ -249,11 +249,11 @@ const ledgerAccount = new Account(myProvider, ledger0addr, myLedgerSigner);
 The Ledger shall be connected, unlocked, with the Starknet internal APP activated, before launch of the script.
 :::
 
-Some complete examples :  
-A Node script : [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/ledgerNano/6.testLedgerAccount221.ts).  
-A test Web DAPP, to use in devnet-rs network : [here](https://github.com/PhilippeR26/Starknet-Ledger-Wallet).
+Some complete examples:  
+A Node script: [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/ledgerNano/6.testLedgerAccount221.ts).  
+A test Web DAPP, to use in devnet-rs network: [here](https://github.com/PhilippeR26/Starknet-Ledger-Wallet).
 
-If you want to read the version of the Ledger Starknet APP :
+If you want to read the version of the Ledger Starknet APP:
 
 ```typescript
 const resp = await myLedgerTransport.send(Number('0x5a'), 0, 0, 0);
@@ -268,7 +268,7 @@ You also have in Starknet.js a signer for the old v1.1.1 Ledger Starknet APP.
 const myLedgerSigner = new LedgerSigner111(myLedgerTransport, 0);
 ```
 
-If you want to use the accounts created with the v1.1.1, using the v2.2.1 :
+If you want to use the accounts created with the v1.1.1, using the v2.2.1:
 
 ```typescript
 const myLedgerSigner = new LedgerSigner221(myLedgerTransport, 0, undefined, getLedgerPathBuffer111);

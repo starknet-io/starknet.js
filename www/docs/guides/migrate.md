@@ -18,7 +18,7 @@ In V6, this object is in `TxR.value`, and several helpers are available (`.statu
 const response = await ethContract.approve(swapContractAddress, cairo.uint256(100000));
 const transactionReceipt = await provider.waitForTransaction(response.transaction_hash);
 
-// v5 : transactionReceipt is just an object
+// v5: transactionReceipt is just an object
 {
 type: 'INVOKE',
   transaction_hash: '0x5286217518c621581ac85505a99ffe182ce1114abaa8fce8b418d2b27c3c04c',
@@ -28,7 +28,7 @@ type: 'INVOKE',
   finality_status: 'ACCEPTED_ON_L2',
   // ...
 }
-// v6 : transactionReceipt is an object + helpers
+// v6: transactionReceipt is an object + helpers
 const receipt = transactionReceipt.value;
 const status: boolean = transactionReceipt.isSuccess();
 

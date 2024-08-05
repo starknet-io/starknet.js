@@ -44,7 +44,7 @@ export type AbiEnum = {
   type: 'enum';
 };
 
-// AbiEvents type is an arborescence :
+// AbiEvents type is an arborescence:
 // - Nodes are hashes of either Cairo 1 components names, or of Cairo 0 or 1 event names,
 // - With Cairo 1 abi, the nodes are linked in accordance with the components arborescence ; the tree can have several levels of nodes.
 // - With Cairo 0 abi : the tree has only one level of nodes (no component concept)
