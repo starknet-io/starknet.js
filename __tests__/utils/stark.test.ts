@@ -68,6 +68,29 @@ describe('stark', () => {
     });
   });
 
+  describe('reduceV2()', () => {
+    test('reduces transaction version F2 to F1', () => {
+      const result = stark.reduceV2('0x2'); // F2
+      expect(result).toBe('0x1'); // F1
+    });
+  
+    test('reduces transaction version V2 to V1', () => {
+      const result = stark.reduceV2('0x2'); // V2
+      expect(result).toBe('0x1'); // V1
+    });
+  
+    test('keeps transaction version F3 unchanged', () => {
+      const result = stark.reduceV2('0x3'); // F3
+      expect(result).toBe('0x3'); // F3
+    });
+  
+    test('keeps transaction version V3 unchanged', () => {
+      const result = stark.reduceV2('0x3'); // V3
+      expect(result).toBe('0x3'); // V3
+    });
+  });
+  
+  
   test('estimatedFeeToMaxFee', () => {
     expect(stark.estimatedFeeToMaxFee(100)).toBe(150n);
   });
