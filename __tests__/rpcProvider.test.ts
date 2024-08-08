@@ -1,5 +1,5 @@
-import { getStarkKey, utils } from '@scure/starknet';
-
+import { getStarkKey, Signature, utils } from '@scure/starknet';
+import typedDataExample from '../__mocks__/typedData/baseExample.json';
 import {
   Account,
   Block,
@@ -18,7 +18,7 @@ import {
 } from '../src';
 import { StarknetChainId } from '../src/constants';
 import { felt, uint256 } from '../src/utils/calldata/cairo';
-import { toHexString } from '../src/utils/num';
+import { toBigInt, toHexString } from '../src/utils/num';
 import {
   compiledC1v2,
   compiledC1v2Casm,
@@ -491,5 +491,51 @@ describeIfNotDevnet('waitForBlock', () => {
   test('waitForBlock pending', async () => {
     await providerStandard.waitForBlock('pending');
     expect(true).toBe(true); // answer without timeout Error (blocks have to be spaced with 16 minutes maximum : 200 retries * 5000ms)
+  });
+});
+
+describeIfDevnet('EIP712 verification', () => {
+  // currently only in Devnet-rs, because can fail in Sepolia.
+  // to test in all cases once PR#989 implemented.
+  const rpcProvider = getTestProvider(false);
+  const account = getTestAccount(rpcProvider);
+
+  test('sign and verify message', async () => {
+    const signature = await account.signMessage(typedDataExample);
+    const verifMessageResponse: boolean = await rpcProvider.verifyMessageInStarknet(
+      typedDataExample,
+      signature,
+      account.address
+    );
+    expect(verifMessageResponse).toBe(true);
+
+    const messageHash = await account.hashMessage(typedDataExample);
+    const verifMessageResponse2: boolean = await rpcProvider.verifyMessageInStarknet(
+      messageHash,
+      signature,
+      account.address
+    );
+    expect(verifMessageResponse2).toBe(true);
+  });
+
+  test('sign and verify EIP712 message fail', async () => {
+    const signature = await account.signMessage(typedDataExample);
+    const [r, s] = stark.formatSignature(signature);
+
+    // change the signature to make it invalid
+    const r2 = toBigInt(r) + 123n;
+    const wrongSignature = new Signature(toBigInt(r2.toString()), toBigInt(s));
+    if (!wrongSignature) return;
+    const verifMessageResponse: boolean = await rpcProvider.verifyMessageInStarknet(
+      typedDataExample,
+      wrongSignature,
+      account.address
+    );
+    expect(verifMessageResponse).toBe(false);
+
+    const wrongAccountAddress = '0x123456789';
+    await expect(
+      rpcProvider.verifyMessageInStarknet(typedDataExample, signature, wrongAccountAddress)
+    ).rejects.toThrow();
   });
 });

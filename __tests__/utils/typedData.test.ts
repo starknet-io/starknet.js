@@ -6,7 +6,18 @@ import exampleEnum from '../../__mocks__/typedData/example_enum.json';
 import examplePresetTypes from '../../__mocks__/typedData/example_presetTypes.json';
 import typedDataStructArrayExample from '../../__mocks__/typedData/mail_StructArray.json';
 import typedDataSessionExample from '../../__mocks__/typedData/session_MerkleTree.json';
-import { BigNumberish, StarknetDomain, num } from '../../src';
+import v1NestedExample from '../../__mocks__/typedData/v1Nested.json';
+import {
+  Account,
+  BigNumberish,
+  StarknetDomain,
+  ec,
+  num,
+  stark,
+  typedData,
+  type ArraySignatureType,
+  type Signature,
+} from '../../src';
 import { PRIME } from '../../src/constants';
 import { getSelectorFromName } from '../../src/utils/hash';
 import { MerkleTree } from '../../src/utils/merkle';
@@ -345,5 +356,47 @@ describe('typedData', () => {
     ])('out of bounds - $type', ({ type }) => {
       expect(() => getMessageHash(baseTypes(type), exampleAddress)).toThrow(RegExp(type));
     });
+  });
+
+  describe('verifyMessage', () => {
+    const addr = '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691';
+    const privK = '0x71d7bb07b9a64f6f78ac4c816aff4da9';
+    const fullPubK = ec.getFullPublicKey(privK);
+    const myAccount = new Account({ nodeUrl: 'fake' }, addr, privK);
+    let signedMessage: Signature;
+    let hashedMessage: string;
+    let arraySign: ArraySignatureType;
+
+    beforeAll(async () => {
+      signedMessage = await myAccount.signMessage(v1NestedExample);
+      hashedMessage = await myAccount.hashMessage(v1NestedExample);
+      arraySign = stark.formatSignature(signedMessage);
+    });
+
+    test('with TypedMessage', () => {
+      expect(
+        typedData.verifyMessage(v1NestedExample, signedMessage, fullPubK, myAccount.address)
+      ).toBe(true);
+      expect(typedData.verifyMessage(v1NestedExample, arraySign, fullPubK, myAccount.address)).toBe(
+        true
+      );
+    });
+
+    test('with messageHash', () => {
+      expect(typedData.verifyMessage(hashedMessage, signedMessage, fullPubK)).toBe(true);
+      expect(typedData.verifyMessage(hashedMessage, arraySign, fullPubK)).toBe(true);
+    });
+
+    test('failure cases', () => {
+      expect(() => typedData.verifyMessage('zero', signedMessage, fullPubK)).toThrow(
+        'message has a wrong format.'
+      );
+      expect(() => typedData.verifyMessage(v1NestedExample, signedMessage, fullPubK)).toThrow(
+        'When providing a TypedData in message parameter, the accountAddress parameter has to be provided.'
+      );
+    });
+    expect(() =>
+      typedData.verifyMessage(v1NestedExample, signedMessage, fullPubK, 'wrong')
+    ).toThrow('accountAddress shall be a BigNumberish');
   });
 });

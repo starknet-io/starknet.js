@@ -397,3 +397,22 @@ export function stringToSha256ToArrayBuff4(str: string): Uint8Array {
   const result: number = int31(BigInt(addHexPrefix(buf2hex(sha256(str)))));
   return hexToBytes(toHex(result));
 }
+
+/**
+ * Checks if a given value is of BigNumberish type.
+ * 234, 234n, "234", "0xea" are valid
+ * @param {unknown} input a value
+ * @returns {boolean} true if type of input is `BigNumberish`
+ * @example
+ * ```typescript
+ * const res = num.isBigNumberish("ZERO");
+ * // res = false
+ *  ```
+ */
+export function isBigNumberish(input: unknown): input is BigNumberish {
+  return (
+    isNumber(input) ||
+    isBigInt(input) ||
+    (typeof input === 'string' && (isHex(input) || /^[0-9]*$/i.test(input)))
+  );
+}
