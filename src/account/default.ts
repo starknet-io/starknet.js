@@ -50,7 +50,6 @@ import { parseContract } from '../utils/provider';
 import { isString } from '../utils/shortString';
 import {
   estimateFeeToBounds,
-  formatSignature,
   reduceV2,
   toFeeVersion,
   toTransactionVersion,
@@ -543,87 +542,37 @@ export class Account extends Provider implements AccountInterface {
     return getMessageHash(typedData, this.address);
   }
 
+  /**
+   * @deprecated To replace by `myRpcProvider.verifyMessageInStarknet()`
+   */
   public async verifyMessageHash(
     hash: BigNumberish,
     signature: Signature,
     signatureVerificationFunctionName?: string,
     signatureVerificationResponse?: { okResponse: string[]; nokResponse: string[]; error: string[] }
   ): Promise<boolean> {
-    // HOTFIX: Accounts should conform to SNIP-6
-    // (https://github.com/starknet-io/SNIPs/blob/f6998f779ee2157d5e1dea36042b08062093b3c5/SNIPS/snip-6.md?plain=1#L61),
-    // but they don't always conform. Also, the SNIP doesn't standardize the response if the signature isn't valid.
-    const knownSigVerificationFName = signatureVerificationFunctionName
-      ? [signatureVerificationFunctionName]
-      : ['isValidSignature', 'is_valid_signature'];
-    const knownSignatureResponse = signatureVerificationResponse || {
-      okResponse: [
-        // any non-nok response is true
-      ],
-      nokResponse: [
-        '0x0', // Devnet
-        '0x00', // OpenZeppelin 0.7.0 to 0.9.0 invalid signature
-      ],
-      error: [
-        'argent/invalid-signature', // ArgentX 0.3.0 to 0.3.1
-        'is invalid, with respect to the public key', // OpenZeppelin until 0.6.1, Braavos 0.0.11
-        'INVALID_SIG', // Braavos 1.0.0
-      ],
-    };
-    let error: any;
-
-    // eslint-disable-next-line no-restricted-syntax
-    for (const SigVerificationFName of knownSigVerificationFName) {
-      try {
-        // eslint-disable-next-line no-await-in-loop
-        const resp = await this.callContract({
-          contractAddress: this.address,
-          entrypoint: SigVerificationFName,
-          calldata: CallData.compile({
-            hash: toBigInt(hash).toString(),
-            signature: formatSignature(signature),
-          }),
-        });
-        // Response NOK Signature
-        if (knownSignatureResponse.nokResponse.includes(resp[0].toString())) {
-          return false;
-        }
-        // Response OK Signature
-        // Empty okResponse assume all non-nok responses are valid signatures
-        // OpenZeppelin 0.7.0 to 0.9.0, ArgentX 0.3.0 to 0.3.1 & Braavos Cairo 0.0.11 to 1.0.0 valid signature
-        if (
-          knownSignatureResponse.okResponse.length === 0 ||
-          knownSignatureResponse.okResponse.includes(resp[0].toString())
-        ) {
-          return true;
-        }
-        throw Error('signatureVerificationResponse Error: response is not part of known responses');
-      } catch (err) {
-        // Known NOK Errors
-        if (
-          knownSignatureResponse.error.some((errMessage) =>
-            (err as Error).message.includes(errMessage)
-          )
-        ) {
-          return false;
-        }
-        // Unknown Error
-        error = err;
-      }
-    }
-
-    throw Error(`Signature verification Error: ${error}`);
+    return this.verifyMessageInStarknet(
+      hash,
+      signature,
+      this.address,
+      signatureVerificationFunctionName,
+      signatureVerificationResponse
+    );
   }
 
+  /**
+   * @deprecated To replace by `myRpcProvider.verifyMessageInStarknet()`
+   */
   public async verifyMessage(
     typedData: TypedData,
     signature: Signature,
     signatureVerificationFunctionName?: string,
     signatureVerificationResponse?: { okResponse: string[]; nokResponse: string[]; error: string[] }
   ): Promise<boolean> {
-    const hash = await this.hashMessage(typedData);
-    return this.verifyMessageHash(
-      hash,
+    return this.verifyMessageInStarknet(
+      typedData,
       signature,
+      this.address,
       signatureVerificationFunctionName,
       signatureVerificationResponse
     );
