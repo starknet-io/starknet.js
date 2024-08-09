@@ -69,7 +69,7 @@ Special thanks to all the [contributors](https://github.com/starknet-io/starknet
 
 - Janek ([@janek26](https://github.com/janek26)) and Dhruv ([@dhruvkelawala](https://github.com/dhruvkelawala)) from [Argent](https://github.com/argentlabs)
 
-- Toni ([@tabaktoni](https://github.com/tabaktoni)) and Ivan ([@ivpavici](https://github.com/ivpavici)) from [SpaceShard](https://www.spaceshard.io/)
+- Toni ([@tabaktoni](https://github.com/tabaktoni)), Petar ([@penovicp](https://github.com/penovicp)) and Ivan ([@ivpavici](https://github.com/ivpavici)) from [SpaceShard](https://www.spaceshard.io/)
 
 - Philippe ROSTAN ([@PhilippeR26](https://github.com/PhilippeR26))
 

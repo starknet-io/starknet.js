@@ -160,3 +160,43 @@ const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
 ```
 
 > If you have customized host and port during starknet-devnet initialization, adapt in accordance your script.
+
+## Batch JSON-RPC
+
+The BatchClient class allows requests to be batched together in a single HTTP request, either by the interval amount or at the end of the callback queue if the batch is set to 0. By batching requests, we can reduce the overhead associated with handling individual requests.
+
+#### Example of usage with RpcProvider
+
+```typescript
+const myProvider = new RpcProvider({
+  batch: 0,
+});
+
+const [getBlockResponse, blockHashAndNumber, txCount] = await Promise.all([
+  myBatchProvider.getBlock(),
+  myBatchProvider.getBlockLatestAccepted(),
+  myBatchProvider.getBlockTransactionCount('latest'),
+]);
+
+// ... usage of getBlockResponse, blockHashAndNumber, txCount
+```
+
+#### Example of direct usage of underlying BatchClient class
+
+```typescript
+const provider = new RpcProvider();
+
+const batchClient = new BatchClient({
+  nodeUrl: provider.channel.nodeUrl,
+  headers: provider.channel.headers,
+  interval: 0,
+});
+
+const [getBlockResponse, blockHashAndNumber, txCount] = await Promise.all([
+  myBatchProvider.getBlock(),
+  myBatchProvider.getBlockLatestAccepted(),
+  myBatchProvider.getBlockTransactionCount('latest'),
+]);
+
+// ... usage of getBlockResponse, blockHashAndNumber, txCount
+```
