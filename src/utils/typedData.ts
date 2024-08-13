@@ -354,8 +354,8 @@ export function encodeValue(
       if (revision === Revision.ACTIVE) {
         const [variantKey, variantData] = Object.entries(data as TypedData['message'])[0];
 
-        const parentType = types[ctx.parent as string][0] as StarknetEnumType;
-        const enumType = types[parentType.contains];
+        const parentType = types[ctx.parent as string].find((t) => t.name === ctx.key);
+        const enumType = types[(parentType as StarknetEnumType).contains];
         const variantType = enumType.find((t) => t.name === variantKey) as StarknetType;
         const variantIndex = enumType.indexOf(variantType);
 
