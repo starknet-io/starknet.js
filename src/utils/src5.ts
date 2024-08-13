@@ -1,10 +1,10 @@
 import { ProviderInterface } from '../provider';
 
-export const supportsInterface = async (
+export async function supportsInterface(
   provider: ProviderInterface,
   contractAddress: string,
   interfaceId: string
-): Promise<boolean> => {
+): Promise<boolean> {
   // create a call
   const call = {
     contractAddress,
@@ -12,6 +12,11 @@ export const supportsInterface = async (
     calldata: [interfaceId],
   };
   // call the contract
-  const resp = await provider.callContract(call);
-  return BigInt(resp[0]) !== 0n;
-};
+  try {
+    const resp = await provider.callContract(call);
+    return BigInt(resp[0]) !== 0n;
+  } catch {
+    // account not compatible with ERC165 (introspection)
+    return false;
+  }
+}

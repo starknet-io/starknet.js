@@ -1,17 +1,18 @@
 import { CallData } from './calldata';
-import { getSelectorFromName } from './selector';
 import { encodeShortString } from './shortString';
 import { Call } from '../types/lib';
-import { Calldata, Signature } from '../types';
-import { formatSignature } from './stark';
-
 import {
-  OutsideExecutionOptions,
-  OutsideCall,
-  EOutsideExecutionVersion,
+  Calldata,
   OutsideExecutionTypesV1,
   OutsideExecutionTypesV2,
-} from '../types/outsideExecution';
+  Signature,
+  type EOutsideExecutionVersion,
+  type OutsideCall,
+  type OutsideExecutionOptions,
+} from '../types';
+import { formatSignature } from './stark';
+
+import { getSelectorFromName } from './hash/selector';
 
 export const OutsideExecutionCallerAny = encodeShortString('ANY_CALLER');
 

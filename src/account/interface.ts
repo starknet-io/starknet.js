@@ -28,10 +28,7 @@ import {
   SimulateTransactionResponse,
   TypedData,
   UniversalDeployerContractPayload,
-  UniversalDetails,
 } from '../types';
-import { EOutsideExecutionVersion } from '../types/outsideExecution';
-import { OutsideExecution } from '../utils/outsideExecution';
 
 export abstract class AccountInterface extends ProviderInterface {
   public abstract address: string;
@@ -364,27 +361,6 @@ export abstract class AccountInterface extends ProviderInterface {
    * @throws {Error} if typedData is not a valid TypedData
    */
   public abstract hashMessage(typedData: TypedData): Promise<string>;
-
-  /**
-   * Get the supported version of the outside execution for the account
-   * @returns the supported version of the outside execution
-   */
-  public abstract getSnip9Version(): Promise<EOutsideExecutionVersion | undefined>;
-
-  /**
-   * Execute an outside execution on the account
-   * @param outsideExecution - the outside execution object
-   * @param signature - the signature for the outside execution
-   * @param targetAddress - the address of an account on which the outside execution will be executed
-   * @param version - the version of the outside execution standard
-   */
-  public abstract executeFromOutside(
-    outsideExecution: OutsideExecution,
-    signature: Signature,
-    targetAddress: string,
-    opts: UniversalDetails,
-    version?: EOutsideExecutionVersion
-  ): Promise<InvokeFunctionResponse>;
 
   /**
    * Gets the nonce of the account with respect to a specific block
