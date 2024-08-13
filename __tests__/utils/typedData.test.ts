@@ -54,7 +54,7 @@ describe('typedData', () => {
     );
     encoded = encodeType(exampleEnum.types, 'Example', TypedDataRevision.ACTIVE);
     expect(encoded).toMatchInlineSnapshot(
-      `"\\"Example\\"(\\"someEnum\\":\\"MyEnum\\")\\"MyEnum\\"(\\"Variant 1\\":(),\\"Variant 2\\":(\\"u128\\",\\"u128*\\"),\\"Variant 3\\":(\\"u128\\"))"`
+      `"\\"Example\\"(\\"someEnum1\\":\\"EnumA\\",\\"someEnum2\\":\\"EnumB\\")\\"EnumA\\"(\\"Variant 1\\":(),\\"Variant 2\\":(\\"u128\\",\\"u128*\\"),\\"Variant 3\\":(\\"u128\\"))\\"EnumB\\"(\\"Variant 1\\":(),\\"Variant 2\\":(\\"u128\\"))"`
     );
   });
 
@@ -94,7 +94,7 @@ describe('typedData', () => {
     );
     typeHash = getTypeHash(exampleEnum.types, 'Example', TypedDataRevision.ACTIVE);
     expect(typeHash).toMatchInlineSnapshot(
-      `"0x380a54d417fb58913b904675d94a8a62e2abc3467f4b5439de0fd65fafdd1a8"`
+      `"0x8eb4aeac64b707f3e843284c4258df6df1f0f7fd38dcffdd8a153a495cd351"`
     );
   });
 
@@ -316,7 +316,7 @@ describe('typedData', () => {
 
     messageHash = getMessageHash(exampleEnum, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
-      `"0x3df10475ad5a8f49db4345a04a5b09164d2e24b09f6e1e236bc1ccd87627cc"`
+      `"0x6e61abaf480b1370bbf231f54e298c5f4872f40a6d2dd409ff30accee5bbd1e"`
     );
 
     expect(spyPedersen).not.toHaveBeenCalled();
