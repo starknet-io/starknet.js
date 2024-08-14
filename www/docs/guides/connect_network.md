@@ -168,7 +168,7 @@ The BatchClient class allows requests to be batched together in a single HTTP re
 #### Example of usage with RpcProvider
 
 ```typescript
-const myProvider = new RpcProvider({
+const myBatchProvider = new RpcProvider({
   batch: 0,
 });
 
@@ -193,9 +193,9 @@ const batchClient = new BatchClient({
 });
 
 const [getBlockResponse, blockHashAndNumber, txCount] = await Promise.all([
-  myBatchProvider.getBlock(),
-  myBatchProvider.getBlockLatestAccepted(),
-  myBatchProvider.getBlockTransactionCount('latest'),
+  batchClient.getBlock(),
+  batchClient.getBlockLatestAccepted(),
+  batchClient.getBlockTransactionCount('latest'),
 ]);
 
 // ... usage of getBlockResponse, blockHashAndNumber, txCount
