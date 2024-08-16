@@ -1,4 +1,4 @@
-// Is tested here the most common case : an account compatible with ERC165 and SNIP-9 (v2).
+// We test here the most common case: an account compatible with ERC-165 and SNIP-9 (v2).
 // To limit test duration, these cases are not tested: non ERC165 account, non SNIP-9 account, SNIP9-v1 account.
 import {
   Provider,
@@ -10,7 +10,7 @@ import {
   CairoOption,
   CairoOptionVariant,
   CallData,
-  EOutsideExecutionVersion,
+  OutsideExecutionVersion,
   type OutsideExecutionOptions,
   type OutsideTransaction,
   constants,
@@ -107,7 +107,7 @@ describe('Account and OutsideExecution', () => {
       callOptions,
       21,
       [call1],
-      EOutsideExecutionVersion.V2
+      OutsideExecutionVersion.V2
     );
     expect(message).toEqual({
       domain: {
@@ -200,7 +200,7 @@ describe('Account and OutsideExecution', () => {
       },
       signature: ['0x123', '0x456'],
       signerAddress: '0x3b278ebae434f283f9340587a7f2dd4282658ac8e03cb9b0956db23a0a83657',
-      version: EOutsideExecutionVersion.V2,
+      version: OutsideExecutionVersion.V2,
     };
 
     const execute: Calldata = outsideExecution.buildExecuteFromOutsideCallData(outsideTransaction);
@@ -222,7 +222,7 @@ describe('Account and OutsideExecution', () => {
   });
 
   test('Signer account should support SNIP-9 v2', async () => {
-    expect(await signerAccount.getSnip9Version()).toBe(EOutsideExecutionVersion.V2);
+    expect(await signerAccount.getSnip9Version()).toBe(OutsideExecutionVersion.V2);
   });
 
   test('SNIP-9 nonce', async () => {
@@ -285,7 +285,7 @@ describe('Account and OutsideExecution', () => {
       callOptions,
       call3
     ); // designated caller
-    expect(outsideTransaction3.version).toBe(EOutsideExecutionVersion.V2);
+    expect(outsideTransaction3.version).toBe(OutsideExecutionVersion.V2);
     expect(outsideTransaction1.signerAddress).toBe(signerAccount.address);
     expect(outsideTransaction3.outsideExecution.caller).toBe(constants.OutsideExecutionCallerAny);
     expect(outsideTransaction1.outsideExecution.caller).toBe(executorAccount.address);

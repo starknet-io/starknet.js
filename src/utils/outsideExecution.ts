@@ -3,7 +3,7 @@ import { Call, type BigNumberish, type Calldata } from '../types/lib';
 import {
   OutsideExecutionTypesV1,
   OutsideExecutionTypesV2,
-  type EOutsideExecutionVersion,
+  type OutsideExecutionVersion,
   type OutsideCall,
   type OutsideExecutionOptions,
   type OutsideTransaction,
@@ -42,7 +42,7 @@ export function getOutsideCall(call: Call): OutsideCall {
 }
 
 /**  represents a call object as a typed data, supporting both v1 and v2 versions */
-function callToTypedData(call: Call, version: EOutsideExecutionVersion) {
+function callToTypedData(call: Call, version: OutsideExecutionVersion) {
   const outsideCall = getOutsideCall(call);
   if (version === '1') {
     return {
@@ -58,7 +58,7 @@ function callToTypedData(call: Call, version: EOutsideExecutionVersion) {
   };
 }
 
-function getDomain(chainId: string, version: EOutsideExecutionVersion) {
+function getDomain(chainId: string, version: OutsideExecutionVersion) {
   return {
     name: 'Account.execute_from_outside',
     version,
@@ -71,9 +71,9 @@ function getDomain(chainId: string, version: EOutsideExecutionVersion) {
  * Build a TypedData message that will be used for an Outside execution.
  * @param {string} chainId  The encoded string of the name of network.
  * @param {OutsideExecutionOptions} options Parameters related to an Outside Execution.
- * @param {BigNumberish} nonce Outside execution nonce (to not confuse with normal transaction nonce).
+ * @param {BigNumberish} nonce Outside execution nonce (not to confuse with normal transaction nonce).
  * @param {Call[]} myCalls transaction(s) to proceed.
- * @param {EOutsideExecutionVersion} version SNIP-9 V1 or V2.
+ * @param {OutsideExecutionVersion} version SNIP-9 V1 or V2.
  * @returns {TypedData} SNIP-12 message conform to SNIP-9.
  * @example
  * ```typescript
@@ -106,7 +106,7 @@ export function getTypedData(
   options: OutsideExecutionOptions,
   nonce: BigNumberish,
   myCalls: Call[],
-  version: EOutsideExecutionVersion
+  version: OutsideExecutionVersion
 ): TypedData {
   if (version === '1') {
     return {
@@ -137,14 +137,14 @@ export function getTypedData(
 
 /**
  * Builds a CallData for the execute_from_outside() entrypoint.
- * @param {OutsideTransaction} outsideTransaction an object that all the data for a Outside Execution.
+ * @param {OutsideTransaction} outsideTransaction an object that contains all the data for a Outside Execution.
  * @returns {Calldata} The Calldata related to this Outside transaction
  * @example
  * ```typescript
  * const outsideTransaction: OutsideTransaction = {
  *     outsideExecution: {
  *      caller: '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691',
- *       nonce: '0x7d0b4b4fce4b236e63d2bb5fc321935d52935cd3b268248cf9cf29c496bd0ae',
+ *      nonce: '0x7d0b4b4fce4b236e63d2bb5fc321935d52935cd3b268248cf9cf29c496bd0ae',
  *      execute_after: 500, execute_before: 600,
  *      calls: [{ to: '0x678', selector: '0x890', calldata: [12, 13] }],
  *    },

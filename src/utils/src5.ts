@@ -7,12 +7,12 @@ import { toHex } from './num';
  * Verify if a contract has implemented some standard functionalities.
  * @param {RpcProvider} provider the provider to access to Starknet.
  * @param {BigNumberish} contractAddress the address of the contract to check.
- * @param {BigNumberish} interfaceId the hash of the functionally to check.
- * @returns {boolean} true if the interfaceId is implement in this contract.
+ * @param {BigNumberish} interfaceId the hash of the functionality to check.
+ * @returns {boolean} true if the interfaceId is implemented in this contract.
  * @example
  * ```typescript
  * const snip9InterfaceV2Id = constants.SNIP9_V2_INTERFACE_ID;
- * const result = src5.supportInterface(myProvider, accountContractAddress, snip9InterfaceV2Id);
+ * const result = src5.supportsInterface(myProvider, accountContractAddress, snip9InterfaceV2Id);
  * // result = true
  * ```
  */

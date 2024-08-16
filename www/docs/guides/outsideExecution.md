@@ -39,7 +39,7 @@ if (version === EOutsideExecutionVersion.UNSUPPORTED) {
 
 :::info
 The account that will sign the transaction needs to be compatible with SNIP-9.  
-Nevertheless, the account that will execute the transaction do not needs to be SNIP-9 compatible ; it needs just to have enough fees to pay the transaction.
+Nevertheless, the account that will execute the transaction do not needs to be SNIP-9 compatible ; it just needs to have enough fees to pay the transaction.
 :::
 
 ### Create an `OutsideTransaction` Object
@@ -74,7 +74,7 @@ const callOptions: OutsideExecutionOptions = {
 You can use the string `"ANY_CALLER"` as content of the `caller` property. To use with care, as anybody that get your `OutsideTransaction` object and execute it.
 :::
 
-To create the `OutsideTransaction` object, you have just to use:
+To create the `OutsideTransaction` object, you just have to use:
 
 ```typescript
 const outsideTransaction1: OutsideTransaction = await signerAccount.getOutsideTransaction(
@@ -84,7 +84,7 @@ const outsideTransaction1: OutsideTransaction = await signerAccount.getOutsideTr
 ```
 
 :::note
-In the same `OutsideTransaction` object, you can include several transactions. So, with only one signature of the signer Account, you can generates an `OutsideTransaction` object that perform many things:
+In the same `OutsideTransaction` object, you can include several transactions. So, with only one signature of the signer Account, you can generate an `OutsideTransaction` object that performs many things:
 
 ```typescript
 const callOptions: OutsideExecutionOptions = {
@@ -150,7 +150,7 @@ const res = await executorAccount.executeFromOutside([outsideTransaction1, outsi
 ## Example of Outside Execution using a Ledger Nano
 
 In this example, we want to sign, with a Ledger Nano X, several transactions at 6PM. Then a code is automatically launched each hour until the next day at 8AM, verifying if some conditions are reached. The code will then trigger the execution of some of the transactions signed earlier with the Ledger Nano.
-By this way, you can pre-sign some transactions with the Ledger, and if during the night something occur, a backend can execute automatically some of these transactions, **in any order**.  
+By this way, you can pre-sign some transactions with the Ledger, and if during the night something occurs, a backend can execute automatically some of these transactions, **in any order**.  
 In this process, **the private key of the Ledger account is never exposed**.
 
 First, create a Ledger account in devnet-rs. You will find some documentation [here](./signature.md#signing-with-a-ledger-hardware-wallet), and an example [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/ledgerNano/4.deployLedgerAccount.ts).
@@ -164,7 +164,7 @@ The initial balances are :
 |                Account1 | 1000.0      |
 |                Account2 | 1000.0      |
 
-Now, we can ask to the user to sign on its Ledger some outside transactions :
+Now, we can ask the user to sign on its Ledger some outside transactions:
 
 ```typescript
 const callOptions: OutsideExecutionOptions = {

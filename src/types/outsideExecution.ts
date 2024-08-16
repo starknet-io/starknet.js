@@ -27,7 +27,7 @@ export interface OutsideTransaction {
   outsideExecution: OutsideExecution;
   signature: Signature;
   signerAddress: BigNumberish;
-  version: EOutsideExecutionVersion;
+  version: OutsideExecutionVersion;
 }
 
 export const OutsideExecutionTypesV1 = {
@@ -74,7 +74,7 @@ export const OutsideExecutionTypesV2 = {
   ],
 };
 
-export enum EOutsideExecutionVersion {
+export enum OutsideExecutionVersion {
   UNSUPPORTED = '0',
   V1 = '1',
   V2 = '2',
