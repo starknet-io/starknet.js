@@ -51,7 +51,7 @@ const msgHash1 = hash.computeHashOnElements(message);
 const isValid1 = typedData.verifyMessage(msgHash1, signature, fullPublicKey);
 console.log('Result (boolean) =', isValid1);
 
-// with a low level function (take care to Types limitations) :
+// with a low level function (take care of Types limitations) :
 const isValid2 = ec.starkCurve.verify(signature1, msgHash, fullPublicKey);
 ```
 
@@ -167,7 +167,7 @@ A verification is also possible if you have the message hash, the signature and 
 ```typescript
 const isValid2 = typedData.verifyMessage(msgHash, signature, fullPublicKey);
 
-// with a low level function (take care to Types limitations) :
+// with a low level function (take care of Types limitations) :
 const isValid3 = ec.starkCurve.verify(signature, msgHash, fullPublicKey);
 ```
 

@@ -494,9 +494,7 @@ describeIfNotDevnet('waitForBlock', () => {
   });
 });
 
-describeIfDevnet('EIP712 verification', () => {
-  // currently only in Devnet-rs, because can fail in Sepolia.
-  // to test in all cases once PR#989 implemented.
+describe('EIP712 verification', () => {
   const rpcProvider = getTestProvider(false);
   const account = getTestAccount(rpcProvider);
 
