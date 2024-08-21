@@ -1,5 +1,4 @@
 import { ETransactionVersion } from './types/api';
-import { ValuesType } from './types/helpers/valuesType';
 
 export { IS_BROWSER } from './utils/encode';
 
@@ -31,51 +30,39 @@ export const RANGE_FELT = range(ZERO, PRIME - 1n);
 export const RANGE_I128 = range(-(2n ** 127n), 2n ** 127n - 1n);
 export const RANGE_U128 = range(ZERO, 2n ** 128n - 1n);
 
-export const BaseUrl = {
-  SN_MAIN: 'https://alpha-mainnet.starknet.io',
-  SN_SEPOLIA: 'https://alpha-sepolia.starknet.io',
-} as const;
+export enum BaseUrl {
+  SN_MAIN = 'https://alpha-mainnet.starknet.io',
+  SN_SEPOLIA = 'https://alpha-sepolia.starknet.io',
+}
 
-export type BaseUrl = ValuesType<typeof BaseUrl>;
+export enum NetworkName {
+  SN_MAIN = 'SN_MAIN',
+  SN_SEPOLIA = 'SN_SEPOLIA',
+}
 
-export const NetworkName = {
-  SN_MAIN: 'SN_MAIN',
-  SN_SEPOLIA: 'SN_SEPOLIA',
-} as const;
+export enum StarknetChainId {
+  SN_MAIN = '0x534e5f4d41494e', // encodeShortString('SN_MAIN'),
+  SN_SEPOLIA = '0x534e5f5345504f4c4941', // encodeShortString('SN_SEPOLIA')
+}
 
-export type NetworkName = ValuesType<typeof NetworkName>;
+export enum TransactionHashPrefix {
+  DECLARE = '0x6465636c617265', // encodeShortString('declare'),
+  DEPLOY = '0x6465706c6f79', // encodeShortString('deploy'),
+  DEPLOY_ACCOUNT = '0x6465706c6f795f6163636f756e74', // encodeShortString('deploy_account'),
+  INVOKE = '0x696e766f6b65', // encodeShortString('invoke'),
+  L1_HANDLER = '0x6c315f68616e646c6572', // encodeShortString('l1_handler'),
+}
 
-export const StarknetChainId = {
-  SN_MAIN: '0x534e5f4d41494e', // encodeShortString('SN_MAIN'),
-  SN_SEPOLIA: '0x534e5f5345504f4c4941', // encodeShortString('SN_SEPOLIA')
-} as const;
-
-export type StarknetChainId = ValuesType<typeof StarknetChainId>;
-
-export const TransactionHashPrefix = {
-  DECLARE: '0x6465636c617265', // encodeShortString('declare'),
-  DEPLOY: '0x6465706c6f79', // encodeShortString('deploy'),
-  DEPLOY_ACCOUNT: '0x6465706c6f795f6163636f756e74', // encodeShortString('deploy_account'),
-  INVOKE: '0x696e766f6b65', // encodeShortString('invoke'),
-  L1_HANDLER: '0x6c315f68616e646c6572', // encodeShortString('l1_handler'),
-} as const;
-
-export type TransactionHashPrefix = ValuesType<typeof TransactionHashPrefix>;
-
-export const FeeMarginPercentage = {
-  L1_BOUND_MAX_AMOUNT: 50,
-  L1_BOUND_MAX_PRICE_PER_UNIT: 50,
-  MAX_FEE: 50,
-} as const;
-
-export type FeeMarginPercentage = ValuesType<typeof FeeMarginPercentage>;
+export const enum FeeMarginPercentage {
+  L1_BOUND_MAX_AMOUNT = 50,
+  L1_BOUND_MAX_PRICE_PER_UNIT = 50,
+  MAX_FEE = 50,
+}
 
 export const UDC = {
   ADDRESS: '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
   ENTRYPOINT: 'deployContract',
 } as const;
-
-export type UDC = ValuesType<typeof UDC>;
 
 export const RPC_DEFAULT_VERSION = 'v0_7';
 
