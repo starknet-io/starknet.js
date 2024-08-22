@@ -390,12 +390,14 @@ describe('typedData', () => {
       expect(() => typedData.verifyMessage('zero', signedMessage, fullPubK)).toThrow(
         'message has a wrong format.'
       );
-      expect(() => typedData.verifyMessage(v1NestedExample, signedMessage, fullPubK)).toThrow(
-        'When providing a TypedData in message parameter, the accountAddress parameter has to be provided.'
-      );
+
+      expect(() =>
+        typedData.verifyMessage(v1NestedExample as any, signedMessage, fullPubK)
+      ).toThrow(/^When providing a TypedData .* the accountAddress parameter has to be provided/);
+
+      expect(() =>
+        typedData.verifyMessage(v1NestedExample, signedMessage, fullPubK, 'wrong')
+      ).toThrow('accountAddress shall be a BigNumberish');
     });
-    expect(() =>
-      typedData.verifyMessage(v1NestedExample, signedMessage, fullPubK, 'wrong')
-    ).toThrow('accountAddress shall be a BigNumberish');
   });
 });

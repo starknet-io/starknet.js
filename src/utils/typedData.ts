@@ -634,12 +634,6 @@ export function verifyMessage(
   signature: Signature,
   fullPublicKey: BigNumberish,
   accountAddress?: BigNumberish
-): boolean;
-export function verifyMessage(
-  message: BigNumberish | TypedData,
-  signature: Signature,
-  fullPublicKey: BigNumberish,
-  accountAddress?: BigNumberish
 ): boolean {
   const isTypedData = validateTypedData(message);
   if (!isBigNumberish(message) && !isTypedData) {
