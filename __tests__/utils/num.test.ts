@@ -217,7 +217,7 @@ describe('stringToSha256ToArrayBuff4', () => {
   });
 });
 
-describe.only('isBigNumberish', () => {
+describe('isBigNumberish', () => {
   test('determine if value is a BigNumberish', () => {
     expect(num.isBigNumberish(234)).toBe(true);
     expect(num.isBigNumberish(234n)).toBe(true);

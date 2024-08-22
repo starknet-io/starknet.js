@@ -17,7 +17,7 @@ import { ec, hash, type BigNumberish, type WeierstrassSignatureType } from 'star
 
 const privateKey = '0x1234567890987654321';
 const starknetPublicKey = ec.starkCurve.getStarkKey(privateKey);
-const fullPublicKey = ec.getFullPublicKey(privateKey);
+const fullPublicKey = stark.getFullPublicKey(privateKey);
 const message: BigNumberish[] = [1, 128, 18, 14];
 
 const msgHash = hash.computeHashOnElements(message);
@@ -143,7 +143,7 @@ const myTypedData: TypedData = {
 };
 
 const account0 = new Account(myProvider, address, privateKey);
-const fullPublicKey = ec.getFullPublicKey(privateKey);
+const fullPublicKey = stark.getFullPublicKey(privateKey);
 
 const msgHash = await account0.hashMessage(myTypedData);
 const signature: Signature = (await account0.signMessage(myTypedData)) as WeierstrassSignatureType;

@@ -413,6 +413,6 @@ export function isBigNumberish(input: unknown): input is BigNumberish {
   return (
     isNumber(input) ||
     isBigInt(input) ||
-    (typeof input === 'string' && (isHex(input) || /^[0-9]*$/i.test(input)))
+    (typeof input === 'string' && (isHex(input) || isStringWholeNumber(input)))
   );
 }

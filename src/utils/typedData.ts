@@ -619,6 +619,23 @@ export function getMessageHash(typedData: TypedData, account: BigNumberish): str
  * ```
  */
 export function verifyMessage(
+  message: TypedData,
+  signature: Signature,
+  fullPublicKey: BigNumberish,
+  accountAddress: BigNumberish
+): boolean;
+export function verifyMessage(
+  message: BigNumberish,
+  signature: Signature,
+  fullPublicKey: BigNumberish
+): boolean;
+export function verifyMessage(
+  message: BigNumberish | TypedData,
+  signature: Signature,
+  fullPublicKey: BigNumberish,
+  accountAddress?: BigNumberish
+): boolean;
+export function verifyMessage(
   message: BigNumberish | TypedData,
   signature: Signature,
   fullPublicKey: BigNumberish,
