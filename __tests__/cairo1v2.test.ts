@@ -26,24 +26,21 @@ import {
   stark,
   types,
 } from '../src';
-import {
-  TEST_TX_VERSION,
-  compiledC1Account,
-  compiledC1AccountCasm,
-  compiledC1v2,
-  compiledC1v2Casm,
-  compiledC210,
-  compiledC210Casm,
-  compiledComplexSierra,
-  compiledHelloSierra,
-  getTestAccount,
-  getTestProvider,
-} from './config/fixtures';
+import { TEST_TX_VERSION, contracts, getTestAccount, getTestProvider } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
 const { uint256, tuple, isCairo1Abi } = cairo;
 const { toHex } = num;
 const { starknetKeccak } = selector;
+
+const compiledComplexSierra = contracts.ComplexSierra;
+const compiledC1Account = contracts.C1Account.sierra;
+const compiledC1AccountCasm = contracts.C1Account.casm;
+const compiledC1v2 = contracts.C1v2.sierra;
+const compiledC1v2Casm = contracts.C1v2.casm;
+const compiledC210 = contracts.C210.sierra;
+const compiledC210Casm = contracts.C210.casm;
+const compiledHelloSierra = contracts.HelloSierra.sierra;
 
 describe('Cairo 1', () => {
   const provider = getTestProvider();

@@ -20,11 +20,7 @@ import { StarknetChainId } from '../src/constants';
 import { felt, uint256 } from '../src/utils/calldata/cairo';
 import { toBigInt, toHexString } from '../src/utils/num';
 import {
-  compiledC1v2,
-  compiledC1v2Casm,
-  compiledErc20Echo,
-  compiledL1L2,
-  compiledOpenZeppelinAccount,
+  contracts,
   createBlockForDevnet,
   describeIfDevnet,
   describeIfNotDevnet,
@@ -36,6 +32,12 @@ import {
   waitNextBlock,
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
+
+const compiledErc20Echo = contracts.Erc20Echo;
+const compiledL1L2 = contracts.L1L2;
+const compiledOpenZeppelinAccount = contracts.OpenZeppelinAccount;
+const compiledC1v2 = contracts.C1v2.sierra;
+const compiledC1v2Casm = contracts.C1v2.casm;
 
 describeIfRpc('RPCProvider', () => {
   const rpcProvider = getTestProvider(false);

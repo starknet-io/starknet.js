@@ -1,5 +1,9 @@
 import { isSierra, extractContractHashes } from '../../src/utils/contract';
-import { compiledHelloSierra, compiledHelloSierraCasm, compiledErc20 } from '../config/fixtures';
+import { contracts } from '../config/fixtures';
+
+const compiledErc20 = contracts.Erc20;
+const compiledHelloSierra = contracts.HelloSierra.sierra;
+const compiledHelloSierraCasm = contracts.HelloSierra.casm;
 
 describe('isSierra', () => {
   test('should return true for a contract in Sierra format', () => {

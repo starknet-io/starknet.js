@@ -20,11 +20,7 @@ import {
 } from '../src';
 import {
   TEST_TX_VERSION,
-  compiledErc20,
-  compiledHelloSierra,
-  compiledHelloSierraCasm,
-  compiledOpenZeppelinAccount,
-  compiledTestDapp,
+  contracts,
   describeIfDevnet,
   erc20ClassHash,
   getTestAccount,
@@ -37,6 +33,12 @@ const { encodeShortString } = shortString;
 const { randomAddress } = stark;
 const { uint256 } = cairo;
 const { Signature } = ec.starkCurve;
+
+const compiledErc20 = contracts.Erc20;
+const compiledOpenZeppelinAccount = contracts.OpenZeppelinAccount;
+const compiledTestDapp = contracts.TestDapp;
+const compiledHelloSierra = contracts.HelloSierra.sierra;
+const compiledHelloSierraCasm = contracts.HelloSierra.casm;
 
 describe('deploy and test Wallet', () => {
   const provider = new Provider(getTestProvider());

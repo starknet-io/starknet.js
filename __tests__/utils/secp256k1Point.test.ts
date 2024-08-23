@@ -1,7 +1,10 @@
 /* eslint-disable no-new */
 import { CallData } from '../../src/utils/calldata';
 import { bigNumberishArrayToDecimalStringArray, toHex } from '../../src/utils/num';
-import { compiledEthAccount, compiledEthPubk } from '../config/fixtures';
+import { contracts } from '../config/fixtures';
+
+const compiledEthAccount = contracts.EthAccount.sierra;
+const compiledEthPubk = contracts.EthPubk.sierra;
 
 describe('secp256k1Point cairo type test', () => {
   const myCallDataAccount = new CallData(compiledEthAccount.abi);

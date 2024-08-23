@@ -15,16 +15,13 @@ import { getSelectorFromName } from '../src/utils/hash';
 import { hexToDecimalString, toBigInt } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import { uint256ToBN } from '../src/utils/uint256';
-import {
-  compiledErc20,
-  compiledErc20Echo,
-  compiledMulticall,
-  compiledTypeTransformation,
-  describeIfDevnet,
-  getTestAccount,
-  getTestProvider,
-} from './config/fixtures';
+import { contracts, describeIfDevnet, getTestAccount, getTestProvider } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
+
+const compiledErc20 = contracts.Erc20;
+const compiledErc20Echo = contracts.Erc20Echo;
+const compiledTypeTransformation = contracts.TypeTransformation;
+const compiledMulticall = contracts.Multicall;
 
 describe('contract module', () => {
   let erc20Address: string;

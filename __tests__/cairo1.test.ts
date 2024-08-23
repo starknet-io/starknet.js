@@ -19,13 +19,7 @@ import {
 } from '../src';
 import {
   TEST_TX_VERSION,
-  compiledC1Account,
-  compiledC1AccountCasm,
-  compiledComplexSierra,
-  compiledHelloSierra,
-  compiledHelloSierraCasm,
-  compiledOnlyConstructorSierra,
-  compiledOnlyConstructorCasm,
+  contracts,
   describeIfDevnet,
   getTestAccount,
   getTestProvider,
@@ -35,6 +29,14 @@ import { initializeMatcher } from './config/schema';
 const { uint256, tuple, isCairo1Abi } = cairo;
 const { toHex } = num;
 const { starknetKeccak } = selector;
+
+const compiledComplexSierra = contracts.ComplexSierra;
+const compiledC1Account = contracts.C1Account.sierra;
+const compiledC1AccountCasm = contracts.C1Account.casm;
+const compiledHelloSierra = contracts.HelloSierra.sierra;
+const compiledHelloSierraCasm = contracts.HelloSierra.casm;
+const compiledOnlyConstructorSierra = contracts.OnlyConstructor.sierra;
+const compiledOnlyConstructorCasm = contracts.OnlyConstructor.casm;
 
 describeIfDevnet('Cairo 1 Devnet', () => {
   describe('API &  Contract interactions', () => {

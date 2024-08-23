@@ -16,20 +16,18 @@ import {
 } from '../src';
 import { hexToDecimalString } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
-import {
-  compiledC240,
-  compiledC240Casm,
-  compiledC260,
-  compiledC260Casm,
-  compiledNonZero,
-  compiledNonZeroCasm,
-  compiledTuple,
-  compiledTupleCasm,
-  compiledU512,
-  compiledU512Casm,
-  getTestAccount,
-  getTestProvider,
-} from './config/fixtures';
+import { contracts, getTestAccount, getTestProvider } from './config/fixtures';
+
+const compiledC240 = contracts.C240.sierra;
+const compiledC240Casm = contracts.C240.casm;
+const compiledC260 = contracts.C260.sierra;
+const compiledC260Casm = contracts.C260.casm;
+const compiledNonZero = contracts.NonZero.sierra;
+const compiledNonZeroCasm = contracts.NonZero.casm;
+const compiledTuple = contracts.Tuple.sierra;
+const compiledTupleCasm = contracts.Tuple.casm;
+const compiledU512 = contracts.U512.sierra;
+const compiledU512Casm = contracts.U512.casm;
 
 describe('Cairo v2.4 onwards', () => {
   const provider = getTestProvider();

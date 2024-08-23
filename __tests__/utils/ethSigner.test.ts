@@ -19,20 +19,22 @@ import {
 import { validateAndParseEthAddress } from '../../src/utils/eth';
 import { ETransactionVersion } from '../../src/types/api';
 import {
-  compiledDummy1Eth,
-  compiledDummy1EthCasm,
-  compiledDummy2Eth,
-  compiledDummy2EthCasm,
-  compiledErc20,
-  compiledEthAccount,
-  compiledEthCasm,
-  compiledEthPubk,
-  compiledEthPubkCasm,
+  contracts,
   describeIfDevnet,
   devnetETHtokenAddress,
   getTestAccount,
   getTestProvider,
 } from '../config/fixtures';
+
+const compiledErc20 = contracts.Erc20;
+const compiledDummy1Eth = contracts.Dummy1Eth.sierra;
+const compiledDummy1EthCasm = contracts.Dummy1Eth.casm;
+const compiledDummy2Eth = contracts.Dummy2Eth.sierra;
+const compiledDummy2EthCasm = contracts.Dummy2Eth.casm;
+const compiledEthAccount = contracts.EthAccount.sierra;
+const compiledEthCasm = contracts.EthAccount.casm;
+const compiledEthPubk = contracts.EthPubk.sierra;
+const compiledEthPubkCasm = contracts.EthPubk.casm;
 
 describe('Ethereum signer', () => {
   describe('signer', () => {

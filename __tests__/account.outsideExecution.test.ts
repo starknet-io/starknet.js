@@ -1,34 +1,32 @@
 // We test here the most common case: an account compatible with ERC-165 and SNIP-9 (v2).
 // To limit test duration, these cases are not tested: non ERC165 account, non SNIP-9 account, SNIP9-v1 account.
 import {
-  Provider,
   Account,
   cairo,
-  ec,
-  stark,
   CairoCustomEnum,
   CairoOption,
   CairoOptionVariant,
   CallData,
+  constants,
+  Contract,
+  ec,
+  outsideExecution,
   OutsideExecutionVersion,
+  Provider,
+  src5,
+  stark,
+  type Call,
+  type Calldata,
   type OutsideExecutionOptions,
   type OutsideTransaction,
-  constants,
-  type Call,
-  Contract,
-  outsideExecution,
   type TypedData,
-  type Calldata,
-  src5,
 } from '../src';
 import { getSelectorFromName } from '../src/utils/hash';
 import { getDecimalString } from '../src/utils/num';
-import {
-  compiledArgentX4Account,
-  compiledErc20OZ,
-  getTestAccount,
-  getTestProvider,
-} from './config/fixtures';
+import { contracts, getTestAccount, getTestProvider } from './config/fixtures';
+
+const compiledErc20OZ = contracts.Erc20OZ.sierra;
+const compiledArgentX4Account = contracts.ArgentX4Account.sierra;
 
 describe('Account and OutsideExecution', () => {
   const ethAddress = '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
