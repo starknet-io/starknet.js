@@ -6,12 +6,10 @@ import {
   SuccessfulTransactionReceiptResponse,
   TransactionExecutionStatus,
 } from '../src';
-import {
-  compiledTestRejectCasm,
-  compiledTestRejectSierra,
-  getTestAccount,
-  getTestProvider,
-} from './config/fixtures';
+import { contracts, getTestAccount, getTestProvider } from './config/fixtures';
+
+const compiledTestRejectSierra = contracts.TestReject.sierra;
+const compiledTestRejectCasm = contracts.TestReject.casm;
 
 describe('Transaction receipt utility', () => {
   const provider = getTestProvider();

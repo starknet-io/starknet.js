@@ -1,13 +1,12 @@
 import { hash } from '../../src';
-import {
-  compiledC260Casm,
-  compiledErc20,
-  compiledHashSierra,
-  compiledHashSierraCasm,
-  compiledOpenZeppelinAccount,
-  compiledTestDapp,
-  erc20ClassHash,
-} from '../config/fixtures';
+import { contracts, erc20ClassHash } from '../config/fixtures';
+
+const compiledErc20 = contracts.Erc20;
+const compiledOpenZeppelinAccount = contracts.OpenZeppelinAccount;
+const compiledTestDapp = contracts.TestDapp;
+const compiledC260Casm = contracts.C260.casm;
+const compiledHashSierra = contracts.HashSierra.sierra;
+const compiledHashSierraCasm = contracts.HashSierra.casm;
 
 describe('Hash Tester', () => {
   test('Test getSelectorFromName', () => {

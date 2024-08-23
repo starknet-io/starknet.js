@@ -10,13 +10,15 @@ import {
 import { toBigInt } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import {
-  compiledErc20,
+  contracts,
   erc20ClassHash,
   getTestAccount,
   getTestProvider,
   wrongClassHash,
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
+
+const compiledErc20 = contracts.Erc20;
 
 const { isPendingStateUpdate } = provider;
 

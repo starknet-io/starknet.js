@@ -1,18 +1,16 @@
 import { Provider, num, shortString } from '../src';
-import {
-  compiledNaming,
-  compiledNamingCasm,
-  compiledPricing,
-  compiledPricingCasm,
-  compiledSidMulticall,
-  compiledSidMulticallCasm,
-  compiledStarknetId,
-  compiledStarknetIdCasm,
-  getTestAccount,
-  getTestProvider,
-} from './config/fixtures';
+import { contracts, getTestAccount, getTestProvider } from './config/fixtures';
 
 const { hexToDecimalString } = num;
+
+const compiledNaming = contracts.starknetId.Naming.sierra;
+const compiledNamingCasm = contracts.starknetId.Naming.casm;
+const compiledPricing = contracts.starknetId.Pricing.sierra;
+const compiledPricingCasm = contracts.starknetId.Pricing.casm;
+const compiledSidMulticall = contracts.starknetId.SidMulticall.sierra;
+const compiledSidMulticallCasm = contracts.starknetId.SidMulticall.casm;
+const compiledStarknetId = contracts.starknetId.StarknetId.sierra;
+const compiledStarknetIdCasm = contracts.starknetId.StarknetId.casm;
 
 describe('deploy and test Wallet', () => {
   const provider = new Provider(getTestProvider());

@@ -2,9 +2,9 @@ import { CallData, RawArgs, UniversalDetails, json, stark } from '../../src';
 import { EDataAvailabilityMode } from '../../src/types/api';
 import { FeeEstimate } from '../../src/types/provider';
 import { toBigInt, toHex } from '../../src/utils/num';
-import { compiledOpenZeppelinAccount } from '../config/fixtures';
+import { contracts } from '../config/fixtures';
 
-const compiledAccount = compiledOpenZeppelinAccount;
+const compiledAccount = contracts.OpenZeppelinAccount;
 
 describe('stark', () => {
   describe('compressProgram()', () => {
