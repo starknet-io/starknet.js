@@ -11,8 +11,7 @@ const generateSourceLinkTemplate = (gitRevision) =>
     gitRevision || '{gitRevision}'
   }/{path}#L{line}`;
 
-// TODO: remove the /next/ fragment after the v5 official release
-const migrationGuideLink = '/docs/next/guides/migrate';
+const migrationGuideLink = `${generateBaseUrl(process.env.DOCS_BASE_URL)}docs/guides/migrate`;
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
