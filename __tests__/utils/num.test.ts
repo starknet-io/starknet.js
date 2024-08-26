@@ -216,3 +216,14 @@ describe('stringToSha256ToArrayBuff4', () => {
     expect(buff).toEqual(new Uint8Array([43, 206, 231, 219]));
   });
 });
+
+describe('isBigNumberish', () => {
+  test('determine if value is a BigNumberish', () => {
+    expect(num.isBigNumberish(234)).toBe(true);
+    expect(num.isBigNumberish(234n)).toBe(true);
+    expect(num.isBigNumberish('234')).toBe(true);
+    expect(num.isBigNumberish('0xea')).toBe(true);
+    expect(num.isBigNumberish('ea')).toBe(false);
+    expect(num.isBigNumberish('zero')).toBe(false);
+  });
+});
