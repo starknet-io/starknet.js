@@ -1,9 +1,11 @@
-import { BigNumberish, RawArgs } from './lib';
+import { BigNumberish, RawArgs, type Signature } from './lib';
 
 export interface OutsideExecutionOptions {
+  /** authorized executer of the transaction(s):  Hex address or "ANY_CALLER" or shortString.encodeShortString(constants.OutsideExecutionCallerAny) */
   caller: string;
-  nonce: BigNumberish;
+  /** Unix timestamp of the beginning of the timeframe */
   execute_after: BigNumberish;
+  /** Unix timestamp of the end of the timeframe */
   execute_before: BigNumberish;
 }
 
@@ -13,10 +15,20 @@ export interface OutsideCall {
   calldata: RawArgs;
 }
 
-export const SNIP9_V1_INTERFACE_ID =
-  '0x68cfd18b92d1907b8ba3cc324900277f5a3622099431ea85dd8089255e4181';
-export const SNIP9_V2_INTERFACE_ID =
-  '0x1d1144bb2138366ff28d8e9ab57456b1d332ac42196230c3a602003c89872';
+export interface OutsideExecution {
+  caller: string;
+  nonce: BigNumberish;
+  execute_after: BigNumberish;
+  execute_before: BigNumberish;
+  calls: OutsideCall[];
+}
+
+export interface OutsideTransaction {
+  outsideExecution: OutsideExecution;
+  signature: Signature;
+  signerAddress: BigNumberish;
+  version: OutsideExecutionVersion;
+}
 
 export const OutsideExecutionTypesV1 = {
   StarkNetDomain: [
@@ -62,7 +74,7 @@ export const OutsideExecutionTypesV2 = {
   ],
 };
 
-export enum EOutsideExecutionVersion {
+export enum OutsideExecutionVersion {
   UNSUPPORTED = '0',
   V1 = '1',
   V2 = '2',
