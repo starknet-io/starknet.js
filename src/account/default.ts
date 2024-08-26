@@ -41,6 +41,12 @@ import {
   UniversalDetails,
 } from '../types';
 import { ETransactionVersion, ETransactionVersion3, ResourceBounds } from '../types/api';
+import {
+  EOutsideExecutionVersion,
+  SNIP9_V1_INTERFACE_ID,
+  SNIP9_V2_INTERFACE_ID,
+} from '../types/outsideExecution';
+import { OutsideExecution, buildExecuteFromOutsideCallData } from '../utils/outsideExecution';
 import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { parseUDCEvent } from '../utils/events';
@@ -48,8 +54,10 @@ import { calculateContractAddressFromHash } from '../utils/hash';
 import { toBigInt, toCairoBool } from '../utils/num';
 import { parseContract } from '../utils/provider';
 import { isString } from '../utils/shortString';
+import { supportsInterface } from '../utils/src5';
 import {
   estimateFeeToBounds,
+  randomAddress,
   reduceV2,
   toFeeVersion,
   toTransactionVersion,
@@ -576,6 +584,87 @@ export class Account extends Provider implements AccountInterface {
       signatureVerificationFunctionName,
       signatureVerificationResponse
     );
+  }
+
+  public async getSnip9Version(): Promise<EOutsideExecutionVersion> {
+    // Check for support of the SNIP-9 version 2 interface
+
+    const supportsSnip9V2 = await supportsInterface(this, this.address, SNIP9_V2_INTERFACE_ID);
+
+    if (supportsSnip9V2) {
+      return EOutsideExecutionVersion.V2;
+    }
+
+    // Check for support of the SNIP-9 version 1 interface
+    const supportsSnip9V1 = await supportsInterface(this, this.address, SNIP9_V1_INTERFACE_ID);
+
+    if (supportsSnip9V1) {
+      return EOutsideExecutionVersion.V1;
+    }
+
+    // Account does not support either version 2 or version 1
+    return EOutsideExecutionVersion.UNSUPPORTED;
+  }
+
+  public async isValidSnip9Nonce(nonce: BigNumberish): Promise<boolean> {
+    try {
+      const call: Call = {
+        contractAddress: this.address,
+        entrypoint: 'is_valid_outside_execution_nonce',
+        calldata: CallData.compile({ nonce }),
+      };
+
+      const resp = await this.callContract(call);
+
+      // Transforming the result into a boolean value
+      return BigInt(resp[0]) !== 0n;
+    } catch (error) {
+      throw new Error(`Failed to check if nonce is valid: ${error}`);
+    }
+  }
+
+  public async executeFromOutside(
+    outsideExecution: OutsideExecution,
+    signature: Signature,
+    targetAddress: string,
+    opts: UniversalDetails,
+    version?: EOutsideExecutionVersion | undefined
+  ): Promise<{ transaction_hash: string }> {
+    // if the version is not specified, try to determine the latest supported version
+    const supportedVersion =
+      version ?? (await new Account(this, targetAddress, this.signer).getSnip9Version());
+    // choose the correct entrypoint
+    let entrypoint: string;
+    if (supportedVersion === EOutsideExecutionVersion.V1) {
+      entrypoint = 'execute_from_outside';
+    } else if (supportedVersion === EOutsideExecutionVersion.V2) {
+      entrypoint = 'execute_from_outside_v2';
+    } else {
+      throw new Error('Unsupported OutsideExecution version');
+    }
+
+    // prepare the call
+    const call = {
+      contractAddress: targetAddress,
+      entrypoint,
+      calldata: buildExecuteFromOutsideCallData(outsideExecution, signature),
+    };
+    // execute the call
+    return this.execute(call, opts);
+  }
+
+  public async getSnip9Nonce(account: Account): Promise<string> {
+    // create random nonce (in felt range)
+    const nonce = randomAddress();
+    // check if nonce is already used
+    const isValidNonce = await account.isValidSnip9Nonce(nonce);
+    if (!isValidNonce) {
+      // if it is, try again
+      return this.getSnip9Nonce(account);
+    }
+    // if not, return it
+    return nonce;
+    // TODO process errors
   }
 
   /*
