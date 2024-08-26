@@ -157,9 +157,7 @@ export type Details = {
 };
 
 export type InvocationsDetailsWithNonce =
-  | (InvocationsDetails & {
-      nonce: BigNumberish;
-    })
+  | (InvocationsDetails & { nonce: BigNumberish })
   | V3TransactionDetails;
 
 export enum TransactionType {
@@ -203,8 +201,8 @@ export enum BlockStatus {
 }
 
 export enum BlockTag {
-  pending = 'pending',
-  latest = 'latest',
+  PENDING = 'pending',
+  LATEST = 'latest',
 }
 
 export type BlockNumber = BlockTag | null | number;
@@ -224,9 +222,9 @@ export type BlockIdentifier = BlockNumber | BigNumberish;
  * items used by AccountInvocations
  */
 export type AccountInvocationItem = (
-  | ({ type: TransactionType.DECLARE } & DeclareContractTransaction)
-  | ({ type: TransactionType.DEPLOY_ACCOUNT } & DeployAccountContractTransaction)
-  | ({ type: TransactionType.INVOKE } & Invocation)
+  | ({ type: typeof TransactionType.DECLARE } & DeclareContractTransaction)
+  | ({ type: typeof TransactionType.DEPLOY_ACCOUNT } & DeployAccountContractTransaction)
+  | ({ type: typeof TransactionType.INVOKE } & Invocation)
 ) &
   InvocationsDetailsWithNonce;
 
@@ -239,12 +237,14 @@ export type AccountInvocations = AccountInvocationItem[];
  * Invocations array user provide to bulk method (simulate)
  */
 export type Invocations = Array<
-  | ({ type: TransactionType.DECLARE } & OptionalPayload<DeclareContractPayload>)
-  | ({ type: TransactionType.DEPLOY } & OptionalPayload<
+  | ({ type: typeof TransactionType.DECLARE } & OptionalPayload<DeclareContractPayload>)
+  | ({ type: typeof TransactionType.DEPLOY } & OptionalPayload<
       AllowArray<UniversalDeployerContractPayload>
     >)
-  | ({ type: TransactionType.DEPLOY_ACCOUNT } & OptionalPayload<DeployAccountContractPayload>)
-  | ({ type: TransactionType.INVOKE } & OptionalPayload<AllowArray<Call>>)
+  | ({
+      type: typeof TransactionType.DEPLOY_ACCOUNT;
+    } & OptionalPayload<DeployAccountContractPayload>)
+  | ({ type: typeof TransactionType.INVOKE } & OptionalPayload<AllowArray<Call>>)
 >;
 
 export type Tupled = { element: any; type: string };

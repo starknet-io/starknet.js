@@ -1,6 +1,11 @@
 import ajvKeywords from 'ajv-keywords';
 import { matchersWithOptions } from 'jest-json-schema';
 
+import starknet_api_openrpc from 'starknet_specs/api/starknet_api_openrpc.json';
+import starknet_metadata from 'starknet_specs/api/starknet_metadata.json';
+import starknet_trace_api_openrpc from 'starknet_specs/api/starknet_trace_api_openrpc.json';
+import starknet_write_api from 'starknet_specs/api/starknet_write_api.json';
+
 import accountSchemas from '../schemas/account.json';
 import componentSchemas from '../schemas/component.json';
 import libSchemas from '../schemas/lib.json';
@@ -9,7 +14,16 @@ import rpcSchemas from '../schemas/rpc.json';
 import { isBigInt } from '../../src/utils/num';
 
 const matcherSchemas = [accountSchemas, libSchemas, providerSchemas, rpcSchemas];
-const schemas = [...matcherSchemas, componentSchemas];
+const starknetSchemas = [
+  { $id: 'starknet_api_openrpc', ...starknet_api_openrpc },
+  { $id: 'starknet_metadata', ...starknet_metadata },
+  { $id: 'starknet_trace_api_openrpc', ...starknet_trace_api_openrpc },
+  { $id: 'starknet_write_api', ...starknet_write_api },
+  // schema aliases to rectify faulty references from the spec
+  { $id: 'starknet_api_openrpc.json', ...starknet_api_openrpc },
+  { $id: 'api/starknet_api_openrpc.json', ...starknet_api_openrpc },
+];
+const schemas = [...matcherSchemas, ...starknetSchemas, componentSchemas];
 const jestJsonMatchers = matchersWithOptions({ schemas }, (ajv: any) => {
   // @ts-ignore
   ajv.addKeyword({
@@ -35,6 +49,10 @@ export const initializeMatcher = (expect: jest.Expect) => {
   });
   expect(accountSchemas).toBeValidSchema();
   expect(componentSchemas).toBeValidSchema();
+  expect(starknet_api_openrpc).toBeValidSchema();
+  expect(starknet_metadata).toBeValidSchema();
+  expect(starknet_trace_api_openrpc).toBeValidSchema();
+  expect(starknet_write_api).toBeValidSchema();
   expect(libSchemas).toBeValidSchema();
   expect(providerSchemas).toBeValidSchema();
   expect(rpcSchemas).toBeValidSchema();

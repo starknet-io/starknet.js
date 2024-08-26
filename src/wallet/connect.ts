@@ -8,11 +8,13 @@ import {
   type ChainId,
   type StarknetWindowObject,
   type TypedData,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  type SPEC,
 } from 'starknet-types-07';
 
 /**
  * Request Permission for wallet account, return addresses that are allowed by user
- * @param silentMode false: request user interaction allowance. true: return only pre-allowed
+ * @param {boolean} [silent_mode=false] false: request user interaction allowance. true: return only pre-allowed
  * @returns allowed accounts addresses
  */
 export function requestAccounts(swo: StarknetWindowObject, silent_mode = false) {
@@ -119,7 +121,8 @@ export function addDeclareTransaction(
 
 /**
  * Sign typed data using the wallet.
- * @param params The typed data to sign.
+ * @param swo the starknet (wallet) window object to request the signature.
+ * @param typedData The typed data to sign.
  * @returns An array of signatures as strings.
  */
 export function signMessage(swo: StarknetWindowObject, typedData: TypedData) {

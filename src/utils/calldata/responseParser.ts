@@ -24,6 +24,7 @@ import {
   isTypeBool,
   isTypeByteArray,
   isTypeEnum,
+  isTypeNonZero,
   isTypeSecp256k1Point,
   isTypeTuple,
 } from './cairo';
@@ -137,6 +138,15 @@ function parseResponseValue(
       parsedDataArr.push(parseResponseValue(responseIterator, el, structs, enums));
     }
     return parsedDataArr;
+  }
+
+  // type NonZero
+  if (isTypeNonZero(element.type)) {
+    // eslint-disable-next-line no-case-declarations
+    // const parsedDataArr: (BigNumberish | ParsedStruct | boolean | any[] | CairoEnum)[] = [];
+    const el: AbiEntry = { name: '', type: getArrayType(element.type) };
+    // parsedDataArr.push();
+    return parseResponseValue(responseIterator, el, structs, enums);
   }
 
   // type struct
@@ -266,6 +276,9 @@ export default function responseParser(
         }
       }
       return parsedDataArr;
+
+    case isTypeNonZero(type):
+      return parseResponseValue(responseIterator, output, structs, enums);
 
     default:
       return parseBaseTypes(type, responseIterator);

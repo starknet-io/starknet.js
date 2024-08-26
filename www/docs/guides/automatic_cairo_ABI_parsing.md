@@ -77,6 +77,6 @@ const provider = new RpcProvider({ nodeUrl: constants.NetworkName.SN_MAIN });
 const contract = new Contract(ABI, address, provider).typedv2(ABI);
 
 // Notice the types inferred for the parameter and the returned value
-const primary_inteface_id = contract.get_primary_interface_id();
+const primary_interface_id = contract.get_primary_interface_id();
 const protocol_fees_collected = contract.get_protocol_fees_collected('0x1');
 ```

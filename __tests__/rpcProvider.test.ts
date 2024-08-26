@@ -1,5 +1,5 @@
-import { getStarkKey, utils } from '@scure/starknet';
-
+import { getStarkKey, Signature, utils } from '@scure/starknet';
+import typedDataExample from '../__mocks__/typedData/baseExample.json';
 import {
   Account,
   Block,
@@ -8,15 +8,17 @@ import {
   FeeEstimate,
   RPC,
   RPC06,
+  RPCResponseParser,
   ReceiptTx,
   RpcProvider,
   TransactionExecutionStatus,
+  cairo,
   stark,
   waitForTransactionOptions,
 } from '../src';
 import { StarknetChainId } from '../src/constants';
 import { felt, uint256 } from '../src/utils/calldata/cairo';
-import { toHexString } from '../src/utils/num';
+import { toBigInt, toHexString } from '../src/utils/num';
 import {
   compiledC1v2,
   compiledC1v2Casm,
@@ -24,11 +26,14 @@ import {
   compiledL1L2,
   compiledOpenZeppelinAccount,
   createBlockForDevnet,
-  describeIfRpc,
-  describeIfNotDevnet,
   describeIfDevnet,
+  describeIfNotDevnet,
+  describeIfRpc,
+  describeIfTestnet,
+  devnetETHtokenAddress,
   getTestAccount,
   getTestProvider,
+  waitNextBlock,
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
@@ -44,6 +49,19 @@ describeIfRpc('RPCProvider', () => {
     const accountKeyPair = utils.randomPrivateKey();
     accountPublicKey = getStarkKey(accountKeyPair);
     await createBlockForDevnet();
+  });
+
+  test('instantiate from rpcProvider', () => {
+    const newInsRPCProvider = new RpcProvider();
+
+    let FinalInsRPCProvider = new RpcProvider(newInsRPCProvider);
+    expect(FinalInsRPCProvider.channel).toBe(newInsRPCProvider.channel);
+    expect(FinalInsRPCProvider.responseParser).toBe(newInsRPCProvider.responseParser);
+
+    delete (newInsRPCProvider as any).responseParser;
+    FinalInsRPCProvider = new RpcProvider(newInsRPCProvider);
+    expect(FinalInsRPCProvider.channel).toBe(newInsRPCProvider.channel);
+    expect(FinalInsRPCProvider.responseParser).toBeInstanceOf(RPCResponseParser);
   });
 
   test('getChainId', async () => {
@@ -115,20 +133,15 @@ describeIfRpc('RPCProvider', () => {
     estimateSpy.mockRestore();
   });
 
-  describe('Test Estimate message fee', () => {
+  describeIfDevnet('Test Estimate message fee Cairo 0', () => {
+    // declaration of Cairo 0 contract is no more authorized in Sepolia Testnet
     let l1l2ContractCairo0Address: string;
-    let l1l2ContractCairo1Address: string;
 
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
         contract: compiledL1L2,
       });
       l1l2ContractCairo0Address = deploy.contract_address;
-      const { deploy: deploy2 } = await account.declareAndDeploy({
-        contract: compiledC1v2,
-        casm: compiledC1v2Casm,
-      });
-      l1l2ContractCairo1Address = deploy2.contract_address;
     });
 
     test('estimate message fee Cairo 0', async () => {
@@ -146,6 +159,19 @@ describeIfRpc('RPCProvider', () => {
           overall_fee: expect.anything(),
         })
       );
+    });
+  });
+
+  describe('Test Estimate message fee Cairo 1', () => {
+    let l1l2ContractCairo1Address: string;
+
+    beforeAll(async () => {
+      const { deploy: deploy2 } = await account.declareAndDeploy({
+        contract: compiledC1v2,
+        casm: compiledC1v2Casm,
+      });
+      l1l2ContractCairo1Address = deploy2.contract_address;
+      await waitNextBlock(provider as RpcProvider, 5000); // in Sepolia Testnet, needs pending block validation before interacting
     });
 
     test('estimate message fee Cairo 1', async () => {
@@ -230,6 +256,16 @@ describeIfRpc('RPCProvider', () => {
     let latestBlock: Block;
 
     beforeAll(async () => {
+      // add a Tx to be sure to have at least one Tx in the last block
+      const { transaction_hash } = await account.execute({
+        contractAddress: devnetETHtokenAddress,
+        entrypoint: 'transfer',
+        calldata: {
+          recipient: account.address,
+          amount: cairo.uint256(1n * 10n ** 4n),
+        },
+      });
+      await account.waitForTransaction(transaction_hash);
       latestBlock = await provider.getBlock('latest');
     });
 
@@ -406,5 +442,98 @@ describeIfRpc('RPCProvider', () => {
       const syncingStats = await rpcProvider.getSyncingStats();
       expect(syncingStats).toMatchSchemaRef('GetSyncingStatsResponse');
     });
+  });
+});
+
+describeIfTestnet('RPCProvider', () => {
+  const provider = getTestProvider();
+
+  test('getL1MessageHash', async () => {
+    const l2TransactionHash = '0x28dfc05eb4f261b37ddad451ff22f1d08d4e3c24dc646af0ec69fa20e096819';
+    const l1MessageHash = await provider.getL1MessageHash(l2TransactionHash);
+    expect(l1MessageHash).toBe(
+      '0x55b3f8b6e607fffd9b4d843dfe8f9b5c05822cd94fcad8797deb01d77805532a'
+    );
+    await expect(
+      provider.getL1MessageHash('0x283882a666a418cf88df04cc5f8fc2262af510bba0b637e61b2820a6ab15318')
+    ).rejects.toThrow(/This L2 transaction is not a L1 message./);
+    await expect(provider.getL1MessageHash('0x123')).rejects.toThrow(/Transaction hash not found/);
+  });
+});
+describeIfNotDevnet('waitForBlock', () => {
+  // As Devnet-rs isn't generating automatically blocks at a periodic time, it's excluded of this test.
+  const providerStandard = new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL });
+  const providerFastTimeOut = new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL, retries: 1 });
+  let block: number;
+  beforeEach(async () => {
+    block = await providerStandard.getBlockNumber();
+  });
+
+  test('waitForBlock timeOut', async () => {
+    await expect(providerFastTimeOut.waitForBlock(10 ** 20, 1)).rejects.toThrow(/timed-out/);
+  });
+
+  test('waitForBlock in the past', async () => {
+    const start = new Date().getTime();
+    await providerStandard.waitForBlock(block);
+    const end = new Date().getTime();
+    expect(end - start).toBeLessThan(1000); // quick answer expected
+  });
+
+  test('waitForBlock latest', async () => {
+    const start = new Date().getTime();
+    await providerStandard.waitForBlock('latest');
+    const end = new Date().getTime();
+    expect(end - start).toBeLessThan(100); // nearly immediate answer expected
+  });
+
+  // NOTA : this test can have a duration up to block interval.
+  test('waitForBlock pending', async () => {
+    await providerStandard.waitForBlock('pending');
+    expect(true).toBe(true); // answer without timeout Error (blocks have to be spaced with 16 minutes maximum : 200 retries * 5000ms)
+  });
+});
+
+describe('EIP712 verification', () => {
+  const rpcProvider = getTestProvider(false);
+  const account = getTestAccount(rpcProvider);
+
+  test('sign and verify message', async () => {
+    const signature = await account.signMessage(typedDataExample);
+    const verifMessageResponse: boolean = await rpcProvider.verifyMessageInStarknet(
+      typedDataExample,
+      signature,
+      account.address
+    );
+    expect(verifMessageResponse).toBe(true);
+
+    const messageHash = await account.hashMessage(typedDataExample);
+    const verifMessageResponse2: boolean = await rpcProvider.verifyMessageInStarknet(
+      messageHash,
+      signature,
+      account.address
+    );
+    expect(verifMessageResponse2).toBe(true);
+  });
+
+  test('sign and verify EIP712 message fail', async () => {
+    const signature = await account.signMessage(typedDataExample);
+    const [r, s] = stark.formatSignature(signature);
+
+    // change the signature to make it invalid
+    const r2 = toBigInt(r) + 123n;
+    const wrongSignature = new Signature(toBigInt(r2.toString()), toBigInt(s));
+    if (!wrongSignature) return;
+    const verifMessageResponse: boolean = await rpcProvider.verifyMessageInStarknet(
+      typedDataExample,
+      wrongSignature,
+      account.address
+    );
+    expect(verifMessageResponse).toBe(false);
+
+    const wrongAccountAddress = '0x123456789';
+    await expect(
+      rpcProvider.verifyMessageInStarknet(typedDataExample, signature, wrongAccountAddress)
+    ).rejects.toThrow();
   });
 });

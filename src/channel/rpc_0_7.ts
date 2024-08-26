@@ -18,6 +18,7 @@ import {
   waitForTransactionOptions,
 } from '../types';
 import { JRPC, RPCSPEC07 as RPC } from '../types/api';
+import { BatchClient } from '../utils/batch';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
 import { validateAndParseEthAddress } from '../utils/eth';
@@ -31,7 +32,7 @@ import { getVersionsByType } from '../utils/transaction';
 
 const defaultOptions = {
   headers: { 'Content-Type': 'application/json' },
-  blockIdentifier: BlockTag.pending,
+  blockIdentifier: BlockTag.PENDING,
   retries: 200,
 };
 
@@ -50,11 +51,24 @@ export class RpcChannel {
 
   private specVersion?: string;
 
+  private transactionRetryIntervalFallback?: number;
+
   readonly waitMode: Boolean; // behave like web2 rpc and return when tx is processed
 
+  private batchClient?: BatchClient;
+
   constructor(optionsOrProvider?: RpcProviderOptions) {
-    const { nodeUrl, retries, headers, blockIdentifier, chainId, specVersion, waitMode } =
-      optionsOrProvider || {};
+    const {
+      nodeUrl,
+      retries,
+      headers,
+      blockIdentifier,
+      chainId,
+      specVersion,
+      waitMode,
+      transactionRetryIntervalFallback,
+      batch,
+    } = optionsOrProvider || {};
     if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
       this.nodeUrl = getDefaultNodeUrl(nodeUrl as NetworkName, optionsOrProvider?.default);
     } else if (nodeUrl) {
@@ -69,6 +83,19 @@ export class RpcChannel {
     this.specVersion = specVersion;
     this.waitMode = waitMode || false;
     this.requestId = 0;
+    this.transactionRetryIntervalFallback = transactionRetryIntervalFallback;
+
+    if (typeof batch === 'number') {
+      this.batchClient = new BatchClient({
+        nodeUrl: this.nodeUrl,
+        headers: this.headers,
+        interval: batch,
+      });
+    }
+  }
+
+  private get transactionRetryIntervalDefault() {
+    return this.transactionRetryIntervalFallback ?? 5000;
   }
 
   public setChainId(chainId: StarknetChainId) {
@@ -110,6 +137,16 @@ export class RpcChannel {
     params?: RPC.Methods[T]['params']
   ): Promise<RPC.Methods[T]['result']> {
     try {
+      if (this.batchClient) {
+        const { error, result } = await this.batchClient.fetch(
+          method,
+          params,
+          (this.requestId += 1)
+        );
+        this.errorHandler(method, params, error);
+        return result as RPC.Methods[T]['result'];
+      }
+
       const rawResult = await this.fetch(method, params, (this.requestId += 1));
       const { error, result } = await rawResult.json();
       this.errorHandler(method, params, error);
@@ -227,12 +264,13 @@ export class RpcChannel {
    */
   public simulateTransaction(
     invocations: AccountInvocations,
-    {
+    simulateTransactionOptions: getSimulateTransactionOptions = {}
+  ) {
+    const {
       blockIdentifier = this.blockIdentifier,
       skipValidate = true,
       skipFeeCharge = true,
-    }: getSimulateTransactionOptions = {}
-  ) {
+    } = simulateTransactionOptions;
     const block_id = new Block(blockIdentifier).identifier;
     const simulationFlags: RPC.ESimulationFlag[] = [];
     if (skipValidate) simulationFlags.push(RPC.ESimulationFlag.SKIP_VALIDATE);
@@ -250,7 +288,7 @@ export class RpcChannel {
     let { retries } = this;
     let onchain = false;
     let isErrorState = false;
-    const retryInterval = options?.retryInterval ?? 5000;
+    const retryInterval = options?.retryInterval ?? this.transactionRetryIntervalDefault;
     const errorStates: any = options?.errorStates ?? [
       RPC.ETransactionStatus.REJECTED,
       // TODO: commented out to preserve the long-standing behavior of "reverted" not being treated as an error by default

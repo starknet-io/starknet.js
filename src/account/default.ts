@@ -1,3 +1,5 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+import type { SPEC } from 'starknet-types-07';
 import { UDC, ZERO } from '../constants';
 import { Provider, ProviderInterface } from '../provider';
 import { Signer, SignerInterface } from '../signer';
@@ -55,7 +57,6 @@ import { isString } from '../utils/shortString';
 import { supportsInterface } from '../utils/src5';
 import {
   estimateFeeToBounds,
-  formatSignature,
   randomAddress,
   reduceV2,
   toFeeVersion,
@@ -73,14 +74,16 @@ export class Account extends Provider implements AccountInterface {
 
   public cairoVersion: CairoVersion;
 
-  readonly transactionVersion: ETransactionVersion.V2 | ETransactionVersion.V3;
+  readonly transactionVersion: typeof ETransactionVersion.V2 | typeof ETransactionVersion.V3;
 
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
     address: string,
     pkOrSigner: Uint8Array | string | SignerInterface,
     cairoVersion?: CairoVersion,
-    transactionVersion: ETransactionVersion.V2 | ETransactionVersion.V3 = ETransactionVersion.V2 // TODO: Discuss this, set to v2 for backward compatibility
+    transactionVersion:
+      | typeof ETransactionVersion.V2
+      | typeof ETransactionVersion.V3 = ETransactionVersion.V2 // TODO: Discuss this, set to v2 for backward compatibility
   ) {
     super(providerOrOptions);
     this.address = address.toLowerCase();
@@ -117,7 +120,7 @@ export class Account extends Provider implements AccountInterface {
   }
 
   /**
-   * Retrieves the Cairo version from the network and sets `cairoVersion` if not already set in the constructor
+   * Retrieves the Cairo version from the network and sets `cairoVersion` if not already set in the constructor.
    * @param classHash if provided detects Cairo version from classHash, otherwise from the account address
    */
   public async getCairoVersion(classHash?: string) {
@@ -547,38 +550,40 @@ export class Account extends Provider implements AccountInterface {
     return getMessageHash(typedData, this.address);
   }
 
-  public async verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean> {
-    try {
-      const resp = await this.callContract({
-        contractAddress: this.address,
-        entrypoint: 'isValidSignature',
-        calldata: CallData.compile({
-          hash: toBigInt(hash).toString(),
-          signature: formatSignature(signature),
-        }),
-      });
-      if (BigInt(resp[0]) === 0n) {
-        // OpenZeppelin 0.8.0 invalid signature
-        return false;
-      }
-      // OpenZeppelin 0.8.0, ArgentX 0.3.0 & Braavos Cairo 0 valid signature
-      return true;
-    } catch (err) {
-      if (
-        ['argent/invalid-signature', 'is invalid, with respect to the public key'].some(
-          (errMessage) => (err as Error).message.includes(errMessage)
-        )
-      ) {
-        // ArgentX 0.3.0 invalid signature, Braavos Cairo 0 invalid signature
-        return false;
-      }
-      throw Error(`Signature verification request is rejected by the network: ${err}`);
-    }
+  /**
+   * @deprecated To replace by `myRpcProvider.verifyMessageInStarknet()`
+   */
+  public async verifyMessageHash(
+    hash: BigNumberish,
+    signature: Signature,
+    signatureVerificationFunctionName?: string,
+    signatureVerificationResponse?: { okResponse: string[]; nokResponse: string[]; error: string[] }
+  ): Promise<boolean> {
+    return this.verifyMessageInStarknet(
+      hash,
+      signature,
+      this.address,
+      signatureVerificationFunctionName,
+      signatureVerificationResponse
+    );
   }
 
-  public async verifyMessage(typedData: TypedData, signature: Signature): Promise<boolean> {
-    const hash = await this.hashMessage(typedData);
-    return this.verifyMessageHash(hash, signature);
+  /**
+   * @deprecated To replace by `myRpcProvider.verifyMessageInStarknet()`
+   */
+  public async verifyMessage(
+    typedData: TypedData,
+    signature: Signature,
+    signatureVerificationFunctionName?: string,
+    signatureVerificationResponse?: { okResponse: string[]; nokResponse: string[]; error: string[] }
+  ): Promise<boolean> {
+    return this.verifyMessageInStarknet(
+      typedData,
+      signature,
+      this.address,
+      signatureVerificationFunctionName,
+      signatureVerificationResponse
+    );
   }
 
   public async getSnip9Version(): Promise<EOutsideExecutionVersion> {

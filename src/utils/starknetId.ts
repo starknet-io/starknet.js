@@ -22,8 +22,13 @@ function extractStars(str: string): [string, number] {
 
 /**
  * Decodes an array of BigInts into a string using the given algorithm.
- * @param {bigint[]} encoded - The encoded array of BigInts.
+ * @param {bigint[]} encoded The encoded array of BigInts.
  * @return {string} The decoded string.
+ * @example
+ * ```typescript
+ * const result = starknetId.useDecoded([3015206943634620n]);
+ * // result = "starknetjs.stark"
+ * ```
  */
 export function useDecoded(encoded: bigint[]): string {
   let decoded = '';
@@ -69,8 +74,13 @@ export function useDecoded(encoded: bigint[]): string {
 /**
  * Encodes a string into a bigint value.
  *
- * @param {string} decoded - The string to be encoded.
- * @returns {bigint} - The encoded bigint value.
+ * @param {string} decoded The string to be encoded.
+ * @returns {bigint} The encoded bigint value.
+ * @example
+ * ```typescript
+ * const result = starknetId.useEncoded("starknet.js");
+ * // result = 3015206943634620n
+ * ```
  */
 export function useEncoded(decoded: string): bigint {
   let encoded = BigInt(0);
@@ -114,26 +124,27 @@ export function useEncoded(decoded: string): bigint {
   return encoded;
 }
 
-export const enum StarknetIdContract {
+export enum StarknetIdContract {
   MAINNET = '0x6ac597f8116f886fa1c97a23fa4e08299975ecaf6b598873ca6792b9bbfb678',
-  TESTNET = '0x3bab268e932d2cecd1946f100ae67ce3dff9fd234119ea2f6da57d16d29fce',
-  TESTNET_SEPOLIA = '0x0707f09bc576bd7cfee59694846291047e965f4184fe13dac62c56759b3b6fa7',
+  TESTNET_SEPOLIA = '0x154bc2e1af9260b9e66af0e9c46fc757ff893b3ff6a85718a810baf1474',
 }
 
 /**
  * Returns the Starknet ID contract address based on the provided chain ID.
  *
- * @param {StarknetChainId} chainId - The chain ID of the Starknet network.
+ * @param {StarknetChainId} chainId The chain ID of the Starknet network.
  * @return {string} The Starknet ID contract address.
  * @throws {Error} Throws an error if the Starknet ID contract is not deployed on the network.
+ * @example
+ * ```typescript
+ * const result = starknetId.getStarknetIdContract(constants.StarknetChainId.SN_SEPOLIA);
+ * // result = "0x154bc2e1af9260b9e66af0e9c46fc757ff893b3ff6a85718a810baf1474"
+ * ```
  */
 export function getStarknetIdContract(chainId: StarknetChainId): string {
   switch (chainId) {
     case StarknetChainId.SN_MAIN:
       return StarknetIdContract.MAINNET;
-
-    case StarknetChainId.SN_GOERLI:
-      return StarknetIdContract.TESTNET;
 
     case StarknetChainId.SN_SEPOLIA:
       return StarknetIdContract.TESTNET_SEPOLIA;
@@ -143,28 +154,29 @@ export function getStarknetIdContract(chainId: StarknetChainId): string {
   }
 }
 
-export const enum StarknetIdIdentityContract {
+export enum StarknetIdIdentityContract {
   MAINNET = '0x05dbdedc203e92749e2e746e2d40a768d966bd243df04a6b712e222bc040a9af',
-  TESTNET = '0x783a9097b26eae0586373b2ce0ed3529ddc44069d1e0fbc4f66d42b69d6850d',
-  TESTNET_SEPOLIA = '0x070DF8B4F5cb2879f8592849fA8f3134da39d25326B8558cc9C8FE8D47EA3A90',
+  TESTNET_SEPOLIA = '0x3697660a0981d734780731949ecb2b4a38d6a58fc41629ed611e8defda',
 }
 
 /**
  * Returns the Starknet ID identity contract address for the given chain ID.
  *
- * @param {StarknetChainId} chainId - The chain ID for the specified network.
+ * @param {StarknetChainId} chainId The chain ID for the specified network.
  *
- * @return {string} - The Starknet ID identity contract address for the specified network.
+ * @return {string} The Starknet ID identity contract address for the specified network.
  *
- * @throws {Error} - If the Starknet ID verifier contract is not deployed on the network.
+ * @throws {Error} If the Starknet ID verifier contract is not deployed on the network.
+ * @example
+ * ```typescript
+ * const result = starknetId.getStarknetIdIdentityContract(constants.StarknetChainId.SN_SEPOLIA);
+ * // result = "0x3697660a0981d734780731949ecb2b4a38d6a58fc41629ed611e8defda"
+ * ```
  */
 export function getStarknetIdIdentityContract(chainId: StarknetChainId): string {
   switch (chainId) {
     case StarknetChainId.SN_MAIN:
       return StarknetIdIdentityContract.MAINNET;
-
-    case StarknetChainId.SN_GOERLI:
-      return StarknetIdIdentityContract.TESTNET;
 
     case StarknetChainId.SN_SEPOLIA:
       return StarknetIdIdentityContract.TESTNET_SEPOLIA;
@@ -183,13 +195,15 @@ export const StarknetIdMulticallContract =
  * @param {StarknetChainId} chainId - The chainId of the network.
  * @return {string} - The address of the Starknet.id multicall contract.
  * @throws {Error} - If the Starknet.id multicall contract is not deployed on the network.
+ * @example
+ * ```typescript
+ * const result = starknetId.getStarknetIdMulticallContract(constants.StarknetChainId.SN_SEPOLIA);
+ * // result = "0x034ffb8f4452df7a613a0210824d6414dbadcddce6c6e19bf4ddc9e22ce5f970"
+ * ```
  */
 export function getStarknetIdMulticallContract(chainId: StarknetChainId): string {
   switch (chainId) {
     case StarknetChainId.SN_MAIN:
-      return StarknetIdMulticallContract;
-
-    case StarknetChainId.SN_GOERLI:
       return StarknetIdMulticallContract;
 
     case StarknetChainId.SN_SEPOLIA:
@@ -200,10 +214,9 @@ export function getStarknetIdMulticallContract(chainId: StarknetChainId): string
   }
 }
 
-export const enum StarknetIdVerifierContract {
+export enum StarknetIdVerifierContract {
   MAINNET = '0x07d14dfd8ee95b41fce179170d88ba1f0d5a512e13aeb232f19cfeec0a88f8bf',
-  TESTNET = '0x057c942544063c3aea6ea6c37009cc9d1beacd750cb6801549a129c7265f0f11',
-  TESTNET_SEPOLIA = '0x0182EcE8173C216A395f4828e1523541b7e3600bf190CB252E1a1A0cE219d184',
+  TESTNET_SEPOLIA = '0x60B94fEDe525f815AE5E8377A463e121C787cCCf3a36358Aa9B18c12c4D566',
 }
 
 /**
@@ -212,14 +225,16 @@ export const enum StarknetIdVerifierContract {
  * @param {StarknetChainId} chainId - The ID of the Starknet chain.
  * @return {string} - The address of the Starknet ID Verifier contract.
  * @throws {Error} - If the Starknet ID Verifier contract is not deployed on the specified network.
+ * @example
+ * ```typescript
+ * const result = starknetId.getStarknetIdVerifierContract(constants.StarknetChainId.SN_SEPOLIA);
+ * // result = "0x60B94fEDe525f815AE5E8377A463e121C787cCCf3a36358Aa9B18c12c4D566"
+ * ```
  */
 export function getStarknetIdVerifierContract(chainId: StarknetChainId): string {
   switch (chainId) {
     case StarknetChainId.SN_MAIN:
       return StarknetIdVerifierContract.MAINNET;
-
-    case StarknetChainId.SN_GOERLI:
-      return StarknetIdVerifierContract.TESTNET;
 
     case StarknetChainId.SN_SEPOLIA:
       return StarknetIdVerifierContract.TESTNET_SEPOLIA;
@@ -229,10 +244,9 @@ export function getStarknetIdVerifierContract(chainId: StarknetChainId): string 
   }
 }
 
-export const enum StarknetIdPfpContract {
+export enum StarknetIdPfpContract {
   MAINNET = '0x070aaa20ec4a46da57c932d9fd89ca5e6bb9ca3188d3df361a32306aff7d59c7',
-  TESTNET = '0x03cac3228b434259734ee0e4ff445f642206ea11adace7e4f45edd2596748698',
-  TESTNET_SEPOLIA = '0x058061bb6bdc501eE215172c9f87d557C1E0f466dC498cA81b18f998Bf1362b2',
+  TESTNET_SEPOLIA = '0x9e7bdb8dabd02ea8cfc23b1d1c5278e46490f193f87516ed5ff2dfec02',
 }
 
 /**
@@ -241,14 +255,16 @@ export const enum StarknetIdPfpContract {
  * @param {StarknetChainId} chainId - The chain ID of the network.
  * @returns {string} - The contract address of the Starknet.id profile picture verifier contract.
  * @throws {Error} - Throws an error if the Starknet.id profile picture verifier contract is not yet deployed on the network.
+ * @example
+ * ```typescript
+ * const result = starknetId.getStarknetIdPfpContract(constants.StarknetChainId.SN_SEPOLIA);
+ * // result = "0x9e7bdb8dabd02ea8cfc23b1d1c5278e46490f193f87516ed5ff2dfec02"
+ * ```
  */
 export function getStarknetIdPfpContract(chainId: StarknetChainId): string {
   switch (chainId) {
     case StarknetChainId.SN_MAIN:
       return StarknetIdPfpContract.MAINNET;
-
-    case StarknetChainId.SN_GOERLI:
-      return StarknetIdPfpContract.TESTNET;
 
     case StarknetChainId.SN_SEPOLIA:
       return StarknetIdPfpContract.TESTNET_SEPOLIA;
@@ -260,10 +276,9 @@ export function getStarknetIdPfpContract(chainId: StarknetChainId): string {
   }
 }
 
-export const enum StarknetIdPopContract {
+export enum StarknetIdPopContract {
   MAINNET = '0x0293eb2ba9862f762bd3036586d5755a782bd22e6f5028320f1d0405fd47bff4',
-  TESTNET = '0x03528caf090179e337931ee669a5b0214041e1bae30d460ff07d2cea2c7a9106',
-  TESTNET_SEPOLIA = '0x0023FE3b845ed5665a9eb3792bbB17347B490EE4090f855C1298d03BB5F49B49',
+  TESTNET_SEPOLIA = '0x15ae88ae054caa74090b89025c1595683f12edf7a4ed2ad0274de3e1d4a',
 }
 
 /**
@@ -272,14 +287,16 @@ export const enum StarknetIdPopContract {
  * @param {StarknetChainId} chainId - The chain ID of the Starknet network.
  * @return {string} - The Starknet ID Pop contract address.
  * @throws {Error} - If the Starknet ID Pop contract is not deployed on the specified network.
+ * @example
+ * ```typescript
+ * const result = starknetId.getStarknetIdPopContract(constants.StarknetChainId.SN_SEPOLIA);
+ * // result = "0x15ae88ae054caa74090b89025c1595683f12edf7a4ed2ad0274de3e1d4a"
+ * ```
  */
 export function getStarknetIdPopContract(chainId: StarknetChainId): string {
   switch (chainId) {
     case StarknetChainId.SN_MAIN:
       return StarknetIdPopContract.MAINNET;
-
-    case StarknetChainId.SN_GOERLI:
-      return StarknetIdPopContract.TESTNET;
 
     case StarknetChainId.SN_SEPOLIA:
       return StarknetIdPopContract.TESTNET_SEPOLIA;
@@ -292,13 +309,24 @@ export function getStarknetIdPopContract(chainId: StarknetChainId): string {
 }
 
 /**
- * Executes a method and returns a CairoCustomEnum object.
+ * Returns a CairoCustomEnum object.
  *
- * Functions to build CairoCustomEnum for multicall contracts
- * @param {Object} staticEx - An optional object defining the "Static" value of the CairoCustomEnum.
- * @param {number[]} ifEqual - An optional array defining the "IfEqual" value of the CairoCustomEnum.
- * @param {number[]} ifNotEqual - An optional array defining the "IfNotEqual" value of the CairoCustomEnum.
+ * Functions to build CairoCustomEnum for multiCall contracts
+ * @param {Object} [staticEx] An optional object defining the "Static" value of the CairoCustomEnum.
+ * @param {number[]} [ifEqual] An optional array defining the "IfEqual" value of the CairoCustomEnum.
+ * @param {number[]} [ifNotEqual] An optional array defining the "IfNotEqual" value of the CairoCustomEnum.
  * @return {CairoCustomEnum} - The created CairoCustomEnum object.
+ * @example
+ * ```typescript
+ * const result: CairoCustomEnum = starknetId.execution(undefined, [1, 2, 3], undefined);
+ * // result = CairoCustomEnum {
+ * //   variant: {
+ * //     Static: undefined,
+ * //     IfEqual: { '0': 1, '1': 2, '2': 3 },
+ * //     IfNotEqual: undefined
+ * //   }
+ * // }
+ * ```
  */
 export function execution(
   staticEx: {} | undefined,
@@ -315,9 +343,16 @@ export function execution(
 /**
  * Creates a new instance of CairoCustomEnum.
  *
- * @param {BigNumberish | undefined} hardcoded - The hardcoded value for the CairoCustomEnum.
- * @param {number[] | undefined} reference - The reference array for the CairoCustomEnum.
+ * @param {BigNumberish} [hardcoded] The hardcoded value for the CairoCustomEnum.
+ * @param {number[]} [reference] The reference array for the CairoCustomEnum.
  * @returns {CairoCustomEnum} The new instance of CairoCustomEnum.
+ * @example
+ * ```typescript
+ * const result: CairoCustomEnum = starknetId.dynamicFelt(undefined, [1, 2]);
+ * // result = CairoCustomEnum {
+ * //  variant: { Hardcoded: undefined, Reference: { '0': 1, '1': 2 } }
+ * // }
+ * ```
  */
 export function dynamicFelt(
   hardcoded: BigNumberish | undefined,
@@ -331,10 +366,21 @@ export function dynamicFelt(
 
 /**
  * Creates a new instance of CairoCustomEnum with the given parameters.
- * @param {BigNumberish | undefined} hardcoded - The hardcoded value.
- * @param {BigNumberish[] | undefined} [reference] - The reference value (optional).
- * @param {BigNumberish[] | undefined} [arrayReference] - The array reference value (optional).
- * @return {CairoCustomEnum} - The new instance of CairoCustomEnum.
+ * @param {BigNumberish} [hardcoded] The hardcoded value.
+ * @param {BigNumberish[]} [reference] The reference value (optional).
+ * @param {BigNumberish[]} [arrayReference] The array reference value (optional).
+ * @return {CairoCustomEnum} The new instance of CairoCustomEnum.
+ * @example
+ * ```typescript
+ * const result: CairoCustomEnum = starknetId.dynamicCallData(undefined, [1, 2], undefined);
+ * // result = CairoCustomEnum {
+ * //   variant: {
+ * //     Hardcoded: undefined,
+ * //     Reference: { '0': 1, '1': 2 },
+ * //     ArrayReference: undefined
+ * //   }
+ * // }
+ * ```
  */
 export function dynamicCallData(
   hardcoded: BigNumberish | undefined,

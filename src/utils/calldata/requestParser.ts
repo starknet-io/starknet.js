@@ -21,6 +21,7 @@ import {
   isTypeArray,
   isTypeBytes31,
   isTypeEnum,
+  isTypeNonZero,
   isTypeOption,
   isTypeResult,
   isTypeSecp256k1Point,
@@ -261,6 +262,10 @@ function parseCalldataValue(
     return [numActiveVariant.toString(), parsedParameter];
   }
 
+  if (isTypeNonZero(type)) {
+    return parseBaseTypes(getArrayType(type), element as BigNumberish);
+  }
+
   if (typeof element === 'object') {
     throw Error(`Parameter ${element} do not align with abi parameter ${type}`);
   }
@@ -296,7 +301,8 @@ export function parseCalldataField(
         value = splitLongString(value);
       }
       return parseCalldataValue(value, input.type, structs, enums);
-
+    case isTypeNonZero(type):
+      return parseBaseTypes(getArrayType(type), value);
     case type === 'core::starknet::eth_address::EthAddress':
       return parseBaseTypes(type, value);
     // Struct or Tuple

@@ -32,7 +32,7 @@
           "type": "object"
         },
         "abi": {
-          "type": "array"
+          "$ref": "starknet_metadata#/components/schemas/ABI"
         }
       },
       "required": ["sierra_program", "contract_class_version", "entry_points_by_type", "abi"]

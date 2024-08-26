@@ -87,10 +87,21 @@ console.log('✅ New OpenZeppelin account created.\n   address =', contract_addr
 
 ## Create an Argent account
 
-Here, we will create a wallet with the Argent smart contract v0.3.0. The contract class is already implemented in the networks.
+Here, we will create a wallet with the Argent smart contract v0.4.0. The contract class is already implemented in the networks.
 
 ```typescript
-import { Account, ec, json, stark, RpcProvider, hash, CallData } from 'starknet';
+import {
+  Account,
+  ec,
+  json,
+  stark,
+  RpcProvider,
+  hash,
+  CallData,
+  CairoOption,
+  CairoOptionVariant,
+  CairoCustomEnum,
+} from 'starknet';
 ```
 
 ### Compute address
@@ -99,8 +110,9 @@ import { Account, ec, json, stark, RpcProvider, hash, CallData } from 'starknet'
 // connect provider
 const provider = new RpcProvider({ nodeUrl: `${myNodeUrl}` });
 
-//new Argent X account v0.3.0
-const argentXaccountClassHash = '0x1a736d6ed154502257f02b1ccdf4d9d1089f80811cd6acad48e6b6a9d1f2003';
+//new Argent X account v0.4.0
+const argentXaccountClassHash =
+  '0x036078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f';
 
 // Generate public and private key pair.
 const privateKeyAX = stark.randomAddress();
@@ -109,9 +121,11 @@ const starkKeyPubAX = ec.starkCurve.getStarkKey(privateKeyAX);
 console.log('AX_ACCOUNT_PUBLIC_KEY=', starkKeyPubAX);
 
 // Calculate future address of the ArgentX account
+const axSigner = new CairoCustomEnum({ Starknet: { pubkey: starkKeyPubAX } });
+const axGuardian = new CairoOption<unknown>(CairoOptionVariant.None);
 const AXConstructorCallData = CallData.compile({
-  owner: starkKeyPubAX,
-  guardian: '0',
+  owner: axSigner,
+  guardian: axGuardian,
 });
 const AXcontractAddress = hash.calculateContractAddressFromHash(
   starkKeyPubAX,
@@ -122,7 +136,7 @@ const AXcontractAddress = hash.calculateContractAddressFromHash(
 console.log('Precalculated account address=', AXcontractAddress);
 ```
 
-If you want a specific private key, replace `stark.randomAddress`()` with your choice.
+If you want a specific private key, replace `stark.randomAddress()` with a value of your choice.
 
 Then you have to fund this address.
 
@@ -249,6 +263,12 @@ const contractETHaddress = hash.calculateContractAddressFromHash(
 );
 console.log('Pre-calculated ETH account address =', contractETHaddress);
 ```
+
+> If you need a random Ethereum private key:
+>
+> ```typescript
+> const myPrivateKey = eth.ethRandomPrivateKey();
+> ```
 
 Then you have to fund this address.
 

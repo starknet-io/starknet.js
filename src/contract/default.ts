@@ -21,7 +21,7 @@ import {
   ParsedEvents,
   RawArgs,
   Result,
-  StructAbi,
+  AbiStruct,
   ValidateType,
 } from '../types';
 import assert from '../utils/assert';
@@ -124,7 +124,7 @@ export class Contract implements ContractInterface {
 
   deployTransactionHash?: string;
 
-  protected readonly structs: { [name: string]: StructAbi };
+  protected readonly structs: { [name: string]: AbiStruct };
 
   protected readonly events: AbiEvents;
 

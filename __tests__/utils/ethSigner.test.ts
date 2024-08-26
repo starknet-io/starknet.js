@@ -9,9 +9,12 @@ import {
   cairo,
   encode,
   eth,
+  extractContractHashes,
+  getLedgerPathBuffer,
   hash,
   num,
   stark,
+  type DeclareContractPayload,
 } from '../../src';
 import { validateAndParseEthAddress } from '../../src/utils/eth';
 import { ETransactionVersion } from '../../src/types/api';
@@ -25,6 +28,8 @@ import {
   compiledEthCasm,
   compiledEthPubk,
   compiledEthPubkCasm,
+  describeIfDevnet,
+  devnetETHtokenAddress,
   getTestAccount,
   getTestProvider,
 } from '../config/fixtures';
@@ -93,11 +98,10 @@ describe('Ethereum signer', () => {
     });
   });
 
-  describe('ETH account tx V2', () => {
+  describeIfDevnet('ETH account tx V2', () => {
+    // devnet only because estimateFee in Sepolia v0.13.1 are producing widely different numbers.
     const provider = new Provider(getTestProvider());
     const account = getTestAccount(provider);
-    const devnetETHtokenAddress =
-      '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
     let ethAccount: Account;
     beforeAll(async () => {
       const { transaction_hash: declTH, class_hash: decClassHash } = await account.declareIfNot({
@@ -107,7 +111,7 @@ describe('Ethereum signer', () => {
       if (declTH) {
         await provider.waitForTransaction(declTH);
       }
-      const privateKeyETH = '0x45397ee6ca34cb49060f1c303c6cb7ee2d6123e617601ef3e31ccf7bf5bef1f9';
+      const privateKeyETH = eth.ethRandomPrivateKey();
       const ethSigner = new EthSigner(privateKeyETH);
       const ethFullPublicKey = await ethSigner.getPubKey();
       const pubKeyETHx = cairo.uint256(
@@ -125,17 +129,6 @@ describe('Ethereum signer', () => {
         0
       );
 
-      // fund account with ETH
-      const { transaction_hash } = await account.execute({
-        contractAddress: devnetETHtokenAddress,
-        entrypoint: 'transfer',
-        calldata: {
-          recipient: contractETHAccountAddress,
-          amount: cairo.uint256(5 * 10 ** 17),
-        },
-      });
-      await account.waitForTransaction(transaction_hash);
-
       ethAccount = new Account(provider, contractETHAccountAddress, ethSigner);
       const deployPayload = {
         classHash: decClassHash,
@@ -144,9 +137,20 @@ describe('Ethereum signer', () => {
       };
       const { suggestedMaxFee: feeDeploy } =
         await ethAccount.estimateAccountDeployFee(deployPayload);
+      // fund account with ETH
+      const { transaction_hash } = await account.execute({
+        contractAddress: devnetETHtokenAddress,
+        entrypoint: 'transfer',
+        calldata: {
+          recipient: contractETHAccountAddress,
+          amount: cairo.uint256(3n * 10n ** 16n),
+        },
+      });
+      await account.waitForTransaction(transaction_hash);
+
       const { transaction_hash: txH2, contract_address } = await ethAccount.deployAccount(
         deployPayload,
-        { maxFee: stark.estimatedFeeToMaxFee(feeDeploy, 100) }
+        { maxFee: stark.estimatedFeeToMaxFee(feeDeploy, 300) }
       );
       await provider.waitForTransaction(txH2);
       expect(contract_address).toBe(contractETHAccountAddress);
@@ -156,11 +160,10 @@ describe('Ethereum signer', () => {
       const ethContract2 = new Contract(compiledErc20.abi, devnetETHtokenAddress, ethAccount);
       const respTransfer = await ethContract2.transfer(
         account.address,
-        cairo.uint256(2 * 10 ** 16),
+        cairo.uint256(1 * 10 ** 4),
         { maxFee: 1 * 10 ** 16 }
       );
       const txR = await provider.waitForTransaction(respTransfer.transaction_hash);
-
       if (txR.isSuccess()) {
         expect(txR.execution_status).toBe('SUCCEEDED');
       } else {
@@ -185,7 +188,8 @@ describe('Ethereum signer', () => {
     });
   });
 
-  describe('ETH account tx V3', () => {
+  describeIfDevnet('ETH account tx V3', () => {
+    // devnet only because estimateFee in Sepolia v0.13.1 are producing widely different numbers.
     const provider = new Provider(getTestProvider());
     const account = getTestAccount(provider);
     const devnetSTRKtokenAddress =
@@ -199,7 +203,7 @@ describe('Ethereum signer', () => {
       if (declTH) {
         await provider.waitForTransaction(declTH);
       }
-      const privateKeyETH = '0x525bc68475c0955fae83869beec0996114d4bb27b28b781ed2a20ef23121b8de';
+      const privateKeyETH = eth.ethRandomPrivateKey();
       const ethSigner = new EthSigner(privateKeyETH);
       const ethFullPublicKey = await ethSigner.getPubKey();
       const pubKeyETHx = cairo.uint256(
@@ -218,17 +222,6 @@ describe('Ethereum signer', () => {
         0
       );
 
-      // fund account with STRK
-      const { transaction_hash } = await account.execute({
-        contractAddress: devnetSTRKtokenAddress,
-        entrypoint: 'transfer',
-        calldata: {
-          recipient: contractETHAccountAddress,
-          amount: cairo.uint256(5 * 10 ** 17),
-        },
-      });
-      await account.waitForTransaction(transaction_hash);
-
       ethAccount = new Account(
         provider,
         contractETHAccountAddress,
@@ -241,6 +234,16 @@ describe('Ethereum signer', () => {
         addressSalt: salt,
         constructorCalldata: accountETHconstructorCalldata,
       });
+      // fund account with STRK
+      const { transaction_hash } = await account.execute({
+        contractAddress: devnetSTRKtokenAddress,
+        entrypoint: 'transfer',
+        calldata: {
+          recipient: contractETHAccountAddress,
+          amount: cairo.uint256(30n * 10n ** 16n), // 0.3 STRK
+        },
+      });
+      await account.waitForTransaction(transaction_hash);
       const { transaction_hash: txH2, contract_address } = await ethAccount.deployAccount(
         {
           classHash: decClassHash,
@@ -253,7 +256,7 @@ describe('Ethereum signer', () => {
             l1_gas: {
               max_amount: num.toHex(BigInt(feeEstimation.resourceBounds.l1_gas.max_amount) * 2n),
               max_price_per_unit: num.toHex(
-                BigInt(feeEstimation.resourceBounds.l1_gas.max_price_per_unit) * 2n
+                BigInt(feeEstimation.resourceBounds.l1_gas.max_price_per_unit)
               ),
             },
           },
@@ -264,22 +267,18 @@ describe('Ethereum signer', () => {
     });
 
     test('ETH account transaction V3', async () => {
-      const ethContract2 = new Contract(compiledErc20.abi, devnetSTRKtokenAddress, ethAccount);
-      const txCallData = ethContract2.populate('transfer', [
+      const strkContract2 = new Contract(compiledErc20.abi, devnetSTRKtokenAddress, ethAccount);
+      const txCallData = strkContract2.populate('transfer', [
         account.address,
-        cairo.uint256(1 * 10 ** 15),
+        cairo.uint256(1 * 10 ** 4),
       ]);
       const feeTransfer = await ethAccount.estimateInvokeFee(txCallData);
       const respTransfer = await ethAccount.execute(txCallData, undefined, {
         resourceBounds: {
           l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
           l1_gas: {
-            max_amount: num.toHex(
-              stark.estimatedFeeToMaxFee(feeTransfer.resourceBounds.l1_gas.max_amount, 150)
-            ),
-            max_price_per_unit: num.toHex(
-              stark.estimatedFeeToMaxFee(feeTransfer.resourceBounds.l1_gas.max_price_per_unit, 150)
-            ),
+            max_amount: num.toHex(BigInt(feeTransfer.resourceBounds.l1_gas.max_amount) * 3n),
+            max_price_per_unit: num.toHex(feeTransfer.resourceBounds.l1_gas.max_price_per_unit),
           },
         },
       });
@@ -295,30 +294,48 @@ describe('Ethereum signer', () => {
     test('ETH account declaration V3', async () => {
       const accountTestSierra = compiledDummy2Eth;
       const accountTestCasm = compiledDummy2EthCasm;
-      const feeDeclare = await ethAccount.estimateDeclareFee({
+      const payload: DeclareContractPayload = {
         contract: accountTestSierra,
         casm: accountTestCasm,
-      });
-      const { transaction_hash: declTH2, class_hash: decClassHash2 } =
-        await ethAccount.declareIfNot(
-          { contract: accountTestSierra, casm: accountTestCasm },
+      };
+      const declareContractPayload = extractContractHashes(payload);
+      try {
+        await provider.getClassByHash(declareContractPayload.classHash);
+        expect(true).toBeTruthy(); // test skipped if class already declared
+      } catch {
+        const feeDeclare = await ethAccount.estimateDeclareFee(payload);
+        const { transaction_hash: declTH2, class_hash: decClassHash2 } = await ethAccount.declare(
+          payload,
           {
             resourceBounds: {
               l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
               l1_gas: {
                 max_amount: num.toHex(BigInt(feeDeclare.resourceBounds.l1_gas.max_amount) * 2n),
                 max_price_per_unit: num.toHex(
-                  BigInt(feeDeclare.resourceBounds.l1_gas.max_price_per_unit) * 2n
+                  BigInt(feeDeclare.resourceBounds.l1_gas.max_price_per_unit)
                 ),
               },
             },
           }
         );
-      if (declTH2) {
         await provider.waitForTransaction(declTH2);
+        expect(decClassHash2).toBe(
+          '0x5d574bd1467f1ca5178c118be7cdb3e74718c37bae90ab686a9b8536ca24436'
+        );
       }
-      expect(decClassHash2).toBe(
-        '0x5d574bd1467f1ca5178c118be7cdb3e74718c37bae90ab686a9b8536ca24436'
+    });
+  });
+  describe('Ethereum address', () => {
+    test('Eth address format', async () => {
+      const ethAddr = '0x8359E4B0152ed5A731162D3c7B0D8D56edB165'; // not a valid 20 bytes ETh address
+      expect(validateAndParseEthAddress(ethAddr)).toBe(
+        '0x008359e4b0152ed5a731162d3c7b0d8d56edb165'
+      );
+      expect(validateAndParseEthAddress(BigInt(ethAddr))).toBe(
+        '0x008359e4b0152ed5a731162d3c7b0d8d56edb165'
+      );
+      expect(validateAndParseEthAddress(BigInt(ethAddr).toString(10))).toBe(
+        '0x008359e4b0152ed5a731162d3c7b0d8d56edb165'
       );
     });
   });
@@ -335,5 +352,18 @@ describe('Ethereum signer', () => {
         '0x008359e4b0152ed5a731162d3c7b0d8d56edb165'
       );
     });
+  });
+});
+
+describe('Ledger Signer', () => {
+  // signature of Ledger can't be tested automatically.
+  // So, just the test of the path encoding.
+  test('getLedgerPathBuffer', () => {
+    const path = getLedgerPathBuffer(3, 'AstroAPP');
+    expect(path).toEqual(
+      new Uint8Array([
+        128, 0, 10, 85, 71, 65, 233, 201, 95, 192, 123, 107, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0,
+      ])
+    );
   });
 });

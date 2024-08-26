@@ -3,7 +3,6 @@ import { SignerInterface } from '../signer';
 import {
   Abi,
   AllowArray,
-  BigNumberish,
   BlockIdentifier,
   CairoVersion,
   Call,
@@ -150,11 +149,11 @@ export abstract class AccountInterface extends ProviderInterface {
    * Estimate Fee for executing a list of transactions on starknet
    * Contract must be deployed for fee estimation to be possible
    *
-   * @param transactions array of transaction object containing :
+   * @param invocations array of transaction object containing :
    * - type - the type of transaction : 'DECLARE' | (multi)'DEPLOY' | (multi)'INVOKE_FUNCTION' | 'DEPLOY_ACCOUNT'
    * - payload - the payload of the transaction
    *
-   *  @param estimateFeeDetails -
+   *  @param details -
    * - blockIdentifier?
    * - nonce?
    * - skipValidate? - default true
@@ -347,45 +346,24 @@ export abstract class AccountInterface extends ProviderInterface {
   ): Promise<DeployContractResponse>;
 
   /**
-   * Signs a JSON object for off-chain usage with the Starknet private key and returns the signature
+   * Signs a TypedData object for off-chain usage with the Starknet private key and returns the signature
    * This adds a message prefix so it can't be interchanged with transactions
    *
-   * @param json - JSON object to be signed
-   * @returns the signature of the JSON object
-   * @throws {Error} if the JSON object is not a valid JSON
+   * @param typedData - TypedData object to be signed
+   * @returns the signature of the TypedData object
+   * @throws {Error} if typedData is not a valid TypedData
    */
   public abstract signMessage(typedData: TypedData): Promise<Signature>;
 
   /**
-   * Hash a JSON object with Pedersen hash and return the hash
+   * Hash a TypedData object with Pedersen hash and return the hash
    * This adds a message prefix so it can't be interchanged with transactions
    *
-   * @param json - JSON object to be hashed
-   * @returns the hash of the JSON object
-   * @throws {Error} if the JSON object is not a valid JSON
+   * @param typedData - TypedData object to be hashed
+   * @returns the hash of the TypedData object
+   * @throws {Error} if typedData is not a valid TypedData
    */
   public abstract hashMessage(typedData: TypedData): Promise<string>;
-
-  /**
-   * Verify a signature of a JSON object
-   *
-   * @param typedData - JSON object to be verified
-   * @param signature - signature of the JSON object
-   * @returns true if the signature is valid, false otherwise
-   * @throws {Error} if the JSON object is not a valid JSON or the signature is not a valid signature
-   */
-  public abstract verifyMessage(typedData: TypedData, signature: Signature): Promise<boolean>;
-
-  /**
-   * Verify a signature of a given hash
-   * @warning This method is not recommended, use verifyMessage instead
-   *
-   * @param hash - hash to be verified
-   * @param signature - signature of the hash
-   * @returns true if the signature is valid, false otherwise
-   * @throws {Error} if the signature is not a valid signature
-   */
-  public abstract verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean>;
 
   /**
    * Get the supported version of the outside execution for the account

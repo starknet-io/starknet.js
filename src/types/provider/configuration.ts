@@ -6,6 +6,7 @@ export interface ProviderOptions extends RpcProviderOptions {}
 export type RpcProviderOptions = {
   nodeUrl?: string | NetworkName;
   retries?: number;
+  transactionRetryIntervalFallback?: number;
   headers?: object;
   blockIdentifier?: BlockIdentifier;
   chainId?: StarknetChainId;
@@ -17,4 +18,5 @@ export type RpcProviderOptions = {
     l1BoundMaxPricePerUnit: number;
     maxFee: number;
   };
+  batch?: false | number;
 };
