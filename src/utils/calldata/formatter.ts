@@ -2,6 +2,14 @@ import { isBigInt } from '../num';
 import { decodeShortString } from '../shortString';
 
 const guard = {
+  /**
+   * Checks if the data is a BigInt (BN) and throws an error if not.
+   * 
+   * @param {Record<string, any>} data - The data object containing the key to check.
+   * @param {Record<string, any>} type - The type definition object.
+   * @param {string} key - The key in the data object to check.
+   * @throws {Error} If the data type does not match the expected BigInt (BN) type.
+   */
   isBN: (data: Record<string, any>, type: Record<string, any>, key: string) => {
     if (!isBigInt(data[key]))
       throw new Error(
@@ -10,6 +18,15 @@ const guard = {
         } to be BN instead it is ${typeof data[key]}`
       );
   },
+
+  /**
+   * Throws an error for unhandled formatter types.
+   * 
+   * @param {Record<string, any>} data - The data object containing the key.
+   * @param {Record<string, any>} type - The type definition object.
+   * @param {string} key - The key in the data object to check.
+   * @throws {Error} If the formatter encounters an unknown type.
+   */
   unknown: (data: Record<string, any>, type: Record<string, any>, key: string) => {
     throw new Error(`Unhandled formatter type on ${key}:${type[key]} for data ${key}:${data[key]}`);
   },
@@ -18,16 +35,37 @@ const guard = {
 /**
  * Formats the given data based on the provided type definition.
  *
- * @param {any} data - The data to be formatted.
- * @param {any} type - The type definition for the data.
+ * @param {Record<string, any>} data - The data to be formatted.
+ * @param {Record<string, any>} type - The type definition for the data.
  * @param {any} [sameType] - The same type definition to be used (optional).
- * @returns - The formatted data.
+ * @returns {Record<string, any>} The formatted data.
+ * 
+ * @example
+ * // Example 1: Formatting a simple object
+ * const data = { value: '123', name: 'test' };
+ * const type = { value: 'number', name: 'string' };
+ * const formatted = formatter(data, type);
+ * // formatted: { value: 123, name: 'test' }
+ * 
+ * @example
+ * // Example 2: Formatting an object with nested structures
+ * const data = { user: { id: '123', age: '30' }, active: '1' };
+ * const type = { user: { id: 'number', age: 'number' }, active: 'number' };
+ * const formatted = formatter(data, type);
+ * // formatted: { user: { id: 123, age: 30 }, active: 1 }
+ * 
+ * @example
+ * // Example 3: Handling arrays in the data object
+ * const data = { items: ['1', '2', '3'], name: 'test' };
+ * const type = { items: ['number'], name: 'string' };
+ * const formatted = formatter(data, type);
+ * // formatted: { items: [1, 2, 3], name: 'test' }
  */
 export default function formatter(
   data: Record<string, any>,
   type: Record<string, any>,
   sameType?: any
-) {
+): Record<string, any> {
   // match data element with type element
   return Object.entries(data).reduce(
     (acc, [key, value]: [any, any]) => {
