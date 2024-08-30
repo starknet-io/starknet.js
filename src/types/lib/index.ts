@@ -2,6 +2,7 @@ import { StarknetChainId } from '../../constants';
 import { weierstrass } from '../../utils/ec';
 import { EDataAvailabilityMode, ResourceBounds } from '../api';
 import { CairoEnum } from '../cairoEnum';
+import { ValuesType } from '../helpers/valuesType';
 import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 
 export type WeierstrassSignatureType = weierstrass.SignatureType;
@@ -99,6 +100,11 @@ export type DeclareContractPayload = {
   compiledClassHash?: string;
 };
 
+/**
+ * DeclareContractPayload with classHash or contract defined
+ */
+export type ContractIdentifier = DeclareContractPayload | { classHash: string };
+
 export type CompleteDeclareContractPayload = {
   contract: CompiledContract | string;
   classHash: string;
@@ -160,12 +166,14 @@ export type InvocationsDetailsWithNonce =
   | (InvocationsDetails & { nonce: BigNumberish })
   | V3TransactionDetails;
 
-export enum TransactionType {
-  DECLARE = 'DECLARE',
-  DEPLOY = 'DEPLOY',
-  DEPLOY_ACCOUNT = 'DEPLOY_ACCOUNT',
-  INVOKE = 'INVOKE_FUNCTION',
-}
+export const TransactionType = {
+  DECLARE: 'DECLARE',
+  DEPLOY: 'DEPLOY',
+  DEPLOY_ACCOUNT: 'DEPLOY_ACCOUNT',
+  INVOKE: 'INVOKE_FUNCTION',
+} as const;
+
+export type TransactionType = ValuesType<typeof TransactionType>;
 
 /**
  * new statuses are defined by props: finality_status and execution_status
