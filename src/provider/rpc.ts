@@ -575,23 +575,23 @@ export class RpcProvider implements ProviderInterface {
   }
 
   /**
-   * Test if class is already declared from contractIdentifier
+   * Test if class is already declared from ContractClassIdentifier
    * Helper method using getClass
-   * @param contractIdentifier
+   * @param ContractClassIdentifier
    * @param blockIdentifier
    */
   public async isClassDeclared(
-    contractIdentifier: ContractClassIdentifier,
+    contractClassIdentifier: ContractClassIdentifier,
     blockIdentifier?: BlockIdentifier
   ) {
     let classHash: string;
-    if (!contractIdentifier.classHash && 'contract' in contractIdentifier) {
-      const hashes = extractContractHashes(contractIdentifier);
+    if (!contractClassIdentifier.classHash && 'contract' in contractClassIdentifier) {
+      const hashes = extractContractHashes(contractClassIdentifier);
       classHash = hashes.classHash;
-    } else if (contractIdentifier.classHash) {
-      classHash = contractIdentifier.classHash;
+    } else if (contractClassIdentifier.classHash) {
+      classHash = contractClassIdentifier.classHash;
     } else {
-      throw Error('ContractIdentifier type not satisfied');
+      throw Error('contractClassIdentifier type not satisfied');
     }
 
     try {
