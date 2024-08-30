@@ -103,7 +103,7 @@ export type DeclareContractPayload = {
 /**
  * DeclareContractPayload with classHash or contract defined
  */
-export type ContractIdentifier = DeclareContractPayload | { classHash: string };
+export type ContractClassIdentifier = DeclareContractPayload | { classHash: string };
 
 export type CompleteDeclareContractPayload = {
   contract: CompiledContract | string;

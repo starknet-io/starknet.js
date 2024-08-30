@@ -9,7 +9,7 @@ import {
   BlockTag,
   Call,
   ContractClassResponse,
-  ContractIdentifier,
+  ContractClassIdentifier,
   ContractVersion,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
@@ -581,7 +581,7 @@ export class RpcProvider implements ProviderInterface {
    * @param blockIdentifier
    */
   public async isClassDeclared(
-    contractIdentifier: ContractIdentifier,
+    contractIdentifier: ContractClassIdentifier,
     blockIdentifier?: BlockIdentifier
   ) {
     let classHash: string;
