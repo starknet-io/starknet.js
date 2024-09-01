@@ -44,7 +44,7 @@ import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { formatSignature } from '../utils/stark';
 import { GetTransactionReceiptResponse, ReceiptTx } from '../utils/transactionReceipt';
 import { getMessageHash, validateTypedData } from '../utils/typedData';
-import { LibraryError } from './errors';
+import { LibraryError } from '../utils/errors';
 import { ProviderInterface } from './interface';
 
 export class RpcProvider implements ProviderInterface {
