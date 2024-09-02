@@ -7,5 +7,6 @@ export * from './signer';
 export * from './typedData';
 export * from './cairoEnum';
 export * from './transactionReceipt';
+export * from './outsideExecution';
 
 export * as RPC from './api';

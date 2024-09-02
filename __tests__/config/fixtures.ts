@@ -30,6 +30,8 @@ const readContractSierra = (name: string): CompiledSierra =>
 export const compiledOpenZeppelinAccount = readContract('Account');
 export const compiledErc20 = readContract('ERC20');
 export const compiledErc20Echo = readContract('ERC20-echo');
+export const compiledErc20OZ = readContractSierra('cairo/ERC20-241/ERC20OZ081.sierra');
+export const compiledErc20OZCasm = readContractSierraCasm('cairo/ERC20-241/ERC20OZ081');
 export const compiledL1L2 = readContract('l1l2_compiled');
 export const compiledTypeTransformation = readContract('contract');
 export const compiledMulticall = readContract('multicall');
@@ -41,6 +43,8 @@ export const compiledHelloSierraCasm = readContractSierraCasm('cairo/helloSierra
 export const compiledComplexSierra = readContractSierra('cairo/complexInput/complexInput');
 export const compiledC1Account = readContractSierra('cairo/account/accountOZ080');
 export const compiledC1AccountCasm = readContractSierraCasm('cairo/account/accountOZ080');
+export const compiledArgentX4Account = readContractSierra('cairo/account/accountArgent040');
+export const compiledArgentX4AccountCasm = readContractSierraCasm('cairo/account/accountArgent040');
 export const compiledC1v2 = readContractSierra('cairo/helloCairo2/compiled');
 export const compiledC1v2Casm = readContractSierraCasm('cairo/helloCairo2/compiled');
 export const compiledC210 = readContractSierra('cairo/cairo210/cairo210.sierra');

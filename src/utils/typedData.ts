@@ -7,9 +7,11 @@ import {
   StarknetMerkleType,
   StarknetType,
   TypedData,
+  type Signature,
 } from '../types';
 import assert from './assert';
 import { byteArrayFromString } from './calldata/byteArray';
+import { starkCurve } from './ec';
 import {
   computePedersenHash,
   computePedersenHashOnElements,
@@ -18,7 +20,7 @@ import {
   getSelectorFromName,
 } from './hash';
 import { MerkleTree } from './merkle';
-import { isHex, toHex } from './num';
+import { isBigNumberish, isHex, toHex } from './num';
 import { encodeShortString, isString } from './shortString';
 
 /** @deprecated prefer importing from 'types' over 'typedData' */
@@ -96,7 +98,7 @@ function getHex(value: BigNumberish): string {
 /**
  * Validates that `data` matches the EIP-712 JSON schema.
  */
-function validateTypedData(data: unknown): data is TypedData {
+export function validateTypedData(data: unknown): data is TypedData {
   const typedData = data as TypedData;
   return Boolean(
     typedData.message && typedData.primaryType && typedData.types && identifyRevision(typedData)
@@ -595,4 +597,63 @@ export function getMessageHash(typedData: TypedData, account: BigNumberish): str
   ];
 
   return hashMethod(message);
+}
+
+/**
+ * Checks if a signed EIP712 message is related to an account.
+ * Valid for a standard Starknet signature.
+ * @param {BigNumberish | TypedData} message a TypedMessage message, or the hash of an EIP712 message (SNIP-12).
+ * @param {Signature} signature a WeierstrassSignatureType signature, or an array of 2 strings.
+ * @param {BigNumberish} fullPublicKey a number coded on 520 bits (from ec.getFullPublicKey()).
+ * @param {BigNumberish} [accountAddress] address of the account that has signed the message. Not needed with a message hash is provided in `message`
+ * @returns {boolean} true if the message is verified.
+ * @example
+ * ```typescript
+ * const myTypedMessage: TypedMessage = .... ;
+ * const sign: Signature = ["0x123...abc", "0x345...def"];
+ * const fullPubK = "0x0400b730bd22358612b5a67f8ad52ce80f9e8e893639ade263537e6ef35852e5d3057795f6b090f7c6985ee143f798608a53b3659222c06693c630857a10a92acf";
+ * const accountAddress = "0x43b7240d227aa2fb8434350b3321c40ac1b88c7067982549e7609870621b535";
+ * const result1 = typedData.verifyMessage(myTypedMessage, sign, fullPubK, accountAddress);
+ * const result2 = typedData.verifyMessage(messageHash, sign, fullPubK);
+ * // result1 = result2 = true
+ * ```
+ */
+export function verifyMessage(
+  message: TypedData,
+  signature: Signature,
+  fullPublicKey: BigNumberish,
+  accountAddress: BigNumberish
+): boolean;
+export function verifyMessage(
+  message: BigNumberish,
+  signature: Signature,
+  fullPublicKey: BigNumberish
+): boolean;
+export function verifyMessage(
+  message: BigNumberish | TypedData,
+  signature: Signature,
+  fullPublicKey: BigNumberish,
+  accountAddress?: BigNumberish
+): boolean {
+  const isTypedData = validateTypedData(message);
+  if (!isBigNumberish(message) && !isTypedData) {
+    throw new Error('message has a wrong format.');
+  }
+  if (isTypedData && accountAddress === undefined) {
+    throw new Error(
+      'When providing a TypedData in message parameter, the accountAddress parameter has to be provided.'
+    );
+  }
+  if (isTypedData && !isBigNumberish(accountAddress)) {
+    throw new Error('accountAddress shall be a BigNumberish');
+  }
+  const messageHash = isTypedData
+    ? getMessageHash(message, accountAddress as BigNumberish)
+    : toHex(message);
+  const sign = Array.isArray(signature)
+    ? new starkCurve.Signature(BigInt(signature[0]), BigInt(signature[1]))
+    : signature;
+  const fullPubKey = toHex(fullPublicKey);
+  const isValid = starkCurve.verify(sign, messageHash, fullPubKey);
+  return isValid;
 }
