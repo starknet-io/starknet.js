@@ -26,6 +26,7 @@ import {
 import extractTupleMemberTypes from './tuple';
 
 import { isString } from '../shortString';
+import { isUndefined } from '../typed';
 
 function errorU256(key: string) {
   return Error(
@@ -184,7 +185,7 @@ export default function orderPropsByAbi(
     const unorderedCustomEnum = unorderedObject2 as CairoCustomEnum;
     const variants = Object.entries(unorderedCustomEnum.variant);
     const newEntries = variants.map((variant) => {
-      if (typeof variant[1] === 'undefined') {
+      if (isUndefined(variant[1])) {
         return variant;
       }
       const variantType: string = abiObject.type.substring(

@@ -14,6 +14,7 @@ import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { addHexPrefix, removeHexPrefix } from '../encode';
 import { toHex } from '../num';
 import { encodeShortString, isString, isText, splitLongString } from '../shortString';
+import { isUndefined } from '../typed';
 import { byteArrayFromString } from './byteArray';
 import {
   felt,
@@ -81,7 +82,7 @@ function parseTuple(element: object, typeStr: string): Tupled[] {
   if (elements.length !== memberTypes.length) {
     throw Error(
       `ParseTuple: provided and expected abi tuple size do not match.
-      provided: ${elements} 
+      provided: ${elements}
       expected: ${memberTypes}`
     );
   }
@@ -185,7 +186,7 @@ function parseCalldataValue(
       const myOption = element as CairoOption<any>;
       if (myOption.isSome()) {
         const listTypeVariant = variants.find((variant) => variant.name === 'Some');
-        if (typeof listTypeVariant === 'undefined') {
+        if (isUndefined(listTypeVariant)) {
           throw Error(`Error in abi : Option has no 'Some' variant.`);
         }
         const typeVariantSome = listTypeVariant.type;
@@ -210,7 +211,7 @@ function parseCalldataValue(
       const myResult = element as CairoResult<any, any>;
       if (myResult.isOk()) {
         const listTypeVariant = variants.find((variant) => variant.name === 'Ok');
-        if (typeof listTypeVariant === 'undefined') {
+        if (isUndefined(listTypeVariant)) {
           throw Error(`Error in abi : Result has no 'Ok' variant.`);
         }
         const typeVariantOk = listTypeVariant.type;
@@ -230,7 +231,7 @@ function parseCalldataValue(
       }
       // is Result::Err
       const listTypeVariant = variants.find((variant) => variant.name === 'Err');
-      if (typeof listTypeVariant === 'undefined') {
+      if (isUndefined(listTypeVariant)) {
         throw Error(`Error in abi : Result has no 'Err' variant.`);
       }
       const typeVariantErr = listTypeVariant.type;
@@ -247,7 +248,7 @@ function parseCalldataValue(
     const myEnum = element as CairoCustomEnum;
     const activeVariant: string = myEnum.activeVariant();
     const listTypeVariant = variants.find((variant) => variant.name === activeVariant);
-    if (typeof listTypeVariant === 'undefined') {
+    if (isUndefined(listTypeVariant)) {
       throw Error(`Not find in abi : Enum has no '${activeVariant}' variant.`);
     }
     const typeActiveVariant = listTypeVariant.type;

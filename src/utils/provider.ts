@@ -43,7 +43,7 @@ export function wait(delay: number): Promise<unknown> {
  * Create Sierra compressed Contract Class from a given Compiled Sierra
  *
  * CompiledSierra -> SierraContractClass
- * 
+ *
  * @param {CompiledSierra} contract sierra code from the Cairo compiler
  * @returns {SierraContractClass} compressed Sierra
  * @example

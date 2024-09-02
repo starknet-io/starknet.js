@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { SPEC } from 'starknet-types-07';
 import { UDC, ZERO } from '../constants';
 import { Provider, ProviderInterface } from '../provider';
 import { Signer, SignerInterface } from '../signer';
@@ -23,6 +21,7 @@ import {
   DeployContractUDCResponse,
   DeployTransactionReceiptResponse,
   EstimateFee,
+  UniversalSuggestedFee,
   EstimateFeeAction,
   EstimateFeeBulk,
   Invocation,
@@ -40,11 +39,12 @@ import {
   UniversalDeployerContractPayload,
   UniversalDetails,
 } from '../types';
-import { ETransactionVersion, ETransactionVersion3, ResourceBounds } from '../types/api';
+import { ETransactionVersion, ETransactionVersion3, type ResourceBounds } from '../types/api';
 import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { parseUDCEvent } from '../utils/events';
 import { calculateContractAddressFromHash } from '../utils/hash';
+import { isUndefined } from '../utils/typed';
 import { toBigInt, toCairoBool } from '../utils/num';
 import { parseContract } from '../utils/provider';
 import { isString } from '../utils/shortString';
@@ -637,9 +637,10 @@ export class Account extends Provider implements AccountInterface {
     version: ETransactionVersion,
     { type, payload }: EstimateFeeAction,
     details: UniversalDetails
-  ) {
+  ): Promise<UniversalSuggestedFee> {
     let maxFee: BigNumberish = 0;
     let resourceBounds: ResourceBounds = estimateFeeToBounds(ZERO);
+
     if (version === ETransactionVersion.V3) {
       resourceBounds =
         details.resourceBounds ??
@@ -656,28 +657,25 @@ export class Account extends Provider implements AccountInterface {
     };
   }
 
-  public async getSuggestedFee({ type, payload }: EstimateFeeAction, details: UniversalDetails) {
-    let feeEstimate: EstimateFee;
-
+  public async getSuggestedFee(
+    { type, payload }: EstimateFeeAction,
+    details: UniversalDetails
+  ): Promise<EstimateFee> {
     switch (type) {
       case TransactionType.INVOKE:
-        feeEstimate = await this.estimateInvokeFee(payload, details);
-        break;
+        return this.estimateInvokeFee(payload, details);
 
       case TransactionType.DECLARE:
-        feeEstimate = await this.estimateDeclareFee(payload, details);
-        break;
+        return this.estimateDeclareFee(payload, details);
 
       case TransactionType.DEPLOY_ACCOUNT:
-        feeEstimate = await this.estimateAccountDeployFee(payload, details);
-        break;
+        return this.estimateAccountDeployFee(payload, details);
 
       case TransactionType.DEPLOY:
-        feeEstimate = await this.estimateDeployFee(payload, details);
-        break;
+        return this.estimateDeployFee(payload, details);
 
       default:
-        feeEstimate = {
+        return {
           gas_consumed: 0n,
           gas_price: 0n,
           overall_fee: ZERO,
@@ -687,10 +685,7 @@ export class Account extends Provider implements AccountInterface {
           data_gas_consumed: 0n,
           data_gas_price: 0n,
         };
-        break;
     }
-
-    return feeEstimate;
   }
 
   public async buildInvocation(
@@ -716,7 +711,7 @@ export class Account extends Provider implements AccountInterface {
     const compressedCompiledContract = parseContract(contract);
 
     if (
-      typeof compiledClassHash === 'undefined' &&
+      isUndefined(compiledClassHash) &&
       (details.version === ETransactionVersion3.F3 || details.version === ETransactionVersion3.V3)
     ) {
       throw Error('V3 Transaction work with Cairo1 Contracts and require compiledClassHash');

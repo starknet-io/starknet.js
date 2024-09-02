@@ -75,7 +75,7 @@ export function isString(value: unknown): value is string {
  * // result = false
  * ```
  */
-export function isText(val: any) {
+export function isText(val: any): boolean {
   return isString(val) && !isHex(val) && !isStringWholeNumber(val);
 }
 
@@ -89,7 +89,7 @@ export function isText(val: any) {
  * // result = true
  * ```
  */
-export const isShortText = (val: any) => isText(val) && isShortString(val);
+export const isShortText = (val: any): boolean => isText(val) && isShortString(val);
 
 /**
  * Test if value is long text
@@ -101,7 +101,7 @@ export const isShortText = (val: any) => isText(val) && isShortString(val);
  * // result = true
  * ```
  */
-export const isLongText = (val: any) => isText(val) && !isShortString(val);
+export const isLongText = (val: any): boolean => isText(val) && !isShortString(val);
 
 /**
  * Split long text (string greater than 31 characters) into short strings (string lesser or equal 31 characters)

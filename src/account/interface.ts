@@ -120,13 +120,13 @@ export abstract class AccountInterface extends ProviderInterface {
   /**
    * Estimate Fee for executing a UDC DEPLOY transaction on starknet
    * This is different from the normal DEPLOY transaction as it goes through the Universal Deployer Contract (UDC)
-   
+
   * @param deployContractPayload array or singular
    * - classHash: computed class hash of compiled contract
    * - salt: address salt
    * - unique: bool if true ensure unique salt
    * - constructorCalldata: constructor calldata
-   * 
+   *
    * @param estimateFeeDetails -
    * - blockIdentifier?
    * - nonce?

@@ -324,7 +324,7 @@ export function hexToBytes(str: string): Uint8Array {
  *
  * @param number value to be modified
  * @param percent integer as percent ex. 50 for 50%
- * @returns {BigInt} modified value
+ * @returns {bigint} modified value
  * @example
  * ```typescript
  * addPercent(100, 50); // 150n
@@ -335,7 +335,7 @@ export function hexToBytes(str: string): Uint8Array {
  * addPercent(200, -150); // -100n
  * ```
  */
-export function addPercent(number: BigNumberish, percent: number) {
+export function addPercent(number: BigNumberish, percent: number): bigint {
   const bigIntNum = BigInt(number);
   return bigIntNum + (bigIntNum * BigInt(percent)) / 100n;
 }
