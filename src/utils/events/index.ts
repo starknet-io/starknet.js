@@ -14,7 +14,6 @@ import {
   type CairoEventVariant,
   type InvokeTransactionReceiptResponse,
   type AbiEntry,
-  DeployContractResponse,
   DeployContractUDCResponse,
 } from '../../types';
 import assert from '../assert';
@@ -267,10 +266,10 @@ export function parseEvents(
  * Parse Transaction Receipt Event from UDC invoke transaction and
  * create DeployContractResponse compatible response with addition of the UDC Event data
  *
- * @returns {DeployContractResponse} | {DeployContractUDCResponse} */
+ * @returns {DeployContractUDCResponse} */
 export function parseUDCEvent(
   txReceipt: InvokeTransactionReceiptResponse
-): DeployContractResponse | DeployContractUDCResponse {
+): DeployContractUDCResponse {
   if (!txReceipt.events) {
     throw new Error('UDC emitted event is empty');
   }

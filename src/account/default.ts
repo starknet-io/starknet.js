@@ -1,4 +1,10 @@
-import { UDC, ZERO } from '../constants';
+import {
+  OutsideExecutionCallerAny,
+  SNIP9_V1_INTERFACE_ID,
+  SNIP9_V2_INTERFACE_ID,
+  UDC,
+  ZERO,
+} from '../constants';
 import { Provider, ProviderInterface } from '../provider';
 import { Signer, SignerInterface } from '../signer';
 import {
@@ -40,17 +46,29 @@ import {
   UniversalDetails,
 } from '../types';
 import { ETransactionVersion, ETransactionVersion3, type ResourceBounds } from '../types/api';
+import {
+  OutsideExecutionVersion,
+  type OutsideExecution,
+  type OutsideExecutionOptions,
+  type OutsideTransaction,
+} from '../types/outsideExecution';
+import {
+  buildExecuteFromOutsideCallData,
+  getOutsideCall,
+  getTypedData,
+} from '../utils/outsideExecution';
 import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { parseUDCEvent } from '../utils/events';
 import { calculateContractAddressFromHash } from '../utils/hash';
 import { isUndefined } from '../utils/typed';
-import { toBigInt, toCairoBool } from '../utils/num';
+import { isHex, toBigInt, toCairoBool, toHex } from '../utils/num';
 import { parseContract } from '../utils/provider';
 import { isString } from '../utils/shortString';
+import { supportsInterface } from '../utils/src5';
 import {
   estimateFeeToBounds,
-  formatSignature,
+  randomAddress,
   reduceV2,
   toFeeVersion,
   toTransactionVersion,
@@ -543,90 +561,216 @@ export class Account extends Provider implements AccountInterface {
     return getMessageHash(typedData, this.address);
   }
 
+  /**
+   * @deprecated To replace by `myRpcProvider.verifyMessageInStarknet()`
+   */
   public async verifyMessageHash(
     hash: BigNumberish,
     signature: Signature,
     signatureVerificationFunctionName?: string,
     signatureVerificationResponse?: { okResponse: string[]; nokResponse: string[]; error: string[] }
   ): Promise<boolean> {
-    // HOTFIX: Accounts should conform to SNIP-6
-    // (https://github.com/starknet-io/SNIPs/blob/f6998f779ee2157d5e1dea36042b08062093b3c5/SNIPS/snip-6.md?plain=1#L61),
-    // but they don't always conform. Also, the SNIP doesn't standardize the response if the signature isn't valid.
-    const knownSigVerificationFName = signatureVerificationFunctionName
-      ? [signatureVerificationFunctionName]
-      : ['isValidSignature', 'is_valid_signature'];
-    const knownSignatureResponse = signatureVerificationResponse || {
-      okResponse: [
-        // any non-nok response is true
-      ],
-      nokResponse: [
-        '0x0', // Devnet
-        '0x00', // OpenZeppelin 0.7.0 to 0.9.0 invalid signature
-      ],
-      error: [
-        'argent/invalid-signature', // ArgentX 0.3.0 to 0.3.1
-        'is invalid, with respect to the public key', // OpenZeppelin until 0.6.1, Braavos 0.0.11
-        'INVALID_SIG', // Braavos 1.0.0
-      ],
-    };
-    let error: any;
-
-    // eslint-disable-next-line no-restricted-syntax
-    for (const SigVerificationFName of knownSigVerificationFName) {
-      try {
-        // eslint-disable-next-line no-await-in-loop
-        const resp = await this.callContract({
-          contractAddress: this.address,
-          entrypoint: SigVerificationFName,
-          calldata: CallData.compile({
-            hash: toBigInt(hash).toString(),
-            signature: formatSignature(signature),
-          }),
-        });
-        // Response NOK Signature
-        if (knownSignatureResponse.nokResponse.includes(resp[0].toString())) {
-          return false;
-        }
-        // Response OK Signature
-        // Empty okResponse assume all non-nok responses are valid signatures
-        // OpenZeppelin 0.7.0 to 0.9.0, ArgentX 0.3.0 to 0.3.1 & Braavos Cairo 0.0.11 to 1.0.0 valid signature
-        if (
-          knownSignatureResponse.okResponse.length === 0 ||
-          knownSignatureResponse.okResponse.includes(resp[0].toString())
-        ) {
-          return true;
-        }
-        throw Error('signatureVerificationResponse Error: response is not part of known responses');
-      } catch (err) {
-        // Known NOK Errors
-        if (
-          knownSignatureResponse.error.some((errMessage) =>
-            (err as Error).message.includes(errMessage)
-          )
-        ) {
-          return false;
-        }
-        // Unknown Error
-        error = err;
-      }
-    }
-
-    throw Error(`Signature verification Error: ${error}`);
+    return this.verifyMessageInStarknet(
+      hash,
+      signature,
+      this.address,
+      signatureVerificationFunctionName,
+      signatureVerificationResponse
+    );
   }
 
+  /**
+   * @deprecated To replace by `myRpcProvider.verifyMessageInStarknet()`
+   */
   public async verifyMessage(
     typedData: TypedData,
     signature: Signature,
     signatureVerificationFunctionName?: string,
     signatureVerificationResponse?: { okResponse: string[]; nokResponse: string[]; error: string[] }
   ): Promise<boolean> {
-    const hash = await this.hashMessage(typedData);
-    return this.verifyMessageHash(
-      hash,
+    return this.verifyMessageInStarknet(
+      typedData,
       signature,
+      this.address,
       signatureVerificationFunctionName,
       signatureVerificationResponse
     );
+  }
+
+  /**
+   * Verify if an account is compatible with SNIP-9 outside execution, and with which version of this standard.
+   * @returns {OutsideExecutionVersion} Not compatible, V1, V2.
+   * @example
+   * ```typescript
+   * const result = myAccount.getSnip9Version();
+   * // result = "V1"
+   * ```
+   */
+  public async getSnip9Version(): Promise<OutsideExecutionVersion> {
+    if (await supportsInterface(this, this.address, SNIP9_V2_INTERFACE_ID)) {
+      return OutsideExecutionVersion.V2;
+    }
+    if (await supportsInterface(this, this.address, SNIP9_V1_INTERFACE_ID)) {
+      return OutsideExecutionVersion.V1;
+    }
+    // Account does not support either version 2 or version 1
+    return OutsideExecutionVersion.UNSUPPORTED;
+  }
+
+  /**
+   * Verify if a SNIP-9 nonce has not yet been used by the account.
+   * @param {BigNumberish} nonce SNIP-9 nonce to test.
+   * @returns  {boolean} true if SNIP-9 nonce not yet used.
+   * @example
+   * ```typescript
+   * const result = myAccount.isValidSnip9Nonce(1234);
+   * // result = true
+   * ```
+   */
+  public async isValidSnip9Nonce(nonce: BigNumberish): Promise<boolean> {
+    try {
+      const call: Call = {
+        contractAddress: this.address,
+        entrypoint: 'is_valid_outside_execution_nonce',
+        calldata: [toHex(nonce)],
+      };
+      const resp = await this.callContract(call);
+      return BigInt(resp[0]) !== 0n;
+    } catch (error) {
+      throw new Error(`Failed to check if nonce is valid: ${error}`);
+    }
+  }
+
+  /**
+   * Outside transaction needs a specific SNIP-9 nonce, that we get in this function.
+   * A SNIP-9 nonce can be any number not yet used ; no ordering is needed.
+   * @returns  {string} an Hex string of a SNIP-9 nonce.
+   * @example
+   * ```typescript
+   * const result = myAccount.getSnip9Nonce();
+   * // result = "0x28a612590dbc36927933c8ee0f357eee639c8b22b3d3aa86949eed3ada4ac55"
+   * ```
+   */
+  public async getSnip9Nonce(): Promise<string> {
+    const nonce = randomAddress();
+    const isValidNonce = await this.isValidSnip9Nonce(nonce);
+    if (!isValidNonce) {
+      return this.getSnip9Nonce();
+    }
+    return nonce;
+  }
+
+  /**
+   * Creates an object containing transaction(s) that can be executed by an other account with` Account.executeFromOutside()`, called Outside Transaction.
+   * @param {OutsideExecutionOptions} options Parameters of the transaction(s).
+   * @param {AllowArray<Call>} calls Transaction(s) to execute.
+   * @param {OutsideExecutionVersion} [version] SNIP-9 version of the Account that creates the outside transaction.
+   * @param {BigNumberish} [nonce] Outside Nonce.
+   * @returns {OutsideTransaction} and object that can be used in `Account.executeFromOutside()`
+   * @example
+   * ```typescript
+   * const now_seconds = Math.floor(Date.now() / 1000);
+   * const callOptions: OutsideExecutionOptions = {
+      caller: executorAccount.address, execute_after: now_seconds - 3600, execute_before: now_seconds + 3600 };
+   * const call1: Call = { contractAddress: ethAddress, entrypoint: 'transfer', calldata: {
+   *     recipient: recipientAccount.address, amount: cairo.uint256(100) } };
+   * const outsideTransaction1: OutsideTransaction = await signerAccount.getOutsideTransaction(callOptions, call3);
+   * // result = {
+   * // outsideExecution: {
+   * // caller: '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691',
+   * // nonce: '0x28a612590dbc36927933c8ee0f357eee639c8b22b3d3aa86949eed3ada4ac55',
+   * // execute_after: 1723650229, execute_before: 1723704229, calls: [[Object]] },
+   * // signature: Signature {
+   * // r: 67518627037915514985321278857825384106482999609634873287406612756843916814n,
+   * // s: 737198738569840639192844101690009498983611654458636624293579534560862067709n, recovery: 0 },
+   * // signerAddress: '0x655f8fd7c4013c07cf12a92184aa6c314d181443913e21f7e209a18f0c78492',
+   * // version: '2'
+   * // }
+   * ```
+   */
+  public async getOutsideTransaction(
+    options: OutsideExecutionOptions,
+    calls: AllowArray<Call>,
+    version?: OutsideExecutionVersion,
+    nonce?: BigNumberish
+  ): Promise<OutsideTransaction> {
+    if (!isHex(options.caller) && options.caller !== 'ANY_CALLER') {
+      throw new Error(`The caller ${options.caller} is not valid.`);
+    }
+    const codedCaller: string = isHex(options.caller) ? options.caller : OutsideExecutionCallerAny;
+    const myCalls: Call[] = Array.isArray(calls) ? calls : [calls];
+    const supportedVersion = version ?? (await this.getSnip9Version());
+    if (!supportedVersion) {
+      throw new Error('This account is not handling outside transactions.');
+    }
+    const myNonce = nonce ? toHex(nonce) : await this.getSnip9Nonce();
+    const message = getTypedData(
+      await this.getChainId(),
+      {
+        caller: codedCaller,
+        execute_after: options.execute_after,
+        execute_before: options.execute_before,
+      },
+      myNonce,
+      myCalls,
+      supportedVersion
+    );
+    const sign: Signature = await this.signMessage(message);
+    const toExecute: OutsideExecution = {
+      caller: codedCaller,
+      nonce: myNonce,
+      execute_after: options.execute_after,
+      execute_before: options.execute_before,
+      calls: myCalls.map(getOutsideCall),
+    };
+    return {
+      outsideExecution: toExecute,
+      signature: sign,
+      signerAddress: this.address,
+      version: supportedVersion,
+    };
+  }
+
+  /**
+   * An account B executes a transaction that has been signed by an account A.
+   * Fees are paid by B.
+   * @param {AllowArray<OutsideTransaction>} outsideTransaction the signed transaction generated by `Account.getOutsideTransaction()`.
+   * @param {UniversalDetails} [opts] same options than `Account.execute()`.
+   * @returns {InvokeFunctionResponse} same response than `Account.execute()`.
+   * @example
+   * ```typescript
+   * const outsideTransaction1: OutsideTransaction = await signerAccount.getOutsideTransaction(callOptions, call1);
+   * const outsideTransaction2: OutsideTransaction = await signerAccount.getOutsideTransaction(callOptions4, call4);
+   * const result = await myAccount.executeFromOutside([
+      outsideTransaction1,
+      outsideTransaction2,
+    ]);
+   * // result = { transaction_hash: '0x11233...`}
+   * ```
+   */
+  public async executeFromOutside(
+    outsideTransaction: AllowArray<OutsideTransaction>,
+    opts?: UniversalDetails
+  ): Promise<InvokeFunctionResponse> {
+    const myOutsideTransactions = Array.isArray(outsideTransaction)
+      ? outsideTransaction
+      : [outsideTransaction];
+    const multiCall: Call[] = myOutsideTransactions.map((outsideTx: OutsideTransaction) => {
+      let entrypoint: string;
+      if (outsideTx.version === OutsideExecutionVersion.V1) {
+        entrypoint = 'execute_from_outside';
+      } else if (outsideTx.version === OutsideExecutionVersion.V2) {
+        entrypoint = 'execute_from_outside_v2';
+      } else {
+        throw new Error('Unsupported OutsideExecution version');
+      }
+      return {
+        contractAddress: toHex(outsideTx.signerAddress),
+        entrypoint,
+        calldata: buildExecuteFromOutsideCallData(outsideTx),
+      };
+    });
+    return this.execute(multiCall, opts);
   }
 
   /*
