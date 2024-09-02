@@ -61,10 +61,9 @@ import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { parseUDCEvent } from '../utils/events';
 import { calculateContractAddressFromHash } from '../utils/hash';
-import { isUndefined } from '../utils/typed';
+import { isUndefined, isString } from '../utils/typed';
 import { isHex, toBigInt, toCairoBool, toHex } from '../utils/num';
 import { parseContract } from '../utils/provider';
-import { isString } from '../utils/shortString';
 import { supportsInterface } from '../utils/src5';
 import {
   estimateFeeToBounds,

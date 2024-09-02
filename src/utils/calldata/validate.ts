@@ -14,8 +14,9 @@ import {
 import assert from '../assert';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
-import { isBigInt, isBoolean, isHex, isNumber, toBigInt } from '../num';
-import { isLongText, isString } from '../shortString';
+import { isHex, toBigInt } from '../num';
+import { isLongText } from '../shortString';
+import { isBoolean, isNumber, isString, isBigInt } from '../typed';
 import {
   getArrayType,
   isLen,

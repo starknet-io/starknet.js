@@ -15,7 +15,8 @@ import {
   ValidateType,
 } from '../../types';
 import assert from '../assert';
-import { isBigInt, toHex } from '../num';
+import { toHex } from '../num';
+import { isBigInt } from '../typed';
 import { getSelectorFromName } from '../hash/selector';
 import { isLongText } from '../shortString';
 import { byteArrayFromString } from './byteArray';

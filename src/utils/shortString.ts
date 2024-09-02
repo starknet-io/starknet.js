@@ -1,6 +1,7 @@
 import { TEXT_TO_FELT_MAX_LEN } from '../constants';
 import { addHexPrefix, removeHexPrefix } from './encode';
 import { isHex, isStringWholeNumber } from './num';
+import { isString } from './typed';
 
 /**
  * Test if string contains only ASCII characters (string can be ascii text)
@@ -47,20 +48,6 @@ export function isShortString(str: string): boolean {
  */
 export function isDecimalString(str: string): boolean {
   return /^[0-9]*$/i.test(str);
-}
-
-/**
- * Checks if a given value is a string.
- * @param {unknown} value the value to be checked.
- * @return {boolean} returns true if the value is a string, false otherwise.
- * @example
- * ```typescript
- * const result = shortString.isString("12345");
- * // result = true
- * ```
- */
-export function isString(value: unknown): value is string {
-  return typeof value === 'string';
 }
 
 /**

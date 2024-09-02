@@ -13,8 +13,8 @@ import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { addHexPrefix, removeHexPrefix } from '../encode';
 import { toHex } from '../num';
-import { encodeShortString, isString, isText, splitLongString } from '../shortString';
-import { isUndefined } from '../typed';
+import { encodeShortString, isText, splitLongString } from '../shortString';
+import { isUndefined, isString } from '../typed';
 import { byteArrayFromString } from './byteArray';
 import {
   felt,

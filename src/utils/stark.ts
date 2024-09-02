@@ -18,11 +18,9 @@ import {
   addPercent,
   bigNumberishArrayToDecimalStringArray,
   bigNumberishArrayToHexadecimalStringArray,
-  isBigInt,
   toHex,
 } from './num';
-import { isString } from './shortString';
-import { isUndefined } from './typed';
+import { isUndefined, isString, isBigInt } from './typed';
 
 type V3Details = Required<
   Pick<

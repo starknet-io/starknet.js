@@ -21,7 +21,8 @@ import {
 } from './hash';
 import { MerkleTree } from './merkle';
 import { isBigNumberish, isHex, toHex } from './num';
-import { encodeShortString, isString } from './shortString';
+import { encodeShortString } from './shortString';
+import { isString } from './typed';
 
 /** @deprecated prefer importing from 'types' over 'typedData' */
 export * from '../types/typedData';

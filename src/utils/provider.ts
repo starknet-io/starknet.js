@@ -18,8 +18,9 @@ import { ETransactionVersion } from '../types/api';
 import { isSierra } from './contract';
 import { formatSpaces } from './hash';
 import { parse, stringify } from './json';
-import { isBigInt, isHex, isNumber, toHex } from './num';
-import { isDecimalString, isString } from './shortString';
+import { isHex, toHex } from './num';
+import { isDecimalString } from './shortString';
+import { isBigInt, isNumber, isString } from './typed';
 import { compressProgram } from './stark';
 import type { GetTransactionReceiptResponse } from './transactionReceipt';
 

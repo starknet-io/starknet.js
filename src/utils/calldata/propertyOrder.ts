@@ -24,9 +24,7 @@ import {
   CairoResultVariant,
 } from './enum';
 import extractTupleMemberTypes from './tuple';
-
-import { isString } from '../shortString';
-import { isUndefined } from '../typed';
+import { isUndefined, isString } from '../typed';
 
 function errorU256(key: string) {
   return Error(
