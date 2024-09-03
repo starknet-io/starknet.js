@@ -1,4 +1,5 @@
 import type { SPEC } from 'starknet-types-07';
+
 import { RPC06, RPC07, RpcChannel } from '../channel';
 import {
   AccountInvocations,
@@ -8,12 +9,14 @@ import {
   BlockTag,
   Call,
   ContractClassResponse,
+  ContractClassIdentifier,
   ContractVersion,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
   GetBlockResponse,
   GetTxReceiptResponseWithoutHelper,
   Invocation,
+  Invocations,
   InvocationsDetailsWithNonce,
   PendingBlock,
   PendingStateUpdate,
@@ -25,24 +28,24 @@ import {
   getContractVersionOptions,
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
-  waitForTransactionOptions,
   type Signature,
   type TypedData,
+  waitForTransactionOptions,
 } from '../types';
 import type { TransactionWithHash } from '../types/provider/spec';
 import assert from '../utils/assert';
+import { CallData } from '../utils/calldata';
 import { getAbiContractVersion } from '../utils/calldata/cairo';
-import { isSierra } from '../utils/contract';
+import { extractContractHashes, isSierra } from '../utils/contract';
+import { solidityUint256PackedKeccak256 } from '../utils/hash';
 import { isBigNumberish, toBigInt, toHex } from '../utils/num';
 import { wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
+import { formatSignature } from '../utils/stark';
 import { GetTransactionReceiptResponse, ReceiptTx } from '../utils/transactionReceipt';
+import { getMessageHash, validateTypedData } from '../utils/typedData';
 import { LibraryError } from './errors';
 import { ProviderInterface } from './interface';
-import { solidityUint256PackedKeccak256 } from '../utils/hash';
-import { CallData } from '../utils/calldata';
-import { formatSignature } from '../utils/stark';
-import { getMessageHash, validateTypedData } from '../utils/typedData';
 
 export class RpcProvider implements ProviderInterface {
   public responseParser: RPCResponseParser;
@@ -569,5 +572,63 @@ export class RpcProvider implements ProviderInterface {
     }
 
     throw Error(`Signature verification Error: ${error}`);
+  }
+
+  /**
+   * Test if class is already declared from ContractClassIdentifier
+   * Helper method using getClass
+   * @param ContractClassIdentifier
+   * @param blockIdentifier
+   */
+  public async isClassDeclared(
+    contractClassIdentifier: ContractClassIdentifier,
+    blockIdentifier?: BlockIdentifier
+  ) {
+    let classHash: string;
+    if (!contractClassIdentifier.classHash && 'contract' in contractClassIdentifier) {
+      const hashes = extractContractHashes(contractClassIdentifier);
+      classHash = hashes.classHash;
+    } else if (contractClassIdentifier.classHash) {
+      classHash = contractClassIdentifier.classHash;
+    } else {
+      throw Error('contractClassIdentifier type not satisfied');
+    }
+
+    try {
+      const result = await this.getClass(classHash, blockIdentifier);
+      return result instanceof Object;
+    } catch (error) {
+      if (error instanceof LibraryError) {
+        return false;
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Build bulk invocations with auto-detect declared class
+   * 1. Test if class is declared if not declare it preventing already declared class error and not declared class errors
+   * 2. Order declarations first
+   * @param invocations
+   */
+  public async prepareInvocations(invocations: Invocations) {
+    const bulk: Invocations = [];
+    // Build new ordered array
+    // eslint-disable-next-line no-restricted-syntax
+    for (const invocation of invocations) {
+      if (invocation.type === TransactionType.DECLARE) {
+        // Test if already declared
+        // eslint-disable-next-line no-await-in-loop
+        const isDeclared = await this.isClassDeclared(
+          'payload' in invocation ? invocation.payload : invocation
+        );
+        if (!isDeclared) {
+          bulk.unshift(invocation);
+        }
+      } else {
+        bulk.push(invocation);
+      }
+    }
+    return bulk;
   }
 }

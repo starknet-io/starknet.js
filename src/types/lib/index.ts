@@ -100,6 +100,11 @@ export type DeclareContractPayload = {
   compiledClassHash?: string;
 };
 
+/**
+ * DeclareContractPayload with classHash or contract defined
+ */
+export type ContractClassIdentifier = DeclareContractPayload | { classHash: string };
+
 export type CompleteDeclareContractPayload = {
   contract: CompiledContract | string;
   classHash: string;
