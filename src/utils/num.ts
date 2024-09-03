@@ -4,7 +4,7 @@ import { BigNumberish } from '../types';
 import assert from './assert';
 import { addHexPrefix, buf2hex, removeHexPrefix } from './encode';
 import { MASK_31 } from '../constants';
-import { isNumber, isBigInt } from './typed';
+import { isNumber, isBigInt, isString } from './typed';
 
 /** @deprecated prefer importing from 'types' over 'num' */
 export type { BigNumberish };
@@ -358,6 +358,6 @@ export function isBigNumberish(input: unknown): input is BigNumberish {
   return (
     isNumber(input) ||
     isBigInt(input) ||
-    (typeof input === 'string' && (isHex(input) || isStringWholeNumber(input)))
+    (isString(input) && (isHex(input) || isStringWholeNumber(input)))
   );
 }
