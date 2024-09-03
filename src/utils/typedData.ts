@@ -465,7 +465,7 @@ export function encodeData<T extends TypedData>(
   type: string,
   data: T['message'],
   revision: Revision = Revision.LEGACY
-) {
+): [string[], string[]] {
   const targetType = types[type] ?? revisionConfiguration[revision].presetTypes[type];
   const [returnTypes, values] = targetType.reduce<[string[], string[]]>(
     ([ts, vs], field) => {
@@ -520,7 +520,7 @@ export function getStructHash<T extends TypedData>(
   type: string,
   data: T['message'],
   revision: Revision = Revision.LEGACY
-) {
+): string {
   return revisionConfiguration[revision].hashMethod(encodeData(types, type, data, revision)[1]);
 }
 
