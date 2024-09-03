@@ -11,7 +11,7 @@ export type ABI = Array<
   FUNCTION | CONSTRUCTOR | L1_HANDLER | EVENT | STRUCT | ENUM | INTERFACE | IMPL
 >;
 
-export type FUNCTION = {
+type FUNCTION = {
   type: 'function';
   name: string;
   inputs: Array<{
@@ -24,7 +24,7 @@ export type FUNCTION = {
   state_mutability: 'view' | 'external';
 };
 
-export type CONSTRUCTOR = {
+type CONSTRUCTOR = {
   type: 'constructor';
   name: 'constructor';
   inputs: Array<{
@@ -33,7 +33,7 @@ export type CONSTRUCTOR = {
   }>;
 };
 
-export type L1_HANDLER = {
+type L1_HANDLER = {
   type: 'l1_handler';
   name: string;
   inputs: Array<{
@@ -46,22 +46,22 @@ export type L1_HANDLER = {
   state_mutability: 'view' | 'external';
 };
 
-export type EVENT = {
+type EVENT = {
   type: 'event';
   name: string;
 } & (ENUM_EVENT | STRUCT_EVENT);
 
-export type STRUCT_EVENT = {
+type STRUCT_EVENT = {
   kind: 'struct';
   members: Array<EVENT_FIELD>;
 };
 
-export type ENUM_EVENT = {
+type ENUM_EVENT = {
   kind: 'enum';
   variants: Array<EVENT_FIELD>;
 };
 
-export type STRUCT = {
+type STRUCT = {
   type: 'struct';
   name: string;
   members: Array<{
@@ -70,7 +70,7 @@ export type STRUCT = {
   }>;
 };
 
-export type ENUM = {
+type ENUM = {
   type: 'enum';
   name: string;
   variants: Array<{
@@ -79,21 +79,19 @@ export type ENUM = {
   }>;
 };
 
-export type INTERFACE = {
+type INTERFACE = {
   type: 'interface';
   name: string;
   items: Array<FUNCTION>;
 };
 
-export type IMPL = {
+type IMPL = {
   type: 'impl';
   name: string;
   interface_name: string;
 };
 
-export type EVENT_KIND = 'struct' | 'enum';
-
-export type EVENT_FIELD = {
+type EVENT_FIELD = {
   name: string;
   type: string;
   kind: 'key' | 'data' | 'nested';
