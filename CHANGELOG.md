@@ -1,3 +1,9 @@
+## [6.13.1](https://github.com/starknet-io/starknet.js/compare/v6.13.0...v6.13.1) (2024-09-03)
+
+### Bug Fixes
+
+- revert companion pattern except constants ([#1193](https://github.com/starknet-io/starknet.js/issues/1193)) ([ebf9f35](https://github.com/starknet-io/starknet.js/commit/ebf9f356fad701be7d3d5dddb539c59222843377))
+
 # [6.13.0](https://github.com/starknet-io/starknet.js/compare/v6.12.1...v6.13.0) (2024-08-27)
 
 ### Bug Fixes
