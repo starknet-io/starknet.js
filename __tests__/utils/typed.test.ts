@@ -1,4 +1,11 @@
-import { isUndefined, isBigInt, isBoolean, isNumber, isString } from '../../src/utils/typed';
+import {
+  isUndefined,
+  isBigInt,
+  isBoolean,
+  isNumber,
+  isString,
+  isObject,
+} from '../../src/utils/typed';
 
 describe('isUndefined', () => {
   test('should return true if value is undefined', () => {
@@ -74,5 +81,20 @@ describe('isString', () => {
     expect(isString(undefined)).toBe(false);
     expect(isString([])).toBe(false);
     expect(isString(true)).toBe(false);
+  });
+});
+
+describe('isObject', () => {
+  test('should return true if value is object', () => {
+    expect(isObject({ test: 'test' })).toEqual(true);
+    expect(isObject({})).toEqual(true);
+  });
+
+  test('should return false if value is not object', () => {
+    expect(isObject(10)).toBe(false);
+    expect(isObject(null)).toBe(false);
+    expect(isObject(undefined)).toBe(false);
+    expect(isObject([])).toBe(false);
+    expect(isObject(true)).toBe(false);
   });
 });

@@ -22,7 +22,7 @@ import responseParser from '../calldata/responseParser';
 import { starkCurve } from '../ec';
 import { addHexPrefix, utf8ToArray } from '../encode';
 import { cleanHex } from '../num';
-import { isUndefined } from '../typed';
+import { isUndefined, isObject } from '../typed';
 
 /**
  * Check if an ABI entry is related to events.
@@ -153,20 +153,6 @@ function getCairo1AbiEvents(abi: Abi): AbiEvents {
  */
 export function getAbiEvents(abi: Abi): AbiEvents {
   return isCairo1Abi(abi) ? getCairo1AbiEvents(abi) : getCairo0AbiEvents(abi);
-}
-
-/**
- * Checks if a given value is an object (Object or Array)
- * @param {any} item the tested item
- * @returns {boolean}
- * @example
- * ```typescript
- * const result = events.isObject({event: "pending"});
- * // result = true
- * ```
- */
-export function isObject(item: any): boolean {
-  return item && typeof item === 'object' && !Array.isArray(item);
 }
 
 /**

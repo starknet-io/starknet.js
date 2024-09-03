@@ -86,3 +86,17 @@ export function isBigInt(value: any): value is bigint {
 export function isString(value: unknown): value is string {
   return typeof value === 'string';
 }
+
+/**
+ * Checks if a given value is an object (Object or Array)
+ * @param {unknown} item the tested item
+ * @returns {boolean}
+ * @example
+ * ```typescript
+ * const result = events.isObject({event: "pending"});
+ * // result = true
+ * ```
+ */
+export function isObject(item: unknown | undefined): boolean {
+  return !!item && typeof item === 'object' && !Array.isArray(item);
+}
