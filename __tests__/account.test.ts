@@ -247,7 +247,7 @@ describe('deploy and test Wallet', () => {
 
     describeIfDevnet('declare tests only on devnet', () => {
       test('simulate DECLARE - Cairo 0 Contract', async () => {
-        const invocation = await provider.createBulkInvocations([
+        const invocation = await provider.prepareInvocations([
           {
             type: TransactionType.DECLARE,
             contract: compiledErc20,
@@ -261,7 +261,7 @@ describe('deploy and test Wallet', () => {
     });
 
     test('simulate DECLARE - Cairo 1 Contract - test if not already declared', async () => {
-      const invocation = await provider.createBulkInvocations([
+      const invocation = await provider.prepareInvocations([
         {
           type: TransactionType.DECLARE,
           contract: compiledHelloSierra,
@@ -767,8 +767,8 @@ describe('deploy and test Wallet', () => {
         });
       });
 
-      test('createBulkInvocations: unordered declare, deploy & multi invoke', async () => {
-        const invocations = await provider.createBulkInvocations([
+      test('prepareInvocations: unordered declare, deploy & multi invoke', async () => {
+        const invocations = await provider.prepareInvocations([
           {
             type: TransactionType.DEPLOY,
             payload: {

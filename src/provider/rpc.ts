@@ -598,7 +598,10 @@ export class RpcProvider implements ProviderInterface {
       const result = await this.getClass(classHash, blockIdentifier);
       return result instanceof Object;
     } catch (error) {
-      return false;
+      if (error instanceof LibraryError) {
+        return false;
+      }
+      throw error;
     }
   }
 
@@ -608,7 +611,7 @@ export class RpcProvider implements ProviderInterface {
    * 2. Order declarations first
    * @param invocations
    */
-  public async createBulkInvocations(invocations: Invocations) {
+  public async prepareInvocations(invocations: Invocations) {
     const bulk: Invocations = [];
     // Build new ordered array
     // eslint-disable-next-line no-restricted-syntax
