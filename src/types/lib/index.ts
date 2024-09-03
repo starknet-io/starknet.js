@@ -3,6 +3,7 @@ import { StarknetChainId } from '../../constants';
 import { weierstrass } from '../../utils/ec';
 import { EDataAvailabilityMode, ResourceBounds } from '../api';
 import { CairoEnum } from '../cairoEnum';
+import { ValuesType } from '../helpers/valuesType';
 import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 
 export type WeierstrassSignatureType = weierstrass.SignatureType;
@@ -99,6 +100,11 @@ export type DeclareContractPayload = {
   casm?: CompiledSierraCasm;
   compiledClassHash?: string;
 };
+
+/**
+ * DeclareContractPayload with classHash or contract defined
+ */
+export type ContractClassIdentifier = DeclareContractPayload | { classHash: string };
 
 export type CompleteDeclareContractPayload = {
   contract: CompiledContract | string;

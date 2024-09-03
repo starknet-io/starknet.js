@@ -1,5 +1,6 @@
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 import type { SPEC } from 'starknet-types-07';
+
 import {
   OutsideExecutionCallerAny,
   SNIP9_V1_INTERFACE_ID,
@@ -53,16 +54,16 @@ import {
   type OutsideExecutionOptions,
   type OutsideTransaction,
 } from '../types/outsideExecution';
-import {
-  buildExecuteFromOutsideCallData,
-  getOutsideCall,
-  getTypedData,
-} from '../utils/outsideExecution';
 import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { parseUDCEvent } from '../utils/events';
 import { calculateContractAddressFromHash } from '../utils/hash';
 import { isHex, toBigInt, toCairoBool, toHex } from '../utils/num';
+import {
+  buildExecuteFromOutsideCallData,
+  getOutsideCall,
+  getTypedData,
+} from '../utils/outsideExecution';
 import { parseContract } from '../utils/provider';
 import { isString } from '../utils/shortString';
 import { supportsInterface } from '../utils/src5';
@@ -279,6 +280,7 @@ export class Account extends Provider implements AccountInterface {
     invocations: Invocations,
     details: UniversalDetails = {}
   ): Promise<EstimateFeeBulk> {
+    if (!invocations.length) throw TypeError('Invocations should be non-empty array');
     const { nonce, blockIdentifier, version, skipValidate } = details;
     const accountInvocations = await this.accountInvocationsFactory(invocations, {
       ...v3Details(details),
@@ -304,6 +306,7 @@ export class Account extends Provider implements AccountInterface {
     invocations: Invocations,
     details: SimulateTransactionDetails = {}
   ): Promise<SimulateTransactionResponse> {
+    if (!invocations.length) throw TypeError('Invocations should be non-empty array');
     const { nonce, blockIdentifier, skipValidate = true, skipExecute, version } = details;
     const accountInvocations = await this.accountInvocationsFactory(invocations, {
       ...v3Details(details),
