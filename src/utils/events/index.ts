@@ -51,7 +51,7 @@ export function isAbiEvent(object: AbiEntry): boolean {
   }
  * ```
  */
-function getCairo0AbiEvents(abi: Abi) {
+function getCairo0AbiEvents(abi: Abi): AbiEvents {
   return abi
     .filter((abiEntry) => abiEntry.type === 'event')
     .reduce((acc, abiEntry) => {
@@ -75,11 +75,11 @@ function getCairo0AbiEvents(abi: Abi) {
  * ```typescript
  * const result = events.getCairo1AbiEvents(abi1);
  * // result = {
- * //   '0x22ea134d4126804c60797e633195f8c9aa5fd6d1567e299f4961d0e96f373ee': 
+ * //   '0x22ea134d4126804c60797e633195f8c9aa5fd6d1567e299f4961d0e96f373ee':
  * //    { '0x34e55c1cd55f1338241b50d352f0e91c7e4ffad0e4271d64eb347589ebdfd16': {
  * //     kind: 'struct', type: 'event',
  * //     name: 'ka::ExComponent::ex_logic_component::Mint',
-      
+
  * //     members: [{
  * //      name: 'spender',
  * //      type: 'core::starknet::contract_address::ContractAddress',
@@ -88,9 +88,10 @@ function getCairo0AbiEvents(abi: Abi) {
  * // ...
  * ```
  */
-function getCairo1AbiEvents(abi: Abi) {
+function getCairo1AbiEvents(abi: Abi): AbiEvents {
   const abiEventsStructs = abi.filter((obj) => isAbiEvent(obj) && obj.kind === 'struct');
   const abiEventsEnums = abi.filter((obj) => isAbiEvent(obj) && obj.kind === 'enum');
+
   const abiEventsData: AbiEvents = abiEventsStructs.reduce((acc: CairoEvent, event: CairoEvent) => {
     let nameList: string[] = [];
     let { name } = event;
@@ -134,11 +135,11 @@ function getCairo1AbiEvents(abi: Abi) {
  * ```typescript
  * const result = events.getAbiEvents(abi);
  * // result = {
- * //   '0x22ea134d4126804c60797e633195f8c9aa5fd6d1567e299f4961d0e96f373ee': 
+ * //   '0x22ea134d4126804c60797e633195f8c9aa5fd6d1567e299f4961d0e96f373ee':
  * //    { '0x34e55c1cd55f1338241b50d352f0e91c7e4ffad0e4271d64eb347589ebdfd16': {
  * //     kind: 'struct', type: 'event',
  * //     name: 'ka::ExComponent::ex_logic_component::Mint',
-      
+
  * //     members: [{
  * //      name: 'spender',
  * //      type: 'core::starknet::contract_address::ContractAddress',
