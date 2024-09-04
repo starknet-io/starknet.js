@@ -1,5 +1,14 @@
-import { AbiEntry, AbiEvent, CairoEventVariant, FunctionAbi, InterfaceAbi } from '../../src';
-import { isAbiEvent, getAbiEvents } from '../../src/utils/events';
+import type {
+  AbiEntry,
+  AbiEnums,
+  AbiEvent,
+  AbiStructs,
+  CairoEventVariant,
+  FunctionAbi,
+  InterfaceAbi,
+  RPC,
+} from '../../src';
+import { isAbiEvent, getAbiEvents, parseEvents } from '../../src/utils/events';
 
 const getAbiEventEntry = (): AbiEntry => ({ name: 'test', type: 'event' });
 
@@ -13,7 +22,7 @@ const getFunctionAbi = (): FunctionAbi => ({
 
 const getInterfaceAbi = (): InterfaceAbi => ({
   items: [getFunctionAbi()],
-  name: 'test interface abi',
+  name: 'test_interface_abi',
   type: 'interface',
 });
 
@@ -30,13 +39,13 @@ describe('isAbiEvent', () => {
 
 describe('getAbiEvents', () => {
   test('should get Cairo1 ABI events', () => {
-    const abiEventAndVariantName = 'cairo event struct';
+    const abiEventAndVariantName = 'cairo_event_struct';
     const abiCairoEventStruct: AbiEvent = {
       kind: 'struct',
       members: [
         {
-          name: 'test name',
-          type: 'test type',
+          name: 'test_name',
+          type: 'test_type',
           kind: 'data',
         },
       ],
@@ -48,19 +57,19 @@ describe('getAbiEvents', () => {
       kind: 'enum',
       variants: [
         {
-          name: 'test name',
+          name: 'test_name',
           type: abiEventAndVariantName,
           kind: 'data',
         },
       ],
-      name: 'test cairo event',
+      name: 'test_cairo_event',
       type: 'event',
     };
 
     const abiEvents = getAbiEvents([getInterfaceAbi(), abiCairoEventStruct, abiCairoEventEnum]);
 
     const result = {
-      '0x39a2b7df1164974dbe26a66730afee631c761abd691bb7c9555bbf564d15f10': abiCairoEventStruct,
+      '0x3c719ce4f57dd2d9059b9ffed65417d694a29982d35b188574144d6ae6c3f87': abiCairoEventStruct,
     };
     expect(abiEvents).toEqual(result);
   });
@@ -70,12 +79,12 @@ describe('getAbiEvents', () => {
       kind: 'struct',
       members: [
         {
-          name: 'test name',
-          type: 'test type',
+          name: 'test_name',
+          type: 'test_type',
           kind: 'data',
         },
       ],
-      name: 'cairo event struct',
+      name: 'cairo_event_struct',
       type: 'event',
     };
 
@@ -83,12 +92,12 @@ describe('getAbiEvents', () => {
       kind: 'enum',
       variants: [
         {
-          name: 'test name',
-          type: 'cairo event struct variant',
+          name: 'test_name',
+          type: 'cairo_event_struct_variant',
           kind: 'data',
         },
       ],
-      name: 'test cairo event',
+      name: 'test_cairo_event',
       type: 'event',
     };
 
@@ -102,19 +111,100 @@ describe('getAbiEvents', () => {
       kind: 'struct',
       members: [
         {
-          name: 'test name',
-          type: 'test type',
+          name: 'test_name',
+          type: 'test_type',
           kind: 'data',
         },
       ],
-      name: 'cairo event struct',
+      name: 'cairo_event_struct',
       type: 'event',
     };
 
     const abiEvents = getAbiEvents([getFunctionAbi(), abiCairoEventStruct]);
     const result = {
-      '0x2bd2c1e69d74c920d0c4fbfd7e83a653d4a8e46f16516765fd625516bff90d8': abiCairoEventStruct,
+      '0x27b21abc103381e154ea5c557dfe64466e0d25add7ef91a45718f5b8ee8fae3': abiCairoEventStruct,
     };
     expect(abiEvents).toEqual(result);
+  });
+});
+
+describe('parseEvents', () => {
+  test('should return parsed events', () => {
+    const abiEventAndVariantName = 'cairo_event_struct';
+    const abiCairoEventStruct: AbiEvent = {
+      kind: 'struct',
+      members: [
+        {
+          name: 'test_name',
+          type: 'test_type',
+          kind: 'data',
+        },
+      ],
+      name: abiEventAndVariantName,
+      type: 'event',
+    };
+
+    const abiCairoEventEnum: CairoEventVariant = {
+      kind: 'enum',
+      variants: [
+        {
+          name: 'test_name',
+          type: abiEventAndVariantName,
+          kind: 'data',
+        },
+      ],
+      name: 'test_cairo_event',
+      type: 'event',
+    };
+
+    const abiEvents = getAbiEvents([getInterfaceAbi(), abiCairoEventStruct, abiCairoEventEnum]);
+
+    const abiStructs: AbiStructs = {
+      abi_structs: {
+        members: [
+          {
+            name: 'test_name',
+            type: 'test_type',
+            offset: 1,
+          },
+        ],
+        size: 2,
+        name: 'cairo_event_struct',
+        type: 'struct',
+      },
+    };
+
+    const abiEnums: AbiEnums = {
+      abi_enums: {
+        variants: [
+          {
+            name: 'test_name',
+            type: 'cairo_event_struct_variant',
+            offset: 1,
+          },
+        ],
+        size: 2,
+        name: 'test_cairo_event',
+        type: 'enum',
+      },
+    };
+
+    const event: RPC.Event = {
+      from_address: 'test_address',
+      keys: ['0x3c719ce4f57dd2d9059b9ffed65417d694a29982d35b188574144d6ae6c3f87'],
+      data: ['0x3c719ce4f57dd2d9059b9ffed65417d694a29982d35b188574144d6ae6c3f87'],
+    };
+
+    const parsedEvents = parseEvents([event], abiEvents, abiStructs, abiEnums);
+
+    const result = [
+      {
+        cairo_event_struct: {
+          test_name: 1708719217404197029088109386680815809747762070431461851150711916567020191623n,
+        },
+      },
+    ];
+
+    expect(parsedEvents).toEqual(result);
   });
 });
