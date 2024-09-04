@@ -1,4 +1,3 @@
-import { ValuesType } from '../helpers/valuesType';
 import { StarknetChainId } from '../../constants';
 import { weierstrass } from '../../utils/ec';
 import { EDataAvailabilityMode, ResourceBounds } from '../api';
