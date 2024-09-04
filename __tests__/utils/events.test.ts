@@ -71,7 +71,7 @@ describe('getAbiEvents', () => {
     const result = {
       '0x3c719ce4f57dd2d9059b9ffed65417d694a29982d35b188574144d6ae6c3f87': abiCairoEventStruct,
     };
-    expect(abiEvents).toEqual(result);
+    expect(abiEvents).toStrictEqual(result);
   });
 
   test('should throw and error if Cairo1 ABI events definition is inconsistent', () => {
@@ -124,7 +124,7 @@ describe('getAbiEvents', () => {
     const result = {
       '0x27b21abc103381e154ea5c557dfe64466e0d25add7ef91a45718f5b8ee8fae3': abiCairoEventStruct,
     };
-    expect(abiEvents).toEqual(result);
+    expect(abiEvents).toStrictEqual(result);
   });
 });
 
@@ -205,6 +205,76 @@ describe('parseEvents', () => {
       },
     ];
 
-    expect(parsedEvents).toEqual(result);
+    expect(parsedEvents).toStrictEqual(result);
+  });
+
+  test('should throw if ABI events has not enough data in "keys" property', () => {
+    const abiEventAndVariantName = 'cairo_event_struct';
+    const abiCairoEventStruct: AbiEvent = {
+      kind: 'struct',
+      members: [
+        {
+          name: 'test_name',
+          type: 'test_type',
+          kind: 'data',
+        },
+      ],
+      name: abiEventAndVariantName,
+      type: 'event',
+    };
+
+    const abiCairoEventEnum: CairoEventVariant = {
+      kind: 'enum',
+      variants: [
+        {
+          name: 'test_name',
+          type: abiEventAndVariantName,
+          kind: 'data',
+        },
+      ],
+      name: 'test_cairo_event',
+      type: 'event',
+    };
+
+    const abiEvents = getAbiEvents([getInterfaceAbi(), abiCairoEventStruct, abiCairoEventEnum]);
+
+    const abiStructs: AbiStructs = {
+      abi_structs: {
+        members: [
+          {
+            name: 'test_name',
+            type: 'test_type',
+            offset: 1,
+          },
+        ],
+        size: 2,
+        name: 'cairo_event_struct',
+        type: 'struct',
+      },
+    };
+
+    const abiEnums: AbiEnums = {
+      abi_enums: {
+        variants: [
+          {
+            name: 'test_name',
+            type: 'cairo_event_struct_variant',
+            offset: 1,
+          },
+        ],
+        size: 2,
+        name: 'test_cairo_event',
+        type: 'enum',
+      },
+    };
+
+    const event: RPC.Event = {
+      from_address: 'test_address',
+      keys: ['0x3c719ce4f57dd2d9059b9ffed65417d694a29982d35b188574144d6ae6c3f87'],
+      data: ['0x3c719ce4f57dd2d9059b9ffed65417d694a29982d35b188574144d6ae6c3f87'],
+    };
+
+    abiEvents['0x3c719ce4f57dd2d9059b9ffed65417d694a29982d35b188574144d6ae6c3f87'].name = '';
+    expect(() => parseEvents([event], abiEvents, abiStructs, abiEnums)).toBeTruthy();
   });
 });

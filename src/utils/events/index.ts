@@ -217,7 +217,7 @@ export function parseEvents(
     }
     while (!abiEvent.name) {
       const hashName = recEvent.keys.shift();
-      assert(!!hashName, 'Not enough data in "key" property of this event.');
+      assert(!!hashName, 'Not enough data in "keys" property of this event.');
       abiEvent = (abiEvent as AbiEvents)[hashName];
     }
     // Create our final event object
