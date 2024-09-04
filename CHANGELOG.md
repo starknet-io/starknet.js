@@ -1,3 +1,9 @@
+# [6.14.0](https://github.com/starknet-io/starknet.js/compare/v6.13.1...v6.14.0) (2024-09-04)
+
+### Features
+
+- isClassDeclared prepareInvocations, fix cairo0 test ([#1211](https://github.com/starknet-io/starknet.js/issues/1211)) ([9fdf54f](https://github.com/starknet-io/starknet.js/commit/9fdf54f9a4547ba4072cb26c9a544c6df9e05853))
+
 ## [6.13.1](https://github.com/starknet-io/starknet.js/compare/v6.13.0...v6.13.1) (2024-09-03)
 
 ### Bug Fixes
