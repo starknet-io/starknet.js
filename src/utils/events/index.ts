@@ -266,7 +266,7 @@ export function parseEvents(
  * @returns DeployContractResponse | UDC Event Response data
  */
 export function parseUDCEvent(txReceipt: InvokeTransactionReceiptResponse) {
-  if (!txReceipt.events) {
+  if (!txReceipt.events?.length) {
     throw new Error('UDC emitted event is empty');
   }
   const event = txReceipt.events.find(

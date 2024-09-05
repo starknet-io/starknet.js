@@ -27,6 +27,26 @@ const getInterfaceAbi = (): InterfaceAbi => ({
   type: 'interface',
 });
 
+const getBaseTxReceiptData = (): InvokeTransactionReceiptResponse => ({
+  type: 'INVOKE',
+  transaction_hash: '0x6eebff0d931f36222268705ca791fd0de8d059eaf01887eecf1ce99a6c27f49',
+  actual_fee: { unit: 'WEI', amount: '0x33d758c09000' },
+  messages_sent: [],
+  events: [],
+  execution_status: 'SUCCEEDED',
+  finality_status: 'ACCEPTED_ON_L2',
+  block_hash: '0xdfc9b788478b2a2b9bcba19ab7d86996bcc45c4f8a865435469334e9077b24',
+  block_number: 584,
+  execution_resources: {
+    steps: 9490,
+    memory_holes: 143,
+    range_check_builtin_applications: 198,
+    pedersen_builtin_applications: 34,
+    ec_op_builtin_applications: 3,
+    data_availability: { l1_gas: 0, l1_data_gas: 544 },
+  },
+});
+
 describe('isAbiEvent', () => {
   test('should return true if it is Abi event', () => {
     expect(isAbiEvent(getAbiEventEntry())).toEqual(true);
@@ -283,10 +303,7 @@ describe('parseEvents', () => {
 describe('parseUDCEvent', () => {
   test('should return parsed UDC event', () => {
     const txReceipt: InvokeTransactionReceiptResponse = {
-      type: 'INVOKE',
-      transaction_hash: '0x6eebff0d931f36222268705ca791fd0de8d059eaf01887eecf1ce99a6c27f49',
-      actual_fee: { unit: 'WEI', amount: '0x33d758c09000' },
-      messages_sent: [],
+      ...getBaseTxReceiptData(),
       events: [
         {
           from_address: '0x41a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
@@ -314,18 +331,6 @@ describe('parseUDCEvent', () => {
           data: ['0x33d758c09000', '0x0'],
         },
       ],
-      execution_status: 'SUCCEEDED',
-      finality_status: 'ACCEPTED_ON_L2',
-      block_hash: '0xdfc9b788478b2a2b9bcba19ab7d86996bcc45c4f8a865435469334e9077b24',
-      block_number: 584,
-      execution_resources: {
-        steps: 9490,
-        memory_holes: 143,
-        range_check_builtin_applications: 198,
-        pedersen_builtin_applications: 34,
-        ec_op_builtin_applications: 3,
-        data_availability: { l1_gas: 0, l1_data_gas: 544 },
-      },
     };
 
     const parsedUDCEvent = parseUDCEvent(txReceipt);
@@ -345,5 +350,14 @@ describe('parseUDCEvent', () => {
       salt: '0x76d9fae688efa7dc5defa712c1fa7df537e4c0f5f8b05842a1fd4a6d8d9d3a1',
     };
     expect(parsedUDCEvent).toStrictEqual(result);
+  });
+
+  test('should throw an error if events are empty', () => {
+    const txReceipt: InvokeTransactionReceiptResponse = {
+      ...getBaseTxReceiptData(),
+      events: [],
+    };
+
+    expect(() => parseUDCEvent(txReceipt)).toThrow(new Error('UDC emitted event is empty'));
   });
 });
