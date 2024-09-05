@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { SPEC } from 'starknet-types-07';
 import {
   OutsideExecutionCallerAny,
   SNIP9_V1_INTERFACE_ID,
@@ -29,6 +27,7 @@ import {
   DeployContractUDCResponse,
   DeployTransactionReceiptResponse,
   EstimateFee,
+  UniversalSuggestedFee,
   EstimateFeeAction,
   EstimateFeeBulk,
   Invocation,
@@ -46,25 +45,25 @@ import {
   UniversalDeployerContractPayload,
   UniversalDetails,
 } from '../types';
-import { ETransactionVersion, ETransactionVersion3, ResourceBounds } from '../types/api';
+import { ETransactionVersion, ETransactionVersion3, type ResourceBounds } from '../types/api';
 import {
   OutsideExecutionVersion,
   type OutsideExecution,
   type OutsideExecutionOptions,
   type OutsideTransaction,
 } from '../types/outsideExecution';
+import { CallData } from '../utils/calldata';
+import { extractContractHashes, isSierra } from '../utils/contract';
+import { parseUDCEvent } from '../utils/events';
+import { calculateContractAddressFromHash } from '../utils/hash';
+import { isUndefined, isString } from '../utils/typed';
+import { isHex, toBigInt, toCairoBool, toHex } from '../utils/num';
 import {
   buildExecuteFromOutsideCallData,
   getOutsideCall,
   getTypedData,
 } from '../utils/outsideExecution';
-import { CallData } from '../utils/calldata';
-import { extractContractHashes, isSierra } from '../utils/contract';
-import { parseUDCEvent } from '../utils/events';
-import { calculateContractAddressFromHash } from '../utils/hash';
-import { isHex, toBigInt, toCairoBool, toHex } from '../utils/num';
 import { parseContract } from '../utils/provider';
-import { isString } from '../utils/shortString';
 import { supportsInterface } from '../utils/src5';
 import {
   estimateFeeToBounds,
@@ -279,6 +278,7 @@ export class Account extends Provider implements AccountInterface {
     invocations: Invocations,
     details: UniversalDetails = {}
   ): Promise<EstimateFeeBulk> {
+    if (!invocations.length) throw TypeError('Invocations should be non-empty array');
     const { nonce, blockIdentifier, version, skipValidate } = details;
     const accountInvocations = await this.accountInvocationsFactory(invocations, {
       ...v3Details(details),
@@ -304,6 +304,7 @@ export class Account extends Provider implements AccountInterface {
     invocations: Invocations,
     details: SimulateTransactionDetails = {}
   ): Promise<SimulateTransactionResponse> {
+    if (!invocations.length) throw TypeError('Invocations should be non-empty array');
     const { nonce, blockIdentifier, skipValidate = true, skipExecute, version } = details;
     const accountInvocations = await this.accountInvocationsFactory(invocations, {
       ...v3Details(details),
@@ -675,7 +676,7 @@ export class Account extends Provider implements AccountInterface {
    * const call1: Call = { contractAddress: ethAddress, entrypoint: 'transfer', calldata: {
    *     recipient: recipientAccount.address, amount: cairo.uint256(100) } };
    * const outsideTransaction1: OutsideTransaction = await signerAccount.getOutsideTransaction(callOptions, call3);
-   * // result = { 
+   * // result = {
    * // outsideExecution: {
    * // caller: '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691',
    * // nonce: '0x28a612590dbc36927933c8ee0f357eee639c8b22b3d3aa86949eed3ada4ac55',
@@ -781,9 +782,10 @@ export class Account extends Provider implements AccountInterface {
     version: ETransactionVersion,
     { type, payload }: EstimateFeeAction,
     details: UniversalDetails
-  ) {
+  ): Promise<UniversalSuggestedFee> {
     let maxFee: BigNumberish = 0;
     let resourceBounds: ResourceBounds = estimateFeeToBounds(ZERO);
+
     if (version === ETransactionVersion.V3) {
       resourceBounds =
         details.resourceBounds ??
@@ -800,28 +802,25 @@ export class Account extends Provider implements AccountInterface {
     };
   }
 
-  public async getSuggestedFee({ type, payload }: EstimateFeeAction, details: UniversalDetails) {
-    let feeEstimate: EstimateFee;
-
+  public async getSuggestedFee(
+    { type, payload }: EstimateFeeAction,
+    details: UniversalDetails
+  ): Promise<EstimateFee> {
     switch (type) {
       case TransactionType.INVOKE:
-        feeEstimate = await this.estimateInvokeFee(payload, details);
-        break;
+        return this.estimateInvokeFee(payload, details);
 
       case TransactionType.DECLARE:
-        feeEstimate = await this.estimateDeclareFee(payload, details);
-        break;
+        return this.estimateDeclareFee(payload, details);
 
       case TransactionType.DEPLOY_ACCOUNT:
-        feeEstimate = await this.estimateAccountDeployFee(payload, details);
-        break;
+        return this.estimateAccountDeployFee(payload, details);
 
       case TransactionType.DEPLOY:
-        feeEstimate = await this.estimateDeployFee(payload, details);
-        break;
+        return this.estimateDeployFee(payload, details);
 
       default:
-        feeEstimate = {
+        return {
           gas_consumed: 0n,
           gas_price: 0n,
           overall_fee: ZERO,
@@ -831,10 +830,7 @@ export class Account extends Provider implements AccountInterface {
           data_gas_consumed: 0n,
           data_gas_price: 0n,
         };
-        break;
     }
-
-    return feeEstimate;
   }
 
   public async buildInvocation(
@@ -860,7 +856,7 @@ export class Account extends Provider implements AccountInterface {
     const compressedCompiledContract = parseContract(contract);
 
     if (
-      typeof compiledClassHash === 'undefined' &&
+      isUndefined(compiledClassHash) &&
       (details.version === ETransactionVersion3.F3 || details.version === ETransactionVersion3.V3)
     ) {
       throw Error('V3 Transaction work with Cairo1 Contracts and require compiledClassHash');

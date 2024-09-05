@@ -27,7 +27,8 @@ import {
   types,
 } from '../src';
 import { hexToDecimalString } from '../src/utils/num';
-import { encodeShortString, isString } from '../src/utils/shortString';
+import { encodeShortString } from '../src/utils/shortString';
+import { isString } from '../src/utils/typed';
 import {
   TEST_TX_VERSION,
   compiledC1Account,

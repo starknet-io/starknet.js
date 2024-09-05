@@ -3,6 +3,7 @@ import { weierstrass } from '../../utils/ec';
 import { EDataAvailabilityMode, ResourceBounds } from '../api';
 import { CairoEnum } from '../cairoEnum';
 import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
+import { ValuesType } from '../helpers/valuesType';
 
 export type WeierstrassSignatureType = weierstrass.SignatureType;
 export type ArraySignatureType = string[];
@@ -99,6 +100,11 @@ export type DeclareContractPayload = {
   compiledClassHash?: string;
 };
 
+/**
+ * DeclareContractPayload with classHash or contract defined
+ */
+export type ContractClassIdentifier = DeclareContractPayload | { classHash: string };
+
 export type CompleteDeclareContractPayload = {
   contract: CompiledContract | string;
   classHash: string;
@@ -160,50 +166,62 @@ export type InvocationsDetailsWithNonce =
   | (InvocationsDetails & { nonce: BigNumberish })
   | V3TransactionDetails;
 
-export enum TransactionType {
-  DECLARE = 'DECLARE',
-  DEPLOY = 'DEPLOY',
-  DEPLOY_ACCOUNT = 'DEPLOY_ACCOUNT',
-  INVOKE = 'INVOKE_FUNCTION',
-}
+export const TransactionType = {
+  DECLARE: 'DECLARE',
+  DEPLOY: 'DEPLOY',
+  DEPLOY_ACCOUNT: 'DEPLOY_ACCOUNT',
+  INVOKE: 'INVOKE_FUNCTION',
+} as const;
+
+export type TransactionType = ValuesType<typeof TransactionType>;
 
 /**
  * new statuses are defined by props: finality_status and execution_status
  * to be #deprecated
  */
-export enum TransactionStatus {
-  NOT_RECEIVED = 'NOT_RECEIVED',
-  RECEIVED = 'RECEIVED',
-  ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
-  ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
-  REJECTED = 'REJECTED',
-  REVERTED = 'REVERTED',
-}
+export const TransactionStatus = {
+  NOT_RECEIVED: 'NOT_RECEIVED',
+  RECEIVED: 'RECEIVED',
+  ACCEPTED_ON_L2: 'ACCEPTED_ON_L2',
+  ACCEPTED_ON_L1: 'ACCEPTED_ON_L1',
+  REJECTED: 'REJECTED',
+  REVERTED: 'REVERTED',
+} as const;
 
-export enum TransactionFinalityStatus {
-  NOT_RECEIVED = 'NOT_RECEIVED',
-  RECEIVED = 'RECEIVED',
-  ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
-  ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
-}
+export type TransactionStatus = ValuesType<typeof TransactionStatus>;
 
-export enum TransactionExecutionStatus {
-  REJECTED = 'REJECTED',
-  REVERTED = 'REVERTED',
-  SUCCEEDED = 'SUCCEEDED',
-}
+export const TransactionFinalityStatus = {
+  NOT_RECEIVED: 'NOT_RECEIVED',
+  RECEIVED: 'RECEIVED',
+  ACCEPTED_ON_L2: 'ACCEPTED_ON_L2',
+  ACCEPTED_ON_L1: 'ACCEPTED_ON_L1',
+} as const;
 
-export enum BlockStatus {
-  PENDING = 'PENDING',
-  ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
-  ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
-  REJECTED = 'REJECTED',
-}
+export type TransactionFinalityStatus = ValuesType<typeof TransactionFinalityStatus>;
 
-export enum BlockTag {
-  PENDING = 'pending',
-  LATEST = 'latest',
-}
+export const TransactionExecutionStatus = {
+  REJECTED: 'REJECTED',
+  REVERTED: 'REVERTED',
+  SUCCEEDED: 'SUCCEEDED',
+} as const;
+
+export type TransactionExecutionStatus = ValuesType<typeof TransactionExecutionStatus>;
+
+export const BlockStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED_ON_L1: 'ACCEPTED_ON_L1',
+  ACCEPTED_ON_L2: 'ACCEPTED_ON_L2',
+  REJECTED: 'REJECTED',
+} as const;
+
+export type BlockStatus = ValuesType<typeof BlockStatus>;
+
+export const BlockTag = {
+  PENDING: 'pending',
+  LATEST: 'latest',
+} as const;
+
+export type BlockTag = ValuesType<typeof BlockTag>;
 
 export type BlockNumber = BlockTag | null | number;
 

@@ -22,7 +22,8 @@ import { starkCurve } from '../ec';
 import { addHexPrefix, utf8ToArray } from '../encode';
 import { parse, stringify } from '../json';
 import { toHex } from '../num';
-import { encodeShortString, isString } from '../shortString';
+import { encodeShortString } from '../shortString';
+import { isString } from '../typed';
 
 export function computePedersenHash(a: BigNumberish, b: BigNumberish): string {
   return starkCurve.pedersen(BigInt(a), BigInt(b));

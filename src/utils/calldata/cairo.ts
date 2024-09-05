@@ -206,6 +206,7 @@ export function getAbiContractVersion(abi: Abi): ContractVersion {
   const testFunction = abi.find(
     (it) => it.type === 'function' && (it.inputs.length || it.outputs.length)
   );
+
   if (!testFunction) {
     return { cairo: undefined, compiler: undefined };
   }

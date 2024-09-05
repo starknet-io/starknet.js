@@ -8,8 +8,13 @@ import {
   type ChainId,
   type StarknetWindowObject,
   type TypedData,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  type SPEC,
+  type Permission,
+  type Address,
+  AddInvokeTransactionResult,
+  AddDeclareTransactionResult,
+  AccountDeploymentData,
+  Signature,
+  SpecVersion,
 } from 'starknet-types-07';
 
 /**
@@ -17,12 +22,13 @@ import {
  * @param {boolean} [silent_mode=false] false: request user interaction allowance. true: return only pre-allowed
  * @returns allowed accounts addresses
  */
-export function requestAccounts(swo: StarknetWindowObject, silent_mode = false) {
+export function requestAccounts(
+  swo: StarknetWindowObject,
+  silent_mode: boolean = false
+): Promise<Address[]> {
   return swo.request({
     type: 'wallet_requestAccounts',
-    params: {
-      silent_mode,
-    },
+    params: { silent_mode },
   });
 }
 
@@ -30,7 +36,7 @@ export function requestAccounts(swo: StarknetWindowObject, silent_mode = false) 
  * Request Permission for wallet account
  * @returns allowed accounts addresses
  */
-export function getPermissions(swo: StarknetWindowObject) {
+export function getPermissions(swo: StarknetWindowObject): Promise<Permission[]> {
   return swo.request({ type: 'wallet_getPermissions' });
 }
 
@@ -39,11 +45,11 @@ export function getPermissions(swo: StarknetWindowObject) {
  * @param asset WatchAssetParameters
  * @returns boolean
  */
-export function watchAsset(swo: StarknetWindowObject, asset: WatchAssetParameters) {
-  return swo.request({
-    type: 'wallet_watchAsset',
-    params: asset,
-  });
+export function watchAsset(
+  swo: StarknetWindowObject,
+  asset: WatchAssetParameters
+): Promise<boolean> {
+  return swo.request({ type: 'wallet_watchAsset', params: asset });
 }
 
 /**
@@ -51,12 +57,12 @@ export function watchAsset(swo: StarknetWindowObject, asset: WatchAssetParameter
  * @param chain AddStarknetChainParameters
  * @returns boolean
  */
-export function addStarknetChain(swo: StarknetWindowObject, chain: AddStarknetChainParameters) {
+export function addStarknetChain(
+  swo: StarknetWindowObject,
+  chain: AddStarknetChainParameters
+): Promise<boolean> {
   // TODO: This should set custom RPC endpoint ?
-  return swo.request({
-    type: 'wallet_addStarknetChain',
-    params: chain,
-  });
+  return swo.request({ type: 'wallet_addStarknetChain', params: chain });
 }
 
 /**
@@ -64,12 +70,10 @@ export function addStarknetChain(swo: StarknetWindowObject, chain: AddStarknetCh
  * @param chainId StarknetChainId
  * @returns boolean
  */
-export function switchStarknetChain(swo: StarknetWindowObject, chainId: ChainId) {
+export function switchStarknetChain(swo: StarknetWindowObject, chainId: ChainId): Promise<boolean> {
   return swo.request({
     type: 'wallet_switchStarknetChain',
-    params: {
-      chainId,
-    },
+    params: { chainId },
   });
 }
 
@@ -77,7 +81,7 @@ export function switchStarknetChain(swo: StarknetWindowObject, chainId: ChainId)
  * Request the current chain ID from the wallet.
  * @returns The current Starknet chain ID.
  */
-export function requestChainId(swo: StarknetWindowObject) {
+export function requestChainId(swo: StarknetWindowObject): Promise<ChainId> {
   return swo.request({ type: 'wallet_requestChainId' });
 }
 
@@ -85,7 +89,7 @@ export function requestChainId(swo: StarknetWindowObject) {
  * Get deployment data for a contract.
  * @returns The deployment data result.
  */
-export function deploymentData(swo: StarknetWindowObject) {
+export function deploymentData(swo: StarknetWindowObject): Promise<AccountDeploymentData> {
   return swo.request({ type: 'wallet_deploymentData' }); // TODO: test
 }
 
@@ -97,11 +101,8 @@ export function deploymentData(swo: StarknetWindowObject) {
 export function addInvokeTransaction(
   swo: StarknetWindowObject,
   params: AddInvokeTransactionParameters
-) {
-  return swo.request({
-    type: 'wallet_addInvokeTransaction',
-    params,
-  });
+): Promise<AddInvokeTransactionResult> {
+  return swo.request({ type: 'wallet_addInvokeTransaction', params });
 }
 
 /**
@@ -112,11 +113,8 @@ export function addInvokeTransaction(
 export function addDeclareTransaction(
   swo: StarknetWindowObject,
   params: AddDeclareTransactionParameters
-) {
-  return swo.request({
-    type: 'wallet_addDeclareTransaction',
-    params,
-  });
+): Promise<AddDeclareTransactionResult> {
+  return swo.request({ type: 'wallet_addDeclareTransaction', params });
 }
 
 /**
@@ -125,18 +123,15 @@ export function addDeclareTransaction(
  * @param typedData The typed data to sign.
  * @returns An array of signatures as strings.
  */
-export function signMessage(swo: StarknetWindowObject, typedData: TypedData) {
-  return swo.request({
-    type: 'wallet_signTypedData',
-    params: typedData,
-  });
+export function signMessage(swo: StarknetWindowObject, typedData: TypedData): Promise<Signature> {
+  return swo.request({ type: 'wallet_signTypedData', params: typedData });
 }
 
 /**
  * Get the list of supported specifications.
  * @returns An array of supported specification strings.
  */
-export function supportedSpecs(swo: StarknetWindowObject) {
+export function supportedSpecs(swo: StarknetWindowObject): Promise<SpecVersion[]> {
   return swo.request({ type: 'wallet_supportedSpecs' });
 }
 
