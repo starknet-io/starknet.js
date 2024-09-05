@@ -187,7 +187,7 @@ function padString(
  * @param {number} length The target length for the padded string.
  * @param {string} [padding='0'] The string to use for padding. Defaults to '0'.
  * @returns {string} The padded string.
- * * @example
+ * @example
  * ```typescript
  * const myString = '1A3F';
  * const result = encode.padLeft(myString, 10);

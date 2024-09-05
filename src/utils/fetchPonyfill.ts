@@ -5,6 +5,6 @@ import isomorphicFetch from 'isomorphic-fetch';
 import { IS_BROWSER } from './encode';
 import { isUndefined } from './typed';
 
-export default (IS_BROWSER && window.fetch) || // use buildin fetch in browser if available
+export default (IS_BROWSER && window.fetch) || // use built-in fetch in browser if available
   (!isUndefined(global) && makeFetchCookie(global.fetch)) || // use buildin fetch in node, react-native and service worker if available
   isomorphicFetch; // ponyfill fetch in node and browsers that don't have it
