@@ -1,5 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { SPEC } from 'starknet-types-07';
 import { getPublicKey, getStarkKey, utils } from '@scure/starknet';
 import { gzip, ungzip } from 'pako';
 
@@ -20,10 +18,21 @@ import {
   addPercent,
   bigNumberishArrayToDecimalStringArray,
   bigNumberishArrayToHexadecimalStringArray,
-  isBigInt,
   toHex,
 } from './num';
-import { isString } from './shortString';
+import { isUndefined, isString, isBigInt } from './typed';
+
+type V3Details = Required<
+  Pick<
+    UniversalDetails,
+    | 'tip'
+    | 'paymasterData'
+    | 'accountDeploymentData'
+    | 'nonceDataAvailabilityMode'
+    | 'feeDataAvailabilityMode'
+    | 'resourceBounds'
+  >
+>;
 
 /**
  * Compress compiled Cairo 0 program
@@ -46,8 +55,8 @@ export function compressProgram(jsonProgram: Program | string): CompressedProgra
 
 /**
  * Decompress compressed compiled Cairo 0 program
- * @param {CompressedProgram} base64 Compressed Cairo 0 program
- * @returns {Object | CompressedProgram} Parsed decompressed compiled Cairo 0 program
+ * @param {CompressedProgram | CompressedProgram[]} base64 Compressed Cairo 0 program
+ * @returns Parsed decompressed compiled Cairo 0 program
  * @example
  * ```typescript
  * const contractCairo0 = json.parse(fs.readFileSync("./cairo0contract.json").toString("ascii"));
@@ -72,7 +81,7 @@ export function compressProgram(jsonProgram: Program | string): CompressedProgra
  * // ...
  * ```
  */
-export function decompressProgram(base64: CompressedProgram) {
+export function decompressProgram(base64: CompressedProgram | CompressedProgram[]) {
   if (Array.isArray(base64)) return base64;
   const decompressed = arrayBufferToString(ungzip(atobUniversal(base64)));
   return parse(decompressed);
@@ -214,7 +223,7 @@ export function estimateFeeToBounds(
     };
   }
 
-  if (typeof estimate.gas_consumed === 'undefined' || typeof estimate.gas_price === 'undefined') {
+  if (isUndefined(estimate.gas_consumed) || isUndefined(estimate.gas_price)) {
     throw Error('estimateFeeToBounds: estimate is undefined');
   }
 
@@ -280,7 +289,7 @@ export function toTransactionVersion(
 /**
  * Convert Transaction version to Fee version or throw an error
  * @param {BigNumberish} [providedVersion] 0..3 number representing the transaction version
- * @returns {ETransactionVersion} the fee estimation version corresponding to the transaction version provided
+ * @returns {ETransactionVersion | undefined} the fee estimation version corresponding to the transaction version provided
  * @throws {Error} if the transaction version is unknown
  * @example
  * ```typescript
@@ -288,7 +297,7 @@ export function toTransactionVersion(
  * // result = "0x100000000000000000000000000000002"
  * ```
  */
-export function toFeeVersion(providedVersion?: BigNumberish) {
+export function toFeeVersion(providedVersion?: BigNumberish): ETransactionVersion | undefined {
   if (!providedVersion) return undefined;
   const version = toHex(providedVersion);
 
@@ -303,7 +312,7 @@ export function toFeeVersion(providedVersion?: BigNumberish) {
 /**
  * Return provided or default v3 tx details
  * @param {UniversalDetails} details details of the transaction
- * @return {} an object including the V3 transaction details.
+ * @return {V3Details} an object including the V3 transaction details.
  * @example
  * ```typescript
  * const detail: UniversalDetails = { tip: 3456n };
@@ -321,7 +330,8 @@ export function toFeeVersion(providedVersion?: BigNumberish) {
  * // }
  * ```
  */
-export function v3Details(details: UniversalDetails) {
+
+export function v3Details(details: UniversalDetails): V3Details {
   return {
     tip: details.tip || 0,
     paymasterData: details.paymasterData || [],

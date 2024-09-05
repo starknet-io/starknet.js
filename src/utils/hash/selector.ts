@@ -4,7 +4,8 @@ import { bytesToHex } from '@noble/curves/abstract/utils';
 import { MASK_250 } from '../../constants';
 import { BigNumberish } from '../../types';
 import { addHexPrefix, removeHexPrefix, utf8ToArray } from '../encode';
-import { hexToBytes, isBigInt, isHex, isNumber, isStringWholeNumber, toHex } from '../num';
+import { hexToBytes, isHex, isStringWholeNumber, toHex } from '../num';
+import { isBigInt, isNumber } from '../typed';
 
 /**
  * Calculate the hex-string Starknet Keccak hash for a given BigNumberish
