@@ -206,7 +206,7 @@ export function parseEvents(
     }
     while (!abiEvent.name) {
       const hashName = recEvent.keys.shift();
-      assert(!!hashName, 'Not enough data in "key" property of this event.');
+      assert(!!hashName, 'Not enough data in "keys" property of this event.');
       abiEvent = (abiEvent as AbiEvents)[hashName];
     }
     // Create our final event object
@@ -251,12 +251,14 @@ export function parseEvents(
 /**
  * Parse Transaction Receipt Event from UDC invoke transaction and
  * create DeployContractResponse compatible response with addition of the UDC Event data
+ * @param {InvokeTransactionReceiptResponse} txReceipt
  *
- * @returns {DeployContractUDCResponse} */
+ * @returns {DeployContractUDCResponse} parsed UDC event data
+ */
 export function parseUDCEvent(
   txReceipt: InvokeTransactionReceiptResponse
 ): DeployContractUDCResponse {
-  if (!txReceipt.events) {
+  if (!txReceipt.events?.length) {
     throw new Error('UDC emitted event is empty');
   }
   const event = txReceipt.events.find(
