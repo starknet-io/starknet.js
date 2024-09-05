@@ -289,7 +289,7 @@ export function toTransactionVersion(
 /**
  * Convert Transaction version to Fee version or throw an error
  * @param {BigNumberish} [providedVersion] 0..3 number representing the transaction version
- * @returns {TransactionVersion} the fee estimation version corresponding to the transaction version provided
+ * @returns {ETransactionVersion | undefined} the fee estimation version corresponding to the transaction version provided
  * @throws {Error} if the transaction version is unknown
  * @example
  * ```typescript

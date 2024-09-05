@@ -269,8 +269,8 @@ export function sanitizeBytes(
  * ```
  */
 export function sanitizeHex(hex: string): string {
-  const hexWihtoutPrefix = removeHexPrefix(hex);
-  const sanitizedHex = sanitizeBytes(hexWihtoutPrefix, 2);
+  const hexWithoutPrefix = removeHexPrefix(hex);
+  const sanitizedHex = sanitizeBytes(hexWithoutPrefix, 2);
   return sanitizedHex ? addHexPrefix(sanitizedHex) : sanitizedHex;
 }
 
