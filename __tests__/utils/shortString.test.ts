@@ -5,7 +5,6 @@ import {
   encodeShortString,
   isDecimalString,
   isShortString,
-  isString,
 } from '../../src/utils/shortString';
 
 describe('shortString', () => {
@@ -108,22 +107,6 @@ describe('shortString', () => {
       pending_word_len: 0,
     })
   ).toBe('');
-});
-
-describe('isString', () => {
-  test('should return true for strings', () => {
-    expect(isString('test')).toBe(true);
-    expect(isString('')).toBe(true);
-  });
-
-  test('should return false for non-string values', () => {
-    expect(isString(10)).toBe(false);
-    expect(isString({})).toBe(false);
-    expect(isString(null)).toBe(false);
-    expect(isString(undefined)).toBe(false);
-    expect(isString([])).toBe(false);
-    expect(isString(true)).toBe(false);
-  });
 });
 
 describe('isShortString', () => {

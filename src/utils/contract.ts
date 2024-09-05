@@ -10,8 +10,7 @@ import { CompleteDeclareContractPayload, DeclareContractPayload } from '../types
 import { computeCompiledClassHash, computeContractClassHash } from './hash';
 import { parse } from './json';
 import { decompressProgram } from './stark';
-
-import { isString } from './shortString';
+import { isString } from './typed';
 
 /**
  * Checks if a given contract is in Sierra (Safe Intermediate Representation) format.

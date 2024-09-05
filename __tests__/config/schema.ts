@@ -11,7 +11,7 @@ import componentSchemas from '../schemas/component.json';
 import libSchemas from '../schemas/lib.json';
 import providerSchemas from '../schemas/provider.json';
 import rpcSchemas from '../schemas/rpc.json';
-import { isBigInt } from '../../src/utils/num';
+import { isBigInt } from '../../src/utils/typed';
 
 const matcherSchemas = [accountSchemas, libSchemas, providerSchemas, rpcSchemas];
 const starknetSchemas = [

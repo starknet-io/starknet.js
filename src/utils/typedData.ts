@@ -21,7 +21,8 @@ import {
 } from './hash';
 import { MerkleTree } from './merkle';
 import { isBigNumberish, isHex, toHex } from './num';
-import { encodeShortString, isString } from './shortString';
+import { encodeShortString } from './shortString';
+import { isString } from './typed';
 
 /** @deprecated prefer importing from 'types' over 'typedData' */
 export * from '../types/typedData';
@@ -464,7 +465,7 @@ export function encodeData<T extends TypedData>(
   type: string,
   data: T['message'],
   revision: Revision = Revision.LEGACY
-) {
+): [string[], string[]] {
   const targetType = types[type] ?? revisionConfiguration[revision].presetTypes[type];
   const [returnTypes, values] = targetType.reduce<[string[], string[]]>(
     ([ts, vs], field) => {
@@ -519,7 +520,7 @@ export function getStructHash<T extends TypedData>(
   type: string,
   data: T['message'],
   revision: Revision = Revision.LEGACY
-) {
+): string {
   return revisionConfiguration[revision].hashMethod(encodeData(types, type, data, revision)[1]);
 }
 

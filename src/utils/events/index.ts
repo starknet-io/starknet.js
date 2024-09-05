@@ -14,6 +14,7 @@ import {
   type CairoEventVariant,
   type InvokeTransactionReceiptResponse,
   type AbiEntry,
+  DeployContractUDCResponse,
 } from '../../types';
 import assert from '../assert';
 import { isCairo1Abi } from '../calldata/cairo';
@@ -21,6 +22,7 @@ import responseParser from '../calldata/responseParser';
 import { starkCurve } from '../ec';
 import { addHexPrefix, utf8ToArray } from '../encode';
 import { cleanHex } from '../num';
+import { isUndefined, isObject } from '../typed';
 
 /**
  * Check if an ABI entry is related to events.
@@ -79,7 +81,6 @@ function getCairo0AbiEvents(abi: Abi): AbiEvents {
  * //    { '0x34e55c1cd55f1338241b50d352f0e91c7e4ffad0e4271d64eb347589ebdfd16': {
  * //     kind: 'struct', type: 'event',
  * //     name: 'ka::ExComponent::ex_logic_component::Mint',
-
  * //     members: [{
  * //      name: 'spender',
  * //      type: 'core::starknet::contract_address::ContractAddress',
@@ -91,7 +92,6 @@ function getCairo0AbiEvents(abi: Abi): AbiEvents {
 function getCairo1AbiEvents(abi: Abi): AbiEvents {
   const abiEventsStructs = abi.filter((obj) => isAbiEvent(obj) && obj.kind === 'struct');
   const abiEventsEnums = abi.filter((obj) => isAbiEvent(obj) && obj.kind === 'enum');
-
   const abiEventsData: AbiEvents = abiEventsStructs.reduce((acc: CairoEvent, event: CairoEvent) => {
     let nameList: string[] = [];
     let { name } = event;
@@ -100,20 +100,24 @@ function getCairo1AbiEvents(abi: Abi): AbiEvents {
     // eslint-disable-next-line no-constant-condition
     while (true) {
       const eventEnum = abiEventsEnums.find((eventE) => eventE.variants.some(findName));
-      if (typeof eventEnum === 'undefined') break;
+      if (isUndefined(eventEnum)) break;
       const variant = eventEnum.variants.find(findName);
       nameList.unshift(variant.name);
       if (variant.kind === 'flat') flat = true;
       name = eventEnum.name;
     }
+
     if (nameList.length === 0) {
       throw new Error('inconsistency in ABI events definition.');
     }
+
     if (flat) nameList = [nameList[nameList.length - 1]];
+
     const final = nameList.pop();
     let result: AbiEvents = {
       [addHexPrefix(starkCurve.keccak(utf8ToArray(final!)).toString(16))]: event,
     };
+
     while (nameList.length > 0) {
       result = {
         [addHexPrefix(starkCurve.keccak(utf8ToArray(nameList.pop()!)).toString(16))]: result,
@@ -139,7 +143,6 @@ function getCairo1AbiEvents(abi: Abi): AbiEvents {
  * //    { '0x34e55c1cd55f1338241b50d352f0e91c7e4ffad0e4271d64eb347589ebdfd16': {
  * //     kind: 'struct', type: 'event',
  * //     name: 'ka::ExComponent::ex_logic_component::Mint',
-
  * //     members: [{
  * //      name: 'spender',
  * //      type: 'core::starknet::contract_address::ContractAddress',
@@ -150,20 +153,6 @@ function getCairo1AbiEvents(abi: Abi): AbiEvents {
  */
 export function getAbiEvents(abi: Abi): AbiEvents {
   return isCairo1Abi(abi) ? getCairo1AbiEvents(abi) : getCairo0AbiEvents(abi);
-}
-
-/**
- * Checks if a given value is an object (Object or Array)
- * @param {any} item the tested item
- * @returns {boolean}
- * @example
- * ```typescript
- * const result = events.isObject({event: "pending"});
- * // result = true
- * ```
- */
-export function isObject(item: any): boolean {
-  return item && typeof item === 'object' && !Array.isArray(item);
 }
 
 /**
@@ -264,9 +253,11 @@ export function parseEvents(
  * create DeployContractResponse compatible response with addition of the UDC Event data
  * @param {InvokeTransactionReceiptResponse} txReceipt
  *
- * @returns DeployContractResponse | UDC Event Response data
+ * @returns {DeployContractUDCResponse} DeployContractResponse | UDC Event Response data
  */
-export function parseUDCEvent(txReceipt: InvokeTransactionReceiptResponse) {
+export function parseUDCEvent(
+  txReceipt: InvokeTransactionReceiptResponse
+): DeployContractUDCResponse {
   if (!txReceipt.events?.length) {
     throw new Error('UDC emitted event is empty');
   }
