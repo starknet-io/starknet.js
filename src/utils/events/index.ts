@@ -262,6 +262,7 @@ export function parseEvents(
 /**
  * Parse Transaction Receipt Event from UDC invoke transaction and
  * create DeployContractResponse compatible response with addition of the UDC Event data
+ * @param {InvokeTransactionReceiptResponse} txReceipt
  *
  * @returns DeployContractResponse | UDC Event Response data
  */
