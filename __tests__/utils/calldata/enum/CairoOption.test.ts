@@ -5,13 +5,13 @@ describe('CairoOption', () => {
     test('should set "Some" if variant is 0', () => {
       const cairoOption = new CairoOption<string>(0, 'option_content');
       expect(cairoOption.Some).toEqual('option_content');
-      expect(cairoOption.None).toEqual(undefined);
+      expect(cairoOption.None).toBeUndefined();
     });
 
     test('should set "None" if variant is 1', () => {
       const cairoOption = new CairoOption<string>(1, 'option_content');
       expect(cairoOption.None).toEqual(true);
-      expect(cairoOption.Some).toEqual(undefined);
+      expect(cairoOption.Some).toBeUndefined();
     });
 
     test('should throw an error if wrong variant is provided', () => {
@@ -30,7 +30,7 @@ describe('CairoOption', () => {
   describe('unwrap', () => {
     test('should return undefined if "None" value is set', () => {
       const cairoOption = new CairoOption<string>(1, 'option_content');
-      expect(cairoOption.unwrap()).toEqual(undefined);
+      expect(cairoOption.unwrap()).toBeUndefined();
     });
 
     test('should return "Some" value if it is set', () => {

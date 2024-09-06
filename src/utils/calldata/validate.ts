@@ -1,7 +1,3 @@
-/**
- * Validate cairo contract method arguments
- * Flow: Determine type from abi and than validate against parameter
- */
 import {
   AbiEntry,
   AbiEnums,
@@ -325,12 +321,64 @@ const validateNonZero = (parameter: any, input: AbiEntry) => {
   }
 };
 
+/**
+ * Validate cairo contract method arguments
+ * Flow: Determine type from abi and than validate against parameter
+ *
+ * @param {FunctionAbi} abiMethod - Abi method.
+ * @param {any[]} args - Arguments.
+ * @param {AbiStructs} structs - ABI structs.
+ * @param {AbiEnums} enums - ABI enums.
+ * @returns {void} - Return void if validation passes
+ *
+ * @example
+ *  const functionAbi: FunctionAbi = {
+ *   inputs: [{ name: 'test', type: 'felt' }],
+ *   name: 'test',
+ *   outputs: [{ name: 'test', type: 'felt' }],
+ *   stateMutability: 'view',
+ *   type: 'function',
+ * };
+ *
+ * const abiStructs: AbiStructs = {
+ *  abi_structs: {
+ *    members: [
+ *        {
+ *          name: 'test_name',
+ *          type: 'test_type',
+ *          offset: 1,
+ *        },
+ *    ],
+ *    size: 2,
+ *    name: 'cairo_event_struct',
+ *    type: 'struct',
+ *   },
+ * };
+ *
+ * const abiEnums: AbiEnums = {
+ *   abi_enums: {
+ *     variants: [
+ *       {
+ *         name: 'test_name',
+ *         type: 'cairo_event_struct_variant',
+ *         offset: 1,
+ *       },
+ *     ],
+ *     size: 2,
+ *     name: 'test_cairo_event',
+ *     type: 'enum',
+ *   },
+ * };
+ *
+ * validateFields(functionAbi, [1n], abiStructs, abiEnums); // Returns void since validation passes
+ * validateFields(functionAbi, [{}], abiStructs, abiEnums); // Throw an error because paramters are not valid
+ */
 export default function validateFields(
   abiMethod: FunctionAbi,
-  args: Array<any>,
+  args: any[],
   structs: AbiStructs,
   enums: AbiEnums
-) {
+): void {
   abiMethod.inputs.reduce((acc, input) => {
     const parameter = args[acc];
 

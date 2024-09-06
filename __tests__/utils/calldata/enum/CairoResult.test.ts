@@ -5,13 +5,13 @@ describe('CairoResult', () => {
     test('should set "Ok" if variant is 0', () => {
       const cairoResult = new CairoResult<number, string>(0, 'result_content');
       expect(cairoResult.Ok).toEqual('result_content');
-      expect(cairoResult.Err).toEqual(undefined);
+      expect(cairoResult.Err).toBeUndefined();
     });
 
     test('should set "Err" if variant is 1', () => {
       const cairoResult = new CairoResult<number, string>(1, 'result_content');
       expect(cairoResult.Err).toEqual('result_content');
-      expect(cairoResult.Ok).toEqual(undefined);
+      expect(cairoResult.Ok).toBeUndefined();
     });
 
     test('should throw an error if wrong variant is provided', () => {
