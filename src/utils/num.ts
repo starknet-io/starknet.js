@@ -1,9 +1,10 @@
 import { hexToBytes as hexToBytesNoble } from '@noble/curves/abstract/utils';
 import { sha256 } from '@noble/hashes/sha256';
+
+import { MASK_31 } from '../constants';
 import { BigNumberish } from '../types';
 import assert from './assert';
 import { addHexPrefix, buf2hex, removeHexPrefix } from './encode';
-import { MASK_31 } from '../constants';
 
 /** @deprecated prefer importing from 'types' over 'num' */
 export type { BigNumberish };
@@ -92,7 +93,21 @@ export const toHexString = toHex;
  * @returns format: storage-key-string
  */
 export function toStorageKey(number: BigNumberish): string {
+  // TODO: This is not completly correct as it will not enforce first 0 and second [0-7], 0x82bda... will pass as valid and should be false
   return addHexPrefix(toBigInt(number).toString(16).padStart(64, '0'));
+}
+
+/**
+ * Convert BigNumberish to hex formate 0x + 64 hex chars
+ *
+ * Similar as toStorageKey but conforming to exactly 0x(64 hex chars).
+ *
+ * @returns format: hex-0x(64)-string
+ */
+export function toHex64(number: BigNumberish): string {
+  const res = addHexPrefix(toBigInt(number).toString(16).padStart(64, '0'));
+  if (res.length !== 66) throw TypeError('number is too big for hex 0x(64) representation');
+  return res;
 }
 
 /**

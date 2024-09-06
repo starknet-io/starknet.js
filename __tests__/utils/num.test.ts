@@ -1,24 +1,24 @@
+import { num } from '../../src';
 import {
-  isHex,
-  toBigInt,
-  isBigInt,
-  toHex,
-  hexToDecimalString,
-  cleanHex,
+  addPercent,
   assertInRange,
   bigNumberishArrayToDecimalStringArray,
   bigNumberishArrayToHexadecimalStringArray,
-  isStringWholeNumber,
+  cleanHex,
   getDecimalString,
   getHexString,
   getHexStringArray,
-  toCairoBool,
   hexToBytes,
-  addPercent,
-  isNumber,
+  hexToDecimalString,
+  isBigInt,
   isBoolean,
+  isHex,
+  isNumber,
+  isStringWholeNumber,
+  toBigInt,
+  toCairoBool,
+  toHex,
 } from '../../src/utils/num';
-import { num } from '../../src';
 
 describe('isHex', () => {
   test('should return true for valid hex strings', () => {
@@ -225,5 +225,61 @@ describe('isBigNumberish', () => {
     expect(num.isBigNumberish('0xea')).toBe(true);
     expect(num.isBigNumberish('ea')).toBe(false);
     expect(num.isBigNumberish('zero')).toBe(false);
+  });
+});
+
+describe('toStorageKey, toHex64', () => {
+  test('should convert to 0x + 64 hex unrestricted', () => {
+    expect(() => num.toStorageKey('monorepo')).toThrow();
+
+    const key1 = num.toStorageKey('0x123');
+    expect(key1).toEqual('0x0000000000000000000000000000000000000000000000000000000000000123');
+    expect(key1.length).toEqual(66);
+
+    const key11 = num.toStorageKey(
+      '0x000000000000000000000000000000000000000000000000000000000000000000000000000000000123'
+    );
+    expect(key11).toEqual('0x0000000000000000000000000000000000000000000000000000000000000123');
+    expect(key11.length).toEqual(66);
+
+    const key2 = num.toStorageKey(123);
+    expect(key2).toEqual('0x000000000000000000000000000000000000000000000000000000000000007b');
+    expect(key2.length).toEqual(66);
+
+    const key3 = num.toStorageKey(123n);
+    expect(key3).toEqual('0x000000000000000000000000000000000000000000000000000000000000007b');
+    expect(key3.length).toEqual(66);
+  });
+
+  test('should convert to 0x + 64 hex restricted', () => {
+    expect(() => num.toHex64('monorepo')).toThrow();
+
+    const key1 = num.toHex64('0x123');
+    expect(key1).toEqual('0x0000000000000000000000000000000000000000000000000000000000000123');
+    expect(key1.length).toEqual(66);
+
+    const key11 = num.toHex64(
+      '0x000000000000000000000000000000000000000000000000000000000000000000000000000000000123'
+    );
+    expect(key11).toEqual('0x0000000000000000000000000000000000000000000000000000000000000123');
+    expect(key11.length).toEqual(66);
+
+    expect(() =>
+      num.toHex64(
+        '0x123000000000000000000000000000000000000000000000000000000000000000000000000000000123'
+      )
+    ).toThrow(TypeError);
+
+    const key2 = num.toHex64(123);
+    expect(key2).toEqual('0x000000000000000000000000000000000000000000000000000000000000007b');
+    expect(key2.length).toEqual(66);
+
+    const key3 = num.toHex64(123n);
+    expect(key3).toEqual('0x000000000000000000000000000000000000000000000000000000000000007b');
+    expect(key3.length).toEqual(66);
+
+    const key4 = num.toHex64('0x82bdafb0c4a2b03cd0f16ddcc3339da37f2cbb1aecb2a419764e35b7c3a8ec29');
+    expect(key4).toEqual('0x82bdafb0c4a2b03cd0f16ddcc3339da37f2cbb1aecb2a419764e35b7c3a8ec29');
+    expect(key4.length).toEqual(66);
   });
 });
