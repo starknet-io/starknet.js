@@ -83,7 +83,7 @@ const getAbiEnums = (): AbiEnums => ({
 
 describe('validateFields', () => {
   describe('felt validation', () => {
-    test('should return undefined if felt validation passes', () => {
+    test('should return void if felt validation passes', () => {
       const result = validateFields(
         getFunctionAbi('felt'),
         ['test'],
@@ -116,6 +116,52 @@ describe('validateFields', () => {
       );
       expect(() => validateFelt([-1])).toThrow(error);
       expect(() => validateFelt([2n ** 252n])).toThrow(error);
+    });
+  });
+
+  describe('bytes31 validation', () => {
+    test('should return void if bytes31 validation passes', () => {
+      const result = validateFields(
+        getFunctionAbi('core::bytes_31::bytes31'),
+        ['test'],
+        getAbiStructs(),
+        getAbiEnums()
+      );
+      expect(result).toBeUndefined();
+    });
+
+    test('should throw an error if parameter is not the type of string', () => {
+      const validateFelt = (params: unknown[]) =>
+        validateFields(
+          getFunctionAbi('core::bytes_31::bytes31'),
+          params,
+          getAbiStructs(),
+          getAbiEnums()
+        );
+
+      const error = new Error('Validate: arg test should be a string.');
+
+      expect(() => validateFelt([0])).toThrow(error);
+      expect(() => validateFelt([BigInt(22)])).toThrow(error);
+      expect(() => validateFelt([new Map()])).toThrow(error);
+      expect(() => validateFelt([true])).toThrow(error);
+      expect(() => validateFelt([])).toThrow(error);
+      expect(() => validateFelt([Symbol('test')])).toThrow(error);
+    });
+
+    test('should throw an error if parameter is less than 32 chars', () => {
+      const validateFelt = (params: unknown[]) =>
+        validateFields(
+          getFunctionAbi('core::bytes_31::bytes31'),
+          params,
+          getAbiStructs(),
+          getAbiEnums()
+        );
+
+      const error = new Error(
+        'Validate: arg test cairo typed core::bytes_31::bytes31 should be a string of less than 32 characters.'
+      );
+      expect(() => validateFelt(['String_that_is_bigger_than_32_characters'])).toThrow(error);
     });
   });
 });
