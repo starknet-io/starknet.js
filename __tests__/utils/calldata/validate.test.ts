@@ -89,6 +89,12 @@ const getAbiEnums = (): AbiEnums => ({
 });
 
 describe('validateFields', () => {
+  test('should throw an error if validation is unhandled', () => {
+    expect(() => {
+      validateFields(getFunctionAbi('test_test'), [true], getAbiStructs(), getAbiEnums());
+    }).toThrow(new Error('Validate Unhandled: argument test, type test_test, value true'));
+  });
+
   describe('felt validation', () => {
     test('should return void if felt validation passes', () => {
       const result = validateFields(
@@ -148,12 +154,9 @@ describe('validateFields', () => {
 
       const error = new Error('Validate: arg test should be a string.');
 
-      expect(() => validateBytes31([0])).toThrow(error);
-      expect(() => validateBytes31([BigInt(22)])).toThrow(error);
-      expect(() => validateBytes31([new Map()])).toThrow(error);
-      expect(() => validateBytes31([true])).toThrow(error);
-      expect(() => validateBytes31([])).toThrow(error);
-      expect(() => validateBytes31([Symbol('test')])).toThrow(error);
+      expect(() => validateBytes31([0, BigInt(22), new Map(), true, Symbol('test')])).toThrow(
+        error
+      );
     });
 
     test('should throw an error if parameter is less than 32 chars', () => {
@@ -383,6 +386,104 @@ describe('validateFields', () => {
       );
 
       expect(() => validateUint([2n ** 512n])).toThrow(error);
+    });
+  });
+
+  describe('Boolean validation', () => {
+    test('should return void if boolean validation passes', () => {
+      const result = validateFields(
+        getFunctionAbi('core::bool'),
+        [true],
+        getAbiStructs(),
+        getAbiEnums()
+      );
+      expect(result).toBeUndefined();
+    });
+
+    test('should throw an error if boolean validation fails', () => {
+      const validateBool = (params: unknown[]) =>
+        validateFields(getFunctionAbi('core::bool'), params, getAbiStructs(), getAbiEnums());
+
+      const error = new Error(
+        `Validate: arg test of cairo type core::bool should be type (Boolean)`
+      );
+
+      expect(() => validateBool(['bool', 22, Symbol('test'), BigInt(2)])).toThrow(error);
+    });
+  });
+
+  describe('Boolean validation', () => {
+    test('should return void if boolean validation passes', () => {
+      const result = validateFields(
+        getFunctionAbi('core::bool'),
+        [true],
+        getAbiStructs(),
+        getAbiEnums()
+      );
+      expect(result).toBeUndefined();
+    });
+
+    test('should throw an error if boolean validation fails', () => {
+      const validateBool = (params: unknown[]) =>
+        validateFields(getFunctionAbi('core::bool'), params, getAbiStructs(), getAbiEnums());
+
+      const error = new Error(
+        `Validate: arg test of cairo type core::bool should be type (Boolean)`
+      );
+
+      expect(() => validateBool(['bool'])).toThrow(error);
+    });
+  });
+
+  describe('ByteArray validation', () => {
+    test('should return void if byte array validation passes', () => {
+      const result = validateFields(
+        getFunctionAbi('core::byte_array::ByteArray'),
+        ['byte_array'],
+        getAbiStructs(),
+        getAbiEnums()
+      );
+      expect(result).toBeUndefined();
+    });
+
+    test('should throw an error if byte array validation fails', () => {
+      const validateByteArray = (params: unknown[]) =>
+        validateFields(
+          getFunctionAbi('core::byte_array::ByteArray'),
+          params,
+          getAbiStructs(),
+          getAbiEnums()
+        );
+
+      const error = new Error(`Validate: arg test should be a string.`);
+
+      expect(() => validateByteArray([false, 0, {}, new Map(), Symbol('test')])).toThrow(error);
+    });
+  });
+
+  describe('Array validation', () => {
+    test('should return void if array validation passes', () => {
+      const validateArray = (type: string, param: unknown) =>
+        validateFields(getFunctionAbi(type), [[param]], getAbiStructs(), getAbiEnums());
+
+      expect(validateArray('core::array::Array::<core::bool>', true)).toBeUndefined();
+      expect(validateArray('core::array::Array::<felt>', 'test')).toBeUndefined();
+      expect(validateArray('core::array::Span::<core::bool>', true)).toBeUndefined();
+    });
+
+    test('should throw an error if array validation is unhandled', () => {
+      expect(() => {
+        validateFields(
+          getFunctionAbi('core::array::Span::<core::test>'),
+          [[true]],
+          getAbiStructs(),
+          getAbiEnums()
+        );
+      }).toThrow(
+        new Error(
+          'Validate Unhandled: argument test, type core::array::Span::<core::test>, value true'
+        )
+      );
     });
   });
 });
