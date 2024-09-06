@@ -25,7 +25,7 @@ export class CairoResult<T, U> {
 
   constructor(variant: CairoResultVariant | number, resultContent: T | U) {
     if (!(variant in Object.values(CairoResultVariant))) {
-      throw new Error('Wrong variant : should be CairoResultVariant.Ok or .Err.');
+      throw new Error('Wrong variant! It should be CairoResultVariant.Ok or .Err.');
     }
     if (variant === CairoResultVariant.Ok) {
       this.Ok = resultContent as T;

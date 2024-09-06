@@ -11,7 +11,7 @@ export type CairoOptionVariant = ValuesType<typeof CairoOptionVariant>;
 /**
  * Class to handle Cairo Option
  * @param variant CairoOptionVariant.Some or CairoOptionVariant.None
- * @param someContent value of type T.
+ * @param content value of type T.
  * @returns an instance representing a Cairo Option.
  * @example
  * ```typescript
@@ -23,17 +23,17 @@ export class CairoOption<T> {
 
   readonly None?: boolean;
 
-  constructor(variant: CairoOptionVariant | number, someContent?: T) {
+  constructor(variant: CairoOptionVariant | number, content?: T) {
     if (!(variant in Object.values(CairoOptionVariant))) {
-      throw new Error('Wrong variant : should be CairoOptionVariant.Some or .None.');
+      throw new Error('Wrong variant! It should be CairoOptionVariant.Some or .None.');
     }
     if (variant === CairoOptionVariant.Some) {
-      if (isUndefined(someContent)) {
+      if (isUndefined(content)) {
         throw new Error(
           'The creation of a Cairo Option with "Some" variant needs a content as input.'
         );
       }
-      this.Some = someContent;
+      this.Some = content;
       this.None = undefined;
     } else {
       this.Some = undefined;
