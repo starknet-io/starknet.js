@@ -461,14 +461,59 @@ describe('validateFields', () => {
     });
   });
 
+  describe('Tuple validation', () => {
+    test('should return void if tuple validation passes', () => {
+      const result = validateFields(
+        getFunctionAbi('(core::bool, core::bool)'),
+        [{ min: true, max: true }],
+        getAbiStructs(),
+        getAbiEnums()
+      );
+      expect(result).toBeUndefined();
+    });
+
+    test('should throw an error if tupple validation fails', () => {
+      const error = new Error(`Validate: arg test should be a tuple (defined as object)`);
+
+      expect(() =>
+        validateFields(
+          getFunctionAbi('(core::bool, core::bool)'),
+          [],
+          getAbiStructs(),
+          getAbiEnums()
+        )
+      ).toThrow(error);
+    });
+  });
+
   describe('Array validation', () => {
-    test('should return void if array validation passes', () => {
+    test('should return void if array validation passes for each type', () => {
       const validateArray = (type: string, param: unknown) =>
         validateFields(getFunctionAbi(type), [[param]], getAbiStructs(), getAbiEnums());
 
       expect(validateArray('core::array::Array::<core::bool>', true)).toBeUndefined();
       expect(validateArray('core::array::Array::<felt>', 'test')).toBeUndefined();
       expect(validateArray('core::array::Span::<core::bool>', true)).toBeUndefined();
+      expect(validateArray('core::array::Array::<felt>', 'felt')).toBeUndefined();
+      expect(validateArray(`core::array::Array::<${Uint.u8}>`, 2n)).toBeUndefined();
+      expect(validateArray('core::array::Array::<felt>', 'felt')).toBeUndefined();
+      expect(
+        validateArray('core::array::Array::<(core::bool, core::bool)>', { min: true, max: true })
+      ).toBeUndefined();
+      expect(
+        validateArray('core::array::Array::<core::array::Array::<core::bool>>', [true])
+      ).toBeUndefined();
+    });
+
+    test('should throw an error if parameter is not an array', () => {
+      expect(() => {
+        validateFields(
+          getFunctionAbi('core::array::Span::<core::bool>'),
+          [true],
+          getAbiStructs(),
+          getAbiEnums()
+        );
+      }).toThrow(new Error('Validate: arg test should be an Array'));
     });
 
     test('should throw an error if array validation is unhandled', () => {
