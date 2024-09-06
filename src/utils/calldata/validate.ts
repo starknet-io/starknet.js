@@ -61,7 +61,7 @@ const validateUint = (parameter: any, input: AbiEntry) => {
   if (isNumber(parameter)) {
     assert(
       parameter <= Number.MAX_SAFE_INTEGER,
-      `Validation: Parameter is to large to be typed as Number use (BigInt or String)`
+      'Validation: Parameter is to large to be typed as Number use (BigInt or String)'
     );
   }
   assert(
@@ -125,12 +125,15 @@ const validateUint = (parameter: any, input: AbiEntry) => {
     case Uint.u256:
       assert(
         param >= 0n && param <= 2n ** 256n - 1n,
-        `Validate: arg ${input.name} is ${input.type} 0 - 2^256-1`
+        `Validate: arg ${input.name} is ${input.type} should be in range 0 - 2^256-1`
       );
       break;
 
     case Uint.u512:
-      assert(CairoUint512.is(param), `Validate: arg ${input.name} is ${input.type} 0 - 2^512-1`);
+      assert(
+        CairoUint512.is(param),
+        `Validate: arg ${input.name} is ${input.type} should be in range 0 - 2^512-1`
+      );
       break;
 
     case Literal.ClassHash:

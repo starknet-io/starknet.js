@@ -1,5 +1,6 @@
 import validateFields from '../../../src/utils/calldata/validate';
 import {
+  Literal,
   Uint,
   type AbiEntry,
   type AbiEnums,
@@ -265,6 +266,123 @@ describe('validateFields', () => {
       expect(() => validateUint([new Map()])).toThrow(getError(new Map()));
       expect(() => validateUint([true])).toThrow(getError(true));
       expect(() => validateUint([{ test: 'test' }])).toThrow(getError({ test: 'test' }));
+    });
+
+    test('should throw an error if Uint "u8" is not in range', () => {
+      const validateUint = (params: unknown[]) =>
+        validateFields(getFunctionAbi(Uint.u8), params, getAbiStructs(), getAbiEnums());
+
+      const error = new Error(
+        `Validate: arg test cairo typed ${Uint.u8} should be in range [0 - 255]`
+      );
+
+      expect(() => validateUint([-1])).toThrow(error);
+      expect(() => validateUint([256n])).toThrow(error);
+    });
+
+    test('should throw an error if Uint "u16" is not in range', () => {
+      const validateUint = (params: unknown[]) =>
+        validateFields(getFunctionAbi(Uint.u16), params, getAbiStructs(), getAbiEnums());
+
+      const error = new Error(
+        `Validate: arg test cairo typed ${Uint.u16} should be in range [0, 65535]`
+      );
+
+      expect(() => validateUint([65536n])).toThrow(error);
+    });
+
+    test('should throw an error if Uint "u32" is not in range', () => {
+      const validateUint = (params: unknown[]) =>
+        validateFields(getFunctionAbi(Uint.u32), params, getAbiStructs(), getAbiEnums());
+
+      const error = new Error(
+        `Validate: arg test cairo typed ${Uint.u32} should be in range [0, 4294967295]`
+      );
+
+      expect(() => validateUint([4294967296n])).toThrow(error);
+    });
+
+    test('should throw an error if Uint "u64" is not in range', () => {
+      const validateUint = (params: unknown[]) =>
+        validateFields(getFunctionAbi(Uint.u64), params, getAbiStructs(), getAbiEnums());
+
+      const error = new Error(
+        `Validate: arg test cairo typed ${Uint.u64} should be in range [0, 2^64-1]`
+      );
+
+      expect(() => validateUint([2n ** 64n])).toThrow(error);
+    });
+
+    test('should throw an error if Uint "u128" is not in range', () => {
+      const validateUint = (params: unknown[]) =>
+        validateFields(getFunctionAbi(Uint.u128), params, getAbiStructs(), getAbiEnums());
+
+      const error = new Error(
+        `Validate: arg test cairo typed ${Uint.u128} should be in range [0, 2^128-1]`
+      );
+
+      expect(() => validateUint([2n ** 128n])).toThrow(error);
+    });
+
+    test('should throw an error if Uint "u256" is not in range', () => {
+      const validateUint = (params: unknown[]) =>
+        validateFields(getFunctionAbi(Uint.u256), params, getAbiStructs(), getAbiEnums());
+
+      const error = new Error('bigNumberish is bigger than UINT_256_MAX');
+
+      expect(() => validateUint([2n ** 256n])).toThrow(error);
+    });
+
+    test('should throw an error if Uint "u512" is not in range', () => {
+      const validateUint = (params: unknown[]) =>
+        validateFields(getFunctionAbi(Uint.u512), params, getAbiStructs(), getAbiEnums());
+
+      const error = new Error('bigNumberish is bigger than UINT_512_MAX.');
+
+      expect(() => validateUint([2n ** 512n])).toThrow(error);
+    });
+
+    test('should throw an error if "Literal.ClassHash" is not in range', () => {
+      const validateUint = (params: unknown[]) =>
+        validateFields(getFunctionAbi(Literal.ClassHash), params, getAbiStructs(), getAbiEnums());
+
+      const error = new Error(
+        `Validate: arg test cairo typed ${Literal.ClassHash} should be in range [0, 2^252-1]`
+      );
+
+      expect(() => validateUint([2n ** 252n])).toThrow(error);
+    });
+
+    test('should throw an error if "Literal.ContractAddress" is not in range', () => {
+      const validateUint = (params: unknown[]) =>
+        validateFields(
+          getFunctionAbi(Literal.ContractAddress),
+          params,
+          getAbiStructs(),
+          getAbiEnums()
+        );
+
+      const error = new Error(
+        `Validate: arg test cairo typed ${Literal.ContractAddress} should be in range [0, 2^252-1]`
+      );
+
+      expect(() => validateUint([2n ** 252n])).toThrow(error);
+    });
+
+    test('should throw an error if "Literal.Secp256k1Point" is not in range', () => {
+      const validateUint = (params: unknown[]) =>
+        validateFields(
+          getFunctionAbi(Literal.Secp256k1Point),
+          params,
+          getAbiStructs(),
+          getAbiEnums()
+        );
+
+      const error = new Error(
+        `Validate: arg test must be ${Literal.Secp256k1Point} : a 512 bits number.`
+      );
+
+      expect(() => validateUint([2n ** 512n])).toThrow(error);
     });
   });
 });
