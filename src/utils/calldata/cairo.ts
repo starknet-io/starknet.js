@@ -4,6 +4,7 @@ import {
   AbiStructs,
   BigNumberish,
   ContractVersion,
+  ETH_ADDRESS,
   Literal,
   Uint,
   Uint256,
@@ -123,7 +124,7 @@ export const isTypeContractAddress = (type: string) => type === Literal.Contract
  * @param {string} type - The type to check.
  * @returns - Returns true if the given type is 'core::starknet::eth_address::EthAddress', otherwise false.
  */
-export const isTypeEthAddress = (type: string) => type === Literal.EthAddress;
+export const isTypeEthAddress = (type: string) => type === ETH_ADDRESS;
 /**
  * Checks if the given type is 'core::bytes_31::bytes31'.
  *

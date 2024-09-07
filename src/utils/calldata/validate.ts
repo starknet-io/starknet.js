@@ -3,6 +3,7 @@ import {
   AbiEnums,
   AbiStructs,
   BigNumberish,
+  ETH_ADDRESS,
   FunctionAbi,
   Literal,
   Uint,
@@ -178,8 +179,8 @@ const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) =>
     return;
   }
 
-  if (input.type === Literal.EthAddress) {
-    assert(!isObject(parameter), `EthAddress type is waiting a BigNumberish. Got ${parameter}`);
+  if (input.type === ETH_ADDRESS) {
+    assert(!isObject(parameter), `EthAddress type is waiting a BigNumberish. Got "${parameter}"`);
     const param = BigInt(parameter.toString(10));
     assert(
       // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1259
@@ -221,7 +222,7 @@ const validateEnum = (parameter: any, input: AbiEntry) => {
     return; // Custom Enum
   }
   throw new Error(
-    `Validate Enum: argument ${input.name}, type ${input.type}, value received "${JSON.stringify(parameter)}", is not an Enum.`
+    `Validate Enum: argument ${input.name}, type ${input.type}, value received "${parameter}", is not an Enum.`
   );
 };
 

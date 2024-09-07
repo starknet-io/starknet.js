@@ -24,7 +24,8 @@ export const Literal = {
   ClassHash: 'core::starknet::class_hash::ClassHash',
   ContractAddress: 'core::starknet::contract_address::ContractAddress',
   Secp256k1Point: 'core::starknet::secp256k1::Secp256k1Point',
-  EthAddress: 'core::starknet::eth_address::EthAddress',
 } as const;
 
 export type Literal = ValuesType<typeof Literal>;
+
+export const ETH_ADDRESS = 'core::starknet::eth_address::EthAddress';

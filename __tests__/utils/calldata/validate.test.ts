@@ -2,6 +2,7 @@ import validateFields from '../../../src/utils/calldata/validate';
 import {
   CairoOption,
   CairoResult,
+  ETH_ADDRESS,
   Literal,
   Uint,
   type AbiEntry,
@@ -449,7 +450,7 @@ describe('validateFields', () => {
   });
 
   describe('Struct validation', () => {
-    test('should return void if struct validation passes', () => {
+    test('should return void if struct validation passes for common struct', () => {
       const result = validateFields(
         getFunctionAbi('struct'),
         [{ test_name: 'test' }],
@@ -460,7 +461,50 @@ describe('validateFields', () => {
       expect(result).toBeUndefined();
     });
 
-    // TODO: Cover Uint & EthAdress struct cases
+    test('should return void if struct validation passes for Uint 256 or 512', () => {
+      const abiStructs = {
+        [Uint.u256]: getAbiStructs().struct,
+      };
+      const result = validateFields(getFunctionAbi(Uint.u256), [1n], abiStructs, getAbiEnums());
+
+      expect(result).toBeUndefined();
+    });
+
+    test('should return void if struct validation passes for EthAddress', () => {
+      const abiStructs = {
+        [ETH_ADDRESS]: getAbiStructs().struct,
+      };
+      const result = validateFields(getFunctionAbi(ETH_ADDRESS), [1n], abiStructs, getAbiEnums());
+
+      expect(result).toBeUndefined();
+    });
+
+    test('should throw an error for EthAddress struct if type is not a BigNumberish', () => {
+      const error = new Error('EthAddress type is waiting a BigNumberish. Got "[object Object]"');
+
+      expect(() => {
+        const abiStructs = {
+          [ETH_ADDRESS]: getAbiStructs().struct,
+        };
+
+        validateFields(getFunctionAbi(ETH_ADDRESS), [{ test: 1 }], abiStructs, getAbiEnums());
+      }).toThrow(error);
+    });
+
+    test('should throw an error for EthAddress struct if it is not in range', () => {
+      const error = new Error(
+        `Validate: arg test cairo typed ${ETH_ADDRESS} should be in range [0, 2^160-1]`
+      );
+
+      expect(() => {
+        const abiStructs = {
+          [ETH_ADDRESS]: getAbiStructs().struct,
+        };
+
+        validateFields(getFunctionAbi(ETH_ADDRESS), [2n ** 160n], abiStructs, getAbiEnums());
+      }).toThrow(error);
+    });
+
     test('should throw an error if arg is not an JS object', () => {
       const error = new Error(
         'Validate: arg test is cairo type struct (struct), and should be defined as js object (not array)'
@@ -501,7 +545,7 @@ describe('validateFields', () => {
       const enumOption = 'core::option::Option::core::bool';
 
       const abiEnums = {
-        [enumOption]: getAbiEnums().enums,
+        [enumOption]: getAbiEnums().enum,
       };
       const result = validateFields(
         getFunctionAbi(enumOption),
@@ -517,7 +561,7 @@ describe('validateFields', () => {
       const enumResult = 'core::result::Result::';
 
       const abiEnums = {
-        [enumResult]: getAbiEnums().enums,
+        [enumResult]: getAbiEnums().enum,
       };
       const result = validateFields(
         getFunctionAbi(enumResult),
@@ -541,7 +585,7 @@ describe('validateFields', () => {
 
     test('should throw an error if arg is not an enum', () => {
       const error = new Error(
-        'Validate Enum: argument test, type enum, value received "{"example":"test"}", is not an Enum.'
+        'Validate Enum: argument test, type enum, value received "[object Object]", is not an Enum.'
       );
 
       expect(() =>
