@@ -1,5 +1,7 @@
 import validateFields from '../../../src/utils/calldata/validate';
 import {
+  CairoOption,
+  CairoResult,
   Literal,
   Uint,
   type AbiEntry,
@@ -475,6 +477,76 @@ describe('validateFields', () => {
       expect(() =>
         validateFields(
           getFunctionAbi('struct'),
+          [{ example: 'test' }],
+          getAbiStructs(),
+          getAbiEnums()
+        )
+      ).toThrow(error);
+    });
+  });
+
+  describe('Enum validation', () => {
+    test('should return void if enum validation passes for custom enum', () => {
+      const result = validateFields(
+        getFunctionAbi('enum'),
+        [{ variant: 'test', activeVariant: 'test' }],
+        getAbiStructs(),
+        getAbiEnums()
+      );
+
+      expect(result).toBeUndefined();
+    });
+
+    test('should return void if enum validation passes for type option', () => {
+      const enumOption = 'core::option::Option::core::bool';
+
+      const abiEnums = {
+        [enumOption]: getAbiEnums().enums,
+      };
+      const result = validateFields(
+        getFunctionAbi(enumOption),
+        [new CairoOption<string>(0, 'content')],
+        getAbiStructs(),
+        abiEnums
+      );
+
+      expect(result).toBeUndefined();
+    });
+
+    test('should return void if enum validation passes for type result', () => {
+      const enumResult = 'core::result::Result::';
+
+      const abiEnums = {
+        [enumResult]: getAbiEnums().enums,
+      };
+      const result = validateFields(
+        getFunctionAbi(enumResult),
+        [new CairoResult<number, string>(0, 'content')],
+        getAbiStructs(),
+        abiEnums
+      );
+
+      expect(result).toBeUndefined();
+    });
+
+    test('should throw an error if arg is not an JS object', () => {
+      const error = new Error(
+        'Validate: arg test is cairo type Enum (enum), and should be defined as js object (not array)'
+      );
+
+      expect(() =>
+        validateFields(getFunctionAbi('enum'), [2], getAbiStructs(), getAbiEnums())
+      ).toThrow(error);
+    });
+
+    test('should throw an error if arg is not an enum', () => {
+      const error = new Error(
+        'Validate Enum: argument test, type enum, value received "{"example":"test"}", is not an Enum.'
+      );
+
+      expect(() =>
+        validateFields(
+          getFunctionAbi('enum'),
           [{ example: 'test' }],
           getAbiStructs(),
           getAbiEnums()

@@ -208,6 +208,7 @@ const validateEnum = (parameter: any, input: AbiEntry) => {
     isObject(parameter),
     `Validate: arg ${input.name} is cairo type Enum (${input.type}), and should be defined as js object (not array)`
   );
+
   const methodsKeys = Object.getOwnPropertyNames(Object.getPrototypeOf(parameter));
   const keys = [...Object.getOwnPropertyNames(parameter), ...methodsKeys];
   if (isTypeOption(input.type) && keys.includes('isSome') && keys.includes('isNone')) {
@@ -220,7 +221,7 @@ const validateEnum = (parameter: any, input: AbiEntry) => {
     return; // Custom Enum
   }
   throw new Error(
-    `Validate Enum: argument ${input.name}, type ${input.type}, value received ${parameter}, is not an Enum.`
+    `Validate Enum: argument ${input.name}, type ${input.type}, value received "${JSON.stringify(parameter)}", is not an Enum.`
   );
 };
 
