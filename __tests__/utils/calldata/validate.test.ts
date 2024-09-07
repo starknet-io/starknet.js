@@ -8,58 +8,18 @@ import {
   type FunctionAbi,
 } from '../../../src';
 
-const getAbiEventEntry = (type: string): AbiEntry => ({ name: 'test', type });
+const getAbiEntry = (type: string): AbiEntry => ({ name: 'test', type });
 
 const getFunctionAbi = (inputsType: string): FunctionAbi => ({
-  inputs: [getAbiEventEntry(inputsType)],
+  inputs: [getAbiEntry(inputsType)],
   name: 'test',
-  outputs: [getAbiEventEntry(inputsType)],
+  outputs: [getAbiEntry(inputsType)],
   stateMutability: 'view',
   type: 'function',
 });
 
-const functionAbi: FunctionAbi = {
-  inputs: [{ name: 'test', type: 'felt' }],
-  name: 'test',
-  outputs: [{ name: 'test', type: 'felt' }],
-  stateMutability: 'view',
-  type: 'function',
-};
-
-const abiStructs: AbiStructs = {
-  abi_structs: {
-    members: [
-      {
-        name: 'test_name',
-        type: 'test_type',
-        offset: 1,
-      },
-    ],
-    size: 2,
-    name: 'cairo_event_struct',
-    type: 'struct',
-  },
-};
-
-const abiEnums: AbiEnums = {
-  abi_enums: {
-    variants: [
-      {
-        name: 'test_name',
-        type: 'cairo_event_struct_variant',
-        offset: 1,
-      },
-    ],
-    size: 2,
-    name: 'test_cairo_event',
-    type: 'enum',
-  },
-};
-
-validateFields(functionAbi, [1n], abiStructs, abiEnums);
-
 const getAbiStructs = (): AbiStructs => ({
-  abi_structs: {
+  struct: {
     members: [
       {
         name: 'test_name',
@@ -74,7 +34,7 @@ const getAbiStructs = (): AbiStructs => ({
 });
 
 const getAbiEnums = (): AbiEnums => ({
-  abi_enums: {
+  enum: {
     variants: [
       {
         name: 'test_name',
@@ -479,6 +439,43 @@ describe('validateFields', () => {
         validateFields(
           getFunctionAbi('(core::bool, core::bool)'),
           [],
+          getAbiStructs(),
+          getAbiEnums()
+        )
+      ).toThrow(error);
+    });
+  });
+
+  describe('Struct validation', () => {
+    test('should return void if struct validation passes', () => {
+      const result = validateFields(
+        getFunctionAbi('struct'),
+        [{ test_name: 'test' }],
+        getAbiStructs(),
+        getAbiEnums()
+      );
+
+      expect(result).toBeUndefined();
+    });
+
+    // TODO: Cover Uint & EthAdress struct cases
+    test('should throw an error if arg is not an JS object', () => {
+      const error = new Error(
+        'Validate: arg test is cairo type struct (struct), and should be defined as js object (not array)'
+      );
+
+      expect(() =>
+        validateFields(getFunctionAbi('struct'), [2], getAbiStructs(), getAbiEnums())
+      ).toThrow(error);
+    });
+
+    test('should throw an error if arg property name does not exist in the struct members', () => {
+      const error = new Error('Validate: arg test should have a property test_name');
+
+      expect(() =>
+        validateFields(
+          getFunctionAbi('struct'),
+          [{ example: 'test' }],
           getAbiStructs(),
           getAbiEnums()
         )

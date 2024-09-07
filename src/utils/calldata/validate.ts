@@ -12,7 +12,7 @@ import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { isHex, toBigInt } from '../num';
 import { isLongText } from '../shortString';
-import { isBoolean, isNumber, isString, isBigInt } from '../typed';
+import { isBoolean, isNumber, isString, isBigInt, isObject } from '../typed';
 import {
   getArrayType,
   isLen,
@@ -68,8 +68,8 @@ const validateUint = (parameter: any, input: AbiEntry) => {
     isString(parameter) ||
       isNumber(parameter) ||
       isBigInt(parameter) ||
-      (typeof parameter === 'object' && 'low' in parameter && 'high' in parameter) ||
-      (typeof parameter === 'object' &&
+      (isObject(parameter) && 'low' in parameter && 'high' in parameter) ||
+      (isObject(parameter) &&
         ['limb0', 'limb1', 'limb2', 'limb3'].every((key) => key in parameter)),
     `Validate: arg ${input.name} of cairo type ${
       input.type
@@ -178,11 +178,8 @@ const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) =>
     return;
   }
 
-  if (input.type === 'core::starknet::eth_address::EthAddress') {
-    assert(
-      typeof parameter !== 'object',
-      `EthAddress type is waiting a BigNumberish. Got ${parameter}`
-    );
+  if (input.type === Literal.EthAddress) {
+    assert(!isObject(parameter), `EthAddress type is waiting a BigNumberish. Got ${parameter}`);
     const param = BigInt(parameter.toString(10));
     assert(
       // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1259
@@ -193,7 +190,7 @@ const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) =>
   }
 
   assert(
-    typeof parameter === 'object' && !Array.isArray(parameter),
+    isObject(parameter),
     `Validate: arg ${input.name} is cairo type struct (${input.type}), and should be defined as js object (not array)`
   );
 
@@ -208,7 +205,7 @@ const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) =>
 
 const validateEnum = (parameter: any, input: AbiEntry) => {
   assert(
-    typeof parameter === 'object' && !Array.isArray(parameter),
+    isObject(parameter),
     `Validate: arg ${input.name} is cairo type Enum (${input.type}), and should be defined as js object (not array)`
   );
   const methodsKeys = Object.getOwnPropertyNames(Object.getPrototypeOf(parameter));
@@ -228,10 +225,7 @@ const validateEnum = (parameter: any, input: AbiEntry) => {
 };
 
 const validateTuple = (parameter: any, input: AbiEntry) => {
-  assert(
-    typeof parameter === 'object' && !Array.isArray(parameter),
-    `Validate: arg ${input.name} should be a tuple (defined as object)`
-  );
+  assert(isObject(parameter), `Validate: arg ${input.name} should be a tuple (defined as object)`);
   // todo: skip tuple structural validation for now
 };
 
