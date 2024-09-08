@@ -29,3 +29,4 @@ export const Literal = {
 export type Literal = ValuesType<typeof Literal>;
 
 export const ETH_ADDRESS = 'core::starknet::eth_address::EthAddress';
+export const NON_ZERO_PREFIX = 'core::zeroable::NonZero::';

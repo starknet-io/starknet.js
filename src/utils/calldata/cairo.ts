@@ -6,6 +6,7 @@ import {
   ContractVersion,
   ETH_ADDRESS,
   Literal,
+  NON_ZERO_PREFIX,
   Uint,
   Uint256,
   Uint512,
@@ -186,7 +187,7 @@ export function isCairo1Abi(abi: Abi): boolean {
  * ```
  */
 export function isTypeNonZero(type: string): boolean {
-  return type.startsWith('core::zeroable::NonZero::');
+  return type.startsWith(NON_ZERO_PREFIX);
 }
 
 /**

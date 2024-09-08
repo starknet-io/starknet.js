@@ -285,6 +285,7 @@ const validateNonZero = (parameter: any, input: AbiEntry) => {
   // so, are authorized here : u8, u16, u32, u64, u128, u256 and felt252.
 
   const baseType = getArrayType(input.type);
+
   assert(
     (isTypeUint(baseType) && baseType !== CairoUint512.abiSelector) || isTypeFelt(baseType),
     `Validate: ${input.name} type is not authorized for NonZero type.`
@@ -299,7 +300,8 @@ const validateNonZero = (parameter: any, input: AbiEntry) => {
       break;
     case isTypeUint(baseType):
       validateUint(parameter, { name: '', type: baseType });
-      switch (input.type) {
+
+      switch (baseType) {
         case Uint.u256:
           assert(
             new CairoUint256(parameter).toBigInt() > 0,
@@ -315,7 +317,7 @@ const validateNonZero = (parameter: any, input: AbiEntry) => {
       break;
     default:
       throw new Error(
-        `Validate Unhandled: argument ${input.name}, type ${input.type}, value ${parameter}`
+        `Validate Unhandled: argument ${input.name}, type ${input.type}, value "${parameter}"`
       );
   }
 };

@@ -4,6 +4,7 @@ import {
   CairoResult,
   ETH_ADDRESS,
   Literal,
+  NON_ZERO_PREFIX,
   Uint,
   type AbiEntry,
   type AbiEnums,
@@ -592,6 +593,82 @@ describe('validateFields', () => {
         validateFields(
           getFunctionAbi('enum'),
           [{ example: 'test' }],
+          getAbiStructs(),
+          getAbiEnums()
+        )
+      ).toThrow(error);
+    });
+  });
+
+  describe('NonZero validation', () => {
+    test('should return void if non zero validation passes for felt', () => {
+      const result = validateFields(
+        getFunctionAbi(`${NON_ZERO_PREFIX}<felt>`),
+        [1n],
+        getAbiStructs(),
+        getAbiEnums()
+      );
+
+      expect(result).toBeUndefined();
+    });
+
+    test('should return void if non zero validation passes for Uint', () => {
+      const result = validateFields(
+        getFunctionAbi(`${NON_ZERO_PREFIX}<${Uint.u8}>`),
+        [1n],
+        getAbiStructs(),
+        getAbiEnums()
+      );
+
+      expect(result).toBeUndefined();
+    });
+
+    test('should throw an error if type is not authorized', () => {
+      const error = new Error('Validate: test type is not authorized for NonZero type.');
+
+      expect(() =>
+        validateFields(
+          getFunctionAbi(`${NON_ZERO_PREFIX}<core::bool>`),
+          [true],
+          getAbiStructs(),
+          getAbiEnums()
+        )
+      ).toThrow(error);
+    });
+
+    test('should throw an error if value 0 iz provided for felt252 type', () => {
+      const error = new Error('Validate: value 0 is not authorized in NonZero felt252 type.');
+
+      expect(() =>
+        validateFields(
+          getFunctionAbi(`${NON_ZERO_PREFIX}<core::felt252>`),
+          [0],
+          getAbiStructs(),
+          getAbiEnums()
+        )
+      ).toThrow(error);
+    });
+
+    test('should throw an error if value 0 iz provided for uint256 type', () => {
+      const error = new Error('Validate: value 0 is not authorized in NonZero uint256 type.');
+
+      expect(() =>
+        validateFields(
+          getFunctionAbi(`${NON_ZERO_PREFIX}<${Uint.u256}>`),
+          [0],
+          getAbiStructs(),
+          getAbiEnums()
+        )
+      ).toThrow(error);
+    });
+
+    test('should throw an error if value 0 iz provided for any uint type', () => {
+      const error = new Error('Validate: value 0 is not authorized in NonZero uint type.');
+
+      expect(() =>
+        validateFields(
+          getFunctionAbi(`${NON_ZERO_PREFIX}<${Uint.u8}>`),
+          [0],
           getAbiStructs(),
           getAbiEnums()
         )
