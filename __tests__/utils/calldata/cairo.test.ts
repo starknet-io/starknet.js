@@ -4,6 +4,8 @@ import {
   isTypeUint,
   isTypeUint256,
   isTypeArray,
+  uint256,
+  uint512,
   isTypeTuple,
   isTypeNamedTuple,
   isTypeStruct,
@@ -22,6 +24,8 @@ import {
   isCairo1Abi,
   isTypeNonZero,
   getAbiContractVersion,
+  tuple,
+  felt,
 } from '../../../src/utils/calldata/cairo';
 import {
   ETH_ADDRESS,
@@ -330,5 +334,41 @@ describe('getAbiContractVersion', () => {
   test('should return undefined values for cairo and compiler', () => {
     const contractVersion: ContractVersion = getAbiContractVersion([{}]);
     expect(contractVersion).toEqual({ cairo: undefined, compiler: undefined });
+  });
+});
+
+describe('uint256', () => {
+  test('should create Uint256 Cairo type', () => {
+    const uint = uint256('892349863487563453485768723498');
+    expect(uint).toEqual({ low: '892349863487563453485768723498', high: '0' });
+  });
+});
+
+describe('uint512', () => {
+  test('should create Uint512 Cairo type', () => {
+    const uint = uint512('345745685892349863487563453485768723498');
+    expect(uint).toEqual({
+      limb0: '5463318971411400024188846054000512042',
+      limb1: '1',
+      limb2: '0',
+      limb3: '0',
+    });
+  });
+});
+
+describe('tuple', () => {
+  test('should create unnamed Cairo type tuples', () => {
+    const tuples = [tuple(true, false), tuple(1, '0x101', 16)];
+    expect(tuples).toEqual([
+      { '0': true, '1': false },
+      { '0': 1, '1': '0x101', '2': 16 },
+    ]);
+  });
+});
+
+describe('felt', () => {
+  test('should create Cairo type felts', () => {
+    const felts = [felt('test'), felt(256n), felt(1234)];
+    expect(felts).toEqual(['1952805748', '256', '1234']);
   });
 });
