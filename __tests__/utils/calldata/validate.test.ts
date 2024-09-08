@@ -707,9 +707,7 @@ describe('validateFields', () => {
       expect(validatedArrayEnum).toBeUndefined();
 
       const structArrayEth = `core::array::Array::<${ETH_ADDRESS}>`;
-      const abiStructs = {
-        [ETH_ADDRESS]: getAbiStructs().struct,
-      };
+      const abiStructs = { [ETH_ADDRESS]: getAbiStructs().struct };
 
       const validatedArrayStruct = validateFields(
         getFunctionAbi(structArrayEth),
