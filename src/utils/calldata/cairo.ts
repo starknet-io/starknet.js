@@ -152,10 +152,9 @@ export const isCairo1Type = (type: string) => type.includes('::');
  * @returns - The array type.
  */
 export const getArrayType = (type: string) => {
-  if (isCairo1Type(type)) {
-    return type.substring(type.indexOf('<') + 1, type.lastIndexOf('>'));
-  }
-  return type.replace('*', '');
+  return isCairo1Type(type)
+    ? type.substring(type.indexOf('<') + 1, type.lastIndexOf('>'))
+    : type.replace('*', '');
 };
 
 /**
