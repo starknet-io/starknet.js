@@ -559,7 +559,7 @@ describe('validateFields', () => {
     });
 
     test('should return void if enum validation passes for type result', () => {
-      const enumResult = 'core::result::Result::';
+      const enumResult = 'core::result::Result::bool';
 
       const abiEnums = {
         [enumResult]: getAbiEnums().enum,
@@ -693,6 +693,32 @@ describe('validateFields', () => {
       expect(
         validateArray('core::array::Array::<core::array::Array::<core::bool>>', [true])
       ).toBeUndefined();
+
+      const enumArrayResult = 'core::array::Array::<core::result::Result::core::bool>';
+
+      const abiEnums = { 'core::result::Result::core::bool': getAbiEnums().enum };
+      const validatedArrayEnum = validateFields(
+        getFunctionAbi(enumArrayResult),
+        [[new CairoResult<number, string>(0, 'content')]],
+        getAbiStructs(),
+        abiEnums
+      );
+
+      expect(validatedArrayEnum).toBeUndefined();
+
+      const structArrayEth = `core::array::Array::<${ETH_ADDRESS}>`;
+      const abiStructs = {
+        [ETH_ADDRESS]: getAbiStructs().struct,
+      };
+
+      const validatedArrayStruct = validateFields(
+        getFunctionAbi(structArrayEth),
+        [[1n]],
+        abiStructs,
+        getAbiEnums()
+      );
+
+      expect(validatedArrayStruct).toBeUndefined();
     });
 
     test('should throw an error if parameter is not an array', () => {
