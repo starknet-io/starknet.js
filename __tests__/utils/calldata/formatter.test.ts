@@ -10,17 +10,17 @@ describe('formatter', () => {
   });
 
   test('should format nested object', () => {
-    const data = { user: { id: toBigInt(123), age: toBigInt(30) }, active: toBigInt(1) };
-    const type = { user: { id: 'number', age: 'number' }, active: 'number' };
+    const data = { test: { id: toBigInt(123), value: toBigInt(30) }, active: toBigInt(1) };
+    const type = { test: { id: 'number', value: 'number' }, active: 'number' };
     const formatted = formatter(data, type);
-    expect(formatted).toEqual({ user: { id: 123, age: 30 }, active: 1 });
+    expect(formatted).toEqual({ test: { id: 123, value: 30 }, active: 1 });
   });
 
   test('should format object that has arrays in it', () => {
-    const data = { items: [toBigInt(1), toBigInt(2), toBigInt(3)], name: toBigInt(1) };
-    const type = { items: ['number'], name: 'string' };
+    const data = { items: [toBigInt(1), toBigInt(2), toBigInt(3)], value: toBigInt(1) };
+    const type = { items: ['number'], value: 'string' };
     const formatted = formatter(data, type);
-    expect(formatted).toEqual({ items: [1, 2, 3], name: '1' });
+    expect(formatted).toEqual({ items: [1, 2, 3], value: '1' });
   });
 
   test('should throw an error if at least one of the value is not Big Int', () => {
