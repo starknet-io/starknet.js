@@ -6,51 +6,8 @@ import {
   Literal,
   NON_ZERO_PREFIX,
   Uint,
-  type AbiEntry,
-  type AbiEnums,
-  type AbiStructs,
-  type FunctionAbi,
 } from '../../../src';
-
-const getAbiEntry = (type: string): AbiEntry => ({ name: 'test', type });
-
-const getFunctionAbi = (inputsType: string): FunctionAbi => ({
-  inputs: [getAbiEntry(inputsType)],
-  name: 'test',
-  outputs: [getAbiEntry(inputsType)],
-  stateMutability: 'view',
-  type: 'function',
-});
-
-const getAbiStructs = (): AbiStructs => ({
-  struct: {
-    members: [
-      {
-        name: 'test_name',
-        type: 'test_type',
-        offset: 1,
-      },
-    ],
-    size: 2,
-    name: 'cairo_event_struct',
-    type: 'struct',
-  },
-});
-
-const getAbiEnums = (): AbiEnums => ({
-  enum: {
-    variants: [
-      {
-        name: 'test_name',
-        type: 'cairo_event_struct_variant',
-        offset: 1,
-      },
-    ],
-    size: 2,
-    name: 'test_cairo_event',
-    type: 'enum',
-  },
-});
+import { getFunctionAbi, getAbiEnums, getAbiStructs } from '../../../__mocks__/factories/abi';
 
 describe('validateFields', () => {
   test('should throw an error if validation is unhandled', () => {

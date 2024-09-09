@@ -3,25 +3,9 @@ import {
   getAbiVersion,
   isNoConstructorValid,
 } from '../../../../src/utils/calldata/parser';
-import type { AbiEntry, FunctionAbi, InterfaceAbi } from '../../../../src';
 import { AbiParser2 } from '../../../../src/utils/calldata/parser/parser-2.0.0';
 import { AbiParser1 } from '../../../../src/utils/calldata/parser/parser-0-1.1.0';
-
-const getAbiEntry = (type: string): AbiEntry => ({ name: 'test', type });
-
-const getFunctionAbi = (inputsType: string): FunctionAbi => ({
-  inputs: [getAbiEntry(inputsType)],
-  name: 'test',
-  outputs: [getAbiEntry(inputsType)],
-  stateMutability: 'view',
-  type: 'function',
-});
-
-const getInterfaceAbi = (): InterfaceAbi => ({
-  items: [getFunctionAbi('struct')],
-  name: 'test_interface_abi',
-  type: 'interface',
-});
+import { getFunctionAbi, getInterfaceAbi } from '../../../../__mocks__/factories/abi';
 
 describe('createAbiParser', () => {
   test('should create an AbiParser2 instance', () => {

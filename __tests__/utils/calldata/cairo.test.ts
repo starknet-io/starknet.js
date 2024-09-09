@@ -27,64 +27,13 @@ import {
   tuple,
   felt,
 } from '../../../src/utils/calldata/cairo';
+import { ETH_ADDRESS, Literal, Uint, type ContractVersion, NON_ZERO_PREFIX } from '../../../src';
 import {
-  ETH_ADDRESS,
-  Literal,
-  Uint,
-  type AbiEnums,
-  type AbiStructs,
-  type AbiEntry,
-  type FunctionAbi,
-  type ContractVersion,
-  InterfaceAbi,
-  NON_ZERO_PREFIX,
-} from '../../../src';
-
-const getAbiEntry = (type: string): AbiEntry => ({ name: 'test', type });
-
-const getFunctionAbi = (inputsType: string): FunctionAbi => ({
-  inputs: [getAbiEntry(inputsType)],
-  name: 'test',
-  outputs: [getAbiEntry(inputsType)],
-  stateMutability: 'view',
-  type: 'function',
-});
-
-const getInterfaceAbi = (): InterfaceAbi => ({
-  items: [getFunctionAbi('event')],
-  name: 'test_interface_abi',
-  type: 'interface',
-});
-
-const getAbiStructs = (): AbiStructs => ({
-  struct: {
-    members: [
-      {
-        name: 'test_name',
-        type: 'test_type',
-        offset: 1,
-      },
-    ],
-    size: 2,
-    name: 'cairo_struct',
-    type: 'struct',
-  },
-});
-
-const getAbiEnums = (): AbiEnums => ({
-  enum: {
-    variants: [
-      {
-        name: 'test_name',
-        type: 'cairo_struct_variant',
-        offset: 1,
-      },
-    ],
-    size: 2,
-    name: 'test_cairo',
-    type: 'enum',
-  },
-});
+  getFunctionAbi,
+  getAbiEnums,
+  getAbiStructs,
+  getInterfaceAbi,
+} from '../../../__mocks__/factories/abi';
 
 describe('isLen', () => {
   test('should return true if name ends with "_len"', () => {

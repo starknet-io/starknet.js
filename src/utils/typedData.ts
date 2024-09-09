@@ -22,7 +22,7 @@ import {
 import { MerkleTree } from './merkle';
 import { isBigNumberish, isHex, toHex } from './num';
 import { encodeShortString } from './shortString';
-import { isString } from './typed';
+import { isBoolean, isString } from './typed';
 
 /** @deprecated prefer importing from 'types' over 'typedData' */
 export * from '../types/typedData';
@@ -436,7 +436,7 @@ export function encodeValue(
     }
     case 'bool': {
       if (revision === Revision.ACTIVE) {
-        assert(typeof data === 'boolean', `Type mismatch for ${type} ${data}`);
+        assert(isBoolean(data), `Type mismatch for ${type} ${data}`);
       } // else fall through to default
       return [type, getHex(data as string)];
     }
