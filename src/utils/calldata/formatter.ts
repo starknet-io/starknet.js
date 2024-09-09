@@ -48,17 +48,17 @@ const guard = {
  *
  * @example
  * // Example 2: Formatting an object with nested structures
- * const data = { user: { id: 1n, age: 30n }, active: 1n };
- * const type = { user: { id: 'number', age: 'number' }, active: 'number' };
+ * const data = { test: { id: 1n, value: 30n }, active: 1n };
+ * const type = { test: { id: 'number', value: 'number' }, active: 'number' };
  * const formatted = formatter(data, type);
- * // formatted: { user: { id: 1n, age: 30n }, active: 1n }
+ * // formatted: { test: { id: 1n, value: 30n }, active: 1n }
  *
  * @example
  * // Example 3: Handling arrays in the data object
- * const data = { items: [1n, 2n, 3n], name: 4n };
- * const type = { items: ['number'], name: 'string' };
+ * const data = { items: [1n, 2n, 3n], value: 4n };
+ * const type = { items: ['number'], value: 'string' };
  * const formatted = formatter(data, type);
- * // formatted: { items: [1n, 2n, 3n], name: '4n' }
+ * // formatted: { items: [1n, 2n, 3n], value: '4n' }
  */
 export default function formatter(
   data: Record<string, any>,
