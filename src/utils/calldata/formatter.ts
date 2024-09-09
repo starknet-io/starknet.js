@@ -1,4 +1,4 @@
-import { isBigInt } from '../typed';
+import { isBigInt, isObject } from '../typed';
 import { decodeShortString } from '../shortString';
 
 const guard = {
@@ -41,24 +41,24 @@ const guard = {
  *
  * @example
  * // Example 1: Formatting a simple object
- * const data = { value: '123', name: 'test' };
+ * const data = { value: 1n, name: 2n };
  * const type = { value: 'number', name: 'string' };
  * const formatted = formatter(data, type);
- * // formatted: { value: 123, name: 'test' }
+ * // formatted: { value: 1n, name: '2n' }
  *
  * @example
  * // Example 2: Formatting an object with nested structures
- * const data = { user: { id: '123', age: '30' }, active: '1' };
+ * const data = { user: { id: 1n, age: 30n }, active: 1n };
  * const type = { user: { id: 'number', age: 'number' }, active: 'number' };
  * const formatted = formatter(data, type);
- * // formatted: { user: { id: 123, age: 30 }, active: 1 }
+ * // formatted: { user: { id: 1n, age: 30n }, active: 1n }
  *
  * @example
  * // Example 3: Handling arrays in the data object
- * const data = { items: ['1', '2', '3'], name: 'test' };
+ * const data = { items: [1n, 2n, 3n], name: 4n };
  * const type = { items: ['number'], name: 'string' };
  * const formatted = formatter(data, type);
- * // formatted: { items: [1, 2, 3], name: 'test' }
+ * // formatted: { items: [1n, 2n, 3n], name: '4n' }
  */
 export default function formatter(
   data: Record<string, any>,
@@ -104,7 +104,7 @@ export default function formatter(
         acc[key] = Object.values(arrayObj);
         return acc;
       }
-      if (typeof elType === 'object') {
+      if (isObject(elType)) {
         acc[key] = formatter(data[key], elType);
         return acc;
       }
