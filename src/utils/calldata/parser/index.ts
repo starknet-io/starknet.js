@@ -15,7 +15,7 @@ export function createAbiParser(abi: Abi): AbiParserInterface {
   throw Error(`Unsupported ABI version ${version}`);
 }
 
-export function getAbiVersion(abi: Abi) {
+export function getAbiVersion(abi: Abi): number {
   if (abi.find((it) => it.type === 'interface')) return 2;
   if (isCairo1Abi(abi)) return 1;
   return 0;
@@ -25,7 +25,7 @@ export function isNoConstructorValid(
   method: string,
   argsCalldata: RawArgs,
   abiMethod?: FunctionAbi
-) {
+): boolean {
   // No constructor in abi and validly empty args
   return method === 'constructor' && !abiMethod && !argsCalldata.length;
 }
