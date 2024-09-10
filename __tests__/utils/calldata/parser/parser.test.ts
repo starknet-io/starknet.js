@@ -34,7 +34,7 @@ describe('getAbiVersion', () => {
 });
 
 describe('isNoConstructorValid', () => {
-  test('should return true if no constructor valid ', () => {
+  test('should return true if no constructor valid', () => {
     expect(isNoConstructorValid('constructor', [])).toEqual(true);
   });
 

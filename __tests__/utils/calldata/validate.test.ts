@@ -420,12 +420,28 @@ describe('validateFields', () => {
     });
 
     test('should return void if struct validation passes for Uint 256 or 512', () => {
-      const abiStructs = {
+      const abiStructs256 = {
         [Uint.u256]: getAbiStructs().struct,
       };
-      const result = validateFields(getFunctionAbi(Uint.u256), [1n], abiStructs, getAbiEnums());
+      const result256 = validateFields(
+        getFunctionAbi(Uint.u256),
+        [2n ** 256n - 1n],
+        abiStructs256,
+        getAbiEnums()
+      );
 
-      expect(result).toBeUndefined();
+      const abiStructs512 = {
+        [Uint.u512]: getAbiStructs().struct,
+      };
+      const result512 = validateFields(
+        getFunctionAbi(Uint.u512),
+        [2n ** 512n - 1n],
+        abiStructs512,
+        getAbiEnums()
+      );
+
+      expect(result256).toBeUndefined();
+      expect(result512).toBeUndefined();
     });
 
     test('should return void if struct validation passes for EthAddress', () => {
@@ -465,7 +481,7 @@ describe('validateFields', () => {
 
     test('should throw an error if arg is not an JS object', () => {
       const error = new Error(
-        'Validate: arg test is cairo type struct (struct), and should be defined as js object (not array)'
+        'Validate: arg test is cairo type struct (struct), and should be defined as a js object (not array)'
       );
 
       expect(() =>
@@ -533,7 +549,7 @@ describe('validateFields', () => {
 
     test('should throw an error if arg is not an JS object', () => {
       const error = new Error(
-        'Validate: arg test is cairo type Enum (enum), and should be defined as js object (not array)'
+        'Validate: arg test is cairo type Enum (enum), and should be defined as a js object (not array)'
       );
 
       expect(() =>

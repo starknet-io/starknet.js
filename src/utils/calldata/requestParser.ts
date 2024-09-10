@@ -22,6 +22,7 @@ import {
   isTypeArray,
   isTypeBytes31,
   isTypeEnum,
+  isTypeEthAddress,
   isTypeNonZero,
   isTypeOption,
   isTypeResult,
@@ -149,8 +150,7 @@ function parseCalldataValue(
     if (CairoUint512.isAbiType(type)) {
       return new CairoUint512(element as any).toApiRequest();
     }
-    if (type === 'core::starknet::eth_address::EthAddress')
-      return parseBaseTypes(type, element as BigNumberish);
+    if (isTypeEthAddress(type)) return parseBaseTypes(type, element as BigNumberish);
 
     if (type === 'core::byte_array::ByteArray') return parseByteArray(element as string);
 
@@ -304,7 +304,7 @@ export function parseCalldataField(
       return parseCalldataValue(value, input.type, structs, enums);
     case isTypeNonZero(type):
       return parseBaseTypes(getArrayType(type), value);
-    case type === 'core::starknet::eth_address::EthAddress':
+    case isTypeEthAddress(type):
       return parseBaseTypes(type, value);
     // Struct or Tuple
     case isTypeStruct(type, structs) ||

@@ -192,7 +192,7 @@ const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) =>
 
   assert(
     isObject(parameter),
-    `Validate: arg ${input.name} is cairo type struct (${input.type}), and should be defined as js object (not array)`
+    `Validate: arg ${input.name} is cairo type struct (${input.type}), and should be defined as a js object (not array)`
   );
 
   // shallow struct validation, only first depth level
@@ -207,7 +207,7 @@ const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) =>
 const validateEnum = (parameter: any, input: AbiEntry) => {
   assert(
     isObject(parameter),
-    `Validate: arg ${input.name} is cairo type Enum (${input.type}), and should be defined as js object (not array)`
+    `Validate: arg ${input.name} is cairo type Enum (${input.type}), and should be defined as a js object (not array)`
   );
 
   const methodsKeys = Object.getOwnPropertyNames(Object.getPrototypeOf(parameter));
@@ -333,7 +333,7 @@ const validateNonZero = (parameter: any, input: AbiEntry) => {
  * @returns {void} - Return void if validation passes
  *
  * @example
- *  const functionAbi: FunctionAbi = {
+ * const functionAbi: FunctionAbi = {
  *   inputs: [{ name: 'test', type: 'felt' }],
  *   name: 'test',
  *   outputs: [{ name: 'test', type: 'felt' }],
