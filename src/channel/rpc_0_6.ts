@@ -1,4 +1,4 @@
-import { NetworkName, StarknetChainId } from '../constants';
+import { NetworkName } from '../constants';
 import { LibraryError } from '../provider/errors';
 import {
   AccountInvocationItem,
@@ -7,6 +7,7 @@ import {
   BlockIdentifier,
   BlockTag,
   Call,
+  ChainId,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
   Invocation,
@@ -47,7 +48,7 @@ export class RpcChannel {
 
   readonly blockIdentifier: BlockIdentifier;
 
-  private chainId?: StarknetChainId;
+  private chainId?: ChainId;
 
   private specVersion?: string;
 
@@ -98,7 +99,7 @@ export class RpcChannel {
     return this.transactionRetryIntervalFallback ?? 5000;
   }
 
-  public setChainId(chainId: StarknetChainId) {
+  public setChainId(chainId: ChainId) {
     this.chainId = chainId;
   }
 
@@ -158,12 +159,12 @@ export class RpcChannel {
   }
 
   public async getChainId() {
-    this.chainId ??= (await this.fetchEndpoint('starknet_chainId')) as StarknetChainId;
+    this.chainId ??= (await this.fetchEndpoint('starknet_chainId')) as ChainId;
     return this.chainId;
   }
 
   public async getSpecVersion() {
-    this.specVersion ??= (await this.fetchEndpoint('starknet_specVersion')) as StarknetChainId;
+    this.specVersion ??= (await this.fetchEndpoint('starknet_specVersion')) as ChainId;
     return this.specVersion;
   }
 

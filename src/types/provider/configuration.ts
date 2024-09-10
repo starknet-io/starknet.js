@@ -1,4 +1,4 @@
-import { NetworkName, StarknetChainId } from '../../constants';
+import { NetworkName } from '../../constants';
 import { BlockIdentifier } from '../lib';
 
 export interface ProviderOptions extends RpcProviderOptions {}
@@ -9,7 +9,7 @@ export type RpcProviderOptions = {
   transactionRetryIntervalFallback?: number;
   headers?: object;
   blockIdentifier?: BlockIdentifier;
-  chainId?: StarknetChainId;
+  chainId?: ChainId;
   specVersion?: string;
   default?: boolean;
   waitMode?: boolean;
@@ -20,3 +20,5 @@ export type RpcProviderOptions = {
   };
   batch?: false | number;
 };
+
+export type ChainId = `0x${string}`;
