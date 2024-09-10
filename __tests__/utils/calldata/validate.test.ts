@@ -172,7 +172,7 @@ describe('validateFields', () => {
         validateFields(getFunctionAbi(Uint.u8), params, getAbiStructs(), getAbiEnums());
 
       const error = new Error(
-        'Validation: Parameter is to large to be typed as Number use (BigInt or String)'
+        'Validation: Parameter is too large to be typed as Number use (BigInt or String)'
       );
 
       expect(() => validateUint([Number.MAX_SAFE_INTEGER + 1])).toThrow(error);
