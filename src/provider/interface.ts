@@ -1,5 +1,4 @@
 import { RPC06, RPC07 } from '../channel';
-import { StarknetChainId } from '../constants';
 import type {
   AccountInvocations,
   BigNumberish,
@@ -7,6 +6,7 @@ import type {
   BlockIdentifier,
   Call,
   CallContractResponse,
+  ChainId,
   ContractClassResponse,
   ContractVersion,
   DeclareContractResponse,
@@ -41,7 +41,7 @@ export abstract class ProviderInterface {
    *
    * @returns the chain Id
    */
-  public abstract getChainId(): Promise<StarknetChainId>;
+  public abstract getChainId(): Promise<ChainId>;
 
   /**
    * Calls a function on the Starknet contract.

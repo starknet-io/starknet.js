@@ -5,7 +5,7 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable import/extensions */
 import { StarknetChainId, TransactionHashPrefix } from '../../../constants';
-import { BigNumberish, RawCalldata } from '../../../types';
+import { BigNumberish, ChainId, RawCalldata } from '../../../types';
 import { starkCurve } from '../../ec';
 import { toBigInt } from '../../num';
 import { getSelector } from '../selector';
@@ -33,7 +33,7 @@ export function calculateTransactionHashCommon(
   entryPointSelector: BigNumberish,
   calldata: RawCalldata,
   maxFee: BigNumberish,
-  chainId: StarknetChainId,
+  chainId: ChainId,
   additionalData: BigNumberish[] = []
 ): string {
   const calldataHash = computeHashOnElements(calldata);
@@ -61,7 +61,7 @@ export function calculateDeclareTransactionHash(
   senderAddress: BigNumberish,
   version: BigNumberish,
   maxFee: BigNumberish,
-  chainId: StarknetChainId,
+  chainId: ChainId,
   nonce: BigNumberish,
   compiledClassHash?: string
 ): string {
@@ -88,7 +88,7 @@ export function calculateDeployAccountTransactionHash(
   salt: BigNumberish,
   version: BigNumberish,
   maxFee: BigNumberish,
-  chainId: StarknetChainId,
+  chainId: ChainId,
   nonce: BigNumberish
 ) {
   const calldata = [classHash, salt, ...constructorCalldata];
@@ -114,7 +114,7 @@ export function calculateTransactionHash(
   version: BigNumberish,
   calldata: RawCalldata,
   maxFee: BigNumberish,
-  chainId: StarknetChainId,
+  chainId: ChainId,
   nonce: BigNumberish
 ): string {
   return calculateTransactionHashCommon(

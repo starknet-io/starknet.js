@@ -1,5 +1,5 @@
 import { NetworkName } from '../../constants';
-import { BlockIdentifier } from '../lib';
+import { BlockIdentifier, ChainId } from '../lib';
 
 export interface ProviderOptions extends RpcProviderOptions {}
 
@@ -21,4 +21,4 @@ export type RpcProviderOptions = {
   batch?: false | number;
 };
 
-export type ChainId = `0x${string}`;
+// export type ChainId = `0x${string}`;

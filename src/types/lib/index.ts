@@ -1,4 +1,3 @@
-import { StarknetChainId } from '../../constants';
 import { weierstrass } from '../../utils/ec';
 import { EDataAvailabilityMode, ResourceBounds } from '../api';
 import { CairoEnum } from '../cairoEnum';
@@ -159,7 +158,7 @@ export type Details = {
   nonce: BigNumberish;
   maxFee: BigNumberish;
   version: BigNumberish;
-  chainId: StarknetChainId;
+  chainId: ChainId;
 };
 
 export type InvocationsDetailsWithNonce =
@@ -312,5 +311,7 @@ export type ContractVersion = {
   /** version of the cairo compiler used to compile the contract */
   compiler: CompilerVersion;
 };
+
+export type ChainId = `0x${string}`;
 
 export * from './contract';

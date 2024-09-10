@@ -4,8 +4,8 @@
 
 import { poseidonHashMany } from '@scure/starknet';
 
-import { StarknetChainId, TransactionHashPrefix } from '../../../constants';
-import { BigNumberish, Calldata } from '../../../types';
+import { TransactionHashPrefix } from '../../../constants';
+import { BigNumberish, Calldata, ChainId } from '../../../types';
 import { EDAMode, ResourceBounds } from '../../../types/api';
 import { toHex } from '../../num';
 import { encodeShortString } from '../../shortString';
@@ -42,7 +42,7 @@ export function calculateTransactionHashCommon(
   txHashPrefix: TransactionHashPrefix,
   version: BigNumberish,
   senderAddress: BigNumberish,
-  chainId: StarknetChainId,
+  chainId: ChainId,
   nonce: BigNumberish,
   tip: BigNumberish,
   paymasterData: BigNumberish[],
@@ -77,7 +77,7 @@ export function calculateDeployAccountTransactionHash(
   compiledConstructorCalldata: Calldata,
   salt: BigNumberish,
   version: BigNumberish,
-  chainId: StarknetChainId,
+  chainId: ChainId,
   nonce: BigNumberish,
   nonceDataAvailabilityMode: EDAMode,
   feeDataAvailabilityMode: EDAMode,
@@ -109,7 +109,7 @@ export function calculateDeclareTransactionHash(
   compiledClassHash: string,
   senderAddress: BigNumberish,
   version: BigNumberish,
-  chainId: StarknetChainId,
+  chainId: ChainId,
   nonce: BigNumberish,
   accountDeploymentData: BigNumberish[],
   nonceDataAvailabilityMode: EDAMode,
@@ -141,7 +141,7 @@ export function calculateInvokeTransactionHash(
   senderAddress: BigNumberish,
   version: BigNumberish,
   compiledCalldata: Calldata,
-  chainId: StarknetChainId,
+  chainId: ChainId,
   nonce: BigNumberish,
   accountDeploymentData: BigNumberish[],
   nonceDataAvailabilityMode: EDAMode,
