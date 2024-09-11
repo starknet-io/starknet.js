@@ -8,7 +8,7 @@ import type {
   RPC,
 } from '../../src';
 import { isAbiEvent, getAbiEvents, parseEvents, parseUDCEvent } from '../../src/utils/events';
-import { getFunctionAbi, getInterfaceAbi, getAbiEntry } from '../../__mocks__/factories/abi';
+import { getFunctionAbi, getInterfaceAbi, getAbiEntry } from '../factories/abi';
 
 const getBaseTxReceiptData = (): InvokeTransactionReceiptResponse => ({
   type: 'INVOKE',

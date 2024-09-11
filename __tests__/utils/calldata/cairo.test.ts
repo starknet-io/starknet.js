@@ -28,12 +28,7 @@ import {
   felt,
 } from '../../../src/utils/calldata/cairo';
 import { ETH_ADDRESS, Literal, Uint, type ContractVersion, NON_ZERO_PREFIX } from '../../../src';
-import {
-  getFunctionAbi,
-  getAbiEnums,
-  getAbiStructs,
-  getInterfaceAbi,
-} from '../../../__mocks__/factories/abi';
+import { getFunctionAbi, getAbiEnums, getAbiStructs, getInterfaceAbi } from '../../factories/abi';
 
 describe('isLen', () => {
   test('should return true if name ends with "_len"', () => {

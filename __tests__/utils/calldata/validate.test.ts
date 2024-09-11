@@ -7,7 +7,7 @@ import {
   NON_ZERO_PREFIX,
   Uint,
 } from '../../../src';
-import { getFunctionAbi, getAbiEnums, getAbiStructs } from '../../../__mocks__/factories/abi';
+import { getFunctionAbi, getAbiEnums, getAbiStructs } from '../../factories/abi';
 
 describe('validateFields', () => {
   test('should throw an error if validation is unhandled', () => {

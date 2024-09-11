@@ -1,5 +1,5 @@
 import { AbiParser2 } from '../../../../src/utils/calldata/parser/parser-2.0.0';
-import { getFunctionAbi, getInterfaceAbi } from '../../../../__mocks__/factories/abi';
+import { getFunctionAbi, getInterfaceAbi } from '../../../factories/abi';
 
 describe('AbiParser2', () => {
   test('should create an instance', () => {
