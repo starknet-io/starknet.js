@@ -33,7 +33,7 @@ export class AbiParser2 implements AbiParserInterface {
     const intf = this.abi.find(
       (it: FunctionAbi | AbiEvent | AbiStruct | InterfaceAbi) => it.type === 'interface'
     ) as InterfaceAbi;
-    return intf.items.find((it) => it.name === name);
+    return intf?.items?.find((it) => it.name === name);
   }
 
   /**
@@ -41,11 +41,8 @@ export class AbiParser2 implements AbiParserInterface {
    * @returns Abi
    */
   public getLegacyFormat(): Abi {
-    return this.abi.flatMap((e: FunctionAbi | LegacyEvent | AbiStruct | InterfaceAbi) => {
-      if (e.type === 'interface') {
-        return e.items;
-      }
-      return e;
+    return this.abi.flatMap((it: FunctionAbi | LegacyEvent | AbiStruct | InterfaceAbi) => {
+      return it.type === 'interface' ? it.items : it;
     });
   }
 }

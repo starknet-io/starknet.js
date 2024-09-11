@@ -1,8 +1,6 @@
 import { isUndefined } from '../../typed';
 
-export type CairoEnumRaw = {
-  [key: string]: any;
-};
+export type CairoEnumRaw = Record<string, any>;
 
 /**
  * Class to handle Cairo custom Enum
@@ -45,9 +43,8 @@ export class CairoCustomEnum {
    * @returns the content of the valid variant of a Cairo custom Enum.
    */
   public unwrap(): any {
-    const variants = Object.entries(this.variant);
-    const activeVariant = variants.find((item) => !isUndefined(item[1]));
-    return isUndefined(activeVariant) ? undefined : activeVariant[1];
+    const variants = Object.values(this.variant);
+    return variants.find((item) => !isUndefined(item));
   }
 
   /**

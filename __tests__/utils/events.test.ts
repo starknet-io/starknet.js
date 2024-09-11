@@ -4,28 +4,11 @@ import type {
   AbiEvent,
   AbiStructs,
   CairoEventVariant,
-  FunctionAbi,
-  InterfaceAbi,
   InvokeTransactionReceiptResponse,
   RPC,
 } from '../../src';
 import { isAbiEvent, getAbiEvents, parseEvents, parseUDCEvent } from '../../src/utils/events';
-
-const getAbiEventEntry = (): AbiEntry => ({ name: 'test', type: 'event' });
-
-const getFunctionAbi = (): FunctionAbi => ({
-  inputs: [getAbiEventEntry()],
-  name: 'test',
-  outputs: [getAbiEventEntry()],
-  stateMutability: 'view',
-  type: 'function',
-});
-
-const getInterfaceAbi = (): InterfaceAbi => ({
-  items: [getFunctionAbi()],
-  name: 'test_interface_abi',
-  type: 'interface',
-});
+import { getFunctionAbi, getInterfaceAbi, getAbiEntry } from '../factories/abi';
 
 const getBaseTxReceiptData = (): InvokeTransactionReceiptResponse => ({
   type: 'INVOKE',
@@ -49,7 +32,7 @@ const getBaseTxReceiptData = (): InvokeTransactionReceiptResponse => ({
 
 describe('isAbiEvent', () => {
   test('should return true if it is Abi event', () => {
-    expect(isAbiEvent(getAbiEventEntry())).toEqual(true);
+    expect(isAbiEvent(getAbiEntry('event'))).toEqual(true);
   });
 
   test('should return false if it is not Abi event', () => {
@@ -141,7 +124,7 @@ describe('getAbiEvents', () => {
       type: 'event',
     };
 
-    const abiEvents = getAbiEvents([getFunctionAbi(), abiCairoEventStruct]);
+    const abiEvents = getAbiEvents([getFunctionAbi('event'), abiCairoEventStruct]);
     const result = {
       '0x27b21abc103381e154ea5c557dfe64466e0d25add7ef91a45718f5b8ee8fae3': abiCairoEventStruct,
     };
