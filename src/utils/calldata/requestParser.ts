@@ -20,6 +20,7 @@ import {
   felt,
   getArrayType,
   isTypeArray,
+  isTypeByteArray,
   isTypeBytes31,
   isTypeEnum,
   isTypeEthAddress,
@@ -152,7 +153,7 @@ function parseCalldataValue(
     }
     if (isTypeEthAddress(type)) return parseBaseTypes(type, element as BigNumberish);
 
-    if (type === 'core::byte_array::ByteArray') return parseByteArray(element as string);
+    if (isTypeByteArray(type)) return parseByteArray(element as string);
 
     const { members } = structs[type];
     const subElement = element as any;
