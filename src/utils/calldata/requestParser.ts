@@ -307,10 +307,7 @@ export function parseCalldataField(
     case isTypeEthAddress(type):
       return parseBaseTypes(type, value);
     // Struct or Tuple
-    case isTypeStruct(type, structs) ||
-      isTypeTuple(type) ||
-      CairoUint256.isAbiType(type) ||
-      CairoUint256.isAbiType(type):
+    case isTypeStruct(type, structs) || isTypeTuple(type) || CairoUint256.isAbiType(type):
       return parseCalldataValue(value as ParsedStruct | BigNumberish[], type, structs, enums);
 
     // Enums
