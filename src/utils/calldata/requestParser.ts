@@ -230,6 +230,7 @@ function parseCalldataValue(
         }
         return [CairoResultVariant.Ok.toString(), parsedParameter];
       }
+
       // is Result::Err
       const listTypeVariant = variants.find((variant) => variant.name === 'Err');
       if (isUndefined(listTypeVariant)) {

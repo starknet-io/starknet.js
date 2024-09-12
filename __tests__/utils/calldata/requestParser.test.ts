@@ -1,6 +1,12 @@
 import { parseCalldataField } from '../../../src/utils/calldata/requestParser';
 import { getAbiEnums, getAbiStructs, getAbiEntry } from '../../factories/abi';
-import { CairoOption, ETH_ADDRESS, NON_ZERO_PREFIX } from '../../../src';
+import {
+  CairoCustomEnum,
+  CairoOption,
+  CairoResult,
+  ETH_ADDRESS,
+  NON_ZERO_PREFIX,
+} from '../../../src';
 
 describe('requestParser', () => {
   describe('parseCalldataField', () => {
@@ -100,7 +106,7 @@ describe('requestParser', () => {
       expect(parsedField).toEqual(['252', '0']);
     });
 
-    test('should return parsed calldata field for Enum type', () => {
+    test('should return parsed calldata field for Enum Option type None', () => {
       const args = [new CairoOption<string>(1, 'content')];
       const argsIterator = args[Symbol.iterator]();
       const parsedField = parseCalldataField(
@@ -110,6 +116,92 @@ describe('requestParser', () => {
         { 'core::option::Option::core::bool': getAbiEnums().enum }
       );
       expect(parsedField).toEqual('1');
+    });
+
+    test('should return parsed calldata field for Enum Option type Some', () => {
+      const args = [new CairoOption<string>(0, 'content')];
+      const argsIterator = args[Symbol.iterator]();
+      const abiEnum = getAbiEnums().enum;
+      abiEnum.variants.push({
+        name: 'Some',
+        type: 'cairo_struct_variant',
+        offset: 1,
+      });
+      const parsedField = parseCalldataField(
+        argsIterator,
+        getAbiEntry('core::option::Option::core::bool'),
+        getAbiStructs(),
+        { 'core::option::Option::core::bool': abiEnum }
+      );
+      expect(parsedField).toEqual(['0', '27988542884245108']);
+    });
+
+    test('should throw an error for Enum Option has no "Some" variant', () => {
+      const args = [new CairoOption<string>(0, 'content')];
+      const argsIterator = args[Symbol.iterator]();
+      expect(() =>
+        parseCalldataField(
+          argsIterator,
+          getAbiEntry('core::option::Option::core::bool'),
+          getAbiStructs(),
+          { 'core::option::Option::core::bool': getAbiEnums().enum }
+        )
+      ).toThrow(new Error(`Error in abi : Option has no 'Some' variant.`));
+    });
+
+    test('should return parsed calldata field for Enum Result type Ok', () => {
+      const args = [new CairoResult<string, string>(0, 'Ok')];
+      const argsIterator = args[Symbol.iterator]();
+      const abiEnum = getAbiEnums().enum;
+      abiEnum.variants.push({
+        name: 'Ok',
+        type: 'cairo_struct_variant',
+        offset: 1,
+      });
+      const parsedField = parseCalldataField(
+        argsIterator,
+        getAbiEntry('core::result::Result::core::bool'),
+        getAbiStructs(),
+        { 'core::result::Result::core::bool': abiEnum }
+      );
+      expect(parsedField).toEqual(['0', '20331']);
+    });
+
+    test('should throw an error for Enum Result has no "Ok" variant', () => {
+      const args = [new CairoResult<string, string>(0, 'Ok')];
+      const argsIterator = args[Symbol.iterator]();
+      expect(() =>
+        parseCalldataField(
+          argsIterator,
+          getAbiEntry('core::result::Result::core::bool'),
+          getAbiStructs(),
+          { 'core::result::Result::core::bool': getAbiEnums().enum }
+        )
+      ).toThrow(new Error(`Error in abi : Result has no 'Ok' variant.`));
+    });
+
+    test('should return parsed calldata field for Custom Enum type', () => {
+      const activeVariantName = 'custom_enum';
+      const args = [new CairoCustomEnum({ [activeVariantName]: 'content' })];
+      const argsIterator = args[Symbol.iterator]();
+      const abiEnum = getAbiEnums().enum;
+      abiEnum.variants.push({
+        name: activeVariantName,
+        type: 'cairo_struct_variant',
+        offset: 1,
+      });
+      const parsedField = parseCalldataField(argsIterator, getAbiEntry('enum'), getAbiStructs(), {
+        enum: abiEnum,
+      });
+      expect(parsedField).toEqual(['1', '27988542884245108']);
+    });
+
+    test('should throw an error for Custon Enum type when there is not active variant', () => {
+      const args = [new CairoCustomEnum({ test: 'content' })];
+      const argsIterator = args[Symbol.iterator]();
+      expect(() =>
+        parseCalldataField(argsIterator, getAbiEntry('enum'), getAbiStructs(), getAbiEnums())
+      ).toThrow(new Error(`Not find in abi : Enum has no 'test' variant.`));
     });
 
     test('should throw an error for CairoUint256 abi type when wrong arg is provided', () => {
