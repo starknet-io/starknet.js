@@ -283,6 +283,48 @@ function parseCalldataValue(
  * @param structs - structs from abi
  * @param enums - enums from abi
  * @return {string | string[]} - parsed arguments in format that contract is expecting
+ *
+ * @example
+ * const abiEntry = { name: 'test', type: 'struct' };
+ * const abiStructs: AbiStructs = {
+ *  struct: {
+ *    members: [
+ *        {
+ *          name: 'test_name',
+ *          type: 'test_type',
+ *          offset: 1,
+ *        },
+ *    ],
+ *    size: 2,
+ *    name: 'cairo__struct',
+ *    type: 'struct',
+ *   },
+ * };
+ *
+ * const abiEnums: AbiEnums = {
+ *   enum: {
+ *     variants: [
+ *       {
+ *         name: 'test_name',
+ *         type: 'cairo_struct_variant',
+ *         offset: 1,
+ *       },
+ *     ],
+ *     size: 2,
+ *     name: 'test_cairo',
+ *     type: 'enum',
+ *   },
+ * };
+ *
+ * const args = [{ test_name: 'test' }];
+ * const argsIterator = args[Symbol.iterator]();
+ * const parsedField = parseCalldataField(
+ *   argsIterator,
+ *   abiEntry,
+ *   abiStructs,
+ *   abiEnums
+ * );
+ * // parsedField === ['1952805748']
  */
 export function parseCalldataField(
   argsIterator: Iterator<any>,
