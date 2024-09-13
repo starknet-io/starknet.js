@@ -1041,6 +1041,9 @@ describe('Cairo 1', () => {
             maker_source: 418413900385n,
             taker_source: 418413900385n,
           },
+          block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
+          block_number: 69198,
+          transaction_hash: '0x4e38fcce79c115b6fe2c486e3514efc1bd4da386b91c104e97230177d0bf181',
         },
       ]);
       // From component `DepositComponent`, event `Deposit` (same event name than next)
@@ -1093,6 +1096,9 @@ describe('Cairo 1', () => {
             funder: 1466771120193999006693452314154095230636738457276435850562375218974960297344n,
             amount: 4956000000000000n,
           },
+          block_hash: '0x31afd649a5042cb1855ce820708a555eab62fe6ea07a2a538fa9100cdc80383',
+          block_number: 69198,
+          transaction_hash: '0x7768860d79bfb4c8463d215abea3c267899e373407c6882077f7447051c50de',
         },
       ]);
       const parsedEventNestedDeposit2 = events.parseEvents(
@@ -1109,6 +1115,9 @@ describe('Cairo 1', () => {
             funder: 1466771120193999006693452314154095230636738457276435850562375218974960297344n,
             amount: 4956000000000000n,
           },
+          block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
+          block_number: 69198,
+          transaction_hash: '0x2d5210e5334a83306abe6f7f5e7e65cd1feed72ad3b8e359a2f4614fa948e1d',
         },
       ]);
 
@@ -1133,6 +1142,9 @@ describe('Cairo 1', () => {
             to: 2087021424722619777119509474943472645767659996348769578120564519014510906823n,
             value: 4956000000000000n,
           },
+          block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
+          block_number: 69198,
+          transaction_hash: '0x2da31a929a9848e9630906275a75a531e1718d4830501e10b0bccacd55f6fe0',
         },
       ]);
     });

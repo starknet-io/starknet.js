@@ -212,6 +212,91 @@ describe('parseEvents', () => {
     expect(parsedEvents).toStrictEqual(result);
   });
 
+  test('should return parsed  emitted events', () => {
+    const abiEventAndVariantName = 'cairo_event_struct';
+    const abiCairoEventStruct: AbiEvent = {
+      kind: 'struct',
+      members: [
+        {
+          name: 'test_name',
+          type: 'test_type',
+          kind: 'data',
+        },
+      ],
+      name: abiEventAndVariantName,
+      type: 'event',
+    };
+
+    const abiCairoEventEnum: CairoEventVariant = {
+      kind: 'enum',
+      variants: [
+        {
+          name: 'test_name',
+          type: abiEventAndVariantName,
+          kind: 'data',
+        },
+      ],
+      name: 'test_cairo_event',
+      type: 'event',
+    };
+
+    const abiEvents = getAbiEvents([getInterfaceAbi(), abiCairoEventStruct, abiCairoEventEnum]);
+
+    const abiStructs: AbiStructs = {
+      abi_structs: {
+        members: [
+          {
+            name: 'test_name',
+            type: 'test_type',
+            offset: 1,
+          },
+        ],
+        size: 2,
+        name: 'cairo_event_struct',
+        type: 'struct',
+      },
+    };
+
+    const abiEnums: AbiEnums = {
+      abi_enums: {
+        variants: [
+          {
+            name: 'test_name',
+            type: 'cairo_event_struct_variant',
+            offset: 1,
+          },
+        ],
+        size: 2,
+        name: 'test_cairo_event',
+        type: 'enum',
+      },
+    };
+
+    const event: RPC.EmittedEvent = {
+      from_address: 'test_address',
+      keys: ['0x3c719ce4f57dd2d9059b9ffed65417d694a29982d35b188574144d6ae6c3f87'],
+      data: ['0x3c719ce4f57dd2d9059b9ffed65417d694a29982d35b188574144d6ae6c3f87'],
+      block_hash: '0x26b160f10156dea0639bec90696772c640b9706a47f5b8c52ea1abe5858b34d',
+      block_number: 1,
+      transaction_hash: '0x26b160f10156dea0639bec90696772c640b9706a47f5b8c52ea1abe5858b34c',
+    };
+
+    const parsedEvents = parseEvents([event], abiEvents, abiStructs, abiEnums);
+
+    const result = [
+      {
+        cairo_event_struct: {
+          test_name: 1708719217404197029088109386680815809747762070431461851150711916567020191623n,
+        },
+        block_hash: '0x26b160f10156dea0639bec90696772c640b9706a47f5b8c52ea1abe5858b34d',
+        block_number: 1,
+        transaction_hash: '0x26b160f10156dea0639bec90696772c640b9706a47f5b8c52ea1abe5858b34c',
+      },
+    ];
+
+    expect(parsedEvents).toStrictEqual(result);
+  });
+
   test('should throw if ABI events has not enough data in "keys" property', () => {
     const abiEventAndVariantName = 'cairo_event_struct';
     const abiCairoEventStruct: AbiEvent = {
