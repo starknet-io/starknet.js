@@ -20,6 +20,7 @@ import {
   felt,
   getArrayType,
   isTypeArray,
+  isTypeByteArray,
   isTypeBytes31,
   isTypeEnum,
   isTypeEthAddress,
@@ -152,7 +153,7 @@ function parseCalldataValue(
     }
     if (isTypeEthAddress(type)) return parseBaseTypes(type, element as BigNumberish);
 
-    if (type === 'core::byte_array::ByteArray') return parseByteArray(element as string);
+    if (isTypeByteArray(type)) return parseByteArray(element as string);
 
     const { members } = structs[type];
     const subElement = element as any;
@@ -229,6 +230,7 @@ function parseCalldataValue(
         }
         return [CairoResultVariant.Ok.toString(), parsedParameter];
       }
+
       // is Result::Err
       const listTypeVariant = variants.find((variant) => variant.name === 'Err');
       if (isUndefined(listTypeVariant)) {
@@ -281,6 +283,48 @@ function parseCalldataValue(
  * @param structs - structs from abi
  * @param enums - enums from abi
  * @return {string | string[]} - parsed arguments in format that contract is expecting
+ *
+ * @example
+ * const abiEntry = { name: 'test', type: 'struct' };
+ * const abiStructs: AbiStructs = {
+ *  struct: {
+ *    members: [
+ *        {
+ *          name: 'test_name',
+ *          type: 'test_type',
+ *          offset: 1,
+ *        },
+ *    ],
+ *    size: 2,
+ *    name: 'cairo__struct',
+ *    type: 'struct',
+ *   },
+ * };
+ *
+ * const abiEnums: AbiEnums = {
+ *   enum: {
+ *     variants: [
+ *       {
+ *         name: 'test_name',
+ *         type: 'cairo_struct_variant',
+ *         offset: 1,
+ *       },
+ *     ],
+ *     size: 2,
+ *     name: 'test_cairo',
+ *     type: 'enum',
+ *   },
+ * };
+ *
+ * const args = [{ test_name: 'test' }];
+ * const argsIterator = args[Symbol.iterator]();
+ * const parsedField = parseCalldataField(
+ *   argsIterator,
+ *   abiEntry,
+ *   abiStructs,
+ *   abiEnums
+ * );
+ * // parsedField === ['1952805748']
  */
 export function parseCalldataField(
   argsIterator: Iterator<any>,
@@ -307,10 +351,7 @@ export function parseCalldataField(
     case isTypeEthAddress(type):
       return parseBaseTypes(type, value);
     // Struct or Tuple
-    case isTypeStruct(type, structs) ||
-      isTypeTuple(type) ||
-      CairoUint256.isAbiType(type) ||
-      CairoUint256.isAbiType(type):
+    case isTypeStruct(type, structs) || isTypeTuple(type) || CairoUint256.isAbiType(type):
       return parseCalldataValue(value as ParsedStruct | BigNumberish[], type, structs, enums);
 
     // Enums

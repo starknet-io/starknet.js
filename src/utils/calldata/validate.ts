@@ -3,7 +3,6 @@ import {
   AbiEnums,
   AbiStructs,
   BigNumberish,
-  ETH_ADDRESS,
   FunctionAbi,
   Literal,
   Uint,
@@ -22,6 +21,7 @@ import {
   isTypeByteArray,
   isTypeBytes31,
   isTypeEnum,
+  isTypeEthAddress,
   isTypeFelt,
   isTypeLiteral,
   isTypeNonZero,
@@ -179,7 +179,7 @@ const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) =>
     return;
   }
 
-  if (input.type === ETH_ADDRESS) {
+  if (isTypeEthAddress(input.type)) {
     assert(!isObject(parameter), `EthAddress type is waiting a BigNumberish. Got "${parameter}"`);
     const param = BigInt(parameter.toString(10));
     assert(
