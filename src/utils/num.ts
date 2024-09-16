@@ -81,7 +81,7 @@ export function toStorageKey(number: BigNumberish): string {
 }
 
 /**
- * Convert BigNumberish to hex formate 0x + 64 hex chars
+ * Convert BigNumberish to hex format 0x + 64 hex chars
  *
  * Similar as toStorageKey but conforming to exactly 0x(64 hex chars).
  *
