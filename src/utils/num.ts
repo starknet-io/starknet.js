@@ -76,7 +76,7 @@ export const toHexString = toHex;
  * @returns format: storage-key-string
  */
 export function toStorageKey(number: BigNumberish): string {
-  // TODO: This is not completly correct as it will not enforce first 0 and second [0-7], 0x82bda... will pass as valid and should be false
+  // TODO: This is not completely correct as it will not enforce first 0 and second [0-7], 0x82bda... will pass as valid and should be false
   return addHexPrefix(toBigInt(number).toString(16).padStart(64, '0'));
 }
 
