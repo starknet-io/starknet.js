@@ -118,12 +118,21 @@ export const getTestAccount = (provider: ProviderInterface) => {
 
 export const createBlockForDevnet = async (): Promise<void> => {
   if (!(process.env.IS_DEVNET === 'true')) return;
-  await fetch(new URL('/create_block', process.env.TEST_RPC_URL), { method: 'POST' });
+  const response = await fetch(new URL('/create_block', process.env.TEST_RPC_URL), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: '{}',
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`DEVNET status ${response.status}: ${errorText}`);
+  }
 };
 
 export async function waitNextBlock(provider: RpcProvider, delay: number) {
   const initBlock = await provider.getBlockNumber();
-  createBlockForDevnet();
+  await createBlockForDevnet();
   let isNewBlock: boolean = false;
   while (!isNewBlock) {
     // eslint-disable-next-line no-await-in-loop

@@ -14,6 +14,11 @@ import { DeclareTransactionReceiptResponse, EstimateFeeResponse } from './provid
 
 export interface EstimateFee extends EstimateFeeResponse {}
 
+export type UniversalSuggestedFee = {
+  maxFee: BigNumberish;
+  resourceBounds: ResourceBounds;
+};
+
 export type EstimateFeeBulk = Array<EstimateFee>;
 
 // TODO: This is too wide generic with optional params

@@ -1,12 +1,10 @@
-import {
-  type AccountChangeEventHandler,
-  type AddStarknetChainParameters,
-  type NetworkChangeEventHandler,
-  type WatchAssetParameters,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  type SPEC,
+import type {
+  Signature,
+  AccountChangeEventHandler,
+  AddStarknetChainParameters,
+  NetworkChangeEventHandler,
+  WatchAssetParameters,
 } from 'starknet-types-07';
-
 import { Account, AccountInterface } from '../account';
 import { ProviderInterface } from '../provider';
 import {
@@ -82,11 +80,11 @@ export class WalletAccount extends Account implements AccountInterface {
   /**
    * WALLET EVENTS
    */
-  public onAccountChange(callback: AccountChangeEventHandler) {
+  public onAccountChange(callback: AccountChangeEventHandler): void {
     onAccountChange(this.walletProvider, callback);
   }
 
-  public onNetworkChanged(callback: NetworkChangeEventHandler) {
+  public onNetworkChanged(callback: NetworkChangeEventHandler): void {
     onNetworkChanged(this.walletProvider, callback);
   }
 
@@ -168,7 +166,7 @@ export class WalletAccount extends Account implements AccountInterface {
     };
   }
 
-  override signMessage(typedData: TypedData) {
+  override signMessage(typedData: TypedData): Promise<Signature> {
     return signMessage(this.walletProvider, typedData);
   }
 

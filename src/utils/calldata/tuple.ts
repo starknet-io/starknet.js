@@ -104,13 +104,30 @@ function extractCairo1Tuple(type: string): string[] {
 }
 
 /**
- * Convert tuple string definition into object like definition
- * @param type tuple string definition
- * @returns object like tuple
+ * Convert a tuple string definition into an object-like definition.
+ * Supports both Cairo 0 and Cairo 1 tuple formats.
+ *
+ * @param type - The tuple string definition (e.g., "(u8, u8)" or "(x:u8, y:u8)").
+ * @returns An array of strings or objects representing the tuple components.
+ *
+ * @example
+ * // Cairo 0 Tuple
+ * const cairo0Tuple = "(u8, u8)";
+ * const result = extractTupleMemberTypes(cairo0Tuple);
+ * // result: ["u8", "u8"]
+ *
+ * @example
+ * // Named Cairo 0 Tuple
+ * const namedCairo0Tuple = "(x:u8, y:u8)";
+ * const namedResult = extractTupleMemberTypes(namedCairo0Tuple);
+ * // namedResult: [{ name: "x", type: "u8" }, { name: "y", type: "u8" }]
+ *
+ * @example
+ * // Cairo 1 Tuple
+ * const cairo1Tuple = "(core::result::Result::<u8, u8>, u8)";
+ * const cairo1Result = extractTupleMemberTypes(cairo1Tuple);
+ * // cairo1Result: ["core::result::Result::<u8, u8>", "u8"]
  */
 export default function extractTupleMemberTypes(type: string): (string | object)[] {
-  if (isCairo1Type(type)) {
-    return extractCairo1Tuple(type);
-  }
-  return extractCairo0Tuple(type);
+  return isCairo1Type(type) ? extractCairo1Tuple(type) : extractCairo0Tuple(type);
 }

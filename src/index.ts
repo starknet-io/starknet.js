@@ -40,7 +40,6 @@ export * from './utils/responseParser';
 export * from './utils/cairoDataTypes/uint256';
 export * from './utils/cairoDataTypes/uint512';
 export * from './utils/address';
-export * from './utils/url';
 export * from './utils/calldata';
 export * from './utils/calldata/enum';
 export * from './utils/contract';

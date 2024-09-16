@@ -1,6 +1,6 @@
-export type CairoEnumRaw = {
-  [key: string]: any;
-};
+import { isUndefined } from '../../typed';
+
+export type CairoEnumRaw = Record<string, any>;
 
 /**
  * Class to handle Cairo custom Enum
@@ -31,9 +31,7 @@ export class CairoCustomEnum {
     if (variantsList.length === 0) {
       throw new Error('This Enum must have at least 1 variant');
     }
-    const nbActiveVariants = variantsList.filter(
-      (content) => typeof content !== 'undefined'
-    ).length;
+    const nbActiveVariants = variantsList.filter((content) => !isUndefined(content)).length;
     if (nbActiveVariants !== 1) {
       throw new Error('This Enum must have exactly one active variant');
     }
@@ -45,12 +43,8 @@ export class CairoCustomEnum {
    * @returns the content of the valid variant of a Cairo custom Enum.
    */
   public unwrap(): any {
-    const variants = Object.entries(this.variant);
-    const activeVariant = variants.find((item) => typeof item[1] !== 'undefined');
-    if (typeof activeVariant === 'undefined') {
-      return undefined;
-    }
-    return activeVariant[1];
+    const variants = Object.values(this.variant);
+    return variants.find((item) => !isUndefined(item));
   }
 
   /**
@@ -59,10 +53,7 @@ export class CairoCustomEnum {
    */
   public activeVariant(): string {
     const variants = Object.entries(this.variant);
-    const activeVariant = variants.find((item) => typeof item[1] !== 'undefined');
-    if (typeof activeVariant === 'undefined') {
-      return '';
-    }
-    return activeVariant[0];
+    const activeVariant = variants.find((item) => !isUndefined(item[1]));
+    return isUndefined(activeVariant) ? '' : activeVariant[0];
   }
 }

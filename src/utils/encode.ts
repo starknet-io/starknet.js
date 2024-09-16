@@ -1,6 +1,5 @@
 import { base64 } from '@scure/base';
 
-/* eslint-disable no-param-reassign */
 export const IS_BROWSER = typeof window !== 'undefined';
 
 const STRING_ZERO = '0';
@@ -106,7 +105,7 @@ export function btoaUniversal(b: ArrayBuffer): string {
  * // result = "48656c6c6f"
  * ```
  */
-export function buf2hex(buffer: Uint8Array) {
+export function buf2hex(buffer: Uint8Array): string {
   return buffer.reduce((r, x) => r + x.toString(16).padStart(2, '0'), '');
 }
 
@@ -163,7 +162,12 @@ export function addHexPrefix(hex: string): string {
  * // result = '00000hello'
  * ```
  */
-function padString(str: string, length: number, left: boolean, padding = STRING_ZERO): string {
+function padString(
+  str: string,
+  length: number,
+  left: boolean,
+  padding: string = STRING_ZERO
+): string {
   const diff = length - str.length;
   let result = str;
   if (diff > 0) {
@@ -183,7 +187,6 @@ function padString(str: string, length: number, left: boolean, padding = STRING_
  * @param {number} length The target length for the padded string.
  * @param {string} [padding='0'] The string to use for padding. Defaults to '0'.
  * @returns {string} The padded string.
- *
  * @example
  * ```typescript
  * const myString = '1A3F';
@@ -191,7 +194,7 @@ function padString(str: string, length: number, left: boolean, padding = STRING_
  * // result: '0000001A3F'
  * ```
  */
-export function padLeft(str: string, length: number, padding = STRING_ZERO): string {
+export function padLeft(str: string, length: number, padding: string = STRING_ZERO): string {
   return padString(str, length, true, padding);
 }
 
@@ -215,7 +218,7 @@ export function padLeft(str: string, length: number, padding = STRING_ZERO): str
  *
  * ```
  */
-export function calcByteLength(str: string, byteSize = 8): number {
+export function calcByteLength(str: string, byteSize: number = 8): number {
   const { length } = str;
   const remainder = length % byteSize;
   return remainder ? ((length - remainder) / byteSize) * byteSize + byteSize : length;
@@ -242,7 +245,11 @@ export function calcByteLength(str: string, byteSize = 8): number {
  * // result: '00000123' (padded to 8 characters)
  * ```
  */
-export function sanitizeBytes(str: string, byteSize = 8, padding = STRING_ZERO): string {
+export function sanitizeBytes(
+  str: string,
+  byteSize: number = 8,
+  padding: string = STRING_ZERO
+): string {
   return padLeft(str, calcByteLength(str, byteSize), padding);
 }
 
@@ -251,8 +258,8 @@ export function sanitizeBytes(str: string, byteSize = 8, padding = STRING_ZERO):
  * and then re-adding the '0x' prefix.
  *
  * *[no internal usage]*
- * @param hex hex-string
- * @returns format: hex-string
+ * @param {string} hex hex-string
+ * @returns {string} format: hex-string
  *
  * @example
  * ```typescript
@@ -262,12 +269,9 @@ export function sanitizeBytes(str: string, byteSize = 8, padding = STRING_ZERO):
  * ```
  */
 export function sanitizeHex(hex: string): string {
-  hex = removeHexPrefix(hex);
-  hex = sanitizeBytes(hex, 2);
-  if (hex) {
-    hex = addHexPrefix(hex);
-  }
-  return hex;
+  const hexWithoutPrefix = removeHexPrefix(hex);
+  const sanitizedHex = sanitizeBytes(hexWithoutPrefix, 2);
+  return sanitizedHex ? addHexPrefix(sanitizedHex) : sanitizedHex;
 }
 
 /**
@@ -285,7 +289,7 @@ export function sanitizeHex(hex: string): string {
  * // result: 'PASCAL_CASE_EXAMPLE'
  * ```
  */
-export const pascalToSnake = (text: string) =>
+export const pascalToSnake = (text: string): string =>
   /[a-z]/.test(text)
     ? text
         .split(/(?=[A-Z])/)

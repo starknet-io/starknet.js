@@ -23,7 +23,9 @@ import {
   isTypeArray,
   isTypeBool,
   isTypeByteArray,
+  isTypeBytes31,
   isTypeEnum,
+  isTypeEthAddress,
   isTypeNonZero,
   isTypeSecp256k1Point,
   isTypeTuple,
@@ -60,10 +62,10 @@ function parseBaseTypes(type: string, it: Iterator<string>) {
       const limb2 = it.next().value;
       const limb3 = it.next().value;
       return new CairoUint512(limb0, limb1, limb2, limb3).toBigInt();
-    case type === 'core::starknet::eth_address::EthAddress':
+    case isTypeEthAddress(type):
       temp = it.next().value;
       return BigInt(temp);
-    case type === 'core::bytes_31::bytes31':
+    case isTypeBytes31(type):
       temp = it.next().value;
       return decodeShortString(temp);
     case isTypeSecp256k1Point(type):
@@ -151,7 +153,7 @@ function parseResponseValue(
 
   // type struct
   if (structs && element.type in structs && structs[element.type]) {
-    if (element.type === 'core::starknet::eth_address::EthAddress') {
+    if (isTypeEthAddress(element.type)) {
       return parseBaseTypes(element.type, responseIterator);
     }
     return structs[element.type].members.reduce((acc, el) => {

@@ -17,7 +17,7 @@ import type {
   TransactionReceipt,
 } from '../../types/provider';
 import { toBigInt } from '../num';
-import { isString } from '../shortString';
+import { isString } from '../typed';
 import { estimateFeeToBounds, estimatedFeeToMaxFee } from '../stark';
 import { ResponseParser } from './interface';
 
