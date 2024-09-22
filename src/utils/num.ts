@@ -4,6 +4,7 @@ import { BigNumberish } from '../types';
 import assert from './assert';
 import { addHexPrefix, buf2hex, removeHexPrefix } from './encode';
 import { MASK_31 } from '../constants';
+import { isNumber, isBigInt, isString } from './typed';
 
 /** @deprecated prefer importing from 'types' over 'num' */
 export type { BigNumberish };
@@ -42,24 +43,6 @@ export function isHex(hex: string): boolean {
  */
 export function toBigInt(value: BigNumberish): bigint {
   return BigInt(value);
-}
-
-/**
- * Test if value is bigint
- *
- * @param value value to test
- * @returns {boolean} true if value is bigint, false otherwise
- * @example
- * ```typescript
- * isBigInt(10n); // true
- * isBigInt(BigInt('10')); // true
- * isBigInt(10); // false
- * isBigInt('10'); // false
- * isBigInt(null); // false
- * ```
- */
-export function isBigInt(value: any): value is bigint {
-  return typeof value === 'bigint';
 }
 
 /**
@@ -324,7 +307,7 @@ export function hexToBytes(str: string): Uint8Array {
  *
  * @param number value to be modified
  * @param percent integer as percent ex. 50 for 50%
- * @returns {BigInt} modified value
+ * @returns {bigint} modified value
  * @example
  * ```typescript
  * addPercent(100, 50); // 150n
@@ -335,47 +318,9 @@ export function hexToBytes(str: string): Uint8Array {
  * addPercent(200, -150); // -100n
  * ```
  */
-export function addPercent(number: BigNumberish, percent: number) {
+export function addPercent(number: BigNumberish, percent: number): bigint {
   const bigIntNum = BigInt(number);
   return bigIntNum + (bigIntNum * BigInt(percent)) / 100n;
-}
-
-/**
- * Check if a value is a number.
- *
- * @param {unknown} value - The value to check.
- * @returns {boolean} Returns true if the value is a number, otherwise returns false.
- * @example
- * ```typescript
- * const result = isNumber(123);
- * // result = true
- *
- * const result2 = isNumber("123");
- * // result2 = false
- * ```
- * @return {boolean} Returns true if the value is a number, otherwise returns false.
- */
-export function isNumber(value: unknown): value is number {
-  return typeof value === 'number';
-}
-
-/**
- * Checks if a given value is of boolean type.
- *
- * @param {unknown} value - The value to check.
- * @returns {boolean} - True if the value is of boolean type, false otherwise.
- * @example
- * ```typescript
- * const result = isBoolean(true);
- * // result = true
- *
- * const result2 = isBoolean(false);
- * // result2 = false
- * ```
- * @return {boolean} - True if the value is of boolean type, false otherwise.
- */
-export function isBoolean(value: unknown): value is boolean {
-  return typeof value === 'boolean';
 }
 
 /**
@@ -396,4 +341,23 @@ export function stringToSha256ToArrayBuff4(str: string): Uint8Array {
   const int31 = (n: bigint) => Number(n & MASK_31);
   const result: number = int31(BigInt(addHexPrefix(buf2hex(sha256(str)))));
   return hexToBytes(toHex(result));
+}
+
+/**
+ * Checks if a given value is of BigNumberish type.
+ * 234, 234n, "234", "0xea" are valid
+ * @param {unknown} input a value
+ * @returns {boolean} true if type of input is `BigNumberish`
+ * @example
+ * ```typescript
+ * const res = num.isBigNumberish("ZERO");
+ * // res = false
+ *  ```
+ */
+export function isBigNumberish(input: unknown): input is BigNumberish {
+  return (
+    isNumber(input) ||
+    isBigInt(input) ||
+    (isString(input) && (isHex(input) || isStringWholeNumber(input)))
+  );
 }

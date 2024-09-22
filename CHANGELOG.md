@@ -1,3 +1,27 @@
+# [6.14.0](https://github.com/starknet-io/starknet.js/compare/v6.13.1...v6.14.0) (2024-09-04)
+
+### Features
+
+- isClassDeclared prepareInvocations, fix cairo0 test ([#1211](https://github.com/starknet-io/starknet.js/issues/1211)) ([9fdf54f](https://github.com/starknet-io/starknet.js/commit/9fdf54f9a4547ba4072cb26c9a544c6df9e05853))
+
+## [6.13.1](https://github.com/starknet-io/starknet.js/compare/v6.13.0...v6.13.1) (2024-09-03)
+
+### Bug Fixes
+
+- revert companion pattern except constants ([#1193](https://github.com/starknet-io/starknet.js/issues/1193)) ([ebf9f35](https://github.com/starknet-io/starknet.js/commit/ebf9f356fad701be7d3d5dddb539c59222843377))
+
+# [6.13.0](https://github.com/starknet-io/starknet.js/compare/v6.12.1...v6.13.0) (2024-08-27)
+
+### Bug Fixes
+
+- repair enum type lookup for typed data hashing ([36f8c3c](https://github.com/starknet-io/starknet.js/commit/36f8c3c0c04b798138756baa373c135fed5a5339))
+- sync cryptographic dependencies ([da20310](https://github.com/starknet-io/starknet.js/commit/da20310ddfd57b30df2c053494220eb50fdfa1b3))
+
+### Features
+
+- implement SNIP-9 outside execution functionality ([#1208](https://github.com/starknet-io/starknet.js/issues/1208)) ([e3c80c5](https://github.com/starknet-io/starknet.js/commit/e3c80c558c84e7554935f90650968310452a25d5)), closes [#1111](https://github.com/starknet-io/starknet.js/issues/1111) [#1202](https://github.com/starknet-io/starknet.js/issues/1202)
+- improve message verification utilities ([#1198](https://github.com/starknet-io/starknet.js/issues/1198)) ([bdad9a5](https://github.com/starknet-io/starknet.js/commit/bdad9a586ad77c2883d37f2c76cf6a152f2d1a38))
+
 ## [6.12.1](https://github.com/starknet-io/starknet.js/compare/v6.12.0...v6.12.1) (2024-07-30)
 
 ### Bug Fixes

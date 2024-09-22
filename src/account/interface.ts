@@ -3,7 +3,6 @@ import { SignerInterface } from '../signer';
 import {
   Abi,
   AllowArray,
-  BigNumberish,
   BlockIdentifier,
   CairoVersion,
   Call,
@@ -120,13 +119,13 @@ export abstract class AccountInterface extends ProviderInterface {
   /**
    * Estimate Fee for executing a UDC DEPLOY transaction on starknet
    * This is different from the normal DEPLOY transaction as it goes through the Universal Deployer Contract (UDC)
-   
+
   * @param deployContractPayload array or singular
    * - classHash: computed class hash of compiled contract
    * - salt: address salt
    * - unique: bool if true ensure unique salt
    * - constructorCalldata: constructor calldata
-   * 
+   *
    * @param estimateFeeDetails -
    * - blockIdentifier?
    * - nonce?
@@ -362,27 +361,6 @@ export abstract class AccountInterface extends ProviderInterface {
    * @throws {Error} if typedData is not a valid TypedData
    */
   public abstract hashMessage(typedData: TypedData): Promise<string>;
-
-  /**
-   * Verify a signature of a TypedData object
-   *
-   * @param typedData - TypedData object to be verified
-   * @param signature - signature of the TypedData object
-   * @returns true if the signature is valid, false otherwise
-   * @throws {Error} if typedData is not a valid TypedData or the signature is not a valid signature
-   */
-  public abstract verifyMessage(typedData: TypedData, signature: Signature): Promise<boolean>;
-
-  /**
-   * Verify a signature of a given hash
-   * @warning This method is not recommended, use verifyMessage instead
-   *
-   * @param hash - hash to be verified
-   * @param signature - signature of the hash
-   * @returns true if the signature is valid, false otherwise
-   * @throws {Error} if the signature is not a valid signature
-   */
-  public abstract verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean>;
 
   /**
    * Gets the nonce of the account with respect to a specific block

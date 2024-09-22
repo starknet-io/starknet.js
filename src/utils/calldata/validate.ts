@@ -1,7 +1,3 @@
-/**
- * Validate cairo contract method arguments
- * Flow: Determine type from abi and than validate against parameter
- */
 import {
   AbiEntry,
   AbiEnums,
@@ -14,8 +10,9 @@ import {
 import assert from '../assert';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
-import { isBigInt, isBoolean, isHex, isNumber, toBigInt } from '../num';
-import { isLongText, isString } from '../shortString';
+import { isHex, toBigInt } from '../num';
+import { isLongText } from '../shortString';
+import { isBoolean, isNumber, isString, isBigInt, isObject } from '../typed';
 import {
   getArrayType,
   isLen,
@@ -24,6 +21,7 @@ import {
   isTypeByteArray,
   isTypeBytes31,
   isTypeEnum,
+  isTypeEthAddress,
   isTypeFelt,
   isTypeLiteral,
   isTypeNonZero,
@@ -64,15 +62,15 @@ const validateUint = (parameter: any, input: AbiEntry) => {
   if (isNumber(parameter)) {
     assert(
       parameter <= Number.MAX_SAFE_INTEGER,
-      `Validation: Parameter is to large to be typed as Number use (BigInt or String)`
+      'Validation: Parameter is too large to be typed as Number use (BigInt or String)'
     );
   }
   assert(
     isString(parameter) ||
       isNumber(parameter) ||
       isBigInt(parameter) ||
-      (typeof parameter === 'object' && 'low' in parameter && 'high' in parameter) ||
-      (typeof parameter === 'object' &&
+      (isObject(parameter) && 'low' in parameter && 'high' in parameter) ||
+      (isObject(parameter) &&
         ['limb0', 'limb1', 'limb2', 'limb3'].every((key) => key in parameter)),
     `Validate: arg ${input.name} of cairo type ${
       input.type
@@ -128,12 +126,15 @@ const validateUint = (parameter: any, input: AbiEntry) => {
     case Uint.u256:
       assert(
         param >= 0n && param <= 2n ** 256n - 1n,
-        `Validate: arg ${input.name} is ${input.type} 0 - 2^256-1`
+        `Validate: arg ${input.name} is ${input.type} should be in range 0 - 2^256-1`
       );
       break;
 
     case Uint.u512:
-      assert(CairoUint512.is(param), `Validate: arg ${input.name} is ${input.type} 0 - 2^512-1`);
+      assert(
+        CairoUint512.is(param),
+        `Validate: arg ${input.name} is ${input.type} should be in range 0 - 2^512-1`
+      );
       break;
 
     case Literal.ClassHash:
@@ -178,11 +179,8 @@ const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) =>
     return;
   }
 
-  if (input.type === 'core::starknet::eth_address::EthAddress') {
-    assert(
-      typeof parameter !== 'object',
-      `EthAddress type is waiting a BigNumberish. Got ${parameter}`
-    );
+  if (isTypeEthAddress(input.type)) {
+    assert(!isObject(parameter), `EthAddress type is waiting a BigNumberish. Got "${parameter}"`);
     const param = BigInt(parameter.toString(10));
     assert(
       // from : https://github.com/starkware-libs/starknet-specs/blob/29bab650be6b1847c92d4461d4c33008b5e50b1a/api/starknet_api_openrpc.json#L1259
@@ -193,8 +191,8 @@ const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) =>
   }
 
   assert(
-    typeof parameter === 'object' && !Array.isArray(parameter),
-    `Validate: arg ${input.name} is cairo type struct (${input.type}), and should be defined as js object (not array)`
+    isObject(parameter),
+    `Validate: arg ${input.name} is cairo type struct (${input.type}), and should be defined as a js object (not array)`
   );
 
   // shallow struct validation, only first depth level
@@ -208,9 +206,10 @@ const validateStruct = (parameter: any, input: AbiEntry, structs: AbiStructs) =>
 
 const validateEnum = (parameter: any, input: AbiEntry) => {
   assert(
-    typeof parameter === 'object' && !Array.isArray(parameter),
-    `Validate: arg ${input.name} is cairo type Enum (${input.type}), and should be defined as js object (not array)`
+    isObject(parameter),
+    `Validate: arg ${input.name} is cairo type Enum (${input.type}), and should be defined as a js object (not array)`
   );
+
   const methodsKeys = Object.getOwnPropertyNames(Object.getPrototypeOf(parameter));
   const keys = [...Object.getOwnPropertyNames(parameter), ...methodsKeys];
   if (isTypeOption(input.type) && keys.includes('isSome') && keys.includes('isNone')) {
@@ -223,15 +222,12 @@ const validateEnum = (parameter: any, input: AbiEntry) => {
     return; // Custom Enum
   }
   throw new Error(
-    `Validate Enum: argument ${input.name}, type ${input.type}, value received ${parameter}, is not an Enum.`
+    `Validate Enum: argument ${input.name}, type ${input.type}, value received "${parameter}", is not an Enum.`
   );
 };
 
 const validateTuple = (parameter: any, input: AbiEntry) => {
-  assert(
-    typeof parameter === 'object' && !Array.isArray(parameter),
-    `Validate: arg ${input.name} should be a tuple (defined as object)`
-  );
+  assert(isObject(parameter), `Validate: arg ${input.name} should be a tuple (defined as object)`);
   // todo: skip tuple structural validation for now
 };
 
@@ -289,6 +285,7 @@ const validateNonZero = (parameter: any, input: AbiEntry) => {
   // so, are authorized here : u8, u16, u32, u64, u128, u256 and felt252.
 
   const baseType = getArrayType(input.type);
+
   assert(
     (isTypeUint(baseType) && baseType !== CairoUint512.abiSelector) || isTypeFelt(baseType),
     `Validate: ${input.name} type is not authorized for NonZero type.`
@@ -303,7 +300,8 @@ const validateNonZero = (parameter: any, input: AbiEntry) => {
       break;
     case isTypeUint(baseType):
       validateUint(parameter, { name: '', type: baseType });
-      switch (input.type) {
+
+      switch (baseType) {
         case Uint.u256:
           assert(
             new CairoUint256(parameter).toBigInt() > 0,
@@ -319,17 +317,69 @@ const validateNonZero = (parameter: any, input: AbiEntry) => {
       break;
     default:
       throw new Error(
-        `Validate Unhandled: argument ${input.name}, type ${input.type}, value ${parameter}`
+        `Validate Unhandled: argument ${input.name}, type ${input.type}, value "${parameter}"`
       );
   }
 };
 
+/**
+ * Validate cairo contract method arguments
+ * Flow: Determine type from abi and than validate against parameter
+ *
+ * @param {FunctionAbi} abiMethod - Abi method.
+ * @param {any[]} args - Arguments.
+ * @param {AbiStructs} structs - ABI structs.
+ * @param {AbiEnums} enums - ABI enums.
+ * @returns {void} - Return void if validation passes
+ *
+ * @example
+ * const functionAbi: FunctionAbi = {
+ *   inputs: [{ name: 'test', type: 'felt' }],
+ *   name: 'test',
+ *   outputs: [{ name: 'test', type: 'felt' }],
+ *   stateMutability: 'view',
+ *   type: 'function',
+ * };
+ *
+ * const abiStructs: AbiStructs = {
+ *  abi_structs: {
+ *    members: [
+ *        {
+ *          name: 'test_name',
+ *          type: 'test_type',
+ *          offset: 1,
+ *        },
+ *    ],
+ *    size: 2,
+ *    name: 'cairo_event_struct',
+ *    type: 'struct',
+ *   },
+ * };
+ *
+ * const abiEnums: AbiEnums = {
+ *   abi_enums: {
+ *     variants: [
+ *       {
+ *         name: 'test_name',
+ *         type: 'cairo_event_struct_variant',
+ *         offset: 1,
+ *       },
+ *     ],
+ *     size: 2,
+ *     name: 'test_cairo_event',
+ *     type: 'enum',
+ *   },
+ * };
+ *
+ * validateFields(functionAbi, [1n], abiStructs, abiEnums); // Returns void since validation passes
+ * validateFields(functionAbi, [{}], abiStructs, abiEnums); // Throw an error because paramters are not valid
+ */
 export default function validateFields(
   abiMethod: FunctionAbi,
-  args: Array<any>,
+  args: any[],
   structs: AbiStructs,
   enums: AbiEnums
-) {
+): void {
   abiMethod.inputs.reduce((acc, input) => {
     const parameter = args[acc];
 

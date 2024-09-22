@@ -4,7 +4,7 @@ import type { ENUM_EVENT, EVENT_FIELD, STRUCT_EVENT } from 'starknet-types-07';
 export type Abi = ReadonlyArray<FunctionAbi | AbiEvent | AbiStruct | InterfaceAbi | any>;
 
 // Basic elements
-export type AbiEntry = { name: string; type: 'felt' | 'felt*' | string };
+export type AbiEntry = { name: string; type: 'felt' | 'felt*' | 'event' | string };
 
 export type EventEntry = { name: string; type: 'felt' | 'felt*' | string; kind: 'key' | 'data' };
 

@@ -1,6 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import type { SPEC } from 'starknet-types-07';
-import { getStarkKey, utils } from '@scure/starknet';
+import { getPublicKey, getStarkKey, utils } from '@scure/starknet';
 import { gzip, ungzip } from 'pako';
 
 import { ZERO, FeeMarginPercentage } from '../constants';
@@ -14,16 +12,27 @@ import {
 } from '../types';
 import { EDAMode, EDataAvailabilityMode, ETransactionVersion, ResourceBounds } from '../types/api';
 import { FeeEstimate } from '../types/provider';
-import { addHexPrefix, arrayBufferToString, atobUniversal, btoaUniversal } from './encode';
+import { addHexPrefix, arrayBufferToString, atobUniversal, btoaUniversal, buf2hex } from './encode';
 import { parse, stringify } from './json';
 import {
   addPercent,
   bigNumberishArrayToDecimalStringArray,
   bigNumberishArrayToHexadecimalStringArray,
-  isBigInt,
   toHex,
 } from './num';
-import { isString } from './shortString';
+import { isUndefined, isString, isBigInt } from './typed';
+
+type V3Details = Required<
+  Pick<
+    UniversalDetails,
+    | 'tip'
+    | 'paymasterData'
+    | 'accountDeploymentData'
+    | 'nonceDataAvailabilityMode'
+    | 'feeDataAvailabilityMode'
+    | 'resourceBounds'
+  >
+>;
 
 /**
  * Compress compiled Cairo 0 program
@@ -46,8 +55,8 @@ export function compressProgram(jsonProgram: Program | string): CompressedProgra
 
 /**
  * Decompress compressed compiled Cairo 0 program
- * @param {CompressedProgram} base64 Compressed Cairo 0 program
- * @returns {Object | CompressedProgram} Parsed decompressed compiled Cairo 0 program
+ * @param {CompressedProgram | CompressedProgram[]} base64 Compressed Cairo 0 program
+ * @returns Parsed decompressed compiled Cairo 0 program
  * @example
  * ```typescript
  * const contractCairo0 = json.parse(fs.readFileSync("./cairo0contract.json").toString("ascii"));
@@ -72,7 +81,7 @@ export function compressProgram(jsonProgram: Program | string): CompressedProgra
  * // ...
  * ```
  */
-export function decompressProgram(base64: CompressedProgram) {
+export function decompressProgram(base64: CompressedProgram | CompressedProgram[]) {
   if (Array.isArray(base64)) return base64;
   const decompressed = arrayBufferToString(ungzip(atobUniversal(base64)));
   return parse(decompressed);
@@ -214,7 +223,7 @@ export function estimateFeeToBounds(
     };
   }
 
-  if (typeof estimate.gas_consumed === 'undefined' || typeof estimate.gas_price === 'undefined') {
+  if (isUndefined(estimate.gas_consumed) || isUndefined(estimate.gas_price)) {
     throw Error('estimateFeeToBounds: estimate is undefined');
   }
 
@@ -280,7 +289,7 @@ export function toTransactionVersion(
 /**
  * Convert Transaction version to Fee version or throw an error
  * @param {BigNumberish} [providedVersion] 0..3 number representing the transaction version
- * @returns {ETransactionVersion} the fee estimation version corresponding to the transaction version provided
+ * @returns {ETransactionVersion | undefined} the fee estimation version corresponding to the transaction version provided
  * @throws {Error} if the transaction version is unknown
  * @example
  * ```typescript
@@ -288,7 +297,7 @@ export function toTransactionVersion(
  * // result = "0x100000000000000000000000000000002"
  * ```
  */
-export function toFeeVersion(providedVersion?: BigNumberish) {
+export function toFeeVersion(providedVersion?: BigNumberish): ETransactionVersion | undefined {
   if (!providedVersion) return undefined;
   const version = toHex(providedVersion);
 
@@ -303,7 +312,7 @@ export function toFeeVersion(providedVersion?: BigNumberish) {
 /**
  * Return provided or default v3 tx details
  * @param {UniversalDetails} details details of the transaction
- * @return {} an object including the V3 transaction details.
+ * @return {V3Details} an object including the V3 transaction details.
  * @example
  * ```typescript
  * const detail: UniversalDetails = { tip: 3456n };
@@ -321,7 +330,8 @@ export function toFeeVersion(providedVersion?: BigNumberish) {
  * // }
  * ```
  */
-export function v3Details(details: UniversalDetails) {
+
+export function v3Details(details: UniversalDetails): V3Details {
   return {
     tip: details.tip || 0,
     paymasterData: details.paymasterData || [],
@@ -350,4 +360,20 @@ export function reduceV2(providedVersion: ETransactionVersion): ETransactionVers
   if (providedVersion === ETransactionVersion.F2) return ETransactionVersion.F1;
   if (providedVersion === ETransactionVersion.V2) return ETransactionVersion.V1;
   return providedVersion;
+}
+
+/**
+ * get the hex string of the full public key related to a Starknet private key.
+ * @param {BigNumberish} privateKey a 252 bits private key.
+ * @returns {string} an hex string of a 520 bit number, representing the full public key related to `privateKey`.
+ * @example
+ * ```typescript
+ * const result = ec.getFullPublicKey("0x43b7240d227aa2fb8434350b3321c40ac1b88c7067982549e7609870621b535");
+ * // result = "0x0400b730bd22358612b5a67f8ad52ce80f9e8e893639ade263537e6ef35852e5d3057795f6b090f7c6985ee143f798608a53b3659222c06693c630857a10a92acf"
+ * ```
+ */
+export function getFullPublicKey(privateKey: BigNumberish): string {
+  const privKey = toHex(privateKey);
+  const fullPrivKey = addHexPrefix(buf2hex(getPublicKey(privKey, false)));
+  return fullPrivKey;
 }

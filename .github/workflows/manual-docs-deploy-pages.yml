@@ -1,0 +1,52 @@
+name: '[Manual] Documentation Deploy Pages'
+on: workflow_dispatch
+
+# populate the following environment variables for the "github-pages" environment
+# - default:
+#     ORGANIZATION_NAME
+#     PROJECT_NAME
+#     DEPLOYMENT_BRANCH
+# - custom:
+#     DOCS_BASE_URL
+
+jobs:
+  build:
+    name: Documentation build
+    runs-on: ubuntu-latest
+    environment: github-pages
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: 'npm'
+      - name: Setup
+        run: |
+          npm ci --ignore-scripts
+          cd www/
+          npm ci --ignore-scripts
+      - name: Build
+        run: |
+          rm -rf www/docs/API/
+          npm run docs:build
+        env:
+          DOCS_BASE_URL: ${{ vars.DOCS_BASE_URL || '/starknet.js/' }}
+      - name: Upload
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: www/build
+
+  deploy:
+    name: documentation deploy
+    runs-on: ubuntu-latest
+    needs: [build]
+    permissions:
+      pages: write # to deploy to pages
+      id-token: write # to verify the deployment originates from an appropriate source
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: deploy
+        id: deployment
+        uses: actions/deploy-pages@v4

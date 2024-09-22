@@ -27,7 +27,8 @@ import {
   types,
 } from '../src';
 import { hexToDecimalString } from '../src/utils/num';
-import { encodeShortString, isString } from '../src/utils/shortString';
+import { encodeShortString } from '../src/utils/shortString';
+import { isString } from '../src/utils/typed';
 import {
   TEST_TX_VERSION,
   compiledC1Account,
@@ -532,7 +533,7 @@ describe('Cairo 1', () => {
       const comp6a = CallData.compile([cairoResult1]);
       const res6a = (await cairo1Contract.call('enum_result_input', comp6a)) as bigint;
       const res7 = (await cairo1Contract.enum_result_input(
-        new CairoResult<Order, BigNumberish>(CairoResultVariant.Ok, myOrder)
+        new CairoResult<Order, number | bigint>(CairoResultVariant.Ok, myOrder)
       )) as bigint;
       const res7a = (await cairo1Contract.enum_result_input(
         CallData.compile([new CairoResult<Order, BigNumberish>(CairoResultVariant.Ok, myOrder)])
