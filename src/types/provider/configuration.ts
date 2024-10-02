@@ -20,5 +20,3 @@ export type RpcProviderOptions = {
   };
   batch?: false | number;
 };
-
-// export type ChainId = `0x${string}`;
