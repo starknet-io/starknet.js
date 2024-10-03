@@ -18,8 +18,6 @@ import {
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
-const compiledErc20 = contracts.Erc20;
-
 const { isPendingStateUpdate } = provider;
 
 const testProvider = new Provider(getTestProvider());
@@ -38,7 +36,7 @@ describe('defaultProvider', () => {
     expect(testProvider).toBeInstanceOf(Provider);
 
     const { deploy } = await account.declareAndDeploy({
-      contract: compiledErc20,
+      contract: contracts.Erc20,
       constructorCalldata: [encodeShortString('Token'), encodeShortString('ERC20'), wallet],
     });
 

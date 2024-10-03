@@ -3,15 +3,6 @@ import { contracts, getTestAccount, getTestProvider } from './config/fixtures';
 
 const { hexToDecimalString } = num;
 
-const compiledNaming = contracts.starknetId.Naming.sierra;
-const compiledNamingCasm = contracts.starknetId.Naming.casm;
-const compiledPricing = contracts.starknetId.Pricing.sierra;
-const compiledPricingCasm = contracts.starknetId.Pricing.casm;
-const compiledSidMulticall = contracts.starknetId.SidMulticall.sierra;
-const compiledSidMulticallCasm = contracts.starknetId.SidMulticall.casm;
-const compiledStarknetId = contracts.starknetId.StarknetId.sierra;
-const compiledStarknetIdCasm = contracts.starknetId.StarknetId.casm;
-
 describe('deploy and test Wallet', () => {
   const provider = new Provider(getTestProvider());
   const account = getTestAccount(provider);
@@ -23,32 +14,32 @@ describe('deploy and test Wallet', () => {
   beforeAll(async () => {
     // Deploy Starknet id contract
     const idResponse = await account.declareAndDeploy({
-      contract: compiledStarknetId,
-      casm: compiledStarknetIdCasm,
+      contract: contracts.starknetId.StarknetId.sierra,
+      casm: contracts.starknetId.StarknetId.casm,
       constructorCalldata: [account.address, 0],
     });
     identityAddress = idResponse.deploy.contract_address;
 
     // Deploy pricing contract
     const pricingResponse = await account.declareAndDeploy({
-      contract: compiledPricing,
-      casm: compiledPricingCasm,
+      contract: contracts.starknetId.Pricing.sierra,
+      casm: contracts.starknetId.Pricing.casm,
       constructorCalldata: [devnetERC20Address],
     });
     const pricingAddress = pricingResponse.deploy.contract_address;
 
     // Deploy naming contract
     const namingResponse = await account.declareAndDeploy({
-      contract: compiledNaming,
-      casm: compiledNamingCasm,
+      contract: contracts.starknetId.Naming.sierra,
+      casm: contracts.starknetId.Naming.casm,
       constructorCalldata: [identityAddress, pricingAddress, 0, account.address],
     });
     namingAddress = namingResponse.deploy.contract_address;
 
     // Deploy multicall contract
     const multicallResponse = await account.declareAndDeploy({
-      contract: compiledSidMulticall,
-      casm: compiledSidMulticallCasm,
+      contract: contracts.starknetId.SidMulticall.sierra,
+      casm: contracts.starknetId.SidMulticall.casm,
     });
     multicallAddress = multicallResponse.deploy.contract_address;
 

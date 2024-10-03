@@ -4,17 +4,15 @@ import { FeeEstimate } from '../../src/types/provider';
 import { toBigInt, toHex } from '../../src/utils/num';
 import { contracts } from '../config/fixtures';
 
-const compiledAccount = contracts.OpenZeppelinAccount;
-
 describe('stark', () => {
   describe('compressProgram()', () => {
     test('compresses a contract program', () => {
-      const inputProgram = compiledAccount.program;
+      const inputProgram = contracts.OpenZeppelinAccount.program;
       const compressed = stark.compressProgram(inputProgram);
       expect(compressed).toMatchSnapshot();
     });
     test('works with strings', () => {
-      const inputProgram = json.stringify(compiledAccount.program);
+      const inputProgram = json.stringify(contracts.OpenZeppelinAccount.program);
       const compressed = stark.compressProgram(inputProgram);
       expect(compressed).toMatchSnapshot();
     });
@@ -22,10 +20,10 @@ describe('stark', () => {
 
   describe('decompressProgram()', () => {
     test('decompress a contract program', () => {
-      const inputProgram = compiledAccount.program;
+      const inputProgram = contracts.OpenZeppelinAccount.program;
       const compressed = stark.compressProgram(inputProgram);
       const decompressed = stark.decompressProgram(compressed);
-      expect(decompressed).toMatchObject(compiledAccount.program);
+      expect(decompressed).toMatchObject(contracts.OpenZeppelinAccount.program);
     });
   });
 

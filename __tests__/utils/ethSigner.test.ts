@@ -26,16 +26,6 @@ import {
   getTestProvider,
 } from '../config/fixtures';
 
-const compiledErc20 = contracts.Erc20;
-const compiledDummy1Eth = contracts.Dummy1Eth.sierra;
-const compiledDummy1EthCasm = contracts.Dummy1Eth.casm;
-const compiledDummy2Eth = contracts.Dummy2Eth.sierra;
-const compiledDummy2EthCasm = contracts.Dummy2Eth.casm;
-const compiledEthAccount = contracts.EthAccount.sierra;
-const compiledEthCasm = contracts.EthAccount.casm;
-const compiledEthPubk = contracts.EthPubk.sierra;
-const compiledEthPubkCasm = contracts.EthPubk.casm;
-
 describe('Ethereum signer', () => {
   describe('signer', () => {
     test('Generates random PK', () => {
@@ -78,11 +68,15 @@ describe('Ethereum signer', () => {
 
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
-        contract: compiledEthPubk,
-        casm: compiledEthPubkCasm,
+        contract: contracts.EthPubk.sierra,
+        casm: contracts.EthPubk.casm,
       });
 
-      ethPubKContract = new Contract(compiledEthPubk.abi, deploy.contract_address, account);
+      ethPubKContract = new Contract(
+        contracts.EthPubk.sierra.abi,
+        deploy.contract_address,
+        account
+      );
     });
 
     test('secp256k1', async () => {
@@ -107,8 +101,8 @@ describe('Ethereum signer', () => {
     let ethAccount: Account;
     beforeAll(async () => {
       const { transaction_hash: declTH, class_hash: decClassHash } = await account.declareIfNot({
-        contract: compiledEthAccount,
-        casm: compiledEthCasm,
+        contract: contracts.EthAccount.sierra,
+        casm: contracts.EthAccount.casm,
       });
       if (declTH) {
         await provider.waitForTransaction(declTH);
@@ -120,7 +114,7 @@ describe('Ethereum signer', () => {
         addAddressPadding(encode.addHexPrefix(ethFullPublicKey.slice(4, -64)))
       );
       const salt = pubKeyETHx.low;
-      const myCallData = new CallData(compiledEthAccount.abi);
+      const myCallData = new CallData(contracts.EthAccount.sierra.abi);
       const accountETHconstructorCalldata = myCallData.compile('constructor', {
         public_key: ethFullPublicKey,
       });
@@ -159,7 +153,7 @@ describe('Ethereum signer', () => {
     });
 
     test('ETH account transaction V2', async () => {
-      const ethContract2 = new Contract(compiledErc20.abi, devnetETHtokenAddress, ethAccount);
+      const ethContract2 = new Contract(contracts.Erc20.abi, devnetETHtokenAddress, ethAccount);
       const respTransfer = await ethContract2.transfer(
         account.address,
         cairo.uint256(1 * 10 ** 4),
@@ -174,8 +168,8 @@ describe('Ethereum signer', () => {
     });
 
     test('ETH account declaration V2', async () => {
-      const accountTestSierra = compiledDummy1Eth;
-      const accountTestCasm = compiledDummy1EthCasm;
+      const accountTestSierra = contracts.Dummy1Eth.sierra;
+      const accountTestCasm = contracts.Dummy1Eth.casm;
       const { transaction_hash: declTH2, class_hash: decClassHash2 } =
         await ethAccount.declareIfNot(
           { contract: accountTestSierra, casm: accountTestCasm },
@@ -199,8 +193,8 @@ describe('Ethereum signer', () => {
     let ethAccount: Account;
     beforeAll(async () => {
       const { transaction_hash: declTH, class_hash: decClassHash } = await account.declareIfNot({
-        contract: compiledEthAccount,
-        casm: compiledEthCasm,
+        contract: contracts.EthAccount.sierra,
+        casm: contracts.EthAccount.casm,
       });
       if (declTH) {
         await provider.waitForTransaction(declTH);
@@ -212,7 +206,7 @@ describe('Ethereum signer', () => {
         addAddressPadding(encode.addHexPrefix(ethFullPublicKey.slice(4, -64)))
       );
       const salt = pubKeyETHx.low;
-      const myCallData = new CallData(compiledEthAccount.abi);
+      const myCallData = new CallData(contracts.EthAccount.sierra.abi);
       const accountETHconstructorCalldata = myCallData.compile('constructor', {
         public_key: ethFullPublicKey,
       });
@@ -269,7 +263,7 @@ describe('Ethereum signer', () => {
     });
 
     test('ETH account transaction V3', async () => {
-      const strkContract2 = new Contract(compiledErc20.abi, devnetSTRKtokenAddress, ethAccount);
+      const strkContract2 = new Contract(contracts.Erc20.abi, devnetSTRKtokenAddress, ethAccount);
       const txCallData = strkContract2.populate('transfer', [
         account.address,
         cairo.uint256(1 * 10 ** 4),
@@ -294,8 +288,8 @@ describe('Ethereum signer', () => {
     });
 
     test('ETH account declaration V3', async () => {
-      const accountTestSierra = compiledDummy2Eth;
-      const accountTestCasm = compiledDummy2EthCasm;
+      const accountTestSierra = contracts.Dummy2Eth.sierra;
+      const accountTestCasm = contracts.Dummy2Eth.casm;
       const payload: DeclareContractPayload = {
         contract: accountTestSierra,
         casm: accountTestCasm,
