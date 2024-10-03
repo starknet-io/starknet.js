@@ -33,12 +33,6 @@ import {
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
-const compiledErc20Echo = contracts.Erc20Echo;
-const compiledL1L2 = contracts.L1L2;
-const compiledOpenZeppelinAccount = contracts.OpenZeppelinAccount;
-const compiledC1v2 = contracts.C1v2.sierra;
-const compiledC1v2Casm = contracts.C1v2.casm;
-
 describeIfRpc('RPCProvider', () => {
   const rpcProvider = getTestProvider(false);
   const provider = getTestProvider();
@@ -141,7 +135,7 @@ describeIfRpc('RPCProvider', () => {
 
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
-        contract: compiledL1L2,
+        contract: contracts.L1L2,
       });
       l1l2ContractCairo0Address = deploy.contract_address;
     });
@@ -169,8 +163,8 @@ describeIfRpc('RPCProvider', () => {
 
     beforeAll(async () => {
       const { deploy: deploy2 } = await account.declareAndDeploy({
-        contract: compiledC1v2,
-        casm: compiledC1v2Casm,
+        contract: contracts.C1v2.sierra,
+        casm: contracts.C1v2.casm,
       });
       l1l2ContractCairo1Address = deploy2.contract_address;
       await waitNextBlock(provider as RpcProvider, 5000); // in Sepolia Testnet, needs pending block validation before interacting
@@ -323,7 +317,7 @@ describeIfRpc('RPCProvider', () => {
         );
 
         const { deploy } = await account.declareAndDeploy({
-          contract: compiledErc20Echo,
+          contract: contracts.Erc20Echo,
           classHash,
           constructorCalldata: CallData.compile({
             name: felt('Token'),
@@ -337,7 +331,7 @@ describeIfRpc('RPCProvider', () => {
         });
 
         const erc20EchoContract = new Contract(
-          compiledErc20Echo.abi,
+          contracts.Erc20Echo.abi,
           deploy.contract_address!,
           account
         );
@@ -387,7 +381,7 @@ describeIfRpc('RPCProvider', () => {
 
       beforeAll(async () => {
         const { deploy } = await account.declareAndDeploy({
-          contract: compiledOpenZeppelinAccount,
+          contract: contracts.OpenZeppelinAccount,
           constructorCalldata: [accountPublicKey],
           salt: accountPublicKey,
         });

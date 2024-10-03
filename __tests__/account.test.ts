@@ -34,12 +34,6 @@ const { randomAddress } = stark;
 const { uint256 } = cairo;
 const { Signature } = ec.starkCurve;
 
-const compiledErc20 = contracts.Erc20;
-const compiledOpenZeppelinAccount = contracts.OpenZeppelinAccount;
-const compiledTestDapp = contracts.TestDapp;
-const compiledHelloSierra = contracts.HelloSierra.sierra;
-const compiledHelloSierraCasm = contracts.HelloSierra.casm;
-
 describe('deploy and test Wallet', () => {
   const provider = new Provider(getTestProvider());
   const account = getTestAccount(provider);
@@ -53,7 +47,7 @@ describe('deploy and test Wallet', () => {
     expect(account).toBeInstanceOf(Account);
 
     dd = await account.declareAndDeploy({
-      contract: compiledErc20,
+      contract: contracts.Erc20,
       constructorCalldata: [
         encodeShortString('Token'),
         encodeShortString('ERC20'),
@@ -62,17 +56,17 @@ describe('deploy and test Wallet', () => {
     });
 
     erc20Address = dd.deploy.contract_address;
-    erc20 = new Contract(compiledErc20.abi, erc20Address, provider);
+    erc20 = new Contract(contracts.Erc20.abi, erc20Address, provider);
 
     const { balance } = await erc20.balanceOf(account.address);
     expect(BigInt(balance.low).toString()).toStrictEqual(BigInt(1000).toString());
 
     const dappResponse = await account.declareAndDeploy({
-      contract: compiledTestDapp,
+      contract: contracts.TestDapp,
       classHash: '0x04367b26fbb92235e8d1137d19c080e6e650a6889ded726d00658411cc1046f5',
     });
 
-    dapp = new Contract(compiledTestDapp.abi, dappResponse.deploy.contract_address!, provider);
+    dapp = new Contract(contracts.TestDapp.abi, dappResponse.deploy.contract_address!, provider);
   });
 
   xtest('validate TS for redeclare - skip testing', async () => {
@@ -123,7 +117,7 @@ describe('deploy and test Wallet', () => {
 
       // declare account
       const declareAccount = await account.declareIfNot({
-        contract: compiledOpenZeppelinAccount,
+        contract: contracts.OpenZeppelinAccount,
       });
       const accountClassHash = declareAccount.class_hash;
 
@@ -252,7 +246,7 @@ describe('deploy and test Wallet', () => {
         const invocation = await provider.prepareInvocations([
           {
             type: TransactionType.DECLARE,
-            contract: compiledErc20,
+            contract: contracts.Erc20,
           },
         ]);
         if (invocation.length) {
@@ -266,8 +260,8 @@ describe('deploy and test Wallet', () => {
       const invocation = await provider.prepareInvocations([
         {
           type: TransactionType.DECLARE,
-          contract: compiledHelloSierra,
-          casm: compiledHelloSierraCasm,
+          contract: contracts.HelloSierra.sierra,
+          casm: contracts.HelloSierra.casm,
         },
       ]);
 
@@ -313,7 +307,7 @@ describe('deploy and test Wallet', () => {
     });
     test('simulate DEPLOY_ACCOUNT - Cairo 0 Account', async () => {
       const declareAccount = await account.declareIfNot({
-        contract: compiledOpenZeppelinAccount,
+        contract: contracts.OpenZeppelinAccount,
       });
       const accountClassHash = declareAccount.class_hash;
       if (declareAccount.transaction_hash) {
@@ -482,7 +476,7 @@ describe('deploy and test Wallet', () => {
 
     test('Declare ERC20 contract', async () => {
       const declareTx = await account.declareIfNot({
-        contract: compiledErc20,
+        contract: contracts.Erc20,
         classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
       });
       if (declareTx.transaction_hash) {
@@ -495,7 +489,7 @@ describe('deploy and test Wallet', () => {
   describe('Declare and UDC Deploy Flow', () => {
     test('ERC20 Declare', async () => {
       const declareTx = await account.declareIfNot({
-        contract: compiledErc20,
+        contract: contracts.Erc20,
       });
 
       if (declareTx.transaction_hash) {
@@ -587,7 +581,7 @@ describe('deploy and test Wallet', () => {
 
     beforeAll(async () => {
       const declareAccount = await account.declareIfNot({
-        contract: compiledOpenZeppelinAccount,
+        contract: contracts.OpenZeppelinAccount,
       });
       accountClassHash = declareAccount.class_hash;
       if (declareAccount.transaction_hash) {
@@ -707,8 +701,8 @@ describe('deploy and test Wallet', () => {
         });
 
         const hashes = extractContractHashes({
-          contract: compiledHelloSierra,
-          casm: compiledHelloSierraCasm,
+          contract: contracts.HelloSierra.sierra,
+          casm: contracts.HelloSierra.casm,
         });
 
         const isDeclaredCairo1 = await account.isClassDeclared({ classHash: hashes.classHash });
@@ -745,7 +739,7 @@ describe('deploy and test Wallet', () => {
                   // Cairo 0
                   type: TransactionType.DECLARE,
                   payload: {
-                    contract: compiledErc20,
+                    contract: contracts.Erc20,
                     classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
                   },
                 },
@@ -756,8 +750,8 @@ describe('deploy and test Wallet', () => {
                 {
                   // Cairo 1.1.0, if declared estimate error with can't redeclare same contract
                   type: TransactionType.DECLARE,
-                  contract: compiledHelloSierra,
-                  casm: compiledHelloSierraCasm,
+                  contract: contracts.HelloSierra.sierra,
+                  casm: contracts.HelloSierra.casm,
                 },
               ]
             : []),
@@ -800,15 +794,15 @@ describe('deploy and test Wallet', () => {
             // Cairo 0
             type: TransactionType.DECLARE,
             payload: {
-              contract: compiledErc20,
+              contract: contracts.Erc20,
               classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
             },
           },
           {
             // Cairo 1.1.0, if declared estimate error with can't redeclare same contract
             type: TransactionType.DECLARE,
-            contract: compiledHelloSierra,
-            casm: compiledHelloSierraCasm,
+            contract: contracts.HelloSierra.sierra,
+            casm: contracts.HelloSierra.casm,
           },
         ]);
 
@@ -825,8 +819,8 @@ describe('deploy and test Wallet', () => {
       // TODO @dhruvkelawala check expectation for feeTransactionVersion
       // Cairo 1 contract
       const ddc1: DeclareDeployUDCResponse = await account.declareAndDeploy({
-        contract: compiledHelloSierra,
-        casm: compiledHelloSierraCasm,
+        contract: contracts.HelloSierra.sierra,
+        casm: contracts.HelloSierra.casm,
       });
 
       // const innerInvokeEstFeeSpy = jest.spyOn(account.signer, 'signTransaction');
@@ -851,21 +845,21 @@ describe('unit', () => {
 
     test('declareIfNot', async () => {
       const declare = await account.declareIfNot({
-        contract: compiledHelloSierra,
-        casm: compiledHelloSierraCasm,
+        contract: contracts.HelloSierra.sierra,
+        casm: contracts.HelloSierra.casm,
       });
       expect(declare).toMatchSchemaRef('DeclareContractResponse');
 
       await expect(
         account.declare({
-          contract: compiledHelloSierra,
-          casm: compiledHelloSierraCasm,
+          contract: contracts.HelloSierra.sierra,
+          casm: contracts.HelloSierra.casm,
         })
       ).rejects.toThrow();
 
       const redeclare = await account.declareIfNot({
-        contract: compiledHelloSierra,
-        casm: compiledHelloSierraCasm,
+        contract: contracts.HelloSierra.sierra,
+        casm: contracts.HelloSierra.casm,
       });
       expect(redeclare.class_hash).toBe(declare.class_hash);
     });

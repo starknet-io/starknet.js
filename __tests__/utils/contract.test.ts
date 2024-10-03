@@ -1,25 +1,21 @@
 import { isSierra, extractContractHashes } from '../../src/utils/contract';
 import { contracts } from '../config/fixtures';
 
-const compiledErc20 = contracts.Erc20;
-const compiledHelloSierra = contracts.HelloSierra.sierra;
-const compiledHelloSierraCasm = contracts.HelloSierra.casm;
-
 describe('isSierra', () => {
   test('should return true for a contract in Sierra format', () => {
-    expect(isSierra(compiledHelloSierra)).toBe(true);
+    expect(isSierra(contracts.HelloSierra.sierra)).toBe(true);
   });
 
   test('should return false for a contract not in Sierra format', () => {
-    expect(isSierra(compiledErc20)).toBe(false);
+    expect(isSierra(contracts.Erc20)).toBe(false);
   });
 });
 
 describe('extractContractHashes', () => {
   test('should properly extract hashes from contract', () => {
     const declareContractPayload = {
-      contract: compiledHelloSierra,
-      casm: compiledHelloSierraCasm,
+      contract: contracts.HelloSierra.sierra,
+      casm: contracts.HelloSierra.casm,
     };
     const result = extractContractHashes(declareContractPayload);
 
