@@ -80,6 +80,12 @@ export const compiledSidMulticall = readContractSierra('starknetId/multicall/mul
 export const compiledSidMulticallCasm = readContractSierraCasm('starknetId/multicall/multicall');
 export const compiledNonZero = readContractSierra('cairo/cairo263/zeroable.sierra');
 export const compiledNonZeroCasm = readContractSierraCasm('cairo/cairo263/zeroable');
+export const compiledOnlyConstructorSierra = readContractSierra(
+  'cairo/onlyConstructor/onlyConstructor.sierra'
+);
+export const compiledOnlyConstructorCasm = readContractSierraCasm(
+  'cairo/onlyConstructor/onlyConstructor'
+);
 
 export function getTestProvider(
   isProvider?: true,

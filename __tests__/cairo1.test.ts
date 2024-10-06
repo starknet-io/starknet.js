@@ -24,6 +24,8 @@ import {
   compiledComplexSierra,
   compiledHelloSierra,
   compiledHelloSierraCasm,
+  compiledOnlyConstructorSierra,
+  compiledOnlyConstructorCasm,
   describeIfDevnet,
   getTestAccount,
   getTestProvider,
@@ -40,6 +42,7 @@ describeIfDevnet('Cairo 1 Devnet', () => {
     const account = getTestAccount(provider);
     let dd: DeclareDeployUDCResponse;
     let cairo1Contract: Contract;
+    let onlyConstructorContract: Contract;
     initializeMatcher(expect);
 
     beforeAll(async () => {
@@ -49,6 +52,18 @@ describeIfDevnet('Cairo 1 Devnet', () => {
       });
 
       cairo1Contract = new Contract(compiledHelloSierra.abi, dd.deploy.contract_address, account);
+
+      const ddOnlyConstructor = await account.declareAndDeploy({
+        contract: compiledOnlyConstructorSierra,
+        casm: compiledOnlyConstructorCasm,
+        constructorCalldata: [101, account.address],
+      });
+
+      onlyConstructorContract = new Contract(
+        compiledOnlyConstructorSierra.abi,
+        ddOnlyConstructor.deploy.contract_address,
+        account
+      );
     });
 
     test('Declare & deploy v2 - Hello Cairo 1 contract', async () => {
@@ -105,9 +120,14 @@ describeIfDevnet('Cairo 1 Devnet', () => {
     });
 
     test('isCairo1', async () => {
-      const isContractCairo1 = cairo1Contract.isCairo1();
+      let isContractCairo1 = cairo1Contract.isCairo1();
       expect(isContractCairo1).toBe(true);
-      const isAbiCairo1 = isCairo1Abi(cairo1Contract.abi);
+      let isAbiCairo1 = isCairo1Abi(cairo1Contract.abi);
+      expect(isAbiCairo1).toBe(true);
+
+      isContractCairo1 = onlyConstructorContract.isCairo1();
+      expect(isContractCairo1).toBe(true);
+      isAbiCairo1 = isCairo1Abi(onlyConstructorContract.abi);
       expect(isAbiCairo1).toBe(true);
     });
 

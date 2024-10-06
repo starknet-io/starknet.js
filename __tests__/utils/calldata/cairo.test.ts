@@ -28,7 +28,13 @@ import {
   felt,
 } from '../../../src/utils/calldata/cairo';
 import { ETH_ADDRESS, Literal, Uint, type ContractVersion, NON_ZERO_PREFIX } from '../../../src';
-import { getFunctionAbi, getAbiEnums, getAbiStructs, getInterfaceAbi } from '../../factories/abi';
+import {
+  getFunctionAbi,
+  getAbiEnums,
+  getAbiStructs,
+  getInterfaceAbi,
+  getConstructorAbi,
+} from '../../factories/abi';
 
 describe('isLen', () => {
   test('should return true if name ends with "_len"', () => {
@@ -252,6 +258,10 @@ describe('isCairo1Abi', () => {
 
   test('should return false if ABI comes from Cairo 0 contract', () => {
     expect(isCairo1Abi([getFunctionAbi('felt')])).toEqual(false);
+  });
+
+  test('should return false if ABI comes from Cairo 0 contract', () => {
+    expect(isCairo1Abi([getConstructorAbi('felt')])).toEqual(false);
   });
 
   test('should throw an error if ABI does not come from Cairo 1 contract ', () => {
