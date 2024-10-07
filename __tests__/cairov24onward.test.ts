@@ -16,20 +16,7 @@ import {
 } from '../src';
 import { hexToDecimalString } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
-import {
-  compiledC240,
-  compiledC240Casm,
-  compiledC260,
-  compiledC260Casm,
-  compiledNonZero,
-  compiledNonZeroCasm,
-  compiledTuple,
-  compiledTupleCasm,
-  compiledU512,
-  compiledU512Casm,
-  getTestAccount,
-  getTestProvider,
-} from './config/fixtures';
+import { contracts, getTestAccount, getTestProvider } from './config/fixtures';
 
 describe('Cairo v2.4 onwards', () => {
   const provider = getTestProvider();
@@ -40,11 +27,11 @@ describe('Cairo v2.4 onwards', () => {
 
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
-        contract: compiledC240,
-        casm: compiledC240Casm,
+        contract: contracts.C240.sierra,
+        casm: contracts.C240.casm,
       });
 
-      stringContract = new Contract(compiledC240.abi, deploy.contract_address, account);
+      stringContract = new Contract(contracts.C240.sierra.abi, deploy.contract_address, account);
     });
 
     test('bytes31', async () => {
@@ -55,7 +42,7 @@ describe('Cairo v2.4 onwards', () => {
       expect(callD1).toEqual([hexToDecimalString(encodeShortString(str))]);
       const callD2 = CallData.compile({ str });
       expect(callD2).toEqual([hexToDecimalString(encodeShortString(str))]);
-      const myCallData = new CallData(compiledC240.abi);
+      const myCallData = new CallData(contracts.C240.sierra.abi);
       const myCalldata1 = myCallData.compile('proceed_bytes31', [str]);
       expect(myCalldata1).toEqual([encodeShortString(str)]);
       const myCalldata2 = myCallData.compile('proceed_bytes31', { str });
@@ -108,11 +95,11 @@ describe('Cairo v2.4 onwards', () => {
 
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
-        contract: compiledTuple,
-        casm: compiledTupleCasm,
+        contract: contracts.Tuple.sierra,
+        casm: contracts.Tuple.casm,
       });
 
-      tupleContract = new Contract(compiledTuple.abi, deploy.contract_address, account);
+      tupleContract = new Contract(contracts.Tuple.sierra.abi, deploy.contract_address, account);
       myCallData = new CallData(tupleContract.abi);
     });
 
@@ -224,8 +211,8 @@ describe('Cairo v2.4 onwards', () => {
   describe('Cairo2.6.0 Sierra1.5.0', () => {
     test('declare Sierra 1.5.0', async () => {
       const declare260Response = await account.declareIfNot({
-        contract: compiledC260,
-        casm: compiledC260Casm,
+        contract: contracts.C260.sierra,
+        casm: contracts.C260.casm,
       });
       expect(declare260Response.class_hash).toBe(
         '0x6184f1a71cad4bd123ff8bb3b97dc9ec876ced6489d9479cfdaada81a2f06d6'
@@ -247,11 +234,11 @@ describe('Cairo v2.4 onwards', () => {
 
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
-        contract: compiledU512,
-        casm: compiledU512Casm,
+        contract: contracts.U512.sierra,
+        casm: contracts.U512.casm,
       });
 
-      u512Contract = new Contract(compiledU512.abi, deploy.contract_address, account);
+      u512Contract = new Contract(contracts.U512.sierra.abi, deploy.contract_address, account);
     });
 
     test('u512 compile', async () => {
@@ -323,10 +310,14 @@ describe('Cairo v2.4 onwards', () => {
 
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
-        contract: compiledNonZero,
-        casm: compiledNonZeroCasm,
+        contract: contracts.NonZero.sierra,
+        casm: contracts.NonZero.casm,
       });
-      nonZeroContract = new Contract(compiledNonZero.abi, deploy.contract_address, account);
+      nonZeroContract = new Contract(
+        contracts.NonZero.sierra.abi,
+        deploy.contract_address,
+        account
+      );
     });
 
     test('NonZero helpers', async () => {
