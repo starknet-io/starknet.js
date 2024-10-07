@@ -1,3 +1,9 @@
+## [6.14.1](https://github.com/starknet-io/starknet.js/compare/v6.14.0...v6.14.1) (2024-09-30)
+
+### Bug Fixes
+
+- adjust module configuration ([47e52cf](https://github.com/starknet-io/starknet.js/commit/47e52cf39a71bf99188edc4991b002018e296504))
+
 # [6.14.0](https://github.com/starknet-io/starknet.js/compare/v6.13.1...v6.14.0) (2024-09-04)
 
 ### Features
