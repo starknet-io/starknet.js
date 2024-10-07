@@ -10,7 +10,7 @@ export const INT_8_MAX = (1n << 7n) - 1n;
 export const INT_8_MIN = -(1n << 7n) + 1n;
 const abiSelector = 'core::integer::i8';
 
-export class Cairoint8 extends CairoInt {
+export class CairoInt8 extends CairoInt {
   /**
    * Default constructor (Lib usage)
    * @param bigNumberish BigNumberish value representing i8
@@ -32,7 +32,7 @@ export class Cairoint8 extends CairoInt {
    */
   static is(bigNumberish: BigNumberish) {
     try {
-      Cairoint8.validate(bigNumberish);
+      CairoInt8.validate(bigNumberish);
     } catch (error) {
       return false;
     }
