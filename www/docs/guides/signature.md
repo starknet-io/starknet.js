@@ -228,7 +228,7 @@ import type Transport from '@ledgerhq/hw-transport'; // type for the transporter
 In a Web DAPP, take care that some browsers are not compatible (FireFox, ...), and that the Bluetooth is not working in all cases and in all operating systems.
 
 :::note
-The last version of the Ledger Starknet APP (v1.1.1) only supports blind signing of the hash of your action. Sign only hashes from a code that you trust.
+The last version of the Ledger Starknet APP (v2.1.0) supports explained V1 (ETH) & V3 (STRK) transactions, and blind signing of the hash for declare & deploy account. Sign only hashes from a code that you trust.
 :::
 
 For example, for a Node script :
@@ -236,7 +236,7 @@ For example, for a Node script :
 ```typescript
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid';
 const myLedgerTransport: Transport = await TransportNodeHid.create();
-const myLedgerSigner = new LedgerSigner(myLedgerTransport, 0);
+const myLedgerSigner = new LedgerSigner210(myLedgerTransport, 0);
 const pubK = await myLedgerSigner.getPubKey();
 const fullPubK = await myLedgerSigner.getFullPubKey();
 // ...
@@ -250,7 +250,7 @@ The Ledger shall be connected, unlocked, with the Starknet internal APP activate
 :::
 
 Some complete examples :  
-A Node script : [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/ledgerNano/5.testLedgerAccount.ts).  
+A Node script : [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/ledgerNano/6.testLedgerAccount210.ts).  
 A test Web DAPP, to use in devnet-rs network : [here](https://github.com/PhilippeR26/Starknet-Ledger-Wallet).
 
 If you want to read the version of the Ledger Starknet APP :
@@ -260,3 +260,18 @@ const resp = await myLedgerTransport.send(Number('0x5a'), 0, 0, 0);
 const appVersion = resp[0] + '.' + resp[1] + '.' + resp[2];
 console.log('version=', appVersion);
 ```
+
+:::note
+You have also in Starknet.js a signer for the old v1.1.1 Ledger Starknet APP.
+
+```typescript
+const myLedgerSigner = new LedgerSigner111(myLedgerTransport, 0);
+```
+
+If you want to use the accounts created with the v1.1.1, using the v2.1.0 :
+
+```typescript
+const myLedgerSigner = new LedgerSigner210(myLedgerTransport, 0, undefined, getLedgerPathBuffer111);
+```
+
+:::

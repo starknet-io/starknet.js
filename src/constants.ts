@@ -82,3 +82,7 @@ export const SNIP9_V1_INTERFACE_ID =
   '0x68cfd18b92d1907b8ba3cc324900277f5a3622099431ea85dd8089255e4181';
 export const SNIP9_V2_INTERFACE_ID =
   '0x1d1144bb2138366ff28d8e9ab57456b1d332ac42196230c3a602003c89872';
+
+// Ledger signer
+export const HARDENING_BYTE = Number('0x80');
+export const HARDENING_4BYTES = BigInt('0x80000000');
