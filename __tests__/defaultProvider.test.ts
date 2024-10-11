@@ -10,7 +10,7 @@ import {
 import { toBigInt } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import {
-  compiledErc20,
+  contracts,
   erc20ClassHash,
   getTestAccount,
   getTestProvider,
@@ -36,7 +36,7 @@ describe('defaultProvider', () => {
     expect(testProvider).toBeInstanceOf(Provider);
 
     const { deploy } = await account.declareAndDeploy({
-      contract: compiledErc20,
+      contract: contracts.Erc20,
       constructorCalldata: [encodeShortString('Token'), encodeShortString('ERC20'), wallet],
     });
 

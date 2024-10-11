@@ -20,19 +20,23 @@ Outside Execution provides several benefits:
 The account that will sign the outside transaction has to be compatible with SNIP-9 (V1 or V2).  
 At mid-2024 :
 
-|    account     | compatibility |
-| :------------: | :-----------: |
-| ArgentX v0.3.0 |      v1       |
-| ArgentX v0.4.0 |      v2       |
-| Braavos v1.0.0 |      v2       |
-|  OpenZeppelin  |      ❌       |
+|       account        | compatibility |
+| :------------------: | :-----------: |
+|    ArgentX v0.3.0    |      v1       |
+|    ArgentX v0.4.0    |      v2       |
+|    Braavos v1.0.0    |      v2       |
+| OpenZeppelin v0.17.0 |    v2 (\*)    |
+
+> (\*): only OpenZeppelin accounts including the `src9` component :  
+> Starknet account: class = [0x540d7f5ec7ecf317e68d48564934cb99259781b1ee3cedbbc37ec5337f8e688](https://voyager.online/class/0x0540d7f5ec7ecf317e68d48564934cb99259781b1ee3cedbbc37ec5337f8e688)  
+> ETH account: class = [0x3940bc18abf1df6bc540cabadb1cad9486c6803b95801e57b6153ae21abfe06](https://voyager.online/class/0x3940bc18abf1df6bc540cabadb1cad9486c6803b95801e57b6153ae21abfe06)
 
 Before using Outside Execution, check if the account that will sign the transaction supports SNIP-9:
 
 ```typescript
 const signerAccount = new Account(myProvider, accountAddress, privateKey);
 const version = await signerAccount.getSnip9Version();
-if (version === EOutsideExecutionVersion.UNSUPPORTED) {
+if (version === OutsideExecutionVersion.UNSUPPORTED) {
   throw new Error('This account is not SNIP-9 compatible.');
 }
 ```

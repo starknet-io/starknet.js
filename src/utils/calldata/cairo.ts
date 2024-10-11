@@ -203,14 +203,16 @@ export function getAbiContractVersion(abi: Abi): ContractVersion {
 
   // determine by function io types "Cairo 1.1" or "Cairo 0.0"
   // find first function with inputs or outputs
-  const testFunction = abi.find(
-    (it) => it.type === 'function' && (it.inputs.length || it.outputs.length)
+  const testSubject = abi.find(
+    (it) =>
+      (it.type === 'function' || it.type === 'constructor') &&
+      (it.inputs.length || it.outputs.length)
   );
 
-  if (!testFunction) {
+  if (!testSubject) {
     return { cairo: undefined, compiler: undefined };
   }
-  const io = testFunction.inputs.length ? testFunction.inputs : testFunction.outputs;
+  const io = testSubject.inputs.length ? testSubject.inputs : testSubject.outputs;
   if (isCairo1Type(io[0].type)) {
     return { cairo: '1', compiler: '1' };
   }

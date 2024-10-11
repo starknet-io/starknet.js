@@ -10,6 +10,13 @@ export const getFunctionAbi = (inputsType: string): FunctionAbi => ({
   type: 'function',
 });
 
+export const getConstructorAbi = (inputsType: string): FunctionAbi => ({
+  inputs: [getAbiEntry(inputsType)],
+  name: 'test',
+  outputs: [getAbiEntry(inputsType)],
+  type: 'constructor',
+});
+
 export const getInterfaceAbi = (functionAbiType: string = 'struct'): InterfaceAbi => ({
   items: [getFunctionAbi(functionAbiType)],
   name: 'test_interface_abi',

@@ -15,15 +15,7 @@ import { getSelectorFromName } from '../src/utils/hash';
 import { hexToDecimalString, toBigInt } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import { uint256ToBN } from '../src/utils/uint256';
-import {
-  compiledErc20,
-  compiledErc20Echo,
-  compiledMulticall,
-  compiledTypeTransformation,
-  describeIfDevnet,
-  getTestAccount,
-  getTestProvider,
-} from './config/fixtures';
+import { contracts, describeIfDevnet, getTestAccount, getTestProvider } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
 describe('contract module', () => {
@@ -42,19 +34,19 @@ describe('contract module', () => {
 
       beforeAll(async () => {
         const { deploy } = await account.declareAndDeploy({
-          contract: compiledErc20,
+          contract: contracts.Erc20,
           classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
           constructorCalldata,
         });
 
-        erc20Contract = new Contract(compiledErc20.abi, deploy.contract_address!, provider);
+        erc20Contract = new Contract(contracts.Erc20.abi, deploy.contract_address!, provider);
 
         const { deploy: multicallDeploy } = await account.declareAndDeploy({
-          contract: compiledMulticall,
+          contract: contracts.Multicall,
         });
 
         multicallContract = new Contract(
-          compiledMulticall.abi,
+          contracts.Multicall.abi,
           multicallDeploy.contract_address!,
           provider
         );
@@ -118,7 +110,7 @@ describe('contract module', () => {
       let factory: ContractFactory;
       beforeAll(async () => {
         factory = new ContractFactory({
-          compiledContract: compiledErc20Echo,
+          compiledContract: contracts.Erc20Echo,
           classHash: factoryClassHash,
           account,
         });
@@ -161,11 +153,11 @@ describe('contract module', () => {
 
       beforeAll(async () => {
         const { deploy } = await account.declareAndDeploy({
-          contract: compiledTypeTransformation,
+          contract: contracts.TypeTransformation,
         });
 
         typeTransformedContract = new Contract(
-          compiledTypeTransformation.abi,
+          contracts.TypeTransformation.abi,
           deploy.contract_address!,
           provider
         );
@@ -269,17 +261,25 @@ describe('contract module', () => {
   describe('class ContractFactory {}', () => {
     beforeAll(async () => {
       await account.declareAndDeploy({
-        contract: compiledErc20,
+        contract: contracts.Erc20,
         constructorCalldata,
       });
     });
     test('deployment of new contract', async () => {
-      const factory = new ContractFactory({ compiledContract: compiledErc20, classHash, account });
+      const factory = new ContractFactory({
+        compiledContract: contracts.Erc20,
+        classHash,
+        account,
+      });
       const erc20 = await factory.deploy('Token', 'ERC20', wallet);
       expect(erc20).toBeInstanceOf(Contract);
     });
     test('wait for deployment transaction', async () => {
-      const factory = new ContractFactory({ compiledContract: compiledErc20, classHash, account });
+      const factory = new ContractFactory({
+        compiledContract: contracts.Erc20,
+        classHash,
+        account,
+      });
       const contract = await factory.deploy(
         CallData.compile({
           name: encodeShortString('Token'),
@@ -290,7 +290,11 @@ describe('contract module', () => {
       await expect(contract.deployed()).resolves.not.toThrow();
     });
     test('attach new contract', async () => {
-      const factory = new ContractFactory({ compiledContract: compiledErc20, classHash, account });
+      const factory = new ContractFactory({
+        compiledContract: contracts.Erc20,
+        classHash,
+        account,
+      });
       const erc20 = factory.attach(erc20Address);
       expect(erc20).toBeInstanceOf(Contract);
     });
@@ -305,7 +309,7 @@ describe('Complex interaction', () => {
   let factory: ContractFactory;
 
   beforeAll(async () => {
-    factory = new ContractFactory({ compiledContract: compiledErc20Echo, classHash, account });
+    factory = new ContractFactory({ compiledContract: contracts.Erc20Echo, classHash, account });
     erc20Echo20Contract = await factory.deploy(
       'Token',
       'ERC20',
@@ -325,7 +329,7 @@ describe('Complex interaction', () => {
   describeIfDevnet('speedup live tests', () => {
     test('declareDeploy with callData - all types using felt,uint256,tuple helpers', async () => {
       const { deploy } = await account.declareAndDeploy({
-        contract: compiledErc20Echo,
+        contract: contracts.Erc20Echo,
         classHash,
         constructorCalldata: CallData.compile({
           name: felt('Token'),
@@ -338,7 +342,11 @@ describe('Complex interaction', () => {
         }),
       });
 
-      erc20Echo20Contract = new Contract(compiledErc20Echo.abi, deploy.contract_address!, provider);
+      erc20Echo20Contract = new Contract(
+        contracts.Erc20Echo.abi,
+        deploy.contract_address!,
+        provider
+      );
       expect(erc20Echo20Contract).toBeInstanceOf(Contract);
     });
 
