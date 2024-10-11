@@ -7,4 +7,4 @@ export {
   LedgerSigner111 as LedgerSigner,
   getLedgerPathBuffer111 as getLedgerPathBuffer,
 } from './ledgerSigner111';
-export { LedgerSigner210, getLedgerPathBuffer210 } from './ledgerSigner210';
+export { LedgerSigner211, getLedgerPathBuffer211 } from './ledgerSigner211';

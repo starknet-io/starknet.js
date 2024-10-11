@@ -11,7 +11,7 @@ import {
   eth,
   extractContractHashes,
   getLedgerPathBuffer111,
-  getLedgerPathBuffer210,
+  getLedgerPathBuffer211,
   hash,
   num,
   stark,
@@ -372,7 +372,7 @@ describe('Ledger Signer', () => {
 
   // Ledger APP v2.1.0
   test('getLedgerPathBuffer', () => {
-    const path = getLedgerPathBuffer210(3, 'AstroAPP');
+    const path = getLedgerPathBuffer211(3, 'AstroAPP');
     expect(path).toEqual(
       new Uint8Array([
         128, 0, 10, 85, 199, 65, 233, 201, 223, 192, 123, 107, 128, 0, 0, 0, 128, 0, 0, 3, 0, 0, 0,
