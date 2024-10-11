@@ -208,7 +208,7 @@ describe('Cairo v2.4 onwards', () => {
     });
   });
 
-  describe('Cairo2.6.0 Sierra1.5.0', () => {
+  describe('Cairo v2.6.0 Sierra1.5.0', () => {
     test('declare Sierra 1.5.0', async () => {
       const declare260Response = await account.declareIfNot({
         contract: contracts.C260.sierra,
@@ -373,6 +373,23 @@ describe('Cairo v2.4 onwards', () => {
       await expect(nonZeroContract.call('send_nonZero_u256', [[10, 20]])).rejects.toThrow();
       const myU512 = new CairoUint512('0x2345634576575478edc243');
       await expect(nonZeroContract.call('send_nonZero_u256', [myU512])).rejects.toThrow();
+    });
+  });
+
+  describe('Cairo v282 u96', () => {
+    let u96Contract: Contract;
+
+    beforeAll(async () => {
+      const { deploy } = await account.declareAndDeploy({
+        contract: contracts.U96.sierra,
+        casm: contracts.U96.casm,
+      });
+      u96Contract = new Contract(contracts.U96.sierra.abi, deploy.contract_address, account);
+    });
+    test('u96', async () => {
+      const value = 2n ** 80n;
+      const res0 = await u96Contract.call('test_u96', [value]);
+      expect(res0).toBe(value + 1n);
     });
   });
 });
