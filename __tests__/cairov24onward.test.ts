@@ -386,7 +386,22 @@ describe('Cairo v2.4 onwards', () => {
       });
       u96Contract = new Contract(contracts.U96.sierra.abi, deploy.contract_address, account);
     });
-    test('u96', async () => {
+
+    test('u96 compile', async () => {
+      const myU96: bigint = 2n ** 90n;
+      const expectedValue = '1237940039285380274899124224';
+      const myCalldata1 = CallData.compile([myU96]);
+      expect(myCalldata1).toEqual([expectedValue]);
+      const myCallData = new CallData(u96Contract.abi);
+      const myCalldata = myCallData.compile('test_u96', {
+        inp: myU96,
+      });
+      expect(myCalldata).toEqual([expectedValue]);
+      const myCall = u96Contract.populate('test_u96', { inp: myU96 });
+      expect(myCall.calldata).toEqual([expectedValue]);
+    });
+
+    test('u96 call', async () => {
       const value = 2n ** 80n;
       const res0 = await u96Contract.call('test_u96', [value]);
       expect(res0).toBe(value + 1n);
