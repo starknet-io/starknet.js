@@ -376,7 +376,7 @@ describe('Cairo v2.4 onwards', () => {
     });
   });
 
-  describe('Cairo v282 u96', () => {
+  describe('Cairo v2.8.2 u96', () => {
     let u96Contract: Contract;
 
     beforeAll(async () => {
