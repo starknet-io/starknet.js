@@ -74,6 +74,12 @@ export const toHexString = toHex;
  * A storage key is represented as up to 62 hex digits, 3 bits, and 5 leading zeroes:
  * `0x0 + [0-7] + 62 hex = 0x + 64 hex`
  * @returns format: storage-key-string
+ * @example
+ * ```typescript
+ * toStorageKey(0x123); // '0x0000000000000000000000000000000000000000000000000000000000000123'
+ * toStorageKey(123); // '0x000000000000000000000000000000000000000000000000000000000000007b'
+ * toStorageKey('test'); // 'Error'
+ * ```
  */
 export function toStorageKey(number: BigNumberish): string {
   // TODO: This is not completely correct as it will not enforce first 0 and second [0-7], 0x82bda... will pass as valid and should be false
@@ -86,6 +92,12 @@ export function toStorageKey(number: BigNumberish): string {
  * Similar as toStorageKey but conforming to exactly 0x(64 hex chars).
  *
  * @returns format: hex-0x(64)-string
+ * @example
+ * ```typescript
+ * toHex64(123); // '0x000000000000000000000000000000000000000000000000000000000000007b'
+ * toHex64(123n); // '0x000000000000000000000000000000000000000000000000000000000000007b'
+ * toHex64('test'); // 'Error'
+ * ```
  */
 export function toHex64(number: BigNumberish): string {
   const res = addHexPrefix(toBigInt(number).toString(16).padStart(64, '0'));
