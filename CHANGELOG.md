@@ -1,3 +1,9 @@
+# [6.15.0](https://github.com/starknet-io/starknet.js/compare/v6.14.1...v6.15.0) (2024-10-16)
+
+### Features
+
+- num.toHex64 ensure 0x(64 char) format ([#1222](https://github.com/starknet-io/starknet.js/issues/1222)) ([56020cd](https://github.com/starknet-io/starknet.js/commit/56020cdbcd9d1cbe7d58d66b554790bbea8762fe))
+
 ## [6.14.1](https://github.com/starknet-io/starknet.js/compare/v6.14.0...v6.14.1) (2024-09-30)
 
 ### Bug Fixes
