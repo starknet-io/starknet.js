@@ -38,16 +38,15 @@ import { StarknetChainId } from '../constants';
 
 // Represent 'Selected Active' Account inside Connected Wallet
 export class WalletAccount extends Account implements AccountInterface {
-  public address: string = '';
-
   public walletProvider: StarknetWalletProvider;
 
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
+    address: string,
     walletProvider: StarknetWalletProvider,
     cairoVersion?: CairoVersion
   ) {
-    super(providerOrOptions, '', '', cairoVersion); // At this point unknown address
+    super(providerOrOptions, address, '', cairoVersion); // At this point unknown address
     this.walletProvider = walletProvider;
 
     // Update Address on change
@@ -63,18 +62,6 @@ export class WalletAccount extends Account implements AccountInterface {
       // At the moment channel is stateless but it could change
       this.channel.setChainId(res as StarknetChainId);
     });
-
-    // Get and Set Address !!! Post constructor initial empty string
-    walletProvider
-      .request({
-        type: 'wallet_requestAccounts',
-        params: {
-          silent_mode: false,
-        },
-      })
-      .then((res) => {
-        this.address = res[0].toLowerCase();
-      });
   }
 
   /**
@@ -168,6 +155,36 @@ export class WalletAccount extends Account implements AccountInterface {
 
   override signMessage(typedData: TypedData): Promise<Signature> {
     return signMessage(this.walletProvider, typedData);
+  }
+
+  static async connect(
+    provider: ProviderInterface,
+    walletProvider: StarknetWalletProvider,
+    cairoVersion?: CairoVersion
+  ) {
+    const [accountAddress] = await walletProvider.request({
+      type: 'wallet_requestAccounts',
+      params: {
+        silent_mode: false,
+      },
+    });
+
+    return new WalletAccount(provider, accountAddress, walletProvider, cairoVersion);
+  }
+
+  static async connectSilent(
+    provider: ProviderInterface,
+    walletProvider: StarknetWalletProvider,
+    cairoVersion?: CairoVersion
+  ) {
+    const [accountAddress] = await walletProvider.request({
+      type: 'wallet_requestAccounts',
+      params: {
+        silent_mode: true,
+      },
+    });
+
+    return new WalletAccount(provider, accountAddress, walletProvider, cairoVersion);
   }
 
   // TODO: MISSING ESTIMATES
