@@ -1,8 +1,8 @@
-import { StarknetChainId } from '../constants';
 import { ETransactionVersion, ETransactionVersion2, ETransactionVersion3 } from './api';
 import {
   BigNumberish,
   CairoVersion,
+  ChainId,
   DeployAccountContractPayload,
   InvocationsDetails,
   V3TransactionDetails,
@@ -16,7 +16,7 @@ export type InvocationsSignerDetails = (V2InvocationsSignerDetails | V3Invocatio
 export type V2InvocationsSignerDetails = {
   walletAddress: string;
   cairoVersion: CairoVersion;
-  chainId: StarknetChainId;
+  chainId: ChainId;
   nonce: BigNumberish;
   maxFee: BigNumberish;
   version: `${ETransactionVersion2}`;
@@ -25,7 +25,7 @@ export type V2InvocationsSignerDetails = {
 export type V3InvocationsSignerDetails = V3TransactionDetails & {
   walletAddress: string;
   cairoVersion: CairoVersion;
-  chainId: StarknetChainId;
+  chainId: ChainId;
   version: `${ETransactionVersion3}`;
 };
 
@@ -37,7 +37,7 @@ export type V2DeclareSignerDetails = Required<InvocationsDetails> & {
   classHash: string;
   compiledClassHash?: string;
   senderAddress: string;
-  chainId: StarknetChainId;
+  chainId: ChainId;
   version: `${ETransactionVersion2}`;
 };
 
@@ -45,7 +45,7 @@ export type V3DeclareSignerDetails = V3TransactionDetails & {
   classHash: string;
   compiledClassHash: string;
   senderAddress: string;
-  chainId: StarknetChainId;
+  chainId: ChainId;
   version: `${ETransactionVersion3}`;
 };
 
@@ -56,13 +56,13 @@ export type DeployAccountSignerDetails =
 export type V2DeployAccountSignerDetails = Required<DeployAccountContractPayload> &
   Required<InvocationsDetails> & {
     contractAddress: BigNumberish;
-    chainId: StarknetChainId;
+    chainId: ChainId;
     version: `${ETransactionVersion2}`;
   };
 
 export type V3DeployAccountSignerDetails = Required<DeployAccountContractPayload> &
   V3TransactionDetails & {
     contractAddress: BigNumberish;
-    chainId: StarknetChainId;
+    chainId: ChainId;
     version: `${ETransactionVersion3}`;
   };

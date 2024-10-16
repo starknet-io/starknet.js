@@ -1,5 +1,5 @@
 import { StarknetChainId, ZERO } from '../constants';
-import { BigNumberish } from '../types';
+import { BigNumberish, ChainId } from '../types';
 import { tuple } from './calldata/cairo';
 import { CairoCustomEnum } from './calldata/enum/CairoCustomEnum';
 /* eslint-disable no-param-reassign */
@@ -132,7 +132,7 @@ export const StarknetIdContract = {
 /**
  * Returns the Starknet ID contract address based on the provided chain ID.
  *
- * @param {StarknetChainId} chainId The chain ID of the Starknet network.
+ * @param {ChainId} chainId The chain ID of the Starknet network.
  * @return {string} The Starknet ID contract address.
  * @throws {Error} Throws an error if the Starknet ID contract is not deployed on the network.
  * @example
@@ -141,7 +141,7 @@ export const StarknetIdContract = {
  * // result = "0x154bc2e1af9260b9e66af0e9c46fc757ff893b3ff6a85718a810baf1474"
  * ```
  */
-export function getStarknetIdContract(chainId: StarknetChainId): string {
+export function getStarknetIdContract(chainId: ChainId): string {
   switch (chainId) {
     case StarknetChainId.SN_MAIN:
       return StarknetIdContract.MAINNET;
@@ -162,7 +162,7 @@ export const StarknetIdIdentityContract = {
 /**
  * Returns the Starknet ID identity contract address for the given chain ID.
  *
- * @param {StarknetChainId} chainId The chain ID for the specified network.
+ * @param {ChainId} chainId The chain ID for the specified network.
  *
  * @return {string} The Starknet ID identity contract address for the specified network.
  *
@@ -173,7 +173,7 @@ export const StarknetIdIdentityContract = {
  * // result = "0x3697660a0981d734780731949ecb2b4a38d6a58fc41629ed611e8defda"
  * ```
  */
-export function getStarknetIdIdentityContract(chainId: StarknetChainId): string {
+export function getStarknetIdIdentityContract(chainId: ChainId): string {
   switch (chainId) {
     case StarknetChainId.SN_MAIN:
       return StarknetIdIdentityContract.MAINNET;
@@ -192,7 +192,7 @@ export const StarknetIdMulticallContract =
 /**
  * Returns the Starknet.id multicall contract address based on the provided chainId.
  *
- * @param {StarknetChainId} chainId - The chainId of the network.
+ * @param {ChainId} chainId - The chainId of the network.
  * @return {string} - The address of the Starknet.id multicall contract.
  * @throws {Error} - If the Starknet.id multicall contract is not deployed on the network.
  * @example
@@ -201,7 +201,7 @@ export const StarknetIdMulticallContract =
  * // result = "0x034ffb8f4452df7a613a0210824d6414dbadcddce6c6e19bf4ddc9e22ce5f970"
  * ```
  */
-export function getStarknetIdMulticallContract(chainId: StarknetChainId): string {
+export function getStarknetIdMulticallContract(chainId: ChainId): string {
   switch (chainId) {
     case StarknetChainId.SN_MAIN:
       return StarknetIdMulticallContract;
@@ -222,7 +222,7 @@ export const StarknetIdVerifierContract = {
 /**
  * Returns the address of the Starknet ID Verifier contract based on the specified chain ID.
  *
- * @param {StarknetChainId} chainId - The ID of the Starknet chain.
+ * @param {ChainId} chainId - The ID of the Starknet chain.
  * @return {string} - The address of the Starknet ID Verifier contract.
  * @throws {Error} - If the Starknet ID Verifier contract is not deployed on the specified network.
  * @example
@@ -231,7 +231,7 @@ export const StarknetIdVerifierContract = {
  * // result = "0x60B94fEDe525f815AE5E8377A463e121C787cCCf3a36358Aa9B18c12c4D566"
  * ```
  */
-export function getStarknetIdVerifierContract(chainId: StarknetChainId): string {
+export function getStarknetIdVerifierContract(chainId: ChainId): string {
   switch (chainId) {
     case StarknetChainId.SN_MAIN:
       return StarknetIdVerifierContract.MAINNET;
@@ -252,7 +252,7 @@ export const StarknetIdPfpContract = {
 /**
  * Retrieves the contract address of the Starknet.id profile picture verifier contract based on the given chain ID.
  *
- * @param {StarknetChainId} chainId - The chain ID of the network.
+ * @param {ChainId} chainId - The chain ID of the network.
  * @returns {string} - The contract address of the Starknet.id profile picture verifier contract.
  * @throws {Error} - Throws an error if the Starknet.id profile picture verifier contract is not yet deployed on the network.
  * @example
@@ -261,7 +261,7 @@ export const StarknetIdPfpContract = {
  * // result = "0x9e7bdb8dabd02ea8cfc23b1d1c5278e46490f193f87516ed5ff2dfec02"
  * ```
  */
-export function getStarknetIdPfpContract(chainId: StarknetChainId): string {
+export function getStarknetIdPfpContract(chainId: ChainId): string {
   switch (chainId) {
     case StarknetChainId.SN_MAIN:
       return StarknetIdPfpContract.MAINNET;
@@ -284,7 +284,7 @@ export const StarknetIdPopContract = {
 /**
  * Retrieves the Starknet ID Proof of Personhood (IdPop) verifier contract address for the given chain ID.
  *
- * @param {StarknetChainId} chainId - The chain ID of the Starknet network.
+ * @param {ChainId} chainId - The chain ID of the Starknet network.
  * @return {string} - The Starknet ID Pop contract address.
  * @throws {Error} - If the Starknet ID Pop contract is not deployed on the specified network.
  * @example
@@ -293,7 +293,7 @@ export const StarknetIdPopContract = {
  * // result = "0x15ae88ae054caa74090b89025c1595683f12edf7a4ed2ad0274de3e1d4a"
  * ```
  */
-export function getStarknetIdPopContract(chainId: StarknetChainId): string {
+export function getStarknetIdPopContract(chainId: ChainId): string {
   switch (chainId) {
     case StarknetChainId.SN_MAIN:
       return StarknetIdPopContract.MAINNET;

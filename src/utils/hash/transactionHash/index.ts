@@ -2,8 +2,7 @@
  * Transaction Hash based on Transaction Version
  */
 
-import { StarknetChainId } from '../../../constants';
-import { BigNumberish, Calldata } from '../../../types';
+import { BigNumberish, Calldata, ChainId } from '../../../types';
 import {
   EDAMode,
   ETransactionVersion,
@@ -38,7 +37,7 @@ type CalcV2InvokeTxHashArgs = {
   version: `${ETransactionVersion2}`;
   compiledCalldata: Calldata;
   maxFee: BigNumberish;
-  chainId: StarknetChainId;
+  chainId: ChainId;
   nonce: BigNumberish;
 };
 
@@ -46,7 +45,7 @@ type CalcV3InvokeTxHashArgs = {
   senderAddress: BigNumberish;
   version: `${ETransactionVersion3}`;
   compiledCalldata: Calldata;
-  chainId: StarknetChainId;
+  chainId: ChainId;
   nonce: BigNumberish;
   accountDeploymentData: BigNumberish[];
   nonceDataAvailabilityMode: EDAMode;
@@ -96,7 +95,7 @@ type CalcV2DeclareTxHashArgs = {
   senderAddress: BigNumberish;
   version: `${ETransactionVersion2}`;
   maxFee: BigNumberish;
-  chainId: StarknetChainId;
+  chainId: ChainId;
   nonce: BigNumberish;
   compiledClassHash?: string;
 };
@@ -106,7 +105,7 @@ type CalcV3DeclareTxHashArgs = {
   compiledClassHash: string;
   senderAddress: BigNumberish;
   version: `${ETransactionVersion3}`;
-  chainId: StarknetChainId;
+  chainId: ChainId;
   nonce: BigNumberish;
   accountDeploymentData: BigNumberish[];
   nonceDataAvailabilityMode: EDAMode;
@@ -164,7 +163,7 @@ type CalcV2DeployAccountTxHashArgs = {
   salt: BigNumberish;
   version: `${ETransactionVersion2}`;
   maxFee: BigNumberish;
-  chainId: StarknetChainId;
+  chainId: ChainId;
   nonce: BigNumberish;
 };
 
@@ -174,7 +173,7 @@ type CalcV3DeployAccountTxHashArgs = {
   compiledConstructorCalldata: Calldata;
   salt: BigNumberish;
   version: `${ETransactionVersion3}`;
-  chainId: StarknetChainId;
+  chainId: ChainId;
   nonce: BigNumberish;
   nonceDataAvailabilityMode: EDAMode;
   feeDataAvailabilityMode: EDAMode;

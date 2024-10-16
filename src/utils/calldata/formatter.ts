@@ -13,8 +13,7 @@ const guard = {
   isBN: (data: Record<string, any>, type: Record<string, any>, key: string) => {
     if (!isBigInt(data[key]))
       throw new Error(
-        `Data and formatter mismatch on ${key}:${type[key]}, expected response data ${key}:${
-          data[key]
+        `Data and formatter mismatch on ${key}:${type[key]}, expected response data ${key}:${data[key]
         } to be BN instead it is ${typeof data[key]}`
       );
   },

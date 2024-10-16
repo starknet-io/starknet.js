@@ -11,6 +11,7 @@ import {
   AllowArray,
   CairoVersion,
   Call,
+  ChainId,
   CompiledSierra,
   DeclareContractPayload,
   MultiDeployContractResponse,
@@ -34,7 +35,6 @@ import {
   watchAsset,
 } from './connect';
 import { StarknetWalletProvider } from './types';
-import { StarknetChainId } from '../constants';
 
 // Represent 'Selected Active' Account inside Connected Wallet
 export class WalletAccount extends Account implements AccountInterface {
@@ -61,7 +61,7 @@ export class WalletAccount extends Account implements AccountInterface {
       if (!res) return;
       // Determine is it better to set chainId or replace channel with new one
       // At the moment channel is stateless but it could change
-      this.channel.setChainId(res as StarknetChainId);
+      this.channel.setChainId(res as ChainId);
     });
 
     // Get and Set Address !!! Post constructor initial empty string
@@ -99,7 +99,7 @@ export class WalletAccount extends Account implements AccountInterface {
     return getPermissions(this.walletProvider);
   }
 
-  public switchStarknetChain(chainId: StarknetChainId) {
+  public switchStarknetChain(chainId: ChainId) {
     return switchStarknetChain(this.walletProvider, chainId);
   }
 
