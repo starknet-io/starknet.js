@@ -26,6 +26,7 @@ import {
   getAbiContractVersion,
   tuple,
   felt,
+  isTypeU96,
 } from '../../../src/utils/calldata/cairo';
 import { ETH_ADDRESS, Literal, Uint, type ContractVersion, NON_ZERO_PREFIX } from '../../../src';
 import {
@@ -324,5 +325,17 @@ describe('felt', () => {
   test('should create Cairo type felts', () => {
     const felts = [felt('test'), felt(256n), felt(1234)];
     expect(felts).toEqual(['1952805748', '256', '1234']);
+  });
+});
+
+describe('u96', () => {
+  test('should return true if given type is u96', () => {
+    expect(
+      isTypeU96('core::internal::bounded_int::BoundedInt::<0, 79228162514264337593543950335>')
+    ).toEqual(true);
+  });
+
+  test('should return false if given type is not u96', () => {
+    expect(isTypeU96('core::bool')).toEqual(false);
   });
 });
