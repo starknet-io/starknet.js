@@ -200,3 +200,17 @@ const [getBlockResponse, blockHashAndNumber, txCount] = await Promise.all([
 
 // ... usage of getBlockResponse, blockHashAndNumber, txCount
 ```
+
+## Error handling
+
+The [Starknet RPC specification](https://github.com/starkware-libs/starknet-specs) defines a set of possible errors that the RPC endpoints could return for various scenarios. If such errors arise `starknet.js` represents them with the corresponding [RpcError](../API/classes/RpcError) class where the endpoint error response information is contained within the `baseError` property. Also of note is that the class has an `isType` convenience method that verifies the base error type as shown in the example below.
+
+#### Example
+
+```typescript
+try {
+  ...
+} catch (error) {
+  if (error instanceof RpcError && error.isType('UNEXPECTED_ERROR')) { ... }
+}
+```

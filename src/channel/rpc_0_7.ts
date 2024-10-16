@@ -1,5 +1,5 @@
 import { NetworkName, StarknetChainId } from '../constants';
-import { LibraryError } from '../provider/errors';
+import { LibraryError, RpcError } from '../utils/errors';
 import {
   AccountInvocationItem,
   AccountInvocations,
@@ -11,6 +11,7 @@ import {
   DeployAccountContractTransaction,
   Invocation,
   InvocationsDetailsWithNonce,
+  RPC_ERROR,
   RpcProviderOptions,
   TransactionType,
   getEstimateFeeBulkOptions,
@@ -118,11 +119,7 @@ export class RpcChannel {
 
   protected errorHandler(method: string, params: any, rpcError?: JRPC.Error, otherError?: any) {
     if (rpcError) {
-      const { code, message, data } = rpcError;
-      throw new LibraryError(
-        `RPC: ${method} with params ${stringify(params, null, 2)}\n 
-        ${code}: ${message}: ${stringify(data)}`
-      );
+      throw new RpcError(rpcError as RPC_ERROR, method, params);
     }
     if (otherError instanceof LibraryError) {
       throw otherError;
