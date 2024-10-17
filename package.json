@@ -105,6 +105,7 @@
     "abi-wan-kanabi": "^2.2.3",
     "fetch-cookie": "^3.0.0",
     "isomorphic-fetch": "^3.0.0",
+    "isows": "^1.0.6",
     "lossless-json": "^4.0.1",
     "pako": "^2.0.4",
     "starknet-types-07": "npm:@starknet-io/types-js@^0.7.7",
