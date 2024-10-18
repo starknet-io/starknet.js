@@ -35,11 +35,24 @@ export class WebSocketChannel implements WebSocketChannelInterface {
 
   public websocket: WebSocket; // TODO: find and set type to standard definition of websocket protocol instead of any
 
-  public onsNewHeads = Function;
+  public onsNewHeads: Function = () => {};
 
-  public onTransactionStatus = Function;
+  public onTransactionStatus: Function = () => {};
 
-  public onEvents = Function;
+  public onEvents: Function = () => {};
+
+  /**
+   * Read all receiving messages using this method
+   */
+  public on: Function = () => {};
+
+  public newHeadsSubscriptionId?: Number;
+
+  public transactionStatusSubscriptionId?: Number;
+
+  public pendingTransactionStatusSubscriptionId?: Number;
+
+  public eventsSubscriptionId?: Number;
 
   public async onsTransactionStatus(callback: Function) {
     callback();
@@ -51,16 +64,11 @@ export class WebSocketChannel implements WebSocketChannelInterface {
    */
   constructor(options: WebSocketOptions = {}) {
     // provided existing websocket
-    const nodeUrl = options.nodeUrl || 'ws://www.host.com/path'; // TODO: implement getDefaultNodeUrl default node when defined by providers?
+    const nodeUrl = options.nodeUrl || 'http://localhost:3000 '; // TODO: implement getDefaultNodeUrl default node when defined by providers?
 
     // TODO: can we know what network it is ?
     this.nodeUrl = options.websocket ? options.websocket.url : nodeUrl;
     this.websocket = options.websocket ? options.websocket : new WebSocket(nodeUrl);
-
-    this.websocket.addEventListener('open', this.onOpen);
-    this.websocket.addEventListener('close', this.onClose);
-    this.websocket.addEventListener('message', this.onMessage);
-    this.websocket.addEventListener('error', this.onError);
   }
 
   public async waitForConnection() {
@@ -73,6 +81,26 @@ export class WebSocketChannel implements WebSocketChannelInterface {
         this.websocket.onerror = reject;
       });
     }
+
+    this.websocket.addEventListener('open', this.onOpen.bind(this));
+    this.websocket.addEventListener('close', this.onClose.bind(this));
+    this.websocket.addEventListener('message', this.onMessage.bind(this));
+    this.websocket.addEventListener('error', this.onError.bind(this));
+  }
+
+  public async waitForDisconnection() {
+    // Wait websocket to disconnect
+    if (this.websocket.readyState !== WebSocket.CLOSED) {
+      await new Promise((resolve, reject) => {
+        if (!this.websocket) return;
+        this.websocket.onclose = resolve;
+        this.websocket.onerror = reject;
+      });
+    }
+  }
+
+  public disconnect() {
+    this.websocket.close();
   }
 
   /**
@@ -103,9 +131,31 @@ export class WebSocketChannel implements WebSocketChannelInterface {
   }
 
   private onMessage({ data }: any /* MessageEvent */) {
+    // TODO: Add error case
     const message = JSON.parse(data);
 
-    switch (message.name) {
+    console.log('RECEIVED:', data);
+
+    // Received Subscription responses
+    switch (message.method) {
+      case 'starknet_subscribeNewHeads':
+        this.newHeadsSubscriptionId = message.result;
+        break;
+      case 'starknet_subscribeEvents':
+        this.eventsSubscriptionId = message.result;
+        break;
+      case 'starknet_subscribeTransactionStatus':
+        this.transactionStatusSubscriptionId = message.result;
+        break;
+      case 'starknet_subscribePendingTransactions':
+        this.pendingTransactionStatusSubscriptionId = message.result;
+        break;
+      default:
+        break;
+    }
+
+    // Received events
+    switch (message.method) {
       case 'starknet_subscriptionReorg':
         throw Error('Reorg'); // todo: implement what to do
         break;
@@ -119,10 +169,14 @@ export class WebSocketChannel implements WebSocketChannelInterface {
         this.onEvents(message.result);
         break;
       default:
-        throw Error('Unknown event received'); // todo: implement what to do
         break;
     }
+
+    // All messages
+    this.on(message);
   }
+
+  // TODO: Add ping service
 
   /**
    * Send data over open ws connection
@@ -143,10 +197,14 @@ export class WebSocketChannel implements WebSocketChannelInterface {
   /**
    * subscribe to new block heads
    */
-  public async subscribeNewHeads(blockIdentifier?: BlockIdentifier) {
+  public subscribeNewHeads(blockIdentifier?: BlockIdentifier) {
     const block_id = blockIdentifier ? new Block(blockIdentifier).identifier : undefined;
     // TODO: Corelate request to response
     this.send('starknet_subscribeNewHeads', { ...spreadIfDefined('block', block_id) });
+  }
+
+  public unsubscribeNewHeads() {
+    this.send('starknet_unsubscribe', { subscription_id: this.newHeadsSubscriptionId });
   }
 
   /**
