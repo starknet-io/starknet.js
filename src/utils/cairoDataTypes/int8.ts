@@ -3,7 +3,7 @@
  * Singular class handling cairo i8 data type
  */
 
-import { BigNumberish } from '../../types';
+import { BigNumberish, Int8 } from '../../types';
 import { CairoInt } from './cairoInt';
 
 export const INT_8_MAX = (1n << 7n) - 1n;
@@ -16,7 +16,9 @@ export class CairoInt8 extends CairoInt {
    * @param bigNumberish BigNumberish value representing i8
    */
 
-  public constructor(int8: BigNumberish) {
+  public constructor(int8: Int8);
+
+  public constructor(int8: any) {
     super(int8, INT_8_MAX, INT_8_MIN);
   }
 

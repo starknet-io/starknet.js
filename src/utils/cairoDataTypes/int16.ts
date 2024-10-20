@@ -10,7 +10,7 @@ export const INT_16_MAX = (1n << 15n) - 1n;
 export const INT_16_MIN = -(1n << 15n) + 1n;
 const abiSelector = 'core::integer::i16';
 
-export class Cairoint16 extends CairoInt {
+export class CairoInt16 extends CairoInt {
   /**
    * Default constructor (Lib usage)
    * @param bigNumberish BigNumberish value representing i16
@@ -32,7 +32,7 @@ export class Cairoint16 extends CairoInt {
    */
   static is(bigNumberish: BigNumberish) {
     try {
-      Cairoint16.validate(bigNumberish);
+      CairoInt16.validate(bigNumberish);
     } catch (error) {
       return false;
     }

@@ -10,7 +10,7 @@ export const INT_64_MAX = (1n << 63n) - 1n;
 export const INT_64_MIN = -(1n << 63n) + 1n;
 const abiSelector = 'core::integer::i64';
 
-export class Cairoint64 extends CairoInt {
+export class CairoInt64 extends CairoInt {
   /**
    * Default constructor (Lib usage)
    * @param bigNumberish BigNumberish value representing i64
@@ -32,7 +32,7 @@ export class Cairoint64 extends CairoInt {
    */
   static is(bigNumberish: BigNumberish) {
     try {
-      Cairoint64.validate(bigNumberish);
+      CairoInt64.validate(bigNumberish);
     } catch (error) {
       return false;
     }

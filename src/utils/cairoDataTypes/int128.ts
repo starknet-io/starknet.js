@@ -10,7 +10,7 @@ export const INT_128_MAX = (1n << 127n) - 1n;
 export const INT_128_MIN = -(1n << 127n) + 1n;
 const abiSelector = 'core::integer::i128';
 
-export class Cairoint128 extends CairoInt {
+export class CairoInt128 extends CairoInt {
   /**
    * Default constructor (Lib usage)
    * @param bigNumberish BigNumberish value representing i128
@@ -32,7 +32,7 @@ export class Cairoint128 extends CairoInt {
    */
   static is(bigNumberish: BigNumberish) {
     try {
-      Cairoint128.validate(bigNumberish);
+      CairoInt128.validate(bigNumberish);
     } catch (error) {
       return false;
     }

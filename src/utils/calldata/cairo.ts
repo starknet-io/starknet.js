@@ -10,10 +10,20 @@ import {
   Uint,
   Uint256,
   Uint512,
+  Int8,
+  Int16,
+  Int32,
+  Int64,
+  Int128,
 } from '../../types';
 import { CairoFelt } from '../cairoDataTypes/felt';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
+import { CairoInt8 } from '../cairoDataTypes/int8';
+import { CairoInt16 } from '../cairoDataTypes/int16';
+import { CairoInt32 } from '../cairoDataTypes/int32';
+import { CairoInt64 } from '../cairoDataTypes/int64';
+import { CairoInt128 } from '../cairoDataTypes/int128';
 
 // Intended for internal usage, maybe should be exported somewhere else and not exported to utils
 /**
@@ -235,6 +245,13 @@ export function getAbiContractVersion(abi: Abi): ContractVersion {
 export const uint256 = (it: BigNumberish): Uint256 => {
   return new CairoUint256(it).toUint256DecimalString();
 };
+/**
+ * Create Uint256 Cairo type (helper for common struct type)
+ * @example
+ * ```typescript
+ * uint256('892349863487563453485768723498');
+ * ```
+ */
 
 /**
  * Create Uint512 Cairo type (helper for common struct type)
@@ -247,6 +264,50 @@ export const uint256 = (it: BigNumberish): Uint256 => {
  */
 export const uint512 = (it: BigNumberish): Uint512 => {
   return new CairoUint512(it).toUint512DecimalString();
+};
+
+export const int8 = (it: BigNumberish): Int8 => {
+  return new CairoInt8(it).toIntDecimalString();
+};
+/**
+ * Create Uint256 Cairo type (helper for common struct type)
+ * @example
+ * ```typescript
+ * uint256('892349863487563453485768723498');
+ * ```
+ */
+export const int16 = (it: BigNumberish): Int16 => {
+  return new CairoInt16(it).toIntDecimalString();
+};
+/**
+ * Create Uint256 Cairo type (helper for common struct type)
+ * @example
+ * ```typescript
+ * uint256('892349863487563453485768723498');
+ * ```
+ */
+export const int32 = (it: BigNumberish): Int32 => {
+  return new CairoInt32(it).toIntDecimalString();
+};
+/**
+ * Create Uint256 Cairo type (helper for common struct type)
+ * @example
+ * ```typescript
+ * uint256('892349863487563453485768723498');
+ * ```
+ */
+export const int64 = (it: BigNumberish): Int64 => {
+  return new CairoInt64(it).toIntDecimalString();
+};
+/**
+ * Create Uint256 Cairo type (helper for common struct type)
+ * @example
+ * ```typescript
+ * uint256('892349863487563453485768723498');
+ * ```
+ */
+export const int128 = (it: BigNumberish): Int128 => {
+  return new CairoInt128(it).toIntDecimalString();
 };
 
 /**

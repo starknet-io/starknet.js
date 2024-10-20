@@ -45,6 +45,41 @@ export interface Uint512 {
   // The higher 128 bits of the value
   limb3: BigNumberish;
 }
+/**
+ * Represents an integer in the range [0, 2^256)
+ */
+export interface Int8 {
+  // The lowest 128 bits of the value
+  int8: BigNumberish;
+}
+/**
+ * Represents an integer in the range [0, 2^256)
+ */
+export interface Int16 {
+  // The lowest 128 bits of the value
+  int16: BigNumberish;
+}
+/**
+ * Represents an integer in the range [0, 2^256)
+ */
+export interface Int32 {
+  // The lowest 128 bits of the value
+  int32: BigNumberish;
+}
+/**
+ * Represents an integer in the range [0, 2^256)
+ */
+export interface Int64 {
+  // The lowest 128 bits of the value
+  int64: BigNumberish;
+}
+/**
+ * Represents an integer in the range [0, 2^256)
+ */
+export interface Int128 {
+  // The lowest 128 bits of the value
+  int128: BigNumberish;
+}
 
 /**
  * BigNumberish array

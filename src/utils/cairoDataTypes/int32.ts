@@ -10,7 +10,7 @@ export const INT_32_MAX = (1n << 31n) - 1n;
 export const INT_32_MIN = -(1n << 31n) + 1n;
 const abiSelector = 'core::integer::i32';
 
-export class Cairoint32 extends CairoInt {
+export class CairoInt32 extends CairoInt {
   /**
    * Default constructor (Lib usage)
    * @param bigNumberish BigNumberish value representing i32
@@ -32,7 +32,7 @@ export class Cairoint32 extends CairoInt {
    */
   static is(bigNumberish: BigNumberish) {
     try {
-      Cairoint32.validate(bigNumberish);
+      CairoInt32.validate(bigNumberish);
     } catch (error) {
       return false;
     }
