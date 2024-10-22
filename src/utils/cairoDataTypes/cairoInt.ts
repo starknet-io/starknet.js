@@ -88,7 +88,9 @@ export class CairoInt {
    * Return i8 structure with DecimalString
    */
   toIntDecimalString() {
-    return this.felt252.toString(10);
+    return {
+      int: this.felt252.toString(10),
+    };
   }
 
   /**

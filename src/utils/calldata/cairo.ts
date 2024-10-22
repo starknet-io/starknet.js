@@ -10,11 +10,6 @@ import {
   Uint,
   Uint256,
   Uint512,
-  Int8,
-  Int16,
-  Int32,
-  Int64,
-  Int128,
 } from '../../types';
 import { CairoFelt } from '../cairoDataTypes/felt';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
@@ -24,6 +19,7 @@ import { CairoInt16 } from '../cairoDataTypes/int16';
 import { CairoInt32 } from '../cairoDataTypes/int32';
 import { CairoInt64 } from '../cairoDataTypes/int64';
 import { CairoInt128 } from '../cairoDataTypes/int128';
+import { Int } from '../../types/lib';
 
 // Intended for internal usage, maybe should be exported somewhere else and not exported to utils
 /**
@@ -266,47 +262,54 @@ export const uint512 = (it: BigNumberish): Uint512 => {
   return new CairoUint512(it).toUint512DecimalString();
 };
 
-export const int8 = (it: BigNumberish): Int8 => {
+/**
+ * Create int8 Cairo type (helper for common struct type)
+ * @example
+ * ```typescript
+ * int8('100');
+ * ```
+ */
+export const int8 = (it: BigNumberish): Int => {
   return new CairoInt8(it).toIntDecimalString();
 };
 /**
- * Create Uint256 Cairo type (helper for common struct type)
+ * Create int16 Cairo type (helper for common struct type)
  * @example
  * ```typescript
- * uint256('892349863487563453485768723498');
+ * int16('30000');
  * ```
  */
-export const int16 = (it: BigNumberish): Int16 => {
+export const int16 = (it: BigNumberish): Int => {
   return new CairoInt16(it).toIntDecimalString();
 };
 /**
- * Create Uint256 Cairo type (helper for common struct type)
+ * Create int32 Cairo type (helper for common struct type)
  * @example
  * ```typescript
- * uint256('892349863487563453485768723498');
+ * int32('2000000000');
  * ```
  */
-export const int32 = (it: BigNumberish): Int32 => {
+export const int32 = (it: BigNumberish): Int => {
   return new CairoInt32(it).toIntDecimalString();
 };
 /**
- * Create Uint256 Cairo type (helper for common struct type)
+ * Create int64 Cairo type (helper for common struct type)
  * @example
  * ```typescript
- * uint256('892349863487563453485768723498');
+ * int64('9000000000000000000');
  * ```
  */
-export const int64 = (it: BigNumberish): Int64 => {
+export const int64 = (it: BigNumberish): Int => {
   return new CairoInt64(it).toIntDecimalString();
 };
 /**
- * Create Uint256 Cairo type (helper for common struct type)
+ * Create int128 Cairo type (helper for common struct type)
  * @example
  * ```typescript
- * uint256('892349863487563453485768723498');
+ * int128('170000000000000000000000000000000000000');
  * ```
  */
-export const int128 = (it: BigNumberish): Int128 => {
+export const int128 = (it: BigNumberish): Int => {
   return new CairoInt128(it).toIntDecimalString();
 };
 
