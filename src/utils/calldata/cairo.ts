@@ -141,6 +141,15 @@ export const isTypeBytes31 = (type: string) => type === 'core::bytes_31::bytes31
  */
 export const isTypeByteArray = (type: string) => type === 'core::byte_array::ByteArray';
 
+/**
+ * Checks if the given type is equal to the u96 type
+ *
+ * @param {string} type - The type to check.
+ * @returns - True if the given type is equal to u96, false otherwise.
+ */
+export const isTypeU96 = (type: string) =>
+  type === 'core::internal::bounded_int::BoundedInt::<0, 79228162514264337593543950335>';
+
 export const isTypeSecp256k1Point = (type: string) => type === Literal.Secp256k1Point;
 
 export const isCairo1Type = (type: string) => type.includes('::');
