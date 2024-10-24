@@ -66,3 +66,5 @@ export type V3DeployAccountSignerDetails = Required<DeployAccountContractPayload
     chainId: StarknetChainId;
     version: `${ETransactionVersion3}`;
   };
+
+export type LedgerPathCalculation = (accountId: number, applicationName: string) => Uint8Array;
