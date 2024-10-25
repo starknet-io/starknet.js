@@ -66,5 +66,5 @@ export abstract class WebSocketChannelInterface {
   /**
    *  Sub-classes **must** implement this method to send the message over their transport.
    */
-  public abstract send(message: string): Promise<void>;
+  public abstract send(message: string): number;
 }

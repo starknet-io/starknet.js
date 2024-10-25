@@ -7,6 +7,22 @@ import { toHex } from '../utils/num';
 import { Block } from '../utils/provider';
 import { WebSocketChannelInterface, WebSocketOptions } from './ws/interface';
 
+export type WsResponse = {
+  id: number;
+  jsonrpc: '2.0';
+  result: any;
+};
+
+export type WsEvent = {
+  jsonrpc: '2.0';
+  method: string;
+  params: {};
+};
+
+export type SUBSCRIPTION_ID = number;
+
+export type SUBSCRIPTION_RESULT = { subscription_id: SUBSCRIPTION_ID };
+
 // import { WebSocket } from 'ws';
 
 /**
@@ -37,22 +53,36 @@ export class WebSocketChannel implements WebSocketChannelInterface {
 
   public onsNewHeads: Function = () => {};
 
+  public onEvents: Function = () => {};
+
   public onTransactionStatus: Function = () => {};
 
-  public onEvents: Function = () => {};
+  public onPendingTransactionStatus: Function = () => {};
 
   /**
    * Read all receiving messages using this method
    */
   public on: Function = () => {};
 
-  public newHeadsSubscriptionId?: Number;
+  /**
+   * JSON RPC latest sent message id
+   * expecting receiving message to contain same id
+   */
+  private sendId: number = 0;
 
-  public transactionStatusSubscriptionId?: Number;
+  /**
+   * Expecting responses id list
+   * List is empty if there is no 'awaiting' responses
+   */
+  // private awaitingResponses: JRPC.RequestBody[] = [];
 
-  public pendingTransactionStatusSubscriptionId?: Number;
+  public newHeadsSubscriptionId?: number;
 
-  public eventsSubscriptionId?: Number;
+  public transactionStatusSubscriptionId?: number;
+
+  public pendingTransactionStatusSubscriptionId?: number;
+
+  public eventsSubscriptionId?: number;
 
   public async onsTransactionStatus(callback: Function) {
     callback();
@@ -71,8 +101,38 @@ export class WebSocketChannel implements WebSocketChannelInterface {
     this.websocket = options.websocket ? options.websocket : new WebSocket(nodeUrl);
   }
 
+  /**
+   * Send request and receive response over ws line
+   * This method abstract ws messages into request/response model
+   * @param method rpc method name
+   * @param params rpc method parameters
+   * @returns Promise<result> (mostly subscription id but can also be boolean in unsubscribe case)
+   */
+  private sendReceive(method: string, params: {}) {
+    const sendId = this.send(method, params);
+
+    return new Promise((resolve, reject) => {
+      if (!this.websocket) return;
+      this.websocket.onmessage = ({ data }) => {
+        const message: WsResponse = JSON.parse(data);
+        if (message.id === sendId) {
+          if (message.result) {
+            resolve(message.result);
+          } else {
+            reject(Error(`response on ${method} missing result`));
+          }
+        }
+        console.log(`data from ${method} response`, data);
+      };
+      this.websocket.onerror = reject;
+    });
+  }
+
+  /**
+   * * await while websocket is connected
+   * * add event listeners
+   */
   public async waitForConnection() {
-    // TODO: test
     // Wait websocket to connect
     if (this.websocket.readyState === WebSocket.CONNECTING) {
       await new Promise((resolve, reject) => {
@@ -88,6 +148,9 @@ export class WebSocketChannel implements WebSocketChannelInterface {
     this.websocket.addEventListener('error', this.onError.bind(this));
   }
 
+  /**
+   * await while websocket is disconnected
+   */
   public async waitForDisconnection() {
     // Wait websocket to disconnect
     if (this.websocket.readyState !== WebSocket.CLOSED) {
@@ -119,9 +182,13 @@ export class WebSocketChannel implements WebSocketChannelInterface {
     // TODO: replay data from last block received (including it) up to latest
   }
 
-  public onOpen() {}
+  public onOpen() {
+    console.log('socket open');
+  }
 
-  public onError() {}
+  public onError() {
+    console.log('socket error');
+  }
 
   public onClose() {
     this.websocket.removeEventListener('open', this.onOpen);
@@ -134,39 +201,24 @@ export class WebSocketChannel implements WebSocketChannelInterface {
     // TODO: Add error case
     const message = JSON.parse(data);
 
-    console.log('RECEIVED:', data);
+    console.log('onMessage:', data);
 
-    // Received Subscription responses
-    switch (message.method) {
-      case 'starknet_subscribeNewHeads':
-        this.newHeadsSubscriptionId = message.result;
-        break;
-      case 'starknet_subscribeEvents':
-        this.eventsSubscriptionId = message.result;
-        break;
-      case 'starknet_subscribeTransactionStatus':
-        this.transactionStatusSubscriptionId = message.result;
-        break;
-      case 'starknet_subscribePendingTransactions':
-        this.pendingTransactionStatusSubscriptionId = message.result;
-        break;
-      default:
-        break;
-    }
-
-    // Received events
+    // Forward events (events contains method)
     switch (message.method) {
       case 'starknet_subscriptionReorg':
         throw Error('Reorg'); // todo: implement what to do
         break;
       case 'starknet_subscriptionNewHeads':
-        this.onsNewHeads(message.result);
+        this.onsNewHeads(message.params);
         break;
       case 'starknet_subscriptionEvents':
-        this.onTransactionStatus(message.result);
+        this.onEvents(message.params);
         break;
       case 'starknet_subscriptionTransactionsStatus':
-        this.onEvents(message.result);
+        this.onTransactionStatus(message.params);
+        break;
+      case 'starknet_subscriptionPendingTransactions':
+        this.onPendingTransactionStatus(message.params);
         break;
       default:
         break;
@@ -178,33 +230,82 @@ export class WebSocketChannel implements WebSocketChannelInterface {
 
   // TODO: Add ping service
 
+  private idResolver(id?: number) {
+    // unmanaged user set id
+    if (id) return id;
+    // managed id, intentional return old and than increment
+    // eslint-disable-next-line no-plusplus
+    return this.sendId++;
+  }
+
   /**
    * Send data over open ws connection
    */
-  public async send(method: string, params?: object, id: string | number = 0) {
+  public send(method: string, params?: object, id?: number) {
     if (!this.isConnected()) {
       throw Error('WebSocketChannel.send() fail due to socket not been connected');
     }
+    const usedId = this.idResolver(id);
     const rpcRequestBody: JRPC.RequestBody = {
-      id,
+      id: usedId,
       jsonrpc: '2.0',
       method,
       ...(params && { params }),
     };
+    // Stringify should remove undefined params
     this.websocket.send(stringify(rpcRequestBody));
+    // this.awaitingResponses.push(rpcRequestBody);
+    return usedId;
+  }
+
+  private unsubscribe(subscriptionId: number) {
+    return this.sendReceive('starknet_unsubscribe', {
+      subscription_id: subscriptionId,
+    }) as Promise<boolean>;
   }
 
   /**
    * subscribe to new block heads
+   * * you can subscribe to this event multiple times and you need to manage subscriptions manually
    */
-  public subscribeNewHeads(blockIdentifier?: BlockIdentifier) {
+  public subscribeNewHeadsUnmanaged(blockIdentifier?: BlockIdentifier) {
     const block_id = blockIdentifier ? new Block(blockIdentifier).identifier : undefined;
-    // TODO: Corelate request to response
-    this.send('starknet_subscribeNewHeads', { ...spreadIfDefined('block', block_id) });
+
+    return this.sendReceive('starknet_subscribeNewHeads', {
+      ...{ block: block_id },
+    }) as Promise<SUBSCRIPTION_RESULT>;
   }
 
-  public unsubscribeNewHeads() {
-    this.send('starknet_unsubscribe', { subscription_id: this.newHeadsSubscriptionId });
+  public async subscribeNewHeads(blockIdentifier?: BlockIdentifier) {
+    if (this.eventsSubscriptionId) throw Error('subscription to this event already exists');
+    this.newHeadsSubscriptionId = (
+      await this.subscribeNewHeadsUnmanaged(blockIdentifier)
+    ).subscription_id;
+    return this.newHeadsSubscriptionId;
+  }
+
+  public async unsubscribeNewHeads() {
+    if (!this.newHeadsSubscriptionId) throw Error('There is no subscription on this event');
+    const status = await this.unsubscribe(this.newHeadsSubscriptionId);
+    if (status) this.newHeadsSubscriptionId = undefined;
+    return status;
+  }
+
+  /**
+   * subscribe to new block heads
+   * * you can subscribe to this event multiple times and you need to manage subscriptions manually
+   */
+  public subscribeEventsUnmanaged(
+    fromAddress?: BigNumberish,
+    keys?: string[][],
+    blockIdentifier?: BlockIdentifier
+  ) {
+    const block_id = blockIdentifier ? new Block(blockIdentifier).identifier : undefined;
+    return this.sendReceive('starknet_subscribeEvents', {
+      ...{ from_address: fromAddress && toHex(fromAddress) },
+      ...{ keys },
+      ...{ block: block_id },
+    }) as Promise<SUBSCRIPTION_RESULT>;
   }
 
   /**
@@ -215,13 +316,48 @@ export class WebSocketChannel implements WebSocketChannelInterface {
     keys?: string[][],
     blockIdentifier?: BlockIdentifier
   ) {
-    // TODO: Corelate request to response
+    if (this.eventsSubscriptionId) throw Error('subscription to this event already exists');
+    // eslint-disable-next-line prefer-rest-params
+    this.eventsSubscriptionId = (
+      await this.subscribeEventsUnmanaged(fromAddress, keys, blockIdentifier)
+    ).subscription_id;
+
+    return this.eventsSubscriptionId;
+  }
+
+  public unsubscribeEvents() {
+    if (!this.eventsSubscriptionId) throw Error('There is no subscription ID for this event');
+    return this.unsubscribe(this.eventsSubscriptionId);
+  }
+
+  // TODO: Test Generics
+
+  private async genericSubscribe(idPointer: any, callback: Function) {
+    if (idPointer) throw Error('subscription to this event already exists');
+    // eslint-disable-next-line no-param-reassign
+    idPointer = await callback();
+    return idPointer;
+  }
+
+  private genericUnsubscribe(idPointer: any) {
+    if (!idPointer) throw Error('There is no subscription ID for this event');
+    return this.unsubscribe(idPointer);
+  }
+
+  /**
+   * subscribe to new block heads
+   * * you can subscribe to this event multiple times and you need to manage subscriptions manually
+   */
+  public subscribeTransactionStatusUnmanaged(
+    transactionHash: BigNumberish,
+    blockIdentifier?: BlockIdentifier
+  ) {
+    const transaction_hash = toHex(transactionHash);
     const block_id = blockIdentifier ? new Block(blockIdentifier).identifier : undefined;
-    this.send('starknet_subscribeEvents', {
-      ...spreadIfDefined('from_address', fromAddress && toHex(fromAddress)),
-      ...spreadIfDefined('keys', keys),
-      ...spreadIfDefined('block', block_id),
-    });
+    return this.sendReceive('starknet_subscribeTransactionStatus', {
+      transaction_hash,
+      ...{ block: block_id },
+    }) as Promise<SUBSCRIPTION_RESULT>;
   }
 
   /**
@@ -231,24 +367,12 @@ export class WebSocketChannel implements WebSocketChannelInterface {
     transactionHash: BigNumberish,
     blockIdentifier?: BlockIdentifier
   ) {
-    // TODO: Corelate request to response
-    const transaction_hash = toHex(transactionHash);
-    const block_id = blockIdentifier ? new Block(blockIdentifier).identifier : undefined;
-    this.send('starknet_subscribeTransactionStatus', {
-      transaction_hash,
-      ...spreadIfDefined('block', block_id),
-    });
+    return this.genericSubscribe(this.transactionStatusSubscriptionId, () =>
+      this.subscribeTransactionStatusUnmanaged(transactionHash, blockIdentifier)
+    );
+  }
+
+  public unsubscribeTransactionStatus() {
+    return this.genericUnsubscribe(this.transactionStatusSubscriptionId);
   }
 }
-
-/**
- * helper method will return object with property to be spread (added to another object) if value if not undefined
- * It will work with false, 0, null as value.
- *
- * Contrary to ...(v && {x:v} where this expresions will also eliminate any falsy* (0, null, false)
- */
-function spreadIfDefined(key: string, value: any) {
-  return value !== undefined && { [key]: value };
-}
-
-// Bolje bi bilo napravit remove undefined from object
