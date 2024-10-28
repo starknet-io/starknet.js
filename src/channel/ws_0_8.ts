@@ -108,7 +108,7 @@ export class WebSocketChannel implements WebSocketChannelInterface {
    * @param params rpc method parameters
    * @returns Promise<result> (mostly subscription id but can also be boolean in unsubscribe case)
    */
-  private sendReceive(method: string, params: {}) {
+  public sendReceive(method: string, params?: {}) {
     const sendId = this.send(method, params);
 
     return new Promise((resolve, reject) => {
@@ -132,12 +132,12 @@ export class WebSocketChannel implements WebSocketChannelInterface {
    * * await while websocket is connected
    * * add event listeners
    */
-  public async waitForConnection() {
+  public async waitForConnection(): Promise<typeof this.websocket.readyState> {
     // Wait websocket to connect
-    if (this.websocket.readyState === WebSocket.CONNECTING) {
-      await new Promise((resolve, reject) => {
+    if (this.websocket.readyState !== WebSocket.OPEN) {
+      return new Promise((resolve, reject) => {
         if (!this.websocket) return;
-        this.websocket.onopen = resolve;
+        this.websocket.onopen = () => resolve(this.websocket.readyState);
         this.websocket.onerror = reject;
       });
     }
@@ -146,20 +146,24 @@ export class WebSocketChannel implements WebSocketChannelInterface {
     this.websocket.addEventListener('close', this.onClose.bind(this));
     this.websocket.addEventListener('message', this.onMessage.bind(this));
     this.websocket.addEventListener('error', this.onError.bind(this));
+
+    return this.websocket.readyState;
   }
 
   /**
    * await while websocket is disconnected
    */
-  public async waitForDisconnection() {
+  public async waitForDisconnection(): Promise<typeof this.websocket.readyState> {
     // Wait websocket to disconnect
     if (this.websocket.readyState !== WebSocket.CLOSED) {
-      await new Promise((resolve, reject) => {
+      return new Promise((resolve, reject) => {
         if (!this.websocket) return;
-        this.websocket.onclose = resolve;
+        this.websocket.onclose = () => resolve(this.websocket.readyState);
         this.websocket.onerror = reject;
       });
     }
+
+    return this.websocket.readyState;
   }
 
   public disconnect() {
