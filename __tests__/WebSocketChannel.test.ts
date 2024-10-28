@@ -118,8 +118,6 @@ describe('websocket specific endpoints - pathfinder test', () => {
       calldata: [account.address, '10', '0'],
     });
 
-    console.log(transaction_hash);
-
     await webSocketChannel.subscribeTransactionStatus(transaction_hash);
 
     // unsubscribe and close connection after receiving 1 messages
