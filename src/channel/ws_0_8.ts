@@ -162,6 +162,27 @@ export class WebSocketChannel implements WebSocketChannelInterface {
     return this.websocket.readyState;
   }
 
+  public onUnsubscribe(_subscriptionId: number) {}
+
+  /**
+   * helper method waiting until removed subscription
+   * @param forSubscriptionId if defined trigger on Id else trigger on any
+   */
+  public async waitForUnsubscription(forSubscriptionId?: number) {
+    // unsubscribe
+    return new Promise((resolve, reject) => {
+      if (!this.websocket) return;
+      this.onUnsubscribe = (subscriptionId) => {
+        if (forSubscriptionId === undefined) {
+          resolve(true);
+        } else if (subscriptionId === forSubscriptionId) {
+          resolve(true);
+        }
+      };
+      this.websocket.onerror = reject;
+    });
+  }
+
   public disconnect() {
     this.websocket.close();
   }
@@ -258,10 +279,16 @@ export class WebSocketChannel implements WebSocketChannelInterface {
     return usedId;
   }
 
-  private unsubscribe(subscriptionId: number) {
-    return this.sendReceive('starknet_unsubscribe', {
+  private async unsubscribe(subscriptionId: number, ref?: string) {
+    const status = (await this.sendReceive('starknet_unsubscribe', {
       subscription_id: subscriptionId,
-    }) as Promise<boolean>;
+    })) as boolean;
+    if (status) {
+      // @ts-ignore
+      this[ref] = undefined; // TODO: check if this can be done withoid ts-ignore
+      this.onUnsubscribe(subscriptionId);
+    }
+    return status;
   }
 
   /**
@@ -290,9 +317,7 @@ export class WebSocketChannel implements WebSocketChannelInterface {
    */
   public async unsubscribeNewHeads() {
     if (!this.newHeadsSubscriptionId) throw Error('There is no subscription on this event');
-    const status = await this.unsubscribe(this.newHeadsSubscriptionId);
-    if (status) this.newHeadsSubscriptionId = undefined;
-    return status;
+    return this.unsubscribe(this.newHeadsSubscriptionId, 'newHeadsSubscriptionId');
   }
 
   /**
@@ -333,11 +358,9 @@ export class WebSocketChannel implements WebSocketChannelInterface {
    * Unsubscribe managed 'starknet events' subscription
    * @returns boolean
    */
-  public async unsubscribeEvents() {
+  public unsubscribeEvents() {
     if (!this.eventsSubscriptionId) throw Error('There is no subscription ID for this event');
-    const status = await this.unsubscribe(this.eventsSubscriptionId);
-    if (status) this.eventsSubscriptionId = undefined;
-    return status;
+    return this.unsubscribe(this.eventsSubscriptionId, 'eventsSubscriptionId');
   }
 
   /**
@@ -378,10 +401,10 @@ export class WebSocketChannel implements WebSocketChannelInterface {
   public async unsubscribeTransactionStatus() {
     if (!this.transactionStatusSubscriptionId)
       throw Error('There is no subscription ID for this event');
-    const status = await this.unsubscribe(this.transactionStatusSubscriptionId);
-    // eslint-disable-next-line no-param-reassign
-    if (status) this.transactionStatusSubscriptionId = undefined;
-    return status;
+    return this.unsubscribe(
+      this.transactionStatusSubscriptionId,
+      'transactionStatusSubscriptionId'
+    );
   }
 
   /**
@@ -422,9 +445,9 @@ export class WebSocketChannel implements WebSocketChannelInterface {
   public async unsubscribePendingTransaction() {
     if (!this.pendingTransactionSubscriptionId)
       throw Error('There is no subscription ID for this event');
-    const status = await this.unsubscribe(this.pendingTransactionSubscriptionId);
-    // eslint-disable-next-line no-param-reassign
-    if (status) this.pendingTransactionSubscriptionId = undefined;
-    return status;
+    return this.unsubscribe(
+      this.pendingTransactionSubscriptionId,
+      'pendingTransactionSubscriptionId'
+    );
   }
 }

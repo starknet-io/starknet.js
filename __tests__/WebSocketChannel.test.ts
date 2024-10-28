@@ -4,38 +4,6 @@ import { Provider, WebSocketChannel } from '../src';
 import { StarknetChainId } from '../src/constants';
 import { getTestAccount, getTestProvider } from './config/fixtures';
 
-/* describe('ws local test', () => {
-  const webSocketChannel = new WebSocketChannel();
-
-  beforeAll(async () => {
-    const x = await webSocketChannel.isConnected();
-    const a = await webSocketChannel.waitForConnection();
-    const b = await webSocketChannel.isConnected();
-
-    console.log(a, x, b);
-  });
-
-  test('Test basic connection', async () => {
-    webSocketChannel.send('stark_test', { testdata: 'test' });
-
-    webSocketChannel.subscribeNewHeads();
-
-    // unsubscribe and close connection after receiving 3 new messages
-    let i = 0;
-    webSocketChannel.onsNewHeads = async (data: any) => {
-      i += 1;
-      console.log(data);
-      if (i === 3) {
-        await webSocketChannel.unsubscribeNewHeads();
-        webSocketChannel.disconnect();
-      }
-    };
-
-    await webSocketChannel.waitForDisconnection();
-    console.log('test id done');
-  });
-}); */
-
 describe('websocket specific endpoints - pathfinder test', () => {
   // account provider
   const provider = new Provider(getTestProvider());
@@ -55,26 +23,27 @@ describe('websocket specific endpoints - pathfinder test', () => {
   test('Test subscribeNewHeads', async () => {
     await webSocketChannel.subscribeNewHeads();
 
-    // unsubscribe and close connection after receiving 2 messages
     let i = 0;
     webSocketChannel.onsNewHeads = async (data: any) => {
       i += 1;
+      // TODO : Add data format validation
       expect(data.result).toBeDefined();
-      if (i === 2) {
+      if (i === 1) {
         const status = await webSocketChannel.unsubscribeNewHeads();
         expect(status).toBe(true);
-        webSocketChannel.disconnect();
       }
     };
 
-    await webSocketChannel.waitForDisconnection();
-    expect(webSocketChannel.isConnected()).toBe(false);
+    const status = await webSocketChannel.waitForUnsubscription(
+      webSocketChannel.newHeadsSubscriptionId
+    );
+    expect(status).toBe(true);
+    expect(webSocketChannel.newHeadsSubscriptionId).toBe(undefined);
   });
 
   test('Test subscribeEvents', async () => {
     await webSocketChannel.subscribeEvents();
 
-    // unsubscribe and close connection after receiving 1 messages
     let i = 0;
     webSocketChannel.onEvents = async (data: any) => {
       i += 1;
@@ -83,18 +52,19 @@ describe('websocket specific endpoints - pathfinder test', () => {
       if (i === 2) {
         const status = await webSocketChannel.unsubscribeEvents();
         expect(status).toBe(true);
-        webSocketChannel.disconnect();
       }
     };
 
-    const status = await webSocketChannel.waitForDisconnection();
-    expect(status).toBe(WebSocket.CLOSED);
+    const status = await webSocketChannel.waitForUnsubscription(
+      webSocketChannel.eventsSubscriptionId
+    );
+    expect(status).toBe(true);
+    expect(webSocketChannel.eventsSubscriptionId).toBe(undefined);
   });
 
   test('Test subscribePendingTransaction', async () => {
     await webSocketChannel.subscribePendingTransaction(true);
 
-    // unsubscribe and close connection after receiving 5 messages
     let i = 0;
     webSocketChannel.onPendingTransaction = async (data: any) => {
       i += 1;
@@ -103,12 +73,14 @@ describe('websocket specific endpoints - pathfinder test', () => {
       if (i === 5) {
         const status = await webSocketChannel.unsubscribePendingTransaction();
         expect(status).toBe(true);
-        webSocketChannel.disconnect();
       }
     };
 
-    const status = await webSocketChannel.waitForDisconnection();
-    expect(status).toBe(WebSocket.CLOSED);
+    const status = await webSocketChannel.waitForUnsubscription(
+      webSocketChannel.pendingTransactionSubscriptionId
+    );
+    expect(status).toBe(true);
+    expect(webSocketChannel.pendingTransactionSubscriptionId).toBe(undefined);
   });
 
   test('Test subscribeTransactionStatus', async () => {
@@ -120,7 +92,6 @@ describe('websocket specific endpoints - pathfinder test', () => {
 
     await webSocketChannel.subscribeTransactionStatus(transaction_hash);
 
-    // unsubscribe and close connection after receiving 1 messages
     let i = 0;
     webSocketChannel.onTransactionStatus = async (data: any) => {
       i += 1;
@@ -129,12 +100,20 @@ describe('websocket specific endpoints - pathfinder test', () => {
       if (i === 2) {
         const status = await webSocketChannel.unsubscribeTransactionStatus();
         expect(status).toBe(true);
-        webSocketChannel.disconnect();
       }
     };
 
-    const status = await webSocketChannel.waitForDisconnection();
-    expect(status).toBe(WebSocket.CLOSED);
+    const status = await webSocketChannel.waitForUnsubscription(
+      webSocketChannel.transactionStatusSubscriptionId
+    );
+    expect(status).toBe(true);
+    expect(webSocketChannel.transactionStatusSubscriptionId).toBe(undefined);
+  });
+
+  test('disconnect', async () => {
+    expect(webSocketChannel.isConnected()).toBe(true);
+    webSocketChannel.disconnect();
+    expect(webSocketChannel.waitForDisconnection()).resolves.toBe(WebSocket.CLOSED);
   });
 });
 
