@@ -1,7 +1,8 @@
 import { WebSocket } from 'isows';
 
-import { WebSocketChannel } from '../src';
+import { Provider, WebSocketChannel } from '../src';
 import { StarknetChainId } from '../src/constants';
+import { getTestAccount, getTestProvider } from './config/fixtures';
 
 /* describe('ws local test', () => {
   const webSocketChannel = new WebSocketChannel();
@@ -36,6 +37,11 @@ import { StarknetChainId } from '../src/constants';
 }); */
 
 describe('websocket specific endpoints - pathfinder test', () => {
+  // account provider
+  const provider = new Provider(getTestProvider());
+  const account = getTestAccount(provider);
+
+  // websocket
   const webSocketChannel = new WebSocketChannel({
     nodeUrl: 'wss://toni.spaceshard.io/rpc/v0_8',
   });
@@ -49,12 +55,12 @@ describe('websocket specific endpoints - pathfinder test', () => {
   test('Test subscribeNewHeads', async () => {
     await webSocketChannel.subscribeNewHeads();
 
-    // unsubscribe and close connection after receiving 3 new messages
+    // unsubscribe and close connection after receiving 2 messages
     let i = 0;
     webSocketChannel.onsNewHeads = async (data: any) => {
       i += 1;
-      expect(data).toBeDefined();
-      if (i === 1) {
+      expect(data.result).toBeDefined();
+      if (i === 2) {
         const status = await webSocketChannel.unsubscribeNewHeads();
         expect(status).toBe(true);
         webSocketChannel.disconnect();
@@ -63,6 +69,74 @@ describe('websocket specific endpoints - pathfinder test', () => {
 
     await webSocketChannel.waitForDisconnection();
     expect(webSocketChannel.isConnected()).toBe(false);
+  });
+
+  test('Test subscribeEvents', async () => {
+    await webSocketChannel.subscribeEvents();
+
+    // unsubscribe and close connection after receiving 1 messages
+    let i = 0;
+    webSocketChannel.onEvents = async (data: any) => {
+      i += 1;
+      // TODO : Add data format validation
+      expect(data.result).toBeDefined();
+      if (i === 2) {
+        const status = await webSocketChannel.unsubscribeEvents();
+        expect(status).toBe(true);
+        webSocketChannel.disconnect();
+      }
+    };
+
+    const status = await webSocketChannel.waitForDisconnection();
+    expect(status).toBe(WebSocket.CLOSED);
+  });
+
+  test('Test subscribePendingTransaction', async () => {
+    await webSocketChannel.subscribePendingTransaction(true);
+
+    // unsubscribe and close connection after receiving 5 messages
+    let i = 0;
+    webSocketChannel.onPendingTransaction = async (data: any) => {
+      i += 1;
+      // TODO : Add data format validation
+      expect(data.result).toBeDefined();
+      if (i === 5) {
+        const status = await webSocketChannel.unsubscribePendingTransaction();
+        expect(status).toBe(true);
+        webSocketChannel.disconnect();
+      }
+    };
+
+    const status = await webSocketChannel.waitForDisconnection();
+    expect(status).toBe(WebSocket.CLOSED);
+  });
+
+  test('Test subscribeTransactionStatus', async () => {
+    const { transaction_hash } = await account.execute({
+      contractAddress: '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
+      entrypoint: 'transfer',
+      calldata: [account.address, '10', '0'],
+    });
+
+    console.log(transaction_hash);
+
+    await webSocketChannel.subscribeTransactionStatus(transaction_hash);
+
+    // unsubscribe and close connection after receiving 1 messages
+    let i = 0;
+    webSocketChannel.onTransactionStatus = async (data: any) => {
+      i += 1;
+      // TODO : Add data format validation
+      expect(data.result).toBeDefined();
+      if (i === 2) {
+        const status = await webSocketChannel.unsubscribeTransactionStatus();
+        expect(status).toBe(true);
+        webSocketChannel.disconnect();
+      }
+    };
+
+    const status = await webSocketChannel.waitForDisconnection();
+    expect(status).toBe(WebSocket.CLOSED);
   });
 });
 

@@ -3,7 +3,7 @@ import { WebSocket } from 'isows';
 import { BigNumberish, BlockIdentifier } from '../types';
 import { JRPC } from '../types/api';
 import { stringify } from '../utils/json';
-import { toHex } from '../utils/num';
+import { bigNumberishArrayToHexadecimalStringArray, toHex } from '../utils/num';
 import { Block } from '../utils/provider';
 import { WebSocketChannelInterface, WebSocketOptions } from './ws/interface';
 
@@ -57,7 +57,7 @@ export class WebSocketChannel implements WebSocketChannelInterface {
 
   public onTransactionStatus: Function = () => {};
 
-  public onPendingTransactionStatus: Function = () => {};
+  public onPendingTransaction: Function = () => {};
 
   /**
    * Read all receiving messages using this method
@@ -80,13 +80,9 @@ export class WebSocketChannel implements WebSocketChannelInterface {
 
   public transactionStatusSubscriptionId?: number;
 
-  public pendingTransactionStatusSubscriptionId?: number;
+  public pendingTransactionSubscriptionId?: number;
 
   public eventsSubscriptionId?: number;
-
-  public async onsTransactionStatus(callback: Function) {
-    callback();
-  }
 
   /**
    * Construct class and event listeners
@@ -99,6 +95,11 @@ export class WebSocketChannel implements WebSocketChannelInterface {
     // TODO: can we know what network it is ?
     this.nodeUrl = options.websocket ? options.websocket.url : nodeUrl;
     this.websocket = options.websocket ? options.websocket : new WebSocket(nodeUrl);
+
+    this.websocket.addEventListener('open', this.onOpen.bind(this));
+    this.websocket.addEventListener('close', this.onClose.bind(this));
+    this.websocket.addEventListener('message', this.onMessage.bind(this));
+    this.websocket.addEventListener('error', this.onError.bind(this));
   }
 
   /**
@@ -141,11 +142,6 @@ export class WebSocketChannel implements WebSocketChannelInterface {
         this.websocket.onerror = reject;
       });
     }
-
-    this.websocket.addEventListener('open', this.onOpen.bind(this));
-    this.websocket.addEventListener('close', this.onClose.bind(this));
-    this.websocket.addEventListener('message', this.onMessage.bind(this));
-    this.websocket.addEventListener('error', this.onError.bind(this));
 
     return this.websocket.readyState;
   }
@@ -205,7 +201,7 @@ export class WebSocketChannel implements WebSocketChannelInterface {
     // TODO: Add error case
     const message = JSON.parse(data);
 
-    console.log('onMessage:', data);
+    // console.log('onMessage:', data);
 
     // Forward events (events contains method)
     switch (message.method) {
@@ -222,7 +218,7 @@ export class WebSocketChannel implements WebSocketChannelInterface {
         this.onTransactionStatus(message.params);
         break;
       case 'starknet_subscriptionPendingTransactions':
-        this.onPendingTransactionStatus(message.params);
+        this.onPendingTransaction(message.params);
         break;
       default:
         break;
@@ -281,13 +277,17 @@ export class WebSocketChannel implements WebSocketChannelInterface {
   }
 
   public async subscribeNewHeads(blockIdentifier?: BlockIdentifier) {
-    if (this.eventsSubscriptionId) throw Error('subscription to this event already exists');
+    if (this.newHeadsSubscriptionId) throw Error('subscription to this event already exists');
     this.newHeadsSubscriptionId = (
       await this.subscribeNewHeadsUnmanaged(blockIdentifier)
     ).subscription_id;
     return this.newHeadsSubscriptionId;
   }
 
+  /**
+   * Unsubscribe managed newHeads subscription
+   * @returns boolean
+   */
   public async unsubscribeNewHeads() {
     if (!this.newHeadsSubscriptionId) throw Error('There is no subscription on this event');
     const status = await this.unsubscribe(this.newHeadsSubscriptionId);
@@ -329,27 +329,19 @@ export class WebSocketChannel implements WebSocketChannelInterface {
     return this.eventsSubscriptionId;
   }
 
-  public unsubscribeEvents() {
+  /**
+   * Unsubscribe managed 'starknet events' subscription
+   * @returns boolean
+   */
+  public async unsubscribeEvents() {
     if (!this.eventsSubscriptionId) throw Error('There is no subscription ID for this event');
-    return this.unsubscribe(this.eventsSubscriptionId);
-  }
-
-  // TODO: Test Generics
-
-  private async genericSubscribe(idPointer: any, callback: Function) {
-    if (idPointer) throw Error('subscription to this event already exists');
-    // eslint-disable-next-line no-param-reassign
-    idPointer = await callback();
-    return idPointer;
-  }
-
-  private genericUnsubscribe(idPointer: any) {
-    if (!idPointer) throw Error('There is no subscription ID for this event');
-    return this.unsubscribe(idPointer);
+    const status = await this.unsubscribe(this.eventsSubscriptionId);
+    if (status) this.eventsSubscriptionId = undefined;
+    return status;
   }
 
   /**
-   * subscribe to new block heads
+   * subscribe to transaction status
    * * you can subscribe to this event multiple times and you need to manage subscriptions manually
    */
   public subscribeTransactionStatusUnmanaged(
@@ -365,18 +357,74 @@ export class WebSocketChannel implements WebSocketChannelInterface {
   }
 
   /**
-   * subscribe to new block heads
+   * subscribe to transaction status
    */
   public async subscribeTransactionStatus(
     transactionHash: BigNumberish,
     blockIdentifier?: BlockIdentifier
   ) {
-    return this.genericSubscribe(this.transactionStatusSubscriptionId, () =>
-      this.subscribeTransactionStatusUnmanaged(transactionHash, blockIdentifier)
-    );
+    if (this.transactionStatusSubscriptionId)
+      throw Error('subscription to this event already exists');
+    // eslint-disable-next-line no-param-reassign
+    this.transactionStatusSubscriptionId = (
+      await this.subscribeTransactionStatusUnmanaged(transactionHash, blockIdentifier)
+    ).subscription_id;
+    return this.transactionStatusSubscriptionId;
   }
 
-  public unsubscribeTransactionStatus() {
-    return this.genericUnsubscribe(this.transactionStatusSubscriptionId);
+  /**
+   * unsubscribe managed transaction status subscription
+   */
+  public async unsubscribeTransactionStatus() {
+    if (!this.transactionStatusSubscriptionId)
+      throw Error('There is no subscription ID for this event');
+    const status = await this.unsubscribe(this.transactionStatusSubscriptionId);
+    // eslint-disable-next-line no-param-reassign
+    if (status) this.transactionStatusSubscriptionId = undefined;
+    return status;
+  }
+
+  /**
+   * subscribe to pending transactions (mempool)
+   * * you can subscribe to this event multiple times and you need to manage subscriptions manually
+   */
+  public subscribePendingTransactionUnmanaged(
+    transactionDetails?: boolean,
+    senderAddress?: BigNumberish[]
+  ) {
+    return this.sendReceive('starknet_subscribePendingTransactions', {
+      ...{ transaction_details: transactionDetails },
+      ...{
+        sender_address: senderAddress && bigNumberishArrayToHexadecimalStringArray(senderAddress),
+      },
+    }) as Promise<SUBSCRIPTION_RESULT>;
+  }
+
+  /**
+   * subscribe to pending transactions (mempool)
+   */
+  public async subscribePendingTransaction(
+    transactionDetails?: boolean,
+    senderAddress?: BigNumberish[]
+  ) {
+    if (this.pendingTransactionSubscriptionId)
+      throw Error('subscription to this event already exists');
+    // eslint-disable-next-line no-param-reassign
+    this.pendingTransactionSubscriptionId = (
+      await this.subscribePendingTransactionUnmanaged(transactionDetails, senderAddress)
+    ).subscription_id;
+    return this.pendingTransactionSubscriptionId;
+  }
+
+  /**
+   * unsubscribe managed pending transaction subscription
+   */
+  public async unsubscribePendingTransaction() {
+    if (!this.pendingTransactionSubscriptionId)
+      throw Error('There is no subscription ID for this event');
+    const status = await this.unsubscribe(this.pendingTransactionSubscriptionId);
+    // eslint-disable-next-line no-param-reassign
+    if (status) this.pendingTransactionSubscriptionId = undefined;
+    return status;
   }
 }
