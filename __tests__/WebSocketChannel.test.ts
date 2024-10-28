@@ -24,7 +24,7 @@ describe('websocket specific endpoints - pathfinder test', () => {
     await webSocketChannel.subscribeNewHeads();
 
     let i = 0;
-    webSocketChannel.onsNewHeads = async (data: any) => {
+    webSocketChannel.onsNewHeads = async (data) => {
       i += 1;
       // TODO : Add data format validation
       expect(data.result).toBeDefined();
@@ -45,7 +45,7 @@ describe('websocket specific endpoints - pathfinder test', () => {
     await webSocketChannel.subscribeEvents();
 
     let i = 0;
-    webSocketChannel.onEvents = async (data: any) => {
+    webSocketChannel.onEvents = async (data) => {
       i += 1;
       // TODO : Add data format validation
       expect(data.result).toBeDefined();
@@ -66,7 +66,7 @@ describe('websocket specific endpoints - pathfinder test', () => {
     await webSocketChannel.subscribePendingTransaction(true);
 
     let i = 0;
-    webSocketChannel.onPendingTransaction = async (data: any) => {
+    webSocketChannel.onPendingTransaction = async (data) => {
       i += 1;
       // TODO : Add data format validation
       expect(data.result).toBeDefined();
@@ -93,7 +93,7 @@ describe('websocket specific endpoints - pathfinder test', () => {
     await webSocketChannel.subscribeTransactionStatus(transaction_hash);
 
     let i = 0;
-    webSocketChannel.onTransactionStatus = async (data: any) => {
+    webSocketChannel.onTransactionStatus = async (data) => {
       i += 1;
       // TODO : Add data format validation
       expect(data.result).toBeDefined();

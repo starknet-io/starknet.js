@@ -1,3 +1,5 @@
+import type { SPEC } from '@starknet-io/types-js';
+// import type { BLOCK_HEADER } from '@starknet-io/types-js';
 import { WebSocket } from 'isows';
 
 import { BigNumberish, BlockIdentifier } from '../types';
@@ -22,6 +24,26 @@ export type WsEvent = {
 export type SUBSCRIPTION_ID = number;
 
 export type SUBSCRIPTION_RESULT = { subscription_id: SUBSCRIPTION_ID };
+
+export type SubscriptionNewHeadsResponse = {
+  subscription_id: SUBSCRIPTION_ID;
+  result: SPEC.BLOCK_HEADER;
+};
+
+export type SubscriptionEventsResponse = {
+  subscription_id: SUBSCRIPTION_ID;
+  result: SPEC.EMITTED_EVENT;
+};
+
+export type SubscriptionTransactionsStatusResponse = {
+  subscription_id: SUBSCRIPTION_ID;
+  result: SPEC.NEW_TXN_STATUS;
+};
+
+export type SubscriptionPendingTransactionsResponse = {
+  subscription_id: SUBSCRIPTION_ID;
+  result: SPEC.TXN_HASH | SPEC.TXN;
+};
 
 // import { WebSocket } from 'ws';
 
@@ -49,18 +71,32 @@ export class WebSocketChannel implements WebSocketChannelInterface {
 
   // private batchClient?: BatchClient;
 
-  public websocket: WebSocket; // TODO: find and set type to standard definition of websocket protocol instead of any
-
-  public onsNewHeads: Function = () => {};
-
-  public onEvents: Function = () => {};
-
-  public onTransactionStatus: Function = () => {};
-
-  public onPendingTransaction: Function = () => {};
+  /**
+   * ws library object
+   */
+  public websocket: WebSocket;
 
   /**
-   * Read all receiving messages using this method
+   * Assign implementation to get 'new block heads'
+   */
+  public onsNewHeads: (this: WebSocketChannel, data: SubscriptionNewHeadsResponse) => any =
+    () => {};
+
+  public onEvents: (this: WebSocketChannel, data: SubscriptionEventsResponse) => any = () => {};
+
+  public onTransactionStatus: (
+    this: WebSocketChannel,
+    data: SubscriptionTransactionsStatusResponse
+  ) => any = () => {};
+
+  public onPendingTransaction: (
+    this: WebSocketChannel,
+    data: SubscriptionPendingTransactionsResponse
+  ) => any = () => {};
+
+  /**
+   * Assign implementation to this method to get all receiving messages
+   * * optionally you can also reassign underlying this.websocket.onmessage
    */
   public on: Function = () => {};
 
@@ -203,13 +239,9 @@ export class WebSocketChannel implements WebSocketChannelInterface {
     // TODO: replay data from last block received (including it) up to latest
   }
 
-  public onOpen() {
-    console.log('socket open');
-  }
+  public onOpen() {}
 
-  public onError() {
-    console.log('socket error');
-  }
+  public onError() {}
 
   public onClose() {
     this.websocket.removeEventListener('open', this.onOpen);
