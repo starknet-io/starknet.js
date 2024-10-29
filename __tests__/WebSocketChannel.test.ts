@@ -1,6 +1,6 @@
 import { WebSocket } from 'isows';
 
-import { Provider, WebSocketChannel } from '../src';
+import { Provider, WSSubscriptions, WebSocketChannel } from '../src';
 import { StarknetChainId } from '../src/constants';
 import { getTestAccount, getTestProvider } from './config/fixtures';
 
@@ -20,11 +20,29 @@ describe('websocket specific endpoints - pathfinder test', () => {
     expect(webSocketChannel.isConnected()).toBe(true);
   });
 
+  test('Test WS Error and edge cases', async () => {
+    webSocketChannel.disconnect();
+
+    // should fail as disconnected
+    await expect(webSocketChannel.subscribeNewHeads()).rejects.toThrow();
+
+    // should reconnect
+    webSocketChannel.reconnect();
+    await webSocketChannel.waitForConnection();
+
+    // should succeed after reconnection
+    await expect(webSocketChannel.subscribeNewHeads()).resolves.toEqual(expect.any(Number));
+
+    // should fails because already subscribed
+    await expect(webSocketChannel.subscribeNewHeads()).resolves.toBe(false);
+  });
+
   test('Test subscribeNewHeads', async () => {
     await webSocketChannel.subscribeNewHeads();
 
     let i = 0;
-    webSocketChannel.onsNewHeads = async (data) => {
+    webSocketChannel.onsNewHeads = async function (data) {
+      expect(this).toBeInstanceOf(WebSocketChannel);
       i += 1;
       // TODO : Add data format validation
       expect(data.result).toBeDefined();
@@ -33,12 +51,10 @@ describe('websocket specific endpoints - pathfinder test', () => {
         expect(status).toBe(true);
       }
     };
-
-    const status = await webSocketChannel.waitForUnsubscription(
-      webSocketChannel.newHeadsSubscriptionId
-    );
-    expect(status).toBe(true);
-    expect(webSocketChannel.newHeadsSubscriptionId).toBe(undefined);
+    const expectedId = webSocketChannel.subscriptions.get(WSSubscriptions.NEW_HEADS);
+    const subscriptionId = await webSocketChannel.waitForUnsubscription(expectedId);
+    expect(subscriptionId).toBe(expectedId);
+    expect(webSocketChannel.subscriptions.get(WSSubscriptions.NEW_HEADS)).toBe(undefined);
   });
 
   test('Test subscribeEvents', async () => {
@@ -54,11 +70,11 @@ describe('websocket specific endpoints - pathfinder test', () => {
         expect(status).toBe(true);
       }
     };
-
-    const status = await webSocketChannel.waitForUnsubscription(
+    const expectedId = webSocketChannel.eventsSubscriptionId;
+    const subscriptionId = await webSocketChannel.waitForUnsubscription(
       webSocketChannel.eventsSubscriptionId
     );
-    expect(status).toBe(true);
+    expect(subscriptionId).toBe(expectedId);
     expect(webSocketChannel.eventsSubscriptionId).toBe(undefined);
   });
 
@@ -75,11 +91,11 @@ describe('websocket specific endpoints - pathfinder test', () => {
         expect(status).toBe(true);
       }
     };
-
-    const status = await webSocketChannel.waitForUnsubscription(
+    const expectedId = webSocketChannel.pendingTransactionSubscriptionId;
+    const subscriptionId = await webSocketChannel.waitForUnsubscription(
       webSocketChannel.pendingTransactionSubscriptionId
     );
-    expect(status).toBe(true);
+    expect(subscriptionId).toBe(expectedId);
     expect(webSocketChannel.pendingTransactionSubscriptionId).toBe(undefined);
   });
 
@@ -102,18 +118,24 @@ describe('websocket specific endpoints - pathfinder test', () => {
         expect(status).toBe(true);
       }
     };
-
-    const status = await webSocketChannel.waitForUnsubscription(
+    const expectedId = webSocketChannel.transactionStatusSubscriptionId;
+    const subscriptionId = await webSocketChannel.waitForUnsubscription(
       webSocketChannel.transactionStatusSubscriptionId
     );
-    expect(status).toBe(true);
+    expect(subscriptionId).toEqual(expectedId);
     expect(webSocketChannel.transactionStatusSubscriptionId).toBe(undefined);
   });
 
   test('disconnect', async () => {
     expect(webSocketChannel.isConnected()).toBe(true);
     webSocketChannel.disconnect();
-    expect(webSocketChannel.waitForDisconnection()).resolves.toBe(WebSocket.CLOSED);
+    await expect(webSocketChannel.waitForDisconnection()).resolves.toBe(WebSocket.CLOSED);
+  });
+
+  afterAll(async () => {
+    webSocketChannel.disconnect();
+    const status = await webSocketChannel.waitForDisconnection();
+    expect(status).toBe(WebSocket.CLOSED);
   });
 });
 
