@@ -1,5 +1,4 @@
 import type { SPEC } from '@starknet-io/types-js';
-// import type { BLOCK_HEADER } from '@starknet-io/types-js';
 import { WebSocket } from 'isows';
 
 import { BigNumberish, BlockIdentifier } from '../types';
@@ -8,7 +7,6 @@ import { WebSocketEvent } from '../types/api/jsonrpc';
 import { stringify } from '../utils/json';
 import { bigNumberishArrayToHexadecimalStringArray, toHex } from '../utils/num';
 import { Block } from '../utils/provider';
-import { WebSocketChannelInterface, WebSocketOptions } from './ws/interface';
 
 export type SUBSCRIPTION_ID = number;
 
@@ -41,12 +39,26 @@ export const WSSubscriptions = {
   PENDING_TRANSACTION: 'pendingTransactions',
 } as const;
 
-// import { WebSocket } from 'ws';
+export type WebSocketOptions = {
+  /**
+   * websocket node url address
+   * @example 'ws://www.host.com/path'
+   * @default public websocket enabled starknet node
+   */
+  nodeUrl?: string;
+  /**
+   * You can provide websocket object defined by protocol standard else library will use default 'isows'/'ws' package
+   * https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/WebSocket#protocols .
+   * https://www.rfc-editor.org/rfc/rfc6455.html#section-1 .
+   * @default WebSocket
+   */
+  websocket?: WebSocket;
+};
 
 /**
  * WebSocket channel provide communication with Starknet node over long-lived socket connection
  */
-export class WebSocketChannel implements WebSocketChannelInterface {
+export class WebSocketChannel {
   /**
    * WEbsocket RPC Node URL
    * @example 'wss://starknet-node.io/rpc/v0_8'
