@@ -138,28 +138,9 @@ export class WebSocketChannel implements WebSocketChannelInterface {
 
   /**
    * subscriptions id
+   * mapped by keys WSSubscriptions
    */
   readonly subscriptions: Map<string, number> = new Map();
-
-  /**
-   * subscriptions id
-   */
-  public newHeadsSubscriptionId?: number;
-
-  /**
-   * subscriptions id
-   */
-  public transactionStatusSubscriptionId?: number;
-
-  /**
-   * subscriptions id
-   */
-  public pendingTransactionSubscriptionId?: number;
-
-  /**
-   * subscriptions id
-   */
-  public eventsSubscriptionId?: number;
 
   /**
    * Construct class and event listeners
@@ -447,13 +428,12 @@ export class WebSocketChannel implements WebSocketChannelInterface {
     keys?: string[][],
     blockIdentifier?: BlockIdentifier
   ) {
-    if (this.eventsSubscriptionId) return false;
+    if (this.subscriptions.get(WSSubscriptions.EVENTS)) return false;
     // eslint-disable-next-line prefer-rest-params
-    this.eventsSubscriptionId = (
-      await this.subscribeEventsUnmanaged(fromAddress, keys, blockIdentifier)
-    ).subscription_id;
-
-    return this.eventsSubscriptionId;
+    const subId = (await this.subscribeEventsUnmanaged(fromAddress, keys, blockIdentifier))
+      .subscription_id;
+    this.subscriptions.set(WSSubscriptions.EVENTS, subId);
+    return subId;
   }
 
   /**
@@ -461,8 +441,9 @@ export class WebSocketChannel implements WebSocketChannelInterface {
    * @returns boolean
    */
   public unsubscribeEvents() {
-    if (!this.eventsSubscriptionId) throw Error('There is no subscription ID for this event');
-    return this.unsubscribe(this.eventsSubscriptionId, 'eventsSubscriptionId');
+    const subId = this.subscriptions.get(WSSubscriptions.EVENTS);
+    if (!subId) throw Error('There is no subscription ID for this event');
+    return this.unsubscribe(subId, WSSubscriptions.EVENTS);
   }
 
   /**
@@ -488,24 +469,21 @@ export class WebSocketChannel implements WebSocketChannelInterface {
     transactionHash: BigNumberish,
     blockIdentifier?: BlockIdentifier
   ) {
-    if (this.transactionStatusSubscriptionId) return false;
+    if (this.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS)) return false;
     // eslint-disable-next-line no-param-reassign
-    this.transactionStatusSubscriptionId = (
-      await this.subscribeTransactionStatusUnmanaged(transactionHash, blockIdentifier)
-    ).subscription_id;
-    return this.transactionStatusSubscriptionId;
+    const subId = (await this.subscribeTransactionStatusUnmanaged(transactionHash, blockIdentifier))
+      .subscription_id;
+    this.subscriptions.set(WSSubscriptions.TRANSACTION_STATUS, subId);
+    return subId;
   }
 
   /**
    * unsubscribe managed transaction status subscription
    */
   public async unsubscribeTransactionStatus() {
-    if (!this.transactionStatusSubscriptionId)
-      throw Error('There is no subscription ID for this event');
-    return this.unsubscribe(
-      this.transactionStatusSubscriptionId,
-      'transactionStatusSubscriptionId'
-    );
+    const subId = this.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS);
+    if (!subId) throw Error('There is no subscription ID for this event');
+    return this.unsubscribe(subId, WSSubscriptions.TRANSACTION_STATUS);
   }
 
   /**
@@ -531,23 +509,21 @@ export class WebSocketChannel implements WebSocketChannelInterface {
     transactionDetails?: boolean,
     senderAddress?: BigNumberish[]
   ) {
-    if (this.pendingTransactionSubscriptionId) return false;
+    if (this.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS)) return false;
     // eslint-disable-next-line no-param-reassign
-    this.pendingTransactionSubscriptionId = (
+    const subId = (
       await this.subscribePendingTransactionUnmanaged(transactionDetails, senderAddress)
     ).subscription_id;
-    return this.pendingTransactionSubscriptionId;
+    this.subscriptions.set(WSSubscriptions.PENDING_TRANSACTION, subId);
+    return subId;
   }
 
   /**
    * unsubscribe managed pending transaction subscription
    */
   public async unsubscribePendingTransaction() {
-    if (!this.pendingTransactionSubscriptionId)
-      throw Error('There is no subscription ID for this event');
-    return this.unsubscribe(
-      this.pendingTransactionSubscriptionId,
-      'pendingTransactionSubscriptionId'
-    );
+    const subId = this.subscriptions.get(WSSubscriptions.PENDING_TRANSACTION);
+    if (!subId) throw Error('There is no subscription ID for this event');
+    return this.unsubscribe(subId, WSSubscriptions.PENDING_TRANSACTION);
   }
 }

@@ -70,12 +70,10 @@ describe('websocket specific endpoints - pathfinder test', () => {
         expect(status).toBe(true);
       }
     };
-    const expectedId = webSocketChannel.eventsSubscriptionId;
-    const subscriptionId = await webSocketChannel.waitForUnsubscription(
-      webSocketChannel.eventsSubscriptionId
-    );
+    const expectedId = webSocketChannel.subscriptions.get(WSSubscriptions.EVENTS);
+    const subscriptionId = await webSocketChannel.waitForUnsubscription(expectedId);
     expect(subscriptionId).toBe(expectedId);
-    expect(webSocketChannel.eventsSubscriptionId).toBe(undefined);
+    expect(webSocketChannel.subscriptions.get(WSSubscriptions.EVENTS)).toBe(undefined);
   });
 
   test('Test subscribePendingTransaction', async () => {
@@ -91,12 +89,10 @@ describe('websocket specific endpoints - pathfinder test', () => {
         expect(status).toBe(true);
       }
     };
-    const expectedId = webSocketChannel.pendingTransactionSubscriptionId;
-    const subscriptionId = await webSocketChannel.waitForUnsubscription(
-      webSocketChannel.pendingTransactionSubscriptionId
-    );
+    const expectedId = webSocketChannel.subscriptions.get(WSSubscriptions.PENDING_TRANSACTION);
+    const subscriptionId = await webSocketChannel.waitForUnsubscription(expectedId);
     expect(subscriptionId).toBe(expectedId);
-    expect(webSocketChannel.pendingTransactionSubscriptionId).toBe(undefined);
+    expect(webSocketChannel.subscriptions.get(WSSubscriptions.PENDING_TRANSACTION)).toBe(undefined);
   });
 
   test('Test subscribeTransactionStatus', async () => {
@@ -118,12 +114,10 @@ describe('websocket specific endpoints - pathfinder test', () => {
         expect(status).toBe(true);
       }
     };
-    const expectedId = webSocketChannel.transactionStatusSubscriptionId;
-    const subscriptionId = await webSocketChannel.waitForUnsubscription(
-      webSocketChannel.transactionStatusSubscriptionId
-    );
+    const expectedId = webSocketChannel.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS);
+    const subscriptionId = await webSocketChannel.waitForUnsubscription(expectedId);
     expect(subscriptionId).toEqual(expectedId);
-    expect(webSocketChannel.transactionStatusSubscriptionId).toBe(undefined);
+    expect(webSocketChannel.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS)).toBe(undefined);
   });
 
   test('disconnect', async () => {
