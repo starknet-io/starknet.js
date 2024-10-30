@@ -92,13 +92,12 @@ export class WebSocketChannel {
    * Assign implementation method to get 'starknet block heads'
    * @example
    * ```typescript
-   * webSocketChannel.onsNewHeads = async function (data) {
+   * webSocketChannel.onNewHeads = async function (data) {
    *  // ... do something with head data
    * }
    * ```
    */
-  public onsNewHeads: (this: WebSocketChannel, data: SubscriptionNewHeadsResponse) => any =
-    () => {};
+  public onNewHeads: (this: WebSocketChannel, data: SubscriptionNewHeadsResponse) => any = () => {};
 
   /**
    * Assign implementation method to get 'starknet events'
@@ -381,7 +380,6 @@ export class WebSocketChannel {
     this.websocket.removeEventListener('close', this.onCloseProxy);
     this.websocket.removeEventListener('message', this.onMessageProxy);
     this.websocket.removeEventListener('error', this.onError);
-
     this.onClose(ev);
   }
 
@@ -392,7 +390,7 @@ export class WebSocketChannel {
       case 'starknet_subscriptionReorg':
         throw Error('Reorg'); // todo: implement what to do
       case 'starknet_subscriptionNewHeads':
-        this.onsNewHeads(message.params as SubscriptionNewHeadsResponse);
+        this.onNewHeads(message.params as SubscriptionNewHeadsResponse);
         break;
       case 'starknet_subscriptionEvents':
         this.onEvents(message.params as SubscriptionEventsResponse);
