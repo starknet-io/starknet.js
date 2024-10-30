@@ -78,17 +78,35 @@ export class WebSocketChannel implements WebSocketChannelInterface {
 
   /**
    * Assign implementation method to get 'starknet block heads'
+   * @example
+   * ```typescript
+   * webSocketChannel.onsNewHeads = async function (data) {
+   *  // ... do something with head data
+   * }
+   * ```
    */
   public onsNewHeads: (this: WebSocketChannel, data: SubscriptionNewHeadsResponse) => any =
     () => {};
 
   /**
    * Assign implementation method to get 'starknet events'
+   * @example
+   * ```typescript
+   * webSocketChannel.onEvents = async function (data) {
+   *  // ... do something with event data
+   * }
+   * ```
    */
   public onEvents: (this: WebSocketChannel, data: SubscriptionEventsResponse) => any = () => {};
 
   /**
    * Assign method to get 'starknet transactions status'
+   * @example
+   * ```typescript
+   * webSocketChannel.onTransactionStatus = async function (data) {
+   *  // ... do something with tx status data
+   * }
+   * ```
    */
   public onTransactionStatus: (
     this: WebSocketChannel,
@@ -97,6 +115,12 @@ export class WebSocketChannel implements WebSocketChannelInterface {
 
   /**
    * Assign implementation method to get 'starknet pending transactions (mempool)'
+   * @example
+   * ```typescript
+   * webSocketChannel.onPendingTransaction = async function (data) {
+   *  // ... do something with pending tx data
+   * }
+   * ```
    */
   public onPendingTransaction: (
     this: WebSocketChannel,
@@ -137,7 +161,7 @@ export class WebSocketChannel implements WebSocketChannelInterface {
   private sendId: number = 0;
 
   /**
-   * subscriptions id
+   * subscriptions ids
    * mapped by keys WSSubscriptions
    */
   readonly subscriptions: Map<string, number> = new Map();
@@ -283,7 +307,7 @@ export class WebSocketChannel implements WebSocketChannelInterface {
    * @param subscriptionId
    * @param ref internal usage, only for managed subscriptions
    */
-  private async unsubscribe(subscriptionId: number, ref?: string) {
+  public async unsubscribe(subscriptionId: number, ref?: string) {
     const status = (await this.sendReceive('starknet_unsubscribe', {
       subscription_id: subscriptionId,
     })) as boolean;
@@ -333,8 +357,10 @@ export class WebSocketChannel implements WebSocketChannelInterface {
     this.websocket.addEventListener('error', this.onError.bind(this));
   }
 
+  // TODO: Add/Test ping service. It seems this work out of the box from pathfinder. If net disc. it will auto replay.
   private reconnectAndUpdate() {
-    this.reconnect(); // TODO: attempt n reconnection times
+    this.reconnect();
+    // TODO: attempt n reconnection times
     // TODO: replay data from last block received (including it) up to latest
   }
 
@@ -353,7 +379,6 @@ export class WebSocketChannel implements WebSocketChannelInterface {
     switch (message.method) {
       case 'starknet_subscriptionReorg':
         throw Error('Reorg'); // todo: implement what to do
-        break;
       case 'starknet_subscriptionNewHeads':
         this.onsNewHeads(message.params as SubscriptionNewHeadsResponse);
         break;
@@ -372,8 +397,6 @@ export class WebSocketChannel implements WebSocketChannelInterface {
     this.onMessage(event);
   }
 
-  // TODO: Add/Test ping service
-
   /**
    * subscribe to new block heads
    * * you can subscribe to this event multiple times and you need to manage subscriptions manually
@@ -386,6 +409,9 @@ export class WebSocketChannel implements WebSocketChannelInterface {
     }) as Promise<SUBSCRIPTION_RESULT>;
   }
 
+  /**
+   * subscribe to new block heads
+   */
   public async subscribeNewHeads(blockIdentifier?: BlockIdentifier) {
     if (this.subscriptions.get(WSSubscriptions.NEW_HEADS)) return false;
     const subId = (await this.subscribeNewHeadsUnmanaged(blockIdentifier)).subscription_id;
@@ -394,8 +420,7 @@ export class WebSocketChannel implements WebSocketChannelInterface {
   }
 
   /**
-   * Unsubscribe managed newHeads subscription
-   * @returns boolean
+   * Unsubscribe newHeads subscription
    */
   public async unsubscribeNewHeads() {
     const subId = this.subscriptions.get(WSSubscriptions.NEW_HEADS);
@@ -404,7 +429,7 @@ export class WebSocketChannel implements WebSocketChannelInterface {
   }
 
   /**
-   * subscribe to new block heads
+   * subscribe to 'starknet events'
    * * you can subscribe to this event multiple times and you need to manage subscriptions manually
    */
   public subscribeEventsUnmanaged(
@@ -421,7 +446,7 @@ export class WebSocketChannel implements WebSocketChannelInterface {
   }
 
   /**
-   * subscribe to new block heads
+   * subscribe to 'starknet events'
    */
   public async subscribeEvents(
     fromAddress?: BigNumberish,
@@ -437,8 +462,7 @@ export class WebSocketChannel implements WebSocketChannelInterface {
   }
 
   /**
-   * Unsubscribe managed 'starknet events' subscription
-   * @returns boolean
+   * Unsubscribe 'starknet events' subscription
    */
   public unsubscribeEvents() {
     const subId = this.subscriptions.get(WSSubscriptions.EVENTS);
@@ -470,7 +494,6 @@ export class WebSocketChannel implements WebSocketChannelInterface {
     blockIdentifier?: BlockIdentifier
   ) {
     if (this.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS)) return false;
-    // eslint-disable-next-line no-param-reassign
     const subId = (await this.subscribeTransactionStatusUnmanaged(transactionHash, blockIdentifier))
       .subscription_id;
     this.subscriptions.set(WSSubscriptions.TRANSACTION_STATUS, subId);
@@ -478,7 +501,7 @@ export class WebSocketChannel implements WebSocketChannelInterface {
   }
 
   /**
-   * unsubscribe managed transaction status subscription
+   * unsubscribe 'transaction status' subscription
    */
   public async unsubscribeTransactionStatus() {
     const subId = this.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS);
@@ -519,7 +542,7 @@ export class WebSocketChannel implements WebSocketChannelInterface {
   }
 
   /**
-   * unsubscribe managed pending transaction subscription
+   * unsubscribe 'pending transaction' subscription
    */
   public async unsubscribePendingTransaction() {
     const subId = this.subscriptions.get(WSSubscriptions.PENDING_TRANSACTION);

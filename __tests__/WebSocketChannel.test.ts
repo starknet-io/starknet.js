@@ -37,6 +37,20 @@ describe('websocket specific endpoints - pathfinder test', () => {
     await expect(webSocketChannel.subscribeNewHeads()).resolves.toBe(false);
   });
 
+  test('onUnsubscribe with unsubscribeNewHeads', async () => {
+    const mockOnUnsubscribe = jest.fn().mockImplementation((subId: number) => {
+      expect(subId).toEqual(expect.any(Number));
+    });
+    webSocketChannel.onUnsubscribe = mockOnUnsubscribe;
+
+    await webSocketChannel.subscribeNewHeads();
+    await expect(webSocketChannel.unsubscribeNewHeads()).resolves.toBe(true);
+    await expect(webSocketChannel.unsubscribeNewHeads()).rejects.toThrow();
+
+    expect(mockOnUnsubscribe).toHaveBeenCalled();
+    expect(webSocketChannel.subscriptions.has(WSSubscriptions.NEW_HEADS)).toBeFalsy();
+  });
+
   test('Test subscribeNewHeads', async () => {
     await webSocketChannel.subscribeNewHeads();
 
@@ -46,7 +60,7 @@ describe('websocket specific endpoints - pathfinder test', () => {
       i += 1;
       // TODO : Add data format validation
       expect(data.result).toBeDefined();
-      if (i === 1) {
+      if (i === 6) {
         const status = await webSocketChannel.unsubscribeNewHeads();
         expect(status).toBe(true);
       }
