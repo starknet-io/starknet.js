@@ -60,7 +60,7 @@ export type WebSocketOptions = {
  */
 export class WebSocketChannel {
   /**
-   * WEbsocket RPC Node URL
+   * WebSocket RPC Node URL
    * @example 'wss://starknet-node.io/rpc/v0_8'
    */
   public nodeUrl: string;
