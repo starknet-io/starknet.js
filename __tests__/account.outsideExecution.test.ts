@@ -1,34 +1,29 @@
 // We test here the most common case: an account compatible with ERC-165 and SNIP-9 (v2).
 // To limit test duration, these cases are not tested: non ERC165 account, non SNIP-9 account, SNIP9-v1 account.
 import {
-  Provider,
   Account,
   cairo,
-  ec,
-  stark,
   CairoCustomEnum,
   CairoOption,
   CairoOptionVariant,
   CallData,
+  constants,
+  Contract,
+  ec,
+  outsideExecution,
   OutsideExecutionVersion,
+  Provider,
+  src5,
+  stark,
+  type Call,
+  type Calldata,
   type OutsideExecutionOptions,
   type OutsideTransaction,
-  constants,
-  type Call,
-  Contract,
-  outsideExecution,
   type TypedData,
-  type Calldata,
-  src5,
 } from '../src';
 import { getSelectorFromName } from '../src/utils/hash';
 import { getDecimalString } from '../src/utils/num';
-import {
-  compiledArgentX4Account,
-  compiledErc20OZ,
-  getTestAccount,
-  getTestProvider,
-} from './config/fixtures';
+import { contracts, getTestAccount, getTestProvider } from './config/fixtures';
 
 describe('Account and OutsideExecution', () => {
   const ethAddress = '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
@@ -39,11 +34,11 @@ describe('Account and OutsideExecution', () => {
   const targetPubK = ec.starkCurve.getStarkKey(targetPK);
   // For ERC20 transfer outside call
   const recipientAccount = executorAccount;
-  const ethContract = new Contract(compiledErc20OZ.abi, ethAddress, provider);
+  const ethContract = new Contract(contracts.Erc20OZ.sierra.abi, ethAddress, provider);
 
   beforeAll(async () => {
     // Deploy the SNIP-9 signer account (ArgentX v 0.4.0, using SNIP-9 v2):
-    const calldataAX = new CallData(compiledArgentX4Account.abi);
+    const calldataAX = new CallData(contracts.ArgentX4Account.sierra.abi);
     const axSigner = new CairoCustomEnum({ Starknet: { pubkey: targetPubK } });
     const axGuardian = new CairoOption<unknown>(CairoOptionVariant.None);
     const constructorAXCallData = calldataAX.compile('constructor', {
@@ -51,7 +46,7 @@ describe('Account and OutsideExecution', () => {
       guardian: axGuardian,
     });
     const response = await executorAccount.declareAndDeploy({
-      contract: compiledArgentX4Account,
+      contract: contracts.ArgentX4Account.sierra,
       classHash: '0x36078334509b514626504edc9fb252328d1a240e4e948bef8d0c08dff45927f',
       compiledClassHash: '0x7a663375245780bd307f56fde688e33e5c260ab02b76741a57711c5b60d47f6',
       constructorCalldata: constructorAXCallData,

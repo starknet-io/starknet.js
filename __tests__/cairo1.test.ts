@@ -19,11 +19,7 @@ import {
 } from '../src';
 import {
   TEST_TX_VERSION,
-  compiledC1Account,
-  compiledC1AccountCasm,
-  compiledComplexSierra,
-  compiledHelloSierra,
-  compiledHelloSierraCasm,
+  contracts,
   describeIfDevnet,
   getTestAccount,
   getTestProvider,
@@ -40,15 +36,32 @@ describeIfDevnet('Cairo 1 Devnet', () => {
     const account = getTestAccount(provider);
     let dd: DeclareDeployUDCResponse;
     let cairo1Contract: Contract;
+    let onlyConstructorContract: Contract;
     initializeMatcher(expect);
 
     beforeAll(async () => {
       dd = await account.declareAndDeploy({
-        contract: compiledHelloSierra,
-        casm: compiledHelloSierraCasm,
+        contract: contracts.HelloSierra.sierra,
+        casm: contracts.HelloSierra.casm,
       });
 
-      cairo1Contract = new Contract(compiledHelloSierra.abi, dd.deploy.contract_address, account);
+      cairo1Contract = new Contract(
+        contracts.HelloSierra.sierra.abi,
+        dd.deploy.contract_address,
+        account
+      );
+
+      const ddOnlyConstructor = await account.declareAndDeploy({
+        contract: contracts.OnlyConstructor.sierra,
+        casm: contracts.OnlyConstructor.casm,
+        constructorCalldata: [101, account.address],
+      });
+
+      onlyConstructorContract = new Contract(
+        contracts.OnlyConstructor.sierra.abi,
+        ddOnlyConstructor.deploy.contract_address,
+        account
+      );
     });
 
     test('Declare & deploy v2 - Hello Cairo 1 contract', async () => {
@@ -64,8 +77,8 @@ describeIfDevnet('Cairo 1 Devnet', () => {
 
     test('ContractFactory on Cairo1', async () => {
       const c1CFactory = new ContractFactory({
-        compiledContract: compiledHelloSierra,
-        casm: compiledHelloSierraCasm,
+        compiledContract: contracts.HelloSierra.sierra,
+        casm: contracts.HelloSierra.casm,
         account,
       });
       const cfContract = await c1CFactory.deploy();
@@ -78,12 +91,12 @@ describeIfDevnet('Cairo 1 Devnet', () => {
 
       await account.declare({
         contract: cc0 as CompiledSierra,
-        casm: compiledHelloSierraCasm,
+        casm: contracts.HelloSierra.casm,
       });
 
       await account.declare({
         contract: cc0_1 as CompiledSierra,
-        casm: compiledHelloSierraCasm,
+        casm: contracts.HelloSierra.casm,
       });
     });
 
@@ -105,9 +118,14 @@ describeIfDevnet('Cairo 1 Devnet', () => {
     });
 
     test('isCairo1', async () => {
-      const isContractCairo1 = cairo1Contract.isCairo1();
+      let isContractCairo1 = cairo1Contract.isCairo1();
       expect(isContractCairo1).toBe(true);
-      const isAbiCairo1 = isCairo1Abi(cairo1Contract.abi);
+      let isAbiCairo1 = isCairo1Abi(cairo1Contract.abi);
+      expect(isAbiCairo1).toBe(true);
+
+      isContractCairo1 = onlyConstructorContract.isCairo1();
+      expect(isContractCairo1).toBe(true);
+      isAbiCairo1 = isCairo1Abi(onlyConstructorContract.abi);
       expect(isAbiCairo1).toBe(true);
     });
 
@@ -414,7 +432,7 @@ describeIfDevnet('Cairo 1 Devnet', () => {
         ],
       ];
 
-      const contractCallData: CallData = new CallData(compiledComplexSierra.abi);
+      const contractCallData: CallData = new CallData(contracts.ComplexSierra.abi);
       const callDataFromObject: Calldata = contractCallData.compile('constructor', myRawArgsObject);
       const callDataFromArray: Calldata = contractCallData.compile('constructor', myRawArgsArray);
       const expectedResult = [
@@ -504,8 +522,8 @@ describeIfDevnet('Cairo 1 Devnet', () => {
 
       // declare account
       const declareAccount = await account.declareIfNot({
-        contract: compiledC1Account,
-        casm: compiledC1AccountCasm,
+        contract: contracts.C1Account.sierra,
+        casm: contracts.C1Account.casm,
       });
       if (declareAccount.transaction_hash) {
         await account.waitForTransaction(declareAccount.transaction_hash);

@@ -15,6 +15,7 @@ import {
   isTypeSecp256k1Point,
   isTypeStruct,
   isTypeTuple,
+  isTypeU96,
 } from './cairo';
 import {
   CairoCustomEnum,
@@ -63,6 +64,9 @@ export default function orderPropsByAbi(
       return unorderedItem;
     }
     if (isTypeByteArray(abiType)) {
+      return unorderedItem;
+    }
+    if (isTypeU96(abiType)) {
       return unorderedItem;
     }
     if (isTypeSecp256k1Point(abiType)) {

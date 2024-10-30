@@ -6,12 +6,7 @@ import {
   SuccessfulTransactionReceiptResponse,
   TransactionExecutionStatus,
 } from '../src';
-import {
-  compiledTestRejectCasm,
-  compiledTestRejectSierra,
-  getTestAccount,
-  getTestProvider,
-} from './config/fixtures';
+import { contracts, getTestAccount, getTestProvider } from './config/fixtures';
 
 describe('Transaction receipt utility', () => {
   const provider = getTestProvider();
@@ -22,11 +17,11 @@ describe('Transaction receipt utility', () => {
 
   beforeAll(async () => {
     dd = await account.declareAndDeploy({
-      contract: compiledTestRejectSierra,
-      casm: compiledTestRejectCasm,
+      contract: contracts.TestReject.sierra,
+      casm: contracts.TestReject.casm,
     });
     await provider.waitForTransaction(dd.deploy.transaction_hash);
-    contract = new Contract(compiledTestRejectSierra.abi, dd.deploy.contract_address, account);
+    contract = new Contract(contracts.TestReject.sierra.abi, dd.deploy.contract_address, account);
     contract.connect(account);
   });
 
