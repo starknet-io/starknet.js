@@ -33,7 +33,7 @@ describe('websocket specific endpoints - pathfinder test', () => {
     // should succeed after reconnection
     await expect(webSocketChannel.subscribeNewHeads()).resolves.toEqual(expect.any(Number));
 
-    // should fails because already subscribed
+    // should fail because already subscribed
     await expect(webSocketChannel.subscribeNewHeads()).resolves.toBe(false);
   });
 
