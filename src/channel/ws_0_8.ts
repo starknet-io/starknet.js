@@ -56,7 +56,7 @@ export type WebSocketOptions = {
 };
 
 /**
- * WebSocket channel provide communication with Starknet node over long-lived socket connection
+ * WebSocket channel provides communication with Starknet node over long-lived socket connection
  */
 export class WebSocketChannel {
   /**
