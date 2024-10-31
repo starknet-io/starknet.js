@@ -5,6 +5,7 @@ import { ProviderInterface, defaultProvider } from '../provider';
 import {
   Abi,
   AbiEvents,
+  AbiStruct,
   ArgsOrCalldata,
   ArgsOrCalldataWithOptions,
   AsyncContractFunction,
@@ -21,7 +22,6 @@ import {
   ParsedEvents,
   RawArgs,
   Result,
-  AbiStruct,
   ValidateType,
 } from '../types';
 import assert from '../utils/assert';
@@ -29,8 +29,8 @@ import { CallData, cairo } from '../utils/calldata';
 import { createAbiParser } from '../utils/calldata/parser';
 import { getAbiEvents, parseEvents as parseRawEvents } from '../utils/events/index';
 import { cleanHex } from '../utils/num';
-import { ContractInterface } from './interface';
 import type { GetTransactionReceiptResponse } from '../utils/transactionReceipt';
+import { ContractInterface } from './interface';
 
 export type TypedContractV2<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & Contract;
 
@@ -46,7 +46,7 @@ export const splitArgsAndOptions = (args: ArgsOrCalldataWithOptions) => {
     'addressSalt',
   ];
   const lastArg = args[args.length - 1];
-  if (typeof lastArg === 'object' && options.some((x) => x in lastArg)) {
+  if (typeof lastArg === 'object' && !Array.isArray(lastArg) && options.some((x) => x in lastArg)) {
     return { args: args as ArgsOrCalldata, options: args.pop() as ContractOptions };
   }
   return { args: args as ArgsOrCalldata };
