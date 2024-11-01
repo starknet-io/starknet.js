@@ -54,8 +54,28 @@ export type ArgsOrCalldataWithOptions =
 
 export type ContractOptions = {
   blockIdentifier?: BlockIdentifier;
+  /**
+   * compile and validate arguments
+   */
   parseRequest?: boolean;
+  /**
+   * Parse elements of the response array and structuring them into response object
+   */
   parseResponse?: boolean;
+  /**
+   * Advance formatting used to get js types data as result
+   * @description https://starknetjs.com/docs/guides/define_call_message/#formatresponse
+   * @example
+   * ```typescript
+   * // assign custom or existing method to resulting data
+   * formatResponse: { balance: uint256ToBN },
+   * ```
+   * @example
+   * ```typescript
+   * // define resulting data js types
+   * const formatAnswer = { id: 'number', description: 'string' };
+   * ```
+   */
   formatResponse?: { [key: string]: any };
   maxFee?: BigNumberish;
   nonce?: BigNumberish;

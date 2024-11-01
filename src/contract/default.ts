@@ -33,24 +33,6 @@ import { ContractInterface } from './interface';
 
 export type TypedContractV2<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & Contract;
 
-/* export const splitArgsAndOptions = (args: ArgsOrCalldataWithOptions) => {
-  const options = [
-    'blockIdentifier',
-    'parseRequest',
-    'parseResponse',
-    'formatResponse',
-    'maxFee',
-    'nonce',
-    'signature',
-    'addressSalt',
-  ];
-  const lastArg = args[args.length - 1];
-  if (typeof lastArg === 'object' && !Array.isArray(lastArg) && options.some((x) => x in lastArg)) {
-    return { args: args as ArgsOrCalldata, options: args.pop() as ContractOptions };
-  }
-  return { args: args as ArgsOrCalldata };
-}; */
-
 /**
  * Adds call methods to the contract
  */
