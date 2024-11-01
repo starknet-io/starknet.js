@@ -132,9 +132,11 @@ describe('Cairo 1', () => {
       );
       await account.waitForTransaction(tx.transaction_hash);
 
-      const balance = await cairo1Contract.get_balance({
-        parseResponse: false,
-      });
+      const balance = await cairo1Contract
+        .withOptions({
+          parseResponse: false,
+        })
+        .get_balance();
 
       expect(num.toBigInt(balance[0])).toBe(100n);
     });
