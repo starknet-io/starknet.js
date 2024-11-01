@@ -70,7 +70,7 @@ function buildCall(contract: Contract, functionAbi: FunctionAbi): AsyncContractF
  * Adds invoke methods to the contract
  */
 function buildInvoke(contract: Contract, functionAbi: FunctionAbi): AsyncContractFunction {
-  return async function (...args: Array<any>): Promise<any> {
+  return async function (...args: ArgsOrCalldataWithOptions): Promise<any> {
     const params = splitArgsAndOptions(args);
     return contract.invoke(functionAbi.name, params.args, {
       parseRequest: true,
