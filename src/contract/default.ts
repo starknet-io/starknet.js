@@ -46,7 +46,7 @@ export const splitArgsAndOptions = (args: ArgsOrCalldataWithOptions) => {
     'addressSalt',
   ];
   const lastArg = args[args.length - 1];
-  if (typeof lastArg === 'object' && !Array.isArray(lastArg) && options.some((x) => x in lastArg)) {
+  if (typeof lastArg === 'object' && options.some((x) => x in lastArg)) {
     return { args: args as ArgsOrCalldata, options: args.pop() as ContractOptions };
   }
   return { args: args as ArgsOrCalldata };
