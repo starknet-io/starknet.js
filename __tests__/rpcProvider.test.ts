@@ -20,11 +20,7 @@ import { StarknetChainId } from '../src/constants';
 import { felt, uint256 } from '../src/utils/calldata/cairo';
 import { toBigInt, toHexString } from '../src/utils/num';
 import {
-  compiledC1v2,
-  compiledC1v2Casm,
-  compiledErc20Echo,
-  compiledL1L2,
-  compiledOpenZeppelinAccount,
+  contracts,
   createBlockForDevnet,
   describeIfDevnet,
   describeIfNotDevnet,
@@ -139,7 +135,7 @@ describeIfRpc('RPCProvider', () => {
 
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
-        contract: compiledL1L2,
+        contract: contracts.L1L2,
       });
       l1l2ContractCairo0Address = deploy.contract_address;
     });
@@ -167,8 +163,8 @@ describeIfRpc('RPCProvider', () => {
 
     beforeAll(async () => {
       const { deploy: deploy2 } = await account.declareAndDeploy({
-        contract: compiledC1v2,
-        casm: compiledC1v2Casm,
+        contract: contracts.C1v2.sierra,
+        casm: contracts.C1v2.casm,
       });
       l1l2ContractCairo1Address = deploy2.contract_address;
       await waitNextBlock(provider as RpcProvider, 5000); // in Sepolia Testnet, needs pending block validation before interacting
@@ -321,7 +317,7 @@ describeIfRpc('RPCProvider', () => {
         );
 
         const { deploy } = await account.declareAndDeploy({
-          contract: compiledErc20Echo,
+          contract: contracts.Erc20Echo,
           classHash,
           constructorCalldata: CallData.compile({
             name: felt('Token'),
@@ -335,7 +331,7 @@ describeIfRpc('RPCProvider', () => {
         });
 
         const erc20EchoContract = new Contract(
-          compiledErc20Echo.abi,
+          contracts.Erc20Echo.abi,
           deploy.contract_address!,
           account
         );
@@ -385,7 +381,7 @@ describeIfRpc('RPCProvider', () => {
 
       beforeAll(async () => {
         const { deploy } = await account.declareAndDeploy({
-          contract: compiledOpenZeppelinAccount,
+          contract: contracts.OpenZeppelinAccount,
           constructorCalldata: [accountPublicKey],
           salt: accountPublicKey,
         });

@@ -1,5 +1,5 @@
 import { NetworkName, StarknetChainId } from '../constants';
-import { LibraryError } from '../provider/errors';
+import { LibraryError, RpcError } from '../utils/errors';
 import {
   AccountInvocationItem,
   AccountInvocations,
@@ -11,6 +11,7 @@ import {
   DeployAccountContractTransaction,
   Invocation,
   InvocationsDetailsWithNonce,
+  RPC_ERROR,
   RpcProviderOptions,
   TransactionType,
   getEstimateFeeBulkOptions,
@@ -51,13 +52,24 @@ export class RpcChannel {
 
   private specVersion?: string;
 
+  private transactionRetryIntervalFallback?: number;
+
   readonly waitMode: Boolean; // behave like web2 rpc and return when tx is processed
 
   private batchClient?: BatchClient;
 
   constructor(optionsOrProvider?: RpcProviderOptions) {
-    const { nodeUrl, retries, headers, blockIdentifier, chainId, specVersion, waitMode, batch } =
-      optionsOrProvider || {};
+    const {
+      nodeUrl,
+      retries,
+      headers,
+      blockIdentifier,
+      chainId,
+      specVersion,
+      waitMode,
+      transactionRetryIntervalFallback,
+      batch,
+    } = optionsOrProvider || {};
     if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
       this.nodeUrl = getDefaultNodeUrl(nodeUrl as NetworkName, optionsOrProvider?.default);
     } else if (nodeUrl) {
@@ -72,6 +84,7 @@ export class RpcChannel {
     this.specVersion = specVersion;
     this.waitMode = waitMode || false;
     this.requestId = 0;
+    this.transactionRetryIntervalFallback = transactionRetryIntervalFallback;
 
     if (typeof batch === 'number') {
       this.batchClient = new BatchClient({
@@ -80,6 +93,10 @@ export class RpcChannel {
         interval: batch,
       });
     }
+  }
+
+  private get transactionRetryIntervalDefault() {
+    return this.transactionRetryIntervalFallback ?? 5000;
   }
 
   public setChainId(chainId: StarknetChainId) {
@@ -102,11 +119,7 @@ export class RpcChannel {
 
   protected errorHandler(method: string, params: any, rpcError?: JRPC.Error, otherError?: any) {
     if (rpcError) {
-      const { code, message, data } = rpcError;
-      throw new LibraryError(
-        `RPC: ${method} with params ${stringify(params, null, 2)}\n
-        ${code}: ${message}: ${stringify(data)}`
-      );
+      throw new RpcError(rpcError as RPC_ERROR, method, params);
     }
     if (otherError instanceof LibraryError) {
       throw otherError;
@@ -267,7 +280,7 @@ export class RpcChannel {
     let { retries } = this;
     let onchain = false;
     let isErrorState = false;
-    const retryInterval = options?.retryInterval ?? 5000;
+    const retryInterval = options?.retryInterval ?? this.transactionRetryIntervalDefault;
     const errorStates: any = options?.errorStates ?? [
       RPC.ETransactionStatus.REJECTED,
       // TODO: commented out to preserve the long-standing behavior of "reverted" not being treated as an error by default

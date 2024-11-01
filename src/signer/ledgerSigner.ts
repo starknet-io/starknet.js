@@ -40,7 +40,7 @@ type _Transport = any;
 /**
  * Signer for accounts using a Ledger Nano S+/X signature
  */
-export class LedgerSigner<Transport extends Record<any, any>> implements SignerInterface {
+export class LedgerSigner<Transport extends Record<any, any> = any> implements SignerInterface {
   readonly transporter: Transport;
 
   // this is a hack to allow the '@ledgerhq/hw-transport' type to be used as a dev dependency but not exposed in the production build
