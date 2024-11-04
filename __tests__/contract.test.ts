@@ -152,7 +152,14 @@ describe('contract module', () => {
             },
           },
         ];
-        return expect(events).toStrictEqual(shouldBe);
+        const event0 = events[0];
+        expect(event0.block_hash).toBeDefined();
+        expect(event0.block_number).toBeDefined();
+        expect(event0.transaction_hash).toBeDefined();
+        delete event0.block_hash;
+        delete event0.block_number;
+        delete event0.transaction_hash;
+        return expect([event0]).toStrictEqual(shouldBe);
       });
     });
 

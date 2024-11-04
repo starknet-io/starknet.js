@@ -194,7 +194,7 @@ function mergeAbiEvents(target: any, source: any): Object {
  * ```
  */
 export function parseEvents(
-  providerReceivedEvents: RPC.EmittedEvent[] | RPC.Event[],
+  providerReceivedEvents: RPC.EmittedEvent[],
   abiEvents: AbiEvents,
   abiStructs: AbiStructs,
   abiEnums: AbiEnums
