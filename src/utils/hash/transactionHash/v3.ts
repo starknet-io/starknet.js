@@ -24,6 +24,11 @@ export function hashDAMode(nonceDAMode: BigNumberish, feeDAMode: BigNumberish) {
   return (BigInt(nonceDAMode) << DATA_AVAILABILITY_MODE_BITS) + BigInt(feeDAMode);
 }
 
+/**
+ * Encode the L1&L2 gas limits of a V3 transaction
+ * @param {ResourceBounds} bounds object including the limits for L1 & L2 gas
+ * @returns {bigint} encoded data
+ */
 export function encodeResourceBoundsL1(bounds: ResourceBounds): bigint {
   return (
     (L1_GAS_NAME << RESOURCE_VALUE_OFFSET) +
@@ -38,7 +43,7 @@ export function encodeResourceBoundsL1(bounds: ResourceBounds): bigint {
  * {l1_gas: {max_amount: u64, max_price_per_unit: u128},
  *  l2_gas: {max_amount: u64, max_price_per_unit: u128}}
 }
- * @returns 
+ * @returns {bigint} encoded data
  */
 export function encodeResourceBoundsL2(bounds: ResourceBounds): bigint {
   return (
