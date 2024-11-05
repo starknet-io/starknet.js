@@ -228,7 +228,7 @@ import type Transport from '@ledgerhq/hw-transport'; // type for the transporter
 In a Web DAPP, take care that some browsers are not compatible (FireFox, ...), and that the Bluetooth is not working in all cases and in all operating systems.
 
 :::note
-The last version of the Ledger Starknet APP (v2.2.1) supports explained V1 (ETH) & V3 (STRK) transactions & deploy accounts. For a class declaration or a message, you will have to blind sign a hash ; sign only hashes from a code that you trust. Do not forget to Enable `Bind signing` in the APP settings.
+The last version of the Ledger Starknet APP (v2.2.1) supports explained V1 (ETH) & V3 (STRK) transactions & deploy accounts. For a class declaration or a message, you will have to blind sign a hash ; sign only hashes from a code that you trust. Do not forget to Enable `Blind signing` in the APP settings.
 :::
 
 For example, for a Node script :
