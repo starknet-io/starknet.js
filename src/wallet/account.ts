@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-underscore-dangle */
 import type {
   Signature,
   AccountChangeEventHandler,
@@ -17,6 +19,8 @@ import {
   ProviderOptions,
   TypedData,
   UniversalDeployerContractPayload,
+  type BlockIdentifier,
+  type Nonce,
 } from '../types';
 import { extractContractHashes } from '../utils/contract';
 import { stringify } from '../utils/json';
@@ -38,8 +42,6 @@ import { StarknetChainId } from '../constants';
 
 // Represent 'Selected Active' Account inside Connected Wallet
 export class WalletAccount extends Account implements AccountInterface {
-  public address: string = '';
-
   public walletProvider: StarknetWalletProvider;
 
   constructor(
@@ -49,7 +51,6 @@ export class WalletAccount extends Account implements AccountInterface {
   ) {
     super(providerOrOptions, '', '', cairoVersion); // At this point unknown address
     this.walletProvider = walletProvider;
-
     // Update Address on change
     this.walletProvider.on('accountsChanged', (res) => {
       if (!res) return;
@@ -63,18 +64,22 @@ export class WalletAccount extends Account implements AccountInterface {
       // At the moment channel is stateless but it could change
       this.channel.setChainId(res as StarknetChainId);
     });
+  }
 
-    // Get and Set Address !!! Post constructor initial empty string
-    walletProvider
-      .request({
+  public async getAddress(): Promise<string> {
+    if (!this.address) {
+      console.log('SNJS-WA.getAddress: define WA address.');
+      const response = await this.walletProvider.request({
         type: 'wallet_requestAccounts',
         params: {
           silent_mode: false,
         },
-      })
-      .then((res) => {
-        this.address = res[0].toLowerCase();
       });
+      console.log('SNJS-getAddress-A');
+      this.address = response[0].toLowerCase();
+      console.log('SNJS-getAddress-B');
+    }
+    return this.address;
   }
 
   /**
@@ -114,6 +119,16 @@ export class WalletAccount extends Account implements AccountInterface {
   /**
    * ACCOUNT METHODS
    */
+
+  override async getNonce(blockIdentifier?: BlockIdentifier): Promise<Nonce> {
+    await this.getAddress();
+    return super.getNonce(blockIdentifier);
+  }
+
+  // ************************
+  // TODO : override the 13 other account methods that uses the account address property (fortunately, all are async)
+  // ***********************
+
   override execute(calls: AllowArray<Call>) {
     const txCalls = [].concat(calls as any).map((it) => {
       const { contractAddress, entrypoint, calldata } = it;
@@ -157,6 +172,7 @@ export class WalletAccount extends Account implements AccountInterface {
   override async deploy(
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[]
   ): Promise<MultiDeployContractResponse> {
+    await this.getAddress();
     const { calls, addresses } = buildUDCCall(payload, this.address);
     const invokeResponse = await this.execute(calls);
 
