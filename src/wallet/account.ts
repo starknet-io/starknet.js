@@ -39,9 +39,9 @@ import { StarknetWalletProvider } from './types';
 
 // Represent 'Selected Active' Account inside Connected Wallet
 export class WalletAccount extends Account implements AccountInterface {
-  public walletProvider: StarknetWalletProvider;
-
   public address: string = '';
+
+  public walletProvider: StarknetWalletProvider;
 
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
@@ -66,7 +66,7 @@ export class WalletAccount extends Account implements AccountInterface {
       this.channel.setChainId(res as StarknetChainId);
     });
 
-    if (!this.address) {
+    if (!address.length) {
       walletProvider
         .request({
           type: 'wallet_requestAccounts',
