@@ -1,11 +1,13 @@
 import type {
-  Signature,
   AccountChangeEventHandler,
   AddStarknetChainParameters,
   NetworkChangeEventHandler,
+  Signature,
   WatchAssetParameters,
 } from 'starknet-types-07';
+
 import { Account, AccountInterface } from '../account';
+import { StarknetChainId } from '../constants';
 import { ProviderInterface } from '../provider';
 import {
   AllowArray,
@@ -34,17 +36,18 @@ import {
   watchAsset,
 } from './connect';
 import { StarknetWalletProvider } from './types';
-import { StarknetChainId } from '../constants';
 
 // Represent 'Selected Active' Account inside Connected Wallet
 export class WalletAccount extends Account implements AccountInterface {
   public walletProvider: StarknetWalletProvider;
 
+  public address: string = '';
+
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
-    address: string,
     walletProvider: StarknetWalletProvider,
-    cairoVersion?: CairoVersion
+    cairoVersion?: CairoVersion,
+    address: string = ''
   ) {
     super(providerOrOptions, address, '', cairoVersion); // At this point unknown address
     this.walletProvider = walletProvider;
@@ -62,6 +65,21 @@ export class WalletAccount extends Account implements AccountInterface {
       // At the moment channel is stateless but it could change
       this.channel.setChainId(res as StarknetChainId);
     });
+
+    if (!this.address) {
+      walletProvider
+        .request({
+          type: 'wallet_requestAccounts',
+          params: {
+            silent_mode: false,
+          },
+        })
+        .then((res) => {
+          this.address = res[0].toLowerCase();
+        });
+    } else {
+      this.address = address;
+    }
   }
 
   /**
@@ -169,7 +187,7 @@ export class WalletAccount extends Account implements AccountInterface {
       },
     });
 
-    return new WalletAccount(provider, accountAddress, walletProvider, cairoVersion);
+    return new WalletAccount(provider, walletProvider, cairoVersion, accountAddress);
   }
 
   static async connectSilent(
@@ -184,7 +202,7 @@ export class WalletAccount extends Account implements AccountInterface {
       },
     });
 
-    return new WalletAccount(provider, accountAddress, walletProvider, cairoVersion);
+    return new WalletAccount(provider, walletProvider, cairoVersion, accountAddress);
   }
 
   // TODO: MISSING ESTIMATES
