@@ -6,6 +6,7 @@ import {
   Contract,
   DeclareDeployUDCResponse,
   Provider,
+  RpcError,
   TransactionType,
   cairo,
   constants,
@@ -366,12 +367,13 @@ describe('deploy and test Wallet', () => {
     };
     const details = { maxFee: 0n };
 
-    await expect(account.execute(transaction, details)).rejects.toThrow(
-      /zero|Transaction must commit to pay a positive amount on fee./
-    );
-    await expect(account.execute(transaction, undefined, details)).rejects.toThrow(
-      /zero|Transaction must commit to pay a positive amount on fee./
-    );
+    const error1: RpcError = await account.execute(transaction, details).catch((e) => e);
+    expect(error1).toBeInstanceOf(RpcError);
+    expect(error1.isType('INSUFFICIENT_MAX_FEE')).toBe(true);
+
+    const error2: RpcError = await account.execute(transaction, undefined, details).catch((e) => e);
+    expect(error2).toBeInstanceOf(RpcError);
+    expect(error2.isType('INSUFFICIENT_MAX_FEE')).toBe(true);
   });
 
   test('execute with custom nonce', async () => {
