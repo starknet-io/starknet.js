@@ -4,17 +4,18 @@ import { Provider, WSSubscriptions, WebSocketChannel } from '../src';
 import { StarknetChainId } from '../src/constants';
 import { getTestAccount, getTestProvider } from './config/fixtures';
 
+const nodeUrl = 'wss://sepolia-pathfinder-rpc.spaceshard.io/rpc/v0_8';
+
 describe('websocket specific endpoints - pathfinder test', () => {
   // account provider
   const provider = new Provider(getTestProvider());
   const account = getTestAccount(provider);
 
   // websocket
-  const webSocketChannel = new WebSocketChannel({
-    nodeUrl: 'wss://sepolia-pathfinder-rpc.spaceshard.io/rpc/v0_8',
-  });
+  let webSocketChannel: WebSocketChannel;
 
   beforeAll(async () => {
+    webSocketChannel = new WebSocketChannel({ nodeUrl });
     expect(webSocketChannel.isConnected()).toBe(false);
     try {
       await webSocketChannel.waitForConnection();
@@ -22,6 +23,12 @@ describe('websocket specific endpoints - pathfinder test', () => {
       console.log(error.message);
     }
     expect(webSocketChannel.isConnected()).toBe(true);
+  });
+
+  afterAll(async () => {
+    expect(webSocketChannel.isConnected()).toBe(true);
+    webSocketChannel.disconnect();
+    await expect(webSocketChannel.waitForDisconnection()).resolves.toBe(WebSocket.CLOSED);
   });
 
   test('Test WS Error and edge cases', async () => {
@@ -139,32 +146,25 @@ describe('websocket specific endpoints - pathfinder test', () => {
     expect(subscriptionId).toEqual(expectedId);
     expect(webSocketChannel.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS)).toBe(undefined);
   });
-
-  afterAll(async () => {
-    expect(webSocketChannel.isConnected()).toBe(true);
-    webSocketChannel.disconnect();
-    await expect(webSocketChannel.waitForDisconnection()).resolves.toBe(WebSocket.CLOSED);
-  });
 });
 
 describe('websocket regular endpoints - pathfinder test', () => {
-  const webSocketChannel = new WebSocketChannel({
-    nodeUrl: 'wss://toni.spaceshard.io/rpc/v0_8',
-  });
+  let webSocketChannel: WebSocketChannel;
 
   beforeAll(async () => {
+    webSocketChannel = new WebSocketChannel({ nodeUrl });
     expect(webSocketChannel.isConnected()).toBe(false);
     const status = await webSocketChannel.waitForConnection();
     expect(status).toBe(WebSocket.OPEN);
   });
 
-  test('regular rpc endpoint', async () => {
-    const response = await webSocketChannel.sendReceive('starknet_chainId');
-    expect(response).toBe(StarknetChainId.SN_SEPOLIA);
-  });
-
   afterAll(async () => {
     expect(webSocketChannel.isConnected()).toBe(true);
     webSocketChannel.disconnect();
+  });
+
+  test('regular rpc endpoint', async () => {
+    const response = await webSocketChannel.sendReceive('starknet_chainId');
+    expect(response).toBe(StarknetChainId.SN_SEPOLIA);
   });
 });
