@@ -170,7 +170,6 @@ export class LedgerSigner221<Transport extends Record<any, any> = any>
     details: DeployAccountSignerDetails
   ): Promise<Signature> {
     const compiledConstructorCalldata = CallData.compile(details.constructorCalldata);
-    /*     const version = BigInt(details.version).toString(); */
     let msgHash;
 
     if (Object.values(ETransactionVersion2).includes(details.version as any)) {
@@ -260,7 +259,7 @@ export class LedgerSigner221<Transport extends Record<any, any> = any>
   }
 
   /**
-   * Ask to the Ledger Nano to display and sign a Starknet V1 transaction.
+   * Ask the Ledger Nano to display and sign a Starknet V1 transaction.
    * @param {V2InvocationsSignerDetails} txDetails All the details needed for a txV1.
    * @param {Call[]} calls array of Starknet invocations
    * @returns an object including the transaction Hash and the signature
@@ -282,7 +281,7 @@ export class LedgerSigner221<Transport extends Record<any, any> = any>
    * // }
    * ```
    */
-  async signTxV1(
+  public async signTxV1(
     txDetails: V2InvocationsSignerDetails,
     calls: Call[]
   ): Promise<{ hash: bigint; signature: Signature }> {
@@ -352,7 +351,7 @@ export class LedgerSigner221<Transport extends Record<any, any> = any>
    * // }
    * ```
    */
-  async signTxV3(
+  public async signTxV3(
     txDetails: V3InvocationsSignerDetails,
     calls: Call[]
   ): Promise<{ hash: bigint; signature: Signature }> {
@@ -430,7 +429,7 @@ export class LedgerSigner221<Transport extends Record<any, any> = any>
   }
 
   /**
-   * Ask to the Ledger Nano to display and sign a Starknet V1 account deployment.
+   * Ask the Ledger Nano to display and sign a Starknet V1 account deployment.
    * @param {V2DeployAccountSignerDetails} deployAccountDetail All the details needed for a V1 deploy account.
    * @returns an object including the transaction Hash and the signature
    * @example
@@ -458,8 +457,7 @@ export class LedgerSigner221<Transport extends Record<any, any> = any>
    * // }
    * ```
    */
-
-  async signDeployAccountV1(
+  public async signDeployAccountV1(
     deployAccountDetail: V2DeployAccountSignerDetails
   ): Promise<{ hash: bigint; signature: Signature }> {
     // APDU 0 for path
@@ -513,7 +511,7 @@ export class LedgerSigner221<Transport extends Record<any, any> = any>
   }
 
   /**
-   *Ask to the Ledger Nano to display and sign a Starknet V3 account deployment.
+   *Ask the Ledger Nano to display and sign a Starknet V3 account deployment.
    * @param {V3DeployAccountSignerDetails} deployAccountDetail All the details needed for a V3 deploy account.
    * @returns an object including the transaction Hash and the signature
    * @example
@@ -541,8 +539,7 @@ export class LedgerSigner221<Transport extends Record<any, any> = any>
    * // }
    * ```
    */
-
-  async signDeployAccountV3(
+  public async signDeployAccountV3(
     deployAccountDetail: V3DeployAccountSignerDetails
   ): Promise<{ hash: bigint; signature: Signature }> {
     // APDU 0 for path
