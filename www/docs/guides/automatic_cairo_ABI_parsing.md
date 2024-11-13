@@ -14,7 +14,7 @@ Please take a look on the Abi-Wan [documentation](https://github.com/keep-starkn
 
 ## Usage
 
-First, you need to wrap your ABI in a array and export it as a `const`.
+First, you need to wrap your ABI in an array and export it as a `const`.
 
 Example:
 
