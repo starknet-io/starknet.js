@@ -262,7 +262,7 @@ console.log('version=', appVersion);
 ```
 
 :::note
-You have also in Starknet.js a signer for the old v1.1.1 Ledger Starknet APP.
+You also have in Starknet.js a signer for the old v1.1.1 Ledger Starknet APP.
 
 ```typescript
 const myLedgerSigner = new LedgerSigner111(myLedgerTransport, 0);
