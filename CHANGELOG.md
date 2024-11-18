@@ -1,3 +1,9 @@
+# [6.18.0](https://github.com/starknet-io/starknet.js/compare/v6.17.0...v6.18.0) (2024-11-18)
+
+### Features
+
+- WalletAccount non-breaking temp solution ([#1259](https://github.com/starknet-io/starknet.js/issues/1259)) ([84b267c](https://github.com/starknet-io/starknet.js/commit/84b267cd20122de2954fe9fd87b50503b19c1baa))
+
 # [6.17.0](https://github.com/starknet-io/starknet.js/compare/v6.16.0...v6.17.0) (2024-10-24)
 
 ### Features
