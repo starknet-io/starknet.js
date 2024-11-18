@@ -1,11 +1,13 @@
 import type {
-  Signature,
   AccountChangeEventHandler,
   AddStarknetChainParameters,
   NetworkChangeEventHandler,
+  Signature,
   WatchAssetParameters,
 } from 'starknet-types-07';
+
 import { Account, AccountInterface } from '../account';
+import { StarknetChainId } from '../constants';
 import { ProviderInterface } from '../provider';
 import {
   AllowArray,
@@ -34,19 +36,19 @@ import {
   watchAsset,
 } from './connect';
 import { StarknetWalletProvider } from './types';
-import { StarknetChainId } from '../constants';
 
+// TODO: Remove non address constructor in next major version
 // Represent 'Selected Active' Account inside Connected Wallet
 export class WalletAccount extends Account implements AccountInterface {
   public walletProvider: StarknetWalletProvider;
 
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
-    address: string,
     walletProvider: StarknetWalletProvider,
-    cairoVersion?: CairoVersion
+    cairoVersion?: CairoVersion,
+    address: string = ''
   ) {
-    super(providerOrOptions, address, '', cairoVersion); // At this point unknown address
+    super(providerOrOptions, address, '', cairoVersion);
     this.walletProvider = walletProvider;
 
     // Update Address on change
@@ -160,16 +162,11 @@ export class WalletAccount extends Account implements AccountInterface {
   static async connect(
     provider: ProviderInterface,
     walletProvider: StarknetWalletProvider,
-    cairoVersion?: CairoVersion
+    cairoVersion?: CairoVersion,
+    silentMode: boolean = false
   ) {
-    const [accountAddress] = await walletProvider.request({
-      type: 'wallet_requestAccounts',
-      params: {
-        silent_mode: false,
-      },
-    });
-
-    return new WalletAccount(provider, accountAddress, walletProvider, cairoVersion);
+    const [accountAddress] = await requestAccounts(walletProvider, silentMode);
+    return new WalletAccount(provider, walletProvider, cairoVersion, accountAddress);
   }
 
   static async connectSilent(
@@ -177,14 +174,7 @@ export class WalletAccount extends Account implements AccountInterface {
     walletProvider: StarknetWalletProvider,
     cairoVersion?: CairoVersion
   ) {
-    const [accountAddress] = await walletProvider.request({
-      type: 'wallet_requestAccounts',
-      params: {
-        silent_mode: true,
-      },
-    });
-
-    return new WalletAccount(provider, accountAddress, walletProvider, cairoVersion);
+    return WalletAccount.connect(provider, walletProvider, cairoVersion, true);
   }
 
   // TODO: MISSING ESTIMATES
