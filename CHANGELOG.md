@@ -1,3 +1,21 @@
+# [6.17.0](https://github.com/starknet-io/starknet.js/compare/v6.16.0...v6.17.0) (2024-10-24)
+
+### Features
+
+- Cairo u96 implementation ([#1247](https://github.com/starknet-io/starknet.js/issues/1247)) ([06f0a80](https://github.com/starknet-io/starknet.js/commit/06f0a8013405ded4685d0a21c4f245a25e7d4827))
+
+# [6.16.0](https://github.com/starknet-io/starknet.js/compare/v6.15.0...v6.16.0) (2024-10-24)
+
+### Features
+
+- increase rpc error information propagation ([#1213](https://github.com/starknet-io/starknet.js/issues/1213)) ([947e8b4](https://github.com/starknet-io/starknet.js/commit/947e8b457d08a7533139072b911ace4e382988ae))
+
+# [6.15.0](https://github.com/starknet-io/starknet.js/compare/v6.14.1...v6.15.0) (2024-10-16)
+
+### Features
+
+- num.toHex64 ensure 0x(64 char) format ([#1222](https://github.com/starknet-io/starknet.js/issues/1222)) ([56020cd](https://github.com/starknet-io/starknet.js/commit/56020cdbcd9d1cbe7d58d66b554790bbea8762fe))
+
 ## [6.14.1](https://github.com/starknet-io/starknet.js/compare/v6.14.0...v6.14.1) (2024-09-30)
 
 ### Bug Fixes

@@ -32,7 +32,7 @@ Using the `get-starknet-core` v4 library, you can create your own UI and logic t
 So, you instantiate a new WalletAccount with :
 
 ```typescript
-import { connect } from 'get-starknet'; // v4.0.0 min
+import { connect } from '@starknet-io/get-starknet'; // v4.0.3 min
 import { WalletAccount } from 'starknet'; // v6.10.0 min
 const myFrontendProviderUrl = 'https://free-rpc.nethermind.io/sepolia-juno/v0_7';
 // standard UI to select a wallet :
