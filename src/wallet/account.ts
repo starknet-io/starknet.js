@@ -67,18 +67,9 @@ export class WalletAccount extends Account implements AccountInterface {
     });
 
     if (!address.length) {
-      walletProvider
-        .request({
-          type: 'wallet_requestAccounts',
-          params: {
-            silent_mode: false,
-          },
-        })
-        .then((res) => {
-          this.address = res[0].toLowerCase();
-        });
-    } else {
-      this.address = address;
+      requestAccounts(this.walletProvider).then(([accountAddress]) => {
+        this.address = accountAddress.toLowerCase();
+      });
     }
   }
 
