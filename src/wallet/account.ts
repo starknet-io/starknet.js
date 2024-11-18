@@ -37,12 +37,27 @@ import {
 } from './connect';
 import { StarknetWalletProvider } from './types';
 
+// TODO: Remove non address constructor in next major version
 // Represent 'Selected Active' Account inside Connected Wallet
 export class WalletAccount extends Account implements AccountInterface {
   public address: string = '';
 
   public walletProvider: StarknetWalletProvider;
 
+  /**
+   * @deprecated Use static method WalletAccount.connect or WalletAccount.connectSilent instead. Constructor {@link WalletAccount.(format:2)}.
+   */
+  constructor(
+    providerOrOptions: ProviderOptions | ProviderInterface,
+    walletProvider: StarknetWalletProvider,
+    cairoVersion?: CairoVersion
+  );
+  constructor(
+    providerOrOptions: ProviderOptions | ProviderInterface,
+    walletProvider: StarknetWalletProvider,
+    cairoVersion?: CairoVersion,
+    address?: string
+  );
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
     walletProvider: StarknetWalletProvider,
@@ -67,6 +82,9 @@ export class WalletAccount extends Account implements AccountInterface {
     });
 
     if (!address.length) {
+      console.warn(
+        '@deprecated Use static method WalletAccount.connect or WalletAccount.connectSilent instead. Constructor {@link WalletAccount.(format:2)}.'
+      );
       requestAccounts(this.walletProvider).then(([accountAddress]) => {
         this.address = accountAddress.toLowerCase();
       });
@@ -174,6 +192,14 @@ export class WalletAccount extends Account implements AccountInterface {
   ) {
     const [accountAddress] = await requestAccounts(walletProvider, silentMode);
     return new WalletAccount(provider, walletProvider, cairoVersion, accountAddress);
+  }
+
+  static async connectSilent(
+    provider: ProviderInterface,
+    walletProvider: StarknetWalletProvider,
+    cairoVersion?: CairoVersion
+  ) {
+    return WalletAccount.connect(provider, walletProvider, cairoVersion, true);
   }
 
   // TODO: MISSING ESTIMATES
