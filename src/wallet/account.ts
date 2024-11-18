@@ -170,7 +170,7 @@ export class WalletAccount extends Account implements AccountInterface {
     provider: ProviderInterface,
     walletProvider: StarknetWalletProvider,
     cairoVersion?: CairoVersion,
-    silentMode: bool = false
+    silentMode: boolean = false
   ) {
     const [accountAddress] = await requestAccounts(walletProvider, silentMode);
     return new WalletAccount(provider, walletProvider, cairoVersion, accountAddress);
