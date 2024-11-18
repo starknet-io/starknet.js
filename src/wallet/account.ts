@@ -178,30 +178,10 @@ export class WalletAccount extends Account implements AccountInterface {
   static async connect(
     provider: ProviderInterface,
     walletProvider: StarknetWalletProvider,
-    cairoVersion?: CairoVersion
+    cairoVersion?: CairoVersion,
+    silentMode: bool = false
   ) {
-    const [accountAddress] = await walletProvider.request({
-      type: 'wallet_requestAccounts',
-      params: {
-        silent_mode: false,
-      },
-    });
-
-    return new WalletAccount(provider, walletProvider, cairoVersion, accountAddress);
-  }
-
-  static async connectSilent(
-    provider: ProviderInterface,
-    walletProvider: StarknetWalletProvider,
-    cairoVersion?: CairoVersion
-  ) {
-    const [accountAddress] = await walletProvider.request({
-      type: 'wallet_requestAccounts',
-      params: {
-        silent_mode: true,
-      },
-    });
-
+    const [accountAddress] = await requestAccounts(walletProvider, silentMode);
     return new WalletAccount(provider, walletProvider, cairoVersion, accountAddress);
   }
 
