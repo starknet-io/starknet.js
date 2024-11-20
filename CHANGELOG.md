@@ -1197,8 +1197,8 @@
 - remove deployMaxFee from deploy ([6d5fa24](https://github.com/starknet-io/starknet.js/commit/6d5fa2461def5caad3cdd71af8a4e6c61d88092e))
 - rpc tests ([cd913ee](https://github.com/starknet-io/starknet.js/commit/cd913ee93df433eb3730e6aae43dd22b0c8aed32))
 - split getNonce interface ([7b7acd9](https://github.com/starknet-io/starknet.js/commit/7b7acd9f5ebe0b2b97e389fb3a68249dd72224ce))
-- tiping issue ([78aa340](https://github.com/starknet-io/starknet.js/commit/78aa3402131f51e83287eada7499ea01de41efa0))
-- udc require L2 status for deployed contract to be awailable to use ([afba8d0](https://github.com/starknet-io/starknet.js/commit/afba8d068685c1c9b03126e5de13a5dfddb2925e))
+- typing issue ([78aa340](https://github.com/starknet-io/starknet.js/commit/78aa3402131f51e83287eada7499ea01de41efa0))
+- udc require L2 status for deployed contract to be available to use ([afba8d0](https://github.com/starknet-io/starknet.js/commit/afba8d068685c1c9b03126e5de13a5dfddb2925e))
 
 ### Features
 
@@ -1264,7 +1264,7 @@
 - rpc 0.2.0 types spec ([25b2d29](https://github.com/starknet-io/starknet.js/commit/25b2d293a1a570b6fc68ea3877bfe6c3e898e3a6))
 - rpc 0.2.1 ([ed17f63](https://github.com/starknet-io/starknet.js/commit/ed17f6380d2b1ab1432d5426c7395ab18c6dc793))
 - rpc v0.2 endpoint, default identifiers, getClassHashAt flip parameters ([f0a0d6c](https://github.com/starknet-io/starknet.js/commit/f0a0d6c49e33442b603dcc9c9c119867c1ed32cc))
-- rpc0.2.1 definition migration comlete ([35c5a06](https://github.com/starknet-io/starknet.js/commit/35c5a0645dafe061080c2c2ced6a9a4a9882207c))
+- rpc0.2.1 definition migration complete ([35c5a06](https://github.com/starknet-io/starknet.js/commit/35c5a0645dafe061080c2c2ced6a9a4a9882207c))
 
 # [4.10.0](https://github.com/starknet-io/starknet.js/compare/v4.9.0...v4.10.0) (2022-11-10)
 
