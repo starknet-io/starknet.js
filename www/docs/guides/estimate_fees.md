@@ -4,7 +4,7 @@ sidebar_position: 11
 
 # Estimate fees
 
-By default, all nonfree Starknet commands (declare, deploy, invoke) work without any limitation of cost.
+By default, all non-free Starknet commands (declare, deploy, invoke) work without any limitation of cost.
 
 Nevertheless, you might want to inform the DAPP user of the cost of the incoming transaction before proceeding and requesting its validation.
 
