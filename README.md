@@ -67,9 +67,9 @@ Special thanks to all the [contributors](https://github.com/starknet-io/starknet
 
 - Sean ([@0xs34n](https://github.com/0xs34n)), the original creator of Starknet.js!
 
-- Janek ([@janek26](https://github.com/janek26)) and Dhruv ([@dhruvkelawala](https://github.com/dhruvkelawala)) from [Argent](https://github.com/argentlabs)
+- Janek ([@janek26](https://github.com/janek26)) and Dhruv Kelawala([@dhruvkelawala](https://github.com/dhruvkelawala)) from [Argent](https://github.com/argentlabs)
 
-- Toni ([@tabaktoni](https://github.com/tabaktoni)), Petar ([@penovicp](https://github.com/penovicp)) and Ivan ([@ivpavici](https://github.com/ivpavici)) from [SpaceShard](https://www.spaceshard.io/)
+- Toni Tabak ([@tabaktoni](https://github.com/tabaktoni)), Petar Penović ([@penovicp](https://github.com/penovicp)) and Ivan Pavičić([@ivpavici](https://github.com/ivpavici)) from [SpaceShard](https://www.spaceshard.io/)
 
 - Philippe ROSTAN ([@PhilippeR26](https://github.com/PhilippeR26))
 
