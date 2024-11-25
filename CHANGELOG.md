@@ -1,3 +1,9 @@
+## [6.18.1](https://github.com/starknet-io/starknet.js/compare/v6.18.0...v6.18.1) (2024-11-25)
+
+### Bug Fixes
+
+- expose BatchClient class ([8d3a0de](https://github.com/starknet-io/starknet.js/commit/8d3a0de85230e6f08edebf67b6581d6e79ea191a))
+
 # [6.18.0](https://github.com/starknet-io/starknet.js/compare/v6.17.0...v6.18.0) (2024-11-18)
 
 ### Features
