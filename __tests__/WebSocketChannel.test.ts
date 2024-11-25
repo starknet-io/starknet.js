@@ -11,12 +11,16 @@ describe('websocket specific endpoints - pathfinder test', () => {
 
   // websocket
   const webSocketChannel = new WebSocketChannel({
-    nodeUrl: 'wss://toni.spaceshard.io/rpc/v0_8',
+    nodeUrl: 'wss://sepolia-pathfinder-rpc.spaceshard.io/rpc/v0_8',
   });
 
   beforeAll(async () => {
     expect(webSocketChannel.isConnected()).toBe(false);
-    await webSocketChannel.waitForConnection();
+    try {
+      await webSocketChannel.waitForConnection();
+    } catch (error: any) {
+      console.log(error.message);
+    }
     expect(webSocketChannel.isConnected()).toBe(true);
   });
 
@@ -116,7 +120,9 @@ describe('websocket specific endpoints - pathfinder test', () => {
       calldata: [account.address, '10', '0'],
     });
 
-    await webSocketChannel.subscribeTransactionStatus(transaction_hash);
+    const subid = await webSocketChannel.subscribeTransactionStatus(transaction_hash);
+    expect(subid).toEqual(expect.any(Number));
+    console.log(`sub:${subid}, txh:${transaction_hash}`);
 
     let i = 0;
     webSocketChannel.onTransactionStatus = async (data) => {

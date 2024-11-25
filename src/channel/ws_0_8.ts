@@ -1,5 +1,5 @@
-import type { SPEC } from '@starknet-io/types-js';
 import { WebSocket } from 'isows';
+import type { SPEC } from 'starknet-types-08';
 
 import { BigNumberish, BlockIdentifier } from '../types';
 import { JRPC } from '../types/api';
@@ -10,7 +10,7 @@ import { Block } from '../utils/provider';
 
 export type SUBSCRIPTION_ID = number;
 
-export type SUBSCRIPTION_RESULT = { subscription_id: SUBSCRIPTION_ID };
+export type SUBSCRIPTION_RESULT = SUBSCRIPTION_ID;
 
 export type SubscriptionNewHeadsResponse = {
   subscription_id: SUBSCRIPTION_ID;
@@ -279,7 +279,9 @@ export class WebSocketChannel {
       return new Promise((resolve, reject) => {
         if (!this.websocket) return;
         this.websocket.onopen = () => resolve(this.websocket.readyState);
-        this.websocket.onerror = reject;
+        this.websocket.onerror = (error) => {
+          return reject(error);
+        };
       });
     }
 
@@ -424,7 +426,7 @@ export class WebSocketChannel {
    */
   public async subscribeNewHeads(blockIdentifier?: BlockIdentifier) {
     if (this.subscriptions.get(WSSubscriptions.NEW_HEADS)) return false;
-    const subId = (await this.subscribeNewHeadsUnmanaged(blockIdentifier)).subscription_id;
+    const subId = await this.subscribeNewHeadsUnmanaged(blockIdentifier);
     this.subscriptions.set(WSSubscriptions.NEW_HEADS, subId);
     return subId;
   }
@@ -465,8 +467,7 @@ export class WebSocketChannel {
   ) {
     if (this.subscriptions.get(WSSubscriptions.EVENTS)) return false;
     // eslint-disable-next-line prefer-rest-params
-    const subId = (await this.subscribeEventsUnmanaged(fromAddress, keys, blockIdentifier))
-      .subscription_id;
+    const subId = await this.subscribeEventsUnmanaged(fromAddress, keys, blockIdentifier);
     this.subscriptions.set(WSSubscriptions.EVENTS, subId);
     return subId;
   }
@@ -504,8 +505,7 @@ export class WebSocketChannel {
     blockIdentifier?: BlockIdentifier
   ) {
     if (this.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS)) return false;
-    const subId = (await this.subscribeTransactionStatusUnmanaged(transactionHash, blockIdentifier))
-      .subscription_id;
+    const subId = await this.subscribeTransactionStatusUnmanaged(transactionHash, blockIdentifier);
     this.subscriptions.set(WSSubscriptions.TRANSACTION_STATUS, subId);
     return subId;
   }
@@ -544,9 +544,10 @@ export class WebSocketChannel {
   ) {
     if (this.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS)) return false;
     // eslint-disable-next-line no-param-reassign
-    const subId = (
-      await this.subscribePendingTransactionUnmanaged(transactionDetails, senderAddress)
-    ).subscription_id;
+    const subId = await this.subscribePendingTransactionUnmanaged(
+      transactionDetails,
+      senderAddress
+    );
     this.subscriptions.set(WSSubscriptions.PENDING_TRANSACTION, subId);
     return subId;
   }
