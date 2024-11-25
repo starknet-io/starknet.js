@@ -1,5 +1,5 @@
-import type { SPEC } from '@starknet-io/types-js';
 import { WebSocket } from 'isows';
+import type { SPEC } from 'starknet-types-08';
 
 import { BigNumberish, BlockIdentifier } from '../types';
 import { JRPC } from '../types/api';
