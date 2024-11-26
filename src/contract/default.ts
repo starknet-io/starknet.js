@@ -5,6 +5,7 @@ import { ProviderInterface, defaultProvider } from '../provider';
 import {
   Abi,
   AbiEvents,
+  AbiStruct,
   ArgsOrCalldata,
   ArgsOrCalldataWithOptions,
   AsyncContractFunction,
@@ -21,7 +22,6 @@ import {
   ParsedEvents,
   RawArgs,
   Result,
-  AbiStruct,
   ValidateType,
 } from '../types';
 import assert from '../utils/assert';
@@ -29,8 +29,8 @@ import { CallData, cairo } from '../utils/calldata';
 import { createAbiParser } from '../utils/calldata/parser';
 import { getAbiEvents, parseEvents as parseRawEvents } from '../utils/events/index';
 import { cleanHex } from '../utils/num';
-import { ContractInterface } from './interface';
 import type { GetTransactionReceiptResponse } from '../utils/transactionReceipt';
+import { ContractInterface } from './interface';
 
 export type TypedContractV2<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & Contract;
 
@@ -70,7 +70,7 @@ function buildCall(contract: Contract, functionAbi: FunctionAbi): AsyncContractF
  * Adds invoke methods to the contract
  */
 function buildInvoke(contract: Contract, functionAbi: FunctionAbi): AsyncContractFunction {
-  return async function (...args: Array<any>): Promise<any> {
+  return async function (...args: ArgsOrCalldataWithOptions): Promise<any> {
     const params = splitArgsAndOptions(args);
     return contract.invoke(functionAbi.name, params.args, {
       parseRequest: true,
