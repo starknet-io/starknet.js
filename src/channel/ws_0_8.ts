@@ -1,5 +1,13 @@
 import { WebSocket } from 'isows';
-import type { SPEC } from 'starknet-types-08';
+import type {
+  Methods,
+  SUBSCRIPTION_ID,
+  SubscriptionEventsResponse,
+  SubscriptionNewHeadsResponse,
+  SubscriptionPendingTransactionsResponse,
+  SubscriptionTransactionsStatusResponse,
+  WebSocketEvents,
+} from 'starknet-types-08';
 
 import { BigNumberish, BlockIdentifier } from '../types';
 import { JRPC } from '../types/api';
@@ -7,30 +15,6 @@ import { WebSocketEvent } from '../types/api/jsonrpc';
 import { stringify } from '../utils/json';
 import { bigNumberishArrayToHexadecimalStringArray, toHex } from '../utils/num';
 import { Block } from '../utils/provider';
-
-export type SUBSCRIPTION_ID = number;
-
-export type SUBSCRIPTION_RESULT = SUBSCRIPTION_ID;
-
-export type SubscriptionNewHeadsResponse = {
-  subscription_id: SUBSCRIPTION_ID;
-  result: SPEC.BLOCK_HEADER;
-};
-
-export type SubscriptionEventsResponse = {
-  subscription_id: SUBSCRIPTION_ID;
-  result: SPEC.EMITTED_EVENT;
-};
-
-export type SubscriptionTransactionsStatusResponse = {
-  subscription_id: SUBSCRIPTION_ID;
-  result: SPEC.NEW_TXN_STATUS;
-};
-
-export type SubscriptionPendingTransactionsResponse = {
-  subscription_id: SUBSCRIPTION_ID;
-  result: SPEC.TXN_HASH | SPEC.TXN;
-};
 
 export const WSSubscriptions = {
   NEW_HEADS: 'newHeads',
@@ -235,9 +219,9 @@ export class WebSocketChannel {
    * const response = await this.sendReceive('starknet_method', params);
    * ```
    */
-  public sendReceive(
-    method: string,
-    params?: {}
+  public sendReceive<T extends keyof Methods>(
+    method: T,
+    params?: Methods[T]['params']
   ): Promise<MessageEvent['data']['result'] | Error | Event> {
     const sendId = this.send(method, params);
 
@@ -387,8 +371,9 @@ export class WebSocketChannel {
 
   private onMessageProxy(event: MessageEvent<any>) {
     const message: WebSocketEvent = JSON.parse(event.data);
-    // console.log('onMessage:', data);
-    switch (message.method) {
+    const eventName = message.method as keyof WebSocketEvents;
+
+    switch (eventName) {
       case 'starknet_subscriptionReorg':
         throw Error('Reorg'); // todo: implement what to do
       case 'starknet_subscriptionNewHeads':
@@ -418,7 +403,7 @@ export class WebSocketChannel {
 
     return this.sendReceive('starknet_subscribeNewHeads', {
       ...{ block_id },
-    }) as Promise<SUBSCRIPTION_RESULT>;
+    }) as Promise<SUBSCRIPTION_ID>;
   }
 
   /**
@@ -451,10 +436,10 @@ export class WebSocketChannel {
   ) {
     const block_id = blockIdentifier ? new Block(blockIdentifier).identifier : undefined;
     return this.sendReceive('starknet_subscribeEvents', {
-      ...{ from_address: fromAddress && toHex(fromAddress) },
+      ...{ from_address: fromAddress !== undefined ? toHex(fromAddress) : undefined },
       ...{ keys },
       ...{ block_id },
-    }) as Promise<SUBSCRIPTION_RESULT>;
+    }) as Promise<SUBSCRIPTION_ID>;
   }
 
   /**
@@ -494,7 +479,7 @@ export class WebSocketChannel {
     return this.sendReceive('starknet_subscribeTransactionStatus', {
       transaction_hash,
       ...{ block_id },
-    }) as Promise<SUBSCRIPTION_RESULT>;
+    }) as Promise<SUBSCRIPTION_ID>;
   }
 
   /**
@@ -532,7 +517,7 @@ export class WebSocketChannel {
       ...{
         sender_address: senderAddress && bigNumberishArrayToHexadecimalStringArray(senderAddress),
       },
-    }) as Promise<SUBSCRIPTION_RESULT>;
+    }) as Promise<SUBSCRIPTION_ID>;
   }
 
   /**
