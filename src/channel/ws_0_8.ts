@@ -397,7 +397,7 @@ export class WebSocketChannel {
       case 'starknet_subscriptionEvents':
         this.onEvents(message.params as SubscriptionEventsResponse);
         break;
-      case 'starknet_subscriptionTransactionsStatus':
+      case 'starknet_subscriptionTransactionStatus':
         this.onTransactionStatus(message.params as SubscriptionTransactionsStatusResponse);
         break;
       case 'starknet_subscriptionPendingTransactions':
@@ -417,7 +417,7 @@ export class WebSocketChannel {
     const block_id = blockIdentifier ? new Block(blockIdentifier).identifier : undefined;
 
     return this.sendReceive('starknet_subscribeNewHeads', {
-      ...{ block: block_id },
+      ...{ block_id },
     }) as Promise<SUBSCRIPTION_RESULT>;
   }
 
@@ -453,7 +453,7 @@ export class WebSocketChannel {
     return this.sendReceive('starknet_subscribeEvents', {
       ...{ from_address: fromAddress && toHex(fromAddress) },
       ...{ keys },
-      ...{ block: block_id },
+      ...{ block_id },
     }) as Promise<SUBSCRIPTION_RESULT>;
   }
 
@@ -493,7 +493,7 @@ export class WebSocketChannel {
     const block_id = blockIdentifier ? new Block(blockIdentifier).identifier : undefined;
     return this.sendReceive('starknet_subscribeTransactionStatus', {
       transaction_hash,
-      ...{ block: block_id },
+      ...{ block_id },
     }) as Promise<SUBSCRIPTION_RESULT>;
   }
 

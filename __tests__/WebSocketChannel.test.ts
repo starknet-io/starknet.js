@@ -120,20 +120,48 @@ describe('websocket specific endpoints - pathfinder test', () => {
       calldata: [account.address, '10', '0'],
     });
 
+    let i = 0;
+    webSocketChannel.onTransactionStatus = async (data) => {
+      i += 1;
+      // TODO : Add data format validation
+      expect(data.result).toBeDefined();
+      if (i >= 1) {
+        const status = await webSocketChannel.unsubscribeTransactionStatus();
+        expect(status).toBe(true);
+      }
+    };
+
     const subid = await webSocketChannel.subscribeTransactionStatus(transaction_hash);
     expect(subid).toEqual(expect.any(Number));
-    console.log(`sub:${subid}, txh:${transaction_hash}`);
+    const expectedId = webSocketChannel.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS);
+    const subscriptionId = await webSocketChannel.waitForUnsubscription(expectedId);
+    expect(subscriptionId).toEqual(expectedId);
+    expect(webSocketChannel.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS)).toBe(undefined);
+  });
+
+  test('Test subscribeTransactionStatus and block_id', async () => {
+    const latestBlock = await account.getBlockLatestAccepted();
+    const blockId = latestBlock.block_number - 5;
+
+    const { transaction_hash } = await account.execute({
+      contractAddress: '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
+      entrypoint: 'transfer',
+      calldata: [account.address, '10', '0'],
+    });
 
     let i = 0;
     webSocketChannel.onTransactionStatus = async (data) => {
       i += 1;
       // TODO : Add data format validation
       expect(data.result).toBeDefined();
-      if (i === 1) {
+      if (i >= 1) {
         const status = await webSocketChannel.unsubscribeTransactionStatus();
         expect(status).toBe(true);
       }
     };
+
+    const subid = await webSocketChannel.subscribeTransactionStatus(transaction_hash, blockId);
+    expect(subid).toEqual(expect.any(Number));
     const expectedId = webSocketChannel.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS);
     const subscriptionId = await webSocketChannel.waitForUnsubscription(expectedId);
     expect(subscriptionId).toEqual(expectedId);
