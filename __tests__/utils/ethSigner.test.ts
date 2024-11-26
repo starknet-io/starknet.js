@@ -10,7 +10,8 @@ import {
   encode,
   eth,
   extractContractHashes,
-  getLedgerPathBuffer,
+  getLedgerPathBuffer111,
+  getLedgerPathBuffer221,
   hash,
   num,
   stark,
@@ -354,11 +355,24 @@ describe('Ethereum signer', () => {
 describe('Ledger Signer', () => {
   // signature of Ledger can't be tested automatically.
   // So, just the test of the path encoding.
-  test('getLedgerPathBuffer', () => {
-    const path = getLedgerPathBuffer(3, 'AstroAPP');
+
+  // Ledger APP v1.1.1
+  test('getLedgerPathBuffer111', () => {
+    const path = getLedgerPathBuffer111(3, 'AstroAPP');
     expect(path).toEqual(
       new Uint8Array([
         128, 0, 10, 85, 71, 65, 233, 201, 95, 192, 123, 107, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0,
+      ])
+    );
+  });
+
+  // Ledger APP v2.2.1
+  test('getLedgerPathBuffer', () => {
+    const path = getLedgerPathBuffer221(3, 'AstroAPP');
+    expect(path).toEqual(
+      new Uint8Array([
+        128, 0, 10, 85, 199, 65, 233, 201, 223, 192, 123, 107, 128, 0, 0, 0, 128, 0, 0, 3, 0, 0, 0,
+        0,
       ])
     );
   });

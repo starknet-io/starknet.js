@@ -1,3 +1,9 @@
+# [6.19.0](https://github.com/starknet-io/starknet.js/compare/v6.18.1...v6.19.0) (2024-11-26)
+
+### Features
+
+- Ledger signer 221 ([#1246](https://github.com/starknet-io/starknet.js/issues/1246)) ([03e2d50](https://github.com/starknet-io/starknet.js/commit/03e2d50edee7e2e9e8efb678a97effaf09adee70))
+
 ## [6.18.1](https://github.com/starknet-io/starknet.js/compare/v6.18.0...v6.18.1) (2024-11-25)
 
 ### Bug Fixes
