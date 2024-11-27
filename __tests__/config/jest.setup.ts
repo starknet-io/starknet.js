@@ -9,6 +9,12 @@ import 'isomorphic-fetch';
 /* eslint-disable no-console */
 import { register } from 'fetch-intercept';
 
+import customMatchers from './customMatchers';
+
+beforeAll(() => {
+  expect.extend(customMatchers);
+});
+
 const util = require('util');
 
 jest.setTimeout(50 * 60 * 1000);

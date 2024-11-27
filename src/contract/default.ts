@@ -23,14 +23,16 @@ import {
   Result,
   AbiStruct,
   ValidateType,
+  type SuccessfulTransactionReceiptResponse,
 } from '../types';
 import assert from '../utils/assert';
-import { CallData, cairo } from '../utils/calldata';
+import { cairo, CallData } from '../utils/calldata';
 import { createAbiParser } from '../utils/calldata/parser';
 import { getAbiEvents, parseEvents as parseRawEvents } from '../utils/events/index';
 import { cleanHex } from '../utils/num';
 import { ContractInterface } from './interface';
 import type { GetTransactionReceiptResponse } from '../utils/transactionReceipt';
+import type { INVOKE_TXN_RECEIPT } from '../types/provider/spec';
 
 export type TypedContractV2<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & Contract;
 
@@ -329,15 +331,32 @@ export class Contract implements ContractInterface {
   }
 
   public parseEvents(receipt: GetTransactionReceiptResponse): ParsedEvents {
-    return parseRawEvents(
-      (receipt as InvokeTransactionReceiptResponse).events?.filter(
-        (event) => cleanHex(event.from_address) === cleanHex(this.address),
-        []
-      ) || [],
-      this.events,
-      this.structs,
-      CallData.getAbiEnum(this.abi)
-    );
+    let parsed: ParsedEvents;
+    receipt.match({
+      success: (txR: SuccessfulTransactionReceiptResponse) => {
+        const emittedEvents =
+          (txR as InvokeTransactionReceiptResponse).events
+            ?.map((event) => {
+              return {
+                block_hash: (txR as INVOKE_TXN_RECEIPT).block_hash,
+                block_number: (txR as INVOKE_TXN_RECEIPT).block_number,
+                transaction_hash: (txR as INVOKE_TXN_RECEIPT).transaction_hash,
+                ...event,
+              };
+            })
+            .filter((event) => cleanHex(event.from_address) === cleanHex(this.address), []) || [];
+        parsed = parseRawEvents(
+          emittedEvents,
+          this.events,
+          this.structs,
+          CallData.getAbiEnum(this.abi)
+        );
+      },
+      _: () => {
+        throw Error('This transaction was not successful.');
+      },
+    });
+    return parsed!;
   }
 
   public isCairo1(): boolean {
