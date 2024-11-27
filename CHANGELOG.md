@@ -1,3 +1,9 @@
+# [6.20.0](https://github.com/starknet-io/starknet.js/compare/v6.19.0...v6.20.0) (2024-11-27)
+
+### Features
+
+- add support for parsing emitted events ([#1227](https://github.com/starknet-io/starknet.js/issues/1227)) ([321ecae](https://github.com/starknet-io/starknet.js/commit/321ecaed2af5828501eccb982dc8744ec3e90f1f))
+
 # [6.19.0](https://github.com/starknet-io/starknet.js/compare/v6.18.1...v6.19.0) (2024-11-26)
 
 ### Features
