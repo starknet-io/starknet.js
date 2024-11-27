@@ -5,6 +5,7 @@ import type {
   SubscriptionEventsResponse,
   SubscriptionNewHeadsResponse,
   SubscriptionPendingTransactionsResponse,
+  SubscriptionReorgResponse,
   SubscriptionTransactionsStatusResponse,
   WebSocketEvents,
 } from 'starknet-types-08';
@@ -71,6 +72,17 @@ export class WebSocketChannel {
    * ws library object
    */
   public websocket: WebSocket;
+
+  /**
+   * Assign implementation method to get 'on reorg event data'
+   * @example
+   * ```typescript
+   * webSocketChannel.onReorg = async function (data) {
+   *  // ... do something when reorg happens
+   * }
+   * ```
+   */
+  public onReorg: (this: WebSocketChannel, data: SubscriptionReorgResponse) => any = () => {};
 
   /**
    * Assign implementation method to get 'starknet block heads'
@@ -375,7 +387,8 @@ export class WebSocketChannel {
 
     switch (eventName) {
       case 'starknet_subscriptionReorg':
-        throw Error('Reorg'); // todo: implement what to do
+        this.onReorg(message.params as SubscriptionReorgResponse);
+        break;
       case 'starknet_subscriptionNewHeads':
         this.onNewHeads(message.params as SubscriptionNewHeadsResponse);
         break;
