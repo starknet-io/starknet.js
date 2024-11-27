@@ -4,10 +4,10 @@ import {
   ContractFactory,
   ParsedEvents,
   RawArgs,
+  SuccessfulTransactionReceiptResponse,
   json,
   shortString,
   stark,
-  SuccessfulTransactionReceiptResponse,
 } from '../src';
 import { CallData } from '../src/utils/calldata';
 import { felt, isCairo1Abi, tuple, uint256 } from '../src/utils/calldata/cairo';
@@ -152,14 +152,7 @@ describe('contract module', () => {
             },
           },
         ];
-        const event0 = events[0];
-        expect(event0.block_hash).toBeDefined();
-        expect(event0.block_number).toBeDefined();
-        expect(event0.transaction_hash).toBeDefined();
-        delete event0.block_hash;
-        delete event0.block_number;
-        delete event0.transaction_hash;
-        return expect([event0]).toStrictEqual(shouldBe);
+        expect(events[0]).toMatchEventStructure(shouldBe[0]);
       });
     });
 

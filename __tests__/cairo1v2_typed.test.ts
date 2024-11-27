@@ -815,14 +815,7 @@ describe('Cairo 1', () => {
       ];
       const tx = await provider.waitForTransaction(transaction_hash);
       const events = eventContract.parseEvents(tx);
-      const event0 = events[0];
-      expect(event0.block_hash).toBeDefined();
-      expect(event0.block_number).toBeDefined();
-      expect(event0.transaction_hash).toBeDefined();
-      delete event0.block_hash;
-      delete event0.block_number;
-      delete event0.transaction_hash;
-      return expect([event0]).toStrictEqual(shouldBe);
+      expect(events[0]).toMatchEventStructure(shouldBe[0]);
     });
 
     test('parse event returning a nested struct', async () => {
@@ -840,14 +833,7 @@ describe('Cairo 1', () => {
       ];
       const tx = await provider.waitForTransaction(transaction_hash);
       const events = eventContract.parseEvents(tx);
-      const event0 = events[0];
-      expect(event0.block_hash).toBeDefined();
-      expect(event0.block_number).toBeDefined();
-      expect(event0.transaction_hash).toBeDefined();
-      delete event0.block_hash;
-      delete event0.block_number;
-      delete event0.transaction_hash;
-      return expect([event0]).toStrictEqual(shouldBe);
+      expect(events[0]).toMatchEventStructure(shouldBe[0]);
     });
 
     test('parse tx returning multiple similar events', async () => {
@@ -893,21 +879,8 @@ describe('Cairo 1', () => {
       const { transaction_hash } = await account.execute([callData1, callData2]);
       const tx = await provider.waitForTransaction(transaction_hash);
       const events = eventContract.parseEvents(tx);
-      const event0 = events[0];
-      expect(event0.block_hash).toBeDefined();
-      expect(event0.block_number).toBeDefined();
-      expect(event0.transaction_hash).toBeDefined();
-      delete event0.block_hash;
-      delete event0.block_number;
-      delete event0.transaction_hash;
-      const event1 = events[1];
-      expect(event1.block_hash).toBeDefined();
-      expect(event1.block_number).toBeDefined();
-      expect(event1.transaction_hash).toBeDefined();
-      delete event1.block_hash;
-      delete event1.block_number;
-      delete event1.transaction_hash;
-      return expect([event0, event1]).toStrictEqual(shouldBe);
+      expect(events[0]).toMatchEventStructure(shouldBe[0]);
+      expect(events[1]).toMatchEventStructure(shouldBe[1]);
     });
     test('parse tx returning multiple different events', async () => {
       const shouldBe: types.ParsedEvents = [
@@ -943,21 +916,8 @@ describe('Cairo 1', () => {
       const { transaction_hash } = await account.execute([callData1, callData2]);
       const tx = await provider.waitForTransaction(transaction_hash);
       const events = eventContract.parseEvents(tx);
-      const event0 = events[0];
-      expect(event0.block_hash).toBeDefined();
-      expect(event0.block_number).toBeDefined();
-      expect(event0.transaction_hash).toBeDefined();
-      delete event0.block_hash;
-      delete event0.block_number;
-      delete event0.transaction_hash;
-      const event1 = events[1];
-      expect(event1.block_hash).toBeDefined();
-      expect(event1.block_number).toBeDefined();
-      expect(event1.transaction_hash).toBeDefined();
-      delete event1.block_hash;
-      delete event1.block_number;
-      delete event1.transaction_hash;
-      return expect([event0, event1]).toStrictEqual(shouldBe);
+      expect(events[0]).toMatchEventStructure(shouldBe[0]);
+      expect(events[1]).toMatchEventStructure(shouldBe[1]);
     });
   });
 
