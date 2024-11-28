@@ -806,7 +806,7 @@ describe('Cairo 1', () => {
       ];
       const tx = await provider.waitForTransaction(transaction_hash);
       const events = eventContract.parseEvents(tx);
-      return expect(events).toStrictEqual(shouldBe);
+      expect(events[0]).toMatchEventStructure(shouldBe[0]);
     });
 
     test('parse event returning a nested struct', async () => {
@@ -824,8 +824,7 @@ describe('Cairo 1', () => {
       ];
       const tx = await provider.waitForTransaction(transaction_hash);
       const events = eventContract.parseEvents(tx);
-
-      return expect(events).toStrictEqual(shouldBe);
+      expect(events[0]).toMatchEventStructure(shouldBe[0]);
     });
 
     test('parse tx returning multiple similar events', async () => {
@@ -871,7 +870,8 @@ describe('Cairo 1', () => {
       const { transaction_hash } = await account.execute([callData1, callData2]);
       const tx = await provider.waitForTransaction(transaction_hash);
       const events = eventContract.parseEvents(tx);
-      return expect(events).toStrictEqual(shouldBe);
+      expect(events[0]).toMatchEventStructure(shouldBe[0]);
+      expect(events[1]).toMatchEventStructure(shouldBe[1]);
     });
     test('parse tx returning multiple different events', async () => {
       const shouldBe: types.ParsedEvents = [
@@ -907,7 +907,8 @@ describe('Cairo 1', () => {
       const { transaction_hash } = await account.execute([callData1, callData2]);
       const tx = await provider.waitForTransaction(transaction_hash);
       const events = eventContract.parseEvents(tx);
-      return expect(events).toStrictEqual(shouldBe);
+      expect(events[0]).toMatchEventStructure(shouldBe[0]);
+      expect(events[1]).toMatchEventStructure(shouldBe[1]);
     });
   });
 

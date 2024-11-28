@@ -1,3 +1,27 @@
+## [6.20.1](https://github.com/starknet-io/starknet.js/compare/v6.20.0...v6.20.1) (2024-11-28)
+
+### Bug Fixes
+
+- bump types js ([#1273](https://github.com/starknet-io/starknet.js/issues/1273)) ([34dee40](https://github.com/starknet-io/starknet.js/commit/34dee407af2d9487050f3cf6f2969068937960d6))
+
+# [6.20.0](https://github.com/starknet-io/starknet.js/compare/v6.19.0...v6.20.0) (2024-11-27)
+
+### Features
+
+- add support for parsing emitted events ([#1227](https://github.com/starknet-io/starknet.js/issues/1227)) ([321ecae](https://github.com/starknet-io/starknet.js/commit/321ecaed2af5828501eccb982dc8744ec3e90f1f))
+
+# [6.19.0](https://github.com/starknet-io/starknet.js/compare/v6.18.1...v6.19.0) (2024-11-26)
+
+### Features
+
+- Ledger signer 221 ([#1246](https://github.com/starknet-io/starknet.js/issues/1246)) ([03e2d50](https://github.com/starknet-io/starknet.js/commit/03e2d50edee7e2e9e8efb678a97effaf09adee70))
+
+## [6.18.1](https://github.com/starknet-io/starknet.js/compare/v6.18.0...v6.18.1) (2024-11-25)
+
+### Bug Fixes
+
+- expose BatchClient class ([8d3a0de](https://github.com/starknet-io/starknet.js/commit/8d3a0de85230e6f08edebf67b6581d6e79ea191a))
+
 # [6.18.0](https://github.com/starknet-io/starknet.js/compare/v6.17.0...v6.18.0) (2024-11-18)
 
 ### Features

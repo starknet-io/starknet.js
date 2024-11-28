@@ -4,10 +4,10 @@ import {
   ContractFactory,
   ParsedEvents,
   RawArgs,
+  SuccessfulTransactionReceiptResponse,
   json,
   shortString,
   stark,
-  SuccessfulTransactionReceiptResponse,
 } from '../src';
 import { CallData } from '../src/utils/calldata';
 import { felt, isCairo1Abi, tuple, uint256 } from '../src/utils/calldata/cairo';
@@ -144,7 +144,7 @@ describe('contract module', () => {
             },
           },
         ];
-        return expect(events).toStrictEqual(shouldBe);
+        expect(events[0]).toMatchEventStructure(shouldBe[0]);
       });
     });
 

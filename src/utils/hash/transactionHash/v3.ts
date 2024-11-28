@@ -24,17 +24,38 @@ export function hashDAMode(nonceDAMode: BigNumberish, feeDAMode: BigNumberish) {
   return (BigInt(nonceDAMode) << DATA_AVAILABILITY_MODE_BITS) + BigInt(feeDAMode);
 }
 
-export function hashFeeField(tip: BigNumberish, bounds: ResourceBounds) {
-  const L1Bound =
+/**
+ * Encode the L1&L2 gas limits of a V3 transaction
+ * @param {ResourceBounds} bounds object including the limits for L1 & L2 gas
+ * @returns {bigint} encoded data
+ */
+export function encodeResourceBoundsL1(bounds: ResourceBounds): bigint {
+  return (
     (L1_GAS_NAME << RESOURCE_VALUE_OFFSET) +
     (BigInt(bounds.l1_gas.max_amount) << MAX_PRICE_PER_UNIT_BITS) +
-    BigInt(bounds.l1_gas.max_price_per_unit);
+    BigInt(bounds.l1_gas.max_price_per_unit)
+  );
+}
 
-  const L2Bound =
+/**
+ * Encode the L2 bound of a V3 transaction
+ * @param {ResourceBounds} bounds 
+ * {l1_gas: {max_amount: u64, max_price_per_unit: u128},
+ *  l2_gas: {max_amount: u64, max_price_per_unit: u128}}
+}
+ * @returns {bigint} encoded data
+ */
+export function encodeResourceBoundsL2(bounds: ResourceBounds): bigint {
+  return (
     (L2_GAS_NAME << RESOURCE_VALUE_OFFSET) +
     (BigInt(bounds.l2_gas.max_amount) << MAX_PRICE_PER_UNIT_BITS) +
-    BigInt(bounds.l2_gas.max_price_per_unit);
+    BigInt(bounds.l2_gas.max_price_per_unit)
+  );
+}
 
+export function hashFeeField(tip: BigNumberish, bounds: ResourceBounds) {
+  const L1Bound = encodeResourceBoundsL1(bounds);
+  const L2Bound = encodeResourceBoundsL2(bounds);
   return poseidonHashMany([BigInt(tip), L1Bound, L2Bound]);
 }
 
