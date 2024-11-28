@@ -1,3 +1,9 @@
+## [6.20.3](https://github.com/starknet-io/starknet.js/compare/v6.20.2...v6.20.3) (2024-11-28)
+
+### Bug Fixes
+
+- remove shadowed WalletAccount address property ([3251ffc](https://github.com/starknet-io/starknet.js/commit/3251ffca5551714e24ea6c1fb5488db06919c24e))
+
 ## [6.20.2](https://github.com/starknet-io/starknet.js/compare/v6.20.1...v6.20.2) (2024-11-28)
 
 ### Bug Fixes
