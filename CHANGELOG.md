@@ -1,3 +1,9 @@
+## [6.20.1](https://github.com/starknet-io/starknet.js/compare/v6.20.0...v6.20.1) (2024-11-28)
+
+### Bug Fixes
+
+- bump types js ([#1273](https://github.com/starknet-io/starknet.js/issues/1273)) ([34dee40](https://github.com/starknet-io/starknet.js/commit/34dee407af2d9487050f3cf6f2969068937960d6))
+
 # [6.20.0](https://github.com/starknet-io/starknet.js/compare/v6.19.0...v6.20.0) (2024-11-27)
 
 ### Features
