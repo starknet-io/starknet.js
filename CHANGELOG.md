@@ -1,3 +1,9 @@
+## [6.20.2](https://github.com/starknet-io/starknet.js/compare/v6.20.1...v6.20.2) (2024-11-28)
+
+### Bug Fixes
+
+- bump typejs 0.7.10 ([#1275](https://github.com/starknet-io/starknet.js/issues/1275)) ([edfa6dd](https://github.com/starknet-io/starknet.js/commit/edfa6dd2466933d4c4b8a8dacb7220778b2669fc))
+
 ## [6.20.1](https://github.com/starknet-io/starknet.js/compare/v6.20.0...v6.20.1) (2024-11-28)
 
 ### Bug Fixes
