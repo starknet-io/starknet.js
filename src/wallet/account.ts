@@ -40,8 +40,6 @@ import { StarknetWalletProvider } from './types';
 // TODO: Remove non address constructor in next major version
 // Represent 'Selected Active' Account inside Connected Wallet
 export class WalletAccount extends Account implements AccountInterface {
-  public address: string = '';
-
   public walletProvider: StarknetWalletProvider;
 
   /**
