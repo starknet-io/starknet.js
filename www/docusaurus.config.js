@@ -133,7 +133,7 @@ const config = {
               },
               {
                 label: 'Discord',
-                href: 'https://discord.com/channels/793094838509764618/927918707613786162',
+                href: 'https://discord.com/channels/793094838509764618/1270119831559078061',
               },
             ],
           },

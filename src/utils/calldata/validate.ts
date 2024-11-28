@@ -199,6 +199,13 @@ const validateUint = (parameter: any, input: AbiEntry) => {
       );
       break;
     }
+    case Literal.U96: {
+      assert(
+        param >= 0n && param <= 2n ** 96n - 1n,
+        `Validate: arg ${input.name} must be ${input.type} : a 96 bits number.`
+      );
+      break;
+    }
 
     default:
       break;

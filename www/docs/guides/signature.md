@@ -209,9 +209,9 @@ console.log('signature message =', sig0);
 ![](./pictures/LedgerTitle.png)
 
 Starknet.js has a support for Ledger Nano S+ or X, to sign your Starknet transactions.
-You have to use a transporter to interact with the Ledger Nano. Depending if you use an USB or a Bluetooth connection, depending of your framework (Node, Web, Mobile), you have to use the appropriate library to create your transporter.
+You have to use a transporter to interact with the Ledger Nano. Depending if you use an USB or a Bluetooth connection, depending on your framework (Node, Web, Mobile), you have to use the appropriate library to create your transporter.
 
-The Ledger documentation is listing all the available cases :
+The Ledger documentation lists all the available cases :
 ![](./pictures/LedgerConnectivity.png)
 
 The libs available are :
@@ -228,7 +228,7 @@ import type Transport from '@ledgerhq/hw-transport'; // type for the transporter
 In a Web DAPP, take care that some browsers are not compatible (FireFox, ...), and that the Bluetooth is not working in all cases and in all operating systems.
 
 :::note
-The last version of the Ledger Starknet APP (v1.1.1) only supports blind signing of the hash of your action. Sign only hashes from a code that you trust.
+The last version of the Ledger Starknet APP (v2.2.1) supports explained V1 (ETH) & V3 (STRK) transactions & deploy accounts. For a class declaration or a message, you will have to blind sign a hash ; sign only hashes from a code that you trust. Do not forget to Enable `Blind signing` in the APP settings.
 :::
 
 For example, for a Node script :
@@ -236,7 +236,7 @@ For example, for a Node script :
 ```typescript
 import TransportNodeHid from '@ledgerhq/hw-transport-node-hid';
 const myLedgerTransport: Transport = await TransportNodeHid.create();
-const myLedgerSigner = new LedgerSigner(myLedgerTransport, 0);
+const myLedgerSigner = new LedgerSigner221(myLedgerTransport, 0);
 const pubK = await myLedgerSigner.getPubKey();
 const fullPubK = await myLedgerSigner.getFullPubKey();
 // ...
@@ -250,7 +250,7 @@ The Ledger shall be connected, unlocked, with the Starknet internal APP activate
 :::
 
 Some complete examples :  
-A Node script : [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/ledgerNano/5.testLedgerAccount.ts).  
+A Node script : [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/ledgerNano/6.testLedgerAccount221.ts).  
 A test Web DAPP, to use in devnet-rs network : [here](https://github.com/PhilippeR26/Starknet-Ledger-Wallet).
 
 If you want to read the version of the Ledger Starknet APP :
@@ -260,3 +260,18 @@ const resp = await myLedgerTransport.send(Number('0x5a'), 0, 0, 0);
 const appVersion = resp[0] + '.' + resp[1] + '.' + resp[2];
 console.log('version=', appVersion);
 ```
+
+:::note
+You also have in Starknet.js a signer for the old v1.1.1 Ledger Starknet APP.
+
+```typescript
+const myLedgerSigner = new LedgerSigner111(myLedgerTransport, 0);
+```
+
+If you want to use the accounts created with the v1.1.1, using the v2.2.1 :
+
+```typescript
+const myLedgerSigner = new LedgerSigner221(myLedgerTransport, 0, undefined, getLedgerPathBuffer111);
+```
+
+:::

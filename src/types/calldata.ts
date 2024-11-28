@@ -34,6 +34,7 @@ export const Literal = {
   ClassHash: 'core::starknet::class_hash::ClassHash',
   ContractAddress: 'core::starknet::contract_address::ContractAddress',
   Secp256k1Point: 'core::starknet::secp256k1::Secp256k1Point',
+  U96: 'core::internal::bounded_int::BoundedInt::<0, 79228162514264337593543950335>',
 } as const;
 
 export type Literal = ValuesType<typeof Literal>;

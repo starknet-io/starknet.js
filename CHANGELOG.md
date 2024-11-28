@@ -1,3 +1,51 @@
+## [6.20.2](https://github.com/starknet-io/starknet.js/compare/v6.20.1...v6.20.2) (2024-11-28)
+
+### Bug Fixes
+
+- bump typejs 0.7.10 ([#1275](https://github.com/starknet-io/starknet.js/issues/1275)) ([edfa6dd](https://github.com/starknet-io/starknet.js/commit/edfa6dd2466933d4c4b8a8dacb7220778b2669fc))
+
+## [6.20.1](https://github.com/starknet-io/starknet.js/compare/v6.20.0...v6.20.1) (2024-11-28)
+
+### Bug Fixes
+
+- bump types js ([#1273](https://github.com/starknet-io/starknet.js/issues/1273)) ([34dee40](https://github.com/starknet-io/starknet.js/commit/34dee407af2d9487050f3cf6f2969068937960d6))
+
+# [6.20.0](https://github.com/starknet-io/starknet.js/compare/v6.19.0...v6.20.0) (2024-11-27)
+
+### Features
+
+- add support for parsing emitted events ([#1227](https://github.com/starknet-io/starknet.js/issues/1227)) ([321ecae](https://github.com/starknet-io/starknet.js/commit/321ecaed2af5828501eccb982dc8744ec3e90f1f))
+
+# [6.19.0](https://github.com/starknet-io/starknet.js/compare/v6.18.1...v6.19.0) (2024-11-26)
+
+### Features
+
+- Ledger signer 221 ([#1246](https://github.com/starknet-io/starknet.js/issues/1246)) ([03e2d50](https://github.com/starknet-io/starknet.js/commit/03e2d50edee7e2e9e8efb678a97effaf09adee70))
+
+## [6.18.1](https://github.com/starknet-io/starknet.js/compare/v6.18.0...v6.18.1) (2024-11-25)
+
+### Bug Fixes
+
+- expose BatchClient class ([8d3a0de](https://github.com/starknet-io/starknet.js/commit/8d3a0de85230e6f08edebf67b6581d6e79ea191a))
+
+# [6.18.0](https://github.com/starknet-io/starknet.js/compare/v6.17.0...v6.18.0) (2024-11-18)
+
+### Features
+
+- WalletAccount non-breaking temp solution ([#1259](https://github.com/starknet-io/starknet.js/issues/1259)) ([84b267c](https://github.com/starknet-io/starknet.js/commit/84b267cd20122de2954fe9fd87b50503b19c1baa))
+
+# [6.17.0](https://github.com/starknet-io/starknet.js/compare/v6.16.0...v6.17.0) (2024-10-24)
+
+### Features
+
+- Cairo u96 implementation ([#1247](https://github.com/starknet-io/starknet.js/issues/1247)) ([06f0a80](https://github.com/starknet-io/starknet.js/commit/06f0a8013405ded4685d0a21c4f245a25e7d4827))
+
+# [6.16.0](https://github.com/starknet-io/starknet.js/compare/v6.15.0...v6.16.0) (2024-10-24)
+
+### Features
+
+- increase rpc error information propagation ([#1213](https://github.com/starknet-io/starknet.js/issues/1213)) ([947e8b4](https://github.com/starknet-io/starknet.js/commit/947e8b457d08a7533139072b911ace4e382988ae))
+
 # [6.15.0](https://github.com/starknet-io/starknet.js/compare/v6.14.1...v6.15.0) (2024-10-16)
 
 ### Features

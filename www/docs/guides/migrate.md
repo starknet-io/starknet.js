@@ -11,7 +11,7 @@ If you encounter any missing changes, please let us know and we will update this
 ## Transaction receipt
 
 When sending a transaction, the receipt type has changed.
-In V5, it's an object that can have varied definitions, depending of the status and the type of transaction.
+In V5, it's an object that can have varied definitions, depending on the status and the type of transaction.
 In V6, this object is in `TxR.value`, and several helpers are available (`.statusReceipt`, `isSuccess()`, `isRejected()`, `isReverted()`, `.isError()`, `match`, ...)
 
 ```typescript
