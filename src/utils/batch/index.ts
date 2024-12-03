@@ -1,11 +1,12 @@
 import { stringify } from '../json';
-import { RPC } from '../../types';
+import { RPC, RpcProviderOptions } from '../../types';
 import { JRPC } from '../../types/api';
 
 export type BatchClientOptions = {
   nodeUrl: string;
   headers: object;
   interval: number;
+  baseFetch: NonNullable<RpcProviderOptions['baseFetch']>;
 };
 
 export class BatchClient {
@@ -27,10 +28,13 @@ export class BatchClient {
 
   private delayPromiseResolve?: () => void;
 
+  private baseFetch: BatchClientOptions['baseFetch'];
+
   constructor(options: BatchClientOptions) {
     this.nodeUrl = options.nodeUrl;
     this.headers = options.headers;
     this.interval = options.interval;
+    this.baseFetch = options.baseFetch;
   }
 
   private async wait(): Promise<void> {
@@ -77,7 +81,7 @@ export class BatchClient {
   }
 
   private async sendBatch(requests: JRPC.RequestBody[]) {
-    const raw = await fetch(this.nodeUrl, {
+    const raw = await this.baseFetch(this.nodeUrl, {
       method: 'POST',
       body: stringify(requests),
       headers: this.headers as Record<string, string>,
