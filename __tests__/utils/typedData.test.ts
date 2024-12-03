@@ -326,7 +326,7 @@ describe('typedData', () => {
 
     messageHash = getMessageHash(exampleEnum, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
-      `"0x6e61abaf480b1370bbf231f54e298c5f4872f40a6d2dd409ff30accee5bbd1e"`
+      `"0x416b85b18063b1b3420ab709e9d5e35cb716691d397c5841ce7c5198ee30bf"`
     );
 
     expect(spyPedersen).not.toHaveBeenCalled();
