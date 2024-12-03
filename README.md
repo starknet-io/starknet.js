@@ -59,7 +59,7 @@ Play with [Code Examples](https://github.com/PhilippeR26/starknet.js-workshop-ty
 
 If you consider to contribute to this project please read [CONTRIBUTING.md](https://github.com/starknet-io/starknet.js/blob/main/CONTRIBUTING.md) first.
 
-You can also join our dedicated channel for [Starknet.js](https://discord.com/channels/793094838509764618/1270119831559078061) on the [Starknet Discord](https://discord.com/invite/Ft6Xtzdg)
+You can also join our dedicated channel for [Starknet.js](https://discord.com/channels/793094838509764618/1270119831559078061) on the [Starknet Discord](https://discord.com/invite/starknet-community)
 
 ## ❤️ Special Thanks
 
