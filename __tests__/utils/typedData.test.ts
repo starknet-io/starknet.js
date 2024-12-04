@@ -335,12 +335,12 @@ describe('typedData', () => {
 
     messageHash = getMessageHash(exampleEnum, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
-      `"0x6e61abaf480b1370bbf231f54e298c5f4872f40a6d2dd409ff30accee5bbd1e"`
+      `"0x416b85b18063b1b3420ab709e9d5e35cb716691d397c5841ce7c5198ee30bf"`
     );
 
     messageHash = getMessageHash(exampleEnumNested, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
-      `"0x691fc54567306a8ea5431130f1b98299e74a748ac391540a86736f20ef5f2b7"`
+      `"0xef07f7e867a3a4a368318c723c76325f244646886bb8dd0fc21d92995df173"`
     );
 
     expect(spyPedersen).not.toHaveBeenCalled();
