@@ -27,7 +27,6 @@ import {
   DeployContractUDCResponse,
   DeployTransactionReceiptResponse,
   EstimateFee,
-  UniversalSuggestedFee,
   EstimateFeeAction,
   EstimateFeeBulk,
   Invocation,
@@ -44,8 +43,16 @@ import {
   TypedData,
   UniversalDeployerContractPayload,
   UniversalDetails,
+  UniversalSuggestedFee,
+  V2DeployAccountSignerDetails,
+  V3DeployAccountSignerDetails,
 } from '../types';
-import { ETransactionVersion, ETransactionVersion3, type ResourceBounds } from '../types/api';
+import {
+  ETransactionVersion,
+  ETransactionVersion2,
+  ETransactionVersion3,
+  type ResourceBounds,
+} from '../types/api';
 import {
   OutsideExecutionVersion,
   type OutsideExecution,
@@ -55,8 +62,10 @@ import {
 import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { parseUDCEvent } from '../utils/events';
-import { calculateContractAddressFromHash } from '../utils/hash';
-import { isUndefined, isString } from '../utils/typed';
+import {
+  calculateContractAddressFromHash,
+  calculateDeployAccountTransactionHash,
+} from '../utils/hash';
 import { isHex, toBigInt, toCairoBool, toHex } from '../utils/num';
 import {
   buildExecuteFromOutsideCallData,
@@ -67,6 +76,7 @@ import { parseContract } from '../utils/provider';
 import { supportsInterface } from '../utils/src5';
 import {
   estimateFeeToBounds,
+  intDAM,
   randomAddress,
   reduceV2,
   toFeeVersion,
@@ -74,6 +84,7 @@ import {
   v3Details,
 } from '../utils/stark';
 import { buildUDCCall, getExecuteCalldata } from '../utils/transaction';
+import { isString, isUndefined } from '../utils/typed';
 import { getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
 
@@ -1040,5 +1051,91 @@ export class Account extends Provider implements AccountInterface {
     StarknetIdContract?: string
   ): Promise<string> {
     return super.getStarkName(address, StarknetIdContract);
+  }
+
+  public async getDeployAccountPayloadToSign(
+    {
+      classHash,
+      constructorCalldata = [],
+      addressSalt = 0,
+      contractAddress: providedContractAddress,
+    }: DeployAccountContractPayload,
+    details: UniversalDetails
+  ): Promise<any> {
+    const version = toTransactionVersion(
+      this.getPreferredVersion(ETransactionVersion.V1, ETransactionVersion.V3),
+      details.version
+    );
+    const nonce = ZERO; // DEPLOY_ACCOUNT transaction will have a nonce zero as it is the first transaction in the account
+    const chainId = await this.getChainId();
+
+    const compiledCalldata = CallData.compile(constructorCalldata);
+    const contractAddress =
+      providedContractAddress ??
+      calculateContractAddressFromHash(addressSalt, classHash, compiledCalldata, 0);
+
+    const estimate = await this.getUniversalSuggestedFee(
+      version,
+      {
+        type: TransactionType.DEPLOY_ACCOUNT,
+        payload: {
+          classHash,
+          constructorCalldata: compiledCalldata,
+          addressSalt,
+          contractAddress,
+        },
+      },
+      details
+    );
+
+    const signaturePayload = {
+      ...v3Details(details),
+      classHash,
+      constructorCalldata: compiledCalldata,
+      contractAddress,
+      addressSalt,
+      chainId,
+      resourceBounds: estimate.resourceBounds,
+      maxFee: estimate.maxFee,
+      version,
+      nonce,
+    };
+
+    const compiledConstructorCalldata = CallData.compile(signaturePayload.constructorCalldata);
+    /*     const version = BigInt(details.version).toString(); */
+    let msgHash;
+
+    if (Object.values(ETransactionVersion2).includes(details.version as any)) {
+      const det = signaturePayload as V2DeployAccountSignerDetails;
+      msgHash = calculateDeployAccountTransactionHash({
+        ...det,
+        salt: det.addressSalt,
+        constructorCalldata: compiledConstructorCalldata,
+        version: det.version,
+      });
+    } else if (Object.values(ETransactionVersion3).includes(details.version as any)) {
+      const det = signaturePayload as V3DeployAccountSignerDetails;
+      msgHash = calculateDeployAccountTransactionHash({
+        ...det,
+        salt: det.addressSalt,
+        compiledConstructorCalldata,
+        version: det.version,
+        nonceDataAvailabilityMode: intDAM(det.nonceDataAvailabilityMode),
+        feeDataAvailabilityMode: intDAM(det.feeDataAvailabilityMode),
+      });
+    } else {
+      throw Error('unsupported signDeployAccountTransaction version');
+    }
+
+    return {
+      payload: { classHash, addressSalt, constructorCalldata, toSign: msgHash },
+      details: {
+        ...v3Details(details),
+        nonce,
+        resourceBounds: estimate.resourceBounds,
+        maxFee: estimate.maxFee,
+        version,
+      },
+    };
   }
 }
