@@ -12,6 +12,7 @@ import { ETransactionVersion } from '../../src/types/api';
 import { toHex } from '../../src/utils/num';
 import { wait } from '../../src/utils/provider';
 import { isString } from '../../src/utils/typed';
+import './customMatchers'; // ensures TS traversal
 
 const readFile = (subpath: string) => fs.readFileSync(path.resolve(__dirname, subpath));
 

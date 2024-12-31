@@ -38,8 +38,8 @@ describe('contract module', () => {
           classHash: '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a',
           constructorCalldata,
         });
-
-        erc20Contract = new Contract(contracts.Erc20.abi, deploy.contract_address!, provider);
+        erc20Address = deploy.address;
+        erc20Contract = new Contract(contracts.Erc20.abi, erc20Address, provider);
 
         const { deploy: multicallDeploy } = await account.declareAndDeploy({
           contract: contracts.Multicall,

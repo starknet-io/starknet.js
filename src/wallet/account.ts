@@ -80,6 +80,7 @@ export class WalletAccount extends Account implements AccountInterface {
     });
 
     if (!address.length) {
+      // eslint-disable-next-line no-console
       console.warn(
         '@deprecated Use static method WalletAccount.connect or WalletAccount.connectSilent instead. Constructor {@link WalletAccount.(format:2)}.'
       );
