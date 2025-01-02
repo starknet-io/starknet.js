@@ -273,8 +273,8 @@ export function encodeType(
               .split(',')
               .map((e) => (e ? esc(e) : e))
               .join(',')})`
-          : esc(targetType);
-        return `${esc(t.name)}:${typeString}`;
+          : `:${esc(targetType)}`;
+        return `${esc(t.name)}${typeString}`;
       });
       return `${esc(dependency)}(${dependencyElements})`;
     })
