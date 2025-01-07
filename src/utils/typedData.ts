@@ -266,8 +266,8 @@ export function encodeType(
               .split(',')
               .map((e) => (e ? esc(e) : e))
               .join(',')})`
-          : `:${esc(targetType)}`;
-        return `${esc(t.name)}${typeString}`;
+          : esc(targetType);
+        return `${esc(t.name)}:${typeString}`;
       });
       return `${esc(dependency)}(${dependencyElements})`;
     })
@@ -357,13 +357,11 @@ export function encodeValue(
       if (revision === Revision.ACTIVE) {
         const [variantKey, variantData] = Object.entries(data as TypedData['message'])[0];
 
-        const parentType = types[ctx.parent as string].find((t) => t.name === ctx.key)!;
-        const enumName = (parentType as StarknetEnumType).contains;
-        const enumType = types[enumName];
+        const parentType = types[ctx.parent as string].find((t) => t.name === ctx.key);
+        const enumType = types[(parentType as StarknetEnumType).contains];
         const variantType = enumType.find((t) => t.name === variantKey) as StarknetType;
         const variantIndex = enumType.indexOf(variantType);
 
-        const typeHash = getTypeHash(types, enumName, revision);
         const encodedSubtypes = variantType.type
           .slice(1, -1)
           .split(',')
@@ -374,7 +372,7 @@ export function encodeValue(
           });
         return [
           type,
-          revisionConfiguration[revision].hashMethod([typeHash, variantIndex, ...encodedSubtypes]),
+          revisionConfiguration[revision].hashMethod([variantIndex, ...encodedSubtypes]),
         ];
       } // else fall through to default
       return [type, getHex(data as string)];
