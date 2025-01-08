@@ -1,3 +1,15 @@
+# [6.21.0](https://github.com/starknet-io/starknet.js/compare/v6.20.3...v6.21.0) (2025-01-08)
+
+### Bug Fixes
+
+- correct enum typed data hashing ([#1281](https://github.com/starknet-io/starknet.js/issues/1281)) ([6e353d3](https://github.com/starknet-io/starknet.js/commit/6e353d3d50226907ce6b5ad53309d55ed51c6874))
+- rectify snip-12 violation by removing extra `:` in enum encoding ([#1288](https://github.com/starknet-io/starknet.js/issues/1288)) ([b903116](https://github.com/starknet-io/starknet.js/commit/b903116e629af5bc375151deb3635cdbe23cc317))
+- repair fetch utility for browser environments ([#1293](https://github.com/starknet-io/starknet.js/issues/1293)) ([2cb1332](https://github.com/starknet-io/starknet.js/commit/2cb13327ffe669000e8152b509d14e060b3ea73b))
+
+### Features
+
+- enable base fetch override ([#1279](https://github.com/starknet-io/starknet.js/issues/1279)) ([0fce61e](https://github.com/starknet-io/starknet.js/commit/0fce61e40535a4f1b3b05fdd9da60f9218250c99))
+
 ## [6.20.3](https://github.com/starknet-io/starknet.js/compare/v6.20.2...v6.20.3) (2024-11-28)
 
 ### Bug Fixes
