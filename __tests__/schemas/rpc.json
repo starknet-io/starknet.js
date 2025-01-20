@@ -2,7 +2,14 @@
   "$id": "rpcSchemas",
   "definitions": {
     "GetSyncingStatsResponse": {
-      "$ref": "starknet_api_openrpc#/components/schemas/SYNC_STATUS"
+      "oneOf": [
+        {
+          "type": "boolean"
+        },
+        {
+          "$ref": "starknet_api_openrpc#/components/schemas/SYNC_STATUS"
+        }
+      ]
     },
     "StarknetEmittedEvent": {
       "$ref": "starknet_api_openrpc#/components/schemas/EMITTED_EVENT"
