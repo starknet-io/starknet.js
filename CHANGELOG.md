@@ -1,3 +1,9 @@
+## [6.21.1](https://github.com/starknet-io/starknet.js/compare/v6.21.0...v6.21.1) (2025-01-23)
+
+### Bug Fixes
+
+- pass signerDetails to fix estimateFeeBulk ([#1299](https://github.com/starknet-io/starknet.js/issues/1299)) ([f09f20d](https://github.com/starknet-io/starknet.js/commit/f09f20da47396456350d26610dabd2e2641a5a98))
+
 # [6.21.0](https://github.com/starknet-io/starknet.js/compare/v6.20.3...v6.21.0) (2025-01-08)
 
 ### Bug Fixes
