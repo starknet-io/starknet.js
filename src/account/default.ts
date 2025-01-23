@@ -990,6 +990,7 @@ export class Account extends Provider implements AccountInterface {
           return {
             ...common,
             ...payload,
+            ...signerDetails,
           };
         }
         if (transaction.type === TransactionType.DEPLOY) {
@@ -1003,6 +1004,7 @@ export class Account extends Provider implements AccountInterface {
           return {
             ...common,
             ...payload,
+            ...signerDetails,
             type: TransactionType.INVOKE,
           };
         }
@@ -1016,6 +1018,7 @@ export class Account extends Provider implements AccountInterface {
           return {
             ...common,
             ...payload,
+            ...signerDetails,
           };
         }
         if (transaction.type === TransactionType.DEPLOY_ACCOUNT) {
@@ -1028,6 +1031,7 @@ export class Account extends Provider implements AccountInterface {
           return {
             ...common,
             ...payload,
+            ...signerDetails,
           };
         }
         throw Error(`accountInvocationsFactory: unsupported transaction type: ${transaction}`);
