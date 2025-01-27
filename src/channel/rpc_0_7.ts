@@ -1,4 +1,4 @@
-import { NetworkName, StarknetChainId } from '../constants';
+import { NetworkName, StarknetChainId } from '../global/constants';
 import { LibraryError, RpcError } from '../utils/errors';
 import {
   AccountInvocationItem,

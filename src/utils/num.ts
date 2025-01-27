@@ -1,7 +1,7 @@
 import { hexToBytes as hexToBytesNoble } from '@noble/curves/abstract/utils';
 import { sha256 } from '@noble/hashes/sha256';
 
-import { MASK_31 } from '../constants';
+import { MASK_31 } from '../global/constants';
 import { BigNumberish } from '../types';
 import assert from './assert';
 import { addHexPrefix, buf2hex, removeHexPrefix } from './encode';

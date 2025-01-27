@@ -1,7 +1,7 @@
 import { getPublicKey, getStarkKey, utils } from '@scure/starknet';
 import { gzip, ungzip } from 'pako';
 
-import { ZERO, FeeMarginPercentage } from '../constants';
+import { ZERO, FeeMarginPercentage } from '../global/constants';
 import {
   ArraySignatureType,
   BigNumberish,

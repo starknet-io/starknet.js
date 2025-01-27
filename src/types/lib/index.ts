@@ -1,4 +1,4 @@
-import { StarknetChainId } from '../../constants';
+import { StarknetChainId } from '../../global/constants';
 import { weierstrass } from '../../utils/ec';
 import { EDataAvailabilityMode, ResourceBounds } from '../api';
 import { CairoEnum } from '../cairoEnum';

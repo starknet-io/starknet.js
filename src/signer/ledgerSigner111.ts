@@ -17,7 +17,7 @@ import type {
 import assert from '../utils/assert';
 import { CallData } from '../utils/calldata';
 import type { SignerInterface } from './interface';
-import { MASK_31 } from '../constants';
+import { MASK_31 } from '../global/constants';
 import { ETransactionVersion2 } from '../types/api/rpcspec_0_6';
 import { getMessageHash } from '../utils/typedData';
 import { getExecuteCalldata } from '../utils/transaction';

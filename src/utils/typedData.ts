@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import { PRIME, RANGE_FELT, RANGE_I128, RANGE_U128 } from '../constants';
+import { PRIME, RANGE_FELT, RANGE_I128, RANGE_U128 } from '../global/constants';
 import {
   BigNumberish,
   TypedDataRevision as Revision,

@@ -1,4 +1,4 @@
-import { TEXT_TO_FELT_MAX_LEN } from '../constants';
+import { TEXT_TO_FELT_MAX_LEN } from '../global/constants';
 import { addHexPrefix, removeHexPrefix } from './encode';
 import { isHex, isStringWholeNumber } from './num';
 import { isString } from './typed';

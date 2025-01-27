@@ -7,7 +7,7 @@ import type {
 } from 'starknet-types-07';
 
 import { Account, AccountInterface } from '../account';
-import { StarknetChainId } from '../constants';
+import { StarknetChainId } from '../global/constants';
 import { ProviderInterface } from '../provider';
 import {
   AllowArray,

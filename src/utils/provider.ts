@@ -1,4 +1,4 @@
-import { NetworkName, RPC_NODES } from '../constants';
+import { NetworkName, RPC_NODES } from '../global/constants';
 import {
   BlockIdentifier,
   BlockTag,

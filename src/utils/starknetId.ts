@@ -1,4 +1,4 @@
-import { StarknetChainId, ZERO } from '../constants';
+import { StarknetChainId, ZERO } from '../global/constants';
 import { BigNumberish } from '../types';
 import { tuple } from './calldata/cairo';
 import { CairoCustomEnum } from './calldata/enum/CairoCustomEnum';

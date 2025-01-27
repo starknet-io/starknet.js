@@ -1,4 +1,4 @@
-import { UDC } from '../constants';
+import { UDC } from '../global/constants';
 import {
   BigNumberish,
   CairoVersion,

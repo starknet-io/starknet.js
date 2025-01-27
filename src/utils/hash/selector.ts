@@ -1,7 +1,7 @@
 import { keccak } from '@scure/starknet';
 import { keccak_256 } from '@noble/hashes/sha3';
 import { bytesToHex } from '@noble/curves/abstract/utils';
-import { MASK_250 } from '../../constants';
+import { MASK_250 } from '../../global/constants';
 import { BigNumberish } from '../../types';
 import { addHexPrefix, removeHexPrefix, utf8ToArray } from '../encode';
 import { hexToBytes, isHex, isStringWholeNumber, toHex } from '../num';

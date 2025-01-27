@@ -1,6 +1,6 @@
-import { ETransactionVersion } from './types/api';
+import { ETransactionVersion } from '../types/api';
 
-export { IS_BROWSER } from './utils/encode';
+export { IS_BROWSER } from '../utils/encode';
 
 /**
  * Cairo Felt support storing max 31 character
