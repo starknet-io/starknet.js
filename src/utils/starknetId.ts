@@ -393,3 +393,21 @@ export function dynamicCallData(
     ArrayReference: arrayReference ? tuple(arrayReference[0], arrayReference[1]) : undefined,
   });
 }
+
+/**
+ * Check if a given string is a valid Starknet.id domain.
+ *
+ * @param {string} domain - The domain string to validate.
+ * @returns {boolean} - True if the domain is a valid Starknet.id domain, false otherwise.
+ * @example
+ * ```typescript
+ * const result = starknetId.isStarkDomain("example.stark");
+ * // result = true
+ *
+ * const result2 = starknetId.isStarkDomain("invalid-domain");
+ * // result2 = false
+ * ```
+ */
+export function isStarkDomain(domain: string): boolean {
+  return /^(?:[a-z0-9-]{1,48}(?:[a-z0-9-]{1,48}[a-z0-9-])?\.)*[a-z0-9-]{1,48}\.stark$/.test(domain);
+}
