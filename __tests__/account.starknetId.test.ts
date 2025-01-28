@@ -86,7 +86,7 @@ describe('deploy and test Wallet', () => {
   });
 
   test('Should throw error when invalid stark domain is provided', async () => {
-    await expect(account.getAddressFromStarkName('invalid-domain', namingAddress)).rejects.toThrow(
+    await expect(account.getAddressFromStarkName('invalid_domain', namingAddress)).rejects.toThrow(
       'Invalid domain, must be a valid .stark domain'
     );
   });
