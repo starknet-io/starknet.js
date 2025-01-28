@@ -1,6 +1,6 @@
+import { DEFAULT_GLOBAL_CONFIG } from './constants';
+
 type ConfigData = {
-  legacyMode: boolean;
-  logLevel: string;
   [key: string]: any;
 };
 
@@ -14,10 +14,7 @@ class Configuration {
   }
 
   private initialize(): void {
-    this.config = {
-      legacyMode: false,
-      logLevel: 'INFO',
-    };
+    this.config = { ...DEFAULT_GLOBAL_CONFIG };
   }
 
   public static getInstance(): Configuration {

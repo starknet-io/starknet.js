@@ -46,6 +46,9 @@ export * from './utils/calldata/enum';
 export * from './utils/contract';
 export * from './utils/transactionReceipt';
 export * as wallet from './wallet/connect';
+export * from './global/config';
+export * from './global/logger';
+export * from './global/logger.type';
 
 /**
  * Deprecated

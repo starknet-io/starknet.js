@@ -1,18 +1,9 @@
+/* eslint-disable no-console */
 import { config } from './config';
-
-enum LogLevel {
-  DEBUG = 0,
-  INFO = 1,
-  WARN = 2,
-  ERROR = 3,
-  FATAL = 4,
-  OFF = 5,
-}
-
-type LogLevelStrings = keyof typeof LogLevel;
+import { LogLevelIndex, LogLevel } from './logger.type';
 
 interface LogMessage {
-  level: LogLevelStrings;
+  level: LogLevel;
   message: string;
   timestamp: string;
   data?: any;
@@ -38,9 +29,9 @@ class Logger {
     return new Date().toISOString();
   }
 
-  private shouldLog(messageLevel: LogLevel): boolean {
+  private shouldLog(messageLevel: LogLevelIndex): boolean {
     const configLevel = this.config.get<string>('logLevel', 'INFO');
-    return messageLevel >= LogLevel[configLevel as LogLevelStrings];
+    return messageLevel <= LogLevelIndex[configLevel as LogLevel];
   }
 
   private formatMessage(logMessage: LogMessage): string {
@@ -48,14 +39,18 @@ class Logger {
     let formattedMessage = `[${timestamp}] ${level}: ${message}`;
 
     if (data) {
-      formattedMessage += `\n${JSON.stringify(data, null, 2)}`;
+      try {
+        formattedMessage += `\n${JSON.stringify(data, null, 2)}`;
+      } catch (error) {
+        formattedMessage += `\n[JSON.stringify Error/Circular]`;
+      }
     }
 
     return formattedMessage;
   }
 
-  private log(level: LogLevelStrings, message: string, data?: any): void {
-    if (!this.shouldLog(LogLevel[level])) {
+  private log(level: LogLevel, message: string, data?: any): void {
+    if (!this.shouldLog(LogLevelIndex[level])) {
       return;
     }
 
@@ -111,8 +106,23 @@ class Logger {
     this.log('FATAL', message, data);
   }
 
-  public setLogLevel(level: LogLevelStrings): void {
+  public setLogLevel(level: LogLevel): void {
     this.config.set('logLevel', level);
+  }
+
+  public getLogLevel(): LogLevel {
+    return this.config.get<string>('logLevel', 'INFO');
+  }
+
+  public getEnabledLogLevels() {
+    const logLevelStringKeys = Object.keys(LogLevelIndex).filter(
+      (v) => Number.isNaN(Number(v)) && v !== 'OFF'
+    );
+    const logLevels = logLevelStringKeys.filter((s) => {
+      return this.shouldLog(LogLevelIndex[s as LogLevel]);
+    });
+
+    return logLevels;
   }
 }
 

@@ -16,7 +16,7 @@ import {
   stark,
   waitForTransactionOptions,
 } from '../src';
-import { StarknetChainId } from '../src/constants';
+import { StarknetChainId } from '../src/global/constants';
 import { felt, uint256 } from '../src/utils/calldata/cairo';
 import { toBigInt, toHexString } from '../src/utils/num';
 import {
