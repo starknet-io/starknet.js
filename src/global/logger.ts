@@ -8,7 +8,9 @@ interface LogMessage {
   timestamp: string;
   data?: any;
 }
-
+/**
+ * Logging class providing different levels of log
+ */
 class Logger {
   private static instance: Logger;
 
@@ -86,26 +88,50 @@ class Logger {
     }
   }
 
+  /**
+   * debug will be displayed when LogLevel level is set to DEBUG(5)
+   */
   public debug(message: string, data?: any): void {
     this.log('DEBUG', message, data);
   }
 
+  /**
+   * info will be displayed when LogLevel level is set to DEBUG(5), INFO(4)
+   */
   public info(message: string, data?: any): void {
     this.log('INFO', message, data);
   }
 
+  /**
+   * warn will be displayed when LogLevel level is set to DEBUG(5), INFO(4), WARN(3)
+   */
   public warn(message: string, data?: any): void {
     this.log('WARN', message, data);
   }
 
+  /**
+   * error will be displayed when LogLevel level is set to DEBUG(5), INFO(4), WARN(3), ERROR(2)
+   */
   public error(message: string, data?: any): void {
     this.log('ERROR', message, data);
   }
 
+  /**
+   * fatal will be displayed when LogLevel level is set to DEBUG(5), INFO(4), WARN(3), ERROR(2), FATAL(1)
+   */
   public fatal(message: string, data?: any): void {
     this.log('FATAL', message, data);
   }
 
+  /**
+   * Set the logging level you would like system to display
+   * * 5 DEBUG  - show all logs
+   * * 4 INFO
+   * * 3 WARN
+   * * 2 ERROR
+   * * 1 FATAL
+   * * 0 OFF    - disable logs
+   */
   public setLogLevel(level: LogLevel): void {
     this.config.set('logLevel', level);
   }
@@ -114,6 +140,10 @@ class Logger {
     return this.config.get<string>('logLevel', 'INFO');
   }
 
+  /**
+   *
+   * @returns logs levels displayed on the configured LogLevel
+   */
   public getEnabledLogLevels() {
     const logLevelStringKeys = Object.keys(LogLevelIndex).filter(
       (v) => Number.isNaN(Number(v)) && v !== 'OFF'
@@ -127,4 +157,15 @@ class Logger {
 }
 
 // Export a single instance
+/**
+ * Logger instance, use for the system logging.
+ * Higher the logger level index, higher the LogLevel required to display log.
+ * Default should be INFO
+ *
+ * DEBUG: 5,
+ * INFO: 4,
+ * WARN: 3,
+ * ERROR: 2,
+ * FATAL: 1,
+ */
 export const logger = Logger.getInstance();

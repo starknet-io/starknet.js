@@ -33,6 +33,7 @@ import { cleanHex } from '../utils/num';
 import { ContractInterface } from './interface';
 import type { GetTransactionReceiptResponse } from '../utils/transactionReceipt';
 import type { INVOKE_TXN_RECEIPT } from '../types/provider/spec';
+import { logger } from '../global/logger';
 
 export type TypedContractV2<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & Contract;
 
@@ -238,8 +239,7 @@ export class Contract implements ContractInterface {
         this.callData.validate(ValidateType.CALL, method, args);
         return this.callData.compile(method, args);
       }
-      // eslint-disable-next-line no-console
-      console.warn('Call skipped parsing but provided rawArgs, possible malfunction request');
+      logger.warn('Call skipped parsing but provided rawArgs, possible malfunction request');
       return args;
     });
 
@@ -275,8 +275,7 @@ export class Contract implements ContractInterface {
         this.callData.validate(ValidateType.INVOKE, method, args);
         return this.callData.compile(method, args);
       }
-      // eslint-disable-next-line no-console
-      console.warn('Invoke skipped parsing but provided rawArgs, possible malfunction request');
+      logger.warn('Invoke skipped parsing but provided rawArgs, possible malfunction request');
       return args;
     });
 
@@ -293,8 +292,7 @@ export class Contract implements ContractInterface {
     }
 
     if (!nonce) throw new Error(`Nonce is required when invoking a function without an account`);
-    // eslint-disable-next-line no-console
-    console.warn(`Invoking ${method} without an account. This will not work on a public node.`);
+    logger.warn(`Invoking ${method} without an account. This will not work on a public node.`);
 
     return this.providerOrAccount.invokeFunction(
       {

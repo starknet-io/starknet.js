@@ -23,6 +23,7 @@ import { isDecimalString } from './shortString';
 import { isBigInt, isNumber, isString } from './typed';
 import { compressProgram } from './stark';
 import type { GetTransactionReceiptResponse } from './transactionReceipt';
+import { logger } from '../global/logger';
 
 /**
  * Helper - Async Sleep for 'delay' time
@@ -121,8 +122,7 @@ export function parseContract(contract: CompiledContract | string): ContractClas
  */
 export const getDefaultNodeUrl = (networkName?: NetworkName, mute: boolean = false): string => {
   if (!mute) {
-    // eslint-disable-next-line no-console
-    console.warn('Using default public node url, please provide nodeUrl in provider options!');
+    logger.info('Using default public node url, please provide nodeUrl in provider options!');
   }
   const nodes = RPC_NODES[networkName ?? NetworkName.SN_SEPOLIA];
   const randIdx = Math.floor(Math.random() * nodes.length);
