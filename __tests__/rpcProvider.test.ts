@@ -32,6 +32,7 @@ import {
   waitNextBlock,
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
+import { isBoolean } from '../src/utils/typed';
 
 describeIfRpc('RPCProvider', () => {
   const rpcProvider = getTestProvider(false);
@@ -307,16 +308,17 @@ describeIfRpc('RPCProvider', () => {
       expect(Array.isArray(transactions)).toBe(true);
     });
 
+    test('getSyncingStats', async () => {
+      const syncingStats = await rpcProvider.getSyncingStats();
+      expect(syncingStats).toMatchSchemaRef('GetSyncingStatsResponse');
+      if (isBoolean(syncingStats)) expect(syncingStats).toBe(false);
+    });
+
     xtest('traceBlockTransactions', async () => {
       await rpcProvider.getBlockTransactionsTraces(latestBlock.block_hash);
     });
 
     describeIfDevnet('devnet only', () => {
-      test('getSyncingStats', async () => {
-        const syncingStats = await rpcProvider.getSyncingStats();
-        expect(syncingStats).toBe(false);
-      });
-
       test('getEvents ', async () => {
         const randomWallet = stark.randomAddress();
         const classHash = '0x011ab8626b891bcb29f7cc36907af7670d6fb8a0528c7944330729d8f01e9ea3';
@@ -438,13 +440,6 @@ describeIfRpc('RPCProvider', () => {
         const contractClass = await rpcProvider.getClass(ozClassHash);
         expect(contractClass).toMatchSchemaRef('LegacyContractClass');
       });
-    });
-  });
-
-  describeIfNotDevnet('global rpc only', () => {
-    test('getSyncingStats', async () => {
-      const syncingStats = await rpcProvider.getSyncingStats();
-      expect(syncingStats).toMatchSchemaRef('GetSyncingStatsResponse');
     });
   });
 });
