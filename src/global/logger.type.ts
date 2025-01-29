@@ -11,4 +11,4 @@ export const LogLevelIndex = {
 
 export type LogLevelIndex = ValuesType<typeof LogLevelIndex>;
 
-export type LogLevel = keyof typeof LogLevelIndex & string & NonNullable<unknown>;
+export type LogLevel = keyof typeof LogLevelIndex;
