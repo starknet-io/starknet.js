@@ -1,3 +1,9 @@
+# [6.23.0](https://github.com/starknet-io/starknet.js/compare/v6.22.0...v6.23.0) (2025-01-29)
+
+### Features
+
+- logger, config, deprecate legacy tx ([#1302](https://github.com/starknet-io/starknet.js/issues/1302)) ([d0ffbcc](https://github.com/starknet-io/starknet.js/commit/d0ffbcc9bef8b6069f79644d3b54667b3d75dbf2))
+
 # [6.22.0](https://github.com/starknet-io/starknet.js/compare/v6.21.2...v6.22.0) (2025-01-29)
 
 ### Features
