@@ -44,7 +44,7 @@ class Logger {
       try {
         formattedMessage += `\n${JSON.stringify(data, null, 2)}`;
       } catch (error) {
-        formattedMessage += `\n[JSON.stringify Error/Circular]`;
+        formattedMessage += `\n[JSON.stringify Error/Circular]: ${error}`;
       }
     }
 
@@ -145,14 +145,9 @@ class Logger {
    * @returns logs levels displayed on the configured LogLevel
    */
   public getEnabledLogLevels() {
-    const logLevelStringKeys = Object.keys(LogLevelIndex).filter(
-      (v) => Number.isNaN(Number(v)) && v !== 'OFF'
-    );
-    const logLevels = logLevelStringKeys.filter((s) => {
-      return this.shouldLog(LogLevelIndex[s as LogLevel]);
+    return Object.keys(LogLevelIndex).filter((s) => {
+      return this.shouldLog(LogLevelIndex[s as LogLevel]) && s !== 'OFF';
     });
-
-    return logLevels;
   }
 }
 

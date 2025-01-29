@@ -1,4 +1,4 @@
-import { NetworkName, StarknetChainId } from '../global/constants';
+import { NetworkName, StarknetChainId, SYSTEM_MESSAGES } from '../global/constants';
 import { LibraryError, RpcError } from '../utils/errors';
 import {
   AccountInvocationItem,
@@ -450,10 +450,10 @@ export class RpcChannel {
         },
       });
 
-      logger.warn(
-        'You are using deprecated transaction version (V0,V1,V2)!, \n Update to the latest V3 transactions!',
-        { version: RPC.ETransactionVersion.V1, type: RPC.ETransactionType.INVOKE }
-      );
+      logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
+        version: RPC.ETransactionVersion.V1,
+        type: RPC.ETransactionType.INVOKE,
+      });
     } else {
       // V3
       promise = this.fetchEndpoint('starknet_addInvokeTransaction', {
@@ -500,10 +500,10 @@ export class RpcChannel {
         },
       });
 
-      logger.warn(
-        'You are using deprecated transaction version (V0,V1,V2)!, \n Update to the latest V3 transactions!',
-        { version: RPC.ETransactionVersion.V1, type: RPC.ETransactionType.DECLARE }
-      );
+      logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
+        version: RPC.ETransactionVersion.V1,
+        type: RPC.ETransactionType.DECLARE,
+      });
     } else if (isSierra(contract) && !isV3Tx(details)) {
       // V2 Cairo1
       promise = this.fetchEndpoint('starknet_addDeclareTransaction', {
@@ -524,10 +524,10 @@ export class RpcChannel {
         },
       });
 
-      logger.warn(
-        'You are using deprecated transaction version (V0,V1,V2)!, \n Update to the latest V3 transactions!',
-        { version: RPC.ETransactionVersion.V2, type: RPC.ETransactionType.DECLARE }
-      );
+      logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
+        version: RPC.ETransactionVersion.V2,
+        type: RPC.ETransactionType.DECLARE,
+      });
     } else if (isSierra(contract) && isV3Tx(details)) {
       // V3 Cairo1
       promise = this.fetchEndpoint('starknet_addDeclareTransaction', {
@@ -579,10 +579,10 @@ export class RpcChannel {
         },
       });
 
-      logger.warn(
-        'You are using deprecated transaction version (V0,V1,V2)!, \n Update to the latest V3 transactions!',
-        { version: RPC.ETransactionVersion.V1, type: RPC.ETransactionType.DEPLOY_ACCOUNT }
-      );
+      logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
+        version: RPC.ETransactionVersion.V1,
+        type: RPC.ETransactionType.DEPLOY_ACCOUNT,
+      });
     } else {
       // v3
       promise = this.fetchEndpoint('starknet_addDeployAccountTransaction', {
@@ -672,10 +672,10 @@ export class RpcChannel {
         max_fee: toHex(invocation.maxFee || 0),
       };
 
-      logger.warn(
-        'You are using deprecated transaction version (V0,V1,V2)!, \n Update to the latest V3 transactions!',
-        { version: invocation.version, type: invocation.type }
-      );
+      logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
+        version: invocation.version,
+        type: invocation.type,
+      });
     } else {
       // V3
       details = {

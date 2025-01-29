@@ -2,7 +2,7 @@ import { DEFAULT_GLOBAL_CONFIG } from './constants';
 
 type ConfigData = {
   [key: string]: any;
-};
+} & typeof DEFAULT_GLOBAL_CONFIG;
 
 class Configuration {
   private static instance: Configuration;

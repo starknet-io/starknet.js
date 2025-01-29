@@ -89,8 +89,8 @@ describe('Configuration', () => {
 
   describe('Edge Cases', () => {
     it('should handle undefined values with default in get()', () => {
-      config.set('logLevel', undefined);
-      expect(config.get('logLevel', 'DEFAULT')).toBe('DEFAULT');
+      config.set('someKey', undefined);
+      expect(config.get('someKey', 'DEFAULT')).toBe('DEFAULT');
     });
 
     it('should treat keys as case-sensitive', () => {
