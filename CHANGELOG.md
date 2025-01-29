@@ -1,3 +1,9 @@
+## [6.21.2](https://github.com/starknet-io/starknet.js/compare/v6.21.1...v6.21.2) (2025-01-29)
+
+### Bug Fixes
+
+- add starkid improvements ([#1301](https://github.com/starknet-io/starknet.js/issues/1301)) ([51702db](https://github.com/starknet-io/starknet.js/commit/51702dbd8dd3dcb0d6e7960b6b320c8c17afff1b))
+
 ## [6.21.1](https://github.com/starknet-io/starknet.js/compare/v6.21.0...v6.21.1) (2025-01-23)
 
 ### Bug Fixes
