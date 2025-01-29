@@ -1,3 +1,9 @@
+# [6.22.0](https://github.com/starknet-io/starknet.js/compare/v6.21.2...v6.22.0) (2025-01-29)
+
+### Features
+
+- units utils ([#1277](https://github.com/starknet-io/starknet.js/issues/1277)) ([26037e9](https://github.com/starknet-io/starknet.js/commit/26037e92c4cdfa220c29fd1147beae7408d8d004))
+
 ## [6.21.2](https://github.com/starknet-io/starknet.js/compare/v6.21.1...v6.21.2) (2025-01-29)
 
 ### Bug Fixes
