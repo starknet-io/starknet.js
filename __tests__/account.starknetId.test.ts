@@ -85,6 +85,12 @@ describe('deploy and test Wallet', () => {
     expect(hexToDecimalString(address)).toEqual(hexToDecimalString(account.address));
   });
 
+  test('Should throw error when invalid stark domain is provided', async () => {
+    await expect(account.getAddressFromStarkName('invalid_domain', namingAddress)).rejects.toThrow(
+      'Invalid domain, must be a valid .stark domain'
+    );
+  });
+
   test('Get the account from a stark name of the account (using starknet.id)', async () => {
     const name = await account.getStarkName(undefined, namingAddress);
     expect(name).toEqual('fricoben.stark');
