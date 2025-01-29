@@ -4,7 +4,7 @@
 
 /* eslint-disable no-param-reassign */
 /* eslint-disable import/extensions */
-import { StarknetChainId, TransactionHashPrefix } from '../../../constants';
+import { StarknetChainId, TransactionHashPrefix } from '../../../global/constants';
 import { BigNumberish, RawCalldata } from '../../../types';
 import { starkCurve } from '../../ec';
 import { toBigInt } from '../../num';

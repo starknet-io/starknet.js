@@ -1,4 +1,4 @@
-import { NetworkName, StarknetChainId } from '../constants';
+import { NetworkName, StarknetChainId, SYSTEM_MESSAGES } from '../global/constants';
 import { LibraryError, RpcError } from '../utils/errors';
 import {
   AccountInvocationItem,
@@ -30,6 +30,7 @@ import { getHexStringArray, toHex, toStorageKey } from '../utils/num';
 import { Block, getDefaultNodeUrl, isV3Tx, isVersion, wait } from '../utils/provider';
 import { decompressProgram, signatureToHexArray } from '../utils/stark';
 import { getVersionsByType } from '../utils/transaction';
+import { logger } from '../global/logger';
 
 const defaultOptions = {
   headers: { 'Content-Type': 'application/json' },
@@ -453,6 +454,11 @@ export class RpcChannel {
           nonce: toHex(details.nonce),
         },
       });
+
+      logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
+        version: RPC.ETransactionVersion.V1,
+        type: RPC.ETransactionType.INVOKE,
+      });
     } else {
       // V3
       promise = this.fetchEndpoint('starknet_addInvokeTransaction', {
@@ -498,6 +504,11 @@ export class RpcChannel {
           nonce: toHex(details.nonce),
         },
       });
+
+      logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
+        version: RPC.ETransactionVersion.V1,
+        type: RPC.ETransactionType.DECLARE,
+      });
     } else if (isSierra(contract) && !isV3Tx(details)) {
       // V2 Cairo1
       promise = this.fetchEndpoint('starknet_addDeclareTransaction', {
@@ -516,6 +527,11 @@ export class RpcChannel {
           sender_address: senderAddress,
           nonce: toHex(details.nonce),
         },
+      });
+
+      logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
+        version: RPC.ETransactionVersion.V2,
+        type: RPC.ETransactionType.DECLARE,
       });
     } else if (isSierra(contract) && isV3Tx(details)) {
       // V3 Cairo1
@@ -566,6 +582,11 @@ export class RpcChannel {
           signature: signatureToHexArray(signature),
           nonce: toHex(details.nonce),
         },
+      });
+
+      logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
+        version: RPC.ETransactionVersion.V1,
+        type: RPC.ETransactionType.DEPLOY_ACCOUNT,
       });
     } else {
       // v3
@@ -655,6 +676,11 @@ export class RpcChannel {
         nonce: toHex(invocation.nonce),
         max_fee: toHex(invocation.maxFee || 0),
       };
+
+      logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
+        version: invocation.version,
+        type: invocation.type,
+      });
     } else {
       // V3
       details = {

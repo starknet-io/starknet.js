@@ -1,5 +1,5 @@
 import { RPC06, RPC07 } from '../channel';
-import { StarknetChainId } from '../constants';
+import { StarknetChainId } from '../global/constants';
 import type {
   AccountInvocations,
   BigNumberish,

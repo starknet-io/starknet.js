@@ -4,7 +4,7 @@
 
 import { poseidonHashMany } from '@scure/starknet';
 
-import { StarknetChainId, TransactionHashPrefix } from '../../../constants';
+import { StarknetChainId, TransactionHashPrefix } from '../../../global/constants';
 import { BigNumberish, Calldata } from '../../../types';
 import { EDAMode, ResourceBounds } from '../../../types/api';
 import { toHex } from '../../num';

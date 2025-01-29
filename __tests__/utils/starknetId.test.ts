@@ -1,4 +1,4 @@
-import { StarknetChainId } from '../../src/constants';
+import { StarknetChainId } from '../../src/global/constants';
 import { getStarknetIdContract, useDecoded, useEncoded } from '../../src/utils/starknetId';
 
 function randomWithSeed(seed: number) {

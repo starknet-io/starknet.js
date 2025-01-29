@@ -1,4 +1,4 @@
-import { NetworkName, StarknetChainId } from '../../constants';
+import { NetworkName, StarknetChainId } from '../../global/constants';
 import { BlockIdentifier } from '../lib';
 
 export interface ProviderOptions extends RpcProviderOptions {}

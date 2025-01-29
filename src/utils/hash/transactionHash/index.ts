@@ -2,7 +2,7 @@
  * Transaction Hash based on Transaction Version
  */
 
-import { StarknetChainId } from '../../../constants';
+import { StarknetChainId } from '../../../global/constants';
 import { BigNumberish, Calldata } from '../../../types';
 import {
   EDAMode,

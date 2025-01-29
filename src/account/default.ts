@@ -4,7 +4,7 @@ import {
   SNIP9_V2_INTERFACE_ID,
   UDC,
   ZERO,
-} from '../constants';
+} from '../global/constants';
 import { Provider, ProviderInterface } from '../provider';
 import { Signer, SignerInterface } from '../signer';
 import {

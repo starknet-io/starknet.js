@@ -17,7 +17,7 @@ import type {
 import assert from '../utils/assert';
 import { CallData } from '../utils/calldata';
 import type { SignerInterface } from './interface';
-import { HARDENING_4BYTES, HARDENING_BYTE } from '../constants';
+import { HARDENING_4BYTES, HARDENING_BYTE } from '../global/constants';
 import { ETransactionVersion2 } from '../types/api/rpcspec_0_6';
 import { getExecuteCalldata } from '../utils/transaction';
 import {

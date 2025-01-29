@@ -1,6 +1,7 @@
-import { ETransactionVersion } from './types/api';
+import { ETransactionVersion } from '../types/api';
+import { type LogLevel } from './logger.type';
 
-export { IS_BROWSER } from './utils/encode';
+export { IS_BROWSER } from '../utils/encode';
 
 /**
  * Cairo Felt support storing max 31 character
@@ -88,3 +89,18 @@ export const SNIP9_V2_INTERFACE_ID =
 export const HARDENING_BYTE = 128;
 // 0x80000000
 export const HARDENING_4BYTES = 2147483648n;
+
+// Default initial global config
+export const DEFAULT_GLOBAL_CONFIG: {
+  legacyMode: boolean;
+  logLevel: LogLevel;
+} = {
+  legacyMode: false,
+  logLevel: 'INFO',
+};
+
+// Default system messages
+export const SYSTEM_MESSAGES = {
+  legacyTxWarningMessage:
+    'You are using a deprecated transaction version (V0,V1,V2)!\nUpdate to the latest V3 transactions!',
+};
