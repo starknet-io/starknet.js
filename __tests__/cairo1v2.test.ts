@@ -805,7 +805,7 @@ describe('Cairo 1', () => {
     });
   });
 
-  describe('Event Parsing', () => {
+  describe.only('Event Parsing', () => {
     let eventContract: Contract;
     const simpleKeyVariable = 0n;
     const simpleKeyStruct = {

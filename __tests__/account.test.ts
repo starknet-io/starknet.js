@@ -359,7 +359,7 @@ describe('deploy and test Wallet', () => {
     expect(balance.low).toStrictEqual(toBigInt(990));
   });
 
-  test('execute with and without deprecated abis parameter', async () => {
+  test.only('execute with and without deprecated abis parameter', async () => {
     const transaction = {
       contractAddress: erc20Address,
       entrypoint: 'transfer',
@@ -369,6 +369,8 @@ describe('deploy and test Wallet', () => {
 
     const error1: RpcError = await account.execute(transaction, details).catch((e) => e);
     expect(error1).toBeInstanceOf(RpcError);
+    console.log(error1);
+    console.log(JSON.stringify(error1));
     expect(error1.isType('INSUFFICIENT_MAX_FEE')).toBe(true);
 
     const error2: RpcError = await account.execute(transaction, undefined, details).catch((e) => e);

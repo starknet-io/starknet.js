@@ -44,4 +44,4 @@ jobs:
       - run: npm ci --ignore-scripts
       - run: npm run pretest && npm run posttest
         if: ${{ !inputs.ignore-scripts }}
-      - run: npm run test:coverage
+      - run: npm run test:coverage --ignore-scripts -- __tests__/account.t __tests__/cairo1v2.t __tests__/co

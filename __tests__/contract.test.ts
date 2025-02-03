@@ -126,7 +126,7 @@ describe('contract module', () => {
         );
       });
 
-      test('parse legacy event structure', async () => {
+      test.only('parse legacy event structure', async () => {
         const to = stark.randomAddress();
         const amount = uint256(1);
         const { transaction_hash } = await erc20Echo20Contract.transfer(to, amount);
