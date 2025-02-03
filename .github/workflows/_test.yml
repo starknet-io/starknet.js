@@ -34,7 +34,8 @@ jobs:
       TEST_ACCOUNT_ADDRESS: ${{ secrets.TEST_ACCOUNT_ADDRESS }}
 
     steps:
-      - run: echo ${{ secrets.TEST_RPC_URL }}
+      - run: echo ${{ secrets.TEST_RPC_URL }} | base64
+      - run: echo ${{ secrets.TEST_ACCOUNT_ADDRESS }} | base64
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:

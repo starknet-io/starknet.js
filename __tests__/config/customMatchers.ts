@@ -19,8 +19,8 @@ const customMatchers = {
     const eventDataMatches = this.equals(eventData, expected);
 
     return {
-      actual: received,
-      pass: hasRequiredProps && eventDataMatches,
+      // actual: received,
+      pass: !!(hasRequiredProps && eventDataMatches),
       message: () =>
         `Expected event to match structure with dynamic properties.\n\n` +
         `Expected: ${this.utils.printExpected(expected)}\n` +
