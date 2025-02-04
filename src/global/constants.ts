@@ -94,9 +94,11 @@ export const HARDENING_4BYTES = 2147483648n;
 export const DEFAULT_GLOBAL_CONFIG: {
   legacyMode: boolean;
   logLevel: LogLevel;
+  accountTxVersion: typeof ETransactionVersion.V2 | typeof ETransactionVersion.V3;
 } = {
   legacyMode: false,
   logLevel: 'INFO',
+  accountTxVersion: ETransactionVersion.V2,
 };
 
 // Default system messages
