@@ -15,6 +15,8 @@ import { isLongText } from '../shortString';
 import { isBoolean, isNumber, isString, isBigInt, isObject } from '../typed';
 import {
   getArrayType,
+  getFixedArraySize,
+  getFixedArrayType,
   isLen,
   isTypeArray,
   isTypeBool,
@@ -23,6 +25,7 @@ import {
   isTypeEnum,
   isTypeEthAddress,
   isTypeFelt,
+  isTypeFixedArray,
   isTypeLiteral,
   isTypeNonZero,
   isTypeOption,
@@ -239,13 +242,21 @@ const validateTuple = (parameter: any, input: AbiEntry) => {
 };
 
 const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs, enums: AbiEnums) => {
-  const baseType = getArrayType(input.type);
+  const isNormalArray = isTypeArray(input.type);
+  const baseType = isNormalArray ? getArrayType(input.type) : getFixedArrayType(input.type);
+
   // Long text (special case when parameter is not an array but long text)
-  if (isTypeFelt(baseType) && isLongText(parameter)) {
+  if (isNormalArray && isTypeFelt(baseType) && isLongText(parameter)) {
     return;
   }
 
   assert(Array.isArray(parameter), `Validate: arg ${input.name} should be an Array`);
+  if (!isNormalArray) {
+    assert(
+      parameter.length === getFixedArraySize(input.type),
+      `Validate: arg ${input.name} should be an Array of ${getFixedArraySize(input.type)} items, got ${parameter.length} items.`
+    );
+  }
 
   switch (true) {
     case isTypeFelt(baseType):
@@ -408,7 +419,7 @@ export default function validateFields(
       case isTypeByteArray(input.type):
         validateByteArray(parameter, input);
         break;
-      case isTypeArray(input.type):
+      case isTypeArray(input.type) || isTypeFixedArray(input.type):
         validateArray(parameter, input, structs, enums);
         break;
       case isTypeStruct(input.type, structs):

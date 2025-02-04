@@ -18,6 +18,8 @@ import { decodeShortString } from '../shortString';
 import { stringFromByteArray } from './byteArray';
 import {
   getArrayType,
+  getFixedArraySize,
+  getFixedArrayType,
   isCairo1Type,
   isLen,
   isTypeArray,
@@ -26,6 +28,7 @@ import {
   isTypeBytes31,
   isTypeEnum,
   isTypeEthAddress,
+  isTypeFixedArray,
   isTypeNonZero,
   isTypeSecp256k1Point,
   isTypeTuple,
@@ -128,6 +131,17 @@ function parseResponseValue(
       pending_word_len,
     };
     return stringFromByteArray(myByteArray);
+  }
+
+  // type fixed-array
+  if (isTypeFixedArray(element.type)) {
+    const parsedDataArr: (BigNumberish | ParsedStruct | boolean | any[] | CairoEnum)[] = [];
+    const el: AbiEntry = { name: '', type: getFixedArrayType(element.type) };
+    const arraySize = getFixedArraySize(element.type);
+    while (parsedDataArr.length < arraySize) {
+      parsedDataArr.push(parseResponseValue(responseIterator, el, structs, enums));
+    }
+    return parsedDataArr;
   }
 
   // type c1 array
@@ -254,6 +268,9 @@ export default function responseParser(
       return parseResponseValue(responseIterator, output, structs, enums);
 
     case enums && isTypeEnum(type, enums):
+      return parseResponseValue(responseIterator, output, structs, enums);
+
+    case isTypeFixedArray(type):
       return parseResponseValue(responseIterator, output, structs, enums);
 
     case isTypeArray(type):

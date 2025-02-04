@@ -9,6 +9,7 @@ import {
   ParsedStruct,
   Tupled,
 } from '../../types';
+import assert from '../assert';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { addHexPrefix, removeHexPrefix } from '../encode';
@@ -19,11 +20,14 @@ import { byteArrayFromString } from './byteArray';
 import {
   felt,
   getArrayType,
+  getFixedArraySize,
+  getFixedArrayType,
   isTypeArray,
   isTypeByteArray,
   isTypeBytes31,
   isTypeEnum,
   isTypeEthAddress,
+  isTypeFixedArray,
   isTypeNonZero,
   isTypeOption,
   isTypeResult,
@@ -130,6 +134,19 @@ function parseCalldataValue(
 ): string | string[] {
   if (element === undefined) {
     throw Error(`Missing parameter for type ${type}`);
+  }
+
+  // value is fixed array
+  if (Array.isArray(element) && isTypeFixedArray(type)) {
+    const result: string[] = [];
+    const arrayType = getFixedArrayType(type);
+    assert(
+      element.length === getFixedArraySize(type),
+      `ABI type ${type}: array provided do not includes  ${getFixedArraySize(type)} items. ${element.length} items provided.`
+    );
+    return element.reduce((acc, it) => {
+      return acc.concat(parseCalldataValue(it, arrayType, structs, enums));
+    }, result);
   }
 
   // value is Array
@@ -336,6 +353,12 @@ export function parseCalldataField(
   let { value } = argsIterator.next();
 
   switch (true) {
+    // Fixed array
+    case isTypeFixedArray(type):
+      if (!Array.isArray(value)) {
+        throw Error(`ABI expected parameter ${name} to be an array, got ${value}`);
+      }
+      return parseCalldataValue(value, input.type, structs, enums);
     // Array
     case isTypeArray(type):
       if (!Array.isArray(value) && !isText(value)) {

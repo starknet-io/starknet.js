@@ -40,6 +40,16 @@ export const isTypeArray = (type: string) =>
   /\*/.test(type) ||
   type.startsWith('core::array::Array::') ||
   type.startsWith('core::array::Span::');
+
+/**
+ * Checks if the given type is a fixed-array type.
+ *
+ * @param {string} type - The type to check.
+ * @returns - `true` if the type is a fixed array type, `false` otherwise.
+ */
+export const isTypeFixedArray = (type: string) =>
+  /^\[.*;\s.*\]$/.test(type) && /(?<=; )\d+(?=\])/.test(type);
+
 /**
  * Checks if the given type is a tuple type.
  *
@@ -164,6 +174,30 @@ export const getArrayType = (type: string) => {
   return isCairo1Type(type)
     ? type.substring(type.indexOf('<') + 1, type.lastIndexOf('>'))
     : type.replace('*', '');
+};
+
+/**
+ * Retrieves the array size from the given type string representing a fixed array.
+ * @param {string} type - The type string.
+ * @returns - The array size.
+ */
+export const getFixedArraySize = (type: string) => {
+  const matchArray = type.match(/(?<=; )\d+(?=\])/);
+  if (matchArray === null)
+    throw new Error(`ABI type ${type} do not includes a valid number after ';' character.`);
+  return Number(matchArray[0]);
+};
+
+/**
+ * Retrieves the fixed-array type from the given type string representing a fixed array.
+ * @param {string} type - The type string.
+ * @returns - The fixed-array type.
+ */
+export const getFixedArrayType = (type: string) => {
+  const matchArray = type.match(/(?<=\[).*(?=;)/);
+  if (matchArray === null)
+    throw new Error(`ABI type ${type} do not includes a valid type of data.`);
+  return matchArray[0];
 };
 
 /**
