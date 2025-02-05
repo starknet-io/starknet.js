@@ -1,13 +1,17 @@
 ---
-sidebar_position: 1.1
+sidebar_position: 2.1
 ---
 
 # Configuration
 
-Global configuration is a singleton object containing default case-sensitive global properties.
-Each property can be configured before rest of the code is run to modified behaviors.
-In the chain of action, parameters passed to the classes should have higher priority than global configuration.
-Global configuration can be used to store and use custom global parameters during runtime lifespan.
+Starknet.js has behaviors that can be adjusted through its configurations: `config` and `logger`.
+
+## Config
+
+The core global configuration is a singleton object containing case-sensitive global default properties.
+Each property can be configured before the rest of the code is run to modify their corresponding behavior.
+When they overlap, constructor and method parameters have higher precedence over the global configuration defaults.
+Custom keys can also be used to store and use arbitrary values during runtime.
 
 ```ts
 import { config } from 'starknet';
@@ -34,45 +38,47 @@ config.delete('newKey');
 config.hasKey('newKey');
 ```
 
-## Global parameters and Default Global Configuration
+### Global parameters and Default Global Configuration
 
 Default global configuration is the initial state that global configuration starts with.
-This list will be expanded and details could be found under global/constants.ts
+
+Details can be found in [global/constants.ts](https://github.com/starknet-io/starknet.js/blob/develop/src/global/constants.ts)
 
 ```ts
   logLevel: 'INFO', // verbosity levels of the system logger, more details under logger
-  accountTxVersion: ETransactionVersion.V2, // by default use V2 Transactions in the Account Class
-  legacyMode: false, // enable legacy transaction types (this could break the code depending on starknet version in production)
+  accountTxVersion: ETransactionVersion.V2, // by default use V2 transactions in Account class instances
+  legacyMode: false, // enable legacy transaction types (note: this could break the code depending on the Starknet version used by the network)
 ```
 
-# Logger
+## Logger
 
-Logger is a singleton object used to inform developers based on the log level.
+Logger is a singleton object through which the Starknet.js logs are managed.
+
+Supported log levels:
+
+|         |     |                               |
+| :-----: | --- | ----------------------------- |
+| `DEBUG` | 5   | show all logs                 |
+| `INFO`  | 4   | show INFO, WARN, ERROR, FATAL |
+| `WARN`  | 3   | show WARN, ERROR, FATAL       |
+| `ERROR` | 2   | show ERROR, FATAL             |
+| `FATAL` | 1   | show only FATAL               |
+|  `OFF`  | 0   | disable logs                  |
 
 ```ts
-  import { logger } from 'starknet';
+import { logger } from 'starknet';
 
-  /**
-   * Set the logging level you would like the system to display
-   * * 5 DEBUG  - show all logs
-   * * 4 INFO   - show INFO, WARN, ERROR, FATAL
-   * * 3 WARN   - show WARN, ERROR, FATAL
-   * * 2 ERROR  - show ERROR, FATAL
-   * * 1 FATAL  - show only FATAL
-   * * 0 OFF    - disable logs
-   */
+// set custom log level (can also be done using global config)
+logger.setLogLevel('WARN');
 
-  // set custom log level (can also be done using global config)
-  logger.setLogLevel(level: 'WARN')
+// get current log level
+logger.getLogLevel();
 
-  // get current log level
-  logger.getLogLevel()
-
-  // get the list of all verbosity mods would be displayed under current log level
-  logger.getEnabledLogLevels()
+// get a list of all verbosity modes that would be displayed with the current log level
+logger.getEnabledLogLevels();
 ```
 
-Developer can also use it to add a custom logs.
+Developers can also use it to add custom logs.
 
 ```ts
 import { logger } from 'starknet';
