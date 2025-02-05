@@ -15,7 +15,6 @@ import { isLongText } from '../shortString';
 import { isBoolean, isNumber, isString, isBigInt, isObject } from '../typed';
 import {
   getArrayType,
-  getFixedArraySize,
   getFixedArrayType,
   isLen,
   isTypeArray,
@@ -241,21 +240,35 @@ const validateTuple = (parameter: any, input: AbiEntry) => {
   // todo: skip tuple structural validation for now
 };
 
-const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs, enums: AbiEnums) => {
+const validateArray = (
+  parameterArray: Array<any> | Record<string, any>,
+  input: AbiEntry,
+  structs: AbiStructs,
+  enums: AbiEnums
+) => {
   const isNormalArray = isTypeArray(input.type);
   const baseType = isNormalArray ? getArrayType(input.type) : getFixedArrayType(input.type);
 
   // Long text (special case when parameter is not an array but long text)
-  if (isNormalArray && isTypeFelt(baseType) && isLongText(parameter)) {
+  if (isNormalArray && isTypeFelt(baseType) && isLongText(parameterArray)) {
     return;
   }
-
-  assert(Array.isArray(parameter), `Validate: arg ${input.name} should be an Array`);
-  if (!isNormalArray) {
-    assert(
-      parameter.length === getFixedArraySize(input.type),
-      `Validate: arg ${input.name} should be an Array of ${getFixedArraySize(input.type)} items, got ${parameter.length} items.`
-    );
+  let parameter: Array<any> = [];
+  if (isNormalArray) {
+    assert(Array.isArray(parameterArray), `Validate: arg ${input.name} should be an Array`);
+    parameter = parameterArray;
+  } else {
+    // fixedArray
+    switch (true) {
+      case Array.isArray(parameterArray):
+        parameter = parameterArray;
+        break;
+      case typeof parameterArray === 'object':
+        parameter = Object.values(parameterArray);
+        break;
+      default:
+        throw new Error(`Validate: arg ${input.name} should be an Array or an object.`);
+    }
   }
 
   switch (true) {
@@ -267,7 +280,7 @@ const validateArray = (parameter: any, input: AbiEntry, structs: AbiStructs, enu
       break;
 
     case isTypeArray(baseType):
-      parameter.forEach((param: BigNumberish) =>
+      parameter.forEach((param: any) =>
         validateArray(param, { name: '', type: baseType }, structs, enums)
       );
       break;

@@ -427,7 +427,6 @@ describe('Cairo v2.4 onwards', () => {
     });
 
     test('Fixed array compile [core::integer::u32; 8]', async () => {
-      // CallData.compile is not tested as it's not compatible with fixed array
       const myCallData = new CallData(fixedArrayContract.abi);
       const myCalldata0 = myCallData.compile('fixed_array', [myArray]);
       expect(myCalldata0).toEqual(expectedCalldata);
@@ -444,6 +443,15 @@ describe('Cairo v2.4 onwards', () => {
       expect(res0).toEqual(expectedRes);
       const res1 = await fixedArrayContract.fixed_array(myArray);
       expect(res1).toEqual(expectedRes);
+      const myCalldata = CallData.compile([cairo.fixedArray(myArray)]);
+      const res2 = await fixedArrayContract.call('fixed_array', myCalldata);
+      expect(res2).toEqual(expectedRes);
+      const myCalldata3 = myCallData.compile('fixed_array', [cairo.fixedArray(myArray)]);
+      const res3 = await fixedArrayContract.call('fixed_array', myCalldata3);
+      expect(res3).toEqual(expectedRes);
+      const myCalldata4 = myCallData.compile('fixed_array', { x: cairo.fixedArray(myArray) });
+      const res4 = await fixedArrayContract.call('fixed_array', myCalldata4);
+      expect(res4).toEqual(expectedRes);
     });
 
     test('Fixed array too long', async () => {

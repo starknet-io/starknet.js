@@ -293,6 +293,24 @@ export const uint512 = (it: BigNumberish): Uint512 => {
 };
 
 /**
+ * Create a fixed array Cairo type.
+ * Be sure to have an array length conform to the ABI.
+ * @param it JS array representing a Cairo fixed array
+ * @returns a specific struct for fixed Array
+ * @example
+ * ```typescript
+ * const result = cairo.fixedArray([10,20,30]);
+ * // result = { '0': 10, '1': 20, '2': 30 }
+ * ```
+ */
+export const fixedArray = (inp: Array<any>): Object => {
+  return inp.reduce((acc: any, item: any, idx: number) => {
+    acc[idx] = item;
+    return acc;
+  }, {});
+};
+
+/**
  * Create unnamed tuple Cairo type (helper same as common struct type)
  * @example
  * ```typescript

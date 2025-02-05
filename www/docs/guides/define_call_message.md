@@ -291,7 +291,7 @@ Do not add the `array_len` parameter before your array. Starknet.js will manage 
 
 > It's also applicable for Cairo `Span` type.
 
-### fixed array
+### Fixed array
 
 Starknet type `[type_array; n]` is waiting for an array of `n` items of type `type_array`, without initial length parameter : item1, item2, ...  
 You can send it to Starknet.js the same way than arrays & spans: bigNumberish[].
@@ -303,7 +303,15 @@ await myContract.my_function(myArray);
 ```
 
 :::caution
-The fixed arrays are handled only by the functions that uses the contract ABI. So, do not use `CallData.compile()` if you want to send a fixed array.
+The fixed arrays are automatically handled only by the functions that uses the contract ABI. So, when using `CallData.compile()`, you have to use `cairo.fixedArray(myArray)`:
+
+```typescript
+// for Cairo type [core::integer::u8; 3]
+const myArray = [1, 2, 3];
+const myFixedArray = cairo.fixedArray(myArray);
+const myCallData = CallData.compile([myFixedArray]);
+```
+
 :::
 
 ### Complex types

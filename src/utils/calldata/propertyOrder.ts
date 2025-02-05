@@ -136,15 +136,23 @@ export default function orderPropsByAbi(
     return myArray.map((myElem) => orderInput(myElem, typeInArray));
   }
 
-  function orderFixedArray(myArray: Array<any>, abiParam: string): Array<any> {
+  function orderFixedArray(input: Array<any> | Record<string, any>, abiParam: string): Array<any> {
     const typeInFixedArray = getFixedArrayType(abiParam);
     const arraySize = getFixedArraySize(abiParam);
-    if (arraySize !== myArray.length) {
+    if (Array.isArray(input)) {
+      if (arraySize !== input.length) {
+        throw new Error(
+          `ABI type ${abiParam}: array provided do not includes  ${arraySize} items. ${input.length} items provided.`
+        );
+      }
+      return input.map((myElem) => orderInput(myElem, typeInFixedArray));
+    }
+    if (arraySize !== Object.keys(input).length) {
       throw new Error(
-        `ABI type ${abiParam}: array provided do not includes  ${arraySize} items. ${myArray.length} items provided.`
+        `ABI type ${abiParam}: object provided do not includes  ${arraySize} properties. ${Object.keys(input).length} items provided.`
       );
     }
-    return myArray.map((myElem) => orderInput(myElem, typeInFixedArray));
+    return orderInput(input, typeInFixedArray);
   }
 
   function orderTuple(unorderedObject2: RawArgsObject, abiParam: string): object {

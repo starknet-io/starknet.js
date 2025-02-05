@@ -137,16 +137,27 @@ function parseCalldataValue(
   }
 
   // value is fixed array
-  if (Array.isArray(element) && isTypeFixedArray(type)) {
-    const result: string[] = [];
+  if (isTypeFixedArray(type)) {
     const arrayType = getFixedArrayType(type);
-    assert(
-      element.length === getFixedArraySize(type),
-      `ABI type ${type}: array provided do not includes  ${getFixedArraySize(type)} items. ${element.length} items provided.`
-    );
-    return element.reduce((acc, it) => {
+    let values: any[] = [];
+    if (Array.isArray(element)) {
+      assert(
+        element.length === getFixedArraySize(type),
+        `ABI type ${type}: array provided do not includes  ${getFixedArraySize(type)} items. ${element.length} items provided.`
+      );
+      values = element;
+    } else if (typeof element === 'object') {
+      values = Object.values(element);
+      assert(
+        values.length === getFixedArraySize(type),
+        `ABI type ${type}: object provided do not includes  ${getFixedArraySize(type)} items. ${values.length} items provided.`
+      );
+    } else {
+      throw new Error(`ABI type ${type}: not an Array of a cairo.fixedArray() provided.`);
+    }
+    return values.reduce((acc, it) => {
       return acc.concat(parseCalldataValue(it, arrayType, structs, enums));
-    }, result);
+    }, [] as string[]);
   }
 
   // value is Array
@@ -355,11 +366,11 @@ export function parseCalldataField(
   switch (true) {
     // Fixed array
     case isTypeFixedArray(type):
-      if (!Array.isArray(value)) {
-        throw Error(`ABI expected parameter ${name} to be an array, got ${value}`);
+      if (!Array.isArray(value) && !(typeof value === 'object')) {
+        throw Error(`ABI expected parameter ${name} to be an array or an object, got ${value}`);
       }
       return parseCalldataValue(value, input.type, structs, enums);
-    // Array
+    // Normal Array
     case isTypeArray(type):
       if (!Array.isArray(value) && !isText(value)) {
         throw Error(`ABI expected parameter ${name} to be array or long string, got ${value}`);

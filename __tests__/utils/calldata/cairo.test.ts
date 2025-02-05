@@ -348,6 +348,15 @@ describe('u96', () => {
 });
 
 describe('fixed array', () => {
+  test('create fixed array for CallData.compile()', () => {
+    expect(
+      cairo.fixedArray([
+        { a: 1, b: 2 },
+        { c: 3, d: 4 },
+      ])
+    ).toStrictEqual({ '0': { a: 1, b: 2 }, '1': { c: 3, d: 4 } });
+  });
+
   test('valid fixed array', () => {
     expect(cairo.isTypeFixedArray('[core::integer::u32; 8]')).toEqual(true);
     expect(cairo.getFixedArraySize('[core::integer::u32; 8]')).toEqual(8);
