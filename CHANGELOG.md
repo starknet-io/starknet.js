@@ -1,3 +1,9 @@
+## [6.23.1](https://github.com/starknet-io/starknet.js/compare/v6.23.0...v6.23.1) (2025-02-05)
+
+### Bug Fixes
+
+- conf. TxV in Account, conf. string auto. all methods, fix unbdef… ([#1311](https://github.com/starknet-io/starknet.js/issues/1311)) ([1d91ec0](https://github.com/starknet-io/starknet.js/commit/1d91ec00c9b3f5c47dfc77946c7250b7022728a6))
+
 # [6.23.0](https://github.com/starknet-io/starknet.js/compare/v6.22.0...v6.23.0) (2025-01-29)
 
 ### Features
