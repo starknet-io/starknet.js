@@ -32,7 +32,7 @@ class Logger {
   }
 
   private shouldLog(messageLevel: LogLevelIndex): boolean {
-    const configLevel = this.config.get<string>('logLevel', 'INFO');
+    const configLevel = this.config.get('logLevel', 'INFO');
     return messageLevel <= LogLevelIndex[configLevel as LogLevel];
   }
 
@@ -137,7 +137,7 @@ class Logger {
   }
 
   public getLogLevel(): LogLevel {
-    return this.config.get<string>('logLevel', 'INFO');
+    return this.config.get('logLevel', 'INFO');
   }
 
   /**

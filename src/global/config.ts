@@ -1,8 +1,9 @@
 import { DEFAULT_GLOBAL_CONFIG } from './constants';
 
-type ConfigData = {
-  [key: string]: any;
-} & typeof DEFAULT_GLOBAL_CONFIG;
+type DefaultConfig = typeof DEFAULT_GLOBAL_CONFIG;
+type CustomConfig = { [key: string]: any };
+
+type ConfigData = DefaultConfig & CustomConfig;
 
 class Configuration {
   private static instance: Configuration;
@@ -24,18 +25,19 @@ class Configuration {
     return Configuration.instance;
   }
 
-  public get<K extends keyof ConfigData>(
-    key: K,
-    defaultValue?: ConfigData[K]
-  ): ConfigData[K] | undefined {
+  public get<K extends keyof DefaultConfig>(key: K): DefaultConfig[K];
+  public get(key: string, defaultValue?: any): any;
+  public get(key: string, defaultValue?: any) {
     return this.config[key] ?? defaultValue;
   }
 
-  public set<K extends keyof ConfigData>(key: K, value: ConfigData[K]): void {
+  public set<K extends keyof DefaultConfig>(key: K, value: DefaultConfig[K]): void;
+  public set(key: string, value: any): void;
+  public set(key: string, value: any): void {
     this.config[key] = value;
   }
 
-  public update(configData: Partial<ConfigData>): void {
+  public update(configData: Partial<DefaultConfig> & CustomConfig): void {
     this.config = {
       ...this.config,
       ...configData,
@@ -50,11 +52,15 @@ class Configuration {
     this.initialize();
   }
 
-  public delete(key: keyof ConfigData): void {
+  public delete<K extends keyof DefaultConfig>(key: K): void;
+  public delete(key: string): void;
+  public delete(key: string): void {
     delete this.config[key];
   }
 
-  public hasKey(key: keyof ConfigData): boolean {
+  public hasKey<K extends keyof DefaultConfig>(key: K): boolean;
+  public hasKey(key: string): boolean;
+  public hasKey(key: string): boolean {
     return key in this.config;
   }
 }

@@ -76,6 +76,7 @@ import {
 import { buildUDCCall, getExecuteCalldata } from '../utils/transaction';
 import { getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
+import { config } from '../global/config';
 
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
@@ -91,9 +92,9 @@ export class Account extends Provider implements AccountInterface {
     address: string,
     pkOrSigner: Uint8Array | string | SignerInterface,
     cairoVersion?: CairoVersion,
-    transactionVersion:
-      | typeof ETransactionVersion.V2
-      | typeof ETransactionVersion.V3 = ETransactionVersion.V2 // TODO: Discuss this, set to v2 for backward compatibility
+    transactionVersion: typeof ETransactionVersion.V2 | typeof ETransactionVersion.V3 = config.get(
+      'accountTxVersion'
+    )
   ) {
     super(providerOrOptions);
     this.address = address.toLowerCase();
