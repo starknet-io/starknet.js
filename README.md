@@ -32,6 +32,9 @@
   <a href="https://twitter.com/starknetjs">
     <img src="https://img.shields.io/badge/follow_us-Twitter-blue">
   </a>
+  <a href="https://www.drips.network/app/projects/github/starknet-io/starknet.js" target="_blank">
+    <img src="https://www.drips.network/api/embed/project/https%3A%2F%2Fgithub.com%2Fstarknet-io%2Fstarknet.js/support.png?background=light&style=github&text=project&stat=none" alt="Support starknet.js on drips.network" height="20">
+  </a>
 </p>
 
 ## Installation
