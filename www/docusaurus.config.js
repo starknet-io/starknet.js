@@ -4,20 +4,21 @@
 const lightCodeTheme = require('prism-react-renderer/themes/github');
 const darkCodeTheme = require('prism-react-renderer/themes/dracula');
 
+const generateBaseUrl = (baseUrl = '') => `/${baseUrl.trim()}/`.replace(/\/+/g, '/');
+
 const generateSourceLinkTemplate = (gitRevision) =>
   `https://github.com/starknet-io/starknet.js/blob/${
     gitRevision || '{gitRevision}'
   }/{path}#L{line}`;
 
-// TODO: remove the /next/ fragment after the v5 official release
-const migrationGuideLink = '/docs/next/guides/migrate';
+const migrationGuideLink = `${generateBaseUrl(process.env.DOCS_BASE_URL)}docs/guides/migrate`;
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
   title: 'Starknet.js',
   tagline: 'JavaScript library for Starknet',
   url: 'https://starknetjs.com',
-  baseUrl: '/',
+  baseUrl: generateBaseUrl(process.env.DOCS_BASE_URL),
   onBrokenLinks: 'warn',
   onBrokenMarkdownLinks: 'warn',
   favicon: 'img/favicon.ico',
@@ -129,6 +130,10 @@ const config = {
               {
                 label: 'Twitter',
                 href: 'https://twitter.com/starknetjs',
+              },
+              {
+                label: 'Discord',
+                href: 'https://discord.com/channels/793094838509764618/1270119831559078061',
               },
             ],
           },

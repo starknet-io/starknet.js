@@ -1,4 +1,11 @@
-import { Abi, FunctionAbi } from '../../../types';
+import {
+  Abi,
+  FunctionAbi,
+  AbiEvent,
+  AbiStruct,
+  InterfaceAbi,
+  type LegacyEvent,
+} from '../../../types';
 import { AbiParserInterface } from './interface';
 
 export class AbiParser2 implements AbiParserInterface {
@@ -23,8 +30,10 @@ export class AbiParser2 implements AbiParserInterface {
    * @returns FunctionAbi | undefined
    */
   public getMethod(name: string): FunctionAbi | undefined {
-    const intf = this.abi.find((it) => it.type === 'interface');
-    return intf.items.find((it: any) => it.name === name);
+    const intf = this.abi.find(
+      (it: FunctionAbi | AbiEvent | AbiStruct | InterfaceAbi) => it.type === 'interface'
+    ) as InterfaceAbi;
+    return intf?.items?.find((it) => it.name === name);
   }
 
   /**
@@ -32,11 +41,8 @@ export class AbiParser2 implements AbiParserInterface {
    * @returns Abi
    */
   public getLegacyFormat(): Abi {
-    return this.abi.flatMap((e) => {
-      if (e.type === 'interface') {
-        return e.items;
-      }
-      return e;
+    return this.abi.flatMap((it: FunctionAbi | LegacyEvent | AbiStruct | InterfaceAbi) => {
+      return it.type === 'interface' ? it.items : it;
     });
   }
 }

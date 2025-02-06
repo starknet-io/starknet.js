@@ -72,6 +72,8 @@ export type RESULT_PAGE_REQUEST = {
 };
 
 export type EMITTED_EVENT = EVENT & {
+  block_hash: BLOCK_HASH;
+  block_number: BLOCK_NUMBER;
   transaction_hash: TXN_HASH;
 };
 
@@ -149,10 +151,9 @@ export type BLOCK_BODY_WITH_TX_HASHES = {
 };
 
 export type BLOCK_BODY_WITH_TXS = {
-  transactions: {
-    transaction: TXN;
+  transactions: (TXN & {
     transaction_hash: TXN_HASH;
-  }[];
+  })[];
 };
 
 export type BLOCK_HEADER = {
@@ -646,8 +647,7 @@ export type L1_HANDLER_TXN_TRACE = {
 export type NESTED_CALL = FUNCTION_INVOCATION;
 
 // Represents a function invocation along with its execution details.
-export type FUNCTION_INVOCATION = {
-  function_call: FUNCTION_CALL;
+export type FUNCTION_INVOCATION = FUNCTION_CALL & {
   caller_address: string;
   class_hash: string;
   entry_point_type: ENTRY_POINT_TYPE;

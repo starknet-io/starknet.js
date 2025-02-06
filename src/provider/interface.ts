@@ -1,5 +1,5 @@
-import { RpcChannel } from '../channel/rpc_0_6';
-import { StarknetChainId } from '../constants';
+import { RPC06, RPC07 } from '../channel';
+import { StarknetChainId } from '../global/constants';
 import type {
   AccountInvocations,
   BigNumberish,
@@ -17,7 +17,6 @@ import type {
   EstimateFeeResponse,
   EstimateFeeResponseBulk,
   GetBlockResponse,
-  GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
   InvocationsDetailsWithNonce,
@@ -32,9 +31,10 @@ import type {
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
+import type { GetTransactionReceiptResponse } from '../utils/transactionReceipt';
 
 export abstract class ProviderInterface {
-  public abstract channel: RpcChannel;
+  public abstract channel: RPC07.RpcChannel | RPC06.RpcChannel;
 
   /**
    * Gets the Starknet chain Id
@@ -61,8 +61,7 @@ export abstract class ProviderInterface {
    * @param blockIdentifier block identifier
    * @returns the block object
    */
-  public abstract getBlock(): Promise<PendingBlock>;
-  public abstract getBlock(blockIdentifier: 'pending'): Promise<PendingBlock>;
+  public abstract getBlock(blockIdentifier?: 'pending'): Promise<PendingBlock>;
   public abstract getBlock(blockIdentifier: 'latest'): Promise<Block>;
   public abstract getBlock(blockIdentifier: BlockIdentifier): Promise<GetBlockResponse>;
 
@@ -77,6 +76,27 @@ export abstract class ProviderInterface {
     contractAddress: string,
     blockIdentifier?: BlockIdentifier
   ): Promise<ContractClassResponse>;
+
+  /**
+   * Gets the price of l1 gas in the block
+   *
+   * @param blockIdentifier block identifier
+   * @returns gas price of the block
+   */
+  public abstract getL1GasPrice(blockIdentifier: BlockIdentifier): Promise<string>;
+
+  /**
+   * Get L1 message hash from L2 transaction hash
+   * @param {BigNumberish} l2TxHash L2 transaction hash
+   * @returns {string} Hex string of L1 message hash
+   * @example
+   * In Sepolia Testnet :
+   * ```typescript
+   * const result = provider.getL1MessageHash('0x28dfc05eb4f261b37ddad451ff22f1d08d4e3c24dc646af0ec69fa20e096819');
+   * // result = '0x55b3f8b6e607fffd9b4d843dfe8f9b5c05822cd94fcad8797deb01d77805532a'
+   * ```
+   */
+  public abstract getL1MessageHash(l2TxHash: BigNumberish): Promise<string>;
 
   /**
    * Returns the contract class hash in the given block for the contract deployed at the given address
@@ -126,7 +146,7 @@ export abstract class ProviderInterface {
   /**
    * Gets the transaction information from a tx id.
    *
-   * @param txHash
+   * @param transactionHash
    * @returns the transaction object \{ transaction_id, status, transaction, block_number?, block_number?, transaction_index?, transaction_failure_reason? \}
    */
   public abstract getTransaction(transactionHash: BigNumberish): Promise<GetTransactionResponse>;
@@ -134,7 +154,7 @@ export abstract class ProviderInterface {
   /**
    * Gets the transaction receipt from a tx hash.
    *
-   * @param txHash
+   * @param transactionHash
    * @returns the transaction receipt object
    */
   public abstract getTransactionReceipt(

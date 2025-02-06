@@ -1,7 +1,8 @@
 // TODO Convert to CairoFelt base on CairoUint256 and implement it in the codebase in the backward compatible manner
 
-import { BigNumberish, isBigInt, isHex, isStringWholeNumber } from '../num';
+import { BigNumberish, isHex, isStringWholeNumber } from '../num';
 import { encodeShortString, isShortString, isText } from '../shortString';
+import { isBoolean, isString, isBigInt } from '../typed';
 
 /**
  * Create felt Cairo type (cairo type helper)
@@ -9,29 +10,33 @@ import { encodeShortString, isShortString, isText } from '../shortString';
  */
 export function CairoFelt(it: BigNumberish): string {
   // BN or number
-  if (isBigInt(it) || (typeof it === 'number' && Number.isInteger(it))) {
+  if (isBigInt(it) || Number.isInteger(it)) {
     return it.toString();
   }
-  // string text
-  if (isText(it)) {
-    if (!isShortString(it as string))
-      throw new Error(
-        `${it} is a long string > 31 chars, felt can store short strings, split it to array of short strings`
-      );
-    const encoded = encodeShortString(it as string);
-    return BigInt(encoded).toString();
-  }
-  // hex string
-  if (typeof it === 'string' && isHex(it)) {
-    // toBN().toString
-    return BigInt(it).toString();
-  }
-  // string number (already converted), or unhandled type
-  if (typeof it === 'string' && isStringWholeNumber(it)) {
-    return it;
+
+  // Handling strings
+  if (isString(it)) {
+    // Hex strings
+    if (isHex(it)) {
+      return BigInt(it).toString();
+    }
+    // Text strings that must be short
+    if (isText(it)) {
+      if (!isShortString(it)) {
+        throw new Error(
+          `${it} is a long string > 31 chars. Please split it into an array of short strings.`
+        );
+      }
+      // Assuming encodeShortString returns a hex representation of the string
+      return BigInt(encodeShortString(it)).toString();
+    }
+    // Whole numeric strings
+    if (isStringWholeNumber(it)) {
+      return it;
+    }
   }
   // bool to felt
-  if (typeof it === 'boolean') {
+  if (isBoolean(it)) {
     return `${+it}`;
   }
 

@@ -16,8 +16,8 @@ To estimate the cost to declare a contract in the network:
 
 ```typescript
 const { suggestedMaxFee: estimatedFee1 } = await account0.estimateDeclareFee({
-	contract: compiledTest,
-	classHash: testClassHash
+  contract: compiledTest,
+  classHash: testClassHash,
 });
 ```
 
@@ -29,9 +29,9 @@ To estimate the cost to deploy a contract in the network:
 
 ```typescript
 const { suggestedMaxFee: estimatedFee1 } = await account0.estimateDeployFee({
-	classHash: testClassHash,
-	// constructorCalldata is not necessary if the contract to deploy has no constructor
-	constructorCalldata: callData
+  classHash: testClassHash,
+  // constructorCalldata is not necessary if the contract to deploy has no constructor
+  constructorCalldata: callData,
 });
 ```
 
@@ -43,9 +43,9 @@ To estimate the cost to deploy an account in the network:
 
 ```typescript
 const { suggestedMaxFee: estimatedFee1 } = await account0.estimateAccountDeployFee({
-	classHash: OZaccountClassHash,
-	constructorCalldata: OZaccountConstructorCallData,
-	contractAddress: OZcontractAddress
+  classHash: OZaccountClassHash,
+  constructorCalldata: OZaccountConstructorCallData,
+  contractAddress: OZcontractAddress,
 });
 ```
 
@@ -57,9 +57,9 @@ To estimate the cost to invoke a contract in the network:
 
 ```typescript
 const { suggestedMaxFee: estimatedFee1 } = await account0.estimateInvokeFee({
-	contractAddress: testAddress,
-	entrypoint: "increase_balance",
-	calldata: ["10", "30"]
+  contractAddress: testAddress,
+  entrypoint: 'increase_balance',
+  calldata: ['10', '30'],
 });
 ```
 
@@ -71,22 +71,25 @@ In all non-free functions, you can add an optional parameter limiting the fee co
 If the fee has been previously estimated, you can use this value for this parameter, but sometimes this value is under-evaluated: **don't hesitate to add a margin of approximately 10%**:
 
 ```typescript
-estimatedFee1 * 11n / 10n
+(estimatedFee1 * 11n) / 10n;
 ```
 
 You can also use the `stark.estimatedFeeToMaxFee` function:
 
 ```typescript
-import { stark } from "starknet";
+import { stark } from 'starknet';
 stark.estimatedFeeToMaxFee(estimatedFee1, 0.1);
 ```
 
 Example for declaring:
 
 ```typescript
-const { suggestedMaxFee: estimatedFee1 } = await account0.estimateDeclareFee({ contract: compiledTest });
+const { suggestedMaxFee: estimatedFee1 } = await account0.estimateDeclareFee({
+  contract: compiledTest,
+});
 
-const declareResponse = await account0.declare({ contract: compiledTest},
-  { maxFee: estimatedFee1 * 11n / 10n}
+const declareResponse = await account0.declare(
+  { contract: compiledTest },
+  { maxFee: (estimatedFee1 * 11n) / 10n }
 );
 ```

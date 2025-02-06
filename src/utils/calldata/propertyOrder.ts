@@ -1,5 +1,6 @@
 import { AbiEntry, AbiEnums, AbiStructs, CairoEnum, RawArgsObject } from '../../types';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
+import { CairoUint512 } from '../cairoDataTypes/uint512';
 import {
   getArrayType,
   isCairo1Type,
@@ -8,10 +9,13 @@ import {
   isTypeByteArray,
   isTypeEnum,
   isTypeEthAddress,
+  isTypeNonZero,
   isTypeOption,
   isTypeResult,
+  isTypeSecp256k1Point,
   isTypeStruct,
   isTypeTuple,
+  isTypeU96,
 } from './cairo';
 import {
   CairoCustomEnum,
@@ -21,12 +25,20 @@ import {
   CairoResultVariant,
 } from './enum';
 import extractTupleMemberTypes from './tuple';
+import { isUndefined, isString } from '../typed';
 
 function errorU256(key: string) {
   return Error(
     `Your object includes the property : ${key}, containing an Uint256 object without the 'low' and 'high' keys.`
   );
 }
+
+function errorU512(key: string) {
+  return Error(
+    `Your object includes the property : ${key}, containing an Uint512 object without the 'limb0' to 'limb3' keys.`
+  );
+}
+
 export default function orderPropsByAbi(
   unorderedObject: RawArgsObject,
   abiOfObject: AbiEntry[],
@@ -48,7 +60,16 @@ export default function orderPropsByAbi(
     if (isTypeEthAddress(abiType)) {
       return unorderedItem;
     }
+    if (isTypeNonZero(abiType)) {
+      return unorderedItem;
+    }
     if (isTypeByteArray(abiType)) {
+      return unorderedItem;
+    }
+    if (isTypeU96(abiType)) {
+      return unorderedItem;
+    }
+    if (isTypeSecp256k1Point(abiType)) {
       return unorderedItem;
     }
     if (CairoUint256.isAbiType(abiType)) {
@@ -61,6 +82,17 @@ export default function orderPropsByAbi(
         throw errorU256(abiType);
       }
       return { low: u256.low, high: u256.high };
+    }
+    if (CairoUint512.isAbiType(abiType)) {
+      const u512 = unorderedItem;
+      if (typeof u512 !== 'object') {
+        // BigNumberish --> just copy
+        return u512;
+      }
+      if (!['limb0', 'limb1', 'limb2', 'limb3'].every((key) => key in u512)) {
+        throw errorU512(abiType);
+      }
+      return { limb0: u512.limb0, limb1: u512.limb1, limb2: u512.limb2, limb3: u512.limb3 };
     }
     if (isTypeStruct(abiType, structs)) {
       const abiOfStruct = structs[abiType].members;
@@ -92,7 +124,7 @@ export default function orderPropsByAbi(
 
   function orderArray(myArray: Array<any> | string, abiParam: string): Array<any> | string {
     const typeInArray = getArrayType(abiParam);
-    if (typeof myArray === 'string') {
+    if (isString(myArray)) {
       return myArray; // longstring
     }
     return myArray.map((myElem) => orderInput(myElem, typeInArray));
@@ -155,7 +187,7 @@ export default function orderPropsByAbi(
     const unorderedCustomEnum = unorderedObject2 as CairoCustomEnum;
     const variants = Object.entries(unorderedCustomEnum.variant);
     const newEntries = variants.map((variant) => {
-      if (typeof variant[1] === 'undefined') {
+      if (isUndefined(variant[1])) {
         return variant;
       }
       const variantType: string = abiObject.type.substring(

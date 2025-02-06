@@ -1,5 +1,7 @@
+import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
 import React from 'react';
 import clsx from 'clsx';
+
 import styles from './styles.module.css';
 
 type FeatureItem = {
@@ -11,7 +13,7 @@ type FeatureItem = {
 const FeatureList: FeatureItem[] = [
   {
     title: 'Scalability and Integrity',
-    image: '/img/starknet-3.png',
+    image: 'img/starknet-3.png',
     description: (
       <>
         Starknet supports scale, while preserving the security of L1 Ethereum by producing STARK proofs off-chain, and then verifying those proofs on-chain.
@@ -20,7 +22,7 @@ const FeatureList: FeatureItem[] = [
   },
   {
     title: 'General Purpose',
-    image: '/img/starknet-2.png',
+    image: 'img/starknet-2.png',
     description: (
       <>
         On Starknet, developers can easily deploy any business logic using Starknet Contracts.
@@ -29,7 +31,7 @@ const FeatureList: FeatureItem[] = [
   },
   {
     title: 'Composability',
-    image: '/img/starknet-1.png',
+    image: 'img/starknet-1.png',
     description: (
       <>
         Starknet provides Ethereum-level composability – facilitating easy development and innovation.
@@ -39,10 +41,11 @@ const FeatureList: FeatureItem[] = [
 ];
 
 function Feature({title, image, description}: FeatureItem) {
+  const { siteConfig } = useDocusaurusContext();
   return (
     <div className={clsx('col col--4')}>
       <div className="text--center">
-        <img className={styles.featureSvg} alt={title} src={image} />
+        <img className={styles.featureSvg} alt={title} src={`${siteConfig.baseUrl}${image}`} />
       </div>
       <div className="text--center padding-horiz--md" style={{marginTop: "15px"}}>
         <h3>{title}</h3>

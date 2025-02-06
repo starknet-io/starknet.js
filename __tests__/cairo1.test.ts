@@ -1,15 +1,14 @@
 import {
-  Abi,
+  type BigNumberish,
+  type Calldata,
+  type CompiledSierra,
+  type DeclareDeployUDCResponse,
+  type RawArgsArray,
+  type RawArgsObject,
   Account,
-  BigNumberish,
   CallData,
-  Calldata,
-  CompiledSierra,
   Contract,
   ContractFactory,
-  DeclareDeployUDCResponse,
-  RawArgsArray,
-  RawArgsObject,
   cairo,
   ec,
   hash,
@@ -20,13 +19,8 @@ import {
 } from '../src';
 import {
   TEST_TX_VERSION,
-  compiledC1Account,
-  compiledC1AccountCasm,
-  compiledComplexSierra,
-  compiledHelloSierra,
-  compiledHelloSierraCasm,
+  contracts,
   describeIfDevnet,
-  describeIfSequencerGoerli,
   getTestAccount,
   getTestProvider,
 } from './config/fixtures';
@@ -42,15 +36,32 @@ describeIfDevnet('Cairo 1 Devnet', () => {
     const account = getTestAccount(provider);
     let dd: DeclareDeployUDCResponse;
     let cairo1Contract: Contract;
+    let onlyConstructorContract: Contract;
     initializeMatcher(expect);
 
     beforeAll(async () => {
       dd = await account.declareAndDeploy({
-        contract: compiledHelloSierra,
-        casm: compiledHelloSierraCasm,
+        contract: contracts.HelloSierra.sierra,
+        casm: contracts.HelloSierra.casm,
       });
 
-      cairo1Contract = new Contract(compiledHelloSierra.abi, dd.deploy.contract_address, account);
+      cairo1Contract = new Contract(
+        contracts.HelloSierra.sierra.abi,
+        dd.deploy.contract_address,
+        account
+      );
+
+      const ddOnlyConstructor = await account.declareAndDeploy({
+        contract: contracts.OnlyConstructor.sierra,
+        casm: contracts.OnlyConstructor.casm,
+        constructorCalldata: [101, account.address],
+      });
+
+      onlyConstructorContract = new Contract(
+        contracts.OnlyConstructor.sierra.abi,
+        ddOnlyConstructor.deploy.contract_address,
+        account
+      );
     });
 
     test('Declare & deploy v2 - Hello Cairo 1 contract', async () => {
@@ -66,8 +77,8 @@ describeIfDevnet('Cairo 1 Devnet', () => {
 
     test('ContractFactory on Cairo1', async () => {
       const c1CFactory = new ContractFactory({
-        compiledContract: compiledHelloSierra,
-        casm: compiledHelloSierraCasm,
+        compiledContract: contracts.HelloSierra.sierra,
+        casm: contracts.HelloSierra.casm,
         account,
       });
       const cfContract = await c1CFactory.deploy();
@@ -80,12 +91,12 @@ describeIfDevnet('Cairo 1 Devnet', () => {
 
       await account.declare({
         contract: cc0 as CompiledSierra,
-        casm: compiledHelloSierraCasm,
+        casm: contracts.HelloSierra.casm,
       });
 
       await account.declare({
         contract: cc0_1 as CompiledSierra,
-        casm: compiledHelloSierraCasm,
+        casm: contracts.HelloSierra.casm,
       });
     });
 
@@ -107,9 +118,14 @@ describeIfDevnet('Cairo 1 Devnet', () => {
     });
 
     test('isCairo1', async () => {
-      const isContractCairo1 = cairo1Contract.isCairo1();
+      let isContractCairo1 = cairo1Contract.isCairo1();
       expect(isContractCairo1).toBe(true);
-      const isAbiCairo1 = isCairo1Abi(cairo1Contract.abi);
+      let isAbiCairo1 = isCairo1Abi(cairo1Contract.abi);
+      expect(isAbiCairo1).toBe(true);
+
+      isContractCairo1 = onlyConstructorContract.isCairo1();
+      expect(isContractCairo1).toBe(true);
+      isAbiCairo1 = isCairo1Abi(onlyConstructorContract.abi);
       expect(isAbiCairo1).toBe(true);
     });
 
@@ -416,7 +432,7 @@ describeIfDevnet('Cairo 1 Devnet', () => {
         ],
       ];
 
-      const contractCallData: CallData = new CallData(compiledComplexSierra.abi);
+      const contractCallData: CallData = new CallData(contracts.ComplexSierra.abi);
       const callDataFromObject: Calldata = contractCallData.compile('constructor', myRawArgsObject);
       const callDataFromArray: Calldata = contractCallData.compile('constructor', myRawArgsArray);
       const expectedResult = [
@@ -506,8 +522,8 @@ describeIfDevnet('Cairo 1 Devnet', () => {
 
       // declare account
       const declareAccount = await account.declareIfNot({
-        contract: compiledC1Account,
-        casm: compiledC1AccountCasm,
+        contract: contracts.C1Account.sierra,
+        casm: contracts.C1Account.casm,
       });
       if (declareAccount.transaction_hash) {
         await account.waitForTransaction(declareAccount.transaction_hash);
@@ -546,68 +562,6 @@ describeIfDevnet('Cairo 1 Devnet', () => {
 
     test('deploy Cairo1 Account from Cairo0 Account', () => {
       expect(accountC1).toBeInstanceOf(Account);
-    });
-  });
-});
-
-describeIfSequencerGoerli('Cairo1 Testnet', () => {
-  describe('Sequencer API - C1 Testnet C:0x00305e...', () => {
-    const provider = getTestProvider();
-    const account = getTestAccount(provider);
-    const classHash: any = '0x022332bb9c1e22ae13ae7fd9f3101eced4644533c6bfe51a25cf8dea028e5045';
-    const contractAddress: any =
-      '0x00305ef61e86F4566b8726d8867EF252d4f37F4B6418Cad4288052738ee22A5d';
-    let cairo1Contract: Contract;
-    initializeMatcher(expect);
-
-    beforeAll(async () => {
-      const cairoClass = await provider.getClassByHash(classHash);
-      // TODO: Fix typing and responses for abi
-      cairo1Contract = new Contract(cairoClass.abi as Abi, contractAddress, account);
-    });
-
-    test('GetClassByHash', async () => {
-      const classResponse = await provider.getClassByHash(classHash);
-      expect(classResponse).toMatchSchemaRef('SierraContractClass');
-    });
-
-    test('GetClassAt', async () => {
-      const classResponse = await provider.getClassAt(contractAddress);
-      expect(classResponse).toMatchSchemaRef('SierraContractClass');
-    });
-
-    test('Cairo 1 Contract Interaction - felt252', async () => {
-      const result = await cairo1Contract.test_felt252(100);
-      expect(result).toBe(101n);
-    });
-
-    test('Cairo 1 Contract Interaction - uint 8, 16, 32, 64, 128', async () => {
-      let result = await cairo1Contract.test_u8(100n);
-      expect(result).toBe(107n);
-      result = await cairo1Contract.test_u16(100n);
-      expect(result).toBe(106n);
-      result = await cairo1Contract.test_u32(100n);
-      expect(result).toBe(104n);
-      result = await cairo1Contract.test_u64(255n);
-      expect(result).toBe(258n);
-      result = await cairo1Contract.test_u128(255n);
-      expect(result).toBe(257n);
-    });
-
-    test('Cairo 1 - uint256 struct', async () => {
-      const myUint256 = uint256(2n ** 256n - 2n);
-      const result = await cairo1Contract.test_u256(myUint256);
-      expect(result).toBe(2n ** 256n - 1n);
-    });
-
-    test('Cairo 1 - uint256 by a bignumber', async () => {
-      const result = await cairo1Contract.test_u256(2n ** 256n - 2n);
-      expect(result).toBe(2n ** 256n - 1n);
-    });
-
-    test('Cairo 1 Contract Interaction - bool', async () => {
-      const tx = await cairo1Contract.test_bool(true);
-      expect(tx).toBe(true);
     });
   });
 });

@@ -1,7 +1,12 @@
-export enum CairoResultVariant {
-  Ok = 0,
-  Err = 1,
-}
+import { ValuesType } from '../../../types/helpers/valuesType';
+import { isUndefined } from '../../typed';
+
+export const CairoResultVariant = {
+  Ok: 0,
+  Err: 1,
+} as const;
+
+export type CairoResultVariant = ValuesType<typeof CairoResultVariant>;
 
 /**
  * Class to handle Cairo Result
@@ -18,9 +23,9 @@ export class CairoResult<T, U> {
 
   readonly Err?: U;
 
-  constructor(variant: CairoResultVariant, resultContent: T | U) {
-    if (!(variant in CairoResultVariant)) {
-      throw new Error('Wrong variant : should be CairoResultVariant.Ok or .Err.');
+  constructor(variant: CairoResultVariant | number, resultContent: T | U) {
+    if (!(variant in Object.values(CairoResultVariant))) {
+      throw new Error('Wrong variant! It should be CairoResultVariant.Ok or .Err.');
     }
     if (variant === CairoResultVariant.Ok) {
       this.Ok = resultContent as T;
@@ -36,10 +41,10 @@ export class CairoResult<T, U> {
    * @returns the content of the valid variant of a Cairo Result.
    */
   public unwrap(): T | U {
-    if (typeof this.Ok !== 'undefined') {
+    if (!isUndefined(this.Ok)) {
       return this.Ok;
     }
-    if (typeof this.Err !== 'undefined') {
+    if (!isUndefined(this.Err)) {
       return this.Err;
     }
     throw new Error('Both Result.Ok and .Err are undefined. Not authorized.');
@@ -50,7 +55,7 @@ export class CairoResult<T, U> {
    * @returns true if the valid variant is 'Ok'.
    */
   public isOk(): boolean {
-    return !(typeof this.Ok === 'undefined');
+    return !isUndefined(this.Ok);
   }
 
   /**
@@ -58,6 +63,6 @@ export class CairoResult<T, U> {
    * @returns true if the valid variant is 'isErr'.
    */
   public isErr(): boolean {
-    return !(typeof this.Err === 'undefined');
+    return !isUndefined(this.Err);
   }
 }

@@ -58,24 +58,76 @@ function extractCairo0Tuple(type: string) {
   return recomposed;
 }
 
-function extractCairo1Tuple(type: string) {
+function getClosureOffset(input: string, open: string, close: string): number {
+  for (let i = 0, counter = 0; i < input.length; i++) {
+    if (input[i] === open) {
+      counter++;
+    } else if (input[i] === close && --counter === 0) {
+      return i;
+    }
+  }
+  return Number.POSITIVE_INFINITY;
+}
+
+function extractCairo1Tuple(type: string): string[] {
   // un-named tuples support
-  const cleanType = type.replace(/\s/g, '').slice(1, -1); // remove first lvl () and spaces
-  const { subTuple, result } = parseSubTuple(cleanType);
-  const recomposed = result.split(',').map((it) => {
-    return subTuple.length ? it.replace(' ', subTuple.shift() as string) : it;
-  });
-  return recomposed;
+  const input = type.slice(1, -1); // remove first lvl ()
+  const result: string[] = [];
+
+  let currentIndex: number = 0;
+  let limitIndex: number;
+
+  while (currentIndex < input.length) {
+    switch (true) {
+      // Tuple
+      case input[currentIndex] === '(': {
+        limitIndex = currentIndex + getClosureOffset(input.slice(currentIndex), '(', ')') + 1;
+        break;
+      }
+      case input.startsWith('core::result::Result::<', currentIndex) ||
+        input.startsWith('core::array::Array::<', currentIndex) ||
+        input.startsWith('core::option::Option::<', currentIndex): {
+        limitIndex = currentIndex + getClosureOffset(input.slice(currentIndex), '<', '>') + 1;
+        break;
+      }
+      default: {
+        const commaIndex = input.indexOf(',', currentIndex);
+        limitIndex = commaIndex !== -1 ? commaIndex : Number.POSITIVE_INFINITY;
+      }
+    }
+
+    result.push(input.slice(currentIndex, limitIndex));
+    currentIndex = limitIndex + 2; // +2 to skip ', '
+  }
+
+  return result;
 }
 
 /**
- * Convert tuple string definition into object like definition
- * @param type tuple string definition
- * @returns object like tuple
+ * Convert a tuple string definition into an object-like definition.
+ * Supports both Cairo 0 and Cairo 1 tuple formats.
+ *
+ * @param type - The tuple string definition (e.g., "(u8, u8)" or "(x:u8, y:u8)").
+ * @returns An array of strings or objects representing the tuple components.
+ *
+ * @example
+ * // Cairo 0 Tuple
+ * const cairo0Tuple = "(u8, u8)";
+ * const result = extractTupleMemberTypes(cairo0Tuple);
+ * // result: ["u8", "u8"]
+ *
+ * @example
+ * // Named Cairo 0 Tuple
+ * const namedCairo0Tuple = "(x:u8, y:u8)";
+ * const namedResult = extractTupleMemberTypes(namedCairo0Tuple);
+ * // namedResult: [{ name: "x", type: "u8" }, { name: "y", type: "u8" }]
+ *
+ * @example
+ * // Cairo 1 Tuple
+ * const cairo1Tuple = "(core::result::Result::<u8, u8>, u8)";
+ * const cairo1Result = extractTupleMemberTypes(cairo1Tuple);
+ * // cairo1Result: ["core::result::Result::<u8, u8>", "u8"]
  */
 export default function extractTupleMemberTypes(type: string): (string | object)[] {
-  if (isCairo1Type(type)) {
-    return extractCairo1Tuple(type);
-  }
-  return extractCairo0Tuple(type);
+  return isCairo1Type(type) ? extractCairo1Tuple(type) : extractCairo0Tuple(type);
 }

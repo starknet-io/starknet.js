@@ -1,12 +1,17 @@
-export enum CairoOptionVariant {
-  Some = 0,
-  None = 1,
-}
+import { ValuesType } from '../../../types/helpers/valuesType';
+import { isUndefined } from '../../typed';
+
+export const CairoOptionVariant = {
+  Some: 0,
+  None: 1,
+} as const;
+
+export type CairoOptionVariant = ValuesType<typeof CairoOptionVariant>;
 
 /**
  * Class to handle Cairo Option
  * @param variant CairoOptionVariant.Some or CairoOptionVariant.None
- * @param someContent value of type T.
+ * @param content value of type T.
  * @returns an instance representing a Cairo Option.
  * @example
  * ```typescript
@@ -18,17 +23,17 @@ export class CairoOption<T> {
 
   readonly None?: boolean;
 
-  constructor(variant: CairoOptionVariant, someContent?: T) {
-    if (!(variant in CairoOptionVariant)) {
-      throw new Error('Wrong variant : should be CairoOptionVariant.Some or .None.');
+  constructor(variant: CairoOptionVariant | number, content?: T) {
+    if (!(variant in Object.values(CairoOptionVariant))) {
+      throw new Error('Wrong variant! It should be CairoOptionVariant.Some or .None.');
     }
     if (variant === CairoOptionVariant.Some) {
-      if (typeof someContent === 'undefined') {
+      if (isUndefined(content)) {
         throw new Error(
           'The creation of a Cairo Option with "Some" variant needs a content as input.'
         );
       }
-      this.Some = someContent;
+      this.Some = content;
       this.None = undefined;
     } else {
       this.Some = undefined;
@@ -42,10 +47,7 @@ export class CairoOption<T> {
    *  If None, returns 'undefined'.
    */
   public unwrap(): T | undefined {
-    if (this.None) {
-      return undefined;
-    }
-    return this.Some;
+    return this.None ? undefined : this.Some;
   }
 
   /**
@@ -53,7 +55,7 @@ export class CairoOption<T> {
    * @returns true if the valid variant is 'isSome'.
    */
   public isSome(): boolean {
-    return !(typeof this.Some === 'undefined');
+    return !isUndefined(this.Some);
   }
 
   /**

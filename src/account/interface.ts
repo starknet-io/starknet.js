@@ -3,7 +3,6 @@ import { SignerInterface } from '../signer';
 import {
   Abi,
   AllowArray,
-  BigNumberish,
   BlockIdentifier,
   CairoVersion,
   Call,
@@ -120,13 +119,13 @@ export abstract class AccountInterface extends ProviderInterface {
   /**
    * Estimate Fee for executing a UDC DEPLOY transaction on starknet
    * This is different from the normal DEPLOY transaction as it goes through the Universal Deployer Contract (UDC)
-   
+
   * @param deployContractPayload array or singular
    * - classHash: computed class hash of compiled contract
    * - salt: address salt
    * - unique: bool if true ensure unique salt
    * - constructorCalldata: constructor calldata
-   * 
+   *
    * @param estimateFeeDetails -
    * - blockIdentifier?
    * - nonce?
@@ -147,11 +146,11 @@ export abstract class AccountInterface extends ProviderInterface {
    * Estimate Fee for executing a list of transactions on starknet
    * Contract must be deployed for fee estimation to be possible
    *
-   * @param transactions array of transaction object containing :
+   * @param invocations array of transaction object containing :
    * - type - the type of transaction : 'DECLARE' | (multi)'DEPLOY' | (multi)'INVOKE_FUNCTION' | 'DEPLOY_ACCOUNT'
    * - payload - the payload of the transaction
    *
-   *  @param estimateFeeDetails -
+   *  @param details -
    * - blockIdentifier?
    * - nonce?
    * - skipValidate? - default true
@@ -203,9 +202,24 @@ export abstract class AccountInterface extends ProviderInterface {
    * - entrypoint - the entrypoint of the contract
    * - calldata - (defaults to []) the calldata
    * - signature - (defaults to []) the signature
-   * @param abi (optional) the abi of the contract for better displaying
+   * @param {InvocationsDetails} transactionsDetail Additional optional parameters for the transaction
    *
    * @returns response from addTransaction
+   */
+  public abstract execute(
+    transactions: AllowArray<Call>,
+    transactionsDetail?: InvocationsDetails
+  ): Promise<InvokeFunctionResponse>;
+  /**
+   * @deprecated
+   * @param transactions the invocation object or an array of them, containing:
+   * - contractAddress - the address of the contract
+   * - entrypoint - the entrypoint of the contract
+   * - calldata - (defaults to []) the calldata
+   * - signature - (defaults to []) the signature
+   * @param abis (optional) the abi of the contract for better displaying
+   * @param {InvocationsDetails} transactionsDetail Additional optional parameters for the transaction
+   * * @returns response from addTransaction
    */
   public abstract execute(
     transactions: AllowArray<Call>,
@@ -329,45 +343,24 @@ export abstract class AccountInterface extends ProviderInterface {
   ): Promise<DeployContractResponse>;
 
   /**
-   * Signs a JSON object for off-chain usage with the Starknet private key and returns the signature
+   * Signs a TypedData object for off-chain usage with the Starknet private key and returns the signature
    * This adds a message prefix so it can't be interchanged with transactions
    *
-   * @param json - JSON object to be signed
-   * @returns the signature of the JSON object
-   * @throws {Error} if the JSON object is not a valid JSON
+   * @param typedData - TypedData object to be signed
+   * @returns the signature of the TypedData object
+   * @throws {Error} if typedData is not a valid TypedData
    */
   public abstract signMessage(typedData: TypedData): Promise<Signature>;
 
   /**
-   * Hash a JSON object with Pedersen hash and return the hash
+   * Hash a TypedData object with Pedersen hash and return the hash
    * This adds a message prefix so it can't be interchanged with transactions
    *
-   * @param json - JSON object to be hashed
-   * @returns the hash of the JSON object
-   * @throws {Error} if the JSON object is not a valid JSON
+   * @param typedData - TypedData object to be hashed
+   * @returns the hash of the TypedData object
+   * @throws {Error} if typedData is not a valid TypedData
    */
   public abstract hashMessage(typedData: TypedData): Promise<string>;
-
-  /**
-   * Verify a signature of a JSON object
-   *
-   * @param typedData - JSON object to be verified
-   * @param signature - signature of the JSON object
-   * @returns true if the signature is valid, false otherwise
-   * @throws {Error} if the JSON object is not a valid JSON or the signature is not a valid signature
-   */
-  public abstract verifyMessage(typedData: TypedData, signature: Signature): Promise<boolean>;
-
-  /**
-   * Verify a signature of a given hash
-   * @warning This method is not recommended, use verifyMessage instead
-   *
-   * @param hash - hash to be verified
-   * @param signature - signature of the hash
-   * @returns true if the signature is valid, false otherwise
-   * @throws {Error} if the signature is not a valid signature
-   */
-  public abstract verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean>;
 
   /**
    * Gets the nonce of the account with respect to a specific block

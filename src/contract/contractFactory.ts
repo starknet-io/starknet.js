@@ -1,4 +1,5 @@
 import { AccountInterface } from '../account';
+import { logger } from '../global/logger';
 import {
   Abi,
   ArgsOrCalldataWithOptions,
@@ -66,8 +67,7 @@ export class ContractFactory {
         this.CallData.validate(ValidateType.DEPLOY, 'constructor', param);
         return this.CallData.compile('constructor', param);
       }
-      // eslint-disable-next-line no-console
-      console.warn('Call skipped parsing but provided rawArgs, possible malfunction request');
+      logger.warn('Call skipped parsing but provided rawArgs, possible malfunction request');
       return param;
     });
 

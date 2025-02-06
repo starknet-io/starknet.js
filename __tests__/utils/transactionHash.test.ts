@@ -1,5 +1,5 @@
 import { constants, hash, shortString, types, v2hash, v3hash } from '../../src';
-import { ResourceBounds } from '../../src/types/api/rpcspec_0_6';
+import { ResourceBounds } from '../../src/types/api';
 
 describe('TxV2 Hash Tests', () => {
   describe('calculateTransactionHashCommon()', () => {
@@ -11,9 +11,9 @@ describe('TxV2 Hash Tests', () => {
         '0x64',
         [],
         '0x0',
-        constants.StarknetChainId.SN_GOERLI
+        constants.StarknetChainId.SN_SEPOLIA
       );
-      expect(result).toBe('0x7d260744de9d8c55e7675a34512d1951a7b262c79e685d26599edd2948de959');
+      expect(result).toBe('0x63ba2bc7f3a3912597e221d5fad8eb0783e0684a428b47fa4737faf66f46dfb');
     });
   });
 });
@@ -93,7 +93,7 @@ describe('TxV3 Hash Tests', () => {
         '0x276faadb842bfcbba834f3af948386a2eb694f7006e118ad6c80305791d3247',
         '0x613816405e6334ab420e53d4b38a0451cb2ebca2755171315958c87d303cf6',
       ],
-      constants.StarknetChainId.SN_GOERLI,
+      constants.StarknetChainId.SN_SEPOLIA,
       '0x8a9',
       [],
       0,
@@ -106,7 +106,7 @@ describe('TxV3 Hash Tests', () => {
       []
     );
 
-    expect(result).toBe('0x41906f1c314cca5f43170ea75d3b1904196a10101190d2b12a41cc61cfd17c');
+    expect(result).toBe('0x6d0e3ff991d62a10189a0ea11685d26b7efdb5baa9fa0d0a4edd1711185f671');
   });
 
   test('calculateDeployAccountTransactionHash Demo', () => {
@@ -138,7 +138,7 @@ describe('TxV3 Hash Tests', () => {
       ['0x5cd65f3d7daea6c63939d659b8473ea0c5cd81576035a4d34e52fb06840196c'],
       '0x0',
       '0x3',
-      constants.StarknetChainId.SN_GOERLI,
+      constants.StarknetChainId.SN_SEPOLIA,
       '0x0',
       types.RPC.EDAMode.L1,
       types.RPC.EDAMode.L1,
@@ -150,7 +150,7 @@ describe('TxV3 Hash Tests', () => {
       []
     );
 
-    expect(result).toBe('0x29fd7881f14380842414cdfdd8d6c0b1f2174f8916edcfeb1ede1eb26ac3ef0');
+    expect(result).toBe('0x3018236df5779c1f28caba0e64febcb78f5bc69aa3538be54f4e27def9de1b3');
   });
 
   test('calculateDeclareTransactionHash Demo', () => {
@@ -181,7 +181,7 @@ describe('TxV3 Hash Tests', () => {
       '0x1add56d64bebf8140f3b8a38bdf102b7874437f0c861ab4ca7526ec33b4d0f8',
       '0x2fab82e4aef1d8664874e1f194951856d48463c3e6bf9a8c68e234a629a6f50',
       '0x3',
-      constants.StarknetChainId.SN_GOERLI,
+      constants.StarknetChainId.SN_SEPOLIA,
       '0x1',
       [],
       types.RPC.EDAMode.L1,
@@ -194,6 +194,6 @@ describe('TxV3 Hash Tests', () => {
       []
     );
 
-    expect(result).toBe('0x41d1f5206ef58a443e7d3d1ca073171ec25fa75313394318fc83a074a6631c3');
+    expect(result).toBe('0x61bfaf480ac824971ad1bdc316fa821f58afd6b47e037242ef265d0aaea7c78');
   });
 });

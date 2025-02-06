@@ -1,5 +1,5 @@
 ---
-sidebar_position: 14
+sidebar_position: 15
 ---
 
 # Signature
@@ -13,12 +13,11 @@ Your message has to be an array of `BigNumberish`. First, calculate the hash of 
 > If the message does not respect some safety rules of composition, this method could be a way of attack of your smart contract. If you have any doubt, prefer the [EIP712 like method](#sign-and-verify-following-eip712), which is safe, but is also more complicated.
 
 ```typescript
-import {ec, hash, num, json, Contract, WeierstrassSignatureType } from "starknet";
+import { ec, hash, type BigNumberish, type WeierstrassSignatureType } from 'starknet';
 
-const privateKey = "0x1234567890987654321";
+const privateKey = '0x1234567890987654321';
 const starknetPublicKey = ec.starkCurve.getStarkKey(privateKey);
-const fullPublicKey = encode.addHexPrefix( encode.buf2hex( ec.starkCurve.getPublicKey( privateKey, false)));
-
+const fullPublicKey = stark.getFullPublicKey(privateKey);
 const message: BigNumberish[] = [1, 128, 18, 14];
 
 const msgHash = hash.computeHashOnElements(message);
@@ -49,8 +48,11 @@ The sender provides the message, the signature, and the full public key. Verific
 
 ```typescript
 const msgHash1 = hash.computeHashOnElements(message);
-const result1 = ec.starkCurve.verify(signature, msgHash1, fullPublicKey);
-console.log("Result (boolean) =", result1);
+const isValid1 = typedData.verifyMessage(msgHash1, signature, fullPublicKey);
+console.log('Result (boolean) =', isValid1);
+
+// with a low level function (take care of Types limitations) :
+const isValid2 = ec.starkCurve.verify(signature1, msgHash, fullPublicKey);
 ```
 
 > The sender can also provide their account address. Then you can check that this full public key is linked to this account. The public Key that you can read in the account contract is part (part X) of the full public Key (parts X & Y):
@@ -58,19 +60,21 @@ console.log("Result (boolean) =", result1);
 Read the Public Key of the account:
 
 ```typescript
-const provider = new RpcProvider({ nodeUrl: "http://127.0.0.1:5050/rpc" }); //devnet
-const compiledAccount = json.parse(fs.readFileSync("./compiled_contracts/Account_0_5_1.json").toString("ascii"));
-const accountAddress ="0x...."; // account of sender
+const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' }); //devnet
+const compiledAccount = json.parse(
+  fs.readFileSync('./__mocks__/cairo/account/accountOZ080.json').toString('ascii')
+);
+const accountAddress = '0x....'; // account of sender
 const contractAccount = new Contract(compiledAccount.abi, accountAddress, provider);
-const pubKey3 = await contractAccount.call("getPublicKey");
+const pubKey3 = await contractAccount.call('getPublicKey');
 ```
 
 Check that the Public Key of the account is part of the full public Key:
 
 ```typescript
 const isFullPubKeyRelatedToAccount: boolean =
-    publicKey.publicKey == BigInt(encode.addHexPrefix( fullPublicKey.slice( 4, 68)));
-console.log("Result (boolean)=", isFullPubKeyRelatedToAccount);
+  pubKey3 == BigInt(encode.addHexPrefix(fullPublicKey.slice(4, 68)));
+console.log('Result (boolean) =', isFullPubKeyRelatedToAccount);
 ```
 
 ### Verify in the Starknet network, with the account:
@@ -78,107 +82,196 @@ console.log("Result (boolean)=", isFullPubKeyRelatedToAccount);
 The sender can provide an account address, despite a full public key.
 
 ```typescript
-const provider = new RpcProvider({ nodeUrl: "http://127.0.0.1:5050/rpc" }); //devnet
-const compiledAccount = json.parse(fs.readFileSync("./compiled_contracts/Account_0_5_1.json").toString("ascii"));
+const myProvider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' }); //devnet-rs
+const accountAddress = '0x...'; // account of sender
 
-const accountAddress ="0x..."; // account of sender
-const contractAccount = new Contract(compiledAccount.abi, accountAddress, provider);
 const msgHash2 = hash.computeHashOnElements(message);
-// The call of isValidSignature will generate an error if not valid
-    let result2: boolean;
-    try {
-        await contractAccount.isValidSignature(msgHash2, [signature.r, signature.s]);
-        result2 = true;
-    } catch {
-        result2 = false;
-    }
-console.log("Result (boolean) =", result2);
+const result2: Boolean = rpcProvider.verifyMessageInStarknet(msgHash2, signature, accountAddress);
+console.log('Result (boolean) =', result2);
 ```
 
-## Sign and verify the following EIP712
+## Sign and verify following EIP712
 
-Previous examples are valid for an array of numbers. In the case of a more complex structure of an object, you have to work in the spirit of [EIP 712](https://eips.ethereum.org/EIPS/eip-712). This JSON structure has 4 mandatory items: `types`, `primaryType`, `domain`, and `message`.  
-These items are designed to be able to be an interface with a wallet. At sign request, the wallet will display:
+Previous examples are valid for an array of numbers. In the case of a more complex structure, you have to work in the spirit of [EIP 712](https://eips.ethereum.org/EIPS/eip-712). This JSON structure has 4 mandatory items: `types`, `primaryType`, `domain`, and `message`.  
+These items are designed to be able to be an interface with a browser wallet. At sign request, the wallet will display:
 
-- the `message` will be displayed at the bottom of the wallet display, showing clearly (not in hex) the message to sign. Its structure has to be in accordance with the type listed in `primaryType`, defined in `types`.
-- the `domain` will be shown above the message. Its structure has to be in accordance with `StarkNetDomain`.
+- the `message` at the bottom of the wallet window, showing clearly (not in hex) the message to sign. Its structure has to be in accordance with the type listed in `primaryType`, defined in `types`.
+- the `domain` above the message. Its structure has to be in accordance with `StarknetDomain`.
 
-The predefined types that you can use:
-
-- felt: for an integer on 251 bits.
-- felt\*: for an array of felt.
-- string: for a shortString of 31 ASCII characters max.
-- selector: for a name of a smart contract function.
-- merkletree: for a Root of a Merkle tree. the root is calculated with the provided data.
+The types than can be used are defined in [SNIP-12](https://github.com/starknet-io/SNIPs/blob/main/SNIPS/snip-12.md). An example of simple message :
 
 ```typescript
-const typedDataValidate: TypedData = {
-        types: {
-            StarkNetDomain: [
-                { name: "name", type: "string" },
-                { name: "version", type: "felt" },
-                { name: "chainId", type: "felt" },
-            ],
-            Airdrop: [
-                { name: "address", type: "felt" },
-                { name: "amount", type: "felt" }
-            ],
-            Validate: [
-                { name: "id", type: "felt" },
-                { name: "from", type: "felt" },
-                { name: "amount", type: "felt" },
-                { name: "nameGamer", type: "string" },
-                { name: "endDate", type: "felt" },
-                { name: "itemsAuthorized", type: "felt*" }, // array of felt
-                { name: "chkFunction", type: "selector" }, // name of function
-                { name: "rootList", type: "merkletree", contains: "Airdrop" } // root of a merkle tree
-            ]
-        },
-        primaryType: "Validate",
-        domain: {
-            name: "myDapp", // put the name of your dapp to ensure that the signatures will not be used by other DAPP
-            version: "1",
-            chainId: shortString.encodeShortString("SN_GOERLI"), // shortString of 'SN_GOERLI' (or 'SN_MAIN'), to be sure that signature can't be used by other network.
-        },
-        message: {
-            id: "0x0000004f000f",
-            from: "0x2c94f628d125cd0e86eaefea735ba24c262b9a441728f63e5776661829a4066",
-            amount: "400",
-            nameGamer: "Hector26",
-            endDate: "0x27d32a3033df4277caa9e9396100b7ca8c66a4ef8ea5f6765b91a7c17f0109c",
-            itemsAuthorized: ["0x01", "0x03", "0x0a", "0x0e"],
-            chkFunction: "check_authorization",
-            rootList: [
-                {
-                    address: "0x69b49c2cc8b16e80e86bfc5b0614a59aa8c9b601569c7b80dde04d3f3151b79",
-                    amount: "1554785",
-                }, {
-                    address: "0x7447084f620ba316a42c72ca5b8eefb3fe9a05ca5fe6430c65a69ecc4349b3b",
-                    amount: "2578248",
-                }, {
-                    address: "0x3cad9a072d3cf29729ab2fad2e08972b8cfde01d4979083fb6d15e8e66f8ab1",
-                    amount: "4732581",
-                }, {
-                    address: "0x7f14339f5d364946ae5e27eccbf60757a5c496bf45baf35ddf2ad30b583541a",
-                    amount: "913548",
-                },
-            ]
-        },
-    };
+const myTypedData: TypedData = {
+  domain: {
+    name: 'DappLand',
+    chainId: constants.StarknetChainId.SN_SEPOLIA,
+    version: '1.0.2',
+    revision: TypedDataRevision.ACTIVE,
+  },
+  message: {
+    name: 'MonKeyCollection',
+    value: 2312,
+    // do not use BigInt type if message sent to a web browser
+  },
+  primaryType: 'Simple',
+  types: {
+    Simple: [
+      {
+        name: 'name',
+        type: 'shortstring',
+      },
+      {
+        name: 'value',
+        type: 'u128',
+      },
+    ],
+    StarknetDomain: [
+      {
+        name: 'name',
+        type: 'shortstring',
+      },
+      {
+        name: 'chainId',
+        type: 'shortstring',
+      },
+      {
+        name: 'version',
+        type: 'shortstring',
+      },
+    ],
+  },
+};
 
-// connect your account, then
-const signature2 = await account.signMessage(typedDataValidate) as WeierstrassSignatureType;
+const account0 = new Account(myProvider, address, privateKey);
+const fullPublicKey = stark.getFullPublicKey(privateKey);
 
+const msgHash = await account0.hashMessage(myTypedData);
+const signature: Signature = (await account0.signMessage(myTypedData)) as WeierstrassSignatureType;
 ```
 
-On the receiver side, you receive the JSON, the signature, and the account address. To verify the message:
+:::note
+A message can be more complex, with nested types. See an example [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/signature/4c.signSnip12vActive.ts).
+:::
+
+### Verify TypedData outside Starknet
+
+On the receiver side, you receive the message, the signature, the full public key and the account address.  
+To verify the message:
 
 ```typescript
-const myAccount = new Account(provider, accountAddress, "0x0123"); // fake private key
-try {
-    const result = await myAccount.verifyMessage(typedMessage, signature);
-    console.log("Result (boolean) =", result);
-} catch {
-    console.log("verification failed :", result.error);
-}
+const isValid = typedData.verifyMessage(myTypedData, signature, fullPublicKey, account0Address);
 ```
+
+A verification is also possible if you have the message hash, the signature and the full public key.
+
+```typescript
+const isValid2 = typedData.verifyMessage(msgHash, signature, fullPublicKey);
+
+// with a low level function (take care of Types limitations) :
+const isValid3 = ec.starkCurve.verify(signature, msgHash, fullPublicKey);
+```
+
+### Verify TypedData in Starknet
+
+On the receiver side, you receive the message, the signature, and the account address.  
+To verify the message:
+
+```typescript
+const isValid4 = await myProvider.verifyMessageInStarknet(
+  myTypedData,
+  signature2,
+  account0.address
+);
+```
+
+A verification is also possible if you have the message hash, the signature and the account address:
+
+```typescript
+const isValid5 = await myProvider.verifyMessageInStarknet(msgHash, signature2, account0.address);
+```
+
+## Signing with an Ethereum signer
+
+All the previous examples are using the standard Starknet signature process, but you can also use the Ethereum one.
+
+```typescript
+const myEthPrivateKey = '0x525bc68475c0955fae83869beec0996114d4bb27b28b781ed2a20ef23121b8de';
+const myEthAccountAddressInStarknet =
+  '0x65a822fbee1ae79e898688b5a4282dc79e0042cbed12f6169937fddb4c26641';
+const myEthSigner = new EthSigner(myEthPrivateKey);
+console.log('Complete public key =', await myEthSigner.getPubKey());
+const sig0 = await myEthSigner.signMessage(message, myEthAccountAddressInStarknet);
+console.log('signature message =', sig0);
+```
+
+## Signing with a Ledger hardware wallet
+
+![](./pictures/LedgerTitle.png)
+
+Starknet.js has a support for Ledger Nano S+ or X, to sign your Starknet transactions.
+You have to use a transporter to interact with the Ledger Nano. Depending if you use an USB or a Bluetooth connection, depending on your framework (Node, Web, Mobile), you have to use the appropriate library to create your transporter.
+
+The Ledger documentation lists all the available cases :
+![](./pictures/LedgerConnectivity.png)
+
+The libs available are :
+
+```typescript
+import TransportNodeHid from '@ledgerhq/hw-transport-node-hid';
+import TransportWebHid from '@ledgerhq/hw-transport-webhid';
+import TransportWebBluetooth from '@ledgerhq/hw-transport-web-ble';
+import TransportHID from '@ledgerhq/react-native-hid';
+import TransportBLE from '@ledgerhq/react-native-hw-transport-ble';
+import type Transport from '@ledgerhq/hw-transport'; // type for the transporter
+```
+
+In a Web DAPP, take care that some browsers are not compatible (FireFox, ...), and that the Bluetooth is not working in all cases and in all operating systems.
+
+:::note
+The last version of the Ledger Starknet APP (v2.2.1) supports explained V1 (ETH) & V3 (STRK) transactions & deploy accounts. For a class declaration or a message, you will have to blind sign a hash ; sign only hashes from a code that you trust. Do not forget to Enable `Blind signing` in the APP settings.
+:::
+
+For example, for a Node script :
+
+```typescript
+import TransportNodeHid from '@ledgerhq/hw-transport-node-hid';
+const myLedgerTransport: Transport = await TransportNodeHid.create();
+const myLedgerSigner = new LedgerSigner221(myLedgerTransport, 0);
+const pubK = await myLedgerSigner.getPubKey();
+const fullPubK = await myLedgerSigner.getFullPubKey();
+// ...
+// deploy here an account related to this public key
+// ...
+const ledgerAccount = new Account(myProvider, ledger0addr, myLedgerSigner);
+```
+
+:::warning important
+The Ledger shall be connected, unlocked, with the Starknet internal APP activated, before launch of the script.
+:::
+
+Some complete examples :  
+A Node script : [here](https://github.com/PhilippeR26/starknet.js-workshop-typescript/blob/main/src/scripts/ledgerNano/6.testLedgerAccount221.ts).  
+A test Web DAPP, to use in devnet-rs network : [here](https://github.com/PhilippeR26/Starknet-Ledger-Wallet).
+
+If you want to read the version of the Ledger Starknet APP :
+
+```typescript
+const resp = await myLedgerTransport.send(Number('0x5a'), 0, 0, 0);
+const appVersion = resp[0] + '.' + resp[1] + '.' + resp[2];
+console.log('version=', appVersion);
+```
+
+:::note
+You also have in Starknet.js a signer for the old v1.1.1 Ledger Starknet APP.
+
+```typescript
+const myLedgerSigner = new LedgerSigner111(myLedgerTransport, 0);
+```
+
+If you want to use the accounts created with the v1.1.1, using the v2.2.1 :
+
+```typescript
+const myLedgerSigner = new LedgerSigner221(myLedgerTransport, 0, undefined, getLedgerPathBuffer111);
+```
+
+:::

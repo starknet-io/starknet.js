@@ -1,5 +1,4 @@
-import type { Abi as AbiKanabiV1 } from 'abi-wan-kanabi-v1';
-import type { Abi as AbiKanabiV2, TypedContract as AbiWanTypedContractV2 } from 'abi-wan-kanabi-v2';
+import type { Abi as AbiKanabi, TypedContract as AbiWanTypedContract } from 'abi-wan-kanabi';
 
 import { AccountInterface } from '../account';
 import { ProviderInterface, defaultProvider } from '../provider';
@@ -16,24 +15,27 @@ import {
   ContractOptions,
   EstimateFeeResponse,
   FunctionAbi,
-  GetTransactionReceiptResponse,
   InvokeFunctionResponse,
   InvokeOptions,
   InvokeTransactionReceiptResponse,
   ParsedEvents,
   RawArgs,
   Result,
-  StructAbi,
+  AbiStruct,
   ValidateType,
+  type SuccessfulTransactionReceiptResponse,
 } from '../types';
 import assert from '../utils/assert';
-import { CallData, cairo } from '../utils/calldata';
+import { cairo, CallData } from '../utils/calldata';
 import { createAbiParser } from '../utils/calldata/parser';
 import { getAbiEvents, parseEvents as parseRawEvents } from '../utils/events/index';
 import { cleanHex } from '../utils/num';
-import { ContractInterface, TypedContractV1 } from './interface';
+import { ContractInterface } from './interface';
+import type { GetTransactionReceiptResponse } from '../utils/transactionReceipt';
+import type { INVOKE_TXN_RECEIPT } from '../types/provider/spec';
+import { logger } from '../global/logger';
 
-export type TypedContractV2<TAbi extends AbiKanabiV2> = AbiWanTypedContractV2<TAbi> & Contract;
+export type TypedContractV2<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & Contract;
 
 export const splitArgsAndOptions = (args: ArgsOrCalldataWithOptions) => {
   const options = [
@@ -125,7 +127,7 @@ export class Contract implements ContractInterface {
 
   deployTransactionHash?: string;
 
-  protected readonly structs: { [name: string]: StructAbi };
+  protected readonly structs: { [name: string]: AbiStruct };
 
   protected readonly events: AbiEvents;
 
@@ -237,8 +239,7 @@ export class Contract implements ContractInterface {
         this.callData.validate(ValidateType.CALL, method, args);
         return this.callData.compile(method, args);
       }
-      // eslint-disable-next-line no-console
-      console.warn('Call skipped parsing but provided rawArgs, possible malfunction request');
+      logger.warn('Call skipped parsing but provided rawArgs, possible malfunction request');
       return args;
     });
 
@@ -274,8 +275,7 @@ export class Contract implements ContractInterface {
         this.callData.validate(ValidateType.INVOKE, method, args);
         return this.callData.compile(method, args);
       }
-      // eslint-disable-next-line no-console
-      console.warn('Invoke skipped parsing but provided rawArgs, possible malfunction request');
+      logger.warn('Invoke skipped parsing but provided rawArgs, possible malfunction request');
       return args;
     });
 
@@ -292,8 +292,7 @@ export class Contract implements ContractInterface {
     }
 
     if (!nonce) throw new Error(`Nonce is required when invoking a function without an account`);
-    // eslint-disable-next-line no-console
-    console.warn(`Invoking ${method} without an account. This will not work on a public node.`);
+    logger.warn(`Invoking ${method} without an account. This will not work on a public node.`);
 
     return this.providerOrAccount.invokeFunction(
       {
@@ -330,15 +329,32 @@ export class Contract implements ContractInterface {
   }
 
   public parseEvents(receipt: GetTransactionReceiptResponse): ParsedEvents {
-    return parseRawEvents(
-      (receipt as InvokeTransactionReceiptResponse).events?.filter(
-        (event) => cleanHex(event.from_address) === cleanHex(this.address),
-        []
-      ) || [],
-      this.events,
-      this.structs,
-      CallData.getAbiEnum(this.abi)
-    );
+    let parsed: ParsedEvents;
+    receipt.match({
+      success: (txR: SuccessfulTransactionReceiptResponse) => {
+        const emittedEvents =
+          (txR as InvokeTransactionReceiptResponse).events
+            ?.map((event) => {
+              return {
+                block_hash: (txR as INVOKE_TXN_RECEIPT).block_hash,
+                block_number: (txR as INVOKE_TXN_RECEIPT).block_number,
+                transaction_hash: (txR as INVOKE_TXN_RECEIPT).transaction_hash,
+                ...event,
+              };
+            })
+            .filter((event) => cleanHex(event.from_address) === cleanHex(this.address), []) || [];
+        parsed = parseRawEvents(
+          emittedEvents,
+          this.events,
+          this.structs,
+          CallData.getAbiEnum(this.abi)
+        );
+      },
+      _: () => {
+        throw Error('This transaction was not successful.');
+      },
+    });
+    return parsed!;
   }
 
   public isCairo1(): boolean {
@@ -349,11 +365,7 @@ export class Contract implements ContractInterface {
     return this.providerOrAccount.getContractVersion(this.address);
   }
 
-  public typedv1<TAbi extends AbiKanabiV1>(tAbi: TAbi): TypedContractV1<TAbi> {
-    return this as TypedContractV1<typeof tAbi>;
-  }
-
-  public typedv2<TAbi extends AbiKanabiV2>(tAbi: TAbi): TypedContractV2<TAbi> {
+  public typedv2<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContractV2<TAbi> {
     return this as unknown as TypedContractV2<typeof tAbi>;
   }
 }

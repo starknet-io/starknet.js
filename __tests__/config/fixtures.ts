@@ -6,65 +6,101 @@ import {
   CompiledSierra,
   CompiledSierraCasm,
   LegacyCompiledContract,
-  waitForTransactionOptions,
+  RpcProviderOptions,
 } from '../../src/types';
 import { ETransactionVersion } from '../../src/types/api';
 import { toHex } from '../../src/utils/num';
+import { wait } from '../../src/utils/provider';
+import { isString } from '../../src/utils/typed';
+import './customMatchers'; // ensures TS traversal
 
-const readContract = (name: string): LegacyCompiledContract =>
-  json.parse(
-    fs.readFileSync(path.resolve(__dirname, `../../__mocks__/${name}.json`)).toString('ascii')
-  );
+const readFile = (subpath: string) => fs.readFileSync(path.resolve(__dirname, subpath));
 
-const readContractSierraCasm = (name: string): CompiledSierraCasm =>
-  json.parse(
-    fs.readFileSync(path.resolve(__dirname, `../../__mocks__/${name}.casm`)).toString('ascii')
-  );
+const readContract = <T = LegacyCompiledContract>(name: string, extension: string = 'json'): T =>
+  json.parse(readFile(`../../__mocks__/${name}.${extension}`).toString('ascii'));
 
-const readContractSierra = (name: string): CompiledSierra =>
-  json.parse(
-    fs.readFileSync(path.resolve(__dirname, `../../__mocks__/${name}.json`)).toString('ascii')
-  );
+const readContractSierra = readContract<CompiledSierra>;
+const readContractSierraCasm = (name: string) => readContract<CompiledSierraCasm>(name, 'casm');
 
-export const compiledOpenZeppelinAccount = readContract('Account');
-export const compiledErc20 = readContract('ERC20');
-export const compiledErc20Echo = readContract('ERC20-echo');
-export const compiledL1L2 = readContract('l1l2_compiled');
-export const compiledTypeTransformation = readContract('contract');
-export const compiledMulticall = readContract('multicall');
-export const compiledTestDapp = readContract('TestDapp');
-export const compiledStarknetId = readContract('starknetId_compiled');
-export const compiledNamingContract = readContract('naming_compiled');
-export const compiledHashSierra = readContractSierra('cairo/hash/hash');
-export const compiledHashSierraCasm = readContractSierraCasm('cairo/hash/hash');
-export const compiledHelloSierra = readContractSierra('cairo/helloSierra/hello');
-export const compiledHelloSierraCasm = readContractSierraCasm('cairo/helloSierra/hello');
-export const compiledComplexSierra = readContractSierra('cairo/complexInput/complexInput');
-export const compiledC1Account = readContractSierra('cairo/account/accountOZ080');
-export const compiledC1AccountCasm = readContractSierraCasm('cairo/account/accountOZ080');
-export const compiledC1v2 = readContractSierra('cairo/helloCairo2/compiled');
-export const compiledC1v2Casm = readContractSierraCasm('cairo/helloCairo2/compiled');
-export const compiledC210 = readContractSierra('cairo/cairo210/cairo210.sierra');
-export const compiledC210Casm = readContractSierraCasm('cairo/cairo210/cairo210');
-export const compiledC240 = readContractSierra('cairo/cairo240/string.sierra');
-export const compiledC240Casm = readContractSierraCasm('cairo/cairo240/string');
+const readContractSet = (name: string, pathPrefix: string = 'cairo') => ({
+  sierra: readContractSierra(`${pathPrefix}/${name}.sierra`),
+  casm: readContractSierraCasm(`${pathPrefix}/${name}`),
+});
 
-export function getTestProvider(isProvider?: true): ProviderInterface;
-export function getTestProvider(isProvider?: false): RpcProvider;
-export function getTestProvider(isProvider: boolean = true): ProviderInterface | RpcProvider {
-  const provider = isProvider
-    ? new Provider({ nodeUrl: process.env.TEST_RPC_URL })
-    : new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL });
+const mapContractSets = <T extends Record<string, any>>(
+  contractRecord: T,
+  pathPrefix?: string
+): { [K in keyof T]: T[K] extends string ? ReturnType<typeof readContractSet> : T[K] } =>
+  Object.fromEntries(
+    Object.entries(contractRecord).map(([key, value]) => [
+      key,
+      isString(value) ? readContractSet(value, pathPrefix) : value,
+    ])
+  ) as any;
 
-  if (process.env.IS_LOCALHOST_DEVNET === 'true') {
+// cairo/ contracts are retrieved as a { sierra, casm } set
+const compiledContracts = {
+  OpenZeppelinAccount: readContract('Account'),
+  Erc20: readContract('ERC20'),
+  Erc20Echo: readContract('ERC20-echo'),
+  L1L2: readContract('l1l2_compiled'),
+  TypeTransformation: readContract('contract'),
+  Multicall: readContract('multicall'),
+  TestDapp: readContract('TestDapp'),
+  ComplexSierra: readContractSierra('cairo/complexInput/complexInput'),
+  // cairo/
+  Erc20OZ: 'ERC20-241/ERC20OZ081',
+  HashSierra: 'hash/hash',
+  HelloSierra: 'helloSierra/hello',
+  C1v2: 'helloCairo2/compiled',
+  C210: 'cairo210/cairo210',
+  C240: 'cairo240/string',
+  Tuple: 'cairo253/tupleResponse',
+  C260: 'cairo260/hello260',
+  U512: 'cairo260/u512',
+  NonZero: 'cairo263/zeroable',
+  OnlyConstructor: 'onlyConstructor/onlyConstructor',
+  C1Account: 'account/accountOZ080',
+  ArgentX4Account: 'account/accountArgent040',
+  EthAccount: 'ethSigner/openzeppelin_EthAccount090',
+  Dummy1Eth: 'ethSigner/dummy1ForEth',
+  Dummy2Eth: 'ethSigner/dummy2ForEth',
+  EthPubk: 'ethSigner/testEthPubKey',
+  TestReject: 'testReject/test_reject',
+  starknetId: mapContractSets(
+    {
+      StarknetId: 'identity/identity',
+      Naming: 'naming/naming',
+      Pricing: 'pricing/pricing',
+      SidMulticall: 'multicall/multicall',
+    },
+    'starknetId'
+  ),
+  U96: 'cairo282/u96',
+};
+export const contracts = mapContractSets(compiledContracts);
+
+export function getTestProvider(
+  isProvider?: true,
+  setProviderOptions?: RpcProviderOptions
+): ProviderInterface;
+export function getTestProvider(
+  isProvider?: false,
+  setProviderOptions?: RpcProviderOptions
+): RpcProvider;
+export function getTestProvider(
+  isProvider: boolean = true,
+  setProviderOptions?: RpcProviderOptions
+): ProviderInterface | RpcProvider {
+  const isDevnet = process.env.IS_DEVNET === 'true';
+
+  const providerOptions: RpcProviderOptions = {
+    ...setProviderOptions,
+    nodeUrl: process.env.TEST_RPC_URL,
     // accelerate the tests when running locally
-    const originalWaitForTransaction = provider.waitForTransaction.bind(provider);
-    provider.waitForTransaction = (txHash: string, options: waitForTransactionOptions = {}) => {
-      return originalWaitForTransaction(txHash, { retryInterval: 1000, ...options });
-    };
-  }
-
-  return provider;
+    ...(isDevnet && { transactionRetryIntervalFallback: 1000 }),
+  };
+  return isProvider ? new Provider(providerOptions) : new RpcProvider(providerOptions);
 }
 
 export const TEST_TX_VERSION = process.env.TX_VERSION === 'v3' ? ETransactionVersion.V3 : undefined;
@@ -80,18 +116,41 @@ export const getTestAccount = (provider: ProviderInterface) => {
 };
 
 export const createBlockForDevnet = async (): Promise<void> => {
-  if (!(process.env.IS_RPC_DEVNET === 'true')) return;
-  await fetch(new URL('/create_block', process.env.TEST_RPC_URL), { method: 'POST' });
+  if (!(process.env.IS_DEVNET === 'true')) return;
+  const response = await fetch(new URL('/create_block', process.env.TEST_RPC_URL), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: '{}',
+  });
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`DEVNET status ${response.status}: ${errorText}`);
+  }
 };
 
-const describeIf = (condition: boolean) => (condition ? describe : describe.skip);
-export const describeIfSequencer = describeIf(process.env.IS_SEQUENCER === 'true');
-export const describeIfRpc = describeIf(process.env.IS_RPC === 'true');
-export const describeIfNotDevnet = describeIf(process.env.IS_LOCALHOST_DEVNET === 'false');
-export const describeIfDevnet = describeIf(process.env.IS_LOCALHOST_DEVNET === 'true');
-export const describeIfDevnetRpc = describeIf(process.env.IS_RPC_DEVNET === 'true');
-export const describeIfDevnetSequencer = describeIf(process.env.IS_SEQUENCER_DEVNET === 'true');
-export const describeIfSequencerGoerli = describeIf(process.env.IS_SEQUENCER_GOERLI === 'true');
+export async function waitNextBlock(provider: RpcProvider, delay: number) {
+  const initBlock = await provider.getBlockNumber();
+  await createBlockForDevnet();
+  let isNewBlock: boolean = false;
+  while (!isNewBlock) {
+    // eslint-disable-next-line no-await-in-loop
+    const currentBlock = await provider.getBlockNumber();
+    if (currentBlock !== initBlock) {
+      isNewBlock = true;
+    } else {
+      // eslint-disable-next-line no-await-in-loop
+      await wait(delay);
+    }
+  }
+}
 
+const describeIf = (condition: boolean) => (condition ? describe : describe.skip);
+export const describeIfRpc = describeIf(process.env.IS_RPC === 'true');
+export const describeIfNotDevnet = describeIf(process.env.IS_DEVNET === 'false');
+export const describeIfDevnet = describeIf(process.env.IS_DEVNET === 'true');
+export const describeIfTestnet = describeIf(process.env.IS_TESTNET === 'true');
 export const erc20ClassHash = '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a';
 export const wrongClassHash = '0x000000000000000000000000000000000000000000000000000000000000000';
+export const devnetETHtokenAddress =
+  '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';

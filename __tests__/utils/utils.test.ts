@@ -1,9 +1,30 @@
 import * as starkCurve from '@scure/starknet';
 
-import { constants, ec, hash, num, stark } from '../../src';
-import { Block } from '../../src/utils/provider';
+import { constants, ec, hash, num, stark, units } from '../../src';
 
 const { IS_BROWSER } = constants;
+
+test('units', () => {
+  expect(units(1n, 'fri')).toEqual('0.000000000000000001');
+  expect(units(1000n, 'fri')).toEqual('0.000000000000001');
+  expect(units(123123123n, 'fri')).toEqual('0.000000000123123123');
+  expect(units('123123123', 'fri')).toEqual('0.000000000123123123');
+  expect(units(10n ** 18n, 'fri')).toEqual('1');
+  expect(units(30n * 10n ** 16n, 'fri')).toEqual('0.3');
+  expect(units(30n * 10n ** 22n, 'fri')).toEqual('300000');
+  expect(units('0x40ff', 'fri')).toEqual('0.000000000000016639');
+
+  expect(units('0.3', 'strk')).toEqual('300000000000000000');
+  expect(units('1', 'strk')).toEqual('1000000000000000000');
+  expect(units('1000', 'strk')).toEqual('1000000000000000000000');
+  expect(units('123123123.123', 'strk')).toEqual('123123123123000000000000000');
+  expect(units('0x40ff', 'strk')).toEqual('16639000000000000000000');
+
+  const toTest = ['0.333', '123123123.123', '1000.1', '123123123.123123', '0.0000003'];
+  toTest.forEach((element) => {
+    expect(units(units(element, 'strk'), 'fri')).toEqual(element);
+  });
+});
 
 test('isNode', () => {
   expect(IS_BROWSER).toBe(false);
@@ -50,6 +71,7 @@ describe('getSelectorFromName()', () => {
     );
   });
 });
+
 describe('computeHashOnElements()', () => {
   test('should return valid hash for empty array', () => {
     const res = hash.computeHashOnElements([]);
@@ -68,13 +90,14 @@ describe('computeHashOnElements()', () => {
     );
   });
 });
+
 describe('estimatedFeeToMaxFee()', () => {
   test('should return maxFee for 0', () => {
-    const res = stark.estimatedFeeToMaxFee(0, 0.15);
+    const res = stark.estimatedFeeToMaxFee(0, 15);
     expect(res).toBe(0n);
   });
   test('should return maxFee for 10_000', () => {
-    const res = stark.estimatedFeeToMaxFee(10_000, 0.15);
+    const res = stark.estimatedFeeToMaxFee(10_000, 15);
     expect(res).toBe(11500n);
   });
 });
@@ -113,21 +136,5 @@ describe('calculateContractAddressFromHash()', () => {
     expect(starkCurveSpy).toHaveBeenCalled();
     expect(BigInt(res)).toBeLessThan(constants.ADDR_BOUND);
     starkCurveSpy.mockRestore();
-  });
-});
-
-describe('new Block()', () => {
-  test('Block identifier and queryIdentifier', () => {
-    const blockA = new Block(0);
-    expect(blockA.identifier).toMatchObject({ block_number: 0 });
-    expect(blockA.queryIdentifier).toBe('blockNumber=0');
-
-    const blockB = new Block('latest');
-    expect(blockB.identifier).toBe('latest');
-    expect(blockB.queryIdentifier).toBe('blockNumber=latest');
-
-    const blockC = new Block('0x01');
-    expect(blockC.identifier).toMatchObject({ block_hash: '0x01' });
-    expect(blockC.queryIdentifier).toBe('blockHash=0x01');
   });
 });

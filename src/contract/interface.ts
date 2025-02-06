@@ -1,5 +1,4 @@
-import type { Abi as AbiKanabiV1, TypedContract as AbiWanTypedContractV1 } from 'abi-wan-kanabi-v1';
-import type { Abi as AbiKanabiV2, TypedContract as AbiWanTypedContractV2 } from 'abi-wan-kanabi-v2';
+import type { Abi as AbiKanabi, TypedContract as AbiWanTypedContract } from 'abi-wan-kanabi';
 
 import { AccountInterface } from '../account';
 import { ProviderInterface } from '../provider';
@@ -14,7 +13,6 @@ import {
   ContractFunction,
   ContractVersion,
   EstimateFeeResponse,
-  GetTransactionReceiptResponse,
   Invocation,
   InvokeFunctionResponse,
   InvokeOptions,
@@ -26,11 +24,14 @@ import {
 import { CairoCustomEnum } from '../utils/calldata/enum/CairoCustomEnum';
 import { CairoOption } from '../utils/calldata/enum/CairoOption';
 import { CairoResult } from '../utils/calldata/enum/CairoResult';
+import type { GetTransactionReceiptResponse } from '../utils/transactionReceipt';
 
-declare module 'abi-wan-kanabi-v2' {
+declare module 'abi-wan-kanabi' {
   export interface Config<OptionT = any, ResultT = any, ErrorT = any> {
     FeltType: BigNumberish;
     U256Type: number | bigint | Uint256;
+    U512Type: BigNumberish;
+    Secp256k1PointType: BigNumberish;
     Option: CairoOption<OptionT>;
     Tuple: Record<number, BigNumberish | object | boolean>;
     Result: CairoResult<ResultT, ErrorT>;
@@ -42,9 +43,7 @@ declare module 'abi-wan-kanabi-v2' {
   }
 }
 
-export type TypedContractV1<TAbi extends AbiKanabiV1> = AbiWanTypedContractV1<TAbi> &
-  ContractInterface;
-type TypedContractV2<TAbi extends AbiKanabiV2> = AbiWanTypedContractV2<TAbi> & ContractInterface;
+type TypedContractV2<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & ContractInterface;
 
 export abstract class ContractInterface {
   public abstract abi: Abi;
@@ -163,6 +162,11 @@ export abstract class ContractInterface {
    */
   public abstract getVersion(): Promise<ContractVersion>;
 
-  public abstract typedv1<TAbi extends AbiKanabiV1>(tAbi: TAbi): TypedContractV1<TAbi>;
-  public abstract typedv2<TAbi extends AbiKanabiV2>(tAbi: TAbi): TypedContractV2<TAbi>;
+  /**
+   * Returns a typed instance of ContractV2 based on the supplied ABI.
+   *
+   * @param {TAbi} tAbi - The ABI (Abstract Binary Interface) of the ContractV2.
+   * @return {TypedContractV2<TAbi>} - A typed instance of ContractV2.
+   */
+  public abstract typedv2<TAbi extends AbiKanabi>(tAbi: TAbi): TypedContractV2<TAbi>;
 }

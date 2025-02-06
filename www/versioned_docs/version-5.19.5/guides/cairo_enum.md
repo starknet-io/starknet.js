@@ -30,11 +30,11 @@ fn test(self: @ContractState, val1: u16) -> Option<Order> {
 In your code, the Starknet.js response will be an instance of the CairoOption class:
 
 ```typescript
-import { CairoOption } from "starknet";
+import { CairoOption } from 'starknet';
 type Order = {
-    p1: BigNumberish,
-    p2: BigNumberish,
-}
+  p1: BigNumberish;
+  p2: BigNumberish;
+};
 const res: CairoOption<Order> = await myTestContract.test(50);
 const res2: CairoOption<Order> = await myTestContract.test(150);
 ```
@@ -71,13 +71,17 @@ fn test5(self: @ContractState, inp: Option<Order>) -> u16 {
 In your code, the Starknet.js request is an instance of the CairoOption class:
 
 ```typescript
-import { CairoOption, CairoOptionVariant } from "starknet";
+import { CairoOption, CairoOptionVariant } from 'starknet';
 type Order = {
-    p1: BigNumberish,
-    p2: BigNumberish,
-}
-const res = await myTestContract.call("test5", [new CairoOption<Order>(CairoOptionVariant.Some, {p1:20, p2:40})]) as bigint;
-const res2 = await myTestContract.call("test5", [new CairoOption<Order>(CairoOptionVariant.None)]) as bigint;
+  p1: BigNumberish;
+  p2: BigNumberish;
+};
+const res = (await myTestContract.call('test5', [
+  new CairoOption<Order>(CairoOptionVariant.Some, { p1: 20, p2: 40 }),
+])) as bigint;
+const res2 = (await myTestContract.call('test5', [
+  new CairoOption<Order>(CairoOptionVariant.None),
+])) as bigint;
 ```
 
 ## Cairo Result
@@ -101,10 +105,10 @@ fn test(self: @ContractState, val1: u16) -> Result<u16, u16> {
 In your code, the Starknet.js response will be an instance of the CairoResult class:
 
 ```typescript
-import { CairoResult } from "starknet";
+import { CairoResult } from 'starknet';
 
-const res:CairoResult<bigint, bigint> = await myTestContract.test(90);
-const res2 = (await myTestContract.call("test", [110])) as CairoResult<bigint, bigint>;
+const res: CairoResult<bigint, bigint> = await myTestContract.test(90);
+const res2 = (await myTestContract.call('test', [110])) as CairoResult<bigint, bigint>;
 ```
 
 In `CairoResult<T, U>`, T is the type of the data related to the `Ok` variant, and U is the type of the data related to the `Err` variant.  
@@ -139,10 +143,14 @@ fn test8(self: @ContractState, inp: Result<Order, u16>) -> u16 {
 In your code, the Starknet.js request is an instance of the CairoResult class:
 
 ```typescript
-import { CairoResult, CairoResultVariant } from "starknet";
+import { CairoResult, CairoResultVariant } from 'starknet';
 
-const res = await myTestContract.call("test8", [new CairoResult<Order, BigNumberish>(CairoResultVariant.Ok, {p1:50, p2:60})]) as bigint;
-const res2 = await myTestContract.call("test8", [new CairoResult<Order, BigNumberish>(CairoResultVariant.Err, 50)])as bigint;
+const res = (await myTestContract.call('test8', [
+  new CairoResult<Order, BigNumberish>(CairoResultVariant.Ok, { p1: 50, p2: 60 }),
+])) as bigint;
+const res2 = (await myTestContract.call('test8', [
+  new CairoResult<Order, BigNumberish>(CairoResultVariant.Err, 50),
+])) as bigint;
 ```
 
 ## Cairo custom Enum
@@ -187,7 +195,7 @@ This example Enum has 5 variants (`Response`, `Warning`, `Error`, `Critical` and
 In your code, the Starknet.js response will be an instance of the CairoCustomEnum class:
 
 ```typescript
-import { CairoCustomEnum } from "starknet";
+import { CairoCustomEnum } from 'starknet';
 
 const res: CairoCustomEnum = await myTestContract.test(10);
 const res2: CairoCustomEnum = await myTestContract.test(100);
@@ -214,8 +222,8 @@ const c5: Object = res5.unwrap(); // {}
 > In a `CairoCustomEnum` instance, you can also have a direct access to the content of a variant:
 
 ```typescript
-const d: Order = res4.variant.Response // { p1: 1n, p2: 190n }
-const e = res4.variant["Critical"] // undefined
+const d: Order = res4.variant.Response; // { p1: 1n, p2: 190n }
+const e = res4.variant['Critical']; // undefined
 ```
 
 ### Send Cairo custom Enum
@@ -245,14 +253,20 @@ fn test2a(self: @ContractState, customEnum:MyEnum ) -> u16{
 In your code, the Starknet.js request is an instance of the CairoCustomEnum class:
 
 ```typescript
-import { CairoCustomEnum } from "starknet";
+import { CairoCustomEnum } from 'starknet';
 
 const orderToSend: Order = { p1: 8, p2: 10 };
-const myCustomEnum = new CairoCustomEnum({Response: orderToSend});
-const res14 = await myTestContract.call("test2a", [myCustomEnum]) as bigint;
-const res14c = await myTestContract.call("test2a", [new CairoCustomEnum({ Error: cairo.tuple(100, 110) })]) as bigint;
-const res14d = await myTestContract.call("test2a", [new CairoCustomEnum({ Critical: ["0x10", "0x11"] })]) as bigint;
-const res14e = await myTestContract.call("test2a", [new CairoCustomEnum({ Empty: {} })]) as bigint;
+const myCustomEnum = new CairoCustomEnum({ Response: orderToSend });
+const res14 = (await myTestContract.call('test2a', [myCustomEnum])) as bigint;
+const res14c = (await myTestContract.call('test2a', [
+  new CairoCustomEnum({ Error: cairo.tuple(100, 110) }),
+])) as bigint;
+const res14d = (await myTestContract.call('test2a', [
+  new CairoCustomEnum({ Critical: ['0x10', '0x11'] }),
+])) as bigint;
+const res14e = (await myTestContract.call('test2a', [
+  new CairoCustomEnum({ Empty: {} }),
+])) as bigint;
 ```
 
 Take care that if you call a method that do not use the abi (as `CallData.compile`), you have to list all the variants of the enum, like this:
@@ -260,12 +274,12 @@ Take care that if you call a method that do not use the abi (as `CallData.compil
 ```typescript
 const orderToSend: Order = { p1: 8, p2: 10 };
 const myCustomEnum = new CairoCustomEnum({
-    Response: undefined,
-    Warning: undefined,
-    Error: cairo.tuple(100, 110),
-    Critical: undefined,
-    Empty: undefined
-    });
+  Response: undefined,
+  Warning: undefined,
+  Error: cairo.tuple(100, 110),
+  Critical: undefined,
+  Empty: undefined,
+});
 const myCalldata = CallData.compile(myCustomEnum);
-const res = await myTestContract.call("test2a", myCalldata) as bigint;
+const res = (await myTestContract.call('test2a', myCalldata)) as bigint;
 ```

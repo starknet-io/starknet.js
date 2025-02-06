@@ -2,6 +2,7 @@ import {
   AbiEntry,
   AbiEnums,
   AbiStructs,
+  AllowArray,
   BigNumberish,
   ByteArray,
   CairoEnum,
@@ -9,18 +10,27 @@ import {
   Tupled,
 } from '../../types';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
+import { CairoUint512 } from '../cairoDataTypes/uint512';
+import { addHexPrefix, removeHexPrefix } from '../encode';
+import { toHex } from '../num';
 import { encodeShortString, isText, splitLongString } from '../shortString';
+import { isUndefined, isString } from '../typed';
 import { byteArrayFromString } from './byteArray';
 import {
   felt,
   getArrayType,
   isTypeArray,
+  isTypeByteArray,
   isTypeBytes31,
   isTypeEnum,
+  isTypeEthAddress,
+  isTypeNonZero,
   isTypeOption,
   isTypeResult,
+  isTypeSecp256k1Point,
   isTypeStruct,
   isTypeTuple,
+  uint256,
 } from './cairo';
 import {
   CairoCustomEnum,
@@ -37,12 +47,25 @@ import extractTupleMemberTypes from './tuple';
  * @param val value provided
  * @returns string | string[]
  */
-function parseBaseTypes(type: string, val: BigNumberish) {
+function parseBaseTypes(type: string, val: BigNumberish): AllowArray<string> {
   switch (true) {
     case CairoUint256.isAbiType(type):
       return new CairoUint256(val).toApiRequest();
+    case CairoUint512.isAbiType(type):
+      return new CairoUint512(val).toApiRequest();
     case isTypeBytes31(type):
       return encodeShortString(val.toString());
+    case isTypeSecp256k1Point(type): {
+      const pubKeyETH = removeHexPrefix(toHex(val)).padStart(128, '0');
+      const pubKeyETHy = uint256(addHexPrefix(pubKeyETH.slice(-64)));
+      const pubKeyETHx = uint256(addHexPrefix(pubKeyETH.slice(0, -64)));
+      return [
+        felt(pubKeyETHx.low),
+        felt(pubKeyETHx.high),
+        felt(pubKeyETHy.low),
+        felt(pubKeyETHy.high),
+      ];
+    }
     default:
       return felt(val);
   }
@@ -61,7 +84,7 @@ function parseTuple(element: object, typeStr: string): Tupled[] {
   if (elements.length !== memberTypes.length) {
     throw Error(
       `ParseTuple: provided and expected abi tuple size do not match.
-      provided: ${elements} 
+      provided: ${elements}
       expected: ${memberTypes}`
     );
   }
@@ -125,11 +148,12 @@ function parseCalldataValue(
     if (CairoUint256.isAbiType(type)) {
       return new CairoUint256(element as any).toApiRequest();
     }
+    if (CairoUint512.isAbiType(type)) {
+      return new CairoUint512(element as any).toApiRequest();
+    }
+    if (isTypeEthAddress(type)) return parseBaseTypes(type, element as BigNumberish);
 
-    if (type === 'core::starknet::eth_address::EthAddress')
-      return parseBaseTypes(type, element as BigNumberish);
-
-    if (type === 'core::byte_array::ByteArray') return parseByteArray(element as string);
+    if (isTypeByteArray(type)) return parseByteArray(element as string);
 
     const { members } = structs[type];
     const subElement = element as any;
@@ -151,6 +175,10 @@ function parseCalldataValue(
   if (CairoUint256.isAbiType(type)) {
     return new CairoUint256(element as any).toApiRequest();
   }
+  // check if u512
+  if (CairoUint512.isAbiType(type)) {
+    return new CairoUint512(element as any).toApiRequest();
+  }
   // check if Enum
   if (isTypeEnum(type, enums)) {
     const { variants } = enums[type];
@@ -159,7 +187,7 @@ function parseCalldataValue(
       const myOption = element as CairoOption<any>;
       if (myOption.isSome()) {
         const listTypeVariant = variants.find((variant) => variant.name === 'Some');
-        if (typeof listTypeVariant === 'undefined') {
+        if (isUndefined(listTypeVariant)) {
           throw Error(`Error in abi : Option has no 'Some' variant.`);
         }
         const typeVariantSome = listTypeVariant.type;
@@ -184,7 +212,7 @@ function parseCalldataValue(
       const myResult = element as CairoResult<any, any>;
       if (myResult.isOk()) {
         const listTypeVariant = variants.find((variant) => variant.name === 'Ok');
-        if (typeof listTypeVariant === 'undefined') {
+        if (isUndefined(listTypeVariant)) {
           throw Error(`Error in abi : Result has no 'Ok' variant.`);
         }
         const typeVariantOk = listTypeVariant.type;
@@ -202,9 +230,10 @@ function parseCalldataValue(
         }
         return [CairoResultVariant.Ok.toString(), parsedParameter];
       }
+
       // is Result::Err
       const listTypeVariant = variants.find((variant) => variant.name === 'Err');
-      if (typeof listTypeVariant === 'undefined') {
+      if (isUndefined(listTypeVariant)) {
         throw Error(`Error in abi : Result has no 'Err' variant.`);
       }
       const typeVariantErr = listTypeVariant.type;
@@ -221,7 +250,7 @@ function parseCalldataValue(
     const myEnum = element as CairoCustomEnum;
     const activeVariant: string = myEnum.activeVariant();
     const listTypeVariant = variants.find((variant) => variant.name === activeVariant);
-    if (typeof listTypeVariant === 'undefined') {
+    if (isUndefined(listTypeVariant)) {
       throw Error(`Not find in abi : Enum has no '${activeVariant}' variant.`);
     }
     const typeActiveVariant = listTypeVariant.type;
@@ -236,6 +265,10 @@ function parseCalldataValue(
     return [numActiveVariant.toString(), parsedParameter];
   }
 
+  if (isTypeNonZero(type)) {
+    return parseBaseTypes(getArrayType(type), element as BigNumberish);
+  }
+
   if (typeof element === 'object') {
     throw Error(`Parameter ${element} do not align with abi parameter ${type}`);
   }
@@ -245,11 +278,53 @@ function parseCalldataValue(
 /**
  * Parse one field of the calldata by using input field from the abi for that method
  *
- * @param argsIterator - Iterator<any> for value of the field
+ * @param argsIterator - Iterator for value of the field
  * @param input  - input(field) information from the abi that will be used to parse the data
  * @param structs - structs from abi
  * @param enums - enums from abi
  * @return {string | string[]} - parsed arguments in format that contract is expecting
+ *
+ * @example
+ * const abiEntry = { name: 'test', type: 'struct' };
+ * const abiStructs: AbiStructs = {
+ *  struct: {
+ *    members: [
+ *        {
+ *          name: 'test_name',
+ *          type: 'test_type',
+ *          offset: 1,
+ *        },
+ *    ],
+ *    size: 2,
+ *    name: 'cairo__struct',
+ *    type: 'struct',
+ *   },
+ * };
+ *
+ * const abiEnums: AbiEnums = {
+ *   enum: {
+ *     variants: [
+ *       {
+ *         name: 'test_name',
+ *         type: 'cairo_struct_variant',
+ *         offset: 1,
+ *       },
+ *     ],
+ *     size: 2,
+ *     name: 'test_cairo',
+ *     type: 'enum',
+ *   },
+ * };
+ *
+ * const args = [{ test_name: 'test' }];
+ * const argsIterator = args[Symbol.iterator]();
+ * const parsedField = parseCalldataField(
+ *   argsIterator,
+ *   abiEntry,
+ *   abiStructs,
+ *   abiEnums
+ * );
+ * // parsedField === ['1952805748']
  */
 export function parseCalldataField(
   argsIterator: Iterator<any>,
@@ -266,13 +341,14 @@ export function parseCalldataField(
       if (!Array.isArray(value) && !isText(value)) {
         throw Error(`ABI expected parameter ${name} to be array or long string, got ${value}`);
       }
-      if (typeof value === 'string') {
+      if (isString(value)) {
         // long string match cairo felt*
         value = splitLongString(value);
       }
       return parseCalldataValue(value, input.type, structs, enums);
-
-    case type === 'core::starknet::eth_address::EthAddress':
+    case isTypeNonZero(type):
+      return parseBaseTypes(getArrayType(type), value);
+    case isTypeEthAddress(type):
       return parseBaseTypes(type, value);
     // Struct or Tuple
     case isTypeStruct(type, structs) || isTypeTuple(type) || CairoUint256.isAbiType(type):

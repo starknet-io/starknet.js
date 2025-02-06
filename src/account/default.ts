@@ -1,4 +1,10 @@
-import { UDC, ZERO } from '../constants';
+import {
+  OutsideExecutionCallerAny,
+  SNIP9_V1_INTERFACE_ID,
+  SNIP9_V2_INTERFACE_ID,
+  UDC,
+  ZERO,
+} from '../global/constants';
 import { Provider, ProviderInterface } from '../provider';
 import { Signer, SignerInterface } from '../signer';
 import {
@@ -21,6 +27,7 @@ import {
   DeployContractUDCResponse,
   DeployTransactionReceiptResponse,
   EstimateFee,
+  UniversalSuggestedFee,
   EstimateFeeAction,
   EstimateFeeBulk,
   Invocation,
@@ -38,26 +45,38 @@ import {
   UniversalDeployerContractPayload,
   UniversalDetails,
 } from '../types';
-import { ETransactionVersion, ETransactionVersion3, ResourceBounds } from '../types/api';
+import { ETransactionVersion, ETransactionVersion3, type ResourceBounds } from '../types/api';
+import {
+  OutsideExecutionVersion,
+  type OutsideExecution,
+  type OutsideExecutionOptions,
+  type OutsideTransaction,
+} from '../types/outsideExecution';
 import { CallData } from '../utils/calldata';
 import { extractContractHashes, isSierra } from '../utils/contract';
-import { starkCurve } from '../utils/ec';
 import { parseUDCEvent } from '../utils/events';
 import { calculateContractAddressFromHash } from '../utils/hash';
-import { toBigInt, toCairoBool } from '../utils/num';
+import { isUndefined, isString } from '../utils/typed';
+import { isHex, toBigInt, toCairoBool, toHex } from '../utils/num';
+import {
+  buildExecuteFromOutsideCallData,
+  getOutsideCall,
+  getTypedData,
+} from '../utils/outsideExecution';
 import { parseContract } from '../utils/provider';
+import { supportsInterface } from '../utils/src5';
 import {
   estimateFeeToBounds,
-  formatSignature,
   randomAddress,
   reduceV2,
   toFeeVersion,
   toTransactionVersion,
   v3Details,
 } from '../utils/stark';
-import { getExecuteCalldata } from '../utils/transaction';
+import { buildUDCCall, getExecuteCalldata } from '../utils/transaction';
 import { getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
+import { config } from '../global/config';
 
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
@@ -66,19 +85,21 @@ export class Account extends Provider implements AccountInterface {
 
   public cairoVersion: CairoVersion;
 
-  readonly transactionVersion: ETransactionVersion.V2 | ETransactionVersion.V3;
+  readonly transactionVersion: typeof ETransactionVersion.V2 | typeof ETransactionVersion.V3;
 
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
     address: string,
     pkOrSigner: Uint8Array | string | SignerInterface,
     cairoVersion?: CairoVersion,
-    transactionVersion: ETransactionVersion.V2 | ETransactionVersion.V3 = ETransactionVersion.V2 // TODO: Discuss this, set to v2 for backward compatibility
+    transactionVersion: typeof ETransactionVersion.V2 | typeof ETransactionVersion.V3 = config.get(
+      'accountTxVersion'
+    )
   ) {
     super(providerOrOptions);
     this.address = address.toLowerCase();
     this.signer =
-      typeof pkOrSigner === 'string' || pkOrSigner instanceof Uint8Array
+      isString(pkOrSigner) || pkOrSigner instanceof Uint8Array
         ? new Signer(pkOrSigner)
         : pkOrSigner;
 
@@ -89,7 +110,7 @@ export class Account extends Provider implements AccountInterface {
   }
 
   // provided version or contract based preferred transactionVersion
-  private getPreferredVersion(type12: ETransactionVersion, type3: ETransactionVersion) {
+  protected getPreferredVersion(type12: ETransactionVersion, type3: ETransactionVersion) {
     if (this.transactionVersion === ETransactionVersion.V3) return type3;
     if (this.transactionVersion === ETransactionVersion.V2) return type12;
 
@@ -100,8 +121,8 @@ export class Account extends Provider implements AccountInterface {
     return super.getNonceForAddress(this.address, blockIdentifier);
   }
 
-  private async getNonceSafe(nonce?: BigNumberish) {
-    // Patch DEPLOY_ACCOUNT: RPC getNonce for non-existing address will result in error, on Sequencer it is '0x0'
+  protected async getNonceSafe(nonce?: BigNumberish) {
+    // Patch DEPLOY_ACCOUNT: RPC getNonce for non-existing address will result in error
     try {
       return toBigInt(nonce ?? (await this.getNonce()));
     } catch (error) {
@@ -110,7 +131,7 @@ export class Account extends Provider implements AccountInterface {
   }
 
   /**
-   * Retrieves the Cairo version from the network and sets `cairoVersion` if not already set in the constructor
+   * Retrieves the Cairo version from the network and sets `cairoVersion` if not already set in the constructor.
    * @param classHash if provided detects Cairo version from classHash, otherwise from the account address
    */
   public async getCairoVersion(classHash?: string) {
@@ -134,7 +155,12 @@ export class Account extends Provider implements AccountInterface {
     calls: AllowArray<Call>,
     details: UniversalDetails = {}
   ): Promise<EstimateFee> {
-    const { nonce: providedNonce, blockIdentifier, version: providedVersion } = details;
+    const {
+      nonce: providedNonce,
+      blockIdentifier,
+      version: providedVersion,
+      skipValidate = true,
+    } = details;
 
     const transactions = Array.isArray(calls) ? calls : [calls];
     const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
@@ -152,6 +178,7 @@ export class Account extends Provider implements AccountInterface {
       version,
       chainId,
       cairoVersion: await this.getCairoVersion(),
+      skipValidate,
     };
 
     const invocation = await this.buildInvocation(transactions, signerDetails);
@@ -167,7 +194,12 @@ export class Account extends Provider implements AccountInterface {
     payload: DeclareContractPayload,
     details: UniversalDetails = {}
   ): Promise<EstimateFee> {
-    const { blockIdentifier, nonce: providedNonce, version: providedVersion } = details;
+    const {
+      blockIdentifier,
+      nonce: providedNonce,
+      version: providedVersion,
+      skipValidate = true,
+    } = details;
     const nonce = toBigInt(providedNonce ?? (await this.getNonce()));
     const version = toTransactionVersion(
       !isSierra(payload.contract)
@@ -185,6 +217,7 @@ export class Account extends Provider implements AccountInterface {
       walletAddress: this.address,
       maxFee: ZERO,
       cairoVersion: undefined, // unused parameter
+      skipValidate,
     });
 
     return super.getDeclareEstimateFee(
@@ -204,7 +237,7 @@ export class Account extends Provider implements AccountInterface {
     }: DeployAccountContractPayload,
     details: UniversalDetails = {}
   ): Promise<EstimateFee> {
-    const { blockIdentifier, version: providedVersion } = details;
+    const { blockIdentifier, version: providedVersion, skipValidate = true } = details;
     const version = toTransactionVersion(
       this.getPreferredVersion(ETransactionVersion.F1, ETransactionVersion.F3),
       toFeeVersion(providedVersion)
@@ -222,6 +255,7 @@ export class Account extends Provider implements AccountInterface {
         walletAddress: this.address, // unused parameter
         maxFee: ZERO,
         cairoVersion: undefined, // unused parameter,
+        skipValidate,
       }
     );
 
@@ -245,7 +279,8 @@ export class Account extends Provider implements AccountInterface {
     invocations: Invocations,
     details: UniversalDetails = {}
   ): Promise<EstimateFeeBulk> {
-    const { nonce, blockIdentifier, version } = details;
+    if (!invocations.length) throw TypeError('Invocations should be non-empty array');
+    const { nonce, blockIdentifier, version, skipValidate } = details;
     const accountInvocations = await this.accountInvocationsFactory(invocations, {
       ...v3Details(details),
       versions: [
@@ -257,11 +292,12 @@ export class Account extends Provider implements AccountInterface {
       ],
       nonce,
       blockIdentifier,
+      skipValidate,
     });
 
     return super.getEstimateFeeBulk(accountInvocations, {
       blockIdentifier,
-      skipValidate: details.skipValidate,
+      skipValidate,
     });
   }
 
@@ -269,7 +305,8 @@ export class Account extends Provider implements AccountInterface {
     invocations: Invocations,
     details: SimulateTransactionDetails = {}
   ): Promise<SimulateTransactionResponse> {
-    const { nonce, blockIdentifier, skipValidate, skipExecute, version } = details;
+    if (!invocations.length) throw TypeError('Invocations should be non-empty array');
+    const { nonce, blockIdentifier, skipValidate = true, skipExecute, version } = details;
     const accountInvocations = await this.accountInvocationsFactory(invocations, {
       ...v3Details(details),
       versions: [
@@ -281,6 +318,7 @@ export class Account extends Provider implements AccountInterface {
       ],
       nonce,
       blockIdentifier,
+      skipValidate,
     });
 
     return super.getSimulateTransaction(accountInvocations, {
@@ -291,11 +329,21 @@ export class Account extends Provider implements AccountInterface {
   }
 
   public async execute(
-    calls: AllowArray<Call>,
-    abis: Abi[] | undefined = undefined,
-    details: UniversalDetails = {}
+    transactions: AllowArray<Call>,
+    transactionsDetail?: UniversalDetails
+  ): Promise<InvokeFunctionResponse>;
+  public async execute(
+    transactions: AllowArray<Call>,
+    abis?: Abi[],
+    transactionsDetail?: UniversalDetails
+  ): Promise<InvokeFunctionResponse>;
+  public async execute(
+    transactions: AllowArray<Call>,
+    arg2?: Abi[] | UniversalDetails,
+    transactionsDetail: UniversalDetails = {}
   ): Promise<InvokeFunctionResponse> {
-    const transactions = Array.isArray(calls) ? calls : [calls];
+    const details = arg2 === undefined || Array.isArray(arg2) ? transactionsDetail : arg2;
+    const calls = Array.isArray(transactions) ? transactions : [transactions];
     const nonce = toBigInt(details.nonce ?? (await this.getNonce()));
     const version = toTransactionVersion(
       this.getPreferredVersion(ETransactionVersion.V1, ETransactionVersion.V3), // TODO: does this depend on cairo version ?
@@ -304,7 +352,7 @@ export class Account extends Provider implements AccountInterface {
 
     const estimate = await this.getUniversalSuggestedFee(
       version,
-      { type: TransactionType.INVOKE, payload: calls },
+      { type: TransactionType.INVOKE, payload: transactions },
       {
         ...details,
         version,
@@ -324,9 +372,9 @@ export class Account extends Provider implements AccountInterface {
       cairoVersion: await this.getCairoVersion(),
     };
 
-    const signature = await this.signer.signTransaction(transactions, signerDetails, abis);
+    const signature = await this.signer.signTransaction(calls, signerDetails);
 
-    const calldata = getExecuteCalldata(transactions, await this.getCairoVersion());
+    const calldata = getExecuteCalldata(calls, await this.getCairoVersion());
 
     return this.invokeFunction(
       { contractAddress: this.address, calldata, signature },
@@ -410,40 +458,7 @@ export class Account extends Provider implements AccountInterface {
     payload: UniversalDeployerContractPayload | UniversalDeployerContractPayload[],
     details: UniversalDetails = {}
   ): Promise<MultiDeployContractResponse> {
-    const params = [].concat(payload as []).map((it) => {
-      const {
-        classHash,
-        salt,
-        unique = true,
-        constructorCalldata = [],
-      } = it as UniversalDeployerContractPayload;
-
-      const compiledConstructorCallData = CallData.compile(constructorCalldata);
-      const deploySalt = salt ?? randomAddress();
-
-      return {
-        call: {
-          contractAddress: UDC.ADDRESS,
-          entrypoint: UDC.ENTRYPOINT,
-          calldata: [
-            classHash,
-            deploySalt,
-            toCairoBool(unique),
-            compiledConstructorCallData.length,
-            ...compiledConstructorCallData,
-          ],
-        },
-        address: calculateContractAddressFromHash(
-          unique ? starkCurve.pedersen(this.address, deploySalt) : deploySalt,
-          classHash,
-          compiledConstructorCallData,
-          unique ? UDC.ADDRESS : 0
-        ),
-      };
-    });
-
-    const calls = params.map((it) => it.call);
-    const addresses = params.map((it) => it.address);
+    const { calls, addresses } = buildUDCCall(payload, this.address);
     const invokeResponse = await this.execute(calls, undefined, details);
 
     return {
@@ -548,51 +563,230 @@ export class Account extends Provider implements AccountInterface {
     return getMessageHash(typedData, this.address);
   }
 
-  public async verifyMessageHash(hash: BigNumberish, signature: Signature): Promise<boolean> {
+  /**
+   * @deprecated To replace by `myRpcProvider.verifyMessageInStarknet()`
+   */
+  public async verifyMessageHash(
+    hash: BigNumberish,
+    signature: Signature,
+    signatureVerificationFunctionName?: string,
+    signatureVerificationResponse?: { okResponse: string[]; nokResponse: string[]; error: string[] }
+  ): Promise<boolean> {
+    return this.verifyMessageInStarknet(
+      hash,
+      signature,
+      this.address,
+      signatureVerificationFunctionName,
+      signatureVerificationResponse
+    );
+  }
+
+  /**
+   * @deprecated To replace by `myRpcProvider.verifyMessageInStarknet()`
+   */
+  public async verifyMessage(
+    typedData: TypedData,
+    signature: Signature,
+    signatureVerificationFunctionName?: string,
+    signatureVerificationResponse?: { okResponse: string[]; nokResponse: string[]; error: string[] }
+  ): Promise<boolean> {
+    return this.verifyMessageInStarknet(
+      typedData,
+      signature,
+      this.address,
+      signatureVerificationFunctionName,
+      signatureVerificationResponse
+    );
+  }
+
+  /**
+   * Verify if an account is compatible with SNIP-9 outside execution, and with which version of this standard.
+   * @returns {OutsideExecutionVersion} Not compatible, V1, V2.
+   * @example
+   * ```typescript
+   * const result = myAccount.getSnip9Version();
+   * // result = "V1"
+   * ```
+   */
+  public async getSnip9Version(): Promise<OutsideExecutionVersion> {
+    if (await supportsInterface(this, this.address, SNIP9_V2_INTERFACE_ID)) {
+      return OutsideExecutionVersion.V2;
+    }
+    if (await supportsInterface(this, this.address, SNIP9_V1_INTERFACE_ID)) {
+      return OutsideExecutionVersion.V1;
+    }
+    // Account does not support either version 2 or version 1
+    return OutsideExecutionVersion.UNSUPPORTED;
+  }
+
+  /**
+   * Verify if a SNIP-9 nonce has not yet been used by the account.
+   * @param {BigNumberish} nonce SNIP-9 nonce to test.
+   * @returns  {boolean} true if SNIP-9 nonce not yet used.
+   * @example
+   * ```typescript
+   * const result = myAccount.isValidSnip9Nonce(1234);
+   * // result = true
+   * ```
+   */
+  public async isValidSnip9Nonce(nonce: BigNumberish): Promise<boolean> {
     try {
-      const resp = await this.callContract({
+      const call: Call = {
         contractAddress: this.address,
-        entrypoint: 'isValidSignature',
-        calldata: CallData.compile({
-          hash: toBigInt(hash).toString(),
-          signature: formatSignature(signature),
-        }),
-      });
-      if (BigInt(resp[0]) === 0n) {
-        // OpenZeppelin 0.8.0 invalid signature
-        return false;
-      }
-      // OpenZeppelin 0.8.0, ArgentX 0.3.0 & Braavos Cairo 0 valid signature
-      return true;
-    } catch (err) {
-      if (
-        ['argent/invalid-signature', 'is invalid, with respect to the public key'].some(
-          (errMessage) => (err as Error).message.includes(errMessage)
-        )
-      ) {
-        // ArgentX 0.3.0 invalid signature, Braavos Cairo 0 invalid signature
-        return false;
-      }
-      throw Error(`Signature verification request is rejected by the network: ${err}`);
+        entrypoint: 'is_valid_outside_execution_nonce',
+        calldata: [toHex(nonce)],
+      };
+      const resp = await this.callContract(call);
+      return BigInt(resp[0]) !== 0n;
+    } catch (error) {
+      throw new Error(`Failed to check if nonce is valid: ${error}`);
     }
   }
 
-  public async verifyMessage(typedData: TypedData, signature: Signature): Promise<boolean> {
-    const hash = await this.hashMessage(typedData);
-    return this.verifyMessageHash(hash, signature);
+  /**
+   * Outside transaction needs a specific SNIP-9 nonce, that we get in this function.
+   * A SNIP-9 nonce can be any number not yet used ; no ordering is needed.
+   * @returns  {string} an Hex string of a SNIP-9 nonce.
+   * @example
+   * ```typescript
+   * const result = myAccount.getSnip9Nonce();
+   * // result = "0x28a612590dbc36927933c8ee0f357eee639c8b22b3d3aa86949eed3ada4ac55"
+   * ```
+   */
+  public async getSnip9Nonce(): Promise<string> {
+    const nonce = randomAddress();
+    const isValidNonce = await this.isValidSnip9Nonce(nonce);
+    if (!isValidNonce) {
+      return this.getSnip9Nonce();
+    }
+    return nonce;
+  }
+
+  /**
+   * Creates an object containing transaction(s) that can be executed by an other account with` Account.executeFromOutside()`, called Outside Transaction.
+   * @param {OutsideExecutionOptions} options Parameters of the transaction(s).
+   * @param {AllowArray<Call>} calls Transaction(s) to execute.
+   * @param {OutsideExecutionVersion} [version] SNIP-9 version of the Account that creates the outside transaction.
+   * @param {BigNumberish} [nonce] Outside Nonce.
+   * @returns {OutsideTransaction} and object that can be used in `Account.executeFromOutside()`
+   * @example
+   * ```typescript
+   * const now_seconds = Math.floor(Date.now() / 1000);
+   * const callOptions: OutsideExecutionOptions = {
+      caller: executorAccount.address, execute_after: now_seconds - 3600, execute_before: now_seconds + 3600 };
+   * const call1: Call = { contractAddress: ethAddress, entrypoint: 'transfer', calldata: {
+   *     recipient: recipientAccount.address, amount: cairo.uint256(100) } };
+   * const outsideTransaction1: OutsideTransaction = await signerAccount.getOutsideTransaction(callOptions, call3);
+   * // result = {
+   * // outsideExecution: {
+   * // caller: '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691',
+   * // nonce: '0x28a612590dbc36927933c8ee0f357eee639c8b22b3d3aa86949eed3ada4ac55',
+   * // execute_after: 1723650229, execute_before: 1723704229, calls: [[Object]] },
+   * // signature: Signature {
+   * // r: 67518627037915514985321278857825384106482999609634873287406612756843916814n,
+   * // s: 737198738569840639192844101690009498983611654458636624293579534560862067709n, recovery: 0 },
+   * // signerAddress: '0x655f8fd7c4013c07cf12a92184aa6c314d181443913e21f7e209a18f0c78492',
+   * // version: '2'
+   * // }
+   * ```
+   */
+  public async getOutsideTransaction(
+    options: OutsideExecutionOptions,
+    calls: AllowArray<Call>,
+    version?: OutsideExecutionVersion,
+    nonce?: BigNumberish
+  ): Promise<OutsideTransaction> {
+    if (!isHex(options.caller) && options.caller !== 'ANY_CALLER') {
+      throw new Error(`The caller ${options.caller} is not valid.`);
+    }
+    const codedCaller: string = isHex(options.caller) ? options.caller : OutsideExecutionCallerAny;
+    const myCalls: Call[] = Array.isArray(calls) ? calls : [calls];
+    const supportedVersion = version ?? (await this.getSnip9Version());
+    if (!supportedVersion) {
+      throw new Error('This account is not handling outside transactions.');
+    }
+    const myNonce = nonce ? toHex(nonce) : await this.getSnip9Nonce();
+    const message = getTypedData(
+      await this.getChainId(),
+      {
+        caller: codedCaller,
+        execute_after: options.execute_after,
+        execute_before: options.execute_before,
+      },
+      myNonce,
+      myCalls,
+      supportedVersion
+    );
+    const sign: Signature = await this.signMessage(message);
+    const toExecute: OutsideExecution = {
+      caller: codedCaller,
+      nonce: myNonce,
+      execute_after: options.execute_after,
+      execute_before: options.execute_before,
+      calls: myCalls.map(getOutsideCall),
+    };
+    return {
+      outsideExecution: toExecute,
+      signature: sign,
+      signerAddress: this.address,
+      version: supportedVersion,
+    };
+  }
+
+  /**
+   * An account B executes a transaction that has been signed by an account A.
+   * Fees are paid by B.
+   * @param {AllowArray<OutsideTransaction>} outsideTransaction the signed transaction generated by `Account.getOutsideTransaction()`.
+   * @param {UniversalDetails} [opts] same options than `Account.execute()`.
+   * @returns {InvokeFunctionResponse} same response than `Account.execute()`.
+   * @example
+   * ```typescript
+   * const outsideTransaction1: OutsideTransaction = await signerAccount.getOutsideTransaction(callOptions, call1);
+   * const outsideTransaction2: OutsideTransaction = await signerAccount.getOutsideTransaction(callOptions4, call4);
+   * const result = await myAccount.executeFromOutside([
+      outsideTransaction1,
+      outsideTransaction2,
+    ]);
+   * // result = { transaction_hash: '0x11233...`}
+   * ```
+   */
+  public async executeFromOutside(
+    outsideTransaction: AllowArray<OutsideTransaction>,
+    opts?: UniversalDetails
+  ): Promise<InvokeFunctionResponse> {
+    const myOutsideTransactions = Array.isArray(outsideTransaction)
+      ? outsideTransaction
+      : [outsideTransaction];
+    const multiCall: Call[] = myOutsideTransactions.map((outsideTx: OutsideTransaction) => {
+      let entrypoint: string;
+      if (outsideTx.version === OutsideExecutionVersion.V1) {
+        entrypoint = 'execute_from_outside';
+      } else if (outsideTx.version === OutsideExecutionVersion.V2) {
+        entrypoint = 'execute_from_outside_v2';
+      } else {
+        throw new Error('Unsupported OutsideExecution version');
+      }
+      return {
+        contractAddress: toHex(outsideTx.signerAddress),
+        entrypoint,
+        calldata: buildExecuteFromOutsideCallData(outsideTx),
+      };
+    });
+    return this.execute(multiCall, opts);
   }
 
   /*
    * Support methods
    */
 
-  private async getUniversalSuggestedFee(
+  protected async getUniversalSuggestedFee(
     version: ETransactionVersion,
     { type, payload }: EstimateFeeAction,
     details: UniversalDetails
-  ) {
+  ): Promise<UniversalSuggestedFee> {
     let maxFee: BigNumberish = 0;
     let resourceBounds: ResourceBounds = estimateFeeToBounds(ZERO);
+
     if (version === ETransactionVersion.V3) {
       resourceBounds =
         details.resourceBounds ??
@@ -609,39 +803,35 @@ export class Account extends Provider implements AccountInterface {
     };
   }
 
-  public async getSuggestedFee({ type, payload }: EstimateFeeAction, details: UniversalDetails) {
-    let feeEstimate: EstimateFee;
-
+  public async getSuggestedFee(
+    { type, payload }: EstimateFeeAction,
+    details: UniversalDetails
+  ): Promise<EstimateFee> {
     switch (type) {
       case TransactionType.INVOKE:
-        feeEstimate = await this.estimateInvokeFee(payload, details);
-        break;
+        return this.estimateInvokeFee(payload, details);
 
       case TransactionType.DECLARE:
-        feeEstimate = await this.estimateDeclareFee(payload, details);
-        break;
+        return this.estimateDeclareFee(payload, details);
 
       case TransactionType.DEPLOY_ACCOUNT:
-        feeEstimate = await this.estimateAccountDeployFee(payload, details);
-        break;
+        return this.estimateAccountDeployFee(payload, details);
 
       case TransactionType.DEPLOY:
-        feeEstimate = await this.estimateDeployFee(payload, details);
-        break;
+        return this.estimateDeployFee(payload, details);
 
       default:
-        feeEstimate = {
+        return {
           gas_consumed: 0n,
           gas_price: 0n,
           overall_fee: ZERO,
           unit: 'FRI',
           suggestedMaxFee: ZERO,
           resourceBounds: estimateFeeToBounds(ZERO),
+          data_gas_consumed: 0n,
+          data_gas_price: 0n,
         };
-        break;
     }
-
-    return feeEstimate;
   }
 
   public async buildInvocation(
@@ -649,7 +839,7 @@ export class Account extends Provider implements AccountInterface {
     details: InvocationsSignerDetails
   ): Promise<Invocation> {
     const calldata = getExecuteCalldata(call, await this.getCairoVersion());
-    const signature = await this.signer.signTransaction(call, details);
+    const signature = !details.skipValidate ? await this.signer.signTransaction(call, details) : [];
 
     return {
       ...v3Details(details),
@@ -667,19 +857,21 @@ export class Account extends Provider implements AccountInterface {
     const compressedCompiledContract = parseContract(contract);
 
     if (
-      typeof compiledClassHash === 'undefined' &&
+      isUndefined(compiledClassHash) &&
       (details.version === ETransactionVersion3.F3 || details.version === ETransactionVersion3.V3)
     ) {
       throw Error('V3 Transaction work with Cairo1 Contracts and require compiledClassHash');
     }
 
-    const signature = await this.signer.signDeclareTransaction({
-      ...details,
-      ...v3Details(details),
-      classHash,
-      compiledClassHash: compiledClassHash as string, // TODO: TS Nekuzi da v2 nemora imat a v3 mora i da je throvano ako nije definiran
-      senderAddress: details.walletAddress,
-    });
+    const signature = !details.skipValidate
+      ? await this.signer.signDeclareTransaction({
+          ...details,
+          ...v3Details(details),
+          classHash,
+          compiledClassHash: compiledClassHash as string, // TODO: TS, cast because optional for v2 and required for v3, thrown if not present
+          senderAddress: details.walletAddress,
+        })
+      : [];
 
     return {
       senderAddress: details.walletAddress,
@@ -703,14 +895,16 @@ export class Account extends Provider implements AccountInterface {
       providedContractAddress ??
       calculateContractAddressFromHash(addressSalt, classHash, compiledCalldata, 0);
 
-    const signature = await this.signer.signDeployAccountTransaction({
-      ...details,
-      ...v3Details(details),
-      classHash,
-      contractAddress,
-      addressSalt,
-      constructorCalldata: compiledCalldata,
-    });
+    const signature = !details.skipValidate
+      ? await this.signer.signDeployAccountTransaction({
+          ...details,
+          ...v3Details(details),
+          classHash,
+          contractAddress,
+          addressSalt,
+          constructorCalldata: compiledCalldata,
+        })
+      : [];
 
     return {
       ...v3Details(details),
@@ -752,7 +946,7 @@ export class Account extends Provider implements AccountInterface {
     invocations: Invocations,
     details: AccountInvocationsFactoryDetails
   ) {
-    const { nonce, blockIdentifier } = details;
+    const { nonce, blockIdentifier, skipValidate = true } = details;
     const safeNonce = await this.getNonceSafe(nonce);
     const chainId = await this.getChainId();
     const versions = details.versions.map((it) => toTransactionVersion(it));
@@ -775,6 +969,7 @@ export class Account extends Provider implements AccountInterface {
           chainId,
           cairoVersion,
           version: '' as ETransactionVersion,
+          skipValidate,
         };
         const common = {
           type: transaction.type,
@@ -796,6 +991,7 @@ export class Account extends Provider implements AccountInterface {
           return {
             ...common,
             ...payload,
+            ...signerDetails,
           };
         }
         if (transaction.type === TransactionType.DEPLOY) {
@@ -809,6 +1005,7 @@ export class Account extends Provider implements AccountInterface {
           return {
             ...common,
             ...payload,
+            ...signerDetails,
             type: TransactionType.INVOKE,
           };
         }
@@ -822,6 +1019,7 @@ export class Account extends Provider implements AccountInterface {
           return {
             ...common,
             ...payload,
+            ...signerDetails,
           };
         }
         if (transaction.type === TransactionType.DEPLOY_ACCOUNT) {
@@ -834,6 +1032,7 @@ export class Account extends Provider implements AccountInterface {
           return {
             ...common,
             ...payload,
+            ...signerDetails,
           };
         }
         throw Error(`accountInvocationsFactory: unsupported transaction type: ${transaction}`);

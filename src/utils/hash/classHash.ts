@@ -4,7 +4,7 @@
 
 import { poseidonHashMany } from '@scure/starknet';
 
-import { ADDR_BOUND, API_VERSION } from '../../constants';
+import { ADDR_BOUND, API_VERSION } from '../../global/constants';
 import {
   BigNumberish,
   Builtins,
@@ -23,6 +23,7 @@ import { addHexPrefix, utf8ToArray } from '../encode';
 import { parse, stringify } from '../json';
 import { toHex } from '../num';
 import { encodeShortString } from '../shortString';
+import { isString } from '../typed';
 
 export function computePedersenHash(a: BigNumberish, b: BigNumberish): string {
   return starkCurve.pedersen(BigInt(a), BigInt(b));
@@ -33,8 +34,16 @@ export function computePoseidonHash(a: BigNumberish, b: BigNumberish): string {
 }
 
 /**
- * Compute pedersen hash from data
- * @returns format: hex-string - pedersen hash
+ * Compute Pedersen hash from data
+ *
+ * @param {BigNumberish[]} data Array of data to compute Pedersen hash on
+ * @returns {string} hex-string of Pedersen hash
+ *
+ * @example
+ * ```typescript
+ * const result = hash.computeHashOnElements(['0xabc', '0x123', '0xabc123'])
+ * // result = 0x148141e8f7db29d005a0187669a56f0790d7e8c2c5b2d780e4d8b9e436a5521
+ * ```
  */
 export function computeHashOnElements(data: BigNumberish[]): string {
   return [...data, data.length]
@@ -50,14 +59,24 @@ export function computePoseidonHashOnElements(data: BigNumberish[]) {
 
 /**
  * Calculate contract address from class hash
- * @returns format: hex-string
+ *
+ * @param {BigNumberish} salt Salt to be used for hashing
+ * @param {BigNumberish} classHash Class hash of contract to generate address for
+ * @param {RawArgs} constructorCalldata Call data for contract constructor
+ * @param {BigNumberish} deployerAddress Address of contract deployer
+ * @returns {string} hex-string
+ * @example
+ * ```typescript
+ * const result = hash.calculateContractAddressFromHash(1234, 0x1cf4fe5d37868d25524cdacb89518d88bf217a9240a1e6fde71cc22c429e0e3, [1234, true, false], 0x052fb1a9ab0db3c4f81d70fea6a2f6e55f57c709a46089b25eeec0e959db3695);
+ * // result = 0x5fb03d3a88d8e474976932f927ff6a9e332e06ed36642ea3e8c7e38bf010f76
+ * ```
  */
 export function calculateContractAddressFromHash(
   salt: BigNumberish,
   classHash: BigNumberish,
   constructorCalldata: RawArgs,
   deployerAddress: BigNumberish
-) {
+): string {
   const compiledCalldata = CallData.compile(constructorCalldata);
   const constructorCalldataHash = computeHashOnElements(compiledCalldata);
 
@@ -86,11 +105,16 @@ function nullSkipReplacer(key: string, value: any) {
 }
 
 /**
- * Format json-string to conform starknet json-string
- * @param json json-string
- * @returns format: json-string
+ * Format json-string without spaces to conform starknet json-string
+ * @param {string} json json-string without spaces
+ * @returns {string} json-string with additional spaces after `:` and `,`
+ * @example
+ * ```typescript
+ * const result = hash.formatSpaces("{'onchain':true,'isStarknet':true}");
+ * // result = "{'onchain': true, 'isStarknet': true}"
+ * ```
  */
-export function formatSpaces(json: string) {
+export function formatSpaces(json: string): string {
   let insideQuotes = false;
   const newString = [];
   // eslint-disable-next-line no-restricted-syntax
@@ -110,23 +134,36 @@ export function formatSpaces(json: string) {
 
 /**
  * Compute hinted class hash for legacy compiled contract (Cairo 0)
- * @returns format: hex-string
- */
-export default function computeHintedClassHash(compiledContract: LegacyCompiledContract) {
+ * @param {LegacyCompiledContract} compiledContract
+ * @returns {string} hex-string
+ * @example
+ * ```typescript
+ * const compiledCairo0 = json.parse(fs.readFileSync("./cairo0contract.json").toString("ascii"));
+ * const result=hash.computeHintedClassHash(compiledCairo0);
+ * // result = "0x293eabb06955c0a1e55557014675aa4e7a1fd69896147382b29b2b6b166a2ac"
+ * ``` */
+export function computeHintedClassHash(compiledContract: LegacyCompiledContract): string {
   const { abi, program } = compiledContract;
   const contractClass = { abi, program };
   const serializedJson = formatSpaces(stringify(contractClass, nullSkipReplacer));
-
   return addHexPrefix(starkCurve.keccak(utf8ToArray(serializedJson)).toString(16));
 }
 
 /**
  * Computes the class hash for legacy compiled contract (Cairo 0)
- * @returns format: hex-string
+ * @param {LegacyCompiledContract | string} contract legacy compiled contract content
+ * @returns {string} hex-string of class hash
+ * @example
+ * ```typescript
+ * const compiledCairo0 = json.parse(fs.readFileSync("./cairo0contract.json").toString("ascii"));
+ * const result=hash.computeLegacyContractClassHash(compiledCairo0);
+ * // result = "0x4a5cae61fa8312b0a3d0c44658b403d3e4197be80027fd5020ffcdf0c803331"
+ * ```
  */
-export function computeLegacyContractClassHash(contract: LegacyCompiledContract | string) {
-  const compiledContract =
-    typeof contract === 'string' ? (parse(contract) as LegacyCompiledContract) : contract;
+export function computeLegacyContractClassHash(contract: LegacyCompiledContract | string): string {
+  const compiledContract = isString(contract)
+    ? (parse(contract) as LegacyCompiledContract)
+    : contract;
 
   const apiVersion = toHex(API_VERSION);
 
@@ -179,10 +216,41 @@ function hashEntryPoint(data: ContractEntryPointFields[]) {
 }
 
 /**
- * Compute compiled class hash for contract (Cairo 1)
- * @returns format: hex-string
+ * Compute hash of the bytecode for Sierra v1.5.0 onwards (Cairo 2.6.0)
+ * Each segment is Poseidon hashed.
+ * The global hash is : 1 + PoseidonHash(len0, h0, len1, h1, ...)
+ * @param {CompiledSierraCasm} casm compiled Sierra CASM file content.
+ * @returns {bigint} the bytecode hash as bigint.
+ * @example
+ * ```typescript
+ * const compiledCasm = json.parse(fs.readFileSync("./contractC260.casm.json").toString("ascii"));
+ * const result = hash.hashByteCodeSegments(compiledCasm);
+ * // result = 80499149343908132326491548897246987792410240503053732367044713070598981699n
+ * ```
  */
-export function computeCompiledClassHash(casm: CompiledSierraCasm) {
+export function hashByteCodeSegments(casm: CompiledSierraCasm): bigint {
+  const byteCode: bigint[] = casm.bytecode.map((n) => BigInt(n));
+  const bytecodeSegmentLengths: number[] = casm.bytecode_segment_lengths ?? [];
+  let segmentStart = 0;
+  const hashLeaves = bytecodeSegmentLengths.flatMap((len) => {
+    const segment = byteCode.slice(segmentStart, (segmentStart += len));
+    return [BigInt(len), poseidonHashMany(segment)];
+  });
+  return 1n + poseidonHashMany(hashLeaves);
+}
+
+/**
+ * Compute compiled class hash for contract (Cairo 1)
+ * @param {CompiledSierraCasm} casm Cairo 1 compiled contract content
+ * @returns {string} hex-string of class hash
+ * @example
+ * ```typescript
+ * const compiledCasm = json.parse(fs.readFileSync("./cairo260.casm.json").toString("ascii"));
+ * const result = hash.computeCompiledClassHash(compiledCasm);
+ * // result = "0x4087905743b4fa2b3affc1fc71333f1390c8c5d1e8ea47d6ba70786de3fc01a"
+```
+ */
+export function computeCompiledClassHash(casm: CompiledSierraCasm): string {
   const COMPILED_CLASS_VERSION = 'COMPILED_CLASS_V1';
 
   // Hash compiled class version
@@ -198,7 +266,9 @@ export function computeCompiledClassHash(casm: CompiledSierraCasm) {
   const constructor = hashEntryPoint(casm.entry_points_by_type.CONSTRUCTOR);
 
   // Hash bytecode.
-  const bytecode = poseidonHashMany(casm.bytecode.map((it: string) => BigInt(it)));
+  const bytecode = casm.bytecode_segment_lengths
+    ? hashByteCodeSegments(casm)
+    : poseidonHashMany(casm.bytecode.map((it: string) => BigInt(it)));
 
   return toHex(
     poseidonHashMany([
@@ -225,9 +295,16 @@ function hashAbi(sierra: CompiledSierra) {
 
 /**
  * Compute sierra contract class hash (Cairo 1)
- * @returns format: hex-string
+ * @param {CompiledSierra} sierra Cairo 1 Sierra contract content
+ * @returns {string} hex-string of class hash
+ * @example
+ * ```typescript
+ * const compiledSierra = json.parse(fs.readFileSync("./cairo260.sierra.json").toString("ascii"));
+ * const result = hash.computeSierraContractClassHash(compiledSierra);
+ * // result = "0x67b6b4f02baded46f02feeed58c4f78e26c55364e59874d8abfd3532d85f1ba"
+```
  */
-export function computeSierraContractClassHash(sierra: CompiledSierra) {
+export function computeSierraContractClassHash(sierra: CompiledSierra): string {
   const CONTRACT_CLASS_VERSION = 'CONTRACT_CLASS_V0.1.0';
 
   // Hash class version
@@ -262,10 +339,17 @@ export function computeSierraContractClassHash(sierra: CompiledSierra) {
 
 /**
  * Compute ClassHash (sierra or legacy) based on provided contract
- * @returns format: hex-string
+ * @param {CompiledContract | string} contract Cairo 1 contract content
+ * @returns {string} hex-string of class hash
+ * @example
+ * ```typescript
+ * const compiledSierra = json.parse(fs.readFileSync("./cairo260.sierra.json").toString("ascii"));
+ * const result = hash.computeContractClassHash(compiledSierra);
+ * // result = "0x67b6b4f02baded46f02feeed58c4f78e26c55364e59874d8abfd3532d85f1ba"
+```
  */
-export function computeContractClassHash(contract: CompiledContract | string) {
-  const compiledContract = typeof contract === 'string' ? parse(contract) : contract;
+export function computeContractClassHash(contract: CompiledContract | string): string {
+  const compiledContract = isString(contract) ? parse(contract) : contract;
 
   if ('sierra_program' in compiledContract) {
     return computeSierraContractClassHash(compiledContract as CompiledSierra);

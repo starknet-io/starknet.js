@@ -34,15 +34,15 @@ function sendMessageToL2(
 You have to pay in the L1 an extra fee when invoking `sendMessageToL2` (of course paid with the L1 fee TOKEN), to pay the L2 part of the messaging mechanism. You can estimate this fee with this function:
 
 ```typescript
-import { SequencerProvider } from "starknet";
+import { SequencerProvider } from 'starknet';
 const provider = new SequencerProvider({ baseUrl: constants.BaseUrl.SN_GOERLI }); // for testnet 1
 
 const responseEstimateMessageFee = await provider.estimateMessageFee({
-    from_address: L1address,
-    to_address: L2address,
-    entry_point_selector: "handle_l1_mess",
-    payload: ["1234567890123456789", "200"]
-})
+  from_address: L1address,
+  to_address: L2address,
+  entry_point_selector: 'handle_l1_mess',
+  payload: ['1234567890123456789', '200'],
+});
 ```
 
 If the fee is paid in L1, the cairo contract at `to_Address` is automatically executed, function `entry_point_selector` (the function shall have a decorator `@l1_handler` in the Cairo code), with parameters `payload`.
@@ -55,9 +55,9 @@ If necessary you can estimate this fee with the generic `estimateInvokeFee` func
 
 ```typescript
 const { suggestedMaxFee: estimatedFee1 } = await account0.estimateInvokeFee({
-	contractAddress: testAddress,
-	entrypoint: "withdraw_to_L1",
-	calldata: ["123456789", "30"]
+  contractAddress: testAddress,
+  entrypoint: 'withdraw_to_L1',
+  calldata: ['123456789', '30'],
 });
 ```
 

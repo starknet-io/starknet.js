@@ -1,8 +1,9 @@
-import { StarknetChainId } from '../../constants';
+import { StarknetChainId } from '../../global/constants';
 import { weierstrass } from '../../utils/ec';
 import { EDataAvailabilityMode, ResourceBounds } from '../api';
 import { CairoEnum } from '../cairoEnum';
 import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
+import { ValuesType } from '../helpers/valuesType';
 
 export type WeierstrassSignatureType = weierstrass.SignatureType;
 export type ArraySignatureType = string[];
@@ -18,6 +19,7 @@ export type ByteArray = {
 
 /**
  * Compiled calldata ready to be sent
+ *
  * decimal-string array
  */
 export type Calldata = string[] & { readonly __compiled__?: true };
@@ -33,7 +35,20 @@ export interface Uint256 {
 }
 
 /**
+ * Represents an integer in the range [0, 2^256)
+ */
+export interface Uint512 {
+  // The lowest 128 bits of the value
+  limb0: BigNumberish;
+  limb1: BigNumberish;
+  limb2: BigNumberish;
+  // The higher 128 bits of the value
+  limb3: BigNumberish;
+}
+
+/**
  * BigNumberish array
+ *
  * use CallData.compile() to convert to Calldata
  */
 export type RawCalldata = BigNumberish[];
@@ -84,6 +99,11 @@ export type DeclareContractPayload = {
   casm?: CompiledSierraCasm;
   compiledClassHash?: string;
 };
+
+/**
+ * DeclareContractPayload with classHash or contract defined
+ */
+export type ContractClassIdentifier = DeclareContractPayload | { classHash: string };
 
 export type CompleteDeclareContractPayload = {
   contract: CompiledContract | string;
@@ -143,62 +163,76 @@ export type Details = {
 };
 
 export type InvocationsDetailsWithNonce =
-  | (InvocationsDetails & {
-      nonce: BigNumberish;
-    })
+  | (InvocationsDetails & { nonce: BigNumberish })
   | V3TransactionDetails;
 
-export enum TransactionType {
-  DECLARE = 'DECLARE',
-  DEPLOY = 'DEPLOY',
-  DEPLOY_ACCOUNT = 'DEPLOY_ACCOUNT',
-  INVOKE = 'INVOKE_FUNCTION',
-}
+export const TransactionType = {
+  DECLARE: 'DECLARE',
+  DEPLOY: 'DEPLOY',
+  DEPLOY_ACCOUNT: 'DEPLOY_ACCOUNT',
+  INVOKE: 'INVOKE_FUNCTION',
+} as const;
+
+export type TransactionType = ValuesType<typeof TransactionType>;
 
 /**
  * new statuses are defined by props: finality_status and execution_status
  * to be #deprecated
  */
-export enum TransactionStatus {
-  NOT_RECEIVED = 'NOT_RECEIVED',
-  RECEIVED = 'RECEIVED',
-  ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
-  ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
-  REJECTED = 'REJECTED',
-  REVERTED = 'REVERTED',
-}
+export const TransactionStatus = {
+  NOT_RECEIVED: 'NOT_RECEIVED',
+  RECEIVED: 'RECEIVED',
+  ACCEPTED_ON_L2: 'ACCEPTED_ON_L2',
+  ACCEPTED_ON_L1: 'ACCEPTED_ON_L1',
+  REJECTED: 'REJECTED',
+  REVERTED: 'REVERTED',
+} as const;
 
-export enum TransactionFinalityStatus {
-  NOT_RECEIVED = 'NOT_RECEIVED',
-  RECEIVED = 'RECEIVED',
-  ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
-  ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
-}
+export type TransactionStatus = ValuesType<typeof TransactionStatus>;
 
-export enum TransactionExecutionStatus {
-  REJECTED = 'REJECTED',
-  REVERTED = 'REVERTED',
-  SUCCEEDED = 'SUCCEEDED',
-}
+export const TransactionFinalityStatus = {
+  NOT_RECEIVED: 'NOT_RECEIVED',
+  RECEIVED: 'RECEIVED',
+  ACCEPTED_ON_L2: 'ACCEPTED_ON_L2',
+  ACCEPTED_ON_L1: 'ACCEPTED_ON_L1',
+} as const;
 
-export enum BlockStatus {
-  PENDING = 'PENDING',
-  ACCEPTED_ON_L1 = 'ACCEPTED_ON_L1',
-  ACCEPTED_ON_L2 = 'ACCEPTED_ON_L2',
-  REJECTED = 'REJECTED',
-}
+export type TransactionFinalityStatus = ValuesType<typeof TransactionFinalityStatus>;
 
-export enum BlockTag {
-  pending = 'pending',
-  latest = 'latest',
-}
+export const TransactionExecutionStatus = {
+  REJECTED: 'REJECTED',
+  REVERTED: 'REVERTED',
+  SUCCEEDED: 'SUCCEEDED',
+} as const;
+
+export type TransactionExecutionStatus = ValuesType<typeof TransactionExecutionStatus>;
+
+export const BlockStatus = {
+  PENDING: 'PENDING',
+  ACCEPTED_ON_L1: 'ACCEPTED_ON_L1',
+  ACCEPTED_ON_L2: 'ACCEPTED_ON_L2',
+  REJECTED: 'REJECTED',
+} as const;
+
+export type BlockStatus = ValuesType<typeof BlockStatus>;
+
+export const BlockTag = {
+  PENDING: 'pending',
+  LATEST: 'latest',
+} as const;
+
+export type BlockTag = ValuesType<typeof BlockTag>;
 
 export type BlockNumber = BlockTag | null | number;
 
 /**
- * hex string and BN are detected as block hashes
+ * hex string and BigInt are detected as block hashes
+ *
  * decimal string and number are detected as block numbers
- * null appends nothing to the request url
+ *
+ * text string are detected as block tag
+ *
+ * null return 'pending' block tag
  */
 export type BlockIdentifier = BlockNumber | BigNumberish;
 
@@ -206,9 +240,9 @@ export type BlockIdentifier = BlockNumber | BigNumberish;
  * items used by AccountInvocations
  */
 export type AccountInvocationItem = (
-  | ({ type: TransactionType.DECLARE } & DeclareContractTransaction)
-  | ({ type: TransactionType.DEPLOY_ACCOUNT } & DeployAccountContractTransaction)
-  | ({ type: TransactionType.INVOKE } & Invocation)
+  | ({ type: typeof TransactionType.DECLARE } & DeclareContractTransaction)
+  | ({ type: typeof TransactionType.DEPLOY_ACCOUNT } & DeployAccountContractTransaction)
+  | ({ type: typeof TransactionType.INVOKE } & Invocation)
 ) &
   InvocationsDetailsWithNonce;
 
@@ -221,12 +255,14 @@ export type AccountInvocations = AccountInvocationItem[];
  * Invocations array user provide to bulk method (simulate)
  */
 export type Invocations = Array<
-  | ({ type: TransactionType.DECLARE } & OptionalPayload<DeclareContractPayload>)
-  | ({ type: TransactionType.DEPLOY } & OptionalPayload<
+  | ({ type: typeof TransactionType.DECLARE } & OptionalPayload<DeclareContractPayload>)
+  | ({ type: typeof TransactionType.DEPLOY } & OptionalPayload<
       AllowArray<UniversalDeployerContractPayload>
     >)
-  | ({ type: TransactionType.DEPLOY_ACCOUNT } & OptionalPayload<DeployAccountContractPayload>)
-  | ({ type: TransactionType.INVOKE } & OptionalPayload<AllowArray<Call>>)
+  | ({
+      type: typeof TransactionType.DEPLOY_ACCOUNT;
+    } & OptionalPayload<DeployAccountContractPayload>)
+  | ({ type: typeof TransactionType.INVOKE } & OptionalPayload<AllowArray<Call>>)
 >;
 
 export type Tupled = { element: any; type: string };

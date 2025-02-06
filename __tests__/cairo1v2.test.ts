@@ -1,3 +1,6 @@
+import fs from 'node:fs';
+import path from 'node:path';
+
 import {
   Account,
   BigNumberish,
@@ -13,33 +16,18 @@ import {
   DeclareDeployUDCResponse,
   RawArgsArray,
   RawArgsObject,
-  byteArray,
   cairo,
   ec,
+  events,
   hash,
+  json,
   num,
   selector,
   shortString,
   stark,
   types,
 } from '../src';
-import { hexToDecimalString } from '../src/utils/num';
-import { encodeShortString } from '../src/utils/shortString';
-import {
-  TEST_TX_VERSION,
-  compiledC1Account,
-  compiledC1AccountCasm,
-  compiledC1v2,
-  compiledC1v2Casm,
-  compiledC210,
-  compiledC210Casm,
-  compiledC240,
-  compiledC240Casm,
-  compiledComplexSierra,
-  compiledHelloSierra,
-  getTestAccount,
-  getTestProvider,
-} from './config/fixtures';
+import { TEST_TX_VERSION, contracts, getTestAccount, getTestProvider } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
 const { uint256, tuple, isCairo1Abi } = cairo;
@@ -58,16 +46,20 @@ describe('Cairo 1', () => {
 
     beforeAll(async () => {
       dd = await account.declareAndDeploy({
-        contract: compiledC1v2,
-        casm: compiledC1v2Casm,
+        contract: contracts.C1v2.sierra,
+        casm: contracts.C1v2.casm,
       });
-      cairo1Contract = new Contract(compiledC1v2.abi, dd.deploy.contract_address, account);
+      cairo1Contract = new Contract(contracts.C1v2.sierra.abi, dd.deploy.contract_address, account);
 
       dd2 = await account.declareAndDeploy({
-        contract: compiledC210,
-        casm: compiledC210Casm,
+        contract: contracts.C210.sierra,
+        casm: contracts.C210.casm,
       });
-      cairo210Contract = new Contract(compiledC210.abi, dd2.deploy.contract_address, account);
+      cairo210Contract = new Contract(
+        contracts.C210.sierra.abi,
+        dd2.deploy.contract_address,
+        account
+      );
     });
 
     test('Declare & deploy v2 - Hello Cairo 1 contract', async () => {
@@ -91,12 +83,12 @@ describe('Cairo 1', () => {
 
       await account.declare({
         contract: cc0 as CompiledSierra,
-        casm: compiledC1v2Casm,
+        casm: contracts.C1v2.casm,
       });
 
       await account.declare({
         contract: cc0_1 as CompiledSierra,
-        casm: compiledC1v2Casm,
+        casm: contracts.C1v2.casm,
       });
     });
 
@@ -229,7 +221,7 @@ describe('Cairo 1', () => {
       const result = await cairo1Contract.call('new_types', compiled.calldata as Calldata);
       expect(result).toStrictEqual({ '0': 123456789n, '1': 987654321n, '2': 657563474357n });
 
-      const myCalldata = new CallData(compiledC1v2.abi); // test arrays
+      const myCalldata = new CallData(contracts.C1v2.sierra.abi); // test arrays
       const compiled2 = myCalldata.compile('array_new_types', {
         tup: cairo.tuple(256, '0x1234567890', '0xe3456'),
         tupa: cairo.tuple(
@@ -605,7 +597,7 @@ describe('Cairo 1', () => {
         ],
       ];
 
-      const contractCallData: CallData = new CallData(compiledComplexSierra.abi);
+      const contractCallData: CallData = new CallData(contracts.ComplexSierra.abi);
       const callDataFromObject: Calldata = contractCallData.compile('constructor', myRawArgsObject);
       const callDataFromArray: Calldata = contractCallData.compile('constructor', myRawArgsArray);
       const expectedResult = [
@@ -681,8 +673,8 @@ describe('Cairo 1', () => {
     });
 
     test('myCallData.decodeParameters for Cairo 1', async () => {
-      const Cairo1HelloAbi = compiledHelloSierra;
-      const Cairo1Abi = compiledC1v2;
+      const Cairo1HelloAbi = contracts.HelloSierra.sierra;
+      const Cairo1Abi = contracts.C1v2.sierra;
       const helloCallData = new CallData(Cairo1HelloAbi.abi);
       const c1v2CallData = new CallData(Cairo1Abi.abi);
 
@@ -770,8 +762,8 @@ describe('Cairo 1', () => {
 
       // declare account
       const declareAccount = await account.declareIfNot({
-        contract: compiledC1Account,
-        casm: compiledC1AccountCasm,
+        contract: contracts.C1Account.sierra,
+        casm: contracts.C1Account.casm,
       });
       if (declareAccount.transaction_hash) {
         await account.waitForTransaction(declareAccount.transaction_hash);
@@ -843,11 +835,11 @@ describe('Cairo 1', () => {
     };
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
-        contract: compiledC1v2,
-        casm: compiledC1v2Casm,
+        contract: contracts.C1v2.sierra,
+        casm: contracts.C1v2.casm,
       });
 
-      eventContract = new Contract(compiledC1v2.abi, deploy.contract_address!, account);
+      eventContract = new Contract(contracts.C1v2.sierra.abi, deploy.contract_address!, account);
     });
 
     test('parse event returning a regular struct', async () => {
@@ -861,7 +853,7 @@ describe('Cairo 1', () => {
       );
       const shouldBe: types.ParsedEvents = [
         {
-          EventRegular: {
+          'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable,
             simpleKeyStruct,
             simpleKeyArray,
@@ -872,8 +864,8 @@ describe('Cairo 1', () => {
         },
       ];
       const tx = await provider.waitForTransaction(transaction_hash);
-      const events = eventContract.parseEvents(tx);
-      return expect(events).toStrictEqual(shouldBe);
+      const myEvents = eventContract.parseEvents(tx);
+      expect(myEvents[0]).toMatchEventStructure(shouldBe[0]);
     });
 
     test('parse event returning a nested struct', async () => {
@@ -883,22 +875,22 @@ describe('Cairo 1', () => {
       );
       const shouldBe: types.ParsedEvents = [
         {
-          EventNested: {
+          'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventNested': {
             nestedKeyStruct,
             nestedDataStruct,
           },
         },
       ];
       const tx = await provider.waitForTransaction(transaction_hash);
-      const events = eventContract.parseEvents(tx);
-      return expect(events).toStrictEqual(shouldBe);
+      const myEvents = eventContract.parseEvents(tx);
+      expect(myEvents[0]).toMatchEventStructure(shouldBe[0]);
     });
 
     test('parse tx returning multiple similar events', async () => {
       const anotherKeyVariable = 100n;
       const shouldBe: types.ParsedEvents = [
         {
-          EventRegular: {
+          'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable,
             simpleKeyStruct,
             simpleKeyArray,
@@ -908,7 +900,7 @@ describe('Cairo 1', () => {
           },
         },
         {
-          EventRegular: {
+          'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable: anotherKeyVariable,
             simpleKeyStruct,
             simpleKeyArray,
@@ -936,13 +928,14 @@ describe('Cairo 1', () => {
       ]);
       const { transaction_hash } = await account.execute([callData1, callData2]);
       const tx = await provider.waitForTransaction(transaction_hash);
-      const events = eventContract.parseEvents(tx);
-      return expect(events).toStrictEqual(shouldBe);
+      const myEvents = eventContract.parseEvents(tx);
+      expect(myEvents[0]).toMatchEventStructure(shouldBe[0]);
+      expect(myEvents[1]).toMatchEventStructure(shouldBe[1]);
     });
     test('parse tx returning multiple different events', async () => {
       const shouldBe: types.ParsedEvents = [
         {
-          EventRegular: {
+          'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventRegular': {
             simpleKeyVariable,
             simpleKeyStruct,
             simpleKeyArray,
@@ -952,7 +945,7 @@ describe('Cairo 1', () => {
           },
         },
         {
-          EventNested: {
+          'hello_res_events_newTypes::hello_res_events_newTypes::HelloStarknet::EventNested': {
             nestedKeyStruct,
             nestedDataStruct,
           },
@@ -972,75 +965,183 @@ describe('Cairo 1', () => {
       ]);
       const { transaction_hash } = await account.execute([callData1, callData2]);
       const tx = await provider.waitForTransaction(transaction_hash);
-      const events = eventContract.parseEvents(tx);
-      return expect(events).toStrictEqual(shouldBe);
-    });
-  });
-
-  describe('cairo v2.4.0 new types', () => {
-    let stringContract: Contract;
-
-    beforeAll(async () => {
-      const { deploy } = await account.declareAndDeploy({
-        contract: compiledC240,
-        casm: compiledC240Casm,
-      });
-
-      stringContract = new Contract(compiledC240.abi, deploy.contract_address, account);
+      const myEvents = eventContract.parseEvents(tx);
+      expect(myEvents[0]).toMatchEventStructure(shouldBe[0]);
+      expect(myEvents[1]).toMatchEventStructure(shouldBe[1]);
     });
 
-    test('bytes31', async () => {
-      const resp = await stringContract.call('proceed_bytes31', ['AZERTY']);
-      expect(resp).toBe('AZERTY');
-      const str = 'TokenName';
-      const callD1 = CallData.compile([str]);
-      expect(callD1).toEqual([hexToDecimalString(encodeShortString(str))]);
-      const callD2 = CallData.compile({ str });
-      expect(callD2).toEqual([hexToDecimalString(encodeShortString(str))]);
-      const myCallData = new CallData(compiledC240.abi);
-      const myCalldata1 = myCallData.compile('proceed_bytes31', [str]);
-      expect(myCalldata1).toEqual([encodeShortString(str)]);
-      const myCalldata2 = myCallData.compile('proceed_bytes31', { str });
-      expect(myCalldata2).toEqual([encodeShortString(str)]);
-      const myCall1 = stringContract.populate('proceed_bytes31', [str]);
-      expect(myCall1.calldata).toEqual([encodeShortString(str)]);
-      const myCall2 = stringContract.populate('proceed_bytes31', { str });
-      expect(myCall2.calldata).toEqual([encodeShortString(str)]);
-    });
-
-    test('bytes31 too long', async () => {
-      await expect(stringContract.call('proceed_bytes31', ['ABCDEFGHIJKLMNOPQRSTUVWXYZ12345A'])) // more than 31 characters
-        .rejects.toThrow();
-    });
-
-    test('ByteArray', async () => {
-      const message = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ12345AAADEFGHIJKLMNOPQRSTUVWXYZ12345A';
-      const callD = CallData.compile([message]);
-      const expectedResult = [
-        '2',
-        hexToDecimalString('0x4142434445464748494a4b4c4d4e4f505152535455565758595a3132333435'),
-        hexToDecimalString('0x4141414445464748494a4b4c4d4e4f505152535455565758595a3132333435'),
-        hexToDecimalString('0x41'),
-        '1',
-      ];
-      expect(callD).toEqual(expectedResult);
-      const callD2 = CallData.compile({ mess: message });
-      expect(callD2).toEqual(expectedResult);
-      const callD3 = CallData.compile({ mess: byteArray.byteArrayFromString('Take care.') });
-      expect(callD3).toEqual(['1', '0', '398475857363345939260718', '10']);
-      const str1 = await stringContract.get_string();
-      expect(str1).toBe(
-        "Cairo has become the most popular language for developers + charizards !@#$%^&*_+|:'<>?~`"
+    test('parsing nested events from Cairo components', () => {
+      // this abi is from Sepolia contract 0x07981ea76ca241100a3e1cd4083a15a73a068b6d6a946d36042cbfc9b531baa2
+      // with the end from OpenZeppelin ERC20 contract (for `flat` event test)
+      const { abi } = json.parse(
+        fs
+          .readFileSync(
+            path.resolve(__dirname, `../__mocks__/cairo/cairo260/nestedEvents.abi.json`)
+          )
+          .toString('ascii')
       );
-      const myCallData = new CallData(stringContract.abi);
-      const expectedString = 'Take care. Zorg is back';
-      const resp3 = await stringContract.proceed_string('Take care.');
-      expect(resp3).toBe(expectedString);
-      const resp4 = await stringContract.call('proceed_string', ['Take care.']);
-      expect(resp4).toBe(expectedString);
-      const calldata1 = myCallData.compile('proceed_string', ['Take care.']);
-      const resp5 = await stringContract.call('proceed_string', calldata1);
-      expect(resp5).toBe(expectedString);
+      const abiEvents = events.getAbiEvents(abi);
+      const abiStructs = CallData.getAbiStruct(abi);
+      const abiEnums = CallData.getAbiEnum(abi);
+      const rawEventNested = {
+        block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
+        block_number: 69198,
+        data: [
+          '0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
+          '0x4718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
+          '0x0',
+          '0x0',
+          '0x8bb2c97000',
+          '0x0',
+          '0x425615c73f000',
+          '0x0',
+          '0x0',
+          '0x0',
+          '0x0',
+          '0x2bfc41e4bcfdbe82d0bafe3f935dadb18b6e90be3d22ccccea1f5b10986ed53',
+          '0x7aab02decaf82af6fa798fe8d23de042695846ab9dae9f18331fffc518d3d36',
+          '0x616b697261',
+          '0x616b697261',
+        ],
+        from_address: '0x7981ea76ca241100a3e1cd4083a15a73a068b6d6a946d36042cbfc9b531baa2',
+        keys: [
+          '0x22ea134d4126804c60797e633195f8c9aa5fd6d1567e299f4961d0e96f373ee',
+          '0x2e0a012a863e6b614014d113e7285b06e30d2999e42e6e03ba2ef6158b0a8f1',
+          '0x33e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
+          '0x33e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
+        ],
+        transaction_hash: '0x4e38fcce79c115b6fe2c486e3514efc1bd4da386b91c104e97230177d0bf181',
+      };
+      const parsedEvent = events.parseEvents([rawEventNested], abiEvents, abiStructs, abiEnums);
+      expect(parsedEvent).toEqual([
+        {
+          'kurosawa_akira::ExchangeBalanceComponent::exchange_balance_logic_component::Trade': {
+            maker: 1466771120193999006693452314154095230636738457276435850562375218974960297344n,
+            taker: 1466771120193999006693452314154095230636738457276435850562375218974960297344n,
+            ticker: {
+              '0': 2087021424722619777119509474943472645767659996348769578120564519014510906823n,
+              '1': 2009894490435840142178314390393166646092438090257831307886760648929397478285n,
+            },
+            router_maker: 0n,
+            router_taker: 0n,
+            amount_base: 600000000000n,
+            amount_quote: 1167000000000000n,
+            is_sell_side: false,
+            is_failed: false,
+            is_ecosystem_book: false,
+            maker_hash:
+              1243447045605505261525562127352132336915826038411731622093247599150671261011n,
+            taker_hash:
+              3467769886575726876986429904727435956490031836678599158998056330580017888566n,
+            maker_source: 418413900385n,
+            taker_source: 418413900385n,
+          },
+          block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
+          block_number: 69198,
+          transaction_hash: '0x4e38fcce79c115b6fe2c486e3514efc1bd4da386b91c104e97230177d0bf181',
+        },
+      ]);
+      // From component `DepositComponent`, event `Deposit` (same event name than next)
+      const rawEventNestedDeposit1 = {
+        block_hash: '0x31afd649a5042cb1855ce820708a555eab62fe6ea07a2a538fa9100cdc80383',
+        block_number: 69198,
+        data: [
+          '0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
+          '0x33e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
+          '0x119b74ab81c000',
+          '0x0',
+        ],
+        from_address: '0x7981ea76ca241100a3e1cd4083a15a73a068b6d6a946d36042cbfc9b531baa2',
+        keys: [
+          '0xa1db419bdf20c7726cf74c30394c4300e5645db4e3cacaf897da05faabae03',
+          '0x9149d2123147c5f43d258257fef0b7b969db78269369ebcf5ebb9eef8592f2',
+          '0x033e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
+        ],
+        transaction_hash: '0x7768860d79bfb4c8463d215abea3c267899e373407c6882077f7447051c50de',
+      };
+      // From component `RouterComponent`, event `Deposit` (same event name than previous)
+      const rawEventNestedDeposit2 = {
+        block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
+        block_number: 69198,
+        data: [
+          '0x33e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
+          '0x119b74ab81c000',
+          '0x0',
+        ],
+        from_address: '0x7981ea76ca241100a3e1cd4083a15a73a068b6d6a946d36042cbfc9b531baa2',
+        keys: [
+          '0x1352a17d221f274db15a49e35cc827e5106495ba85330b210632597411d5a46',
+          '0x9149d2123147c5f43d258257fef0b7b969db78269369ebcf5ebb9eef8592f2',
+          '0x33e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
+          '0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
+        ],
+        transaction_hash: '0x2d5210e5334a83306abe6f7f5e7e65cd1feed72ad3b8e359a2f4614fa948e1d',
+      };
+      const parsedEventNestedDeposit1 = events.parseEvents(
+        [rawEventNestedDeposit1],
+        abiEvents,
+        abiStructs,
+        abiEnums
+      );
+      expect(parsedEventNestedDeposit1).toEqual([
+        {
+          'kurosawa_akira::DepositComponent::deposit_component::Deposit': {
+            receiver: 1466771120193999006693452314154095230636738457276435850562375218974960297344n,
+            token: 2087021424722619777119509474943472645767659996348769578120564519014510906823n,
+            funder: 1466771120193999006693452314154095230636738457276435850562375218974960297344n,
+            amount: 4956000000000000n,
+          },
+          block_hash: '0x31afd649a5042cb1855ce820708a555eab62fe6ea07a2a538fa9100cdc80383',
+          block_number: 69198,
+          transaction_hash: '0x7768860d79bfb4c8463d215abea3c267899e373407c6882077f7447051c50de',
+        },
+      ]);
+      const parsedEventNestedDeposit2 = events.parseEvents(
+        [rawEventNestedDeposit2],
+        abiEvents,
+        abiStructs,
+        abiEnums
+      );
+      expect(parsedEventNestedDeposit2).toEqual([
+        {
+          'kurosawa_akira::RouterComponent::router_component::Deposit': {
+            router: 1466771120193999006693452314154095230636738457276435850562375218974960297344n,
+            token: 2087021424722619777119509474943472645767659996348769578120564519014510906823n,
+            funder: 1466771120193999006693452314154095230636738457276435850562375218974960297344n,
+            amount: 4956000000000000n,
+          },
+          block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
+          block_number: 69198,
+          transaction_hash: '0x2d5210e5334a83306abe6f7f5e7e65cd1feed72ad3b8e359a2f4614fa948e1d',
+        },
+      ]);
+
+      // parsing nested event with #[flat] attribute, from a Cairo component
+      const rawEventFlat = {
+        block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
+        block_number: 69198,
+        data: ['0x119b74ab81c000', '0x0'],
+        from_address: '0x7981ea76ca241100a3e1cd4083a15a73a068b6d6a946d36042cbfc9b531baa2',
+        keys: [
+          '0x99cd8bde557814842a3121e8ddfd433a539b8c9f14bf31ebf108d12e6196e9',
+          '0x33e29bc9b537bae4e370559331e2bf35b434b566f41a64601b37f410f46a580',
+          '0x49d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7',
+        ],
+        transaction_hash: '0x2da31a929a9848e9630906275a75a531e1718d4830501e10b0bccacd55f6fe0',
+      };
+      const parsedEventFlat = events.parseEvents([rawEventFlat], abiEvents, abiStructs, abiEnums);
+      expect(parsedEventFlat).toEqual([
+        {
+          'openzeppelin::token::erc20::erc20::ERC20Component::Transfer': {
+            from: 1466771120193999006693452314154095230636738457276435850562375218974960297344n,
+            to: 2087021424722619777119509474943472645767659996348769578120564519014510906823n,
+            value: 4956000000000000n,
+          },
+          block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
+          block_number: 69198,
+          transaction_hash: '0x2da31a929a9848e9630906275a75a531e1718d4830501e10b0bccacd55f6fe0',
+        },
+      ]);
     });
   });
 });

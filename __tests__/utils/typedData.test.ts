@@ -6,7 +6,18 @@ import exampleEnum from '../../__mocks__/typedData/example_enum.json';
 import examplePresetTypes from '../../__mocks__/typedData/example_presetTypes.json';
 import typedDataStructArrayExample from '../../__mocks__/typedData/mail_StructArray.json';
 import typedDataSessionExample from '../../__mocks__/typedData/session_MerkleTree.json';
-import { BigNumberish, StarkNetDomain, num } from '../../src';
+import v1NestedExample from '../../__mocks__/typedData/v1Nested.json';
+import {
+  Account,
+  BigNumberish,
+  StarknetDomain,
+  num,
+  stark,
+  typedData,
+  type ArraySignatureType,
+  type Signature,
+} from '../../src';
+import { PRIME } from '../../src/global/constants';
 import { getSelectorFromName } from '../../src/utils/hash';
 import { MerkleTree } from '../../src/utils/merkle';
 import {
@@ -16,6 +27,8 @@ import {
   getMessageHash,
   getStructHash,
   getTypeHash,
+  prepareSelector,
+  isMerkleTreeType,
 } from '../../src/utils/typedData';
 
 const exampleAddress = '0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826';
@@ -31,27 +44,27 @@ describe('typedData', () => {
     expect(encoded).toMatchInlineSnapshot(
       `"Mail(from:Person,to:Person,posts_len:felt,posts:Post*)Person(name:felt,wallet:felt)Post(title:felt,content:felt)"`
     );
-    encoded = encodeType(typedDataExample.types, 'Mail', TypedDataRevision.Active);
+    encoded = encodeType(typedDataExample.types, 'Mail', TypedDataRevision.ACTIVE);
     expect(encoded).toMatchInlineSnapshot(
       JSON.stringify(
         '"Mail"("from":"Person","to":"Person","contents":"felt")"Person"("name":"felt","wallet":"felt")'
       )
     );
-    encoded = encodeType(typedDataStructArrayExample.types, 'Mail', TypedDataRevision.Active);
+    encoded = encodeType(typedDataStructArrayExample.types, 'Mail', TypedDataRevision.ACTIVE);
     expect(encoded).toMatchInlineSnapshot(
       `"\\"Mail\\"(\\"from\\":\\"Person\\",\\"to\\":\\"Person\\",\\"posts_len\\":\\"felt\\",\\"posts\\":\\"Post*\\")\\"Person\\"(\\"name\\":\\"felt\\",\\"wallet\\":\\"felt\\")\\"Post\\"(\\"title\\":\\"felt\\",\\"content\\":\\"felt\\")"`
     );
-    encoded = encodeType(exampleBaseTypes.types, 'Example', TypedDataRevision.Active);
+    encoded = encodeType(exampleBaseTypes.types, 'Example', TypedDataRevision.ACTIVE);
     expect(encoded).toMatchInlineSnapshot(
-      `"\\"Example\\"(\\"n0\\":\\"felt\\",\\"n1\\":\\"bool\\",\\"n2\\":\\"string\\",\\"n3\\":\\"selector\\",\\"n4\\":\\"u128\\",\\"n5\\":\\"ContractAddress\\",\\"n6\\":\\"ClassHash\\",\\"n7\\":\\"timestamp\\",\\"n8\\":\\"shortstring\\")"`
+      `"\\"Example\\"(\\"n0\\":\\"felt\\",\\"n1\\":\\"bool\\",\\"n2\\":\\"string\\",\\"n3\\":\\"selector\\",\\"n4\\":\\"u128\\",\\"n5\\":\\"i128\\",\\"n6\\":\\"ContractAddress\\",\\"n7\\":\\"ClassHash\\",\\"n8\\":\\"timestamp\\",\\"n9\\":\\"shortstring\\")"`
     );
-    encoded = encodeType(examplePresetTypes.types, 'Example', TypedDataRevision.Active);
+    encoded = encodeType(examplePresetTypes.types, 'Example', TypedDataRevision.ACTIVE);
     expect(encoded).toMatchInlineSnapshot(
-      `"\\"Example\\"(\\"n0\\":\\"TokenAmount\\",\\"n1\\":\\"NftId\\")"`
+      `"\\"Example\\"(\\"n0\\":\\"TokenAmount\\",\\"n1\\":\\"NftId\\")\\"NftId\\"(\\"collection_address\\":\\"ContractAddress\\",\\"token_id\\":\\"u256\\")\\"TokenAmount\\"(\\"token_address\\":\\"ContractAddress\\",\\"amount\\":\\"u256\\")\\"u256\\"(\\"low\\":\\"u128\\",\\"high\\":\\"u128\\")"`
     );
-    encoded = encodeType(exampleEnum.types, 'Example', TypedDataRevision.Active);
+    encoded = encodeType(exampleEnum.types, 'Example', TypedDataRevision.ACTIVE);
     expect(encoded).toMatchInlineSnapshot(
-      `"\\"Example\\"(\\"someEnum\\":\\"MyEnum\\")\\"MyEnum\\"(\\"Variant 1\\":(),\\"Variant 2\\":(\\"u128\\",\\"u128*\\"),\\"Variant 3\\":(\\"u128\\"))"`
+      `"\\"Example\\"(\\"someEnum1\\":\\"EnumA\\",\\"someEnum2\\":\\"EnumB\\")\\"EnumA\\"(\\"Variant 1\\":(),\\"Variant 2\\":(\\"u128\\",\\"u128*\\"),\\"Variant 3\\":(\\"u128\\"))\\"EnumB\\"(\\"Variant 1\\":(),\\"Variant 2\\":(\\"u128\\"))"`
     );
   });
 
@@ -81,17 +94,17 @@ describe('typedData', () => {
     expect(typeHash).toMatchInlineSnapshot(
       `"0x1d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470"`
     );
-    typeHash = getTypeHash(exampleBaseTypes.types, 'Example', TypedDataRevision.Active);
+    typeHash = getTypeHash(exampleBaseTypes.types, 'Example', TypedDataRevision.ACTIVE);
     expect(typeHash).toMatchInlineSnapshot(
-      `"0x2e5b7e12ca4388c49b4ceb305d853b8f7bf5f36525fea5e4255346b80153249"`
+      `"0x1f94cd0be8b4097a41486170fdf09a4cd23aefbc74bb2344718562994c2c111"`
     );
-    typeHash = getTypeHash(examplePresetTypes.types, 'Example', TypedDataRevision.Active);
+    typeHash = getTypeHash(examplePresetTypes.types, 'Example', TypedDataRevision.ACTIVE);
     expect(typeHash).toMatchInlineSnapshot(
-      `"0x155de33c6a0cc7f2b8926afc7a71fc2ac31ffc26726aee5da0570c5d517a763"`
+      `"0x1a25a8bb84b761090b1fadaebe762c4b679b0d8883d2bedda695ea340839a55"`
     );
-    typeHash = getTypeHash(exampleEnum.types, 'Example', TypedDataRevision.Active);
+    typeHash = getTypeHash(exampleEnum.types, 'Example', TypedDataRevision.ACTIVE);
     expect(typeHash).toMatchInlineSnapshot(
-      `"0x380a54d417fb58913b904675d94a8a62e2abc3467f4b5439de0fd65fafdd1a8"`
+      `"0x8eb4aeac64b707f3e843284c4258df6df1f0f7fd38dcffdd8a153a495cd351"`
     );
   });
 
@@ -109,6 +122,21 @@ describe('typedData', () => {
     `);
   });
 
+  test('should prepare selector', () => {
+    const res1 = prepareSelector('myFunction');
+    expect(res1).toEqual('0xc14cfe23f3fa7ce7b1f8db7d7682305b1692293f71a61cc06637f0d8d8b6c8');
+
+    const res2 = prepareSelector(
+      '0xc14cfe23f3fa7ce7b1f8db7d7682305b1692293f71a61cc06637f0d8d8b6c8'
+    );
+    expect(res2).toEqual('0xc14cfe23f3fa7ce7b1f8db7d7682305b1692293f71a61cc06637f0d8d8b6c8');
+
+    const res3 = prepareSelector(
+      '0xc14cfe23f3fa7ce7b1f8db7d7682305b1692293f71a61cc06637f0d8d8b6c8'
+    );
+    expect(res3).not.toEqual('0xc14cfe23f3fa7ce7b1f8db7d76');
+  });
+
   test('should transform merkle tree', () => {
     const tree = new MerkleTree(['0x1', '0x2', '0x3']);
     const [, merkleTreeHash] = encodeValue({}, 'merkletree', tree.leaves);
@@ -116,6 +144,20 @@ describe('typedData', () => {
     expect(merkleTreeHash).toMatchInlineSnapshot(
       `"0x15ac9e457789ef0c56e5d559809e7336a909c14ee2511503fa7af69be1ba639"`
     );
+  });
+
+  test('should check merkle tree type', () => {
+    const type = {
+      name: 'test',
+      type: 'merkletree',
+    };
+    expect(isMerkleTreeType(type)).toBe(true);
+
+    const type2 = {
+      name: 'test',
+      type: 'non-merkletree',
+    };
+    expect(isMerkleTreeType(type2)).toBe(false);
   });
 
   test('should transform merkle tree with custom types', () => {
@@ -169,7 +211,7 @@ describe('typedData', () => {
     const hash = getStructHash(
       typedDataExample.types,
       'StarkNetDomain',
-      typedDataExample.domain as StarkNetDomain
+      typedDataExample.domain as StarknetDomain
     );
     expect(hash).toMatchInlineSnapshot(
       `"0x54833b121883a3e3aebff48ec08a962f5742e5f7b973469c1f8f4f55d470b07"`
@@ -180,8 +222,8 @@ describe('typedData', () => {
     const hash = getStructHash(
       exampleBaseTypes.types,
       'StarknetDomain',
-      exampleBaseTypes.domain as StarkNetDomain,
-      TypedDataRevision.Active
+      exampleBaseTypes.domain as StarknetDomain,
+      TypedDataRevision.ACTIVE
     );
     expect(hash).toMatchInlineSnapshot(
       `"0x555f72e550b308e50c1a4f8611483a174026c982a9893a05c185eeb85399657"`
@@ -274,22 +316,88 @@ describe('typedData', () => {
     let messageHash: string;
     messageHash = getMessageHash(exampleBaseTypes, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
-      `"0x790d9fa99cf9ad91c515aaff9465fcb1c87784d9cfb27271ed193675cd06f9c"`
+      `"0xdb7829db8909c0c5496f5952bcfc4fc894341ce01842537fc4f448743480b6"`
     );
 
     messageHash = getMessageHash(examplePresetTypes, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
-      `"0x26e7b8cedfa63cdbed14e7e51b60ee53ac82bdf26724eb1e3f0710cb8987522"`
+      `"0x185b339d5c566a883561a88fb36da301051e2c0225deb325c91bb7aa2f3473a"`
     );
 
     messageHash = getMessageHash(exampleEnum, exampleAddress);
     expect(messageHash).toMatchInlineSnapshot(
-      `"0x3df10475ad5a8f49db4345a04a5b09164d2e24b09f6e1e236bc1ccd87627cc"`
+      `"0x6e61abaf480b1370bbf231f54e298c5f4872f40a6d2dd409ff30accee5bbd1e"`
     );
 
     expect(spyPedersen).not.toHaveBeenCalled();
     expect(spyPoseidon).toHaveBeenCalled();
     spyPedersen.mockRestore();
     spyPoseidon.mockRestore();
+  });
+
+  describe('should fail validation', () => {
+    const baseTypes = (type: string, value: any = PRIME) => {
+      const copy = JSON.parse(JSON.stringify(exampleBaseTypes)) as typeof exampleBaseTypes;
+      const property = copy.types.Example.find((e) => e.type === type)!.name;
+      (copy.message as any)[property] = value;
+      return copy;
+    };
+
+    test.each([
+      { type: 'felt' },
+      { type: 'bool' },
+      { type: 'u128' },
+      { type: 'i128' },
+      { type: 'ContractAddress' },
+      { type: 'ClassHash' },
+      { type: 'timestamp' },
+      { type: 'shortstring' },
+    ])('out of bounds - $type', ({ type }) => {
+      expect(() => getMessageHash(baseTypes(type), exampleAddress)).toThrow(RegExp(type));
+    });
+  });
+
+  describe('verifyMessage', () => {
+    const addr = '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691';
+    const privK = '0x71d7bb07b9a64f6f78ac4c816aff4da9';
+    const fullPubK = stark.getFullPublicKey(privK);
+    const myAccount = new Account({ nodeUrl: 'fake' }, addr, privK);
+    let signedMessage: Signature;
+    let hashedMessage: string;
+    let arraySign: ArraySignatureType;
+
+    beforeAll(async () => {
+      signedMessage = await myAccount.signMessage(v1NestedExample);
+      hashedMessage = await myAccount.hashMessage(v1NestedExample);
+      arraySign = stark.formatSignature(signedMessage);
+    });
+
+    test('with TypedMessage', () => {
+      expect(
+        typedData.verifyMessage(v1NestedExample, signedMessage, fullPubK, myAccount.address)
+      ).toBe(true);
+      expect(typedData.verifyMessage(v1NestedExample, arraySign, fullPubK, myAccount.address)).toBe(
+        true
+      );
+    });
+
+    test('with messageHash', () => {
+      expect(typedData.verifyMessage(hashedMessage, signedMessage, fullPubK)).toBe(true);
+      expect(typedData.verifyMessage(hashedMessage, arraySign, fullPubK)).toBe(true);
+    });
+
+    test('failure cases', () => {
+      expect(() => typedData.verifyMessage('zero', signedMessage, fullPubK)).toThrow(
+        'message has a wrong format.'
+      );
+
+      expect(() =>
+        typedData.verifyMessage(v1NestedExample as any, signedMessage, fullPubK)
+      ).toThrow(/^When providing a TypedData .* the accountAddress parameter has to be provided/);
+
+      expect(() =>
+        typedData.verifyMessage(v1NestedExample, signedMessage, fullPubK, 'wrong')
+      ).toThrow('accountAddress shall be a BigNumberish');
+    });
   });
 });

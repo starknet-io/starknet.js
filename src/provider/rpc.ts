@@ -1,4 +1,6 @@
-import { RpcChannel } from '../channel/rpc_0_6';
+import type { SPEC } from 'starknet-types-07';
+
+import { RPC06, RPC07, RpcChannel } from '../channel';
 import {
   AccountInvocations,
   BigNumberish,
@@ -6,11 +8,15 @@ import {
   BlockIdentifier,
   BlockTag,
   Call,
+  ContractClassResponse,
+  ContractClassIdentifier,
   ContractVersion,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
   GetBlockResponse,
+  GetTxReceiptResponseWithoutHelper,
   Invocation,
+  Invocations,
   InvocationsDetailsWithNonce,
   PendingBlock,
   PendingStateUpdate,
@@ -22,23 +28,40 @@ import {
   getContractVersionOptions,
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
+  type Signature,
+  type TypedData,
   waitForTransactionOptions,
 } from '../types';
+import type { TransactionWithHash } from '../types/provider/spec';
+import assert from '../utils/assert';
+import { CallData } from '../utils/calldata';
 import { getAbiContractVersion } from '../utils/calldata/cairo';
-import { isSierra } from '../utils/contract';
+import { extractContractHashes, isSierra } from '../utils/contract';
+import { solidityUint256PackedKeccak256 } from '../utils/hash';
+import { isBigNumberish, toBigInt, toHex } from '../utils/num';
+import { wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
+import { formatSignature } from '../utils/stark';
+import { GetTransactionReceiptResponse, ReceiptTx } from '../utils/transactionReceipt';
+import { getMessageHash, validateTypedData } from '../utils/typedData';
+import { LibraryError } from '../utils/errors';
 import { ProviderInterface } from './interface';
 
 export class RpcProvider implements ProviderInterface {
-  private responseParser = new RPCResponseParser();
+  public responseParser: RPCResponseParser;
 
-  public channel: RpcChannel;
+  public channel: RPC07.RpcChannel | RPC06.RpcChannel;
 
   constructor(optionsOrProvider?: RpcProviderOptions | ProviderInterface | RpcProvider) {
     if (optionsOrProvider && 'channel' in optionsOrProvider) {
       this.channel = optionsOrProvider.channel;
+      this.responseParser =
+        'responseParser' in optionsOrProvider
+          ? optionsOrProvider.responseParser
+          : new RPCResponseParser();
     } else {
       this.channel = new RpcChannel({ ...optionsOrProvider, waitMode: false });
+      this.responseParser = new RPCResponseParser(optionsOrProvider?.feeMarginPercentage);
     }
   }
 
@@ -95,6 +118,76 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getBlockWithTxs(blockIdentifier);
   }
 
+  /**
+   * Pause the execution of the script until a specified block is created.
+   * @param {BlockIdentifier} blockIdentifier bloc number (BigNumberish) or 'pending' or 'latest'.
+   * Use of 'latest" or of a block already created will generate no pause.
+   * @param {number} [retryInterval] number of milliseconds between 2 requests to the node
+   * @example
+   * ```typescript
+   * await myProvider.waitForBlock();
+   * // wait the creation of the pending block
+   * ```
+   */
+  public async waitForBlock(
+    blockIdentifier: BlockIdentifier = 'pending',
+    retryInterval: number = 5000
+  ) {
+    if (blockIdentifier === BlockTag.LATEST) return;
+    const currentBlock = await this.getBlockNumber();
+    const targetBlock =
+      blockIdentifier === BlockTag.PENDING
+        ? currentBlock + 1
+        : Number(toHex(blockIdentifier as BigNumberish));
+    if (targetBlock <= currentBlock) return;
+    const { retries } = this.channel;
+    let retriesCount = retries;
+    let isTargetBlock: boolean = false;
+    while (!isTargetBlock) {
+      // eslint-disable-next-line no-await-in-loop
+      const currBlock = await this.getBlockNumber();
+      if (currBlock === targetBlock) {
+        isTargetBlock = true;
+      } else {
+        // eslint-disable-next-line no-await-in-loop
+        await wait(retryInterval);
+      }
+      retriesCount -= 1;
+      if (retriesCount <= 0) {
+        throw new Error(`waitForBlock() timed-out after ${retries} tries.`);
+      }
+    }
+  }
+
+  public async getL1GasPrice(blockIdentifier?: BlockIdentifier) {
+    return this.channel
+      .getBlockWithTxHashes(blockIdentifier)
+      .then(this.responseParser.parseL1GasPriceResponse);
+  }
+
+  public async getL1MessageHash(l2TxHash: BigNumberish): Promise<string> {
+    const transaction = (await this.channel.getTransactionByHash(l2TxHash)) as TransactionWithHash;
+    assert(transaction.type === 'L1_HANDLER', 'This L2 transaction is not a L1 message.');
+    const { calldata, contract_address, entry_point_selector, nonce } =
+      transaction as SPEC.L1_HANDLER_TXN;
+    const params = [
+      calldata[0],
+      contract_address,
+      nonce,
+      entry_point_selector,
+      calldata.length - 1,
+      ...calldata.slice(1),
+    ];
+    return solidityUint256PackedKeccak256(params);
+  }
+
+  public async getBlockWithReceipts(blockIdentifier?: BlockIdentifier) {
+    if (this.channel instanceof RPC06.RpcChannel)
+      throw new LibraryError('Unsupported method for RPC version');
+
+    return this.channel.getBlockWithReceipts(blockIdentifier);
+  }
+
   public getStateUpdate = this.getBlockStateUpdate;
 
   public async getBlockStateUpdate(): Promise<PendingStateUpdate>;
@@ -115,11 +208,11 @@ export class RpcProvider implements ProviderInterface {
 
   /**
    * Return transactions from pending block
-   * @deprecated Instead use getBlock(BlockTag.pending); (will be removed in next minor version)
+   * @deprecated Instead use getBlock(BlockTag.PENDING); (will be removed in next minor version)
    * Utility method, same result can be achieved using getBlockWithTxHashes(BlockTag.pending);
    */
   public async getPendingTransactions() {
-    const { transactions } = await this.getBlockWithTxHashes(BlockTag.pending).then(
+    const { transactions } = await this.getBlockWithTxHashes(BlockTag.PENDING).then(
       this.responseParser.parseGetBlockResponse
     );
     return Promise.all(transactions.map((it: any) => this.getTransactionByHash(it)));
@@ -137,10 +230,11 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getTransactionByBlockIdAndIndex(blockIdentifier, index);
   }
 
-  public async getTransactionReceipt(txHash: BigNumberish) {
-    return this.channel
-      .getTransactionReceipt(txHash)
-      .then(this.responseParser.parseTransactionReceipt);
+  public async getTransactionReceipt(txHash: BigNumberish): Promise<GetTransactionReceiptResponse> {
+    const txReceiptWoHelper = await this.channel.getTransactionReceipt(txHash);
+    const txReceiptWoHelperModified: GetTxReceiptResponseWithoutHelper =
+      this.responseParser.parseTransactionReceipt(txReceiptWoHelper);
+    return new ReceiptTx(txReceiptWoHelperModified) as GetTransactionReceiptResponse;
   }
 
   public async getTransactionTrace(txHash: BigNumberish) {
@@ -156,7 +250,7 @@ export class RpcProvider implements ProviderInterface {
 
   /**
    * @param invocations AccountInvocations
-   * @param simulateTransactionOptions blockIdentifier and flags to skip validation and fee charge<br/>
+   * @param options blockIdentifier and flags to skip validation and fee charge<br/>
    * - blockIdentifier<br/>
    * - skipValidate (default false)<br/>
    * - skipFeeCharge (default true)<br/>
@@ -168,11 +262,19 @@ export class RpcProvider implements ProviderInterface {
     // can't be named simulateTransaction because of argument conflict with account
     return this.channel
       .simulateTransaction(invocations, options)
-      .then(this.responseParser.parseSimulateTransactionResponse);
+      .then((r) => this.responseParser.parseSimulateTransactionResponse(r));
   }
 
-  public async waitForTransaction(txHash: BigNumberish, options?: waitForTransactionOptions) {
-    return this.channel.waitForTransaction(txHash, options);
+  public async waitForTransaction(
+    txHash: BigNumberish,
+    options?: waitForTransactionOptions
+  ): Promise<GetTransactionReceiptResponse> {
+    const receiptWoHelper = (await this.channel.waitForTransaction(
+      txHash,
+      options
+    )) as GetTxReceiptResponseWithoutHelper;
+
+    return new ReceiptTx(receiptWoHelper) as GetTransactionReceiptResponse;
   }
 
   public async getStorageAt(
@@ -222,7 +324,7 @@ export class RpcProvider implements ProviderInterface {
       compiler = true,
     }: getContractVersionOptions = {}
   ): Promise<ContractVersion> {
-    let contractClass;
+    let contractClass: ContractClassResponse;
     if (contractAddress) {
       contractClass = await this.getClassAt(contractAddress, blockIdentifier);
     } else if (classHash) {
@@ -270,7 +372,7 @@ export class RpcProvider implements ProviderInterface {
         ],
         { blockIdentifier, skipValidate }
       )
-      .then(this.responseParser.parseFeeEstimateResponse);
+      .then((r) => this.responseParser.parseFeeEstimateResponse(r));
   }
 
   public async getDeclareEstimateFee(
@@ -290,7 +392,7 @@ export class RpcProvider implements ProviderInterface {
         ],
         { blockIdentifier, skipValidate }
       )
-      .then(this.responseParser.parseFeeEstimateResponse);
+      .then((r) => this.responseParser.parseFeeEstimateResponse(r));
   }
 
   public async getDeployAccountEstimateFee(
@@ -310,7 +412,7 @@ export class RpcProvider implements ProviderInterface {
         ],
         { blockIdentifier, skipValidate }
       )
-      .then(this.responseParser.parseFeeEstimateResponse);
+      .then((r) => this.responseParser.parseFeeEstimateResponse(r));
   }
 
   public async getEstimateFeeBulk(
@@ -319,7 +421,7 @@ export class RpcProvider implements ProviderInterface {
   ) {
     return this.channel
       .getEstimateFee(invocations, options)
-      .then(this.responseParser.parseFeeEstimateBulkResponse);
+      .then((r) => this.responseParser.parseFeeEstimateBulkResponse(r));
   }
 
   public async invokeFunction(
@@ -372,5 +474,161 @@ export class RpcProvider implements ProviderInterface {
    */
   public async getEvents(eventFilter: RPC.EventFilter) {
     return this.channel.getEvents(eventFilter);
+  }
+
+  /**
+   * Verify in Starknet a signature of a TypedData object or of a given hash.
+   * @param {BigNumberish | TypedData} message TypedData object to be verified, or message hash to be verified.
+   * @param {Signature} signature signature of the message.
+   * @param {BigNumberish} accountAddress address of the account that has signed the message.
+   * @param {string} [signatureVerificationFunctionName] if account contract with non standard account verification function name.
+   * @param { okResponse: string[]; nokResponse: string[]; error: string[] } [signatureVerificationResponse] if account contract with non standard response of verification function.
+   * @returns
+   * ```typescript
+   * const myTypedMessage: TypedMessage = .... ;
+   * const messageHash = typedData.getMessageHash(myTypedMessage,accountAddress);
+   * const sign: WeierstrassSignatureType = ec.starkCurve.sign(messageHash, privateKey);
+   * const accountAddress = "0x43b7240d227aa2fb8434350b3321c40ac1b88c7067982549e7609870621b535";
+   * const result1 = myRpcProvider.verifyMessageInStarknet(myTypedMessage, sign, accountAddress);
+   * const result2 = myRpcProvider.verifyMessageInStarknet(messageHash, sign, accountAddress);
+   * // result1 = result2 = true
+   * ```
+   */
+  public async verifyMessageInStarknet(
+    message: BigNumberish | TypedData,
+    signature: Signature,
+    accountAddress: BigNumberish,
+    signatureVerificationFunctionName?: string,
+    signatureVerificationResponse?: { okResponse: string[]; nokResponse: string[]; error: string[] }
+  ): Promise<boolean> {
+    const isTypedData = validateTypedData(message);
+    if (!isBigNumberish(message) && !isTypedData) {
+      throw new Error('message has a wrong format.');
+    }
+    if (!isBigNumberish(accountAddress)) {
+      throw new Error('accountAddress shall be a BigNumberish');
+    }
+    const messageHash = isTypedData ? getMessageHash(message, accountAddress) : toHex(message);
+    // HOTFIX: Accounts should conform to SNIP-6
+    // (https://github.com/starknet-io/SNIPs/blob/f6998f779ee2157d5e1dea36042b08062093b3c5/SNIPS/snip-6.md?plain=1#L61),
+    // but they don't always conform. Also, the SNIP doesn't standardize the response if the signature isn't valid.
+    const knownSigVerificationFName = signatureVerificationFunctionName
+      ? [signatureVerificationFunctionName]
+      : ['isValidSignature', 'is_valid_signature'];
+    const knownSignatureResponse = signatureVerificationResponse || {
+      okResponse: [
+        // any non-nok response is true
+      ],
+      nokResponse: [
+        '0x0', // Devnet
+        '0x00', // OpenZeppelin 0.7.0 to 0.9.0 invalid signature
+      ],
+      error: [
+        'argent/invalid-signature', // ArgentX 0.3.0 to 0.3.1
+        'is invalid, with respect to the public key', // OpenZeppelin until 0.6.1, Braavos 0.0.11
+        'INVALID_SIG', // Braavos 1.0.0
+      ],
+    };
+    let error: any;
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const SigVerificationFName of knownSigVerificationFName) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        const resp = await this.callContract({
+          contractAddress: toHex(accountAddress),
+          entrypoint: SigVerificationFName,
+          calldata: CallData.compile({
+            hash: toBigInt(messageHash).toString(),
+            signature: formatSignature(signature),
+          }),
+        });
+        // Response NOK Signature
+        if (knownSignatureResponse.nokResponse.includes(resp[0].toString())) {
+          return false;
+        }
+        // Response OK Signature
+        // Empty okResponse assume all non-nok responses are valid signatures
+        // OpenZeppelin 0.7.0 to 0.9.0, ArgentX 0.3.0 to 0.3.1 & Braavos Cairo 0.0.11 to 1.0.0 valid signature
+        if (
+          knownSignatureResponse.okResponse.length === 0 ||
+          knownSignatureResponse.okResponse.includes(resp[0].toString())
+        ) {
+          return true;
+        }
+        throw Error('signatureVerificationResponse Error: response is not part of known responses');
+      } catch (err) {
+        // Known NOK Errors
+        if (
+          knownSignatureResponse.error.some((errMessage) =>
+            (err as Error).message.includes(errMessage)
+          )
+        ) {
+          return false;
+        }
+        // Unknown Error
+        error = err;
+      }
+    }
+
+    throw Error(`Signature verification Error: ${error}`);
+  }
+
+  /**
+   * Test if class is already declared from ContractClassIdentifier
+   * Helper method using getClass
+   * @param ContractClassIdentifier
+   * @param blockIdentifier
+   */
+  public async isClassDeclared(
+    contractClassIdentifier: ContractClassIdentifier,
+    blockIdentifier?: BlockIdentifier
+  ) {
+    let classHash: string;
+    if (!contractClassIdentifier.classHash && 'contract' in contractClassIdentifier) {
+      const hashes = extractContractHashes(contractClassIdentifier);
+      classHash = hashes.classHash;
+    } else if (contractClassIdentifier.classHash) {
+      classHash = contractClassIdentifier.classHash;
+    } else {
+      throw Error('contractClassIdentifier type not satisfied');
+    }
+
+    try {
+      const result = await this.getClass(classHash, blockIdentifier);
+      return result instanceof Object;
+    } catch (error) {
+      if (error instanceof LibraryError) {
+        return false;
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Build bulk invocations with auto-detect declared class
+   * 1. Test if class is declared if not declare it preventing already declared class error and not declared class errors
+   * 2. Order declarations first
+   * @param invocations
+   */
+  public async prepareInvocations(invocations: Invocations) {
+    const bulk: Invocations = [];
+    // Build new ordered array
+    // eslint-disable-next-line no-restricted-syntax
+    for (const invocation of invocations) {
+      if (invocation.type === TransactionType.DECLARE) {
+        // Test if already declared
+        // eslint-disable-next-line no-await-in-loop
+        const isDeclared = await this.isClassDeclared(
+          'payload' in invocation ? invocation.payload : invocation
+        );
+        if (!isDeclared) {
+          bulk.unshift(invocation);
+        }
+      } else {
+        bulk.push(invocation);
+      }
+    }
+    return bulk;
   }
 }

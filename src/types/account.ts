@@ -14,6 +14,11 @@ import { DeclareTransactionReceiptResponse, EstimateFeeResponse } from './provid
 
 export interface EstimateFee extends EstimateFeeResponse {}
 
+export type UniversalSuggestedFee = {
+  maxFee: BigNumberish;
+  resourceBounds: ResourceBounds;
+};
+
 export type EstimateFeeBulk = Array<EstimateFee>;
 
 // TODO: This is too wide generic with optional params
@@ -21,6 +26,7 @@ export type AccountInvocationsFactoryDetails = {
   versions: Array<`${ETransactionVersion}`>;
   nonce?: BigNumberish;
   blockIdentifier?: BlockIdentifier;
+  skipValidate?: boolean;
 } & Partial<V3TransactionDetails>;
 
 export interface UniversalDetails {
@@ -75,25 +81,29 @@ export type SimulateTransactionDetails = {
   skipExecute?: boolean;
 } & Partial<V3TransactionDetails>;
 
-export enum SIMULATION_FLAG {
-  SKIP_VALIDATE = 'SKIP_VALIDATE',
-  SKIP_EXECUTE = 'SKIP_EXECUTE',
-}
-
 export type EstimateFeeAction =
   | {
-      type: TransactionType.INVOKE;
+      type: typeof TransactionType.INVOKE;
       payload: AllowArray<Call>;
     }
   | {
-      type: TransactionType.DECLARE;
+      type: typeof TransactionType.DECLARE;
       payload: DeclareContractPayload;
     }
   | {
-      type: TransactionType.DEPLOY_ACCOUNT;
+      type: typeof TransactionType.DEPLOY_ACCOUNT;
       payload: DeployAccountContractPayload;
     }
   | {
-      type: TransactionType.DEPLOY;
+      type: typeof TransactionType.DEPLOY;
       payload: UniversalDeployerContractPayload;
     };
+
+export type StarkProfile = {
+  name?: string;
+  profilePicture?: string;
+  discord?: string;
+  twitter?: string;
+  github?: string;
+  proofOfPersonhood?: boolean;
+};
