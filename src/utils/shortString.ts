@@ -1,6 +1,7 @@
-import { TEXT_TO_FELT_MAX_LEN } from '../constants';
+import { TEXT_TO_FELT_MAX_LEN } from '../global/constants';
 import { addHexPrefix, removeHexPrefix } from './encode';
 import { isHex, isStringWholeNumber } from './num';
+import { isString } from './typed';
 
 /**
  * Test if string contains only ASCII characters (string can be ascii text)
@@ -50,20 +51,6 @@ export function isDecimalString(str: string): boolean {
 }
 
 /**
- * Checks if a given value is a string.
- * @param {unknown} value the value to be checked.
- * @return {boolean} returns true if the value is a string, false otherwise.
- * @example
- * ```typescript
- * const result = shortString.isString("12345");
- * // result = true
- * ```
- */
-export function isString(value: unknown): value is string {
-  return typeof value === 'string';
-}
-
-/**
  * Test if value is a pure string text, and not a hex string or number string
  * @param {any} val the value to test
  * @returns {boolean} returns true if the value is a free-form string text, otherwise false
@@ -75,7 +62,7 @@ export function isString(value: unknown): value is string {
  * // result = false
  * ```
  */
-export function isText(val: any) {
+export function isText(val: any): boolean {
   return isString(val) && !isHex(val) && !isStringWholeNumber(val);
 }
 
@@ -89,7 +76,7 @@ export function isText(val: any) {
  * // result = true
  * ```
  */
-export const isShortText = (val: any) => isText(val) && isShortString(val);
+export const isShortText = (val: any): boolean => isText(val) && isShortString(val);
 
 /**
  * Test if value is long text
@@ -101,7 +88,7 @@ export const isShortText = (val: any) => isText(val) && isShortString(val);
  * // result = true
  * ```
  */
-export const isLongText = (val: any) => isText(val) && !isShortString(val);
+export const isLongText = (val: any): boolean => isText(val) && !isShortString(val);
 
 /**
  * Split long text (string greater than 31 characters) into short strings (string lesser or equal 31 characters)

@@ -1,8 +1,11 @@
 import { hexToBytes as hexToBytesNoble } from '@noble/curves/abstract/utils';
+import { sha256 } from '@noble/hashes/sha256';
 
+import { MASK_31 } from '../global/constants';
 import { BigNumberish } from '../types';
 import assert from './assert';
-import { addHexPrefix, removeHexPrefix } from './encode';
+import { addHexPrefix, buf2hex, removeHexPrefix } from './encode';
+import { isBigInt, isNumber, isString } from './typed';
 
 /** @deprecated prefer importing from 'types' over 'num' */
 export type { BigNumberish };
@@ -44,24 +47,6 @@ export function toBigInt(value: BigNumberish): bigint {
 }
 
 /**
- * Test if value is bigint
- *
- * @param value value to test
- * @returns {boolean} true if value is bigint, false otherwise
- * @example
- * ```typescript
- * isBigInt(10n); // true
- * isBigInt(BigInt('10')); // true
- * isBigInt(10); // false
- * isBigInt('10'); // false
- * isBigInt(null); // false
- * ```
- */
-export function isBigInt(value: any): value is bigint {
-  return typeof value === 'bigint';
-}
-
-/**
  * Convert BigNumberish to hex-string
  *
  * @param {BigNumberish} value value to convert
@@ -89,9 +74,35 @@ export const toHexString = toHex;
  * A storage key is represented as up to 62 hex digits, 3 bits, and 5 leading zeroes:
  * `0x0 + [0-7] + 62 hex = 0x + 64 hex`
  * @returns format: storage-key-string
+ * @example
+ * ```typescript
+ * toStorageKey(0x123); // '0x0000000000000000000000000000000000000000000000000000000000000123'
+ * toStorageKey(123); // '0x000000000000000000000000000000000000000000000000000000000000007b'
+ * toStorageKey('test'); // 'Error'
+ * ```
  */
 export function toStorageKey(number: BigNumberish): string {
+  // TODO: This is not completely correct as it will not enforce first 0 and second [0-7], 0x82bda... will pass as valid and should be false
   return addHexPrefix(toBigInt(number).toString(16).padStart(64, '0'));
+}
+
+/**
+ * Convert BigNumberish to hex format 0x + 64 hex chars
+ *
+ * Similar as toStorageKey but conforming to exactly 0x(64 hex chars).
+ *
+ * @returns format: hex-0x(64)-string
+ * @example
+ * ```typescript
+ * toHex64(123); // '0x000000000000000000000000000000000000000000000000000000000000007b'
+ * toHex64(123n); // '0x000000000000000000000000000000000000000000000000000000000000007b'
+ * toHex64('test'); // 'Error'
+ * ```
+ */
+export function toHex64(number: BigNumberish): string {
+  const res = addHexPrefix(toBigInt(number).toString(16).padStart(64, '0'));
+  if (res.length !== 66) throw TypeError('number is too big for hex 0x(64) representation');
+  return res;
 }
 
 /**
@@ -323,7 +334,7 @@ export function hexToBytes(str: string): Uint8Array {
  *
  * @param number value to be modified
  * @param percent integer as percent ex. 50 for 50%
- * @returns {BigInt} modified value
+ * @returns {bigint} modified value
  * @example
  * ```typescript
  * addPercent(100, 50); // 150n
@@ -334,45 +345,46 @@ export function hexToBytes(str: string): Uint8Array {
  * addPercent(200, -150); // -100n
  * ```
  */
-export function addPercent(number: BigNumberish, percent: number) {
+export function addPercent(number: BigNumberish, percent: number): bigint {
   const bigIntNum = BigInt(number);
   return bigIntNum + (bigIntNum * BigInt(percent)) / 100n;
 }
 
 /**
- * Check if a value is a number.
- *
- * @param {unknown} value - The value to check.
- * @returns {boolean} Returns true if the value is a number, otherwise returns false.
+ * Calculate the sha256 hash of an utf8 string, then encode the
+ * result in an uint8Array of 4 elements.
+ * Useful in wallet path calculation.
+ * @param {string} str utf8 string (hex string not handled).
+ * @returns a uint8Array of 4 bytes.
  * @example
  * ```typescript
- * const result = isNumber(123);
- * // result = true
- *
- * const result2 = isNumber("123");
- * // result2 = false
+ * const ledgerPathApplicationName = 'LedgerW';
+ * const path2Buffer = num.stringToSha256ToArrayBuff4(ledgerPathApplicationName);
+ * // path2Buffer = Uint8Array(4) [43, 206, 231, 219]
  * ```
- * @return {boolean} Returns true if the value is a number, otherwise returns false.
  */
-export function isNumber(value: unknown): value is number {
-  return typeof value === 'number';
+export function stringToSha256ToArrayBuff4(str: string): Uint8Array {
+  // eslint-disable-next-line no-bitwise
+  const int31 = (n: bigint) => Number(n & MASK_31);
+  const result: number = int31(BigInt(addHexPrefix(buf2hex(sha256(str)))));
+  return hexToBytes(toHex(result));
 }
 
 /**
- * Checks if a given value is of boolean type.
- *
- * @param {unknown} value - The value to check.
- * @returns {boolean} - True if the value is of boolean type, false otherwise.
+ * Checks if a given value is of BigNumberish type.
+ * 234, 234n, "234", "0xea" are valid
+ * @param {unknown} input a value
+ * @returns {boolean} true if type of input is `BigNumberish`
  * @example
  * ```typescript
- * const result = isBoolean(true);
- * // result = true
- *
- * const result2 = isBoolean(false);
- * // result2 = false
- * ```
- * @return {boolean} - True if the value is of boolean type, false otherwise.
+ * const res = num.isBigNumberish("ZERO");
+ * // res = false
+ *  ```
  */
-export function isBoolean(value: unknown): value is boolean {
-  return typeof value === 'boolean';
+export function isBigNumberish(input: unknown): input is BigNumberish {
+  return (
+    isNumber(input) ||
+    isBigInt(input) ||
+    (isString(input) && (isHex(input) || isStringWholeNumber(input)))
+  );
 }

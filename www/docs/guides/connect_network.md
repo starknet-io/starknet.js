@@ -160,3 +160,57 @@ const provider = new RpcProvider({ nodeUrl: 'http://127.0.0.1:5050/rpc' });
 ```
 
 > If you have customized host and port during starknet-devnet initialization, adapt in accordance your script.
+
+## Batch JSON-RPC
+
+The BatchClient class allows requests to be batched together in a single HTTP request, either by the interval amount or at the end of the callback queue if the batch is set to 0. By batching requests, we can reduce the overhead associated with handling individual requests.
+
+#### Example of usage with RpcProvider
+
+```typescript
+const myBatchProvider = new RpcProvider({
+  batch: 0,
+});
+
+const [getBlockResponse, blockHashAndNumber, txCount] = await Promise.all([
+  myBatchProvider.getBlock(),
+  myBatchProvider.getBlockLatestAccepted(),
+  myBatchProvider.getBlockTransactionCount('latest'),
+]);
+
+// ... usage of getBlockResponse, blockHashAndNumber, txCount
+```
+
+#### Example of direct usage of underlying BatchClient class
+
+```typescript
+const provider = new RpcProvider();
+
+const batchClient = new BatchClient({
+  nodeUrl: provider.channel.nodeUrl,
+  headers: provider.channel.headers,
+  interval: 0,
+});
+
+const [getBlockResponse, blockHashAndNumber, txCount] = await Promise.all([
+  batchClient.getBlock(),
+  batchClient.getBlockLatestAccepted(),
+  batchClient.getBlockTransactionCount('latest'),
+]);
+
+// ... usage of getBlockResponse, blockHashAndNumber, txCount
+```
+
+## Error handling
+
+The [Starknet RPC specification](https://github.com/starkware-libs/starknet-specs) defines a set of possible errors that the RPC endpoints could return for various scenarios. If such errors arise `starknet.js` represents them with the corresponding [RpcError](../API/classes/RpcError) class where the endpoint error response information is contained within the `baseError` property. Also of note is that the class has an `isType` convenience method that verifies the base error type as shown in the example below.
+
+#### Example
+
+```typescript
+try {
+  ...
+} catch (error) {
+  if (error instanceof RpcError && error.isType('UNEXPECTED_ERROR')) { ... }
+}
+```

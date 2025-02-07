@@ -1,6 +1,7 @@
-import { ETransactionVersion } from './types/api';
+import { ETransactionVersion } from '../types/api';
+import { type LogLevel } from './logger.type';
 
-export { IS_BROWSER } from './utils/encode';
+export { IS_BROWSER } from '../utils/encode';
 
 /**
  * Cairo Felt support storing max 31 character
@@ -16,6 +17,7 @@ export { ETransactionVersion as TRANSACTION_VERSION };
 
 export const ZERO = 0n;
 export const MASK_250 = 2n ** 250n - 1n; // 2 ** 250 - 1
+export const MASK_31 = 2n ** 31n - 1n; // 2 ** 31 - 1
 export const API_VERSION = ZERO;
 export const PRIME = 2n ** 251n + 17n * 2n ** 192n + 1n;
 
@@ -75,3 +77,32 @@ export const RPC_NODES = {
     `https://free-rpc.nethermind.io/sepolia-juno/${RPC_DEFAULT_VERSION}`,
   ],
 } as const;
+
+export const OutsideExecutionCallerAny = '0x414e595f43414c4c4552'; // encodeShortString('ANY_CALLER')
+export const SNIP9_V1_INTERFACE_ID =
+  '0x68cfd18b92d1907b8ba3cc324900277f5a3622099431ea85dd8089255e4181';
+export const SNIP9_V2_INTERFACE_ID =
+  '0x1d1144bb2138366ff28d8e9ab57456b1d332ac42196230c3a602003c89872';
+
+// Ledger signer
+// 0x80
+export const HARDENING_BYTE = 128;
+// 0x80000000
+export const HARDENING_4BYTES = 2147483648n;
+
+// Default initial global config
+export const DEFAULT_GLOBAL_CONFIG: {
+  legacyMode: boolean;
+  logLevel: LogLevel;
+  accountTxVersion: typeof ETransactionVersion.V2 | typeof ETransactionVersion.V3;
+} = {
+  legacyMode: false,
+  logLevel: 'INFO',
+  accountTxVersion: ETransactionVersion.V2,
+};
+
+// Default system messages
+export const SYSTEM_MESSAGES = {
+  legacyTxWarningMessage:
+    'You are using a deprecated transaction version (V0,V1,V2)!\nUpdate to the latest V3 transactions!',
+};

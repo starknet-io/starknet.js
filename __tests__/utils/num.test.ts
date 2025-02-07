@@ -1,22 +1,20 @@
+import { num } from '../../src';
 import {
-  isHex,
-  toBigInt,
-  isBigInt,
-  toHex,
-  hexToDecimalString,
-  cleanHex,
+  addPercent,
   assertInRange,
   bigNumberishArrayToDecimalStringArray,
   bigNumberishArrayToHexadecimalStringArray,
-  isStringWholeNumber,
+  cleanHex,
   getDecimalString,
   getHexString,
   getHexStringArray,
-  toCairoBool,
   hexToBytes,
-  addPercent,
-  isNumber,
-  isBoolean,
+  hexToDecimalString,
+  isHex,
+  isStringWholeNumber,
+  toBigInt,
+  toCairoBool,
+  toHex,
 } from '../../src/utils/num';
 
 describe('isHex', () => {
@@ -45,23 +43,6 @@ describe('toBigInt', () => {
 
   test('should throw for invalid arg', () => {
     expect(() => toBigInt('test')).toThrow();
-  });
-});
-
-describe('isBigInt', () => {
-  test('should return true for big integers', () => {
-    expect(isBigInt(BigInt(10))).toBe(true);
-    expect(isBigInt(BigInt('9007199254740991'))).toBe(true);
-  });
-
-  test('should return false for non-big integers', () => {
-    expect(isBigInt(10)).toBe(false);
-    expect(isBigInt('10')).toBe(false);
-    expect(isBigInt(undefined)).toBe(false);
-    expect(isBigInt(null)).toBe(false);
-    expect(isBigInt({})).toBe(false);
-    expect(isBigInt([])).toBe(false);
-    expect(isBigInt(true)).toBe(false);
   });
 });
 
@@ -176,35 +157,76 @@ describe('addPercent', () => {
   });
 });
 
-describe('isNumber', () => {
-  test('should correctly determine if value is a number', () => {
-    expect(isNumber(0)).toBe(true);
-    expect(isNumber(123)).toBe(true);
-    expect(isNumber(-123)).toBe(true);
-
-    expect(isNumber(123n)).toBe(false);
-    expect(isNumber('')).toBe(false);
-    expect(isNumber('123')).toBe(false);
-    expect(isNumber(true)).toBe(false);
-    expect(isNumber(false)).toBe(false);
-    expect(isNumber(null)).toBe(false);
-    expect(isBoolean([])).toBe(false);
-    expect(isBoolean({})).toBe(false);
+describe('stringToSha256ToArrayBuff4', () => {
+  test('should correctly hash&encode an utf8 string', () => {
+    const buff = num.stringToSha256ToArrayBuff4('LedgerW');
+    expect(buff).toEqual(new Uint8Array([43, 206, 231, 219]));
   });
 });
 
-describe('isBoolean', () => {
-  test('should correctly determine if value is a boolean', () => {
-    expect(isBoolean(true)).toBe(true);
-    expect(isBoolean(false)).toBe(true);
+describe('isBigNumberish', () => {
+  test('determine if value is a BigNumberish', () => {
+    expect(num.isBigNumberish(234)).toBe(true);
+    expect(num.isBigNumberish(234n)).toBe(true);
+    expect(num.isBigNumberish('234')).toBe(true);
+    expect(num.isBigNumberish('0xea')).toBe(true);
+    expect(num.isBigNumberish('ea')).toBe(false);
+    expect(num.isBigNumberish('zero')).toBe(false);
+  });
+});
 
-    expect(isBoolean(0)).toBe(false);
-    expect(isBoolean(1)).toBe(false);
-    expect(isBoolean('')).toBe(false);
-    expect(isBoolean('true')).toBe(false);
-    expect(isBoolean('false')).toBe(false);
-    expect(isBoolean(null)).toBe(false);
-    expect(isBoolean([])).toBe(false);
-    expect(isBoolean({})).toBe(false);
+describe('toStorageKey, toHex64', () => {
+  test('should convert to 0x + 64 hex unrestricted', () => {
+    expect(() => num.toStorageKey('monorepo')).toThrow();
+
+    const key1 = num.toStorageKey('0x123');
+    expect(key1).toEqual('0x0000000000000000000000000000000000000000000000000000000000000123');
+    expect(key1.length).toEqual(66);
+
+    const key11 = num.toStorageKey(
+      '0x000000000000000000000000000000000000000000000000000000000000000000000000000000000123'
+    );
+    expect(key11).toEqual('0x0000000000000000000000000000000000000000000000000000000000000123');
+    expect(key11.length).toEqual(66);
+
+    const key2 = num.toStorageKey(123);
+    expect(key2).toEqual('0x000000000000000000000000000000000000000000000000000000000000007b');
+    expect(key2.length).toEqual(66);
+
+    const key3 = num.toStorageKey(123n);
+    expect(key3).toEqual('0x000000000000000000000000000000000000000000000000000000000000007b');
+    expect(key3.length).toEqual(66);
+  });
+
+  test('should convert to 0x + 64 hex restricted', () => {
+    expect(() => num.toHex64('monorepo')).toThrow();
+
+    const key1 = num.toHex64('0x123');
+    expect(key1).toEqual('0x0000000000000000000000000000000000000000000000000000000000000123');
+    expect(key1.length).toEqual(66);
+
+    const key11 = num.toHex64(
+      '0x000000000000000000000000000000000000000000000000000000000000000000000000000000000123'
+    );
+    expect(key11).toEqual('0x0000000000000000000000000000000000000000000000000000000000000123');
+    expect(key11.length).toEqual(66);
+
+    expect(() =>
+      num.toHex64(
+        '0x123000000000000000000000000000000000000000000000000000000000000000000000000000000123'
+      )
+    ).toThrow(TypeError);
+
+    const key2 = num.toHex64(123);
+    expect(key2).toEqual('0x000000000000000000000000000000000000000000000000000000000000007b');
+    expect(key2.length).toEqual(66);
+
+    const key3 = num.toHex64(123n);
+    expect(key3).toEqual('0x000000000000000000000000000000000000000000000000000000000000007b');
+    expect(key3.length).toEqual(66);
+
+    const key4 = num.toHex64('0x82bdafb0c4a2b03cd0f16ddcc3339da37f2cbb1aecb2a419764e35b7c3a8ec29');
+    expect(key4).toEqual('0x82bdafb0c4a2b03cd0f16ddcc3339da37f2cbb1aecb2a419764e35b7c3a8ec29');
+    expect(key4.length).toEqual(66);
   });
 });

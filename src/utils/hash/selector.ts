@@ -1,12 +1,14 @@
 import { keccak } from '@scure/starknet';
-
-import { MASK_250 } from '../../constants';
+import { keccak_256 } from '@noble/hashes/sha3';
+import { bytesToHex } from '@noble/curves/abstract/utils';
+import { MASK_250 } from '../../global/constants';
 import { BigNumberish } from '../../types';
 import { addHexPrefix, removeHexPrefix, utf8ToArray } from '../encode';
-import { hexToBytes, isHex, isStringWholeNumber, toHex, toHexString } from '../num';
+import { hexToBytes, isHex, isStringWholeNumber, toHex } from '../num';
+import { isBigInt, isNumber } from '../typed';
 
 /**
- * Calculate the hex-string Keccak hash for a given BigNumberish
+ * Calculate the hex-string Starknet Keccak hash for a given BigNumberish
  *
  * @param value value to hash
  * @returns hex-string Keccak hash
@@ -24,7 +26,7 @@ export function keccakBn(value: BigNumberish): string {
 
 /**
  * [internal]
- * Calculate hex-string Keccak hash for a given string
+ * Calculate hex-string Starknet Keccak hash for a given string
  *
  * String -> hex-string Keccak hash
  * @returns format: hex-string
@@ -69,9 +71,9 @@ export function getSelectorFromName(funcName: string) {
 }
 
 /**
- * Calculate the hex-string selector from a given abi function name, decimal string or hex string
+ * Calculate the hex-string selector from a given abi function name or of any representation of number.
  *
- * @param value hex-string | dec-string | ascii-string
+ * @param value ascii-string | hex-string | dec-string | number | BigInt
  * @returns hex-string selector
  * @example
  * ```typescript
@@ -83,14 +85,76 @@ export function getSelectorFromName(funcName: string) {
  *
  * const selector3: string = getSelector("123456");
  * // selector3 = "0x1e240"
+ *
+ * const selector4: string = getSelector(123456n);
+ * // selector4 = "0x1e240"
  * ```
  */
-export function getSelector(value: string) {
-  if (isHex(value)) {
-    return value;
-  }
-  if (isStringWholeNumber(value)) {
-    return toHexString(value);
-  }
+export function getSelector(value: string | BigNumberish) {
+  if (isNumber(value) || isBigInt(value)) return toHex(value);
+  if (isHex(value)) return value;
+  if (isStringWholeNumber(value)) return toHex(value);
   return getSelectorFromName(value);
+}
+
+/**
+ * Solidity hash of an array of uint256
+ * @param {BigNumberish[]} params an array of uint256 numbers
+ * @returns the hash of the array of Solidity uint256
+ * @example
+ * ```typescript
+ * const result = hash.solidityUint256PackedKeccak256(['0x100', '200', 300, 400n]);
+ * // result = '0xd1e6cb422b65269603c491b0c85463295edabebfb2a6844e4fdc389ff1dcdd97'
+ * ```
+ */
+export function solidityUint256PackedKeccak256(params: BigNumberish[]): string {
+  const myEncode = addHexPrefix(
+    params.reduce(
+      (res: string, par: BigNumberish) => res + removeHexPrefix(toHex(par)).padStart(64, '0'),
+      ''
+    )
+  );
+  return addHexPrefix(bytesToHex(keccak_256(hexToBytes(myEncode))));
+}
+
+/**
+ * Calculate the L2 message hash related by a message L1->L2
+ * @param {BigNumberish} l1FromAddress L1 account address that paid the message.
+ * @param {BigNumberish} l2ToAddress L2 contract address to execute.
+ * @param {string | BigNumberish} l2Selector can be a function name ("bridge_withdraw") or a number (BigNumberish).
+ * @param {RawCalldata} l2Calldata an array of BigNumberish of the raw parameters passed to the above function.
+ * @param {BigNumberish} l1Nonce The nonce of the L1 account.
+ * @returns {string} hex-string of the L2 transaction hash
+ * @example
+ * ```typescript
+ * const l1FromAddress = "0x0000000000000000000000008453fc6cd1bcfe8d4dfc069c400b433054d47bdc";
+ * const l2ToAddress = 2158142789748719025684046545159279785659305214176670733242887773692203401023n;
+ * const l2Selector = 774397379524139446221206168840917193112228400237242521560346153613428128537n;
+ * const payload = [
+ *     4543560n,
+ *    829565602143178078434185452406102222830667255948n,
+ *     3461886633118033953192540141609307739580461579986333346825796013261542798665n,
+ *     9000000000000000n,
+ *     0n,
+ * ];
+ * const l1Nonce = 8288n;
+ * const result = hash.getL2MessageHash(l1FromAddress, l2ToAddress, l2Selector, payload, l1Nonce);
+ * // result = "0x2e350fa9d830482605cb68be4fdb9f0cb3e1f95a0c51623ac1a5d1bd997c2090"
+ * ```
+ */
+export function getL2MessageHash(
+  l1FromAddress: BigNumberish,
+  l2ToAddress: BigNumberish,
+  l2Selector: string | BigNumberish,
+  l2Calldata: BigNumberish[],
+  l1Nonce: BigNumberish
+): string {
+  return solidityUint256PackedKeccak256([
+    l1FromAddress,
+    l2ToAddress,
+    l1Nonce,
+    l2Selector,
+    l2Calldata.length,
+    ...l2Calldata,
+  ]);
 }

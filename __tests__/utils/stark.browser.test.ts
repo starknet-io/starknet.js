@@ -3,7 +3,7 @@
  */
 import { TextEncoder } from 'util';
 
-import * as constants from '../../src/constants';
+import * as constants from '../../src/global/constants';
 import * as json from '../../src/utils/json';
 
 const { IS_BROWSER } = constants;
@@ -26,8 +26,8 @@ describe('compressProgram()', () => {
   const { stark } = require('../../src'); // eslint-disable-line global-require
 
   // eslint-disable-next-line global-require
-  const fixtures = require('../config/fixtures');
-  const compiledAccount = fixtures.compiledOpenZeppelinAccount;
+  const { contracts } = require('../config/fixtures');
+  const compiledAccount = contracts.OpenZeppelinAccount;
 
   test('compresses a contract program', () => {
     const compressed = stark.compressProgram(compiledAccount.program);

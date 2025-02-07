@@ -1,4 +1,4 @@
-import { NetworkName, RPC_NODES } from '../constants';
+import { NetworkName, RPC_NODES } from '../global/constants';
 import {
   BlockIdentifier,
   BlockTag,
@@ -18,10 +18,12 @@ import { ETransactionVersion } from '../types/api';
 import { isSierra } from './contract';
 import { formatSpaces } from './hash';
 import { parse, stringify } from './json';
-import { isBigInt, isHex, isNumber, toHex } from './num';
-import { isDecimalString, isString } from './shortString';
+import { isHex, toHex } from './num';
+import { isDecimalString } from './shortString';
+import { isBigInt, isNumber, isString } from './typed';
 import { compressProgram } from './stark';
 import type { GetTransactionReceiptResponse } from './transactionReceipt';
+import { logger } from '../global/logger';
 
 /**
  * Helper - Async Sleep for 'delay' time
@@ -43,7 +45,7 @@ export function wait(delay: number): Promise<unknown> {
  * Create Sierra compressed Contract Class from a given Compiled Sierra
  *
  * CompiledSierra -> SierraContractClass
- * 
+ *
  * @param {CompiledSierra} contract sierra code from the Cairo compiler
  * @returns {SierraContractClass} compressed Sierra
  * @example
@@ -120,8 +122,7 @@ export function parseContract(contract: CompiledContract | string): ContractClas
  */
 export const getDefaultNodeUrl = (networkName?: NetworkName, mute: boolean = false): string => {
   if (!mute) {
-    // eslint-disable-next-line no-console
-    console.warn('Using default public node url, please provide nodeUrl in provider options!');
+    logger.info('Using default public node url, please provide nodeUrl in provider options!');
   }
   const nodes = RPC_NODES[networkName ?? NetworkName.SN_SEPOLIA];
   const randIdx = Math.floor(Math.random() * nodes.length);

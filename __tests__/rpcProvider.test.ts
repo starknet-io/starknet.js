@@ -1,5 +1,5 @@
-import { getStarkKey, utils } from '@scure/starknet';
-
+import { getStarkKey, Signature, utils } from '@scure/starknet';
+import typedDataExample from '../__mocks__/typedData/baseExample.json';
 import {
   Account,
   Block,
@@ -16,15 +16,11 @@ import {
   stark,
   waitForTransactionOptions,
 } from '../src';
-import { StarknetChainId } from '../src/constants';
+import { StarknetChainId } from '../src/global/constants';
 import { felt, uint256 } from '../src/utils/calldata/cairo';
-import { toHexString } from '../src/utils/num';
+import { toBigInt, toHexString } from '../src/utils/num';
 import {
-  compiledC1v2,
-  compiledC1v2Casm,
-  compiledErc20Echo,
-  compiledL1L2,
-  compiledOpenZeppelinAccount,
+  contracts,
   createBlockForDevnet,
   describeIfDevnet,
   describeIfNotDevnet,
@@ -36,6 +32,7 @@ import {
   waitNextBlock,
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
+import { isBoolean } from '../src/utils/typed';
 
 describeIfRpc('RPCProvider', () => {
   const rpcProvider = getTestProvider(false);
@@ -49,6 +46,14 @@ describeIfRpc('RPCProvider', () => {
     const accountKeyPair = utils.randomPrivateKey();
     accountPublicKey = getStarkKey(accountKeyPair);
     await createBlockForDevnet();
+  });
+
+  test('baseFetch override', async () => {
+    const { nodeUrl } = rpcProvider.channel;
+    const baseFetch = jest.fn();
+    const fetchProvider = new RpcProvider({ nodeUrl, baseFetch });
+    (fetchProvider.fetch as any)();
+    expect(baseFetch.mock.calls.length).toBe(1);
   });
 
   test('instantiate from rpcProvider', () => {
@@ -139,7 +144,7 @@ describeIfRpc('RPCProvider', () => {
 
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
-        contract: compiledL1L2,
+        contract: contracts.L1L2,
       });
       l1l2ContractCairo0Address = deploy.contract_address;
     });
@@ -167,8 +172,8 @@ describeIfRpc('RPCProvider', () => {
 
     beforeAll(async () => {
       const { deploy: deploy2 } = await account.declareAndDeploy({
-        contract: compiledC1v2,
-        casm: compiledC1v2Casm,
+        contract: contracts.C1v2.sierra,
+        casm: contracts.C1v2.casm,
       });
       l1l2ContractCairo1Address = deploy2.contract_address;
       await waitNextBlock(provider as RpcProvider, 5000); // in Sepolia Testnet, needs pending block validation before interacting
@@ -303,16 +308,17 @@ describeIfRpc('RPCProvider', () => {
       expect(Array.isArray(transactions)).toBe(true);
     });
 
+    test('getSyncingStats', async () => {
+      const syncingStats = await rpcProvider.getSyncingStats();
+      expect(syncingStats).toMatchSchemaRef('GetSyncingStatsResponse');
+      if (isBoolean(syncingStats)) expect(syncingStats).toBe(false);
+    });
+
     xtest('traceBlockTransactions', async () => {
       await rpcProvider.getBlockTransactionsTraces(latestBlock.block_hash);
     });
 
     describeIfDevnet('devnet only', () => {
-      test('getSyncingStats', async () => {
-        const syncingStats = await rpcProvider.getSyncingStats();
-        expect(syncingStats).toBe(false);
-      });
-
       test('getEvents ', async () => {
         const randomWallet = stark.randomAddress();
         const classHash = '0x011ab8626b891bcb29f7cc36907af7670d6fb8a0528c7944330729d8f01e9ea3';
@@ -321,7 +327,7 @@ describeIfRpc('RPCProvider', () => {
         );
 
         const { deploy } = await account.declareAndDeploy({
-          contract: compiledErc20Echo,
+          contract: contracts.Erc20Echo,
           classHash,
           constructorCalldata: CallData.compile({
             name: felt('Token'),
@@ -335,7 +341,7 @@ describeIfRpc('RPCProvider', () => {
         });
 
         const erc20EchoContract = new Contract(
-          compiledErc20Echo.abi,
+          contracts.Erc20Echo.abi,
           deploy.contract_address!,
           account
         );
@@ -385,7 +391,7 @@ describeIfRpc('RPCProvider', () => {
 
       beforeAll(async () => {
         const { deploy } = await account.declareAndDeploy({
-          contract: compiledOpenZeppelinAccount,
+          contract: contracts.OpenZeppelinAccount,
           constructorCalldata: [accountPublicKey],
           salt: accountPublicKey,
         });
@@ -436,13 +442,6 @@ describeIfRpc('RPCProvider', () => {
       });
     });
   });
-
-  describeIfNotDevnet('global rpc only', () => {
-    test('getSyncingStats', async () => {
-      const syncingStats = await rpcProvider.getSyncingStats();
-      expect(syncingStats).toMatchSchemaRef('GetSyncingStatsResponse');
-    });
-  });
 });
 
 describeIfTestnet('RPCProvider', () => {
@@ -491,5 +490,49 @@ describeIfNotDevnet('waitForBlock', () => {
   test('waitForBlock pending', async () => {
     await providerStandard.waitForBlock('pending');
     expect(true).toBe(true); // answer without timeout Error (blocks have to be spaced with 16 minutes maximum : 200 retries * 5000ms)
+  });
+});
+
+describe('EIP712 verification', () => {
+  const rpcProvider = getTestProvider(false);
+  const account = getTestAccount(rpcProvider);
+
+  test('sign and verify message', async () => {
+    const signature = await account.signMessage(typedDataExample);
+    const verifMessageResponse: boolean = await rpcProvider.verifyMessageInStarknet(
+      typedDataExample,
+      signature,
+      account.address
+    );
+    expect(verifMessageResponse).toBe(true);
+
+    const messageHash = await account.hashMessage(typedDataExample);
+    const verifMessageResponse2: boolean = await rpcProvider.verifyMessageInStarknet(
+      messageHash,
+      signature,
+      account.address
+    );
+    expect(verifMessageResponse2).toBe(true);
+  });
+
+  test('sign and verify EIP712 message fail', async () => {
+    const signature = await account.signMessage(typedDataExample);
+    const [r, s] = stark.formatSignature(signature);
+
+    // change the signature to make it invalid
+    const r2 = toBigInt(r) + 123n;
+    const wrongSignature = new Signature(toBigInt(r2.toString()), toBigInt(s));
+    if (!wrongSignature) return;
+    const verifMessageResponse: boolean = await rpcProvider.verifyMessageInStarknet(
+      typedDataExample,
+      wrongSignature,
+      account.address
+    );
+    expect(verifMessageResponse).toBe(false);
+
+    const wrongAccountAddress = '0x123456789';
+    await expect(
+      rpcProvider.verifyMessageInStarknet(typedDataExample, signature, wrongAccountAddress)
+    ).rejects.toThrow();
   });
 });

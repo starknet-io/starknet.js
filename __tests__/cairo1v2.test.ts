@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+
 import {
   Account,
   BigNumberish,
@@ -26,19 +27,7 @@ import {
   stark,
   types,
 } from '../src';
-import {
-  TEST_TX_VERSION,
-  compiledC1Account,
-  compiledC1AccountCasm,
-  compiledC1v2,
-  compiledC1v2Casm,
-  compiledC210,
-  compiledC210Casm,
-  compiledComplexSierra,
-  compiledHelloSierra,
-  getTestAccount,
-  getTestProvider,
-} from './config/fixtures';
+import { TEST_TX_VERSION, contracts, getTestAccount, getTestProvider } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
 const { uint256, tuple, isCairo1Abi } = cairo;
@@ -57,16 +46,20 @@ describe('Cairo 1', () => {
 
     beforeAll(async () => {
       dd = await account.declareAndDeploy({
-        contract: compiledC1v2,
-        casm: compiledC1v2Casm,
+        contract: contracts.C1v2.sierra,
+        casm: contracts.C1v2.casm,
       });
-      cairo1Contract = new Contract(compiledC1v2.abi, dd.deploy.contract_address, account);
+      cairo1Contract = new Contract(contracts.C1v2.sierra.abi, dd.deploy.contract_address, account);
 
       dd2 = await account.declareAndDeploy({
-        contract: compiledC210,
-        casm: compiledC210Casm,
+        contract: contracts.C210.sierra,
+        casm: contracts.C210.casm,
       });
-      cairo210Contract = new Contract(compiledC210.abi, dd2.deploy.contract_address, account);
+      cairo210Contract = new Contract(
+        contracts.C210.sierra.abi,
+        dd2.deploy.contract_address,
+        account
+      );
     });
 
     test('Declare & deploy v2 - Hello Cairo 1 contract', async () => {
@@ -90,12 +83,12 @@ describe('Cairo 1', () => {
 
       await account.declare({
         contract: cc0 as CompiledSierra,
-        casm: compiledC1v2Casm,
+        casm: contracts.C1v2.casm,
       });
 
       await account.declare({
         contract: cc0_1 as CompiledSierra,
-        casm: compiledC1v2Casm,
+        casm: contracts.C1v2.casm,
       });
     });
 
@@ -228,7 +221,7 @@ describe('Cairo 1', () => {
       const result = await cairo1Contract.call('new_types', compiled.calldata as Calldata);
       expect(result).toStrictEqual({ '0': 123456789n, '1': 987654321n, '2': 657563474357n });
 
-      const myCalldata = new CallData(compiledC1v2.abi); // test arrays
+      const myCalldata = new CallData(contracts.C1v2.sierra.abi); // test arrays
       const compiled2 = myCalldata.compile('array_new_types', {
         tup: cairo.tuple(256, '0x1234567890', '0xe3456'),
         tupa: cairo.tuple(
@@ -604,7 +597,7 @@ describe('Cairo 1', () => {
         ],
       ];
 
-      const contractCallData: CallData = new CallData(compiledComplexSierra.abi);
+      const contractCallData: CallData = new CallData(contracts.ComplexSierra.abi);
       const callDataFromObject: Calldata = contractCallData.compile('constructor', myRawArgsObject);
       const callDataFromArray: Calldata = contractCallData.compile('constructor', myRawArgsArray);
       const expectedResult = [
@@ -680,8 +673,8 @@ describe('Cairo 1', () => {
     });
 
     test('myCallData.decodeParameters for Cairo 1', async () => {
-      const Cairo1HelloAbi = compiledHelloSierra;
-      const Cairo1Abi = compiledC1v2;
+      const Cairo1HelloAbi = contracts.HelloSierra.sierra;
+      const Cairo1Abi = contracts.C1v2.sierra;
       const helloCallData = new CallData(Cairo1HelloAbi.abi);
       const c1v2CallData = new CallData(Cairo1Abi.abi);
 
@@ -769,8 +762,8 @@ describe('Cairo 1', () => {
 
       // declare account
       const declareAccount = await account.declareIfNot({
-        contract: compiledC1Account,
-        casm: compiledC1AccountCasm,
+        contract: contracts.C1Account.sierra,
+        casm: contracts.C1Account.casm,
       });
       if (declareAccount.transaction_hash) {
         await account.waitForTransaction(declareAccount.transaction_hash);
@@ -842,11 +835,11 @@ describe('Cairo 1', () => {
     };
     beforeAll(async () => {
       const { deploy } = await account.declareAndDeploy({
-        contract: compiledC1v2,
-        casm: compiledC1v2Casm,
+        contract: contracts.C1v2.sierra,
+        casm: contracts.C1v2.casm,
       });
 
-      eventContract = new Contract(compiledC1v2.abi, deploy.contract_address!, account);
+      eventContract = new Contract(contracts.C1v2.sierra.abi, deploy.contract_address!, account);
     });
 
     test('parse event returning a regular struct', async () => {
@@ -872,7 +865,7 @@ describe('Cairo 1', () => {
       ];
       const tx = await provider.waitForTransaction(transaction_hash);
       const myEvents = eventContract.parseEvents(tx);
-      return expect(myEvents).toStrictEqual(shouldBe);
+      expect(myEvents[0]).toMatchEventStructure(shouldBe[0]);
     });
 
     test('parse event returning a nested struct', async () => {
@@ -890,7 +883,7 @@ describe('Cairo 1', () => {
       ];
       const tx = await provider.waitForTransaction(transaction_hash);
       const myEvents = eventContract.parseEvents(tx);
-      return expect(myEvents).toStrictEqual(shouldBe);
+      expect(myEvents[0]).toMatchEventStructure(shouldBe[0]);
     });
 
     test('parse tx returning multiple similar events', async () => {
@@ -936,7 +929,8 @@ describe('Cairo 1', () => {
       const { transaction_hash } = await account.execute([callData1, callData2]);
       const tx = await provider.waitForTransaction(transaction_hash);
       const myEvents = eventContract.parseEvents(tx);
-      return expect(myEvents).toStrictEqual(shouldBe);
+      expect(myEvents[0]).toMatchEventStructure(shouldBe[0]);
+      expect(myEvents[1]).toMatchEventStructure(shouldBe[1]);
     });
     test('parse tx returning multiple different events', async () => {
       const shouldBe: types.ParsedEvents = [
@@ -972,7 +966,8 @@ describe('Cairo 1', () => {
       const { transaction_hash } = await account.execute([callData1, callData2]);
       const tx = await provider.waitForTransaction(transaction_hash);
       const myEvents = eventContract.parseEvents(tx);
-      return expect(myEvents).toStrictEqual(shouldBe);
+      expect(myEvents[0]).toMatchEventStructure(shouldBe[0]);
+      expect(myEvents[1]).toMatchEventStructure(shouldBe[1]);
     });
 
     test('parsing nested events from Cairo components', () => {
@@ -1041,6 +1036,9 @@ describe('Cairo 1', () => {
             maker_source: 418413900385n,
             taker_source: 418413900385n,
           },
+          block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
+          block_number: 69198,
+          transaction_hash: '0x4e38fcce79c115b6fe2c486e3514efc1bd4da386b91c104e97230177d0bf181',
         },
       ]);
       // From component `DepositComponent`, event `Deposit` (same event name than next)
@@ -1093,6 +1091,9 @@ describe('Cairo 1', () => {
             funder: 1466771120193999006693452314154095230636738457276435850562375218974960297344n,
             amount: 4956000000000000n,
           },
+          block_hash: '0x31afd649a5042cb1855ce820708a555eab62fe6ea07a2a538fa9100cdc80383',
+          block_number: 69198,
+          transaction_hash: '0x7768860d79bfb4c8463d215abea3c267899e373407c6882077f7447051c50de',
         },
       ]);
       const parsedEventNestedDeposit2 = events.parseEvents(
@@ -1109,6 +1110,9 @@ describe('Cairo 1', () => {
             funder: 1466771120193999006693452314154095230636738457276435850562375218974960297344n,
             amount: 4956000000000000n,
           },
+          block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
+          block_number: 69198,
+          transaction_hash: '0x2d5210e5334a83306abe6f7f5e7e65cd1feed72ad3b8e359a2f4614fa948e1d',
         },
       ]);
 
@@ -1133,6 +1137,9 @@ describe('Cairo 1', () => {
             to: 2087021424722619777119509474943472645767659996348769578120564519014510906823n,
             value: 4956000000000000n,
           },
+          block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
+          block_number: 69198,
+          transaction_hash: '0x2da31a929a9848e9630906275a75a531e1718d4830501e10b0bccacd55f6fe0',
         },
       ]);
     });

@@ -32,6 +32,9 @@
   <a href="https://twitter.com/starknetjs">
     <img src="https://img.shields.io/badge/follow_us-Twitter-blue">
   </a>
+  <a href="https://www.drips.network/app/projects/github/starknet-io/starknet.js" target="_blank">
+    <img src="https://www.drips.network/api/embed/project/https%3A%2F%2Fgithub.com%2Fstarknet-io%2Fstarknet.js/support.png?background=light&style=github&text=project&stat=none" alt="Support starknet.js on drips.network" height="20">
+  </a>
 </p>
 
 ## Installation
@@ -59,7 +62,7 @@ Play with [Code Examples](https://github.com/PhilippeR26/starknet.js-workshop-ty
 
 If you consider to contribute to this project please read [CONTRIBUTING.md](https://github.com/starknet-io/starknet.js/blob/main/CONTRIBUTING.md) first.
 
-You can also join our dedicated channel for [Starknet.js](https://discord.com/channels/793094838509764618/927918707613786162) on the [Starknet Discord](https://discord.com/invite/YgsdxEx3)
+You can also join our dedicated channel for [Starknet.js](https://discord.com/channels/793094838509764618/1270119831559078061) on the [Starknet Discord](https://discord.com/invite/starknet-community)
 
 ## ❤️ Special Thanks
 
@@ -69,7 +72,7 @@ Special thanks to all the [contributors](https://github.com/starknet-io/starknet
 
 - Janek ([@janek26](https://github.com/janek26)) and Dhruv ([@dhruvkelawala](https://github.com/dhruvkelawala)) from [Argent](https://github.com/argentlabs)
 
-- Toni ([@tabaktoni](https://github.com/tabaktoni)) and Ivan ([@ivpavici](https://github.com/ivpavici)) from [SpaceShard](https://www.spaceshard.io/)
+- Toni ([@tabaktoni](https://github.com/tabaktoni)), Petar ([@penovicp](https://github.com/penovicp)) and Ivan ([@ivpavici](https://github.com/ivpavici)) from [SpaceShard](https://www.spaceshard.io/)
 
 - Philippe ROSTAN ([@PhilippeR26](https://github.com/PhilippeR26))
 

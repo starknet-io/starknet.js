@@ -15,6 +15,7 @@ import {
   isTypeSecp256k1Point,
   isTypeStruct,
   isTypeTuple,
+  isTypeU96,
 } from './cairo';
 import {
   CairoCustomEnum,
@@ -24,8 +25,7 @@ import {
   CairoResultVariant,
 } from './enum';
 import extractTupleMemberTypes from './tuple';
-
-import { isString } from '../shortString';
+import { isUndefined, isString } from '../typed';
 
 function errorU256(key: string) {
   return Error(
@@ -64,6 +64,9 @@ export default function orderPropsByAbi(
       return unorderedItem;
     }
     if (isTypeByteArray(abiType)) {
+      return unorderedItem;
+    }
+    if (isTypeU96(abiType)) {
       return unorderedItem;
     }
     if (isTypeSecp256k1Point(abiType)) {
@@ -184,7 +187,7 @@ export default function orderPropsByAbi(
     const unorderedCustomEnum = unorderedObject2 as CairoCustomEnum;
     const variants = Object.entries(unorderedCustomEnum.variant);
     const newEntries = variants.map((variant) => {
-      if (typeof variant[1] === 'undefined') {
+      if (isUndefined(variant[1])) {
         return variant;
       }
       const variantType: string = abiObject.type.substring(

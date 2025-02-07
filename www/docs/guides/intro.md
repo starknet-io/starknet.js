@@ -16,15 +16,11 @@ npm install starknet
 npm install starknet@next
 ```
 
-## Running test locally
+## Running tests locally
 
-### With Devnet
+Local tests rely on <ins>[Starknet Devnet](https://github.com/0xSpaceShard/starknet-devnet-rs)</ins>, a local testnet emulation.
 
-- RPC Devnet [repo](https://github.com/0xSpaceShard/starknet-devnet-rs)
-
-Launch the development net.
-
-Open a new console tab, go to your starknet.js directory, and run:
+Launch a Devnet instance and run:
 
 ```bash
 npm run test # all tests
@@ -33,7 +29,7 @@ npm run test ./__tests__/contract.test.ts # just one test suite
 
 ## Running docs locally
 
-If you want to change documentation and see how it looks before making a PR:
+If you want to make changes to the documentation and see how it looks before making a PR:
 
 ```bash
 cd www
@@ -41,7 +37,7 @@ npm install # install docusaurus
 npm run start # fires up a local documentation site
 ```
 
-## Compiling Starknet Contracts
+## Compiling Starknet contracts
 
 Please check the Starknet documentation <ins>[here](https://docs.starknet.io/documentation/quick_start/declare_a_smart_contract/#compiling_a_smart_contract)</ins> to compile Starknet contracts.
 

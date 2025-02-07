@@ -86,7 +86,7 @@ const res2 = (await myTestContract.call('test5', [
 
 ## Cairo Result
 
-Cairo v2.1.0 introduces an other core Enum: `Result`.  
+Cairo v2.1.0 introduces another core Enum: `Result`.  
 This Enum has 2 variants (`Ok` and `Err`) and both variants can contain data.
 
 ### Receive Cairo Result

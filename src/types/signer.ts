@@ -1,4 +1,4 @@
-import { StarknetChainId } from '../constants';
+import { StarknetChainId } from '../global/constants';
 import { ETransactionVersion, ETransactionVersion2, ETransactionVersion3 } from './api';
 import {
   BigNumberish,
@@ -66,3 +66,5 @@ export type V3DeployAccountSignerDetails = Required<DeployAccountContractPayload
     chainId: StarknetChainId;
     version: `${ETransactionVersion3}`;
   };
+
+export type LedgerPathCalculation = (accountId: number, applicationName: string) => Uint8Array;

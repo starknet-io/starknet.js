@@ -4,7 +4,7 @@
 
 import { poseidonHashMany } from '@scure/starknet';
 
-import { ADDR_BOUND, API_VERSION } from '../../constants';
+import { ADDR_BOUND, API_VERSION } from '../../global/constants';
 import {
   BigNumberish,
   Builtins,
@@ -22,7 +22,8 @@ import { starkCurve } from '../ec';
 import { addHexPrefix, utf8ToArray } from '../encode';
 import { parse, stringify } from '../json';
 import { toHex } from '../num';
-import { encodeShortString, isString } from '../shortString';
+import { encodeShortString } from '../shortString';
+import { isString } from '../typed';
 
 export function computePedersenHash(a: BigNumberish, b: BigNumberish): string {
   return starkCurve.pedersen(BigInt(a), BigInt(b));
@@ -159,7 +160,7 @@ export function computeHintedClassHash(compiledContract: LegacyCompiledContract)
  * // result = "0x4a5cae61fa8312b0a3d0c44658b403d3e4197be80027fd5020ffcdf0c803331"
  * ```
  */
-export function computeLegacyContractClassHash(contract: LegacyCompiledContract | string) {
+export function computeLegacyContractClassHash(contract: LegacyCompiledContract | string): string {
   const compiledContract = isString(contract)
     ? (parse(contract) as LegacyCompiledContract)
     : contract;
@@ -242,7 +243,7 @@ export function hashByteCodeSegments(casm: CompiledSierraCasm): bigint {
  * Compute compiled class hash for contract (Cairo 1)
  * @param {CompiledSierraCasm} casm Cairo 1 compiled contract content
  * @returns {string} hex-string of class hash
- * @example 
+ * @example
  * ```typescript
  * const compiledCasm = json.parse(fs.readFileSync("./cairo260.casm.json").toString("ascii"));
  * const result = hash.computeCompiledClassHash(compiledCasm);
@@ -296,7 +297,7 @@ function hashAbi(sierra: CompiledSierra) {
  * Compute sierra contract class hash (Cairo 1)
  * @param {CompiledSierra} sierra Cairo 1 Sierra contract content
  * @returns {string} hex-string of class hash
- * @example 
+ * @example
  * ```typescript
  * const compiledSierra = json.parse(fs.readFileSync("./cairo260.sierra.json").toString("ascii"));
  * const result = hash.computeSierraContractClassHash(compiledSierra);
@@ -340,7 +341,7 @@ export function computeSierraContractClassHash(sierra: CompiledSierra): string {
  * Compute ClassHash (sierra or legacy) based on provided contract
  * @param {CompiledContract | string} contract Cairo 1 contract content
  * @returns {string} hex-string of class hash
- * @example 
+ * @example
  * ```typescript
  * const compiledSierra = json.parse(fs.readFileSync("./cairo260.sierra.json").toString("ascii"));
  * const result = hash.computeContractClassHash(compiledSierra);

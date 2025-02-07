@@ -111,4 +111,4 @@ For major changes that markedly transform the existing API or significantly alte
 
 If you want to contribute but have any questions, concerns or doubts, feel free to ping maintainers. Ideally create a pull request with `WIP` (Work in progress) in its title and ask questions in the pull request description.
 
-You can also ask your query on our dedicated channel for [Starknet.js](https://discord.com/channels/793094838509764618/927918707613786162) on the [Starknet Discord](https://discord.com/invite/YgsdxEx3)
+You can also ask your query on our dedicated channel for [Starknet.js](https://discord.com/channels/793094838509764618/1270119831559078061) on the [Starknet Discord](https://discord.com/invite/Ft6Xtzdg)

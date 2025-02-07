@@ -1,5 +1,3 @@
-import { bytesToHex } from '@noble/curves/abstract/utils';
-import { keccak_256 } from '@noble/hashes/sha3';
 import type { SPEC } from 'starknet-types-07';
 
 import { RPC06, RPC07, RpcChannel } from '../channel';
@@ -11,12 +9,14 @@ import {
   BlockTag,
   Call,
   ContractClassResponse,
+  ContractClassIdentifier,
   ContractVersion,
   DeclareContractTransaction,
   DeployAccountContractTransaction,
   GetBlockResponse,
   GetTxReceiptResponseWithoutHelper,
   Invocation,
+  Invocations,
   InvocationsDetailsWithNonce,
   PendingBlock,
   PendingStateUpdate,
@@ -28,18 +28,23 @@ import {
   getContractVersionOptions,
   getEstimateFeeBulkOptions,
   getSimulateTransactionOptions,
+  type Signature,
+  type TypedData,
   waitForTransactionOptions,
 } from '../types';
 import type { TransactionWithHash } from '../types/provider/spec';
 import assert from '../utils/assert';
+import { CallData } from '../utils/calldata';
 import { getAbiContractVersion } from '../utils/calldata/cairo';
-import { isSierra } from '../utils/contract';
-import { addHexPrefix, removeHexPrefix } from '../utils/encode';
-import { hexToBytes, toHex } from '../utils/num';
+import { extractContractHashes, isSierra } from '../utils/contract';
+import { solidityUint256PackedKeccak256 } from '../utils/hash';
+import { isBigNumberish, toBigInt, toHex } from '../utils/num';
 import { wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
+import { formatSignature } from '../utils/stark';
 import { GetTransactionReceiptResponse, ReceiptTx } from '../utils/transactionReceipt';
-import { LibraryError } from './errors';
+import { getMessageHash, validateTypedData } from '../utils/typedData';
+import { LibraryError } from '../utils/errors';
 import { ProviderInterface } from './interface';
 
 export class RpcProvider implements ProviderInterface {
@@ -115,7 +120,7 @@ export class RpcProvider implements ProviderInterface {
 
   /**
    * Pause the execution of the script until a specified block is created.
-   * @param {BlockIdentifier} blockIdentifier bloc number (BigNumberisk) or 'pending' or 'latest'.
+   * @param {BlockIdentifier} blockIdentifier bloc number (BigNumberish) or 'pending' or 'latest'.
    * Use of 'latest" or of a block already created will generate no pause.
    * @param {number} [retryInterval] number of milliseconds between 2 requests to the node
    * @example
@@ -160,7 +165,7 @@ export class RpcProvider implements ProviderInterface {
       .then(this.responseParser.parseL1GasPriceResponse);
   }
 
-  public async getL1MessageHash(l2TxHash: BigNumberish) {
+  public async getL1MessageHash(l2TxHash: BigNumberish): Promise<string> {
     const transaction = (await this.channel.getTransactionByHash(l2TxHash)) as TransactionWithHash;
     assert(transaction.type === 'L1_HANDLER', 'This L2 transaction is not a L1 message.');
     const { calldata, contract_address, entry_point_selector, nonce } =
@@ -173,13 +178,7 @@ export class RpcProvider implements ProviderInterface {
       calldata.length - 1,
       ...calldata.slice(1),
     ];
-    const myEncode = addHexPrefix(
-      params.reduce(
-        (res: string, par: BigNumberish) => res + removeHexPrefix(toHex(par)).padStart(64, '0'),
-        ''
-      )
-    );
-    return addHexPrefix(bytesToHex(keccak_256(hexToBytes(myEncode))));
+    return solidityUint256PackedKeccak256(params);
   }
 
   public async getBlockWithReceipts(blockIdentifier?: BlockIdentifier) {
@@ -475,5 +474,161 @@ export class RpcProvider implements ProviderInterface {
    */
   public async getEvents(eventFilter: RPC.EventFilter) {
     return this.channel.getEvents(eventFilter);
+  }
+
+  /**
+   * Verify in Starknet a signature of a TypedData object or of a given hash.
+   * @param {BigNumberish | TypedData} message TypedData object to be verified, or message hash to be verified.
+   * @param {Signature} signature signature of the message.
+   * @param {BigNumberish} accountAddress address of the account that has signed the message.
+   * @param {string} [signatureVerificationFunctionName] if account contract with non standard account verification function name.
+   * @param { okResponse: string[]; nokResponse: string[]; error: string[] } [signatureVerificationResponse] if account contract with non standard response of verification function.
+   * @returns
+   * ```typescript
+   * const myTypedMessage: TypedMessage = .... ;
+   * const messageHash = typedData.getMessageHash(myTypedMessage,accountAddress);
+   * const sign: WeierstrassSignatureType = ec.starkCurve.sign(messageHash, privateKey);
+   * const accountAddress = "0x43b7240d227aa2fb8434350b3321c40ac1b88c7067982549e7609870621b535";
+   * const result1 = myRpcProvider.verifyMessageInStarknet(myTypedMessage, sign, accountAddress);
+   * const result2 = myRpcProvider.verifyMessageInStarknet(messageHash, sign, accountAddress);
+   * // result1 = result2 = true
+   * ```
+   */
+  public async verifyMessageInStarknet(
+    message: BigNumberish | TypedData,
+    signature: Signature,
+    accountAddress: BigNumberish,
+    signatureVerificationFunctionName?: string,
+    signatureVerificationResponse?: { okResponse: string[]; nokResponse: string[]; error: string[] }
+  ): Promise<boolean> {
+    const isTypedData = validateTypedData(message);
+    if (!isBigNumberish(message) && !isTypedData) {
+      throw new Error('message has a wrong format.');
+    }
+    if (!isBigNumberish(accountAddress)) {
+      throw new Error('accountAddress shall be a BigNumberish');
+    }
+    const messageHash = isTypedData ? getMessageHash(message, accountAddress) : toHex(message);
+    // HOTFIX: Accounts should conform to SNIP-6
+    // (https://github.com/starknet-io/SNIPs/blob/f6998f779ee2157d5e1dea36042b08062093b3c5/SNIPS/snip-6.md?plain=1#L61),
+    // but they don't always conform. Also, the SNIP doesn't standardize the response if the signature isn't valid.
+    const knownSigVerificationFName = signatureVerificationFunctionName
+      ? [signatureVerificationFunctionName]
+      : ['isValidSignature', 'is_valid_signature'];
+    const knownSignatureResponse = signatureVerificationResponse || {
+      okResponse: [
+        // any non-nok response is true
+      ],
+      nokResponse: [
+        '0x0', // Devnet
+        '0x00', // OpenZeppelin 0.7.0 to 0.9.0 invalid signature
+      ],
+      error: [
+        'argent/invalid-signature', // ArgentX 0.3.0 to 0.3.1
+        'is invalid, with respect to the public key', // OpenZeppelin until 0.6.1, Braavos 0.0.11
+        'INVALID_SIG', // Braavos 1.0.0
+      ],
+    };
+    let error: any;
+
+    // eslint-disable-next-line no-restricted-syntax
+    for (const SigVerificationFName of knownSigVerificationFName) {
+      try {
+        // eslint-disable-next-line no-await-in-loop
+        const resp = await this.callContract({
+          contractAddress: toHex(accountAddress),
+          entrypoint: SigVerificationFName,
+          calldata: CallData.compile({
+            hash: toBigInt(messageHash).toString(),
+            signature: formatSignature(signature),
+          }),
+        });
+        // Response NOK Signature
+        if (knownSignatureResponse.nokResponse.includes(resp[0].toString())) {
+          return false;
+        }
+        // Response OK Signature
+        // Empty okResponse assume all non-nok responses are valid signatures
+        // OpenZeppelin 0.7.0 to 0.9.0, ArgentX 0.3.0 to 0.3.1 & Braavos Cairo 0.0.11 to 1.0.0 valid signature
+        if (
+          knownSignatureResponse.okResponse.length === 0 ||
+          knownSignatureResponse.okResponse.includes(resp[0].toString())
+        ) {
+          return true;
+        }
+        throw Error('signatureVerificationResponse Error: response is not part of known responses');
+      } catch (err) {
+        // Known NOK Errors
+        if (
+          knownSignatureResponse.error.some((errMessage) =>
+            (err as Error).message.includes(errMessage)
+          )
+        ) {
+          return false;
+        }
+        // Unknown Error
+        error = err;
+      }
+    }
+
+    throw Error(`Signature verification Error: ${error}`);
+  }
+
+  /**
+   * Test if class is already declared from ContractClassIdentifier
+   * Helper method using getClass
+   * @param ContractClassIdentifier
+   * @param blockIdentifier
+   */
+  public async isClassDeclared(
+    contractClassIdentifier: ContractClassIdentifier,
+    blockIdentifier?: BlockIdentifier
+  ) {
+    let classHash: string;
+    if (!contractClassIdentifier.classHash && 'contract' in contractClassIdentifier) {
+      const hashes = extractContractHashes(contractClassIdentifier);
+      classHash = hashes.classHash;
+    } else if (contractClassIdentifier.classHash) {
+      classHash = contractClassIdentifier.classHash;
+    } else {
+      throw Error('contractClassIdentifier type not satisfied');
+    }
+
+    try {
+      const result = await this.getClass(classHash, blockIdentifier);
+      return result instanceof Object;
+    } catch (error) {
+      if (error instanceof LibraryError) {
+        return false;
+      }
+      throw error;
+    }
+  }
+
+  /**
+   * Build bulk invocations with auto-detect declared class
+   * 1. Test if class is declared if not declare it preventing already declared class error and not declared class errors
+   * 2. Order declarations first
+   * @param invocations
+   */
+  public async prepareInvocations(invocations: Invocations) {
+    const bulk: Invocations = [];
+    // Build new ordered array
+    // eslint-disable-next-line no-restricted-syntax
+    for (const invocation of invocations) {
+      if (invocation.type === TransactionType.DECLARE) {
+        // Test if already declared
+        // eslint-disable-next-line no-await-in-loop
+        const isDeclared = await this.isClassDeclared(
+          'payload' in invocation ? invocation.payload : invocation
+        );
+        if (!isDeclared) {
+          bulk.unshift(invocation);
+        }
+      } else {
+        bulk.push(invocation);
+      }
+    }
+    return bulk;
   }
 }

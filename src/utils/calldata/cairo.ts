@@ -4,7 +4,9 @@ import {
   AbiStructs,
   BigNumberish,
   ContractVersion,
+  ETH_ADDRESS,
   Literal,
+  NON_ZERO_PREFIX,
   Uint,
   Uint256,
   Uint512,
@@ -116,16 +118,14 @@ export const isTypeBool = (type: string) => type === 'core::bool';
  * @param {string} type - The type to be checked.
  * @returns - true if the type matches 'core::starknet::contract_address::ContractAddress', false otherwise.
  */
-export const isTypeContractAddress = (type: string) =>
-  type === 'core::starknet::contract_address::ContractAddress';
+export const isTypeContractAddress = (type: string) => type === Literal.ContractAddress;
 /**
  * Determines if the given type is an Ethereum address type.
  *
  * @param {string} type - The type to check.
  * @returns - Returns true if the given type is 'core::starknet::eth_address::EthAddress', otherwise false.
  */
-export const isTypeEthAddress = (type: string) =>
-  type === 'core::starknet::eth_address::EthAddress';
+export const isTypeEthAddress = (type: string) => type === ETH_ADDRESS;
 /**
  * Checks if the given type is 'core::bytes_31::bytes31'.
  *
@@ -140,8 +140,18 @@ export const isTypeBytes31 = (type: string) => type === 'core::bytes_31::bytes31
  * @returns - True if the given type is equal to 'core::byte_array::ByteArray', false otherwise.
  */
 export const isTypeByteArray = (type: string) => type === 'core::byte_array::ByteArray';
-export const isTypeSecp256k1Point = (type: string) =>
-  type === 'core::starknet::secp256k1::Secp256k1Point';
+
+/**
+ * Checks if the given type is equal to the u96 type
+ *
+ * @param {string} type - The type to check.
+ * @returns - True if the given type is equal to u96, false otherwise.
+ */
+export const isTypeU96 = (type: string) =>
+  type === 'core::internal::bounded_int::BoundedInt::<0, 79228162514264337593543950335>';
+
+export const isTypeSecp256k1Point = (type: string) => type === Literal.Secp256k1Point;
+
 export const isCairo1Type = (type: string) => type.includes('::');
 /**
  * Retrieves the array type from the given type string.
@@ -151,10 +161,9 @@ export const isCairo1Type = (type: string) => type.includes('::');
  * @returns - The array type.
  */
 export const getArrayType = (type: string) => {
-  if (isCairo1Type(type)) {
-    return type.substring(type.indexOf('<') + 1, type.lastIndexOf('>'));
-  }
-  return type.replace('*', '');
+  return isCairo1Type(type)
+    ? type.substring(type.indexOf('<') + 1, type.lastIndexOf('>'))
+    : type.replace('*', '');
 };
 
 /**
@@ -186,7 +195,7 @@ export function isCairo1Abi(abi: Abi): boolean {
  * ```
  */
 export function isTypeNonZero(type: string): boolean {
-  return type.startsWith('core::zeroable::NonZero::');
+  return type.startsWith(NON_ZERO_PREFIX);
 }
 
 /**
@@ -203,13 +212,16 @@ export function getAbiContractVersion(abi: Abi): ContractVersion {
 
   // determine by function io types "Cairo 1.1" or "Cairo 0.0"
   // find first function with inputs or outputs
-  const testFunction = abi.find(
-    (it) => it.type === 'function' && (it.inputs.length || it.outputs.length)
+  const testSubject = abi.find(
+    (it) =>
+      (it.type === 'function' || it.type === 'constructor') &&
+      (it.inputs.length || it.outputs.length)
   );
-  if (!testFunction) {
+
+  if (!testSubject) {
     return { cairo: undefined, compiler: undefined };
   }
-  const io = testFunction.inputs.length ? testFunction.inputs : testFunction.outputs;
+  const io = testSubject.inputs.length ? testSubject.inputs : testSubject.outputs;
   if (isCairo1Type(io[0].type)) {
     return { cairo: '1', compiler: '1' };
   }

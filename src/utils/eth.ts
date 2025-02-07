@@ -3,7 +3,7 @@ import { secp256k1 } from '@noble/curves/secp256k1';
 import { addHexPrefix, buf2hex, removeHexPrefix, sanitizeHex } from './encode';
 import type { BigNumberish } from '../types';
 import { assertInRange, toHex } from './num';
-import { ZERO } from '../constants';
+import { ZERO } from '../global/constants';
 import assert from './assert';
 
 /**

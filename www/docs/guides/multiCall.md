@@ -18,7 +18,7 @@ const accountAddress = '0x7e00d496e324876bbc8531f2d9a82bf154d1a04a50218ee74cdd37
 // Ether token contract address
 const contractAddress_1 = '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7';
 
-// contract address which require ether
+// contract address which requires ether
 const contractAddress_2 = '0x078f36c1d59dd29e00a0bb60aa2a9409856f4f9841c47f165aba5bab4225aa6b';
 
 const account = new Account(provider, accountAddress, privateKey);

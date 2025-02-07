@@ -1,13 +1,13 @@
-import {
-  type AccountChangeEventHandler,
-  type AddStarknetChainParameters,
-  type NetworkChangeEventHandler,
-  type WatchAssetParameters,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  type SPEC,
+import type {
+  AccountChangeEventHandler,
+  AddStarknetChainParameters,
+  NetworkChangeEventHandler,
+  Signature,
+  WatchAssetParameters,
 } from 'starknet-types-07';
 
 import { Account, AccountInterface } from '../account';
+import { StarknetChainId } from '../global/constants';
 import { ProviderInterface } from '../provider';
 import {
   AllowArray,
@@ -36,20 +36,34 @@ import {
   watchAsset,
 } from './connect';
 import { StarknetWalletProvider } from './types';
-import { StarknetChainId } from '../constants';
+import { logger } from '../global/logger';
 
+// TODO: Remove non address constructor in next major version
 // Represent 'Selected Active' Account inside Connected Wallet
 export class WalletAccount extends Account implements AccountInterface {
-  public address: string = '';
-
   public walletProvider: StarknetWalletProvider;
 
+  /**
+   * @deprecated Use static method WalletAccount.connect or WalletAccount.connectSilent instead. Constructor {@link WalletAccount.(format:2)}.
+   */
   constructor(
     providerOrOptions: ProviderOptions | ProviderInterface,
     walletProvider: StarknetWalletProvider,
     cairoVersion?: CairoVersion
+  );
+  constructor(
+    providerOrOptions: ProviderOptions | ProviderInterface,
+    walletProvider: StarknetWalletProvider,
+    cairoVersion?: CairoVersion,
+    address?: string
+  );
+  constructor(
+    providerOrOptions: ProviderOptions | ProviderInterface,
+    walletProvider: StarknetWalletProvider,
+    cairoVersion?: CairoVersion,
+    address: string = ''
   ) {
-    super(providerOrOptions, '', '', cairoVersion); // At this point unknown address
+    super(providerOrOptions, address, '', cairoVersion); // At this point unknown address
     this.walletProvider = walletProvider;
 
     // Update Address on change
@@ -66,27 +80,24 @@ export class WalletAccount extends Account implements AccountInterface {
       this.channel.setChainId(res as StarknetChainId);
     });
 
-    // Get and Set Address !!! Post constructor initial empty string
-    walletProvider
-      .request({
-        type: 'wallet_requestAccounts',
-        params: {
-          silent_mode: false,
-        },
-      })
-      .then((res) => {
-        this.address = res[0].toLowerCase();
+    if (!address.length) {
+      logger.warn(
+        '@deprecated Use static method WalletAccount.connect or WalletAccount.connectSilent instead. Constructor {@link WalletAccount.(format:2)}.'
+      );
+      requestAccounts(this.walletProvider).then(([accountAddress]) => {
+        this.address = accountAddress.toLowerCase();
       });
+    }
   }
 
   /**
    * WALLET EVENTS
    */
-  public onAccountChange(callback: AccountChangeEventHandler) {
+  public onAccountChange(callback: AccountChangeEventHandler): void {
     onAccountChange(this.walletProvider, callback);
   }
 
-  public onNetworkChanged(callback: NetworkChangeEventHandler) {
+  public onNetworkChanged(callback: NetworkChangeEventHandler): void {
     onNetworkChanged(this.walletProvider, callback);
   }
 
@@ -168,8 +179,26 @@ export class WalletAccount extends Account implements AccountInterface {
     };
   }
 
-  override signMessage(typedData: TypedData) {
+  override signMessage(typedData: TypedData): Promise<Signature> {
     return signMessage(this.walletProvider, typedData);
+  }
+
+  static async connect(
+    provider: ProviderInterface,
+    walletProvider: StarknetWalletProvider,
+    cairoVersion?: CairoVersion,
+    silentMode: boolean = false
+  ) {
+    const [accountAddress] = await requestAccounts(walletProvider, silentMode);
+    return new WalletAccount(provider, walletProvider, cairoVersion, accountAddress);
+  }
+
+  static async connectSilent(
+    provider: ProviderInterface,
+    walletProvider: StarknetWalletProvider,
+    cairoVersion?: CairoVersion
+  ) {
+    return WalletAccount.connect(provider, walletProvider, cairoVersion, true);
   }
 
   // TODO: MISSING ESTIMATES

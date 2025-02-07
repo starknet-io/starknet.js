@@ -1,18 +1,23 @@
 {
   "name": "starknet",
-  "version": "6.11.0",
+  "version": "6.23.1",
   "description": "JavaScript library for Starknet",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/starknet-io/starknet.js.git"
+  },
   "main": "dist/index.js",
   "module": "dist/index.mjs",
   "types": "dist/index.d.ts",
+  "browser": "dist/index.global.js",
   "jsdelivr": "dist/index.global.js",
   "unpkg": "dist/index.global.js",
   "exports": {
     ".": {
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js",
       "types": "./dist/index.d.ts",
-      "browser": "./dist/index.global.js"
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
     }
   },
   "files": [
@@ -49,8 +54,6 @@
     "zk",
     "rollup"
   ],
-  "repository": "github:starknet-io/starknet.js",
-  "license": "MIT",
   "devDependencies": {
     "@babel/plugin-transform-modules-commonjs": "^7.18.2",
     "@babel/preset-env": "^7.18.2",
@@ -58,15 +61,14 @@
     "@commitlint/cli": "^19.0.0",
     "@commitlint/config-conventional": "^19.0.0",
     "@semantic-release/changelog": "^6.0.1",
-    "@semantic-release/commit-analyzer": "^12.0.0",
+    "@semantic-release/commit-analyzer": "^13.0.0",
     "@semantic-release/git": "^10.0.1",
     "@semantic-release/npm": "^12.0.0",
-    "@semantic-release/release-notes-generator": "^13.0.0",
+    "@semantic-release/release-notes-generator": "^14.0.0",
     "@types/isomorphic-fetch": "^0.0.39",
     "@types/jest": "^29.5.0",
     "@types/jest-json-schema": "^6.1.1",
     "@types/pako": "^2.0.0",
-    "@types/url-join": "^4.0.1",
     "@typescript-eslint/eslint-plugin": "^7.4.0",
     "@typescript-eslint/parser": "^7.4.0",
     "ajv": "^8.12.0",
@@ -86,28 +88,25 @@
     "lint-staged": "^15.2.2",
     "prettier": "^3.2.5",
     "prettier-plugin-import-sort": "^0.0.7",
-    "semantic-release": "^23.0.5",
+    "semantic-release": "^24.0.0",
     "starknet_specs": "github:starkware-libs/starknet-specs#v0.7.1",
     "tsup": "^8.0.2",
     "type-coverage": "^2.28.2",
-    "typedoc": "^0.25.7",
-    "typescript": "~5.4.0",
+    "typescript": "~5.7.0",
     "typescript-coverage-report": "npm:@penovicp/typescript-coverage-report@^1.0.0-beta.2"
   },
   "dependencies": {
-    "@noble/curves": "~1.4.0",
-    "@noble/hashes": "^1.4.0",
-    "@scure/base": "~1.1.3",
-    "@scure/starknet": "~1.0.0",
-    "abi-wan-kanabi": "^2.2.2",
-    "fetch-cookie": "^3.0.0",
-    "get-starknet-core": "^4.0.0-next.3",
-    "isomorphic-fetch": "^3.0.0",
+    "@noble/curves": "1.7.0",
+    "@noble/hashes": "1.6.0",
+    "@scure/base": "1.2.1",
+    "@scure/starknet": "1.1.0",
+    "abi-wan-kanabi": "^2.2.3",
+    "fetch-cookie": "~3.0.0",
+    "isomorphic-fetch": "~3.0.0",
     "lossless-json": "^4.0.1",
     "pako": "^2.0.4",
-    "starknet-types-07": "npm:@starknet-io/types-js@^0.7.7",
-    "ts-mixer": "^6.0.3",
-    "url-join": "^4.0.1"
+    "starknet-types-07": "npm:@starknet-io/types-js@^0.7.10",
+    "ts-mixer": "^6.0.3"
   },
   "lint-staged": {
     "*.ts": "eslint --cache --fix",
