@@ -9,6 +9,8 @@ import {
   ParsedStruct,
   Tupled,
 } from '../../types';
+import assert from '../assert';
+import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { addHexPrefix, removeHexPrefix } from '../encode';
@@ -130,6 +132,27 @@ function parseCalldataValue(
 ): string | string[] {
   if (element === undefined) {
     throw Error(`Missing parameter for type ${type}`);
+  }
+
+  // value is fixed array
+  if (CairoFixedArray.isTypeFixedArray(type)) {
+    const arrayType = CairoFixedArray.getFixedArrayType(type);
+    let values: any[] = [];
+    if (Array.isArray(element)) {
+      const array = new CairoFixedArray(element, type);
+      values = array.content;
+    } else if (typeof element === 'object') {
+      values = Object.values(element);
+      assert(
+        values.length === CairoFixedArray.getFixedArraySize(type),
+        `ABI type ${type}: object provided do not includes  ${CairoFixedArray.getFixedArraySize(type)} items. ${values.length} items provided.`
+      );
+    } else {
+      throw new Error(`ABI type ${type}: not an Array representing a cairo.fixedArray() provided.`);
+    }
+    return values.reduce((acc, it) => {
+      return acc.concat(parseCalldataValue(it, arrayType, structs, enums));
+    }, [] as string[]);
   }
 
   // value is Array
@@ -336,7 +359,13 @@ export function parseCalldataField(
   let { value } = argsIterator.next();
 
   switch (true) {
-    // Array
+    // Fixed array
+    case CairoFixedArray.isTypeFixedArray(type):
+      if (!Array.isArray(value) && !(typeof value === 'object')) {
+        throw Error(`ABI expected parameter ${name} to be an array or an object, got ${value}`);
+      }
+      return parseCalldataValue(value, input.type, structs, enums);
+    // Normal Array
     case isTypeArray(type):
       if (!Array.isArray(value) && !isText(value)) {
         throw Error(`ABI expected parameter ${name} to be array or long string, got ${value}`);

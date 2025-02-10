@@ -77,6 +77,7 @@ const compiledContracts = {
     'starknetId'
   ),
   U96: 'cairo282/u96',
+  fixedArray: 'cairo292/fixed_array',
 };
 export const contracts = mapContractSets(compiledContracts);
 
