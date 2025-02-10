@@ -3,15 +3,12 @@ import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 import {
   getArrayType,
-  getFixedArraySize,
-  getFixedArrayType,
   isCairo1Type,
   isLen,
   isTypeArray,
   isTypeByteArray,
   isTypeEnum,
   isTypeEthAddress,
-  isTypeFixedArray,
   isTypeNonZero,
   isTypeOption,
   isTypeResult,
@@ -29,6 +26,7 @@ import {
 } from './enum';
 import extractTupleMemberTypes from './tuple';
 import { isUndefined, isString } from '../typed';
+import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
 
 function errorU256(key: string) {
   return Error(
@@ -49,7 +47,7 @@ export default function orderPropsByAbi(
   enums: AbiEnums
 ): object {
   const orderInput = (unorderedItem: any, abiType: string): any => {
-    if (isTypeFixedArray(abiType)) {
+    if (CairoFixedArray.isTypeFixedArray(abiType)) {
       return orderFixedArray(unorderedItem, abiType);
     }
     if (isTypeArray(abiType)) {
@@ -137,8 +135,8 @@ export default function orderPropsByAbi(
   }
 
   function orderFixedArray(input: Array<any> | Record<string, any>, abiParam: string): Array<any> {
-    const typeInFixedArray = getFixedArrayType(abiParam);
-    const arraySize = getFixedArraySize(abiParam);
+    const typeInFixedArray = CairoFixedArray.getFixedArrayType(abiParam);
+    const arraySize = CairoFixedArray.getFixedArraySize(abiParam);
     if (Array.isArray(input)) {
       if (arraySize !== input.length) {
         throw new Error(

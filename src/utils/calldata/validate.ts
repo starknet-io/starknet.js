@@ -8,6 +8,7 @@ import {
   Uint,
 } from '../../types';
 import assert from '../assert';
+import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { isHex, toBigInt } from '../num';
@@ -15,7 +16,6 @@ import { isLongText } from '../shortString';
 import { isBoolean, isNumber, isString, isBigInt, isObject } from '../typed';
 import {
   getArrayType,
-  getFixedArrayType,
   isLen,
   isTypeArray,
   isTypeBool,
@@ -24,7 +24,6 @@ import {
   isTypeEnum,
   isTypeEthAddress,
   isTypeFelt,
-  isTypeFixedArray,
   isTypeLiteral,
   isTypeNonZero,
   isTypeOption,
@@ -247,7 +246,9 @@ const validateArray = (
   enums: AbiEnums
 ) => {
   const isNormalArray = isTypeArray(input.type);
-  const baseType = isNormalArray ? getArrayType(input.type) : getFixedArrayType(input.type);
+  const baseType = isNormalArray
+    ? getArrayType(input.type)
+    : CairoFixedArray.getFixedArrayType(input.type);
 
   // Long text (special case when parameter is not an array but long text)
   if (isNormalArray && isTypeFelt(baseType) && isLongText(parameterArray)) {
@@ -432,7 +433,7 @@ export default function validateFields(
       case isTypeByteArray(input.type):
         validateByteArray(parameter, input);
         break;
-      case isTypeArray(input.type) || isTypeFixedArray(input.type):
+      case isTypeArray(input.type) || CairoFixedArray.isTypeFixedArray(input.type):
         validateArray(parameter, input, structs, enums);
         break;
       case isTypeStruct(input.type, structs):

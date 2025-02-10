@@ -1,6 +1,7 @@
 import {
   BigNumberish,
   CairoCustomEnum,
+  CairoFixedArray,
   CairoOption,
   CairoOptionVariant,
   CairoResult,
@@ -443,13 +444,14 @@ describe('Cairo v2.4 onwards', () => {
       expect(res0).toEqual(expectedRes);
       const res1 = await fixedArrayContract.fixed_array(myArray);
       expect(res1).toEqual(expectedRes);
-      const myCalldata = CallData.compile([cairo.fixedArray(myArray)]);
+      const myCalldata = CallData.compile([CairoFixedArray.compile(myArray)]);
       const res2 = await fixedArrayContract.call('fixed_array', myCalldata);
       expect(res2).toEqual(expectedRes);
-      const myCalldata3 = myCallData.compile('fixed_array', [cairo.fixedArray(myArray)]);
+      const myCalldata3 = myCallData.compile('fixed_array', [CairoFixedArray.compile(myArray)]);
       const res3 = await fixedArrayContract.call('fixed_array', myCalldata3);
       expect(res3).toEqual(expectedRes);
-      const myCalldata4 = myCallData.compile('fixed_array', { x: cairo.fixedArray(myArray) });
+      const myFixedArray = new CairoFixedArray(myArray, '[core::integer::u32; 8]');
+      const myCalldata4 = myCallData.compile('fixed_array', { x: myFixedArray.compile() });
       const res4 = await fixedArrayContract.call('fixed_array', myCalldata4);
       expect(res4).toEqual(expectedRes);
     });

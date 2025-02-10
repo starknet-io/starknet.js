@@ -10,6 +10,7 @@ import {
   Tupled,
 } from '../../types';
 import assert from '../assert';
+import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { addHexPrefix, removeHexPrefix } from '../encode';
@@ -20,14 +21,11 @@ import { byteArrayFromString } from './byteArray';
 import {
   felt,
   getArrayType,
-  getFixedArraySize,
-  getFixedArrayType,
   isTypeArray,
   isTypeByteArray,
   isTypeBytes31,
   isTypeEnum,
   isTypeEthAddress,
-  isTypeFixedArray,
   isTypeNonZero,
   isTypeOption,
   isTypeResult,
@@ -137,23 +135,20 @@ function parseCalldataValue(
   }
 
   // value is fixed array
-  if (isTypeFixedArray(type)) {
-    const arrayType = getFixedArrayType(type);
+  if (CairoFixedArray.isTypeFixedArray(type)) {
+    const arrayType = CairoFixedArray.getFixedArrayType(type);
     let values: any[] = [];
     if (Array.isArray(element)) {
-      assert(
-        element.length === getFixedArraySize(type),
-        `ABI type ${type}: array provided do not includes  ${getFixedArraySize(type)} items. ${element.length} items provided.`
-      );
-      values = element;
+      const array = new CairoFixedArray(element, type);
+      values = array.content;
     } else if (typeof element === 'object') {
       values = Object.values(element);
       assert(
-        values.length === getFixedArraySize(type),
-        `ABI type ${type}: object provided do not includes  ${getFixedArraySize(type)} items. ${values.length} items provided.`
+        values.length === CairoFixedArray.getFixedArraySize(type),
+        `ABI type ${type}: object provided do not includes  ${CairoFixedArray.getFixedArraySize(type)} items. ${values.length} items provided.`
       );
     } else {
-      throw new Error(`ABI type ${type}: not an Array of a cairo.fixedArray() provided.`);
+      throw new Error(`ABI type ${type}: not an Array representing a cairo.fixedArray() provided.`);
     }
     return values.reduce((acc, it) => {
       return acc.concat(parseCalldataValue(it, arrayType, structs, enums));
@@ -365,7 +360,7 @@ export function parseCalldataField(
 
   switch (true) {
     // Fixed array
-    case isTypeFixedArray(type):
+    case CairoFixedArray.isTypeFixedArray(type):
       if (!Array.isArray(value) && !(typeof value === 'object')) {
         throw Error(`ABI expected parameter ${name} to be an array or an object, got ${value}`);
       }

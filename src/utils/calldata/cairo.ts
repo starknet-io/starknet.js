@@ -42,15 +42,6 @@ export const isTypeArray = (type: string) =>
   type.startsWith('core::array::Span::');
 
 /**
- * Checks if the given type is a fixed-array type.
- *
- * @param {string} type - The type to check.
- * @returns - `true` if the type is a fixed array type, `false` otherwise.
- */
-export const isTypeFixedArray = (type: string) =>
-  /^\[.*;\s.*\]$/.test(type) && /(?<=; )\d+(?=\])/.test(type);
-
-/**
  * Checks if the given type is a tuple type.
  *
  * @param {string} type - The type to be checked.
@@ -177,30 +168,6 @@ export const getArrayType = (type: string) => {
 };
 
 /**
- * Retrieves the array size from the given type string representing a fixed array.
- * @param {string} type - The type string.
- * @returns - The array size.
- */
-export const getFixedArraySize = (type: string) => {
-  const matchArray = type.match(/(?<=; )\d+(?=\])/);
-  if (matchArray === null)
-    throw new Error(`ABI type ${type} do not includes a valid number after ';' character.`);
-  return Number(matchArray[0]);
-};
-
-/**
- * Retrieves the fixed-array type from the given type string representing a fixed array.
- * @param {string} type - The type string.
- * @returns - The fixed-array type.
- */
-export const getFixedArrayType = (type: string) => {
-  const matchArray = type.match(/(?<=\[).*(?=;)/);
-  if (matchArray === null)
-    throw new Error(`ABI type ${type} do not includes a valid type of data.`);
-  return matchArray[0];
-};
-
-/**
  * Test if an ABI comes from a Cairo 1 contract
  * @param abi representing the interface of a Cairo contract
  * @returns TRUE if it is an ABI from a Cairo1 contract
@@ -290,24 +257,6 @@ export const uint256 = (it: BigNumberish): Uint256 => {
  */
 export const uint512 = (it: BigNumberish): Uint512 => {
   return new CairoUint512(it).toUint512DecimalString();
-};
-
-/**
- * Create a fixed array Cairo type.
- * Be sure to have an array length conform to the ABI.
- * @param it JS array representing a Cairo fixed array
- * @returns a specific struct for fixed Array
- * @example
- * ```typescript
- * const result = cairo.fixedArray([10,20,30]);
- * // result = { '0': 10, '1': 20, '2': 30 }
- * ```
- */
-export const fixedArray = (inp: Array<any>): Object => {
-  return inp.reduce((acc: any, item: any, idx: number) => {
-    acc[idx] = item;
-    return acc;
-  }, {});
 };
 
 /**

@@ -303,13 +303,12 @@ await myContract.my_function(myArray);
 ```
 
 :::caution
-The fixed arrays are automatically handled only by the functions that uses the contract ABI. So, when using `CallData.compile()`, you have to use `cairo.fixedArray(myArray)`:
+The fixed arrays are automatically handled only by the functions that uses the contract ABI. So, when using `CallData.compile()`, you have to use the `CairoFixedArray` class:
 
 ```typescript
 // for Cairo type [core::integer::u8; 3]
 const myArray = [1, 2, 3];
-const myFixedArray = cairo.fixedArray(myArray);
-const myCallData = CallData.compile([myFixedArray]);
+const myCalldata = CallData.compile([CairoFixedArray.compile(myArray)]);
 ```
 
 :::

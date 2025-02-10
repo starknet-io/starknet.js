@@ -28,14 +28,7 @@ import {
   felt,
   isTypeU96,
 } from '../../../src/utils/calldata/cairo';
-import {
-  ETH_ADDRESS,
-  Literal,
-  Uint,
-  type ContractVersion,
-  NON_ZERO_PREFIX,
-  cairo,
-} from '../../../src';
+import { ETH_ADDRESS, Literal, Uint, type ContractVersion, NON_ZERO_PREFIX } from '../../../src';
 import {
   getFunctionAbi,
   getAbiEnums,
@@ -344,30 +337,5 @@ describe('u96', () => {
 
   test('should return false if given type is not u96', () => {
     expect(isTypeU96('core::bool')).toEqual(false);
-  });
-});
-
-describe('fixed array', () => {
-  test('create fixed array for CallData.compile()', () => {
-    expect(
-      cairo.fixedArray([
-        { a: 1, b: 2 },
-        { c: 3, d: 4 },
-      ])
-    ).toStrictEqual({ '0': { a: 1, b: 2 }, '1': { c: 3, d: 4 } });
-  });
-
-  test('valid fixed array', () => {
-    expect(cairo.isTypeFixedArray('[core::integer::u32; 8]')).toEqual(true);
-    expect(cairo.getFixedArraySize('[core::integer::u32; 8]')).toEqual(8);
-    expect(cairo.getFixedArrayType('[core::integer::u32; 8]')).toEqual('core::integer::u32');
-  });
-
-  test('invalid fixed array', () => {
-    expect(cairo.isTypeFixedArray('[core::integer::u32]')).toEqual(false);
-    expect(cairo.isTypeFixedArray('[core::integer::u32; zorg]')).toEqual(false);
-    expect(cairo.isTypeFixedArray('core::integer::u32; 12')).toEqual(false);
-    expect(() => cairo.getFixedArraySize('[core::integer::u32; zorg]')).toThrow();
-    expect(() => cairo.getFixedArrayType('[core::integer::u32, 8]')).toThrow();
   });
 });
