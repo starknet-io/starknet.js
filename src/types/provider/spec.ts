@@ -1,8 +1,8 @@
 // this file aims to unify the RPC specification types used by the common Provider class
 
-import { RPCSPEC07 } from '../api';
-import * as RPC06 from '../api/rpcspec_0_6';
-import { SPEC as SPEC06 } from '../api/rpcspec_0_6';
+import { RPCSPEC07, RPCSPEC08 } from '../api';
+
+// TODO: Check can we remove this ?
 
 // taken from type-fest
 type Simplify<T> = { [K in keyof T]: T[K] } & {};
@@ -50,62 +50,71 @@ type Merge<T1, T2> = Simplify<
           : T1 | T2
 >;
 
-export type BLOCK_HASH = Merge<SPEC06.BLOCK_HASH, RPCSPEC07.SPEC.BLOCK_HASH>;
-export type BLOCK_NUMBER = Merge<SPEC06.BLOCK_NUMBER, RPCSPEC07.SPEC.BLOCK_NUMBER>;
-export type FELT = Merge<SPEC06.FELT, RPCSPEC07.SPEC.FELT>;
-export type TXN_HASH = Merge<SPEC06.TXN_HASH, RPCSPEC07.SPEC.TXN_HASH>;
+export type BLOCK_HASH = Merge<RPCSPEC08.BLOCK_HASH, RPCSPEC07.SPEC.BLOCK_HASH>;
+export type BLOCK_NUMBER = Merge<RPCSPEC08.BLOCK_NUMBER, RPCSPEC07.SPEC.BLOCK_NUMBER>;
+export type FELT = Merge<RPCSPEC08.FELT, RPCSPEC07.SPEC.FELT>;
+export type TXN_HASH = Merge<RPCSPEC08.TXN_HASH, RPCSPEC07.SPEC.TXN_HASH>;
 
-export type PRICE_UNIT = Merge<SPEC06.PRICE_UNIT, RPCSPEC07.SPEC.PRICE_UNIT>;
-export type RESOURCE_PRICE = Merge<SPEC06.RESOURCE_PRICE, RPCSPEC07.SPEC.RESOURCE_PRICE>;
-export type SIMULATION_FLAG = Merge<SPEC06.SIMULATION_FLAG, RPCSPEC07.SPEC.SIMULATION_FLAG>;
+export type PRICE_UNIT = Merge<RPCSPEC08.PRICE_UNIT, RPCSPEC07.SPEC.PRICE_UNIT>;
+export type RESOURCE_PRICE = Merge<RPCSPEC08.RESOURCE_PRICE, RPCSPEC07.SPEC.RESOURCE_PRICE>;
+export type SIMULATION_FLAG = Merge<RPCSPEC08.SIMULATION_FLAG, RPCSPEC07.SPEC.SIMULATION_FLAG>;
 
-export type STATE_UPDATE = Merge<SPEC06.STATE_UPDATE, RPCSPEC07.SPEC.STATE_UPDATE>;
+export type STATE_UPDATE = Merge<RPCSPEC08.STATE_UPDATE, RPCSPEC07.SPEC.STATE_UPDATE>;
 export type PENDING_STATE_UPDATE = Merge<
-  SPEC06.PENDING_STATE_UPDATE,
+  RPCSPEC08.PENDING_STATE_UPDATE,
   RPCSPEC07.SPEC.PENDING_STATE_UPDATE
 >;
 
 export type INVOKE_TXN_RECEIPT = Merge<
-  SPEC06.INVOKE_TXN_RECEIPT,
+  RPCSPEC08.INVOKE_TXN_RECEIPT,
   RPCSPEC07.SPEC.INVOKE_TXN_RECEIPT & RPCSPEC07.BlockHashAndNumber
 >;
 export type DECLARE_TXN_RECEIPT = Merge<
-  SPEC06.DECLARE_TXN_RECEIPT,
+  RPCSPEC08.DECLARE_TXN_RECEIPT,
   RPCSPEC07.SPEC.DECLARE_TXN_RECEIPT & RPCSPEC07.BlockHashAndNumber
 >;
 export type DEPLOY_ACCOUNT_TXN_RECEIPT = Merge<
-  SPEC06.DEPLOY_ACCOUNT_TXN_RECEIPT,
+  RPCSPEC08.DEPLOY_ACCOUNT_TXN_RECEIPT,
   RPCSPEC07.SPEC.DEPLOY_ACCOUNT_TXN_RECEIPT & RPCSPEC07.BlockHashAndNumber
 >;
 export type L1_HANDLER_TXN_RECEIPT = Merge<
-  SPEC06.L1_HANDLER_TXN_RECEIPT,
+  RPCSPEC08.L1_HANDLER_TXN_RECEIPT,
   RPCSPEC07.SPEC.L1_HANDLER_TXN_RECEIPT & RPCSPEC07.BlockHashAndNumber
 >;
 export type PENDING_INVOKE_TXN_RECEIPT = Merge<
-  SPEC06.PENDING_INVOKE_TXN_RECEIPT,
+  RPCSPEC08.INVOKE_TXN_RECEIPT,
   RPCSPEC07.SPEC.INVOKE_TXN_RECEIPT
 >;
 export type PENDING_DECLARE_TXN_RECEIPT = Merge<
-  SPEC06.PENDING_DECLARE_TXN_RECEIPT,
+  RPCSPEC08.DECLARE_TXN_RECEIPT,
   RPCSPEC07.SPEC.DECLARE_TXN_RECEIPT
 >;
 export type PENDING_DEPLOY_ACCOUNT_TXN_RECEIPT = Merge<
-  SPEC06.PENDING_DEPLOY_ACCOUNT_TXN_RECEIPT,
+  RPCSPEC08.DEPLOY_ACCOUNT_TXN_RECEIPT,
   RPCSPEC07.SPEC.DEPLOY_ACCOUNT_TXN_RECEIPT
 >;
 export type PENDING_L1_HANDLER_TXN_RECEIPT = Merge<
-  SPEC06.PENDING_L1_HANDLER_TXN_RECEIPT,
+  RPCSPEC08.L1_HANDLER_TXN_RECEIPT,
   RPCSPEC07.SPEC.L1_HANDLER_TXN_RECEIPT
 >;
 
-export type BlockWithTxHashes = Merge<RPC06.BlockWithTxHashes, RPCSPEC07.BlockWithTxHashes>;
-export type ContractClassPayload = Merge<RPC06.ContractClass, RPCSPEC07.ContractClass>;
-export type DeclaredTransaction = Merge<RPC06.DeclaredTransaction, RPCSPEC07.DeclaredTransaction>;
-export type FeeEstimate = Merge<SPEC06.FEE_ESTIMATE, RPCSPEC07.SPEC.FEE_ESTIMATE>;
-export type InvokedTransaction = Merge<RPC06.InvokedTransaction, RPCSPEC07.InvokedTransaction>;
-export type PendingReceipt = Merge<RPC06.PendingReceipt, RPCSPEC07.PendingReceipt>;
-export type Receipt = Merge<RPC06.Receipt, RPCSPEC07.Receipt>;
-export type ResourceBounds = Merge<RPC06.ResourceBounds, RPCSPEC07.ResourceBounds>;
-export type SimulateTransaction = Merge<RPC06.SimulateTransaction, RPCSPEC07.SimulateTransaction>;
-export type TransactionReceipt = Merge<RPC06.TransactionReceipt, RPCSPEC07.TransactionReceipt>;
-export type TransactionWithHash = Merge<RPC06.TransactionWithHash, RPCSPEC07.TransactionWithHash>;
+export type BlockWithTxHashes = Merge<RPCSPEC08.BlockWithTxHashes, RPCSPEC07.BlockWithTxHashes>;
+export type ContractClassPayload = Merge<RPCSPEC08.ContractClass, RPCSPEC07.ContractClass>;
+export type DeclaredTransaction = Merge<
+  RPCSPEC08.DeclaredTransaction,
+  RPCSPEC07.DeclaredTransaction
+>;
+export type FeeEstimate = Merge<RPCSPEC08.FEE_ESTIMATE, RPCSPEC07.SPEC.FEE_ESTIMATE>;
+export type InvokedTransaction = Merge<RPCSPEC08.InvokedTransaction, RPCSPEC07.InvokedTransaction>;
+export type PendingReceipt = Merge<RPCSPEC08.PendingReceipt, RPCSPEC07.PendingReceipt>;
+export type Receipt = Merge<RPCSPEC08.Receipt, RPCSPEC07.Receipt>;
+export type ResourceBounds = Merge<RPCSPEC08.ResourceBounds, RPCSPEC07.ResourceBounds>;
+export type SimulateTransaction = Merge<
+  RPCSPEC08.SimulateTransaction,
+  RPCSPEC07.SimulateTransaction
+>;
+export type TransactionReceipt = Merge<RPCSPEC08.TransactionReceipt, RPCSPEC07.TransactionReceipt>;
+export type TransactionWithHash = Merge<
+  RPCSPEC08.TransactionWithHash,
+  RPCSPEC07.TransactionWithHash
+>;

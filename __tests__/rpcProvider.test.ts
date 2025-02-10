@@ -7,7 +7,7 @@ import {
   Contract,
   FeeEstimate,
   RPC,
-  RPC06,
+  RPC07,
   RPCResponseParser,
   ReceiptTx,
   RpcProvider,
@@ -204,8 +204,8 @@ describeIfRpc('RPCProvider', () => {
 
     const generateOptions = (o: waitForTransactionOptions) => ({ retryInterval: 10, ...o });
     const generateTransactionStatus = (
-      finality_status: RPC.SPEC.TXN_STATUS,
-      execution_status?: RPC.SPEC.TXN_EXECUTION_STATUS
+      finality_status: RPC.TXN_STATUS,
+      execution_status?: RPC.TXN_EXECUTION_STATUS
     ): RPC.TransactionStatus => ({
       finality_status,
       execution_status,
@@ -284,13 +284,13 @@ describeIfRpc('RPCProvider', () => {
       expect(blockResponse).toHaveProperty('transactions');
     });
 
-    test('getBlockWithReceipts - 0.6 RpcChannel', async () => {
-      const channel = new RPC06.RpcChannel({ nodeUrl: rpcProvider.channel.nodeUrl });
+    test('getBlockWithReceipts - 0.v-1 RpcChannel', async () => {
+      const channel = new RPC07.RpcChannel({ nodeUrl: rpcProvider.channel.nodeUrl });
       const p = new RpcProvider({ channel } as any);
       await expect(p.getBlockWithReceipts(latestBlock.block_number)).rejects.toThrow(/Unsupported/);
     });
 
-    test('getBlockWithReceipts - 0.7 RpcChannel', async () => {
+    test('getBlockWithReceipts - 0.v RpcChannel', async () => {
       const blockResponse = await rpcProvider.getBlockWithReceipts(latestBlock.block_number);
       expect(blockResponse).toMatchSchemaRef('BlockWithTxReceipts');
     });

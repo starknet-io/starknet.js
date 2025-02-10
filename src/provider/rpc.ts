@@ -1,6 +1,6 @@
 import type { SPEC } from 'starknet-types-07';
 
-import { RPC06, RPC07, RpcChannel } from '../channel';
+import { RPC08, RPC07, RpcChannel } from '../channel';
 import {
   AccountInvocations,
   BigNumberish,
@@ -50,7 +50,7 @@ import { ProviderInterface } from './interface';
 export class RpcProvider implements ProviderInterface {
   public responseParser: RPCResponseParser;
 
-  public channel: RPC07.RpcChannel | RPC06.RpcChannel;
+  public channel: RPC07.RpcChannel | RPC08.RpcChannel;
 
   constructor(optionsOrProvider?: RpcProviderOptions | ProviderInterface | RpcProvider) {
     if (optionsOrProvider && 'channel' in optionsOrProvider) {
@@ -182,7 +182,7 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getBlockWithReceipts(blockIdentifier?: BlockIdentifier) {
-    if (this.channel instanceof RPC06.RpcChannel)
+    if (this.channel instanceof RPC08.RpcChannel)
       throw new LibraryError('Unsupported method for RPC version');
 
     return this.channel.getBlockWithReceipts(blockIdentifier);

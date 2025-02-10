@@ -18,7 +18,6 @@ import assert from '../utils/assert';
 import { CallData } from '../utils/calldata';
 import type { SignerInterface } from './interface';
 import { HARDENING_4BYTES, HARDENING_BYTE } from '../global/constants';
-import { ETransactionVersion2 } from '../types/api/rpcspec_0_6';
 import { getExecuteCalldata } from '../utils/transaction';
 import {
   calculateDeployAccountTransactionHash,
@@ -29,7 +28,12 @@ import { intDAM } from '../utils/stark';
 import { addHexPrefix, buf2hex, concatenateArrayBuffer, removeHexPrefix } from '../utils/encode';
 import { hexToBytes, stringToSha256ToArrayBuff4, toBigInt, toHex } from '../utils/num';
 import { starkCurve } from '../utils/ec';
-import { EDAMode, EDataAvailabilityMode, ETransactionVersion3 } from '../types/api';
+import {
+  EDAMode,
+  EDataAvailabilityMode,
+  ETransactionVersion2,
+  ETransactionVersion3,
+} from '../types/api';
 import { addAddressPadding } from '../utils/address';
 import {
   encodeResourceBoundsL1,

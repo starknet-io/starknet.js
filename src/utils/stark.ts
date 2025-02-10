@@ -219,6 +219,7 @@ export function estimateFeeToBounds(
   if (isBigInt(estimate)) {
     return {
       l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
+      l1_data_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
       l1_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
     };
   }
@@ -234,6 +235,7 @@ export function estimateFeeToBounds(
   const maxUnitPrice = toHex(addPercent(estimate.gas_price, priceOverhead));
   return {
     l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
+    l1_data_gas: { max_amount: '0x0', max_price_per_unit: '0x0' }, // TODO: check what to fill here
     l1_gas: { max_amount: maxUnits, max_price_per_unit: maxUnitPrice },
   };
 }

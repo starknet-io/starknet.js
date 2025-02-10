@@ -1,4 +1,4 @@
-import { NetworkName, RPC_NODES } from '../global/constants';
+import { NetworkName, RPC_NODES, SUPPORTED_RPC_VERSIONS } from '../global/constants';
 import {
   BlockIdentifier,
   BlockTag,
@@ -288,7 +288,7 @@ export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3Trans
 /**
  * Determines if the given response matches the specified version.
  *
- * @param {('0.5' | '0.6' | '0.7')} version The version to compare against the response.
+ * @param {SUPPORTED_RPC_VERSIONS} version The version to compare against the response.
  * @param {string} response The response to check against the version.
  * @returns {boolean} True if the response matches the version, false otherwise.
  * @example
@@ -297,7 +297,7 @@ export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3Trans
  * // result = false
  * ```
  */
-export function isVersion(version: '0.5' | '0.6' | '0.7', response: string): boolean {
+export function isVersion(version: SUPPORTED_RPC_VERSIONS, response: string): boolean {
   const [majorS, minorS] = version.split('.');
   const [majorR, minorR] = response.split('.');
 

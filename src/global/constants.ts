@@ -90,6 +90,13 @@ export const HARDENING_BYTE = 128;
 // 0x80000000
 export const HARDENING_4BYTES = 2147483648n;
 
+export const SUPPORTED_RPC_VERSIONS = {
+  0.7: '0.7',
+  0.8: '0.8',
+} as const;
+export type SUPPORTED_RPC_VERSIONS =
+  (typeof SUPPORTED_RPC_VERSIONS)[keyof typeof SUPPORTED_RPC_VERSIONS];
+
 // Default initial global config
 export const DEFAULT_GLOBAL_CONFIG: {
   legacyMode: boolean;
@@ -98,11 +105,12 @@ export const DEFAULT_GLOBAL_CONFIG: {
 } = {
   legacyMode: false,
   logLevel: 'INFO',
-  accountTxVersion: ETransactionVersion.V2,
+  accountTxVersion: ETransactionVersion.V3,
 };
 
 // Default system messages
 export const SYSTEM_MESSAGES = {
   legacyTxWarningMessage:
     'You are using a deprecated transaction version (V0,V1,V2)!\nUpdate to the latest V3 transactions!',
+  legacyTxRPC08Message: 'RPC 0.8 do not support legacy transactions',
 };
