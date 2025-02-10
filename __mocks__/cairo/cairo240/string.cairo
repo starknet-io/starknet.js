@@ -15,7 +15,7 @@ mod MyTestReject {
     use core::byte_array::ByteArrayTrait;
     #[storage]
     struct Storage {}
-    // To be tested with special characters (!@#$%^&*_+{}|:";./,\[];'<>?~`)
+    // To be tested with special characters (!@#$%^&*_+{}|:\";./,\\[];'<>?~`)
     #[abi(embed_v0)]
     impl TestReject of super::ITestReject<ContractState> {
         fn proceed_bytes31(self: @ContractState, str: bytes31) -> bytes31 {
