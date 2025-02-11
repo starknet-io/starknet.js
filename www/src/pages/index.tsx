@@ -4,6 +4,7 @@ import HomepageFeatures from '@site/src/components/HomepageFeatures';
 import Layout from '@theme/Layout';
 import clsx from 'clsx';
 import React from 'react';
+import { Helmet } from 'react-helmet';
 
 import styles from './index.module.css';
 
@@ -20,6 +21,10 @@ function HomepageHeader() {
           </Link>
         </div>
       </div>
+      <a className="twitter-timeline" data-width="250" data-height="500" data-dnt="true" data-theme="dark" href="https://twitter.com/starknetjs?ref_src=twsrc%5Etfw">Tweets by Starknetjs</a>
+      <Helmet>
+        <script async src="https://platform.twitter.com/widgets.js" charSet="utf-8"></script>
+      </Helmet>
     </header>
   );
 }
@@ -28,7 +33,7 @@ export default function Home(): JSX.Element {
   const { siteConfig } = useDocusaurusContext();
   return (
     <Layout
-      title={`Hello from ${siteConfig.title}`}
+      title={``}
       description="JavaScript library for Starknet"
     >
       <HomepageHeader />
