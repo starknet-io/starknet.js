@@ -15,7 +15,7 @@ const migrationGuideLink = `${generateBaseUrl(process.env.DOCS_BASE_URL)}docs/gu
 
 /** @type {import('@docusaurus/types').Config} */
 const config = {
-  title: 'Starknet.js',
+  title: 'Starknet.js docs',
   tagline: 'JavaScript library for Starknet',
   url: 'https://starknetjs.com',
   baseUrl: generateBaseUrl(process.env.DOCS_BASE_URL),
