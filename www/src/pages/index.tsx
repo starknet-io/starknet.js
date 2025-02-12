@@ -21,12 +21,46 @@ function HomepageHeader() {
           </Link>
         </div>
       </div>
-      <a className="twitter-timeline" data-width="250" data-height="500" data-dnt="true" data-theme="dark" href="https://twitter.com/starknetjs?ref_src=twsrc%5Etfw">Tweets by Starknetjs</a>
-      <Helmet>
-        <script async src="https://platform.twitter.com/widgets.js" charSet="utf-8"></script>
-      </Helmet>
     </header>
   );
+};
+
+function XFeed() {
+  const minXFeedWidth = 220;
+  const height = 500;
+  const xPadding = 40;
+  const width = window.innerWidth < minXFeedWidth ? minXFeedWidth : Math.max(minXFeedWidth, window.innerWidth);
+  return (
+    <div
+      className={clsx('hero hero--primary', styles.heroBanner)}
+      style={{
+        height: height,
+        padding: 0,
+      }}
+    >
+      <div
+        style={{
+          width: width,
+          margin: "auto",
+          paddingLeft: window.innerWidth < (minXFeedWidth + 2 * xPadding) ? 0 : xPadding,
+          paddingRight: window.innerWidth < (minXFeedWidth + 2 * xPadding) ? 0 : xPadding,
+        }}
+      >
+        <a
+          className="twitter-timeline"
+          data-width={width}
+          data-height={height}
+          data-dnt="true"
+          data-theme="dark"
+          href="https://twitter.com/starknetjs?ref_src=twsrc%5Etfw"
+          text-align="center"
+        >Tweets by Starknetjs</a>
+        <Helmet>
+          <script async src="https://platform.twitter.com/widgets.js" charSet="utf-8"></script>
+        </Helmet>
+      </div>
+    </div>
+  )
 }
 
 export default function Home(): JSX.Element {
@@ -38,6 +72,7 @@ export default function Home(): JSX.Element {
     >
       <HomepageHeader />
       <main>
+        <XFeed></XFeed>
         <HomepageFeatures />
       </main>
     </Layout>
