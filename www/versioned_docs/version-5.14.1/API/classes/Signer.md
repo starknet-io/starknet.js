@@ -64,7 +64,7 @@ public key of signer as hex string with 0x prefix
 
 ▸ **signMessage**(`typedData`, `accountAddress`): `Promise`<[`Signature`](../namespaces/types.md#signature)\>
 
-Sign an JSON object for off-chain usage with the starknet private key and return the signature
+Sign a JSON object for off-chain usage with the starknet private key and return the signature
 This adds a message prefix so it can't be interchanged with transactions
 
 **`Throws`**
