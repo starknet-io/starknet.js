@@ -8,7 +8,7 @@ _[Use GitHub interface](https://blog.sapegin.me/all/open-source-for-everyone/) f
 
 > :warning: IMPORTANT NOTE :warning:
 >
-> All contributions are expected to be of the highest possible quality! That means the PR is thoroughly tested and documented, and without blindly generated ChatGPT code and documentation! We will not consider no merge PR-s that do not comply to these rules!
+> All contributions are expected to be of the highest possible quality! That means the PR is thoroughly tested and documented, and without blindly generated ChatGPT code and documentation! We will not consider or merge PR-s that do not comply to these rules!
 
 ## Prerequisites
 
