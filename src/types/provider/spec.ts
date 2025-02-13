@@ -1,6 +1,7 @@
 // this file aims to unify the RPC specification types used by the common Provider class
 
 import { RPCSPEC07, RPCSPEC08 } from '../api';
+import { OneOf } from '../helpers/oneOf';
 
 // TODO: Check can we remove this ?
 
@@ -108,7 +109,7 @@ export type FeeEstimate = Merge<RPCSPEC08.FEE_ESTIMATE, RPCSPEC07.SPEC.FEE_ESTIM
 export type InvokedTransaction = Merge<RPCSPEC08.InvokedTransaction, RPCSPEC07.InvokedTransaction>;
 export type PendingReceipt = Merge<RPCSPEC08.PendingReceipt, RPCSPEC07.PendingReceipt>;
 export type Receipt = Merge<RPCSPEC08.Receipt, RPCSPEC07.Receipt>;
-export type ResourceBounds = Merge<RPCSPEC08.ResourceBounds, RPCSPEC07.ResourceBounds>;
+export type ResourceBounds = Merge<RPCSPEC08.ResourceBounds, RPCSPEC07.ResourceBounds>; // TODO: only l1_gas:val, l2_gas:0 OR l1_gas:val, l1_data_gas: val, l2_gas:val ARE VALID COMBO, waiting slack response
 export type SimulateTransaction = Merge<
   RPCSPEC08.SimulateTransaction,
   RPCSPEC07.SimulateTransaction

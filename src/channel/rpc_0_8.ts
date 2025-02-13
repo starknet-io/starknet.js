@@ -18,7 +18,7 @@ import {
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
-import { JRPC, RPCSPEC08 as RPC } from '../types/api';
+import { CONTRACT_STORAGE_KEYS, JRPC, RPCSPEC08 as RPC } from '../types/api';
 import { BatchClient } from '../utils/batch';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
@@ -26,7 +26,12 @@ import { validateAndParseEthAddress } from '../utils/eth';
 import fetch from '../utils/fetchPonyfill';
 import { getSelector, getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
-import { getHexStringArray, toHex, toStorageKey } from '../utils/num';
+import {
+  bigNumberishArrayToHexadecimalStringArray,
+  getHexStringArray,
+  toHex,
+  toStorageKey,
+} from '../utils/num';
 import { Block, getDefaultNodeUrl, isV3Tx, wait } from '../utils/provider';
 import { decompressProgram, signatureToHexArray } from '../utils/stark';
 import { getVersionsByType } from '../utils/transaction';
@@ -170,10 +175,41 @@ export class RpcChannel {
   /**
    * Given an l1 tx hash, returns the associated l1_handler tx hashes and statuses for all L1 -> L2 messages sent by the l1 transaction, ordered by the l1 tx sending order
    */
-  public async getMessagesStatus(txHash: BigNumberish) {
+  public getMessagesStatus(txHash: BigNumberish) {
     const transaction_hash = toHex(txHash);
     return this.fetchEndpoint('starknet_getMessagesStatus', {
       transaction_hash,
+    });
+  }
+
+  // TODO: New Method add test
+  public getStorageProof(
+    blockIdentifier: BlockIdentifier = this.blockIdentifier,
+    classHashes: BigNumberish[] = [],
+    contractAddresses: BigNumberish[] = [],
+    contractsStorageKeys: CONTRACT_STORAGE_KEYS[] = [] // TODO: allow BigNUmberish[] and fix formatting before request
+  ) {
+    const block_id = new Block(blockIdentifier).identifier;
+    const class_hashes = bigNumberishArrayToHexadecimalStringArray(classHashes);
+    const contract_addresses = bigNumberishArrayToHexadecimalStringArray(contractAddresses);
+
+    return this.fetchEndpoint('starknet_getStorageProof', {
+      block_id,
+      class_hashes,
+      contract_addresses,
+      contracts_storage_keys: contractsStorageKeys,
+    });
+  }
+
+  // TODO: New Method add test
+  public getCompiledCasm(
+    classHash: BigNumberish
+  ): Promise<RPC.Methods['starknet_getCompiledCasm']['result']> {
+    // TODO: remove response type when update types-js
+    const class_hash = toHex(classHash);
+
+    return this.fetchEndpoint('starknet_getCompiledCasm', {
+      class_hash,
     });
   }
 
