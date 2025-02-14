@@ -43,7 +43,8 @@ function XFeed() {
         >
           <div
             style={{
-              width: window.innerWidth < minXFeedWidth ? minXFeedWidth : Math.max(minXFeedWidth, window.innerWidth),
+              width:"90%",
+              maxWidth: window.innerWidth < minXFeedWidth ? minXFeedWidth : Math.max(minXFeedWidth, window.innerWidth),
               margin: "auto",
               paddingLeft: window.innerWidth < (minXFeedWidth + 2 * xPadding) ? 0 : xPadding,
               paddingRight: window.innerWidth < (minXFeedWidth + 2 * xPadding) ? 0 : xPadding,
