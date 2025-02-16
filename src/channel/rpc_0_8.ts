@@ -202,10 +202,7 @@ export class RpcChannel {
   }
 
   // TODO: New Method add test
-  public getCompiledCasm(
-    classHash: BigNumberish
-  ): Promise<RPC.Methods['starknet_getCompiledCasm']['result']> {
-    // TODO: remove response type when update types-js
+  public getCompiledCasm(classHash: BigNumberish): Promise<RPC.CASM_COMPILED_CONTRACT_CLASS> {
     const class_hash = toHex(classHash);
 
     return this.fetchEndpoint('starknet_getCompiledCasm', {

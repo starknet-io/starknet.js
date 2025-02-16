@@ -144,7 +144,7 @@ export class RpcChannel {
       if (this.batchClient) {
         const { error, result } = await this.batchClient.fetch(
           method,
-          params,
+          params as any, // TODO: fix this temporary cast with some permanent solution
           (this.requestId += 1)
         );
         this.errorHandler(method, params, error);

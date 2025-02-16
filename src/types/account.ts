@@ -10,7 +10,10 @@ import {
   UniversalDeployerContractPayload,
   V3TransactionDetails,
 } from './lib';
-import { DeclareTransactionReceiptResponse, EstimateFeeResponse } from './provider';
+import {
+  DeclareTransactionReceiptResponse,
+  EstimateFeeResponse,
+} from '../provider/types/index.type';
 
 export interface EstimateFee extends EstimateFeeResponse {}
 

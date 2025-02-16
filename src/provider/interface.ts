@@ -17,6 +17,7 @@ import type {
   EstimateFeeResponse,
   EstimateFeeResponseBulk,
   GetBlockResponse,
+  GetTransactionReceiptResponse,
   GetTransactionResponse,
   Invocation,
   InvocationsDetailsWithNonce,
@@ -31,7 +32,6 @@ import type {
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
-import type { GetTransactionReceiptResponse } from '../utils/transactionReceipt';
 
 export abstract class ProviderInterface {
   public abstract channel: RPC07.RpcChannel | RPC08.RpcChannel;

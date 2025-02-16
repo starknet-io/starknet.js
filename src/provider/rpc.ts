@@ -31,8 +31,9 @@ import {
   type Signature,
   type TypedData,
   waitForTransactionOptions,
+  GetTransactionReceiptResponse,
 } from '../types';
-import type { TransactionWithHash } from '../types/provider/spec';
+import type { TransactionWithHash } from './types/spec.type';
 import assert from '../utils/assert';
 import { CallData } from '../utils/calldata';
 import { getAbiContractVersion } from '../utils/calldata/cairo';
@@ -42,7 +43,7 @@ import { isBigNumberish, toBigInt, toHex } from '../utils/num';
 import { wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { formatSignature } from '../utils/stark';
-import { GetTransactionReceiptResponse, ReceiptTx } from '../utils/transactionReceipt';
+import { ReceiptTx } from '../utils/transactionReceipt/transactionReceipt';
 import { getMessageHash, validateTypedData } from '../utils/typedData';
 import { LibraryError } from '../utils/errors';
 import { ProviderInterface } from './interface';
@@ -232,9 +233,9 @@ export class RpcProvider implements ProviderInterface {
 
   public async getTransactionReceipt(txHash: BigNumberish): Promise<GetTransactionReceiptResponse> {
     const txReceiptWoHelper = await this.channel.getTransactionReceipt(txHash);
-    const txReceiptWoHelperModified: GetTxReceiptResponseWithoutHelper =
+    const txReceiptWoHelperModified =
       this.responseParser.parseTransactionReceipt(txReceiptWoHelper);
-    return new ReceiptTx(txReceiptWoHelperModified) as GetTransactionReceiptResponse;
+    return new ReceiptTx(txReceiptWoHelperModified);
   }
 
   public async getTransactionTrace(txHash: BigNumberish) {

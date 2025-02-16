@@ -11,7 +11,7 @@ import {
   UniversalDetails,
 } from '../types';
 import { EDAMode, EDataAvailabilityMode, ETransactionVersion, ResourceBounds } from '../types/api';
-import { FeeEstimate } from '../types/provider';
+import { FeeEstimate } from '../provider/types/index.type';
 import { addHexPrefix, arrayBufferToString, atobUniversal, btoaUniversal, buf2hex } from './encode';
 import { parse, stringify } from './json';
 import {

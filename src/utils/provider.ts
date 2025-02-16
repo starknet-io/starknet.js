@@ -22,7 +22,7 @@ import { isHex, toHex } from './num';
 import { isDecimalString } from './shortString';
 import { isBigInt, isNumber, isString } from './typed';
 import { compressProgram } from './stark';
-import type { GetTransactionReceiptResponse } from './transactionReceipt';
+import type { GetTransactionReceiptResponse } from './transactionReceipt/transactionReceipt.type';
 import { logger } from '../global/logger';
 
 /**

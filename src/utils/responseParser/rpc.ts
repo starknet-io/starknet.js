@@ -14,12 +14,13 @@ import type {
   RpcProviderOptions,
   SimulateTransactionResponse,
   SimulatedTransaction,
-  TransactionReceipt,
-} from '../../types/provider';
+} from '../../provider/types/index.type';
 import { toBigInt } from '../num';
 import { isString } from '../typed';
 import { estimateFeeToBounds, estimatedFeeToMaxFee } from '../stark';
 import { ResponseParser } from './interface';
+import { TransactionReceipt } from '../../provider/types/spec.type';
+// import { TransactionReceipt } from '../../types/api/merge';
 
 export class RPCResponseParser
   implements
