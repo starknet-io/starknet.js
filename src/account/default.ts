@@ -59,7 +59,7 @@ import { calculateContractAddressFromHash } from '../utils/hash';
 import { isUndefined, isString } from '../utils/typed';
 import { isHex, toBigInt, toCairoBool, toHex } from '../utils/num';
 import {
-  buildExecuteFromOutsideCallData,
+  buildExecuteFromOutsideCall,
   getOutsideCall,
   getTypedData,
 } from '../utils/outsideExecution';
@@ -754,24 +754,7 @@ export class Account extends Provider implements AccountInterface {
     outsideTransaction: AllowArray<OutsideTransaction>,
     opts?: UniversalDetails
   ): Promise<InvokeFunctionResponse> {
-    const myOutsideTransactions = Array.isArray(outsideTransaction)
-      ? outsideTransaction
-      : [outsideTransaction];
-    const multiCall: Call[] = myOutsideTransactions.map((outsideTx: OutsideTransaction) => {
-      let entrypoint: string;
-      if (outsideTx.version === OutsideExecutionVersion.V1) {
-        entrypoint = 'execute_from_outside';
-      } else if (outsideTx.version === OutsideExecutionVersion.V2) {
-        entrypoint = 'execute_from_outside_v2';
-      } else {
-        throw new Error('Unsupported OutsideExecution version');
-      }
-      return {
-        contractAddress: toHex(outsideTx.signerAddress),
-        entrypoint,
-        calldata: buildExecuteFromOutsideCallData(outsideTx),
-      };
-    });
+    const multiCall = buildExecuteFromOutsideCall(outsideTransaction);
     return this.execute(multiCall, opts);
   }
 
