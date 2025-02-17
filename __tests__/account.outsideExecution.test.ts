@@ -238,7 +238,7 @@ describe('Account and OutsideExecution', () => {
     expect(outsideExecutionCall).toEqual([
       {
         calldata: [
-          '2846891009026995430665703316224827616914889274105712248413538305735679628945',
+          num.hexToDecimalString(recipientAccount.address),
           num.hexToDecimalString(outsideTransaction1.outsideExecution.nonce as string),
           outsideTransaction1.outsideExecution.execute_after.toString(),
           outsideTransaction1.outsideExecution.execute_before.toString(),
@@ -246,13 +246,13 @@ describe('Account and OutsideExecution', () => {
           '2087021424722619777119509474943472645767659996348769578120564519014510906823',
           '232670485425082704932579856502088130646006032362877466777181098476241604910',
           '3',
-          '2846891009026995430665703316224827616914889274105712248413538305735679628945',
+          num.hexToDecimalString(recipientAccount.address),
           '100',
           '0',
           '2087021424722619777119509474943472645767659996348769578120564519014510906823',
           '232670485425082704932579856502088130646006032362877466777181098476241604910',
           '3',
-          '2846891009026995430665703316224827616914889274105712248413538305735679628945',
+          num.hexToDecimalString(recipientAccount.address),
           '200',
           '0',
           '2',
