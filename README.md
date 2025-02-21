@@ -6,7 +6,7 @@
 <!-- primary badges -->
 <p align="center">
   <a href="https://github.com/starknet-io/starknet.js/actions">
-    <img src="https://github.com/starknet-io/starknet.js/actions/workflows/manual-release.yml/badge.svg">
+    <img src="https://github.com/starknet-io/starknet.js/actions/workflows/manual-release.yml">
   </a>
   <a href="https://www.npmjs.com/package/starknet">
     <img src='https://img.shields.io/npm/v/starknet' />
@@ -29,8 +29,8 @@
   <a href="https://starkware.co/">
     <img src="https://img.shields.io/badge/powered_by-StarkWare-navy">
   </a>
-  <a href="https://twitter.com/starknetjs">
-    <img src="https://img.shields.io/badge/follow_us-Twitter-blue">
+  <a href="https://x.com/starknetjs">
+    <img src="https://img.shields.io/twitter/follow/starknetjs">
   </a>
   <a href="https://www.drips.network/app/projects/github/starknet-io/starknet.js" target="_blank">
     <img src="https://www.drips.network/api/embed/project/https%3A%2F%2Fgithub.com%2Fstarknet-io%2Fstarknet.js/support.png?background=light&style=github&text=project&stat=none" alt="Support starknet.js on drips.network" height="20">
