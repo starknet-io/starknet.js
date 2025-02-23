@@ -1,5 +1,6 @@
 import { NetworkName, StarknetChainId } from '../../global/constants';
 import { BlockIdentifier } from '../../types/lib';
+import { ResourceBoundsOverhead } from './spec.type';
 
 export interface ProviderOptions extends RpcProviderOptions {}
 
@@ -15,9 +16,8 @@ export type RpcProviderOptions = {
   waitMode?: boolean;
   baseFetch?: WindowOrWorkerGlobalScope['fetch'];
   feeMarginPercentage?: {
-    l1BoundMaxAmount: number;
-    l1BoundMaxPricePerUnit: number;
-    maxFee: number;
+    bounds: ResourceBoundsOverhead; // V3 tx
+    maxFee: number; // V legacy tx
   };
   batch?: false | number;
 };

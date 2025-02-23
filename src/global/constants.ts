@@ -57,6 +57,10 @@ export enum TransactionHashPrefix {
 export const enum FeeMarginPercentage {
   L1_BOUND_MAX_AMOUNT = 50,
   L1_BOUND_MAX_PRICE_PER_UNIT = 50,
+  L1_DATA_BOUND_MAX_AMOUNT = 50,
+  L1_DATA_BOUND_MAX_PRICE_PER_UNIT = 50,
+  L2_BOUND_MAX_AMOUNT = 50,
+  L2_BOUND_MAX_PRICE_PER_UNIT = 50,
   MAX_FEE = 50,
 }
 
@@ -113,4 +117,5 @@ export const SYSTEM_MESSAGES = {
   legacyTxWarningMessage:
     'You are using a deprecated transaction version (V0,V1,V2)!\nUpdate to the latest V3 transactions!',
   legacyTxRPC08Message: 'RPC 0.8 do not support legacy transactions',
+  SWOldV3: 'RPC 0.7 V3 tx (improper resource bounds) not supported in RPC 0.8',
 };

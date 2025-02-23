@@ -1,6 +1,6 @@
 import type { SPEC } from 'starknet-types-07';
 
-import { RPC08, RPC07, RpcChannel } from '../channel';
+import { RPC08, RPC07 } from '../channel';
 import {
   AccountInvocations,
   BigNumberish,
@@ -61,7 +61,7 @@ export class RpcProvider implements ProviderInterface {
           ? optionsOrProvider.responseParser
           : new RPCResponseParser();
     } else {
-      this.channel = new RpcChannel({ ...optionsOrProvider, waitMode: false });
+      this.channel = new RPC08.RpcChannel({ ...optionsOrProvider, waitMode: false });
       this.responseParser = new RPCResponseParser(optionsOrProvider?.feeMarginPercentage);
     }
   }

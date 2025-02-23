@@ -1,6 +1,7 @@
 // this file aims to unify the RPC specification types used by the common Provider class
 
 import { IsPending, IsType, RPCSPEC07, RPCSPEC08 } from '../../types/api';
+import { SimpleOneOf } from '../../types/helpers';
 
 // TODO: Check can we remove this ?
 
@@ -27,13 +28,15 @@ type MergeProperties<T1 extends Record<any, any>, T2 extends Record<any, any>> =
   [K in Exclude<keyof T2, keyof T1>]?: T2[K];
 };
 
-// type a = { w: bigint[]; x: bigint; y: string };
-// type b = { w: number[]; x: number; z: string };
-// type c = Merge<a, b>; // { w: (bigint | number)[] x: bigint | number; y?: string; z?: string; }
-//
-// NOTE: handling for ambiguous overlaps, such as a shared property being an array or object,
-// is simplified to resolve to only one type since there shouldn't be such occurrences in the
-// currently supported RPC specifications
+/**
+ *  type a = { w: bigint[]; x: bigint; y: string };
+ type b = { w: number[]; x: number; z: string };
+ type c = Merge<a, b>; // { w: (bigint | number)[] x: bigint | number; y?: string; z?: string; }
+
+ NOTE: handling for ambiguous overlaps, such as a shared property being an array or object,
+ is simplified to resolve to only one type since there shouldn't be such occurrences in the
+ currently supported RPC specifications
+ */
 type Merge<T1, T2> = Simplify<
   T1 extends Array<any>
     ? T2 extends Array<any>
@@ -91,18 +94,62 @@ export type DeclaredTransaction = Merge<
   RPCSPEC08.DeclaredTransaction,
   RPCSPEC07.DeclaredTransaction
 >;
-export type FeeEstimate = Merge<RPCSPEC08.FEE_ESTIMATE, RPCSPEC07.SPEC.FEE_ESTIMATE>;
 export type InvokedTransaction = Merge<RPCSPEC08.InvokedTransaction, RPCSPEC07.InvokedTransaction>;
 export type PendingReceipt = Merge<
   RPCSPEC08.TransactionReceiptPendingBlock,
   RPCSPEC07.PendingReceipt
 >;
 export type Receipt = Merge<RPCSPEC08.TransactionReceiptProductionBlock, RPCSPEC07.Receipt>;
-export type ResourceBounds = Merge<RPCSPEC08.ResourceBounds, RPCSPEC07.ResourceBounds>; // TODO: only l1_gas:val, l2_gas:0 OR l1_gas:val, l1_data_gas: val, l2_gas:val ARE VALID COMBO, waiting slack response
-export type SimulateTransaction = Merge<
-  RPCSPEC08.SimulateTransaction,
-  RPCSPEC07.SimulateTransaction
+
+// One of
+export type FeeEstimate = SimpleOneOf<RPCSPEC08.FEE_ESTIMATE, RPCSPEC07.SPEC.FEE_ESTIMATE>;
+
+export function isRPC08_FeeEstimate(entry: FeeEstimate): entry is RPCSPEC08.FEE_ESTIMATE {
+  return 'l1_data_gas_consumed' in entry;
+}
+
+// One of
+export type ResourceBounds = Simplify<
+  SimpleOneOf<RPCSPEC08.ResourceBounds, RPCSPEC07.ResourceBounds>
 >;
+
+export function isRPC08_ResourceBounds(entry: ResourceBounds): entry is RPCSPEC08.ResourceBounds {
+  return 'l1_data_gas' in entry;
+}
+
+/**
+ * overhead percentage on estimate fee
+ */
+export type ResourceBoundsOverhead = ResourceBoundsOverheadRPC08 | ResourceBoundsOverheadRPC07;
+
+/**
+ * percentage overhead on estimated fee
+ */
+export type ResourceBoundsOverheadRPC08 = {
+  l1_gas: {
+    max_amount: number;
+    max_price_per_unit: number;
+  };
+  l2_gas: {
+    max_amount: number;
+    max_price_per_unit: number;
+  };
+  l1_data_gas: {
+    max_amount: number;
+    max_price_per_unit: number;
+  };
+};
+
+export type ResourceBoundsOverheadRPC07 = {
+  l1_gas: {
+    max_amount: number;
+    max_price_per_unit: number;
+  };
+};
+
+// TODO: ja mislin da types-js rpc 0.7 ima krivu definiciju za transaction trace
+export type SimulateTransaction = RPCSPEC08.SimulateTransaction;
+
 export type TransactionWithHash = Merge<
   RPCSPEC08.TransactionWithHash,
   RPCSPEC07.TransactionWithHash

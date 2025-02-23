@@ -1,4 +1,4 @@
-import { EDataAvailabilityMode, ETransactionVersion, ResourceBounds } from './api';
+import { EDataAvailabilityMode, ETransactionVersion } from './api';
 import {
   AllowArray,
   BigNumberish,
@@ -14,6 +14,7 @@ import {
   DeclareTransactionReceiptResponse,
   EstimateFeeResponse,
 } from '../provider/types/index.type';
+import { ResourceBounds } from '../provider/types/spec.type';
 
 export interface EstimateFee extends EstimateFeeResponse {}
 
