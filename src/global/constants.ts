@@ -1,5 +1,6 @@
+import type { FeeMarginPercentage } from '../types';
 import { ETransactionVersion } from '../types/api';
-import { type LogLevel } from './logger.type';
+import type { LogLevel } from './logger.type';
 
 export { IS_BROWSER } from '../utils/encode';
 
@@ -54,16 +55,6 @@ export enum TransactionHashPrefix {
   L1_HANDLER = '0x6c315f68616e646c6572', // encodeShortString('l1_handler'),
 }
 
-export const enum FeeMarginPercentage {
-  L1_BOUND_MAX_AMOUNT = 50,
-  L1_BOUND_MAX_PRICE_PER_UNIT = 50,
-  L1_DATA_BOUND_MAX_AMOUNT = 50,
-  L1_DATA_BOUND_MAX_PRICE_PER_UNIT = 50,
-  L2_BOUND_MAX_AMOUNT = 50,
-  L2_BOUND_MAX_PRICE_PER_UNIT = 50,
-  MAX_FEE = 50,
-}
-
 export const UDC = {
   ADDRESS: '0x041a78e741e5af2fec34b695679bc6891742439f7afb8484ecd7766661ad02bf',
   ENTRYPOINT: 'deployContract',
@@ -106,10 +97,28 @@ export const DEFAULT_GLOBAL_CONFIG: {
   legacyMode: boolean;
   logLevel: LogLevel;
   accountTxVersion: typeof ETransactionVersion.V2 | typeof ETransactionVersion.V3;
+  feeMarginPercentage: FeeMarginPercentage;
 } = {
   legacyMode: false,
   logLevel: 'INFO',
   accountTxVersion: ETransactionVersion.V3,
+  feeMarginPercentage: {
+    bounds: {
+      l1_gas: {
+        max_amount: 50,
+        max_price_per_unit: 50,
+      },
+      l1_data_gas: {
+        max_amount: 50,
+        max_price_per_unit: 50,
+      },
+      l2_gas: {
+        max_amount: 50,
+        max_price_per_unit: 50,
+      },
+    },
+    maxFee: 50,
+  },
 };
 
 // Default system messages

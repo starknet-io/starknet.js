@@ -162,6 +162,7 @@ describe('Ethereum signer', () => {
       );
       const txR = await provider.waitForTransaction(respTransfer.transaction_hash);
       if (txR.isSuccess()) {
+        // TODO: @PhilippeR26 Why this is not working
         expect(txR.execution_status).toBe('SUCCEEDED');
       } else {
         fail('txR not success');

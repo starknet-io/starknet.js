@@ -115,8 +115,12 @@ describeIfRpc('RPCProvider', () => {
     const p = new RpcProvider({
       nodeUrl: provider.channel.nodeUrl,
       feeMarginPercentage: {
-        l1BoundMaxAmount: 0,
-        l1BoundMaxPricePerUnit: 0,
+        bounds: {
+          l1_gas: {
+            max_amount: 0,
+            max_price_per_unit: 0,
+          },
+        },
         maxFee: 0,
       },
     });
