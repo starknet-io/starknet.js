@@ -162,8 +162,8 @@ describe('Ethereum signer', () => {
       );
       const txR = await provider.waitForTransaction(respTransfer.transaction_hash);
       if (txR.isSuccess()) {
-        // TODO: @PhilippeR26 Why this is not working
-        expect(txR.execution_status).toBe('SUCCEEDED');
+        // TODO: @PhilippeR26 Why this is not working, fix 'as any' hotfix
+        expect((txR as any).execution_status).toBe('SUCCEEDED');
       } else {
         fail('txR not success');
       }
@@ -283,7 +283,7 @@ describe('Ethereum signer', () => {
 
       const txR = await provider.waitForTransaction(respTransfer.transaction_hash);
       if (txR.isSuccess()) {
-        expect(txR.execution_status).toBe('SUCCEEDED');
+        expect((txR as any).execution_status).toBe('SUCCEEDED');
       } else {
         fail('txR not success');
       }
