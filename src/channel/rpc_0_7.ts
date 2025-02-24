@@ -27,7 +27,7 @@ import fetch from '../utils/fetchPonyfill';
 import { getSelector, getSelectorFromName } from '../utils/hash';
 import { stringify } from '../utils/json';
 import { getHexStringArray, toHex, toStorageKey } from '../utils/num';
-import { Block, getDefaultNodeUrl, isV3Tx, isVersion, wait } from '../utils/provider';
+import { Block, getDefaultNodeUrl, isV3Tx, wait } from '../utils/provider';
 import { decompressProgram, signatureToHexArray } from '../utils/stark';
 import { getVersionsByType } from '../utils/transaction';
 import { logger } from '../global/logger';
@@ -144,7 +144,7 @@ export class RpcChannel {
       if (this.batchClient) {
         const { error, result } = await this.batchClient.fetch(
           method,
-          params,
+          params as any, // TODO: fix this temporary cast with some permanent solution
           (this.requestId += 1)
         );
         this.errorHandler(method, params, error);
@@ -425,12 +425,11 @@ export class RpcChannel {
     { blockIdentifier = this.blockIdentifier, skipValidate = true }: getEstimateFeeBulkOptions
   ) {
     const block_id = new Block(blockIdentifier).identifier;
-    let flags = {};
-    if (!isVersion('0.5', await this.getSpecVersion())) {
-      flags = {
-        simulation_flags: skipValidate ? [RPC.ESimulationFlag.SKIP_VALIDATE] : [],
-      };
-    } // else v(0.5) no flags
+    const flags = {
+      simulation_flags: (skipValidate
+        ? [RPC.ESimulationFlag.SKIP_VALIDATE]
+        : []) as RPC.Methods['starknet_estimateFee']['params']['simulation_flags'],
+    };
 
     return this.fetchEndpoint('starknet_estimateFee', {
       request: invocations.map((it) => this.buildTransaction(it, 'fee')),

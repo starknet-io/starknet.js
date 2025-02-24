@@ -1,6 +1,6 @@
 import type { SPEC } from 'starknet-types-07';
 
-import { RPC06, RPC07, RpcChannel } from '../channel';
+import { RPC08, RPC07 } from '../channel';
 import {
   AccountInvocations,
   BigNumberish,
@@ -31,8 +31,9 @@ import {
   type Signature,
   type TypedData,
   waitForTransactionOptions,
+  GetTransactionReceiptResponse,
 } from '../types';
-import type { TransactionWithHash } from '../types/provider/spec';
+import type { TransactionWithHash } from './types/spec.type';
 import assert from '../utils/assert';
 import { CallData } from '../utils/calldata';
 import { getAbiContractVersion } from '../utils/calldata/cairo';
@@ -42,7 +43,7 @@ import { isBigNumberish, toBigInt, toHex } from '../utils/num';
 import { wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { formatSignature } from '../utils/stark';
-import { GetTransactionReceiptResponse, ReceiptTx } from '../utils/transactionReceipt';
+import { ReceiptTx } from '../utils/transactionReceipt/transactionReceipt';
 import { getMessageHash, validateTypedData } from '../utils/typedData';
 import { LibraryError } from '../utils/errors';
 import { ProviderInterface } from './interface';
@@ -50,7 +51,7 @@ import { ProviderInterface } from './interface';
 export class RpcProvider implements ProviderInterface {
   public responseParser: RPCResponseParser;
 
-  public channel: RPC07.RpcChannel | RPC06.RpcChannel;
+  public channel: RPC07.RpcChannel | RPC08.RpcChannel;
 
   constructor(optionsOrProvider?: RpcProviderOptions | ProviderInterface | RpcProvider) {
     if (optionsOrProvider && 'channel' in optionsOrProvider) {
@@ -60,7 +61,7 @@ export class RpcProvider implements ProviderInterface {
           ? optionsOrProvider.responseParser
           : new RPCResponseParser();
     } else {
-      this.channel = new RpcChannel({ ...optionsOrProvider, waitMode: false });
+      this.channel = new RPC08.RpcChannel({ ...optionsOrProvider, waitMode: false });
       this.responseParser = new RPCResponseParser(optionsOrProvider?.feeMarginPercentage);
     }
   }
@@ -182,7 +183,7 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getBlockWithReceipts(blockIdentifier?: BlockIdentifier) {
-    if (this.channel instanceof RPC06.RpcChannel)
+    if (this.channel instanceof RPC08.RpcChannel)
       throw new LibraryError('Unsupported method for RPC version');
 
     return this.channel.getBlockWithReceipts(blockIdentifier);
@@ -232,9 +233,9 @@ export class RpcProvider implements ProviderInterface {
 
   public async getTransactionReceipt(txHash: BigNumberish): Promise<GetTransactionReceiptResponse> {
     const txReceiptWoHelper = await this.channel.getTransactionReceipt(txHash);
-    const txReceiptWoHelperModified: GetTxReceiptResponseWithoutHelper =
+    const txReceiptWoHelperModified =
       this.responseParser.parseTransactionReceipt(txReceiptWoHelper);
-    return new ReceiptTx(txReceiptWoHelperModified) as GetTransactionReceiptResponse;
+    return new ReceiptTx(txReceiptWoHelperModified);
   }
 
   public async getTransactionTrace(txHash: BigNumberish) {

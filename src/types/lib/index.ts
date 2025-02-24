@@ -1,9 +1,10 @@
 import { StarknetChainId } from '../../global/constants';
 import { weierstrass } from '../../utils/ec';
-import { EDataAvailabilityMode, ResourceBounds } from '../api';
+import { EDataAvailabilityMode } from '../api';
 import { CairoEnum } from '../cairoEnum';
 import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 import { ValuesType } from '../helpers/valuesType';
+import { ResourceBounds } from '../../provider/types/spec.type';
 
 export type WeierstrassSignatureType = weierstrass.SignatureType;
 export type ArraySignatureType = string[];
