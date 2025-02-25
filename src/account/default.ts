@@ -45,7 +45,11 @@ import {
   UniversalDeployerContractPayload,
   UniversalDetails,
 } from '../types';
-import { ETransactionVersion, ETransactionVersion3 } from '../types/api';
+import {
+  ETransactionVersion,
+  ETransactionVersion3,
+  ResourceBounds,
+} from '../provider/types/spec.type';
 import {
   OutsideExecutionVersion,
   type OutsideExecution,
@@ -77,7 +81,6 @@ import { buildUDCCall, getExecuteCalldata } from '../utils/transaction';
 import { getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
 import { config } from '../global/config';
-import { ResourceBounds } from '../provider/types/spec.type';
 
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;

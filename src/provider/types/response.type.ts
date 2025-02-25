@@ -3,6 +3,7 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 
+import { IsReverted, IsSucceeded, IsType } from 'starknet-types-08';
 import { CompiledSierra, LegacyContractClass } from '../../types/lib';
 import {
   BLOCK_HASH,
@@ -21,7 +22,7 @@ import {
   TransactionWithHash,
 } from './spec.type';
 
-import { IsReverted, IsSucceeded, IsType, TransactionReceipt } from '../../types/api';
+import { TransactionReceipt } from '../../types/api';
 
 export { BlockWithTxHashes, ContractClassPayload, FeeEstimate } from './spec.type';
 

@@ -1,9 +1,9 @@
 // this file aims to unify the RPC specification types used by the common Provider class
 
-import { IsPending, IsType, RPCSPEC07, RPCSPEC08 } from '../../types/api';
-import { SimpleOneOf } from '../../types/helpers';
+import * as RPCSPEC07 from 'starknet-types-07';
+import * as RPCSPEC08 from 'starknet-types-08';
 
-// TODO: Check can we remove this ?
+import { SimpleOneOf } from '../../types/helpers';
 
 // taken from type-fest
 type Simplify<T> = { [K in keyof T]: T[K] } & {};
@@ -53,6 +53,17 @@ type Merge<T1, T2> = Simplify<
           : T1 | T2
 >;
 
+// Default exports for both RPCs
+export type ETransactionVersion = RPCSPEC08.ETransactionVersion;
+export const { ETransactionVersion } = RPCSPEC08;
+
+export type ETransactionVersion2 = RPCSPEC08.ETransactionVersion2;
+export const { ETransactionVersion2 } = RPCSPEC08;
+
+export type ETransactionVersion3 = RPCSPEC08.ETransactionVersion3;
+export const { ETransactionVersion3 } = RPCSPEC08;
+
+// MERGES
 export type BLOCK_HASH = Merge<RPCSPEC08.BLOCK_HASH, RPCSPEC07.SPEC.BLOCK_HASH>;
 export type BLOCK_NUMBER = Merge<RPCSPEC08.BLOCK_NUMBER, RPCSPEC07.SPEC.BLOCK_NUMBER>;
 export type FELT = Merge<RPCSPEC08.FELT, RPCSPEC07.SPEC.FELT>;
@@ -69,22 +80,24 @@ export type PENDING_STATE_UPDATE = Merge<
 >;
 
 // TODO: Can we remove all of this ?
-/* export type INVOKE_TXN_RECEIPT = IsInBlock<IsType<RPCSPEC08.TransactionReceipt, 'INVOKE'>>;
-export type DECLARE_TXN_RECEIPT = IsInBlock<IsType<RPCSPEC08.TransactionReceipt, 'DECLARE'>>;
+/* export type INVOKE_TXN_RECEIPT = IsInBlock<RPCSPEC08.IsType<RPCSPEC08.TransactionReceipt, 'INVOKE'>>;
+export type DECLARE_TXN_RECEIPT = IsInBlock<RPCSPEC08.IsType<RPCSPEC08.TransactionReceipt, 'DECLARE'>>;
 export type DEPLOY_ACCOUNT_TXN_RECEIPT = IsInBlock<
-  IsType<RPCSPEC08.TransactionReceipt, 'DEPLOY_ACCOUNT'>
+  RPCSPEC08.IsType<RPCSPEC08.TransactionReceipt, 'DEPLOY_ACCOUNT'>
 >;
-export type L1_HANDLER_TXN_RECEIPT = IsInBlock<IsType<RPCSPEC08.TransactionReceipt, 'L1_HANDLER'>>; */
+export type L1_HANDLER_TXN_RECEIPT = IsInBlock<RPCSPEC08.IsType<RPCSPEC08.TransactionReceipt, 'L1_HANDLER'>>; */
 
-export type PENDING_INVOKE_TXN_RECEIPT = IsPending<IsType<RPCSPEC08.TransactionReceipt, 'INVOKE'>>;
-export type PENDING_DECLARE_TXN_RECEIPT = IsPending<
-  IsType<RPCSPEC08.TransactionReceipt, 'DECLARE'>
+export type PENDING_INVOKE_TXN_RECEIPT = RPCSPEC08.IsPending<
+  RPCSPEC08.IsType<RPCSPEC08.TransactionReceipt, 'INVOKE'>
 >;
-export type PENDING_DEPLOY_ACCOUNT_TXN_RECEIPT = IsPending<
-  IsType<RPCSPEC08.TransactionReceipt, 'DEPLOY_ACCOUNT'>
+export type PENDING_DECLARE_TXN_RECEIPT = RPCSPEC08.IsPending<
+  RPCSPEC08.IsType<RPCSPEC08.TransactionReceipt, 'DECLARE'>
 >;
-export type PENDING_L1_HANDLER_TXN_RECEIPT = IsPending<
-  IsType<RPCSPEC08.TransactionReceipt, 'L1_HANDLER'>
+export type PENDING_DEPLOY_ACCOUNT_TXN_RECEIPT = RPCSPEC08.IsPending<
+  RPCSPEC08.IsType<RPCSPEC08.TransactionReceipt, 'DEPLOY_ACCOUNT'>
+>;
+export type PENDING_L1_HANDLER_TXN_RECEIPT = RPCSPEC08.IsPending<
+  RPCSPEC08.IsType<RPCSPEC08.TransactionReceipt, 'L1_HANDLER'>
 >;
 //
 
@@ -95,6 +108,21 @@ export type DeclaredTransaction = Merge<
   RPCSPEC07.DeclaredTransaction
 >;
 export type InvokedTransaction = Merge<RPCSPEC08.InvokedTransaction, RPCSPEC07.InvokedTransaction>;
+export type DeployedAccountTransaction = Merge<
+  RPCSPEC08.DeployedAccountTransaction,
+  RPCSPEC07.DeployedAccountTransaction
+>;
+
+export type L1Message = Merge<RPCSPEC08.L1Message, RPCSPEC07.L1Message>;
+export type EventFilter = RPCSPEC08.EventFilter;
+export type L1_HANDLER_TXN = RPCSPEC08.L1_HANDLER_TXN;
+export type EDataAvailabilityMode = RPCSPEC08.EDataAvailabilityMode;
+export const { EDataAvailabilityMode } = RPCSPEC08;
+export type EDAMode = RPCSPEC08.EDAMode;
+export const { EDAMode } = RPCSPEC08;
+export type EmittedEvent = Merge<RPCSPEC08.EmittedEvent, RPCSPEC07.EmittedEvent>;
+export type Event = Merge<RPCSPEC08.Event, RPCSPEC07.Event>;
+
 export type PendingReceipt = Merge<
   RPCSPEC08.TransactionReceiptPendingBlock,
   RPCSPEC07.PendingReceipt
@@ -156,3 +184,20 @@ export type TransactionWithHash = Merge<
 >;
 
 export type TransactionReceipt = Merge<RPCSPEC08.TransactionReceipt, RPCSPEC07.TransactionReceipt>;
+export type Methods = RPCSPEC08.Methods;
+export type TXN_STATUS = Merge<RPCSPEC08.TXN_STATUS, RPCSPEC07.SPEC.TXN_STATUS>;
+export type TXN_EXECUTION_STATUS = Merge<
+  RPCSPEC08.TXN_EXECUTION_STATUS,
+  RPCSPEC07.SPEC.TXN_EXECUTION_STATUS
+>;
+export type TransactionStatus = Merge<RPCSPEC08.TransactionStatus, RPCSPEC07.TransactionStatus>;
+export type ETransactionStatus = RPCSPEC08.ETransactionStatus;
+export const { ETransactionStatus } = RPCSPEC08;
+export type ETransactionExecutionStatus = RPCSPEC08.ETransactionExecutionStatus;
+export const { ETransactionExecutionStatus } = RPCSPEC08;
+export type TRANSACTION_TRACE = Merge<
+  RPCSPEC08.TRANSACTION_TRACE,
+  RPCSPEC07.SPEC.TRANSACTION_TRACE
+>;
+export type FEE_ESTIMATE = Merge<RPCSPEC08.FEE_ESTIMATE, RPCSPEC07.SPEC.FEE_ESTIMATE>;
+export type EVENTS_CHUNK = Merge<RPCSPEC08.EVENTS_CHUNK, RPCSPEC07.SPEC.EVENTS_CHUNK>;

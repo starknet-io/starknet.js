@@ -1,5 +1,5 @@
 import type { FeeMarginPercentage } from '../types';
-import { ETransactionVersion } from '../types/api';
+import { ETransactionVersion, RPCSPEC08 } from '../types/api';
 import type { LogLevel } from './logger.type';
 
 export { IS_BROWSER } from '../utils/encode';
@@ -14,7 +14,7 @@ export const TEXT_TO_FELT_MAX_LEN = 31;
  * types.RPC.ETransactionVersion
  * For BN do BigInt(TRANSACTION_VERSION.*)
  */
-export { ETransactionVersion as TRANSACTION_VERSION };
+export const { ETransactionVersion: TRANSACTION_VERSION } = RPCSPEC08;
 
 export const ZERO = 0n;
 export const MASK_250 = 2n ** 250n - 1n; // 2 ** 250 - 1

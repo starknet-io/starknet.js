@@ -346,7 +346,7 @@ export class Contract implements ContractInterface {
             })
             .filter((event) => cleanHex(event.from_address) === cleanHex(this.address), []) || [];
         parsed = parseRawEvents(
-          emittedEvents,
+          emittedEvents as any, // TODO: any temp hotfix, fix this
           this.events,
           this.structs,
           CallData.getAbiEnum(this.abi)

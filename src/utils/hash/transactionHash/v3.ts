@@ -6,10 +6,14 @@ import { poseidonHashMany } from '@scure/starknet';
 
 import { StarknetChainId, TransactionHashPrefix } from '../../../global/constants';
 import { BigNumberish, Calldata } from '../../../types';
-import { EDAMode, RPCSPEC07, RPCSPEC08 } from '../../../types/api';
+import { RPCSPEC07, RPCSPEC08 } from '../../../types/api';
 import { toHex } from '../../num';
 import { encodeShortString } from '../../shortString';
-import { isRPC08_ResourceBounds, type ResourceBounds } from '../../../provider/types/spec.type';
+import {
+  EDAMode,
+  isRPC08_ResourceBounds,
+  type ResourceBounds,
+} from '../../../provider/types/spec.type';
 
 const AToBI = (array: BigNumberish[]) => array.map((it: BigNumberish) => BigInt(it));
 

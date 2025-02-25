@@ -10,7 +10,6 @@ import {
   Signature,
   UniversalDetails,
 } from '../../types';
-import { EDAMode, EDataAvailabilityMode, ETransactionVersion } from '../../types/api';
 import { FeeEstimate } from '../../provider/types/index.type';
 import {
   addHexPrefix,
@@ -28,6 +27,9 @@ import {
 } from '../num';
 import { isBigInt, isString } from '../typed';
 import {
+  EDAMode,
+  EDataAvailabilityMode,
+  ETransactionVersion,
   isRPC08_FeeEstimate,
   ResourceBounds,
   ResourceBoundsOverhead,

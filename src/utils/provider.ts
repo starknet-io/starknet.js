@@ -14,7 +14,6 @@ import {
   StateUpdateResponse,
   V3TransactionDetails,
 } from '../types';
-import { ETransactionVersion } from '../types/api';
 import { isSierra } from './contract';
 import { formatSpaces } from './hash';
 import { parse, stringify } from './json';
@@ -24,6 +23,7 @@ import { isBigInt, isNumber, isString } from './typed';
 import { compressProgram } from './stark';
 import type { GetTransactionReceiptResponse } from './transactionReceipt/transactionReceipt.type';
 import { logger } from '../global/logger';
+import { ETransactionVersion } from '../provider/types/spec.type';
 
 /**
  * Helper - Async Sleep for 'delay' time

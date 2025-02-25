@@ -1,5 +1,3 @@
-import type { SPEC } from 'starknet-types-07';
-
 import { RPC08, RPC07 } from '../channel';
 import {
   AccountInvocations,
@@ -20,7 +18,6 @@ import {
   InvocationsDetailsWithNonce,
   PendingBlock,
   PendingStateUpdate,
-  RPC,
   RpcProviderOptions,
   StateUpdate,
   StateUpdateResponse,
@@ -33,7 +30,18 @@ import {
   waitForTransactionOptions,
   GetTransactionReceiptResponse,
 } from '../types';
-import type { TransactionWithHash } from './types/spec.type';
+import type {
+  DeclaredTransaction,
+  DeployedAccountTransaction,
+  EventFilter,
+  EVENTS_CHUNK,
+  FEE_ESTIMATE,
+  InvokedTransaction,
+  L1_HANDLER_TXN,
+  L1Message,
+  TRANSACTION_TRACE,
+  TransactionWithHash,
+} from './types/spec.type';
 import assert from '../utils/assert';
 import { CallData } from '../utils/calldata';
 import { getAbiContractVersion } from '../utils/calldata/cairo';
@@ -170,7 +178,7 @@ export class RpcProvider implements ProviderInterface {
     const transaction = (await this.channel.getTransactionByHash(l2TxHash)) as TransactionWithHash;
     assert(transaction.type === 'L1_HANDLER', 'This L2 transaction is not a L1 message.');
     const { calldata, contract_address, entry_point_selector, nonce } =
-      transaction as SPEC.L1_HANDLER_TXN;
+      transaction as L1_HANDLER_TXN;
     const params = [
       calldata[0],
       contract_address,
@@ -238,7 +246,7 @@ export class RpcProvider implements ProviderInterface {
     return new ReceiptTx(txReceiptWoHelperModified);
   }
 
-  public async getTransactionTrace(txHash: BigNumberish) {
+  public async getTransactionTrace(txHash: BigNumberish): Promise<TRANSACTION_TRACE> {
     return this.channel.getTransactionTrace(txHash);
   }
 
@@ -429,24 +437,21 @@ export class RpcProvider implements ProviderInterface {
     functionInvocation: Invocation,
     details: InvocationsDetailsWithNonce
   ) {
-    return this.channel.invoke(functionInvocation, details) as Promise<RPC.InvokedTransaction>;
+    return this.channel.invoke(functionInvocation, details) as Promise<InvokedTransaction>;
   }
 
   public async declareContract(
     transaction: DeclareContractTransaction,
     details: InvocationsDetailsWithNonce
   ) {
-    return this.channel.declare(transaction, details) as Promise<RPC.DeclaredTransaction>;
+    return this.channel.declare(transaction, details) as Promise<DeclaredTransaction>;
   }
 
   public async deployAccountContract(
     transaction: DeployAccountContractTransaction,
     details: InvocationsDetailsWithNonce
   ) {
-    return this.channel.deployAccount(
-      transaction,
-      details
-    ) as Promise<RPC.DeployedAccountTransaction>;
+    return this.channel.deployAccount(transaction, details) as Promise<DeployedAccountTransaction>;
   }
 
   public async callContract(call: Call, blockIdentifier?: BlockIdentifier) {
@@ -457,7 +462,10 @@ export class RpcProvider implements ProviderInterface {
    * NEW: Estimate the fee for a message from L1
    * @param message Message From L1
    */
-  public async estimateMessageFee(message: RPC.L1Message, blockIdentifier?: BlockIdentifier) {
+  public async estimateMessageFee(
+    message: L1Message,
+    blockIdentifier?: BlockIdentifier
+  ): Promise<FEE_ESTIMATE> {
     return this.channel.estimateMessageFee(message, blockIdentifier);
   }
 
@@ -473,7 +481,7 @@ export class RpcProvider implements ProviderInterface {
    * Returns all events matching the given filter
    * @returns events and the pagination of the events
    */
-  public async getEvents(eventFilter: RPC.EventFilter) {
+  public async getEvents(eventFilter: EventFilter): Promise<EVENTS_CHUNK> {
     return this.channel.getEvents(eventFilter);
   }
 

@@ -18,7 +18,7 @@ import {
   getSimulateTransactionOptions,
   waitForTransactionOptions,
 } from '../types';
-import { CONTRACT_STORAGE_KEYS, JRPC, RPCSPEC08 as RPC } from '../types/api';
+import { JRPC, RPCSPEC08 as RPC } from '../types/api';
 import { BatchClient } from '../utils/batch';
 import { CallData } from '../utils/calldata';
 import { isSierra } from '../utils/contract';
@@ -189,7 +189,7 @@ export class RpcChannel {
     blockIdentifier: BlockIdentifier = this.blockIdentifier,
     classHashes: BigNumberish[] = [],
     contractAddresses: BigNumberish[] = [],
-    contractsStorageKeys: CONTRACT_STORAGE_KEYS[] = [] // TODO: allow BigNUmberish[] and fix formatting before request
+    contractsStorageKeys: RPC.CONTRACT_STORAGE_KEYS[] = [] // TODO: allow BigNUmberish[] and fix formatting before request
   ) {
     const block_id = new Block(blockIdentifier).identifier;
     const class_hashes = bigNumberishArrayToHexadecimalStringArray(classHashes);
