@@ -1,4 +1,9 @@
-import { NetworkName, StarknetChainId, SYSTEM_MESSAGES } from '../global/constants';
+import {
+  NetworkName,
+  StarknetChainId,
+  SupportedRpcVersion,
+  SYSTEM_MESSAGES,
+} from '../global/constants';
 import { LibraryError, RpcError } from '../utils/errors';
 import {
   AccountInvocationItem,
@@ -46,6 +51,8 @@ const defaultOptions = {
 };
 
 export class RpcChannel {
+  readonly id = 'RPC08';
+
   public nodeUrl: string;
 
   public headers: object;
@@ -60,7 +67,7 @@ export class RpcChannel {
 
   private chainId?: StarknetChainId;
 
-  private specVersion?: string;
+  private specVersion?: SupportedRpcVersion;
 
   private transactionRetryIntervalFallback?: number;
 
@@ -107,6 +114,10 @@ export class RpcChannel {
         baseFetch: this.baseFetch,
       });
     }
+  }
+
+  public readSpecVersion() {
+    return this.specVersion;
   }
 
   private get transactionRetryIntervalDefault() {
@@ -212,9 +223,26 @@ export class RpcChannel {
     });
   }
 
+  /**
+   * fetch if undefined else just return this.specVersion
+   * return this.specVersion as 'M.m'
+   * @example this.specVersion = "0.8"
+   */
   public async getSpecVersion() {
-    this.specVersion ??= (await this.fetchEndpoint('starknet_specVersion')) as StarknetChainId;
+    if (!this.specVersion) {
+      const extendedVersion = await this.getSpecificationVersion();
+      const [major, minor] = extendedVersion.split('.');
+      const specVerson = `${major}.${minor}` as SupportedRpcVersion;
+      this.specVersion ??= specVerson;
+    }
     return this.specVersion;
+  }
+
+  /**
+   * fetch spec version in extended format "M.m.p-?"
+   */
+  public getSpecificationVersion() {
+    return this.fetchEndpoint('starknet_specVersion');
   }
 
   public getNonceForAddress(

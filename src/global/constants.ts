@@ -60,19 +60,6 @@ export const UDC = {
   ENTRYPOINT: 'deployContract',
 } as const;
 
-export const RPC_DEFAULT_VERSION = 'v0_7';
-
-export const RPC_NODES = {
-  SN_MAIN: [
-    `https://starknet-mainnet.public.blastapi.io/rpc/${RPC_DEFAULT_VERSION}`,
-    `https://free-rpc.nethermind.io/mainnet-juno/${RPC_DEFAULT_VERSION}`,
-  ],
-  SN_SEPOLIA: [
-    `https://starknet-sepolia.public.blastapi.io/rpc/${RPC_DEFAULT_VERSION}`,
-    `https://free-rpc.nethermind.io/sepolia-juno/${RPC_DEFAULT_VERSION}`,
-  ],
-} as const;
-
 export const OutsideExecutionCallerAny = '0x414e595f43414c4c4552'; // encodeShortString('ANY_CALLER')
 export const SNIP9_V1_INTERFACE_ID =
   '0x68cfd18b92d1907b8ba3cc324900277f5a3622099431ea85dd8089255e4181';
@@ -85,23 +72,31 @@ export const HARDENING_BYTE = 128;
 // 0x80000000
 export const HARDENING_4BYTES = 2147483648n;
 
-export const SUPPORTED_RPC_VERSIONS = {
+/**
+ * dot formate rpc versions
+ */
+export const SupportedRpcVersion = {
   0.7: '0.7',
   0.8: '0.8',
 } as const;
-export type SUPPORTED_RPC_VERSIONS =
-  (typeof SUPPORTED_RPC_VERSIONS)[keyof typeof SUPPORTED_RPC_VERSIONS];
+export type SupportedRpcVersion = (typeof SupportedRpcVersion)[keyof typeof SupportedRpcVersion];
+
+export type SupportedTransactionVersion =
+  | typeof ETransactionVersion.V2
+  | typeof ETransactionVersion.V3;
 
 // Default initial global config
 export const DEFAULT_GLOBAL_CONFIG: {
   legacyMode: boolean;
   logLevel: LogLevel;
-  accountTxVersion: typeof ETransactionVersion.V2 | typeof ETransactionVersion.V3;
+  rpcVersion: SupportedRpcVersion;
+  transactionVersion: SupportedTransactionVersion;
   feeMarginPercentage: FeeMarginPercentage;
 } = {
   legacyMode: false,
+  rpcVersion: '0.8',
+  transactionVersion: ETransactionVersion.V3,
   logLevel: 'INFO',
-  accountTxVersion: ETransactionVersion.V3,
   feeMarginPercentage: {
     bounds: {
       l1_gas: {
@@ -120,6 +115,20 @@ export const DEFAULT_GLOBAL_CONFIG: {
     maxFee: 50,
   },
 };
+
+const vToUrl = (versionString: SupportedRpcVersion) =>
+  `v${versionString.replace(/^v/, '').replace(/\./g, '_')}`;
+
+export const RPC_NODES = {
+  SN_MAIN: [
+    `https://starknet-mainnet.public.blastapi.io/rpc/${vToUrl(DEFAULT_GLOBAL_CONFIG.rpcVersion)}`,
+    `https://free-rpc.nethermind.io/mainnet-juno/${vToUrl(DEFAULT_GLOBAL_CONFIG.rpcVersion)}`,
+  ],
+  SN_SEPOLIA: [
+    `https://starknet-sepolia.public.blastapi.io/rpc/${vToUrl(DEFAULT_GLOBAL_CONFIG.rpcVersion)}`,
+    `https://free-rpc.nethermind.io/sepolia-juno/${vToUrl(DEFAULT_GLOBAL_CONFIG.rpcVersion)}`,
+  ],
+} as const;
 
 // Default system messages
 export const SYSTEM_MESSAGES = {

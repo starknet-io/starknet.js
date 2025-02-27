@@ -48,13 +48,14 @@ import { getAbiContractVersion } from '../utils/calldata/cairo';
 import { extractContractHashes, isSierra } from '../utils/contract';
 import { solidityUint256PackedKeccak256 } from '../utils/hash';
 import { isBigNumberish, toBigInt, toHex } from '../utils/num';
-import { wait } from '../utils/provider';
+import { isVersion, wait } from '../utils/provider';
 import { RPCResponseParser } from '../utils/responseParser/rpc';
 import { formatSignature } from '../utils/stark';
 import { ReceiptTx } from '../utils/transactionReceipt/transactionReceipt';
 import { getMessageHash, validateTypedData } from '../utils/typedData';
 import { LibraryError } from '../utils/errors';
 import { ProviderInterface } from './interface';
+import { config } from '../global/config';
 
 export class RpcProvider implements ProviderInterface {
   public responseParser: RPCResponseParser;
@@ -69,9 +70,39 @@ export class RpcProvider implements ProviderInterface {
           ? optionsOrProvider.responseParser
           : new RPCResponseParser();
     } else {
-      this.channel = new RPC08.RpcChannel({ ...optionsOrProvider, waitMode: false });
+      if (optionsOrProvider && optionsOrProvider.specVersion) {
+        if (isVersion('0.8', optionsOrProvider.specVersion)) {
+          this.channel = new RPC08.RpcChannel({ ...optionsOrProvider, waitMode: false });
+        } else if (isVersion('0.7', optionsOrProvider.specVersion)) {
+          this.channel = new RPC07.RpcChannel({ ...optionsOrProvider, waitMode: false });
+        } else
+          throw new Error(`unsupported channel for spec version: ${optionsOrProvider.specVersion}`);
+      } else if (isVersion('0.8', config.get('rpcVersion'))) {
+        this.channel = new RPC08.RpcChannel({ ...optionsOrProvider, waitMode: false });
+      } else if (isVersion('0.7', config.get('rpcVersion'))) {
+        this.channel = new RPC07.RpcChannel({ ...optionsOrProvider, waitMode: false });
+      } else throw new Error('unable to define spec version for channel');
+
       this.responseParser = new RPCResponseParser(optionsOrProvider?.feeMarginPercentage);
     }
+  }
+
+  /**
+   * auto configure channel based on provided node
+   * leave space for other async before constructor
+   */
+  static async create(optionsOrProvider?: RpcProviderOptions) {
+    const channel = new RPC07.RpcChannel({ ...optionsOrProvider });
+    const spec = await channel.getSpecVersion();
+
+    if (isVersion('0.7', spec)) {
+      return new RpcProvider({ ...optionsOrProvider, specVersion: '0.7' });
+    }
+    if (isVersion('0.8', spec)) {
+      return new RpcProvider({ ...optionsOrProvider, specVersion: '0.8' });
+    }
+
+    throw new Error('unable to detect specification version');
   }
 
   public fetch(method: string, params?: object, id: string | number = 0) {
@@ -82,6 +113,9 @@ export class RpcProvider implements ProviderInterface {
     return this.channel.getChainId();
   }
 
+  /**
+   * return spec version in format "M.m.p-?"
+   */
   public async getSpecVersion() {
     return this.channel.getSpecVersion();
   }

@@ -7,7 +7,6 @@ import {
   Contract,
   FeeEstimate,
   RPC,
-  RPC07,
   RPCResponseParser,
   ReceiptTx,
   RpcProvider,
@@ -33,6 +32,7 @@ import {
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 import { isBoolean } from '../src/utils/typed';
+import { isVersion } from '../src/utils/provider';
 
 describeIfRpc('RPCProvider', () => {
   const rpcProvider = getTestProvider(false);
@@ -46,6 +46,16 @@ describeIfRpc('RPCProvider', () => {
     const accountKeyPair = utils.randomPrivateKey();
     accountPublicKey = getStarkKey(accountKeyPair);
     await createBlockForDevnet();
+  });
+
+  test('detect spec version with create', async () => {
+    const providerTest = await RpcProvider.create({ nodeUrl: process.env.TEST_RPC_URL });
+    const { channel } = providerTest;
+    expect(channel).toBeDefined();
+    const rawResult = await channel.fetch('starknet_specVersion');
+    const j = await rawResult.json();
+    expect(channel.readSpecVersion()).toBeDefined();
+    expect(isVersion(j.result, await channel.getSpecVersion())).toBeTruthy();
   });
 
   test('baseFetch override', async () => {
@@ -286,12 +296,6 @@ describeIfRpc('RPCProvider', () => {
     test('getBlockWithTxs', async () => {
       const blockResponse = await rpcProvider.getBlockWithTxs(latestBlock.block_number);
       expect(blockResponse).toHaveProperty('transactions');
-    });
-
-    test('getBlockWithReceipts - 0.v-1 RpcChannel', async () => {
-      const channel = new RPC07.RpcChannel({ nodeUrl: rpcProvider.channel.nodeUrl });
-      const p = new RpcProvider({ channel } as any);
-      await expect(p.getBlockWithReceipts(latestBlock.block_number)).rejects.toThrow(/Unsupported/);
     });
 
     test('getBlockWithReceipts - 0.v RpcChannel', async () => {

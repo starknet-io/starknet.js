@@ -8,11 +8,11 @@ import {
   LegacyCompiledContract,
   RpcProviderOptions,
 } from '../../src/types';
-import { ETransactionVersion } from '../../src/types/api';
 import { toHex } from '../../src/utils/num';
 import { wait } from '../../src/utils/provider';
 import { isString } from '../../src/utils/typed';
 import './customMatchers'; // ensures TS traversal
+import { SupportedRpcVersion, SupportedTransactionVersion } from '../../src/global/constants';
 
 const readFile = (subpath: string) => fs.readFileSync(path.resolve(__dirname, subpath));
 
@@ -97,13 +97,14 @@ export function getTestProvider(
   const providerOptions: RpcProviderOptions = {
     ...setProviderOptions,
     nodeUrl: process.env.TEST_RPC_URL,
+    specVersion: process.env.RPC_SPEC_VERSION as SupportedRpcVersion,
     // accelerate the tests when running locally
     ...(isDevnet && { transactionRetryIntervalFallback: 1000 }),
   };
   return isProvider ? new Provider(providerOptions) : new RpcProvider(providerOptions);
 }
 
-export const TEST_TX_VERSION = process.env.TX_VERSION === 'v3' ? ETransactionVersion.V3 : undefined;
+export const TEST_TX_VERSION = process.env.TX_VERSION as SupportedTransactionVersion;
 
 export const getTestAccount = (provider: ProviderInterface) => {
   return new Account(

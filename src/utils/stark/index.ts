@@ -1,7 +1,7 @@
 import { getPublicKey, getStarkKey, utils } from '@scure/starknet';
 import { gzip, ungzip } from 'pako';
 
-import { ZERO } from '../../global/constants';
+import { SupportedRpcVersion, ZERO } from '../../global/constants';
 import {
   ArraySignatureType,
   BigNumberish,
@@ -216,14 +216,16 @@ export function estimatedFeeToMaxFee(
  */
 export function estimateFeeToBounds(
   estimate: FeeEstimate | 0n,
-  overhead: ResourceBoundsOverhead = config.get('feeMarginPercentage').bounds
+  overhead: ResourceBoundsOverhead = config.get('feeMarginPercentage').bounds,
+  specVersion?: string
 ): ResourceBounds {
   if (isBigInt(estimate)) {
-    // TODO: for RPC 0.7 should not return l1_data_gas, see how to resolve this
     return {
       l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
       l1_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
-      l1_data_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
+      ...(specVersion === '0.8' && {
+        l1_data_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
+      }),
     };
   }
 
@@ -328,14 +330,14 @@ export function toFeeVersion(providedVersion?: BigNumberish): ETransactionVersio
  * ```
  */
 
-export function v3Details(details: UniversalDetails): V3Details {
+export function v3Details(details: UniversalDetails, specVersion?: SupportedRpcVersion): V3Details {
   return {
     tip: details.tip || 0,
     paymasterData: details.paymasterData || [],
     accountDeploymentData: details.accountDeploymentData || [],
     nonceDataAvailabilityMode: details.nonceDataAvailabilityMode || EDataAvailabilityMode.L1,
     feeDataAvailabilityMode: details.feeDataAvailabilityMode || EDataAvailabilityMode.L1,
-    resourceBounds: details.resourceBounds ?? estimateFeeToBounds(ZERO),
+    resourceBounds: details.resourceBounds ?? estimateFeeToBounds(ZERO, undefined, specVersion),
   };
 }
 
