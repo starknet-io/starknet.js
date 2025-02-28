@@ -107,6 +107,8 @@ export class RpcChannel {
         baseFetch: this.baseFetch,
       });
     }
+
+    logger.debug('Using Channel', this.id);
   }
 
   public readSpecVersion() {

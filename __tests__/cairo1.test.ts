@@ -9,6 +9,7 @@ import {
   CallData,
   Contract,
   ContractFactory,
+  ProviderInterface,
   cairo,
   ec,
   hash,
@@ -18,11 +19,12 @@ import {
   stark,
 } from '../src';
 import {
-  TEST_TX_VERSION,
+  // TEST_TX_VERSION,
   contracts,
+  createTestProvider,
   describeIfDevnet,
   getTestAccount,
-  getTestProvider,
+  TEST_TX_VERSION,
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
@@ -32,14 +34,17 @@ const { starknetKeccak } = selector;
 
 describeIfDevnet('Cairo 1 Devnet', () => {
   describe('API &  Contract interactions', () => {
-    const provider = getTestProvider();
-    const account = getTestAccount(provider);
+    let provider: ProviderInterface;
+    let account: Account;
     let dd: DeclareDeployUDCResponse;
     let cairo1Contract: Contract;
     let onlyConstructorContract: Contract;
     initializeMatcher(expect);
 
     beforeAll(async () => {
+      provider = await createTestProvider();
+      account = getTestAccount(provider);
+
       dd = await account.declareAndDeploy({
         contract: contracts.HelloSierra.sierra,
         casm: contracts.HelloSierra.casm,
@@ -509,11 +514,14 @@ describeIfDevnet('Cairo 1 Devnet', () => {
   });
 
   describe('Cairo1 Account contract', () => {
-    const provider = getTestProvider();
-    const account = getTestAccount(provider);
+    let provider: ProviderInterface;
+    let account: Account;
     let accountC1: Account;
 
     beforeAll(async () => {
+      provider = await createTestProvider();
+      account = getTestAccount(provider);
+
       // Deploy Cairo 1 Account
       const priKey = stark.randomAddress();
       const pubKey = ec.starkCurve.getStarkKey(priKey);
@@ -550,7 +558,14 @@ describeIfDevnet('Cairo 1 Devnet', () => {
       await account.waitForTransaction(transaction_hash);
 
       // deploy account
-      accountC1 = new Account(provider, toBeAccountAddress, priKey, '1', TEST_TX_VERSION);
+      accountC1 = new Account(
+        provider,
+        toBeAccountAddress,
+        priKey,
+        '1',
+        TEST_TX_VERSION
+        /* ETransactionVersion.V2 */ // TODO: devnet issue, change to TEST_TX_VERSION when fixed
+      );
       const deployed = await accountC1.deploySelf({
         classHash: accountClassHash,
         constructorCalldata: calldata,

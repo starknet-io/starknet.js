@@ -114,10 +114,17 @@ export class RpcProvider implements ProviderInterface {
   }
 
   /**
-   * return spec version in format "M.m.p-?"
+   * return spec version in format "M.m"
    */
   public async getSpecVersion() {
     return this.channel.getSpecVersion();
+  }
+
+  /**
+   * @returns return spec version in format 'M.m.p-rc'
+   */
+  public async getSpecificationVersion() {
+    return this.channel.getSpecificationVersion();
   }
 
   public async getNonceForAddress(

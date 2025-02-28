@@ -13,6 +13,7 @@ import {
   CompiledSierra,
   Contract,
   DeclareDeployUDCResponse,
+  ProviderInterface,
   RawArgsArray,
   RawArgsObject,
   TypedContractV2,
@@ -29,7 +30,7 @@ import {
 import { hexToDecimalString } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import { isString } from '../src/utils/typed';
-import { TEST_TX_VERSION, contracts, getTestAccount, getTestProvider } from './config/fixtures';
+import { contracts, createTestProvider, getTestAccount, TEST_TX_VERSION } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
 const { uint256, tuple, isCairo1Abi } = cairo;
@@ -37,8 +38,14 @@ const { toHex } = num;
 const { starknetKeccak } = selector;
 
 describe('Cairo 1', () => {
-  const provider = getTestProvider();
-  const account = getTestAccount(provider);
+  let provider: ProviderInterface;
+  let account: Account;
+
+  beforeAll(async () => {
+    provider = await createTestProvider();
+    account = getTestAccount(provider);
+  });
+
   describe('API &  Contract interactions', () => {
     let dd: DeclareDeployUDCResponse;
     let cairo1Contract: TypedContractV2<typeof tAbi>;
@@ -727,7 +734,14 @@ describe('Cairo 1', () => {
       await account.waitForTransaction(transaction_hash);
 
       // deploy account
-      accountC1 = new Account(provider, toBeAccountAddress, priKey, '1', TEST_TX_VERSION);
+      accountC1 = new Account(
+        provider,
+        toBeAccountAddress,
+        priKey,
+        '1',
+        TEST_TX_VERSION
+        /* ETransactionVersion.V2 */ // TODO: Devnet issue, switch TEST_TX_VERSION
+      );
       const deployed = await accountC1.deploySelf({
         classHash: accountClassHash,
         constructorCalldata: calldata,

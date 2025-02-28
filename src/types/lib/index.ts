@@ -180,7 +180,7 @@ export type TransactionType = ValuesType<typeof TransactionType>;
  * new statuses are defined by props: finality_status and execution_status
  * to be #deprecated
  */
-export const TransactionStatus = {
+/* export const TransactionStatus = {
   NOT_RECEIVED: 'NOT_RECEIVED',
   RECEIVED: 'RECEIVED',
   ACCEPTED_ON_L2: 'ACCEPTED_ON_L2',
@@ -189,7 +189,7 @@ export const TransactionStatus = {
   REVERTED: 'REVERTED',
 } as const;
 
-export type TransactionStatus = ValuesType<typeof TransactionStatus>;
+export type TransactionStatus = ValuesType<typeof TransactionStatus>; */
 
 export const TransactionFinalityStatus = {
   NOT_RECEIVED: 'NOT_RECEIVED',

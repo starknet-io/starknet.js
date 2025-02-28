@@ -1,13 +1,16 @@
 import { LibraryError, RPC08, RPC07, RpcError } from '../src';
-import { createBlockForDevnet, getTestProvider } from './config/fixtures';
+import { createBlockForDevnet, createTestProvider } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
 describe('RpcChannel', () => {
-  const { nodeUrl } = getTestProvider(false).channel;
-  const channel07 = new RPC07.RpcChannel({ nodeUrl });
+  let nodeUrl: string;
+  let channel07: RPC07.RpcChannel;
   initializeMatcher(expect);
 
   beforeAll(async () => {
+    nodeUrl = (await createTestProvider(false)).channel.nodeUrl;
+    channel07 = new RPC07.RpcChannel({ nodeUrl });
+
     await createBlockForDevnet();
   });
 

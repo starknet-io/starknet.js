@@ -1,8 +1,10 @@
 import {
+  Account,
   BigNumberish,
   Contract,
   ContractFactory,
   ParsedEvents,
+  ProviderInterface,
   RawArgs,
   SuccessfulTransactionReceiptResponse,
   json,
@@ -15,17 +17,22 @@ import { getSelectorFromName } from '../src/utils/hash';
 import { hexToDecimalString, toBigInt } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import { uint256ToBN } from '../src/utils/uint256';
-import { contracts, describeIfDevnet, getTestAccount, getTestProvider } from './config/fixtures';
+import { contracts, createTestProvider, describeIfDevnet, getTestAccount } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
 describe('contract module', () => {
   let erc20Address: string;
-  const provider = getTestProvider();
+  let provider: ProviderInterface;
+  let account: Account;
   const wallet = stark.randomAddress();
-  const account = getTestAccount(provider);
   const constructorCalldata = [encodeShortString('Token'), encodeShortString('ERC20'), wallet];
   const classHash = '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a';
   initializeMatcher(expect);
+
+  beforeAll(async () => {
+    provider = await createTestProvider();
+    account = getTestAccount(provider);
+  });
 
   describe('class Contract {}', () => {
     describe('Basic Interaction', () => {
@@ -303,12 +310,15 @@ describe('contract module', () => {
 
 describe('Complex interaction', () => {
   let erc20Echo20Contract: Contract;
-  const provider = getTestProvider();
-  const account = getTestAccount(provider);
+  let provider: ProviderInterface;
+  let account: Account;
   const classHash = '0x011ab8626b891bcb29f7cc36907af7670d6fb8a0528c7944330729d8f01e9ea3';
   let factory: ContractFactory;
 
   beforeAll(async () => {
+    provider = await createTestProvider();
+    account = getTestAccount(provider);
+
     factory = new ContractFactory({ compiledContract: contracts.Erc20Echo, classHash, account });
     erc20Echo20Contract = await factory.deploy(
       'Token',

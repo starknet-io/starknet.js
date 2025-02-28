@@ -82,6 +82,7 @@ import { buildUDCCall, getExecuteCalldata } from '../utils/transaction';
 import { getMessageHash } from '../utils/typedData';
 import { AccountInterface } from './interface';
 import { config } from '../global/config';
+import { logger } from '../global/logger';
 
 export class Account extends Provider implements AccountInterface {
   public signer: SignerInterface;
@@ -110,6 +111,12 @@ export class Account extends Provider implements AccountInterface {
       this.cairoVersion = cairoVersion.toString() as CairoVersion;
     }
     this.transactionVersion = transactionVersion;
+
+    logger.debug('Account setup', {
+      transactionVersion: this.transactionVersion,
+      cairoVersion: this.cairoVersion,
+      channel: this.channel.id,
+    });
   }
 
   // provided version or contract based preferred transactionVersion

@@ -6,6 +6,7 @@ import {
   CallData,
   Contract,
   FeeEstimate,
+  ProviderInterface,
   RPC,
   RPCResponseParser,
   ReceiptTx,
@@ -21,13 +22,13 @@ import { toBigInt, toHexString } from '../src/utils/num';
 import {
   contracts,
   createBlockForDevnet,
+  createTestProvider,
   describeIfDevnet,
   describeIfNotDevnet,
   describeIfRpc,
   describeIfTestnet,
   devnetETHtokenAddress,
   getTestAccount,
-  getTestProvider,
   waitNextBlock,
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
@@ -35,13 +36,17 @@ import { isBoolean } from '../src/utils/typed';
 import { isVersion } from '../src/utils/provider';
 
 describeIfRpc('RPCProvider', () => {
-  const rpcProvider = getTestProvider(false);
-  const provider = getTestProvider();
-  const account = getTestAccount(provider);
+  let rpcProvider: RpcProvider;
+  let provider: ProviderInterface;
+  let account: Account;
   let accountPublicKey: string;
   initializeMatcher(expect);
 
   beforeAll(async () => {
+    rpcProvider = await createTestProvider(false);
+    provider = await createTestProvider();
+    account = getTestAccount(provider);
+
     expect(account).toBeInstanceOf(Account);
     const accountKeyPair = utils.randomPrivateKey();
     accountPublicKey = getStarkKey(accountKeyPair);
@@ -213,8 +218,8 @@ describeIfRpc('RPCProvider', () => {
 
   describe('waitForTransaction', () => {
     const receipt = {};
-    const transactionStatusSpy = jest.spyOn(rpcProvider.channel as any, 'getTransactionStatus');
-    const transactionReceiptSpy = jest.spyOn(rpcProvider.channel as any, 'getTransactionReceipt');
+    let transactionStatusSpy: any;
+    let transactionReceiptSpy: any;
 
     const generateOptions = (o: waitForTransactionOptions) => ({ retryInterval: 10, ...o });
     const generateTransactionStatus = (
@@ -231,6 +236,9 @@ describeIfRpc('RPCProvider', () => {
     };
 
     beforeAll(() => {
+      transactionStatusSpy = jest.spyOn(rpcProvider.channel as any, 'getTransactionStatus');
+      transactionReceiptSpy = jest.spyOn(rpcProvider.channel as any, 'getTransactionReceipt');
+
       transactionStatusSpy.mockResolvedValue(null);
       transactionReceiptSpy.mockResolvedValue(receipt);
     });
@@ -453,7 +461,11 @@ describeIfRpc('RPCProvider', () => {
 });
 
 describeIfTestnet('RPCProvider', () => {
-  const provider = getTestProvider();
+  let provider: ProviderInterface;
+
+  beforeEach(async () => {
+    provider = await createTestProvider();
+  });
 
   test('getL1MessageHash', async () => {
     const l2TransactionHash = '0x28dfc05eb4f261b37ddad451ff22f1d08d4e3c24dc646af0ec69fa20e096819';
@@ -472,6 +484,7 @@ describeIfNotDevnet('waitForBlock', () => {
   const providerStandard = new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL });
   const providerFastTimeOut = new RpcProvider({ nodeUrl: process.env.TEST_RPC_URL, retries: 1 });
   let block: number;
+
   beforeEach(async () => {
     block = await providerStandard.getBlockNumber();
   });
@@ -502,8 +515,13 @@ describeIfNotDevnet('waitForBlock', () => {
 });
 
 describe('EIP712 verification', () => {
-  const rpcProvider = getTestProvider(false);
-  const account = getTestAccount(rpcProvider);
+  let rpcProvider: RpcProvider;
+  let account: Account;
+
+  beforeEach(async () => {
+    rpcProvider = await createTestProvider(false);
+    account = getTestAccount(rpcProvider);
+  });
 
   test('sign and verify message', async () => {
     const signature = await account.signMessage(typedDataExample);

@@ -5,17 +5,23 @@ import {
   RevertedTransactionReceiptResponse,
   SuccessfulTransactionReceiptResponse,
   TransactionExecutionStatus,
+  ProviderInterface,
+  Account,
 } from '../src';
-import { contracts, getTestAccount, getTestProvider } from './config/fixtures';
+import { contracts, createTestProvider, getTestAccount } from './config/fixtures';
 
-describe('Transaction receipt utility', () => {
-  const provider = getTestProvider();
-  const account = getTestAccount(provider);
+// TODO: add RPC 0.7 V3, RPC 0.8 V3
+describe('Transaction receipt utility - RPC 0.7 - V2', () => {
+  let provider: ProviderInterface;
+  let account: Account;
 
   let dd: DeclareDeployUDCResponse;
   let contract: Contract;
 
   beforeAll(async () => {
+    provider = await createTestProvider();
+    account = getTestAccount(provider /* Spec.ETransactionVersion.V2 */); // TODO: remove version when devnet fix
+
     dd = await account.declareAndDeploy({
       contract: contracts.TestReject.sierra,
       casm: contracts.TestReject.casm,
