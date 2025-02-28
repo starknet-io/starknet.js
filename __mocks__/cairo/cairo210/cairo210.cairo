@@ -13,7 +13,7 @@ mod MyTestFelt {
         counter: u128,
     }
 
-    #[external(v0)]
+    #[abi(embed_v0)]
     impl TestFelt of super::ITestC210<ContractState> {
         fn test_felt(self: @ContractState, p1: felt252, p2: u128, p3: u8) -> u128 {
             p2 + 1
