@@ -107,7 +107,7 @@ describe('Ethereum signer', () => {
 
     beforeAll(async () => {
       provider = new Provider(await createTestProvider());
-      account = getTestAccount(provider /* ETransactionVersion.V2 */); // TODO: remove version when devnet fix
+      account = getTestAccount(provider);
 
       const { transaction_hash: declTH, class_hash: decClassHash } = await account.declareIfNot({
         contract: contracts.EthAccount.sierra,

@@ -20,7 +20,7 @@ describe('Transaction receipt utility - RPC 0.7 - V2', () => {
 
   beforeAll(async () => {
     provider = await createTestProvider();
-    account = getTestAccount(provider /* Spec.ETransactionVersion.V2 */); // TODO: remove version when devnet fix
+    account = getTestAccount(provider);
 
     dd = await account.declareAndDeploy({
       contract: contracts.TestReject.sierra,

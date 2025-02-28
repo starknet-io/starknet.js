@@ -25,6 +25,7 @@ import {
   contracts,
   createTestProvider,
   describeIfDevnet,
+  devnetFeeTokenAddress,
   erc20ClassHash,
   getTestAccount,
 } from './config/fixtures';
@@ -133,10 +134,9 @@ describe('deploy and test Wallet', () => {
         calldata,
         0
       );
-      const devnetERC20Address =
-        '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
+
       const { transaction_hash } = await account.execute({
-        contractAddress: devnetERC20Address,
+        contractAddress: devnetFeeTokenAddress,
         entrypoint: 'transfer',
         calldata: {
           recipient: tobeAccountAddress,
@@ -151,7 +151,6 @@ describe('deploy and test Wallet', () => {
         tobeAccountAddress,
         priKey,
         undefined,
-        // ETransactionVersion.V2, // TODO: Devenet Error switch when fixed
         TEST_TX_VERSION
       );
       const deployed = await accountOZ.deploySelf({

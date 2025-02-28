@@ -23,6 +23,7 @@ import {
   contracts,
   createTestProvider,
   describeIfDevnet,
+  devnetFeeTokenAddress,
   getTestAccount,
   TEST_TX_VERSION,
 } from './config/fixtures';
@@ -545,10 +546,9 @@ describeIfDevnet('Cairo 1 Devnet', () => {
         calldata,
         0
       );
-      const devnetERC20Address =
-        '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
+
       const { transaction_hash } = await account.execute({
-        contractAddress: devnetERC20Address,
+        contractAddress: devnetFeeTokenAddress,
         entrypoint: 'transfer',
         calldata: {
           recipient: toBeAccountAddress,
@@ -558,14 +558,7 @@ describeIfDevnet('Cairo 1 Devnet', () => {
       await account.waitForTransaction(transaction_hash);
 
       // deploy account
-      accountC1 = new Account(
-        provider,
-        toBeAccountAddress,
-        priKey,
-        '1',
-        TEST_TX_VERSION
-        /* ETransactionVersion.V2 */ // TODO: devnet issue, change to TEST_TX_VERSION when fixed
-      );
+      accountC1 = new Account(provider, toBeAccountAddress, priKey, '1', TEST_TX_VERSION);
       const deployed = await accountC1.deploySelf({
         classHash: accountClassHash,
         constructorCalldata: calldata,
