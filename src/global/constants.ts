@@ -1,5 +1,6 @@
 import { ETransactionVersion } from '../types/api';
 import { type LogLevel } from './logger.type';
+import { RpcProvider } from 'starknet';
 
 export { IS_BROWSER } from '../utils/encode';
 
@@ -71,10 +72,12 @@ export const RPC_NODES = {
   SN_MAIN: [
     `https://starknet-mainnet.public.blastapi.io/rpc/${RPC_DEFAULT_VERSION}`,
     `https://free-rpc.nethermind.io/mainnet-juno/${RPC_DEFAULT_VERSION}`,
+    `https://starknet.lava.build/rpc/${RPC_DEFAULT_VERSION}`,
   ],
   SN_SEPOLIA: [
     `https://starknet-sepolia.public.blastapi.io/rpc/${RPC_DEFAULT_VERSION}`,
     `https://free-rpc.nethermind.io/sepolia-juno/${RPC_DEFAULT_VERSION}`,
+    `https://starknet.lava.build/rpc/${RPC_DEFAULT_VERSION}`,
   ],
 } as const;
 
@@ -106,3 +109,6 @@ export const SYSTEM_MESSAGES = {
   legacyTxWarningMessage:
     'You are using a deprecated transaction version (V0,V1,V2)!\nUpdate to the latest V3 transactions!',
 };
+
+// Provider will automatically select one of the available nodes, including Lava
+const provider = new RpcProvider();
