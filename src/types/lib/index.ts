@@ -1,3 +1,4 @@
+import { SUBSCRIPTION_BLOCK_TAG } from 'starknet-types-08';
 import { StarknetChainId } from '../../constants';
 import { weierstrass } from '../../utils/ec';
 import { EDataAvailabilityMode, ResourceBounds } from '../api';
@@ -235,6 +236,8 @@ export type BlockNumber = BlockTag | null | number;
  * null return 'pending' block tag
  */
 export type BlockIdentifier = BlockNumber | BigNumberish;
+
+export type SubscriptionBlockIdentifier = SUBSCRIPTION_BLOCK_TAG | (string & {}) | number | bigint;
 
 /**
  * items used by AccountInvocations

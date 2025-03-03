@@ -192,7 +192,7 @@ describe('websocket regular endpoints - pathfinder test', () => {
   });
 
   test('regular rpc endpoint', async () => {
-    const response = await webSocketChannel.sendReceive('starknet_chainId');
+    const response = await webSocketChannel.sendReceiveAny('starknet_chainId');
     expect(response).toBe(StarknetChainId.SN_SEPOLIA);
   });
 });

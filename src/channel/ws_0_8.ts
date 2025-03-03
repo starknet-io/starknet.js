@@ -1,6 +1,5 @@
 import { WebSocket } from 'isows';
 import type {
-  Methods,
   SUBSCRIPTION_ID,
   SubscriptionEventsResponse,
   SubscriptionNewHeadsResponse,
@@ -8,9 +7,10 @@ import type {
   SubscriptionReorgResponse,
   SubscriptionTransactionsStatusResponse,
   WebSocketEvents,
+  WebSocketMethods,
 } from 'starknet-types-08';
 
-import { BigNumberish, BlockIdentifier } from '../types';
+import { BigNumberish, SubscriptionBlockIdentifier } from '../types';
 import { JRPC } from '../types/api';
 import { WebSocketEvent } from '../types/api/jsonrpc';
 import { stringify } from '../utils/json';
@@ -222,6 +222,13 @@ export class WebSocketChannel {
   }
 
   /**
+   * Any Starknet method not just websocket override
+   */
+  public sendReceiveAny(method: any, params?: any) {
+    return this.sendReceive(method, params);
+  }
+
+  /**
    * Send request and receive response over ws line
    * This method abstract ws messages into request/response model
    * @param method rpc method name
@@ -231,9 +238,9 @@ export class WebSocketChannel {
    * const response = await this.sendReceive('starknet_method', params);
    * ```
    */
-  public sendReceive<T extends keyof Methods>(
+  public sendReceive<T extends keyof WebSocketMethods>(
     method: T,
-    params?: Methods[T]['params']
+    params?: WebSocketMethods[T]['params']
   ): Promise<MessageEvent['data']['result'] | Error | Event> {
     const sendId = this.send(method, params);
 
@@ -411,7 +418,7 @@ export class WebSocketChannel {
    * subscribe to new block heads
    * * you can subscribe to this event multiple times and you need to manage subscriptions manually
    */
-  public subscribeNewHeadsUnmanaged(blockIdentifier?: BlockIdentifier) {
+  public subscribeNewHeadsUnmanaged(blockIdentifier?: SubscriptionBlockIdentifier) {
     const block_id = blockIdentifier ? new Block(blockIdentifier).identifier : undefined;
 
     return this.sendReceive('starknet_subscribeNewHeads', {
@@ -422,7 +429,7 @@ export class WebSocketChannel {
   /**
    * subscribe to new block heads
    */
-  public async subscribeNewHeads(blockIdentifier?: BlockIdentifier) {
+  public async subscribeNewHeads(blockIdentifier?: SubscriptionBlockIdentifier) {
     if (this.subscriptions.get(WSSubscriptions.NEW_HEADS)) return false;
     const subId = await this.subscribeNewHeadsUnmanaged(blockIdentifier);
     this.subscriptions.set(WSSubscriptions.NEW_HEADS, subId);
@@ -445,7 +452,7 @@ export class WebSocketChannel {
   public subscribeEventsUnmanaged(
     fromAddress?: BigNumberish,
     keys?: string[][],
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: SubscriptionBlockIdentifier
   ) {
     const block_id = blockIdentifier ? new Block(blockIdentifier).identifier : undefined;
     return this.sendReceive('starknet_subscribeEvents', {
@@ -461,7 +468,7 @@ export class WebSocketChannel {
   public async subscribeEvents(
     fromAddress?: BigNumberish,
     keys?: string[][],
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: SubscriptionBlockIdentifier
   ) {
     if (this.subscriptions.get(WSSubscriptions.EVENTS)) return false;
     // eslint-disable-next-line prefer-rest-params
@@ -485,7 +492,7 @@ export class WebSocketChannel {
    */
   public subscribeTransactionStatusUnmanaged(
     transactionHash: BigNumberish,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: SubscriptionBlockIdentifier
   ) {
     const transaction_hash = toHex(transactionHash);
     const block_id = blockIdentifier ? new Block(blockIdentifier).identifier : undefined;
@@ -500,7 +507,7 @@ export class WebSocketChannel {
    */
   public async subscribeTransactionStatus(
     transactionHash: BigNumberish,
-    blockIdentifier?: BlockIdentifier
+    blockIdentifier?: SubscriptionBlockIdentifier
   ) {
     if (this.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS)) return false;
     const subId = await this.subscribeTransactionStatusUnmanaged(transactionHash, blockIdentifier);
