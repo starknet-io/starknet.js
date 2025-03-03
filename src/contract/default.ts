@@ -17,7 +17,7 @@ import {
   FunctionAbi,
   InvokeFunctionResponse,
   InvokeOptions,
-  InvokeTransactionReceiptResponse,
+  GetTransactionReceiptResponse,
   ParsedEvents,
   RawArgs,
   Result,
@@ -31,8 +31,6 @@ import { createAbiParser } from '../utils/calldata/parser';
 import { getAbiEvents, parseEvents as parseRawEvents } from '../utils/events/index';
 import { cleanHex } from '../utils/num';
 import { ContractInterface } from './interface';
-import type { GetTransactionReceiptResponse } from '../utils/transactionReceipt';
-import type { INVOKE_TXN_RECEIPT } from '../types/provider/spec';
 import { logger } from '../global/logger';
 
 export type TypedContractV2<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & Contract;
@@ -328,23 +326,27 @@ export class Contract implements ContractInterface {
     };
   }
 
+  // TODO: Demistify what is going on here ???
+  // TODO: receipt status filtering test and fix this do not look right
   public parseEvents(receipt: GetTransactionReceiptResponse): ParsedEvents {
     let parsed: ParsedEvents;
     receipt.match({
       success: (txR: SuccessfulTransactionReceiptResponse) => {
         const emittedEvents =
-          (txR as InvokeTransactionReceiptResponse).events
+          txR.events
             ?.map((event) => {
               return {
-                block_hash: (txR as INVOKE_TXN_RECEIPT).block_hash,
-                block_number: (txR as INVOKE_TXN_RECEIPT).block_number,
-                transaction_hash: (txR as INVOKE_TXN_RECEIPT).transaction_hash,
+                // TODO: this do not check that block is production and block_hash and block_number actually exists
+                // TODO: second issue is that ts do not complains about it
+                block_hash: txR.block_hash,
+                block_number: txR.block_number,
+                transaction_hash: txR.transaction_hash,
                 ...event,
               };
             })
             .filter((event) => cleanHex(event.from_address) === cleanHex(this.address), []) || [];
         parsed = parseRawEvents(
-          emittedEvents,
+          emittedEvents as any, // TODO: any temp hotfix, fix this
           this.events,
           this.structs,
           CallData.getAbiEnum(this.abi)

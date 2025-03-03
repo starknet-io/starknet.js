@@ -21,12 +21,15 @@ const getBaseTxReceiptData = (): InvokeTransactionReceiptResponse => ({
   block_hash: '0xdfc9b788478b2a2b9bcba19ab7d86996bcc45c4f8a865435469334e9077b24',
   block_number: 584,
   execution_resources: {
-    steps: 9490,
-    memory_holes: 143,
-    range_check_builtin_applications: 198,
-    pedersen_builtin_applications: 34,
-    ec_op_builtin_applications: 3,
-    data_availability: { l1_gas: 0, l1_data_gas: 544 },
+    // steps: 9490,
+    // memory_holes: 143,
+    // range_check_builtin_applications: 198,
+    // pedersen_builtin_applications: 34,
+    // ec_op_builtin_applications: 3,
+    // data_availability: { l1_gas: 0, l1_data_gas: 544 },
+    l1_gas: 0,
+    l1_data_gas: 544,
+    l2_gas: 0,
   },
 });
 

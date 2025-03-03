@@ -5,6 +5,7 @@ import {
   Contract,
   EthSigner,
   Provider,
+  ProviderInterface,
   addAddressPadding,
   cairo,
   encode,
@@ -21,10 +22,10 @@ import { validateAndParseEthAddress } from '../../src/utils/eth';
 import { ETransactionVersion } from '../../src/types/api';
 import {
   contracts,
+  createTestProvider,
   describeIfDevnet,
   devnetETHtokenAddress,
   getTestAccount,
-  getTestProvider,
 } from '../config/fixtures';
 
 describe('Ethereum signer', () => {
@@ -63,11 +64,14 @@ describe('Ethereum signer', () => {
   });
 
   describe('cairo v2.5.3 new secp256k1 type', () => {
-    const provider = new Provider(getTestProvider());
+    let provider: ProviderInterface;
+    let account: Account;
     let ethPubKContract: Contract;
-    const account = getTestAccount(provider);
 
     beforeAll(async () => {
+      provider = new Provider(await createTestProvider());
+      account = getTestAccount(provider);
+
       const { deploy } = await account.declareAndDeploy({
         contract: contracts.EthPubk.sierra,
         casm: contracts.EthPubk.casm,
@@ -97,10 +101,14 @@ describe('Ethereum signer', () => {
 
   describeIfDevnet('ETH account tx V2', () => {
     // devnet only because estimateFee in Sepolia v0.13.1 are producing widely different numbers.
-    const provider = new Provider(getTestProvider());
-    const account = getTestAccount(provider);
+    let provider: ProviderInterface;
+    let account: Account;
     let ethAccount: Account;
+
     beforeAll(async () => {
+      provider = new Provider(await createTestProvider());
+      account = getTestAccount(provider);
+
       const { transaction_hash: declTH, class_hash: decClassHash } = await account.declareIfNot({
         contract: contracts.EthAccount.sierra,
         casm: contracts.EthAccount.casm,
@@ -126,7 +134,13 @@ describe('Ethereum signer', () => {
         0
       );
 
-      ethAccount = new Account(provider, contractETHAccountAddress, ethSigner);
+      ethAccount = new Account(
+        provider,
+        contractETHAccountAddress,
+        ethSigner,
+        undefined,
+        ETransactionVersion.V2
+      );
       const deployPayload = {
         classHash: decClassHash,
         constructorCalldata: accountETHconstructorCalldata,
@@ -162,7 +176,8 @@ describe('Ethereum signer', () => {
       );
       const txR = await provider.waitForTransaction(respTransfer.transaction_hash);
       if (txR.isSuccess()) {
-        expect(txR.execution_status).toBe('SUCCEEDED');
+        // TODO: @PhilippeR26 Why this is not working, fix 'as any' hotfix
+        expect((txR as any).execution_status).toBe('SUCCEEDED');
       } else {
         fail('txR not success');
       }
@@ -187,12 +202,16 @@ describe('Ethereum signer', () => {
 
   describeIfDevnet('ETH account tx V3', () => {
     // devnet only because estimateFee in Sepolia v0.13.1 are producing widely different numbers.
-    const provider = new Provider(getTestProvider());
-    const account = getTestAccount(provider);
+    let provider: Provider;
+    let account: Account;
+    let ethAccount: Account;
     const devnetSTRKtokenAddress =
       '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d';
-    let ethAccount: Account;
+
     beforeAll(async () => {
+      provider = new Provider(await createTestProvider());
+      account = getTestAccount(provider);
+
       const { transaction_hash: declTH, class_hash: decClassHash } = await account.declareIfNot({
         contract: contracts.EthAccount.sierra,
         casm: contracts.EthAccount.casm,
@@ -282,7 +301,7 @@ describe('Ethereum signer', () => {
 
       const txR = await provider.waitForTransaction(respTransfer.transaction_hash);
       if (txR.isSuccess()) {
-        expect(txR.execution_status).toBe('SUCCEEDED');
+        expect((txR as any).execution_status).toBe('SUCCEEDED');
       } else {
         fail('txR not success');
       }

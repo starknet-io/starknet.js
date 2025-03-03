@@ -1,12 +1,29 @@
 /* eslint-disable no-console */
-import { logger, LogLevel } from '../../src';
+import { LogLevel } from '../../src';
 
-// Mock the config module
-const mockConfigStore: { logLevel: LogLevel; [key: string]: any } = {
-  logLevel: 'INFO',
+// Mock console methods first
+const mockConsole = {
+  debug: jest.fn(),
+  info: jest.fn(),
+  warn: jest.fn(),
+  error: jest.fn(),
+  log: jest.fn(),
 };
 
-jest.mock('../../src/global/config', () => ({
+global.console = mockConsole as any;
+
+// Create the mock config store with an index signature
+const mockConfigStore: {
+  logLevel: LogLevel;
+  rpcVersion: string;
+  [key: string]: any; // Add this index signature to allow any string key
+} = {
+  logLevel: 'INFO' as LogLevel,
+  rpcVersion: '0.8',
+};
+
+// Use doMock instead of mock (doesn't get hoisted)
+jest.doMock('../../src/global/config', () => ({
   config: {
     get: jest.fn().mockImplementation((key: string, defaultValue?: any) => {
       return mockConfigStore[key] ?? defaultValue;
@@ -17,16 +34,8 @@ jest.mock('../../src/global/config', () => ({
   },
 }));
 
-// Mock console methods
-const mockConsole = {
-  debug: jest.fn(),
-  info: jest.fn(),
-  warn: jest.fn(),
-  error: jest.fn(),
-  log: jest.fn(),
-};
-
-global.console = mockConsole as any;
+// Import logger AFTER the mock is set up
+const { logger } = require('../../src');
 
 describe('Logger', () => {
   // const gLog = jest.spyOn(global.console, 'log');

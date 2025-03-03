@@ -1,38 +1,42 @@
 import {
+  Account,
   BlockNumber,
   CallData,
   GetBlockResponse,
   LibraryError,
   Provider,
   provider,
+  ProviderInterface,
   stark,
 } from '../src';
 import { toBigInt } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import {
   contracts,
+  createTestProvider,
   erc20ClassHash,
   getTestAccount,
-  getTestProvider,
   wrongClassHash,
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
 const { isPendingStateUpdate } = provider;
 
-const testProvider = new Provider(getTestProvider());
-
 describe('defaultProvider', () => {
+  let testProvider: ProviderInterface;
+  let account: Account;
   let exampleTransactionHash: string;
   let erc20ContractAddress: string;
   let exampleBlock: GetBlockResponse;
   let exampleBlockNumber: BlockNumber;
   let exampleBlockHash: string;
   const wallet = stark.randomAddress();
-  const account = getTestAccount(testProvider);
   initializeMatcher(expect);
 
   beforeAll(async () => {
+    testProvider = new Provider(await createTestProvider());
+    account = getTestAccount(testProvider);
+
     expect(testProvider).toBeInstanceOf(Provider);
 
     const { deploy } = await account.declareAndDeploy({
