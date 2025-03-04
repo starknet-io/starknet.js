@@ -1,13 +1,12 @@
 import {
-  RejectedTransactionReceiptResponse,
   RevertedTransactionReceiptResponse,
   SuccessfulTransactionReceiptResponse,
-} from './provider';
+} from '../../provider/types/index.type';
 
 export type TransactionStatusReceiptSets = {
   success: SuccessfulTransactionReceiptResponse;
   reverted: RevertedTransactionReceiptResponse;
-  rejected: RejectedTransactionReceiptResponse;
+  // rejected: RejectedTransactionReceiptResponse;
   error: Error;
 };
 export type TransactionReceiptStatus = keyof TransactionStatusReceiptSets;
@@ -23,7 +22,7 @@ export type TransactionReceiptCallbacks =
   | TransactionReceiptCallbacksDefined
   | TransactionReceiptCallbacksDefault;
 
-export type TransactionReceiptUtilityInterface = {
+export type GetTransactionReceiptResponse = {
   readonly statusReceipt: TransactionReceiptStatus;
   readonly value: TransactionReceiptValue;
   match(callbacks: TransactionReceiptCallbacks): void;

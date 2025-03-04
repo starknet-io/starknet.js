@@ -1,18 +1,17 @@
 /* eslint-disable no-nested-ternary */
 import {
   GetTxReceiptResponseWithoutHelper,
-  RejectedTransactionReceiptResponse,
   RevertedTransactionReceiptResponse,
   SuccessfulTransactionReceiptResponse,
   TransactionExecutionStatus,
-} from '../types';
+} from '../../types';
 import type {
   TransactionReceiptCallbacks,
   TransactionReceiptCallbacksDefault,
   TransactionReceiptStatus,
-  TransactionReceiptUtilityInterface,
+  GetTransactionReceiptResponse,
   TransactionReceiptValue,
-} from '../types/transactionReceipt';
+} from './transactionReceipt.type';
 
 /**
  * Utility that analyses transaction receipt response and provides helpers to process it
@@ -21,7 +20,6 @@ import type {
  * const responseTx = new ReceiptTx(receipt);
  * responseTx.match({
  *   success: (txR: SuccessfulTransactionReceiptResponse) => { },
- *   rejected: (txR: RejectedTransactionReceiptResponse) => { },
  *   reverted: (txR: RevertedTransactionReceiptResponse) => { },
  *   error: (err: Error) => { },
  * });
@@ -31,7 +29,7 @@ import type {
  * }
  * ```
  */
-export class ReceiptTx implements TransactionReceiptUtilityInterface {
+export class ReceiptTx implements GetTransactionReceiptResponse {
   public readonly statusReceipt: TransactionReceiptStatus;
 
   public readonly value: TransactionReceiptValue;
@@ -41,9 +39,7 @@ export class ReceiptTx implements TransactionReceiptUtilityInterface {
       ? ['success', receipt]
       : ReceiptTx.isReverted(receipt)
         ? ['reverted', receipt]
-        : ReceiptTx.isRejected(receipt)
-          ? ['rejected', receipt]
-          : ['error', new Error('Unknown response type')];
+        : ['error', new Error('Unknown response type')];
     // eslint-disable-next-line no-restricted-syntax
     for (const [key] of Object.entries(this)) {
       Object.defineProperty(this, key, {
@@ -75,9 +71,12 @@ export class ReceiptTx implements TransactionReceiptUtilityInterface {
     return this.statusReceipt === 'reverted';
   }
 
-  isRejected(): this is RejectedTransactionReceiptResponse {
+  // TODO: Missing is Pending or Production block
+
+  // Status do not exist on receipts
+  /*   isRejected(): this is RejectedTransactionReceiptResponse {
     return this.statusReceipt === 'rejected';
-  }
+  } */
 
   isError() {
     return this.statusReceipt === 'error';
@@ -86,29 +85,24 @@ export class ReceiptTx implements TransactionReceiptUtilityInterface {
   static isSuccess(
     transactionReceipt: GetTxReceiptResponseWithoutHelper
   ): transactionReceipt is SuccessfulTransactionReceiptResponse {
-    return (
-      (transactionReceipt as SuccessfulTransactionReceiptResponse).execution_status ===
-      TransactionExecutionStatus.SUCCEEDED
-    );
+    return transactionReceipt.execution_status === TransactionExecutionStatus.SUCCEEDED;
   }
 
   static isReverted(
     transactionReceipt: GetTxReceiptResponseWithoutHelper
   ): transactionReceipt is RevertedTransactionReceiptResponse {
-    return (
-      (transactionReceipt as RevertedTransactionReceiptResponse).execution_status ===
-      TransactionExecutionStatus.REVERTED
-    );
+    return transactionReceipt.execution_status === TransactionExecutionStatus.REVERTED;
   }
 
-  static isRejected(
+  // Status do not exist on receipts
+  /*   static isRejected(
     transactionReceipt: GetTxReceiptResponseWithoutHelper
   ): transactionReceipt is RejectedTransactionReceiptResponse {
     return (
       (transactionReceipt as RejectedTransactionReceiptResponse).status ===
       TransactionExecutionStatus.REJECTED
     );
-  }
+  } */
 }
 
-export type GetTransactionReceiptResponse = GetTxReceiptResponseWithoutHelper & ReceiptTx;
+// export type GetTransactionReceiptResponse = GetTxReceiptResponseWithoutHelper & ReceiptTx;

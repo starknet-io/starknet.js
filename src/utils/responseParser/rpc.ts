@@ -13,13 +13,13 @@ import type {
   GetTxReceiptResponseWithoutHelper,
   RpcProviderOptions,
   SimulateTransactionResponse,
-  SimulatedTransaction,
-  TransactionReceipt,
-} from '../../types/provider';
+} from '../../provider/types/index.type';
 import { toBigInt } from '../num';
 import { isString } from '../typed';
 import { estimateFeeToBounds, estimatedFeeToMaxFee } from '../stark';
 import { ResponseParser } from './interface';
+import { SimulateTransaction, TransactionReceipt } from '../../provider/types/spec.type';
+// import { TransactionReceipt } from '../../types/api/merge';
 
 export class RPCResponseParser
   implements
@@ -43,12 +43,9 @@ export class RPCResponseParser
     return estimatedFeeToMaxFee(estimatedFee, this.margin?.maxFee);
   }
 
+  // TODO: Check how to recaltulate bounds and what use this ?
   private estimateFeeToBounds(estimate: Parameters<typeof estimateFeeToBounds>[0]) {
-    return estimateFeeToBounds(
-      estimate,
-      this.margin?.l1BoundMaxAmount,
-      this.margin?.l1BoundMaxPricePerUnit
-    );
+    return estimateFeeToBounds(estimate, this.margin?.bounds);
   }
 
   public parseGetBlockResponse(res: BlockWithTxHashes): GetBlockResponse {
@@ -75,8 +72,8 @@ export class RPCResponseParser
     const val = res[0];
     return {
       overall_fee: toBigInt(val.overall_fee),
-      gas_consumed: toBigInt(val.gas_consumed),
-      gas_price: toBigInt(val.gas_price),
+      gas_consumed: toBigInt(0), // TODO: vidit sta sa ovim
+      gas_price: toBigInt(0), // TODO: vidit sta sa ovim
       unit: val.unit,
       suggestedMaxFee: this.estimatedFeeToMaxFee(val.overall_fee),
       resourceBounds: this.estimateFeeToBounds(val),
@@ -88,8 +85,9 @@ export class RPCResponseParser
   public parseFeeEstimateBulkResponse(res: FeeEstimate[]): EstimateFeeResponseBulk {
     return res.map((val) => ({
       overall_fee: toBigInt(val.overall_fee),
-      gas_consumed: toBigInt(val.gas_consumed),
-      gas_price: toBigInt(val.gas_price),
+      // TODO: vidit sta sa ovim
+      gas_consumed: toBigInt(0), // TODO: vidit sta sa ovim
+      gas_price: toBigInt(0), // TODO: vidit sta sa ovim
       unit: val.unit,
       suggestedMaxFee: this.estimatedFeeToMaxFee(val.overall_fee),
       resourceBounds: this.estimateFeeToBounds(val),
@@ -106,7 +104,7 @@ export class RPCResponseParser
     // res: SimulateTransactionResponse
     res: any
   ): SimulateTransactionResponse {
-    return res.map((it: SimulatedTransaction) => {
+    return res.map((it: SimulateTransaction) => {
       return {
         ...it,
         suggestedMaxFee: this.estimatedFeeToMaxFee(it.fee_estimation.overall_fee),

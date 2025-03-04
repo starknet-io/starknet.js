@@ -1,4 +1,5 @@
 import { UDC } from '../global/constants';
+import { ETransactionVersion } from '../provider/types/spec.type';
 import {
   BigNumberish,
   CairoVersion,
@@ -9,7 +10,6 @@ import {
   RawArgs,
   UniversalDeployerContractPayload,
 } from '../types';
-import { ETransactionVersion } from '../types/api';
 import { CallData } from './calldata';
 import { starkCurve } from './ec';
 import { calculateContractAddressFromHash, getSelectorFromName } from './hash';
