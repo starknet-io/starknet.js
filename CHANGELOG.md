@@ -1,3 +1,11 @@
+# [7.0.0-beta.1](https://github.com/starknet-io/starknet.js/compare/v6.24.0-beta.1...v7.0.0-beta.1) (2025-03-04)
+
+- Implement RPC 0.8 and V3 transactions ([#1328](https://github.com/starknet-io/starknet.js/issues/1328)) ([316ae27](https://github.com/starknet-io/starknet.js/commit/316ae2789376368dcffe653ce4817eebf0a63d97))
+
+### BREAKING CHANGES
+
+- Library defaults to RPC 0.8 with the corresponding API changes, dropped RPC 0.6 support
+
 ## [6.23.1](https://github.com/starknet-io/starknet.js/compare/v6.23.0...v6.23.1) (2025-02-05)
 
 ### Bug Fixes
