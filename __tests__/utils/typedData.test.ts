@@ -309,7 +309,7 @@ describe('typedData', () => {
   });
 
   test('should hash messages with revision 1 types', () => {
-    // necessary to spy dependecy since function spies (hash.computePedersenHash; hash.computePoseidonHash) won't work
+    // necessary to spy dependency since function spies (hash.computePedersenHash; hash.computePoseidonHash) won't work
     const spyPedersen = jest.spyOn(starkCurve, 'pedersen');
     const spyPoseidon = jest.spyOn(starkCurve, 'poseidonHashMany');
 

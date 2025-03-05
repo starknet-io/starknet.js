@@ -379,7 +379,7 @@ const validateNonZero = (parameter: any, input: AbiEntry) => {
  * };
  *
  * validateFields(functionAbi, [1n], abiStructs, abiEnums); // Returns void since validation passes
- * validateFields(functionAbi, [{}], abiStructs, abiEnums); // Throw an error because paramters are not valid
+ * validateFields(functionAbi, [{}], abiStructs, abiEnums); // Throw an error because parameters are not valid
  */
 export default function validateFields(
   abiMethod: FunctionAbi,
