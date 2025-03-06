@@ -1,6 +1,7 @@
 import { getPublicKey, getStarkKey, utils } from '@scure/starknet';
 import { gzip, ungzip } from 'pako';
 
+import { PRICE_UNIT } from 'starknet-types-08';
 import { SupportedRpcVersion, ZERO } from '../../global/constants';
 import {
   ArraySignatureType,
@@ -236,6 +237,24 @@ export function estimateFeeToBounds(
 }
 
 export type feeOverhead = ResourceBounds;
+
+/**
+ * Mock zero fee response
+ */
+export function ZEROFee(specVersion: string) {
+  return {
+    l1_gas_consumed: 0n,
+    l1_gas_price: 0n,
+    l1_data_gas_consumed: 0n,
+    l1_data_gas_price: 0n,
+    l2_gas_consumed: 0n,
+    l2_gas_price: 0n,
+    overall_fee: ZERO,
+    unit: 'FRI' as PRICE_UNIT,
+    suggestedMaxFee: ZERO,
+    resourceBounds: estimateFeeToBounds(ZERO, undefined, specVersion),
+  };
+}
 
 /**
  * Converts the data availability mode from EDataAvailabilityMode to EDAMode.

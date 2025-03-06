@@ -199,10 +199,10 @@ export class RpcChannel {
 
   // TODO: New Method add test
   public getStorageProof(
-    blockIdentifier: BlockIdentifier = this.blockIdentifier,
     classHashes: BigNumberish[] = [],
     contractAddresses: BigNumberish[] = [],
-    contractsStorageKeys: RPC.CONTRACT_STORAGE_KEYS[] = [] // TODO: allow BigNUmberish[] and fix formatting before request
+    contractsStorageKeys: RPC.CONTRACT_STORAGE_KEYS[] = [], // TODO: allow BigNUmberish[] and fix formatting before request
+    blockIdentifier: BlockIdentifier = this.blockIdentifier
   ) {
     const block_id = new Block(blockIdentifier).identifier;
     const class_hashes = bigNumberishArrayToHexadecimalStringArray(classHashes);

@@ -29,6 +29,7 @@ import {
   type TypedData,
   waitForTransactionOptions,
   GetTransactionReceiptResponse,
+  RPC,
 } from '../types';
 import type {
   DeclaredTransaction,
@@ -232,9 +233,6 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getBlockWithReceipts(blockIdentifier?: BlockIdentifier) {
-    if (this.channel instanceof RPC08.RpcChannel)
-      throw new LibraryError('Unsupported method for RPC version');
-
     return this.channel.getBlockWithReceipts(blockIdentifier);
   }
 
@@ -262,9 +260,7 @@ export class RpcProvider implements ProviderInterface {
    * Utility method, same result can be achieved using getBlockWithTxHashes(BlockTag.pending);
    */
   public async getPendingTransactions() {
-    const { transactions } = await this.getBlockWithTxHashes(BlockTag.PENDING).then(
-      this.responseParser.parseGetBlockResponse
-    );
+    const { transactions } = await this.getBlockWithTxHashes(BlockTag.PENDING);
     return Promise.all(transactions.map((it: any) => this.getTransactionByHash(it)));
   }
 
@@ -680,5 +676,48 @@ export class RpcProvider implements ProviderInterface {
       }
     }
     return bulk;
+  }
+
+  /**
+   * Given an l1 tx hash, returns the associated l1_handler tx hashes and statuses for all L1 -> L2 messages sent by the l1 transaction, ordered by the l1 tx sending order
+   */
+  public getL1MessagesStatus(transactionHash: BigNumberish) {
+    if (this.channel instanceof RPC08.RpcChannel) {
+      this.channel.getMessagesStatus(transactionHash);
+    }
+
+    throw new LibraryError('Unsupported method for RPC version');
+  }
+
+  /**
+   * Get merkle paths in one of the state tries: global state, classes, individual contract
+   */
+  public getStorageProof(
+    classHashes: BigNumberish[],
+    contractAddresses: BigNumberish[],
+    contractsStorageKeys: RPC.CONTRACT_STORAGE_KEYS[],
+    blockIdentifier?: BlockIdentifier
+  ) {
+    if (this.channel instanceof RPC08.RpcChannel) {
+      this.channel.getStorageProof(
+        classHashes,
+        contractAddresses,
+        contractsStorageKeys,
+        blockIdentifier
+      );
+    }
+
+    throw new LibraryError('Unsupported method for RPC version');
+  }
+
+  /**
+   * Get the contract class definition in the given block associated with the given hash
+   */
+  public getCompiledCasm(classHash: BigNumberish) {
+    if (this.channel instanceof RPC08.RpcChannel) {
+      this.channel.getCompiledCasm(classHash);
+    }
+
+    throw new LibraryError('Unsupported method for RPC version');
   }
 }

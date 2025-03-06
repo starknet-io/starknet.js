@@ -47,6 +47,14 @@ export function toBigInt(value: BigNumberish): bigint {
 }
 
 /**
+ * try to convert BigNumberish to bigint
+ * in case of undefined return undefined
+ */
+export function tryToBigInt(value: BigNumberish | undefined) {
+  return value ? BigInt(value) : undefined;
+}
+
+/**
  * Convert BigNumberish to hex-string
  *
  * @param {BigNumberish} value value to convert
