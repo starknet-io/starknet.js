@@ -43,6 +43,7 @@ export class RPCResponseParser
     return estimatedFeeToMaxFee(estimatedFee, this.margin?.maxFee);
   }
 
+  // TODO: Check how to recaltulate bounds and what use this ?
   private estimateFeeToBounds(estimate: Parameters<typeof estimateFeeToBounds>[0]) {
     return estimateFeeToBounds(estimate, this.margin?.bounds);
   }
