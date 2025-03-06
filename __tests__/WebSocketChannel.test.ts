@@ -1,7 +1,7 @@
 import { WebSocket } from 'isows';
 
 import { Provider, WSSubscriptions, WebSocketChannel } from '../src';
-import { StarknetChainId } from '../src/constants';
+import { StarknetChainId } from '../src/global/constants';
 import { getTestAccount, getTestProvider } from './config/fixtures';
 
 const nodeUrl = 'wss://sepolia-pathfinder-rpc.spaceshard.io/rpc/v0_8';

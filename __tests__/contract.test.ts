@@ -83,9 +83,11 @@ describe('contract module', () => {
       });
 
       test('read initial balance of that account', async () => {
-        const { balance } = await erc20Contract.balanceOf(wallet, {
-          formatResponse: { balance: uint256ToBN },
-        });
+        const { balance } = await erc20Contract
+          .withOptions({
+            formatResponse: { balance: uint256ToBN },
+          })
+          .balanceOf(wallet);
         expect(balance).toStrictEqual(BigInt(1000));
       });
 
@@ -573,18 +575,24 @@ describe('Complex interaction', () => {
       const calldata = CallData.compile(request);
       const args = Object.values(request);
 
-      const result = await erc20Echo20Contract.echo(calldata, {
-        parseRequest: true,
-        parseResponse: true,
-        formatResponse,
-      });
+      const result = await erc20Echo20Contract
+        .withOptions({
+          parseRequest: true,
+          parseResponse: true,
+          formatResponse,
+        })
+        .echo(calldata);
 
-      const result2 = await erc20Echo20Contract.echo(...args, {
-        formatResponse,
-      });
+      const result2 = await erc20Echo20Contract
+        .withOptions({
+          formatResponse,
+        })
+        .echo(...args);
+
       const result3 = await erc20Echo20Contract.call('echo', calldata, {
         formatResponse,
       });
+
       const result4 = await erc20Echo20Contract.call('echo', args, {
         formatResponse,
       });
@@ -851,26 +859,27 @@ describe('Complex interaction', () => {
 
     describe('speedup live tests', () => {
       test('call parameterized data', async () => {
-        const result = await erc20Echo20Contract.echo(
-          request.t1,
-          request.n1,
-          request.tl2,
-          request.k1,
-          request.k2,
-          request.u1,
-          request.s1,
-          request.s2,
-          request.af1,
-          request.au1,
-          request.as1,
-          request.atmk,
-          request.atmku,
-          {
+        const result = await erc20Echo20Contract
+          .withOptions({
             parseRequest: true,
             parseResponse: true,
             formatResponse,
-          }
-        );
+          })
+          .echo(
+            request.t1,
+            request.n1,
+            request.tl2,
+            request.k1,
+            request.k2,
+            request.u1,
+            request.s1,
+            request.s2,
+            request.af1,
+            request.au1,
+            request.as1,
+            request.atmk,
+            request.atmku
+          );
 
         // Convert request uint256 to match response
         const compareRequest = {
@@ -883,22 +892,25 @@ describe('Complex interaction', () => {
       });
 
       test('invoke parameterized data', async () => {
-        const result = await erc20Echo20Contract.iecho(
-          request.t1,
-          request.n1,
-          request.tl2,
-          request.k1,
-          request.k2,
-          request.u1,
-          request.s1,
-          request.s2,
-          request.af1,
-          request.au1,
-          request.as1,
-          request.atmk,
-          request.atmku,
-          { formatResponse }
-        );
+        const result = await erc20Echo20Contract
+          .withOptions({
+            formatResponse,
+          })
+          .iecho(
+            request.t1,
+            request.n1,
+            request.tl2,
+            request.k1,
+            request.k2,
+            request.u1,
+            request.s1,
+            request.s2,
+            request.af1,
+            request.au1,
+            request.as1,
+            request.atmk,
+            request.atmku
+          );
         const transaction = await provider.waitForTransaction(result.transaction_hash);
         expect(
           (transaction as unknown as SuccessfulTransactionReceiptResponse).execution_status
@@ -930,7 +942,11 @@ describe('Complex interaction', () => {
 
       // mark data as compiled (it can be also done manually check defineProperty compiled in CallData.compile)
       const compiledCallData = CallData.compile(populated4.calldata);
-      const result = await erc20Echo20Contract.echo(compiledCallData, { formatResponse });
+      const result = await erc20Echo20Contract
+        .withOptions({
+          formatResponse,
+        })
+        .echo(compiledCallData);
 
       // Convert request uint256 to match response
       const compareRequest = {
