@@ -232,9 +232,6 @@ export class RpcProvider implements ProviderInterface {
   }
 
   public async getBlockWithReceipts(blockIdentifier?: BlockIdentifier) {
-    if (this.channel instanceof RPC08.RpcChannel)
-      throw new LibraryError('Unsupported method for RPC version');
-
     return this.channel.getBlockWithReceipts(blockIdentifier);
   }
 
