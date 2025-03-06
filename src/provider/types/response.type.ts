@@ -3,58 +3,39 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 
-import { IsReverted, IsSucceeded, IsType } from 'starknet-types-08';
+import {
+  BLOCK_WITH_TX_HASHES,
+  BlockWithTxHashes,
+  IsReverted,
+  IsSucceeded,
+  IsType,
+  PENDING_BLOCK_WITH_TX_HASHES,
+} from 'starknet-types-08';
 import { CompiledSierra, LegacyContractClass } from '../../types/lib';
 import {
-  BLOCK_HASH,
-  BLOCK_NUMBER,
   FELT,
   PENDING_STATE_UPDATE,
   PRICE_UNIT,
-  RESOURCE_PRICE,
   SIMULATION_FLAG,
   STATE_UPDATE,
-  TXN_HASH,
   DeclaredTransaction,
   InvokedTransaction,
   ResourceBounds,
   SimulateTransaction,
   TransactionWithHash,
+  Simplify,
 } from './spec.type';
 
 import { TransactionReceipt } from '../../types/api';
 
-export { BlockWithTxHashes, ContractClassPayload, FeeEstimate } from './spec.type';
+export type Block = Simplify<BLOCK_WITH_TX_HASHES>;
+export type PendingBlock = Simplify<PENDING_BLOCK_WITH_TX_HASHES>;
+export type GetBlockResponse = Simplify<BlockWithTxHashes>;
 
-export type GetBlockResponse = PendingBlock | Block;
-
-export type PendingBlock = {
-  status: 'PENDING';
-  parent_hash: BLOCK_HASH;
-  timestamp: number;
-  sequencer_address: FELT;
-  l1_gas_price: RESOURCE_PRICE;
-  starknet_version: string;
-  transactions: TXN_HASH[];
-};
-
-export type Block = {
-  status: 'ACCEPTED_ON_L2' | 'ACCEPTED_ON_L1' | 'REJECTED';
-  block_hash: BLOCK_HASH;
-  parent_hash: BLOCK_HASH;
-  block_number: BLOCK_NUMBER;
-  new_root: FELT;
-  timestamp: number;
-  sequencer_address: FELT;
-  l1_gas_price: RESOURCE_PRICE;
-  starknet_version: string;
-  transactions: TXN_HASH[];
-};
-
-export interface MessageToL1 {
+/* export interface MessageToL1 {
   to_address: string;
   payload: Array<string>;
-}
+} */
 
 /* 
 export type RevertedTransactionReceiptResponse = {
@@ -113,14 +94,18 @@ export type L1HandlerTransactionReceiptResponse =
 export type GetTransactionResponse = TransactionWithHash;
 
 export interface EstimateFeeResponse {
-  gas_consumed: bigint;
   overall_fee: bigint;
-  gas_price: bigint;
   unit: PRICE_UNIT;
+
+  l1_gas_consumed: bigint;
+  l1_gas_price: bigint;
+  l2_gas_consumed: bigint | undefined;
+  l2_gas_price: bigint | undefined;
+  l1_data_gas_consumed: bigint;
+  l1_data_gas_price: bigint;
+
   suggestedMaxFee: bigint;
   resourceBounds: ResourceBounds;
-  data_gas_consumed: bigint;
-  data_gas_price: bigint;
 }
 
 export type EstimateFeeResponseBulk = Array<EstimateFeeResponse>;
@@ -135,7 +120,7 @@ export type Storage = FELT;
 
 export type Nonce = string;
 
-export type { SIMULATION_FLAG };
+// export type { SIMULATION_FLAG };
 export type SimulationFlags = Array<SIMULATION_FLAG>;
 
 export type SimulatedTransaction = SimulateTransaction & {

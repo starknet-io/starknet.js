@@ -3,7 +3,6 @@
  * Intersection (sequencer response ∩ (∪ rpc responses))
  */
 import type {
-  BlockWithTxHashes,
   ContractClassPayload,
   ContractClassResponse,
   EstimateFeeResponse,
@@ -13,8 +12,9 @@ import type {
   GetTxReceiptResponseWithoutHelper,
   RpcProviderOptions,
   SimulateTransactionResponse,
+  BlockWithTxHashes,
 } from '../../provider/types/index.type';
-import { toBigInt } from '../num';
+import { toBigInt, tryToBigInt } from '../num';
 import { isString } from '../typed';
 import { estimateFeeToBounds, estimatedFeeToMaxFee } from '../stark';
 import { ResponseParser } from './interface';
@@ -43,28 +43,15 @@ export class RPCResponseParser
     return estimatedFeeToMaxFee(estimatedFee, this.margin?.maxFee);
   }
 
-  // TODO: Check how to recaltulate bounds and what use this ?
   private estimateFeeToBounds(estimate: Parameters<typeof estimateFeeToBounds>[0]) {
     return estimateFeeToBounds(estimate, this.margin?.bounds);
   }
 
   public parseGetBlockResponse(res: BlockWithTxHashes): GetBlockResponse {
-    return { status: 'PENDING', ...res } as GetBlockResponse;
+    return res as GetBlockResponse;
   }
 
   public parseTransactionReceipt(res: TransactionReceipt): GetTxReceiptResponseWithoutHelper {
-    // HOTFIX RPC 0.5 to align with RPC 0.6
-    // This case is RPC 0.5. It can be only v2 thx with FRI units
-    if ('actual_fee' in res && isString(res.actual_fee)) {
-      return {
-        ...(res as GetTxReceiptResponseWithoutHelper),
-        actual_fee: {
-          amount: res.actual_fee,
-          unit: 'FRI',
-        },
-      } as GetTxReceiptResponseWithoutHelper;
-    }
-
     return res as GetTxReceiptResponseWithoutHelper;
   }
 
@@ -72,27 +59,36 @@ export class RPCResponseParser
     const val = res[0];
     return {
       overall_fee: toBigInt(val.overall_fee),
-      gas_consumed: toBigInt(0), // TODO: vidit sta sa ovim
-      gas_price: toBigInt(0), // TODO: vidit sta sa ovim
       unit: val.unit,
+
+      l1_gas_consumed: tryToBigInt(val.l1_gas_consumed) ?? tryToBigInt(val.gas_consumed) ?? 0n,
+      l1_gas_price: tryToBigInt(val.l1_gas_price) ?? tryToBigInt(val.gas_price) ?? 0n,
+      l2_gas_consumed: tryToBigInt(val.l2_gas_consumed) ?? undefined,
+      l2_gas_price: tryToBigInt(val.l2_gas_price) ?? undefined,
+      l1_data_gas_consumed:
+        tryToBigInt(val.l1_data_gas_consumed) ?? tryToBigInt(val.data_gas_consumed) ?? 0n,
+      l1_data_gas_price: tryToBigInt(val.l1_data_gas_price) ?? tryToBigInt(val.gas_price) ?? 0n,
+
       suggestedMaxFee: this.estimatedFeeToMaxFee(val.overall_fee),
       resourceBounds: this.estimateFeeToBounds(val),
-      data_gas_consumed: val.data_gas_consumed ? toBigInt(val.data_gas_consumed) : 0n,
-      data_gas_price: val.data_gas_price ? toBigInt(val.data_gas_price) : 0n,
     };
   }
 
   public parseFeeEstimateBulkResponse(res: FeeEstimate[]): EstimateFeeResponseBulk {
     return res.map((val) => ({
       overall_fee: toBigInt(val.overall_fee),
-      // TODO: vidit sta sa ovim
-      gas_consumed: toBigInt(0), // TODO: vidit sta sa ovim
-      gas_price: toBigInt(0), // TODO: vidit sta sa ovim
       unit: val.unit,
+
+      l1_gas_consumed: tryToBigInt(val.l1_gas_consumed) ?? tryToBigInt(val.gas_consumed) ?? 0n,
+      l1_gas_price: tryToBigInt(val.l1_gas_price) ?? tryToBigInt(val.gas_price) ?? 0n,
+      l2_gas_consumed: tryToBigInt(val.l2_gas_consumed) ?? undefined,
+      l2_gas_price: tryToBigInt(val.l2_gas_price) ?? undefined,
+      l1_data_gas_consumed:
+        tryToBigInt(val.l1_data_gas_consumed) ?? tryToBigInt(val.data_gas_consumed) ?? 0n,
+      l1_data_gas_price: tryToBigInt(val.l1_data_gas_price) ?? tryToBigInt(val.gas_price) ?? 0n,
+
       suggestedMaxFee: this.estimatedFeeToMaxFee(val.overall_fee),
       resourceBounds: this.estimateFeeToBounds(val),
-      data_gas_consumed: val.data_gas_consumed ? toBigInt(val.data_gas_consumed) : 0n,
-      data_gas_price: val.data_gas_price ? toBigInt(val.data_gas_price) : 0n,
     }));
   }
 

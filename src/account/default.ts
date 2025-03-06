@@ -77,6 +77,7 @@ import {
   toFeeVersion,
   toTransactionVersion,
   v3Details,
+  ZEROFee,
 } from '../utils/stark';
 import { buildUDCCall, getExecuteCalldata } from '../utils/transaction';
 import { getMessageHash } from '../utils/typedData';
@@ -835,16 +836,7 @@ export class Account extends Provider implements AccountInterface {
         return this.estimateDeployFee(payload, details);
 
       default:
-        return {
-          gas_consumed: 0n,
-          gas_price: 0n,
-          overall_fee: ZERO,
-          unit: 'FRI',
-          suggestedMaxFee: ZERO,
-          resourceBounds: estimateFeeToBounds(ZERO, undefined, await this.channel.getSpecVersion()),
-          data_gas_consumed: 0n,
-          data_gas_price: 0n,
-        };
+        return ZEROFee(await this.channel.getSpecVersion());
     }
   }
 

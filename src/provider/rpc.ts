@@ -262,9 +262,7 @@ export class RpcProvider implements ProviderInterface {
    * Utility method, same result can be achieved using getBlockWithTxHashes(BlockTag.pending);
    */
   public async getPendingTransactions() {
-    const { transactions } = await this.getBlockWithTxHashes(BlockTag.PENDING).then(
-      this.responseParser.parseGetBlockResponse
-    );
+    const { transactions } = await this.getBlockWithTxHashes(BlockTag.PENDING);
     return Promise.all(transactions.map((it: any) => this.getTransactionByHash(it)));
   }
 

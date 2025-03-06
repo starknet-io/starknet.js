@@ -6,7 +6,7 @@ import * as RPCSPEC08 from 'starknet-types-08';
 import { SimpleOneOf } from '../../types/helpers';
 
 // taken from type-fest
-type Simplify<T> = { [K in keyof T]: T[K] } & {};
+export type Simplify<T> = { [K in keyof T]: T[K] } & {};
 
 // taken from type-fest
 export type RequiredKeysOf<T extends object> = Exclude<
