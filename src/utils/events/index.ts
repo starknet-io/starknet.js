@@ -1,4 +1,4 @@
-import { UDC } from '../../constants';
+import { UDC } from '../../global/constants';
 import {
   Abi,
   AbiEnums,
@@ -194,57 +194,62 @@ function mergeAbiEvents(target: any, source: any): Object {
  * ```
  */
 export function parseEvents(
-  providerReceivedEvents: RPC.Event[],
+  providerReceivedEvents: RPC.EmittedEvent[],
   abiEvents: AbiEvents,
   abiStructs: AbiStructs,
   abiEnums: AbiEnums
 ): ParsedEvents {
-  const ret = providerReceivedEvents.flat().reduce((acc, recEvent: RPC.Event) => {
-    let abiEvent: AbiEvent | AbiEvents = abiEvents[recEvent.keys.shift() ?? 0];
-    if (!abiEvent) {
+  const ret = providerReceivedEvents
+    .flat()
+    .reduce((acc, recEvent: RPC.EmittedEvent | RPC.Event) => {
+      let abiEvent: AbiEvent | AbiEvents = abiEvents[recEvent.keys.shift() ?? 0];
+      if (!abiEvent) {
+        return acc;
+      }
+      while (!abiEvent.name) {
+        const hashName = recEvent.keys.shift();
+        assert(!!hashName, 'Not enough data in "keys" property of this event.');
+        abiEvent = (abiEvent as AbiEvents)[hashName];
+      }
+      // Create our final event object
+      const parsedEvent: ParsedEvent = {};
+      parsedEvent[abiEvent.name as string] = {};
+      // Remove the event's name hashed from the keys array
+      const keysIter = recEvent.keys[Symbol.iterator]();
+      const dataIter = recEvent.data[Symbol.iterator]();
+
+      const abiEventKeys =
+        (abiEvent as CairoEventDefinition).members?.filter((it) => it.kind === 'key') ||
+        (abiEvent as LegacyEvent).keys;
+      const abiEventData =
+        (abiEvent as CairoEventDefinition).members?.filter((it) => it.kind === 'data') ||
+        (abiEvent as LegacyEvent).data;
+
+      abiEventKeys.forEach((key) => {
+        parsedEvent[abiEvent.name as string][key.name] = responseParser(
+          keysIter,
+          key,
+          abiStructs,
+          abiEnums,
+          parsedEvent[abiEvent.name as string]
+        );
+      });
+
+      abiEventData.forEach((data) => {
+        parsedEvent[abiEvent.name as string][data.name] = responseParser(
+          dataIter,
+          data,
+          abiStructs,
+          abiEnums,
+          parsedEvent[abiEvent.name as string]
+        );
+      });
+      if ('block_hash' in recEvent) parsedEvent.block_hash = recEvent.block_hash;
+      if ('block_number' in recEvent) parsedEvent.block_number = recEvent.block_number;
+      if ('transaction_hash' in recEvent) parsedEvent.transaction_hash = recEvent.transaction_hash;
+      acc.push(parsedEvent);
       return acc;
-    }
-    while (!abiEvent.name) {
-      const hashName = recEvent.keys.shift();
-      assert(!!hashName, 'Not enough data in "keys" property of this event.');
-      abiEvent = (abiEvent as AbiEvents)[hashName];
-    }
-    // Create our final event object
-    const parsedEvent: ParsedEvent = {};
-    parsedEvent[abiEvent.name as string] = {};
-    // Remove the event's name hashed from the keys array
-    const keysIter = recEvent.keys[Symbol.iterator]();
-    const dataIter = recEvent.data[Symbol.iterator]();
-
-    const abiEventKeys =
-      (abiEvent as CairoEventDefinition).members?.filter((it) => it.kind === 'key') ||
-      (abiEvent as LegacyEvent).keys;
-    const abiEventData =
-      (abiEvent as CairoEventDefinition).members?.filter((it) => it.kind === 'data') ||
-      (abiEvent as LegacyEvent).data;
-
-    abiEventKeys.forEach((key) => {
-      parsedEvent[abiEvent.name as string][key.name] = responseParser(
-        keysIter,
-        key,
-        abiStructs,
-        abiEnums,
-        parsedEvent[abiEvent.name as string]
-      );
-    });
-
-    abiEventData.forEach((data) => {
-      parsedEvent[abiEvent.name as string][data.name] = responseParser(
-        dataIter,
-        data,
-        abiStructs,
-        abiEnums,
-        parsedEvent[abiEvent.name as string]
-      );
-    });
-    acc.push(parsedEvent);
-    return acc;
-  }, [] as ParsedEvents);
+    }, [] as ParsedEvents);
   return ret;
 }
 

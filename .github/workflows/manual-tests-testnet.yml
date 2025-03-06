@@ -1,5 +1,11 @@
 name: '[Manual] Test Testnet'
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      ignore-scripts:
+        description: 'Ignore scripts'
+        type: boolean
+        default: false
 
 jobs:
   tests:
@@ -10,6 +16,8 @@ jobs:
         name: [rpc-sepolia]
 
     uses: ./.github/workflows/_test.yml
+    with:
+      ignore-scripts: ${{ inputs.ignore-scripts }}
     secrets:
       TEST_RPC_URL: ${{ secrets.TEST_RPC_URL }}
       TEST_ACCOUNT_PRIVATE_KEY: ${{ secrets.TEST_ACCOUNT_PRIVATE_KEY }}

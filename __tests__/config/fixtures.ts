@@ -1,17 +1,18 @@
 import fs from 'node:fs';
 import path from 'node:path';
 
-import { Account, Provider, ProviderInterface, RpcProvider, json } from '../../src';
+import { Account, Provider, ProviderInterface, RpcProvider, config, json } from '../../src';
 import {
   CompiledSierra,
   CompiledSierraCasm,
   LegacyCompiledContract,
   RpcProviderOptions,
 } from '../../src/types';
-import { ETransactionVersion } from '../../src/types/api';
 import { toHex } from '../../src/utils/num';
 import { wait } from '../../src/utils/provider';
 import { isString } from '../../src/utils/typed';
+import './customMatchers'; // ensures TS traversal
+import { SupportedRpcVersion, SupportedTransactionVersion } from '../../src/global/constants';
 
 const readFile = (subpath: string) => fs.readFileSync(path.resolve(__dirname, subpath));
 
@@ -79,6 +80,8 @@ const compiledContracts = {
 };
 export const contracts = mapContractSets(compiledContracts);
 
+config.set('logLevel', 'DEBUG');
+
 export function getTestProvider(
   isProvider?: true,
   setProviderOptions?: RpcProviderOptions
@@ -96,21 +99,49 @@ export function getTestProvider(
   const providerOptions: RpcProviderOptions = {
     ...setProviderOptions,
     nodeUrl: process.env.TEST_RPC_URL,
+    specVersion: process.env.RPC_SPEC_VERSION as SupportedRpcVersion,
     // accelerate the tests when running locally
     ...(isDevnet && { transactionRetryIntervalFallback: 1000 }),
   };
   return isProvider ? new Provider(providerOptions) : new RpcProvider(providerOptions);
 }
 
-export const TEST_TX_VERSION = process.env.TX_VERSION === 'v3' ? ETransactionVersion.V3 : undefined;
+export async function createTestProvider(
+  isProvider?: true,
+  setProviderOptions?: RpcProviderOptions
+): Promise<ProviderInterface>;
+export async function createTestProvider(
+  isProvider?: false,
+  setProviderOptions?: RpcProviderOptions
+): Promise<RpcProvider>;
+export async function createTestProvider(
+  isProvider: boolean = true,
+  setProviderOptions?: RpcProviderOptions
+): Promise<ProviderInterface | RpcProvider> {
+  const isDevnet = process.env.IS_DEVNET === 'true';
 
-export const getTestAccount = (provider: ProviderInterface) => {
+  const providerOptions: RpcProviderOptions = {
+    ...setProviderOptions,
+    nodeUrl: process.env.TEST_RPC_URL,
+    specVersion: process.env.RPC_SPEC_VERSION as SupportedRpcVersion,
+    // accelerate the tests when running locally
+    ...(isDevnet && { transactionRetryIntervalFallback: 1000 }),
+  };
+  return isProvider ? Provider.create(providerOptions) : RpcProvider.create(providerOptions);
+}
+
+export const TEST_TX_VERSION = process.env.TX_VERSION as SupportedTransactionVersion;
+
+export const getTestAccount = (
+  provider: ProviderInterface,
+  txVersion?: SupportedTransactionVersion
+) => {
   return new Account(
     provider,
     toHex(process.env.TEST_ACCOUNT_ADDRESS || ''),
     process.env.TEST_ACCOUNT_PRIVATE_KEY || '',
     undefined,
-    TEST_TX_VERSION
+    txVersion ?? TEST_TX_VERSION
   );
 };
 
@@ -152,4 +183,8 @@ export const describeIfTestnet = describeIf(process.env.IS_TESTNET === 'true');
 export const erc20ClassHash = '0x54328a1075b8820eb43caf0caa233923148c983742402dcfc38541dd843d01a';
 export const wrongClassHash = '0x000000000000000000000000000000000000000000000000000000000000000';
 export const devnetETHtokenAddress =
-  '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
+  '0x049d36570d4e46f48e99674bd3fcc84644ddd6b96f7c741b1562b82f9e004dc7';
+export const devnetSTRKtokenAddress =
+  '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d';
+export const devnetFeeTokenAddress =
+  TEST_TX_VERSION === '0x3' ? devnetSTRKtokenAddress : devnetETHtokenAddress;

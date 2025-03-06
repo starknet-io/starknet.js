@@ -1,17 +1,20 @@
-import { Provider, num, shortString } from '../src';
-import { contracts, getTestAccount, getTestProvider } from './config/fixtures';
+import { Account, Provider, num, shortString } from '../src';
+import { contracts, createTestProvider, getTestAccount } from './config/fixtures';
 
 const { hexToDecimalString } = num;
 
 describe('deploy and test Wallet', () => {
-  const provider = new Provider(getTestProvider());
-  const account = getTestAccount(provider);
+  let provider: Provider;
+  let account: Account;
   let identityAddress: string;
   let namingAddress: string;
   let multicallAddress: string;
   const devnetERC20Address = '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
 
   beforeAll(async () => {
+    provider = new Provider(await createTestProvider());
+    account = getTestAccount(provider);
+
     // Deploy Starknet id contract
     const idResponse = await account.declareAndDeploy({
       contract: contracts.starknetId.StarknetId.sierra,
@@ -83,6 +86,12 @@ describe('deploy and test Wallet', () => {
   test('Get the stark name of the account (using starknet.id)', async () => {
     const address = await account.getAddressFromStarkName('fricoben.stark', namingAddress);
     expect(hexToDecimalString(address)).toEqual(hexToDecimalString(account.address));
+  });
+
+  test('Should throw error when invalid stark domain is provided', async () => {
+    await expect(account.getAddressFromStarkName('invalid_domain', namingAddress)).rejects.toThrow(
+      'Invalid domain, must be a valid .stark domain'
+    );
   });
 
   test('Get the account from a stark name of the account (using starknet.id)', async () => {

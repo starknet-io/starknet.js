@@ -9,6 +9,7 @@ import {
   CallData,
   Contract,
   ContractFactory,
+  ProviderInterface,
   cairo,
   ec,
   hash,
@@ -18,11 +19,13 @@ import {
   stark,
 } from '../src';
 import {
-  TEST_TX_VERSION,
+  // TEST_TX_VERSION,
   contracts,
+  createTestProvider,
   describeIfDevnet,
+  devnetFeeTokenAddress,
   getTestAccount,
-  getTestProvider,
+  TEST_TX_VERSION,
 } from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
@@ -32,14 +35,17 @@ const { starknetKeccak } = selector;
 
 describeIfDevnet('Cairo 1 Devnet', () => {
   describe('API &  Contract interactions', () => {
-    const provider = getTestProvider();
-    const account = getTestAccount(provider);
+    let provider: ProviderInterface;
+    let account: Account;
     let dd: DeclareDeployUDCResponse;
     let cairo1Contract: Contract;
     let onlyConstructorContract: Contract;
     initializeMatcher(expect);
 
     beforeAll(async () => {
+      provider = await createTestProvider();
+      account = getTestAccount(provider);
+
       dd = await account.declareAndDeploy({
         contract: contracts.HelloSierra.sierra,
         casm: contracts.HelloSierra.casm,
@@ -513,11 +519,14 @@ describeIfDevnet('Cairo 1 Devnet', () => {
   });
 
   describe('Cairo1 Account contract', () => {
-    const provider = getTestProvider();
-    const account = getTestAccount(provider);
+    let provider: ProviderInterface;
+    let account: Account;
     let accountC1: Account;
 
     beforeAll(async () => {
+      provider = await createTestProvider();
+      account = getTestAccount(provider);
+
       // Deploy Cairo 1 Account
       const priKey = stark.randomAddress();
       const pubKey = ec.starkCurve.getStarkKey(priKey);
@@ -541,10 +550,9 @@ describeIfDevnet('Cairo 1 Devnet', () => {
         calldata,
         0
       );
-      const devnetERC20Address =
-        '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
+
       const { transaction_hash } = await account.execute({
-        contractAddress: devnetERC20Address,
+        contractAddress: devnetFeeTokenAddress,
         entrypoint: 'transfer',
         calldata: {
           recipient: toBeAccountAddress,

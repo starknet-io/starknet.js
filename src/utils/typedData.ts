@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import { PRIME, RANGE_FELT, RANGE_I128, RANGE_U128 } from '../constants';
+import { PRIME, RANGE_FELT, RANGE_I128, RANGE_U128 } from '../global/constants';
 import {
   BigNumberish,
   TypedDataRevision as Revision,
@@ -528,7 +528,7 @@ export function getStructHash<T extends TypedData>(
  * Get the SNIP-12 encoded message to sign, from the typedData object.
  *
  * @param {TypedData} typedData - The TypedData object.
- * @param {BigNumberish} account - The account to sign the message.
+ * @param {BigNumberish} accountAddress - The account address to sign the message.
  *
  * @returns {string} The hash of the message to sign.
  * @throws Will throw an error if the typedData does not match the JSON schema.
@@ -582,7 +582,7 @@ export function getStructHash<T extends TypedData>(
  * // result = "0x70338fb11b8f70b68b261de8a322bcb004bd85e88ac47d9147982c7f5ac66fd"
  * ```
  */
-export function getMessageHash(typedData: TypedData, account: BigNumberish): string {
+export function getMessageHash(typedData: TypedData, accountAddress: BigNumberish): string {
   if (!validateTypedData(typedData)) {
     throw new Error('Typed data does not match JSON schema');
   }
@@ -593,7 +593,7 @@ export function getMessageHash(typedData: TypedData, account: BigNumberish): str
   const message = [
     encodeShortString('StarkNet Message'),
     getStructHash(typedData.types, domain, typedData.domain, revision),
-    account,
+    accountAddress,
     getStructHash(typedData.types, typedData.primaryType, typedData.message, revision),
   ];
 

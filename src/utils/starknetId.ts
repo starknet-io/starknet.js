@@ -1,4 +1,4 @@
-import { StarknetChainId, ZERO } from '../constants';
+import { StarknetChainId, ZERO } from '../global/constants';
 import { BigNumberish } from '../types';
 import { tuple } from './calldata/cairo';
 import { CairoCustomEnum } from './calldata/enum/CairoCustomEnum';
@@ -392,4 +392,22 @@ export function dynamicCallData(
     Reference: reference ? tuple(reference[0], reference[1]) : undefined,
     ArrayReference: arrayReference ? tuple(arrayReference[0], arrayReference[1]) : undefined,
   });
+}
+
+/**
+ * Check if a given string is a valid Starknet.id domain.
+ *
+ * @param {string} domain - The domain string to validate.
+ * @returns {boolean} - True if the domain is a valid Starknet.id domain, false otherwise.
+ * @example
+ * ```typescript
+ * const result = starknetId.isStarkDomain("example.stark");
+ * // result = true
+ *
+ * const result2 = starknetId.isStarkDomain("invalid-domain");
+ * // result2 = false
+ * ```
+ */
+export function isStarkDomain(domain: string): boolean {
+  return /^(?:[a-z0-9-]{1,48}(?:[a-z0-9-]{1,48}[a-z0-9-])?\.)*[a-z0-9-]{1,48}\.stark$/.test(domain);
 }

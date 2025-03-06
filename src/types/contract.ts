@@ -1,7 +1,9 @@
+import { BlockHash, TransactionHash } from 'starknet-types-07';
 import { CairoEnum } from './cairoEnum';
 import {
   BigNumberish,
   BlockIdentifier,
+  BlockNumber,
   Calldata,
   ParsedStruct,
   RawArgsArray,
@@ -93,6 +95,10 @@ export type InvokeOptions = Pick<
   'maxFee' | 'nonce' | 'signature' | 'parseRequest'
 >;
 
-export type ParsedEvent = { [name: string]: ParsedStruct };
+export type ParsedEvent = { [name: string]: ParsedStruct } & {
+  block_hash?: BlockHash;
+  block_number?: BlockNumber;
+  transaction_hash?: TransactionHash;
+};
 
 export type ParsedEvents = Array<ParsedEvent>;

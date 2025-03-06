@@ -1,3 +1,95 @@
+# [7.0.0-beta.1](https://github.com/starknet-io/starknet.js/compare/v6.24.0-beta.1...v7.0.0-beta.1) (2025-03-04)
+
+- Implement RPC 0.8 and V3 transactions ([#1328](https://github.com/starknet-io/starknet.js/issues/1328)) ([316ae27](https://github.com/starknet-io/starknet.js/commit/316ae2789376368dcffe653ce4817eebf0a63d97))
+
+### BREAKING CHANGES
+
+- Library defaults to RPC 0.8 with the corresponding API changes, dropped RPC 0.6 support
+
+## [6.23.1](https://github.com/starknet-io/starknet.js/compare/v6.23.0...v6.23.1) (2025-02-05)
+
+### Bug Fixes
+
+- conf. TxV in Account, conf. string auto. all methods, fix unbdef… ([#1311](https://github.com/starknet-io/starknet.js/issues/1311)) ([1d91ec0](https://github.com/starknet-io/starknet.js/commit/1d91ec00c9b3f5c47dfc77946c7250b7022728a6))
+
+# [6.23.0](https://github.com/starknet-io/starknet.js/compare/v6.22.0...v6.23.0) (2025-01-29)
+
+### Features
+
+- logger, config, deprecate legacy tx ([#1302](https://github.com/starknet-io/starknet.js/issues/1302)) ([d0ffbcc](https://github.com/starknet-io/starknet.js/commit/d0ffbcc9bef8b6069f79644d3b54667b3d75dbf2))
+
+# [6.22.0](https://github.com/starknet-io/starknet.js/compare/v6.21.2...v6.22.0) (2025-01-29)
+
+### Features
+
+- units utils ([#1277](https://github.com/starknet-io/starknet.js/issues/1277)) ([26037e9](https://github.com/starknet-io/starknet.js/commit/26037e92c4cdfa220c29fd1147beae7408d8d004))
+
+## [6.21.2](https://github.com/starknet-io/starknet.js/compare/v6.21.1...v6.21.2) (2025-01-29)
+
+### Bug Fixes
+
+- add starkid improvements ([#1301](https://github.com/starknet-io/starknet.js/issues/1301)) ([51702db](https://github.com/starknet-io/starknet.js/commit/51702dbd8dd3dcb0d6e7960b6b320c8c17afff1b))
+
+## [6.21.1](https://github.com/starknet-io/starknet.js/compare/v6.21.0...v6.21.1) (2025-01-23)
+
+### Bug Fixes
+
+- pass signerDetails to fix estimateFeeBulk ([#1299](https://github.com/starknet-io/starknet.js/issues/1299)) ([f09f20d](https://github.com/starknet-io/starknet.js/commit/f09f20da47396456350d26610dabd2e2641a5a98))
+
+# [6.21.0](https://github.com/starknet-io/starknet.js/compare/v6.20.3...v6.21.0) (2025-01-08)
+
+### Bug Fixes
+
+- correct enum typed data hashing ([#1281](https://github.com/starknet-io/starknet.js/issues/1281)) ([6e353d3](https://github.com/starknet-io/starknet.js/commit/6e353d3d50226907ce6b5ad53309d55ed51c6874))
+- rectify snip-12 violation by removing extra `:` in enum encoding ([#1288](https://github.com/starknet-io/starknet.js/issues/1288)) ([b903116](https://github.com/starknet-io/starknet.js/commit/b903116e629af5bc375151deb3635cdbe23cc317))
+- repair fetch utility for browser environments ([#1293](https://github.com/starknet-io/starknet.js/issues/1293)) ([2cb1332](https://github.com/starknet-io/starknet.js/commit/2cb13327ffe669000e8152b509d14e060b3ea73b))
+
+### Features
+
+- enable base fetch override ([#1279](https://github.com/starknet-io/starknet.js/issues/1279)) ([0fce61e](https://github.com/starknet-io/starknet.js/commit/0fce61e40535a4f1b3b05fdd9da60f9218250c99))
+
+## [6.20.3](https://github.com/starknet-io/starknet.js/compare/v6.20.2...v6.20.3) (2024-11-28)
+
+### Bug Fixes
+
+- remove shadowed WalletAccount address property ([3251ffc](https://github.com/starknet-io/starknet.js/commit/3251ffca5551714e24ea6c1fb5488db06919c24e))
+
+## [6.20.2](https://github.com/starknet-io/starknet.js/compare/v6.20.1...v6.20.2) (2024-11-28)
+
+### Bug Fixes
+
+- bump typejs 0.7.10 ([#1275](https://github.com/starknet-io/starknet.js/issues/1275)) ([edfa6dd](https://github.com/starknet-io/starknet.js/commit/edfa6dd2466933d4c4b8a8dacb7220778b2669fc))
+
+## [6.20.1](https://github.com/starknet-io/starknet.js/compare/v6.20.0...v6.20.1) (2024-11-28)
+
+### Bug Fixes
+
+- bump types js ([#1273](https://github.com/starknet-io/starknet.js/issues/1273)) ([34dee40](https://github.com/starknet-io/starknet.js/commit/34dee407af2d9487050f3cf6f2969068937960d6))
+
+# [6.20.0](https://github.com/starknet-io/starknet.js/compare/v6.19.0...v6.20.0) (2024-11-27)
+
+### Features
+
+- add support for parsing emitted events ([#1227](https://github.com/starknet-io/starknet.js/issues/1227)) ([321ecae](https://github.com/starknet-io/starknet.js/commit/321ecaed2af5828501eccb982dc8744ec3e90f1f))
+
+# [6.19.0](https://github.com/starknet-io/starknet.js/compare/v6.18.1...v6.19.0) (2024-11-26)
+
+### Features
+
+- Ledger signer 221 ([#1246](https://github.com/starknet-io/starknet.js/issues/1246)) ([03e2d50](https://github.com/starknet-io/starknet.js/commit/03e2d50edee7e2e9e8efb678a97effaf09adee70))
+
+## [6.18.1](https://github.com/starknet-io/starknet.js/compare/v6.18.0...v6.18.1) (2024-11-25)
+
+### Bug Fixes
+
+- expose BatchClient class ([8d3a0de](https://github.com/starknet-io/starknet.js/commit/8d3a0de85230e6f08edebf67b6581d6e79ea191a))
+
+# [6.18.0](https://github.com/starknet-io/starknet.js/compare/v6.17.0...v6.18.0) (2024-11-18)
+
+### Features
+
+- WalletAccount non-breaking temp solution ([#1259](https://github.com/starknet-io/starknet.js/issues/1259)) ([84b267c](https://github.com/starknet-io/starknet.js/commit/84b267cd20122de2954fe9fd87b50503b19c1baa))
+
 # [6.17.0](https://github.com/starknet-io/starknet.js/compare/v6.16.0...v6.17.0) (2024-10-24)
 
 ### Features

@@ -4,7 +4,7 @@
 
 import { poseidonHashMany } from '@scure/starknet';
 
-import { ADDR_BOUND, API_VERSION } from '../../constants';
+import { ADDR_BOUND, API_VERSION } from '../../global/constants';
 import {
   BigNumberish,
   Builtins,

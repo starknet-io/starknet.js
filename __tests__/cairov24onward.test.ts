@@ -1,4 +1,5 @@
 import {
+  Account,
   BigNumberish,
   CairoCustomEnum,
   CairoOption,
@@ -9,6 +10,7 @@ import {
   CairoUint512,
   CallData,
   Contract,
+  ProviderInterface,
   byteArray,
   cairo,
   num,
@@ -16,11 +18,16 @@ import {
 } from '../src';
 import { hexToDecimalString } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
-import { contracts, getTestAccount, getTestProvider } from './config/fixtures';
+import { contracts, createTestProvider, getTestAccount } from './config/fixtures';
 
 describe('Cairo v2.4 onwards', () => {
-  const provider = getTestProvider();
-  const account = getTestAccount(provider);
+  let provider: ProviderInterface;
+  let account: Account;
+
+  beforeAll(async () => {
+    provider = await createTestProvider();
+    account = getTestAccount(provider);
+  });
 
   describe('cairo v2.4.0 new types', () => {
     let stringContract: Contract;

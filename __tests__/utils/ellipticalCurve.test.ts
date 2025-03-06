@@ -1,5 +1,5 @@
 import { constants, ec } from '../../src';
-import { StarknetChainId } from '../../src/constants';
+import { StarknetChainId } from '../../src/global/constants';
 import { computeHashOnElements } from '../../src/utils/hash';
 import { calculateTransactionHash } from '../../src/utils/hash/transactionHash/v2';
 import { fromCallsToExecuteCalldataWithNonce } from '../../src/utils/transaction';

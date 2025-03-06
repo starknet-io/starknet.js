@@ -17,19 +17,20 @@ import {
   FunctionAbi,
   InvokeFunctionResponse,
   InvokeOptions,
-  InvokeTransactionReceiptResponse,
+  GetTransactionReceiptResponse,
   ParsedEvents,
   RawArgs,
   Result,
   ValidateType,
+  type SuccessfulTransactionReceiptResponse,
 } from '../types';
 import assert from '../utils/assert';
-import { CallData, cairo } from '../utils/calldata';
+import { cairo, CallData } from '../utils/calldata';
 import { createAbiParser } from '../utils/calldata/parser';
 import { getAbiEvents, parseEvents as parseRawEvents } from '../utils/events/index';
 import { cleanHex } from '../utils/num';
-import type { GetTransactionReceiptResponse } from '../utils/transactionReceipt';
 import { ContractInterface } from './interface';
+import { logger } from '../global/logger';
 
 export type TypedContractV2<TAbi extends AbiKanabi> = AbiWanTypedContract<TAbi> & Contract;
 
@@ -228,8 +229,7 @@ export class Contract implements ContractInterface {
         this.callData.validate(ValidateType.CALL, method, args);
         return this.callData.compile(method, args);
       }
-      // eslint-disable-next-line no-console
-      console.warn('Call skipped parsing but provided rawArgs, possible malfunction request');
+      logger.warn('Call skipped parsing but provided rawArgs, possible malfunction request');
       return args;
     });
 
@@ -265,8 +265,7 @@ export class Contract implements ContractInterface {
         this.callData.validate(ValidateType.INVOKE, method, args);
         return this.callData.compile(method, args);
       }
-      // eslint-disable-next-line no-console
-      console.warn('Invoke skipped parsing but provided rawArgs, possible malfunction request');
+      logger.warn('Invoke skipped parsing but provided rawArgs, possible malfunction request');
       return args;
     });
 
@@ -283,8 +282,7 @@ export class Contract implements ContractInterface {
     }
 
     if (!nonce) throw new Error(`Nonce is required when invoking a function without an account`);
-    // eslint-disable-next-line no-console
-    console.warn(`Invoking ${method} without an account. This will not work on a public node.`);
+    logger.warn(`Invoking ${method} without an account. This will not work on a public node.`);
 
     return this.providerOrAccount.invokeFunction(
       {
@@ -320,16 +318,37 @@ export class Contract implements ContractInterface {
     };
   }
 
+  // TODO: Demistify what is going on here ???
+  // TODO: receipt status filtering test and fix this do not look right
   public parseEvents(receipt: GetTransactionReceiptResponse): ParsedEvents {
-    return parseRawEvents(
-      (receipt as InvokeTransactionReceiptResponse).events?.filter(
-        (event) => cleanHex(event.from_address) === cleanHex(this.address),
-        []
-      ) || [],
-      this.events,
-      this.structs,
-      CallData.getAbiEnum(this.abi)
-    );
+    let parsed: ParsedEvents;
+    receipt.match({
+      success: (txR: SuccessfulTransactionReceiptResponse) => {
+        const emittedEvents =
+          txR.events
+            ?.map((event) => {
+              return {
+                // TODO: this do not check that block is production and block_hash and block_number actually exists
+                // TODO: second issue is that ts do not complains about it
+                block_hash: txR.block_hash,
+                block_number: txR.block_number,
+                transaction_hash: txR.transaction_hash,
+                ...event,
+              };
+            })
+            .filter((event) => cleanHex(event.from_address) === cleanHex(this.address), []) || [];
+        parsed = parseRawEvents(
+          emittedEvents as any, // TODO: any temp hotfix, fix this
+          this.events,
+          this.structs,
+          CallData.getAbiEnum(this.abi)
+        );
+      },
+      _: () => {
+        throw Error('This transaction was not successful.');
+      },
+    });
+    return parsed!;
   }
 
   public isCairo1(): boolean {

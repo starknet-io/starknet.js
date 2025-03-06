@@ -5,12 +5,14 @@ import {
   Contract,
   EthSigner,
   Provider,
+  ProviderInterface,
   addAddressPadding,
   cairo,
   encode,
   eth,
   extractContractHashes,
-  getLedgerPathBuffer,
+  getLedgerPathBuffer111,
+  getLedgerPathBuffer221,
   hash,
   num,
   stark,
@@ -20,10 +22,10 @@ import { validateAndParseEthAddress } from '../../src/utils/eth';
 import { ETransactionVersion } from '../../src/types/api';
 import {
   contracts,
+  createTestProvider,
   describeIfDevnet,
   devnetETHtokenAddress,
   getTestAccount,
-  getTestProvider,
 } from '../config/fixtures';
 
 describe('Ethereum signer', () => {
@@ -62,11 +64,14 @@ describe('Ethereum signer', () => {
   });
 
   describe('cairo v2.5.3 new secp256k1 type', () => {
-    const provider = new Provider(getTestProvider());
+    let provider: ProviderInterface;
+    let account: Account;
     let ethPubKContract: Contract;
-    const account = getTestAccount(provider);
 
     beforeAll(async () => {
+      provider = new Provider(await createTestProvider());
+      account = getTestAccount(provider);
+
       const { deploy } = await account.declareAndDeploy({
         contract: contracts.EthPubk.sierra,
         casm: contracts.EthPubk.casm,
@@ -96,10 +101,14 @@ describe('Ethereum signer', () => {
 
   describeIfDevnet('ETH account tx V2', () => {
     // devnet only because estimateFee in Sepolia v0.13.1 are producing widely different numbers.
-    const provider = new Provider(getTestProvider());
-    const account = getTestAccount(provider);
+    let provider: ProviderInterface;
+    let account: Account;
     let ethAccount: Account;
+
     beforeAll(async () => {
+      provider = new Provider(await createTestProvider());
+      account = getTestAccount(provider);
+
       const { transaction_hash: declTH, class_hash: decClassHash } = await account.declareIfNot({
         contract: contracts.EthAccount.sierra,
         casm: contracts.EthAccount.casm,
@@ -125,7 +134,13 @@ describe('Ethereum signer', () => {
         0
       );
 
-      ethAccount = new Account(provider, contractETHAccountAddress, ethSigner);
+      ethAccount = new Account(
+        provider,
+        contractETHAccountAddress,
+        ethSigner,
+        undefined,
+        ETransactionVersion.V2
+      );
       const deployPayload = {
         classHash: decClassHash,
         constructorCalldata: accountETHconstructorCalldata,
@@ -159,7 +174,8 @@ describe('Ethereum signer', () => {
         .transfer(account.address, cairo.uint256(1 * 10 ** 4));
       const txR = await provider.waitForTransaction(respTransfer.transaction_hash);
       if (txR.isSuccess()) {
-        expect(txR.execution_status).toBe('SUCCEEDED');
+        // TODO: @PhilippeR26 Why this is not working, fix 'as any' hotfix
+        expect((txR as any).execution_status).toBe('SUCCEEDED');
       } else {
         fail('txR not success');
       }
@@ -184,12 +200,16 @@ describe('Ethereum signer', () => {
 
   describeIfDevnet('ETH account tx V3', () => {
     // devnet only because estimateFee in Sepolia v0.13.1 are producing widely different numbers.
-    const provider = new Provider(getTestProvider());
-    const account = getTestAccount(provider);
+    let provider: Provider;
+    let account: Account;
+    let ethAccount: Account;
     const devnetSTRKtokenAddress =
       '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d';
-    let ethAccount: Account;
+
     beforeAll(async () => {
+      provider = new Provider(await createTestProvider());
+      account = getTestAccount(provider);
+
       const { transaction_hash: declTH, class_hash: decClassHash } = await account.declareIfNot({
         contract: contracts.EthAccount.sierra,
         casm: contracts.EthAccount.casm,
@@ -279,7 +299,7 @@ describe('Ethereum signer', () => {
 
       const txR = await provider.waitForTransaction(respTransfer.transaction_hash);
       if (txR.isSuccess()) {
-        expect(txR.execution_status).toBe('SUCCEEDED');
+        expect((txR as any).execution_status).toBe('SUCCEEDED');
       } else {
         fail('txR not success');
       }
@@ -352,11 +372,24 @@ describe('Ethereum signer', () => {
 describe('Ledger Signer', () => {
   // signature of Ledger can't be tested automatically.
   // So, just the test of the path encoding.
-  test('getLedgerPathBuffer', () => {
-    const path = getLedgerPathBuffer(3, 'AstroAPP');
+
+  // Ledger APP v1.1.1
+  test('getLedgerPathBuffer111', () => {
+    const path = getLedgerPathBuffer111(3, 'AstroAPP');
     expect(path).toEqual(
       new Uint8Array([
         128, 0, 10, 85, 71, 65, 233, 201, 95, 192, 123, 107, 0, 0, 0, 0, 0, 0, 0, 3, 0, 0, 0, 0,
+      ])
+    );
+  });
+
+  // Ledger APP v2.2.1
+  test('getLedgerPathBuffer', () => {
+    const path = getLedgerPathBuffer221(3, 'AstroAPP');
+    expect(path).toEqual(
+      new Uint8Array([
+        128, 0, 10, 85, 199, 65, 233, 201, 223, 192, 123, 107, 128, 0, 0, 0, 128, 0, 0, 3, 0, 0, 0,
+        0,
       ])
     );
   });

@@ -23,20 +23,25 @@ import {
 } from '../src';
 import { getSelectorFromName } from '../src/utils/hash';
 import { getDecimalString } from '../src/utils/num';
-import { contracts, getTestAccount, getTestProvider } from './config/fixtures';
+import { contracts, createTestProvider, getTestAccount } from './config/fixtures';
 
 describe('Account and OutsideExecution', () => {
   const ethAddress = '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
-  const provider = new Provider(getTestProvider());
-  const executorAccount = getTestAccount(provider);
+  let provider: Provider;
+  let executorAccount: Account;
   let signerAccount: Account;
   const targetPK = stark.randomAddress();
   const targetPubK = ec.starkCurve.getStarkKey(targetPK);
   // For ERC20 transfer outside call
-  const recipientAccount = executorAccount;
-  const ethContract = new Contract(contracts.Erc20OZ.sierra.abi, ethAddress, provider);
+  let recipientAccount: Account;
+  let ethContract: Contract;
 
   beforeAll(async () => {
+    provider = new Provider(await createTestProvider());
+    executorAccount = getTestAccount(provider);
+    recipientAccount = executorAccount;
+    ethContract = new Contract(contracts.Erc20OZ.sierra.abi, ethAddress, provider);
+
     // Deploy the SNIP-9 signer account (ArgentX v 0.4.0, using SNIP-9 v2):
     const calldataAX = new CallData(contracts.ArgentX4Account.sierra.abi);
     const axSigner = new CairoCustomEnum({ Starknet: { pubkey: targetPubK } });
