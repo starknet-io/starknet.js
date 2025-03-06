@@ -32,68 +32,19 @@ export type Block = Simplify<BLOCK_WITH_TX_HASHES>;
 export type PendingBlock = Simplify<PENDING_BLOCK_WITH_TX_HASHES>;
 export type GetBlockResponse = Simplify<BlockWithTxHashes>;
 
-/* export interface MessageToL1 {
-  to_address: string;
-  payload: Array<string>;
-} */
-
-/* 
-export type RevertedTransactionReceiptResponse = {
-  type?: TransactionType | any; // RPC only // any due to RPC Spec issue
-  execution_status: typeof TransactionExecutionStatus.REVERTED | any; // any due to RPC Spec
-  finality_status: TransactionFinalityStatus | any;
-  status?: TransactionStatus; // SEQ only
-  actual_fee: string;
-  block_hash?: string; // ?~ optional due to RPC spec issue
-  block_number?: BlockNumber; // ?~ optional due to RCP spec issue
-  transaction_hash: string;
-  transaction_index?: number; // SEQ only
-  messages_sent: Array<MessageToL1>; // SEQ Casted l2_to_l1_messages
-  events: any[];
-  revert_reason?: string; // SEQ Casted revert_error // ?~ optional due to RCP spec issue
-};
-*/
-
-// This do not exist any more as tx receipt
-/* export type RejectedTransactionReceiptResponse = {
-  status: typeof TransactionStatus.REJECTED;
-  transaction_failure_reason: {
-    code: string;
-    error_message: string;
-  };
-}; */
-
 export type GetTxReceiptResponseWithoutHelper = TransactionReceipt;
-
-// TODO: This has misleading name as it is all types not just success
-/* export type SuccessfulTransactionReceiptResponse =
-  | InvokeTransactionReceiptResponse
-  | DeployTransactionReceiptResponse
-  | DeclareTransactionReceiptResponse; */
 
 export type SuccessfulTransactionReceiptResponse = IsSucceeded<TransactionReceipt>;
 export type RevertedTransactionReceiptResponse = IsReverted<TransactionReceipt>;
-
 export type InvokeTransactionReceiptResponse = IsType<TransactionReceipt, 'INVOKE'>;
 export type DeployTransactionReceiptResponse = InvokeTransactionReceiptResponse;
 export type DeclareTransactionReceiptResponse = IsType<TransactionReceipt, 'DECLARE'>;
-
-// Spread individual types for usage convenience
-/* 
-export type InvokeTransactionReceiptResponse = INVOKE_TXN_RECEIPT | PENDING_INVOKE_TXN_RECEIPT;
-export type DeclareTransactionReceiptResponse = DECLARE_TXN_RECEIPT | PENDING_DECLARE_TXN_RECEIPT;
-
-export type DeployAccountTransactionReceiptResponse =
-  | DEPLOY_ACCOUNT_TXN_RECEIPT
-  | PENDING_DEPLOY_ACCOUNT_TXN_RECEIPT;
-export type L1HandlerTransactionReceiptResponse =
-  | L1_HANDLER_TXN_RECEIPT
-  | PENDING_L1_HANDLER_TXN_RECEIPT; 
-*/
+export type DeployAccountTransactionReceiptResponse = IsType<TransactionReceipt, 'DEPLOY_ACCOUNT'>;
+export type L1HandlerTransactionReceiptResponse = IsType<TransactionReceipt, 'L1_HANDLER'>;
 
 export type GetTransactionResponse = TransactionWithHash;
 
-export interface EstimateFeeResponse {
+export type EstimateFeeResponse = {
   overall_fee: bigint;
   unit: PRICE_UNIT;
 
@@ -106,7 +57,7 @@ export interface EstimateFeeResponse {
 
   suggestedMaxFee: bigint;
   resourceBounds: ResourceBounds;
-}
+};
 
 export type EstimateFeeResponseBulk = Array<EstimateFeeResponse>;
 
