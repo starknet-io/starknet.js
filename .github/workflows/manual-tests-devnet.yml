@@ -1,5 +1,11 @@
 name: '[Manual] Test Devnet'
-on: workflow_dispatch
+on:
+  workflow_dispatch:
+    inputs:
+      ignore-scripts:
+        description: 'Ignore scripts'
+        type: boolean
+        default: false
 
 jobs:
   tests:
@@ -14,5 +20,6 @@ jobs:
     uses: ./.github/workflows/_test.yml
     with:
       use-devnet: ${{ matrix.TEST_RPC_URL != '' }}
+      ignore-scripts: ${{ inputs.ignore-scripts }}
     secrets:
       TEST_RPC_URL: ${{ matrix.TEST_RPC_URL }}

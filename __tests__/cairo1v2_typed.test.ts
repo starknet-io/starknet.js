@@ -13,6 +13,7 @@ import {
   CompiledSierra,
   Contract,
   DeclareDeployUDCResponse,
+  ProviderInterface,
   RawArgsArray,
   RawArgsObject,
   TypedContractV2,
@@ -29,7 +30,13 @@ import {
 import { hexToDecimalString } from '../src/utils/num';
 import { encodeShortString } from '../src/utils/shortString';
 import { isString } from '../src/utils/typed';
-import { TEST_TX_VERSION, contracts, getTestAccount, getTestProvider } from './config/fixtures';
+import {
+  contracts,
+  createTestProvider,
+  devnetFeeTokenAddress,
+  getTestAccount,
+  TEST_TX_VERSION,
+} from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
 const { uint256, tuple, isCairo1Abi } = cairo;
@@ -37,8 +44,14 @@ const { toHex } = num;
 const { starknetKeccak } = selector;
 
 describe('Cairo 1', () => {
-  const provider = getTestProvider();
-  const account = getTestAccount(provider);
+  let provider: ProviderInterface;
+  let account: Account;
+
+  beforeAll(async () => {
+    provider = await createTestProvider();
+    account = getTestAccount(provider);
+  });
+
   describe('API &  Contract interactions', () => {
     let dd: DeclareDeployUDCResponse;
     let cairo1Contract: TypedContractV2<typeof tAbi>;
@@ -714,10 +727,9 @@ describe('Cairo 1', () => {
         calldata,
         0
       );
-      const devnetERC20Address =
-        '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
+
       const { transaction_hash } = await account.execute({
-        contractAddress: devnetERC20Address,
+        contractAddress: devnetFeeTokenAddress,
         entrypoint: 'transfer',
         calldata: {
           recipient: toBeAccountAddress,
@@ -806,7 +818,7 @@ describe('Cairo 1', () => {
       ];
       const tx = await provider.waitForTransaction(transaction_hash);
       const events = eventContract.parseEvents(tx);
-      return expect(events).toStrictEqual(shouldBe);
+      expect(events[0]).toMatchEventStructure(shouldBe[0]);
     });
 
     test('parse event returning a nested struct', async () => {
@@ -824,8 +836,7 @@ describe('Cairo 1', () => {
       ];
       const tx = await provider.waitForTransaction(transaction_hash);
       const events = eventContract.parseEvents(tx);
-
-      return expect(events).toStrictEqual(shouldBe);
+      expect(events[0]).toMatchEventStructure(shouldBe[0]);
     });
 
     test('parse tx returning multiple similar events', async () => {
@@ -871,7 +882,8 @@ describe('Cairo 1', () => {
       const { transaction_hash } = await account.execute([callData1, callData2]);
       const tx = await provider.waitForTransaction(transaction_hash);
       const events = eventContract.parseEvents(tx);
-      return expect(events).toStrictEqual(shouldBe);
+      expect(events[0]).toMatchEventStructure(shouldBe[0]);
+      expect(events[1]).toMatchEventStructure(shouldBe[1]);
     });
     test('parse tx returning multiple different events', async () => {
       const shouldBe: types.ParsedEvents = [
@@ -907,7 +919,8 @@ describe('Cairo 1', () => {
       const { transaction_hash } = await account.execute([callData1, callData2]);
       const tx = await provider.waitForTransaction(transaction_hash);
       const events = eventContract.parseEvents(tx);
-      return expect(events).toStrictEqual(shouldBe);
+      expect(events[0]).toMatchEventStructure(shouldBe[0]);
+      expect(events[1]).toMatchEventStructure(shouldBe[1]);
     });
   });
 

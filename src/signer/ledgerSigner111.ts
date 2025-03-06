@@ -17,8 +17,7 @@ import type {
 import assert from '../utils/assert';
 import { CallData } from '../utils/calldata';
 import type { SignerInterface } from './interface';
-import { MASK_31 } from '../constants';
-import { ETransactionVersion2 } from '../types/api/rpcspec_0_6';
+import { MASK_31 } from '../global/constants';
 import { getMessageHash } from '../utils/typedData';
 import { getExecuteCalldata } from '../utils/transaction';
 import {
@@ -30,7 +29,7 @@ import { intDAM } from '../utils/stark';
 import { addHexPrefix, buf2hex, concatenateArrayBuffer, removeHexPrefix } from '../utils/encode';
 import { hexToBytes, stringToSha256ToArrayBuff4, toHex } from '../utils/num';
 import { starkCurve } from '../utils/ec';
-import { ETransactionVersion3 } from '../types/api';
+import { ETransactionVersion2, ETransactionVersion3 } from '../types/api';
 
 // import type _Transport from '@ledgerhq/hw-transport';
 // NOTE: the preceding line was substituted because of the '@ledgerhq/hw-transport' module bug listed in

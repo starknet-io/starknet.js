@@ -1,7 +1,7 @@
 /* eslint-disable no-bitwise */
 import { hexToBytes } from '@noble/curves/abstract/utils';
 
-import { ADDR_BOUND, ZERO } from '../constants';
+import { ADDR_BOUND, ZERO } from '../global/constants';
 import { BigNumberish } from '../types';
 import { addHexPrefix, removeHexPrefix } from './encode';
 import { keccakBn } from './hash';

@@ -7,7 +7,7 @@ import type {
 } from 'starknet-types-08';
 
 import { Account, AccountInterface } from '../account';
-import { StarknetChainId } from '../constants';
+import { StarknetChainId } from '../global/constants';
 import { ProviderInterface } from '../provider';
 import {
   AllowArray,
@@ -36,12 +36,11 @@ import {
   watchAsset,
 } from './connect';
 import { StarknetWalletProvider } from './types';
+import { logger } from '../global/logger';
 
 // TODO: Remove non address constructor in next major version
 // Represent 'Selected Active' Account inside Connected Wallet
 export class WalletAccount extends Account implements AccountInterface {
-  public address: string = '';
-
   public walletProvider: StarknetWalletProvider;
 
   /**
@@ -82,7 +81,7 @@ export class WalletAccount extends Account implements AccountInterface {
     });
 
     if (!address.length) {
-      console.warn(
+      logger.warn(
         '@deprecated Use static method WalletAccount.connect or WalletAccount.connectSilent instead. Constructor {@link WalletAccount.(format:2)}.'
       );
       requestAccounts(this.walletProvider).then(([accountAddress]) => {

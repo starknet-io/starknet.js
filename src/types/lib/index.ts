@@ -1,10 +1,11 @@
 import { SUBSCRIPTION_BLOCK_TAG } from 'starknet-types-08';
-import { StarknetChainId } from '../../constants';
+import { StarknetChainId } from '../../global/constants';
 import { weierstrass } from '../../utils/ec';
-import { EDataAvailabilityMode, ResourceBounds } from '../api';
+import { EDataAvailabilityMode } from '../api';
 import { CairoEnum } from '../cairoEnum';
 import { CompiledContract, CompiledSierraCasm, ContractClass } from './contract';
 import { ValuesType } from '../helpers/valuesType';
+import { ResourceBounds } from '../../provider/types/spec.type';
 
 export type WeierstrassSignatureType = weierstrass.SignatureType;
 export type ArraySignatureType = string[];
@@ -180,7 +181,7 @@ export type TransactionType = ValuesType<typeof TransactionType>;
  * new statuses are defined by props: finality_status and execution_status
  * to be #deprecated
  */
-export const TransactionStatus = {
+/* export const TransactionStatus = {
   NOT_RECEIVED: 'NOT_RECEIVED',
   RECEIVED: 'RECEIVED',
   ACCEPTED_ON_L2: 'ACCEPTED_ON_L2',
@@ -189,7 +190,7 @@ export const TransactionStatus = {
   REVERTED: 'REVERTED',
 } as const;
 
-export type TransactionStatus = ValuesType<typeof TransactionStatus>;
+export type TransactionStatus = ValuesType<typeof TransactionStatus>; */
 
 export const TransactionFinalityStatus = {
   NOT_RECEIVED: 'NOT_RECEIVED',

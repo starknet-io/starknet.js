@@ -32,6 +32,9 @@
   <a href="https://twitter.com/starknetjs">
     <img src="https://img.shields.io/badge/follow_us-Twitter-blue">
   </a>
+  <a href="https://www.drips.network/app/projects/github/starknet-io/starknet.js" target="_blank">
+    <img src="https://www.drips.network/api/embed/project/https%3A%2F%2Fgithub.com%2Fstarknet-io%2Fstarknet.js/support.png?background=light&style=github&text=project&stat=none" alt="Support starknet.js on drips.network" height="20">
+  </a>
 </p>
 
 ## Installation
@@ -59,7 +62,7 @@ Play with [Code Examples](https://github.com/PhilippeR26/starknet.js-workshop-ty
 
 If you consider to contribute to this project please read [CONTRIBUTING.md](https://github.com/starknet-io/starknet.js/blob/main/CONTRIBUTING.md) first.
 
-You can also join our dedicated channel for [Starknet.js](https://discord.com/channels/793094838509764618/1270119831559078061) on the [Starknet Discord](https://discord.com/invite/Ft6Xtzdg)
+You can also join our dedicated channel for [Starknet.js](https://discord.com/channels/793094838509764618/1270119831559078061) on the [Starknet Discord](https://discord.com/invite/starknet-community)
 
 ## ❤️ Special Thanks
 

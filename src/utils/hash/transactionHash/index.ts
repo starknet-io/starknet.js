@@ -2,14 +2,14 @@
  * Transaction Hash based on Transaction Version
  */
 
-import { StarknetChainId } from '../../../constants';
+import { StarknetChainId } from '../../../global/constants';
+import { ResourceBounds } from '../../../provider/types/spec.type';
 import { BigNumberish, Calldata } from '../../../types';
 import {
   EDAMode,
   ETransactionVersion,
   ETransactionVersion2,
   ETransactionVersion3,
-  ResourceBounds,
 } from '../../../types/api';
 import {
   calculateDeclareTransactionHash as v2calculateDeclareTransactionHash,

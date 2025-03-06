@@ -1,7 +1,7 @@
 import { hexToBytes as hexToBytesNoble } from '@noble/curves/abstract/utils';
 import { sha256 } from '@noble/hashes/sha256';
 
-import { MASK_31 } from '../constants';
+import { MASK_31 } from '../global/constants';
 import { BigNumberish } from '../types';
 import assert from './assert';
 import { addHexPrefix, buf2hex, removeHexPrefix } from './encode';
@@ -44,6 +44,14 @@ export function isHex(hex: string): boolean {
  */
 export function toBigInt(value: BigNumberish): bigint {
   return BigInt(value);
+}
+
+/**
+ * try to convert BigNumberish to bigint
+ * in case of undefined return undefined
+ */
+export function tryToBigInt(value: BigNumberish | undefined) {
+  return value ? BigInt(value) : undefined;
 }
 
 /**

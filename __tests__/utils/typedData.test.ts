@@ -17,7 +17,7 @@ import {
   type ArraySignatureType,
   type Signature,
 } from '../../src';
-import { PRIME } from '../../src/constants';
+import { PRIME } from '../../src/global/constants';
 import { getSelectorFromName } from '../../src/utils/hash';
 import { MerkleTree } from '../../src/utils/merkle';
 import {

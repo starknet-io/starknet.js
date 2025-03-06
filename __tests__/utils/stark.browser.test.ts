@@ -3,7 +3,7 @@
  */
 import { TextEncoder } from 'util';
 
-import * as constants from '../../src/constants';
+import * as constants from '../../src/global/constants';
 import * as json from '../../src/utils/json';
 
 const { IS_BROWSER } = constants;

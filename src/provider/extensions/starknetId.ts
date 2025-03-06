@@ -12,6 +12,7 @@ import {
   getStarknetIdPfpContract,
   getStarknetIdPopContract,
   getStarknetIdVerifierContract,
+  isStarkDomain,
   useDecoded,
   useEncoded,
 } from '../../utils/starknetId';
@@ -97,11 +98,17 @@ export class StarknetId {
     name: string,
     StarknetIdContract?: string
   ): Promise<string> {
+    const starkName = name.endsWith('.stark') ? name : `${name}.stark`;
+
+    if (!isStarkDomain(starkName)) {
+      throw new Error('Invalid domain, must be a valid .stark domain');
+    }
+
     const chainId = await provider.getChainId();
     const contract = StarknetIdContract ?? getStarknetIdContract(chainId);
 
     try {
-      const encodedDomain = name
+      const encodedDomain = starkName
         .replace('.stark', '')
         .split('.')
         .map((part) => useEncoded(part).toString(10));

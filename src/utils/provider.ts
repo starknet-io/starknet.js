@@ -1,4 +1,4 @@
-import { NetworkName, RPC_NODES } from '../constants';
+import { NetworkName, RPC_NODES, SupportedRpcVersion } from '../global/constants';
 import {
   BlockIdentifier,
   BlockTag,
@@ -14,7 +14,6 @@ import {
   StateUpdateResponse,
   V3TransactionDetails,
 } from '../types';
-import { ETransactionVersion } from '../types/api';
 import { isSierra } from './contract';
 import { formatSpaces } from './hash';
 import { parse, stringify } from './json';
@@ -22,7 +21,9 @@ import { isHex, toHex } from './num';
 import { isDecimalString } from './shortString';
 import { isBigInt, isNumber, isString } from './typed';
 import { compressProgram } from './stark';
-import type { GetTransactionReceiptResponse } from './transactionReceipt';
+import type { GetTransactionReceiptResponse } from './transactionReceipt/transactionReceipt.type';
+import { logger } from '../global/logger';
+import { ETransactionVersion } from '../provider/types/spec.type';
 
 /**
  * Helper - Async Sleep for 'delay' time
@@ -121,8 +122,7 @@ export function parseContract(contract: CompiledContract | string): ContractClas
  */
 export const getDefaultNodeUrl = (networkName?: NetworkName, mute: boolean = false): string => {
   if (!mute) {
-    // eslint-disable-next-line no-console
-    console.warn('Using default public node url, please provide nodeUrl in provider options!');
+    logger.info('Using default public node url, please provide nodeUrl in provider options!');
   }
   const nodes = RPC_NODES[networkName ?? NetworkName.SN_SEPOLIA];
   const randIdx = Math.floor(Math.random() * nodes.length);
@@ -288,7 +288,7 @@ export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3Trans
 /**
  * Determines if the given response matches the specified version.
  *
- * @param {('0.5' | '0.6' | '0.7')} version The version to compare against the response.
+ * @param {SupportedRpcVersion} version The version to compare against the response.
  * @param {string} response The response to check against the version.
  * @returns {boolean} True if the response matches the version, false otherwise.
  * @example
@@ -297,11 +297,16 @@ export function isV3Tx(details: InvocationsDetailsWithNonce): details is V3Trans
  * // result = false
  * ```
  */
-export function isVersion(version: '0.5' | '0.6' | '0.7', response: string): boolean {
+export function isVersion(version: SupportedRpcVersion, response: string): boolean {
   const [majorS, minorS] = version.split('.');
   const [majorR, minorR] = response.split('.');
 
   return majorS === majorR && minorS === minorR;
+}
+
+export function stringToSpecVersion(version: string) {
+  const [major, minor] = version.split('.');
+  return `${major}.${minor}` as SupportedRpcVersion;
 }
 
 /**

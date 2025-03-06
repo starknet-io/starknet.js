@@ -1,5 +1,6 @@
 import fs from 'node:fs';
 import path from 'node:path';
+
 import {
   Account,
   BigNumberish,
@@ -13,6 +14,7 @@ import {
   CompiledSierra,
   Contract,
   DeclareDeployUDCResponse,
+  ProviderInterface,
   RawArgsArray,
   RawArgsObject,
   cairo,
@@ -26,7 +28,13 @@ import {
   stark,
   types,
 } from '../src';
-import { TEST_TX_VERSION, contracts, getTestAccount, getTestProvider } from './config/fixtures';
+import {
+  contracts,
+  createTestProvider,
+  devnetFeeTokenAddress,
+  getTestAccount,
+  TEST_TX_VERSION,
+} from './config/fixtures';
 import { initializeMatcher } from './config/schema';
 
 const { uint256, tuple, isCairo1Abi } = cairo;
@@ -34,8 +42,14 @@ const { toHex } = num;
 const { starknetKeccak } = selector;
 
 describe('Cairo 1', () => {
-  const provider = getTestProvider();
-  const account = getTestAccount(provider);
+  let provider: ProviderInterface;
+  let account: Account;
+
+  beforeAll(async () => {
+    provider = await createTestProvider();
+    account = getTestAccount(provider);
+  });
+
   describe('API &  Contract interactions', () => {
     let dd: DeclareDeployUDCResponse;
     let cairo1Contract: Contract;
@@ -749,7 +763,7 @@ describe('Cairo 1', () => {
     });
   });
 
-  describe('Cairo1 Account contract', () => {
+  describe('Cairo1 Account contract - RPC 0.7 V2', () => {
     let accountC1: Account;
 
     beforeAll(async () => {
@@ -776,10 +790,9 @@ describe('Cairo 1', () => {
         calldata,
         0
       );
-      const devnetERC20Address =
-        '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
+
       const { transaction_hash } = await account.execute({
-        contractAddress: devnetERC20Address,
+        contractAddress: devnetFeeTokenAddress,
         entrypoint: 'transfer',
         calldata: {
           recipient: toBeAccountAddress,
@@ -864,7 +877,7 @@ describe('Cairo 1', () => {
       ];
       const tx = await provider.waitForTransaction(transaction_hash);
       const myEvents = eventContract.parseEvents(tx);
-      return expect(myEvents).toStrictEqual(shouldBe);
+      expect(myEvents[0]).toMatchEventStructure(shouldBe[0]);
     });
 
     test('parse event returning a nested struct', async () => {
@@ -882,7 +895,7 @@ describe('Cairo 1', () => {
       ];
       const tx = await provider.waitForTransaction(transaction_hash);
       const myEvents = eventContract.parseEvents(tx);
-      return expect(myEvents).toStrictEqual(shouldBe);
+      expect(myEvents[0]).toMatchEventStructure(shouldBe[0]);
     });
 
     test('parse tx returning multiple similar events', async () => {
@@ -928,7 +941,8 @@ describe('Cairo 1', () => {
       const { transaction_hash } = await account.execute([callData1, callData2]);
       const tx = await provider.waitForTransaction(transaction_hash);
       const myEvents = eventContract.parseEvents(tx);
-      return expect(myEvents).toStrictEqual(shouldBe);
+      expect(myEvents[0]).toMatchEventStructure(shouldBe[0]);
+      expect(myEvents[1]).toMatchEventStructure(shouldBe[1]);
     });
     test('parse tx returning multiple different events', async () => {
       const shouldBe: types.ParsedEvents = [
@@ -964,7 +978,8 @@ describe('Cairo 1', () => {
       const { transaction_hash } = await account.execute([callData1, callData2]);
       const tx = await provider.waitForTransaction(transaction_hash);
       const myEvents = eventContract.parseEvents(tx);
-      return expect(myEvents).toStrictEqual(shouldBe);
+      expect(myEvents[0]).toMatchEventStructure(shouldBe[0]);
+      expect(myEvents[1]).toMatchEventStructure(shouldBe[1]);
     });
 
     test('parsing nested events from Cairo components', () => {
@@ -1033,6 +1048,9 @@ describe('Cairo 1', () => {
             maker_source: 418413900385n,
             taker_source: 418413900385n,
           },
+          block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
+          block_number: 69198,
+          transaction_hash: '0x4e38fcce79c115b6fe2c486e3514efc1bd4da386b91c104e97230177d0bf181',
         },
       ]);
       // From component `DepositComponent`, event `Deposit` (same event name than next)
@@ -1085,6 +1103,9 @@ describe('Cairo 1', () => {
             funder: 1466771120193999006693452314154095230636738457276435850562375218974960297344n,
             amount: 4956000000000000n,
           },
+          block_hash: '0x31afd649a5042cb1855ce820708a555eab62fe6ea07a2a538fa9100cdc80383',
+          block_number: 69198,
+          transaction_hash: '0x7768860d79bfb4c8463d215abea3c267899e373407c6882077f7447051c50de',
         },
       ]);
       const parsedEventNestedDeposit2 = events.parseEvents(
@@ -1101,6 +1122,9 @@ describe('Cairo 1', () => {
             funder: 1466771120193999006693452314154095230636738457276435850562375218974960297344n,
             amount: 4956000000000000n,
           },
+          block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
+          block_number: 69198,
+          transaction_hash: '0x2d5210e5334a83306abe6f7f5e7e65cd1feed72ad3b8e359a2f4614fa948e1d',
         },
       ]);
 
@@ -1125,6 +1149,9 @@ describe('Cairo 1', () => {
             to: 2087021424722619777119509474943472645767659996348769578120564519014510906823n,
             value: 4956000000000000n,
           },
+          block_hash: '0x39f27ab4cd508ab99e818512b261a7e4ae01072eb4ec8bb86aeb64755f99f2c',
+          block_number: 69198,
+          transaction_hash: '0x2da31a929a9848e9630906275a75a531e1718d4830501e10b0bccacd55f6fe0',
         },
       ]);
     });
