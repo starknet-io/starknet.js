@@ -363,22 +363,27 @@ describe('deploy and test Wallet', () => {
     expect(balance.low).toStrictEqual(toBigInt(990));
   });
 
-  // TODO: @penovicp this is your space, for some reson this return Object, disabled at the moment
-  xtest('execute with and without deprecated abis parameter', async () => {
+  test('execute with and without deprecated abis parameter', async () => {
     const transaction = {
       contractAddress: erc20Address,
       entrypoint: 'transfer',
       calldata: [erc20.address, '10', '0'],
     };
-    const details = { maxFee: 0n };
+    const details: Parameters<(typeof account)['execute']>[2] = { nonce: 0 };
 
-    const error1: RpcError = await account.execute(transaction, details).catch((e) => e);
+    let error1: RpcError | undefined;
+    // eslint-disable-next-line no-return-assign
+    await account.execute(transaction, details).catch((e) => (error1 = e));
+    expect(error1).toBeDefined();
     expect(error1).toBeInstanceOf(RpcError);
-    expect(error1.isType('INSUFFICIENT_MAX_FEE')).toBe(true);
+    expect(error1!.isType('TRANSACTION_EXECUTION_ERROR')).toBe(true);
 
-    const error2: RpcError = await account.execute(transaction, undefined, details).catch((e) => e);
+    let error2: RpcError | undefined;
+    // eslint-disable-next-line no-return-assign
+    await account.execute(transaction, undefined, details).catch((e) => (error2 = e));
+    expect(error2).toBeDefined();
     expect(error2).toBeInstanceOf(RpcError);
-    expect(error2.isType('INSUFFICIENT_MAX_FEE')).toBe(true);
+    expect(error2!.isType('TRANSACTION_EXECUTION_ERROR')).toBe(true);
   });
 
   test('execute with custom nonce', async () => {
