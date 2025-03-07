@@ -116,17 +116,14 @@ export const DEFAULT_GLOBAL_CONFIG: {
   },
 };
 
-const vToUrl = (versionString: SupportedRpcVersion) =>
-  `v${versionString.replace(/^v/, '').replace(/\./g, '_')}`;
-
-export const RPC_NODES = {
+export const RPC_DEFAULT_NODES = {
   SN_MAIN: [
-    `https://starknet-mainnet.public.blastapi.io/rpc/${vToUrl(DEFAULT_GLOBAL_CONFIG.rpcVersion)}`,
-    `https://free-rpc.nethermind.io/mainnet-juno/${vToUrl(DEFAULT_GLOBAL_CONFIG.rpcVersion)}`,
+    `https://starknet-mainnet.public.blastapi.io/rpc/`,
+    `https://free-rpc.nethermind.io/mainnet-juno/`,
   ],
   SN_SEPOLIA: [
-    `https://starknet-sepolia.public.blastapi.io/rpc/${vToUrl(DEFAULT_GLOBAL_CONFIG.rpcVersion)}`,
-    `https://free-rpc.nethermind.io/sepolia-juno/${vToUrl(DEFAULT_GLOBAL_CONFIG.rpcVersion)}`,
+    `https://starknet-sepolia.public.blastapi.io/rpc/`,
+    `https://free-rpc.nethermind.io/sepolia-juno/`,
   ],
 } as const;
 

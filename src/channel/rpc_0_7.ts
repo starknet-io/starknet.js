@@ -82,11 +82,11 @@ export class RpcChannel {
       waitMode,
     } = optionsOrProvider || {};
     if (Object.values(NetworkName).includes(nodeUrl as NetworkName)) {
-      this.nodeUrl = getDefaultNodeUrl(nodeUrl as NetworkName, optionsOrProvider?.default);
+      this.nodeUrl = getDefaultNodeUrl(nodeUrl as NetworkName, optionsOrProvider?.default, '0.7');
     } else if (nodeUrl) {
       this.nodeUrl = nodeUrl;
     } else {
-      this.nodeUrl = getDefaultNodeUrl(undefined, optionsOrProvider?.default);
+      this.nodeUrl = getDefaultNodeUrl(undefined, optionsOrProvider?.default, '0.7');
     }
     this.baseFetch = baseFetch ?? fetch;
     this.blockIdentifier = blockIdentifier ?? defaultOptions.blockIdentifier;

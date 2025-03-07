@@ -1,4 +1,4 @@
-import { NetworkName, RPC_NODES, SupportedRpcVersion } from '../global/constants';
+import { NetworkName, RPC_DEFAULT_NODES, SupportedRpcVersion } from '../global/constants';
 import {
   BlockIdentifier,
   BlockTag,
@@ -24,6 +24,7 @@ import { compressProgram } from './stark';
 import type { GetTransactionReceiptResponse } from './transactionReceipt/transactionReceipt.type';
 import { logger } from '../global/logger';
 import { ETransactionVersion } from '../provider/types/spec.type';
+import { config } from '../global/config';
 
 /**
  * Helper - Async Sleep for 'delay' time
@@ -120,14 +121,38 @@ export function parseContract(contract: CompiledContract | string): ContractClas
  * // result = "https://starknet-mainnet.public.blastapi.io/rpc/v0_7"
  * ```
  */
-export const getDefaultNodeUrl = (networkName?: NetworkName, mute: boolean = false): string => {
+export const getDefaultNodeUrl = (
+  networkName?: NetworkName,
+  mute: boolean = false,
+  rpcVersion?: SupportedRpcVersion
+): string => {
   if (!mute) {
     logger.info('Using default public node url, please provide nodeUrl in provider options!');
   }
-  const nodes = RPC_NODES[networkName ?? NetworkName.SN_SEPOLIA];
+  const rpcNodes = getDefaultNodes(rpcVersion ?? config.get('rpcVersion'));
+
+  const nodes = rpcNodes[networkName ?? NetworkName.SN_SEPOLIA];
   const randIdx = Math.floor(Math.random() * nodes.length);
   return nodes[randIdx];
 };
+
+/**
+ * return Defaults RPC Nodes endpoints
+ */
+export function getDefaultNodes(rpcVersion: SupportedRpcVersion) {
+  const vToUrl = (versionString: SupportedRpcVersion) =>
+    `v${versionString.replace(/^v/, '').replace(/\./g, '_')}`;
+
+  const nodes: any = { ...RPC_DEFAULT_NODES };
+
+  Object.keys(nodes).forEach(function (key, _) {
+    nodes[key] = nodes[key].map((it: any) => {
+      return `${it}${vToUrl(rpcVersion)}`;
+    });
+  });
+
+  return nodes;
+}
 
 export const validBlockTags = Object.values(BlockTag);
 
