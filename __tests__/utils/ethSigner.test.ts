@@ -24,8 +24,9 @@ import {
   contracts,
   createTestProvider,
   describeIfDevnet,
-  devnetETHtokenAddress,
+  ETHtokenAddress,
   getTestAccount,
+  STRKtokenAddress,
 } from '../config/fixtures';
 
 describe('Ethereum signer', () => {
@@ -150,7 +151,7 @@ describe('Ethereum signer', () => {
         await ethAccount.estimateAccountDeployFee(deployPayload);
       // fund account with ETH
       const { transaction_hash } = await account.execute({
-        contractAddress: devnetETHtokenAddress,
+        contractAddress: ETHtokenAddress,
         entrypoint: 'transfer',
         calldata: {
           recipient: contractETHAccountAddress,
@@ -168,7 +169,7 @@ describe('Ethereum signer', () => {
     });
 
     test('ETH account transaction V2', async () => {
-      const ethContract2 = new Contract(contracts.Erc20.abi, devnetETHtokenAddress, ethAccount);
+      const ethContract2 = new Contract(contracts.Erc20.abi, ETHtokenAddress, ethAccount);
       const respTransfer = await ethContract2
         .withOptions({ maxFee: 1 * 10 ** 16 })
         .transfer(account.address, cairo.uint256(1 * 10 ** 4));
@@ -203,8 +204,6 @@ describe('Ethereum signer', () => {
     let provider: Provider;
     let account: Account;
     let ethAccount: Account;
-    const devnetSTRKtokenAddress =
-      '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d';
 
     beforeAll(async () => {
       provider = new Provider(await createTestProvider());
@@ -250,7 +249,7 @@ describe('Ethereum signer', () => {
       });
       // fund account with STRK
       const { transaction_hash } = await account.execute({
-        contractAddress: devnetSTRKtokenAddress,
+        contractAddress: STRKtokenAddress,
         entrypoint: 'transfer',
         calldata: {
           recipient: contractETHAccountAddress,
@@ -281,7 +280,7 @@ describe('Ethereum signer', () => {
     });
 
     test('ETH account transaction V3', async () => {
-      const strkContract2 = new Contract(contracts.Erc20.abi, devnetSTRKtokenAddress, ethAccount);
+      const strkContract2 = new Contract(contracts.Erc20.abi, STRKtokenAddress, ethAccount);
       const txCallData = strkContract2.populate('transfer', [
         account.address,
         cairo.uint256(1 * 10 ** 4),

@@ -2,7 +2,7 @@ import { WebSocket } from 'isows';
 
 import { Provider, WSSubscriptions, WebSocketChannel } from '../src';
 import { StarknetChainId } from '../src/global/constants';
-import { getTestAccount, getTestProvider } from './config/fixtures';
+import { getTestAccount, getTestProvider, STRKtokenAddress, TEST_WS_URL } from './config/fixtures';
 
 const nodeUrl = 'wss://sepolia-pathfinder-rpc.spaceshard.io/rpc/v0_8';
 
@@ -15,7 +15,7 @@ describe('websocket specific endpoints - pathfinder test', () => {
   let webSocketChannel: WebSocketChannel;
 
   beforeAll(async () => {
-    webSocketChannel = new WebSocketChannel({ nodeUrl });
+    webSocketChannel = new WebSocketChannel({ nodeUrl: TEST_WS_URL });
     expect(webSocketChannel.isConnected()).toBe(false);
     try {
       await webSocketChannel.waitForConnection();
@@ -122,7 +122,7 @@ describe('websocket specific endpoints - pathfinder test', () => {
 
   test('Test subscribeTransactionStatus', async () => {
     const { transaction_hash } = await account.execute({
-      contractAddress: '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
+      contractAddress: STRKtokenAddress,
       entrypoint: 'transfer',
       calldata: [account.address, '10', '0'],
     });
@@ -147,11 +147,8 @@ describe('websocket specific endpoints - pathfinder test', () => {
   });
 
   test('Test subscribeTransactionStatus and block_id', async () => {
-    const latestBlock = await account.getBlockLatestAccepted();
-    const blockId = latestBlock.block_number - 5;
-
     const { transaction_hash } = await account.execute({
-      contractAddress: '0x04718f5a0fc34cc1af16a1cdee98ffb20c31f5cd61d6ab07201858f4287c938d',
+      contractAddress: STRKtokenAddress,
       entrypoint: 'transfer',
       calldata: [account.address, '10', '0'],
     });
@@ -167,7 +164,7 @@ describe('websocket specific endpoints - pathfinder test', () => {
       }
     };
 
-    const subid = await webSocketChannel.subscribeTransactionStatus(transaction_hash, blockId);
+    const subid = await webSocketChannel.subscribeTransactionStatus(transaction_hash);
     expect(subid).toEqual(expect.any(Number));
     const expectedId = webSocketChannel.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS);
     const subscriptionId = await webSocketChannel.waitForUnsubscription(expectedId);

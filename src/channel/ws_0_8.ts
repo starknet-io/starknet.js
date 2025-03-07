@@ -505,12 +505,9 @@ export class WebSocketChannel {
   /**
    * subscribe to transaction status
    */
-  public async subscribeTransactionStatus(
-    transactionHash: BigNumberish,
-    blockIdentifier?: SubscriptionBlockIdentifier
-  ) {
+  public async subscribeTransactionStatus(transactionHash: BigNumberish) {
     if (this.subscriptions.get(WSSubscriptions.TRANSACTION_STATUS)) return false;
-    const subId = await this.subscribeTransactionStatusUnmanaged(transactionHash, blockIdentifier);
+    const subId = await this.subscribeTransactionStatusUnmanaged(transactionHash);
     this.subscriptions.set(WSSubscriptions.TRANSACTION_STATUS, subId);
     return subId;
   }

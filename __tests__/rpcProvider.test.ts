@@ -27,7 +27,7 @@ import {
   describeIfNotDevnet,
   describeIfRpc,
   describeIfTestnet,
-  devnetETHtokenAddress,
+  ETHtokenAddress,
   getTestAccount,
   waitNextBlock,
 } from './config/fixtures';
@@ -290,7 +290,7 @@ describeIfRpc('RPCProvider', () => {
     beforeAll(async () => {
       // add a Tx to be sure to have at least one Tx in the last block
       const { transaction_hash } = await account.execute({
-        contractAddress: devnetETHtokenAddress,
+        contractAddress: ETHtokenAddress,
         entrypoint: 'transfer',
         calldata: {
           recipient: account.address,

@@ -87,6 +87,7 @@ class StrategyResolver {
       TEST_ACCOUNT_PRIVATE_KEY: '****',
       INITIAL_BALANCE: process.env.INITIAL_BALANCE,
       TEST_RPC_URL: process.env.TEST_RPC_URL,
+      TEST_WS_URL: process.env.TEST_WS_URL,
       TX_VERSION: process.env.TX_VERSION,
       SPEC_VERSION: process.env.SPEC_VERSION,
     });

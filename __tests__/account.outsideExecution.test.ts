@@ -23,10 +23,9 @@ import {
 } from '../src';
 import { getSelectorFromName } from '../src/utils/hash';
 import { getDecimalString } from '../src/utils/num';
-import { contracts, createTestProvider, getTestAccount } from './config/fixtures';
+import { contracts, createTestProvider, ETHtokenAddress, getTestAccount } from './config/fixtures';
 
 describe('Account and OutsideExecution', () => {
-  const ethAddress = '0x49D36570D4E46F48E99674BD3FCC84644DDD6B96F7C741B1562B82F9E004DC7';
   let provider: Provider;
   let executorAccount: Account;
   let signerAccount: Account;
@@ -40,7 +39,7 @@ describe('Account and OutsideExecution', () => {
     provider = new Provider(await createTestProvider());
     executorAccount = getTestAccount(provider);
     recipientAccount = executorAccount;
-    ethContract = new Contract(contracts.Erc20OZ.sierra.abi, ethAddress, provider);
+    ethContract = new Contract(contracts.Erc20OZ.sierra.abi, ETHtokenAddress, provider);
 
     // Deploy the SNIP-9 signer account (ArgentX v 0.4.0, using SNIP-9 v2):
     const calldataAX = new CallData(contracts.ArgentX4Account.sierra.abi);
@@ -61,7 +60,7 @@ describe('Account and OutsideExecution', () => {
 
     // Transfer dust of ETH token to the signer account
     const transferCall = {
-      contractAddress: ethAddress,
+      contractAddress: ETHtokenAddress,
       entrypoint: 'transfer',
       calldata: {
         recipient: signerAccount.address,
@@ -245,7 +244,7 @@ describe('Account and OutsideExecution', () => {
       caller: 'ANY_CALLER',
     };
     const call1: Call = {
-      contractAddress: ethAddress,
+      contractAddress: ETHtokenAddress,
       entrypoint: 'transfer',
       calldata: {
         recipient: recipientAccount.address,
@@ -253,7 +252,7 @@ describe('Account and OutsideExecution', () => {
       },
     };
     const call2: Call = {
-      contractAddress: ethAddress,
+      contractAddress: ETHtokenAddress,
       entrypoint: 'transfer',
       calldata: {
         recipient: recipientAccount.address,
@@ -261,7 +260,7 @@ describe('Account and OutsideExecution', () => {
       },
     };
     const call3: Call = {
-      contractAddress: ethAddress,
+      contractAddress: ETHtokenAddress,
       entrypoint: 'transfer',
       calldata: {
         recipient: recipientAccount.address,
@@ -269,7 +268,7 @@ describe('Account and OutsideExecution', () => {
       },
     };
     const call4: Call = {
-      contractAddress: ethAddress,
+      contractAddress: ETHtokenAddress,
       entrypoint: 'transfer',
       calldata: {
         recipient: recipientAccount.address,
@@ -293,7 +292,7 @@ describe('Account and OutsideExecution', () => {
     expect(outsideTransaction1.outsideExecution.execute_before).toBe(hour_later);
     expect(outsideTransaction1.outsideExecution.calls).toEqual([
       {
-        to: ethAddress,
+        to: ETHtokenAddress,
         selector: '0x83afd3f4caedc6eebf44246fe54e38c95e3179a5ec9ea81740eca5b482d12e',
         calldata: [getDecimalString(recipientAccount.address), '300', '0'],
       },
@@ -305,12 +304,12 @@ describe('Account and OutsideExecution', () => {
     );
     expect(outsideTransaction2.outsideExecution.calls).toEqual([
       {
-        to: ethAddress,
+        to: ETHtokenAddress,
         selector: '0x83afd3f4caedc6eebf44246fe54e38c95e3179a5ec9ea81740eca5b482d12e',
         calldata: [getDecimalString(recipientAccount.address), '100', '0'],
       },
       {
-        to: ethAddress,
+        to: ETHtokenAddress,
         selector: '0x83afd3f4caedc6eebf44246fe54e38c95e3179a5ec9ea81740eca5b482d12e',
         calldata: [getDecimalString(recipientAccount.address), '200', '0'],
       },
