@@ -2,7 +2,6 @@ import { RPC, RpcError } from '../../src';
 
 describe('Error utility tests', () => {
   test('RpcError', () => {
-    // TODO: @penovicp types 0.8 exporta u top level sve 0.7 exporta po komponentama, neznan jeli treba minjat test i mod da ocukuje oba tipa
     const baseError: RPC.RPCSPEC08.UNEXPECTED_ERROR = {
       code: 63,
       message: 'An unexpected error occurred',
