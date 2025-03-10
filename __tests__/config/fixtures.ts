@@ -81,6 +81,7 @@ const compiledContracts = {
 export const contracts = mapContractSets(compiledContracts);
 
 config.set('logLevel', 'DEBUG');
+config.set('legacyMode', true);
 
 export function getTestProvider(
   isProvider?: true,

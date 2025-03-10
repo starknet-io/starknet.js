@@ -133,4 +133,5 @@ export const SYSTEM_MESSAGES = {
     'You are using a deprecated transaction version (V0,V1,V2)!\nUpdate to the latest V3 transactions!',
   legacyTxRPC08Message: 'RPC 0.8 do not support legacy transactions',
   SWOldV3: 'RPC 0.7 V3 tx (improper resource bounds) not supported in RPC 0.8',
+  nonLegacy: 'Using old transactions version while legacyMode is disabled',
 };

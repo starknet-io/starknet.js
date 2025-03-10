@@ -36,6 +36,7 @@ import { Block, getDefaultNodeUrl, isV3Tx, wait } from '../utils/provider';
 import { decompressProgram, signatureToHexArray } from '../utils/stark';
 import { getVersionsByType } from '../utils/transaction';
 import { logger } from '../global/logger';
+import { config } from '../global/config';
 
 const defaultOptions = {
   headers: { 'Content-Type': 'application/json' },
@@ -484,10 +485,14 @@ export class RpcChannel {
         },
       });
 
-      logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
-        version: RPC.ETransactionVersion.V1,
-        type: RPC.ETransactionType.INVOKE,
-      });
+      if (config.get('legacyMode')) {
+        logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
+          version: RPC.ETransactionVersion.V1,
+          type: RPC.ETransactionType.INVOKE,
+        });
+      } else {
+        throw Error(SYSTEM_MESSAGES.nonLegacy);
+      }
     } else {
       // V3
       promise = this.fetchEndpoint('starknet_addInvokeTransaction', {
@@ -534,10 +539,14 @@ export class RpcChannel {
         },
       });
 
-      logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
-        version: RPC.ETransactionVersion.V1,
-        type: RPC.ETransactionType.DECLARE,
-      });
+      if (config.get('legacyMode')) {
+        logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
+          version: RPC.ETransactionVersion.V1,
+          type: RPC.ETransactionType.DECLARE,
+        });
+      } else {
+        throw Error(SYSTEM_MESSAGES.nonLegacy);
+      }
     } else if (isSierra(contract) && !isV3Tx(details)) {
       // V2 Cairo1
       promise = this.fetchEndpoint('starknet_addDeclareTransaction', {
@@ -558,10 +567,14 @@ export class RpcChannel {
         },
       });
 
-      logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
-        version: RPC.ETransactionVersion.V2,
-        type: RPC.ETransactionType.DECLARE,
-      });
+      if (config.get('legacyMode')) {
+        logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
+          version: RPC.ETransactionVersion.V2,
+          type: RPC.ETransactionType.DECLARE,
+        });
+      } else {
+        throw Error(SYSTEM_MESSAGES.nonLegacy);
+      }
     } else if (isSierra(contract) && isV3Tx(details)) {
       // V3 Cairo1
       promise = this.fetchEndpoint('starknet_addDeclareTransaction', {
@@ -613,10 +626,14 @@ export class RpcChannel {
         },
       });
 
-      logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
-        version: RPC.ETransactionVersion.V1,
-        type: RPC.ETransactionType.DEPLOY_ACCOUNT,
-      });
+      if (config.get('legacyMode')) {
+        logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
+          version: RPC.ETransactionVersion.V1,
+          type: RPC.ETransactionType.DEPLOY_ACCOUNT,
+        });
+      } else {
+        throw Error(SYSTEM_MESSAGES.nonLegacy);
+      }
     } else {
       // v3
       promise = this.fetchEndpoint('starknet_addDeployAccountTransaction', {
@@ -706,10 +723,14 @@ export class RpcChannel {
         max_fee: toHex(invocation.maxFee || 0),
       };
 
-      logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
-        version: invocation.version,
-        type: invocation.type,
-      });
+      if (config.get('legacyMode')) {
+        logger.warn(SYSTEM_MESSAGES.legacyTxWarningMessage, {
+          version: invocation.version,
+          type: invocation.type,
+        });
+      } else {
+        throw Error(SYSTEM_MESSAGES.nonLegacy);
+      }
     } else {
       // V3
       details = {
