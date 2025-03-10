@@ -1,3 +1,15 @@
+# [7.0.0-beta.2](https://github.com/starknet-io/starknet.js/compare/v7.0.0-beta.1...v7.0.0-beta.2) (2025-03-10)
+
+### Bug Fixes
+
+- contract withOptions Fix/1252 ([#1255](https://github.com/starknet-io/starknet.js/issues/1255)) ([b59952e](https://github.com/starknet-io/starknet.js/commit/b59952e74baf82641d6028c96625db104049c02e))
+- update ws impl, add TEST_WS_URL, update token constants ([411eeec](https://github.com/starknet-io/starknet.js/commit/411eeec1df6a38358f28612260066b38fc942957))
+
+### Features
+
+- the WebSockets ([#1251](https://github.com/starknet-io/starknet.js/issues/1251)) ([fabca27](https://github.com/starknet-io/starknet.js/commit/fabca27a7a3e398030a99cf8d78bffa51cebfe9a)), closes [#1272](https://github.com/starknet-io/starknet.js/issues/1272)
+- v7 fee, new methods, tests ([#1337](https://github.com/starknet-io/starknet.js/issues/1337)) ([00743de](https://github.com/starknet-io/starknet.js/commit/00743de2cad5375a558844646f11b4adef15188b))
+
 # [7.0.0-beta.1](https://github.com/starknet-io/starknet.js/compare/v6.24.0-beta.1...v7.0.0-beta.1) (2025-03-04)
 
 - Implement RPC 0.8 and V3 transactions ([#1328](https://github.com/starknet-io/starknet.js/issues/1328)) ([316ae27](https://github.com/starknet-io/starknet.js/commit/316ae2789376368dcffe653ce4817eebf0a63d97))
