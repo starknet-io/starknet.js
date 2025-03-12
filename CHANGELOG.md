@@ -18,6 +18,13 @@
 
 - Library defaults to RPC 0.8 with the corresponding API changes, dropped RPC 0.6 support
 
+# [6.24.0](https://github.com/starknet-io/starknet.js/compare/v6.23.1...v6.24.0) (2025-03-12)
+
+### Features
+
+- add simulate and estimate fee utility methods for outside execution ([#1327](https://github.com/starknet-io/starknet.js/issues/1327)) ([3668b01](https://github.com/starknet-io/starknet.js/commit/3668b01c4f63969bb0770ee6120fe3eac72d0335))
+- implement cairo fixed array support ([#1310](https://github.com/starknet-io/starknet.js/issues/1310)) ([45df63e](https://github.com/starknet-io/starknet.js/commit/45df63e7bb7f7cb2de2e98900387b1c44a95f257))
+
 ## [6.23.1](https://github.com/starknet-io/starknet.js/compare/v6.23.0...v6.23.1) (2025-02-05)
 
 ### Bug Fixes

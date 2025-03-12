@@ -40,6 +40,7 @@ export * from './utils/batch';
 export * from './utils/responseParser';
 export * from './utils/cairoDataTypes/uint256';
 export * from './utils/cairoDataTypes/uint512';
+export * from './utils/cairoDataTypes/fixedArray';
 export * from './utils/address';
 export * from './utils/calldata';
 export * from './utils/calldata/enum';

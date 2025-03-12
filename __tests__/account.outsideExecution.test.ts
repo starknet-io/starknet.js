@@ -10,16 +10,20 @@ import {
   constants,
   Contract,
   ec,
+  num,
   outsideExecution,
   OutsideExecutionVersion,
   Provider,
   src5,
   stark,
+  TransactionType,
   type Call,
   type Calldata,
+  type Invocations,
   type OutsideExecutionOptions,
   type OutsideTransaction,
   type TypedData,
+  type WeierstrassSignatureType,
 } from '../src';
 import { getSelectorFromName } from '../src/utils/hash';
 import { getDecimalString } from '../src/utils/num';
@@ -29,17 +33,43 @@ describe('Account and OutsideExecution', () => {
   let provider: Provider;
   let executorAccount: Account;
   let signerAccount: Account;
+
   const targetPK = stark.randomAddress();
   const targetPubK = ec.starkCurve.getStarkKey(targetPK);
+
   // For ERC20 transfer outside call
   let recipientAccount: Account;
   let ethContract: Contract;
+
+  let call1: Call;
+  let call2: Call;
+
+  const now_seconds = Math.floor(Date.now() / 1000);
+  const hour_ago = (now_seconds - 3600).toString();
+  const hour_later = (now_seconds + 3600).toString();
 
   beforeAll(async () => {
     provider = new Provider(await createTestProvider());
     executorAccount = getTestAccount(provider);
     recipientAccount = executorAccount;
     ethContract = new Contract(contracts.Erc20OZ.sierra.abi, ETHtokenAddress, provider);
+
+    call1 = {
+      contractAddress: ETHtokenAddress,
+      entrypoint: 'transfer',
+      calldata: {
+        recipient: recipientAccount.address,
+        amount: cairo.uint256(100),
+      },
+    };
+    call2 = {
+      contractAddress: ETHtokenAddress,
+      entrypoint: 'transfer',
+      calldata: {
+        recipient: recipientAccount.address,
+        amount: cairo.uint256(200),
+      },
+    };
 
     // Deploy the SNIP-9 signer account (ArgentX v 0.4.0, using SNIP-9 v2):
     const calldataAX = new CallData(contracts.ArgentX4Account.sierra.abi);
@@ -64,7 +94,7 @@ describe('Account and OutsideExecution', () => {
       entrypoint: 'transfer',
       calldata: {
         recipient: signerAccount.address,
-        amount: cairo.uint256(1000),
+        amount: cairo.uint256(1300),
       },
     };
     const { transaction_hash } = await executorAccount.execute(transferCall);
@@ -72,30 +102,14 @@ describe('Account and OutsideExecution', () => {
   });
 
   test('getOutsideCall', async () => {
-    const call1: Call = {
-      contractAddress: '0x0123',
-      entrypoint: 'transfer',
-      calldata: {
-        recipient: '0xabcd',
-        amount: cairo.uint256(10),
-      },
-    };
     expect(outsideExecution.getOutsideCall(call1)).toEqual({
-      to: '0x0123',
+      to: ETHtokenAddress,
       selector: getSelectorFromName(call1.entrypoint),
-      calldata: ['43981', '10', '0'],
+      calldata: [num.hexToDecimalString(recipientAccount.address), '100', '0'],
     });
   });
 
   test('Build SNIP-9 v2 TypedData', async () => {
-    const call1: Call = {
-      contractAddress: '0x0123',
-      entrypoint: 'transfer',
-      calldata: {
-        recipient: '0xabcd',
-        amount: cairo.uint256(10),
-      },
-    };
     const callOptions: OutsideExecutionOptions = {
       caller: '0x1234',
       execute_after: 100,
@@ -119,9 +133,9 @@ describe('Account and OutsideExecution', () => {
         Caller: '0x1234',
         Calls: [
           {
-            Calldata: ['43981', '10', '0'],
-            Selector: '0x83afd3f4caedc6eebf44246fe54e38c95e3179a5ec9ea81740eca5b482d12e',
-            To: '0x0123',
+            Calldata: [num.hexToDecimalString(recipientAccount.address), '100', '0'],
+            Selector: getSelectorFromName(call1.entrypoint),
+            To: ETHtokenAddress,
           },
         ],
         'Execute After': 100,
@@ -220,6 +234,48 @@ describe('Account and OutsideExecution', () => {
     ]);
   });
 
+  test('buildExecuteFromOutsideCall', async () => {
+    const callOptions: OutsideExecutionOptions = {
+      caller: executorAccount.address,
+      execute_after: hour_ago,
+      execute_before: hour_later,
+    };
+    const outsideTransaction1: OutsideTransaction = await signerAccount.getOutsideTransaction(
+      callOptions,
+      [call1, call2]
+    );
+    const outsideExecutionCall: Call[] =
+      outsideExecution.buildExecuteFromOutsideCall(outsideTransaction1);
+    expect(outsideExecutionCall).toEqual([
+      {
+        calldata: [
+          num.hexToDecimalString(recipientAccount.address),
+          num.hexToDecimalString(outsideTransaction1.outsideExecution.nonce as string),
+          outsideTransaction1.outsideExecution.execute_after.toString(),
+          outsideTransaction1.outsideExecution.execute_before.toString(),
+          '2',
+          '2087021424722619777119509474943472645767659996348769578120564519014510906823',
+          '232670485425082704932579856502088130646006032362877466777181098476241604910',
+          '3',
+          num.hexToDecimalString(recipientAccount.address),
+          '100',
+          '0',
+          '2087021424722619777119509474943472645767659996348769578120564519014510906823',
+          '232670485425082704932579856502088130646006032362877466777181098476241604910',
+          '3',
+          num.hexToDecimalString(recipientAccount.address),
+          '200',
+          '0',
+          '2',
+          (outsideTransaction1.signature as WeierstrassSignatureType).r.toString(),
+          (outsideTransaction1.signature as WeierstrassSignatureType).s.toString(),
+        ],
+        contractAddress: signerAccount.address,
+        entrypoint: 'execute_from_outside_v2',
+      },
+    ]);
+  });
+
   test('Signer account should support SNIP-9 v2', async () => {
     expect(await signerAccount.getSnip9Version()).toBe(OutsideExecutionVersion.V2);
   });
@@ -231,9 +287,6 @@ describe('Account and OutsideExecution', () => {
   });
 
   test('should build and execute outside transactions', async () => {
-    const now_seconds = Math.floor(Date.now() / 1000);
-    const hour_ago = (now_seconds - 3600).toString();
-    const hour_later = (now_seconds + 3600).toString();
     const callOptions: OutsideExecutionOptions = {
       caller: executorAccount.address,
       execute_after: hour_ago,
@@ -242,22 +295,6 @@ describe('Account and OutsideExecution', () => {
     const callOptions4: OutsideExecutionOptions = {
       ...callOptions,
       caller: 'ANY_CALLER',
-    };
-    const call1: Call = {
-      contractAddress: ETHtokenAddress,
-      entrypoint: 'transfer',
-      calldata: {
-        recipient: recipientAccount.address,
-        amount: cairo.uint256(100),
-      },
-    };
-    const call2: Call = {
-      contractAddress: ETHtokenAddress,
-      entrypoint: 'transfer',
-      calldata: {
-        recipient: recipientAccount.address,
-        amount: cairo.uint256(200),
-      },
     };
     const call3: Call = {
       contractAddress: ETHtokenAddress,
@@ -329,6 +366,51 @@ describe('Account and OutsideExecution', () => {
     expect(bal1 - bal2).toBe(700n);
     expect(await signerAccount.isValidSnip9Nonce(outsideTransaction3.outsideExecution.nonce)).toBe(
       false
+    );
+  });
+
+  test('estimate fees / simulate outsideExecution', async () => {
+    const callOptions: OutsideExecutionOptions = {
+      caller: executorAccount.address,
+      execute_after: hour_ago,
+      execute_before: hour_later,
+    };
+    const outsideTransaction: OutsideTransaction = await signerAccount.getOutsideTransaction(
+      callOptions,
+      [call1, call2]
+    );
+    const outsideExecutionCall: Call[] =
+      outsideExecution.buildExecuteFromOutsideCall(outsideTransaction);
+    const estimateFee = await executorAccount.estimateFee(outsideExecutionCall);
+    expect(Object.keys(estimateFee).sort()).toEqual(
+      [
+        'overall_fee',
+        'unit',
+        'suggestedMaxFee',
+        'resourceBounds',
+        'l1_gas_consumed',
+        'l1_data_gas_consumed',
+        'l1_data_gas_price',
+        'l1_gas_price',
+        'l2_gas_consumed',
+        'l2_gas_price',
+      ].sort()
+    );
+
+    const invocations: Invocations = [
+      {
+        type: TransactionType.INVOKE,
+        payload: outsideExecutionCall,
+      },
+    ];
+    const responseSimulate = await executorAccount.simulateTransaction(invocations);
+    expect(Object.keys(responseSimulate[0]).sort()).toEqual(
+      Object.keys({
+        transaction_trace: 0,
+        fee_estimation: 0,
+        suggestedMaxFee: 0,
+        resourceBounds: 0,
+      }).sort()
     );
   });
 
