@@ -1,9 +1,9 @@
 import { CallData } from './calldata';
-import { Call, type BigNumberish, type Calldata } from '../types/lib';
+import { Call, type AllowArray, type BigNumberish, type Calldata } from '../types/lib';
 import {
   OutsideExecutionTypesV1,
   OutsideExecutionTypesV2,
-  type OutsideExecutionVersion,
+  OutsideExecutionVersion,
   type OutsideCall,
   type OutsideExecutionOptions,
   type OutsideTransaction,
@@ -11,6 +11,7 @@ import {
 } from '../types';
 import { getSelectorFromName } from './hash/selector';
 import { formatSignature } from './stark';
+import { toHex } from './num';
 
 /**
  * Converts a Call object to an OutsideCall object that can be used for an Outside Execution.
@@ -136,7 +137,7 @@ export function getTypedData(
 }
 
 /**
- * Builds a CallData for the execute_from_outside() entrypoint.
+ * Builds a Calldata for the execute_from_outside() entrypoint.
  * @param {OutsideTransaction} outsideTransaction an object that contains all the data for a Outside Execution.
  * @returns {Calldata} The Calldata related to this Outside transaction
  * @example
@@ -166,4 +167,53 @@ export function buildExecuteFromOutsideCallData(outsideTransaction: OutsideTrans
     outside_execution: execution,
     signature: formattedSignature,
   });
+}
+
+/**
+ * Builds a Call for execute(), estimateFee() and simulateTransaction() functions.
+ * @param {AllowArray<OutsideTransaction>} outsideTransaction an object that contains all the data for an Outside Execution.
+ * @returns {Call[]} The Call related to this Outside transaction
+ * @example
+ * ```typescript
+ * const outsideTransaction: OutsideTransaction = {
+ *     outsideExecution: {
+ *      caller: '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691',
+ *      nonce: '0x7d0b4b4fce4b236e63d2bb5fc321935d52935cd3b268248cf9cf29c496bd0ae',
+ *      execute_after: 500, execute_before: 600,
+ *      calls: [{ to: '0x678', selector: '0x890', calldata: [12, 13] }],
+ *    },
+ *    signature: ['0x123', '0x456'],
+ *    signerAddress: '0x3b278ebae434f283f9340587a7f2dd4282658ac8e03cb9b0956db23a0a83657',
+ *    version: EOutsideExecutionVersion.V2,
+ *  };
+ *
+ *  const result: Call[] = outsideExecution.buildExecuteFromOutsideCall(outsideTransaction);
+ * // result = [{contractAddress: '0x64b48806902a367c8598f4f95c305e8c1a1acba5f082d294a43793113115691',
+ * //   entrypoint: 'execute_from_outside_v2',
+ * //   calldata: [ ... ],
+ * // }]
+ * ```
+ */
+export function buildExecuteFromOutsideCall(
+  outsideTransaction: AllowArray<OutsideTransaction>
+): Call[] {
+  const myOutsideTransactions = Array.isArray(outsideTransaction)
+    ? outsideTransaction
+    : [outsideTransaction];
+  const multiCall: Call[] = myOutsideTransactions.map((outsideTx: OutsideTransaction) => {
+    let entrypoint: string;
+    if (outsideTx.version === OutsideExecutionVersion.V1) {
+      entrypoint = 'execute_from_outside';
+    } else if (outsideTx.version === OutsideExecutionVersion.V2) {
+      entrypoint = 'execute_from_outside_v2';
+    } else {
+      throw new Error('Unsupported OutsideExecution version');
+    }
+    return {
+      contractAddress: toHex(outsideTx.signerAddress),
+      entrypoint,
+      calldata: buildExecuteFromOutsideCallData(outsideTx),
+    };
+  });
+  return multiCall;
 }
