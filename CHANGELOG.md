@@ -1,3 +1,10 @@
+# [7.0.0-beta.3](https://github.com/starknet-io/starknet.js/compare/v7.0.0-beta.2...v7.0.0-beta.3) (2025-03-13)
+
+### Features
+
+- add simulate and estimate fee utility methods for outside execution ([#1327](https://github.com/starknet-io/starknet.js/issues/1327)) ([3668b01](https://github.com/starknet-io/starknet.js/commit/3668b01c4f63969bb0770ee6120fe3eac72d0335))
+- implement cairo fixed array support ([#1310](https://github.com/starknet-io/starknet.js/issues/1310)) ([45df63e](https://github.com/starknet-io/starknet.js/commit/45df63e7bb7f7cb2de2e98900387b1c44a95f257))
+
 # [7.0.0-beta.2](https://github.com/starknet-io/starknet.js/compare/v7.0.0-beta.1...v7.0.0-beta.2) (2025-03-10)
 
 ### Bug Fixes
