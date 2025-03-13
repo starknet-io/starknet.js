@@ -10,6 +10,7 @@ import {
   EventEntry,
   ParsedStruct,
 } from '../../types';
+import { CairoFixedArray } from '../cairoDataTypes/fixedArray';
 import { CairoUint256 } from '../cairoDataTypes/uint256';
 import { CairoUint512 } from '../cairoDataTypes/uint512';
 import { addHexPrefix, removeHexPrefix } from '../encode';
@@ -128,6 +129,17 @@ function parseResponseValue(
       pending_word_len,
     };
     return stringFromByteArray(myByteArray);
+  }
+
+  // type fixed-array
+  if (CairoFixedArray.isTypeFixedArray(element.type)) {
+    const parsedDataArr: (BigNumberish | ParsedStruct | boolean | any[] | CairoEnum)[] = [];
+    const el: AbiEntry = { name: '', type: CairoFixedArray.getFixedArrayType(element.type) };
+    const arraySize = CairoFixedArray.getFixedArraySize(element.type);
+    while (parsedDataArr.length < arraySize) {
+      parsedDataArr.push(parseResponseValue(responseIterator, el, structs, enums));
+    }
+    return parsedDataArr;
   }
 
   // type c1 array
@@ -254,6 +266,9 @@ export default function responseParser(
       return parseResponseValue(responseIterator, output, structs, enums);
 
     case enums && isTypeEnum(type, enums):
+      return parseResponseValue(responseIterator, output, structs, enums);
+
+    case CairoFixedArray.isTypeFixedArray(type):
       return parseResponseValue(responseIterator, output, structs, enums);
 
     case isTypeArray(type):
