@@ -1,6 +1,5 @@
 import { BigNumberish } from '../../types';
 import { CallData } from '../../utils/calldata';
-import { decodeShortString } from '../../utils/shortString';
 import type { ProviderInterface } from '..';
 import { StarknetChainId } from '../../global/constants';
 import { useEncoded, useDecoded } from '../../utils/starknetId';
@@ -166,8 +165,8 @@ export class BrotherId {
         throw Error('Brother name not found');
       }
 
-      const domain = decodeShortString(primaryDomain[0]);
-      return `${domain}.brother`;
+      const encodedDomain = BigInt(primaryDomain[0]);
+      return decodeBrotherDomain(encodedDomain);
     } catch (e) {
       if (e instanceof Error && e.message === 'Brother name not found') {
         throw e;
@@ -244,7 +243,9 @@ export class BrotherId {
         throw Error('Brother profile not found');
       }
 
-      const domain = decodeShortString(primaryDomain[0]);
+      const encodedDomain = BigInt(primaryDomain[0]);
+      const decodedDomain = decodeBrotherDomain(encodedDomain);
+      const domain = decodedDomain.replace('.brother', '');
 
       const domainDetails = await provider.callContract({
         contractAddress: contract,
