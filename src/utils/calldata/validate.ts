@@ -262,7 +262,8 @@ const validateArray = (
     // fixedArray
     switch (true) {
       case Array.isArray(parameterArray):
-        parameter = parameterArray;
+        // the type cast is just for the documentation generation, TS narrowing works as expected
+        parameter = parameterArray as any;
         break;
       case typeof parameterArray === 'object':
         parameter = Object.values(parameterArray);
