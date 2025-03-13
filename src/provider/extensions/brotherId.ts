@@ -1,8 +1,9 @@
 import { BigNumberish } from '../../types';
 import { CallData } from '../../utils/calldata';
-import { decodeShortString, encodeShortString } from '../../utils/shortString';
+import { decodeShortString } from '../../utils/shortString';
 import type { ProviderInterface } from '..';
 import { StarknetChainId } from '../../global/constants';
+import { useEncoded, useDecoded } from '../../utils/starknetId';
 
 /**
  * Validates if a domain is a valid .brother domain
@@ -11,6 +12,43 @@ import { StarknetChainId } from '../../global/constants';
  */
 export function isBrotherDomain(domain: string): boolean {
   return domain.endsWith('.brother');
+}
+
+/**
+ * Encodes a Brother domain name into a bigint value.
+ * This uses the same encoding logic as Starknet ID.
+ * @param domain - The domain name without .brother suffix
+ * @returns encoded bigint value
+ * @example
+ * ```typescript
+ * const encoded = encodeBrotherDomain("myname.brother");
+ * // Returns a bigint value
+ * ```
+ */
+export function encodeBrotherDomain(domain: string): bigint {
+  const brotherName = domain.endsWith('.brother') ? domain.replace('.brother', '') : domain;
+  return useEncoded(brotherName);
+}
+
+/**
+ * Decodes a bigint value into a Brother domain name.
+ * This uses the same decoding logic as Starknet ID but returns a .brother domain.
+ * @param encoded - The encoded bigint value
+ * @returns The decoded domain name with .brother suffix
+ * @example
+ * ```typescript
+ * const domain = decodeBrotherDomain(1234567890n);
+ * // Returns "example.brother"
+ * ```
+ */
+export function decodeBrotherDomain(encoded: bigint): string {
+  const decoded = useDecoded([encoded]);
+  // Replace .stark with .brother
+  if (decoded.endsWith('.stark')) {
+    return decoded.replace('.stark', '.brother');
+  }
+  // If no suffix, add .brother
+  return decoded ? `${decoded}.brother` : decoded;
 }
 
 /**
@@ -44,7 +82,12 @@ export interface BrotherProfile {
 }
 
 /**
- * Class providing methods to interact with Brother Identity contracts
+ * Class providing methods to interact with Brother Identity contracts.
+ *
+ * This implementation uses the same domain encoding and decoding logic as StarknetId,
+ * allowing for consistent handling of domain names between the two systems.
+ * The encoding/decoding functions (encodeBrotherDomain/decodeBrotherDomain) are direct
+ * adaptations of StarknetId's useEncoded/useDecoded functions to work with .brother domains.
  */
 export class BrotherId {
   /**
@@ -159,7 +202,7 @@ export class BrotherId {
         contractAddress: contract,
         entrypoint: 'get_details_by_domain',
         calldata: CallData.compile({
-          domain: encodeShortString(brotherName.replace('.brother', '')),
+          domain: encodeBrotherDomain(brotherName),
         }),
       });
 
@@ -207,7 +250,7 @@ export class BrotherId {
         contractAddress: contract,
         entrypoint: 'get_details_by_domain',
         calldata: CallData.compile({
-          domain: encodeShortString(domain),
+          domain: encodeBrotherDomain(domain),
         }),
       });
 
