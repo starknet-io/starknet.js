@@ -295,3 +295,44 @@ const invocations: Invocations = [
 ];
 const responseSimulate = await executorAccount.simulateTransaction(invocations);
 ```
+
+## Utility Methods for Outside Execution (v6.24.0+)
+
+Starting from version 6.24.0, Starknet.js provides utility methods to simplify the simulation and fee estimation for outside execution transactions:
+
+### Simulate Outside Execution
+
+The `simulateOutsideExecution` utility method allows you to simulate an outside execution transaction without having to manually create the outside execution call:
+
+```typescript
+import { simulateOutsideExecution } from 'starknet';
+
+// Simulate the outside execution
+const simulationResult = await simulateOutsideExecution({
+  provider: myProvider,
+  outsideTransaction,
+  executorAddress: executorAccount.address,
+});
+
+console.log('Simulation result:', simulationResult);
+```
+
+### Estimate Fee for Outside Execution
+
+The `estimateFeeOutsideExecution` utility method allows you to estimate the fee for an outside execution transaction:
+
+```typescript
+import { estimateFeeOutsideExecution } from 'starknet';
+
+// Estimate the fee for the outside execution
+const feeEstimation = await estimateFeeOutsideExecution({
+  provider: myProvider,
+  outsideTransaction,
+  executorAddress: executorAccount.address,
+});
+
+console.log('Estimated fee:', feeEstimation.overall_fee);
+console.log('Suggested max fee:', feeEstimation.suggestedMaxFee);
+```
+
+These utility methods simplify the process of working with outside execution transactions by handling the creation of the outside execution call internally.
