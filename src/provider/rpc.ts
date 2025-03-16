@@ -120,7 +120,7 @@ export class RpcProvider implements ProviderInterface {
 
   /**
    * Pause the execution of the script until a specified block is created.
-   * @param {BlockIdentifier} blockIdentifier bloc number (BigNumberish) or 'pending' or 'latest'.
+   * @param {BlockIdentifier} blockIdentifier block number (BigNumberish) or 'pending' or 'latest'.
    * Use of 'latest" or of a block already created will generate no pause.
    * @param {number} [retryInterval] number of milliseconds between 2 requests to the node
    * @example
