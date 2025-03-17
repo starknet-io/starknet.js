@@ -46,6 +46,14 @@ export enum StarknetChainId {
   SN_SEPOLIA = '0x534e5f5345504f4c4941', // encodeShortString('SN_SEPOLIA')
 }
 
+export enum RosettaNetworkName {
+  MAIN = 'MAIN',
+}
+
+export enum RosettanetChainId {
+  MAIN = '0x52535453',
+}
+
 export enum TransactionHashPrefix {
   DECLARE = '0x6465636c617265', // encodeShortString('declare'),
   DEPLOY = '0x6465706c6f79', // encodeShortString('deploy'),
@@ -77,6 +85,10 @@ export const RPC_NODES = {
     `https://free-rpc.nethermind.io/sepolia-juno/${RPC_DEFAULT_VERSION}`,
   ],
 } as const;
+
+export const ROSETTANET_RPC_NODES = {
+  MAIN: ['https://alpha-deployment.rosettanet.io'],
+};
 
 export const OutsideExecutionCallerAny = '0x414e595f43414c4c4552'; // encodeShortString('ANY_CALLER')
 export const SNIP9_V1_INTERFACE_ID =
