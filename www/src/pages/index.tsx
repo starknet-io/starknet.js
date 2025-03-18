@@ -27,35 +27,16 @@ function HomepageHeader() {
 };
 
 function XFeed() {
-  const minXFeedWidth = 220;
-  const height = 500;
-  const xPadding = 40;
-
   return (
     <BrowserOnly>
       {() =>
-        <div
-          className={clsx('hero hero--primary', styles.heroBanner)}
-          style={{
-            height: height,
-            padding: 0,
-          }}
-        >
-          <div
-            style={{
-              width:"90%",
-              maxWidth: window.innerWidth < minXFeedWidth ? minXFeedWidth : Math.max(minXFeedWidth, window.innerWidth),
-              margin: "auto",
-              paddingLeft: window.innerWidth < (minXFeedWidth + 2 * xPadding) ? 0 : xPadding,
-              paddingRight: window.innerWidth < (minXFeedWidth + 2 * xPadding) ? 0 : xPadding,
-            }}
-          >
+        <div className={clsx('hero hero--primary', styles.heroBanner, styles.feedSection)}>
+          <div className={clsx(styles.feedContainer)}>
             <a
-              className="twitter-timeline"
-              data-width={window.innerWidth < minXFeedWidth ? minXFeedWidth : Math.max(minXFeedWidth, window.innerWidth)}
-              data-height={height}
+            className={clsx('twitter-timeline', styles.twitterTarget)}
+              data-width={600}
+              data-height={400}
               data-dnt="true"
-              data-theme="dark"
               href="https://twitter.com/starknetjs?ref_src=twsrc%5Etfw"
               text-align="center"
             >Tweets by Starknetjs</a>
