@@ -121,15 +121,6 @@ export function randomAddress(): string {
 }
 
 /**
- * Lowercase and hex prefix string
- *
- * @deprecated Not used internally, naming is confusing based on functionality
- */
-export function makeAddress(input: string): string {
-  return addHexPrefix(input).toLowerCase();
-}
-
-/**
  * Format Signature to standard type (hex array)
  * @param {Signature} [sig]
  * @returns {ArraySignatureType} Custom hex string array

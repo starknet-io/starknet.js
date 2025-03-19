@@ -24,9 +24,6 @@ import { isBigNumberish, isHex, toHex } from './num';
 import { encodeShortString } from './shortString';
 import { isBoolean, isString } from './typed';
 
-/** @deprecated prefer importing from 'types' over 'typedData' */
-export * from '../types/typedData';
-
 interface Context {
   parent?: string;
   key?: string;

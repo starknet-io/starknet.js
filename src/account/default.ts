@@ -9,7 +9,6 @@ import {
 import { Provider, ProviderInterface } from '../provider';
 import { Signer, SignerInterface } from '../signer';
 import {
-  Abi,
   AccountInvocations,
   AccountInvocationsFactoryDetails,
   AllowArray,
@@ -341,31 +340,20 @@ export class Account extends Provider implements AccountInterface {
 
   public async execute(
     transactions: AllowArray<Call>,
-    transactionsDetail?: UniversalDetails
-  ): Promise<InvokeFunctionResponse>;
-  public async execute(
-    transactions: AllowArray<Call>,
-    abis?: Abi[],
-    transactionsDetail?: UniversalDetails
-  ): Promise<InvokeFunctionResponse>;
-  public async execute(
-    transactions: AllowArray<Call>,
-    arg2?: Abi[] | UniversalDetails,
     transactionsDetail: UniversalDetails = {}
   ): Promise<InvokeFunctionResponse> {
-    const details = arg2 === undefined || Array.isArray(arg2) ? transactionsDetail : arg2;
     const calls = Array.isArray(transactions) ? transactions : [transactions];
-    const nonce = toBigInt(details.nonce ?? (await this.getNonce()));
+    const nonce = toBigInt(transactionsDetail.nonce ?? (await this.getNonce()));
     const version = toTransactionVersion(
       this.getPreferredVersion(ETransactionVersion.V1, ETransactionVersion.V3), // TODO: does this depend on cairo version ?
-      details.version
+      transactionsDetail.version
     );
 
     const estimate = await this.getUniversalSuggestedFee(
       version,
       { type: TransactionType.INVOKE, payload: transactions },
       {
-        ...details,
+        ...transactionsDetail,
         version,
       }
     );
@@ -373,7 +361,7 @@ export class Account extends Provider implements AccountInterface {
     const chainId = await this.getChainId();
 
     const signerDetails: InvocationsSignerDetails = {
-      ...v3Details(details, await this.channel.getSpecVersion()),
+      ...v3Details(transactionsDetail, await this.channel.getSpecVersion()),
       resourceBounds: estimate.resourceBounds,
       walletAddress: this.address,
       nonce,
@@ -390,7 +378,7 @@ export class Account extends Provider implements AccountInterface {
     return this.invokeFunction(
       { contractAddress: this.address, calldata, signature },
       {
-        ...v3Details(details, await this.channel.getSpecVersion()),
+        ...v3Details(transactionsDetail, await this.channel.getSpecVersion()),
         resourceBounds: estimate.resourceBounds,
         nonce,
         maxFee: estimate.maxFee,
@@ -470,7 +458,7 @@ export class Account extends Provider implements AccountInterface {
     details: UniversalDetails = {}
   ): Promise<MultiDeployContractResponse> {
     const { calls, addresses } = buildUDCCall(payload, this.address);
-    const invokeResponse = await this.execute(calls, undefined, details);
+    const invokeResponse = await this.execute(calls, details);
 
     return {
       ...invokeResponse,
@@ -572,42 +560,6 @@ export class Account extends Provider implements AccountInterface {
 
   public async hashMessage(typedData: TypedData): Promise<string> {
     return getMessageHash(typedData, this.address);
-  }
-
-  /**
-   * @deprecated To replace by `myRpcProvider.verifyMessageInStarknet()`
-   */
-  public async verifyMessageHash(
-    hash: BigNumberish,
-    signature: Signature,
-    signatureVerificationFunctionName?: string,
-    signatureVerificationResponse?: { okResponse: string[]; nokResponse: string[]; error: string[] }
-  ): Promise<boolean> {
-    return this.verifyMessageInStarknet(
-      hash,
-      signature,
-      this.address,
-      signatureVerificationFunctionName,
-      signatureVerificationResponse
-    );
-  }
-
-  /**
-   * @deprecated To replace by `myRpcProvider.verifyMessageInStarknet()`
-   */
-  public async verifyMessage(
-    typedData: TypedData,
-    signature: Signature,
-    signatureVerificationFunctionName?: string,
-    signatureVerificationResponse?: { okResponse: string[]; nokResponse: string[]; error: string[] }
-  ): Promise<boolean> {
-    return this.verifyMessageInStarknet(
-      typedData,
-      signature,
-      this.address,
-      signatureVerificationFunctionName,
-      signatureVerificationResponse
-    );
   }
 
   /**

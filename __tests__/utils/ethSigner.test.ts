@@ -286,7 +286,7 @@ describe('Ethereum signer', () => {
         cairo.uint256(1 * 10 ** 4),
       ]);
       const feeTransfer = await ethAccount.estimateInvokeFee(txCallData);
-      const respTransfer = await ethAccount.execute(txCallData, undefined, {
+      const respTransfer = await ethAccount.execute(txCallData, {
         resourceBounds: {
           l2_gas: { max_amount: '0x0', max_price_per_unit: '0x0' },
           l1_gas: {

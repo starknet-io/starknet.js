@@ -176,8 +176,8 @@ describe('Cairo v2.4 onwards', () => {
 
     test('Tuple ((u256,(u16,Order2)), u8)', async () => {
       type Order2 = {
-        p1: num.BigNumberish;
-        p2: num.BigNumberish[];
+        p1: BigNumberish;
+        p2: BigNumberish[];
       };
       const myOrder2: Order2 = { p1: 100, p2: [5, 6, 7] };
       const calldata9 = myCallData.compile('get_tuple9', {
